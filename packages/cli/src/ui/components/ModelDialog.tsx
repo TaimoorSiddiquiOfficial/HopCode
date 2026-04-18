@@ -150,7 +150,12 @@ export function ModelDialog({
 
     // Separate runtime models from registry models
     const runtimeModels = allModels.filter((m) => m.isRuntimeModel);
-    const registryModels = allModels.filter((m) => !m.isRuntimeModel);
+    // Exclude discontinued qwen-oauth registry models — they can't be selected
+    // and confuse users. Runtime qwen-oauth snapshots (from cached tokens) are
+    // still allowed so existing sessions keep working.
+    const registryModels = allModels.filter(
+      (m) => !m.isRuntimeModel && m.authType !== AuthType.QWEN_OAUTH,
+    );
 
     // Group registry models by authType
     const modelsByAuthTypeMap = new Map<AuthType, CoreAvailableModel[]>();
@@ -162,13 +167,13 @@ export function ModelDialog({
       modelsByAuthTypeMap.get(authType)!.push(model);
     }
 
-    // Fixed order: qwen-oauth first, then others in a stable order
+    // Stable order: active provider first, then others
     const authTypeOrder: AuthType[] = [
-      AuthType.QWEN_OAUTH,
       AuthType.USE_OPENAI,
       AuthType.USE_ANTHROPIC,
       AuthType.USE_GEMINI,
       AuthType.USE_VERTEX_AI,
+      AuthType.QWEN_OAUTH, // runtime-only fallback — kept for snapshot compat
     ];
 
     // Filter to only include authTypes that have registry models and maintain order
