@@ -62,7 +62,7 @@ jobs:
             # Convert comma-separated to JSON array
             PACKAGES_JSON=$(echo "${{ github.event.inputs.packages }}" | tr ',' '\n' | jq -R . | jq -s .)
           fi
-          echo "PACKAGES_JSON=${PACKAGES_JSON}" >> "$GITHUB_OUTPUT"
+          echo "packages_json=${PACKAGES_JSON}" >> "$GITHUB_OUTPUT"
           echo "Packages to publish: ${PACKAGES_JSON}"
 
   publish-packages:
