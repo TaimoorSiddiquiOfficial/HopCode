@@ -1,1 +1,14 @@
-{`n  `name`: `@hoptrendy/cli-export-html`,`n  `private`: true,`n  `type`: `module`,`n  `scripts`: {`n    `build`: `node build.mjs``n  },`n  `dependencies`: {`n    `@hoptrendy/webui`: `latest``n  },`n  `devDependencies`: {`n    `esbuild`: `0.25.0``n  }`n}`n
+﻿{
+  "name": "@hoptrendy/cli-export-html",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@hoptrendy/webui": "latest"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.0"
+  }
+}
