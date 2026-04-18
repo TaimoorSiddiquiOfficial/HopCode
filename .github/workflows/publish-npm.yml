@@ -84,14 +84,17 @@ jobs:
           scope: '@hoptrendy'
 
       - name: 'Install Dependencies'
+        shell: bash
         run: npm ci --no-audit --progress=false
 
       - name: 'Build Package'
         working-directory: '${{ matrix.package }}'
+        shell: bash
         run: npm run build || true
 
       - name: 'Publish ${{ matrix.package }}'
         working-directory: '${{ matrix.package }}'
+        shell: bash
         run: |
           if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
             echo "DRY RUN: Would publish ${{ matrix.package }}"
