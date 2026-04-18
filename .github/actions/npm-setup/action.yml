@@ -1,0 +1,35 @@
+name: 'NPM Setup'
+description: 'Checkout, setup Node.js 20, and run npm ci — shared setup for publish jobs.'
+
+inputs:
+  ref:
+    description: 'Git ref to checkout'
+    required: false
+    default: ''
+  registry-url:
+    description: 'NPM registry URL'
+    required: false
+    default: 'https://registry.npmjs.org'
+  scope:
+    description: 'NPM scope for the registry'
+    required: false
+    default: '@hoptrendy'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Checkout'
+      uses: 'actions/checkout@v4'
+      with:
+        ref: '${{ inputs.ref }}'
+
+    - name: 'Setup Node.js'
+      uses: 'actions/setup-node@v4'
+      with:
+        node-version: '20'
+        registry-url: '${{ inputs.registry-url }}'
+        scope: '${{ inputs.scope }}'
+
+    - name: 'Install Dependencies'
+      shell: bash
+      run: npm ci --no-audit --progress=false
