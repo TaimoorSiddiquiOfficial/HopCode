@@ -4,7 +4,7 @@
  */
 
 export class NamedError extends Error {
-  readonly name: string;
+  override readonly name: string;
   readonly metadata?: Record<string, any>;
 
   constructor(message: string, name?: string, metadata?: Record<string, any>) {

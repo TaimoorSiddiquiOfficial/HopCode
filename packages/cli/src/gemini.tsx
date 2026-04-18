@@ -424,7 +424,7 @@ export async function main() {
   }
 
   // We are now past the logic handling potentially launching a child process
-  // to run Qwen Code. It is now safe to perform expensive initialization that
+  // to run HopCode. It is now safe to perform expensive initialization that
   // may have side effects.
   profileCheckpoint('after_sandbox_check');
 
@@ -513,7 +513,7 @@ export async function main() {
         ...(config.getModelsConfig().getCurrentAuthType() ===
         AuthType.QWEN_OAUTH
           ? [
-              'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
+              'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
             ]
           : []),
       ]),

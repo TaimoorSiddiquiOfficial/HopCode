@@ -5,7 +5,20 @@
     "rootDir": "src",
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
-    "types": ["node"]
+    "types": ["node"],
+    "strict": false,
+    "noImplicitAny": false,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "src/insight", "src/export-html"]

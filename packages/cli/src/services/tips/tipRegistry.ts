@@ -98,7 +98,7 @@ export const tipRegistry: ContextualTip[] = [
   {
     id: 'shell-commands',
     content:
-      'You can run any shell commands from Qwen Code using ! (e.g. !ls).',
+      'You can run any shell commands from HopCode using ! (e.g. !ls).',
     trigger: 'startup',
     isRelevant: (ctx) => ctx.sessionCount < 15,
     cooldownPrompts: 0,

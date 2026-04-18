@@ -189,10 +189,10 @@ export function validateAuthMethod(
   }
 
   if (authMethod === AuthType.hopcode_OAUTH) {
-    // Qwen OAuth free tier was discontinued on 2026-04-15.
+    // HopCode OAuth free tier was discontinued on 2026-04-15.
     // Block new OAuth setups; existing cached tokens still work until server rejects them.
     return t(
-      'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
+      'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
     );
   }
 

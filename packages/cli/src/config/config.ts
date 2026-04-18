@@ -195,9 +195,9 @@ export async function parseArguments(): Promise<CliArgs> {
 
   const yargsInstance = yargs(rawArgv)
     .locale('en')
-    .scriptName('qwen')
+    .scriptName('hopcode')
     .usage(
-      'Usage: qwen [options] [command]\n\nQwen Code - Launch an interactive CLI, use -p/--prompt for non-interactive mode',
+      'Usage: hopcode [options] [command]\n\nHopCode - Launch an interactive CLI, use -p/--prompt for non-interactive mode',
     )
     .option('telemetry', {
       type: 'boolean',
@@ -262,7 +262,7 @@ export async function parseArguments(): Promise<CliArgs> {
     })
     .option('proxy', {
       type: 'string',
-      description: 'Proxy for Qwen Code, like schema://user:password@host:port',
+      description: 'Proxy for HopCode, like schema://user:password@host:port',
     })
     .deprecateOption(
       'proxy',
@@ -273,7 +273,7 @@ export async function parseArguments(): Promise<CliArgs> {
       description:
         'Enable chat recording to disk. If false, chat history is not saved and --continue/--resume will not work.',
     })
-    .command('$0 [query..]', 'Launch Qwen Code CLI', (yargsInstance: Argv) =>
+    .command('$0 [query..]', 'Launch HopCode CLI', (yargsInstance: Argv) =>
       yargsInstance
         .positional('query', {
           description:
@@ -1027,7 +1027,7 @@ export async function loadCliConfig(
       sessionId = argv.resume;
       sessionData = await sessionService.loadSession(argv.resume);
       if (!sessionData) {
-        const message = `No saved session found with ID ${argv.resume}. Run \`qwen --resume\` without an ID to choose from existing sessions.`;
+        const message = `No saved session found with ID ${argv.resume}. Run \`hopcode --resume\` without an ID to choose from existing sessions.`;
         writeStderrLine(message);
         process.exit(1);
       }

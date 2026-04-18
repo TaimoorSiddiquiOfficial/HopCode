@@ -352,7 +352,7 @@ export function ModelDialog({
       if (isQwenOAuthSelection && !isRuntimeOAuthSelection) {
         setErrorMessage(
           t(
-            'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
+            'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
           ),
         );
         return;

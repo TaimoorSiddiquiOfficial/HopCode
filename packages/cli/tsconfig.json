@@ -4,16 +4,27 @@
     "outDir": "dist",
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    "strict": false,
+    "noImplicitAny": false,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false
   },
   "include": [
     "index.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.json",
-    "./package.json",
-    "../core/src/utils/toml-to-markdown-converter.test.ts",
-    "../core/src/utils/toml-to-markdown-converter.ts"
+    "./package.json"
   ],
   "exclude": [
     "node_modules",

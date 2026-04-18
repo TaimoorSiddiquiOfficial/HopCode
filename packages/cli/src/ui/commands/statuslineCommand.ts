@@ -11,7 +11,7 @@ import { t } from '../../i18n/index.js';
 export const statuslineCommand: SlashCommand = {
   name: 'statusline',
   get description() {
-    return t("Set up Qwen Code's status line UI");
+    return t("Set up HopCode's status line UI");
   },
   kind: CommandKind.BUILT_IN,
   action: (_context, args): SubmitPromptActionReturn => {

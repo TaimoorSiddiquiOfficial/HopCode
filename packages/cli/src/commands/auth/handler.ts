@@ -140,13 +140,13 @@ export async function handleQwenAuth(
 }
 
 /**
- * Handles Qwen OAuth authentication
+ * Handles HopCode OAuth authentication
  */
 async function handleQwenOAuth(
   config: Config,
   settings: LoadedSettings,
 ): Promise<void> {
-  writeStdoutLine(t('Starting Qwen OAuth authentication...'));
+  writeStdoutLine(t('Starting HopCode OAuth authentication...'));
 
   try {
     await config.refreshAuth(AuthType.hopcode_OAUTH);
@@ -159,11 +159,11 @@ async function handleQwenOAuth(
       AuthType.hopcode_OAUTH,
     );
 
-    writeStdoutLine(t('Successfully authenticated with Qwen OAuth.'));
+    writeStdoutLine(t('Successfully authenticated with HopCode OAuth.'));
     process.exit(0);
   } catch (error) {
     writeStderrLine(
-      t('Failed to authenticate with Qwen OAuth: {{error}}', {
+      t('Failed to authenticate with HopCode OAuth: {{error}}', {
         error: getErrorMessage(error),
       }),
     );
@@ -381,7 +381,7 @@ export async function runInteractiveAuth() {
       },
       {
         value: 'qwen-oauth' as const,
-        label: t('Qwen OAuth'),
+        label: t('HopCode OAuth'),
         description: t('Discontinued — switch to Coding Plan or API Key'),
       },
     ],
@@ -390,11 +390,11 @@ export async function runInteractiveAuth() {
 
   let choice = await selector.select();
 
-  // If user selects discontinued Qwen OAuth, warn and re-prompt
+  // If user selects discontinued HopCode OAuth, warn and re-prompt
   while (choice === 'qwen-oauth') {
     writeStdoutLine(
       t(
-        '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
+        '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
       ),
     );
     choice = await selector.select();
@@ -423,27 +423,27 @@ export async function showAuthStatus(): Promise<void> {
       writeStdoutLine(t('Run one of the following commands to get started:\n'));
       writeStdoutLine(
         t(
-          '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (free tier)',
+          '  hopcode auth qwen-oauth     - Authenticate with HopCode OAuth (free tier)',
         ),
       );
       writeStdoutLine(
         t(
-          '  qwen auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n',
+          '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n',
         ),
       );
       writeStdoutLine(t('Or simply run:'));
       writeStdoutLine(
-        t('  qwen auth                - Interactive authentication setup\n'),
+        t('  hopcode auth                - Interactive authentication setup\n'),
       );
       process.exit(0);
     }
 
     // Display status based on auth type
     if (selectedType === AuthType.hopcode_OAUTH) {
-      writeStdoutLine(t('✓ Authentication Method: Qwen OAuth'));
+      writeStdoutLine(t('✓ Authentication Method: HopCode OAuth'));
       writeStdoutLine(t('  Type: Free tier (discontinued 2026-04-15)'));
       writeStdoutLine(t('  Limit: No longer available'));
-      writeStdoutLine(t('  Models: Qwen latest models'));
+      writeStdoutLine(t('  Models: HopCode latest models'));
       writeStdoutLine(
         t('\n  ⚠ Run /auth to switch to Coding Plan or another provider.\n'),
       );
@@ -495,7 +495,7 @@ export async function showAuthStatus(): Promise<void> {
         writeStdoutLine(
           t('  Issue: API key not found in environment or settings\n'),
         );
-        writeStdoutLine(t('  Run `qwen auth coding-plan` to re-configure.\n'));
+        writeStdoutLine(t('  Run `hopcode auth coding-plan` to re-configure.\n'));
       }
     } else {
       writeStdoutLine(

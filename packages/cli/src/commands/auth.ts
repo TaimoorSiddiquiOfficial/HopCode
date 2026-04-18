@@ -15,7 +15,7 @@ import { t } from '../i18n/index.js';
 // Define subcommands separately
 const qwenOauthCommand = {
   command: 'qwen-oauth',
-  describe: t('Authenticate using Qwen OAuth'),
+  describe: t('Authenticate using HopCode OAuth'),
   handler: async () => {
     await handleQwenAuth('qwen-oauth', {});
   },
@@ -61,7 +61,7 @@ const statusCommand = {
 export const authCommand: CommandModule = {
   command: 'auth',
   describe: t(
-    'Configure Qwen authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan',
+    'Configure HopCode authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan',
   ),
   builder: (yargs: Argv) =>
     yargs
