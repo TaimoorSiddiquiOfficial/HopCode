@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode-core",
-  "version": "0.14.6",
+  "version": "0.14.7",
   "description": "HopCode Core",
   "repository": {
     "type": "git",
@@ -94,7 +94,11 @@
     "undici": "^6.22.0",
     "uuid": "^9.0.1",
     "web-tree-sitter": "^0.24.7",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "fuzzysort": "^3.1.0",
+    "remeda": "^2.33.7",
+    "yaml": "^2.7.0",
+    "zod": "^3.25.0"
   },
   "optionalDependencies": {
     "@lydell/node-pty": "1.2.0-beta.10",
