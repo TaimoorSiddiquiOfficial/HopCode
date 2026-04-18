@@ -48,27 +48,30 @@ jobs:
           scope: '@hoptrendy'
 
       - name: 'Install Dependencies'
+        shell: bash
         run: npm ci --no-audit --progress=false
 
       - name: 'Determine packages to publish'
         id: 'packages'
+        shell: bash
         run: |
           if [[ "${{ github.event.inputs.packages }}" == "all" ]]; then
-            # Get all workspace packages
-            PACKAGES=$(npm query '.workspace' | jq -r '.[].name' | tr '\n' ',' | sed 's/,$//')
+            # Get all workspace packages as JSON array
+            PACKAGES_JSON=$(npm query '.workspace' | jq -c '[.[].name]')
           else
-            PACKAGES="${{ github.event.inputs.packages }}"
+            # Convert comma-separated to JSON array
+            PACKAGES_JSON=$(echo "${{ github.event.inputs.packages }}" | tr ',' '\n' | jq -R . | jq -s .)
           fi
-          echo "PACKAGES=${PACKAGES}" >> "$GITHUB_OUTPUT"
-          echo "Packages to publish: ${PACKAGES}"
+          echo "PACKAGES_JSON=${PACKAGES_JSON}" >> "$GITHUB_OUTPUT"
+          echo "Packages to publish: ${PACKAGES_JSON}"
 
   publish-packages:
-    name: 'Publish Package'
+    name: 'Publish ${{ matrix.package }}'
     runs-on: 'ubuntu-latest'
     needs: 'prepare'
     strategy:
       matrix:
-        package: ${{ fromJson(format('["{0}"]', join(needs.prepare.outputs.packages, '","'))) }}
+        package: ${{ fromJson(needs.prepare.outputs.packages_json) }}
       fail-fast: false
     steps:
       - name: 'Checkout'
