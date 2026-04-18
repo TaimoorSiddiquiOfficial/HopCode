@@ -46,7 +46,7 @@ import { t } from '../../i18n/index.js';
  * Replace this placeholder once the app is registered.
  */
 const HOPCODE_GITHUB_APP_CLIENT_ID =
-  process.env['HOPCODE_GITHUB_CLIENT_ID'] ?? 'REPLACE_WITH_CLIENT_ID';
+  process.env['HOPCODE_GITHUB_CLIENT_ID'] ?? 'Iv23livRiRBTa9cyBnk1';
 
 const GITHUB_DEVICE_CODE_URL = 'https://github.com/login/device/code';
 const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
@@ -109,7 +109,6 @@ async function pollForToken(
   deviceCode: string,
   intervalSecs: number,
 ): Promise<string> {
-   
   while (true) {
     await new Promise((r) => setTimeout(r, intervalSecs * 1000));
 
