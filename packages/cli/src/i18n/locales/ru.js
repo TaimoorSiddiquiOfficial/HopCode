@@ -217,7 +217,8 @@ export default {
   // Агенты - Мастер создания
   // ============================================================================
   'Project Level (.hopcode/agents/)': 'Уровень проекта (.hopcode/agents/)',
-  'User Level (~/.hopcode/agents/)': 'Уровень пользователя (~/.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)':
+    'Уровень пользователя (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ Подагент успешно создан!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Подагент "{{name}}" сохранен на уровне {{level}}.',
@@ -1347,11 +1348,14 @@ export default {
   'From project settings': 'Из настроек проекта',
   'From session': 'Из сессии',
   'Project settings (local)': 'Настройки проекта (локальные)',
-  'Saved in .hopcode/settings.local.json': 'Сохранено в .hopcode/settings.local.json',
+  'Saved in .hopcode/settings.local.json':
+    'Сохранено в .hopcode/settings.local.json',
   'Project settings': 'Настройки проекта',
-  'Checked in at .hopcode/settings.json': 'Зафиксировано в .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Зафиксировано в .hopcode/settings.json',
   'User settings': 'Пользовательские настройки',
-  'Saved in at ~/.hopcode/settings.json': 'Сохранено в ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Сохранено в ~/.hopcode/settings.json',
   'Add a new rule…': 'Добавить новое правило…',
   'Add {{type}} permission rule': 'Добавить правило разрешения {{type}}',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

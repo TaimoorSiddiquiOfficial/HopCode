@@ -220,18 +220,18 @@ Here are the most important commands for daily use:
 
 | Command               | What it does                                     | Example                       |
 | --------------------- | ------------------------------------------------ | ----------------------------- |
-| `qwen`                | start HopCode                                  | `qwen`                        |
+| `qwen`                | start HopCode                                    | `qwen`                        |
 | `/auth`               | Change authentication method (in session)        | `/auth`                       |
 | `qwen auth`           | Configure authentication from the terminal       | `qwen auth`                   |
 | `qwen auth status`    | Check current authentication status              | `qwen auth status`            |
 | `/help`               | Display help information for available commands  | `/help` or `/?`               |
 | `/compress`           | Replace chat history with summary to save Tokens | `/compress`                   |
 | `/clear`              | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |
-| `/theme`              | Change HopCode visual theme                    | `/theme`                      |
+| `/theme`              | Change HopCode visual theme                      | `/theme`                      |
 | `/language`           | View or change language settings                 | `/language`                   |
 | → `ui [language]`     | Set UI interface language                        | `/language ui zh-CN`          |
 | → `output [language]` | Set LLM output language                          | `/language output Chinese`    |
-| `/quit`               | Exit HopCode immediately                       | `/quit` or `/exit`            |
+| `/quit`               | Exit HopCode immediately                         | `/quit` or `/exit`            |
 
 See the [CLI reference](./features/commands) for a complete list of commands.
 

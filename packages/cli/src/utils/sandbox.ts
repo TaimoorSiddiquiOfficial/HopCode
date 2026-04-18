@@ -540,8 +540,7 @@ export async function start_sandbox(
 
   // name container after image, plus random suffix to avoid conflicts
   const imageName = parseImageName(image);
-  const isIntegrationTest =
-    process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
+  const isIntegrationTest = process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
   let containerName;
   if (isIntegrationTest) {
     containerName = `qwen-code-integration-test-${randomBytes(4).toString(
@@ -565,10 +564,7 @@ export async function start_sandbox(
 
   // copy HOPCODE_TEST_VAR for integration tests
   if (process.env['HOPCODE_TEST_VAR']) {
-    args.push(
-      '--env',
-      `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`,
-    );
+    args.push('--env', `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`);
   }
 
   // copy GEMINI_API_KEY(s)

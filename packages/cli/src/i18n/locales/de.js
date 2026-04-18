@@ -1424,9 +1424,11 @@ export default {
   'Saved in .hopcode/settings.local.json':
     'Gespeichert in .hopcode/settings.local.json',
   'Project settings': 'Projekteinstellungen',
-  'Checked in at .hopcode/settings.json': 'Eingecheckt in .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Eingecheckt in .hopcode/settings.json',
   'User settings': 'Benutzereinstellungen',
-  'Saved in at ~/.hopcode/settings.json': 'Gespeichert in ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Gespeichert in ~/.hopcode/settings.json',
   'Add a new rule…': 'Neue Regel hinzufügen…',
   'Add {{type}} permission rule': '{{type}}-Berechtigungsregel hinzufügen',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

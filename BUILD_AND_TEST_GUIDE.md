@@ -44,11 +44,13 @@ npm install
 ```
 
 **What this does:**
+
 - Installs all dependencies for root package
 - Installs dependencies for all 14 workspaces
 - Creates `node_modules/` directory
 
 **Expected output:**
+
 ```
 added XXX packages in XXs
 ```
@@ -62,6 +64,7 @@ npm run generate
 ```
 
 **What this does:**
+
 - Generates commit hash and build info
 - Creates version files for branding
 
@@ -74,6 +77,7 @@ npm run generate:settings-schema
 ```
 
 **What this does:**
+
 - Generates TypeScript types from settings
 - Updates `settingsSchema.ts` with HopCode branding
 
@@ -86,12 +90,14 @@ npm run build
 ```
 
 **What this builds:**
+
 - CLI package (`packages/cli/`)
 - Core package (`packages/core/`)
 - All channel packages
 - SDK packages
 
 **Expected output:**
+
 ```
 Building @hopcode/hopcode...
 Build complete! ✅
@@ -106,10 +112,12 @@ npm run build:vscode
 ```
 
 **What this does:**
+
 - Builds VS Code IDE companion
 - Creates `.vsix` package for marketplace
 
 **Requirements:**
+
 - Node.js 20+
 - VS Code extension tools
 
@@ -122,6 +130,7 @@ npm run build:sandbox
 ```
 
 **What this does:**
+
 - Builds Docker sandbox image
 - Prepares containerized execution environment
 
@@ -134,6 +143,7 @@ npm run build:all
 ```
 
 **What this does:**
+
 - Runs `npm run build`
 - Runs `npm run build:sandbox`
 - Runs `npm run build:vscode`
@@ -149,6 +159,7 @@ npm test
 ```
 
 **What this does:**
+
 - Runs unit tests across all workspaces
 - Runs in parallel for speed
 
@@ -338,6 +349,7 @@ npm ls --depth=0
 ### Issue 1: Build Fails with "Module not found"
 
 **Solution:**
+
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules
@@ -351,10 +363,12 @@ npm run build
 ### Issue 2: Tests Fail After Rebranding
 
 **Possible causes:**
+
 - Old cached test files
 - Missed rebranding references
 
 **Solution:**
+
 ```bash
 # Clear test cache
 npm run test -- --clearCache
@@ -368,6 +382,7 @@ npm test
 ### Issue 3: VS Code Build Fails
 
 **Solution:**
+
 ```bash
 # Install VS Code extension dependencies
 npm install -g @vscode/vsce
@@ -381,6 +396,7 @@ npm run build:vscode
 ### Issue 4: Docker Sandbox Build Fails
 
 **Solution:**
+
 ```bash
 # Ensure Docker is running
 docker --version
@@ -398,13 +414,13 @@ npm run build:sandbox
 
 ### Expected Build Times
 
-| Component | Time |
-|-----------|------|
-| Core build | 2-5 min |
-| VS Code extension | 1-2 min |
-| Sandbox image | 5-10 min |
-| All packages | 10-15 min |
-| Full test suite | 15-30 min |
+| Component         | Time      |
+| ----------------- | --------- |
+| Core build        | 2-5 min   |
+| VS Code extension | 1-2 min   |
+| Sandbox image     | 5-10 min  |
+| All packages      | 10-15 min |
+| Full test suite   | 15-30 min |
 
 ---
 
@@ -413,16 +429,19 @@ npm run build:sandbox
 ### After Successful Build
 
 1. **Verify branding in built files**
+
    ```bash
    findstr /S "HopCode" packages\cli\dist\*.js
    ```
 
 2. **Test CLI command**
+
    ```bash
    node packages\cli\dist\index.js --help
    ```
 
 3. **Check package sizes**
+
    ```bash
    dir /S packages\*\dist
    ```
@@ -438,16 +457,19 @@ npm run build:sandbox
 ### Before Publishing
 
 1. **Build everything**
+
    ```bash
    npm run build:all
    ```
 
 2. **Run full test suite**
+
    ```bash
    npm run test:ci
    ```
 
 3. **Verify all packages**
+
    ```bash
    npm ls --depth=0
    ```
@@ -479,7 +501,7 @@ npm run build:sandbox
 ### Branding Success ✅
 
 - [ ] All "Qwen Code" → "HopCode"
-- [ ] All "@qwen-code/*" → "@hopcode/*"
+- [ ] All "@qwen-code/_" → "@hopcode/_"
 - [ ] All "qwen" commands → "hopcode"
 - [ ] Visual assets updated
 
@@ -515,6 +537,7 @@ npm run build
 Your HopCode rebranding is complete and ready for building!
 
 **Next steps:**
+
 1. Run `npm install`
 2. Run `npm run build`
 3. Run `npm test`
@@ -525,4 +548,4 @@ Your HopCode rebranding is complete and ready for building!
 
 **Good luck! 🦋**
 
-*For questions, see REBRANDING_EXECUTION_COMPLETE.md*
+_For questions, see REBRANDING_EXECUTION_COMPLETE.md_

@@ -168,7 +168,7 @@ export function createFollowupController(
         suggestion_length: text.length,
       });
     } catch (e: unknown) {
-      // eslint-disable-next-line no-console
+       
       console.error('[followup] onOutcome callback threw:', e);
     }
 
@@ -180,7 +180,7 @@ export function createFollowupController(
           getOnAccept?.()?.(text);
         }
       } catch (error: unknown) {
-        // eslint-disable-next-line no-console
+         
         console.error('[followup] onAccept callback threw:', error);
       } finally {
         if (acceptTimeoutId) {
@@ -214,7 +214,7 @@ export function createFollowupController(
           suggestion_length: currentState.suggestion.length,
         });
       } catch (e: unknown) {
-        // eslint-disable-next-line no-console
+         
         console.error('[followup] onOutcome callback threw:', e);
       }
     }

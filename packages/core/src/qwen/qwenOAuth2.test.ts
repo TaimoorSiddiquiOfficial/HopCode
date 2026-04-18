@@ -274,7 +274,8 @@ describe('Type Guards', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       };
 
@@ -309,7 +310,8 @@ describe('QwenOAuth2Client', () => {
           device_code: 'test-device-code',
           user_code: 'TEST123',
           verification_uri: 'https://chat.hopcode.ai/device',
-          verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+          verification_uri_complete:
+            'https://chat.hopcode.ai/device?code=TEST123',
           expires_in: 1800,
         }),
       };
@@ -326,7 +328,8 @@ describe('QwenOAuth2Client', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       });
     });
@@ -1146,7 +1149,8 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 0.1, // Very short timeout for testing
       }),
     };
@@ -1195,7 +1199,8 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -1330,7 +1335,8 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -1379,7 +1385,8 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -1432,7 +1439,8 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -1501,7 +1509,8 @@ describe('Browser Launch and Error Handling', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -1554,7 +1563,8 @@ describe('Browser Launch and Error Handling', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -1664,7 +1674,11 @@ describe('Utility Functions', () => {
       const os = await import('os');
       const path = await import('path');
 
-      const expectedPath = path.join(os.homedir(), '.hopcode', 'oauth_creds.json');
+      const expectedPath = path.join(
+        os.homedir(),
+        '.hopcode',
+        'oauth_creds.json',
+      );
 
       // Since this is a private function, we test it indirectly through clearQwenCredentials
       const { promises: fs } = await import('node:fs');
@@ -1814,7 +1828,8 @@ describe('Enhanced Error Handling and Edge Cases', () => {
           device_code: 'test-device-code',
           user_code: 'TEST123',
           verification_uri: 'https://chat.hopcode.ai/device',
-          verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+          verification_uri_complete:
+            'https://chat.hopcode.ai/device?code=TEST123',
           expires_in: 1800,
         }),
       };
@@ -1844,7 +1859,8 @@ describe('Enhanced Error Handling and Edge Cases', () => {
           device_code: 'test-device-code',
           user_code: 'TEST123',
           verification_uri: 'https://chat.hopcode.ai/device',
-          verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+          verification_uri_complete:
+            'https://chat.hopcode.ai/device?code=TEST123',
           expires_in: 1800,
         }),
       };
@@ -1875,7 +1891,8 @@ describe('Enhanced Error Handling and Edge Cases', () => {
           device_code: 'test-device-code',
           user_code: 'TEST123',
           verification_uri: 'https://chat.hopcode.ai/device',
-          verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+          verification_uri_complete:
+            'https://chat.hopcode.ai/device?code=TEST123',
           expires_in: 1800,
         }),
       };
@@ -2149,7 +2166,8 @@ describe('SharedTokenManager Integration in QwenOAuth2Client', () => {
           device_code: 'test-device-code',
           user_code: 'TEST123',
           verification_uri: 'https://chat.hopcode.ai/device',
-          verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+          verification_uri_complete:
+            'https://chat.hopcode.ai/device?code=TEST123',
           expires_in: 1800,
         }),
       };
@@ -2194,7 +2212,8 @@ describe('Constants and Configuration', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -2220,7 +2239,8 @@ describe('Constants and Configuration', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };
@@ -2249,7 +2269,8 @@ describe('Constants and Configuration', () => {
         device_code: 'test-device-code',
         user_code: 'TEST123',
         verification_uri: 'https://chat.hopcode.ai/device',
-        verification_uri_complete: 'https://chat.hopcode.ai/device?code=TEST123',
+        verification_uri_complete:
+          'https://chat.hopcode.ai/device?code=TEST123',
         expires_in: 1800,
       }),
     };

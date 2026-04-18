@@ -198,10 +198,7 @@ describe('IDEServer', () => {
     await ideServer.start(mockContext);
     const replaceMock = mockContext.environmentVariableCollection.replace;
 
-    expect(replaceMock).toHaveBeenCalledWith(
-      'HOPCODE_IDE_WORKSPACE_PATH',
-      '',
-    );
+    expect(replaceMock).toHaveBeenCalledWith('HOPCODE_IDE_WORKSPACE_PATH', '');
 
     const port = getPortFromMock(replaceMock);
     const expectedLockFile = path.join(

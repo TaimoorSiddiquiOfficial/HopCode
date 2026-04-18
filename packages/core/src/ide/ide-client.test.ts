@@ -273,10 +273,14 @@ describe('IdeClient', () => {
       vi.mocked(fs.promises.readFile).mockImplementation(
         async (filePath: fs.PathLike | FileHandle) => {
           const file = String(filePath);
-          if (file === path.join('/home/test', '.hopcode', 'ide', '1111.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '1111.lock')
+          ) {
             return JSON.stringify(primaryConfig);
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '2222.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '2222.lock')
+          ) {
             return JSON.stringify(fallbackConfig);
           }
           throw new Error(`unexpected path: ${file}`);
@@ -545,7 +549,9 @@ describe('IdeClient', () => {
           if (file === path.join('/tmp', 'qwen-code-ide-server-12345.json')) {
             throw new Error('not found');
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')
+          ) {
             return JSON.stringify(liveConfig);
           }
           throw new Error(`unexpected path: ${file}`);
@@ -588,10 +594,14 @@ describe('IdeClient', () => {
           if (file === path.join('/tmp', 'qwen-code-ide-server-12345.json')) {
             throw new Error('not found');
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')
+          ) {
             return JSON.stringify({ port: '1000' });
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '2000.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '2000.lock')
+          ) {
             return JSON.stringify(latestConfig);
           }
           throw new Error(`unexpected path: ${file}`);
@@ -639,13 +649,17 @@ describe('IdeClient', () => {
           if (file === path.join('/tmp', 'qwen-code-ide-server-12345.json')) {
             throw new Error('not found');
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')
+          ) {
             return JSON.stringify({
               port: '1000',
               workspacePath: '/older/workspace',
             });
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '2000.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '2000.lock')
+          ) {
             return JSON.stringify(latestConfig);
           }
           throw new Error(`unexpected path: ${file}`);
@@ -688,13 +702,17 @@ describe('IdeClient', () => {
           if (file === path.join('/tmp', 'qwen-code-ide-server-12345.json')) {
             throw new Error('not found');
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '1000.lock')
+          ) {
             return JSON.stringify({
               port: '1000',
               workspacePath: '/another/workspace',
             });
           }
-          if (file === path.join('/home/test', '.hopcode', 'ide', '2000.lock')) {
+          if (
+            file === path.join('/home/test', '.hopcode', 'ide', '2000.lock')
+          ) {
             return JSON.stringify({
               port: '2000',
               workspacePath: '/yet/another/workspace',

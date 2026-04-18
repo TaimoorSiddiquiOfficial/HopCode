@@ -2,65 +2,65 @@ import {
   type LanguageModelV2CallOptions,
   type LanguageModelV2CallWarning,
   UnsupportedFunctionalityError,
-} from "@ai-sdk/provider"
-import { codeInterpreterArgsSchema } from "./tool/code-interpreter.js.js"
-import { fileSearchArgsSchema } from "./tool/file-search.js.js"
-import { webSearchArgsSchema } from "./tool/web-search.js.js"
-import { webSearchPreviewArgsSchema } from "./tool/web-search-preview.js.js"
-import { imageGenerationArgsSchema } from "./tool/image-generation.js.js"
-import type { OpenAIResponsesTool } from "./openai-responses-api-types.js.js"
+} from '@ai-sdk/provider';
+import { codeInterpreterArgsSchema } from './tool/code-interpreter.js.js';
+import { fileSearchArgsSchema } from './tool/file-search.js.js';
+import { webSearchArgsSchema } from './tool/web-search.js.js';
+import { webSearchPreviewArgsSchema } from './tool/web-search-preview.js.js';
+import { imageGenerationArgsSchema } from './tool/image-generation.js.js';
+import type { OpenAIResponsesTool } from './openai-responses-api-types.js.js';
 
 export function prepareResponsesTools({
   tools,
   toolChoice,
   strictJsonSchema,
 }: {
-  tools: LanguageModelV2CallOptions["tools"]
-  toolChoice?: LanguageModelV2CallOptions["toolChoice"]
-  strictJsonSchema: boolean
+  tools: LanguageModelV2CallOptions['tools'];
+  toolChoice?: LanguageModelV2CallOptions['toolChoice'];
+  strictJsonSchema: boolean;
 }): {
-  tools?: Array<OpenAIResponsesTool>
+  tools?: Array<OpenAIResponsesTool>;
   toolChoice?:
-    | "auto"
-    | "none"
-    | "required"
-    | { type: "file_search" }
-    | { type: "web_search_preview" }
-    | { type: "web_search" }
-    | { type: "function"; name: string }
-    | { type: "code_interpreter" }
-    | { type: "image_generation" }
-  toolWarnings: LanguageModelV2CallWarning[]
+    | 'auto'
+    | 'none'
+    | 'required'
+    | { type: 'file_search' }
+    | { type: 'web_search_preview' }
+    | { type: 'web_search' }
+    | { type: 'function'; name: string }
+    | { type: 'code_interpreter' }
+    | { type: 'image_generation' };
+  toolWarnings: LanguageModelV2CallWarning[];
 } {
   // when the tools array is empty, change it to undefined to prevent errors:
-  tools = tools?.length ? tools : undefined
+  tools = tools?.length ? tools : undefined;
 
-  const toolWarnings: LanguageModelV2CallWarning[] = []
+  const toolWarnings: LanguageModelV2CallWarning[] = [];
 
   if (tools == null) {
-    return { tools: undefined, toolChoice: undefined, toolWarnings }
+    return { tools: undefined, toolChoice: undefined, toolWarnings };
   }
 
-  const openaiTools: Array<OpenAIResponsesTool> = []
+  const openaiTools: Array<OpenAIResponsesTool> = [];
 
   for (const tool of tools) {
     switch (tool.type) {
-      case "function":
+      case 'function':
         openaiTools.push({
-          type: "function",
+          type: 'function',
           name: tool.name,
           description: tool.description,
           parameters: tool.inputSchema,
           strict: strictJsonSchema,
-        })
-        break
-      case "provider-defined": {
+        });
+        break;
+      case 'provider-defined': {
         switch (tool.id) {
-          case "openai.file_search": {
-            const args = fileSearchArgsSchema.parse(tool.args)
+          case 'openai.file_search': {
+            const args = fileSearchArgsSchema.parse(tool.args);
 
             openaiTools.push({
-              type: "file_search",
+              type: 'file_search',
               vector_store_ids: args.vectorStoreIds,
               max_num_results: args.maxNumResults,
               ranking_options: args.ranking
@@ -70,52 +70,55 @@ export function prepareResponsesTools({
                   }
                 : undefined,
               filters: args.filters,
-            })
+            });
 
-            break
+            break;
           }
-          case "openai.local_shell": {
+          case 'openai.local_shell': {
             openaiTools.push({
-              type: "local_shell",
-            })
-            break
+              type: 'local_shell',
+            });
+            break;
           }
-          case "openai.web_search_preview": {
-            const args = webSearchPreviewArgsSchema.parse(tool.args)
+          case 'openai.web_search_preview': {
+            const args = webSearchPreviewArgsSchema.parse(tool.args);
             openaiTools.push({
-              type: "web_search_preview",
+              type: 'web_search_preview',
               search_context_size: args.searchContextSize,
               user_location: args.userLocation,
-            })
-            break
+            });
+            break;
           }
-          case "openai.web_search": {
-            const args = webSearchArgsSchema.parse(tool.args)
+          case 'openai.web_search': {
+            const args = webSearchArgsSchema.parse(tool.args);
             openaiTools.push({
-              type: "web_search",
-              filters: args.filters != null ? { allowed_domains: args.filters.allowedDomains } : undefined,
+              type: 'web_search',
+              filters:
+                args.filters != null
+                  ? { allowed_domains: args.filters.allowedDomains }
+                  : undefined,
               search_context_size: args.searchContextSize,
               user_location: args.userLocation,
-            })
-            break
+            });
+            break;
           }
-          case "openai.code_interpreter": {
-            const args = codeInterpreterArgsSchema.parse(tool.args)
+          case 'openai.code_interpreter': {
+            const args = codeInterpreterArgsSchema.parse(tool.args);
             openaiTools.push({
-              type: "code_interpreter",
+              type: 'code_interpreter',
               container:
                 args.container == null
-                  ? { type: "auto", file_ids: undefined }
-                  : typeof args.container === "string"
+                  ? { type: 'auto', file_ids: undefined }
+                  : typeof args.container === 'string'
                     ? args.container
-                    : { type: "auto", file_ids: args.container.fileIds },
-            })
-            break
+                    : { type: 'auto', file_ids: args.container.fileIds },
+            });
+            break;
           }
-          case "openai.image_generation": {
-            const args = imageGenerationArgsSchema.parse(tool.args)
+          case 'openai.image_generation': {
+            const args = imageGenerationArgsSchema.parse(tool.args);
             openaiTools.push({
-              type: "image_generation",
+              type: 'image_generation',
               background: args.background,
               input_fidelity: args.inputFidelity,
               input_image_mask: args.inputImageMask
@@ -131,47 +134,47 @@ export function prepareResponsesTools({
               output_compression: args.outputCompression,
               output_format: args.outputFormat,
               size: args.size,
-            })
-            break
+            });
+            break;
           }
         }
-        break
+        break;
       }
       default:
-        toolWarnings.push({ type: "unsupported-tool", tool })
-        break
+        toolWarnings.push({ type: 'unsupported-tool', tool });
+        break;
     }
   }
 
   if (toolChoice == null) {
-    return { tools: openaiTools, toolChoice: undefined, toolWarnings }
+    return { tools: openaiTools, toolChoice: undefined, toolWarnings };
   }
 
-  const type = toolChoice.type
+  const type = toolChoice.type;
 
   switch (type) {
-    case "auto":
-    case "none":
-    case "required":
-      return { tools: openaiTools, toolChoice: type, toolWarnings }
-    case "tool":
+    case 'auto':
+    case 'none':
+    case 'required':
+      return { tools: openaiTools, toolChoice: type, toolWarnings };
+    case 'tool':
       return {
         tools: openaiTools,
         toolChoice:
-          toolChoice.toolName === "code_interpreter" ||
-          toolChoice.toolName === "file_search" ||
-          toolChoice.toolName === "image_generation" ||
-          toolChoice.toolName === "web_search_preview" ||
-          toolChoice.toolName === "web_search"
+          toolChoice.toolName === 'code_interpreter' ||
+          toolChoice.toolName === 'file_search' ||
+          toolChoice.toolName === 'image_generation' ||
+          toolChoice.toolName === 'web_search_preview' ||
+          toolChoice.toolName === 'web_search'
             ? { type: toolChoice.toolName }
-            : { type: "function", name: toolChoice.toolName },
+            : { type: 'function', name: toolChoice.toolName },
         toolWarnings,
-      }
+      };
     default: {
-      const _exhaustiveCheck: never = type
+      const _exhaustiveCheck: never = type;
       throw new UnsupportedFunctionalityError({
         functionality: `tool choice type: ${_exhaustiveCheck}`,
-      })
+      });
     }
   }
 }

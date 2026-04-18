@@ -1468,11 +1468,14 @@ export default {
   'From project settings': 'From project settings',
   'From session': 'From session',
   'Project settings (local)': 'Project settings (local)',
-  'Saved in .hopcode/settings.local.json': 'Saved in .hopcode/settings.local.json',
+  'Saved in .hopcode/settings.local.json':
+    'Saved in .hopcode/settings.local.json',
   'Project settings': 'Project settings',
-  'Checked in at .hopcode/settings.json': 'Checked in at .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Checked in at .hopcode/settings.json',
   'User settings': 'User settings',
-  'Saved in at ~/.hopcode/settings.json': 'Saved in at ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Saved in at ~/.hopcode/settings.json',
   'Add a new rule…': 'Add a new rule…',
   'Add {{type}} permission rule': 'Add {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

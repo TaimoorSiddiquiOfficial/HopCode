@@ -117,7 +117,12 @@ async function main() {
     const packageJson = JSON.parse(packageJsonContent);
 
     // Look for package-lock.json in the workspace root (two levels up from package)
-    const packageLockJsonPath = path.join(packagePath, '..', '..', 'package-lock.json');
+    const packageLockJsonPath = path.join(
+      packagePath,
+      '..',
+      '..',
+      'package-lock.json',
+    );
     const packageLockJsonContent = await fs.readFile(
       packageLockJsonPath,
       'utf-8',

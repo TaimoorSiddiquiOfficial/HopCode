@@ -68,6 +68,7 @@ To complete a full production build, these items need fixing:
 **Issue:** Repository URL still has old path
 
 **Fix:**
+
 ```json
 "repository": {
   "type": "git",
@@ -79,6 +80,7 @@ To complete a full production build, these items need fixing:
 ### 2. Fix All Repository URLs
 
 Search and replace in all package.json files:
+
 ```
 QwenLM/hopcode → TaimoorSiddiquiOfficial/HopCode
 ```
@@ -120,6 +122,7 @@ npm run build
 ### Issue: "Cannot find module"
 
 **Solution:**
+
 ```bash
 # Reinstall dependencies
 rm -rf node_modules package-lock.json
@@ -129,6 +132,7 @@ npm install --legacy-peer-deps
 ### Issue: "Prepare script failed"
 
 **Solution:**
+
 ```bash
 # Install without prepare scripts
 npm install --ignore-scripts
@@ -140,6 +144,7 @@ npm run prepare --workspace=packages/cli
 ### Issue: "Repository URL not found"
 
 **Solution:**
+
 ```bash
 # Find and replace all occurrences
 findstr /S /I "QwenLM" *.json packages\*\*.json

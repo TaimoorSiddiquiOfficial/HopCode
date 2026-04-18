@@ -1470,7 +1470,8 @@ export default {
   'Project settings': 'Paramètres du projet',
   'Checked in at .hopcode/settings.json': 'Validé dans .hopcode/settings.json',
   'User settings': 'Paramètres utilisateur',
-  'Saved in at ~/.hopcode/settings.json': 'Enregistré dans ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Enregistré dans ~/.hopcode/settings.json',
   'Add a new rule…': 'Ajouter une nouvelle règle…',
   'Add {{type}} permission rule': 'Ajouter une règle de permission {{type}}',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

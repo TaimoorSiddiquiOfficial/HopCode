@@ -60,11 +60,13 @@ chmod +x rebrand-to-hopcode.sh
 ### Option A: Run All Phases (Complete Rebranding)
 
 **Windows:**
+
 ```powershell
 .\rebrand-to-hopcode.ps1
 ```
 
 **macOS/Linux:**
+
 ```bash
 ./rebrand-to-hopcode.sh
 ```
@@ -74,6 +76,7 @@ chmod +x rebrand-to-hopcode.sh
 If you want more control, run phases individually:
 
 **Phase 1 - Core Identity:**
+
 ```bash
 # Windows
 .\rebrand-to-hopcode.ps1 -Phase 1
@@ -83,6 +86,7 @@ If you want more control, run phases individually:
 ```
 
 **Phase 2 - High Visibility:**
+
 ```bash
 # Windows
 .\rebrand-to-hopcode.ps1 -Phase 2
@@ -110,6 +114,7 @@ git status
 ```
 
 **Important:** Carefully review the changes, especially:
+
 - Package names in `package.json` files
 - Command names in documentation
 - Configuration directory paths
@@ -124,6 +129,7 @@ Some items require manual attention:
 ### 5.1 Update Model Names (Keep as-is)
 
 **DO NOT CHANGE** these actual Alibaba Cloud model names:
+
 - `qwen3.5-plus` ✓ Keep
 - `qwen3.6-plus` ✓ Keep
 
@@ -204,17 +210,18 @@ cd scripts/installation
    - Push new container images to registry
 
 3. **NPM Publishing:**
+
    ```bash
    # Reserve @hopcode scope
    npm login
-   
+
    # Publish packages (example)
    cd packages/core
    npm publish --access public
-   
+
    cd ../cli
    npm publish --access public
-   
+
    # Repeat for all packages
    ```
 
@@ -230,6 +237,7 @@ hopcode migrate
 ```
 
 This should:
+
 - Move `~/.qwen/` → `~/.hopcode/`
 - Update settings files
 - Create backup

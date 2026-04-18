@@ -25,6 +25,7 @@
 **Prerequisites:** Install ImageMagick from [imagemagick.org](https://imagemagick.org/)
 
 **Commands:**
+
 ```bash
 cd D:\HopCode\assets
 
@@ -50,6 +51,7 @@ magick -density 300 hopcode-logo-simplified.svg -define icon:auto-resize=256,128
 **Prerequisites:** Install Inkscape from [inkscape.org](https://inkscape.org/)
 
 **Steps:**
+
 1. Open `hopcode-logo-simplified.svg` in Inkscape
 2. File → Export (or Shift+Ctrl+E)
 3. Set export area to "Page"
@@ -62,15 +64,15 @@ magick -density 300 hopcode-logo-simplified.svg -define icon:auto-resize=256,128
 
 ## 📦 Required Favicon Sizes
 
-| Size | Use Case | File Name |
-|------|----------|-----------|
-| **16×16 px** | Browser tabs | `favicon-16.png` |
-| **32×32 px** | Taskbar, bookmarks | `favicon-32.png` |
-| **48×48 px** | Mobile browsers | `favicon-48.png` |
-| **64×64 px** | High DPI displays | `favicon-64.png` |
-| **128×128 px** | Chrome Web Store | `favicon-128.png` |
-| **256×256 px** | App icons, splash | `favicon-256.png` |
-| **ICO format** | Windows legacy | `favicon.ico` |
+| Size           | Use Case           | File Name         |
+| -------------- | ------------------ | ----------------- |
+| **16×16 px**   | Browser tabs       | `favicon-16.png`  |
+| **32×32 px**   | Taskbar, bookmarks | `favicon-32.png`  |
+| **48×48 px**   | Mobile browsers    | `favicon-48.png`  |
+| **64×64 px**   | High DPI displays  | `favicon-64.png`  |
+| **128×128 px** | Chrome Web Store   | `favicon-128.png` |
+| **256×256 px** | App icons, splash  | `favicon-256.png` |
+| **ICO format** | Windows legacy     | `favicon.ico`     |
 
 ---
 
@@ -80,28 +82,38 @@ Add this to your HTML `<head>` section:
 
 ```html
 <!-- Standard favicon -->
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
 <!-- PNG favicons for modern browsers -->
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
-<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
 
 <!-- Apple Touch Icon (iOS) -->
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
 <!-- Android Chrome Icons -->
-<link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+<link
+  rel="icon"
+  type="image/png"
+  sizes="192x192"
+  href="/android-chrome-192x192.png"
+/>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="512x512"
+  href="/android-chrome-512x512.png"
+/>
 
 <!-- Safari Pinned Tab -->
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#7C3AED">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#7C3AED" />
 
 <!-- MS Application Tile -->
-<meta name="msapplication-TileColor" content="#7C3AED">
-<meta name="msapplication-TileImage" content="/mstile-144x144.png">
-<meta name="theme-color" content="#7C3AED">
+<meta name="msapplication-TileColor" content="#7C3AED" />
+<meta name="msapplication-TileImage" content="/mstile-144x144.png" />
+<meta name="theme-color" content="#7C3AED" />
 ```
 
 ---
@@ -113,11 +125,13 @@ Add this to your HTML `<head>` section:
 **File:** `packages/vscode-ide-companion/assets/icon.png`
 
 **Required Sizes:**
+
 - 128×128 px (extension marketplace)
 - 256×256 px (VS Code UI)
 - 512×512 px (high resolution)
 
 **Export Command:**
+
 ```bash
 magick -density 300 hopcode-logo-simplified.svg -resize 256x256 packages/vscode-ide-companion/assets/icon.png
 ```
@@ -129,6 +143,7 @@ magick -density 300 hopcode-logo-simplified.svg -resize 256x256 packages/vscode-
 **File:** `packages/zed-extension/hopcode.svg`
 
 **Action:** Copy the SVG directly
+
 ```bash
 copy hopcode-logo-concept1.svg packages/zed-extension/hopcode.svg
 ```
@@ -140,6 +155,7 @@ copy hopcode-logo-concept1.svg packages/zed-extension/hopcode.svg
 **File:** `packages/web-templates/src/export-html/src/favicon.svg`
 
 **Action:** Copy simplified version
+
 ```bash
 copy hopcode-logo-simplified.svg packages/web-templates/src/export-html/src/favicon.svg
 ```
@@ -151,15 +167,18 @@ copy hopcode-logo-simplified.svg packages/web-templates/src/export-html/src/favi
 ### Ensure Color Accuracy
 
 **sRGB Color Space:**
+
 - Use sRGB color profile for web exports
 - Ensures consistent colors across browsers
 
 **In ImageMagick:**
+
 ```bash
 magick -density 300 hopcode-logo-simplified.svg -colorspace sRGB -resize 256x256 favicon-256.png
 ```
 
 **In Inkscape:**
+
 - File → Document Properties
 - Set Color Profile to sRGB IEC61966-2.1
 
@@ -185,6 +204,7 @@ Before deploying favicons:
 ### Browser Testing
 
 Test your favicon in:
+
 - **Chrome:** Check tab, bookmarks bar, history
 - **Firefox:** Check tab, library, address bar suggestions
 - **Safari:** Check tab, bookmarks, favorites
@@ -193,6 +213,7 @@ Test your favicon in:
 ### Device Testing
 
 Test on:
+
 - **Desktop:** Windows, macOS, Linux
 - **Mobile:** iOS Safari, Android Chrome
 - **Tablets:** iPad, Android tablets
@@ -267,6 +288,7 @@ copy hopcode-logo-simplified.svg assets/favicons/safari-pinned-tab.svg
 ### Issue: Favicon not showing in browser
 
 **Solution:**
+
 1. Clear browser cache (Ctrl+Shift+Delete)
 2. Hard refresh (Ctrl+F5)
 3. Check file path in HTML
@@ -275,6 +297,7 @@ copy hopcode-logo-simplified.svg assets/favicons/safari-pinned-tab.svg
 ### Issue: Favicon looks pixelated
 
 **Solution:**
+
 1. Export at higher resolution (300 DPI)
 2. Use SVG format where supported
 3. Ensure source is vector (SVG), not raster (PNG)
@@ -282,6 +305,7 @@ copy hopcode-logo-simplified.svg assets/favicons/safari-pinned-tab.svg
 ### Issue: Colors look wrong
 
 **Solution:**
+
 1. Convert to sRGB color space
 2. Check browser color management settings
 3. Verify PNG export settings
@@ -290,4 +314,4 @@ copy hopcode-logo-simplified.svg assets/favicons/safari-pinned-tab.svg
 
 **Ready to export! 🎨**
 
-*For questions, see ASSET_INVENTORY.md*
+_For questions, see ASSET_INVENTORY.md_

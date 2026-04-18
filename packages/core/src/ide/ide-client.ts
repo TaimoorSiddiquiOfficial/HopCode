@@ -574,10 +574,7 @@ export class IdeClient {
           );
         }
       } catch (e) {
-        debugLogger.error(
-          'Failed to parse HOPCODE_IDE_SERVER_STDIO_ARGS:',
-          e,
-        );
+        debugLogger.error('Failed to parse HOPCODE_IDE_SERVER_STDIO_ARGS:', e);
       }
     }
 

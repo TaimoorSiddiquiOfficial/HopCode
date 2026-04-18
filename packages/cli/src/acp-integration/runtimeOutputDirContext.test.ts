@@ -26,7 +26,9 @@ describe('runWithAcpRuntimeOutputDir', () => {
     } as LoadedSettings;
 
     await runWithAcpRuntimeOutputDir(settings, cwd, async () => {
-      expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.hopcode-runtime'));
+      expect(Storage.getRuntimeBaseDir()).toBe(
+        path.join(cwd, '.hopcode-runtime'),
+      );
     });
 
     expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalQwenDir());

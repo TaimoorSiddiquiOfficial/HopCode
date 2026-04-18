@@ -37,7 +37,8 @@ const mockQwenOAuth2Events = vi.mocked(qwenOAuth2Events);
 describe('useQwenAuth', () => {
   const mockDeviceAuth: DeviceAuthorizationData = {
     verification_uri: 'https://oauth.hopcode.com/device',
-    verification_uri_complete: 'https://oauth.hopcode.com/device?user_code=ABC123',
+    verification_uri_complete:
+      'https://oauth.hopcode.com/device?user_code=ABC123',
     user_code: 'ABC123',
     expires_in: 1800,
     device_code: 'device_code_123',
@@ -100,7 +101,9 @@ describe('useQwenAuth', () => {
       return mockQwenOAuth2Events;
     });
 
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     act(() => {
       handleDeviceAuth!(mockDeviceAuth);
@@ -123,7 +126,9 @@ describe('useQwenAuth', () => {
       return mockQwenOAuth2Events;
     });
 
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     act(() => {
       handleAuthProgress!('success', 'Authentication successful!');
@@ -148,7 +153,9 @@ describe('useQwenAuth', () => {
       return mockQwenOAuth2Events;
     });
 
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     act(() => {
       handleAuthProgress!('error', 'Authentication failed');
@@ -173,7 +180,9 @@ describe('useQwenAuth', () => {
       return mockQwenOAuth2Events;
     });
 
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     act(() => {
       handleAuthProgress!('polling', 'Waiting for user authorization...');
@@ -198,7 +207,9 @@ describe('useQwenAuth', () => {
       return mockQwenOAuth2Events;
     });
 
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     act(() => {
       handleAuthProgress!(
@@ -226,7 +237,9 @@ describe('useQwenAuth', () => {
       return mockQwenOAuth2Events;
     });
 
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     act(() => {
       handleAuthProgress!('success');
@@ -377,7 +390,9 @@ describe('useQwenAuth', () => {
       return mockQwenOAuth2Events;
     });
 
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     // Set up some state
     act(() => {
@@ -417,7 +432,9 @@ describe('useQwenAuth', () => {
   });
 
   it('should initialize with idle status when starting authentication with Qwen auth', () => {
-    const { result } = renderHook(() => useQwenAuth(AuthType.hopcode_OAUTH, true));
+    const { result } = renderHook(() =>
+      useQwenAuth(AuthType.hopcode_OAUTH, true),
+    );
 
     expect(result.current.hopcodeAuthState.authStatus).toBe('idle');
     expect(mockQwenOAuth2Events.on).toHaveBeenCalled();

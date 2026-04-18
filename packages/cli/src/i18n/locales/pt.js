@@ -1427,9 +1427,11 @@ export default {
   'From project settings': 'Das configurações do projeto',
   'From session': 'Da sessão',
   'Project settings (local)': 'Configurações do projeto (local)',
-  'Saved in .hopcode/settings.local.json': 'Salvo em .hopcode/settings.local.json',
+  'Saved in .hopcode/settings.local.json':
+    'Salvo em .hopcode/settings.local.json',
   'Project settings': 'Configurações do projeto',
-  'Checked in at .hopcode/settings.json': 'Registrado em .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Registrado em .hopcode/settings.json',
   'User settings': 'Configurações do usuário',
   'Saved in at ~/.hopcode/settings.json': 'Salvo em ~/.hopcode/settings.json',
   'Add a new rule…': 'Adicionar nova regra…',

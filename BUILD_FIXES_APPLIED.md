@@ -10,6 +10,7 @@
 ### 1. Repository URLs Fixed
 
 **Files Updated:**
+
 - ✅ `packages/cli/package.json`
 - ✅ `packages/core/package.json`
 - ✅ `packages/vscode-ide-companion/package.json`
@@ -17,6 +18,7 @@
 - ✅ `packages/sdk-typescript/package.json`
 
 **Changes:**
+
 ```json
 // Before
 "repository": {
@@ -34,12 +36,14 @@
 ### 2. Package Names Fixed
 
 **Updated Package Names:**
+
 - ✅ `@hopcode/hopcode-cli` (was `@hopcode/qwen-code`)
 - ✅ `@hopcode/hopcode-core` (was `@hopcode/qwen-code-core`)
 - ✅ `hopcode-vscode-ide-companion` (publisher: `hopcode`)
 - ✅ `@hopcode/sdk` (description updated)
 
 **Bin Commands:**
+
 - ✅ `hopcode` (was `qwen`)
 
 ---
@@ -47,6 +51,7 @@
 ### 3. SDK Package Updates
 
 **`packages/sdk-typescript/package.json`:**
+
 - ✅ Description: "HopCode CLI" (was "qwen-code CLI")
 - ✅ Keywords: `hopcode`, `hopcode-code` (was `qwen`, `qwen-code`)
 - ✅ Author: "HopCode Team" (was "Qwen Team")
@@ -58,6 +63,7 @@
 ### 4. VS Code Companion Fixes
 
 **`packages/vscode-ide-companion/package.json`:**
+
 - ✅ Repository URL updated
 - ✅ Prepare script disabled (temporarily)
 - ✅ generate-notices.js path fixed
@@ -67,6 +73,7 @@
 ### 5. Root Package.json
 
 **`package.json`:**
+
 - ✅ Bin command: `hopcode` (was `qwen`)
 - ✅ Prepare script simplified to just `husky`
 
@@ -82,6 +89,7 @@
 The authentication type `QWEN_OAUTH` refers to the actual Alibaba Cloud Qwen OAuth system and **should NOT be changed**. This is a real API service name.
 
 **Files Affected:**
+
 - `packages/core/src/config/config.test.ts` (14 errors)
 - `packages/core/src/config/config.ts` (1 error)
 - `packages/core/src/core/contentGenerator.test.ts` (3 errors)
@@ -103,6 +111,7 @@ These should remain as `AuthType.QWEN_OAUTH` because they refer to the actual Al
 
 **To Fix:**
 Run a find-and-replace in the core package:
+
 ```
 AuthType.hopcode_OAUTH → AuthType.QWEN_OAUTH
 ```
@@ -114,11 +123,13 @@ AuthType.hopcode_OAUTH → AuthType.QWEN_OAUTH
 **Issue:** Properties renamed from `qwenClient` to `hopcodeClient` in error
 
 **Files:**
+
 - `packages/core/src/qwen/qwenContentGenerator.ts`
 - `packages/core/src/services/fileDiscoveryService.ts`
 
 **Solution:**
 These internal service names that refer to actual Qwen API clients should remain unchanged:
+
 - `qwenClient` → Keep as is (refers to Qwen API client)
 - `qwenIgnoreFilter` → Keep as is (refers to Qwen ignore file format)
 
@@ -165,20 +176,24 @@ findstr /S /I "AuthType.hopcode_OAUTH" *.ts */*.ts
 ### Step 2: Fix Service Property Names
 
 In `packages/core/src/qwen/qwenContentGenerator.ts`:
+
 - Change `hopcodeClient` back to `qwenClient`
 - Change all references accordingly
 
 In `packages/core/src/services/fileDiscoveryService.ts`:
+
 - Change `hopcodeIgnoreFilter` back to `qwenIgnoreFilter`
 
 ### Step 3: Re-enable Build Scripts
 
 In `packages/vscode-ide-companion/package.json`:
+
 ```json
 "prepare": "npm run generate:notices"
 ```
 
 In root `package.json`:
+
 ```json
 "prepare": "husky && npm run build && npm run bundle"
 ```
@@ -220,7 +235,7 @@ npm run build
 **Files Fixed:** 7 package.json files  
 **URLs Updated:** 7 repository URLs  
 **Package Names:** 3 main packages  
-**Build Status:** ⚠️ Needs TypeScript fixes  
+**Build Status:** ⚠️ Needs TypeScript fixes
 
 **Estimated Time to Complete:** 30-60 minutes
 

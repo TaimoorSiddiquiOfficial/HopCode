@@ -269,7 +269,10 @@ describe('RipGrepTool', () => {
     });
 
     it('should include .hopcodeignore matches when disabled in config', async () => {
-      await fs.writeFile(path.join(tempRootDir, '.hopcodeignore'), 'kept.txt\n');
+      await fs.writeFile(
+        path.join(tempRootDir, '.hopcodeignore'),
+        'kept.txt\n',
+      );
       await fs.writeFile(path.join(tempRootDir, 'kept.txt'), 'keep me');
       Object.assign(mockConfig, {
         getFileFilteringOptions: () => ({
@@ -510,7 +513,10 @@ describe('RipGrepTool', () => {
       const secondDir = await fs.mkdtemp(
         path.join(os.tmpdir(), 'grep-tool-second-'),
       );
-      await fs.writeFile(path.join(secondDir, '.hopcodeignore'), 'ignored.txt\n');
+      await fs.writeFile(
+        path.join(secondDir, '.hopcodeignore'),
+        'ignored.txt\n',
+      );
       await fs.writeFile(
         path.join(tempRootDir, '.hopcodeignore'),
         'other-ignored.txt\n',
@@ -539,7 +545,9 @@ describe('RipGrepTool', () => {
       const ignoreFileArgs = rgArgs.filter(
         (a: string, i: number) => i > 0 && rgArgs[i - 1] === '--ignore-file',
       );
-      expect(ignoreFileArgs).toContain(path.join(tempRootDir, '.hopcodeignore'));
+      expect(ignoreFileArgs).toContain(
+        path.join(tempRootDir, '.hopcodeignore'),
+      );
       expect(ignoreFileArgs).toContain(path.join(secondDir, '.hopcodeignore'));
 
       await fs.rm(secondDir, { recursive: true, force: true });

@@ -9,14 +9,14 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { Storage } from './storage.js';
 
-describe('Storage – getGlobalSettingsPath', () => {
+describe('Storage ï¿½ getGlobalSettingsPath', () => {
   it('returns path to ~/.hopcode/settings.json', () => {
     const expected = path.join(os.homedir(), '.hopcode', 'settings.json');
     expect(Storage.getGlobalSettingsPath()).toBe(expected);
   });
 });
 
-describe('Storage – additional helpers', () => {
+describe('Storage ï¿½ additional helpers', () => {
   const projectRoot = '/tmp/project';
   const storage = new Storage(projectRoot);
 
@@ -36,12 +36,16 @@ describe('Storage – additional helpers', () => {
   });
 
   it('getMcpOAuthTokensPath returns ~/.hopcode/mcp-oauth-tokens.json', () => {
-    const expected = path.join(os.homedir(), '.hopcode', 'mcp-oauth-tokens.json');
+    const expected = path.join(
+      os.homedir(),
+      '.hopcode',
+      'mcp-oauth-tokens.json',
+    );
     expect(Storage.getMcpOAuthTokensPath()).toBe(expected);
   });
 });
 
-describe('Storage – getRuntimeBaseDir / setRuntimeBaseDir', () => {
+describe('Storage ï¿½ getRuntimeBaseDir / setRuntimeBaseDir', () => {
   const originalEnv = process.env['QWEN_RUNTIME_DIR'];
 
   beforeEach(() => {
@@ -157,7 +161,7 @@ describe('Storage – getRuntimeBaseDir / setRuntimeBaseDir', () => {
   });
 });
 
-describe('Storage – runtime path methods use getRuntimeBaseDir', () => {
+describe('Storage ï¿½ runtime path methods use getRuntimeBaseDir', () => {
   const originalEnv = process.env['QWEN_RUNTIME_DIR'];
 
   beforeEach(() => {
@@ -240,7 +244,7 @@ describe('Storage – runtime path methods use getRuntimeBaseDir', () => {
   });
 });
 
-describe('Storage – config paths remain at ~/.hopcode regardless of runtime dir', () => {
+describe('Storage ï¿½ config paths remain at ~/.hopcode regardless of runtime dir', () => {
   const originalEnv = process.env['QWEN_RUNTIME_DIR'];
   const globalQwenDir = Storage.getGlobalQwenDir();
 
@@ -313,7 +317,7 @@ describe('Storage – config paths remain at ~/.hopcode regardless of runtime dir'
   });
 });
 
-describe('Storage – runtime base dir async context isolation', () => {
+describe('Storage ï¿½ runtime base dir async context isolation', () => {
   const originalEnv = process.env['QWEN_RUNTIME_DIR'];
 
   beforeEach(() => {

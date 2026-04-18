@@ -626,7 +626,9 @@ Skill 3 content`);
       const baseDirs = manager.getSkillsBaseDirs('project');
 
       expect(baseDirs).toHaveLength(2);
-      expect(baseDirs).toContain(path.join('/test/project', '.hopcode', 'skills'));
+      expect(baseDirs).toContain(
+        path.join('/test/project', '.hopcode', 'skills'),
+      );
       expect(baseDirs).toContain(
         path.join('/test/project', '.agents', 'skills'),
       );

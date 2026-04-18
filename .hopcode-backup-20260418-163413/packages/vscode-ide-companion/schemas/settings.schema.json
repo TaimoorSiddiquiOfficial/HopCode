@@ -74,16 +74,7 @@
         },
         "language": {
           "description": "The language for the user interface. Use \"auto\" to detect from system settings. You can also use custom language codes (e.g., \"es\", \"fr\") by placing JS language files in ~/.qwen/locales/ (e.g., ~/.qwen/locales/es.js). Options: auto, en, zh, ru, de, ja, pt, fr",
-          "enum": [
-            "auto",
-            "en",
-            "zh",
-            "ru",
-            "de",
-            "ja",
-            "pt",
-            "fr"
-          ],
+          "enum": ["auto", "en", "zh", "ru", "de", "ja", "pt", "fr"],
           "default": "auto"
         },
         "outputLanguage": {
@@ -103,10 +94,7 @@
         },
         "defaultFileEncoding": {
           "description": "Default encoding for new files. Use \"utf-8\" (default) for UTF-8 without BOM, or \"utf-8-bom\" for UTF-8 with BOM. Only change this if your project specifically requires BOM. Options: utf-8, utf-8-bom",
-          "enum": [
-            "utf-8",
-            "utf-8-bom"
-          ],
+          "enum": ["utf-8", "utf-8-bom"],
           "default": "utf-8"
         }
       }
@@ -117,10 +105,7 @@
       "properties": {
         "format": {
           "description": "The format of the CLI output. Options: text, json",
-          "enum": [
-            "text",
-            "json"
-          ],
+          "enum": ["text", "json"],
           "default": "text"
         }
       }
@@ -344,10 +329,7 @@
             },
             "schemaCompliance": {
               "description": "The compliance mode for tool schemas sent to the model. Use \"openapi_30\" for strict OpenAPI 3.0 compatibility (e.g., for Gemini). Options: auto, openapi_30",
-              "enum": [
-                "auto",
-                "openapi_30"
-              ],
+              "enum": ["auto", "openapi_30"],
               "default": "auto"
             },
             "contextWindowSize": {
@@ -532,12 +514,7 @@
         },
         "approvalMode": {
           "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, yolo",
-          "enum": [
-            "plan",
-            "default",
-            "auto-edit",
-            "yolo"
-          ],
+          "enum": ["plan", "default", "auto-edit", "yolo"],
           "default": "default"
         },
         "autoAccept": {
@@ -669,10 +646,7 @@
           "items": {
             "type": "string"
           },
-          "default": [
-            "DEBUG",
-            "DEBUG_MODE"
-          ]
+          "default": ["DEBUG", "DEBUG_MODE"]
         },
         "bugCommand": {
           "description": "Configuration for the bug report command.",
@@ -700,9 +674,7 @@
       "properties": {
         "displayMode": {
           "description": "Display mode for multi-agent sessions. Currently only \"in-process\" is supported. Options: in-process",
-          "enum": [
-            "in-process"
-          ]
+          "enum": ["in-process"]
         },
         "arena": {
           "description": "Settings for Arena (multi-model competitive execution).",
@@ -773,10 +745,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -834,21 +803,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "Stop": {
@@ -876,10 +838,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -937,21 +896,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "Notification": {
@@ -979,10 +931,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1040,21 +989,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "PreToolUse": {
@@ -1082,10 +1024,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1143,21 +1082,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "PostToolUse": {
@@ -1185,10 +1117,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1246,21 +1175,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "PostToolUseFailure": {
@@ -1288,10 +1210,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1349,21 +1268,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "SessionStart": {
@@ -1391,10 +1303,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1452,21 +1361,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "SessionEnd": {
@@ -1494,10 +1396,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1555,21 +1454,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "PreCompact": {
@@ -1597,10 +1489,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1658,21 +1547,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "SubagentStart": {
@@ -1700,10 +1582,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1761,21 +1640,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "SubagentStop": {
@@ -1803,10 +1675,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1864,21 +1733,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         },
         "PermissionRequest": {
@@ -1906,10 +1768,7 @@
                     "type": {
                       "description": "The type of hook. Note: \"function\" type is only available via SDK registration, not settings.json.",
                       "type": "string",
-                      "enum": [
-                        "command",
-                        "http"
-                      ]
+                      "enum": ["command", "http"]
                     },
                     "command": {
                       "description": "The command to execute when the hook is triggered. Required for \"command\" type.",
@@ -1967,21 +1826,14 @@
                     "shell": {
                       "description": "The shell to use for command execution.",
                       "type": "string",
-                      "enum": [
-                        "bash",
-                        "powershell"
-                      ]
+                      "enum": ["bash", "powershell"]
                     }
                   },
-                  "required": [
-                    "type"
-                  ]
+                  "required": ["type"]
                 }
               }
             },
-            "required": [
-              "hooks"
-            ]
+            "required": ["hooks"]
           }
         }
       }

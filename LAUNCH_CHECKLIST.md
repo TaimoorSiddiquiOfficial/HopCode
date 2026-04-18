@@ -8,6 +8,7 @@
 ## ✅ Pre-Launch Preparation (Complete)
 
 ### Technical Readiness
+
 - [x] Rebranding complete (Qwen Code → HopCode)
 - [x] Build system working
 - [x] AI SDK providers tested and working
@@ -24,6 +25,7 @@
 ### Phase 1: Final Testing (2 hours)
 
 #### 1.1 Build Verification
+
 ```bash
 cd D:\HopCode
 
@@ -45,6 +47,7 @@ npm run build
 ---
 
 #### 1.2 Create npm Packages
+
 ```bash
 cd D:\HopCode
 
@@ -65,6 +68,7 @@ cd ../zed-extension
 ---
 
 #### 1.3 Test Installation
+
 ```bash
 # Test global installation
 npm install -g hopcode-0.14.5.tgz
@@ -84,6 +88,7 @@ hopcode auth login
 ### Phase 2: Publishing (1 hour)
 
 #### 2.1 Publish to npm
+
 ```bash
 # Publish main package
 cd D:\HopCode
@@ -102,6 +107,7 @@ vsce publish
 ---
 
 #### 2.2 Update GitHub
+
 - [ ] Update repository description
 - [ ] Update website link
 - [ ] Add topics: `hopcode`, `ai`, `coding-assistant`
@@ -115,10 +121,12 @@ vsce publish
 ### Phase 3: Announcement (1 hour)
 
 #### 3.1 Blog Post
+
 **File:** `docs/announcements/launch.md`
 
 **Template:**
-```markdown
+
+````markdown
 # HopCode: The Butterfly Effect of Intelligent Code
 
 🦋 Today we're launching HopCode!
@@ -126,8 +134,9 @@ vsce publish
 ## What is HopCode?
 
 HopCode is an open-source AI coding assistant that helps you:
+
 - Understand large codebases
-- Automate tedious tasks  
+- Automate tedious tasks
 - Ship code faster
 
 ## Get Started
@@ -136,16 +145,18 @@ HopCode is an open-source AI coding assistant that helps you:
 npm install -g @hopcode/hopcode
 hopcode auth login
 ```
+````
 
 ## Coming Soon: Multi-AI Support
 
-We're building support for 20+ AI providers including OpenAI, 
+We're building support for 20+ AI providers including OpenAI,
 Anthropic, Google, Groq, and more!
 
 ## Learn More
 
 - Documentation: https://hopcode.dev/docs
 - GitHub: https://github.com/TaimoorSiddiquiOfficial/HopCode
+
 ```
 
 **Status:** ⏳ Pending
@@ -156,6 +167,7 @@ Anthropic, Google, Groq, and more!
 
 **Twitter/X:**
 ```
+
 🦋 Introducing HopCode!
 
 The butterfly effect of intelligent code is here.
@@ -166,10 +178,12 @@ npm install -g @hopcode/hopcode
 Multi-AI support coming soon!
 
 #HopCode #AI #CodingAssistant #OpenSource #DeveloperTools
+
 ```
 
 **LinkedIn:**
 ```
+
 🚀 Excited to announce HopCode!
 
 An AI-powered coding assistant with:
@@ -181,6 +195,7 @@ An AI-powered coding assistant with:
 Try it: npm install -g @hopcode/hopcode
 
 #HopCode #AI #SoftwareDevelopment #OpenSource #Innovation
+
 ```
 
 **Status:** ⏳ Pending
@@ -341,6 +356,7 @@ Try it: npm install -g @hopcode/hopcode
 
 ---
 
-*Last Updated: 2026-04-18*  
-*Launch Window: TODAY*  
+*Last Updated: 2026-04-18*
+*Launch Window: TODAY*
 *Confidence: HIGH*
+```

@@ -1107,9 +1107,11 @@ export default {
   'From project settings': 'プロジェクト設定から',
   'From session': 'セッションから',
   'Project settings (local)': 'プロジェクト設定（ローカル）',
-  'Saved in .hopcode/settings.local.json': '.hopcode/settings.local.json に保存',
+  'Saved in .hopcode/settings.local.json':
+    '.hopcode/settings.local.json に保存',
   'Project settings': 'プロジェクト設定',
-  'Checked in at .hopcode/settings.json': '.hopcode/settings.json にチェックイン',
+  'Checked in at .hopcode/settings.json':
+    '.hopcode/settings.json にチェックイン',
   'User settings': 'ユーザー設定',
   'Saved in at ~/.hopcode/settings.json': '~/.hopcode/settings.json に保存',
   'Add a new rule…': '新しいルールを追加…',

@@ -6,7 +6,7 @@ HopCode commands are triggered through specific prefixes and fall into three cat
 
 | Prefix Type                | Function Description                                | Typical Use Case                                                 |
 | -------------------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
-| Slash Commands (`/`)       | Meta-level control of HopCode itself              | Managing sessions, modifying settings, getting help              |
+| Slash Commands (`/`)       | Meta-level control of HopCode itself                | Managing sessions, modifying settings, getting help              |
 | At Commands (`@`)          | Quickly inject local file content into conversation | Allowing AI to analyze specified files or code under directories |
 | Exclamation Commands (`!`) | Direct interaction with system Shell                | Executing system commands like `git status`, `ls`, etc.          |
 
@@ -35,7 +35,7 @@ Commands for adjusting interface appearance and work environment.
 | `/clear`     | Clear terminal screen content            | `/clear` (shortcut: `Ctrl+L`) |
 | `/context`   | Show context window usage breakdown      | `/context`                    |
 | → `detail`   | Show per-item context usage breakdown    | `/context detail`             |
-| `/theme`     | Change HopCode visual theme            | `/theme`                      |
+| `/theme`     | Change HopCode visual theme              | `/theme`                      |
 | `/vim`       | Turn input area Vim editing mode on/off  | `/vim`                        |
 | `/directory` | Manage multi-directory support workspace | `/dir add ./src,./tests`      |
 | `/editor`    | Open dialog to select supported editor   | `/editor`                     |
@@ -84,7 +84,7 @@ These commands invoke bundled skills that provide specialized workflows.
 | ------------ | ------------------------------------------------------------------- | ------------------------------------------------- |
 | `/review`    | Review code changes with 5 parallel agents + deterministic analysis | `/review`, `/review 123`, `/review 123 --comment` |
 | `/loop`      | Run a prompt on a recurring schedule                                | `/loop 5m check the build`                        |
-| `/qc-helper` | Answer questions about HopCode usage and configuration            | `/qc-helper how do I configure MCP?`              |
+| `/qc-helper` | Answer questions about HopCode usage and configuration              | `/qc-helper how do I configure MCP?`              |
 
 See [Code Review](./code-review.md) for full `/review` documentation.
 
@@ -167,9 +167,9 @@ Commands for obtaining information and performing system settings.
 | `/stats`    | Display detailed statistics for current session | `/stats`                         |
 | `/settings` | Open settings editor                            | `/settings`                      |
 | `/auth`     | Change authentication method                    | `/auth`                          |
-| `/bug`      | Submit issue about HopCode                    | `/bug Button click unresponsive` |
+| `/bug`      | Submit issue about HopCode                      | `/bug Button click unresponsive` |
 | `/copy`     | Copy last output content to clipboard           | `/copy`                          |
-| `/quit`     | Exit HopCode immediately                      | `/quit` or `/exit`               |
+| `/quit`     | Exit HopCode immediately                        | `/quit` or `/exit`               |
 
 ### 1.8 Common Shortcuts
 

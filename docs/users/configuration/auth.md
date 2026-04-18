@@ -142,10 +142,10 @@ The simplest way to get started with API Key authentication is to put everything
 
 What each field does:
 
-| Field                        | Description                                                                                                                                     |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `modelProviders`             | Declares which models are available and how to connect to them. Keys (`openai`, `anthropic`, `gemini`) represent the API protocol.              |
-| `env`                        | Stores API keys directly in `settings.json` as a fallback (lowest priority — shell `export` and `.env` files take precedence).                  |
+| Field                        | Description                                                                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `modelProviders`             | Declares which models are available and how to connect to them. Keys (`openai`, `anthropic`, `gemini`) represent the API protocol.            |
+| `env`                        | Stores API keys directly in `settings.json` as a fallback (lowest priority — shell `export` and `.env` files take precedence).                |
 | `security.auth.selectedType` | Tells HopCode which protocol to use on startup (e.g. `openai`, `anthropic`, `gemini`). Without this, you'd need to run `/auth` interactively. |
 | `model.name`                 | The default model to activate when HopCode starts. Must match one of the `id` values in your `modelProviders`.                                |
 

@@ -1,6 +1,6 @@
-import { APICallError } from "ai"
-import { STATUS_CODES } from "http"
-import { iife } from "../util/iife.js.js"
+import { APICallError } from 'ai';
+import { STATUS_CODES } from 'http';
+import { iife } from '../util/iife.js.js';
 
 export namespace ProviderError {
   // Adapted from overflow detection patterns in:
@@ -19,171 +19,183 @@ export namespace ProviderError {
     /context window exceeds limit/i, // MiniMax
     /exceeded model token limit/i, // Kimi For Coding, Moonshot
     /context[_ ]length[_ ]exceeded/i, // Generic fallback
-  ]
+  ];
 
   function isOpenAiErrorRetryable(e: APICallError) {
-    const status = e.statusCode
-    if (!status) return e.isRetryable
+    const status = e.statusCode;
+    if (!status) return e.isRetryable;
     // openai sometimes returns 404 for models that are actually available
-    return status === 404 || e.isRetryable
+    return status === 404 || e.isRetryable;
   }
 
   // Providers not reliably handled in this function:
   // - z.ai: can accept overflow silently (needs token-count/context-window checks)
   function isOverflow(message: string) {
-    if (OVERFLOW_PATTERNS.some((p) => p.test(message))) return true
+    if (OVERFLOW_PATTERNS.some((p) => p.test(message))) return true;
 
     // Providers/status patterns handled outside of regex list:
     // - Cerebras: often returns "400 (no body)" / "413 (no body)"
     // - Mistral: often returns "400 (no body)" / "413 (no body)"
-    return /^4(00|13)\s*(status code)?\s*\(no body\)/i.test(message)
+    return /^4(00|13)\s*(status code)?\s*\(no body\)/i.test(message);
   }
 
   function error(providerID: string, error: APICallError) {
-    if (providerID.includes("github-copilot") && error.statusCode === 403) {
-      return "Please reauthenticate with the copilot provider to ensure your credentials work properly with OpenCode."
+    if (providerID.includes('github-copilot') && error.statusCode === 403) {
+      return 'Please reauthenticate with the copilot provider to ensure your credentials work properly with OpenCode.';
     }
 
-    return error.message
+    return error.message;
   }
 
   function message(providerID: string, e: APICallError) {
     return iife(() => {
-      const msg = e.message
-      if (msg === "") {
-        if (e.responseBody) return e.responseBody
+      const msg = e.message;
+      if (msg === '') {
+        if (e.responseBody) return e.responseBody;
         if (e.statusCode) {
-          const err = STATUS_CODES[e.statusCode]
-          if (err) return err
+          const err = STATUS_CODES[e.statusCode];
+          if (err) return err;
         }
-        return "Unknown error"
+        return 'Unknown error';
       }
 
-      const transformed = error(providerID, e)
+      const transformed = error(providerID, e);
       if (transformed !== msg) {
-        return transformed
+        return transformed;
       }
-      if (!e.responseBody || (e.statusCode && msg !== STATUS_CODES[e.statusCode])) {
-        return msg
+      if (
+        !e.responseBody ||
+        (e.statusCode && msg !== STATUS_CODES[e.statusCode])
+      ) {
+        return msg;
       }
 
       try {
-        const body = JSON.parse(e.responseBody)
+        const body = JSON.parse(e.responseBody);
         // try to extract common error message fields
-        const errMsg = body.message || body.error || body.error?.message
-        if (errMsg && typeof errMsg === "string") {
-          return `${msg}: ${errMsg}`
+        const errMsg = body.message || body.error || body.error?.message;
+        if (errMsg && typeof errMsg === 'string') {
+          return `${msg}: ${errMsg}`;
         }
       } catch {}
 
-      return `${msg}: ${e.responseBody}`
-    }).trim()
+      return `${msg}: ${e.responseBody}`;
+    }).trim();
   }
 
   function json(input: unknown) {
-    if (typeof input === "string") {
+    if (typeof input === 'string') {
       try {
-        const result = JSON.parse(input)
-        if (result && typeof result === "object") return result
-        return undefined
+        const result = JSON.parse(input);
+        if (result && typeof result === 'object') return result;
+        return undefined;
       } catch {
-        return undefined
+        return undefined;
       }
     }
-    if (typeof input === "object" && input !== null) {
-      return input
+    if (typeof input === 'object' && input !== null) {
+      return input;
     }
-    return undefined
+    return undefined;
   }
 
   export type ParsedStreamError =
     | {
-        type: "context_overflow"
-        message: string
-        responseBody: string
+        type: 'context_overflow';
+        message: string;
+        responseBody: string;
       }
     | {
-        type: "api_error"
-        message: string
-        isRetryable: false
-        responseBody: string
-      }
+        type: 'api_error';
+        message: string;
+        isRetryable: false;
+        responseBody: string;
+      };
 
-  export function parseStreamError(input: unknown): ParsedStreamError | undefined {
-    const body = json(input)
-    if (!body) return
+  export function parseStreamError(
+    input: unknown,
+  ): ParsedStreamError | undefined {
+    const body = json(input);
+    if (!body) return;
 
-    const responseBody = JSON.stringify(body)
-    if (body.type !== "error") return
+    const responseBody = JSON.stringify(body);
+    if (body.type !== 'error') return;
 
     switch (body?.error?.code) {
-      case "context_length_exceeded":
+      case 'context_length_exceeded':
         return {
-          type: "context_overflow",
-          message: "Input exceeds context window of this model",
+          type: 'context_overflow',
+          message: 'Input exceeds context window of this model',
           responseBody,
-        }
-      case "insufficient_quota":
+        };
+      case 'insufficient_quota':
         return {
-          type: "api_error",
-          message: "Quota exceeded. Check your plan and billing details.",
+          type: 'api_error',
+          message: 'Quota exceeded. Check your plan and billing details.',
           isRetryable: false,
           responseBody,
-        }
-      case "usage_not_included":
+        };
+      case 'usage_not_included':
         return {
-          type: "api_error",
-          message: "To use Codex with your ChatGPT plan, upgrade to Plus: https://chatgpt.com/explore/plus.",
+          type: 'api_error',
+          message:
+            'To use Codex with your ChatGPT plan, upgrade to Plus: https://chatgpt.com/explore/plus.',
           isRetryable: false,
           responseBody,
-        }
-      case "invalid_prompt":
+        };
+      case 'invalid_prompt':
         return {
-          type: "api_error",
-          message: typeof body?.error?.message === "string" ? body?.error?.message : "Invalid prompt.",
+          type: 'api_error',
+          message:
+            typeof body?.error?.message === 'string'
+              ? body?.error?.message
+              : 'Invalid prompt.',
           isRetryable: false,
           responseBody,
-        }
+        };
     }
   }
 
   export type ParsedAPICallError =
     | {
-        type: "context_overflow"
-        message: string
-        responseBody?: string
+        type: 'context_overflow';
+        message: string;
+        responseBody?: string;
       }
     | {
-        type: "api_error"
-        message: string
-        statusCode?: number
-        isRetryable: boolean
-        responseHeaders?: Record<string, string>
-        responseBody?: string
-        metadata?: Record<string, string>
-      }
+        type: 'api_error';
+        message: string;
+        statusCode?: number;
+        isRetryable: boolean;
+        responseHeaders?: Record<string, string>;
+        responseBody?: string;
+        metadata?: Record<string, string>;
+      };
 
-  export function parseAPICallError(input: { providerID: string; error: APICallError }): ParsedAPICallError {
-    const m = message(input.providerID, input.error)
+  export function parseAPICallError(input: {
+    providerID: string;
+    error: APICallError;
+  }): ParsedAPICallError {
+    const m = message(input.providerID, input.error);
     if (isOverflow(m)) {
       return {
-        type: "context_overflow",
+        type: 'context_overflow',
         message: m,
         responseBody: input.error.responseBody,
-      }
+      };
     }
 
-    const metadata = input.error.url ? { url: input.error.url } : undefined
+    const metadata = input.error.url ? { url: input.error.url } : undefined;
     return {
-      type: "api_error",
+      type: 'api_error',
       message: m,
       statusCode: input.error.statusCode,
-      isRetryable: input.providerID.startsWith("openai")
+      isRetryable: input.providerID.startsWith('openai')
         ? isOpenAiErrorRetryable(input.error)
         : input.error.isRetryable,
       responseHeaders: input.error.responseHeaders,
       responseBody: input.error.responseBody,
       metadata,
-    }
+    };
   }
 }

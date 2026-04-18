@@ -1683,7 +1683,9 @@ describe('buildHumanReadableRuleLabel', () => {
   });
 
   it('converts Read with absolute path specifier', () => {
-    const label = buildHumanReadableRuleLabel(['Read(//Users/mochi/.hopcode/**)']);
+    const label = buildHumanReadableRuleLabel([
+      'Read(//Users/mochi/.hopcode/**)',
+    ]);
     expect(label).toBe('read files in /Users/mochi/.hopcode/');
   });
 

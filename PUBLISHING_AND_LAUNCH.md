@@ -12,6 +12,7 @@
 **Action:** Reserve `@hopcode` scope on npmjs.com
 
 **Steps:**
+
 1. Go to [npmjs.com](https://www.npmjs.com/)
 2. Sign in / Create account
 3. Go to Organizations
@@ -33,6 +34,7 @@ registry=https://registry.npmjs.org/
 ```
 
 **Set environment variable:**
+
 ```bash
 # Windows (PowerShell)
 $env:NPM_TOKEN="your-npm-token-here"
@@ -130,27 +132,32 @@ npm publish --access public
 ### VS Code Marketplace
 
 **Step 1: Install VSCE**
+
 ```bash
 npm install -g @vscode/vsce
 ```
 
 **Step 2: Create Publisher Account**
+
 1. Go to https://marketplace.visualstudio.com/manage
 2. Create publisher ID: `hopcode`
 3. Verify email
 
 **Step 3: Package Extension**
+
 ```bash
 cd packages/vscode-ide-companion
 vsce package
 ```
 
 **Step 4: Publish**
+
 ```bash
 vsce publish
 ```
 
 **Or with PAT (Personal Access Token):**
+
 ```bash
 vsce publish -p YOUR_PERSONAL_ACCESS_TOKEN
 ```
@@ -162,15 +169,18 @@ vsce publish -p YOUR_PERSONAL_ACCESS_TOKEN
 ### Open VSX Registry
 
 **Step 1: Install OVSX**
+
 ```bash
 npm install -g ovsx
 ```
 
 **Step 2: Get Token**
+
 1. Go to https://open-vsx.org/user-settings/tokens
 2. Create access token
 
 **Step 3: Publish**
+
 ```bash
 ovsx publish -p YOUR_TOKEN
 ```
@@ -180,6 +190,7 @@ ovsx publish -p YOUR_TOKEN
 ### Zed Extension
 
 **Step 1: Update extension.toml**
+
 ```toml
 id = "hopcode"
 name = "HopCode"
@@ -187,6 +198,7 @@ authors = ["HopCode Team"]
 ```
 
 **Step 2: Submit to Zed**
+
 1. Go to https://zed.dev/extensions
 2. Sign in with GitHub
 3. Submit extension repository
@@ -199,6 +211,7 @@ authors = ["HopCode Team"]
 ### After Publishing Each Package
 
 **Verify on npm:**
+
 ```bash
 # Check package exists
 npm view @hopcode/core
@@ -208,6 +221,7 @@ npm view @hopcode/sdk
 ```
 
 **Test installation:**
+
 ```bash
 # Install globally to test
 npm install -g @hopcode/hopcode
@@ -255,6 +269,7 @@ npm run deploy
 - [x] Website URL updated ✅
 
 **Update repository settings:**
+
 1. Go to Settings → General
 2. Update description: "HopCode - AI-powered coding assistant"
 3. Update website: https://hopcode.dev (if applicable)
@@ -271,11 +286,11 @@ FOR IMMEDIATE RELEASE
 
 HopCode: The Butterfly Effect of Intelligent Code
 
-[CITY], [DATE] — Today marks the launch of HopCode, the rebranded 
-open-source AI coding assistant that's transforming how developers 
+[CITY], [DATE] — Today marks the launch of HopCode, the rebranded
+open-source AI coding assistant that's transforming how developers
 work with large codebases.
 
-Formerly known as "Qwen Code," HopCode represents a new chapter in 
+Formerly known as "Qwen Code," HopCode represents a new chapter in
 AI-assisted development, featuring:
 
 - Enhanced terminal interface
@@ -284,8 +299,8 @@ AI-assisted development, featuring:
 - Open-source SDK for extensibility
 - Cross-platform compatibility
 
-"HopCode embodies the butterfly effect - small changes create 
-massive impact," said [SPOKESPERSON NAME], [TITLE]. "We're excited 
+"HopCode embodies the butterfly effect - small changes create
+massive impact," said [SPOKESPERSON NAME], [TITLE]. "We're excited
 to empower developers with intelligent coding assistance."
 
 Key Features:
@@ -295,15 +310,15 @@ Key Features:
 ✓ MCP server integration
 ✓ Extensive hook system
 
-HopCode is available now on npm as @hopcode/hopcode and as 
+HopCode is available now on npm as @hopcode/hopcode and as
 extensions for VS Code and Zed.
 
 Download: https://github.com/TaimoorSiddiquiOfficial/HopCode
 Documentation: https://hopcode.dev/docs
 
 About HopCode:
-HopCode is an open-source AI agent for the terminal, optimized for 
-Qwen series models. It helps developers understand large codebases, 
+HopCode is an open-source AI agent for the terminal, optimized for
+Qwen series models. It helps developers understand large codebases,
 automate tedious work, and ship faster.
 
 ###
@@ -318,7 +333,7 @@ automate tedious work, and ship faster.
 ```
 🦋 Introducing HopCode!
 
-The butterfly effect of intelligent code is here. We've rebranded from 
+The butterfly effect of intelligent code is here. We've rebranded from
 Qwen Code to HopCode, marking a new era of AI-assisted development.
 
 Try it now:
@@ -332,13 +347,13 @@ npm install -g @hopcode/hopcode
 ```
 🚀 Exciting News! We're launching HopCode!
 
-After successful development as "Qwen Code," we're rebranding to 
-HopCode - an AI-powered coding assistant optimized for Qwen series 
+After successful development as "Qwen Code," we're rebranding to
+HopCode - an AI-powered coding assistant optimized for Qwen series
 models.
 
 ✨ What's new:
 - Fresh brand identity
-- Enhanced terminal experience  
+- Enhanced terminal experience
 - Multi-IDE support
 - Open-source SDK
 
@@ -405,23 +420,23 @@ Questions? Drop them below! 👇
 
 ### Week 1 Targets
 
-| Metric | Target | Actual |
-|--------|--------|--------|
-| npm downloads | 500+ | ___ |
-| GitHub stars | 100+ | ___ |
-| Extension installs | 200+ | ___ |
-| Documentation views | 1000+ | ___ |
-| Social media reach | 5000+ | ___ |
+| Metric              | Target | Actual |
+| ------------------- | ------ | ------ |
+| npm downloads       | 500+   | \_\_\_ |
+| GitHub stars        | 100+   | \_\_\_ |
+| Extension installs  | 200+   | \_\_\_ |
+| Documentation views | 1000+  | \_\_\_ |
+| Social media reach  | 5000+  | \_\_\_ |
 
 ### Month 1 Targets
 
-| Metric | Target | Actual |
-|--------|--------|--------|
-| npm downloads | 5000+ | ___ |
-| GitHub stars | 500+ | ___ |
-| Extension installs | 1000+ | ___ |
-| Active users | 100+ | ___ |
-| Community contributors | 10+ | ___ |
+| Metric                 | Target | Actual |
+| ---------------------- | ------ | ------ |
+| npm downloads          | 5000+  | \_\_\_ |
+| GitHub stars           | 500+   | \_\_\_ |
+| Extension installs     | 1000+  | \_\_\_ |
+| Active users           | 100+   | \_\_\_ |
+| Community contributors | 10+    | \_\_\_ |
 
 ---
 
@@ -431,7 +446,7 @@ Questions? Drop them below! 👇
 
 Create a migration guide for users of "Qwen Code":
 
-```markdown
+````markdown
 # Migrating from Qwen Code to HopCode
 
 Good news! Qwen Code is now HopCode. Here's how to upgrade:
@@ -441,6 +456,7 @@ Good news! Qwen Code is now HopCode. Here's how to upgrade:
 ```bash
 npm uninstall -g @qwen-code/qwen-code
 ```
+````
 
 ## 2. Install New Version
 
@@ -450,12 +466,13 @@ npm install -g @hopcode/hopcode
 
 ## 3. Migrate Configuration
 
-Your settings are safe! HopCode will automatically migrate your 
+Your settings are safe! HopCode will automatically migrate your
 configuration from `~/.qwen/` to `~/.hopcode/` on first run.
 
 ## 4. Update Your Workflow
 
 Update any scripts or documentation that reference:
+
 - `qwen` command → `hopcode`
 - `@qwen-code/*` packages → `@hopcode/*`
 - `.qwen/` directory → `.hopcode/`
@@ -463,7 +480,8 @@ Update any scripts or documentation that reference:
 ## Questions?
 
 See our migration guide: [link]
-```
+
+````
 
 ---
 
@@ -500,7 +518,7 @@ If critical issues arise:
 
 ```bash
 npm deprecate @hopcode/hopcode@0.14.5 "Critical bug - please downgrade to 0.14.4"
-```
+````
 
 ### Step 2: Restore Previous Version
 
@@ -513,6 +531,7 @@ npm dist-tag add @hopcode/hopcode@0.14.4 latest
 ### Step 3: Communicate
 
 Post announcement:
+
 - GitHub Issues
 - Discord/Community channels
 - Twitter/X
@@ -578,4 +597,4 @@ echo "HopCode is live! 🚀"
 
 **Ready to launch HopCode to the world! 🦋**
 
-*Good luck!*
+_Good luck!_

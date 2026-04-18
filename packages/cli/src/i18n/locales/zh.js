@@ -1389,7 +1389,8 @@ export default {
   'From project settings': '来自项目设置',
   'From session': '来自会话',
   'Project settings (local)': '项目设置（本地）',
-  'Saved in .hopcode/settings.local.json': '保存在 .hopcode/settings.local.json',
+  'Saved in .hopcode/settings.local.json':
+    '保存在 .hopcode/settings.local.json',
   'Project settings': '项目设置',
   'Checked in at .hopcode/settings.json': '保存在 .hopcode/settings.json',
   'User settings': '用户设置',

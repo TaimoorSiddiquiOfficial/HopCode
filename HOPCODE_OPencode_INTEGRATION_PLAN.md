@@ -21,6 +21,7 @@
 OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 
 #### Core Providers
+
 1. **@ai-sdk/openai** (v2.0.89) - GPT-4, GPT-4 Turbo, GPT-3.5
 2. **@ai-sdk/anthropic** (v2.0.65) - Claude 3.5, Claude 3 Opus, Claude 3 Haiku
 3. **@ai-sdk/google** (v2.0.54) - Gemini 1.5 Pro, Gemini 1.5 Flash
@@ -29,12 +30,14 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 6. **@ai-sdk/amazon-bedrock** (v3.0.82) - Bedrock (Claude, Llama, etc.)
 
 #### Performance Providers
+
 7. **@ai-sdk/groq** (v2.0.34) - Ultra-fast inference (500+ tokens/s)
 8. **@ai-sdk/cerebras** (v1.0.36) - Fastest inference
 9. **@ai-sdk/togetherai** (v1.0.34) - Fast open-source models
 10. **@ai-sdk/deepinfra** (v1.0.36) - Low-cost inference
 
 #### Specialized Providers
+
 11. **@ai-sdk/perplexity** (v2.0.23) - Real-time search, citations
 12. **@ai-sdk/cohere** (v2.0.22) - RAG, embeddings
 13. **@ai-sdk/mistral** (v2.0.27) - Mistral models
@@ -42,6 +45,7 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 15. **@ai-sdk/vercel** (v1.0.33) - Vercel AI Gateway
 
 #### Additional Providers
+
 16. **@openrouter/ai-sdk-provider** (v1.5.4) - 100+ models via OpenRouter
 17. **@ai-sdk/gateway** (v2.0.30) - AI Gateway
 18. **@ai-sdk/openai-compatible** (v1.0.32) - OpenAI-compatible APIs
@@ -53,6 +57,7 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 ## 🏗️ Architecture Comparison
 
 ### HopCode (Current)
+
 ```
 ┌─────────────────┐
 │   HopCode CLI   │
@@ -72,6 +77,7 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 ```
 
 ### OpenCode (Target)
+
 ```
 ┌─────────────────────────┐
 │    OpenCode Core        │
@@ -99,6 +105,7 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 **Approach:** Migrate OpenCode's provider system to HopCode
 
 **Pros:**
+
 - ✅ Production-ready code
 - ✅ 20+ providers work out-of-box
 - ✅ Battle-tested (v1.2.10)
@@ -106,6 +113,7 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 - ✅ Community-maintained
 
 **Cons:**
+
 - ⚠️ Larger codebase to maintain
 - ⚠️ Need to align architectures
 
@@ -118,11 +126,13 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 **Approach:** Use OpenCode as reference, build custom implementation
 
 **Pros:**
+
 - ✅ More control over architecture
 - ✅ Smaller footprint
 - ✅ Can optimize for HopCode specifically
 
 **Cons:**
+
 - ⚠️ More development time (4-6 weeks)
 - ⚠️ Need to maintain separately
 
@@ -135,11 +145,13 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 **Approach:** Create adapter layer between HopCode and OpenCode
 
 **Pros:**
+
 - ✅ Minimal changes to HopCode
 - ✅ Can use OpenCode providers immediately
 - ✅ Easy to switch implementations
 
 **Cons:**
+
 - ⚠️ Additional abstraction layer
 - ⚠️ Dependency on OpenCode
 
@@ -157,6 +169,7 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 **To:** `D:\HopCode\packages\core\src\provider\`
 
 **Files to Copy:**
+
 ```
 provider/
 ├── provider.ts          # Main provider registry (1339 lines)
@@ -169,6 +182,7 @@ provider/
 ```
 
 **Key Components:**
+
 - `BUNDLED_PROVIDERS` - 20+ provider factories
 - `Provider.getModel()` - Model resolution
 - `Provider.defaultModel()` - Default model selection
@@ -223,7 +237,7 @@ export const ProviderConfig = z.object({
   small_model: z.string().optional(),
   disabled_providers: z.array(z.string()).optional(),
   enabled_providers: z.array(z.string()).optional(),
-})
+});
 ```
 
 ---
@@ -235,26 +249,31 @@ export const ProviderConfig = z.object({
 **File:** `packages/core/src/core/contentGenerator.ts`
 
 **Current:**
+
 ```typescript
-import { QwenContentGenerator } from "../qwen/qwenContentGenerator"
+import { QwenContentGenerator } from '../qwen/qwenContentGenerator';
 
 export function createContentGenerator(config: Config) {
-  return new QwenContentGenerator(config)
+  return new QwenContentGenerator(config);
 }
 ```
 
 **New:**
+
 ```typescript
-import { Provider } from "../provider/provider"
+import { Provider } from '../provider/provider';
 
 export async function createContentGenerator(config: Config) {
-  const provider = await Provider.get(config.model.provider)
-  const model = await Provider.getModel(config.model.provider, config.model.model)
-  
+  const provider = await Provider.get(config.model.provider);
+  const model = await Provider.getModel(
+    config.model.provider,
+    config.model.model,
+  );
+
   return provider.languageModel(model, {
     maxTokens: config.maxTokens,
     temperature: config.temperature,
-  })
+  });
 }
 ```
 
@@ -268,27 +287,29 @@ export async function createContentGenerator(config: Config) {
 // commands/providers.ts
 export const providersCommand = {
   list: async () => {
-    const list = await Provider.listProviders()
-    console.table(list.map(p => ({
-      id: p.id,
-      name: p.name,
-      models: p.models.length,
-      status: p.status
-    })))
+    const list = await Provider.listProviders();
+    console.table(
+      list.map((p) => ({
+        id: p.id,
+        name: p.name,
+        models: p.models.length,
+        status: p.status,
+      })),
+    );
   },
-  
+
   configure: async (providerId: string) => {
-    const provider = await Provider.get(providerId)
-    const config = await provider.configure()
-    await Config.save({ provider: config })
+    const provider = await Provider.get(providerId);
+    const config = await provider.configure();
+    await Config.save({ provider: config });
   },
-  
+
   test: async (providerId: string) => {
-    const provider = await Provider.get(providerId)
-    const result = await provider.test()
-    console.log(result.success ? '✅ Success' : '❌ Failed')
-  }
-}
+    const provider = await Provider.get(providerId);
+    const result = await provider.test();
+    console.log(result.success ? '✅ Success' : '❌ Failed');
+  },
+};
 ```
 
 ---
@@ -298,6 +319,7 @@ export const providersCommand = {
 **File:** `packages/core/src/auth/index.ts`
 
 Integrate OpenCode's auth system:
+
 - OAuth for GitHub Copilot
 - API key management
 - Credential storage
@@ -312,29 +334,29 @@ Integrate OpenCode's auth system:
 ```typescript
 // test/providers/all-providers.test.ts
 describe('All Providers', () => {
-  const providers = ['openai', 'anthropic', 'google', 'groq', 'cerebras']
-  
+  const providers = ['openai', 'anthropic', 'google', 'groq', 'cerebras'];
+
   for (const providerId of providers) {
     describe(providerId, () => {
       it('should generate content', async () => {
-        const provider = await Provider.get(providerId)
-        const model = await provider.getModel('default')
+        const provider = await Provider.get(providerId);
+        const model = await provider.getModel('default');
         const result = await model.generateContent({
-          messages: [{ role: 'user', content: 'Hello' }]
-        })
-        expect(result.text).toBeDefined()
-      })
-      
+          messages: [{ role: 'user', content: 'Hello' }],
+        });
+        expect(result.text).toBeDefined();
+      });
+
       it('should stream content', async () => {
         // Test streaming
-      })
-      
+      });
+
       it('should handle errors', async () => {
         // Test error handling
-      })
-    })
+      });
+    });
   }
-})
+});
 ```
 
 ---
@@ -363,6 +385,7 @@ bench('Anthropic Claude', async () => {
 ## 📊 Provider Configuration Examples
 
 ### OpenAI
+
 ```json
 {
   "provider": {
@@ -380,6 +403,7 @@ bench('Anthropic Claude', async () => {
 ```
 
 ### Anthropic
+
 ```json
 {
   "provider": {
@@ -396,6 +420,7 @@ bench('Anthropic Claude', async () => {
 ```
 
 ### Groq (Fast)
+
 ```json
 {
   "provider": {
@@ -412,6 +437,7 @@ bench('Anthropic Claude', async () => {
 ```
 
 ### OpenRouter (100+ Models)
+
 ```json
 {
   "provider": {
@@ -457,14 +483,14 @@ $ hopcode providers select
 
 ### Time Saved
 
-| Task | From Scratch | With OpenCode | Saved |
-|------|-------------|---------------|-------|
-| Provider interface | 40 hours | 0 hours | 40h |
-| Provider implementations | 200 hours | 0 hours | 200h |
-| Authentication | 40 hours | 20 hours | 20h |
-| Testing | 80 hours | 40 hours | 40h |
-| Documentation | 40 hours | 20 hours | 20h |
-| **Total** | **400 hours** | **80 hours** | **320h** |
+| Task                     | From Scratch  | With OpenCode | Saved    |
+| ------------------------ | ------------- | ------------- | -------- |
+| Provider interface       | 40 hours      | 0 hours       | 40h      |
+| Provider implementations | 200 hours     | 0 hours       | 200h     |
+| Authentication           | 40 hours      | 20 hours      | 20h      |
+| Testing                  | 80 hours      | 40 hours      | 40h      |
+| Documentation            | 40 hours      | 20 hours      | 20h      |
+| **Total**                | **400 hours** | **80 hours**  | **320h** |
 
 **Time Saved:** 320 hours (~8 weeks)  
 **Cost Saved:** $32,000 (at $100/hr)
@@ -497,6 +523,7 @@ MIT License - Same as HopCode
 ```
 
 **Action Required:**
+
 - [ ] Add attribution to OpenCode project
 - [ ] Include MIT license copy
 - [ ] Add notice in README
@@ -528,6 +555,7 @@ docs/providers/
 ## ✅ Implementation Checklist
 
 ### Phase 1: Code Migration
+
 - [ ] Copy provider/ directory
 - [ ] Install dependencies
 - [ ] Update package.json
@@ -535,6 +563,7 @@ docs/providers/
 - [ ] Fix import paths
 
 ### Phase 2: Integration
+
 - [ ] Update contentGenerator.ts
 - [ ] Update CLI commands
 - [ ] Integrate authentication
@@ -542,6 +571,7 @@ docs/providers/
 - [ ] Add provider commands
 
 ### Phase 3: Testing
+
 - [ ] Test each provider
 - [ ] Run benchmarks
 - [ ] Test error handling
@@ -549,6 +579,7 @@ docs/providers/
 - [ ] Test model switching
 
 ### Phase 4: Documentation
+
 - [ ] Write provider docs
 - [ ] Create setup guides
 - [ ] Add troubleshooting
@@ -556,6 +587,7 @@ docs/providers/
 - [ ] Create migration guide
 
 ### Phase 5: Launch
+
 - [ ] Beta testing
 - [ ] Collect feedback
 - [ ] Fix issues
@@ -590,6 +622,7 @@ hopcode
 **Integrating OpenCode's provider system is the fastest path to a multi-AI HopCode!**
 
 **Benefits:**
+
 - ✅ 320 hours saved
 - ✅ 20+ providers immediately
 - ✅ Production-ready code
@@ -602,6 +635,6 @@ hopcode
 
 **Let's build the universal AI coding assistant! 🦋**
 
-*Created: 2026-04-18*  
-*Source: OpenCode v1.2.10*  
-*License: MIT*
+_Created: 2026-04-18_  
+_Source: OpenCode v1.2.10_  
+_License: MIT_

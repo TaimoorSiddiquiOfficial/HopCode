@@ -60,7 +60,12 @@ export class QwenSessionReader {
       if (!allProjects && workingDir) {
         // Current project only
         const projectHash = getProjectHash(workingDir);
-        const chatsDir = path.join(this.hopcodeDir, 'tmp', projectHash, 'chats');
+        const chatsDir = path.join(
+          this.hopcodeDir,
+          'tmp',
+          projectHash,
+          'chats',
+        );
         const projectSessions = await this.readSessionsFromDir(chatsDir);
         sessions.push(...projectSessions);
       } else {

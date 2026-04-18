@@ -180,7 +180,7 @@ Here is a complete example:
 | `modelProviders[].baseUrl`   | The API endpoint URL (required for non-default endpoints).                                                                            |
 | `env`                        | A fallback place to store API keys (lowest priority; prefer `.env` files or `export` for sensitive keys).                             |
 | `security.auth.selectedType` | The protocol to use on startup (`openai`, `anthropic`, `gemini`, `vertex-ai`).                                                        |
-| `model.name`                 | The default model to use when HopCode starts.                                                                                       |
+| `model.name`                 | The default model to use when HopCode starts.                                                                                         |
 
 **Step 3:** Start HopCode — your configuration takes effect automatically:
 
@@ -483,8 +483,8 @@ Build on top of HopCode with the TypeScript SDK:
 
 HopCode can be configured via `settings.json`, environment variables, and CLI flags.
 
-| File                    | Scope         | Description                                                                             |
-| ----------------------- | ------------- | --------------------------------------------------------------------------------------- |
+| File                    | Scope         | Description                                                                           |
+| ----------------------- | ------------- | ------------------------------------------------------------------------------------- |
 | `~/.qwen/settings.json` | User (global) | Applies to all your HopCode sessions. **Recommended for `modelProviders` and `env`.** |
 | `.qwen/settings.json`   | Project       | Applies only when running HopCode in this project. Overrides user settings.           |
 
@@ -495,7 +495,7 @@ The most commonly used top-level fields in `settings.json`:
 | `modelProviders`             | Define available models per protocol (`openai`, `anthropic`, `gemini`, `vertex-ai`).                 |
 | `env`                        | Fallback environment variables (e.g. API keys). Lower priority than shell `export` and `.env` files. |
 | `security.auth.selectedType` | The protocol to use on startup (e.g. `openai`).                                                      |
-| `model.name`                 | The default model to use when HopCode starts.                                                      |
+| `model.name`                 | The default model to use when HopCode starts.                                                        |
 
 > See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://hopcode.dev/docs/en/users/configuration/settings/) for all available options.
 
@@ -503,8 +503,8 @@ The most commonly used top-level fields in `settings.json`:
 
 ### Terminal-Bench Performance
 
-| Agent     | Model              | Accuracy |
-| --------- | ------------------ | -------- |
+| Agent   | Model              | Accuracy |
+| ------- | ------------------ | -------- |
 | HopCode | Qwen3-Coder-480A35 | 37.5%    |
 | HopCode | Qwen3-Coder-30BA3B | 31.3%    |
 
