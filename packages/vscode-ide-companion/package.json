@@ -2,7 +2,7 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.14.7",
+  "version": "0.14.8",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
@@ -179,6 +179,11 @@
   },
   "main": "./dist/extension.cjs",
   "type": "module",
+  "files": [
+    "dist",
+    "assets",
+    "schemas"
+  ],
   "scripts": {
     "prepackage": "node ./scripts/prepackage.js",
     "prebuild": "npm --prefix ../webui run build || true",
