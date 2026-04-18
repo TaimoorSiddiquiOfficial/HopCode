@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -108,7 +108,7 @@ describe('validateAuthMethod', () => {
   });
 
   it('should return an error for QWEN_OAUTH (free tier discontinued)', () => {
-    const result = validateAuthMethod(AuthType.QWEN_OAUTH);
+    const result = validateAuthMethod(AuthType.hopcode_OAUTH);
     expect(result).toContain('discontinued on 2026-04-15');
   });
 

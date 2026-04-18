@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { AgentSpawnConfig } from './types.js';
 
-// ─── Hoisted mocks for iterm-it2 ────────────────────────────────
+// --- Hoisted mocks for iterm-it2 --------------------------------
 const hoistedVerifyITerm = vi.hoisted(() => vi.fn());
 const hoistedItermSplitPane = vi.hoisted(() => vi.fn());
 const hoistedItermRunCommand = vi.hoisted(() => vi.fn());
@@ -24,7 +24,7 @@ vi.mock('./iterm-it2.js', () => ({
   itermCloseSession: hoistedItermCloseSession,
 }));
 
-// ─── Hoisted mocks for node:fs/promises ─────────────────────────
+// --- Hoisted mocks for node:fs/promises -------------------------
 const hoistedFsMkdir = vi.hoisted(() => vi.fn());
 const hoistedFsReadFile = vi.hoisted(() => vi.fn());
 const hoistedFsRm = vi.hoisted(() => vi.fn());
@@ -95,7 +95,7 @@ describe('ITermBackend', () => {
     }
   });
 
-  // ─── Initialization ─────────────────────────────────────────
+  // --- Initialization -----------------------------------------
 
   it('throws if spawnAgent is called before init', async () => {
     await expect(backend.spawnAgent(makeConfig('a1'))).rejects.toThrow(
@@ -122,7 +122,7 @@ describe('ITermBackend', () => {
     expect(hoistedVerifyITerm).toHaveBeenCalledTimes(1);
   });
 
-  // ─── Spawning ─────────────────────────────────────────────
+  // --- Spawning ---------------------------------------------
 
   it('spawns first agent using ITERM_SESSION_ID when set', async () => {
     process.env['ITERM_SESSION_ID'] = 'leader-sess';
@@ -181,7 +181,7 @@ describe('ITermBackend', () => {
     expect(exitCallback).toHaveBeenCalledWith('fail', 1, null);
   });
 
-  // ─── buildShellCommand (env key validation) ────────────────
+  // --- buildShellCommand (env key validation) ----------------
 
   it('rejects invalid environment variable names', async () => {
     await backend.init();
@@ -211,7 +211,7 @@ describe('ITermBackend', () => {
     ).resolves.toBeUndefined();
   });
 
-  // ─── buildShellCommand (atomic marker write) ──────────────
+  // --- buildShellCommand (atomic marker write) --------------
 
   it('builds command with atomic exit marker write', async () => {
     await backend.init();
@@ -241,7 +241,7 @@ describe('ITermBackend', () => {
     expect(cmdArg).toContain('env ');
   });
 
-  // ─── Navigation ───────────────────────────────────────────
+  // --- Navigation -------------------------------------------
 
   it('switchTo changes active agent and focuses session', async () => {
     await backend.init();
@@ -293,7 +293,7 @@ describe('ITermBackend', () => {
     expect(backend.getActiveAgentId()).toBe('solo');
   });
 
-  // ─── Stop & Cleanup ──────────────────────────────────────
+  // --- Stop & Cleanup --------------------------------------
 
   it('stopAgent closes session and fires exit callback', async () => {
     await backend.init();
@@ -377,7 +377,7 @@ describe('ITermBackend', () => {
     await expect(backend.cleanup()).resolves.toBeUndefined();
   });
 
-  // ─── Exit Detection ─────────────────────────────────────────
+  // --- Exit Detection -----------------------------------------
 
   it('marks agent as exited when marker file appears', async () => {
     await backend.init();
@@ -448,12 +448,12 @@ describe('ITermBackend', () => {
     // Reset to track future reads
     hoistedFsReadFile.mockClear();
 
-    // Advance more — should not poll anymore
+    // Advance more � should not poll anymore
     await vi.advanceTimersByTimeAsync(2000);
     expect(hoistedFsReadFile).not.toHaveBeenCalled();
   });
 
-  // ─── waitForAll ─────────────────────────────────────────────
+  // --- waitForAll ---------------------------------------------
 
   it('waitForAll resolves immediately when no agents exist', async () => {
     await backend.init();
@@ -486,7 +486,7 @@ describe('ITermBackend', () => {
     expect(result).toBe(false);
   });
 
-  // ─── Input ─────────────────────────────────────────────────
+  // --- Input -------------------------------------------------
 
   it('writeToAgent sends text via itermSendText', async () => {
     await backend.init();
@@ -526,7 +526,7 @@ describe('ITermBackend', () => {
     expect(backend.forwardInput('hello')).toBe(false);
   });
 
-  // ─── Snapshots ──────────────────────────────────────────────
+  // --- Snapshots ----------------------------------------------
 
   it('getActiveSnapshot returns null', async () => {
     await backend.init();
@@ -546,14 +546,14 @@ describe('ITermBackend', () => {
     expect(backend.getAgentScrollbackLength('a')).toBe(0);
   });
 
-  // ─── getAttachHint ──────────────────────────────────────────
+  // --- getAttachHint ------------------------------------------
 
   it('getAttachHint returns null', async () => {
     await backend.init();
     expect(backend.getAttachHint()).toBeNull();
   });
 
-  // ─── resizeAll ──────────────────────────────────────────────
+  // --- resizeAll ----------------------------------------------
 
   it('resizeAll is a no-op', async () => {
     await backend.init();
@@ -561,7 +561,7 @@ describe('ITermBackend', () => {
     backend.resizeAll(80, 24);
   });
 
-  // ─── type ───────────────────────────────────────────────────
+  // --- type ---------------------------------------------------
 
   it('has type "iterm2"', () => {
     expect(backend.type).toBe('iterm2');

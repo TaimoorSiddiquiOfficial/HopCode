@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +6,7 @@
 
 /**
  * E2E tests for MCP (Model Context Protocol) server integration via SDK
- * Tests that the SDK can properly interact with MCP servers configured in qwen-code
+ * Tests that the SDK can properly interact with MCP servers configured in hopcode
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -20,7 +20,7 @@ import {
   type ToolUseBlock,
   type SDKSystemMessage,
   type SDKUserMessage,
-} from '@qwen-code/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   createMCPServer,

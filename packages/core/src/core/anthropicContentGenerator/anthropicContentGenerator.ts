@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -156,7 +156,7 @@ export class AnthropicContentGenerator implements ContentGenerator {
 
   private buildHeaders(): Record<string, string> {
     const version = this.cliConfig.getCliVersion() || 'unknown';
-    const userAgent = `QwenCode/${version} (${process.platform}; ${process.arch})`;
+    const userAgent = `HopCode/${version} (${process.platform}; ${process.arch})`;
     const { customHeaders } = this.contentGeneratorConfig;
 
     const betas: string[] = [];
@@ -240,8 +240,8 @@ export class AnthropicContentGenerator implements ContentGenerator {
         ? Math.min(userMaxTokens, modelLimit)
         : userMaxTokens;
     } else {
-      // No explicit user config â€” check env var, then use capped default.
-      const envVal = process.env['QWEN_CODE_MAX_OUTPUT_TOKENS'];
+      // No explicit user config — check env var, then use capped default.
+      const envVal = process.env['HOPCODE_MAX_OUTPUT_TOKENS'];
       const envMaxTokens = envVal ? parseInt(envVal, 10) : NaN;
       if (!isNaN(envMaxTokens) && envMaxTokens > 0) {
         maxTokens = isKnownModel

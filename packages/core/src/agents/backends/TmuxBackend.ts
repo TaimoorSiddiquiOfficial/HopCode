@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,13 +10,13 @@
  * Layout (inside tmux): main process on the left (leader pane ~30%),
  * agent panes on the right, arranged via `main-vertical`.
  *
- * ┌────────────┬──────────────────────────────────┐
- * │            │             Agent 1              │
- * │   Leader   ├──────────────────────────────────┤
- * │   (30%)    │             Agent 2              │
- * │            ├──────────────────────────────────┤
- * │            │             Agent 3              │
- * └────────────┴──────────────────────────────────┘
+ * +-----------------------------------------------+
+ * �            �             Agent 1              �
+ * �   Leader   +----------------------------------�
+ * �   (30%)    �             Agent 2              �
+ * �            +----------------------------------�
+ * �            �             Agent 3              �
+ * +-----------------------------------------------+
  *
  * Outside tmux: a dedicated tmux server is created and panes are arranged
  * using `tiled` layout in a separate session/window.
@@ -144,7 +144,7 @@ export class TmuxBackend implements Backend {
     this.initialized = true;
   }
 
-  // ─── Agent Lifecycle ────────────────────────────────────────
+  // --- Agent Lifecycle ----------------------------------------
 
   async spawnAgent(config: AgentSpawnConfig): Promise<void> {
     if (!this.initialized) {
@@ -229,7 +229,7 @@ export class TmuxBackend implements Backend {
       this.startExitPolling();
 
       debugLogger.info(
-        `[spawnAgentAsync] Spawned agent "${agentId}" in pane ${paneId} — SUCCESS`,
+        `[spawnAgentAsync] Spawned agent "${agentId}" in pane ${paneId} � SUCCESS`,
       );
     } catch (error) {
       debugLogger.error(
@@ -279,7 +279,7 @@ export class TmuxBackend implements Backend {
   stopAgent(agentId: string): void {
     const pane = this.panes.get(agentId);
     if (!pane || pane.status !== 'running') return;
-    // Kill the pane outright — a single Ctrl-C only cancels the current
+    // Kill the pane outright � a single Ctrl-C only cancels the current
     // turn in interactive CLI agents and does not reliably exit the process.
     if (pane.paneId) {
       void tmuxKillPane(pane.paneId, this.getServerName());
@@ -370,7 +370,7 @@ export class TmuxBackend implements Backend {
     });
   }
 
-  // ─── Active Agent & Navigation ──────────────────────────────
+  // --- Active Agent & Navigation ------------------------------
 
   switchTo(agentId: string): void {
     if (!this.panes.has(agentId)) {
@@ -400,7 +400,7 @@ export class TmuxBackend implements Backend {
     return this.activeAgentId;
   }
 
-  // ─── Screen Capture ─────────────────────────────────────────
+  // --- Screen Capture -----------------------------------------
 
   getActiveSnapshot(): AnsiOutput | null {
     if (!this.activeAgentId) return null;
@@ -414,7 +414,7 @@ export class TmuxBackend implements Backend {
     // tmux panes are rendered by tmux itself. capture-pane is available
     // but returns raw text. For the progress bar we don't need snapshots;
     // full rendering is handled by tmux directly.
-    // Return null — the UI doesn't use snapshots for split-pane backends.
+    // Return null � the UI doesn't use snapshots for split-pane backends.
     return null;
   }
 
@@ -423,7 +423,7 @@ export class TmuxBackend implements Backend {
     return 0;
   }
 
-  // ─── Input ──────────────────────────────────────────────────
+  // --- Input --------------------------------------------------
 
   forwardInput(data: string): boolean {
     if (!this.activeAgentId) return false;
@@ -442,13 +442,13 @@ export class TmuxBackend implements Backend {
     return true;
   }
 
-  // ─── Resize ─────────────────────────────────────────────────
+  // --- Resize -------------------------------------------------
 
   resizeAll(_cols: number, _rows: number): void {
     // tmux manages pane sizes automatically based on the terminal window
   }
 
-  // ─── External Session Info ─────────────────────────────────
+  // --- External Session Info ---------------------------------
 
   getAttachHint(): string | null {
     if (this.insideTmux) {
@@ -461,7 +461,7 @@ export class TmuxBackend implements Backend {
     return `tmux -L ${server} a`;
   }
 
-  // ─── Private ────────────────────────────────────────────────
+  // --- Private ------------------------------------------------
 
   private resolveTmuxOptions(config: AgentSpawnConfig): ResolvedTmuxOptions {
     const opts = config.backend?.tmux ?? {};
@@ -544,7 +544,7 @@ export class TmuxBackend implements Backend {
     const paneCount = panes.length;
     if (paneCount === 1) {
       debugLogger.info(
-        `[spawnInsideTmux] First agent — split -h -l ${options.firstSplitPercent}% from ${this.mainPaneId}`,
+        `[spawnInsideTmux] First agent � split -h -l ${options.firstSplitPercent}% from ${this.mainPaneId}`,
       );
       return await tmuxSplitWindow(this.mainPaneId, {
         horizontal: true,
@@ -583,7 +583,7 @@ export class TmuxBackend implements Backend {
       );
       this.mainPaneId = firstPaneId;
       debugLogger.info(
-        `[spawnOutsideTmux] First agent — respawn in pane ${firstPaneId}`,
+        `[spawnOutsideTmux] First agent � respawn in pane ${firstPaneId}`,
       );
       await tmuxRespawnPane(firstPaneId, cmd, serverName);
       return firstPaneId;
@@ -746,7 +746,7 @@ export class TmuxBackend implements Backend {
       return;
     }
 
-    // Build a lookup: paneId → TmuxPaneInfo
+    // Build a lookup: paneId ? TmuxPaneInfo
     const paneMap = new Map<string, TmuxPaneInfo>();
     for (const info of paneInfos) {
       paneMap.set(info.paneId, info);
@@ -775,11 +775,11 @@ export class TmuxBackend implements Backend {
 
       const info = paneMap.get(agent.paneId);
       if (!info) {
-        // Pane was killed externally — treat as exited
+        // Pane was killed externally � treat as exited
         agent.status = 'exited';
         agent.exitCode = 1;
         debugLogger.info(
-          `[pollPaneStatus] Agent "${agent.agentId}" pane ${agent.paneId} not found in tmux list — marking as exited`,
+          `[pollPaneStatus] Agent "${agent.agentId}" pane ${agent.paneId} not found in tmux list � marking as exited`,
         );
         this.onExitCallback?.(agent.agentId, 1, null);
         continue;

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,8 +14,8 @@ import {
 
 describe('acpModelUtils', () => {
   it('formats modelId(authType)', () => {
-    expect(formatAcpModelId('qwen3', AuthType.QWEN_OAUTH)).toBe(
-      `qwen3(${AuthType.QWEN_OAUTH})`,
+    expect(formatAcpModelId('qwen3', AuthType.hopcode_OAUTH)).toBe(
+      `qwen3(${AuthType.hopcode_OAUTH})`,
     );
   });
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -167,7 +167,7 @@ export class ContentGenerationPipeline {
         // further merging so trailing chunks don't duplicate the
         // function-call parts carried by the finish chunk.
         if (finishYielded) {
-          // Finish already yielded â€” absorb any remaining usage
+          // Finish already yielded — absorb any remaining usage
           // metadata but do NOT yield another response.
           // Note: pendingFinishResponse is guaranteed non-null here because
           // finishYielded is only set to true inside the `if (pendingFinishResponse)`
@@ -347,13 +347,13 @@ export class ContentGenerationPipeline {
     // When thinking is explicitly disabled (e.g., forked queries for suggestions),
     // override thinking-related keys that may have been injected by extra_body.
     // extra_body is spread last in provider.buildRequest, so it overrides
-    // buildReasoningConfig's decision â€” we must post-process here.
+    // buildReasoningConfig's decision — we must post-process here.
     if (request.config?.thinkingConfig?.includeThoughts === false) {
       const typed = providerRequest as unknown as Record<string, unknown>;
       if ('enable_thinking' in typed) {
         typed['enable_thinking'] = false;
       }
-      // Also strip reasoning config â€” extra_body could inject it, overriding
+      // Also strip reasoning config — extra_body could inject it, overriding
       // buildReasoningConfig's decision to return {} for disabled thinking.
       if ('reasoning' in typed) {
         delete typed['reasoning'];
@@ -432,11 +432,11 @@ export class ContentGenerationPipeline {
     // Reasoning configuration for OpenAI-compatible endpoints is highly fragmented.
     // For example, across common providers and models:
     //
-    //   - deepseek-reasoner   â€” thinking is enabled by default and cannot be disabled
-    //   - glm-4.7             â€” thinking is enabled by default; can be disabled via `extra_body.thinking.enabled`
-    //   - kimi-k2-thinking    â€” thinking is enabled by default and cannot be disabled
-    //   - gpt-5.x series      â€” thinking is enabled by default; can be disabled via `reasoning.effort`
-    //   - qwen3 series        â€” model-dependent; can be manually disabled via `extra_body.enable_thinking`
+    //   - deepseek-reasoner   — thinking is enabled by default and cannot be disabled
+    //   - glm-4.7             — thinking is enabled by default; can be disabled via `extra_body.thinking.enabled`
+    //   - kimi-k2-thinking    — thinking is enabled by default and cannot be disabled
+    //   - gpt-5.x series      — thinking is enabled by default; can be disabled via `reasoning.effort`
+    //   - qwen3 series        — model-dependent; can be manually disabled via `extra_body.enable_thinking`
     //
     // Given this inconsistency, we avoid mapping values and only pass through the
     // configured reasoning object when explicitly enabled. This keeps provider- and

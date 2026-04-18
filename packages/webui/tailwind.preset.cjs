@@ -1,21 +1,21 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @qwen-code/webui Tailwind CSS Preset
+ * @hopcode/webui Tailwind CSS Preset
  *
  * This preset provides shared theme configuration for all Qwen Code products.
  * Consumers should include this preset in their tailwind.config.js:
  *
  * @example
  * module.exports = {
- *   presets: [require('@qwen-code/webui/tailwind.preset')],
+ *   presets: [require('@hopcode/webui/tailwind.preset')],
  *   content: [
  *     './src/**\/*.{ts,tsx}',
- *     './node_modules/@qwen-code/webui/dist/**\/*.js'
+ *     './node_modules/@hopcode/webui/dist/**\/*.js'
  *   ]
  * }
  */

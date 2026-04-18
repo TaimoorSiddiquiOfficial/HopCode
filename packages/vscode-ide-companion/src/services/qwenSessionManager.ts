@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +24,7 @@ export class QwenSessionManager {
   private qwenDir: string;
 
   constructor() {
-    this.qwenDir = path.join(os.homedir(), '.qwen');
+    this.hopcodeDir = path.join(os.homedir(), '.hopcode');
   }
 
   /**
@@ -32,7 +32,7 @@ export class QwenSessionManager {
    */
   private getSessionDir(workingDir: string): string {
     const projectHash = getProjectHash(workingDir);
-    const sessionDir = path.join(this.qwenDir, 'tmp', projectHash, 'chats');
+    const sessionDir = path.join(this.hopcodeDir, 'tmp', projectHash, 'chats');
     return sessionDir;
   }
 

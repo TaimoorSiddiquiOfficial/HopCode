@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Speculation Tool Gate
@@ -12,7 +12,7 @@
  * SECURITY: Speculation bypasses the normal permission/approval flow.
  * Write tools are ONLY redirected to overlay when the user's approval mode
  * already permits automatic edits (auto-edit or yolo). In default/plan mode,
- * write tools hit boundary â€” no silent writes without user consent.
+ * write tools hit boundary — no silent writes without user consent.
  */
 
 import { ToolNames } from '../tools/tool-names.js';
@@ -32,11 +32,11 @@ const SAFE_READ_ONLY_TOOLS = new Set<string>([
   ToolNames.GLOB,
   ToolNames.LS,
   ToolNames.LSP,
-  // web_fetch and web_search excluded â€” they require user confirmation
+  // web_fetch and web_search excluded — they require user confirmation
   // for external network requests, which speculation bypasses
 ]);
 
-/** Tools that produce file writes â€” must be redirected to overlay */
+/** Tools that produce file writes — must be redirected to overlay */
 const WRITE_TOOLS = new Set<string>([ToolNames.EDIT, ToolNames.WRITE_FILE]);
 
 /** Tools that should always stop speculation */
@@ -66,14 +66,14 @@ export async function evaluateToolCall(
   overlayFs: OverlayFs,
   approvalMode: ApprovalMode,
 ): Promise<ToolGateResult> {
-  // Safe read-only tools â€” allow, but resolve paths through overlay
+  // Safe read-only tools — allow, but resolve paths through overlay
   if (SAFE_READ_ONLY_TOOLS.has(toolName)) {
     // Rewrite read paths to overlay if file was previously written there
     await resolveReadPaths(args, overlayFs);
     return { action: 'allow' };
   }
 
-  // Write tools â€” only redirect to overlay if approval mode permits auto-edits
+  // Write tools — only redirect to overlay if approval mode permits auto-edits
   if (WRITE_TOOLS.has(toolName)) {
     if (
       approvalMode === ApprovalMode.AUTO_EDIT ||
@@ -81,14 +81,14 @@ export async function evaluateToolCall(
     ) {
       return { action: 'redirect', reason: `write_tool:${toolName}` };
     }
-    // In default/plan mode, writes are a boundary â€” don't silently edit
+    // In default/plan mode, writes are a boundary — don't silently edit
     return {
       action: 'boundary',
       reason: `write_tool_no_auto:${toolName}`,
     };
   }
 
-  // Shell â€” use AST parser for accurate read-only detection
+  // Shell — use AST parser for accurate read-only detection
   if (toolName === ToolNames.SHELL) {
     const command = typeof args['command'] === 'string' ? args['command'] : '';
     if (command && (await isShellCommandReadOnlyAST(command))) {
@@ -105,7 +105,7 @@ export async function evaluateToolCall(
     return { action: 'boundary', reason: `denied_tool:${toolName}` };
   }
 
-  // Unknown tools (including MCP/discovered) â€” boundary for safety
+  // Unknown tools (including MCP/discovered) — boundary for safety
   return { action: 'boundary', reason: `unknown_tool:${toolName}` };
 }
 

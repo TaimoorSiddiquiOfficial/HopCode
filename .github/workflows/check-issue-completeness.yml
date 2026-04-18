@@ -1,4 +1,4 @@
-name: 'Check Issue Completeness'
+﻿name: 'Check Issue Completeness'
 
 on:
   issues:
@@ -14,7 +14,7 @@ jobs:
   check-issue-info:
     timeout-minutes: 2
     if: |-
-      ${{ github.repository == 'QwenLM/qwen-code' && contains(github.event.issue.labels.*.name, 'type/bug') }}
+      ${{ github.repository == 'QwenLM/hopcode' && contains(github.event.issue.labels.*.name, 'type/bug') }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Check for Client Information'

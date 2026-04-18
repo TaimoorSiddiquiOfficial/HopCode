@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -644,7 +644,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           initialMessages = [...rawHistory];
         }
       } else {
-        // History ends with user (unusual) — drop the trailing user
+        // History ends with user (unusual) � drop the trailing user
         // message to avoid consecutive user messages when agent-headless
         // sends the task_prompt.
         initialMessages = rawHistory.slice(0, -1);
@@ -666,7 +666,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
 
     const generationConfig = geminiClient?.getChat().getGenerationConfig();
     if (generationConfig?.systemInstruction) {
-      // Inline FunctionDeclaration[] from the parent — passed verbatim
+      // Inline FunctionDeclaration[] from the parent � passed verbatim
       // (including `agent` and cron tools) so the fork's system prompt,
       // tools, and history exactly match the parent's and share its
       // DashScope cache prefix. A fork is a context-sharing extension of
@@ -712,7 +712,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
   }
 
   // Runs the SubagentStop hook after execution. On a blocking decision, feeds the
-  // reason back and re-executes — up to 5 iterations to defend against a
+  // reason back and re-executes � up to 5 iterations to defend against a
   // misconfigured hook looping forever.
   private async runSubagentStopHookLoop(
     subagent: AgentHeadless,
@@ -975,7 +975,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         updateOutput,
       };
 
-      // ── Background (async) execution path ──────────────────────
+      // -- Background (async) execution path ----------------------
       // OR the tool parameter with the agent definition's background flag.
       const shouldRunInBackground =
         this.params.run_in_background === true ||
@@ -1003,7 +1003,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           }
         }
 
-        // Create an independent AbortController — background agents
+        // Create an independent AbortController � background agents
         // survive ESC cancellation of the parent's current turn.
         const bgAbortController = new AbortController();
 
@@ -1015,7 +1015,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         const bgConfig = Object.create(agentConfig) as any;
         bgConfig.getShouldAvoidPermissionPrompts = () => true;
 
-        // Register in the background task registry only AFTER init succeeds — if
+        // Register in the background task registry only AFTER init succeeds � if
         // construction throws, a pre-registered phantom 'running' entry would hang
         // the non-interactive hold-back loop forever.
         let bgSubagent: AgentHeadless;
@@ -1052,7 +1052,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         // Fire-and-forget: start the subagent without blocking the parent.
         // For forks, wrap the body in runInForkContext so the recursive-fork
         // guard in execute() fires if the fork child's model calls `agent`
-        // again — otherwise background forks bypass the ALS marker and can
+        // again � otherwise background forks bypass the ALS marker and can
         // spawn nested implicit forks.
         const bgBody = async () => {
           try {

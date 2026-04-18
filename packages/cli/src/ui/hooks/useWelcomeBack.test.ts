@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -122,7 +122,7 @@ describe('useWelcomeBack', () => {
 
     await waitFor(() => {
       expect(buffer.setText).toHaveBeenCalledWith(
-        "@.qwen/PROJECT_SUMMARY.md, Based on our previous conversation,Let's continue?",
+        "@.hopcode/PROJECT_SUMMARY.md, Based on our previous conversation,Let's continue?",
       );
     });
 

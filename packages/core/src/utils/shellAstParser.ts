@@ -1,17 +1,17 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Shell AST Parser â€” powered by web-tree-sitter + tree-sitter-bash.
+ * Shell AST Parser — powered by web-tree-sitter + tree-sitter-bash.
  *
  * Provides:
- *   1. `initParser()`           â€“ lazy singleton Parser initialisation
- *   2. `parseShellCommand()`    â€“ parse a command string into a tree-sitter Tree
- *   3. `isShellCommandReadOnlyAST()` â€“ AST-based read-only command detection
- *   4. `extractCommandRules()`  â€“ extract minimum-scope wildcard permission rules
+ *   1. `initParser()`           – lazy singleton Parser initialisation
+ *   2. `parseShellCommand()`    – parse a command string into a tree-sitter Tree
+ *   3. `isShellCommandReadOnlyAST()` – AST-based read-only command detection
+ *   4. `extractCommandRules()`  – extract minimum-scope wildcard permission rules
  */
 
 import Parser from 'web-tree-sitter';
@@ -30,7 +30,7 @@ import { isShellCommandReadOnly } from './shellReadOnlyChecker.js';
  *
  * In bundle mode (esbuild with wasmBinaryPlugin), the `?binary` import is
  * transformed at build-time to embed the WASM bytes inline, so `dynamicImport`
- * succeeds and returns the bytes immediately â€” no external vendor files needed.
+ * succeeds and returns the bytes immediately — no external vendor files needed.
  *
  * In source / transpiled mode (Vitest, tsx, etc.), the `?binary` specifier is
  * unknown to Node's module resolver and the import throws.  The catch block
@@ -189,7 +189,7 @@ const SED_SIDE_EFFECT_PATTERNS = [
 const WRITE_REDIRECT_OPERATORS = new Set(['>', '>>', '&>', '&>>', '>|']);
 
 /**
- * Map of root command â†’ known sub-command sets.
+ * Map of root command ? known sub-command sets.
  * Used by `extractCommandRules()` to identify sub-commands vs arguments.
  */
 const KNOWN_SUBCOMMANDS: Record<string, Set<string>> = {
@@ -608,7 +608,7 @@ let parserInitFailed = false;
 
 /**
  * Initialise the tree-sitter Parser singleton.
- * Safe to call multiple times â€“ only the first call does real work.
+ * Safe to call multiple times – only the first call does real work.
  */
 export async function initParser(): Promise<void> {
   if (parserInstance) return;
@@ -872,7 +872,7 @@ function evaluateStatementReadOnly(node: SyntaxNode): boolean {
     }
 
     case 'compound_statement': {
-      // { cmd1; cmd2; } â€“ evaluate each inner statement
+      // { cmd1; cmd2; } – evaluate each inner statement
       for (const child of node.namedChildren) {
         if (!evaluateStatementReadOnly(child)) return false;
       }
@@ -881,7 +881,7 @@ function evaluateStatementReadOnly(node: SyntaxNode): boolean {
 
     case 'variable_assignment':
     case 'variable_assignments':
-      // Pure assignments without a command â€“ read-only (just sets env)
+      // Pure assignments without a command – read-only (just sets env)
       return true;
 
     case 'negated_command': {
@@ -898,15 +898,15 @@ function evaluateStatementReadOnly(node: SyntaxNode): boolean {
     case 'for_statement':
     case 'case_statement':
     case 'c_style_for_statement':
-      // Control flow constructs â€“ conservatively non-read-only
+      // Control flow constructs – conservatively non-read-only
       return false;
 
     case 'declaration_command':
-      // export/declare/local/readonly/typeset â€“ can modify env
+      // export/declare/local/readonly/typeset – can modify env
       return false;
 
     default:
-      // Unknown node types â€“ conservatively non-read-only
+      // Unknown node types – conservatively non-read-only
       return false;
   }
 }
@@ -958,7 +958,7 @@ export async function isShellCommandReadOnlyAST(
     tree.delete();
     return true;
   } catch {
-    // Unexpected runtime failure (e.g. WASM init error on first call) â€“
+    // Unexpected runtime failure (e.g. WASM init error on first call) –
     // fall back to the regex-based checker rather than propagating the error.
     return isShellCommandReadOnly(command);
   }
@@ -1022,7 +1022,7 @@ function extractRuleFromCommand(commandNode: SyntaxNode): string | null {
     }
   }
 
-  // No known subcommand â€“ if there are any args, append *
+  // No known subcommand – if there are any args, append *
   if (argTexts.length > 0) {
     rule += ' *';
   }
@@ -1062,7 +1062,7 @@ function extractRulesFromStatement(node: SyntaxNode): string[] {
 
     case 'variable_assignment':
     case 'variable_assignments':
-      // Pure assignments â€“ no rule needed
+      // Pure assignments – no rule needed
       return [];
 
     default:
@@ -1077,33 +1077,33 @@ function extractRulesFromStatement(node: SyntaxNode): string[] {
  *
  * Rules follow the minimum-scope principle:
  *   - Preserve root command + sub-command, replace arguments with `*`
- *   - Compound commands are split â†’ separate rules for each part
- *   - No arguments â†’ no wildcard suffix
+ *   - Compound commands are split ? separate rules for each part
+ *   - No arguments ? no wildcard suffix
  *
  * @param command - The full shell command string.
  * @returns Deduplicated list of permission rule strings.
  *
  * @example
  * extractCommandRules('git clone https://github.com/foo/bar.git')
- * // â†’ ['git clone *']
+ * // ? ['git clone *']
  *
  * extractCommandRules('npm install express')
- * // â†’ ['npm install *']
+ * // ? ['npm install *']
  *
  * extractCommandRules('npm outdated')
- * // â†’ ['npm outdated']
+ * // ? ['npm outdated']
  *
  * extractCommandRules('cat /etc/passwd')
- * // â†’ ['cat *']
+ * // ? ['cat *']
  *
  * extractCommandRules('git clone foo && npm install')
- * // â†’ ['git clone *', 'npm install']
+ * // ? ['git clone *', 'npm install']
  *
  * extractCommandRules('ls -la /tmp')
- * // â†’ ['ls *']
+ * // ? ['ls *']
  *
  * extractCommandRules('docker compose up -d')
- * // â†’ ['docker compose up *']
+ * // ? ['docker compose up *']
  */
 export async function extractCommandRules(command: string): Promise<string[]> {
   if (typeof command !== 'string' || !command.trim()) return [];

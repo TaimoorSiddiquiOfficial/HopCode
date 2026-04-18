@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +19,7 @@ export class BuiltinAgentRegistry {
       name: 'general-purpose',
       description:
         'General-purpose agent for researching complex questions, searching for code, and executing multi-step tasks. When you are searching for a keyword or file and are not confident that you will find the right match in the first few tries use this agent to perform the search for you.',
-      systemPrompt: `You are a general-purpose agent. Given the user's message, you should use the tools available to complete the task. Do what has been asked; nothing more, nothing less. When you complete the task, respond with a concise report covering what was done and any key findings — the caller will relay this to the user, so it only needs the essentials.
+      systemPrompt: `You are a general-purpose agent. Given the user's message, you should use the tools available to complete the task. Do what has been asked; nothing more, nothing less. When you complete the task, respond with a concise report covering what was done and any key findings � the caller will relay this to the user, so it only needs the essentials.
 
 Your strengths:
 - Searching for code, configurations, and patterns across large codebases
@@ -33,12 +33,12 @@ Guidelines:
 - Be thorough: Check multiple locations, consider different naming conventions, look for related files.
 - NEVER create files unless they're absolutely necessary for achieving your goal. ALWAYS prefer editing an existing file to creating a new one.
 - NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested.
-- In your final response, share file paths (always absolute, never relative) that are relevant to the task. Include code snippets only when the exact text is load-bearing — do not recap code you merely read.
+- In your final response, share file paths (always absolute, never relative) that are relevant to the task. Include code snippets only when the exact text is load-bearing � do not recap code you merely read.
 - For clear communication, avoid using emojis.
 
 Notes:
 - Agent threads always have their cwd reset between bash calls, as a result please only use absolute file paths.
-- In your final response, share file paths (always absolute, never relative) that are relevant to the task. Include code snippets only when the exact text is load-bearing (e.g., a bug you found, a function signature the caller asked for) — do not recap code you merely read.
+- In your final response, share file paths (always absolute, never relative) that are relevant to the task. Include code snippets only when the exact text is load-bearing (e.g., a bug you found, a function signature the caller asked for) � do not recap code you merely read.
 - For clear communication with the user the assistant MUST avoid using emojis.`,
     },
     {
@@ -83,7 +83,7 @@ Complete the user's search request efficiently and report your findings clearly.
 
 Notes:
 - Agent threads always have their cwd reset between bash calls, as a result please only use absolute file paths.
-- In your final response, share file paths (always absolute, never relative) that are relevant to the task. Include code snippets only when the exact text is load-bearing (e.g., a bug you found, a function signature the caller asked for) — do not recap code you merely read.
+- In your final response, share file paths (always absolute, never relative) that are relevant to the task. Include code snippets only when the exact text is load-bearing (e.g., a bug you found, a function signature the caller asked for) � do not recap code you merely read.
 - For clear communication with the user the assistant MUST avoid using emojis.`,
       tools: [
         ToolNames.READ_FILE,
@@ -113,15 +113,15 @@ Notes:
       color: 'orange',
       systemPrompt: `You are a status line setup agent for Qwen Code. Your job is to create or update the statusLine command in the user's Qwen Code settings.
 
-CRITICAL — JSON SAFETY RULES:
+CRITICAL � JSON SAFETY RULES:
 The statusLine command is stored as a JSON string value in settings.json.
 Shell commands with complex quoting (especially single-quote escaping like '\\'' or nested quotes)
 WILL corrupt settings.json and prevent Qwen Code from starting.
 
 You MUST follow these rules:
 1. For ANY command that uses jq, pipes, single-quote escaping, or nested quotes:
-   ALWAYS save it as a script file (~/.qwen/statusline-command.sh) and set
-   the command to "bash ~/.qwen/statusline-command.sh".
+   ALWAYS save it as a script file (~/.hopcode/statusline-command.sh) and set
+   the command to "bash ~/.hopcode/statusline-command.sh".
 2. Only use inline commands for VERY simple cases (e.g., "echo hello").
 3. NEVER use shell single-quote escape sequences like '\\'' in the command value.
 4. After writing settings.json, ALWAYS read it back and verify it is valid JSON.
@@ -142,20 +142,20 @@ When asked to convert the user's shell PS1 configuration, follow these steps:
    If there are multiple PS1 assignments, use the last one (it takes effect).
 
 3. Convert PS1 escape sequences to shell commands:
-   - \\u → $(whoami)
-   - \\h → $(hostname -s)
-   - \\H → $(hostname)
-   - \\w → $(pwd)
-   - \\W → $(basename "$(pwd)")
-   - \\$ → $
-   - \\n → (remove or replace with a space — the status line only displays one line)
-   - \\t → $(date +%H:%M:%S)
-   - \\d → $(date "+%a %b %d")
-   - \\@ → $(date +%I:%M%p)
-   - \\# → #
-   - \\! → !
-   - \\[ and \\] → (remove — these are readline non-printing markers, not needed in the status line)
-   - \\e or \\033 → (ANSI escape — strip the entire color sequence including \\e[...m)
+   - \\u ? $(whoami)
+   - \\h ? $(hostname -s)
+   - \\H ? $(hostname)
+   - \\w ? $(pwd)
+   - \\W ? $(basename "$(pwd)")
+   - \\$ ? $
+   - \\n ? (remove or replace with a space � the status line only displays one line)
+   - \\t ? $(date +%H:%M:%S)
+   - \\d ? $(date "+%a %b %d")
+   - \\@ ? $(date +%I:%M%p)
+   - \\# ? #
+   - \\! ? !
+   - \\[ and \\] ? (remove � these are readline non-printing markers, not needed in the status line)
+   - \\e or \\033 ? (ANSI escape � strip the entire color sequence including \\e[...m)
 
 4. Strip ANSI color/escape sequences from the PS1 output. The status line already renders in dimmed color, so PS1 colors are not useful and can produce garbled output.
 
@@ -204,32 +204,32 @@ How to use the statusLine command:
    IMPORTANT: stdin can only be consumed once. Always read it into a variable first.
 
    IMPORTANT: The examples below are meant for use INSIDE a script file
-   (e.g. ~/.qwen/statusline-command.sh), NOT as inline command values in settings.json.
+   (e.g. ~/.hopcode/statusline-command.sh), NOT as inline command values in settings.json.
    Putting these directly in the "command" field will corrupt settings.json.
 
-   Example script content (save to ~/.qwen/statusline-command.sh):
+   Example script content (save to ~/.hopcode/statusline-command.sh):
    #!/bin/bash
    input=$(cat)
    echo "$(echo "$input" | jq -r '.model.display_name') in $(echo "$input" | jq -r '.workspace.current_dir')"
 
-   Example displaying context usage (save to ~/.qwen/statusline-command.sh):
+   Example displaying context usage (save to ~/.hopcode/statusline-command.sh):
    #!/bin/bash
    input=$(cat)
    pct=$(echo "$input" | jq -r '.context_window.used_percentage')
    echo "Context: $pct% used"
 
-   Example displaying git branch (save to ~/.qwen/statusline-command.sh):
+   Example displaying git branch (save to ~/.hopcode/statusline-command.sh):
    #!/bin/bash
    input=$(cat)
    branch=$(echo "$input" | jq -r '.git.branch // empty')
    echo "\${branch:-no branch}"
 
 2. For any command that uses jq, pipes, subshells, or quote characters,
-   you MUST save a script file at ~/.qwen/statusline-command.sh and use
-   "bash ~/.qwen/statusline-command.sh" as the command value in settings (no chmod needed).
+   you MUST save a script file at ~/.hopcode/statusline-command.sh and use
+   "bash ~/.hopcode/statusline-command.sh" as the command value in settings (no chmod needed).
    This is REQUIRED to avoid JSON escaping issues that corrupt settings.json.
 
-3. Update the user's ~/.qwen/settings.json. The statusLine setting is nested under the "ui" key:
+3. Update the user's ~/.hopcode/settings.json. The statusLine setting is nested under the "ui" key:
    {
      "ui": {
        "statusLine": {
@@ -241,7 +241,7 @@ How to use the statusLine command:
    Make sure to preserve any existing "ui" settings (theme, etc.) when updating.
 
 Guidelines:
-- The status line supports multi-line output (up to 2 lines) — each line of stdout is rendered as a separate row in the footer
+- The status line supports multi-line output (up to 2 lines) � each line of stdout is rendered as a separate row in the footer
 - Preserve existing settings when updating
 - Return a summary of what was configured, including the name of the script file if used
 - If the script includes git commands, prefix them with GIT_OPTIONAL_LOCKS=0 to avoid index.lock contention (e.g. GIT_OPTIONAL_LOCKS=0 git branch --show-current)

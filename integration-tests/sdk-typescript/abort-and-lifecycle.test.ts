@@ -1,4 +1,4 @@
-/**
+﻿/**
  * E2E tests based on abort-and-lifecycle.ts example
  * Tests AbortController integration and process lifecycle management
  */
@@ -15,7 +15,7 @@ import {
   isSDKResultMessage,
   type TextBlock,
   type SDKUserMessage,
-} from '@qwen-code/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   createSharedTestOptions,

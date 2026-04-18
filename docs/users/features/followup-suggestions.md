@@ -1,12 +1,12 @@
-# Followup Suggestions
+﻿# Followup Suggestions
 
-Qwen Code can predict what you want to type next and show it as ghost text in the input area. This feature uses an LLM call to analyze the conversation context and generate a natural next step suggestion.
+HopCode can predict what you want to type next and show it as ghost text in the input area. This feature uses an LLM call to analyze the conversation context and generate a natural next step suggestion.
 
 This feature works end-to-end in the CLI. In the WebUI, the hook and UI plumbing are available, but host applications must trigger suggestion generation and wire the followup state for suggestions to appear.
 
 ## How It Works
 
-After Qwen Code finishes responding, a suggestion appears as dimmed text in the input area after a short delay (~300ms). For example, after fixing a bug, you might see:
+After HopCode finishes responding, a suggestion appears as dimmed text in the input area after a short delay (~300ms). For example, after fixing a bug, you might see:
 
 ```
 > run the tests

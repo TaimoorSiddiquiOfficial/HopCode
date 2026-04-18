@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+﻿import { useState, useCallback, useEffect } from 'react';
 import * as fs from 'node:fs';
 import {
   type Config,
@@ -156,7 +156,7 @@ export const useFeedbackDialog = ({
         // 7. Fatigue mechanism allows showing (not shown recently across sessions)
         // 8. Not temporarily dismissed
         if (
-          config.getAuthType() !== AuthType.QWEN_OAUTH ||
+          config.getAuthType() !== AuthType.hopcode_OAUTH ||
           !config.getUsageStatisticsEnabled() ||
           settings.merged.ui?.enableUserFeedback === false ||
           !lastMessageIsAIResponse(history) ||

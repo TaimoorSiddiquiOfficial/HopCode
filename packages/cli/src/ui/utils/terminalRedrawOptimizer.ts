@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -65,7 +65,7 @@ export function optimizeMultilineEraseLines(output: string): string {
 export function installTerminalRedrawOptimizer(
   stdout: NodeJS.WriteStream,
 ): () => void {
-  if (process.env['QWEN_CODE_LEGACY_ERASE_LINES'] === '1') {
+  if (process.env['HOPCODE_LEGACY_ERASE_LINES'] === '1') {
     return () => {};
   }
 

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -66,7 +66,7 @@ export class PanelManager {
     }
 
     // First, check if there's an existing Qwen Code group
-    const existingGroup = this.findExistingQwenCodeGroup();
+    const existingGroup = this.findExistingHopCodeGroup();
 
     if (existingGroup) {
       // If Qwen Code webview already exists in a locked group, create the new panel in that same group
@@ -74,7 +74,7 @@ export class PanelManager {
         '[PanelManager] Found existing Qwen Code group, creating panel in same group',
       );
       this.panel = vscode.window.createWebviewPanel(
-        'qwenCode.chat',
+        'HopCode.chat',
         'Qwen Code',
         { viewColumn: existingGroup.viewColumn, preserveFocus: false },
         {
@@ -102,7 +102,7 @@ export class PanelManager {
         const activeColumn =
           vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One;
         this.panel = vscode.window.createWebviewPanel(
-          'qwenCode.chat',
+          'HopCode.chat',
           'Qwen Code',
           { viewColumn: activeColumn, preserveFocus: false },
           {
@@ -123,7 +123,7 @@ export class PanelManager {
       const newGroupColumn = vscode.window.tabGroups.activeTabGroup.viewColumn;
 
       this.panel = vscode.window.createWebviewPanel(
-        'qwenCode.chat',
+        'HopCode.chat',
         'Qwen Code',
         { viewColumn: newGroupColumn, preserveFocus: false },
         {
@@ -161,7 +161,7 @@ export class PanelManager {
    * Find the group and view column where the existing Qwen Code webview is located
    * @returns The found group and view column, or undefined if not found
    */
-  private findExistingQwenCodeGroup():
+  private findExistingHopCodeGroup():
     | { group: vscode.TabGroup; viewColumn: vscode.ViewColumn }
     | undefined {
     for (const group of vscode.window.tabGroups.all) {
@@ -172,7 +172,7 @@ export class PanelManager {
 
         if (
           isWebviewInput(input) &&
-          input.viewType === 'mainThreadWebview-qwenCode.chat'
+          input.viewType === 'mainThreadWebview-HopCode.chat'
         ) {
           // Found an existing Qwen Code tab
           console.log('[PanelManager] Found existing Qwen Code group:', {
@@ -261,7 +261,7 @@ export class PanelManager {
         const isWebviewInput = (inp: unknown): inp is { viewType: string } =>
           !!inp && typeof inp === 'object' && 'viewType' in inp;
         const isWebview = isWebviewInput(input);
-        const sameViewType = isWebview && input.viewType === 'qwenCode.chat';
+        const sameViewType = isWebview && input.viewType === 'HopCode.chat';
         const sameLabel = t.label === panelTitle;
         return !!(sameViewType || sameLabel);
       });

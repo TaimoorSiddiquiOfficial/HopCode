@@ -96,8 +96,8 @@ class ReadFileToolInvocation extends BaseToolInvocation<
     const osTempDir = os.tmpdir();
 
     // Auto-allow reads of files within the managed auto-memory root for this
-    // project only â€” using the narrower isAutoMemPath check instead of the
-    // broad getMemoryBaseDir() to avoid exposing sensitive ~/.qwen files such
+    // project only — using the narrower isAutoMemPath check instead of the
+    // broad getMemoryBaseDir() to avoid exposing sensitive ~/.hopcode files such
     // as settings.json or OAuth credentials.
     if (
       workspaceContext.isPathWithinWorkspace(filePath) ||
@@ -157,7 +157,7 @@ class ReadFileToolInvocation extends BaseToolInvocation<
           llmContent = note + llmContent;
         }
       } catch {
-        // Best-effort â€” if stat fails, omit the note silently.
+        // Best-effort — if stat fails, omit the note silently.
       }
     }
 
@@ -248,7 +248,7 @@ export class ReadFileTool extends BaseDeclarativeTool<
 
     const fileService = this.config.getFileService();
     if (fileService.shouldQwenIgnoreFile(params.file_path)) {
-      return `File path '${filePath}' is ignored by .qwenignore pattern(s).`;
+      return `File path '${filePath}' is ignored by .hopcodeignore pattern(s).`;
     }
 
     return null;

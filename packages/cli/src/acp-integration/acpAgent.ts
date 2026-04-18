@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -218,7 +218,7 @@ class QwenAgent implements Agent {
       });
     };
 
-    if (method === AuthType.QWEN_OAUTH) {
+    if (method === AuthType.hopcode_OAUTH) {
       qwenOAuth2Events.once(QwenOAuth2Event.AuthUri, authUriHandler);
     }
 
@@ -231,7 +231,7 @@ class QwenAgent implements Agent {
         method,
       );
     } finally {
-      if (method === AuthType.QWEN_OAUTH) {
+      if (method === AuthType.hopcode_OAUTH) {
         qwenOAuth2Events.off(QwenOAuth2Event.AuthUri, authUriHandler);
       }
     }
@@ -500,7 +500,7 @@ class QwenAgent implements Agent {
       errorMessage?.includes('Qwen OAuth')
     ) {
       const qwenOAuthMethods = authMethods.filter(
-        (m) => m.id === AuthType.QWEN_OAUTH,
+        (m) => m.id === AuthType.hopcode_OAUTH,
       );
       return qwenOAuthMethods.length ? qwenOAuthMethods : authMethods;
     }

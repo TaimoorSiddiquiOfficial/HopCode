@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +8,7 @@
  * @fileoverview Generic non-blocking message queue.
  *
  * Simple FIFO queue for producer/consumer patterns. Dequeue is
- * non-blocking â€” returns null when empty. The consumer decides
+ * non-blocking — returns null when empty. The consumer decides
  * when and how to process items.
  */
 

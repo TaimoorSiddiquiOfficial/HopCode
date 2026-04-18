@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
@@ -24,7 +24,7 @@ import * as os from 'node:os';
 import {
   QWEN_CONFIG_DIR,
   DEFAULT_CONTEXT_FILENAME,
-} from '@qwen-code/qwen-code-core/src/memory/const.js';
+} from '@hopcode/hopcode-core/src/memory/const.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, '..');
@@ -94,7 +94,7 @@ export async function setup() {
 
   // Environment variables for CLI integration tests
   process.env['INTEGRATION_TEST_FILE_DIR'] = runDir;
-  process.env['QWEN_CODE_INTEGRATION_TEST'] = 'true';
+  process.env['hopcode_INTEGRATION_TEST'] = 'true';
   process.env['TELEMETRY_LOG_FILE'] = join(runDir, 'telemetry.log');
 
   // Environment variables for SDK E2E tests

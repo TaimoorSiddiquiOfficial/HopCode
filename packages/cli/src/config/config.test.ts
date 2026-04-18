@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -2464,18 +2464,18 @@ describe('sandbox image resolution precedence', () => {
     vi.resetAllMocks();
     vi.mocked(os.homedir).mockReturnValue('/mock/home/user');
     vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
-    delete process.env['QWEN_SANDBOX_IMAGE'];
+    delete process.env['HOPCODE_SANDBOX_IMAGE'];
   });
 
   afterEach(() => {
     process.argv = originalArgv;
     vi.unstubAllEnvs();
     vi.restoreAllMocks();
-    delete process.env['QWEN_SANDBOX_IMAGE'];
+    delete process.env['HOPCODE_SANDBOX_IMAGE'];
   });
 
   it('uses --sandbox-image over env and settings', async () => {
-    vi.stubEnv('QWEN_SANDBOX_IMAGE', 'env-image');
+    vi.stubEnv('HOPCODE_SANDBOX_IMAGE', 'env-image');
     process.argv = [
       'node',
       'script.js',
@@ -2494,8 +2494,8 @@ describe('sandbox image resolution precedence', () => {
     expect(config.getSandbox()?.image).toBe('cli-image');
   });
 
-  it('uses QWEN_SANDBOX_IMAGE over tools.sandboxImage', async () => {
-    vi.stubEnv('QWEN_SANDBOX_IMAGE', 'env-image');
+  it('uses HOPCODE_SANDBOX_IMAGE over tools.sandboxImage', async () => {
+    vi.stubEnv('HOPCODE_SANDBOX_IMAGE', 'env-image');
     process.argv = ['node', 'script.js', '--sandbox'];
     const argv = await parseArguments();
     const settings: Settings = {
@@ -2569,11 +2569,11 @@ describe('loadCliConfig runtimeOutputDir', () => {
   it('should resolve relative runtimeOutputDir against cwd', async () => {
     const argv = await parseArguments();
     const settings: Settings = {
-      advanced: { runtimeOutputDir: '.qwen' },
+      advanced: { runtimeOutputDir: '.hopcode' },
     };
     const cwd = path.resolve('workspace', 'my-project');
     await loadCliConfig(settings, argv, cwd);
-    expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.qwen'));
+    expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.hopcode'));
   });
 
   it('should not set runtime base dir when runtimeOutputDir is absent', async () => {

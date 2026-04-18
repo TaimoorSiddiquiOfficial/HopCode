@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,8 +190,8 @@ export default {
   // ============================================================================
   // Agents - Creation Wizard
   // ============================================================================
-  'Project Level (.qwen/agents/)': 'Projektebene (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': 'Benutzerebene (~/.qwen/agents/)',
+  'Project Level (.hopcode/agents/)': 'Projektebene (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': 'Benutzerebene (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ Unteragent erfolgreich erstellt!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Unteragent "{{name}}" wurde auf {{level}}-Ebene gespeichert.',
@@ -331,7 +331,7 @@ export default {
   'Load Memory From Include Directories':
     'Speicher aus Include-Verzeichnissen laden',
   'Respect .gitignore': '.gitignore beachten',
-  'Respect .qwenignore': '.qwenignore beachten',
+  'Respect .hopcodeignore': '.hopcodeignore beachten',
   'Enable Recursive File Search': 'Rekursive Dateisuche aktivieren',
   'Disable Fuzzy Search': 'Unscharfe Suche deaktivieren',
   'Interactive Shell (PTY)': 'Interaktive Shell (PTY)',
@@ -1009,8 +1009,8 @@ export default {
   // ============================================================================
   // Commands - Summary
   // ============================================================================
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'Projektzusammenfassung generieren und in .qwen/PROJECT_SUMMARY.md speichern',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    'Projektzusammenfassung generieren und in .hopcode/PROJECT_SUMMARY.md speichern',
   'No chat client available to generate summary.':
     'Kein Chat-Client verfügbar, um Zusammenfassung zu generieren.',
   'Already generating summary, wait for previous request to complete':
@@ -1421,12 +1421,12 @@ export default {
   'From project settings': 'Aus Projekteinstellungen',
   'From session': 'Aus Sitzung',
   'Project settings (local)': 'Projekteinstellungen (lokal)',
-  'Saved in .qwen/settings.local.json':
-    'Gespeichert in .qwen/settings.local.json',
+  'Saved in .hopcode/settings.local.json':
+    'Gespeichert in .hopcode/settings.local.json',
   'Project settings': 'Projekteinstellungen',
-  'Checked in at .qwen/settings.json': 'Eingecheckt in .qwen/settings.json',
+  'Checked in at .hopcode/settings.json': 'Eingecheckt in .hopcode/settings.json',
   'User settings': 'Benutzereinstellungen',
-  'Saved in at ~/.qwen/settings.json': 'Gespeichert in ~/.qwen/settings.json',
+  'Saved in at ~/.hopcode/settings.json': 'Gespeichert in ~/.hopcode/settings.json',
   'Add a new rule…': 'Neue Regel hinzufügen…',
   'Add {{type}} permission rule': '{{type}}-Berechtigungsregel hinzufügen',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

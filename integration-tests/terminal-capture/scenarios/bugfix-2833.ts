@@ -1,4 +1,4 @@
-import type { ScenarioConfig } from '../scenario-runner.js';
+﻿import type { ScenarioConfig } from '../scenario-runner.js';
 
 /**
  * Streaming capture for /qc:bugfix command on GitHub issue #2833.
@@ -8,10 +8,10 @@ import type { ScenarioConfig } from '../scenario-runner.js';
 export default {
   name: 'streaming-bugfix-2833',
   spawn: ['node', 'dist/cli.js', '--yolo'],
-  terminal: { title: 'qwen-code', cwd: '../../..' },
+  terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {
-      type: '/qc:bugfix https://github.com/QwenLM/qwen-code/issues/2833',
+      type: '/qc:bugfix https://github.com/QwenLM/hopcode/issues/2833',
       // Bugfix workflow is long-running (20+ minutes), capture throughout
       streaming: {
         delayMs: 10000, // Wait 10s for initial prompt processing

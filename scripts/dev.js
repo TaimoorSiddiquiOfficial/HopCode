@@ -1,11 +1,11 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Development entry point for Qwen Code CLI.
+ * Development entry point for HopCode CLI.
  *
  * Runs the CLI directly from TypeScript source files without requiring a build step.
  * Changes to packages/core or packages/cli are reflected immediately.

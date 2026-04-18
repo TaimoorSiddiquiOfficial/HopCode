@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <!-- HopCode - Typed Logo Version 1: Clean Modern -->
+  <!-- Pure typography, no graphics -->
+  
+  <defs>
+    <!-- Gradient for text -->
+    <linearGradient id="typedGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="typedGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="200" fill="#0F0F14"/>
+  
+  <!-- Main Text -->
+  <text x="400" y="110" 
+        font-family="'Inter', 'JetBrains Mono', monospace" 
+        font-size="72" 
+        font-weight="700"
+        letter-spacing="-2"
+        fill="url(#typedGradient1)"
+        text-anchor="middle">
+    HOPCODE
+  </text>
+  
+  <!-- Tagline -->
+  <text x="400" y="150" 
+        font-family="'Inter', system-ui, sans-serif" 
+        font-size="18" 
+        font-weight="400"
+        letter-spacing="4"
+        fill="#A1A1AA"
+        text-anchor="middle">
+    CODE WITH AI
+  </text>
+  
+  <!-- Underline accent -->
+  <line x1="250" y1="125" x2="550" y2="125" 
+        stroke="#7C3AED" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        opacity="0.5"/>
+</svg>

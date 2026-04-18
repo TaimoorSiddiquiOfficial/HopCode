@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -212,8 +212,8 @@ export default {
   // ============================================================================
   // Agents - Creation Wizard
   // ============================================================================
-  'Project Level (.qwen/agents/)': 'Project Level (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': 'User Level (~/.qwen/agents/)',
+  'Project Level (.hopcode/agents/)': 'Project Level (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': 'User Level (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ Subagent Created Successfully!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Subagent "{{name}}" has been saved to {{level}} level.',
@@ -416,7 +416,7 @@ export default {
   'Load Memory From Include Directories':
     'Load Memory From Include Directories',
   'Respect .gitignore': 'Respect .gitignore',
-  'Respect .qwenignore': 'Respect .qwenignore',
+  'Respect .hopcodeignore': 'Respect .hopcodeignore',
   'Enable Recursive File Search': 'Enable Recursive File Search',
   'Disable Fuzzy Search': 'Disable Fuzzy Search',
   'Interactive Shell (PTY)': 'Interactive Shell (PTY)',
@@ -1170,8 +1170,8 @@ export default {
   // ============================================================================
   // Commands - Summary
   // ============================================================================
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     'No chat client available to generate summary.',
   'Already generating summary, wait for previous request to complete':
@@ -1468,11 +1468,11 @@ export default {
   'From project settings': 'From project settings',
   'From session': 'From session',
   'Project settings (local)': 'Project settings (local)',
-  'Saved in .qwen/settings.local.json': 'Saved in .qwen/settings.local.json',
+  'Saved in .hopcode/settings.local.json': 'Saved in .hopcode/settings.local.json',
   'Project settings': 'Project settings',
-  'Checked in at .qwen/settings.json': 'Checked in at .qwen/settings.json',
+  'Checked in at .hopcode/settings.json': 'Checked in at .hopcode/settings.json',
   'User settings': 'User settings',
-  'Saved in at ~/.qwen/settings.json': 'Saved in at ~/.qwen/settings.json',
+  'Saved in at ~/.hopcode/settings.json': 'Saved in at ~/.hopcode/settings.json',
   'Add a new rule…': 'Add a new rule…',
   'Add {{type}} permission rule': 'Add {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

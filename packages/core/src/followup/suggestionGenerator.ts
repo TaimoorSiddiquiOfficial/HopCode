@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Prompt Suggestion Generator
@@ -39,14 +39,14 @@ PRIORITY: If the assistant's last message contains a tip or hint like "Tip: type
 or "type X to ...", extract X as the suggestion. These are explicit next-step hints.
 
 EXAMPLES:
-Assistant says "Tip: type post comments to publish findings" → "post comments"
-Assistant says "type /review to start" → "/review"
-User asked "fix the bug and run tests", bug is fixed → "run the tests"
-After code written → "try it out"
-Model offers options → suggest the one the user would likely pick, based on conversation
-Model asks to continue → "yes" or "go ahead"
-Task complete, obvious follow-up → "commit this" or "push it"
-After error or misunderstanding → silence (let them assess/correct)
+Assistant says "Tip: type post comments to publish findings" ? "post comments"
+Assistant says "type /review to start" ? "/review"
+User asked "fix the bug and run tests", bug is fixed ? "run the tests"
+After code written ? "try it out"
+Model offers options ? suggest the one the user would likely pick, based on conversation
+Model asks to continue ? "yes" or "go ahead"
+Task complete, obvious follow-up ? "commit this" or "push it"
+After error or misunderstanding ? silence (let them assess/correct)
 
 Be specific: "run the tests" beats "continue".
 
@@ -190,7 +190,7 @@ async function generateViaForkedQuery(
       const raw = parsed['suggestion'];
       return typeof raw === 'string' ? raw : null;
     } catch {
-      // Model returned plain text — use it directly
+      // Model returned plain text � use it directly
       return result.text;
     }
   }
@@ -219,7 +219,7 @@ async function generateViaBaseLlm(
       contents,
       config: {
         abortSignal,
-        // Disable thinking for suggestion generation — not needed and wastes tokens
+        // Disable thinking for suggestion generation � not needed and wastes tokens
         thinkingConfig: { includeThoughts: false },
       },
     },
@@ -245,7 +245,7 @@ async function generateViaBaseLlm(
       const s = parsed['suggestion'];
       if (typeof s === 'string') return s;
     } catch {
-      // Not JSON — use raw text as the suggestion
+      // Not JSON � use raw text as the suggestion
     }
     return text;
   }
@@ -308,7 +308,7 @@ export function getFilterReason(suggestion: string): string | null {
 
   if (/^\w+:\s/.test(suggestion)) return 'prefixed_label';
 
-  // CJK text has no spaces — skip whitespace-based word count checks
+  // CJK text has no spaces � skip whitespace-based word count checks
   // and use character count instead
   const hasCJK = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(
     suggestion,

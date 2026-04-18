@@ -83,7 +83,7 @@ class GrepToolInvocation extends BaseToolInvocation<
       let searchDirDisplay: string;
 
       if (this.params.path) {
-        // User specified a path â€” search only that path
+        // User specified a path — search only that path
         const searchDirAbs = resolveAndValidatePath(
           this.config,
           this.params.path,
@@ -92,7 +92,7 @@ class GrepToolInvocation extends BaseToolInvocation<
         searchPaths.push(searchDirAbs);
         searchDirDisplay = this.params.path;
       } else {
-        // No path specified â€” search all workspace directories
+        // No path specified — search all workspace directories
         const workspaceDirs = this.config
           .getWorkspaceContext()
           .getDirectories();
@@ -243,21 +243,21 @@ class GrepToolInvocation extends BaseToolInvocation<
       pattern,
     ];
 
-    // Add file exclusions from .gitignore and .qwenignore
+    // Add file exclusions from .gitignore and .hopcodeignore
     const filteringOptions = this.getFileFilteringOptions();
     if (!filteringOptions.respectGitIgnore) {
       rgArgs.push('--no-ignore-vcs');
     }
 
     if (filteringOptions.respectQwenIgnore) {
-      // Load .qwenignore from each workspace directory, not just the primary one
+      // Load .hopcodeignore from each workspace directory, not just the primary one
       const seenIgnoreFiles = new Set<string>();
       for (const searchPath of paths) {
         const dir =
           fs.existsSync(searchPath) && fs.statSync(searchPath).isDirectory()
             ? searchPath
             : path.dirname(searchPath);
-        const qwenIgnorePath = path.join(dir, '.qwenignore');
+        const qwenIgnorePath = path.join(dir, '.hopcodeignore');
         if (
           !seenIgnoreFiles.has(qwenIgnorePath) &&
           fs.existsSync(qwenIgnorePath)

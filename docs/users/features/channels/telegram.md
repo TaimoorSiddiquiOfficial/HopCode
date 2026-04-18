@@ -1,6 +1,6 @@
-# Telegram
+﻿# Telegram
 
-This guide covers setting up a Qwen Code channel on Telegram.
+This guide covers setting up a HopCode channel on Telegram.
 
 ## Prerequisites
 

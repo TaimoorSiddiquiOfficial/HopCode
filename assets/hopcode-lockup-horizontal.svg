@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 150">
+  <!-- HopCode Logo - Horizontal Lockup (Butterfly + Wordmark) -->
+  <!-- For headers, documentation, and marketing materials -->
+  
+  <defs>
+    <!-- Butterfly wing gradients -->
+    <linearGradient id="lockupWingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="lockupWingRightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22D3EE;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Text gradient -->
+    <linearGradient id="lockupTextGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Butterfly Symbol (left side, 80x80) -->
+  <g transform="translate(15, 35)">
+    <!-- Left Wing -->
+    <path d="M 35 50 Q 25 35 30 25 Q 33 15 45 20 L 45 50 Z" fill="url(#lockupWingGradient)"/>
+    
+    <!-- Right Wing -->
+    <path d="M 55 50 Q 65 35 60 25 Q 57 15 45 20 L 45 50 Z" fill="url(#lockupWingRightGradient)"/>
+    
+    <!-- H Letterform -->
+    <path d="M 40 55 L 40 75 L 44 75 L 44 65 L 46 65 L 46 75 L 50 75 L 50 55 L 46 55 L 46 62 L 44 62 L 44 55 Z" fill="#F59E0B"/>
+    
+    <!-- Center dot -->
+    <circle cx="45" cy="48" r="3" fill="#FEF3C7"/>
+  </g>
+  
+  <!-- "HopCode" Wordmark (right side) -->
+  <text x="110" y="95" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="56" 
+        font-weight="600"
+        letter-spacing="-1.5"
+        fill="url(#lockupTextGradient)">
+    HopCode
+  </text>
+  
+  <!-- Tagline (optional, below wordmark) -->
+  <text x="112" y="120" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="14" 
+        font-weight="400"
+        letter-spacing="1"
+        fill="#71717A">
+    Code with AI
+  </text>
+  
+  <!-- Decorative underline accent -->
+  <line x1="110" y1="105" x2="280" y2="105" 
+        stroke="#7C3AED" 
+        stroke-width="2" 
+        stroke-linecap="round"
+        opacity="0.4"/>
+</svg>

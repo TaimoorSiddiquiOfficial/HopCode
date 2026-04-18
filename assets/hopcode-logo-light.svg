@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- HopCode Logo - Butterfly Light Theme Version -->
+  <!-- Optimized for light backgrounds with adjusted colors -->
+  
+  <defs>
+    <!-- Darker gradient for light theme visibility -->
+    <linearGradient id="lightWingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6D28D9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5B21B6;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="lightWingRightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0E7490;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#155E75;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Shadow for depth on light background -->
+    <filter id="lightShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Left Wing -->
+  <path d="M 75 100 
+           Q 55 70 60 50 
+           Q 65 30 85 25 
+           Q 95 23 100 30 
+           L 100 100 
+           Q 85 100 75 100 Z" 
+        fill="url(#lightWingGradient)"
+        filter="url(#lightShadow)"/>
+  
+  <!-- Right Wing -->
+  <path d="M 125 100 
+           Q 145 70 140 50 
+           Q 135 30 115 25 
+           Q 105 23 100 30 
+           L 100 100 
+           Q 115 100 125 100 Z" 
+        fill="url(#lightWingRightGradient)"
+        filter="url(#lightShadow)"/>
+  
+  <!-- Center H Letterform -->
+  <path d="M 88 115 
+           L 88 165 
+           L 96 165 
+           L 96 140 
+           L 104 140 
+           L 104 165 
+           L 112 165 
+           L 112 115 
+           L 104 115 
+           L 104 132 
+           L 96 132 
+           L 96 115 
+           Z" 
+        fill="#D97706"
+        filter="url(#lightShadow)"/>
+  
+  <!-- Code bracket accent (left) -->
+  <path d="M 70 85 
+           L 62 100 
+           L 70 115" 
+        stroke="#78716C" 
+        stroke-width="4" 
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        opacity="0.5"/>
+  
+  <!-- Code bracket accent (right) -->
+  <path d="M 130 85 
+           L 138 100 
+           L 130 115" 
+        stroke="#78716C" 
+        stroke-width="4" 
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        opacity="0.5"/>
+  
+  <!-- Center dot (AI core) -->
+  <circle cx="100" cy="95" r="6" fill="#D97706" filter="url(#lightShadow)"/>
+</svg>

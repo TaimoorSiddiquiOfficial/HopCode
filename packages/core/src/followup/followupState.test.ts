@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +26,7 @@ describe('createFollowupController', () => {
 
     ctrl.setSuggestion('commit this');
 
-    // Not yet â€” delay hasn't elapsed
+    // Not yet — delay hasn't elapsed
     expect(onStateChange).not.toHaveBeenCalled();
 
     vi.advanceTimersByTime(300);
@@ -83,7 +83,7 @@ describe('createFollowupController', () => {
     // State should be cleared
     expect(onStateChange).toHaveBeenCalledWith(INITIAL_FOLLOWUP_STATE);
 
-    // Callback fires via microtask â€” flush it
+    // Callback fires via microtask — flush it
     await Promise.resolve();
 
     expect(onAccept).toHaveBeenCalledTimes(1);
@@ -128,7 +128,7 @@ describe('createFollowupController', () => {
     ctrl.setSuggestion('commit this');
     vi.advanceTimersByTime(300);
 
-    // First accept â€” callback throws, but lock should still be released
+    // First accept — callback throws, but lock should still be released
     ctrl.accept();
     await Promise.resolve();
 
@@ -144,7 +144,7 @@ describe('createFollowupController', () => {
     ctrl.setSuggestion('run tests');
     vi.advanceTimersByTime(300);
 
-    // Second accept â€” should NOT be blocked
+    // Second accept — should NOT be blocked
     ctrl.accept();
     await Promise.resolve();
 
@@ -240,7 +240,7 @@ describe('createFollowupController', () => {
     const onOutcome = vi.fn();
     const ctrl = createFollowupController({ onStateChange, onOutcome });
 
-    // No suggestion set â€” dismiss should be a no-op
+    // No suggestion set — dismiss should be a no-op
     ctrl.dismiss();
 
     expect(onOutcome).not.toHaveBeenCalled();
@@ -263,7 +263,7 @@ describe('createFollowupController', () => {
     // clear before debounce timeout releases lock
     ctrl.clear();
 
-    // Set new suggestion and accept again â€” should work
+    // Set new suggestion and accept again — should work
     ctrl.setSuggestion('second');
     vi.advanceTimersByTime(300);
     ctrl.accept();
@@ -318,7 +318,7 @@ describe('createFollowupController', () => {
       expect.objectContaining({ outcome: 'accepted', accept_method: 'enter' }),
     );
 
-    // Flush microtask â€” onAccept should NOT be called
+    // Flush microtask — onAccept should NOT be called
     await Promise.resolve();
     expect(onAccept).not.toHaveBeenCalled();
 

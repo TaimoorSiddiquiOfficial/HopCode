@@ -1,13 +1,13 @@
-{
-  "name": "qwen-code-vscode-ide-companion",
-  "displayName": "Qwen Code Companion",
-  "description": "Enable Qwen Code with direct access to your VS Code workspace.",
+﻿{
+  "name": "hopcode-vscode-ide-companion",
+  "displayName": "HopCode Companion",
+  "description": "Enable HopCode with direct access to your VS Code workspace.",
   "version": "0.14.5",
-  "publisher": "qwenlm",
+  "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/QwenLM/qwen-code.git",
+    "url": "https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {
@@ -19,7 +19,7 @@
     "AI"
   ],
   "keywords": [
-    "qwen-code",
+    "hopcode",
     "qwen code",
     "qwen",
     "qwen code",
@@ -29,12 +29,12 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onView:qwen-code.chatView.sidebar",
-    "onView:qwen-code.chatView.secondary",
-    "onCommand:qwen-code.openChat",
-    "onCommand:qwen-code.focusChat",
-    "onCommand:qwen-code.newConversation",
-    "onCommand:qwen-code.showLogs"
+    "onView:hopcode.chatView.sidebar",
+    "onView:hopcode.chatView.secondary",
+    "onCommand:hopcode.openChat",
+    "onCommand:hopcode.focusChat",
+    "onCommand:hopcode.newConversation",
+    "onCommand:hopcode.showLogs"
   ],
   "contributes": {
     "jsonValidation": [
@@ -46,38 +46,38 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "qwen-code-sidebar",
+          "id": "hopcode-sidebar",
           "title": "Qwen Code",
           "icon": "assets/sidebar-icon.svg",
-          "when": "!qwen-code:supportsSecondarySidebar"
+          "when": "!hopcode:supportsSecondarySidebar"
         }
       ],
       "secondarySidebar": [
         {
-          "id": "qwen-code-secondary",
+          "id": "hopcode-secondary",
           "title": "Qwen Code",
           "icon": "assets/sidebar-icon.svg",
-          "when": "qwen-code:supportsSecondarySidebar"
+          "when": "hopcode:supportsSecondarySidebar"
         }
       ]
     },
     "views": {
-      "qwen-code-sidebar": [
+      "hopcode-sidebar": [
         {
           "type": "webview",
-          "id": "qwen-code.chatView.sidebar",
+          "id": "hopcode.chatView.sidebar",
           "name": "Qwen Code",
           "icon": "assets/sidebar-icon.svg",
-          "when": "!qwen-code:supportsSecondarySidebar"
+          "when": "!hopcode:supportsSecondarySidebar"
         }
       ],
-      "qwen-code-secondary": [
+      "hopcode-secondary": [
         {
           "type": "webview",
-          "id": "qwen-code.chatView.secondary",
+          "id": "hopcode.chatView.secondary",
           "name": "Qwen Code",
           "icon": "assets/sidebar-icon.svg",
-          "when": "qwen-code:supportsSecondarySidebar"
+          "when": "hopcode:supportsSecondarySidebar"
         }
       ]
     },
@@ -98,32 +98,32 @@
         "icon": "$(close)"
       },
       {
-        "command": "qwen-code.runQwenCode",
+        "command": "hopcode.runQwenCode",
         "title": "Qwen Code: Run"
       },
       {
-        "command": "qwen-code.showNotices",
+        "command": "hopcode.showNotices",
         "title": "Qwen Code: View Third-Party Notices"
       },
       {
-        "command": "qwen-code.openChat",
+        "command": "hopcode.openChat",
         "title": "Qwen Code: Open",
         "icon": "./assets/icon.png"
       },
       {
-        "command": "qwen-code.login",
+        "command": "hopcode.login",
         "title": "Qwen Code: Login"
       },
       {
-        "command": "qwen-code.focusChat",
+        "command": "hopcode.focusChat",
         "title": "Qwen Code: Focus Chat View"
       },
       {
-        "command": "qwen-code.newConversation",
+        "command": "hopcode.newConversation",
         "title": "Qwen Code: New Conversation"
       },
       {
-        "command": "qwen-code.showLogs",
+        "command": "hopcode.showLogs",
         "title": "Qwen Code: Show Logs"
       }
     ],
@@ -138,7 +138,7 @@
           "when": "qwen.diff.isVisible"
         },
         {
-          "command": "qwen-code.login",
+          "command": "hopcode.login",
           "when": "false"
         }
       ],
@@ -154,7 +154,7 @@
           "group": "navigation"
         },
         {
-          "command": "qwen-code.openChat",
+          "command": "hopcode.openChat",
           "group": "navigation"
         }
       ]
@@ -171,7 +171,7 @@
         "when": "qwen.diff.isVisible"
       },
       {
-        "command": "qwen-code.focusChat",
+        "command": "hopcode.focusChat",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l"
       }
@@ -185,7 +185,6 @@
     "build:dev": "npm run check-types && npm run lint && node esbuild.js",
     "build:prod": "node esbuild.js --production",
     "generate:notices": "node ./scripts/generate-notices.js",
-    "prepare": "npm run generate:notices",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "watch": "npm-run-all2 -p watch:*",
@@ -219,7 +218,7 @@
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^0.14.1",
-    "@qwen-code/webui": "*",
+    "@hopcode/webui": "*",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",

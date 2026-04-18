@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -143,7 +143,7 @@ function applyResolvedModelConfig(
 
 /**
  * Resolve a credential field (apiKey or baseUrl) with the following
- * priority: explicit override → same-provider parent value → env var.
+ * priority: explicit override ? same-provider parent value ? env var.
  */
 export function resolveCredentialField(
   explicitValue: string | undefined,

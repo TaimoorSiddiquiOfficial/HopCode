@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen team
+ * Copyright 2026 HopCode Team team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +20,7 @@ function sorted(ops: ShellOperation[]) {
 }
 
 describe('extractShellOperations', () => {
-  // ── Empty / no-op ──────────────────────────────────────────────────────────
+  // -- Empty / no-op ----------------------------------------------------------
 
   it('returns [] for empty string', () => {
     expect(extractShellOperations('', CWD)).toEqual([]);
@@ -38,7 +38,7 @@ describe('extractShellOperations', () => {
     expect(extractShellOperations('FOO=bar', CWD)).toEqual([]);
   });
 
-  // ── cat ────────────────────────────────────────────────────────────────────
+  // -- cat --------------------------------------------------------------------
 
   it('cat: absolute path', () => {
     const ops = extractShellOperations('cat /etc/passwd', CWD);
@@ -79,7 +79,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── head / tail ────────────────────────────────────────────────────────────
+  // -- head / tail ------------------------------------------------------------
 
   it('head: -n value not treated as path', () => {
     const ops = extractShellOperations('head -n 10 /var/log/syslog', CWD);
@@ -96,7 +96,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── diff ───────────────────────────────────────────────────────────────────
+  // -- diff -------------------------------------------------------------------
 
   it('diff: two files', () => {
     const ops = extractShellOperations('diff /old /new', CWD);
@@ -106,7 +106,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── grep ───────────────────────────────────────────────────────────────────
+  // -- grep -------------------------------------------------------------------
 
   it('grep: first positional is pattern, rest are files', () => {
     const ops = extractShellOperations('grep password /etc/shadow', CWD);
@@ -131,9 +131,9 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  it('grep: -f patternfile — positionals are file paths', () => {
+  it('grep: -f patternfile � positionals are file paths', () => {
     const ops = extractShellOperations('grep -f patterns.txt /etc/hosts', CWD);
-    // -f consumes patterns.txt; /etc/hosts is the only positional → first positional skipped? No.
+    // -f consumes patterns.txt; /etc/hosts is the only positional ? first positional skipped? No.
     // With -f, hasPatternFlag=true, so all positionals are file paths (no slice(1))
     expect(ops).toEqual([{ virtualTool: 'read_file', filePath: '/etc/hosts' }]);
   });
@@ -145,7 +145,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── ls / find ──────────────────────────────────────────────────────────────
+  // -- ls / find --------------------------------------------------------------
 
   it('ls: no args defaults to cwd', () => {
     const ops = extractShellOperations('ls', CWD);
@@ -169,7 +169,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'list_directory', filePath: CWD }]);
   });
 
-  // ── touch / mkdir ──────────────────────────────────────────────────────────
+  // -- touch / mkdir ----------------------------------------------------------
 
   it('touch: creates a file (write_file)', () => {
     const ops = extractShellOperations('touch /tmp/new.txt', CWD);
@@ -183,7 +183,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'write_file', filePath: '/tmp/a/b' }]);
   });
 
-  // ── cp / mv ────────────────────────────────────────────────────────────────
+  // -- cp / mv ----------------------------------------------------------------
 
   it('cp: src=read, dst=write', () => {
     const ops = extractShellOperations('cp /etc/passwd /tmp/backup', CWD);
@@ -201,7 +201,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── rm ─────────────────────────────────────────────────────────────────────
+  // -- rm ---------------------------------------------------------------------
 
   it('rm: single file is edit', () => {
     const ops = extractShellOperations('rm /tmp/secret.txt', CWD);
@@ -213,7 +213,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/tmp/dir' }]);
   });
 
-  // ── chmod / chown ──────────────────────────────────────────────────────────
+  // -- chmod / chown ----------------------------------------------------------
 
   it('chmod: mode arg is skipped, file is edit', () => {
     const ops = extractShellOperations('chmod 755 /usr/local/bin/script', CWD);
@@ -227,7 +227,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/etc/config' }]);
   });
 
-  // ── sed ────────────────────────────────────────────────────────────────────
+  // -- sed --------------------------------------------------------------------
 
   it('sed without -i: read_file', () => {
     const ops = extractShellOperations("sed 's/foo/bar/' /etc/hosts", CWD);
@@ -247,7 +247,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── awk ────────────────────────────────────────────────────────────────────
+  // -- awk --------------------------------------------------------------------
 
   it('awk: program expression filtered, file identified', () => {
     const ops = extractShellOperations("awk '{print $1}' /etc/passwd", CWD);
@@ -263,7 +263,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── dd ─────────────────────────────────────────────────────────────────────
+  // -- dd ---------------------------------------------------------------------
 
   it('dd if= and of=', () => {
     const ops = extractShellOperations('dd if=/dev/sda of=/tmp/disk.img', CWD);
@@ -273,7 +273,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── Redirections ───────────────────────────────────────────────────────────
+  // -- Redirections -----------------------------------------------------------
 
   it('redirect >: write_file', () => {
     const ops = extractShellOperations('echo hello > /tmp/out.txt', CWD);
@@ -316,7 +316,7 @@ describe('extractShellOperations', () => {
     });
   });
 
-  // ── curl / wget ────────────────────────────────────────────────────────────
+  // -- curl / wget ------------------------------------------------------------
 
   it('curl: extracts domain', () => {
     const ops = extractShellOperations(
@@ -354,7 +354,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'web_fetch', domain: 'example.com' }]);
   });
 
-  // ── sudo / prefix commands ─────────────────────────────────────────────────
+  // -- sudo / prefix commands -------------------------------------------------
 
   it('sudo cat: transparent wrapper', () => {
     const ops = extractShellOperations('sudo cat /etc/sudoers', CWD);
@@ -383,7 +383,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'web_fetch', domain: 'example.com' }]);
   });
 
-  // ── Combination: command + redirect ───────────────────────────────────────
+  // -- Combination: command + redirect ---------------------------------------
 
   it('cat src > dst: both read and write', () => {
     const ops = extractShellOperations('cat /etc/passwd > /tmp/copy', CWD);
@@ -404,7 +404,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // ── Variables / unresolvable patterns ─────────────────────────────────────
+  // -- Variables / unresolvable patterns -------------------------------------
 
   it('$VAR paths are not included', () => {
     const ops = extractShellOperations('cat $SECRET_FILE', CWD);

@@ -1,4 +1,4 @@
-import type { ScenarioConfig } from '../scenario-runner.js';
+﻿import type { ScenarioConfig } from '../scenario-runner.js';
 
 /**
  * Demonstrates streaming capture with the /insight command.
@@ -8,7 +8,7 @@ import type { ScenarioConfig } from '../scenario-runner.js';
 export default {
   name: 'streaming-insight',
   spawn: ['node', 'dist/cli.js', '--yolo'],
-  terminal: { title: 'qwen-code', cwd: '../../..' },
+  terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {
       type: '/insight',

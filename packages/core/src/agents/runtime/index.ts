@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview Runtime barrel â€” re-exports agent execution primitives.
+ * @fileoverview Runtime barrel — re-exports agent execution primitives.
  */
 
 export * from './agent-types.js';

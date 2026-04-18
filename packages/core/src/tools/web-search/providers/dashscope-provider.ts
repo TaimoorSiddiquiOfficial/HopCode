@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -59,7 +59,7 @@ interface DashScopeSearchResponse {
 }
 
 // File System Configuration
-const QWEN_DIR = '.qwen';
+const QWEN_DIR = '.hopcode';
 const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
 
 /**

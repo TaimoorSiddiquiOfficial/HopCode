@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -21,8 +21,8 @@ if (process.env['QWEN_DEBUG_LOG_FILE'] === undefined) {
 setSimulate429(false);
 
 // Keep managed auto-memory test fixtures under per-test temp project roots.
-if (process.env['QWEN_CODE_MEMORY_LOCAL'] === undefined) {
-  process.env['QWEN_CODE_MEMORY_LOCAL'] = '1';
+if (process.env['HOPCODE_MEMORY_LOCAL'] === undefined) {
+  process.env['HOPCODE_MEMORY_LOCAL'] = '1';
 }
 
 // Some dependencies (e.g., undici) expect a global File constructor in Node.

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -207,8 +207,8 @@ export default {
   // ============================================================================
   // Agents - Creation Wizard
   // ============================================================================
-  'Project Level (.qwen/agents/)': '项目级 (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': '用户级 (~/.qwen/agents/)',
+  'Project Level (.hopcode/agents/)': '项目级 (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': '用户级 (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ 子智能体创建成功！',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     '子智能体 "{{name}}" 已保存到 {{level}} 级别。',
@@ -397,7 +397,7 @@ export default {
   'Memory Discovery Max Dirs': '内存发现最大目录数',
   'Load Memory From Include Directories': '从包含目录加载内存',
   'Respect .gitignore': '遵守 .gitignore',
-  'Respect .qwenignore': '遵守 .qwenignore',
+  'Respect .hopcodeignore': '遵守 .hopcodeignore',
   'Enable Recursive File Search': '启用递归文件搜索',
   'Disable Fuzzy Search': '禁用模糊搜索',
   'Interactive Shell (PTY)': '交互式 Shell (PTY)',
@@ -1110,8 +1110,8 @@ export default {
   // ============================================================================
   // Commands - Summary
   // ============================================================================
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    '生成项目摘要并保存到 .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    '生成项目摘要并保存到 .hopcode/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     '没有可用的聊天客户端来生成摘要',
   'Already generating summary, wait for previous request to complete':
@@ -1389,11 +1389,11 @@ export default {
   'From project settings': '来自项目设置',
   'From session': '来自会话',
   'Project settings (local)': '项目设置（本地）',
-  'Saved in .qwen/settings.local.json': '保存在 .qwen/settings.local.json',
+  'Saved in .hopcode/settings.local.json': '保存在 .hopcode/settings.local.json',
   'Project settings': '项目设置',
-  'Checked in at .qwen/settings.json': '保存在 .qwen/settings.json',
+  'Checked in at .hopcode/settings.json': '保存在 .hopcode/settings.json',
   'User settings': '用户设置',
-  'Saved in at ~/.qwen/settings.json': '保存在 ~/.qwen/settings.json',
+  'Saved in at ~/.hopcode/settings.json': '保存在 ~/.hopcode/settings.json',
   'Add a new rule…': '添加新规则…',
   'Add {{type}} permission rule': '添加{{type}}权限规则',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

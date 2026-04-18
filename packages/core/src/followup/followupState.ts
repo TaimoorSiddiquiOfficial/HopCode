@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Shared Follow-up Suggestions State Logic
@@ -80,7 +80,7 @@ export interface FollowupControllerActions {
   dismiss: () => void;
   /** Hard-clear all state and timers */
   clear: () => void;
-  /** Clean up timers â€” call on unmount */
+  /** Clean up timers — call on unmount */
   cleanup: () => void;
 }
 

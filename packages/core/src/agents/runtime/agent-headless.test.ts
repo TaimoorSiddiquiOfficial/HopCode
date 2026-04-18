@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1005,7 +1005,7 @@ describe('subagent.ts', () => {
       it('should not set finalText from thought-only response', async () => {
         const { config } = await createMockConfig();
 
-        // First call: only thought text (no regular text → nudge)
+        // First call: only thought text (no regular text ? nudge)
         // Second call: regular text response
         let callIndex = 0;
         mockSendMessageStream = vi.fn().mockImplementation(async () => {

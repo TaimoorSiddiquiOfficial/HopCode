@@ -1,9 +1,9 @@
-import type { ScenarioConfig } from '../scenario-runner.js';
+﻿import type { ScenarioConfig } from '../scenario-runner.js';
 
 export default {
   name: '/qc:code-review',
   spawn: ['node', 'dist/cli.js', '--yolo'],
-  terminal: { title: 'qwen-code', cwd: '../../..' },
+  terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {
       type: '/qc:code-review 2117',

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -103,7 +103,7 @@ export const QWEN_OAUTH_MODELS: ModelConfig[] = [
     id: 'coder-model',
     name: 'coder-model',
     description:
-      'Qwen 3.6 Plus â€” efficient hybrid model with leading coding performance',
+      'Qwen 3.6 Plus — efficient hybrid model with leading coding performance',
     capabilities: { vision: true },
   },
 ];

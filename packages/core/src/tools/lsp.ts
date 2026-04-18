@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -786,7 +786,7 @@ class LspToolInvocation extends BaseToolInvocation<LspToolParams, ToolResult> {
 
     const lines = actions.slice(0, limit).map((action, index) => {
       const kind = action.kind ? ` [${action.kind}]` : '';
-      const preferred = action.isPreferred ? ' ★' : '';
+      const preferred = action.isPreferred ? ' ?' : '';
       const hasEdit = action.edit ? ' (has edit)' : '';
       const hasCommand = action.command ? ' (has command)' : '';
       const serverSuffix = action.serverName ? ` [${action.serverName}]` : '';

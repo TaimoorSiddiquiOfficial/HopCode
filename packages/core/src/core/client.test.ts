@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -479,7 +479,7 @@ describe('Gemini Client (client.ts)', () => {
     });
 
     it('should not strip thoughts on active session (< 5min idle)', async () => {
-      // Simulate a recent API completion (2 minutes ago â€” within default 5 min threshold)
+      // Simulate a recent API completion (2 minutes ago — within default 5 min threshold)
       client['lastApiCompletionTimestamp'] = Date.now() - 2 * 60 * 1000;
       client['thinkingClearLatched'] = false;
 
@@ -499,7 +499,7 @@ describe('Gemini Client (client.ts)', () => {
     });
 
     it('should latch and strip thoughts after > 5min idle', async () => {
-      // Simulate an old API completion (10 minutes ago â€” exceeds default 5 min threshold)
+      // Simulate an old API completion (10 minutes ago — exceeds default 5 min threshold)
       client['lastApiCompletionTimestamp'] = Date.now() - 10 * 60 * 1000;
       client['thinkingClearLatched'] = false;
 
@@ -520,7 +520,7 @@ describe('Gemini Client (client.ts)', () => {
     });
 
     it('should keep stripping once latched even if idle < 5min', async () => {
-      // Pre-set latch with a recent timestamp (2 minutes ago â€” within threshold)
+      // Pre-set latch with a recent timestamp (2 minutes ago — within threshold)
       client['lastApiCompletionTimestamp'] = Date.now() - 2 * 60 * 1000;
       client['thinkingClearLatched'] = true;
 
@@ -1446,7 +1446,7 @@ hello
         selectedDocs: [
           {
             type: 'user',
-            filePath: '/test/project/root/.qwen/memory/user.md',
+            filePath: '/test/project/root/.hopcode/memory/user.md',
             relativePath: 'user.md',
             filename: 'user.md',
             title: 'User Memory',
@@ -1504,7 +1504,7 @@ hello
           selectedDocs: [
             {
               type: 'user',
-              filePath: '/test/project/root/.qwen/memory/user.md',
+              filePath: '/test/project/root/.hopcode/memory/user.md',
               relativePath: 'user.md',
               filename: 'user.md',
               title: 'User Memory',
@@ -1557,7 +1557,7 @@ hello
         'Keep it short again',
         expect.objectContaining({
           excludedFilePaths: new Set([
-            '/test/project/root/.qwen/memory/user.md',
+            '/test/project/root/.hopcode/memory/user.md',
           ]),
         }),
       );

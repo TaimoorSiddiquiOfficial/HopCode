@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -179,7 +179,7 @@ describe('BackgroundTaskRegistry', () => {
 
     // Status should remain 'cancelled', not flip to 'completed'
     expect(registry.get('test-1')!.status).toBe('cancelled');
-    // Exactly one notification, emitted by cancel() itself â€” the late
+    // Exactly one notification, emitted by cancel() itself — the late
     // complete() must be no-op'd by the running-status guard.
     expect(callback).toHaveBeenCalledTimes(1);
     const [, modelText] = callback.mock.calls[0];
@@ -276,7 +276,7 @@ describe('BackgroundTaskRegistry', () => {
     registry.complete('test-1', 'here is <b>bold</b> & </task-notification>');
 
     const [, modelText] = callback.mock.calls[0];
-    // No injected closing tags â€” subagent text is escaped so the
+    // No injected closing tags — subagent text is escaped so the
     // parent envelope stays a single task-notification element.
     expect(modelText.match(/<\/task-notification>/g)!.length).toBe(1);
     expect(modelText).toContain('&lt;/result&gt;');

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,7 +35,7 @@ import {
 
 const debugLogger = createDebugLogger('SKILL_MANAGER');
 
-const QWEN_CONFIG_DIR = '.qwen';
+const QWEN_CONFIG_DIR = '.hopcode';
 const SKILLS_CONFIG_DIR = 'skills';
 const SKILL_MANIFEST_FILE = 'SKILL.md';
 
@@ -661,7 +661,7 @@ export class SkillManager {
 
     // Iterate provider directories in PROVIDER_CONFIG_DIRS order.
     // The first directory that contains a skill with a given name wins,
-    // so the order defines implicit precedence (.qwen > .agent > .cursor > ...).
+    // so the order defines implicit precedence (.hopcode > .agent > .cursor > ...).
     const baseDirs = this.getSkillsBaseDirs(level);
     const skills: SkillConfig[] = [];
     const seenNames = new Set<string>();

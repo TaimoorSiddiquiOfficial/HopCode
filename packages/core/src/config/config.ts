@@ -44,7 +44,7 @@ import {
 import { GitService } from '../services/gitService.js';
 import { CronScheduler } from '../services/cronScheduler.js';
 
-// Tools â€” only lightweight imports; tool classes are lazy-loaded via dynamic import
+// Tools — only lightweight imports; tool classes are lazy-loaded via dynamic import
 import type { SendSdkMcpMessage } from '../tools/mcp-client.js';
 import { setGeminiMdFilename } from '../memory/const.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
@@ -231,7 +231,7 @@ export interface GitCoAuthorSettings {
   email?: string;
 }
 
-export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
+export type ExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
 
 export interface ExtensionInstallMetadata {
   source: string;
@@ -311,7 +311,7 @@ export interface AgentsCollabSettings {
   displayMode?: string;
   /** Arena-specific settings */
   arena?: {
-    /** Custom base directory for Arena worktrees (default: ~/.qwen/arena) */
+    /** Custom base directory for Arena worktrees (default: ~/.hopcode/arena) */
     worktreeBaseDir?: string;
     /** Preserve worktrees and state files after session ends */
     preserveArtifacts?: boolean;
@@ -464,7 +464,7 @@ export interface ConfigParameters {
    * Disable all hooks (default: false, hooks enabled).
    * Migration note: This replaces the deprecated hooksConfig.enabled setting.
    * Users with old settings.json containing hooksConfig.enabled should migrate
-   * to use disableAllHooks instead (note: inverted logic - enabled:true â†’ disableAllHooks:false).
+   * to use disableAllHooks instead (note: inverted logic - enabled:true ? disableAllHooks:false).
    */
   disableAllHooks?: boolean;
   /**
@@ -480,7 +480,7 @@ export interface ConfigParameters {
   projectHooks?: Record<string, unknown>;
 
   hooks?: Record<string, unknown>;
-  /** Glob patterns to exclude from .qwen/rules/ loading. */
+  /** Glob patterns to exclude from .hopcode/rules/ loading. */
   contextRuleExcludes?: string[];
   /** Warnings generated during configuration resolution */
   warnings?: string[];
@@ -1595,7 +1595,7 @@ export class Config {
    *   - settings.permissions.allow  (persistent rules from all scopes)
    *   - allowedTools param  (SDK / argv auto-approve list)
    *
-   * Note: coreTools is intentionally excluded here â€” it has whitelist semantics
+   * Note: coreTools is intentionally excluded here — it has whitelist semantics
    * (only listed tools are registered), not auto-approve semantics. It is
    * handled separately via PermissionManager.coreToolsAllowList.
    *
@@ -1924,7 +1924,7 @@ export class Config {
 
   isCronEnabled(): boolean {
     // Cron is experimental and opt-in: enabled via settings or env var
-    if (process.env['QWEN_CODE_ENABLE_CRON'] === '1') return true;
+    if (process.env['HOPCODE_ENABLE_CRON'] === '1') return true;
     return this.cronEnabled;
   }
 
@@ -2433,7 +2433,7 @@ export class Config {
     );
 
     // Helper: check permission then register a lazy factory (no module import
-    // happens here â€” the dynamic import() only runs when the tool is first used).
+    // happens here — the dynamic import() only runs when the tool is first used).
     const registerLazy = async (
       toolName: ToolName,
       factory: ToolFactory,

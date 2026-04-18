@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
@@ -23,7 +23,7 @@ describe('cron-tools', () => {
       await rig.cleanup();
     }
     // Clean up env vars
-    delete process.env['QWEN_CODE_ENABLE_CRON'];
+    delete process.env['hopcode_ENABLE_CRON'];
   });
 
   it('should have cron tools registered when enabled via settings', async () => {
@@ -48,7 +48,7 @@ describe('cron-tools', () => {
       rig = new TestRig();
       await rig.setup('cron-tools-env-var');
 
-      process.env['QWEN_CODE_ENABLE_CRON'] = '1';
+      process.env['hopcode_ENABLE_CRON'] = '1';
 
       const result = await rig.run(
         'Do you have access to tools called cron_create, cron_list, and cron_delete? Reply with just "yes" or "no".',

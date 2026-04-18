@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -36,7 +36,7 @@ export async function initializeApp(
 ): Promise<InitializationResult> {
   // Initialize i18n system
   const languageSetting =
-    process.env['QWEN_CODE_LANG'] ||
+    process.env['HOPCODE_LANG'] ||
     (settings.merged.general?.language as string) ||
     'auto';
   await initializeI18n(languageSetting as SupportedLanguage | 'auto');

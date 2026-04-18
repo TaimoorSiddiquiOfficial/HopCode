@@ -3027,15 +3027,15 @@ describe('Fire hook functions integration', () => {
 
   describe('Concurrent tool execution', () => {
     // Ensure tests are deterministic regardless of environment.
-    const origEnv = process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
+    const origEnv = process.env['HOPCODE_MAX_TOOL_CONCURRENCY'];
     beforeEach(() => {
-      delete process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
+      delete process.env['HOPCODE_MAX_TOOL_CONCURRENCY'];
     });
     afterEach(() => {
       if (origEnv !== undefined) {
-        process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'] = origEnv;
+        process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] = origEnv;
       } else {
-        delete process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
+        delete process.env['HOPCODE_MAX_TOOL_CONCURRENCY'];
       }
     });
 
@@ -3104,7 +3104,7 @@ describe('Fire hook functions integration', () => {
         execute: async (params) => {
           const id = (params as { id: string }).id;
           executionLog.push(`start:${id}`);
-          // Simulate async work — concurrent agents will interleave here
+          // Simulate async work � concurrent agents will interleave here
           await new Promise((r) => setTimeout(r, 50));
           executionLog.push(`end:${id}`);
           return {
@@ -3253,7 +3253,7 @@ describe('Fire hook functions integration', () => {
       expect(completedCalls).toHaveLength(4);
       expect(completedCalls.every((c) => c.status === 'success')).toBe(true);
 
-      // All 4 tools are concurrency-safe → they should all start
+      // All 4 tools are concurrency-safe ? they should all start
       // before any of them finishes (parallel execution).
       const allStarts = [
         executionLog.indexOf('read:start:1'),
@@ -3322,8 +3322,8 @@ describe('Fire hook functions integration', () => {
         onToolCallsUpdate,
       );
 
-      // [Read₁, Read₂, Edit, Read₃]
-      // Expected batches: [Read₁,Read₂](parallel) → [Edit](seq) → [Read₃](seq)
+      // [Read1, Read2, Edit, Read3]
+      // Expected batches: [Read1,Read2](parallel) ? [Edit](seq) ? [Read3](seq)
       const requests = [
         {
           callId: '1',
@@ -3363,7 +3363,7 @@ describe('Fire hook functions integration', () => {
       expect(completedCalls).toHaveLength(4);
       expect(completedCalls.every((c) => c.status === 'success')).toBe(true);
 
-      // Batch 1: Read₁ and Read₂ run in parallel (both start before either ends)
+      // Batch 1: Read1 and Read2 run in parallel (both start before either ends)
       const read1Start = executionLog.indexOf('read:start:1');
       const read2Start = executionLog.indexOf('read:start:2');
       const firstReadEnd = Math.min(
@@ -3385,7 +3385,7 @@ describe('Fire hook functions integration', () => {
       expect(editStart).not.toBe(-1);
       expect(editStart).toBeGreaterThan(lastReadEnd);
 
-      // Batch 3: Read₃ starts after Edit completes
+      // Batch 3: Read3 starts after Edit completes
       const editEnd = executionLog.indexOf('edit:end:E');
       const read3Start = executionLog.indexOf('read:start:3');
       expect(editEnd).not.toBe(-1);
@@ -3422,8 +3422,8 @@ describe('Fire hook functions integration', () => {
         onToolCallsUpdate,
       );
 
-      // "git log" and "ls" are read-only → concurrent
-      // "npm install" is not read-only → sequential, breaks the batch
+      // "git log" and "ls" are read-only ? concurrent
+      // "npm install" is not read-only ? sequential, breaks the batch
       const requests = [
         {
           callId: '1',
@@ -4036,7 +4036,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
     msg = getLastErrorMessage(onToolCallsUpdate);
     expect(msg).not.toContain(RETRY_LOOP_STOP_DIRECTIVE);
 
-    // Turn 3: same bad params — should trigger directive
+    // Turn 3: same bad params � should trigger directive
     await scheduler.schedule(
       [makeRequest('c3', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -4066,7 +4066,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       new AbortController().signal,
     );
 
-    // Turn 4: back to tool — should be count 1 again (no directive)
+    // Turn 4: back to tool � should be count 1 again (no directive)
     await scheduler.schedule(
       [makeRequest('c4', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -4096,7 +4096,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       new AbortController().signal,
     );
 
-    // Two more failures — count should restart at 1, not jump to 3+.
+    // Two more failures � count should restart at 1, not jump to 3+.
     await scheduler.schedule(
       [makeRequest('c4', 'strictStringTool', { value: 123 })],
       new AbortController().signal,

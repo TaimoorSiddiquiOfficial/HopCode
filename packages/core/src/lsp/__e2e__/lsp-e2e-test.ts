@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -472,14 +472,14 @@ const tsConfig: LanguageTestConfig = {
   positions: {
     // hover on `createCalculator` call: L2 char 27
     hover: { file: `${TS_ROOT}/src/index.ts`, line: 2, char: 27 },
-    // definitions on `createCalculator` call → math.ts definition
+    // definitions on `createCalculator` call ? math.ts definition
     definitions: { file: `${TS_ROOT}/src/index.ts`, line: 2, char: 27 },
-    // references on `Calculator` → found in both files
+    // references on `Calculator` ? found in both files
     references: { file: `${TS_ROOT}/src/index.ts`, line: 2, char: 12 },
     // documentSymbols on math.ts (has interface, class, function)
     documentSymbolsFile: `${TS_ROOT}/src/math.ts`,
     symbolQuery: 'Calculator',
-    // implementations on `Calculator` interface → SimpleCalculator
+    // implementations on `Calculator` interface ? SimpleCalculator
     implementations: { file: `${TS_ROOT}/src/math.ts`, line: 0, char: 17 },
     // call hierarchy on `createCalculator` (called by index.ts, calls SimpleCalculator)
     callHierarchy: { file: `${TS_ROOT}/src/math.ts`, line: 15, char: 16 },
@@ -530,20 +530,20 @@ const cppConfig: LanguageTestConfig = {
   // clangd v19.x does not implement callHierarchy/outgoingCalls (returns -32601)
   serverLimitedMethods: new Set(['outgoingCalls']),
   positions: {
-    // hover on `Calculator` type at main.cpp L16:4 → class info
+    // hover on `Calculator` type at main.cpp L16:4 ? class info
     hover: { file: `${CPP_ROOT}/src/main.cpp`, line: 16, char: 4 },
-    // definitions on `computeSum` call at main.cpp L17:17 → L11 definition
+    // definitions on `computeSum` call at main.cpp L17:17 ? L11 definition
     definitions: { file: `${CPP_ROOT}/src/main.cpp`, line: 17, char: 17 },
-    // references on `add` method at calculator.h L4:8 → all usages
+    // references on `add` method at calculator.h L4:8 ? all usages
     references: { file: `${CPP_ROOT}/src/calculator.h`, line: 4, char: 8 },
-    // documentSymbols on main.cpp → addValues, subtractValues, computeSum, main
+    // documentSymbols on main.cpp ? addValues, subtractValues, computeSum, main
     documentSymbolsFile: `${CPP_ROOT}/src/main.cpp`,
     symbolQuery: 'Calculator',
     // implementations on `Calculator` class at calculator.h L2:6
-    // → should find AdvancedCalculator (derived class)
+    // ? should find AdvancedCalculator (derived class)
     implementations: { file: `${CPP_ROOT}/src/calculator.h`, line: 2, char: 6 },
     // call hierarchy on `computeSum` at main.cpp L11:4
-    // → incomingCalls: main; outgoingCalls: addValues, subtractValues
+    // ? incomingCalls: main; outgoingCalls: addValues, subtractValues
     callHierarchy: { file: `${CPP_ROOT}/src/main.cpp`, line: 11, char: 4 },
     diagnosticsFile: `${CPP_ROOT}/src/main.cpp`,
   },
@@ -582,25 +582,25 @@ const javaConfig: LanguageTestConfig = {
   workspaceRoot: JAVA_ROOT,
   indexWaitMs: 20000,
   positions: {
-    // hover on `Calculator` type at Main.java L8:8 → interface info
+    // hover on `Calculator` type at Main.java L8:8 ? interface info
     hover: {
       file: `${JAVA_ROOT}/src/main/java/com/test/Main.java`,
       line: 8,
       char: 8,
     },
-    // definitions on `computeSum` call at Main.java L9:21 → L3 definition
+    // definitions on `computeSum` call at Main.java L9:21 ? L3 definition
     definitions: {
       file: `${JAVA_ROOT}/src/main/java/com/test/Main.java`,
       line: 9,
       char: 21,
     },
-    // references on `add` at Calculator.java L3:8 → all usages
+    // references on `add` at Calculator.java L3:8 ? all usages
     references: {
       file: `${JAVA_ROOT}/src/main/java/com/test/Calculator.java`,
       line: 3,
       char: 8,
     },
-    // documentSymbols on Main.java → Main class, computeSum, main
+    // documentSymbols on Main.java ? Main class, computeSum, main
     documentSymbolsFile: `${JAVA_ROOT}/src/main/java/com/test/Main.java`,
     symbolQuery: 'Calculator',
     // implementations on `Calculator` interface at Calculator.java L2:17
@@ -610,7 +610,7 @@ const javaConfig: LanguageTestConfig = {
       char: 17,
     },
     // call hierarchy on `computeSum` at Main.java L3:22
-    // → incomingCalls: main; outgoingCalls: add, subtract
+    // ? incomingCalls: main; outgoingCalls: add, subtract
     callHierarchy: {
       file: `${JAVA_ROOT}/src/main/java/com/test/Main.java`,
       line: 3,

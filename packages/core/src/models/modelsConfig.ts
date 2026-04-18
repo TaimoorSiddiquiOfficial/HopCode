@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -447,7 +447,7 @@ export class ModelsConfig {
    * Extract RuntimeModelSnapshot ID from modelId if it's a runtime model reference.
    *
    * Supports the following formats:
-   * - Direct snapshot ID: `$runtime|${authType}|${modelId}` → returns as-is if exists in Map
+   * - Direct snapshot ID: `$runtime|${authType}|${modelId}` ? returns as-is if exists in Map
    * - Direct snapshot ID match: returns if exists in Map
    *
    * Note: When called from ACP integration via setModel, the modelId has already

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -172,8 +172,8 @@ export default {
   '❌ Error:': '❌ エラー:',
   'Are you sure you want to delete agent "{{name}}"?':
     'エージェント "{{name}}" を削除してもよろしいですか?',
-  'Project Level (.qwen/agents/)': 'プロジェクトレベル (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': 'ユーザーレベル (~/.qwen/agents/)',
+  'Project Level (.hopcode/agents/)': 'プロジェクトレベル (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': 'ユーザーレベル (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!':
     '✅ サブエージェントの作成に成功しました!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
@@ -302,7 +302,7 @@ export default {
   'Load Memory From Include Directories':
     'インクルードディレクトリからメモリを読み込み',
   'Respect .gitignore': '.gitignore を優先',
-  'Respect .qwenignore': '.qwenignore を優先',
+  'Respect .hopcodeignore': '.hopcodeignore を優先',
   'Enable Recursive File Search': '再帰的ファイル検索を有効化',
   'Disable Fuzzy Search': 'ファジー検索を無効化',
   'Enable Interactive Shell': '対話型シェルを有効化',
@@ -767,8 +767,8 @@ export default {
   'Share the current conversation to a markdown or json file. Usage: /chat share <file>':
     '現在の会話をmarkdownまたはjsonファイルに共有。使い方: /chat share <ファイル>',
   // Summary
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'プロジェクトサマリーを生成し、.qwen/PROJECT_SUMMARY.md に保存',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    'プロジェクトサマリーを生成し、.hopcode/PROJECT_SUMMARY.md に保存',
   'No chat client available to generate summary.':
     'サマリーを生成するためのチャットクライアントがありません',
   'Already generating summary, wait for previous request to complete':
@@ -1107,11 +1107,11 @@ export default {
   'From project settings': 'プロジェクト設定から',
   'From session': 'セッションから',
   'Project settings (local)': 'プロジェクト設定（ローカル）',
-  'Saved in .qwen/settings.local.json': '.qwen/settings.local.json に保存',
+  'Saved in .hopcode/settings.local.json': '.hopcode/settings.local.json に保存',
   'Project settings': 'プロジェクト設定',
-  'Checked in at .qwen/settings.json': '.qwen/settings.json にチェックイン',
+  'Checked in at .hopcode/settings.json': '.hopcode/settings.json にチェックイン',
   'User settings': 'ユーザー設定',
-  'Saved in at ~/.qwen/settings.json': '~/.qwen/settings.json に保存',
+  'Saved in at ~/.hopcode/settings.json': '~/.hopcode/settings.json に保存',
   'Add a new rule…': '新しいルールを追加…',
   'Add {{type}} permission rule': '{{type}}権限ルールを追加',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

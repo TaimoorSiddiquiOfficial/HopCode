@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,7 +43,7 @@ export interface TmuxWindowInfo {
  */
 const MIN_TMUX_VERSION = '3.0';
 
-// ─── Helpers ────────────────────────────────────────────────────
+// --- Helpers ----------------------------------------------------
 
 async function tmuxResult(
   args: string[],
@@ -71,7 +71,7 @@ async function tmux(args: string[], serverName?: string): Promise<string> {
 }
 
 function parseVersion(versionStr: string): number[] {
-  // "tmux 3.4" → [3, 4]
+  // "tmux 3.4" ? [3, 4]
   const match = versionStr.match(/(\d+)\.(\d+)/);
   if (!match) return [0, 0];
   return [parseInt(match[1]!, 10), parseInt(match[2]!, 10)];
@@ -84,7 +84,7 @@ function isVersionAtLeast(current: string, minimum: string): boolean {
   return curMinor >= minMinor;
 }
 
-// ─── Public API ─────────────────────────────────────────────────
+// --- Public API -------------------------------------------------
 
 /**
  * Check if tmux is available on the system.

@@ -235,7 +235,7 @@ export function convertToFunctionResponse(
         mediaParts.push({ fileData: part.fileData });
       }
       // Other exotic part types (e.g. functionCall) are intentionally
-      // dropped here – they should not appear inside tool results.
+      // dropped here � they should not appear inside tool results.
     }
 
     const output =
@@ -302,7 +302,7 @@ const VALIDATION_RETRY_LOOP_THRESHOLD = 3;
 
 /** Directive injected when a tool call repeatedly fails validation. */
 const RETRY_LOOP_STOP_DIRECTIVE =
-  '\n\n⚠️ RETRY LOOP DETECTED: This tool call has failed validation multiple times with the same error. ' +
+  '\n\n?? RETRY LOOP DETECTED: This tool call has failed validation multiple times with the same error. ' +
   'STOP retrying the same approach. Re-examine the tool schema and parameter requirements, then try a ' +
   'fundamentally different approach. If you cannot resolve the validation error, explain the issue to the user ' +
   'instead of retrying.';
@@ -341,7 +341,7 @@ interface CoreToolSchedulerOptions {
   chatRecordingService?: ChatRecordingService;
 }
 
-// ─── Tool Concurrency Helpers ────────────────────────────────
+// --- Tool Concurrency Helpers --------------------------------
 
 interface ToolBatch {
   concurrent: boolean;
@@ -358,7 +358,7 @@ function isConcurrencySafe(call: ScheduledToolCall): boolean {
   // Shell commands: check if the command is read-only (e.g., git log, cat).
   // Uses the synchronous regex+shell-quote checker (not the async AST-based
   // one) because partitioning runs synchronously. The sync checker covers
-  // the same command whitelist and is fail-closed — unknown commands remain
+  // the same command whitelist and is fail-closed � unknown commands remain
   // sequential. The AST version is used separately for permission decisions.
   if (call.tool.kind === Kind.Execute) {
     const command = (call.request.args as { command?: string }).command;
@@ -378,7 +378,7 @@ function isConcurrencySafe(call: ScheduledToolCall): boolean {
  * Consecutive safe tools are merged into a single parallel batch.
  * Each unsafe tool forms its own sequential batch.
  *
- * Example: [Read, Read, Edit, Read] → [[Read,Read](parallel), [Edit](seq), [Read](seq)]
+ * Example: [Read, Read, Edit, Read] ? [[Read,Read](parallel), [Edit](seq), [Read](seq)]
  */
 function partitionToolCalls(calls: ScheduledToolCall[]): ToolBatch[] {
   return calls.reduce<ToolBatch[]>((batches, call) => {
@@ -974,7 +974,7 @@ export class CoreToolScheduler {
           }
 
           // =================================================================
-          // L3→L4→L5 Permission Flow
+          // L3?L4?L5 Permission Flow
           // =================================================================
 
           // ---- L3: Tool's default permission ----
@@ -1031,7 +1031,7 @@ export class CoreToolScheduler {
             continue;
           }
 
-          // finalPermission === 'ask' (or 'default' from PM → treat as ask)
+          // finalPermission === 'ask' (or 'default' from PM ? treat as ask)
           // apply ApprovalMode overrides.
           // ask_user_question always needs confirmation so the user can answer;
           // it must bypass both YOLO auto-approve and plan-mode blocking.
@@ -1049,7 +1049,7 @@ export class CoreToolScheduler {
             confirmationDetails =
               await invocation.getConfirmationDetails(signal);
 
-            // ── Centralised rule injection ──────────────────────────────────
+            // -- Centralised rule injection ----------------------------------
             injectPermissionRulesIfMissing(confirmationDetails, pmCtx);
 
             if (
@@ -1355,7 +1355,7 @@ export class CoreToolScheduler {
 
   /**
    * Opens an IDE diff view for edit-type tools when IDE mode is active.
-   * The IDE resolution is handled asynchronously — if the user accepts or
+   * The IDE resolution is handled asynchronously � if the user accepts or
    * rejects from the IDE, it triggers handleConfirmationResponse.
    *
    * Uses confirmationDetails.filePath / newContent (the same data shown in
@@ -1508,7 +1508,7 @@ export class CoreToolScheduler {
     signal: AbortSignal,
   ): Promise<void> {
     const parsed = parseInt(
-      process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'] || '',
+      process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] || '',
       10,
     );
     const maxConcurrency = Number.isFinite(parsed) && parsed >= 1 ? parsed : 10;
@@ -1906,7 +1906,7 @@ export class CoreToolScheduler {
 
     for (const pendingTool of pendingTools) {
       try {
-        // Re-run L3→L4 to see if the tool can now be auto-approved
+        // Re-run L3?L4 to see if the tool can now be auto-approved
         const defaultPermission =
           await pendingTool.invocation.getDefaultPermission();
         const toolParams = pendingTool.invocation.params as Record<

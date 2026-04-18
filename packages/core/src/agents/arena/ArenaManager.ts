@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -98,7 +98,7 @@ export class ArenaManager {
     this.callbacks = callbacks;
     this.eventEmitter = new ArenaEventEmitter();
     const arenaSettings = config.getAgentsSettings().arena;
-    // Use the user-configured base dir, or default to ~/.qwen/arena.
+    // Use the user-configured base dir, or default to ~/.hopcode/arena.
     this.arenaBaseDir =
       arenaSettings?.worktreeBaseDir ??
       path.join(Storage.getGlobalQwenDir(), 'arena');
@@ -110,7 +110,7 @@ export class ArenaManager {
     this.terminalRows = process.stdout.rows || 40;
   }
 
-  // ─── Public API ────────────────────────────────────────────────
+  // --- Public API ------------------------------------------------
 
   /**
    * Get the event emitter for subscribing to Arena events.
@@ -187,7 +187,7 @@ export class ArenaManager {
     }
   }
 
-  // ─── PTY Interaction ───────────────────────────────────────────
+  // --- PTY Interaction -------------------------------------------
 
   /**
    * Switch the active agent for screen display and input routing.
@@ -257,7 +257,7 @@ export class ArenaManager {
     this.backend?.resizeAll(cols, rows);
   }
 
-  // ─── Session Lifecycle ─────────────────────────────────────────
+  // --- Session Lifecycle -----------------------------------------
 
   /**
    * Start an Arena session.
@@ -306,7 +306,7 @@ export class ArenaManager {
 
     // Fail fast on missing git or non-repo directory before any UI output
     // so the user gets a clean, single error message without the
-    // "Arena started…" banner.
+    // "Arena started�" banner.
     const gitCheck = await this.worktreeService.checkGitAvailable();
     if (!gitCheck.available) {
       throw new Error(gitCheck.error!);
@@ -355,7 +355,7 @@ export class ArenaManager {
       }
 
       // Set up worktrees for all agents
-      this.emitProgress(`Setting up environment for agents…`);
+      this.emitProgress(`Setting up environment for agents�`);
       await this.setupWorktrees();
 
       // If cancelled during worktree setup, bail out early
@@ -370,13 +370,13 @@ export class ArenaManager {
       const worktreeInfo = Array.from(this.agents.values())
         .map(
           (agent, i) =>
-            `  ${i + 1}. ${agent.model.modelId} → ${agent.worktree.path}`,
+            `  ${i + 1}. ${agent.model.modelId} ? ${agent.worktree.path}`,
         )
         .join('\n');
       this.emitProgress(`Environment ready. Agent worktrees:\n${worktreeInfo}`);
 
       // Start all agents in parallel via PTY
-      this.emitProgress('Launching agents…');
+      this.emitProgress('Launching agents�');
       this.sessionStatus = ArenaSessionStatus.RUNNING;
       await this.runAgents();
 
@@ -458,7 +458,7 @@ export class ArenaManager {
       }
     }
 
-    // Update agent statuses — skip agents already in a terminal state
+    // Update agent statuses � skip agents already in a terminal state
     // (COMPLETED, FAILED, CANCELLED) so we don't overwrite a successful result.
     for (const agent of this.agents.values()) {
       if (!isTerminalStatus(agent.status)) {
@@ -598,16 +598,16 @@ export class ArenaManager {
     return this.worktreeService.getWorktreeDiff(agent.worktree.path);
   }
 
-  // ─── Private: Telemetry ───────────────────────────────────────
+  // --- Private: Telemetry ---------------------------------------
 
   /**
    * Emit the `arena_session_ended` telemetry event exactly once.
    *
    * Called from:
-   *  - start() early-cancel paths → 'cancelled'
-   *  - start() catch block → 'failed'
-   *  - applyAgentResult() on success → 'selected' (with winner)
-   *  - cleanup() / cleanupRuntime() → 'discarded' (user left without picking)
+   *  - start() early-cancel paths ? 'cancelled'
+   *  - start() catch block ? 'failed'
+   *  - applyAgentResult() on success ? 'selected' (with winner)
+   *  - cleanup() / cleanupRuntime() ? 'discarded' (user left without picking)
    */
   private emitSessionEnded(
     status: ArenaSessionEndedStatus,
@@ -638,7 +638,7 @@ export class ArenaManager {
     );
   }
 
-  // ─── Private: Progress ─────────────────────────────────────────
+  // --- Private: Progress -----------------------------------------
 
   /**
    * Emit a progress message via SESSION_UPDATE so the UI can display
@@ -657,7 +657,7 @@ export class ArenaManager {
     });
   }
 
-  // ─── Private: Validation ───────────────────────────────────────
+  // --- Private: Validation ---------------------------------------
 
   private validateStartOptions(options: ArenaStartOptions): void {
     if (!options.models || options.models.length < 2) {
@@ -696,7 +696,7 @@ export class ArenaManager {
     }
   }
 
-  // ─── Private: Backend Initialization ───────────────────────────
+  // --- Private: Backend Initialization ---------------------------
 
   /**
    * Initialize the backend.
@@ -727,12 +727,12 @@ export class ArenaManager {
     }
   }
 
-  // ─── Private: Worktree Setup ───────────────────────────────────
+  // --- Private: Worktree Setup -----------------------------------
 
   /**
    * Derive a short, filesystem-friendly directory name from the full session ID.
    * Uses the first 8 hex characters of the UUID. If that path already exists,
-   * appends a numeric suffix (-2, -3, …) until an unused name is found.
+   * appends a numeric suffix (-2, -3, �) until an unused name is found.
    */
   private async deriveWorktreeDirName(sessionId: string): Promise<string> {
     const shortId = sessionId.replaceAll('-', '').slice(0, 8);
@@ -815,7 +815,7 @@ export class ArenaManager {
     debugLogger.info(`Created ${this.agents.size} agent worktrees`);
   }
 
-  // ─── Private: Agent Execution ──────────────────────────────────
+  // --- Private: Agent Execution ----------------------------------
 
   private async runAgents(): Promise<void> {
     if (!this.arenaConfig) {
@@ -833,7 +833,7 @@ export class ArenaManager {
 
     const isInProcess = backend.type === DISPLAY_MODE.IN_PROCESS;
 
-    // Spawn agents sequentially — each spawn completes before starting the next.
+    // Spawn agents sequentially � each spawn completes before starting the next.
     // This creates a visual effect where panes appear one by one.
     for (const agent of this.agents.values()) {
       await this.spawnAgentPty(agent);
@@ -1084,7 +1084,7 @@ export class ArenaManager {
     return spawnConfig;
   }
 
-  // ─── Private: Status & Results ─────────────────────────────────
+  // --- Private: Status & Results ---------------------------------
 
   /** Decide whether a status transition is valid. Returns the new status or null. */
   private resolveTransition(
@@ -1093,7 +1093,7 @@ export class ArenaManager {
   ): AgentStatus | null {
     if (current === incoming) return null;
     if (isTerminalStatus(current)) {
-      // Allow revival: COMPLETED → RUNNING (agent received new input)
+      // Allow revival: COMPLETED ? RUNNING (agent received new input)
       if (
         current === AgentStatus.COMPLETED &&
         incoming === AgentStatus.RUNNING
@@ -1142,13 +1142,13 @@ export class ArenaManager {
     }
 
     // Emit progress messages for follow-up transitions (only after
-    // the initial task — the session is IDLE once all agents first settle).
+    // the initial task � the session is IDLE once all agents first settle).
     if (this.sessionStatus === ArenaSessionStatus.IDLE) {
       if (
         previousStatus === AgentStatus.IDLE &&
         newStatus === AgentStatus.RUNNING
       ) {
-        this.emitProgress(`Agent ${label} is working on a follow-up task…`);
+        this.emitProgress(`Agent ${label} is working on a follow-up task�`);
       } else if (
         previousStatus === AgentStatus.RUNNING &&
         newStatus === AgentStatus.IDLE
@@ -1218,17 +1218,17 @@ export class ArenaManager {
     };
   }
 
-  // ─── Arena Session Directory ──────────────────────────────────
+  // --- Arena Session Directory ----------------------------------
 
   /**
    * Get the arena session directory for the current session.
    * All status and control files are stored here.
    *
    * Returns the absolute path to the session directory, e.g.
-   * `~/.qwen/worktrees/<sessionId>/`.  The directory contains:
-   * - `config.json` — consolidated session config + per-agent status
-   * - `agents/<safeAgentId>.json` — individual agent status files
-   * - `control/` — control signals (shutdown, cancel)
+   * `~/.hopcode/worktrees/<sessionId>/`.  The directory contains:
+   * - `config.json` � consolidated session config + per-agent status
+   * - `agents/<safeAgentId>.json` � individual agent status files
+   * - `control/` � control signals (shutdown, cancel)
    */
   getArenaSessionDir(): string {
     if (!this.arenaConfig) {
@@ -1240,7 +1240,7 @@ export class ArenaManager {
     );
   }
 
-  // ─── Private: Polling & Control Signals ──────────────────────
+  // --- Private: Polling & Control Signals ----------------------
 
   /**
    * Wait for all agents to reach IDLE or TERMINATED state.
@@ -1319,7 +1319,7 @@ export class ArenaManager {
       const emitter = interactive.getEventEmitter();
       if (!emitter) continue;
 
-      // AgentInteractive emits canonical AgentStatus values — no mapping needed.
+      // AgentInteractive emits canonical AgentStatus values � no mapping needed.
 
       const syncStats = () => {
         const { totalToolCalls, totalDurationMs, ...rest } =
@@ -1473,7 +1473,7 @@ export class ArenaManager {
   /**
    * Merge agent status data into the arena session's config.json.
    * Reads the existing config, adds/updates `updatedAt` and `agents`,
-   * then writes back atomically (temp file → rename).
+   * then writes back atomically (temp file ? rename).
    */
   private async writeConsolidatedStatus(
     agents: Record<string, ArenaStatusFile>,

@@ -1,12 +1,12 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen team
+ * Copyright 2026 HopCode Team team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Utilities for managing the LLM output language rule file.
- * This file handles the creation and maintenance of ~/.qwen/output-language.md
+ * This file handles the creation and maintenance of ~/.hopcode/output-language.md
  * which instructs the LLM to respond in the user's preferred language.
  */
 
@@ -61,7 +61,7 @@ export function resolveOutputLanguage(
 }
 
 /**
- * Returns the path to the LLM output language rule file (~/.qwen/output-language.md).
+ * Returns the path to the LLM output language rule file (~/.hopcode/output-language.md).
  */
 function getOutputLanguageFilePath(): string {
   return path.join(

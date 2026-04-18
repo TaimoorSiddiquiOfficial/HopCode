@@ -1,8 +1,8 @@
-/**
+﻿/**
  * Terminal-Bench Integration Tests
  *
- * Tests qwen-code integration with terminal-bench tasks
- * using both oracle (for debugging) and qwen-code agents
+ * Tests hopcode integration with terminal-bench tasks
+ * using both oracle (for debugging) and hopcode agents
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -211,7 +211,7 @@ describe('terminal-bench integration', () => {
     );
 
     it(
-      `should complete ${taskId} task with qwen-code agent`,
+      `should complete ${taskId} task with hopcode agent`,
       async () => {
         rig.setup(`terminal-bench-qwen-${taskId}`);
 
@@ -221,19 +221,19 @@ describe('terminal-bench integration', () => {
         const apiKey = process.env['OPENAI_API_KEY'];
         if (!apiKey) {
           throw new Error(
-            'OPENAI_API_KEY environment variable is not set. This test requires an API key to run the qwen-code agent.',
+            'OPENAI_API_KEY environment variable is not set. This test requires an API key to run the hopcode agent.',
           );
         }
 
-        // Run qwen-code agent using spawn to avoid blocking event loop
+        // Run hopcode agent using spawn to avoid blocking event loop
         const args = [
           'run',
           '--agent-import-path',
-          'integration-tests.terminal-bench.qwen_code:QwenCodeAgent',
+          'integration-tests.terminal-bench.hopcode:QwenCodeAgent',
           '--agent-kwarg',
           `api_key=${apiKey}`,
           '--agent-kwarg',
-          `version=${process.env['QWEN_CODE_VERSION'] || 'latest'}`,
+          `version=${process.env['hopcode_VERSION'] || 'latest'}`,
           '--dataset-path',
           ciTasksPath,
           '--task-id',
@@ -271,7 +271,7 @@ describe('terminal-bench integration', () => {
           child.on('close', (code) => {
             if (code !== 0) {
               console.error(
-                `qwen-code agent failed for ${taskId} with stderr:`,
+                `hopcode agent failed for ${taskId} with stderr:`,
                 stderr,
               );
               reject(new Error(`Process exited with code ${code}: ${stderr}`));

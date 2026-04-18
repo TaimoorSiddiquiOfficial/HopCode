@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -263,8 +263,8 @@ export async function start_sandbox(
         ...finalArgv.map((arg) => quote([arg])),
       ].join(' '),
     );
-    // start and set up proxy if QWEN_SANDBOX_PROXY_COMMAND is set
-    const proxyCommand = process.env['QWEN_SANDBOX_PROXY_COMMAND'];
+    // start and set up proxy if HOPCODE_SANDBOX_PROXY_COMMAND is set
+    const proxyCommand = process.env['HOPCODE_SANDBOX_PROXY_COMMAND'];
     let proxyProcess: ChildProcess | undefined = undefined;
     let sandboxProcess: ChildProcess | undefined = undefined;
     const sandboxEnv = { ...process.env };
@@ -357,7 +357,7 @@ export async function start_sandbox(
     if (!gcPath.includes('qwen-code/packages/')) {
       throw new FatalSandboxError(
         'Cannot build sandbox using installed Qwen Code binary; ' +
-          'run `npm link ./packages/cli` under QwenCode-cli repo to switch to linked binary.',
+          'run `npm link ./packages/cli` under HopCode-cli repo to switch to linked binary.',
       );
     } else {
       writeStderrLine('building sandbox ...');
@@ -378,7 +378,7 @@ export async function start_sandbox(
           stdio: 'inherit',
           env: {
             ...process.env,
-            QWEN_SANDBOX: config.command, // in case sandbox is enabled via flags (see config.ts under cli package)
+            HOPCODE_SANDBOX: config.command, // in case sandbox is enabled via flags (see config.ts under cli package)
           },
         },
       );
@@ -498,8 +498,8 @@ export async function start_sandbox(
 
   // copy proxy environment variables, replacing localhost with SANDBOX_PROXY_NAME
   // copy as both upper-case and lower-case as is required by some utilities
-  // QWEN_SANDBOX_PROXY_COMMAND implies HTTPS_PROXY unless HTTP_PROXY is set
-  const proxyCommand = process.env['QWEN_SANDBOX_PROXY_COMMAND'];
+  // HOPCODE_SANDBOX_PROXY_COMMAND implies HTTPS_PROXY unless HTTP_PROXY is set
+  const proxyCommand = process.env['HOPCODE_SANDBOX_PROXY_COMMAND'];
 
   if (proxyCommand) {
     let proxy =
@@ -541,7 +541,7 @@ export async function start_sandbox(
   // name container after image, plus random suffix to avoid conflicts
   const imageName = parseImageName(image);
   const isIntegrationTest =
-    process.env['QWEN_CODE_INTEGRATION_TEST'] === 'true';
+    process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
   let containerName;
   if (isIntegrationTest) {
     containerName = `qwen-code-integration-test-${randomBytes(4).toString(
@@ -563,11 +563,11 @@ export async function start_sandbox(
   }
   args.push('--name', containerName, '--hostname', containerName);
 
-  // copy QWEN_CODE_TEST_VAR for integration tests
-  if (process.env['QWEN_CODE_TEST_VAR']) {
+  // copy HOPCODE_TEST_VAR for integration tests
+  if (process.env['HOPCODE_TEST_VAR']) {
     args.push(
       '--env',
-      `QWEN_CODE_TEST_VAR=${process.env['QWEN_CODE_TEST_VAR']}`,
+      `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`,
     );
   }
 
@@ -641,8 +641,8 @@ export async function start_sandbox(
 
   // Pass through IDE mode environment variables
   for (const envVar of [
-    'QWEN_CODE_IDE_SERVER_PORT',
-    'QWEN_CODE_IDE_WORKSPACE_PATH',
+    'HOPCODE_IDE_SERVER_PORT',
+    'HOPCODE_IDE_WORKSPACE_PATH',
     'TERM_PROGRAM',
   ]) {
     if (process.env[envVar]) {
@@ -718,13 +718,13 @@ export async function start_sandbox(
 
   // Check if we should use current user's UID/GID in sandbox
   // In integration test mode, we still respect SANDBOX_SET_UID_GID to allow
-  // tests that need to access host's ~/.qwen (e.g., --resume functionality)
+  // tests that need to access host's ~/.hopcode (e.g., --resume functionality)
   const useCurrentUser = await shouldUseCurrentUserInSandbox();
 
   if (useCurrentUser) {
     // SANDBOX_SET_UID_GID is enabled: create user with host's UID/GID
     // This includes integration test mode with SANDBOX_SET_UID_GID=true,
-    // allowing tests that need to access host's ~/.qwen (e.g., --resume) to work.
+    // allowing tests that need to access host's ~/.hopcode (e.g., --resume) to work.
     // For the user-creation logic to work, the container must start as root.
     // The entrypoint script then handles dropping privileges to the correct user.
     args.push('--user', 'root');
@@ -773,7 +773,7 @@ export async function start_sandbox(
   // push container entrypoint (including args)
   args.push(...finalEntrypoint);
 
-  // start and set up proxy if QWEN_SANDBOX_PROXY_COMMAND is set
+  // start and set up proxy if HOPCODE_SANDBOX_PROXY_COMMAND is set
   let proxyProcess: ChildProcess | undefined = undefined;
   let sandboxProcess: ChildProcess | undefined = undefined;
 

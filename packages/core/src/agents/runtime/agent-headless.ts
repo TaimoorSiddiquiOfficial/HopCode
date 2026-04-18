@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview AgentHeadless — one-shot task execution wrapper around AgentCore.
+ * @fileoverview AgentHeadless � one-shot task execution wrapper around AgentCore.
  *
  * AgentHeadless manages
- * the lifecycle of a single headless task: start → run → finish.
+ * the lifecycle of a single headless task: start ? run ? finish.
  * It delegates all model reasoning and tool scheduling to AgentCore.
  *
  * For persistent interactive agents, see AgentInteractive (Phase 2).
@@ -39,7 +39,7 @@ import { DEFAULT_QWEN_MODEL } from '../../config/models.js';
 
 const debugLogger = createDebugLogger('SUBAGENT');
 
-// ─── Utilities (unchanged, re-exported for consumers) ────────
+// --- Utilities (unchanged, re-exported for consumers) --------
 
 /**
  * Manages the runtime context state for the subagent.
@@ -122,15 +122,15 @@ export function templateString(
   );
 }
 
-// ─── AgentHeadless ──────────────────────────────────────────
+// --- AgentHeadless ------------------------------------------
 
 /**
- * AgentHeadless — one-shot task executor.
+ * AgentHeadless � one-shot task executor.
  *
  * Takes a task, runs it through AgentCore's reasoning loop, and returns
  * the result.
  *
- * Lifecycle: Born → execute() → die.
+ * Lifecycle: Born ? execute() ? die.
  */
 export class AgentHeadless {
   private readonly core: AgentCore;
@@ -312,7 +312,7 @@ export class AgentHeadless {
     }
   }
 
-  // ─── Accessors ─────────────────────────────────────────────
+  // --- Accessors ---------------------------------------------
 
   /**
    * Provides access to the underlying AgentCore for advanced use cases.

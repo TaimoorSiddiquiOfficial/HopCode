@@ -1,4 +1,4 @@
-import * as crypto from 'node:crypto';
+﻿import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
@@ -22,7 +22,7 @@ export class PairingStore {
   private allowlistPath: string;
 
   constructor(channelName: string) {
-    this.dir = path.join(os.homedir(), '.qwen', 'channels');
+    this.dir = path.join(os.homedir(), '.hopcode', 'channels');
     this.pendingPath = path.join(this.dir, `${channelName}-pairing.json`);
     this.allowlistPath = path.join(this.dir, `${channelName}-allowlist.json`);
   }

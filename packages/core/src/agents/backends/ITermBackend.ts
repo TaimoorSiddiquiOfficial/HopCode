@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -83,7 +83,7 @@ export class ITermBackend implements Backend {
     debugLogger.info('ITermBackend initialized');
   }
 
-  // ─── Agent Lifecycle ────────────────────────────────────────
+  // --- Agent Lifecycle ----------------------------------------
 
   async spawnAgent(config: AgentSpawnConfig): Promise<void> {
     if (!this.initialized) {
@@ -243,7 +243,7 @@ export class ITermBackend implements Backend {
     });
   }
 
-  // ─── Active Agent & Navigation ──────────────────────────────
+  // --- Active Agent & Navigation ------------------------------
 
   switchTo(agentId: string): void {
     if (!this.sessions.has(agentId)) {
@@ -275,10 +275,10 @@ export class ITermBackend implements Backend {
     return this.activeAgentId;
   }
 
-  // ─── Screen Capture ─────────────────────────────────────────
+  // --- Screen Capture -----------------------------------------
 
   getActiveSnapshot(): AnsiOutput | null {
-    // iTerm2 manages rendering — snapshots not supported
+    // iTerm2 manages rendering � snapshots not supported
     return null;
   }
 
@@ -293,7 +293,7 @@ export class ITermBackend implements Backend {
     return 0;
   }
 
-  // ─── Input ──────────────────────────────────────────────────
+  // --- Input --------------------------------------------------
 
   forwardInput(data: string): boolean {
     if (!this.activeAgentId) return false;
@@ -309,7 +309,7 @@ export class ITermBackend implements Backend {
     return true;
   }
 
-  // ─── Resize ─────────────────────────────────────────────────
+  // --- Resize -------------------------------------------------
 
   resizeAll(_cols: number, _rows: number): void {
     // iTerm2 manages pane sizes automatically
@@ -320,7 +320,7 @@ export class ITermBackend implements Backend {
     return null;
   }
 
-  // ─── Private ────────────────────────────────────────────────
+  // --- Private ------------------------------------------------
 
   /**
    * Build the shell command with exit marker wrapping.
@@ -409,7 +409,7 @@ export class ITermBackend implements Backend {
 
         this.onExitCallback?.(agent.agentId, agent.exitCode, null);
       } catch {
-        // File doesn't exist yet — command still running
+        // File doesn't exist yet � command still running
       }
     }
 

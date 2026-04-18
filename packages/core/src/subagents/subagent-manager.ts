@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,7 +50,7 @@ const debugLogger = createDebugLogger('SUBAGENT_MANAGER');
 import { BuiltinAgentRegistry } from './builtin-agents.js';
 import { ToolDisplayNamesMigration } from '../tools/tool-names.js';
 
-const QWEN_CONFIG_DIR = '.qwen';
+const QWEN_CONFIG_DIR = '.hopcode';
 const AGENT_CONFIG_DIR = 'agents';
 
 /**

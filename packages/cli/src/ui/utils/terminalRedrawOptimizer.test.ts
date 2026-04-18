@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -88,7 +88,7 @@ describe('installTerminalRedrawOptimizer', () => {
   });
 
   it('can be disabled for terminal compatibility fallback', () => {
-    vi.stubEnv('QWEN_CODE_LEGACY_ERASE_LINES', '1');
+    vi.stubEnv('HOPCODE_LEGACY_ERASE_LINES', '1');
     const write = vi.fn(() => true);
     const stdout = { write } as unknown as NodeJS.WriteStream;
     const restore = installTerminalRedrawOptimizer(stdout);

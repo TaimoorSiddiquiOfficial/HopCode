@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,8 +21,8 @@ import type {
 /**
  * Represents the storage level for a subagent configuration.
  * - 'session': Session-level agents provided at runtime, read-only (highest priority)
- * - 'project': Stored in `.qwen/agents/` within the project directory
- * - 'user': Stored in `~/.qwen/agents/` in the user's home directory
+ * - 'project': Stored in `.hopcode/agents/` within the project directory
+ * - 'user': Stored in `~/.hopcode/agents/` in the user's home directory
  * - 'extension': Provided by an installed extension
  * - 'builtin': Built-in agents embedded in the codebase, always available (lowest priority)
  */
@@ -102,7 +102,7 @@ export interface SubagentConfig {
 
   /**
    * When true, this agent always runs as a background task when spawned.
-   * OR'd with the `run_in_background` tool parameter â€” if either is true,
+   * OR'd with the `run_in_background` tool parameter — if either is true,
    * the agent runs in the background.
    */
   background?: boolean;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +22,7 @@ import { createDebugLogger } from '../utils/debugLogger.js';
 const debugLogger = createDebugLogger('QWEN_OAUTH');
 
 // File System Configuration
-const QWEN_DIR = '.qwen';
+const QWEN_DIR = '.hopcode';
 const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
 const QWEN_LOCK_FILENAME = 'oauth_creds.lock';
 

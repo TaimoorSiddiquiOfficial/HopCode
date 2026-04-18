@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +44,7 @@ export class QwenSessionReader {
   private qwenDir: string;
 
   constructor() {
-    this.qwenDir = path.join(os.homedir(), '.qwen');
+    this.hopcodeDir = path.join(os.homedir(), '.hopcode');
   }
 
   /**
@@ -60,12 +60,12 @@ export class QwenSessionReader {
       if (!allProjects && workingDir) {
         // Current project only
         const projectHash = getProjectHash(workingDir);
-        const chatsDir = path.join(this.qwenDir, 'tmp', projectHash, 'chats');
+        const chatsDir = path.join(this.hopcodeDir, 'tmp', projectHash, 'chats');
         const projectSessions = await this.readSessionsFromDir(chatsDir);
         sessions.push(...projectSessions);
       } else {
         // All projects
-        const tmpDir = path.join(this.qwenDir, 'tmp');
+        const tmpDir = path.join(this.hopcodeDir, 'tmp');
         if (!fs.existsSync(tmpDir)) {
           console.log('[QwenSessionReader] Tmp directory not found:', tmpDir);
           return [];

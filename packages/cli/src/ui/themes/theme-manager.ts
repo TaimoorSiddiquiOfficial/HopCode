@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -230,7 +230,7 @@ class ThemeManager {
     );
 
     // Combine Qwen themes first, then sorted others
-    return [...qwenThemes, ...sortedOtherThemes];
+    return [...hopcodeThemes, ...sortedOtherThemes];
   }
 
   /**

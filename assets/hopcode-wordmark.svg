@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <!-- HopCode Logo - Concept 4: Minimalist Wordmark -->
+  <!-- Clean, modern typography-based logo -->
+  
+  <defs>
+    <!-- Subtle gradient for text -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Code bracket accent gradient -->
+    <linearGradient id="bracketGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F97316;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background (optional, remove for transparent) -->
+  <rect width="400" height="120" fill="#0F0F14" rx="12"/>
+  
+  <!-- Opening code bracket (stylized) -->
+  <path d="M 35 40 L 25 60 L 35 80" 
+        stroke="url(#bracketGradient)" 
+        stroke-width="6" 
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"/>
+  
+  <!-- "HopCode" Wordmark -->
+  <text x="55" y="75" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="48" 
+        font-weight="600"
+        letter-spacing="-1"
+        fill="url(#textGradient)">
+    HopCode
+  </text>
+  
+  <!-- Dot on "i" replaced with code symbol (optional accent) -->
+  <!-- Integrated into the text flow -->
+  
+  <!-- Closing code bracket (stylized, smaller) -->
+  <path d="M 365 50 L 375 65 L 365 80" 
+        stroke="#7C3AED" 
+        stroke-width="4" 
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        opacity="0.6"/>
+  
+  <!-- Tagline (optional, for hero usage) -->
+  <text x="55" y="95" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="12" 
+        font-weight="400"
+        letter-spacing="2"
+        fill="#71717A">
+    CODE WITH AI
+  </text>
+  
+  <!-- Underline accent -->
+  <line x1="50" y1="105" x2="200" y2="105" 
+        stroke="#7C3AED" 
+        stroke-width="2" 
+        stroke-linecap="round"
+        opacity="0.5"/>
+</svg>

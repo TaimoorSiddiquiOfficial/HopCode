@@ -1,4 +1,4 @@
-# Automation and Triage Processes
+﻿# Automation and Triage Processes
 
 This document provides a detailed overview of the automated processes we use to manage and triage issues and pull requests. Our goal is to provide prompt feedback and ensure that contributions are reviewed and integrated efficiently. Understanding this automation will help you as a contributor know what to expect and how to best interact with our repository bots.
 
@@ -71,7 +71,7 @@ This is a fallback workflow to ensure that no issue gets missed by the triage pr
 
 ### 5. Release Automation
 
-This workflow handles the process of packaging and publishing new versions of Qwen Code.
+This workflow handles the process of packaging and publishing new versions of HopCode.
 
 - **Workflow File**: `.github/workflows/release.yml`
 - **When it runs**: On a daily schedule for "nightly" releases, and manually for official patch/minor releases.

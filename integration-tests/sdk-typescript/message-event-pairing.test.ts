@@ -1,4 +1,4 @@
-/**
+﻿/**
  * E2E tests for message_start and message_stop event pairing
  * Ensures that message_start and message_stop events are always paired correctly
  */
@@ -10,7 +10,7 @@ import {
   isSDKAssistantMessage,
   type SDKPartialAssistantMessage,
   type TextBlock,
-} from '@qwen-code/sdk';
+} from '@hopcode/sdk';
 import { SDKTestHelper, createSharedTestOptions } from './test-helper.js';
 
 const SHARED_TEST_OPTIONS = createSharedTestOptions();

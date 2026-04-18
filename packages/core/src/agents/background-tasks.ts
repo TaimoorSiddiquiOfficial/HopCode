@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview BackgroundTaskRegistry â€” tracks background (async) sub-agents.
+ * @fileoverview BackgroundTaskRegistry — tracks background (async) sub-agents.
  *
  * When the Agent tool is called with `run_in_background: true`, the sub-agent
  * runs asynchronously. This registry tracks the lifecycle of each background
@@ -21,7 +21,7 @@ const MAX_RESULT_LENGTH = 2000;
 
 // Escape text so it is safe to interpolate into an XML element body.
 // Subagent-produced strings (description, result, error) can contain `<`,
-// `>`, or literal `</task-notification>` â€” without escaping, a subagent
+// `>`, or literal `</task-notification>` — without escaping, a subagent
 // summarizing HTML or another agent's notification could close the
 // envelope early and forge sibling tags (e.g. a faked <status>) that the
 // parent model would treat as trusted metadata.
@@ -91,7 +91,7 @@ export class BackgroundTaskRegistry {
     }
   }
 
-  // No-op if not 'running' â€” guards against race with concurrent cancellation.
+  // No-op if not 'running' — guards against race with concurrent cancellation.
   complete(
     agentId: string,
     result: string,
@@ -109,7 +109,7 @@ export class BackgroundTaskRegistry {
     this.emitNotification(entry);
   }
 
-  // No-op if not 'running' â€” guards against race with concurrent cancellation.
+  // No-op if not 'running' — guards against race with concurrent cancellation.
   fail(agentId: string, error: string, stats?: AgentCompletionStats): void {
     const entry = this.agents.get(agentId);
     if (!entry || entry.status !== 'running') return;
@@ -123,7 +123,7 @@ export class BackgroundTaskRegistry {
     this.emitNotification(entry);
   }
 
-  // Emit the terminal notification here â€” the fire-and-forget complete()/fail()
+  // Emit the terminal notification here — the fire-and-forget complete()/fail()
   // path is guarded by `status !== 'running'` and will no-op, so without this the
   // SDK contract breaks: consumers saw task_started but never receive a matching
   // task_notification.

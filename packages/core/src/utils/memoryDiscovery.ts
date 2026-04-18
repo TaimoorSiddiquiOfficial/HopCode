@@ -314,7 +314,7 @@ export interface LoadServerHierarchicalMemoryResponse {
 
 /**
  * Loads hierarchical QWEN.md files and concatenates their content.
- * Also loads path-based context rules from `.qwen/rules/` directories.
+ * Also loads path-based context rules from `.hopcode/rules/` directories.
  * This function is intended for use by the server.
  *
  * @param contextRuleExcludes - Glob patterns to skip when loading rules.
@@ -363,7 +363,7 @@ export async function loadServerHierarchicalMemory(
     ).length;
   }
 
-  // Load path-based context rules from .qwen/rules/ directories
+  // Load path-based context rules from .hopcode/rules/ directories
   const resolvedCwd = path.resolve(currentWorkingDirectory);
   const foundRoot = await findProjectRoot(resolvedCwd);
   const effectiveRoot = foundRoot ?? resolvedCwd;

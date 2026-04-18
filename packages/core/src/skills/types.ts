@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,8 +8,8 @@ import type { HookDefinition, HookEventName } from '../hooks/types.js';
 
 /**
  * Represents the storage level for a skill configuration.
- * - 'project': Stored in `.qwen/skills/` within the project directory
- * - 'user': Stored in `~/.qwen/skills/` in the user's home directory
+ * - 'project': Stored in `.hopcode/skills/` within the project directory
+ * - 'user': Stored in `~/.hopcode/skills/` in the user's home directory
  * - 'extension': Provided by an installed extension
  * - 'bundled': Built-in skills shipped with qwen-code
  */

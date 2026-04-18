@@ -1,4 +1,4 @@
-import * as path from 'node:path';
+﻿import * as path from 'node:path';
 import * as os from 'node:os';
 import type { CommandModule } from 'yargs';
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
@@ -50,7 +50,7 @@ function resolveProxy(cliProxy?: string): string | undefined {
 }
 
 function sessionsPath(): string {
-  return path.join(os.homedir(), '.qwen', 'channels', 'sessions.json');
+  return path.join(os.homedir(), '.hopcode', 'channels', 'sessions.json');
 }
 
 function loadChannelsConfig(): Record<string, unknown> {

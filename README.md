@@ -1,26 +1,26 @@
-<div align="center">
+﻿<div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@qwen-code/qwen-code.svg)](https://www.npmjs.com/package/@qwen-code/qwen-code)
+[![npm version](https://img.shields.io/npm/v/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
 [![License](https://img.shields.io/github/license/QwenLM/qwen-code.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
-[![Downloads](https://img.shields.io/npm/dm/@qwen-code/qwen-code.svg)](https://www.npmjs.com/package/@qwen-code/qwen-code)
+[![Downloads](https://img.shields.io/npm/dm/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
 
 <a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="QwenLM%2Fqwen-code | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
 **An open-source AI agent that lives in your terminal.**
 
-<a href="https://qwenlm.github.io/qwen-code-docs/zh/users/overview">中文</a> |
-<a href="https://qwenlm.github.io/qwen-code-docs/de/users/overview">Deutsch</a> |
-<a href="https://qwenlm.github.io/qwen-code-docs/fr/users/overview">français</a> |
-<a href="https://qwenlm.github.io/qwen-code-docs/ja/users/overview">日本語</a> |
-<a href="https://qwenlm.github.io/qwen-code-docs/ru/users/overview">Русский</a> |
-<a href="https://qwenlm.github.io/qwen-code-docs/pt-BR/users/overview">Português (Brasil)</a>
+<a href="https://hopcode.dev/docs/zh/users/overview">中文</a> |
+<a href="https://hopcode.dev/docs/de/users/overview">Deutsch</a> |
+<a href="https://hopcode.dev/docs/fr/users/overview">français</a> |
+<a href="https://hopcode.dev/docs/ja/users/overview">日本語</a> |
+<a href="https://hopcode.dev/docs/ru/users/overview">Русский</a> |
+<a href="https://hopcode.dev/docs/pt-BR/users/overview">Português (Brasil)</a>
 
 </div>
 
 ## 🎉 News
 
-- **2026-04-15**: Qwen OAuth free tier has been discontinued. To continue using Qwen Code, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `qwen auth` to configure.
+- **2026-04-15**: Qwen OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `qwen auth` to configure.
 
 - **2026-04-13**: Qwen OAuth free tier policy update: daily quota adjusted to 100 requests/day (from 1,000).
 
@@ -28,9 +28,9 @@
 
 - **2026-02-16**: Qwen3.5-Plus is now live!
 
-## Why Qwen Code?
+## Why HopCode?
 
-Qwen Code is an open-source AI agent for the terminal, optimized for Qwen series models. It helps you understand large codebases, automate tedious work, and ship faster.
+HopCode is an open-source AI agent for the terminal, optimized for Qwen series models. It helps you understand large codebases, automate tedious work, and ship faster.
 
 - **Multi-protocol, flexible providers**: use OpenAI / Anthropic / Gemini-compatible APIs, [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key.
 - **Open-source, co-evolving**: both the framework and the Qwen3-Coder model are open-source—and they ship and evolve together.
@@ -46,7 +46,7 @@ Qwen Code is an open-source AI agent for the terminal, optimized for Qwen series
 #### Linux / macOS
 
 ```bash
-bash -c "$(curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.sh)"
+bash -c "$(curl -fsSL https://hopcode-assets.example.com/installation/install-qwen.sh)"
 ```
 
 #### Windows (Run as Administrator)
@@ -54,7 +54,7 @@ bash -c "$(curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/inst
 Works in both Command Prompt and PowerShell:
 
 ```cmd
-powershell -Command "Invoke-WebRequest 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.bat' -OutFile (Join-Path $env:TEMP 'install-qwen.bat'); & (Join-Path $env:TEMP 'install-qwen.bat')"
+powershell -Command "Invoke-WebRequest 'https://hopcode-assets.example.com/installation/install-qwen.bat' -OutFile (Join-Path $env:TEMP 'install-qwen.bat'); & (Join-Path $env:TEMP 'install-qwen.bat')"
 ```
 
 > **Note**: It's recommended to restart your terminal after installation to ensure environment variables take effect.
@@ -68,19 +68,19 @@ Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](
 #### NPM
 
 ```bash
-npm install -g @qwen-code/qwen-code@latest
+npm install -g @hopcode/hopcode@latest
 ```
 
 #### Homebrew (macOS, Linux)
 
 ```bash
-brew install qwen-code
+brew install hopcode
 ```
 
 ## Quick Start
 
 ```bash
-# Start Qwen Code (interactive)
+# Start HopCode (interactive)
 qwen
 
 # Then, in the session:
@@ -108,19 +108,19 @@ Your browser does not support the video tag.
 
 </details>
 
-## 🦞 Use Qwen Code for Coding Tasks in Claw
+## 🦞 Use HopCode for Coding Tasks in Claw
 
 Copy the prompt below and paste it into your agent:
 
 ```
-Use Qwen Code as a coding agent. First, fetch and read this skill reference:
+Use HopCode as a coding agent. First, fetch and read this skill reference:
 https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/.qwen/skills/qwen-code-claw/SKILL.md
-Then follow the instructions inside to install, authenticate, and use Qwen Code via acpx for all coding tasks.
+Then follow the instructions inside to install, authenticate, and use HopCode via acpx for all coding tasks.
 ```
 
 ## Authentication
 
-Qwen Code supports the following authentication methods:
+HopCode supports the following authentication methods:
 
 - **API Key (recommended)**: use an API key from Alibaba Cloud Model Studio ([Beijing](https://bailian.console.aliyun.com/) / [intl](https://modelstudio.console.alibabacloud.com/)) or any supported provider (OpenAI, Anthropic, Google GenAI, and other compatible endpoints).
 - **Coding Plan**: subscribe to the Alibaba Cloud Coding Plan ([Beijing](https://bailian.console.aliyun.com/cn-beijing?tab=coding-plan#/efm/coding-plan-index) / [intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) for a fixed monthly fee with higher quotas.
@@ -180,9 +180,9 @@ Here is a complete example:
 | `modelProviders[].baseUrl`   | The API endpoint URL (required for non-default endpoints).                                                                            |
 | `env`                        | A fallback place to store API keys (lowest priority; prefer `.env` files or `export` for sensitive keys).                             |
 | `security.auth.selectedType` | The protocol to use on startup (`openai`, `anthropic`, `gemini`, `vertex-ai`).                                                        |
-| `model.name`                 | The default model to use when Qwen Code starts.                                                                                       |
+| `model.name`                 | The default model to use when HopCode starts.                                                                                       |
 
-**Step 3:** Start Qwen Code — your configuration takes effect automatically:
+**Step 3:** Start HopCode — your configuration takes effect automatically:
 
 ```bash
 qwen
@@ -345,7 +345,7 @@ Use the `/model` command at any time to switch between all configured models.
 
 </details>
 
-> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/) for full details.
+> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://hopcode.dev/docs/en/users/configuration/auth/) for full details.
 
 > **Security note:** Never commit API keys to version control. The `~/.qwen/settings.json` file is in your home directory and should stay private.
 
@@ -419,7 +419,7 @@ You can also run models locally — no API key or cloud account needed. This is 
 
 ## Usage
 
-As an open-source terminal agent, you can use Qwen Code in four primary ways:
+As an open-source terminal agent, you can use HopCode in four primary ways:
 
 1. Interactive mode (terminal UI)
 2. Headless mode (scripts, CI)
@@ -442,21 +442,21 @@ cd your-project/
 qwen -p "your question"
 ```
 
-Use `-p` to run Qwen Code without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://qwenlm.github.io/qwen-code-docs/en/users/features/headless).
+Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://hopcode.dev/docs/en/users/features/headless).
 
 #### IDE integration
 
-Use Qwen Code inside your editor (VS Code, Zed, and JetBrains IDEs):
+Use HopCode inside your editor (VS Code, Zed, and JetBrains IDEs):
 
-- [Use in VS Code](https://qwenlm.github.io/qwen-code-docs/en/users/integration-vscode/)
-- [Use in Zed](https://qwenlm.github.io/qwen-code-docs/en/users/integration-zed/)
-- [Use in JetBrains IDEs](https://qwenlm.github.io/qwen-code-docs/en/users/integration-jetbrains/)
+- [Use in VS Code](https://hopcode.dev/docs/en/users/integration-vscode/)
+- [Use in Zed](https://hopcode.dev/docs/en/users/integration-zed/)
+- [Use in JetBrains IDEs](https://hopcode.dev/docs/en/users/integration-jetbrains/)
 
 #### TypeScript SDK
 
-Build on top of Qwen Code with the TypeScript SDK:
+Build on top of HopCode with the TypeScript SDK:
 
-- [Use the Qwen Code SDK](./packages/sdk-typescript/README.md)
+- [Use the HopCode SDK](./packages/sdk-typescript/README.md)
 
 ## Commands & Shortcuts
 
@@ -467,7 +467,7 @@ Build on top of Qwen Code with the TypeScript SDK:
 - `/compress` - Compress history to save tokens
 - `/stats` - Show current session information
 - `/bug` - Submit a bug report
-- `/exit` or `/quit` - Exit Qwen Code
+- `/exit` or `/quit` - Exit HopCode
 
 ### Keyboard Shortcuts
 
@@ -475,18 +475,18 @@ Build on top of Qwen Code with the TypeScript SDK:
 - `Ctrl+D` - Exit (on empty line)
 - `Up/Down` - Navigate command history
 
-> Learn more about [Commands](https://qwenlm.github.io/qwen-code-docs/en/users/features/commands/)
+> Learn more about [Commands](https://hopcode.dev/docs/en/users/features/commands/)
 >
-> **Tip**: In YOLO mode (`--yolo`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://qwenlm.github.io/qwen-code-docs/en/users/features/approval-mode/)
+> **Tip**: In YOLO mode (`--yolo`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/docs/en/users/features/approval-mode/)
 
 ## Configuration
 
-Qwen Code can be configured via `settings.json`, environment variables, and CLI flags.
+HopCode can be configured via `settings.json`, environment variables, and CLI flags.
 
 | File                    | Scope         | Description                                                                             |
 | ----------------------- | ------------- | --------------------------------------------------------------------------------------- |
-| `~/.qwen/settings.json` | User (global) | Applies to all your Qwen Code sessions. **Recommended for `modelProviders` and `env`.** |
-| `.qwen/settings.json`   | Project       | Applies only when running Qwen Code in this project. Overrides user settings.           |
+| `~/.qwen/settings.json` | User (global) | Applies to all your HopCode sessions. **Recommended for `modelProviders` and `env`.** |
+| `.qwen/settings.json`   | Project       | Applies only when running HopCode in this project. Overrides user settings.           |
 
 The most commonly used top-level fields in `settings.json`:
 
@@ -495,9 +495,9 @@ The most commonly used top-level fields in `settings.json`:
 | `modelProviders`             | Define available models per protocol (`openai`, `anthropic`, `gemini`, `vertex-ai`).                 |
 | `env`                        | Fallback environment variables (e.g. API keys). Lower priority than shell `export` and `.env` files. |
 | `security.auth.selectedType` | The protocol to use on startup (e.g. `openai`).                                                      |
-| `model.name`                 | The default model to use when Qwen Code starts.                                                      |
+| `model.name`                 | The default model to use when HopCode starts.                                                      |
 
-> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/) for all available options.
+> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://hopcode.dev/docs/en/users/configuration/settings/) for all available options.
 
 ## Benchmark Results
 
@@ -505,19 +505,19 @@ The most commonly used top-level fields in `settings.json`:
 
 | Agent     | Model              | Accuracy |
 | --------- | ------------------ | -------- |
-| Qwen Code | Qwen3-Coder-480A35 | 37.5%    |
-| Qwen Code | Qwen3-Coder-30BA3B | 31.3%    |
+| HopCode | Qwen3-Coder-480A35 | 37.5%    |
+| HopCode | Qwen3-Coder-30BA3B | 31.3%    |
 
 ## Ecosystem
 
 Looking for a graphical interface?
 
-- [**AionUi**](https://github.com/iOfficeAI/AionUi) A modern GUI for command-line AI tools including Qwen Code
-- [**Gemini CLI Desktop**](https://github.com/Piebald-AI/gemini-cli-desktop) A cross-platform desktop/web/mobile UI for Qwen Code
+- [**AionUi**](https://github.com/iOfficeAI/AionUi) A modern GUI for command-line AI tools including HopCode
+- [**Gemini CLI Desktop**](https://github.com/Piebald-AI/gemini-cli-desktop) A cross-platform desktop/web/mobile UI for HopCode
 
 ## Troubleshooting
 
-If you encounter issues, check the [troubleshooting guide](https://qwenlm.github.io/qwen-code-docs/en/users/support/troubleshooting/).
+If you encounter issues, check the [troubleshooting guide](https://hopcode.dev/docs/en/users/support/troubleshooting/).
 
 **Common issues:**
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -205,7 +205,7 @@ describe('AtFileProcessor', () => {
       expect(context.ui.addItem).toHaveBeenCalledWith(
         {
           type: MessageType.INFO,
-          text: "File '@{ignored.txt}' was ignored by .gitignore or .qwenignore and was not included in the prompt.",
+          text: "File '@{ignored.txt}' was ignored by .gitignore or .hopcodeignore and was not included in the prompt.",
         },
         expect.any(Number),
       );

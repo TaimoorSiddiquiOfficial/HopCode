@@ -1,9 +1,9 @@
-# Makefile for qwen-code
+﻿# Makefile for hopcode
 
 .PHONY: help install build build-sandbox build-all test lint format preflight clean start debug release run-npx create-alias
 
 help:
-	@echo "Makefile for qwen-code"
+	@echo "Makefile for hopcode"
 	@echo ""
 	@echo "Usage:"
 	@echo "  make install          - Install npm dependencies"
@@ -53,7 +53,7 @@ debug:
 
 
 run-npx:
-	npx https://github.com/QwenLM/qwen-code
+	npx https://github.com/QwenLM/hopcode
 
 create-alias:
 	scripts/create_alias.sh

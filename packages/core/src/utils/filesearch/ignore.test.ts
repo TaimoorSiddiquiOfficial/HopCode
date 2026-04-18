@@ -92,9 +92,9 @@ describe('loadIgnoreRules', () => {
     expect(fileFilter('test.txt')).toBe(false);
   });
 
-  it('should load rules from .qwenignore', async () => {
+  it('should load rules from .hopcodeignore', async () => {
     tmpDir = await createTmpDir({
-      '.qwenignore': '*.log',
+      '.hopcodeignore': '*.log',
     });
     const ignore = loadIgnoreRules({
       projectRoot: tmpDir,
@@ -107,10 +107,10 @@ describe('loadIgnoreRules', () => {
     expect(fileFilter('test.txt')).toBe(false);
   });
 
-  it('should combine rules from .gitignore and .qwenignore', async () => {
+  it('should combine rules from .gitignore and .hopcodeignore', async () => {
     tmpDir = await createTmpDir({
       '.gitignore': '*.log',
-      '.qwenignore': '*.txt',
+      '.hopcodeignore': '*.txt',
     });
     const ignore = loadIgnoreRules({
       projectRoot: tmpDir,

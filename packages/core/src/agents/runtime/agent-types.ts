@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +13,7 @@
 
 import type { Content, FunctionDeclaration } from '@google/genai';
 
-// ─── Agent Configuration ─────────────────────────────────────
+// --- Agent Configuration -------------------------------------
 
 /**
  * Configures the initial prompt for an agent.
@@ -27,7 +27,7 @@ export interface PromptConfig {
   systemPrompt?: string;
 
   /**
-   * A pre-rendered system instruction consumed verbatim — no templating, no
+   * A pre-rendered system instruction consumed verbatim � no templating, no
    * non-interactive suffix, no user-memory injection. Used by fork subagents
    * to share the parent conversation's exact cache prefix. Mutually exclusive
    * with `systemPrompt`.
@@ -106,17 +106,17 @@ export enum AgentTerminateMode {
   SHUTDOWN = 'SHUTDOWN',
 }
 
-// ─── Agent Status ────────────────────────────────────────────
+// --- Agent Status --------------------------------------------
 
 /**
  * Canonical lifecycle status for any agent (headless, interactive, arena).
  *
  * State machine:
- *   INITIALIZING → RUNNING → IDLE ⇄ RUNNING → … → COMPLETED / FAILED / CANCELLED
+ *   INITIALIZING ? RUNNING ? IDLE ? RUNNING ? � ? COMPLETED / FAILED / CANCELLED
  *
  * - INITIALIZING: Setting up (creating chat, loading tools).
  * - RUNNING:      Actively processing (model thinking / tool execution).
- * - IDLE:         Finished current work, waiting — can accept new messages.
+ * - IDLE:         Finished current work, waiting � can accept new messages.
  * - COMPLETED:    Finished for good (explicit shutdown). No further interaction.
  * - FAILED:       Finished with error (API failure, process crash, etc.).
  * - CANCELLED:    Cancelled by user or system.
@@ -130,17 +130,17 @@ export enum AgentStatus {
   CANCELLED = 'cancelled',
 }
 
-/** True for COMPLETED, FAILED, CANCELLED — agent is done for good. */
+/** True for COMPLETED, FAILED, CANCELLED � agent is done for good. */
 export const isTerminalStatus = (s: AgentStatus): boolean =>
   s === AgentStatus.COMPLETED ||
   s === AgentStatus.FAILED ||
   s === AgentStatus.CANCELLED;
 
-/** True for IDLE or COMPLETED — agent finished its work successfully. */
+/** True for IDLE or COMPLETED � agent finished its work successfully. */
 export const isSuccessStatus = (s: AgentStatus): boolean =>
   s === AgentStatus.IDLE || s === AgentStatus.COMPLETED;
 
-/** True for terminal statuses OR IDLE — agent has settled (not actively working). */
+/** True for terminal statuses OR IDLE � agent has settled (not actively working). */
 export const isSettledStatus = (s: AgentStatus): boolean =>
   s === AgentStatus.IDLE || isTerminalStatus(s);
 

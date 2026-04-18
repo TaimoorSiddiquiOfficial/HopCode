@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -70,7 +70,7 @@ describe('showAuthStatus', () => {
       createMockSettings({
         security: {
           auth: {
-            selectedType: AuthType.QWEN_OAUTH,
+            selectedType: AuthType.hopcode_OAUTH,
           },
         },
       }),

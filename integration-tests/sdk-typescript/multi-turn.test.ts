@@ -1,4 +1,4 @@
-/**
+﻿/**
  * E2E tests based on multi-turn.ts example
  * Tests multi-turn conversation functionality with real CLI
  */
@@ -21,7 +21,7 @@ import {
   type SDKMessage,
   type ControlMessage,
   type ToolUseBlock,
-} from '@qwen-code/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   createSharedTestOptions,

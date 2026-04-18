@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -216,8 +216,8 @@ export default {
   // ============================================================================
   // Агенты - Мастер создания
   // ============================================================================
-  'Project Level (.qwen/agents/)': 'Уровень проекта (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': 'Уровень пользователя (~/.qwen/agents/)',
+  'Project Level (.hopcode/agents/)': 'Уровень проекта (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': 'Уровень пользователя (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ Подагент успешно создан!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Подагент "{{name}}" сохранен на уровне {{level}}.',
@@ -353,7 +353,7 @@ export default {
   'Load Memory From Include Directories':
     'Загружать память из включенных директорий',
   'Respect .gitignore': 'Учитывать .gitignore',
-  'Respect .qwenignore': 'Учитывать .qwenignore',
+  'Respect .hopcodeignore': 'Учитывать .hopcodeignore',
   'Enable Recursive File Search': 'Включить рекурсивный поиск файлов',
   'Disable Fuzzy Search': 'Отключить нечеткий поиск',
   'Interactive Shell (PTY)': 'Интерактивный терминал (PTY)',
@@ -1017,8 +1017,8 @@ export default {
   // ============================================================================
   // Команды - Резюме
   // ============================================================================
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'Сгенерировать сводку проекта и сохранить её в .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    'Сгенерировать сводку проекта и сохранить её в .hopcode/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     'Нет доступного чат-клиента для генерации сводки.',
   'Already generating summary, wait for previous request to complete':
@@ -1347,11 +1347,11 @@ export default {
   'From project settings': 'Из настроек проекта',
   'From session': 'Из сессии',
   'Project settings (local)': 'Настройки проекта (локальные)',
-  'Saved in .qwen/settings.local.json': 'Сохранено в .qwen/settings.local.json',
+  'Saved in .hopcode/settings.local.json': 'Сохранено в .hopcode/settings.local.json',
   'Project settings': 'Настройки проекта',
-  'Checked in at .qwen/settings.json': 'Зафиксировано в .qwen/settings.json',
+  'Checked in at .hopcode/settings.json': 'Зафиксировано в .hopcode/settings.json',
   'User settings': 'Пользовательские настройки',
-  'Saved in at ~/.qwen/settings.json': 'Сохранено в ~/.qwen/settings.json',
+  'Saved in at ~/.hopcode/settings.json': 'Сохранено в ~/.hopcode/settings.json',
   'Add a new rule…': 'Добавить новое правило…',
   'Add {{type}} permission rule': 'Добавить правило разрешения {{type}}',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

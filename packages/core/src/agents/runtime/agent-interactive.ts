@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview AgentInteractive — persistent interactive agent.
+ * @fileoverview AgentInteractive � persistent interactive agent.
  *
  * Composes AgentCore with on-demand message processing. Builds conversation
  * state (messages, pending approvals, live outputs) that the UI reads.
@@ -42,13 +42,13 @@ import {
 const debugLogger = createDebugLogger('AGENT_INTERACTIVE');
 
 /**
- * AgentInteractive — persistent interactive agent that processes
+ * AgentInteractive � persistent interactive agent that processes
  * messages on demand.
  *
  * Three-level cancellation:
- * - `cancelCurrentRound()` — abort the current reasoning loop only
- * - `shutdown()` — graceful: stop accepting messages, wait for cycle
- * - `abort()` — immediate: master abort, set cancelled
+ * - `cancelCurrentRound()` � abort the current reasoning loop only
+ * - `shutdown()` � graceful: stop accepting messages, wait for cycle
+ * - `abort()` � immediate: master abort, set cancelled
  */
 export class AgentInteractive {
   readonly config: AgentInteractiveConfig;
@@ -91,7 +91,7 @@ export class AgentInteractive {
     this.setupEventListeners();
   }
 
-  // ─── Lifecycle ──────────────────────────────────────────────
+  // --- Lifecycle ----------------------------------------------
 
   /**
    * Start the agent. Initializes the chat session, then kicks off
@@ -204,7 +204,7 @@ export class AgentInteractive {
     } catch (err) {
       // User-initiated cancellation already logged by cancelCurrentRound().
       if (this.roundCancelledByUser) return;
-      // Agent survives round errors — log and settle status in runLoop.
+      // Agent survives round errors � log and settle status in runLoop.
       const errorMessage = err instanceof Error ? err.message : String(err);
       this.lastRoundError = errorMessage;
       debugLogger.error('AgentInteractive round error:', err);
@@ -218,7 +218,7 @@ export class AgentInteractive {
     }
   }
 
-  // ─── Cancellation ──────────────────────────────────────────
+  // --- Cancellation ------------------------------------------
 
   /**
    * Cancel only the current reasoning round.
@@ -258,7 +258,7 @@ export class AgentInteractive {
     this.pendingApprovals.clear();
   }
 
-  // ─── Message Queue ─────────────────────────────────────────
+  // --- Message Queue -----------------------------------------
 
   /**
    * Enqueue a message for the agent to process.
@@ -270,7 +270,7 @@ export class AgentInteractive {
     }
   }
 
-  // ─── State Accessors ───────────────────────────────────────
+  // --- State Accessors ---------------------------------------
 
   getMessages(): readonly AgentMessage[] {
     return this.messages;
@@ -307,7 +307,7 @@ export class AgentInteractive {
 
   /**
    * Returns tool calls currently awaiting user approval.
-   * Keyed by callId → full ToolCallConfirmationDetails (with onConfirm).
+   * Keyed by callId ? full ToolCallConfirmationDetails (with onConfirm).
    * The UI reads this to render confirmation dialogs inside ToolGroupMessage.
    */
   getPendingApprovals(): ReadonlyMap<string, ToolCallConfirmationDetails> {
@@ -316,7 +316,7 @@ export class AgentInteractive {
 
   /**
    * Returns live output for currently-executing tools.
-   * Keyed by callId → latest ToolResultDisplay (replaces on each update).
+   * Keyed by callId ? latest ToolResultDisplay (replaces on each update).
    * Entries are cleared when TOOL_RESULT arrives for the call.
    */
   getLiveOutputs(): ReadonlyMap<string, ToolResultDisplay> {
@@ -325,7 +325,7 @@ export class AgentInteractive {
 
   /**
    * Returns PTY PIDs for currently-executing interactive shell tools.
-   * Keyed by callId → PID. Populated from TOOL_OUTPUT_UPDATE when pid is
+   * Keyed by callId ? PID. Populated from TOOL_OUTPUT_UPDATE when pid is
    * present; cleared when TOOL_RESULT arrives. The UI uses this to enable
    * interactive shell input via HistoryItemDisplay's activeShellPtyId prop.
    */
@@ -342,12 +342,12 @@ export class AgentInteractive {
     }
   }
 
-  // ─── Private Helpers ───────────────────────────────────────
+  // --- Private Helpers ---------------------------------------
 
   /**
    * Settle status after the run loop empties.
-   * On success → IDLE (agent stays alive for follow-up messages).
-   * On error → FAILED (terminal).
+   * On success ? IDLE (agent stays alive for follow-up messages).
+   * On error ? FAILED (terminal).
    */
   private settleRoundStatus(): void {
     if (this.lastRoundError && !this.roundCancelledByUser) {
@@ -459,7 +459,7 @@ export class AgentInteractive {
           ) => {
             this.pendingApprovals.delete(event.callId);
             // Nudge the UI to re-render so the tool transitions visually
-            // from Confirming → Executing without waiting for the first
+            // from Confirming ? Executing without waiting for the first
             // real TOOL_OUTPUT_UPDATE from the tool's execution.
             this.core.eventEmitter?.emit(AgentEventType.TOOL_OUTPUT_UPDATE, {
               subagentId: this.core.subagentId,

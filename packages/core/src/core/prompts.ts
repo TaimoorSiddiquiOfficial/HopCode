@@ -118,7 +118,7 @@ export function getCoreSystemPrompt(
   appendInstruction?: string,
 ): string {
   // if QWEN_SYSTEM_MD is set (and not 0|false), override system prompt from file
-  // default path is .qwen/system.md but can be modified via custom path in QWEN_SYSTEM_MD
+  // default path is .hopcode/system.md but can be modified via custom path in QWEN_SYSTEM_MD
   let systemMdEnabled = false;
   // The default path for the system prompt file. This can be overridden.
   let systemMdPath = path.resolve(path.join(QWEN_CONFIG_DIR, 'system.md'));
@@ -543,7 +543,7 @@ To help you check their settings, I can read their contents. Which one would you
 </example>
 `.trim();
 
-const qwenCoderToolCallExamples = `
+const HopCoderToolCallExamples = `
 # Examples (Illustrating Tone and Workflow)
 <example>
 user: 1 + 2
@@ -801,18 +801,18 @@ To help you check their settings, I can read their contents. Which one would you
 
 function getToolCallExamples(model?: string): string {
   // Check for environment variable override first
-  const toolCallStyle = process.env['QWEN_CODE_TOOL_CALL_STYLE'];
+  const toolCallStyle = process.env['HOPCODE_TOOL_CALL_STYLE'];
   if (toolCallStyle) {
     switch (toolCallStyle.toLowerCase()) {
       case 'qwen-coder':
-        return qwenCoderToolCallExamples;
+        return HopCoderToolCallExamples;
       case 'qwen-vl':
         return qwenVlToolCallExamples;
       case 'general':
         return generalToolCallExamples;
       default:
         debugLogger.warn(
-          `Unknown QWEN_CODE_TOOL_CALL_STYLE value: ${toolCallStyle}. Using model-based detection.`,
+          `Unknown HOPCODE_TOOL_CALL_STYLE value: ${toolCallStyle}. Using model-based detection.`,
         );
         break;
     }
@@ -822,7 +822,7 @@ function getToolCallExamples(model?: string): string {
   if (model && model.length < 100) {
     // Match qwen*-coder patterns (e.g., qwen3-coder, qwen2.5-coder, qwen-coder)
     if (/qwen[^-]*-coder/i.test(model)) {
-      return qwenCoderToolCallExamples;
+      return HopCoderToolCallExamples;
     }
     // Match qwen*-vl patterns (e.g., qwen-vl, qwen2-vl, qwen3-vl)
     if (/qwen[^-]*-vl/i.test(model)) {
@@ -830,7 +830,7 @@ function getToolCallExamples(model?: string): string {
     }
     // Match coder-model pattern (same as qwen3-coder)
     if (/coder-model/i.test(model)) {
-      return qwenCoderToolCallExamples;
+      return HopCoderToolCallExamples;
     }
   }
 
@@ -931,11 +931,11 @@ CRITICAL GUIDELINES:
    "
 
 2. **user_satisfaction_counts**: Base ONLY on explicit user signals.
-   - "Yay!", "great!", "perfect!" → happy
-   - "thanks", "looks good", "that works" → satisfied
-   - "ok, now let's..." (continuing without complaint) → likely_satisfied
-   - "that's not right", "try again" → dissatisfied
-   - "this is broken", "I give up" → frustrated
+   - "Yay!", "great!", "perfect!" ? happy
+   - "thanks", "looks good", "that works" ? satisfied
+   - "ok, now let's..." (continuing without complaint) ? likely_satisfied
+   - "that's not right", "try again" ? dissatisfied
+   - "this is broken", "I give up" ? frustrated
 
 3. **friction_counts**: Be specific about what went wrong.
    - misunderstood_request: Qwen interpreted incorrectly
@@ -1012,7 +1012,7 @@ Find something genuinely interesting or amusing from the session summaries.`,
    - Example: "To connect to GitHub, run \`qwen mcp add --header "Authorization: Bearer your_github_mcp_pat" --transport http github https://api.githubcopilot.com/mcp/\` and set the AUTHORIZATION header with your PAT. Then you can ask Qwen to query issues, PRs, or repos."
 
 2. **Custom Skills**: Reusable prompts you define as markdown files that run with a single /command.
-   - How to use: Create \`.qwen/skills/commit/SKILL.md\` with instructions. Then type \`/commit\` to run it.
+   - How to use: Create \`.hopcode/skills/commit/SKILL.md\` with instructions. Then type \`/commit\` to run it.
    - Good for: repetitive workflows - /commit, /review, /test, /deploy, /pr, or complex multi-step workflows
    - SKILL.md format:
     \`\`\`
@@ -1027,8 +1027,8 @@ Find something genuinely interesting or amusing from the session summaries.`,
     3. Finally, verify Z.
 
     # Examples
-    - Input: "fix lint errors in src/" → Output: runs eslint --fix, commits changes
-    - Input: "review this PR" → Output: reads diff, posts inline comments
+    - Input: "fix lint errors in src/" ? Output: runs eslint --fix, commits changes
+    - Input: "review this PR" ? Output: reads diff, posts inline comments
 
     # Edge Cases
     - If no files match, report "nothing to do" instead of failing.

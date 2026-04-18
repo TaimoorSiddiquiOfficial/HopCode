@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Code
+ * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +26,7 @@ export interface UpdateSymlinkOptions {
  * The symlink uses a relative target so it stays valid even when the
  * parent directory is moved.
  *
- * All errors are swallowed â€” the operation is strictly best-effort.
+ * All errors are swallowed — the operation is strictly best-effort.
  */
 export async function updateSymlink(
   linkPath: string,

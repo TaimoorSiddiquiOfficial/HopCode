@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 // Path-based context rule injection.
 //
-// Discovers .qwen/rules/ files (recursively) with optional YAML frontmatter.
+// Discovers .hopcode/rules/ files (recursively) with optional YAML frontmatter.
 // Rules declare applicable file paths via glob patterns in `paths:`.
 //
 // - Rules WITHOUT `paths:` always load at session start (baseline rules).
@@ -25,9 +25,9 @@ import { createDebugLogger } from './debugLogger.js';
 
 const logger = createDebugLogger('RULES_DISCOVERY');
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 export interface RuleFile {
   filePath: string;
@@ -45,9 +45,9 @@ export interface LoadRulesResponse {
   conditionalRules: RuleFile[];
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Parsing
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---(?:\n|$)([\s\S]*)$/;
 
@@ -112,9 +112,9 @@ export function parseRuleFile(
   return { filePath, description, paths, content };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Directory scanning (recursive)
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 /**
  * Recursively collect all .md file paths under a directory.
@@ -141,7 +141,7 @@ async function collectMdFiles(dir: string): Promise<string[]> {
 }
 
 /**
- * Discover and load rule files from a single `.qwen/rules/` directory.
+ * Discover and load rule files from a single `.hopcode/rules/` directory.
  * Scans recursively; files are sorted alphabetically for deterministic ordering.
  *
  * @param excludes - Glob patterns to skip (matched against absolute paths).
@@ -154,7 +154,7 @@ async function loadRulesFromDir(
   if (allPaths.length === 0) return [];
 
   // Sort for deterministic ordering. Use Array.sort() default (UTF-16 code
-  // point comparison) rather than localeCompare — locale-dependent sorting
+  // point comparison) rather than localeCompare � locale-dependent sorting
   // can produce different orders on machines with different locales.
   allPaths.sort();
 
@@ -185,9 +185,9 @@ async function loadRulesFromDir(
   return ruleFiles;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Formatting
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 /**
  * Format loaded rules into a single string with source markers,
@@ -201,8 +201,8 @@ export function formatRules(rules: RuleFile[], projectRoot: string): string {
         : rule.filePath;
       // Normalize to forward slashes for cross-platform consistency in the
       // system prompt. Glob patterns in `paths:` use forward slashes, so
-      // display paths should match — otherwise Windows shows `.qwen\rules\foo.md`
-      // and Linux shows `.qwen/rules/foo.md`, which is confusing in diffs/tests.
+      // display paths should match � otherwise Windows shows `.hopcode\rules\foo.md`
+      // and Linux shows `.hopcode/rules/foo.md`, which is confusing in diffs/tests.
       const displayPath = rawDisplayPath.replace(/\\/g, '/');
       return (
         `--- Rule from: ${displayPath} ---\n` +
@@ -213,9 +213,9 @@ export function formatRules(rules: RuleFile[], projectRoot: string): string {
     .join('\n\n');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // ConditionalRulesRegistry (Gap 3: turn-level lazy loading)
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 interface CompiledRule {
   rule: RuleFile;
@@ -266,7 +266,7 @@ export class ConditionalRulesRegistry {
       .replace(/\\/g, '/');
 
     // Paths outside the project root produce `../` prefixes (or exact `..`
-    // when the target equals the parent of projectRoot) — don't inject rules
+    // when the target equals the parent of projectRoot) � don't inject rules
     // for files outside the project boundary.
     if (relativePath === '..' || relativePath.startsWith('../')) {
       return undefined;
@@ -299,13 +299,13 @@ export class ConditionalRulesRegistry {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Main entry point
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 /**
- * Load rules from both global (`~/.qwen/rules/`) and project-level
- * (`.qwen/rules/`) directories.
+ * Load rules from both global (`~/.hopcode/rules/`) and project-level
+ * (`.hopcode/rules/`) directories.
  *
  * Baseline rules (no `paths:`) are returned in `content` for immediate
  * injection into the system prompt. Conditional rules (with `paths:`) are
@@ -324,13 +324,13 @@ export async function loadRules(
 
   const allRules: RuleFile[] = [];
 
-  // 1. Global rules: ~/.qwen/rules/
+  // 1. Global rules: ~/.hopcode/rules/
   const globalRulesDir = path.join(homedir(), QWEN_DIR, 'rules');
   const globalRules = await loadRulesFromDir(globalRulesDir, excludes);
   allRules.push(...globalRules);
   logger.debug(`Loaded ${globalRules.length} global rule(s)`);
 
-  // 2. Project-level rules: <projectRoot>/.qwen/rules/  (trusted only)
+  // 2. Project-level rules: <projectRoot>/.hopcode/rules/  (trusted only)
   //    Skip if it resolves to the same directory as global rules.
   if (folderTrust) {
     const projectRulesDir = path.join(projectRoot, QWEN_DIR, 'rules');
@@ -340,7 +340,7 @@ export async function loadRules(
       logger.debug(`Loaded ${projectRules.length} project rule(s)`);
     } else {
       logger.debug(
-        'Project rules dir same as global — skipping to avoid duplicates',
+        'Project rules dir same as global � skipping to avoid duplicates',
       );
     }
   }

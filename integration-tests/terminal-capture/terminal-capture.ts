@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TerminalCapture - Terminal Screenshot Tool
  *
  * Terminal screenshot solution based on xterm.js + Playwright + node-pty.
@@ -229,7 +229,7 @@ export class TerminalCapture {
    * const t = await TerminalCapture.create({
    *   theme: 'dracula',
    *   chrome: true,
-   *   title: 'qwen-code',
+   *   title: 'hopcode',
    * });
    * ```
    */

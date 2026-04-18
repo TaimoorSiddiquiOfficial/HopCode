@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -149,14 +149,14 @@ async function handleQwenOAuth(
   writeStdoutLine(t('Starting Qwen OAuth authentication...'));
 
   try {
-    await config.refreshAuth(AuthType.QWEN_OAUTH);
+    await config.refreshAuth(AuthType.hopcode_OAUTH);
 
     // Persist the auth type
     const authTypeScope = getPersistScopeForModelSelection(settings);
     settings.setValue(
       authTypeScope,
       'security.auth.selectedType',
-      AuthType.QWEN_OAUTH,
+      AuthType.hopcode_OAUTH,
     );
 
     writeStdoutLine(t('Successfully authenticated with Qwen OAuth.'));
@@ -439,7 +439,7 @@ export async function showAuthStatus(): Promise<void> {
     }
 
     // Display status based on auth type
-    if (selectedType === AuthType.QWEN_OAUTH) {
+    if (selectedType === AuthType.hopcode_OAUTH) {
       writeStdoutLine(t('✓ Authentication Method: Qwen OAuth'));
       writeStdoutLine(t('  Type: Free tier (discontinued 2026-04-15)'));
       writeStdoutLine(t('  Limit: No longer available'));

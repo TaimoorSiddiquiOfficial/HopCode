@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,14 +17,14 @@ import { isNodeError } from '../utils/errors.js';
  * Commit message used for the baseline snapshot in worktrees.
  * After overlaying the user's dirty state (tracked changes + untracked files),
  * a commit with this message is created so that later diffs only capture the
- * agent's changes â€” not the pre-existing local edits.
+ * agent's changes — not the pre-existing local edits.
  */
 export const BASELINE_COMMIT_MESSAGE = 'baseline (dirty state overlay)';
 
 /**
  * Default directory and branch-prefix name used for worktrees.
- * Changing this value affects the on-disk layout (`~/.qwen/<WORKTREES_DIR>/`)
- * **and** the default git branch prefix (`<WORKTREES_DIR>/<sessionId>/â€¦`).
+ * Changing this value affects the on-disk layout (`~/.hopcode/<WORKTREES_DIR>/`)
+ * **and** the default git branch prefix (`<WORKTREES_DIR>/<sessionId>/…`).
  */
 export const WORKTREES_DIR = 'worktrees';
 
@@ -161,9 +161,9 @@ export class GitWorktreeService {
         return true;
       }
     } catch {
-      // IS_REPO_ROOT check failed â€” fall through to the general check
+      // IS_REPO_ROOT check failed — fall through to the general check
     }
-    // Not the root (or root check threw) â€” check if we're inside a git repo
+    // Not the root (or root check threw) — check if we're inside a git repo
     try {
       return await this.git.checkIsRepo();
     } catch {
@@ -363,7 +363,7 @@ export class GitWorktreeService {
     try {
       dirtyStateSnapshot = (await this.git.stash(['create'])).trim();
     } catch {
-      // Ignore â€” proceed without dirty state if stash create fails
+      // Ignore — proceed without dirty state if stash create fails
     }
 
     // Discover untracked files so they can be copied into each worktree.

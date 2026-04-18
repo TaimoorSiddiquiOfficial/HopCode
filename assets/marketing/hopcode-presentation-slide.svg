@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <!-- HopCode Presentation Title Slide -->
+  <!-- Size: 1920x1080px (Full HD presentation slide) -->
+  
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="presBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0F14;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1E1E2E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0F0F14;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Butterfly wing gradients -->
+    <linearGradient id="presWingLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="presWingRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22D3EE;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Large glow effect -->
+    <filter id="presGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="15" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Background radial gradients -->
+    <radialGradient id="presGlow1" cx="30%" cy="40%" r="35%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0.25" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0" />
+    </radialGradient>
+    
+    <radialGradient id="presGlow2" cx="70%" cy="60%" r="35%">
+      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#presBg)"/>
+  
+  <!-- Background glow effects -->
+  <circle cx="576" cy="432" r="378" fill="url(#presGlow1)"/>
+  <circle cx="1344" cy="648" r="378" fill="url(#presGlow2)"/>
+  
+  <!-- Large decorative code brackets (background) -->
+  <path d="M 150 300 L 100 540 L 150 780" stroke="#3F3F46" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.15"/>
+  <path d="M 1770 300 L 1820 540 L 1770 780" stroke="#3F3F46" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.15"/>
+  
+  <!-- Giant Butterfly Logo (center) -->
+  <g transform="translate(760, 340)" filter="url(#presGlow)">
+    <!-- Left Wing -->
+    <path d="M 75 100 Q 55 70 60 50 Q 65 30 85 25 Q 95 23 100 30 L 100 100 Q 85 100 75 100 Z" fill="url(#presWingLeft)"/>
+    <!-- Right Wing -->
+    <path d="M 125 100 Q 145 70 140 50 Q 135 30 115 25 Q 105 23 100 30 L 100 100 Q 115 100 125 100 Z" fill="url(#presWingRight)"/>
+    <!-- H Letterform -->
+    <path d="M 88 115 L 88 165 L 96 165 L 96 140 L 104 140 L 104 165 L 112 165 L 112 115 L 104 115 L 104 132 L 96 132 L 96 115 Z" fill="#F59E0B"/>
+    <!-- Code brackets -->
+    <path d="M 70 85 L 62 100 L 70 115" stroke="#FEF3C7" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <path d="M 130 85 L 138 100 L 130 115" stroke="#FEF3C7" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <!-- Center dot -->
+    <circle cx="100" cy="95" r="10" fill="#FEF3C7"/>
+  </g>
+  
+  <!-- "HopCode" Title (below logo) -->
+  <text x="960" y="680" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="120" 
+        font-weight="700"
+        letter-spacing="-3"
+        fill="#FFFFFF"
+        text-anchor="middle">
+    Hop<tspan fill="#7C3AED">Code</tspan>
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="960" y="760" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="42" 
+        font-weight="400"
+        letter-spacing="8"
+        fill="#A1A1AA"
+        text-anchor="middle">
+    CODE WITH AI
+  </text>
+  
+  <!-- Bottom tagline -->
+  <text x="960" y="850" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="32" 
+        font-weight="300"
+        fill="#71717A"
+        text-anchor="middle">
+    Transform your workflow with the butterfly effect of intelligent code
+  </text>
+  
+  <!-- Footer accent line -->
+  <line x1="200" y1="980" x2="1720" y2="980" stroke="#3F3F46" stroke-width="3" opacity="0.5"/>
+  
+  <!-- Footer text -->
+  <text x="960" y="1030" 
+        font-family="'JetBrains Mono', monospace" 
+        font-size="20" 
+        fill="#52525B"
+        text-anchor="middle">
+    github.com/TaimoorSiddiquiOfficial/HopCode
+  </text>
+  
+  <!-- Decorative particles (floating) -->
+  <circle cx="300" cy="200" r="5" fill="#7C3AED" opacity="0.6"/>
+  <circle cx="1620" cy="280" r="5" fill="#06B6D4" opacity="0.6"/>
+  <circle cx="250" cy="800" r="5" fill="#F59E0B" opacity="0.6"/>
+  <circle cx="1670" cy="750" r="5" fill="#7C3AED" opacity="0.6"/>
+  <circle cx="500" cy="150" r="3" fill="#22D3EE" opacity="0.5"/>
+  <circle cx="1420" cy="200" r="3" fill="#8B5CF6" opacity="0.5"/>
+</svg>

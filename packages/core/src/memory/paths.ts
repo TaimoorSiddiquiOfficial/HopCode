@@ -81,16 +81,16 @@ function findCanonicalGitRoot(startPath: string): string | null {
 
 /**
  * Returns the base directory for all auto-memory storage.
- * Defaults to `~/.qwen`; overridable via QWEN_CODE_MEMORY_BASE_DIR for tests.
+ * Defaults to `~/.hopcode`; overridable via HOPCODE_MEMORY_BASE_DIR for tests.
  */
 export function getMemoryBaseDir(): string {
-  if (process.env['QWEN_CODE_MEMORY_BASE_DIR']) {
-    return process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+  if (process.env['HOPCODE_MEMORY_BASE_DIR']) {
+    return process.env['HOPCODE_MEMORY_BASE_DIR'];
   }
   return path.join(os.homedir(), QWEN_DIR);
 }
 
-// Memoize by projectRoot â€” findCanonicalGitRoot() walks the file system (existsSync
+// Memoize by projectRoot — findCanonicalGitRoot() walks the file system (existsSync
 // per directory) and is called from hot-path code such as schedulers and scanners.
 const _autoMemoryRootCache = new Map<string, string>();
 
@@ -99,7 +99,7 @@ export function getAutoMemoryRoot(projectRoot: string): string {
   if (cached !== undefined) return cached;
 
   let result: string;
-  if (process.env['QWEN_CODE_MEMORY_LOCAL'] === '1') {
+  if (process.env['HOPCODE_MEMORY_LOCAL'] === '1') {
     result = path.join(projectRoot, QWEN_DIR, AUTO_MEMORY_DIRNAME);
   } else {
     const canonicalRoot =

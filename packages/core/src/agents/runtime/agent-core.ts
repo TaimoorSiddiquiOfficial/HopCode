@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview AgentCore — the shared execution engine for subagents.
+ * @fileoverview AgentCore � the shared execution engine for subagents.
  *
  * AgentCore encapsulates the model reasoning loop, tool scheduling, stats,
  * and event emission. It is composed by both AgentHeadless (one-shot tasks)
@@ -131,7 +131,7 @@ export interface ExecutionStats {
 }
 
 /**
- * AgentCore — shared execution engine for model reasoning and tool scheduling.
+ * AgentCore � shared execution engine for model reasoning and tool scheduling.
  *
  * This class encapsulates:
  * - Chat/model session creation (`createChat`)
@@ -141,7 +141,7 @@ export interface ExecutionStats {
  * - Statistics tracking and event emission
  *
  * It does NOT manage lifecycle (start/stop/terminate), abort signals,
- * or final result interpretation — those are the caller's responsibility.
+ * or final result interpretation � those are the caller's responsibility.
  */
 export class AgentCore {
   readonly subagentId: string;
@@ -209,7 +209,7 @@ export class AgentCore {
     this.hooks = hooks;
   }
 
-  // ─── Chat Creation ────────────────────────────────────────
+  // --- Chat Creation ----------------------------------------
 
   /**
    * Creates a GeminiChat instance configured for this agent.
@@ -260,7 +260,7 @@ export class AgentCore {
     // Build generationConfig. For fork subagents, `renderedSystemPrompt`
     // carries the parent's exact rendered systemInstruction so the fork
     // shares a byte-identical cache prefix. Otherwise, template
-    // `systemPrompt` via buildChatSystemPrompt (which may throw — kept
+    // `systemPrompt` via buildChatSystemPrompt (which may throw � kept
     // outside the try/catch so template errors surface to the caller).
     const generationConfig: GenerateContentConfig & {
       systemInstruction?: string | Content;
@@ -292,7 +292,7 @@ export class AgentCore {
     }
   }
 
-  // ─── Tool Preparation ─────────────────────────────────────
+  // --- Tool Preparation -------------------------------------
 
   /**
    * Prepares the list of tools available to this agent.
@@ -358,13 +358,13 @@ export class AgentCore {
     return toolsList;
   }
 
-  // ─── Reasoning Loop ───────────────────────────────────────
+  // --- Reasoning Loop ---------------------------------------
 
   /**
    * Runs the inner model reasoning loop.
    *
    * This is the core execution cycle:
-   * send messages → stream response → collect tool calls → execute tools → repeat.
+   * send messages ? stream response ? collect tool calls ? execute tools ? repeat.
    *
    * The loop terminates when:
    * - The model produces a text response without tool calls (normal completion)
@@ -393,7 +393,7 @@ export class AgentCore {
     let terminateMode: AgentTerminateMode | null = null;
 
     while (true) {
-      // Check abort before starting a new round — prevents unnecessary API
+      // Check abort before starting a new round � prevents unnecessary API
       // calls after processFunctionCalls was unblocked by an abort signal.
       if (abortController.signal.aborted) {
         terminateMode = AgentTerminateMode.CANCELLED;
@@ -531,7 +531,7 @@ export class AgentCore {
           currentResponseId,
         );
       } else {
-        // No tool calls — treat this as the model's final answer.
+        // No tool calls � treat this as the model's final answer.
         if (roundText && roundText.trim().length > 0) {
           finalText = roundText.trim();
           // Emit ROUND_END for the final round so all consumers see it.
@@ -579,7 +579,7 @@ export class AgentCore {
     };
   }
 
-  // ─── Tool Execution ───────────────────────────────────────
+  // --- Tool Execution ---------------------------------------
 
   /**
    * Processes a list of function calls via CoreToolScheduler.
@@ -660,7 +660,7 @@ export class AgentCore {
     const responded = new Set<string>();
     let resolveBatch: (() => void) | null = null;
     const emittedCallIds = new Set<string>();
-    // pidMap: callId → PTY PID, populated by onToolCallsUpdate when a shell
+    // pidMap: callId ? PTY PID, populated by onToolCallsUpdate when a shell
     // tool spawns a PTY. Shared with outputUpdateHandler via closure so the
     // PID is included in TOOL_OUTPUT_UPDATE events for interactive shell support.
     const pidMap = new Map<string, number>();
@@ -900,7 +900,7 @@ export class AgentCore {
     return [{ role: 'user', parts: toolResponseParts }];
   }
 
-  // ─── Stats & Events ───────────────────────────────────────
+  // --- Stats & Events ---------------------------------------
 
   getEventEmitter(): AgentEventEmitter | undefined {
     return this.eventEmitter;
@@ -1013,7 +1013,7 @@ export class AgentCore {
     );
   }
 
-  // ─── Private Helpers ──────────────────────────────────────
+  // --- Private Helpers --------------------------------------
 
   /**
    * Builds the system prompt with template substitution and optional
@@ -1061,7 +1061,7 @@ Important Rules:
     const thoughtTok = Number(usage.thoughtsTokenCount || 0);
     const cachedTok = Number(usage.cachedContentTokenCount || 0);
     const totalTok = Number(usage.totalTokenCount || 0);
-    // Prefer totalTokenCount (prompt + output) for context usage — the
+    // Prefer totalTokenCount (prompt + output) for context usage � the
     // output from this round becomes history for the next, matching
     // the approach in geminiChat.ts.
     const contextTok = isFinite(totalTok) && totalTok > 0 ? totalTok : inTok;

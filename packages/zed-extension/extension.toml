@@ -1,13 +1,13 @@
-id = "qwen-code"
-name = "Qwen Code"
+﻿id = "hopcode"
+name = "HopCode"
 version = "0.1.0"
 schema_version = 1
-authors = ["Qwen Team"]
-description = "Qwen Code Agent Server Extension for Zed"
-repository = "https://github.com/QwenLM/qwen-code"
+authors = ["HopCode Team"]
+description = "HopCode Agent Server Extension for Zed"
+repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
-[agent_servers.qwen-code]
-name = "Qwen Code"
+[agent_servers.hopcode]
+name = "HopCode"
 icon = "qwen-code.svg"
 
 [agent_servers.qwen-code.targets.darwin-aarch64]

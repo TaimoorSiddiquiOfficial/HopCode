@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Qwen Concurrent Runner - Execute multiple CLI tasks across different models concurrently.
 
@@ -758,7 +758,7 @@ class QwenRunner:
             # Run the CLI
             env = os.environ.copy()
             worktree_dir_resolved = worktree_dir.resolve()
-            env["QWEN_CODE_ROOT"] = str(worktree_dir_resolved)
+            env["hopcode_ROOT"] = str(worktree_dir_resolved)
 
             proc = await asyncio.create_subprocess_exec(
                 *cmd,

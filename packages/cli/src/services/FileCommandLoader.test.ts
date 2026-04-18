@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -529,7 +529,7 @@ describe('FileCommandLoader', () => {
       ).getProjectCommandsDir();
       const extensionDir = path.join(
         process.cwd(),
-        '.qwen/extensions/test-ext',
+        '.hopcode/extensions/test-ext',
       );
 
       mock({
@@ -582,7 +582,7 @@ describe('FileCommandLoader', () => {
       ).getProjectCommandsDir();
       const extensionDir = path.join(
         process.cwd(),
-        '.qwen/extensions/test-ext',
+        '.hopcode/extensions/test-ext',
       );
 
       mock({
@@ -678,11 +678,11 @@ describe('FileCommandLoader', () => {
     it('only loads commands from active extensions', async () => {
       const extensionDir1 = path.join(
         process.cwd(),
-        '.qwen/extensions/active-ext',
+        '.hopcode/extensions/active-ext',
       );
       const extensionDir2 = path.join(
         process.cwd(),
-        '.qwen/extensions/inactive-ext',
+        '.hopcode/extensions/inactive-ext',
       );
 
       mock({
@@ -737,7 +737,7 @@ describe('FileCommandLoader', () => {
     it('handles missing extension commands directory gracefully', async () => {
       const extensionDir = path.join(
         process.cwd(),
-        '.qwen/extensions/no-commands',
+        '.hopcode/extensions/no-commands',
       );
 
       mock({
@@ -769,7 +769,7 @@ describe('FileCommandLoader', () => {
     });
 
     it('handles nested command structure in extensions', async () => {
-      const extensionDir = path.join(process.cwd(), '.qwen/extensions/a');
+      const extensionDir = path.join(process.cwd(), '.hopcode/extensions/a');
 
       mock({
         [extensionDir]: {

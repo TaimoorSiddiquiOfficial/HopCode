@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,7 +82,7 @@ describe('modelCommand', () => {
   it('should return dialog action for QWEN_OAUTH auth type', async () => {
     const mockConfig = createMockConfig({
       model: 'test-model',
-      authType: AuthType.QWEN_OAUTH,
+      authType: AuthType.hopcode_OAUTH,
     });
     mockContext.services.config = mockConfig as Config;
 

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,7 +34,7 @@ export const useQwenAuth = (
     authMessage: null,
   });
 
-  const isQwenAuth = pendingAuthType === AuthType.QWEN_OAUTH;
+  const isQwenAuth = pendingAuthType === AuthType.hopcode_OAUTH;
 
   // Set up event listeners when authentication starts
   useEffect(() => {

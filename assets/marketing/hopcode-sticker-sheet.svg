@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <!-- HopCode Sticker Sheet -->
+  <!-- Multiple sticker designs for printing/cutting -->
+  
+  <defs>
+    <!-- Butterfly wing gradients -->
+    <linearGradient id="stickerWingLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="stickerWingRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22D3EE;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Sticker border -->
+    <filter id="stickerBorder" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+    
+    <!-- White sticker backing -->
+    <filter id="stickerBacking" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background (checkerboard for transparency indication) -->
+  <rect width="800" height="800" fill="#F3F4F6"/>
+  
+  <!-- Title -->
+  <text x="400" y="50" font-family="system-ui" font-size="24" fill="#1F2937" text-anchor="middle" font-weight="600">HopCode Sticker Sheet</text>
+  
+  <!-- ========== Sticker 1: Full Color Logo (Top Left) ========== -->
+  <g transform="translate(100, 100)" filter="url(#stickerBacking)">
+    <!-- White backing -->
+    <circle cx="100" cy="100" r="95" fill="#FFFFFF"/>
+    <!-- Butterfly logo -->
+    <g transform="translate(50, 50)">
+      <path d="M 75 100 Q 55 70 60 50 Q 65 30 85 25 Q 95 23 100 30 L 100 100 Q 85 100 75 100 Z" fill="url(#stickerWingLeft)"/>
+      <path d="M 125 100 Q 145 70 140 50 Q 135 30 115 25 Q 105 23 100 30 L 100 100 Q 115 100 125 100 Z" fill="url(#stickerWingRight)"/>
+      <path d="M 88 115 L 88 165 L 96 165 L 96 140 L 104 140 L 104 165 L 112 165 L 112 115 L 104 115 L 104 132 L 96 132 L 96 115 Z" fill="#F59E0B"/>
+      <circle cx="100" cy="95" r="8" fill="#FEF3C7"/>
+    </g>
+    <!-- Cut line (dashed) -->
+    <circle cx="100" cy="100" r="95" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+  
+  <!-- ========== Sticker 2: Wordmark (Top Right) ========== -->
+  <g transform="translate(450, 100)" filter="url(#stickerBacking)">
+    <!-- White backing -->
+    <rect x="-120" y="-50" width="240" height="100" rx="12" fill="#FFFFFF"/>
+    <!-- Wordmark -->
+    <text x="0" y="20" font-family="'Inter', system-ui, sans-serif" font-size="42" font-weight="700" text-anchor="middle" fill="#7C3AED">Hop<tspan fill="#06B6D4">Code</tspan></text>
+    <!-- Cut line -->
+    <rect x="-120" y="-50" width="240" height="100" rx="12" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+  
+  <!-- ========== Sticker 3: Icon Only (Middle Left) ========== -->
+  <g transform="translate(100, 350)" filter="url(#stickerBacking)">
+    <!-- White backing (square with rounded corners) -->
+    <rect x="-95" y="-95" width="190" height="190" rx="24" fill="#FFFFFF"/>
+    <!-- Simplified butterfly -->
+    <g transform="translate(-50, -50)">
+      <path d="M 75 100 Q 55 70 60 50 Q 65 30 85 25 Q 95 23 100 30 L 100 100 Q 85 100 75 100 Z" fill="url(#stickerWingLeft)"/>
+      <path d="M 125 100 Q 145 70 140 50 Q 135 30 115 25 Q 105 23 100 30 L 100 100 Q 115 100 125 100 Z" fill="url(#stickerWingRight)"/>
+      <rect x="88" y="110" width="8" height="20" fill="#F59E0B"/>
+      <rect x="104" y="110" width="8" height="20" fill="#F59E0B"/>
+      <rect x="88" y="125" width="24" height="8" fill="#F59E0B"/>
+      <circle cx="100" cy="95" r="6" fill="#FEF3C7"/>
+    </g>
+    <!-- Cut line -->
+    <rect x="-95" y="-95" width="190" height="190" rx="24" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+  
+  <!-- ========== Sticker 4: Dark Version (Middle Right) ========== -->
+  <g transform="translate(450, 350)" filter="url(#stickerBacking)">
+    <!-- Dark backing -->
+    <circle cx="100" cy="100" r="95" fill="#1E1E2E"/>
+    <!-- White butterfly -->
+    <g transform="translate(50, 50)">
+      <path d="M 75 100 Q 55 70 60 50 Q 65 30 85 25 Q 95 23 100 30 L 100 100 Q 85 100 75 100 Z" fill="#FFFFFF" opacity="0.9"/>
+      <path d="M 125 100 Q 145 70 140 50 Q 135 30 115 25 Q 105 23 100 30 L 100 100 Q 115 100 125 100 Z" fill="#FFFFFF" opacity="0.9"/>
+      <path d="M 88 115 L 88 165 L 96 165 L 96 140 L 104 140 L 104 165 L 112 165 L 112 115 L 104 115 L 104 132 L 96 132 L 96 115 Z" fill="#F59E0B"/>
+      <circle cx="100" cy="95" r="8" fill="#FEF3C7"/>
+    </g>
+    <!-- Cut line -->
+    <circle cx="100" cy="100" r="95" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+  
+  <!-- ========== Sticker 5: Badge Style (Bottom Left) ========== -->
+  <g transform="translate(150, 600)" filter="url(#stickerBacking)">
+    <!-- White backing (hexagon) -->
+    <polygon points="100,10 165,45 165,115 100,150 35,115 35,45" fill="#FFFFFF"/>
+    <!-- Butterfly (small) -->
+    <g transform="translate(65, 50) scale(0.7)">
+      <path d="M 75 100 Q 55 70 60 50 Q 65 30 85 25 Q 95 23 100 30 L 100 100 Q 85 100 75 100 Z" fill="url(#stickerWingLeft)"/>
+      <path d="M 125 100 Q 145 70 140 50 Q 135 30 115 25 Q 105 23 100 30 L 100 100 Q 115 100 125 100 Z" fill="url(#stickerWingRight)"/>
+      <path d="M 88 115 L 88 165 L 96 165 L 96 140 L 104 140 L 104 165 L 112 165 L 112 115 L 104 115 L 104 132 L 96 132 L 96 115 Z" fill="#F59E0B"/>
+    </g>
+    <!-- Text -->
+    <text x="100" y="130" font-family="'Inter', system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="#7C3AED">HopCode</text>
+    <!-- Cut line -->
+    <polygon points="100,10 165,45 165,115 100,150 35,115 35,45" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+  
+  <!-- ========== Sticker 6: Minimal H (Bottom Right) ========== -->
+  <g transform="translate(450, 600)" filter="url(#stickerBacking)">
+    <!-- White backing (rounded square) -->
+    <rect x="-70" y="-70" width="140" height="140" rx="20" fill="#FFFFFF"/>
+    <!-- Bold H only -->
+    <rect x="-20" y="-30" width="12" height="60" rx="3" fill="#7C3AED"/>
+    <rect x="8" y="-30" width="12" height="60" rx="3" fill="#06B6D4"/>
+    <rect x="-20" y="-5" width="40" height="15" rx="3" fill="#F59E0B"/>
+    <!-- Cut line -->
+    <rect x="-70" y="-70" width="140" height="140" rx="20" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+  
+  <!-- Legend -->
+  <text x="400" y="780" font-family="system-ui" font-size="12" fill="#6B7280" text-anchor="middle">Dashed lines indicate cut boundaries · Print on vinyl sticker paper</text>
+</svg>

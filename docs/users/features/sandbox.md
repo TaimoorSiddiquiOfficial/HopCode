@@ -1,13 +1,13 @@
-# Sandbox
+﻿# Sandbox
 
-This document explains how to run Qwen Code inside a sandbox to reduce risk when tools execute shell commands or modify files.
+This document explains how to run HopCode inside a sandbox to reduce risk when tools execute shell commands or modify files.
 
 ## Prerequisites
 
-Before using sandboxing, you need to install and set up Qwen Code:
+Before using sandboxing, you need to install and set up HopCode:
 
 ```bash
-npm install -g @qwen-code/qwen-code
+npm install -g @hopcode/hopcode
 ```
 
 To verify the installation
@@ -47,7 +47,7 @@ Lightweight, built-in sandboxing using `sandbox-exec`.
 
 Cross-platform sandboxing with complete process isolation.
 
-By default, Qwen Code uses a published sandbox image (configured in the CLI package) and will pull it as needed.
+By default, HopCode uses a published sandbox image (configured in the CLI package) and will pull it as needed.
 
 The container sandbox mounts your workspace and your `~/.qwen` directory into the container so auth and settings persist between runs.
 
@@ -103,14 +103,14 @@ qwen -p "run the test suite"
 
 - **CLI flag**: `--sandbox-image <image>`
 - **Environment variable**: `QWEN_SANDBOX_IMAGE=<image>`
-- **Settings file**: `tools.sandboxImage` in your `settings.json` (e.g., `{"tools": {"sandboxImage": "ghcr.io/qwenlm/qwen-code:0.14.1"}}`)
+- **Settings file**: `tools.sandboxImage` in your `settings.json` (e.g., `{"tools": {"sandboxImage": "ghcr.io/qwenlm/hopcode:0.14.1"}}`)
 
 Priority order (highest to lowest):
 
 1. `--sandbox-image`
 2. `QWEN_SANDBOX_IMAGE`
 3. `tools.sandboxImage`
-4. Built-in default image from the CLI package (for example `ghcr.io/qwenlm/qwen-code:<version>`)
+4. Built-in default image from the CLI package (for example `ghcr.io/qwenlm/hopcode:<version>`)
 
 `settings.env.QWEN_SANDBOX_IMAGE` also works as a generic env injection mechanism, but `tools.sandboxImage` is the preferred persistent setting.
 
@@ -167,7 +167,7 @@ For a working allowlist-style proxy example, see: [Example Proxy Script](/develo
 
 ## Linux UID/GID handling
 
-On Linux, Qwen Code defaults to enabling UID/GID mapping so the sandbox runs as your user (and reuses the mounted `~/.qwen`). Override with:
+On Linux, HopCode defaults to enabling UID/GID mapping so the sandbox runs as your user (and reuses the mounted `~/.qwen`). Override with:
 
 ```bash
 export SANDBOX_SET_UID_GID=true   # Force host UID/GID
@@ -191,12 +191,12 @@ export SANDBOX_SET_UID_GID=false  # Disable UID/GID mapping
 
 **Java not available in Docker sandbox**
 
-The official Qwen Code Docker image is intentionally minimal to keep the image small, secure, and fast to pull. Different users require different language runtimes (Java, Python, Node.js, etc.), and bundling all environments into a single image is not practical. Therefore, Java is **not included by default** in the Docker sandbox.
+The official HopCode Docker image is intentionally minimal to keep the image small, secure, and fast to pull. Different users require different language runtimes (Java, Python, Node.js, etc.), and bundling all environments into a single image is not practical. Therefore, Java is **not included by default** in the Docker sandbox.
 
 If your workflow requires Java, you can extend the base image by creating a `.qwen/sandbox.Dockerfile` in your project:
 
 ```dockerfile
-FROM ghcr.io/qwenlm/qwen-code:latest
+FROM ghcr.io/qwenlm/hopcode:latest
 
 RUN apt-get update && \
     apt-get install -y openjdk-17-jre && \
@@ -223,7 +223,7 @@ For more details on customizing the sandbox, see [Customizing the sandbox enviro
 DEBUG=1 qwen -s -p "debug command"
 ```
 
-**Note:** If you have `DEBUG=true` in a project's `.env` file, it won't affect the CLI due to automatic exclusion. Use `.qwen/.env` files for Qwen Code-specific debug settings.
+**Note:** If you have `DEBUG=true` in a project's `.env` file, it won't affect the CLI due to automatic exclusion. Use `.qwen/.env` files for HopCode-specific debug settings.
 
 ### Inspect sandbox
 

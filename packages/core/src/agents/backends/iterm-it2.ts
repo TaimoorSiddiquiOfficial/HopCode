@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +16,7 @@ import { createDebugLogger } from '../../utils/debugLogger.js';
 
 const debugLogger = createDebugLogger('ITERM_IT2');
 
-// ─── Helpers ────────────────────────────────────────────────────
+// --- Helpers ----------------------------------------------------
 
 async function it2Result(
   args: string[],
@@ -48,7 +48,7 @@ function parseCreatedPaneId(output: string): string {
   return match[1];
 }
 
-// ─── Installation & Verification ───────────────────────────────
+// --- Installation & Verification -------------------------------
 
 export function isIt2Available(): boolean {
   return isCommandAvailable('it2').available;
@@ -98,7 +98,7 @@ export async function verifyITerm(): Promise<void> {
     combined.includes('not enabled')
   ) {
     throw new Error(
-      'iTerm2 Python API not enabled. Enable it in iTerm2 → Settings → General → Magic → Enable Python API, then restart iTerm2.',
+      'iTerm2 Python API not enabled. Enable it in iTerm2 ? Settings ? General ? Magic ? Enable Python API, then restart iTerm2.',
     );
   }
 
@@ -107,7 +107,7 @@ export async function verifyITerm(): Promise<void> {
   );
 }
 
-// ─── Public API ─────────────────────────────────────────────────
+// --- Public API -------------------------------------------------
 
 export async function itermSplitPane(sessionId?: string): Promise<string> {
   const args = ['session', 'split', '-v'];

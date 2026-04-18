@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -14,7 +14,7 @@ import { Storage } from '@qwen-code/qwen-code-core';
 describe('FileCommandLoader - Extension Commands Support', () => {
   const projectRoot = '/test/project';
   const userCommandsDir = Storage.getUserCommandsDir();
-  const projectCommandsDir = path.join(projectRoot, '.qwen', 'commands');
+  const projectCommandsDir = path.join(projectRoot, '.hopcode', 'commands');
 
   afterEach(() => {
     mock.restore();
@@ -23,7 +23,7 @@ describe('FileCommandLoader - Extension Commands Support', () => {
   it('should load commands from extension with config.commands path', async () => {
     const extensionDir = path.join(
       projectRoot,
-      '.qwen',
+      '.hopcode',
       'extensions',
       'test-ext',
     );
@@ -78,7 +78,7 @@ describe('FileCommandLoader - Extension Commands Support', () => {
   it('should load commands from extension with multiple commands paths', async () => {
     const extensionDir = path.join(
       projectRoot,
-      '.qwen',
+      '.hopcode',
       'extensions',
       'multi-ext',
     );
@@ -133,7 +133,7 @@ describe('FileCommandLoader - Extension Commands Support', () => {
   it('should fallback to default "commands" directory when config.commands not specified', async () => {
     const extensionDir = path.join(
       projectRoot,
-      '.qwen',
+      '.hopcode',
       'extensions',
       'default-ext',
     );
@@ -183,7 +183,7 @@ describe('FileCommandLoader - Extension Commands Support', () => {
   it('should handle extension without commands directory gracefully', async () => {
     const extensionDir = path.join(
       projectRoot,
-      '.qwen',
+      '.hopcode',
       'extensions',
       'no-cmds-ext',
     );
@@ -230,7 +230,7 @@ describe('FileCommandLoader - Extension Commands Support', () => {
   it('should set extensionName property for extension commands', async () => {
     const extensionDir = path.join(
       projectRoot,
-      '.qwen',
+      '.hopcode',
       'extensions',
       'prefix-ext',
     );
@@ -279,8 +279,8 @@ describe('FileCommandLoader - Extension Commands Support', () => {
   });
 
   it('should load commands from multiple extensions in alphabetical order', async () => {
-    const ext1Dir = path.join(projectRoot, '.qwen', 'extensions', 'ext-b');
-    const ext2Dir = path.join(projectRoot, '.qwen', 'extensions', 'ext-a');
+    const ext1Dir = path.join(projectRoot, '.hopcode', 'extensions', 'ext-b');
+    const ext2Dir = path.join(projectRoot, '.hopcode', 'extensions', 'ext-a');
 
     mock({
       [userCommandsDir]: {},

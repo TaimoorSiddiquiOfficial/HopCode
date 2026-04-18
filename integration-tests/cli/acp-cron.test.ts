@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
@@ -87,7 +87,7 @@ function setupAcpCronTest(rig: TestRig) {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: {
         ...process.env,
-        QWEN_CODE_ENABLE_CRON: '1',
+        hopcode_ENABLE_CRON: '1',
       },
     },
   );

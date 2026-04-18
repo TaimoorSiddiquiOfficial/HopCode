@@ -1,6 +1,6 @@
-# DingTalk (Dingtalk)
+﻿# DingTalk (Dingtalk)
 
-This guide covers setting up a Qwen Code channel on DingTalk (钉钉).
+This guide covers setting up a HopCode channel on DingTalk (钉钉).
 
 ## Prerequisites
 

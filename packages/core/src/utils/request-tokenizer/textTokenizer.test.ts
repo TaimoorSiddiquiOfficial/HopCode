@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -59,21 +59,21 @@ describe('TextTokenizer', () => {
     });
 
     it('should calculate tokens for non-ASCII text (CJK)', async () => {
-      const unicodeText = '你好世界'; // 4 non-ASCII chars
+      const unicodeText = '????'; // 4 non-ASCII chars
       const result = await tokenizer.calculateTokens(unicodeText);
       // 4 * 1.1 = 4.4 -> ceil = 5
       expect(result).toBe(5);
     });
 
     it('should calculate tokens for mixed ASCII and non-ASCII text', async () => {
-      const mixedText = 'Hello 世界'; // 6 ASCII + 2 non-ASCII
+      const mixedText = 'Hello ??'; // 6 ASCII + 2 non-ASCII
       const result = await tokenizer.calculateTokens(mixedText);
       // (6 / 4) + (2 * 1.1) = 1.5 + 2.2 = 3.7 -> ceil = 4
       expect(result).toBe(4);
     });
 
     it('should calculate tokens for emoji', async () => {
-      const emojiText = '🌍'; // 2 UTF-16 code units (non-ASCII)
+      const emojiText = '??'; // 2 UTF-16 code units (non-ASCII)
       const result = await tokenizer.calculateTokens(emojiText);
       // 2 * 1.1 = 2.2 -> ceil = 3
       expect(result).toBe(3);
@@ -132,11 +132,11 @@ describe('TextTokenizer', () => {
     });
 
     it('should handle mixed ASCII and non-ASCII texts', async () => {
-      const texts = ['Hello', '世界', 'Hello 世界'];
+      const texts = ['Hello', '??', 'Hello ??'];
       const result = await tokenizer.calculateTokensBatch(texts);
       // 'Hello' = 5 / 4 = 1.25 -> ceil = 2
-      // '世界' = 2 * 1.1 = 2.2 -> ceil = 3
-      // 'Hello 世界' = (6/4) + (2*1.1) = 1.5 + 2.2 = 3.7 -> ceil = 4
+      // '??' = 2 * 1.1 = 2.2 -> ceil = 3
+      // 'Hello ??' = (6/4) + (2*1.1) = 1.5 + 2.2 = 3.7 -> ceil = 4
       expect(result).toEqual([2, 3, 4]);
     });
 
@@ -219,7 +219,7 @@ describe('TextTokenizer', () => {
 
     it('should handle surrogate pairs correctly', async () => {
       // Character outside BMP (Basic Multilingual Plane)
-      const text = '𝕳𝖊𝖑𝖑𝖔'; // Mathematical bold letters (2 UTF-16 units each)
+      const text = '??????????'; // Mathematical bold letters (2 UTF-16 units each)
       const result = await tokenizer.calculateTokens(text);
       // Each character is 2 UTF-16 units, all non-ASCII
       // Total: 10 non-ASCII units
@@ -238,7 +238,7 @@ describe('TextTokenizer', () => {
     });
 
     it('should handle accented characters', async () => {
-      const text = 'café'; // 'caf' = 3 ASCII, 'é' = 1 non-ASCII
+      const text = 'caf�'; // 'caf' = 3 ASCII, '�' = 1 non-ASCII
       const result = await tokenizer.calculateTokens(text);
       // ASCII: 3 / 4 = 0.75
       // Non-ASCII: 1 * 1.1 = 1.1
@@ -247,9 +247,9 @@ describe('TextTokenizer', () => {
     });
 
     it('should handle various unicode scripts', async () => {
-      const cyrillic = 'Привет'; // 6 non-ASCII chars
-      const arabic = 'مرحبا'; // 5 non-ASCII chars
-      const japanese = 'こんにちは'; // 5 non-ASCII chars
+      const cyrillic = '??????'; // 6 non-ASCII chars
+      const arabic = '?????'; // 5 non-ASCII chars
+      const japanese = '?????'; // 5 non-ASCII chars
 
       const result1 = await tokenizer.calculateTokens(cyrillic);
       const result2 = await tokenizer.calculateTokens(arabic);

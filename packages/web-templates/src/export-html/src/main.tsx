@@ -1,4 +1,4 @@
-import './styles.css';
+﻿import './styles.css';
 import logoSvg from './favicon.svg';
 import { TempFileModal } from './components/TempFileModal.js';
 import { usePlatformContext } from './components/hooks.js';
@@ -15,7 +15,7 @@ declare global {
 const ReactDOM = window.ReactDOM;
 const React = window.React;
 
-declare const QwenCodeWebUI: {
+declare const HopCodeWebUI: {
   ChatViewer: (props: {
     messages: unknown[];
     autoScroll: boolean;
@@ -27,7 +27,7 @@ declare const QwenCodeWebUI: {
   }) => React.ReactNode;
 };
 
-const { ChatViewer, PlatformProvider } = QwenCodeWebUI;
+const { ChatViewer, PlatformProvider } = HopCodeWebUI;
 
 const logoSvgWithGradient = (() => {
   if (!logoSvg) {

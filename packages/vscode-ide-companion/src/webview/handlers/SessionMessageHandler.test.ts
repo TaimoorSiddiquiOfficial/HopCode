@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,7 +67,7 @@ describe('SessionMessageHandler', () => {
       data: { modelId: 'glm-5' },
     });
 
-    expect(mockExecuteCommand).toHaveBeenCalledWith('qwenCode.openNewChatTab', {
+    expect(mockExecuteCommand).toHaveBeenCalledWith('HopCode.openNewChatTab', {
       initialModelId: 'glm-5',
     });
   });

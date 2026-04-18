@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <!-- HopCode - Typed Logo Version 3: Bold Geometric -->
+  <!-- Strong, modern typography with geometric styling -->
+  
+  <defs>
+    <!-- Violet to Cyan gradient -->
+    <linearGradient id="boldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Shadow effect -->
+    <filter id="boldShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="200" fill="#0F0F14"/>
+  
+  <!-- Background accent circle -->
+  <circle cx="400" cy="100" r="80" fill="#7C3AED" opacity="0.1"/>
+  
+  <!-- Main Text - Bold -->
+  <text x="400" y="115" 
+        font-family="'Inter', 'Arial Black', sans-serif" 
+        font-size="80" 
+        font-weight="900"
+        letter-spacing="-3"
+        fill="url(#boldGradient)"
+        filter="url(#boldShadow)"
+        text-anchor="middle">
+    HOPCODE
+  </text>
+  
+  <!-- Split emphasis - HOP in violet, CODE in cyan -->
+  <text x="400" y="160" 
+        font-family="'Inter', sans-serif" 
+        font-size="16" 
+        font-weight="500"
+        letter-spacing="6"
+        text-anchor="middle">
+    <tspan fill="#A1A1AA">CODE WITH </tspan><tspan fill="#06B6D4">AI</tspan>
+  </text>
+  
+  <!-- Geometric accent lines -->
+  <line x1="200" y1="90" x2="350" y2="90" stroke="#7C3AED" stroke-width="2" opacity="0.6"/>
+  <line x1="450" y1="90" x2="600" y2="90" stroke="#06B6D4" stroke-width="2" opacity="0.6"/>
+</svg>

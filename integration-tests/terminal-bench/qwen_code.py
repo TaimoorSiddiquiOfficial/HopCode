@@ -1,4 +1,4 @@
-import os
+﻿import os
 import shlex
 
 from terminal_bench.agents.installed_agents.abstract_installed_agent import (
@@ -56,7 +56,7 @@ class QwenCodeAgent(AbstractInstalledAgent):
 
     @property
     def _install_agent_script_path(self) -> os.PathLike:
-        return self._get_templated_script_path("qwen-code-setup.sh.j2")
+        return self._get_templated_script_path("hopcode-setup.sh.j2")
 
     def _run_agent_commands(self, task_description: str) -> list[TerminalCommand]:
         escaped_description = shlex.quote(task_description)

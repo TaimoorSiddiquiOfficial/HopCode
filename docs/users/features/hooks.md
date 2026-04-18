@@ -1,8 +1,8 @@
-# Qwen Code Hooks
+﻿# HopCode Hooks
 
 ## Overview
 
-Qwen Code hooks provide a powerful mechanism for extending and customizing the behavior of the Qwen Code application. Hooks allow users to execute custom scripts or programs at specific points in the application lifecycle, such as before tool execution, after tool execution, at session start/end, and during other key events.
+HopCode hooks provide a powerful mechanism for extending and customizing the behavior of the HopCode application. Hooks allow users to execute custom scripts or programs at specific points in the application lifecycle, such as before tool execution, after tool execution, at session start/end, and during other key events.
 
 Hooks are enabled by default. You can temporarily disable all hooks by setting `disableAllHooks` to `true` in your settings file (at the top level, alongside `hooks`):
 
@@ -19,7 +19,7 @@ This disables all hooks without deleting their configurations.
 
 ## What are Hooks?
 
-Hooks are user-defined scripts or programs that are automatically executed by Qwen Code at predefined points in the application flow. They allow users to:
+Hooks are user-defined scripts or programs that are automatically executed by HopCode at predefined points in the application flow. They allow users to:
 
 - Monitor and audit tool usage
 - Enforce security policies
@@ -30,7 +30,7 @@ Hooks are user-defined scripts or programs that are automatically executed by Qw
 
 ## Hook Types
 
-Qwen Code supports three hook executor types:
+HopCode supports three hook executor types:
 
 | Type       | Description                                                                                    |
 | :--------- | :--------------------------------------------------------------------------------------------- |
@@ -136,7 +136,7 @@ Function hooks directly call registered JavaScript/TypeScript functions. They ar
 
 ## Hook Events
 
-Hooks fire at specific points during a Qwen Code session. Different events support different matchers to filter trigger conditions.
+Hooks fire at specific points during a HopCode session. Different events support different matchers to filter trigger conditions.
 
 | Event                | Triggered When                            | Matcher Target                                            |
 | :------------------- | :---------------------------------------- | :-------------------------------------------------------- |
@@ -482,7 +482,7 @@ Hook output supports three categories of fields:
 ```json
 {
   "decision": "block",
-  "reason": "Must be provided when Qwen Code is blocked from stopping"
+  "reason": "Must be provided when HopCode is blocked from stopping"
 }
 ```
 
@@ -596,7 +596,7 @@ Hook output supports three categories of fields:
 ```json
 {
   "decision": "block",
-  "reason": "Must be provided when Qwen Code is blocked from stopping"
+  "reason": "Must be provided when HopCode is blocked from stopping"
 }
 ```
 
@@ -756,7 +756,7 @@ Hook output supports three categories of fields:
 
 ## Hook Configuration
 
-Hooks are configured in Qwen Code settings, typically in `.qwen/settings.json` or user configuration files:
+Hooks are configured in HopCode settings, typically in `.qwen/settings.json` or user configuration files:
 
 ```json
 {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * E2E tests for system controller features:
  * - setModel API for dynamic model switching
  */
@@ -10,7 +10,7 @@ import {
   isSDKSystemMessage,
   isSDKResultMessage,
   type SDKUserMessage,
-} from '@qwen-code/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   createSharedTestOptions,

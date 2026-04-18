@@ -28,7 +28,7 @@ import type { Content } from '@google/genai';
 
 import os from 'node:os';
 
-const GEMINI_DIR_NAME = '.qwen';
+const GEMINI_DIR_NAME = '.hopcode';
 const TMP_DIR_NAME = 'tmp';
 const LOG_FILE_NAME = 'logs.json';
 const CHECKPOINT_FILE_NAME = 'checkpoint.json';
@@ -418,11 +418,11 @@ describe('Logger', () => {
         encodedTag: 'test-tag',
       },
       {
-        tag: '你好世界',
+        tag: '????',
         encodedTag: '%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C',
       },
       {
-        tag: 'japanese-ひらがなひらがな形声',
+        tag: 'japanese-??????????',
         encodedTag:
           'japanese-%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E5%BD%A2%E5%A3%B0',
       },
@@ -472,11 +472,11 @@ describe('Logger', () => {
         encodedTag: 'test-tag',
       },
       {
-        tag: '你好世界',
+        tag: '????',
         encodedTag: '%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C',
       },
       {
-        tag: 'japanese-ひらがなひらがな形声',
+        tag: 'japanese-??????????',
         encodedTag:
           'japanese-%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E5%BD%A2%E5%A3%B0',
       },

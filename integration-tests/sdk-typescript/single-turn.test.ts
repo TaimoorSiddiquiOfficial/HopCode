@@ -1,4 +1,4 @@
-/**
+﻿/**
  * E2E tests for single-turn query execution
  * Tests basic query patterns with simple prompts and clear output expectations
  */
@@ -13,7 +13,7 @@ import {
   type SDKMessage,
   type SDKSystemMessage,
   type SDKAssistantMessage,
-} from '@qwen-code/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   extractText,
@@ -180,7 +180,7 @@ describe('Single-Turn Query (E2E)', () => {
         expect(Array.isArray(systemMessage!.mcp_servers)).toBe(true);
         expect(systemMessage!.model).toBeDefined();
         expect(systemMessage!.permission_mode).toBeDefined();
-        expect(systemMessage!.qwen_code_version).toBeDefined();
+        expect(systemMessage!.hopcode_version).toBeDefined();
 
         // Validate system message appears early in sequence
         const systemMessageIndex = messages.findIndex(

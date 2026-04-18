@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -59,7 +59,7 @@ function getMergeStrategyForPath(path: string[]): MergeStrategy | undefined {
 
 export type { Settings, MemoryImportFormat };
 
-export const SETTINGS_DIRECTORY_NAME = '.qwen';
+export const SETTINGS_DIRECTORY_NAME = '.hopcode';
 export const USER_SETTINGS_PATH = Storage.getGlobalSettingsPath();
 export const USER_SETTINGS_DIR = path.dirname(USER_SETTINGS_PATH);
 export const DEFAULT_EXCLUDED_ENV_VARS = ['DEBUG', 'DEBUG_MODE'];
@@ -137,11 +137,11 @@ export function migrateLegacyPermissions(
 }
 
 export function getSystemSettingsPath(): string {
-  if (process.env['QWEN_CODE_SYSTEM_SETTINGS_PATH']) {
-    return process.env['QWEN_CODE_SYSTEM_SETTINGS_PATH'];
+  if (process.env['HOPCODE_SYSTEM_SETTINGS_PATH']) {
+    return process.env['HOPCODE_SYSTEM_SETTINGS_PATH'];
   }
   if (platform() === 'darwin') {
-    return '/Library/Application Support/QwenCode/settings.json';
+    return '/Library/Application Support/HopCode/settings.json';
   } else if (platform() === 'win32') {
     return 'C:\\ProgramData\\qwen-code\\settings.json';
   } else {
@@ -150,8 +150,8 @@ export function getSystemSettingsPath(): string {
 }
 
 export function getSystemDefaultsPath(): string {
-  if (process.env['QWEN_CODE_SYSTEM_DEFAULTS_PATH']) {
-    return process.env['QWEN_CODE_SYSTEM_DEFAULTS_PATH'];
+  if (process.env['HOPCODE_SYSTEM_DEFAULTS_PATH']) {
+    return process.env['HOPCODE_SYSTEM_DEFAULTS_PATH'];
   }
   return path.join(
     path.dirname(getSystemSettingsPath()),
@@ -485,7 +485,7 @@ export function createMinimalSettings(): LoadedSettings {
  * Finds the .env file to load, respecting workspace trust settings.
  *
  * When workspace is untrusted, only allow user-level .env files at:
- * - ~/.qwen/.env
+ * - ~/.hopcode/.env
  * - ~/.env
  */
 function findEnvFile(settings: Settings, startDir: string): string | null {

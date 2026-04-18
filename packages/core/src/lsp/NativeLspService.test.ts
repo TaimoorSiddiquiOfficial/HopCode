@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,7 +16,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-// 模拟依赖项
+// ?????
 class MockConfig {
   rootPath = '/test/workspace';
 
@@ -68,7 +68,7 @@ class MockWorkspaceContext {
 
 class MockFileDiscoveryService {
   async discoverFiles(_root: string, _options: unknown): Promise<string[]> {
-    // 模拟发现一些文件
+    // ????????
     return [
       '/test/workspace/src/index.ts',
       '/test/workspace/src/utils.ts',
@@ -83,7 +83,7 @@ class MockFileDiscoveryService {
 }
 
 class MockIdeContextStore {
-  // 模拟 IDE 上下文存储
+  // ?? IDE ?????
 }
 
 describe('NativeLspService', () => {
@@ -140,7 +140,7 @@ describe('NativeLspService', () => {
     await lspService.discoverAndPrepare();
     const status = lspService.getStatus();
 
-    // 检查服务是否已准备就绪
+    // ???????????
     expect(status).toBeDefined();
   });
 

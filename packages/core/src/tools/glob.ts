@@ -149,7 +149,7 @@ class GlobToolInvocation extends BaseToolInvocation<
     })) as GlobPath[];
 
     // Filter using paths relative to the project root (the base that
-    // FileDiscoveryService uses for .gitignore / .qwenignore evaluation).
+    // FileDiscoveryService uses for .gitignore / .hopcodeignore evaluation).
     // Using searchDir-relative paths would cause ignore rules to be
     // evaluated against incorrect paths when searchDir != projectRoot.
     const projectRoot = this.config.getTargetDir();
@@ -185,7 +185,7 @@ class GlobToolInvocation extends BaseToolInvocation<
       let searchLocationDescription: string;
 
       if (this.params.path) {
-        // User specified a path â€” search only that directory
+        // User specified a path — search only that directory
         const searchDirAbs = resolveAndValidatePath(
           this.config,
           this.params.path,
@@ -194,7 +194,7 @@ class GlobToolInvocation extends BaseToolInvocation<
         searchDirs.push(searchDirAbs);
         searchLocationDescription = `within ${searchDirAbs}`;
       } else {
-        // No path specified â€” search all workspace directories
+        // No path specified — search all workspace directories
         const workspaceDirs = this.config
           .getWorkspaceContext()
           .getDirectories();

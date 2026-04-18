@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+﻿import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import path from 'node:path';
 import { Storage } from '@qwen-code/qwen-code-core';
 import type { LoadedSettings } from '../config/settings.js';
@@ -20,13 +20,13 @@ describe('runWithAcpRuntimeOutputDir', () => {
     const settings = {
       merged: {
         advanced: {
-          runtimeOutputDir: '.qwen-runtime',
+          runtimeOutputDir: '.hopcode-runtime',
         },
       },
     } as LoadedSettings;
 
     await runWithAcpRuntimeOutputDir(settings, cwd, async () => {
-      expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.qwen-runtime'));
+      expect(Storage.getRuntimeBaseDir()).toBe(path.join(cwd, '.hopcode-runtime'));
     });
 
     expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalQwenDir());

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -68,14 +68,14 @@ describe('AgentTool', () => {
       description: 'Specialized agent for searching and analyzing files',
       systemPrompt: 'You are a file search specialist.',
       level: 'project',
-      filePath: '/project/.qwen/agents/file-search.md',
+      filePath: '/project/.hopcode/agents/file-search.md',
     },
     {
       name: 'code-review',
       description: 'Agent for reviewing code quality and best practices',
       systemPrompt: 'You are a code review specialist.',
       level: 'user',
-      filePath: '/home/user/.qwen/agents/code-review.md',
+      filePath: '/home/user/.hopcode/agents/code-review.md',
     },
   ];
 
@@ -273,7 +273,7 @@ describe('AgentTool', () => {
           description: 'A brand new agent',
           systemPrompt: 'Do new things.',
           level: 'project',
-          filePath: '/project/.qwen/agents/new-agent.md',
+          filePath: '/project/.hopcode/agents/new-agent.md',
         },
       ];
 
@@ -298,7 +298,7 @@ describe('AgentTool', () => {
           description: 'A test agent',
           systemPrompt: 'Test prompt',
           level: 'project',
-          filePath: '/project/.qwen/agents/test-agent.md',
+          filePath: '/project/.hopcode/agents/test-agent.md',
         },
       ];
 
@@ -326,7 +326,7 @@ describe('AgentTool', () => {
         formatCompactResult: vi
           .fn()
           .mockReturnValue(
-            '✅ Success: Search files completed with GOAL termination',
+            '? Success: Search files completed with GOAL termination',
           ),
         getExecutionSummary: vi.fn().mockReturnValue({
           rounds: 2,
@@ -593,7 +593,7 @@ describe('AgentTool', () => {
 
       MockedContextState.mockImplementation(() => mockContextState);
 
-      // Parent conversation history: empty (first-turn fork — falls back to
+      // Parent conversation history: empty (first-turn fork � falls back to
       // the fork agent's own systemPrompt + wildcard tools because no
       // cache params have been captured yet).
       vi.mocked(config.getGeminiClient).mockReturnValue({
@@ -635,7 +635,7 @@ describe('AgentTool', () => {
 
       // Fork returns the placeholder synchronously.
       const llmText = partToString(result.llmContent);
-      expect(llmText).toBe('Fork started — processing in background');
+      expect(llmText).toBe('Fork started � processing in background');
 
       // Drain the background executeSubagent() promise so its assertions
       // become visible before the test ends.
@@ -660,7 +660,7 @@ describe('AgentTool', () => {
         result: 'Task completed successfully',
         terminateMode: AgentTerminateMode.GOAL,
         getFinalText: vi.fn().mockReturnValue('Task completed successfully'),
-        formatCompactResult: vi.fn().mockReturnValue('✅ Success'),
+        formatCompactResult: vi.fn().mockReturnValue('? Success'),
         getExecutionSummary: vi.fn().mockReturnValue({
           rounds: 1,
           totalDurationMs: 500,
@@ -839,7 +839,7 @@ describe('AgentTool', () => {
         result: 'Task completed successfully',
         terminateMode: AgentTerminateMode.GOAL,
         getFinalText: vi.fn().mockReturnValue('Task completed successfully'),
-        formatCompactResult: vi.fn().mockReturnValue('✅ Success'),
+        formatCompactResult: vi.fn().mockReturnValue('? Success'),
         getExecutionSummary: vi.fn().mockReturnValue({
           rounds: 1,
           totalDurationMs: 500,
@@ -1142,7 +1142,7 @@ describe('AgentTool', () => {
         result: 'Done',
         terminateMode: AgentTerminateMode.GOAL,
         getFinalText: vi.fn().mockReturnValue('Done'),
-        formatCompactResult: vi.fn().mockReturnValue('✅ Success'),
+        formatCompactResult: vi.fn().mockReturnValue('? Success'),
         getExecutionSummary: vi.fn().mockReturnValue({
           rounds: 1,
           totalDurationMs: 100,
@@ -1206,7 +1206,7 @@ describe('AgentTool', () => {
           timestamp: Date.now(),
         } satisfies AgentToolCallEvent);
 
-        // Tool needs approval → pendingConfirmation is set
+        // Tool needs approval ? pendingConfirmation is set
         emitter.emit(AgentEventType.TOOL_WAITING_APPROVAL, {
           subagentId: 'sub-1',
           round: 1,
@@ -1226,7 +1226,7 @@ describe('AgentTool', () => {
           respond: vi.fn(),
         } as unknown as AgentApprovalRequestEvent);
 
-        // IDE diff-tab accepted → TOOL_RESULT arrives without onConfirm
+        // IDE diff-tab accepted ? TOOL_RESULT arrives without onConfirm
         emitter.emit(AgentEventType.TOOL_RESULT, {
           subagentId: 'sub-1',
           round: 1,
@@ -1417,7 +1417,7 @@ describe('AgentTool', () => {
       description: 'Background monitor agent',
       systemPrompt: 'You are a monitor.',
       level: 'project',
-      filePath: '/project/.qwen/agents/monitor.md',
+      filePath: '/project/.hopcode/agents/monitor.md',
       background: true,
     };
 

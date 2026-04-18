@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -340,7 +340,7 @@ describe('ExitPlanModeTool', () => {
       const signal = new AbortController().signal;
 
       const invocation = tool.build(params);
-      // Do NOT call onConfirm â€” this mirrors what the YOLO scheduler does
+      // Do NOT call onConfirm — this mirrors what the YOLO scheduler does
       const result = await invocation.execute(signal);
 
       expect(result.llmContent).toContain(
@@ -357,7 +357,7 @@ describe('ExitPlanModeTool', () => {
       const invocation = tool.build(params);
       await invocation.execute(signal);
 
-      // Approval mode must remain YOLO â€” do not downgrade to AUTO_EDIT
+      // Approval mode must remain YOLO — do not downgrade to AUTO_EDIT
       expect(mockConfig.setApprovalMode).not.toHaveBeenCalled();
       expect(approvalMode).toBe(ApprovalMode.YOLO);
     });

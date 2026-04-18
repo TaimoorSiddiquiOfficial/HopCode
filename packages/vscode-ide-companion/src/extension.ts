@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -21,8 +21,8 @@ import { registerNewCommands } from './commands/index.js';
 import { ReadonlyFileSystemProvider } from './services/readonlyFileSystemProvider.js';
 import { isWindows } from './utils/platform.js';
 
-const CLI_IDE_COMPANION_IDENTIFIER = 'qwenlm.qwen-code-vscode-ide-companion';
-const INFO_MESSAGE_SHOWN_KEY = 'qwenCodeInfoMessageShown';
+const CLI_IDE_COMPANION_IDENTIFIER = 'qwenlm.hopcode-code-vscode-ide-companion';
+const INFO_MESSAGE_SHOWN_KEY = 'HopCodeInfoMessageShown';
 export const DIFF_SCHEME = 'qwen-diff';
 
 /**
@@ -167,7 +167,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Register WebView panel serializer for persistence across reloads
   context.subscriptions.push(
-    vscode.window.registerWebviewPanelSerializer('qwenCode.chat', {
+    vscode.window.registerWebviewPanelSerializer('HopCode.chat', {
       async deserializeWebviewPanel(
         webviewPanel: vscode.WebviewPanel,
         state: unknown,
@@ -302,7 +302,7 @@ export async function activate(context: vscode.ExtensionContext) {
       ideServer.syncEnvVars();
     }),
     vscode.commands.registerCommand(
-      'qwen-code.runQwenCode',
+      'qwen-code.runHopCode',
       async (
         location?:
           | vscode.TerminalLocation

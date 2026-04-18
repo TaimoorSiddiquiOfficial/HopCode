@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,10 +15,10 @@ import {
 
 type Logger = (message: string) => void;
 
-export const runQwenCodeCommand = 'qwen-code.runQwenCode';
-export const showDiffCommand = 'qwenCode.showDiff';
+export const runHopCodeCommand = 'qwen-code.runHopCode';
+export const showDiffCommand = 'HopCode.showDiff';
 export const openChatCommand = 'qwen-code.openChat';
-export const openNewChatTabCommand = 'qwenCode.openNewChatTab';
+export const openNewChatTabCommand = 'HopCode.openNewChatTab';
 export const loginCommand = 'qwen-code.login';
 export const focusChatCommand = 'qwen-code.focusChat';
 export const newConversationCommand = 'qwen-code.newConversation';

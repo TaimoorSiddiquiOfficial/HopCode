@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -104,7 +104,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
             typeof data?.modelId === 'string' && data.modelId.trim().length > 0
               ? data.modelId.trim()
               : undefined;
-          await vscode.commands.executeCommand('qwenCode.openNewChatTab', {
+          await vscode.commands.executeCommand('HopCode.openNewChatTab', {
             initialModelId: modelId,
           });
         } catch (error) {

@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300">
+  <!-- HopCode GitHub Repository Banner -->
+  <!-- Size: 1200x300px (GitHub repo header / Twitter banner) -->
+  
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F0F14;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1E1E2E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0F0F14;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Butterfly wing gradients -->
+    <linearGradient id="bannerWingLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="bannerWingRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22D3EE;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="bannerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Background circuit pattern -->
+    <pattern id="circuitPattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <circle cx="50" cy="50" r="2" fill="#7C3AED" opacity="0.1"/>
+      <path d="M 50 0 L 50 20 M 50 80 L 50 100 M 0 50 L 20 50 M 80 50 L 100 50" stroke="#7C3AED" stroke-width="1" opacity="0.15"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="300" fill="url(#bannerBg)"/>
+  
+  <!-- Circuit pattern overlay -->
+  <rect width="1200" height="300" fill="url(#circuitPattern)"/>
+  
+  <!-- Background glow circles -->
+  <circle cx="300" cy="150" r="150" fill="#7C3AED" opacity="0.15"/>
+  <circle cx="900" cy="150" r="150" fill="#06B6D4" opacity="0.12"/>
+  
+  <!-- Butterfly Logo (left side) -->
+  <g transform="translate(100, 50)" filter="url(#bannerGlow)">
+    <!-- Left Wing -->
+    <path d="M 75 100 Q 55 70 60 50 Q 65 30 85 25 Q 95 23 100 30 L 100 100 Q 85 100 75 100 Z" fill="url(#bannerWingLeft)"/>
+    <!-- Right Wing -->
+    <path d="M 125 100 Q 145 70 140 50 Q 135 30 115 25 Q 105 23 100 30 L 100 100 Q 115 100 125 100 Z" fill="url(#bannerWingRight)"/>
+    <!-- H Letterform -->
+    <path d="M 88 115 L 88 165 L 96 165 L 96 140 L 104 140 L 104 165 L 112 165 L 112 115 L 104 115 L 104 132 L 96 132 L 96 115 Z" fill="#F59E0B"/>
+    <!-- Code brackets -->
+    <path d="M 70 85 L 62 100 L 70 115" stroke="#FEF3C7" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M 130 85 L 138 100 L 130 115" stroke="#FEF3C7" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <!-- Center dot -->
+    <circle cx="100" cy="95" r="8" fill="#FEF3C7"/>
+  </g>
+  
+  <!-- "HopCode" Text (center-right) -->
+  <text x="450" y="165" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="96" 
+        font-weight="700"
+        letter-spacing="-2"
+        fill="#FFFFFF">
+    Hop<tspan fill="#7C3AED">Code</tspan>
+  </text>
+  
+  <!-- Tagline (below main text) -->
+  <text x="452" y="210" 
+        font-family="'Inter', system-ui, -apple-system, sans-serif" 
+        font-size="28" 
+        font-weight="400"
+        letter-spacing="6"
+        fill="#A1A1AA">
+    CODE WITH AI
+  </text>
+  
+  <!-- Feature badges (right side) -->
+  <g transform="translate(850, 80)">
+    <!-- Badge 1: AI-Powered -->
+    <rect x="0" y="0" width="280" height="50" fill="#1E1E2E" rx="8" stroke="#7C3AED" stroke-width="2"/>
+    <text x="140" y="32" font-family="'Inter', system-ui, sans-serif" font-size="18" fill="#E4E4E7" text-anchor="middle" font-weight="500">🦋 AI-Powered Coding</text>
+    
+    <!-- Badge 2: Multi-IDE -->
+    <rect x="0" y="65" width="280" height="50" fill="#1E1E2E" rx="8" stroke="#06B6D4" stroke-width="2"/>
+    <text x="140" y="97" font-family="'Inter', system-ui, sans-serif" font-size="18" fill="#E4E4E7" text-anchor="middle" font-weight="500">💻 VS Code + Zed Support</text>
+    
+    <!-- Badge 3: Open Source -->
+    <rect x="0" y="130" width="280" height="50" fill="#1E1E2E" rx="8" stroke="#F59E0B" stroke-width="2"/>
+    <text x="140" y="162" font-family="'Inter', system-ui, sans-serif" font-size="18" fill="#E4E4E7" text-anchor="middle" font-weight="500">🚀 Open Source</text>
+  </g>
+  
+  <!-- Bottom accent line with gradient -->
+  <line x1="100" y1="280" x2="1100" y2="280" stroke="url(#bannerWingRight)" stroke-width="3" opacity="0.6"/>
+  
+  <!-- Decorative code symbols (scattered) -->
+  <text x="50" y="50" font-family="'JetBrains Mono', monospace" font-size="20" fill="#3F3F46" opacity="0.4">{ }</text>
+  <text x="1150" y="280" font-family="'JetBrains Mono', monospace" font-size="20" fill="#3F3F46" opacity="0.4">&lt; /&gt;</text>
+</svg>

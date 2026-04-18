@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -56,11 +56,11 @@ describe('bugCommand', () => {
     if (!bugCommand.action) throw new Error('Action is not defined');
     await bugCommand.action(mockContext, 'A test bug');
 
-    const qwenCodeLine =
+    const HopCodeLine =
       GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO)
         ? `Qwen Code: 0.1.0 (${GIT_COMMIT_INFO})`
         : 'Qwen Code: 0.1.0';
-    const expectedInfo = `${qwenCodeLine}
+    const expectedInfo = `${HopCodeLine}
 Runtime: Node.js v20.0.0 / npm 10.0.0
 IDE Client: VSCode
 OS: test-platform x64 (22.0.0)
@@ -101,11 +101,11 @@ Memory Usage: 100 MB`;
     if (!bugCommand.action) throw new Error('Action is not defined');
     await bugCommand.action(mockContext, 'A custom bug');
 
-    const qwenCodeLine =
+    const HopCodeLine =
       GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO)
         ? `Qwen Code: 0.1.0 (${GIT_COMMIT_INFO})`
         : 'Qwen Code: 0.1.0';
-    const expectedInfo = `${qwenCodeLine}
+    const expectedInfo = `${HopCodeLine}
 Runtime: Node.js v20.0.0 / npm 10.0.0
 IDE Client: VSCode
 OS: test-platform x64 (22.0.0)
@@ -163,11 +163,11 @@ Memory Usage: 100 MB`;
     if (!bugCommand.action) throw new Error('Action is not defined');
     await bugCommand.action(mockContext, 'OpenAI bug');
 
-    const qwenCodeLine =
+    const HopCodeLine =
       GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO)
         ? `Qwen Code: 0.1.0 (${GIT_COMMIT_INFO})`
         : 'Qwen Code: 0.1.0';
-    const expectedInfo = `${qwenCodeLine}
+    const expectedInfo = `${HopCodeLine}
 Runtime: Node.js v20.0.0 / npm 10.0.0
 IDE Client: VSCode
 OS: test-platform x64 (22.0.0)

@@ -1,10 +1,10 @@
-{
-  "name": "@qwen-code/qwen-code-core",
+﻿{
+  "name": "@hopcode/hopcode-core",
   "version": "0.14.5",
-  "description": "Qwen Code Core",
+  "description": "HopCode Core",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/qwen-code.git"
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -23,10 +23,33 @@
     "scripts/postinstall.js"
   ],
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "3.0.82",
+    "@ai-sdk/anthropic": "2.0.65",
+    "@ai-sdk/azure": "2.0.91",
+    "@ai-sdk/cerebras": "1.0.36",
+    "@ai-sdk/cohere": "2.0.22",
+    "@ai-sdk/deepinfra": "1.0.36",
+    "@ai-sdk/gateway": "2.0.30",
+    "@ai-sdk/google": "2.0.54",
+    "@ai-sdk/google-vertex": "3.0.106",
+    "@ai-sdk/groq": "2.0.34",
+    "@ai-sdk/mistral": "2.0.27",
+    "@ai-sdk/openai": "2.0.89",
+    "@ai-sdk/openai-compatible": "1.0.32",
+    "@ai-sdk/perplexity": "2.0.23",
+    "@ai-sdk/provider": "2.0.1",
+    "@ai-sdk/provider-utils": "3.0.21",
+    "@ai-sdk/togetherai": "1.0.34",
+    "@ai-sdk/vercel": "1.0.33",
+    "@ai-sdk/xai": "2.0.51",
     "@anthropic-ai/sdk": "^0.36.1",
     "@google/genai": "1.30.0",
     "@iarna/toml": "^2.2.5",
     "@modelcontextprotocol/sdk": "^1.25.1",
+    "@openrouter/ai-sdk-provider": "1.5.4",
+    "@gitlab/gitlab-ai-provider": "3.6.0",
+    "ai": "5.0.124",
+    "ai-gateway-provider": "2.3.1",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-logs-otlp-grpc": "^0.203.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.203.0",

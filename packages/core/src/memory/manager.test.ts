@@ -17,7 +17,7 @@ import {
 } from './paths.js';
 import type { Config } from '../config/config.js';
 
-// ─── Mocks ────────────────────────────────────────────────────────────────────
+// --- Mocks --------------------------------------------------------------------
 
 vi.mock('./extract.js', () => ({
   runAutoMemoryExtract: vi.fn(),
@@ -30,7 +30,7 @@ vi.mock('./dream.js', () => ({
 import { runAutoMemoryExtract } from './extract.js';
 import { runManagedAutoMemoryDream } from './dream.js';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function makeMockConfig(overrides: Partial<Config> = {}): Config {
   return {
@@ -43,7 +43,7 @@ function makeMockConfig(overrides: Partial<Config> = {}): Config {
   } as unknown as Config;
 }
 
-// ─── MemoryManager ────────────────────────────────────────────────────────────
+// --- MemoryManager ------------------------------------------------------------
 
 describe('MemoryManager', () => {
   describe('globalMemoryManager', () => {
@@ -52,7 +52,7 @@ describe('MemoryManager', () => {
     });
   });
 
-  // ─── drain() ──────────────────────────────────────────────────────────────
+  // --- drain() --------------------------------------------------------------
 
   describe('drain()', () => {
     it('resolves true immediately when there are no in-flight tasks', async () => {
@@ -90,7 +90,7 @@ describe('MemoryManager', () => {
     });
   });
 
-  // ─── scheduleExtract() ────────────────────────────────────────────────────
+  // --- scheduleExtract() ----------------------------------------------------
 
   describe('scheduleExtract()', () => {
     let tempDir: string;
@@ -98,7 +98,7 @@ describe('MemoryManager', () => {
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      process.env['QWEN_CODE_MEMORY_LOCAL'] = '1';
+      process.env['HOPCODE_MEMORY_LOCAL'] = '1';
       clearAutoMemoryRootCache();
       tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mgr-extract-'));
       projectRoot = path.join(tempDir, 'project');
@@ -107,7 +107,7 @@ describe('MemoryManager', () => {
     });
 
     afterEach(async () => {
-      delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+      delete process.env['HOPCODE_MEMORY_LOCAL'];
       clearAutoMemoryRootCache();
       await fs.rm(tempDir, { recursive: true, force: true });
     });
@@ -144,7 +144,7 @@ describe('MemoryManager', () => {
                 functionCall: {
                   name: 'write_file',
                   args: {
-                    file_path: `${projectRoot}/.qwen/memory/user/test.md`,
+                    file_path: `${projectRoot}/.hopcode/memory/user/test.md`,
                   },
                 },
               },
@@ -181,7 +181,7 @@ describe('MemoryManager', () => {
         history: [{ role: 'user', parts: [{ text: 'first' }] }],
       });
 
-      // Second call while first is in-flight — should be queued
+      // Second call while first is in-flight � should be queued
       const queued = await mgr.scheduleExtract({
         projectRoot,
         sessionId: 'sess-1',
@@ -222,7 +222,7 @@ describe('MemoryManager', () => {
     });
   });
 
-  // ─── listTasksByType() ────────────────────────────────────────────────────
+  // --- listTasksByType() ----------------------------------------------------
 
   describe('listTasksByType()', () => {
     it('returns empty array when no tasks of that type exist', () => {
@@ -260,7 +260,7 @@ describe('MemoryManager', () => {
     });
   });
 
-  // ─── scheduleDream() ─────────────────────────────────────────────────────
+  // --- scheduleDream() -----------------------------------------------------
 
   describe('scheduleDream()', () => {
     let tempDir: string;
@@ -268,7 +268,7 @@ describe('MemoryManager', () => {
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      process.env['QWEN_CODE_MEMORY_LOCAL'] = '1';
+      process.env['HOPCODE_MEMORY_LOCAL'] = '1';
       clearAutoMemoryRootCache();
       tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mgr-dream-'));
       projectRoot = path.join(tempDir, 'project');
@@ -285,7 +285,7 @@ describe('MemoryManager', () => {
     });
 
     afterEach(async () => {
-      delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+      delete process.env['HOPCODE_MEMORY_LOCAL'];
       clearAutoMemoryRootCache();
       await fs.rm(tempDir, { recursive: true, force: true });
     });
@@ -374,7 +374,7 @@ describe('MemoryManager', () => {
     });
 
     it('skips when session count is below threshold (via session scanner)', async () => {
-      // Only 1 session — need 5
+      // Only 1 session � need 5
       const mgr = new MemoryManager(async () => ['sess-0']);
 
       const result = await mgr.scheduleDream({
@@ -425,7 +425,7 @@ describe('MemoryManager', () => {
     });
   });
 
-  // ─── resetExtractStateForTests() ─────────────────────────────────────────
+  // --- resetExtractStateForTests() -----------------------------------------
 
   describe('resetExtractStateForTests()', () => {
     it('clears in-flight extract state so subsequent calls are not blocked', async () => {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -130,7 +130,7 @@ export interface Backend {
    */
   init(): Promise<void>;
 
-  // ─── Agent Lifecycle ────────────────────────────────────────
+  // --- Agent Lifecycle ----------------------------------------
 
   /**
    * Spawn a new agent subprocess.
@@ -167,7 +167,7 @@ export interface Backend {
    */
   waitForAll(timeoutMs?: number): Promise<boolean>;
 
-  // ─── Active Agent & Navigation ──────────────────────────────
+  // --- Active Agent & Navigation ------------------------------
 
   /**
    * Switch the active agent for screen capture and input routing.
@@ -189,7 +189,7 @@ export interface Backend {
    */
   getActiveAgentId(): string | null;
 
-  // ─── Screen Capture ─────────────────────────────────────────
+  // --- Screen Capture -----------------------------------------
 
   /**
    * Get the screen snapshot for the currently active agent.
@@ -214,7 +214,7 @@ export interface Backend {
    */
   getAgentScrollbackLength(agentId: string): number;
 
-  // ─── Input ──────────────────────────────────────────────────
+  // --- Input --------------------------------------------------
 
   /**
    * Forward input to the currently active agent's PTY stdin.
@@ -230,14 +230,14 @@ export interface Backend {
    */
   writeToAgent(agentId: string, data: string): boolean;
 
-  // ─── Resize ─────────────────────────────────────────────────
+  // --- Resize -------------------------------------------------
 
   /**
    * Resize all agent terminals/panes.
    */
   resizeAll(cols: number, rows: number): void;
 
-  // ─── External Session Info ─────────────────────────────────
+  // --- External Session Info ---------------------------------
 
   /**
    * Get a user-facing hint for how to attach to the external display session.

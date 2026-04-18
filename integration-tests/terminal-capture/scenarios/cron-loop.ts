@@ -1,4 +1,4 @@
-import type { ScenarioConfig } from '../scenario-runner.js';
+﻿import type { ScenarioConfig } from '../scenario-runner.js';
 
 /**
  * Demonstrates the /loop skill and cron scheduling tools.
@@ -7,7 +7,7 @@ import type { ScenarioConfig } from '../scenario-runner.js';
 export default {
   name: 'cron-loop',
   spawn: ['node', 'dist/cli.js', '--yolo'],
-  terminal: { title: 'qwen-code', cwd: '../../..' },
+  terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     { type: 'hi' },
     { type: '/loop 1m say hi to me' },

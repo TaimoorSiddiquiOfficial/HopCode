@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -875,7 +875,7 @@ describe('OpenAIContentConverter', () => {
      *
      * Ensures that when an MCP tool returns multiple content blocks
      * (e.g., text + image, or multiple text sections), all content
-     * ends up inside the tool message â€“ NOT in a separate user message.
+     * ends up inside the tool message – NOT in a separate user message.
      *
      * These tests simulate the data shape produced by the *fixed*
      * convertToFunctionResponse(), where all text is joined into
@@ -1696,7 +1696,7 @@ describe('MCP tool result end-to-end through OpenAI converter (issue #1520)', ()
    * End-to-end regression tests for https://github.com/QwenLM/qwen-code/issues/1520
    *
    * Simulates the full pipeline:
-   *   transformMcpContentToParts â†’ convertToFunctionResponse â†’ OpenAI converter
+   *   transformMcpContentToParts ? convertToFunctionResponse ? OpenAI converter
    *
    * Verifies that multi-part MCP tool results are properly carried through
    * into the OpenAI tool message, with no content leaking into user messages.
@@ -1852,7 +1852,7 @@ describe('MCP tool result end-to-end through OpenAI converter (issue #1520)', ()
   });
 
   it('should work correctly when MCP tool returns a single text part', () => {
-    // Single text part â€” the control case that has always worked
+    // Single text part — the control case that has always worked
     const mcpTransformedParts: Part[] = [
       { text: 'Single text response from MCP tool' },
     ];
@@ -2061,7 +2061,7 @@ describe('Truncated tool call detection in streaming', () => {
           id: 'call_1',
           name: 'write_file',
           arguments: '{"file_path": "/tmp/test.cpp"',
-          // Missing closing brace and content field â€” truncated
+          // Missing closing brace and content field — truncated
         },
       ],
       'stop',

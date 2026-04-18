@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+﻿import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs';
 import {
   initStartupProfiler,
@@ -32,8 +32,8 @@ describe('startupProfiler', () => {
   beforeEach(() => {
     resetStartupProfiler();
     vi.restoreAllMocks();
-    saveEnv('QWEN_CODE_PROFILE_STARTUP', 'SANDBOX');
-    delete process.env['QWEN_CODE_PROFILE_STARTUP'];
+    saveEnv('HOPCODE_PROFILE_STARTUP', 'SANDBOX');
+    delete process.env['HOPCODE_PROFILE_STARTUP'];
     delete process.env['SANDBOX'];
   });
 
@@ -42,7 +42,7 @@ describe('startupProfiler', () => {
   });
 
   function enableProfiler() {
-    process.env['QWEN_CODE_PROFILE_STARTUP'] = '1';
+    process.env['HOPCODE_PROFILE_STARTUP'] = '1';
     process.env['SANDBOX'] = '1';
   }
 
@@ -63,8 +63,8 @@ describe('startupProfiler', () => {
   });
 
   describe('when outside sandbox (SANDBOX not set)', () => {
-    it('should not enable profiler even with QWEN_CODE_PROFILE_STARTUP=1', () => {
-      process.env['QWEN_CODE_PROFILE_STARTUP'] = '1';
+    it('should not enable profiler even with HOPCODE_PROFILE_STARTUP=1', () => {
+      process.env['HOPCODE_PROFILE_STARTUP'] = '1';
       delete process.env['SANDBOX'];
 
       initStartupProfiler();
@@ -73,7 +73,7 @@ describe('startupProfiler', () => {
     });
   });
 
-  describe('when enabled (QWEN_CODE_PROFILE_STARTUP=1 + SANDBOX)', () => {
+  describe('when enabled (HOPCODE_PROFILE_STARTUP=1 + SANDBOX)', () => {
     beforeEach(() => {
       enableProfiler();
     });

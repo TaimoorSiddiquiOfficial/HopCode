@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 export interface Annotation {
@@ -122,7 +122,7 @@ export interface SDKSystemMessage {
   model?: string;
   permission_mode?: string;
   slash_commands?: string[];
-  qwen_code_version?: string;
+  HOPCODE_version?: string;
   output_style?: string;
   agents?: string[];
   skills?: string[];
@@ -571,7 +571,7 @@ export interface SubagentConfig {
 
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 

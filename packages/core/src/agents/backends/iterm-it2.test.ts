@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// ─── Hoisted mocks for shell-utils ──────────────────────────────
+// --- Hoisted mocks for shell-utils ------------------------------
 const hoistedExecCommand = vi.hoisted(() => vi.fn());
 const hoistedIsCommandAvailable = vi.hoisted(() => vi.fn());
 
@@ -39,7 +39,7 @@ describe('iterm-it2', () => {
     vi.clearAllMocks();
   });
 
-  // ─── isIt2Available ─────────────────────────────────────────
+  // --- isIt2Available -----------------------------------------
 
   describe('isIt2Available', () => {
     it('returns true when it2 is on PATH', () => {
@@ -54,7 +54,7 @@ describe('iterm-it2', () => {
     });
   });
 
-  // ─── ensureIt2Installed ──────────────────────────────────────
+  // --- ensureIt2Installed --------------------------------------
 
   describe('ensureIt2Installed', () => {
     it('does nothing if it2 is already available', async () => {
@@ -64,7 +64,7 @@ describe('iterm-it2', () => {
     });
 
     it('installs via uv when uv is available', async () => {
-      // isIt2Available() → false; uv available; install succeeds; recheck → true
+      // isIt2Available() ? false; uv available; install succeeds; recheck ? true
       hoistedIsCommandAvailable
         .mockReturnValueOnce({ available: false }) // isIt2Available() initial
         .mockReturnValueOnce({ available: true }); // uv available
@@ -137,7 +137,7 @@ describe('iterm-it2', () => {
     });
   });
 
-  // ─── verifyITerm ──────────────────────────────────────────────
+  // --- verifyITerm ----------------------------------------------
 
   describe('verifyITerm', () => {
     it('succeeds when session list returns code 0', async () => {
@@ -185,7 +185,7 @@ describe('iterm-it2', () => {
     });
   });
 
-  // ─── itermSplitPane ──────────────────────────────────────────
+  // --- itermSplitPane ------------------------------------------
 
   describe('itermSplitPane', () => {
     it('splits vertically without session ID', async () => {
@@ -240,7 +240,7 @@ describe('iterm-it2', () => {
     });
   });
 
-  // ─── itermRunCommand ──────────────────────────────────────────
+  // --- itermRunCommand ------------------------------------------
 
   describe('itermRunCommand', () => {
     it('calls it2 session run with correct args', async () => {
@@ -259,7 +259,7 @@ describe('iterm-it2', () => {
     });
   });
 
-  // ─── itermFocusSession ────────────────────────────────────────
+  // --- itermFocusSession ----------------------------------------
 
   describe('itermFocusSession', () => {
     it('calls it2 session focus with correct args', async () => {
@@ -278,7 +278,7 @@ describe('iterm-it2', () => {
     });
   });
 
-  // ─── itermSendText ─────────────────────────────────────────────
+  // --- itermSendText ---------------------------------------------
 
   describe('itermSendText', () => {
     it('calls it2 session send with correct args', async () => {
@@ -297,7 +297,7 @@ describe('iterm-it2', () => {
     });
   });
 
-  // ─── itermCloseSession ────────────────────────────────────────
+  // --- itermCloseSession ----------------------------------------
 
   describe('itermCloseSession', () => {
     it('calls it2 session close with correct args', async () => {

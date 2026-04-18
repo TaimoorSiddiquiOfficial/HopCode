@@ -1,12 +1,12 @@
-import type { ScenarioConfig } from '../scenario-runner.js';
+﻿import type { ScenarioConfig } from '../scenario-runner.js';
 
 export default {
   name: 'pr-2371-review',
   spawn: ['node', 'dist/cli.js', '--yolo'],
-  terminal: { title: 'qwen-code', cwd: '../../..' },
+  terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {
-      type: '/review https://github.com/QwenLM/qwen-code/pull/2371',
+      type: '/review https://github.com/QwenLM/hopcode/pull/2371',
       streaming: {
         delayMs: 5000,
         intervalMs: 10000, // Every 10s

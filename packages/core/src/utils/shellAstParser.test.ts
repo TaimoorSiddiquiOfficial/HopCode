@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,7 +23,7 @@ afterAll(() => {
 });
 
 // =========================================================================
-// isShellCommandReadOnlyAST — mirror all tests from shellReadOnlyChecker.test.ts
+// isShellCommandReadOnlyAST � mirror all tests from shellReadOnlyChecker.test.ts
 // =========================================================================
 
 describe('isShellCommandReadOnlyAST', () => {
@@ -665,7 +665,7 @@ describe('consistency: isShellCommandReadOnly (regex) vs isShellCommandReadOnlyA
   ];
 
   for (const [cmd, expected, note] of sharedCases) {
-    it(`${note ? `[${note}] ` : ''}${JSON.stringify(cmd).slice(0, 60)} → ${expected}`, async () => {
+    it(`${note ? `[${note}] ` : ''}${JSON.stringify(cmd).slice(0, 60)} ? ${expected}`, async () => {
       const regexResult = isShellCommandReadOnly(cmd);
       const astResult = await isShellCommandReadOnlyAST(cmd);
 
@@ -682,8 +682,8 @@ describe('consistency: isShellCommandReadOnly (regex) vs isShellCommandReadOnlyA
 
   describe('known divergences (AST is more precise)', () => {
     it('[divergence] pure variable assignment: both return true', async () => {
-      // Regex: skipEnvironmentAssignments → no root command → true
-      // AST:   variable_assignment node → true
+      // Regex: skipEnvironmentAssignments ? no root command ? true
+      // AST:   variable_assignment node ? true
       expect(isShellCommandReadOnly('FOO=bar')).toBe(true);
       expect(await isShellCommandReadOnlyAST('FOO=bar')).toBe(true);
     });
@@ -697,8 +697,8 @@ describe('consistency: isShellCommandReadOnly (regex) vs isShellCommandReadOnlyA
     });
 
     it('[divergence] control flow: both return false', async () => {
-      // Regex: 'if' is not in READ_ONLY_ROOT_COMMANDS → false
-      // AST:   if_statement → conservatively false
+      // Regex: 'if' is not in READ_ONLY_ROOT_COMMANDS ? false
+      // AST:   if_statement ? conservatively false
       expect(isShellCommandReadOnly('if [ -f file ]; then cat file; fi')).toBe(
         false,
       );
@@ -708,8 +708,8 @@ describe('consistency: isShellCommandReadOnly (regex) vs isShellCommandReadOnlyA
     });
 
     it('[divergence] function definition: both return false', async () => {
-      // Regex: shell-quote parses 'foo()' as root → not in readonly → false
-      // AST:   function_definition → false
+      // Regex: shell-quote parses 'foo()' as root ? not in readonly ? false
+      // AST:   function_definition ? false
       expect(isShellCommandReadOnly('foo() { rm -rf /; }')).toBe(false);
       expect(await isShellCommandReadOnlyAST('foo() { rm -rf /; }')).toBe(
         false,

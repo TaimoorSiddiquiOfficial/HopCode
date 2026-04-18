@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -390,7 +390,7 @@ describe('InProcessBackend', () => {
     const exitCallback = vi.fn();
     backend.setOnAgentExit(exitCallback);
 
-    // spawnAgent should NOT throw â€” it catches the error internally
+    // spawnAgent should NOT throw — it catches the error internally
     await expect(
       backend.spawnAgent(createSpawnConfig('agent-fail')),
     ).resolves.toBeUndefined();
@@ -512,7 +512,7 @@ describe('InProcessBackend', () => {
         apiKey: 'bad-key',
       };
 
-      // Should not throw â€” falls back gracefully
+      // Should not throw — falls back gracefully
       await expect(backend.spawnAgent(config)).resolves.toBeUndefined();
 
       const MockAgentCore = AgentCore as unknown as ReturnType<typeof vi.fn>;

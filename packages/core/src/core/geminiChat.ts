@@ -37,7 +37,7 @@ import {
 } from '../telemetry/types.js';
 import type { UiTelemetryService } from '../telemetry/uiTelemetry.js';
 
-const debugLogger = createDebugLogger('QWEN_CODE_CHAT');
+const debugLogger = createDebugLogger('HOPCODE_CHAT');
 
 export enum StreamEventType {
   /** A regular content chunk from the API. */
@@ -363,7 +363,7 @@ export class GeminiChat {
         const hasUserMaxTokensOverride =
           (cgConfig?.samplingParams?.max_tokens !== undefined &&
             cgConfig?.samplingParams?.max_tokens !== null) ||
-          !!process.env['QWEN_CODE_MAX_OUTPUT_TOKENS'];
+          !!process.env['HOPCODE_MAX_OUTPUT_TOKENS'];
 
         let lastFinishReason: string | undefined;
 
@@ -467,7 +467,7 @@ export class GeminiChat {
               await delay(delayMs, params.config?.abortSignal).promise;
               continue;
             }
-            // Transient budget exhausted â€” stop immediately.
+            // Transient budget exhausted — stop immediately.
             if (isTransientStreamError) {
               break;
             }

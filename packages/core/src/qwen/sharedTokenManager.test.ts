@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  *
  */
@@ -176,7 +176,7 @@ describe('SharedTokenManager', () => {
     mockPath.dirname.mockImplementation((filePath) => {
       // Handle undefined/null input gracefully
       if (!filePath || typeof filePath !== 'string') {
-        return '/home/user/.qwen'; // Return the expected directory path
+        return '/home/user/.hopcode'; // Return the expected directory path
       }
       const parts = filePath.split('/');
       const result = parts.slice(0, -1).join('/');
@@ -595,7 +595,7 @@ describe('SharedTokenManager', () => {
       await expect(
         tokenManager.getValidCredentials(mockClient),
       ).rejects.toThrow(TokenManagerError);
-    }, 500); // 500ms timeout for lock test (3 attempts Ã— 50ms = ~150ms + buffer)
+    }, 500); // 500ms timeout for lock test (3 attempts × 50ms = ~150ms + buffer)
 
     it('should handle refresh response without access token', async () => {
       // Create a fresh token manager instance to avoid state contamination

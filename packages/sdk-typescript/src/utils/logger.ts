@@ -1,4 +1,4 @@
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+﻿export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface LoggerConfig {
   debug?: boolean;
@@ -38,12 +38,12 @@ export class SdkLogger {
       return 'debug';
     }
 
-    const envLevel = process.env['DEBUG_QWEN_CODE_SDK_LEVEL'];
+    const envLevel = process.env['DEBUG_HOPCODE_SDK_LEVEL'];
     if (envLevel && this.isValidLogLevel(envLevel)) {
       return envLevel as LogLevel;
     }
 
-    if (process.env['DEBUG_QWEN_CODE_SDK']) {
+    if (process.env['DEBUG_HOPCODE_SDK']) {
       return 'debug';
     }
 

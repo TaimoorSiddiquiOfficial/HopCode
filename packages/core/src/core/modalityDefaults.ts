@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,20 +20,20 @@ const FULL_MULTIMODAL: InputModalities = {
  */
 const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   // -------------------
-  // Google Gemini â€” full multimodal
+  // Google Gemini — full multimodal
   // -------------------
   [/^gemini-3/, FULL_MULTIMODAL],
   [/^gemini-/, FULL_MULTIMODAL],
 
   // -------------------
-  // OpenAI â€” image by default for all gpt/o-series models
+  // OpenAI — image by default for all gpt/o-series models
   // -------------------
   [/^gpt-5/, { image: true }],
   [/^gpt-/, { image: true }],
   [/^o\d/, { image: true }],
 
   // -------------------
-  // Anthropic Claude â€” image + pdf
+  // Anthropic Claude — image + pdf
   // -------------------
   [/^claude-/, { image: true, pdf: true }],
 
@@ -54,7 +54,7 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   [/^qwen/, {}],
 
   // -------------------
-  // DeepSeek â€” text-only
+  // DeepSeek — text-only
   // -------------------
   [/^deepseek/, {}],
 
@@ -66,7 +66,7 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   [/^glm-/, {}],
 
   // -------------------
-  // MiniMax â€” text-only
+  // MiniMax — text-only
   // -------------------
   [/^minimax-/, {}],
 

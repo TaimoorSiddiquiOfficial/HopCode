@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -47,7 +47,7 @@ export interface ResolvedCliGenerationConfig {
 
 export function getAuthTypeFromEnv(): AuthType | undefined {
   if (process.env['QWEN_OAUTH']) {
-    return AuthType.QWEN_OAUTH;
+    return AuthType.hopcode_OAUTH;
   }
 
   if (

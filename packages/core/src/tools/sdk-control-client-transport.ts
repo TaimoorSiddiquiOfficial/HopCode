@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,8 +10,8 @@
  * This transport enables CLI's MCP client to connect to SDK MCP servers
  * through the control plane. Messages are routed:
  *
- * CLI MCP Client → SdkControlClientTransport → sendMcpMessage() →
- * control_request (mcp_message) → SDK → control_response → onmessage → CLI
+ * CLI MCP Client ? SdkControlClientTransport ? sendMcpMessage() ?
+ * control_request (mcp_message) ? SDK ? control_response ? onmessage ? CLI
  *
  * Unlike StdioClientTransport which spawns a subprocess, this transport
  * communicates with SDK MCP servers running in the SDK process.

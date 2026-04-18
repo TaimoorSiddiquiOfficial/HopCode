@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Speculation Engine
@@ -9,10 +9,10 @@
  * using a forked GeminiChat with copy-on-write file isolation.
  *
  * Flow:
- * 1. Suggestion shown â†’ startSpeculation() fires
+ * 1. Suggestion shown ? startSpeculation() fires
  * 2. Speculative loop runs in background (read-only tools + overlay writes)
- * 3. User presses Tab/Enter â†’ acceptSpeculation() copies overlay to real FS
- * 4. User types â†’ abortSpeculation() cleans up
+ * 3. User presses Tab/Enter ? acceptSpeculation() copies overlay to real FS
+ * 4. User types ? abortSpeculation() cleans up
  */
 
 import type { Content, Part } from '@google/genai';
@@ -162,7 +162,7 @@ export async function startSpeculation(
                 state.pipelinedSuggestion = next;
               }
             } catch {
-              // Non-blocking â€” pipelined suggestion is optional
+              // Non-blocking — pipelined suggestion is optional
             }
           }
         }
@@ -231,7 +231,7 @@ async function runSpeculativeLoop(
       const response = event.value;
       const parts = response.candidates?.[0]?.content?.parts ?? [];
       for (const part of parts) {
-        // Skip thought/reasoning parts â€” only capture visible text + function calls
+        // Skip thought/reasoning parts — only capture visible text + function calls
         if (part.text && !(part as Record<string, unknown>)['thought']) {
           modelParts.push({ text: part.text });
         }
@@ -259,7 +259,7 @@ async function runSpeculativeLoop(
     );
 
     if (functionCalls.length === 0) {
-      // No tool calls â€” speculation complete (text-only response)
+      // No tool calls — speculation complete (text-only response)
       break;
     }
 
@@ -287,7 +287,7 @@ async function runSpeculativeLoop(
         try {
           await rewritePathArgs(args, state.overlayFs!);
         } catch {
-          // Path rewrite failed (e.g., absolute path outside cwd) â€” treat as boundary
+          // Path rewrite failed (e.g., absolute path outside cwd) — treat as boundary
           hitBoundary = true;
           break;
         }
@@ -338,7 +338,7 @@ async function runSpeculativeLoop(
       // Keep already-executed tool responses, strip unexecuted function calls
       // from model message, and add the partial responses we do have (#18)
       if (functionResponses.length > 0) {
-        // Some tools were executed before boundary â€” keep only the first N
+        // Some tools were executed before boundary — keep only the first N
         // functionCall parts (matching functionResponses.length) by order,
         // not by name, to handle duplicate tool names correctly.
         let keptFunctionCalls = 0;
@@ -361,7 +361,7 @@ async function runSpeculativeLoop(
           messages.pop();
         }
       } else {
-        // No tools were executed â€” remove the model message entirely
+        // No tools were executed — remove the model message entirely
         const textOnlyParts = modelParts.filter(
           (p) => p.functionCall === undefined,
         );

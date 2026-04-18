@@ -305,7 +305,7 @@ describe('TodoWriteTool', () => {
   });
 });
 
-describe('TodoWriteTool – runtime output directory', () => {
+describe('TodoWriteTool � runtime output directory', () => {
   let tool: TodoWriteTool;
   let mockAbortSignal: AbortSignal;
   let mockConfig: Config;
@@ -372,7 +372,7 @@ describe('TodoWriteTool – runtime output directory', () => {
     expect(writePath).toContain(path.join(envRuntimeDir, 'todos'));
   });
 
-  it('should use default ~/.qwen path when no custom dir is configured', async () => {
+  it('should use default ~/.hopcode path when no custom dir is configured', async () => {
     const params: TodoWriteParams = {
       todos: [{ id: '1', content: 'Task 1', status: 'pending' }],
     };
@@ -385,7 +385,7 @@ describe('TodoWriteTool – runtime output directory', () => {
     await invocation.execute(mockAbortSignal);
 
     const writePath = mockFs.writeFile.mock.calls[0]?.[0] as string;
-    expect(writePath).toContain(path.join('.qwen', 'todos'));
+    expect(writePath).toContain(path.join('.hopcode', 'todos'));
   });
 
   it('should check file existence in custom runtime dir for getDescription', () => {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -59,7 +59,7 @@ describe('ensureToolResultPairing', () => {
           { functionCall: { name: 'edit', args: {} } },
         ],
       },
-      // No functionResponse follows â€” boundary truncation
+      // No functionResponse follows — boundary truncation
     ];
     const result = ensureToolResultPairing(messages);
     expect(result).toHaveLength(2);

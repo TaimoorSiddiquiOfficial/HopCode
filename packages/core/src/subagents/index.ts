@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview Subagents â€” file-based configuration layer.
+ * @fileoverview Subagents — file-based configuration layer.
  *
  * This module provides the foundation for the subagents feature by implementing
  * a file-based configuration system that builds on the agent runtime.
