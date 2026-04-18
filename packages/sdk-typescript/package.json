@@ -1,5 +1,5 @@
-﻿{
-  "name": "@hopcode/sdk",
+{
+  "name": "@hoptrendy/sdk",
   "version": "0.1.6",
   "description": "TypeScript SDK for programmatic access to HopCode CLI",
   "main": "./dist/index.cjs",

@@ -1,5 +1,5 @@
-﻿{
-  "name": "@hopcode/webui",
+{
+  "name": "@hoptrendy/webui",
   "version": "0.14.5",
   "description": "Shared UI components for Qwen Code packages",
   "type": "module",

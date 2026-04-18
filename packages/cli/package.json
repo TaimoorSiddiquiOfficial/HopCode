@@ -1,5 +1,5 @@
-﻿{
-  "name": "@hopcode/hopcode-cli",
+{
+  "name": "@hoptrendy/hopcode-cli",
   "version": "0.14.5",
   "description": "HopCode CLI",
   "repository": {
@@ -40,12 +40,12 @@
     "@google/genai": "1.30.0",
     "@iarna/toml": "^2.2.5",
     "@modelcontextprotocol/sdk": "^1.25.1",
-    "@hopcode/channel-base": "file:../channels/base",
-    "@hopcode/channel-telegram": "file:../channels/telegram",
-    "@hopcode/channel-weixin": "file:../channels/weixin",
-    "@hopcode/channel-dingtalk": "file:../channels/dingtalk",
-    "@hopcode/qwen-code-core": "file:../core",
-    "@hopcode/web-templates": "file:../web-templates",
+    "@hoptrendy/channel-base": "file:../channels/base",
+    "@hoptrendy/channel-telegram": "file:../channels/telegram",
+    "@hoptrendy/channel-weixin": "file:../channels/weixin",
+    "@hoptrendy/channel-dingtalk": "file:../channels/dingtalk",
+    "@hoptrendy/qwen-code-core": "file:../core",
+    "@hoptrendy/web-templates": "file:../web-templates",
     "@types/update-notifier": "^6.0.8",
     "ansi-regex": "^6.2.2",
     "command-exists": "^1.2.9",

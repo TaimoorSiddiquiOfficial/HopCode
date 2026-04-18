@@ -1,5 +1,5 @@
-﻿{
-  "name": "@hopcode/channel-plugin-example",
+{
+  "name": "@hoptrendy/channel-plugin-example",
   "version": "0.14.5",
   "private": true,
   "type": "module",
@@ -24,7 +24,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@hopcode/channel-base": "file:../base",
+    "@hoptrendy/channel-base": "file:../base",
     "ws": "^8.18.0"
   },
   "devDependencies": {

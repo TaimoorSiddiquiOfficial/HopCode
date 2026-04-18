@@ -1,5 +1,5 @@
-﻿{
-  "name": "@hopcode/web-templates",
+{
+  "name": "@hoptrendy/web-templates",
   "version": "0.14.5",
   "description": "Web templates bundled as embeddable JS/CSS strings",
   "repository": {

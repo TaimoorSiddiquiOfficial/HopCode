@@ -1,5 +1,5 @@
 {
-  "name": "@hopcode/hopcode",
+  "name": "@hoptrendy/hopcode",
   "version": "0.14.5",
   "engines": {
     "node": ">=20.0.0"

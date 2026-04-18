@@ -1,5 +1,5 @@
-﻿{
-  "name": "@hopcode/cli-insight",
+{
+  "name": "@hoptrendy/cli-insight",
   "private": true,
   "type": "module",
   "scripts": {

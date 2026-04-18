@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@hopcode'
+          scope: '@hoptrendy'
 
       - name: 'Install Dependencies'
         run: npm ci --no-audit --progress=false
@@ -81,7 +81,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@hopcode'
+          scope: '@hoptrendy'
 
       - name: 'Install Dependencies'
         run: npm ci --no-audit --progress=false
