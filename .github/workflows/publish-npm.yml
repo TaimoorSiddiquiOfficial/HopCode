@@ -148,20 +148,100 @@ jobs:
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
 
+  publish-vscode-extension:
+    name: 'Publish VS Code Extension (Marketplace + Open VSX)'
+    runs-on: 'ubuntu-latest'
+    needs: 'prepare'
+    if: >-
+      !cancelled() &&
+      needs.prepare.result == 'success' &&
+      (github.event.inputs.packages == 'all' ||
+       contains(github.event.inputs.packages, 'vscode-ide-companion'))
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4'
+        with:
+          ref: '${{ github.event.inputs.ref || github.sha }}'
+
+      - name: 'Setup'
+        uses: './.github/actions/npm-setup'
+
+      - name: 'Generate git commit info'
+        shell: bash
+        run: node scripts/generate-git-commit-info.js || true
+
+      - name: 'Package VS Code Extension (VSIX)'
+        working-directory: packages/vscode-ide-companion
+        shell: bash
+        run: npm run package
+
+      - name: 'Publish to VS Code Marketplace'
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        working-directory: packages/vscode-ide-companion
+        shell: bash
+        run: |
+          output=$(npx @vscode/vsce publish --packagePath *.vsix --no-verify 2>&1)
+          echo "$output"
+          if echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST)"; then
+            version=$(node -p "require('./package.json').version")
+            echo "⏭️ VS Code Marketplace: v${version} already published, skipping"
+          elif echo "$output" | grep -qi "error"; then
+            echo "$output" >&2; exit 1
+          fi
+        env:
+          VSCE_PAT: '${{ secrets.VSCE_PAT }}'
+
+      - name: 'Publish to Open VSX Registry'
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        working-directory: packages/vscode-ide-companion
+        shell: bash
+        run: |
+          output=$(npx ovsx publish *.vsix -p "$OVSX_TOKEN" 2>&1) && echo "$output" || {
+            if echo "$output" | grep -qiE "(already published|already exists|version already)"; then
+              version=$(node -p "require('./package.json').version")
+              echo "⏭️ Open VSX: v${version} already published, skipping"
+            else
+              echo "$output" >&2; exit 1
+            fi
+          }
+        env:
+          OVSX_TOKEN: '${{ secrets.OVSX_TOKEN }}'
+
+      - name: 'DRY RUN: Show packaged VSIX'
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        working-directory: packages/vscode-ide-companion
+        shell: bash
+        run: |
+          ls -lh *.vsix || echo "No VSIX found"
+          echo "DRY RUN: Extension packaged but not published"
+
   notify:
     name: 'Notify Result'
     runs-on: 'ubuntu-latest'
-    needs: ['prepare', 'publish-packages']
+    needs: ['prepare', 'publish-packages', 'publish-vscode-extension']
     if: always()
     steps:
       - name: 'Publish Result'
         shell: bash
         run: |
-          if [[ "${{ needs.publish-packages.result }}" == "success" ]]; then
-            echo "✅ All packages published successfully!"
-          elif [[ "${{ needs.publish-packages.result }}" == "skipped" ]]; then
-            echo "⏭️ Publish skipped (dry run)"
+          npm_result="${{ needs.publish-packages.result }}"
+          vsix_result="${{ needs.publish-vscode-extension.result }}"
+          failed=0
+
+          if [[ "$npm_result" == "failure" ]]; then
+            echo "❌ NPM package publishing failed"; failed=1
+          elif [[ "$npm_result" == "success" ]]; then
+            echo "✅ NPM packages published successfully"
           else
-            echo "❌ Package publishing failed"
-            exit 1
+            echo "⏭️ NPM publish: ${npm_result}"
           fi
+
+          if [[ "$vsix_result" == "failure" ]]; then
+            echo "❌ VS Code Extension publishing failed"; failed=1
+          elif [[ "$vsix_result" == "success" ]]; then
+            echo "✅ VS Code Extension published successfully"
+          else
+            echo "⏭️ VS Code Extension: ${vsix_result}"
+          fi
+
+          exit $failed
