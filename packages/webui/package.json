@@ -76,5 +76,10 @@
     "shared"
   ],
   "author": "Qwen Team",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "directory": "packages/webui"
+  }
 }

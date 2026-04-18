@@ -92,6 +92,10 @@ esbuild
         __dirname,
         'packages/cli/src/patches/is-in-ci.ts',
       ),
+      '@qwen-code/qwen-code-core': path.resolve(
+        __dirname,
+        'packages/core/src/index.ts',
+      ),
       '@qwen-code/web-templates': path.resolve(
         __dirname,
         'packages/web-templates/src/index.ts',

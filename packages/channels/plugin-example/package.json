@@ -29,5 +29,10 @@
   },
   "devDependencies": {
     "@types/ws": "^8.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "directory": "packages/channels/plugin-example"
   }
 }
