@@ -35,9 +35,9 @@ import type { CommandModule } from 'yargs';
 import { loadSettings } from '../config/settings.js';
 import {
   PROVIDER_REGISTRY,
-  handleApiKeyAuth,
   detectActiveProvider,
-} from './auth/providers.js';
+} from './auth/registry.js';
+import { handleApiKeyAuth } from './auth/providers.js';
 import { isCodingPlanConfig } from '../constants/codingPlan.js';
 import { InteractiveSelector } from './auth/interactiveSelector.js';
 import { writeStdoutLine } from '../utils/stdioHelpers.js';

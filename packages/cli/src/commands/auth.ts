@@ -10,7 +10,8 @@ import {
   runInteractiveAuth,
   showAuthStatus,
 } from './auth/handler.js';
-import { PROVIDER_REGISTRY, handleApiKeyAuth } from './auth/providers.js';
+import { PROVIDER_REGISTRY } from './auth/registry.js';
+import { handleApiKeyAuth } from './auth/providers.js';
 import { t } from '../i18n/index.js';
 
 // Define subcommands separately

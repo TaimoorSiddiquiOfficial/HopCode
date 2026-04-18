@@ -27,9 +27,9 @@ import type { CliArgs } from '../../config/config.js';
 import { InteractiveSelector } from './interactiveSelector.js';
 import {
   PROVIDER_REGISTRY,
-  handleApiKeyAuth,
   detectActiveProvider,
-} from './providers.js';
+} from './registry.js';
+import { handleApiKeyAuth } from './providers.js';
 
 interface QwenAuthOptions {
   region?: string;

@@ -24,7 +24,7 @@ import { UIStateContext, type UIState } from '../contexts/UIStateContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import { t } from '../../i18n/index.js';
-import { PROVIDER_REGISTRY } from '../../commands/auth/providers.js';
+import { PROVIDER_REGISTRY } from '../../commands/auth/registry.js';
 import { getCatalog } from '../../commands/model/catalog.js';
 
 function formatModalities(modalities?: InputModalities): string {

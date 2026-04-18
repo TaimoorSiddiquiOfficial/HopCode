@@ -24,7 +24,7 @@
 
 import type { CommandModule, Argv } from 'yargs';
 import { loadSettings, SettingScope } from '../../config/settings.js';
-import { detectActiveProvider } from '../auth/providers.js';
+import { detectActiveProvider } from '../auth/registry.js';
 import { isCodingPlanConfig } from '../../constants/codingPlan.js';
 import { getCatalog } from './catalog.js';
 import { fetchOllamaModels } from './ollama.js';
