@@ -109,6 +109,7 @@ jobs:
     if: always()
     steps:
       - name: 'Publish Result'
+        shell: bash
         run: |
           if [[ "${{ needs.publish-packages.result }}" == "success" ]]; then
             echo "✅ All packages published successfully!"
