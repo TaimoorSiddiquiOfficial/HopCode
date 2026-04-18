@@ -93,7 +93,7 @@ export function QwenOAuthProgress({
         width="100%"
       >
         <Text bold color={theme.status.error}>
-          {t('Qwen OAuth Authentication Timeout')}
+          {t('HopCode OAuth Authentication Timeout')}
         </Text>
 
         <Box marginTop={1}>
@@ -127,7 +127,7 @@ export function QwenOAuthProgress({
         width="100%"
       >
         <Text bold color={theme.status.error}>
-          {t('Qwen OAuth Authentication Error')}
+          {t('HopCode OAuth Authentication Error')}
         </Text>
 
         <Box marginTop={1}>
@@ -156,10 +156,10 @@ export function QwenOAuthProgress({
         padding={1}
         width="100%"
       >
-        <Text bold>{t('Qwen OAuth Authentication')}</Text>
+        <Text bold>{t('HopCode OAuth Authentication')}</Text>
 
         <Box marginTop={1} flexDirection="column">
-          <Text>{t('Waiting for Qwen OAuth authentication...')}</Text>
+          <Text>{t('Waiting for HopCode OAuth authentication...')}</Text>
           <Text>
             {t('Time remaining:')} {formatTime(timeRemaining)}
           </Text>
@@ -180,7 +180,7 @@ export function QwenOAuthProgress({
       padding={1}
       width="100%"
     >
-      <Text bold>{t('Qwen OAuth Authentication')}</Text>
+      <Text bold>{t('HopCode OAuth Authentication')}</Text>
 
       <Box marginTop={1}>
         <Text>{t('Please visit this URL to authorize:')}</Text>

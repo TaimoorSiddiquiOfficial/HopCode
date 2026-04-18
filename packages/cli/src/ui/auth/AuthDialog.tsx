@@ -28,7 +28,7 @@ import {
 } from '../../constants/alibabaStandardApiKey.js';
 
 const MODEL_PROVIDERS_DOCUMENTATION_URL =
-  'https://qwenlm.github.io/qwen-code-docs/en/users/configuration/model-providers/';
+  'https://github.com/TaimoorSiddiquiOfficial/HopCode';
 
 function parseDefaultAuthType(
   defaultAuthType: string | undefined,
@@ -43,7 +43,7 @@ function parseDefaultAuthType(
 }
 
 // Main menu option type
-type MainOption = typeof AuthType.QWEN_OAUTH | 'CODING_PLAN' | 'API_KEY';
+type MainOption = 'API_KEY';
 type ApiKeyOption = 'ALIBABA_STANDARD_API_KEY' | 'CUSTOM_API_KEY';
 
 // View level for navigation
@@ -100,30 +100,14 @@ export function AuthDialog(): React.JSX.Element {
   const [alibabaStandardModelIdError, setAlibabaStandardModelIdError] =
     useState<string | null>(null);
 
-  // Main authentication entries (flat three-option layout)
+  // Main authentication entries
   const mainItems = [
-    {
-      key: 'CODING_PLAN',
-      title: t('Alibaba Cloud Coding Plan'),
-      label: t('Alibaba Cloud Coding Plan'),
-      description: t(
-        'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models',
-      ),
-      value: 'CODING_PLAN' as MainOption,
-    },
     {
       key: 'API_KEY',
       title: t('API Key'),
       label: t('API Key'),
       description: t('Bring your own API key'),
       value: 'API_KEY' as MainOption,
-    },
-    {
-      key: AuthType.QWEN_OAUTH,
-      title: t('Qwen OAuth'),
-      label: t('Qwen OAuth'),
-      description: t('Discontinued — switch to Coding Plan or API Key'),
-      value: AuthType.QWEN_OAUTH as MainOption,
     },
   ];
 
@@ -212,19 +196,10 @@ export function AuthDialog(): React.JSX.Element {
 
   const apiKeyTypeItems = [
     {
-      key: 'ALIBABA_STANDARD_API_KEY',
-      title: t('Alibaba Cloud ModelStudio Standard API Key'),
-      label: t('Alibaba Cloud ModelStudio Standard API Key'),
-      description: t('Quick setup for Model Studio (China/International)'),
-      value: 'ALIBABA_STANDARD_API_KEY' as ApiKeyOption,
-    },
-    {
       key: 'CUSTOM_API_KEY',
-      title: t('Custom API Key'),
-      label: t('Custom API Key'),
-      description: t(
-        'For other OpenAI / Anthropic / Gemini-compatible providers',
-      ),
+      title: t('API Key'),
+      label: t('API Key'),
+      description: t('For OpenAI / Anthropic / Gemini-compatible providers'),
       value: 'CUSTOM_API_KEY' as ApiKeyOption,
     },
   ];
@@ -261,16 +236,16 @@ export function AuthDialog(): React.JSX.Element {
         return item.value === authTypeToMainOption(currentAuthType);
       }
 
-      // Priority 3: QWEN_DEFAULT_AUTH_TYPE env var
+      // Priority 3: HOPCODE_DEFAULT_AUTH_TYPE env var
       const defaultAuthType = parseDefaultAuthType(
-        process.env['QWEN_DEFAULT_AUTH_TYPE'],
+        process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ?? process.env['QWEN_DEFAULT_AUTH_TYPE'],
       );
       if (defaultAuthType) {
         return item.value === authTypeToMainOption(defaultAuthType);
       }
 
-      // Priority 4: default to QWEN_OAUTH
-      return item.value === AuthType.QWEN_OAUTH;
+      // Priority 4: default to API_KEY
+      return item.value === 'API_KEY';
     }),
   );
 
@@ -278,24 +253,8 @@ export function AuthDialog(): React.JSX.Element {
     setErrorMessage(null);
     onAuthError(null);
 
-    if (value === 'CODING_PLAN') {
-      // Navigate to region selection
-      setViewLevel('region-select');
-      return;
-    }
-
     if (value === 'API_KEY') {
       setViewLevel('api-key-type-select');
-      return;
-    }
-
-    // Qwen OAuth free tier discontinued — show warning instead of proceeding
-    if (value === AuthType.QWEN_OAUTH) {
-      setErrorMessage(
-        t(
-          'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
-        ),
-      );
       return;
     }
 
@@ -714,16 +673,16 @@ export function AuthDialog(): React.JSX.Element {
           </Box>
           <Box>
             <Text color={theme.text.primary}>
-              {t('Terms of Services and Privacy Notice')}:
+              {t('HopCode — AI-powered coding assistant')}
             </Text>
           </Box>
           <Box>
             <Link
-              url="https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/"
+              url="https://github.com/TaimoorSiddiquiOfficial/HopCode"
               fallback={false}
             >
               <Text color={theme.text.secondary} underline>
-                https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/
+                https://github.com/TaimoorSiddiquiOfficial/HopCode
               </Text>
             </Link>
           </Box>

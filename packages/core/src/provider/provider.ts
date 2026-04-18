@@ -45,6 +45,10 @@ import { createGateway } from '@ai-sdk/gateway';
 import { createTogetherAI } from '@ai-sdk/togetherai';
 import { createPerplexity } from '@ai-sdk/perplexity';
 import { createVercel } from '@ai-sdk/vercel';
+import { createDeepSeek } from '@ai-sdk/deepseek';
+import { createFireworks } from '@ai-sdk/fireworks';
+import { createReplicate } from '@ai-sdk/replicate';
+import { createHuggingFace } from '@ai-sdk/huggingface';
 import {
   createGitLab,
   VERSION as GITLAB_PROVIDER_VERSION,
@@ -126,6 +130,10 @@ export namespace Provider {
     '@ai-sdk/togetherai': createTogetherAI,
     '@ai-sdk/perplexity': createPerplexity,
     '@ai-sdk/vercel': createVercel,
+    '@ai-sdk/deepseek': createDeepSeek,
+    '@ai-sdk/fireworks': createFireworks,
+    '@ai-sdk/replicate': createReplicate,
+    '@ai-sdk/huggingface': createHuggingFace,
     '@gitlab/gitlab-ai-provider': createGitLab,
     // @ts-ignore (TODO: kill this code so we dont have to maintain it)
     '@ai-sdk/github-copilot': createGitHubCopilotOpenAICompatible,
@@ -453,8 +461,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            'HTTP-Referer': 'https://opencode.ai/',
-            'X-Title': 'opencode',
+            'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+            'X-Title': 'hopcode',
           },
         },
       };
@@ -464,8 +472,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            'http-referer': 'https://opencode.ai/',
-            'x-title': 'opencode',
+            'http-referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+            'x-title': 'hopcode',
           },
         },
       };
@@ -559,8 +567,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            'HTTP-Referer': 'https://opencode.ai/',
-            'X-Title': 'opencode',
+            'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+            'X-Title': 'hopcode',
           },
         },
       };
@@ -580,7 +588,7 @@ export namespace Provider {
       const providerConfig = config.provider?.['gitlab'];
 
       const aiGatewayHeaders = {
-        'User-Agent': `opencode/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
+        'User-Agent': `hopcode/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
         ...(providerConfig?.options?.aiGatewayHeaders || {}),
       };
 
@@ -650,7 +658,7 @@ export namespace Provider {
       if (!apiToken) {
         throw new Error(
           'CLOUDFLARE_API_TOKEN (or CF_AIG_TOKEN) is required for Cloudflare AI Gateway. ' +
-            'Set it via environment variable or run `opencode auth cloudflare-ai-gateway`.',
+            'Set it via environment variable or run `hopcode auth cloudflare-ai-gateway`.',
         );
       }
 
@@ -685,7 +693,7 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            'X-Cerebras-3rd-Party-Integration': 'opencode',
+            'X-Cerebras-3rd-Party-Integration': 'hopcode',
           },
         },
       };
@@ -695,8 +703,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            'HTTP-Referer': 'https://opencode.ai/',
-            'X-Title': 'opencode',
+            'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+            'X-Title': 'hopcode',
           },
         },
       };

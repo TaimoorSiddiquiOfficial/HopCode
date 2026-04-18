@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode-core",
-  "version": "0.14.7",
+  "version": "0.14.8",
   "description": "HopCode Core",
   "repository": {
     "type": "git",
@@ -95,6 +95,10 @@
     "uuid": "^9.0.1",
     "web-tree-sitter": "^0.24.7",
     "ws": "^8.18.0",
+    "@ai-sdk/deepseek": "2.0.29",
+    "@ai-sdk/fireworks": "2.0.46",
+    "@ai-sdk/replicate": "2.0.29",
+    "@ai-sdk/huggingface": "1.0.43",
     "@aws-sdk/credential-providers": "^3.0.0",
     "fuzzysort": "^3.1.0",
     "remeda": "^2.33.7",

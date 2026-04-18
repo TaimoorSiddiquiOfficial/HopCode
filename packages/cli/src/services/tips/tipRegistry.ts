@@ -80,7 +80,7 @@ export const tipRegistry: ContextualTip[] = [
   },
   {
     id: 'new-user-qwenmd',
-    content: 'Add a QWEN.md file to give Qwen Code persistent project context.',
+    content: 'Add a HOPCODE.md file to give HopCode persistent project context.',
     trigger: 'startup',
     isRelevant: (ctx) => ctx.sessionCount < 10,
     cooldownPrompts: 0,
@@ -89,7 +89,7 @@ export const tipRegistry: ContextualTip[] = [
   {
     id: 'new-user-resume',
     content:
-      'You can resume a previous conversation by running qwen --continue or qwen --resume.',
+      'You can resume a previous conversation by running hopcode --continue or hopcode --resume.',
     trigger: 'startup',
     isRelevant: (ctx) => ctx.sessionCount < 10,
     cooldownPrompts: 0,
