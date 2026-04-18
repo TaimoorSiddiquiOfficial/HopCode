@@ -61,7 +61,7 @@ export const getLatestGitHubRelease = async (
   try {
     const controller = new AbortController();
 
-    const endpoint = `https://api.github.com/repos/QwenLM/qwen-code-action/releases/latest`;
+    const endpoint = `https://api.github.com/repos/TaimoorSiddiquiOfficial/HopCode/releases/latest`;
 
     const response = await fetch(endpoint, {
       method: 'GET',
@@ -75,24 +75,21 @@ export const getLatestGitHubRelease = async (
     } as RequestInit);
 
     if (!response.ok) {
-      throw new Error(
-        `Invalid response code: ${response.status} - ${response.statusText}`,
-      );
+      // No releases yet — fall back to main branch
+      return 'main';
     }
 
     const releaseTag = (await response.json()).tag_name;
     if (!releaseTag) {
-      throw new Error(`Response did not include tag_name field`);
+      return 'main';
     }
     return releaseTag;
   } catch (_error) {
     debugLogger.debug(
-      `Failed to determine latest qwen-code-action release:`,
+      `Failed to determine latest HopCode release, falling back to main:`,
       _error,
     );
-    throw new Error(
-      `Unable to determine the latest qwen-code-action release on GitHub.`,
-    );
+    return 'main';
   }
 };
 
