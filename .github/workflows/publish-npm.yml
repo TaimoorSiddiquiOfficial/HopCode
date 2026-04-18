@@ -78,6 +78,10 @@ jobs:
       - name: 'Setup'
         uses: './.github/actions/npm-setup'
 
+      - name: 'Generate build artifacts'
+        shell: bash
+        run: node scripts/generate-git-commit-info.js || true
+
       - name: 'Build Package'
         working-directory: '${{ matrix.package.path }}'
         shell: bash
