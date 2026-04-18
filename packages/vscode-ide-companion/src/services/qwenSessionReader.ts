@@ -41,7 +41,7 @@ export interface QwenSession {
 }
 
 export class QwenSessionReader {
-  private qwenDir: string;
+  private hopcodeDir: string;
 
   constructor() {
     this.hopcodeDir = path.join(os.homedir(), '.hopcode');
