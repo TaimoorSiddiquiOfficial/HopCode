@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
@@ -71,7 +71,7 @@ import { pathToFileURL } from 'node:url';
 const coreSourceUrl = '${coreSourceUrl}';
 
 export function resolve(specifier, context, nextResolve) {
-  if (specifier === '@qwen-code/qwen-code-core') {
+  if (specifier === '@hoptrendy/hopcode-core') {
     return {
       shortCircuit: true,
       url: coreSourceUrl,
