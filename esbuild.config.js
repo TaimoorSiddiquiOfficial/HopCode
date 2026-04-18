@@ -100,6 +100,31 @@ esbuild
         __dirname,
         'packages/web-templates/src/index.ts',
       ),
+      // Sub-path exports must come before their parent alias
+      '@qwen-code/channel-weixin/accounts': path.resolve(
+        __dirname,
+        'packages/channels/weixin/src/accounts.ts',
+      ),
+      '@qwen-code/channel-weixin/login': path.resolve(
+        __dirname,
+        'packages/channels/weixin/src/login.ts',
+      ),
+      '@qwen-code/channel-base': path.resolve(
+        __dirname,
+        'packages/channels/base/src/index.ts',
+      ),
+      '@qwen-code/channel-telegram': path.resolve(
+        __dirname,
+        'packages/channels/telegram/src/index.ts',
+      ),
+      '@qwen-code/channel-weixin': path.resolve(
+        __dirname,
+        'packages/channels/weixin/src/index.ts',
+      ),
+      '@qwen-code/channel-dingtalk': path.resolve(
+        __dirname,
+        'packages/channels/dingtalk/src/index.ts',
+      ),
       // Resolve to userland punycode instead of deprecated node:punycode built-in
       punycode: require.resolve('punycode/'),
     },

@@ -91,7 +91,15 @@ jobs:
             echo "DRY RUN: Would publish ${{ matrix.package.name }}"
             npm publish --access public --dry-run
           else
-            npm publish --access public --provenance
+            output=$(npm publish --access public --provenance 2>&1) && echo "$output" || {
+              if echo "$output" | grep -q "You cannot publish over the previously published versions"; then
+                version=$(node -p "require('./package.json').version")
+                echo "⏭️ ${{ matrix.package.name }}@${version} already published, skipping"
+              else
+                echo "$output" >&2
+                exit 1
+              fi
+            }
           fi
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
