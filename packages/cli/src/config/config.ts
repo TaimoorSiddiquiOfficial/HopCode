@@ -35,6 +35,9 @@ import { hooksCommand } from '../commands/hooks.js';
 import type { Settings } from './settings.js';
 import { loadSettings, SettingScope } from './settings.js';
 import { authCommand } from '../commands/auth.js';
+import { githubCommand } from '../commands/github/index.js';
+import { modelCommand } from '../commands/model/index.js';
+import { providerCommand } from '../commands/provider.js';
 import {
   resolveCliGenerationConfig,
   getAuthTypeFromEnv,
@@ -610,7 +613,13 @@ export async function parseArguments(): Promise<CliArgs> {
     // Register Hooks subcommands
     .command(hooksCommand)
     // Register Channel subcommands
-    .command(channelCommand);
+    .command(channelCommand)
+    // Register GitHub integration commands
+    .command(githubCommand)
+    // Register model selector command
+    .command(modelCommand)
+    // Register provider manager command
+    .command(providerCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json

@@ -1,0 +1,278 @@
+/**
+ * @license
+ * Copyright 2026 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
+ * `hopcode model` command
+ *
+ * Shows all accessible models for the currently-configured provider,
+ * grouped by category. Interactive arrow-key selection switches the active model.
+ *
+ * UX flow:
+ *   $ hopcode model
+ *   Active provider: DeepSeek
+ *   Current model:   deepseek/deepseek-chat
+ *
+ *   Select a model:
+ *   ── Chat ───────────────────────────────────
+ * > deepseek/deepseek-chat          · Best for general use
+ *   ...
+ *   (↑↓ navigate, Enter select, Esc cancel)
+ */
+
+import type { CommandModule, Argv } from 'yargs';
+import { loadSettings, SettingScope } from '../../config/settings.js';
+import { detectActiveProvider } from '../auth/providers.js';
+import { isCodingPlanConfig } from '../../constants/codingPlan.js';
+import { getCatalog } from './catalog.js';
+import { fetchOllamaModels } from './ollama.js';
+import { InteractiveSelector } from '../auth/interactiveSelector.js';
+import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
+import { t } from '../../i18n/index.js';
+import type { ModelCategory } from './catalog.js';
+
+// ── Types ───────────────────────────────────────────────────────────────────
+
+interface ModelCommandArgs {
+  list?: boolean;
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Determine the label + settings key for the active provider. */
+function resolveActiveProviderInfo(settings: ReturnType<typeof loadSettings>): {
+  providerId: string;
+  providerLabel: string;
+  currentModel: string;
+  authTypeKey: 'openai' | 'anthropic' | 'gemini';
+  baseUrl?: string;
+} | null {
+  const allSettings = settings.merged;
+  const authType = allSettings?.security?.auth?.selectedType as
+    | string
+    | undefined;
+  if (!authType) return null;
+
+  const modelName = (allSettings?.model?.name as string | undefined) ?? '';
+
+  // Check Coding Plan
+  const openaiProviders =
+    (allSettings?.modelProviders?.openai as
+      | Array<{ envKey?: string; baseUrl?: string; id?: string }>
+      | undefined) ?? [];
+  const first = openaiProviders[0];
+  if (first && isCodingPlanConfig(first.baseUrl, first.envKey)) {
+    return {
+      providerId: 'coding-plan',
+      providerLabel: 'Alibaba Cloud Coding Plan',
+      currentModel: modelName,
+      authTypeKey: 'openai',
+      baseUrl: first.baseUrl,
+    };
+  }
+
+  // Check registry providers
+  const regProvider = detectActiveProvider(
+    allSettings as Parameters<typeof detectActiveProvider>[0],
+  );
+  if (regProvider) {
+    const atKey =
+      regProvider.authType === 'anthropic'
+        ? ('anthropic' as const)
+        : regProvider.authType === 'gemini'
+          ? ('gemini' as const)
+          : ('openai' as const);
+    return {
+      providerId: regProvider.id,
+      providerLabel: regProvider.label,
+      currentModel: modelName,
+      authTypeKey: atKey,
+      baseUrl: regProvider.baseUrl,
+    };
+  }
+
+  // Gemini fallback
+  if (authType === 'gemini') {
+    return {
+      providerId: 'gemini',
+      providerLabel: 'Google Gemini',
+      currentModel: modelName,
+      authTypeKey: 'gemini',
+    };
+  }
+
+  return null;
+}
+
+/** Flatten categories into a flat selector option list. */
+function flattenToOptions(
+  categories: ModelCategory[],
+): Array<{ value: string; label: string; description: string }> {
+  return categories.flatMap((cat) =>
+    cat.models.map((m) => ({
+      value: m.id,
+      label: m.label,
+      description: [m.description, m.context ? `ctx ${m.context}` : '']
+        .filter(Boolean)
+        .join(' · '),
+    })),
+  );
+}
+
+/** Pretty-print model categories to stdout (--list mode). */
+function printCategories(
+  categories: ModelCategory[],
+  currentModel: string,
+): void {
+  for (const cat of categories) {
+    writeStdoutLine(
+      `\n  ── ${cat.name} ${'─'.repeat(Math.max(0, 40 - cat.name.length))}`,
+    );
+    for (const m of cat.models) {
+      const active = m.id === currentModel ? ' ← current' : '';
+      const desc = m.description ? `  · ${m.description}` : '';
+      const ctx = m.context ? ` [${m.context}]` : '';
+      writeStdoutLine(`  ${m.id}${ctx}${desc}${active}`);
+    }
+  }
+  writeStdoutLine('');
+}
+
+// ── Handler ─────────────────────────────────────────────────────────────────
+
+async function handleModelCommand(argv: ModelCommandArgs): Promise<void> {
+  const settings = loadSettings();
+  const info = resolveActiveProviderInfo(settings);
+
+  if (!info) {
+    writeStderrLine(t('No provider configured. Run: hopcode auth'));
+    process.exit(1);
+  }
+
+  writeStdoutLine(
+    t('\n  Active provider: {{label}}', { label: info.providerLabel }),
+  );
+  writeStdoutLine(
+    t('  Current model:   {{model}}\n', {
+      model: info.currentModel || '(none)',
+    }),
+  );
+
+  // Get model categories (live for Ollama, static otherwise)
+  let categories: ModelCategory[] | null = null;
+
+  if (
+    info.providerId === 'ollama-local' ||
+    info.providerId === 'ollama-cloud'
+  ) {
+    const baseUrl =
+      info.baseUrl ??
+      (info.providerId === 'ollama-local'
+        ? 'http://localhost:11434/v1'
+        : 'https://ollama.com/v1');
+    process.stdout.write(t('  Fetching available models...'));
+    categories = await fetchOllamaModels(baseUrl);
+    if (categories) {
+      process.stdout.write(' ✓\n');
+    } else {
+      process.stdout.write(t(' (Ollama unreachable, showing suggestions)\n'));
+    }
+  }
+
+  // Fall back to static catalog
+  if (!categories) {
+    const catalog = getCatalog(info.providerId);
+    if (!catalog) {
+      writeStderrLine(
+        t('No model catalog available for provider: {{id}}', {
+          id: info.providerId,
+        }),
+      );
+      process.exit(1);
+    }
+    categories = catalog.categories;
+  }
+
+  // --list flag: just print and exit
+  if ((argv as ModelCommandArgs).list) {
+    printCategories(categories, info.currentModel);
+    return;
+  }
+
+  // Interactive selection
+  const options = flattenToOptions(categories);
+  if (!options.length) {
+    writeStderrLine(
+      t('No models found for provider: {{id}}', { id: info.providerId }),
+    );
+    process.exit(1);
+  }
+
+  const selector = new InteractiveSelector(
+    options,
+    t('Select a model (↑↓ navigate, Enter select, Esc cancel):'),
+  );
+
+  const chosen = await selector.select();
+  if (chosen === undefined || chosen === null) {
+    writeStdoutLine(t('Cancelled.'));
+    return;
+  }
+
+  // Persist model choice
+  const scope = SettingScope.User;
+
+  settings.setValue(scope, 'model.name', chosen);
+
+  // Also update the modelProviders entry so the active provider's id matches
+  const providerKey = info.authTypeKey;
+  const existingProviders =
+    (settings.merged?.modelProviders?.[providerKey] as
+      | Array<Record<string, unknown>>
+      | undefined) ?? [];
+  if (existingProviders.length > 0) {
+    existingProviders[0]['id'] = chosen;
+    settings.setValue(
+      scope,
+      `modelProviders.${providerKey}`,
+      existingProviders,
+    );
+  }
+
+  writeStdoutLine(t('\n  ✓ Model switched to: {{model}}\n', { model: chosen }));
+  writeStdoutLine(
+    t(
+      '  Restart HopCode for the model change to take effect in a running session.\n',
+    ),
+  );
+}
+
+// ── Command definition ───────────────────────────────────────────────────────
+
+export const modelCommand: CommandModule<
+  Record<string, unknown>,
+  ModelCommandArgs
+> = {
+  command: 'model',
+  describe: t('Select or list available models for the active provider'),
+  builder: (yargs: Argv) =>
+    yargs.option('list', {
+      alias: 'l',
+      type: 'boolean',
+      description: t('Print all models without interactive selection'),
+      default: false,
+    }) as Argv<ModelCommandArgs>,
+  handler: async (argv: ModelCommandArgs) => {
+    try {
+      await handleModelCommand(argv);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === 'Interrupted')
+        process.exit(0);
+      const msg = err instanceof Error ? err.message : String(err);
+      writeStderrLine(`Error: ${msg}`);
+      process.exit(1);
+    }
+  },
+};

@@ -24,14 +24,14 @@
 import {
   AuthType,
   getErrorMessage,
-  type Config,
   type ProviderModelConfig as ModelConfig,
 } from '@hoptrendy/hopcode-core';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
+import { promptForSecretInput } from '../../utils/promptUtils.js';
 import { t } from '../../i18n/index.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import { backupSettingsFile } from '../../utils/settingsUtils.js';
-import { loadSettings, type LoadedSettings } from '../../config/settings.js';
+import { loadSettings } from '../../config/settings.js';
 import { loadCliConfig } from '../../config/config.js';
 import type { CliArgs } from '../../config/config.js';
 import { isCodingPlanConfig } from '../../constants/codingPlan.js';
@@ -148,8 +148,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     envKey: 'FIREWORKS_API_KEY',
     baseUrl: 'https://api.fireworks.ai/openai/v1',
     authType: AuthType.USE_OPENAI,
-    defaultModel:
-      'fireworks/accounts/fireworks/models/llama-v3p1-70b-instruct',
+    defaultModel: 'fireworks/accounts/fireworks/models/llama-v3p1-70b-instruct',
     requiresApiKey: true,
   },
   {
@@ -205,7 +204,8 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
   {
     id: 'ollama-local',
     label: 'Ollama (Local)',
-    description: 'Local models via Ollama at localhost:11434 · No API key needed',
+    description:
+      'Local models via Ollama at localhost:11434 · No API key needed',
     envKey: 'OLLAMA_API_KEY',
     baseUrl: 'http://localhost:11434/v1',
     authType: AuthType.USE_OPENAI,
@@ -215,7 +215,8 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
   {
     id: 'ollama-cloud',
     label: 'Ollama Cloud',
-    description: 'DeepSeek-V3, Kimi K2, GPT-OSS cloud models · Requires OLLAMA_API_KEY',
+    description:
+      'DeepSeek-V3, Kimi K2, GPT-OSS cloud models · Requires OLLAMA_API_KEY',
     envKey: 'OLLAMA_API_KEY',
     baseUrl: 'https://ollama.com/v1',
     authType: AuthType.USE_OPENAI,
@@ -238,7 +239,8 @@ export function getProvider(id: string): ProviderConfig | undefined {
 export function detectActiveProvider(
   modelProvidersEntry: ModelConfig[] | undefined,
 ): ProviderConfig | undefined {
-  if (!modelProvidersEntry || modelProvidersEntry.length === 0) return undefined;
+  if (!modelProvidersEntry || modelProvidersEntry.length === 0)
+    return undefined;
   const first = modelProvidersEntry[0];
   if (!first) return undefined;
   // Skip Coding Plan configs
@@ -251,56 +253,14 @@ export function detectActiveProvider(
 
 /**
  * Prompts the user for an API key with masked input.
+ * Uses readline-based approach so paste works correctly on all platforms.
+ *
  * @param providerLabel - Provider name shown in the prompt
  */
 export async function promptForApiKey(providerLabel: string): Promise<string> {
-  const stdin = process.stdin;
-  const stdout = process.stdout;
-
-  stdout.write(t('Enter your {{provider}} API key: ', { provider: providerLabel }));
-
-  const wasRaw = stdin.isRaw;
-  if (stdin.setRawMode) {
-    stdin.setRawMode(true);
-  }
-  stdin.resume();
-
-  return new Promise<string>((resolve, reject) => {
-    let input = '';
-
-    const onData = (chunk: string) => {
-      for (const char of chunk) {
-        switch (char) {
-          case '\r':
-          case '\n':
-            stdin.removeListener('data', onData);
-            if (stdin.setRawMode) stdin.setRawMode(wasRaw);
-            stdout.write('\n');
-            resolve(input);
-            return;
-          case '\x03':
-            stdin.removeListener('data', onData);
-            if (stdin.setRawMode) stdin.setRawMode(wasRaw);
-            stdout.write('^C\n');
-            reject(new Error('Interrupted'));
-            return;
-          case '\x08':
-          case '\x7F':
-            if (input.length > 0) {
-              input = input.slice(0, -1);
-              stdout.write('\x1B[D \x1B[D');
-            }
-            break;
-          default:
-            input += char;
-            stdout.write('*');
-            break;
-        }
-      }
-    };
-
-    stdin.on('data', onData);
-  });
+  return promptForSecretInput(
+    t('Enter your {{provider}} API key: ', { provider: providerLabel }),
+  );
 }
 
 /**
@@ -402,7 +362,9 @@ export async function handleApiKeyAuth(
     }
 
     writeStdoutLine(
-      t('Configuring {{provider}} authentication...', { provider: provider.label }),
+      t('Configuring {{provider}} authentication...', {
+        provider: provider.label,
+      }),
     );
 
     const authTypeScope = getPersistScopeForModelSelection(settings);
@@ -436,13 +398,13 @@ export async function handleApiKeyAuth(
 
     if (modelProvidersKey) {
       const existingConfigs =
-        ((settings.merged.modelProviders as Record<string, ModelConfig[]>) ?? {})[
-          modelProvidersKey
-        ] ?? [];
+        ((settings.merged.modelProviders as Record<string, ModelConfig[]>) ??
+          {})[modelProvidersKey] ?? [];
 
       // Remove any existing entry with the same envKey+baseUrl to keep settings clean
       const filteredConfigs = existingConfigs.filter(
-        (c) => !(c.envKey === provider.envKey && c.baseUrl === provider.baseUrl),
+        (c) =>
+          !(c.envKey === provider.envKey && c.baseUrl === provider.baseUrl),
       );
 
       const updatedConfigs = [newModelConfig, ...filteredConfigs];
@@ -482,9 +444,7 @@ export async function handleApiKeyAuth(
     writeStdoutLine(
       t('  Default model: {{model}}', { model: provider.defaultModel }),
     );
-    writeStdoutLine(
-      t('  Switch model anytime with: hopcode -m <model-id>'),
-    );
+    writeStdoutLine(t('  Switch model anytime with: hopcode -m <model-id>'));
     process.exit(0);
   } catch (error) {
     writeStderrLine(

@@ -11,6 +11,7 @@ import {
   type ProviderModelConfig as ModelConfig,
 } from '@hoptrendy/hopcode-core';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
+import { promptForSecretInput } from '../../utils/promptUtils.js';
 import { t } from '../../i18n/index.js';
 import {
   getCodingPlanConfig,
@@ -310,65 +311,11 @@ async function promptForRegion(): Promise<CodingPlanRegion> {
 }
 
 /**
- * Prompts the user to enter an API key
+ * Prompts the user to enter an API key with masked input.
+ * Uses readline-based approach so paste works correctly on all platforms.
  */
 async function promptForKey(): Promise<string> {
-  // Create a simple password-style input (without echoing characters)
-  const stdin = process.stdin;
-  const stdout = process.stdout;
-
-  stdout.write(t('Enter your Coding Plan API key: '));
-
-  // Set raw mode to capture keystrokes
-  const wasRaw = stdin.isRaw;
-  if (stdin.setRawMode) {
-    stdin.setRawMode(true);
-  }
-  stdin.resume();
-
-  return new Promise<string>((resolve, reject) => {
-    let input = '';
-
-    const onData = (chunk: string) => {
-      for (const char of chunk) {
-        switch (char) {
-          case '\r': // Enter
-          case '\n':
-            stdin.removeListener('data', onData);
-            if (stdin.setRawMode) {
-              stdin.setRawMode(wasRaw);
-            }
-            stdout.write('\n'); // New line after input
-            resolve(input);
-            return;
-          case '\x03': // Ctrl+C
-            stdin.removeListener('data', onData);
-            if (stdin.setRawMode) {
-              stdin.setRawMode(wasRaw);
-            }
-            stdout.write('^C\n');
-            reject(new Error('Interrupted'));
-            return;
-          case '\x08': // Backspace
-          case '\x7F': // Delete
-            if (input.length > 0) {
-              input = input.slice(0, -1);
-              // Move cursor back, print space, move back again
-              stdout.write('\x1B[D \x1B[D');
-            }
-            break;
-          default:
-            // Add character to input
-            input += char;
-            // Print asterisk instead of the actual character for security
-            stdout.write('*');
-            break;
-        }
-      }
-    };
-
-    stdin.on('data', onData);
-  });
+  return promptForSecretInput(t('Enter your Coding Plan API key: '));
 }
 
 /**
@@ -471,7 +418,9 @@ export async function showAuthStatus(): Promise<void> {
     } else if (selectedType === AuthType.USE_OPENAI) {
       // Detect which provider is actually configured
       const openaiModelProviders = (
-        mergedSettings.modelProviders as Record<string, ModelConfig[]> | undefined
+        mergedSettings.modelProviders as
+          | Record<string, ModelConfig[]>
+          | undefined
       )?.[AuthType.USE_OPENAI];
 
       const activeProvider = detectActiveProvider(openaiModelProviders);
@@ -499,7 +448,9 @@ export async function showAuthStatus(): Promise<void> {
               codingPlanRegion === CodingPlanRegion.CHINA
                 ? t('中国 (China) - 阿里云百炼')
                 : t('Global - Alibaba Cloud');
-            writeStdoutLine(t('  Region: {{region}}', { region: regionDisplay }));
+            writeStdoutLine(
+              t('  Region: {{region}}', { region: regionDisplay }),
+            );
           }
 
           if (modelName) {
@@ -526,7 +477,9 @@ export async function showAuthStatus(): Promise<void> {
           writeStdoutLine(
             t('  Issue: API key not found in environment or settings\n'),
           );
-          writeStdoutLine(t('  Run `hopcode auth coding-plan` to re-configure.\n'));
+          writeStdoutLine(
+            t('  Run `hopcode auth coding-plan` to re-configure.\n'),
+          );
         }
       } else if (activeProvider) {
         // A known registry provider is configured
@@ -541,8 +494,11 @@ export async function showAuthStatus(): Promise<void> {
               provider: activeProvider.label,
             }),
           );
-          const modelName = mergedSettings.model?.name ?? activeProvider.defaultModel;
-          writeStdoutLine(t('  Default Model: {{model}}', { model: modelName }));
+          const modelName =
+            mergedSettings.model?.name ?? activeProvider.defaultModel;
+          writeStdoutLine(
+            t('  Default Model: {{model}}', { model: modelName }),
+          );
           writeStdoutLine(t('  Status: API key configured\n'));
         } else {
           writeStdoutLine(
