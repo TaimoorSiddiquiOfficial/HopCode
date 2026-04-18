@@ -8,7 +8,7 @@ import {
   getAutoMemoryRoot,
   getProjectHash,
   QWEN_DIR,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import type { SlashCommand } from './types.js';
 import { CommandKind } from './types.js';

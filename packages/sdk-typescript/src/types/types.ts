@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   PermissionMode,
   PermissionSuggestion,
   SubagentConfig,
@@ -111,7 +111,7 @@ export type McpAuthProviderType =
  * - Streamable HTTP: httpUrl, headers
  * - WebSocket: tcp
  *
- * This interface aligns with MCPServerConfig in @qwen-code/qwen-code-core.
+ * This interface aligns with MCPServerConfig in @hoptrendy/hopcode-core.
  */
 export interface CLIMcpServerConfig {
   // For stdio transport

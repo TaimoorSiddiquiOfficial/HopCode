@@ -1,6 +1,6 @@
 import { APICallError } from 'ai';
 import { STATUS_CODES } from 'http';
-import { iife } from '../util/iife.js.js';
+import { iife } from '../util/iife.js';
 
 export namespace ProviderError {
   // Adapted from overflow detection patterns in:

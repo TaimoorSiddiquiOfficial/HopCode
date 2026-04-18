@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -20,7 +20,7 @@
 
 import { Box, Text } from 'ink';
 import { useState, useEffect, useCallback } from 'react';
-import { AgentStatus, AgentEventType } from '@qwen-code/qwen-code-core';
+import { AgentStatus, AgentEventType } from '@hoptrendy/hopcode-core';
 import {
   useAgentViewState,
   useAgentViewActions,

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -8,7 +8,7 @@
  */
 
 import type { FC } from 'react';
-import { Onboarding as BaseOnboarding } from '@qwen-code/webui';
+import { Onboarding as BaseOnboarding } from '@hoptrendy/webui';
 import { generateIconUrl } from '../../utils/resourceUrl.js';
 
 interface OnboardingPageProps {

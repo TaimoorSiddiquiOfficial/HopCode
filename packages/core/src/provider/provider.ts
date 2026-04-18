@@ -1,22 +1,22 @@
 import z from 'zod';
 import os from 'os';
 import fuzzysort from 'fuzzysort';
-import { Config } from '../config/config.js.js';
+import { Config } from '../config/config.js';
 import { mapValues, mergeDeep, omit, pickBy, sortBy } from 'remeda';
 import { NoSuchModelError, type Provider as SDK } from 'ai';
-import { Log } from '../util/log.js.js';
-import { BunProc } from '../bun.js.js';
-import { Plugin } from '../plugin.js.js';
-import { ModelsDev } from './models.js.js';
-import { NamedError } from '../util/error.js.js';
-import { Auth } from '../auth.js.js';
-import { Env } from '../env.js.js';
-import { Instance } from '../project/instance.js.js';
-import { Flag } from '../flag/flag.js.js';
-import { iife } from '../util/iife.js.js';
-import { Global } from '../global.js.js';
+import { Log } from '../util/log.js';
+import { BunProc } from '../bun.js';
+import { Plugin } from '../plugin.js';
+import { ModelsDev } from './models.js';
+import { NamedError } from '../util/error.js';
+import { Auth } from '../auth.js';
+import { Env } from '../env.js';
+import { Instance } from '../project/instance.js';
+import { Flag } from '../flag/flag.js';
+import { iife } from '../util/iife.js';
+import { Global } from '../global.js';
 import path from 'path';
-import { Filesystem } from '../util/filesystem.js.js';
+import { Filesystem } from '../util/filesystem.js';
 
 // Direct imports for bundled providers
 import {
@@ -34,7 +34,7 @@ import {
   createOpenRouter,
   type LanguageModelV2,
 } from '@openrouter/ai-sdk-provider';
-import { createOpenaiCompatible as createGitHubCopilotOpenAICompatible } from './sdk/copilot.js.js';
+import { createOpenaiCompatible as createGitHubCopilotOpenAICompatible } from './sdk/copilot.js';
 import { createXai } from '@ai-sdk/xai';
 import { createMistral } from '@ai-sdk/mistral';
 import { createGroq } from '@ai-sdk/groq';
@@ -51,8 +51,8 @@ import {
 } from '@gitlab/gitlab-ai-provider';
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
 import { GoogleAuth } from 'google-auth-library';
-import { ProviderTransform } from './transform.js.js';
-import { Installation } from '../installation.js.js';
+import { ProviderTransform } from './transform.js';
+import { Installation } from '../installation.js';
 
 export namespace Provider {
   const log = Log.create({ service: 'provider' });

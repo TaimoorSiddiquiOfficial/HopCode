@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -16,8 +16,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { DebugLogger } from '@qwen-code/qwen-code-core';
-import { createDebugLogger } from '@qwen-code/qwen-code-core';
+import type { DebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import type { IControlContext } from '../ControlContext.js';
 import type {
   ControlRequestPayload,

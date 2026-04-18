@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -7,7 +7,7 @@
 import { useState, useMemo } from 'react';
 import { Box } from 'ink';
 import { RadioButtonSelect } from '../../shared/RadioButtonSelect.js';
-import { type Extension } from '@qwen-code/qwen-code-core';
+import { type Extension } from '@hoptrendy/hopcode-core';
 import { t } from '../../../../i18n/index.js';
 import { type ExtensionAction } from '../types.js';
 

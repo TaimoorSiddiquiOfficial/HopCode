@@ -3,12 +3,12 @@ import {
   type LanguageModelV2CallWarning,
   UnsupportedFunctionalityError,
 } from '@ai-sdk/provider';
-import { codeInterpreterArgsSchema } from './tool/code-interpreter.js.js';
-import { fileSearchArgsSchema } from './tool/file-search.js.js';
-import { webSearchArgsSchema } from './tool/web-search.js.js';
-import { webSearchPreviewArgsSchema } from './tool/web-search-preview.js.js';
-import { imageGenerationArgsSchema } from './tool/image-generation.js.js';
-import type { OpenAIResponsesTool } from './openai-responses-api-types.js.js';
+import { codeInterpreterArgsSchema } from './tool/code-interpreter.js';
+import { fileSearchArgsSchema } from './tool/file-search.js';
+import { webSearchArgsSchema } from './tool/web-search.js';
+import { webSearchPreviewArgsSchema } from './tool/web-search-preview.js';
+import { imageGenerationArgsSchema } from './tool/image-generation.js';
+import type { OpenAIResponsesTool } from './openai-responses-api-types.js';
 
 export function prepareResponsesTools({
   tools,

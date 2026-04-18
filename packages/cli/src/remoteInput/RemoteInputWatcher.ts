@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +6,7 @@
 
 import { createReadStream, watchFile, unwatchFile, statSync } from 'node:fs';
 import { createInterface } from 'node:readline';
-import { createDebugLogger } from '@qwen-code/qwen-code-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('REMOTE_INPUT');
 

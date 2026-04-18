@@ -9,11 +9,11 @@ import { z } from 'zod/v4';
 import type {
   OpenAIResponsesInput,
   OpenAIResponsesReasoning,
-} from './openai-responses-api-types.js.js';
+} from './openai-responses-api-types.js';
 import {
   localShellInputSchema,
   localShellOutputSchema,
-} from './tool/local-shell.js.js';
+} from './tool/local-shell.js';
 
 /**
  * Check if a string is a file ID based on the given prefixes

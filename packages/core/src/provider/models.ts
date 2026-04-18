@@ -1,11 +1,11 @@
-import { Global } from '../global.js.js';
-import { Log } from '../util/log.js.js';
+import { Global } from '../global.js';
+import { Log } from '../util/log.js';
 import path from 'path';
 import z from 'zod';
-import { Installation } from '../installation.js.js';
-import { Flag } from '../flag/flag.js.js';
+import { Installation } from '../installation.js';
+import { Flag } from '../flag/flag.js';
 import { lazy } from '../util/lazy.js';
-import { Filesystem } from '../util/filesystem.js.js';
+import { Filesystem } from '../util/filesystem.js';
 
 // Try to import bundled snapshot (generated at build time)
 // Falls back to undefined in dev mode when snapshot doesn't exist

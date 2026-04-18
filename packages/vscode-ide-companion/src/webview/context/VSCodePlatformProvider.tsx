@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -9,8 +9,8 @@
 
 import { useMemo, useCallback, useEffect, useRef } from 'react';
 import type { FC, ReactNode } from 'react';
-import { PlatformProvider } from '@qwen-code/webui';
-import type { PlatformContextValue } from '@qwen-code/webui';
+import { PlatformProvider } from '@hoptrendy/webui';
+import type { PlatformContextValue } from '@hoptrendy/webui';
 import { useVSCode } from '../hooks/useVSCode.js';
 import { generateIconUrl } from '../utils/resourceUrl.js';
 

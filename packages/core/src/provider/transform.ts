@@ -2,8 +2,8 @@ import type { ModelMessage } from 'ai';
 import { mergeDeep, unique } from 'remeda';
 import type { JSONSchema7 } from '@ai-sdk/provider';
 import type { JSONSchema } from 'zod/v4/core';
-import type { Provider } from './provider.js.js';
-import type { ModelsDev } from './models.js.js';
+import type { Provider } from './provider.js';
+import type { ModelsDev } from './models.js';
 import { iife } from '../util/iife.js';
 import { Flag } from '../flag/flag.js';
 

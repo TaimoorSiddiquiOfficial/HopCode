@@ -23,8 +23,8 @@ import type {
   PermissionManager,
   RuleWithSource,
   RuleType,
-} from '@qwen-code/qwen-code-core';
-import { isPathWithinRoot } from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
+import { isPathWithinRoot } from '@hoptrendy/hopcode-core';
 
 // ---------------------------------------------------------------------------
 // Types

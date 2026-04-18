@@ -1,11 +1,11 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import type { ModelInfo } from '@agentclientprotocol/sdk';
-import type { ContextUsage } from '@qwen-code/webui';
+import type { ContextUsage } from '@hoptrendy/webui';
 import type { UsageStatsPayload } from '../../types/chatTypes.js';
 
 export function computeContextUsage(

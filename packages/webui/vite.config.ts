@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -10,7 +10,7 @@ import dts from 'vite-plugin-dts';
 import { resolve } from 'path';
 
 /**
- * Vite configuration for @qwen-code/webui library
+ * Vite configuration for @hoptrendy/webui library
  *
  * Build outputs:
  * - ESM: dist/index.js (primary format)

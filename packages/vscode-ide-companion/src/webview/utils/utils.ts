@@ -1,10 +1,10 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Shared utility functions for tool call components
- * Now re-exports from @qwen-code/webui for backward compatibility
+ * Now re-exports from @hoptrendy/webui for backward compatibility
  */
 
 export {
@@ -15,7 +15,7 @@ export {
   groupContent,
   hasToolCallOutput,
   mapToolStatusToContainerStatus,
-} from '@qwen-code/webui';
+} from '@hoptrendy/webui';
 
 // Re-export types for backward compatibility
 export type {
@@ -23,4 +23,4 @@ export type {
   GroupedContent,
   ToolCallData,
   ToolCallStatus,
-} from '@qwen-code/webui';
+} from '@hoptrendy/webui';

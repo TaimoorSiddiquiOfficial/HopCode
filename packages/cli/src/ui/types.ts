@@ -12,7 +12,7 @@ import type {
   ToolConfirmationOutcome,
   ToolResultDisplay,
   AgentStatus,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { PartListUnion } from '@google/genai';
 import { type ReactNode } from 'react';
 

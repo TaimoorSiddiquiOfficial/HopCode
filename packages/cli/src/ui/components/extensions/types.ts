@@ -1,10 +1,10 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Extension, Config } from '@qwen-code/qwen-code-core';
+import type { Extension, Config } from '@hoptrendy/hopcode-core';
 
 /**
  * Management steps for the extensions manager dialog.

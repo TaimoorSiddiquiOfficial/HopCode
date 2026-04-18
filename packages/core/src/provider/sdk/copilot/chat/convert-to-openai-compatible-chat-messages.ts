@@ -3,7 +3,7 @@ import {
   type SharedV2ProviderMetadata,
   UnsupportedFunctionalityError,
 } from '@ai-sdk/provider';
-import type { OpenAICompatibleChatPrompt } from './openai-compatible-api-types.js.js';
+import type { OpenAICompatibleChatPrompt } from './openai-compatible-api-types.js';
 import { convertToBase64 } from '@ai-sdk/provider-utils';
 
 function getOpenAIMetadata(message: {

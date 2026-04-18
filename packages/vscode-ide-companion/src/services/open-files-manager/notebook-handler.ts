@@ -1,11 +1,11 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as vscode from 'vscode';
-import type { File } from '@qwen-code/qwen-code-core/src/ide/types.js';
+import type { File } from '@hoptrendy/hopcode-core/src/ide/types.js';
 import { MAX_FILES, MAX_SELECTED_TEXT_LENGTH } from './constants.js';
 import {
   deactivateCurrentActiveFile,

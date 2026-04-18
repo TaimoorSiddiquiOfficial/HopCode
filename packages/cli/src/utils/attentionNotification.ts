@@ -1,11 +1,11 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import process from 'node:process';
-import { createDebugLogger } from '@qwen-code/qwen-code-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 export enum AttentionNotificationReason {
   ToolApproval = 'tool_approval',

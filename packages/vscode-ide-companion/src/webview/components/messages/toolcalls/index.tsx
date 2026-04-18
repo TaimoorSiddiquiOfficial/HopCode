@@ -1,10 +1,10 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Tool call component factory - routes to specialized components by kind
- * All UI components are now imported from @qwen-code/webui
+ * All UI components are now imported from @hoptrendy/webui
  */
 
 import type { FC } from 'react';
@@ -20,8 +20,8 @@ import {
   ShellToolCall,
   ReadToolCall,
   WebFetchToolCall,
-} from '@qwen-code/webui';
-import type { BaseToolCallProps } from '@qwen-code/webui';
+} from '@hoptrendy/webui';
+import type { BaseToolCallProps } from '@hoptrendy/webui';
 
 /**
  * Factory function that returns the appropriate tool call component based on kind
@@ -97,4 +97,4 @@ export const ToolCallRouter: React.FC<BaseToolCallProps> = ({ toolCall }) => {
 };
 
 // Re-export types for convenience
-export type { BaseToolCallProps, ToolCallData } from '@qwen-code/webui';
+export type { BaseToolCallProps, ToolCallData } from '@hoptrendy/webui';

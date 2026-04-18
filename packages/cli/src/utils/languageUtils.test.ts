@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team team
  * SPDX-License-Identifier: Apache-2.0
@@ -34,8 +34,8 @@ vi.mock('../i18n/index.js', () => ({
   }),
 }));
 
-// Mock @qwen-code/qwen-code-core
-vi.mock('@qwen-code/qwen-code-core', () => ({
+// Mock @hoptrendy/hopcode-core
+vi.mock('@hoptrendy/hopcode-core', () => ({
   Storage: {
     getGlobalQwenDir: vi.fn(() => '/mock/home/.hopcode'),
   },

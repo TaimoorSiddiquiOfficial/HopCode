@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -12,8 +12,8 @@ import type {
 } from './types.js';
 import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';
-import type { ApprovalMode } from '@qwen-code/qwen-code-core';
-import { APPROVAL_MODES } from '@qwen-code/qwen-code-core';
+import type { ApprovalMode } from '@hoptrendy/hopcode-core';
+import { APPROVAL_MODES } from '@hoptrendy/hopcode-core';
 
 /**
  * Parses the argument string and returns the corresponding ApprovalMode if valid.

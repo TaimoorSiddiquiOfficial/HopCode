@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -12,7 +12,7 @@ import {
   type SubmitPromptActionReturn,
 } from './types.js';
 import { t } from '../../i18n/index.js';
-import { ApprovalMode } from '@qwen-code/qwen-code-core';
+import { ApprovalMode } from '@hoptrendy/hopcode-core';
 
 export const planCommand: SlashCommand = {
   name: 'plan',

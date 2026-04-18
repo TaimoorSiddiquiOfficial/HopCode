@@ -22,19 +22,19 @@ import {
   type ResponseHandler,
 } from '@ai-sdk/provider-utils';
 import { z } from 'zod/v4';
-import { convertToOpenAICompatibleChatMessages } from './convert-to-openai-compatible-chat-messages.js.js';
-import { getResponseMetadata } from './get-response-metadata.js.js';
-import { mapOpenAICompatibleFinishReason } from './map-openai-compatible-finish-reason.js.js';
+import { convertToOpenAICompatibleChatMessages } from './convert-to-openai-compatible-chat-messages.js';
+import { getResponseMetadata } from './get-response-metadata.js';
+import { mapOpenAICompatibleFinishReason } from './map-openai-compatible-finish-reason.js';
 import {
   type OpenAICompatibleChatModelId,
   openaiCompatibleProviderOptions,
-} from './openai-compatible-chat-options.js.js';
+} from './openai-compatible-chat-options.js';
 import {
   defaultOpenAICompatibleErrorStructure,
   type ProviderErrorStructure,
-} from '../openai-compatible-error.js.js';
-import type { MetadataExtractor } from './openai-compatible-metadata-extractor.js.js';
-import { prepareTools } from './openai-compatible-prepare-tools.js.js';
+} from '../openai-compatible-error.js';
+import type { MetadataExtractor } from './openai-compatible-metadata-extractor.js';
+import { prepareTools } from './openai-compatible-prepare-tools.js';
 
 export type OpenAICompatibleChatConfig = {
   provider: string;

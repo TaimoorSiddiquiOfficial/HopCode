@@ -1,10 +1,10 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { WebSearchProviderConfig } from '@qwen-code/qwen-code-core';
+import type { WebSearchProviderConfig } from '@hoptrendy/hopcode-core';
 import type { Settings } from './settings.js';
 
 /**

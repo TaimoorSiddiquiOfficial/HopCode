@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -19,12 +19,12 @@ describe('imageSupport browser bundling', () => {
       platform: 'browser',
       write: false,
       logLevel: 'silent',
-      external: ['@qwen-code/qwen-code-core'],
+      external: ['@hoptrendy/hopcode-core'],
     });
 
     const output = result.outputFiles[0]?.text ?? '';
 
-    expect(output).not.toContain('@qwen-code/qwen-code-core');
+    expect(output).not.toContain('@hoptrendy/hopcode-core');
     expect(output).not.toContain('supportedImageFormats.js');
   });
 
@@ -38,12 +38,12 @@ describe('imageSupport browser bundling', () => {
       platform: 'browser',
       write: false,
       logLevel: 'silent',
-      external: ['@qwen-code/qwen-code-core'],
+      external: ['@hoptrendy/hopcode-core'],
     });
 
     const output = result.outputFiles[0]?.text ?? '';
 
-    expect(output).not.toContain('@qwen-code/qwen-code-core');
+    expect(output).not.toContain('@hoptrendy/hopcode-core');
     expect(output).not.toContain('tokenLimits.js');
   });
 });

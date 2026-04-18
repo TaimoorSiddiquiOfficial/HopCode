@@ -19,23 +19,23 @@ import {
   postJsonToApi,
 } from '@ai-sdk/provider-utils';
 import { z } from 'zod/v4';
-import type { OpenAIConfig } from './openai-config.js.js';
-import { openaiFailedResponseHandler } from './openai-error.js.js';
+import type { OpenAIConfig } from './openai-config.js';
+import { openaiFailedResponseHandler } from './openai-error.js';
 import {
   codeInterpreterInputSchema,
   codeInterpreterOutputSchema,
-} from './tool/code-interpreter.js.js';
-import { fileSearchOutputSchema } from './tool/file-search.js.js';
-import { imageGenerationOutputSchema } from './tool/image-generation.js.js';
-import { convertToOpenAIResponsesInput } from './convert-to-openai-responses-input.js.js';
-import { mapOpenAIResponseFinishReason } from './map-openai-responses-finish-reason.js.js';
+} from './tool/code-interpreter.js';
+import { fileSearchOutputSchema } from './tool/file-search.js';
+import { imageGenerationOutputSchema } from './tool/image-generation.js';
+import { convertToOpenAIResponsesInput } from './convert-to-openai-responses-input.js';
+import { mapOpenAIResponseFinishReason } from './map-openai-responses-finish-reason.js';
 import type {
   OpenAIResponsesIncludeOptions,
   OpenAIResponsesIncludeValue,
-} from './openai-responses-api-types.js.js';
-import { prepareResponsesTools } from './openai-responses-prepare-tools.js.js';
-import type { OpenAIResponsesModelId } from './openai-responses-settings.js.js';
-import { localShellInputSchema } from './tool/local-shell.js.js';
+} from './openai-responses-api-types.js';
+import { prepareResponsesTools } from './openai-responses-prepare-tools.js';
+import type { OpenAIResponsesModelId } from './openai-responses-settings.js';
+import { localShellInputSchema } from './tool/local-shell.js';
 
 const webSearchCallItem = z.object({
   type: z.literal('web_search_call'),

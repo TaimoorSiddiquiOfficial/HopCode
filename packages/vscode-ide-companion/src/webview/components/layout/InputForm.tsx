@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -8,11 +8,11 @@
  */
 
 import type { ClipboardEvent, FC, ReactNode } from 'react';
-import { InputForm as BaseInputForm, getEditModeIcon } from '@qwen-code/webui';
+import { InputForm as BaseInputForm, getEditModeIcon } from '@hoptrendy/webui';
 import type {
   InputFormProps as BaseInputFormProps,
   EditModeInfo,
-} from '@qwen-code/webui';
+} from '@hoptrendy/webui';
 import type { CompletionItem } from '../../../types/completionItemTypes.js';
 import { getApprovalModeInfoFromString } from '../../../types/acpTypes.js';
 import type { ApprovalModeValue } from '../../../types/approvalModeValueTypes.js';

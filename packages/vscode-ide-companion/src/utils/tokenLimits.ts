@@ -1,11 +1,11 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Browser-safe subset of @qwen-code/qwen-code-core tokenLimits.
+ * Browser-safe subset of @hoptrendy/hopcode-core tokenLimits.
  *
  * The webview bundle (IIFE, platform: browser) cannot `require` Node.js
  * packages. This module replicates the constants and logic the webview
@@ -172,7 +172,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
  * Return the token limit for a given model name.
  *
  * This is a browser-safe mirror of `tokenLimit()` in
- * `@qwen-code/qwen-code-core`. The webview only calls this as a fallback
+ * `@hoptrendy/hopcode-core`. The webview only calls this as a fallback
  * when `modelInfo._meta.contextLimit` is unavailable.
  *
  * @param model - The model identifier string

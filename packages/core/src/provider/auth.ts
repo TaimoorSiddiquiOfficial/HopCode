@@ -1,10 +1,10 @@
-import { Instance } from '../project/instance.js.js';
-import { Plugin } from '../plugin.js.js';
+import { Instance } from '../project/instance.js';
+import { Plugin } from '../plugin.js';
 import { map, filter, pipe, fromEntries, mapValues } from 'remeda';
 import z from 'zod';
-import { fn } from '../util/fn.js.js';
-import { NamedError } from '../util/error.js.js';
-import { Auth } from '../auth.js.js';
+import { fn } from '../util/fn.js';
+import { NamedError } from '../util/error.js';
+import { Auth } from '../auth.js';
 
 export namespace ProviderAuth {
   const state = Instance.state(async () => {

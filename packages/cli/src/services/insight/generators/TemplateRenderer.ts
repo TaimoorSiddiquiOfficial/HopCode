@@ -1,10 +1,10 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { INSIGHT_JS, INSIGHT_CSS } from '@qwen-code/web-templates';
+import { INSIGHT_JS, INSIGHT_CSS } from '@hoptrendy/web-templates';
 import type { InsightData } from '../types/StaticInsightTypes.js';
 
 export class TemplateRenderer {

@@ -4,8 +4,8 @@ import {
   withoutTrailingSlash,
   withUserAgentSuffix,
 } from '@ai-sdk/provider-utils';
-import { OpenAICompatibleChatLanguageModel } from './chat/openai-compatible-chat-language-model.js.js';
-import { OpenAIResponsesLanguageModel } from './responses/openai-responses-language-model.js.js';
+import { OpenAICompatibleChatLanguageModel } from './chat/openai-compatible-chat-language-model.js';
+import { OpenAIResponsesLanguageModel } from './responses/openai-responses-language-model.js';
 
 // Import the version or define it
 const VERSION = '0.1.0';
