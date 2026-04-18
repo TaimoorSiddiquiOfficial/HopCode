@@ -95,6 +95,7 @@
     "uuid": "^9.0.1",
     "web-tree-sitter": "^0.24.7",
     "ws": "^8.18.0",
+    "@aws-sdk/credential-providers": "^3.0.0",
     "fuzzysort": "^3.1.0",
     "remeda": "^2.33.7",
     "yaml": "^2.7.0",
