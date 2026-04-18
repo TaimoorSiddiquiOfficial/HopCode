@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-dingtalk",
-  "version": "0.14.6",
+  "version": "0.14.7",
   "description": "DingTalk channel adapter for Qwen Code",
   "type": "module",
   "main": "dist/index.js",
@@ -18,7 +18,7 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@hoptrendy/channel-base": "file:../base",
+    "@hoptrendy/channel-base": "workspace:*",
     "dingtalk-stream-sdk-nodejs": "^2.0.4"
   },
   "devDependencies": {
