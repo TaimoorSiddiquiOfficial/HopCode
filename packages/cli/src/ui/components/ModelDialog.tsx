@@ -24,6 +24,8 @@ import { UIStateContext, type UIState } from '../contexts/UIStateContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import { t } from '../../i18n/index.js';
+import { PROVIDER_REGISTRY } from '../../commands/auth/providers.js';
+import { getCatalog } from '../../commands/model/catalog.js';
 
 function formatModalities(modalities?: InputModalities): string {
   if (!modalities) return t('text-only');
@@ -146,7 +148,81 @@ export function ModelDialog({
   const authType = config?.getAuthType();
 
   const availableModelEntries = useMemo(() => {
-    const allModels = config ? config.getAllConfiguredModels() : [];
+    const coreModels = config ? config.getAllConfiguredModels() : [];
+
+    // ── Load full catalog for the active provider ────────────────────────────
+    // Detects which provider is configured in settings and augments the core
+    // model list with every model in that provider's static catalog.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const merged = settings?.merged as any;
+    let catalogExtras: CoreAvailableModel[] = [];
+    let activeProviderLabel: string | undefined;
+
+    if (merged) {
+      const selectedType = merged?.security?.auth?.selectedType as
+        | string
+        | undefined;
+      let activeProviderId: string | undefined;
+
+      if (selectedType === AuthType.USE_ANTHROPIC) {
+        activeProviderId = 'anthropic';
+      } else if (selectedType === AuthType.USE_GEMINI) {
+        activeProviderId = 'gemini';
+      } else if (selectedType === AuthType.USE_OPENAI) {
+        const openaiCfg = merged?.modelProviders?.openai?.[0] as
+          | { envKey?: string; baseUrl?: string }
+          | undefined;
+        if (openaiCfg) {
+          // Match by both envKey and baseUrl so ollama-local vs ollama-cloud
+          // are distinguished (same envKey, different baseUrl).
+          const match = PROVIDER_REGISTRY.find(
+            (p) =>
+              p.envKey === openaiCfg.envKey && p.baseUrl === openaiCfg.baseUrl,
+          );
+          activeProviderId = match?.id;
+        }
+      }
+
+      if (activeProviderId) {
+        const providerEntry = PROVIDER_REGISTRY.find(
+          (p) => p.id === activeProviderId,
+        );
+        activeProviderLabel = providerEntry?.label;
+        const catalog = getCatalog(activeProviderId);
+
+        if (catalog && providerEntry) {
+          const existingIds = new Set(coreModels.map((m) => m.id));
+          catalogExtras = catalog.categories.flatMap((cat) =>
+            cat.models
+              .filter((m) => !existingIds.has(m.id))
+              .map(
+                (m) =>
+                  ({
+                    id: m.id,
+                    label: m.label,
+                    // Embed category name so the detail panel is informative
+                    description:
+                      cat.name + (m.description ? ` · ${m.description}` : ''),
+                    authType: providerEntry.authType,
+                    isRuntimeModel: false,
+                    // Expose provider's baseUrl/envKey so the detail panel shows
+                    // correct connection info for catalog-sourced models.
+                    baseUrl: providerEntry.baseUrl,
+                    envKey: providerEntry.envKey,
+                    capabilities: {
+                      image: false,
+                      pdf: false,
+                      audio: false,
+                      video: false,
+                    } as InputModalities,
+                  }) as CoreAvailableModel,
+              ),
+          );
+        }
+      }
+    }
+
+    const allModels = [...coreModels, ...catalogExtras];
 
     // Separate runtime models from registry models
     const runtimeModels = allModels.filter((m) => m.isRuntimeModel);
@@ -188,6 +264,8 @@ export function ModelDialog({
       model: CoreAvailableModel;
       isRuntime?: boolean;
       snapshotId?: string;
+      /** Human-readable provider name for the badge, e.g. "Ollama Cloud" */
+      providerLabel?: string;
     }> = [];
 
     // Add all runtime models first
@@ -203,22 +281,32 @@ export function ModelDialog({
     // Add registry models grouped by authType
     for (const t of orderedAuthTypes) {
       for (const model of modelsByAuthTypeMap.get(t) ?? []) {
-        result.push({ authType: t, model, isRuntime: false });
+        result.push({
+          authType: t,
+          model,
+          isRuntime: false,
+          // Show real provider name in badge for openai-compat providers
+          providerLabel:
+            t === AuthType.USE_OPENAI ? activeProviderLabel : undefined,
+        });
       }
     }
 
     return result;
-  }, [config]);
+  }, [config, settings]);
 
   const MODEL_OPTIONS = useMemo(
     () =>
       availableModelEntries.map(
-        ({ authType: t2, model, isRuntime, snapshotId }) => {
+        ({ authType: t2, model, isRuntime, snapshotId, providerLabel }) => {
           // Runtime models use snapshotId directly (format: $runtime|${authType}|${modelId})
           const value =
             isRuntime && snapshotId ? snapshotId : `${t2}::${model.id}`;
 
           const isQwenOAuth = t2 === AuthType.QWEN_OAUTH;
+          // Show real provider label (e.g. "Ollama Cloud") when available,
+          // otherwise fall back to the raw authType string.
+          const badgeLabel = providerLabel ?? t2;
 
           const title = (
             <Text>
@@ -232,7 +320,7 @@ export function ModelDialog({
                       : theme.text.accent
                 }
               >
-                [{t2}]
+                [{badgeLabel}]
               </Text>
               <Text>{` ${model.label}`}</Text>
               {isRuntime && (
