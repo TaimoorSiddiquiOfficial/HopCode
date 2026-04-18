@@ -172,8 +172,12 @@ async function handleModelCommand(argv: ModelCommandArgs): Promise<void> {
       (info.providerId === 'ollama-local'
         ? 'http://localhost:11434/v1'
         : 'https://ollama.com/v1');
+    const apiKey =
+      info.providerId === 'ollama-cloud'
+        ? (process.env['OLLAMA_API_KEY'] ?? undefined)
+        : undefined;
     process.stdout.write(t('  Fetching available models...'));
-    categories = await fetchOllamaModels(baseUrl);
+    categories = await fetchOllamaModels(baseUrl, apiKey);
     if (categories) {
       process.stdout.write(' ✓\n');
     } else {

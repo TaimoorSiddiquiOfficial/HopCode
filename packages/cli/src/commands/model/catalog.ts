@@ -364,55 +364,132 @@ const catalogs: ProviderCatalog[] = [
     providerId: 'openrouter',
     categories: [
       {
-        name: 'Top Models',
+        name: 'Anthropic',
         models: [
           {
-            id: 'openrouter/auto',
-            label: 'Auto (Best)',
-            description: 'Routes to best available',
-            context: 'varies',
-          },
-          {
-            id: 'openrouter/anthropic/claude-opus-4-5',
+            id: 'anthropic/claude-opus-4-5',
             label: 'Claude Opus 4.5',
-            description: 'Via OpenRouter',
+            description: 'Most capable',
             context: '200k',
           },
           {
-            id: 'openrouter/openai/gpt-4o',
+            id: 'anthropic/claude-sonnet-4-5',
+            label: 'Claude Sonnet 4.5',
+            description: 'Balanced',
+            context: '200k',
+          },
+        ],
+      },
+      {
+        name: 'OpenAI',
+        models: [
+          {
+            id: 'openai/gpt-4o',
             label: 'GPT-4o',
-            description: 'Via OpenRouter',
+            description: 'Multimodal flagship',
             context: '128k',
           },
           {
-            id: 'openrouter/google/gemini-2.5-pro',
+            id: 'openai/o3',
+            label: 'o3',
+            description: 'Advanced reasoning',
+            context: '200k',
+          },
+          {
+            id: 'openai/gpt-4.1',
+            label: 'GPT-4.1',
+            description: 'Fast + smart',
+            context: '1M',
+          },
+        ],
+      },
+      {
+        name: 'Google',
+        models: [
+          {
+            id: 'google/gemini-2.5-pro',
             label: 'Gemini 2.5 Pro',
-            description: 'Via OpenRouter',
+            description: 'Largest context',
             context: '1M',
           },
           {
-            id: 'openrouter/meta-llama/llama-3.3-70b-instruct',
+            id: 'google/gemini-2.5-flash',
+            label: 'Gemini 2.5 Flash',
+            description: 'Fast + affordable',
+            context: '1M',
+          },
+        ],
+      },
+      {
+        name: 'Meta',
+        models: [
+          {
+            id: 'meta-llama/llama-3.3-70b-instruct',
             label: 'Llama 3.3 70B',
-            description: 'Via OpenRouter',
+            description: 'Open source',
             context: '128k',
           },
           {
-            id: 'openrouter/deepseek/deepseek-r1',
+            id: 'meta-llama/llama-3.1-405b-instruct',
+            label: 'Llama 3.1 405B',
+            description: 'Most capable open',
+            context: '128k',
+          },
+        ],
+      },
+      {
+        name: 'DeepSeek',
+        models: [
+          {
+            id: 'deepseek/deepseek-r1',
             label: 'DeepSeek R1',
-            description: 'Via OpenRouter',
+            description: 'Reasoning model',
             context: '64k',
           },
           {
-            id: 'openrouter/mistralai/mistral-large',
+            id: 'deepseek/deepseek-chat-v3-5',
+            label: 'DeepSeek V3.5',
+            description: 'Fast + capable',
+            context: '64k',
+          },
+        ],
+      },
+      {
+        name: 'Mistral',
+        models: [
+          {
+            id: 'mistralai/mistral-large',
             label: 'Mistral Large',
-            description: 'Via OpenRouter',
+            description: 'Frontier',
             context: '128k',
           },
           {
-            id: 'openrouter/x-ai/grok-3',
+            id: 'mistralai/codestral-2501',
+            label: 'Codestral',
+            description: 'Code specialist',
+            context: '256k',
+          },
+        ],
+      },
+      {
+        name: 'xAI',
+        models: [
+          {
+            id: 'x-ai/grok-3',
             label: 'Grok 3',
-            description: 'Via OpenRouter',
+            description: 'xAI flagship',
             context: '131k',
+          },
+        ],
+      },
+      {
+        name: 'Moonshot',
+        models: [
+          {
+            id: 'moonshotai/kimi-k2',
+            label: 'Kimi K2',
+            description: 'Agentic + code',
+            context: '128k',
           },
         ],
       },
@@ -803,8 +880,14 @@ const catalogs: ProviderCatalog[] = [
         name: 'Cloud Models',
         models: [
           {
-            id: 'deepseek-v3.1:671b-cloud',
-            label: 'DeepSeek V3.1 671B',
+            id: 'gpt-oss:120b-cloud',
+            label: 'GPT-OSS 120B',
+            description: 'OpenAI open-source, Ollama cloud',
+            context: '128k',
+          },
+          {
+            id: 'deepseek-v3:685b-cloud',
+            label: 'DeepSeek V3 685B',
             description: 'Flagship cloud',
             context: '64k',
           },

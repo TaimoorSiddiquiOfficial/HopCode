@@ -105,11 +105,11 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
   {
     id: 'openrouter',
     label: 'OpenRouter',
-    description: 'Unified API for 200+ models · Requires OPENROUTER_API_KEY',
+    description: 'Unified API for 300+ models · Requires OPENROUTER_API_KEY',
     envKey: 'OPENROUTER_API_KEY',
     baseUrl: 'https://openrouter.ai/api/v1',
     authType: AuthType.USE_OPENAI,
-    defaultModel: 'openrouter/auto',
+    defaultModel: 'anthropic/claude-opus-4-5',
     requiresApiKey: true,
   },
   {
@@ -197,11 +197,11 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     id: 'ollama-cloud',
     label: 'Ollama Cloud',
     description:
-      'DeepSeek-V3, Kimi K2, GPT-OSS cloud models · Requires OLLAMA_API_KEY',
+      'GPT-OSS, DeepSeek, Llama cloud offloaded · Requires OLLAMA_API_KEY',
     envKey: 'OLLAMA_API_KEY',
     baseUrl: 'https://ollama.com/v1',
     authType: AuthType.USE_OPENAI,
-    defaultModel: 'deepseek-v3.1:671b-cloud',
+    defaultModel: 'gpt-oss:120b-cloud',
     requiresApiKey: true,
   },
 ];

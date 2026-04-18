@@ -21,20 +21,26 @@ interface OllamaTagsResponse {
 }
 
 /**
- * Fetches installed models from a running Ollama daemon.
- * @param baseUrl - e.g. http://localhost:11434
+ * Fetches installed models from a running Ollama daemon, or cloud models
+ * from https://ollama.com/api/tags when an API key is provided.
+ * @param baseUrl - e.g. http://localhost:11434/v1 or https://ollama.com/v1
+ * @param apiKey  - Bearer token for Ollama Cloud (OLLAMA_API_KEY); omit for local
  * @param timeoutMs - max wait time before falling back to static list
  */
 export async function fetchOllamaModels(
   baseUrl: string,
+  apiKey?: string,
   timeoutMs = 3000,
 ): Promise<ModelCategory[] | null> {
   const url = `${baseUrl.replace(/\/v1\/?$/, '')}/api/tags`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
+  const headers: Record<string, string> = {};
+  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
   try {
-    const resp = await fetch(url, { signal: controller.signal });
+    const resp = await fetch(url, { signal: controller.signal, headers });
     if (!resp.ok) return null;
     const data = (await resp.json()) as OllamaTagsResponse;
     clearTimeout(timer);
