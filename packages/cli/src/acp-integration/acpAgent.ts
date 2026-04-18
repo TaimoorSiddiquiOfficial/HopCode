@@ -497,7 +497,7 @@ class QwenAgent implements Agent {
     const errorMessage = this.extractErrorMessage(error);
     if (
       errorMessage?.includes('qwen-oauth') ||
-      errorMessage?.includes('HopCode OAuth')
+      errorMessage?.includes('Qwen OAuth')
     ) {
       const qwenOAuthMethods = authMethods.filter(
         (m) => m.id === AuthType.hopcode_OAUTH,

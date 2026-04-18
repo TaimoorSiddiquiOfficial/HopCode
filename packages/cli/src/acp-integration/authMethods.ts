@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,8 +20,8 @@ export function buildAuthMethods(): AuthMethod[] {
     },
     {
       id: AuthType.hopcode_OAUTH,
-      name: 'HopCode OAuth',
-      description: 'HopCode OAuth (free tier discontinued 2026-04-15)',
+      name: 'Qwen OAuth',
+      description: 'Qwen OAuth (free tier discontinued 2026-04-15)',
       _meta: {
         type: 'terminal',
         args: ['--auth-type=qwen-oauth'],
@@ -42,7 +42,7 @@ export function pickAuthMethodsForDetails(details?: string): AuthMethod[] {
   if (!details) {
     return authMethods;
   }
-  if (details.includes('qwen-oauth') || details.includes('HopCode OAuth')) {
+  if (details.includes('qwen-oauth') || details.includes('Qwen OAuth')) {
     const narrowed = filterAuthMethodsById(authMethods, AuthType.hopcode_OAUTH);
     return narrowed.length ? narrowed : authMethods;
   }
