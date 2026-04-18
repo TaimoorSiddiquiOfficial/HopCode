@@ -18,7 +18,7 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@hoptrendy/channel-base": "workspace:*",
+    "@hoptrendy/channel-base": "file:../base",
     "dingtalk-stream-sdk-nodejs": "^2.0.4"
   },
   "devDependencies": {

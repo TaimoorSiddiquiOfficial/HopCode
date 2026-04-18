@@ -83,6 +83,46 @@ jobs:
         shell: bash
         run: npm run build || true
 
+      - name: 'Normalize workspace deps for publish'
+        working-directory: '${{ matrix.package.path }}'
+        shell: bash
+        run: |
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          let changed = false;
+          for (const section of ['dependencies','devDependencies','peerDependencies','optionalDependencies']) {
+            if (!pkg[section]) continue;
+            for (const [dep, ver] of Object.entries(pkg[section])) {
+              if (!ver.startsWith('file:')) continue;
+              const relPath = ver.slice(5);
+              try {
+                const depPkg = JSON.parse(fs.readFileSync(path.resolve(relPath, 'package.json'), 'utf8'));
+                const actualName = depPkg.name;
+                const resolvedVer = depPkg.version;
+                if (actualName !== dep) {
+                  pkg[section][actualName] = resolvedVer;
+                  delete pkg[section][dep];
+                  console.log('Renamed+resolved: ' + dep + ' -> ' + actualName + '@' + resolvedVer);
+                } else {
+                  pkg[section][dep] = resolvedVer;
+                  console.log('Resolved: ' + dep + '@' + resolvedVer);
+                }
+                changed = true;
+              } catch(e) {
+                console.warn('Could not resolve ' + dep + ' from ' + ver + ': ' + e.message);
+              }
+            }
+          }
+          if (changed) {
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+            console.log('Updated package.json');
+          } else {
+            console.log('No file: deps to normalize');
+          }
+          "
+
       - name: 'Publish ${{ matrix.package.name }}'
         working-directory: '${{ matrix.package.path }}'
         shell: bash

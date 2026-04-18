@@ -26,7 +26,7 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@hoptrendy/channel-base": "workspace:*"
+    "@hoptrendy/channel-base": "file:../base"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
