@@ -1,11 +1,10 @@
 name: 'NPM Setup'
-description: 'Checkout, setup Node.js 20, and run npm ci — shared setup for publish jobs.'
+description: >
+  Setup Node.js 20 and run npm ci.
+  NOTE: actions/checkout must be called before using this action
+  (local actions require the repo to already be on disk).
 
 inputs:
-  ref:
-    description: 'Git ref to checkout'
-    required: false
-    default: ''
   registry-url:
     description: 'NPM registry URL'
     required: false
@@ -18,11 +17,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 'Checkout'
-      uses: 'actions/checkout@v4'
-      with:
-        ref: '${{ inputs.ref }}'
-
     - name: 'Setup Node.js'
       uses: 'actions/setup-node@v4'
       with:

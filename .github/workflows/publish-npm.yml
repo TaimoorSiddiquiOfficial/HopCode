@@ -35,10 +35,13 @@ jobs:
     outputs:
       packages_json: '${{ steps.packages.outputs.packages_json }}'
     steps:
-      - name: 'Setup'
-        uses: './.github/actions/npm-setup'
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4'
         with:
           ref: '${{ github.event.inputs.ref || github.sha }}'
+
+      - name: 'Setup'
+        uses: './.github/actions/npm-setup'
 
       - name: 'Determine packages to publish'
         id: 'packages'
@@ -67,10 +70,13 @@ jobs:
         package: ${{ fromJson(needs.prepare.outputs.packages_json) }}
       fail-fast: false
     steps:
-      - name: 'Setup'
-        uses: './.github/actions/npm-setup'
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4'
         with:
           ref: '${{ github.event.inputs.ref || github.sha }}'
+
+      - name: 'Setup'
+        uses: './.github/actions/npm-setup'
 
       - name: 'Build Package'
         working-directory: '${{ matrix.package.path }}'
