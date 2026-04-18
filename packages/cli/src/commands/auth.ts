@@ -10,6 +10,7 @@ import {
   runInteractiveAuth,
   showAuthStatus,
 } from './auth/handler.js';
+import { PROVIDER_REGISTRY, handleApiKeyAuth } from './auth/providers.js';
 import { t } from '../i18n/index.js';
 
 // Define subcommands separately
@@ -58,20 +59,41 @@ const statusCommand = {
   },
 };
 
+// Dynamically build one subcommand per provider in PROVIDER_REGISTRY
+const providerCommands = PROVIDER_REGISTRY.map((provider) => ({
+  command: provider.id,
+  describe: t('Authenticate using {{label}}', { label: provider.label }),
+  builder: (yargs: Argv) =>
+    yargs.option('key', {
+      alias: 'k',
+      describe: t('API key for {{label}}', { label: provider.label }),
+      type: 'string',
+    }),
+  handler: async (argv: { key?: string }) => {
+    await handleApiKeyAuth(provider.id, { apiKey: argv['key'] });
+  },
+}));
+
 export const authCommand: CommandModule = {
   command: 'auth',
   describe: t(
-    'Configure HopCode authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan',
+    'Configure HopCode authentication — Coding Plan, Qwen OAuth, or any AI provider',
   ),
-  builder: (yargs: Argv) =>
-    yargs
+  builder: (yargs: Argv) => {
+    let y = yargs
       .command(qwenOauthCommand)
       .command(codePlanCommand)
-      .command(statusCommand)
-      .demandCommand(0) // Don't require a subcommand
-      .version(false),
+      .command(statusCommand);
+
+    // Register all provider subcommands
+    for (const cmd of providerCommands) {
+      y = y.command(cmd);
+    }
+
+    return y.demandCommand(0).version(false);
+  },
   handler: async () => {
-    // This handler is for when no subcommand is provided - show interactive menu
+    // No subcommand provided — show interactive menu
     await runInteractiveAuth();
   },
 };

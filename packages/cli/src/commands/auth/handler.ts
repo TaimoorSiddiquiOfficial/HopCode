@@ -24,6 +24,11 @@ import { loadSettings, type LoadedSettings } from '../../config/settings.js';
 import { loadCliConfig } from '../../config/config.js';
 import type { CliArgs } from '../../config/config.js';
 import { InteractiveSelector } from './interactiveSelector.js';
+import {
+  PROVIDER_REGISTRY,
+  handleApiKeyAuth,
+  detectActiveProvider,
+} from './providers.js';
 
 interface QwenAuthOptions {
   region?: string;
@@ -370,7 +375,19 @@ async function promptForKey(): Promise<string> {
  * Runs the interactive authentication flow
  */
 export async function runInteractiveAuth() {
-  const selector = new InteractiveSelector(
+  // Build selector options: start with Coding Plan + Qwen OAuth, then add all registry providers
+  type AuthChoice =
+    | 'coding-plan'
+    | 'qwen-oauth'
+    | (typeof PROVIDER_REGISTRY)[number]['id'];
+
+  const providerOptions = PROVIDER_REGISTRY.map((p) => ({
+    value: p.id as AuthChoice,
+    label: t(p.label),
+    description: t(p.description),
+  }));
+
+  const selector = new InteractiveSelector<AuthChoice>(
     [
       {
         value: 'coding-plan' as const,
@@ -384,6 +401,7 @@ export async function runInteractiveAuth() {
         label: t('Qwen OAuth'),
         description: t('Discontinued — switch to Coding Plan or API Key'),
       },
+      ...providerOptions,
     ],
     t('Select authentication method:'),
   );
@@ -402,6 +420,9 @@ export async function runInteractiveAuth() {
 
   if (choice === 'coding-plan') {
     await handleQwenAuth('coding-plan', {});
+  } else {
+    // Delegate all registry providers to handleApiKeyAuth
+    await handleApiKeyAuth(choice, {});
   }
 }
 
@@ -448,54 +469,100 @@ export async function showAuthStatus(): Promise<void> {
         t('\n  ⚠ Run /auth to switch to Coding Plan or another provider.\n'),
       );
     } else if (selectedType === AuthType.USE_OPENAI) {
-      // Check for Coding Plan configuration
-      const codingPlanRegion = mergedSettings.codingPlan?.region;
-      const codingPlanVersion = mergedSettings.codingPlan?.version;
-      const modelName = mergedSettings.model?.name;
+      // Detect which provider is actually configured
+      const openaiModelProviders = (
+        mergedSettings.modelProviders as Record<string, ModelConfig[]> | undefined
+      )?.[AuthType.USE_OPENAI];
 
-      // Check if API key is set in environment
-      const hasApiKey =
-        !!process.env[CODING_PLAN_ENV_KEY] ||
-        !!mergedSettings.env?.[CODING_PLAN_ENV_KEY];
+      const activeProvider = detectActiveProvider(openaiModelProviders);
 
-      if (hasApiKey) {
-        writeStdoutLine(
-          t('✓ Authentication Method: Alibaba Cloud Coding Plan'),
-        );
+      // Check for Coding Plan first (uses CODING_PLAN_ENV_KEY)
+      const firstEntry = openaiModelProviders?.[0];
+      const isCodingPlan =
+        firstEntry && isCodingPlanConfig(firstEntry.baseUrl, firstEntry.envKey);
 
-        if (codingPlanRegion) {
-          const regionDisplay =
-            codingPlanRegion === CodingPlanRegion.CHINA
-              ? t('中国 (China) - 阿里云百炼')
-              : t('Global - Alibaba Cloud');
-          writeStdoutLine(t('  Region: {{region}}', { region: regionDisplay }));
-        }
+      if (isCodingPlan) {
+        const codingPlanRegion = mergedSettings.codingPlan?.region;
+        const codingPlanVersion = mergedSettings.codingPlan?.version;
+        const modelName = mergedSettings.model?.name;
+        const hasApiKey =
+          !!process.env[CODING_PLAN_ENV_KEY] ||
+          !!mergedSettings.env?.[CODING_PLAN_ENV_KEY];
 
-        if (modelName) {
+        if (hasApiKey) {
           writeStdoutLine(
-            t('  Current Model: {{model}}', { model: modelName }),
+            t('✓ Authentication Method: Alibaba Cloud Coding Plan'),
           );
-        }
 
-        if (codingPlanVersion) {
+          if (codingPlanRegion) {
+            const regionDisplay =
+              codingPlanRegion === CodingPlanRegion.CHINA
+                ? t('中国 (China) - 阿里云百炼')
+                : t('Global - Alibaba Cloud');
+            writeStdoutLine(t('  Region: {{region}}', { region: regionDisplay }));
+          }
+
+          if (modelName) {
+            writeStdoutLine(
+              t('  Current Model: {{model}}', { model: modelName }),
+            );
+          }
+
+          if (codingPlanVersion) {
+            writeStdoutLine(
+              t('  Config Version: {{version}}', {
+                version: codingPlanVersion.substring(0, 8) + '...',
+              }),
+            );
+          }
+
+          writeStdoutLine(t('  Status: API key configured\n'));
+        } else {
           writeStdoutLine(
-            t('  Config Version: {{version}}', {
-              version: codingPlanVersion.substring(0, 8) + '...',
+            t(
+              '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)',
+            ),
+          );
+          writeStdoutLine(
+            t('  Issue: API key not found in environment or settings\n'),
+          );
+          writeStdoutLine(t('  Run `hopcode auth coding-plan` to re-configure.\n'));
+        }
+      } else if (activeProvider) {
+        // A known registry provider is configured
+        const hasApiKey = activeProvider.envKey
+          ? !!process.env[activeProvider.envKey] ||
+            !!mergedSettings.env?.[activeProvider.envKey]
+          : true; // Ollama local has no real key requirement
+
+        if (hasApiKey) {
+          writeStdoutLine(
+            t('✓ Authentication Method: {{provider}}', {
+              provider: activeProvider.label,
+            }),
+          );
+          const modelName = mergedSettings.model?.name ?? activeProvider.defaultModel;
+          writeStdoutLine(t('  Default Model: {{model}}', { model: modelName }));
+          writeStdoutLine(t('  Status: API key configured\n'));
+        } else {
+          writeStdoutLine(
+            t('⚠️  Authentication Method: {{provider}} (Incomplete)', {
+              provider: activeProvider.label,
+            }),
+          );
+          writeStdoutLine(
+            t('  Issue: {{key}} not found\n', { key: activeProvider.envKey }),
+          );
+          writeStdoutLine(
+            t('  Run `hopcode auth {{id}}` to re-configure.\n', {
+              id: activeProvider.id,
             }),
           );
         }
-
-        writeStdoutLine(t('  Status: API key configured\n'));
       } else {
-        writeStdoutLine(
-          t(
-            '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)',
-          ),
-        );
-        writeStdoutLine(
-          t('  Issue: API key not found in environment or settings\n'),
-        );
-        writeStdoutLine(t('  Run `hopcode auth coding-plan` to re-configure.\n'));
+        // Unknown OpenAI-compatible configuration
+        writeStdoutLine(t('✓ Authentication Method: OpenAI-compatible'));
+        writeStdoutLine(t('  Status: Configured\n'));
       }
     } else {
       writeStdoutLine(
