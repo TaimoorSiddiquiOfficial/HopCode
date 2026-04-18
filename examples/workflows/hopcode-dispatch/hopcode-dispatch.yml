@@ -1,0 +1,59 @@
+# HopCode Dispatch Workflow
+# Manually trigger HopCode to perform any task in your repository.
+#
+# Required secrets:
+#   OPENAI_API_KEY  (or any supported provider key)
+#   GITHUB_TOKEN    (automatically provided by GitHub Actions)
+#
+# Usage: Go to Actions → HopCode Dispatch → Run workflow, enter your task.
+
+name: HopCode Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task for HopCode to perform'
+        required: true
+        type: string
+      model:
+        description: 'AI model to use (default: gpt-4o)'
+        required: false
+        default: 'gpt-4o'
+        type: string
+
+jobs:
+  hopcode:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install HopCode CLI
+        run: npm install -g @hoptrendy/hopcode-cli
+
+      - name: Configure HopCode
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          hopcode auth openai --key "$OPENAI_API_KEY"
+
+      - name: Run task with HopCode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOPCODE_MODEL: ${{ inputs.model }}
+        run: |
+          hopcode github auth --token "$GITHUB_TOKEN"
+          echo "${{ inputs.task }}" | hopcode --model "$HOPCODE_MODEL" --yolo

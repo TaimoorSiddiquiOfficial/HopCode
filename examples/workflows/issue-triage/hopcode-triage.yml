@@ -1,0 +1,57 @@
+# HopCode Issue Triage Workflow
+# Automatically triage new issues: apply labels, add comments, and
+# assign to team members using AI analysis.
+#
+# Required secrets:
+#   OPENAI_API_KEY  (or any supported provider key)
+#   GITHUB_TOKEN    (automatically provided by GitHub Actions)
+
+name: HopCode Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install HopCode CLI
+        run: npm install -g @hoptrendy/hopcode-cli
+
+      - name: Configure HopCode
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          hopcode auth openai --key "$OPENAI_API_KEY"
+
+      - name: Triage issue with HopCode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          hopcode github auth --token "$GITHUB_TOKEN"
+          cat <<'EOF' | hopcode --yolo
+          Triage GitHub issue #$ISSUE_NUMBER:
+          Title: $ISSUE_TITLE
+          Body: $ISSUE_BODY
+
+          Please:
+          1. Add appropriate labels (bug, enhancement, question, documentation, etc.)
+          2. Add a helpful triage comment explaining the category and next steps
+          3. If it's a clear duplicate or needs more info, note that in the comment
+          EOF

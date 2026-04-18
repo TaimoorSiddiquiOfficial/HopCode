@@ -1,0 +1,57 @@
+# HopCode PR Review Workflow
+# Automatically reviews pull requests for code quality, bugs,
+# security issues, and style using AI analysis.
+#
+# Required secrets:
+#   OPENAI_API_KEY  (or any supported provider key)
+#   GITHUB_TOKEN    (automatically provided by GitHub Actions)
+
+name: HopCode PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+jobs:
+  review:
+    # Skip draft PRs
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install HopCode CLI
+        run: npm install -g @hoptrendy/hopcode-cli
+
+      - name: Configure HopCode
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          hopcode auth openai --key "$OPENAI_API_KEY"
+
+      - name: Review PR with HopCode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          hopcode github auth --token "$GITHUB_TOKEN"
+          cat <<'EOF' | hopcode --yolo
+          Review pull request #$PR_NUMBER using "hopcode github pr" commands.
+          Please:
+          1. Fetch the PR diff and review for bugs, security issues, and logic errors
+          2. Check for code quality and best practices
+          3. Post a review comment summarising findings
+          4. If there are blocking issues, request changes; otherwise approve
+          EOF

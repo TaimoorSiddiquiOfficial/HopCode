@@ -1,0 +1,53 @@
+# HopCode Scheduled Issue Triage Workflow
+# Runs weekly to triage any open, unlabelled issues in bulk.
+#
+# Required secrets:
+#   OPENAI_API_KEY  (or any supported provider key)
+#   GITHUB_TOKEN    (automatically provided by GitHub Actions)
+#
+# Schedule: Every Monday at 9:00 AM UTC (adjust cron as needed).
+
+name: HopCode Scheduled Triage
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 9:00 AM UTC
+  workflow_dispatch:       # Also allow manual trigger
+
+jobs:
+  scheduled-triage:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install HopCode CLI
+        run: npm install -g @hoptrendy/hopcode-cli
+
+      - name: Configure HopCode
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          hopcode auth openai --key "$OPENAI_API_KEY"
+
+      - name: List and triage open issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          hopcode github auth --token "$GITHUB_TOKEN"
+          cat <<'EOF' | hopcode --yolo
+          Review all open issues in this repository and:
+          1. Use "hopcode github issues" to list open issues
+          2. For any issues without labels, suggest and apply appropriate labels
+          3. Close issues that appear to be resolved or are clear duplicates
+          4. Add helpful comments where needed
+          EOF
