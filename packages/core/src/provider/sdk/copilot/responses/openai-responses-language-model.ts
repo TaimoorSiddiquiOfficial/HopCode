@@ -888,7 +888,7 @@ export class OpenAIResponsesLanguageModel implements LanguageModelV2 {
             }
 
             // handle failed chunk parsing / validation:
-            if (!chunk.success) {
+            if (chunk.success === false) {
               finishReason = 'error';
               controller.enqueue({ type: 'error', error: chunk.error });
               return;

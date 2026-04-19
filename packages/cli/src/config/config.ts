@@ -38,6 +38,7 @@ import { authCommand } from '../commands/auth.js';
 import { githubCommand } from '../commands/github/index.js';
 import { modelCommand } from '../commands/model/index.js';
 import { providerCommand } from '../commands/provider.js';
+import { skillsCommand } from '../commands/skills.js';
 import {
   resolveCliGenerationConfig,
   getAuthTypeFromEnv,
@@ -619,7 +620,8 @@ export async function parseArguments(): Promise<CliArgs> {
     // Register model selector command
     .command(modelCommand)
     // Register provider manager command
-    .command(providerCommand);
+    .command(providerCommand)
+    .command(skillsCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json

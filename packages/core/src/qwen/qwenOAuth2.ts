@@ -546,7 +546,7 @@ export async function getQwenOAuthClient(
     // If we couldn't obtain valid credentials via SharedTokenManager, fall back to
     // interactive device authorization (unless explicitly forbidden above).
     const result = await authWithQwenDeviceFlow(client, config);
-    if (!result.success) {
+    if (result.success === false) {
       // Only emit timeout event if the failure reason is actually timeout
       // Other error types (401, 429, etc.) have already emitted their specific events
       if (result.reason === 'timeout') {
