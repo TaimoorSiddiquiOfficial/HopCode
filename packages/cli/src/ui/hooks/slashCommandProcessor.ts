@@ -76,6 +76,7 @@ interface SlashCommandProcessorActions {
   openMemoryDialog: () => void;
   openSettingsDialog: () => void;
   openModelDialog: (options?: { fastModelMode?: boolean }) => void;
+  openProviderDialog: () => void;
   openTrustDialog: () => void;
   openPermissionsDialog: () => void;
   openApprovalModeDialog: () => void;
@@ -538,6 +539,9 @@ export const useSlashCommandProcessor = (
                       return { type: 'handled' };
                     case 'mcp':
                       actions.openMcpDialog();
+                      return { type: 'handled' };
+                    case 'provider':
+                      actions.openProviderDialog();
                       return { type: 'handled' };
                     case 'hooks':
                       actions.openHooksDialog();

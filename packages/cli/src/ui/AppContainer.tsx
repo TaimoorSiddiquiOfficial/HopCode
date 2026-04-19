@@ -69,6 +69,7 @@ import { useAuthCommand } from './auth/useAuth.js';
 import { useEditorSettings } from './hooks/useEditorSettings.js';
 import { useSettingsCommand } from './hooks/useSettingsCommand.js';
 import { useModelCommand } from './hooks/useModelCommand.js';
+import { useProviderCommand } from './hooks/useProviderCommand.js';
 import { useArenaCommand } from './hooks/useArenaCommand.js';
 import { useApprovalModeCommand } from './hooks/useApprovalModeCommand.js';
 import { useResumeCommand } from './hooks/useResumeCommand.js';
@@ -561,6 +562,8 @@ export const AppContainer = (props: AppContainerProps) => {
     openModelDialog,
     closeModelDialog,
   } = useModelCommand();
+  const { isProviderDialogOpen, openProviderDialog, closeProviderDialog } =
+    useProviderCommand();
   const { activeArenaDialog, openArenaDialog, closeArenaDialog } =
     useArenaCommand();
 
@@ -624,6 +627,7 @@ export const AppContainer = (props: AppContainerProps) => {
       openExtensionsManagerDialog,
       openMcpDialog,
       openHooksDialog,
+      openProviderDialog,
       openResumeDialog,
     }),
     [
@@ -645,6 +649,7 @@ export const AppContainer = (props: AppContainerProps) => {
       openExtensionsManagerDialog,
       openMcpDialog,
       openHooksDialog,
+      openProviderDialog,
       openResumeDialog,
     ],
   );
@@ -1964,6 +1969,7 @@ export const AppContainer = (props: AppContainerProps) => {
     isSettingsDialogOpen ||
     isMemoryDialogOpen ||
     isModelDialogOpen ||
+    isProviderDialogOpen ||
     isTrustDialogOpen ||
     activeArenaDialog !== null ||
     isPermissionsDialogOpen ||
@@ -2015,6 +2021,7 @@ export const AppContainer = (props: AppContainerProps) => {
       isMemoryDialogOpen,
       isModelDialogOpen,
       isFastModelMode,
+      isProviderDialogOpen,
       isTrustDialogOpen,
       activeArenaDialog,
       isPermissionsDialogOpen,
@@ -2122,6 +2129,7 @@ export const AppContainer = (props: AppContainerProps) => {
       isMemoryDialogOpen,
       isModelDialogOpen,
       isFastModelMode,
+      isProviderDialogOpen,
       isTrustDialogOpen,
       activeArenaDialog,
       isPermissionsDialogOpen,
@@ -2234,6 +2242,8 @@ export const AppContainer = (props: AppContainerProps) => {
       closeMemoryDialog,
       closeModelDialog,
       openModelDialog,
+      openProviderDialog,
+      closeProviderDialog,
       openArenaDialog,
       closeArenaDialog,
       handleArenaModelsSelected,
@@ -2296,6 +2306,8 @@ export const AppContainer = (props: AppContainerProps) => {
       closeMemoryDialog,
       closeModelDialog,
       openModelDialog,
+      openProviderDialog,
+      closeProviderDialog,
       openArenaDialog,
       closeArenaDialog,
       handleArenaModelsSelected,

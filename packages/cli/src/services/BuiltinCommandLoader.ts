@@ -34,6 +34,7 @@ import { dreamCommand } from '../ui/commands/dreamCommand.js';
 import { forgetCommand } from '../ui/commands/forgetCommand.js';
 import { memoryCommand } from '../ui/commands/memoryCommand.js';
 import { modelCommand } from '../ui/commands/modelCommand.js';
+import { providerCommand } from '../ui/commands/providerCommand.js';
 import { rememberCommand } from '../ui/commands/rememberCommand.js';
 import { planCommand } from '../ui/commands/planCommand.js';
 import { permissionsCommand } from '../ui/commands/permissionsCommand.js';
@@ -111,6 +112,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
         : []),
       memoryCommand,
       modelCommand,
+      providerCommand,
       rememberCommand,
       planCommand,
       permissionsCommand,
