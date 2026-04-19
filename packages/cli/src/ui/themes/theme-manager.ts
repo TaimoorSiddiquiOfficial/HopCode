@@ -195,6 +195,11 @@ class ThemeManager {
       }),
     );
 
+    // HopCode-branded themes shown first
+    const hopcodeThemes = builtInThemes.filter(
+      (theme) => theme.name === QwenLight.name || theme.name === QwenDark.name,
+    );
+
     // Separate built-in themes
     const otherBuiltInThemes = builtInThemes.filter(
       (theme) => theme.name !== QwenLight.name && theme.name !== QwenDark.name,

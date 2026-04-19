@@ -112,7 +112,7 @@ export function getAvailableModelsForAuthType(
 
   // Fall back to environment variables for specific auth types (no config provided)
   switch (authType) {
-    case AuthType.hopcode_OAUTH: {
+    case AuthType.QWEN_OAUTH: {
       return [...getQwenOAuthModels()];
     }
     case AuthType.USE_OPENAI: {

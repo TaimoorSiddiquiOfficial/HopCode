@@ -47,7 +47,7 @@ export interface ResolvedCliGenerationConfig {
 
 export function getAuthTypeFromEnv(): AuthType | undefined {
   if (process.env['QWEN_OAUTH']) {
-    return AuthType.hopcode_OAUTH;
+    return AuthType.QWEN_OAUTH;
   }
 
   if (
