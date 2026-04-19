@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode-core",
-  "version": "0.14.9",
+  "version": "0.14.10",
   "description": "HopCode Core",
   "repository": {
     "type": "git",
@@ -114,6 +114,7 @@
     "@lydell/node-pty-win32-x64": "1.2.0-beta.10"
   },
   "devDependencies": {
+    "@types/bun": "^1.1.0",
     "@types/diff": "^7.0.2",
     "@types/dotenv": "^6.1.1",
     "@types/fast-levenshtein": "^0.0.4",
