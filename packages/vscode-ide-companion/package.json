@@ -179,11 +179,6 @@
   },
   "main": "./dist/extension.cjs",
   "type": "module",
-  "files": [
-    "dist",
-    "assets",
-    "schemas"
-  ],
   "scripts": {
     "prepackage": "node ./scripts/prepackage.js",
     "prebuild": "npm --prefix ../webui run build || true",
