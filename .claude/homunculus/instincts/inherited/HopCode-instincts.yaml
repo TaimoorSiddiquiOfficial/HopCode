@@ -1,0 +1,566 @@
+# Instincts generated from https://github.com/TaimoorSiddiquiOfficial/HopCode
+# Generated: 2026-04-19T02:06:23.816Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: HopCode-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, perf, fix, ci, merge
+
+## Evidence
+
+- 7 commits analyzed
+- Detected conventional commit pattern
+- Examples: feat(mcp): add OSC 52 copy hotkey for OAuth authorization URL (#3337) (#3393), perf(vscode): fix input lag in long conversations (#2395) (#2550)
+
+---
+id: HopCode-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Commit Length
+
+## Action
+
+Write moderate-length commit messages (~72 characters)
+
+## Evidence
+
+- Average commit message length: 72 chars
+- Based on 7 commits
+
+---
+id: HopCode-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: HopCode-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: HopCode-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: HopCode-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: 
+
+---
+id: HopCode-test-framework
+trigger: "when writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Test Framework
+
+## Action
+
+Use vitest as the test framework
+
+## Evidence
+
+- Test framework detected: vitest
+- File pattern: *.test.ts
+
+---
+id: HopCode-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Test Naming
+
+## Action
+
+Name test files using the pattern: *.test.ts
+
+## Evidence
+
+- File pattern: *.test.ts
+- Consistent across test files
+
+---
+id: HopCode-test-mocking
+trigger: "when mocking dependencies in tests"
+confidence: 0.75
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Test Mocking
+
+## Action
+
+Use msw for mocking
+
+## Evidence
+
+- Mocking pattern detected: msw
+- Consistent across test files
+
+---
+id: HopCode-workflow-feature-development-with-tests-and-shared-components
+trigger: "when doing feature development with tests and shared components"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Workflow Feature Development With Tests And Shared Components
+
+## Action
+
+Follow the feature-development-with-tests-and-shared-components workflow:
+1. Design or update feature plan or documentation
+2. Implement backend logic or service
+3. Update or create shared types/interfaces
+4. Implement or update frontend/UI components
+5. Write or update corresponding tests
+6. Wire up feature in main index/entry points
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: docs/plans/*.md, packages/*/src/**/*.ts, packages/*/src/**/*.tsx
+
+---
+id: HopCode-workflow-infrastructure-or-configuration-update
+trigger: "when doing infrastructure or configuration update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Workflow Infrastructure Or Configuration Update
+
+## Action
+
+Follow the infrastructure-or-configuration-update workflow:
+1. Edit configuration or workflow files (e.g., package.json, .github/workflows/*.yml)
+2. Test changes locally or in CI
+3. Document rationale in commit message
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: package.json, .github/workflows/*.yml
+
+---
+id: HopCode-workflow-merge-upstream-with-conflict-resolution
+trigger: "when doing merge upstream with conflict resolution"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/TaimoorSiddiquiOfficial/HopCode
+---
+
+# HopCode Workflow Merge Upstream With Conflict Resolution
+
+## Action
+
+Follow the merge-upstream-with-conflict-resolution workflow:
+1. Fetch and merge upstream branch
+2. Resolve file conflicts, especially in shared or heavily modified files
+3. Preserve local branding, architecture, and configuration
+4. Summarize merged features and conflict resolutions in commit message
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: .github/workflows/*.yml, docs/plans/*.md, package.json
+
+---
+id: hopcode-instinct-file-naming-camelcase
+trigger: "When creating a new file in the codebase"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct File Naming Camelcase
+
+## Action
+
+Name the file using camelCase convention
+
+## Evidence
+
+- Pattern in files: packages/*/src/**/*.ts
+- NamingConventions.files = camelCase
+
+---
+id: hopcode-instinct-function-naming-camelcase
+trigger: "When defining a new function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Function Naming Camelcase
+
+## Action
+
+Use camelCase for the function name
+
+## Evidence
+
+- NamingConventions.functions = camelCase
+- Pattern in TypeScript code
+
+---
+id: hopcode-instinct-class-naming-pascalcase
+trigger: "When defining a new class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Class Naming Pascalcase
+
+## Action
+
+Use PascalCase for the class name
+
+## Evidence
+
+- NamingConventions.classes = PascalCase
+- Pattern in TypeScript code
+
+---
+id: hopcode-instinct-constant-naming-screaming-snake-case
+trigger: "When declaring a constant value"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Constant Naming Screaming Snake Case
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for the constant name
+
+## Evidence
+
+- NamingConventions.constants = SCREAMING_SNAKE_CASE
+- Pattern in TypeScript code
+
+---
+id: hopcode-instinct-import-style-relative
+trigger: "When importing modules within the project"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Import Style Relative
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- importStyle = relative
+- Pattern in TypeScript code
+
+---
+id: hopcode-instinct-export-style-named
+trigger: "When exporting functions, classes, or constants"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Export Style Named
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- exportStyle = named
+- Pattern in TypeScript code
+
+---
+id: hopcode-instinct-test-file-pattern
+trigger: "When creating a new test file"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Test File Pattern
+
+## Action
+
+Name the file with the pattern *.test.ts or *.test.tsx
+
+## Evidence
+
+- testing.filePattern = *.test.ts
+- Pattern in packages/*/src/**/*.test.ts
+
+---
+id: hopcode-instinct-use-vitest
+trigger: "When writing automated tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Use Vitest
+
+## Action
+
+Use the vitest framework
+
+## Evidence
+
+- testing.framework = vitest
+- Pattern in test files
+
+---
+id: hopcode-instinct-use-msw-for-mocking
+trigger: "When mocking APIs or network requests in tests"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Use Msw For Mocking
+
+## Action
+
+Use msw for mocking
+
+## Evidence
+
+- testing.mockingStyle = msw
+- Pattern in test files
+
+---
+id: hopcode-instinct-unit-tests-default
+trigger: "When writing tests for new or existing code"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Unit Tests Default
+
+## Action
+
+Write unit tests as the default test type
+
+## Evidence
+
+- testing.testTypes = unit
+- Pattern in test files
+
+---
+id: hopcode-instinct-conventional-commit-format
+trigger: "When writing a commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Conventional Commit Format
+
+## Action
+
+Use conventional commit format with prefix (feat, perf, fix, ci, merge)
+
+## Evidence
+
+- commits.type = conventional
+- commits.prefixes = [feat, perf, fix, ci, merge]
+- Example: feat(mcp): add OSC 52 copy hotkey for OAuth authorization URL (#3337) (#3393)
+
+---
+id: hopcode-instinct-commit-length-guideline
+trigger: "When composing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Commit Length Guideline
+
+## Action
+
+Keep the commit message around 72 characters on average
+
+## Evidence
+
+- commits.averageLength = 72
+- Pattern in commit history
+
+---
+id: hopcode-instinct-feature-development-workflow
+trigger: "When adding a new feature or capability spanning backend, frontend, and shared code"
+confidence: 0.92
+domain: workflow
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Feature Development Workflow
+
+## Action
+
+Follow the workflow: update docs/plans, implement backend, update shared types, implement frontend components, write tests, wire up in index
+
+## Evidence
+
+- Workflow: feature-development-with-tests-and-shared-components
+- Pattern in commit sequences and files: docs/plans/*.md, packages/*/src/**/*.ts, packages/*/src/**/*.tsx, packages/*/src/**/*.test.ts, packages/*/src/types/**/*.ts
+
+---
+id: hopcode-instinct-infra-config-update-workflow
+trigger: "When fixing or improving build tooling, CI/CD automation, or project configuration"
+confidence: 0.88
+domain: workflow
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Infra Config Update Workflow
+
+## Action
+
+Edit configuration/workflow files (package.json, .github/workflows/*.yml), test changes, document rationale in commit message
+
+## Evidence
+
+- Workflow: infrastructure-or-configuration-update
+- Pattern in commits: fix(build): invoke tsx directly via node --import instead of npx (#3237)
+- Pattern in files: package.json, .github/workflows/*.yml
+
+---
+id: hopcode-instinct-merge-upstream-workflow
+trigger: "When syncing the fork with upstream changes while maintaining local modifications"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: TaimoorSiddiquiOfficial/HopCode
+---
+
+# Hopcode Instinct Merge Upstream Workflow
+
+## Action
+
+Fetch and merge upstream branch, resolve conflicts, preserve local customizations, summarize in commit message
+
+## Evidence
+
+- Workflow: merge-upstream-with-conflict-resolution
+- Pattern in commits: merge(upstream): sync QwenLM/qwen-code upstream changes Apr 18-19 2026
+- Pattern in files: .github/workflows/*.yml, docs/plans/*.md, package.json, packages/*/src/**/*.ts
+
