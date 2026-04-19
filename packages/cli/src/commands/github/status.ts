@@ -82,15 +82,15 @@ async function handleGithubStatus(): Promise<void> {
 
   writeStdoutLine(
     t('  Stars:   {{stars}}  ·  Open Issues: {{issues}}', {
-      stars: repoInfo.stargazers_count,
-      issues: repoInfo.open_issues_count,
+      stars: String(repoInfo.stargazers_count),
+      issues: String(repoInfo.open_issues_count),
     }),
   );
 
   // Open PRs
   writeStdoutLine(
     t('\n  ── Open Pull Requests ({{count}}) ─────────────────────', {
-      count: openPRs.length,
+      count: String(openPRs.length),
     }),
   );
   if (openPRs.length === 0) {
@@ -100,7 +100,7 @@ async function handleGithubStatus(): Promise<void> {
       const draft = pr.draft ? ' [draft]' : '';
       writeStdoutLine(
         t('  #{{num}}  {{title}}{{draft}}', {
-          num: pr.number,
+          num: String(pr.number),
           title: pr.title.slice(0, 60),
           draft,
         }),

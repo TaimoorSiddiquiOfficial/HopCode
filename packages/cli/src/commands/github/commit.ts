@@ -179,7 +179,7 @@ async function handleCommit(argv: {
 
   writeStdoutLine(
     t('\n  Staged files ({{count}}): {{files}}', {
-      count: files.length,
+      count: String(files.length),
       files:
         files.slice(0, 5).join(', ') +
         (files.length > 5 ? ` +${files.length - 5} more` : ''),

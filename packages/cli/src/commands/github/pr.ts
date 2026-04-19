@@ -213,7 +213,7 @@ const createCommand: CommandModule = {
 
     writeStdoutLine(
       t('\n  ✓ PR created: #{{num}} — {{title}}', {
-        num: pr.number,
+        num: String(pr.number),
         title: pr.title,
       }),
     );
@@ -249,7 +249,7 @@ const listCommand: CommandModule = {
       const draft = pr.draft ? ' [DRAFT]' : '';
       writeStdoutLine(
         t('  #{{num}}  {{title}}{{draft}}', {
-          num: pr.number,
+          num: String(pr.number),
           title: pr.title.slice(0, 65),
           draft,
         }),
@@ -276,7 +276,7 @@ const reviewCommand: CommandModule = {
     const { owner, repo } = requireRepo();
     const num = argv['number'] as number;
 
-    writeStdoutLine(t('  Fetching PR #{{num}} diff...', { num }));
+    writeStdoutLine(t('  Fetching PR #{{num}} diff...', { num: String(num) }));
     const diff = await getPRDiff(owner, repo, num);
     const truncated = diff.slice(0, 12000);
 

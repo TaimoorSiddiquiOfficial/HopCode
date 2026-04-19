@@ -233,7 +233,7 @@ async function handleModelCommand(argv: ModelCommandArgs): Promise<void> {
   // Also update the modelProviders entry so the active provider's id matches
   const providerKey = info.authTypeKey;
   const existingProviders =
-    (settings.merged?.modelProviders?.[providerKey] as
+    (settings.merged?.modelProviders?.[providerKey] as unknown as
       | Array<Record<string, unknown>>
       | undefined) ?? [];
   if (existingProviders.length > 0) {

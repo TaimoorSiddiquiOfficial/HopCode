@@ -200,6 +200,10 @@ export const hooksCommand: SlashCommand = {
 
     // In non-interactive mode, list hooks
     const result = await listCommand.action?.(context, args);
-    return result ?? { type: 'message', messageType: 'info', content: '' };
+    return (result ?? {
+      type: 'message',
+      messageType: 'info',
+      content: '',
+    }) as SlashCommandActionReturn;
   },
 };

@@ -79,7 +79,7 @@ const listCommand: CommandModule = {
       const labels = issue.labels.map((l) => l.name).join(', ');
       writeStdoutLine(
         t('  #{{num}}  {{title}}', {
-          num: issue.number,
+          num: String(issue.number),
           title: issue.title.slice(0, 70),
         }),
       );
@@ -136,7 +136,7 @@ const createCommand: CommandModule = {
     const issue = await createIssue(owner, repo, { title, body, labels });
     writeStdoutLine(
       t('\n  ✓ Issue created: #{{num}} — {{title}}', {
-        num: issue.number,
+        num: String(issue.number),
         title: issue.title,
       }),
     );
@@ -158,7 +158,7 @@ const closeCommand: CommandModule = {
     const { owner, repo } = requireRepo();
     const num = argv['number'] as number;
     await closeIssue(owner, repo, num);
-    writeStdoutLine(t('✓ Issue #{{num}} closed.', { num }));
+    writeStdoutLine(t('✓ Issue #{{num}} closed.', { num: String(num) }));
   },
 };
 
