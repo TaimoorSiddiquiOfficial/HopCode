@@ -200,6 +200,8 @@ jobs:
             if echo "$output" | grep -qiE "(already published|already exists|version already)"; then
               version=$(node -p "require('./package.json').version")
               echo "⏭️ Open VSX: v${version} already published, skipping"
+            elif echo "$output" | grep -qiE "(unknown publisher|create-namespace|namespace)"; then
+              echo "⚠️ Open VSX: publisher namespace not registered. Visit https://open-vsx.org to create the 'hopcode' namespace, then re-run."
             else
               echo "$output" >&2; exit 1
             fi
