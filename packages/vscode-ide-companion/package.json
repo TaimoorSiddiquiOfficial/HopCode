@@ -196,7 +196,7 @@
     "watch": "npm-run-all2 -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "vsce package --no-dependencies",
+    "package": "npx --yes @vscode/vsce package --no-dependencies",
     "test": "vitest run",
     "test:ci": "vitest run --coverage",
     "validate:notices": "node ./scripts/validate-notices.js"
