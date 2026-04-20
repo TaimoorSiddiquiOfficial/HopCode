@@ -24,7 +24,7 @@ import * as os from 'node:os';
 import {
   QWEN_CONFIG_DIR,
   DEFAULT_CONTEXT_FILENAME,
-} from '@hopcode/hopcode-core/src/memory/const.js';
+} from '@hoptrendy/hopcode-core/src/memory/const.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, '..');
