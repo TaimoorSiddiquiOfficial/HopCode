@@ -27,6 +27,14 @@ package-lock.json
 .claude
 CLAUDE.md
 
+# Temporary planning and notes markdown files
+# Keep only product-essential docs; ignore all other .md at root
+/*.md
+!README.md
+!CONTRIBUTING.md
+!SECURITY.md
+!AGENTS.md
+
 # OS metadata
 .DS_Store
 Thumbs.db
