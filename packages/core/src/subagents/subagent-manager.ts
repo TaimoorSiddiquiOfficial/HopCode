@@ -673,12 +673,18 @@ export class SubagentManager {
    * authType-prefixed), build a Config override with a dedicated
    * ContentGenerator so the model actually reaches the API.
    * Returns the original context unchanged for inherit selectors.
+   *
+   * Priority: settings.json `agentModels[name]` > YAML `model` field > inherit
    */
   private async maybeOverrideContentGenerator(
     config: SubagentConfig,
     base: Config,
   ): Promise<Config> {
-    const selection = parseSubagentModelSelection(config.model);
+    // Check if the user has configured a per-agent model override in settings.json
+    const settingsOverride = base.getAgentModelForType(config.name);
+    const modelStr = settingsOverride ?? config.model;
+
+    const selection = parseSubagentModelSelection(modelStr);
     if (selection.inherits) {
       return base;
     }

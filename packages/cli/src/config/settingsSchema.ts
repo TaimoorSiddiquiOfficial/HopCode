@@ -1587,14 +1587,36 @@ const SETTINGS_SCHEMA = {
     default: undefined as
       | {
           provider: Array<{
-            type: 'tavily' | 'google' | 'dashscope';
+            type:
+              | 'tavily'
+              | 'google'
+              | 'dashscope'
+              | 'duckduckgo'
+              | 'exa'
+              | 'bing'
+              | 'jina'
+              | 'firecrawl'
+              | 'custom';
             apiKey?: string;
             searchEngineId?: string;
+            [key: string]: unknown;
           }>;
           default: string;
+          mode?: 'auto' | 'manual';
         }
       | undefined,
-    description: 'Configuration for web search providers.',
+    description:
+      'Configuration for web search providers. Supports: tavily, google, dashscope, duckduckgo, exa, bing, jina, firecrawl, custom. Set mode="auto" for failover chain.',
+    showInDialog: false,
+  },
+  agentModels: {
+    type: 'object',
+    label: 'Agent Model Overrides',
+    category: 'Advanced',
+    requiresRestart: false,
+    default: undefined as Record<string, string> | undefined,
+    description:
+      'Per-agent model overrides. Map of agent name → model string. Example: {"general-purpose": "openai::gpt-4o", "Explore": "inherit"}. Use "inherit" to use the parent model.',
     showInDialog: false,
   },
   agents: {

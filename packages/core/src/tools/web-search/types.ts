@@ -101,6 +101,13 @@ export interface WebSearchConfig {
    * The default provider to use.
    */
   default: string;
+
+  /**
+   * Search mode:
+   * - "auto"   — try providers in priority order, fall back on failure (default)
+   * - "manual" — use only the provider specified in `default`
+   */
+  mode?: 'auto' | 'manual';
 }
 
 /**
@@ -153,4 +160,97 @@ export interface DashScopeProviderConfig {
 export type WebSearchProviderConfig =
   | TavilyProviderConfig
   | GoogleProviderConfig
-  | DashScopeProviderConfig;
+  | DashScopeProviderConfig
+  | DuckDuckGoProviderConfig
+  | ExaProviderConfig
+  | BingProviderConfig
+  | JinaProviderConfig
+  | FirecrawlProviderConfig
+  | CustomProviderConfig;
+
+/**
+ * Configuration for DuckDuckGo provider (free, no API key required).
+ */
+export interface DuckDuckGoProviderConfig {
+  type: 'duckduckgo';
+  maxResults?: number;
+  safeSearch?: 'off' | 'moderate' | 'strict';
+}
+
+/**
+ * Configuration for Exa AI neural search provider.
+ */
+export interface ExaProviderConfig {
+  type: 'exa';
+  apiKey?: string;
+  maxResults?: number;
+  useWebSearch?: boolean;
+  /** Search type: "keyword" | "neural" | "auto" (default: "auto") */
+  searchType?: 'keyword' | 'neural' | 'auto';
+  includeSummary?: boolean;
+}
+
+/**
+ * Configuration for Microsoft Bing Web Search provider.
+ */
+export interface BingProviderConfig {
+  type: 'bing';
+  apiKey?: string;
+  maxResults?: number;
+  market?: string;
+  safeSearch?: 'Off' | 'Moderate' | 'Strict';
+  freshness?: string;
+}
+
+/**
+ * Configuration for Jina AI Search provider.
+ */
+export interface JinaProviderConfig {
+  type: 'jina';
+  apiKey?: string;
+  maxResults?: number;
+  locale?: string;
+}
+
+/**
+ * Configuration for Firecrawl web scraping/search provider.
+ */
+export interface FirecrawlProviderConfig {
+  type: 'firecrawl';
+  apiKey?: string;
+  maxResults?: number;
+  scrapeOptions?: {
+    formats?: string[];
+    onlyMainContent?: boolean;
+  };
+}
+
+/**
+ * Configuration for a custom HTTP JSON search API.
+ * Supports SearXNG, Brave, SerpAPI, and any arbitrary REST endpoint.
+ */
+export interface CustomProviderConfig {
+  type: 'custom';
+  /** The base URL of the search endpoint */
+  url: string;
+  /** Query parameter name (default: "q") */
+  queryParam?: string;
+  /** HTTP method (default: "GET") */
+  method?: 'GET' | 'POST';
+  /** API key value */
+  apiKey?: string;
+  /** Header name for the API key (default: "Authorization") */
+  authHeader?: string;
+  /** Auth scheme prefix (default: "Bearer") */
+  authScheme?: string;
+  /** Additional headers to include */
+  headers?: Record<string, string>;
+  /** Dot-notation path to results array in JSON response */
+  jsonPath?: string;
+  /** Additional static query parameters */
+  params?: Record<string, string>;
+  /** Maximum results to return */
+  maxResults?: number;
+  /** Built-in preset name: "searxng" | "brave" | "serpapi" | "google" */
+  preset?: string;
+}

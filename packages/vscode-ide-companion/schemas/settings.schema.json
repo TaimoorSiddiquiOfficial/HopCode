@@ -708,7 +708,12 @@
       }
     },
     "webSearch": {
-      "description": "Configuration for web search providers.",
+      "description": "Configuration for web search providers. Supports: tavily, google, dashscope, duckduckgo, exa, bing, jina, firecrawl, custom. Set mode=\"auto\" for failover chain.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "agentModels": {
+      "description": "Per-agent model overrides. Map of agent name → model string. Example: {\"general-purpose\": \"openai::gpt-4o\", \"Explore\": \"inherit\"}. Use \"inherit\" to use the parent model.",
       "type": "object",
       "additionalProperties": true
     },

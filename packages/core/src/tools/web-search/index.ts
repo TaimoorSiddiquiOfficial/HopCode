@@ -24,6 +24,12 @@ import { buildContentWithSources } from './utils.js';
 import { TavilyProvider } from './providers/tavily-provider.js';
 import { GoogleProvider } from './providers/google-provider.js';
 import { DashScopeProvider } from './providers/dashscope-provider.js';
+import { DuckDuckGoProvider } from './providers/duckduckgo-provider.js';
+import { ExaProvider } from './providers/exa-provider.js';
+import { BingProvider } from './providers/bing-provider.js';
+import { JinaProvider } from './providers/jina-provider.js';
+import { FirecrawlProvider } from './providers/firecrawl-provider.js';
+import { CustomProvider } from './providers/custom-provider.js';
 import type {
   WebSearchToolParams,
   WebSearchToolResult,
@@ -105,8 +111,25 @@ class WebSearchToolInvocation extends BaseToolInvocation<
         };
         return new DashScopeProvider(dashscopeConfig);
       }
-      default:
-        throw new Error('Unknown provider type');
+      case 'duckduckgo':
+        return new DuckDuckGoProvider(config);
+      case 'exa':
+        return new ExaProvider(config);
+      case 'bing':
+        return new BingProvider(config);
+      case 'jina':
+        return new JinaProvider(config);
+      case 'firecrawl':
+        return new FirecrawlProvider(config);
+      case 'custom':
+        return new CustomProvider(config);
+      default: {
+        // Exhaustive guard — should never reach here at runtime
+        const unknownConfig = config as { type?: string };
+        throw new Error(
+          `Unknown provider type: ${unknownConfig.type ?? 'unknown'}`,
+        );
+      }
     }
   }
 
@@ -133,15 +156,32 @@ class WebSearchToolInvocation extends BaseToolInvocation<
   }
 
   /**
+   * Priority order for auto-chain failover mode.
+   * Higher priority providers are tried first; DuckDuckGo is the last resort (always available).
+   */
+  private static readonly AUTO_CHAIN_PRIORITY = [
+    'firecrawl',
+    'tavily',
+    'exa',
+    'bing',
+    'jina',
+    'google',
+    'dashscope',
+    'custom',
+    'duckduckgo',
+  ];
+
+  /**
    * Select the appropriate provider based on configuration and parameters.
-   * Throws error if provider not found.
+   * In "auto" mode, tries providers in priority order with failover on error.
    */
   private selectProvider(
     providers: Map<string, WebSearchProvider>,
     requestedProvider?: string,
     defaultProvider?: string,
-  ): WebSearchProvider {
-    // Use requested provider if specified
+    mode?: 'auto' | 'manual',
+  ): WebSearchProvider | 'auto' {
+    // Explicit provider request always wins
     if (requestedProvider) {
       const provider = providers.get(requestedProvider);
       if (!provider) {
@@ -153,17 +193,41 @@ class WebSearchToolInvocation extends BaseToolInvocation<
       return provider;
     }
 
-    // Use default provider if specified and available
+    // Auto-chain mode: return a sentinel so execute() handles failover
+    if (mode === 'auto' || (!mode && !defaultProvider)) {
+      return 'auto';
+    }
+
+    // Manual mode: use default or first available
     if (defaultProvider && providers.has(defaultProvider)) {
       return providers.get(defaultProvider)!;
     }
 
-    // Fallback to first available provider
     const firstProvider = providers.values().next().value;
     if (!firstProvider) {
       throw new Error('No web search providers are available.');
     }
     return firstProvider;
+  }
+
+  /**
+   * Build an ordered list of providers for auto-chain failover.
+   */
+  private buildAutoChain(
+    providers: Map<string, WebSearchProvider>,
+  ): WebSearchProvider[] {
+    const ordered: WebSearchProvider[] = [];
+    for (const type of WebSearchToolInvocation.AUTO_CHAIN_PRIORITY) {
+      const p = providers.get(type);
+      if (p) ordered.push(p);
+    }
+    // Include any providers not in the priority list at the end
+    for (const [type, p] of providers) {
+      if (!WebSearchToolInvocation.AUTO_CHAIN_PRIORITY.includes(type)) {
+        ordered.push(p);
+      }
+    }
+    return ordered;
   }
 
   /**
@@ -242,29 +306,81 @@ class WebSearchToolInvocation extends BaseToolInvocation<
     }
 
     try {
-      // Create and select provider
+      // Create all available providers
       const providers = this.createProviders(webSearchConfig.provider);
-      const provider = this.selectProvider(
+
+      if (providers.size === 0) {
+        return {
+          llmContent: 'No web search providers are available.',
+          returnDisplay: 'No web search providers are available.',
+          error: {
+            message: 'No web search providers are available.',
+            type: ToolErrorType.EXECUTION_FAILED,
+          },
+        };
+      }
+
+      const selected = this.selectProvider(
         providers,
         this.params.provider,
         webSearchConfig.default,
+        webSearchConfig.mode,
       );
 
-      // Perform search
-      const searchResult = await provider.search(this.params.query, signal);
+      // Auto-chain failover mode
+      if (selected === 'auto') {
+        const chain = this.buildAutoChain(providers);
+        let lastError: unknown;
+
+        for (const provider of chain) {
+          try {
+            const searchResult = await provider.search(
+              this.params.query,
+              signal,
+            );
+            const { content, sources } = this.formatSearchResults(searchResult);
+
+            if (content.trim()) {
+              return {
+                llmContent: `Web search results for "${this.params.query}" (via ${provider.name}):\n\n${content}`,
+                returnDisplay: `Search results for "${this.params.query}".`,
+                sources,
+              };
+            }
+          } catch (error) {
+            debugLogger.warn(
+              `Provider ${provider.name} failed, trying next:`,
+              error,
+            );
+            lastError = error;
+          }
+        }
+
+        // All providers failed
+        const errorMessage = `All web search providers failed. Last error: ${getErrorMessage(lastError)}`;
+        return {
+          llmContent: errorMessage,
+          returnDisplay: 'Error performing web search.',
+          error: {
+            message: errorMessage,
+            type: ToolErrorType.EXECUTION_FAILED,
+          },
+        };
+      }
+
+      // Single provider mode
+      const searchResult = await selected.search(this.params.query, signal);
       const { content, sources } = this.formatSearchResults(searchResult);
 
-      // Guard: Check if we got results
       if (!content.trim()) {
         return {
-          llmContent: `No search results found for query: "${this.params.query}" (via ${provider.name})`,
+          llmContent: `No search results found for query: "${this.params.query}" (via ${selected.name})`,
           returnDisplay: `No information found for "${this.params.query}".`,
         };
       }
 
-      // Success result
       return {
-        llmContent: `Web search results for "${this.params.query}" (via ${provider.name}):\n\n${content}`,
+        llmContent: `Web search results for "${this.params.query}" (via ${selected.name}):\n\n${content}`,
         returnDisplay: `Search results for "${this.params.query}".`,
         sources,
       };

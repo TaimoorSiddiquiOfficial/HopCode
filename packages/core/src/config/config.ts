@@ -113,6 +113,7 @@ import {
   SessionService,
   type ResumedSessionData,
 } from '../services/sessionService.js';
+import type { WebSearchProviderConfig } from '../tools/web-search/types.js';
 import { randomUUID } from 'node:crypto';
 import { loadServerHierarchicalMemory } from '../utils/memoryDiscovery.js';
 import { ConditionalRulesRegistry } from '../utils/rulesDiscovery.js';
@@ -406,13 +407,12 @@ export interface ConfigParameters {
   chatRecording?: boolean;
   // Web search providers
   webSearch?: {
-    provider: Array<{
-      type: 'tavily' | 'google' | 'dashscope';
-      apiKey?: string;
-      searchEngineId?: string;
-    }>;
+    provider: WebSearchProviderConfig[];
     default: string;
+    mode?: 'auto' | 'manual';
   };
+  /** Per-agent model overrides. Map of agent name → model string (e.g. "openai::gpt-4o"). */
+  agentModels?: Record<string, string>;
   chatCompression?: ChatCompressionSettings;
   interactive?: boolean;
   trustedFolder?: boolean;
@@ -665,13 +665,12 @@ export class Config {
   private readonly loadMemoryFromIncludeDirectories: boolean = false;
   private readonly importFormat: 'tree' | 'flat';
   private readonly webSearch?: {
-    provider: Array<{
-      type: 'tavily' | 'google' | 'dashscope';
-      apiKey?: string;
-      searchEngineId?: string;
-    }>;
+    provider: WebSearchProviderConfig[];
     default: string;
+    mode?: 'auto' | 'manual';
   };
+  /** Per-agent model overrides keyed by agent name. */
+  private readonly agentModels?: Record<string, string>;
   private readonly chatCompression: ChatCompressionSettings | undefined;
   private readonly interactive: boolean;
   private readonly trustedFolder: boolean | undefined;
@@ -839,6 +838,7 @@ export class Config {
 
     // Web search
     this.webSearch = params.webSearch;
+    this.agentModels = params.agentModels;
     this.useRipgrep = params.useRipgrep ?? true;
     this.useBuiltinRipgrep = params.useBuiltinRipgrep ?? true;
     this.shouldUseNodePtyShell =
@@ -2260,6 +2260,17 @@ export class Config {
   // Web search provider configuration
   getWebSearchConfig() {
     return this.getBareMode() ? undefined : this.webSearch;
+  }
+
+  /**
+   * Returns the model override for a given agent type name (from settings.json
+   * `agentModels` map), or `undefined` if no override is configured.
+   * The special value `"inherit"` is treated the same as `undefined`.
+   */
+  getAgentModelForType(agentName: string): string | undefined {
+    const override = this.agentModels?.[agentName];
+    if (!override || override === 'inherit') return undefined;
+    return override;
   }
 
   getIdeMode(): boolean {

@@ -40,6 +40,7 @@ import { githubCommand } from '../commands/github/index.js';
 import { modelCommand } from '../commands/model/index.js';
 import { providerCommand } from '../commands/provider.js';
 import { skillsCommand } from '../commands/skills.js';
+import { profileCommand } from '../commands/profile/index.js';
 import {
   resolveCliGenerationConfig,
   getAuthTypeFromEnv,
@@ -641,7 +642,9 @@ export async function parseArguments(): Promise<CliArgs> {
     .command(modelCommand)
     // Register provider manager command
     .command(providerCommand)
-    .command(skillsCommand);
+    .command(skillsCommand)
+    // Register profile manager command
+    .command(profileCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json
@@ -1219,6 +1222,7 @@ export async function loadCliConfig(
     webSearch: bareMode
       ? undefined
       : buildWebSearchConfig(argv, settings, selectedAuthType),
+    agentModels: settings.agentModels,
     ideMode,
     chatCompression: settings.model?.chatCompression,
     folderTrust,
