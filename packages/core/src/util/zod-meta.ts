@@ -6,9 +6,9 @@ declare module 'zod' {
   }
 }
 
-// @ts-expect-error — patching prototype at runtime
-z.ZodType.prototype.meta = function (data: unknown) {
-  // @ts-expect-error — _meta is not in the public type
-  this._meta = data;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(z.ZodType.prototype as any).meta = function (data: unknown) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (this as any)._meta = data;
   return this;
 };

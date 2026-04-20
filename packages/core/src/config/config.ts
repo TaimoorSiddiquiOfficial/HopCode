@@ -43,6 +43,8 @@ import {
 } from '../services/fileSystemService.js';
 import { GitService } from '../services/gitService.js';
 import { CronScheduler } from '../services/cronScheduler.js';
+import { TaskStore } from '../services/task-store.js';
+import { PermissionBlockerService } from '../services/permissionBlockerService.js';
 
 // Tools � only lightweight imports; tool classes are lazy-loaded via dynamic import
 import type { SendSdkMcpMessage } from '../tools/mcp-client.js';
@@ -631,6 +633,8 @@ export class Config {
   private geminiClient!: GeminiClient;
   private baseLlmClient!: BaseLlmClient;
   private cronScheduler: CronScheduler | null = null;
+  private taskStore: TaskStore | null = null;
+  private permissionBlockerService: PermissionBlockerService | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
     respectQwenIgnore: boolean;
@@ -2015,6 +2019,25 @@ export class Config {
     return this.cronScheduler;
   }
 
+  getTaskStore(): TaskStore {
+    if (!this.taskStore) {
+      const runtimeDir = Storage.getRuntimeBaseDir();
+      this.taskStore = new TaskStore(runtimeDir, this.sessionId);
+    }
+    return this.taskStore;
+  }
+
+  getPermissionBlockerService(): PermissionBlockerService {
+    if (!this.permissionBlockerService) {
+      const persistPath = path.join(
+        Storage.getGlobalQwenDir(),
+        'permission-blockers.json',
+      );
+      this.permissionBlockerService = new PermissionBlockerService(persistPath);
+    }
+    return this.permissionBlockerService;
+  }
+
   isCronEnabled(): boolean {
     // Cron is experimental and opt-in: enabled via settings or env var
     if (process.env['HOPCODE_ENABLE_CRON'] === '1') return true;
@@ -2718,6 +2741,36 @@ export class Config {
         return new CronDeleteTool(this);
       });
     }
+
+    // Register task management tools (always available)
+    await registerLazy(ToolNames.TASK_CREATE, async () => {
+      const { TaskCreateTool } = await import('../tools/task-create.js');
+      return new TaskCreateTool(this);
+    });
+    await registerLazy(ToolNames.TASK_UPDATE, async () => {
+      const { TaskUpdateTool } = await import('../tools/task-update.js');
+      return new TaskUpdateTool(this);
+    });
+    await registerLazy(ToolNames.TASK_LIST, async () => {
+      const { TaskListTool } = await import('../tools/task-list.js');
+      return new TaskListTool(this);
+    });
+    await registerLazy(ToolNames.TASK_GET, async () => {
+      const { TaskGetTool } = await import('../tools/task-get.js');
+      return new TaskGetTool(this);
+    });
+    await registerLazy(ToolNames.TASK_STOP, async () => {
+      const { TaskStopTool } = await import('../tools/task-stop.js');
+      return new TaskStopTool(this);
+    });
+    await registerLazy(ToolNames.TASK_OUTPUT, async () => {
+      const { TaskOutputTool } = await import('../tools/task-output.js');
+      return new TaskOutputTool(this);
+    });
+    await registerLazy(ToolNames.TASK_READY, async () => {
+      const { TaskReadyTool } = await import('../tools/task-ready.js');
+      return new TaskReadyTool(this);
+    });
 
     if (!options?.skipDiscovery) {
       await registry.discoverAllTools();
