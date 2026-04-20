@@ -19,9 +19,9 @@ describe('package.json command metadata', () => {
     };
 
     const command = manifest.contributes.commands.find(
-      (item) => item.command === 'qwen-code.focusChat',
+      (item) => item.command === 'hopcode.focusChat',
     );
 
-    expect(command?.title).toBe('Qwen Code: Focus Chat View');
+    expect(command?.title).toBe('HopCode: Focus Chat View');
   });
 });

@@ -11,7 +11,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToolCallRouter } from './index.js';
 
-vi.mock('@qwen-code/webui', async () => {
+vi.mock('@hoptrendy/webui', async () => {
   const React = await vi.importActual<typeof import('react')>('react');
 
   const renderLabel = (label: string) =>
