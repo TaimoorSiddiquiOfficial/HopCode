@@ -35,7 +35,7 @@ HopCode is an open-source AI agent for the terminal that works with **any LLM pr
 - **VS Code extension**: companion extension available on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion) for in-editor AI assistance.
 - **Terminal-first, IDE-friendly**: built for developers who live in the command line, with optional integration for VS Code, Zed, and JetBrains IDEs.
 
-![](https://gw.alicdn.com/imgextra/i1/O1CN01D2DviS1wwtEtMwIzJ_!!6000000006373-2-tps-1600-900.png)
+![HopCode CLI Screenshot](./docs/hopcodecli.png)
 
 ## Installation
 
