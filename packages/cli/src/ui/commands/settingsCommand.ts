@@ -14,6 +14,7 @@ export const settingsCommand: SlashCommand = {
     return t('View and edit HopCode settings');
   },
   kind: CommandKind.BUILT_IN,
+  commandType: 'local-jsx',
   action: (_context, _args): OpenDialogActionReturn => ({
     type: 'dialog',
     dialog: 'settings',

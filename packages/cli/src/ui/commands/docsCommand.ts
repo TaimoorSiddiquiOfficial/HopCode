@@ -20,6 +20,7 @@ export const docsCommand: SlashCommand = {
     return t('open full HopCode documentation in your browser');
   },
   kind: CommandKind.BUILT_IN,
+  commandType: 'local-jsx',
   action: async (context: CommandContext): Promise<void> => {
     const langPath = getCurrentLanguage()?.startsWith('zh') ? 'zh' : 'en';
     const docsUrl = `https://qwenlm.github.io/qwen-code-docs/${langPath}`;

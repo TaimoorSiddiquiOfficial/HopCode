@@ -5,10 +5,7 @@
  */
 
 import type { Config } from '@hoptrendy/hopcode-core';
-import {
-  getErrorMessage,
-  getMCPServerPrompts,
-} from '@hoptrendy/hopcode-core';
+import { getErrorMessage, getMCPServerPrompts } from '@hoptrendy/hopcode-core';
 import type {
   CommandContext,
   SlashCommand,
@@ -46,6 +43,10 @@ export class McpPromptLoader implements ICommandLoader {
           name: commandName,
           description: prompt.description || `Invoke prompt ${prompt.name}`,
           kind: CommandKind.MCP_PROMPT,
+          source: 'mcp-prompt' as const,
+          sourceLabel: `MCP: ${serverName}`,
+          commandType: 'prompt' as const,
+          modelInvocable: true,
           subCommands: [
             {
               name: 'help',
