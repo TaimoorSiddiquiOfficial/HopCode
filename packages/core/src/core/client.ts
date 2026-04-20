@@ -93,6 +93,9 @@ import { ideContextStore } from '../ide/ideContext.js';
 import { type File, type IdeContext } from '../ide/types.js';
 import type { StopHookOutput } from '../hooks/types.js';
 
+// Skill evolution
+import { runEvolvePass } from '../services/evolveService.js';
+
 const MAX_TURNS = 100;
 
 export enum SendMessageType {
@@ -1123,6 +1126,22 @@ export class GeminiClient {
       }
 
       this.runManagedAutoMemoryBackgroundTasks(messageType);
+
+      // Fire-and-forget skill evolution pass every N turns
+      void (async () => {
+        try {
+          const recentHistory = this.getHistory().slice(-20);
+          const recentMessages = recentHistory
+            .filter((c) => c.role === 'user' || c.role === 'model')
+            .map((c) => ({
+              role: c.role as string,
+              text: partToString(c.parts ?? []),
+            }));
+          await runEvolvePass(this.config, recentMessages);
+        } catch {
+          // Never surface evolve errors to the user
+        }
+      })();
 
       if (arenaAgentClient) {
         // No continuation needed — agent completed its task
