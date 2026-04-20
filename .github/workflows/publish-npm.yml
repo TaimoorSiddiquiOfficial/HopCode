@@ -82,6 +82,10 @@ jobs:
         shell: bash
         run: node scripts/generate-git-commit-info.js || true
 
+      - name: 'Build workspace dependencies'
+        shell: bash
+        run: npm run build --workspaces --if-present || true
+
       - name: 'Build Package'
         working-directory: '${{ matrix.package.path }}'
         shell: bash

@@ -1,6 +1,6 @@
 name: 'NPM Setup'
 description: >
-  Setup Node.js 20 and run npm ci.
+  Setup Node.js 24 and run npm ci.
   NOTE: actions/checkout must be called before using this action
   (local actions require the repo to already be on disk).
 
@@ -20,7 +20,7 @@ runs:
     - name: 'Setup Node.js'
       uses: 'actions/setup-node@v4'
       with:
-        node-version: '20'
+        node-version: '24'
         registry-url: '${{ inputs.registry-url }}'
         scope: '${{ inputs.scope }}'
 
