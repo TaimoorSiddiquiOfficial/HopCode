@@ -919,6 +919,311 @@ const catalogs: ProviderCatalog[] = [
       },
     ],
   },
+
+  // ── Cerebras ──────────────────────────────────────────────────────────────
+  {
+    providerId: 'cerebras',
+    categories: [
+      {
+        name: 'Llama (2000+ t/s)',
+        models: [
+          {
+            id: 'llama-3.3-70b',
+            label: 'Llama 3.3 70B',
+            description: 'Best quality, ultra-fast',
+            context: '128k',
+          },
+          {
+            id: 'llama-3.1-70b',
+            label: 'Llama 3.1 70B',
+            description: 'Stable, ultra-fast',
+            context: '128k',
+          },
+          {
+            id: 'llama3.1-8b',
+            label: 'Llama 3.1 8B',
+            description: 'Compact, fastest',
+            context: '128k',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── NVIDIA NIM ────────────────────────────────────────────────────────────
+  {
+    providerId: 'nvidia-nim',
+    categories: [
+      {
+        name: 'Llama',
+        models: [
+          {
+            id: 'nvidia/llama-3.1-nemotron-70b-instruct',
+            label: 'Llama Nemotron 70B',
+            description: 'NVIDIA-tuned, top quality',
+            context: '128k',
+          },
+          {
+            id: 'meta/llama-3.3-70b-instruct',
+            label: 'Llama 3.3 70B',
+            description: 'Latest Meta model',
+            context: '128k',
+          },
+          {
+            id: 'meta/llama-3.1-8b-instruct',
+            label: 'Llama 3.1 8B',
+            description: 'Fast',
+            context: '128k',
+          },
+        ],
+      },
+      {
+        name: 'Other',
+        models: [
+          {
+            id: 'mistralai/mistral-large-2-instruct',
+            label: 'Mistral Large 2',
+            description: 'Frontier model',
+            context: '128k',
+          },
+          {
+            id: 'deepseek-ai/deepseek-r1',
+            label: 'DeepSeek R1',
+            description: 'Reasoning model',
+            context: '64k',
+          },
+          {
+            id: 'qwen/qwen2.5-72b-instruct',
+            label: 'Qwen 2.5 72B',
+            description: 'Alibaba model',
+            context: '32k',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── SambaNova ─────────────────────────────────────────────────────────────
+  {
+    providerId: 'sambanova',
+    categories: [
+      {
+        name: 'Llama',
+        models: [
+          {
+            id: 'Meta-Llama-3.3-70B-Instruct',
+            label: 'Llama 3.3 70B',
+            description: 'Best quality',
+            context: '128k',
+          },
+          {
+            id: 'Meta-Llama-3.1-405B-Instruct',
+            label: 'Llama 3.1 405B',
+            description: 'Most capable open',
+            context: '16k',
+          },
+          {
+            id: 'Meta-Llama-3.1-8B-Instruct',
+            label: 'Llama 3.1 8B',
+            description: 'Fast',
+            context: '16k',
+          },
+        ],
+      },
+      {
+        name: 'Other',
+        models: [
+          {
+            id: 'DeepSeek-R1',
+            label: 'DeepSeek R1',
+            description: 'Reasoning model',
+            context: '32k',
+          },
+          {
+            id: 'Qwen2.5-72B-Instruct',
+            label: 'Qwen 2.5 72B',
+            description: 'Alibaba model',
+            context: '8k',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── AI21 Labs ─────────────────────────────────────────────────────────────
+  {
+    providerId: 'ai21',
+    categories: [
+      {
+        name: 'Jamba',
+        models: [
+          {
+            id: 'jamba-1.5-large',
+            label: 'Jamba 1.5 Large',
+            description: 'Most capable, 256k context',
+            context: '256k',
+          },
+          {
+            id: 'jamba-1.5-mini',
+            label: 'Jamba 1.5 Mini',
+            description: 'Fast, efficient',
+            context: '256k',
+          },
+          {
+            id: 'jamba-instruct',
+            label: 'Jamba Instruct',
+            description: 'Previous gen',
+            context: '256k',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Alibaba DashScope (Qwen) ──────────────────────────────────────────────
+  {
+    providerId: 'dashscope',
+    categories: [
+      {
+        name: 'Qwen',
+        models: [
+          {
+            id: 'qwen-max',
+            label: 'Qwen Max',
+            description: 'Most capable',
+            context: '32k',
+          },
+          {
+            id: 'qwen-max-latest',
+            label: 'Qwen Max (latest)',
+            description: 'Latest snapshot',
+            context: '32k',
+          },
+          {
+            id: 'qwen-plus',
+            label: 'Qwen Plus',
+            description: 'Balanced',
+            context: '128k',
+          },
+          {
+            id: 'qwen-long',
+            label: 'Qwen Long',
+            description: 'Long context',
+            context: '1M',
+          },
+          {
+            id: 'qwen-turbo',
+            label: 'Qwen Turbo',
+            description: 'Fast, cheap',
+            context: '1M',
+          },
+        ],
+      },
+      {
+        name: 'Qwen Coder',
+        models: [
+          {
+            id: 'qwen2.5-coder-32b-instruct',
+            label: 'Qwen 2.5 Coder 32B',
+            description: 'Code specialist',
+            context: '128k',
+          },
+          {
+            id: 'qwen2.5-coder-7b-instruct',
+            label: 'Qwen 2.5 Coder 7B',
+            description: 'Compact code model',
+            context: '128k',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Moonshot AI (Kimi) ────────────────────────────────────────────────────
+  {
+    providerId: 'moonshot',
+    categories: [
+      {
+        name: 'Moonshot v1',
+        models: [
+          {
+            id: 'moonshot-v1-128k',
+            label: 'Moonshot v1 128K',
+            description: '128k context',
+            context: '128k',
+          },
+          {
+            id: 'moonshot-v1-32k',
+            label: 'Moonshot v1 32K',
+            description: '32k context',
+            context: '32k',
+          },
+          {
+            id: 'moonshot-v1-8k',
+            label: 'Moonshot v1 8K',
+            description: 'Fast, compact',
+            context: '8k',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 01.AI (Yi) ────────────────────────────────────────────────────────────
+  {
+    providerId: 'yi-01',
+    categories: [
+      {
+        name: 'Yi',
+        models: [
+          {
+            id: 'yi-lightning',
+            label: 'Yi Lightning',
+            description: 'Fastest, most capable',
+            context: '16k',
+          },
+          {
+            id: 'yi-large-turbo',
+            label: 'Yi Large Turbo',
+            description: 'Balanced',
+            context: '16k',
+          },
+          {
+            id: 'yi-large',
+            label: 'Yi Large',
+            description: 'High quality',
+            context: '32k',
+          },
+          {
+            id: 'yi-medium',
+            label: 'Yi Medium',
+            description: 'Compact',
+            context: '16k',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── LM Studio (Local) ─────────────────────────────────────────────────────
+  // Note: lm-studio fetches live model list from the local server.
+  // This static fallback is shown if LM Studio is not running.
+  {
+    providerId: 'lm-studio',
+    categories: [
+      {
+        name: 'Local Models (load via LM Studio)',
+        models: [
+          {
+            id: 'local-model',
+            label: 'Active Model',
+            description: 'Whatever model is loaded in LM Studio',
+            context: 'varies',
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 /** Returns the static model catalog for a given providerId, or undefined. */

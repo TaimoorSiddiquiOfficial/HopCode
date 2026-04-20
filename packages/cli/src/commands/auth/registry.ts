@@ -37,6 +37,13 @@ export interface ProviderConfig {
   defaultModel: string;
   /** Whether the user must supply an API key (false for Ollama local) */
   requiresApiKey: boolean;
+  /**
+   * When true the model command will attempt to fetch the live model list
+   * from the provider's /v1/models endpoint rather than using the static catalog.
+   * Only set for providers whose model list changes frequently or is too large
+   * to maintain statically (e.g. OpenRouter 300+, Groq, Mistral).
+   */
+  liveModels?: boolean;
 }
 
 /**
@@ -91,6 +98,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'groq/llama-3.3-70b-versatile',
     requiresApiKey: true,
+    liveModels: true,
   },
   {
     id: 'mistral',
@@ -101,6 +109,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'mistral/mistral-large-latest',
     requiresApiKey: true,
+    liveModels: true,
   },
   {
     id: 'openrouter',
@@ -111,6 +120,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'anthropic/claude-opus-4-5',
     requiresApiKey: true,
+    liveModels: true,
   },
   {
     id: 'togetherai',
@@ -121,6 +131,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'togetherai/meta-llama/Llama-3-70b-chat-hf',
     requiresApiKey: true,
+    liveModels: true,
   },
   {
     id: 'fireworks',
@@ -192,6 +203,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'llama3.2',
     requiresApiKey: false,
+    liveModels: true,
   },
   {
     id: 'ollama-cloud',
@@ -203,6 +215,96 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'gpt-oss:120b-cloud',
     requiresApiKey: true,
+    liveModels: true,
+  },
+  // ── Additional cloud providers ────────────────────────────────────────────
+  {
+    id: 'cerebras',
+    label: 'Cerebras',
+    description: 'Llama 3.3 70B at 2000+ t/s · Requires CEREBRAS_API_KEY',
+    envKey: 'CEREBRAS_API_KEY',
+    baseUrl: 'https://api.cerebras.ai/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'llama-3.3-70b',
+    requiresApiKey: true,
+    liveModels: true,
+  },
+  {
+    id: 'nvidia-nim',
+    label: 'NVIDIA NIM',
+    description:
+      'NVIDIA-hosted Llama, Mistral & more · Requires NVIDIA_API_KEY',
+    envKey: 'NVIDIA_API_KEY',
+    baseUrl: 'https://integrate.api.nvidia.com/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'nvidia/llama-3.1-nemotron-70b-instruct',
+    requiresApiKey: true,
+    liveModels: true,
+  },
+  {
+    id: 'sambanova',
+    label: 'SambaNova Cloud',
+    description: 'Fast open-source inference · Requires SAMBANOVA_API_KEY',
+    envKey: 'SAMBANOVA_API_KEY',
+    baseUrl: 'https://api.sambanova.ai/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'Meta-Llama-3.3-70B-Instruct',
+    requiresApiKey: true,
+    liveModels: true,
+  },
+  {
+    id: 'ai21',
+    label: 'AI21 Labs',
+    description: 'Jamba 1.5 Large/Mini · Requires AI21_API_KEY',
+    envKey: 'AI21_API_KEY',
+    baseUrl: 'https://api.ai21.com/studio/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'jamba-1.5-large',
+    requiresApiKey: true,
+  },
+  {
+    id: 'dashscope',
+    label: 'Alibaba DashScope (Qwen)',
+    description: 'Qwen-Max, Qwen-Plus · Requires DASHSCOPE_API_KEY',
+    envKey: 'DASHSCOPE_API_KEY',
+    baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'qwen-max',
+    requiresApiKey: true,
+    liveModels: true,
+  },
+  {
+    id: 'moonshot',
+    label: 'Moonshot AI (Kimi)',
+    description: 'Kimi long-context models · Requires MOONSHOT_API_KEY',
+    envKey: 'MOONSHOT_API_KEY',
+    baseUrl: 'https://api.moonshot.cn/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'moonshot-v1-128k',
+    requiresApiKey: true,
+  },
+  {
+    id: 'yi-01',
+    label: '01.AI (Yi)',
+    description: 'Yi Lightning, Yi Large · Requires LINGYIWANWU_API_KEY',
+    envKey: 'LINGYIWANWU_API_KEY',
+    baseUrl: 'https://api.lingyiwanwu.com/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'yi-lightning',
+    requiresApiKey: true,
+  },
+  // ── Local providers ───────────────────────────────────────────────────────
+  {
+    id: 'lm-studio',
+    label: 'LM Studio (Local)',
+    description:
+      'Local models via LM Studio at localhost:1234 · No API key needed',
+    envKey: 'LM_STUDIO_API_KEY',
+    baseUrl: 'http://localhost:1234/v1',
+    authType: AuthType.USE_OPENAI,
+    defaultModel: 'local-model',
+    requiresApiKey: false,
+    liveModels: true,
   },
 ];
 
