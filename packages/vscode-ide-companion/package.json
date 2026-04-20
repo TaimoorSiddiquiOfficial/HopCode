@@ -97,7 +97,7 @@
         "icon": "$(close)"
       },
       {
-        "command": "hopcode.runQwenCode",
+        "command": "hopcode.runHopCode",
         "title": "HopCode: Run"
       },
       {

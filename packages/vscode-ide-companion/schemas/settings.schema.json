@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "Qwen Code settings configuration",
+  "description": "HopCode settings configuration",
   "properties": {
     "mcpServers": {
       "description": "Configuration for MCP servers.",
@@ -151,7 +151,7 @@
         "theme": {
           "description": "The color theme for the UI.",
           "type": "string",
-          "default": "Qwen Dark"
+          "default": "HopCode Dark"
         },
         "statusLine": {
           "description": "Custom status line display configuration. Optional `refreshInterval` (seconds, >= 1) re-runs the command on a timer so external data stays fresh.",
