@@ -268,19 +268,57 @@ export class GeminiClient {
     const overrideSystemPrompt = this.config.getSystemPrompt();
     const appendSystemPrompt = this.config.getAppendSystemPrompt();
 
+    // Build extra injections: capability manifest + permission blocker note
+    const extraSections = this.buildSystemPromptExtras();
+    const fullAppend = appendSystemPrompt
+      ? `${appendSystemPrompt}\n\n${extraSections}`
+      : extraSections || undefined;
+
     if (overrideSystemPrompt) {
       return getCustomSystemPrompt(
         overrideSystemPrompt,
         userMemory,
-        appendSystemPrompt,
+        fullAppend,
       );
     }
 
-    return getCoreSystemPrompt(
-      userMemory,
-      this.config.getModel(),
-      appendSystemPrompt,
-    );
+    return getCoreSystemPrompt(userMemory, this.config.getModel(), fullAppend);
+  }
+
+  /**
+   * Builds supplementary system-prompt sections injected each session start:
+   *  1. Capability manifest — lists active MCP tool names so the model knows
+   *     what external tools are available beyond the built-in set.
+   *  2. Permission blocker note — reminds the model if certain tools have been
+   *     repeatedly denied, so it can avoid re-requesting them.
+   */
+  private buildSystemPromptExtras(): string {
+    const parts: string[] = [];
+
+    // 1. Capability manifest for MCP tools
+    try {
+      const registry = this.config.getToolRegistry();
+      const allNames = registry.getAllToolNames();
+      // MCP tool names follow the pattern `serverName__toolName` (two underscores)
+      const mcpTools = allNames.filter((n) => n.includes('__'));
+      if (mcpTools.length > 0) {
+        parts.push(
+          `# Active MCP Tools\nThe following tools are available via MCP servers:\n${mcpTools.map((t) => `- \`${t}\``).join('\n')}`,
+        );
+      }
+    } catch {
+      // Registry not yet initialised — skip silently
+    }
+
+    // 2. PermissionBlocker note
+    try {
+      const note = this.config.getPermissionBlockerService().buildPromptNote();
+      if (note) parts.push(note);
+    } catch {
+      // Service not available — skip silently
+    }
+
+    return parts.join('\n\n');
   }
 
   async startChat(extraHistory?: Content[]): Promise<GeminiChat> {

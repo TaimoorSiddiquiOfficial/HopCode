@@ -242,7 +242,7 @@ export function convertToFunctionResponse(
         mediaParts.push({ fileData: part.fileData });
       }
       // Other exotic part types (e.g. functionCall) are intentionally
-      // dropped here – they should not appear inside tool results.
+      // dropped here ï¿½ they should not appear inside tool results.
     }
 
     const output =
@@ -365,7 +365,7 @@ function isConcurrencySafe(call: ScheduledToolCall): boolean {
   // Shell commands: check if the command is read-only (e.g., git log, cat).
   // Uses the synchronous regex+shell-quote checker (not the async AST-based
   // one) because partitioning runs synchronously. The sync checker covers
-  // the same command whitelist and is fail-closed — unknown commands remain
+  // the same command whitelist and is fail-closed ï¿½ unknown commands remain
   // sequential. The AST version is used separately for permission decisions.
   if (call.tool.kind === Kind.Execute) {
     const command = (call.request.args as { command?: string }).command;
@@ -1313,6 +1313,16 @@ export class CoreToolScheduler {
     this.setToolCallOutcome(callId, outcome);
 
     if (outcome === ToolConfirmationOutcome.Cancel || signal.aborted) {
+      // Record denial in PermissionBlockerService for prompt-injection tracking
+      if (outcome === ToolConfirmationOutcome.Cancel) {
+        try {
+          void this.config
+            .getPermissionBlockerService()
+            .recordDenial(toolCall.request.name);
+        } catch {
+          // Non-critical â€” never fail a tool cancellation due to tracking errors
+        }
+      }
       // Use custom cancel message from payload if provided, otherwise use default
       const cancelMessage =
         payload?.cancelMessage || 'User did not allow tool call';
@@ -1363,7 +1373,7 @@ export class CoreToolScheduler {
 
   /**
    * Opens an IDE diff view for edit-type tools when IDE mode is active.
-   * The IDE resolution is handled asynchronously — if the user accepts or
+   * The IDE resolution is handled asynchronously ï¿½ if the user accepts or
    * rejects from the IDE, it triggers handleConfirmationResponse.
    *
    * Uses confirmationDetails.filePath / newContent (the same data shown in
