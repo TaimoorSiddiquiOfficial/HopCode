@@ -1,4 +1,4 @@
-﻿name: 'Check Issue Completeness'
+name: 'Check Issue Completeness'
 
 on:
   issues:
@@ -14,7 +14,7 @@ jobs:
   check-issue-info:
     timeout-minutes: 2
     if: |-
-      ${{ github.repository == 'QwenLM/hopcode' && contains(github.event.issue.labels.*.name, 'type/bug') }}
+      ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' && contains(github.event.issue.labels.*.name, 'type/bug') }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Check for Client Information'
@@ -66,7 +66,7 @@ jobs:
           # Determine what's missing
           if [ "$HAS_ABOUT_OUTPUT" = false ]; then
             if [ "$HAS_VERSION" = false ]; then
-              MISSING_INFO+=("Qwen Code version")
+              MISSING_INFO+=("HopCode version")
             fi
             if [ "$HAS_OS_INFO" = false ]; then
               MISSING_INFO+=("operating system information")
