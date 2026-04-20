@@ -182,12 +182,12 @@ jobs:
         working-directory: packages/vscode-ide-companion
         shell: bash
         run: |
-          output=$(npx @vscode/vsce publish --packagePath ./*.vsix --no-verify 2>&1)
+          output=$(npx @vscode/vsce publish --packagePath ./*.vsix --no-verify 2>&1) || true
           echo "$output"
-          if echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST)"; then
+          if echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST|already.*0\.[0-9])"; then
             version=$(node -p "require('./package.json').version")
             echo "⏭️ VS Code Marketplace: v${version} already published, skipping"
-          elif echo "$output" | grep -qi "error"; then
+          elif echo "$output" | grep -qiE "^error|ERROR|failed to publish" && ! echo "$output" | grep -qi "already"; then
             echo "$output" >&2; exit 1
           fi
         env:
