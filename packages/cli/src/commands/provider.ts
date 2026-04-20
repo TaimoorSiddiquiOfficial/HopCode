@@ -33,10 +33,7 @@
 
 import type { CommandModule } from 'yargs';
 import { loadSettings } from '../config/settings.js';
-import {
-  PROVIDER_REGISTRY,
-  detectActiveProvider,
-} from './auth/registry.js';
+import { PROVIDER_REGISTRY, detectActiveProvider } from './auth/registry.js';
 import { handleApiKeyAuth } from './auth/providers.js';
 import { isCodingPlanConfig } from '../constants/codingPlan.js';
 import { InteractiveSelector } from './auth/interactiveSelector.js';
@@ -140,7 +137,7 @@ function buildSelectorOptions(activeProviderId: string | undefined): Array<{
   });
   options.push({
     value: 'qwen-oauth',
-    label: '  Qwen OAuth',
+    label: '  Legacy OAuth',
     description: 'Discontinued — switch to Coding Plan or API Key',
   });
 
@@ -180,7 +177,6 @@ async function handleProviderCommand(): Promise<void> {
   writeStdoutLine(t('\n  HopCode Provider Manager'));
   writeStdoutLine(t('  (Enter to configure, select ← Exit to quit)\n'));
 
-   
   while (true) {
     const options = buildSelectorOptions(activeProviderId);
 
@@ -215,7 +211,9 @@ async function handleProviderCommand(): Promise<void> {
     }
     if (chosen === 'qwen-oauth') {
       writeStdoutLine(
-        t('\n  → Qwen OAuth is discontinued. Use: hopcode auth coding-plan\n'),
+        t(
+          '\n  → Legacy OAuth is discontinued. Use: hopcode auth coding-plan\n',
+        ),
       );
       continue;
     }

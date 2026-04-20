@@ -8,6 +8,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { Box, Text } from 'ink';
 import {
   AuthType,
+  type ModelProvidersConfig,
   type ProviderModelConfig as ModelConfig,
 } from '@hoptrendy/hopcode-core';
 import { theme } from '../semantic-colors.js';
@@ -259,6 +260,13 @@ export function ProviderDialog({
               `${t('Model')}: ${modelId}`,
           },
           Date.now(),
+        );
+
+        // Reload modelProviders into in-memory config BEFORE refreshAuth so the
+        // new provider/model is recognised during auth validation (avoids the
+        // "Model not found for authType" error and ensures the header updates).
+        config?.reloadModelProvidersConfig(
+          settings.merged.modelProviders as ModelProvidersConfig | undefined,
         );
 
         // Refresh auth async (fire-and-forget; errors shown via historyManager)

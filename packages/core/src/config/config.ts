@@ -44,7 +44,7 @@ import {
 import { GitService } from '../services/gitService.js';
 import { CronScheduler } from '../services/cronScheduler.js';
 
-// Tools — only lightweight imports; tool classes are lazy-loaded via dynamic import
+// Tools ï¿½ only lightweight imports; tool classes are lazy-loaded via dynamic import
 import type { SendSdkMcpMessage } from '../tools/mcp-client.js';
 import { setGeminiMdFilename } from '../memory/const.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
@@ -733,8 +733,8 @@ export class Config {
     };
     this.gitCoAuthor = {
       enabled: params.gitCoAuthor ?? true,
-      name: 'Qwen-Coder',
-      email: 'qwen-coder@alibabacloud.com',
+      name: 'HopCode',
+      email: 'hopcode@hoptrendy.com',
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
     this.outputLanguageFilePath = params.outputLanguageFilePath;
@@ -1595,7 +1595,7 @@ export class Config {
    *   - settings.permissions.allow  (persistent rules from all scopes)
    *   - allowedTools param  (SDK / argv auto-approve list)
    *
-   * Note: coreTools is intentionally excluded here — it has whitelist semantics
+   * Note: coreTools is intentionally excluded here ï¿½ it has whitelist semantics
    * (only listed tools are registered), not auto-approve semantics. It is
    * handled separately via PermissionManager.coreToolsAllowList.
    *
@@ -2433,7 +2433,7 @@ export class Config {
     );
 
     // Helper: check permission then register a lazy factory (no module import
-    // happens here — the dynamic import() only runs when the tool is first used).
+    // happens here ï¿½ the dynamic import() only runs when the tool is first used).
     const registerLazy = async (
       toolName: ToolName,
       factory: ToolFactory,
