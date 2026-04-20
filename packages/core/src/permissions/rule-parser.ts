@@ -8,6 +8,9 @@ import path from 'node:path';
 import os from 'node:os';
 import picomatch from 'picomatch';
 import { parse } from 'shell-quote';
+import { createDebugLogger } from '../utils/debugLogger.js';
+
+const debugLogger = createDebugLogger('PERMISSIONS');
 
 /**
  * Normalize a filesystem path to use POSIX-style forward slashes.
@@ -44,37 +47,37 @@ export const TOOL_NAME_ALIASES: Readonly<Record<string, string>> = {
   ShellTool: 'run_shell_command',
   Bash: 'run_shell_command', // Claude Code compatibility
 
-  // Edit tool — "Edit" is also a meta-category covering edit + write_file
+  // Edit tool ï¿½ "Edit" is also a meta-category covering edit + write_file
   edit: 'edit',
   Edit: 'edit',
   EditTool: 'edit',
 
-  // Write File tool — also matched by "Edit" meta-category rules
+  // Write File tool ï¿½ also matched by "Edit" meta-category rules
   write_file: 'write_file',
   WriteFile: 'write_file',
   WriteFileTool: 'write_file',
   Write: 'write_file',
 
-  // Read File tool — "Read" is also a meta-category covering read_file + grep + glob + list_directory
+  // Read File tool ï¿½ "Read" is also a meta-category covering read_file + grep + glob + list_directory
   read_file: 'read_file',
   ReadFile: 'read_file',
   ReadFileTool: 'read_file',
   Read: 'read_file',
 
-  // Grep tool — also matched by "Read" meta-category rules
+  // Grep tool ï¿½ also matched by "Read" meta-category rules
   grep_search: 'grep_search',
   Grep: 'grep_search',
   GrepTool: 'grep_search',
   search_file_content: 'grep_search', // legacy
   SearchFiles: 'grep_search', // legacy display name
 
-  // Glob tool — also matched by "Read" meta-category rules
+  // Glob tool ï¿½ also matched by "Read" meta-category rules
   glob: 'glob',
   Glob: 'glob',
   GlobTool: 'glob',
   FindFiles: 'glob', // legacy display name
 
-  // List Directory tool — also matched by "Read" meta-category rules
+  // List Directory tool ï¿½ also matched by "Read" meta-category rules
   list_directory: 'list_directory',
   ListFiles: 'list_directory',
   ListFilesTool: 'list_directory',
@@ -130,7 +133,7 @@ export const TOOL_NAME_ALIASES: Readonly<Record<string, string>> = {
 const SHELL_TOOL_NAMES = new Set(['run_shell_command']);
 
 /**
- * File-reading tools — "Read" rules apply to all of these (best-effort).
+ * File-reading tools ï¿½ "Read" rules apply to all of these (best-effort).
  *
  * Per Claude Code docs: "Claude makes a best-effort attempt to apply Read rules
  * to all built-in tools that read files like Grep and Glob."
@@ -143,7 +146,7 @@ const READ_TOOLS = new Set([
 ]);
 
 /**
- * File-editing tools — "Edit" rules apply to all of these.
+ * File-editing tools ï¿½ "Edit" rules apply to all of these.
  *
  * Per Claude Code docs: "Edit rules apply to all built-in tools that edit files."
  */
@@ -247,10 +250,13 @@ export function parseRule(raw: string): PermissionRule {
   }
 
   const toolPart = normalized.substring(0, openParen).trim();
-  const specifier = normalized.endsWith(')')
-    ? normalized.substring(openParen + 1, normalized.length - 1)
-    : undefined;
 
+  if (!normalized.endsWith(')')) {
+    // Malformed: unbalanced parentheses â€” mark as invalid so it never matches.
+    return { raw: trimmed, toolName: resolveToolName(toolPart), invalid: true };
+  }
+
+  const specifier = normalized.substring(openParen + 1, normalized.length - 1);
   const canonicalName = resolveToolName(toolPart);
   const specifierKind = specifier ? getSpecifierKind(canonicalName) : undefined;
 
@@ -267,7 +273,17 @@ export function parseRule(raw: string): PermissionRule {
  * silently skipping any empty entries.
  */
 export function parseRules(raws: string[]): PermissionRule[] {
-  return raws.filter((r) => r && r.trim()).map(parseRule);
+  return raws
+    .filter((r) => r && r.trim())
+    .map(parseRule)
+    .map((r) => {
+      if (r.invalid) {
+        debugLogger.warn(
+          `Ignoring malformed rule (unbalanced parentheses): ${r.raw}`,
+        );
+      }
+      return r;
+    });
 }
 
 // -----------------------------------------------------------------------------
@@ -321,7 +337,7 @@ export function getRuleDisplayName(canonicalToolName: string): string {
  * Tools whose parameter path points to a **file** (as opposed to a directory).
  *
  * For these tools the minimum-scope rule uses `path.dirname()` so the rule
- * covers the containing directory rather than a single file — e.g.
+ * covers the containing directory rather than a single file ï¿½ e.g.
  *   read_file("/Users/alice/.secrets") ? `Read(//Users/alice)`
  *
  * Directory-targeted tools (list_directory, grep_search, glob) already receive
@@ -344,7 +360,7 @@ const FILE_TARGETED_TOOLS = new Set(['read_file', 'edit', 'write_file']);
  *       Directory-targeted tools (grep, glob, ls) use the directory as-is.
  *       The `//` prefix denotes an absolute filesystem path in the rule grammar.
  *   - **domain** tools (WebFetch): `WebFetch(example.com)`
- *   - **command** tools (Bash): `Bash(command)` — note: Shell already generates
+ *   - **command** tools (Bash): `Bash(command)` ï¿½ note: Shell already generates
  *     its own fine-grained rules via `extractCommandRules`; this is a fallback.
  *   - **literal** tools (Skill/Task): `Skill(name)` / `Task(type)`
  *
@@ -361,7 +377,7 @@ export function buildPermissionRules(ctx: PermissionCheckContext): string[] {
 
   switch (kind) {
     case 'command':
-      // Shell commands — fallback only; shell.ts provides its own rules via
+      // Shell commands ï¿½ fallback only; shell.ts provides its own rules via
       // extractCommandRules which are more granular (per-simple-command).
       if (ctx.command) {
         return [`${displayName}(${ctx.command})`];
@@ -378,7 +394,7 @@ export function buildPermissionRules(ctx: PermissionCheckContext): string[] {
         // Use the `//` prefix for absolute filesystem paths in rule grammar.
         // Append `/**` so the gitignore-style glob matches all files in the
         // directory recursively (picomatch uses `**` for recursive descent).
-        // resolvePathPattern("//foo/**") ? "/foo/**" — round-trips correctly.
+        // resolvePathPattern("//foo/**") ? "/foo/**" ï¿½ round-trips correctly.
         const specifier = dirPath.startsWith('/')
           ? `/${dirPath}/**`
           : `${dirPath}/**`;
@@ -734,7 +750,7 @@ function stripLeadingVariableAssignments(command: string): string {
  * | `./path`  | Relative to current working dir    | `./secrets/**`               |
  * | `path`    | Relative to current working dir    | `*.env`                      |
  *
- * WARNING: `/Users/alice/file` is NOT an absolute path — it's relative to
+ * WARNING: `/Users/alice/file` is NOT an absolute path ï¿½ it's relative to
  * the project root. Use `//Users/alice/file` for absolute paths.
  */
 export function resolvePathPattern(
@@ -796,7 +812,7 @@ export function matchesPathPattern(
   const isMatch = picomatch(resolvedPattern, {
     dot: true, // Match dotfiles (e.g. .env)
     nocase: false, // Case-sensitive (filesystem convention)
-    // Note: do NOT set bash: true — it makes `*` match across directories.
+    // Note: do NOT set bash: true ï¿½ it makes `*` match across directories.
     // Default picomatch behavior is gitignore-style: `*` = single dir, `**` = recursive.
   });
 
@@ -938,6 +954,11 @@ export function matchesRule(
   specifier?: string,
 ): boolean {
   const canonicalCtxToolName = resolveToolName(toolName);
+
+  // â”€â”€ Invalid (malformed) rules never match anything â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  if (rule.invalid) {
+    return false;
+  }
 
   // -- MCP tool matching ------------------------------------------------
   if (
