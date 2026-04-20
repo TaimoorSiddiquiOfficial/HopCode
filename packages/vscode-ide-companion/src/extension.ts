@@ -90,7 +90,7 @@ async function checkForUpdates(
 
     if (latestVersion && semver.gt(latestVersion, currentVersion)) {
       const selection = await vscode.window.showInformationMessage(
-        `A new version (${latestVersion}) of the Qwen Code Companion extension is available.`,
+        `A new version (${latestVersion}) of the HopCode Companion extension is available.`,
         'Update to latest version',
       );
       if (selection === 'Update to latest version') {
