@@ -151,6 +151,8 @@ export * from './memory/manager.js';
 
 // Foundational utilities (paths, storage scaffold, type definitions, constants)
 // that are legitimately needed by UI code (MemoryDialog, commands, etc.)
+import './util/zod-meta.js';
+import './util/bun-shim.js';
 export * from './memory/types.js';
 export * from './memory/paths.js';
 export * from './memory/store.js';

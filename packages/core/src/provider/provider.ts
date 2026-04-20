@@ -34,7 +34,7 @@ import {
   createOpenRouter,
   type LanguageModelV2,
 } from '@openrouter/ai-sdk-provider';
-import { createOpenaiCompatible as createGitHubCopilotOpenAICompatible } from './sdk/copilot.js';
+import { createOpenaiCompatible as createGitHubCopilotOpenAICompatible } from './sdk/copilot/index.js';
 import { createXai } from '@ai-sdk/xai';
 import { createMistral } from '@ai-sdk/mistral';
 import { createGroq } from '@ai-sdk/groq';
@@ -130,11 +130,11 @@ export namespace Provider {
     '@ai-sdk/togetherai': createTogetherAI,
     '@ai-sdk/perplexity': createPerplexity,
     '@ai-sdk/vercel': createVercel,
-    '@ai-sdk/deepseek': createDeepSeek,
-    '@ai-sdk/fireworks': createFireworks,
-    '@ai-sdk/replicate': createReplicate,
-    '@ai-sdk/huggingface': createHuggingFace,
-    '@gitlab/gitlab-ai-provider': createGitLab,
+    '@ai-sdk/deepseek': createDeepSeek as any,
+    '@ai-sdk/fireworks': createFireworks as any,
+    '@ai-sdk/replicate': createReplicate as any,
+    '@ai-sdk/huggingface': createHuggingFace as any,
+    '@gitlab/gitlab-ai-provider': createGitLab as any,
     // @ts-ignore (TODO: kill this code so we dont have to maintain it)
     '@ai-sdk/github-copilot': createGitHubCopilotOpenAICompatible,
   };
@@ -886,7 +886,9 @@ export namespace Provider {
 
     log.info('init');
 
-    const configProviders = Object.entries(config.provider ?? {});
+    const configProviders = Object.entries(
+      (config.provider as Record<string, any>) ?? {},
+    ) as [string, any][];
 
     // Add GitHub Copilot Enterprise provider that inherits from GitHub Copilot
     if (database['github-copilot']) {
@@ -927,7 +929,9 @@ export namespace Provider {
         models: existing?.models ?? {},
       };
 
-      for (const [modelID, model] of Object.entries(provider.models ?? {})) {
+      for (const [modelID, model] of Object.entries(
+        (provider.models as Record<string, any>) ?? {},
+      )) {
         const existingModel = parsed.models[model.id ?? modelID];
         const name = iife(() => {
           if (model.name) return model.name;
@@ -1244,6 +1248,7 @@ export namespace Provider {
           ...model.headers,
         };
 
+      // @ts-ignore
       const key = Bun.hash.xxHash32(
         JSON.stringify({
           providerID: model.providerID,

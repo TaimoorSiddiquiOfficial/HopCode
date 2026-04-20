@@ -533,8 +533,33 @@ export interface ConfigInitializeOptions {
 }
 
 export class Config {
+  private static _instance: Config | undefined;
+
+  static async get(): Promise<Config> {
+    if (!this._instance) {
+      // Create a minimal default instance for internal core use
+      this._instance = new Config({
+        targetDir: process.cwd(),
+      } as Parameters<typeof Config>[0]);
+      await this._instance.initialize();
+    }
+    return this._instance;
+  }
+
+  static setInstance(instance: Config) {
+    this._instance = instance;
+  }
+
   private sessionId: string;
   private sessionData?: ResumedSessionData;
+
+  // Provider system compatibility fields
+  provider?: Record<string, unknown>;
+  disabled_providers?: string[];
+  enabled_providers?: string[];
+  small_model?: string;
+  model?: string;
+
   private debugLogger: DebugLogger;
   private toolRegistry!: ToolRegistry;
   private promptRegistry!: PromptRegistry;

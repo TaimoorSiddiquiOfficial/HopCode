@@ -6,6 +6,13 @@ import { fn } from '../util/fn.js';
 import { NamedError } from '../util/error.js';
 import { Auth } from '../auth.js';
 
+type AuthOuathResult = {
+  url: string;
+  method: 'auto' | 'code';
+  instructions: string;
+  callback: (code?: string) => Promise<any>;
+};
+
 export namespace ProviderAuth {
   const state = Instance.state(async () => {
     const methods = pipe(
