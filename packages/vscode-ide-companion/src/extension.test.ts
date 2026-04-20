@@ -120,7 +120,7 @@ describe('activate', () => {
     } as vscode.Extension<unknown>);
     await activate(context);
     expect(showInformationMessageMock).toHaveBeenCalledWith(
-      'Qwen Code Companion extension successfully installed.',
+      'HopCode Companion extension successfully installed.',
     );
   });
 
@@ -164,7 +164,7 @@ describe('activate', () => {
     } as vscode.Extension<unknown>);
     await activate(context);
     expect(showInformationMessageMock).toHaveBeenCalledWith(
-      'Qwen Code Companion extension successfully installed.',
+      'HopCode Companion extension successfully installed.',
     );
   });
 
@@ -197,7 +197,7 @@ describe('activate', () => {
       await activate(context);
 
       expect(showInformationMessageMock).toHaveBeenCalledWith(
-        'A new version (1.2.0) of the Qwen Code Companion extension is available.',
+        'A new version (1.2.0) of the HopCode Companion extension is available.',
         'Update to latest version',
       );
     });
