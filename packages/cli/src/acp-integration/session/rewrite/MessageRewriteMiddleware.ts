@@ -27,6 +27,8 @@ const debugLogger = createDebugLogger('MESSAGE_REWRITE');
  *      LlmRewriter rewrites the accumulated content
  *   4. Rewritten text is emitted as agent_message_chunk with _meta.rewritten=true
  */
+const DEFAULT_REWRITE_TIMEOUT_MS = 30_000;
+
 export class MessageRewriteMiddleware {
   private readonly turnBuffer: TurnBuffer;
   private readonly rewriter: LlmRewriter;
@@ -42,7 +44,7 @@ export class MessageRewriteMiddleware {
     this.turnBuffer = new TurnBuffer();
     this.rewriter = new LlmRewriter(config, rewriteConfig);
     this.target = rewriteConfig.target;
-    this.timeoutMs = rewriteConfig.timeoutMs ?? 30_000;
+    this.timeoutMs = rewriteConfig.timeoutMs ?? DEFAULT_REWRITE_TIMEOUT_MS;
   }
 
   /**
