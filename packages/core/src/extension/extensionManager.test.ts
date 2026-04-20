@@ -793,11 +793,11 @@ describe('extension tests', () => {
   });
 
   describe('hooks loading and processing', () => {
-    it('should load hooks from qwen-extension.json', async () => {
+    it('should load hooks from hopcode-extension.json', async () => {
       const extensionDir = path.join(userExtensionsDir, 'hooks-extension');
       fs.mkdirSync(extensionDir, { recursive: true });
 
-      // Create qwen-extension.json with hooks
+      // Create hopcode-extension.json with hooks
       const configWithHooks = {
         name: 'hooks-extension',
         version: '1.0.0',
@@ -844,7 +844,7 @@ describe('extension tests', () => {
       );
       fs.mkdirSync(extensionDir, { recursive: true });
 
-      // Create qwen-extension.json without hooks
+      // Create hopcode-extension.json without hooks
       const configWithoutHooks = {
         name: 'hooks-from-file-extension',
         version: '1.0.0',
@@ -898,7 +898,7 @@ describe('extension tests', () => {
       const extensionDir = path.join(userExtensionsDir, 'hooks-var-extension');
       fs.mkdirSync(extensionDir, { recursive: true });
 
-      // Create qwen-extension.json with hooks using ${CLAUDE_PLUGIN_ROOT}
+      // Create hopcode-extension.json with hooks using ${CLAUDE_PLUGIN_ROOT}
       const configWithHooks = {
         name: 'hooks-var-extension',
         version: '1.0.0',
@@ -968,7 +968,7 @@ describe('extension tests', () => {
         JSON.stringify(hooksJson),
       );
 
-      // Create qwen-extension.json with hooks as string path
+      // Create hopcode-extension.json with hooks as string path
       const configWithHooksPath = {
         name: 'hooks-from-config-path',
         version: '1.0.0',
@@ -1033,7 +1033,7 @@ describe('extension tests', () => {
         }),
       );
 
-      // Create qwen-extension.json with hooks as string path
+      // Create hopcode-extension.json with hooks as string path
       fs.writeFileSync(
         path.join(extensionDir, EXTENSIONS_CONFIG_FILENAME),
         JSON.stringify({

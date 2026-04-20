@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -181,7 +181,7 @@ describe('MemoryManager', () => {
         history: [{ role: 'user', parts: [{ text: 'first' }] }],
       });
 
-      // Second call while first is in-flight — should be queued
+      // Second call while first is in-flight ï¿½ should be queued
       const queued = await mgr.scheduleExtract({
         projectRoot,
         sessionId: 'sess-1',
@@ -374,7 +374,7 @@ describe('MemoryManager', () => {
     });
 
     it('skips when session count is below threshold (via session scanner)', async () => {
-      // Only 1 session — need 5
+      // Only 1 session ï¿½ need 5
       const mgr = new MemoryManager(async () => ['sess-0']);
 
       const result = await mgr.scheduleDream({

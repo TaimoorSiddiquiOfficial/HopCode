@@ -7,12 +7,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   AuthType,
-  qwenOAuth2Events,
-  QwenOAuth2Event,
+  hopCodeOAuth2Events,
+  HopCodeOAuth2Event,
   type DeviceAuthorizationData,
 } from '@hoptrendy/hopcode-core';
 
-export interface QwenAuthState {
+export interface HopCodeAuthState {
   deviceAuth: DeviceAuthorizationData | null;
   authStatus:
     | 'idle'
@@ -24,23 +24,23 @@ export interface QwenAuthState {
   authMessage: string | null;
 }
 
-export const useQwenAuth = (
+export const useHopCodeAuth = (
   pendingAuthType: AuthType | undefined,
   isAuthenticating: boolean,
 ) => {
-  const [qwenAuthState, setQwenAuthState] = useState<QwenAuthState>({
+  const [hopCodeAuthState, setHopCodeAuthState] = useState<HopCodeAuthState>({
     deviceAuth: null,
     authStatus: 'idle',
     authMessage: null,
   });
 
-  const isQwenAuth = pendingAuthType === AuthType.QWEN_OAUTH;
+  const isHopCodeAuth = pendingAuthType === AuthType.QWEN_OAUTH;
 
   // Set up event listeners when authentication starts
   useEffect(() => {
-    if (!isQwenAuth || !isAuthenticating) {
-      // Reset state when not authenticating or not Qwen auth
-      setQwenAuthState({
+    if (!isHopCodeAuth || !isAuthenticating) {
+      // Reset state when not authenticating or not HopCode auth
+      setHopCodeAuthState({
         deviceAuth: null,
         authStatus: 'idle',
         authMessage: null,
@@ -48,14 +48,14 @@ export const useQwenAuth = (
       return;
     }
 
-    setQwenAuthState((prev) => ({
+    setHopCodeAuthState((prev) => ({
       ...prev,
       authStatus: 'idle',
     }));
 
     // Set up event listeners
     const handleDeviceAuth = (deviceAuth: DeviceAuthorizationData) => {
-      setQwenAuthState((prev) => ({
+      setHopCodeAuthState((prev) => ({
         ...prev,
         deviceAuth: {
           verification_uri: deviceAuth.verification_uri,
@@ -72,7 +72,7 @@ export const useQwenAuth = (
       status: 'success' | 'error' | 'polling' | 'timeout' | 'rate_limit',
       message?: string,
     ) => {
-      setQwenAuthState((prev) => ({
+      setHopCodeAuthState((prev) => ({
         ...prev,
         authStatus: status,
         authMessage: message || null,
@@ -80,21 +80,24 @@ export const useQwenAuth = (
     };
 
     // Add event listeners
-    qwenOAuth2Events.on(QwenOAuth2Event.AuthUri, handleDeviceAuth);
-    qwenOAuth2Events.on(QwenOAuth2Event.AuthProgress, handleAuthProgress);
+    hopCodeOAuth2Events.on(HopCodeOAuth2Event.AuthUri, handleDeviceAuth);
+    hopCodeOAuth2Events.on(HopCodeOAuth2Event.AuthProgress, handleAuthProgress);
 
     // Cleanup event listeners when component unmounts or auth finishes
     return () => {
-      qwenOAuth2Events.off(QwenOAuth2Event.AuthUri, handleDeviceAuth);
-      qwenOAuth2Events.off(QwenOAuth2Event.AuthProgress, handleAuthProgress);
+      hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, handleDeviceAuth);
+      hopCodeOAuth2Events.off(
+        HopCodeOAuth2Event.AuthProgress,
+        handleAuthProgress,
+      );
     };
-  }, [isQwenAuth, isAuthenticating]);
+  }, [isHopCodeAuth, isAuthenticating]);
 
-  const cancelQwenAuth = useCallback(() => {
+  const cancelHopCodeAuth = useCallback(() => {
     // Emit cancel event to stop polling
-    qwenOAuth2Events.emit(QwenOAuth2Event.AuthCancel);
+    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthCancel);
 
-    setQwenAuthState({
+    setHopCodeAuthState({
       deviceAuth: null,
       authStatus: 'idle',
       authMessage: null,
@@ -102,7 +105,7 @@ export const useQwenAuth = (
   }, []);
 
   return {
-    qwenAuthState,
-    cancelQwenAuth,
+    hopCodeAuthState,
+    cancelHopCodeAuth,
   };
 };

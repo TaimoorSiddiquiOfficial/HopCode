@@ -21,7 +21,7 @@ function extractContent(message?: {
 }): string {
   if (!message) return '';
 
-  // Qwen format: parts array
+  // HopCode format: parts array
   if (message.parts?.length) {
     return message.parts.map((p) => p.text).join('');
   }

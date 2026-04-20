@@ -1458,7 +1458,7 @@ describe('loggers', () => {
 
       logHookCall(mockConfig, event);
 
-      // Should call QwenLogger
+      // Should call HopCodeLogger
       expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
@@ -1479,7 +1479,7 @@ describe('loggers', () => {
 
       logHookCall(mockConfig, event);
 
-      // Should call QwenLogger
+      // Should call HopCodeLogger
       expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
@@ -1495,7 +1495,7 @@ describe('loggers', () => {
         true,
       );
 
-      // Should not throw when QwenLogger is not available
+      // Should not throw when HopCodeLogger is not available
       expect(() => logHookCall(mockConfig, event)).not.toThrow();
     });
 

@@ -17,7 +17,7 @@
  * - Project-level: `.hopcode/skills/`
  * - User-level: `~/.hopcode/skills/`
  * - Extension-level: provided by installed extensions
- * - Bundled: built-in skills shipped with qwen-code
+ * - Bundled: built-in skills shipped with hopcode-code
  */
 
 // Core types and interfaces

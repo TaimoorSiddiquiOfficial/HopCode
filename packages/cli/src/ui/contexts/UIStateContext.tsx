@@ -18,7 +18,7 @@ import type {
   SettingInputRequest,
   PluginChoiceRequest,
 } from '../types.js';
-import type { QwenAuthState } from '../hooks/useQwenAuth.js';
+import type { HopCodeAuthState } from '../hooks/useHopCodeAuth.js';
 import type { CommandContext, SlashCommand } from '../commands/types.js';
 import type { TextBuffer } from '../components/shared/text-buffer.js';
 import type {
@@ -48,7 +48,7 @@ export interface UIState {
   isAuthDialogOpen: boolean;
   pendingAuthType: AuthType | undefined;
   // HopCode OAuth state
-  qwenAuthState: QwenAuthState;
+  hopCodeAuthState: HopCodeAuthState;
   editorError: string | null;
   isEditorDialogOpen: boolean;
   debugMessage: string;

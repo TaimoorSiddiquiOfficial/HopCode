@@ -103,7 +103,7 @@ const INPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
   // Anthropic Claude
   [/^claude-/, LIMITS['200k']],
 
-  // Alibaba / Qwen
+  // Alibaba / HopCode
   [/^qwen3-coder-plus/, LIMITS['1m']],
   [/^qwen3-coder-flash/, LIMITS['1m']],
   [/^qwen3\.\d/, LIMITS['1m']],

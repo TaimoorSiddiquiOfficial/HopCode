@@ -1042,7 +1042,7 @@ const SETTINGS_SCHEMA = {
             description: 'Respect .gitignore files when searching',
             showInDialog: true,
           },
-          respectQwenIgnore: {
+          respectHopCodeIgnore: {
             type: 'boolean',
             label: 'Respect .hopcodeignore',
             category: 'Context',

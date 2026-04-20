@@ -9,7 +9,7 @@ import type { Usage } from '@agentclientprotocol/sdk';
 import type { ApprovalModeValue } from './approvalModeValueTypes.js';
 
 // ---------------------------------------------------------------------------
-// Private / Qwen-specific types (not part of ACP spec)
+// Private / HopCode-specific types (not part of ACP spec)
 // ---------------------------------------------------------------------------
 
 export const authMethod = 'qwen-oauth';

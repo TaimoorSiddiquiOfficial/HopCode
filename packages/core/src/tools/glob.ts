@@ -185,7 +185,7 @@ class GlobToolInvocation extends BaseToolInvocation<
       let searchLocationDescription: string;
 
       if (this.params.path) {
-        // User specified a path — search only that directory
+        // User specified a path ï¿½ search only that directory
         const searchDirAbs = resolveAndValidatePath(
           this.config,
           this.params.path,
@@ -194,7 +194,7 @@ class GlobToolInvocation extends BaseToolInvocation<
         searchDirs.push(searchDirAbs);
         searchLocationDescription = `within ${searchDirAbs}`;
       } else {
-        // No path specified — search all workspace directories
+        // No path specified ï¿½ search all workspace directories
         const workspaceDirs = this.config
           .getWorkspaceContext()
           .getDirectories();
@@ -295,9 +295,9 @@ class GlobToolInvocation extends BaseToolInvocation<
       respectGitIgnore:
         options?.respectGitIgnore ??
         DEFAULT_FILE_FILTERING_OPTIONS.respectGitIgnore,
-      respectQwenIgnore:
-        options?.respectQwenIgnore ??
-        DEFAULT_FILE_FILTERING_OPTIONS.respectQwenIgnore,
+      respectHopCodeIgnore:
+        options?.respectHopCodeIgnore ??
+        DEFAULT_FILE_FILTERING_OPTIONS.respectHopCodeIgnore,
     };
   }
 }

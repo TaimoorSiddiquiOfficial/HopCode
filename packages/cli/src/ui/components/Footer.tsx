@@ -67,7 +67,7 @@ export const Footer: React.FC = () => {
   const sandboxInfo = sandboxEnv
     ? sandboxEnv === 'sandbox-exec'
       ? 'seatbelt'
-      : sandboxEnv.startsWith('qwen-code')
+      : sandboxEnv.startsWith('hopcode')
         ? 'docker'
         : sandboxEnv
     : null;

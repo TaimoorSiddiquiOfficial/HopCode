@@ -80,7 +80,7 @@ interface MemoryCache {
 }
 
 /**
- * Validates that the given data is a valid QwenCredentials object
+ * Validates that the given data is a valid HopCodeCredentials object
  *
  * @param data - The data to validate
  * @returns The validated credentials object
@@ -201,7 +201,7 @@ export class SharedTokenManager {
   /**
    * Get valid OAuth credentials, refreshing them if necessary
    *
-   * @param qwenClient - The OAuth2 client instance
+   * @param hopcodeClient - The OAuth2 client instance
    * @param forceRefresh - If true, refresh token even if current one is still valid
    * @returns Promise resolving to valid credentials
    * @throws TokenManagerError if unable to obtain valid credentials
@@ -412,7 +412,7 @@ export class SharedTokenManager {
   }
 
   /**
-   * Load credentials from the file system into memory cache and sync with qwenClient
+   * Load credentials from the file system into memory cache and sync with hopcodeClient
    */
   private async reloadCredentialsFromFile(
     qwenClient?: IQwenOAuth2Client,
@@ -429,7 +429,7 @@ export class SharedTokenManager {
       // Update memory cache first
       this.memoryCache.credentials = credentials;
 
-      // Sync with qwenClient atomically - rollback on failure
+      // Sync with hopcodeClient atomically - rollback on failure
       try {
         if (qwenClient) {
           qwenClient.setCredentials(credentials);
@@ -457,7 +457,7 @@ export class SharedTokenManager {
   /**
    * Refresh the OAuth token using file locking to prevent concurrent refreshes
    *
-   * @param qwenClient - The OAuth2 client instance
+   * @param hopcodeClient - The OAuth2 client instance
    * @param forceRefresh - If true, skip checking if token is already valid after getting lock
    * @returns Promise resolving to refreshed credentials
    * @throws TokenManagerError if refresh fails or lock cannot be acquired
@@ -504,7 +504,7 @@ export class SharedTokenManager {
         this.memoryCache.credentials &&
         this.isTokenValid(this.memoryCache.credentials)
       ) {
-        // No need to call qwenClient.setCredentials here as checkAndReloadIfNeeded already did it
+        // No need to call hopcodeClient.setCredentials here as checkAndReloadIfNeeded already did it
         return this.memoryCache.credentials;
       }
 

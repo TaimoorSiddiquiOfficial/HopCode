@@ -27,7 +27,7 @@ export class Storage {
 
   /**
    * Custom runtime output base directory set via settings.
-   * When null, falls back to getGlobalQwenDir().
+   * When null, falls back to getGlobalHopCodeDir().
    */
   private static runtimeBaseDir: string | null = null;
   private static readonly runtimeBaseDirContext = new AsyncLocalStorage<
@@ -70,7 +70,7 @@ export class Storage {
   /**
    * Sets the custom runtime output base directory.
    * Handles tilde (~) expansion and resolves relative paths to absolute.
-   * Pass null/undefined/empty string to reset to default (getGlobalQwenDir()).
+   * Pass null/undefined/empty string to reset to default (getGlobalHopCodeDir()).
    * @param dir - The directory path, or null/undefined to reset
    * @param cwd - Base directory for resolving relative paths (defaults to process.cwd()).
    *              Pass the project root so that relative values like ".hopcode" resolve
@@ -97,28 +97,29 @@ export class Storage {
    * Returns the base directory for all runtime output (temp files, debug logs,
    * session data, todos, insights, etc.).
    *
-   * Priority: QWEN_RUNTIME_DIR env var > setRuntimeBaseDir() value > getGlobalQwenDir()
+   * Priority: HOPCODE_RUNTIME_DIR env var > QWEN_RUNTIME_DIR env var > setRuntimeBaseDir() value > getGlobalHopCodeDir()
    * @returns Absolute path to the runtime output base directory
    */
   static getRuntimeBaseDir(): string {
-    const envDir = process.env['QWEN_RUNTIME_DIR'];
+    const envDir =
+      process.env['HOPCODE_RUNTIME_DIR'] ?? process.env['QWEN_RUNTIME_DIR'];
     if (envDir) {
       return (
-        Storage.resolveRuntimeBaseDir(envDir) ?? Storage.getGlobalQwenDir()
+        Storage.resolveRuntimeBaseDir(envDir) ?? Storage.getGlobalHopCodeDir()
       );
     }
 
     const contextualDir = Storage.runtimeBaseDirContext.getStore();
     if (contextualDir !== undefined) {
-      return contextualDir ?? Storage.getGlobalQwenDir();
+      return contextualDir ?? Storage.getGlobalHopCodeDir();
     }
     if (Storage.runtimeBaseDir) {
       return Storage.runtimeBaseDir;
     }
-    return Storage.getGlobalQwenDir();
+    return Storage.getGlobalHopCodeDir();
   }
 
-  static getGlobalQwenDir(): string {
+  static getGlobalHopCodeDir(): string {
     const homeDir = os.homedir();
     if (!homeDir) {
       return path.join(os.tmpdir(), '.hopcode');
@@ -127,27 +128,27 @@ export class Storage {
   }
 
   static getMcpOAuthTokensPath(): string {
-    return path.join(Storage.getGlobalQwenDir(), 'mcp-oauth-tokens.json');
+    return path.join(Storage.getGlobalHopCodeDir(), 'mcp-oauth-tokens.json');
   }
 
   static getGlobalSettingsPath(): string {
-    return path.join(Storage.getGlobalQwenDir(), 'settings.json');
+    return path.join(Storage.getGlobalHopCodeDir(), 'settings.json');
   }
 
   static getInstallationIdPath(): string {
-    return path.join(Storage.getGlobalQwenDir(), 'installation_id');
+    return path.join(Storage.getGlobalHopCodeDir(), 'installation_id');
   }
 
   static getGoogleAccountsPath(): string {
-    return path.join(Storage.getGlobalQwenDir(), GOOGLE_ACCOUNTS_FILENAME);
+    return path.join(Storage.getGlobalHopCodeDir(), GOOGLE_ACCOUNTS_FILENAME);
   }
 
   static getUserCommandsDir(): string {
-    return path.join(Storage.getGlobalQwenDir(), 'commands');
+    return path.join(Storage.getGlobalHopCodeDir(), 'commands');
   }
 
   static getGlobalMemoryFilePath(): string {
-    return path.join(Storage.getGlobalQwenDir(), 'memory.md');
+    return path.join(Storage.getGlobalHopCodeDir(), 'memory.md');
   }
 
   static getGlobalTempDir(): string {
@@ -167,7 +168,7 @@ export class Storage {
   }
 
   static getPlansDir(): string {
-    return path.join(Storage.getGlobalQwenDir(), PLANS_DIR_NAME);
+    return path.join(Storage.getGlobalHopCodeDir(), PLANS_DIR_NAME);
   }
 
   static getPlanFilePath(sessionId: string): string {
@@ -175,14 +176,14 @@ export class Storage {
   }
 
   static getGlobalBinDir(): string {
-    return path.join(Storage.getGlobalQwenDir(), BIN_DIR_NAME);
+    return path.join(Storage.getGlobalHopCodeDir(), BIN_DIR_NAME);
   }
 
   static getGlobalArenaDir(): string {
-    return path.join(Storage.getGlobalQwenDir(), ARENA_DIR_NAME);
+    return path.join(Storage.getGlobalHopCodeDir(), ARENA_DIR_NAME);
   }
 
-  getQwenDir(): string {
+  getHopCodeDir(): string {
     return path.join(this.targetDir, QWEN_DIR);
   }
 
@@ -207,7 +208,7 @@ export class Storage {
   }
 
   static getOAuthCredsPath(): string {
-    return path.join(Storage.getGlobalQwenDir(), OAUTH_FILE);
+    return path.join(Storage.getGlobalHopCodeDir(), OAUTH_FILE);
   }
 
   getProjectRoot(): string {
@@ -222,11 +223,11 @@ export class Storage {
   }
 
   getWorkspaceSettingsPath(): string {
-    return path.join(this.getQwenDir(), 'settings.json');
+    return path.join(this.getHopCodeDir(), 'settings.json');
   }
 
   getProjectCommandsDir(): string {
-    return path.join(this.getQwenDir(), 'commands');
+    return path.join(this.getHopCodeDir(), 'commands');
   }
 
   getProjectTempCheckpointsDir(): string {
@@ -234,11 +235,11 @@ export class Storage {
   }
 
   getExtensionsDir(): string {
-    return path.join(this.getQwenDir(), 'extensions');
+    return path.join(this.getHopCodeDir(), 'extensions');
   }
 
   getExtensionsConfigPath(): string {
-    return path.join(this.getExtensionsDir(), 'qwen-extension.json');
+    return path.join(this.getExtensionsDir(), 'hopcode-extension.json');
   }
 
   getUserSkillsDirs(): string[] {
@@ -254,7 +255,7 @@ export class Storage {
    * project-level extensions which live in <project>/.hopcode/extensions/.
    */
   static getUserExtensionsDir(): string {
-    return path.join(Storage.getGlobalQwenDir(), 'extensions');
+    return path.join(Storage.getGlobalHopCodeDir(), 'extensions');
   }
 
   getHistoryFilePath(): string {

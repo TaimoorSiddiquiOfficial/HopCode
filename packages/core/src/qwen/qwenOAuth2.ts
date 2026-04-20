@@ -111,7 +111,7 @@ export class CredentialsClearRequiredError extends Error {
 }
 
 /**
- * Qwen OAuth2 credentials interface
+ * HopCode OAuth2 credentials interface
  */
 export interface QwenCredentials {
   access_token?: string;
@@ -232,7 +232,7 @@ export interface TokenRefreshData {
 export type TokenRefreshResponse = TokenRefreshData | ErrorData;
 
 /**
- * Qwen OAuth2 client interface
+ * HopCode OAuth2 client interface
  */
 export interface IQwenOAuth2Client {
   setCredentials(credentials: QwenCredentials): void;
@@ -251,7 +251,7 @@ export interface IQwenOAuth2Client {
 }
 
 /**
- * Qwen OAuth2 client implementation
+ * HopCode OAuth2 client implementation
  */
 export class QwenOAuth2Client implements IQwenOAuth2Client {
   private credentials: QwenCredentials = {};
@@ -477,7 +477,7 @@ export class QwenOAuth2Client implements IQwenOAuth2Client {
   }
 }
 
-export enum QwenOAuth2Event {
+export enum HopCodeOAuth2Event {
   AuthUri = 'auth-uri',
   AuthProgress = 'auth-progress',
   AuthCancel = 'auth-cancel',
@@ -495,9 +495,9 @@ export type AuthResult =
     };
 
 /**
- * Global event emitter instance for QwenOAuth2 authentication events
+ * Global event emitter instance for HopCodeOAuth2 authentication events
  */
-export const qwenOAuth2Events = new EventEmitter();
+export const hopCodeOAuth2Events = new EventEmitter();
 
 export async function getQwenOAuthClient(
   config: Config,
@@ -550,8 +550,8 @@ export async function getQwenOAuthClient(
       // Only emit timeout event if the failure reason is actually timeout
       // Other error types (401, 429, etc.) have already emitted their specific events
       if (result.reason === 'timeout') {
-        qwenOAuth2Events.emit(
-          QwenOAuth2Event.AuthProgress,
+        hopCodeOAuth2Events.emit(
+          HopCodeOAuth2Event.AuthProgress,
           'timeout',
           'Authentication timed out. Please try again or select a different authentication method.',
         );
@@ -694,7 +694,7 @@ async function authWithQwenDeviceFlow(
   const cancelHandler = () => {
     isCancelled = true;
   };
-  qwenOAuth2Events.once(QwenOAuth2Event.AuthCancel, cancelHandler);
+  hopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthCancel, cancelHandler);
 
   // Helper to check cancellation and return appropriate result
   const checkCancellation = (): AuthResult | null => {
@@ -703,7 +703,7 @@ async function authWithQwenDeviceFlow(
     }
     const message = 'Authentication cancelled by user.';
     debugLogger.debug('\n' + message);
-    qwenOAuth2Events.emit(QwenOAuth2Event.AuthProgress, 'error', message);
+    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthProgress, 'error', message);
     return { success: false, reason: 'cancelled', message };
   };
 
@@ -712,7 +712,7 @@ async function authWithQwenDeviceFlow(
     status: 'polling' | 'success' | 'error' | 'timeout' | 'rate_limit',
     message: string,
   ): void => {
-    qwenOAuth2Events.emit(QwenOAuth2Event.AuthProgress, status, message);
+    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthProgress, status, message);
   };
 
   // Helper to handle browser launch with error handling
@@ -757,7 +757,7 @@ async function authWithQwenDeviceFlow(
     }
 
     // Emit device authorization event for UI integration immediately
-    qwenOAuth2Events.emit(QwenOAuth2Event.AuthUri, deviceAuth);
+    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthUri, deviceAuth);
 
     if (config.isBrowserLaunchSuppressed() || !config.isInteractive()) {
       showFallbackMessage(deviceAuth.verification_uri_complete);
@@ -795,7 +795,7 @@ async function authWithQwenDeviceFlow(
         if (isDeviceTokenSuccess(tokenResponse)) {
           const tokenData = tokenResponse as DeviceTokenData;
 
-          // Convert to QwenCredentials format
+          // Convert to HopCodeCredentials format
           const credentials: QwenCredentials = {
             access_token: tokenData.access_token!, // Safe to assert as non-null due to isDeviceTokenSuccess check
             refresh_token: tokenData.refresh_token || undefined,
@@ -961,7 +961,7 @@ async function authWithQwenDeviceFlow(
     return { success: false, reason: 'error', message };
   } finally {
     // Clean up event listener
-    qwenOAuth2Events.off(QwenOAuth2Event.AuthCancel, cancelHandler);
+    hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthCancel, cancelHandler);
   }
 }
 
@@ -994,7 +994,7 @@ async function cacheQwenCredentials(credentials: QwenCredentials) {
 }
 
 /**
- * Clear cached Qwen credentials from disk
+ * Clear cached HopCode credentials from disk
  * This is useful when credentials have expired or need to be reset
  */
 export async function clearQwenCredentials(): Promise<void> {

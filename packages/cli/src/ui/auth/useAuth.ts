@@ -25,7 +25,7 @@ export interface OpenAICredentials {
   baseUrl?: string;
   model?: string;
 }
-import { useQwenAuth } from '../hooks/useQwenAuth.js';
+import { useHopCodeAuth } from '../hooks/useHopCodeAuth.js';
 import { AuthState, MessageType } from '../types.js';
 import type { HistoryItem } from '../types.js';
 import { t } from '../../i18n/index.js';
@@ -42,7 +42,7 @@ import {
   type AlibabaStandardRegion,
 } from '../../constants/alibabaStandardApiKey.js';
 
-export type { QwenAuthState } from '../hooks/useQwenAuth.js';
+export type { HopCodeAuthState } from '../hooks/useHopCodeAuth.js';
 
 export const useAuthCommand = (
   settings: LoadedSettings,
@@ -64,7 +64,7 @@ export const useAuthCommand = (
     undefined,
   );
 
-  const { qwenAuthState, cancelQwenAuth } = useQwenAuth(
+  const { hopCodeAuthState, cancelHopCodeAuth } = useHopCodeAuth(
     pendingAuthType,
     isAuthenticating,
   );
@@ -275,7 +275,7 @@ export const useAuthCommand = (
 
   const cancelAuthentication = useCallback(() => {
     if (isAuthenticating && pendingAuthType === AuthType.QWEN_OAUTH) {
-      cancelQwenAuth();
+      cancelHopCodeAuth();
     }
 
     // Log authentication cancellation
@@ -288,7 +288,7 @@ export const useAuthCommand = (
     setIsAuthenticating(false);
     setIsAuthDialogOpen(true);
     setAuthError(null);
-  }, [isAuthenticating, pendingAuthType, cancelQwenAuth, config]);
+  }, [isAuthenticating, pendingAuthType, cancelHopCodeAuth, config]);
 
   /**
    * Handle coding plan submission - generates configs from template and stores api-key
@@ -602,7 +602,7 @@ export const useAuthCommand = (
     isAuthDialogOpen,
     isAuthenticating,
     pendingAuthType,
-    qwenAuthState,
+    hopCodeAuthState,
     handleAuthSelect,
     handleCodingPlanSubmit,
     handleAlibabaStandardSubmit,

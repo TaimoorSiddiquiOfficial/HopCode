@@ -5,7 +5,7 @@
  */
 
 /**
- * Converter for Claude Code plugins to Qwen Code format.
+ * Converter for Claude Code plugins to HopCode Code format.
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -155,9 +155,9 @@ function parseStringOrArray(value: unknown): string[] | undefined {
 }
 
 /**
- * Converts a Claude agent config to Qwen Code subagent format.
+ * Converts a Claude agent config to HopCode Code subagent format.
  * @param claudeAgent Claude agent configuration
- * @returns Converted agent config compatible with Qwen Code SubagentConfig
+ * @returns Converted agent config compatible with HopCode Code SubagentConfig
  */
 export function convertClaudeAgentConfig(
   claudeAgent: ClaudeAgentConfig,
@@ -187,7 +187,7 @@ export function convertClaudeAgentConfig(
     qwenAgent['model'] = claudeAgent.model;
   }
 
-  // Map Claude permission mode aliases to Qwen ApprovalMode values.
+  // Map Claude permission mode aliases to HopCode ApprovalMode values.
   // Note: Claude's `dontAsk` denies any tool call that would prompt the user,
   // making it restrictive. We map it to `default` (which also requires approval)
   // rather than `auto-edit` (which auto-approves), preserving the restrictive
@@ -220,7 +220,7 @@ export function convertClaudeAgentConfig(
 }
 
 /**
- * Converts all agent files in a directory from Claude format to Qwen format.
+ * Converts all agent files in a directory from Claude format to HopCode format.
  * Parses the YAML frontmatter, converts the configuration, and writes back.
  * @param agentsDir Directory containing agent markdown files
  */
@@ -267,7 +267,7 @@ async function convertAgentFiles(agentsDir: string): Promise<void> {
         systemPrompt: body.trim(),
       };
 
-      // Convert to Qwen format
+      // Convert to HopCode format
       const qwenAgent = convertClaudeAgentConfig(claudeAgent);
 
       // Build new frontmatter (excluding systemPrompt as it goes in body)
@@ -298,9 +298,9 @@ ${systemPrompt}
 }
 
 /**
- * Converts a Claude plugin config to Qwen Code format.
+ * Converts a Claude plugin config to HopCode Code format.
  * @param claudeConfig Claude plugin configuration
- * @returns Qwen ExtensionConfig
+ * @returns HopCode ExtensionConfig
  */
 export function convertClaudeToQwenConfig(
   claudeConfig: ClaudePluginConfig,
@@ -354,9 +354,9 @@ export function convertClaudeToQwenConfig(
 }
 
 /**
- * Converts a complete Claude plugin package to Qwen Code format.
+ * Converts a complete Claude plugin package to HopCode Code format.
  * Creates a new temporary directory with:
- * 1. Converted qwen-extension.json
+ * 1. Converted hopcode-extension.json
  * 2. Commands, skills, and agents collected to respective folders
  * 3. MCP servers resolved from JSON files if needed
  * 4. All other files preserved
@@ -517,15 +517,15 @@ export async function convertClaudePluginPackage(
       }
     }
 
-    // Step 9: Convert collected agent files from Claude format to Qwen format
+    // Step 9: Convert collected agent files from Claude format to HopCode format
     const agentsDestDir = path.join(tmpDir, 'agents');
     await convertAgentFiles(agentsDestDir);
 
-    // Step 10: Convert to Qwen format config
+    // Step 10: Convert to HopCode format config
     const qwenConfig = convertClaudeToQwenConfig(mergedConfig);
 
-    // Step 11: Write qwen-extension.json
-    const qwenConfigPath = path.join(tmpDir, 'qwen-extension.json');
+    // Step 11: Write hopcode-extension.json
+    const qwenConfigPath = path.join(tmpDir, 'hopcode-extension.json');
     fs.writeFileSync(
       qwenConfigPath,
       JSON.stringify(qwenConfig, null, 2),

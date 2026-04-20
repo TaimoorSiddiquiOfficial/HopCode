@@ -20,41 +20,41 @@ const FULL_MULTIMODAL: InputModalities = {
  */
 const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   // -------------------
-  // Google Gemini — full multimodal
+  // Google Gemini ï¿½ full multimodal
   // -------------------
   [/^gemini-3/, FULL_MULTIMODAL],
   [/^gemini-/, FULL_MULTIMODAL],
 
   // -------------------
-  // OpenAI — image by default for all gpt/o-series models
+  // OpenAI ï¿½ image by default for all gpt/o-series models
   // -------------------
   [/^gpt-5/, { image: true }],
   [/^gpt-/, { image: true }],
   [/^o\d/, { image: true }],
 
   // -------------------
-  // Anthropic Claude — image + pdf
+  // Anthropic Claude ï¿½ image + pdf
   // -------------------
   [/^claude-/, { image: true, pdf: true }],
 
   // -------------------
-  // Alibaba / Qwen
+  // Alibaba / HopCode
   // -------------------
   // Qwen3.5-Plus, Qwen3.6-Plus: image + video support
   [/^qwen3\.5-plus/, { image: true, video: true }],
   [/^qwen3\.6-plus/, { image: true, video: true }],
   [/^coder-model$/, { image: true, video: true }],
 
-  // Qwen VL (vision-language) models: image + video
+  // HopCode VL (vision-language) models: image + video
   [/^qwen-vl-/, { image: true, video: true }],
   [/^qwen3-vl-/, { image: true, video: true }],
 
-  // Qwen coder / text models: text-only
+  // HopCode coder / text models: text-only
   [/^qwen3-coder-/, {}],
   [/^qwen/, {}],
 
   // -------------------
-  // DeepSeek — text-only
+  // DeepSeek ï¿½ text-only
   // -------------------
   [/^deepseek/, {}],
 
@@ -66,7 +66,7 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   [/^glm-/, {}],
 
   // -------------------
-  // MiniMax — text-only
+  // MiniMax ï¿½ text-only
   // -------------------
   [/^minimax-/, {}],
 

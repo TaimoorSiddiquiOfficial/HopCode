@@ -141,7 +141,7 @@ vi.mock('../telemetry/index.js', async (importOriginal) => {
     ...actual,
     uiTelemetryService: mockUiTelemetryService,
     // We keep the real implementations of logChatCompression, etc.
-    // but we can spy on QwenLogger if needed
+    // but we can spy on HopCodeLogger if needed
   };
 });
 vi.mock('../ide/ideContext.js');
@@ -479,7 +479,7 @@ describe('Gemini Client (client.ts)', () => {
     });
 
     it('should not strip thoughts on active session (< 5min idle)', async () => {
-      // Simulate a recent API completion (2 minutes ago — within default 5 min threshold)
+      // Simulate a recent API completion (2 minutes ago ï¿½ within default 5 min threshold)
       client['lastApiCompletionTimestamp'] = Date.now() - 2 * 60 * 1000;
       client['thinkingClearLatched'] = false;
 
@@ -499,7 +499,7 @@ describe('Gemini Client (client.ts)', () => {
     });
 
     it('should latch and strip thoughts after > 5min idle', async () => {
-      // Simulate an old API completion (10 minutes ago — exceeds default 5 min threshold)
+      // Simulate an old API completion (10 minutes ago ï¿½ exceeds default 5 min threshold)
       client['lastApiCompletionTimestamp'] = Date.now() - 10 * 60 * 1000;
       client['thinkingClearLatched'] = false;
 
@@ -520,7 +520,7 @@ describe('Gemini Client (client.ts)', () => {
     });
 
     it('should keep stripping once latched even if idle < 5min', async () => {
-      // Pre-set latch with a recent timestamp (2 minutes ago — within threshold)
+      // Pre-set latch with a recent timestamp (2 minutes ago ï¿½ within threshold)
       client['lastApiCompletionTimestamp'] = Date.now() - 2 * 60 * 1000;
       client['thinkingClearLatched'] = true;
 

@@ -31,6 +31,6 @@ describe('runWithAcpRuntimeOutputDir', () => {
       );
     });
 
-    expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalQwenDir());
+    expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalHopCodeDir());
   });
 });

@@ -145,7 +145,7 @@ export async function handleQwenAuth(
 }
 
 /**
- * Handles Qwen OAuth authentication
+ * Handles HopCode OAuth authentication
  */
 async function handleQwenOAuth(
   config: Config,
@@ -321,7 +321,7 @@ async function promptForKey(): Promise<string> {
  * Runs the interactive authentication flow
  */
 export async function runInteractiveAuth() {
-  // Build selector options: start with Coding Plan + Qwen OAuth, then add all registry providers
+  // Build selector options: start with Coding Plan + HopCode OAuth, then add all registry providers
   type AuthChoice =
     | 'coding-plan'
     | 'qwen-oauth'
@@ -354,7 +354,7 @@ export async function runInteractiveAuth() {
 
   let choice = await selector.select();
 
-  // If user selects discontinued Qwen OAuth, warn and re-prompt
+  // If user selects discontinued HopCode OAuth, warn and re-prompt
   while (choice === 'qwen-oauth') {
     writeStdoutLine(
       t(

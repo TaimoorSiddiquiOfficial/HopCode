@@ -61,7 +61,7 @@ function setPrivateProperty<T>(obj: unknown, property: string, value: T): void {
 }
 
 /**
- * Creates a mock QwenOAuth2Client for testing
+ * Creates a mock HopCodeOAuth2Client for testing
  */
 function createMockQwenClient(
   initialCredentials: Partial<QwenCredentials> = {},
@@ -595,7 +595,7 @@ describe('SharedTokenManager', () => {
       await expect(
         tokenManager.getValidCredentials(mockClient),
       ).rejects.toThrow(TokenManagerError);
-    }, 500); // 500ms timeout for lock test (3 attempts × 50ms = ~150ms + buffer)
+    }, 500); // 500ms timeout for lock test (3 attempts ï¿½ 50ms = ~150ms + buffer)
 
     it('should handle refresh response without access token', async () => {
       // Create a fresh token manager instance to avoid state contamination

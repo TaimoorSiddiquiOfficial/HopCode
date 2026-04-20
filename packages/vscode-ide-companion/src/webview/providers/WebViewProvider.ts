@@ -276,7 +276,7 @@ export class WebViewProvider {
       });
     });
 
-    // Note: Tool call updates are handled in handleSessionUpdate within QwenAgentManager
+    // Note: Tool call updates are handled in handleSessionUpdate within HopCodeAgentManager
     // and sent via onStreamChunk callback
     this.agentManager.onToolCall((update) => {
       // Always surface tool calls; they are part of the live assistant flow.
@@ -368,7 +368,7 @@ export class WebViewProvider {
               (request.toolCall as { kind?: string } | undefined)?.kind ===
               'switch_mode';
 
-            // Always close open qwen-diff editors after any permission decision
+            // Always close open hopcode-diff editors after any permission decision
             void vscode.commands.executeCommand('hopcode.diff.closeAll');
 
             if (isCancel) {
@@ -974,7 +974,7 @@ export class WebViewProvider {
           });
         }
 
-        // Load messages from the current Qwen session
+        // Load messages from the current HopCode session
         const sessionReady = await this.loadCurrentSessionMessages(options);
 
         if (sessionReady) {
@@ -1174,7 +1174,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Load messages from current Qwen session
+   * Load messages from current HopCode session
    * Skips session restoration and creates a new session directly
    */
   private async loadCurrentSessionMessages(options?: {
@@ -1804,7 +1804,7 @@ export class WebViewProvider {
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       const workingDir = workspaceFolder?.uri.fsPath || process.cwd();
 
-      // Create new Qwen session via agent manager
+      // Create new HopCode session via agent manager
       await this.agentManager.createNewSession(workingDir, { forceNew: true });
       this.messageHandler.setCurrentConversationId(null);
 

@@ -13,7 +13,7 @@ import type { DeviceAuthorizationData } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { t } from '../../i18n/index.js';
 
-interface QwenOAuthProgressProps {
+interface HopCodeOAuthProgressProps {
   onTimeout: () => void;
   onCancel: () => void;
   deviceAuth?: DeviceAuthorizationData;
@@ -33,13 +33,13 @@ function formatTime(seconds: number): string {
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-export function QwenOAuthProgress({
+export function HopCodeOAuthProgress({
   onTimeout,
   onCancel,
   deviceAuth,
   authStatus,
   authMessage,
-}: QwenOAuthProgressProps): React.JSX.Element {
+}: HopCodeOAuthProgressProps): React.JSX.Element {
   const defaultTimeout = deviceAuth?.expires_in || 300; // Default 5 minutes
   const [timeRemaining, setTimeRemaining] = useState<number>(defaultTimeout);
   const [dots, setDots] = useState<string>('...');

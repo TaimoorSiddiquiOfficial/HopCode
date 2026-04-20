@@ -64,7 +64,7 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   return {
     ...actual,
     Storage: {
-      getGlobalQwenDir: vi.fn().mockReturnValue('/mock/.hopcode'),
+      getGlobalHopCodeDir: vi.fn().mockReturnValue('/mock/.hopcode'),
       getGlobalSettingsPath: vi
         .fn()
         .mockReturnValue('/mock/.hopcode/settings.json'),

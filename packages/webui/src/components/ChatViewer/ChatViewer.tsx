@@ -55,7 +55,7 @@ export type ToolCallData = BaseToolCallData;
 
 /**
  * Single chat message from JSONL format
- * Supports both Qwen format and Claude format
+ * Supports both HopCode format and Claude format
  */
 export interface ChatMessageData {
   uuid: string;
@@ -63,7 +63,7 @@ export interface ChatMessageData {
   sessionId?: string;
   timestamp: string; // ISO timestamp string
   type: 'user' | 'assistant' | 'system' | 'tool_call';
-  // Qwen format
+  // HopCode format
   message?: {
     role?: string;
     parts?: MessagePart[];
@@ -110,12 +110,12 @@ export interface ChatViewerProps {
 }
 
 /**
- * Extract text content from message (supports both Qwen and Claude formats)
+ * Extract text content from message (supports both HopCode and Claude formats)
  */
 function extractContent(message: ChatMessageData['message']): string {
   if (!message) return '';
 
-  // Qwen format: message.parts[].text
+  // HopCode format: message.parts[].text
   if (message.parts && Array.isArray(message.parts)) {
     return message.parts.map((part) => part.text || '').join('');
   }

@@ -22,7 +22,7 @@ import { DEFAULT_DASHSCOPE_BASE_URL } from '../core/openaiContentGenerator/const
 import { createDebugLogger } from '../utils/debugLogger.js';
 
 /**
- * Qwen Content Generator that uses Qwen OAuth tokens with automatic refresh
+ * HopCode Content Generator that uses HopCode OAuth tokens with automatic refresh
  */
 export class QwenContentGenerator extends OpenAIContentGenerator {
   private readonly debugLogger = createDebugLogger('QWEN');
@@ -35,7 +35,7 @@ export class QwenContentGenerator extends OpenAIContentGenerator {
     contentGeneratorConfig: ContentGeneratorConfig,
     cliConfig: Config,
   ) {
-    // Create DashScope provider for Qwen
+    // Create DashScope provider for HopCode
     const dashscopeProvider = new DashScopeOpenAICompatibleProvider(
       contentGeneratorConfig,
       cliConfig,

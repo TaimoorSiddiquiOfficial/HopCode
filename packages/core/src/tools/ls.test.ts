@@ -39,7 +39,7 @@ describe('LSTool', () => {
       getFileService: () => new FileDiscoveryService(tempRootDir),
       getFileFilteringOptions: () => ({
         respectGitIgnore: true,
-        respectQwenIgnore: true,
+        respectHopCodeIgnore: true,
       }),
       getTruncateToolOutputLines: () => 1000,
       storage: {

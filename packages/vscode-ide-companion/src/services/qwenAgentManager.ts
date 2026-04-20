@@ -1233,7 +1233,7 @@ export class QwenAgentManager {
     this.sessionCreateInFlight = (async () => {
       try {
         let newSessionResult: unknown;
-        // Try to create a new ACP session. If Qwen asks for auth, let it handle authentication.
+        // Try to create a new ACP session. If HopCode asks for auth, let it handle authentication.
         try {
           newSessionResult = await this.connection.newSession(workingDir);
           console.log(

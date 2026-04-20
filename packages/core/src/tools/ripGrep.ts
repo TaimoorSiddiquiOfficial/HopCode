@@ -83,7 +83,7 @@ class GrepToolInvocation extends BaseToolInvocation<
       let searchDirDisplay: string;
 
       if (this.params.path) {
-        // User specified a path — search only that path
+        // User specified a path ï¿½ search only that path
         const searchDirAbs = resolveAndValidatePath(
           this.config,
           this.params.path,
@@ -92,7 +92,7 @@ class GrepToolInvocation extends BaseToolInvocation<
         searchPaths.push(searchDirAbs);
         searchDirDisplay = this.params.path;
       } else {
-        // No path specified — search all workspace directories
+        // No path specified ï¿½ search all workspace directories
         const workspaceDirs = this.config
           .getWorkspaceContext()
           .getDirectories();
@@ -249,7 +249,7 @@ class GrepToolInvocation extends BaseToolInvocation<
       rgArgs.push('--no-ignore-vcs');
     }
 
-    if (filteringOptions.respectQwenIgnore) {
+    if (filteringOptions.respectHopCodeIgnore) {
       // Load .hopcodeignore from each workspace directory, not just the primary one
       const seenIgnoreFiles = new Set<string>();
       for (const searchPath of paths) {
@@ -291,9 +291,9 @@ class GrepToolInvocation extends BaseToolInvocation<
       respectGitIgnore:
         options?.respectGitIgnore ??
         DEFAULT_FILE_FILTERING_OPTIONS.respectGitIgnore,
-      respectQwenIgnore:
-        options?.respectQwenIgnore ??
-        DEFAULT_FILE_FILTERING_OPTIONS.respectQwenIgnore,
+      respectHopCodeIgnore:
+        options?.respectHopCodeIgnore ??
+        DEFAULT_FILE_FILTERING_OPTIONS.respectHopCodeIgnore,
     };
   }
 

@@ -55,16 +55,13 @@ const vscodeMock = vi.hoisted(() => {
 });
 
 vi.mock('vscode', () => vscodeMock);
-vi.mock(
-  '@hoptrendy/hopcode-core/src/services/fileDiscoveryService.js',
-  () => ({
-    FileDiscoveryService: class {
-      shouldIgnoreFile(filePath: string, options?: unknown) {
-        return shouldIgnoreFileMock(filePath, options);
-      }
-    },
-  }),
-);
+vi.mock('@hoptrendy/hopcode-core/src/services/fileDiscoveryService.js', () => ({
+  FileDiscoveryService: class {
+    shouldIgnoreFile(filePath: string, options?: unknown) {
+      return shouldIgnoreFileMock(filePath, options);
+    }
+  },
+}));
 vi.mock('@hoptrendy/hopcode-core/src/utils/filesearch/fileSearch.js', () => ({
   FileSearchFactory: {
     create: () => fileSearchMock,
@@ -166,7 +163,7 @@ describe('FileMessageHandler', () => {
     );
     expect(shouldIgnoreFileMock).toHaveBeenCalledWith(ignoredPath, {
       respectGitIgnore: true,
-      respectQwenIgnore: false,
+      respectHopCodeIgnore: false,
     });
 
     const payload = sendToWebView.mock.calls[

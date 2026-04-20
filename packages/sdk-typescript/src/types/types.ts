@@ -190,7 +190,7 @@ export function isSdkMcpServerConfig(
 }
 
 /**
- * Configuration options for creating a query session with the Qwen CLI.
+ * Configuration options for creating a query session with the HopCode CLI.
  */
 export interface QueryOptions {
   /**
@@ -208,7 +208,7 @@ export interface QueryOptions {
   model?: string;
 
   /**
-   * Path to the Qwen CLI executable.
+   * Path to the HopCode CLI executable.
    *
    * If not provided, the SDK automatically uses the bundled CLI included in the package.
    *
@@ -231,17 +231,17 @@ export interface QueryOptions {
   pathToQwenExecutable?: string;
 
   /**
-   * Environment variables to pass to the Qwen CLI process.
+   * Environment variables to pass to the HopCode CLI process.
    * These variables will be merged with the current process environment.
    */
   env?: Record<string, string>;
 
   /**
-   * System prompt configuration for the Qwen CLI session.
+   * System prompt configuration for the HopCode CLI session.
    *
    * - `string`: fully overrides the main session system prompt
    * - `{ type: 'preset', preset: 'qwen_code', append?: string }`:
-   *   uses Qwen Code's built-in prompt as the base and optionally appends extra
+   *   uses HopCode Code's built-in prompt as the base and optionally appends extra
    *   instructions for the main session
    */
   systemPrompt?: QuerySystemPrompt;
@@ -342,7 +342,7 @@ export interface QueryOptions {
   debug?: boolean;
 
   /**
-   * Custom handler for stderr output from the Qwen CLI process.
+   * Custom handler for stderr output from the HopCode CLI process.
    * Use this to capture and process error messages or diagnostic output.
    */
   stderr?: (message: string) => void;
@@ -418,7 +418,7 @@ export interface QueryOptions {
   /**
    * Authentication type for the AI service.
    * - 'openai': Use OpenAI-compatible authentication
-   * - 'qwen-oauth': Use Qwen OAuth authentication
+   * - 'qwen-oauth': Use HopCode OAuth authentication
    *
    * Though we support 'qwen-oauth', it's not recommended to use it in the SDK.
    * Because the credentials are stored in `~/.hopcode` and may need to refresh periodically.
@@ -443,7 +443,7 @@ export interface QueryOptions {
 
   /**
    * Resume a previous session by providing its session ID.
-   * This is equivalent to using the `--resume` flag in the Qwen CLI.
+   * This is equivalent to using the `--resume` flag in the HopCode CLI.
    * @example '123e4567-e89b-12d3-a456-426614174000'
    */
   resume?: string;

@@ -572,7 +572,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
   }
 
   /**
-   * Handle new Qwen session request
+   * Handle new HopCode session request
    */
   private async handleNewQwenSession(): Promise<void> {
     try {
@@ -631,7 +631,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
   }
 
   /**
-   * Handle switch Qwen session request
+   * Handle switch HopCode session request
    */
   private async handleSwitchQwenSession(sessionId: string): Promise<void> {
     try {
@@ -820,7 +820,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
   }
 
   /**
-   * Handle get Qwen sessions request
+   * Handle get HopCode sessions request
    */
   private async handleGetQwenSessions(
     cursor?: number,

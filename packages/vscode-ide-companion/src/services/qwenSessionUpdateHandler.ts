@@ -5,7 +5,7 @@
  */
 
 /**
- * Qwen Session Update Handler
+ * HopCode Session Update Handler
  *
  * Handles session updates from ACP and dispatches them to appropriate callbacks
  */
@@ -22,7 +22,7 @@ import type {
 } from '../types/chatTypes.js';
 
 /**
- * Qwen Session Update Handler class
+ * HopCode Session Update Handler class
  * Processes various session update events and calls appropriate callbacks
  */
 export class QwenSessionUpdateHandler {

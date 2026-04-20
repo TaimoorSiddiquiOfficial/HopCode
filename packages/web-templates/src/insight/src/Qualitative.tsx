@@ -484,7 +484,7 @@ export function FrictionPoints({
   );
 }
 
-// Qwen.md Additions Section Component
+// HopCode.md Additions Section Component
 function QwenMdAdditionsSection({
   additions,
 }: {

@@ -371,7 +371,7 @@ export interface ConfigParameters {
   usageStatisticsEnabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    respectQwenIgnore?: boolean;
+    respectHopCodeIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
   };
@@ -438,7 +438,7 @@ export interface ConfigParameters {
   channel?: string;
   /**
    * File descriptor number for structured JSON event output (dual output mode).
-   * When set, Qwen Code outputs structured JSON events to this fd while
+   * When set, HopCode Code outputs structured JSON events to this fd while
    * continuing to render the TUI on stdout. The caller must provide this fd
    * via spawn stdio configuration.
    * Mutually exclusive with jsonFile.
@@ -637,7 +637,7 @@ export class Config {
   private permissionBlockerService: PermissionBlockerService | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectQwenIgnore: boolean;
+    respectHopCodeIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
@@ -793,7 +793,7 @@ export class Config {
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
+      respectHopCodeIgnore: params.fileFiltering?.respectHopCodeIgnore ?? true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -2030,7 +2030,7 @@ export class Config {
   getPermissionBlockerService(): PermissionBlockerService {
     if (!this.permissionBlockerService) {
       const persistPath = path.join(
-        Storage.getGlobalQwenDir(),
+        Storage.getGlobalHopCodeDir(),
         'permission-blockers.json',
       );
       this.permissionBlockerService = new PermissionBlockerService(persistPath);
@@ -2056,13 +2056,13 @@ export class Config {
     return this.fileFiltering.respectGitIgnore;
   }
   getFileFilteringRespectQwenIgnore(): boolean {
-    return this.fileFiltering.respectQwenIgnore;
+    return this.fileFiltering.respectHopCodeIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
+      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
     };
   }
 

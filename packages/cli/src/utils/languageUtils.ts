@@ -65,7 +65,7 @@ export function resolveOutputLanguage(
  */
 function getOutputLanguageFilePath(): string {
   return path.join(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalHopCodeDir(),
     LLM_OUTPUT_LANGUAGE_RULE_FILENAME,
   );
 }
@@ -111,7 +111,7 @@ Raw tool/system outputs may contain fixed-format English. Preserve them verbatim
  * Supports both the new marker format and legacy heading format.
  */
 function parseOutputLanguageFromContent(content: string): string | null {
-  // Primary: machine-readable marker (e.g., <!-- qwen-code:llm-output-language: 中文 -->)
+  // Primary: machine-readable marker (e.g., <!-- hopcode-code:llm-output-language: 中文 -->)
   const markerRegex = new RegExp(
     String.raw`<!--\s*${LLM_OUTPUT_LANGUAGE_MARKER_PREFIX}\s*(.*?)\s*-->`,
     'i',

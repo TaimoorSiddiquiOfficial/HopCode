@@ -491,7 +491,7 @@ export const AppContainer = (props: AppContainerProps) => {
     isAuthDialogOpen,
     isAuthenticating,
     pendingAuthType,
-    qwenAuthState,
+    hopCodeAuthState,
     handleAuthSelect,
     handleCodingPlanSubmit,
     handleAlibabaStandardSubmit,
@@ -2044,7 +2044,7 @@ export const AppContainer = (props: AppContainerProps) => {
       isAuthDialogOpen,
       pendingAuthType,
       // HopCode OAuth state
-      qwenAuthState,
+      hopCodeAuthState,
       editorError,
       isEditorDialogOpen,
       debugMessage,
@@ -2154,7 +2154,7 @@ export const AppContainer = (props: AppContainerProps) => {
       isAuthDialogOpen,
       pendingAuthType,
       // HopCode OAuth state
-      qwenAuthState,
+      hopCodeAuthState,
       editorError,
       isEditorDialogOpen,
       debugMessage,

@@ -15,8 +15,8 @@ import { DefaultLight } from './default-light.js';
 import { DefaultDark } from './default.js';
 import { ShadesOfPurple } from './shades-of-purple.js';
 import { XCode } from './xcode.js';
-import { QwenLight } from './qwen-light.js';
-import { QwenDark } from './qwen-dark.js';
+import { QwenLight } from './hopcode-light.js';
+import { QwenDark } from './hopcode-dark.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
@@ -231,7 +231,7 @@ class ThemeManager {
       },
     );
 
-    // Combine Qwen themes first, then sorted others
+    // Combine HopCode themes first, then sorted others
     return [...hopcodeThemes, ...sortedOtherThemes];
   }
 

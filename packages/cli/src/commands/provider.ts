@@ -26,7 +26,7 @@
  *     Ollama (Local)  [not configured]
  *   ── Legacy ────────────────────────────────
  *     Alibaba Cloud Coding Plan
- *     Qwen OAuth
+ *     HopCode OAuth
  *   ──────────────────────────────────────────
  *     ← Exit
  */
@@ -201,7 +201,7 @@ async function handleProviderCommand(): Promise<void> {
       return;
     }
 
-    // Legacy Coding Plan / Qwen OAuth — tell user to use auth command
+    // Legacy Coding Plan / HopCode OAuth — tell user to use auth command
     if (chosen === 'coding-plan') {
       writeStdoutLine(t('\n  → Run: hopcode auth coding-plan'));
       writeStdoutLine(

@@ -160,11 +160,11 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
     ),
     DEFAULT_MEMORY_FILE_FILTERING_OPTIONS: {
       respectGitIgnore: false,
-      respectQwenIgnore: true,
+      respectHopCodeIgnore: true,
     },
     DEFAULT_FILE_FILTERING_OPTIONS: {
       respectGitIgnore: true,
-      respectQwenIgnore: true,
+      respectHopCodeIgnore: true,
     },
   };
 });
@@ -2280,12 +2280,12 @@ describe('loadCliConfig fileFiltering', () => {
       value: false,
     },
     {
-      property: 'respectQwenIgnore',
+      property: 'respectHopCodeIgnore',
       getter: (c) => c.getFileFilteringRespectQwenIgnore(),
       value: true,
     },
     {
-      property: 'respectQwenIgnore',
+      property: 'respectHopCodeIgnore',
       getter: (c) => c.getFileFilteringRespectQwenIgnore(),
       value: false,
     },
@@ -2681,7 +2681,7 @@ describe('loadCliConfig runtimeOutputDir', () => {
     const argv = await parseArguments();
     const settings: Settings = {};
     await loadCliConfig(settings, argv);
-    expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalQwenDir());
+    expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalHopCodeDir());
   });
 
   it('should let QWEN_RUNTIME_DIR env var take priority over settings', async () => {
@@ -2707,6 +2707,6 @@ describe('loadCliConfig runtimeOutputDir', () => {
     expect(Storage.getRuntimeBaseDir()).toBe(firstRuntimeDir);
 
     await loadCliConfig({}, argv);
-    expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalQwenDir());
+    expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalHopCodeDir());
   });
 });

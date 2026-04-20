@@ -15,7 +15,7 @@ import { SettingInputPrompt } from './SettingInputPrompt.js';
 import { PluginChoicePrompt } from './PluginChoicePrompt.js';
 import { ThemeDialog } from './ThemeDialog.js';
 import { SettingsDialog } from './SettingsDialog.js';
-import { QwenOAuthProgress } from './QwenOAuthProgress.js';
+import { HopCodeOAuthProgress } from './HopCodeOAuthProgress.js';
 import { AuthDialog } from '../auth/AuthDialog.js';
 import { EditorSettingsDialog } from './EditorSettingsDialog.js';
 import { TrustDialog } from './TrustDialog.js';
@@ -316,10 +316,10 @@ export const DialogManager = ({
     // HopCode OAuth remains as a separate flow
     if (uiState.pendingAuthType === AuthType.QWEN_OAUTH) {
       return (
-        <QwenOAuthProgress
-          deviceAuth={uiState.qwenAuthState.deviceAuth || undefined}
-          authStatus={uiState.qwenAuthState.authStatus}
-          authMessage={uiState.qwenAuthState.authMessage}
+        <HopCodeOAuthProgress
+          deviceAuth={uiState.hopCodeAuthState.deviceAuth || undefined}
+          authStatus={uiState.hopCodeAuthState.authStatus}
+          authMessage={uiState.hopCodeAuthState.authMessage}
           onTimeout={() => {
             uiActions.onAuthError('HopCode OAuth authentication timed out.');
             uiActions.cancelAuthentication();

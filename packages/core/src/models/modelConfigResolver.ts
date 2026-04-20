@@ -123,7 +123,7 @@ export function resolveModelConfig(
   const warnings: string[] = [];
   const sources: ConfigSources = {};
 
-  // Special handling for Qwen OAuth
+  // Special handling for HopCode OAuth
   if (authType === AuthType.QWEN_OAUTH) {
     return resolveQwenOAuthConfig(input, warnings);
   }
@@ -270,8 +270,8 @@ export function resolveModelConfig(
 }
 
 /**
- * Special resolver for Qwen OAuth authentication.
- * Qwen OAuth has fixed model options and uses dynamic tokens.
+ * Special resolver for HopCode OAuth authentication.
+ * HopCode OAuth has fixed model options and uses dynamic tokens.
  */
 function resolveQwenOAuthConfig(
   input: ModelConfigSourcesInput,
@@ -280,7 +280,7 @@ function resolveQwenOAuthConfig(
   const { cli, settings, proxy, modelProvider } = input;
   const sources: ConfigSources = {};
 
-  // Qwen OAuth only allows specific models
+  // HopCode OAuth only allows specific models
   const allowedModels = new Set<string>(QWEN_OAUTH_ALLOWED_MODELS);
 
   // Determine requested model

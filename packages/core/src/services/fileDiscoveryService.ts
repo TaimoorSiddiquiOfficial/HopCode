@@ -13,7 +13,7 @@ import * as path from 'node:path';
 
 export interface FilterFilesOptions {
   respectGitIgnore?: boolean;
-  respectQwenIgnore?: boolean;
+  respectHopCodeIgnore?: boolean;
 }
 
 export interface FilterReport {
@@ -42,14 +42,14 @@ export class FileDiscoveryService {
     filePaths: string[],
     options: FilterFilesOptions = {
       respectGitIgnore: true,
-      respectQwenIgnore: true,
+      respectHopCodeIgnore: true,
     },
   ): string[] {
     return filePaths.filter((filePath) => {
       if (options.respectGitIgnore && this.shouldGitIgnoreFile(filePath)) {
         return false;
       }
-      if (options.respectQwenIgnore && this.shouldQwenIgnoreFile(filePath)) {
+      if (options.respectHopCodeIgnore && this.shouldQwenIgnoreFile(filePath)) {
         return false;
       }
       return true;
@@ -64,7 +64,7 @@ export class FileDiscoveryService {
     filePaths: string[],
     opts: FilterFilesOptions = {
       respectGitIgnore: true,
-      respectQwenIgnore: true,
+      respectHopCodeIgnore: true,
     },
   ): FilterReport {
     const filteredPaths: string[] = [];
@@ -77,7 +77,7 @@ export class FileDiscoveryService {
         continue;
       }
 
-      if (opts.respectQwenIgnore && this.shouldQwenIgnoreFile(filePath)) {
+      if (opts.respectHopCodeIgnore && this.shouldQwenIgnoreFile(filePath)) {
         qwenIgnoredCount++;
         continue;
       }
@@ -103,7 +103,7 @@ export class FileDiscoveryService {
   }
 
   /**
-   * Checks if a single file should be qwen-ignored
+   * Checks if a single file should be hopcode-ignored
    */
   shouldQwenIgnoreFile(filePath: string): boolean {
     if (this.qwenIgnoreFilter) {
@@ -121,13 +121,13 @@ export class FileDiscoveryService {
   ): boolean {
     const {
       respectGitIgnore = true,
-      respectQwenIgnore: respectQwenIgnore = true,
+      respectHopCodeIgnore: respectHopCodeIgnore = true,
     } = options;
 
     if (respectGitIgnore && this.shouldGitIgnoreFile(filePath)) {
       return true;
     }
-    if (respectQwenIgnore && this.shouldQwenIgnoreFile(filePath)) {
+    if (respectHopCodeIgnore && this.shouldQwenIgnoreFile(filePath)) {
       return true;
     }
     return false;

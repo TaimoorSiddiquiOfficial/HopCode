@@ -32,7 +32,7 @@ export class PanelManager {
   private panel: vscode.WebviewPanel | null = null;
   private panelTab: vscode.Tab | null = null;
   // Best-effort tracking of the group (by view column) that currently hosts
-  // the Qwen webview. We update this when creating/revealing the panel and
+  // the HopCode webview. We update this when creating/revealing the panel and
   // whenever we can capture the Tab from the tab model.
   private panelGroupViewColumn: vscode.ViewColumn | null = null;
 
@@ -143,7 +143,7 @@ export class PanelManager {
       this.panelGroupViewColumn = newGroupColumn;
     }
 
-    // Set panel icon to Qwen logo
+    // Set panel icon to HopCode logo
     this.panel.iconPath = vscode.Uri.joinPath(
       this.extensionUri,
       'assets',
@@ -310,15 +310,15 @@ export class PanelManager {
         this.onPanelDispose();
 
         // After VS Code updates its tab model, check if that group is now
-        // empty (and typically locked for Qwen). If so, close the group to
-        // avoid leaving an empty locked column when the user closes Qwen.
+        // empty (and typically locked for HopCode). If so, close the group to
+        // avoid leaving an empty locked column when the user closes HopCode.
         if (targetColumn !== null) {
           const column: vscode.ViewColumn = targetColumn;
           setTimeout(async () => {
             try {
               const groups = vscode.window.tabGroups.all;
               const group = groups.find((g) => g.viewColumn === column);
-              // If the group that hosted Qwen is now empty, close it to avoid
+              // If the group that hosted HopCode is now empty, close it to avoid
               // leaving an empty locked column around. VS Code's stable API
               // does not expose the lock state on TabGroup, so we only check
               // for emptiness here.

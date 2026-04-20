@@ -348,7 +348,7 @@ describe('AuthDialog', () => {
 
       const { lastFrame } = renderAuthDialog(settings);
 
-      // Default is Coding Plan (first option); Qwen OAuth is last (discontinued)
+      // Default is Coding Plan (first option); HopCode OAuth is last (discontinued)
       expect(lastFrame()).toContain('Alibaba Cloud Coding Plan');
     });
 
@@ -391,7 +391,7 @@ describe('AuthDialog', () => {
       const { lastFrame } = renderAuthDialog(settings);
 
       // Since the auth dialog doesn't show QWEN_DEFAULT_AUTH_TYPE errors anymore,
-      // it will just show the default Qwen OAuth option
+      // it will just show the default HopCode OAuth option
       expect(lastFrame()).toContain('Qwen OAuth');
     });
   });

@@ -5,7 +5,7 @@
  */
 
 /**
- * Converter for Gemini extensions to Qwen Code format.
+ * Converter for Gemini extensions to HopCode Code format.
  */
 
 import * as fs from 'node:fs';
@@ -28,9 +28,9 @@ export interface GeminiExtensionConfig {
 }
 
 /**
- * Converts a Gemini extension config to Qwen Code format.
+ * Converts a Gemini extension config to HopCode Code format.
  * @param extensionDir Path to the Gemini extension directory
- * @returns Qwen ExtensionConfig
+ * @returns HopCode ExtensionConfig
  */
 export function convertGeminiToQwenConfig(
   extensionDir: string,
@@ -58,9 +58,9 @@ export function convertGeminiToQwenConfig(
 }
 
 /**
- * Converts a complete Gemini extension package to Qwen Code format.
+ * Converts a complete Gemini extension package to HopCode Code format.
  * Creates a new temporary directory with:
- * 1. Converted qwen-extension.json
+ * 1. Converted hopcode-extension.json
  * 2. Commands converted from TOML to MD
  * 3. All other files/folders preserved
  *
@@ -85,8 +85,8 @@ export async function convertGeminiExtensionPackage(
       await convertCommandsDirectory(commandsDir);
     }
 
-    // Step 3: Create qwen-extension.json with converted config
-    const qwenConfigPath = path.join(tmpDir, 'qwen-extension.json');
+    // Step 3: Create hopcode-extension.json with converted config
+    const qwenConfigPath = path.join(tmpDir, 'hopcode-extension.json');
     fs.writeFileSync(
       qwenConfigPath,
       JSON.stringify(geminiConfig, null, 2),
@@ -229,6 +229,6 @@ export function isGeminiExtensionConfig(extensionDir: string) {
     }
   }
 
-  // If it has Gemini-specific fields but not Qwen-specific fields, likely Gemini
+  // If it has Gemini-specific fields but not HopCode-specific fields, likely Gemini
   return true;
 }

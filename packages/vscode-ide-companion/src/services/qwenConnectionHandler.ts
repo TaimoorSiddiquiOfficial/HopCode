@@ -5,7 +5,7 @@
  */
 
 /**
- * Qwen Connection Handler
+ * HopCode Connection Handler
  *
  * Handles HopCode Agent connection establishment, authentication, and session creation
  */
@@ -37,7 +37,7 @@ export interface QwenConnectionResult {
 }
 
 /**
- * Qwen Connection Handler class
+ * HopCode Connection Handler class
  * Handles connection, authentication, and session initialization
  */
 export class QwenConnectionHandler {
@@ -220,7 +220,7 @@ export class QwenConnectionHandler {
           errorMessage,
         );
 
-        // If Qwen reports that authentication is required, try to
+        // If HopCode reports that authentication is required, try to
         // authenticate on-the-fly once and retry without waiting.
         const requiresAuth = isAuthenticationRequiredError(error);
         if (requiresAuth) {

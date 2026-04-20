@@ -10,8 +10,8 @@ import {
   AuthType,
   clearCachedCredentialFile,
   createDebugLogger,
-  QwenOAuth2Event,
-  qwenOAuth2Events,
+  HopCodeOAuth2Event,
+  hopCodeOAuth2Events,
   MCPServerConfig,
   SessionService,
   tokenLimit,
@@ -187,7 +187,7 @@ class QwenAgent implements Agent {
     return {
       protocolVersion: PROTOCOL_VERSION,
       agentInfo: {
-        name: 'qwen-code',
+        name: 'hopcode',
         title: 'HopCode',
         version,
       },
@@ -219,7 +219,7 @@ class QwenAgent implements Agent {
     };
 
     if (method === AuthType.QWEN_OAUTH) {
-      qwenOAuth2Events.once(QwenOAuth2Event.AuthUri, authUriHandler);
+      hopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthUri, authUriHandler);
     }
 
     await clearCachedCredentialFile();
@@ -232,7 +232,7 @@ class QwenAgent implements Agent {
       );
     } finally {
       if (method === AuthType.QWEN_OAUTH) {
-        qwenOAuth2Events.off(QwenOAuth2Event.AuthUri, authUriHandler);
+        hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, authUriHandler);
       }
     }
   }

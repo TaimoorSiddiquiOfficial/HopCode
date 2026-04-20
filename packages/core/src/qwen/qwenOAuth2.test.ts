@@ -16,8 +16,8 @@ import {
   isDeviceTokenPending,
   isDeviceTokenSuccess,
   isErrorResponse,
-  qwenOAuth2Events,
-  QwenOAuth2Event,
+  hopCodeOAuth2Events,
+  HopCodeOAuth2Event,
   QwenOAuth2Client,
   type DeviceAuthorizationResponse,
   type DeviceTokenResponse,
@@ -937,7 +937,7 @@ describe('getQwenOAuthClient', () => {
 
     vi.mocked(global.fetch).mockRejectedValue(fetchError);
 
-    const emitSpy = vi.spyOn(qwenOAuth2Events, 'emit');
+    const emitSpy = vi.spyOn(hopCodeOAuth2Events, 'emit');
 
     let thrownError: unknown;
     try {
@@ -958,7 +958,7 @@ describe('getQwenOAuthClient', () => {
     expect((thrownError as Error).message).toContain('--proxy');
 
     expect(emitSpy).toHaveBeenCalledWith(
-      QwenOAuth2Event.AuthProgress,
+      HopCodeOAuth2Event.AuthProgress,
       'error',
       expect.stringContaining('NODE_EXTRA_CA_CERTS'),
     );
@@ -1593,16 +1593,16 @@ describe('Browser Launch and Error Handling', () => {
 });
 
 describe('Event Emitter Integration', () => {
-  it('should export qwenOAuth2Events as EventEmitter', async () => {
-    const { qwenOAuth2Events } = await import('./qwenOAuth2.js');
-    expect(qwenOAuth2Events).toBeInstanceOf(EventEmitter);
+  it('should export hopCodeOAuth2Events as EventEmitter', async () => {
+    const { hopCodeOAuth2Events } = await import('./qwenOAuth2.js');
+    expect(hopCodeOAuth2Events).toBeInstanceOf(EventEmitter);
   });
 
   it('should define correct event enum values', async () => {
-    const { QwenOAuth2Event } = await import('./qwenOAuth2.js');
-    expect(QwenOAuth2Event.AuthUri).toBe('auth-uri');
-    expect(QwenOAuth2Event.AuthProgress).toBe('auth-progress');
-    expect(QwenOAuth2Event.AuthCancel).toBe('auth-cancel');
+    const { HopCodeOAuth2Event } = await import('./qwenOAuth2.js');
+    expect(HopCodeOAuth2Event.AuthUri).toBe('auth-uri');
+    expect(HopCodeOAuth2Event.AuthProgress).toBe('auth-progress');
+    expect(HopCodeOAuth2Event.AuthCancel).toBe('auth-cancel');
   });
 });
 

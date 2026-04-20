@@ -33,7 +33,7 @@ function getQwenOAuthModels(): readonly AvailableModel[] {
 }
 
 /**
- * Get available Qwen models
+ * Get available HopCode models
  * coder-model now has vision capabilities by default.
  */
 export function getFilteredQwenModels(): AvailableModel[] {

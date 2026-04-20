@@ -325,7 +325,7 @@ export function logFileOperation(
 }
 
 export function logApiRequest(config: Config, event: ApiRequestEvent): void {
-  // QwenLogger.getInstance(config)?.logApiRequestEvent(event);
+  // HopCodeLogger.getInstance(config)?.logApiRequestEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -811,7 +811,7 @@ export function logModelSlashCommand(
 }
 
 export function logHookCall(config: Config, event: HookCallEvent): void {
-  // Log to QwenLogger for RUM telemetry only
+  // Log to HopCodeLogger for RUM telemetry only
   QwenLogger.getInstance(config)?.logHookCallEvent(event);
 }
 

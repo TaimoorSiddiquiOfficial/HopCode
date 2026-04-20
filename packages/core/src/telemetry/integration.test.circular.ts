@@ -68,7 +68,7 @@ describe('Circular Reference Integration Test', () => {
       },
     } as RumEvent;
 
-    // Test that QwenLogger can handle this
+    // Test that HopCodeLogger can handle this
     const logger = QwenLogger.getInstance(mockConfig);
 
     expect(() => {

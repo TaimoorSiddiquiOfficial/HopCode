@@ -63,7 +63,7 @@ function loadChannelsConfig(): Record<string, unknown> {
 
 /**
  * Load channel plugins from active extensions.
- * Extensions declare channels in their qwen-extension.json manifest.
+ * Extensions declare channels in their hopcode-extension.json manifest.
  */
 async function loadChannelsFromExtensions(): Promise<number> {
   let loaded = 0;

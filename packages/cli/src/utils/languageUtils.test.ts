@@ -37,7 +37,7 @@ vi.mock('../i18n/index.js', () => ({
 // Mock @hoptrendy/hopcode-core
 vi.mock('@hoptrendy/hopcode-core', () => ({
   Storage: {
-    getGlobalQwenDir: vi.fn(() => '/mock/home/.hopcode'),
+    getGlobalHopCodeDir: vi.fn(() => '/mock/home/.hopcode'),
   },
 }));
 

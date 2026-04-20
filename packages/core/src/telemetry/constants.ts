@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const SERVICE_NAME = 'qwen-code';
+export const SERVICE_NAME = 'hopcode';
 
 export const EVENT_USER_PROMPT = 'qwen-code.user_prompt';
 export const EVENT_USER_RETRY = 'qwen-code.user_retry';

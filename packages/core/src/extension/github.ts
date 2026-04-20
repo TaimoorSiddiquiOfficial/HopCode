@@ -302,7 +302,7 @@ export async function downloadFromGitHubRelease(
     // For regular github releases, the repository is put inside of a top level
     // directory. In this case we should see exactly two file in the destination
     // dir, the archive and the directory. If we see that, validate that the
-    // dir has a qwen extension configuration file (or gemini-extension.json
+    // dir has a hopcode extension configuration file (or gemini-extension.json
     // which will be converted later) and then move all files from the directory
     // up one level into the destination directory.
     const entries = await fs.promises.readdir(destination, {

@@ -325,7 +325,7 @@ describe('QwenContentGenerator', () => {
       getUsageStatisticsEnabled: vi.fn().mockReturnValue(false),
     } as unknown as Config;
 
-    // Mock QwenOAuth2Client
+    // Mock HopCodeOAuth2Client
     mockQwenClient = {
       getAccessToken: vi.fn(),
       getCredentials: vi.fn(),
@@ -335,7 +335,7 @@ describe('QwenContentGenerator', () => {
       pollDeviceToken: vi.fn(),
     };
 
-    // Create QwenContentGenerator instance
+    // Create HopCodeContentGenerator instance
     const contentGeneratorConfig = {
       model: 'qwen-turbo',
       apiKey: 'test-api-key',

@@ -57,7 +57,7 @@ export function normalize(model: string): string {
   // - dates (e.g., -20250219), -v1, version numbers, 'latest', 'preview' etc.
   s = s.replace(/-preview/g, '');
   // Special handling for model names that include date/version as part of the model identifier
-  // - Qwen models: qwen-plus-latest, qwen-flash-latest, qwen-vl-max-latest
+  // - HopCode models: qwen-plus-latest, hopcode-flash-latest, hopcode-vl-max-latest
   // - Kimi models: kimi-k2-0905, kimi-k2-0711, etc. (keep date for version distinction)
   if (
     !s.match(/^qwen-(?:plus|flash|vl-max)-latest$/) &&
@@ -106,7 +106,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^claude-/, LIMITS['200k']], // All Claude models: 200K
 
   // -------------------
-  // Alibaba / Qwen
+  // Alibaba / HopCode
   // -------------------
   // Commercial API models (1,000,000 context)
   [/^qwen3-coder-plus/, LIMITS['1m']],
@@ -119,7 +119,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^qwen3-max/, LIMITS['256k']],
   // Open-source Qwen3 variants: 256K native
   [/^qwen3-coder-/, LIMITS['256k']],
-  // Qwen fallback (VL, turbo, plus, 2.5, etc.): 128K
+  // HopCode fallback (VL, turbo, plus, 2.5, etc.): 128K
   [/^qwen/, LIMITS['256k']],
 
   // -------------------
@@ -170,7 +170,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^claude-sonnet-4-6/, LIMITS['64k']], // Sonnet 4.6: 64K
   [/^claude-/, LIMITS['64k']], // Claude fallback: 64K
 
-  // Alibaba / Qwen
+  // Alibaba / HopCode
   [/^qwen3\.\d/, LIMITS['64k']],
   [/^coder-model$/, LIMITS['64k']],
   [/^qwen/, LIMITS['32k']], // Qwen fallback (VL, turbo, plus, etc.): 8K

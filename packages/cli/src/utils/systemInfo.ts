@@ -104,7 +104,7 @@ export function getSandboxEnv(stripPrefix = false): string {
     return 'no sandbox';
   }
 
-  // For bug reports, remove qwen- prefix
+  // For bug reports, remove hopcode- prefix
   if (stripPrefix) {
     return sandbox.replace(/^qwen-(?:code-)?/, '');
   }

@@ -19,7 +19,7 @@ const debugLogger = createDebugLogger('Extension:variables');
 export type { HookDefinition };
 
 export const EXTENSIONS_DIRECTORY_NAME = path.join(QWEN_DIR, 'extensions');
-export const EXTENSIONS_CONFIG_FILENAME = 'qwen-extension.json';
+export const EXTENSIONS_CONFIG_FILENAME = 'hopcode-extension.json';
 export const INSTALL_METADATA_FILENAME = '.hopcode-extension-install.json';
 export const EXTENSION_SETTINGS_FILENAME = '.env';
 

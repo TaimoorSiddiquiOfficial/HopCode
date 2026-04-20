@@ -32,7 +32,7 @@ describe('getAboutSystemInfoFields', () => {
     const labels = fields.map((f) => f.label);
 
     expect(labels).toEqual([
-      'Qwen Code',
+      'HopCode',
       'Runtime',
       'IDE Client',
       'OS',

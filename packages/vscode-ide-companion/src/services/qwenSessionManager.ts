@@ -12,7 +12,7 @@ import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
 import type { QwenSession } from './qwenSessionReader.js';
 
 /**
- * Qwen Session Manager
+ * HopCode Session Manager
  *
  * This service provides direct filesystem access to load sessions.
  *
