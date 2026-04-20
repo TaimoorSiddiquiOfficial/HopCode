@@ -2281,12 +2281,12 @@ describe('loadCliConfig fileFiltering', () => {
     },
     {
       property: 'respectHopCodeIgnore',
-      getter: (c) => c.getFileFilteringRespectQwenIgnore(),
+      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
       value: true,
     },
     {
       property: 'respectHopCodeIgnore',
-      getter: (c) => c.getFileFilteringRespectQwenIgnore(),
+      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
       value: false,
     },
     {

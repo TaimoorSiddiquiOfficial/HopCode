@@ -32,10 +32,10 @@ vi.mock('../utils/shell-utils.js', () => ({
   isCommandAvailable: vi.fn(),
 }));
 
-const hoistedMockGetGlobalQwenDir = vi.hoisted(() => vi.fn());
+const hoistedMockGetGlobalHopCodeDir = vi.hoisted(() => vi.fn());
 vi.mock('../config/storage.js', () => ({
   Storage: {
-    getGlobalHopCodeDir: hoistedMockGetGlobalQwenDir,
+    getGlobalHopCodeDir: hoistedMockGetGlobalHopCodeDir,
   },
 }));
 
@@ -65,7 +65,7 @@ describe('GitWorktreeService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    hoistedMockGetGlobalQwenDir.mockReturnValue('/mock-qwen');
+    hoistedMockGetGlobalHopCodeDir.mockReturnValue('/mock-hopcode');
     (isCommandAvailable as Mock).mockReturnValue({ available: true });
 
     hoistedMockSimpleGit.mockImplementation(() => ({
@@ -178,7 +178,7 @@ describe('GitWorktreeService', () => {
     const result = await service.createWorktree('s1', 'Model A');
 
     const expectedPath = path.join(
-      '/mock-qwen',
+      '/mock-hopcode',
       'worktrees',
       's1',
       'worktrees',
