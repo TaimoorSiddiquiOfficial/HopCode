@@ -252,3 +252,42 @@ node packages/cli/dist/hopcode.js
 - All sub-packages should bump in sync
 - Use semantic versioning: `MAJOR.MINOR.PATCH`
 - Current scope: `@hoptrendy` (NPM org)
+
+---
+
+## GitHub Actions Workflow Integration (`/ci` command)
+
+HopCode CLI can interact with GitHub Actions directly, allowing developers to check CI status, view failure logs, re-run jobs, and trigger dispatches without leaving the terminal.
+
+### Token Resolution
+
+Priority order for GitHub token:
+
+1. `GITHUB_TOKEN` environment variable
+2. `settings.env.GITHUB_TOKEN` (stored via `hopcode github auth`)
+
+### New Files
+
+| File                                         | Purpose                                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------------------ |
+| `packages/cli/src/utils/githubApi.ts`        | GitHub REST API client — PR, issue, commit, and **Actions** methods            |
+| `packages/cli/src/utils/githubTokenStore.ts` | Token persistence (`loadGitHubToken`, `saveGitHubToken`, `requireGitHubToken`) |
+| `packages/cli/src/ui/commands/ciCommand.ts`  | `/ci` slash command handler                                                    |
+
+### `/ci` Sub-Commands
+
+| Sub-command                     | API call                                            | Permissions needed |
+| ------------------------------- | --------------------------------------------------- | ------------------ |
+| `/ci`                           | `GET /repos/.../actions/runs?branch=`               | Actions: read      |
+| `/ci logs`                      | `GET .../runs/{id}/jobs` + `GET .../jobs/{id}/logs` | Actions: read      |
+| `/ci rerun`                     | `POST .../runs/{id}/rerun-failed-jobs`              | Actions: write     |
+| `/ci cancel`                    | `POST .../runs/{id}/cancel`                         | Actions: write     |
+| `/ci dispatch <workflow> [ref]` | `POST .../workflows/{id}/dispatches`                | Actions: write     |
+| `/ci workflows`                 | `GET .../actions/workflows`                         | Actions: read      |
+
+### Doctor Check
+
+`/doctor` reports `GitHub token` status under the **HopCode** category:
+
+- ✅ pass — token found in env or settings
+- ⚠ warn — not configured (recommends setting `GITHUB_TOKEN` or running `hopcode github auth`)

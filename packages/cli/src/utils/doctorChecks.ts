@@ -18,6 +18,7 @@ import {
   MCPServerStatus,
 } from '@hoptrendy/hopcode-core';
 import { t } from '../i18n/index.js';
+import { loadGitHubToken } from './githubTokenStore.js';
 
 const MIN_NODE_MAJOR = 20;
 
@@ -371,6 +372,28 @@ async function checkGit(context: CommandContext): Promise<DoctorCheckResult> {
   };
 }
 
+function checkGithubToken(): DoctorCheckResult {
+  const stored = loadGitHubToken();
+  const token = stored?.accessToken ?? process.env['GITHUB_TOKEN'];
+  if (token) {
+    return {
+      category: t('HopCode'),
+      name: t('GitHub token'),
+      status: 'pass',
+      message: t('configured'),
+    };
+  }
+  return {
+    category: t('HopCode'),
+    name: t('GitHub token'),
+    status: 'warn',
+    message: t('not configured'),
+    detail: t(
+      'Set GITHUB_TOKEN env var or run: hopcode github auth. Required for /ci command.',
+    ),
+  };
+}
+
 /**
  * Run all doctor diagnostic checks.
  */
@@ -407,5 +430,6 @@ export async function runDoctorChecks(
     gitResult,
     // HopCode
     npmCliResult,
+    checkGithubToken(),
   ];
 }
