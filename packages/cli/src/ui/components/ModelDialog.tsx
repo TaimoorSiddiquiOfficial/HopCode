@@ -15,6 +15,8 @@ import {
   type AvailableModel as CoreAvailableModel,
   type ContentGeneratorConfig,
   type InputModalities,
+  type ModelProvidersConfig,
+  type ProviderModelConfig,
 } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
@@ -75,6 +77,60 @@ function persistAuthTypeSelection(
 ): void {
   const scope = getPersistScopeForModelSelection(settings);
   settings.setValue(scope, 'security.auth.selectedType', authType);
+}
+
+/**
+ * Ensure a model from the live/catalog list is registered in modelRegistry
+ * before calling config.switchModel(). Without this, catalog extras and
+ * live-fetched models that are not yet in settings.modelProviders would throw
+ * "Model not found for authType 'openai'".
+ *
+ * Mirrors the persistence logic in ProviderDialog.persistProviderConfig.
+ */
+function registerModelForActiveProvider(
+  settings: ReturnType<typeof useSettings>,
+  provider: import('../../commands/auth/registry.js').ProviderConfig,
+  modelId: string,
+  config:
+    | {
+        reloadModelProvidersConfig?: (
+          cfg: ModelProvidersConfig | undefined,
+        ) => void;
+      }
+    | null
+    | undefined,
+): void {
+  const scope = getPersistScopeForModelSelection(settings);
+
+  const newModelConfig: ProviderModelConfig = {
+    id: modelId,
+    name: `[${provider.label}] ${modelId}`,
+    envKey: provider.envKey || undefined,
+    ...(provider.baseUrl ? { baseUrl: provider.baseUrl } : {}),
+  };
+
+  // Only openai-compat providers use modelProviders.openai
+  if (provider.authType !== AuthType.USE_OPENAI) return;
+
+  const existingConfigs =
+    ((settings.merged?.modelProviders as Record<
+      string,
+      ProviderModelConfig[]
+    >) ?? {})[AuthType.USE_OPENAI] ?? [];
+
+  // Keep entries for other providers; replace the entry for this provider
+  const filteredConfigs = existingConfigs.filter(
+    (c) => !(c.envKey === provider.envKey && c.baseUrl === provider.baseUrl),
+  );
+
+  settings.setValue(scope, `modelProviders.${AuthType.USE_OPENAI}`, [
+    newModelConfig,
+    ...filteredConfigs,
+  ]);
+
+  config?.reloadModelProvidersConfig?.(
+    settings.merged?.modelProviders as ModelProvidersConfig | undefined,
+  );
 }
 
 interface HandleModelSwitchSuccessParams {
@@ -249,7 +305,20 @@ export function ModelDialog({
   }, [activeProviderEntry, settings]);
 
   const availableModelEntries = useMemo(() => {
-    const coreModels = config ? config.getAllConfiguredModels() : [];
+    const allCoreModels = config ? config.getAllConfiguredModels() : [];
+
+    // For OpenAI-compat providers, filter to only models belonging to the active
+    // provider (matched by baseUrl). This prevents models from other configured
+    // providers (e.g. OpenRouter entries while DeepSeek is active) from appearing
+    // mixed in under the wrong provider badge.
+    const coreModels =
+      activeProviderEntry?.authType === AuthType.USE_OPENAI
+        ? allCoreModels.filter(
+            (m) =>
+              m.authType === AuthType.USE_OPENAI &&
+              m.baseUrl === activeProviderEntry.baseUrl,
+          )
+        : allCoreModels;
 
     // ── Load full catalog for the active provider ────────────────────────────
     // Uses activeProviderEntry (resolved from settings) to augment the core
@@ -397,7 +466,13 @@ export function ModelDialog({
               >
                 [{badgeLabel}]
               </Text>
-              <Text>{` ${model.label}`}</Text>
+              <Text>{` ${
+                // Strip the "[ProviderName] " prefix that persistProviderConfig
+                // embeds in the stored model name — the badge already shows it.
+                model.label.startsWith(`[${badgeLabel}] `)
+                  ? model.label.slice(`[${badgeLabel}] `.length)
+                  : model.label
+              }`}</Text>
               {isRuntime && (
                 <Text color={theme.status.warning}> (Runtime)</Text>
               )}
@@ -563,6 +638,25 @@ export function ModelDialog({
           modelId = idx >= 0 ? selected.slice(idx + sep.length) : selected;
         }
 
+        // For OpenAI-compat providers: ensure the selected model exists in the
+        // modelRegistry before calling switchModel. Catalog and live-fetched models
+        // that the user hasn't previously selected won't be in the registry yet,
+        // causing "Model not found for authType 'openai'". Persisting the entry
+        // here (mirrors ProviderDialog.persistProviderConfig) and reloading the
+        // registry fixes that without requiring a full provider re-auth flow.
+        if (
+          !isRuntime &&
+          selectedAuthType === AuthType.USE_OPENAI &&
+          activeProviderEntry
+        ) {
+          registerModelForActiveProvider(
+            settings,
+            activeProviderEntry,
+            modelId,
+            config,
+          );
+        }
+
         await config.switchModel(
           selectedAuthType,
           modelId,
@@ -609,6 +703,7 @@ export function ModelDialog({
       uiState,
       setErrorMessage,
       isFastModelMode,
+      activeProviderEntry,
     ],
   );
 
