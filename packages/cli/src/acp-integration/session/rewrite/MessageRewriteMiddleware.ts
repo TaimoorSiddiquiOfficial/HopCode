@@ -31,6 +31,7 @@ export class MessageRewriteMiddleware {
   private readonly turnBuffer: TurnBuffer;
   private readonly rewriter: LlmRewriter;
   private readonly target: MessageRewriteConfig['target'];
+  private readonly timeoutMs: number;
   private turnIndex = 0;
 
   constructor(
@@ -41,6 +42,7 @@ export class MessageRewriteMiddleware {
     this.turnBuffer = new TurnBuffer();
     this.rewriter = new LlmRewriter(config, rewriteConfig);
     this.target = rewriteConfig.target;
+    this.timeoutMs = rewriteConfig.timeoutMs ?? 30_000;
   }
 
   /**
@@ -109,8 +111,8 @@ export class MessageRewriteMiddleware {
     this.turnIndex++;
     const turnIdx = this.turnIndex;
 
-    // Always enforce a 30s timeout, combined with caller's signal if provided
-    const timeoutSignal = AbortSignal.timeout(30_000);
+    // Enforce configurable timeout, combined with caller's signal if provided
+    const timeoutSignal = AbortSignal.timeout(this.timeoutMs);
     const rewriteSignal = signal
       ? AbortSignal.any([signal, timeoutSignal])
       : timeoutSignal;

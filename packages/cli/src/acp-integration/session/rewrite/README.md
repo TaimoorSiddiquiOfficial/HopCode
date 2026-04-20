@@ -24,9 +24,20 @@ Add to `settings.json`:
   "messageRewrite": {
     "enabled": true,
     "target": "all",
-    "promptFile": ".qwen/rewrite-prompt.txt",
+    "promptFile": ".hopcode/rewrite-prompt.txt",
     "model": "qwen3-plus",
-    "contextTurns": 1
+    "contextTurns": 1,
+    "timeoutMs": 60000
   }
 }
 ```
+
+| Field          | Type                              | Default       | Description                                                        |
+| -------------- | --------------------------------- | ------------- | ------------------------------------------------------------------ |
+| `enabled`      | `boolean`                         | —             | Enable/disable rewriting                                           |
+| `target`       | `"message" \| "thought" \| "all"` | —             | Which chunks to rewrite                                            |
+| `promptFile`   | `string`                          | —             | Path to rewrite system prompt file                                 |
+| `prompt`       | `string`                          | —             | Inline rewrite system prompt (overridden by `promptFile`)          |
+| `model`        | `string`                          | current model | Model to use for rewriting                                         |
+| `contextTurns` | `number \| "all"`                 | `1`           | Previous rewrite outputs to include as context                     |
+| `timeoutMs`    | `number`                          | `30000`       | Timeout (ms) for the rewrite LLM call — increase for large outputs |

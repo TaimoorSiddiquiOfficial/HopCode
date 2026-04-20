@@ -24,6 +24,10 @@ export interface MessageRewriteConfig {
    *  1 = last rewrite only (default), "all" = all previous rewrites,
    *  0 = no context, N = last N rewrites. */
   contextTurns?: number | 'all';
+  /** Timeout in milliseconds for the rewrite LLM call (default: 30000).
+   *  Increase this for large outputs (e.g. KPI tables, report bodies) that
+   *  can exceed the default limit and get silently aborted. */
+  timeoutMs?: number;
 }
 
 /**
