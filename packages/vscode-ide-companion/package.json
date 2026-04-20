@@ -2,7 +2,7 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.14.9",
+  "version": "0.14.10",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
@@ -20,12 +20,11 @@
   ],
   "keywords": [
     "hopcode",
-    "qwen code",
-    "qwen",
-    "qwen code",
+    "ai coding",
     "cli",
     "ide integration",
-    "ide companion"
+    "ide companion",
+    "AI assistant"
   ],
   "activationEvents": [
     "onStartupFinished",
@@ -47,7 +46,7 @@
       "activitybar": [
         {
           "id": "hopcode-sidebar",
-          "title": "Qwen Code",
+          "title": "HopCode",
           "icon": "assets/sidebar-icon.svg",
           "when": "!hopcode:supportsSecondarySidebar"
         }
@@ -55,7 +54,7 @@
       "secondarySidebar": [
         {
           "id": "hopcode-secondary",
-          "title": "Qwen Code",
+          "title": "HopCode",
           "icon": "assets/sidebar-icon.svg",
           "when": "hopcode:supportsSecondarySidebar"
         }
@@ -66,7 +65,7 @@
         {
           "type": "webview",
           "id": "hopcode.chatView.sidebar",
-          "name": "Qwen Code",
+          "name": "HopCode",
           "icon": "assets/sidebar-icon.svg",
           "when": "!hopcode:supportsSecondarySidebar"
         }
@@ -75,7 +74,7 @@
         {
           "type": "webview",
           "id": "hopcode.chatView.secondary",
-          "name": "Qwen Code",
+          "name": "HopCode",
           "icon": "assets/sidebar-icon.svg",
           "when": "hopcode:supportsSecondarySidebar"
         }
@@ -89,42 +88,42 @@
     "commands": [
       {
         "command": "qwen.diff.accept",
-        "title": "Qwen Code: Accept Current Diff",
+        "title": "HopCode: Accept Current Diff",
         "icon": "$(check)"
       },
       {
         "command": "qwen.diff.cancel",
-        "title": "Qwen Code: Close Diff Editor",
+        "title": "HopCode: Close Diff Editor",
         "icon": "$(close)"
       },
       {
         "command": "hopcode.runQwenCode",
-        "title": "Qwen Code: Run"
+        "title": "HopCode: Run"
       },
       {
         "command": "hopcode.showNotices",
-        "title": "Qwen Code: View Third-Party Notices"
+        "title": "HopCode: View Third-Party Notices"
       },
       {
         "command": "hopcode.openChat",
-        "title": "Qwen Code: Open",
+        "title": "HopCode: Open",
         "icon": "./assets/icon.png"
       },
       {
         "command": "hopcode.login",
-        "title": "Qwen Code: Login"
+        "title": "HopCode: Login"
       },
       {
         "command": "hopcode.focusChat",
-        "title": "Qwen Code: Focus Chat View"
+        "title": "HopCode: Focus Chat View"
       },
       {
         "command": "hopcode.newConversation",
-        "title": "Qwen Code: New Conversation"
+        "title": "HopCode: New Conversation"
       },
       {
         "command": "hopcode.showLogs",
-        "title": "Qwen Code: Show Logs"
+        "title": "HopCode: Show Logs"
       }
     ],
     "menus": {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,7 @@ import { registerNewCommands } from './commands/index.js';
 import { ReadonlyFileSystemProvider } from './services/readonlyFileSystemProvider.js';
 import { isWindows } from './utils/platform.js';
 
-const CLI_IDE_COMPANION_IDENTIFIER = 'qwenlm.hopcode-code-vscode-ide-companion';
+const CLI_IDE_COMPANION_IDENTIFIER = 'hopcode.hopcode-vscode-ide-companion';
 const INFO_MESSAGE_SHOWN_KEY = 'HopCodeInfoMessageShown';
 export const DIFF_SCHEME = 'qwen-diff';
 

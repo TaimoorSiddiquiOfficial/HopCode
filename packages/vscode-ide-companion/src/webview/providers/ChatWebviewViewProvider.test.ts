@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -20,7 +20,7 @@ describe('ChatWebviewViewProvider', () => {
 
     const mockWebviewView = {
       webview: {},
-      viewType: 'qwen-code.chatView.sidebar',
+      viewType: 'hopcode.chatView.sidebar',
     };
 
     await viewProvider.resolveWebviewView(mockWebviewView as never);
@@ -28,7 +28,7 @@ describe('ChatWebviewViewProvider', () => {
     expect(factory).toHaveBeenCalledTimes(1);
     expect(mockProvider.attachToView).toHaveBeenCalledWith(
       mockWebviewView,
-      'qwen-code.chatView.sidebar',
+      'hopcode.chatView.sidebar',
     );
   });
 
