@@ -25,10 +25,7 @@ import { loadSettings, type LoadedSettings } from '../../config/settings.js';
 import { loadCliConfig } from '../../config/config.js';
 import type { CliArgs } from '../../config/config.js';
 import { InteractiveSelector } from './interactiveSelector.js';
-import {
-  PROVIDER_REGISTRY,
-  detectActiveProvider,
-} from './registry.js';
+import { PROVIDER_REGISTRY, detectActiveProvider } from './registry.js';
 import { handleApiKeyAuth } from './providers.js';
 
 interface QwenAuthOptions {
@@ -75,6 +72,7 @@ export async function handleQwenAuth(
       prompt: undefined,
       promptInteractive: undefined,
       yolo: undefined,
+      bare: undefined,
       approvalMode: undefined,
       telemetry: undefined,
       checkpointing: undefined,
@@ -111,6 +109,7 @@ export async function handleQwenAuth(
       maxSessionTurns: undefined,
       coreTools: undefined,
       excludeTools: undefined,
+      disabledSlashCommands: undefined,
       authType: undefined,
       channel: undefined,
       systemPrompt: undefined,
