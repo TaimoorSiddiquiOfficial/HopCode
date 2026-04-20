@@ -5,6 +5,8 @@
  */
 
 import process from 'node:process';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import os from 'node:os';
 import { getNpmVersion, getGitVersion } from './systemInfo.js';
 import { validateAuthMethod } from '../config/auth.js';
@@ -309,6 +311,38 @@ async function checkRipgrep(
   }
 }
 
+const execFileAsync = promisify(execFile);
+
+const NPM_PACKAGE_NAME = '@hoptrendy/hopcode-cli';
+
+async function checkNpmCli(): Promise<DoctorCheckResult> {
+  try {
+    const { stdout } = await execFileAsync('npm', [
+      'view',
+      NPM_PACKAGE_NAME,
+      'version',
+      '--json',
+    ]);
+    const published = stdout.trim().replace(/^"|"$/g, '');
+    return {
+      category: t('HopCode'),
+      name: t('NPM CLI package'),
+      status: 'pass',
+      message: t('published v{{version}}', { version: published }),
+    };
+  } catch {
+    return {
+      category: t('HopCode'),
+      name: t('NPM CLI package'),
+      status: 'warn',
+      message: t('not found on npm'),
+      detail: t('{{pkg}} has not been published to NPM yet.', {
+        pkg: NPM_PACKAGE_NAME,
+      }),
+    };
+  }
+}
+
 async function checkGit(context: CommandContext): Promise<DoctorCheckResult> {
   if (context.services.git) {
     return {
@@ -344,12 +378,13 @@ export async function runDoctorChecks(
   context: CommandContext,
 ): Promise<DoctorCheckResult[]> {
   // Run async checks in parallel
-  const [npmResult, ripgrepResult, apiClientResult, gitResult] =
+  const [npmResult, ripgrepResult, apiClientResult, gitResult, npmCliResult] =
     await Promise.all([
       checkNpmVersion(),
       checkRipgrep(context),
       checkApiClient(context),
       checkGit(context),
+      checkNpmCli(),
     ]);
 
   return [
@@ -370,5 +405,7 @@ export async function runDoctorChecks(
     ripgrepResult,
     // Git
     gitResult,
+    // HopCode
+    npmCliResult,
   ];
 }
