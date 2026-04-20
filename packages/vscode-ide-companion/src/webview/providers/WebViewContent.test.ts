@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -35,7 +35,7 @@ describe('WebViewContent', () => {
     const html = WebViewContent.generate(webview as never, fakeExtensionUri);
 
     expect(html).toContain('<!DOCTYPE html>');
-    expect(html).toContain('Qwen Code');
+    expect(html).toContain('HopCode');
     expect(html).toContain(webview.cspSource);
     expect(webview.asWebviewUri).toHaveBeenCalled();
   });

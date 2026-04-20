@@ -194,7 +194,7 @@ export function resetConversationState({
   // Reset the VS Code tab title to default label
   vscode.postMessage({
     type: 'updatePanelTitle',
-    data: { title: 'Qwen Code' },
+    data: { title: 'HopCode' },
   });
 }
 
@@ -482,11 +482,11 @@ export const useWebViewMessages = ({
           handlers.messageHandling.clearWaitingForResponse();
           const errorMsg =
             (message?.data?.message as string) ||
-            'Failed to connect to Qwen agent.';
+            'Failed to connect to HopCode agent.';
 
           handlers.messageHandling.addMessage({
             role: 'assistant',
-            content: `Failed to connect to Qwen agent: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
+            content: `Failed to connect to HopCode agent: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
             timestamp: Date.now(),
           });
           // Set authentication state to false

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -21,7 +21,7 @@ interface AccountInfoDialogProps {
 }
 
 const AUTH_LABELS: Record<string, string> = {
-  'qwen-oauth': 'Qwen OAuth',
+  'qwen-oauth': 'HopCode OAuth',
   openai: 'OpenAI-compatible',
   gemini: 'Gemini',
   anthropic: 'Anthropic',

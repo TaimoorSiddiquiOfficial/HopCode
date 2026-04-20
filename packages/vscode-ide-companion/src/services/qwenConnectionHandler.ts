@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -7,7 +7,7 @@
 /**
  * Qwen Connection Handler
  *
- * Handles Qwen Agent connection establishment, authentication, and session creation
+ * Handles HopCode Agent connection establishment, authentication, and session creation
  */
 
 import * as vscode from 'vscode';
@@ -42,7 +42,7 @@ export interface QwenConnectionResult {
  */
 export class QwenConnectionHandler {
   /**
-   * Connect to Qwen service and establish session
+   * Connect to HopCode service and establish session
    *
    * @param connection - ACP connection instance
    * @param workingDir - Working directory

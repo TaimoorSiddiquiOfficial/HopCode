@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -74,7 +74,7 @@ export function extractSessionListItems(
 }
 
 /**
- * Qwen Agent Manager
+ * HopCode Agent Manager
  *
  * Coordinates various modules and provides unified interface
  */
@@ -315,7 +315,7 @@ export class QwenAgentManager {
   }
 
   /**
-   * Connect to Qwen service
+   * Connect to HopCode service
    *
    * @param workingDir - Working directory
    * @param cliEntryPath - Path to bundled CLI entrypoint (cli.js)

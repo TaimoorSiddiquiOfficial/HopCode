@@ -73,7 +73,7 @@ describe('registerChatViewProviders', () => {
     });
     expect(executeCommand).toHaveBeenCalledWith(
       'setContext',
-      'qwen-code:supportsSecondarySidebar',
+      'hopcode:supportsSecondarySidebar',
       true,
     );
     expect(context.subscriptions).toHaveLength(2);
@@ -88,7 +88,7 @@ describe('registerChatViewProviders', () => {
 
     expect(executeCommand).toHaveBeenCalledWith(
       'setContext',
-      'qwen-code:supportsSecondarySidebar',
+      'hopcode:supportsSecondarySidebar',
       false,
     );
   });

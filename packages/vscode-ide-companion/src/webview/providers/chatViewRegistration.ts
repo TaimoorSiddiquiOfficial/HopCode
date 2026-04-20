@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -14,7 +14,7 @@ import {
   type WebViewProviderFactory,
 } from './ChatWebviewViewProvider.js';
 
-const SECONDARY_SIDEBAR_CONTEXT_KEY = 'qwen-code:supportsSecondarySidebar';
+const SECONDARY_SIDEBAR_CONTEXT_KEY = 'hopcode:supportsSecondarySidebar';
 
 export function detectSecondarySidebarSupport(vscodeVersion: string): boolean {
   const [major, minor] = vscodeVersion.split('.').map(Number);

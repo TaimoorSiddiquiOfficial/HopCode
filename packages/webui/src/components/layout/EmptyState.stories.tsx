@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -65,14 +65,14 @@ type Story = StoryObj<typeof meta>;
 export const Authenticated: Story = {
   args: {
     isAuthenticated: true,
-    appName: 'Qwen Code',
+    appName: 'HopCode',
   },
 };
 
 export const NotAuthenticated: Story = {
   args: {
     isAuthenticated: false,
-    appName: 'Qwen Code',
+    appName: 'HopCode',
   },
 };
 
@@ -80,7 +80,7 @@ export const Loading: Story = {
   args: {
     isAuthenticated: false,
     loadingMessage: 'Initializing...',
-    appName: 'Qwen Code',
+    appName: 'HopCode',
   },
 };
 

@@ -272,7 +272,7 @@ async function setupAttachedProvider(options?: {
       onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
       onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
     } as never,
-    'qwen-code.chatView.sidebar',
+    'hopcode.chatView.sidebar',
   );
 
   return { webview, postMessage, provider, messageHandler };

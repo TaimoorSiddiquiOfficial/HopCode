@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -232,7 +232,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       if (this.loginHandler) {
         await this.loginHandler();
       } else {
-        await vscode.commands.executeCommand('qwen-code.login');
+        await vscode.commands.executeCommand('hopcode.login');
       }
       return true;
     }
@@ -256,7 +256,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       if (this.loginHandler) {
         await this.loginHandler();
       } else {
-        await vscode.commands.executeCommand('qwen-code.login');
+        await vscode.commands.executeCommand('hopcode.login');
       }
       return 'login';
     }
@@ -425,7 +425,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       console.warn('[SessionMessageHandler] Agent not connected');
 
       // Show non-modal notification with Login button
-      await this.promptLogin('You need to login first to use Qwen Code.');
+      await this.promptLogin('You need to login first to use HopCode.');
       return;
     }
 
@@ -443,7 +443,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         const errorMsg = this.getErrorMessage(createErr);
         if (this.shouldPromptLogin(createErr)) {
           await this.promptLogin(
-            'Your login session has expired or is invalid. Please login again to continue using Qwen Code.',
+            'Your login session has expired or is invalid. Please login again to continue using HopCode.',
           );
           return;
         }
@@ -526,7 +526,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       ) {
         // Show a more user-friendly error message for expired sessions
         await this.promptLogin(
-          'Your login session has expired or is invalid. Please login again to continue using Qwen Code.',
+          'Your login session has expired or is invalid. Please login again to continue using HopCode.',
         );
 
         // Send a specific error to the webview for better UI handling

@@ -154,10 +154,10 @@ describe('activate', () => {
     expect(viewIds).toContain('hopcode.chatView.secondary');
   });
 
-  it('should launch the Qwen Code when the user clicks the button', async () => {
+  it('should launch HopCode when the user clicks the button', async () => {
     const showInformationMessageMock = vi
       .mocked(vscode.window.showInformationMessage)
-      .mockResolvedValue('Run Qwen Code' as never);
+      .mockResolvedValue('Run HopCode' as never);
     vi.mocked(context.globalState.get).mockReturnValue(undefined);
     vi.mocked(vscode.extensions.getExtension).mockReturnValue({
       packageJSON: { version: '1.1.0' },

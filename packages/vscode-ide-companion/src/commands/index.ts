@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -15,17 +15,17 @@ import {
 
 type Logger = (message: string) => void;
 
-export const runHopCodeCommand = 'qwen-code.runHopCode';
+export const runHopCodeCommand = 'hopcode.runHopCode';
 export const showDiffCommand = 'HopCode.showDiff';
-export const openChatCommand = 'qwen-code.openChat';
+export const openChatCommand = 'hopcode.openChat';
 export const openNewChatTabCommand = 'HopCode.openNewChatTab';
-export const loginCommand = 'qwen-code.login';
-export const focusChatCommand = 'qwen-code.focusChat';
-export const newConversationCommand = 'qwen-code.newConversation';
-export const showLogsCommand = 'qwen-code.showLogs';
+export const loginCommand = 'hopcode.login';
+export const focusChatCommand = 'hopcode.focusChat';
+export const newConversationCommand = 'hopcode.newConversation';
+export const showLogsCommand = 'hopcode.showLogs';
 
 /**
- * Register all Qwen Code chat-related commands.
+ * Register all HopCode chat-related commands.
  *
  * `openChat` and `newConversation` always open an editor tab, while
  * `focusChat` focuses the secondary sidebar (preferred) or primary sidebar.
@@ -107,7 +107,7 @@ export function registerNewCommands(
         await providers[providers.length - 1].forceReLogin();
       } else {
         vscode.window.showInformationMessage(
-          'Please open Qwen Code chat first before logging in.',
+          'Please open HopCode chat first before logging in.',
         );
       }
     }),
@@ -140,7 +140,7 @@ export function registerNewCommands(
         outputChannel.show(true);
       } else {
         vscode.window.showWarningMessage(
-          'Qwen Code Companion log channel is not available.',
+          'HopCode Companion log channel is not available.',
         );
       }
     }),

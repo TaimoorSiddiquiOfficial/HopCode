@@ -283,7 +283,7 @@ export const App: React.FC = () => {
           {
             id: 'login',
             label: 'Login',
-            description: 'Login to Qwen Code',
+            description: 'Login to HopCode',
             type: 'command',
             group: 'Account',
           },
@@ -975,7 +975,7 @@ export const App: React.FC = () => {
           <div className="text-center">
             <div className="border-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
             <p className="text-muted-foreground text-sm">
-              Preparing Qwen Code...
+              Preparing HopCode...
             </p>
           </div>
         </div>
@@ -1015,7 +1015,7 @@ export const App: React.FC = () => {
               onLogin={() => {
                 vscode.postMessage({ type: 'login', data: {} });
                 messageHandling.setWaitingForResponse(
-                  'Logging in to Qwen Code...',
+                  'Logging in to HopCode...',
                 );
               }}
             />

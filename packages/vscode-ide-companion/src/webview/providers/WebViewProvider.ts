@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -369,7 +369,7 @@ export class WebViewProvider {
               'switch_mode';
 
             // Always close open qwen-diff editors after any permission decision
-            void vscode.commands.executeCommand('qwen.diff.closeAll');
+            void vscode.commands.executeCommand('hopcode.diff.closeAll');
 
             if (isCancel) {
               // Fire and forget — for normal tool calls, cancel generation and
@@ -443,7 +443,9 @@ export class WebViewProvider {
               })();
             } else {
               // Allowed/proceeded — suppress diff re-open briefly
-              void vscode.commands.executeCommand('qwen.diff.suppressBriefly');
+              void vscode.commands.executeCommand(
+                'hopcode.diff.suppressBriefly',
+              );
             }
           };
           // Store handler in message handler
@@ -757,7 +759,7 @@ export class WebViewProvider {
           ).trim();
           const panelRef = this.panelManager.getPanel();
           if (panelRef) {
-            panelRef.title = title ? truncatePanelTitle(title) : 'Qwen Code';
+            panelRef.title = title ? truncatePanelTitle(title) : 'HopCode';
           }
           return;
         }
@@ -990,7 +992,7 @@ export class WebViewProvider {
         const errorMsg = getErrorMessage(_error);
         console.error('[WebViewProvider] Agent connection error:', _error);
         vscode.window.showWarningMessage(
-          `Failed to connect to Qwen CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
+          `Failed to connect to HopCode CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
         );
         // Fallback to empty conversation
         await this.initializeEmptyConversation();
@@ -1117,7 +1119,7 @@ export class WebViewProvider {
       type: 'agentConnectionError',
       data: {
         message:
-          'Lost connection to Qwen agent and auto-reconnect failed. Please use the refresh button to try again.',
+          'Lost connection to HopCode agent and auto-reconnect failed. Please use the refresh button to try again.',
       },
     });
   }
@@ -1566,7 +1568,7 @@ export class WebViewProvider {
 
     // Ensure restored tab title starts from default label
     try {
-      panel.title = 'Qwen Code';
+      panel.title = 'HopCode';
     } catch (e) {
       console.warn(
         '[WebViewProvider] Failed to reset restored panel title:',
@@ -1603,7 +1605,7 @@ export class WebViewProvider {
           ).trim();
           const panelRef = this.panelManager.getPanel();
           if (panelRef) {
-            panelRef.title = title ? truncatePanelTitle(title) : 'Qwen Code';
+            panelRef.title = title ? truncatePanelTitle(title) : 'HopCode';
           }
           return;
         }

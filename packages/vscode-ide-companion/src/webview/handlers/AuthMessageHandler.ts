@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -93,9 +93,9 @@ export class AuthMessageHandler extends BaseMessageHandler {
         console.log('[AuthMessageHandler] Using fallback login method');
         // Fallback: show message and use command
         vscode.window.showInformationMessage(
-          'Please wait while we connect to Qwen Code...',
+          'Please wait while we connect to HopCode...',
         );
-        await vscode.commands.executeCommand('qwen-code.login');
+        await vscode.commands.executeCommand('hopcode.login');
       }
     } catch (error) {
       const errorMsg = getErrorMessage(error);

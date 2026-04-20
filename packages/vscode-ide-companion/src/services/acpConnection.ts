@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -116,7 +116,7 @@ export class AcpConnection {
 
     if (!fs.existsSync(cliEntryPath)) {
       throw new Error(
-        `Bundled Qwen CLI entry not found at ${cliEntryPath}. The extension may not have been packaged correctly.`,
+        `Bundled HopCode CLI entry not found at ${cliEntryPath}. The extension may not have been packaged correctly.`,
       );
     }
 

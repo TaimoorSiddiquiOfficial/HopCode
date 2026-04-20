@@ -82,17 +82,17 @@
     },
     "languages": [
       {
-        "id": "qwen-diff-editable"
+        "id": "hopcode-diff-editable"
       }
     ],
     "commands": [
       {
-        "command": "qwen.diff.accept",
+        "command": "hopcode.diff.accept",
         "title": "HopCode: Accept Current Diff",
         "icon": "$(check)"
       },
       {
-        "command": "qwen.diff.cancel",
+        "command": "hopcode.diff.cancel",
         "title": "HopCode: Close Diff Editor",
         "icon": "$(close)"
       },
@@ -129,12 +129,12 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "qwen.diff.accept",
-          "when": "qwen.diff.isVisible"
+          "command": "hopcode.diff.accept",
+          "when": "hopcode.diff.isVisible"
         },
         {
-          "command": "qwen.diff.cancel",
-          "when": "qwen.diff.isVisible"
+          "command": "hopcode.diff.cancel",
+          "when": "hopcode.diff.isVisible"
         },
         {
           "command": "hopcode.login",
@@ -143,13 +143,13 @@
       ],
       "editor/title": [
         {
-          "command": "qwen.diff.accept",
-          "when": "qwen.diff.isVisible",
+          "command": "hopcode.diff.accept",
+          "when": "hopcode.diff.isVisible",
           "group": "navigation"
         },
         {
-          "command": "qwen.diff.cancel",
-          "when": "qwen.diff.isVisible",
+          "command": "hopcode.diff.cancel",
+          "when": "hopcode.diff.isVisible",
           "group": "navigation"
         },
         {
@@ -160,14 +160,14 @@
     },
     "keybindings": [
       {
-        "command": "qwen.diff.accept",
+        "command": "hopcode.diff.accept",
         "key": "ctrl+s",
-        "when": "qwen.diff.isVisible"
+        "when": "hopcode.diff.isVisible"
       },
       {
-        "command": "qwen.diff.accept",
+        "command": "hopcode.diff.accept",
         "key": "cmd+s",
-        "when": "qwen.diff.isVisible"
+        "when": "hopcode.diff.isVisible"
       },
       {
         "command": "hopcode.focusChat",

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -173,7 +173,7 @@ describe('useWebViewMessages', () => {
     ).toHaveBeenCalledWith('Past Conversations');
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: 'updatePanelTitle',
-      data: { title: 'Qwen Code' },
+      data: { title: 'HopCode' },
     });
   });
 
