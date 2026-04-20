@@ -1,13 +1,13 @@
-# @qwen-code/channel-base
+# @hoptrendy/channel-base
 
-Base infrastructure for building Qwen Code channel adapters. Provides the abstract base class, access control, session routing, and the ACP bridge that communicates with the agent.
+Base infrastructure for building HopCode channel adapters. Provides the abstract base class, access control, session routing, and the ACP bridge that communicates with the agent.
 
 If you're building a channel plugin, this is your only dependency.
 
 ## Install
 
 ```bash
-npm install @qwen-code/channel-base
+npm install @hoptrendy/channel-base
 ```
 
 ## Quick start
@@ -15,12 +15,12 @@ npm install @qwen-code/channel-base
 Subclass `ChannelBase` and implement three methods:
 
 ```typescript
-import { ChannelBase } from '@qwen-code/channel-base';
+import { ChannelBase } from '@hoptrendy/channel-base';
 import type {
   ChannelConfig,
   Envelope,
   AcpBridge,
-} from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
 
 class MyChannel extends ChannelBase {
   async connect(): Promise<void> {
@@ -42,7 +42,7 @@ class MyChannel extends ChannelBase {
 Export a `ChannelPlugin` object so the extension loader can discover it:
 
 ```typescript
-import type { ChannelPlugin } from '@qwen-code/channel-base';
+import type { ChannelPlugin } from '@hoptrendy/channel-base';
 
 export const plugin: ChannelPlugin = {
   channelType: 'my-platform',
@@ -53,7 +53,7 @@ export const plugin: ChannelPlugin = {
 };
 ```
 
-For a complete working example, see [`@qwen-code/channel-plugin-example`](../plugin-example/).
+For a complete working example, see [`@hoptrendy/channel-plugin-example`](../plugin-example/).
 
 ## Architecture
 
@@ -78,15 +78,15 @@ Everything between `handleInbound()` and `sendMessage()` is handled by the base 
 
 ### Classes
 
-| Class           | Purpose                                                          |
-| --------------- | ---------------------------------------------------------------- |
-| `ChannelBase`   | Abstract base class — extend this to build a channel adapter     |
-| `AcpBridge`     | Spawns and communicates with the `qwen-code --acp` agent process |
-| `BlockStreamer` | Progressive multi-message delivery for block streaming           |
-| `SessionRouter` | Maps senders to ACP sessions with configurable scoping           |
-| `SenderGate`    | DM access control (allowlist / pairing / open)                   |
-| `GroupGate`     | Group chat policy and @mention gating                            |
-| `PairingStore`  | Pairing code generation, approval, and allowlist persistence     |
+| Class           | Purpose                                                        |
+| --------------- | -------------------------------------------------------------- |
+| `ChannelBase`   | Abstract base class — extend this to build a channel adapter   |
+| `AcpBridge`     | Spawns and communicates with the `hopcode --acp` agent process |
+| `BlockStreamer` | Progressive multi-message delivery for block streaming         |
+| `SessionRouter` | Maps senders to ACP sessions with configurable scoping         |
+| `SenderGate`    | DM access control (allowlist / pairing / open)                 |
+| `GroupGate`     | Group chat policy and @mention gating                          |
+| `PairingStore`  | Pairing code generation, approval, and allowlist persistence   |
 
 ### Types
 
@@ -225,7 +225,7 @@ When `requireMention` is `true` (default), group messages are only processed if 
 constructor(channelName: string)
 ```
 
-Persists pairing state to `~/.qwen/channels/{channelName}-pairing.json` and `{channelName}-allowlist.json`.
+Persists pairing state to `~/.hopcode/channels/{channelName}-pairing.json` and `{channelName}-allowlist.json`.
 
 | Method                                | Description                                                                                               |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -292,4 +292,4 @@ Block streaming and `onResponseChunk` work independently — plugins can overrid
 ## Further reading
 
 - [Channel Plugin Developer Guide](../../docs/developers/channel-plugins.md)
-- [`@qwen-code/channel-plugin-example`](../plugin-example/) — working reference implementation
+- [`@hoptrendy/channel-plugin-example`](../plugin-example/) — working reference implementation

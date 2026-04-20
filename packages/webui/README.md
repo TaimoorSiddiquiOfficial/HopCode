@@ -1,6 +1,6 @@
-# @qwen-code/webui
+# @hoptrendy/webui
 
-A shared React component library for Qwen Code applications, providing cross-platform UI components with consistent styling and behavior.
+A shared React component library for HopCode applications, providing cross-platform UI components with consistent styling and behavior.
 
 ## Features
 
@@ -15,7 +15,7 @@ A shared React component library for Qwen Code applications, providing cross-pla
 ## Installation
 
 ```bash
-npm install @qwen-code/webui
+npm install @hoptrendy/webui
 ```
 
 ## CDN Usage
@@ -61,20 +61,20 @@ You can also use this library directly in the browser via CDN:
     </script>
 
     <!-- Load the webui library -->
-    <script src="https://unpkg.com/@qwen-code/webui@0.1.0-beta.2/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/@hoptrendy/webui@latest/dist/index.umd.js"></script>
 
     <!-- Load the CSS -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@qwen-code/webui@0.1.0-beta.2/dist/styles.css"
+      href="https://unpkg.com/@hoptrendy/webui@latest/dist/styles.css"
     />
   </head>
   <body>
     <div id="root"></div>
 
     <script type="text/babel">
-      // Access components from the global QwenCodeWebUI object
-      const { ChatViewer } = QwenCodeWebUI;
+      // Access components from the global HopCodeWebUI object
+      const { ChatViewer } = HopCodeWebUI;
 
       // Use the components with JSX support
       const App = () => (
@@ -123,20 +123,20 @@ You can also use this library directly in the browser via CDN:
     </script>
 
     <!-- Load the webui library -->
-    <script src="https://unpkg.com/@qwen-code/webui@0.1.0-beta.2/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/@hoptrendy/webui@latest/dist/index.umd.js"></script>
 
     <!-- Load the CSS -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@qwen-code/webui@0.1.0-beta.2/dist/styles.css"
+      href="https://unpkg.com/@hoptrendy/webui@latest/dist/styles.css"
     />
   </head>
   <body>
     <div id="root"></div>
 
     <script>
-      // Access components from the global QwenCodeWebUI object
-      const { ChatViewer } = QwenCodeWebUI;
+      // Access components from the global HopCodeWebUI object
+      const { ChatViewer } = HopCodeWebUI;
 
       // Use the components with React.createElement (no JSX)
       const App = React.createElement(ChatViewer, {
@@ -156,8 +156,8 @@ For a complete working example, see [examples/cdn-usage-demo.html](./examples/cd
 ## Quick Start
 
 ```tsx
-import { Button, Input, Tooltip } from '@qwen-code/webui';
-import { PlatformProvider } from '@qwen-code/webui/context';
+import { Button, Input, Tooltip } from '@hoptrendy/webui';
+import { PlatformProvider } from '@hoptrendy/webui/context';
 
 function App() {
   return (

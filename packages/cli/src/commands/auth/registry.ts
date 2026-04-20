@@ -86,7 +86,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     envKey: 'DEEPSEEK_API_KEY',
     baseUrl: 'https://api.deepseek.com/v1',
     authType: AuthType.USE_OPENAI,
-    defaultModel: 'deepseek/deepseek-chat',
+    defaultModel: 'deepseek-chat',
     requiresApiKey: true,
   },
   {
@@ -96,7 +96,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     envKey: 'GROQ_API_KEY',
     baseUrl: 'https://api.groq.com/openai/v1',
     authType: AuthType.USE_OPENAI,
-    defaultModel: 'groq/llama-3.3-70b-versatile',
+    defaultModel: 'llama-3.3-70b-versatile',
     requiresApiKey: true,
     liveModels: true,
   },
@@ -107,7 +107,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     envKey: 'MISTRAL_API_KEY',
     baseUrl: 'https://api.mistral.ai/v1',
     authType: AuthType.USE_OPENAI,
-    defaultModel: 'mistral/mistral-large-latest',
+    defaultModel: 'mistral-large-latest',
     requiresApiKey: true,
     liveModels: true,
   },
@@ -142,6 +142,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'fireworks/accounts/fireworks/models/llama-v3p1-70b-instruct',
     requiresApiKey: true,
+    liveModels: true,
   },
   {
     id: 'xai',
@@ -192,6 +193,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     authType: AuthType.USE_OPENAI,
     defaultModel: 'replicate/meta/meta-llama-3-70b-instruct',
     requiresApiKey: true,
+    liveModels: true,
   },
   {
     id: 'ollama-local',

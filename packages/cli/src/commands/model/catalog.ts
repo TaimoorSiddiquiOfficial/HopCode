@@ -208,6 +208,7 @@ const catalogs: ProviderCatalog[] = [
   },
 
   // ── DeepSeek ─────────────────────────────────────────────────────────────
+  // IDs use DeepSeek's native format (no prefix) for api.deepseek.com/v1
   {
     providerId: 'deepseek',
     categories: [
@@ -215,13 +216,13 @@ const catalogs: ProviderCatalog[] = [
         name: 'Chat',
         models: [
           {
-            id: 'deepseek/deepseek-chat',
+            id: 'deepseek-chat',
             label: 'DeepSeek Chat',
             description: 'General use',
             context: '64k',
           },
           {
-            id: 'deepseek/deepseek-chat-v3-0324',
+            id: 'deepseek-chat-v3-0324',
             label: 'DeepSeek Chat v3 (Mar)',
             description: 'March snapshot',
             context: '64k',
@@ -232,19 +233,19 @@ const catalogs: ProviderCatalog[] = [
         name: 'Reasoning',
         models: [
           {
-            id: 'deepseek/deepseek-reasoner',
+            id: 'deepseek-reasoner',
             label: 'DeepSeek Reasoner',
             description: 'Deep thinking',
             context: '64k',
           },
           {
-            id: 'deepseek/deepseek-r1',
+            id: 'deepseek-r1',
             label: 'DeepSeek R1',
             description: 'Chain-of-thought',
             context: '64k',
           },
           {
-            id: 'deepseek/deepseek-r1-distill-llama-70b',
+            id: 'deepseek-r1-distill-llama-70b',
             label: 'R1 Distill 70B',
             description: 'Efficient reasoning',
             context: '32k',
@@ -255,6 +256,8 @@ const catalogs: ProviderCatalog[] = [
   },
 
   // ── Groq ─────────────────────────────────────────────────────────────────
+  // IDs use Groq's native format (no prefix) for api.groq.com/openai/v1
+  // Groq has liveModels:true so this catalog is a fallback only.
   {
     providerId: 'groq',
     categories: [
@@ -262,19 +265,19 @@ const catalogs: ProviderCatalog[] = [
         name: 'Llama',
         models: [
           {
-            id: 'groq/llama-3.3-70b-versatile',
+            id: 'llama-3.3-70b-versatile',
             label: 'Llama 3.3 70B',
             description: 'Best quality',
             context: '128k',
           },
           {
-            id: 'groq/llama-3.1-70b-versatile',
+            id: 'llama-3.1-70b-versatile',
             label: 'Llama 3.1 70B',
             description: 'Previous gen',
             context: '128k',
           },
           {
-            id: 'groq/llama3-8b-8192',
+            id: 'llama3-8b-8192',
             label: 'Llama 3 8B',
             description: 'Ultra-fast',
             context: '8k',
@@ -285,13 +288,13 @@ const catalogs: ProviderCatalog[] = [
         name: 'Other',
         models: [
           {
-            id: 'groq/mixtral-8x7b-32768',
+            id: 'mixtral-8x7b-32768',
             label: 'Mixtral 8×7B',
             description: 'MoE model',
             context: '32k',
           },
           {
-            id: 'groq/gemma2-9b-it',
+            id: 'gemma2-9b-it',
             label: 'Gemma 2 9B',
             description: 'Google model',
             context: '8k',
@@ -302,6 +305,8 @@ const catalogs: ProviderCatalog[] = [
   },
 
   // ── Mistral ───────────────────────────────────────────────────────────────
+  // IDs use Mistral's native format (no prefix) for api.mistral.ai/v1
+  // Mistral has liveModels:true so this catalog is a fallback only.
   {
     providerId: 'mistral',
     categories: [
@@ -309,13 +314,13 @@ const catalogs: ProviderCatalog[] = [
         name: 'Flagship',
         models: [
           {
-            id: 'mistral/mistral-large-latest',
+            id: 'mistral-large-latest',
             label: 'Mistral Large',
             description: 'Most capable',
             context: '128k',
           },
           {
-            id: 'mistral/mistral-medium-latest',
+            id: 'mistral-medium-latest',
             label: 'Mistral Medium',
             description: 'Balanced',
             context: '128k',
@@ -326,13 +331,13 @@ const catalogs: ProviderCatalog[] = [
         name: 'Code',
         models: [
           {
-            id: 'mistral/codestral-latest',
+            id: 'codestral-latest',
             label: 'Codestral',
             description: 'Code specialist',
             context: '256k',
           },
           {
-            id: 'mistral/devstral-small-latest',
+            id: 'devstral-small-latest',
             label: 'Devstral Small',
             description: 'Agentic coding',
             context: '128k',
@@ -343,13 +348,13 @@ const catalogs: ProviderCatalog[] = [
         name: 'Fast',
         models: [
           {
-            id: 'mistral/mistral-small-latest',
+            id: 'mistral-small-latest',
             label: 'Mistral Small',
             description: 'Fast, cheap',
             context: '128k',
           },
           {
-            id: 'mistral/mistral-tiny-latest',
+            id: 'mistral-tiny-latest',
             label: 'Mistral Tiny',
             description: 'Lightest',
             context: '128k',

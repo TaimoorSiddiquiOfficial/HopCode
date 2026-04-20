@@ -1,7 +1,7 @@
 {
   "name": "@hoptrendy/webui",
-  "version": "0.14.34",
-  "description": "Shared UI components for Qwen Code packages",
+  "version": "0.14.35",
+  "description": "Shared UI components for HopCode packages",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -70,12 +70,12 @@
     "@vitest/coverage-v8": "^3.2.4"
   },
   "keywords": [
-    "qwen",
+    "hopcode",
     "ui",
     "components",
     "shared"
   ],
-  "author": "Qwen Team",
+  "author": "HopCode Team",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-﻿id = "hopcode"
+id = "hopcode"
 name = "HopCode"
 version = "0.1.0"
 schema_version = 1
@@ -8,25 +8,25 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 [agent_servers.hopcode]
 name = "HopCode"
-icon = "qwen-code.svg"
+icon = "hopcode.svg"
 
-[agent_servers.qwen-code.targets.darwin-aarch64]
-archive = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.10.0.tgz"
+[agent_servers.hopcode.targets.darwin-aarch64]
+archive = "https://registry.npmjs.org/@hoptrendy/cli/-/cli-0.14.35.tgz"
 cmd = "node"
 args = ["./package/cli.js", "--acp"]
 
-[agent_servers.qwen-code.targets.darwin-x86_64]
-archive = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.10.0.tgz"
+[agent_servers.hopcode.targets.darwin-x86_64]
+archive = "https://registry.npmjs.org/@hoptrendy/cli/-/cli-0.14.35.tgz"
 cmd = "node"
 args = ["./package/cli.js", "--acp"]
 
-[agent_servers.qwen-code.targets.linux-x86_64]
-archive = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.10.0.tgz"
+[agent_servers.hopcode.targets.linux-x86_64]
+archive = "https://registry.npmjs.org/@hoptrendy/cli/-/cli-0.14.35.tgz"
 cmd = "node"
 args = ["./package/cli.js", "--acp"]
 
-[agent_servers.qwen-code.targets.windows-x86_64]
-archive = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.10.0.tgz"
+[agent_servers.hopcode.targets.windows-x86_64]
+archive = "https://registry.npmjs.org/@hoptrendy/cli/-/cli-0.14.35.tgz"
 cmd = "node"
 args = ["./package/cli.js", "--acp"]
 
