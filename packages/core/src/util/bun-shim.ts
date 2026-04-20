@@ -7,5 +7,5 @@ export const BunShim = {
   },
 };
 
-// @ts-expect-error — polyfill Bun global for Node.js environments
-globalThis.Bun = globalThis.Bun || BunShim;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis as any).Bun = (globalThis as any).Bun || BunShim;

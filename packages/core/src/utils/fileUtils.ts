@@ -843,9 +843,9 @@ export async function processSingleFileContent(
 
         // pdftotext failed or not available — return helpful error
         return {
-          llmContent: `[Cannot extract text from PDF: "${displayName}". ${pdfResult.error}]`,
+          llmContent: `[Cannot extract text from PDF: "${displayName}". ${(pdfResult as { success: false; error: string }).error}]`,
           returnDisplay: `Failed to read pdf: ${relativePathForDisplay}`,
-          error: pdfResult.error,
+          error: (pdfResult as { success: false; error: string }).error,
           errorType: ToolErrorType.READ_CONTENT_FAILURE,
         };
       }

@@ -555,7 +555,7 @@ export class Config {
       // Create a minimal default instance for internal core use
       this._instance = new Config({
         targetDir: process.cwd(),
-      } as Parameters<typeof Config>[0]);
+      } as ConfigParameters);
       await this._instance.initialize();
     }
     return this._instance;
@@ -1020,7 +1020,8 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['tool_response'] as Record<string, unknown>) || {},
                   (input['tool_use_id'] as string) || '',
-                  (input['permission_mode'] as PermissionMode) || 'default',
+                  (input['permission_mode'] as PermissionMode | undefined) ??
+                    PermissionMode.Default,
                   signal,
                 );
                 break;
@@ -1031,15 +1032,17 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['error'] as string) || '',
                   input['is_interrupt'] as boolean | undefined,
-                  (input['permission_mode'] as PermissionMode) || 'default',
+                  (input['permission_mode'] as PermissionMode | undefined) ??
+                    PermissionMode.Default,
                   signal,
                 );
                 break;
               case 'Notification':
                 result = await hookSystem.fireNotificationEvent(
                   (input['message'] as string) || '',
-                  (input['notification_type'] as NotificationType) ||
-                    'permission_prompt',
+                  (input['notification_type'] as
+                    | NotificationType
+                    | undefined) ?? NotificationType.PermissionPrompt,
                   (input['title'] as string) || undefined,
                   signal,
                 );

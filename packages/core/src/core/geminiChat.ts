@@ -467,7 +467,7 @@ export class GeminiChat {
               await delay(delayMs, params.config?.abortSignal).promise;
               continue;
             }
-            // Transient budget exhausted — stop immediately.
+            // Transient budget exhausted ï¿½ stop immediately.
             if (isTransientStreamError) {
               break;
             }
@@ -803,8 +803,9 @@ export class GeminiChat {
       for (const tool of tools) {
         if (
           (tool.schema.parametersJsonSchema &&
-            hasCycleInSchema(tool.schema.parametersJsonSchema)) ||
-          (tool.schema.parameters && hasCycleInSchema(tool.schema.parameters))
+            hasCycleInSchema(tool.schema.parametersJsonSchema as object)) ||
+          (tool.schema.parameters &&
+            hasCycleInSchema(tool.schema.parameters as object))
         ) {
           cyclicSchemaTools.push(tool.displayName);
         }

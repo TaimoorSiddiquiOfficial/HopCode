@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode",
-  "version": "0.14.37",
+  "version": "0.14.38",
   "type": "module",
   "workspaces": [
     "packages/*",
@@ -24,7 +24,7 @@
     "debug": "cross-env DEBUG=1 node --inspect-brk scripts/start.js",
     "generate": "node scripts/generate-git-commit-info.js",
     "generate:settings-schema": "node --import tsx/esm scripts/generate-settings-schema.ts",
-    "build": "node scripts/build.js",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 node scripts/build.js",
     "build-and-start": "npm run build && npm run start",
     "build:vscode": "node scripts/build_vscode_companion.js",
     "build:all": "npm run build && npm run build:sandbox && npm run build:vscode",

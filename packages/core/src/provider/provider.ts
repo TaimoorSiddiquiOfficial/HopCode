@@ -58,6 +58,17 @@ import { GoogleAuth } from 'google-auth-library';
 import { ProviderTransform } from './transform.js';
 import { Installation } from '../installation.js';
 
+/** Typed shape for provider config entries in Config.provider map */
+interface ProviderConfigEntry {
+  options?: Record<string, unknown>;
+  blacklist?: string[];
+  whitelist?: string[];
+  models?: Record<
+    string,
+    { variants?: Record<string, { disabled?: boolean }> }
+  >;
+}
+
 export namespace Provider {
   const log = Log.create({ service: 'provider' });
 
@@ -168,7 +179,11 @@ export namespace Provider {
         if (input.env.some((item) => env[item])) return true;
         if (await Auth.get(input.id)) return true;
         const config = await Config.get();
-        if (config.provider?.['opencode']?.options?.apiKey) return true;
+        if (
+          (config.provider?.['opencode'] as ProviderConfigEntry | undefined)
+            ?.options?.['apiKey']
+        )
+          return true;
         return false;
       })();
 
@@ -260,17 +275,23 @@ export namespace Provider {
     },
     'amazon-bedrock': async () => {
       const config = await Config.get();
-      const providerConfig = config.provider?.['amazon-bedrock'];
+      const providerConfig = config.provider?.['amazon-bedrock'] as
+        | ProviderConfigEntry
+        | undefined;
 
       const auth = await Auth.get('amazon-bedrock');
 
       // Region precedence: 1) config file, 2) env var, 3) default
-      const configRegion = providerConfig?.options?.region;
+      const configRegion = providerConfig?.options?.['region'] as
+        | string
+        | undefined;
       const envRegion = Env.get('AWS_REGION');
       const defaultRegion = configRegion ?? envRegion ?? 'us-east-1';
 
       // Profile: config file takes precedence over env var
-      const configProfile = providerConfig?.options?.profile;
+      const configProfile = providerConfig?.options?.['profile'] as
+        | string
+        | undefined;
       const envProfile = Env.get('AWS_PROFILE');
       const profile = configProfile ?? envProfile;
 
@@ -321,7 +342,8 @@ export namespace Provider {
 
       // Add custom endpoint if specified (endpoint takes precedence over baseURL)
       const endpoint =
-        providerConfig?.options?.endpoint ?? providerConfig?.options?.baseURL;
+        (providerConfig?.options?.['endpoint'] as string | undefined) ??
+        (providerConfig?.options?.['baseURL'] as string | undefined);
       if (endpoint) {
         providerOptions.baseURL = endpoint;
       }
@@ -569,11 +591,16 @@ export namespace Provider {
       })();
 
       const config = await Config.get();
-      const providerConfig = config.provider?.['gitlab'];
+      const providerConfig = config.provider?.['gitlab'] as
+        | ProviderConfigEntry
+        | undefined;
 
       const aiGatewayHeaders = {
         'User-Agent': `hopcode/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
-        ...(providerConfig?.options?.aiGatewayHeaders || {}),
+        ...((providerConfig?.options?.['aiGatewayHeaders'] as Record<
+          string,
+          string
+        >) || {}),
       };
 
       return {
@@ -585,7 +612,10 @@ export namespace Provider {
           featureFlags: {
             duo_agent_platform_agentic_chat: true,
             duo_agent_platform: true,
-            ...(providerConfig?.options?.featureFlags || {}),
+            ...((providerConfig?.options?.['featureFlags'] as Record<
+              string,
+              boolean
+            >) || {}),
           },
         },
         async getModel(sdk: ReturnType<typeof createGitLab>, modelID: string) {
@@ -594,7 +624,10 @@ export namespace Provider {
             featureFlags: {
               duo_agent_platform_agentic_chat: true,
               duo_agent_platform: true,
-              ...(providerConfig?.options?.featureFlags || {}),
+              ...((providerConfig?.options?.['featureFlags'] as Record<
+                string,
+                boolean
+              >) || {}),
             },
           });
         },
@@ -907,13 +940,13 @@ export namespace Provider {
     function mergeProvider(providerID: string, provider: Partial<Info>) {
       const existing = providers[providerID];
       if (existing) {
-        // @ts-expect-error
+        // @ts-ignore
         providers[providerID] = mergeDeep(existing, provider);
         return;
       }
       const match = database[providerID];
       if (!match) return;
-      // @ts-expect-error
+      // @ts-ignore
       providers[providerID] = mergeDeep(match, provider);
     }
 
@@ -1043,8 +1076,8 @@ export namespace Provider {
           model.variants ?? {},
         );
         parsedModel.variants = mapValues(
-          pickBy(merged, (v) => !v.disabled),
-          (v) => omit(v, ['disabled']),
+          pickBy(merged, (v) => !(v as { disabled?: boolean }).disabled),
+          (v) => omit(v as { disabled?: boolean }, ['disabled']),
         );
         parsed.models[modelID] = parsedModel;
       }
@@ -1159,7 +1192,9 @@ export namespace Provider {
         continue;
       }
 
-      const configProvider = config.provider?.[providerID];
+      const configProvider = config.provider?.[providerID] as
+        | ProviderConfigEntry
+        | undefined;
 
       for (const [modelID, model] of Object.entries(provider.models)) {
         model.api.id = model.api.id ?? model.id ?? modelID;
@@ -1189,8 +1224,8 @@ export namespace Provider {
         if (configVariants && model.variants) {
           const merged = mergeDeep(model.variants, configVariants);
           model.variants = mapValues(
-            pickBy(merged, (v) => !v.disabled),
-            (v) => omit(v, ['disabled']),
+            pickBy(merged, (v) => !(v as { disabled?: boolean }).disabled),
+            (v) => omit(v as { disabled?: boolean }, ['disabled']),
           );
         }
       }
@@ -1261,7 +1296,7 @@ export namespace Provider {
 
       const customFetch = options['fetch'];
 
-      options['fetch'] = async (input: any, init?: BunFetchRequestInit) => {
+      options['fetch'] = async (input: any, init?: RequestInit) => {
         // Preserve custom fetch if it exists, wrap it with timeout logic
         const fetchFn = customFetch ?? fetch;
         const opts = init ?? {};

@@ -4,7 +4,7 @@ import { map, filter, pipe, fromEntries, mapValues } from 'remeda';
 import z from 'zod';
 import { fn } from '../util/fn.js';
 import { NamedError } from '../util/error.js';
-import { Auth } from '../auth.js';
+import { Auth, type AuthInfo } from '../auth.js';
 
 type AuthOuathResult = {
   url: string;
@@ -106,7 +106,7 @@ export namespace ProviderAuth {
           });
         }
         if ('refresh' in result) {
-          const info: Auth.Info = {
+          const info: AuthInfo = {
             type: 'oauth',
             access: result.access,
             refresh: result.refresh,

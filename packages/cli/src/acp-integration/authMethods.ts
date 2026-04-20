@@ -19,7 +19,7 @@ export function buildAuthMethods(): AuthMethod[] {
       },
     },
     {
-      id: AuthType.hopcode_OAUTH,
+      id: AuthType.QWEN_OAUTH,
       name: 'Qwen OAuth',
       description: 'Qwen OAuth (free tier discontinued 2026-04-15)',
       _meta: {
@@ -43,7 +43,7 @@ export function pickAuthMethodsForDetails(details?: string): AuthMethod[] {
     return authMethods;
   }
   if (details.includes('qwen-oauth') || details.includes('Qwen OAuth')) {
-    const narrowed = filterAuthMethodsById(authMethods, AuthType.hopcode_OAUTH);
+    const narrowed = filterAuthMethodsById(authMethods, AuthType.QWEN_OAUTH);
     return narrowed.length ? narrowed : authMethods;
   }
   return authMethods;

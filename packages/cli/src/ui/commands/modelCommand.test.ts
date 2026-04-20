@@ -82,7 +82,7 @@ describe('modelCommand', () => {
   it('should return dialog action for QWEN_OAUTH auth type', async () => {
     const mockConfig = createMockConfig({
       model: 'test-model',
-      authType: AuthType.hopcode_OAUTH,
+      authType: AuthType.QWEN_OAUTH,
     });
     mockContext.services.config = mockConfig as Config;
 

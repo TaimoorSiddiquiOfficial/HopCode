@@ -128,7 +128,7 @@ export const useAuthCommand = (
 
         // Only update credentials if not switching to QWEN_OAUTH,
         // so that OpenAI credentials are preserved when switching to QWEN_OAUTH.
-        if (authType !== AuthType.hopcode_OAUTH && credentials) {
+        if (authType !== AuthType.QWEN_OAUTH && credentials) {
           if (credentials?.apiKey != null) {
             settings.setValue(
               authTypeScope,
@@ -274,7 +274,7 @@ export const useAuthCommand = (
   }, []);
 
   const cancelAuthentication = useCallback(() => {
-    if (isAuthenticating && pendingAuthType === AuthType.hopcode_OAUTH) {
+    if (isAuthenticating && pendingAuthType === AuthType.QWEN_OAUTH) {
       cancelQwenAuth();
     }
 
@@ -569,7 +569,7 @@ export const useAuthCommand = (
     if (
       defaultAuthType &&
       ![
-        AuthType.hopcode_OAUTH,
+        AuthType.QWEN_OAUTH,
         AuthType.USE_OPENAI,
         AuthType.USE_ANTHROPIC,
         AuthType.USE_GEMINI,
@@ -582,7 +582,7 @@ export const useAuthCommand = (
           {
             value: defaultAuthType,
             validValues: [
-              AuthType.hopcode_OAUTH,
+              AuthType.QWEN_OAUTH,
               AuthType.USE_OPENAI,
               AuthType.USE_ANTHROPIC,
               AuthType.USE_GEMINI,

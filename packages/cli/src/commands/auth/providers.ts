@@ -127,6 +127,8 @@ export async function handleApiKeyAuth(
       channel: undefined,
       systemPrompt: undefined,
       appendSystemPrompt: undefined,
+      bare: undefined,
+      disabledSlashCommands: undefined,
     };
 
     const config = await loadCliConfig(

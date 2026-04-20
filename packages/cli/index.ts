@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// NODE_OPTIONS="--max-old-space-size=8192" node dist/cli.js
+// For large projects, increase heap: NODE_OPTIONS=--max-old-space-size=8192 hopcode
 
 /**
  * @license

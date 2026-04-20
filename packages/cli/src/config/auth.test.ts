@@ -108,7 +108,7 @@ describe('validateAuthMethod', () => {
   });
 
   it('should return an error for QWEN_OAUTH (free tier discontinued)', () => {
-    const result = validateAuthMethod(AuthType.hopcode_OAUTH);
+    const result = validateAuthMethod(AuthType.QWEN_OAUTH);
     expect(result).toContain('discontinued on 2026-04-15');
   });
 

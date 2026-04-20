@@ -93,7 +93,7 @@ export class HookRunner {
     const signal =
       contextOrSignal && 'aborted' in contextOrSignal
         ? contextOrSignal
-        : contextOrSignal?.signal;
+        : (contextOrSignal as FunctionHookContext | undefined)?.signal;
 
     // Check if already aborted before starting
     if (signal?.aborted) {
