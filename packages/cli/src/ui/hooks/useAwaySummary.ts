@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { generateSessionRecap, type Config } from '@qwen-code/qwen-code-core';
+import { generateSessionRecap, type Config } from '@hoptrendy/hopcode-core';
 import type { HistoryItemAwayRecap, HistoryItemWithoutId } from '../types.js';
 
 const AWAY_THRESHOLD_MS = 5 * 60 * 1000;
