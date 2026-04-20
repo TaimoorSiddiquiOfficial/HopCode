@@ -5,7 +5,7 @@
  */
 
 import type React from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
 import {
   AuthType,
@@ -25,7 +25,15 @@ import { useSettings } from '../contexts/SettingsContext.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import { t } from '../../i18n/index.js';
 import { PROVIDER_REGISTRY } from '../../commands/auth/registry.js';
-import { getCatalog } from '../../commands/model/catalog.js';
+import {
+  getCatalog,
+  type ModelCategory,
+} from '../../commands/model/catalog.js';
+import {
+  fetchOpenAICompatibleModels,
+  fetchOpenRouterModels,
+} from '../../commands/model/discovery.js';
+import { fetchOllamaModels } from '../../commands/model/ollama.js';
 
 function formatModalities(modalities?: InputModalities): string {
   if (!modalities) return t('text-only');
@@ -147,78 +155,145 @@ export function ModelDialog({
 
   const authType = config?.getAuthType();
 
+  // Detect which registry provider is currently active
+  const activeProviderEntry = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const merged = settings?.merged as any;
+    if (!merged) return null;
+
+    const selectedType = merged?.security?.auth?.selectedType as
+      | string
+      | undefined;
+    let activeProviderId: string | undefined;
+
+    if (selectedType === AuthType.USE_ANTHROPIC) {
+      activeProviderId = 'anthropic';
+    } else if (selectedType === AuthType.USE_GEMINI) {
+      activeProviderId = 'gemini';
+    } else if (selectedType === AuthType.USE_OPENAI) {
+      const openaiCfg = merged?.modelProviders?.openai?.[0] as
+        | { envKey?: string; baseUrl?: string }
+        | undefined;
+      if (openaiCfg) {
+        const match = PROVIDER_REGISTRY.find(
+          (p) =>
+            p.envKey === openaiCfg.envKey && p.baseUrl === openaiCfg.baseUrl,
+        );
+        activeProviderId = match?.id;
+      }
+    }
+
+    if (!activeProviderId) return null;
+    return PROVIDER_REGISTRY.find((p) => p.id === activeProviderId) ?? null;
+  }, [settings]);
+
+  // State for live model discovery
+  const [liveModelCategories, setLiveModelCategories] = useState<
+    ModelCategory[] | null
+  >(null);
+  const [isLoadingLiveModels, setIsLoadingLiveModels] = useState(false);
+
+  // Fetch live models when provider supports live discovery
+  useEffect(() => {
+    if (!activeProviderEntry?.liveModels) {
+      setLiveModelCategories(null);
+      setIsLoadingLiveModels(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoadingLiveModels(true);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const merged = settings?.merged as any;
+    const storedApiKey = activeProviderEntry.envKey
+      ? process.env[activeProviderEntry.envKey] ||
+        (merged?.env as Record<string, string> | undefined)?.[
+          activeProviderEntry.envKey
+        ]
+      : undefined;
+
+    async function fetchLive(): Promise<void> {
+      if (!activeProviderEntry) return;
+      let cats: ModelCategory[] | null = null;
+
+      if (activeProviderEntry.id === 'openrouter') {
+        cats = await fetchOpenRouterModels(storedApiKey);
+      } else if (activeProviderEntry.id.startsWith('ollama')) {
+        cats = activeProviderEntry.baseUrl
+          ? await fetchOllamaModels(activeProviderEntry.baseUrl, storedApiKey)
+          : null;
+      } else if (activeProviderEntry.baseUrl) {
+        cats = await fetchOpenAICompatibleModels(
+          activeProviderEntry.baseUrl,
+          storedApiKey,
+        );
+      }
+
+      if (!cancelled) {
+        setLiveModelCategories(cats);
+        setIsLoadingLiveModels(false);
+      }
+    }
+
+    fetchLive().catch(() => {
+      if (!cancelled) {
+        setLiveModelCategories(null);
+        setIsLoadingLiveModels(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeProviderEntry, settings]);
+
   const availableModelEntries = useMemo(() => {
     const coreModels = config ? config.getAllConfiguredModels() : [];
 
     // ── Load full catalog for the active provider ────────────────────────────
-    // Detects which provider is configured in settings and augments the core
-    // model list with every model in that provider's static catalog.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const merged = settings?.merged as any;
+    // Uses activeProviderEntry (resolved from settings) to augment the core
+    // model list. For providers with liveModels:true, uses live-fetched models;
+    // otherwise falls back to the static catalog.
     let catalogExtras: CoreAvailableModel[] = [];
     let activeProviderLabel: string | undefined;
 
-    if (merged) {
-      const selectedType = merged?.security?.auth?.selectedType as
-        | string
-        | undefined;
-      let activeProviderId: string | undefined;
+    if (activeProviderEntry) {
+      activeProviderLabel = activeProviderEntry.label;
+      // Prefer live-fetched models; fall back to static catalog.
+      const categories =
+        activeProviderEntry.liveModels && liveModelCategories
+          ? liveModelCategories
+          : (getCatalog(activeProviderEntry.id)?.categories ?? null);
 
-      if (selectedType === AuthType.USE_ANTHROPIC) {
-        activeProviderId = 'anthropic';
-      } else if (selectedType === AuthType.USE_GEMINI) {
-        activeProviderId = 'gemini';
-      } else if (selectedType === AuthType.USE_OPENAI) {
-        const openaiCfg = merged?.modelProviders?.openai?.[0] as
-          | { envKey?: string; baseUrl?: string }
-          | undefined;
-        if (openaiCfg) {
-          // Match by both envKey and baseUrl so ollama-local vs ollama-cloud
-          // are distinguished (same envKey, different baseUrl).
-          const match = PROVIDER_REGISTRY.find(
-            (p) =>
-              p.envKey === openaiCfg.envKey && p.baseUrl === openaiCfg.baseUrl,
-          );
-          activeProviderId = match?.id;
-        }
-      }
-
-      if (activeProviderId) {
-        const providerEntry = PROVIDER_REGISTRY.find(
-          (p) => p.id === activeProviderId,
+      if (categories) {
+        const existingIds = new Set(coreModels.map((m) => m.id));
+        catalogExtras = categories.flatMap((cat) =>
+          cat.models
+            .filter((m) => !existingIds.has(m.id))
+            .map(
+              (m) =>
+                ({
+                  id: m.id,
+                  label: m.label,
+                  // Embed category name so the detail panel is informative
+                  description:
+                    cat.name + (m.description ? ` · ${m.description}` : ''),
+                  authType: activeProviderEntry.authType,
+                  isRuntimeModel: false,
+                  // Expose provider's baseUrl/envKey so the detail panel shows
+                  // correct connection info for catalog-sourced models.
+                  baseUrl: activeProviderEntry.baseUrl,
+                  envKey: activeProviderEntry.envKey,
+                  capabilities: {
+                    image: false,
+                    pdf: false,
+                    audio: false,
+                    video: false,
+                  } as InputModalities,
+                }) as CoreAvailableModel,
+            ),
         );
-        activeProviderLabel = providerEntry?.label;
-        const catalog = getCatalog(activeProviderId);
-
-        if (catalog && providerEntry) {
-          const existingIds = new Set(coreModels.map((m) => m.id));
-          catalogExtras = catalog.categories.flatMap((cat) =>
-            cat.models
-              .filter((m) => !existingIds.has(m.id))
-              .map(
-                (m) =>
-                  ({
-                    id: m.id,
-                    label: m.label,
-                    // Embed category name so the detail panel is informative
-                    description:
-                      cat.name + (m.description ? ` · ${m.description}` : ''),
-                    authType: providerEntry.authType,
-                    isRuntimeModel: false,
-                    // Expose provider's baseUrl/envKey so the detail panel shows
-                    // correct connection info for catalog-sourced models.
-                    baseUrl: providerEntry.baseUrl,
-                    envKey: providerEntry.envKey,
-                    capabilities: {
-                      image: false,
-                      pdf: false,
-                      audio: false,
-                      video: false,
-                    } as InputModalities,
-                  }) as CoreAvailableModel,
-              ),
-          );
-        }
       }
     }
 
@@ -293,7 +368,7 @@ export function ModelDialog({
     }
 
     return result;
-  }, [config, settings]);
+  }, [config, activeProviderEntry, liveModelCategories]);
 
   const MODEL_OPTIONS = useMemo(
     () =>
@@ -549,7 +624,13 @@ export function ModelDialog({
     >
       <Text bold>{t('Select Model')}</Text>
 
-      {!hasModels ? (
+      {isLoadingLiveModels && !hasModels ? (
+        <Box marginTop={1}>
+          <Text color={theme.text.secondary}>
+            {t('⟳ Fetching available models…')}
+          </Text>
+        </Box>
+      ) : !hasModels ? (
         <Box marginTop={1} flexDirection="column">
           <Text color={theme.status.warning}>
             {t(
@@ -568,7 +649,7 @@ export function ModelDialog({
           </Box>
         </Box>
       ) : (
-        <Box marginTop={1}>
+        <Box marginTop={1} flexDirection="column">
           <DescriptiveRadioButtonSelect
             items={MODEL_OPTIONS}
             onSelect={handleSelect}
@@ -576,6 +657,13 @@ export function ModelDialog({
             initialIndex={initialIndex}
             showNumbers={true}
           />
+          {isLoadingLiveModels && (
+            <Box marginTop={1}>
+              <Text color={theme.text.secondary}>
+                {t('⟳ Fetching available models…')}
+              </Text>
+            </Box>
+          )}
         </Box>
       )}
 

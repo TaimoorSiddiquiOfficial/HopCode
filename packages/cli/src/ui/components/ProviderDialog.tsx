@@ -44,6 +44,19 @@ function maskApiKey(key: string): string {
   return key.slice(0, 4) + '…' + key.slice(-4);
 }
 
+/**
+ * Read stored API key: checks process.env first, then settings.merged.env as
+ * fallback (handles cases where loadEnvironment didn't populate process.env).
+ */
+function getStoredApiKey(
+  settings: ReturnType<typeof useSettings>,
+  envKey: string,
+): string | undefined {
+  if (process.env[envKey]) return process.env[envKey];
+  const env = settings.merged?.env as Record<string, string> | undefined;
+  return env?.[envKey] || undefined;
+}
+
 function persistProviderConfig(
   settings: ReturnType<typeof useSettings>,
   provider: ProviderConfig,
@@ -119,7 +132,9 @@ export function ProviderDialog({
   // ── Step 1: Provider list ────────────────────────────────────────────────
   const providerItems = PROVIDER_REGISTRY.map(
     (p): DescriptiveRadioSelectItem<string> => {
-      const existingKey = p.requiresApiKey ? process.env[p.envKey] : undefined;
+      const existingKey = p.requiresApiKey
+        ? getStoredApiKey(settings, p.envKey)
+        : undefined;
       const suffix = existingKey ? ` · ✓ ${maskApiKey(existingKey)}` : '';
       return {
         key: p.id,
@@ -153,14 +168,14 @@ export function ProviderDialog({
     // Allow empty submission if a key is already configured (keep existing key)
     const alreadyConfigured =
       selectedProvider?.requiresApiKey &&
-      !!process.env[selectedProvider.envKey];
+      !!getStoredApiKey(settings, selectedProvider.envKey);
     if (!trimmed && !alreadyConfigured) {
       setApiKeyError(t('API key cannot be empty.'));
       return;
     }
     setApiKeyError(null);
     setStep('model');
-  }, [apiKey, selectedProvider]);
+  }, [apiKey, selectedProvider, settings]);
 
   // ── Step 3: Model selection — async live fetch ───────────────────────────
   useEffect(() => {
@@ -171,7 +186,9 @@ export function ProviderDialog({
     setModelItems([]);
 
     const effectiveApiKey = selectedProvider.requiresApiKey
-      ? apiKey.trim() || process.env[selectedProvider.envKey] || ''
+      ? apiKey.trim() ||
+        getStoredApiKey(settings, selectedProvider.envKey) ||
+        ''
       : undefined;
 
     async function load(): Promise<void> {
@@ -236,13 +253,15 @@ export function ProviderDialog({
     return () => {
       cancelled = true;
     };
-  }, [step, selectedProvider, apiKey]);
+  }, [step, selectedProvider, apiKey, settings]);
 
   const handleModelSelect = useCallback(
     async (modelId: string) => {
       if (!selectedProvider) return;
       const effectiveApiKey = selectedProvider.requiresApiKey
-        ? apiKey.trim() || process.env[selectedProvider.envKey] || ''
+        ? apiKey.trim() ||
+          getStoredApiKey(settings, selectedProvider.envKey) ||
+          ''
         : 'ollama';
       try {
         persistProviderConfig(
@@ -344,11 +363,13 @@ export function ProviderDialog({
             {t('Configure {{provider}}', { provider: selectedProvider.label })}
           </Text>
           <Box marginTop={1} flexDirection="column">
-            {process.env[selectedProvider.envKey] ? (
+            {getStoredApiKey(settings, selectedProvider.envKey) ? (
               <Text color={theme.text.secondary}>
                 {t('Key already set')} (
-                {maskApiKey(process.env[selectedProvider.envKey]!)}).{' '}
-                {t('Press Enter to keep it, or type a new one:')}
+                {maskApiKey(
+                  getStoredApiKey(settings, selectedProvider.envKey)!,
+                )}
+                ). {t('Press Enter to keep it, or type a new one:')}
               </Text>
             ) : (
               <Text color={theme.text.secondary}>
@@ -363,7 +384,7 @@ export function ProviderDialog({
                 onChange={setApiKey}
                 onSubmit={handleApiKeySubmit}
                 placeholder={
-                  process.env[selectedProvider.envKey]
+                  getStoredApiKey(settings, selectedProvider.envKey)
                     ? t('Leave empty to keep existing key…')
                     : t('Paste API key here...')
                 }
