@@ -41,6 +41,8 @@ export namespace ProviderTransform {
         return 'gateway';
       case '@openrouter/ai-sdk-provider':
         return 'openrouter';
+      default:
+        return undefined;
     }
     return undefined;
   }
@@ -48,7 +50,7 @@ export namespace ProviderTransform {
   function normalizeMessages(
     msgs: ModelMessage[],
     model: Provider.Model,
-    options: Record<string, unknown>,
+    _options: Record<string, unknown>,
   ): ModelMessage[] {
     // Anthropic rejects messages with empty content - filter out empty string messages
     // and remove empty text/reasoning parts from array content
@@ -502,7 +504,7 @@ export namespace ProviderTransform {
           OPENAI_EFFORTS.map((effort) => [effort, { reasoningEffort: effort }]),
         );
 
-      case '@ai-sdk/github-copilot':
+      case '@ai-sdk/github-copilot': {
         if (model.id.includes('gemini')) {
           // currently github copilot only returns thinking
           return {};
@@ -531,6 +533,7 @@ export namespace ProviderTransform {
             },
           ]),
         );
+      }
 
       case '@ai-sdk/cerebras':
       // https://v5.ai-sdk.dev/providers/ai-sdk-providers/cerebras
@@ -550,7 +553,7 @@ export namespace ProviderTransform {
           ]),
         );
 
-      case '@ai-sdk/azure':
+      case '@ai-sdk/azure': {
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/azure
         if (id === 'o1-mini') return {};
         const azureEfforts = ['low', 'medium', 'high'];
@@ -567,7 +570,8 @@ export namespace ProviderTransform {
             },
           ]),
         );
-      case '@ai-sdk/openai':
+      }
+      case '@ai-sdk/openai': {
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/openai
         if (id === 'gpt-5-pro') return {};
         const openaiEfforts = iife(() => {
@@ -598,6 +602,7 @@ export namespace ProviderTransform {
             },
           ]),
         );
+      }
 
       case '@ai-sdk/anthropic':
       // https://v5.ai-sdk.dev/providers/ai-sdk-providers/anthropic
@@ -684,7 +689,7 @@ export namespace ProviderTransform {
 
       case '@ai-sdk/google-vertex':
       // https://v5.ai-sdk.dev/providers/ai-sdk-providers/google-vertex
-      case '@ai-sdk/google':
+      case '@ai-sdk/google': {
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai
         if (id.includes('2.5')) {
           return {
@@ -718,6 +723,7 @@ export namespace ProviderTransform {
             },
           ]),
         );
+      }
 
       case '@ai-sdk/mistral':
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/mistral
@@ -727,7 +733,7 @@ export namespace ProviderTransform {
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/cohere
         return {};
 
-      case '@ai-sdk/groq':
+      case '@ai-sdk/groq': {
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/groq
         const groqEffort = ['none', ...WIDELY_SUPPORTED_EFFORTS];
         return Object.fromEntries(
@@ -738,6 +744,7 @@ export namespace ProviderTransform {
             },
           ]),
         );
+      }
 
       case '@ai-sdk/perplexity':
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/perplexity
@@ -767,6 +774,8 @@ export namespace ProviderTransform {
             { reasoningEffort: effort },
           ]),
         );
+      default:
+        break;
     }
     return {};
   }

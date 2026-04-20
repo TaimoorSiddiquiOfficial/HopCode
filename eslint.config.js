@@ -29,6 +29,9 @@ export default tseslint.config(
       'docs-site/.next/**',
       'docs-site/out/**',
       '.qwen/**',
+      '.hopcode-backup-*/**',
+      'packages/core/test-openai-provider.ts',
+      'packages/core/src/provider/sdk/**',
     ],
   },
   eslint.configs.recommended,
@@ -185,7 +188,7 @@ export default tseslint.config(
   },
   // extra settings for scripts that we run directly with node
   {
-    files: ['./scripts/**/*.js', 'esbuild.config.js', 'packages/*/scripts/**/*.js'],
+    files: ['./scripts/**/*.{js,mjs}', 'esbuild.config.js', 'packages/*/scripts/**/*.{js,mjs}'],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -201,6 +204,31 @@ export default tseslint.config(
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
+  // Provider directory - uses TypeScript namespaces and complex AI SDK types by design
+  {
+    files: ['packages/core/src/provider/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/array-type': 'off',
+      '@typescript-eslint/no-this-alias': 'off',
+      'no-fallthrough': ['error', { allowEmptyCase: true }],
+      'import/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            'zod/v4',
+            'zod/v4/core',
+            'ai/internal',
+            '@ai-sdk/**',
+            'date-fns/**',
+            'lodash/**',
+          ],
         },
       ],
     },

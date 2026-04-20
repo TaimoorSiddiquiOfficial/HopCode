@@ -184,70 +184,58 @@ export namespace Provider {
         options: hasKey ? {} : { apiKey: 'public' },
       };
     },
-    openai: async () => {
-      return {
-        autoload: false,
-        async getModel(
-          sdk: any,
-          modelID: string,
-          _options?: Record<string, any>,
-        ) {
+    openai: async () => ({
+      autoload: false,
+      async getModel(
+        sdk: any,
+        modelID: string,
+        _options?: Record<string, any>,
+      ) {
+        return sdk.responses(modelID);
+      },
+      options: {},
+    }),
+    'github-copilot': async () => ({
+      autoload: false,
+      async getModel(
+        sdk: any,
+        modelID: string,
+        _options?: Record<string, any>,
+      ) {
+        if (sdk.responses === undefined && sdk.chat === undefined)
+          return sdk.languageModel(modelID);
+        return shouldUseCopilotResponsesApi(modelID)
+          ? sdk.responses(modelID)
+          : sdk.chat(modelID);
+      },
+      options: {},
+    }),
+    'github-copilot-enterprise': async () => ({
+      autoload: false,
+      async getModel(
+        sdk: any,
+        modelID: string,
+        _options?: Record<string, any>,
+      ) {
+        if (sdk.responses === undefined && sdk.chat === undefined)
+          return sdk.languageModel(modelID);
+        return shouldUseCopilotResponsesApi(modelID)
+          ? sdk.responses(modelID)
+          : sdk.chat(modelID);
+      },
+      options: {},
+    }),
+    azure: async () => ({
+      autoload: false,
+      async getModel(sdk: any, modelID: string, options?: Record<string, any>) {
+        if (options?.['useCompletionUrls']) {
+          return sdk.chat(modelID);
+        } else {
           return sdk.responses(modelID);
-        },
-        options: {},
-      };
-    },
-    'github-copilot': async () => {
-      return {
-        autoload: false,
-        async getModel(
-          sdk: any,
-          modelID: string,
-          _options?: Record<string, any>,
-        ) {
-          if (sdk.responses === undefined && sdk.chat === undefined)
-            return sdk.languageModel(modelID);
-          return shouldUseCopilotResponsesApi(modelID)
-            ? sdk.responses(modelID)
-            : sdk.chat(modelID);
-        },
-        options: {},
-      };
-    },
-    'github-copilot-enterprise': async () => {
-      return {
-        autoload: false,
-        async getModel(
-          sdk: any,
-          modelID: string,
-          _options?: Record<string, any>,
-        ) {
-          if (sdk.responses === undefined && sdk.chat === undefined)
-            return sdk.languageModel(modelID);
-          return shouldUseCopilotResponsesApi(modelID)
-            ? sdk.responses(modelID)
-            : sdk.chat(modelID);
-        },
-        options: {},
-      };
-    },
-    azure: async () => {
-      return {
-        autoload: false,
-        async getModel(
-          sdk: any,
-          modelID: string,
-          options?: Record<string, any>,
-        ) {
-          if (options?.['useCompletionUrls']) {
-            return sdk.chat(modelID);
-          } else {
-            return sdk.responses(modelID);
-          }
-        },
-        options: {},
-      };
-    },
+        }
+      },
+      options: {},
+    }),
     'azure-cognitive-services': async () => {
       const resourceName = Env.get('AZURE_COGNITIVE_SERVICES_RESOURCE_NAME');
       return {
@@ -450,34 +438,32 @@ export namespace Provider {
               }
               break;
             }
+            default:
+              break;
           }
 
           return sdk.languageModel(modelID);
         },
       };
     },
-    openrouter: async () => {
-      return {
-        autoload: false,
-        options: {
-          headers: {
-            'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
-            'X-Title': 'hopcode',
-          },
+    openrouter: async () => ({
+      autoload: false,
+      options: {
+        headers: {
+          'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+          'X-Title': 'hopcode',
         },
-      };
-    },
-    vercel: async () => {
-      return {
-        autoload: false,
-        options: {
-          headers: {
-            'http-referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
-            'x-title': 'hopcode',
-          },
+      },
+    }),
+    vercel: async () => ({
+      autoload: false,
+      options: {
+        headers: {
+          'http-referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+          'x-title': 'hopcode',
         },
-      };
-    },
+      },
+    }),
     'google-vertex': async (provider) => {
       const project =
         provider.options?.project ??
@@ -562,17 +548,15 @@ export namespace Provider {
         },
       };
     },
-    zenmux: async () => {
-      return {
-        autoload: false,
-        options: {
-          headers: {
-            'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
-            'X-Title': 'hopcode',
-          },
+    zenmux: async () => ({
+      autoload: false,
+      options: {
+        headers: {
+          'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+          'X-Title': 'hopcode',
         },
-      };
-    },
+      },
+    }),
     gitlab: async (input) => {
       const instanceUrl =
         Env.get('GITLAB_INSTANCE_URL') || 'https://gitlab.com';
@@ -688,27 +672,23 @@ export namespace Provider {
         options: {},
       };
     },
-    cerebras: async () => {
-      return {
-        autoload: false,
-        options: {
-          headers: {
-            'X-Cerebras-3rd-Party-Integration': 'hopcode',
-          },
+    cerebras: async () => ({
+      autoload: false,
+      options: {
+        headers: {
+          'X-Cerebras-3rd-Party-Integration': 'hopcode',
         },
-      };
-    },
-    kilo: async () => {
-      return {
-        autoload: false,
-        options: {
-          headers: {
-            'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
-            'X-Title': 'hopcode',
-          },
+      },
+    }),
+    kilo: async () => ({
+      autoload: false,
+      options: {
+        headers: {
+          'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+          'X-Title': 'hopcode',
         },
-      };
-    },
+      },
+    }),
   };
 
   export const Model = z
@@ -1553,7 +1533,7 @@ export namespace Provider {
   export function parseModel(model: string) {
     const [providerID, ...rest] = model.split('/');
     return {
-      providerID: providerID,
+      providerID,
       modelID: rest.join('/'),
     };
   }

@@ -5,9 +5,13 @@
 
 export class NamedError extends Error {
   override readonly name: string;
-  readonly metadata?: Record<string, any>;
+  readonly metadata?: Record<string, unknown>;
 
-  constructor(message: string, name?: string, metadata?: Record<string, any>) {
+  constructor(
+    message: string,
+    name?: string,
+    metadata?: Record<string, unknown>,
+  ) {
     super(message);
     this.name = name ?? this.constructor.name;
     this.metadata = metadata;

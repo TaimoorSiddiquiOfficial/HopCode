@@ -1,4 +1,4 @@
-import { APICallError } from 'ai';
+import type { APICallError } from 'ai';
 import { STATUS_CODES } from 'http';
 import { iife } from '../util/iife.js';
 
@@ -77,7 +77,9 @@ export namespace ProviderError {
         if (errMsg && typeof errMsg === 'string') {
           return `${msg}: ${errMsg}`;
         }
-      } catch {}
+      } catch (_e: unknown) {
+        // swallow JSON parse errors
+      }
 
       return `${msg}: ${e.responseBody}`;
     }).trim();
@@ -153,6 +155,8 @@ export namespace ProviderError {
           isRetryable: false,
           responseBody,
         };
+      default:
+        return undefined;
     }
   }
 

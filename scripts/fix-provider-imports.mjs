@@ -11,7 +11,7 @@ const PROVIDER_DIR = join(process.cwd(), 'packages', 'core', 'src', 'provider')
 
 function fixFile(filePath) {
   let content = readFileSync(filePath, 'utf-8')
-  const original = content
+  const _original = content
   let changed = false
 
   // Fix @/ imports to relative paths
