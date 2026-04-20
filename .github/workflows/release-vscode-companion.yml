@@ -317,9 +317,9 @@ jobs:
           for vsix in vsix-artifacts/*.vsix; do
             echo "Publishing: ${vsix}"
             if [[ "${{ needs.prepare.outputs.is_preview }}" == "true" ]]; then
-              ovsx publish "${vsix}" --pat "${OVSX_TOKEN}" --pre-release
+              ovsx publish "${vsix}" --pat "${OVSX_TOKEN}" --pre-release || echo "Skipping duplicate: ${vsix}"
             else
-              ovsx publish "${vsix}" --pat "${OVSX_TOKEN}"
+              ovsx publish "${vsix}" --pat "${OVSX_TOKEN}" || echo "Skipping duplicate: ${vsix}"
             fi
           done
 
