@@ -13,6 +13,7 @@
  *
  * Usage:
  *   const cats = await fetchOpenAICompatibleModels('https://api.groq.com/openai/v1', apiKey);
+ *   const cats = await fetchOpenRouterModels(apiKey);  // free-tier aware
  */
 
 import type { ModelCategory } from './catalog.js';
@@ -133,6 +134,101 @@ export async function fetchOpenAICompatibleModels(
         })),
       },
     ];
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ── OpenRouter-specific discovery ─────────────────────────────────────────────
+
+/**
+ * Fetch live model list from OpenRouter, splitting free-tier (`:free` suffix)
+ * models into a dedicated category shown first.
+ *
+ * OpenRouter exposes 300+ models; many have a `:free` variant that requires
+ * no credits. Surfacing them separately makes it easy for users to get started.
+ *
+ * @param apiKey    - OPENROUTER_API_KEY (optional — free models work without one)
+ * @param timeoutMs - How long to wait before giving up
+ */
+export async function fetchOpenRouterModels(
+  apiKey?: string,
+  timeoutMs = 8000,
+): Promise<ModelCategory[] | null> {
+  const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+    'X-Title': 'HopCode',
+  };
+  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+  try {
+    const resp = await fetch(`${OPENROUTER_BASE}/models`, {
+      signal: controller.signal,
+      headers,
+    });
+    if (!resp.ok) return null;
+
+    const json = (await resp.json()) as {
+      data?: Array<{
+        id: string;
+        owned_by?: string;
+        pricing?: { prompt?: string };
+      }>;
+    };
+
+    const rawModels = Array.isArray(json.data) ? json.data : [];
+    if (!rawModels.length) return null;
+
+    const chatModels = rawModels
+      .filter((m) => m.id && !isNonChatModel(m.id))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    if (!chatModels.length) return null;
+
+    const free: typeof chatModels = [];
+    const paid: typeof chatModels = [];
+
+    for (const m of chatModels) {
+      // Free models have :free suffix or zero prompt cost
+      const isFree =
+        m.id.endsWith(':free') ||
+        m.pricing?.prompt === '0' ||
+        m.pricing?.prompt === '0.0';
+      (isFree ? free : paid).push(m);
+    }
+
+    const categories: ModelCategory[] = [];
+
+    if (free.length) {
+      categories.push({
+        name: 'Free Tier (no credits needed)',
+        models: free.map((m) => ({
+          id: m.id,
+          label: m.id,
+          description: m.owned_by ? `by ${m.owned_by} · free` : 'free',
+        })),
+      });
+    }
+
+    if (paid.length) {
+      categories.push({
+        name: 'Paid Models',
+        models: paid.map((m) => ({
+          id: m.id,
+          label: m.id,
+          description: m.owned_by ? `by ${m.owned_by}` : undefined,
+        })),
+      });
+    }
+
+    return categories.length ? categories : null;
   } catch {
     return null;
   } finally {

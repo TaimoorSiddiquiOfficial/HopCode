@@ -26,7 +26,7 @@ import { createImagePathResolver } from '../utils/imageHandler.js';
 import { type ApprovalModeValue } from '../../types/approvalModeValueTypes.js';
 import { isAuthenticationRequiredError } from '../../utils/authErrors.js';
 import { getErrorMessage } from '../../utils/errorMessage.js';
-import { parseInsightMessage } from '@qwen-code/qwen-code-core';
+import { parseInsightMessage } from '@hoptrendy/hopcode-core';
 
 function isInsightCommand(command: string): boolean {
   const [firstToken = ''] = command.trim().split(/\s+/, 1);

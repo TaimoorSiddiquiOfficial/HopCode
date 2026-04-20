@@ -24,10 +24,14 @@
 
 import type { CommandModule, Argv } from 'yargs';
 import { loadSettings, SettingScope } from '../../config/settings.js';
-import { detectActiveProvider } from '../auth/registry.js';
+import { detectActiveProvider, PROVIDER_REGISTRY } from '../auth/registry.js';
 import { isCodingPlanConfig } from '../../constants/codingPlan.js';
 import { getCatalog } from './catalog.js';
 import { fetchOllamaModels } from './ollama.js';
+import {
+  fetchOpenAICompatibleModels,
+  fetchOpenRouterModels,
+} from './discovery.js';
 import { InteractiveSelector } from '../auth/interactiveSelector.js';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { t } from '../../i18n/index.js';
@@ -160,7 +164,7 @@ async function handleModelCommand(argv: ModelCommandArgs): Promise<void> {
     }),
   );
 
-  // Get model categories (live for Ollama, static otherwise)
+  // Get model categories (live fetch where supported, static fallback otherwise)
   let categories: ModelCategory[] | null = null;
 
   if (
@@ -182,6 +186,33 @@ async function handleModelCommand(argv: ModelCommandArgs): Promise<void> {
       process.stdout.write(' ✓\n');
     } else {
       process.stdout.write(t(' (Ollama unreachable, showing suggestions)\n'));
+    }
+  } else {
+    // For providers with liveModels: true, try to fetch the live model list
+    const providerDef = PROVIDER_REGISTRY.find((p) => p.id === info.providerId);
+    if (providerDef?.liveModels && providerDef.baseUrl) {
+      const apiKey = providerDef.envKey
+        ? (process.env[providerDef.envKey] ?? undefined)
+        : undefined;
+
+      process.stdout.write(t('  Fetching available models...'));
+
+      if (info.providerId === 'openrouter') {
+        categories = await fetchOpenRouterModels(apiKey);
+      } else {
+        categories = await fetchOpenAICompatibleModels(
+          providerDef.baseUrl,
+          apiKey,
+        );
+      }
+
+      if (categories) {
+        process.stdout.write(' ✓\n');
+      } else {
+        process.stdout.write(
+          t(' (could not reach provider, showing catalog)\n'),
+        );
+      }
     }
   }
 

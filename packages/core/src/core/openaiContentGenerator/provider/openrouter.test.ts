@@ -104,8 +104,8 @@ describe('OpenRouterOpenAICompatibleProvider', () => {
 
       expect(headers).toEqual({
         'User-Agent': `HopCode/1.0.0 (${process.platform}; ${process.arch})`,
-        'HTTP-Referer': 'https://github.com/QwenLM/qwen-code.git',
-        'X-OpenRouter-Title': 'Qwen Code',
+        'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
+        'X-Title': 'HopCode',
       });
     });
 
@@ -124,8 +124,8 @@ describe('OpenRouterOpenAICompatibleProvider', () => {
 
       expect(headers).toEqual({
         'User-Agent': 'ParentAgent/1.0.0',
-        'HTTP-Referer': 'https://github.com/QwenLM/qwen-code.git', // OpenRouter-specific value should override
-        'X-OpenRouter-Title': 'Qwen Code',
+        'HTTP-Referer': 'https://github.com/TaimoorSiddiquiOfficial/HopCode', // OpenRouter-specific value should override
+        'X-Title': 'HopCode',
       });
 
       parentBuildHeaders.mockRestore();
@@ -140,9 +140,9 @@ describe('OpenRouterOpenAICompatibleProvider', () => {
         `HopCode/unknown (${process.platform}; ${process.arch})`,
       );
       expect(headers['HTTP-Referer']).toBe(
-        'https://github.com/QwenLM/qwen-code.git',
+        'https://github.com/TaimoorSiddiquiOfficial/HopCode',
       );
-      expect(headers['X-OpenRouter-Title']).toBe('Qwen Code');
+      expect(headers['X-Title']).toBe('HopCode');
     });
   });
 
@@ -213,9 +213,9 @@ describe('OpenRouterOpenAICompatibleProvider', () => {
       // Should have both parent and OpenRouter-specific headers
       expect(headers['User-Agent']).toBeDefined(); // From parent
       expect(headers['HTTP-Referer']).toBe(
-        'https://github.com/QwenLM/qwen-code.git',
+        'https://github.com/TaimoorSiddiquiOfficial/HopCode',
       ); // OpenRouter-specific
-      expect(headers['X-OpenRouter-Title']).toBe('Qwen Code'); // OpenRouter-specific
+      expect(headers['X-Title']).toBe('HopCode'); // OpenRouter-specific
     });
   });
 });
