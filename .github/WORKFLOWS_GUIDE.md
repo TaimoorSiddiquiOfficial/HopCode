@@ -45,7 +45,7 @@ force_skip_tests: false # Skip validation tests
 
 ### 2. **release-sdk.yml** - SDK TypeScript Release
 
-**Purpose:** Release `@hopcode/sdk` package
+**Purpose:** Release `@hoptrendy/sdk` package
 
 **Triggers:**
 
@@ -130,7 +130,7 @@ force_skip_tests: false
 **Manual Trigger Options:**
 
 ```yaml
-packages: 'all' # or '@hopcode/core,@hopcode/sdk'
+packages: 'all' # or '@hoptrendy/core,@hoptrendy/sdk'
 dry_run: true # Dry-run mode
 ref: 'main' # Branch to publish from
 ```
@@ -291,7 +291,7 @@ create_preview_release: true # ← Creates preview
 ```yaml
 # Go to Actions → Publish NPM Packages → Run workflow
 # Fill in:
-packages: '@hopcore/core,@hopcode/sdk' # ← Specific packages
+packages: '@hoptrendy/hopcode-core,@hoptrendy/sdk' # ← Specific packages
 dry_run: true
 ```
 
@@ -517,7 +517,7 @@ run: npm publish --access public --provenance
 ### After Release
 
 - [ ] Verify package on npmjs.com
-- [ ] Test installation: `npm install -g @hopcode/hopcode`
+- [ ] Test installation: `npm install -g @hoptrendy/hopcode-cli`
 - [ ] Update documentation
 - [ ] Announce release
 - [ ] Monitor for issues

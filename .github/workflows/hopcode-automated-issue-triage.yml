@@ -103,7 +103,7 @@ jobs:
             - Causes data loss or corruption with no workaround.
             - Crashes the application or makes a core feature completely unusable for all or most users in a production environment. Will it cause severe quality degration? Is it preventing contributors from contributing to the repository or is it a release blocker?
             Qualifier: Is the main function of the software broken?
-            Example: The qwen auth login command fails with an unrecoverable error, preventing any user from authenticating and using the rest of the CLI.
+            Example: The hopcode auth login command fails with an unrecoverable error, preventing any user from authenticating and using the rest of the CLI.
             P1: High
             - A P1 bug is a serious issue that significantly degrades the user experience or impacts a core feature.
             - While not a complete blocker, it's a major problem that needs a fast resolution. Feature requests are almost never P1.
@@ -115,7 +115,7 @@ jobs:
             - Severe performance degradation making the application frustratingly slow.
             - No straightforward workaround exists, or the workaround is difficult and non-obvious.
             Qualifier: Is a key feature unusable or giving very wrong results?
-            Example: Qwen Code enters a loop when making read-many-files tool call. I am unable to break out of the loop and qwen doesn't follow instructions subsequently.
+            Example: HopCode enters a loop when making read-many-files tool call. I am unable to break out of the loop and HopCode doesn't follow instructions subsequently.
             P2: Medium
             - A P2 bug is a moderately impactful issue. It's a noticeable problem but doesn't prevent the use of the software's main functionality.
             Impact:

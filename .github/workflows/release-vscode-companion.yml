@@ -137,7 +137,7 @@ jobs:
         if: |-
           ${{ github.event.inputs.force_skip_tests != 'true' }}
         run: |
-          npm run build --workspace=@hopcode/webui
+          npm run build --workspace=@hoptrendy/webui
 
       - name: 'Run Tests'
         if: |-
