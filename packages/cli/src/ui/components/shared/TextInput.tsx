@@ -33,6 +33,8 @@ export interface TextInputProps {
   validationErrors?: string[];
   inputWidth?: number;
   initialCursorOffset?: number;
+  /** When true, renders each character as ● to hide sensitive input like API keys. */
+  mask?: boolean;
 }
 
 export function TextInput({
@@ -48,6 +50,7 @@ export function TextInput({
   validationErrors = [],
   inputWidth = 80,
   initialCursorOffset,
+  mask = false,
 }: TextInputProps) {
   const allowMultiline = height > 1;
 
@@ -165,7 +168,9 @@ export function TextInput({
           ) : (
             linesToRender.map((lineText, visualIdxInRenderedSet) => {
               const cursorVisualRow = cursorVisualRowAbsolute - scrollVisualRow;
-              let display = cpSlice(lineText, 0, inputWidth);
+              const rawSlice = cpSlice(lineText, 0, inputWidth);
+              // When masking, replace each character with ● but preserve length for cursor math
+              let display = mask ? '●'.repeat(cpLen(rawSlice)) : rawSlice;
               const currentVisualWidth = stringWidth(display);
               if (currentVisualWidth < inputWidth) {
                 display = display + ' '.repeat(inputWidth - currentVisualWidth);

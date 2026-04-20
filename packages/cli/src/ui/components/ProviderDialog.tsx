@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type React from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Box, Text } from 'ink';
 import {
   AuthType,
@@ -27,6 +27,8 @@ import {
   type ProviderConfig,
 } from '../../commands/auth/registry.js';
 import { getCatalog } from '../../commands/model/catalog.js';
+import { fetchOllamaModels } from '../../commands/model/ollama.js';
+import { fetchOpenAICompatibleModels } from '../../commands/model/discovery.js';
 
 type Step = 'provider' | 'apikey' | 'model';
 
@@ -34,9 +36,11 @@ interface ProviderDialogProps {
   onClose: () => void;
 }
 
-function isProviderConfigured(provider: ProviderConfig): boolean {
-  if (!provider.requiresApiKey) return true;
-  return !!process.env[provider.envKey];
+/** Returns a masked version of a key like: sk-...4f3a */
+function maskApiKey(key: string): string {
+  if (!key) return '';
+  if (key.length <= 8) return '●'.repeat(key.length);
+  return key.slice(0, 4) + '…' + key.slice(-4);
 }
 
 function persistProviderConfig(
@@ -106,21 +110,23 @@ export function ProviderDialog({
   const [apiKey, setApiKey] = useState('');
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [modelItems, setModelItems] = useState<
+    Array<DescriptiveRadioSelectItem<string>>
+  >([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   // ── Step 1: Provider list ────────────────────────────────────────────────
-  const providerItems = useMemo(
-    () =>
-      PROVIDER_REGISTRY.map((p): DescriptiveRadioSelectItem<string> => {
-        const configured = isProviderConfigured(p);
-        const suffix = configured ? ` · [${t('configured')}]` : '';
-        return {
-          key: p.id,
-          title: p.label,
-          description: p.description + suffix,
-          value: p.id,
-        };
-      }),
-    [],
+  const providerItems = PROVIDER_REGISTRY.map(
+    (p): DescriptiveRadioSelectItem<string> => {
+      const existingKey = p.requiresApiKey ? process.env[p.envKey] : undefined;
+      const suffix = existingKey ? ` · ✓ ${maskApiKey(existingKey)}` : '';
+      return {
+        key: p.id,
+        title: p.label,
+        description: p.description + suffix,
+        value: p.id,
+      };
+    },
   );
 
   const handleProviderSelect = useCallback((value: string) => {
@@ -131,8 +137,9 @@ export function ProviderDialog({
     setApiKeyError(null);
     setErrorMessage(null);
 
-    // If key needed and not set → ask for it; otherwise go straight to model
-    if (provider.requiresApiKey && !process.env[provider.envKey]) {
+    // Always show API key step for providers that require one,
+    // so users can update their key or press Enter to keep the existing one.
+    if (provider.requiresApiKey) {
       setStep('apikey');
     } else {
       setStep('model');
@@ -142,39 +149,93 @@ export function ProviderDialog({
   // ── Step 2: API key input ────────────────────────────────────────────────
   const handleApiKeySubmit = useCallback(() => {
     const trimmed = apiKey.trim();
-    if (!trimmed) {
+    // Allow empty submission if a key is already configured (keep existing key)
+    const alreadyConfigured =
+      selectedProvider?.requiresApiKey &&
+      !!process.env[selectedProvider.envKey];
+    if (!trimmed && !alreadyConfigured) {
       setApiKeyError(t('API key cannot be empty.'));
       return;
     }
     setApiKeyError(null);
     setStep('model');
-  }, [apiKey]);
+  }, [apiKey, selectedProvider]);
 
-  // ── Step 3: Model selection ──────────────────────────────────────────────
-  const modelItems = useMemo((): Array<DescriptiveRadioSelectItem<string>> => {
-    if (!selectedProvider) return [];
-    const catalog = getCatalog(selectedProvider.id);
-    if (!catalog) {
-      return [
-        {
-          key: selectedProvider.defaultModel,
-          title: selectedProvider.defaultModel,
-          description: t('Default model'),
-          value: selectedProvider.defaultModel,
-        },
-      ];
+  // ── Step 3: Model selection — async live fetch ───────────────────────────
+  useEffect(() => {
+    if (step !== 'model' || !selectedProvider) return;
+
+    let cancelled = false;
+    setIsLoadingModels(true);
+    setModelItems([]);
+
+    const effectiveApiKey = selectedProvider.requiresApiKey
+      ? apiKey.trim() || process.env[selectedProvider.envKey] || ''
+      : undefined;
+
+    async function load(): Promise<void> {
+      if (!selectedProvider) return;
+      let categories = null;
+
+      if (selectedProvider.liveModels && selectedProvider.baseUrl) {
+        const isOllama = selectedProvider.id.startsWith('ollama');
+        categories = isOllama
+          ? await fetchOllamaModels(selectedProvider.baseUrl, effectiveApiKey)
+          : await fetchOpenAICompatibleModels(
+              selectedProvider.baseUrl,
+              effectiveApiKey,
+            );
+      }
+
+      // Fall back to static catalog
+      if (!categories) {
+        const catalog = getCatalog(selectedProvider.id);
+        if (catalog) categories = catalog.categories;
+      }
+
+      // Last resort: show the default model
+      if (!categories || categories.length === 0) {
+        categories = [
+          {
+            name: t('Default'),
+            models: [
+              {
+                id: selectedProvider.defaultModel,
+                label: selectedProvider.defaultModel,
+              },
+            ],
+          },
+        ];
+      }
+
+      if (!cancelled) {
+        setModelItems(
+          categories.flatMap((cat) =>
+            cat.models.map(
+              (m): DescriptiveRadioSelectItem<string> => ({
+                key: m.id,
+                title: m.label,
+                description: `${cat.name}${m.description ? ` · ${m.description}` : ''}${'context' in m && m.context ? ` · ${String(m.context)}` : ''}`,
+                value: m.id,
+              }),
+            ),
+          ),
+        );
+        setIsLoadingModels(false);
+      }
     }
-    return catalog.categories.flatMap((cat) =>
-      cat.models.map(
-        (m): DescriptiveRadioSelectItem<string> => ({
-          key: m.id,
-          title: m.label,
-          description: `${cat.name}${m.description ? ` · ${m.description}` : ''}${m.context ? ` · ${m.context}` : ''}`,
-          value: m.id,
-        }),
-      ),
-    );
-  }, [selectedProvider]);
+
+    load().catch((err: unknown) => {
+      if (!cancelled) {
+        setErrorMessage(err instanceof Error ? err.message : String(err));
+        setIsLoadingModels(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [step, selectedProvider, apiKey]);
 
   const handleModelSelect = useCallback(
     async (modelId: string) => {
@@ -230,11 +291,8 @@ export function ProviderDialog({
       } else if (step === 'apikey') {
         setStep('provider');
       } else if (step === 'model') {
-        // Go back to apikey step if we showed it, else back to provider list
-        if (
-          selectedProvider?.requiresApiKey &&
-          !process.env[selectedProvider.envKey]
-        ) {
+        // Go back to apikey step if provider requires one, else back to provider list
+        if (selectedProvider?.requiresApiKey) {
           setStep('apikey');
         } else {
           setStep('provider');
@@ -278,17 +336,30 @@ export function ProviderDialog({
             {t('Configure {{provider}}', { provider: selectedProvider.label })}
           </Text>
           <Box marginTop={1} flexDirection="column">
-            <Text color={theme.text.secondary}>
-              {t('Enter your {{provider}} API key:', {
-                provider: selectedProvider.label,
-              })}
-            </Text>
+            {process.env[selectedProvider.envKey] ? (
+              <Text color={theme.text.secondary}>
+                {t('Key already set')} (
+                {maskApiKey(process.env[selectedProvider.envKey]!)}).{' '}
+                {t('Press Enter to keep it, or type a new one:')}
+              </Text>
+            ) : (
+              <Text color={theme.text.secondary}>
+                {t('Enter your {{provider}} API key:', {
+                  provider: selectedProvider.label,
+                })}
+              </Text>
+            )}
             <Box marginTop={1}>
               <TextInput
                 value={apiKey}
                 onChange={setApiKey}
                 onSubmit={handleApiKeySubmit}
-                placeholder={t('Paste API key here...')}
+                placeholder={
+                  process.env[selectedProvider.envKey]
+                    ? t('Leave empty to keep existing key…')
+                    : t('Paste API key here...')
+                }
+                mask={true}
                 isActive={true}
               />
             </Box>
@@ -314,23 +385,31 @@ export function ProviderDialog({
             })}
           </Text>
           <Box marginTop={1}>
-            <DescriptiveRadioButtonSelect
-              items={modelItems}
-              onSelect={handleModelSelect}
-              onHighlight={() => {}}
-              showNumbers={true}
-            />
+            {isLoadingModels ? (
+              <Text color={theme.text.secondary}>
+                {t('⟳ Fetching available models…')}
+              </Text>
+            ) : (
+              <DescriptiveRadioButtonSelect
+                items={modelItems}
+                onSelect={handleModelSelect}
+                onHighlight={() => {}}
+                showNumbers={true}
+              />
+            )}
           </Box>
           {errorMessage && (
             <Box marginTop={1}>
               <Text color={theme.status.error}>✕ {errorMessage}</Text>
             </Box>
           )}
-          <Box marginTop={1}>
-            <Text color={theme.text.secondary}>
-              {t('Enter to select, ↑↓ to navigate, Esc to go back')}
-            </Text>
-          </Box>
+          {!isLoadingModels && (
+            <Box marginTop={1}>
+              <Text color={theme.text.secondary}>
+                {t('Enter to select, ↑↓ to navigate, Esc to go back')}
+              </Text>
+            </Box>
+          )}
         </>
       )}
     </Box>
