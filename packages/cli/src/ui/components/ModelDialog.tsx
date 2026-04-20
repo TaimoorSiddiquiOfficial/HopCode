@@ -26,7 +26,10 @@ import { UIStateContext, type UIState } from '../contexts/UIStateContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import { t } from '../../i18n/index.js';
-import { PROVIDER_REGISTRY } from '../../commands/auth/registry.js';
+import {
+  PROVIDER_REGISTRY,
+  type ProviderConfig,
+} from '../../commands/auth/registry.js';
 import {
   getCatalog,
   type ModelCategory,
@@ -89,7 +92,7 @@ function persistAuthTypeSelection(
  */
 function registerModelForActiveProvider(
   settings: ReturnType<typeof useSettings>,
-  provider: import('../../commands/auth/registry.js').ProviderConfig,
+  provider: ProviderConfig,
   modelId: string,
   config:
     | {
@@ -243,16 +246,32 @@ export function ModelDialog({
     return PROVIDER_REGISTRY.find((p) => p.id === activeProviderId) ?? null;
   }, [settings]);
 
-  // State for live model discovery
-  const [liveModelCategories, setLiveModelCategories] = useState<
-    ModelCategory[] | null
-  >(null);
+  // All providers that have an API key configured (or don't need one)
+  const configuredProviders = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const merged = settings?.merged as any;
+    return PROVIDER_REGISTRY.filter((provider) => {
+      if (!provider.requiresApiKey) return true;
+      const envKey = provider.envKey;
+      if (!envKey) return false;
+      const key =
+        process.env[envKey] ||
+        (merged?.env as Record<string, string> | undefined)?.[envKey];
+      return !!key?.trim();
+    });
+  }, [settings]);
+
+  // State for live model discovery — map from providerId → categories
+  const [liveModelCategoriesMap, setLiveModelCategoriesMap] = useState<
+    Map<string, ModelCategory[]>
+  >(new Map());
   const [isLoadingLiveModels, setIsLoadingLiveModels] = useState(false);
 
-  // Fetch live models when provider supports live discovery
+  // Fetch live models for ALL configured providers that support live discovery
   useEffect(() => {
-    if (!activeProviderEntry?.liveModels) {
-      setLiveModelCategories(null);
+    const liveProviders = configuredProviders.filter((p) => p.liveModels);
+    if (liveProviders.length === 0) {
+      setLiveModelCategoriesMap(new Map());
       setIsLoadingLiveModels(false);
       return;
     }
@@ -262,39 +281,46 @@ export function ModelDialog({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const merged = settings?.merged as any;
-    const storedApiKey = activeProviderEntry.envKey
-      ? process.env[activeProviderEntry.envKey] ||
-        (merged?.env as Record<string, string> | undefined)?.[
-          activeProviderEntry.envKey
-        ]
-      : undefined;
 
-    async function fetchLive(): Promise<void> {
-      if (!activeProviderEntry) return;
-      let cats: ModelCategory[] | null = null;
+    async function fetchAllLive(): Promise<void> {
+      const results = new Map<string, ModelCategory[]>();
 
-      if (activeProviderEntry.id === 'openrouter') {
-        cats = await fetchOpenRouterModels(storedApiKey);
-      } else if (activeProviderEntry.id.startsWith('ollama')) {
-        cats = activeProviderEntry.baseUrl
-          ? await fetchOllamaModels(activeProviderEntry.baseUrl, storedApiKey)
-          : null;
-      } else if (activeProviderEntry.baseUrl) {
-        cats = await fetchOpenAICompatibleModels(
-          activeProviderEntry.baseUrl,
-          storedApiKey,
-        );
-      }
+      await Promise.allSettled(
+        liveProviders.map(async (provider) => {
+          const storedApiKey = provider.envKey
+            ? process.env[provider.envKey] ||
+              (merged?.env as Record<string, string> | undefined)?.[
+                provider.envKey
+              ]
+            : undefined;
+
+          let cats: ModelCategory[] | null = null;
+          if (provider.id === 'openrouter') {
+            cats = await fetchOpenRouterModels(storedApiKey);
+          } else if (provider.id.startsWith('ollama')) {
+            cats = provider.baseUrl
+              ? await fetchOllamaModels(provider.baseUrl, storedApiKey)
+              : null;
+          } else if (provider.baseUrl) {
+            cats = await fetchOpenAICompatibleModels(
+              provider.baseUrl,
+              storedApiKey,
+            );
+          }
+
+          if (cats) results.set(provider.id, cats);
+        }),
+      );
 
       if (!cancelled) {
-        setLiveModelCategories(cats);
+        setLiveModelCategoriesMap(results);
         setIsLoadingLiveModels(false);
       }
     }
 
-    fetchLive().catch(() => {
+    fetchAllLive().catch(() => {
       if (!cancelled) {
-        setLiveModelCategories(null);
+        setLiveModelCategoriesMap(new Map());
         setIsLoadingLiveModels(false);
       }
     });
@@ -302,107 +328,75 @@ export function ModelDialog({
     return () => {
       cancelled = true;
     };
-  }, [activeProviderEntry, settings]);
+  }, [configuredProviders, settings]);
 
   const availableModelEntries = useMemo(() => {
     const allCoreModels = config ? config.getAllConfiguredModels() : [];
 
-    // For OpenAI-compat providers, filter to only models belonging to the active
-    // provider (matched by baseUrl). This prevents models from other configured
-    // providers (e.g. OpenRouter entries while DeepSeek is active) from appearing
-    // mixed in under the wrong provider badge.
-    const coreModels =
-      activeProviderEntry?.authType === AuthType.USE_OPENAI
-        ? allCoreModels.filter(
-            (m) =>
-              m.authType === AuthType.USE_OPENAI &&
-              m.baseUrl === activeProviderEntry.baseUrl,
-          )
-        : allCoreModels;
-
-    // ── Load full catalog for the active provider ────────────────────────────
-    // Uses activeProviderEntry (resolved from settings) to augment the core
-    // model list. For providers with liveModels:true, uses live-fetched models;
-    // otherwise falls back to the static catalog.
-    let catalogExtras: CoreAvailableModel[] = [];
-    let activeProviderLabel: string | undefined;
-
-    if (activeProviderEntry) {
-      activeProviderLabel = activeProviderEntry.label;
-      // Prefer live-fetched models; fall back to static catalog.
-      const categories =
-        activeProviderEntry.liveModels && liveModelCategories
-          ? liveModelCategories
-          : (getCatalog(activeProviderEntry.id)?.categories ?? null);
-
-      if (categories) {
-        const existingIds = new Set(coreModels.map((m) => m.id));
-        catalogExtras = categories.flatMap((cat) =>
-          cat.models
-            .filter((m) => !existingIds.has(m.id))
-            .map(
-              (m) =>
-                ({
-                  id: m.id,
-                  label: m.label,
-                  // Embed category name so the detail panel is informative
-                  description:
-                    cat.name + (m.description ? ` · ${m.description}` : ''),
-                  authType: activeProviderEntry.authType,
-                  isRuntimeModel: false,
-                  // Expose provider's baseUrl/envKey so the detail panel shows
-                  // correct connection info for catalog-sourced models.
-                  baseUrl: activeProviderEntry.baseUrl,
-                  envKey: activeProviderEntry.envKey,
-                  capabilities: {
-                    image: false,
-                    pdf: false,
-                    audio: false,
-                    video: false,
-                  } as InputModalities,
-                }) as CoreAvailableModel,
-            ),
-        );
-      }
-    }
-
-    const allModels = [...coreModels, ...catalogExtras];
-
-    // Separate runtime models from registry models
-    const runtimeModels = allModels.filter((m) => m.isRuntimeModel);
     // Exclude discontinued qwen-oauth registry models — they can't be selected
     // and confuse users. Runtime qwen-oauth snapshots (from cached tokens) are
     // still allowed so existing sessions keep working.
-    const registryModels = allModels.filter(
+    const runtimeModels = allCoreModels.filter((m) => m.isRuntimeModel);
+    const registryModels = allCoreModels.filter(
       (m) => !m.isRuntimeModel && m.authType !== AuthType.QWEN_OAUTH,
     );
 
-    // Group registry models by authType
-    const modelsByAuthTypeMap = new Map<AuthType, CoreAvailableModel[]>();
-    for (const model of registryModels) {
-      const authType = model.authType;
-      if (!modelsByAuthTypeMap.has(authType)) {
-        modelsByAuthTypeMap.set(authType, []);
+    // For each USE_OPENAI registry model, resolve its ProviderConfig via baseUrl
+    const coreModelProviderMap = new Map<string, ProviderConfig | null>();
+    for (const m of registryModels) {
+      if (m.authType === AuthType.USE_OPENAI) {
+        const entry =
+          PROVIDER_REGISTRY.find(
+            (p) =>
+              p.authType === AuthType.USE_OPENAI && p.baseUrl === m.baseUrl,
+          ) ?? null;
+        coreModelProviderMap.set(`${m.id}::${m.baseUrl ?? ''}`, entry);
       }
-      modelsByAuthTypeMap.get(authType)!.push(model);
     }
 
-    // Stable order: active provider first, then others
-    const authTypeOrder: AuthType[] = [
-      AuthType.USE_OPENAI,
-      AuthType.USE_ANTHROPIC,
-      AuthType.USE_GEMINI,
-      AuthType.USE_VERTEX_AI,
-      AuthType.QWEN_OAUTH, // runtime-only fallback — kept for snapshot compat
-    ];
-
-    // Filter to only include authTypes that have registry models and maintain order
-    const availableAuthTypes = new Set(modelsByAuthTypeMap.keys());
-    const orderedAuthTypes = authTypeOrder.filter((t) =>
-      availableAuthTypes.has(t),
+    // Catalog/live extras from ALL configured providers (deduplicated)
+    type CatalogEntry = { model: CoreAvailableModel; provider: ProviderConfig };
+    const catalogEntries: CatalogEntry[] = [];
+    const existingKeys = new Set(
+      registryModels.map((m) => `${m.authType}::${m.id}::${m.baseUrl ?? ''}`),
     );
 
-    // Build ordered list: runtime models first, then registry models grouped by authType
+    for (const provider of configuredProviders) {
+      const categories =
+        provider.liveModels && liveModelCategoriesMap.has(provider.id)
+          ? liveModelCategoriesMap.get(provider.id)!
+          : (getCatalog(provider.id)?.categories ?? null);
+
+      if (!categories) continue;
+
+      for (const cat of categories) {
+        for (const m of cat.models) {
+          const key = `${provider.authType}::${m.id}::${provider.baseUrl ?? ''}`;
+          if (existingKeys.has(key)) continue;
+          existingKeys.add(key);
+          catalogEntries.push({
+            model: {
+              id: m.id,
+              label: m.label,
+              description:
+                cat.name + (m.description ? ` · ${m.description}` : ''),
+              authType: provider.authType,
+              isRuntimeModel: false,
+              baseUrl: provider.baseUrl,
+              envKey: provider.envKey,
+              capabilities: {
+                image: false,
+                pdf: false,
+                audio: false,
+                video: false,
+              } as InputModalities,
+            } as CoreAvailableModel,
+            provider,
+          });
+        }
+      }
+    }
+
     const result: Array<{
       authType: AuthType;
       model: CoreAvailableModel;
@@ -410,6 +404,8 @@ export function ModelDialog({
       snapshotId?: string;
       /** Human-readable provider name for the badge, e.g. "Ollama Cloud" */
       providerLabel?: string;
+      /** The ProviderConfig this model belongs to (null for non-USE_OPENAI) */
+      providerEntry?: ProviderConfig | null;
     }> = [];
 
     // Add all runtime models first
@@ -422,22 +418,49 @@ export function ModelDialog({
       });
     }
 
-    // Add registry models grouped by authType
-    for (const t of orderedAuthTypes) {
-      for (const model of modelsByAuthTypeMap.get(t) ?? []) {
-        result.push({
-          authType: t,
-          model,
-          isRuntime: false,
-          // Show real provider name in badge for openai-compat providers
-          providerLabel:
-            t === AuthType.USE_OPENAI ? activeProviderLabel : undefined,
-        });
-      }
+    // Add registry models (already persisted in settings)
+    for (const m of registryModels) {
+      const providerEntry =
+        m.authType === AuthType.USE_OPENAI
+          ? (coreModelProviderMap.get(`${m.id}::${m.baseUrl ?? ''}`) ??
+            activeProviderEntry)
+          : null;
+      result.push({
+        authType: m.authType,
+        model: m,
+        isRuntime: false,
+        providerLabel:
+          m.authType === AuthType.USE_OPENAI
+            ? (providerEntry?.label ?? activeProviderEntry?.label)
+            : undefined,
+        providerEntry,
+      });
+    }
+
+    // Add catalog/live extras grouped by provider (active provider first)
+    const sorted = [...catalogEntries].sort((a, b) => {
+      const aIsActive = a.provider.id === activeProviderEntry?.id ? 0 : 1;
+      const bIsActive = b.provider.id === activeProviderEntry?.id ? 0 : 1;
+      return aIsActive - bIsActive;
+    });
+    for (const { model, provider } of sorted) {
+      result.push({
+        authType: model.authType,
+        model,
+        isRuntime: false,
+        providerLabel:
+          model.authType === AuthType.USE_OPENAI ? provider.label : undefined,
+        providerEntry: provider,
+      });
     }
 
     return result;
-  }, [config, activeProviderEntry, liveModelCategories]);
+  }, [
+    config,
+    activeProviderEntry,
+    configuredProviders,
+    liveModelCategoriesMap,
+  ]);
 
   const MODEL_OPTIONS = useMemo(
     () =>
@@ -644,17 +667,24 @@ export function ModelDialog({
         // causing "Model not found for authType 'openai'". Persisting the entry
         // here (mirrors ProviderDialog.persistProviderConfig) and reloading the
         // registry fixes that without requiring a full provider re-auth flow.
-        if (
-          !isRuntime &&
-          selectedAuthType === AuthType.USE_OPENAI &&
-          activeProviderEntry
-        ) {
-          registerModelForActiveProvider(
-            settings,
-            activeProviderEntry,
-            modelId,
-            config,
+        if (!isRuntime && selectedAuthType === AuthType.USE_OPENAI) {
+          // Use the provider that owns this specific model (not necessarily the active one)
+          const modelEntry = availableModelEntries.find(
+            ({ authType: t2, model, isRuntime: ir, snapshotId }) => {
+              const v = ir && snapshotId ? snapshotId : `${t2}::${model.id}`;
+              return v === selected;
+            },
           );
+          const modelProviderEntry =
+            modelEntry?.providerEntry ?? activeProviderEntry;
+          if (modelProviderEntry) {
+            registerModelForActiveProvider(
+              settings,
+              modelProviderEntry,
+              modelId,
+              config,
+            );
+          }
         }
 
         await config.switchModel(
@@ -704,6 +734,7 @@ export function ModelDialog({
       setErrorMessage,
       isFastModelMode,
       activeProviderEntry,
+      availableModelEntries,
     ],
   );
 
