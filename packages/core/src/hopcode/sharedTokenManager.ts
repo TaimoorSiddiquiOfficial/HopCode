@@ -9,9 +9,9 @@ import { promises as fs, unlinkSync } from 'node:fs';
 import * as os from 'os';
 import { randomUUID } from 'node:crypto';
 
-import type { IQwenOAuth2Client } from './hopCodeOAuth2.js';
+import type { IHopCodeOAuth2Client } from './hopCodeOAuth2.js';
 import {
-  type QwenCredentials,
+  type HopCodeCredentials,
   type TokenRefreshData,
   type ErrorData,
   isErrorResponse,
@@ -22,7 +22,7 @@ import { createDebugLogger } from '../utils/debugLogger.js';
 const debugLogger = createDebugLogger('QWEN_OAUTH');
 
 // File System Configuration
-const QWEN_DIR = '.hopcode';
+const HOPCODE_DIR = '.hopcode';
 const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
 const QWEN_LOCK_FILENAME = 'oauth_creds.lock';
 
@@ -74,7 +74,7 @@ export class TokenManagerError extends Error {
  * Interface for the memory cache state
  */
 interface MemoryCache {
-  credentials: QwenCredentials | null;
+  credentials: HopCodeCredentials | null;
   fileModTime: number;
   lastCheck: number;
 }
@@ -86,12 +86,12 @@ interface MemoryCache {
  * @returns The validated credentials object
  * @throws Error if the data is invalid
  */
-function validateCredentials(data: unknown): QwenCredentials {
+function validateCredentials(data: unknown): HopCodeCredentials {
   if (!data || typeof data !== 'object') {
     throw new Error('Invalid credentials format');
   }
 
-  const creds = data as Partial<QwenCredentials>;
+  const creds = data as Partial<HopCodeCredentials>;
   const requiredFields = [
     'access_token',
     'refresh_token',
@@ -110,7 +110,7 @@ function validateCredentials(data: unknown): QwenCredentials {
     throw new Error('Invalid credentials: missing expiry_date');
   }
 
-  return creds as QwenCredentials;
+  return creds as HopCodeCredentials;
 }
 
 /**
@@ -131,7 +131,7 @@ export class SharedTokenManager {
   /**
    * Promise tracking any ongoing token refresh operation
    */
-  private refreshPromise: Promise<QwenCredentials> | null = null;
+  private refreshPromise: Promise<HopCodeCredentials> | null = null;
 
   /**
    * Promise tracking any ongoing file check operation to prevent concurrent checks
@@ -207,9 +207,9 @@ export class SharedTokenManager {
    * @throws TokenManagerError if unable to obtain valid credentials
    */
   async getValidCredentials(
-    qwenClient: IQwenOAuth2Client,
+    qwenClient: IHopCodeOAuth2Client,
     forceRefresh = false,
-  ): Promise<QwenCredentials> {
+  ): Promise<HopCodeCredentials> {
     try {
       // Check if credentials file has been updated by other sessions
       await this.checkAndReloadIfNeeded(qwenClient);
@@ -263,7 +263,7 @@ export class SharedTokenManager {
    * Uses promise-based locking to prevent concurrent file checks
    */
   private async checkAndReloadIfNeeded(
-    qwenClient?: IQwenOAuth2Client,
+    qwenClient?: IHopCodeOAuth2Client,
   ): Promise<void> {
     // If there's already an ongoing check, wait for it to complete
     if (this.checkPromise) {
@@ -328,7 +328,7 @@ export class SharedTokenManager {
    * This is separated to enable proper promise-based synchronization
    */
   private async performFileCheck(
-    qwenClient: IQwenOAuth2Client | undefined,
+    qwenClient: IHopCodeOAuth2Client | undefined,
     checkTime: number,
   ): Promise<void> {
     // Update lastCheck atomically at the start to prevent other calls from proceeding
@@ -376,7 +376,9 @@ export class SharedTokenManager {
   /**
    * Force a file check without time-based throttling (used during refresh operations)
    */
-  private async forceFileCheck(qwenClient?: IQwenOAuth2Client): Promise<void> {
+  private async forceFileCheck(
+    qwenClient?: IHopCodeOAuth2Client,
+  ): Promise<void> {
     try {
       const filePath = this.getCredentialFilePath();
       const stats = await fs.stat(filePath);
@@ -415,7 +417,7 @@ export class SharedTokenManager {
    * Load credentials from the file system into memory cache and sync with hopcodeClient
    */
   private async reloadCredentialsFromFile(
-    qwenClient?: IQwenOAuth2Client,
+    qwenClient?: IHopCodeOAuth2Client,
   ): Promise<void> {
     try {
       const filePath = this.getCredentialFilePath();
@@ -463,9 +465,9 @@ export class SharedTokenManager {
    * @throws TokenManagerError if refresh fails or lock cannot be acquired
    */
   private async performTokenRefresh(
-    qwenClient: IQwenOAuth2Client,
+    qwenClient: IHopCodeOAuth2Client,
     forceRefresh = false,
-  ): Promise<QwenCredentials> {
+  ): Promise<HopCodeCredentials> {
     const startTime = Date.now();
     const lockPath = this.getLockFilePath();
     let lockAcquired = false;
@@ -538,7 +540,7 @@ export class SharedTokenManager {
       }
 
       // Create updated credentials object
-      const credentials: QwenCredentials = {
+      const credentials: HopCodeCredentials = {
         access_token: tokenData.access_token,
         token_type: tokenData.token_type,
         refresh_token:
@@ -611,7 +613,7 @@ export class SharedTokenManager {
    * @param credentials - The credentials to save
    */
   private async saveCredentialsToFile(
-    credentials: QwenCredentials,
+    credentials: HopCodeCredentials,
   ): Promise<void> {
     const filePath = this.getCredentialFilePath();
     const dirPath = path.dirname(filePath);
@@ -678,7 +680,7 @@ export class SharedTokenManager {
    * @param credentials - The credentials to validate
    * @returns true if token is valid and not expired, false otherwise
    */
-  private isTokenValid(credentials: QwenCredentials): boolean {
+  private isTokenValid(credentials: HopCodeCredentials): boolean {
     if (!credentials.expiry_date || !credentials.access_token) {
       return false;
     }
@@ -691,7 +693,7 @@ export class SharedTokenManager {
    * @returns The absolute path to the credentials file
    */
   private getCredentialFilePath(): string {
-    return path.join(os.homedir(), QWEN_DIR, QWEN_CREDENTIAL_FILENAME);
+    return path.join(os.homedir(), HOPCODE_DIR, QWEN_CREDENTIAL_FILENAME);
   }
 
   /**
@@ -700,7 +702,7 @@ export class SharedTokenManager {
    * @returns The absolute path to the lock file
    */
   private getLockFilePath(): string {
-    return path.join(os.homedir(), QWEN_DIR, QWEN_LOCK_FILENAME);
+    return path.join(os.homedir(), HOPCODE_DIR, QWEN_LOCK_FILENAME);
   }
 
   /**
@@ -801,7 +803,7 @@ export class SharedTokenManager {
    * @param lastCheck - Last check timestamp (optional, defaults to current time)
    */
   private updateCacheState(
-    credentials: QwenCredentials | null,
+    credentials: HopCodeCredentials | null,
     fileModTime: number,
     lastCheck?: number,
   ): void {
@@ -826,7 +828,7 @@ export class SharedTokenManager {
    *
    * @returns The currently cached credentials or null
    */
-  getCurrentCredentials(): QwenCredentials | null {
+  getCurrentCredentials(): HopCodeCredentials | null {
     return this.memoryCache.credentials;
   }
 

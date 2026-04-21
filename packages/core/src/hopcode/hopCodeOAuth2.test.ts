@@ -18,11 +18,11 @@ import {
   isErrorResponse,
   hopCodeOAuth2Events,
   HopCodeOAuth2Event,
-  QwenOAuth2Client,
+  HopCodeOAuth2Client,
   type DeviceAuthorizationResponse,
   type DeviceTokenResponse,
   type ErrorData,
-  type QwenCredentials,
+  type HopCodeCredentials,
 } from './hopCodeOAuth2.js';
 import {
   SharedTokenManager,
@@ -31,8 +31,10 @@ import {
 } from './sharedTokenManager.js';
 
 interface MockSharedTokenManager {
-  getValidCredentials(qwenClient: QwenOAuth2Client): Promise<QwenCredentials>;
-  getCurrentCredentials(): QwenCredentials | null;
+  getValidCredentials(
+    qwenClient: HopCodeOAuth2Client,
+  ): Promise<HopCodeCredentials>;
+  getCurrentCredentials(): HopCodeCredentials | null;
   clearCache(): void;
 }
 
@@ -49,8 +51,8 @@ vi.mock('./sharedTokenManager.js', () => ({
     }
 
     async getValidCredentials(
-      qwenClient: QwenOAuth2Client,
-    ): Promise<QwenCredentials> {
+      qwenClient: HopCodeOAuth2Client,
+    ): Promise<HopCodeCredentials> {
       // Try to get credentials from the client first
       const clientCredentials = qwenClient.getCredentials();
       if (clientCredentials && clientCredentials.access_token) {
@@ -67,7 +69,7 @@ vi.mock('./sharedTokenManager.js', () => ({
       };
     }
 
-    getCurrentCredentials(): QwenCredentials | null {
+    getCurrentCredentials(): HopCodeCredentials | null {
       // Return null to let the client manage its own credentials
       return null;
     }
@@ -284,13 +286,13 @@ describe('Type Guards', () => {
   });
 });
 
-describe('QwenOAuth2Client', () => {
-  let client: QwenOAuth2Client;
+describe('HopCodeOAuth2Client', () => {
+  let client: HopCodeOAuth2Client;
   let originalFetch: typeof global.fetch;
 
   beforeEach(() => {
     // Create client instance
-    client = new QwenOAuth2Client();
+    client = new HopCodeOAuth2Client();
 
     // Mock fetch
     originalFetch = global.fetch;
@@ -523,7 +525,7 @@ describe('QwenOAuth2Client', () => {
       (
         client as unknown as {
           sharedManager: {
-            getValidCredentials: () => Promise<QwenCredentials>;
+            getValidCredentials: () => Promise<HopCodeCredentials>;
           };
         }
       ).sharedManager = {
@@ -546,7 +548,7 @@ describe('QwenOAuth2Client', () => {
       (
         client as unknown as {
           sharedManager: {
-            getValidCredentials: () => Promise<QwenCredentials>;
+            getValidCredentials: () => Promise<HopCodeCredentials>;
           };
         }
       ).sharedManager = {
@@ -1036,12 +1038,12 @@ describe('clearQwenCredentials', () => {
   });
 });
 
-describe('QwenOAuth2Client - Additional Error Scenarios', () => {
-  let client: QwenOAuth2Client;
+describe('HopCodeOAuth2Client - Additional Error Scenarios', () => {
+  let client: HopCodeOAuth2Client;
   let originalFetch: typeof global.fetch;
 
   beforeEach(() => {
-    client = new QwenOAuth2Client();
+    client = new HopCodeOAuth2Client();
     originalFetch = global.fetch;
     global.fetch = vi.fn();
   });
@@ -1705,7 +1707,7 @@ describe('Credential Caching Functions', () => {
   describe('cacheQwenCredentials', () => {
     it('should create directory and write credentials to file', async () => {
       // Mock the internal cacheQwenCredentials function by creating client and calling refresh
-      const client = new QwenOAuth2Client();
+      const client = new HopCodeOAuth2Client();
       client.setCredentials({
         refresh_token: 'test-refresh',
       });
@@ -1738,11 +1740,11 @@ describe('Credential Caching Functions', () => {
 });
 
 describe('Enhanced Error Handling and Edge Cases', () => {
-  let client: QwenOAuth2Client;
+  let client: HopCodeOAuth2Client;
   let originalFetch: typeof global.fetch;
 
   beforeEach(() => {
-    client = new QwenOAuth2Client();
+    client = new HopCodeOAuth2Client();
     originalFetch = global.fetch;
     global.fetch = vi.fn();
   });
@@ -1752,7 +1754,7 @@ describe('Enhanced Error Handling and Edge Cases', () => {
     vi.clearAllMocks();
   });
 
-  describe('QwenOAuth2Client getAccessToken enhanced scenarios', () => {
+  describe('HopCodeOAuth2Client getAccessToken enhanced scenarios', () => {
     it('should return undefined when SharedTokenManager fails (no fallback)', async () => {
       // Set up client with valid credentials (but we don't use fallback anymore)
       client.setCredentials({
@@ -1764,7 +1766,7 @@ describe('Enhanced Error Handling and Edge Cases', () => {
       (
         client as unknown as {
           sharedManager: {
-            getValidCredentials: () => Promise<QwenCredentials>;
+            getValidCredentials: () => Promise<HopCodeCredentials>;
           };
         }
       ).sharedManager = {
@@ -1791,7 +1793,7 @@ describe('Enhanced Error Handling and Edge Cases', () => {
       (
         client as unknown as {
           sharedManager: {
-            getValidCredentials: () => Promise<QwenCredentials>;
+            getValidCredentials: () => Promise<HopCodeCredentials>;
           };
         }
       ).sharedManager = {
@@ -1813,7 +1815,7 @@ describe('Enhanced Error Handling and Edge Cases', () => {
       (
         client as unknown as {
           sharedManager: {
-            getValidCredentials: () => Promise<QwenCredentials>;
+            getValidCredentials: () => Promise<HopCodeCredentials>;
           };
         }
       ).sharedManager = {
@@ -2123,11 +2125,11 @@ describe('Enhanced Error Handling and Edge Cases', () => {
   });
 });
 
-describe('SharedTokenManager Integration in QwenOAuth2Client', () => {
-  let client: QwenOAuth2Client;
+describe('SharedTokenManager Integration in HopCodeOAuth2Client', () => {
+  let client: HopCodeOAuth2Client;
 
   beforeEach(() => {
-    client = new QwenOAuth2Client();
+    client = new HopCodeOAuth2Client();
   });
 
   it('should use SharedTokenManager instance in constructor', () => {
@@ -2214,7 +2216,7 @@ describe('SharedTokenManager Integration in QwenOAuth2Client', () => {
 describe('Constants and Configuration', () => {
   it('should have correct OAuth endpoints', async () => {
     // Test that the constants are properly defined by checking they're used in requests
-    const client = new QwenOAuth2Client();
+    const client = new HopCodeOAuth2Client();
 
     const mockResponse = {
       ok: true,
@@ -2241,7 +2243,7 @@ describe('Constants and Configuration', () => {
   });
 
   it('should use correct client ID in requests', async () => {
-    const client = new QwenOAuth2Client();
+    const client = new HopCodeOAuth2Client();
 
     const mockResponse = {
       ok: true,
@@ -2271,7 +2273,7 @@ describe('Constants and Configuration', () => {
 
   it('should use correct default scope', async () => {
     // Test the default scope constant by checking it's used in device flow
-    const client = new QwenOAuth2Client();
+    const client = new HopCodeOAuth2Client();
 
     const mockResponse = {
       ok: true,

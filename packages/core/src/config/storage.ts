@@ -10,7 +10,7 @@ import * as fs from 'node:fs';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { getProjectHash, sanitizeCwd } from '../utils/paths.js';
 
-export const QWEN_DIR = '.hopcode';
+export const HOPCODE_DIR = '.hopcode';
 export const GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json';
 export const OAUTH_FILE = 'oauth_creds.json';
 export const SKILL_PROVIDER_CONFIG_DIRS = ['.hopcode', '.agents'];
@@ -124,7 +124,7 @@ export class Storage {
     if (!homeDir) {
       return path.join(os.tmpdir(), '.hopcode');
     }
-    return path.join(homeDir, QWEN_DIR);
+    return path.join(homeDir, HOPCODE_DIR);
   }
 
   static getMcpOAuthTokensPath(): string {
@@ -184,7 +184,7 @@ export class Storage {
   }
 
   getHopCodeDir(): string {
-    return path.join(this.targetDir, QWEN_DIR);
+    return path.join(this.targetDir, HOPCODE_DIR);
   }
 
   getProjectDir(): string {

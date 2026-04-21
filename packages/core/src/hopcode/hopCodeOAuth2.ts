@@ -36,7 +36,7 @@ const QWEN_OAUTH_SCOPE = 'openid profile email model.completion';
 const QWEN_OAUTH_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';
 
 // File System Configuration
-const QWEN_DIR = '.hopcode';
+const HOPCODE_DIR = '.hopcode';
 const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
 
 /**
@@ -113,7 +113,7 @@ export class CredentialsClearRequiredError extends Error {
 /**
  * HopCode OAuth2 credentials interface
  */
-export interface QwenCredentials {
+export interface HopCodeCredentials {
   access_token?: string;
   refresh_token?: string;
   id_token?: string;
@@ -234,9 +234,9 @@ export type TokenRefreshResponse = TokenRefreshData | ErrorData;
 /**
  * HopCode OAuth2 client interface
  */
-export interface IQwenOAuth2Client {
-  setCredentials(credentials: QwenCredentials): void;
-  getCredentials(): QwenCredentials;
+export interface IHopCodeOAuth2Client {
+  setCredentials(credentials: HopCodeCredentials): void;
+  getCredentials(): HopCodeCredentials;
   getAccessToken(): Promise<{ token?: string }>;
   requestDeviceAuthorization(options: {
     scope: string;
@@ -253,19 +253,19 @@ export interface IQwenOAuth2Client {
 /**
  * HopCode OAuth2 client implementation
  */
-export class QwenOAuth2Client implements IQwenOAuth2Client {
-  private credentials: QwenCredentials = {};
+export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
+  private credentials: HopCodeCredentials = {};
   private sharedManager: SharedTokenManager;
 
   constructor() {
     this.sharedManager = SharedTokenManager.getInstance();
   }
 
-  setCredentials(credentials: QwenCredentials): void {
+  setCredentials(credentials: HopCodeCredentials): void {
     this.credentials = credentials;
   }
 
-  getCredentials(): QwenCredentials {
+  getCredentials(): HopCodeCredentials {
     return this.credentials;
   }
 
@@ -459,7 +459,7 @@ export class QwenOAuth2Client implements IQwenOAuth2Client {
 
     // Handle successful response
     const tokenData = responseData as TokenRefreshData;
-    const tokens: QwenCredentials = {
+    const tokens: HopCodeCredentials = {
       access_token: tokenData.access_token,
       token_type: tokenData.token_type,
       // Use new refresh token if provided, otherwise preserve existing one
@@ -502,8 +502,8 @@ export const hopCodeOAuth2Events = new EventEmitter();
 export async function getQwenOAuthClient(
   config: Config,
   options?: { requireCachedCredentials?: boolean },
-): Promise<QwenOAuth2Client> {
-  const client = new QwenOAuth2Client();
+): Promise<HopCodeOAuth2Client> {
+  const client = new HopCodeOAuth2Client();
 
   // Use shared token manager to get valid credentials with cross-session synchronization
   const sharedManager = SharedTokenManager.getInstance();
@@ -685,7 +685,7 @@ function showFallbackMessage(verificationUriComplete: string): void {
 }
 
 async function authWithQwenDeviceFlow(
-  client: QwenOAuth2Client,
+  client: HopCodeOAuth2Client,
   config: Config,
 ): Promise<AuthResult> {
   let isCancelled = false;
@@ -796,7 +796,7 @@ async function authWithQwenDeviceFlow(
           const tokenData = tokenResponse as DeviceTokenData;
 
           // Convert to HopCodeCredentials format
-          const credentials: QwenCredentials = {
+          const credentials: HopCodeCredentials = {
             access_token: tokenData.access_token!, // Safe to assert as non-null due to isDeviceTokenSuccess check
             refresh_token: tokenData.refresh_token || undefined,
             token_type: tokenData.token_type,
@@ -965,7 +965,7 @@ async function authWithQwenDeviceFlow(
   }
 }
 
-async function cacheQwenCredentials(credentials: QwenCredentials) {
+async function cacheQwenCredentials(credentials: HopCodeCredentials) {
   const filePath = getQwenCachedCredentialPath();
   try {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -1025,7 +1025,7 @@ export async function clearQwenCredentials(): Promise<void> {
 }
 
 function getQwenCachedCredentialPath(): string {
-  return path.join(os.homedir(), QWEN_DIR, QWEN_CREDENTIAL_FILENAME);
+  return path.join(os.homedir(), HOPCODE_DIR, QWEN_CREDENTIAL_FILENAME);
 }
 
 export const clearCachedCredentialFile = clearQwenCredentials;

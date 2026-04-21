@@ -28,7 +28,7 @@ import type {
 import { ToolNames } from '../tools/tool-names.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { getProposalsDir } from '../memory/proposalStore.js';
-import { QWEN_DIR } from '../config/storage.js';
+import { HOPCODE_DIR } from '../config/storage.js';
 
 const logger = createDebugLogger('EVOLVE_SERVICE');
 
@@ -57,7 +57,7 @@ export async function runEvolvePass(
   const projectRoot = config.getTargetDir();
   const evolveSkillsDir = path.join(
     projectRoot,
-    QWEN_DIR,
+    HOPCODE_DIR,
     EVOLVE_DIR_NAME,
     'skills',
   );
@@ -111,7 +111,7 @@ export async function runEvolvePass(
 }
 
 async function getExistingSkillNames(projectRoot: string): Promise<string[]> {
-  const skillsDir = path.join(projectRoot, QWEN_DIR, 'skills');
+  const skillsDir = path.join(projectRoot, HOPCODE_DIR, 'skills');
   try {
     const entries = await fs.readdir(skillsDir, { withFileTypes: true });
     return entries.filter((e) => e.isDirectory()).map((e) => e.name);

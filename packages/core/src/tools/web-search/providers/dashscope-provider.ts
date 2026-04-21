@@ -13,7 +13,7 @@ import type {
   WebSearchResultItem,
   DashScopeProviderConfig,
 } from '../types.js';
-import type { QwenCredentials } from '../../../hopcode/hopCodeOAuth2.js';
+import type { HopCodeCredentials } from '../../../hopcode/hopCodeOAuth2.js';
 
 interface DashScopeSearchItem {
   _id: string;
@@ -59,24 +59,24 @@ interface DashScopeSearchResponse {
 }
 
 // File System Configuration
-const QWEN_DIR = '.hopcode';
+const HOPCODE_DIR = '.hopcode';
 const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
 
 /**
  * Get the path to the cached OAuth credentials file.
  */
 function getQwenCachedCredentialPath(): string {
-  return path.join(os.homedir(), QWEN_DIR, QWEN_CREDENTIAL_FILENAME);
+  return path.join(os.homedir(), HOPCODE_DIR, QWEN_CREDENTIAL_FILENAME);
 }
 
 /**
  * Load cached HopCode OAuth credentials from disk.
  */
-async function loadQwenCredentials(): Promise<QwenCredentials | null> {
+async function loadQwenCredentials(): Promise<HopCodeCredentials | null> {
   try {
     const keyFile = getQwenCachedCredentialPath();
     const creds = await fs.readFile(keyFile, 'utf-8');
-    return JSON.parse(creds) as QwenCredentials;
+    return JSON.parse(creds) as HopCodeCredentials;
   } catch {
     return null;
   }

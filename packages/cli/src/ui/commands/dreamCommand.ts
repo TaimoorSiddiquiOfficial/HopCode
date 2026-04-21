@@ -7,7 +7,7 @@
 import {
   getAutoMemoryRoot,
   getProjectHash,
-  QWEN_DIR,
+  HOPCODE_DIR,
 } from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import type { SlashCommand } from './types.js';
@@ -32,7 +32,7 @@ export const dreamCommand: SlashCommand = {
     const projectRoot = config.getProjectRoot();
     const memoryRoot = getAutoMemoryRoot(projectRoot);
     const projectHash = getProjectHash(projectRoot);
-    const transcriptDir = `${QWEN_DIR}/tmp/${projectHash}/chats`;
+    const transcriptDir = `${HOPCODE_DIR}/tmp/${projectHash}/chats`;
 
     const prompt = config
       .getMemoryManager()

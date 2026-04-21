@@ -134,5 +134,5 @@ export {
   ApiRequestPhase,
   FileOperation,
 } from './metrics.js';
-export { QwenLogger } from './hopcode-logger/hopcode-logger.js';
+export { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 export { sanitizeHookName } from './sanitize.js';

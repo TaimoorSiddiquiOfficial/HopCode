@@ -70,7 +70,7 @@ import {
   recordMemoryDreamMetrics,
   recordMemoryRecallMetrics,
 } from './metrics.js';
-import { QwenLogger } from './hopcode-logger/hopcode-logger.js';
+import { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 import { isTelemetrySdkInitialized } from './sdk.js';
 import type {
   ApiErrorEvent,
@@ -135,7 +135,7 @@ export function logStartSession(
   config: Config,
   event: StartSessionEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logStartSessionEvent(event);
+  HopCodeLogger.getInstance(config)?.logStartSessionEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -171,7 +171,7 @@ export function logStartSession(
 }
 
 export function logUserPrompt(config: Config, event: UserPromptEvent): void {
-  QwenLogger.getInstance(config)?.logNewPromptEvent(event);
+  HopCodeLogger.getInstance(config)?.logNewPromptEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -199,7 +199,7 @@ export function logUserPrompt(config: Config, event: UserPromptEvent): void {
 }
 
 export function logUserRetry(config: Config, event: UserRetryEvent): void {
-  QwenLogger.getInstance(config)?.logRetryEvent(event);
+  HopCodeLogger.getInstance(config)?.logRetryEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -227,7 +227,7 @@ export function logToolCall(config: Config, event: ToolCallEvent): void {
   if (!isInternalPromptId(event.prompt_id)) {
     config.getChatRecordingService()?.recordUiTelemetryEvent(uiEvent);
   }
-  QwenLogger.getInstance(config)?.logToolCallEvent(event);
+  HopCodeLogger.getInstance(config)?.logToolCallEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -262,7 +262,7 @@ export function logToolOutputTruncated(
   config: Config,
   event: ToolOutputTruncatedEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logToolOutputTruncatedEvent(event);
+  HopCodeLogger.getInstance(config)?.logToolOutputTruncatedEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -284,7 +284,7 @@ export function logFileOperation(
   config: Config,
   event: FileOperationEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logFileOperationEvent(event);
+  HopCodeLogger.getInstance(config)?.logFileOperationEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -347,7 +347,7 @@ export function logFlashFallback(
   config: Config,
   event: FlashFallbackEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logFlashFallbackEvent(event);
+  HopCodeLogger.getInstance(config)?.logFlashFallbackEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -369,7 +369,7 @@ export function logRipgrepFallback(
   config: Config,
   event: RipgrepFallbackEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logRipgrepFallbackEvent(event);
+  HopCodeLogger.getInstance(config)?.logRipgrepFallbackEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -397,7 +397,7 @@ export function logApiError(config: Config, event: ApiErrorEvent): void {
   if (!isInternalPromptId(event.prompt_id)) {
     config.getChatRecordingService()?.recordUiTelemetryEvent(uiEvent);
   }
-  QwenLogger.getInstance(config)?.logApiErrorEvent(event);
+  HopCodeLogger.getInstance(config)?.logApiErrorEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -437,7 +437,7 @@ export function logApiCancel(config: Config, event: ApiCancelEvent): void {
     'event.timestamp': new Date().toISOString(),
   } as UiEvent;
   uiTelemetryService.addEvent(uiEvent);
-  QwenLogger.getInstance(config)?.logApiCancelEvent(event);
+  HopCodeLogger.getInstance(config)?.logApiCancelEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -466,7 +466,7 @@ export function logApiResponse(config: Config, event: ApiResponseEvent): void {
   if (!isInternalPromptId(event.prompt_id)) {
     config.getChatRecordingService()?.recordUiTelemetryEvent(uiEvent);
   }
-  QwenLogger.getInstance(config)?.logApiResponseEvent(event);
+  HopCodeLogger.getInstance(config)?.logApiResponseEvent(event);
   if (!isTelemetrySdkInitialized()) return;
   const attributes: LogAttributes = {
     ...getCommonAttributes(config),
@@ -519,7 +519,7 @@ export function logLoopDetected(
   config: Config,
   event: LoopDetectedEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logLoopDetectedEvent(event);
+  HopCodeLogger.getInstance(config)?.logLoopDetectedEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -539,14 +539,14 @@ export function logLoopDetectionDisabled(
   config: Config,
   _event: LoopDetectionDisabledEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logLoopDetectionDisabledEvent();
+  HopCodeLogger.getInstance(config)?.logLoopDetectionDisabledEvent();
 }
 
 export function logNextSpeakerCheck(
   config: Config,
   event: NextSpeakerCheckEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logNextSpeakerCheck(event);
+  HopCodeLogger.getInstance(config)?.logNextSpeakerCheck(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -567,7 +567,7 @@ export function logSlashCommand(
   config: Config,
   event: SlashCommandEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logSlashCommandEvent(event);
+  HopCodeLogger.getInstance(config)?.logSlashCommandEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -588,7 +588,7 @@ export function logIdeConnection(
   config: Config,
   event: IdeConnectionEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logIdeConnectionEvent(event);
+  HopCodeLogger.getInstance(config)?.logIdeConnectionEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -609,7 +609,7 @@ export function logConversationFinishedEvent(
   config: Config,
   event: ConversationFinishedEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logConversationFinishedEvent(event);
+  HopCodeLogger.getInstance(config)?.logConversationFinishedEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -630,7 +630,7 @@ export function logChatCompression(
   config: Config,
   event: ChatCompressionEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logChatCompressionEvent(event);
+  HopCodeLogger.getInstance(config)?.logChatCompressionEvent(event);
 
   const attributes: LogAttributes = {
     ...getCommonAttributes(config),
@@ -655,7 +655,7 @@ export function logKittySequenceOverflow(
   config: Config,
   event: KittySequenceOverflowEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logKittySequenceOverflowEvent(event);
+  HopCodeLogger.getInstance(config)?.logKittySequenceOverflowEvent(event);
   if (!isTelemetrySdkInitialized()) return;
   const attributes: LogAttributes = {
     ...getCommonAttributes(config),
@@ -673,7 +673,7 @@ export function logMalformedJsonResponse(
   config: Config,
   event: MalformedJsonResponseEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logMalformedJsonResponseEvent(event);
+  HopCodeLogger.getInstance(config)?.logMalformedJsonResponseEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -694,7 +694,7 @@ export function logInvalidChunk(
   config: Config,
   event: InvalidChunkEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logInvalidChunkEvent(event);
+  HopCodeLogger.getInstance(config)?.logInvalidChunkEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -720,7 +720,7 @@ export function logContentRetry(
   config: Config,
   event: ContentRetryEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logContentRetryEvent(event);
+  HopCodeLogger.getInstance(config)?.logContentRetryEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -742,7 +742,7 @@ export function logContentRetryFailure(
   config: Config,
   event: ContentRetryFailureEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logContentRetryFailureEvent(event);
+  HopCodeLogger.getInstance(config)?.logContentRetryFailureEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -764,7 +764,7 @@ export function logSubagentExecution(
   config: Config,
   event: SubagentExecutionEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logSubagentExecutionEvent(event);
+  HopCodeLogger.getInstance(config)?.logSubagentExecutionEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -792,7 +792,7 @@ export function logModelSlashCommand(
   config: Config,
   event: ModelSlashCommandEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logModelSlashCommandEvent(event);
+  HopCodeLogger.getInstance(config)?.logModelSlashCommandEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -812,14 +812,14 @@ export function logModelSlashCommand(
 
 export function logHookCall(config: Config, event: HookCallEvent): void {
   // Log to HopCodeLogger for RUM telemetry only
-  QwenLogger.getInstance(config)?.logHookCallEvent(event);
+  HopCodeLogger.getInstance(config)?.logHookCallEvent(event);
 }
 
 export function logExtensionInstallEvent(
   config: Config,
   event: ExtensionInstallEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logExtensionInstallEvent(event);
+  HopCodeLogger.getInstance(config)?.logExtensionInstallEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -845,7 +845,7 @@ export function logExtensionUninstall(
   config: Config,
   event: ExtensionUninstallEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logExtensionUninstallEvent(event);
+  HopCodeLogger.getInstance(config)?.logExtensionUninstallEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -867,7 +867,7 @@ export async function logExtensionUpdateEvent(
   config: Config,
   event: ExtensionUpdateEvent,
 ): Promise<void> {
-  QwenLogger.getInstance(config)?.logExtensionUpdateEvent(event);
+  HopCodeLogger.getInstance(config)?.logExtensionUpdateEvent(event);
 
   const attributes: LogAttributes = {
     ...getCommonAttributes(config),
@@ -893,7 +893,7 @@ export function logExtensionEnable(
   config: Config,
   event: ExtensionEnableEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logExtensionEnableEvent(event);
+  HopCodeLogger.getInstance(config)?.logExtensionEnableEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -915,7 +915,7 @@ export function logExtensionDisable(
   config: Config,
   event: ExtensionDisableEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logExtensionDisableEvent(event);
+  HopCodeLogger.getInstance(config)?.logExtensionDisableEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -934,7 +934,7 @@ export function logExtensionDisable(
 }
 
 export function logAuth(config: Config, event: AuthEvent): void {
-  QwenLogger.getInstance(config)?.logAuthEvent(event);
+  HopCodeLogger.getInstance(config)?.logAuthEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -988,7 +988,7 @@ export function logUserFeedback(
   } as UiEvent;
   uiTelemetryService.addEvent(uiEvent);
   config.getChatRecordingService()?.recordUiTelemetryEvent(uiEvent);
-  QwenLogger.getInstance(config)?.logUserFeedbackEvent(event);
+  HopCodeLogger.getInstance(config)?.logUserFeedbackEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -1010,7 +1010,7 @@ export function logArenaSessionStarted(
   config: Config,
   event: ArenaSessionStartedEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logArenaSessionStartedEvent(event);
+  HopCodeLogger.getInstance(config)?.logArenaSessionStartedEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -1034,7 +1034,7 @@ export function logArenaAgentCompleted(
   config: Config,
   event: ArenaAgentCompletedEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logArenaAgentCompletedEvent(event);
+  HopCodeLogger.getInstance(config)?.logArenaAgentCompletedEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -1064,7 +1064,7 @@ export function logArenaSessionEnded(
   config: Config,
   event: ArenaSessionEndedEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logArenaSessionEndedEvent(event);
+  HopCodeLogger.getInstance(config)?.logArenaSessionEndedEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {

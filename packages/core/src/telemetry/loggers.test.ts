@@ -58,7 +58,7 @@ import {
   logApiError,
 } from './loggers.js';
 import * as metrics from './metrics.js';
-import { QwenLogger } from './hopcode-logger/hopcode-logger.js';
+import { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 import * as sdk from './sdk.js';
 import { ToolCallDecision } from './tool-call-decision.js';
 import {
@@ -111,10 +111,10 @@ describe('loggers', () => {
   describe('logChatCompression', () => {
     beforeEach(() => {
       vi.spyOn(metrics, 'recordChatCompressionMetrics');
-      vi.spyOn(QwenLogger.prototype, 'logChatCompressionEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logChatCompressionEvent');
     });
 
-    it('logs the chat compression event to QwenLogger', () => {
+    it('logs the chat compression event to HopCodeLogger', () => {
       const mockConfig = makeFakeConfig({ sessionId: 'test-session-id' });
 
       const event = makeChatCompressionEvent({
@@ -124,9 +124,9 @@ describe('loggers', () => {
 
       logChatCompression(mockConfig, event);
 
-      expect(QwenLogger.prototype.logChatCompressionEvent).toHaveBeenCalledWith(
-        event,
-      );
+      expect(
+        HopCodeLogger.prototype.logChatCompressionEvent,
+      ).toHaveBeenCalledWith(event);
     });
 
     it('records the chat compression event to OTEL', () => {
@@ -535,7 +535,7 @@ describe('loggers', () => {
     } as unknown as Config;
 
     beforeEach(() => {
-      vi.spyOn(QwenLogger.prototype, 'logRipgrepFallbackEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logRipgrepFallbackEvent');
     });
 
     it('should log ripgrep fallback event', () => {
@@ -547,7 +547,9 @@ describe('loggers', () => {
 
       logRipgrepFallback(mockConfig, event);
 
-      expect(QwenLogger.prototype.logRipgrepFallbackEvent).toHaveBeenCalled();
+      expect(
+        HopCodeLogger.prototype.logRipgrepFallbackEvent,
+      ).toHaveBeenCalled();
 
       const emittedEvent = mockLogger.emit.mock.calls[0][0];
       expect(emittedEvent.body).toBe('Switching to grep as fallback.');
@@ -565,7 +567,9 @@ describe('loggers', () => {
 
       logRipgrepFallback(mockConfig, event);
 
-      expect(QwenLogger.prototype.logRipgrepFallbackEvent).toHaveBeenCalled();
+      expect(
+        HopCodeLogger.prototype.logRipgrepFallbackEvent,
+      ).toHaveBeenCalled();
 
       const emittedEvent = mockLogger.emit.mock.calls[0][0];
       expect(emittedEvent.body).toBe('Switching to grep as fallback.');
@@ -1151,7 +1155,7 @@ describe('loggers', () => {
 
   describe('logMalformedJsonResponse', () => {
     beforeEach(() => {
-      vi.spyOn(QwenLogger.prototype, 'logMalformedJsonResponseEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logMalformedJsonResponseEvent');
     });
 
     it('logs the event to Clearcut and OTEL', () => {
@@ -1161,7 +1165,7 @@ describe('loggers', () => {
       logMalformedJsonResponse(mockConfig, event);
 
       expect(
-        QwenLogger.prototype.logMalformedJsonResponseEvent,
+        HopCodeLogger.prototype.logMalformedJsonResponseEvent,
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
@@ -1277,7 +1281,7 @@ describe('loggers', () => {
     } as unknown as Config;
 
     beforeEach(() => {
-      vi.spyOn(QwenLogger.prototype, 'logExtensionInstallEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logExtensionInstallEvent');
     });
 
     afterEach(() => {
@@ -1295,7 +1299,7 @@ describe('loggers', () => {
       logExtensionInstallEvent(mockConfig, event);
 
       expect(
-        QwenLogger.prototype.logExtensionInstallEvent,
+        HopCodeLogger.prototype.logExtensionInstallEvent,
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
@@ -1320,7 +1324,7 @@ describe('loggers', () => {
     } as unknown as Config;
 
     beforeEach(() => {
-      vi.spyOn(QwenLogger.prototype, 'logExtensionUninstallEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logExtensionUninstallEvent');
     });
 
     afterEach(() => {
@@ -1333,7 +1337,7 @@ describe('loggers', () => {
       logExtensionUninstall(mockConfig, event);
 
       expect(
-        QwenLogger.prototype.logExtensionUninstallEvent,
+        HopCodeLogger.prototype.logExtensionUninstallEvent,
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
@@ -1356,7 +1360,7 @@ describe('loggers', () => {
     } as unknown as Config;
 
     beforeEach(() => {
-      vi.spyOn(QwenLogger.prototype, 'logExtensionEnableEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logExtensionEnableEvent');
     });
 
     afterEach(() => {
@@ -1368,9 +1372,9 @@ describe('loggers', () => {
 
       logExtensionEnable(mockConfig, event);
 
-      expect(QwenLogger.prototype.logExtensionEnableEvent).toHaveBeenCalledWith(
-        event,
-      );
+      expect(
+        HopCodeLogger.prototype.logExtensionEnableEvent,
+      ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
         body: 'Enabled extension vscode',
@@ -1392,7 +1396,7 @@ describe('loggers', () => {
     } as unknown as Config;
 
     beforeEach(() => {
-      vi.spyOn(QwenLogger.prototype, 'logExtensionDisableEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logExtensionDisableEvent');
     });
 
     afterEach(() => {
@@ -1405,7 +1409,7 @@ describe('loggers', () => {
       logExtensionDisable(mockConfig, event);
 
       expect(
-        QwenLogger.prototype.logExtensionDisableEvent,
+        HopCodeLogger.prototype.logExtensionDisableEvent,
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
@@ -1435,13 +1439,13 @@ describe('loggers', () => {
     };
 
     beforeEach(() => {
-      vi.spyOn(QwenLogger, 'getInstance').mockReturnValue(
-        mockQwenLogger as unknown as QwenLogger,
+      vi.spyOn(HopCodeLogger, 'getInstance').mockReturnValue(
+        mockQwenLogger as unknown as HopCodeLogger,
       );
       mockQwenLogger.logHookCallEvent.mockClear();
     });
 
-    it('should log a successful hook call to QwenLogger', () => {
+    it('should log a successful hook call to HopCodeLogger', () => {
       const event = new HookCallEvent(
         'UserPromptSubmit',
         'command',
@@ -1483,8 +1487,8 @@ describe('loggers', () => {
       expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
-    it('should handle when QwenLogger is not available', () => {
-      vi.spyOn(QwenLogger, 'getInstance').mockReturnValue(undefined);
+    it('should handle when HopCodeLogger is not available', () => {
+      vi.spyOn(HopCodeLogger, 'getInstance').mockReturnValue(undefined);
 
       const event = new HookCallEvent(
         'UserPromptSubmit',
@@ -1628,7 +1632,7 @@ describe('loggers', () => {
       }
     });
 
-    it('should pass the exact event object to QwenLogger', () => {
+    it('should pass the exact event object to HopCodeLogger', () => {
       const event = new HookCallEvent(
         'PreToolUse',
         'command',

@@ -213,7 +213,7 @@ export type {
 // Telemetry
 // ============================================================================
 
-export { QwenLogger } from './telemetry/hopcode-logger/hopcode-logger.js';
+export { HopCodeLogger } from './telemetry/hopcode-logger/hopcode-logger.js';
 export * from './telemetry/index.js';
 export {
   logAuth,

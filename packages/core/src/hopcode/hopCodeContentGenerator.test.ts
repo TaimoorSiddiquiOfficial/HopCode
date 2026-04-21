@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { IQwenOAuth2Client } from './hopCodeOAuth2.js';
-import { type QwenCredentials, type ErrorData } from './hopCodeOAuth2.js';
+import type { IHopCodeOAuth2Client } from './hopCodeOAuth2.js';
+import { type HopCodeCredentials, type ErrorData } from './hopCodeOAuth2.js';
 import type {
   GenerateContentParameters,
   GenerateContentResponse,
@@ -16,7 +16,7 @@ import type {
   EmbedContentResponse,
 } from '@google/genai';
 import { FinishReason } from '@google/genai';
-import { QwenContentGenerator } from './hopCodeContentGenerator.js';
+import type { HopCodeContentGenerator } from './hopCodeContentGenerator.js';
 import { SharedTokenManager } from './sharedTokenManager.js';
 import type { Config } from '../config/config.js';
 import { AuthType } from '../core/contentGenerator.js';
@@ -114,7 +114,7 @@ vi.mock('../core/openaiContentGenerator/pipeline.js', () => ({
 vi.mock('./sharedTokenManager.js', () => ({
   SharedTokenManager: class {
     private static instance: unknown = null;
-    private mockCredentials: QwenCredentials | null = null;
+    private mockCredentials: HopCodeCredentials | null = null;
     private shouldThrowError: boolean = false;
     private errorToThrow: Error | null = null;
 
@@ -126,8 +126,8 @@ vi.mock('./sharedTokenManager.js', () => ({
     }
 
     async getValidCredentials(
-      qwenClient: IQwenOAuth2Client,
-    ): Promise<QwenCredentials> {
+      qwenClient: IHopCodeOAuth2Client,
+    ): Promise<HopCodeCredentials> {
       // If we're configured to throw an error, do so
       if (this.shouldThrowError && this.errorToThrow) {
         throw this.errorToThrow;
@@ -196,7 +196,7 @@ vi.mock('./sharedTokenManager.js', () => ({
       };
     }
 
-    getCurrentCredentials(): QwenCredentials | null {
+    getCurrentCredentials(): HopCodeCredentials | null {
       return this.mockCredentials;
     }
 
@@ -205,7 +205,7 @@ vi.mock('./sharedTokenManager.js', () => ({
     }
 
     // Helper method for tests to set credentials
-    setMockCredentials(credentials: QwenCredentials | null): void {
+    setMockCredentials(credentials: HopCodeCredentials | null): void {
       this.mockCredentials = credentials;
     }
 
@@ -290,12 +290,12 @@ const createMockResponse = (text: string): GenerateContentResponse =>
     codeExecutionResult: '',
   }) as GenerateContentResponse;
 
-describe('QwenContentGenerator', () => {
-  let mockQwenClient: IQwenOAuth2Client;
-  let qwenContentGenerator: QwenContentGenerator;
+describe('HopCodeContentGenerator', () => {
+  let mockQwenClient: IHopCodeOAuth2Client;
+  let HopCodeContentGenerator: HopCodeContentGenerator;
   let mockConfig: Config;
 
-  const mockCredentials: QwenCredentials = {
+  const mockCredentials: HopCodeCredentials = {
     access_token: 'test-access-token',
     refresh_token: 'test-refresh-token',
     resource_url: 'https://test-endpoint.com/v1',
@@ -344,7 +344,7 @@ describe('QwenContentGenerator', () => {
       timeout: 120000,
       maxRetries: 3,
     };
-    qwenContentGenerator = new QwenContentGenerator(
+    HopCodeContentGenerator = new HopCodeContentGenerator(
       mockQwenClient,
       contentGeneratorConfig,
       mockConfig,
@@ -367,7 +367,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      const result = await qwenContentGenerator.generateContent(
+      const result = await HopCodeContentGenerator.generateContent(
         request,
         'test-prompt-id',
       );
@@ -387,7 +387,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello stream' }] }],
       };
 
-      const stream = await qwenContentGenerator.generateContentStream(
+      const stream = await HopCodeContentGenerator.generateContentStream(
         request,
         'test-prompt-id',
       );
@@ -410,7 +410,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Count me' }] }],
       };
 
-      const result = await qwenContentGenerator.countTokens(request);
+      const result = await HopCodeContentGenerator.countTokens(request);
 
       expect(result.totalTokens).toBe(15);
       // countTokens is a local operation and should not require OAuth credentials
@@ -428,7 +428,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ parts: [{ text: 'Embed me' }] }],
       };
 
-      const result = await qwenContentGenerator.embedContent(request);
+      const result = await HopCodeContentGenerator.embedContent(request);
 
       expect(result.embeddings).toHaveLength(1);
       expect(result.embeddings?.[0]?.values).toEqual([0.1, 0.2, 0.3]);
@@ -467,7 +467,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      const result = await qwenContentGenerator.generateContent(
+      const result = await HopCodeContentGenerator.generateContent(
         request,
         'test-prompt-id',
       );
@@ -509,7 +509,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello stream' }] }],
       };
 
-      const stream = await qwenContentGenerator.generateContentStream(
+      const stream = await HopCodeContentGenerator.generateContentStream(
         request,
         'test-prompt-id',
       );
@@ -540,7 +540,7 @@ describe('QwenContentGenerator', () => {
       };
 
       await expect(
-        qwenContentGenerator.generateContent(request, 'test-prompt-id'),
+        HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
       ).rejects.toThrow(
         'Failed to obtain valid Qwen access token. Please re-authenticate.',
       );
@@ -563,7 +563,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      await qwenContentGenerator.generateContent(request, 'test-prompt-id');
+      await HopCodeContentGenerator.generateContent(request, 'test-prompt-id');
 
       expect(mockQwenClient.getCredentials).toHaveBeenCalled();
     });
@@ -584,11 +584,11 @@ describe('QwenContentGenerator', () => {
 
       // Mock the parent's generateContent to capture the baseURL during the call
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = vi.fn().mockImplementation(function (
-        this: QwenContentGenerator,
+        this: HopCodeContentGenerator,
       ) {
         capturedBaseURL = (
           this as unknown as { pipeline: { client: { baseURL: string } } }
@@ -601,7 +601,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      await qwenContentGenerator.generateContent(request, 'test-prompt-id');
+      await HopCodeContentGenerator.generateContent(request, 'test-prompt-id');
 
       // Should use default endpoint with /v1 suffix
       expect(capturedBaseURL).toBe(
@@ -625,11 +625,11 @@ describe('QwenContentGenerator', () => {
 
       // Mock the parent's generateContent to capture the baseURL during the call
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = vi.fn().mockImplementation(function (
-        this: QwenContentGenerator,
+        this: HopCodeContentGenerator,
       ) {
         capturedBaseURL = (
           this as unknown as { pipeline: { client: { baseURL: string } } }
@@ -642,7 +642,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      await qwenContentGenerator.generateContent(request, 'test-prompt-id');
+      await HopCodeContentGenerator.generateContent(request, 'test-prompt-id');
 
       // Should add https:// and /v1
       expect(capturedBaseURL).toBe('https://custom-endpoint.com/v1');
@@ -664,11 +664,11 @@ describe('QwenContentGenerator', () => {
 
       // Mock the parent's generateContent to capture the baseURL during the call
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = vi.fn().mockImplementation(function (
-        this: QwenContentGenerator,
+        this: HopCodeContentGenerator,
       ) {
         capturedBaseURL = (
           this as unknown as { pipeline: { client: { baseURL: string } } }
@@ -681,7 +681,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      await qwenContentGenerator.generateContent(request, 'test-prompt-id');
+      await HopCodeContentGenerator.generateContent(request, 'test-prompt-id');
 
       // Should preserve https:// and add /v1
       expect(capturedBaseURL).toBe('https://custom-endpoint.com/v1');
@@ -703,11 +703,11 @@ describe('QwenContentGenerator', () => {
 
       // Mock the parent's generateContent to capture the baseURL during the call
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = vi.fn().mockImplementation(function (
-        this: QwenContentGenerator,
+        this: HopCodeContentGenerator,
       ) {
         capturedBaseURL = (
           this as unknown as { pipeline: { client: { baseURL: string } } }
@@ -720,7 +720,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      await qwenContentGenerator.generateContent(request, 'test-prompt-id');
+      await HopCodeContentGenerator.generateContent(request, 'test-prompt-id');
 
       // Should not duplicate /v1
       expect(capturedBaseURL).toBe('https://custom-endpoint.com/v1');
@@ -733,7 +733,7 @@ describe('QwenContentGenerator', () => {
   describe('Client State Management', () => {
     it('should set dynamic credentials during operations', async () => {
       const client = (
-        qwenContentGenerator as unknown as {
+        HopCodeContentGenerator as unknown as {
           pipeline: { client: { apiKey: string; baseURL: string } };
         }
       ).pipeline.client;
@@ -752,7 +752,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      await qwenContentGenerator.generateContent(request, 'test-prompt-id');
+      await HopCodeContentGenerator.generateContent(request, 'test-prompt-id');
 
       // Should have dynamic credentials set
       expect(client.apiKey).toBe('temp-token');
@@ -761,7 +761,7 @@ describe('QwenContentGenerator', () => {
 
     it('should set credentials even when operation throws', async () => {
       const client = (
-        qwenContentGenerator as unknown as {
+        HopCodeContentGenerator as unknown as {
           pipeline: { client: { apiKey: string; baseURL: string } };
         }
       ).pipeline.client;
@@ -777,7 +777,7 @@ describe('QwenContentGenerator', () => {
       // Mock the parent method to throw an error
       const mockError = new Error('Network error');
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = vi.fn().mockRejectedValue(mockError);
@@ -788,7 +788,10 @@ describe('QwenContentGenerator', () => {
       };
 
       try {
-        await qwenContentGenerator.generateContent(request, 'test-prompt-id');
+        await HopCodeContentGenerator.generateContent(
+          request,
+          'test-prompt-id',
+        );
       } catch (error) {
         expect(error).toBe(mockError);
       }
@@ -814,7 +817,7 @@ describe('QwenContentGenerator', () => {
 
       // Replace the parent method
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = mockGenerateContent;
@@ -848,7 +851,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
-      const result = await qwenContentGenerator.generateContent(
+      const result = await HopCodeContentGenerator.generateContent(
         request,
         'test-prompt-id',
       );
@@ -866,7 +869,7 @@ describe('QwenContentGenerator', () => {
 
       const mockGenerateContent = vi.fn().mockRejectedValue(networkError);
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = mockGenerateContent;
@@ -882,7 +885,7 @@ describe('QwenContentGenerator', () => {
       };
 
       await expect(
-        qwenContentGenerator.generateContent(request, 'test-prompt-id'),
+        HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
       ).rejects.toThrow('Network timeout');
       expect(mockGenerateContent).toHaveBeenCalledTimes(1);
       expect(mockQwenClient.refreshAccessToken).not.toHaveBeenCalled();
@@ -906,40 +909,40 @@ describe('QwenContentGenerator', () => {
       };
 
       await expect(
-        qwenContentGenerator.generateContent(request, 'test-prompt-id'),
+        HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
       ).rejects.toThrow('Failed to obtain valid Qwen access token');
     });
   });
 
   describe('Token State Management', () => {
     it('should cache and return current token', () => {
-      expect(qwenContentGenerator.getCurrentToken()).toBeNull();
+      expect(HopCodeContentGenerator.getCurrentToken()).toBeNull();
 
       // Simulate setting a token internally
       (
-        qwenContentGenerator as unknown as { currentToken: string }
+        HopCodeContentGenerator as unknown as { currentToken: string }
       ).currentToken = 'cached-token';
 
-      expect(qwenContentGenerator.getCurrentToken()).toBe('cached-token');
+      expect(HopCodeContentGenerator.getCurrentToken()).toBe('cached-token');
     });
 
     it('should clear token on clearToken()', () => {
       // Simulate having cached token value
-      const qwenInstance = qwenContentGenerator as unknown as {
+      const qwenInstance = HopCodeContentGenerator as unknown as {
         currentToken: string;
       };
       qwenInstance.currentToken = 'cached-token';
 
-      qwenContentGenerator.clearToken();
+      HopCodeContentGenerator.clearToken();
 
-      expect(qwenContentGenerator.getCurrentToken()).toBeNull();
+      expect(HopCodeContentGenerator.getCurrentToken()).toBeNull();
     });
 
     it('should handle concurrent token refresh requests', async () => {
       let refreshCallCount = 0;
 
       // Clear any existing cached token first
-      qwenContentGenerator.clearToken();
+      HopCodeContentGenerator.clearToken();
 
       // Mock to simulate auth error on first parent call, which should trigger refresh
       const authError = { status: 401, message: 'Unauthorized' };
@@ -962,7 +965,7 @@ describe('QwenContentGenerator', () => {
 
       // Mock the parent method to fail first then succeed
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = vi.fn().mockImplementation(async () => {
@@ -980,9 +983,9 @@ describe('QwenContentGenerator', () => {
 
       // Make multiple concurrent requests - should all use the same refresh promise
       const promises = [
-        qwenContentGenerator.generateContent(request, 'test-prompt-id'),
-        qwenContentGenerator.generateContent(request, 'test-prompt-id'),
-        qwenContentGenerator.generateContent(request, 'test-prompt-id'),
+        HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
+        HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
+        HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
       ];
 
       const results = await Promise.all(promises);
@@ -1014,7 +1017,7 @@ describe('QwenContentGenerator', () => {
 
       authErrors.forEach((error) => {
         const shouldSuppress = (
-          qwenContentGenerator as unknown as {
+          HopCodeContentGenerator as unknown as {
             shouldSuppressErrorLogging: (
               error: unknown,
               request: GenerateContentParameters,
@@ -1035,7 +1038,7 @@ describe('QwenContentGenerator', () => {
 
       nonAuthErrors.forEach((error) => {
         const shouldSuppress = (
-          qwenContentGenerator as unknown as {
+          HopCodeContentGenerator as unknown as {
             shouldSuppressErrorLogging: (
               error: unknown,
               request: GenerateContentParameters,
@@ -1062,7 +1065,7 @@ describe('QwenContentGenerator', () => {
       });
 
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       parentPrototype.generateContent = mockGenerateContent;
 
@@ -1096,7 +1099,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Test message' }] }],
       };
 
-      const result = await qwenContentGenerator.generateContent(
+      const result = await HopCodeContentGenerator.generateContent(
         request,
         'test-prompt-id',
       );
@@ -1126,7 +1129,7 @@ describe('QwenContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       // Create new instance to pick up the mock
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1161,7 +1164,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1194,7 +1197,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1240,7 +1243,7 @@ describe('QwenContentGenerator', () => {
           resource_url: input,
         });
 
-        const generator = qwenContentGenerator as unknown as {
+        const generator = HopCodeContentGenerator as unknown as {
           getCurrentEndpoint: (resourceUrl?: string) => string;
         };
 
@@ -1265,7 +1268,7 @@ describe('QwenContentGenerator', () => {
       ];
 
       endpoints.forEach(({ input, expected }) => {
-        const generator = qwenContentGenerator as unknown as {
+        const generator = HopCodeContentGenerator as unknown as {
           getCurrentEndpoint: (resourceUrl?: string) => string;
         };
 
@@ -1274,7 +1277,7 @@ describe('QwenContentGenerator', () => {
     });
 
     it('should handle undefined resource URL', () => {
-      const generator = qwenContentGenerator as unknown as {
+      const generator = HopCodeContentGenerator as unknown as {
         getCurrentEndpoint: (resourceUrl?: string) => string;
       };
 
@@ -1284,7 +1287,7 @@ describe('QwenContentGenerator', () => {
     });
 
     it('should handle empty resource URL', () => {
-      const generator = qwenContentGenerator as unknown as {
+      const generator = HopCodeContentGenerator as unknown as {
         getCurrentEndpoint: (resourceUrl?: string) => string;
       };
 
@@ -1305,7 +1308,7 @@ describe('QwenContentGenerator', () => {
       ];
 
       authErrors.forEach((error) => {
-        const generator = qwenContentGenerator as unknown as {
+        const generator = HopCodeContentGenerator as unknown as {
           isAuthError: (error: unknown) => boolean;
         };
         expect(generator.isAuthError(error)).toBe(true);
@@ -1313,7 +1316,7 @@ describe('QwenContentGenerator', () => {
 
       // 400 is not typically an auth error, it's bad request
       const nonAuthError = { status: 400 };
-      const generator = qwenContentGenerator as unknown as {
+      const generator = HopCodeContentGenerator as unknown as {
         isAuthError: (error: unknown) => boolean;
       };
       expect(generator.isAuthError(nonAuthError)).toBe(false);
@@ -1334,7 +1337,7 @@ describe('QwenContentGenerator', () => {
 
       authMessages.forEach((message) => {
         const error = new Error(message);
-        const generator = qwenContentGenerator as unknown as {
+        const generator = HopCodeContentGenerator as unknown as {
           isAuthError: (error: unknown) => boolean;
         };
         expect(generator.isAuthError(error)).toBe(true);
@@ -1356,7 +1359,7 @@ describe('QwenContentGenerator', () => {
       ];
 
       nonAuthErrors.forEach((error) => {
-        const generator = qwenContentGenerator as unknown as {
+        const generator = HopCodeContentGenerator as unknown as {
           isAuthError: (error: unknown) => boolean;
         };
         expect(generator.isAuthError(error)).toBe(false);
@@ -1372,7 +1375,7 @@ describe('QwenContentGenerator', () => {
 
       // These should not be identified as auth errors because the method only looks at top-level properties
       complexErrors.forEach((error) => {
-        const generator = qwenContentGenerator as unknown as {
+        const generator = HopCodeContentGenerator as unknown as {
           isAuthError: (error: unknown) => boolean;
         };
         expect(generator.isAuthError(error)).toBe(false);
@@ -1383,7 +1386,7 @@ describe('QwenContentGenerator', () => {
   describe('Stream Error Handling', () => {
     it('should set credentials when stream generation fails', async () => {
       const client = (
-        qwenContentGenerator as unknown as {
+        HopCodeContentGenerator as unknown as {
           pipeline: { client: { apiKey: string; baseURL: string } };
         }
       ).pipeline.client;
@@ -1399,7 +1402,7 @@ describe('QwenContentGenerator', () => {
 
       // Mock parent method to throw error
       const parentPrototype = Object.getPrototypeOf(
-        Object.getPrototypeOf(qwenContentGenerator),
+        Object.getPrototypeOf(HopCodeContentGenerator),
       );
       const originalGenerateContentStream =
         parentPrototype.generateContentStream;
@@ -1413,7 +1416,7 @@ describe('QwenContentGenerator', () => {
       };
 
       try {
-        await qwenContentGenerator.generateContentStream(
+        await HopCodeContentGenerator.generateContentStream(
           request,
           'test-prompt-id',
         );
@@ -1431,7 +1434,7 @@ describe('QwenContentGenerator', () => {
 
     it('should set credentials for successful streams', async () => {
       const client = (
-        qwenContentGenerator as unknown as {
+        HopCodeContentGenerator as unknown as {
           pipeline: { client: { apiKey: string; baseURL: string } };
         }
       ).pipeline.client;
@@ -1453,7 +1456,7 @@ describe('QwenContentGenerator', () => {
 
       // Set the SharedTokenManager mock to return stream credentials
       const mockTokenManager = SharedTokenManager.getInstance() as unknown as {
-        setMockCredentials: (credentials: QwenCredentials | null) => void;
+        setMockCredentials: (credentials: HopCodeCredentials | null) => void;
       };
       mockTokenManager.setMockCredentials(streamCredentials);
 
@@ -1462,7 +1465,7 @@ describe('QwenContentGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Stream test' }] }],
       };
 
-      const stream = await qwenContentGenerator.generateContentStream(
+      const stream = await HopCodeContentGenerator.generateContentStream(
         request,
         'test-prompt-id',
       );
@@ -1498,7 +1501,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1519,7 +1522,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1542,7 +1545,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1563,7 +1566,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1579,7 +1582,7 @@ describe('QwenContentGenerator', () => {
 
   describe('Constructor and Initialization', () => {
     it('should initialize with configured base URL when provided', () => {
-      const generator = new QwenContentGenerator(
+      const generator = new HopCodeContentGenerator(
         mockQwenClient,
         {
           model: 'qwen-turbo',
@@ -1599,7 +1602,7 @@ describe('QwenContentGenerator', () => {
     });
 
     it('should get SharedTokenManager instance', () => {
-      const generator = new QwenContentGenerator(
+      const generator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1625,7 +1628,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,
@@ -1654,7 +1657,7 @@ describe('QwenContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new QwenContentGenerator(
+      const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
         mockConfig,

@@ -11,18 +11,18 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Config } from '../config/config.js';
 import type { RumEvent } from './hopcode-logger/event-types.js';
-import { QwenLogger } from './hopcode-logger/hopcode-logger.js';
+import { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 
 describe('Circular Reference Integration Test', () => {
   beforeEach(() => {
     // Clear singleton instance before each test
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (QwenLogger as any).instance = undefined;
+    (HopCodeLogger as any).instance = undefined;
   });
 
   afterEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (QwenLogger as any).instance = undefined;
+    (HopCodeLogger as any).instance = undefined;
   });
 
   it('should handle HttpsProxyAgent-like circular references in qwen logging', () => {
@@ -69,7 +69,7 @@ describe('Circular Reference Integration Test', () => {
     } as RumEvent;
 
     // Test that HopCodeLogger can handle this
-    const logger = QwenLogger.getInstance(mockConfig);
+    const logger = HopCodeLogger.getInstance(mockConfig);
 
     expect(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,7 +85,7 @@ describe('Circular Reference Integration Test', () => {
       getDebugMode: () => true,
     } as unknown as Config;
 
-    const logger = QwenLogger.getInstance(mockConfig);
+    const logger = HopCodeLogger.getInstance(mockConfig);
 
     // Add more events than the maximum capacity
     for (let i = 0; i < 1100; i++) {

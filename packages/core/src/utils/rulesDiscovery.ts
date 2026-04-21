@@ -20,7 +20,7 @@ import { homedir } from 'node:os';
 import picomatch from 'picomatch';
 import { parse as parseYaml } from './yaml-parser.js';
 import { normalizeContent } from './textUtils.js';
-import { QWEN_DIR } from './paths.js';
+import { HOPCODE_DIR } from './paths.js';
 import { createDebugLogger } from './debugLogger.js';
 
 const logger = createDebugLogger('RULES_DISCOVERY');
@@ -154,7 +154,7 @@ async function loadRulesFromDir(
   if (allPaths.length === 0) return [];
 
   // Sort for deterministic ordering. Use Array.sort() default (UTF-16 code
-  // point comparison) rather than localeCompare — locale-dependent sorting
+  // point comparison) rather than localeCompare ï¿½ locale-dependent sorting
   // can produce different orders on machines with different locales.
   allPaths.sort();
 
@@ -201,7 +201,7 @@ export function formatRules(rules: RuleFile[], projectRoot: string): string {
         : rule.filePath;
       // Normalize to forward slashes for cross-platform consistency in the
       // system prompt. Glob patterns in `paths:` use forward slashes, so
-      // display paths should match — otherwise Windows shows `.hopcode\rules\foo.md`
+      // display paths should match ï¿½ otherwise Windows shows `.hopcode\rules\foo.md`
       // and Linux shows `.hopcode/rules/foo.md`, which is confusing in diffs/tests.
       const displayPath = rawDisplayPath.replace(/\\/g, '/');
       return (
@@ -266,7 +266,7 @@ export class ConditionalRulesRegistry {
       .replace(/\\/g, '/');
 
     // Paths outside the project root produce `../` prefixes (or exact `..`
-    // when the target equals the parent of projectRoot) — don't inject rules
+    // when the target equals the parent of projectRoot) ï¿½ don't inject rules
     // for files outside the project boundary.
     if (relativePath === '..' || relativePath.startsWith('../')) {
       return undefined;
@@ -325,7 +325,7 @@ export async function loadRules(
   const allRules: RuleFile[] = [];
 
   // 1. Global rules: ~/.hopcode/rules/
-  const globalRulesDir = path.join(homedir(), QWEN_DIR, 'rules');
+  const globalRulesDir = path.join(homedir(), HOPCODE_DIR, 'rules');
   const globalRules = await loadRulesFromDir(globalRulesDir, excludes);
   allRules.push(...globalRules);
   logger.debug(`Loaded ${globalRules.length} global rule(s)`);
@@ -333,14 +333,14 @@ export async function loadRules(
   // 2. Project-level rules: <projectRoot>/.hopcode/rules/  (trusted only)
   //    Skip if it resolves to the same directory as global rules.
   if (folderTrust) {
-    const projectRulesDir = path.join(projectRoot, QWEN_DIR, 'rules');
+    const projectRulesDir = path.join(projectRoot, HOPCODE_DIR, 'rules');
     if (path.resolve(projectRulesDir) !== path.resolve(globalRulesDir)) {
       const projectRules = await loadRulesFromDir(projectRulesDir, excludes);
       allRules.push(...projectRules);
       logger.debug(`Loaded ${projectRules.length} project rule(s)`);
     } else {
       logger.debug(
-        'Project rules dir same as global — skipping to avoid duplicates',
+        'Project rules dir same as global ï¿½ skipping to avoid duplicates',
       );
     }
   }

@@ -9,7 +9,7 @@ import {
   runForkedAgent,
   type ForkedAgentResult,
 } from '../utils/forkedAgent.js';
-import { getProjectHash, QWEN_DIR } from '../utils/paths.js';
+import { getProjectHash, HOPCODE_DIR } from '../utils/paths.js';
 import {
   AUTO_MEMORY_INDEX_FILENAME,
   getAutoMemoryRoot,
@@ -162,7 +162,7 @@ Rules:
 
 function getTranscriptDir(projectRoot: string): string {
   const projectHash = getProjectHash(projectRoot);
-  return `${QWEN_DIR}/tmp/${projectHash}/chats`;
+  return `${HOPCODE_DIR}/tmp/${projectHash}/chats`;
 }
 
 export function buildConsolidationTaskPrompt(

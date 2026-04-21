@@ -315,7 +315,7 @@ export async function createContentGenerator(
     const { getQwenOAuthClient: getQwenOauthClient } = await import(
       '../hopcode/hopCodeOAuth2.js'
     );
-    const { QwenContentGenerator } = await import(
+    const { HopCodeContentGenerator } = await import(
       '../hopcode/hopCodeContentGenerator.js'
     );
 
@@ -324,7 +324,7 @@ export async function createContentGenerator(
         config,
         isInitialAuth ? { requireCachedCredentials: true } : undefined,
       );
-      baseGenerator = new QwenContentGenerator(
+      baseGenerator = new HopCodeContentGenerator(
         qwenClient,
         generatorConfig,
         config,

@@ -5,9 +5,9 @@
  */
 
 import type { GitIgnoreFilter } from '../utils/gitIgnoreParser.js';
-import type { QwenIgnoreFilter } from '../utils/qwenIgnoreParser.js';
+import type { HopCodeIgnoreFilter } from '../utils/hopCodeIgnoreParser.js';
 import { GitIgnoreParser } from '../utils/gitIgnoreParser.js';
-import { QwenIgnoreParser } from '../utils/qwenIgnoreParser.js';
+import { HopCodeIgnoreParser } from '../utils/hopCodeIgnoreParser.js';
 import { isGitRepository } from '../utils/gitUtils.js';
 import * as path from 'node:path';
 
@@ -19,12 +19,12 @@ export interface FilterFilesOptions {
 export interface FilterReport {
   filteredPaths: string[];
   gitIgnoredCount: number;
-  qwenIgnoredCount: number;
+  hopCodeIgnoredCount: number;
 }
 
 export class FileDiscoveryService {
   private gitIgnoreFilter: GitIgnoreFilter | null = null;
-  private qwenIgnoreFilter: QwenIgnoreFilter | null = null;
+  private HopCodeIgnoreFilter: HopCodeIgnoreFilter | null = null;
   private projectRoot: string;
 
   constructor(projectRoot: string) {
@@ -32,7 +32,7 @@ export class FileDiscoveryService {
     if (isGitRepository(this.projectRoot)) {
       this.gitIgnoreFilter = new GitIgnoreParser(this.projectRoot);
     }
-    this.qwenIgnoreFilter = new QwenIgnoreParser(this.projectRoot);
+    this.HopCodeIgnoreFilter = new HopCodeIgnoreParser(this.projectRoot);
   }
 
   /**
@@ -69,7 +69,7 @@ export class FileDiscoveryService {
   ): FilterReport {
     const filteredPaths: string[] = [];
     let gitIgnoredCount = 0;
-    let qwenIgnoredCount = 0;
+    let hopCodeIgnoredCount = 0;
 
     for (const filePath of filePaths) {
       if (opts.respectGitIgnore && this.shouldGitIgnoreFile(filePath)) {
@@ -78,7 +78,7 @@ export class FileDiscoveryService {
       }
 
       if (opts.respectHopCodeIgnore && this.shouldQwenIgnoreFile(filePath)) {
-        qwenIgnoredCount++;
+        hopCodeIgnoredCount++;
         continue;
       }
 
@@ -88,7 +88,7 @@ export class FileDiscoveryService {
     return {
       filteredPaths,
       gitIgnoredCount,
-      qwenIgnoredCount,
+      hopCodeIgnoredCount,
     };
   }
 
@@ -106,8 +106,8 @@ export class FileDiscoveryService {
    * Checks if a single file should be hopcode-ignored
    */
   shouldQwenIgnoreFile(filePath: string): boolean {
-    if (this.qwenIgnoreFilter) {
-      return this.qwenIgnoreFilter.isIgnored(filePath);
+    if (this.HopCodeIgnoreFilter) {
+      return this.HopCodeIgnoreFilter.isIgnored(filePath);
     }
     return false;
   }
@@ -137,6 +137,6 @@ export class FileDiscoveryService {
    * Returns loaded patterns from .hopcodeignore
    */
   getQwenIgnorePatterns(): string[] {
-    return this.qwenIgnoreFilter?.getPatterns() ?? [];
+    return this.HopCodeIgnoreFilter?.getPatterns() ?? [];
   }
 }

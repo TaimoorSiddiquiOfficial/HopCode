@@ -6,7 +6,7 @@
 
 import { OpenAIContentGenerator } from '../core/openaiContentGenerator/index.js';
 import { DashScopeOpenAICompatibleProvider } from '../core/openaiContentGenerator/provider/dashscope.js';
-import type { IQwenOAuth2Client } from './hopCodeOAuth2.js';
+import type { IHopCodeOAuth2Client } from './hopCodeOAuth2.js';
 import { SharedTokenManager } from './sharedTokenManager.js';
 import { type Config } from '../config/config.js';
 import type {
@@ -24,14 +24,14 @@ import { createDebugLogger } from '../utils/debugLogger.js';
 /**
  * HopCode Content Generator that uses HopCode OAuth tokens with automatic refresh
  */
-export class QwenContentGenerator extends OpenAIContentGenerator {
+export class HopCodeContentGenerator extends OpenAIContentGenerator {
   private readonly debugLogger = createDebugLogger('QWEN');
-  private qwenClient: IQwenOAuth2Client;
+  private qwenClient: IHopCodeOAuth2Client;
   private sharedManager: SharedTokenManager;
   private currentToken?: string;
 
   constructor(
-    qwenClient: IQwenOAuth2Client,
+    qwenClient: IHopCodeOAuth2Client,
     contentGeneratorConfig: ContentGeneratorConfig,
     cliConfig: Config,
   ) {

@@ -11,7 +11,7 @@ import * as dotenv from 'dotenv';
 import process from 'node:process';
 import {
   FatalConfigError,
-  QWEN_DIR,
+  HOPCODE_DIR,
   getErrorMessage,
   Storage,
   createDebugLogger,
@@ -495,7 +495,7 @@ function findEnvFile(settings: Settings, startDir: string): string | null {
   // Pre-compute user-level .env paths for fast comparison
   const userLevelPaths = new Set([
     path.normalize(path.join(homeDir, '.env')),
-    path.normalize(path.join(homeDir, QWEN_DIR, '.env')),
+    path.normalize(path.join(homeDir, HOPCODE_DIR, '.env')),
   ]);
 
   // Determine if we can use this .env file based on trust settings
@@ -504,8 +504,8 @@ function findEnvFile(settings: Settings, startDir: string): string | null {
 
   let currentDir = path.resolve(startDir);
   while (true) {
-    // Prefer gemini-specific .env under QWEN_DIR
-    const geminiEnvPath = path.join(currentDir, QWEN_DIR, '.env');
+    // Prefer gemini-specific .env under HOPCODE_DIR
+    const geminiEnvPath = path.join(currentDir, HOPCODE_DIR, '.env');
     if (fs.existsSync(geminiEnvPath) && canUseEnvFile(geminiEnvPath)) {
       return geminiEnvPath;
     }
@@ -518,7 +518,7 @@ function findEnvFile(settings: Settings, startDir: string): string | null {
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir || !parentDir) {
       // At home directory - check fallback .env files
-      const homeGeminiEnvPath = path.join(homeDir, QWEN_DIR, '.env');
+      const homeGeminiEnvPath = path.join(homeDir, HOPCODE_DIR, '.env');
       if (fs.existsSync(homeGeminiEnvPath)) {
         return homeGeminiEnvPath;
       }
@@ -580,7 +580,7 @@ export function loadEnvironment(settings: Settings): void {
 
       const excludedVars =
         settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
-      const isProjectEnvFile = !envFilePath.includes(QWEN_DIR);
+      const isProjectEnvFile = !envFilePath.includes(HOPCODE_DIR);
 
       for (const key in parsedEnv) {
         if (Object.hasOwn(parsedEnv, key)) {

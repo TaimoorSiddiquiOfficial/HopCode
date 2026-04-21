@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { QWEN_DIR, sanitizeCwd } from '../utils/paths.js';
+import { HOPCODE_DIR, sanitizeCwd } from '../utils/paths.js';
 import type { AutoMemoryType } from './types.js';
 
 export const AUTO_MEMORY_DIRNAME = 'memory';
@@ -87,10 +87,10 @@ export function getMemoryBaseDir(): string {
   if (process.env['HOPCODE_MEMORY_BASE_DIR']) {
     return process.env['HOPCODE_MEMORY_BASE_DIR'];
   }
-  return path.join(os.homedir(), QWEN_DIR);
+  return path.join(os.homedir(), HOPCODE_DIR);
 }
 
-// Memoize by projectRoot — findCanonicalGitRoot() walks the file system (existsSync
+// Memoize by projectRoot ï¿½ findCanonicalGitRoot() walks the file system (existsSync
 // per directory) and is called from hot-path code such as schedulers and scanners.
 const _autoMemoryRootCache = new Map<string, string>();
 
@@ -100,7 +100,7 @@ export function getAutoMemoryRoot(projectRoot: string): string {
 
   let result: string;
   if (process.env['HOPCODE_MEMORY_LOCAL'] === '1') {
-    result = path.join(projectRoot, QWEN_DIR, AUTO_MEMORY_DIRNAME);
+    result = path.join(projectRoot, HOPCODE_DIR, AUTO_MEMORY_DIRNAME);
   } else {
     const canonicalRoot =
       findCanonicalGitRoot(projectRoot) ?? path.resolve(projectRoot);

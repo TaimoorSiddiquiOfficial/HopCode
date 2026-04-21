@@ -12,7 +12,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import {
   getAllGeminiMdFilenames,
-  QWEN_DIR,
+  HOPCODE_DIR,
   getAutoMemoryRoot,
   getAutoMemoryProjectStateDir,
 } from '@hoptrendy/hopcode-core';
@@ -125,7 +125,7 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
     () =>
       path.join(
         os.homedir(),
-        QWEN_DIR,
+        HOPCODE_DIR,
         getAllGeminiMdFilenames()[0] ?? 'HOPCODE.md',
       ),
     [],
@@ -215,7 +215,7 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
           );
         case 'global':
           return resolvePreferredMemoryFile(
-            path.join(os.homedir(), QWEN_DIR),
+            path.join(os.homedir(), HOPCODE_DIR),
             getAllGeminiMdFilenames()[0] ?? 'HOPCODE.md',
           );
         case 'managed':

@@ -14,7 +14,7 @@ import { setGeminiMdFilename as mockSetGeminiMdFilename } from '../memory/const.
 import {
   DEFAULT_TELEMETRY_TARGET,
   DEFAULT_OTLP_ENDPOINT,
-  QwenLogger,
+  HopCodeLogger,
 } from '../telemetry/index.js';
 import type {
   ContentGenerator,
@@ -276,9 +276,10 @@ describe('Server Config (config.ts)', () => {
   beforeEach(() => {
     // Reset mocks if necessary
     vi.clearAllMocks();
-    vi.spyOn(QwenLogger.prototype, 'logStartSessionEvent').mockImplementation(
-      async () => undefined,
-    );
+    vi.spyOn(
+      HopCodeLogger.prototype,
+      'logStartSessionEvent',
+    ).mockImplementation(async () => undefined);
 
     // Setup default mock for resolveContentGeneratorConfigWithSources
     vi.mocked(resolveContentGeneratorConfigWithSources).mockImplementation(
@@ -884,7 +885,9 @@ describe('Server Config (config.ts)', () => {
       });
       await config.initialize();
 
-      expect(QwenLogger.prototype.logStartSessionEvent).toHaveBeenCalledOnce();
+      expect(
+        HopCodeLogger.prototype.logStartSessionEvent,
+      ).toHaveBeenCalledOnce();
     });
   });
 

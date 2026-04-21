@@ -14,7 +14,7 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { QWEN_DIR } from '../config/storage.js';
+import { HOPCODE_DIR } from '../config/storage.js';
 import * as os from 'node:os';
 
 const EVOLVE_DIR = 'evolve';
@@ -26,7 +26,7 @@ const PROPOSALS_SUBDIR = 'proposals';
  */
 export function getProposalsDir(projectRoot?: string): string {
   const base = projectRoot ?? os.homedir();
-  return path.join(base, QWEN_DIR, EVOLVE_DIR, PROPOSALS_SUBDIR);
+  return path.join(base, HOPCODE_DIR, EVOLVE_DIR, PROPOSALS_SUBDIR);
 }
 
 export interface Proposal {
