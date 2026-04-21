@@ -20,7 +20,7 @@ import type {
   QwenCredentials,
   TokenRefreshData,
   ErrorData,
-} from './qwenOAuth2.js';
+} from './hopCodeOAuth2.js';
 
 // Mock external dependencies
 vi.mock('node:fs', () => ({
@@ -791,7 +791,9 @@ describe('SharedTokenManager', () => {
 
   describe('CredentialsClearRequiredError handling', () => {
     it('should clear memory cache when CredentialsClearRequiredError is thrown during refresh', async () => {
-      const { CredentialsClearRequiredError } = await import('./qwenOAuth2.js');
+      const { CredentialsClearRequiredError } = await import(
+        './hopCodeOAuth2.js'
+      );
 
       const tokenManager = SharedTokenManager.getInstance();
       tokenManager.clearCache();
@@ -855,7 +857,9 @@ describe('SharedTokenManager', () => {
     });
 
     it('should convert CredentialsClearRequiredError to TokenManagerError', async () => {
-      const { CredentialsClearRequiredError } = await import('./qwenOAuth2.js');
+      const { CredentialsClearRequiredError } = await import(
+        './hopCodeOAuth2.js'
+      );
 
       const tokenManager = SharedTokenManager.getInstance();
       tokenManager.clearCache();

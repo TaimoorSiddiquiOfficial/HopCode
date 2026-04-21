@@ -9,14 +9,14 @@ import { promises as fs, unlinkSync } from 'node:fs';
 import * as os from 'os';
 import { randomUUID } from 'node:crypto';
 
-import type { IQwenOAuth2Client } from './qwenOAuth2.js';
+import type { IQwenOAuth2Client } from './hopCodeOAuth2.js';
 import {
   type QwenCredentials,
   type TokenRefreshData,
   type ErrorData,
   isErrorResponse,
   CredentialsClearRequiredError,
-} from './qwenOAuth2.js';
+} from './hopCodeOAuth2.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
 const debugLogger = createDebugLogger('QWEN_OAUTH');

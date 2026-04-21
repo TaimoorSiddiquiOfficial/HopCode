@@ -313,10 +313,10 @@ export async function createContentGenerator(
     baseGenerator = createOpenAIContentGenerator(generatorConfig, config);
   } else if (authType === AuthType.QWEN_OAUTH) {
     const { getQwenOAuthClient: getQwenOauthClient } = await import(
-      '../qwen/qwenOAuth2.js'
+      '../hopcode/hopCodeOAuth2.js'
     );
     const { QwenContentGenerator } = await import(
-      '../qwen/qwenContentGenerator.js'
+      '../hopcode/hopCodeContentGenerator.js'
     );
 
     try {

@@ -213,7 +213,7 @@ export type {
 // Telemetry
 // ============================================================================
 
-export { QwenLogger } from './telemetry/qwen-logger/qwen-logger.js';
+export { QwenLogger } from './telemetry/hopcode-logger/hopcode-logger.js';
 export * from './telemetry/index.js';
 export {
   logAuth,
@@ -310,7 +310,7 @@ export * from './utils/sideQuery.js';
 // OAuth & Authentication
 // ============================================================================
 
-export * from './qwen/qwenOAuth2.js';
+export * from './hopcode/hopCodeOAuth2.js';
 
 // ============================================================================
 // Message Bus Types

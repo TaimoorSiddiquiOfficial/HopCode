@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { IQwenOAuth2Client } from './qwenOAuth2.js';
-import { type QwenCredentials, type ErrorData } from './qwenOAuth2.js';
+import type { IQwenOAuth2Client } from './hopCodeOAuth2.js';
+import { type QwenCredentials, type ErrorData } from './hopCodeOAuth2.js';
 import type {
   GenerateContentParameters,
   GenerateContentResponse,
@@ -16,7 +16,7 @@ import type {
   EmbedContentResponse,
 } from '@google/genai';
 import { FinishReason } from '@google/genai';
-import { QwenContentGenerator } from './qwenContentGenerator.js';
+import { QwenContentGenerator } from './hopCodeContentGenerator.js';
 import { SharedTokenManager } from './sharedTokenManager.js';
 import type { Config } from '../config/config.js';
 import { AuthType } from '../core/contentGenerator.js';

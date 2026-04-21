@@ -23,7 +23,7 @@ import {
   type DeviceTokenResponse,
   type ErrorData,
   type QwenCredentials,
-} from './qwenOAuth2.js';
+} from './hopCodeOAuth2.js';
 import {
   SharedTokenManager,
   TokenManagerError,
@@ -747,7 +747,9 @@ describe('QwenOAuth2Client', () => {
     });
 
     it('should NOT clear credentials on malformed 200 response (e.g. proxy HTML)', async () => {
-      const { CredentialsClearRequiredError } = await import('./qwenOAuth2.js');
+      const { CredentialsClearRequiredError } = await import(
+        './hopCodeOAuth2.js'
+      );
 
       const mockResponse = {
         ok: true,
@@ -769,7 +771,9 @@ describe('QwenOAuth2Client', () => {
     });
 
     it('should clear credentials and throw CredentialsClearRequiredError on 401 response', async () => {
-      const { CredentialsClearRequiredError } = await import('./qwenOAuth2.js');
+      const { CredentialsClearRequiredError } = await import(
+        './hopCodeOAuth2.js'
+      );
 
       const mockResponse = {
         ok: false,
@@ -845,7 +849,7 @@ describe('getQwenOAuthClient', () => {
     const originalGetInstance = SharedTokenManager.getInstance;
     SharedTokenManager.getInstance = vi.fn().mockReturnValue(mockTokenManager);
 
-    const client = await import('./qwenOAuth2.js').then((module) =>
+    const client = await import('./hopCodeOAuth2.js').then((module) =>
       module.getQwenOAuthClient(mockConfig),
     );
 
@@ -878,7 +882,7 @@ describe('getQwenOAuthClient', () => {
 
     // The function should handle the invalid cached credentials and throw the expected error
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
@@ -901,7 +905,7 @@ describe('getQwenOAuthClient', () => {
     vi.mocked(global.fetch).mockResolvedValue({ ok: true } as Response);
 
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig, {
           requireCachedCredentials: true,
         }),
@@ -941,7 +945,7 @@ describe('getQwenOAuthClient', () => {
 
     let thrownError: unknown;
     try {
-      const { getQwenOAuthClient } = await import('./qwenOAuth2.js');
+      const { getQwenOAuthClient } = await import('./hopCodeOAuth2.js');
       await getQwenOAuthClient(mockConfig);
     } catch (error: unknown) {
       thrownError = error;
@@ -970,7 +974,9 @@ describe('getQwenOAuthClient', () => {
 
 describe('CredentialsClearRequiredError', () => {
   it('should create error with correct name and message', async () => {
-    const { CredentialsClearRequiredError } = await import('./qwenOAuth2.js');
+    const { CredentialsClearRequiredError } = await import(
+      './hopCodeOAuth2.js'
+    );
 
     const message = 'Test error message';
     const originalError = { status: 400, response: 'Bad Request' };
@@ -983,7 +989,9 @@ describe('CredentialsClearRequiredError', () => {
   });
 
   it('should work without originalError', async () => {
-    const { CredentialsClearRequiredError } = await import('./qwenOAuth2.js');
+    const { CredentialsClearRequiredError } = await import(
+      './hopCodeOAuth2.js'
+    );
 
     const message = 'Test error message';
     const error = new CredentialsClearRequiredError(message);
@@ -997,7 +1005,7 @@ describe('CredentialsClearRequiredError', () => {
 describe('clearQwenCredentials', () => {
   it('should successfully clear credentials file', async () => {
     const { promises: fs } = await import('node:fs');
-    const { clearQwenCredentials } = await import('./qwenOAuth2.js');
+    const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
 
     vi.mocked(fs.unlink).mockResolvedValue(undefined);
 
@@ -1007,7 +1015,7 @@ describe('clearQwenCredentials', () => {
 
   it('should handle file not found error gracefully', async () => {
     const { promises: fs } = await import('node:fs');
-    const { clearQwenCredentials } = await import('./qwenOAuth2.js');
+    const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
 
     const notFoundError = new Error('File not found');
     (notFoundError as Error & { code: string }).code = 'ENOENT';
@@ -1018,7 +1026,7 @@ describe('clearQwenCredentials', () => {
 
   it('should handle other file system errors gracefully', async () => {
     const { promises: fs } = await import('node:fs');
-    const { clearQwenCredentials } = await import('./qwenOAuth2.js');
+    const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
 
     const permissionError = new Error('Permission denied');
     vi.mocked(fs.unlink).mockRejectedValue(permissionError);
@@ -1118,7 +1126,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
     vi.mocked(global.fetch).mockResolvedValue(mockAuthResponse as Response);
 
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
@@ -1168,7 +1176,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
       .mockResolvedValue(mockPendingResponse as Response);
 
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Authorization timeout, please restart the process.');
@@ -1218,7 +1226,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
       .mockResolvedValue(mockRateLimitResponse as Response);
 
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig),
       ),
     ).rejects.toThrow(
@@ -1256,7 +1264,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
     global.fetch = vi.fn().mockResolvedValue(mockAuthResponse as Response);
 
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
@@ -1315,7 +1323,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
     global.fetch = vi.fn().mockResolvedValue(mockAuthResponse as Response);
 
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
@@ -1356,7 +1364,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
       .mockResolvedValueOnce(mockAuthResponse as Response)
       .mockResolvedValue(mockTokenResponse as Response);
 
-    const client = await import('./qwenOAuth2.js').then((module) =>
+    const client = await import('./hopCodeOAuth2.js').then((module) =>
       module.getQwenOAuthClient(mockConfig),
     );
 
@@ -1404,7 +1412,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
       .mockResolvedValue(mock401Response as Response);
 
     await expect(
-      import('./qwenOAuth2.js').then((module) =>
+      import('./hopCodeOAuth2.js').then((module) =>
         module.getQwenOAuthClient(mockConfig),
       ),
     ).rejects.toThrow(
@@ -1461,7 +1469,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
       .mockResolvedValueOnce(mockAuthResponse as Response)
       .mockResolvedValue(mockTokenResponse as Response);
 
-    const client = await import('./qwenOAuth2.js').then((module) =>
+    const client = await import('./hopCodeOAuth2.js').then((module) =>
       module.getQwenOAuthClient(mockConfig),
     );
 
@@ -1530,7 +1538,7 @@ describe('Browser Launch and Error Handling', () => {
       .mockResolvedValueOnce(mockAuthResponse as Response)
       .mockResolvedValue(mockTokenResponse as Response);
 
-    const client = await import('./qwenOAuth2.js').then((module) =>
+    const client = await import('./hopCodeOAuth2.js').then((module) =>
       module.getQwenOAuthClient(mockConfig),
     );
 
@@ -1584,7 +1592,7 @@ describe('Browser Launch and Error Handling', () => {
       .mockResolvedValueOnce(mockAuthResponse as Response)
       .mockResolvedValue(mockTokenResponse as Response);
 
-    const client = await import('./qwenOAuth2.js').then((module) =>
+    const client = await import('./hopCodeOAuth2.js').then((module) =>
       module.getQwenOAuthClient(mockConfig),
     );
 
@@ -1594,12 +1602,12 @@ describe('Browser Launch and Error Handling', () => {
 
 describe('Event Emitter Integration', () => {
   it('should export hopCodeOAuth2Events as EventEmitter', async () => {
-    const { hopCodeOAuth2Events } = await import('./qwenOAuth2.js');
+    const { hopCodeOAuth2Events } = await import('./hopCodeOAuth2.js');
     expect(hopCodeOAuth2Events).toBeInstanceOf(EventEmitter);
   });
 
   it('should define correct event enum values', async () => {
-    const { HopCodeOAuth2Event } = await import('./qwenOAuth2.js');
+    const { HopCodeOAuth2Event } = await import('./hopCodeOAuth2.js');
     expect(HopCodeOAuth2Event.AuthUri).toBe('auth-uri');
     expect(HopCodeOAuth2Event.AuthProgress).toBe('auth-progress');
     expect(HopCodeOAuth2Event.AuthCancel).toBe('auth-cancel');
@@ -1682,7 +1690,7 @@ describe('Utility Functions', () => {
 
       // Since this is a private function, we test it indirectly through clearQwenCredentials
       const { promises: fs } = await import('node:fs');
-      const { clearQwenCredentials } = await import('./qwenOAuth2.js');
+      const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
 
       vi.mocked(fs.unlink).mockResolvedValue(undefined);
 
@@ -2014,7 +2022,9 @@ describe('Enhanced Error Handling and Edge Cases', () => {
     });
 
     it('should throw CredentialsClearRequiredError on 400 error', async () => {
-      const { CredentialsClearRequiredError } = await import('./qwenOAuth2.js');
+      const { CredentialsClearRequiredError } = await import(
+        './hopCodeOAuth2.js'
+      );
 
       client.setCredentials({
         refresh_token: 'expired-refresh',
@@ -2188,7 +2198,7 @@ describe('SharedTokenManager Integration in QwenOAuth2Client', () => {
         .mockResolvedValue(mockTokenResponse as Response);
 
       try {
-        await import('./qwenOAuth2.js').then((module) =>
+        await import('./hopCodeOAuth2.js').then((module) =>
           module.getQwenOAuthClient(mockConfig),
         );
       } catch {

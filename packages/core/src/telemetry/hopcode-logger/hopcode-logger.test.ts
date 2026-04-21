@@ -14,7 +14,7 @@ import {
   afterAll,
 } from 'vitest';
 import * as os from 'node:os';
-import { QwenLogger, TEST_ONLY } from './qwen-logger.js';
+import { QwenLogger, TEST_ONLY } from './hopcode-logger.js';
 import type { Config } from '../../config/config.js';
 import { AuthType } from '../../core/contentGenerator.js';
 import {

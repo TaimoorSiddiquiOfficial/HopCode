@@ -6,7 +6,7 @@
 
 import { OpenAIContentGenerator } from '../core/openaiContentGenerator/index.js';
 import { DashScopeOpenAICompatibleProvider } from '../core/openaiContentGenerator/provider/dashscope.js';
-import type { IQwenOAuth2Client } from './qwenOAuth2.js';
+import type { IQwenOAuth2Client } from './hopCodeOAuth2.js';
 import { SharedTokenManager } from './sharedTokenManager.js';
 import { type Config } from '../config/config.js';
 import type {
