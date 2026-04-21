@@ -188,10 +188,12 @@ jobs:
         run: |
           output=$(npx @vscode/vsce publish --packagePath ./*.vsix --no-verify 2>&1) || true
           echo "$output"
-          if echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST|already.*0\.[0-9])"; then
+          if echo "$output" | grep -q "Published "; then
+            echo "✅ VS Code Marketplace: published successfully"
+          elif echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST|already.*0\.[0-9])"; then
             version=$(node -p "require('./package.json').version")
             echo "⏭️ VS Code Marketplace: v${version} already published, skipping"
-          elif echo "$output" | grep -qiE "^error|ERROR|failed to publish" && ! echo "$output" | grep -qi "already"; then
+          elif echo "$output" | grep -qiE "(^error|failed to publish)" && ! echo "$output" | grep -qi "already"; then
             echo "$output" >&2; exit 1
           fi
         env:
@@ -205,7 +207,9 @@ jobs:
           if output=$(npx ovsx publish ./*.vsix -p "$OVSX_TOKEN" 2>&1); then
             echo "$output"
           else
-            if echo "$output" | grep -qiE "(already published|already exists|version already)"; then
+            if echo "$output" | grep -q "Published "; then
+              echo "✅ Open VSX: published successfully (exit code ignored)"
+            elif echo "$output" | grep -qiE "(already published|already exists|version already)"; then
               version=$(node -p "require('./package.json').version")
               echo "⏭️ Open VSX: v${version} already published, skipping"
             elif echo "$output" | grep -qiE "(unknown publisher|create-namespace|namespace)"; then
