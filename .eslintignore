@@ -1,0 +1,56 @@
+# Dependencies
+**/node_modules/**
+
+# Build outputs
+**/dist/**
+**/build/**
+**/coverage/**
+**/*.tsbuildinfo
+
+# IDE and Editor
+**/.vscode/**
+**/.idea/**
+**/*.swp
+**/*.swo
+**/*~
+
+# Git
+**/.git/**
+.gitignore
+
+# HopCode specific
+**/.hopcode/**
+**/.hopcode-backup-*/**
+
+# Windows system directories (for global ESLint runs)
+Application Data/
+Cookies/
+Local Settings/
+My Documents/
+NetHood/
+PrintHood/
+Recent/
+SendTo/
+Start Menu/
+Templates/
+Saved Games/
+AppData/
+Program Files/
+Program Files (x86)/
+
+# Temporary files
+**/.cache/**
+**/.tmp/**
+**/tmp/**
+**/*.log
+
+# Test fixtures
+**/fixtures/**
+
+# Documentation site
+docs-site/node_modules/**
+docs-site/.next/**
+
+# Sandbox and containers
+**/.docker/**
+**/sandbox/**

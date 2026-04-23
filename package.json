@@ -138,11 +138,20 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --fix --max-warnings 0 --no-warn-ignored"
+      {
+        "title": "Format with Prettier",
+        "task": "prettier --write"
+      },
+      {
+        "title": "Fix ESLint issues",
+        "task": "eslint --fix --max-warnings 0 --no-warn-ignored"
+      }
     ],
     "*.{json,md}": [
-      "prettier --write"
+      {
+        "title": "Format with Prettier",
+        "task": "prettier --write"
+      }
     ]
   }
 }
