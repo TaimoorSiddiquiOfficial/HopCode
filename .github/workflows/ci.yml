@@ -83,6 +83,17 @@ jobs:
       - name: 'Run sensitive keyword linter'
         run: 'node scripts/lint.js --sensitive-keywords'
 
+      - name: 'Build CLI dependencies'
+        run: |
+          npm run build --workspace=packages/core
+          npm run build --workspace=packages/web-templates
+          npm run build --workspace=packages/channels/base
+          npm run build --workspace=packages/channels/discord
+          npm run build --workspace=packages/channels/telegram
+          npm run build --workspace=packages/channels/weixin
+          npm run build --workspace=packages/channels/dingtalk
+          npm run generate
+
       - name: 'Build CLI package'
         run: 'npm run build --workspace=packages/cli'
 
