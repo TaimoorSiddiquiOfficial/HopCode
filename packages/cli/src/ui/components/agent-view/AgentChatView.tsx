@@ -38,7 +38,7 @@ import { useTerminalSize } from '../../hooks/useTerminalSize.js';
 import { HistoryItemDisplay } from '../HistoryItemDisplay.js';
 import { ToolCallStatus } from '../../types.js';
 import { theme } from '../../semantic-colors.js';
-import { GeminiRespondingSpinner } from '../GeminiRespondingSpinner.js';
+import { HopCodeRespondingSpinner } from '../HopCodeRespondingSpinner.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { agentMessagesToHistoryItems } from './agentHistoryAdapter.js';
 import { AgentHeader } from './AgentHeader.js';
@@ -267,7 +267,7 @@ export const AgentChatView = ({ agentId }: AgentChatViewProps) => {
       {/* Spinner */}
       {isRunning && (
         <Box marginX={2} marginTop={1}>
-          <GeminiRespondingSpinner />
+          <HopCodeRespondingSpinner />
         </Box>
       )}
     </Box>

@@ -17,9 +17,9 @@ export * from './permissions/index.js';
 
 // Model configuration
 export {
-  DEFAULT_QWEN_MODEL,
-  DEFAULT_QWEN_FLASH_MODEL,
-  DEFAULT_QWEN_EMBEDDING_MODEL,
+  DEFAULT_HOPCODE_MODEL,
+  DEFAULT_HOPCODE_FLASH_MODEL,
+  DEFAULT_HOPCODE_EMBEDDING_MODEL,
   MAINLINE_CODER_MODEL,
 } from './config/models.js';
 export {
@@ -38,7 +38,7 @@ export {
   type ModelProvidersConfig,
   type ModelSwitchMetadata,
   type OnModelChangeCallback,
-  QWEN_OAUTH_MODELS,
+  HOPCODE_OAUTH_MODELS,
   resolveModelConfig,
   type ResolvedModelConfig,
   validateModelConfig,
@@ -57,7 +57,7 @@ export * from './core/contentGenerator.js';
 export * from './core/coreToolScheduler.js';
 export * from './core/permission-helpers.js';
 export * from './core/hopCodeChat.js';
-export * from './core/geminiRequest.js';
+export * from './core/hopCodeRequest.js';
 export * from './core/insightProtocol.js';
 export * from './core/logger.js';
 export * from './core/nonInteractiveToolExecutor.js';

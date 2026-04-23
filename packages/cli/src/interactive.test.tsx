@@ -119,10 +119,10 @@ describe('gemini.tsx main function', () => {
     // Store and clear sandbox-related env variables to ensure a consistent test environment
     originalEnvGeminiSandbox = process.env['HOPCODE_SANDBOX'];
     originalEnvSandbox = process.env['SANDBOX'];
-    originalEnvQwenCodeSimple = process.env['QWEN_CODE_SIMPLE'];
+    originalEnvQwenCodeSimple = process.env['HOPCODE_SIMPLE'];
     delete process.env['HOPCODE_SANDBOX'];
     delete process.env['SANDBOX'];
-    delete process.env['QWEN_CODE_SIMPLE'];
+    delete process.env['HOPCODE_SIMPLE'];
 
     initialUnhandledRejectionListeners =
       process.listeners('unhandledRejection');
@@ -141,9 +141,9 @@ describe('gemini.tsx main function', () => {
       delete process.env['SANDBOX'];
     }
     if (originalEnvQwenCodeSimple !== undefined) {
-      process.env['QWEN_CODE_SIMPLE'] = originalEnvQwenCodeSimple;
+      process.env['HOPCODE_SIMPLE'] = originalEnvQwenCodeSimple;
     } else {
-      delete process.env['QWEN_CODE_SIMPLE'];
+      delete process.env['HOPCODE_SIMPLE'];
     }
 
     const currentListeners = process.listeners('unhandledRejection');
@@ -496,8 +496,8 @@ describe('gemini.tsx main function kitty protocol', () => {
 
   beforeEach(() => {
     // Set no relaunch in tests since process spawning causing issues in tests
-    originalEnvNoRelaunch = process.env['QWEN_CODE_NO_RELAUNCH'];
-    process.env['QWEN_CODE_NO_RELAUNCH'] = 'true';
+    originalEnvNoRelaunch = process.env['HOPCODE_NO_RELAUNCH'];
+    process.env['HOPCODE_NO_RELAUNCH'] = 'true';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(process.stdin as any).setRawMode) {
@@ -519,9 +519,9 @@ describe('gemini.tsx main function kitty protocol', () => {
   afterEach(() => {
     // Restore original env variables
     if (originalEnvNoRelaunch !== undefined) {
-      process.env['QWEN_CODE_NO_RELAUNCH'] = originalEnvNoRelaunch;
+      process.env['HOPCODE_NO_RELAUNCH'] = originalEnvNoRelaunch;
     } else {
-      delete process.env['QWEN_CODE_NO_RELAUNCH'];
+      delete process.env['HOPCODE_NO_RELAUNCH'];
     }
   });
 

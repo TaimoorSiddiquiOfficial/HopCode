@@ -1116,7 +1116,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: 'echo $QWEN_SKILL_ROOT'
+          command: 'echo $HOPCODE_SKILL_ROOT'
 ---
 Skill content`;
 

@@ -1022,7 +1022,7 @@ export class ArenaManager {
     // Construct env vars for the agent
     const arenaSessionDir = this.getArenaSessionDir();
     const env: Record<string, string> = {
-      QWEN_CODE: '1',
+      HOPCODE: '1',
       ARENA_AGENT_ID: agentId,
       ARENA_SESSION_ID: this.arenaConfig?.sessionId ?? '',
       ARENA_SESSION_DIR: arenaSessionDir,
@@ -1030,10 +1030,10 @@ export class ArenaManager {
 
     // If the model has auth overrides, pass them via env
     if (model.apiKey) {
-      env['QWEN_API_KEY'] = model.apiKey;
+      env['HOPCODE_API_KEY'] = model.apiKey;
     }
     if (model.baseUrl) {
-      env['QWEN_BASE_URL'] = model.baseUrl;
+      env['HOPCODE_BASE_URL'] = model.baseUrl;
     }
 
     const spawnConfig: AgentSpawnConfig = {

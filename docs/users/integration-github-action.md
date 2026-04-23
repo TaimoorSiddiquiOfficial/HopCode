@@ -4,13 +4,13 @@
 
 `hopcode-action` is a GitHub Action that integrates [HopCode] into your development workflow via the [HopCode CLI]. It acts both as an autonomous agent for critical routine coding tasks, and an on-demand collaborator you can quickly delegate work to.
 
-Use it to perform GitHub pull request reviews, triage issues, perform code analysis and modification, and more using [HopCode] conversationally (e.g., `@qwencoder fix this issue`) directly inside your GitHub repositories.
+Use it to perform GitHub pull request reviews, triage issues, perform code analysis and modification, and more using [HopCode] conversationally (e.g., `@hopcoder fix this issue`) directly inside your GitHub repositories.
 
 ## Features
 
 - **Automation**: Trigger workflows based on events (e.g. issue opening) or schedules (e.g. nightly).
 - **On-demand Collaboration**: Trigger workflows in issue and pull request
-  comments by mentioning the [HopCode CLI](./features/commands) (e.g., `@qwencoder /review`).
+  comments by mentioning the [HopCode CLI](./features/commands) (e.g., `@hopcoder /review`).
 - **Extensible with Tools**: Leverage [HopCode](../developers/tools/introduction.md) models' tool-calling capabilities to interact with other CLIs like the [GitHub CLI] (`gh`).
 - **Customizable**: Use a `HOPCODE.md` file in your repository to provide
   project-specific instructions and context to [HopCode CLI](./features/commands).
@@ -19,17 +19,17 @@ Use it to perform GitHub pull request reviews, triage issues, perform code analy
 
 Get started with HopCode CLI in your repository in just a few minutes:
 
-### 1. Get a Qwen API Key
+### 1. Get a HopCode API Key
 
-Obtain your API key from [DashScope](https://help.aliyun.com/zh/model-studio/hopcode) (Alibaba Cloud's AI platform)
+Obtain your API key from your AI provider (e.g., [DashScope](https://dashscope.aliyuncs.com), OpenAI, Anthropic) and store it securely.
 
 ### 2. Add it as a GitHub Secret
 
-Store your API key as a secret named `QWEN_API_KEY` in your repository:
+Store your API key as a secret named `HOPCODE_API_KEY` in your repository:
 
 - Go to your repository's **Settings > Secrets and variables > Actions**
 - Click **New repository secret**
-- Name: `QWEN_API_KEY`, Value: your API key
+- Name: `HOPCODE_API_KEY`, Value: your API key
 
 ### 3. Update your .gitignore
 
@@ -37,7 +37,7 @@ Add the following entries to your `.gitignore` file:
 
 ```gitignore
 # hopcode-cli settings
-.qwen/
+.hopcode/
 
 # GitHub App credentials
 gha-creds-*.json
@@ -52,7 +52,7 @@ You have two options to set up a workflow:
 1. Start the HopCode CLI in your terminal:
 
    ```shell
-   qwen
+   hopcode
    ```
 
 2. In HopCode CLI in your terminal, type:
@@ -63,28 +63,28 @@ You have two options to set up a workflow:
 
 **Option B: Manually copy workflows**
 
-1. Copy the pre-built workflows from the [`examples/workflows`](./common-workflow) directory to your repository's `.github/workflows` directory. Note: the `qwen-dispatch.yml` workflow must also be copied, which triggers the workflows to run.
+1. Copy the pre-built workflows from the [`examples/workflows`](./common-workflow) directory to your repository's `.github/workflows` directory. Note: the `hopcode-dispatch.yml` workflow must also be copied, which triggers the workflows to run.
 
 ### 5. Try it out
 
 **Pull Request Review:**
 
 - Open a pull request in your repository and wait for automatic review
-- Comment `@qwencoder /review` on an existing pull request to manually trigger a review
+- Comment `@hopcoder /review` on an existing pull request to manually trigger a review
 
 **Issue Triage:**
 
 - Open an issue and wait for automatic triage
-- Comment `@qwencoder /triage` on existing issues to manually trigger triaging
+- Comment `@hopcoder /triage` on existing issues to manually trigger triaging
 
 **General AI Assistance:**
 
-- In any issue or pull request, mention `@qwencoder` followed by your request
+- In any issue or pull request, mention `@hopcoder` followed by your request
 - Examples:
-  - `@qwencoder explain this code change`
-  - `@qwencoder suggest improvements for this function`
-  - `@qwencoder help me debug this error`
-  - `@qwencoder write unit tests for this component`
+  - `@hopcoder explain this code change`
+  - `@hopcoder suggest improvements for this function`
+  - `@hopcoder help me debug this error`
+  - `@hopcoder write unit tests for this component`
 
 ## Workflows
 
@@ -112,20 +112,20 @@ This type of action can be used to invoke a general-purpose, conversational HopC
 
 <!-- BEGIN_AUTOGEN_INPUTS -->
 
-- <a name="__input_qwen_api_key"></a><a href="#user-content-__input_qwen_api_key"><code>qwen*api_key</code></a>: *(Optional)\_ The API key for the Qwen API.
+- <a name="__input_HOPCODE_API_KEY"></a><a href="#user-content-__input_HOPCODE_API_KEY"><code>hopcode_api_key</code></a>: *(Optional)\_ The API key for the Qwen API.
 
-- <a name="__input_qwen_cli_version"></a><a href="#user-content-__input_qwen_cli_version"><code>qwen*cli_version</code></a>: *(Optional, default: `latest`)\_ The version of the HopCode CLI to install. Can be "latest", "preview", "nightly", a specific version number, or a git branch, tag, or commit. For more information, see [HopCode CLI releases](https://github.com/QwenLM/hopcode-action/blob/main/docs/releases.md).
+- <a name="__input_hopcode_cli_version"></a><a href="#user-content-__input_hopcode_cli_version"><code>hopcode_cli_version</code></a>: *(Optional, default: `latest`)\_ The version of the HopCode CLI to install. Can be "latest", "preview", "nightly", a specific version number, or a git branch, tag, or commit. For more information, see [HopCode CLI releases](https://github.com/QwenLM/hopcode-action/blob/main/docs/releases.md).
 
-- <a name="__input_qwen_debug"></a><a href="#user-content-__input_qwen_debug"><code>qwen*debug</code></a>: *(Optional)\_ Enable debug logging and output streaming.
+- <a name="__input_hopcode_debug"></a><a href="#user-content-__input_hopcode_debug"><code>hopcode_debug</code></a>: *(Optional)\_ Enable debug logging and output streaming.
 
-- <a name="__input_qwen_model"></a><a href="#user-content-__input_qwen_model"><code>qwen*model</code></a>: *(Optional)\_ The model to use with HopCode.
+- <a name="__input_hopcode_model"></a><a href="#user-content-__input_hopcode_model"><code>hopcode_model</code></a>: *(Optional)\_ The model to use with HopCode.
 
 - <a name="__input_prompt"></a><a href="#user-content-__input_prompt"><code>prompt</code></a>: _(Optional, default: `You are a helpful assistant.`)_ A string passed to the HopCode CLI's [`--prompt` argument](https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/configuration.md#command-line-arguments).
 
 - <a name="__input_settings"></a><a href="#user-content-__input_settings"><code>settings</code></a>: _(Optional)_ A JSON string written to `.hopcode/settings.json` to configure the CLI's _project_ settings.
   For more details, see the documentation on [settings files](https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/configuration.md#settings-files).
 
-- <a name="__input_use_qwen_code_assist"></a><a href="#user-content-__input_use_qwen_code_assist"><code>use*qwen_code_assist</code></a>: *(Optional, default: `false`)\_ Whether to use Code Assist for HopCode model access instead of the default HopCode API key.
+- <a name="__input_use_hopcode_assist"></a><a href="#user-content-__input_use_hopcode_assist"><code>use*qwen_code_assist</code></a>: *(Optional, default: `false`)\_ Whether to use Code Assist for HopCode model access instead of the default HopCode API key.
   For more information, see the [HopCode CLI documentation](https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/authentication.md).
 
 - <a name="__input_use_vertex_ai"></a><a href="#user-content-__input_use_vertex_ai"><code>use*vertex_ai</code></a>: *(Optional, default: `false`)\_ Whether to use Vertex AI for HopCode model access instead of the default HopCode API key.
@@ -175,7 +175,7 @@ You can set the following secrets in your repository:
 
 | Name              | Description                                   | Required | When Required                              |
 | ----------------- | --------------------------------------------- | -------- | ------------------------------------------ |
-| `QWEN_API_KEY`    | Your Qwen API key from DashScope.             | Yes      | Required for all workflows that call Qwen. |
+| `HOPCODE_API_KEY`    | Your Qwen API key from DashScope.             | Yes      | Required for all workflows that call Qwen. |
 | `APP_PRIVATE_KEY` | Private key for your GitHub App (PEM format). | No       | Using a custom GitHub App.                 |
 
 To add a secret:

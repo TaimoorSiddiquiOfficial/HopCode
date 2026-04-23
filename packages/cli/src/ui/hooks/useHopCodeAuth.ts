@@ -34,7 +34,7 @@ export const useHopCodeAuth = (
     authMessage: null,
   });
 
-  const isHopCodeAuth = pendingAuthType === AuthType.QWEN_OAUTH;
+  const isHopCodeAuth = pendingAuthType === AuthType.HOPCODE_OAUTH;
 
   // Set up event listeners when authentication starts
   useEffect(() => {

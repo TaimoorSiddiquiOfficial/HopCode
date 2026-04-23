@@ -36,7 +36,7 @@ export function ArenaStartDialog({
 
     return selectableModels.map((model) => {
       const token = `${model.authType}:${model.id}`;
-      const isQwenOauth = model.authType === AuthType.QWEN_OAUTH;
+      const isQwenOauth = model.authType === AuthType.HOPCODE_OAUTH;
       return {
         key: token,
         value: token,

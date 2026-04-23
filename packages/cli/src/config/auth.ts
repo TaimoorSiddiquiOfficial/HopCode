@@ -188,7 +188,7 @@ export function validateAuthMethod(
     return null;
   }
 
-  if (authMethod === AuthType.QWEN_OAUTH) {
+  if (authMethod === AuthType.HOPCODE_OAUTH) {
     // HopCode OAuth free tier was discontinued on 2026-04-15.
     // Block new OAuth setups; existing cached tokens still work until server rejects them.
     return t(

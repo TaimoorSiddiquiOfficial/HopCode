@@ -19,7 +19,7 @@ import {
 } from './hopCodeOAuth2.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
-const debugLogger = createDebugLogger('QWEN_OAUTH');
+const debugLogger = createDebugLogger('HOPCODE_OAUTH');
 
 // File System Configuration
 const HOPCODE_DIR = '.hopcode';

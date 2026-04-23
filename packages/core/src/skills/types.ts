@@ -67,7 +67,7 @@ export interface SkillConfig {
 
   /**
    * Absolute path to the skill root directory (directory containing SKILL.md).
-   * Used to set QWEN_SKILL_ROOT environment variable for skill hooks.
+   * Used to set HOPCODE_SKILL_ROOT environment variable for skill hooks.
    */
   skillRoot?: string;
 

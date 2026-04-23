@@ -58,7 +58,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       timeout: 60000,
       maxRetries: 2,
       model: 'qwen-max',
-      authType: AuthType.QWEN_OAUTH,
+      authType: AuthType.HOPCODE_OAUTH,
     } as ContentGeneratorConfig;
 
     // Mock Config
@@ -84,9 +84,9 @@ describe('DashScopeOpenAICompatibleProvider', () => {
   });
 
   describe('isDashScopeProvider', () => {
-    it('should return true for QWEN_OAUTH auth type', () => {
+    it('should return true for HOPCODE_OAUTH auth type', () => {
       const config = {
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         baseUrl: 'https://api.openai.com/v1',
       } as ContentGeneratorConfig;
 
@@ -172,7 +172,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
         'User-Agent': `HopCode/1.0.0 (${process.platform}; ${process.arch})`,
         'X-DashScope-CacheControl': 'enable',
         'X-DashScope-UserAgent': `HopCode/1.0.0 (${process.platform}; ${process.arch})`,
-        'X-DashScope-AuthType': AuthType.QWEN_OAUTH,
+        'X-DashScope-AuthType': AuthType.HOPCODE_OAUTH,
       });
     });
 
@@ -192,7 +192,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
 
       expect(headers['User-Agent']).toContain('HopCode/1.0.0');
       expect(headers['X-DashScope-UserAgent']).toContain('HopCode/1.0.0');
-      expect(headers['X-DashScope-AuthType']).toBe(AuthType.QWEN_OAUTH);
+      expect(headers['X-DashScope-AuthType']).toBe(AuthType.HOPCODE_OAUTH);
       expect(headers['X-Custom']).toBe('1');
       expect(headers['X-DashScope-CacheControl']).toBe('disable');
     });
@@ -229,7 +229,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
             'User-Agent': `HopCode/1.0.0 (${process.platform}; ${process.arch})`,
             'X-DashScope-CacheControl': 'enable',
             'X-DashScope-UserAgent': `HopCode/1.0.0 (${process.platform}; ${process.arch})`,
-            'X-DashScope-AuthType': AuthType.QWEN_OAUTH,
+            'X-DashScope-AuthType': AuthType.HOPCODE_OAUTH,
           },
         }),
       );

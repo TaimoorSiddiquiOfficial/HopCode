@@ -314,7 +314,7 @@ export const DialogManager = ({
   if (uiState.isAuthenticating) {
     // OpenAI authentication now handled through AuthDialog with coding-plan/custom sub-modes
     // HopCode OAuth remains as a separate flow
-    if (uiState.pendingAuthType === AuthType.QWEN_OAUTH) {
+    if (uiState.pendingAuthType === AuthType.HOPCODE_OAUTH) {
       return (
         <HopCodeOAuthProgress
           deviceAuth={uiState.hopCodeAuthState.deviceAuth || undefined}

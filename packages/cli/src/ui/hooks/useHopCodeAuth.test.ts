@@ -67,7 +67,7 @@ describe('useHopCodeAuth', () => {
 
   it('should initialize with default state when Qwen auth but not authenticating', () => {
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, false),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, false),
     );
 
     expect(result.current.hopCodeAuthState).toEqual({
@@ -79,7 +79,7 @@ describe('useHopCodeAuth', () => {
   });
 
   it('should set up event listeners when Qwen auth and authenticating', () => {
-    renderHook(() => useHopCodeAuth(AuthType.QWEN_OAUTH, true));
+    renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
 
     expect(mockHopCodeOAuth2Events.on).toHaveBeenCalledWith(
       HopCodeOAuth2Event.AuthUri,
@@ -102,7 +102,7 @@ describe('useHopCodeAuth', () => {
     });
 
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     act(() => {
@@ -127,7 +127,7 @@ describe('useHopCodeAuth', () => {
     });
 
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     act(() => {
@@ -154,7 +154,7 @@ describe('useHopCodeAuth', () => {
     });
 
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     act(() => {
@@ -181,7 +181,7 @@ describe('useHopCodeAuth', () => {
     });
 
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     act(() => {
@@ -208,7 +208,7 @@ describe('useHopCodeAuth', () => {
     });
 
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     act(() => {
@@ -238,7 +238,7 @@ describe('useHopCodeAuth', () => {
     });
 
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     act(() => {
@@ -255,7 +255,7 @@ describe('useHopCodeAuth', () => {
         useHopCodeAuth(pendingAuthType, isAuthenticating),
       {
         initialProps: {
-          pendingAuthType: AuthType.QWEN_OAUTH,
+          pendingAuthType: AuthType.HOPCODE_OAUTH,
           isAuthenticating: true,
         },
       },
@@ -277,7 +277,7 @@ describe('useHopCodeAuth', () => {
   it('should clean up event listeners when authentication stops', () => {
     const { rerender } = renderHook(
       ({ isAuthenticating }) =>
-        useHopCodeAuth(AuthType.QWEN_OAUTH, isAuthenticating),
+        useHopCodeAuth(AuthType.HOPCODE_OAUTH, isAuthenticating),
       { initialProps: { isAuthenticating: true } },
     );
 
@@ -296,7 +296,7 @@ describe('useHopCodeAuth', () => {
 
   it('should clean up event listeners on unmount', () => {
     const { unmount } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     unmount();
@@ -326,7 +326,7 @@ describe('useHopCodeAuth', () => {
         useHopCodeAuth(pendingAuthType, isAuthenticating),
       {
         initialProps: {
-          pendingAuthType: AuthType.QWEN_OAUTH,
+          pendingAuthType: AuthType.HOPCODE_OAUTH,
           isAuthenticating: true,
         },
       },
@@ -360,7 +360,7 @@ describe('useHopCodeAuth', () => {
 
     const { result, rerender } = renderHook(
       ({ isAuthenticating }) =>
-        useHopCodeAuth(AuthType.QWEN_OAUTH, isAuthenticating),
+        useHopCodeAuth(AuthType.HOPCODE_OAUTH, isAuthenticating),
       { initialProps: { isAuthenticating: true } },
     );
 
@@ -391,7 +391,7 @@ describe('useHopCodeAuth', () => {
     });
 
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     // Set up some state
@@ -414,7 +414,7 @@ describe('useHopCodeAuth', () => {
   it('should handle different auth types correctly', () => {
     // Test with HopCode OAuth - should set up event listeners when authenticating
     const { result: qwenResult } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
     expect(qwenResult.current.hopCodeAuthState.authStatus).toBe('idle');
     expect(mockHopCodeOAuth2Events.on).toHaveBeenCalled();
@@ -433,7 +433,7 @@ describe('useHopCodeAuth', () => {
 
   it('should initialize with idle status when starting authentication with Qwen auth', () => {
     const { result } = renderHook(() =>
-      useHopCodeAuth(AuthType.QWEN_OAUTH, true),
+      useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
 
     expect(result.current.hopCodeAuthState.authStatus).toBe('idle');

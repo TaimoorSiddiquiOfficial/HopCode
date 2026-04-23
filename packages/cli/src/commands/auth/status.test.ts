@@ -70,7 +70,7 @@ describe('showAuthStatus', () => {
       createMockSettings({
         security: {
           auth: {
-            selectedType: AuthType.QWEN_OAUTH,
+            selectedType: AuthType.HOPCODE_OAUTH,
           },
         },
       }),

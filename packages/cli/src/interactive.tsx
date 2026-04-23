@@ -116,7 +116,7 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     );
   }
 
-  if (process.env['QWEN_CODE_NO_RELAUNCH']) {
+  if ((process.env['HOPCODE_NO_RELAUNCH'] ?? process.env['QWEN_CODE_NO_RELAUNCH'])) {
     return [];
   }
 
@@ -545,7 +545,7 @@ export async function main() {
         ...getSettingsWarnings(settings),
         ...config.getWarnings(),
         ...(config.getModelsConfig().getCurrentAuthType() ===
-        AuthType.QWEN_OAUTH
+        AuthType.HOPCODE_OAUTH
           ? [
               'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
             ]

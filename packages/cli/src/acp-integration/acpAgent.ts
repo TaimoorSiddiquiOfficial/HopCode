@@ -218,7 +218,7 @@ class QwenAgent implements Agent {
       });
     };
 
-    if (method === AuthType.QWEN_OAUTH) {
+    if (method === AuthType.HOPCODE_OAUTH) {
       hopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthUri, authUriHandler);
     }
 
@@ -231,7 +231,7 @@ class QwenAgent implements Agent {
         method,
       );
     } finally {
-      if (method === AuthType.QWEN_OAUTH) {
+      if (method === AuthType.HOPCODE_OAUTH) {
         hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, authUriHandler);
       }
     }
@@ -500,7 +500,7 @@ class QwenAgent implements Agent {
       errorMessage?.includes('Qwen OAuth')
     ) {
       const qwenOAuthMethods = authMethods.filter(
-        (m) => m.id === AuthType.QWEN_OAUTH,
+        (m) => m.id === AuthType.HOPCODE_OAUTH,
       );
       return qwenOAuthMethods.length ? qwenOAuthMethods : authMethods;
     }

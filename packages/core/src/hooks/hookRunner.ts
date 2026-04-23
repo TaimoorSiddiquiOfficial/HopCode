@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -551,7 +551,8 @@ export class HookRunner {
         ...process.env,
         GEMINI_PROJECT_DIR: input.cwd,
         CLAUDE_PROJECT_DIR: input.cwd, // For compatibility
-        QWEN_PROJECT_DIR: input.cwd, // For Qwen Code compatibility
+        HOPCODE_PROJECT_DIR: input.cwd,
+        QWEN_PROJECT_DIR: input.cwd, // Backward compat alias
         ...hookConfig.env,
       };
 

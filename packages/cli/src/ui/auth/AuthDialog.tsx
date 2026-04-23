@@ -205,7 +205,7 @@ export function AuthDialog(): React.JSX.Element {
   ];
 
   // Map an AuthType to the corresponding main menu option.
-  // QWEN_OAUTH maps directly; USE_OPENAI maps to:
+  // HOPCODE_OAUTH maps directly; USE_OPENAI maps to:
   // - CODING_PLAN when current config matches coding plan
   // - API_KEY for other OpenAI / Anthropic / Gemini-compatible configs
   const contentGenConfig = config.getContentGeneratorConfig();
@@ -215,7 +215,7 @@ export function AuthDialog(): React.JSX.Element {
       contentGenConfig?.apiKeyEnvKey,
     ) !== false;
   const authTypeToMainOption = (authType: AuthType): string => {
-    if (authType === AuthType.QWEN_OAUTH) return AuthType.QWEN_OAUTH;
+    if (authType === AuthType.HOPCODE_OAUTH) return AuthType.HOPCODE_OAUTH;
     if (authType === AuthType.USE_OPENAI && isCurrentlyCodingPlan) {
       return 'CODING_PLAN';
     }
@@ -239,7 +239,7 @@ export function AuthDialog(): React.JSX.Element {
       // Priority 3: HOPCODE_DEFAULT_AUTH_TYPE env var
       const defaultAuthType = parseDefaultAuthType(
         process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ??
-          process.env['QWEN_DEFAULT_AUTH_TYPE'],
+          (process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ?? process.env['QWEN_DEFAULT_AUTH_TYPE']),
       );
       if (defaultAuthType) {
         return item.value === authTypeToMainOption(defaultAuthType);

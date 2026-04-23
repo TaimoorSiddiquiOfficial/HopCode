@@ -338,7 +338,7 @@ export function ModelDialog({
     // still allowed so existing sessions keep working.
     const runtimeModels = allCoreModels.filter((m) => m.isRuntimeModel);
     const registryModels = allCoreModels.filter(
-      (m) => !m.isRuntimeModel && m.authType !== AuthType.QWEN_OAUTH,
+      (m) => !m.isRuntimeModel && m.authType !== AuthType.HOPCODE_OAUTH,
     );
 
     // For each USE_OPENAI registry model, resolve its ProviderConfig via baseUrl
@@ -470,7 +470,7 @@ export function ModelDialog({
           const value =
             isRuntime && snapshotId ? snapshotId : `${t2}::${model.id}`;
 
-          const isQwenOAuth = t2 === AuthType.QWEN_OAUTH;
+          const isQwenOAuth = t2 === AuthType.HOPCODE_OAUTH;
           // Show real provider label (e.g. "Ollama Cloud") when available,
           // otherwise fall back to the raw authType string.
           const badgeLabel = providerLabel ?? t2;
@@ -609,11 +609,11 @@ export function ModelDialog({
       // (only block non-runtime OAuth; runtime OAuth models from existing
       //  cached tokens are still allowed to work until the server rejects them)
       const isQwenOAuthSelection =
-        selected.startsWith(`${AuthType.QWEN_OAUTH}::`) ||
+        selected.startsWith(`${AuthType.HOPCODE_OAUTH}::`) ||
         (selected.startsWith('$runtime|') &&
-          selected.split('|')[1] === AuthType.QWEN_OAUTH);
+          selected.split('|')[1] === AuthType.HOPCODE_OAUTH);
       const isRuntimeOAuthSelection = selected.startsWith(
-        `$runtime|${AuthType.QWEN_OAUTH}|`,
+        `$runtime|${AuthType.HOPCODE_OAUTH}|`,
       );
       if (isQwenOAuthSelection && !isRuntimeOAuthSelection) {
         setErrorMessage(
@@ -691,7 +691,7 @@ export function ModelDialog({
           selectedAuthType,
           modelId,
           selectedAuthType !== authType &&
-            selectedAuthType === AuthType.QWEN_OAUTH
+            selectedAuthType === AuthType.HOPCODE_OAUTH
             ? { requireCachedCredentials: true }
             : undefined,
         );
@@ -803,7 +803,7 @@ export function ModelDialog({
             borderRight={false}
             borderColor={theme.border.default}
           />
-          {highlightedEntry.authType === AuthType.QWEN_OAUTH &&
+          {highlightedEntry.authType === AuthType.HOPCODE_OAUTH &&
             !highlightedEntry.isRuntime && (
               <Box marginTop={1}>
                 <Text color={theme.status.warning}>
@@ -821,7 +821,7 @@ export function ModelDialog({
               highlightedEntry.model.contextWindowSize,
             )}
           />
-          {highlightedEntry.authType !== AuthType.QWEN_OAUTH && (
+          {highlightedEntry.authType !== AuthType.HOPCODE_OAUTH && (
             <>
               <DetailRow
                 label="Base URL"

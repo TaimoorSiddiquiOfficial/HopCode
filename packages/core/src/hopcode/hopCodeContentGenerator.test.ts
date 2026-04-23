@@ -339,7 +339,7 @@ describe('HopCodeContentGenerator', () => {
     const contentGeneratorConfig = {
       model: 'qwen-turbo',
       apiKey: 'test-api-key',
-      authType: AuthType.QWEN_OAUTH,
+      authType: AuthType.HOPCODE_OAUTH,
       baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
       timeout: 120000,
       maxRetries: 3,
@@ -1131,7 +1131,7 @@ describe('HopCodeContentGenerator', () => {
       // Create new instance to pick up the mock
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1166,7 +1166,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1199,7 +1199,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1503,7 +1503,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1524,7 +1524,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1547,7 +1547,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1568,7 +1568,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1586,7 +1586,7 @@ describe('HopCodeContentGenerator', () => {
         mockQwenClient,
         {
           model: 'qwen-turbo',
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
           apiKey: 'test-key',
         },
@@ -1604,7 +1604,7 @@ describe('HopCodeContentGenerator', () => {
     it('should get SharedTokenManager instance', () => {
       const generator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1630,7 +1630,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1659,7 +1659,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeContentGenerator(
         mockQwenClient,
-        { model: 'qwen-turbo', authType: AuthType.QWEN_OAUTH },
+        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 

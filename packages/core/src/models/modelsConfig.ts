@@ -9,7 +9,7 @@ import process from 'node:process';
 import { AuthType } from '../core/contentGenerator.js';
 import type { ContentGeneratorConfig } from '../core/contentGenerator.js';
 import type { ContentGeneratorConfigSources } from '../core/contentGenerator.js';
-import { DEFAULT_QWEN_MODEL } from '../config/models.js';
+import { DEFAULT_HOPCODE_MODEL } from '../config/models.js';
 import { tokenLimit } from '../core/tokenLimits.js';
 import { defaultModalities } from '../core/modalityDefaults.js';
 
@@ -212,7 +212,7 @@ export class ModelsConfig {
    * Get current model ID
    */
   getModel(): string {
-    return this._generationConfig.model || DEFAULT_QWEN_MODEL;
+    return this._generationConfig.model || DEFAULT_HOPCODE_MODEL;
   }
 
   /**
@@ -270,11 +270,11 @@ export class ModelsConfig {
 
     // Force qwen-oauth to the front (if requested / defaulted in).
     const orderedAuthTypes: AuthType[] = [];
-    if (uniqueAuthTypes.includes(AuthType.QWEN_OAUTH)) {
-      orderedAuthTypes.push(AuthType.QWEN_OAUTH);
+    if (uniqueAuthTypes.includes(AuthType.HOPCODE_OAUTH)) {
+      orderedAuthTypes.push(AuthType.HOPCODE_OAUTH);
     }
     for (const authType of uniqueAuthTypes) {
-      if (authType !== AuthType.QWEN_OAUTH) {
+      if (authType !== AuthType.HOPCODE_OAUTH) {
         orderedAuthTypes.push(authType);
       }
     }
@@ -323,8 +323,8 @@ export class ModelsConfig {
     // Special case: qwen-oauth model switch - hot update in place
     // coder-model supports vision capabilities and can be hot-updated
     if (
-      this.currentAuthType === AuthType.QWEN_OAUTH &&
-      newModel === DEFAULT_QWEN_MODEL
+      this.currentAuthType === AuthType.HOPCODE_OAUTH &&
+      newModel === DEFAULT_HOPCODE_MODEL
     ) {
       this.strictModelProviderSelection = false;
       this._generationConfig.model = newModel;
@@ -335,7 +335,7 @@ export class ModelsConfig {
 
       // Notify Config to update contentGeneratorConfig
       if (this.onModelChange) {
-        await this.onModelChange(AuthType.QWEN_OAUTH, false);
+        await this.onModelChange(AuthType.HOPCODE_OAUTH, false);
       }
       return;
     }
@@ -382,7 +382,7 @@ export class ModelsConfig {
     }
 
     const rollbackSnapshot = this.createStateSnapshotForRollback();
-    if (authType === AuthType.QWEN_OAUTH && options?.requireCachedCredentials) {
+    if (authType === AuthType.HOPCODE_OAUTH && options?.requireCachedCredentials) {
       this.requireCachedQwenCredentialsOnce = true;
     }
 
@@ -714,8 +714,8 @@ export class ModelsConfig {
     //
     // (OpenAI client instantiation requires an apiKey even though it will be
     // replaced later.)
-    if (this.currentAuthType === AuthType.QWEN_OAUTH) {
-      this._generationConfig.apiKey = 'QWEN_OAUTH_DYNAMIC_TOKEN';
+    if (this.currentAuthType === AuthType.HOPCODE_OAUTH) {
+      this._generationConfig.apiKey = 'HOPCODE_OAUTH_DYNAMIC_TOKEN';
       this.generationConfigSources['apiKey'] = {
         kind: 'computed',
         detail: 'Qwen OAuth placeholder token',
@@ -822,7 +822,7 @@ export class ModelsConfig {
 
     // For HopCode OAuth, model switches within the same authType can always be hot-updated
     // (coder-model supports vision capabilities and doesn't require ContentGenerator recreation)
-    if (authType === AuthType.QWEN_OAUTH) {
+    if (authType === AuthType.HOPCODE_OAUTH) {
       return false;
     }
 

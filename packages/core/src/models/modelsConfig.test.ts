@@ -447,17 +447,17 @@ describe('ModelsConfig', () => {
   it('should always force Qwen OAuth apiKey placeholder when applying model defaults', async () => {
     // Simulate a stale/explicit apiKey existing before switching models.
     const modelsConfig = new ModelsConfig({
-      initialAuthType: AuthType.QWEN_OAUTH,
+      initialAuthType: AuthType.HOPCODE_OAUTH,
       generationConfig: {
         apiKey: 'manual-key-should-not-leak',
       },
     });
 
     // Switching within qwen-oauth triggers applyResolvedModelDefaults().
-    await modelsConfig.switchModel(AuthType.QWEN_OAUTH, 'coder-model');
+    await modelsConfig.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
 
     const gc = currentGenerationConfig(modelsConfig);
-    expect(gc.apiKey).toBe('QWEN_OAUTH_DYNAMIC_TOKEN');
+    expect(gc.apiKey).toBe('HOPCODE_OAUTH_DYNAMIC_TOKEN');
     expect(gc.apiKeyEnvKey).toBeUndefined();
   });
 
@@ -500,15 +500,15 @@ describe('ModelsConfig', () => {
     // Fresh user: authType not selected yet (currentAuthType undefined).
     const modelsConfig = new ModelsConfig();
 
-    // Config.refreshAuth passes modelId from modelsConfig.getModel(), which falls back to DEFAULT_QWEN_MODEL.
+    // Config.refreshAuth passes modelId from modelsConfig.getModel(), which falls back to DEFAULT_HOPCODE_MODEL.
     modelsConfig.syncAfterAuthRefresh(
-      AuthType.QWEN_OAUTH,
+      AuthType.HOPCODE_OAUTH,
       modelsConfig.getModel(),
     );
 
     const gc = currentGenerationConfig(modelsConfig);
     expect(gc.model).toBe('coder-model');
-    expect(gc.apiKey).toBe('QWEN_OAUTH_DYNAMIC_TOKEN');
+    expect(gc.apiKey).toBe('HOPCODE_OAUTH_DYNAMIC_TOKEN');
     expect(gc.apiKeyEnvKey).toBeUndefined();
   });
 
@@ -525,16 +525,16 @@ describe('ModelsConfig', () => {
     // User switches to qwen-oauth via AuthDialog
     // refreshAuth calls syncAfterAuthRefresh with the current model (gpt-4o)
     // which doesn't exist in qwen-oauth registry, so it should use default
-    modelsConfig.syncAfterAuthRefresh(AuthType.QWEN_OAUTH, 'gpt-4o');
+    modelsConfig.syncAfterAuthRefresh(AuthType.HOPCODE_OAUTH, 'gpt-4o');
 
     const gc = currentGenerationConfig(modelsConfig);
     // Should use default qwen-oauth model (coder-model), not the OPENAI model
     expect(gc.model).toBe('coder-model');
-    expect(gc.apiKey).toBe('QWEN_OAUTH_DYNAMIC_TOKEN');
+    expect(gc.apiKey).toBe('HOPCODE_OAUTH_DYNAMIC_TOKEN');
     expect(gc.apiKeyEnvKey).toBeUndefined();
   });
 
-  it('should clear manual credentials when switching from USE_OPENAI to QWEN_OAUTH', () => {
+  it('should clear manual credentials when switching from USE_OPENAI to HOPCODE_OAUTH', () => {
     // User manually set credentials for OpenAI
     const modelsConfig = new ModelsConfig({
       initialAuthType: AuthType.USE_OPENAI,
@@ -555,14 +555,14 @@ describe('ModelsConfig', () => {
     // User switches to qwen-oauth
     // Since authType is not USE_OPENAI, manual credentials should be cleared
     // and default qwen-oauth model should be applied
-    modelsConfig.syncAfterAuthRefresh(AuthType.QWEN_OAUTH, 'gpt-4o');
+    modelsConfig.syncAfterAuthRefresh(AuthType.HOPCODE_OAUTH, 'gpt-4o');
 
     const gc = currentGenerationConfig(modelsConfig);
     // Should use default qwen-oauth model, not preserve manual OpenAI credentials
     expect(gc.model).toBe('coder-model');
-    expect(gc.apiKey).toBe('QWEN_OAUTH_DYNAMIC_TOKEN');
+    expect(gc.apiKey).toBe('HOPCODE_OAUTH_DYNAMIC_TOKEN');
     // baseUrl should be set to qwen-oauth default, not preserved from manual OpenAI config
-    expect(gc.baseUrl).toBe('DYNAMIC_QWEN_OAUTH_BASE_URL');
+    expect(gc.baseUrl).toBe('DYNAMIC_HOPCODE_OAUTH_BASE_URL');
     expect(gc.apiKeyEnvKey).toBeUndefined();
   });
 
@@ -638,7 +638,7 @@ describe('ModelsConfig', () => {
       modelProvidersConfig,
       generationConfig: {},
     });
-    expect(config3.getModel()).toBe('coder-model'); // Falls back to DEFAULT_QWEN_MODEL
+    expect(config3.getModel()).toBe('coder-model'); // Falls back to DEFAULT_HOPCODE_MODEL
     expect(config3.getGenerationConfig().model).toBeUndefined();
   });
 
@@ -757,23 +757,23 @@ describe('ModelsConfig', () => {
 
       // qwen-oauth models should be ordered first
       const firstNonQwenIndex = allModels.findIndex(
-        (m) => m.authType !== AuthType.QWEN_OAUTH,
+        (m) => m.authType !== AuthType.HOPCODE_OAUTH,
       );
       expect(firstNonQwenIndex).toBeGreaterThan(0);
       expect(
         allModels
           .slice(0, firstNonQwenIndex)
-          .every((m) => m.authType === AuthType.QWEN_OAUTH),
+          .every((m) => m.authType === AuthType.HOPCODE_OAUTH),
       ).toBe(true);
       expect(
         allModels
           .slice(firstNonQwenIndex)
-          .every((m) => m.authType !== AuthType.QWEN_OAUTH),
+          .every((m) => m.authType !== AuthType.HOPCODE_OAUTH),
       ).toBe(true);
 
       // Should include qwen-oauth models (hard-coded)
       const qwenModels = allModels.filter(
-        (m) => m.authType === AuthType.QWEN_OAUTH,
+        (m) => m.authType === AuthType.HOPCODE_OAUTH,
       );
       expect(qwenModels.length).toBeGreaterThan(0);
 
@@ -808,7 +808,7 @@ describe('ModelsConfig', () => {
       // Should still include qwen-oauth models (hard-coded)
       expect(allModels.length).toBeGreaterThan(0);
       const qwenModels = allModels.filter(
-        (m) => m.authType === AuthType.QWEN_OAUTH,
+        (m) => m.authType === AuthType.HOPCODE_OAUTH,
       );
       expect(qwenModels.length).toBeGreaterThan(0);
     });
@@ -881,18 +881,18 @@ describe('ModelsConfig', () => {
       // Filter: include qwen-oauth but request it later -> still ordered first
       const withQwen = modelsConfig.getAllConfiguredModels([
         AuthType.USE_OPENAI,
-        AuthType.QWEN_OAUTH,
+        AuthType.HOPCODE_OAUTH,
         AuthType.USE_ANTHROPIC,
       ]);
       expect(withQwen.length).toBeGreaterThan(0);
       const firstNonQwenIndex = withQwen.findIndex(
-        (m) => m.authType !== AuthType.QWEN_OAUTH,
+        (m) => m.authType !== AuthType.HOPCODE_OAUTH,
       );
       expect(firstNonQwenIndex).toBeGreaterThan(0);
       expect(
         withQwen
           .slice(0, firstNonQwenIndex)
-          .every((m) => m.authType === AuthType.QWEN_OAUTH),
+          .every((m) => m.authType === AuthType.HOPCODE_OAUTH),
       ).toBe(true);
     });
   });

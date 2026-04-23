@@ -93,7 +93,7 @@ export class DashScopeProvider extends BaseWebSearchProvider {
   }
 
   isAvailable(): boolean {
-    // DashScope provider is only available when auth type is QWEN_OAUTH
+    // DashScope provider is only available when auth type is HOPCODE_OAUTH
     // This ensures it's only used when OAuth credentials are available
     return this.config.authType === 'qwen-oauth';
   }

@@ -108,12 +108,12 @@ function prepareHookConfig(
   skillRoot?: string,
 ): CommandHookConfig | HttpHookConfig {
   if (hook.type === 'command' && skillRoot) {
-    // Add QWEN_SKILL_ROOT to environment variables
+    // Add HOPCODE_SKILL_ROOT to environment variables
     return {
       ...hook,
       env: {
         ...hook.env,
-        QWEN_SKILL_ROOT: skillRoot,
+        HOPCODE_SKILL_ROOT: skillRoot,
       },
     };
   }

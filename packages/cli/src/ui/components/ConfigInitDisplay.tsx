@@ -9,7 +9,7 @@ import { appEvents } from './../../utils/events.js';
 import { Box, Text } from 'ink';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { type McpClient, MCPServerStatus } from '@hoptrendy/hopcode-core';
-import { GeminiSpinner } from './GeminiRespondingSpinner.js';
+import { HopCodeSpinner } from './HopCodeRespondingSpinner.js';
 import { theme } from '../semantic-colors.js';
 import { t } from '../../i18n/index.js';
 
@@ -46,7 +46,7 @@ export const ConfigInitDisplay = () => {
   return (
     <Box marginTop={1}>
       <Text>
-        <GeminiSpinner /> <Text color={theme.text.primary}>{message}</Text>
+        <HopCodeSpinner /> <Text color={theme.text.primary}>{message}</Text>
       </Text>
     </Box>
   );

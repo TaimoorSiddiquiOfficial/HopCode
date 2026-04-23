@@ -208,7 +208,7 @@ describe('registerSkillHooks', () => {
             hooks: [
               {
                 type: HookType.Command,
-                command: 'echo $QWEN_SKILL_ROOT',
+                command: 'echo $HOPCODE_SKILL_ROOT',
               },
             ],
           },

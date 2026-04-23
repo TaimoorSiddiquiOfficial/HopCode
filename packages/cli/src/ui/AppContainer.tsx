@@ -776,7 +776,7 @@ export const AppContainer = (props: AppContainerProps) => {
     streamingState,
     submitQuery,
     initError,
-    pendingHistoryItems: pendingGeminiHistoryItems,
+    pendingHistoryItems: pendingHistoryItems,
     thought,
     cancelOngoingRequest,
     retryLastPrompt,
@@ -1183,8 +1183,8 @@ export const AppContainer = (props: AppContainerProps) => {
   } = useWelcomeBack(config, handleFinalSubmit, buffer, settings.merged);
 
   const pendingHistoryItems = useMemo(
-    () => [...pendingSlashCommandHistoryItems, ...pendingGeminiHistoryItems],
-    [pendingSlashCommandHistoryItems, pendingGeminiHistoryItems],
+    () => [...pendingSlashCommandHistoryItems, ...pendingHistoryItems],
+    [pendingSlashCommandHistoryItems, pendingHistoryItems],
   );
 
   // Terminal tab progress bar (OSC 9;4) for iTerm2/Ghostty
@@ -1193,7 +1193,7 @@ export const AppContainer = (props: AppContainerProps) => {
   cancelHandlerRef.current = useCallback(() => {
     const pendingHistoryItems = [
       ...pendingSlashCommandHistoryItems,
-      ...pendingGeminiHistoryItems,
+      ...pendingHistoryItems,
     ];
     if (isToolExecuting(pendingHistoryItems)) {
       buffer.setText(''); // Just clear the prompt
@@ -1219,7 +1219,7 @@ export const AppContainer = (props: AppContainerProps) => {
     buffer,
     popAllMessages,
     pendingSlashCommandHistoryItems,
-    pendingGeminiHistoryItems,
+    pendingHistoryItems,
   ]);
 
   const handleClearScreen = useCallback(() => {
@@ -1378,10 +1378,10 @@ export const AppContainer = (props: AppContainerProps) => {
       prevStreamingStateRef.current === StreamingState.Responding &&
       streamingState === StreamingState.Idle &&
       // Check both committed history and pending items for errors
-      // (API errors go to pendingGeminiHistoryItems, not historyManager.history)
+      // (API errors go to pendingHistoryItems, not historyManager.history)
       historyManager.history[historyManager.history.length - 1]?.type !==
         'error' &&
-      !pendingGeminiHistoryItems.some((item) => item.type === 'error') &&
+      !pendingHistoryItems.some((item) => item.type === 'error') &&
       !shellConfirmationRequest &&
       !confirmationRequest &&
       !loopDetectionConfirmationRequest &&
@@ -2072,7 +2072,7 @@ export const AppContainer = (props: AppContainerProps) => {
       geminiMdFileCount,
       streamingState,
       initError,
-      pendingGeminiHistoryItems,
+      pendingHistoryItems,
       thought,
       shellModeActive,
       userMessages,
@@ -2182,7 +2182,7 @@ export const AppContainer = (props: AppContainerProps) => {
       geminiMdFileCount,
       streamingState,
       initError,
-      pendingGeminiHistoryItems,
+      pendingHistoryItems,
       thought,
       shellModeActive,
       userMessages,

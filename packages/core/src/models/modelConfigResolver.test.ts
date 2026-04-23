@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -10,7 +10,7 @@ import {
   validateModelConfig,
 } from './modelConfigResolver.js';
 import { AuthType } from '../core/contentGenerator.js';
-import { DEFAULT_QWEN_MODEL, MAINLINE_CODER_MODEL } from '../config/models.js';
+import { DEFAULT_HOPCODE_MODEL, MAINLINE_CODER_MODEL } from '../config/models.js';
 
 describe('modelConfigResolver', () => {
   describe('resolveModelConfig', () => {
@@ -127,39 +127,39 @@ describe('modelConfigResolver', () => {
         expect(result.sources['apiKey'].via?.kind).toBe('modelProviders');
       });
 
-      it('reads QWEN_MODEL as fallback for OPENAI_MODEL', () => {
+      it('reads HOPCODE_MODEL as fallback for OPENAI_MODEL', () => {
         const result = resolveModelConfig({
           authType: AuthType.USE_OPENAI,
           cli: {},
           settings: {},
           env: {
-            QWEN_MODEL: 'qwen-model',
+            HOPCODE_MODEL: 'qwen-model',
             OPENAI_API_KEY: 'key',
           },
         });
 
         expect(result.config.model).toBe('qwen-model');
-        expect(result.sources['model'].envKey).toBe('QWEN_MODEL');
+        expect(result.sources['model'].envKey).toBe('HOPCODE_MODEL');
       });
     });
 
     describe('Qwen OAuth auth type', () => {
       it('uses default model for Qwen OAuth', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {},
         });
 
-        expect(result.config.model).toBe(DEFAULT_QWEN_MODEL);
-        expect(result.config.apiKey).toBe('QWEN_OAUTH_DYNAMIC_TOKEN');
+        expect(result.config.model).toBe(DEFAULT_HOPCODE_MODEL);
+        expect(result.config.apiKey).toBe('HOPCODE_OAUTH_DYNAMIC_TOKEN');
         expect(result.sources['apiKey'].kind).toBe('computed');
       });
 
       it('allows coder-model for Qwen OAuth', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {
             model: 'coder-model',
           },
@@ -173,7 +173,7 @@ describe('modelConfigResolver', () => {
 
       it('warns and falls back for unsupported Qwen OAuth models', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {
             model: 'unsupported-model',
           },
@@ -181,7 +181,7 @@ describe('modelConfigResolver', () => {
           env: {},
         });
 
-        expect(result.config.model).toBe(DEFAULT_QWEN_MODEL);
+        expect(result.config.model).toBe(DEFAULT_HOPCODE_MODEL);
         expect(result.warnings).toHaveLength(1);
         expect(result.warnings[0]).toContain('unsupported-model');
       });
@@ -313,9 +313,9 @@ describe('modelConfigResolver', () => {
 
     it('always passes for Qwen OAuth', () => {
       const result = validateModelConfig({
-        authType: AuthType.QWEN_OAUTH,
-        model: DEFAULT_QWEN_MODEL,
-        apiKey: 'QWEN_OAUTH_DYNAMIC_TOKEN',
+        authType: AuthType.HOPCODE_OAUTH,
+        model: DEFAULT_HOPCODE_MODEL,
+        apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
       });
 
       expect(result.valid).toBe(true);

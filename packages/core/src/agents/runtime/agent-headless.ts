@@ -5,7 +5,7 @@
  */
 
 /**
- * @fileoverview AgentHeadless — one-shot task execution wrapper around AgentCore.
+ * @fileoverview AgentHeadless ï¿½ one-shot task execution wrapper around AgentCore.
  *
  * AgentHeadless manages
  * the lifecycle of a single headless task: start ? run ? finish.
@@ -35,7 +35,7 @@ import { AgentTerminateMode } from './agent-types.js';
 import { logSubagentExecution } from '../../telemetry/loggers.js';
 import { SubagentExecutionEvent } from '../../telemetry/types.js';
 import { AgentCore } from './agent-core.js';
-import { DEFAULT_QWEN_MODEL } from '../../config/models.js';
+import { DEFAULT_HOPCODE_MODEL } from '../../config/models.js';
 
 const debugLogger = createDebugLogger('SUBAGENT');
 
@@ -125,7 +125,7 @@ export function templateString(
 // --- AgentHeadless ------------------------------------------
 
 /**
- * AgentHeadless — one-shot task executor.
+ * AgentHeadless ï¿½ one-shot task executor.
  *
  * Takes a task, runs it through AgentCore's reasoning loop, and returns
  * the result.
@@ -233,7 +233,7 @@ export class AgentHeadless {
         model:
           this.core.modelConfig.model ||
           this.core.runtimeContext.getModel() ||
-          DEFAULT_QWEN_MODEL,
+          DEFAULT_HOPCODE_MODEL,
         tools: (this.core.toolConfig?.tools || ['*']).map((t) =>
           typeof t === 'string' ? t : t.name,
         ),
