@@ -573,7 +573,7 @@ export const AppContainer = (props: AppContainerProps) => {
     isResumeDialogOpen,
     openResumeDialog,
     closeResumeDialog,
-    handleResume: handleResumeInner,
+    handleResume,
   } = useResumeCommand({
     config,
     historyManager,
@@ -663,8 +663,6 @@ export const AppContainer = (props: AppContainerProps) => {
     btwItem,
     setBtwItem,
     cancelBtw,
-    awayRecapItem,
-    setAwayRecapItem,
     commandContext,
     shellConfirmationRequest,
     confirmationRequest,
@@ -684,22 +682,6 @@ export const AppContainer = (props: AppContainerProps) => {
     extensionsUpdateStateInternal,
     isConfigInitialized,
     logger,
-  );
-
-  // Wrap handleResume so the sticky recap from the previous session
-  // doesn't carry over into the new one. Only clear after the inner
-  // handler confirms a session was actually loaded — otherwise (no
-  // session data, missing deps) we'd drop the current session's recap
-  // for no reason.
-  const handleResume = useCallback(
-    async (sessionId: string): Promise<boolean> => {
-      const switched = await handleResumeInner(sessionId);
-      if (switched) {
-        setAwayRecapItem(null);
-      }
-      return switched;
-    },
-    [handleResumeInner, setAwayRecapItem],
   );
 
   // onDebugMessage should log to debug logfile, not update footer debugMessage
@@ -1253,7 +1235,7 @@ export const AppContainer = (props: AppContainerProps) => {
         setControlsHeight(fullFooterMeasurement.height);
       }
     }
-  }, [buffer, terminalWidth, terminalHeight, awayRecapItem, btwItem]);
+  }, [buffer, terminalWidth, terminalHeight, btwItem]);
 
   // agentViewState is declared earlier (before handleFinalSubmit) so it
   // is available for input routing. Referenced here for layout computation.
@@ -1286,7 +1268,10 @@ export const AppContainer = (props: AppContainerProps) => {
     config,
     isFocused,
     isIdle: streamingState === StreamingState.Idle,
-    setAwayRecapItem,
+    addItem: historyManager.addItem,
+    history: historyManager.history,
+    awayThresholdMinutes:
+      settings.merged.general?.sessionRecapAwayThresholdMinutes,
   });
 
   // Context file names computation
@@ -2108,8 +2093,6 @@ export const AppContainer = (props: AppContainerProps) => {
       btwItem,
       setBtwItem,
       cancelBtw,
-      awayRecapItem,
-      setAwayRecapItem,
       nightly,
       branchName,
       sessionStats,
@@ -2217,8 +2200,6 @@ export const AppContainer = (props: AppContainerProps) => {
       btwItem,
       setBtwItem,
       cancelBtw,
-      awayRecapItem,
-      setAwayRecapItem,
       nightly,
       branchName,
       sessionStats,

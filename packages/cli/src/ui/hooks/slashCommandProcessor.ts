@@ -31,7 +31,6 @@ import type {
   Message,
   HistoryItemWithoutId,
   HistoryItemBtw,
-  HistoryItemAwayRecap,
   SlashCommandProcessorResult,
   HistoryItem,
   ConfirmationRequest,
@@ -157,9 +156,6 @@ export const useSlashCommandProcessor = (
   const [btwItem, setBtwItem] = useState<HistoryItemBtw | null>(null);
   const btwAbortControllerRef = useRef<AbortController | null>(null);
 
-  const [awayRecapItem, setAwayRecapItem] =
-    useState<HistoryItemAwayRecap | null>(null);
-
   const cancelBtw = useCallback(() => {
     btwAbortControllerRef.current?.abort();
     btwAbortControllerRef.current = null;
@@ -273,7 +269,6 @@ export const useSlashCommandProcessor = (
         addItem,
         clear: () => {
           cancelBtw();
-          setAwayRecapItem(null);
           clearItems();
           clearScreen();
           refreshStatic();
@@ -286,8 +281,6 @@ export const useSlashCommandProcessor = (
         setBtwItem,
         cancelBtw,
         btwAbortControllerRef,
-        awayRecapItem,
-        setAwayRecapItem,
         isIdleRef,
         toggleVimEnabled,
         setContextMdFileCount,
@@ -320,8 +313,6 @@ export const useSlashCommandProcessor = (
       btwItem,
       setBtwItem,
       cancelBtw,
-      awayRecapItem,
-      setAwayRecapItem,
       toggleVimEnabled,
       sessionShellAllowlist,
       setContextMdFileCount,
@@ -798,8 +789,6 @@ export const useSlashCommandProcessor = (
     btwItem,
     setBtwItem,
     cancelBtw,
-    awayRecapItem,
-    setAwayRecapItem,
     commandContext,
     shellConfirmationRequest,
     confirmationRequest,

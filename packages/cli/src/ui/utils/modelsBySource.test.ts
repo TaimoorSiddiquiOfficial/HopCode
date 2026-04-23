@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import {
   MAIN_SOURCE,
   type ModelMetrics,
   type ModelMetricsCore,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { flattenModelsBySource } from './modelsBySource.js';
 
 const emptyCore = (): ModelMetricsCore => ({

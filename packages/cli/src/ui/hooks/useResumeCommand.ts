@@ -26,12 +26,12 @@ export interface UseResumeCommandResult {
   openResumeDialog: () => void;
   closeResumeDialog: () => void;
   /**
-   * Resolves to `true` when the target session was actually loaded, or
-   * `false` when the call short-circuited (missing dependencies or no
-   * session data found). Callers can use the boolean to gate cleanup
-   * that should only happen on a successful session switch.
+   * Async — the implementation awaits SessionService and SessionStart hooks.
+   * Callers that need to chain post-resume work should `await` it; pure
+   * fire-and-forget callers (the resume dialog's `onSelect`) can ignore the
+   * promise.
    */
-  handleResume: (sessionId: string) => Promise<boolean>;
+  handleResume: (sessionId: string) => Promise<void>;
 }
 
 export function useResumeCommand(
@@ -53,9 +53,9 @@ export function useResumeCommand(
   const { clearItems, loadHistory } = historyManager ?? {};
 
   const handleResume = useCallback(
-    async (sessionId: string): Promise<boolean> => {
-      if (!config || !hasHistoryManager || !startNewSession) {
-        return false;
+    async (sessionId: string) => {
+      if (!config || !historyManager || !startNewSession) {
+        return;
       }
 
       // Close dialog immediately to prevent input capture during async operations.
@@ -66,7 +66,7 @@ export function useResumeCommand(
       const sessionData = await sessionService.loadSession(sessionId);
 
       if (!sessionData) {
-        return false;
+        return;
       }
 
       // Start new session in UI context.
@@ -96,7 +96,6 @@ export function useResumeCommand(
 
       // Refresh terminal UI.
       remount?.();
-      return true;
     },
     [
       closeResumeDialog,
