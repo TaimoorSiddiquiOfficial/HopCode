@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- gRPC proto-typed messages */
+/* eslint-disable default-case -- agent status switch intentionally omits default */
+
 /**
  * @fileoverview In-process gRPC session manager.
  *
@@ -40,9 +43,7 @@ import type {
   AgentUsageEvent,
   AgentStatusChangeEvent,
 } from '@hoptrendy/hopcode-core';
-import {
-  ToolConfirmationOutcome,
-} from '@hoptrendy/hopcode-core';
+import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
 import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('GRPC_IN_PROCESS');
@@ -109,15 +110,14 @@ export class InProcessSessionManager {
       this.options.runtimeConfig.model ||
       'claude-sonnet-4-6';
 
-    const cwd =
-      (request.cwd as string) || this.options.cwd || process.cwd();
+    const cwd = (request.cwd as string) || this.options.cwd || process.cwd();
 
     const emitter = new AgentEventEmitter();
 
     const core = new AgentCore(
       `grpc-session-${sessionId.slice(0, 8)}`,
       this.options.runtimeConfig,
-      { systemPrompt: undefined },     // uses default HOPCODE.md system prompt
+      { systemPrompt: undefined }, // uses default HOPCODE.md system prompt
       { model },
       {
         max_turns: request.max_turns ?? undefined,
@@ -271,8 +271,13 @@ export class InProcessSessionManager {
     this.sessions.delete(sessionId);
   }
 
-  async executeTool(request: Record<string, any>): Promise<Record<string, any>> {
-    debugLogger.info('Direct tool execution not yet supported in in-process mode', request.name);
+  async executeTool(
+    request: Record<string, any>,
+  ): Promise<Record<string, any>> {
+    debugLogger.info(
+      'Direct tool execution not yet supported in in-process mode',
+      request.name,
+    );
     return {
       tool_use_id: randomUUID(),
       content: `Direct tool execution (${request.name}) is not supported in in-process mode. Use a streaming session.`,
@@ -341,7 +346,7 @@ export class InProcessSessionManager {
           ? typeof ev.resultDisplay === 'string'
             ? ev.resultDisplay
             : JSON.stringify(ev.resultDisplay)
-          : ev.error ?? '';
+          : (ev.error ?? '');
       write({
         tool_result: {
           tool_use_id: ev.callId,
@@ -386,11 +391,15 @@ export class InProcessSessionManager {
 
     // Round start/end status events
     emitter.on(AgentEventType.ROUND_START, () => {
-      write({ status: { status: 'round_start', details: 'Agent round started' } });
+      write({
+        status: { status: 'round_start', details: 'Agent round started' },
+      });
     });
 
     emitter.on(AgentEventType.ROUND_END, () => {
-      write({ status: { status: 'round_end', details: 'Agent round completed' } });
+      write({
+        status: { status: 'round_end', details: 'Agent round completed' },
+      });
     });
 
     // Status changes (IDLE → finished, FAILED → error, CANCELLED → cancelled)
@@ -400,29 +409,44 @@ export class InProcessSessionManager {
 
       switch (ev.newStatus) {
         case AgentStatus.IDLE:
-          write({ status: { status: 'idle', details: 'Agent is idle, ready for next message' } });
+          write({
+            status: {
+              status: 'idle',
+              details: 'Agent is idle, ready for next message',
+            },
+          });
           break;
         case AgentStatus.COMPLETED:
-          write({ status: { status: 'finished', details: 'Agent session completed' } });
+          write({
+            status: { status: 'finished', details: 'Agent session completed' },
+          });
           this.sessions.delete(session.sessionId);
           break;
         case AgentStatus.FAILED:
           write({
             error: {
               type: 'AGENT_FAILED',
-              message: session.agent.getError() ?? 'Agent failed with unknown error',
+              message:
+                session.agent.getError() ?? 'Agent failed with unknown error',
             },
           });
           this.sessions.delete(session.sessionId);
           break;
         case AgentStatus.CANCELLED:
-          write({ status: { status: 'cancelled', details: 'Agent was cancelled' } });
+          write({
+            status: { status: 'cancelled', details: 'Agent was cancelled' },
+          });
           break;
       }
     });
 
     emitter.on(AgentEventType.ERROR, (ev) => {
-      write({ error: { type: 'AGENT_ERROR', message: (ev as any).error ?? 'Unknown error' } });
+      write({
+        error: {
+          type: 'AGENT_ERROR',
+          message: (ev as any).error ?? 'Unknown error',
+        },
+      });
     });
   }
 

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/* eslint-disable no-console -- server lifecycle logging */
+/* eslint-disable @typescript-eslint/no-explicit-any -- gRPC proto-typed messages */
+
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { join, dirname } from 'node:path';
@@ -134,9 +137,7 @@ export class HopCodeServer {
   // RPC Handlers
   // ---------------------------------------------------------------------------
 
-  private handleStreamSession(
-    call: grpc.ServerDuplexStream<any, any>,
-  ): void {
+  private handleStreamSession(call: grpc.ServerDuplexStream<any, any>): void {
     let sessionId: string | undefined;
 
     call.on('data', async (clientMessage: any) => {
@@ -270,4 +271,3 @@ export class HopCodeServer {
 }
 
 export { HopCodeSessionManager };
-

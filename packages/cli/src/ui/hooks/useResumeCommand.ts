@@ -62,7 +62,7 @@ export function useResumeCommand(
   const { config, historyManager, startNewSession, setSessionName, remount } =
     options ?? {};
 
-  const hasHistoryManager = !!historyManager;
+  const _hasHistoryManager = !!historyManager;
   const { clearItems, loadHistory } = historyManager ?? {};
 
   const handleResume = useCallback(
@@ -118,6 +118,8 @@ export function useResumeCommand(
       closeResumeDialog,
       config,
       historyManager,
+      clearItems,
+      loadHistory,
       startNewSession,
       setSessionName,
       remount,

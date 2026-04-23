@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- gRPC proto-typed messages */
+
 import { spawn, type ChildProcess } from 'node:child_process';
 import { createInterface } from 'node:readline';
 import { randomUUID } from 'node:crypto';
@@ -29,7 +31,10 @@ interface ActiveSession {
   writeCallback?: (msg: Record<string, unknown>) => void;
   pendingApprovals: Map<
     string,
-    { resolve: (allow: boolean, reason?: string) => void; reject: (err: Error) => void }
+    {
+      resolve: (allow: boolean, reason?: string) => void;
+      reject: (err: Error) => void;
+    }
   >;
 }
 
@@ -54,7 +59,9 @@ export class HopCodeSessionManager {
   // Session lifecycle
   // ---------------------------------------------------------------------------
 
-  async createSession(request: Record<string, any>): Promise<Record<string, any>> {
+  async createSession(
+    request: Record<string, any>,
+  ): Promise<Record<string, any>> {
     const sessionId = request.sessionId || randomUUID();
     const now = Date.now();
 
@@ -143,11 +150,16 @@ export class HopCodeSessionManager {
   ): Promise<void> {
     const cliPath = this.options.cliPath ?? 'hopcode';
     const args: string[] = [
-      '--input-format', 'stream-json',
-      '--output-format', 'stream-json',
-      '--model', session.model,
-      '--permission-mode', request.permissionMode ?? 'default',
-      '--cwd', session.cwd,
+      '--input-format',
+      'stream-json',
+      '--output-format',
+      'stream-json',
+      '--model',
+      session.model,
+      '--permission-mode',
+      request.permissionMode ?? 'default',
+      '--cwd',
+      session.cwd,
     ];
 
     if (request.allowedTools?.length) {
@@ -160,7 +172,12 @@ export class HopCodeSessionManager {
       args.push('--auth-type', request.authType);
     }
 
-    debugLogger.info('Spawning agent', session.sessionId, cliPath, args.join(' '));
+    debugLogger.info(
+      'Spawning agent',
+      session.sessionId,
+      cliPath,
+      args.join(' '),
+    );
 
     const child = spawn(cliPath, args, {
       cwd: session.cwd,
@@ -176,7 +193,7 @@ export class HopCodeSessionManager {
       try {
         const event = JSON.parse(line);
         this.translateAndEmit(session, event);
-      } catch (err) {
+      } catch (_err) {
         debugLogger.info('Failed to parse JSONL line:', line.slice(0, 200));
       }
     });
@@ -198,7 +215,8 @@ export class HopCodeSessionManager {
       session.writeCallback?.({
         status: {
           status: 'finished',
-          details: code === 0 ? 'Agent completed' : `Agent exited with code ${code}`,
+          details:
+            code === 0 ? 'Agent completed' : `Agent exited with code ${code}`,
         },
       });
       session.child = null;
@@ -216,9 +234,15 @@ export class HopCodeSessionManager {
     }
   }
 
-  private writeToAgent(session: ActiveSession, message: Record<string, unknown>): void {
+  private writeToAgent(
+    session: ActiveSession,
+    message: Record<string, unknown>,
+  ): void {
     if (!session.child?.stdin?.writable) {
-      debugLogger.info('Agent stdin not writable for session', session.sessionId);
+      debugLogger.info(
+        'Agent stdin not writable for session',
+        session.sessionId,
+      );
       return;
     }
     const line = JSON.stringify(message) + '\n';
@@ -229,14 +253,22 @@ export class HopCodeSessionManager {
   // JSONL event translation
   // ---------------------------------------------------------------------------
 
-  private translateAndEmit(session: ActiveSession, event: Record<string, unknown>): void {
+  private translateAndEmit(
+    session: ActiveSession,
+    event: Record<string, unknown>,
+  ): void {
     if (!session.writeCallback) return;
 
     const type = event.type as string;
 
     switch (type) {
       case 'message_start': {
-        session.writeCallback({ status: { status: 'round_start', details: 'Assistant message started' } });
+        session.writeCallback({
+          status: {
+            status: 'round_start',
+            details: 'Assistant message started',
+          },
+        });
         break;
       }
 
@@ -245,7 +277,9 @@ export class HopCodeSessionManager {
         if (delta?.type === 'text_delta') {
           session.writeCallback({ textChunk: { text: delta.text } });
         } else if (delta?.type === 'thinking_delta') {
-          session.writeCallback({ thinkingChunk: { thinking: delta.thinking } });
+          session.writeCallback({
+            thinkingChunk: { thinking: delta.thinking },
+          });
         }
         break;
       }
@@ -275,7 +309,8 @@ export class HopCodeSessionManager {
         session.writeCallback({
           toolResult: {
             toolUseId: (event as any).tool_use_id ?? '',
-            content: typeof result === 'string' ? result : JSON.stringify(result),
+            content:
+              typeof result === 'string' ? result : JSON.stringify(result),
             isError: false,
           },
         });
@@ -327,7 +362,8 @@ export class HopCodeSessionManager {
               inputTokens: data.usage.input_tokens ?? 0,
               outputTokens: data.usage.output_tokens ?? 0,
               cacheReadInputTokens: data.usage.cache_read_input_tokens ?? 0,
-              cacheCreationInputTokens: data.usage.cache_creation_input_tokens ?? 0,
+              cacheCreationInputTokens:
+                data.usage.cache_creation_input_tokens ?? 0,
               totalTokens: data.usage.total_tokens ?? 0,
             },
           });
@@ -348,11 +384,18 @@ export class HopCodeSessionManager {
     session: ActiveSession,
     prompt: Record<string, any>,
   ): Promise<void> {
-    debugLogger.info('User prompt in session', session.sessionId, prompt.text?.slice(0, 50));
+    debugLogger.info(
+      'User prompt in session',
+      session.sessionId,
+      prompt.text?.slice(0, 50),
+    );
 
     if (!session.child) {
       // If the agent hasn't been spawned yet, spawn it with this prompt as initial
-      await this.spawnAgent(session, { ...session, initialPrompt: prompt.text });
+      await this.spawnAgent(session, {
+        ...session,
+        initialPrompt: prompt.text,
+      });
       return;
     }
 
@@ -487,7 +530,9 @@ export class HopCodeSessionManager {
     this.sessions.delete(sessionId);
   }
 
-  async executeTool(request: Record<string, any>): Promise<Record<string, any>> {
+  async executeTool(
+    request: Record<string, any>,
+  ): Promise<Record<string, any>> {
     debugLogger.info('Execute tool', request.name);
     return {
       toolUseId: randomUUID(),

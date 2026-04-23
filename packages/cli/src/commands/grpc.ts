@@ -8,17 +8,19 @@
  * Provides bidirectional streaming agent sessions over gRPC,
  * enabling remote IDE integrations, microservices, and
  * language-agnostic clients.
- *
- * By default the server runs **in-process**: AgentInteractive is instantiated
- * directly in the server process, sharing the fully-initialized Config (auth,
- * tools, model config). Use --subprocess for isolated per-session processes.
- *
- * Usage:
- *   hopcode grpc [--port 50051] [--host 0.0.0.0] [--subprocess]
- *
- * Proto file:
- *   packages/server/proto/hopcode.proto
  */
+
+/* eslint-disable no-console -- CLI server command, console output is intentional */
+
+// By default the server runs **in-process**: AgentInteractive is instantiated
+// directly in the server process, sharing the fully-initialized Config (auth,
+// tools, model config). Use --subprocess for isolated per-session processes.
+//
+// Usage:
+//   hopcode grpc [--port 50051] [--host 0.0.0.0] [--subprocess]
+//
+// Proto file:
+//   packages/server/proto/hopcode.proto
 
 import type { CommandModule, Argv } from 'yargs';
 import { loadCliConfig, parseArguments } from '../config/config.js';
@@ -38,7 +40,9 @@ async function buildConfig(): Promise<Config | undefined> {
     return await loadCliConfig(settings.merged, argv, process.cwd());
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[grpc] Could not build in-process config (${msg}); falling back to subprocess mode.`);
+    console.warn(
+      `[grpc] Could not build in-process config (${msg}); falling back to subprocess mode.`,
+    );
     return undefined;
   }
 }
@@ -65,11 +69,17 @@ async function startGrpcServer(
       };
     };
 
-    const server = new serverModule.HopCodeServer({ port, host, runtimeConfig });
+    const server = new serverModule.HopCodeServer({
+      port,
+      host,
+      runtimeConfig,
+    });
     const boundPort = await server.start();
 
     const mode = runtimeConfig ? 'in-process' : 'subprocess';
-    console.log(`🐇  HopCode gRPC server running on ${host}:${boundPort} [${mode} mode]`);
+    console.log(
+      `🐇  HopCode gRPC server running on ${host}:${boundPort} [${mode} mode]`,
+    );
     console.log(`    Proto: packages/server/proto/hopcode.proto`);
 
     const shutdown = async () => {
