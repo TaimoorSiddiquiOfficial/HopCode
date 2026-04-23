@@ -43,7 +43,10 @@ import { skillsCommand } from '../commands/skills.js';
 import { profileCommand } from '../commands/profile/index.js';
 import { dashboardCommand } from '../commands/dashboard.js';
 import { serveCommand } from '../commands/serve.js';
+import { grpcCommand } from '../commands/grpc.js';
 import { learnCommand } from '../commands/learn.js';
+import { cronCommand } from '../commands/cron.js';
+import { searchCommand } from '../commands/search.js';
 import {
   resolveCliGenerationConfig,
   getAuthTypeFromEnv,
@@ -652,8 +655,14 @@ export async function parseArguments(): Promise<CliArgs> {
     .command(dashboardCommand)
     // Register headless HTTP API server command
     .command(serveCommand)
+    // Register gRPC headless server command
+    .command(grpcCommand)
     // Register learning loop command
-    .command(learnCommand);
+    .command(learnCommand)
+    // Register persistent cron scheduler command
+    .command(cronCommand)
+    // Register cross-session search command
+    .command(searchCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json
@@ -822,6 +831,31 @@ export async function loadCliConfig(
       outputLanguageFilePath = globalOutputLanguagePath;
     }
   }
+
+  // Load SOUL.md global persona (cross-project user personality).
+  // Read ~/.hopcode/SOUL.md and prepend it to appendSystemPrompt so the agent
+  // always knows who it's talking to, regardless of which project is active.
+  let soulPersona: string | undefined;
+  if (!bareMode) {
+    const soulPath = path.join(Storage.getGlobalHopCodeDir(), 'SOUL.md');
+    if (fs.existsSync(soulPath)) {
+      try {
+        const soulContent = fs.readFileSync(soulPath, 'utf-8').trim();
+        if (soulContent) {
+          soulPersona = soulContent;
+        }
+      } catch {
+        // best-effort — ignore read errors
+      }
+    }
+  }
+
+  // Merge SOUL.md with any --append-system-prompt from argv
+  const effectiveAppendSystemPrompt = soulPersona
+    ? argv.appendSystemPrompt
+      ? `${soulPersona}\n\n${argv.appendSystemPrompt}`
+      : soulPersona
+    : argv.appendSystemPrompt;
 
   const fileService = new FileDiscoveryService(cwd);
 
@@ -1142,7 +1176,7 @@ export async function loadCliConfig(
     debugMode,
     question,
     systemPrompt: argv.systemPrompt,
-    appendSystemPrompt: argv.appendSystemPrompt,
+    appendSystemPrompt: effectiveAppendSystemPrompt,
     // Legacy fields – kept for backward compatibility with getCoreTools() etc.
     coreTools: bareMode
       ? undefined

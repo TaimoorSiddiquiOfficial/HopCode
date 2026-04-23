@@ -5,6 +5,7 @@
   "workspaces": [
     "packages/*",
     "packages/channels/base",
+    "packages/channels/discord",
     "packages/channels/telegram",
     "packages/channels/weixin",
     "packages/channels/dingtalk",

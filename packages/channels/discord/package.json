@@ -1,0 +1,32 @@
+{
+  "name": "@hoptrendy/channel-discord",
+  "version": "0.15.1",
+  "description": "Discord channel adapter for HopCode",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@hoptrendy/channel-base": "file:../base",
+    "discord.js": "^14.17.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "directory": "packages/channels/discord"
+  }
+}

@@ -39,6 +39,7 @@
     "@iarna/toml": "^2.2.5",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "@hoptrendy/channel-base": "file:../channels/base",
+    "@hoptrendy/channel-discord": "file:../channels/discord",
     "@hoptrendy/channel-telegram": "file:../channels/telegram",
     "@hoptrendy/channel-weixin": "file:../channels/weixin",
     "@hoptrendy/channel-dingtalk": "file:../channels/dingtalk",
