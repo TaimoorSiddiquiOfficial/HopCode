@@ -41,6 +41,7 @@ import { modelCommand } from '../commands/model/index.js';
 import { providerCommand } from '../commands/provider.js';
 import { skillsCommand } from '../commands/skills.js';
 import { profileCommand } from '../commands/profile/index.js';
+import { dashboardCommand } from '../commands/dashboard.js';
 import {
   resolveCliGenerationConfig,
   getAuthTypeFromEnv,
@@ -644,7 +645,9 @@ export async function parseArguments(): Promise<CliArgs> {
     .command(providerCommand)
     .command(skillsCommand)
     // Register profile manager command
-    .command(profileCommand);
+    .command(profileCommand)
+    // Register web dashboard command
+    .command(dashboardCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json

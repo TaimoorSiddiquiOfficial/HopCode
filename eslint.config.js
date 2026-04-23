@@ -260,6 +260,11 @@ export default tseslint.config(
     files: ['packages/webui/**/*.ts', 'packages/webui/**/*.tsx', 'packages/webui/**/*.js'],
     rules: { 'no-console': 'off' },
   },
+  // Web Dashboard - browser React app, console is fine for error handling
+  {
+    files: ['packages/web-dashboard/src/**/*.{ts,tsx}', 'packages/web-dashboard/server/**/*.ts'],
+    rules: { 'no-console': 'off' },
+  },
   // Specific CLI files that intentionally wrap console usage
   {
     files: [
