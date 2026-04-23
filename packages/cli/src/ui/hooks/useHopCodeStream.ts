@@ -1103,7 +1103,7 @@ export const useHopCodeStream = (
     [addItem, pendingHistoryItemRef, setPendingHistoryItem],
   );
 
-  const processGeminiStreamEvents = useCallback(
+  const processHopCodeStreamEvents = useCallback(
     async (
       stream: AsyncIterable<GeminiEvent>,
       userMessageTimestamp: number,
@@ -1415,7 +1415,7 @@ export const useHopCodeStream = (
             },
           );
 
-          const processingStatus = await processGeminiStreamEvents(
+          const processingStatus = await processHopCodeStreamEvents(
             stream,
             userMessageTimestamp,
             abortSignal,
@@ -1496,7 +1496,7 @@ export const useHopCodeStream = (
       streamingState,
       setModelSwitchedFromQuotaError,
       prepareQueryForGemini,
-      processGeminiStreamEvents,
+      processHopCodeStreamEvents,
       pendingHistoryItemRef,
       addItem,
       setPendingHistoryItem,
