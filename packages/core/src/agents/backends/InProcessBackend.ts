@@ -5,7 +5,7 @@
  */
 
 /**
- * @fileoverview InProcessBackend � Backend implementation that runs agents
+ * @fileoverview InProcessBackend � Backend implementation that runs agents
  * in the current process using AgentInteractive instead of PTY subprocesses.
  *
  * This enables Arena to work without tmux or any external terminal multiplexer.
@@ -51,6 +51,7 @@ export class InProcessBackend implements Backend {
 
   private readonly runtimeContext: Config;
   private readonly agents = new Map<string, AgentInteractive>();
+  private readonly agentContentGenerators = new Map<string, ContentGenerator>();
   private readonly agentRegistries: ToolRegistry[] = [];
   private readonly agentOrder: string[] = [];
   private activeAgentId: string | null = null;
@@ -88,12 +89,19 @@ export class InProcessBackend implements Backend {
     // Build a per-agent runtime context with isolated working directory,
     // target directory, workspace context, tool registry, and (optionally)
     // a dedicated ContentGenerator for per-agent auth isolation.
-    const agentContext = await createPerAgentConfig(
+    const perAgent = await createPerAgentConfig(
       this.runtimeContext,
       config.cwd,
       inProcessConfig.runtimeConfig.modelConfig.model,
       inProcessConfig.authOverrides,
     );
+    const agentContext = perAgent.config;
+    if (perAgent.contentGenerator) {
+      this.agentContentGenerators.set(
+        config.agentId,
+        perAgent.contentGenerator,
+      );
+    }
 
     this.agentRegistries.push(agentContext.getToolRegistry());
 
@@ -131,7 +139,7 @@ export class InProcessBackend implements Backend {
       const context = new ContextState();
       await interactive.start(context);
 
-      // Watch for completion and fire exit callback � but only for
+      // Watch for completion and fire exit callback � but only for
       // truly terminal statuses. IDLE means the agent is still alive
       // and can accept follow-up messages.
       void interactive.waitForCompletion().then(() => {
@@ -200,6 +208,7 @@ export class InProcessBackend implements Backend {
     this.agentRegistries.length = 0;
 
     this.agents.clear();
+    this.agentContentGenerators.clear();
     this.agentOrder.length = 0;
     this.activeAgentId = null;
     debugLogger.info('InProcessBackend cleaned up');
@@ -309,7 +318,19 @@ export class InProcessBackend implements Backend {
     return this.agents.get(agentId);
   }
 
-  // --- Private -----------------------------------------------
+  /**
+   * Get the ContentGenerator this agent can use for summary generation.
+   * If auth overrides created an isolated generator, this returns that
+   * generator. If no override was requested, this returns the inherited
+   * generator the agent already runs with. If override creation failed, this is
+   * undefined so callers can avoid sending agent data through a fallback
+   * provider.
+   */
+  getAgentContentGenerator(agentId: string): ContentGenerator | undefined {
+    return this.agentContentGenerators.get(agentId);
+  }
+
+  // ─── Private ───────────────────────────────────────────────
 
   private navigate(direction: 1 | -1): string | null {
     if (this.agentOrder.length === 0) return null;
@@ -335,16 +356,18 @@ export class InProcessBackend implements Backend {
  * - `getToolRegistry()` ? per-agent tool registry with core tools bound to
  *   the agent Config
  * - `getContentGenerator()` / `getContentGeneratorConfig()` / `getAuthType()`
- *   ? per-agent ContentGenerator when `authOverrides` is provided
+ *   → per-agent ContentGenerator when `authOverrides` is provided
+ * - returned `contentGenerator` → the generator safe to use for summaries
  */
 async function createPerAgentConfig(
   base: Config,
   cwd: string,
   modelId?: string,
   authOverrides?: InProcessSpawnConfig['authOverrides'],
-): Promise<Config> {
+): Promise<{ config: Config; contentGenerator?: ContentGenerator }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const override = Object.create(base) as any;
+  let dedicatedContentGenerator: ContentGenerator | undefined;
 
   override.getWorkingDir = () => cwd;
   override.getTargetDir = () => cwd;
@@ -374,6 +397,7 @@ async function createPerAgentConfig(
         agentGeneratorConfig,
         override as Config,
       );
+      dedicatedContentGenerator = agentGenerator;
       override.getContentGenerator = (): ContentGenerator => agentGenerator;
       override.getContentGeneratorConfig = (): ContentGeneratorConfig =>
         agentGeneratorConfig;
@@ -392,5 +416,10 @@ async function createPerAgentConfig(
     }
   }
 
-  return override as Config;
+  return {
+    config: override as Config,
+    contentGenerator:
+      dedicatedContentGenerator ??
+      (authOverrides?.authType ? undefined : base.getContentGenerator()),
+  };
 }
