@@ -29,14 +29,16 @@
 
 HopCode is an open-source AI agent for the terminal that works with **any LLM provider** — cloud or local. It helps you understand large codebases, automate tedious work, and ship faster.
 
-- **Any provider, any model**: OpenAI, Anthropic, Google Gemini, Mistral, DeepSeek, Groq, Together AI, Fireworks AI, Cohere, xAI Grok, [OpenRouter](https://openrouter.ai) (100+ models), [Ollama](https://ollama.com) / [vLLM](https://vllm.ai) (local), and any OpenAI-compatible endpoint.
+- **Any provider, any model**: OpenAI, Anthropic, Google Gemini, Mistral, DeepSeek, Groq, Together AI, Fireworks AI, Cohere, xAI Grok, [OpenRouter](https://openrouter.ai) (100+ models), [Ollama](https://ollama.com) / [vLLM](https://vllm.ai) (local), and any OpenAI-compatible endpoint. **15+ native provider SDKs** — more deep integrations than any competitor.
 - **Skills system**: modular, auto-loaded skills extend HopCode's capabilities — run `hopcode skills list` to see bundled skills or add your own.
 - **Agentic workflow, feature-rich**: built-in tools for file editing, shell execution, web search, sub-agents, and full agentic loops — a Claude Code-like experience.
-- **VS Code extension**: companion extension available on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion) for in-editor AI assistance.
-- **Terminal-first, IDE-friendly**: built for developers who live in the command line, with optional integration for VS Code, Zed, and JetBrains IDEs.
+- **VS Code extension**: **the only terminal AI agent with a native VS Code Marketplace extension** — install directly from VS Code for in-editor AI assistance. No JSON-RPC setup required.
+- **Terminal-first, IDE-friendly**: built for developers who live in the command line, with optional integration for VS Code, Zed, and JetBrains IDEs. Plus a **web dashboard** for browser-based workflows.
 - **🏟️ Arena mode** _(unique)_: run multiple AI models in parallel on the same task and compare outputs side-by-side. No other terminal agent has this.
 - **📊 Per-subagent `/stats`**: track token usage, latency, and cost broken down by subagent — see exactly what each agent spent.
+- **🔍 LSP integration**: native Language Server Protocol support for deep code intelligence — symbol navigation, hover info, and diagnostics powered by your language server.
 - **💬 Enterprise channels**: WeChat and DingTalk integration for teams using Chinese enterprise platforms.
+- **🌐 Multi-language docs**: documentation in 7 languages (EN, ZH, DE, FR, JA, RU, PT-BR).
 
 ![HopCode CLI Screenshot](./docs/hopcodecli.png)
 
@@ -51,7 +53,9 @@ hopcode --arena gpt-4o,claude-sonnet-4-5,deepseek-r1 "Refactor this function for
 
 Arena mode spawns parallel subagents — each using a different model — and streams their responses in synchronized columns. Use `/stats` to see per-subagent token usage and latency breakdown.
 
-> No competitor (Hermes Agent, OpenClaude, Claude Code, Cursor) offers multi-model parallel competition. This is HopCode's defining feature.
+> No competitor — not **Hermes Agent**, **OpenClaude**, **Claude Code**, or **Cursor** — offers multi-model parallel competition. Arena Mode is HopCode's exclusive superpower.
+>
+> **HopCode is also the only terminal agent with:** a native VS Code Marketplace extension, LSP integration, a browser-based web dashboard, and 15+ native AI SDK provider integrations.
 
 ## Installation
 
