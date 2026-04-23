@@ -51,7 +51,7 @@ observability framework — HopCode's observability system provides:
 >
 > **⚠️ Special Note: This feature requires corresponding code changes. This documentation is provided in advance; please refer to future code updates for actual functionality.**
 
-All telemetry behavior is controlled through your `.qwen/settings.json` file.
+All telemetry behavior is controlled through your `.hopcode/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
 | Setting        | Environment Variable           | CLI Flag                                                 | Description                                       | Values             | Default                 |
@@ -77,7 +77,7 @@ For detailed information about all configuration options, see the
 
 Sends telemetry directly to Aliyun services. No collector needed.
 
-1. Enable telemetry in your `.qwen/settings.json`:
+1. Enable telemetry in your `.hopcode/settings.json`:
    ```json
    {
      "telemetry": {
@@ -95,7 +95,7 @@ For local development and debugging, you can capture telemetry data locally:
 
 ### File-based Output (Recommended)
 
-1. Enable telemetry in your `.qwen/settings.json`:
+1. Enable telemetry in your `.hopcode/settings.json`:
    ```json
    {
      "telemetry": {

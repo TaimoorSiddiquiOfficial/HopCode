@@ -1,12 +1,12 @@
-# Channels Design
+﻿# Channels Design
 
-> External messaging integrations for Qwen Code — interact with an agent from Telegram, WeChat, and more.
+> External messaging integrations for HopCode — interact with an agent from Telegram, WeChat, and more.
 >
 > User documentation: [Channels Overview](../../users/features/channels/overview.md).
 
 ## Overview
 
-A **channel** connects an external messaging platform to a Qwen Code agent. Configured in `settings.json`, managed via `qwen channel` subcommands, multi-user (each user gets an isolated ACP session).
+A **channel** connects an external messaging platform to a HopCode agent. Configured in `settings.json`, managed via `qwen channel` subcommands, multi-user (each user gets an isolated ACP session).
 
 ## Architecture
 
@@ -19,7 +19,7 @@ A **channel** connects an external messaging platform to a Qwen Code agent. Conf
 │ User B   │                        │  │ Adapter    │    │  (shared)    │  │
 └──────────┘                        │  │            │    │              │  │
                                     │  │ - connect  │    │  - spawns    │  │
-                                    │  │ - receive  │    │    qwen-code │  │
+                                    │  │ - receive  │    │    hopcode │  │
                                     │  │ - send     │    │  - manages   │  │
                                     │  │            │    │    sessions  │  │
                                     │  └─────┬──────┘    └──────┬───────┘  │
@@ -34,13 +34,13 @@ A **channel** connects an external messaging platform to a Qwen Code agent. Conf
                                                      │ stdio (ACP ndjson)
                                                      ▼
                                     ┌─────────────────────────────────────┐
-                                    │        qwen-code --acp              │
+                                    │        hopcode --acp              │
                                     │   Session A (user alice, id: "abc") │
                                     │   Session B (user bob,   id: "def") │
                                     └─────────────────────────────────────┘
 ```
 
-**Platform Adapter** — connects to external API, translates messages to/from Envelopes. **ACP Bridge** — spawns `qwen-code --acp`, manages sessions, emits `textChunk`/`toolCall`/`disconnected` events. **Session Router** — maps senders to ACP sessions via namespaced keys (`<channel>:<sender>`). **Sender Gate** / **Group Gate** — access control (allowlist / pairing / open) and mention gating. **Channel Base** — abstract base with Template Method pattern: plugins override `connect`, `sendMessage`, `disconnect`. **Channel Registry** — `Map<string, ChannelPlugin>` with collision detection.
+**Platform Adapter** — connects to external API, translates messages to/from Envelopes. **ACP Bridge** — spawns `hopcode --acp`, manages sessions, emits `textChunk`/`toolCall`/`disconnected` events. **Session Router** — maps senders to ACP sessions via namespaced keys (`<channel>:<sender>`). **Sender Gate** / **Group Gate** — access control (allowlist / pairing / open) and mention gating. **Channel Base** — abstract base with Template Method pattern: plugins override `connect`, `sendMessage`, `disconnect`. **Channel Registry** — `Map<string, ChannelPlugin>` with collision detection.
 
 ### Envelope
 
@@ -63,7 +63,7 @@ Slash commands (`/clear`, `/help`, `/status`) are handled in ChannelBase before 
 
 ### Sessions
 
-One `qwen-code --acp` process with multiple ACP sessions. Scope per channel: **`user`** (default), **`thread`**, or **`single`**. Routing keys namespaced as `<channelName>:<key>`.
+One `hopcode --acp` process with multiple ACP sessions. Scope per channel: **`user`** (default), **`thread`**, or **`single`**. Routing keys namespaced as `<channelName>:<key>`.
 
 ### Error Handling
 
@@ -159,7 +159,7 @@ qwen extensions remove <name>                 # uninstall
 
 ```
 packages/channels/
-├── base/                    # @qwen-code/channel-base
+├── base/                    # @hopcode/channel-base
 │   └── src/
 │       ├── AcpBridge.ts     # ACP process lifecycle, session management
 │       ├── SessionRouter.ts # sender ↔ session mapping, persistence
@@ -168,9 +168,9 @@ packages/channels/
 │       ├── PairingStore.ts  # pairing code generation + approval
 │       ├── ChannelBase.ts   # abstract base: routing, slash commands
 │       └── types.ts         # Envelope, ChannelConfig, etc.
-├── telegram/                # @qwen-code/channel-telegram
-├── weixin/                  # @qwen-code/channel-weixin
-└── dingtalk/                # @qwen-code/channel-dingtalk
+├── telegram/                # @hopcode/channel-telegram
+├── weixin/                  # @hopcode/channel-weixin
+└── dingtalk/                # @hopcode/channel-dingtalk
 ```
 
 ## Future Work

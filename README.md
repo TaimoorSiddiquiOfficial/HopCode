@@ -21,16 +21,16 @@
 
 - **2026-04-19**: 🎸 **VS Code Extension v0.14.8** published to the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion). Install directly from VS Code!
 
-- **2026-04-19**: ✨ **Skills System** launched — 5 built-in skills (`spec-driven`, `git-workflow`, `codebase-map`, `changelog`, `mcp-builder`). Run `qwen skills list` to see them.
+- **2026-04-19**: ✨ **Skills System** launched — 5 built-in skills (`spec-driven`, `git-workflow`, `codebase-map`, `changelog`, `mcp-builder`). Run `hopcode skills list` to see them.
 
-- **2026-04-15**: Qwen OAuth free tier has been discontinued. Switch to [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), any compatible API provider, or run models locally via Ollama. Run `qwen auth` to configure.
+- **2026-04-15**: Qwen OAuth provider has been discontinued. Switch to [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), any compatible API provider, or run models locally via Ollama. Run `hopcode auth` to configure.
 
 ## Why HopCode?
 
 HopCode is an open-source AI agent for the terminal that works with **any LLM provider** — cloud or local. It helps you understand large codebases, automate tedious work, and ship faster.
 
 - **Any provider, any model**: OpenAI, Anthropic, Google Gemini, Mistral, DeepSeek, Groq, Together AI, Fireworks AI, Cohere, xAI Grok, [OpenRouter](https://openrouter.ai) (100+ models), [Ollama](https://ollama.com) / [vLLM](https://vllm.ai) (local), and any OpenAI-compatible endpoint.
-- **Skills system**: modular, auto-loaded skills extend HopCode's capabilities — run `qwen skills list` to see bundled skills or add your own.
+- **Skills system**: modular, auto-loaded skills extend HopCode's capabilities — run `hopcode skills list` to see bundled skills or add your own.
 - **Agentic workflow, feature-rich**: built-in tools for file editing, shell execution, web search, sub-agents, and full agentic loops — a Claude Code-like experience.
 - **VS Code extension**: companion extension available on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion) for in-editor AI assistance.
 - **Terminal-first, IDE-friendly**: built for developers who live in the command line, with optional integration for VS Code, Zed, and JetBrains IDEs.
@@ -54,7 +54,7 @@ Or install via the [VS Code Marketplace](https://marketplace.visualstudio.com/it
 #### Linux / macOS
 
 ```bash
-bash -c "$(curl -fsSL https://hopcode-assets.example.com/installation/install-qwen.sh)"
+bash -c "$(curl -fsSL https://hopcode-assets.example.com/installation/install-hopcode.sh)"
 ```
 
 #### Windows (Run as Administrator)
@@ -62,7 +62,7 @@ bash -c "$(curl -fsSL https://hopcode-assets.example.com/installation/install-qw
 Works in both Command Prompt and PowerShell:
 
 ```cmd
-powershell -Command "Invoke-WebRequest 'https://hopcode-assets.example.com/installation/install-qwen.bat' -OutFile (Join-Path $env:TEMP 'install-qwen.bat'); & (Join-Path $env:TEMP 'install-qwen.bat')"
+powershell -Command "Invoke-WebRequest 'https://hopcode-assets.example.com/installation/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
 ```
 
 > **Note**: It's recommended to restart your terminal after installation to ensure environment variables take effect.
@@ -89,7 +89,7 @@ brew install hopcode
 
 ```bash
 # Start HopCode (interactive)
-qwen
+hopcode
 
 # Then, in the session:
 /help
@@ -122,7 +122,7 @@ Copy the prompt below and paste it into your agent:
 
 ```
 Use HopCode as a coding agent. First, fetch and read this skill reference:
-https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/.qwen/skills/qwen-code-claw/SKILL.md
+https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
 Then follow the instructions inside to install, authenticate, and use HopCode via acpx for all coding tasks.
 ```
 
@@ -157,7 +157,7 @@ HopCode supports the following authentication methods:
 - **API Key (recommended)**: use an API key from any supported provider (OpenAI, Anthropic, Google GenAI, Mistral, Groq, DeepSeek, OpenRouter, and any OpenAI-compatible endpoint).
 - **Coding Plan**: subscribe to the Alibaba Cloud Coding Plan ([Beijing](https://bailian.console.aliyun.com/cn-beijing?tab=coding-plan#/efm/coding-plan-index) / [intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) for a fixed monthly fee with higher quotas.
 
-> ⚠️ **Qwen OAuth was discontinued on April 15, 2026.** If you were previously using Qwen OAuth, please switch to one of the methods above. Run `qwen` and then `/auth` to reconfigure.
+> ⚠️ **Qwen OAuth was discontinued on April 15, 2026.** If you were previously using Qwen OAuth, please switch to one of the methods above. Run `hopcode` and then `/auth` to reconfigure.
 
 #### API Key (recommended)
 
@@ -167,11 +167,11 @@ Use an API key to connect to any supported provider. Supports multiple protocols
 - **Anthropic**: Claude models directly
 - **Google GenAI / Vertex AI**: Gemini models
 
-The **recommended** way to configure models and providers is by editing `~/.qwen/settings.json` (create it if it doesn't exist). This file lets you define all available models, API keys, and default settings in one place.
+The **recommended** way to configure models and providers is by editing `~/.hopcode/settings.json` (create it if it doesn't exist). This file lets you define all available models, API keys, and default settings in one place.
 
 ##### Quick Setup in 3 Steps
 
-**Step 1:** Create or edit `~/.qwen/settings.json`
+**Step 1:** Create or edit `~/.hopcode/settings.json`
 
 Here is a complete example using [OpenRouter](https://openrouter.ai) (gives you access to 300+ models with a single API key):
 
@@ -231,7 +231,7 @@ Here is a complete example using [OpenRouter](https://openrouter.ai) (gives you 
 **Step 3:** Start HopCode — your configuration takes effect automatically:
 
 ```bash
-qwen
+hopcode
 ```
 
 Use the `/model` command at any time to switch between all configured models.
@@ -393,18 +393,18 @@ Use the `/model` command at any time to switch between all configured models.
 
 > **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://hopcode.dev/docs/en/users/configuration/auth/) for full details.
 
-> **Security note:** Never commit API keys to version control. The `~/.qwen/settings.json` file is in your home directory and should stay private.
+> **Security note:** Never commit API keys to version control. The `~/.hopcode/settings.json` file is in your home directory and should stay private.
 
 #### Local Model Setup (Ollama / vLLM / LM Studio)
 
-You can also run models locally — no API key or cloud account needed. Configure your local model endpoint in `~/.qwen/settings.json` using the `modelProviders` field.
+You can also run models locally — no API key or cloud account needed. Configure your local model endpoint in `~/.hopcode/settings.json` using the `modelProviders` field.
 
 <details>
 <summary>Ollama setup (multiple models)</summary>
 
 1. Install Ollama from [ollama.com](https://ollama.com/)
 2. Pull models: `ollama pull qwen3:32b && ollama pull llama3.3:70b && ollama pull deepseek-r1:14b`
-3. Configure `~/.qwen/settings.json` — list all your pulled models so you can switch with `/model`:
+3. Configure `~/.hopcode/settings.json` — list all your pulled models so you can switch with `/model`:
 
 ```json
 {
@@ -450,7 +450,7 @@ Use `/model` inside HopCode to switch between models from the same Ollama instan
 
 1. Install vLLM: `pip install vllm`
 2. Start the server: `vllm serve Qwen/Qwen3-32B`
-3. Configure `~/.qwen/settings.json`:
+3. Configure `~/.hopcode/settings.json`:
 
 ```json
 {
@@ -490,16 +490,16 @@ As an open-source terminal agent, you can use HopCode in four primary ways:
 
 ```bash
 cd your-project/
-qwen
+hopcode
 ```
 
-Run `qwen` in your project folder to launch the interactive terminal UI. Use `@` to reference local files (for example `@src/main.ts`).
+Run `hopcode` in your project folder to launch the interactive terminal UI. Use `@` to reference local files (for example `@src/main.ts`).
 
 #### Headless mode
 
 ```bash
 cd your-project/
-qwen -p "your question"
+hopcode -p "your question"
 ```
 
 Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://hopcode.dev/docs/en/users/features/headless).
@@ -524,16 +524,16 @@ Skills are modular instruction sets that extend HopCode's capabilities for speci
 
 ```bash
 # List available skills
-qwen skills list
+hopcode skills list
 
 # Show a skill's instructions
-qwen skills show spec-driven
+hopcode skills show spec-driven
 
 # Add a custom skill from a URL
-qwen skills add https://example.com/my-skill/SKILL.md
+hopcode skills add https://example.com/my-skill/SKILL.md
 
 # Remove a skill
-qwen skills remove my-skill
+hopcode skills remove my-skill
 ```
 
 **Built-in skills:**
@@ -571,10 +571,10 @@ qwen skills remove my-skill
 
 HopCode can be configured via `settings.json`, environment variables, and CLI flags.
 
-| File                    | Scope         | Description                                                                           |
-| ----------------------- | ------------- | ------------------------------------------------------------------------------------- |
-| `~/.qwen/settings.json` | User (global) | Applies to all your HopCode sessions. **Recommended for `modelProviders` and `env`.** |
-| `.qwen/settings.json`   | Project       | Applies only when running HopCode in this project. Overrides user settings.           |
+| File                       | Scope         | Description                                                                           |
+| -------------------------- | ------------- | ------------------------------------------------------------------------------------- |
+| `~/.hopcode/settings.json` | User (global) | Applies to all your HopCode sessions. **Recommended for `modelProviders` and `env`.** |
+| `.hopcode/settings.json`   | Project       | Applies only when running HopCode in this project. Overrides user settings.           |
 
 The most commonly used top-level fields in `settings.json`:
 
@@ -609,7 +609,7 @@ If you encounter issues, check the [troubleshooting guide](https://hopcode.dev/d
 
 **Common issues:**
 
-- **`Qwen OAuth free tier was discontinued on 2026-04-15`**: Qwen OAuth is no longer available. Run `qwen` → `/auth` and switch to API Key or Coding Plan. See the [Authentication](#authentication) section above for setup instructions.
+- **`Qwen OAuth free tier was discontinued on 2026-04-15`**: Qwen OAuth is no longer available. Run `hopcode` → `/auth` and switch to API Key or Coding Plan. See the [Authentication](#authentication) section above for setup instructions.
 
 To report a bug from within the CLI, run `/bug` and include a short title and repro steps.
 

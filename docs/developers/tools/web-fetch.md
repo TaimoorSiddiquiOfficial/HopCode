@@ -78,7 +78,7 @@ web_fetch(url="https://developers.cloudflare.com/fundamentals/reference/markdown
 
 ## Markdown for Agents Support
 
-Qwen Code's `web_fetch` tool implements support for [Cloudflare's Markdown for Agents](https://blog.cloudflare.com/markdown-for-agents/) specification. This feature allows websites to serve markdown content directly to AI agents, significantly reducing token usage compared to parsing HTML.
+HopCode's `web_fetch` tool implements support for [Cloudflare's Markdown for Agents](https://blog.cloudflare.com/markdown-for-agents/) specification. This feature allows websites to serve markdown content directly to AI agents, significantly reducing token usage compared to parsing HTML.
 
 ### How it works
 

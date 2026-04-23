@@ -186,14 +186,14 @@ export SANDBOX_SET_UID_GID=false  # Disable UID/GID mapping
 
 **Missing commands**
 
-- Container sandbox: add them via `.qwen/sandbox.Dockerfile` or `.qwen/sandbox.bashrc`.
+- Container sandbox: add them via `.hopcode/sandbox.Dockerfile` or `.qwen/sandbox.bashrc`.
 - Seatbelt: your host binaries are used, but the sandbox may restrict access to some paths.
 
 **Java not available in Docker sandbox**
 
 The official HopCode Docker image is intentionally minimal to keep the image small, secure, and fast to pull. Different users require different language runtimes (Java, Python, Node.js, etc.), and bundling all environments into a single image is not practical. Therefore, Java is **not included by default** in the Docker sandbox.
 
-If your workflow requires Java, you can extend the base image by creating a `.qwen/sandbox.Dockerfile` in your project:
+If your workflow requires Java, you can extend the base image by creating a `.hopcode/sandbox.Dockerfile` in your project:
 
 ```dockerfile
 FROM ghcr.io/qwenlm/hopcode:latest
@@ -223,7 +223,7 @@ For more details on customizing the sandbox, see [Customizing the sandbox enviro
 DEBUG=1 qwen -s -p "debug command"
 ```
 
-**Note:** If you have `DEBUG=true` in a project's `.env` file, it won't affect the CLI due to automatic exclusion. Use `.qwen/.env` files for HopCode-specific debug settings.
+**Note:** If you have `DEBUG=true` in a project's `.env` file, it won't affect the CLI due to automatic exclusion. Use `.hopcode/.env` files for HopCode-specific debug settings.
 
 ### Inspect sandbox
 

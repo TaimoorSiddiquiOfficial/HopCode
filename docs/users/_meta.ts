@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   'Getting started': {
     type: 'separator',
     title: 'Getting started', // Title is optional
@@ -14,9 +14,9 @@ export default {
   'integration-zed': 'Zed IDE',
   'integration-jetbrains': 'JetBrains IDEs',
   'integration-github-action': 'Github Actions',
-  'Code with Qwen Code': {
+  'Code with HopCode': {
     type: 'separator',
-    title: 'Code with Qwen Code', // Title is optional
+    title: 'Code with HopCode', // Title is optional
   },
   features: 'Features',
   configuration: 'Configuration',

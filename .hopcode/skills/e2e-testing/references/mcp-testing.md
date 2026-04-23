@@ -1,10 +1,10 @@
-# MCP Server E2E Testing
+﻿# MCP Server E2E Testing
 
 How to set up and run end-to-end tests involving MCP tool servers.
 
 ## Where MCP Config Goes
 
-MCP servers are configured in `.qwen/settings.json` under `mcpServers`. This is
+MCP servers are configured in `.hopcode/settings.json` under `mcpServers`. This is
 the **only** location that works for E2E testing.
 
 Common mistakes that waste time:
@@ -20,7 +20,7 @@ The CLI needs a git repo to load project settings. Create a temp directory:
 ```bash
 mkdir -p /tmp/test-dir && cd /tmp/test-dir && git init -q
 mkdir -p .qwen
-cat > .qwen/settings.json << 'EOF'
+cat > .hopcode/settings.json << 'EOF'
 {
   "mcpServers": {
     "my-server": {
@@ -71,6 +71,6 @@ Check the `type: "system"` init message in JSON output:
 
 If `mcp_servers` is empty:
 
-- You're not running from the directory containing `.qwen/settings.json`
+- You're not running from the directory containing `.hopcode/settings.json`
 - The directory is not a git repo (`git init` missing)
 - The server command/path is wrong (check stderr with `2>&1`)

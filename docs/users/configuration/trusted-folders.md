@@ -32,7 +32,7 @@ Your choice is saved in a central file (`~/.qwen/trustedFolders.json`), so you w
 
 When a folder is **untrusted**, the HopCode runs in a restricted "safe mode" to protect you. In this mode, the following features are disabled:
 
-1.  **Workspace Settings are Ignored**: The CLI will **not** load the `.qwen/settings.json` file from the project. This prevents the loading of custom tools and other potentially dangerous configurations.
+1.  **Workspace Settings are Ignored**: The CLI will **not** load the `.hopcode/settings.json` file from the project. This prevents the loading of custom tools and other potentially dangerous configurations.
 
 2.  **Environment Variables are Ignored**: The CLI will **not** load any `.env` files from the project.
 

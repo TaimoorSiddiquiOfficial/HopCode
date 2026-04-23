@@ -40,7 +40,7 @@ Use this index to locate the right document for the user's question. Load only t
 | Settings reference (all config keys)      | `docs/configuration/settings.md`        |
 | Authentication setup                      | `docs/configuration/auth.md`            |
 | Model providers (OpenAI-compatible, etc.) | `docs/configuration/model-providers.md` |
-| .qwenignore file                          | `docs/configuration/qwen-ignore.md`     |
+| .hopcodeignore file                       | `docs/configuration/hopcode-ignore.md`  |
 | Themes                                    | `docs/configuration/themes.md`          |
 | Memory                                    | `docs/configuration/memory.md`          |
 | Trusted folders                           | `docs/configuration/trusted-folders.md` |

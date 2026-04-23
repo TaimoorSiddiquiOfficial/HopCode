@@ -27,7 +27,7 @@ qwen extensions link /path/to/my-channel-extension
 
 ## Configuring a Custom Channel
 
-Add a channel entry to `~/.qwen/settings.json` using the custom type provided by the extension:
+Add a channel entry to `~/.hopcode/settings.json` using the custom type provided by the extension:
 
 ```json
 {

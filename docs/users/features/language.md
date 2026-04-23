@@ -8,7 +8,7 @@ From a user point of view, HopCode’s “internationalization” spans multiple
 
 | Capability / Setting     | What it controls                                                       | Where stored                 |
 | ------------------------ | ---------------------------------------------------------------------- | ---------------------------- |
-| `/language ui`           | Terminal UI text (menus, system messages, prompts)                     | `~/.qwen/settings.json`      |
+| `/language ui`           | Terminal UI text (menus, system messages, prompts)                     | `~/.hopcode/settings.json`   |
 | `/language output`       | Language the AI responds in (an output preference, not UI translation) | `~/.qwen/output-language.md` |
 | Custom UI language packs | Overrides/extends built-in UI translations                             | `~/.qwen/locales/*.js`       |
 

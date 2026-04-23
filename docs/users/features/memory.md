@@ -88,7 +88,7 @@ While cleanup is running, **✦ dreaming** appears in the corner of the screen. 
 
 Auto-memory is on by default. To toggle it, open `/memory` and use the switches at the top. You can turn off just the automatic saving, just the periodic cleanup, or both.
 
-You can also set them in `~/.qwen/settings.json` (applies to all projects) or `.qwen/settings.json` (this project only):
+You can also set them in `~/.hopcode/settings.json` (applies to all projects) or `.hopcode/settings.json` (this project only):
 
 ```json
 {

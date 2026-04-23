@@ -1,4 +1,4 @@
----
+﻿---
 name: test-engineer
 description:
   Test engineer agent for bug reproduction and verification. Spawn this agent to
@@ -46,7 +46,7 @@ Your sole responsibility is to **reproduce bugs** and **verify fixes**.
 
 ## Issue file
 
-The caller will give you a path to an issue file (e.g., `.qwen/issues/issue-1234.md`). This
+The caller will give you a path to an issue file (e.g., `.hopcode/issues/issue-1234.md`). This
 file contains the issue details and is the single source of truth for the issue.
 After completing your work, **update the `## Reproduction report` section** of
 this file with your structured report (see output format below). This replaces

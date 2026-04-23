@@ -756,7 +756,7 @@ Hook output supports three categories of fields:
 
 ## Hook Configuration
 
-Hooks are configured in HopCode settings, typically in `.qwen/settings.json` or user configuration files:
+Hooks are configured in HopCode settings, typically in `.hopcode/settings.json` or user configuration files:
 
 ```json
 {
@@ -895,7 +895,7 @@ echo '{
 exit 0
 ```
 
-Configure in `.qwen/settings.json`:
+Configure in `.hopcode/settings.json`:
 
 ```json
 {

@@ -39,7 +39,7 @@ You can safely delete this file to reset tip history.
 
 ## Disabling Tips
 
-To hide all tips (both startup and post-response), set `ui.hideTips` to `true` in `~/.qwen/settings.json`:
+To hide all tips (both startup and post-response), set `ui.hideTips` to `true` in `~/.hopcode/settings.json`:
 
 ```json
 {

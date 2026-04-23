@@ -204,7 +204,7 @@ Use the `/mcp auth` command to manage OAuth authentication:
 - **`authorizationUrl`** (string): OAuth authorization endpoint (auto-discovered if omitted)
 - **`tokenUrl`** (string): OAuth token endpoint (auto-discovered if omitted)
 - **`scopes`** (string[]): Required OAuth scopes
-- **`redirectUri`** (string): Custom redirect URI. **Critical for remote deployments**: Defaults to `http://localhost:7777/oauth/callback`. When running Qwen Code on remote/cloud servers, set this to a publicly accessible URL (e.g., `https://your-server.com/oauth/callback`). Can be configured via `qwen mcp add --oauth-redirect-uri` or directly in settings.json.
+- **`redirectUri`** (string): Custom redirect URI. **Critical for remote deployments**: Defaults to `http://localhost:7777/oauth/callback`. When running HopCode on remote/cloud servers, set this to a publicly accessible URL (e.g., `https://your-server.com/oauth/callback`). Can be configured via `qwen mcp add --oauth-redirect-uri` or directly in settings.json.
 - **`tokenParamName`** (string): Query parameter name for tokens in SSE URLs
 - **`audiences`** (string[]): Audiences the token is valid for
 
@@ -777,7 +777,7 @@ While you can always configure MCP servers by manually editing your `settings.js
 
 ### Adding a Server (`qwen mcp add`)
 
-The `add` command configures a new MCP server in your `settings.json`. Based on the scope (`-s, --scope`), it will be added to either the user config `~/.qwen/settings.json` or the project config `.qwen/settings.json` file.
+The `add` command configures a new MCP server in your `settings.json`. Based on the scope (`-s, --scope`), it will be added to either the user config `~/.hopcode/settings.json` or the project config `.hopcode/settings.json` file.
 
 **Command:**
 
@@ -802,7 +802,7 @@ qwen mcp add [options] <name> <commandOrUrl> [args...]
 - `--exclude-tools`: A comma-separated list of tools to exclude.
 - `--oauth-client-id`: OAuth client ID for MCP server authentication.
 - `--oauth-client-secret`: OAuth client secret for MCP server authentication.
-- `--oauth-redirect-uri`: OAuth redirect URI (e.g., `https://your-server.com/oauth/callback`). Defaults to `http://localhost:7777/oauth/callback` for local setups. **Important for remote deployments**: When running Qwen Code on remote/cloud servers, set this to a publicly accessible URL.
+- `--oauth-redirect-uri`: OAuth redirect URI (e.g., `https://your-server.com/oauth/callback`). Defaults to `http://localhost:7777/oauth/callback` for local setups. **Important for remote deployments**: When running HopCode on remote/cloud servers, set this to a publicly accessible URL.
 - `--oauth-authorization-url`: OAuth authorization URL.
 - `--oauth-token-url`: OAuth token URL.
 - `--oauth-scopes`: OAuth scopes (comma-separated).

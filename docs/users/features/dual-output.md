@@ -356,8 +356,8 @@ through every launch. The same channels can be configured in
 `settings.json` under the top-level `dualOutput` key:
 
 ```jsonc
-// ~/.qwen/settings.json  (user-level)
-// or <workspace>/.qwen/settings.json  (workspace-level)
+// ~/.hopcode/settings.json  (user-level)
+// or <workspace>/.hopcode/settings.json  (workspace-level)
 {
   "dualOutput": {
     "jsonFile": "/tmp/qwen-events.jsonl",

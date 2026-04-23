@@ -1,4 +1,4 @@
-# Agent Tool Display Implementation Plan
+﻿# Agent Tool Display Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -6,7 +6,7 @@
 
 **Architecture:** Preserve ACP `rawOutput` through the VSCode session/update pipeline into `ToolCallData`, then let the shared web UI router detect `task_execution` payloads and render a dedicated `AgentToolCall` component. Keep the change shared in `packages/webui` so VSCode and `ChatViewer` stay aligned.
 
-**Tech Stack:** TypeScript, React, Vitest, shared `@qwen-code/webui` tool-call components.
+**Tech Stack:** TypeScript, React, Vitest, shared `@hoptrendy/webui` tool-call components.
 
 ### Task 1: Lock in the failing data-flow behavior
 

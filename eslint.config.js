@@ -28,7 +28,7 @@ export default tseslint.config(
       'dist/**',
       'docs-site/.next/**',
       'docs-site/out/**',
-      '.qwen/**',
+      '.hopcode/**',
       '.hopcode-backup-*/**',
       'packages/core/test-openai-provider.ts',
       'packages/core/src/provider/sdk/**',

@@ -1,9 +1,9 @@
----
-name: qwen-code-claw
-description: Use Qwen Code as a Code Agent for code understanding, project generation, features, bug fixes, refactoring, and various programming tasks
+﻿---
+name: hopcode-claw
+description: Use HopCode as a Code Agent for code understanding, project generation, features, bug fixes, refactoring, and various programming tasks
 ---
 
-# Qwen Code Claw
+# HopCode Claw
 
 ## When to Use This Skill
 
@@ -19,7 +19,7 @@ Use this skill when you need to:
 ## Install
 
 ```bash
-npm install -g @qwen-code/qwen-code
+npm install -g @hoptrendy/hopcode-cli
 ```
 
 For normal session reuse, prefer a global install over `npx`.
@@ -29,7 +29,7 @@ For normal session reuse, prefer a global install over `npx`.
 Check if authentication is already configured:
 
 ```bash
-qwen auth status
+hopcode auth status
 ```
 
 If authentication exists, skip this section. If not authenticated, check if the `BAILIAN_CODING_PLAN_API_KEY` environment variable exists:
@@ -41,20 +41,20 @@ echo $BAILIAN_CODING_PLAN_API_KEY
 **If `BAILIAN_CODING_PLAN_API_KEY` exists**, authenticate directly:
 
 ```bash
-qwen auth coding-plan --region china --key $BAILIAN_CODING_PLAN_API_KEY
+hopcode auth coding-plan --region china --key $BAILIAN_CODING_PLAN_API_KEY
 ```
 
-**If the environment variable does not exist**, interrupt and prompt the user to authenticate via `qwen-oauth` or `coding-plan`:
+**If the environment variable does not exist**, interrupt and prompt the user to authenticate via `coding-plan` or API key:
 
 ```bash
-qwen auth
+hopcode auth
 ```
 
-Or configure custom API after launching Qwen Code via `/auth`.
+Or configure custom API after launching HopCode via `/auth`.
 
 ## ACPX Integration
 
-You should always use `acpx` to run Qwen Code over the Agent Client Protocol (ACP) instead of scraping PTY sessions.
+You should always use `acpx` to run HopCode over the Agent Client Protocol (ACP) instead of scraping PTY sessions.
 
 To use acpx:
 
@@ -82,12 +82,12 @@ To use acpx:
 4. **For complete CLI reference with all options and examples**:
    https://raw.githubusercontent.com/openclaw/acpx/main/docs/CLI.md
 
-From now on, when you need to delegate work to Qwen Code, use `acpx` instead of spawning raw terminal sessions. For example:
+From now on, when you need to delegate work to HopCode, use `acpx` instead of spawning raw terminal sessions. For example:
 
 ```bash
-npx acpx@latest qwen "fix the failing tests"
-npx acpx@latest qwen "refactor the auth module"
-npx acpx@latest qwen exec "one-shot: summarize this repo"
+npx acpx@latest hopcode "fix the failing tests"
+npx acpx@latest hopcode "refactor the auth module"
+npx acpx@latest hopcode exec "one-shot: summarize this repo"
 ```
 
 > **Tip:** You should typically use the `--approve-all` flag to prevent task interruptions.
@@ -97,28 +97,28 @@ npx acpx@latest qwen exec "one-shot: summarize this repo"
 ### Persistent Repository Assistant
 
 ```bash
-acpx qwen 'inspect failing tests and propose a fix plan'
-acpx qwen 'apply the smallest safe fix and run tests'
+acpx hopcode 'inspect failing tests and propose a fix plan'
+acpx hopcode 'apply the smallest safe fix and run tests'
 ```
 
 ### One-Shot Script Steps
 
 ```bash
-acpx qwen exec 'summarize repo purpose in 3 lines'
+acpx hopcode exec 'summarize repo purpose in 3 lines'
 ```
 
 ### Parallel Named Streams
 
 ```bash
-acpx qwen -s backend 'fix API pagination bug'
-acpx qwen -s docs 'draft changelog entry for release'
+acpx hopcode -s backend 'fix API pagination bug'
+acpx hopcode -s docs 'draft changelog entry for release'
 ```
 
 ### Queue Follow-ups Without Waiting
 
 ```bash
-acpx qwen 'run full test suite and investigate failures'
-acpx qwen --no-wait 'after tests, summarize root causes and next steps'
+acpx hopcode 'run full test suite and investigate failures'
+acpx hopcode --no-wait 'after tests, summarize root causes and next steps'
 ```
 
 ### Machine-Readable Output for Orchestration
@@ -150,7 +150,7 @@ If every permission request is denied/cancelled and none are approved, `acpx` ex
 4. Use `--format json` for automation and script integration
 5. Use `--cwd` to manage context across multiple projects
 
-## QwenCode Reference
+## HopCode Reference
 
 ### CLI Commands
 
@@ -161,13 +161,13 @@ If every permission request is denied/cancelled and none are approved, `acpx` ex
 | `/compress` | Compress history to save tokens |
 | `/stats`    | Show session info               |
 | `/auth`     | Configure authentication        |
-| `/exit`     | Exit Qwen Code                  |
+| `/exit`     | Exit HopCode                    |
 
-Full reference: https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/features/commands.md
+Full reference: https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/features/commands.md
 
 ### Configuration
 
-Config files (highest priority first): CLI args > env vars > system > project (`.qwen/settings.json`) > user (`~/.qwen/settings.json`) > defaults. Format: JSONC with env var interpolation.
+Config files (highest priority first): CLI args > env vars > system > project (`.hopcode/settings.json`) > user (`~/.hopcode/settings.json`) > defaults. Format: JSONC with env var interpolation.
 
 Key settings:
 
@@ -178,30 +178,30 @@ Key settings:
 | `permissions.allow/ask/deny` | Tool permission rules                     |
 | `mcpServers.*`               | MCP server configurations                 |
 
-Full reference: https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/configuration/settings.md
+Full reference: https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/configuration/settings.md
 
 ### Authentication
 
 Supports Alibaba Cloud Coding Plan, OpenAI-compatible API keys, and Qwen OAuth (free tier discontinued 2026-04-15).
 
-Full reference: https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/configuration/auth.md
+Full reference: https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/configuration/auth.md
 
 ### Model Providers
 
 Configure custom model providers via `modelProviders` in settings or environment variables (`OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`).
 
-Full reference: https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/configuration/model-providers.md
+Full reference: https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/configuration/model-providers.md
 
 ### Key Features
 
-| Feature       | Description                               | Docs                                                                                                    |
-| ------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Approval Mode | Control tool execution permissions        | https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/features/approval-mode.md |
-| MCP           | Model Context Protocol server integration | https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/features/mcp.md           |
-| Skills        | Reusable skill system via `/skill`        | https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/features/skills.md        |
-| Sub-agents    | Delegate tasks to specialized agents      | https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/features/sub-agents.md    |
-| Sandbox       | Secure code execution environment         | https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/features/sandbox.md       |
-| Headless      | Non-interactive / CI mode                 | https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/main/docs/users/features/headless.md      |
+| Feature       | Description                               | Docs                                                                                                                   |
+| ------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Approval Mode | Control tool execution permissions        | https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/features/approval-mode.md |
+| MCP           | Model Context Protocol server integration | https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/features/mcp.md           |
+| Skills        | Reusable skill system via `/skill`        | https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/features/skills.md        |
+| Sub-agents    | Delegate tasks to specialized agents      | https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/features/sub-agents.md    |
+| Sandbox       | Secure code execution environment         | https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/features/sandbox.md       |
+| Headless      | Non-interactive / CI mode                 | https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/features/headless.md      |
 
 ## ACPX Reference
 
@@ -209,7 +209,7 @@ Full reference: https://raw.githubusercontent.com/QwenLM/qwen-code/refs/heads/ma
 
 Well-known agent names resolve to commands:
 
-- `qwen` → `qwen --acp`
+- `hopcode` → `hopcode --acp`
 
 ### Command Syntax
 

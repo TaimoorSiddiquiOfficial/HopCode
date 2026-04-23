@@ -1,4 +1,4 @@
----
+﻿---
 name: e2e-testing
 description: Guide for running end-to-end tests of the Qwen Code CLI, including headless mode, MCP server testing, and API traffic inspection. Use this skill whenever you need to verify CLI behavior with real model calls, reproduce user-reported bugs end-to-end, test MCP tool integrations, or inspect raw API request/response payloads. Trigger on mentions of E2E testing, headless testing, MCP tool testing, or reproducing issues.
 ---
@@ -162,7 +162,7 @@ a reusable zero-dependency test server template in `scripts/mcp-test-server.js`.
 Use `scripts/token-stats.py` to summarize token usage across recent API logs:
 
 ```bash
-python3 .qwen/skills/e2e-testing/scripts/token-stats.py 20  # last 20 requests
+python3 .hopcode/skills/e2e-testing/scripts/token-stats.py 20  # last 20 requests
 ```
 
 Shows input, cached, and output tokens per request with cache hit rates. Useful

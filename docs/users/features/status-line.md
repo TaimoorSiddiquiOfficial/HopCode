@@ -47,7 +47,7 @@ You can also give it specific instructions:
 
 ## Manual configuration
 
-Add a `statusLine` object under the `ui` key in `~/.qwen/settings.json`:
+Add a `statusLine` object under the `ui` key in `~/.hopcode/settings.json`:
 
 ```json
 {

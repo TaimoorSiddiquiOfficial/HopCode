@@ -177,7 +177,7 @@ function App() {
 #### Button
 
 ```tsx
-import { Button } from '@qwen-code/webui';
+import { Button } from '@hoptrendy/webui';
 
 <Button variant="primary" size="md" loading={false}>
   Submit
@@ -196,7 +196,7 @@ import { Button } from '@qwen-code/webui';
 #### Input
 
 ```tsx
-import { Input } from '@qwen-code/webui';
+import { Input } from '@hoptrendy/webui';
 
 <Input
   label="Email"
@@ -219,7 +219,7 @@ import { Input } from '@qwen-code/webui';
 #### Tooltip
 
 ```tsx
-import { Tooltip } from '@qwen-code/webui';
+import { Tooltip } from '@hoptrendy/webui';
 
 <Tooltip content="Helpful tip">
   <span>Hover me</span>
@@ -229,7 +229,7 @@ import { Tooltip } from '@qwen-code/webui';
 ### Icons
 
 ```tsx
-import { FileIcon, FolderIcon, CheckIcon } from '@qwen-code/webui/icons';
+import { FileIcon, FolderIcon, CheckIcon } from '@hoptrendy/webui/icons';
 
 <FileIcon size={16} className="text-gray-500" />;
 ```
@@ -263,7 +263,7 @@ Available icon categories:
 The Platform Context provides an abstraction layer for platform-specific capabilities:
 
 ```tsx
-import { PlatformProvider, usePlatform } from '@qwen-code/webui/context';
+import { PlatformProvider, usePlatform } from '@hoptrendy/webui/context';
 
 const platformContext = {
   postMessage: (message) => vscode.postMessage(message),
@@ -298,7 +298,7 @@ Use the shared Tailwind preset for consistent styling:
 ```js
 // tailwind.config.js
 module.exports = {
-  presets: [require('@qwen-code/webui/tailwind.preset.cjs')],
+  presets: [require('@hoptrendy/webui/tailwind.preset.cjs')],
   // your customizations
 };
 ```

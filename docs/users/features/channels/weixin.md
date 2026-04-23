@@ -21,7 +21,7 @@ This will display a QR code URL. Scan it with your WeChat mobile app to authenti
 
 ### 2. Configure the channel
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.hopcode/settings.json`:
 
 ```json
 {

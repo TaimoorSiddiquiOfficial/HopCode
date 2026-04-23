@@ -1,4 +1,4 @@
----
+﻿---
 description: Fix a bug from a GitHub issue, following the reproduce-first workflow
 ---
 
@@ -12,7 +12,7 @@ A GitHub issue URL or number: $ARGUMENTS
 
 ### 1. Read the issue and create the issue file
 
-Create `.qwen/issues/` if it doesn't exist, then pipe the issue directly
+Create `.hopcode/issues/` if it doesn't exist, then pipe the issue directly
 into a markdown file using `gh`:
 
 ```bash
@@ -32,7 +32,7 @@ _Pending — to be filled by the test engineer._
 ## Verification report
 
 _Pending — to be filled by the test engineer._
-' > .qwen/issues/issue-<number>.md
+' > .hopcode/issues/issue-<number>.md
 ```
 
 This file is the single source of truth for the issue. It avoids passing large
@@ -40,7 +40,7 @@ text blobs between agents, saving tokens and preventing context loss.
 
 ### 2. Reproduce
 
-Spawn the `test-engineer` agent and tell it to read `.qwen/issues/issue-<number>.md`
+Spawn the `test-engineer` agent and tell it to read `.hopcode/issues/issue-<number>.md`
 for the issue details, then assess and reproduce the bug. Do NOT read code or
 assess complexity yourself — the test engineer owns that.
 
@@ -50,7 +50,7 @@ state the goal (reproduce or verify). Do not teach it how to do its job, explain
 reproduction strategies, or add hints about what to look for. It will figure that
 out on its own.
 
-Wait for the test engineer to finish. Then **read `.qwen/issues/issue-<number>.md`**
+Wait for the test engineer to finish. Then **read `.hopcode/issues/issue-<number>.md`**
 to get the reproduction report. If the status is `NOT_REPRODUCED`, say so and
 stop.
 
@@ -66,7 +66,7 @@ If the bug is complex enough that your first attempt doesn't work, switch to the
 ### 4. Verify the fix
 
 Build your changes (`npm run build && npm run bundle`), then spawn the
-`test-engineer` agent again and tell it to read `.qwen/issues/issue-<number>.md`
+`test-engineer` agent again and tell it to read `.hopcode/issues/issue-<number>.md`
 and _verify_ the fix. It will re-run its reproduction steps using
 `node dist/cli.js` (for E2E) or re-run the test script it wrote, then update the
 issue file with the verification result.

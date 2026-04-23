@@ -16,7 +16,7 @@ All channels share one agent process with isolated sessions per user. Each chann
 ## Quick Start
 
 1. Set up a bot on your messaging platform (see channel-specific guides: [Telegram](./telegram), [WeChat](./weixin), [DingTalk](./dingtalk))
-2. Add the channel configuration to `~/.qwen/settings.json`
+2. Add the channel configuration to `~/.hopcode/settings.json`
 3. Run `qwen channel start` to start all channels, or `qwen channel start <name>` for a single channel
 
 Want to connect a platform that isn't built in? See [Plugins](./plugins) to add a custom adapter as an extension.

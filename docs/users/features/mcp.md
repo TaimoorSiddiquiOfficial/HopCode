@@ -42,8 +42,8 @@ qwen mcp
 
 Most users only need these two scopes:
 
-- **Project scope (default)**: `.qwen/settings.json` in your project root
-- **User scope**: `~/.qwen/settings.json` across all projects on your machine
+- **Project scope (default)**: `.hopcode/settings.json` in your project root
+- **User scope**: `~/.hopcode/settings.json` across all projects on your machine
 
 Write to user scope:
 
@@ -75,7 +75,7 @@ Both approaches produce the same `mcpServers` entries in your `settings.json`—
 
 #### Stdio server (local process)
 
-JSON (`.qwen/settings.json`):
+JSON (`.hopcode/settings.json`):
 
 ```json
 {
@@ -155,11 +155,11 @@ qwen mcp add --transport sse sseServer http://localhost:8080/sse --timeout 30000
 
 ### OAuth authentication
 
-Qwen Code supports OAuth 2.0 authentication for MCP servers. This is useful when accessing remote servers that require authentication.
+HopCode supports OAuth 2.0 authentication for MCP servers. This is useful when accessing remote servers that require authentication.
 
 #### Basic usage
 
-When you add an MCP server with OAuth credentials, Qwen Code will automatically handle the authentication flow:
+When you add an MCP server with OAuth credentials, HopCode will automatically handle the authentication flow:
 
 ```bash
 qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
@@ -173,9 +173,9 @@ qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
 
 The OAuth flow requires a redirect URI where the authorization provider sends the authentication code.
 
-- **Local development**: By default, Qwen Code uses `http://localhost:7777/oauth/callback`. This works when running Qwen Code on your local machine with a local browser.
+- **Local development**: By default, HopCode uses `http://localhost:7777/oauth/callback`. This works when running HopCode on your local machine with a local browser.
 
-- **Remote/cloud deployments**: When running Qwen Code on remote servers, cloud IDEs, or web terminals, the default `localhost` redirect will NOT work. You MUST configure `--oauth-redirect-uri` to point to a publicly accessible URL that can receive the OAuth callback.
+- **Remote/cloud deployments**: When running HopCode on remote servers, cloud IDEs, or web terminals, the default `localhost` redirect will NOT work. You MUST configure `--oauth-redirect-uri` to point to a publicly accessible URL that can receive the OAuth callback.
 
 Example for remote servers:
 
@@ -229,7 +229,7 @@ OAuth tokens are automatically:
 - **Refreshed** when expired (if refresh tokens are available)
 - **Validated** before each connection attempt
 
-Use the `/mcp auth` command within Qwen Code to manage OAuth authentication interactively.
+Use the `/mcp auth` command within HopCode to manage OAuth authentication interactively.
 
 ### Tool filtering (allow/deny tools per server)
 
