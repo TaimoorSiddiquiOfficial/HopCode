@@ -19,6 +19,10 @@ import { flattenModelsBySource } from '../utils/modelsBySource.js';
 import { t } from '../../i18n/index.js';
 
 const METRIC_COL_WIDTH = 28;
+// 28 + 2*24 = 76, fitting the 76-column panel at 80-column terminal width
+// when the session has a single (model, source) pair split into two columns.
+// Sessions with three or more sources will exceed the panel — acceptable per
+// the design doc, which accepts the crowded layout for many-subagent cases.
 const MODEL_COL_WIDTH = 24;
 
 interface StatRowProps {
@@ -60,11 +64,9 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
 }) => {
   const { stats } = useSessionStats();
   const { models } = stats.metrics;
-  const activeModels = flattenModelsBySource(models).filter(
-    ({ metrics }) => metrics.api.totalRequests > 0,
-  );
+  const entries = flattenModelsBySource(models);
 
-  if (activeModels.length === 0) {
+  if (entries.length === 0) {
     return (
       <Box
         borderStyle="round"
@@ -82,13 +84,13 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
 
   const getModelValues = (
     getter: (metrics: ModelMetricsCore) => string | React.ReactElement,
-  ) => activeModels.map(({ metrics }) => getter(metrics));
+  ) => entries.map(({ metrics }) => getter(metrics));
 
-  const hasThoughts = activeModels.some(
+  const hasThoughts = entries.some(
     ({ metrics }) => metrics.tokens.thoughts > 0,
   );
-  const hasTool = activeModels.some(({ metrics }) => metrics.tokens.tool > 0);
-  const hasCached = activeModels.some(
+  const hasTool = entries.some(({ metrics }) => metrics.tokens.tool > 0);
+  const hasCached = entries.some(
     ({ metrics }) => metrics.tokens.cached > 0,
   );
 
@@ -113,7 +115,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
             {t('Metric')}
           </Text>
         </Box>
-        {activeModels.map(({ key, label }) => (
+        {entries.map(({ key, label }) => (
           <Box width={MODEL_COL_WIDTH} key={key}>
             <Text bold color={theme.text.primary}>
               {label}

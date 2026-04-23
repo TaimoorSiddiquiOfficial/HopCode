@@ -143,8 +143,8 @@ import {
 const CTRL_EXIT_PROMPT_DURATION_MS = 1000;
 const debugLogger = createDebugLogger('APP_CONTAINER');
 
-function isToolExecuting(pendingHistoryItems: HistoryItemWithoutId[]) {
-  return pendingHistoryItems.some((item) => {
+function isToolExecuting(pendingGeminiHistoryItems: HistoryItemWithoutId[]) {
+  return pendingGeminiHistoryItems.some((item) => {
     if (item && item.type === 'tool_group') {
       return item.tools.some(
         (tool) => ToolCallStatus.Executing === tool.status,
@@ -659,7 +659,7 @@ export const AppContainer = (props: AppContainerProps) => {
   const {
     handleSlashCommand,
     slashCommands,
-    pendingHistoryItems: pendingSlashCommandHistoryItems,
+    pendingGeminiHistoryItems: pendingSlashCommandHistoryItems,
     btwItem,
     setBtwItem,
     cancelBtw,
@@ -776,7 +776,7 @@ export const AppContainer = (props: AppContainerProps) => {
     streamingState,
     submitQuery,
     initError,
-    pendingHistoryItems: pendingHistoryItems,
+    pendingGeminiHistoryItems: pendingGeminiHistoryItems,
     thought,
     cancelOngoingRequest,
     retryLastPrompt,
@@ -1182,20 +1182,20 @@ export const AppContainer = (props: AppContainerProps) => {
     handleWelcomeBackClose,
   } = useWelcomeBack(config, handleFinalSubmit, buffer, settings.merged);
 
-  const pendingHistoryItems = useMemo(
-    () => [...pendingSlashCommandHistoryItems, ...pendingHistoryItems],
-    [pendingSlashCommandHistoryItems, pendingHistoryItems],
+  const pendingGeminiHistoryItems = useMemo(
+    () => [...pendingSlashCommandHistoryItems, ...pendingGeminiHistoryItems],
+    [pendingSlashCommandHistoryItems, pendingGeminiHistoryItems],
   );
 
   // Terminal tab progress bar (OSC 9;4) for iTerm2/Ghostty
-  useTerminalProgress(streamingState, isToolExecuting(pendingHistoryItems));
+  useTerminalProgress(streamingState, isToolExecuting(pendingGeminiHistoryItems));
 
   cancelHandlerRef.current = useCallback(() => {
-    const pendingHistoryItems = [
+    const pendingGeminiHistoryItems = [
       ...pendingSlashCommandHistoryItems,
-      ...pendingHistoryItems,
+      ...pendingGeminiHistoryItems,
     ];
-    if (isToolExecuting(pendingHistoryItems)) {
+    if (isToolExecuting(pendingGeminiHistoryItems)) {
       buffer.setText(''); // Just clear the prompt
       return;
     }
@@ -1219,7 +1219,7 @@ export const AppContainer = (props: AppContainerProps) => {
     buffer,
     popAllMessages,
     pendingSlashCommandHistoryItems,
-    pendingHistoryItems,
+    pendingGeminiHistoryItems,
   ]);
 
   const handleClearScreen = useCallback(() => {
@@ -1378,10 +1378,10 @@ export const AppContainer = (props: AppContainerProps) => {
       prevStreamingStateRef.current === StreamingState.Responding &&
       streamingState === StreamingState.Idle &&
       // Check both committed history and pending items for errors
-      // (API errors go to pendingHistoryItems, not historyManager.history)
+      // (API errors go to pendingGeminiHistoryItems, not historyManager.history)
       historyManager.history[historyManager.history.length - 1]?.type !==
         'error' &&
-      !pendingHistoryItems.some((item) => item.type === 'error') &&
+      !pendingGeminiHistoryItems.some((item) => item.type === 'error') &&
       !shellConfirmationRequest &&
       !confirmationRequest &&
       !loopDetectionConfirmationRequest &&
@@ -2072,7 +2072,7 @@ export const AppContainer = (props: AppContainerProps) => {
       contextMdFileCount,
       streamingState,
       initError,
-      pendingHistoryItems,
+      pendingGeminiHistoryItems,
       thought,
       shellModeActive,
       userMessages,
@@ -2104,7 +2104,7 @@ export const AppContainer = (props: AppContainerProps) => {
       staticAreaMaxItemHeight,
       staticExtraHeight,
       dialogsVisible,
-      pendingHistoryItems,
+      pendingGeminiHistoryItems,
       btwItem,
       setBtwItem,
       cancelBtw,
@@ -2182,7 +2182,7 @@ export const AppContainer = (props: AppContainerProps) => {
       contextMdFileCount,
       streamingState,
       initError,
-      pendingHistoryItems,
+      pendingGeminiHistoryItems,
       thought,
       shellModeActive,
       userMessages,
@@ -2213,7 +2213,7 @@ export const AppContainer = (props: AppContainerProps) => {
       staticAreaMaxItemHeight,
       staticExtraHeight,
       dialogsVisible,
-      pendingHistoryItems,
+      pendingGeminiHistoryItems,
       btwItem,
       setBtwItem,
       cancelBtw,

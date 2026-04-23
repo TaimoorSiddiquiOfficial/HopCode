@@ -47,8 +47,8 @@ export interface ModelSourceEntry {
  * - Within the split case, sources under a given model are sorted with
  *   `MAIN_SOURCE` first (if present), then the rest alphabetically.
  * - Models with zero requests (aggregate) are omitted.
- * - If `bySource` is somehow empty (defensive), fall back to the aggregate
- *   row with the plain model name.
+ * - If `bySource` is somehow empty (defensive — callers shouldn't hit this),
+ *   fall back to the aggregate row with the plain model name.
  */
 export function flattenModelsBySource(
   models: Record<string, ModelMetrics>,
@@ -100,6 +100,9 @@ export function flattenModelsBySource(
 
 /**
  * Strips the Gemini `-001` version suffix from model names for display.
+ * Historically the StatsDisplay summary table normalized model names this
+ * way; keep the behavior but apply it to the model portion only so subagent
+ * names that happen to contain `-001` are not mangled.
  */
 function normalizeModelName(modelName: string): string {
   return modelName.replace('-001', '');

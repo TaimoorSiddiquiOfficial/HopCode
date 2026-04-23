@@ -9,34 +9,67 @@
  * enabling remote IDE integrations, microservices, and
  * language-agnostic clients.
  *
+ * By default the server runs **in-process**: AgentInteractive is instantiated
+ * directly in the server process, sharing the fully-initialized Config (auth,
+ * tools, model config). Use --subprocess for isolated per-session processes.
+ *
  * Usage:
- *   hopcode grpc [--port 50051] [--host 0.0.0.0]
+ *   hopcode grpc [--port 50051] [--host 0.0.0.0] [--subprocess]
  *
  * Proto file:
  *   packages/server/proto/hopcode.proto
  */
 
 import type { CommandModule, Argv } from 'yargs';
+import { loadCliConfig, parseArguments } from '../config/config.js';
+import { loadSettings } from '../config/settings.js';
+import type { Config } from '@hoptrendy/hopcode-core';
 
 interface GrpcArgs {
   port: number;
   host: string;
+  subprocess: boolean;
 }
 
-async function startGrpcServer(port: number, host: string): Promise<void> {
+async function buildConfig(): Promise<Config | undefined> {
   try {
+    const argv = await parseArguments();
+    const settings = loadSettings();
+    return await loadCliConfig(settings.merged, argv, process.cwd());
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[grpc] Could not build in-process config (${msg}); falling back to subprocess mode.`);
+    return undefined;
+  }
+}
+
+async function startGrpcServer(
+  port: number,
+  host: string,
+  useSubprocess: boolean,
+): Promise<void> {
+  try {
+    // Build runtime config for in-process mode unless --subprocess is set
+    const runtimeConfig = useSubprocess ? undefined : await buildConfig();
+
     // Dynamic import so the server package is only loaded when this command runs.
     // @ts-expect-error — package may not be built yet in dev; resolved at runtime.
     const serverModule = (await import('@hoptrendy/hopcode-server')) as {
-      HopCodeServer: new (opts: { port: number; host: string }) => {
+      HopCodeServer: new (opts: {
+        port: number;
+        host: string;
+        runtimeConfig?: Config;
+      }) => {
         start(): Promise<number>;
         stop(): Promise<void>;
       };
     };
-    const server = new serverModule.HopCodeServer({ port, host });
+
+    const server = new serverModule.HopCodeServer({ port, host, runtimeConfig });
     const boundPort = await server.start();
 
-    console.log(`🐇  HopCode gRPC server running on ${host}:${boundPort}`);
+    const mode = runtimeConfig ? 'in-process' : 'subprocess';
+    console.log(`🐇  HopCode gRPC server running on ${host}:${boundPort} [${mode} mode]`);
     console.log(`    Proto: packages/server/proto/hopcode.proto`);
 
     const shutdown = async () => {
@@ -68,9 +101,15 @@ export const grpcCommand: CommandModule<unknown, GrpcArgs> = {
         type: 'string',
         default: '0.0.0.0',
         description: 'Host to bind to',
+      })
+      .option('subprocess', {
+        type: 'boolean',
+        default: false,
+        description:
+          'Use subprocess-per-session mode instead of in-process AgentInteractive (for isolation)',
       });
   },
   async handler(args) {
-    await startGrpcServer(args.port, args.host);
+    await startGrpcServer(args.port, args.host, args.subprocess);
   },
 };

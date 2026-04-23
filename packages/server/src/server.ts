@@ -8,7 +8,9 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Config } from '@hoptrendy/hopcode-core';
 import { HopCodeSessionManager } from './session-manager.js';
+import { InProcessSessionManager } from './in-process-session-manager.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROTO_PATH = join(__dirname, '..', 'proto', 'hopcode.proto');
@@ -20,6 +22,14 @@ export interface ServerOptions {
   cwd?: string;
   /** Default model when client does not specify one. */
   defaultModel?: string;
+  /**
+   * When provided, sessions are run **in-process** using AgentInteractive
+   * directly (no subprocess spawn).  The Config carries auth credentials,
+   * tool permissions, and model settings from the hosting CLI process.
+   *
+   * When omitted, sessions are backed by a subprocess `hopcode …` invocation.
+   */
+  runtimeConfig?: Config;
 }
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
@@ -39,15 +49,19 @@ const hopcodeProto = grpc.loadPackageDefinition(packageDefinition) as any;
  * enabling remote IDE integrations, microservices, and headless
  * agent workers.
  *
+ * When `runtimeConfig` is provided in ServerOptions, sessions use
+ * AgentInteractive directly in-process (no subprocess spawning).
+ * Otherwise, each session spawns a `hopcode` child process.
+ *
  * Usage:
- *   const server = new HopCodeServer({ port: 50051 });
+ *   const server = new HopCodeServer({ port: 50051, runtimeConfig });
  *   await server.start();
  *   // ...
  *   await server.stop();
  */
 export class HopCodeServer {
   private server: grpc.Server;
-  private sessionManager: HopCodeSessionManager;
+  private sessionManager: HopCodeSessionManager | InProcessSessionManager;
   private port: number;
   private host: string;
 
@@ -55,10 +69,21 @@ export class HopCodeServer {
     this.port = options.port ?? 50051;
     this.host = options.host ?? '0.0.0.0';
     this.server = new grpc.Server();
-    this.sessionManager = new HopCodeSessionManager({
-      cwd: options.cwd,
-      defaultModel: options.defaultModel,
-    });
+
+    // Use in-process manager when a runtimeConfig is supplied (preferred),
+    // otherwise fall back to the subprocess-based manager.
+    if (options.runtimeConfig) {
+      this.sessionManager = new InProcessSessionManager({
+        runtimeConfig: options.runtimeConfig,
+        cwd: options.cwd,
+        defaultModel: options.defaultModel,
+      });
+    } else {
+      this.sessionManager = new HopCodeSessionManager({
+        cwd: options.cwd,
+        defaultModel: options.defaultModel,
+      });
+    }
 
     this.registerServices();
   }
@@ -117,9 +142,12 @@ export class HopCodeServer {
     call.on('data', async (clientMessage: any) => {
       try {
         if (!sessionId) {
-          // First message must establish the session
-          const payload = clientMessage.payload;
-          if (!payload || !payload.userPrompt) {
+          // First message must establish the session.
+          // The in-process manager accepts user_prompt (snake_case); the
+          // subprocess manager accepts userPrompt (camelCase). Normalize here.
+          const payload = clientMessage.payload ?? clientMessage;
+          const hasPrompt = payload?.user_prompt || payload?.userPrompt;
+          if (!hasPrompt) {
             call.write({
               error: {
                 type: 'INVALID_FIRST_MESSAGE',
@@ -194,7 +222,9 @@ export class HopCodeServer {
     callback: grpc.sendUnaryData<any>,
   ): Promise<void> {
     try {
-      const history = await this.sessionManager.getHistory(call.request.sessionId);
+      const history = await this.sessionManager.getHistory(
+        call.request.session_id ?? call.request.sessionId,
+      );
       callback(null, history);
     } catch (err) {
       callback(this.toGrpcError(err));
@@ -206,7 +236,9 @@ export class HopCodeServer {
     callback: grpc.sendUnaryData<any>,
   ): Promise<void> {
     try {
-      await this.sessionManager.closeSession(call.request.sessionId);
+      await this.sessionManager.closeSession(
+        call.request.session_id ?? call.request.sessionId,
+      );
       callback(null, {});
     } catch (err) {
       callback(this.toGrpcError(err));
@@ -238,3 +270,4 @@ export class HopCodeServer {
 }
 
 export { HopCodeSessionManager };
+

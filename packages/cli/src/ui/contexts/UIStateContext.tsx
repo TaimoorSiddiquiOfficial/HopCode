@@ -76,7 +76,7 @@ export interface UIState {
   contextMdFileCount: number;
   streamingState: StreamingState;
   initError: string | null;
-  pendingHistoryItems: HistoryItemWithoutId[];
+  pendingGeminiHistoryItems: HistoryItemWithoutId[];
   thought: ThoughtSummary | null;
   shellModeActive: boolean;
   userMessages: string[];
@@ -108,7 +108,7 @@ export interface UIState {
   staticAreaMaxItemHeight: number;
   staticExtraHeight: number;
   dialogsVisible: boolean;
-  pendingHistoryItems: HistoryItemWithoutId[];
+  pendingGeminiHistoryItems: HistoryItemWithoutId[];
   btwItem: HistoryItemBtw | null;
   setBtwItem: (item: HistoryItemBtw | null) => void;
   cancelBtw: () => void;

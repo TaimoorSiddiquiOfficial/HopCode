@@ -18,7 +18,7 @@ import {
   setupUnhandledRejectionHandler,
   validateDnsResolutionOrder,
   startInteractiveUI,
-} from './gemini.js';
+} from './interactive.js';
 import type { CliArgs } from './config/config.js';
 import { type LoadedSettings } from './config/settings.js';
 import { appEvents, AppEvent } from './utils/events.js';

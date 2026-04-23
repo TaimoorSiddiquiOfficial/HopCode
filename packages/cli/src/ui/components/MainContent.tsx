@@ -30,7 +30,7 @@ export const MainContent = () => {
   const uiActions = useUIActions();
   const { compactMode } = useCompactMode();
   const {
-    pendingHistoryItems,
+    pendingGeminiHistoryItems,
     terminalWidth,
     mainAreaWidth,
     staticAreaMaxItemHeight,
@@ -110,7 +110,7 @@ export const MainContent = () => {
       </Static>
       <OverflowProvider>
         <Box flexDirection="column">
-          {pendingHistoryItems.map((item, i) => (
+          {pendingGeminiHistoryItems.map((item, i) => (
             <HistoryItemDisplay
               key={i}
               availableTerminalHeight={

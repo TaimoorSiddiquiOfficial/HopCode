@@ -6,3 +6,7 @@
 
 export { HopCodeServer } from './server.js';
 export { HopCodeSessionManager } from './session-manager.js';
+export {
+  InProcessSessionManager,
+  type InProcessSessionManagerOptions,
+} from './in-process-session-manager.js';

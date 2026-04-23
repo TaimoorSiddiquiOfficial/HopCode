@@ -195,7 +195,7 @@ export const useSlashCommandProcessor = (
     { isActive: isProcessing },
   );
 
-  const pendingHistoryItems = useMemo(() => {
+  const pendingGeminiHistoryItems = useMemo(() => {
     const items: HistoryItemWithoutId[] = [];
     if (pendingItem != null) {
       items.push(pendingItem);
@@ -794,7 +794,7 @@ export const useSlashCommandProcessor = (
   return {
     handleSlashCommand,
     slashCommands: commands,
-    pendingHistoryItems,
+    pendingGeminiHistoryItems,
     btwItem,
     setBtwItem,
     cancelBtw,

@@ -13,8 +13,8 @@ import { initStartupProfiler } from './src/utils/startupProfiler.js';
 // Must run before any other imports to capture the earliest possible T0.
 initStartupProfiler();
 
-import './src/gemini.js';
-import { main } from './src/gemini.js';
+import './src/interactive.js';
+import { main } from './src/interactive.js';
 import { FatalError } from '@hoptrendy/hopcode-core';
 import { writeStderrLine } from './src/utils/stdioHelpers.js';
 

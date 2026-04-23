@@ -77,10 +77,16 @@ const ModelUsageTable: React.FC<{
   totalCachedTokens: number;
   cacheEfficiency: number;
 }> = ({ models, totalCachedTokens, cacheEfficiency }) => {
+  // 35 + 8 + 15 + 15 = 73, fitting within the 76-column panel allocated
+  // when the terminal is at the default 80-column width. Subagent labels
+  // longer than 35 characters will wrap — acceptable cosmetic trade-off
+  // given the alternative is overflowing the panel border.
   const nameWidth = 35;
   const requestsWidth = 8;
   const inputTokensWidth = 15;
   const outputTokensWidth = 15;
+
+  const entries = flattenModelsBySource(models);
 
   return (
     <Box flexDirection="column" marginTop={1}>
@@ -119,7 +125,7 @@ const ModelUsageTable: React.FC<{
       ></Box>
 
       {/* Rows */}
-      {flattenModelsBySource(models).map(({ key, label, metrics }) => (
+      {entries.map(({ key, label, metrics }) => (
         <Box key={key}>
           <Box width={nameWidth}>
             <Text color={theme.text.primary}>{label}</Text>

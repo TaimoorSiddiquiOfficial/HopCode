@@ -55,13 +55,17 @@ function areModelMetricsCoreEqual(
 
 function areModelMetricsEqual(a: ModelMetrics, b: ModelMetrics): boolean {
   if (!areModelMetricsCoreEqual(a, b)) return false;
+
   const aKeys = Object.keys(a.bySource);
   const bKeys = Object.keys(b.bySource);
   if (aKeys.length !== bKeys.length) return false;
+
   for (const key of aKeys) {
-    if (!b.bySource[key]) return false;
-    if (!areModelMetricsCoreEqual(a.bySource[key], b.bySource[key]))
+    const aSource = a.bySource[key];
+    const bSource = b.bySource[key];
+    if (!bSource || !areModelMetricsCoreEqual(aSource, bSource)) {
       return false;
+    }
   }
   return true;
 }

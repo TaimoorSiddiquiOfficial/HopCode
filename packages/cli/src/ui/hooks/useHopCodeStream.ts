@@ -1764,7 +1764,7 @@ export const useHopCodeStream = (
     ],
   );
 
-  const pendingHistoryItems = useMemo(
+  const pendingGeminiHistoryItems = useMemo(
     () =>
       [
         pendingHistoryItem,
@@ -1969,7 +1969,7 @@ export const useHopCodeStream = (
     streamingState,
     submitQuery,
     initError,
-    pendingHistoryItems,
+    pendingGeminiHistoryItems,
     thought,
     cancelOngoingRequest,
     retryLastPrompt,

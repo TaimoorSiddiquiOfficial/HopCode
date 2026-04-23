@@ -240,6 +240,10 @@ export class ApiRequestEvent implements BaseTelemetryEvent {
   model: string;
   prompt_id: string;
   request_text?: string;
+  /**
+   * Name of the subagent that issued this request, or undefined when the
+   * request originates from the main conversation.
+   */
   subagent_name?: string;
 
   constructor(
@@ -271,6 +275,10 @@ export class ApiErrorEvent implements BaseTelemetryEvent {
   error_type?: string;
   // HTTP status code from the API response (e.g. 429, 500)
   status_code?: number | string;
+  /**
+   * Name of the subagent that issued this request, or undefined when the
+   * request originates from the main conversation.
+   */
   subagent_name?: string;
 
   constructor(opts: {
@@ -330,6 +338,10 @@ export class ApiResponseEvent implements BaseTelemetryEvent {
   response_text?: string;
   prompt_id: string;
   auth_type?: string;
+  /**
+   * Name of the subagent that issued this request, or undefined when the
+   * request originates from the main conversation.
+   */
   subagent_name?: string;
 
   constructor(
