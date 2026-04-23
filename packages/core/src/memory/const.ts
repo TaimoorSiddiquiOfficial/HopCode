@@ -5,15 +5,17 @@
  */
 
 export const QWEN_CONFIG_DIR = '.hopcode';
-export const DEFAULT_CONTEXT_FILENAME = 'QWEN.md';
+export const DEFAULT_CONTEXT_FILENAME = 'HOPCODE.md';
+export const LEGACY_CONTEXT_FILENAME = 'QWEN.md';
 export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
-export const MEMORY_SECTION_HEADER = '## Qwen Added Memories';
+export const MEMORY_SECTION_HEADER = '## HopCode Added Memories';
 
 // This variable will hold the currently configured filename for context files.
-// It defaults to include both QWEN.md and AGENTS.md but can be overridden by setGeminiMdFilename.
-// QWEN.md is first to maintain backward compatibility (used by /init command tool).
+// It defaults to include HOPCODE.md, QWEN.md (legacy), and AGENTS.md.
+// QWEN.md is kept for backward compatibility with existing projects.
 let currentGeminiMdFilename: string | string[] = [
   DEFAULT_CONTEXT_FILENAME,
+  LEGACY_CONTEXT_FILENAME,
   AGENT_CONTEXT_FILENAME,
 ];
 
