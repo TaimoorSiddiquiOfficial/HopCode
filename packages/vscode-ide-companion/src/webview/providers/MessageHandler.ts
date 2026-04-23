@@ -5,7 +5,7 @@
  */
 
 import type * as vscode from 'vscode';
-import type { QwenAgentManager } from '../../services/qwenAgentManager.js';
+import type { HopCodeAgentManager } from '../../services/hopcodeAgentManager.js';
 import type { ConversationStore } from '../../services/conversationStore.js';
 import type {
   PermissionResponseMessage,
@@ -22,7 +22,7 @@ export class MessageHandler {
   private router: MessageRouter;
 
   constructor(
-    agentManager: QwenAgentManager,
+    agentManager: HopCodeAgentManager,
     conversationStore: ConversationStore,
     currentConversationId: string | null,
     sendToWebView: (message: unknown) => void,

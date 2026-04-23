@@ -15,19 +15,19 @@ import {
 } from 'vitest';
 
 import type { Content, GenerateContentResponse, Part } from '@google/genai';
-import { GeminiClient, SendMessageType } from './client.js';
+import { HopCodeClient, SendMessageType } from './client.js';
 import { findCompressSplitPoint } from '../services/chatCompressionService.js';
 import {
   AuthType,
   type ContentGenerator,
   type ContentGeneratorConfig,
 } from './contentGenerator.js';
-import { type GeminiChat } from './geminiChat.js';
+import { type HopCodeChat } from './hopCodeChat.js';
 import type { Config } from '../config/config.js';
 import { ApprovalMode } from '../config/config.js';
 import {
   CompressionStatus,
-  GeminiEventType,
+  HopCodeEventType,
   Turn,
   type ChatCompressionInfo,
 } from './turn.js';
@@ -266,7 +266,7 @@ describe('findCompressSplitPoint', () => {
 describe('Gemini Client (client.ts)', () => {
   let mockContentGenerator: ContentGenerator;
   let mockConfig: Config;
-  let client: GeminiClient;
+  let client: HopCodeClient;
   let mockGenerateContentFn: Mock;
   let mockMemoryManager: {
     scheduleExtract: ReturnType<typeof vi.fn>;
@@ -307,7 +307,7 @@ describe('Gemini Client (client.ts)', () => {
       countTokens: vi.fn().mockResolvedValue({ totalTokens: 100 }),
     } as unknown as ContentGenerator;
 
-    // Because the GeminiClient constructor kicks off an async process (startChat)
+    // Because the HopCodeClient constructor kicks off an async process (startChat)
     // that depends on a fully-formed Config object, we need to mock the
     // entire implementation of Config for these tests.
     const mockToolRegistry = {
@@ -361,7 +361,7 @@ describe('Gemini Client (client.ts)', () => {
       getWorkspaceContext: vi.fn().mockReturnValue({
         getDirectories: vi.fn().mockReturnValue(['/test/dir']),
       }),
-      getGeminiClient: vi.fn(),
+      getHopCodeClient: vi.fn(),
       getModelRouterService: vi.fn().mockReturnValue({
         route: vi.fn().mockResolvedValue({ model: 'default-routed-model' }),
       }),
@@ -403,9 +403,9 @@ describe('Gemini Client (client.ts)', () => {
       }),
     } as unknown as Config;
 
-    client = new GeminiClient(mockConfig);
+    client = new HopCodeClient(mockConfig);
     await client.initialize();
-    vi.mocked(mockConfig.getGeminiClient).mockReturnValue(client);
+    vi.mocked(mockConfig.getHopCodeClient).mockReturnValue(client);
   });
 
   afterEach(() => {
@@ -416,7 +416,7 @@ describe('Gemini Client (client.ts)', () => {
     it('should call chat.addHistory with the provided content', async () => {
       const mockChat = {
         addHistory: vi.fn(),
-      } as unknown as GeminiChat;
+      } as unknown as HopCodeChat;
       client['chat'] = mockChat;
 
       const newContent = {
@@ -458,12 +458,12 @@ describe('Gemini Client (client.ts)', () => {
   });
 
   describe('thinking block idle cleanup and latch', () => {
-    let mockChat: Partial<GeminiChat>;
+    let mockChat: Partial<HopCodeChat>;
 
     beforeEach(() => {
       const mockStream = (async function* () {
         yield {
-          type: GeminiEventType.Content,
+          type: HopCodeEventType.Content,
           value: 'response',
         };
       })();
@@ -475,7 +475,7 @@ describe('Gemini Client (client.ts)', () => {
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
     });
 
     it('should not strip thoughts on active session (< 5min idle)', async () => {
@@ -580,7 +580,7 @@ describe('Gemini Client (client.ts)', () => {
         setHistory: vi.fn(),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
-      } as unknown as GeminiChat;
+      } as unknown as HopCodeChat;
     });
 
     function setup({
@@ -597,13 +597,13 @@ describe('Gemini Client (client.ts)', () => {
       compressionInputTokenCount = 1600,
       compressionOutputTokenCount = 50,
     } = {}) {
-      const mockOriginalChat: Partial<GeminiChat> = {
+      const mockOriginalChat: Partial<HopCodeChat> = {
         getHistory: vi.fn((_curated?: boolean) => chatHistory),
         setHistory: vi.fn(),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockOriginalChat as GeminiChat;
+      client['chat'] = mockOriginalChat as HopCodeChat;
 
       vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
         originalTokenCount,
@@ -654,14 +654,14 @@ describe('Gemini Client (client.ts)', () => {
         ...historyToKeep,
       ];
 
-      const mockNewChat: Partial<GeminiChat> = {
+      const mockNewChat: Partial<HopCodeChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
         setHistory: vi.fn(),
       };
 
       client['startChat'] = vi.fn().mockImplementation(async () => {
-        client['chat'] = mockNewChat as GeminiChat;
-        return mockNewChat as GeminiChat;
+        client['chat'] = mockNewChat as HopCodeChat;
+        return mockNewChat as HopCodeChat;
       });
 
       // New token count formula: originalTokenCount - (compressionInputTokenCount - 1000) + compressionOutputTokenCount
@@ -899,12 +899,12 @@ describe('Gemini Client (client.ts)', () => {
         },
         ...historyToKeep,
       ];
-      const mockNewChat: Partial<GeminiChat> = {
+      const mockNewChat: Partial<HopCodeChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
       };
       client['startChat'] = vi
         .fn()
-        .mockResolvedValue(mockNewChat as GeminiChat);
+        .mockResolvedValue(mockNewChat as HopCodeChat);
 
       await client.tryCompressChat('prompt-id-3', false);
 
@@ -961,12 +961,12 @@ describe('Gemini Client (client.ts)', () => {
         },
         ...historyToKeep,
       ];
-      const mockNewChat: Partial<GeminiChat> = {
+      const mockNewChat: Partial<HopCodeChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
       };
       client['startChat'] = vi.fn().mockImplementation(async () => {
-        client['chat'] = mockNewChat as GeminiChat;
-        return mockNewChat as GeminiChat;
+        client['chat'] = mockNewChat as HopCodeChat;
+        return mockNewChat as HopCodeChat;
       });
 
       // Mock the summary response from the chat
@@ -1056,12 +1056,12 @@ describe('Gemini Client (client.ts)', () => {
         },
         ...historyToKeep,
       ];
-      const mockNewChat: Partial<GeminiChat> = {
+      const mockNewChat: Partial<HopCodeChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
       };
       client['startChat'] = vi.fn().mockImplementation(async () => {
-        client['chat'] = mockNewChat as GeminiChat;
-        return mockNewChat as GeminiChat;
+        client['chat'] = mockNewChat as HopCodeChat;
+        return mockNewChat as HopCodeChat;
       });
 
       // Mock the summary response from the chat
@@ -1133,12 +1133,12 @@ describe('Gemini Client (client.ts)', () => {
         },
         ...historyToKeep,
       ];
-      const mockNewChat: Partial<GeminiChat> = {
+      const mockNewChat: Partial<HopCodeChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
       };
       client['startChat'] = vi.fn().mockImplementation(async () => {
-        client['chat'] = mockNewChat as GeminiChat;
-        return mockNewChat as GeminiChat;
+        client['chat'] = mockNewChat as HopCodeChat;
+        return mockNewChat as HopCodeChat;
       });
 
       // Mock the summary response from the chat
@@ -1205,7 +1205,7 @@ describe('Gemini Client (client.ts)', () => {
 
       // Assert
       expect(events).toContainEqual({
-        type: GeminiEventType.ChatCompressed,
+        type: HopCodeEventType.ChatCompressed,
         value: compressionInfo,
       });
     });
@@ -1246,7 +1246,7 @@ describe('Gemini Client (client.ts)', () => {
 
         // Assert
         expect(events).not.toContainEqual({
-          type: GeminiEventType.ChatCompressed,
+          type: HopCodeEventType.ChatCompressed,
           value: expect.anything(),
         });
       },
@@ -1295,7 +1295,7 @@ describe('Gemini Client (client.ts)', () => {
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
-      } as unknown as GeminiChat;
+      } as unknown as HopCodeChat;
       client['chat'] = mockChat;
 
       const initialRequest: Part[] = [{ text: 'Hi' }];
@@ -1346,13 +1346,13 @@ Other open files:
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       const initialRequest = [{ text: 'Hi' }];
 
@@ -1403,13 +1403,13 @@ Other open files:
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       const initialRequest = [{ text: 'Hi' }];
 
@@ -1463,12 +1463,12 @@ hello
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       const stream = client.sendMessageStream(
         [{ text: 'Please answer tersely' }],
@@ -1526,12 +1526,12 @@ hello
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       const first = client.sendMessageStream(
         [{ text: 'Please answer tersely' }],
@@ -1575,11 +1575,11 @@ hello
       });
 
       const mockStream = (async function* () {
-        yield { type: GeminiEventType.Content, value: 'Done' };
+        yield { type: HopCodeEventType.Content, value: 'Done' };
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([
           { role: 'user', parts: [{ text: 'I prefer terse responses.' }] },
@@ -1587,7 +1587,7 @@ hello
         ]),
         stripThoughtsFromHistory: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       const events = await fromAsync(
         client.sendMessageStream(
@@ -1611,7 +1611,7 @@ hello
         config: mockConfig,
       });
       expect(events).not.toContainEqual({
-        type: GeminiEventType.HookSystemMessage,
+        type: HopCodeEventType.HookSystemMessage,
         value: 'Managed auto-memory updated: user.md',
       });
     });
@@ -1646,13 +1646,13 @@ hello
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       const initialRequest = [{ text: 'Hi' }];
 
@@ -1686,13 +1686,13 @@ Other open files:
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       // Act
       const stream = client.sendMessageStream(
@@ -1732,13 +1732,13 @@ Other open files:
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       // Use a signal that never gets aborted
       const abortController = new AbortController();
@@ -1821,13 +1821,13 @@ Other open files:
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       // Act & Assert
       // Run up to the limit
@@ -1855,7 +1855,7 @@ Other open files:
         events.push(event);
       }
 
-      expect(events).toEqual([{ type: GeminiEventType.MaxSessionTurns }]);
+      expect(events).toEqual([{ type: HopCodeEventType.MaxSessionTurns }]);
       expect(mockTurnRunFn).toHaveBeenCalledTimes(MAX_SESSION_TURNS);
     });
 
@@ -1879,13 +1879,13 @@ Other open files:
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       // Use a signal that never gets aborted
       const abortController = new AbortController();
@@ -1955,7 +1955,7 @@ Other open files:
         vi.spyOn(client['config'], 'getIdeMode').mockReturnValue(true);
         mockTurnRunFn.mockReturnValue(mockStream);
 
-        const mockChat: Partial<GeminiChat> = {
+        const mockChat: Partial<HopCodeChat> = {
           addHistory: vi.fn(),
           setHistory: vi.fn(),
           // Assume history is not empty for delta checks
@@ -1967,7 +1967,7 @@ Other open files:
           stripThoughtsFromHistory: vi.fn(),
           stripThoughtsFromHistoryKeepRecent: vi.fn(),
         };
-        client['chat'] = mockChat as GeminiChat;
+        client['chat'] = mockChat as HopCodeChat;
       });
 
       const testCases = [
@@ -2200,7 +2200,7 @@ Other open files:
     });
 
     describe('IDE context with pending tool calls', () => {
-      let mockChat: Partial<GeminiChat>;
+      let mockChat: Partial<HopCodeChat>;
 
       beforeEach(() => {
         vi.spyOn(client, 'tryCompressChat').mockResolvedValue({
@@ -2221,7 +2221,7 @@ Other open files:
           stripThoughtsFromHistory: vi.fn(),
           stripThoughtsFromHistoryKeepRecent: vi.fn(),
         };
-        client['chat'] = mockChat as GeminiChat;
+        client['chat'] = mockChat as HopCodeChat;
 
         vi.spyOn(client['config'], 'getIdeMode').mockReturnValue(true);
         vi.mocked(ideContextStore.get).mockReturnValue({
@@ -2549,19 +2549,19 @@ Other open files:
 
       const mockStream = (async function* () {
         yield {
-          type: GeminiEventType.Error,
+          type: HopCodeEventType.Error,
           value: { error: { message: 'test error' } },
         };
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       // Act
       const stream = client.sendMessageStream(
@@ -2585,21 +2585,21 @@ Other open files:
       const mockCheckNextSpeaker = vi.mocked(checkNextSpeaker);
 
       const mockStream = (async function* () {
-        yield { type: GeminiEventType.Content, value: 'some content' };
+        yield { type: HopCodeEventType.Content, value: 'some content' };
         yield {
-          type: GeminiEventType.Error,
+          type: HopCodeEventType.Error,
           value: { error: { message: 'test error' } },
         };
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       // Act
       const stream = client.sendMessageStream(
@@ -2634,13 +2634,13 @@ Other open files:
       })();
       mockTurnRunFn.mockReturnValue(mockStream);
 
-      const mockChat: Partial<GeminiChat> = {
+      const mockChat: Partial<HopCodeChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
         stripThoughtsFromHistory: vi.fn(),
         stripThoughtsFromHistoryKeepRecent: vi.fn(),
       };
-      client['chat'] = mockChat as GeminiChat;
+      client['chat'] = mockChat as HopCodeChat;
 
       // Act
       const stream = client.sendMessageStream(
@@ -2658,7 +2658,7 @@ Other open files:
 
     describe('retry sendMessageType', () => {
       it('should call stripOrphanedUserEntriesFromHistory before executing', async () => {
-        const mockChat: Partial<GeminiChat> = {
+        const mockChat: Partial<HopCodeChat> = {
           addHistory: vi.fn(),
           getHistory: vi.fn().mockReturnValue([]),
           setHistory: vi.fn(),
@@ -2666,7 +2666,7 @@ Other open files:
           stripThoughtsFromHistoryKeepRecent: vi.fn(),
           stripOrphanedUserEntriesFromHistory: vi.fn(),
         };
-        client['chat'] = mockChat as GeminiChat;
+        client['chat'] = mockChat as HopCodeChat;
 
         const mockStream = (async function* () {
           yield { type: 'content', value: 'retry response' };
@@ -2691,7 +2691,7 @@ Other open files:
       });
 
       it('should not increment sessionTurnCount for retry', async () => {
-        const mockChat: Partial<GeminiChat> = {
+        const mockChat: Partial<HopCodeChat> = {
           addHistory: vi.fn(),
           getHistory: vi.fn().mockReturnValue([]),
           setHistory: vi.fn(),
@@ -2699,7 +2699,7 @@ Other open files:
           stripThoughtsFromHistoryKeepRecent: vi.fn(),
           stripOrphanedUserEntriesFromHistory: vi.fn(),
         };
-        client['chat'] = mockChat as GeminiChat;
+        client['chat'] = mockChat as HopCodeChat;
 
         const mockStream = (async function* () {
           yield { type: 'content', value: 'ok' };
@@ -2723,7 +2723,7 @@ Other open files:
     });
 
     describe('hooks fast-path optimization', () => {
-      let mockChat: Partial<GeminiChat>;
+      let mockChat: Partial<HopCodeChat>;
 
       beforeEach(() => {
         vi.spyOn(client, 'tryCompressChat').mockResolvedValue({
@@ -2743,7 +2743,7 @@ Other open files:
           stripThoughtsFromHistory: vi.fn(),
           stripThoughtsFromHistoryKeepRecent: vi.fn(),
         };
-        client['chat'] = mockChat as GeminiChat;
+        client['chat'] = mockChat as HopCodeChat;
       });
 
       it('should skip messageBus.request for UserPromptSubmit when hasHooksForEvent returns false', async () => {

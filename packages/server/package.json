@@ -1,0 +1,54 @@
+{
+  "name": "@hoptrendy/hopcode-server",
+  "version": "0.15.1",
+  "description": "gRPC headless server for HopCode agent",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "proto",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/build_package.js",
+    "test": "vitest run",
+    "test:ci": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "hopcode",
+    "grpc",
+    "server",
+    "ai",
+    "agent"
+  ],
+  "author": "HopCode Team",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.13.0",
+    "@grpc/proto-loader": "^0.7.13",
+    "@hoptrendy/hopcode-core": "0.15.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5",
+    "vitest": "^3.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "directory": "packages/server"
+  }
+}

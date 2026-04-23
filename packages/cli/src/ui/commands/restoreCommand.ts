@@ -90,7 +90,7 @@ async function restoreAction(
     }
 
     if (toolCallData.clientHistory) {
-      await config?.getGeminiClient()?.setHistory(toolCallData.clientHistory);
+      await config?.getHopCodeClient()?.setHistory(toolCallData.clientHistory);
     }
 
     if (toolCallData.commitHash) {

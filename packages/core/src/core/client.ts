@@ -22,7 +22,7 @@ const debugLogger = createDebugLogger('CLIENT');
 
 // Core modules
 import type { ContentGenerator } from './contentGenerator.js';
-import { GeminiChat } from './geminiChat.js';
+import { HopCodeChat } from './hopCodeChat.js';
 import {
   getArenaSystemReminder,
   getCoreSystemPrompt,
@@ -32,10 +32,10 @@ import {
 } from './prompts.js';
 import {
   CompressionStatus,
-  GeminiEventType,
+  HopCodeEventType,
   Turn,
   type ChatCompressionInfo,
-  type ServerGeminiStreamEvent,
+  type ServerHopCodeStreamEvent,
 } from './turn.js';
 
 // Services
@@ -128,8 +128,8 @@ const EMPTY_RELEVANT_AUTO_MEMORY_RESULT: RelevantAutoMemoryPromptResult = {
   strategy: 'none',
 };
 
-export class GeminiClient {
-  private chat?: GeminiChat;
+export class HopCodeClient {
+  private chat?: HopCodeChat;
   private sessionTurnCount = 0;
   private readonly surfacedRelevantAutoMemoryPaths = new Set<string>();
 
@@ -203,7 +203,7 @@ export class GeminiClient {
     this.getChat().addHistory(content);
   }
 
-  getChat(): GeminiChat {
+  getChat(): HopCodeChat {
     if (!this.chat) {
       throw new Error('Chat not initialized');
     }
@@ -324,7 +324,7 @@ export class GeminiClient {
     return parts.join('\n\n');
   }
 
-  async startChat(extraHistory?: Content[]): Promise<GeminiChat> {
+  async startChat(extraHistory?: Content[]): Promise<HopCodeChat> {
     this.forceFullIdeContext = true;
     this.hasFailedCompressionAttempt = false;
     // Clear stale cache params on session reset to prevent cross-session leakage
@@ -335,7 +335,7 @@ export class GeminiClient {
     try {
       const systemInstruction = this.getMainSessionSystemInstruction();
 
-      this.chat = new GeminiChat(
+      this.chat = new HopCodeChat(
         this.config,
         {
           systemInstruction,
@@ -628,7 +628,7 @@ export class GeminiClient {
     prompt_id: string,
     options?: SendMessageOptions,
     turns: number = MAX_TURNS,
-  ): AsyncGenerator<ServerGeminiStreamEvent, Turn> {
+  ): AsyncGenerator<ServerHopCodeStreamEvent, Turn> {
     const messageType = options?.type ?? SendMessageType.UserQuery;
     let relevantAutoMemoryPromise:
       | Promise<RelevantAutoMemoryPromptResult>
@@ -672,7 +672,7 @@ export class GeminiClient {
         hookOutput?.shouldStopExecution()
       ) {
         yield {
-          type: GeminiEventType.UserPromptSubmitBlocked,
+          type: HopCodeEventType.UserPromptSubmitBlocked,
           value: {
             reason: hookOutput.getEffectiveReason(),
             originalPrompt: promptText,
@@ -785,7 +785,7 @@ export class GeminiClient {
         this.config.getMaxSessionTurns() > 0 &&
         this.sessionTurnCount > this.config.getMaxSessionTurns()
       ) {
-        yield { type: GeminiEventType.MaxSessionTurns };
+        yield { type: HopCodeEventType.MaxSessionTurns };
         return new Turn(this.getChat(), prompt_id);
       }
     }
@@ -799,7 +799,7 @@ export class GeminiClient {
     const compressed = await this.tryCompressChat(prompt_id, false, signal);
 
     if (compressed.compressionStatus === CompressionStatus.COMPRESSED) {
-      yield { type: GeminiEventType.ChatCompressed, value: compressed };
+      yield { type: HopCodeEventType.ChatCompressed, value: compressed };
     }
 
     // Check session token limit after compression.
@@ -809,7 +809,7 @@ export class GeminiClient {
       const lastPromptTokenCount = uiTelemetryService.getLastPromptTokenCount();
       if (lastPromptTokenCount > sessionTokenLimit) {
         yield {
-          type: GeminiEventType.SessionTokenLimitExceeded,
+          type: HopCodeEventType.SessionTokenLimitExceeded,
           value: {
             currentTokens: lastPromptTokenCount,
             limit: sessionTokenLimit,
@@ -926,7 +926,7 @@ export class GeminiClient {
         if (this.loopDetector.addAndCheck(event)) {
           const loopType = this.loopDetector.getLastLoopType();
           yield {
-            type: GeminiEventType.LoopDetected,
+            type: HopCodeEventType.LoopDetected,
             ...(loopType && { value: { loopType } }),
           };
           if (arenaAgentClient) {
@@ -938,12 +938,12 @@ export class GeminiClient {
       }
       // Update arena status on Finished events — stats are derived
       // automatically from uiTelemetryService by the reporter.
-      if (arenaAgentClient && event.type === GeminiEventType.Finished) {
+      if (arenaAgentClient && event.type === HopCodeEventType.Finished) {
         await arenaAgentClient.updateStatus();
       }
 
       yield event;
-      if (event.type === GeminiEventType.Error) {
+      if (event.type === HopCodeEventType.Error) {
         if (arenaAgentClient) {
           const errorMsg =
             event.value instanceof Error
@@ -1010,7 +1010,7 @@ export class GeminiClient {
       // This should happen regardless of the hook's decision
       if (stopOutput?.systemMessage) {
         yield {
-          type: GeminiEventType.HookSystemMessage,
+          type: HopCodeEventType.HookSystemMessage,
           value: stopOutput.systemMessage,
         };
       }
@@ -1041,7 +1041,7 @@ export class GeminiClient {
         // when stop hooks have been executed multiple times (loop detected).
         if (currentIterationCount > 1) {
           yield {
-            type: GeminiEventType.StopHookLoop,
+            type: HopCodeEventType.StopHookLoop,
             value: {
               iterationCount: currentIterationCount,
               reasons: currentReasons,

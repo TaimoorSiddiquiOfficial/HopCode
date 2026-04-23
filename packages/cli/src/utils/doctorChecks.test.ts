@@ -36,7 +36,7 @@ describe('runDoctorChecks', () => {
       services: {
         config: {
           getAuthType: vi.fn().mockReturnValue('openai'),
-          getGeminiClient: vi.fn().mockReturnValue({
+          getHopCodeClient: vi.fn().mockReturnValue({
             isInitialized: vi.fn().mockReturnValue(true),
           }),
           getModel: vi.fn().mockReturnValue('gpt-4'),
@@ -102,7 +102,7 @@ describe('runDoctorChecks', () => {
       services: {
         config: {
           getAuthType: vi.fn().mockReturnValue(undefined),
-          getGeminiClient: vi.fn().mockReturnValue({
+          getHopCodeClient: vi.fn().mockReturnValue({
             isInitialized: vi.fn().mockReturnValue(false),
           }),
           getModel: vi.fn().mockReturnValue('gpt-4'),
@@ -146,7 +146,7 @@ describe('runDoctorChecks', () => {
       services: {
         config: {
           getAuthType: vi.fn().mockReturnValue('openai'),
-          getGeminiClient: vi.fn().mockReturnValue({
+          getHopCodeClient: vi.fn().mockReturnValue({
             isInitialized: vi.fn().mockReturnValue(true),
           }),
           getModel: vi.fn().mockReturnValue('gpt-4'),
@@ -173,7 +173,7 @@ describe('runDoctorChecks', () => {
       services: {
         config: {
           getAuthType: vi.fn().mockReturnValue('openai'),
-          getGeminiClient: vi.fn().mockReturnValue({
+          getHopCodeClient: vi.fn().mockReturnValue({
             isInitialized: vi.fn().mockReturnValue(true),
           }),
           getModel: vi.fn().mockReturnValue('gpt-4'),
@@ -203,7 +203,7 @@ describe('runDoctorChecks', () => {
       services: {
         config: {
           getAuthType: vi.fn().mockReturnValue('openai'),
-          getGeminiClient: vi.fn().mockReturnValue({
+          getHopCodeClient: vi.fn().mockReturnValue({
             isInitialized: vi.fn().mockReturnValue(true),
           }),
           getModel: vi.fn().mockReturnValue('gpt-4'),
@@ -234,7 +234,7 @@ describe('runDoctorChecks', () => {
       services: {
         config: {
           getAuthType: vi.fn().mockReturnValue('openai'),
-          getGeminiClient: vi.fn().mockReturnValue({
+          getHopCodeClient: vi.fn().mockReturnValue({
             isInitialized: vi.fn().mockReturnValue(true),
           }),
           getModel: vi.fn().mockReturnValue('gpt-4'),

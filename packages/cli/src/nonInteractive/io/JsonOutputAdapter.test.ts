@@ -7,9 +7,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type {
   Config,
-  ServerGeminiStreamEvent,
+  ServerHopCodeStreamEvent,
 } from '@hoptrendy/hopcode-core';
-import { GeminiEventType, OutputFormat } from '@hoptrendy/hopcode-core';
+import { HopCodeEventType, OutputFormat } from '@hoptrendy/hopcode-core';
 import type { Part } from '@google/genai';
 import { JsonOutputAdapter } from './JsonOutputAdapter.js';
 
@@ -54,14 +54,14 @@ describe('JsonOutputAdapter', () => {
     });
 
     it('should append text content from Content events', () => {
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Content,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Content,
         value: 'Hello',
       };
       adapter.processEvent(event);
 
-      const event2: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Content,
+      const event2: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Content,
         value: ' World',
       };
       adapter.processEvent(event2);
@@ -75,8 +75,8 @@ describe('JsonOutputAdapter', () => {
     });
 
     it('should append citation content from Citation events', () => {
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Citation,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Citation,
         value: 'Citation text',
       };
       adapter.processEvent(event);
@@ -89,10 +89,10 @@ describe('JsonOutputAdapter', () => {
     });
 
     it('should ignore non-string citation values', () => {
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Citation,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Citation,
         value: 123,
-      } as unknown as ServerGeminiStreamEvent;
+      } as unknown as ServerHopCodeStreamEvent;
       adapter.processEvent(event);
 
       const message = adapter.finalizeAssistantMessage();
@@ -100,8 +100,8 @@ describe('JsonOutputAdapter', () => {
     });
 
     it('should append thinking from Thought events', () => {
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Thought,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Thought,
         value: {
           subject: 'Planning',
           description: 'Thinking about the task',
@@ -119,8 +119,8 @@ describe('JsonOutputAdapter', () => {
     });
 
     it('should handle thinking with only subject', () => {
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Thought,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Thought,
         value: {
           subject: 'Planning',
           description: '',
@@ -136,8 +136,8 @@ describe('JsonOutputAdapter', () => {
     });
 
     it('should append tool use from ToolCallRequest events', () => {
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.ToolCallRequest,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.ToolCallRequest,
         value: {
           callId: 'tool-call-1',
           name: 'test_tool',
@@ -160,7 +160,7 @@ describe('JsonOutputAdapter', () => {
 
     it('should set stop_reason to tool_use when message contains only tool_use blocks', () => {
       adapter.processEvent({
-        type: GeminiEventType.ToolCallRequest,
+        type: HopCodeEventType.ToolCallRequest,
         value: {
           callId: 'tool-call-1',
           name: 'test_tool',
@@ -176,7 +176,7 @@ describe('JsonOutputAdapter', () => {
 
     it('should set stop_reason to null when message contains text blocks', () => {
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Some text',
       });
 
@@ -186,7 +186,7 @@ describe('JsonOutputAdapter', () => {
 
     it('should set stop_reason to null when message contains thinking blocks', () => {
       adapter.processEvent({
-        type: GeminiEventType.Thought,
+        type: HopCodeEventType.Thought,
         value: {
           subject: 'Planning',
           description: 'Thinking about the task',
@@ -199,7 +199,7 @@ describe('JsonOutputAdapter', () => {
 
     it('should set stop_reason to tool_use when message contains multiple tool_use blocks', () => {
       adapter.processEvent({
-        type: GeminiEventType.ToolCallRequest,
+        type: HopCodeEventType.ToolCallRequest,
         value: {
           callId: 'tool-call-1',
           name: 'test_tool_1',
@@ -209,7 +209,7 @@ describe('JsonOutputAdapter', () => {
         },
       });
       adapter.processEvent({
-        type: GeminiEventType.ToolCallRequest,
+        type: HopCodeEventType.ToolCallRequest,
         value: {
           callId: 'tool-call-2',
           name: 'test_tool_2',
@@ -234,8 +234,8 @@ describe('JsonOutputAdapter', () => {
         cachedContentTokenCount: 10,
         totalTokenCount: 160,
       };
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Finished,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Finished,
         value: {
           reason: undefined,
           usageMetadata,
@@ -255,12 +255,12 @@ describe('JsonOutputAdapter', () => {
     it('should finalize pending blocks on Finished event', () => {
       // Add some text first
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Some text',
       });
 
-      const event: ServerGeminiStreamEvent = {
-        type: GeminiEventType.Finished,
+      const event: ServerHopCodeStreamEvent = {
+        type: HopCodeEventType.Finished,
         value: { reason: undefined, usageMetadata: undefined },
       };
       adapter.processEvent(event);
@@ -275,7 +275,7 @@ describe('JsonOutputAdapter', () => {
         adapter.finalizeAssistantMessage().message.content;
 
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Should be ignored',
       });
 
@@ -291,7 +291,7 @@ describe('JsonOutputAdapter', () => {
 
     it('should build and emit a complete assistant message', () => {
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Test response',
       });
 
@@ -308,7 +308,7 @@ describe('JsonOutputAdapter', () => {
 
     it('should return same message on subsequent calls', () => {
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Test',
       });
 
@@ -320,11 +320,11 @@ describe('JsonOutputAdapter', () => {
 
     it('should split different block types into separate assistant messages', () => {
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Text',
       });
       adapter.processEvent({
-        type: GeminiEventType.Thought,
+        type: HopCodeEventType.Thought,
         value: { subject: 'Thinking', description: 'Thought' },
       });
 
@@ -381,7 +381,7 @@ describe('JsonOutputAdapter', () => {
     beforeEach(() => {
       adapter.startAssistantMessage();
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Response text',
       });
       adapter.finalizeAssistantMessage();
@@ -822,7 +822,7 @@ describe('JsonOutputAdapter', () => {
       adapter.emitUserMessage([{ text: 'User input' }]);
       adapter.startAssistantMessage();
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Assistant response',
       });
       adapter.finalizeAssistantMessage();

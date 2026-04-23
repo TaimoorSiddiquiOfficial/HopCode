@@ -27,7 +27,7 @@ import { ArenaAgentClient } from '../agents/arena/ArenaAgentClient.js';
 
 // Core
 import { BaseLlmClient } from '../core/baseLlmClient.js';
-import { GeminiClient } from '../core/client.js';
+import { HopCodeClient } from '../core/client.js';
 import {
   AuthType,
   createContentGenerator,
@@ -630,7 +630,7 @@ export class Config {
   private readonly telemetrySettings: TelemetrySettings;
   private readonly gitCoAuthor: GitCoAuthorSettings;
   private readonly usageStatisticsEnabled: boolean;
-  private geminiClient!: GeminiClient;
+  private geminiClient!: HopCodeClient;
   private baseLlmClient!: BaseLlmClient;
   private cronScheduler: CronScheduler | null = null;
   private taskStore: TaskStore | null = null;
@@ -898,7 +898,7 @@ export class Config {
     if (proxyUrl) {
       setGlobalDispatcher(new ProxyAgent(proxyUrl));
     }
-    this.geminiClient = new GeminiClient(this);
+    this.geminiClient = new HopCodeClient(this);
     this.chatRecordingService = this.chatRecordingEnabled
       ? new ChatRecordingService(this)
       : undefined;
@@ -2008,7 +2008,7 @@ export class Config {
     return this.telemetrySettings.useCollector ?? false;
   }
 
-  getGeminiClient(): GeminiClient {
+  getHopCodeClient(): HopCodeClient {
     return this.geminiClient;
   }
 

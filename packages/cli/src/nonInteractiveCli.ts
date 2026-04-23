@@ -15,7 +15,7 @@ import {
   executeToolCall,
   shutdownTelemetry,
   isTelemetrySdkInitialized,
-  GeminiEventType,
+  HopCodeEventType,
   FatalInputError,
   promptIdContext,
   OutputFormat,
@@ -101,7 +101,7 @@ async function emitNonInteractiveFinalMessage(params: {
   // (systemMessage should already be emitted by caller)
   adapter.startAssistantMessage();
   adapter.processEvent({
-    type: GeminiEventType.Content,
+    type: HopCodeEventType.Content,
     value: message,
   } as unknown as Parameters<JsonOutputAdapterInterface['processEvent']>[0]);
   adapter.finalizeAssistantMessage();
@@ -182,7 +182,7 @@ export async function runNonInteractive(
       }
     };
 
-    const geminiClient = config.getGeminiClient();
+    const geminiClient = config.getHopCodeClient();
     const abortController = options.abortController ?? new AbortController();
 
     // Setup signal handlers for graceful shutdown
@@ -370,15 +370,15 @@ export async function runNonInteractive(
           }
           // Use adapter for all event processing
           adapter.processEvent(event);
-          if (event.type === GeminiEventType.ToolCallRequest) {
+          if (event.type === HopCodeEventType.ToolCallRequest) {
             toolCallRequests.push(event.value);
           }
-          if (event.type === GeminiEventType.LoopDetected) {
+          if (event.type === HopCodeEventType.LoopDetected) {
             emitLoopDetectedMessage(config, event.value?.loopType);
           }
           if (
             outputFormat === OutputFormat.TEXT &&
-            event.type === GeminiEventType.Error
+            event.type === HopCodeEventType.Error
           ) {
             const errorText = parseAndFormatApiError(
               event.value.error,
@@ -539,15 +539,15 @@ export async function runNonInteractive(
                   return;
                 }
                 adapter.processEvent(event);
-                if (event.type === GeminiEventType.ToolCallRequest) {
+                if (event.type === HopCodeEventType.ToolCallRequest) {
                   itemToolCallRequests.push(event.value);
                 }
-                if (event.type === GeminiEventType.LoopDetected) {
+                if (event.type === HopCodeEventType.LoopDetected) {
                   emitLoopDetectedMessage(config, event.value?.loopType);
                 }
                 if (
                   outputFormat === OutputFormat.TEXT &&
-                  event.type === GeminiEventType.Error
+                  event.type === HopCodeEventType.Error
                 ) {
                   const errorText = parseAndFormatApiError(
                     event.value.error,

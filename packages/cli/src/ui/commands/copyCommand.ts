@@ -17,7 +17,7 @@ export const copyCommand: SlashCommand = {
   kind: CommandKind.BUILT_IN,
   commandType: 'local-jsx',
   action: async (context, _args): Promise<SlashCommandActionReturn | void> => {
-    const chat = await context.services.config?.getGeminiClient()?.getChat();
+    const chat = await context.services.config?.getHopCodeClient()?.getChat();
     const history = chat?.getHistory();
 
     // Get the last message from the AI (model role)

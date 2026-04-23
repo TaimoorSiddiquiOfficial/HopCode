@@ -9,7 +9,7 @@
  *
  * The two execution paths are selected by whether cacheSafeParams is supplied:
  *
- *   WITH cacheSafeParams  → GeminiChat single-turn, NO tools, shares parent
+ *   WITH cacheSafeParams  → HopCodeChat single-turn, NO tools, shares parent
  *                            prompt cache (systemInstruction + history).
  *                            Use for: /btw, suggestions, pipelined suggestions.
  *
@@ -30,7 +30,7 @@ import type {
   GenerateContentResponseUsageMetadata,
 } from '@google/genai';
 import { ApprovalMode, type Config } from '../config/config.js';
-import { GeminiChat, StreamEventType } from '../core/geminiChat.js';
+import { HopCodeChat, StreamEventType } from '../core/hopCodeChat.js';
 import {
   AgentHeadless,
   AgentEventEmitter,
@@ -69,7 +69,7 @@ let currentVersion = 0;
 
 /**
  * Save cache-safe params after a successful main conversation turn.
- * Called from GeminiClient.sendMessageStream() on successful completion.
+ * Called from HopCodeClient.sendMessageStream() on successful completion.
  */
 export function saveCacheSafeParams(
   generationConfig: GenerateContentConfig,
@@ -124,7 +124,7 @@ const NO_TOOLS = Object.freeze({ tools: [] as const }) as Pick<
 >;
 
 /**
- * Create an isolated GeminiChat that shares the main conversation's
+ * Create an isolated HopCodeChat that shares the main conversation's
  * generationConfig (including systemInstruction, tools, and history).
  *
  * Used by runForkedAgent (cache path) and directly by speculation.ts which
@@ -133,14 +133,14 @@ const NO_TOOLS = Object.freeze({ tools: [] as const }) as Pick<
 export function createForkedChat(
   config: Config,
   params: CacheSafeParams,
-): GeminiChat {
+): HopCodeChat {
   const maxHistoryEntries = 40;
   const history =
     params.history.length > maxHistoryEntries
       ? params.history.slice(-maxHistoryEntries)
       : params.history;
 
-  return new GeminiChat(
+  return new HopCodeChat(
     config,
     {
       ...params.generationConfig,

@@ -6,9 +6,9 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
-  GeminiEventType,
+  HopCodeEventType,
   type Config,
-  type ServerGeminiStreamEvent,
+  type ServerHopCodeStreamEvent,
   type ToolCallRequestInfo,
   type AgentResultDisplay,
 } from '@hoptrendy/hopcode-core';
@@ -288,7 +288,7 @@ describe('BaseJsonOutputAdapter', () => {
     it('should build message with text blocks', () => {
       adapter.startAssistantMessage();
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Hello world',
       });
 
@@ -311,7 +311,7 @@ describe('BaseJsonOutputAdapter', () => {
     it('should set stop_reason to tool_use when message contains only tool_use blocks', () => {
       adapter.startAssistantMessage();
       adapter.processEvent({
-        type: GeminiEventType.ToolCallRequest,
+        type: HopCodeEventType.ToolCallRequest,
         value: {
           callId: 'tool-1',
           name: 'test_tool',
@@ -438,7 +438,7 @@ describe('BaseJsonOutputAdapter', () => {
       adapter.startAssistantMessage();
       const state = adapter['mainAgentMessageState'];
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'text',
       });
 
@@ -478,7 +478,7 @@ describe('BaseJsonOutputAdapter', () => {
       adapter.startAssistantMessage();
       const state = adapter['mainAgentMessageState'];
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'test',
       });
 
@@ -499,7 +499,7 @@ describe('BaseJsonOutputAdapter', () => {
       adapter.startAssistantMessage();
       const state = adapter['mainAgentMessageState'];
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'test',
       });
 
@@ -517,7 +517,7 @@ describe('BaseJsonOutputAdapter', () => {
       adapter.startAssistantMessage();
       const state = adapter['mainAgentMessageState'];
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'test',
       });
       state.openBlocks.add(0);
@@ -763,7 +763,7 @@ describe('BaseJsonOutputAdapter', () => {
     it('should reset main agent message state', () => {
       adapter.startAssistantMessage();
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'test',
       });
 
@@ -782,7 +782,7 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should process Content events', () => {
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Hello',
       });
 
@@ -796,7 +796,7 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should process Citation events', () => {
       adapter.processEvent({
-        type: GeminiEventType.Citation,
+        type: HopCodeEventType.Citation,
         value: 'Citation text',
       });
 
@@ -808,9 +808,9 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should ignore non-string Citation values', () => {
       adapter.processEvent({
-        type: GeminiEventType.Citation,
+        type: HopCodeEventType.Citation,
         value: 123,
-      } as unknown as ServerGeminiStreamEvent);
+      } as unknown as ServerHopCodeStreamEvent);
 
       const state = adapter['mainAgentMessageState'];
       expect(state.blocks).toHaveLength(0);
@@ -818,7 +818,7 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should process Thought events', () => {
       adapter.processEvent({
-        type: GeminiEventType.Thought,
+        type: HopCodeEventType.Thought,
         value: {
           subject: 'Planning',
           description: 'Thinking',
@@ -836,7 +836,7 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should process ToolCallRequest events', () => {
       adapter.processEvent({
-        type: GeminiEventType.ToolCallRequest,
+        type: HopCodeEventType.ToolCallRequest,
         value: {
           callId: 'tool-1',
           name: 'test_tool',
@@ -858,7 +858,7 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should process Finished events with usage metadata', () => {
       adapter.processEvent({
-        type: GeminiEventType.Finished,
+        type: HopCodeEventType.Finished,
         value: {
           reason: undefined,
           usageMetadata: {
@@ -877,13 +877,13 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should ignore events after finalization', () => {
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'First',
       });
       adapter.finalizeAssistantMessage();
 
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Second',
       });
 
@@ -902,7 +902,7 @@ describe('BaseJsonOutputAdapter', () => {
 
     it('should build and return assistant message', () => {
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Test response',
       });
 
@@ -1110,7 +1110,7 @@ describe('BaseJsonOutputAdapter', () => {
     beforeEach(() => {
       adapter.startAssistantMessage();
       adapter.processEvent({
-        type: GeminiEventType.Content,
+        type: HopCodeEventType.Content,
         value: 'Response text',
       });
       const message = adapter.finalizeAssistantMessage();

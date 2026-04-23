@@ -238,8 +238,11 @@ export function startEarlyInputCapture(): void {
     return;
   }
 
-  // Check if disabled
-  if (process.env['QWEN_CODE_DISABLE_EARLY_CAPTURE'] === '1') {
+  // Check if disabled (support both new HOPCODE_ and legacy QWEN_CODE_ env vars)
+  if (
+    process.env['HOPCODE_DISABLE_EARLY_CAPTURE'] === '1' ||
+    process.env['QWEN_CODE_DISABLE_EARLY_CAPTURE'] === '1'
+  ) {
     debugLogger.debug('Early input capture disabled by environment variable');
     return;
   }

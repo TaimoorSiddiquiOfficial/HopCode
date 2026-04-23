@@ -235,7 +235,7 @@ export class AgentTool extends BaseDeclarativeTool<AgentParams, ToolResult> {
       this.updateDescriptionAndSchema();
     } finally {
       // Update the client with the new tools
-      const geminiClient = this.config.getGeminiClient();
+      const geminiClient = this.config.getHopCodeClient();
       if (geminiClient) {
         await geminiClient.setTools();
       }
@@ -610,7 +610,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
     subagent: AgentHeadless;
     taskPrompt: string;
   }> {
-    const geminiClient = this.config.getGeminiClient();
+    const geminiClient = this.config.getHopCodeClient();
     const rawHistory = geminiClient ? geminiClient.getHistory(true) : [];
 
     // Build the history that will seed the fork's chat. Must end with a

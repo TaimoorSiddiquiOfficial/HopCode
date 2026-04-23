@@ -16,7 +16,7 @@ const {
   mockOnDidChangeTextEditorSelection,
   mockOpenExternal,
   slashCommandNotificationCallbackRef,
-  mockQwenAgentManagerInstances,
+  mockHopCodeAgentManagerInstances,
 } = vi.hoisted(() => ({
   availableCommandsCallbackRef: {
     current: undefined as
@@ -47,7 +47,7 @@ const {
         }) => void)
       | undefined,
   },
-  mockQwenAgentManagerInstances: [] as Array<{
+  mockHopCodeAgentManagerInstances: [] as Array<{
     permissionRequestCallback?: (request: unknown) => Promise<string>;
     cancelCurrentPrompt: ReturnType<typeof vi.fn>;
   }>,
@@ -89,7 +89,7 @@ vi.mock('vscode', () => ({
 }));
 
 vi.mock('../../services/qwenAgentManager.js', () => ({
-  QwenAgentManager: class {
+  HopCodeAgentManager: class {
     isConnected = false;
     currentSessionId = null;
     connect = vi.fn();
@@ -139,7 +139,7 @@ vi.mock('../../services/qwenAgentManager.js', () => ({
     cancelCurrentPrompt = vi.fn();
     disconnect = vi.fn();
     constructor() {
-      mockQwenAgentManagerInstances.push(this);
+      mockHopCodeAgentManagerInstances.push(this);
     }
   },
 }));
@@ -282,7 +282,7 @@ describe('WebViewProvider.attachToView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockMessageHandlerInstances.length = 0;
-    mockQwenAgentManagerInstances.length = 0;
+    mockHopCodeAgentManagerInstances.length = 0;
     mockGetPanel.mockReturnValue(null);
     availableCommandsCallbackRef.current = undefined;
     slashCommandNotificationCallbackRef.current = undefined;
@@ -614,7 +614,7 @@ describe('WebViewProvider.attachToView', () => {
       'hopcode.chatView.sidebar',
     );
 
-    const agentManager = mockQwenAgentManagerInstances.at(-1);
+    const agentManager = mockHopCodeAgentManagerInstances.at(-1);
     const messageHandler = mockMessageHandlerInstances.at(-1);
 
     expect(agentManager?.permissionRequestCallback).toBeTypeOf('function');

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { QwenAgentManager } from '../../services/qwenAgentManager.js';
+import type { HopCodeAgentManager } from '../../services/hopcodeAgentManager.js';
 import type { ConversationStore } from '../../services/conversationStore.js';
 
 /**
@@ -33,7 +33,7 @@ export interface IMessageHandler {
  */
 export abstract class BaseMessageHandler implements IMessageHandler {
   constructor(
-    protected agentManager: QwenAgentManager,
+    protected agentManager: HopCodeAgentManager,
     protected conversationStore: ConversationStore,
     protected currentConversationId: string | null,
     protected sendToWebView: (message: unknown) => void,

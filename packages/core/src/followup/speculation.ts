@@ -6,7 +6,7 @@
  * Speculation Engine
  *
  * Speculatively executes the accepted suggestion before the user confirms,
- * using a forked GeminiChat with copy-on-write file isolation.
+ * using a forked HopCodeChat with copy-on-write file isolation.
  *
  * Flow:
  * 1. Suggestion shown ? startSpeculation() fires
@@ -17,8 +17,8 @@
 
 import type { Content, Part } from '@google/genai';
 import type { Config } from '../config/config.js';
-import type { GeminiClient } from '../core/client.js';
-import { StreamEventType } from '../core/geminiChat.js';
+import type { HopCodeClient } from '../core/client.js';
+import { StreamEventType } from '../core/hopCodeChat.js';
 import { OverlayFs } from './overlayFs.js';
 import { evaluateToolCall, rewritePathArgs } from './speculationToolGate.js';
 import {
@@ -405,7 +405,7 @@ async function runSpeculativeLoop(
  */
 export async function acceptSpeculation(
   state: SpeculationState,
-  geminiClient: GeminiClient,
+  geminiClient: HopCodeClient,
 ): Promise<SpeculationResult> {
   const timeSavedMs = state.boundary
     ? Math.max(0, state.boundary.completedAt - state.startTime)

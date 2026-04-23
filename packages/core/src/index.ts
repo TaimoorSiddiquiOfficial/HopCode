@@ -56,7 +56,7 @@ export * from './core/client.js';
 export * from './core/contentGenerator.js';
 export * from './core/coreToolScheduler.js';
 export * from './core/permission-helpers.js';
-export * from './core/geminiChat.js';
+export * from './core/hopCodeChat.js';
 export * from './core/geminiRequest.js';
 export * from './core/insightProtocol.js';
 export * from './core/logger.js';

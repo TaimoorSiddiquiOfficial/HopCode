@@ -13,7 +13,7 @@ import type { Content, GenerateContentResponse } from '@google/genai';
 import { CompressionStatus } from '../core/turn.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 import { tokenLimit } from '../core/tokenLimits.js';
-import type { GeminiChat } from '../core/geminiChat.js';
+import type { HopCodeChat } from '../core/hopCodeChat.js';
 import type { Config } from '../config/config.js';
 import type { ContentGenerator } from '../core/contentGenerator.js';
 import {
@@ -275,7 +275,7 @@ describe('findCompressSplitPoint', () => {
 
 describe('ChatCompressionService', () => {
   let service: ChatCompressionService;
-  let mockChat: GeminiChat;
+  let mockChat: HopCodeChat;
   let mockConfig: Config;
   const mockModel = 'gemini-pro';
   const mockPromptId = 'test-prompt-id';
@@ -286,7 +286,7 @@ describe('ChatCompressionService', () => {
     service = new ChatCompressionService();
     mockChat = {
       getHistory: vi.fn(),
-    } as unknown as GeminiChat;
+    } as unknown as HopCodeChat;
     mockFireSessionStartEvent = vi.fn().mockResolvedValue(undefined);
     mockGetHookSystem = vi.fn().mockReturnValue({
       fireSessionStartEvent: mockFireSessionStartEvent,

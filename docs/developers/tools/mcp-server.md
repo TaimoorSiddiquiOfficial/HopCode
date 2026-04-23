@@ -1,4 +1,4 @@
-﻿# MCP servers with HopCode
+# MCP servers with HopCode
 
 This document provides a guide to configuring and using Model Context Protocol (MCP) servers with HopCode.
 
@@ -172,7 +172,7 @@ For **remote/cloud server deployments** (e.g., web terminals, SSH sessions, clou
 Example for remote servers:
 
 ```bash
-qwen mcp add --transport sse remote-server https://api.example.com/sse/ \
+hopcode mcp add --transport sse remote-server https://api.example.com/sse/ \
   --oauth-redirect-uri https://your-remote-server.example.com/oauth/callback
 ```
 
@@ -204,7 +204,7 @@ Use the `/mcp auth` command to manage OAuth authentication:
 - **`authorizationUrl`** (string): OAuth authorization endpoint (auto-discovered if omitted)
 - **`tokenUrl`** (string): OAuth token endpoint (auto-discovered if omitted)
 - **`scopes`** (string[]): Required OAuth scopes
-- **`redirectUri`** (string): Custom redirect URI. **Critical for remote deployments**: Defaults to `http://localhost:7777/oauth/callback`. When running HopCode on remote/cloud servers, set this to a publicly accessible URL (e.g., `https://your-server.com/oauth/callback`). Can be configured via `qwen mcp add --oauth-redirect-uri` or directly in settings.json.
+- **`redirectUri`** (string): Custom redirect URI. **Critical for remote deployments**: Defaults to `http://localhost:7777/oauth/callback`. When running HopCode on remote/cloud servers, set this to a publicly accessible URL (e.g., `https://your-server.com/oauth/callback`). Can be configured via `hopcode mcp add --oauth-redirect-uri` or directly in settings.json.
 - **`tokenParamName`** (string): Query parameter name for tokens in SSE URLs
 - **`audiences`** (string[]): Audiences the token is valid for
 
@@ -212,7 +212,7 @@ Use the `/mcp auth` command to manage OAuth authentication:
 
 OAuth tokens are automatically:
 
-- **Stored securely** in `~/.qwen/mcp-oauth-tokens.json`
+- **Stored securely** in `~/.hopcode/mcp-oauth-tokens.json`
 - **Refreshed** when expired (if refresh tokens are available)
 - **Validated** before each connection attempt
 - **Cleaned up** when invalid or expired
@@ -771,18 +771,18 @@ or, using positional arguments:
 
 When you run this command, the CLI executes the `prompts/get` method on the MCP server with the provided arguments. The server is responsible for substituting the arguments into the prompt template and returning the final prompt text. The CLI then sends this prompt to the model for execution. This provides a convenient way to automate and share common workflows.
 
-## Managing MCP Servers with `qwen mcp`
+## Managing MCP Servers with `hopcode mcp`
 
 While you can always configure MCP servers by manually editing your `settings.json` file, the CLI provides a convenient set of commands to manage your server configurations programmatically. These commands streamline the process of adding, listing, and removing MCP servers without needing to directly edit JSON files.
 
-### Adding a Server (`qwen mcp add`)
+### Adding a Server (`hopcode mcp add`)
 
 The `add` command configures a new MCP server in your `settings.json`. Based on the scope (`-s, --scope`), it will be added to either the user config `~/.hopcode/settings.json` or the project config `.hopcode/settings.json` file.
 
 **Command:**
 
 ```bash
-qwen mcp add [options] <name> <commandOrUrl> [args...]
+hopcode mcp add [options] <name> <commandOrUrl> [args...]
 ```
 
 - `<name>`: A unique name for the server.
@@ -813,13 +813,13 @@ This is the default transport for running local servers.
 
 ```bash
 # Basic syntax
-qwen mcp add <name> <command> [args...]
+hopcode mcp add <name> <command> [args...]
 
 # Example: Adding a local server
-qwen mcp add my-stdio-server -e API_KEY=123 /path/to/server arg1 arg2 arg3
+hopcode mcp add my-stdio-server -e API_KEY=123 /path/to/server arg1 arg2 arg3
 
 # Example: Adding a local python server
-qwen mcp add python-server python server.py --port 8080
+hopcode mcp add python-server python server.py --port 8080
 ```
 
 #### Adding an HTTP server
@@ -828,13 +828,13 @@ This transport is for servers that use the streamable HTTP transport.
 
 ```bash
 # Basic syntax
-qwen mcp add --transport http <name> <url>
+hopcode mcp add --transport http <name> <url>
 
 # Example: Adding an HTTP server
-qwen mcp add --transport http http-server https://api.example.com/mcp/
+hopcode mcp add --transport http http-server https://api.example.com/mcp/
 
 # Example: Adding an HTTP server with an authentication header
-qwen mcp add --transport http secure-http https://api.example.com/mcp/ --header "Authorization: Bearer abc123"
+hopcode mcp add --transport http secure-http https://api.example.com/mcp/ --header "Authorization: Bearer abc123"
 ```
 
 #### Adding an SSE server
@@ -843,25 +843,25 @@ This transport is for servers that use Server-Sent Events (SSE).
 
 ```bash
 # Basic syntax
-qwen mcp add --transport sse <name> <url>
+hopcode mcp add --transport sse <name> <url>
 
 # Example: Adding an SSE server
-qwen mcp add --transport sse sse-server https://api.example.com/sse/
+hopcode mcp add --transport sse sse-server https://api.example.com/sse/
 
 # Example: Adding an SSE server with an authentication header
-qwen mcp add --transport sse secure-sse https://api.example.com/sse/ --header "Authorization: Bearer abc123"
+hopcode mcp add --transport sse secure-sse https://api.example.com/sse/ --header "Authorization: Bearer abc123"
 
 # Example: Adding an OAuth-enabled SSE server
-qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
+hopcode mcp add --transport sse oauth-server https://api.example.com/sse/ \
   --oauth-client-id your-client-id \
   --oauth-redirect-uri https://your-server.com/oauth/callback \
   --oauth-authorization-url https://provider.example.com/authorize \
   --oauth-token-url https://provider.example.com/token
 ```
 
-### Managing Servers (`qwen mcp`)
+### Managing Servers (`hopcode mcp`)
 
-To view and manage all MCP servers currently configured, use the `manage` command or simply `qwen mcp`. This opens an interactive TUI dialog where you can:
+To view and manage all MCP servers currently configured, use the `manage` command or simply `hopcode mcp`. This opens an interactive TUI dialog where you can:
 
 - View all MCP servers with their connection status
 - Enable/disable servers
@@ -872,27 +872,27 @@ To view and manage all MCP servers currently configured, use the `manage` comman
 **Command:**
 
 ```bash
-qwen mcp
+hopcode mcp
 # or
-qwen mcp manage
+hopcode mcp manage
 ```
 
 The management dialog provides a visual interface showing each server's name, configuration details, connection status, and available tools/prompts.
 
-### Removing a Server (`qwen mcp remove`)
+### Removing a Server (`hopcode mcp remove`)
 
 To delete a server from your configuration, use the `remove` command with the server's name.
 
 **Command:**
 
 ```bash
-qwen mcp remove <name>
+hopcode mcp remove <name>
 ```
 
 **Example:**
 
 ```bash
-qwen mcp remove my-server
+hopcode mcp remove my-server
 ```
 
 This will find and delete the "my-server" entry from the `mcpServers` object in the appropriate `settings.json` file based on the scope (`-s, --scope`).

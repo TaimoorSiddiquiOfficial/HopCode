@@ -8,19 +8,19 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import type {
   Config,
   EditorType,
-  GeminiClient,
+  HopCodeClient,
   RetryInfo,
-  ServerGeminiChatCompressedEvent,
-  ServerGeminiContentEvent as ContentEvent,
-  ServerGeminiFinishedEvent,
-  ServerGeminiStreamEvent as GeminiEvent,
+  ServerHopCodeChatCompressedEvent,
+  ServerHopCodeContentEvent as ContentEvent,
+  ServerHopCodeFinishedEvent,
+  ServerHopCodeStreamEvent as GeminiEvent,
   ThoughtSummary,
   ToolCallRequestInfo,
-  GeminiErrorEventValue,
+  HopCodeErrorEventValue,
   StopFailureErrorType,
 } from '@hoptrendy/hopcode-core';
 import {
-  GeminiEventType as ServerGeminiEventType,
+  HopCodeEventType as ServerHopCodeEventType,
   SendMessageType,
   createDebugLogger,
   getErrorMessage,
@@ -191,8 +191,8 @@ function showCitations(settings: LoadedSettings): boolean {
  * Manages the Gemini stream, including user input, command processing,
  * API interaction, and tool call lifecycle.
  */
-export const useGeminiStream = (
-  geminiClient: GeminiClient,
+export const useHopCodeStream = (
+  geminiClient: HopCodeClient,
   history: HistoryItem[],
   addItem: UseHistoryManagerReturn['addItem'],
   config: Config,
@@ -850,7 +850,7 @@ export const useGeminiStream = (
   );
 
   const handleErrorEvent = useCallback(
-    (eventValue: GeminiErrorEventValue, userMessageTimestamp: number) => {
+    (eventValue: HopCodeErrorEventValue, userMessageTimestamp: number) => {
       lastPromptErroredRef.current = true;
       if (pendingHistoryItemRef.current) {
         addItem(pendingHistoryItemRef.current, userMessageTimestamp);
@@ -919,7 +919,7 @@ export const useGeminiStream = (
   );
 
   const handleFinishedEvent = useCallback(
-    (event: ServerGeminiFinishedEvent, userMessageTimestamp: number) => {
+    (event: ServerHopCodeFinishedEvent, userMessageTimestamp: number) => {
       const finishReason = event.value.reason;
       if (!finishReason) {
         return;
@@ -970,7 +970,7 @@ export const useGeminiStream = (
 
   const handleChatCompressionEvent = useCallback(
     (
-      eventValue: ServerGeminiChatCompressedEvent['value'],
+      eventValue: ServerHopCodeChatCompressedEvent['value'],
       userMessageTimestamp: number,
     ) => {
       if (pendingHistoryItemRef.current) {
@@ -1028,7 +1028,7 @@ export const useGeminiStream = (
       setLoopDetectionConfirmationRequest(null);
 
       if (result.userSelection === 'disable') {
-        config.getGeminiClient().getLoopDetectionService().disableForSession();
+        config.getHopCodeClient().getLoopDetectionService().disableForSession();
         addItem(
           {
             type: 'info',
@@ -1116,7 +1116,7 @@ export const useGeminiStream = (
       for await (const event of stream) {
         dualOutput?.processEvent(event);
         switch (event.type) {
-          case ServerGeminiEventType.Thought:
+          case ServerHopCodeEventType.Thought:
             // If the thought has a subject, it's a discrete status update rather than
             // a streamed textual thought, so we update the thought state directly.
             if (event.value.subject) {
@@ -1129,50 +1129,50 @@ export const useGeminiStream = (
               );
             }
             break;
-          case ServerGeminiEventType.Content:
+          case ServerHopCodeEventType.Content:
             geminiMessageBuffer = handleContentEvent(
               event.value,
               geminiMessageBuffer,
               userMessageTimestamp,
             );
             break;
-          case ServerGeminiEventType.ToolCallRequest:
+          case ServerHopCodeEventType.ToolCallRequest:
             toolCallRequests.push(event.value);
             break;
-          case ServerGeminiEventType.UserCancelled:
+          case ServerHopCodeEventType.UserCancelled:
             handleUserCancelledEvent(userMessageTimestamp);
             break;
-          case ServerGeminiEventType.Error:
+          case ServerHopCodeEventType.Error:
             handleErrorEvent(event.value, userMessageTimestamp);
             break;
-          case ServerGeminiEventType.ChatCompressed:
+          case ServerHopCodeEventType.ChatCompressed:
             handleChatCompressionEvent(event.value, userMessageTimestamp);
             break;
-          case ServerGeminiEventType.ToolCallConfirmation:
-          case ServerGeminiEventType.ToolCallResponse:
+          case ServerHopCodeEventType.ToolCallConfirmation:
+          case ServerHopCodeEventType.ToolCallResponse:
             // do nothing
             break;
-          case ServerGeminiEventType.MaxSessionTurns:
+          case ServerHopCodeEventType.MaxSessionTurns:
             handleMaxSessionTurnsEvent();
             break;
-          case ServerGeminiEventType.SessionTokenLimitExceeded:
+          case ServerHopCodeEventType.SessionTokenLimitExceeded:
             handleSessionTokenLimitExceededEvent(event.value);
             break;
-          case ServerGeminiEventType.Finished:
+          case ServerHopCodeEventType.Finished:
             handleFinishedEvent(
-              event as ServerGeminiFinishedEvent,
+              event as ServerHopCodeFinishedEvent,
               userMessageTimestamp,
             );
             break;
-          case ServerGeminiEventType.Citation:
+          case ServerHopCodeEventType.Citation:
             handleCitationEvent(event.value, userMessageTimestamp);
             break;
-          case ServerGeminiEventType.LoopDetected:
+          case ServerHopCodeEventType.LoopDetected:
             // handle later because we want to move pending history to history
             // before we add loop detected message to history
             loopDetectedRef.current = true;
             break;
-          case ServerGeminiEventType.Retry:
+          case ServerHopCodeEventType.Retry:
             // Clear any pending partial content from the failed attempt
             if (pendingHistoryItemRef.current) {
               setPendingHistoryItem(null);
@@ -1185,7 +1185,7 @@ export const useGeminiStream = (
               clearRetryCountdown();
             }
             break;
-          case ServerGeminiEventType.HookSystemMessage:
+          case ServerHopCodeEventType.HookSystemMessage:
             // Display system message from Stop hooks with "Stop says:" prefix
             // First commit any pending AI response to ensure correct ordering
             if (pendingHistoryItemRef.current) {
@@ -1200,13 +1200,13 @@ export const useGeminiStream = (
               userMessageTimestamp,
             );
             break;
-          case ServerGeminiEventType.UserPromptSubmitBlocked:
+          case ServerHopCodeEventType.UserPromptSubmitBlocked:
             handleUserPromptSubmitBlockedEvent(
               event.value,
               userMessageTimestamp,
             );
             break;
-          case ServerGeminiEventType.StopHookLoop:
+          case ServerHopCodeEventType.StopHookLoop:
             handleStopHookLoopEvent(event.value, userMessageTimestamp);
             break;
           default: {

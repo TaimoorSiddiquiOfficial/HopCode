@@ -43,7 +43,7 @@ describe('btwCommand', () => {
   let mockContext: CommandContext;
 
   const createConfig = (overrides: Record<string, unknown> = {}) => ({
-    getGeminiClient: () => ({}),
+    getHopCodeClient: () => ({}),
     getModel: () => 'test-model',
     getSessionId: () => 'test-session-id',
     getApprovalMode: () => 'default',
@@ -187,7 +187,7 @@ describe('btwCommand', () => {
       const liveContext = createMockCommandContext({
         services: {
           config: createConfig({
-            getGeminiClient: () => geminiClient,
+            getHopCodeClient: () => geminiClient,
           }),
         },
       });
@@ -240,7 +240,7 @@ describe('btwCommand', () => {
       const liveContext = createMockCommandContext({
         services: {
           config: createConfig({
-            getGeminiClient: () => geminiClient,
+            getHopCodeClient: () => geminiClient,
           }),
         },
       });

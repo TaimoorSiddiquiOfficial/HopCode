@@ -67,7 +67,7 @@ describe('ShellTool', () => {
       getTruncateToolOutputThreshold: vi.fn().mockReturnValue(0),
       getTruncateToolOutputLines: vi.fn().mockReturnValue(0),
       getPermissionManager: vi.fn().mockReturnValue(undefined),
-      getGeminiClient: vi.fn(),
+      getHopCodeClient: vi.fn(),
       getGitCoAuthor: vi.fn().mockReturnValue({
         enabled: true,
         name: 'Qwen-Coder',

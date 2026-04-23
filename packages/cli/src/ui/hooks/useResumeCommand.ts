@@ -79,7 +79,7 @@ export function useResumeCommand(
 
       // Update session history core.
       config.startNewSession(sessionId, sessionData);
-      await config.getGeminiClient()?.initialize?.();
+      await config.getHopCodeClient()?.initialize?.();
 
       // Fire SessionStart event after resuming session
       try {

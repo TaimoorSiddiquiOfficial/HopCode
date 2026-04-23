@@ -50,7 +50,7 @@ function buildBtwPrompt(question: string): string {
 function getBtwCacheSafeParams(
   context: CommandContext,
 ): ReturnType<typeof getCacheSafeParams> {
-  const geminiClient = context.services.config?.getGeminiClient();
+  const geminiClient = context.services.config?.getHopCodeClient();
   if (
     geminiClient &&
     typeof geminiClient === 'object' &&

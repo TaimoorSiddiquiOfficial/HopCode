@@ -86,7 +86,7 @@ import { computeWindowTitle } from '../utils/windowTitle.js';
 import { clearScreen } from '../utils/stdioHelpers.js';
 import { useTextBuffer } from './components/shared/text-buffer.js';
 import { useLogger } from './hooks/useLogger.js';
-import { useGeminiStream } from './hooks/useGeminiStream.js';
+import { useHopCodeStream } from './hooks/useHopCodeStream.js';
 import { useVim } from './hooks/vim.js';
 import { isBtwCommand } from './utils/commandUtils.js';
 import { type LoadedSettings, SettingScope } from '../config/settings.js';
@@ -372,7 +372,7 @@ export const AppContainer = (props: AppContainerProps) => {
   // Track idle state via ref so the update handler can defer notifications
   // while the model is streaming, without triggering re-renders.
   // Note: isIdleRef.current is assigned after streamingState becomes available
-  // (see the assignment below useGeminiStream).
+  // (see the assignment below useHopCodeStream).
   const isIdleRef = useRef(true);
   const updateHandlerRef = useRef<{
     cleanup: () => void;
@@ -784,8 +784,8 @@ export const AppContainer = (props: AppContainerProps) => {
     activePtyId,
     loopDetectionConfirmationRequest,
     pendingToolCalls,
-  } = useGeminiStream(
-    config.getGeminiClient(),
+  } = useHopCodeStream(
+    config.getHopCodeClient(),
     historyManager.history,
     historyManager.addItem,
     config,
@@ -855,7 +855,7 @@ export const AppContainer = (props: AppContainerProps) => {
   }, []);
 
   // Auto-accept indicator — disabled on agent tabs (agents handle their own)
-  const geminiClient = config.getGeminiClient();
+  const geminiClient = config.getHopCodeClient();
 
   const showAutoAcceptIndicator = useAutoAcceptIndicator({
     config,

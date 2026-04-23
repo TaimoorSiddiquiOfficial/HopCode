@@ -140,7 +140,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
         `[WebFetchTool] Content length: ${textContent.length} characters`,
       );
 
-      const geminiClient = this.config.getGeminiClient();
+      const geminiClient = this.config.getHopCodeClient();
       const fallbackPrompt = `The user requested the following: "${this.params.prompt}".
 
 I have fetched the content from ${this.params.url}. Please use the following content to answer the user's request.

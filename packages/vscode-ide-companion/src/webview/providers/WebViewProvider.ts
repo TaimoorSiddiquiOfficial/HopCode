@@ -5,7 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import { QwenAgentManager } from '../../services/qwenAgentManager.js';
+import { HopCodeAgentManager } from '../../services/hopcodeAgentManager.js';
 import { ConversationStore } from '../../services/conversationStore.js';
 import type {
   RequestPermissionRequest,
@@ -36,7 +36,7 @@ function isInsightCommand(command: string): boolean {
 export class WebViewProvider {
   private panelManager: PanelManager;
   private messageHandler: MessageHandler;
-  private agentManager: QwenAgentManager;
+  private agentManager: HopCodeAgentManager;
   private conversationStore: ConversationStore;
   private disposables: vscode.Disposable[] = [];
   private agentInitialized = false; // Track if agent has been initialized
@@ -75,7 +75,7 @@ export class WebViewProvider {
     private context: vscode.ExtensionContext,
     private extensionUri: vscode.Uri,
   ) {
-    this.agentManager = new QwenAgentManager();
+    this.agentManager = new HopCodeAgentManager();
     this.conversationStore = new ConversationStore(context);
     this.panelManager = new PanelManager(extensionUri, () => {
       // Panel dispose callback — unblock any pending ACP Promises
@@ -1389,7 +1389,7 @@ export class WebViewProvider {
    * Context-aware handler for the "New Chat" action (openNewChatTab message).
    *
    * - View host (sidebar / secondary bar): resets the conversation in-place by
-   *   routing to the newQwenSession handler (includes auth checks and UI clearing).
+   *   routing to the newHopCodeSession handler (includes auth checks and UI clearing).
    * - Editor tab: returns false so the message falls through to
    *   SessionMessageHandler which opens a brand-new editor tab.
    *
@@ -1402,7 +1402,7 @@ export class WebViewProvider {
     if (message.type !== 'openNewChatTab' || !this.isViewHost) {
       return false;
     }
-    void this.messageHandler.route({ type: 'newQwenSession', data: {} });
+    void this.messageHandler.route({ type: 'newHopCodeSession', data: {} });
     return true;
   }
 

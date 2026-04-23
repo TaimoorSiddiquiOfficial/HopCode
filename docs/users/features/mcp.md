@@ -1,4 +1,4 @@
-﻿# Connect HopCode to tools via MCP
+# Connect HopCode to tools via MCP
 
 HopCode can connect to external tools and data sources through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). MCP servers give HopCode access to your tools, databases, and APIs.
 
@@ -20,20 +20,20 @@ With MCP servers connected, you can ask HopCode to:
 HopCode loads MCP servers from `mcpServers` in your `settings.json`. You can configure servers either:
 
 - By editing `settings.json` directly
-- By using `qwen mcp` commands (see [CLI reference](#qwen-mcp-cli))
+- By using `hopcode mcp` commands (see [CLI reference](#qwen-mcp-cli))
 
 ### Add your first server
 
 1. Add a server (example: remote HTTP MCP server):
 
 ```bash
-qwen mcp add --transport http my-server http://localhost:3000/mcp
+hopcode mcp add --transport http my-server http://localhost:3000/mcp
 ```
 
 2. Open MCP management dialog to view and manage servers:
 
 ```bash
-qwen mcp
+hopcode mcp
 ```
 
 3. Restart HopCode in the same project (or start it if it wasn’t running yet), then ask the model to use tools from that server.
@@ -48,7 +48,7 @@ Most users only need these two scopes:
 Write to user scope:
 
 ```bash
-qwen mcp add --scope user --transport http my-server http://localhost:3000/mcp
+hopcode mcp add --scope user --transport http my-server http://localhost:3000/mcp
 ```
 
 > [!tip]
@@ -69,7 +69,7 @@ qwen mcp add --scope user --transport http my-server http://localhost:3000/mcp
 >
 > If a server supports both, prefer **HTTP** over **SSE**.
 
-### Configure via `settings.json` vs `qwen mcp add`
+### Configure via `settings.json` vs `hopcode mcp add`
 
 Both approaches produce the same `mcpServers` entries in your `settings.json`—use whichever you prefer.
 
@@ -97,7 +97,7 @@ JSON (`.hopcode/settings.json`):
 CLI (writes to project scope by default):
 
 ```bash
-qwen mcp add pythonTools -e DATABASE_URL=$DB_CONNECTION_STRING -e API_KEY=$EXTERNAL_API_KEY \
+hopcode mcp add pythonTools -e DATABASE_URL=$DB_CONNECTION_STRING -e API_KEY=$EXTERNAL_API_KEY \
   --timeout 15000 python -m my_mcp_server --port 8080
 ```
 
@@ -122,7 +122,7 @@ JSON:
 CLI:
 
 ```bash
-qwen mcp add --transport http httpServerWithAuth http://localhost:3000/mcp \
+hopcode mcp add --transport http httpServerWithAuth http://localhost:3000/mcp \
   --header "Authorization: Bearer your-api-token" --timeout 5000
 ```
 
@@ -144,7 +144,7 @@ JSON:
 CLI:
 
 ```bash
-qwen mcp add --transport sse sseServer http://localhost:8080/sse --timeout 30000
+hopcode mcp add --transport sse sseServer http://localhost:8080/sse --timeout 30000
 ```
 
 ## Safety and control
@@ -162,7 +162,7 @@ HopCode supports OAuth 2.0 authentication for MCP servers. This is useful when a
 When you add an MCP server with OAuth credentials, HopCode will automatically handle the authentication flow:
 
 ```bash
-qwen mcp add --transport sse oauth-server https://api.example.com/sse/ \
+hopcode mcp add --transport sse oauth-server https://api.example.com/sse/ \
   --oauth-client-id your-client-id \
   --oauth-redirect-uri https://your-server.com/oauth/callback \
   --oauth-authorization-url https://provider.example.com/authorize \
@@ -180,7 +180,7 @@ The OAuth flow requires a redirect URI where the authorization provider sends th
 Example for remote servers:
 
 ```bash
-qwen mcp add --transport sse remote-server https://api.example.com/sse/ \
+hopcode mcp add --transport sse remote-server https://api.example.com/sse/ \
   --oauth-redirect-uri https://your-remote-server.example.com/oauth/callback
 ```
 
@@ -225,7 +225,7 @@ OAuth configuration properties:
 
 OAuth tokens are automatically:
 
-- **Stored securely** in `~/.qwen/mcp-oauth-tokens.json`
+- **Stored securely** in `~/.hopcode/mcp-oauth-tokens.json`
 - **Refreshed** when expired (if refresh tokens are available)
 - **Validated** before each connection attempt
 
@@ -327,14 +327,14 @@ Optional:
 
 <a id="qwen-mcp-cli"></a>
 
-### Manage MCP servers with `qwen mcp`
+### Manage MCP servers with `hopcode mcp`
 
 You can always configure MCP servers by manually editing `settings.json`, but the CLI is usually faster.
 
-#### Adding a server (`qwen mcp add`)
+#### Adding a server (`hopcode mcp add`)
 
 ```bash
-qwen mcp add [options] <name> <commandOrUrl> [args...]
+hopcode mcp add [options] <name> <commandOrUrl> [args...]
 ```
 
 | Argument/Option             | Description                                                         | Default                                | Example                                                            |
@@ -360,8 +360,8 @@ qwen mcp add [options] <name> <commandOrUrl> [args...]
 
 > `--oauth-*` flags apply only to `--transport sse` and `--transport http`. Combining them with `--transport stdio` is rejected.
 
-#### Removing a server (`qwen mcp remove`)
+#### Removing a server (`hopcode mcp remove`)
 
 ```bash
-qwen mcp remove <name>
+hopcode mcp remove <name>
 ```

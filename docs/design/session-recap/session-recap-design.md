@@ -1,4 +1,4 @@
-﻿# Session Recap Design
+# Session Recap Design
 
 > A one-line "where did I leave off" summary surfaced when the user
 > returns to an idle session, either on demand (`/recap`) or after the
@@ -87,7 +87,7 @@ generator and not as a coding assistant.
 
 Note that `GeminiClient.generateContent()` internally runs the prompt
 through `getCustomSystemPrompt()`, which appends the user's memory
-(QWEN.md / managed auto-memory) as a suffix. The final system prompt is
+(HOPCODE.md / managed auto-memory) as a suffix. The final system prompt is
 therefore `recap prompt + user memory` — useful project context for the
 recap, not a leak.
 
@@ -228,7 +228,7 @@ and a null `pendingItem`.
 All failures are **fully transparent** to the user — recap is an
 auxiliary feature and never throws into the UI. Developers can grep for
 the `[SESSION_RECAP]` tag in the debug log file: written by default to
-`~/.qwen/debug/<sessionId>.txt` (`latest.txt` symlinks to the current
+`~/.hopcode/debug/<sessionId>.txt` (`latest.txt` symlinks to the current
 session); disable via `QWEN_DEBUG_LOG_FILE=0`.
 
 ## Out of Scope
@@ -238,5 +238,5 @@ session); disable via `QWEN_DEBUG_LOG_FILE=0`.
 | Progress UI for `/recap` (spinner / pendingItem) | 3-5 second wait is tolerable; adds complexity.                                                                                           |
 | Automated tests                                  | Service is small (~150 lines), end-to-end tested manually first; unit tests can land in a separate PR.                                   |
 | Localized prompts                                | The system prompt is for the model; English is the most reliable substrate. The model selects the output language from the conversation. |
-| `QWEN_CODE_ENABLE_AWAY_SUMMARY` env var          | Claude Code uses it to keep the feature on when telemetry is disabled; HopCode's current telemetry model doesn't need this.              |
+| `HOPCODE_ENABLE_AWAY_SUMMARY` env var          | Claude Code uses it to keep the feature on when telemetry is disabled; HopCode's current telemetry model doesn't need this.              |
 | Auto-recap on `/resume` completion               | A natural follow-up but needs a hook point in `useResumeCommand`; out of scope for this PR.                                              |

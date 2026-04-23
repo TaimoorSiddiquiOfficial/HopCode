@@ -1,4 +1,4 @@
-﻿# Troubleshooting
+# Troubleshooting
 
 This guide provides solutions to common issues and debugging tips, including topics on:
 
@@ -89,7 +89,7 @@ This guide provides solutions to common issues and debugging tips, including top
 - Ensure VS Code has a single workspace folder open.
 - Restart the integrated terminal after installing the extension so it inherits:
   - `QWEN_CODE_IDE_WORKSPACE_PATH`
-  - `QWEN_CODE_IDE_SERVER_PORT`
+  - `HOPCODE_IDE_SERVER_PORT`
 - If running in a container, verify `host.docker.internal` resolves. Otherwise, map the host appropriately.
 - Reinstall the companion with `/ide install` and use “HopCode: Run” in the Command Palette to verify it launches.
 

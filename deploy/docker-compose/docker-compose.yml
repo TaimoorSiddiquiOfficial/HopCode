@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  hopcode-agent:
+    image: ghcr.io/taimoorsiddiquiofficial/hopcode:0.15.1
+    container_name: hopcode-agent
+    restart: unless-stopped
+    ports:
+      - "50051:50051"   # gRPC server
+      - "7900:7900"     # HTTP API server (optional)
+    environment:
+      - HOPCODE_SIMPLE=1
+      - HOPCODE_MODEL=claude-sonnet-4-6
+      - HOPCODE_PERMISSION_MODE=yolo
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HOPCODE_SANDBOX=false
+    volumes:
+      - hopcode-data:/home/node/.hopcode
+      - ./workspace:/workspace
+    working_dir: /workspace
+    command: ["hopcode", "grpc", "--port", "50051", "--host", "0.0.0.0"]
+    healthcheck:
+      test: ["CMD", "hopcode", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  hopcode-dashboard:
+    image: ghcr.io/taimoorsiddiquiofficial/hopcode:0.15.1
+    container_name: hopcode-dashboard
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - HOPCODE_DASHBOARD_PORT=3000
+    volumes:
+      - hopcode-data:/home/node/.hopcode
+    command: ["hopcode", "dashboard", "--port", "3000"]
+    depends_on:
+      hopcode-agent:
+        condition: service_healthy
+
+volumes:
+  hopcode-data:
+    driver: local

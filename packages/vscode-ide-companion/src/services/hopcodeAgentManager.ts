@@ -17,20 +17,20 @@ import type {
   SlashCommandNotification,
 } from '../types/acpTypes.js';
 import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
-import { QwenSessionReader, type QwenSession } from './qwenSessionReader.js';
-import { QwenSessionManager } from './qwenSessionManager.js';
+import { HopCodeSessionReader, type HopCodeSession } from './hopcodeSessionReader.js';
+import { HopCodeSessionManager } from './hopcodeSessionManager.js';
 import type {
   ChatMessage,
   PlanEntry,
   ToolCallUpdateData,
-  QwenAgentCallbacks,
+  HopCodeAgentCallbacks,
   UsageStatsPayload,
 } from '../types/chatTypes.js';
 import {
-  QwenConnectionHandler,
-  type QwenConnectionResult,
-} from '../services/qwenConnectionHandler.js';
-import { QwenSessionUpdateHandler } from './qwenSessionUpdateHandler.js';
+  HopCodeConnectionHandler,
+  type HopCodeConnectionResult,
+} from '../services/hopcodeConnectionHandler.js';
+import { HopCodeSessionUpdateHandler } from './hopcodeSessionUpdateHandler.js';
 import { authMethod } from '../types/acpTypes.js';
 import {
   extractModelInfoFromNewSessionResult,
@@ -86,12 +86,12 @@ interface AgentSessionOptions {
   forceNew?: boolean;
 }
 
-export class QwenAgentManager {
+export class HopCodeAgentManager {
   private connection: AcpConnection;
-  private sessionReader: QwenSessionReader;
-  private sessionManager: QwenSessionManager;
-  private connectionHandler: QwenConnectionHandler;
-  private sessionUpdateHandler: QwenSessionUpdateHandler;
+  private sessionReader: HopCodeSessionReader;
+  private sessionManager: HopCodeSessionManager;
+  private connectionHandler: HopCodeConnectionHandler;
+  private sessionUpdateHandler: HopCodeSessionUpdateHandler;
   private currentWorkingDir: string = process.cwd();
   // When loading a past session via ACP, the CLI replays history through
   // session/update notifications. We set this flag to route message chunks
@@ -102,7 +102,7 @@ export class QwenAgentManager {
   private sessionCreateInFlight: Promise<string | null> | null = null;
 
   // Callback storage
-  private callbacks: QwenAgentCallbacks = {};
+  private callbacks: HopCodeAgentCallbacks = {};
   // Baseline state from session/new (default/settings-backed), used to clear stale
   // UI mode/model when session/load response omits optional fields.
   private baselineModeId: ApprovalModeValue = 'default';
@@ -118,10 +118,10 @@ export class QwenAgentManager {
 
   constructor() {
     this.connection = new AcpConnection();
-    this.sessionReader = new QwenSessionReader();
-    this.sessionManager = new QwenSessionManager();
-    this.connectionHandler = new QwenConnectionHandler();
-    this.sessionUpdateHandler = new QwenSessionUpdateHandler({});
+    this.sessionReader = new HopCodeSessionReader();
+    this.sessionManager = new HopCodeSessionManager();
+    this.connectionHandler = new HopCodeConnectionHandler();
+    this.sessionUpdateHandler = new HopCodeSessionUpdateHandler({});
 
     // Set ACP connection callbacks
     this.connection.onSessionUpdate = (data: SessionNotification) => {
@@ -213,7 +213,7 @@ export class QwenAgentManager {
           // the webview can process independently of streaming state.
         }
       } catch (err) {
-        console.warn('[QwenAgentManager] Rehydration routing failed:', err);
+        console.warn('[HopCodeAgentManager] Rehydration routing failed:', err);
       }
 
       // Default handling path
@@ -254,7 +254,7 @@ export class QwenAgentManager {
           this.callbacks.onStreamChunk('');
         }
       } catch (err) {
-        console.warn('[QwenAgentManager] onEndTurn callback error:', err);
+        console.warn('[HopCodeAgentManager] onEndTurn callback error:', err);
       }
     };
 
@@ -266,7 +266,7 @@ export class QwenAgentManager {
         handleAuthenticateUpdate(data);
       } catch (err) {
         console.warn(
-          '[QwenAgentManager] onAuthenticateUpdate callback error:',
+          '[HopCodeAgentManager] onAuthenticateUpdate callback error:',
           err,
         );
       }
@@ -299,7 +299,7 @@ export class QwenAgentManager {
           });
         }
       } catch (err) {
-        console.warn('[QwenAgentManager] onInitialized parse error:', err);
+        console.warn('[HopCodeAgentManager] onInitialized parse error:', err);
       }
     };
 
@@ -308,7 +308,7 @@ export class QwenAgentManager {
       signal: string | null,
     ) => {
       console.log(
-        `[QwenAgentManager] Process disconnected (code: ${code}, signal: ${signal})`,
+        `[HopCodeAgentManager] Process disconnected (code: ${code}, signal: ${signal})`,
       );
       this.callbacks.onDisconnected?.(code, signal);
     };
@@ -324,7 +324,7 @@ export class QwenAgentManager {
     workingDir: string,
     cliEntryPath: string,
     options?: AgentConnectOptions,
-  ): Promise<QwenConnectionResult> {
+  ): Promise<HopCodeConnectionResult> {
     this.currentWorkingDir = workingDir;
     const res = await this.connectionHandler.connect(
       this.connection,
@@ -340,7 +340,7 @@ export class QwenAgentManager {
     if (res.availableModels && res.availableModels.length > 0) {
       this.baselineAvailableModels = res.availableModels;
       console.log(
-        '[QwenAgentManager] Emitting availableModels from connect():',
+        '[HopCodeAgentManager] Emitting availableModels from connect():',
         res.availableModels.map((m) => m.modelId),
       );
       if (this.callbacks.onAvailableModels) {
@@ -372,8 +372,8 @@ export class QwenAgentManager {
   async reconnect(
     cliEntryPath: string,
     options?: AgentConnectOptions,
-  ): Promise<QwenConnectionResult> {
-    console.log('[QwenAgentManager] Attempting reconnection...');
+  ): Promise<HopCodeConnectionResult> {
+    console.log('[HopCodeAgentManager] Attempting reconnection...');
     try {
       this.connection.disconnect();
     } catch (_e) {
@@ -405,7 +405,7 @@ export class QwenAgentManager {
       this.callbacks.onModeChanged?.(confirmed);
       return confirmed;
     } catch (err) {
-      console.error('[QwenAgentManager] Failed to set mode:', err);
+      console.error('[HopCodeAgentManager] Failed to set mode:', err);
       throw err;
     }
   }
@@ -427,7 +427,7 @@ export class QwenAgentManager {
       this.callbacks.onModelChanged?.(modelInfo);
       return modelInfo;
     } catch (err) {
-      console.error('[QwenAgentManager] Failed to set model:', err);
+      console.error('[HopCodeAgentManager] Failed to set model:', err);
       throw err;
     }
   }
@@ -467,7 +467,7 @@ export class QwenAgentManager {
 
       return sessionExists;
     } catch (error) {
-      console.warn('[QwenAgentManager] Session validation failed:', error);
+      console.warn('[HopCodeAgentManager] Session validation failed:', error);
       // If we can't validate, assume session is invalid
       return false;
     }
@@ -481,21 +481,21 @@ export class QwenAgentManager {
    */
   async getSessionList(): Promise<Array<Record<string, unknown>>> {
     console.log(
-      '[QwenAgentManager] Getting session list with version-aware strategy',
+      '[HopCodeAgentManager] Getting session list with version-aware strategy',
     );
 
     try {
       console.log(
-        '[QwenAgentManager] Attempting to get session list via ACP method',
+        '[HopCodeAgentManager] Attempting to get session list via ACP method',
       );
       const response = await this.connection.listSessions();
-      console.log('[QwenAgentManager] ACP session list response:', response);
+      console.log('[HopCodeAgentManager] ACP session list response:', response);
 
       const res: unknown = response;
       const items = extractSessionListItems(res);
 
       console.log(
-        '[QwenAgentManager] Sessions retrieved via ACP:',
+        '[HopCodeAgentManager] Sessions retrieved via ACP:',
         res,
         items.length,
       );
@@ -514,29 +514,29 @@ export class QwenAgentManager {
         }));
 
         console.log(
-          '[QwenAgentManager] Sessions retrieved via ACP:',
+          '[HopCodeAgentManager] Sessions retrieved via ACP:',
           sessions.length,
         );
         return sessions;
       }
     } catch (error) {
       console.warn(
-        '[QwenAgentManager] ACP session list failed, falling back to file system method:',
+        '[HopCodeAgentManager] ACP session list failed, falling back to file system method:',
         error,
       );
     }
 
     // Always fall back to file system method
     try {
-      console.log('[QwenAgentManager] Getting session list from file system');
+      console.log('[HopCodeAgentManager] Getting session list from file system');
       const sessions = await this.sessionReader.getAllSessions(undefined, true);
       console.log(
-        '[QwenAgentManager] Session list from file system (all projects):',
+        '[HopCodeAgentManager] Session list from file system (all projects):',
         sessions.length,
       );
 
       const result = sessions.map(
-        (session: QwenSession): Record<string, unknown> => ({
+        (session: HopCodeSession): Record<string, unknown> => ({
           id: session.sessionId,
           sessionId: session.sessionId,
           title: this.sessionReader.getSessionTitle(session),
@@ -551,13 +551,13 @@ export class QwenAgentManager {
       );
 
       console.log(
-        '[QwenAgentManager] Sessions retrieved from file system:',
+        '[HopCodeAgentManager] Sessions retrieved from file system:',
         result.length,
       );
       return result;
     } catch (error) {
       console.error(
-        '[QwenAgentManager] Failed to get session list from file system:',
+        '[HopCodeAgentManager] Failed to get session list from file system:',
         error,
       );
       return [];
@@ -618,7 +618,7 @@ export class QwenAgentManager {
 
       return { sessions: mapped, nextCursor: nextCursorNum, hasMore };
     } catch (error) {
-      console.warn('[QwenAgentManager] Paged ACP session list failed:', error);
+      console.warn('[HopCodeAgentManager] Paged ACP session list failed:', error);
       // fall through to file system
     }
 
@@ -655,7 +655,7 @@ export class QwenAgentManager {
       const hasMore = filtered.length > size;
       return { sessions, nextCursor: nextCursorVal, hasMore };
     } catch (error) {
-      console.error('[QwenAgentManager] File system paged list failed:', error);
+      console.error('[HopCodeAgentManager] File system paged list failed:', error);
       return { sessions: [], hasMore: false };
     }
   }
@@ -674,7 +674,7 @@ export class QwenAgentManager {
           (s) => s.sessionId === sessionId || s.id === sessionId,
         );
         console.log(
-          '[QwenAgentManager] Session list item for filePath lookup:',
+          '[HopCodeAgentManager] Session list item for filePath lookup:',
           item,
         );
         if (
@@ -689,7 +689,7 @@ export class QwenAgentManager {
           return messages;
         }
       } catch (e) {
-        console.warn('[QwenAgentManager] JSONL read path lookup failed:', e);
+        console.warn('[HopCodeAgentManager] JSONL read path lookup failed:', e);
       }
 
       // Fallback: legacy JSON session files
@@ -709,7 +709,7 @@ export class QwenAgentManager {
       );
     } catch (error) {
       console.error(
-        '[QwenAgentManager] Failed to get session messages:',
+        '[HopCodeAgentManager] Failed to get session messages:',
         error,
       );
       return [];
@@ -744,7 +744,7 @@ export class QwenAgentManager {
       }
       // Simple linear reconstruction: filter user/assistant and sort by timestamp
       console.log(
-        '[QwenAgentManager] JSONL records read:',
+        '[HopCodeAgentManager] JSONL records read:',
         records.length,
         filePath,
       );
@@ -903,12 +903,12 @@ export class QwenAgentManager {
       }
 
       console.log(
-        '[QwenAgentManager] JSONL messages reconstructed:',
+        '[HopCodeAgentManager] JSONL messages reconstructed:',
         msgs.length,
       );
       return msgs;
     } catch (err) {
-      console.warn('[QwenAgentManager] Failed to read JSONL messages:', err);
+      console.warn('[HopCodeAgentManager] Failed to read JSONL messages:', err);
       return [];
     }
   }
@@ -1042,11 +1042,11 @@ export class QwenAgentManager {
       // Route upcoming session/update messages as discrete messages for replay
       this.rehydratingSessionId = sessionId;
       console.log(
-        '[QwenAgentManager] Rehydration start for session:',
+        '[HopCodeAgentManager] Rehydration start for session:',
         sessionId,
       );
       console.log(
-        '[QwenAgentManager] Attempting session/load via ACP for session:',
+        '[HopCodeAgentManager] Attempting session/load via ACP for session:',
         sessionId,
       );
       const response = await this.connection.loadSession(
@@ -1054,7 +1054,7 @@ export class QwenAgentManager {
         cwdOverride,
       );
       console.log(
-        '[QwenAgentManager] Session load succeeded. Response:',
+        '[HopCodeAgentManager] Session load succeeded. Response:',
         JSON.stringify(response).substring(0, 200),
       );
       this.applySessionStateFromResult(response);
@@ -1064,11 +1064,11 @@ export class QwenAgentManager {
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       console.error(
-        '[QwenAgentManager] Session load via ACP failed for session:',
+        '[HopCodeAgentManager] Session load via ACP failed for session:',
         sessionId,
       );
-      console.error('[QwenAgentManager] Error type:', error?.constructor?.name);
-      console.error('[QwenAgentManager] Error message:', errorMessage);
+      console.error('[HopCodeAgentManager] Error type:', error?.constructor?.name);
+      console.error('[HopCodeAgentManager] Error message:', errorMessage);
 
       // Check if error is from ACP response
       if (error && typeof error === 'object') {
@@ -1079,23 +1079,23 @@ export class QwenAgentManager {
           };
           if (acpError.error) {
             console.error(
-              '[QwenAgentManager] ACP error code:',
+              '[HopCodeAgentManager] ACP error code:',
               acpError.error.code,
             );
             console.error(
-              '[QwenAgentManager] ACP error message:',
+              '[HopCodeAgentManager] ACP error message:',
               acpError.error.message,
             );
           }
         } else {
-          console.error('[QwenAgentManager] Non-ACPIf error details:', error);
+          console.error('[HopCodeAgentManager] Non-ACPIf error details:', error);
         }
       }
 
       throw error;
     } finally {
       // End rehydration routing regardless of outcome
-      console.log('[QwenAgentManager] Rehydration end for session:', sessionId);
+      console.log('[HopCodeAgentManager] Rehydration end for session:', sessionId);
       this.rehydratingSessionId = null;
     }
   }
@@ -1109,22 +1109,22 @@ export class QwenAgentManager {
    */
   async loadSession(sessionId: string): Promise<ChatMessage[] | null> {
     console.log(
-      '[QwenAgentManager] Loading session with version-aware strategy:',
+      '[HopCodeAgentManager] Loading session with version-aware strategy:',
       sessionId,
     );
 
     try {
       console.log(
-        '[QwenAgentManager] Attempting to load session via ACP method',
+        '[HopCodeAgentManager] Attempting to load session via ACP method',
       );
       await this.loadSessionViaAcp(sessionId);
-      console.log('[QwenAgentManager] Session loaded successfully via ACP');
+      console.log('[HopCodeAgentManager] Session loaded successfully via ACP');
 
       // After loading via ACP, we still need to get messages from file system
       // In future, we might get them directly from the ACP response
     } catch (error) {
       console.warn(
-        '[QwenAgentManager] ACP session load failed, falling back to file system method:',
+        '[HopCodeAgentManager] ACP session load failed, falling back to file system method:',
         error,
       );
     }
@@ -1132,16 +1132,16 @@ export class QwenAgentManager {
     // Always fall back to file system method
     try {
       console.log(
-        '[QwenAgentManager] Loading session messages from file system',
+        '[HopCodeAgentManager] Loading session messages from file system',
       );
       const messages = await this.loadSessionMessagesFromFile(sessionId);
       console.log(
-        '[QwenAgentManager] Session messages loaded successfully from file system',
+        '[HopCodeAgentManager] Session messages loaded successfully from file system',
       );
       return messages;
     } catch (error) {
       console.error(
-        '[QwenAgentManager] Failed to load session messages from file system:',
+        '[HopCodeAgentManager] Failed to load session messages from file system:',
         error,
       );
       return null;
@@ -1159,7 +1159,7 @@ export class QwenAgentManager {
   ): Promise<ChatMessage[] | null> {
     try {
       console.log(
-        '[QwenAgentManager] Loading session from file system:',
+        '[HopCodeAgentManager] Loading session from file system:',
         sessionId,
       );
 
@@ -1171,7 +1171,7 @@ export class QwenAgentManager {
 
       if (!session) {
         console.log(
-          '[QwenAgentManager] Session not found in file system:',
+          '[HopCodeAgentManager] Session not found in file system:',
           sessionId,
         );
         return null;
@@ -1187,7 +1187,7 @@ export class QwenAgentManager {
       return messages;
     } catch (error) {
       console.error(
-        '[QwenAgentManager] Session load from file system failed:',
+        '[HopCodeAgentManager] Session load from file system failed:',
         error,
       );
       throw error;
@@ -1212,7 +1212,7 @@ export class QwenAgentManager {
     // Explicit "new session" actions must bypass this and call session/new.
     if (!forceNew && this.connection.currentSessionId) {
       console.log(
-        '[QwenAgentManager] createNewSession: reusing existing session',
+        '[HopCodeAgentManager] createNewSession: reusing existing session',
         this.connection.currentSessionId,
       );
       return this.connection.currentSessionId;
@@ -1220,7 +1220,7 @@ export class QwenAgentManager {
     // Deduplicate concurrent session/new attempts
     if (this.sessionCreateInFlight) {
       console.log(
-        '[QwenAgentManager] createNewSession: session creation already in flight',
+        '[HopCodeAgentManager] createNewSession: session creation already in flight',
       );
       if (!forceNew) {
         return this.sessionCreateInFlight;
@@ -1228,7 +1228,7 @@ export class QwenAgentManager {
       await this.sessionCreateInFlight;
     }
 
-    console.log('[QwenAgentManager] Creating new session...');
+    console.log('[HopCodeAgentManager] Creating new session...');
 
     this.sessionCreateInFlight = (async () => {
       try {
@@ -1237,7 +1237,7 @@ export class QwenAgentManager {
         try {
           newSessionResult = await this.connection.newSession(workingDir);
           console.log(
-            '[QwenAgentManager] newSession returned:',
+            '[HopCodeAgentManager] newSession returned:',
             JSON.stringify(newSessionResult, null, 2),
           );
         } catch (err) {
@@ -1246,25 +1246,25 @@ export class QwenAgentManager {
           if (requiresAuth) {
             if (!autoAuthenticate) {
               console.warn(
-                '[QwenAgentManager] session/new requires authentication but auto-auth is disabled. Deferring until user logs in.',
+                '[HopCodeAgentManager] session/new requires authentication but auto-auth is disabled. Deferring until user logs in.',
               );
               throw err;
             }
             console.warn(
-              '[QwenAgentManager] session/new requires authentication. Retrying with authenticate...',
+              '[HopCodeAgentManager] session/new requires authentication. Retrying with authenticate...',
             );
             try {
               // Let CLI handle authentication - it's the single source of truth
               await this.connection.authenticate(authMethod);
               console.log(
-                '[QwenAgentManager] createNewSession Authentication successful. Retrying session/new...',
+                '[HopCodeAgentManager] createNewSession Authentication successful. Retrying session/new...',
               );
               // Add a slight delay to ensure auth state is settled
               await new Promise((resolve) => setTimeout(resolve, 300));
               newSessionResult = await this.connection.newSession(workingDir);
             } catch (reauthErr) {
               console.error(
-                '[QwenAgentManager] Re-authentication failed:',
+                '[HopCodeAgentManager] Re-authentication failed:',
                 reauthErr,
               );
               throw reauthErr;
@@ -1278,7 +1278,7 @@ export class QwenAgentManager {
 
         const newSessionId = this.connection.currentSessionId;
         console.log(
-          '[QwenAgentManager] New session created with ID:',
+          '[HopCodeAgentManager] New session created with ID:',
           newSessionId,
         );
         return newSessionId;
@@ -1303,7 +1303,7 @@ export class QwenAgentManager {
    * Cancel current prompt
    */
   async cancelCurrentPrompt(): Promise<void> {
-    console.log('[QwenAgentManager] Cancelling current prompt');
+    console.log('[HopCodeAgentManager] Cancelling current prompt');
     await this.connection.cancelSession();
   }
 

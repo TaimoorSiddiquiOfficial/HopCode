@@ -1,4 +1,4 @@
-﻿# WeChat (Weixin)
+# WeChat (Weixin)
 
 This guide covers setting up a HopCode channel on WeChat via the official iLink Bot API.
 
@@ -14,10 +14,10 @@ This guide covers setting up a HopCode channel on WeChat via the official iLink 
 WeChat uses QR code authentication instead of a static bot token. Run the login command:
 
 ```bash
-qwen channel configure-weixin
+hopcode channel configure-weixin
 ```
 
-This will display a QR code URL. Scan it with your WeChat mobile app to authenticate. Your credentials are saved to `~/.qwen/channels/weixin/account.json`.
+This will display a QR code URL. Scan it with your WeChat mobile app to authenticate. Your credentials are saved to `~/.hopcode/channels/weixin/account.json`.
 
 ### 2. Configure the channel
 
@@ -45,10 +45,10 @@ Note: WeChat channels do not use a `token` field — credentials come from the Q
 
 ```bash
 # Start only the WeChat channel
-qwen channel start my-weixin
+hopcode channel start my-weixin
 
 # Or start all configured channels together
-qwen channel start
+hopcode channel start
 ```
 
 Open WeChat and send a message to the bot. You should see a typing indicator ("...") while the agent processes, followed by the response.
@@ -97,7 +97,7 @@ Your WeChat login session has expired. Stop the channel and run `qwen channel co
 ### Bot doesn't respond
 
 - Check the terminal output for errors
-- Verify the channel is running (`qwen channel start my-weixin`)
+- Verify the channel is running (`hopcode channel start my-weixin`)
 - If using `senderPolicy: "allowlist"`, make sure your WeChat user ID is in `allowedUsers`
 
 ### Images not working

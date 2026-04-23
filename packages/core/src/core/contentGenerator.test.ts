@@ -46,7 +46,7 @@ describe('createContentGenerator', () => {
         },
       },
     });
-    // We expect it to be a LoggingContentGenerator wrapping a GeminiContentGenerator
+    // We expect it to be a LoggingContentGenerator wrapping a HopCodeContentGenerator
     expect(generator).toBeInstanceOf(LoggingContentGenerator);
     const wrapped = (generator as LoggingContentGenerator).getWrapped();
     expect(wrapped).toBeDefined();

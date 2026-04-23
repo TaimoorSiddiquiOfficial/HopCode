@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 import { BaseMessageHandler } from './BaseMessageHandler.js';
-import type { ChatMessage } from '../../services/qwenAgentManager.js';
+import type { ChatMessage } from '../../services/hopcodeAgentManager.js';
 import type { ImageAttachment } from '../../utils/imageSupport.js';
 import type { ApprovalModeValue } from '../../types/approvalModeValueTypes.js';
 import {
@@ -28,9 +28,9 @@ export class SessionMessageHandler extends BaseMessageHandler {
   canHandle(messageType: string): boolean {
     return [
       'sendMessage',
-      'newQwenSession',
-      'switchQwenSession',
-      'getQwenSessions',
+      'newHopCodeSession',
+      'switchHopCodeSession',
+      'getHopCodeSessions',
       'resumeSession',
       'cancelStreaming',
       // UI action: open a new chat tab (new WebviewPanel)
@@ -77,15 +77,15 @@ export class SessionMessageHandler extends BaseMessageHandler {
         break;
 
       case 'newQwenSession':
-        await this.handleNewQwenSession();
+        await this.handleNewHopCodeSession();
         break;
 
       case 'switchQwenSession':
-        await this.handleSwitchQwenSession((data?.sessionId as string) || '');
+        await this.handleSwitchHopCodeSession((data?.sessionId as string) || '');
         break;
 
       case 'getQwenSessions':
-        await this.handleGetQwenSessions(
+        await this.handleGetHopCodeSessions(
           (data?.cursor as number | undefined) ?? undefined,
           (data?.size as number | undefined) ?? undefined,
         );
@@ -574,9 +574,9 @@ export class SessionMessageHandler extends BaseMessageHandler {
   /**
    * Handle new HopCode session request
    */
-  private async handleNewQwenSession(): Promise<void> {
+  private async handleNewHopCodeSession(): Promise<void> {
     try {
-      console.log('[SessionMessageHandler] Creating new Qwen session...');
+      console.log('[SessionMessageHandler] Creating new HopCode session...');
 
       // Ensure connection (login) before creating a new session
       if (!this.agentManager.isConnected) {
@@ -633,7 +633,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
   /**
    * Handle switch HopCode session request
    */
-  private async handleSwitchQwenSession(sessionId: string): Promise<void> {
+  private async handleSwitchHopCodeSession(sessionId: string): Promise<void> {
     try {
       console.log('[SessionMessageHandler] Switching to session:', sessionId);
 
@@ -822,7 +822,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
   /**
    * Handle get HopCode sessions request
    */
-  private async handleGetQwenSessions(
+  private async handleGetHopCodeSessions(
     cursor?: number,
     size?: number,
   ): Promise<void> {
@@ -933,7 +933,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         this.isTitleSet = false;
 
         // Successfully loaded session, return early to avoid fallback logic
-        await this.handleGetQwenSessions();
+        await this.handleGetHopCodeSessions();
         return;
       } catch (acpError) {
         // Check for authentication/session expiration errors
@@ -952,7 +952,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         }
       }
 
-      await this.handleGetQwenSessions();
+      await this.handleGetHopCodeSessions();
     } catch (error) {
       console.error('[SessionMessageHandler] Failed to resume session:', error);
 

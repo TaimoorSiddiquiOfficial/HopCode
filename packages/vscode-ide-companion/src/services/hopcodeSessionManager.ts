@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as crypto from 'crypto';
 import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
-import type { QwenSession } from './qwenSessionReader.js';
+import type { HopCodeSession } from './hopcodeSessionReader.js';
 
 /**
  * HopCode Session Manager
@@ -20,7 +20,7 @@ import type { QwenSession } from './qwenSessionReader.js';
  * This class is primarily used as a fallback mechanism for loading sessions
  * when ACP methods are unavailable or fail.
  */
-export class QwenSessionManager {
+export class HopCodeSessionManager {
   private hopcodeDir: string;
 
   constructor() {
@@ -53,24 +53,24 @@ export class QwenSessionManager {
   async loadSession(
     sessionId: string,
     workingDir: string,
-  ): Promise<QwenSession | null> {
+  ): Promise<HopCodeSession | null> {
     try {
       const sessionDir = this.getSessionDir(workingDir);
       const filename = `session-${sessionId}.json`;
       const filePath = path.join(sessionDir, filename);
 
       if (!fs.existsSync(filePath)) {
-        console.log(`[QwenSessionManager] Session file not found: ${filePath}`);
+        console.log(`[HopCodeSessionManager] Session file not found: ${filePath}`);
         return null;
       }
 
       const content = fs.readFileSync(filePath, 'utf-8');
-      const session = JSON.parse(content) as QwenSession;
+      const session = JSON.parse(content) as HopCodeSession;
 
-      console.log(`[QwenSessionManager] Session loaded: ${filePath}`);
+      console.log(`[HopCodeSessionManager] Session loaded: ${filePath}`);
       return session;
     } catch (error) {
-      console.error('[QwenSessionManager] Failed to load session:', error);
+      console.error('[HopCodeSessionManager] Failed to load session:', error);
       return null;
     }
   }
@@ -81,7 +81,7 @@ export class QwenSessionManager {
    * @param workingDir - Current working directory
    * @returns Array of session objects
    */
-  async listSessions(workingDir: string): Promise<QwenSession[]> {
+  async listSessions(workingDir: string): Promise<HopCodeSession[]> {
     try {
       const sessionDir = this.getSessionDir(workingDir);
 
@@ -95,16 +95,16 @@ export class QwenSessionManager {
           (file) => file.startsWith('session-') && file.endsWith('.json'),
         );
 
-      const sessions: QwenSession[] = [];
+      const sessions: HopCodeSession[] = [];
       for (const file of files) {
         try {
           const filePath = path.join(sessionDir, file);
           const content = fs.readFileSync(filePath, 'utf-8');
-          const session = JSON.parse(content) as QwenSession;
+          const session = JSON.parse(content) as HopCodeSession;
           sessions.push(session);
         } catch (error) {
           console.error(
-            `[QwenSessionManager] Failed to read session file ${file}:`,
+            `[HopCodeSessionManager] Failed to read session file ${file}:`,
             error,
           );
         }
@@ -118,7 +118,7 @@ export class QwenSessionManager {
 
       return sessions;
     } catch (error) {
-      console.error('[QwenSessionManager] Failed to list sessions:', error);
+      console.error('[HopCodeSessionManager] Failed to list sessions:', error);
       return [];
     }
   }
@@ -138,13 +138,13 @@ export class QwenSessionManager {
 
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        console.log(`[QwenSessionManager] Session deleted: ${filePath}`);
+        console.log(`[HopCodeSessionManager] Session deleted: ${filePath}`);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error('[QwenSessionManager] Failed to delete session:', error);
+      console.error('[HopCodeSessionManager] Failed to delete session:', error);
       return false;
     }
   }

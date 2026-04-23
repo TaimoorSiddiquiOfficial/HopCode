@@ -25,7 +25,7 @@ import type {
 /**
  * A wrapper for GoogleGenAI that implements the ContentGenerator interface.
  */
-export class GeminiContentGenerator implements ContentGenerator {
+export class HopCodeContentGenerator implements ContentGenerator {
   private readonly googleGenAI: GoogleGenAI;
   private readonly contentGeneratorConfig?: ContentGeneratorConfig;
 

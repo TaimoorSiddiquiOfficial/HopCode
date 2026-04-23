@@ -140,7 +140,7 @@ describe('useResumeCommand', () => {
 
     const config = {
       getTargetDir: () => '/tmp',
-      getGeminiClient: () => geminiClient,
+      getHopCodeClient: () => geminiClient,
       startNewSession: vi.fn(),
       getDebugLogger: () => ({
         warn: vi.fn(),

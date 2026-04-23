@@ -27,7 +27,7 @@ import {
   createContentGeneratorConfig,
   resolveContentGeneratorConfigWithSources,
 } from '../core/contentGenerator.js';
-import { GeminiClient } from '../core/client.js';
+import { HopCodeClient } from '../core/client.js';
 import { GitService } from '../services/gitService.js';
 import { ShellTool } from '../tools/shell.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
@@ -165,7 +165,7 @@ vi.mock('../tools/memory-config', () => ({
 vi.mock('../core/contentGenerator.js');
 
 vi.mock('../core/client.js', () => ({
-  GeminiClient: vi.fn().mockImplementation(() => ({
+  HopCodeClient: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     isInitialized: vi.fn().mockReturnValue(true),
     stripThoughtsFromHistory: vi.fn(),
@@ -406,7 +406,7 @@ describe('Server Config (config.ts)', () => {
       );
       // Verify that contentGeneratorConfig is updated
       expect(config.getContentGeneratorConfig()).toEqual(mockContentConfig);
-      expect(GeminiClient).toHaveBeenCalledWith(config);
+      expect(HopCodeClient).toHaveBeenCalledWith(config);
     });
 
     it('should fire auth_success notification hook when hooks are enabled', async () => {
@@ -480,7 +480,7 @@ describe('Server Config (config.ts)', () => {
       await config.refreshAuth(AuthType.USE_GEMINI);
 
       expect(
-        config.getGeminiClient().stripThoughtsFromHistory,
+        config.getHopCodeClient().stripThoughtsFromHistory,
       ).not.toHaveBeenCalledWith();
     });
   });
@@ -563,7 +563,7 @@ describe('Server Config (config.ts)', () => {
 
       await config.refreshAuth(AuthType.QWEN_OAUTH);
 
-      const stripSpy = config.getGeminiClient().stripThoughtsFromHistory;
+      const stripSpy = config.getHopCodeClient().stripThoughtsFromHistory;
       vi.mocked(stripSpy).mockClear();
 
       await config.switchModel(AuthType.QWEN_OAUTH, 'coder-model');

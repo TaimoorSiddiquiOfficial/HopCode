@@ -1,4 +1,4 @@
-﻿# Github Actions：hopcode-action
+# Github Actions：hopcode-action
 
 ## Overview
 
@@ -12,7 +12,7 @@ Use it to perform GitHub pull request reviews, triage issues, perform code analy
 - **On-demand Collaboration**: Trigger workflows in issue and pull request
   comments by mentioning the [HopCode CLI](./features/commands) (e.g., `@qwencoder /review`).
 - **Extensible with Tools**: Leverage [HopCode](../developers/tools/introduction.md) models' tool-calling capabilities to interact with other CLIs like the [GitHub CLI] (`gh`).
-- **Customizable**: Use a `QWEN.md` file in your repository to provide
+- **Customizable**: Use a `HOPCODE.md` file in your repository to provide
   project-specific instructions and context to [HopCode CLI](./features/commands).
 
 ## Quick Start
@@ -223,7 +223,7 @@ For a comprehensive guide on securing your repository and workflows, please refe
 
 ## Customization
 
-Create a QWEN.md file in the root of your repository to provide
+Create a HOPCODE.md file in the root of your repository to provide
 project-specific context and instructions to [HopCode CLI](./common-workflow). This is useful for defining
 coding conventions, architectural patterns, or other guidelines the model should
 follow for a given repository.
@@ -238,4 +238,4 @@ Contributions are welcome! Check out the HopCode CLI **Contributing Guide** for 
 [HopCode CLI]: https://github.com/QwenLM/hopcode-action/
 [variables]: https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-variables#creating-configuration-variables-for-a-repository
 [GitHub CLI]: https://docs.github.com/en/github-cli/github-cli
-[QWEN.md]: https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/configuration.md#context-files-hierarchical-instructional-context
+[HOPCODE.md]: https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/configuration.md#context-files-hierarchical-instructional-context

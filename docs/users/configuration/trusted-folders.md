@@ -1,4 +1,4 @@
-﻿# Trusted Folders
+# Trusted Folders
 
 The Trusted Folders feature is a security setting that gives you control over which projects can use the full capabilities of the HopCode. It prevents potentially malicious code from running by asking you to approve a folder before the CLI loads any project-specific configurations from it.
 
@@ -26,7 +26,7 @@ Once the feature is enabled, the first time you run the HopCode from a folder, a
 - **Trust parent folder**: Grants trust to the parent directory (e.g. `safe-projects`), which automatically trusts all of its subdirectories as well. This is useful if you keep all your safe projects in one place.
 - **Don't trust**: Marks the folder as untrusted. The CLI will operate in a restricted "safe mode."
 
-Your choice is saved in a central file (`~/.qwen/trustedFolders.json`), so you will only be asked once per folder.
+Your choice is saved in a central file (`~/.hopcode/trustedFolders.json`), so you will only be asked once per folder.
 
 ## Why Trust Matters: The Impact of an Untrusted Workspace
 
@@ -50,7 +50,7 @@ If you need to change a decision or see all your settings, you have a couple of 
 
 - **Change the Current Folder's Trust**: Run the `/permissions` command from within the CLI. This will bring up the same interactive dialog, allowing you to change the trust level for the current folder.
 
-- **View All Trust Rules**: To see a complete list of all your trusted and untrusted folder rules, you can inspect the contents of the `~/.qwen/trustedFolders.json` file in your home directory.
+- **View All Trust Rules**: To see a complete list of all your trusted and untrusted folder rules, you can inspect the contents of the `~/.hopcode/trustedFolders.json` file in your home directory.
 
 ## The Trust Check Process (Advanced)
 
@@ -58,4 +58,4 @@ For advanced users, it's helpful to know the exact order of operations for how t
 
 1.  **IDE Trust Signal**: If you are using the [IDE Integration](../ide-integration/ide-integration), the CLI first asks the IDE if the workspace is trusted. The IDE's response takes highest priority.
 
-2.  **Local Trust File**: If the IDE is not connected, the CLI checks the central `~/.qwen/trustedFolders.json` file.
+2.  **Local Trust File**: If the IDE is not connected, the CLI checks the central `~/.hopcode/trustedFolders.json` file.

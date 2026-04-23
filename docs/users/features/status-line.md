@@ -1,4 +1,4 @@
-﻿# Status Line
+# Status Line
 
 > Display custom information in the footer using a shell command.
 
@@ -209,7 +209,7 @@ Output (refreshed every second): `14:32:07  (main)`
 
 ### Script file for complex commands
 
-For longer commands, save a script file at `~/.qwen/statusline-command.sh`:
+For longer commands, save a script file at `~/.hopcode/statusline-command.sh`:
 
 ```bash
 #!/bin/bash
@@ -236,7 +236,7 @@ Then reference it in settings:
   "ui": {
     "statusLine": {
       "type": "command",
-      "command": "bash ~/.qwen/statusline-command.sh"
+      "command": "bash ~/.hopcode/statusline-command.sh"
     }
   }
 }
@@ -248,7 +248,7 @@ Then reference it in settings:
 - **Timeout**: Commands that take longer than 5 seconds are killed. The status line clears on failure.
 - **Output**: Multi-line output is supported (up to 2 lines; extra lines are discarded). Each line is rendered as a separate row with dimmed colors in the footer's left section. Lines that exceed the available width are truncated.
 - **Hot reload**: Changes to `ui.statusLine` in settings take effect immediately — no restart required.
-- **Shell**: Commands run via `/bin/sh` on macOS/Linux. On Windows, `cmd.exe` is used by default — wrap POSIX commands with `bash -c "..."` or point to a bash script (e.g. `bash ~/.qwen/statusline-command.sh`).
+- **Shell**: Commands run via `/bin/sh` on macOS/Linux. On Windows, `cmd.exe` is used by default — wrap POSIX commands with `bash -c "..."` or point to a bash script (e.g. `bash ~/.hopcode/statusline-command.sh`).
 - **Removal**: Delete the `ui.statusLine` key from settings to disable. The "? for shortcuts" hint returns.
 
 ## Troubleshooting

@@ -24,7 +24,7 @@ import type { ToolRegistry } from './tool-registry.js';
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
-import { GeminiClient } from '../core/client.js';
+import { HopCodeClient } from '../core/client.js';
 import { createMockWorkspaceContext } from '../test-utils/mockWorkspaceContext.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
 
@@ -33,7 +33,7 @@ const rootDir = path.resolve(os.tmpdir(), 'qwen-code-test-root');
 // --- MOCKS ---
 vi.mock('../core/client.js');
 
-let mockGeminiClientInstance: Mocked<GeminiClient>;
+let mockHopCodeClientInstance: Mocked<HopCodeClient>;
 
 // Mock Config
 const fsService = new StandardFileSystemService();
@@ -42,7 +42,7 @@ const mockConfigInternal = {
   getProjectRoot: () => rootDir,
   getApprovalMode: vi.fn(() => ApprovalMode.DEFAULT),
   setApprovalMode: vi.fn(),
-  getGeminiClient: vi.fn(), // Initialize as a plain mock function
+  getHopCodeClient: vi.fn(), // Initialize as a plain mock function
   getBaseLlmClient: vi.fn(), // Initialize as a plain mock function
   getFileSystemService: () => fsService,
   getWorkspaceContext: () => createMockWorkspaceContext(rootDir),
@@ -91,15 +91,15 @@ describe('WriteFileTool', () => {
       fs.mkdirSync(rootDir, { recursive: true });
     }
 
-    // Setup GeminiClient mock
-    mockGeminiClientInstance = new (vi.mocked(GeminiClient))(
+    // Setup HopCodeClient mock
+    mockHopCodeClientInstance = new (vi.mocked(HopCodeClient))(
       mockConfig,
-    ) as Mocked<GeminiClient>;
-    vi.mocked(GeminiClient).mockImplementation(() => mockGeminiClientInstance);
+    ) as Mocked<HopCodeClient>;
+    vi.mocked(HopCodeClient).mockImplementation(() => mockHopCodeClientInstance);
 
-    // Now that mockGeminiClientInstance is initialized, set the mock implementation for getGeminiClient
-    mockConfigInternal.getGeminiClient.mockReturnValue(
-      mockGeminiClientInstance,
+    // Now that mockHopCodeClientInstance is initialized, set the mock implementation for getHopCodeClient
+    mockConfigInternal.getHopCodeClient.mockReturnValue(
+      mockHopCodeClientInstance,
     );
 
     tool = new WriteFileTool(mockConfig);

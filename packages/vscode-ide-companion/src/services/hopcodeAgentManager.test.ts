@@ -7,8 +7,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   extractSessionListItems,
-  QwenAgentManager,
-} from './qwenAgentManager.js';
+  HopCodeAgentManager,
+} from './hopcodeAgentManager.js';
 import type { ModelInfo } from '@agentclientprotocol/sdk';
 
 vi.mock('vscode', () => ({
@@ -59,9 +59,9 @@ describe('extractSessionListItems', () => {
   });
 });
 
-describe('QwenAgentManager.setModelFromUi', () => {
+describe('HopCodeAgentManager.setModelFromUi', () => {
   it('emits the selected model metadata from the available models list', async () => {
-    const manager = new QwenAgentManager();
+    const manager = new HopCodeAgentManager();
     const onModelChanged = vi.fn();
     manager.onModelChanged(onModelChanged);
 
@@ -104,9 +104,9 @@ describe('QwenAgentManager.setModelFromUi', () => {
   });
 });
 
-describe('QwenAgentManager.createNewSession', () => {
+describe('HopCodeAgentManager.createNewSession', () => {
   it('creates a fresh ACP session when explicitly requested even if one is already active', async () => {
-    const manager = new QwenAgentManager();
+    const manager = new HopCodeAgentManager();
     const connection = {
       currentSessionId: 'session-1',
       newSession: vi.fn().mockImplementation(async () => {
@@ -131,7 +131,7 @@ describe('QwenAgentManager.createNewSession', () => {
   });
 
   it('creates a distinct fresh session after an in-flight bootstrap when forceNew is requested', async () => {
-    const manager = new QwenAgentManager();
+    const manager = new HopCodeAgentManager();
     const connection = {
       currentSessionId: null as string | null,
       newSession: vi.fn().mockImplementation(async () => {

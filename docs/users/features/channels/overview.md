@@ -1,10 +1,10 @@
-﻿# Channels
+# Channels
 
 Channels let you interact with a HopCode agent from messaging platforms like Telegram, WeChat, or DingTalk, instead of the terminal. You send messages from your phone or desktop chat app, and the agent responds just like it would in the CLI.
 
 ## How It Works
 
-When you run `qwen channel start`, HopCode:
+When you run `hopcode channel start`, HopCode:
 
 1. Reads channel configurations from your `settings.json`
 2. Spawns a single agent process using the [Agent Client Protocol (ACP)](../../developers/architecture)
@@ -17,7 +17,7 @@ All channels share one agent process with isolated sessions per user. Each chann
 
 1. Set up a bot on your messaging platform (see channel-specific guides: [Telegram](./telegram), [WeChat](./weixin), [DingTalk](./dingtalk))
 2. Add the channel configuration to `~/.hopcode/settings.json`
-3. Run `qwen channel start` to start all channels, or `qwen channel start <name>` for a single channel
+3. Run `hopcode channel start` to start all channels, or `hopcode channel start <name>` for a single channel
 
 Want to connect a platform that isn't built in? See [Plugins](./plugins) to add a custom adapter as an extension.
 
@@ -104,19 +104,19 @@ When `senderPolicy` is set to `"pairing"`, unknown senders go through an approva
 4. You approve them via CLI:
 
 ```bash
-qwen channel pairing approve my-channel VEQDDWXJ
+hopcode channel pairing approve my-channel VEQDDWXJ
 ```
 
-Once approved, the user's ID is saved to `~/.qwen/channels/<name>-allowlist.json` and all future messages go through normally.
+Once approved, the user's ID is saved to `~/.hopcode/channels/<name>-allowlist.json` and all future messages go through normally.
 
 ### Pairing CLI Commands
 
 ```bash
 # List pending pairing requests
-qwen channel pairing list my-channel
+hopcode channel pairing list my-channel
 
 # Approve a request by code
-qwen channel pairing approve my-channel <CODE>
+hopcode channel pairing approve my-channel <CODE>
 ```
 
 ### Pairing Rules
@@ -125,7 +125,7 @@ qwen channel pairing approve my-channel <CODE>
 - Codes expire after 1 hour
 - Maximum 3 pending requests per channel at a time — additional requests are ignored until one expires or is approved
 - Users listed in `allowedUsers` in `settings.json` always skip pairing
-- Approved users are stored in `~/.qwen/channels/<name>-allowlist.json` — treat this file as sensitive
+- Approved users are stored in `~/.hopcode/channels/<name>-allowlist.json` — treat this file as sensitive
 
 ## Group Chats
 
@@ -298,39 +298,39 @@ These commands work on all channel types (Telegram, WeChat, DingTalk).
 
 ```bash
 # Start all configured channels (shared agent process)
-qwen channel start
+hopcode channel start
 
 # Start a single channel
-qwen channel start my-channel
+hopcode channel start my-channel
 
 # Check if the service is running
-qwen channel status
+hopcode channel status
 
 # Stop the running service
-qwen channel stop
+hopcode channel stop
 ```
 
-The bot runs in the foreground. Press `Ctrl+C` to stop, or use `qwen channel stop` from another terminal.
+The bot runs in the foreground. Press `Ctrl+C` to stop, or use `hopcode channel stop` from another terminal.
 
 ### Multi-Channel Mode
 
-When you run `qwen channel start` without a name, all channels defined in `settings.json` start together sharing a single agent process. Each channel maintains its own sessions — a Telegram user and a WeChat user get separate conversations, even though they share the same agent.
+When you run `hopcode channel start` without a name, all channels defined in `settings.json` start together sharing a single agent process. Each channel maintains its own sessions — a Telegram user and a WeChat user get separate conversations, even though they share the same agent.
 
 Each channel uses its own `cwd` from its config, so different channels can work on different projects simultaneously.
 
 ### Service Management
 
-The channel service uses a PID file (`~/.qwen/channels/service.pid`) to track the running instance:
+The channel service uses a PID file (`~/.hopcode/channels/service.pid`) to track the running instance:
 
-- **Duplicate prevention**: Running `qwen channel start` while a service is already running will show an error instead of starting a second instance
-- **`qwen channel stop`**: Gracefully stops the running service from another terminal
-- **`qwen channel status`**: Shows whether the service is running, its uptime, and session counts per channel
+- **Duplicate prevention**: Running `hopcode channel start` while a service is already running will show an error instead of starting a second instance
+- **`hopcode channel stop`**: Gracefully stops the running service from another terminal
+- **`hopcode channel status`**: Shows whether the service is running, its uptime, and session counts per channel
 
 ### Crash Recovery
 
 If the agent process crashes unexpectedly, the channel service automatically restarts it and attempts to restore all active sessions. Users can continue their conversations without starting over.
 
-- Sessions are persisted to `~/.qwen/channels/sessions.json` while the service is running
+- Sessions are persisted to `~/.hopcode/channels/sessions.json` while the service is running
 - On crash: the agent restarts within 3 seconds and reloads saved sessions
 - After 3 consecutive crashes, the service exits with an error
-- On clean shutdown (Ctrl+C or `qwen channel stop`): session data is cleared — the next start is always fresh
+- On clean shutdown (Ctrl+C or `hopcode channel stop`): session data is cleared — the next start is always fresh

@@ -12,7 +12,7 @@ import type {
 } from '@google/genai';
 import type {
   Config,
-  GeminiChat,
+  HopCodeChat,
   ToolCallConfirmationDetails,
   ToolResult,
   ChatRecord,
@@ -79,7 +79,7 @@ import {
 } from '../../nonInteractiveCliCommands.js';
 import { isSlashCommand } from '../../ui/utils/commandUtils.js';
 import { parseAcpModelOption } from '../../utils/acpModelUtils.js';
-import { classifyApiError } from '../../ui/hooks/useGeminiStream.js';
+import { classifyApiError } from '../../ui/hooks/useHopCodeStream.js';
 
 // Import modular session components
 import type {
@@ -144,7 +144,7 @@ export class Session implements SessionContext {
 
   constructor(
     id: string,
-    private readonly chat: GeminiChat,
+    private readonly chat: HopCodeChat,
     readonly config: Config,
     private readonly client: AgentSideConnection,
     private readonly settings: LoadedSettings,
@@ -458,7 +458,7 @@ export class Session implements SessionContext {
             }
           } catch (error) {
             // Fire StopFailure hook (fire-and-forget, replaces Stop event for API errors)
-            // Aligned with useGeminiStream.ts handleFinishedWithErrorEvent
+            // Aligned with useHopCodeStream.ts handleFinishedWithErrorEvent
             const errorStatus = getErrorStatus(error);
             const errorMessage =
               error instanceof Error ? error.message : String(error);
@@ -547,7 +547,7 @@ export class Session implements SessionContext {
    * If a Stop hook requests continuation, it sends a follow-up message and loops back.
    * Maximum iterations (100) prevent infinite loops.
    *
-   * @param chat - The GeminiChat instance
+   * @param chat - The HopCodeChat instance
    * @param pendingSend - The abort controller for the current prompt
    * @param promptId - The prompt ID for tracking
    * @param hooksEnabled - Whether hooks are enabled
@@ -555,7 +555,7 @@ export class Session implements SessionContext {
    * @returns The stop reason ('end_turn' or 'cancelled')
    */
   async #handleStopHookLoop(
-    chat: GeminiChat,
+    chat: HopCodeChat,
     pendingSend: AbortController,
     promptId: string,
     hooksEnabled: boolean,

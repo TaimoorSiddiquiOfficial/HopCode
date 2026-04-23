@@ -23,7 +23,7 @@ export const FORK_AGENT = {
 // reads the marker and rejects nested fork calls.
 //
 // Why ALS and not a history scan: the nested AgentTool's `this.config` is the
-// main process Config, so `getGeminiClient().getHistory()` returns the parent
+// main process Config, so `getHopCodeClient().getHistory()` returns the parent
 // conversation — not the fork child's chat — and cannot be used to detect
 // nesting. Async context propagation works naturally across the fork's
 // await chain and is scoped per-execution.

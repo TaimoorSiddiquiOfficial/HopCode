@@ -1,4 +1,4 @@
-﻿# Commands
+# Commands
 
 This document details all commands supported by HopCode, helping you efficiently manage sessions, customize the interface, and control its behavior.
 
@@ -285,8 +285,8 @@ Save frequently used prompts as shortcut commands to improve work efficiency and
 | Function         | Description                                | Advantages                             | Priority | Applicable Scenarios                                 |
 | ---------------- | ------------------------------------------ | -------------------------------------- | -------- | ---------------------------------------------------- |
 | Namespace        | Subdirectory creates colon-named commands  | Better command organization            |          |                                                      |
-| Global Commands  | `~/.qwen/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
-| Project Commands | `<project root directory>/.qwen/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
+| Global Commands  | `~/.hopcode/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
+| Project Commands | `<project root directory>/.hopcode/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
 
 Priority Rules: Project commands > User commands (project command used when names are same)
 
@@ -296,8 +296,8 @@ Priority Rules: Project commands > User commands (project command used when name
 
 | File Location                            | Generated Command | Example Call          |
 | ---------------------------------------- | ----------------- | --------------------- |
-| `~/.qwen/commands/test.md`               | `/test`           | `/test Parameter`     |
-| `<project>/.qwen/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
+| `~/.hopcode/commands/test.md`               | `/test`           | `/test Parameter`     |
+| `<project>/.hopcode/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
 
 Naming Rules: Path separator (`/` or `\`) converted to colon (`:`)
 
@@ -411,8 +411,8 @@ Review {{args}}, reference standards:
 
 | Operation                     | Command/Code                              |
 | ----------------------------- | ----------------------------------------- |
-| 1. Create directory structure | `mkdir -p ~/.qwen/commands/refactor`      |
-| 2. Create command file        | `touch ~/.qwen/commands/refactor/pure.md` |
+| 1. Create directory structure | `mkdir -p ~/.hopcode/commands/refactor`      |
+| 2. Create command file        | `touch ~/.hopcode/commands/refactor/pure.md` |
 | 3. Edit command content       | Refer to the complete code below.         |
 | 4. Test command               | `@file.js` → `/refactor:pure`             |
 

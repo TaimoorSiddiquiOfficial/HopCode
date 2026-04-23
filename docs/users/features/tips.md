@@ -1,4 +1,4 @@
-﻿# Contextual Tips
+# Contextual Tips
 
 HopCode includes a contextual tips system that helps you discover features and stay aware of session state.
 
@@ -11,7 +11,7 @@ New users see onboarding-focused tips during their first sessions:
 | Sessions | Example tips                                         |
 | -------- | ---------------------------------------------------- |
 | < 5      | Slash commands (`/`), Tab autocomplete               |
-| < 10     | `QWEN.md` project context, `--continue` / `--resume` |
+| < 10     | `HOPCODE.md` project context, `--continue` / `--resume` |
 | < 15     | Shell commands with `!` prefix                       |
 
 After that, tips rotate through general features like `/compress`, `/approval-mode`, `/insight`, `/btw`, and more.
@@ -30,7 +30,7 @@ Post-response tips have per-tip cooldowns to avoid being repetitive.
 
 ## Tip History
 
-Tip display history is persisted at `~/.qwen/tip_history.json`. This file tracks:
+Tip display history is persisted at `~/.hopcode/tip_history.json`. This file tracks:
 
 - Session count (used for new-user tip selection)
 - Which tips have been shown and when (used for LRU rotation and cooldown)

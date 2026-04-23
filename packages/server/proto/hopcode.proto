@@ -1,0 +1,205 @@
+syntax = "proto3";
+
+package hopcode;
+
+option go_package = "github.com/hopcode/hopcode-server/proto";
+
+// ---------------------------------------------------------------------------
+// HopCode gRPC Agent Service
+// ---------------------------------------------------------------------------
+
+service HopCodeAgent {
+  // Bidirectional streaming RPC for an interactive agent session.
+  // The client sends prompts, tool approvals, and control messages.
+  // The server streams back text chunks, tool calls, tool results,
+  // permission requests, and status events.
+  rpc StreamSession (stream ClientMessage) returns (stream ServerMessage);
+
+  // Create a new agent session and return its metadata.
+  rpc CreateSession (CreateSessionRequest) returns (SessionInfo);
+
+  // List all active sessions.
+  rpc ListSessions (Empty) returns (SessionList);
+
+  // Get the conversation history for a session.
+  rpc GetSessionHistory (SessionId) returns (SessionHistory);
+
+  // Cancel / abort an active session.
+  rpc CancelSession (SessionId) returns (Empty);
+
+  // Execute a single tool call directly (fire-and-forget style).
+  rpc ExecuteTool (ToolRequest) returns (ToolResult);
+}
+
+// ---------------------------------------------------------------------------
+// Common
+// ---------------------------------------------------------------------------
+
+message Empty {}
+
+// ---------------------------------------------------------------------------
+// Session Management
+// ---------------------------------------------------------------------------
+
+message CreateSessionRequest {
+  string session_id = 1;           // optional; server generates if empty
+  string model = 2;                  // e.g. "claude-sonnet-4-6"
+  string cwd = 3;                    // working directory
+  repeated string allowed_tools = 4; // whitelist tool names
+  repeated string exclude_tools = 5; // blacklist tool names
+  string permission_mode = 6;        // "default" | "plan" | "auto-edit" | "yolo"
+  string auth_type = 7;              // e.g. "anthropic" | "openai" | "gemini"
+  map<string, string> env = 8;       // extra env vars
+  bool resume = 9;                   // resume previous session
+}
+
+message SessionInfo {
+  string session_id = 1;
+  string status = 2;               // "initializing" | "running" | "paused" | "finished" | "error"
+  string model = 3;
+  string cwd = 4;
+  int64 created_at = 5;            // unix timestamp (ms)
+  int64 updated_at = 6;
+}
+
+message SessionId {
+  string session_id = 1;
+}
+
+message SessionList {
+  repeated SessionInfo sessions = 1;
+}
+
+message SessionHistory {
+  string session_id = 1;
+  repeated HistoryMessage messages = 2;
+}
+
+message HistoryMessage {
+  string id = 1;
+  string role = 2;                   // "user" | "assistant" | "system" | "tool"
+  string content = 3;
+  int64 timestamp = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Client -> Server Messages
+// ---------------------------------------------------------------------------
+
+message ClientMessage {
+  oneof payload {
+    UserPrompt user_prompt = 1;
+    ToolApproval tool_approval = 2;
+    ToolDenial tool_denial = 3;
+    CancelRound cancel_round = 4;
+    ShutdownSession shutdown = 5;
+  }
+}
+
+message UserPrompt {
+  string text = 1;
+  repeated ImageAttachment images = 2;
+}
+
+message ImageAttachment {
+  bytes data = 1;
+  string mime_type = 2;
+}
+
+message ToolApproval {
+  string tool_use_id = 1;
+  bool allow = 2;                    // true = allow, false = deny
+  string reason = 3;                 // optional denial reason
+}
+
+message ToolDenial {
+  string tool_use_id = 1;
+  string reason = 2;
+}
+
+message CancelRound {
+  // empty — signals the client wants to cancel the current reasoning round
+}
+
+message ShutdownSession {
+  bool graceful = 1;                 // true = wait for current round, false = abort immediately
+}
+
+// ---------------------------------------------------------------------------
+// Server -> Client Messages
+// ---------------------------------------------------------------------------
+
+message ServerMessage {
+  oneof payload {
+    SessionInfo session_info = 1;
+    TextChunk text_chunk = 2;
+    ThinkingChunk thinking_chunk = 3;
+    ToolCall tool_call = 4;
+    ToolResult tool_result = 5;
+    PermissionRequest permission_request = 6;
+    UsageEvent usage = 7;
+    ErrorEvent error = 8;
+    StatusEvent status = 9;
+    ToolOutputUpdate tool_output_update = 10;
+  }
+}
+
+message TextChunk {
+  string text = 1;
+}
+
+message ThinkingChunk {
+  string thinking = 1;
+}
+
+message ToolCall {
+  string tool_use_id = 1;
+  string name = 2;
+  string input_json = 3;           // serialized JSON input
+}
+
+message ToolResult {
+  string tool_use_id = 1;
+  string content = 2;
+  bool is_error = 3;
+}
+
+message PermissionRequest {
+  string tool_use_id = 1;
+  string tool_name = 2;
+  string input_json = 3;
+  string description = 4;            // human-readable explanation
+}
+
+message ToolOutputUpdate {
+  string tool_use_id = 1;
+  string output = 2;
+}
+
+message UsageEvent {
+  int32 input_tokens = 1;
+  int32 output_tokens = 2;
+  int32 cache_read_input_tokens = 3;
+  int32 cache_creation_input_tokens = 4;
+  int32 total_tokens = 5;
+}
+
+message ErrorEvent {
+  string type = 1;
+  string message = 2;
+}
+
+message StatusEvent {
+  string status = 1;               // e.g. "round_start", "round_end", "tool_executing", "finished"
+  string details = 2;                // optional extra context
+}
+
+// ---------------------------------------------------------------------------
+// Direct Tool Execution
+// ---------------------------------------------------------------------------
+
+message ToolRequest {
+  string name = 1;
+  string input_json = 2;
+  string cwd = 3;
+}

@@ -194,7 +194,7 @@ export const directoryCommand: SlashCommand = {
         }
 
         if (added.length > 0) {
-          const gemini = config.getGeminiClient();
+          const gemini = config.getHopCodeClient();
           if (gemini) {
             await gemini.addDirectoryContext();
           }

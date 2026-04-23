@@ -29,7 +29,7 @@ import {
   resolveContentGeneratorConfigWithSources,
   AuthType,
 } from '../../core/contentGenerator.js';
-import { GeminiChat } from '../../core/geminiChat.js';
+import { HopCodeChat } from '../../core/hopCodeChat.js';
 import { executeToolCall } from '../../core/nonInteractiveToolExecutor.js';
 import type { ToolRegistry } from '../../tools/tool-registry.js';
 import { type AnyDeclarativeTool } from '../../tools/tools.js';
@@ -49,7 +49,7 @@ import type {
 } from './agent-types.js';
 import { AgentTerminateMode } from './agent-types.js';
 
-vi.mock('../../core/geminiChat.js');
+vi.mock('../../core/hopCodeChat.js');
 vi.mock('../../core/contentGenerator.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../core/contentGenerator.js')>();
@@ -264,11 +264,11 @@ describe('subagent.ts', () => {
       });
 
       mockSendMessageStream = vi.fn();
-      vi.mocked(GeminiChat).mockImplementation(
+      vi.mocked(HopCodeChat).mockImplementation(
         () =>
           ({
             sendMessageStream: mockSendMessageStream,
-          }) as unknown as GeminiChat,
+          }) as unknown as HopCodeChat,
       );
 
       // Default mock for executeToolCall
@@ -289,7 +289,7 @@ describe('subagent.ts', () => {
     const getGenerationConfigFromMock = (
       callIndex = 0,
     ): GenerateContentConfig & { systemInstruction?: string | Content } => {
-      const callArgs = vi.mocked(GeminiChat).mock.calls[callIndex];
+      const callArgs = vi.mocked(HopCodeChat).mock.calls[callIndex];
       const generationConfig = callArgs?.[1];
       // Ensure it's defined before proceeding
       expect(generationConfig).toBeDefined();
@@ -410,10 +410,10 @@ describe('subagent.ts', () => {
     });
 
     describe('execute - Initialization and Prompting', () => {
-      it('should correctly template the system prompt and initialize GeminiChat', async () => {
+      it('should correctly template the system prompt and initialize HopCodeChat', async () => {
         const { config } = await createMockConfig();
 
-        vi.mocked(GeminiChat).mockClear();
+        vi.mocked(HopCodeChat).mockClear();
 
         const promptConfig: PromptConfig = {
           systemPrompt: 'Hello ${name}, your task is ${task}.',
@@ -435,9 +435,9 @@ describe('subagent.ts', () => {
 
         await scope.execute(context);
 
-        // Check if GeminiChat was initialized correctly by the subagent
-        expect(GeminiChat).toHaveBeenCalledTimes(1);
-        const callArgs = vi.mocked(GeminiChat).mock.calls[0];
+        // Check if HopCodeChat was initialized correctly by the subagent
+        expect(HopCodeChat).toHaveBeenCalledTimes(1);
+        const callArgs = vi.mocked(HopCodeChat).mock.calls[0];
 
         // Check Generation Config
         const generationConfig = getGenerationConfigFromMock();
@@ -466,7 +466,7 @@ describe('subagent.ts', () => {
           '# Output language preference: English\nRespond in English.';
         vi.spyOn(config, 'getUserMemory').mockReturnValue(userMemoryContent);
 
-        vi.mocked(GeminiChat).mockClear();
+        vi.mocked(HopCodeChat).mockClear();
 
         const promptConfig: PromptConfig = {
           systemPrompt: 'You are a test agent.',
@@ -504,7 +504,7 @@ describe('subagent.ts', () => {
         const { config } = await createMockConfig();
         vi.spyOn(config, 'getUserMemory').mockReturnValue('');
 
-        vi.mocked(GeminiChat).mockClear();
+        vi.mocked(HopCodeChat).mockClear();
 
         const promptConfig: PromptConfig = {
           systemPrompt: 'You are a test agent.',
@@ -533,7 +533,7 @@ describe('subagent.ts', () => {
         const { config } = await createMockConfig();
         vi.spyOn(config, 'getUserMemory').mockReturnValue('   \n\n  ');
 
-        vi.mocked(GeminiChat).mockClear();
+        vi.mocked(HopCodeChat).mockClear();
 
         const promptConfig: PromptConfig = {
           systemPrompt: 'You are a test agent.',
@@ -559,7 +559,7 @@ describe('subagent.ts', () => {
 
       it('should replace env history with initialMessages when both initialMessages and systemPrompt are set', async () => {
         const { config } = await createMockConfig();
-        vi.mocked(GeminiChat).mockClear();
+        vi.mocked(HopCodeChat).mockClear();
 
         const initialMessages: Content[] = [
           { role: 'user', parts: [{ text: 'prior user turn' }] },
@@ -585,7 +585,7 @@ describe('subagent.ts', () => {
 
         await scope.execute(context);
 
-        const callArgs = vi.mocked(GeminiChat).mock.calls[0];
+        const callArgs = vi.mocked(HopCodeChat).mock.calls[0];
         const generationConfig = getGenerationConfigFromMock();
         const history = callArgs[2];
 
@@ -600,7 +600,7 @@ describe('subagent.ts', () => {
 
       it('should use renderedSystemPrompt verbatim and bypass templating', async () => {
         const { config } = await createMockConfig();
-        vi.mocked(GeminiChat).mockClear();
+        vi.mocked(HopCodeChat).mockClear();
 
         const rendered = 'Verbatim parent system prompt ${name}';
         const promptConfig: PromptConfig = {
@@ -942,11 +942,11 @@ describe('subagent.ts', () => {
           { text: 'Let me think...' as string, thought: true },
           { text: 'Here is the answer.' as string },
         ]);
-        vi.mocked(GeminiChat).mockImplementation(
+        vi.mocked(HopCodeChat).mockImplementation(
           () =>
             ({
               sendMessageStream: mockSendMessageStream,
-            }) as unknown as GeminiChat,
+            }) as unknown as HopCodeChat,
         );
 
         const eventEmitter = new AgentEventEmitter();
@@ -981,11 +981,11 @@ describe('subagent.ts', () => {
           { text: 'Internal reasoning here.' as string, thought: true },
           { text: 'The final answer.' as string },
         ]);
-        vi.mocked(GeminiChat).mockImplementation(
+        vi.mocked(HopCodeChat).mockImplementation(
           () =>
             ({
               sendMessageStream: mockSendMessageStream,
-            }) as unknown as GeminiChat,
+            }) as unknown as HopCodeChat,
         );
 
         const scope = await AgentHeadless.create(
@@ -1045,11 +1045,11 @@ describe('subagent.ts', () => {
             }
           })();
         });
-        vi.mocked(GeminiChat).mockImplementation(
+        vi.mocked(HopCodeChat).mockImplementation(
           () =>
             ({
               sendMessageStream: mockSendMessageStream,
-            }) as unknown as GeminiChat,
+            }) as unknown as HopCodeChat,
         );
 
         const scope = await AgentHeadless.create(

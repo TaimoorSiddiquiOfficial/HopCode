@@ -270,13 +270,13 @@ export class InvalidStreamError extends Error {
  * @remarks
  * The session maintains all the turns between user and model.
  */
-export class GeminiChat {
+export class HopCodeChat {
   // A promise to represent the current state of the message being sent to the
   // model.
   private sendPromise: Promise<void> = Promise.resolve();
 
   /**
-   * Creates a new GeminiChat instance.
+   * Creates a new HopCodeChat instance.
    *
    * @param config - The configuration object.
    * @param generationConfig - Optional generation configuration.

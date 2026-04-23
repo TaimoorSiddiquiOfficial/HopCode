@@ -89,7 +89,7 @@ export class SkillTool extends BaseDeclarativeTool<SkillParams, ToolResult> {
       this.updateDescriptionAndSchema();
     } finally {
       // Update the client with the new tools
-      const geminiClient = this.config.getGeminiClient();
+      const geminiClient = this.config.getHopCodeClient();
       if (geminiClient) {
         await geminiClient.setTools();
       }

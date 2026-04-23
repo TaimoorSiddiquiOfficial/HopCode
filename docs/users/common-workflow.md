@@ -1,4 +1,4 @@
-﻿# Common workflows
+# Common workflows
 
 > Learn about common workflows with HopCode.
 
@@ -323,7 +323,7 @@ This fetches data from connected MCP servers using the format @server: resource.
 > [!tip]
 >
 > - File paths can be relative or absolute
-> - @ file references add `QWEN.md` in the file's directory and parent directories to context
+> - @ file references add `HOPCODE.md` in the file's directory and parent directories to context
 > - Directory references show file listings, not contents
 > - You can reference multiple files in a single message (for example, "`@file 1.js` and `@file 2.js`")
 

@@ -12,11 +12,11 @@ vi.mock('vscode', () => ({
   },
 }));
 
-import { QwenConnectionHandler } from './qwenConnectionHandler.js';
+import { HopCodeConnectionHandler } from './hopcodeConnectionHandler.js';
 import type { AcpConnection } from './acpConnection.js';
 
-describe('QwenConnectionHandler', () => {
-  let handler: QwenConnectionHandler;
+describe('HopCodeConnectionHandler', () => {
+  let handler: HopCodeConnectionHandler;
   let mockConnection: AcpConnection;
   let mockGetConfiguration: ReturnType<typeof vi.fn>;
 
@@ -27,7 +27,7 @@ describe('QwenConnectionHandler', () => {
     >;
     mockGetConfiguration.mockReset();
 
-    handler = new QwenConnectionHandler();
+    handler = new HopCodeConnectionHandler();
     mockConnection = {
       connect: vi.fn().mockResolvedValue(undefined),
       newSession: vi.fn().mockResolvedValue({ sessionId: 'test-session' }),
@@ -157,7 +157,7 @@ describe('QwenConnectionHandler', () => {
       (mockConnection.connect as ReturnType<typeof vi.fn>)
         .mockRejectedValueOnce(
           new Error(
-            'Qwen ACP process failed to start (exit code: null, signal: SIGTERM)',
+            'HopCode ACP process failed to start (exit code: null, signal: SIGTERM)',
           ),
         )
         .mockResolvedValueOnce(undefined);
@@ -169,7 +169,7 @@ describe('QwenConnectionHandler', () => {
 
     it('throws after exhausting all connect retry attempts (3 attempts)', async () => {
       const spawnError = new Error(
-        'Qwen ACP process failed to start (exit code: null, signal: SIGTERM)',
+        'HopCode ACP process failed to start (exit code: null, signal: SIGTERM)',
       );
       (mockConnection.connect as ReturnType<typeof vi.fn>).mockRejectedValue(
         spawnError,

@@ -24,7 +24,7 @@ vi.mock('@hoptrendy/hopcode-core', async () => {
   };
 });
 
-import type { GeminiClient } from '@hoptrendy/hopcode-core';
+import type { HopCodeClient } from '@hoptrendy/hopcode-core';
 
 describe('clearCommand', () => {
   let mockContext: CommandContext;
@@ -48,10 +48,10 @@ describe('clearCommand', () => {
     mockContext = createMockCommandContext({
       services: {
         config: {
-          getGeminiClient: () =>
+          getHopCodeClient: () =>
             ({
               resetChat: mockResetChat,
-            }) as unknown as GeminiClient,
+            }) as unknown as HopCodeClient,
           startNewSession: mockStartNewSession,
           getHookSystem: mockGetHookSystem,
           getDebugLogger: () => ({

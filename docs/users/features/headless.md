@@ -1,4 +1,4 @@
-﻿# Headless Mode
+# Headless Mode
 
 Headless mode allows you to run HopCode programmatically from command line
 scripts and automation tools without any interactive UI. This is ideal for
@@ -55,7 +55,7 @@ qwen --resume 123e4567-e89b-12d3-a456-426614174000 -p "Apply the follow-up refac
 
 > [!note]
 >
-> - Session data is project-scoped JSONL under `~/.qwen/projects/<sanitized-cwd>/chats`.
+> - Session data is project-scoped JSONL under `~/.hopcode/projects/<sanitized-cwd>/chats`.
 > - Restores conversation history, tool outputs, and chat-compression checkpoints before sending the new prompt.
 
 ## Customize the Main Session Prompt
@@ -67,7 +67,7 @@ You can change the main session system prompt for a single CLI run without editi
 Use `--system-prompt` to replace HopCode's built-in main-session prompt for the current run:
 
 ```bash
-qwen -p "Review this patch" --system-prompt "You are a terse release reviewer. Report only blocking issues."
+hopcode -p "Review this patch" --system-prompt "You are a terse release reviewer. Report only blocking issues."
 ```
 
 ### Append Extra Instructions
@@ -75,13 +75,13 @@ qwen -p "Review this patch" --system-prompt "You are a terse release reviewer. R
 Use `--append-system-prompt` to keep the built-in prompt and add extra instructions for this run:
 
 ```bash
-qwen -p "Review this patch" --append-system-prompt "Be terse and focus on concrete findings."
+hopcode -p "Review this patch" --append-system-prompt "Be terse and focus on concrete findings."
 ```
 
 You can combine both flags when you want a custom base prompt plus an extra run-specific instruction:
 
 ```bash
-qwen -p "Summarize this repository" \
+hopcode -p "Summarize this repository" \
   --system-prompt "You are a migration planner." \
   --append-system-prompt "Return exactly three bullets."
 ```
@@ -89,7 +89,7 @@ qwen -p "Summarize this repository" \
 > [!note]
 >
 > - `--system-prompt` applies only to the current run's main session.
-> - Loaded memory and context files such as `QWEN.md` are still appended after `--system-prompt`.
+> - Loaded memory and context files such as `HOPCODE.md` are still appended after `--system-prompt`.
 > - `--append-system-prompt` is applied after the built-in prompt and loaded memory, and can be used together with `--system-prompt`.
 
 ## Output Formats
@@ -101,7 +101,7 @@ HopCode supports multiple output formats for different use cases:
 Standard human-readable output:
 
 ```bash
-qwen -p "What is the capital of France?"
+hopcode -p "What is the capital of France?"
 ```
 
 Response format:
@@ -119,7 +119,7 @@ The JSON output is an array of message objects. The output includes multiple mes
 #### Example Usage
 
 ```bash
-qwen -p "What is the capital of France?" --output-format json
+hopcode -p "What is the capital of France?" --output-format json
 ```
 
 Output (at end of execution):
@@ -171,7 +171,7 @@ Output (at end of execution):
 Stream-JSON format emits JSON messages immediately as they occur during execution, enabling real-time monitoring. This format uses line-delimited JSON where each message is a complete JSON object on a single line.
 
 ```bash
-qwen -p "Explain TypeScript" --output-format stream-json
+hopcode -p "Explain TypeScript" --output-format stream-json
 ```
 
 Output (streaming as events occur):
@@ -185,7 +185,7 @@ Output (streaming as events occur):
 When combined with `--include-partial-messages`, additional stream events are emitted in real-time (message_start, content_block_delta, etc.) for real-time UI updates.
 
 ```bash
-qwen -p "Write a Python script" --output-format stream-json --include-partial-messages
+hopcode -p "Write a Python script" --output-format stream-json --include-partial-messages
 ```
 
 ### Input Format
@@ -203,20 +203,20 @@ Save output to files or pipe to other commands:
 
 ```bash
 # Save to file
-qwen -p "Explain Docker" > docker-explanation.txt
-qwen -p "Explain Docker" --output-format json > docker-explanation.json
+hopcode -p "Explain Docker" > docker-explanation.txt
+hopcode -p "Explain Docker" --output-format json > docker-explanation.json
 
 # Append to file
-qwen -p "Add more details" >> docker-explanation.txt
+hopcode -p "Add more details" >> docker-explanation.txt
 
 # Pipe to other tools
-qwen -p "What is Kubernetes?" --output-format json | jq '.response'
-qwen -p "Explain microservices" | wc -w
-qwen -p "List programming languages" | grep -i "python"
+hopcode -p "What is Kubernetes?" --output-format json | jq '.response'
+hopcode -p "Explain microservices" | wc -w
+hopcode -p "List programming languages" | grep -i "python"
 
 # Stream-JSON output for real-time processing
-qwen -p "Explain Docker" --output-format stream-json | jq '.type'
-qwen -p "Write code" --output-format stream-json --include-partial-messages | jq '.event.type'
+hopcode -p "Explain Docker" --output-format stream-json | jq '.type'
+hopcode -p "Write code" --output-format stream-json --include-partial-messages | jq '.event.type'
 ```
 
 ## Configuration Options

@@ -79,13 +79,13 @@ describe('telemetry/config helpers', () => {
         useCollector: false,
       };
       const env = {
-        QWEN_TELEMETRY_ENABLED: '1',
-        QWEN_TELEMETRY_TARGET: 'gcp',
-        QWEN_TELEMETRY_OTLP_ENDPOINT: 'http://env:4317',
-        QWEN_TELEMETRY_OTLP_PROTOCOL: 'http',
-        QWEN_TELEMETRY_LOG_PROMPTS: 'true',
-        QWEN_TELEMETRY_OUTFILE: 'env.log',
-        QWEN_TELEMETRY_USE_COLLECTOR: 'true',
+        HOPCODE_TELEMETRY_ENABLED: '1',
+        HOPCODE_TELEMETRY_TARGET: 'gcp',
+        HOPCODE_TELEMETRY_OTLP_ENDPOINT: 'http://env:4317',
+        HOPCODE_TELEMETRY_OTLP_PROTOCOL: 'http',
+        HOPCODE_TELEMETRY_LOG_PROMPTS: 'true',
+        HOPCODE_TELEMETRY_OUTFILE: 'env.log',
+        HOPCODE_TELEMETRY_USE_COLLECTOR: 'true',
       } as Record<string, string>;
       const argv = {
         telemetry: false,
@@ -133,7 +133,7 @@ describe('telemetry/config helpers', () => {
     });
 
     it('throws on unknown protocol values', async () => {
-      const env = { QWEN_TELEMETRY_OTLP_PROTOCOL: 'unknown' } as Record<
+      const env = { HOPCODE_TELEMETRY_OTLP_PROTOCOL: 'unknown' } as Record<
         string,
         string
       >;
@@ -143,7 +143,7 @@ describe('telemetry/config helpers', () => {
     });
 
     it('throws on unknown target values', async () => {
-      const env = { QWEN_TELEMETRY_TARGET: 'unknown' } as Record<
+      const env = { HOPCODE_TELEMETRY_TARGET: 'unknown' } as Record<
         string,
         string
       >;

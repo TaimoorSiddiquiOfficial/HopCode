@@ -75,7 +75,7 @@ describe('SkillTool', () => {
       getProjectRoot: vi.fn().mockReturnValue('/test/project'),
       getSessionId: vi.fn().mockReturnValue('test-session-id'),
       getSkillManager: vi.fn(),
-      getGeminiClient: vi.fn().mockReturnValue(undefined),
+      getHopCodeClient: vi.fn().mockReturnValue(undefined),
     } as unknown as Config;
 
     changeListeners = [];

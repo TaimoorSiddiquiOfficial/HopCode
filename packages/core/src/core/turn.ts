@@ -26,7 +26,7 @@ import {
   UnauthorizedError,
   toFriendlyError,
 } from '../utils/errors.js';
-import type { GeminiChat } from './geminiChat.js';
+import type { HopCodeChat } from './hopCodeChat.js';
 import type { RetryInfo } from '../utils/rateLimit.js';
 import {
   getThoughtText,
@@ -46,7 +46,7 @@ export interface ServerTool {
   ): Promise<ToolResult>;
 }
 
-export enum GeminiEventType {
+export enum HopCodeEventType {
   Content = 'content',
   ToolCallRequest = 'tool_call_request',
   ToolCallResponse = 'tool_call_response',
@@ -66,8 +66,8 @@ export enum GeminiEventType {
   StopHookLoop = 'stop_hook_loop',
 }
 
-export type ServerGeminiRetryEvent = {
-  type: GeminiEventType.Retry;
+export type ServerHopCodeRetryEvent = {
+  type: HopCodeEventType.Retry;
   retryInfo?: RetryInfo;
 };
 
@@ -76,7 +76,7 @@ export interface StructuredError {
   status?: number;
 }
 
-export interface GeminiErrorEventValue {
+export interface HopCodeErrorEventValue {
   error: StructuredError;
 }
 
@@ -117,38 +117,38 @@ export interface ServerToolCallConfirmationDetails {
   details: ToolCallConfirmationDetails;
 }
 
-export type ServerGeminiContentEvent = {
-  type: GeminiEventType.Content;
+export type ServerHopCodeContentEvent = {
+  type: HopCodeEventType.Content;
   value: string;
 };
 
-export type ServerGeminiThoughtEvent = {
-  type: GeminiEventType.Thought;
+export type ServerHopCodeThoughtEvent = {
+  type: HopCodeEventType.Thought;
   value: ThoughtSummary;
 };
 
-export type ServerGeminiToolCallRequestEvent = {
-  type: GeminiEventType.ToolCallRequest;
+export type ServerHopCodeToolCallRequestEvent = {
+  type: HopCodeEventType.ToolCallRequest;
   value: ToolCallRequestInfo;
 };
 
-export type ServerGeminiToolCallResponseEvent = {
-  type: GeminiEventType.ToolCallResponse;
+export type ServerHopCodeToolCallResponseEvent = {
+  type: HopCodeEventType.ToolCallResponse;
   value: ToolCallResponseInfo;
 };
 
-export type ServerGeminiToolCallConfirmationEvent = {
-  type: GeminiEventType.ToolCallConfirmation;
+export type ServerHopCodeToolCallConfirmationEvent = {
+  type: HopCodeEventType.ToolCallConfirmation;
   value: ServerToolCallConfirmationDetails;
 };
 
-export type ServerGeminiUserCancelledEvent = {
-  type: GeminiEventType.UserCancelled;
+export type ServerHopCodeUserCancelledEvent = {
+  type: HopCodeEventType.UserCancelled;
 };
 
-export type ServerGeminiErrorEvent = {
-  type: GeminiEventType.Error;
-  value: GeminiErrorEventValue;
+export type ServerHopCodeErrorEvent = {
+  type: HopCodeEventType.Error;
+  value: HopCodeErrorEventValue;
 };
 
 export enum CompressionStatus {
@@ -174,27 +174,27 @@ export interface ChatCompressionInfo {
   compressionStatus: CompressionStatus;
 }
 
-export type ServerGeminiChatCompressedEvent = {
-  type: GeminiEventType.ChatCompressed;
+export type ServerHopCodeChatCompressedEvent = {
+  type: HopCodeEventType.ChatCompressed;
   value: ChatCompressionInfo | null;
 };
 
-export type ServerGeminiMaxSessionTurnsEvent = {
-  type: GeminiEventType.MaxSessionTurns;
+export type ServerHopCodeMaxSessionTurnsEvent = {
+  type: HopCodeEventType.MaxSessionTurns;
 };
 
-export type ServerGeminiSessionTokenLimitExceededEvent = {
-  type: GeminiEventType.SessionTokenLimitExceeded;
+export type ServerHopCodeSessionTokenLimitExceededEvent = {
+  type: HopCodeEventType.SessionTokenLimitExceeded;
   value: SessionTokenLimitExceededValue;
 };
 
-export type ServerGeminiFinishedEvent = {
-  type: GeminiEventType.Finished;
+export type ServerHopCodeFinishedEvent = {
+  type: HopCodeEventType.Finished;
   value: GeminiFinishedEventValue;
 };
 
-export type ServerGeminiLoopDetectedEvent = {
-  type: GeminiEventType.LoopDetected;
+export type ServerHopCodeLoopDetectedEvent = {
+  type: HopCodeEventType.LoopDetected;
   // The loop type is optional so historical call sites that don't produce one
   // (tests, fixtures) stay valid. Real emissions in client.ts always populate
   // it so downstream consumers can surface a concrete reason to the user.
@@ -203,26 +203,26 @@ export type ServerGeminiLoopDetectedEvent = {
   };
 };
 
-export type ServerGeminiCitationEvent = {
-  type: GeminiEventType.Citation;
+export type ServerHopCodeCitationEvent = {
+  type: HopCodeEventType.Citation;
   value: string;
 };
 
-export type ServerGeminiHookSystemMessageEvent = {
-  type: GeminiEventType.HookSystemMessage;
+export type ServerHopCodeHookSystemMessageEvent = {
+  type: HopCodeEventType.HookSystemMessage;
   value: string;
 };
 
-export type ServerGeminiUserPromptSubmitBlockedEvent = {
-  type: GeminiEventType.UserPromptSubmitBlocked;
+export type ServerHopCodeUserPromptSubmitBlockedEvent = {
+  type: HopCodeEventType.UserPromptSubmitBlocked;
   value: {
     reason: string;
     originalPrompt: string;
   };
 };
 
-export type ServerGeminiStopHookLoopEvent = {
-  type: GeminiEventType.StopHookLoop;
+export type ServerHopCodeStopHookLoopEvent = {
+  type: HopCodeEventType.StopHookLoop;
   value: {
     iterationCount: number;
     reasons: string[];
@@ -231,24 +231,24 @@ export type ServerGeminiStopHookLoopEvent = {
 };
 
 // The original union type, now composed of the individual types
-export type ServerGeminiStreamEvent =
-  | ServerGeminiChatCompressedEvent
-  | ServerGeminiCitationEvent
-  | ServerGeminiContentEvent
-  | ServerGeminiErrorEvent
-  | ServerGeminiFinishedEvent
-  | ServerGeminiHookSystemMessageEvent
-  | ServerGeminiUserPromptSubmitBlockedEvent
-  | ServerGeminiStopHookLoopEvent
-  | ServerGeminiLoopDetectedEvent
-  | ServerGeminiMaxSessionTurnsEvent
-  | ServerGeminiThoughtEvent
-  | ServerGeminiToolCallConfirmationEvent
-  | ServerGeminiToolCallRequestEvent
-  | ServerGeminiToolCallResponseEvent
-  | ServerGeminiUserCancelledEvent
-  | ServerGeminiSessionTokenLimitExceededEvent
-  | ServerGeminiRetryEvent;
+export type ServerHopCodeStreamEvent =
+  | ServerHopCodeChatCompressedEvent
+  | ServerHopCodeCitationEvent
+  | ServerHopCodeContentEvent
+  | ServerHopCodeErrorEvent
+  | ServerHopCodeFinishedEvent
+  | ServerHopCodeHookSystemMessageEvent
+  | ServerHopCodeUserPromptSubmitBlockedEvent
+  | ServerHopCodeStopHookLoopEvent
+  | ServerHopCodeLoopDetectedEvent
+  | ServerHopCodeMaxSessionTurnsEvent
+  | ServerHopCodeThoughtEvent
+  | ServerHopCodeToolCallConfirmationEvent
+  | ServerHopCodeToolCallRequestEvent
+  | ServerHopCodeToolCallResponseEvent
+  | ServerHopCodeUserCancelledEvent
+  | ServerHopCodeSessionTokenLimitExceededEvent
+  | ServerHopCodeRetryEvent;
 
 // A turn manages the agentic loop turn within the server context.
 export class Turn {
@@ -259,7 +259,7 @@ export class Turn {
   private currentResponseId?: string;
 
   constructor(
-    private readonly chat: GeminiChat,
+    private readonly chat: HopCodeChat,
     private readonly prompt_id: string,
   ) {}
   // The run method yields simpler events suitable for server logic
@@ -267,7 +267,7 @@ export class Turn {
     model: string,
     req: PartListUnion,
     signal: AbortSignal,
-  ): AsyncGenerator<ServerGeminiStreamEvent> {
+  ): AsyncGenerator<ServerHopCodeStreamEvent> {
     try {
       // Note: This assumes `sendMessageStream` yields events like
       // { type: StreamEventType.RETRY } or { type: StreamEventType.CHUNK, value: GenerateContentResponse }
@@ -284,7 +284,7 @@ export class Turn {
 
       for await (const streamEvent of responseStream) {
         if (signal?.aborted) {
-          yield { type: GeminiEventType.UserCancelled };
+          yield { type: HopCodeEventType.UserCancelled };
           return;
         }
 
@@ -296,7 +296,7 @@ export class Turn {
           this.debugResponses = [];
           this.finishReason = undefined;
           yield {
-            type: GeminiEventType.Retry,
+            type: HopCodeEventType.Retry,
             retryInfo: streamEvent.retryInfo,
           };
           continue; // Skip to the next event in the stream
@@ -316,14 +316,14 @@ export class Turn {
         const thoughtText = getThoughtText(resp);
         if (thoughtText) {
           yield {
-            type: GeminiEventType.Thought,
+            type: HopCodeEventType.Thought,
             value: parseThought(thoughtText),
           };
         }
 
         const text = getResponseText(resp);
         if (text) {
-          yield { type: GeminiEventType.Content, value: text };
+          yield { type: HopCodeEventType.Content, value: text };
         }
 
         // Handle function calls (requesting tool execution)
@@ -354,7 +354,7 @@ export class Turn {
 
           if (this.pendingCitations.size > 0) {
             yield {
-              type: GeminiEventType.Citation,
+              type: HopCodeEventType.Citation,
               value: `Citations:\n${[...this.pendingCitations].sort().join('\n')}`,
             };
             this.pendingCitations.clear();
@@ -362,7 +362,7 @@ export class Turn {
 
           this.finishReason = finishReason;
           yield {
-            type: GeminiEventType.Finished,
+            type: HopCodeEventType.Finished,
             value: {
               reason: finishReason,
               usageMetadata: resp.usageMetadata,
@@ -372,7 +372,7 @@ export class Turn {
       }
     } catch (e) {
       if (signal.aborted) {
-        yield { type: GeminiEventType.UserCancelled };
+        yield { type: HopCodeEventType.UserCancelled };
         // Regular cancellation error, fail gracefully.
         return;
       }
@@ -401,14 +401,14 @@ export class Turn {
         status,
       };
       await this.chat.maybeIncludeSchemaDepthContext(structuredError);
-      yield { type: GeminiEventType.Error, value: { error: structuredError } };
+      yield { type: HopCodeEventType.Error, value: { error: structuredError } };
       return;
     }
   }
 
   private handlePendingFunctionCall(
     fnCall: FunctionCall,
-  ): ServerGeminiStreamEvent | null {
+  ): ServerHopCodeStreamEvent | null {
     const callId =
       fnCall.id ??
       `${fnCall.name}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -427,7 +427,7 @@ export class Turn {
     this.pendingToolCalls.push(toolCallRequest);
 
     // Yield a request for the tool call, not the pending/confirming status
-    return { type: GeminiEventType.ToolCallRequest, value: toolCallRequest };
+    return { type: HopCodeEventType.ToolCallRequest, value: toolCallRequest };
   }
 
   getDebugResponses(): GenerateContentResponse[] {

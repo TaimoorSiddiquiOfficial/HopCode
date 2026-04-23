@@ -1,4 +1,4 @@
-﻿# HopCode Execution and Deployment
+# HopCode Execution and Deployment
 
 This document describes how to run HopCode and explains the deployment architecture that HopCode uses.
 
@@ -46,7 +46,7 @@ For security and isolation, HopCode can be run inside a container. This is the d
 - **Using the `--sandbox` flag:**
   If you have HopCode installed locally (using the standard installation described above), you can instruct it to run inside the sandbox container.
   ```bash
-  qwen --sandbox -y -p "your prompt here"
+  hopcode --sandbox -y -p "your prompt here"
   ```
 
 ---

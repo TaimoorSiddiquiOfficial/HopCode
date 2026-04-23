@@ -5,14 +5,14 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { QwenSessionUpdateHandler } from './qwenSessionUpdateHandler.js';
+import { HopCodeSessionUpdateHandler } from './hopcodeSessionUpdateHandler.js';
 import type { SessionNotification } from '@agentclientprotocol/sdk';
 import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
-import type { QwenAgentCallbacks } from '../types/chatTypes.js';
+import type { HopCodeAgentCallbacks } from '../types/chatTypes.js';
 
-describe('QwenSessionUpdateHandler', () => {
-  let handler: QwenSessionUpdateHandler;
-  let mockCallbacks: QwenAgentCallbacks;
+describe('HopCodeSessionUpdateHandler', () => {
+  let handler: HopCodeSessionUpdateHandler;
+  let mockCallbacks: HopCodeAgentCallbacks;
 
   beforeEach(() => {
     mockCallbacks = {
@@ -25,7 +25,7 @@ describe('QwenSessionUpdateHandler', () => {
       onUsageUpdate: vi.fn(),
       onAvailableCommands: vi.fn(),
     };
-    handler = new QwenSessionUpdateHandler(mockCallbacks);
+    handler = new HopCodeSessionUpdateHandler(mockCallbacks);
   });
 
   describe('current_mode_update handling', () => {
@@ -235,7 +235,7 @@ describe('QwenSessionUpdateHandler', () => {
     });
 
     it('falls back to stream chunk when onPlan is not set', () => {
-      const handlerWithStream = new QwenSessionUpdateHandler({
+      const handlerWithStream = new HopCodeSessionUpdateHandler({
         onStreamChunk: vi.fn(),
       });
 
@@ -319,7 +319,7 @@ describe('QwenSessionUpdateHandler', () => {
     });
 
     it('does not call callback when onAvailableCommands is not set', () => {
-      const handlerWithoutCallback = new QwenSessionUpdateHandler({});
+      const handlerWithoutCallback = new HopCodeSessionUpdateHandler({});
 
       const commandsUpdate: SessionNotification = {
         sessionId: 'test-session',

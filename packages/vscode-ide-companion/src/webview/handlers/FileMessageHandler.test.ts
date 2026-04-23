@@ -5,7 +5,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { QwenAgentManager } from '../../services/qwenAgentManager.js';
+import type { HopCodeAgentManager } from '../../services/hopcodeAgentManager.js';
 import type { ConversationStore } from '../../services/conversationStore.js';
 import { FileMessageHandler } from './FileMessageHandler.js';
 import * as vscode from 'vscode';
@@ -91,7 +91,7 @@ describe('FileMessageHandler', () => {
 
     const sendToWebView = vi.fn();
     const handler = new FileMessageHandler(
-      {} as QwenAgentManager,
+      {} as HopCodeAgentManager,
       {} as ConversationStore,
       null,
       sendToWebView,
@@ -145,7 +145,7 @@ describe('FileMessageHandler', () => {
 
     const sendToWebView = vi.fn();
     const handler = new FileMessageHandler(
-      {} as QwenAgentManager,
+      {} as HopCodeAgentManager,
       {} as ConversationStore,
       null,
       sendToWebView,

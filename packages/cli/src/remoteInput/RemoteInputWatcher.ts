@@ -64,7 +64,7 @@ export class RemoteInputWatcher {
 
   /**
    * Register the TUI's submit function. Called from AppContainer
-   * once useGeminiStream's submitQuery is available.
+   * once useHopCodeStream's submitQuery is available.
    */
   setSubmitFn(fn: SubmitFn): void {
     this.submitFn = fn;

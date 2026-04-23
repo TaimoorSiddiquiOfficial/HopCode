@@ -1,6 +1,6 @@
-﻿# Getting Started with HopCode Extensions
+# Getting Started with HopCode Extensions
 
-This guide will walk you through creating your first HopCode extension. You'll learn how to set up a new extension, add a custom tool via an MCP server, create a custom command, and provide context to the model with a `QWEN.md` file.
+This guide will walk you through creating your first HopCode extension. You'll learn how to set up a new extension, add a custom tool via an MCP server, create a custom command, and provide context to the model with a `HOPCODE.md` file.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ The easiest way to start is by using one of the built-in templates. We'll use th
 Run the following command to create a new directory called `my-first-extension` with the template files:
 
 ```bash
-qwen extensions new my-first-extension mcp-server
+hopcode extensions new my-first-extension mcp-server
 ```
 
 This will create a new directory with the following structure:
@@ -133,7 +133,7 @@ Before you can use the extension, you need to compile the TypeScript code and li
     The `link` command creates a symbolic link from the HopCode extensions directory to your development directory. This means any changes you make will be reflected immediately without needing to reinstall.
 
     ```bash
-    qwen extensions link .
+    hopcode extensions link .
     ```
 
 Now, restart your HopCode session. The new `fetch_posts` tool will be available. You can test it by asking: "fetch posts".
@@ -248,11 +248,11 @@ Subagents are specialized AI assistants for specific tasks.
 
 After restarting HopCode, your custom skills will be available via `/skills` and subagents via `/agents manage`.
 
-## Step 6: Add a Custom `QWEN.md`
+## Step 6: Add a Custom `HOPCODE.md`
 
-You can provide persistent context to the model by adding a `QWEN.md` file to your extension. This is useful for giving the model instructions on how to behave or information about your extension's tools. Note that you may not always need this for extensions built to expose commands and prompts.
+You can provide persistent context to the model by adding a `HOPCODE.md` file to your extension. This is useful for giving the model instructions on how to behave or information about your extension's tools. Note that you may not always need this for extensions built to expose commands and prompts.
 
-1.  Create a file named `QWEN.md` in the root of your extension directory:
+1.  Create a file named `HOPCODE.md` in the root of your extension directory:
 
     ```markdown
     # My First Extension Instructions
@@ -266,7 +266,7 @@ You can provide persistent context to the model by adding a `QWEN.md` file to yo
     {
       "name": "my-first-extension",
       "version": "1.0.0",
-      "contextFileName": "QWEN.md",
+      "contextFileName": "HOPCODE.md",
       "mcpServers": {
         "nodeServer": {
           "command": "node",
@@ -277,7 +277,7 @@ You can provide persistent context to the model by adding a `QWEN.md` file to yo
     }
     ```
 
-Restart the CLI again. The model will now have the context from your `QWEN.md` file in every session where the extension is active.
+Restart the CLI again. The model will now have the context from your `HOPCODE.md` file in every session where the extension is active.
 
 ## Step 7: Releasing Your Extension
 

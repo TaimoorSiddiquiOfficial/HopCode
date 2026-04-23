@@ -56,7 +56,7 @@ export const clearCommand: SlashCommand = {
       // Clear UI first for immediate responsiveness
       context.ui.clear();
 
-      const geminiClient = config.getGeminiClient();
+      const geminiClient = config.getHopCodeClient();
       if (geminiClient) {
         context.ui.setDebugMessage(
           t('Starting a new session, resetting chat, and clearing terminal.'),

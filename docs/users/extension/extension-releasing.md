@@ -1,4 +1,4 @@
-﻿# Extension Releasing
+# Extension Releasing
 
 There are three primary ways of releasing extensions to users:
 
@@ -10,7 +10,7 @@ Git repository releases tend to be the simplest and most flexible approach, whil
 
 ## Releasing through a git repository
 
-This is the most flexible and simple option. All you need to do us create a publicly accessible git repo (such as a public github repository) and then users can install your extension using `qwen extensions install <your-repo-uri>`, or for a GitHub repository they can use the simplified `qwen extensions install <org>/<repo>` format. They can optionally depend on a specific ref (branch/tag/commit) using the `--ref=<some-ref>` argument, this defaults to the default branch.
+This is the most flexible and simple option. All you need to do us create a publicly accessible git repo (such as a public github repository) and then users can install your extension using `hopcode extensions install <your-repo-uri>`, or for a GitHub repository they can use the simplified `hopcode extensions install <org>/<repo>` format. They can optionally depend on a specific ref (branch/tag/commit) using the `--ref=<some-ref>` argument, this defaults to the default branch.
 
 Whenever commits are pushed to the ref that a user depends on, they will be prompted to update the extension. Note that this also allows for easy rollbacks, the HEAD commit is always treated as the latest version regardless of the actual version in the `qwen-extension.json` file.
 
@@ -18,13 +18,13 @@ Whenever commits are pushed to the ref that a user depends on, they will be prom
 
 Users can depend on any ref from your git repo, such as a branch or tag, which allows you to manage multiple release channels.
 
-For instance, you can maintain a `stable` branch, which users can install this way `qwen extensions install <your-repo-uri> --ref=stable`. Or, you could make this the default by treating your default branch as your stable release branch, and doing development in a different branch (for instance called `dev`). You can maintain as many branches or tags as you like, providing maximum flexibility for you and your users.
+For instance, you can maintain a `stable` branch, which users can install this way `hopcode extensions install <your-repo-uri> --ref=stable`. Or, you could make this the default by treating your default branch as your stable release branch, and doing development in a different branch (for instance called `dev`). You can maintain as many branches or tags as you like, providing maximum flexibility for you and your users.
 
 Note that these `ref` arguments can be tags, branches, or even specific commits, which allows users to depend on a specific version of your extension. It is up to you how you want to manage your tags and branches.
 
 ### Example releasing flow using a git repo
 
-While there are many options for how you want to manage releases using a git flow, we recommend treating your default branch as your "stable" release branch. This means that the default behavior for `qwen extensions install <your-repo-uri>` is to be on the stable release branch.
+While there are many options for how you want to manage releases using a git flow, we recommend treating your default branch as your "stable" release branch. This means that the default behavior for `hopcode extensions install <your-repo-uri>` is to be on the stable release branch.
 
 Lets say you want to maintain three standard release channels, `stable`, `preview`, and `dev`. You would do all your standard development in the `dev` branch. When you are ready to do a preview release, you merge that branch into your `preview` branch. When you are ready to promote your preview branch to stable, you merge `preview` into your stable branch (which might be your default branch or a different branch).
 
@@ -139,7 +139,7 @@ A minimal package structure looks like:
 my-extension/
 ├── package.json
 ├── qwen-extension.json
-├── QWEN.md              # optional context file
+├── HOPCODE.md              # optional context file
 ├── commands/             # optional custom commands
 ├── skills/               # optional custom skills
 └── agents/               # optional custom subagents
@@ -165,13 +165,13 @@ Users install your extension using the scoped package name:
 
 ```bash
 # Install latest version
-qwen extensions install @your-org/my-extension
+hopcode extensions install @your-org/my-extension
 
 # Install a specific version
-qwen extensions install @your-org/my-extension@1.2.0
+hopcode extensions install @your-org/my-extension@1.2.0
 
 # Install from a custom registry
-qwen extensions install @your-org/my-extension --registry https://your-registry.com
+hopcode extensions install @your-org/my-extension --registry https://your-registry.com
 ```
 
 ### Update behavior
@@ -198,7 +198,7 @@ You can use npm dist-tags to manage release channels:
 npm publish --tag beta
 
 # Users install beta channel
-qwen extensions install @your-org/my-extension@beta
+hopcode extensions install @your-org/my-extension@beta
 ```
 
 This works similarly to git branch-based release channels but uses npm's native dist-tag mechanism.

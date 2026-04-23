@@ -7,12 +7,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Config } from '../config/config.js';
 import type {
-  ServerGeminiContentEvent,
-  ServerGeminiStreamEvent,
-  ServerGeminiThoughtEvent,
-  ServerGeminiToolCallRequestEvent,
+  ServerHopCodeContentEvent,
+  ServerHopCodeStreamEvent,
+  ServerHopCodeThoughtEvent,
+  ServerHopCodeToolCallRequestEvent,
 } from '../core/turn.js';
-import { GeminiEventType } from '../core/turn.js';
+import { HopCodeEventType } from '../core/turn.js';
 import * as loggers from '../telemetry/loggers.js';
 import { LoopDetectionService } from './loopDetectionService.js';
 
@@ -43,8 +43,8 @@ describe('LoopDetectionService', () => {
   const createToolCallRequestEvent = (
     name: string,
     args: Record<string, unknown>,
-  ): ServerGeminiToolCallRequestEvent => ({
-    type: GeminiEventType.ToolCallRequest,
+  ): ServerHopCodeToolCallRequestEvent => ({
+    type: HopCodeEventType.ToolCallRequest,
     value: {
       name,
       args,
@@ -54,16 +54,16 @@ describe('LoopDetectionService', () => {
     },
   });
 
-  const createContentEvent = (content: string): ServerGeminiContentEvent => ({
-    type: GeminiEventType.Content,
+  const createContentEvent = (content: string): ServerHopCodeContentEvent => ({
+    type: HopCodeEventType.Content,
     value: content,
   });
 
   const createThoughtEvent = (
     subject: string,
     description = '',
-  ): ServerGeminiThoughtEvent => ({
-    type: GeminiEventType.Thought,
+  ): ServerHopCodeThoughtEvent => ({
+    type: HopCodeEventType.Thought,
     value: { subject, description },
   });
 
@@ -126,8 +126,8 @@ describe('LoopDetectionService', () => {
         param: 'value',
       });
       const otherEvent = {
-        type: GeminiEventType.UserCancelled,
-      } as unknown as ServerGeminiStreamEvent;
+        type: HopCodeEventType.UserCancelled,
+      } as unknown as ServerHopCodeStreamEvent;
 
       // Send events just below the threshold
       for (let i = 0; i < TOOL_CALL_LOOP_THRESHOLD - 1; i++) {
@@ -626,7 +626,7 @@ describe('LoopDetectionService', () => {
     it('should return false for unhandled event types', () => {
       const otherEvent = {
         type: 'unhandled_event',
-      } as unknown as ServerGeminiStreamEvent;
+      } as unknown as ServerHopCodeStreamEvent;
       expect(service.addAndCheck(otherEvent)).toBe(false);
       expect(service.addAndCheck(otherEvent)).toBe(false);
     });

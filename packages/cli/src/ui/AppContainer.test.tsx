@@ -18,7 +18,7 @@ import { AppContainer } from './AppContainer.js';
 import {
   type Config,
   makeFakeConfig,
-  type GeminiClient,
+  type HopCodeClient,
   type SubagentManager,
 } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../config/settings.js';
@@ -65,7 +65,7 @@ vi.mock('./hooks/slashCommandProcessor.js');
 vi.mock('./hooks/useTerminalSize.js', () => ({
   useTerminalSize: vi.fn(() => ({ columns: 80, rows: 24 })),
 }));
-vi.mock('./hooks/useGeminiStream.js');
+vi.mock('./hooks/useHopCodeStream.js');
 vi.mock('./hooks/vim.js');
 vi.mock('./hooks/useFocus.js');
 vi.mock('./hooks/useBracketedPaste.js');
@@ -108,7 +108,7 @@ import { useEditorSettings } from './hooks/useEditorSettings.js';
 import { useSettingsCommand } from './hooks/useSettingsCommand.js';
 import { useModelCommand } from './hooks/useModelCommand.js';
 import { useSlashCommandProcessor } from './hooks/slashCommandProcessor.js';
-import { useGeminiStream } from './hooks/useGeminiStream.js';
+import { useHopCodeStream } from './hooks/useHopCodeStream.js';
 import { useVim } from './hooks/vim.js';
 import { useFolderTrust } from './hooks/useFolderTrust.js';
 import { useIdeTrustListener } from './hooks/useIdeTrustListener.js';
@@ -137,7 +137,7 @@ describe('AppContainer State Management', () => {
   const mockedUseSettingsCommand = useSettingsCommand as Mock;
   const mockedUseModelCommand = useModelCommand as Mock;
   const mockedUseSlashCommandProcessor = useSlashCommandProcessor as Mock;
-  const mockedUseGeminiStream = useGeminiStream as Mock;
+  const mockedUseGeminiStream = useHopCodeStream as Mock;
   const mockedUseVim = useVim as Mock;
   const mockedUseFolderTrust = useFolderTrust as Mock;
   const mockedUseIdeTrustListener = useIdeTrustListener as Mock;
@@ -272,14 +272,14 @@ describe('AppContainer State Management', () => {
     // Mock config's getTargetDir to return consistent workspace directory
     vi.spyOn(mockConfig, 'getTargetDir').mockReturnValue('/test/workspace');
 
-    // Mock GeminiClient to prevent unhandled errors from AgentTool.refreshSubagents
-    const mockGeminiClient: Partial<GeminiClient> = {
+    // Mock HopCodeClient to prevent unhandled errors from AgentTool.refreshSubagents
+    const mockHopCodeClient: Partial<HopCodeClient> = {
       initialize: vi.fn().mockResolvedValue(undefined),
       setTools: vi.fn().mockResolvedValue(undefined),
       isInitialized: vi.fn().mockReturnValue(false), // Return false to prevent setTools from being called
     };
-    vi.spyOn(mockConfig, 'getGeminiClient').mockReturnValue(
-      mockGeminiClient as GeminiClient,
+    vi.spyOn(mockConfig, 'getHopCodeClient').mockReturnValue(
+      mockHopCodeClient as HopCodeClient,
     );
 
     // Mock SubagentManager to prevent errors during AgentTool initialization
@@ -517,8 +517,8 @@ describe('AppContainer State Management', () => {
   });
 
   describe('Cancel Handler (issue #3204)', () => {
-    // The cancel handler is wired through useGeminiStream's onCancelSubmit
-    // arg (positional index 14 — see the useGeminiStream call site in
+    // The cancel handler is wired through useHopCodeStream's onCancelSubmit
+    // arg (positional index 14 — see the useHopCodeStream call site in
     // AppContainer.tsx). We capture it via mockImplementation so a future
     // signature change surfaces as a clear test failure rather than silently
     // grabbing the wrong callback.
@@ -541,7 +541,7 @@ describe('AppContainer State Management', () => {
     const triggerCancel = () => {
       if (!capturedOnCancelSubmit) {
         throw new Error(
-          `onCancelSubmit was not captured at arg index ${ON_CANCEL_SUBMIT_ARG_INDEX} — useGeminiStream signature may have changed`,
+          `onCancelSubmit was not captured at arg index ${ON_CANCEL_SUBMIT_ARG_INDEX} — useHopCodeStream signature may have changed`,
         );
       }
       capturedOnCancelSubmit();

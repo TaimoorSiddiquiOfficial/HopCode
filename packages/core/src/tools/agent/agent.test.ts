@@ -88,7 +88,7 @@ describe('AgentTool', () => {
       getProjectRoot: vi.fn().mockReturnValue('/test/project'),
       getSessionId: vi.fn().mockReturnValue('test-session-id'),
       getSubagentManager: vi.fn(),
-      getGeminiClient: vi.fn().mockReturnValue(undefined),
+      getHopCodeClient: vi.fn().mockReturnValue(undefined),
       getHookSystem: vi.fn().mockReturnValue(undefined),
       getTranscriptPath: vi.fn().mockReturnValue('/test/transcript'),
       getApprovalMode: vi.fn().mockReturnValue('default'),
@@ -596,12 +596,12 @@ describe('AgentTool', () => {
       // Parent conversation history: empty (first-turn fork — falls back to
       // the fork agent's own systemPrompt + wildcard tools because no
       // cache params have been captured yet).
-      vi.mocked(config.getGeminiClient).mockReturnValue({
+      vi.mocked(config.getHopCodeClient).mockReturnValue({
         getHistory: vi.fn().mockReturnValue([]),
         getChat: vi.fn().mockReturnValue({
           getGenerationConfig: vi.fn().mockReturnValue({}),
         }),
-      } as unknown as ReturnType<Config['getGeminiClient']>);
+      } as unknown as ReturnType<Config['getHopCodeClient']>);
 
       vi.mocked(AgentHeadless.create).mockResolvedValue(mockAgent);
     });
@@ -702,7 +702,7 @@ describe('AgentTool', () => {
         fireSubagentStopEvent: vi.fn().mockResolvedValue(undefined),
       } as unknown as HookSystem;
 
-      vi.mocked(config.getGeminiClient).mockReturnValue(undefined as never);
+      vi.mocked(config.getHopCodeClient).mockReturnValue(undefined as never);
       (config as unknown as Record<string, unknown>)['getHookSystem'] = vi
         .fn()
         .mockReturnValue(mockHookSystem);
@@ -881,7 +881,7 @@ describe('AgentTool', () => {
         fireSubagentStopEvent: vi.fn().mockResolvedValue(undefined),
       } as unknown as HookSystem;
 
-      vi.mocked(config.getGeminiClient).mockReturnValue(undefined as never);
+      vi.mocked(config.getHopCodeClient).mockReturnValue(undefined as never);
       (config as unknown as Record<string, unknown>)['getHookSystem'] = vi
         .fn()
         .mockReturnValue(mockHookSystem);

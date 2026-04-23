@@ -13,7 +13,7 @@ import { useCallback, useState } from 'react';
 import type {
   AnsiOutput,
   Config,
-  GeminiClient,
+  HopCodeClient,
   ShellExecutionResult,
 } from '@hoptrendy/hopcode-core';
 import {
@@ -36,7 +36,7 @@ const MAX_OUTPUT_LENGTH = 10000;
 const debugLogger = createDebugLogger('SHELL_COMMAND_PROCESSOR');
 
 function addShellCommandToGeminiHistory(
-  geminiClient: GeminiClient,
+  geminiClient: HopCodeClient,
   rawQuery: string,
   resultText: string,
 ) {
@@ -75,7 +75,7 @@ export const useShellCommandProcessor = (
   onExec: (command: Promise<void>) => void,
   onDebugMessage: (message: string) => void,
   config: Config,
-  geminiClient: GeminiClient,
+  geminiClient: HopCodeClient,
   setShellInputFocused: (value: boolean) => void,
   terminalWidth?: number,
   terminalHeight?: number,

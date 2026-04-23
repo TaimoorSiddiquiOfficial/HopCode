@@ -1,4 +1,4 @@
-﻿# Phase 1 技术设计文档：基础设施重建
+# Phase 1 技术设计文档：基础设施重建
 
 ## 1. 设计目标与约束
 
@@ -50,7 +50,7 @@ export type ExecutionMode = 'interactive' | 'non_interactive' | 'acp';
 export type CommandSource =
   | 'builtin-command' // 内置命令（BuiltinCommandLoader）
   | 'bundled-skill' // 随包分发的 skill（BundledSkillLoader）
-  | 'skill-dir-command' // 用户/项目 .qwen/commands/ 下的文件命令（FileCommandLoader，非插件）
+  | 'skill-dir-command' // 用户/项目 .hopcode/commands/ 下的文件命令（FileCommandLoader，非插件）
   | 'plugin-command' // 插件提供的命令（FileCommandLoader，extensionName 不为空）
   | 'mcp-prompt'; // MCP server 提供的 prompt（McpPromptLoader）
 // 以下来源预留，Phase 1 不实现对应 Loader，但 schema 先定义：

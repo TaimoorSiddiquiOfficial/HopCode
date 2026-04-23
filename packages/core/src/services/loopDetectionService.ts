@@ -5,8 +5,8 @@
  */
 
 import { createHash } from 'node:crypto';
-import type { ServerGeminiStreamEvent } from '../core/turn.js';
-import { GeminiEventType } from '../core/turn.js';
+import type { ServerHopCodeStreamEvent } from '../core/turn.js';
+import { HopCodeEventType } from '../core/turn.js';
 import type { ThoughtSummary } from '../utils/thoughtUtils.js';
 import {
   logLoopDetected,
@@ -124,13 +124,13 @@ export class LoopDetectionService {
    * @param event - The stream event to process
    * @returns true if a loop is detected, false otherwise
    */
-  addAndCheck(event: ServerGeminiStreamEvent): boolean {
+  addAndCheck(event: ServerHopCodeStreamEvent): boolean {
     if (this.loopDetected || this.disabledForSession) {
       return this.loopDetected;
     }
 
     switch (event.type) {
-      case GeminiEventType.ToolCallRequest: {
+      case HopCodeEventType.ToolCallRequest: {
         // content chanting only happens in one single stream, reset if there
         // is a tool call in between
         this.resetContentTracking();
@@ -147,11 +147,11 @@ export class LoopDetectionService {
         this.loopDetected = toolCallLoop || readFileLoop || actionStagnation;
         break;
       }
-      case GeminiEventType.Content: {
+      case HopCodeEventType.Content: {
         this.loopDetected = this.checkContentLoop(event.value);
         break;
       }
-      case GeminiEventType.Thought: {
+      case HopCodeEventType.Thought: {
         this.trackThought(event.value);
         this.loopDetected = this.checkRepetitiveThoughts();
         break;

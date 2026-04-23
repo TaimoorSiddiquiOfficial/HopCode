@@ -1,4 +1,4 @@
-﻿# Channels Design
+# Channels Design
 
 > External messaging integrations for HopCode — interact with an agent from Telegram, WeChat, and more.
 >
@@ -6,7 +6,7 @@
 
 ## Overview
 
-A **channel** connects an external messaging platform to a HopCode agent. Configured in `settings.json`, managed via `qwen channel` subcommands, multi-user (each user gets an isolated ACP session).
+A **channel** connects an external messaging platform to a HopCode agent. Configured in `settings.json`, managed via `hopcode channel` subcommands, multi-user (each user gets an isolated ACP session).
 
 ## Architecture
 
@@ -111,7 +111,7 @@ External plugins are **extensions** managed by `ExtensionManager`, declared in `
 }
 ```
 
-Loading sequence at `qwen channel start`: load settings → register built-ins → scan extensions → dynamic import + validate → register (reject collisions) → validate config → `createChannel()` → `connect()`.
+Loading sequence at `hopcode channel start`: load settings → register built-ins → scan extensions → dynamic import + validate → register (reject collisions) → validate config → `createChannel()` → `connect()`.
 
 Plugins run in-process (no sandbox), same trust model as npm dependencies.
 
@@ -142,17 +142,17 @@ Auth is plugin-specific: static token (Telegram), app credentials (DingTalk), QR
 
 ```bash
 # Channels
-qwen channel start [name]                     # start all or one channel
-qwen channel stop                             # stop running service
-qwen channel status                           # show channels, sessions, uptime
-qwen channel pairing list <ch>                # pending pairing requests
-qwen channel pairing approve <ch> <code>      # approve a request
+hopcode channel start [name]                     # start all or one channel
+hopcode channel stop                             # stop running service
+hopcode channel status                           # show channels, sessions, uptime
+hopcode channel pairing list <ch>                # pending pairing requests
+hopcode channel pairing approve <ch> <code>      # approve a request
 
 # Extensions
-qwen extensions install <path-or-package>     # install
-qwen extensions link <local-path>             # symlink for dev
-qwen extensions list                          # show installed
-qwen extensions remove <name>                 # uninstall
+hopcode extensions install <path-or-package>     # install
+hopcode extensions link <local-path>             # symlink for dev
+hopcode extensions list                          # show installed
+hopcode extensions remove <name>                 # uninstall
 ```
 
 ## Package Structure
@@ -185,8 +185,8 @@ packages/channels/
 
 ### Operational Tooling
 
-- **`qwen channel doctor`** — config validation, env vars, bot tokens, network checks
-- **`qwen channel status --probe`** — real connectivity checks per channel
+- **`hopcode channel doctor`** — config validation, env vars, bot tokens, network checks
+- **`hopcode channel status --probe`** — real connectivity checks per channel
 
 ### Platform Expansion
 
@@ -200,5 +200,5 @@ packages/channels/
 
 ### Plugin Ecosystem
 
-- **Community plugin template** — `create-qwen-channel` scaffolding tool
-- **Plugin registry/discovery** — `qwen extensions search`, version compatibility
+- **Community plugin template** — `create-hopcode-channel` scaffolding tool
+- **Plugin registry/discovery** — `hopcode extensions search`, version compatibility

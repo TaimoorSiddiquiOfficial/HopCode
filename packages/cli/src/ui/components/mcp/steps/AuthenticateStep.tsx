@@ -137,7 +137,7 @@ export const AuthenticateStep: React.FC<AuthenticateStepProps> = ({
       }
 
       // Update the client with the new tools
-      const geminiClient = config.getGeminiClient();
+      const geminiClient = config.getHopCodeClient();
       if (geminiClient) {
         await geminiClient.setTools();
       }

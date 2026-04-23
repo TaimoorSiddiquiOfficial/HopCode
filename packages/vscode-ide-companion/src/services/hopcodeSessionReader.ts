@@ -11,7 +11,7 @@ import * as readline from 'readline';
 import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
 import { truncatePanelTitle } from '../webview/utils/panelTitleUtils.js';
 
-export interface QwenMessage {
+export interface HopCodeMessage {
   id: string;
   timestamp: string;
   type: 'user' | 'qwen';
@@ -28,19 +28,19 @@ export interface QwenMessage {
   model?: string;
 }
 
-export interface QwenSession {
+export interface HopCodeSession {
   sessionId: string;
   projectHash: string;
   startTime: string;
   lastUpdated: string;
-  messages: QwenMessage[];
+  messages: HopCodeMessage[];
   filePath?: string;
   messageCount?: number;
   firstUserText?: string;
   cwd?: string;
 }
 
-export class QwenSessionReader {
+export class HopCodeSessionReader {
   private hopcodeDir: string;
 
   constructor() {
@@ -53,9 +53,9 @@ export class QwenSessionReader {
   async getAllSessions(
     workingDir?: string,
     allProjects: boolean = false,
-  ): Promise<QwenSession[]> {
+  ): Promise<HopCodeSession[]> {
     try {
-      const sessions: QwenSession[] = [];
+      const sessions: HopCodeSession[] = [];
 
       if (!allProjects && workingDir) {
         // Current project only
@@ -72,7 +72,7 @@ export class QwenSessionReader {
         // All projects
         const tmpDir = path.join(this.hopcodeDir, 'tmp');
         if (!fs.existsSync(tmpDir)) {
-          console.log('[QwenSessionReader] Tmp directory not found:', tmpDir);
+          console.log('[HopCodeSessionReader] Tmp directory not found:', tmpDir);
           return [];
         }
 
@@ -92,7 +92,7 @@ export class QwenSessionReader {
 
       return sessions;
     } catch (error) {
-      console.error('[QwenSessionReader] Failed to get sessions:', error);
+      console.error('[HopCodeSessionReader] Failed to get sessions:', error);
       return [];
     }
   }
@@ -100,8 +100,8 @@ export class QwenSessionReader {
   /**
    * Read all sessions from specified directory
    */
-  private async readSessionsFromDir(chatsDir: string): Promise<QwenSession[]> {
-    const sessions: QwenSession[] = [];
+  private async readSessionsFromDir(chatsDir: string): Promise<HopCodeSession[]> {
+    const sessions: HopCodeSession[] = [];
 
     if (!fs.existsSync(chatsDir)) {
       return sessions;
@@ -121,12 +121,12 @@ export class QwenSessionReader {
       const filePath = path.join(chatsDir, file);
       try {
         const content = fs.readFileSync(filePath, 'utf-8');
-        const session = JSON.parse(content) as QwenSession;
+        const session = JSON.parse(content) as HopCodeSession;
         session.filePath = filePath;
         sessions.push(session);
       } catch (error) {
         console.error(
-          '[QwenSessionReader] Failed to read session file:',
+          '[HopCodeSessionReader] Failed to read session file:',
           filePath,
           error,
         );
@@ -143,7 +143,7 @@ export class QwenSessionReader {
         }
       } catch (error) {
         console.error(
-          '[QwenSessionReader] Failed to read JSONL session file:',
+          '[HopCodeSessionReader] Failed to read JSONL session file:',
           filePath,
           error,
         );
@@ -159,7 +159,7 @@ export class QwenSessionReader {
   async getSession(
     sessionId: string,
     _workingDir?: string,
-  ): Promise<QwenSession | null> {
+  ): Promise<HopCodeSession | null> {
     // First try to find in all projects
     const sessions = await this.getAllSessions(undefined, true);
     const found = sessions.find((s) => s.sessionId === sessionId);
@@ -186,7 +186,7 @@ export class QwenSessionReader {
   /**
    * Get session title (based on first user message)
    */
-  getSessionTitle(session: QwenSession): string {
+  getSessionTitle(session: HopCodeSession): string {
     // Prefer cached prompt text to avoid loading messages for JSONL sessions
     const text = session.firstUserText
       ? session.firstUserText
@@ -206,7 +206,7 @@ export class QwenSessionReader {
   private async readJsonlSession(
     filePath: string,
     includeMessages: boolean,
-  ): Promise<QwenSession | null> {
+  ): Promise<HopCodeSession | null> {
     try {
       if (!fs.existsSync(filePath)) {
         return null;
@@ -219,7 +219,7 @@ export class QwenSessionReader {
         crlfDelay: Infinity,
       });
 
-      const messages: QwenMessage[] = [];
+      const messages: HopCodeMessage[] = [];
       const seenUuids = new Set<string>();
       let sessionId: string | undefined;
       let startTime: string | undefined;
@@ -296,7 +296,7 @@ export class QwenSessionReader {
       };
     } catch (error) {
       console.error(
-        '[QwenSessionReader] Failed to parse JSONL session:',
+        '[HopCodeSessionReader] Failed to parse JSONL session:',
         error,
       );
       return null;
@@ -345,7 +345,7 @@ export class QwenSessionReader {
       }
       return false;
     } catch (error) {
-      console.error('[QwenSessionReader] Failed to delete session:', error);
+      console.error('[HopCodeSessionReader] Failed to delete session:', error);
       return false;
     }
   }

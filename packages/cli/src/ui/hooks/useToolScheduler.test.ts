@@ -66,7 +66,7 @@ const mockConfig = {
     authType: 'gemini',
   }),
   getUseModelRouter: () => false,
-  getGeminiClient: () => null, // No client needed for these tests
+  getHopCodeClient: () => null, // No client needed for these tests
   getShellExecutionConfig: () => ({ terminalWidth: 80, terminalHeight: 24 }),
   getChatRecordingService: () => undefined,
   getMessageBus: vi.fn().mockReturnValue(undefined),

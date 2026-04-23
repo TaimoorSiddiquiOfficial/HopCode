@@ -1,4 +1,4 @@
-﻿# Sandbox
+# Sandbox
 
 This document explains how to run HopCode inside a sandbox to reduce risk when tools execute shell commands or modify files.
 
@@ -13,7 +13,7 @@ npm install -g @hopcode/hopcode
 To verify the installation
 
 ```bash
-qwen --version
+hopcode --version
 ```
 
 ## Overview of sandboxing
@@ -49,7 +49,7 @@ Cross-platform sandboxing with complete process isolation.
 
 By default, HopCode uses a published sandbox image (configured in the CLI package) and will pull it as needed.
 
-The container sandbox mounts your workspace and your `~/.qwen` directory into the container so auth and settings persist between runs.
+The container sandbox mounts your workspace and your `~/.hopcode` directory into the container so auth and settings persist between runs.
 
 **Best for**: Strong isolation on any OS, consistent tooling inside a known image.
 
@@ -69,7 +69,7 @@ qwen -s -p "analyze the code structure"
 
 # Or enable sandboxing for your shell session (recommended for CI / scripts)
 export QWEN_SANDBOX=true   # true auto-picks a provider (see notes below)
-qwen -p "run the test suite"
+hopcode -p "run the test suite"
 
 # Configure in settings.json
 {
@@ -158,7 +158,7 @@ export SANDBOX_FLAGS="--flag1 --flag2=value"
 
 If you want to restrict outbound network access to an allowlist, you can run a local proxy alongside the sandbox:
 
-- Set `QWEN_SANDBOX_PROXY_COMMAND=<command>`
+- Set `HOPCODE_SANDBOX_PROXY_COMMAND=<command>`
 - The command must start a proxy server that listens on `:::8877`
 
 This is especially useful with `*-proxied` Seatbelt profiles.
@@ -167,7 +167,7 @@ For a working allowlist-style proxy example, see: [Example Proxy Script](/develo
 
 ## Linux UID/GID handling
 
-On Linux, HopCode defaults to enabling UID/GID mapping so the sandbox runs as your user (and reuses the mounted `~/.qwen`). Override with:
+On Linux, HopCode defaults to enabling UID/GID mapping so the sandbox runs as your user (and reuses the mounted `~/.hopcode`). Override with:
 
 ```bash
 export SANDBOX_SET_UID_GID=true   # Force host UID/GID

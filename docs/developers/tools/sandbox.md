@@ -1,4 +1,4 @@
-﻿## Customizing the sandbox environment (Docker/Podman)
+## Customizing the sandbox environment (Docker/Podman)
 
 ### Currently, the project does not support the use of the BUILD_SANDBOX function after installation through the npm package
 
@@ -36,7 +36,7 @@ ls -la $(dirname $(which qwen))/../lib/node_modules/@hopcode/hopcode
 # It should show that this is a symbolic link pointing to your source code directory
 
 # 7.Test the version of qwen
-qwen -v
+hopcode -v
 # npm link will overwrite the global qwen. To avoid being unable to distinguish the same version number, you can uninstall the global CLI first
 
 ```
@@ -87,5 +87,5 @@ npm install -g @hopcode/hopcode
 
 # Verification Recovery
 which qwen
-qwen --version
+hopcode --version
 ```

@@ -13,11 +13,11 @@ import type {
 import { ApiError } from '@google/genai';
 import type { ContentGenerator } from '../core/contentGenerator.js';
 import {
-  GeminiChat,
+  HopCodeChat,
   InvalidStreamError,
   StreamEventType,
   type StreamEvent,
-} from './geminiChat.js';
+} from './hopCodeChat.js';
 import { StreamContentError } from './openaiContentGenerator/pipeline.js';
 import type { Config } from '../config/config.js';
 import { setSimulate429 } from '../utils/testUtils.js';
@@ -79,9 +79,9 @@ vi.mock('../telemetry/uiTelemetry.js', () => ({
   },
 }));
 
-describe('GeminiChat', async () => {
+describe('HopCodeChat', async () => {
   let mockContentGenerator: ContentGenerator;
-  let chat: GeminiChat;
+  let chat: HopCodeChat;
   let mockConfig: Config;
   const config: GenerateContentConfig = {};
 
@@ -124,7 +124,7 @@ describe('GeminiChat', async () => {
     // Disable 429 simulation for tests
     setSimulate429(false);
     // Reset history for each test by creating a new instance
-    chat = new GeminiChat(
+    chat = new HopCodeChat(
       mockConfig,
       config,
       [],
@@ -944,8 +944,8 @@ describe('GeminiChat', async () => {
     });
 
     it('should not update global telemetry when no telemetryService is provided (subagent isolation)', async () => {
-      // Simulate a subagent GeminiChat: created without a telemetryService
-      const subagentChat = new GeminiChat(mockConfig, config, []);
+      // Simulate a subagent HopCodeChat: created without a telemetryService
+      const subagentChat = new HopCodeChat(mockConfig, config, []);
 
       const response = (async function* () {
         yield {
