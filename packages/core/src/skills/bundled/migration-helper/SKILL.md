@@ -2,12 +2,12 @@
 name: migration-helper
 description: Automated code migration assistant for frameworks, languages, and libraries
 allowedTools:
-  - read-file
-  - write-file
+  - read_file
+  - write_file
   - edit
   - glob
-  - ripGrep
-  - shell
+  - grep_search
+  - run_shell_command
 hooks:
   on_session_start:
     - matcher: ".*migrate.*"
@@ -303,12 +303,12 @@ npm install moment
 
 ## Tools Usage
 
-- Use `read-file` to examine code before migration
+- Use `read_file` to examine code before migration
 - Use `edit` for automated transformations
-- Use `write-file` for new TypeScript files
+- Use `write_file` for new TypeScript files
 - Use `glob` to find all files needing migration
-- Use `ripGrep` to find patterns to replace
-- Use `shell` to run codemods and tests
+- Use `grep_search` to find patterns to replace
+- Use `run_shell_command` to run codemods and tests
 
 ## When Complete
 

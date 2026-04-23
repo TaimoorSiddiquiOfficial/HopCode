@@ -2,10 +2,10 @@
 name: performance-profile
 description: Performance analysis and optimization recommendations for applications
 allowedTools:
-  - read-file
-  - shell
+  - read_file
+  - run_shell_command
   - glob
-  - ripGrep
+  - grep_search
 hooks:
   on_session_start:
     - matcher: ".*performance.*"
@@ -216,10 +216,10 @@ const result = data.map(x => map.get(x.id));
 
 ## Tools Usage
 
-- Use `read-file` to examine performance-critical code
-- Use `shell` to run profiling tools and benchmarks
+- Use `read_file` to examine performance-critical code
+- Use `run_shell_command` to run profiling tools and benchmarks
 - Use `glob` to find configuration files (webpack, vite, etc.)
-- Use `ripGrep` to search for performance anti-patterns
+- Use `grep_search` to search for performance anti-patterns
 
 ## When Complete
 

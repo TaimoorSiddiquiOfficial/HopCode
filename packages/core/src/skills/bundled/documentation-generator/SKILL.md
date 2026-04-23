@@ -2,11 +2,11 @@
 name: documentation-generator
 description: Auto-generate comprehensive documentation from code (API docs, READMEs, architecture diagrams)
 allowedTools:
-  - read-file
-  - write-file
+  - read_file
+  - write_file
   - glob
-  - ripGrep
-  - shell
+  - grep_search
+  - run_shell_command
 hooks:
   on_session_start:
     - matcher: ".*document.*"
@@ -305,11 +305,11 @@ docs/
 
 ## Tools Usage
 
-- Use `read-file` to examine source files
-- Use `write-file` to generate documentation
+- Use `read_file` to examine source files
+- Use `write_file` to generate documentation
 - Use `glob` to find all source files
-- Use `ripGrep` to extract JSDoc and patterns
-- Use `shell` to run documentation generators (typedoc, jsdoc)
+- Use `grep_search` to extract JSDoc and patterns
+- Use `run_shell_command` to run documentation generators (typedoc, jsdoc)
 
 ## When Complete
 

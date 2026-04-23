@@ -2,10 +2,10 @@
 name: security-audit
 description: Automated security scanning and vulnerability detection for codebases
 allowedTools:
-  - read-file
-  - ripGrep
+  - read_file
+  - grep_search
   - glob
-  - shell
+  - run_shell_command
 hooks:
   on_session_start:
     - matcher: ".*security.*"
@@ -140,10 +140,10 @@ const query = 'SELECT * FROM users WHERE id = ?';
 
 ## Tools Usage
 
-- Use `read-file` to examine suspicious files
-- Use `ripGrep` to search for patterns across the codebase
+- Use `read_file` to examine suspicious files
+- Use `grep_search` to search for patterns across the codebase
 - Use `glob` to find configuration files
-- Use `shell` to run security scanners if available (e.g., `npm audit`, `snyk test`)
+- Use `run_shell_command` to run security scanners if available (e.g., `npm audit`, `snyk test`)
 
 ## When Complete
 
