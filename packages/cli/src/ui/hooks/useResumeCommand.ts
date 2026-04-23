@@ -62,12 +62,11 @@ export function useResumeCommand(
   const { config, historyManager, startNewSession, setSessionName, remount } =
     options ?? {};
 
-  const _hasHistoryManager = !!historyManager;
-  const { clearItems, loadHistory } = historyManager ?? {};
-
+  const hasHistoryManager = !!historyManager;
+  const { clearItems, loadHistory } = historyManager || {};
   const handleResume = useCallback(
     async (sessionId: string) => {
-      if (!config || !historyManager || !startNewSession) {
+      if (!config || !hasHistoryManager || !startNewSession) {
         return;
       }
 
@@ -117,7 +116,7 @@ export function useResumeCommand(
     [
       closeResumeDialog,
       config,
-      historyManager,
+      hasHistoryManager,
       clearItems,
       loadHistory,
       startNewSession,
