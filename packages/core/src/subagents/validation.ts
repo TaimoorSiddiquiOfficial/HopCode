@@ -135,6 +135,7 @@ export class SubagentValidator {
 
     // Check for reserved names
     const reservedNames = [
+      'main',
       'self',
       'system',
       'user',

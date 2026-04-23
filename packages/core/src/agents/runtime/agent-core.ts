@@ -1,11 +1,11 @@
-/**
+ï»¿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview AgentCore — the shared execution engine for subagents.
+ * @fileoverview AgentCore ï¿½ the shared execution engine for subagents.
  *
  * AgentCore encapsulates the model reasoning loop, tool scheduling, stats,
  * and event emission. It is composed by both AgentHeadless (one-shot tasks)
@@ -17,6 +17,7 @@
  */
 
 import { reportError } from '../../utils/errorReporting.js';
+import { subagentNameContext } from '../../utils/subagentNameContext.js';
 import type { Config } from '../../config/config.js';
 import { type ToolCallRequestInfo } from '../../core/turn.js';
 import {
@@ -131,7 +132,7 @@ export interface ExecutionStats {
 }
 
 /**
- * AgentCore — shared execution engine for model reasoning and tool scheduling.
+ * AgentCore ï¿½ shared execution engine for model reasoning and tool scheduling.
  *
  * This class encapsulates:
  * - Chat/model session creation (`createChat`)
@@ -141,7 +142,7 @@ export interface ExecutionStats {
  * - Statistics tracking and event emission
  *
  * It does NOT manage lifecycle (start/stop/terminate), abort signals,
- * or final result interpretation — those are the caller's responsibility.
+ * or final result interpretation ï¿½ those are the caller's responsibility.
  */
 export class AgentCore {
   readonly subagentId: string;
@@ -260,7 +261,7 @@ export class AgentCore {
     // Build generationConfig. For fork subagents, `renderedSystemPrompt`
     // carries the parent's exact rendered systemInstruction so the fork
     // shares a byte-identical cache prefix. Otherwise, template
-    // `systemPrompt` via buildChatSystemPrompt (which may throw — kept
+    // `systemPrompt` via buildChatSystemPrompt (which may throw ï¿½ kept
     // outside the try/catch so template errors surface to the caller).
     const generationConfig: GenerateContentConfig & {
       systemInstruction?: string | Content;
@@ -386,6 +387,28 @@ export class AgentCore {
     abortController: AbortController,
     options?: ReasoningLoopOptions,
   ): Promise<ReasoningLoopResult> {
+    // Tag every API call emitted from this loop with the owning subagent's
+    // name so the `/stats` panel can attribute tokens/requests to the
+    // originating subagent. The store is read inside
+    // `LoggingContentGenerator` via `subagentNameContext.getStore()`.
+    return subagentNameContext.run(this.name, () =>
+      this._runReasoningLoopInner(
+        chat,
+        initialMessages,
+        toolsList,
+        abortController,
+        options,
+      ),
+    );
+  }
+
+  private async _runReasoningLoopInner(
+    chat: GeminiChat,
+    initialMessages: Content[],
+    toolsList: FunctionDeclaration[],
+    abortController: AbortController,
+    options?: ReasoningLoopOptions,
+  ): Promise<ReasoningLoopResult> {
     const startTime = options?.startTimeMs ?? Date.now();
     let currentMessages = initialMessages;
     let turnCounter = 0;
@@ -393,7 +416,7 @@ export class AgentCore {
     let terminateMode: AgentTerminateMode | null = null;
 
     while (true) {
-      // Check abort before starting a new round — prevents unnecessary API
+      // Check abort before starting a new round ï¿½ prevents unnecessary API
       // calls after processFunctionCalls was unblocked by an abort signal.
       if (abortController.signal.aborted) {
         terminateMode = AgentTerminateMode.CANCELLED;
@@ -531,7 +554,7 @@ export class AgentCore {
           currentResponseId,
         );
       } else {
-        // No tool calls — treat this as the model's final answer.
+        // No tool calls ï¿½ treat this as the model's final answer.
         if (roundText && roundText.trim().length > 0) {
           finalText = roundText.trim();
           // Emit ROUND_END for the final round so all consumers see it.
@@ -1079,7 +1102,7 @@ Important Rules:
     const thoughtTok = Number(usage.thoughtsTokenCount || 0);
     const cachedTok = Number(usage.cachedContentTokenCount || 0);
     const totalTok = Number(usage.totalTokenCount || 0);
-    // Prefer totalTokenCount (prompt + output) for context usage — the
+    // Prefer totalTokenCount (prompt + output) for context usage ï¿½ the
     // output from this round becomes history for the next, matching
     // the approach in geminiChat.ts.
     const contextTok = isFinite(totalTok) && totalTok > 0 ? totalTok : inTok;

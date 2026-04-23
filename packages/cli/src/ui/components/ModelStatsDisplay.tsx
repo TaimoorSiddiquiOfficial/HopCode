@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -13,12 +13,13 @@ import {
   calculateCacheHitRate,
   calculateErrorRate,
 } from '../utils/computeStats.js';
-import type { ModelMetrics } from '../contexts/SessionContext.js';
+import type { ModelMetricsCore } from '../contexts/SessionContext.js';
 import { useSessionStats } from '../contexts/SessionContext.js';
+import { flattenModelsBySource } from '../utils/modelsBySource.js';
 import { t } from '../../i18n/index.js';
 
 const METRIC_COL_WIDTH = 28;
-const MODEL_COL_WIDTH = 22;
+const MODEL_COL_WIDTH = 24;
 
 interface StatRowProps {
   title: string;
@@ -59,8 +60,8 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
 }) => {
   const { stats } = useSessionStats();
   const { models } = stats.metrics;
-  const activeModels = Object.entries(models).filter(
-    ([, metrics]) => metrics.api.totalRequests > 0,
+  const activeModels = flattenModelsBySource(models).filter(
+    ({ metrics }) => metrics.api.totalRequests > 0,
   );
 
   if (activeModels.length === 0) {
@@ -79,18 +80,16 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
     );
   }
 
-  const modelNames = activeModels.map(([name]) => name);
-
   const getModelValues = (
-    getter: (metrics: ModelMetrics) => string | React.ReactElement,
-  ) => activeModels.map(([, metrics]) => getter(metrics));
+    getter: (metrics: ModelMetricsCore) => string | React.ReactElement,
+  ) => activeModels.map(({ metrics }) => getter(metrics));
 
   const hasThoughts = activeModels.some(
-    ([, metrics]) => metrics.tokens.thoughts > 0,
+    ({ metrics }) => metrics.tokens.thoughts > 0,
   );
-  const hasTool = activeModels.some(([, metrics]) => metrics.tokens.tool > 0);
+  const hasTool = activeModels.some(({ metrics }) => metrics.tokens.tool > 0);
   const hasCached = activeModels.some(
-    ([, metrics]) => metrics.tokens.cached > 0,
+    ({ metrics }) => metrics.tokens.cached > 0,
   );
 
   return (
@@ -114,10 +113,10 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
             {t('Metric')}
           </Text>
         </Box>
-        {modelNames.map((name) => (
-          <Box width={MODEL_COL_WIDTH} key={name}>
+        {activeModels.map(({ key, label }) => (
+          <Box width={MODEL_COL_WIDTH} key={key}>
             <Text bold color={theme.text.primary}>
-              {name}
+              {label}
             </Text>
           </Box>
         ))}
