@@ -1363,6 +1363,13 @@ export class Config {
     sessionId?: string,
     sessionData?: ResumedSessionData,
   ): string {
+    // Finalize the outgoing session before switching.
+    try {
+      this.chatRecordingService?.finalize();
+    } catch {
+      // Best-effort — don't block session switch
+    }
+
     this.sessionId = sessionId ?? randomUUID();
     this.sessionData = sessionData;
     setDebugLogSession(this);
@@ -1629,6 +1636,13 @@ export class Config {
       return;
     }
     try {
+      // Finalize the current session's metadata before cleanup.
+      try {
+        this.chatRecordingService?.finalize();
+      } catch {
+        // Best-effort — don't block shutdown
+      }
+
       this.skillManager?.stopWatching();
 
       if (this.toolRegistry) {

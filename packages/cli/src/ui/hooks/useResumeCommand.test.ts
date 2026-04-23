@@ -51,6 +51,9 @@ vi.mock('@hoptrendy/hopcode-core', () => {
         })
       );
     }
+    getSessionTitle(_sessionId: string) {
+      return undefined;
+    }
   }
 
   return {
