@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { basename, join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -15,6 +15,82 @@ import type {
   Envelope,
   AcpBridge,
 } from '@hoptrendy/channel-base';
+
+// ──────────────────────────────────────────────────────────────
+// Whisper transcription helper
+// ──────────────────────────────────────────────────────────────
+
+/**
+ * Transcribe an audio file using a Whisper-compatible API.
+ *
+ * Configuration via environment variables (all optional):
+ *   HOPCODE_WHISPER_KEY  — API key (falls back to OPENAI_API_KEY)
+ *   HOPCODE_WHISPER_URL  — API endpoint (default: OpenAI; use Groq URL for free tier)
+ *   HOPCODE_WHISPER_MODEL — model name (default: whisper-1)
+ *
+ * Returns the transcribed text, or null if transcription is not configured
+ * or fails (so callers can fall back to the original attachment-only flow).
+ */
+async function transcribeAudio(
+  filePath: string,
+  mimeType: string,
+): Promise<string | null> {
+  const apiKey =
+    process.env['HOPCODE_WHISPER_KEY'] ?? process.env['OPENAI_API_KEY'];
+  if (!apiKey) return null; // transcription not configured
+
+  const endpoint =
+    process.env['HOPCODE_WHISPER_URL'] ??
+    'https://api.openai.com/v1/audio/transcriptions';
+  const model = process.env['HOPCODE_WHISPER_MODEL'] ?? 'whisper-1';
+
+  try {
+    const audioBuffer = readFileSync(filePath);
+    // Determine file extension from mime type or file path
+    const ext =
+      mimeType === 'audio/ogg'
+        ? '.ogg'
+        : mimeType === 'audio/mpeg'
+          ? '.mp3'
+          : mimeType === 'audio/mp4'
+            ? '.m4a'
+            : mimeType === 'audio/wav'
+              ? '.wav'
+              : mimeType === 'audio/webm'
+                ? '.webm'
+                : basename(filePath).includes('.')
+                  ? `.${basename(filePath).split('.').pop()!}`
+                  : '.ogg';
+
+    const form = new FormData();
+    const blob = new Blob([audioBuffer], { type: mimeType });
+    form.append('file', blob, `audio${ext}`);
+    form.append('model', model);
+    form.append('response_format', 'text');
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}` },
+      body: form,
+    });
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => '');
+      process.stderr.write(
+        `[Whisper] Transcription failed (${response.status}): ${errText.slice(0, 200)}\n`,
+      );
+      return null;
+    }
+
+    const text = (await response.text()).trim();
+    return text || null;
+  } catch (err) {
+    process.stderr.write(
+      `[Whisper] Transcription error: ${err instanceof Error ? err.message : String(err)}\n`,
+    );
+    return null;
+  }
+}
 
 export class TelegramChannel extends ChannelBase {
   private bot: Bot;
@@ -180,15 +256,28 @@ export class TelegramChannel extends ChannelBase {
         const filePath = join(dir, fileName);
         writeFileSync(filePath, buf);
 
-        envelope.text = msg.caption || '';
-        envelope.attachments = [
-          {
-            type: 'audio',
-            filePath,
-            mimeType: voice.mime_type || 'audio/ogg',
-            fileName,
-          },
-        ];
+        // Attempt Whisper transcription (uses HOPCODE_WHISPER_KEY or OPENAI_API_KEY)
+        const mimeType = voice.mime_type || 'audio/ogg';
+        const transcript = await transcribeAudio(filePath, mimeType);
+
+        if (transcript) {
+          // Transcription succeeded — use the text as the prompt
+          envelope.text = transcript;
+          process.stderr.write(
+            `[Telegram:${this.name}] Voice transcribed (${transcript.length} chars)\n`,
+          );
+        } else {
+          // No transcription — pass the audio file as an attachment
+          envelope.text = msg.caption || '';
+          envelope.attachments = [
+            {
+              type: 'audio',
+              filePath,
+              mimeType,
+              fileName,
+            },
+          ];
+        }
       } catch (err) {
         process.stderr.write(
           `[Telegram:${this.name}] Failed to download voice message: ${err instanceof Error ? err.message : err}\n`,
