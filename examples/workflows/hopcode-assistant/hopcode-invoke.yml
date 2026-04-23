@@ -8,62 +8,62 @@
 # Usage: Comment "/hopcode <task>" on any issue or PR.
 #   Example: /hopcode Fix the failing test in src/auth.ts
 
-name: HopCode Assistant
+name: 'HopCode Assistant'
 
 on:
   issue_comment:
-    types: [created]
+    types: ['created']
   pull_request_review_comment:
-    types: [created]
+    types: ['created']
 
 jobs:
   hopcode-assist:
     # Only run when comment starts with /hopcode
-    if: startsWith(github.event.comment.body, '/hopcode')
-    runs-on: ubuntu-latest
+    if: 'startsWith(github.event.comment.body, ''/hopcode'')'
+    runs-on: 'ubuntu-latest'
     permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+      contents: 'write'
+      issues: 'write'
+      pull-requests: 'write'
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: 'Checkout repository'
+        uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v4'
         with:
           node-version: '20'
 
-      - name: Install HopCode CLI
-        run: npm install -g @hoptrendy/hopcode-cli
+      - name: 'Install HopCode CLI'
+        run: 'npm install -g @hoptrendy/hopcode-cli'
 
-      - name: Configure HopCode
+      - name: 'Configure HopCode'
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
         run: |
           hopcode auth openai --key "$OPENAI_API_KEY"
 
-      - name: Extract task from comment
-        id: parse
+      - name: 'Extract task from comment'
+        id: 'parse'
         run: |
           COMMENT="${{ github.event.comment.body }}"
           TASK="${COMMENT#/hopcode}"
           TASK="${TASK#"${TASK%%[![:space:]]*}"}"  # trim leading whitespace
           echo "task=$TASK" >> "$GITHUB_OUTPUT"
 
-      - name: Run HopCode
+      - name: 'Run HopCode'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         run: |
           hopcode github auth --token "$GITHUB_TOKEN"
           echo "${{ steps.parse.outputs.task }}" | hopcode --yolo
 
-      - name: React to comment
+      - name: 'React to comment'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         run: |
           gh api \
             --method POST \

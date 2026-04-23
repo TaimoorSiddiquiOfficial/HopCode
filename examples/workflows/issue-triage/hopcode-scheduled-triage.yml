@@ -7,7 +7,7 @@
 #
 # Schedule: Every Monday at 9:00 AM UTC (adjust cron as needed).
 
-name: HopCode Scheduled Triage
+name: 'HopCode Scheduled Triage'
 
 on:
   schedule:
@@ -16,32 +16,32 @@ on:
 
 jobs:
   scheduled-triage:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
     permissions:
-      issues: write
-      contents: read
+      issues: 'write'
+      contents: 'read'
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: 'Checkout repository'
+        uses: 'actions/checkout@v4'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v4'
         with:
           node-version: '20'
 
-      - name: Install HopCode CLI
-        run: npm install -g @hoptrendy/hopcode-cli
+      - name: 'Install HopCode CLI'
+        run: 'npm install -g @hoptrendy/hopcode-cli'
 
-      - name: Configure HopCode
+      - name: 'Configure HopCode'
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
         run: |
           hopcode auth openai --key "$OPENAI_API_KEY"
 
-      - name: List and triage open issues
+      - name: 'List and triage open issues'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         run: |
           hopcode github auth --token "$GITHUB_TOKEN"
           cat <<'EOF' | hopcode --yolo

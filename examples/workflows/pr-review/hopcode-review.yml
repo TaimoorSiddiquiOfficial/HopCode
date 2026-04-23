@@ -6,45 +6,45 @@
 #   OPENAI_API_KEY  (or any supported provider key)
 #   GITHUB_TOKEN    (automatically provided by GitHub Actions)
 
-name: HopCode PR Review
+name: 'HopCode PR Review'
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review]
+    types: ['opened', 'synchronize', 'ready_for_review']
 
 jobs:
   review:
     # Skip draft PRs
-    if: github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    if: 'github.event.pull_request.draft == false'
+    runs-on: 'ubuntu-latest'
     permissions:
-      pull-requests: write
-      contents: read
+      pull-requests: 'write'
+      contents: 'read'
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: 'Checkout repository'
+        uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v4'
         with:
           node-version: '20'
 
-      - name: Install HopCode CLI
-        run: npm install -g @hoptrendy/hopcode-cli
+      - name: 'Install HopCode CLI'
+        run: 'npm install -g @hoptrendy/hopcode-cli'
 
-      - name: Configure HopCode
+      - name: 'Configure HopCode'
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
         run: |
           hopcode auth openai --key "$OPENAI_API_KEY"
 
-      - name: Review PR with HopCode
+      - name: 'Review PR with HopCode'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          PR_NUMBER: '${{ github.event.pull_request.number }}'
         run: |
           hopcode github auth --token "$GITHUB_TOKEN"
           cat <<'EOF' | hopcode --yolo

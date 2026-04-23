@@ -40,14 +40,14 @@ instruction: |-
   Suddenly the inputs and outputs are no longer separable?
 
   This feels like a bug to me, but I might be missing something?
-author_name: TheMikeMerrill
-author_email: mchlmerrill@gmail.com
-difficulty: hard
-category: debugging
+author_name: 'TheMikeMerrill'
+author_email: 'mchlmerrill@gmail.com'
+difficulty: 'hard'
+category: 'debugging'
 tags:
-  - debugging
-  - swe-bench
-parser_name: pytest
+  - 'debugging'
+  - 'swe-bench'
+parser_name: 'pytest'
 max_agent_timeout_sec: 1000.0
 max_test_timeout_sec: 600.0
 run_tests_in_same_shell: false
