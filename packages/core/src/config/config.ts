@@ -362,7 +362,7 @@ export interface ConfigParameters {
   };
   lspClient?: LspClient;
   userMemory?: string;
-  geminiMdFileCount?: number;
+  contextMdFileCount?: number;
   approvalMode?: ApprovalMode;
   contextFileName?: string | string[];
   accessibility?: AccessibilitySettings;
@@ -621,7 +621,7 @@ export class Config {
   private sessionSubagents: SubagentConfig[];
   private userMemory: string;
   private sdkMode: boolean;
-  private geminiMdFileCount: number;
+  private contextMdFileCount: number;
   private conditionalRulesRegistry: ConditionalRulesRegistry | undefined;
   private readonly contextRuleExcludes: string[];
   private approvalMode: ApprovalMode;
@@ -770,7 +770,7 @@ export class Config {
     this.sessionSubagents = params.sessionSubagents ?? [];
     this.sdkMode = params.sdkMode ?? false;
     this.userMemory = params.userMemory ?? '';
-    this.geminiMdFileCount = params.geminiMdFileCount ?? 0;
+    this.contextMdFileCount = params.contextMdFileCount ?? 0;
     this.contextRuleExcludes = params.contextRuleExcludes ?? [];
     this.approvalMode = params.approvalMode ?? ApprovalMode.DEFAULT;
     this.accessibility = params.accessibility ?? {};
@@ -1842,11 +1842,11 @@ export class Config {
   }
 
   getContextMdFileCount(): number {
-    return this.geminiMdFileCount;
+    return this.contextMdFileCount;
   }
 
   setContextMdFileCount(count: number): void {
-    this.geminiMdFileCount = count;
+    this.contextMdFileCount = count;
   }
 
   getArenaManager(): ArenaManager | null {

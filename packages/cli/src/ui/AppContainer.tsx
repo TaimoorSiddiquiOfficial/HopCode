@@ -59,7 +59,7 @@ import {
 } from '@hoptrendy/hopcode-core';
 import { buildResumedHistoryItems } from './utils/resumeHistoryUtils.js';
 import { validateAuthMethod } from '../config/auth.js';
-import { loadHierarchicalGeminiMemory } from '../config/config.js';
+import { loadHierarchicalContextMemory } from '../config/config.js';
 import process from 'node:process';
 import { useHistory } from './hooks/useHistoryManager.js';
 import { useMemoryMonitor } from './hooks/useMemoryMonitor.js';
@@ -188,8 +188,8 @@ export const AppContainer = (props: AppContainerProps) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [embeddedShellFocused, setEmbeddedShellFocused] = useState(false);
 
-  const [geminiMdFileCount, setContextMdFileCount] = useState<number>(
-    initializationResult.geminiMdFileCount,
+  const [contextMdFileCount, setContextMdFileCount] = useState<number>(
+    initializationResult.contextMdFileCount,
   );
   const [shellModeActive, setShellModeActive] = useState(false);
   const [modelSwitchedFromQuotaError, setModelSwitchedFromQuotaError] =
@@ -720,7 +720,7 @@ export const AppContainer = (props: AppContainerProps) => {
     );
     try {
       const { memoryContent, fileCount, conditionalRules, projectRoot } =
-        await loadHierarchicalGeminiMemory(
+        await loadHierarchicalContextMemory(
           process.cwd(),
           settings.merged.context?.loadFromIncludeDirectories
             ? config.getWorkspaceContext().getDirectories()
@@ -2069,7 +2069,7 @@ export const AppContainer = (props: AppContainerProps) => {
       settingInputRequests,
       pluginChoiceRequests,
       loopDetectionConfirmationRequest,
-      geminiMdFileCount,
+      contextMdFileCount,
       streamingState,
       initError,
       pendingHistoryItems,
@@ -2179,7 +2179,7 @@ export const AppContainer = (props: AppContainerProps) => {
       settingInputRequests,
       pluginChoiceRequests,
       loopDetectionConfirmationRequest,
-      geminiMdFileCount,
+      contextMdFileCount,
       streamingState,
       initError,
       pendingHistoryItems,

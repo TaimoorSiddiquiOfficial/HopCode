@@ -5,7 +5,7 @@
  * high-resolution timestamps at key phases of CLI startup and writes a JSON
  * report to ~/.hopcode/startup-perf/ on finalization.
  *
- * Usage (already wired in index.ts / gemini.tsx):
+ * Usage (already wired in index.ts / interactive.tsx):
  *   initStartupProfiler()        — call once at process start to record T0
  *   profileCheckpoint('name')    — call at each phase boundary
  *   finalizeStartupProfile(id)   — call after last checkpoint to write report

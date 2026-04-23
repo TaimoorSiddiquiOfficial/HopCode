@@ -78,7 +78,7 @@ export async function runAcpAgent(
   argv: CliArgs,
 ) {
   // Initialize config to set up hookSystem (required for SessionStart/SessionEnd hooks)
-  // This is needed because gemini.tsx calls runAcpAgent without calling config.initialize()
+  // This is needed because interactive.tsx calls runAcpAgent without calling config.initialize()
   await config.initialize();
 
   const stdout = Writable.toWeb(process.stdout) as WritableStream;

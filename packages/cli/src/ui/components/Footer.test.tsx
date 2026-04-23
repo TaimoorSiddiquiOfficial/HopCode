@@ -74,7 +74,7 @@ const createMockUIState = (overrides: Partial<UIState> = {}): UIState =>
     },
     currentModel: 'gemini-pro',
     branchName: undefined,
-    geminiMdFileCount: 0,
+    contextMdFileCount: 0,
     contextFileNames: [],
     showToolDescriptions: false,
     ideContextState: undefined,

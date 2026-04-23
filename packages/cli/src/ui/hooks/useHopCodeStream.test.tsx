@@ -180,7 +180,7 @@ describe('useHopCodeStream', () => {
       mcpServers: undefined,
       userAgent: 'test-agent',
       userMemory: '',
-      geminiMdFileCount: 0,
+      contextMdFileCount: 0,
       alwaysSkipModificationConfirmation: false,
       vertexai: false,
       contextFileName: undefined,

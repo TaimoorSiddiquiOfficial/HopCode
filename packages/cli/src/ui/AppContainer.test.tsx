@@ -310,7 +310,7 @@ describe('AppContainer State Management', () => {
       themeError: null,
       authError: null,
       shouldOpenAuthDialog: false,
-      geminiMdFileCount: 0,
+      contextMdFileCount: 0,
     } as InitializationResult;
   });
 

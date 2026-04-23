@@ -104,11 +104,11 @@ vi.mock('./core/initializer.js', () => ({
     authError: null,
     themeError: null,
     shouldOpenAuthDialog: false,
-    geminiMdFileCount: 0,
+    contextMdFileCount: 0,
   }),
 }));
 
-describe('gemini.tsx main function', () => {
+describe('interactive.tsx main function', () => {
   let originalEnvGeminiSandbox: string | undefined;
   let originalEnvSandbox: string | undefined;
   let originalEnvQwenCodeSimple: string | undefined;
@@ -394,7 +394,7 @@ describe('gemini.tsx main function', () => {
       authError: null,
       themeError: null,
       shouldOpenAuthDialog: false,
-      geminiMdFileCount: 0,
+      contextMdFileCount: 0,
     });
     vi.spyOn(startupWarningsModule, 'getStartupWarnings').mockResolvedValue([]);
     vi.spyOn(
@@ -488,7 +488,7 @@ describe('gemini.tsx main function', () => {
   });
 });
 
-describe('gemini.tsx main function kitty protocol', () => {
+describe('interactive.tsx main function kitty protocol', () => {
   let originalEnvNoRelaunch: string | undefined;
   let setRawModeSpy: MockInstance<
     (mode: boolean) => NodeJS.ReadStream & { fd: 0 }
@@ -703,7 +703,7 @@ describe('startInteractiveUI', () => {
       authError: null,
       themeError: null,
       shouldOpenAuthDialog: false,
-      geminiMdFileCount: 0,
+      contextMdFileCount: 0,
     };
 
     await startInteractiveUI(
@@ -737,7 +737,7 @@ describe('startInteractiveUI', () => {
       authError: null,
       themeError: null,
       shouldOpenAuthDialog: false,
-      geminiMdFileCount: 0,
+      contextMdFileCount: 0,
     };
 
     await startInteractiveUI(
@@ -780,7 +780,7 @@ describe('startInteractiveUI', () => {
       authError: null,
       themeError: null,
       shouldOpenAuthDialog: false,
-      geminiMdFileCount: 0,
+      contextMdFileCount: 0,
     };
 
     await startInteractiveUI(

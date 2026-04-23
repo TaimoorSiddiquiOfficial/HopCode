@@ -73,7 +73,7 @@ export interface UIState {
   settingInputRequests: SettingInputRequest[];
   pluginChoiceRequests: PluginChoiceRequest[];
   loopDetectionConfirmationRequest: LoopDetectionConfirmationRequest | null;
-  geminiMdFileCount: number;
+  contextMdFileCount: number;
   streamingState: StreamingState;
   initError: string | null;
   pendingHistoryItems: HistoryItemWithoutId[];
