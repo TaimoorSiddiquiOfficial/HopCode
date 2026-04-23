@@ -6,8 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { showAuthStatus } from './handler.js';
-import { AuthType } from '@hoptrendy/hopcode-core';
-import { CODING_PLAN_ENV_KEY } from '../../constants/codingPlan.js';
+import { AuthType, CODING_PLAN_ENV_KEY } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 
 vi.mock('../../config/settings.js', () => ({

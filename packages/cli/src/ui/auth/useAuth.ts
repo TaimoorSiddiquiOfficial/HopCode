@@ -15,6 +15,10 @@ import {
   AuthType,
   getErrorMessage,
   logAuth,
+  getCodingPlanConfig,
+  isCodingPlanConfig,
+  CodingPlanRegion,
+  CODING_PLAN_ENV_KEY,
 } from '@hoptrendy/hopcode-core';
 import { useCallback, useEffect, useState } from 'react';
 import type { LoadedSettings } from '../../config/settings.js';
@@ -29,12 +33,6 @@ import { useHopCodeAuth } from '../hooks/useHopCodeAuth.js';
 import { AuthState, MessageType } from '../types.js';
 import type { HistoryItem } from '../types.js';
 import { t } from '../../i18n/index.js';
-import {
-  getCodingPlanConfig,
-  isCodingPlanConfig,
-  CodingPlanRegion,
-  CODING_PLAN_ENV_KEY,
-} from '../../constants/codingPlan.js';
 import { backupSettingsFile } from '../../utils/settingsUtils.js';
 import {
   ALIBABA_STANDARD_API_KEY_ENDPOINTS,

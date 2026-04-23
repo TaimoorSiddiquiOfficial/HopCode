@@ -158,6 +158,45 @@
         }
       ]
     },
+    "configuration": {
+      "title": "Qwen Code",
+      "properties": {
+        "qwen-code.provider": {
+          "order": 0,
+          "type": "string",
+          "enum": [
+            "coding-plan",
+            "api-key"
+          ],
+          "enumDescriptions": [
+            "Alibaba Cloud Coding Plan — configurable from VS Code Settings",
+            "Configured via Qwen Code: Auth or the onboarding button"
+          ],
+          "default": "coding-plan",
+          "markdownDescription": "**Coding Plan**: enter API Key + Region here to sync `~/.qwen/settings.json`.\n\n**API Key**: use **Qwen Code: Auth** or the onboarding button to configure ModelStudio or custom OpenAI-compatible providers."
+        },
+        "qwen-code.apiKey": {
+          "order": 1,
+          "type": "string",
+          "default": "",
+          "markdownDescription": "API key used for **Coding Plan** settings sync. For **API Key** providers, configure the full provider details through **Qwen Code: Auth**."
+        },
+        "qwen-code.codingPlanRegion": {
+          "order": 2,
+          "type": "string",
+          "enum": [
+            "china",
+            "global"
+          ],
+          "enumDescriptions": [
+            "China — 阿里云百炼 (aliyun.com)",
+            "Global — Alibaba Cloud (alibabacloud.com)"
+          ],
+          "default": "china",
+          "markdownDescription": "Region for Coding Plan. _(Only used when Provider is `coding-plan`)_"
+        }
+      }
+    },
     "keybindings": [
       {
         "command": "hopcode.diff.accept",

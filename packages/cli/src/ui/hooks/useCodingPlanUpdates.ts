@@ -6,15 +6,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Config, ModelProvidersConfig } from '@hoptrendy/hopcode-core';
-import { AuthType } from '@hoptrendy/hopcode-core';
-import type { LoadedSettings } from '../../config/settings.js';
-import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import {
+  AuthType,
   isCodingPlanConfig,
   getCodingPlanConfig,
   CodingPlanRegion,
   CODING_PLAN_ENV_KEY,
-} from '../../constants/codingPlan.js';
+} from '@hoptrendy/hopcode-core';
+import type { LoadedSettings } from '../../config/settings.js';
+import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import { t } from '../../i18n/index.js';
 
 export interface CodingPlanUpdateRequest {

@@ -19,7 +19,7 @@ export const runHopCodeCommand = 'hopcode.runHopCode';
 export const showDiffCommand = 'HopCode.showDiff';
 export const openChatCommand = 'hopcode.openChat';
 export const openNewChatTabCommand = 'HopCode.openNewChatTab';
-export const loginCommand = 'hopcode.login';
+export const authCommand = 'hopcode.auth';
 export const focusChatCommand = 'hopcode.focusChat';
 export const newConversationCommand = 'hopcode.newConversation';
 export const showLogsCommand = 'hopcode.showLogs';
@@ -101,15 +101,15 @@ export function registerNewCommands(
   );
 
   disposables.push(
-    vscode.commands.registerCommand(loginCommand, async () => {
+    vscode.commands.registerCommand(authCommand, async () => {
       const providers = getWebViewProviders();
-      if (providers.length > 0) {
-        await providers[providers.length - 1].forceReLogin();
-      } else {
-        vscode.window.showInformationMessage(
-          'Please open HopCode chat first before logging in.',
-        );
-      }
+      const provider =
+        providers.length > 0
+          ? providers[providers.length - 1]
+          : createWebViewProvider();
+
+      await provider.show();
+      await provider.startInteractiveAuth();
     }),
   );
 

@@ -11,8 +11,8 @@ import {
   CODING_PLAN_ENV_KEY,
   getCodingPlanConfig,
   CodingPlanRegion,
-} from '../../constants/codingPlan.js';
-import { AuthType } from '@hoptrendy/hopcode-core';
+  AuthType,
+} from '@hoptrendy/hopcode-core';
 
 // Get region configs for testing
 const chinaConfig = getCodingPlanConfig(CodingPlanRegion.CHINA);

@@ -49,7 +49,7 @@ export enum StreamEventType {
 
 export type StreamEvent =
   | { type: StreamEventType.CHUNK; value: GenerateContentResponse }
-  | { type: StreamEventType.RETRY; retryInfo?: RetryInfo };
+  | { type: StreamEventType.RETRY; retryInfo?: RetryInfo; isContinuation?: boolean };
 
 /**
  * Options for retrying due to invalid content from the model.

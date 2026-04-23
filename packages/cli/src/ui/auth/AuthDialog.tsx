@@ -6,7 +6,11 @@
 
 import type React from 'react';
 import { useState } from 'react';
-import { AuthType } from '@hoptrendy/hopcode-core';
+import {
+  AuthType,
+  CodingPlanRegion,
+  isCodingPlanConfig,
+} from '@hoptrendy/hopcode-core';
 import { Box, Text } from 'ink';
 import Link from 'ink-link';
 import { theme } from '../semantic-colors.js';
@@ -18,10 +22,6 @@ import { useUIState } from '../contexts/UIStateContext.js';
 import { useUIActions } from '../contexts/UIActionsContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { t } from '../../i18n/index.js';
-import {
-  CodingPlanRegion,
-  isCodingPlanConfig,
-} from '../../constants/codingPlan.js';
 import {
   ALIBABA_STANDARD_API_KEY_ENDPOINTS,
   type AlibabaStandardRegion,
