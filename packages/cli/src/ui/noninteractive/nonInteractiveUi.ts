@@ -28,7 +28,7 @@ export function createNonInteractiveUI(): CommandContext['ui'] {
     setAwayRecapItem: (_item) => {},
     isIdleRef: { current: true },
     toggleVimEnabled: async () => false,
-    setGeminiMdFileCount: (_count) => {},
+    setContextMdFileCount: (_count) => {},
     reloadCommands: () => {},
     extensionsUpdateState: new Map(),
     dispatchExtensionStateUpdate: (_action: ExtensionUpdateAction) => {},

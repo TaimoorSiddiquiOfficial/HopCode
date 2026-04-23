@@ -1190,7 +1190,7 @@ export class Config {
     } else {
       this.setUserMemory(memoryContent);
     }
-    this.setGeminiMdFileCount(fileCount);
+    this.setContextMdFileCount(fileCount);
     this.conditionalRulesRegistry = new ConditionalRulesRegistry(
       conditionalRules,
       projectRoot,
@@ -1841,11 +1841,11 @@ export class Config {
     this.userMemory = newUserMemory;
   }
 
-  getGeminiMdFileCount(): number {
+  getContextMdFileCount(): number {
     return this.geminiMdFileCount;
   }
 
-  setGeminiMdFileCount(count: number): void {
+  setContextMdFileCount(count: number): void {
     this.geminiMdFileCount = count;
   }
 

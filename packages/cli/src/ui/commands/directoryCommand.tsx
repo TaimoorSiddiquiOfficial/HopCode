@@ -167,11 +167,11 @@ export const directoryCommand: SlashCommand = {
                 config.getContextRuleExcludes(),
               );
             config.setUserMemory(memoryContent);
-            config.setGeminiMdFileCount(fileCount);
+            config.setContextMdFileCount(fileCount);
             config.setConditionalRulesRegistry(
               new ConditionalRulesRegistry(conditionalRules, projectRoot),
             );
-            context.ui.setGeminiMdFileCount(fileCount);
+            context.ui.setContextMdFileCount(fileCount);
           }
           addItem(
             {

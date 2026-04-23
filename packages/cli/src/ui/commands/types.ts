@@ -89,7 +89,7 @@ export interface CommandContext {
      */
     loadHistory: UseHistoryManagerReturn['loadHistory'];
     toggleVimEnabled: () => Promise<boolean>;
-    setGeminiMdFileCount: (count: number) => void;
+    setContextMdFileCount: (count: number) => void;
     reloadCommands: () => void;
     extensionsUpdateState: Map<string, ExtensionUpdateStatus>;
     dispatchExtensionStateUpdate: (action: ExtensionUpdateAction) => void;

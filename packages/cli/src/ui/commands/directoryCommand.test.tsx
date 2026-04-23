@@ -47,7 +47,7 @@ describe('directoryCommand', () => {
       getExtensionContextFilePaths: () => [],
       getFileFilteringOptions: () => ({ ignore: [], include: [] }),
       setUserMemory: vi.fn(),
-      setGeminiMdFileCount: vi.fn(),
+      setContextMdFileCount: vi.fn(),
     } as unknown as Config;
 
     mockContext = {

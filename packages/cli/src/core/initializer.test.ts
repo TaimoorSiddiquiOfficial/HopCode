@@ -42,7 +42,7 @@ describe('initializeApp', () => {
   let mockConfig: {
     getModelsConfig: ReturnType<typeof vi.fn>;
     getIdeMode: ReturnType<typeof vi.fn>;
-    getGeminiMdFileCount: ReturnType<typeof vi.fn>;
+    getContextMdFileCount: ReturnType<typeof vi.fn>;
   };
   let mockSettings: {
     merged: Record<string, unknown>;
@@ -58,7 +58,7 @@ describe('initializeApp', () => {
         wasAuthTypeExplicitlyProvided: vi.fn().mockReturnValue(false),
       }),
       getIdeMode: vi.fn().mockReturnValue(false),
-      getGeminiMdFileCount: vi.fn().mockReturnValue(0),
+      getContextMdFileCount: vi.fn().mockReturnValue(0),
     };
 
     mockSettings = {

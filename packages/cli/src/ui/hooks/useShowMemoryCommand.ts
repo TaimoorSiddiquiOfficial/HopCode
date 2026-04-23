@@ -30,7 +30,7 @@ export function createShowMemoryAction(
     debugLogger.debug('[DEBUG] Show Memory command invoked.');
 
     const currentMemory = config.getUserMemory();
-    const fileCount = config.getGeminiMdFileCount();
+    const fileCount = config.getContextMdFileCount();
     const contextFileName = settings.merged.context?.fileName;
     const contextFileNames = Array.isArray(contextFileName)
       ? contextFileName

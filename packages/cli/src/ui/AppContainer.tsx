@@ -188,7 +188,7 @@ export const AppContainer = (props: AppContainerProps) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [embeddedShellFocused, setEmbeddedShellFocused] = useState(false);
 
-  const [geminiMdFileCount, setGeminiMdFileCount] = useState<number>(
+  const [geminiMdFileCount, setContextMdFileCount] = useState<number>(
     initializationResult.geminiMdFileCount,
   );
   const [shellModeActive, setShellModeActive] = useState(false);
@@ -679,7 +679,7 @@ export const AppContainer = (props: AppContainerProps) => {
     isProcessing,
     setIsProcessing,
     isIdleRef,
-    setGeminiMdFileCount,
+    setContextMdFileCount,
     slashCommandActions,
     extensionsUpdateStateInternal,
     isConfigInitialized,
@@ -733,11 +733,11 @@ export const AppContainer = (props: AppContainerProps) => {
         );
 
       config.setUserMemory(memoryContent);
-      config.setGeminiMdFileCount(fileCount);
+      config.setContextMdFileCount(fileCount);
       config.setConditionalRulesRegistry(
         new ConditionalRulesRegistry(conditionalRules, projectRoot),
       );
-      setGeminiMdFileCount(fileCount);
+      setContextMdFileCount(fileCount);
 
       historyManager.addItem(
         {

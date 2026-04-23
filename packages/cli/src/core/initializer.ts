@@ -61,6 +61,6 @@ export async function initializeApp(
     authError,
     themeError,
     shouldOpenAuthDialog,
-    geminiMdFileCount: config.getGeminiMdFileCount(),
+    geminiMdFileCount: config.getContextMdFileCount(),
   };
 }
