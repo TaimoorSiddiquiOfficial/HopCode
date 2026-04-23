@@ -2,6 +2,14 @@
 .env
 .env~
 
+# GitHub App private keys (CRITICAL: Never commit these)
+*.pem
+*.key
+**/*.pem
+**/*.key
+.github/*.pem
+.github/*.key
+
 # gemini-cli settings
 # We want to keep the .gemini in the root of the repo and ignore any .gemini
 # in subdirectories. In our root .gemini we want to allow for version control

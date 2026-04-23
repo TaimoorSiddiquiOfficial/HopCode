@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "GitHub Settings Schema",
+  "description": "Configuration for GitHub App integration in HopCode",
+  "properties": {
+    "github": {
+      "type": "object",
+      "title": "GitHub Configuration",
+      "description": "GitHub App authentication and MCP server settings",
+      "properties": {
+        "appId": {
+          "type": "string",
+          "title": "GitHub App ID",
+          "description": "Your GitHub Application ID (e.g., 3424564)",
+          "examples": ["3424564"]
+        },
+        "clientId": {
+          "type": "string",
+          "title": "GitHub Client ID",
+          "description": "Your GitHub App Client ID (e.g., Iv23livRiRBTa9cyBnk1)",
+          "examples": ["Iv23livRiRBTa9cyBnk1"]
+        },
+        "clientSecret": {
+          "type": "string",
+          "title": "GitHub Client Secret",
+          "description": "Your GitHub App Client Secret",
+          "sensitive": true
+        },
+        "privateKey": {
+          "type": "string",
+          "title": "GitHub App Private Key",
+          "description": "Private key in PEM format",
+          "sensitive": true,
+          "examples": ["-----BEGIN RSA PRIVATE KEY-----\n..."]
+        },
+        "webhookSecret": {
+          "type": "string",
+          "title": "Webhook Secret",
+          "description": "Secret for verifying GitHub webhooks",
+          "sensitive": true
+        },
+        "hostname": {
+          "type": "string",
+          "title": "GitHub Hostname",
+          "description": "GitHub hostname (github.com or GitHub Enterprise)",
+          "default": "github.com",
+          "examples": ["github.com", "github.yourcompany.com"]
+        },
+        "installationId": {
+          "type": "string",
+          "title": "Installation ID",
+          "description": "GitHub App installation ID (auto-detected if not provided)"
+        }
+      },
+      "required": ["appId", "privateKey"]
+    },
+    "mcpServers": {
+      "type": "object",
+      "title": "MCP Servers",
+      "properties": {
+        "github": {
+          "type": "object",
+          "title": "GitHub MCP Server",
+          "properties": {
+            "httpUrl": {
+              "type": "string",
+              "title": "MCP Server URL",
+              "description": "GitHub MCP server endpoint",
+              "default": "https://api.githubcopilot.com/mcp/",
+              "format": "uri"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "Server description"
+            },
+            "oauth": {
+              "type": "object",
+              "title": "OAuth Configuration",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "provider": {
+                  "type": "string",
+                  "enum": ["github-app", "github-oauth"],
+                  "default": "github-app"
+                },
+                "clientId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
