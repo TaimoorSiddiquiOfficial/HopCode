@@ -77,7 +77,7 @@ import { getErrorMessage } from '../utils/errors.js';
 import { checkNextSpeaker } from '../utils/nextSpeakerChecker.js';
 import { flatMapTextParts } from '../utils/partUtils.js';
 import { promptIdContext } from '../utils/promptIdContext.js';
-import { retryWithBackoff } from '../utils/retry.js';
+import { retryWithBackoff, isUnattendedMode } from '../utils/retry.js';
 
 // Hook types and utilities
 import {
@@ -1194,6 +1194,13 @@ export class HopCodeClient {
       };
       const result = await retryWithBackoff(apiCall, {
         authType: this.config.getContentGeneratorConfig()?.authType,
+        persistentMode: isUnattendedMode(),
+        signal: abortSignal,
+        heartbeatFn: (info) => {
+          process.stderr.write(
+            `[qwen-code] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
+          );
+        },
       });
       return result;
     } catch (error: unknown) {

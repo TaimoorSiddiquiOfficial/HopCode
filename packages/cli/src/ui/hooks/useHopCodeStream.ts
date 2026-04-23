@@ -1966,6 +1966,9 @@ export const useHopCodeStream = (
     }
   }, [streamingState, submitQuery, notificationTrigger, addItem]);
 
+  const streamingResponseLengthRef = useRef(0);
+  const isReceivingContent = streamingState !== StreamingState.Idle;
+
   return {
     streamingState,
     submitQuery,
@@ -1978,5 +1981,7 @@ export const useHopCodeStream = (
     handleApprovalModeChange,
     activePtyId,
     loopDetectionConfirmationRequest,
+    streamingResponseLengthRef,
+    isReceivingContent,
   };
 };
