@@ -43,6 +43,7 @@ import { skillsCommand } from '../commands/skills.js';
 import { profileCommand } from '../commands/profile/index.js';
 import { dashboardCommand } from '../commands/dashboard.js';
 import { serveCommand } from '../commands/serve.js';
+import { learnCommand } from '../commands/learn.js';
 import {
   resolveCliGenerationConfig,
   getAuthTypeFromEnv,
@@ -650,7 +651,9 @@ export async function parseArguments(): Promise<CliArgs> {
     // Register web dashboard command
     .command(dashboardCommand)
     // Register headless HTTP API server command
-    .command(serveCommand);
+    .command(serveCommand)
+    // Register learning loop command
+    .command(learnCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json
