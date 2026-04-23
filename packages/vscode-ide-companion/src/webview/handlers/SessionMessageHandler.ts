@@ -83,7 +83,9 @@ export class SessionMessageHandler extends BaseMessageHandler {
         break;
 
       case 'switchQwenSession':
-        await this.handleSwitchHopCodeSession((data?.sessionId as string) || '');
+        await this.handleSwitchHopCodeSession(
+          (data?.sessionId as string) || '',
+        );
         break;
 
       case 'getQwenSessions':
@@ -1091,7 +1093,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         });
         return;
       }
-      // Matches SESSION_TITLE_MAX_LENGTH from @qwen-code/qwen-code-core/sessionService
+      // Matches SESSION_TITLE_MAX_LENGTH from @hoptrendy/hopcode-core/sessionService
       if (trimmedTitle.length > 200) {
         this.sendToWebView({
           type: 'error',

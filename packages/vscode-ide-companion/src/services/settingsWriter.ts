@@ -15,7 +15,7 @@ import {
   CodingPlanRegion,
   CODING_PLAN_ENV_KEY,
   getCodingPlanConfig,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 
 // ---------------------------------------------------------------------------
 // Types
