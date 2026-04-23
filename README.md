@@ -34,8 +34,24 @@ HopCode is an open-source AI agent for the terminal that works with **any LLM pr
 - **Agentic workflow, feature-rich**: built-in tools for file editing, shell execution, web search, sub-agents, and full agentic loops — a Claude Code-like experience.
 - **VS Code extension**: companion extension available on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion) for in-editor AI assistance.
 - **Terminal-first, IDE-friendly**: built for developers who live in the command line, with optional integration for VS Code, Zed, and JetBrains IDEs.
+- **🏟️ Arena mode** _(unique)_: run multiple AI models in parallel on the same task and compare outputs side-by-side. No other terminal agent has this.
+- **📊 Per-subagent `/stats`**: track token usage, latency, and cost broken down by subagent — see exactly what each agent spent.
+- **💬 Enterprise channels**: WeChat and DingTalk integration for teams using Chinese enterprise platforms.
 
 ![HopCode CLI Screenshot](./docs/hopcodecli.png)
+
+## 🏟️ Arena Mode — Unique to HopCode
+
+Run **multiple AI models simultaneously** on the same prompt and compare their responses side-by-side. Use Arena mode to find the best model for any task without switching context.
+
+```bash
+# Start Arena mode with 3 models competing
+hopcode --arena gpt-4o,claude-sonnet-4-5,deepseek-r1 "Refactor this function for readability"
+```
+
+Arena mode spawns parallel subagents — each using a different model — and streams their responses in synchronized columns. Use `/stats` to see per-subagent token usage and latency breakdown.
+
+> No competitor (Hermes Agent, OpenClaude, Claude Code, Cursor) offers multi-model parallel competition. This is HopCode's defining feature.
 
 ## Installation
 
@@ -584,6 +600,23 @@ The most commonly used top-level fields in `settings.json`:
 | `env`                        | Fallback environment variables (e.g. API keys). Lower priority than shell `export` and `.env` files. |
 | `security.auth.selectedType` | The protocol to use on startup (e.g. `openai`).                                                      |
 | `model.name`                 | The default model to use when HopCode starts.                                                        |
+| `agentModels`                | Per-subagent model overrides — route specific subagents to different models.                         |
+
+#### Per-Agent Model Routing
+
+Use `agentModels` in `settings.json` to route specific subagents to different models. This lets you use a fast/cheap model for simple subagents and a powerful model for complex ones:
+
+```json
+{
+  "agentModels": {
+    "test-engineer": "gpt-4o-mini",
+    "code-review": "claude-opus-4",
+    "main": "claude-sonnet-4-5"
+  }
+}
+```
+
+The key is the subagent name (as defined in its config), and the value is any model ID configured in `modelProviders`. The `"main"` key sets the model for the primary conversation agent.
 
 > See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://hopcode.dev/docs/en/users/configuration/settings/) for all available options.
 
