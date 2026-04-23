@@ -6,6 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { OpenAIContentConverter } from './converter.js';
+import { StreamingToolCallParser } from './streamingToolCallParser.js';
 import {
   Type,
   FinishReason,
@@ -31,29 +32,169 @@ describe('OpenAIContentConverter', () => {
   });
 
   describe('createStreamContext', () => {
-    it('should return a context with an independent StreamingToolCallParser', () => {
+    it('returns a fresh context with its own StreamingToolCallParser', () => {
       const ctx1 = converter.createStreamContext();
       const ctx2 = converter.createStreamContext();
 
-      // Each context has its own parser
-      ctx1.toolCallParser.addChunk(0, '{"arg": "value"}', 'id-1', 'fn-1');
-      ctx2.toolCallParser.addChunk(0, '{"other": "data"}', 'id-2', 'fn-2');
-
-      // Writes to ctx1 do not leak into ctx2
-      expect(ctx2.toolCallParser.getBuffer(0)).toBe('{"other": "data"}');
-      expect(ctx1.toolCallParser.getBuffer(0)).toBe('{"arg": "value"}');
-    });
-
-    it('should return a fresh context each call (distinct instances)', () => {
-      const ctx1 = converter.createStreamContext();
-      const ctx2 = converter.createStreamContext();
-      expect(ctx1).not.toBe(ctx2);
+      expect(ctx1.toolCallParser).toBeInstanceOf(StreamingToolCallParser);
+      expect(ctx2.toolCallParser).toBeInstanceOf(StreamingToolCallParser);
       expect(ctx1.toolCallParser).not.toBe(ctx2.toolCallParser);
     });
 
-    it('should start with an empty parser state', () => {
-      const ctx = converter.createStreamContext();
-      expect(ctx.toolCallParser.getBuffer(0)).toBe('');
+    it('isolates two contexts so writes to one do not leak into the other', () => {
+      // Regression for issue #3516: previously the parser lived on the
+      // Converter as an instance field, so two concurrent streams sharing
+      // the same Config.contentGenerator would overwrite each other's
+      // tool-call buffers. Per-stream contexts eliminate that contention.
+      const ctx1 = converter.createStreamContext();
+      const ctx2 = converter.createStreamContext();
+
+      ctx1.toolCallParser.addChunk(0, '{"a":1}', 'call_A', 'fn_A');
+      ctx2.toolCallParser.addChunk(0, '{"b":2}', 'call_B', 'fn_B');
+
+      expect(ctx1.toolCallParser.getBuffer(0)).toBe('{"a":1}');
+      expect(ctx2.toolCallParser.getBuffer(0)).toBe('{"b":2}');
+      expect(ctx1.toolCallParser.getToolCallMeta(0).id).toBe('call_A');
+      expect(ctx2.toolCallParser.getToolCallMeta(0).id).toBe('call_B');
+    });
+
+    it('demuxes interleaved chunks from two concurrent streams correctly (#3516)', () => {
+      // Real-world shape: two subagents share one Config (hence one
+      // Converter). Their OpenAI streams run concurrently; chunks arrive
+      // interleaved at the event loop. Under the pre-fix architecture
+      // this corrupted both tool calls; under per-stream contexts each
+      // stream's chunks stay in their own parser and close cleanly.
+      const streamA = converter.createStreamContext();
+      const streamB = converter.createStreamContext();
+
+      const openerA = {
+        object: 'chat.completion.chunk',
+        id: 'A-open',
+        created: 1,
+        model: 'test',
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call_A',
+                  type: 'function' as const,
+                  function: {
+                    name: 'read_file',
+                    arguments: '{"file_path":"/a',
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+            logprobs: null,
+          },
+        ],
+      } as unknown as OpenAI.Chat.ChatCompletionChunk;
+
+      const openerB = {
+        ...openerA,
+        id: 'B-open',
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call_B',
+                  type: 'function' as const,
+                  function: {
+                    name: 'read_file',
+                    arguments: '{"file_path":"/b',
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+            logprobs: null,
+          },
+        ],
+      } as unknown as OpenAI.Chat.ChatCompletionChunk;
+
+      const contA = {
+        ...openerA,
+        id: 'A-cont',
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [{ index: 0, function: { arguments: '/x.ts"}' } }],
+            },
+            finish_reason: null,
+            logprobs: null,
+          },
+        ],
+      } as unknown as OpenAI.Chat.ChatCompletionChunk;
+
+      const contB = {
+        ...openerB,
+        id: 'B-cont',
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [{ index: 0, function: { arguments: '/y.ts"}' } }],
+            },
+            finish_reason: null,
+            logprobs: null,
+          },
+        ],
+      } as unknown as OpenAI.Chat.ChatCompletionChunk;
+
+      const finisher = (id: string) =>
+        ({
+          object: 'chat.completion.chunk',
+          id,
+          created: 2,
+          model: 'test',
+          choices: [
+            {
+              index: 0,
+              delta: {},
+              finish_reason: 'tool_calls',
+              logprobs: null,
+            },
+          ],
+        }) as unknown as OpenAI.Chat.ChatCompletionChunk;
+
+      // Interleave the two streams. Pre-fix this produced corrupt JSON
+      // because every chunk fed the same shared parser.
+      converter.convertOpenAIChunkToGemini(openerA, streamA);
+      converter.convertOpenAIChunkToGemini(openerB, streamB);
+      converter.convertOpenAIChunkToGemini(contA, streamA);
+      converter.convertOpenAIChunkToGemini(contB, streamB);
+
+      const resultA = converter.convertOpenAIChunkToGemini(
+        finisher('A-finish'),
+        streamA,
+      );
+      const resultB = converter.convertOpenAIChunkToGemini(
+        finisher('B-finish'),
+        streamB,
+      );
+
+      const fnA = resultA.candidates?.[0]?.content?.parts?.find(
+        (p: Part) => p.functionCall,
+      )?.functionCall;
+      const fnB = resultB.candidates?.[0]?.content?.parts?.find(
+        (p: Part) => p.functionCall,
+      )?.functionCall;
+
+      expect(fnA?.name).toBe('read_file');
+      expect(fnA?.args).toEqual({ file_path: '/a/x.ts' });
+      expect(fnA?.id).toBe('call_A');
+
+      expect(fnB?.name).toBe('read_file');
+      expect(fnB?.args).toEqual({ file_path: '/b/y.ts' });
+      expect(fnB?.id).toBe('call_B');
     });
   });
 

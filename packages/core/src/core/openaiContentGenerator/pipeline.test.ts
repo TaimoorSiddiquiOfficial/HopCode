@@ -12,6 +12,7 @@ import { GenerateContentResponse, Type, FinishReason } from '@google/genai';
 import type { PipelineConfig } from './pipeline.js';
 import { ContentGenerationPipeline, StreamContentError } from './pipeline.js';
 import { OpenAIContentConverter } from './converter.js';
+import { StreamingToolCallParser } from './streamingToolCallParser.js';
 import type { Config } from '../../config/config.js';
 import type { ContentGeneratorConfig, AuthType } from '../contentGenerator.js';
 import type { OpenAICompatibleProvider } from './provider/index.js';
@@ -44,7 +45,8 @@ describe('ContentGenerationPipeline', () => {
       },
     } as unknown as OpenAI;
 
-    // Mock converter
+    // Mock converter. `createStreamContext` returns a fresh parser each
+    // stream; tests that don't care about tool-call buffers just ignore it.
     mockConverter = {
       setModel: vi.fn(),
       setModalities: vi.fn(),
@@ -52,7 +54,9 @@ describe('ContentGenerationPipeline', () => {
       convertOpenAIResponseToGemini: vi.fn(),
       convertOpenAIChunkToGemini: vi.fn(),
       convertGeminiToolsToOpenAI: vi.fn(),
-      createStreamContext: vi.fn().mockReturnValue({ toolCallParser: {} }),
+      createStreamContext: vi.fn(() => ({
+        toolCallParser: new StreamingToolCallParser(),
+      })),
     } as unknown as OpenAIContentConverter;
 
     // Mock provider
@@ -607,6 +611,8 @@ describe('ContentGenerationPipeline', () => {
       expect(results).toHaveLength(2);
       expect(results[0]).toBe(mockGeminiResponse1);
       expect(results[1]).toBe(mockGeminiResponse2);
+      // Parser is now created per-stream via createStreamContext — assert
+      // that the pipeline asked for a fresh one at stream entry.
       expect(mockConverter.createStreamContext).toHaveBeenCalled();
       expect(mockClient.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({

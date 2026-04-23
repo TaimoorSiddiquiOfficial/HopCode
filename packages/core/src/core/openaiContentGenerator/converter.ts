@@ -979,7 +979,7 @@ export class OpenAIContentConverter {
         }
       }
 
-      // Handle tool calls using the streaming parser
+      // Handle tool calls using the stream-local parser
       if (choice.delta?.tool_calls) {
         for (const toolCall of choice.delta.tool_calls) {
           const index = toolCall.index ?? 0;
