@@ -5,11 +5,11 @@
  */
 
 import type { Content } from '@google/genai';
-import type { Config } from '@qwen-code/qwen-code-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   getResponseText,
   SESSION_TITLE_MAX_LENGTH,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { SlashCommand, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';
@@ -45,7 +45,7 @@ async function generateSessionTitle(
   signal?: AbortSignal,
 ): Promise<string | null> {
   try {
-    const history = config.getGeminiClient().getHistory(true);
+    const history = config.getHopCodeClient().getHistory(true);
     const conversationText = extractConversationText(history);
     if (!conversationText) {
       return null;

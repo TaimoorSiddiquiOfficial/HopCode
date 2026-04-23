@@ -13,7 +13,7 @@ import type {
   ModelMetricsCore,
   SessionMetrics,
 } from '../contexts/SessionContext.js';
-import { MAIN_SOURCE } from '@qwen-code/qwen-code-core';
+import { MAIN_SOURCE } from '@hoptrendy/hopcode-core';
 
 // Wraps a core metrics object as a ModelMetrics with a single `main` source
 // bucket, matching the shape produced by processing an API call with no

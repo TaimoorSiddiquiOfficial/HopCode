@@ -90,9 +90,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
     ({ metrics }) => metrics.tokens.thoughts > 0,
   );
   const hasTool = entries.some(({ metrics }) => metrics.tokens.tool > 0);
-  const hasCached = entries.some(
-    ({ metrics }) => metrics.tokens.cached > 0,
-  );
+  const hasCached = entries.some(({ metrics }) => metrics.tokens.cached > 0);
 
   return (
     <Box

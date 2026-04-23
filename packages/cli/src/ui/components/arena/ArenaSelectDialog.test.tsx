@@ -11,7 +11,7 @@ import {
   ArenaSessionStatus,
   type ArenaManager,
   type Config,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { ArenaSelectDialog } from './ArenaSelectDialog.js';
 
