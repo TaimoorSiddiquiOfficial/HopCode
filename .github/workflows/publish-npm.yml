@@ -214,6 +214,8 @@ jobs:
               echo "⏭️ Open VSX: v${version} already published, skipping"
             elif echo "$output" | grep -qiE "(unknown publisher|create-namespace|namespace)"; then
               echo "⚠️ Open VSX: publisher namespace not registered. Visit https://open-vsx.org to create the 'hopcode' namespace, then re-run."
+            elif echo "$output" | grep -qiE "(publisher agreement|eclipse foundation|sign.*agreement)"; then
+              echo "⚠️ Open VSX: Publisher Agreement not signed. Visit https://open-vsx.org to sign the Eclipse Foundation Publisher Agreement."
             else
               echo "$output" >&2; exit 1
             fi
