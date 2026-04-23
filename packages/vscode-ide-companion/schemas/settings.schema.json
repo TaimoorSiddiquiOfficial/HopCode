@@ -418,7 +418,7 @@
               "type": "boolean",
               "default": true
             },
-            "respectQwenIgnore": {
+            "respectHopCodeIgnore": {
               "description": "Respect .hopcodeignore files when searching",
               "type": "boolean",
               "default": true

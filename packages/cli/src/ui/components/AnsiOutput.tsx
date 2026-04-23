@@ -7,7 +7,7 @@
 import type React from 'react';
 import { Box, Text } from 'ink';
 import type { AnsiLine, AnsiOutput, AnsiToken } from '@hoptrendy/hopcode-core';
-import { formatDuration, formatMemoryUsage } from '../utils/formatters.js';
+import { formatMemoryUsage } from '../utils/formatters.js';
 import { theme } from '../semantic-colors.js';
 import { MaxSizedBox } from './shared/MaxSizedBox.js';
 
@@ -58,22 +58,17 @@ export const AnsiOutputText: React.FC<AnsiOutputProps> = ({
 export interface ShellStatsBarProps {
   totalLines?: number;
   totalBytes?: number;
-  timeoutMs?: number;
   displayHeight?: number;
 }
 
 export const ShellStatsBar: React.FC<ShellStatsBarProps> = ({
   totalLines,
   totalBytes,
-  timeoutMs,
   displayHeight = DEFAULT_HEIGHT,
 }) => {
   const parts: string[] = [];
   if (totalLines && totalLines > displayHeight) {
     parts.push(`+${totalLines - displayHeight} lines`);
-  }
-  if (timeoutMs) {
-    parts.push(`timeout ${formatDuration(timeoutMs)}`);
   }
   if (totalBytes && totalBytes > 0) {
     parts.push(formatMemoryUsage(totalBytes));

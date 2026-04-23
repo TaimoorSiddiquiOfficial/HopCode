@@ -52,7 +52,7 @@ describe('ContentGenerationPipeline', () => {
       convertOpenAIResponseToGemini: vi.fn(),
       convertOpenAIChunkToGemini: vi.fn(),
       convertGeminiToolsToOpenAI: vi.fn(),
-      resetStreamingToolCalls: vi.fn(),
+      createStreamContext: vi.fn().mockReturnValue({ toolCallParser: {} }),
     } as unknown as OpenAIContentConverter;
 
     // Mock provider
@@ -205,7 +205,7 @@ describe('ContentGenerationPipeline', () => {
       // Act
       const result = await pipeline.execute(request, userPromptId);
 
-      // Assert — request.model takes precedence over contentGeneratorConfig.model
+      // Assert ï¿½ request.model takes precedence over contentGeneratorConfig.model
       expect(result).toBe(mockGeminiResponse);
       expect(
         (mockConverter as unknown as { setModel: Mock }).setModel,
@@ -219,7 +219,7 @@ describe('ContentGenerationPipeline', () => {
     });
 
     it('should fall back to configured model when request.model is empty', async () => {
-      // Arrange — empty model string is falsy, should fall back to contentGeneratorConfig.model
+      // Arrange ï¿½ empty model string is falsy, should fall back to contentGeneratorConfig.model
       const request: GenerateContentParameters = {
         model: '',
         contents: [{ parts: [{ text: 'Hello' }], role: 'user' }],
@@ -252,7 +252,7 @@ describe('ContentGenerationPipeline', () => {
       // Act
       const result = await pipeline.execute(request, userPromptId);
 
-      // Assert — falls back to contentGeneratorConfig.model
+      // Assert ï¿½ falls back to contentGeneratorConfig.model
       expect(result).toBe(mockGeminiResponse);
       expect(
         (mockConverter as unknown as { setModel: Mock }).setModel,
@@ -335,7 +335,7 @@ describe('ContentGenerationPipeline', () => {
     });
 
     it('should skip empty tools array in request', async () => {
-      // Arrange — tools: [] should NOT be included in the API request
+      // Arrange ï¿½ tools: [] should NOT be included in the API request
       const request: GenerateContentParameters = {
         model: 'test-model',
         contents: [{ parts: [{ text: 'Hello' }], role: 'user' }],
@@ -365,7 +365,7 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, userPromptId);
 
-      // Assert — tools should NOT be in the request
+      // Assert ï¿½ tools should NOT be in the request
       expect(mockConverter.convertGeminiToolsToOpenAI).not.toHaveBeenCalled();
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
@@ -373,7 +373,7 @@ describe('ContentGenerationPipeline', () => {
     });
 
     it('should override enable_thinking when thinkingConfig disables it', async () => {
-      // Arrange — provider injects enable_thinking: true via extra_body,
+      // Arrange ï¿½ provider injects enable_thinking: true via extra_body,
       // but request explicitly disables thinking
       (mockProvider.buildRequest as Mock).mockImplementation((req) => ({
         ...req,
@@ -414,14 +414,14 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, userPromptId);
 
-      // Assert — enable_thinking should be overridden to false
+      // Assert ï¿½ enable_thinking should be overridden to false
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
       expect(apiCall.enable_thinking).toBe(false);
     });
 
     it('should strip reasoning key from extra_body when thinking is disabled', async () => {
-      // Arrange — provider injects reasoning via extra_body
+      // Arrange ï¿½ provider injects reasoning via extra_body
       (mockProvider.buildRequest as Mock).mockImplementation((req) => ({
         ...req,
         reasoning: { effort: 'high' },
@@ -455,14 +455,14 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, 'forked_query');
 
-      // Assert — reasoning should be stripped
+      // Assert ï¿½ reasoning should be stripped
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
       expect(apiCall.reasoning).toBeUndefined();
     });
 
     it('should preserve enable_thinking when thinking is not explicitly disabled', async () => {
-      // Arrange — normal request (not forked query), enable_thinking should be preserved
+      // Arrange ï¿½ normal request (not forked query), enable_thinking should be preserved
       (mockProvider.buildRequest as Mock).mockImplementation((req) => ({
         ...req,
         enable_thinking: true,
@@ -471,7 +471,7 @@ describe('ContentGenerationPipeline', () => {
       const request: GenerateContentParameters = {
         model: 'test-model',
         contents: [{ parts: [{ text: 'Hello' }], role: 'user' }],
-        // No thinkingConfig — normal request
+        // No thinkingConfig ï¿½ normal request
       };
 
       const mockMessages = [
@@ -496,7 +496,7 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, 'main');
 
-      // Assert — enable_thinking should be PRESERVED (not disabled)
+      // Assert ï¿½ enable_thinking should be PRESERVED (not disabled)
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
       expect(apiCall.enable_thinking).toBe(true);
@@ -607,7 +607,7 @@ describe('ContentGenerationPipeline', () => {
       expect(results).toHaveLength(2);
       expect(results[0]).toBe(mockGeminiResponse1);
       expect(results[1]).toBe(mockGeminiResponse2);
-      expect(mockConverter.resetStreamingToolCalls).toHaveBeenCalled();
+      expect(mockConverter.createStreamContext).toHaveBeenCalled();
       expect(mockClient.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
           stream: true,
@@ -719,7 +719,7 @@ describe('ContentGenerationPipeline', () => {
       }
 
       expect(results).toHaveLength(0); // No results due to error
-      expect(mockConverter.resetStreamingToolCalls).toHaveBeenCalledTimes(2); // Once at start, once on error
+      expect(mockConverter.createStreamContext).toHaveBeenCalledTimes(1); // Once per stream entry
       expect(mockErrorHandler.handle).toHaveBeenCalledWith(
         testError,
         expect.any(Object),
@@ -1307,7 +1307,7 @@ describe('ContentGenerationPipeline', () => {
         results.push(result);
       }
 
-      // Assert: exactly 2 results — content chunk + ONE merged finish chunk.
+      // Assert: exactly 2 results ï¿½ content chunk + ONE merged finish chunk.
       // Before the fix this was 3 (the trailing chunk triggered a duplicate).
       expect(results).toHaveLength(2);
       expect(results[0]).toBe(mockContentResponse);
@@ -1326,7 +1326,7 @@ describe('ContentGenerationPipeline', () => {
         totalTokenCount: 30,
       });
 
-      // Count function-call parts across ALL yielded results — must be exactly 1
+      // Count function-call parts across ALL yielded results ï¿½ must be exactly 1
       let totalFunctionCalls = 0;
       for (const result of results) {
         const parts = result.candidates?.[0]?.content?.parts ?? [];

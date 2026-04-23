@@ -143,8 +143,10 @@ export class ContentGenerationPipeline {
   ): AsyncGenerator<GenerateContentResponse> {
     const collectedGeminiResponses: GenerateContentResponse[] = [];
 
-    // Reset streaming tool calls to prevent data pollution from previous streams
-    this.converter.resetStreamingToolCalls();
+    // Create a fresh per-stream context. Each call to processStreamWithLogging
+    // gets its own StreamingToolCallParser so concurrent streams (subagents,
+    // fork children, â€¦) never share parser state (issue #3516).
+    const streamCtx = this.converter.createStreamContext();
 
     // State for handling chunk merging.
     // pendingFinishResponse holds a finish chunk waiting to be merged with
@@ -170,7 +172,10 @@ export class ContentGenerationPipeline {
           throw new StreamContentError(errorContent);
         }
 
-        const response = this.converter.convertOpenAIChunkToGemini(chunk);
+        const response = this.converter.convertOpenAIChunkToGemini(
+          chunk,
+          streamCtx,
+        );
 
         // Stage 2b: Filter empty responses to avoid downstream issues
         if (
@@ -187,7 +192,7 @@ export class ContentGenerationPipeline {
         // further merging so trailing chunks don't duplicate the
         // function-call parts carried by the finish chunk.
         if (finishYielded) {
-          // Finish already yielded — absorb any remaining usage
+          // Finish already yielded ï¿½ absorb any remaining usage
           // metadata but do NOT yield another response.
           // Note: pendingFinishResponse is guaranteed non-null here because
           // finishYielded is only set to true inside the `if (pendingFinishResponse)`
@@ -234,8 +239,8 @@ export class ContentGenerationPipeline {
       // Stage 2e: Stream completed successfully
       context.duration = Date.now() - context.startTime;
     } catch (error) {
-      // Clear streaming tool calls on error to prevent data pollution
-      this.converter.resetStreamingToolCalls();
+      // No manual parser cleanup needed â€” streamCtx is stream-local and GC'd
+      // when the catch block exits.
 
       // Re-throw StreamContentError directly so it can be handled by
       // the caller's retry logic (e.g., TPM throttling retry in sendMessageStream)
@@ -367,13 +372,13 @@ export class ContentGenerationPipeline {
     // When thinking is explicitly disabled (e.g., forked queries for suggestions),
     // override thinking-related keys that may have been injected by extra_body.
     // extra_body is spread last in provider.buildRequest, so it overrides
-    // buildReasoningConfig's decision — we must post-process here.
+    // buildReasoningConfig's decision ï¿½ we must post-process here.
     if (request.config?.thinkingConfig?.includeThoughts === false) {
       const typed = providerRequest as unknown as Record<string, unknown>;
       if ('enable_thinking' in typed) {
         typed['enable_thinking'] = false;
       }
-      // Also strip reasoning config — extra_body could inject it, overriding
+      // Also strip reasoning config ï¿½ extra_body could inject it, overriding
       // buildReasoningConfig's decision to return {} for disabled thinking.
       if ('reasoning' in typed) {
         delete typed['reasoning'];
@@ -452,11 +457,11 @@ export class ContentGenerationPipeline {
     // Reasoning configuration for OpenAI-compatible endpoints is highly fragmented.
     // For example, across common providers and models:
     //
-    //   - deepseek-reasoner   — thinking is enabled by default and cannot be disabled
-    //   - glm-4.7             — thinking is enabled by default; can be disabled via `extra_body.thinking.enabled`
-    //   - kimi-k2-thinking    — thinking is enabled by default and cannot be disabled
-    //   - gpt-5.x series      — thinking is enabled by default; can be disabled via `reasoning.effort`
-    //   - qwen3 series        — model-dependent; can be manually disabled via `extra_body.enable_thinking`
+    //   - deepseek-reasoner   ï¿½ thinking is enabled by default and cannot be disabled
+    //   - glm-4.7             ï¿½ thinking is enabled by default; can be disabled via `extra_body.thinking.enabled`
+    //   - kimi-k2-thinking    ï¿½ thinking is enabled by default and cannot be disabled
+    //   - gpt-5.x series      ï¿½ thinking is enabled by default; can be disabled via `reasoning.effort`
+    //   - qwen3 series        ï¿½ model-dependent; can be manually disabled via `extra_body.enable_thinking`
     //
     // Given this inconsistency, we avoid mapping values and only pass through the
     // configured reasoning object when explicitly enabled. This keeps provider- and

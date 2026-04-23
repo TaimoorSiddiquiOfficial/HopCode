@@ -146,7 +146,6 @@ const useResultDisplayRenderer = (
         stats: {
           totalLines: display.totalLines,
           totalBytes: display.totalBytes,
-          timeoutMs: display.timeoutMs,
         },
       };
     }
@@ -313,6 +312,20 @@ export const ToolMessage: React.FC<ToolMessageProps> = ({
     }
   }, [resultDisplay]);
 
+  // Shell tools surface their configured timeout via AnsiOutputDisplay as
+  // soon as streaming starts. Feed it into ToolElapsedTime so the budget is
+  // shown inline (`(elapsed · timeout N)`) instead of in a separate stats row.
+  const shellTimeoutMs = React.useMemo(() => {
+    if (
+      typeof resultDisplay === 'object' &&
+      resultDisplay !== null &&
+      'ansiOutput' in resultDisplay
+    ) {
+      return (resultDisplay as AnsiOutputDisplay).timeoutMs;
+    }
+    return undefined;
+  }, [resultDisplay]);
+
   React.useEffect(() => {
     if (!lastUpdateTime) {
       return;
@@ -382,6 +395,7 @@ export const ToolMessage: React.FC<ToolMessageProps> = ({
         <ToolElapsedTime
           status={status}
           executionStartTime={executionStartTime}
+          timeoutMs={shellTimeoutMs}
         />
         {emphasis === 'high' && <TrailingIndicator />}
       </Box>

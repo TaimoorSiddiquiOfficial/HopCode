@@ -49,9 +49,12 @@ export function useResumeCommand(
 
   const { config, historyManager, startNewSession, remount } = options ?? {};
 
+  const hasHistoryManager = !!historyManager;
+  const { clearItems, loadHistory } = historyManager ?? {};
+
   const handleResume = useCallback(
     async (sessionId: string): Promise<boolean> => {
-      if (!config || !historyManager || !startNewSession) {
+      if (!config || !hasHistoryManager || !startNewSession) {
         return false;
       }
 
@@ -71,8 +74,8 @@ export function useResumeCommand(
 
       // Reset UI history.
       const uiHistoryItems = buildResumedHistoryItems(sessionData, config);
-      historyManager.clearItems();
-      historyManager.loadHistory(uiHistoryItems);
+      clearItems?.();
+      loadHistory?.(uiHistoryItems);
 
       // Update session history core.
       config.startNewSession(sessionId, sessionData);
@@ -95,7 +98,15 @@ export function useResumeCommand(
       remount?.();
       return true;
     },
-    [closeResumeDialog, config, historyManager, startNewSession, remount],
+    [
+      closeResumeDialog,
+      config,
+      hasHistoryManager,
+      clearItems,
+      loadHistory,
+      startNewSession,
+      remount,
+    ],
   );
 
   return {
