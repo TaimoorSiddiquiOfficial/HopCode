@@ -46,6 +46,7 @@ const buildOrder = [
   'packages/core',
   'packages/web-templates',
   'packages/channels/base',
+  'packages/channels/discord',
   'packages/channels/telegram',
   'packages/channels/weixin',
   'packages/channels/dingtalk',
