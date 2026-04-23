@@ -63,6 +63,7 @@ import { githubAuthCommand } from '../ui/commands/githubAuthCommand.js';
 import { githubDeviceAuthCommand } from '../ui/commands/githubDeviceAuthCommand.js';
 import { mcpSecurityAuditCommand } from '../ui/commands/mcpSecurityAuditCommand.js';
 import { agentOwaspComplianceCommand } from '../ui/commands/agentOwaspComplianceCommand.js';
+import { makeSkillTemplateCommand } from '../ui/commands/makeSkillTemplateCommand.js';
 
 const builtinDebugLogger = createDebugLogger('BUILTIN_COMMAND_LOADER');
 
@@ -151,6 +152,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       githubDeviceAuthCommand,
       mcpSecurityAuditCommand,
       agentOwaspComplianceCommand,
+      makeSkillTemplateCommand,
     ];
 
     return allDefinitions
