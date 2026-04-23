@@ -117,10 +117,10 @@ describe('gemini.tsx main function', () => {
 
   beforeEach(() => {
     // Store and clear sandbox-related env variables to ensure a consistent test environment
-    originalEnvGeminiSandbox = process.env['QWEN_SANDBOX'];
+    originalEnvGeminiSandbox = process.env['HOPCODE_SANDBOX'];
     originalEnvSandbox = process.env['SANDBOX'];
     originalEnvQwenCodeSimple = process.env['QWEN_CODE_SIMPLE'];
-    delete process.env['QWEN_SANDBOX'];
+    delete process.env['HOPCODE_SANDBOX'];
     delete process.env['SANDBOX'];
     delete process.env['QWEN_CODE_SIMPLE'];
 
@@ -131,9 +131,9 @@ describe('gemini.tsx main function', () => {
   afterEach(() => {
     // Restore original env variables
     if (originalEnvGeminiSandbox !== undefined) {
-      process.env['QWEN_SANDBOX'] = originalEnvGeminiSandbox;
+      process.env['HOPCODE_SANDBOX'] = originalEnvGeminiSandbox;
     } else {
-      delete process.env['QWEN_SANDBOX'];
+      delete process.env['HOPCODE_SANDBOX'];
     }
     if (originalEnvSandbox !== undefined) {
       process.env['SANDBOX'] = originalEnvSandbox;

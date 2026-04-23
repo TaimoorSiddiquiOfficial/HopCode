@@ -564,6 +564,20 @@ hopcode skills remove my-skill
 
 ## Commands & Shortcuts
 
+### CLI Profile Commands
+
+Save and switch provider/model configurations as named profiles:
+
+```bash
+hopcode profile init "fast-local"   # interactive wizard — sets provider, model, base URL, API key
+hopcode profile list                 # list all saved profiles
+hopcode profile use "fast-local"     # activate a profile for next startup
+hopcode profile show                 # show currently active profile
+hopcode profile delete "fast-local"  # remove a profile
+```
+
+Profiles are stored in `~/.hopcode-profiles.json` and persist across sessions.
+
 ### Session Commands
 
 - `/help` - Display available commands

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -12,8 +12,8 @@ import {
 } from '../test-helper.js';
 
 const IS_SANDBOX =
-  process.env['QWEN_SANDBOX'] &&
-  process.env['QWEN_SANDBOX']!.toLowerCase() !== 'false';
+  process.env['HOPCODE_SANDBOX'] &&
+  process.env['HOPCODE_SANDBOX']!.toLowerCase() !== 'false';
 
 describe('cron-tools', () => {
   let rig: TestRig;

@@ -14,5 +14,17 @@ export default defineConfig({
       'integration-tests',
       'scripts',
     ],
+    coverage: {
+      provider: 'v8',
+      reportsDirectory: './coverage',
+      reporter: ['text', 'html', 'json-summary', 'lcov'],
+      include: ['packages/*/src/**/*', 'packages/channels/*/src/**/*'],
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/*.test.*',
+        '**/*.spec.*',
+      ],
+    },
   },
 });

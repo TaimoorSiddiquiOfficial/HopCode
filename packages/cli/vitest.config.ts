@@ -47,7 +47,7 @@ export default defineConfig({
     },
     server: {
       deps: {
-        inline: [/@qwen-code\/qwen-code-core/],
+        inline: [/@hoptrendy\/hopcode-core/],
       },
     },
   },
