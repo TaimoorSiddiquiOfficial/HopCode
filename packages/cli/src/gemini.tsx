@@ -10,7 +10,7 @@ import {
   isDebugLoggingDegraded,
   isBareMode,
   logUserPrompt,
-  QWEN_CODE_SIMPLE_ENV_VAR,
+  HOPCODE_SIMPLE_ENV_VAR,
   Storage,
   type Config,
   createDebugLogger,
@@ -298,14 +298,14 @@ export async function main() {
   setupUnhandledRejectionHandler();
 
   if (process.argv.includes('--bare')) {
-    process.env[QWEN_CODE_SIMPLE_ENV_VAR] = '1';
+    process.env[HOPCODE_SIMPLE_ENV_VAR] = '1';
   }
 
   let argv = await parseArguments();
   profileCheckpoint('after_parse_arguments');
 
   if (isBareMode(argv.bare)) {
-    process.env[QWEN_CODE_SIMPLE_ENV_VAR] = '1';
+    process.env[HOPCODE_SIMPLE_ENV_VAR] = '1';
   }
 
   const settings = isBareMode(argv.bare)
