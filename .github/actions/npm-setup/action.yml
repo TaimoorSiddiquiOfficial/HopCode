@@ -25,5 +25,5 @@ runs:
         scope: '${{ inputs.scope }}'
 
     - name: 'Install Dependencies'
-      shell: bash
-      run: npm ci --no-audit --progress=false
+      shell: 'bash'
+      run: 'npm ci --no-audit --progress=false'

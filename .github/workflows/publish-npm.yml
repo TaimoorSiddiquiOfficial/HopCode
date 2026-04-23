@@ -6,17 +6,17 @@ on:
       packages:
         description: 'Packages to publish (comma-separated, or "all")'
         required: false
-        type: string
+        type: 'string'
         default: 'all'
       dry_run:
         description: 'Run dry-run (no actual publish)'
         required: false
-        type: boolean
+        type: 'boolean'
         default: true
       ref:
         description: 'Branch or ref to publish from'
         required: false
-        type: string
+        type: 'string'
         default: 'main'
 
 concurrency:
@@ -24,9 +24,9 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  id-token: write
-  contents: read
-  packages: write
+  id-token: 'write'
+  contents: 'read'
+  packages: 'write'
 
 jobs:
   prepare:
@@ -45,7 +45,7 @@ jobs:
 
       - name: 'Determine packages to publish'
         id: 'packages'
-        shell: bash
+        shell: 'bash'
         run: |
           ROOT=$(pwd)
           ALL_PACKAGES=$(npm query '.workspace' | jq -c --arg root "${ROOT}/" \
@@ -67,7 +67,7 @@ jobs:
     needs: 'prepare'
     strategy:
       matrix:
-        package: ${{ fromJson(needs.prepare.outputs.packages_json) }}
+        package: '${{ fromJson(needs.prepare.outputs.packages_json) }}'
       fail-fast: false
     steps:
       - name: 'Checkout'
@@ -79,21 +79,21 @@ jobs:
         uses: './.github/actions/npm-setup'
 
       - name: 'Generate build artifacts'
-        shell: bash
-        run: node scripts/generate-git-commit-info.js || true
+        shell: 'bash'
+        run: 'node scripts/generate-git-commit-info.js || true'
 
       - name: 'Build workspace dependencies'
-        shell: bash
-        run: npm run build --workspaces --if-present || true
+        shell: 'bash'
+        run: 'npm run build --workspaces --if-present || true'
 
       - name: 'Build Package'
         working-directory: '${{ matrix.package.path }}'
-        shell: bash
-        run: npm run build || true
+        shell: 'bash'
+        run: 'npm run build || true'
 
       - name: 'Normalize workspace deps for publish'
         working-directory: '${{ matrix.package.path }}'
-        shell: bash
+        shell: 'bash'
         run: |
           node -e "
           const fs = require('fs');
@@ -133,7 +133,7 @@ jobs:
 
       - name: 'Publish ${{ matrix.package.name }}'
         working-directory: '${{ matrix.package.path }}'
-        shell: bash
+        shell: 'bash'
         run: |
           if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
             echo "DRY RUN: Would publish ${{ matrix.package.name }}"
@@ -173,18 +173,18 @@ jobs:
         uses: './.github/actions/npm-setup'
 
       - name: 'Generate git commit info'
-        shell: bash
-        run: node scripts/generate-git-commit-info.js || true
+        shell: 'bash'
+        run: 'node scripts/generate-git-commit-info.js || true'
 
       - name: 'Package VS Code Extension (VSIX)'
-        working-directory: packages/vscode-ide-companion
-        shell: bash
-        run: npm run package
+        working-directory: 'packages/vscode-ide-companion'
+        shell: 'bash'
+        run: 'npm run package'
 
       - name: 'Publish to VS Code Marketplace'
-        if: ${{ github.event.inputs.dry_run != 'true' }}
-        working-directory: packages/vscode-ide-companion
-        shell: bash
+        if: '${{ github.event.inputs.dry_run != ''true'' }}'
+        working-directory: 'packages/vscode-ide-companion'
+        shell: 'bash'
         run: |
           output=$(npx @vscode/vsce publish --packagePath ./*.vsix --no-verify 2>&1) || true
           echo "$output"
@@ -200,9 +200,9 @@ jobs:
           VSCE_PAT: '${{ secrets.VSCE_PAT }}'
 
       - name: 'Publish to Open VSX Registry'
-        if: ${{ github.event.inputs.dry_run != 'true' }}
-        working-directory: packages/vscode-ide-companion
-        shell: bash
+        if: '${{ github.event.inputs.dry_run != ''true'' }}'
+        working-directory: 'packages/vscode-ide-companion'
+        shell: 'bash'
         run: |
           if output=$(npx ovsx publish ./*.vsix -p "$OVSX_TOKEN" 2>&1); then
             echo "$output"
@@ -222,9 +222,9 @@ jobs:
           OVSX_TOKEN: '${{ secrets.OVSX_TOKEN }}'
 
       - name: 'DRY RUN: Show packaged VSIX'
-        if: ${{ github.event.inputs.dry_run == 'true' }}
-        working-directory: packages/vscode-ide-companion
-        shell: bash
+        if: '${{ github.event.inputs.dry_run == ''true'' }}'
+        working-directory: 'packages/vscode-ide-companion'
+        shell: 'bash'
         run: |
           ls -lh ./*.vsix || echo "No VSIX found"
           echo "DRY RUN: Extension packaged but not published"
@@ -233,10 +233,10 @@ jobs:
     name: 'Notify Result'
     runs-on: 'ubuntu-latest'
     needs: ['prepare', 'publish-packages', 'publish-vscode-extension']
-    if: always()
+    if: 'always()'
     steps:
       - name: 'Publish Result'
-        shell: bash
+        shell: 'bash'
         run: |
           npm_result="${{ needs.publish-packages.result }}"
           vsix_result="${{ needs.publish-vscode-extension.result }}"
