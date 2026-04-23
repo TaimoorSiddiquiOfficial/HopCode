@@ -21,6 +21,7 @@ import {
 } from '../utils/displayUtils.js';
 import { computeSessionStats } from '../utils/computeStats.js';
 import { t } from '../../i18n/index.js';
+import { formatCostUsd } from '@hoptrendy/hopcode-core';
 
 // A more flexible and powerful StatRow component
 interface StatRowProps {
@@ -283,6 +284,14 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
             </Text>
           </Text>
         </SubStatRow>
+        {computed.estimatedCostUsd > 0 && (
+          <StatRow title={t('Est. Cost:')}>
+            <Text color={theme.status.warning}>
+              {formatCostUsd(computed.estimatedCostUsd)}
+            </Text>
+            <Text color={theme.text.secondary}> (approx.)</Text>
+          </StatRow>
+        )}
       </Section>
 
       {Object.keys(models).length > 0 && (

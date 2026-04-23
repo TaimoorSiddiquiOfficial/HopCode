@@ -136,3 +136,9 @@ export {
 } from './metrics.js';
 export { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 export { sanitizeHookName } from './sanitize.js';
+export {
+  getModelPricing,
+  estimateModelCost,
+  formatCostUsd,
+} from './modelPricing.js';
+export type { ModelPricing } from './modelPricing.js';

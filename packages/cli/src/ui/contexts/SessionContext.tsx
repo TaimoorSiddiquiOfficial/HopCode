@@ -179,6 +179,8 @@ export interface ComputedSessionStats {
   totalPromptTokens: number;
   totalLinesAdded: number;
   totalLinesRemoved: number;
+  /** Estimated total session cost in USD. 0 if all models are local/unknown. */
+  estimatedCostUsd: number;
 }
 
 // Defines the final "value" of our context, including the state

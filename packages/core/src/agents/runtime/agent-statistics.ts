@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { estimateModelCost } from '../../telemetry/modelPricing.js';
+
 export interface ToolUsageStats {
   name: string;
   count: number;
@@ -27,6 +29,8 @@ export interface AgentStatsSummary {
   cachedTokens: number;
   totalTokens: number;
   toolUsage: ToolUsageStats[];
+  /** Estimated cost in USD. 0 for unknown/local models. */
+  estimatedCost: number;
 }
 
 export class AgentStatistics {
@@ -41,9 +45,14 @@ export class AgentStatistics {
   private cachedTokens = 0;
   private apiTotalTokens = 0;
   private toolUsage = new Map<string, ToolUsageStats>();
+  private modelName?: string;
 
   start(now = Date.now()) {
     this.startTimeMs = now;
+  }
+
+  setModelName(name: string) {
+    this.modelName = name;
   }
 
   setRounds(rounds: number) {
@@ -103,6 +112,9 @@ export class AgentStatistics {
       this.apiTotalTokens > 0
         ? this.apiTotalTokens
         : this.inputTokens + this.outputTokens + this.thoughtTokens;
+    const estimatedCost = this.modelName
+      ? estimateModelCost(this.modelName, this.inputTokens, this.outputTokens)
+      : 0;
     return {
       rounds: this.rounds,
       totalDurationMs,
@@ -116,6 +128,7 @@ export class AgentStatistics {
       cachedTokens: this.cachedTokens,
       totalTokens,
       toolUsage: Array.from(this.toolUsage.values()),
+      estimatedCost,
     };
   }
 

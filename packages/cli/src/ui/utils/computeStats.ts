@@ -9,6 +9,7 @@ import type {
   ComputedSessionStats,
   ModelMetricsCore,
 } from '../contexts/SessionContext.js';
+import { estimateModelCost } from '@hoptrendy/hopcode-core';
 
 export function calculateErrorRate(metrics: ModelMetricsCore): number {
   if (metrics.api.totalRequests === 0) {
@@ -68,6 +69,18 @@ export const computeSessionStats = (
       ? (tools.totalDecisions.accept / totalDecisions) * 100
       : 0;
 
+  // Estimate cost per model using public pricing table
+  const estimatedCostUsd = Object.entries(models).reduce(
+    (total, [modelName, modelMetrics]) =>
+      total +
+      estimateModelCost(
+        modelName,
+        modelMetrics.tokens.prompt,
+        modelMetrics.tokens.candidates,
+      ),
+    0,
+  );
+
   return {
     totalApiTime,
     totalToolTime,
@@ -82,5 +95,6 @@ export const computeSessionStats = (
     totalPromptTokens,
     totalLinesAdded: files.totalLinesAdded,
     totalLinesRemoved: files.totalLinesRemoved,
+    estimatedCostUsd,
   };
 };
