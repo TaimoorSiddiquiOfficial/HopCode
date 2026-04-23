@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "github-copilot": {
+      "httpUrl": "https://api.githubcopilot.com/mcp/",
+      "description": "GitHub Copilot MCP — code search, PR review, issue tracking via GitHub APIs",
+      "oauth": {
+        "enabled": true
+      }
+    },
+    "deepwiki": {
+      "httpUrl": "https://mcp.deepwiki.com/mcp",
+      "description": "DeepWiki MCP — query and search any public GitHub repository's documentation and code"
+    },
+    "semgrep": {
+      "url": "https://mcp.semgrep.ai/sse",
+      "description": "Semgrep MCP — static analysis and security scanning for code"
+    }
+  }
+}

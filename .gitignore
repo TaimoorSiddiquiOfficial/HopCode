@@ -70,6 +70,7 @@ packages/vscode-ide-companion/*.vsix
 !.hopcode/skills/**
 !.hopcode/agents/
 !.hopcode/agents/**
+!.hopcode/settings.json.example
 logs/
 # GHA credentials
 gha-creds-*.json
