@@ -75,7 +75,6 @@ export interface UIState {
   contextMdFileCount: number;
   streamingState: StreamingState;
   initError: string | null;
-  pendingGeminiHistoryItems: HistoryItemWithoutId[];
   thought: ThoughtSummary | null;
   shellModeActive: boolean;
   userMessages: string[];
@@ -145,6 +144,10 @@ export interface UIState {
   isFeedbackDialogOpen: boolean;
   // Per-task token tracking
   taskStartTokens: number;
+  // Real-time token display: ref to streaming output char length (polled, not state)
+  streamingResponseLengthRef: React.RefObject<number>;
+  // True = receiving content (↓), false = waiting for API response (↑)
+  isReceivingContent: boolean;
   // Prompt suggestion
   promptSuggestion: string | null;
   /** Dismiss prompt suggestion (clears state, aborts speculation) */

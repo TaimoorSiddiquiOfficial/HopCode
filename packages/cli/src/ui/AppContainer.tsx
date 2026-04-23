@@ -758,7 +758,7 @@ export const AppContainer = (props: AppContainerProps) => {
     streamingState,
     submitQuery,
     initError,
-    pendingGeminiHistoryItems: pendingGeminiHistoryItems,
+    pendingGeminiHistoryItems: pendingStreamHistoryItems,
     thought,
     cancelOngoingRequest,
     retryLastPrompt,
@@ -766,6 +766,8 @@ export const AppContainer = (props: AppContainerProps) => {
     activePtyId,
     loopDetectionConfirmationRequest,
     pendingToolCalls,
+    streamingResponseLengthRef,
+    isReceivingContent,
   } = useHopCodeStream(
     config.getHopCodeClient(),
     historyManager.history,
@@ -1165,18 +1167,14 @@ export const AppContainer = (props: AppContainerProps) => {
   } = useWelcomeBack(config, handleFinalSubmit, buffer, settings.merged);
 
   const pendingGeminiHistoryItems = useMemo(
-    () => [...pendingSlashCommandHistoryItems, ...pendingGeminiHistoryItems],
-    [pendingSlashCommandHistoryItems, pendingGeminiHistoryItems],
+    () => [...pendingSlashCommandHistoryItems, ...pendingStreamHistoryItems],
+    [pendingSlashCommandHistoryItems, pendingStreamHistoryItems],
   );
 
   // Terminal tab progress bar (OSC 9;4) for iTerm2/Ghostty
   useTerminalProgress(streamingState, isToolExecuting(pendingGeminiHistoryItems));
 
   cancelHandlerRef.current = useCallback(() => {
-    const pendingGeminiHistoryItems = [
-      ...pendingSlashCommandHistoryItems,
-      ...pendingGeminiHistoryItems,
-    ];
     if (isToolExecuting(pendingGeminiHistoryItems)) {
       buffer.setText(''); // Just clear the prompt
       return;
@@ -1200,7 +1198,6 @@ export const AppContainer = (props: AppContainerProps) => {
   }, [
     buffer,
     popAllMessages,
-    pendingSlashCommandHistoryItems,
     pendingGeminiHistoryItems,
   ]);
 
@@ -2124,6 +2121,9 @@ export const AppContainer = (props: AppContainerProps) => {
       isFeedbackDialogOpen,
       // Per-task token tracking
       taskStartTokens,
+      // Real-time token display
+      streamingResponseLengthRef,
+      isReceivingContent,
       // Prompt suggestion
       promptSuggestion,
       dismissPromptSuggestion,
@@ -2233,6 +2233,9 @@ export const AppContainer = (props: AppContainerProps) => {
       isFeedbackDialogOpen,
       // Per-task token tracking
       taskStartTokens,
+      // Real-time token display
+      streamingResponseLengthRef,
+      isReceivingContent,
       // Prompt suggestion
       promptSuggestion,
       dismissPromptSuggestion,
