@@ -48,6 +48,7 @@ export interface ServerTool {
 
 export enum HopCodeEventType {
   Content = 'content',
+  Text = 'text',
   ToolCallRequest = 'tool_call_request',
   ToolCallResponse = 'tool_call_response',
   ToolCallConfirmation = 'tool_call_confirmation',

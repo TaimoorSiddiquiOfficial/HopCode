@@ -1130,6 +1130,7 @@ export const useHopCodeStream = (
             }
             break;
           case ServerHopCodeEventType.Content:
+          case ServerHopCodeEventType.Text:
             geminiMessageBuffer = handleContentEvent(
               event.value,
               geminiMessageBuffer,
