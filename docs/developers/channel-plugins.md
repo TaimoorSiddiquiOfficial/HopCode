@@ -126,7 +126,7 @@ The legacy `imageBase64`/`imageMimeType` fields still work for backwards compati
 
 ## Extension Manifest
 
-Your `qwen-extension.json` declares the channel type. The key must match `channelType` in your plugin object:
+Your `hopcode-extension.json` declares the channel type. The key must match `channelType` in your plugin object:
 
 ```json
 {

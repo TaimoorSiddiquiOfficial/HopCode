@@ -1,4 +1,4 @@
-# HopCode Execution and Deployment
+﻿# HopCode Execution and Deployment
 
 This document describes how to run HopCode and explains the deployment architecture that HopCode uses.
 
@@ -21,7 +21,7 @@ This is the recommended way for end-users to install HopCode. It involves downlo
   Then, run the CLI from anywhere:
 
   ```bash
-  qwen
+  hopcode
   ```
 
 - **NPX execution:**
@@ -68,8 +68,8 @@ Contributors to the project will want to run the CLI directly from the source co
   # Link the local cli package to your global node_modules
   npm link packages/cli
 
-  # Now you can run your local version using the `qwen` command
-  qwen
+  # Now you can run your local version using the `hopcode` command
+  hopcode
   ```
 
 ---

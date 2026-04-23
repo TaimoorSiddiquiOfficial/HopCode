@@ -282,9 +282,9 @@ The SDK provides specific exception types for different error scenarios:
 
 ## FAQ / Troubleshooting
 
-### Q: Do I need to install the Qwen CLI separately?
+### Q: Do I need to install the HopCode CLI separately?
 
-A: yes, requires Qwen CLI 0.5.5 or higher.
+A: yes, requires HopCode CLI 0.5.5 or higher.
 
 ### Q: What Java versions are supported?
 

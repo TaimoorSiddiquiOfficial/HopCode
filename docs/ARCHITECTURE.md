@@ -1,4 +1,4 @@
-# HopCode CLI — Architecture Design
+﻿# HopCode CLI — Architecture Design
 
 > **Purpose:** This document is the authoritative memory of the HopCode product architecture.
 > Read it before making changes to understand how components interact and where to start.

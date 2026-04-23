@@ -1,4 +1,4 @@
-# Speculation Engine Design
+﻿# Speculation Engine Design
 
 > Speculatively executes the accepted suggestion before the user confirms, using copy-on-write file isolation. Results appear instantly when the user presses Tab.
 
@@ -17,7 +17,7 @@ User sees suggestion "commit this"
 │                                                              │
 │  ┌─────────────────┐    ┌────────────────────┐               │
 │  │ Forked GeminiChat│    │  OverlayFs          │              │
-│  │ (cache-shared)   │    │  /tmp/qwen-         │              │
+│  │ (cache-shared)   │    │  /tmp/hopcode-         │              │
 │  │                  │    │   speculation/       │              │
 │  │  systemInstruction│   │   {pid}/{id}/        │              │
 │  │  + tools          │   │                      │              │
@@ -84,7 +84,7 @@ User sees suggestion "commit this"
 
 ```
 Real CWD: /home/user/project/
-Overlay:  /tmp/qwen-speculation/12345/a1b2c3d4/
+Overlay:  /tmp/hopcode-speculation/12345/a1b2c3d4/
 
 Write to src/app.ts:
   1. Copy /home/user/project/src/app.ts → overlay/src/app.ts (first time only)
