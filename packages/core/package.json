@@ -93,7 +93,7 @@
     "tar": "latest",
     "undici": "latest",
     "uuid": "latest",
-    "web-tree-sitter": "latest",
+    "web-tree-sitter": "0.24.7",
     "ws": "latest",
     "@ai-sdk/deepseek": "latest",
     "@ai-sdk/fireworks": "latest",
