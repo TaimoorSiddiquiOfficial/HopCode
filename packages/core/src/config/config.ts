@@ -11,7 +11,8 @@ import * as path from 'node:path';
 import process from 'node:process';
 
 // External dependencies
-import { ProxyAgent, setGlobalDispatcher } from 'undici';
+// Note: undici ProxyAgent/setGlobalDispatcher removed - proxy handling is now
+// done per-request via buildRuntimeFetchOptions in runtimeFetchOptions.ts
 
 // Types
 import type {
@@ -735,7 +736,8 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel = params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
+    this.embeddingModel =
+      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
@@ -900,10 +902,12 @@ export class Config {
       initializeTelemetry(this);
     }
 
-    const proxyUrl = this.getProxy();
-    if (proxyUrl) {
-      setGlobalDispatcher(new ProxyAgent(proxyUrl));
-    }
+    // Note: We no longer set a global proxy dispatcher here.
+    // The OpenAI SDK and other HTTP clients configure proxies per-request
+    // via buildRuntimeFetchOptions in runtimeFetchOptions.ts.
+    // Setting a global dispatcher interferes with direct API connections
+    // and causes "fetch failed" errors when no proxy is actually needed.
+
     this.geminiClient = new HopCodeClient(this);
     this.chatRecordingService = this.chatRecordingEnabled
       ? new ChatRecordingService(this)
