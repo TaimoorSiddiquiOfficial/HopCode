@@ -17,7 +17,6 @@ const COMPACTABLE_TOOLS = new Set<string>([
   ToolNames.GREP,
   ToolNames.GLOB,
   ToolNames.WEB_FETCH,
-  ToolNames.WEB_SEARCH,
   ToolNames.EDIT,
   ToolNames.WRITE_FILE,
 ]);
@@ -133,7 +132,8 @@ export function microcompactHistory(
   }
   const { gapMs } = trigger;
 
-  const envKeep = (process.env['HOPCODE_MC_KEEP_RECENT'] ?? process.env['QWEN_MC_KEEP_RECENT']);
+  const envKeep =
+    process.env['HOPCODE_MC_KEEP_RECENT'] ?? process.env['QWEN_MC_KEEP_RECENT'];
   const rawKeepRecent =
     envKeep !== undefined && Number.isFinite(Number(envKeep))
       ? Number(envKeep)

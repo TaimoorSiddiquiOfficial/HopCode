@@ -410,6 +410,28 @@ export class AgentCore {
     abortController: AbortController,
     options?: ReasoningLoopOptions,
   ): Promise<ReasoningLoopResult> {
+    // Tag every API call emitted from this loop with the owning subagent's
+    // name so the `/stats` panel can attribute tokens/requests to the
+    // originating subagent. The store is read inside
+    // `LoggingContentGenerator` via `subagentNameContext.getStore()`.
+    return subagentNameContext.run(this.name, () =>
+      this._runReasoningLoopInnerImpl(
+        chat,
+        initialMessages,
+        toolsList,
+        abortController,
+        options,
+      ),
+    );
+  }
+
+  private async _runReasoningLoopInnerImpl(
+    chat: HopCodeChat,
+    initialMessages: Content[],
+    toolsList: FunctionDeclaration[],
+    abortController: AbortController,
+    options?: ReasoningLoopOptions,
+  ): Promise<ReasoningLoopResult> {
     const startTime = options?.startTimeMs ?? Date.now();
     let currentMessages = initialMessages;
     let turnCounter = 0;

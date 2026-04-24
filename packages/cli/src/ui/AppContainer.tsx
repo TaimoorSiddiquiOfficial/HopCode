@@ -879,11 +879,7 @@ export const AppContainer = (props: AppContainerProps) => {
   });
 
   const { messageQueue, addMessage, popAllMessages, drainQueue } =
-    useMessageQueue({
-      isConfigInitialized,
-      streamingState,
-      submitQuery,
-    });
+    useMessageQueue();
 
   // Bridge message queue to mid-turn drain via ref.
   // drainQueue reads the synchronous queueRef inside the hook, so it
@@ -1201,7 +1197,10 @@ export const AppContainer = (props: AppContainerProps) => {
   );
 
   // Terminal tab progress bar (OSC 9;4) for iTerm2/Ghostty
-  useTerminalProgress(streamingState, isToolExecuting(pendingGeminiHistoryItems));
+  useTerminalProgress(
+    streamingState,
+    isToolExecuting(pendingGeminiHistoryItems),
+  );
 
   cancelHandlerRef.current = useCallback(() => {
     if (isToolExecuting(pendingGeminiHistoryItems)) {
@@ -1224,11 +1223,7 @@ export const AppContainer = (props: AppContainerProps) => {
       // content). Mirrors the popQueueIntoInput convention in InputPrompt.
       buffer.setText(currentText ? `${popped}\n${currentText}` : popped);
     }
-  }, [
-    buffer,
-    popAllMessages,
-    pendingGeminiHistoryItems,
-  ]);
+  }, [buffer, popAllMessages, pendingGeminiHistoryItems]);
 
   const handleClearScreen = useCallback(() => {
     historyManager.clearItems();
