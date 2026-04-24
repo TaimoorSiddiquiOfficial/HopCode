@@ -89,7 +89,7 @@ import { useTextBuffer } from './components/shared/text-buffer.js';
 import { useLogger } from './hooks/useLogger.js';
 import { useHopCodeStream } from './hooks/useHopCodeStream.js';
 import { useVim } from './hooks/vim.js';
-import { isBtwCommand } from './utils/commandUtils.js';
+import { isBtwCommand, isSlashCommand } from './utils/commandUtils.js';
 import { type LoadedSettings, SettingScope } from '../config/settings.js';
 import { type InitializationResult } from '../core/initializer.js';
 import { useFocus } from './hooks/useFocus.js';
@@ -1157,6 +1157,15 @@ export const AppContainer = (props: AppContainerProps) => {
       if (spec.status === 'running') {
         abortSpeculation(spec).catch(() => {});
         speculationRef.current = IDLE_SPECULATION;
+      }
+
+      // Execute slash commands immediately when idle (don't queue them)
+      if (
+        streamingState === StreamingState.Idle &&
+        isSlashCommand(submittedValue)
+      ) {
+        void submitQuery(submittedValue);
+        return;
       }
 
       addMessage(submittedValue);
