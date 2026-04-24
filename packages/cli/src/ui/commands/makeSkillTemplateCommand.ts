@@ -374,7 +374,7 @@ main().catch((error) => {
 /**
  * Generate test file
  */
-function generateTests(skillName: string, description: string): GeneratedFile {
+function generateTests(skillName: string, _description: string): GeneratedFile {
   const camelCaseName = toCamelCase(skillName);
 
   return {
@@ -693,7 +693,7 @@ function generatePackageJson(skillName: string, description: string): GeneratedF
 /**
  * Generate TypeScript config
  */
-function generateTsConfig(skillName: string): GeneratedFile {
+function generateTsConfig(_skillName: string): GeneratedFile {
   return {
     path: 'tsconfig.json',
     description: 'TypeScript configuration',
@@ -729,7 +729,7 @@ function generateTsConfig(skillName: string): GeneratedFile {
  */
 function updateMcpConfig(skillName: string, configPath: string): GeneratedFile | null {
   try {
-    let config: any = { mcpServers: {} };
+    let config: Record<string, unknown> = { mcpServers: {} };
 
     if (existsSync(configPath)) {
       const content = readFileSync(configPath, 'utf-8');
@@ -888,8 +888,8 @@ npm install axios lodash
 
 ---
 
-**Generated**: ${new Date().toISOString()}  
-**Skill**: ${skillName}  
+**Generated**: ${new Date().toISOString()}
+**Skill**: ${skillName}
 **Version**: 1.0.0
 `;
 }

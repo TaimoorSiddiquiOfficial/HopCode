@@ -23,7 +23,7 @@ export const mcpSecurityAuditCommand: SlashCommand = {
   name: 'mcp-security-audit',
   description: 'Audit MCP server configurations for security vulnerabilities',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, args: string): Promise<SlashCommandActionReturn> => {
+  action: async (context: CommandContext, _args: string): Promise<SlashCommandActionReturn> => {
     try {
       const auditResults = await performMcpSecurityAudit(context);
 
@@ -113,7 +113,7 @@ async function performMcpSecurityAudit(context: CommandContext): Promise<Securit
 /**
  * Find MCP configuration files
  */
-async function findMcpConfigFiles(context: CommandContext): Promise<string[]> {
+async function findMcpConfigFiles(_context: CommandContext): Promise<string[]> {
   const configFiles: string[] = [];
   const possiblePaths = [
     '.hopcode/mcp.json',
@@ -136,16 +136,8 @@ async function findMcpConfigFiles(context: CommandContext): Promise<string[]> {
 /**
  * Find MCP server source files
  */
-async function findMcpServerFiles(context: CommandContext): Promise<string[]> {
+async function findMcpServerFiles(_context: CommandContext): Promise<string[]> {
   const serverFiles: string[] = [];
-  const patterns = [
-    '**/mcp-server/**/*.ts',
-    '**/mcp-server/**/*.js',
-    '**/mcp/*.ts',
-    '**/mcp/*.js',
-    '**/*.mcp.ts',
-    '**/*.mcp.js',
-  ];
 
   // TODO: Implement glob search when available
   // For now, check common locations
@@ -341,7 +333,7 @@ function auditForSecrets(filePath: string, content: string, findings: SecurityFi
  */
 function auditForUnpinnedVersions(
   filePath: string,
-  config: any,
+  config: Record<string, unknown>,
   findings: SecurityFindings,
 ): void {
   if (!config.mcpServers) {
@@ -349,43 +341,43 @@ function auditForUnpinnedVersions(
   }
 
   for (const [serverName, serverConfig] of Object.entries(config.mcpServers)) {
-    const config = serverConfig as any;
+    const cfg = serverConfig as Record<string, unknown>;
 
     // Check for 'latest' tag
-    if (config.image?.includes(':latest')) {
+    if (typeof cfg.image === 'string' && cfg.image.includes(':latest')) {
       findings.high.push({
         rule: 'UNPINNED_DOCKER_IMAGE',
         severity: 'high',
         file: filePath,
         description: `MCP server "${serverName}" uses unpinned 'latest' tag`,
         recommendation: 'Pin to specific version or SHA digest for reproducibility',
-        evidence: config.image,
+        evidence: cfg.image,
       });
     }
 
     // Check for missing SHA digest
-    if (config.image && !config.image.includes('@sha256:')) {
+    if (typeof cfg.image === 'string' && !cfg.image.includes('@sha256:')) {
       findings.medium.push({
         rule: 'MISSING_SHA_DIGEST',
         severity: 'medium',
         file: filePath,
         description: `MCP server "${serverName}" missing SHA digest`,
         recommendation: 'Add SHA digest for immutable image reference',
-        evidence: config.image,
+        evidence: cfg.image,
       });
     }
 
     // Check for unpinned npm versions
-    if (config.command?.includes('npx') || config.command?.includes('npm')) {
+    if (typeof cfg.command === 'string' && (cfg.command.includes('npx') || cfg.command.includes('npm'))) {
       const versionPattern = /@(latest|\^|~)/g;
-      if (versionPattern.test(config.command)) {
+      if (versionPattern.test(cfg.command)) {
         findings.medium.push({
           rule: 'UNPINNED_NPM_VERSION',
           severity: 'medium',
           file: filePath,
           description: `MCP server "${serverName}" uses unpinned npm version`,
           recommendation: 'Pin to specific version (e.g., package@1.2.3)',
-          evidence: config.command,
+          evidence: cfg.command,
         });
       }
     }
@@ -397,7 +389,7 @@ function auditForUnpinnedVersions(
  */
 function auditForInsecureCommands(
   filePath: string,
-  config: any,
+  config: Record<string, unknown>,
   findings: SecurityFindings,
 ): void {
   if (!config.mcpServers) {
@@ -405,31 +397,31 @@ function auditForInsecureCommands(
   }
 
   for (const [serverName, serverConfig] of Object.entries(config.mcpServers)) {
-    const config = serverConfig as any;
+    const cfg = serverConfig as Record<string, unknown>;
 
     // Check for shell execution
-    if (config.command?.includes('sh -c') || config.command?.includes('bash -c')) {
+    if (typeof cfg.command === 'string' && (cfg.command.includes('sh -c') || cfg.command.includes('bash -c'))) {
       findings.high.push({
         rule: 'SHELL_EXECUTION',
         severity: 'high',
         file: filePath,
         description: `MCP server "${serverName}" uses shell execution`,
         recommendation: 'Use direct binary execution to avoid shell injection',
-        evidence: config.command,
+        evidence: cfg.command,
       });
     }
 
     // Check for dangerous commands
     const dangerousCommands = ['rm -rf', 'curl | bash', 'wget | bash', 'chmod 777'];
     for (const dangerous of dangerousCommands) {
-      if (config.command?.includes(dangerous)) {
+      if (typeof cfg.command === 'string' && cfg.command.includes(dangerous)) {
         findings.critical.push({
           rule: 'DANGEROUS_COMMAND',
           severity: 'critical',
           file: filePath,
           description: `MCP server "${serverName}" uses dangerous command: ${dangerous}`,
           recommendation: 'Remove dangerous command and use safer alternatives',
-          evidence: config.command,
+          evidence: cfg.command,
         });
       }
     }
@@ -441,7 +433,7 @@ function auditForInsecureCommands(
  */
 function auditForMissingValidation(
   filePath: string,
-  config: any,
+  config: Record<string, unknown>,
   findings: SecurityFindings,
 ): void {
   if (!config.mcpServers) {
@@ -449,21 +441,22 @@ function auditForMissingValidation(
   }
 
   for (const [serverName, serverConfig] of Object.entries(config.mcpServers)) {
-    const config = serverConfig as any;
+    const cfg = serverConfig as Record<string, unknown>;
 
     // Check for missing env validation
-    if (config.env && typeof config.env === 'object') {
-      const hasSecrets = Object.keys(config.env).some(
+    if (cfg.env && typeof cfg.env === 'object') {
+      const envObj = cfg.env as Record<string, unknown>;
+      const hasSecrets = Object.keys(envObj).some(
         k => k.toLowerCase().includes('key') || k.toLowerCase().includes('secret'),
       );
-      if (hasSecrets && !config.env.HOPCODE_VALIDATE_ENV) {
+      if (hasSecrets && !envObj.HOPCODE_VALIDATE_ENV) {
         findings.low.push({
           rule: 'MISSING_ENV_VALIDATION',
           severity: 'low',
           file: filePath,
           description: `MCP server "${serverName}" has secrets in env but no validation`,
           recommendation: 'Add environment variable validation on startup',
-          evidence: JSON.stringify(config.env),
+          evidence: JSON.stringify(cfg.env),
         });
       }
     }
@@ -475,7 +468,7 @@ function auditForMissingValidation(
  */
 function auditForPermissions(
   filePath: string,
-  config: any,
+  config: Record<string, unknown>,
   findings: SecurityFindings,
 ): void {
   if (!config.mcpServers) {
@@ -483,10 +476,10 @@ function auditForPermissions(
   }
 
   for (const [serverName, serverConfig] of Object.entries(config.mcpServers)) {
-    const config = serverConfig as any;
+    const cfg = serverConfig as Record<string, unknown>;
 
     // Check for privileged containers
-    if (config.privileged === true) {
+    if (cfg.privileged === true) {
       findings.critical.push({
         rule: 'PRIVILEGED_CONTAINER',
         severity: 'critical',
@@ -498,14 +491,14 @@ function auditForPermissions(
     }
 
     // Check for root user
-    if (config.user === 'root' || config.user === '0') {
+    if (cfg.user === 'root' || cfg.user === '0') {
       findings.high.push({
         rule: 'ROOT_USER',
         severity: 'high',
         file: filePath,
         description: `MCP server "${serverName}" runs as root user`,
         recommendation: 'Run as non-root user for security',
-        evidence: `user: ${config.user}`,
+        evidence: `user: ${String(cfg.user)}`,
       });
     }
   }

@@ -6,9 +6,8 @@
 
 import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { execSync } from 'node:child_process';
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 /**
  * Python MCP Server Generator Command
@@ -95,7 +94,7 @@ function extractProjectName(description: string): string {
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .substring(0, 50);
-    return `mcp-${name}` || 'mcp-server';
+    return name ? `mcp-${name}` : 'mcp-server';
   }
   return 'mcp-server';
 }
@@ -105,7 +104,7 @@ function extractProjectName(description: string): string {
  */
 async function generatePythonMcpServer(
   projectName: string,
-  description: string,
+  _description: string,
   outputDir: string
 ): Promise<GeneratedFile[]> {
   const generatedFiles: GeneratedFile[] = [];
@@ -269,7 +268,7 @@ if __name__ == "__main__":
 /**
  * Generate tools module
  */
-function generateToolsModule(projectName: string, description: string): string {
+function generateToolsModule(projectName: string, _description: string): string {
   return `"""
 Tool definitions and handlers for ${projectName}
 
@@ -464,7 +463,7 @@ python_files = "test_*.py"
 /**
  * Generate .env.example
  */
-function generateEnvExample(description: string): string {
+function generateEnvExample(_description: string): string {
   return `# MCP Server Environment Configuration
 # Copy this file to .env and fill in your values
 
@@ -686,7 +685,7 @@ For more information about MCP, see the [MCP Specification](https://modelcontext
 /**
  * Generate test file
  */
-function generateTests(projectName: string, description: string): string {
+function generateTests(projectName: string, _description: string): string {
   return `"""
 Test suite for ${projectName}
 
@@ -815,7 +814,7 @@ if __name__ == "__main__":
 /**
  * Generate Dockerfile
  */
-function generateDockerfile(projectName: string): string {
+function generateDockerfile(_projectName: string): string {
   return `# Use Python 3.11 slim image
 FROM python:3.11-slim
 

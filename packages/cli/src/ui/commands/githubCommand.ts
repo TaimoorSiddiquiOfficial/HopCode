@@ -18,6 +18,7 @@ function hasGitHubCredentials(context: CommandContext): boolean {
   const config = context.services.config;
   if (!config) return false;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const settings = ({ github: { appId: process.env.GITHUB_APP_ID, privateKey: process.env.GITHUB_APP_PRIVATE_KEY } } as any);
   const githubConfig = settings?.github;
 

@@ -27,7 +27,7 @@ export const agentOwaspComplianceCommand: SlashCommand = {
   name: 'agent-owasp-compliance',
   description: 'Check AI agent codebase against OWASP Top 10 agentic security risks',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, args: string): Promise<SlashCommandActionReturn> => {
+  action: async (context: CommandContext, _args: string): Promise<SlashCommandActionReturn> => {
     try {
       const complianceResults = await performOwaspComplianceCheck(context);
       return {
@@ -429,6 +429,9 @@ async function checkOwaspRisk(
           if (status === 'compliant') status = 'partial';
         }
       }
+      break;
+    default:
+      // Other risks are considered compliant for now
       break;
   }
 

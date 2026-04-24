@@ -6,7 +6,7 @@
 
 import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
-import { readdirSync, readFileSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, extname, relative } from 'node:path';
 
 /**
@@ -496,10 +496,14 @@ async function performSecurityReview(
             case 'info':
               findings.info.push(finding);
               break;
+            default:
+              // Unknown severity - treat as info
+              findings.info.push(finding);
+              break;
           }
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // Skip files that can't be read
       continue;
     }
@@ -549,7 +553,7 @@ async function collectFilesToScan(rootPath: string): Promise<string[]> {
           }
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // Skip directories we can't read
     }
   }

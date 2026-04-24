@@ -184,6 +184,7 @@ function saveAccessToken(context: CommandContext, token: string): void {
     // eslint-disable-next-line no-console
     console.log('✅ Access token saved to config');
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Failed to save token:', error);
     throw new Error('Failed to save access token to config');
   }
