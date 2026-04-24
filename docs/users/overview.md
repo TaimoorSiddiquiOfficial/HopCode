@@ -1,7 +1,7 @@
 ﻿# HopCode overview
 
-[![@hopcode/hopcode downloads](https://img.shields.io/npm/dw/@hopcode/hopcode.svg)](https://npm-compare.com/@hopcode/hopcode)
-[![@hopcode/hopcode version](https://img.shields.io/npm/v/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
+[![@hoptrendy/hopcode downloads](https://img.shields.io/npm/dw/@hoptrendy/hopcode.svg)](https://npm-compare.com/@hoptrendy/hopcode)
+[![@hoptrendy/hopcode version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 
 > Learn about HopCode, Qwen's agentic coding tool that lives in your terminal and helps you turn ideas into code faster than ever before.
 

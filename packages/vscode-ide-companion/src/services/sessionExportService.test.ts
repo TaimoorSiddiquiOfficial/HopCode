@@ -31,7 +31,7 @@ const {
   mockShowSaveDialog: vi.fn(),
 }));
 
-vi.mock('@qwen-code/qwen-code-core', () => {
+vi.mock('@hoptrendy/hopcode-core', () => {
   class SessionService {
     constructor(_cwd: string) {}
 
@@ -45,7 +45,7 @@ vi.mock('@qwen-code/qwen-code-core', () => {
   };
 });
 
-vi.mock('@qwen-code/qwen-code/export', () => ({
+vi.mock('@hoptrendy/hopcode-cli/export', () => ({
   collectSessionData: mockCollectSessionData,
   normalizeSessionData: mockNormalizeSessionData,
   toHtml: mockToHtml,
@@ -95,7 +95,7 @@ describe('sessionExportService', () => {
     mockToJson.mockReturnValue('{"ok":true}');
     mockToJsonl.mockReturnValue('{"ok":true}');
     mockGenerateExportFilename.mockImplementation(
-      (format: string) => `qwen-export.${format}`,
+      (format: string) => `hopcode-export.${format}`,
     );
   });
 
@@ -132,7 +132,7 @@ describe('sessionExportService', () => {
 
   describe('exportSessionToFile', () => {
     it('writes the exported session to the user-chosen path', async () => {
-      const chosenPath = path.join('/workspace', 'qwen-export.html');
+      const chosenPath = path.join('/workspace', 'hopcode-export.html');
       mockShowSaveDialog.mockResolvedValue({ fsPath: chosenPath });
 
       const result = await exportSessionToFile({
@@ -158,7 +158,7 @@ describe('sessionExportService', () => {
         'utf-8',
       );
       expect(result).toEqual({
-        filename: 'qwen-export.html',
+        filename: 'hopcode-export.html',
         uri: { fsPath: chosenPath },
       });
     });

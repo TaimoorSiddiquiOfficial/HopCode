@@ -159,7 +159,7 @@ hopcode extensions remove <name>                 # uninstall
 
 ```
 packages/channels/
-├── base/                    # @hopcode/channel-base
+├── base/                    # @hoptrendy/channel-base
 │   └── src/
 │       ├── AcpBridge.ts     # ACP process lifecycle, session management
 │       ├── SessionRouter.ts # sender ↔ session mapping, persistence
@@ -168,9 +168,9 @@ packages/channels/
 │       ├── PairingStore.ts  # pairing code generation + approval
 │       ├── ChannelBase.ts   # abstract base: routing, slash commands
 │       └── types.ts         # Envelope, ChannelConfig, etc.
-├── telegram/                # @hopcode/channel-telegram
-├── weixin/                  # @hopcode/channel-weixin
-└── dingtalk/                # @hopcode/channel-dingtalk
+├── telegram/                # @hoptrendy/channel-telegram
+├── weixin/                  # @hoptrendy/channel-weixin
+└── dingtalk/                # @hoptrendy/channel-dingtalk
 ```
 
 ## Future Work

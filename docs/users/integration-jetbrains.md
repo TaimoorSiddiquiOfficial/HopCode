@@ -21,7 +21,7 @@
 1. Install HopCode CLI:
 
    ```bash
-   npm install -g @hopcode/hopcode
+   npm install -g @hoptrendy/hopcode
    ```
 
 2. Open your JetBrains IDE and navigate to AI Chat tool window.
@@ -43,7 +43,7 @@
 1. Install HopCode CLI:
 
    ```bash
-   npm install -g @hopcode/hopcode
+   npm install -g @hoptrendy/hopcode
    ```
 
 2. Open your JetBrains IDE and navigate to AI Chat tool window.

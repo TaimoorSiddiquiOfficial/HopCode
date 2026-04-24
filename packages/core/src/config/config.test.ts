@@ -150,7 +150,7 @@ vi.mock('../memory/const.js', () => ({
   getCurrentGeminiMdFilename: vi.fn(() => 'QWEN.md'), // Mock the original filename
   getAllGeminiMdFilenames: vi.fn(() => ['QWEN.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'QWEN.md',
-  QWEN_CONFIG_DIR: '.hopcode',
+  HOPCODE_CONFIG_DIR: '.hopcode',
 }));
 vi.mock('../tools/memory-config', () => ({
   setGeminiMdFilename: vi.fn(),
@@ -158,8 +158,8 @@ vi.mock('../tools/memory-config', () => ({
   getAllGeminiMdFilenames: vi.fn(() => ['QWEN.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'QWEN.md',
   AGENT_CONTEXT_FILENAME: 'AGENTS.md',
-  QWEN_CONFIG_DIR: '.hopcode',
-  MEMORY_SECTION_HEADER: '## Qwen Added Memories',
+  HOPCODE_CONFIG_DIR: '.hopcode',
+  MEMORY_SECTION_HEADER: '## HopCode Added Memories',
 }));
 
 vi.mock('../core/contentGenerator.js');
@@ -251,7 +251,7 @@ describe('Server Config (config.ts)', () => {
   });
   const SANDBOX: SandboxConfig = {
     command: 'docker',
-    image: 'qwen-code-sandbox',
+    image: 'hopcode-sandbox',
   };
   const TARGET_DIR = '/path/to/target';
   const DEBUG_MODE = false;

@@ -19,7 +19,7 @@ const {
   mockOnDidChangeActiveTextEditor,
   mockOnDidChangeTextEditorSelection,
   mockOpenExternal,
-  mockReadQwenSettingsForVSCode,
+  mockReadHopcodeSettingsForVSCode,
   mockWriteCodingPlanConfig,
   mockWriteModelProvidersConfig,
   mockClearPersistedAuth,
@@ -60,7 +60,7 @@ const {
   mockOnDidChangeActiveTextEditor: vi.fn(() => ({ dispose: vi.fn() })),
   mockOnDidChangeTextEditorSelection: vi.fn(() => ({ dispose: vi.fn() })),
   mockOpenExternal: vi.fn(),
-  mockReadQwenSettingsForVSCode: vi.fn<
+  mockReadHopcodeSettingsForVSCode: vi.fn<
     () => {
       provider: 'coding-plan' | 'api-key';
       apiKey: string;
@@ -133,11 +133,11 @@ vi.mock('vscode', () => ({
 vi.mock('../../services/settingsWriter.js', () => ({
   writeCodingPlanConfig: mockWriteCodingPlanConfig,
   writeModelProvidersConfig: mockWriteModelProvidersConfig,
-  readQwenSettingsForVSCode: mockReadQwenSettingsForVSCode,
+  readHopcodeSettingsForVSCode: mockReadHopcodeSettingsForVSCode,
   clearPersistedAuth: mockClearPersistedAuth,
 }));
 
-vi.mock('../../services/qwenAgentManager.js', () => ({
+vi.mock('../../services/hopcodeAgentManager.js', () => ({
   HopCodeAgentManager: class {
     isConnected = false;
     currentSessionId = null;
@@ -753,17 +753,17 @@ describe('WebViewProvider settings sync', () => {
 
     const synced = await (
       provider as unknown as {
-        syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+        syncVSCodeSettingsToHopcodeConfig: () => Promise<boolean>;
       }
-    ).syncVSCodeSettingsToQwenConfig();
+    ).syncVSCodeSettingsToHopcodeConfig();
 
     expect(synced).toBe(false);
     expect(mockWriteCodingPlanConfig).not.toHaveBeenCalled();
     expect(mockWriteModelProvidersConfig).not.toHaveBeenCalled();
   });
 
-  it('only syncs non-secret VS Code settings from ~/.qwen/settings.json', async () => {
-    mockReadQwenSettingsForVSCode.mockReturnValue({
+  it('only syncs non-secret VS Code settings from ~/.hopcode/settings.json', async () => {
+    mockReadHopcodeSettingsForVSCode.mockReturnValue({
       provider: 'coding-plan',
       apiKey: 'sk-updated',
       codingPlanRegion: 'global',
@@ -788,9 +788,9 @@ describe('WebViewProvider settings sync', () => {
 
     await (
       provider as unknown as {
-        syncQwenConfigToVSCodeSettings: () => Promise<void>;
+        syncHopcodeConfigToVSCodeSettings: () => Promise<void>;
       }
-    ).syncQwenConfigToVSCodeSettings();
+    ).syncHopcodeConfigToVSCodeSettings();
 
     expect(mockConfigUpdate).toHaveBeenCalledTimes(2);
     expect(mockConfigUpdate).toHaveBeenCalledWith(
@@ -810,7 +810,7 @@ describe('WebViewProvider settings sync', () => {
     );
   });
 
-  it('ignores non-auth qwen-code setting changes', async () => {
+  it('ignores non-auth hopcode setting changes', async () => {
     const provider = new WebViewProvider(
       { subscriptions: [] } as never,
       { fsPath: '/extension-root' } as never,
@@ -818,21 +818,21 @@ describe('WebViewProvider settings sync', () => {
     const syncSpy = vi
       .spyOn(
         provider as unknown as {
-          syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+          syncVSCodeSettingsToHopcodeConfig: () => Promise<boolean>;
         },
-        'syncVSCodeSettingsToQwenConfig',
+        'syncVSCodeSettingsToHopcodeConfig',
       )
       .mockResolvedValue(true);
 
     const configChangeHandler = mockConfigChangeHandlers.at(-1);
     expect(configChangeHandler).toBeDefined();
 
-    await configChangeHandler?.(createConfigChangeEvent('qwen-code'));
+    await configChangeHandler?.(createConfigChangeEvent('hopcode'));
 
     expect(syncSpy).not.toHaveBeenCalled();
   });
 
-  it('reacts to auth-related qwen-code setting changes', async () => {
+  it('reacts to auth-related hopcode setting changes', async () => {
     const provider = new WebViewProvider(
       { subscriptions: [] } as never,
       { fsPath: '/extension-root' } as never,
@@ -840,9 +840,9 @@ describe('WebViewProvider settings sync', () => {
     const syncSpy = vi
       .spyOn(
         provider as unknown as {
-          syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+          syncVSCodeSettingsToHopcodeConfig: () => Promise<boolean>;
         },
-        'syncVSCodeSettingsToQwenConfig',
+        'syncVSCodeSettingsToHopcodeConfig',
       )
       .mockResolvedValue(false);
 
@@ -850,7 +850,7 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.apiKey'),
+      createConfigChangeEvent('hopcode', 'hopcode.apiKey'),
     );
 
     expect(syncSpy).toHaveBeenCalledTimes(1);
@@ -866,12 +866,12 @@ describe('WebViewProvider settings sync', () => {
     (provider as unknown as { agentInitialized: boolean }).agentInitialized =
       true;
 
-    // syncVSCodeSettingsToQwenConfig returns false because apiKey is empty
+    // syncVSCodeSettingsToHopcodeConfig returns false because apiKey is empty
     vi.spyOn(
       provider as unknown as {
-        syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+        syncVSCodeSettingsToHopcodeConfig: () => Promise<boolean>;
       },
-      'syncVSCodeSettingsToQwenConfig',
+      'syncVSCodeSettingsToHopcodeConfig',
     ).mockResolvedValue(false);
 
     // apiKey is empty (user cleared it in Settings)
@@ -886,14 +886,14 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.apiKey'),
+      createConfigChangeEvent('hopcode', 'hopcode.apiKey'),
     );
 
     // Should clear persisted auth
     expect(mockClearPersistedAuth).toHaveBeenCalledTimes(1);
 
     // Should disconnect the agent
-    const agentManager = mockQwenAgentManagerInstances.at(-1);
+    const agentManager = mockHopCodeAgentManagerInstances.at(-1);
     expect(agentManager?.disconnect).toHaveBeenCalledTimes(1);
 
     // agentInitialized should be reset
@@ -912,12 +912,12 @@ describe('WebViewProvider settings sync', () => {
     (provider as unknown as { agentInitialized: boolean }).agentInitialized =
       true;
 
-    // syncVSCodeSettingsToQwenConfig returns false — normal for api-key providers
+    // syncVSCodeSettingsToHopcodeConfig returns false — normal for api-key providers
     vi.spyOn(
       provider as unknown as {
-        syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+        syncVSCodeSettingsToHopcodeConfig: () => Promise<boolean>;
       },
-      'syncVSCodeSettingsToQwenConfig',
+      'syncVSCodeSettingsToHopcodeConfig',
     ).mockResolvedValue(false);
 
     // apiKey is empty because api-key providers don't use this VS Code setting
@@ -936,12 +936,12 @@ describe('WebViewProvider settings sync', () => {
 
     // Changing codingPlanRegion should NOT trigger de-auth
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.codingPlanRegion'),
+      createConfigChangeEvent('hopcode', 'hopcode.codingPlanRegion'),
     );
 
     expect(mockClearPersistedAuth).not.toHaveBeenCalled();
 
-    const agentManager = mockQwenAgentManagerInstances.at(-1);
+    const agentManager = mockHopCodeAgentManagerInstances.at(-1);
     expect(agentManager?.disconnect).not.toHaveBeenCalled();
 
     // agentInitialized should remain true

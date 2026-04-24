@@ -10,7 +10,7 @@ import os from 'node:os';
 import { ToolNames } from '../tools/tool-names.js';
 import process from 'node:process';
 import { isGitRepository } from '../utils/gitUtils.js';
-import { QWEN_CONFIG_DIR } from '../memory/const.js';
+import { HOPCODE_CONFIG_DIR } from '../memory/const.js';
 import type { GenerateContentConfig } from '@google/genai';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
@@ -121,9 +121,11 @@ export function getCoreSystemPrompt(
   // default path is .hopcode/system.md but can be modified via custom path in HOPCODE_SYSTEM_MD
   let systemMdEnabled = false;
   // The default path for the system prompt file. This can be overridden.
-  let systemMdPath = path.resolve(path.join(QWEN_CONFIG_DIR, 'system.md'));
+  let systemMdPath = path.resolve(path.join(HOPCODE_CONFIG_DIR, 'system.md'));
   // Resolve the environment variable to get either a path or a switch value.
-  const systemMdResolution = resolvePathFromEnv((process.env['HOPCODE_SYSTEM_MD'] ?? process.env['QWEN_SYSTEM_MD']));
+  const systemMdResolution = resolvePathFromEnv(
+    process.env['HOPCODE_SYSTEM_MD'],
+  );
 
   // Proceed only if the environment variable is set and is not disabled.
   if (systemMdResolution.value && !systemMdResolution.isDisabled) {
@@ -328,7 +330,7 @@ Your core function is efficient and safe assistance. Balance extreme conciseness
 
   // if HOPCODE_WRITE_SYSTEM_MD is set (and not 0|false), write base system prompt to file
   const writeSystemMdResolution = resolvePathFromEnv(
-    (process.env['HOPCODE_WRITE_SYSTEM_MD'] ?? process.env['QWEN_WRITE_SYSTEM_MD']),
+    process.env['HOPCODE_WRITE_SYSTEM_MD'],
   );
 
   // Check if the feature is enabled. This proceeds only if the environment

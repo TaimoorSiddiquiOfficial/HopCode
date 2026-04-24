@@ -1,14 +1,14 @@
 ﻿# Package Overview
 
-This monorepo contains two main packages: `@hopcode/hopcode` and `@hopcode/hopcode-core`.
+This monorepo contains two main packages: `@hoptrendy/hopcode` and `@hoptrendy/hopcode-core`.
 
-## `@hopcode/hopcode`
+## `@hoptrendy/hopcode`
 
 This is the main package for HopCode. It is responsible for the user interface, command parsing, and all other user-facing functionality.
 
-When this package is published, it is bundled into a single executable file. This bundle includes all of the package's dependencies, including `@hopcode/hopcode-core`. This means that whether a user installs the package with `npm install -g @hopcode/hopcode` or runs it directly with `npx @hopcode/hopcode`, they are using this single, self-contained executable.
+When this package is published, it is bundled into a single executable file. This bundle includes all of the package's dependencies, including `@hoptrendy/hopcode-core`. This means that whether a user installs the package with `npm install -g @hoptrendy/hopcode` or runs it directly with `npx @hoptrendy/hopcode`, they are using this single, self-contained executable.
 
-## `@hopcode/hopcode-core`
+## `@hoptrendy/hopcode-core`
 
 This package contains the core logic for the CLI. It is responsible for making API requests to configured providers, handling authentication, and managing the local cache.
 
@@ -59,13 +59,13 @@ To install the latest version of each type:
 
 ```bash
 # Stable (default)
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 # Preview
-npm install -g @hopcode/hopcode@preview
+npm install -g @hoptrendy/hopcode@preview
 
 # Nightly
-npm install -g @hopcode/hopcode@nightly
+npm install -g @hoptrendy/hopcode@nightly
 ```
 
 ### Release Process Details
@@ -87,9 +87,9 @@ If any step in the release workflow fails, it will automatically create a new is
 
 After pushing a new release smoke testing should be performed to ensure that the packages are working as expected. This can be done by installing the packages locally and running a set of tests to ensure that they are functioning correctly.
 
-- `npx -y @hopcode/hopcode@latest --version` to validate the push worked as expected if you were not doing a rc or dev tag
-- `npx -y @hopcode/hopcode@<release tag> --version` to validate the tag pushed appropriately
-- _This is destructive locally_ `npm uninstall @hopcode/hopcode && npm uninstall -g @hopcode/hopcode && npm cache clean --force &&  npm install @hopcode/hopcode@<version>`
+- `npx -y @hoptrendy/hopcode@latest --version` to validate the push worked as expected if you were not doing a rc or dev tag
+- `npx -y @hoptrendy/hopcode@<release tag> --version` to validate the tag pushed appropriately
+- _This is destructive locally_ `npm uninstall @hoptrendy/hopcode && npm uninstall -g @hoptrendy/hopcode && npm cache clean --force &&  npm install @hoptrendy/hopcode@<version>`
 - Smoke testing a basic run through of exercising a few llm commands and tools is recommended to ensure that the packages are working as expected. We'll codify this more in the future.
 
 ## When to merge the version change, or not?
@@ -255,4 +255,4 @@ This tells NPM that any folder inside the `packages` directory is a separate pac
 
 - **Simplified Dependency Management**: Running `npm install` from the root of the project will install all dependencies for all packages in the workspace and link them together. This means you don't need to run `npm install` in each package's directory.
 - **Automatic Linking**: Packages within the workspace can depend on each other. When you run `npm install`, NPM will automatically create symlinks between the packages. This means that when you make changes to one package, the changes are immediately available to other packages that depend on it.
-- **Simplified Script Execution**: You can run scripts in any package from the root of the project using the `--workspace` flag. For example, to run the `build` script in the `cli` package, you can run `npm run build --workspace @hopcode/hopcode`.
+- **Simplified Script Execution**: You can run scripts in any package from the root of the project using the `--workspace` flag. For example, to run the `build` script in the `cli` package, you can run `npm run build --workspace @hoptrendy/hopcode`.

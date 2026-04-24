@@ -58,8 +58,8 @@ describe('bugCommand', () => {
 
     const HopCodeLine =
       GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO)
-        ? `Qwen Code: 0.1.0 (${GIT_COMMIT_INFO})`
-        : 'Qwen Code: 0.1.0';
+        ? `HopCode: 0.1.0 (${GIT_COMMIT_INFO})`
+        : 'HopCode: 0.1.0';
     const expectedInfo = `${HopCodeLine}
 Runtime: Node.js v20.0.0 / npm 10.0.0
 IDE Client: VSCode
@@ -71,7 +71,7 @@ Sandbox: test
 Proxy: no proxy
 Memory Usage: 100 MB`;
     const expectedUrl =
-      'https://github.com/QwenLM/qwen-code/issues/new?template=bug_report.yml&title=A%20test%20bug&info=%0A' +
+      'https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/new?template=bug_report.yml&title=A%20test%20bug&info=%0A' +
       encodeURIComponent(expectedInfo) +
       '%0A';
 
@@ -103,8 +103,8 @@ Memory Usage: 100 MB`;
 
     const HopCodeLine =
       GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO)
-        ? `Qwen Code: 0.1.0 (${GIT_COMMIT_INFO})`
-        : 'Qwen Code: 0.1.0';
+        ? `HopCode: 0.1.0 (${GIT_COMMIT_INFO})`
+        : 'HopCode: 0.1.0';
     const expectedInfo = `${HopCodeLine}
 Runtime: Node.js v20.0.0 / npm 10.0.0
 IDE Client: VSCode
@@ -165,8 +165,8 @@ Memory Usage: 100 MB`;
 
     const HopCodeLine =
       GIT_COMMIT_INFO && !['N/A'].includes(GIT_COMMIT_INFO)
-        ? `Qwen Code: 0.1.0 (${GIT_COMMIT_INFO})`
-        : 'Qwen Code: 0.1.0';
+        ? `HopCode: 0.1.0 (${GIT_COMMIT_INFO})`
+        : 'HopCode: 0.1.0';
     const expectedInfo = `${HopCodeLine}
 Runtime: Node.js v20.0.0 / npm 10.0.0
 IDE Client: VSCode
@@ -180,7 +180,7 @@ Sandbox: test
 Proxy: no proxy
 Memory Usage: 100 MB`;
     const expectedUrl =
-      'https://github.com/QwenLM/qwen-code/issues/new?template=bug_report.yml&title=OpenAI%20bug&info=%0A' +
+      'https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/new?template=bug_report.yml&title=OpenAI%20bug&info=%0A' +
       encodeURIComponent(expectedInfo) +
       '%0A';
 

@@ -2,7 +2,7 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.17.0",
+  "version": "0.17.3",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
@@ -200,9 +200,9 @@
       ]
     },
     "configuration": {
-      "title": "Qwen Code",
+      "title": "HopCode",
       "properties": {
-        "qwen-code.provider": {
+        "hopcode.provider": {
           "order": 0,
           "type": "string",
           "enum": [
@@ -211,18 +211,18 @@
           ],
           "enumDescriptions": [
             "Alibaba Cloud Coding Plan — configurable from VS Code Settings",
-            "Configured via Qwen Code: Auth or the onboarding button"
+            "Configured via HopCode: Auth or the onboarding button"
           ],
           "default": "coding-plan",
-          "markdownDescription": "**Coding Plan**: enter API Key + Region here to sync `~/.qwen/settings.json`.\n\n**API Key**: use **Qwen Code: Auth** or the onboarding button to configure ModelStudio or custom OpenAI-compatible providers."
+          "markdownDescription": "**Coding Plan**: enter API Key + Region here to sync `~/.hopcode/settings.json`.\n\n**API Key**: use **HopCode: Auth** or the onboarding button to configure ModelStudio or custom OpenAI-compatible providers."
         },
-        "qwen-code.apiKey": {
+        "hopcode.apiKey": {
           "order": 1,
           "type": "string",
           "default": "",
-          "markdownDescription": "API key used for **Coding Plan** settings sync. For **API Key** providers, configure the full provider details through **Qwen Code: Auth**."
+          "markdownDescription": "API key used for **Coding Plan** settings sync. For **API Key** providers, configure the full provider details through **HopCode: Auth**."
         },
-        "qwen-code.codingPlanRegion": {
+        "hopcode.codingPlanRegion": {
           "order": 2,
           "type": "string",
           "enum": [

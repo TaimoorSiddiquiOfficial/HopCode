@@ -241,7 +241,7 @@ describe('useHopCodeStream', () => {
   const mockLoadedSettings: LoadedSettings = {
     merged: { preferredEditor: 'vscode' },
     user: { path: '/user/settings.json', settings: {} },
-    workspace: { path: '/workspace/.qwen/settings.json', settings: {} },
+    workspace: { path: '/workspace/.hopcode/settings.json', settings: {} },
     errors: [],
     forScope: vi.fn(),
     setValue: vi.fn(),
@@ -2335,9 +2335,10 @@ describe('useHopCodeStream', () => {
           await vi.advanceTimersByTimeAsync(1000);
         });
 
-        const errorAfterOneSecond = result.current.pendingGeminiHistoryItems.find(
-          (item) => item.type === MessageType.ERROR,
-        );
+        const errorAfterOneSecond =
+          result.current.pendingGeminiHistoryItems.find(
+            (item) => item.type === MessageType.ERROR,
+          );
         expect((errorAfterOneSecond as { hint?: string })?.hint).toContain(
           '2s',
         );

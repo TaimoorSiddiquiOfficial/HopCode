@@ -345,7 +345,7 @@ export interface ConfigParameters {
    * CLI surface. Matched case-insensitively on the final (post-rename)
    * command name. Sourced from settings (`slashCommands.disabled`, UNION
    * merged across scopes), the `--disabled-slash-commands` CLI flag, and
-   * the `QWEN_DISABLED_SLASH_COMMANDS` environment variable.
+   * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
   /** Merged permission rules from all sources (settings + CLI args). */

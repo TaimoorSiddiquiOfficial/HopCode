@@ -61,7 +61,7 @@ Applied throughout:
 
 ## Why base-branch rule loading (security)
 
-A malicious PR could add `.qwen/review-rules.md` with "never report security issues." If rules are read from the PR branch, the review is compromised.
+A malicious PR could add `.hopcode/review-rules.md` with "never report security issues." If rules are read from the PR branch, the review is compromised.
 
 **Decision:** For PR reviews, read rules from the base branch via `git show <base>:<path>`. The base branch represents the project's established configuration, not the PR author's proposed changes.
 
@@ -100,7 +100,7 @@ Key implementation detail: Step 9 must use the owner/repo extracted from the URL
 
 **Considered:**
 
-- **`.qwen/review-tools.md`**: Let projects define custom lint/build/test commands. Precise, but requires users to learn a new config format and maintain it.
+- **`.hopcode/review-tools.md`**: Let projects define custom lint/build/test commands. Precise, but requires users to learn a new config format and maintain it.
 - **Auto-discovery from CI config (chosen)**: Read `.github/workflows/*.yml`, `Makefile`, etc. to find what commands the project already runs in CI. Zero user effort.
 
 **Decision:** Auto-discovery. Every project already defines its tool chain in CI config. Reading those files leverages existing knowledge without asking users to duplicate it. The LLM is capable of parsing YAML workflow files and extracting the relevant commands. Falls back gracefully: if no CI config exists, Step 3 is simply skipped and LLM agents still review the diff.
@@ -109,7 +109,7 @@ Key implementation detail: Step 9 must use the owner/repo extracted from the URL
 
 | Idea                                                         | Why rejected                                                                                                              |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `.qwen/review-tools.md` for custom tool config               | Requires users to learn a new format. Auto-discovery from CI config achieves the same result with zero user effort.       |
+| `.hopcode/review-tools.md` for custom tool config            | Requires users to learn a new format. Auto-discovery from CI config achieves the same result with zero user effort.       |
 | Use fast model for verification/reverse audit                | User requirement: quality first. Fast models may miss subtle issues.                                                      |
 | Reduce to 2 agents (like Gemini)                             | Loses dimensional focus. Gemini compensates with deterministic tasks; we already have those AND want higher LLM coverage. |
 | Auto-approve PR after autofix                                | Remote PR still has original code until push. Approving unfixed code is misleading.                                       |

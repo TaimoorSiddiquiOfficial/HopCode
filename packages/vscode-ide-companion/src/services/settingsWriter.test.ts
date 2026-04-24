@@ -27,7 +27,7 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 
 import { CODING_PLAN_ENV_KEY, AuthType } from '@hoptrendy/hopcode-core';
 import {
-  readQwenSettingsForVSCode,
+  readHopcodeSettingsForVSCode,
   writeCodingPlanConfig,
   writeModelProvidersConfig,
 } from './settingsWriter.js';
@@ -38,8 +38,10 @@ describe('settingsWriter', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-vscode-settings-'));
-    settingsPath = path.join(tempDir, '.qwen', 'settings.json');
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'hopcode-vscode-settings-'),
+    );
+    settingsPath = path.join(tempDir, '.hopcode', 'settings.json');
     mockGetGlobalSettingsPath.mockReturnValue(settingsPath);
   });
 
@@ -96,7 +98,7 @@ describe('settingsWriter', () => {
       activeModel: 'gpt-4o',
     });
 
-    expect(readQwenSettingsForVSCode()).toEqual({
+    expect(readHopcodeSettingsForVSCode()).toEqual({
       provider: 'api-key',
       apiKey: 'manual-key',
       codingPlanRegion: 'china',

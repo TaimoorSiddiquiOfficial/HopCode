@@ -120,7 +120,7 @@ export const TimeoutConfigSchema = z.object({
 const QuerySystemPromptPresetSchema = z
   .object({
     type: z.literal('preset'),
-    preset: z.literal('qwen_code'),
+    preset: z.literal('hopcode'),
     append: z
       .string()
       .min(1, 'systemPrompt.append must be a non-empty string')

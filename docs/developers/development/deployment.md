@@ -15,7 +15,7 @@ This is the recommended way for end-users to install HopCode. It involves downlo
 - **Global install:**
 
   ```bash
-  npm install -g @hopcode/hopcode
+  npm install -g @hoptrendy/hopcode
   ```
 
   Then, run the CLI from anywhere:
@@ -28,7 +28,7 @@ This is the recommended way for end-users to install HopCode. It involves downlo
 
   ```bash
   # Execute the latest version from NPM without a global install
-  npx @hopcode/hopcode
+  npx @hoptrendy/hopcode
   ```
 
 ---
@@ -91,8 +91,8 @@ The execution methods described above are made possible by the following archite
 
 HopCode project is a monorepo that publishes core packages to the NPM registry:
 
-- `@hopcode/hopcode-core`: The backend, handling logic and tool execution.
-- `@hopcode/hopcode`: The user-facing frontend.
+- `@hoptrendy/hopcode-core`: The backend, handling logic and tool execution.
+- `@hoptrendy/hopcode`: The user-facing frontend.
 
 These packages are used when performing the standard installation and when running HopCode from the source.
 
@@ -100,7 +100,7 @@ These packages are used when performing the standard installation and when runni
 
 There are two distinct build processes used, depending on the distribution channel:
 
-- **NPM publication:** For publishing to the NPM registry, the TypeScript source code in `@hopcode/hopcode-core` and `@hopcode/hopcode` is transpiled into standard JavaScript using the TypeScript Compiler (`tsc`). The resulting `dist/` directory is what gets published in the NPM package. This is a standard approach for TypeScript libraries.
+- **NPM publication:** For publishing to the NPM registry, the TypeScript source code in `@hoptrendy/hopcode-core` and `@hoptrendy/hopcode` is transpiled into standard JavaScript using the TypeScript Compiler (`tsc`). The resulting `dist/` directory is what gets published in the NPM package. This is a standard approach for TypeScript libraries.
 
 - **GitHub `npx` execution:** When running the latest version of HopCode directly from GitHub, a different process is triggered by the `prepare` script in `package.json`. This script uses `esbuild` to bundle the entire application and its dependencies into a single, self-contained JavaScript file. This bundle is created on-the-fly on the user's machine and is not checked into the repository.
 

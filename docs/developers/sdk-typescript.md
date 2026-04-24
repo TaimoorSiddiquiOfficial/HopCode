@@ -1,6 +1,6 @@
 # Typescript SDK
 
-## @hopcode/sdk
+## @hoptrendy/sdk
 
 A minimum experimental TypeScript SDK for programmatic access to HopCode.
 
@@ -9,7 +9,7 @@ Feel free to submit a feature request/issue/PR.
 ## Installation
 
 ```bash
-npm install @hopcode/sdk
+npm install @hoptrendy/sdk
 ```
 
 ## Requirements
@@ -22,7 +22,7 @@ npm install @hopcode/sdk
 ## Quick Start
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 // Single-turn query
 const result = query({
@@ -71,7 +71,7 @@ Creates a new query session with the HopCode.
 | `coreTools`              | `string[]`                                     | -                | Equivalent to `tool.core` in settings.json. If specified, only these tools will be available to the AI. Example: `['read_file', 'write_file', 'run_terminal_cmd']`.                                                                                                                                                                                                                                                                                                                 |
 | `excludeTools`           | `string[]`                                     | -                | Equivalent to `tool.exclude` in settings.json. Excluded tools return a permission error immediately. Takes highest priority over all other permission settings. Supports pattern matching: tool name (`'write_file'`), tool class (`'ShellTool'`), or shell command prefix (`'ShellTool(rm )'`).                                                                                                                                                                                    |
 | `allowedTools`           | `string[]`                                     | -                | Equivalent to `tool.allowed` in settings.json. Matching tools bypass `canUseTool` callback and execute automatically. Only applies when tool requires confirmation. Supports same pattern matching as `excludeTools`.                                                                                                                                                                                                                                                               |
-| `authType`               | `'openai' \| 'qwen-oauth'`                     | `'openai'`       | Authentication type for the AI service. Using `'qwen-oauth'` in SDK is not recommended as credentials are stored in `~/.hopcode` and may need periodic refresh.                                                                                                                                                                                                                                                                                                                        |
+| `authType`               | `'openai' \| 'qwen-oauth'`                     | `'openai'`       | Authentication type for the AI service. Using `'qwen-oauth'` in SDK is not recommended as credentials are stored in `~/.hopcode` and may need periodic refresh.                                                                                                                                                                                                                                                                                                                     |
 | `agents`                 | `SubagentConfig[]`                             | -                | Configuration for subagents that can be invoked during the session. Subagents are specialized AI agents for specific tasks or domains.                                                                                                                                                                                                                                                                                                                                              |
 | `includePartialMessages` | `boolean`                                      | `false`          | When `true`, the SDK emits incomplete messages as they are being generated, allowing real-time streaming of the AI's response.                                                                                                                                                                                                                                                                                                                                                      |
 
@@ -110,7 +110,7 @@ import {
   isSDKSystemMessage,
   isSDKResultMessage,
   isSDKPartialAssistantMessage,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 
 for await (const message of result) {
   if (isSDKAssistantMessage(message)) {
@@ -175,7 +175,7 @@ The SDK supports different permission modes for controlling tool execution:
 ### Multi-turn Conversation
 
 ```typescript
-import { query, type SDKUserMessage } from '@hopcode/sdk';
+import { query, type SDKUserMessage } from '@hoptrendy/sdk';
 
 async function* generateMessages(): AsyncIterable<SDKUserMessage> {
   yield {
@@ -209,7 +209,7 @@ for await (const message of result) {
 ### Custom Permission Handler
 
 ```typescript
-import { query, type CanUseTool } from '@hopcode/sdk';
+import { query, type CanUseTool } from '@hoptrendy/sdk';
 
 const canUseTool: CanUseTool = async (toolName, input, { signal }) => {
   // Allow all read operations
@@ -238,7 +238,7 @@ const result = query({
 ### With External MCP Servers
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 const result = query({
   prompt: 'Use the custom tool from my MCP server',
@@ -257,7 +257,7 @@ const result = query({
 ### Override the System Prompt
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 const result = query({
   prompt: 'Say hello in one sentence.',
@@ -270,7 +270,7 @@ const result = query({
 ### Append to the Built-in System Prompt
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 const result = query({
   prompt: 'Review the current directory.',
@@ -328,7 +328,7 @@ Returns a `McpSdkServerConfigWithInstance` object that can be passed directly to
 
 ```typescript
 import { z } from 'zod';
-import { query, tool, createSdkMcpServer } from '@hopcode/sdk';
+import { query, tool, createSdkMcpServer } from '@hoptrendy/sdk';
 
 // Define a tool with Zod schema
 const calculatorTool = tool(
@@ -365,7 +365,7 @@ for await (const message of result) {
 ### Abort a Query
 
 ```typescript
-import { query, isAbortError } from '@hopcode/sdk';
+import { query, isAbortError } from '@hoptrendy/sdk';
 
 const abortController = new AbortController();
 
@@ -397,7 +397,7 @@ try {
 The SDK provides an `AbortError` class for handling aborted queries:
 
 ```typescript
-import { AbortError, isAbortError } from '@hopcode/sdk';
+import { AbortError, isAbortError } from '@hoptrendy/sdk';
 
 try {
   // ... query operations

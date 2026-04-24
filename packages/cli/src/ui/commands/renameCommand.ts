@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Code
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -269,7 +269,8 @@ export const renameCommand: SlashCommand = {
           type: 'message',
           messageType: 'error',
           content: autoFailureMessage(
-            (outcome as { ok: false; reason: SessionTitleFailureReason }).reason,
+            (outcome as { ok: false; reason: SessionTitleFailureReason })
+              .reason,
           ),
         };
       }

@@ -347,7 +347,7 @@ export class AcpConnection {
             this.onAuthenticateUpdate(
               params as unknown as AuthenticateUpdateNotification,
             );
-          } else if (method === '_qwencode/slash_command') {
+          } else if (method === '_hopcode/slash_command') {
             this.onSlashCommandNotification(
               params as unknown as SlashCommandNotification,
             );

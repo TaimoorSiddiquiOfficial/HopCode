@@ -100,8 +100,8 @@ When the user asks about configuration, the primary reference is `docs/configura
 
 | Level   | Path                                                         | Description                            |
 | ------- | ------------------------------------------------------------ | -------------------------------------- |
-| User    | `~/.qwen/settings.json`                                      | Personal global config                 |
-| Project | `<project>/.qwen/settings.json`                              | Project-specific, overrides user level |
+| User    | `~/.hopcode/settings.json`                                   | Personal global config                 |
+| Project | `<project>/.hopcode/settings.json`                           | Project-specific, overrides user level |
 | System  | macOS: `/Library/Application Support/QwenCode/settings.json` | Admin-level config                     |
 
 **Priority** (highest to lowest): CLI args > env vars > system settings > project settings > user settings > defaults
@@ -136,7 +136,7 @@ When the user asks about configuration, the primary reference is `docs/configura
 When the user wants to modify their configuration:
 
 1. **Read the relevant doc** to understand the config key, its type, allowed values, and defaults
-2. **Ask which config level** to modify if not specified: user (`~/.qwen/settings.json`) or project (`.qwen/settings.json`)
+2. **Ask which config level** to modify if not specified: user (`~/.hopcode/settings.json`) or project (`.hopcode/settings.json`)
 3. **Use `read_file`** to check the current content of the target settings file
 4. **Use `edit_file`** to apply the change with correct JSON syntax
 5. **After every configuration change**, you MUST remind the user:

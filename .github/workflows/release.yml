@@ -262,7 +262,7 @@ jobs:
 
       - name: 'Build Sandbox'
         env:
-          QWEN_SANDBOX: 'docker'
+          HOPCODE_SANDBOX: 'docker'
         run: |-
           npm run build:sandbox -- -s
 
@@ -270,11 +270,11 @@ jobs:
         run: |-
           # The package.json docker test scripts each rebuild the sandbox image.
           # Run vitest directly here so this job reuses the image built above.
-          QWEN_SANDBOX=docker npx vitest run --root ./integration-tests cli
+          HOPCODE_SANDBOX=docker npx vitest run --root ./integration-tests cli
 
       - name: 'Run Interactive Docker Integration Tests'
         run: |-
-          QWEN_SANDBOX=docker npx vitest run --root ./integration-tests interactive
+          HOPCODE_SANDBOX=docker npx vitest run --root ./integration-tests interactive
 
   publish:
     name: 'Publish Release'

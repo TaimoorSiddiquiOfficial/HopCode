@@ -39,7 +39,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Run HopCode Issue Analysis'
-        uses: 'QwenLM/qwen-code-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
+        uses: 'TaimoorSiddiquiOfficial/HopCode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
         id: 'hopcode_issue_analysis'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'

@@ -142,7 +142,7 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, false);
 
     expect(mockedExecSync).toHaveBeenCalledWith(
-      'brew list -1 | grep -q "^qwen-code$"',
+      'brew list -1 | grep -q "^hopcode$"',
       { stdio: 'ignore' },
     );
     expect(info.packageManager).toBe(PackageManager.HOMEBREW);
@@ -164,7 +164,7 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, false);
 
     expect(mockedExecSync).toHaveBeenCalledWith(
-      'brew list -1 | grep -q "^qwen-code$"',
+      'brew list -1 | grep -q "^hopcode$"',
       { stdio: 'ignore' },
     );
     // Should fall back to default global npm
@@ -184,7 +184,9 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, true);
     expect(info.packageManager).toBe(PackageManager.PNPM);
     expect(info.isGlobal).toBe(true);
-    expect(info.updateCommand).toBe('pnpm add -g @hoptrendy/hopcode-cli@latest');
+    expect(info.updateCommand).toBe(
+      'pnpm add -g @hoptrendy/hopcode-cli@latest',
+    );
     expect(info.updateMessage).toContain('Attempting to automatically update');
 
     // isAutoUpdateEnabled = false -> "Please run..."

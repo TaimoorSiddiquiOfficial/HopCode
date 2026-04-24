@@ -50,7 +50,7 @@ export type TransportOptions = {
 
 export interface QuerySystemPromptPreset {
   type: 'preset';
-  preset: 'qwen_code';
+  preset: 'hopcode';
   append?: string;
 }
 
@@ -240,7 +240,7 @@ export interface QueryOptions {
    * System prompt configuration for the HopCode CLI session.
    *
    * - `string`: fully overrides the main session system prompt
-   * - `{ type: 'preset', preset: 'qwen_code', append?: string }`:
+   * - `{ type: 'preset', preset: 'hopcode', append?: string }`:
    *   uses HopCode Code's built-in prompt as the base and optionally appends extra
    *   instructions for the main session
    */

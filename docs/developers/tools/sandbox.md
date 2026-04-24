@@ -32,7 +32,7 @@ which qwen
 # Or similar paths, but it should be a symbolic link
 
 # 6. For details of the symbolic link, you can see the specific source code path
-ls -la $(dirname $(which qwen))/../lib/node_modules/@hopcode/hopcode
+ls -la $(dirname $(which qwen))/../lib/node_modules/@hoptrendy/hopcode
 # It should show that this is a symbolic link pointing to your source code directory
 
 # 7.Test the version of qwen
@@ -72,7 +72,7 @@ This builds a project-specific image based on the default sandbox image.
 
 ```bash
 # Method 1: Unlink globally
-npm unlink -g @hopcode/hopcode
+npm unlink -g @hoptrendy/hopcode
 
 # Method 2: Remove it in the packages/cli directory
 cd packages/cli
@@ -83,7 +83,7 @@ which qwen
 # It should display "qwen not found"
 
 # Reinstall the global version if necessary
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 # Verification Recovery
 which qwen

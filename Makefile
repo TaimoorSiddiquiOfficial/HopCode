@@ -18,7 +18,7 @@ help:
 	@echo "  make debug            - Start the HopCode CLI in debug mode"
 	@echo ""
 	@echo "  make run-npx          - Run the CLI using npx (for testing the published package)"
-	@echo "  make create-alias     - Create a 'qwen' alias for your shell"
+	@echo "  make create-alias     - Create a 'hopcode' alias for your shell"
 
 install:
 	npm install
@@ -53,7 +53,7 @@ debug:
 
 
 run-npx:
-	npx https://github.com/QwenLM/hopcode
+	npx https://github.com/TaimoorSiddiquiOfficial/HopCode
 
 create-alias:
 	scripts/create_alias.sh

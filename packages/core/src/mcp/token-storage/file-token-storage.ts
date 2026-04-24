@@ -23,6 +23,15 @@ export class FileTokenStorage extends BaseTokenStorage {
   }
 
   private deriveEncryptionKey(): Buffer {
+    const salt = `${os.hostname()}-${os.userInfo().username}-hopcode`;
+    return crypto.scryptSync('hopcode-oauth', salt, 32);
+  }
+
+  /**
+   * Derive the legacy encryption key for backward compatibility
+   * with tokens encrypted under the old qwen-code-oauth service name.
+   */
+  private deriveLegacyEncryptionKey(): Buffer {
     const salt = `${os.hostname()}-${os.userInfo().username}-qwen-code`;
     return crypto.scryptSync('qwen-code-oauth', salt, 32);
   }
@@ -49,17 +58,23 @@ export class FileTokenStorage extends BaseTokenStorage {
     const authTag = Buffer.from(parts[1], 'hex');
     const encrypted = parts[2];
 
-    const decipher = crypto.createDecipheriv(
-      'aes-256-gcm',
-      this.encryptionKey,
-      iv,
-    );
-    decipher.setAuthTag(authTag);
+    // Try the current key first, then fall back to the legacy key
+    // for backward compatibility with tokens encrypted under the old name.
+    for (const key of [this.encryptionKey, this.deriveLegacyEncryptionKey()]) {
+      try {
+        const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+        decipher.setAuthTag(authTag);
 
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
 
-    return decrypted;
+        return decrypted;
+      } catch {
+        // Decryption failed with this key, try the next one
+      }
+    }
+
+    throw new Error('Failed to decrypt data with both current and legacy keys');
   }
 
   private async ensureDirectoryExists(): Promise<void> {

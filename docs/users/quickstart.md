@@ -43,7 +43,7 @@ Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](
 **NPM**
 
 ```bash
-npm install -g @hopcode/hopcode@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
 **Homebrew (macOS, Linux)**

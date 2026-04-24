@@ -38,7 +38,7 @@ const AUTO_TITLE_ATTEMPT_CAP = 3;
 
 /**
  * Users who don't want the fast model silently generating titles can opt
- * out at runtime: `QWEN_DISABLE_AUTO_TITLE=1` (or any truthy-ish value)
+ * out at runtime: `HOPCODE_DISABLE_AUTO_TITLE=1` (or any truthy-ish value)
  * makes {@link ChatRecordingService.maybeTriggerAutoTitle} a no-op without
  * touching the rest of the feature (so `/rename --auto` still works on
  * explicit user request). Read per-call rather than cached so tests can
@@ -46,7 +46,7 @@ const AUTO_TITLE_ATTEMPT_CAP = 3;
  * one env lookup per assistant turn is irrelevant next to an LLM call.
  */
 function autoTitleDisabledByEnv(): boolean {
-  const v = process.env['QWEN_DISABLE_AUTO_TITLE'];
+  const v = process.env['HOPCODE_DISABLE_AUTO_TITLE'];
   if (!v) return false;
   // Accept "0", "false", "no", "off" (case-insensitive) as "not disabled".
   const lowered = v.trim().toLowerCase();

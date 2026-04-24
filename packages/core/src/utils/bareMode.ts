@@ -6,9 +6,6 @@
 
 export const HOPCODE_SIMPLE_ENV_VAR = 'HOPCODE_SIMPLE';
 
-// Backward compatibility with the old Qwen Code env var name
-export const QWEN_CODE_SIMPLE_ENV_VAR = 'QWEN_CODE_SIMPLE';
-
 function isTruthy(value: string | undefined): boolean {
   if (!value) {
     return false;
@@ -18,9 +15,5 @@ function isTruthy(value: string | undefined): boolean {
 }
 
 export function isBareMode(cliFlag?: boolean): boolean {
-  return (
-    cliFlag === true ||
-    isTruthy(process.env[HOPCODE_SIMPLE_ENV_VAR]) ||
-    isTruthy(process.env[QWEN_CODE_SIMPLE_ENV_VAR])
-  );
+  return cliFlag === true || isTruthy(process.env[HOPCODE_SIMPLE_ENV_VAR]);
 }

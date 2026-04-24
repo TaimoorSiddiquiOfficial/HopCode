@@ -17,7 +17,7 @@ ChannelBase  →  calls your sendMessage() with the agent's response
 Your extension entry point exports a `plugin` conforming to `ChannelPlugin`:
 
 ```typescript
-import type { ChannelPlugin } from '@hopcode/channel-base';
+import type { ChannelPlugin } from '@hoptrendy/channel-base';
 import { MyChannel } from './MyChannel.js';
 
 export const plugin: ChannelPlugin = {
@@ -34,8 +34,8 @@ export const plugin: ChannelPlugin = {
 Extend `ChannelBase` and implement three methods:
 
 ```typescript
-import { ChannelBase } from '@hopcode/channel-base';
-import type { Envelope } from '@hopcode/channel-base';
+import { ChannelBase } from '@hoptrendy/channel-base';
+import type { Envelope } from '@hoptrendy/channel-base';
 
 export class MyChannel extends ChannelBase {
   async connect(): Promise<void> {

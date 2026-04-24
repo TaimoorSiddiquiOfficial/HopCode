@@ -84,7 +84,7 @@ const reactDedupPlugin = {
 const publicCliExportPlugin = {
   name: 'public-cli-export',
   setup(build) {
-    build.onResolve({ filter: /^@qwen-code\/qwen-code\/export$/ }, () => ({
+    build.onResolve({ filter: /^@hoptrendy\/hopcode-cli\/export$/ }, () => ({
       path: resolve(repoRoot, 'packages/cli/src/export/index.ts'),
     }));
   },

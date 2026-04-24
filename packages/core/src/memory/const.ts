@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const QWEN_CONFIG_DIR = '.hopcode';
+export const HOPCODE_CONFIG_DIR = '.hopcode';
 export const DEFAULT_CONTEXT_FILENAME = 'HOPCODE.md';
 export const LEGACY_CONTEXT_FILENAME = 'QWEN.md';
 export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';

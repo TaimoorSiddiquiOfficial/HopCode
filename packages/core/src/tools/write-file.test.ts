@@ -28,7 +28,7 @@ import { HopCodeClient } from '../core/client.js';
 import { createMockWorkspaceContext } from '../test-utils/mockWorkspaceContext.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
 
-const rootDir = path.resolve(os.tmpdir(), 'qwen-code-test-root');
+const rootDir = path.resolve(os.tmpdir(), 'hopcode-test-root');
 
 // --- MOCKS ---
 vi.mock('../core/client.js');
@@ -95,7 +95,9 @@ describe('WriteFileTool', () => {
     mockHopCodeClientInstance = new (vi.mocked(HopCodeClient))(
       mockConfig,
     ) as Mocked<HopCodeClient>;
-    vi.mocked(HopCodeClient).mockImplementation(() => mockHopCodeClientInstance);
+    vi.mocked(HopCodeClient).mockImplementation(
+      () => mockHopCodeClientInstance,
+    );
 
     // Now that mockHopCodeClientInstance is initialized, set the mock implementation for getHopCodeClient
     mockConfigInternal.getHopCodeClient.mockReturnValue(

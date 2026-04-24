@@ -219,7 +219,7 @@ const MOCK_DATA: InsightData = {
           why_for_you:
             'You have 6 feature requests and 3+ PR creation sessions - these repetitive workflows would benefit from /pr, /review, /test commands',
           example_code:
-            'Create .qwen/skills/pr/SKILL.md:\n```\nCreate a PR using the template at .github/PULL_REQUEST_TEMPLATE.md\n- Summarize commits since main\n- Use English language\n- Include test coverage notes\n```',
+            'Create .hopcode/skills/pr/SKILL.md:\n```\nCreate a PR using the template at .github/PULL_REQUEST_TEMPLATE.md\n- Summarize commits since main\n- Use English language\n- Include test coverage notes\n```',
         },
         {
           feature: 'Custom Skills',
@@ -227,7 +227,7 @@ const MOCK_DATA: InsightData = {
           why_for_you:
             'You had 2 test creation sessions with mock implementation issues - a /test skill would ensure consistent patterns',
           example_code:
-            'Create .qwen/skills/test/SKILL.md:\n```\nGenerate Vitest tests for the specified file:\n- Use vi.mock() for modules before vi.mocked()\n- Include provider wrappers as needed\n- Run tests after generation to verify\n```',
+            'Create .hopcode/skills/test/SKILL.md:\n```\nGenerate Vitest tests for the specified file:\n- Use vi.mock() for modules before vi.mocked()\n- Include provider wrappers as needed\n- Run tests after generation to verify\n```',
         },
         {
           feature: 'Custom Skills',
@@ -235,7 +235,7 @@ const MOCK_DATA: InsightData = {
           why_for_you:
             'You had 3 code review sessions where the code-reviewer subagent failed - a manual /review skill would be more reliable',
           example_code:
-            'Create .qwen/skills/review/SKILL.md:\n```\nReview code for:\n1. Test coverage for new features\n2. Error handling in async functions\n3. Security implications\n4. Breaking changes\n```',
+            'Create .hopcode/skills/review/SKILL.md:\n```\nReview code for:\n1. Test coverage for new features\n2. Error handling in async functions\n3. Security implications\n4. Breaking changes\n```',
         },
         {
           feature: 'Headless Mode',
@@ -271,7 +271,7 @@ const MOCK_DATA: InsightData = {
           detail:
             "You've created multiple PRs and tests with similar patterns each time. Creating /pr and /test skills would ensure consistency (English language, proper templates, correct mock patterns) and save time across your 314 sessions.",
           copyable_prompt:
-            'Create .qwen/skills/pr/SKILL.md with your PR template requirements, then just type /pr',
+            'Create .hopcode/skills/pr/SKILL.md with your PR template requirements, then just type /pr',
         },
         {
           title: 'Improve Session Completion Rate',

@@ -7,7 +7,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { SessionService, type Config } from '@qwen-code/qwen-code-core';
+import { SessionService, type Config } from '@hoptrendy/hopcode-core';
 import {
   collectSessionData,
   generateExportFilename,
@@ -16,7 +16,7 @@ import {
   toJson,
   toJsonl,
   toMarkdown,
-} from '@qwen-code/qwen-code/export';
+} from '@hoptrendy/hopcode-cli/export';
 import {
   EXPORT_SESSION_FORMATS,
   getExportSubcommandRequiredMessage,

@@ -621,13 +621,13 @@ export class IdeClient {
       try {
         const portFile = path.join(
           os.tmpdir(),
-          `qwen-code-ide-server-${this.ideProcessInfo.pid}.json`,
+          `hopcode-ide-server-${this.ideProcessInfo.pid}.json`,
         );
         const portFileContents = await fs.promises.readFile(portFile, 'utf8');
         return JSON.parse(portFileContents);
       } catch (_) {
         // For older/newer extension versions, the file name matches the pattern
-        // /^qwen-code-ide-server-${pid}-\d+\.json$/. If multiple IDE
+        // /^hopcode-ide-server-${pid}-\d+\.json$/. If multiple IDE
         // windows are open, multiple files matching the pattern are expected to
         // exist.
       }
@@ -637,7 +637,7 @@ export class IdeClient {
       try {
         const portFile = path.join(
           os.tmpdir(),
-          `qwen-code-ide-server-${portFromEnv}.json`,
+          `hopcode-ide-server-${portFromEnv}.json`,
         );
         const portFileContents = await fs.promises.readFile(portFile, 'utf8');
         return JSON.parse(portFileContents);

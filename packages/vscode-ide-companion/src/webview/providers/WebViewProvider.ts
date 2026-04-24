@@ -29,15 +29,15 @@ import { getErrorMessage } from '../../utils/errorMessage.js';
 import {
   writeCodingPlanConfig,
   writeModelProvidersConfig,
-  readQwenSettingsForVSCode,
+  readHopcodeSettingsForVSCode,
   clearPersistedAuth,
 } from '../../services/settingsWriter.js';
 import { parseInsightMessage } from '@hoptrendy/hopcode-core';
 
-const AUTH_RELATED_QWEN_SETTINGS = [
-  'qwen-code.provider',
-  'qwen-code.apiKey',
-  'qwen-code.codingPlanRegion',
+const AUTH_RELATED_SETTINGS = [
+  'hopcode.provider',
+  'hopcode.apiKey',
+  'hopcode.codingPlanRegion',
 ] as const;
 
 function isInsightCommand(command: string): boolean {
@@ -139,15 +139,15 @@ export class WebViewProvider {
     // The isSyncingToVSCode guard prevents a loop when we programmatically populate VSCode settings.
     const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(
       async (e) => {
-        const authSettingsChanged = AUTH_RELATED_QWEN_SETTINGS.some((setting) =>
+        const authSettingsChanged = AUTH_RELATED_SETTINGS.some((setting) =>
           e.affectsConfiguration(setting),
         );
 
         if (authSettingsChanged && !this.isSyncingToVSCode) {
           console.log(
-            '[WebViewProvider] Auth-related qwen-code settings changed by user, syncing...',
+            '[WebViewProvider] Auth-related hopcode settings changed by user, syncing...',
           );
-          const synced = await this.syncVSCodeSettingsToQwenConfig();
+          const synced = await this.syncVSCodeSettingsToHopcodeConfig();
           if (synced && this.agentInitialized) {
             // Settings changed and we have an active connection — reconnect
             try {
@@ -166,14 +166,14 @@ export class WebViewProvider {
           } else if (
             !synced &&
             this.agentInitialized &&
-            e.affectsConfiguration('qwen-code.apiKey')
+            e.affectsConfiguration('hopcode.apiKey')
           ) {
-            // Only de-auth when qwen-code.apiKey itself was cleared.
+            // Only de-auth when hopcode.apiKey itself was cleared.
             // Other auth-related settings (provider, codingPlanRegion) returning
             // synced=false is normal for api-key providers — those are managed by
             // the interactive auth flow, not VS Code Settings sync.
             const apiKey = vscode.workspace
-              .getConfiguration('qwen-code')
+              .getConfiguration('hopcode')
               .get<string>('apiKey', '');
             if (!apiKey) {
               console.log(
@@ -965,14 +965,14 @@ export class WebViewProvider {
   }
 
   /**
-   * Sync VSCode extension settings (qwen-code.*) to ~/.qwen/settings.json
+   * Sync VSCode extension settings (hopcode.*) to ~/.hopcode/settings.json
    * if an API key is configured. This enables auto-connect on startup
    * without requiring the user to click "Connect" each time.
    *
    * @returns true if settings were synced (apiKey is configured), false otherwise
    */
-  private async syncVSCodeSettingsToQwenConfig(): Promise<boolean> {
-    const config = vscode.workspace.getConfiguration('qwen-code');
+  private async syncVSCodeSettingsToHopcodeConfig(): Promise<boolean> {
+    const config = vscode.workspace.getConfiguration('hopcode');
     const apiKey = config.get<string>('apiKey', '');
 
     if (!apiKey) {
@@ -996,7 +996,7 @@ export class WebViewProvider {
       writeCodingPlanConfig(region, apiKey);
 
       console.log(
-        `[WebViewProvider] Synced VSCode settings → ~/.qwen/settings.json (provider=${provider})`,
+        `[WebViewProvider] Synced VSCode settings → ~/.hopcode/settings.json (provider=${provider})`,
       );
       return true;
     } catch (error) {
@@ -1006,39 +1006,42 @@ export class WebViewProvider {
   }
 
   /**
-   * Sync ~/.qwen/settings.json values back to VSCode Settings UI.
+   * Sync ~/.hopcode/settings.json values back to VSCode Settings UI.
    * This makes existing CLI-configured non-secret metadata visible in the
    * VSCode Settings page without mirroring credentials into settings.json.
    */
-  private async syncQwenConfigToVSCodeSettings(): Promise<void> {
+  private async syncHopcodeConfigToVSCodeSettings(): Promise<void> {
     try {
-      const qwenSettings = readQwenSettingsForVSCode();
-      if (!qwenSettings) {
+      const hopcodeSettings = readHopcodeSettingsForVSCode();
+      if (!hopcodeSettings) {
         return;
       }
 
       console.log(
-        '[WebViewProvider] Syncing ~/.qwen/settings.json → VSCode settings',
+        '[WebViewProvider] Syncing ~/.hopcode/settings.json → VSCode settings',
       );
 
       // Set guard to prevent onDidChangeConfiguration from triggering a write-back
-      const config = vscode.workspace.getConfiguration('qwen-code');
+      const config = vscode.workspace.getConfiguration('hopcode');
       const target = vscode.ConfigurationTarget.Global;
       const updates: Array<Thenable<void>> = [];
 
       if (
-        config.get<string>('provider', 'coding-plan') !== qwenSettings.provider
+        config.get<string>('provider', 'coding-plan') !==
+        hopcodeSettings.provider
       ) {
-        updates.push(config.update('provider', qwenSettings.provider, target));
+        updates.push(
+          config.update('provider', hopcodeSettings.provider, target),
+        );
       }
       if (
         config.get<'china' | 'global'>('codingPlanRegion', 'china') !==
-        qwenSettings.codingPlanRegion
+        hopcodeSettings.codingPlanRegion
       ) {
         updates.push(
           config.update(
             'codingPlanRegion',
-            qwenSettings.codingPlanRegion,
+            hopcodeSettings.codingPlanRegion,
             target,
           ),
         );
@@ -1046,7 +1049,7 @@ export class WebViewProvider {
 
       if (updates.length === 0) {
         console.log(
-          '[WebViewProvider] VSCode settings already match ~/.qwen/settings.json',
+          '[WebViewProvider] VSCode settings already match ~/.hopcode/settings.json',
         );
         return;
       }
@@ -1060,7 +1063,7 @@ export class WebViewProvider {
       }
     } catch (error) {
       console.error(
-        '[WebViewProvider] Failed to sync qwen config to VSCode settings:',
+        '[WebViewProvider] Failed to sync hopcode config to VSCode settings:',
         error,
       );
     }
@@ -1068,9 +1071,9 @@ export class WebViewProvider {
 
   /**
    * Attempt to restore authentication state and initialize connection.
-   * On startup, sync ~/.qwen/settings.json → VSCode settings so the Settings UI
+   * On startup, sync ~/.hopcode/settings.json → VSCode settings so the Settings UI
    * reflects existing non-secret CLI config, then attempt a connection.
-   * Writing back to ~/.qwen/settings.json happens through the auth flow and
+   * Writing back to ~/.hopcode/settings.json happens through the auth flow and
    * auth-related VSCode setting changes.
    */
   private async attemptAuthStateRestoration(): Promise<void> {
@@ -1081,7 +1084,7 @@ export class WebViewProvider {
 
     this.initializationPromise = (async () => {
       try {
-        await this.syncQwenConfigToVSCodeSettings();
+        await this.syncHopcodeConfigToVSCodeSettings();
 
         console.log('[WebViewProvider] Attempting connection...');
         // Attempt a connection to detect prior auth without forcing login
@@ -1224,8 +1227,8 @@ export class WebViewProvider {
 
   /**
    * Handle auth interactive — interactive auth flow result.
-   * Writes provider config to ~/.qwen/settings.json and reconnects.
-   * Mirrors the CLI's `qwen auth coding-plan` / `qwen auth` flow.
+   * Writes provider config to ~/.hopcode/settings.json and reconnects.
+   * Mirrors the CLI's `hopcode auth coding-plan` / `hopcode auth` flow.
    */
   private async handleAuthInteractive(
     provider: string,

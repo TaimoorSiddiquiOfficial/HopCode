@@ -35,7 +35,7 @@ import {
 
 const debugLogger = createDebugLogger('SKILL_MANAGER');
 
-const QWEN_CONFIG_DIR = '.hopcode';
+const HOPCODE_CONFIG_DIR = '.hopcode';
 const SKILLS_CONFIG_DIR = 'skills';
 const SKILL_MANIFEST_FILE = 'SKILL.md';
 
@@ -891,7 +891,11 @@ export class SkillManager {
   }
 
   private async ensureUserSkillsDir(): Promise<void> {
-    const baseDir = path.join(os.homedir(), QWEN_CONFIG_DIR, SKILLS_CONFIG_DIR);
+    const baseDir = path.join(
+      os.homedir(),
+      HOPCODE_CONFIG_DIR,
+      SKILLS_CONFIG_DIR,
+    );
     try {
       await fs.mkdir(baseDir, { recursive: true });
     } catch (error) {

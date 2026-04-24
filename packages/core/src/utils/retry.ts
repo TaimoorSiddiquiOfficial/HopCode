@@ -80,9 +80,7 @@ export function isTransientCapacityError(error: unknown): boolean {
  * into an infinite-wait job would be surprising and dangerous.
  */
 export function isUnattendedMode(): boolean {
-  const val =
-    process.env['HOPCODE_UNATTENDED_RETRY'] ??
-    process.env['QWEN_CODE_UNATTENDED_RETRY'];
+  const val = process.env['HOPCODE_UNATTENDED_RETRY'];
   return val === 'true' || val === '1';
 }
 
@@ -199,7 +197,10 @@ export async function retryWithBackoff<T>(
       const errorStatus = getErrorStatus(error);
 
       // Check for HopCode OAuth quota exceeded error - throw immediately without retry
-      if (authType === AuthType.HOPCODE_OAUTH && isQwenQuotaExceededError(error)) {
+      if (
+        authType === AuthType.HOPCODE_OAUTH &&
+        isQwenQuotaExceededError(error)
+      ) {
         throw new Error(
           `Qwen OAuth free tier has been discontinued as of 2026-04-15.\n\n` +
             `To continue using Qwen Code, try one of these alternatives:\n` +

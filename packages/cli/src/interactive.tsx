@@ -116,7 +116,7 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     );
   }
 
-  if ((process.env['HOPCODE_NO_RELAUNCH'] ?? process.env['QWEN_CODE_NO_RELAUNCH'])) {
+  if (process.env['HOPCODE_NO_RELAUNCH']) {
     return [];
   }
 

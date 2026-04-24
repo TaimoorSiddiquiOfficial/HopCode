@@ -4,14 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type {
+  SlashCommand,
+  CommandContext,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
  * MCP Security Audit Command
- * 
+ *
  * Audits MCP server configurations for security issues:
  * - Hardcoded secrets and API keys
  * - Unpinned versions (supply chain risk)
@@ -23,7 +27,10 @@ export const mcpSecurityAuditCommand: SlashCommand = {
   name: 'mcp-security-audit',
   description: 'Audit MCP server configurations for security vulnerabilities',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, _args: string): Promise<SlashCommandActionReturn> => {
+  action: async (
+    context: CommandContext,
+    _args: string,
+  ): Promise<SlashCommandActionReturn> => {
     try {
       const auditResults = await performMcpSecurityAudit(context);
 
@@ -41,7 +48,8 @@ export const mcpSecurityAuditCommand: SlashCommand = {
         content: generateSecurityReport(auditResults),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       return {
         type: 'message',
         messageType: 'error',
@@ -85,7 +93,9 @@ interface Finding {
 /**
  * Perform comprehensive MCP security audit
  */
-async function performMcpSecurityAudit(context: CommandContext): Promise<SecurityFindings> {
+async function performMcpSecurityAudit(
+  context: CommandContext,
+): Promise<SecurityFindings> {
   const findings: SecurityFindings = {
     critical: [],
     high: [],
@@ -117,11 +127,9 @@ async function findMcpConfigFiles(_context: CommandContext): Promise<string[]> {
   const configFiles: string[] = [];
   const possiblePaths = [
     '.hopcode/mcp.json',
-    '.qwen/mcp.json',
     'mcp.json',
     '.mcp.json',
     join(process.cwd(), '.hopcode', 'mcp.json'),
-    join(process.cwd(), '.qwen', 'mcp.json'),
   ];
 
   for (const path of possiblePaths) {
@@ -151,7 +159,9 @@ async function findMcpServerFiles(_context: CommandContext): Promise<string[]> {
     if (existsSync(dir)) {
       // Add TypeScript files in directory
       const files = await readDirectoryRecursive(dir);
-      serverFiles.push(...files.filter(f => f.endsWith('.ts') || f.endsWith('.js')));
+      serverFiles.push(
+        ...files.filter((f) => f.endsWith('.ts') || f.endsWith('.js')),
+      );
     }
   }
 
@@ -174,7 +184,11 @@ async function readDirectoryRecursive(dir: string): Promise<string[]> {
       const fullPath = join(dir, entry);
       const stats = await stat(fullPath);
 
-      if (stats.isDirectory() && !entry.startsWith('.') && entry !== 'node_modules') {
+      if (
+        stats.isDirectory() &&
+        !entry.startsWith('.') &&
+        entry !== 'node_modules'
+      ) {
         const subFiles = await readDirectoryRecursive(fullPath);
         files.push(...subFiles);
       } else if (stats.isFile()) {
@@ -191,7 +205,10 @@ async function readDirectoryRecursive(dir: string): Promise<string[]> {
 /**
  * Audit MCP configuration file
  */
-async function auditMcpConfigFile(configPath: string, findings: SecurityFindings): Promise<void> {
+async function auditMcpConfigFile(
+  configPath: string,
+  findings: SecurityFindings,
+): Promise<void> {
   try {
     const content = readFileSync(configPath, 'utf-8');
     const config = JSON.parse(content);
@@ -225,7 +242,10 @@ async function auditMcpConfigFile(configPath: string, findings: SecurityFindings
 /**
  * Audit MCP server source files
  */
-async function auditMcpServerFile(serverPath: string, findings: SecurityFindings): Promise<void> {
+async function auditMcpServerFile(
+  serverPath: string,
+  findings: SecurityFindings,
+): Promise<void> {
   try {
     const content = readFileSync(serverPath, 'utf-8');
     const lines = content.split('\n');
@@ -256,7 +276,11 @@ async function auditMcpServerFile(serverPath: string, findings: SecurityFindings
 /**
  * Check for hardcoded secrets
  */
-function auditForSecrets(filePath: string, content: string, findings: SecurityFindings): void {
+function auditForSecrets(
+  filePath: string,
+  content: string,
+  findings: SecurityFindings,
+): void {
   const secretPatterns = [
     {
       pattern: /api[_-]?key\s*[=:]\s*["'][^"']+["']/gi,
@@ -313,14 +337,19 @@ function auditForSecrets(filePath: string, content: string, findings: SecurityFi
   for (const { pattern, rule, severity, description } of secretPatterns) {
     for (let i = 0; i < lines.length; i++) {
       const match = lines[i].match(pattern);
-      if (match && !lines[i].trim().startsWith('//') && !lines[i].trim().startsWith('#')) {
+      if (
+        match &&
+        !lines[i].trim().startsWith('//') &&
+        !lines[i].trim().startsWith('#')
+      ) {
         findings[severity].push({
           rule,
           severity,
           file: filePath,
           line: i + 1,
           description,
-          recommendation: 'Use environment variables or a secrets manager instead',
+          recommendation:
+            'Use environment variables or a secrets manager instead',
           evidence: lines[i].trim(),
         });
       }
@@ -350,7 +379,8 @@ function auditForUnpinnedVersions(
         severity: 'high',
         file: filePath,
         description: `MCP server "${serverName}" uses unpinned 'latest' tag`,
-        recommendation: 'Pin to specific version or SHA digest for reproducibility',
+        recommendation:
+          'Pin to specific version or SHA digest for reproducibility',
         evidence: cfg.image,
       });
     }
@@ -368,7 +398,10 @@ function auditForUnpinnedVersions(
     }
 
     // Check for unpinned npm versions
-    if (typeof cfg.command === 'string' && (cfg.command.includes('npx') || cfg.command.includes('npm'))) {
+    if (
+      typeof cfg.command === 'string' &&
+      (cfg.command.includes('npx') || cfg.command.includes('npm'))
+    ) {
       const versionPattern = /@(latest|\^|~)/g;
       if (versionPattern.test(cfg.command)) {
         findings.medium.push({
@@ -400,7 +433,10 @@ function auditForInsecureCommands(
     const cfg = serverConfig as Record<string, unknown>;
 
     // Check for shell execution
-    if (typeof cfg.command === 'string' && (cfg.command.includes('sh -c') || cfg.command.includes('bash -c'))) {
+    if (
+      typeof cfg.command === 'string' &&
+      (cfg.command.includes('sh -c') || cfg.command.includes('bash -c'))
+    ) {
       findings.high.push({
         rule: 'SHELL_EXECUTION',
         severity: 'high',
@@ -412,7 +448,12 @@ function auditForInsecureCommands(
     }
 
     // Check for dangerous commands
-    const dangerousCommands = ['rm -rf', 'curl | bash', 'wget | bash', 'chmod 777'];
+    const dangerousCommands = [
+      'rm -rf',
+      'curl | bash',
+      'wget | bash',
+      'chmod 777',
+    ];
     for (const dangerous of dangerousCommands) {
       if (typeof cfg.command === 'string' && cfg.command.includes(dangerous)) {
         findings.critical.push({
@@ -447,7 +488,8 @@ function auditForMissingValidation(
     if (cfg.env && typeof cfg.env === 'object') {
       const envObj = cfg.env as Record<string, unknown>;
       const hasSecrets = Object.keys(envObj).some(
-        k => k.toLowerCase().includes('key') || k.toLowerCase().includes('secret'),
+        (k) =>
+          k.toLowerCase().includes('key') || k.toLowerCase().includes('secret'),
       );
       if (hasSecrets && !envObj.HOPCODE_VALIDATE_ENV) {
         findings.low.push({
@@ -550,7 +592,8 @@ function auditForDangerousPatterns(
           file: filePath,
           line: i + 1,
           description,
-          recommendation: 'Use safer alternatives (e.g., child_process.execFile)',
+          recommendation:
+            'Use safer alternatives (e.g., child_process.execFile)',
           evidence: lines[i].trim(),
         });
       }
@@ -569,7 +612,9 @@ function auditForInputValidation(
   // Check if tool handlers validate input
   const hasToolHandlers = /tools\.setToolHandler|server\.tool/g.test(content);
   const hasInputValidation =
-    /z\.object|yup\.object|joi\.object|validateInput|assertInput/g.test(content);
+    /z\.object|yup\.object|joi\.object|validateInput|assertInput/g.test(
+      content,
+    );
 
   if (hasToolHandlers && !hasInputValidation) {
     findings.medium.push({
@@ -607,7 +652,8 @@ function auditForInsecureTempFiles(
         severity,
         file: filePath,
         description,
-        recommendation: 'Use fs.mkdtemp() or crypto.randomUUID() for temp files',
+        recommendation:
+          'Use fs.mkdtemp() or crypto.randomUUID() for temp files',
         evidence: 'Hardcoded /tmp path detected',
       });
     }

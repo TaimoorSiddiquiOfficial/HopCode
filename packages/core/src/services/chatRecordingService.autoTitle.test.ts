@@ -91,10 +91,10 @@ describe('ChatRecordingService - auto-title trigger', () => {
       storage: {
         getProjectTempDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.qwen/tmp/hash'),
+          .mockReturnValue('/test/project/root/.hopcode/tmp/hash'),
         getProjectDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.qwen/projects/test-project'),
+          .mockReturnValue('/test/project/root/.hopcode/projects/test-project'),
       },
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getFastModel: vi.fn(() => fastModelValue),
@@ -240,9 +240,9 @@ describe('ChatRecordingService - auto-title trigger', () => {
     });
   });
 
-  it('does not trigger when QWEN_DISABLE_AUTO_TITLE is set', async () => {
-    const prev = process.env['QWEN_DISABLE_AUTO_TITLE'];
-    process.env['QWEN_DISABLE_AUTO_TITLE'] = '1';
+  it('does not trigger when HOPCODE_DISABLE_AUTO_TITLE is set', async () => {
+    const prev = process.env['HOPCODE_DISABLE_AUTO_TITLE'];
+    process.env['HOPCODE_DISABLE_AUTO_TITLE'] = '1';
     try {
       chatRecordingService.recordAssistantTurn({
         model: 'qwen-plus',
@@ -252,15 +252,15 @@ describe('ChatRecordingService - auto-title trigger', () => {
       expect(tryGenerateSessionTitleMock).not.toHaveBeenCalled();
       expect(findCustomTitleRecord()).toBeUndefined();
     } finally {
-      if (prev === undefined) delete process.env['QWEN_DISABLE_AUTO_TITLE'];
-      else process.env['QWEN_DISABLE_AUTO_TITLE'] = prev;
+      if (prev === undefined) delete process.env['HOPCODE_DISABLE_AUTO_TITLE'];
+      else process.env['HOPCODE_DISABLE_AUTO_TITLE'] = prev;
     }
   });
 
-  it('still triggers when QWEN_DISABLE_AUTO_TITLE is falsy ("0")', async () => {
+  it('still triggers when HOPCODE_DISABLE_AUTO_TITLE is falsy ("0")', async () => {
     mockOk('Fix login button');
-    const prev = process.env['QWEN_DISABLE_AUTO_TITLE'];
-    process.env['QWEN_DISABLE_AUTO_TITLE'] = '0';
+    const prev = process.env['HOPCODE_DISABLE_AUTO_TITLE'];
+    process.env['HOPCODE_DISABLE_AUTO_TITLE'] = '0';
     try {
       chatRecordingService.recordAssistantTurn({
         model: 'qwen-plus',
@@ -269,8 +269,8 @@ describe('ChatRecordingService - auto-title trigger', () => {
       await flushMicrotasks();
       expect(tryGenerateSessionTitleMock).toHaveBeenCalledOnce();
     } finally {
-      if (prev === undefined) delete process.env['QWEN_DISABLE_AUTO_TITLE'];
-      else process.env['QWEN_DISABLE_AUTO_TITLE'] = prev;
+      if (prev === undefined) delete process.env['HOPCODE_DISABLE_AUTO_TITLE'];
+      else process.env['HOPCODE_DISABLE_AUTO_TITLE'] = prev;
     }
   });
 

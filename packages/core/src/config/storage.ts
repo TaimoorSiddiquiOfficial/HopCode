@@ -97,12 +97,11 @@ export class Storage {
    * Returns the base directory for all runtime output (temp files, debug logs,
    * session data, todos, insights, etc.).
    *
-   * Priority: HOPCODE_RUNTIME_DIR env var > QWEN_RUNTIME_DIR env var > setRuntimeBaseDir() value > getGlobalHopCodeDir()
+   * Priority: HOPCODE_RUNTIME_DIR env var > setRuntimeBaseDir() value > getGlobalHopCodeDir()
    * @returns Absolute path to the runtime output base directory
    */
   static getRuntimeBaseDir(): string {
-    const envDir =
-      process.env['HOPCODE_RUNTIME_DIR'] ?? process.env['QWEN_RUNTIME_DIR'];
+    const envDir = process.env['HOPCODE_RUNTIME_DIR'];
     if (envDir) {
       return (
         Storage.resolveRuntimeBaseDir(envDir) ?? Storage.getGlobalHopCodeDir()

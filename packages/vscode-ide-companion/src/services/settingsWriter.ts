@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Settings writer for VSCode extension.
- * Handles bidirectional sync between VSCode Settings and ~/.qwen/settings.json.
+ * Handles bidirectional sync between VSCode Settings and ~/.hopcode/settings.json.
  */
 
 import * as fs from 'node:fs';
@@ -28,9 +28,9 @@ import {
 export type VSCodeModelProviders = Record<string, string>;
 
 /**
- * Values extracted from ~/.qwen/settings.json for populating VSCode Settings.
+ * Values extracted from ~/.hopcode/settings.json for populating VSCode Settings.
  */
-export interface QwenSettingsForVSCode {
+export interface HopcodeSettingsForVSCode {
   provider: 'coding-plan' | 'api-key';
   apiKey: string;
   codingPlanRegion: 'china' | 'global';
@@ -41,7 +41,7 @@ export interface QwenSettingsForVSCode {
 // ---------------------------------------------------------------------------
 
 /**
- * Read ~/.qwen/settings.json. Returns {} if missing or invalid.
+ * Read ~/.hopcode/settings.json. Returns {} if missing or invalid.
  */
 function readSettings(): Record<string, unknown> {
   try {
@@ -53,7 +53,7 @@ function readSettings(): Record<string, unknown> {
 }
 
 /**
- * Write ~/.qwen/settings.json (creates dir if needed).
+ * Write ~/.hopcode/settings.json (creates dir if needed).
  */
 function writeSettings(settings: Record<string, unknown>): void {
   const settingsPath = Storage.getGlobalSettingsPath();
@@ -102,11 +102,11 @@ function findOpenaiModels(
 }
 
 // ---------------------------------------------------------------------------
-// Write: VSCode Settings → ~/.qwen/settings.json
+// Write: VSCode Settings → ~/.hopcode/settings.json
 // ---------------------------------------------------------------------------
 
 /**
- * Write Coding Plan configuration to ~/.qwen/settings.json.
+ * Write Coding Plan configuration to ~/.hopcode/settings.json.
  * Auto-injects model providers from the regional template,
  * preserving any existing non-Coding-Plan entries.
  *
@@ -157,7 +157,7 @@ export function writeCodingPlanConfig(
 }
 
 /**
- * Write model providers from VSCode Settings (key-value map) to ~/.qwen/settings.json.
+ * Write model providers from VSCode Settings (key-value map) to ~/.hopcode/settings.json.
  * Used when provider = "api-key" and user edits the modelProviders map.
  *
  * @param params.apiKey - The API key
@@ -209,14 +209,14 @@ export function writeModelProvidersConfig(params: {
 }
 
 // ---------------------------------------------------------------------------
-// Read: ~/.qwen/settings.json → VSCode Settings
+// Read: ~/.hopcode/settings.json → VSCode Settings
 // ---------------------------------------------------------------------------
 
 /**
- * Read ~/.qwen/settings.json and extract values for VSCode Settings UI.
+ * Read ~/.hopcode/settings.json and extract values for VSCode Settings UI.
  * Returns null if no valid configuration found.
  */
-export function readQwenSettingsForVSCode(): QwenSettingsForVSCode | null {
+export function readHopcodeSettingsForVSCode(): HopcodeSettingsForVSCode | null {
   const settings = readSettings();
 
   const security = settings.security as Record<string, unknown> | undefined;
@@ -260,7 +260,7 @@ export function readQwenSettingsForVSCode(): QwenSettingsForVSCode | null {
 }
 
 /**
- * Clear persisted auth credentials from ~/.qwen/settings.json.
+ * Clear persisted auth credentials from ~/.hopcode/settings.json.
  * Removes API keys, auth type selection, and coding plan metadata
  * so runtime state matches the cleared VS Code settings.
  */

@@ -25,7 +25,7 @@ describe('splitMessageContentForImages', () => {
 });
 
 describe('useImage browser bundle', () => {
-  it('bundles without resolving node-only qwen-code-core modules', async () => {
+  it('bundles without resolving node-only hopcode-core modules', async () => {
     const entryPoint = fileURLToPath(new URL('./useImage.ts', import.meta.url));
 
     await expect(

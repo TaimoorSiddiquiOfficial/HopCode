@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-discord",
-  "version": "0.17.2",
+  "version": "0.17.3",
   "description": "Discord channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",

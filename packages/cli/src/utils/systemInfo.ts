@@ -89,9 +89,9 @@ export async function getIdeClientName(
 /**
  * Gets the sandbox environment information.
  * Handles different sandbox types including sandbox-exec and custom sandbox environments.
- * For bug reports, removes 'qwen-' or 'qwen-code-' prefixes from sandbox names.
+ * For bug reports, removes 'hopcode-' or 'qwen-' prefixes from sandbox names.
  *
- * @param stripPrefix - Whether to strip 'qwen-' prefix (used for bug reports)
+ * @param stripPrefix - Whether to strip 'hopcode-' prefix (used for bug reports)
  */
 export function getSandboxEnv(stripPrefix = false): string {
   const sandbox = process.env['SANDBOX'];
@@ -106,7 +106,7 @@ export function getSandboxEnv(stripPrefix = false): string {
 
   // For bug reports, remove hopcode- prefix
   if (stripPrefix) {
-    return sandbox.replace(/^qwen-(?:code-)?/, '');
+    return sandbox.replace(/^(?:hopcode-|qwen-(?:code-)?)/, '');
   }
 
   return sandbox;
