@@ -84,7 +84,7 @@ jobs:
 
       - name: 'Build workspace dependencies'
         shell: 'bash'
-        run: 'npm run build --workspaces --if-present || true'
+        run: 'npm run build'
 
       - name: 'Build Package'
         working-directory: '${{ matrix.package.path }}'
@@ -175,6 +175,10 @@ jobs:
       - name: 'Generate git commit info'
         shell: 'bash'
         run: 'node scripts/generate-git-commit-info.js || true'
+
+      - name: 'Build all packages'
+        shell: 'bash'
+        run: 'npm run build'
 
       - name: 'Package VS Code Extension (VSIX)'
         working-directory: 'packages/vscode-ide-companion'
