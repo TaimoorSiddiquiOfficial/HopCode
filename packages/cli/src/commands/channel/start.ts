@@ -1,7 +1,6 @@
 import * as path from 'node:path';
 import * as os from 'node:os';
 import type { CommandModule } from 'yargs';
-import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { normalizeProxyUrl } from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
@@ -25,15 +24,12 @@ const CRASH_WINDOW_MS = 5 * 60 * 1000; // 5-minute window for counting crashes
 const RESTART_DELAY_MS = 3000;
 
 /**
- * Resolve and apply proxy settings for the channel service process.
+ * Resolve proxy settings for the channel service process.
  *
- * The normal CLI path applies proxy via loadCliConfig → Config constructor →
- * setGlobalDispatcher, but `channel start` never calls loadCliConfig. This
- * replicates the same resolution logic (--proxy flag → HTTPS_PROXY →
- * HTTP_PROXY) and applies the global dispatcher for native fetch() calls.
- * The resolved URL is also passed to channels via ChannelBaseOptions so
- * adapters can configure their own HTTP clients (e.g. grammy uses node-fetch
- * which needs a separate agent).
+ * Reads proxy from --proxy flag → HTTPS_PROXY → HTTP_PROXY env vars.
+ * The resolved URL is passed to channels via ChannelBaseOptions so adapters
+ * can configure their own HTTP clients. We do NOT set a global dispatcher
+ * to avoid interfering with other HTTP clients (e.g. OpenAI SDK).
  */
 function resolveProxy(cliProxy?: string): string | undefined {
   const proxyUrl = normalizeProxyUrl(
@@ -43,9 +39,6 @@ function resolveProxy(cliProxy?: string): string | undefined {
       process.env['HTTP_PROXY'] ||
       process.env['http_proxy'],
   );
-  if (proxyUrl) {
-    setGlobalDispatcher(new ProxyAgent(proxyUrl));
-  }
   return proxyUrl;
 }
 
