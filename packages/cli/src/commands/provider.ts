@@ -136,8 +136,8 @@ function buildSelectorOptions(activeProviderId: string | undefined): Array<{
     description: 'Paid · Alibaba Cloud Coding Plan',
   });
   options.push({
-    value: 'qwen-oauth',
-    label: '  Legacy OAuth',
+    value: 'hopcode-oauth',
+    label: '  Legacy HopCode OAuth',
     description: 'Discontinued — switch to Coding Plan or API Key',
   });
 

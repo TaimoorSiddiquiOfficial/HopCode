@@ -23,14 +23,14 @@ export const docsCommand: SlashCommand = {
   supportedModes: ['interactive', 'non_interactive', 'acp'] as const,
   action: async (context: CommandContext) => {
     const langPath = getCurrentLanguage()?.startsWith('zh') ? 'zh' : 'en';
-    const docsUrl = `https://qwenlm.github.io/qwen-code-docs/${langPath}`;
+    const docsUrl = `https://taimoor-siddiqui-official.github.io/HopCode/${langPath}`;
 
     // Non-interactive/ACP: return URL directly, no browser, no addItem
     if (context.executionMode !== 'interactive') {
       return {
         type: 'message' as const,
         messageType: 'info' as const,
-        content: `Qwen Code documentation: ${docsUrl}`,
+        content: `HopCode documentation: ${docsUrl}`,
       };
     }
 

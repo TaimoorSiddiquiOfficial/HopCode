@@ -6,7 +6,7 @@
 
 import type { CommandModule, Argv } from 'yargs';
 import {
-  handleQwenAuth,
+  handleHopcodeAuth,
   runInteractiveAuth,
   showAuthStatus,
 } from './auth/handler.js';
@@ -15,11 +15,11 @@ import { handleApiKeyAuth } from './auth/providers.js';
 import { t } from '../i18n/index.js';
 
 // Define subcommands separately
-const qwenOauthCommand = {
-  command: 'qwen-oauth',
+const hopcodeOauthCommand = {
+  command: 'hopcode-oauth',
   describe: t('Authenticate using HopCode OAuth'),
   handler: async () => {
-    await handleQwenAuth('qwen-oauth', {});
+    await handleHopcodeAuth('hopcode-oauth', {});
   },
 };
 
@@ -44,10 +44,10 @@ const codePlanCommand = {
 
     // If region and key are provided, use them directly
     if (region && key) {
-      await handleQwenAuth('coding-plan', { region, key });
+      await handleHopcodeAuth('coding-plan', { region, key });
     } else {
       // Otherwise, prompt interactively
-      await handleQwenAuth('coding-plan', {});
+      await handleHopcodeAuth('coding-plan', {});
     }
   },
 };
@@ -78,11 +78,11 @@ const providerCommands = PROVIDER_REGISTRY.map((provider) => ({
 export const authCommand: CommandModule = {
   command: 'auth',
   describe: t(
-    'Configure HopCode authentication — Coding Plan, Qwen OAuth, or any AI provider',
+    'Configure HopCode authentication — Coding Plan, HopCode OAuth, or any AI provider',
   ),
   builder: (yargs: Argv) => {
     let y = yargs
-      .command(qwenOauthCommand)
+      .command(hopcodeOauthCommand)
       .command(codePlanCommand)
       .command(statusCommand);
 

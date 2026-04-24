@@ -28,7 +28,7 @@ import { InteractiveSelector } from './interactiveSelector.js';
 import { PROVIDER_REGISTRY, detectActiveProvider } from './registry.js';
 import { handleApiKeyAuth } from './providers.js';
 
-interface QwenAuthOptions {
+interface HopcodeAuthOptions {
   region?: string;
   key?: string;
 }
@@ -55,9 +55,9 @@ interface MergedSettingsWithCodingPlan {
 /**
  * Handles the authentication process based on the specified command and options
  */
-export async function handleQwenAuth(
-  command: 'qwen-oauth' | 'coding-plan',
-  options: QwenAuthOptions,
+export async function handleHopcodeAuth(
+  command: 'hopcode-oauth' | 'coding-plan',
+  options: HopcodeAuthOptions,
 ) {
   try {
     const settings = loadSettings();
@@ -182,7 +182,7 @@ async function handleQwenOAuth(
 async function handleCodePlanAuth(
   config: Config,
   settings: LoadedSettings,
-  options: QwenAuthOptions,
+  options: HopcodeAuthOptions,
 ): Promise<void> {
   const { region, key } = options;
 
@@ -343,8 +343,8 @@ export async function runInteractiveAuth() {
         ),
       },
       {
-        value: 'qwen-oauth' as const,
-        label: t('Qwen OAuth'),
+        value: 'hopcode-oauth' as const,
+        label: t('HopCode OAuth'),
         description: t('Discontinued — switch to Coding Plan or API Key'),
       },
       ...providerOptions,
@@ -355,17 +355,17 @@ export async function runInteractiveAuth() {
   let choice = await selector.select();
 
   // If user selects discontinued HopCode OAuth, warn and re-prompt
-  while (choice === 'qwen-oauth') {
+  while (choice === 'hopcode-oauth') {
     writeStdoutLine(
       t(
-        '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
+        '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
       ),
     );
     choice = await selector.select();
   }
 
   if (choice === 'coding-plan') {
-    await handleQwenAuth('coding-plan', {});
+    await handleHopcodeAuth('coding-plan', {});
   } else {
     // Delegate all registry providers to handleApiKeyAuth
     await handleApiKeyAuth(choice, {});
@@ -390,7 +390,7 @@ export async function showAuthStatus(): Promise<void> {
       writeStdoutLine(t('Run one of the following commands to get started:\n'));
       writeStdoutLine(
         t(
-          '  hopcode auth qwen-oauth     - Authenticate with Qwen OAuth (free tier)',
+          '  hopcode auth hopcode-oauth  - Authenticate with HopCode OAuth (free tier)',
         ),
       );
       writeStdoutLine(
@@ -407,10 +407,10 @@ export async function showAuthStatus(): Promise<void> {
 
     // Display status based on auth type
     if (selectedType === AuthType.HOPCODE_OAUTH) {
-      writeStdoutLine(t('✓ Authentication Method: Qwen OAuth'));
+      writeStdoutLine(t('✓ Authentication Method: HopCode OAuth'));
       writeStdoutLine(t('  Type: Free tier (discontinued 2026-04-15)'));
       writeStdoutLine(t('  Limit: No longer available'));
-      writeStdoutLine(t('  Models: Qwen latest models'));
+      writeStdoutLine(t('  Models: HopCode latest models'));
       writeStdoutLine(
         t('\n  ⚠ Run /auth to switch to Coding Plan or another provider.\n'),
       );

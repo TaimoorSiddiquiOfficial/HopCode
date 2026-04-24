@@ -20,11 +20,11 @@ export function buildAuthMethods(): AuthMethod[] {
     },
     {
       id: AuthType.HOPCODE_OAUTH,
-      name: 'Qwen OAuth',
-      description: 'Qwen OAuth (free tier discontinued 2026-04-15)',
+      name: 'HopCode OAuth',
+      description: 'HopCode OAuth (free tier discontinued 2026-04-15)',
       _meta: {
         type: 'terminal',
-        args: ['--auth-type=qwen-oauth'],
+        args: ['--auth-type=hopcode-oauth'],
       },
     },
   ];
@@ -42,7 +42,7 @@ export function pickAuthMethodsForDetails(details?: string): AuthMethod[] {
   if (!details) {
     return authMethods;
   }
-  if (details.includes('qwen-oauth') || details.includes('Qwen OAuth')) {
+  if (details.includes('hopcode-oauth') || details.includes('HopCode OAuth')) {
     const narrowed = filterAuthMethodsById(authMethods, AuthType.HOPCODE_OAUTH);
     return narrowed.length ? narrowed : authMethods;
   }

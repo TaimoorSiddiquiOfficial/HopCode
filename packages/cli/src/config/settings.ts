@@ -143,9 +143,9 @@ export function getSystemSettingsPath(): string {
   if (platform() === 'darwin') {
     return '/Library/Application Support/HopCode/settings.json';
   } else if (platform() === 'win32') {
-    return 'C:\\ProgramData\\qwen-code\\settings.json';
+    return 'C:\\ProgramData\\hopcode\\settings.json';
   } else {
-    return '/etc/qwen-code/settings.json';
+    return '/etc/hopcode/settings.json';
   }
 }
 

@@ -35,9 +35,9 @@ function getContainerPath(hostPath: string): string {
   return hostPath;
 }
 
-const LOCAL_DEV_SANDBOX_IMAGE_NAME = 'qwen-code-sandbox';
-const SANDBOX_NETWORK_NAME = 'qwen-code-sandbox';
-const SANDBOX_PROXY_NAME = 'qwen-code-sandbox-proxy';
+const LOCAL_DEV_SANDBOX_IMAGE_NAME = 'hopcode-sandbox';
+const SANDBOX_NETWORK_NAME = 'hopcode-sandbox';
+const SANDBOX_PROXY_NAME = 'hopcode-sandbox-proxy';
 const BUILTIN_SEATBELT_PROFILES = [
   'permissive-open',
   'permissive-closed',
@@ -354,7 +354,7 @@ export async function start_sandbox(
   //
   // note this can only be done with binary linked from hopcode-code repo
   if (process.env['BUILD_SANDBOX']) {
-    if (!gcPath.includes('qwen-code/packages/')) {
+    if (!gcPath.includes('hopcode/packages/')) {
       throw new FatalSandboxError(
         'Cannot build sandbox using installed HopCode binary; ' +
           'run `npm link ./packages/cli` under HopCode-cli repo to switch to linked binary.',
@@ -389,8 +389,8 @@ export async function start_sandbox(
   if (!(await ensureSandboxImageIsPresent(config.command, image))) {
     const remedy =
       image === LOCAL_DEV_SANDBOX_IMAGE_NAME
-        ? 'Try running `npm run build:all` or `npm run build:sandbox` under the qwen-code repo to build it locally, or check the image name and your network connection.'
-        : 'Please check the image name, your network connection, or notify qwen-code-dev@service.alibaba.com if the issue persists.';
+        ? 'Try running `npm run build:all` or `npm run build:sandbox` under the hopcode repo to build it locally, or check the image name and your network connection.'
+        : 'Please check the image name, your network connection, or notify the HopCode team if the issue persists.';
     throw new FatalSandboxError(
       `Sandbox image '${image}' is missing or could not be pulled. ${remedy}`,
     );
@@ -543,7 +543,7 @@ export async function start_sandbox(
   const isIntegrationTest = process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
   let containerName;
   if (isIntegrationTest) {
-    containerName = `qwen-code-integration-test-${randomBytes(4).toString(
+    containerName = `hopcode-integration-test-${randomBytes(4).toString(
       'hex',
     )}`;
     writeStderrLine(`ContainerName: ${containerName}`);
