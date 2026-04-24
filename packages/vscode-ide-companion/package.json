@@ -242,7 +242,7 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/semver": "latest",
-    "@types/vscode": "latest",
+    "@types/vscode": "^1.99.0",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "autoprefixer": "latest",
