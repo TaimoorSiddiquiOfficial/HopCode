@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/webui",
-  "version": "0.17.4",
+  "version": "0.17.5",
   "description": "Shared UI components for HopCode packages",
   "type": "module",
   "main": "./dist/index.cjs",

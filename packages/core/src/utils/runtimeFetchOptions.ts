@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProxyAgent, type Dispatcher } from 'undici';
+import { Agent, ProxyAgent, type Dispatcher } from 'undici';
 
 /**
  * JavaScript runtime type
@@ -136,18 +136,16 @@ function buildFetchOptionsWithDispatcher(
   proxyUrl?: string,
 ): OpenAIRuntimeFetchOptions | AnthropicRuntimeFetchOptions {
   try {
-    // Only create a dispatcher when proxy is configured.
-    // When no proxy is set, let the SDK use its default fetch behavior
-    // to avoid any undici Agent compatibility issues.
-    if (!proxyUrl) {
-      return sdkType === 'openai' ? undefined : {};
-    }
-
-    const dispatcher = new ProxyAgent({
-      uri: proxyUrl,
-      headersTimeout: 0,
-      bodyTimeout: 0,
-    });
+    const dispatcher = proxyUrl
+      ? new ProxyAgent({
+          uri: proxyUrl,
+          headersTimeout: 0,
+          bodyTimeout: 0,
+        })
+      : new Agent({
+          headersTimeout: 0,
+          bodyTimeout: 0,
+        });
     return { fetchOptions: { dispatcher } };
   } catch {
     return sdkType === 'openai' ? undefined : {};
