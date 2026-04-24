@@ -41,7 +41,8 @@ execSync('npm run generate', { stdio: 'inherit', cwd: root });
 // 5. cli (depends on core, web-templates, channel packages)
 // 6. webui (shared UI components - used by vscode companion)
 // 7. sdk (no internal dependencies)
-// 8. vscode-ide-companion (depends on webui)
+// 8. server (depends on core)
+// 9. vscode-ide-companion (depends on webui)
 const buildOrder = [
   'packages/core',
   'packages/web-templates',
@@ -54,6 +55,7 @@ const buildOrder = [
   'packages/cli',
   'packages/webui',
   'packages/sdk-typescript',
+  'packages/server',
   'packages/vscode-ide-companion',
 ];
 

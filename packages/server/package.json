@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode-server",
-  "version": "0.15.3",
+  "version": "0.15.4",
   "description": "gRPC headless server for HopCode agent",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,7 +39,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.13.0",
     "@grpc/proto-loader": "^0.7.13",
-    "@hoptrendy/hopcode-core": "0.15.1"
+    "@hoptrendy/hopcode-core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

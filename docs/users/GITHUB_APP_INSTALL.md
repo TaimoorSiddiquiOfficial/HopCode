@@ -14,7 +14,7 @@ Click the button below to install HopCode on your GitHub repositories:
 
 👉 **[Install HopCode GitHub App](https://github.com/apps/hopcode-cli/installations/select_target)**
 
-*(Button opens in new tab - come back here after installation)*
+_(Button opens in new tab - come back here after installation)_
 
 ### Step 2: Select Repositories
 
@@ -31,37 +31,15 @@ After installation, configure HopCode with your credentials:
 Add to your shell profile (`~/.bashrc`, `~/.zshrc`, or `~/.zprofile`):
 
 ```bash
-export GITHUB_APP_ID=3424564
+# Replace the values below with YOUR GitHub App credentials
+export GITHUB_APP_ID=YOUR_APP_ID
 export GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEAyZvuxE43qw5MObiSTRkXTTNPvPNiiCKMUlZW9grvTfZmE2kq
-cBdtctmurZ2xfEJNnaywpFDPVJ1hsB2SwfXGTqkw+0o9ubI76uvz2+T72Oh5to3l
-IHwRX8I6s24OJRxW9TUF6EqIhZly2V0TTOv9hgOABkNgYUItWDPPm6KEyO2Z7UZO
-Iiq9lyhlIR5hbPBnPhSElEySEkR5Q1bqGtfLh286FNBLLkjCptU3KmX2gAF9FfFE
-vtWAdDVoTKtd+viJ3IJmP+YZwSZAoeJbn3RSxJq5Fl/Ly+m/nhyCwV1fnECwoWU1
-0PAnrt39scnD/xxO7eJ4g4D1LQWc49Bif/wywQIDAQABAoIBADRRadm5borOUAue
-kSC+xSQ8j5G6GzS2unFXhIOe/NDfg0fAP8oM2lM2mDTnujpDvn6PZNuPOO59VO9u
-DTqWPBsHnvVnI7N/xDrHdmX2+0AjvAoasn4GlD+kWLVddwA8ZXiGhPzt8pWw53Pu
-ymZoy0auu9dkPquej8PW1iZOO2UkhaTFyk/Z2QWh1XQEeenFdGan4I8I8edLmyiZ
-dCwHe2G1kQjlOj34lFhq1BvZOPT1sfxcNjSXHgofFi07spBBhDE0ak442BYc3NG
-EBRNroAmkQZsmnPOCWogNENLyTUxLEouENyngF0vplNl1+cDcuc2dpv+fcS/tGBX
-8kwqO/0CgYEA5iEZ71VpSwOvWovAGJwhcPzegQyW+E6tq6IyrSOYPZ2FtAY36gcP
-04GcAMkssFW2fMHVvu/6nmD5RRMvDw/s3gNsy9t6NaVy8aBK3wqKf1t10zNKGvWx
-ouroR6je0C8uGdrSVc2aeNcLUYxl6JF9ph1l+dOjGuAVJbKLfyOcErcCgYEA4EYM
-QwSg67Zd8gE4rxwNDSnFFfSypriAryE3EopNdPBD42/BiAQfUyuO2pvZRXhUvbwi
-G3L75ip1jxJhePX4+974LR/on4Zhh+ESAnv9Za36kT8L+9Kk9E+2P+PTErr+i/KR
-NB3C+tVapnC9r8r0r7qIuGRQ43LszlD66O27DkcCgYAnsJfPflSdmnIY1Ld5xxvB
-Z+tcKHa1NqSfUGcbE2ODZPKVXOkx1Kv3F4h3Xjr14qKJm8iomK0JucHkFu3r1BxP
-IhoWgrDuJa3QXIvtMd03H+gPV+40/iD37znGeiqLj0eNL/9MyxwUMUqDcwp0dPtN
-tg5LayPbU8Bx8vw6HkMhuwKBgQC78BdAZfWP8S/Cp+FfZGtPd4xPvNGkwoIbwALN
-h5YnA1xwj+sm1wWFBcBdUzJ8c7zXjnsqc23B0BzZevaxjbZLIurnrZCbddnvKt2T
-tWGAPo31/1ZEfZ17mfzIh1sOnCLJFck2WiZVWkrvpRRf5vyq8e62TmI2Z80ni1bn
-sKgK6wKBgFG0xBuqSJDHCMZGlmgd6nLW255ofY7skWOv1PWNuObE3jgaqibBt8Ar
-YOS8QKBoX+7/6mwOgK9bYnlLHsRXj4oc+oSyTl2DInXuQe1vvsd9rlmAdbANrLLA
-7mZTd7H1ctQNCylIsovwcgio5wbaJ2Sa30fX6eWCX2RNG7fcqfl/
+YOUR_PRIVATE_KEY_HERE
 -----END RSA PRIVATE KEY-----"
 ```
 
 Then reload your shell:
+
 ```bash
 source ~/.bashrc  # or source ~/.zshrc
 ```
@@ -73,8 +51,8 @@ Add to `~/.hopcode/settings.json`:
 ```json
 {
   "github": {
-    "appId": "3424564",
-    "privateKey": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAyZvuxE43qw5MObiSTRkXTTNPvPNiiCKMUlZW9grvTfZmE2kq\ncBdtctmurZ2xfEJNnaywpFDPVJ1hsB2SwfXGTqkw+0o9ubI76uvz2+T72Oh5to3l\nIHwRX8I6s24OJRxW9TUF6EqIhZly2V0TTOv9hgOABkNgYUItWDPPm6KEyO2Z7UZO\nIiq9lyhlIR5hbPBnPhSElEySEkR5Q1bqGtfLh286FNBLLkjCptU3KmX2gAF9FfFE\nvtWAdDVoTKtd+viJ3IJmP+YZwSZAoeJbn3RSxJq5Fl/Ly+m/nhyCwV1fnECwoWU1\n0PAnrt39scnD/xxO7eJ4g4D1LQWc49Bif/wywQIDAQABAoIBADRRadm5borOUAue\nkSC+xSQ8j5G6GzS2unFXhIOe/NDfg0fAP8oM2lM2mDTnujpDvn6PZNuPOO59VO9u\nDTqWPBsHnvVnI7N/xDrHdmX2+0AjvAoasn4GlD+kWLVddwA8ZXiGhPzt8pWw53Pu\nymZoy0auu9dkPquej8PW1iZOO2UkhaTFyk/Z2QWh1XQEeenFdGan4I8I8edLmyiZ\ndCwHe2G1kQjlOj34lFhq1BvZOPT1sfxcNjSXHgofFi07spBBhDE0ak442BYc3NG\nEBRNroAmkQZsmnPOCWogNENLyTUxLEouENyngF0vplNl1+cDcuc2dpv+fcS/tGBX\n8kwqO/0CgYEA5iEZ71VpSwOvWovAGJwhcPzegQyW+E6tq6IyrSOYPZ2FtAY36gcP\n04GcAMkssFW2fMHVvu/6nmD5RRMvDw/s3gNsy9t6NaVy8aBK3wqKf1t10zNKGvWx\nouroR6je0C8uGdrSVc2aeNcLUYxl6JF9ph1l+dOjGuAVJbKLfyOcErcCgYEA4EYM\nQwSg67Zd8gE4rxwNDSnFFfSypriAryE3EopNdPBD42/BiAQfUyuO2pvZRXhUvbwi\nG3L75ip1jxJhePX4+974LR/on4Zhh+ESAnv9Za36kT8L+9Kk9E+2P+PTErr+i/KR\nNB3C+tVapnC9r8r0r7qIuGRQ43LszlD66O27DkcCgYAnsJfPflSdmnIY1Ld5xxvB\nZ+tcKHa1NqSfUGcbE2ODZPKVXOkx1Kv3F4h3Xjr14qKJm8iomK0JucHkFu3r1BxP\nIhoWgrDuJa3QXIvtMd03H+gPV+40/iD37znGeiqLj0eNL/9MyxwUMUqDcwp0dPtN\ntg5LayPbU8Bx8vw6HkMhuwKBgQC78BdAZfWP8S/Cp+FfZGtPd4xPvNGkwoIbwALN\nh5YnA1xwj+sm1wWFBcBdUzJ8c7zXjnsqc23B0BzZevaxjbZLIurnrZCbddnvKt2T\ntWGAPo31/1ZEfZ17mfzIh1sOnCLJFck2WiZVWkrvpRRf5vyq8e62TmI2Z80ni1bn\nsKgK6wKBgFG0xBuqSJDHCMZGlmgd6nLW255ofY7skWOv1PWNuObE3jgaqibBt8Ar\nYOS8QKBoX+7/6mwOgK9bYnlLHsRXj4oc+oSyTl2DInXuQe1vvsd9rlmAdbANrLLA\n7mZTd7H1ctQNCylIsovwcgio5wbaJ2Sa30fX6eWCX2RNG7fcqfl/\n-----END RSA PRIVATE KEY-----"
+    "appId": "YOUR_APP_ID",
+    "privateKey": "-----BEGIN RSA PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END RSA PRIVATE KEY-----"
   }
 }
 ```
@@ -161,6 +139,7 @@ If you prefer to create your own GitHub App instead of using the shared one:
 ### Step 2: Configure Permissions
 
 **Repository Permissions:**
+
 - Contents: **Read & Write**
 - Issues: **Read & Write**
 - Pull requests: **Read & Write**
