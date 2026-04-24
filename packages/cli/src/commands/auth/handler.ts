@@ -129,8 +129,8 @@ export async function handleHopcodeAuth(
       },
     );
 
-    if (command === 'qwen-oauth') {
-      await handleQwenOAuth(config, settings);
+    if (command === 'hopcode-oauth') {
+      await handleHopcodeOAuth(config, settings);
     } else if (command === 'coding-plan') {
       await handleCodePlanAuth(config, settings, options);
     }
@@ -147,11 +147,11 @@ export async function handleHopcodeAuth(
 /**
  * Handles HopCode OAuth authentication
  */
-async function handleQwenOAuth(
+async function handleHopcodeOAuth(
   config: Config,
   settings: LoadedSettings,
 ): Promise<void> {
-  writeStdoutLine(t('Starting Qwen OAuth authentication...'));
+  writeStdoutLine(t('Starting HopCode OAuth authentication...'));
 
   try {
     await config.refreshAuth(AuthType.HOPCODE_OAUTH);

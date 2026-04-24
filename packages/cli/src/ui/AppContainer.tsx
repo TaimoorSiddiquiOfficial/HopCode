@@ -878,12 +878,17 @@ export const AppContainer = (props: AppContainerProps) => {
     disabled: agentViewState.activeView !== 'main',
   });
 
-  const { messageQueue, addMessage, popAllMessages, drainQueue } =
-    useMessageQueue();
+  const {
+    messageQueue,
+    addMessage,
+    popAllMessages,
+    drainQueue,
+    popNextSegment,
+  } = useMessageQueue();
 
   // Bridge message queue to mid-turn drain via ref.
   // drainQueue reads the synchronous queueRef inside the hook, so it
-  // stays consistent with popAllMessages even before React re-renders.
+  // stays consistent with popNextSegment even before React re-renders.
   midTurnDrainRef.current = drainQueue;
 
   // Connect remote input watcher to submitQuery for bidirectional sync.
@@ -903,6 +908,39 @@ export const AppContainer = (props: AppContainerProps) => {
       remoteInput.notifyIdle();
     }
   }, [remoteInput, streamingState]);
+
+  // Drain queued messages when idle. queueDrainNonce re-fires the effect
+  // after each submission settles so multi-step queues drain end-to-end.
+  const queueDrainingRef = useRef(false);
+  const [queueDrainNonce, setQueueDrainNonce] = useState(0);
+
+  useEffect(() => {
+    if (queueDrainingRef.current) return;
+    if (!isConfigInitialized) return;
+    if (streamingState !== StreamingState.Idle) return;
+    if (dialogsVisibleRef.current) return;
+    if (messageQueue.length === 0) return;
+
+    // Two-phase: batch plain prompts as one turn, else pop next slash command.
+    const plainPrompts = drainQueue();
+    const submission =
+      plainPrompts.length > 0 ? plainPrompts.join('\n\n') : popNextSegment();
+    if (submission === null) return;
+
+    queueDrainingRef.current = true;
+    Promise.resolve(submitQuery(submission)).finally(() => {
+      queueDrainingRef.current = false;
+      setQueueDrainNonce((n) => n + 1);
+    });
+  }, [
+    isConfigInitialized,
+    streamingState,
+    messageQueue,
+    drainQueue,
+    popNextSegment,
+    submitQuery,
+    queueDrainNonce,
+  ]);
 
   // Dual-output tool-confirmation bridge.
   //
@@ -1213,23 +1251,15 @@ export const AppContainer = (props: AppContainerProps) => {
 
   cancelHandlerRef.current = useCallback(() => {
     if (isToolExecuting(pendingGeminiHistoryItems)) {
-      buffer.setText(''); // Just clear the prompt
+      // Tool-cancel: drop both buffer and queue so nothing auto-fires later.
+      buffer.setText('');
       return;
     }
 
-    // Move any queued follow-up messages back into the buffer so the user
-    // can edit or resubmit them. Otherwise leave the buffer alone — in
-    // particular, do NOT repopulate it with the previous prompt; the user
-    // can still recall it via history navigation (Up/Ctrl+P).
-    //
-    // popAllMessages is atomic via the queue's synchronous ref, matching
-    // the drain behavior used during tool completion.
+    // Restore queued input joined into the buffer for editing.
     const popped = popAllMessages();
     if (popped) {
       const currentText = buffer.text;
-      // Preserve any in-progress draft the user typed since submitting (this
-      // is reachable via Ctrl+C cancel, which fires regardless of buffer
-      // content). Mirrors the popQueueIntoInput convention in InputPrompt.
       buffer.setText(currentText ? `${popped}\n${currentText}` : popped);
     }
   }, [buffer, popAllMessages, pendingGeminiHistoryItems]);
