@@ -2,7 +2,7 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
@@ -124,6 +124,18 @@
       {
         "command": "hopcode.showLogs",
         "title": "HopCode: Show Logs"
+      },
+      {
+        "command": "hopcode.copyMessage",
+        "title": "%hopcode.copyMessage.title%"
+      },
+      {
+        "command": "hopcode.copyAllMessages",
+        "title": "%hopcode.copyAllMessages.title%"
+      },
+      {
+        "command": "hopcode.copyLastReply",
+        "title": "%hopcode.copyLastReply.title%"
       }
     ],
     "menus": {
@@ -139,6 +151,35 @@
         {
           "command": "hopcode.login",
           "when": "false"
+        },
+        {
+          "command": "hopcode.copyMessage",
+          "when": "false"
+        },
+        {
+          "command": "hopcode.copyAllMessages",
+          "when": "false"
+        },
+        {
+          "command": "hopcode.copyLastReply",
+          "when": "false"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "hopcode.copyMessage",
+          "when": "webviewSection == 'chat-messages'",
+          "group": "9_cutcopypaste@1"
+        },
+        {
+          "command": "hopcode.copyAllMessages",
+          "when": "webviewSection == 'chat-messages'",
+          "group": "9_cutcopypaste@2"
+        },
+        {
+          "command": "hopcode.copyLastReply",
+          "when": "webviewSection == 'chat-messages'",
+          "group": "9_cutcopypaste@3"
         }
       ],
       "editor/title": [

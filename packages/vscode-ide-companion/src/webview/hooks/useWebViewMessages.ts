@@ -1200,6 +1200,18 @@ export const useWebViewMessages = ({
           handlers.messageHandling.clearWaitingForResponse();
           break;
 
+        case 'copyCommand': {
+          // Handle copy command from extension (triggered by native context menu)
+          // Forward to App component which has access to allMessages state
+          break;
+        }
+
+        case 'contextMenuTriggered': {
+          // Extension notified us that context menu was triggered in this webview
+          // No action needed - extension tracks which provider was last active
+          break;
+        }
+
         default:
           break;
       }
