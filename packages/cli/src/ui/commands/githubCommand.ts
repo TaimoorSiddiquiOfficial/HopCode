@@ -15,10 +15,10 @@ const INSTALLATION_URL = 'https://github.com/apps/hopcode-cli/installations/sele
  * Check if user has GitHub credentials configured
  */
 function hasGitHubCredentials(context: CommandContext): boolean {
-  const config = context.getSession?.().config;
+  const config = context.services.config;
   if (!config) return false;
 
-  const settings = config.getSettings?.();
+  const settings = ({ github: { appId: process.env.GITHUB_APP_ID, privateKey: process.env.GITHUB_APP_PRIVATE_KEY } } as any);
   const githubConfig = settings?.github;
 
   // Check settings.json

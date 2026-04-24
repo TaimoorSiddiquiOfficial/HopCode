@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createHash, randomBytes } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 
 /**
  * GitHub Device Flow response
@@ -246,7 +246,7 @@ export class GitHubDeviceFlowAuth {
     const length = 8;
     const bytes = randomBytes(length);
     return Array.from(bytes)
-      .map(b => chars[b.charCodeAt(0) % chars.length])
+      .map(b => chars[b % chars.length])
       .join('-')
       .replace(/(.{4})/, '$1-');
   }

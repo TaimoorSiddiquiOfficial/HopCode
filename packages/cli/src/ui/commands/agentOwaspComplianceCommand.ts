@@ -32,7 +32,7 @@ export const agentOwaspComplianceCommand: SlashCommand = {
       const complianceResults = await performOwaspComplianceCheck(context);
       return {
         type: 'message',
-        messageType: complianceResults.nonCompliant.length > 0 ? 'warning' : 'success',
+        messageType: complianceResults.nonCompliant > 0 ? 'warning' : 'success',
         content: generateComplianceReport(complianceResults),
       };
     } catch (error) {

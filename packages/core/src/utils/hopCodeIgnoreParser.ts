@@ -6,7 +6,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import ignore from 'ignore';
+import ignore_ from 'ignore';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ignore = (ignore_ as any).default || ignore_;
 
 export interface HopCodeIgnoreFilter {
   isIgnored(filePath: string): boolean;

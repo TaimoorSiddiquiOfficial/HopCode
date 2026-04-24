@@ -57,7 +57,7 @@ async function startGrpcServer(
     const runtimeConfig = useSubprocess ? undefined : await buildConfig();
 
     // Dynamic import so the server package is only loaded when this command runs.
-    // @ts-expect-error — package may not be built yet in dev; resolved at runtime.
+    // @ts-expect-error - external type mismatch after dependency updates — package may not be built yet in dev; resolved at runtime.
     const serverModule = (await import('@hoptrendy/hopcode-server')) as {
       HopCodeServer: new (opts: {
         port: number;

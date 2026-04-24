@@ -6,7 +6,7 @@
 
 import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 
 /**

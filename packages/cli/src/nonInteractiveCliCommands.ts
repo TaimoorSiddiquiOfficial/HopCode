@@ -93,7 +93,7 @@ function handleCommandResult(
     case 'message':
       return {
         type: 'message',
-        messageType: result.messageType,
+        messageType: (result.messageType === 'warning' || result.messageType === 'success') ? 'info' as const : result.messageType,
         content: result.content,
       };
 
@@ -145,6 +145,14 @@ function handleCommandResult(
         reason:
           'Shell command confirmation is not supported in non-interactive mode. Use YOLO mode or pre-approve commands.',
         originalType: 'confirm_shell_commands',
+      };
+
+    case 'startImmediateSubagent':
+      return {
+        type: 'unsupported',
+        reason:
+          'Immediate subagent launch is not supported in non-interactive mode.',
+        originalType: 'startImmediateSubagent',
       };
 
     case 'confirm_action':

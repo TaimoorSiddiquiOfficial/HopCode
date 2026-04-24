@@ -5,7 +5,7 @@
  */
 
 import { createSign } from 'node:crypto';
-import type { Config } from '../config/config.js';
+
 
 /**
  * GitHub App authentication configuration
@@ -227,31 +227,31 @@ export class GitHubAppAuth {
 }
 
 /**
- * Load GitHub App configuration from Config
+ * Load GitHub App configuration from environment variables
  */
-export function loadGitHubAppConfig(config: Config): GitHubAppConfig | null {
-  const settings = config.getSettings();
-  const githubConfig = settings.github;
+export function loadGitHubAppConfigFromEnv(): GitHubAppConfig | null {
+  const appId = process.env.GITHUB_APP_ID;
+  const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
 
-  if (!githubConfig?.appId || !githubConfig?.privateKey) {
+  if (!appId || !privateKey) {
     return null;
   }
 
   return {
-    appId: githubConfig.appId,
-    privateKey: githubConfig.privateKey,
-    clientId: githubConfig.clientId,
-    clientSecret: githubConfig.clientSecret,
-    webhookSecret: githubConfig.webhookSecret,
-    hostname: githubConfig.hostname,
+    appId,
+    privateKey,
+    clientId: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    webhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
+    hostname: process.env.GITHUB_HOSTNAME,
   };
 }
 
 /**
- * Create GitHub App Auth instance from Config
+ * Create GitHub App Auth instance from environment variables
  */
-export function createGitHubAppAuth(config: Config): GitHubAppAuth | null {
-  const githubConfig = loadGitHubAppConfig(config);
+export function createGitHubAppAuth(): GitHubAppAuth | null {
+  const githubConfig = loadGitHubAppConfigFromEnv();
   if (!githubConfig) {
     return null;
   }

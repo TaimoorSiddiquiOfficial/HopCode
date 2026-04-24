@@ -731,6 +731,10 @@ export const useSlashCommandProcessor = (
                     true,
                   );
                 }
+                case 'startImmediateSubagent': {
+                  // startImmediateSubagent is handled by launching the subagent directly
+                  return { type: 'handled' };
+                }
                 case 'stream_messages': {
                   // stream_messages is only used in ACP/Zed integration mode
                   // and should not be returned in interactive UI mode

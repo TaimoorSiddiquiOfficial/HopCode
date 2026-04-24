@@ -213,6 +213,12 @@ export type {
   OAuthDisplayPayload,
 } from './mcp/oauth-provider.js';
 export { MCPOAuthTokenStorage } from './mcp/oauth-token-storage.js';
+export { GitHubAppAuth, loadGitHubAppConfigFromEnv, createGitHubAppAuth } from './auth/github-app-auth.js';
+export type { GitHubAppConfig, GitHubInstallationToken } from './auth/github-app-auth.js';
+export type { DeviceFlowResponse, DeviceFlowTokenResponse } from './auth/github-device-flow-auth.js';
+export { GitHubDeviceFlowAuth, createGitHubDeviceFlowAuth, DeviceFlowPendingError, DeviceFlowSlowDownError, DeviceFlowExpiredError, DeviceFlowAccessDeniedError } from './auth/github-device-flow-auth.js';
+export { GitHubSubagentRegistry } from './agents/github-agents.js';
+export { GitHubMCPClient, createGitHubMCPClient } from './mcp/github-mcp-client.js';
 export { KeychainTokenStorage } from './mcp/token-storage/keychain-token-storage.js';
 export type {
   OAuthCredentials,

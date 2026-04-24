@@ -5,7 +5,7 @@
  */
 
 import type { Config } from '../config/config.js';
-import { GitHubAppAuth, type GitHubInstallationToken } from './github-app-auth.js';
+import { GitHubAppAuth } from '../auth/github-app-auth.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
 const debugLogger = createDebugLogger('GITHUB_MCP');
@@ -127,7 +127,7 @@ export class GitHubMCPClient {
   private readonly auth: GitHubAppAuth;
   private readonly baseUrl: string;
 
-  constructor(config: Config) {
+  constructor(_config: Config) {
     const githubAuth = new GitHubAppAuth({
       appId: process.env.GITHUB_APP_ID || '',
       privateKey: process.env.GITHUB_APP_PRIVATE_KEY || '',

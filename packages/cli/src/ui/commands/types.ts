@@ -131,7 +131,7 @@ export interface QuitActionReturn {
  */
 export interface MessageActionReturn {
   type: 'message';
-  messageType: 'info' | 'error';
+  messageType: 'info' | 'error' | 'warning' | 'success';
   content: string;
 }
 
@@ -231,6 +231,15 @@ export interface ConfirmActionReturn {
   };
 }
 
+/**
+ * The return type for a command action that starts an immediate subagent.
+ */
+export interface StartImmediateSubagentActionReturn {
+  type: 'startImmediateSubagent';
+  subagent: string;
+  prompt: string;
+}
+
 export type SlashCommandActionReturn =
   | ToolActionReturn
   | MessageActionReturn
@@ -240,7 +249,8 @@ export type SlashCommandActionReturn =
   | LoadHistoryActionReturn
   | SubmitPromptActionReturn
   | ConfirmShellCommandsActionReturn
-  | ConfirmActionReturn;
+  | ConfirmActionReturn
+  | StartImmediateSubagentActionReturn;
 
 export enum CommandKind {
   BUILT_IN = 'built-in',
