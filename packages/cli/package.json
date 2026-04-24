@@ -44,6 +44,7 @@
     "@hoptrendy/channel-weixin": "file:../channels/weixin",
     "@hoptrendy/channel-dingtalk": "file:../channels/dingtalk",
     "@hoptrendy/hopcode-core": "file:../core",
+    "@hoptrendy/hopcode-server": "file:../server",
     "@hoptrendy/web-templates": "file:../web-templates",
     "@types/update-notifier": "latest",
     "ansi-regex": "latest",

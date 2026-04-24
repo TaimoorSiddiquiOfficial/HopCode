@@ -57,18 +57,9 @@ async function startGrpcServer(
     const runtimeConfig = useSubprocess ? undefined : await buildConfig();
 
     // Dynamic import so the server package is only loaded when this command runs.
-    const serverModule = (await import('@hoptrendy/hopcode-server')) as {
-      HopCodeServer: new (opts: {
-        port: number;
-        host: string;
-        runtimeConfig?: Config;
-      }) => {
-        start(): Promise<number>;
-        stop(): Promise<void>;
-      };
-    };
+    const { HopCodeServer } = await import('@hoptrendy/hopcode-server');
 
-    const server = new serverModule.HopCodeServer({
+    const server = new HopCodeServer({
       port,
       host,
       runtimeConfig,
