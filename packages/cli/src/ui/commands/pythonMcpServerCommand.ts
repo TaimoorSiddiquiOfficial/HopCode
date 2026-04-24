@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type {
+  SlashCommand,
+  CommandContext,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -25,7 +29,10 @@ export const pythonMcpServerCommand: SlashCommand = {
   name: 'python-mcp-server',
   description: 'Generate a Python MCP server from a description',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, args: string): Promise<SlashCommandActionReturn> => {
+  action: async (
+    context: CommandContext,
+    args: string,
+  ): Promise<SlashCommandActionReturn> => {
     try {
       if (!args.trim()) {
         return {
@@ -40,7 +47,11 @@ export const pythonMcpServerCommand: SlashCommand = {
       const outputDir = join(process.cwd(), projectName);
 
       // Generate the MCP server
-      const generatedFiles = await generatePythonMcpServer(projectName, description, outputDir);
+      const generatedFiles = await generatePythonMcpServer(
+        projectName,
+        description,
+        outputDir,
+      );
 
       return {
         type: 'message',
@@ -48,7 +59,8 @@ export const pythonMcpServerCommand: SlashCommand = {
         content: generateSuccessReport(projectName, outputDir, generatedFiles),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       return {
         type: 'message',
         messageType: 'error',
@@ -87,7 +99,9 @@ interface GeneratedFile {
  */
 function extractProjectName(description: string): string {
   // Try to extract a name from the description
-  const match = description.match(/(?:create|build|make|generate)\s+(?:an?|a)?\s*(?:MCP\s+)?(?:server\s+)?(?:for\s+)?(.+?)(?:\s|$|\.)/i);
+  const match = description.match(
+    /(?:create|build|make|generate)\s+(?:an?|a)?\s*(?:MCP\s+)?(?:server\s+)?(?:for\s+)?(.+?)(?:\s|$|\.)/i,
+  );
   if (match && match[1]) {
     const name = match[1]
       .toLowerCase()
@@ -105,7 +119,7 @@ function extractProjectName(description: string): string {
 async function generatePythonMcpServer(
   projectName: string,
   _description: string,
-  outputDir: string
+  outputDir: string,
 ): Promise<GeneratedFile[]> {
   const generatedFiles: GeneratedFile[] = [];
 
@@ -115,7 +129,7 @@ async function generatePythonMcpServer(
   }
 
   // Generate server implementation
-  const serverCode = generateServerCode(projectName, description);
+  const serverCode = generateServerCode(projectName, _description);
   const serverPath = join(outputDir, 'server.py');
   writeFileSync(serverPath, serverCode, 'utf-8');
   generatedFiles.push({
@@ -125,7 +139,7 @@ async function generatePythonMcpServer(
   });
 
   // Generate tools module
-  const toolsCode = generateToolsModule(projectName, description);
+  const toolsCode = generateToolsModule(projectName, _description);
   const toolsPath = join(outputDir, 'tools.py');
   writeFileSync(toolsPath, toolsCode, 'utf-8');
   generatedFiles.push({
@@ -145,7 +159,7 @@ async function generatePythonMcpServer(
   });
 
   // Generate .env.example
-  const envExampleContent = generateEnvExample(description);
+  const envExampleContent = generateEnvExample(_description);
   const envExamplePath = join(outputDir, '.env.example');
   writeFileSync(envExamplePath, envExampleContent, 'utf-8');
   generatedFiles.push({
@@ -155,7 +169,7 @@ async function generatePythonMcpServer(
   });
 
   // Generate README
-  const readmeContent = generateReadme(projectName, description);
+  const readmeContent = generateReadme(projectName, _description);
   const readmePath = join(outputDir, 'README.md');
   writeFileSync(readmePath, readmeContent, 'utf-8');
   generatedFiles.push({
@@ -165,7 +179,7 @@ async function generatePythonMcpServer(
   });
 
   // Generate tests
-  const testContent = generateTests(projectName, description);
+  const testContent = generateTests(projectName, _description);
   const testPath = join(outputDir, 'test_server.py');
   writeFileSync(testPath, testContent, 'utf-8');
   generatedFiles.push({
@@ -268,7 +282,10 @@ if __name__ == "__main__":
 /**
  * Generate tools module
  */
-function generateToolsModule(projectName: string, _description: string): string {
+function generateToolsModule(
+  projectName: string,
+  _description: string,
+): string {
   return `"""
 Tool definitions and handlers for ${projectName}
 
@@ -1013,7 +1030,7 @@ See the generated README.md for detailed instructions.
 function generateSuccessReport(
   projectName: string,
   outputDir: string,
-  generatedFiles: GeneratedFile[]
+  generatedFiles: GeneratedFile[],
 ): string {
   const filesList = generatedFiles
     .map((f) => `- **${f.path}** - ${f.description}`)
