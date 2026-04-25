@@ -82,6 +82,7 @@ import { DualOutputContext } from './dualOutput/DualOutputContext.js';
 import { RemoteInputWatcher } from './remoteInput/RemoteInputWatcher.js';
 import { RemoteInputContext } from './remoteInput/RemoteInputContext.js';
 import { installTerminalRedrawOptimizer } from './ui/utils/terminalRedrawOptimizer.js';
+import { installSynchronizedOutput } from './ui/utils/synchronizedOutput.js';
 
 const debugLogger = createDebugLogger('STARTUP');
 
@@ -167,6 +168,10 @@ export async function startInteractiveUI(
 ) {
   const version = await getCliVersion();
   setWindowTitle(basename(workspaceRoot), settings);
+  const restoreSynchronizedOutput =
+    process.stdout.isTTY && !config.getScreenReader()
+      ? installSynchronizedOutput(process.stdout)
+      : () => {};
   const restoreTerminalRedrawOptimizer =
     process.stdout.isTTY && !config.getScreenReader()
       ? installTerminalRedrawOptimizer(process.stdout)
@@ -290,6 +295,7 @@ export async function startInteractiveUI(
     remoteInputWatcher?.shutdown();
     await dualOutputBridge?.shutdown();
     instance.unmount();
+    restoreSynchronizedOutput();
     restoreTerminalRedrawOptimizer();
   });
 }

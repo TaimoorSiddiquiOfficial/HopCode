@@ -232,7 +232,7 @@ export interface UiTelemetryRecordPayload {
  * - Linear history reconstruction
  * - Future checkpointing (branch from any historical point)
  *
- * File location: ~/.hopcode/tmp/<project_id>/chats/
+ * File location: ~/.hopcode/projects/<sanitized_project>/chats/
  *
  * For session management (list, load, remove), use SessionService.
  */
@@ -248,25 +248,23 @@ export class ChatRecordingService {
    * (safe default) without rewriting the persisted record.
    */
   private currentTitleSource: TitleSource | undefined;
+
   /**
-   * How many auto-title attempts have been made this process.
-   *
-   * We don't commit to "one attempt per session" because the first assistant
-   * turn may be a pure tool-call with no user-visible text (e.g., the model
-   * opens with a search) — the title service returns null, and we'd waste
-   * the whole session's chance on a turn that never had a shot. Instead we
-   * retry for a handful of turns until either the title lands or we hit the
-   * cap, which protects against a persistently failing fast-model looping
-   * on every turn. {@link AUTO_TITLE_ATTEMPT_CAP} sets the ceiling.
+   * Cache for ensureChatsDir and ensureConversationFile results to avoid
+   * repeated sync fs calls on the hot path.
+   */
+  private chatsDirEnsured = false;
+  private conversationFile: string | undefined;
+
+  /**
+   * Number of auto-title generation attempts made in this session.
+   * We retry up to {@link AUTO_TITLE_ATTEMPT_CAP} times if the model
+   * fails to produce a title (e.g. due to safety filters or transient errors).
    */
   private autoTitleAttempts = 0;
+
   /**
-   * AbortController for the in-flight auto-title LLM call, or `undefined`
-   * when no generation is pending. Doubles as the in-flight guard — a
-   * defined controller means "one is running; don't launch another".
-   * Stored on the instance so {@link finalize} (called on session switch
-   * and shutdown) can cancel a pending call cleanly rather than letting
-   * it burn tokens after the session has already moved on.
+   * AbortController for the active auto-title generation task.
    */
   private autoTitleController: AbortController | undefined;
 
@@ -275,16 +273,9 @@ export class ChatRecordingService {
     this.lastRecordUuid =
       config.getResumedSessionData()?.lastCompletedUuid ?? null;
 
-    // On resume, load the cached custom title AND its source from the
-    // session file. Preserving the persisted source is load-bearing: the
-    // SessionPicker dim-styling depends on it, and hardcoding `'manual'`
-    // would silently downgrade auto-titled sessions every time they get
-    // resumed. Legacy records (no `titleSource` field) stay `undefined` —
-    // treated as manual for safety without rewriting the JSONL.
-    //
-    // We then re-append a custom_title record to EOF so the title stays
-    // within the tail window that readers scan (guarding against a crash
-    // before the next finalize).
+    // On resume, restore the cached title/source and re-append it to EOF so
+    // readers scanning the file tail still see the latest metadata after a
+    // crash or abrupt shutdown.
     if (config.getResumedSessionData()) {
       try {
         const sessionService = config.getSessionService();
@@ -299,61 +290,58 @@ export class ChatRecordingService {
   }
 
   /**
-   * Returns the current custom title, if any. Read-only accessor for
-   * callers (e.g. auto-title trigger) that need to know whether a title is
-   * already set before attempting generation.
+   * Writes are synchronous today, but shutdown still awaits this hook so the
+   * caller contract stays stable if recording becomes buffered again later.
+   */
+  async flush(): Promise<void> {
+    await Promise.resolve();
+  }
+
+  /**
+   * Returns the current custom title, if any.
    */
   getCurrentCustomTitle(): string | undefined {
     return this.currentCustomTitle;
   }
 
   /**
-   * Returns the source of the current custom title, or `undefined` when no
-   * title is set.
+   * Returns the source of the current custom title, if any.
    */
   getCurrentTitleSource(): TitleSource | undefined {
     return this.currentTitleSource;
   }
 
-  /**
-   * Returns the session ID.
-   * @returns The session ID.
-   */
   private getSessionId(): string {
     return this.config.getSessionId();
   }
 
-  /**
-   * Ensures the chats directory exists, creating it if it doesn't exist.
-   * @returns The path to the chats directory.
-   * @throws Error if the directory cannot be created.
-   */
   private ensureChatsDir(): string {
-    const projectDir = this.config.storage.getProjectDir();
-    const chatsDir = path.join(projectDir, 'chats');
+    const storage = this.config.storage;
+    const chatsDir = path.join(storage.getProjectDir(), 'chats');
 
-    try {
-      fs.mkdirSync(chatsDir, { recursive: true });
-    } catch {
-      // Ignore errors - directory will be created if it doesn't exist
+    if (this.chatsDirEnsured) {
+      return chatsDir;
     }
 
+    if (!fs.existsSync(chatsDir)) {
+      fs.mkdirSync(chatsDir, { recursive: true });
+    }
+    this.chatsDirEnsured = true;
     return chatsDir;
   }
 
-  /**
-   * Ensures the conversation file exists, creating it if it doesn't exist.
-   * Uses atomic file creation to avoid race conditions.
-   * @returns The path to the conversation file.
-   * @throws Error if the file cannot be created or accessed.
-   */
   private ensureConversationFile(): string {
+    if (this.conversationFile) {
+      return this.conversationFile;
+    }
+
     const chatsDir = this.ensureChatsDir();
     const sessionId = this.getSessionId();
     const safeFilename = `${sessionId}.jsonl`;
     const conversationFile = path.join(chatsDir, safeFilename);
 
     if (fs.existsSync(conversationFile)) {
+      this.conversationFile = conversationFile;
       return conversationFile;
     }
 
@@ -361,6 +349,7 @@ export class ChatRecordingService {
       // Use 'wx' flag for exclusive creation - atomic operation that fails if file exists
       // This avoids the TOCTOU race condition of existsSync + writeFileSync
       fs.writeFileSync(conversationFile, '', { flag: 'wx', encoding: 'utf8' });
+      this.conversationFile = conversationFile;
     } catch (error) {
       const nodeError = error as NodeJS.ErrnoException;
       // EEXIST means file already exists, which is expected and fine
@@ -370,6 +359,7 @@ export class ChatRecordingService {
           `Failed to create conversation file at ${conversationFile}: ${message}`,
         );
       }
+      this.conversationFile = conversationFile;
     }
 
     return conversationFile;
@@ -399,7 +389,6 @@ export class ChatRecordingService {
   private appendRecord(record: ChatRecord): void {
     try {
       const conversationFile = this.ensureConversationFile();
-
       jsonl.writeLineSync(conversationFile, record);
       this.lastRecordUuid = record.uuid;
     } catch (error) {

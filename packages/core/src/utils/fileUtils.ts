@@ -581,16 +581,6 @@ export async function processSingleFileContent(
 ): Promise<ProcessedFileReadResult> {
   const rootDirectory = config.getTargetDir();
   try {
-    if (!fs.existsSync(filePath)) {
-      // Sync check is acceptable before async read
-      return {
-        llmContent:
-          'Could not read file because no file was found at the specified path.',
-        returnDisplay: 'File not found.',
-        error: `File not found: ${filePath}`,
-        errorType: ToolErrorType.FILE_NOT_FOUND,
-      };
-    }
     const stats = await fs.promises.stat(filePath);
     if (stats.isDirectory()) {
       return {
@@ -877,6 +867,18 @@ export async function processSingleFileContent(
       }
     }
   } catch (error) {
+    if (
+      (error as NodeJS.ErrnoException).code === 'ENOENT' ||
+      (error instanceof Error && error.message.includes('ENOENT'))
+    ) {
+      return {
+        llmContent:
+          'Could not read file because no file was found at the specified path.',
+        returnDisplay: 'File not found.',
+        error: `File not found: ${filePath}`,
+        errorType: ToolErrorType.FILE_NOT_FOUND,
+      };
+    }
     const errorMessage = error instanceof Error ? error.message : String(error);
     const displayPath = path
       .relative(rootDirectory, filePath)

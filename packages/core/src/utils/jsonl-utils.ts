@@ -35,6 +35,11 @@ const debugLogger = createDebugLogger('JSONL');
 const fileLocks = new Map<string, Mutex>();
 
 /**
+ * A set of directories that have already been ensured to exist.
+ */
+const ensuredDirs = new Set<string>();
+
+/**
  * Gets or creates a mutex for a specific file path.
  */
 function getFileLock(filePath: string): Mutex {
@@ -42,6 +47,14 @@ function getFileLock(filePath: string): Mutex {
     fileLocks.set(filePath, new Mutex());
   }
   return fileLocks.get(filePath)!;
+}
+
+/**
+ * Resets the directory cache for testing.
+ * @internal
+ */
+export function _resetEnsuredDirsForTest(): void {
+  ensuredDirs.clear();
 }
 
 /**
@@ -118,14 +131,15 @@ export async function writeLine(
   data: unknown,
 ): Promise<void> {
   const lock = getFileLock(filePath);
-  await lock.runExclusive(() => {
+  await lock.runExclusive(async () => {
     const line = `${JSON.stringify(data)}\n`;
     // Ensure directory exists before writing
     const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    if (!ensuredDirs.has(dir)) {
+      await fs.promises.mkdir(dir, { recursive: true });
+      ensuredDirs.add(dir);
     }
-    fs.appendFileSync(filePath, line, 'utf8');
+    await fs.promises.appendFile(filePath, line, 'utf8');
   });
 }
 
@@ -137,8 +151,11 @@ export function writeLineSync(filePath: string, data: unknown): void {
   const line = `${JSON.stringify(data)}\n`;
   // Ensure directory exists before writing
   const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  if (!ensuredDirs.has(dir)) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    ensuredDirs.add(dir);
   }
   fs.appendFileSync(filePath, line, 'utf8');
 }
@@ -151,8 +168,11 @@ export function write(filePath: string, data: unknown[]): void {
   const lines = data.map((item) => JSON.stringify(item)).join('\n');
   // Ensure directory exists before writing
   const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  if (!ensuredDirs.has(dir)) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    ensuredDirs.add(dir);
   }
   fs.writeFileSync(filePath, `${lines}\n`, 'utf8');
 }

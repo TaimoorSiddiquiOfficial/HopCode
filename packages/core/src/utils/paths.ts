@@ -314,10 +314,30 @@ export function validatePath(
     return;
   }
 
+  // Check cache first
+  if (IS_DIRECTORY_CACHE.get(resolvedPath)) {
+    return;
+  }
+
   try {
     const stats = fs.statSync(resolvedPath);
-    if (!allowFiles && !stats.isDirectory()) {
+    const isDirectory = stats.isDirectory();
+    if (!allowFiles && !isDirectory) {
       throw new Error(`Path is not a directory: ${resolvedPath}`);
+    }
+
+    // Only cache positive directory results.
+    // We don't cache files because they are more likely to be deleted/re-created
+    // during a session, and we don't cache ENOENT so that a freshly created
+    // file/dir is picked up immediately.
+    if (isDirectory) {
+      if (IS_DIRECTORY_CACHE.size >= MAX_IS_DIRECTORY_CACHE_SIZE) {
+        const firstKey = IS_DIRECTORY_CACHE.keys().next().value;
+        if (firstKey !== undefined) {
+          IS_DIRECTORY_CACHE.delete(firstKey);
+        }
+      }
+      IS_DIRECTORY_CACHE.set(resolvedPath, true);
     }
   } catch (error: unknown) {
     if (isNodeError(error) && error.code === 'ENOENT') {
@@ -349,4 +369,20 @@ export function resolveAndValidatePath(
   const resolvedPath = resolvePath(targetDir, relativePath);
   validatePath(config, resolvedPath, options);
   return resolvedPath;
+}
+
+/**
+ * Bounded cache for isDirectory results to avoid repeated sync fs.statSync calls.
+ * Only caches positive results (isDirectory === true).
+ * Uses a simple FIFO eviction strategy.
+ */
+const IS_DIRECTORY_CACHE = new Map<string, boolean>();
+const MAX_IS_DIRECTORY_CACHE_SIZE = 1024;
+
+/**
+ * Resets the isDirectory cache for testing.
+ * @internal
+ */
+export function _resetIsDirectoryCacheForTest(): void {
+  IS_DIRECTORY_CACHE.clear();
 }

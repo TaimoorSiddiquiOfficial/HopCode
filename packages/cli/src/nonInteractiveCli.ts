@@ -178,7 +178,12 @@ export async function runNonInteractive(
     const stdoutErrorHandler = (err: NodeJS.ErrnoException) => {
       if (err.code === 'EPIPE') {
         process.stdout.removeListener('error', stdoutErrorHandler);
-        process.exit(0);
+        // Routine CLI patterns like `hopcode -p ... | head -1` close the
+        // downstream pipe and trigger EPIPE. Destroying stdout lets writes
+        // fail fast and the natural function return drive cleanup (including
+        // chat-recording flush). We deliberately do not process.exit(0) here
+        // as that would bypass the caller's runExitCleanup chain.
+        process.stdout.destroy();
       }
     };
 

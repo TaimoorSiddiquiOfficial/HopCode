@@ -1658,6 +1658,7 @@ export class Config {
       // Finalize the current session's metadata before cleanup.
       try {
         this.chatRecordingService?.finalize();
+        await this.chatRecordingService?.flush();
       } catch {
         // Best-effort — don't block shutdown
       }

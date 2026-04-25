@@ -22,6 +22,23 @@ import type { PermissionDecision } from '../permissions/types.js';
 const debugLogger = createDebugLogger('RIPGREP');
 
 /**
+ * Bounded caches for filesystem lookups to avoid repeated sync fs calls on the tool hot path.
+ * Uses a simple FIFO eviction strategy.
+ */
+const DIR_IS_DIR_CACHE = new Map<string, boolean>();
+const HOPCODE_IGNORE_EXISTS_CACHE = new Map<string, boolean>();
+const MAX_CACHE_SIZE = 256;
+
+/**
+ * Resets the ripgrep caches for testing.
+ * @internal
+ */
+export function _resetRipGrepCachesForTest(): void {
+  DIR_IS_DIR_CACHE.clear();
+  HOPCODE_IGNORE_EXISTS_CACHE.clear();
+}
+
+/**
  * Parameters for the GrepTool (Simplified)
  */
 export interface RipGrepToolParams {
@@ -253,17 +270,45 @@ class GrepToolInvocation extends BaseToolInvocation<
       // Load .hopcodeignore from each workspace directory, not just the primary one
       const seenIgnoreFiles = new Set<string>();
       for (const searchPath of paths) {
-        const dir =
-          fs.existsSync(searchPath) && fs.statSync(searchPath).isDirectory()
-            ? searchPath
-            : path.dirname(searchPath);
-        const qwenIgnorePath = path.join(dir, '.hopcodeignore');
-        if (
-          !seenIgnoreFiles.has(qwenIgnorePath) &&
-          fs.existsSync(qwenIgnorePath)
-        ) {
-          rgArgs.push('--ignore-file', qwenIgnorePath);
-          seenIgnoreFiles.add(qwenIgnorePath);
+        let isDir = DIR_IS_DIR_CACHE.get(searchPath);
+        if (isDir === undefined) {
+          try {
+            isDir =
+              fs.existsSync(searchPath) &&
+              fs.statSync(searchPath).isDirectory();
+            if (isDir) {
+              if (DIR_IS_DIR_CACHE.size >= MAX_CACHE_SIZE) {
+                const firstKey = DIR_IS_DIR_CACHE.keys().next().value;
+                if (firstKey !== undefined) DIR_IS_DIR_CACHE.delete(firstKey);
+              }
+              DIR_IS_DIR_CACHE.set(searchPath, true);
+            }
+          } catch {
+            isDir = false;
+          }
+        }
+
+        const dir = isDir ? searchPath : path.dirname(searchPath);
+        const hopcodeIgnorePath = path.join(dir, '.hopcodeignore');
+
+        if (seenIgnoreFiles.has(hopcodeIgnorePath)) {
+          continue;
+        }
+
+        let exists = HOPCODE_IGNORE_EXISTS_CACHE.get(hopcodeIgnorePath);
+        if (exists === undefined) {
+          exists = fs.existsSync(hopcodeIgnorePath);
+          if (HOPCODE_IGNORE_EXISTS_CACHE.size >= MAX_CACHE_SIZE) {
+            const firstKey = HOPCODE_IGNORE_EXISTS_CACHE.keys().next().value;
+            if (firstKey !== undefined)
+              HOPCODE_IGNORE_EXISTS_CACHE.delete(firstKey);
+          }
+          HOPCODE_IGNORE_EXISTS_CACHE.set(hopcodeIgnorePath, exists);
+        }
+
+        if (exists) {
+          rgArgs.push('--ignore-file', hopcodeIgnorePath);
+          seenIgnoreFiles.add(hopcodeIgnorePath);
         }
       }
     }

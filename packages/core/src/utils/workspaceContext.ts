@@ -12,6 +12,13 @@ import { createDebugLogger } from './debugLogger.js';
 
 const debugLogger = createDebugLogger('WORKSPACE');
 
+/**
+ * Bounded cache for fullyResolvedPath to avoid repeated sync fs.realpathSync calls.
+ * Uses a simple FIFO eviction strategy.
+ */
+const RESOLVED_PATH_CACHE = new Map<string, string>();
+const MAX_RESOLVED_PATH_CACHE_SIZE = 1024;
+
 export type Unsubscribe = () => void;
 
 /**
@@ -203,8 +210,14 @@ export class WorkspaceContext {
    * if it did exist.
    */
   private fullyResolvedPath(pathToCheck: string): string {
+    const cached = RESOLVED_PATH_CACHE.get(pathToCheck);
+    if (cached) {
+      return cached;
+    }
+
+    let resolved: string;
     try {
-      return fs.realpathSync(pathToCheck);
+      resolved = fs.realpathSync(pathToCheck);
     } catch (e: unknown) {
       if (
         isNodeError(e) &&
@@ -215,10 +228,22 @@ export class WorkspaceContext {
         !this.isFileSymlink(e.path)
       ) {
         // If it doesn't exist, e.path contains the fully resolved path.
-        return e.path;
+        resolved = e.path;
+      } else {
+        throw e;
       }
-      throw e;
     }
+
+    // Cache the result. FIFO eviction if full.
+    if (RESOLVED_PATH_CACHE.size >= MAX_RESOLVED_PATH_CACHE_SIZE) {
+      const firstKey = RESOLVED_PATH_CACHE.keys().next().value;
+      if (firstKey !== undefined) {
+        RESOLVED_PATH_CACHE.delete(firstKey);
+      }
+    }
+    RESOLVED_PATH_CACHE.set(pathToCheck, resolved);
+
+    return resolved;
   }
 
   /**

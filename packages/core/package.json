@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode-core",
-  "version": "0.17.7",
+  "version": "0.17.8",
   "description": "HopCode Core",
   "repository": {
     "type": "git",
@@ -91,7 +91,7 @@
     "simple-git": "latest",
     "strip-ansi": "latest",
     "tar": "latest",
-    "undici": "latest",
+    "undici": "^6.22.0",
     "uuid": "latest",
     "web-tree-sitter": "0.24.7",
     "ws": "latest",

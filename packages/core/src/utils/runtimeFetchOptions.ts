@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProxyAgent, EnvHttpProxyAgent, type Dispatcher } from 'undici';
+import { Agent, EnvHttpProxyAgent, ProxyAgent, type Dispatcher } from 'undici';
 
 /**
  * JavaScript runtime type
@@ -136,19 +136,33 @@ function buildFetchOptionsWithDispatcher(
   proxyUrl?: string,
 ): OpenAIRuntimeFetchOptions | AnthropicRuntimeFetchOptions {
   try {
-    // Use EnvHttpProxyAgent when no explicit proxy is provided to respect
-    // system environment variables (HTTP_PROXY, HTTPS_PROXY, NO_PROXY).
-    // This also ensures localhost/127.0.0.1 are not proxied by default.
-    const dispatcher = proxyUrl
-      ? new ProxyAgent({
-          uri: proxyUrl,
-          headersTimeout: 0,
-          bodyTimeout: 0,
-        })
-      : new EnvHttpProxyAgent({
-          headersTimeout: 0,
-          bodyTimeout: 0,
-        });
+    const envProxyConfigured =
+      process.env['HTTP_PROXY'] ||
+      process.env['HTTPS_PROXY'] ||
+      process.env['http_proxy'] ||
+      process.env['https_proxy'];
+    let dispatcher: Dispatcher;
+
+    if (proxyUrl) {
+      dispatcher = new ProxyAgent({
+        uri: proxyUrl,
+        headersTimeout: 0,
+        bodyTimeout: 0,
+      });
+    } else if (envProxyConfigured) {
+      dispatcher = new EnvHttpProxyAgent({
+        headersTimeout: 0,
+        bodyTimeout: 0,
+      });
+    } else {
+      // No proxy configured: keep the timeout-disabling behavior without
+      // installing proxy-aware dispatchers unnecessarily.
+      dispatcher = new Agent({
+        headersTimeout: 0,
+        bodyTimeout: 0,
+      });
+    }
+
     return { fetchOptions: { dispatcher } };
   } catch {
     return sdkType === 'openai' ? undefined : {};
