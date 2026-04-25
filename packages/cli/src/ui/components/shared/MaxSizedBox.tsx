@@ -117,6 +117,14 @@ export const MaxSizedBox: React.FC<MaxSizedBoxProps> = ({
     MINIMUM_MAX_HEIGHT,
   );
 
+  // On Windows, the terminal line-wrapper often behaves inconsistently with
+  // string-width when characters are at the absolute boundary. Adding a
+  // 1-character safety buffer prevents overflows that cause ghosting.
+  const effectiveMaxWidth =
+    process.platform === 'win32' && maxWidth !== undefined
+      ? maxWidth - 1
+      : maxWidth;
+
   if (maxWidth === undefined) {
     throw new Error('maxWidth must be defined when maxHeight is set.');
   }
@@ -131,7 +139,11 @@ export const MaxSizedBox: React.FC<MaxSizedBoxProps> = ({
     }
 
     if (element.type === Box) {
-      layoutInkElementAsStyledText(element, maxWidth!, laidOutStyledText);
+      layoutInkElementAsStyledText(
+        element,
+        effectiveMaxWidth!,
+        laidOutStyledText,
+      );
       return;
     }
 
