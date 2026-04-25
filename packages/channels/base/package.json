@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-base",
-  "version": "0.17.10",
+  "version": "0.17.11",
   "description": "Base channel infrastructure for Qwen Code",
   "type": "module",
   "main": "dist/index.js",
