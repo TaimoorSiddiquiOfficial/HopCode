@@ -73,23 +73,12 @@ interface MessageListItem {
 interface MessageListProps {
   allMessages: MessageListItem[];
   onFileClick: (path: string) => void;
-  /**
-   * After each render, this ref is updated with an array that maps
-   * DOM child position → allMessages index, only for items that
-   * actually render a DOM element (skipping nulls).
-   */
-  childIndexMap: React.MutableRefObject<number[]>;
 }
 
 const MessageList = React.memo<MessageListProps>(
-  ({ allMessages, onFileClick, childIndexMap }) => {
+  ({ allMessages, onFileClick }) => {
     const vscode = useVSCode();
     let imageIndex = 0;
-
-    // Build child→allMessages index mapping: for each item that renders
-    // a non-null element, record its allMessages index. This array's
-    // position corresponds to the DOM child position in the container.
-    const mapping: number[] = [];
 
     // Handle context menu trigger - notify extension which webview was right-clicked
     const handleContextMenu = useCallback(
@@ -173,8 +162,6 @@ const MessageList = React.memo<MessageListProps>(
           return null;
       }
 
-      // Record the mapping: DOM position → allMessages index
-      mapping.push(index);
       return (
         <div
           key={`message-${index}`}
@@ -185,9 +172,6 @@ const MessageList = React.memo<MessageListProps>(
         </div>
       );
     });
-
-    // Update the ref after render
-    childIndexMap.current = mapping;
 
     return <>{elements}</>;
   },
@@ -245,8 +229,6 @@ export const App: React.FC = () => {
   // Scroll container for message list; used to keep the view anchored to the latest content
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const inputFieldRef = useRef<HTMLDivElement | null>(null);
-  /** Maps DOM child positions to allMessages indices for copy command routing */
-  const childIndexMapRef = useRef<number[]>([]);
 
   const [editMode, setEditMode] = useState<ApprovalModeValue>(
     ApprovalMode.DEFAULT,
@@ -1178,7 +1160,6 @@ export const App: React.FC = () => {
             <MessageList
               allMessages={allMessages}
               onFileClick={handleFileClick}
-              childIndexMap={childIndexMapRef}
             />
 
             {insightProgress && (
