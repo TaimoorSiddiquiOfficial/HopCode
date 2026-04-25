@@ -38,9 +38,19 @@ export function isAbortError(error: unknown): boolean {
 
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    const cause = error.cause;
-    if (cause instanceof Error && cause.message !== error.message) {
-      return `${error.message} (cause: ${cause.message})`;
+    const messages: string[] = [error.message];
+    let currentCause = error.cause;
+    while (currentCause instanceof Error) {
+      if (
+        currentCause.message &&
+        currentCause.message !== messages[messages.length - 1]
+      ) {
+        messages.push(currentCause.message);
+      }
+      currentCause = currentCause.cause;
+    }
+    if (messages.length > 1) {
+      return `${messages[0]} (cause: ${messages.slice(1).join(' -> ')})`;
     }
     return error.message;
   }

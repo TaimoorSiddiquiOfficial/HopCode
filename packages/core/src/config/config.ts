@@ -2339,7 +2339,6 @@ export class Config {
   ): { model: string; baseUrl?: string; apiKey?: string } | undefined {
     const override = this.agentModels?.[agentName];
     if (!override || typeof override === 'string') return undefined;
-    if (override === 'inherit') return undefined;
     return override;
   }
 

@@ -6,6 +6,7 @@
 
 import { isApiError, isStructuredError } from './quotaErrorDetection.js';
 import { AuthType } from '../core/contentGenerator.js';
+import { getErrorMessage } from './errors.js';
 
 // Free Tier message functions
 const RATE_LIMIT_ERROR_MESSAGE_USE_GEMINI =
@@ -39,7 +40,8 @@ export function parseAndFormatApiError(
       return error.message;
     }
 
-    let text = `[API Error: ${error.message}]`;
+    const errorMessage = getErrorMessage(error);
+    let text = `[API Error: ${errorMessage}]`;
     if (error.status === 429) {
       text += getRateLimitMessage(authType);
     }

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Agent, ProxyAgent, type Dispatcher } from 'undici';
+import { ProxyAgent, EnvHttpProxyAgent, type Dispatcher } from 'undici';
 
 /**
  * JavaScript runtime type
@@ -136,13 +136,16 @@ function buildFetchOptionsWithDispatcher(
   proxyUrl?: string,
 ): OpenAIRuntimeFetchOptions | AnthropicRuntimeFetchOptions {
   try {
+    // Use EnvHttpProxyAgent when no explicit proxy is provided to respect
+    // system environment variables (HTTP_PROXY, HTTPS_PROXY, NO_PROXY).
+    // This also ensures localhost/127.0.0.1 are not proxied by default.
     const dispatcher = proxyUrl
       ? new ProxyAgent({
           uri: proxyUrl,
           headersTimeout: 0,
           bodyTimeout: 0,
         })
-      : new Agent({
+      : new EnvHttpProxyAgent({
           headersTimeout: 0,
           bodyTimeout: 0,
         });
