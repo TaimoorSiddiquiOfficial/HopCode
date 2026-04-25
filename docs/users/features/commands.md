@@ -270,7 +270,7 @@ Exclamation commands allow you to execute system commands directly within HopCod
 | `!<shell command>` | Execute command in sub-Shell                                       | `!ls -la`, `!git status`               |
 | Standalone `!`     | Switch Shell mode, any input is executed directly as Shell command | `!`(enter) → Input command → `!`(exit) |
 
-Environment Variables: Commands executed via `!` will set the `QWEN_CODE=1` environment variable.
+Environment Variables: Commands executed via `!` will set the `HOPCODE=1` environment variable.
 
 ## 4. Custom Commands
 
@@ -282,9 +282,9 @@ Save frequently used prompts as shortcut commands to improve work efficiency and
 
 ### Quick Overview
 
-| Function         | Description                                | Advantages                             | Priority | Applicable Scenarios                                 |
-| ---------------- | ------------------------------------------ | -------------------------------------- | -------- | ---------------------------------------------------- |
-| Namespace        | Subdirectory creates colon-named commands  | Better command organization            |          |                                                      |
+| Function         | Description                                   | Advantages                             | Priority | Applicable Scenarios                                 |
+| ---------------- | --------------------------------------------- | -------------------------------------- | -------- | ---------------------------------------------------- |
+| Namespace        | Subdirectory creates colon-named commands     | Better command organization            |          |                                                      |
 | Global Commands  | `~/.hopcode/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
 | Project Commands | `<project root directory>/.hopcode/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
 
@@ -294,8 +294,8 @@ Priority Rules: Project commands > User commands (project command used when name
 
 #### File Path to Command Name Mapping Table
 
-| File Location                            | Generated Command | Example Call          |
-| ---------------------------------------- | ----------------- | --------------------- |
+| File Location                               | Generated Command | Example Call          |
+| ------------------------------------------- | ----------------- | --------------------- |
 | `~/.hopcode/commands/test.md`               | `/test`           | `/test Parameter`     |
 | `<project>/.hopcode/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
 
@@ -409,12 +409,12 @@ Review {{args}}, reference standards:
 
 #### "Pure Function Refactoring" Command Creation Steps Table
 
-| Operation                     | Command/Code                              |
-| ----------------------------- | ----------------------------------------- |
+| Operation                     | Command/Code                                 |
+| ----------------------------- | -------------------------------------------- |
 | 1. Create directory structure | `mkdir -p ~/.hopcode/commands/refactor`      |
 | 2. Create command file        | `touch ~/.hopcode/commands/refactor/pure.md` |
-| 3. Edit command content       | Refer to the complete code below.         |
-| 4. Test command               | `@file.js` → `/refactor:pure`             |
+| 3. Edit command content       | Refer to the complete code below.            |
+| 4. Test command               | `@file.js` → `/refactor:pure`                |
 
 ```markdown
 ---

@@ -193,13 +193,13 @@ curl -qL https://www.npmjs.com/install.sh | sh
 ### NPM Installation
 
 ```bash
-npm install -g @qwen-code/qwen-code@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
 ### Homebrew (macOS, Linux)
 
 ```bash
-brew install qwen-code
+brew install hopcode
 ```
 
 ## Troubleshooting
@@ -227,7 +227,7 @@ sh install-qwen-with-source.sh --source github
 
 **Linux/macOS:**
 
-- Ensure NVM is installed: `curl -o- https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install_nvm.sh | bash`
+- Ensure NVM is installed: `curl -o- https://hopcode.dev/installation/install_nvm.sh | bash`
 - Restart your terminal or run: `source ~/.bashrc`
 
 **Windows:**

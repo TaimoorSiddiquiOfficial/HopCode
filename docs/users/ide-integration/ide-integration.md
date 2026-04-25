@@ -114,7 +114,7 @@ If you encounter issues with IDE integration, here are some common error message
 ### Connection Errors
 
 - **Message:** `🔴 Disconnected: Failed to connect to IDE companion extension for [IDE Name]. Please ensure the extension is running and try restarting your terminal. To install the extension, run /ide install.`
-  - **Cause:** HopCode could not find the necessary environment variables (`QWEN_CODE_IDE_WORKSPACE_PATH` or `HOPCODE_IDE_SERVER_PORT`) to connect to the IDE. This usually means the IDE companion extension is not running or did not initialize correctly.
+  - **Cause:** HopCode could not find the necessary environment variables (`HOPCODE_IDE_WORKSPACE_PATH` or `HOPCODE_IDE_SERVER_PORT`) to connect to the IDE. This usually means the IDE companion extension is not running or did not initialize correctly.
   - **Solution:**
     1.  Make sure you have installed the **HopCode Companion** extension in your IDE and that it is enabled.
     2.  Open a new terminal window in your IDE to ensure it picks up the correct environment.

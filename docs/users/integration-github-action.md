@@ -112,24 +112,24 @@ This type of action can be used to invoke a general-purpose, conversational HopC
 
 <!-- BEGIN_AUTOGEN_INPUTS -->
 
-- <a name="__input_HOPCODE_API_KEY"></a><a href="#user-content-__input_HOPCODE_API_KEY"><code>hopcode_api_key</code></a>: *(Optional)\_ The API key for the Qwen API.
+- <a name="__input_HOPCODE_API_KEY"></a><a href="#user-content-__input_HOPCODE_API_KEY"><code>hopcode_api_key</code></a>: \*(Optional)\_ The API key for the Qwen API.
 
-- <a name="__input_hopcode_cli_version"></a><a href="#user-content-__input_hopcode_cli_version"><code>hopcode_cli_version</code></a>: *(Optional, default: `latest`)\_ The version of the HopCode CLI to install. Can be "latest", "preview", "nightly", a specific version number, or a git branch, tag, or commit. For more information, see [HopCode CLI releases](https://github.com/QwenLM/hopcode-action/blob/main/docs/releases.md).
+- <a name="__input_hopcode_cli_version"></a><a href="#user-content-__input_hopcode_cli_version"><code>hopcode_cli_version</code></a>: \*(Optional, default: `latest`)\_ The version of the HopCode CLI to install. Can be "latest", "preview", "nightly", a specific version number, or a git branch, tag, or commit. For more information, see [HopCode CLI releases](https://github.com/QwenLM/hopcode-action/blob/main/docs/releases.md).
 
-- <a name="__input_hopcode_debug"></a><a href="#user-content-__input_hopcode_debug"><code>hopcode_debug</code></a>: *(Optional)\_ Enable debug logging and output streaming.
+- <a name="__input_hopcode_debug"></a><a href="#user-content-__input_hopcode_debug"><code>hopcode_debug</code></a>: \*(Optional)\_ Enable debug logging and output streaming.
 
-- <a name="__input_hopcode_model"></a><a href="#user-content-__input_hopcode_model"><code>hopcode_model</code></a>: *(Optional)\_ The model to use with HopCode.
+- <a name="__input_hopcode_model"></a><a href="#user-content-__input_hopcode_model"><code>hopcode_model</code></a>: \*(Optional)\_ The model to use with HopCode.
 
-- <a name="__input_prompt"></a><a href="#user-content-__input_prompt"><code>prompt</code></a>: _(Optional, default: `You are a helpful assistant.`)_ A string passed to the HopCode CLI's [`--prompt` argument](https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/configuration.md#command-line-arguments).
+- <a name="__input_prompt"></a><a href="#user-content-__input_prompt"><code>prompt</code></a>: _(Optional, default: `You are a helpful assistant.`)_ A string passed to the HopCode CLI's [`--prompt` argument](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/configuration.md#command-line-arguments).
 
 - <a name="__input_settings"></a><a href="#user-content-__input_settings"><code>settings</code></a>: _(Optional)_ A JSON string written to `.hopcode/settings.json` to configure the CLI's _project_ settings.
-  For more details, see the documentation on [settings files](https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/configuration.md#settings-files).
+  For more details, see the documentation on [settings files](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/configuration.md#settings-files).
 
-- <a name="__input_use_hopcode_assist"></a><a href="#user-content-__input_use_hopcode_assist"><code>use*qwen_code_assist</code></a>: *(Optional, default: `false`)\_ Whether to use Code Assist for HopCode model access instead of the default HopCode API key.
-  For more information, see the [HopCode CLI documentation](https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/authentication.md).
+- <a name="__input_use_hopcode_assist"></a><a href="#user-content-__input_use_hopcode_assist"><code>use*qwen_code_assist</code></a>: *(Optional, default: `false`)\* Whether to use Code Assist for HopCode model access instead of the default HopCode API key.
+  For more information, see the [HopCode CLI documentation](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/authentication.md).
 
-- <a name="__input_use_vertex_ai"></a><a href="#user-content-__input_use_vertex_ai"><code>use*vertex_ai</code></a>: *(Optional, default: `false`)\_ Whether to use Vertex AI for HopCode model access instead of the default HopCode API key.
-  For more information, see the [HopCode CLI documentation](https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/authentication.md).
+- <a name="__input_use_vertex_ai"></a><a href="#user-content-__input_use_vertex_ai"><code>use*vertex_ai</code></a>: *(Optional, default: `false`)\* Whether to use Vertex AI for HopCode model access instead of the default HopCode API key.
+  For more information, see the [HopCode CLI documentation](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/authentication.md).
 
 - <a name="__input_extensions"></a><a href="#user-content-__input_extensions"><code>extensions</code></a>: _(Optional)_ A list of HopCode CLI extensions to install.
 
@@ -175,7 +175,7 @@ You can set the following secrets in your repository:
 
 | Name              | Description                                   | Required | When Required                              |
 | ----------------- | --------------------------------------------- | -------- | ------------------------------------------ |
-| `HOPCODE_API_KEY`    | Your Qwen API key from DashScope.             | Yes      | Required for all workflows that call Qwen. |
+| `HOPCODE_API_KEY` | Your Qwen API key from DashScope.             | Yes      | Required for all workflows that call Qwen. |
 | `APP_PRIVATE_KEY` | Private key for your GitHub App (PEM format). | No       | Using a custom GitHub App.                 |
 
 To add a secret:

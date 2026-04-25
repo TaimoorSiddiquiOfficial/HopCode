@@ -6,9 +6,9 @@ HopCode is built for multilingual workflows: it supports UI localization (i18n/l
 
 From a user point of view, HopCode’s “internationalization” spans multiple layers:
 
-| Capability / Setting     | What it controls                                                       | Where stored                 |
-| ------------------------ | ---------------------------------------------------------------------- | ---------------------------- |
-| `/language ui`           | Terminal UI text (menus, system messages, prompts)                     | `~/.hopcode/settings.json`   |
+| Capability / Setting     | What it controls                                                       | Where stored                    |
+| ------------------------ | ---------------------------------------------------------------------- | ------------------------------- |
+| `/language ui`           | Terminal UI text (menus, system messages, prompts)                     | `~/.hopcode/settings.json`      |
 | `/language output`       | Language the AI responds in (an output preference, not UI translation) | `~/.hopcode/output-language.md` |
 | Custom UI language packs | Overrides/extends built-in UI translations                             | `~/.hopcode/locales/*.js`       |
 
@@ -44,7 +44,7 @@ On first startup, HopCode detects your system locale and sets the UI language au
 
 Detection priority:
 
-1. `QWEN_CODE_LANG` environment variable
+1. `HOPCODE_LANG` environment variable
 2. `LANG` environment variable
 3. System locale via JavaScript Intl API
 4. Default: English
@@ -101,10 +101,10 @@ Any language name works. The LLM will be instructed to respond in that language.
 ### Via Environment Variable
 
 ```bash
-export QWEN_CODE_LANG=zh
+export HOPCODE_LANG=zh
 ```
 
-This influences auto-detection on first startup (if you haven’t set a UI language and no `output-language.md` file exists yet).
+This influences auto-detection on first startup (if you haven't set a UI language and no `output-language.md` file exists yet).
 
 ## Custom Language Packs
 

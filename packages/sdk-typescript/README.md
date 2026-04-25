@@ -418,16 +418,16 @@ try {
 
 If you're using SDK version **0.1.0**, please note the following requirements:
 
-#### Qwen Code Installation Required
+#### HopCode Installation Required
 
-Version 0.1.0 requires [Qwen Code](https://github.com/QwenLM/qwen-code) **>= 0.4.0** to be installed separately and accessible in your PATH.
+Version 0.1.0 requires [HopCode](https://github.com/TaimoorSiddiquiOfficial/HopCode) **>= 0.4.0** to be installed separately and accessible in your PATH.
 
 ```bash
-# Install Qwen Code globally
-npm install -g qwen-code@^0.4.0
+# Install HopCode globally
+npm install -g hopcode@^0.4.0
 ```
 
-**Note**: From version **0.1.1** onwards, the CLI is bundled with the SDK, so no separate Qwen Code installation is needed.
+**Note**: From version **0.1.1** onwards, the CLI is bundled with the SDK, so no separate HopCode installation is needed.
 
 ## License
 

@@ -323,14 +323,14 @@ When Qwen Code runs in CI/CD pipelines or as a background daemon, a brief API ou
 
 ### Activation
 
-Set the `QWEN_CODE_UNATTENDED_RETRY` environment variable to `true` or `1` (strict match, case-sensitive):
+Set the `HOPCODE_UNATTENDED_RETRY` environment variable to `true` or `1` (strict match, case-sensitive):
 
 ```bash
-export QWEN_CODE_UNATTENDED_RETRY=1
+export HOPCODE_UNATTENDED_RETRY=1
 ```
 
 > [!important]
-> Persistent retry requires an **explicit opt-in**. `CI=true` alone does **not** activate it — silently turning a fast-fail CI job into an infinite-wait job would be dangerous. Always set `QWEN_CODE_UNATTENDED_RETRY` explicitly in your pipeline configuration.
+> Persistent retry requires an **explicit opt-in**. `CI=true` alone does **not** activate it — silently turning a fast-fail CI job into an infinite-wait job would be dangerous. Always set `HOPCODE_UNATTENDED_RETRY` explicitly in your pipeline configuration.
 
 ### Examples
 
@@ -339,9 +339,9 @@ export QWEN_CODE_UNATTENDED_RETRY=1
 ```yaml
 - name: Automated code review
   env:
-    QWEN_CODE_UNATTENDED_RETRY: '1'
+    HOPCODE_UNATTENDED_RETRY: '1'
   run: |
-    qwen -p "Review all files in src/ for security issues" \
+    hopcode -p "Review all files in src/ for security issues" \
       --output-format json \
       --yolo > review.json
 ```
@@ -349,14 +349,14 @@ export QWEN_CODE_UNATTENDED_RETRY=1
 #### Overnight batch processing
 
 ```bash
-export QWEN_CODE_UNATTENDED_RETRY=1
-qwen -p "Migrate all callback-style functions to async/await in src/" --yolo
+export HOPCODE_UNATTENDED_RETRY=1
+hopcode -p "Migrate all callback-style functions to async/await in src/" --yolo
 ```
 
 #### Background daemon
 
 ```bash
-QWEN_CODE_UNATTENDED_RETRY=1 nohup qwen -p "Audit all dependencies for known CVEs" \
+HOPCODE_UNATTENDED_RETRY=1 nohup hopcode -p "Audit all dependencies for known CVEs" \
   --output-format json > audit.json 2> audit.log &
 ```
 
@@ -365,8 +365,8 @@ QWEN_CODE_UNATTENDED_RETRY=1 nohup qwen -p "Audit all dependencies for known CVE
 During persistent retry, heartbeat messages are printed to **stderr**:
 
 ```
-[qwen-code] Waiting for API capacity... attempt 3, retry in 45s
-[qwen-code] Waiting for API capacity... attempt 3, retry in 15s
+[hopcode] Waiting for API capacity... attempt 3, retry in 45s
+[hopcode] Waiting for API capacity... attempt 3, retry in 15s
 ```
 
 These messages keep CI runners alive and let you monitor progress. They do not appear in stdout, so JSON output piped to other tools remains clean.
