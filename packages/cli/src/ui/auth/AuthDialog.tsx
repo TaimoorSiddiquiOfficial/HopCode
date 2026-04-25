@@ -239,7 +239,8 @@ export function AuthDialog(): React.JSX.Element {
       // Priority 3: HOPCODE_DEFAULT_AUTH_TYPE env var
       const defaultAuthType = parseDefaultAuthType(
         process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ??
-          (process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ?? process.env['QWEN_DEFAULT_AUTH_TYPE']),
+          process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ??
+          process.env['QWEN_DEFAULT_AUTH_TYPE'],
       );
       if (defaultAuthType) {
         return item.value === authTypeToMainOption(defaultAuthType);

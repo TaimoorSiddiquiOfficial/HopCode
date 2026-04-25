@@ -20,6 +20,7 @@ import {
 import {
   AUTH_ENV_MAPPINGS,
   MODEL_GENERATION_CONFIG_FIELDS,
+  setGenerationConfigField,
 } from './constants.js';
 import type { ResolvedModelConfig } from './types.js';
 
@@ -61,8 +62,7 @@ export function buildAgentContentGeneratorConfig(
   // settings (samplingParams, reasoning, extra_body, etc.) don't leak.
   if (!sameProvider) {
     for (const field of MODEL_GENERATION_CONFIG_FIELDS) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (nextConfig as any)[field] = undefined;
+      setGenerationConfigField(nextConfig, field, undefined);
     }
   }
 
@@ -135,8 +135,7 @@ function applyResolvedModelConfig(
   for (const field of MODEL_GENERATION_CONFIG_FIELDS) {
     const registryValue = resolvedModel.generationConfig[field];
     if (registryValue !== undefined) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (targetConfig as any)[field] = registryValue;
+      setGenerationConfigField(targetConfig, field, registryValue);
     }
   }
 }

@@ -24,6 +24,7 @@ export GITHUB_APP_PRIVATE_KEY="..."
 ```
 
 **Files**:
+
 - `packages/cli/src/ui/commands/githubCommand.ts` - Checks credentials, shows installation link
 - `packages/cli/src/ui/commands/githubAuthCommand.ts` - Detailed auth status
 
@@ -70,11 +71,11 @@ export GITHUB_APP_PRIVATE_KEY="..."
 
 ### 3. Documentation for Users
 
-| File | Purpose | Users See |
-|------|---------|-----------|
-| `docs/users/GITHUB_APP_INSTALL.md` | Installation guide | Step-by-step setup |
-| `docs/users/GITHUB_QUICK_START.md` | Quick reference | Commands & examples |
-| `docs/users/github-integration.md` | Full guide | API reference, troubleshooting |
+| File                               | Purpose            | Users See                      |
+| ---------------------------------- | ------------------ | ------------------------------ |
+| `docs/users/GITHUB_APP_INSTALL.md` | Installation guide | Step-by-step setup             |
+| `docs/users/GITHUB_QUICK_START.md` | Quick reference    | Commands & examples            |
+| `docs/users/github-integration.md` | Full guide         | API reference, troubleshooting |
 
 ---
 
@@ -143,7 +144,7 @@ export GITHUB_APP_PRIVATE_KEY="..."
 
 ```typescript
 // User runs: /github
-githubCommand.action(context, '')
+githubCommand.action(context, '');
 
 // Step 1: Check credentials
 const hasCredentials = hasGitHubCredentials(context);
@@ -155,13 +156,13 @@ if (!hasCredentials) {
   // Show installation link
   return {
     type: 'message',
-    content: `👉 Install: ${INSTALLATION_URL}...`
+    content: `👉 Install: ${INSTALLATION_URL}...`,
   };
 } else {
   // Show status and commands
   return {
     type: 'message',
-    content: `✅ Ready - Available commands...`
+    content: `✅ Ready - Available commands...`,
   };
 }
 ```
@@ -186,7 +187,7 @@ Where:
 User: /github
 Bot: GitHub Integration Commands:
   /github auth...
-  
+
 User: 😕 I don't have credentials
 ```
 
@@ -195,13 +196,13 @@ User: 😕 I don't have credentials
 ```
 User: /github
 Bot: 🔐 Not Configured
-  
+
   👉 Click here to install: https://github.com/apps/hopcode-ai-agent/installations/select_target
-  
+
   After installation:
   export GITHUB_APP_ID=3424564
   export GITHUB_APP_PRIVATE_KEY="..."
-  
+
 User: ✅ Clicks link → Installs → Configures → Works!
 ```
 
@@ -211,25 +212,25 @@ User: ✅ Clicks link → Installs → Configures → Works!
 
 ### ✅ Implemented
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Installation Link | ✅ | Auto-generated clickable link |
-| Credential Check | ✅ | Checks settings.json & env vars |
-| Status Messages | ✅ | Different messages for configured/unconfigured |
-| Subagent Integration | ✅ | 5 GitHub-specialized subagents |
-| MCP Tools | ✅ | 40+ GitHub API methods |
-| Documentation | ✅ | 3 comprehensive guides |
-| Security | ✅ | JWT auth, no Client Secret needed |
-| Auto-completion | ✅ | Context-aware suggestions |
+| Feature              | Status | Description                                    |
+| -------------------- | ------ | ---------------------------------------------- |
+| Installation Link    | ✅     | Auto-generated clickable link                  |
+| Credential Check     | ✅     | Checks settings.json & env vars                |
+| Status Messages      | ✅     | Different messages for configured/unconfigured |
+| Subagent Integration | ✅     | 5 GitHub-specialized subagents                 |
+| MCP Tools            | ✅     | 40+ GitHub API methods                         |
+| Documentation        | ✅     | 3 comprehensive guides                         |
+| Security             | ✅     | JWT auth, no Client Secret needed              |
+| Auto-completion      | ✅     | Context-aware suggestions                      |
 
 ### 🔜 Future Enhancements
 
-| Feature | Priority | Description |
-|---------|----------|-------------|
-| OAuth Flow | Low | For user-specific actions |
-| Webhook Handler | Medium | Real-time event processing |
-| GitHub Copilot SDK | Medium | Access Copilot models |
-| VS Code Panel | High | Native GitHub integration in IDE |
+| Feature            | Priority | Description                      |
+| ------------------ | -------- | -------------------------------- |
+| OAuth Flow         | Low      | For user-specific actions        |
+| Webhook Handler    | Medium   | Real-time event processing       |
+| GitHub Copilot SDK | Medium   | Access Copilot models            |
+| VS Code Panel      | High     | Native GitHub integration in IDE |
 
 ---
 
@@ -245,6 +246,7 @@ const GITHUB_APP_NAME = 'YOUR-ACTUAL-APP-SLUG'; // Check in GitHub settings
 ```
 
 **How to find your app slug:**
+
 1. Go to https://github.com/settings/apps/3424564
 2. Look at URL: `github.com/apps/YOUR-APP-SLUG`
 3. Update `GITHUB_APP_NAME` constant
@@ -305,13 +307,13 @@ npm publish
 
 ## 📖 Documentation Links
 
-| Document | Audience | Purpose |
-|----------|----------|---------|
-| `GITHUB_APP_INSTALL.md` | End Users | Installation guide with clickable link |
-| `GITHUB_QUICK_START.md` | End Users | Quick reference |
-| `github-integration.md` | Developers | Full API reference |
-| `.github-app-config.md` | You | Credential reference |
-| `GITHUB_INTEGRATION_STATUS.md` | You | Implementation status |
+| Document                       | Audience   | Purpose                                |
+| ------------------------------ | ---------- | -------------------------------------- |
+| `GITHUB_APP_INSTALL.md`        | End Users  | Installation guide with clickable link |
+| `GITHUB_QUICK_START.md`        | End Users  | Quick reference                        |
+| `github-integration.md`        | Developers | Full API reference                     |
+| `.github-app-config.md`        | You        | Credential reference                   |
+| `GITHUB_INTEGRATION_STATUS.md` | You        | Implementation status                  |
 
 ---
 
@@ -337,11 +339,13 @@ npm publish
 Your GitHub integration is **complete and production-ready**!
 
 **What users experience:**
+
 1. Run `/github` → See installation link
 2. Click link → Install on repos
 3. Configure credentials → Start using immediately
 
 **What you built:**
+
 - 11 new files (2,800+ lines)
 - 5 GitHub subagents
 - 40+ API methods
@@ -349,6 +353,7 @@ Your GitHub integration is **complete and production-ready**!
 - Comprehensive documentation
 
 **Security:**
+
 - JWT authentication (no Client Secret)
 - Private keys protected
 - User-isolated credentials

@@ -115,13 +115,14 @@ interface ProviderConfig {
   requiresApiKey: boolean;
   envKey?: string;
   baseUrl?: string;
-  liveModels: boolean;  // Fetch models from API at runtime
+  liveModels: boolean; // Fetch models from API at runtime
   defaultModel?: string;
   categories: string[];
 }
 ```
 
 **Provider Registry** (23 providers):
+
 - `openai` — OpenAI, Groq, Fireworks, Together AI, OpenRouter
 - `anthropic` — Anthropic Claude
 - `google` / `vertex-ai` — Google Gemini / Vertex AI
@@ -139,6 +140,7 @@ interface ProviderConfig {
 - And 9 more...
 
 **Model Resolution**:
+
 ```
 User selects model "gpt-4o"
   ↓
@@ -163,32 +165,34 @@ ContentGenerator created with resolved config
 **File**: `packages/core/src/tools/tools.ts`
 
 Tools are the actions HopCode can take. Each tool is a class with:
+
 - `invoke()` — Execute the tool
 - `schema` — Zod schema for parameters
 - `description` — What the tool does
 
 **Core Tools** (63 tool files):
 
-| Category | Tools |
-|----------|-------|
-| **File I/O** | `read-file`, `write-file`, `edit`, `ls`, `glob` |
-| **Search** | `ripGrep`, `grep` |
-| **Shell** | `shell` (execute commands) |
-| **LSP** | `lsp` (language server protocol) |
-| **MCP** | `mcp-client`, `mcp-tool` |
-| **Web** | `web-search`, `web-fetch` |
-| **Task Management** | `todoWrite`, `task-create`, `task-get`, `task-list`, `task-update`, `task-output` |
-| **Agent Control** | `task-stop`, `task-ready` (spawn/kill subagents) |
-| **Skills** | `skill` (invoke skills) |
-| **User Interaction** | `askUserQuestion` |
-| **Cron** | `cron-create`, `cron-list`, `cron-delete` |
-| **Configuration** | `diffOptions` |
+| Category             | Tools                                                                             |
+| -------------------- | --------------------------------------------------------------------------------- |
+| **File I/O**         | `read-file`, `write-file`, `edit`, `ls`, `glob`                                   |
+| **Search**           | `ripGrep`, `grep`                                                                 |
+| **Shell**            | `shell` (execute commands)                                                        |
+| **LSP**              | `lsp` (language server protocol)                                                  |
+| **MCP**              | `mcp-client`, `mcp-tool`                                                          |
+| **Web**              | `web-search`, `web-fetch`                                                         |
+| **Task Management**  | `todoWrite`, `task-create`, `task-get`, `task-list`, `task-update`, `task-output` |
+| **Agent Control**    | `task-stop`, `task-ready` (spawn/kill subagents)                                  |
+| **Skills**           | `skill` (invoke skills)                                                           |
+| **User Interaction** | `askUserQuestion`                                                                 |
+| **Cron**             | `cron-create`, `cron-list`, `cron-delete`                                         |
+| **Configuration**    | `diffOptions`                                                                     |
 
 **Tool Registry**:
+
 ```typescript
 class ToolRegistry {
   private tools: Map<ToolName, Tool<any, any>>;
-  
+
   registerTool(tool: Tool<any, any>): void;
   getTool(name: ToolName): Tool<any, any>;
   listTools(): Tool<any, any>[];
@@ -197,6 +201,7 @@ class ToolRegistry {
 
 **Permission System**:
 Tools can run in different approval modes:
+
 - `plan` — All tool calls require approval
 - `default` — Edit tools require approval
 - `auto-edit` — Safe edits auto-approved
@@ -212,13 +217,14 @@ HopCode uses a **multi-agent architecture** where the main agent can spawn speci
 
 **Agent Types**:
 
-| Agent | Purpose |
-|-------|---------|
-| **Main Agent** | Primary conversation partner |
-| **Subagents** | Specialized tasks (testing, review, etc.) |
-| **Arena Agents** | Parallel model comparison |
+| Agent            | Purpose                                   |
+| ---------------- | ----------------------------------------- |
+| **Main Agent**   | Primary conversation partner              |
+| **Subagents**    | Specialized tasks (testing, review, etc.) |
+| **Arena Agents** | Parallel model comparison                 |
 
 **Subagent Configuration** (`AGENT.md`):
+
 ```markdown
 ---
 name: test-engineer
@@ -235,6 +241,7 @@ You are a test engineering specialist...
 ```
 
 **Runtime Config Types**:
+
 ```typescript
 interface PromptConfig {
   systemPrompt: string;
@@ -266,6 +273,7 @@ interface ToolConfig {
 Skills are modular instruction sets that extend HopCode's capabilities.
 
 **Skill Structure** (`SKILL.md`):
+
 ```markdown
 ---
 name: spec-driven
@@ -276,7 +284,7 @@ allowedTools:
   - shell
 hooks:
   on_session_start:
-    - matcher: ".*"
+    - matcher: '.*'
       hooks:
         - type: command
           command: "echo 'Starting spec-driven workflow'"
@@ -291,6 +299,7 @@ when_to_use: Use when user wants to implement a feature from a spec
 ```
 
 **Skill Levels** (precedence order):
+
 1. `session` — Runtime-provided (highest)
 2. `project` — `.hopcode/skills/` in project
 3. `user` — `~/.hopcode/skills/`
@@ -298,6 +307,7 @@ when_to_use: Use when user wants to implement a feature from a spec
 5. `bundled` — Built-in skills (lowest)
 
 **Built-in Skills**:
+
 - `spec-driven` — TDD / spec-first development
 - `git-workflow` — Conventional commits, PR descriptions
 - `codebase-map` — Generate architecture docs
@@ -318,6 +328,7 @@ when_to_use: Use when user wants to implement a feature from a spec
 MCP allows HopCode to connect to external data sources and tools.
 
 **MCP Server Configuration**:
+
 ```json
 {
   "mcpServers": {
@@ -333,6 +344,7 @@ MCP allows HopCode to connect to external data sources and tools.
 ```
 
 **OAuth Flow**:
+
 1. User initiates MCP connection
 2. OAuth provider redirects to authorization URL
 3. User grants permission
@@ -348,6 +360,7 @@ MCP allows HopCode to connect to external data sources and tools.
 LSP integration provides deep code intelligence.
 
 **LSP Features**:
+
 - Symbol navigation (go to definition, find references)
 - Hover information (type hints, documentation)
 - Diagnostics (errors, warnings)
@@ -355,6 +368,7 @@ LSP integration provides deep code intelligence.
 - Document symbols
 
 **LSP Configuration** (`.hopcode/lsp.json`):
+
 ```json
 {
   "servers": {
@@ -379,6 +393,7 @@ LSP integration provides deep code intelligence.
 Arena mode runs multiple models in parallel on the same task.
 
 **Flow**:
+
 ```
 User: hopcode --arena gpt-4o,claude-sonnet,deepseek-r1 "refactor this"
   ↓
@@ -402,28 +417,31 @@ User can compare outputs side-by-side
 Hooks allow external automation to integrate with HopCode sessions.
 
 **Hook Types**:
+
 - **Command Hooks**: Run shell commands
 - **HTTP Hooks**: Call external APIs
 
 **Hook Events**:
+
 - `on_session_start` — When session begins
 - `on_tool_call` — Before/after tool execution
 - `on_agent_spawn` — When subagent is spawned
 - `on_session_end` — When session ends
 
 **Hook Configuration**:
+
 ```yaml
 hooks:
   on_session_start:
-    - matcher: ".*"
+    - matcher: '.*'
       hooks:
         - type: command
           command: "notify-send 'HopCode session started'"
         - type: http
-          url: "https://api.example.com/hopcode-event"
+          url: 'https://api.example.com/hopcode-event'
           headers:
-            Authorization: "Bearer ${API_KEY}"
-          allowedEnvVars: ["API_KEY"]
+            Authorization: 'Bearer ${API_KEY}'
+          allowedEnvVars: ['API_KEY']
 ```
 
 ---
@@ -435,10 +453,12 @@ hooks:
 **File**: `packages/core/src/services/sessionService.ts`
 
 Sessions are persisted to disk:
+
 - Location: `~/.hopcode/sessions/<sessionId>.json`
 - Contains: Conversation history, tool calls, model config
 
 **Session Lifecycle**:
+
 1. Session created on startup
 2. Each turn appended to history
 3. Session can be resumed later
@@ -449,11 +469,13 @@ Sessions are persisted to disk:
 **File**: `packages/core/src/memory/`
 
 Auto-memory tracks important facts across sessions:
+
 - User preferences
 - Project structure notes
 - Past decisions
 
 **Memory Files**:
+
 - `~/.hopcode/auto-memory/index.json` — Searchable index
 - `GEMINI.md` files in project — Manual memory
 
@@ -466,12 +488,14 @@ Auto-memory tracks important facts across sessions:
 **File**: `packages/cli/src/utils/githubApi.ts`
 
 HopCode can interact with GitHub Actions:
+
 - Check CI status
 - View failure logs
 - Rerun failed jobs
 - Trigger workflows
 
 **Commands**:
+
 - `/ci` — List recent runs
 - `/ci logs <run-id>` — View logs
 - `/ci rerun <run-id>` — Rerun failed jobs
@@ -483,12 +507,14 @@ HopCode can interact with GitHub Actions:
 **File**: `packages/vscode-ide-companion/src/extension.ts`
 
 The VS Code extension provides:
+
 - Sidebar chat view
 - Diff editor integration
 - Workspace context access
 - Settings sync
 
 **Communication**:
+
 - Extension runs local HTTP server (port 7777)
 - CLI connects via HTTP for IDE context
 - Diff view uses VS Code native diff editor
@@ -540,17 +566,20 @@ interface Settings {
 HopCode uses OpenTelemetry for tracing:
 
 **Events Tracked**:
+
 - Session start/end
 - Tool calls (type, duration, success/failure)
 - Model requests (tokens in/out, latency)
 - Errors and crashes
 
 **Exporters**:
+
 - OTLP/gRPC — Send to observability backend
 - OTLP/HTTP — HTTP-based export
 - Local logging — Debug mode
 
 **Configuration**:
+
 ```json
 {
   "telemetry": {
@@ -568,6 +597,7 @@ HopCode uses OpenTelemetry for tracing:
 ### Authentication
 
 **Supported Methods**:
+
 - API Key (all providers)
 - OAuth (GitHub Copilot, Google)
 - AWS Credentials (Bedrock)
@@ -578,11 +608,13 @@ HopCode uses OpenTelemetry for tracing:
 **File**: `scripts/build_sandbox.js`
 
 Sandboxing isolates tool execution:
+
 - **Linux**: Docker/Podman containers
 - **macOS**: Seatbelt sandbox profiles
 - **Windows**: Job objects + restricted tokens
 
 **Sandbox Configuration**:
+
 ```bash
 # Enable sandboxing
 export QWEN_SANDBOX=true
@@ -669,6 +701,7 @@ export QWEN_SANDBOX=true
 **File**: `packages/core/src/provider/error.ts`
 
 Provider errors classified by type:
+
 - `RATE_LIMIT` — Too many requests
 - `AUTH` — Authentication failure
 - `QUOTA` — API quota exceeded

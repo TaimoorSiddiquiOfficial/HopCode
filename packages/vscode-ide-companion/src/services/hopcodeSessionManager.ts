@@ -60,7 +60,9 @@ export class HopCodeSessionManager {
       const filePath = path.join(sessionDir, filename);
 
       if (!fs.existsSync(filePath)) {
-        console.log(`[HopCodeSessionManager] Session file not found: ${filePath}`);
+        console.log(
+          `[HopCodeSessionManager] Session file not found: ${filePath}`,
+        );
         return null;
       }
 

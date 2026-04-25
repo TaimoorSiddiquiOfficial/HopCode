@@ -54,8 +54,8 @@ observability framework — HopCode's observability system provides:
 All telemetry behavior is controlled through your `.hopcode/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
-| Setting        | Environment Variable           | CLI Flag                                                 | Description                                       | Values             | Default                 |
-| -------------- | ------------------------------ | -------------------------------------------------------- | ------------------------------------------------- | ------------------ | ----------------------- |
+| Setting        | Environment Variable              | CLI Flag                                                 | Description                                       | Values             | Default                 |
+| -------------- | --------------------------------- | -------------------------------------------------------- | ------------------------------------------------- | ------------------ | ----------------------- |
 | `enabled`      | `HOPCODE_TELEMETRY_ENABLED`       | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                       | `true`/`false`     | `false`                 |
 | `target`       | `HOPCODE_TELEMETRY_TARGET`        | `--telemetry-target <local\|qwen>`                       | Where to send telemetry data                      | `"qwen"`/`"local"` | `"local"`               |
 | `otlpEndpoint` | `HOPCODE_TELEMETRY_OTLP_ENDPOINT` | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                           | URL string         | `http://localhost:4317` |

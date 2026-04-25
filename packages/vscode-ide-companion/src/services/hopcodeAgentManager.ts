@@ -17,7 +17,10 @@ import type {
   SlashCommandNotification,
 } from '../types/acpTypes.js';
 import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
-import { HopCodeSessionReader, type HopCodeSession } from './hopcodeSessionReader.js';
+import {
+  HopCodeSessionReader,
+  type HopCodeSession,
+} from './hopcodeSessionReader.js';
 import { HopCodeSessionManager } from './hopcodeSessionManager.js';
 import type {
   ChatMessage,
@@ -528,7 +531,9 @@ export class HopCodeAgentManager {
 
     // Always fall back to file system method
     try {
-      console.log('[HopCodeAgentManager] Getting session list from file system');
+      console.log(
+        '[HopCodeAgentManager] Getting session list from file system',
+      );
       const sessions = await this.sessionReader.getAllSessions(undefined, true);
       console.log(
         '[HopCodeAgentManager] Session list from file system (all projects):',
@@ -618,7 +623,10 @@ export class HopCodeAgentManager {
 
       return { sessions: mapped, nextCursor: nextCursorNum, hasMore };
     } catch (error) {
-      console.warn('[HopCodeAgentManager] Paged ACP session list failed:', error);
+      console.warn(
+        '[HopCodeAgentManager] Paged ACP session list failed:',
+        error,
+      );
       // fall through to file system
     }
 
@@ -655,7 +663,10 @@ export class HopCodeAgentManager {
       const hasMore = filtered.length > size;
       return { sessions, nextCursor: nextCursorVal, hasMore };
     } catch (error) {
-      console.error('[HopCodeAgentManager] File system paged list failed:', error);
+      console.error(
+        '[HopCodeAgentManager] File system paged list failed:',
+        error,
+      );
       return { sessions: [], hasMore: false };
     }
   }
@@ -1067,7 +1078,10 @@ export class HopCodeAgentManager {
         '[HopCodeAgentManager] Session load via ACP failed for session:',
         sessionId,
       );
-      console.error('[HopCodeAgentManager] Error type:', error?.constructor?.name);
+      console.error(
+        '[HopCodeAgentManager] Error type:',
+        error?.constructor?.name,
+      );
       console.error('[HopCodeAgentManager] Error message:', errorMessage);
 
       // Check if error is from ACP response
@@ -1088,14 +1102,20 @@ export class HopCodeAgentManager {
             );
           }
         } else {
-          console.error('[HopCodeAgentManager] Non-ACPIf error details:', error);
+          console.error(
+            '[HopCodeAgentManager] Non-ACPIf error details:',
+            error,
+          );
         }
       }
 
       throw error;
     } finally {
       // End rehydration routing regardless of outcome
-      console.log('[HopCodeAgentManager] Rehydration end for session:', sessionId);
+      console.log(
+        '[HopCodeAgentManager] Rehydration end for session:',
+        sessionId,
+      );
       this.rehydratingSessionId = null;
     }
   }

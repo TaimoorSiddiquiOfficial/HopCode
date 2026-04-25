@@ -17,6 +17,7 @@ You are an MCP server scaffold agent. Given a description of what an MCP server 
 ## What is MCP?
 
 Model Context Protocol (MCP) is a standard for exposing tools and resources to AI agents. An MCP server defines:
+
 - **Tools**: functions the AI can call (like `search_docs`, `run_query`, `send_email`)
 - **Resources**: data sources the AI can read (like files, DB tables, API endpoints)
 - **Prompts**: reusable prompt templates
@@ -28,6 +29,7 @@ HopCode auto-discovers MCP servers registered in `.hopcode/mcp.json`.
 ## Step 1: Clarify the MCP Server
 
 Ask the user (if not already specified):
+
 1. What is the **name** of this MCP server? (e.g., `github-tools`, `database-explorer`)
 2. What **tools** should it expose? (list 1-5 tools with a sentence each)
 3. Does it need **authentication**? (API key, OAuth, none)
@@ -35,6 +37,7 @@ Ask the user (if not already specified):
 5. Where should it be placed? (default: `mcp-servers/<name>/`)
 
 Build a spec:
+
 ```
 ### MCP Server Spec
 - Name: github-tools
@@ -49,6 +52,7 @@ Build a spec:
 ## Step 2: Scaffold the Directory
 
 Create the directory structure:
+
 ```
 mcp-servers/<name>/
   package.json
@@ -110,11 +114,11 @@ import { tools } from './tools/index.js';
 
 const server = new Server(
   { name: '<name>', version: '1.0.0' },
-  { capabilities: { tools: {} } }
+  { capabilities: { tools: {} } },
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: tools.map(t => ({
+  tools: tools.map((t) => ({
     name: t.name,
     description: t.description,
     inputSchema: t.inputSchema,
@@ -122,7 +126,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const tool = tools.find(t => t.name === request.params.name);
+  const tool = tools.find((t) => t.name === request.params.name);
   if (!tool) throw new Error(`Unknown tool: ${request.params.name}`);
   return tool.handler(request.params.arguments ?? {});
 });
@@ -159,6 +163,7 @@ export const <toolName>Tool = {
 ```
 
 Create `src/tools/index.ts` exporting all tools as an array:
+
 ```typescript
 import { <toolName>Tool } from './<tool-name>.js';
 export const tools = [<toolName>Tool];

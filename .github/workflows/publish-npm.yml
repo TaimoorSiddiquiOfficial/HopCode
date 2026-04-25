@@ -186,7 +186,7 @@ jobs:
         run: 'npm run package'
 
       - name: 'Publish to VS Code Marketplace'
-        if: '${{ github.event.inputs.dry_run != ''true'' }}'
+        if: "${{ github.event.inputs.dry_run != 'true' }}"
         working-directory: 'packages/vscode-ide-companion'
         shell: 'bash'
         run: |
@@ -204,7 +204,7 @@ jobs:
           VSCE_PAT: '${{ secrets.VSCE_PAT }}'
 
       - name: 'Publish to Open VSX Registry'
-        if: '${{ github.event.inputs.dry_run != ''true'' }}'
+        if: "${{ github.event.inputs.dry_run != 'true' }}"
         working-directory: 'packages/vscode-ide-companion'
         shell: 'bash'
         run: |
@@ -228,7 +228,7 @@ jobs:
           OVSX_TOKEN: '${{ secrets.OVSX_TOKEN }}'
 
       - name: 'DRY RUN: Show packaged VSIX'
-        if: '${{ github.event.inputs.dry_run == ''true'' }}'
+        if: "${{ github.event.inputs.dry_run == 'true' }}"
         working-directory: 'packages/vscode-ide-companion'
         shell: 'bash'
         run: |

@@ -21,18 +21,18 @@ HopCode/
 
 ### Root Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `package.json` | Root workspace config with npm workspaces |
-| `tsconfig.json` | Root TypeScript configuration (strict mode, ESM) |
-| `eslint.config.js` | ESLint v9 flat config for monorepo |
-| `.prettierrc.json` | Prettier formatting rules |
-| `.nvmrc` | Node.js version specification (~20.19.0) |
-| `.npmrc` | NPM configuration (registry, scopes) |
-| `esbuild.config.js` | Esbuild bundling configuration |
-| `vitest.config.ts` | Vitest test runner configuration |
-| `Dockerfile` | Container build configuration |
-| `Makefile` | Makefile for common operations |
+| File                | Purpose                                          |
+| ------------------- | ------------------------------------------------ |
+| `package.json`      | Root workspace config with npm workspaces        |
+| `tsconfig.json`     | Root TypeScript configuration (strict mode, ESM) |
+| `eslint.config.js`  | ESLint v9 flat config for monorepo               |
+| `.prettierrc.json`  | Prettier formatting rules                        |
+| `.nvmrc`            | Node.js version specification (~20.19.0)         |
+| `.npmrc`            | NPM configuration (registry, scopes)             |
+| `esbuild.config.js` | Esbuild bundling configuration                   |
+| `vitest.config.ts`  | Vitest test runner configuration                 |
+| `Dockerfile`        | Container build configuration                    |
+| `Makefile`          | Makefile for common operations                   |
 
 ---
 
@@ -324,6 +324,7 @@ packages/vscode-ide-companion/
 ```
 
 **Key Features**:
+
 - Sidebar chat view (primary + secondary)
 - Diff editor integration (accept/cancel)
 - Keybindings (Ctrl+Shift+L / Cmd+Shift+L)
@@ -348,6 +349,7 @@ packages/sdk-typescript/
 ```
 
 **Exports**:
+
 - `./dist/index.mjs` — ESM build
 - `./dist/index.cjs` — CommonJS build
 - `./dist/index.d.ts` — TypeScript types
@@ -448,6 +450,7 @@ integration-tests/
 ```
 
 **Test Commands**:
+
 - `npm run test:integration:sandbox:none` — Run without sandboxing
 - `npm run test:integration:sandbox:docker` — Run with Docker sandbox
 - `npm run test:integration:sandbox:podman` — Run with Podman sandbox
@@ -557,14 +560,23 @@ scripts/
 ```
 
 **Settings Structure**:
+
 ```json
 {
-  "modelProviders": { /* provider configurations */ },
-  "env": { /* environment variables */ },
+  "modelProviders": {
+    /* provider configurations */
+  },
+  "env": {
+    /* environment variables */
+  },
   "security": { "auth": { "selectedType": "openai" } },
   "model": { "name": "gpt-4o" },
-  "agentModels": { /* per-subagent model routing */ },
-  "mcpServers": { /* MCP server configurations */ }
+  "agentModels": {
+    /* per-subagent model routing */
+  },
+  "mcpServers": {
+    /* MCP server configurations */
+  }
 }
 ```
 
@@ -578,6 +590,7 @@ packages/*/dist/                # Package build outputs
 ```
 
 **Build Process**:
+
 1. `npm run build` — TypeScript compilation to each package's `dist/`
 2. `npm run bundle` — Esbuild bundles into single `dist/cli.js`
 3. `npm run build:all` — Full build including sandbox container
@@ -586,13 +599,13 @@ packages/*/dist/                # Package build outputs
 
 ## Key Path Conventions
 
-| Path | Purpose |
-|------|---------|
-| `~/.hopcode/settings.json` | User-global settings |
-| `~/.hopcode/skills/` | User-level skills |
-| `~/.hopcode/agents/` | User-level subagents |
-| `.hopcode/settings.json` | Project-specific settings |
-| `.hopcode/skills/` | Project-level skills |
-| `.hopcode/agents/` | Project-level subagents |
-| `~/.hopcode-profiles.json` | CLI profile storage |
-| `~/.config/hopcode/` | Config directory (alternative location) |
+| Path                       | Purpose                                 |
+| -------------------------- | --------------------------------------- |
+| `~/.hopcode/settings.json` | User-global settings                    |
+| `~/.hopcode/skills/`       | User-level skills                       |
+| `~/.hopcode/agents/`       | User-level subagents                    |
+| `.hopcode/settings.json`   | Project-specific settings               |
+| `.hopcode/skills/`         | Project-level skills                    |
+| `.hopcode/agents/`         | Project-level subagents                 |
+| `~/.hopcode-profiles.json` | CLI profile storage                     |
+| `~/.config/hopcode/`       | Config directory (alternative location) |

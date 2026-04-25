@@ -99,8 +99,12 @@ function writeLog(
 
   void ensureDebugDirExists()
     .then(() => fs.appendFile(logFilePath, line, 'utf8'))
-    .catch(() => {
+    .catch((error) => {
       hasWriteFailure = true;
+      // Log to stderr as a last resort when file logging fails
+      // Use process.stderr.write to avoid any potential recursion with console
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      process.stderr.write(`[debugLogger] Failed to write log: ${errorMsg}\n`);
     });
 }
 

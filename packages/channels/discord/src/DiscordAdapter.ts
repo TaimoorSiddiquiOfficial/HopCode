@@ -9,7 +9,8 @@ import type {
   NewsChannel,
   ThreadChannel,
   VoiceChannel,
-  StageChannel} from 'discord.js';
+  StageChannel,
+} from 'discord.js';
 import {
   Client,
   GatewayIntentBits,

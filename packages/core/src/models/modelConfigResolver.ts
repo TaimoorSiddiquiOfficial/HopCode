@@ -40,6 +40,7 @@ import {
   DEFAULT_MODELS,
   HOPCODE_OAUTH_ALLOWED_MODELS,
   MODEL_GENERATION_CONFIG_FIELDS,
+  setGenerationConfigField,
 } from './constants.js';
 import type { ModelConfig as ModelProviderConfig } from './types.js';
 export {
@@ -351,16 +352,14 @@ function resolveGenerationConfig(
   for (const field of MODEL_GENERATION_CONFIG_FIELDS) {
     // ModelProvider config takes priority over settings config
     if (authType && modelProviderConfig && field in modelProviderConfig) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (result as any)[field] = modelProviderConfig[field];
+      setGenerationConfigField(result, field, modelProviderConfig[field]);
       sources[field] = modelProvidersSource(
         authType,
         modelId || '',
         `generationConfig.${field}`,
       );
     } else if (settingsConfig && field in settingsConfig) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (result as any)[field] = settingsConfig[field];
+      setGenerationConfigField(result, field, settingsConfig[field]);
       sources[field] = settingsSource(`model.generationConfig.${field}`);
     }
   }

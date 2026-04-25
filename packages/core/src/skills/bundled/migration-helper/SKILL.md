@@ -10,7 +10,7 @@ allowedTools:
   - run_shell_command
 hooks:
   on_session_start:
-    - matcher: ".*migrate.*"
+    - matcher: '.*migrate.*'
       hooks:
         - type: command
           command: "echo 'Starting migration helper workflow...'"
@@ -33,18 +33,19 @@ Guide users through code migrations with automated transformations, testing, and
 #### React Class Components → Hooks
 
 **Pattern to find:**
+
 ```javascript
 class MyComponent extends React.Component {
   state = { count: 0 };
-  
+
   componentDidMount() {
     document.title = `Count: ${this.state.count}`;
   }
-  
+
   handleClick = () => {
     this.setState({ count: this.state.count + 1 });
   };
-  
+
   render() {
     return <button onClick={this.handleClick}>{this.state.count}</button>;
   }
@@ -52,24 +53,26 @@ class MyComponent extends React.Component {
 ```
 
 **Transform to:**
+
 ```javascript
 function MyComponent() {
   const [count, setCount] = useState(0);
-  
+
   useEffect(() => {
     document.title = `Count: ${count}`;
   }, [count]);
-  
+
   const handleClick = () => {
     setCount(count + 1);
   };
-  
+
   return <button onClick={handleClick}>{count}</button>;
 }
 ```
 
 **Migration steps:**
-1. Find all class components: `rg "extends React\.Component|extends Component"` 
+
+1. Find all class components: `rg "extends React\.Component|extends Component"`
 2. For each component:
    - Convert state to useState
    - Convert lifecycle methods to useEffect
@@ -85,12 +88,14 @@ function MyComponent() {
 **Migration strategy:**
 
 **Step 1: Setup**
+
 ```bash
 npm install -D typescript @types/node @types/react
 npx tsc --init
 ```
 
 **Step 2: Incremental conversion**
+
 1. Rename `.js` → `.js` (keep extension initially)
 2. Add JSDoc types for type inference
 3. Fix obvious type errors
@@ -131,18 +136,18 @@ const user: User = { name: 'John', age: 30 };
 
 ```javascript
 // ❌ moment
-moment().format('YYYY-MM-DD')
-moment().add(1, 'day')
-moment().subtract(2, 'weeks')
-moment().startOf('month')
-moment().isBefore(date)
+moment().format('YYYY-MM-DD');
+moment().add(1, 'day');
+moment().subtract(2, 'weeks');
+moment().startOf('month');
+moment().isBefore(date);
 
 // ✅ date-fns
-format(new Date(), 'yyyy-MM-dd')
-addDays(new Date(), 1)
-subWeeks(new Date(), 2)
-startOfMonth(new Date())
-isBefore(new Date(), date)
+format(new Date(), 'yyyy-MM-dd');
+addDays(new Date(), 1);
+subWeeks(new Date(), 2);
+startOfMonth(new Date());
+isBefore(new Date(), date);
 ```
 
 #### Redux → Zustand
@@ -150,7 +155,7 @@ isBefore(new Date(), date)
 ```javascript
 // ❌ Redux
 const store = createStore((state, action) => {
-  switch(action.type) {
+  switch (action.type) {
     case 'INCREMENT':
       return { count: state.count + 1 };
     default:
@@ -170,10 +175,11 @@ const useStore = create((set) => ({
 ### Phase 1: Assessment
 
 1. **Inventory**: Catalog all files needing migration
+
    ```bash
    # Count class components
    rg "extends React\.Component" --type js --type tsx | wc -l
-   
+
    # Find moment imports
    rg "import.*moment|require.*moment" --type js --type ts
    ```
@@ -184,10 +190,11 @@ const useStore = create((set) => ({
    - Dependency requirements
 
 3. **Test Coverage Check**: Ensure tests exist
+
    ```bash
    # Check test coverage
    npm run test:coverage
-   
+
    # Find untested files
    rg "describe\(|it\(" --type js --type ts | sort | uniq
    ```
@@ -195,11 +202,13 @@ const useStore = create((set) => ({
 ### Phase 2: Preparation
 
 1. **Backup**: Create git branch
+
    ```bash
    git checkout -b migration/moment-to-date-fns
    ```
 
 2. **Install Dependencies**
+
    ```bash
    npm install date-fns
    npm uninstall moment
@@ -228,10 +237,11 @@ const useStore = create((set) => ({
 
 Generate a migration report:
 
-```markdown
+````markdown
 # Migration Report: [Source] → [Target]
 
 ## Summary
+
 - **Files Changed**: X
 - **Lines Modified**: Y
 - **Breaking Changes**: Z
@@ -240,17 +250,20 @@ Generate a migration report:
 ## Migration Checklist
 
 ### Pre-Migration
+
 - [ ] Backup created (git branch)
 - [ ] Tests passing
 - [ ] Dependencies installed
 - [ ] Team notified
 
 ### Migration Steps
+
 - [ ] Step 1: [Description]
 - [ ] Step 2: [Description]
 - [ ] Step 3: [Description]
 
 ### Post-Migration
+
 - [ ] All tests passing
 - [ ] Type checking passes
 - [ ] Linting passes
@@ -259,20 +272,22 @@ Generate a migration report:
 
 ## Changed Files
 
-| File | Status | Notes |
-|------|--------|-------|
-| src/component.js | ✅ Migrated | Converted to hooks |
-| src/utils.js | ⚠️ Manual review | Complex logic |
-| src/legacy.js | ❌ Skipped | Deprecated, will remove |
+| File             | Status           | Notes                   |
+| ---------------- | ---------------- | ----------------------- |
+| src/component.js | ✅ Migrated      | Converted to hooks      |
+| src/utils.js     | ⚠️ Manual review | Complex logic           |
+| src/legacy.js    | ❌ Skipped       | Deprecated, will remove |
 
 ## Breaking Changes
 
 ### 1. API Change: `formatDate`
+
 **Before**: `formatDate(date, 'YYYY-MM-DD')`
 **After**: `format(date, 'yyyy-MM-dd')`
 **Action**: Update all call sites (found 23)
 
 ### 2. Behavior Change: Timezone handling
+
 **Before**: Uses local timezone
 **After**: Uses UTC
 **Action**: Audit date comparisons
@@ -280,10 +295,12 @@ Generate a migration report:
 ## Rollback Plan
 
 If issues occur:
+
 ```bash
 git revert migration-branch
 npm install moment
 ```
+````
 
 ## Next Steps
 
@@ -291,6 +308,7 @@ npm install moment
 2. Run full test suite
 3. Deploy to staging
 4. Monitor for issues
+
 ```
 
 ## Rules
@@ -317,3 +335,4 @@ Provide:
 - Breaking changes with migration guide
 - Test results
 - Rollback instructions if needed
+```

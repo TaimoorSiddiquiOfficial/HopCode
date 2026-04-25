@@ -41,7 +41,12 @@ export interface DeviceFlowTokenResponse {
  */
 export interface DeviceFlowErrorResponse {
   /** Error type */
-  error: 'authorization_pending' | 'slow_down' | 'expired_token' | 'access_denied' | string;
+  error:
+    | 'authorization_pending'
+    | 'slow_down'
+    | 'expired_token'
+    | 'access_denied'
+    | string;
   /** Error description */
   error_description?: string;
   /** Error URI */
@@ -50,7 +55,7 @@ export interface DeviceFlowErrorResponse {
 
 /**
  * GitHub Device Flow authentication manager
- * 
+ *
  * Implements OAuth 2.0 Device Authorization Grant (RFC 8628)
  * Perfect for CLI and device authentication
  */
@@ -66,21 +71,20 @@ export class GitHubDeviceFlowAuth {
   ) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.baseUrl = hostname === 'github.com' 
-      ? 'https://github.com' 
-      : `https://${hostname}`;
+    this.baseUrl =
+      hostname === 'github.com' ? 'https://github.com' : `https://${hostname}`;
   }
 
   /**
    * Initiate device flow authentication
-   * 
+   *
    * @returns Device flow response with user_code and verification URI
    */
   async initiateDeviceFlow(): Promise<DeviceFlowResponse> {
     const response = await fetch(`${this.baseUrl}/login/device/code`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
         'User-Agent': 'HopCode-Device-Flow',
       },
@@ -92,15 +96,17 @@ export class GitHubDeviceFlowAuth {
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Failed to initiate device flow: ${response.status} ${error}`);
+      throw new Error(
+        `Failed to initiate device flow: ${response.status} ${error}`,
+      );
     }
 
-    return await response.json() as DeviceFlowResponse;
+    return (await response.json()) as DeviceFlowResponse;
   }
 
   /**
    * Poll for access token
-   * 
+   *
    * @param deviceCode - Device code from initiateDeviceFlow
    * @returns Access token when user authorizes, or error
    */
@@ -108,7 +114,7 @@ export class GitHubDeviceFlowAuth {
     const response = await fetch(`${this.baseUrl}/login/oauth/access_token`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
         'User-Agent': 'HopCode-Device-Flow',
       },
@@ -124,22 +130,22 @@ export class GitHubDeviceFlowAuth {
 
     if (!response.ok) {
       const errorData = data as DeviceFlowErrorResponse;
-      
+
       switch (errorData.error) {
         case 'authorization_pending':
           // User hasn't authorized yet - continue polling
           throw new DeviceFlowPendingError('Authorization pending');
-        
+
         case 'slow_down':
           // Polling too fast - increase interval
           throw new DeviceFlowSlowDownError('Slow down polling');
-        
+
         case 'expired_token':
           throw new DeviceFlowExpiredError('Device code expired');
-        
+
         case 'access_denied':
           throw new DeviceFlowAccessDeniedError('User denied access');
-        
+
         default:
           throw new Error(`Device flow error: ${errorData.error}`);
       }
@@ -150,7 +156,7 @@ export class GitHubDeviceFlowAuth {
 
   /**
    * Complete device flow with automatic polling
-   * 
+   *
    * @param onUserCode - Callback with user_code and verification URI (display to user)
    * @param onToken - Callback with access token (save for later use)
    * @param onError - Callback with error message
@@ -170,35 +176,36 @@ export class GitHubDeviceFlowAuth {
       }
 
       const deviceResponse = await this.initiateDeviceFlow();
-      
+
       // Step 2: Show user code to user
       onUserCode(deviceResponse);
 
       if (progressCallback) {
         progressCallback(
-          `Enter code ${deviceResponse.user_code} at ${deviceResponse.verification_uri}`
+          `Enter code ${deviceResponse.user_code} at ${deviceResponse.verification_uri}`,
         );
       }
 
       // Step 3: Poll for token
-      const expiresAt = Date.now() + (deviceResponse.expires_in * 1000);
+      const expiresAt = Date.now() + deviceResponse.expires_in * 1000;
       let interval = deviceResponse.interval * 1000;
 
       while (Date.now() < expiresAt) {
         try {
           await this.sleep(interval);
-          
-          const tokenResponse = await this.pollForToken(deviceResponse.device_code);
-          
+
+          const tokenResponse = await this.pollForToken(
+            deviceResponse.device_code,
+          );
+
           // Success!
           onToken(tokenResponse);
-          
+
           if (progressCallback) {
             progressCallback('✅ Authentication successful!');
           }
 
           return tokenResponse;
-          
         } catch (error) {
           if (error instanceof DeviceFlowPendingError) {
             // Continue polling
@@ -207,25 +214,27 @@ export class GitHubDeviceFlowAuth {
             }
             continue;
           }
-          
+
           if (error instanceof DeviceFlowSlowDownError) {
             // Increase polling interval
             interval += 5000;
             if (progressCallback) {
-              progressCallback(`Slowing down... (interval: ${interval/1000}s)`);
+              progressCallback(
+                `Slowing down... (interval: ${interval / 1000}s)`,
+              );
             }
             continue;
           }
-          
+
           // Other errors - fail
           throw error;
         }
       }
 
       throw new DeviceFlowExpiredError('Device code expired');
-      
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       onError(errorMessage);
       throw error;
     }
@@ -235,7 +244,7 @@ export class GitHubDeviceFlowAuth {
    * Simple sleep utility
    */
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -246,7 +255,7 @@ export class GitHubDeviceFlowAuth {
     const length = 8;
     const bytes = randomBytes(length);
     return Array.from(bytes)
-      .map(b => chars[b % chars.length])
+      .map((b) => chars[b % chars.length])
       .join('-')
       .replace(/(.{4})/, '$1-');
   }

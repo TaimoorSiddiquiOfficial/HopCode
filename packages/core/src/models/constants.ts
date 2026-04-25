@@ -35,6 +35,19 @@ export const MODEL_GENERATION_CONFIG_FIELDS = [
   'modalities',
 ] as const satisfies ReadonlyArray<keyof ContentGeneratorConfig>;
 
+export type ModelGenerationConfigField =
+  (typeof MODEL_GENERATION_CONFIG_FIELDS)[number];
+
+/**
+ * Type-safe setter for dynamic field assignment on ContentGeneratorConfig.
+ * Eliminates the need for `as any` when iterating over MODEL_GENERATION_CONFIG_FIELDS.
+ */
+export function setGenerationConfigField<
+  T extends ContentGeneratorConfig | Partial<ContentGeneratorConfig>,
+>(config: T, field: ModelGenerationConfigField, value: unknown): void {
+  (config[field as keyof T] as unknown) = value;
+}
+
 /**
  * Credential-related fields that are part of ContentGeneratorConfig
  * but not ModelGenerationConfig.

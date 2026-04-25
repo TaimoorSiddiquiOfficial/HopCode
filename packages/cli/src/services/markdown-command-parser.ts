@@ -5,10 +5,7 @@
  */
 
 import { z } from 'zod';
-import {
-  parse as parseYaml,
-  normalizeContent,
-} from '@hoptrendy/hopcode-core';
+import { parse as parseYaml, normalizeContent } from '@hoptrendy/hopcode-core';
 
 /**
  * Defines the Zod schema for a Markdown command definition file.

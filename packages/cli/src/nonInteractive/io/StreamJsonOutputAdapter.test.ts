@@ -5,10 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import type {
-  Config,
-  ServerHopCodeStreamEvent,
-} from '@hoptrendy/hopcode-core';
+import type { Config, ServerHopCodeStreamEvent } from '@hoptrendy/hopcode-core';
 import { HopCodeEventType } from '@hoptrendy/hopcode-core';
 import type { Part } from '@google/genai';
 import { StreamJsonOutputAdapter } from './StreamJsonOutputAdapter.js';

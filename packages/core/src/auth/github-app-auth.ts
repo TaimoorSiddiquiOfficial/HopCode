@@ -6,7 +6,6 @@
 
 import { createSign } from 'node:crypto';
 
-
 /**
  * GitHub App authentication configuration
  */
@@ -75,7 +74,10 @@ interface JWTPayload {
 export class GitHubAppAuth {
   private readonly config: GitHubAppConfig;
   private readonly hostname: string;
-  private tokenCache: Map<number, GitHubInstallationToken & { cachedAt: number }> = new Map();
+  private tokenCache: Map<
+    number,
+    GitHubInstallationToken & { cachedAt: number }
+  > = new Map();
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // Cache tokens for 5 minutes
 
   constructor(config: GitHubAppConfig) {
@@ -99,10 +101,10 @@ export class GitHubAppAuth {
    */
   generateJWT(): string {
     const now = Math.floor(Date.now() / 1000);
-    
+
     const payload: JWTPayload = {
       iat: now,
-      exp: now + (10 * 60), // 10 minutes
+      exp: now + 10 * 60, // 10 minutes
       iss: this.config.appId,
     };
 
@@ -130,7 +132,9 @@ export class GitHubAppAuth {
    * Get an installation token for a specific installation ID
    * Tokens are cached for 5 minutes to avoid excessive API calls
    */
-  async getInstallationToken(installationId: number): Promise<GitHubInstallationToken> {
+  async getInstallationToken(
+    installationId: number,
+  ): Promise<GitHubInstallationToken> {
     // Check cache first
     const cached = this.tokenCache.get(installationId);
     if (cached && Date.now() - cached.cachedAt < this.CACHE_TTL_MS) {
@@ -139,7 +143,7 @@ export class GitHubAppAuth {
 
     // Generate new token
     const token = await this.createInstallationToken(installationId);
-    
+
     // Cache the token
     this.tokenCache.set(installationId, {
       ...token,
@@ -152,15 +156,17 @@ export class GitHubAppAuth {
   /**
    * Create a new installation token via GitHub API
    */
-  private async createInstallationToken(installationId: number): Promise<GitHubInstallationToken> {
+  private async createInstallationToken(
+    installationId: number,
+  ): Promise<GitHubInstallationToken> {
     const jwt = this.generateJWT();
     const url = `${this.getBaseUrl()}/app/installations/${installationId}/access_tokens`;
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${jwt}`,
-        'Accept': 'application/vnd.github+json',
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
         'User-Agent': 'HopCode-GitHub-App',
       },
@@ -168,10 +174,12 @@ export class GitHubAppAuth {
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Failed to create installation token: ${response.status} ${error}`);
+      throw new Error(
+        `Failed to create installation token: ${response.status} ${error}`,
+      );
     }
 
-    return await response.json() as GitHubInstallationToken;
+    return (await response.json()) as GitHubInstallationToken;
   }
 
   /**
@@ -183,8 +191,8 @@ export class GitHubAppAuth {
 
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${jwt}`,
-        'Accept': 'application/vnd.github+json',
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
         'User-Agent': 'HopCode-GitHub-App',
       },
@@ -192,7 +200,9 @@ export class GitHubAppAuth {
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Failed to get installation ID: ${response.status} ${error}`);
+      throw new Error(
+        `Failed to get installation ID: ${response.status} ${error}`,
+      );
     }
 
     const data = await response.json();
@@ -202,7 +212,10 @@ export class GitHubAppAuth {
   /**
    * Get installation token for a repository
    */
-  async getTokenForRepository(owner: string, repo: string): Promise<GitHubInstallationToken> {
+  async getTokenForRepository(
+    owner: string,
+    repo: string,
+  ): Promise<GitHubInstallationToken> {
     const installationId = await this.getInstallationId(owner, repo);
     return await this.getInstallationToken(installationId);
   }

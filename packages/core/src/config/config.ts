@@ -74,6 +74,24 @@ import {
   StartSessionEvent,
   type TelemetryTarget,
 } from '../telemetry/index.js';
+
+/**
+ * Type for partial overrides of Config methods.
+ * Each key corresponds to a Config method that can be overridden.
+ */
+export type ConfigOverride = Partial<{
+  getWorkingDir: () => string;
+  getTargetDir: () => string;
+  getProjectRoot: () => string;
+  getWorkspaceContext: () => import('../utils/workspaceContext.js').WorkspaceContext;
+  getFileService: () => import('../services/fileDiscoveryService.js').FileDiscoveryService;
+  getToolRegistry: () => import('../tools/tool-registry.js').ToolRegistry;
+  getContentGenerator: () => import('../core/contentGenerator.js').ContentGenerator;
+  getContentGeneratorConfig: () => import('../core/contentGenerator.js').ContentGeneratorConfig;
+  getAuthType: () => import('../core/contentGenerator.js').AuthType | undefined;
+  getModel: () => string;
+  getApprovalMode: () => ApprovalMode;
+}>;
 import {
   ExtensionManager,
   type Extension,
@@ -2887,4 +2905,34 @@ export class Config {
     );
     return registry;
   }
+}
+
+/**
+ * Creates a Config override with typed method replacements.
+ * Uses prototype delegation to avoid mutating the parent config while
+ * providing type safety for overridden methods.
+ *
+ * @param base - The base Config to delegate to for non-overridden methods
+ * @param overrides - Partial set of methods to override
+ * @returns A new Config instance that delegates to base for non-overridden methods
+ */
+export function createConfigOverride(
+  base: Config,
+  overrides: ConfigOverride,
+): Config {
+  // Create a new object that delegates to base for non-overridden properties
+  const override = Object.create(base) as Config;
+
+  // Apply each override with type checking using index signature
+  const entries = Object.entries(overrides) as Array<
+    [string, (() => unknown) | undefined]
+  >;
+
+  for (const [key, value] of entries) {
+    if (value !== undefined) {
+      (override as unknown as Record<string, unknown>)[key] = value;
+    }
+  }
+
+  return override;
 }

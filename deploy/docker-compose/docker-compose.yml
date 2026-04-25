@@ -6,8 +6,8 @@ services:
     container_name: 'hopcode-agent'
     restart: 'unless-stopped'
     ports:
-      - '50051:50051'   # gRPC server
-      - '7900:7900'     # HTTP API server (optional)
+      - '50051:50051' # gRPC server
+      - '7900:7900' # HTTP API server (optional)
     environment:
       - 'HOPCODE_SIMPLE=1'
       - 'HOPCODE_MODEL=claude-sonnet-4-6'

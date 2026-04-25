@@ -9,7 +9,7 @@ allowedTools:
   - run_shell_command
 hooks:
   on_session_start:
-    - matcher: ".*document.*"
+    - matcher: '.*document.*'
       hooks:
         - type: command
           command: "echo 'Starting documentation generation workflow...'"
@@ -58,7 +58,7 @@ export function fibonacci(n, options = {}) { ... }
 
 **Output format (Markdown):**
 
-```markdown
+````markdown
 # API Reference
 
 ## Functions
@@ -68,6 +68,7 @@ export function fibonacci(n, options = {}) { ... }
 Calculates the Fibonacci sequence up to n terms.
 
 **Parameters:**
+
 - `n` (number): Number of terms (must be positive)
 - `options` (Object, optional): Configuration options
   - `zeroIndexed` (boolean, optional): Start from 0. Default: `false`
@@ -77,11 +78,14 @@ Calculates the Fibonacci sequence up to n terms.
 **Throws:** `Error` - If n is negative
 
 **Example:**
+
 ```javascript
-fibonacci(5) // [0, 1, 1, 2, 3]
-fibonacci(5, { zeroIndexed: true }) // [1, 1, 2, 3, 5]
+fibonacci(5); // [0, 1, 1, 2, 3]
+fibonacci(5, { zeroIndexed: true }); // [1, 1, 2, 3, 5]
 ```
-```
+````
+
+````
 
 ### 2. README Generation
 
@@ -96,11 +100,11 @@ ls -la src/index.* src/main.*
 
 # Find examples
 find examples -type f -name "*.js" -o -name "*.ts"
-```
+````
 
 **Generate README.md:**
 
-```markdown
+````markdown
 # {Project Name}
 
 {Description from package.json}
@@ -110,6 +114,7 @@ find examples -type f -name "*.js" -o -name "*.ts"
 ```bash
 npm install {package-name}
 ```
+````
 
 ## Quick Start
 
@@ -150,7 +155,8 @@ See [API.md](./docs/API.md) for complete documentation.
 ## License
 
 {Extract from package.json}
-```
+
+````
 
 ### 3. Architecture Documentation
 
@@ -165,11 +171,11 @@ rg "^import|^export" --type ts --type js src/ | sort | uniq
 
 # Dependencies
 cat package.json | jq '.dependencies'
-```
+````
 
 **Generate architecture docs:**
 
-```markdown
+````markdown
 # Architecture Overview
 
 ## System Design
@@ -182,6 +188,7 @@ graph TD
     C --> E[(Database)]
     D --> E
 ```
+````
 
 ## Directory Structure
 
@@ -206,15 +213,18 @@ src/
 ## Key Components
 
 ### AuthService
+
 - Handles authentication
 - Manages JWT tokens
 - Integrates with OAuth providers
 
-### DataService  
+### DataService
+
 - CRUD operations
 - Data validation
 - Caching layer
-```
+
+````
 
 ### 4. Code Examples from Tests
 
@@ -226,11 +236,11 @@ find . -name "*.test.ts" -o -name "*.spec.ts"
 
 # Extract test cases as examples
 rg "it\('(.*)'.*\)" --type ts -A 10
-```
+````
 
 **Generate examples:**
 
-```markdown
+````markdown
 # Usage Examples
 
 ## Example 1: Basic Authentication
@@ -242,13 +252,15 @@ import { authenticate } from './auth';
 
 const user = await authenticate({
   username: 'john',
-  password: 'secret123'
+  password: 'secret123',
 });
 ```
+````
 
 ## Example 2: Advanced Caching
 
 {Extracted from cache.test.ts}
+
 ```
 
 ## Documentation Generation Process
@@ -288,11 +300,13 @@ const user = await authenticate({
 Generate documentation files:
 
 ```
+
 docs/
-├── API.md              # Complete API reference
-├── ARCHITECTURE.md     # Architecture overview
-├── EXAMPLES.md         # Usage examples
-└── README.md           # Main documentation
+├── API.md # Complete API reference
+├── ARCHITECTURE.md # Architecture overview
+├── EXAMPLES.md # Usage examples
+└── README.md # Main documentation
+
 ```
 
 ## Rules
@@ -318,3 +332,4 @@ Provide:
 - List of undocumented exports
 - Suggestions for improving JSDoc coverage
 - Links to view rendered documentation
+```

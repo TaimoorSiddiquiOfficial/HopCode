@@ -5,6 +5,7 @@
  */
 
 import type { GenerateContentParameters } from '@google/genai';
+import { hasErrorCode, hasErrorType } from '../../utils/errors.js';
 import { createDebugLogger } from '../../utils/debugLogger.js';
 import type { ErrorHandler, RequestContext } from './types.js';
 
@@ -56,10 +57,9 @@ export class EnhancedErrorHandler implements ErrorHandler {
       error instanceof Error
         ? error.message.toLowerCase()
         : String(error).toLowerCase();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const errorCode = (error as any)?.code;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const errorType = (error as any)?.type;
+
+    const errorCode = hasErrorCode(error) ? error.code : undefined;
+    const errorType = hasErrorType(error) ? error.type : undefined;
 
     // Check for common timeout indicators
     return (

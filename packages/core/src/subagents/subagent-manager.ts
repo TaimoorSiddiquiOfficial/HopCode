@@ -34,13 +34,8 @@ import type {
   AgentHooks,
 } from '../agents/runtime/agent-events.js';
 import type { Config } from '../config/config.js';
-import { APPROVAL_MODES } from '../config/config.js';
-import {
-  type AuthType,
-  type ContentGenerator,
-  type ContentGeneratorConfig,
-  createContentGenerator,
-} from '../core/contentGenerator.js';
+import { APPROVAL_MODES, createConfigOverride } from '../config/config.js';
+import { createContentGenerator } from '../core/contentGenerator.js';
 import {
   buildAgentContentGeneratorConfig,
   type AuthOverrides,
@@ -712,20 +707,18 @@ export class SubagentManager {
       base,
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const override = Object.create(base) as any;
-    override.getContentGenerator = (): ContentGenerator => agentGenerator;
-    override.getContentGeneratorConfig = (): ContentGeneratorConfig =>
-      agentGeneratorConfig;
-    override.getAuthType = (): AuthType | undefined =>
-      agentGeneratorConfig.authType;
-    override.getModel = (): string => agentGeneratorConfig.model;
+    const override = createConfigOverride(base, {
+      getContentGenerator: () => agentGenerator,
+      getContentGeneratorConfig: () => agentGeneratorConfig,
+      getAuthType: () => agentGeneratorConfig.authType,
+      getModel: () => agentGeneratorConfig.model,
+    });
 
     debugLogger.info(
       `Created per-agent ContentGenerator for subagent "${config.name}": authType=${authType}, model=${agentGeneratorConfig.model}`,
     );
 
-    return override as Config;
+    return override;
   }
 
   /**

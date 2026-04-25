@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  Config,
-  ConfigInitializeOptions,
-} from '@hoptrendy/hopcode-core';
+import type { Config, ConfigInitializeOptions } from '@hoptrendy/hopcode-core';
 import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import { StreamJsonInputReader } from './io/StreamJsonInputReader.js';
 import { StreamJsonOutputAdapter } from './io/StreamJsonOutputAdapter.js';

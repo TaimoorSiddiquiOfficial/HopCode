@@ -58,9 +58,7 @@ async function readSkillsFromDir(
 
   try {
     const items = await fs.readdir(dir, { withFileTypes: true });
-    subdirs = items
-      .filter((e) => e.isDirectory())
-      .map((e) => e.name);
+    subdirs = items.filter((e) => e.isDirectory()).map((e) => e.name);
   } catch {
     return [];
   }
@@ -106,9 +104,7 @@ const listCommand: CommandModule = {
     const skills = await listAllSkills();
 
     if (skills.length === 0) {
-      writeStdoutLine(
-        t('\n  No user or project skills installed.\n'),
-      );
+      writeStdoutLine(t('\n  No user or project skills installed.\n'));
       writeStdoutLine(
         t(
           '  Bundled skills (batch, loop, qc-helper, review, spec-driven, git-workflow,\n' +
@@ -125,14 +121,18 @@ const listCommand: CommandModule = {
     const userOnes = skills.filter((s) => s.level === 'user');
 
     if (projectOnes.length > 0) {
-      writeStdoutLine(t('\n  ── Project skills (.hopcode/skills/) ──────────────'));
+      writeStdoutLine(
+        t('\n  ── Project skills (.hopcode/skills/) ──────────────'),
+      );
       for (const s of projectOnes) {
         writeStdoutLine(`  ${s.name.padEnd(24)} ${s.description}`);
       }
     }
 
     if (userOnes.length > 0) {
-      writeStdoutLine(t('\n  ── User skills (~/.hopcode/skills/) ───────────────'));
+      writeStdoutLine(
+        t('\n  ── User skills (~/.hopcode/skills/) ───────────────'),
+      );
       for (const s of userOnes) {
         writeStdoutLine(`  ${s.name.padEnd(24)} ${s.description}`);
       }
@@ -224,7 +224,9 @@ const addCommand: CommandModule<Record<string, unknown>, AddArgs> = {
   builder: (yargs: Argv) =>
     yargs.positional('source', {
       type: 'string',
-      description: t('GitHub raw URL or local path to a SKILL.md file or skill directory'),
+      description: t(
+        'GitHub raw URL or local path to a SKILL.md file or skill directory',
+      ),
       demandOption: true,
     }) as Argv<AddArgs>,
   handler: async (argv: AddArgs) => {
@@ -240,9 +242,7 @@ const addCommand: CommandModule<Record<string, unknown>, AddArgs> = {
       const rawUrl = source.includes('SKILL.md')
         ? toRawUrl(source)
         : toRawUrl(
-            source.endsWith('/')
-              ? `${source}SKILL.md`
-              : `${source}/SKILL.md`,
+            source.endsWith('/') ? `${source}SKILL.md` : `${source}/SKILL.md`,
           );
 
       writeStdoutLine(t(`\n  Fetching skill from: ${rawUrl}\n`));
@@ -251,27 +251,33 @@ const addCommand: CommandModule<Record<string, unknown>, AddArgs> = {
         const response = await fetch(rawUrl);
         if (!response.ok) {
           writeStderrLine(
-            t(`Failed to fetch skill: HTTP ${response.status} ${response.statusText}`),
+            t(
+              `Failed to fetch skill: HTTP ${response.status} ${response.statusText}`,
+            ),
           );
           process.exit(1);
         }
         content = await response.text();
       } catch (err: unknown) {
         writeStderrLine(
-          t(`Network error: ${err instanceof Error ? err.message : String(err)}`),
+          t(
+            `Network error: ${err instanceof Error ? err.message : String(err)}`,
+          ),
         );
         process.exit(1);
       }
     } else {
       // Local path
       const localPath = path.resolve(source);
-      const isDir = fsSync.existsSync(localPath) && fsSync.lstatSync(localPath).isDirectory();
-      const skillFilePath = isDir ? path.join(localPath, SKILL_FILE) : localPath;
+      const isDir =
+        fsSync.existsSync(localPath) &&
+        fsSync.lstatSync(localPath).isDirectory();
+      const skillFilePath = isDir
+        ? path.join(localPath, SKILL_FILE)
+        : localPath;
 
       if (!fsSync.existsSync(skillFilePath)) {
-        writeStderrLine(
-          t(`SKILL.md not found at: ${skillFilePath}`),
-        );
+        writeStderrLine(t(`SKILL.md not found at: ${skillFilePath}`));
         process.exit(1);
       }
 
@@ -281,7 +287,9 @@ const addCommand: CommandModule<Record<string, unknown>, AddArgs> = {
     // Validate minimal SKILL.md structure
     if (!content.includes('---')) {
       writeStderrLine(
-        t('Invalid SKILL.md: missing YAML frontmatter (expected --- delimiters).'),
+        t(
+          'Invalid SKILL.md: missing YAML frontmatter (expected --- delimiters).',
+        ),
       );
       process.exit(1);
     }
@@ -290,11 +298,11 @@ const addCommand: CommandModule<Record<string, unknown>, AddArgs> = {
     await fs.mkdir(targetDir, { recursive: true });
     await fs.writeFile(targetFile, content, 'utf8');
 
-    writeStdoutLine(t(`\n  ✓ Skill "${skillName}" installed to: ${targetFile}`));
     writeStdoutLine(
-      t(
-        '  Restart HopCode for the skill to appear as a /slash command.\n',
-      ),
+      t(`\n  ✓ Skill "${skillName}" installed to: ${targetFile}`),
+    );
+    writeStdoutLine(
+      t('  Restart HopCode for the skill to appear as a /slash command.\n'),
     );
   },
 };
@@ -345,7 +353,10 @@ export const skillsCommand: CommandModule = {
       .command(showCommand as CommandModule)
       .command(addCommand as CommandModule)
       .command(removeCommand as CommandModule)
-      .demandCommand(1, 'You need at least one sub-command. Try: hopcode skills list')
+      .demandCommand(
+        1,
+        'You need at least one sub-command. Try: hopcode skills list',
+      )
       .version(false),
   handler: () => {
     // yargs shows help via demandCommand(1)

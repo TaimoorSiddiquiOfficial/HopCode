@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type {
+  SlashCommand,
+  CommandContext,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, extname, relative } from 'node:path';
@@ -27,7 +31,10 @@ export const securityReviewCommand: SlashCommand = {
   name: 'security-review',
   description: 'AI-powered security code review for vulnerabilities',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, args: string): Promise<SlashCommandActionReturn> => {
+  action: async (
+    context: CommandContext,
+    args: string,
+  ): Promise<SlashCommandActionReturn> => {
     try {
       const targetPath = args.trim() || process.cwd();
       const scanResults = await performSecurityReview(context, targetPath);
@@ -46,7 +53,8 @@ export const securityReviewCommand: SlashCommand = {
         content: generateSecurityReviewReport(scanResults, targetPath),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       return {
         type: 'message',
         messageType: 'error',
@@ -117,7 +125,8 @@ const SECURITY_PATTERNS: Array<{
     severity: 'critical',
     category: 'Hardcoded Secret',
     description: 'Hardcoded password detected',
-    recommendation: 'Use environment variables or a secrets manager (e.g., Azure Key Vault, AWS Secrets Manager)',
+    recommendation:
+      'Use environment variables or a secrets manager (e.g., Azure Key Vault, AWS Secrets Manager)',
     cwe: 'CWE-798',
     owasp: 'A07:2021-Identification and Authentication Failures',
   },
@@ -126,7 +135,8 @@ const SECURITY_PATTERNS: Array<{
     severity: 'critical',
     category: 'Hardcoded Secret',
     description: 'Hardcoded API key detected',
-    recommendation: 'Store API keys in environment variables or a secure secrets manager',
+    recommendation:
+      'Store API keys in environment variables or a secure secrets manager',
     cwe: 'CWE-798',
     owasp: 'A07:2021-Identification and Authentication Failures',
   },
@@ -135,7 +145,8 @@ const SECURITY_PATTERNS: Array<{
     severity: 'critical',
     category: 'Hardcoded Secret',
     description: 'Hardcoded secret/token detected',
-    recommendation: 'Use environment variables for sensitive configuration values',
+    recommendation:
+      'Use environment variables for sensitive configuration values',
     cwe: 'CWE-798',
     owasp: 'A07:2021-Identification and Authentication Failures',
   },
@@ -144,18 +155,20 @@ const SECURITY_PATTERNS: Array<{
     severity: 'critical',
     category: 'Hardcoded Secret',
     description: 'Private key embedded in source code',
-    recommendation: 'Store private keys in a secure secrets manager, never in source code',
+    recommendation:
+      'Store private keys in a secure secrets manager, never in source code',
     cwe: 'CWE-312',
     owasp: 'A01:2021-Broken Access Control',
   },
-  
+
   // SQL Injection
   {
     pattern: /(?:execute|query|raw)\s*\(\s*`[^`]*\$\{[^}]+\}[^`]*`/gi,
     severity: 'critical',
     category: 'SQL Injection',
     description: 'Potential SQL injection via template literal',
-    recommendation: 'Use parameterized queries or prepared statements instead of string interpolation',
+    recommendation:
+      'Use parameterized queries or prepared statements instead of string interpolation',
     cwe: 'CWE-89',
     owasp: 'A03:2021-Injection',
   },
@@ -164,18 +177,20 @@ const SECURITY_PATTERNS: Array<{
     severity: 'critical',
     category: 'SQL Injection',
     description: 'Potential SQL injection via string concatenation',
-    recommendation: 'Use parameterized queries to prevent SQL injection attacks',
+    recommendation:
+      'Use parameterized queries to prevent SQL injection attacks',
     cwe: 'CWE-89',
     owasp: 'A03:2021-Injection',
   },
-  
+
   // Command Injection
   {
     pattern: /(?:exec|spawn|spawnSync)\s*\(\s*`[^`]*\$\{[^}]+\}[^`]*`/gi,
     severity: 'critical',
     category: 'Command Injection',
     description: 'Potential command injection via template literal',
-    recommendation: 'Avoid shell execution with user input. Use safe APIs or sanitize input rigorously',
+    recommendation:
+      'Avoid shell execution with user input. Use safe APIs or sanitize input rigorously',
     cwe: 'CWE-78',
     owasp: 'A03:2021-Injection',
   },
@@ -188,14 +203,15 @@ const SECURITY_PATTERNS: Array<{
     cwe: 'CWE-78',
     owasp: 'A03:2021-Injection',
   },
-  
+
   // XSS (Cross-Site Scripting)
   {
     pattern: /innerHTML\s*=\s*/gi,
     severity: 'high',
     category: 'XSS',
     description: 'Direct innerHTML assignment can lead to XSS vulnerabilities',
-    recommendation: 'Use textContent or sanitize HTML before assignment. Consider using a framework with auto-escaping',
+    recommendation:
+      'Use textContent or sanitize HTML before assignment. Consider using a framework with auto-escaping',
     cwe: 'CWE-79',
     owasp: 'A03:2021-Injection',
   },
@@ -204,7 +220,8 @@ const SECURITY_PATTERNS: Array<{
     severity: 'high',
     category: 'XSS',
     description: 'document.write can introduce XSS vulnerabilities',
-    recommendation: 'Avoid document.write. Use DOM manipulation methods with proper sanitization',
+    recommendation:
+      'Avoid document.write. Use DOM manipulation methods with proper sanitization',
     cwe: 'CWE-79',
     owasp: 'A03:2021-Injection',
   },
@@ -212,19 +229,24 @@ const SECURITY_PATTERNS: Array<{
     pattern: /\$\s*\([^)]*\)\.html\s*\(/gi,
     severity: 'high',
     category: 'XSS',
-    description: 'jQuery .html() can introduce XSS if used with unsanitized data',
-    recommendation: 'Use .text() for plain text or sanitize HTML content before insertion',
+    description:
+      'jQuery .html() can introduce XSS if used with unsanitized data',
+    recommendation:
+      'Use .text() for plain text or sanitize HTML content before insertion',
     cwe: 'CWE-79',
     owasp: 'A03:2021-Injection',
   },
-  
+
   // Path Traversal
   {
-    pattern: /(?:readFile|writeFile|createReadStream|createWriteStream)\s*\([^)]*\+\s*[^)]*\)/gi,
+    pattern:
+      /(?:readFile|writeFile|createReadStream|createWriteStream)\s*\([^)]*\+\s*[^)]*\)/gi,
     severity: 'high',
     category: 'Path Traversal',
-    description: 'Potential path traversal via string concatenation in file operations',
-    recommendation: 'Validate and sanitize file paths. Use path.resolve and check against allowed directories',
+    description:
+      'Potential path traversal via string concatenation in file operations',
+    recommendation:
+      'Validate and sanitize file paths. Use path.resolve and check against allowed directories',
     cwe: 'CWE-22',
     owasp: 'A01:2021-Broken Access Control',
   },
@@ -232,19 +254,21 @@ const SECURITY_PATTERNS: Array<{
     pattern: /require\s*\(\s*["']\.\.\/["']\s*\+\s*/gi,
     severity: 'high',
     category: 'Path Traversal',
-    description: 'Dynamic require with path concatenation can lead to path traversal',
+    description:
+      'Dynamic require with path concatenation can lead to path traversal',
     recommendation: 'Avoid dynamic requires with user-controlled paths',
     cwe: 'CWE-22',
     owasp: 'A01:2021-Broken Access Control',
   },
-  
+
   // Weak Cryptography
   {
     pattern: /\b(?:md5|sha1)\s*\(/gi,
     severity: 'high',
     category: 'Weak Cryptography',
     description: 'Use of weak hash function (MD5/SHA1)',
-    recommendation: 'Use SHA-256 or stronger hash functions. For passwords, use bcrypt, scrypt, or Argon2',
+    recommendation:
+      'Use SHA-256 or stronger hash functions. For passwords, use bcrypt, scrypt, or Argon2',
     cwe: 'CWE-328',
     owasp: 'A02:2021-Cryptographic Failures',
   },
@@ -257,25 +281,27 @@ const SECURITY_PATTERNS: Array<{
     cwe: 'CWE-328',
     owasp: 'A02:2021-Cryptographic Failures',
   },
-  
+
   // Insecure Randomness
   {
     pattern: /\bMath\.random\s*\(\s*\)/gi,
     severity: 'medium',
     category: 'Insecure Randomness',
     description: 'Math.random() is not cryptographically secure',
-    recommendation: 'Use crypto.randomBytes() or crypto.getRandomValues() for security-sensitive randomness',
+    recommendation:
+      'Use crypto.randomBytes() or crypto.getRandomValues() for security-sensitive randomness',
     cwe: 'CWE-330',
     owasp: 'A02:2021-Cryptographic Failures',
   },
-  
+
   // Prototype Pollution
   {
     pattern: /\[\s*['"]__proto__['"]\s*\]/gi,
     severity: 'high',
     category: 'Prototype Pollution',
     description: 'Direct __proto__ access can lead to prototype pollution',
-    recommendation: 'Use Object.create(null) or Map for user-controlled key-value stores',
+    recommendation:
+      'Use Object.create(null) or Map for user-controlled key-value stores',
     cwe: 'CWE-1321',
     owasp: 'A01:2021-Broken Access Control',
   },
@@ -284,28 +310,31 @@ const SECURITY_PATTERNS: Array<{
     severity: 'medium',
     category: 'Prototype Pollution',
     description: 'Object.assign with user input can cause prototype pollution',
-    recommendation: 'Use Object.create(null) or freeze prototype chains before merging',
+    recommendation:
+      'Use Object.create(null) or freeze prototype chains before merging',
     cwe: 'CWE-1321',
   },
-  
+
   // SSRF (Server-Side Request Forgery)
   {
     pattern: /(?:fetch|axios|request|http\.get|https\.get)\s*\(\s*[^)]*req\./gi,
     severity: 'high',
     category: 'SSRF',
     description: 'Potential SSRF via user-controlled URL in HTTP request',
-    recommendation: 'Validate and whitelist allowed URLs. Block internal IP ranges and localhost',
+    recommendation:
+      'Validate and whitelist allowed URLs. Block internal IP ranges and localhost',
     cwe: 'CWE-918',
     owasp: 'A10:2021-Server-Side Request Forgery',
   },
-  
+
   // Eval and Dangerous Functions
   {
     pattern: /\beval\s*\(/gi,
     severity: 'critical',
     category: 'Dangerous Function',
     description: 'eval() execution can lead to arbitrary code execution',
-    recommendation: 'Never use eval(). Use safer alternatives like JSON.parse() or Function constructors with strict validation',
+    recommendation:
+      'Never use eval(). Use safer alternatives like JSON.parse() or Function constructors with strict validation',
     cwe: 'CWE-95',
     owasp: 'A03:2021-Injection',
   },
@@ -331,20 +360,23 @@ const SECURITY_PATTERNS: Array<{
     severity: 'medium',
     category: 'Dangerous Function',
     description: 'setInterval with string argument can execute arbitrary code',
-    recommendation: 'Pass function references to setInterval instead of strings',
+    recommendation:
+      'Pass function references to setInterval instead of strings',
     cwe: 'CWE-95',
   },
-  
+
   // Insecure Dependencies
   {
     pattern: /"version"\s*:\s*"[^"]*latest"/gi,
     severity: 'medium',
     category: 'Insecure Dependency',
-    description: 'Using "latest" version tag can introduce breaking changes or vulnerabilities',
-    recommendation: 'Pin dependencies to specific versions and use automated dependency updates',
+    description:
+      'Using "latest" version tag can introduce breaking changes or vulnerabilities',
+    recommendation:
+      'Pin dependencies to specific versions and use automated dependency updates',
     cwe: 'CWE-1391',
   },
-  
+
   // Security Misconfigurations
   {
     pattern: /cors\s*\(\s*\{\s*origin\s*:\s*['"]\*['"]/gi,
@@ -363,7 +395,7 @@ const SECURITY_PATTERNS: Array<{
     recommendation: 'Ensure static directories do not expose sensitive files',
     cwe: 'CWE-284',
   },
-  
+
   // Debug/Development Code in Production
   {
     pattern: /console\.(log|debug|info|warn|error)\s*\(/gi,
@@ -381,7 +413,7 @@ const SECURITY_PATTERNS: Array<{
     recommendation: 'Remove debugger statements before deployment',
     cwe: 'CWE-489',
   },
-  
+
   // Hardcoded URLs and Endpoints
   {
     pattern: /https?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0):/gi,
@@ -397,23 +429,34 @@ const SECURITY_PATTERNS: Array<{
  * File extensions to scan
  */
 const SCAN_EXTENSIONS = [
-  '.js', '.jsx', '.ts', '.tsx',
+  '.js',
+  '.jsx',
+  '.ts',
+  '.tsx',
   '.py',
   '.java',
   '.go',
   '.rb',
   '.php',
   '.cs',
-  '.c', '.cpp', '.h', '.hpp',
+  '.c',
+  '.cpp',
+  '.h',
+  '.hpp',
   '.rs',
   '.swift',
-  '.kt', '.kts',
+  '.kt',
+  '.kts',
   '.scala',
-  '.sh', '.bash', '.zsh',
+  '.sh',
+  '.bash',
+  '.zsh',
   '.ps1',
-  '.yaml', '.yml',
+  '.yaml',
+  '.yml',
   '.json',
-  '.env', '.env.*',
+  '.env',
+  '.env.*',
   '.config',
   '.sql',
 ];
@@ -443,7 +486,7 @@ const SKIP_DIRS = [
  */
 async function performSecurityReview(
   context: CommandContext,
-  targetPath: string
+  targetPath: string,
 ): Promise<SecurityReviewResults> {
   const startTime = Date.now();
   const findings: SecurityReviewResults = {
@@ -567,7 +610,7 @@ async function collectFilesToScan(rootPath: string): Promise<string[]> {
  */
 function scanFileForVulnerabilities(
   filePath: string,
-  content: string
+  content: string,
 ): SecurityFinding[] {
   const findings: SecurityFinding[] = [];
   const lines = content.split('\n');
@@ -582,7 +625,11 @@ function scanFileForVulnerabilities(
       const lineContent = lines[lineNumber - 1]?.trim() || '';
 
       // Skip if line is commented out (simple heuristic)
-      if (lineContent.startsWith('//') || lineContent.startsWith('#') || lineContent.startsWith('*')) {
+      if (
+        lineContent.startsWith('//') ||
+        lineContent.startsWith('#') ||
+        lineContent.startsWith('*')
+      ) {
         continue;
       }
 
@@ -608,7 +655,7 @@ function scanFileForVulnerabilities(
  */
 function generateSecurityReviewReport(
   results: SecurityReviewResults,
-  targetPath: string
+  targetPath: string,
 ): string {
   const totalIssues =
     results.critical.length +

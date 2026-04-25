@@ -55,16 +55,16 @@ await server.stop();
 
 The server bridges `AgentInteractive` events from `@hoptrendy/hopcode-core` into gRPC messages:
 
-| Agent Event | gRPC Message |
-|-------------|--------------|
-| `round_start` | `StatusEvent` |
-| `stream_text` | `TextChunk` |
-| `tool_call` | `ToolCall` |
-| `tool_result` | `ToolResult` |
+| Agent Event             | gRPC Message        |
+| ----------------------- | ------------------- |
+| `round_start`           | `StatusEvent`       |
+| `stream_text`           | `TextChunk`         |
+| `tool_call`             | `ToolCall`          |
+| `tool_result`           | `ToolResult`        |
 | `tool_waiting_approval` | `PermissionRequest` |
-| `usage_metadata` | `UsageEvent` |
-| `error` | `ErrorEvent` |
-| `finish` | `StatusEvent` |
+| `usage_metadata`        | `UsageEvent`        |
+| `error`                 | `ErrorEvent`        |
+| `finish`                | `StatusEvent`       |
 
 ## Status
 

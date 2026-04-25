@@ -89,10 +89,14 @@ describe('createContentGeneratorConfig', () => {
   } as unknown as Config;
 
   it('should preserve provided fields and set authType for HOPCODE_OAUTH', () => {
-    const cfg = createContentGeneratorConfig(mockConfig, AuthType.HOPCODE_OAUTH, {
-      model: 'coder-model',
-      apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
-    });
+    const cfg = createContentGeneratorConfig(
+      mockConfig,
+      AuthType.HOPCODE_OAUTH,
+      {
+        model: 'coder-model',
+        apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
+      },
+    );
     expect(cfg.authType).toBe(AuthType.HOPCODE_OAUTH);
     expect(cfg.model).toBe('coder-model');
     expect(cfg.apiKey).toBe('HOPCODE_OAUTH_DYNAMIC_TOKEN');
@@ -102,9 +106,13 @@ describe('createContentGeneratorConfig', () => {
     const warnSpy = vi
       .spyOn(console, 'warn')
       .mockImplementation(() => undefined);
-    const cfg = createContentGeneratorConfig(mockConfig, AuthType.HOPCODE_OAUTH, {
-      model: 'some-random-model',
-    });
+    const cfg = createContentGeneratorConfig(
+      mockConfig,
+      AuthType.HOPCODE_OAUTH,
+      {
+        model: 'some-random-model',
+      },
+    );
     expect(cfg.model).toBe('some-random-model');
     expect(cfg.apiKey).toBeUndefined();
     expect(warnSpy).not.toHaveBeenCalled();

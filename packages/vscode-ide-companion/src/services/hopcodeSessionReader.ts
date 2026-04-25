@@ -72,7 +72,10 @@ export class HopCodeSessionReader {
         // All projects
         const tmpDir = path.join(this.hopcodeDir, 'tmp');
         if (!fs.existsSync(tmpDir)) {
-          console.log('[HopCodeSessionReader] Tmp directory not found:', tmpDir);
+          console.log(
+            '[HopCodeSessionReader] Tmp directory not found:',
+            tmpDir,
+          );
           return [];
         }
 
@@ -100,7 +103,9 @@ export class HopCodeSessionReader {
   /**
    * Read all sessions from specified directory
    */
-  private async readSessionsFromDir(chatsDir: string): Promise<HopCodeSession[]> {
+  private async readSessionsFromDir(
+    chatsDir: string,
+  ): Promise<HopCodeSession[]> {
     const sessions: HopCodeSession[] = [];
 
     if (!fs.existsSync(chatsDir)) {

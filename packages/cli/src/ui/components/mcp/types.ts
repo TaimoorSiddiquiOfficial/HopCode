@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  MCPServerConfig,
-  MCPServerStatus,
-} from '@hoptrendy/hopcode-core';
+import type { MCPServerConfig, MCPServerStatus } from '@hoptrendy/hopcode-core';
 
 /**
  * MCP管理步骤定义

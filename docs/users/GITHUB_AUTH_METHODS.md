@@ -18,6 +18,7 @@ HopCode supports **3 authentication methods** for GitHub integration:
 ## Method 1: GitHub App JWT Authentication ✅ (Recommended)
 
 ### Best For
+
 - Production deployments
 - Server-to-server communication
 - Automated workflows
@@ -94,6 +95,7 @@ hopcode /github issues list
 ## Method 2: OAuth Device Flow ✅ (Best for CLI)
 
 ### Best For
+
 - CLI interactive authentication
 - Quick testing
 - Personal use
@@ -176,6 +178,7 @@ hopcode /github issues list
 ## Method 3: Personal Access Token (PAT) ⚠️ (Legacy)
 
 ### Best For
+
 - Legacy systems
 - Simple scripts
 - Backward compatibility
@@ -239,16 +242,16 @@ hopcode /github issues list
 
 ## Comparison Table
 
-| Feature | GitHub App JWT | OAuth Device Flow | Personal Access Token |
-|---------|----------------|-------------------|----------------------|
-| **Setup Complexity** | Medium | Easy | Easy |
-| **Rate Limit** | 15,000/hr | 5,000/hr | 5,000/hr |
-| **Token Expiry** | Auto-refresh | 8 hours | Never (manual) |
-| **Security** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Best Use** | Production | CLI testing | Legacy |
-| **Acts As** | App | User | User |
-| **Permissions** | Fine-grained | User scopes | All-or-nothing |
-| **Setup Time** | 10 minutes | 1 minute | 5 minutes |
+| Feature              | GitHub App JWT | OAuth Device Flow | Personal Access Token |
+| -------------------- | -------------- | ----------------- | --------------------- |
+| **Setup Complexity** | Medium         | Easy              | Easy                  |
+| **Rate Limit**       | 15,000/hr      | 5,000/hr          | 5,000/hr              |
+| **Token Expiry**     | Auto-refresh   | 8 hours           | Never (manual)        |
+| **Security**         | ⭐⭐⭐⭐⭐     | ⭐⭐⭐⭐          | ⭐⭐⭐                |
+| **Best Use**         | Production     | CLI testing       | Legacy                |
+| **Acts As**          | App            | User              | User                  |
+| **Permissions**      | Fine-grained   | User scopes       | All-or-nothing        |
+| **Setup Time**       | 10 minutes     | 1 minute          | 5 minutes             |
 
 ---
 
@@ -282,11 +285,11 @@ hopcode /github issues list
 
 ## Implementation Status
 
-| Method | Status | Command | Docs |
-|--------|--------|---------|------|
-| **GitHub App JWT** | ✅ Implemented | Configure in settings.json | `docs/users/github-integration.md` |
-| **OAuth Device Flow** | ✅ Implemented | `/github-device-auth` | `docs/users/GITHUB_DEVICE_FLOW_GUIDE.md` |
-| **Personal Access Token** | ⚠️ Legacy | Set `GITHUB_TOKEN` env | GitHub docs |
+| Method                    | Status         | Command                    | Docs                                     |
+| ------------------------- | -------------- | -------------------------- | ---------------------------------------- |
+| **GitHub App JWT**        | ✅ Implemented | Configure in settings.json | `docs/users/github-integration.md`       |
+| **OAuth Device Flow**     | ✅ Implemented | `/github-device-auth`      | `docs/users/GITHUB_DEVICE_FLOW_GUIDE.md` |
+| **Personal Access Token** | ⚠️ Legacy      | Set `GITHUB_TOKEN` env     | GitHub docs                              |
 
 ---
 
@@ -381,6 +384,7 @@ echo "*.pem" >> .gitignore
 ### Issue: "Invalid private key"
 
 **Solution**: Check PEM format
+
 ```bash
 # Should include newlines
 export GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
@@ -389,6 +393,7 @@ export GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RS
 ### Issue: "Token expired"
 
 **Solution**: Re-authenticate
+
 ```bash
 # Device Flow
 hopcode /github-device-auth
@@ -399,6 +404,7 @@ hopcode /github-device-auth
 ### Issue: "Rate limit exceeded"
 
 **Solution**: Use GitHub App JWT (15k/hr vs 5k/hr)
+
 ```bash
 # Switch from Device Flow/PAT to GitHub App
 export GITHUB_APP_ID=3424564
@@ -418,11 +424,11 @@ export GITHUB_APP_PRIVATE_KEY="..."
 
 ## Summary
 
-| Method | Status | Recommendation |
-|--------|--------|----------------|
-| **GitHub App JWT** | ✅ Implemented | ⭐⭐⭐⭐⭐ Best for production |
-| **OAuth Device Flow** | ✅ Implemented | ⭐⭐⭐⭐ Best for CLI testing |
-| **Personal Access Token** | ⚠️ Legacy | ⭐⭐ Only for legacy systems |
+| Method                    | Status         | Recommendation                 |
+| ------------------------- | -------------- | ------------------------------ |
+| **GitHub App JWT**        | ✅ Implemented | ⭐⭐⭐⭐⭐ Best for production |
+| **OAuth Device Flow**     | ✅ Implemented | ⭐⭐⭐⭐ Best for CLI testing  |
+| **Personal Access Token** | ⚠️ Legacy      | ⭐⭐ Only for legacy systems   |
 
 **All three methods are fully implemented and working!** Choose based on your use case.
 

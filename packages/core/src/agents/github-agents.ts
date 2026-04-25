@@ -65,10 +65,7 @@ Use Shell tool with gh CLI commands for all GitHub operations (gh issue, gh labe
 Use Grep to search for duplicate issues and patterns.
 
 For clear communication, avoid using emojis.`,
-      tools: [
-        ToolNames.SHELL,
-        ToolNames.GREP,
-      ],
+      tools: [ToolNames.SHELL, ToolNames.GREP],
       approvalMode: 'auto-edit',
     },
     {
@@ -85,10 +82,7 @@ For clear communication, avoid using emojis.`,
 Use Shell tool with gh CLI commands (gh run list, gh run view, gh run view --log) for CI operations.
 
 For clear communication, avoid using emojis.`,
-      tools: [
-        ToolNames.SHELL,
-        ToolNames.READ_FILE,
-      ],
+      tools: [ToolNames.SHELL, ToolNames.READ_FILE],
       approvalMode: 'plan',
     },
     {
@@ -104,11 +98,7 @@ For clear communication, avoid using emojis.`,
 Use Shell tool with gh CLI commands (gh release create, gh pr list) for release operations.
 
 For clear communication, avoid using emojis.`,
-      tools: [
-        ToolNames.SHELL,
-        ToolNames.READ_FILE,
-        ToolNames.EDIT,
-      ],
+      tools: [ToolNames.SHELL, ToolNames.READ_FILE, ToolNames.EDIT],
       approvalMode: 'plan',
     },
     {
@@ -125,11 +115,7 @@ For clear communication, avoid using emojis.`,
 Use Shell tool with gh CLI commands (gh api) for security scanning operations.
 
 For clear communication, avoid using emojis.`,
-      tools: [
-        ToolNames.SHELL,
-        ToolNames.GREP,
-        ToolNames.READ_FILE,
-      ],
+      tools: [ToolNames.SHELL, ToolNames.GREP, ToolNames.READ_FILE],
       approvalMode: 'plan',
     },
   ];

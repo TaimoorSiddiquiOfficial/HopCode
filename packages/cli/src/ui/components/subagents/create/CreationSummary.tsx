@@ -7,10 +7,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import type { WizardStepProps } from '../types.js';
-import type {
-  SubagentManager,
-  SubagentConfig,
-} from '@hoptrendy/hopcode-core';
+import type { SubagentManager, SubagentConfig } from '@hoptrendy/hopcode-core';
 import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import { theme } from '../../../semantic-colors.js';
 import { shouldShowColor, getColorForDisplay } from '../utils.js';

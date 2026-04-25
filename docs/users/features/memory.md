@@ -24,9 +24,9 @@ Don't include things HopCode can figure out by reading your code. HOPCODE.md wor
 
 ### Where to create HOPCODE.md
 
-| File                          | Who it applies to                             |
-| ----------------------------- | --------------------------------------------- |
-| `~/.hopcode/HOPCODE.md`             | You, across all your projects                 |
+| File                             | Who it applies to                             |
+| -------------------------------- | --------------------------------------------- |
+| `~/.hopcode/HOPCODE.md`          | You, across all your projects                 |
 | `HOPCODE.md` in the project root | Your whole team (commit it to source control) |
 
 You can have both. HopCode loads all HOPCODE.md files it finds when you start a session — your personal one plus any in the project.

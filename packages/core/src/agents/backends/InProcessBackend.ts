@@ -13,10 +13,9 @@
 
 import { createDebugLogger } from '../../utils/debugLogger.js';
 import type { Config } from '../../config/config.js';
+import { createConfigOverride } from '../../config/config.js';
 import {
-  type AuthType,
   type ContentGenerator,
-  type ContentGeneratorConfig,
   createContentGenerator,
 } from '../../core/contentGenerator.js';
 import type { ToolRegistry } from '../../tools/tool-registry.js';
@@ -365,26 +364,31 @@ async function createPerAgentConfig(
   modelId?: string,
   authOverrides?: InProcessSpawnConfig['authOverrides'],
 ): Promise<{ config: Config; contentGenerator?: ContentGenerator }> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const override = Object.create(base) as any;
+  const agentWorkspace = new WorkspaceContext(cwd);
+  const agentFileService = new FileDiscoveryService(cwd);
+
+  // Create the base override with workspace and file service
+  let override = createConfigOverride(base, {
+    getWorkingDir: () => cwd,
+    getTargetDir: () => cwd,
+    getProjectRoot: () => cwd,
+    getWorkspaceContext: () => agentWorkspace,
+    getFileService: () => agentFileService,
+  });
+
   let dedicatedContentGenerator: ContentGenerator | undefined;
 
-  override.getWorkingDir = () => cwd;
-  override.getTargetDir = () => cwd;
-  override.getProjectRoot = () => cwd;
-
-  const agentWorkspace = new WorkspaceContext(cwd);
-  override.getWorkspaceContext = () => agentWorkspace;
-
-  const agentFileService = new FileDiscoveryService(cwd);
-  override.getFileService = () => agentFileService;
-
+  // Create tool registry - needs to be done after override creation
   const agentRegistry: ToolRegistry = await override.createToolRegistry(
     undefined,
     { skipDiscovery: true },
   );
   agentRegistry.copyDiscoveredToolsFrom(base.getToolRegistry());
-  override.getToolRegistry = () => agentRegistry;
+
+  // Create a new override that includes the tool registry
+  override = createConfigOverride(override, {
+    getToolRegistry: () => agentRegistry,
+  });
 
   if (authOverrides?.authType) {
     try {
@@ -395,15 +399,17 @@ async function createPerAgentConfig(
       );
       const agentGenerator = await createContentGenerator(
         agentGeneratorConfig,
-        override as Config,
+        override,
       );
       dedicatedContentGenerator = agentGenerator;
-      override.getContentGenerator = (): ContentGenerator => agentGenerator;
-      override.getContentGeneratorConfig = (): ContentGeneratorConfig =>
-        agentGeneratorConfig;
-      override.getAuthType = (): AuthType | undefined =>
-        agentGeneratorConfig.authType;
-      override.getModel = (): string => agentGeneratorConfig.model;
+
+      // Create final override with content generator methods
+      override = createConfigOverride(override, {
+        getContentGenerator: () => agentGenerator,
+        getContentGeneratorConfig: () => agentGeneratorConfig,
+        getAuthType: () => agentGeneratorConfig.authType,
+        getModel: () => agentGeneratorConfig.model,
+      });
 
       debugLogger.info(
         `Created per-agent ContentGenerator: authType=${authOverrides.authType}, model=${agentGeneratorConfig.model}`,
@@ -417,7 +423,7 @@ async function createPerAgentConfig(
   }
 
   return {
-    config: override as Config,
+    config: override,
     contentGenerator:
       dedicatedContentGenerator ??
       (authOverrides?.authType ? undefined : base.getContentGenerator()),

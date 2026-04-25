@@ -225,7 +225,7 @@ export default function Page() {
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     sendMessage({ text: input });
     setInput('');
@@ -233,7 +233,7 @@ export default function Page() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input value={input} onChange={e => setInput(e.target.value)} />
+      <input value={input} onChange={(e) => setInput(e.target.value)} />
       <button type="submit">Send</button>
     </form>
   );
@@ -270,7 +270,7 @@ Typed tool parts also use different property names:
 
 // ✅ Correct - using typed tool parts (recommended)
 {
-  message.parts.map(part => {
+  message.parts.map((part) => {
     switch (part.type) {
       case 'text':
         return part.text;
@@ -288,7 +288,7 @@ Typed tool parts also use different property names:
 import { isToolUIPart } from 'ai';
 
 {
-  message.parts.map(part => {
+  message.parts.map((part) => {
     if (part.type === 'text') {
       return part.text;
     }

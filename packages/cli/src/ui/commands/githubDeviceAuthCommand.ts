@@ -4,10 +4,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type {
+  SlashCommand,
+  CommandContext,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
-import { GitHubDeviceFlowAuth } from '@hoptrendy/hopcode-core';
-import type { DeviceFlowResponse, DeviceFlowTokenResponse } from '@hoptrendy/hopcode-core';
+import {
+  GitHubDeviceFlowAuth,
+  createDebugLogger,
+} from '@hoptrendy/hopcode-core';
+import type {
+  DeviceFlowResponse,
+  DeviceFlowTokenResponse,
+} from '@hoptrendy/hopcode-core';
 
 // GitHub OAuth App configuration
 const GITHUB_OAUTH_CLIENT_ID = 'Iv23livRiRBTa9cyBnk1';
@@ -21,7 +31,10 @@ export const githubDeviceAuthCommand: SlashCommand = {
   name: 'github-device-auth',
   description: 'Authenticate with GitHub using Device Flow (interactive)',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, _args: string): Promise<SlashCommandActionReturn> => {
+  action: async (
+    context: CommandContext,
+    _args: string,
+  ): Promise<SlashCommandActionReturn> => {
     try {
       // Create Device Flow auth instance
       const deviceAuth = new GitHubDeviceFlowAuth(
@@ -39,19 +52,19 @@ export const githubDeviceAuthCommand: SlashCommand = {
           verificationUri = response.verification_uri;
           userCode = response.user_code;
         },
-        
+
         // onToken callback
         (token: DeviceFlowTokenResponse) => {
           // Save token to config
           saveAccessToken(context, token.access_token);
         },
-        
+
         // onError callback
         (error: string) => {
           // eslint-disable-next-line no-console
           console.error('Authentication failed:', error);
         },
-        
+
         // progressCallback
         (message: string) => {
           // eslint-disable-next-line no-console
@@ -111,10 +124,10 @@ hopcode /github ci status
 
 **Note**: Device Flow is perfect for CLI authentication. For production use, consider GitHub App JWT authentication for server-to-server operations.`,
       };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+
       return {
         type: 'message',
         messageType: 'error',
@@ -157,35 +170,22 @@ See: \`docs/users/github-integration.md\``,
 
 /**
  * Save access token to user config
+ * Note: Currently logs the token saving attempt. Full persistence requires
+ * adding GitHub OAuth token storage to the settings schema.
  */
-function saveAccessToken(context: CommandContext, token: string): void {
+function saveAccessToken(_context: CommandContext, token: string): void {
   try {
-    const config = context.services.config;
-    if (!config) {
-      // eslint-disable-next-line no-console
-      console.warn('No config available, cannot save token');
-      return;
-    }
+    const debugLogger = createDebugLogger('github-device-auth');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const settings = ({ github: { appId: process.env.GITHUB_APP_ID, privateKey: process.env.GITHUB_APP_PRIVATE_KEY } } as any);
-    if (!settings) {
-      // eslint-disable-next-line no-console
-      console.warn('No settings available, cannot save token');
-      return;
-    }
-
-    // Save to settings.json
-    settings.github = {
-      ...settings.github,
-      oauthToken: token,
-    };
-
-    // eslint-disable-next-line no-console
-    console.log('✅ Access token saved to config');
+    // Token received and validated - in a full implementation, this would
+    // be persisted to the user's config. For now, log the successful auth.
+    debugLogger.info(
+      `GitHub OAuth token received (length: ${token.length}). ` +
+        'Note: Token persistence requires configuration of GitHub OAuth storage.',
+    );
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to save token:', error);
-    throw new Error('Failed to save access token to config');
+    const debugLogger = createDebugLogger('github-device-auth');
+    debugLogger.error('Failed to process token:', error);
+    throw new Error('Failed to process access token');
   }
 }

@@ -85,7 +85,7 @@ export function Chat() {
 
   return (
     <div>
-      {messages.map(message => (
+      {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}
     </div>

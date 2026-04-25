@@ -28,14 +28,17 @@ git diff --cached
 ```
 
 If nothing is staged:
+
 ```bash
 git status
 ```
+
 Inform the user nothing is staged and suggest running `git add <files>` first. Do not proceed.
 
 ### Step 2: Analyse the Diff
 
 Read the staged diff carefully. Identify:
+
 - **Type**: what kind of change is this? (feat, fix, chore, refactor, test, docs, style, perf, ci, build, revert)
 - **Scope**: which module, package, or subsystem is affected?
 - **Description**: one-line imperative summary (72 chars max) of WHAT changed, not HOW
@@ -68,6 +71,7 @@ Follow **Conventional Commits** format:
 | `revert` | Reverting a prior commit |
 
 **Rules**:
+
 - Subject line: present tense, imperative ("add X", not "added X" or "adds X")
 - Subject line: no trailing period
 - Body: wrap at 72 chars, explain motivation and context
@@ -84,6 +88,7 @@ Show the commit message to the user and ask: "Apply this commit? (yes / edit / c
 ### Step 5: Confirm
 
 After committing, show:
+
 ```
 Committed: feat(auth): add device-flow OAuth for GitHub integration
   SHA: <short hash from git log --oneline -1>
@@ -108,20 +113,25 @@ If no commits ahead of base, inform the user and stop.
 **PR Title**: Conventional Commits style, 72 chars max, present tense
 
 **PR Body** template:
+
 ```markdown
 ## Summary
+
 <!-- One paragraph: what this PR does and why -->
 
 ## Changes
-<!-- Bullet list of significant changes -->
--
+
+## <!-- Bullet list of significant changes -->
 
 ## Testing
+
 <!-- How was this tested? -->
+
 - [ ] Unit tests added/updated
 - [ ] Manual testing performed
 
 ## Notes
+
 <!-- Breaking changes, migration steps, follow-up work -->
 ```
 
@@ -132,6 +142,7 @@ Fill in based on the diff and commit history. Be specific — name the files and
 Show the full PR title and body. Ask: "Use this PR description? (yes / edit / cancel)"
 
 If **yes**, print the title and body in a copyable code block for the user to paste into GitHub, or if `gh` CLI is available:
+
 ```bash
 gh pr create --title "..." --body "..."
 ```
@@ -141,11 +152,13 @@ gh pr create --title "..." --body "..."
 ## `/git-workflow branch`
 
 ### Input
+
 The user provides a short description, e.g. "add rate limiting to API" or "fix login crash on iOS".
 
 ### Generate Branch Name
 
 Rules:
+
 - Format: `<type>/<short-slug>`
 - Slug: lowercase, hyphens only, 40 chars max
 - Types: `feat/`, `fix/`, `chore/`, `refactor/`, `docs/`, `test/`, `ci/`
@@ -161,6 +174,7 @@ Examples:
 Present the suggestion and ask: "Create this branch? (yes / different name / cancel)"
 
 If **yes**:
+
 ```bash
 git checkout -b <branch-name>
 ```

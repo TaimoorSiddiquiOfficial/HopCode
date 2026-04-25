@@ -32,6 +32,12 @@ export type ToolFactory = () => Promise<AnyDeclarativeTool>;
 
 const debugLogger = createDebugLogger('TOOL_REGISTRY');
 
+/**
+ * Timeout for in-flight tool factory promises.
+ * If a factory takes longer than this, it will be cleaned up to prevent memory leaks.
+ */
+const INFLIGHT_TOOL_TIMEOUT_MS = 60_000; // 60 seconds
+
 class DiscoveredToolInvocation extends BaseToolInvocation<
   ToolParams,
   ToolResult
@@ -230,6 +236,9 @@ export class ToolRegistry {
    * loaded, otherwise invokes the factory, caches the result, and returns it.
    * Concurrent calls for the same name share a single in-flight promise so the
    * factory is never executed more than once.
+   *
+   * In-flight promises are automatically cleaned up after a timeout to prevent
+   * memory leaks from stalled factory operations.
    */
   async ensureTool(name: string): Promise<AnyDeclarativeTool | undefined> {
     const cached = this.tools.get(name);
@@ -246,17 +255,31 @@ export class ToolRegistry {
     const factory = this.factories.get(name);
     if (!factory) return undefined;
 
-    const load = factory()
-      .then((tool) => {
+    // Create a timeout promise that will clean up the inflight entry
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      const timeoutId = setTimeout(() => {
+        this.inflight.delete(name);
+        reject(
+          new Error(
+            `Tool factory for "${name}" timed out after ${INFLIGHT_TOOL_TIMEOUT_MS}ms`,
+          ),
+        );
+      }, INFLIGHT_TOOL_TIMEOUT_MS);
+      timeoutId.unref(); // Don't keep process alive just for this timeout
+    });
+
+    const load = Promise.race([
+      factory().then((tool) => {
         this.tools.set(name, tool);
         this.factories.delete(name);
         this.inflight.delete(name);
         return tool;
-      })
-      .catch((err: unknown) => {
-        this.inflight.delete(name);
-        throw err;
-      });
+      }),
+      timeoutPromise,
+    ]).catch((err: unknown) => {
+      this.inflight.delete(name);
+      throw err;
+    });
 
     this.inflight.set(name, load);
     return load;

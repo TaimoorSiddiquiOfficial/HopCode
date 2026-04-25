@@ -20,10 +20,7 @@ import type {
   ToolMcpConfirmationDetails,
   ApprovalMode,
 } from '@hoptrendy/hopcode-core';
-import {
-  InputFormat,
-  ToolConfirmationOutcome,
-} from '@hoptrendy/hopcode-core';
+import { InputFormat, ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
 import type {
   CLIControlPermissionRequest,
   CLIControlSetPermissionModeRequest,

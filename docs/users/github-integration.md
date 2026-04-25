@@ -9,6 +9,7 @@
 ## Overview
 
 HopCode now includes native GitHub integration through:
+
 1. **GitHub App Authentication** - JWT-based app authentication
 2. **GitHub MCP Client** - Full GitHub API v3 coverage
 3. **GitHub Subagents** - Specialized agents for GitHub workflows
@@ -34,36 +35,37 @@ Callback URL: https://hopcode.dev/auth/github/callback
 
 **Repository Permissions:**
 
-| Permission | Access | Description |
-|------------|--------|-------------|
-| Contents | Read & Write | Read/write repository contents |
-| Issues | Read & Write | Manage issues |
-| Pull requests | Read & Write | Manage PRs |
-| Workflows | Read & Write | Trigger/manage workflows |
-| Actions | Read & Write | Access workflow runs |
-| Checks | Read & Write | Create check runs |
-| Commit statuses | Read & Write | Create commit statuses |
-| Members | Read | Read team members |
-| Metadata | Read | Always enabled |
-| Projects | Read & Write | Manage projects |
+| Permission      | Access       | Description                    |
+| --------------- | ------------ | ------------------------------ |
+| Contents        | Read & Write | Read/write repository contents |
+| Issues          | Read & Write | Manage issues                  |
+| Pull requests   | Read & Write | Manage PRs                     |
+| Workflows       | Read & Write | Trigger/manage workflows       |
+| Actions         | Read & Write | Access workflow runs           |
+| Checks          | Read & Write | Create check runs              |
+| Commit statuses | Read & Write | Create commit statuses         |
+| Members         | Read         | Read team members              |
+| Metadata        | Read         | Always enabled                 |
+| Projects        | Read & Write | Manage projects                |
 
 **Organization Permissions:**
 
-| Permission | Access | Description |
-|------------|--------|-------------|
-| Members | Read | Read team members |
-| Projects | Read & Write | Manage org projects |
+| Permission | Access       | Description         |
+| ---------- | ------------ | ------------------- |
+| Members    | Read         | Read team members   |
+| Projects   | Read & Write | Manage org projects |
 
 **User Permissions:**
 
-| Permission | Access | Description |
-|------------|--------|-------------|
-| Email | Read | User email |
-| Profile | Read | User profile info |
+| Permission | Access | Description       |
+| ---------- | ------ | ----------------- |
+| Email      | Read   | User email        |
+| Profile    | Read   | User profile info |
 
 ### Step 3: Subscribe to Events
 
 Enable these webhook events:
+
 - Issues
 - Issue comment
 - Pull request
@@ -180,6 +182,7 @@ hopcode -p "/agent github-security-scanner Scan repo for vulnerabilities"
 Available GitHub MCP tools:
 
 **Issues:**
+
 - `github.list_issues` - List issues with filters
 - `github.get_issue` - Get issue details
 - `github.create_issue` - Create new issue
@@ -187,6 +190,7 @@ Available GitHub MCP tools:
 - `github.add_issue_comment` - Add comment
 
 **Pull Requests:**
+
 - `github.list_pull_requests` - List PRs
 - `github.get_pull_request` - Get PR details
 - `github.get_pull_request_files` - Get changed files
@@ -195,6 +199,7 @@ Available GitHub MCP tools:
 - `github.merge_pull_request` - Merge PR
 
 **Workflows:**
+
 - `github.list_workflows` - List workflows
 - `github.trigger_workflow` - Trigger workflow
 - `github.list_workflow_runs` - List runs
@@ -204,6 +209,7 @@ Available GitHub MCP tools:
 - `github.rerun_workflow_run` - Rerun run
 
 **Checks:**
+
 - `github.list_check_runs` - List check runs
 - `github.create_check_run` - Create check run
 - `github.update_check_run` - Update check run
@@ -277,7 +283,7 @@ name: HopCode CI Monitor
 
 on:
   workflow_run:
-    workflows: ["*"]
+    workflows: ['*']
     types: [completed]
 
 jobs:
@@ -383,6 +389,7 @@ await client.createCheckRun('owner', 'repo', { name: 'test', head_sha: '...' });
 **Error**: `Failed to create installation token: 401`
 
 **Solution**:
+
 1. Verify App ID is correct
 2. Check private key format (should include newlines)
 3. Ensure app is installed on the repository
@@ -390,6 +397,7 @@ await client.createCheckRun('owner', 'repo', { name: 'test', head_sha: '...' });
 **Error**: `Rate limit exceeded`
 
 **Solution**:
+
 1. Use installation tokens (cached for 5 minutes)
 2. Implement exponential backoff
 3. Consider GitHub App rate limits (higher than OAuth)
@@ -399,6 +407,7 @@ await client.createCheckRun('owner', 'repo', { name: 'test', head_sha: '...' });
 **Error**: `Resource not accessible by integration`
 
 **Solution**:
+
 1. Check app permissions in GitHub Settings
 2. Ensure repository granted access to app
 3. Reinstall app with correct permissions
@@ -408,6 +417,7 @@ await client.createCheckRun('owner', 'repo', { name: 'test', head_sha: '...' });
 **Error**: `Webhook signature verification failed`
 
 **Solution**:
+
 1. Verify webhook secret matches
 2. Check webhook URL is accessible
 3. Review webhook logs in GitHub App settings

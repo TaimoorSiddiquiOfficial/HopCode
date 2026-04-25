@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type { SlashCommand, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
 
 /**
@@ -14,12 +14,13 @@ export const githubAuthCommand: SlashCommand = {
   name: 'github-auth',
   description: 'Authenticate with GitHub and install HopCode App',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, _args: string): Promise<SlashCommandActionReturn> => {
-    const config = context.services.config;
-    
+  action: async (
+    _context: unknown,
+    _args: string,
+  ): Promise<SlashCommandActionReturn> => {
     // Check if user has GitHub credentials configured
-    const hasCredentials = await checkGitHubCredentials(config);
-    
+    const hasCredentials = await checkGitHubCredentials();
+
     if (!hasCredentials) {
       // User not configured - provide installation link
       return {
@@ -30,8 +31,8 @@ export const githubAuthCommand: SlashCommand = {
     }
 
     // User has credentials - verify authentication
-    const isAuthenticated = await verifyGitHubAuthentication(config);
-    
+    const isAuthenticated = await verifyGitHubAuthentication();
+
     if (!isAuthenticated) {
       return {
         type: 'message',
@@ -44,47 +45,31 @@ export const githubAuthCommand: SlashCommand = {
     return {
       type: 'message',
       messageType: 'success',
-      content: generateAuthenticatedMessage(config),
+      content: generateAuthenticatedMessage(),
     };
   },
 };
 
 /**
- * Check if user has GitHub credentials configured
+ * Check if user has GitHub credentials configured via environment variables.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function checkGitHubCredentials(config: any): Promise<boolean> {
-  if (!config) {
-    return false;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings = ({ github: { appId: process.env.GITHUB_APP_ID, privateKey: process.env.GITHUB_APP_PRIVATE_KEY, clientId: process.env.GITHUB_CLIENT_ID, clientSecret: process.env.GITHUB_CLIENT_SECRET } } as any);
-  const githubConfig = settings?.github;
-
-  // Check for required JWT auth credentials
-  const hasAppId = !!githubConfig?.appId;
-  const hasPrivateKey = !!githubConfig?.privateKey;
-
-  // Also check environment variables
-  const envAppId = !!process.env.GITHUB_APP_ID;
-  const envPrivateKey = !!process.env.GITHUB_APP_PRIVATE_KEY;
-
-  return (hasAppId && hasPrivateKey) || (envAppId && envPrivateKey);
+async function checkGitHubCredentials(): Promise<boolean> {
+  return !!process.env.GITHUB_APP_ID && !!process.env.GITHUB_APP_PRIVATE_KEY;
 }
 
 /**
  * Verify GitHub authentication works
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function verifyGitHubAuthentication(_config: any): Promise<boolean> {
+async function verifyGitHubAuthentication(): Promise<boolean> {
   try {
     // TODO: Implement actual authentication test
     // For now, just check credentials exist
     return true;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('GitHub auth verification failed:', error);
+    // Use debugLogger instead of console for proper logging
+    const { createDebugLogger } = await import('@hoptrendy/hopcode-core');
+    const debugLogger = createDebugLogger('github-auth');
+    debugLogger.error('GitHub auth verification failed:', error);
     return false;
   }
 }
@@ -96,7 +81,7 @@ function generateInstallationInstructions(): string {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const appId = '3424564';
   const appName = 'hopcode-ai-agent'; // Replace with your actual app name
-  
+
   return `# 🔐 GitHub Authentication Required
 
 ## Step 1: Install HopCode GitHub App
@@ -248,12 +233,9 @@ See: \`docs/users/GITHUB_QUICK_START.md\` for detailed setup.`;
 /**
  * Generate success message for authenticated users
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function generateAuthenticatedMessage(_config: any): string {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings = ({ github: { appId: process.env.GITHUB_APP_ID, privateKey: process.env.GITHUB_APP_PRIVATE_KEY } } as any);
-  const appId = settings?.github?.appId || process.env.GITHUB_APP_ID || 'Unknown';
-  
+function generateAuthenticatedMessage(): string {
+  const appId = process.env.GITHUB_APP_ID || 'Unknown';
+
   return `# ✅ GitHub Authentication Successful
 
 **App ID**: ${appId}  

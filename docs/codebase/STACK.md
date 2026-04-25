@@ -15,15 +15,15 @@
 
 ## Major Packages
 
-| Package | Version | Description |
-|---------|---------|-------------|
-| `@hoptrendy/hopcode-cli` | 0.15.3 | CLI entry point with Ink-based terminal UI |
-| `@hoptrendy/hopcode-core` | 0.15.3 | Core logic: providers, agents, tools, MCP |
-| `@hoptrendy/sdk` | 0.15.1 | TypeScript SDK for programmatic access |
-| `hopcode-vscode-ide-companion` | 0.15.3 | VS Code extension (native sidebar integration) |
-| `@hoptrendy/web-templates` | - | Web UI component templates |
-| `@hoptrendy/webui` | - | Shared web UI components |
-| `@hoptrendy/channel-*` | - | Enterprise messaging channels (WeChat, DingTalk, Discord, Telegram) |
+| Package                        | Version | Description                                                         |
+| ------------------------------ | ------- | ------------------------------------------------------------------- |
+| `@hoptrendy/hopcode-cli`       | 0.15.3  | CLI entry point with Ink-based terminal UI                          |
+| `@hoptrendy/hopcode-core`      | 0.15.3  | Core logic: providers, agents, tools, MCP                           |
+| `@hoptrendy/sdk`               | 0.15.1  | TypeScript SDK for programmatic access                              |
+| `hopcode-vscode-ide-companion` | 0.15.3  | VS Code extension (native sidebar integration)                      |
+| `@hoptrendy/web-templates`     | -       | Web UI component templates                                          |
+| `@hoptrendy/webui`             | -       | Shared web UI components                                            |
+| `@hoptrendy/channel-*`         | -       | Enterprise messaging channels (WeChat, DingTalk, Discord, Telegram) |
 
 ## AI/LLM Integration
 

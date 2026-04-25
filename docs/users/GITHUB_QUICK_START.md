@@ -7,11 +7,11 @@
 
 ## Your Credentials
 
-| Credential | Value | Location |
-|------------|-------|----------|
-| **App ID** | `3424564` | Configured |
-| **Client ID** | `Iv23livRiRBTa9cyBnk1` | Reference only |
-| **Private Key** | ✅ Available | `.github/hopcode-cli.2026-04-23.private-key.pem` |
+| Credential      | Value                  | Location                                         |
+| --------------- | ---------------------- | ------------------------------------------------ |
+| **App ID**      | `3424564`              | Configured                                       |
+| **Client ID**   | `Iv23livRiRBTa9cyBnk1` | Reference only                                   |
+| **Private Key** | ✅ Available           | `.github/hopcode-cli.2026-04-23.private-key.pem` |
 
 ---
 
@@ -71,15 +71,15 @@ hopcode -p "/agent github-ci-monitor Check CI status"
 
 ## Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `/github auth` | Authentication status |
-| `/github issues` | Manage issues |
-| `/github pr` | Review pull requests |
-| `/github ci` | Check CI/CD |
-| `/github workflow` | Manage workflows |
-| `/github release` | Create releases |
-| `/github security` | Security scanning |
+| Command            | Description           |
+| ------------------ | --------------------- |
+| `/github auth`     | Authentication status |
+| `/github issues`   | Manage issues         |
+| `/github pr`       | Review pull requests  |
+| `/github ci`       | Check CI/CD           |
+| `/github workflow` | Manage workflows      |
+| `/github release`  | Create releases       |
+| `/github security` | Security scanning     |
 
 ---
 
@@ -95,14 +95,17 @@ hopcode -p "/agent github-ci-monitor Check CI status"
 ## Troubleshooting
 
 **"Permission denied" errors:**
+
 - Check app is installed on the repository
 - Verify repository permissions in GitHub App settings
 
 **"Invalid private key" errors:**
+
 - Ensure PEM file content includes newlines (`\n`)
 - Check file wasn't corrupted during copy
 
 **"Rate limit exceeded":**
+
 - Installation tokens are cached for 5 minutes
 - GitHub App limits are much higher than OAuth
 

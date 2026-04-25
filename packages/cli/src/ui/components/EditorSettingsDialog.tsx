@@ -18,10 +18,7 @@ import { ScopeSelector } from './shared/ScopeSelector.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
 import type { EditorType } from '@hoptrendy/hopcode-core';
-import {
-  createDebugLogger,
-  isEditorAvailable,
-} from '@hoptrendy/hopcode-core';
+import { createDebugLogger, isEditorAvailable } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { t } from '../../i18n/index.js';
 

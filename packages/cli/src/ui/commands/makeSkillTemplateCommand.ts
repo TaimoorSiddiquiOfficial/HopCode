@@ -4,17 +4,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type {
+  SlashCommand,
+  CommandContext,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 
 /**
  * Make Skill Template Command
- * 
+ *
  * Generates a complete MCP server implementation from a natural language description.
  * Creates tool definitions, handler code, tests, and registers the server in .hopcode/mcp.json.
- * 
+ *
  * Usage: /make-skill-template <description>
  * Example: /make-skill-template "Create a skill for interacting with Linear API for issue tracking"
  */
@@ -23,7 +27,10 @@ export const makeSkillTemplateCommand: SlashCommand = {
   description:
     'Generate a complete MCP server skill from a description (tools, handlers, tests, config)',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, args: string): Promise<SlashCommandActionReturn> => {
+  action: async (
+    context: CommandContext,
+    args: string,
+  ): Promise<SlashCommandActionReturn> => {
     if (!args || args.trim().length === 0) {
       return {
         type: 'message',
@@ -48,7 +55,11 @@ export const makeSkillTemplateCommand: SlashCommand = {
 
     try {
       const skillName = extractSkillName(args);
-      const generatedFiles = await generateSkillTemplate(context, skillName, args);
+      const generatedFiles = await generateSkillTemplate(
+        context,
+        skillName,
+        args,
+      );
 
       return {
         type: 'message',
@@ -56,7 +67,8 @@ export const makeSkillTemplateCommand: SlashCommand = {
         content: generateSuccessReport(skillName, generatedFiles),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       return {
         type: 'message',
         messageType: 'error',
@@ -146,7 +158,10 @@ async function generateSkillTemplate(
 /**
  * Generate MCP server TypeScript code
  */
-function generateMcpServer(skillName: string, description: string): GeneratedFile {
+function generateMcpServer(
+  skillName: string,
+  description: string,
+): GeneratedFile {
   const pascalCaseName = toPascalCase(skillName);
   const camelCaseName = toCamelCase(skillName);
 
@@ -649,7 +664,10 @@ Apache-2.0
 /**
  * Generate package.json
  */
-function generatePackageJson(skillName: string, description: string): GeneratedFile {
+function generatePackageJson(
+  skillName: string,
+  description: string,
+): GeneratedFile {
   return {
     path: 'package.json',
     description: 'NPM package configuration',
@@ -727,7 +745,10 @@ function generateTsConfig(_skillName: string): GeneratedFile {
 /**
  * Update MCP configuration
  */
-function updateMcpConfig(skillName: string, configPath: string): GeneratedFile | null {
+function updateMcpConfig(
+  skillName: string,
+  configPath: string,
+): GeneratedFile | null {
   try {
     let config: Record<string, unknown> = { mcpServers: {} };
 
@@ -758,7 +779,7 @@ function updateMcpConfig(skillName: string, configPath: string): GeneratedFile |
 function toPascalCase(str: string): string {
   return str
     .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join('');
 }
 
@@ -770,14 +791,17 @@ function toCamelCase(str: string): string {
 /**
  * Generate success report
  */
-function generateSuccessReport(skillName: string, files: GeneratedFile[]): string {
+function generateSuccessReport(
+  skillName: string,
+  files: GeneratedFile[],
+): string {
   return `# ✅ Skill Template Generated: \`${skillName}\`
 
 ## Generated Files (${files.length})
 
 | File | Description |
 |------|-------------|
-${files.map(f => `| \`${f.path}\` | ${f.description} |`).join('\n')}
+${files.map((f) => `| \`${f.path}\` | ${f.description} |`).join('\n')}
 
 ## Next Steps
 

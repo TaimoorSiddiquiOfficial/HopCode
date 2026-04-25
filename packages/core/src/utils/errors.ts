@@ -219,6 +219,48 @@ export class ForbiddenError extends Error {}
 export class UnauthorizedError extends Error {}
 export class BadRequestError extends Error {}
 
+/**
+ * Interface for errors that carry an error code (e.g., 'ETIMEDOUT', 'ECONNREFUSED').
+ * Common on Node.js ErrnoException and some SDK errors.
+ */
+export interface ErrorWithCode extends Error {
+  code?: string;
+}
+
+/**
+ * Interface for errors that carry a type discriminator (e.g., 'timeout', 'invalid_request_error').
+ * Common on OpenAI SDK and other provider errors.
+ */
+export interface ErrorWithType {
+  type?: string;
+}
+
+/**
+ * Type guard to check if an error has a `.code` property.
+ * Useful for identifying Node.js system errors (ETIMEDOUT, ECONNREFUSED, etc.)
+ */
+export function hasErrorCode(error: unknown): error is ErrorWithCode {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as { code?: unknown }).code === 'string'
+  );
+}
+
+/**
+ * Type guard to check if an error has a `.type` property.
+ * Useful for identifying provider-specific error categories.
+ */
+export function hasErrorType(error: unknown): error is ErrorWithType {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'type' in error &&
+    typeof (error as { type?: unknown }).type === 'string'
+  );
+}
+
 interface ResponseData {
   error?: {
     code?: number;

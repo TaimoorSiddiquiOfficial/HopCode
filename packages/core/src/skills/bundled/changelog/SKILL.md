@@ -17,16 +17,19 @@ You are a changelog automation agent. You read git history since the last releas
 ## Step 1: Determine Version Range
 
 Get the last tag:
+
 ```bash
 git describe --tags --abbrev=0 2>/dev/null || echo "none"
 ```
 
 Get the current version from `package.json`:
+
 ```bash
 node -p "require('./package.json').version" 2>/dev/null
 ```
 
 If no tags exist, use the entire git history. If a tag exists, get commits since that tag:
+
 ```bash
 git log <last-tag>..HEAD --oneline --no-merges
 ```
@@ -36,11 +39,13 @@ git log <last-tag>..HEAD --oneline --no-merges
 ## Step 2: Parse Commits
 
 Get full commit details:
+
 ```bash
 git log <last-tag>..HEAD --pretty=format:"%h %s" --no-merges
 ```
 
 Parse each commit message and group into sections:
+
 - **Breaking Changes** (commits with `!` or `BREAKING CHANGE:` footer — always include)
 - **Added** (feat commits)
 - **Fixed** (fix commits)
@@ -61,17 +66,21 @@ Use Keep a Changelog format:
 ## [<version>] - <date>
 
 ### Breaking Changes
+
 - **feat(auth)!**: remove legacy API key format — tokens must now use `hc_` prefix ([abc1234])
 
 ### Added
+
 - feat(skills): add spec-driven development workflow skill ([def5678])
 - feat(model): support Ollama Cloud model switching ([ghi9012])
 
 ### Fixed
+
 - fix(auth): resolve paste corruption on Windows when entering API key ([jkl3456])
 ```
 
 Rules:
+
 - Date format: `YYYY-MM-DD`
 - Short 7-char commit hash in parentheses at end of each line
 - Remove `feat:` / `fix:` prefixes in bullet text (implied by section heading)
@@ -82,10 +91,12 @@ Rules:
 ## Step 4: Read Existing CHANGELOG.md
 
 If `CHANGELOG.md` exists:
+
 - Prepend the new entry below the `# Changelog` header
 - Keep all existing entries intact
 
 If no `CHANGELOG.md` exists, create it with:
+
 ```markdown
 # Changelog
 
@@ -97,6 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [<version>] - <date>
+
 ...
 ```
 

@@ -8,11 +8,11 @@ Each time you launch HopCode, a tip is shown in the header area. Tips are select
 
 New users see onboarding-focused tips during their first sessions:
 
-| Sessions | Example tips                                         |
-| -------- | ---------------------------------------------------- |
-| < 5      | Slash commands (`/`), Tab autocomplete               |
+| Sessions | Example tips                                            |
+| -------- | ------------------------------------------------------- |
+| < 5      | Slash commands (`/`), Tab autocomplete                  |
 | < 10     | `HOPCODE.md` project context, `--continue` / `--resume` |
-| < 15     | Shell commands with `!` prefix                       |
+| < 15     | Shell commands with `!` prefix                          |
 
 After that, tips rotate through general features like `/compress`, `/approval-mode`, `/insight`, `/btw`, and more.
 

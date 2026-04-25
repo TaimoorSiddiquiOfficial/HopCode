@@ -116,11 +116,11 @@ Arena behavior can be customized in [settings.json](/users/configuration/setting
 }
 ```
 
-| Setting                   | Description                        | Default              |
-| :------------------------ | :--------------------------------- | :------------------- |
-| `arena.worktreeBaseDir`   | Base directory for arena worktrees | `~/.hopcode/arena`   |
-| `arena.maxRoundsPerAgent` | Maximum reasoning rounds per agent | `50`            |
-| `arena.timeoutSeconds`    | Timeout for each agent in seconds  | `600`           |
+| Setting                   | Description                        | Default            |
+| :------------------------ | :--------------------------------- | :----------------- |
+| `arena.worktreeBaseDir`   | Base directory for arena worktrees | `~/.hopcode/arena` |
+| `arena.maxRoundsPerAgent` | Maximum reasoning rounds per agent | `50`               |
+| `arena.timeoutSeconds`    | Timeout for each agent in seconds  | `600`              |
 
 ## Best practices
 

@@ -563,7 +563,9 @@ export const useAuthCommand = (
     * or broken authentication cycles.
     */
   useEffect(() => {
-    const defaultAuthType = (process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ?? process.env['QWEN_DEFAULT_AUTH_TYPE']);
+    const defaultAuthType =
+      process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ??
+      process.env['QWEN_DEFAULT_AUTH_TYPE'];
     if (
       defaultAuthType &&
       ![

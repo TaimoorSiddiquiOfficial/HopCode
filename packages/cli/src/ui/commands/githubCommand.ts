@@ -4,31 +4,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type {
+  SlashCommand,
+  CommandContext,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 
 // GitHub App configuration
 const GITHUB_APP_ID = '3424564';
-const INSTALLATION_URL = 'https://github.com/apps/hopcode-cli/installations/select_target';
+const INSTALLATION_URL =
+  'https://github.com/apps/hopcode-cli/installations/select_target';
 
 /**
- * Check if user has GitHub credentials configured
+ * Check if user has GitHub credentials configured via environment variables.
+ * Note: GitHub App credentials are currently only supported via environment
+ * variables (GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY).
  */
-function hasGitHubCredentials(context: CommandContext): boolean {
-  const config = context.services.config;
-  if (!config) return false;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings = ({ github: { appId: process.env.GITHUB_APP_ID, privateKey: process.env.GITHUB_APP_PRIVATE_KEY } } as any);
-  const githubConfig = settings?.github;
-
-  // Check settings.json
-  const hasSettingsAuth = !!githubConfig?.appId && !!githubConfig?.privateKey;
-  
-  // Check environment variables
-  const hasEnvAuth = !!process.env.GITHUB_APP_ID && !!process.env.GITHUB_APP_PRIVATE_KEY;
-
-  return hasSettingsAuth || hasEnvAuth;
+function hasGitHubCredentials(_context: CommandContext): boolean {
+  return !!process.env.GITHUB_APP_ID && !!process.env.GITHUB_APP_PRIVATE_KEY;
 }
 
 /**
@@ -38,13 +32,16 @@ export const githubCommand: SlashCommand = {
   name: 'github',
   description: 'GitHub integration - manage issues, PRs, workflows, and more',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, args: string): Promise<SlashCommandActionReturn> => {
+  action: async (
+    context: CommandContext,
+    args: string,
+  ): Promise<SlashCommandActionReturn> => {
     const subCommand = args.trim();
 
     // If no subcommand, show installation link or status
     if (!subCommand) {
       const hasCredentials = hasGitHubCredentials(context);
-      
+
       if (!hasCredentials) {
         // User not configured - show installation link and Device Flow option
         return {
@@ -226,7 +223,7 @@ Available commands:
   },
   completion: async (context: CommandContext, partialArg: string) => {
     const hasCredentials = hasGitHubCredentials(context);
-    
+
     const suggestions = hasCredentials
       ? [
           { label: 'auth', description: 'Check authentication' },

@@ -144,7 +144,7 @@ const config = {
 const config = {
   model: 'gpt-4o',
   provider: 'openai',
-  tools: ['read-file', 'write-file']
+  tools: ['read-file', 'write-file'],
 };
 ```
 
@@ -159,7 +159,7 @@ const message = 'Hello, World!';
 const greeting = `Hello, ${name}!`;
 
 // ❌ Bad
-const message = "Hello, World!";
+const message = 'Hello, World!';
 ```
 
 ### Braces
@@ -169,13 +169,11 @@ const message = "Hello, World!";
 
 ```typescript
 // Control structures
-if (condition)
-{
+if (condition) {
   // ...
 }
 
-for (let i = 0; i < 10; i++)
-{
+for (let i = 0; i < 10; i++) {
   // ...
 }
 
@@ -483,6 +481,7 @@ chore: Update dependencies
 ### PR Titles
 
 Follow Conventional Commits format:
+
 - `feat: Add arena mode for multi-model comparison`
 - `fix: Handle rate limit errors gracefully`
 - `chore: Bump AI SDK to 5.0.124`

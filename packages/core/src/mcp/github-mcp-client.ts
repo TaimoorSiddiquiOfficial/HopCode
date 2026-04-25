@@ -109,7 +109,14 @@ export interface GitHubCheckRun {
   node_id: string;
   head_sha: string;
   status: 'queued' | 'in_progress' | 'completed';
-  conclusion: 'success' | 'failure' | 'neutral' | 'cancelled' | 'skipped' | 'stale' | null;
+  conclusion:
+    | 'success'
+    | 'failure'
+    | 'neutral'
+    | 'cancelled'
+    | 'skipped'
+    | 'stale'
+    | null;
   started_at: string;
   completed_at: string;
   output: {
@@ -134,7 +141,7 @@ export class GitHubMCPClient {
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
     });
-    
+
     this.auth = githubAuth;
     this.baseUrl = githubAuth.getBaseUrl();
   }
@@ -142,11 +149,14 @@ export class GitHubMCPClient {
   /**
    * Get authorization headers for API requests
    */
-  private async getAuthHeaders(owner: string, repo: string): Promise<Record<string, string>> {
+  private async getAuthHeaders(
+    owner: string,
+    repo: string,
+  ): Promise<Record<string, string>> {
     const token = await this.auth.getTokenForRepository(owner, repo);
     return {
-      'Authorization': `Bearer ${token.token}`,
-      'Accept': 'application/vnd.github+json',
+      Authorization: `Bearer ${token.token}`,
+      Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
       'User-Agent': 'HopCode-GitHub-MCP',
     };
@@ -162,19 +172,24 @@ export class GitHubMCPClient {
     debugLogger.debug(`GET ${url}`);
 
     const response = await fetch(url, { headers });
-    
+
     if (!response.ok) {
       const error = await response.text();
       throw new Error(`GitHub API error: ${response.status} ${error}`);
     }
 
-    return await response.json() as T;
+    return (await response.json()) as T;
   }
 
   /**
    * Make authenticated POST request
    */
-  private async post<T>(owner: string, repo: string, path: string, body?: unknown): Promise<T> {
+  private async post<T>(
+    owner: string,
+    repo: string,
+    path: string,
+    body?: unknown,
+  ): Promise<T> {
     const url = `${this.baseUrl}/repos/${owner}/${repo}${path}`;
     const headers = await this.getAuthHeaders(owner, repo);
 
@@ -194,13 +209,18 @@ export class GitHubMCPClient {
       throw new Error(`GitHub API error: ${response.status} ${error}`);
     }
 
-    return await response.json() as T;
+    return (await response.json()) as T;
   }
 
   /**
    * Make authenticated PATCH request
    */
-  private async patch<T>(owner: string, repo: string, path: string, body: unknown): Promise<T> {
+  private async patch<T>(
+    owner: string,
+    repo: string,
+    path: string,
+    body: unknown,
+  ): Promise<T> {
     const url = `${this.baseUrl}/repos/${owner}/${repo}${path}`;
     const headers = await this.getAuthHeaders(owner, repo);
 
@@ -220,13 +240,18 @@ export class GitHubMCPClient {
       throw new Error(`GitHub API error: ${response.status} ${error}`);
     }
 
-    return await response.json() as T;
+    return (await response.json()) as T;
   }
 
   /**
    * Make authenticated PUT request
    */
-  private async put<T>(owner: string, repo: string, path: string, body?: unknown): Promise<T> {
+  private async put<T>(
+    owner: string,
+    repo: string,
+    path: string,
+    body?: unknown,
+  ): Promise<T> {
     const url = `${this.baseUrl}/repos/${owner}/${repo}${path}`;
     const headers = await this.getAuthHeaders(owner, repo);
 
@@ -246,13 +271,17 @@ export class GitHubMCPClient {
       throw new Error(`GitHub API error: ${response.status} ${error}`);
     }
 
-    return await response.json() as T;
+    return (await response.json()) as T;
   }
 
   /**
    * Make authenticated DELETE request
    */
-  private async delete(owner: string, repo: string, path: string): Promise<void> {
+  private async delete(
+    owner: string,
+    repo: string,
+    path: string,
+  ): Promise<void> {
     const url = `${this.baseUrl}/repos/${owner}/${repo}${path}`;
     const headers = await this.getAuthHeaders(owner, repo);
 
@@ -298,14 +327,18 @@ export class GitHubMCPClient {
 
     const queryString = params.toString();
     const path = `/issues${queryString ? `?${queryString}` : ''}`;
-    
+
     return await this.get(owner, repo, path);
   }
 
   /**
    * Get issue by number
    */
-  async getIssue(owner: string, repo: string, issueNumber: number): Promise<GitHubIssue> {
+  async getIssue(
+    owner: string,
+    repo: string,
+    issueNumber: number,
+  ): Promise<GitHubIssue> {
     return await this.get(owner, repo, `/issues/${issueNumber}`);
   }
 
@@ -354,7 +387,9 @@ export class GitHubMCPClient {
     issueNumber: number,
     body: string,
   ): Promise<{ id: number; body: string; created_at: string }> {
-    return await this.post(owner, repo, `/issues/${issueNumber}/comments`, { body });
+    return await this.post(owner, repo, `/issues/${issueNumber}/comments`, {
+      body,
+    });
   }
 
   // ==================== PULL REQUESTS ====================
@@ -386,14 +421,18 @@ export class GitHubMCPClient {
 
     const queryString = params.toString();
     const path = `/pulls${queryString ? `?${queryString}` : ''}`;
-    
+
     return await this.get(owner, repo, path);
   }
 
   /**
    * Get pull request by number
    */
-  async getPullRequest(owner: string, repo: string, prNumber: number): Promise<GitHubPullRequest> {
+  async getPullRequest(
+    owner: string,
+    repo: string,
+    prNumber: number,
+  ): Promise<GitHubPullRequest> {
     return await this.get(owner, repo, `/pulls/${prNumber}`);
   }
 
@@ -465,7 +504,10 @@ export class GitHubMCPClient {
   /**
    * List workflows
    */
-  async listWorkflows(owner: string, repo: string): Promise<{ workflows: GitHubWorkflow[] }> {
+  async listWorkflows(
+    owner: string,
+    repo: string,
+  ): Promise<{ workflows: GitHubWorkflow[] }> {
     return await this.get(owner, repo, '/actions/workflows');
   }
 
@@ -481,7 +523,12 @@ export class GitHubMCPClient {
       inputs?: Record<string, string>;
     },
   ): Promise<{ id: number; node_id: string }> {
-    return await this.post(owner, repo, `/actions/workflows/${workflowId}/dispatches`, data);
+    return await this.post(
+      owner,
+      repo,
+      `/actions/workflows/${workflowId}/dispatches`,
+      data,
+    );
   }
 
   /**
@@ -508,7 +555,7 @@ export class GitHubMCPClient {
 
     const queryString = params.toString();
     const path = `/actions/workflows/${workflowId}/runs${queryString ? `?${queryString}` : ''}`;
-    
+
     return await this.get(owner, repo, path);
   }
 
@@ -526,14 +573,22 @@ export class GitHubMCPClient {
   /**
    * Cancel workflow run
    */
-  async cancelWorkflowRun(owner: string, repo: string, runId: number): Promise<void> {
+  async cancelWorkflowRun(
+    owner: string,
+    repo: string,
+    runId: number,
+  ): Promise<void> {
     await this.post(owner, repo, `/actions/runs/${runId}/cancel`);
   }
 
   /**
    * Rerun workflow run
    */
-  async rerunWorkflowRun(owner: string, repo: string, runId: number): Promise<void> {
+  async rerunWorkflowRun(
+    owner: string,
+    repo: string,
+    runId: number,
+  ): Promise<void> {
     await this.post(owner, repo, `/actions/runs/${runId}/rerun`);
   }
 
@@ -563,7 +618,7 @@ export class GitHubMCPClient {
 
     const queryString = params.toString();
     const path = `/commits/${ref}/check-runs${queryString ? `?${queryString}` : ''}`;
-    
+
     return await this.get(owner, repo, path);
   }
 
@@ -577,7 +632,13 @@ export class GitHubMCPClient {
       name: string;
       head_sha: string;
       status?: 'queued' | 'in_progress' | 'completed';
-      conclusion?: 'success' | 'failure' | 'neutral' | 'cancelled' | 'skipped' | 'stale';
+      conclusion?:
+        | 'success'
+        | 'failure'
+        | 'neutral'
+        | 'cancelled'
+        | 'skipped'
+        | 'stale';
       output?: {
         title: string;
         summary: string;
@@ -609,7 +670,13 @@ export class GitHubMCPClient {
     data: {
       name?: string;
       status?: 'queued' | 'in_progress' | 'completed';
-      conclusion?: 'success' | 'failure' | 'neutral' | 'cancelled' | 'skipped' | 'stale';
+      conclusion?:
+        | 'success'
+        | 'failure'
+        | 'neutral'
+        | 'cancelled'
+        | 'skipped'
+        | 'stale';
       output?: {
         title: string;
         summary: string;

@@ -19,7 +19,7 @@ on:
 jobs:
   hopcode-assist:
     # Only run when comment starts with /hopcode
-    if: 'startsWith(github.event.comment.body, ''/hopcode'')'
+    if: "startsWith(github.event.comment.body, '/hopcode')"
     runs-on: 'ubuntu-latest'
     permissions:
       contents: 'write'

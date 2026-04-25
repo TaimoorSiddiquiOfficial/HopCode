@@ -18,6 +18,7 @@ import type {
   ToolConfirmationPayload,
 } from '../tools.js';
 import type { Config } from '../../config/config.js';
+import { createConfigOverride } from '../../config/config.js';
 import type { SubagentManager } from '../../subagents/subagent-manager.js';
 import type { SubagentConfig } from '../../subagents/types.js';
 import { AgentTerminateMode } from '../../agents/runtime/agent-types.js';
@@ -152,10 +153,9 @@ function permissionModeToApprovalMode(mode: PermissionMode): ApprovalMode {
  * Uses prototype delegation to avoid mutating the parent config.
  */
 function createApprovalModeOverride(base: Config, mode: ApprovalMode): Config {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const override = Object.create(base) as any;
-  override.getApprovalMode = (): ApprovalMode => mode;
-  return override as Config;
+  return createConfigOverride(base, {
+    getApprovalMode: () => mode,
+  });
 }
 
 /**
@@ -665,7 +665,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           initialMessages = [...rawHistory];
         }
       } else {
-        // History ends with user (unusual) — drop the trailing user
+        // History ends with user (unusual) ï¿½ drop the trailing user
         // message to avoid consecutive user messages when agent-headless
         // sends the task_prompt.
         initialMessages = rawHistory.slice(0, -1);
@@ -687,7 +687,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
 
     const generationConfig = geminiClient?.getChat().getGenerationConfig();
     if (generationConfig?.systemInstruction) {
-      // Inline FunctionDeclaration[] from the parent — passed verbatim
+      // Inline FunctionDeclaration[] from the parent ï¿½ passed verbatim
       // (including `agent` and cron tools) so the fork's system prompt,
       // tools, and history exactly match the parent's and share its
       // DashScope cache prefix. A fork is a context-sharing extension of
@@ -733,7 +733,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
   }
 
   // Runs the SubagentStop hook after execution. On a blocking decision, feeds the
-  // reason back and re-executes — up to 5 iterations to defend against a
+  // reason back and re-executes ï¿½ up to 5 iterations to defend against a
   // misconfigured hook looping forever.
   private async runSubagentStopHookLoop(
     subagent: AgentHeadless,
@@ -1024,7 +1024,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           }
         }
 
-        // Create an independent AbortController — background agents
+        // Create an independent AbortController ï¿½ background agents
         // survive ESC cancellation of the parent's current turn.
         const bgAbortController = new AbortController();
 
@@ -1032,11 +1032,12 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         // auto-denied rather than auto-approved (YOLO). PermissionRequest hooks
         // still run and can override. Use Object.create so the resolved approval
         // mode override (e.g. subagent-level `approvalMode: auto-edit`) is preserved.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const bgConfig = Object.create(agentConfig) as any;
-        bgConfig.getShouldAvoidPermissionPrompts = () => true;
+        const bgConfig = Object.create(agentConfig) as Config;
+        (
+          bgConfig as unknown as Record<string, unknown>
+        ).getShouldAvoidPermissionPrompts = () => true;
 
-        // Register in the background task registry only AFTER init succeeds — if
+        // Register in the background task registry only AFTER init succeeds ï¿½ if
         // construction throws, a pre-registered phantom 'running' entry would hang
         // the non-interactive hold-back loop forever.
         let bgSubagent: AgentHeadless;
@@ -1073,7 +1074,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         // Fire-and-forget: start the subagent without blocking the parent.
         // For forks, wrap the body in runInForkContext so the recursive-fork
         // guard in execute() fires if the fork child's model calls `agent`
-        // again — otherwise background forks bypass the ALS marker and can
+        // again ï¿½ otherwise background forks bypass the ALS marker and can
         // spawn nested implicit forks.
         const bgBody = async () => {
           try {

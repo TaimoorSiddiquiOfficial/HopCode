@@ -17,18 +17,18 @@ Comprehensive security rules for web application development. Every anti-pattern
 
 ## OWASP Top 10 — 2025 Quick Reference
 
-| # | Category | Key Mitigation |
-|---|----------|----------------|
-| A01 | Broken Access Control | Auth middleware on every endpoint, RBAC, ownership checks |
-| A02 | Security Misconfiguration | Security headers, no debug in prod, no default credentials |
-| A03 | Software Supply Chain Failures *(NEW)* | `npm audit`, lockfile integrity, SBOM, SLSA provenance |
-| A04 | Cryptographic Failures | Argon2id/bcrypt for passwords, TLS everywhere, no secrets in code |
-| A05 | Injection | Parameterized queries, input validation, no raw HTML with user input |
-| A06 | Insecure Design | Threat modeling, secure design patterns, abuse case testing |
-| A07 | Authentication Failures | Rate-limit login, secure session management, MFA |
-| A08 | Software or Data Integrity Failures | SRI for CDN scripts, signed artifacts, no insecure deserialization |
-| A09 | Security Logging and Alerting Failures | Log security events, no PII in logs, correlation IDs, active alerting |
-| A10 | Mishandling of Exceptional Conditions *(NEW)* | Handle all errors, no stack traces in prod, fail-secure |
+| #   | Category                                      | Key Mitigation                                                        |
+| --- | --------------------------------------------- | --------------------------------------------------------------------- |
+| A01 | Broken Access Control                         | Auth middleware on every endpoint, RBAC, ownership checks             |
+| A02 | Security Misconfiguration                     | Security headers, no debug in prod, no default credentials            |
+| A03 | Software Supply Chain Failures _(NEW)_        | `npm audit`, lockfile integrity, SBOM, SLSA provenance                |
+| A04 | Cryptographic Failures                        | Argon2id/bcrypt for passwords, TLS everywhere, no secrets in code     |
+| A05 | Injection                                     | Parameterized queries, input validation, no raw HTML with user input  |
+| A06 | Insecure Design                               | Threat modeling, secure design patterns, abuse case testing           |
+| A07 | Authentication Failures                       | Rate-limit login, secure session management, MFA                      |
+| A08 | Software or Data Integrity Failures           | SRI for CDN scripts, signed artifacts, no insecure deserialization    |
+| A09 | Security Logging and Alerting Failures        | Log security events, no PII in logs, correlation IDs, active alerting |
+| A10 | Mishandling of Exceptional Conditions _(NEW)_ | Handle all errors, no stack traces in prod, fail-secure               |
 
 ---
 
@@ -45,7 +45,9 @@ Comprehensive security rules for web application development. Every anti-pattern
 const unsafeResult = await db.query(`SELECT * FROM users WHERE id = ${userId}`);
 
 // GOOD — parameterized query
-const safeResult = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+const safeResult = await db.query('SELECT * FROM users WHERE id = $1', [
+  userId,
+]);
 ```
 
 ### I2: NoSQL Injection (MongoDB Operator Injection)
@@ -56,13 +58,16 @@ const safeResult = await db.query('SELECT * FROM users WHERE id = $1', [userId])
 
 ```typescript
 // BAD — attacker sends { "password": { "$gt": "" } }
-const user = await User.findOne({ username: req.body.username, password: req.body.password });
+const user = await User.findOne({
+  username: req.body.username,
+  password: req.body.password,
+});
 
 // GOOD — validate and cast input types
 const username = String(req.body.username);
 const password = String(req.body.password);
 const user = await User.findOne({ username });
-const valid = user && await verifyPassword(user.passwordHash, password);
+const valid = user && (await verifyPassword(user.passwordHash, password));
 ```
 
 ### I3: Command Injection (exec with User Input)
@@ -84,8 +89,8 @@ const pExecFile = promisify(execFile);
 const dir = String(req.query.dir ?? '');
 if (!dir || dir.startsWith('-')) throw new Error('Invalid directory');
 const { stdout: safeOutput } = await pExecFile('ls', ['-la', '--', dir], {
-  timeout: 5_000,      // fail fast on hung processes
-  maxBuffer: 1 << 20,  // 1 MiB cap to prevent memory exhaustion
+  timeout: 5_000, // fail fast on hung processes
+  maxBuffer: 1 << 20, // 1 MiB cap to prevent memory exhaustion
 });
 
 // BEST — allowlist validation on top of the async, bounded call above
@@ -135,7 +140,12 @@ function isPrivateIP(ip: string): boolean {
   // Normalize IPv4-mapped IPv6 (e.g., ::ffff:127.0.0.1 → 127.0.0.1)
   const normalized = ip.startsWith('::ffff:') ? ip.slice(7) : ip;
   // IPv4 private/reserved/loopback ranges
-  if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|127\.|0\.|169\.254\.)/.test(normalized)) return true;
+  if (
+    /^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|127\.|0\.|169\.254\.)/.test(
+      normalized,
+    )
+  )
+    return true;
   // IPv6 loopback, link-local (fe80::/10), and unique-local
   if (/^(::1|fe[89ab]|fc|fd)/i.test(normalized)) return true;
   return false;
@@ -144,10 +154,14 @@ function isPrivateIP(ip: string): boolean {
 const parsed = new URL(req.body.url);
 if (parsed.protocol !== 'https:') throw new Error('Only HTTPS allowed');
 const allowedHosts = ['api.example.com', 'cdn.example.com'];
-if (!allowedHosts.includes(parsed.hostname)) throw new Error('Host not allowed');
+if (!allowedHosts.includes(parsed.hostname))
+  throw new Error('Host not allowed');
 // Resolve all A/AAAA records to prevent DNS rebinding via multiple IPs
 const resolved = await dns.lookup(parsed.hostname, { all: true });
-if (resolved.length === 0 || resolved.some(({ address }) => isPrivateIP(address))) {
+if (
+  resolved.length === 0 ||
+  resolved.some(({ address }) => isPrivateIP(address))
+) {
   throw new Error('Private or reserved IPs not allowed');
 }
 // Note: for production, pin the resolved IP in the HTTP client to prevent
@@ -169,7 +183,8 @@ const file = fs.readFileSync(`/data/${req.params.filename}`);
 import path from 'path';
 const basePath = '/data';
 const filePath = path.resolve(basePath, req.params.filename);
-if (!filePath.startsWith(basePath + path.sep)) throw new Error('Path traversal detected');
+if (!filePath.startsWith(basePath + path.sep))
+  throw new Error('Path traversal detected');
 const file = fs.readFileSync(filePath);
 ```
 
@@ -184,7 +199,9 @@ const file = fs.readFileSync(filePath);
 const html = ejs.render(req.body.template, data);
 
 // GOOD — predefined templates, user input only as data
-const html = ejs.renderFile('./templates/page.ejs', { content: req.body.content });
+const html = ejs.renderFile('./templates/page.ejs', {
+  content: req.body.content,
+});
 ```
 
 ### I8: XXE Injection (XML External Entity)
@@ -247,7 +264,11 @@ const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '15m' });
 localStorage.setItem('accessToken', token);
 
 // GOOD — httpOnly cookie set by server
-res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'strict',
+});
 ```
 
 ### AU4: Plaintext / Fast Hash for Passwords (MD5/SHA-1/SHA-256)
@@ -262,7 +283,11 @@ const sha256Hash = crypto.createHash('sha256').update(password).digest('hex');
 
 // GOOD — Argon2id (OWASP recommended)
 import { hash as argon2Hash, argon2id } from 'argon2';
-const hashed = await argon2Hash(password, { type: argon2id, memoryCost: 65536, timeCost: 3 });
+const hashed = await argon2Hash(password, {
+  type: argon2id,
+  memoryCost: 65536,
+  timeCost: 3,
+});
 ```
 
 ### AU5: Missing Brute-Force Protection on Login
@@ -545,10 +570,12 @@ Value: `camera=(), microphone=(), geolocation=(), payment=()`
 
 ```typescript
 // GOOD
-app.use(cors({
-  origin: ['https://app.example.com', 'https://staging.example.com'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: ['https://app.example.com', 'https://staging.example.com'],
+    credentials: true,
+  }),
+);
 ```
 
 ---
@@ -744,7 +771,8 @@ const response = await llm.complete(`Summarize this: ${userInput}`);
 
 // GOOD — structured input with system/user message separation
 const response = await llm.complete({
-  system: "You are a summarization assistant. Only summarize the provided text.",
+  system:
+    'You are a summarization assistant. Only summarize the provided text.',
   user: userInput,
 });
 ```
@@ -784,7 +812,9 @@ Log: auth failures, access denied, rate limit hits, input validation failures, p
 
 ```typescript
 import pino from 'pino';
-const logger = pino({ redact: ['req.headers.authorization', 'req.body.password'] });
+const logger = pino({
+  redact: ['req.headers.authorization', 'req.body.password'],
+});
 ```
 
 ### L3: Missing Trace IDs
@@ -815,12 +845,13 @@ Use structured logging (JSON, auto-escaped) instead of string concatenation.
 import { auth } from '@/auth';
 export async function deleteUser(id: string) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') throw new Error('Unauthorized');
+  if (!session?.user || session.user.role !== 'admin')
+    throw new Error('Unauthorized');
   await db.user.delete({ where: { id } });
 }
 ```
 
-### RX2: process.env Without NEXT_PUBLIC_ in Client
+### RX2: process.env Without NEXT*PUBLIC* in Client
 
 - **Severity**: IMPORTANT
 - **Detection**: `'use client'` file accessing `process.env` without `NEXT_PUBLIC_`
@@ -896,7 +927,11 @@ app.use(express.json({ limit: '100kb' }));
 
 ```typescript
 res.cookie('session', value, {
-  httpOnly: true, secure: true, sameSite: 'strict', maxAge: 3600000, path: '/',
+  httpOnly: true,
+  secure: true,
+  sameSite: 'strict',
+  maxAge: 3600000,
+  path: '/',
 });
 ```
 
@@ -947,28 +982,30 @@ db.Where("id = ?", userID).Find(&user)
 ```typescript
 import helmet from 'helmet';
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      fontSrc: ["'self'"],
-      connectSrc: ["'self'"],
-      frameAncestors: ["'none'"],
-      objectSrc: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
-      upgradeInsecureRequests: [],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        fontSrc: ["'self'"],
+        connectSrc: ["'self'"],
+        frameAncestors: ["'none'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        upgradeInsecureRequests: [],
+      },
     },
-  },
-  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
-  frameguard: { action: 'deny' },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  crossOriginOpenerPolicy: { policy: 'same-origin' },
-  crossOriginResourcePolicy: { policy: 'same-origin' },
-}));
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    frameguard: { action: 'deny' },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin' },
+    crossOriginResourcePolicy: { policy: 'same-origin' },
+  }),
+);
 app.disable('x-powered-by');
 ```
 
@@ -994,20 +1031,21 @@ app.disable('x-powered-by');
 Set-Cookie: session=value; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=3600
 ```
 
-| Flag | Purpose | When to use |
-|------|---------|-------------|
-| `HttpOnly` | Not accessible via JavaScript (prevents XSS token theft) | Always |
-| `Secure` | Only sent over HTTPS | Always |
-| `SameSite=Strict` | Only sent on same-site requests (strongest CSRF) | Auth/session cookies |
-| `SameSite=Lax` | Sent on top-level navigations (moderate CSRF) | Cookies that need cross-site top-level nav (e.g., OAuth return) |
-| `Path=/` | Limit cookie scope | Always |
-| `Max-Age` | Explicit expiration (prefer over `Expires`) | Always |
+| Flag              | Purpose                                                  | When to use                                                     |
+| ----------------- | -------------------------------------------------------- | --------------------------------------------------------------- |
+| `HttpOnly`        | Not accessible via JavaScript (prevents XSS token theft) | Always                                                          |
+| `Secure`          | Only sent over HTTPS                                     | Always                                                          |
+| `SameSite=Strict` | Only sent on same-site requests (strongest CSRF)         | Auth/session cookies                                            |
+| `SameSite=Lax`    | Sent on top-level navigations (moderate CSRF)            | Cookies that need cross-site top-level nav (e.g., OAuth return) |
+| `Path=/`          | Limit cookie scope                                       | Always                                                          |
+| `Max-Age`         | Explicit expiration (prefer over `Expires`)              | Always                                                          |
 
 ---
 
 ## Security Checklist
 
 ### Authentication and Sessions
+
 - [ ] Passwords hashed with Argon2id or bcrypt (cost >= 12)
 - [ ] JWT signed with RS256/ES256, algorithm enforced on verify
 - [ ] Access tokens expire in <= 15 minutes
@@ -1017,6 +1055,7 @@ Set-Cookie: session=value; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=36
 - [ ] MFA available for privileged accounts
 
 ### Authorization
+
 - [ ] Every API endpoint has auth middleware
 - [ ] Ownership checks on all resource access (prevent IDOR)
 - [ ] Server-side authorization (frontend guards are UX only)
@@ -1024,18 +1063,21 @@ Set-Cookie: session=value; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=36
 - [ ] Re-authentication required for sensitive operations
 
 ### Input and Output
+
 - [ ] All user input validated server-side (zod/joi/class-validator)
 - [ ] Parameterized queries for all database operations
 - [ ] HTML output sanitized (DOMPurify) when rendering user content
 - [ ] Error responses do not expose stack traces in production
 
 ### Secrets
+
 - [ ] No hardcoded secrets in source code
 - [ ] `.env` files in `.gitignore`
-- [ ] Server secrets not exposed to client (no NEXT_PUBLIC_ on secrets)
+- [ ] Server secrets not exposed to client (no NEXT*PUBLIC* on secrets)
 - [ ] Environment variables validated at startup
 
 ### Headers
+
 - [ ] Content-Security-Policy configured (nonce-based preferred)
 - [ ] Strict-Transport-Security with preload
 - [ ] X-Content-Type-Options: nosniff
@@ -1045,12 +1087,14 @@ Set-Cookie: session=value; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=36
 - [ ] CORS restricted to known origins
 
 ### Dependencies
+
 - [ ] `npm audit` (or equivalent) passing in CI
 - [ ] Lockfile committed and verified with `npm ci`
 - [ ] New dependencies reviewed for typosquatting and postinstall scripts
 - [ ] No wildcard or "latest" versions in production
 
 ### Logging
+
 - [ ] Security events logged (auth failures, access denied, rate limits)
 - [ ] No sensitive data in logs (passwords, tokens, PII)
 - [ ] Structured logging with correlation IDs

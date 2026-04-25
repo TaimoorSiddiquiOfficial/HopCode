@@ -25,13 +25,17 @@ export function registerCleanup(fn: (() => void) | (() => Promise<void>)) {
 /**
  * Per-cleanup ceiling. Caps any single hung cleanup so it can't starve the
  * rest of the cleanup chain.
+ * Increased from 2s to 5s to handle complex cleanup scenarios like
+ * MCP server disconnections, LSP shutdown, and file system operations.
  */
-const PER_CLEANUP_TIMEOUT_MS = 2_000;
+const PER_CLEANUP_TIMEOUT_MS = 5_000;
 
 /**
  * Wall-clock ceiling for the whole cleanup pass.
+ * Increased from 5s to 15s to accommodate multiple cleanup operations
+ * that may involve network I/O (MCP servers) and process termination.
  */
-const OVERALL_CLEANUP_TIMEOUT_MS = 5_000;
+const OVERALL_CLEANUP_TIMEOUT_MS = 15_000;
 
 /**
  * Awaits a promise but resolves to `undefined` if the timeout elapses first.

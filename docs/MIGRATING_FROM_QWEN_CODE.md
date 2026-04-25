@@ -17,26 +17,27 @@ HopCode is a fork of Qwen Code with expanded multi-provider support, new feature
 
 ## Command Changes
 
-| Qwen Code | HopCode | Notes |
-|-----------|---------|-------|
-| `qwen` | `hopcode` | Main CLI entry point |
-| `qwen --json` | `hopcode --json` | Headless JSON output |
-| `qwen serve` | `hopcode serve` | HTTP API server |
-| `qwen dashboard` | `hopcode dashboard` | Web dashboard |
-| `qwen profile` | `hopcode profile` | Profile management |
-| — | `hopcode grpc` | **New** — gRPC headless server |
-| — | `hopcode arena` | **New** — multi-agent arena mode |
+| Qwen Code        | HopCode             | Notes                            |
+| ---------------- | ------------------- | -------------------------------- |
+| `qwen`           | `hopcode`           | Main CLI entry point             |
+| `qwen --json`    | `hopcode --json`    | Headless JSON output             |
+| `qwen serve`     | `hopcode serve`     | HTTP API server                  |
+| `qwen dashboard` | `hopcode dashboard` | Web dashboard                    |
+| `qwen profile`   | `hopcode profile`   | Profile management               |
+| —                | `hopcode grpc`      | **New** — gRPC headless server   |
+| —                | `hopcode arena`     | **New** — multi-agent arena mode |
 
 ## Configuration Directory
 
-| Qwen Code | HopCode |
-|-----------|---------|
-| `~/.qwen/` | `~/.hopcode/` |
-| `.qwen/agents/` | `.hopcode/agents/` |
-| `.qwen/skills/` | `.hopcode/skills/` |
+| Qwen Code         | HopCode              |
+| ----------------- | -------------------- |
+| `~/.qwen/`        | `~/.hopcode/`        |
+| `.qwen/agents/`   | `.hopcode/agents/`   |
+| `.qwen/skills/`   | `.hopcode/skills/`   |
 | `.qwen/commands/` | `.hopcode/commands/` |
 
 **Migration:**
+
 ```bash
 # Linux/macOS
 mv ~/.qwen ~/.hopcode
@@ -47,19 +48,20 @@ rename %USERPROFILE%\.qwen %USERPROFILE%\.hopcode
 
 ## Environment Variables
 
-| Qwen Code | HopCode | Status |
-|-----------|---------|--------|
-| `QWEN_CODE_SIMPLE` | `HOPCODE_SIMPLE` | **Preferred** (old still works) |
-| `QWEN_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended |
+| Qwen Code          | HopCode           | Status                          |
+| ------------------ | ----------------- | ------------------------------- |
+| `QWEN_CODE_SIMPLE` | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
+| `QWEN_SANDBOX`     | `HOPCODE_SANDBOX` | Update recommended              |
 
 ## Package Name Changes
 
-| Old | New |
-|-----|-----|
+| Old         | New                  |
+| ----------- | -------------------- |
 | `qwen-code` | `@hoptrendy/hopcode` |
-| `@qwen/sdk` | `@hoptrendy/sdk` |
+| `@qwen/sdk` | `@hoptrendy/sdk`     |
 
 **Update imports:**
+
 ```typescript
 // Before
 import { Query } from '@qwen/sdk';
@@ -106,6 +108,7 @@ Features not available in Qwen Code:
 ### "Command not found: hopcode"
 
 Ensure `@hoptrendy/hopcode` is installed globally:
+
 ```bash
 npm install -g @hoptrendy/hopcode
 ```
@@ -113,6 +116,7 @@ npm install -g @hoptrendy/hopcode
 ### "Cannot find config directory"
 
 Run the migration command:
+
 ```bash
 hopcode doctor --fix-config-path
 ```
@@ -120,6 +124,7 @@ hopcode doctor --fix-config-path
 ### VS Code extension shows "QwenAgentManager" errors
 
 The VS Code extension has been fully rebranded. Update to the latest version:
+
 ```bash
 # In VS Code
 ext install hopcode.hopcode-vscode-ide-companion

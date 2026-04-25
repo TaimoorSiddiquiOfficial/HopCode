@@ -4,20 +4,22 @@ Run HopCode as a containerized service stack with Docker Compose.
 
 ## Files
 
-| File | Purpose |
-|------|---------|
+| File                 | Purpose                                |
+| -------------------- | -------------------------------------- |
 | `docker-compose.yml` | Service definition (agent + dashboard) |
-| `.env.example` | Example environment variables |
+| `.env.example`       | Example environment variables          |
 
 ## Quick Start
 
 1. **Copy environment file**
+
    ```bash
    cp .env.example .env
    # Edit .env and add your API keys
    ```
 
 2. **Start services**
+
    ```bash
    docker-compose up -d
    ```
@@ -37,23 +39,25 @@ Run HopCode as a containerized service stack with Docker Compose.
 ## Services
 
 ### hopcode-agent
+
 - Exposes gRPC server on port 50051
 - Headless agent execution
 - Persistent volume for `.hopcode` config and sessions
 - Health check via `hopcode --version`
 
 ### hopcode-dashboard
+
 - Web UI for session browsing and chat
 - Depends on agent being healthy
 - Exposes port 3000
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Optional | For Claude models |
-| `OPENAI_API_KEY` | Optional | For GPT models |
-| `HOPCODE_MODEL` | Optional | Default model ID |
+| Variable                  | Required | Description                            |
+| ------------------------- | -------- | -------------------------------------- |
+| `ANTHROPIC_API_KEY`       | Optional | For Claude models                      |
+| `OPENAI_API_KEY`          | Optional | For GPT models                         |
+| `HOPCODE_MODEL`           | Optional | Default model ID                       |
 | `HOPCODE_PERMISSION_MODE` | Optional | `default`, `plan`, `auto-edit`, `yolo` |
 
 ## Scaling

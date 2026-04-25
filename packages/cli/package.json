@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode-cli",
-  "version": "0.17.11",
+  "version": "0.17.12",
   "repository": {
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
@@ -31,7 +31,7 @@
     "dist"
   ],
   "config": {
-    "sandboxImageUri": "ghcr.io/hopcode/hopcode:0.17.10"
+    "sandboxImageUri": "ghcr.io/hopcode/hopcode:0.17.12"
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "latest",

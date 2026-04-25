@@ -80,7 +80,8 @@ export const tipRegistry: ContextualTip[] = [
   },
   {
     id: 'new-user-qwenmd',
-    content: 'Add a HOPCODE.md file to give HopCode persistent project context.',
+    content:
+      'Add a HOPCODE.md file to give HopCode persistent project context.',
     trigger: 'startup',
     isRelevant: (ctx) => ctx.sessionCount < 10,
     cooldownPrompts: 0,
@@ -97,8 +98,7 @@ export const tipRegistry: ContextualTip[] = [
   },
   {
     id: 'shell-commands',
-    content:
-      'You can run any shell commands from HopCode using ! (e.g. !ls).',
+    content: 'You can run any shell commands from HopCode using ! (e.g. !ls).',
     trigger: 'startup',
     isRelevant: (ctx) => ctx.sessionCount < 15,
     cooldownPrompts: 0,

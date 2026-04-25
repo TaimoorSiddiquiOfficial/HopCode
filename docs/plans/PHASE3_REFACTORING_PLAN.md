@@ -24,6 +24,7 @@ Phase 3 focuses on refactoring four major systems to improve code quality, type 
 **File**: `packages/core/src/provider/provider.ts` (1597 lines)
 
 **Problems**:
+
 - ESLint exceptions for `no-namespace` and `no-explicit-any`
 - Inconsistent error handling across providers
 - Duplicated model catalog logic
@@ -43,42 +44,42 @@ Phase 3 focuses on refactoring four major systems to improve code quality, type 
 export interface HopCodeProvider {
   /** Unique provider identifier (e.g., 'openai', 'anthropic') */
   readonly id: string;
-  
+
   /** Human-readable label */
   readonly label: string;
-  
+
   /** Whether API key is required */
   readonly requiresApiKey: boolean;
-  
+
   /** Environment variable name for API key */
   readonly envKey?: string;
-  
+
   /** Default base URL (if applicable) */
   readonly baseUrl?: string;
-  
+
   /** Whether to fetch models from API at runtime */
   readonly liveModels: boolean;
-  
+
   /** Default model to use if none specified */
   readonly defaultModel?: string;
-  
+
   /** Provider categories for UI grouping */
   readonly categories: string[];
-  
+
   /**
    * Create provider client with given options.
    * @param options - Provider-specific options
    * @returns Configured provider client
    */
   createClient(options: ProviderOptions): ProviderClient;
-  
+
   /**
    * Fetch available models from provider API.
    * @param options - Authentication options
    * @returns List of available models
    */
   getModels(options: AuthOptions): Promise<ProviderModel[]>;
-  
+
   /**
    * Validate API key format and authenticity.
    * @param key - API key to validate
@@ -95,7 +96,7 @@ export interface ProviderClient {
    * Generate content from prompt.
    */
   generateContent(request: GenerationRequest): Promise<GenerationResponse>;
-  
+
   /**
    * Stream content from prompt.
    */
@@ -114,25 +115,25 @@ export interface ProviderClient {
 export enum HopCodeErrorType {
   /** Rate limit exceeded */
   RATE_LIMIT = 'RATE_LIMIT',
-  
+
   /** Authentication failure */
   AUTH = 'AUTH',
-  
+
   /** API quota exceeded */
   QUOTA = 'QUOTA',
-  
+
   /** Invalid request parameters */
   INVALID_REQUEST = 'INVALID_REQUEST',
-  
+
   /** Provider server error */
   SERVER = 'SERVER',
-  
+
   /** Network connectivity issue */
   NETWORK = 'NETWORK',
-  
+
   /** Content filtered by provider */
   CONTENT_FILTER = 'CONTENT_FILTER',
-  
+
   /** Model not found or unavailable */
   MODEL_NOT_FOUND = 'MODEL_NOT_FOUND',
 }
@@ -151,7 +152,7 @@ export class ProviderError extends Error {
     super(message);
     this.name = 'ProviderError';
   }
-  
+
   /**
    * Classify an unknown error into a ProviderError.
    */
@@ -159,11 +160,11 @@ export class ProviderError extends Error {
     if (error instanceof ProviderError) {
       return error;
     }
-    
+
     // Classification logic here
     // ...
   }
-  
+
   /**
    * Convert to JSON for logging/telemetry.
    */
@@ -196,33 +197,29 @@ export namespace ProviderUtils {
     fn: () => Promise<T>,
     options: RetryOptions = {},
   ): Promise<T> {
-    const {
-      maxRetries = 3,
-      initialDelay = 1000,
-      maxDelay = 30000,
-    } = options;
-    
+    const { maxRetries = 3, initialDelay = 1000, maxDelay = 30000 } = options;
+
     let delay = initialDelay;
     let lastError: unknown;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await fn();
       } catch (error) {
         lastError = error;
-        
+
         if (!isRetryable(error) || attempt === maxRetries) {
           break;
         }
-        
+
         await sleep(delay);
         delay = Math.min(delay * 2, maxDelay);
       }
     }
-    
+
     throw lastError;
   }
-  
+
   /**
    * Count tokens using provider-specific tokenizer.
    */
@@ -233,7 +230,7 @@ export namespace ProviderUtils {
   ): number {
     // Provider-specific token counting
   }
-  
+
   /**
    * Transform messages between provider formats.
    */
@@ -267,6 +264,7 @@ export namespace ProviderUtils {
 **Directory**: `packages/core/src/tools/` (63 tool files)
 
 **Problems**:
+
 - Inconsistent patterns across tool implementations
 - Some tools loaded at startup (slow initialization)
 - Duplicated permission check logic
@@ -286,16 +284,16 @@ export namespace ProviderUtils {
 export abstract class BaseTool<TParams, TResult> {
   /** Tool name (must be unique) */
   abstract readonly name: ToolName;
-  
+
   /** Human-readable description */
   abstract readonly description: string;
-  
+
   /** Zod schema for parameter validation */
   abstract readonly schema: z.ZodSchema<TParams>;
-  
+
   /** Whether tool requires approval */
   readonly requiresApproval: boolean = true;
-  
+
   /**
    * Execute the tool with full lifecycle.
    */
@@ -305,24 +303,24 @@ export abstract class BaseTool<TParams, TResult> {
   ): Promise<ToolResult<TResult>> {
     // 1. Validate parameters
     const validatedParams = await this.validate(params);
-    
+
     // 2. Check permissions
     await this.checkPermissions(context);
-    
+
     // 3. Fire pre-execution hooks
     await this.firePreExecuteHooks(validatedParams, context);
-    
+
     // 4. Execute tool
     const startTime = Date.now();
     try {
       const result = await this.invoke(validatedParams, context);
-      
+
       // 5. Fire post-execution hooks
       await this.firePostExecuteHooks(result, context);
-      
+
       // 6. Log telemetry
       this.logExecution(startTime, 'success');
-      
+
       return { success: true, result };
     } catch (error) {
       // 7. Handle errors
@@ -330,14 +328,14 @@ export abstract class BaseTool<TParams, TResult> {
       throw error;
     }
   }
-  
+
   /**
    * Validate parameters against schema.
    */
   protected async validate(params: unknown): Promise<TParams> {
     return await this.schema.parseAsync(params);
   }
-  
+
   /**
    * Check if tool execution is permitted.
    */
@@ -348,7 +346,7 @@ export abstract class BaseTool<TParams, TResult> {
       );
     }
   }
-  
+
   /**
    * Main tool implementation (to be implemented by subclasses).
    */
@@ -356,7 +354,7 @@ export abstract class BaseTool<TParams, TResult> {
     params: TParams,
     context: ToolContext,
   ): Promise<TResult>;
-  
+
   /**
    * Fire pre-execution hooks.
    */
@@ -370,7 +368,7 @@ export abstract class BaseTool<TParams, TResult> {
       phase: 'pre',
     });
   }
-  
+
   /**
    * Fire post-execution hooks.
    */
@@ -384,7 +382,7 @@ export abstract class BaseTool<TParams, TResult> {
       phase: 'post',
     });
   }
-  
+
   /**
    * Log tool execution for telemetry.
    */
@@ -410,14 +408,14 @@ export abstract class BaseTool<TParams, TResult> {
 export class ToolRegistry {
   private readonly toolFactories = new Map<ToolName, ToolFactory>();
   private readonly toolCache = new Map<ToolName, Tool<any, any>>();
-  
+
   /**
    * Register a tool factory for lazy loading.
    */
   registerFactory(name: ToolName, factory: ToolFactory): void {
     this.toolFactories.set(name, factory);
   }
-  
+
   /**
    * Get tool instance, loading on first access.
    */
@@ -427,18 +425,18 @@ export class ToolRegistry {
     if (cached) {
       return cached;
     }
-    
+
     // Load tool on demand
     const factory = this.toolFactories.get(name);
     if (!factory) {
       throw new Error(`Tool not registered: ${name}`);
     }
-    
+
     const tool = factory();
     this.toolCache.set(name, tool);
     return tool;
   }
-  
+
   /**
    * List all registered tools (without loading).
    */
@@ -454,12 +452,10 @@ export type ToolFactory = () => Tool<any, any>;
 ```
 
 **Usage Example**:
+
 ```typescript
 // Register tool with lazy loading
-toolRegistry.registerFactory(
-  ToolNames.READ_FILE,
-  () => new ReadFileTool(),
-);
+toolRegistry.registerFactory(ToolNames.READ_FILE, () => new ReadFileTool());
 
 // Tool is only loaded when first accessed
 const tool = toolRegistry.getTool(ToolNames.READ_FILE);
@@ -478,7 +474,7 @@ export class ToolPermissionManager {
     private readonly permissionMode: PermissionMode,
     private readonly approvalManager: ApprovalManager,
   ) {}
-  
+
   /**
    * Check if tool execution is permitted.
    */
@@ -489,20 +485,20 @@ export class ToolPermissionManager {
     switch (this.permissionMode) {
       case PermissionMode.YOLO:
         return { permitted: true };
-        
+
       case PermissionMode.AUTO_EDIT:
         if (this.isSafeEdit(tool, context)) {
           return { permitted: true };
         }
         return await this.requestApproval(tool, context);
-        
+
       case PermissionMode.PLAN:
       case PermissionMode.DEFAULT:
       default:
         return await this.requestApproval(tool, context);
     }
   }
-  
+
   /**
    * Determine if an edit is safe (auto-approvable).
    */
@@ -513,7 +509,7 @@ export class ToolPermissionManager {
     // - No security-sensitive operations
     // ...
   }
-  
+
   /**
    * Request user approval for tool execution.
    */
@@ -550,6 +546,7 @@ export class ToolPermissionManager {
 **File**: `packages/core/src/config/config.ts` (2844 lines)
 
 **Problems**:
+
 - Too large to understand at once
 - Mixed concerns (auth, tools, models, session, telemetry)
 - Difficult to test in isolation
@@ -560,6 +557,7 @@ export class ToolPermissionManager {
 #### 3.1 Split into Modules
 
 **New Directory Structure**:
+
 ```
 config/
 ├── Config.ts                 # Main orchestrator class (~300 lines)
@@ -602,19 +600,19 @@ export class AuthConfig {
   constructor(private readonly config: AuthConfigInput) {
     AuthConfigSchema.parse(config);
   }
-  
+
   get selectedType(): AuthType {
     return this.config.selectedType as AuthType;
   }
-  
+
   getApiKey(provider: string): string | undefined {
     return this.config.apiKeys?.[provider];
   }
-  
+
   getOAuthToken(provider: string): string | undefined {
     return this.config.oauthTokens?.[provider];
   }
-  
+
   /**
    * Create new config with updated API key.
    */
@@ -633,34 +631,35 @@ export class AuthConfig {
 #### 3.3 Main Config as Orchestrator
 
 **Refactored Config.ts** (simplified):
+
 ```typescript
 export class Config {
   private readonly _auth: AuthConfig;
   private readonly _models: ModelConfig;
   private readonly _tools: ToolConfig;
-  
+
   constructor(options: ConfigOptions) {
     // Delegate to specialized config classes
     this._auth = new AuthConfig(options.auth);
     this._models = new ModelConfig(options.models);
     this._tools = new ToolConfig(options.tools);
-    
+
     // Initialize services
     this.initializeServices();
   }
-  
+
   get auth(): AuthConfig {
     return this._auth;
   }
-  
+
   get models(): ModelConfig {
     return this._models;
   }
-  
+
   get tools(): ToolConfig {
     return this._tools;
   }
-  
+
   private initializeServices(): void {
     // Service initialization only
   }
@@ -687,6 +686,7 @@ export class Config {
 **Files**: Throughout codebase, especially `provider/sdk/` directory
 
 **Problems**:
+
 - `any` types in provider SDK directory
 - Missing return type annotations
 - Inconsistent use of type guards
@@ -697,6 +697,7 @@ export class Config {
 #### 4.1 Eliminate `any` Types
 
 **Before**:
+
 ```typescript
 function transformResponse(data: any): any {
   // Unsafe transformation
@@ -705,6 +706,7 @@ function transformResponse(data: any): any {
 ```
 
 **After**:
+
 ```typescript
 interface ApiResponse {
   result: unknown;
@@ -719,11 +721,7 @@ function transformResponse(data: unknown): TransformedData {
 }
 
 function isApiResponse(data: unknown): data is ApiResponse {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'result' in data
-  );
+  return typeof data === 'object' && data !== null && 'result' in data;
 }
 ```
 
@@ -749,10 +747,7 @@ export function isProviderError(error: unknown): error is ProviderError {
 }
 
 export function isToolError(error: unknown): error is ToolError {
-  return (
-    error instanceof Error &&
-    error.name === 'ToolError'
-  );
+  return error instanceof Error && error.name === 'ToolError';
 }
 
 /**
@@ -774,6 +769,7 @@ export function isErrorResponse(
 #### 4.3 Strict Return Types
 
 **ESLint Rule Update**:
+
 ```javascript
 // eslint.config.js
 {
@@ -800,30 +796,33 @@ export function isErrorResponse(
 
 ## Risk Assessment
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Breaking changes in provider interface | Medium | High | Maintain backward compatibility during transition |
-| Tool lazy loading causes issues | Low | Medium | Comprehensive testing, feature flag |
-| Config refactoring breaks initialization | Medium | High | Extensive unit tests, gradual migration |
-| Type changes cause cascade of errors | High | Medium | Fix incrementally, module by module |
+| Risk                                     | Likelihood | Impact | Mitigation                                        |
+| ---------------------------------------- | ---------- | ------ | ------------------------------------------------- |
+| Breaking changes in provider interface   | Medium     | High   | Maintain backward compatibility during transition |
+| Tool lazy loading causes issues          | Low        | Medium | Comprehensive testing, feature flag               |
+| Config refactoring breaks initialization | Medium     | High   | Extensive unit tests, gradual migration           |
+| Type changes cause cascade of errors     | High       | Medium | Fix incrementally, module by module               |
 
 ---
 
 ## Success Metrics
 
 ### Code Quality
+
 - [ ] Zero `any` types in codebase
 - [ ] All functions have explicit return types
 - [ ] All ESLint rules passing (no exceptions)
 - [ ] TypeScript strict mode fully enabled
 
 ### Maintainability
+
 - [ ] Config.ts reduced from 2844 to <500 lines
 - [ ] Provider errors handled consistently
 - [ ] Tools load 40% faster (lazy loading)
 - [ ] Test coverage >80% for refactored modules
 
 ### Performance
+
 - [ ] Startup time reduced by 40%
 - [ ] Tool execution latency unchanged
 - [ ] Memory usage stable
@@ -832,12 +831,12 @@ export function isErrorResponse(
 
 ## Timeline
 
-| Week | Focus | Deliverables |
-|------|-------|--------------|
-| 6 | Provider System | Unified interface, error handling, utils |
-| 7 | Tool System | Base class, lazy loading, permissions |
-| 8 | Config System | Modular config, validation schemas |
-| 8 (cont.) | Type Safety | Eliminate `any`, add type guards |
+| Week      | Focus           | Deliverables                             |
+| --------- | --------------- | ---------------------------------------- |
+| 6         | Provider System | Unified interface, error handling, utils |
+| 7         | Tool System     | Base class, lazy loading, permissions    |
+| 8         | Config System   | Modular config, validation schemas       |
+| 8 (cont.) | Type Safety     | Eliminate `any`, add type guards         |
 
 **Total Estimated Duration**: 3 weeks
 

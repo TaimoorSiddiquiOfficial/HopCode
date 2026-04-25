@@ -1,5 +1,5 @@
 #!/usr/bin/env node
- 
+
 /**
  * Start the mock WebSocket server for testing the plugin-example channel.
  *

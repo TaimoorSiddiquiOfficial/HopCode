@@ -13,6 +13,94 @@ import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('SERVER_SESSION_MANAGER');
 
+// ---------------------------------------------------------------------------
+// JSONL event types from CLI stream-json output
+// ---------------------------------------------------------------------------
+
+interface ContentBlockDelta {
+  type: 'text_delta' | 'thinking_delta';
+  text?: string;
+  thinking?: string;
+}
+
+interface ContentBlockContentBlockDelta {
+  type: 'content_block_delta';
+  delta: ContentBlockDelta;
+}
+
+interface TextContentBlock {
+  type: 'text';
+  text: string;
+}
+
+interface ToolUseContentBlock {
+  type: 'tool_use';
+  id: string;
+  name: string;
+  input: Record<string, unknown>;
+}
+
+interface AssistantMessage {
+  content: Array<TextContentBlock | ToolUseContentBlock>;
+}
+
+interface AssistantEvent {
+  type: 'assistant';
+  message: AssistantMessage;
+}
+
+interface ToolResultEvent {
+  type: 'tool_result';
+  tool_use_id: string;
+  content: unknown;
+}
+
+interface CanUseToolData {
+  tool_use_id: string;
+  tool_name: string;
+  input: Record<string, unknown>;
+}
+
+interface ControlRequestEvent {
+  type: 'control_request';
+  subtype: 'can_use_tool' | string;
+  data?: CanUseToolData;
+}
+
+interface ResultEvent {
+  type: 'result';
+  is_error: boolean;
+  subtype?: string;
+  error?: { message?: string };
+  num_turns?: number;
+}
+
+interface UsageData {
+  input_tokens?: number;
+  output_tokens?: number;
+  cache_read_input_tokens?: number;
+  cache_creation_input_tokens?: number;
+  total_tokens?: number;
+}
+
+interface SystemEventData {
+  usage?: UsageData;
+}
+
+interface SystemEvent {
+  type: 'system';
+  data?: SystemEventData;
+}
+
+/**
+ * Type-safe accessor for JSONL events from the CLI stream.
+ * The event parameter is `Record<string, unknown>` from parsed JSON;
+ * this function casts through `unknown` to the desired event type.
+ */
+function asEvent<T>(event: Record<string, unknown>): T {
+  return event as unknown as T;
+}
+
 export interface SessionManagerOptions {
   cwd?: string;
   defaultModel?: string;
@@ -274,7 +362,7 @@ export class HopCodeSessionManager {
       }
 
       case 'content_block_delta': {
-        const delta = (event as any)['delta'];
+        const delta = asEvent<ContentBlockContentBlockDelta>(event).delta;
         if (delta?.type === 'text_delta') {
           session.writeCallback({ textChunk: { text: delta.text } });
         } else if (delta?.type === 'thinking_delta') {
@@ -286,7 +374,7 @@ export class HopCodeSessionManager {
       }
 
       case 'assistant': {
-        const msg = (event as any)['message'];
+        const msg = asEvent<AssistantEvent>(event).message;
         if (msg?.content) {
           for (const block of msg.content) {
             if (block.type === 'text') {
@@ -306,10 +394,11 @@ export class HopCodeSessionManager {
       }
 
       case 'tool_result': {
-        const result = (event as any)['content'];
+        const toolResultEvent = asEvent<ToolResultEvent>(event);
+        const result = toolResultEvent.content;
         session.writeCallback({
           toolResult: {
-            toolUseId: (event as any)['tool_use_id'] ?? '',
+            toolUseId: toolResultEvent.tool_use_id ?? '',
             content:
               typeof result === 'string' ? result : JSON.stringify(result),
             isError: false,
@@ -319,13 +408,13 @@ export class HopCodeSessionManager {
       }
 
       case 'control_request': {
-        const subtype = (event as any)['subtype'];
-        if (subtype === 'can_use_tool') {
-          const data = (event as any)['data'] ?? event;
+        const controlEvent = asEvent<ControlRequestEvent>(event);
+        if (controlEvent.subtype === 'can_use_tool') {
+          const data = controlEvent.data ?? (event as Record<string, unknown>);
           session.writeCallback({
             permissionRequest: {
-              toolUseId: data.tool_use_id,
-              toolName: data.tool_name,
+              toolUseId: data.tool_use_id as string,
+              toolName: data.tool_name as string,
               inputJson: JSON.stringify(data.input),
               description: `Tool: ${data.tool_name}`,
             },
@@ -335,7 +424,7 @@ export class HopCodeSessionManager {
       }
 
       case 'result': {
-        const resultEvent = event as any;
+        const resultEvent = asEvent<ResultEvent>(event);
         if (resultEvent.is_error) {
           session.writeCallback({
             error: {
@@ -355,8 +444,8 @@ export class HopCodeSessionManager {
       }
 
       case 'system': {
-        // System messages carry metadata; surface usage if present
-        const data = (event as any)['data'];
+        const systemEvent = asEvent<SystemEvent>(event);
+        const data = systemEvent.data;
         if (data?.usage) {
           session.writeCallback({
             usage: {

@@ -8,7 +8,7 @@ allowedTools:
   - run_shell_command
 hooks:
   on_session_start:
-    - matcher: ".*security.*"
+    - matcher: '.*security.*'
       hooks:
         - type: command
           command: "echo 'Starting security audit workflow...'"
@@ -27,7 +27,9 @@ Scan the codebase for security vulnerabilities and provide actionable remediatio
 ## Security Checklist
 
 ### 1. Secret Detection
+
 Search for hardcoded credentials:
+
 - API keys (patterns: `api_key`, `apikey`, `API_KEY`)
 - Passwords in code or config files
 - Private keys or certificates
@@ -40,56 +42,68 @@ Search for hardcoded credentials:
 ### 2. OWASP Top 10 Vulnerabilities
 
 #### A. Injection Flaws
+
 - SQL injection (unsanitized user input in queries)
 - Command injection (user input in shell commands)
 - Path traversal (user input in file paths)
 
 #### B. Broken Authentication
+
 - Weak password policies
 - Missing rate limiting on auth endpoints
 - Session fixation vulnerabilities
 - Insecure cookie settings
 
 #### C. Sensitive Data Exposure
+
 - Unencrypted transmission of sensitive data
 - Logging of sensitive information
 - Missing encryption at rest
 
 #### D. XML External Entities (XXE)
+
 - XML parsers without XXE protection
 
 #### E. Broken Access Control
+
 - Missing authorization checks
 - IDOR (Insecure Direct Object References)
 - CORS misconfigurations
 
 #### F. Security Misconfigurations
+
 - Default credentials in use
 - Unnecessary features enabled
 - Verbose error messages exposing internals
 
 #### G. Cross-Site Scripting (XSS)
+
 - Unsanitized user output in HTML
 - Missing Content Security Policy
 
 #### H. Insecure Deserialization
+
 - Untrusted data deserialization
 - Missing integrity checks
 
 #### I. Vulnerable Components
+
 - Outdated dependencies with known CVEs
 - Deprecated libraries
 
 #### J. Insufficient Logging & Monitoring
+
 - Missing audit logs
 - No alerting for security events
 
 ### 3. File Permission Checks
+
 - World-readable sensitive files
 - Executable permissions on scripts
 - Configuration file permissions
 
 ### 4. Network Security
+
 - Hardcoded IP addresses or endpoints
 - Missing TLS/SSL configuration
 - Insecure protocol usage (HTTP vs HTTPS)
@@ -98,23 +112,26 @@ Search for hardcoded credentials:
 
 Generate a security report with:
 
-```markdown
+````markdown
 # Security Audit Report
 
 ## Summary
+
 - **Critical**: X issues
-- **High**: Y issues  
+- **High**: Y issues
 - **Medium**: Z issues
 - **Low**: W issues
 
 ## Critical Issues
 
 ### [Issue Name]
+
 **Location**: `path/to/file.js:line`
 **Description**: What the vulnerability is
 **Impact**: What an attacker could do
 **Remediation**: How to fix it
 **Code Example**:
+
 ```javascript
 // ❌ Vulnerable
 const query = `SELECT * FROM users WHERE id = ${userId}`;
@@ -122,12 +139,16 @@ const query = `SELECT * FROM users WHERE id = ${userId}`;
 // ✅ Secure
 const query = 'SELECT * FROM users WHERE id = ?';
 ```
+````
 
 ## High Priority Issues
+
 ...
 
 ## Recommendations
+
 1. [Priority action items]
+
 ```
 
 ## Rules
@@ -148,3 +169,4 @@ const query = 'SELECT * FROM users WHERE id = ?';
 ## When Complete
 
 Provide a summary of findings organized by severity, with clear remediation steps for each issue.
+```

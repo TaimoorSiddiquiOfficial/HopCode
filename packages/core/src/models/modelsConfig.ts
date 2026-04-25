@@ -25,6 +25,7 @@ import {
   MODEL_GENERATION_CONFIG_FIELDS,
   CREDENTIAL_FIELDS,
   PROVIDER_SOURCED_FIELDS,
+  setGenerationConfigField,
 } from './constants.js';
 
 export {
@@ -382,7 +383,10 @@ export class ModelsConfig {
     }
 
     const rollbackSnapshot = this.createStateSnapshotForRollback();
-    if (authType === AuthType.HOPCODE_OAUTH && options?.requireCachedCredentials) {
+    if (
+      authType === AuthType.HOPCODE_OAUTH &&
+      options?.requireCachedCredentials
+    ) {
       this.requireCachedQwenCredentialsOnce = true;
     }
 
@@ -506,9 +510,11 @@ export class ModelsConfig {
         !(field in this._generationConfig) &&
         field in settingsGenerationConfig
       ) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this._generationConfig as any)[field] =
-          settingsGenerationConfig[field];
+        setGenerationConfigField(
+          this._generationConfig,
+          field,
+          settingsGenerationConfig[field],
+        );
         this.generationConfigSources[field] = {
           kind: 'settings',
           detail: `model.generationConfig.${field}`,
@@ -764,8 +770,7 @@ export class ModelsConfig {
     // Generation config: apply all fields from MODEL_GENERATION_CONFIG_FIELDS
     const gc = model.generationConfig;
     for (const field of MODEL_GENERATION_CONFIG_FIELDS) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this._generationConfig as any)[field] = gc[field];
+      setGenerationConfigField(this._generationConfig, field, gc[field]);
       this.generationConfigSources[field] = {
         kind: 'modelProviders',
         authType: model.authType,

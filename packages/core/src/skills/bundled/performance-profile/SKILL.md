@@ -8,7 +8,7 @@ allowedTools:
   - grep_search
 hooks:
   on_session_start:
-    - matcher: ".*performance.*"
+    - matcher: '.*performance.*'
       hooks:
         - type: command
           command: "echo 'Starting performance profiling workflow...'"
@@ -31,6 +31,7 @@ Analyze the application's performance characteristics and provide actionable opt
 **For JavaScript/TypeScript projects:**
 
 Check bundle size and identify large dependencies:
+
 ```bash
 # Analyze bundle composition
 npx webpack-bundle-analyzer
@@ -42,6 +43,7 @@ npx npm-duplicate-deps-checker
 ```
 
 **Recommendations:**
+
 - Replace heavy libraries with lighter alternatives (e.g., `lodash` → `lodash-es` or native)
 - Implement code splitting for large modules
 - Tree-shake unused exports
@@ -50,11 +52,13 @@ npx npm-duplicate-deps-checker
 ### 2. Runtime Performance
 
 #### JavaScript Execution
+
 - Identify long tasks (>50ms)
 - Find expensive computations
 - Detect memory leaks
 
 **Tools:**
+
 ```bash
 # Chrome DevTools Performance tab
 # Node.js: --inspect flag + Chrome devtools
@@ -63,6 +67,7 @@ npx 0x --output-dir '/tmp/flamegraph'
 ```
 
 #### Rendering Performance
+
 - Detect unnecessary re-renders
 - Identify layout thrashing
 - Check for forced synchronous layouts
@@ -70,11 +75,13 @@ npx 0x --output-dir '/tmp/flamegraph'
 ### 3. Network Performance
 
 #### API Calls
+
 - Find N+1 query patterns
 - Identify missing caching
 - Detect large payloads
 
 **Analysis:**
+
 ```bash
 # Check for repeated API calls
 rg "fetch\(|axios\.|http\." --type js --type ts
@@ -84,6 +91,7 @@ rg "onChange|onInput|onScroll" --type js --type ts
 ```
 
 #### Asset Optimization
+
 - Check image sizes and formats
 - Verify compression is enabled
 - Audit third-party scripts
@@ -91,11 +99,13 @@ rg "onChange|onInput|onScroll" --type js --type ts
 ### 4. Database Performance
 
 #### Query Analysis
+
 - Find slow queries
 - Detect missing indexes
 - Identify N+1 queries
 
 **Commands:**
+
 ```bash
 # Look for unindexed queries
 rg "SELECT \* FROM" --type sql --type ts --type js
@@ -107,12 +117,14 @@ rg "query\(|execute\(" --type ts --type js
 ### 5. Caching Strategy
 
 #### Check for:
+
 - Missing HTTP cache headers
 - Absent database query caching
 - No CDN for static assets
 - Missing memoization in compute-heavy functions
 
 **Commands:**
+
 ```bash
 # Check cache headers
 rg "Cache-Control|ETag|Last-Modified" --type ts --type js
@@ -124,12 +136,14 @@ rg "useMemo|useCallback|memoize" --type ts --type js
 ### 6. Memory Profiling
 
 #### Look for:
+
 - Event listener leaks
 - Growing arrays/objects never cleared
 - Closures holding large objects
 - Detached DOM trees
 
 **Tools:**
+
 ```bash
 # Node.js heap snapshots
 node --inspect
@@ -141,10 +155,11 @@ npx memwatch-next
 
 Generate a performance report:
 
-```markdown
+````markdown
 # Performance Audit Report
 
 ## Summary
+
 - **Bundle Size**: X MB (target: <500 KB)
 - **First Contentful Paint**: Xs (target: <1.5s)
 - **Time to Interactive**: Xs (target: <3.5s)
@@ -153,6 +168,7 @@ Generate a performance report:
 ## Critical Bottlenecks
 
 ### 1. [Bottleneck Name]
+
 **Impact**: High/Medium/Low
 **Location**: `path/to/file.js:line`
 **Current**: What's happening now
@@ -160,31 +176,35 @@ Generate a performance report:
 **Solution**: How to fix it
 
 **Before**:
+
 ```javascript
 // ❌ Slow - O(n²) complexity
-const result = data.map(x => 
-  data.filter(y => y.id === x.id)
-);
+const result = data.map((x) => data.filter((y) => y.id === x.id));
 ```
+````
 
 **After**:
+
 ```javascript
 // ✅ Fast - O(n) with Map
-const map = new Map(data.map(x => [x.id, x]));
-const result = data.map(x => map.get(x.id));
+const map = new Map(data.map((x) => [x.id, x]));
+const result = data.map((x) => map.get(x.id));
 ```
 
 ## Optimization Opportunities
 
 ### Bundle Size
+
 - Replace `moment` (67KB) with `date-fns` (tree-shakeable)
 - Lazy load charting library (saves 120KB initial load)
 
 ### Runtime
+
 - Add virtual scrolling for long lists (1000+ items)
 - Implement debouncing for search input
 
 ### Network
+
 - Add HTTP caching for static assets
 - Implement API response caching with Redis
 - Enable gzip/brotli compression
@@ -198,12 +218,13 @@ const result = data.map(x => map.get(x.id));
 
 ## Performance Budget
 
-| Metric | Current | Target | Status |
-|--------|---------|--------|--------|
-| Bundle Size | 1.2 MB | 500 KB | ❌ |
-| FCP | 2.1s | 1.5s | ❌ |
-| TTI | 4.5s | 3.5s | ❌ |
-| Lighthouse | 72 | 90+ | ❌ |
+| Metric      | Current | Target | Status |
+| ----------- | ------- | ------ | ------ |
+| Bundle Size | 1.2 MB  | 500 KB | ❌     |
+| FCP         | 2.1s    | 1.5s   | ❌     |
+| TTI         | 4.5s    | 3.5s   | ❌     |
+| Lighthouse  | 72      | 90+    | ❌     |
+
 ```
 
 ## Rules
@@ -228,3 +249,4 @@ Provide a prioritized list of optimizations with:
 - Implementation effort (S/M/L)
 - Code examples for each fix
 - Performance budget tracking
+```

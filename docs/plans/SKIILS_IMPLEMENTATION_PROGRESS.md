@@ -8,12 +8,12 @@
 
 ## 📊 Overall Progress
 
-| Category | Total Skills | Implemented | In Progress | Remaining |
-|----------|-------------|-------------|-------------|-----------|
-| **Critical Priority** | 5 | 5 ✅ | 0 🔄 | 0 ⏳ |
-| **High Priority** | 15 | 3 ✅ | 0 🔄 | 12 ⏳ |
-| **Medium Priority** | 20 | 0 ✅ | 0 🔄 | 20 ⏳ |
-| **Total** | 40 | 8 ✅ | 0 🔄 | 32 ⏳ |
+| Category              | Total Skills | Implemented | In Progress | Remaining |
+| --------------------- | ------------ | ----------- | ----------- | --------- |
+| **Critical Priority** | 5            | 5 ✅        | 0 🔄        | 0 ⏳      |
+| **High Priority**     | 15           | 3 ✅        | 0 🔄        | 12 ⏳     |
+| **Medium Priority**   | 20           | 0 ✅        | 0 🔄        | 20 ⏳     |
+| **Total**             | 40           | 8 ✅        | 0 🔄        | 32 ⏳     |
 
 **Completion Rate**: 20% (8/40 priority skills)
 
@@ -22,11 +22,13 @@
 ## ✅ Implemented Skills (v0.16.0)
 
 ### 1. MCP Security Audit
+
 **Command**: `/mcp-security-audit`  
 **Status**: ✅ Complete  
 **File**: `packages/cli/src/ui/commands/mcpSecurityAuditCommand.ts`
 
 **Features**:
+
 - Scans MCP configurations for hardcoded secrets
 - Detects unpinned versions (supply chain risk)
 - Identifies dangerous command execution patterns
@@ -35,6 +37,7 @@
 - Generates detailed security report with remediation steps
 
 **Security Rules**:
+
 - ✅ HARDCODED_API_KEY
 - ✅ HARDCODED_SECRET
 - ✅ HARDCODED_PASSWORD
@@ -55,17 +58,20 @@
 ---
 
 ### 2. Agent OWASP Compliance
+
 **Command**: `/agent-owasp-compliance`  
 **Status**: ✅ Complete  
 **File**: `packages/cli/src/ui/commands/agentOwaspComplianceCommand.ts`
 
 **Features**:
+
 - Checks all OWASP Agentic AI Top 10 risks
 - Provides compliance percentage
 - Generates detailed remediation plan
 - MITRE ATT&CK mapping
 
 **OWASP Top 10 Coverage**:
+
 1. ✅ Excessive Agency - Permission checks, least privilege, user confirmation
 2. ✅ Indirect Prompt Injection - Input sanitization, prompt separation
 3. ✅ Memory Corruption - Memory encryption, isolation, validation
@@ -80,11 +86,13 @@
 ---
 
 ### 3. Make Skill Template
+
 **Command**: `/make-skill-template <description>`  
 **Status**: ✅ Complete  
 **File**: `packages/cli/src/ui/commands/makeSkillTemplateCommand.ts`
 
 **Features**:
+
 - Generates complete MCP server from natural language
 - Creates TypeScript code with Zod validation
 - Generates Vitest tests
@@ -93,6 +101,7 @@
 - Includes package.json and tsconfig
 
 **Generated Files**:
+
 - ✅ `src/{skill}-skill.ts` - MCP server implementation
 - ✅ `src/{skill}.test.ts` - Unit tests
 - ✅ `README.md` - Documentation
@@ -103,11 +112,13 @@
 ---
 
 ### 4. Security Review
+
 **Command**: `/security-review [path]`
 **Status**: ✅ Complete
 **File**: `packages/cli/src/ui/commands/securityReviewCommand.ts`
 
 **Features**:
+
 - AI-powered codebase security scanner
 - Pattern-based vulnerability detection
 - OWASP Top 10 coverage
@@ -116,6 +127,7 @@
 - Generates detailed security reports with remediation
 
 **Security Patterns** (28+ rules):
+
 - ✅ Hardcoded Secrets (passwords, API keys, tokens, private keys)
 - ✅ SQL Injection (template literals, string concatenation)
 - ✅ Command Injection (exec, spawn with user input)
@@ -123,7 +135,7 @@
 - ✅ Path Traversal (file operations with concatenation)
 - ✅ Weak Cryptography (MD5, SHA1)
 - ✅ Insecure Randomness (Math.random)
-- ✅ Prototype Pollution (Object.assign, __proto__)
+- ✅ Prototype Pollution (Object.assign, **proto**)
 - ✅ SSRF (fetch/axios with user URLs)
 - ✅ Dangerous Functions (eval, Function constructor)
 - ✅ Security Misconfigurations (CORS, static files)
@@ -132,11 +144,13 @@
 ---
 
 ### 5. Python MCP Server Generator
+
 **Command**: `/python-mcp-server <description>`
 **Status**: ✅ Complete
 **File**: `packages/cli/src/ui/commands/pythonMcpServerCommand.ts`
 
 **Features**:
+
 - Generates complete Python MCP servers from natural language
 - Creates server implementation with tools
 - Generates tool definitions and handlers
@@ -146,6 +160,7 @@
 - Auto-generates README with usage instructions
 
 **Generated Files**:
+
 - ✅ `server.py` - Main MCP server implementation
 - ✅ `tools.py` - Tool definitions and handlers
 - ✅ `pyproject.toml` - Project configuration
@@ -158,10 +173,12 @@
 ---
 
 ### 6. GitHub Integration (from previous work)
+
 **Commands**: `/github`, `/github-auth`, `/github-device-auth`  
 **Status**: ✅ Complete
 
 **Features**:
+
 - GitHub App JWT authentication
 - OAuth 2.0 Device Flow
 - GitHub MCP client (40+ API methods)
@@ -171,9 +188,11 @@
 ---
 
 ### 5. Existing Azure Skills (26 skills)
+
 **Status**: ✅ Already Implemented
 
 Includes:
+
 - azure-prepare, azure-deploy, azure-validate
 - azure-diagnostics, azure-compliance
 - azure-resource-visualizer, azure-kubernetes
@@ -314,24 +333,24 @@ None currently in progress. All Critical Priority skills complete!
 
 ### Code Statistics
 
-| Metric | Value |
-|--------|-------|
-| **Total New Skills** | 5 |
-| **Lines of Code** | ~5,200 |
-| **Files Created** | 5 |
-| **Commands Added** | 5 |
-| **Security Rules** | 44+ |
-| **OWASP Controls** | 10 |
-| **Documentation** | 3 files |
+| Metric               | Value   |
+| -------------------- | ------- |
+| **Total New Skills** | 5       |
+| **Lines of Code**    | ~5,200  |
+| **Files Created**    | 5       |
+| **Commands Added**   | 5       |
+| **Security Rules**   | 44+     |
+| **OWASP Controls**   | 10      |
+| **Documentation**    | 3 files |
 
 ### GitHub Activity
 
-| Metric | Value |
-|--------|-------|
-| **Commits** | 5+ |
-| **Pushes** | 5+ |
-| **Files Changed** | 8 |
-| **Version** | 0.15.3 → 0.16.0 |
+| Metric            | Value           |
+| ----------------- | --------------- |
+| **Commits**       | 5+              |
+| **Pushes**        | 5+              |
+| **Files Changed** | 8               |
+| **Version**       | 0.15.3 → 0.16.0 |
 
 ---
 

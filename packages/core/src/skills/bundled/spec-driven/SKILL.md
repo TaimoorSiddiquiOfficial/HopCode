@@ -39,6 +39,7 @@ Parse the user's spec. For each ambiguity, ask a focused question. Cover:
 If the spec is clear, skip directly to Step 2. Do not over-ask.
 
 **Output a Requirements Summary** before proceeding:
+
 ```
 ### Requirements Summary
 - Feature: [one-line description]
@@ -55,11 +56,13 @@ If the spec is clear, skip directly to Step 2. Do not over-ask.
 Before writing any implementation, write tests. Tests define the contract.
 
 ### Test File Placement
+
 - Put tests alongside source: `src/foo.test.ts` next to `src/foo.ts`
 - Or in a `__tests__/` directory if the project convention requires it
 - Match the existing test runner (Jest, Vitest, Node test, etc.) — check `package.json`
 
 ### Test Structure
+
 ```typescript
 describe('<ComponentOrFunction>', () => {
   it('returns X when given Y', () => { ... });
@@ -69,6 +72,7 @@ describe('<ComponentOrFunction>', () => {
 ```
 
 ### Run Tests to Confirm They Fail
+
 ```bash
 npm test -- --testPathPattern=<file>
 # or
@@ -84,6 +88,7 @@ npx vitest run <file>
 Write the minimum code to make the failing tests pass. Do not over-engineer.
 
 ### Implementation Rules
+
 - One function/class per file where possible
 - Export only what tests and callers need
 - Use the language and style of the surrounding codebase
@@ -91,10 +96,13 @@ Write the minimum code to make the failing tests pass. Do not over-engineer.
 - If a test requires mocking, use the project's existing mock strategy
 
 ### After Each Implementation Unit
+
 Run the tests:
+
 ```bash
 npm test -- --testPathPattern=<file>
 ```
+
 Iterate until all tests pass. If a test is genuinely wrong (misunderstood requirement), fix the test AND document why.
 
 ---
@@ -109,6 +117,7 @@ Once tests are green, clean up:
 - **Add types** — ensure TypeScript types are accurate, not `any`
 
 ### Refactor Rules
+
 - Run tests after every significant change
 - Never introduce new behaviour during refactor
 - Keep diffs small and reviewable
@@ -134,6 +143,7 @@ After implementation and refactor:
    ```
 
 ### Final Output
+
 ```
 ### Spec-Driven Complete
 

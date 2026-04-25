@@ -13,12 +13,14 @@
 ### Phase 1: GitHub App Integration
 
 **Files Created**:
+
 - `packages/core/src/auth/github-app-auth.ts` - JWT authentication, token management
 - `packages/core/src/mcp/github-mcp-client.ts` - Full GitHub API client
 - `docs/users/github-integration.md` - Complete integration guide
 - `.github-app-config.md` - Quick configuration reference
 
 **Features**:
+
 - ✅ GitHub App JWT token generation
 - ✅ Installation token caching (5 min TTL)
 - ✅ Repository-level token resolution
@@ -29,9 +31,11 @@
 ### Phase 2: GitHub MCP Server Integration
 
 **Files Created**:
+
 - `packages/core/src/mcp/github-mcp-client.ts` - 40+ GitHub API methods
 
 **API Coverage**:
+
 - ✅ Issues (list, get, create, update, comment)
 - ✅ Pull Requests (list, get, files, create, update, merge)
 - ✅ Workflows (list, trigger, runs, logs, cancel, rerun)
@@ -44,11 +48,13 @@
 ### Phase 3: Unified Agent System
 
 **Files Created**:
+
 - `packages/core/src/agents/github-agents.ts` - 5 GitHub subagents
 - `packages/cli/src/ui/commands/githubCommand.ts` - GitHub slash command
 - `packages/vscode-ide-companion/schemas/github-settings.schema.json` - Settings schema
 
 **Subagents**:
+
 1. ✅ `github-reviewer` - PR code review
 2. ✅ `github-triager` - Issue triage
 3. ✅ `github-ci-monitor` - CI/CD monitoring
@@ -56,6 +62,7 @@
 5. ✅ `github-security-scanner` - Security scanning
 
 **Slash Commands**:
+
 - `/github auth` - Authentication
 - `/github issues` - Issue management
 - `/github pr` - Pull request review
@@ -79,10 +86,12 @@ Your private key is stored at: `.github/hopcode-cli.2026-04-23.private-key.pem`
 HopCode uses **JWT authentication** which is more secure and doesn't require Client Secret:
 
 **Required credentials:**
+
 - ✅ App ID: `3424564`
 - ✅ Private Key: Available in `.github/` folder
 
 **Not required for core functionality:**
+
 - ❌ Client Secret (only for OAuth user-specific flows)
 - ❌ Webhook URL (only for real-time event notifications)
 
@@ -165,15 +174,15 @@ hopcode workflows list
 
 ## 📁 Files Created
 
-| File | Purpose | Lines |
-|------|---------|-------|
-| `packages/core/src/auth/github-app-auth.ts` | GitHub App authentication | 250 |
-| `packages/core/src/mcp/github-mcp-client.ts` | GitHub API client | 500 |
-| `packages/core/src/agents/github-agents.ts` | GitHub subagents | 300 |
-| `packages/cli/src/ui/commands/githubCommand.ts` | GitHub slash command | 150 |
-| `packages/vscode-ide-companion/schemas/github-settings.schema.json` | Settings schema | 100 |
-| `docs/users/github-integration.md` | Integration guide | 400 |
-| `.github-app-config.md` | Quick config reference | 100 |
+| File                                                                | Purpose                   | Lines |
+| ------------------------------------------------------------------- | ------------------------- | ----- |
+| `packages/core/src/auth/github-app-auth.ts`                         | GitHub App authentication | 250   |
+| `packages/core/src/mcp/github-mcp-client.ts`                        | GitHub API client         | 500   |
+| `packages/core/src/agents/github-agents.ts`                         | GitHub subagents          | 300   |
+| `packages/cli/src/ui/commands/githubCommand.ts`                     | GitHub slash command      | 150   |
+| `packages/vscode-ide-companion/schemas/github-settings.schema.json` | Settings schema           | 100   |
+| `docs/users/github-integration.md`                                  | Integration guide         | 400   |
+| `.github-app-config.md`                                             | Quick config reference    | 100   |
 
 **Total**: ~1,800 lines of code and documentation
 
@@ -182,6 +191,7 @@ hopcode workflows list
 ## 🎯 Next Steps
 
 ### Immediate (Required)
+
 1. ✅ Get Client Secret from GitHub App settings
 2. ✅ Download Private Key (PEM file)
 3. ✅ Generate Webhook Secret
@@ -189,6 +199,7 @@ hopcode workflows list
 5. ✅ Install app on repositories
 
 ### Short Term (Week 1-2)
+
 1. Build and test the new modules
 2. Test authentication flow
 3. Test all MCP tools
@@ -196,6 +207,7 @@ hopcode workflows list
 5. Add unit tests for new code
 
 ### Medium Term (Week 3-4)
+
 1. Add GitHub webhook handler
 2. Implement real-time event processing
 3. Add GitHub Actions workflows for HopCode
@@ -203,6 +215,7 @@ hopcode workflows list
 5. Create VS Code GitHub panel
 
 ### Long Term (Week 5-8)
+
 1. GitHub Copilot SDK model access
 2. Advanced AI features (auto-fix, auto-review)
 3. Team collaboration features

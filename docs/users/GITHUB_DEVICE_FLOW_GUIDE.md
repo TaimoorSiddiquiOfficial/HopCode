@@ -51,6 +51,7 @@ hopcode /github-device-auth
 ```
 
 **What happens:**
+
 1. HopCode requests a device code from GitHub
 2. Displays a user code and verification URL
 3. You enter the code in your browser
@@ -199,16 +200,16 @@ curl -H "Authorization: token YOUR_ACCESS_TOKEN" \
 
 ## Comparison: Device Flow vs JWT Auth
 
-| Feature | Device Flow (OAuth) | JWT (GitHub App) |
-|---------|---------------------|------------------|
-| **Use Case** | User authentication | App authentication |
-| **Token Type** | OAuth access token | JWT → Installation token |
-| **Permissions** | User's permissions | App's permissions |
-| **Expiry** | 8 hours (configurable) | 1 hour (auto-refresh) |
-| **Best For** | CLI, mobile apps | Server-to-server |
-| **Setup** | OAuth App required | GitHub App required |
-| **Rate Limit** | 5,000 requests/hour | 15,000 requests/hour |
-| **Acts As** | User | App installation |
+| Feature         | Device Flow (OAuth)    | JWT (GitHub App)         |
+| --------------- | ---------------------- | ------------------------ |
+| **Use Case**    | User authentication    | App authentication       |
+| **Token Type**  | OAuth access token     | JWT → Installation token |
+| **Permissions** | User's permissions     | App's permissions        |
+| **Expiry**      | 8 hours (configurable) | 1 hour (auto-refresh)    |
+| **Best For**    | CLI, mobile apps       | Server-to-server         |
+| **Setup**       | OAuth App required     | GitHub App required      |
+| **Rate Limit**  | 5,000 requests/hour    | 15,000 requests/hour     |
+| **Acts As**     | User                   | App installation         |
 
 ---
 
@@ -239,12 +240,13 @@ curl -H "Authorization: token YOUR_ACCESS_TOKEN" \
 // ~/.hopcode/settings.json
 {
   "github": {
-    "oauthToken": "gho_abc123..."  // ← Device Flow token
+    "oauthToken": "gho_abc123..." // ← Device Flow token
   }
 }
 ```
 
 **Best Practices:**
+
 - ✅ Store in user's home directory
 - ✅ Set file permissions to 600 (owner read/write only)
 - ✅ Never commit to git
@@ -272,8 +274,8 @@ user:email        - Access user email addresses
 import { GitHubDeviceFlowAuth } from '@hoptrendy/hopcode-core';
 
 const deviceAuth = new GitHubDeviceFlowAuth(
-  'Iv23livRiRBTa9cyBnk1',  // Client ID
-  'your_client_secret'       // Client Secret (optional)
+  'Iv23livRiRBTa9cyBnk1', // Client ID
+  'your_client_secret', // Client Secret (optional)
 );
 
 // Authenticate with progress
@@ -282,22 +284,22 @@ const token = await deviceAuth.authenticateWithProgress(
   (response) => {
     console.log(`Enter ${response.user_code} at ${response.verification_uri}`);
   },
-  
+
   // Save token
   (token) => {
     console.log(`Got token: ${token.access_token}`);
     saveToConfig(token.access_token);
   },
-  
+
   // Handle errors
   (error) => {
     console.error(`Auth failed: ${error}`);
   },
-  
+
   // Progress updates
   (message) => {
     console.log(`[Auth] ${message}`);
-  }
+  },
 );
 ```
 
@@ -310,9 +312,9 @@ import { GitHubDeviceFlowAuth } from '@hoptrendy/hopcode-core';
 
 async function authenticate() {
   const auth = new GitHubDeviceFlowAuth(process.env.GITHUB_CLIENT_ID);
-  
+
   console.log('Starting GitHub authentication...\n');
-  
+
   try {
     const token = await auth.authenticateWithProgress(
       (response) => {
@@ -336,9 +338,9 @@ async function authenticate() {
       },
       (message) => {
         console.log(`[Status] ${message}`);
-      }
+      },
     );
-    
+
     return token;
   } catch (error) {
     console.error('Fatal error:', error.message);
@@ -364,6 +366,7 @@ authenticate();
 ### Issue: Token not working
 
 **Check:**
+
 ```bash
 # Verify token is valid
 curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user
@@ -376,6 +379,7 @@ curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user
 ### Issue: Polling never completes
 
 **Check:**
+
 - User entered correct code
 - User actually authorized (check email for confirmation)
 - Device code hasn't expired (15 min limit)
@@ -384,6 +388,7 @@ curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user
 ### Issue: Getting "slow_down" errors
 
 **Solution:**
+
 ```typescript
 // Increase polling interval
 let interval = 5000; // Start at 5 seconds

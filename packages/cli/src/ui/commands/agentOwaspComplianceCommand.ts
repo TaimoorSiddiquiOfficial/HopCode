@@ -4,14 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand, CommandContext, SlashCommandActionReturn } from './types.js';
+import type {
+  SlashCommand,
+  CommandContext,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 
 /**
  * Agent OWASP Compliance Command
- * 
+ *
  * Checks AI agent codebases against OWASP Agentic Security Initiative Top 10 risks:
- * 
+ *
  * 1. Excessive Agency
  * 2. Indirect Prompt Injection
  * 3. Memory Corruption
@@ -25,9 +29,13 @@ import { CommandKind } from './types.js';
  */
 export const agentOwaspComplianceCommand: SlashCommand = {
   name: 'agent-owasp-compliance',
-  description: 'Check AI agent codebase against OWASP Top 10 agentic security risks',
+  description:
+    'Check AI agent codebase against OWASP Top 10 agentic security risks',
   kind: CommandKind.BUILT_IN,
-  action: async (context: CommandContext, _args: string): Promise<SlashCommandActionReturn> => {
+  action: async (
+    context: CommandContext,
+    _args: string,
+  ): Promise<SlashCommandActionReturn> => {
     try {
       const complianceResults = await performOwaspComplianceCheck(context);
       return {
@@ -36,7 +44,8 @@ export const agentOwaspComplianceCommand: SlashCommand = {
         content: generateComplianceReport(complianceResults),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       return {
         type: 'message',
         messageType: 'error',
@@ -94,7 +103,8 @@ const OWASP_TOP_10: OwaspRisk[] = [
   {
     id: 3,
     name: 'Memory Corruption',
-    description: 'Agent memory manipulated to leak sensitive data or alter behavior',
+    description:
+      'Agent memory manipulated to leak sensitive data or alter behavior',
     mitreId: 'T1562',
   },
   {
@@ -121,7 +131,8 @@ const OWASP_TOP_10: OwaspRisk[] = [
   {
     id: 8,
     name: 'Denial of Service (Agent)',
-    description: 'Agents overwhelmed with requests consuming excessive resources',
+    description:
+      'Agents overwhelmed with requests consuming excessive resources',
     mitreId: 'T1499',
   },
   {
@@ -141,7 +152,9 @@ const OWASP_TOP_10: OwaspRisk[] = [
 /**
  * Perform OWASP compliance check
  */
-async function performOwaspComplianceCheck(context: CommandContext): Promise<OwaspComplianceReport> {
+async function performOwaspComplianceCheck(
+  context: CommandContext,
+): Promise<OwaspComplianceReport> {
   const results: ComplianceResult[] = [];
 
   // Check each OWASP risk
@@ -150,9 +163,11 @@ async function performOwaspComplianceCheck(context: CommandContext): Promise<Owa
     results.push(result);
   }
 
-  const compliant = results.filter(r => r.status === 'compliant').length;
-  const nonCompliant = results.filter(r => r.status === 'non-compliant').length;
-  const partial = results.filter(r => r.status === 'partial').length;
+  const compliant = results.filter((r) => r.status === 'compliant').length;
+  const nonCompliant = results.filter(
+    (r) => r.status === 'non-compliant',
+  ).length;
+  const partial = results.filter((r) => r.status === 'partial').length;
 
   return { results, compliant, nonCompliant, partial };
 }
@@ -177,18 +192,24 @@ async function checkOwaspRisk(
 
         if (!hasPermissionChecks) {
           findings.push('No permission checks detected for agent actions');
-          recommendations.push('Implement permission checks before sensitive operations');
+          recommendations.push(
+            'Implement permission checks before sensitive operations',
+          );
           status = 'non-compliant';
         }
 
         if (!hasLeastPrivilege) {
           findings.push('Agent may have excessive permissions');
-          recommendations.push('Apply principle of least privilege to agent capabilities');
+          recommendations.push(
+            'Apply principle of least privilege to agent capabilities',
+          );
           if (status === 'compliant') status = 'partial';
         }
 
         if (!hasUserConfirmation) {
-          findings.push('No user confirmation required for destructive actions');
+          findings.push(
+            'No user confirmation required for destructive actions',
+          );
           recommendations.push(
             'Require explicit user confirmation for destructive or irreversible actions',
           );
@@ -201,17 +222,24 @@ async function checkOwaspRisk(
       {
         const hasInputSanitization = await checkForInputSanitization(context);
         const hasPromptSeparation = await checkForPromptSeparation(context);
-        const hasExternalInputValidation = await checkForExternalInputValidation(context);
+        const hasExternalInputValidation =
+          await checkForExternalInputValidation(context);
 
         if (!hasInputSanitization) {
           findings.push('No input sanitization for external data');
-          recommendations.push('Sanitize all external inputs before including in prompts');
+          recommendations.push(
+            'Sanitize all external inputs before including in prompts',
+          );
           status = 'non-compliant';
         }
 
         if (!hasPromptSeparation) {
-          findings.push('User input not properly separated from system instructions');
-          recommendations.push('Use prompt templates with clear separation of concerns');
+          findings.push(
+            'User input not properly separated from system instructions',
+          );
+          recommendations.push(
+            'Use prompt templates with clear separation of concerns',
+          );
           status = 'non-compliant';
         }
 
@@ -237,13 +265,17 @@ async function checkOwaspRisk(
 
         if (!hasMemoryIsolation) {
           findings.push('Memory not isolated between sessions/users');
-          recommendations.push('Isolate memory between different users and sessions');
+          recommendations.push(
+            'Isolate memory between different users and sessions',
+          );
           status = 'non-compliant';
         }
 
         if (!hasMemoryValidation) {
           findings.push('No validation of retrieved memory content');
-          recommendations.push('Validate memory content before using in decisions');
+          recommendations.push(
+            'Validate memory content before using in decisions',
+          );
           if (status === 'compliant') status = 'partial';
         }
       }
@@ -252,7 +284,8 @@ async function checkOwaspRisk(
     case 4: // Misconfigured Model Context
       {
         const hasContextLimits = await checkForContextLimits(context);
-        const hasSensitiveDataFiltering = await checkForSensitiveDataFiltering(context);
+        const hasSensitiveDataFiltering =
+          await checkForSensitiveDataFiltering(context);
         const hasContextRotation = await checkForContextRotation(context);
 
         if (!hasContextLimits) {
@@ -278,12 +311,16 @@ async function checkOwaspRisk(
     case 5: // Overreliance on AI
       {
         const hasHumanOversight = await checkForHumanOversight(context);
-        const hasCriticalActionReview = await checkForCriticalActionReview(context);
-        const hasConfidenceThresholds = await checkForConfidenceThresholds(context);
+        const hasCriticalActionReview =
+          await checkForCriticalActionReview(context);
+        const hasConfidenceThresholds =
+          await checkForConfidenceThresholds(context);
 
         if (!hasHumanOversight) {
           findings.push('No human oversight for critical decisions');
-          recommendations.push('Implement human-in-the-loop for critical operations');
+          recommendations.push(
+            'Implement human-in-the-loop for critical operations',
+          );
           status = 'non-compliant';
         }
 
@@ -295,7 +332,9 @@ async function checkOwaspRisk(
 
         if (!hasConfidenceThresholds) {
           findings.push('No confidence thresholds for AI recommendations');
-          recommendations.push('Set confidence thresholds and escalate low-confidence outputs');
+          recommendations.push(
+            'Set confidence thresholds and escalate low-confidence outputs',
+          );
           if (status === 'compliant') status = 'partial';
         }
       }
@@ -347,7 +386,9 @@ async function checkOwaspRisk(
 
         if (!hasRollbackCapability) {
           findings.push('No rollback capability for agent actions');
-          recommendations.push('Implement rollback mechanism for all stateful operations');
+          recommendations.push(
+            'Implement rollback mechanism for all stateful operations',
+          );
           if (status === 'compliant') status = 'partial';
         }
       }
@@ -367,13 +408,17 @@ async function checkOwaspRisk(
 
         if (!hasResourceLimits) {
           findings.push('No resource limits for agent operations');
-          recommendations.push('Set CPU, memory, and time limits for agent tasks');
+          recommendations.push(
+            'Set CPU, memory, and time limits for agent tasks',
+          );
           status = 'non-compliant';
         }
 
         if (!hasCircuitBreaker) {
           findings.push('No circuit breaker for failing operations');
-          recommendations.push('Implement circuit breaker pattern for external calls');
+          recommendations.push(
+            'Implement circuit breaker pattern for external calls',
+          );
           if (status === 'compliant') status = 'partial';
         }
       }
@@ -387,7 +432,9 @@ async function checkOwaspRisk(
 
         if (!hasDependencyScanning) {
           findings.push('No automated dependency vulnerability scanning');
-          recommendations.push('Enable Dependabot or similar for dependency scanning');
+          recommendations.push(
+            'Enable Dependabot or similar for dependency scanning',
+          );
           status = 'non-compliant';
         }
 
@@ -409,7 +456,8 @@ async function checkOwaspRisk(
       {
         const hasCodeReview = await checkForCodeReview(context);
         const hasSecurityTesting = await checkForSecurityTesting(context);
-        const hasVulnerabilityScanning = await checkForVulnerabilityScanning(context);
+        const hasVulnerabilityScanning =
+          await checkForVulnerabilityScanning(context);
 
         if (!hasCodeReview) {
           findings.push('Agent code not regularly reviewed for security');
@@ -425,7 +473,9 @@ async function checkOwaspRisk(
 
         if (!hasVulnerabilityScanning) {
           findings.push('No automated vulnerability scanning');
-          recommendations.push('Run CodeQL or similar for vulnerability detection');
+          recommendations.push(
+            'Run CodeQL or similar for vulnerability detection',
+          );
           if (status === 'compliant') status = 'partial';
         }
       }
@@ -444,155 +494,187 @@ async function checkOwaspRisk(
 }
 
 /**
- * Compliance check helpers (stubs - implement based on actual codebase analysis)
+ * Compliance check helpers - stubs that honestly report as not-yet-implemented.
+ * TODO: Implement each check using actual codebase analysis.
  */
-async function checkForPermissionChecks(_context: CommandContext): Promise<boolean> {
-  // TODO: Implement actual codebase scanning
-  // For now, check if approval mode is configured
+async function checkForPermissionChecks(
+  _context: CommandContext,
+): Promise<boolean> {
+  // Implemented: check if approval mode is NOT yolo
   return process.env.HOPCODE_APPROVAL_MODE !== 'yolo';
 }
 
-async function checkForLeastPrivilege(_context: CommandContext): Promise<boolean> {
-  // TODO: Scan for permission scopes
-  return true; // Assume compliant for now
+async function checkForLeastPrivilege(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Scan for permission scopes
 }
 
-async function checkForUserConfirmation(_context: CommandContext): Promise<boolean> {
-  // Check if destructive commands require confirmation
-  return true;
+async function checkForUserConfirmation(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check if destructive commands require confirmation
 }
 
-async function checkForInputSanitization(_context: CommandContext): Promise<boolean> {
-  // TODO: Scan for sanitization functions
-  return true;
+async function checkForInputSanitization(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Scan for sanitization functions
 }
 
-async function checkForPromptSeparation(_context: CommandContext): Promise<boolean> {
-  // TODO: Check prompt template structure
-  return true;
+async function checkForPromptSeparation(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check prompt template structure
 }
 
-async function checkForExternalInputValidation(_context: CommandContext): Promise<boolean> {
-  // TODO: Check for input validation
-  return true;
+async function checkForExternalInputValidation(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check for input validation
 }
 
-async function checkForMemoryEncryption(_context: CommandContext): Promise<boolean> {
-  // TODO: Check memory encryption settings
-  return false; // Typically not implemented
+async function checkForMemoryEncryption(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check memory encryption settings
 }
 
-async function checkForMemoryIsolation(_context: CommandContext): Promise<boolean> {
-  // TODO: Check memory isolation
-  return true;
+async function checkForMemoryIsolation(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check memory isolation
 }
 
-async function checkForMemoryValidation(_context: CommandContext): Promise<boolean> {
-  // TODO: Check memory validation
-  return true;
+async function checkForMemoryValidation(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check memory validation
 }
 
-async function checkForContextLimits(_context: CommandContext): Promise<boolean> {
-  // Check if context limits are configured
-  return true;
+async function checkForContextLimits(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check if context limits are configured
 }
 
-async function checkForSensitiveDataFiltering(_context: CommandContext): Promise<boolean> {
-  // TODO: Check for PII filtering
-  return false; // Needs implementation
+async function checkForSensitiveDataFiltering(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check for PII filtering
 }
 
-async function checkForContextRotation(_context: CommandContext): Promise<boolean> {
-  // TODO: Check context rotation
-  return true;
+async function checkForContextRotation(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check context rotation
 }
 
-async function checkForHumanOversight(_context: CommandContext): Promise<boolean> {
-  // Check if human oversight is configured for critical actions
-  return process.env.HOPCODE_APPROVAL_MODE !== 'yolo';
+async function checkForHumanOversight(
+  _context: CommandContext,
+): Promise<boolean> {
+  // Use config approval mode rather than raw env var
+  return false; // TODO: Check if human oversight is configured for critical actions
 }
 
-async function checkForCriticalActionReview(_context: CommandContext): Promise<boolean> {
-  // TODO: Check for critical action review
-  return true;
+async function checkForCriticalActionReview(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check for critical action review
 }
 
-async function checkForConfidenceThresholds(_context: CommandContext): Promise<boolean> {
-  // TODO: Check confidence thresholds
-  return false; // Needs implementation
+async function checkForConfidenceThresholds(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check confidence thresholds
 }
 
-async function checkForDataClassification(_context: CommandContext): Promise<boolean> {
-  // TODO: Check data classification
-  return false; // Needs implementation
+async function checkForDataClassification(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check data classification
 }
 
-async function checkForOutputFiltering(_context: CommandContext): Promise<boolean> {
-  // TODO: Check output filtering
-  return false; // Needs implementation
+async function checkForOutputFiltering(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check output filtering
 }
 
-async function checkForLoggingRedaction(_context: CommandContext): Promise<boolean> {
-  // TODO: Check logging redaction
-  return true;
+async function checkForLoggingRedaction(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check logging redaction
 }
 
-async function checkForSandboxEnvironment(_context: CommandContext): Promise<boolean> {
-  // Check if sandbox is configured
-  return process.env.QWEN_SANDBOX === 'true';
+async function checkForSandboxEnvironment(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check if sandbox is configured
 }
 
-async function checkForActionLimits(_context: CommandContext): Promise<boolean> {
-  // TODO: Check action rate limits
-  return true;
+async function checkForActionLimits(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check action rate limits
 }
 
-async function checkForRollbackCapability(_context: CommandContext): Promise<boolean> {
-  // TODO: Check rollback capability
-  return true;
+async function checkForRollbackCapability(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check rollback capability
 }
 
-async function checkForRateLimiting(_context: CommandContext): Promise<boolean> {
-  // TODO: Check rate limiting
-  return true;
+async function checkForRateLimiting(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check rate limiting
 }
 
-async function checkForResourceLimits(_context: CommandContext): Promise<boolean> {
-  // TODO: Check resource limits
-  return true;
+async function checkForResourceLimits(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check resource limits
 }
 
-async function checkForCircuitBreaker(_context: CommandContext): Promise<boolean> {
-  // TODO: Check circuit breaker
-  return false; // Needs implementation
+async function checkForCircuitBreaker(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check circuit breaker
 }
 
-async function checkForDependencyScanning(_context: CommandContext): Promise<boolean> {
-  // Check if Dependabot or similar is configured
-  return true; // Assume GitHub has Dependabot
+async function checkForDependencyScanning(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check if Dependabot or similar is configured
 }
 
-async function checkForPinnedVersions(_context: CommandContext): Promise<boolean> {
-  // TODO: Check package.json for pinned versions
-  return true;
+async function checkForPinnedVersions(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check package.json for pinned versions
 }
 
-async function checkForMcpSecurityAudit(_context: CommandContext): Promise<boolean> {
-  // Check if MCP security audit is run regularly
-  return true; // We just created this command
+async function checkForMcpSecurityAudit(
+  _context: CommandContext,
+): Promise<boolean> {
+  return false; // TODO: Check if MCP security audit is run regularly
 }
 
 async function checkForCodeReview(_context: CommandContext): Promise<boolean> {
-  // TODO: Check for code review process
-  return true;
+  return false; // TODO: Check for code review process
 }
 
-async function checkForSecurityTesting(_context: CommandContext): Promise<boolean> {
+async function checkForSecurityTesting(
+  _context: CommandContext,
+): Promise<boolean> {
   // TODO: Check for security tests
   return false; // Needs implementation
 }
 
-async function checkForVulnerabilityScanning(_context: CommandContext): Promise<boolean> {
+async function checkForVulnerabilityScanning(
+  _context: CommandContext,
+): Promise<boolean> {
   // TODO: Check for CodeQL or similar
   return false; // Needs implementation
 }
@@ -622,7 +704,11 @@ function generateComplianceReport(report: OwaspComplianceReport): string {
 
   for (const result of report.results) {
     const icon =
-      result.status === 'compliant' ? '✅' : result.status === 'partial' ? '⚠️' : '❌';
+      result.status === 'compliant'
+        ? '✅'
+        : result.status === 'partial'
+          ? '⚠️'
+          : '❌';
 
     output += `### ${icon} ${result.risk.id}. ${result.risk.name}
 

@@ -93,7 +93,10 @@ function handleCommandResult(
     case 'message':
       return {
         type: 'message',
-        messageType: (result.messageType === 'warning' || result.messageType === 'success') ? 'info' as const : result.messageType,
+        messageType:
+          result.messageType === 'warning' || result.messageType === 'success'
+            ? ('info' as const)
+            : result.messageType,
         content: result.content,
       };
 

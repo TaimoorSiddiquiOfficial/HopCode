@@ -42,6 +42,7 @@ import type {
   AgentApprovalRequestEvent,
   AgentUsageEvent,
   AgentStatusChangeEvent,
+  AgentErrorEvent,
 } from '@hoptrendy/hopcode-core';
 import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
 import { createDebugLogger } from '@hoptrendy/hopcode-core';
@@ -440,11 +441,11 @@ export class InProcessSessionManager {
       }
     });
 
-    emitter.on(AgentEventType.ERROR, (ev) => {
+    emitter.on(AgentEventType.ERROR, (ev: AgentErrorEvent) => {
       write({
         error: {
           type: 'AGENT_ERROR',
-          message: (ev as any).error ?? 'Unknown error',
+          message: ev.error ?? 'Unknown error',
         },
       });
     });

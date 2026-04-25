@@ -145,14 +145,17 @@ describe('HopCodeContentGenerator', () => {
   });
 
   it('should prioritize contentGeneratorConfig samplingParams over request config', async () => {
-    const generatorWithParams = new HopCodeContentGenerator({ apiKey: 'test' }, {
-      model: 'gemini-1.5-flash',
-      samplingParams: {
-        temperature: 0.1,
-        top_p: 0.2,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    const generatorWithParams = new HopCodeContentGenerator(
+      { apiKey: 'test' },
+      {
+        model: 'gemini-1.5-flash',
+        samplingParams: {
+          temperature: 0.1,
+          top_p: 0.2,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
+    );
 
     const request = {
       model: 'gemini-1.5-flash',

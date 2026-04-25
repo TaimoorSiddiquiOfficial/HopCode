@@ -6,7 +6,7 @@
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | User Experience                 | ✅ Terminal UI<br>✅ Support OpenAI Protocol<br>✅ Settings<br>✅ OAuth<br>✅ Cache Control<br>✅ Memory<br>✅ Compress<br>✅ Theme                                                | Better UI<br>OnBoarding<br>LogView<br>✅ Session<br>Permission<br>🔄 Cross-platform Compatibility<br>✅ Coding Plan<br>✅ Anthropic Provider<br>✅ Multimodal Input<br>✅ Unified WebUI |
 | Coding Workflow                 | ✅ Slash Commands<br>✅ MCP<br>✅ PlanMode<br>✅ TodoWrite<br>✅ SubAgent<br>✅ Multi Model<br>✅ Chat Management<br>✅ Tools (WebFetch, Bash, TextSearch, FileReadFile, EditFile) | 🔄 Hooks<br>✅ Skill<br>✅ Headless Mode<br>✅ Tools (WebSearch)<br>✅ LSP Support<br>✅ Concurrent Runner                                                                              |
-| Building Open Capabilities      | ✅ Custom Commands                                                                                                                                                                 | ✅ HopCode SDK<br>✅ Extension System                                                                                                                                                  |
+| Building Open Capabilities      | ✅ Custom Commands                                                                                                                                                                 | ✅ HopCode SDK<br>✅ Extension System                                                                                                                                                   |
 | Integrating Community Ecosystem |                                                                                                                                                                                    | ✅ VSCode Plugin<br>✅ ACP/Zed<br>✅ GHA                                                                                                                                                |
 | Administrative Capabilities     | ✅ Stats<br>✅ Feedback                                                                                                                                                            | Costs<br>Dashboard<br>✅ User Feedback Dialog                                                                                                                                           |
 
@@ -57,7 +57,7 @@
 | Tool: TextSearch        | `V0.0.8+` | Text search tool (grep, supports .hopcodeignore)        | Coding Workflow                 | 1     |
 | Tool: WebFetch          | `V0.0.7+` | Web content fetching tool                               | Coding Workflow                 | 1     |
 | Tool: WebSearch         | `V0.0.7+` | Web search tool (using Tavily API)                      | Coding Workflow                 | 1     |
-| OAuth                   | `V0.0.5+` | OAuth login authentication (HopCode OAuth)                 | User Experience                 | 1     |
+| OAuth                   | `V0.0.5+` | OAuth login authentication (HopCode OAuth)              | User Experience                 | 1     |
 
 #### Features to Develop
 

@@ -16,7 +16,8 @@ import type { Config } from '../config/config.js';
 import { HopCodeChat, StreamEventType } from '../core/hopCodeChat.js';
 
 vi.mock('../core/hopCodeChat.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../core/hopCodeChat.js')>();
+  const actual =
+    await importOriginal<typeof import('../core/hopCodeChat.js')>();
   return {
     ...actual,
     HopCodeChat: vi.fn(),
@@ -52,7 +53,7 @@ describe('CacheSafeParams', () => {
 
       saveCacheSafeParams(config, [], 'model');
 
-      // Mutate original — should not affect saved params
+      // Mutate original ï¿½ should not affect saved params
       (
         config.tools![0] as { functionDeclarations: unknown[] }
       ).functionDeclarations.push({ name: 'tool2' });
@@ -195,7 +196,7 @@ describe('runForkedAgent (cache path)', () => {
     });
 
     // Verify HopCodeChat was constructed with the full generationConfig
-    // (including tools) — createForkedChat retains tools for speculation callers
+    // (including tools) ï¿½ createForkedChat retains tools for speculation callers
     expect(HopCodeChat).toHaveBeenCalledOnce();
     const ctorArgs = vi.mocked(HopCodeChat).mock.calls[0];
     const chatGenerationConfig = ctorArgs[1] as GenerateContentConfig;
