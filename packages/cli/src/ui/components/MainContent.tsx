@@ -59,40 +59,35 @@ export const MainContent = () => {
   // buffer, it cannot be replaced. In compact mode, when a new tool_group is
   // merged into a previous one, the merged result has FEWER items than the
   // raw history. Static would not re-render the older items even though their
-  // content changed.
+  // content changed, so we explicitly call refreshStatic() to clear the
+  // terminal and re-render the merged view.
   //
-  // Rather than clearing the entire terminal (visible flash), we only need to
-  // clear when items have been *consumed* — i.e., the merged list grew by
-  // fewer items than the raw history grew. This means older Static entries
-  // have become stale and must be redrawn. We still trigger a full clear but
-  // only on genuine consumption, not on every tool event.
-  //
-  // The `key` bump on `historyRemountKey` ensures <Static> fully remounts.
-  const prevRawLenRef = useRef(uiState.history.length);
-  const prevMergedLenRef = useRef(mergedHistory.length);
+  // Detection: if history length grew but mergedHistory length did NOT grow
+  // proportionally (i.e., a merge consolidated items), trigger a refresh.
+  const prevHistoryLengthRef = useRef(uiState.history.length);
+  const prevMergedLengthRef = useRef(mergedHistory.length);
   useEffect(() => {
     if (!compactMode) {
-      prevRawLenRef.current = uiState.history.length;
-      prevMergedLenRef.current = mergedHistory.length;
+      prevHistoryLengthRef.current = uiState.history.length;
+      prevMergedLengthRef.current = mergedHistory.length;
       return;
     }
-    const prevRaw = prevRawLenRef.current;
-    const currRaw = uiState.history.length;
-    const prevMerged = prevMergedLenRef.current;
-    const currMerged = mergedHistory.length;
-    // New raw items added without proportional merged growth = items were
-    // merged into existing entries. Clear to stay consistent.
-    if (currRaw > prevRaw && currMerged === prevMerged) {
+    const prevHLen = prevHistoryLengthRef.current;
+    const currHLen = uiState.history.length;
+    const prevMLen = prevMergedLengthRef.current;
+    const currMLen = mergedHistory.length;
+    // History grew, but merged length stayed same or shrank → a merge happened.
+    if (currHLen > prevHLen && currMLen <= prevMLen) {
       uiActions.refreshStatic();
     }
-    prevRawLenRef.current = currRaw;
-    prevMergedLenRef.current = currMerged;
+    prevHistoryLengthRef.current = currHLen;
+    prevMergedLengthRef.current = currMLen;
   }, [compactMode, uiState.history, mergedHistory, uiActions]);
 
   return (
     <>
       <Static
-        key={uiState.historyRemountKey}
+        key={`${uiState.historyRemountKey}-${uiState.currentModel}`}
         items={[
           <AppHeader key="app-header" version={version} />,
           <DebugModeNotification key="debug-notification" />,
