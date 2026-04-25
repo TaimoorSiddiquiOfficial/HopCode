@@ -348,7 +348,7 @@ export async function runNonInteractive(
           config.getMaxSessionTurns() >= 0 &&
           turnCount > config.getMaxSessionTurns()
         ) {
-          handleMaxTurnsExceededError(config);
+          await handleMaxTurnsExceededError(config);
         }
 
         const toolCallRequests: ToolCallRequestInfo[] = [];
@@ -371,7 +371,7 @@ export async function runNonInteractive(
 
         for await (const event of responseStream) {
           if (abortController.signal.aborted) {
-            handleCancellationError(config);
+            await handleCancellationError(config);
           }
           // Use adapter for all event processing
           adapter.processEvent(event);
@@ -497,7 +497,7 @@ export async function runNonInteractive(
               config.getMaxSessionTurns() >= 0 &&
               turnCount > config.getMaxSessionTurns()
             ) {
-              handleMaxTurnsExceededError(config);
+              await handleMaxTurnsExceededError(config);
             }
 
             const inputFormat =
@@ -710,7 +710,7 @@ export async function runNonInteractive(
               while (localQueue.length > 0) {
                 emitNotificationToSdk(localQueue.shift()!);
               }
-              handleCancellationError(config);
+              await handleCancellationError(config);
             }
             await drainLocalQueue();
             const running = registry.getRunning();
@@ -765,7 +765,7 @@ export async function runNonInteractive(
         usage,
         stats,
       });
-      handleError(error, config);
+      await handleError(error, config);
     } finally {
       const reg = config.getBackgroundTaskRegistry();
       reg.setNotificationCallback(undefined);

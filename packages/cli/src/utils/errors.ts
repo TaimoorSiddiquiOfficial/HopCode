@@ -14,6 +14,7 @@ import {
   ToolErrorType,
   createDebugLogger,
 } from '@hoptrendy/hopcode-core';
+import { runExitCleanup } from './cleanup.js';
 import { writeStderrLine } from './stdioHelpers.js';
 
 const debugLogger = createDebugLogger('CLI_ERRORS');
@@ -81,16 +82,35 @@ function getNumericExitCode(errorCode: string | number): number {
   return typeof errorCode === 'number' ? errorCode : 1;
 }
 
+// Guards against double-entry when two terminating paths race. Only the first
+// caller drains cleanup and exits; later callers park until the process exits.
+let exiting = false;
+
+async function exitAfterCleanup(code: number): Promise<never> {
+  if (exiting) {
+    return new Promise<never>(() => {});
+  }
+
+  exiting = true;
+  await runExitCleanup();
+  return process.exit(code);
+}
+
+/** @internal test hook */
+export function _resetExitLatchForTest(): void {
+  exiting = false;
+}
+
 /**
  * Handles errors consistently for both JSON and text output formats.
  * In JSON mode, outputs formatted JSON error and exits.
  * In text mode, outputs error message and re-throws.
  */
-export function handleError(
+export async function handleError(
   error: unknown,
   config: Config,
   customErrorCode?: string | number,
-): never {
+): Promise<never> {
   const errorMessage = parseAndFormatApiError(
     error,
     config.getContentGeneratorConfig()?.authType,
@@ -106,9 +126,10 @@ export function handleError(
     );
 
     writeStderrLine(formattedError);
-    process.exit(getNumericExitCode(errorCode));
+    return exitAfterCleanup(getNumericExitCode(errorCode));
   } else {
     writeStderrLine(errorMessage);
+    await runExitCleanup();
     throw error;
   }
 }
@@ -155,7 +176,7 @@ export function handleToolError(
 /**
  * Handles cancellation/abort signals consistently.
  */
-export function handleCancellationError(config: Config): never {
+export async function handleCancellationError(config: Config): Promise<never> {
   const cancellationError = new FatalCancellationError('Operation cancelled.');
 
   if (config.getOutputFormat() === OutputFormat.JSON) {
@@ -166,17 +187,19 @@ export function handleCancellationError(config: Config): never {
     );
 
     writeStderrLine(formattedError);
-    process.exit(cancellationError.exitCode);
   } else {
     writeStderrLine(cancellationError.message);
-    process.exit(cancellationError.exitCode);
   }
+
+  return exitAfterCleanup(cancellationError.exitCode);
 }
 
 /**
  * Handles max session turns exceeded consistently.
  */
-export function handleMaxTurnsExceededError(config: Config): never {
+export async function handleMaxTurnsExceededError(
+  config: Config,
+): Promise<never> {
   const maxTurnsError = new FatalTurnLimitedError(
     'Reached max session turns for this session. Increase the number of turns by specifying maxSessionTurns in settings.json.',
   );
@@ -189,9 +212,9 @@ export function handleMaxTurnsExceededError(config: Config): never {
     );
 
     writeStderrLine(formattedError);
-    process.exit(maxTurnsError.exitCode);
   } else {
     writeStderrLine(maxTurnsError.message);
-    process.exit(maxTurnsError.exitCode);
   }
+
+  return exitAfterCleanup(maxTurnsError.exitCode);
 }

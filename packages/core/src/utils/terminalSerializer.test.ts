@@ -8,6 +8,7 @@ import { describe, it, expect } from 'vitest';
 import { Terminal } from '@xterm/headless';
 import {
   serializeTerminalToObject,
+  serializeTerminalToText,
   convertColorToHex,
   ColorMode,
 } from './terminalSerializer.js';
@@ -170,6 +171,34 @@ describe('terminalSerializer', () => {
       expect(result[0][0].fg).toBe('#800000');
       expect(result[0][0].bg).toBe('#008000');
       expect(result[0][0].text).toBe('Styled text');
+    });
+
+    it('unwraps wrapped lines when requested', async () => {
+      const terminal = new Terminal({
+        cols: 5,
+        rows: 24,
+        allowProposedApi: true,
+      });
+      await writeToTerminal(terminal, 'abcdefgh');
+
+      const result = serializeTerminalToObject(terminal, 0, {
+        unwrapWrappedLines: true,
+      });
+
+      expect(result[0][0].text).toBe('abcdefgh');
+    });
+  });
+
+  describe('serializeTerminalToText', () => {
+    it('preserves logical lines across soft wraps', async () => {
+      const terminal = new Terminal({
+        cols: 5,
+        rows: 24,
+        allowProposedApi: true,
+      });
+      await writeToTerminal(terminal, 'abcdefgh');
+
+      expect(serializeTerminalToText(terminal)).toBe('abcdefgh');
     });
   });
   describe('convertColorToHex', () => {

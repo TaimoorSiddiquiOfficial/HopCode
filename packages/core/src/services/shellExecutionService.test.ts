@@ -33,6 +33,7 @@ const mockIsBinary = vi.hoisted(() => vi.fn());
 const mockPlatform = vi.hoisted(() => vi.fn());
 const mockGetPty = vi.hoisted(() => vi.fn());
 const mockSerializeTerminalToObject = vi.hoisted(() => vi.fn());
+const mockSerializeTerminalToText = vi.hoisted(() => vi.fn());
 const mockGetShellConfiguration = vi.hoisted(() =>
   vi.fn().mockReturnValue({
     executable: 'bash',
@@ -74,6 +75,7 @@ vi.mock('../utils/getPty.js', () => ({
 }));
 vi.mock('../utils/terminalSerializer.js', () => ({
   serializeTerminalToObject: mockSerializeTerminalToObject,
+  serializeTerminalToText: mockSerializeTerminalToText,
 }));
 vi.mock('../utils/shell-utils.js', () => ({
   getShellConfiguration: mockGetShellConfiguration,
@@ -164,6 +166,23 @@ describe('ShellExecutionService', () => {
     mockGetPty.mockResolvedValue({
       module: { spawn: mockPtySpawn },
       name: 'mock-pty',
+    });
+    mockSerializeTerminalToText.mockImplementation((terminal: Terminal) => {
+      const buffer = terminal.buffer.active;
+      const lines: string[] = [];
+
+      for (let i = 0; i < buffer.length; i++) {
+        const line = buffer.getLine(i);
+        const lineContent = line ? line.translateToString(true) : '';
+
+        if (line?.isWrapped && lines.length > 0) {
+          lines[lines.length - 1] += lineContent;
+        } else {
+          lines.push(lineContent);
+        }
+      }
+
+      return lines.join('\n').trimEnd();
     });
 
     onOutputEventMock = vi.fn();

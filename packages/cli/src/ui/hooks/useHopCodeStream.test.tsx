@@ -1330,7 +1330,7 @@ describe('useHopCodeStream', () => {
       // 3. Assertion
       await waitFor(() => {
         expect(mockParseAndFormatApiError).toHaveBeenCalledWith(
-          'Rate limit exceeded',
+          expect.objectContaining({ message: 'Rate limit exceeded' }),
           mockAuthType,
         );
       });

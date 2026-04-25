@@ -178,6 +178,11 @@ enum StreamProcessingStatus {
 }
 
 const EDIT_TOOL_NAMES = new Set(['replace', 'write_file']);
+const STREAM_UPDATE_THROTTLE_MS = 60;
+
+type BufferedStreamEvent =
+  | { kind: 'content'; value: string }
+  | { kind: 'thought'; value: ThoughtSummary };
 
 function showCitations(settings: LoadedSettings): boolean {
   const enabled = settings?.merged?.ui?.showCitations;
@@ -216,6 +221,7 @@ export const useHopCodeStream = (
 ) => {
   const [initError, setInitError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const flushBufferedStreamEventsRef = useRef<Set<() => void>>(new Set());
   const turnCancelledRef = useRef(false);
   const isSubmittingQueryRef = useRef(false);
   const lastPromptRef = useRef<PartListUnion | null>(null);
@@ -476,6 +482,9 @@ export const useHopCodeStream = (
     }
     if (turnCancelledRef.current) {
       return;
+    }
+    for (const flushBufferedStreamEvents of flushBufferedStreamEventsRef.current) {
+      flushBufferedStreamEvents();
     }
     turnCancelledRef.current = true;
     isSubmittingQueryRef.current = false;
@@ -1112,110 +1121,202 @@ export const useHopCodeStream = (
       let geminiMessageBuffer = '';
       let thoughtBuffer = '';
       const toolCallRequests: ToolCallRequestInfo[] = [];
-      dualOutput?.startAssistantMessage();
-      for await (const event of stream) {
-        dualOutput?.processEvent(event);
-        switch (event.type) {
-          case ServerHopCodeEventType.Thought:
-            // If the thought has a subject, it's a discrete status update rather than
-            // a streamed textual thought, so we update the thought state directly.
-            if (event.value.subject) {
-              setThought(event.value);
-            } else {
-              thoughtBuffer = handleThoughtEvent(
-                event.value,
-                thoughtBuffer,
-                userMessageTimestamp,
-              );
+      const bufferedEvents: BufferedStreamEvent[] = [];
+      let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+      const discardBufferedStreamEvents = () => {
+        if (flushTimer) {
+          clearTimeout(flushTimer);
+          flushTimer = null;
+        }
+        bufferedEvents.length = 0;
+      };
+
+      const flushBufferedStreamEvents = () => {
+        if (flushTimer) {
+          clearTimeout(flushTimer);
+          flushTimer = null;
+        }
+
+        if (bufferedEvents.length === 0) {
+          return;
+        }
+
+        while (bufferedEvents.length > 0) {
+          const nextEvent = bufferedEvents.shift()!;
+
+          if (nextEvent.kind === 'content') {
+            let mergedContent = nextEvent.value;
+
+            while (bufferedEvents[0]?.kind === 'content') {
+              const queuedContent = bufferedEvents.shift();
+              if (queuedContent?.kind !== 'content') {
+                break;
+              }
+              mergedContent += queuedContent.value;
             }
-            break;
-          case ServerHopCodeEventType.Content:
+
             geminiMessageBuffer = handleContentEvent(
-              event.value,
+              mergedContent,
               geminiMessageBuffer,
               userMessageTimestamp,
             );
-            break;
-          case ServerHopCodeEventType.ToolCallRequest:
-            toolCallRequests.push(event.value);
-            break;
-          case ServerHopCodeEventType.UserCancelled:
-            handleUserCancelledEvent(userMessageTimestamp);
-            break;
-          case ServerHopCodeEventType.Error:
-            handleErrorEvent(event.value, userMessageTimestamp);
-            break;
-          case ServerHopCodeEventType.ChatCompressed:
-            handleChatCompressionEvent(event.value, userMessageTimestamp);
-            break;
-          case ServerHopCodeEventType.ToolCallConfirmation:
-          case ServerHopCodeEventType.ToolCallResponse:
-            // do nothing
-            break;
-          case ServerHopCodeEventType.MaxSessionTurns:
-            handleMaxSessionTurnsEvent();
-            break;
-          case ServerHopCodeEventType.SessionTokenLimitExceeded:
-            handleSessionTokenLimitExceededEvent(event.value);
-            break;
-          case ServerHopCodeEventType.Finished:
-            handleFinishedEvent(
-              event as ServerHopCodeFinishedEvent,
-              userMessageTimestamp,
-            );
-            break;
-          case ServerHopCodeEventType.Citation:
-            handleCitationEvent(event.value, userMessageTimestamp);
-            break;
-          case ServerHopCodeEventType.LoopDetected:
-            // handle later because we want to move pending history to history
-            // before we add loop detected message to history
-            loopDetectedRef.current = true;
-            break;
-          case ServerHopCodeEventType.Retry:
-            // Clear any pending partial content from the failed attempt
-            if (pendingHistoryItemRef.current) {
-              setPendingHistoryItem(null);
+            continue;
+          }
+
+          let mergedThought = nextEvent.value;
+
+          while (bufferedEvents[0]?.kind === 'thought') {
+            const queuedThought = bufferedEvents.shift();
+            if (queuedThought?.kind !== 'thought') {
+              break;
             }
-            // Show retry info if available (rate-limit / throttling errors)
-            if (event.retryInfo) {
-              startRetryCountdown(event.retryInfo);
-            } else {
-              // The retry attempt is starting now, so any prior retry UI is stale.
-              clearRetryCountdown();
+
+            mergedThought = {
+              subject: queuedThought.value.subject || mergedThought.subject,
+              description: `${mergedThought.description ?? ''}${
+                queuedThought.value.description ?? ''
+              }`,
+            };
+          }
+
+          thoughtBuffer = handleThoughtEvent(
+            mergedThought,
+            thoughtBuffer,
+            userMessageTimestamp,
+          );
+        }
+      };
+
+      const scheduleBufferedStreamFlush = () => {
+        if (flushTimer) {
+          return;
+        }
+
+        flushTimer = setTimeout(() => {
+          flushBufferedStreamEvents();
+        }, STREAM_UPDATE_THROTTLE_MS);
+      };
+
+      flushBufferedStreamEventsRef.current.add(flushBufferedStreamEvents);
+      dualOutput?.startAssistantMessage();
+      try {
+        for await (const event of stream) {
+          dualOutput?.processEvent(event);
+          switch (event.type) {
+            case ServerHopCodeEventType.Thought:
+              if (event.value.subject) {
+                flushBufferedStreamEvents();
+                setThought(event.value);
+              } else {
+                bufferedEvents.push({ kind: 'thought', value: event.value });
+                scheduleBufferedStreamFlush();
+              }
+              break;
+            case ServerHopCodeEventType.Content:
+              bufferedEvents.push({ kind: 'content', value: event.value });
+              scheduleBufferedStreamFlush();
+              break;
+            case ServerHopCodeEventType.ToolCallRequest:
+              flushBufferedStreamEvents();
+              toolCallRequests.push(event.value);
+              break;
+            case ServerHopCodeEventType.UserCancelled:
+              flushBufferedStreamEvents();
+              handleUserCancelledEvent(userMessageTimestamp);
+              break;
+            case ServerHopCodeEventType.Error:
+              flushBufferedStreamEvents();
+              handleErrorEvent(event.value, userMessageTimestamp);
+              break;
+            case ServerHopCodeEventType.ChatCompressed:
+              flushBufferedStreamEvents();
+              handleChatCompressionEvent(event.value, userMessageTimestamp);
+              break;
+            case ServerHopCodeEventType.ToolCallConfirmation:
+            case ServerHopCodeEventType.ToolCallResponse:
+              flushBufferedStreamEvents();
+              break;
+            case ServerHopCodeEventType.MaxSessionTurns:
+              flushBufferedStreamEvents();
+              handleMaxSessionTurnsEvent();
+              break;
+            case ServerHopCodeEventType.SessionTokenLimitExceeded:
+              flushBufferedStreamEvents();
+              handleSessionTokenLimitExceededEvent(event.value);
+              break;
+            case ServerHopCodeEventType.Finished:
+              flushBufferedStreamEvents();
+              handleFinishedEvent(
+                event as ServerHopCodeFinishedEvent,
+                userMessageTimestamp,
+              );
+              break;
+            case ServerHopCodeEventType.Citation:
+              flushBufferedStreamEvents();
+              handleCitationEvent(event.value, userMessageTimestamp);
+              break;
+            case ServerHopCodeEventType.LoopDetected:
+              flushBufferedStreamEvents();
+              loopDetectedRef.current = true;
+              break;
+            case ServerHopCodeEventType.Retry:
+              if (!event.isContinuation) {
+                discardBufferedStreamEvents();
+                if (pendingHistoryItemRef.current) {
+                  setPendingHistoryItem(null);
+                }
+                geminiMessageBuffer = '';
+                thoughtBuffer = '';
+              } else {
+                flushBufferedStreamEvents();
+              }
+
+              toolCallRequests.length = 0;
+
+              if (event.retryInfo) {
+                startRetryCountdown(event.retryInfo);
+              } else {
+                clearRetryCountdown();
+              }
+              break;
+            case ServerHopCodeEventType.HookSystemMessage:
+              flushBufferedStreamEvents();
+              if (pendingHistoryItemRef.current) {
+                addItem(pendingHistoryItemRef.current, userMessageTimestamp);
+                setPendingHistoryItem(null);
+              }
+              addItem(
+                {
+                  type: 'stop_hook_system_message',
+                  message: event.value,
+                } as HistoryItemWithoutId,
+                userMessageTimestamp,
+              );
+              break;
+            case ServerHopCodeEventType.UserPromptSubmitBlocked:
+              flushBufferedStreamEvents();
+              handleUserPromptSubmitBlockedEvent(
+                event.value,
+                userMessageTimestamp,
+              );
+              break;
+            case ServerHopCodeEventType.StopHookLoop:
+              flushBufferedStreamEvents();
+              handleStopHookLoopEvent(event.value, userMessageTimestamp);
+              break;
+            default: {
+              const unreachable: never = event;
+              return unreachable;
             }
-            break;
-          case ServerHopCodeEventType.HookSystemMessage:
-            // Display system message from Stop hooks with "Stop says:" prefix
-            // First commit any pending AI response to ensure correct ordering
-            if (pendingHistoryItemRef.current) {
-              addItem(pendingHistoryItemRef.current, userMessageTimestamp);
-              setPendingHistoryItem(null);
-            }
-            addItem(
-              {
-                type: 'stop_hook_system_message',
-                message: event.value,
-              } as HistoryItemWithoutId,
-              userMessageTimestamp,
-            );
-            break;
-          case ServerHopCodeEventType.UserPromptSubmitBlocked:
-            handleUserPromptSubmitBlockedEvent(
-              event.value,
-              userMessageTimestamp,
-            );
-            break;
-          case ServerHopCodeEventType.StopHookLoop:
-            handleStopHookLoopEvent(event.value, userMessageTimestamp);
-            break;
-          default: {
-            // enforces exhaustive switch-case
-            const unreachable: never = event;
-            return unreachable;
           }
         }
+      } finally {
+        flushBufferedStreamEvents();
+        discardBufferedStreamEvents();
+        flushBufferedStreamEventsRef.current.delete(flushBufferedStreamEvents);
       }
+
       dualOutput?.finalizeAssistantMessage();
       if (toolCallRequests.length > 0) {
         scheduleToolCalls(toolCallRequests, signal);
