@@ -77,6 +77,7 @@ import { useDeleteCommand } from './hooks/useDeleteCommand.js';
 import { useSlashCommandProcessor } from './hooks/slashCommandProcessor.js';
 import { useVimMode } from './contexts/VimModeContext.js';
 import { CompactModeProvider } from './contexts/CompactModeContext.js';
+import { installTerminalRedrawOptimizer } from './utils/terminalRedrawOptimizer.js';
 import { useTerminalSize } from './hooks/useTerminalSize.js';
 import { calculatePromptWidths } from './components/InputPrompt.js';
 import { useStdin, useStdout } from 'ink';
@@ -176,6 +177,10 @@ const SHELL_WIDTH_FRACTION = 0.89;
 const SHELL_HEIGHT_PADDING = 10;
 
 export const AppContainer = (props: AppContainerProps) => {
+  // Install stdout optimizer to collapse redundant clear-line sequences
+  // that cause visual bounce/flicker during streaming and resize.
+  useEffect(() => installTerminalRedrawOptimizer(process.stdout), []);
+
   const { settings, config, initializationResult } = props;
   const historyManager = useHistory();
   useMemoryMonitor(historyManager);
