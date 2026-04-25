@@ -21,12 +21,12 @@ import type {
   ContentBlock,
   TextBlock,
   ToolUseBlock,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 import {
   isSDKAssistantMessage,
   isSDKSystemMessage,
   isSDKResultMessage,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 
 // ============================================================================
 // Core Test Helper Class

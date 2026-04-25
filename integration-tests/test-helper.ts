@@ -395,15 +395,15 @@ export class TestRig {
     }
 
     child.stdout!.on('data', (data: Buffer) => {
-      stdout += data;
-      if (env.KEEP_OUTPUT === 'true' || env.VERBOSE === 'true') {
+      stdout += data.toString();
+      if (env['KEEP_OUTPUT'] === 'true' || env['VERBOSE'] === 'true') {
         process.stdout.write(data);
       }
     });
 
     child.stderr!.on('data', (data: Buffer) => {
-      stderr += data;
-      if (env.KEEP_OUTPUT === 'true' || env.VERBOSE === 'true') {
+      stderr += data.toString();
+      if (env['KEEP_OUTPUT'] === 'true' || env['VERBOSE'] === 'true') {
         process.stderr.write(data);
       }
     });
@@ -715,7 +715,7 @@ export class TestRig {
         logs.push(logData);
       } catch (e) {
         // Skip objects that aren't valid JSON
-        if (env.VERBOSE === 'true') {
+        if (env['VERBOSE'] === 'true') {
           console.error('Failed to parse telemetry object:', e);
         }
       }
@@ -769,13 +769,13 @@ export class TestRig {
         logData.attributes &&
         logData.attributes['event.name'] === 'hopcode.tool_call'
       ) {
-        const toolName = logData.attributes.function_name;
+        const attrs = logData.attributes as Record<string, unknown>;
         logs.push({
           toolRequest: {
-            name: toolName,
-            args: logData.attributes.function_args,
-            success: logData.attributes.success,
-            duration_ms: logData.attributes.duration_ms,
+            name: attrs['function_name'] as string,
+            args: attrs['function_args'] as string,
+            success: attrs['success'] as boolean,
+            duration_ms: attrs['duration_ms'] as number,
           },
         });
       }
@@ -791,7 +791,8 @@ export class TestRig {
         logData.attributes &&
         logData.attributes['event.name'] === 'hopcode.api_request',
     );
-    return apiRequests.pop() || null;
+    const result = apiRequests.pop();
+    return result ? (result as unknown as Record<string, unknown>) : null;
   }
 
   readMetric(metricName: string): Record<string, unknown> | null {
@@ -841,9 +842,9 @@ export class TestRig {
       env: process.env as { [key: string]: string },
     });
 
-    ptyProcess.onData((data) => {
+    ptyProcess.onData((data: string) => {
       this._interactiveOutput += data;
-      if (env.KEEP_OUTPUT === 'true' || env.VERBOSE === 'true') {
+      if (env['KEEP_OUTPUT'] === 'true' || env['VERBOSE'] === 'true') {
         process.stdout.write(data);
       }
     });
@@ -853,9 +854,11 @@ export class TestRig {
       signal?: number;
       output: string;
     }>((resolve) => {
-      ptyProcess.onExit(({ exitCode, signal }) => {
-        resolve({ exitCode, signal, output: this._interactiveOutput });
-      });
+      ptyProcess.onExit(
+        ({ exitCode, signal }: { exitCode: number; signal?: number }) => {
+          resolve({ exitCode, signal, output: this._interactiveOutput });
+        },
+      );
     });
 
     return { ptyProcess, promise };
