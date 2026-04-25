@@ -7,19 +7,20 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * ANSI escape sequence to clear the screen and move cursor home.
- * \x1b[2J  — clear entire screen
- * \x1b[H   — move cursor to home position (top-left)
+ * ANSI escape sequence to move the cursor to the home position
+ * (top-left of the visible area). Unlike clear-screen this does
+ * not erase the scrollback buffer, avoiding the blank flash
+ * that made resize feel jarring.  The terminal redraw optimizer
+ * and synchronized-output patch already prevent the classic Ink
+ * corruption issues (truncated lines, scrollback bounce).
  */
-const CLEAR_SCREEN_AND_HOME = '\x1b[2J\x1b[H';
+const CURSOR_HOME = '\x1b[H';
 
 /**
  * Returns the actual terminal size without any padding adjustments.
  *
- * On resize, clears the terminal screen and homes the cursor so Ink can
- * re-render all components at the new dimensions without visual corruption
- * (truncated lines, overlapping content from Static frames that were flushed
- * at the previous width).
+ * On resize, homes the cursor so Ink can re-render at the new
+ * dimensions without residual cursor-offset artifacts.
  */
 export function useTerminalSize(): { columns: number; rows: number } {
   const [size, setSize] = useState({
@@ -42,13 +43,12 @@ export function useTerminalSize(): { columns: number; rows: number } {
         clearTimeout(resizeTimerRef.current);
       }
       resizeTimerRef.current = setTimeout(() => {
-        // Clear screen + home cursor AFTER the debounce period so it fires
-        // just before the React re-render (Ink reads the new columns/rows on
-        // the next layout pass). Clearing too early leaves a blank gap;
-        // clearing synchronously with the state update lets Ink repaint at
-        // the new dimensions immediately.
+        // Home the cursor so Ink's next layout pass starts from the
+        // expected position. We intentionally avoid clearing the screen
+        // here: the redraw optimizer handles erase-line bounce, and a
+        // full clear caused a jarring blank flash during every resize.
         if (process.stdout.isTTY) {
-          process.stdout.write(CLEAR_SCREEN_AND_HOME);
+          process.stdout.write(CURSOR_HOME);
         }
         setSize({ columns: newCols, rows: newRows });
         resizeTimerRef.current = null;

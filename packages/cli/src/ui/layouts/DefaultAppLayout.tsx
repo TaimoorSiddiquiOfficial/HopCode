@@ -5,7 +5,6 @@
  */
 
 import type React from 'react';
-import { useEffect, useRef } from 'react';
 import { Box } from 'ink';
 import { MainContent } from '../components/MainContent.js';
 import { DialogManager } from '../components/DialogManager.js';
@@ -16,29 +15,22 @@ import { AgentTabBar } from '../components/agent-view/AgentTabBar.js';
 import { AgentChatView } from '../components/agent-view/AgentChatView.js';
 import { AgentComposer } from '../components/agent-view/AgentComposer.js';
 import { useUIState } from '../contexts/UIStateContext.js';
-import { useUIActions } from '../contexts/UIActionsContext.js';
 import { useAgentViewState } from '../contexts/AgentViewContext.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 
 export const DefaultAppLayout: React.FC = () => {
   const uiState = useUIState();
-  const { refreshStatic } = useUIActions();
   const { activeView, agents } = useAgentViewState();
   const { columns: terminalWidth } = useTerminalSize();
   const hasAgents = agents.size > 0;
   const isAgentTab = activeView !== 'main' && agents.has(activeView);
 
-  // Clear terminal on view switch so previous view's <Static> output
-  // is removed. refreshStatic clears the terminal and bumps the
-  // historyRemountKey so MainContent's <Static> re-renders all items
-  // when switching back.
-  const prevViewRef = useRef(activeView);
-  useEffect(() => {
-    if (prevViewRef.current !== activeView) {
-      prevViewRef.current = activeView;
-      refreshStatic();
-    }
-  }, [activeView, refreshStatic]);
+  // We intentionally do NOT clear the terminal on view switch.
+  // The previous view's <Static> output remains as scrollback, which is
+  // consistent with normal terminal expectations. A full screen clear on
+  // every view switch was a major source of visible flicker and is no
+  // longer necessary because Ink handles the dynamic/dynamic boundary
+  // between views without corruption in practice.
 
   return (
     <Box flexDirection="column" width={terminalWidth}>

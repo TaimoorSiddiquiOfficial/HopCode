@@ -59,27 +59,35 @@ export const MainContent = () => {
   // buffer, it cannot be replaced. In compact mode, when a new tool_group is
   // merged into a previous one, the merged result has FEWER items than the
   // raw history. Static would not re-render the older items even though their
-  // content changed, so we explicitly call refreshStatic() to clear the
-  // terminal and re-render the merged view.
+  // content changed.
   //
-  // To avoid visible flicker under heavy tool throughput we only trigger a
-  // full clear when the *merged* list shrinks (meaning items were truly
-  // consolidated). Growing merged lists are handled naturally by Static's
-  // append-only model.
-  const prevMergedLengthRef = useRef(mergedHistory.length);
+  // Rather than clearing the entire terminal (visible flash), we only need to
+  // clear when items have been *consumed* — i.e., the merged list grew by
+  // fewer items than the raw history grew. This means older Static entries
+  // have become stale and must be redrawn. We still trigger a full clear but
+  // only on genuine consumption, not on every tool event.
+  //
+  // The `key` bump on `historyRemountKey` ensures <Static> fully remounts.
+  const prevRawLenRef = useRef(uiState.history.length);
+  const prevMergedLenRef = useRef(mergedHistory.length);
   useEffect(() => {
     if (!compactMode) {
-      prevMergedLengthRef.current = mergedHistory.length;
+      prevRawLenRef.current = uiState.history.length;
+      prevMergedLenRef.current = mergedHistory.length;
       return;
     }
-    const prevMLen = prevMergedLengthRef.current;
-    const currMLen = mergedHistory.length;
-    // Shrink: items were consolidated — need full clear
-    if (currMLen < prevMLen) {
+    const prevRaw = prevRawLenRef.current;
+    const currRaw = uiState.history.length;
+    const prevMerged = prevMergedLenRef.current;
+    const currMerged = mergedHistory.length;
+    // New raw items added without proportional merged growth = items were
+    // merged into existing entries. Clear to stay consistent.
+    if (currRaw > prevRaw && currMerged === prevMerged) {
       uiActions.refreshStatic();
     }
-    prevMergedLengthRef.current = currMLen;
-  }, [compactMode, mergedHistory, uiActions]);
+    prevRawLenRef.current = currRaw;
+    prevMergedLenRef.current = currMerged;
+  }, [compactMode, uiState.history, mergedHistory, uiActions]);
 
   return (
     <>
