@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-plugin-example",
-  "version": "0.18.5",
+  "version": "0.18.6",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
