@@ -77,7 +77,7 @@ describe('ProcessTransport', () => {
     vi.clearAllMocks();
 
     // Clean up environment variables for FORK_MODE tests
-    delete process.env.FORK_MODE;
+    delete process.env['FORK_MODE'];
     delete (process.versions as { electron?: string }).electron;
 
     const mockWriteFn = vi.fn((chunk, encoding, callback) => {
@@ -193,7 +193,7 @@ describe('ProcessTransport', () => {
         maxSessionTurns: 10,
         coreTools: ['read_file', 'write_file'],
         excludeTools: ['web_fetch'],
-        authType: 'api-key',
+        authType: 'openai',
       };
 
       new ProcessTransport(options);
@@ -216,7 +216,7 @@ describe('ProcessTransport', () => {
           '--exclude-tools',
           'web_fetch',
           '--auth-type',
-          'api-key',
+          'openai',
         ]),
         expect.any(Object),
       );
@@ -1581,7 +1581,7 @@ describe('ProcessTransport', () => {
 
   describe('Fork Mode', () => {
     it('should use fork when FORK_MODE=1', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'node',
         args: ['/path/to/cli.js'],
@@ -1601,7 +1601,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should use spawn when FORK_MODE is not set', () => {
-      // process.env.FORK_MODE is not set
+      // process.env['FORK_MODE'] is not set
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'qwen',
         args: [],
@@ -1621,7 +1621,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should pass correct modulePath to fork', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'node',
         args: ['/path/to/cli.js'],
@@ -1648,7 +1648,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should configure stdio with ipc channel for fork', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'node',
         args: ['/path/to/cli.js'],
@@ -1673,7 +1673,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should configure stdio with pipe for stderr when debug mode is on', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'node',
         args: ['/path/to/cli.js'],
@@ -1699,7 +1699,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should handle Electron environment with JS file execution', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       (process.versions as { electron?: string }).electron = '28.0.0';
 
       mockPrepareSpawnInfo.mockReturnValue({
@@ -1725,7 +1725,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should handle normal JS execution in non-Electron environment', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       // process.versions.electron is not set
 
       mockPrepareSpawnInfo.mockReturnValue({
@@ -1754,7 +1754,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should pass env to fork', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'node',
         args: ['/path/to/cli.js'],
@@ -1783,7 +1783,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should pass cwd to fork', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'node',
         args: ['/path/to/cli.js'],
@@ -1809,7 +1809,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should pass abort signal to fork', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'node',
         args: ['/path/to/cli.js'],
@@ -1836,7 +1836,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should fallback to spawn for native type when FORK_MODE=1', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'qwen',
         args: [],
@@ -1863,7 +1863,7 @@ describe('ProcessTransport', () => {
     });
 
     it('should use fork for bun type with correct execPath when FORK_MODE=1', () => {
-      process.env.FORK_MODE = '1';
+      process.env['FORK_MODE'] = '1';
       mockPrepareSpawnInfo.mockReturnValue({
         command: 'bun',
         args: ['/path/to/cli.js'],
