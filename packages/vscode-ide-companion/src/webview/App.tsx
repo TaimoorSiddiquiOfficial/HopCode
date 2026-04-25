@@ -653,110 +653,6 @@ export const App: React.FC = () => {
     setAskUserQuestionRequest(null);
   }, [vscode]);
 
-  // Handle copy command from extension (via native context menu)
-  useEffect(() => {
-    const handleCopyCommand = (event: MessageEvent) => {
-      const message = event.data;
-      if (message.type !== 'copyCommand') return;
-
-      const action = message.data?.action as string | undefined;
-      if (!action) return;
-
-      // Helper to format tool call as markdown
-      const formatToolCall = (item: MessageListItem): string => {
-        if (item.type === 'message') return '';
-        const toolCall = item.data as ToolCallData;
-        const title = toolCall.title || toolCall.kind || 'Tool';
-        const status = toolCall.status || 'unknown';
-        let content = '';
-
-        if (toolCall.content && Array.isArray(toolCall.content)) {
-          for (const c of toolCall.content) {
-            if (c && typeof c === 'object' && 'content' in c) {
-              const inner = c.content as
-                | { type?: string; text?: string }
-                | undefined;
-              if (inner?.type === 'text' && inner.text) {
-                content += inner.text + '\n';
-              } else if (inner?.type === 'diff' && inner.text) {
-                content += '```diff\n' + inner.text + '\n```\n';
-              }
-            }
-          }
-        }
-
-        if (content) {
-          return `## ${title}\n\n${content}`;
-        }
-        return `## ${title} (${status})`;
-      };
-
-      // Helper to convert message to markdown
-      const messageToMarkdown = (item: MessageListItem): string => {
-        if (item.type === 'message') {
-          const msg = item.data as TextMessage;
-          if (msg.role === 'thinking') return '';
-          if (msg.kind === 'image' && msg.imagePath) {
-            return `![Image](${msg.imagePath})`;
-          }
-          return msg.content || '';
-        }
-        return formatToolCall(item);
-      };
-
-      let textToCopy = '';
-
-      if (action === 'copyMessage') {
-        // Get the message index from the last context menu event
-        // The extension sends the messageIndex along with the action
-        const messageIndex = message.data?.messageIndex as number | undefined;
-        if (typeof messageIndex === 'number' && allMessages[messageIndex]) {
-          const item = allMessages[messageIndex];
-          textToCopy = messageToMarkdown(item);
-        }
-      } else if (action === 'copyAllMessages') {
-        // Copy all messages as markdown
-        const lines: string[] = [];
-        for (const item of allMessages) {
-          if (item.type === 'message') {
-            const msg = item.data as TextMessage;
-            if (msg.role === 'thinking') continue;
-            if (msg.kind === 'image' && msg.imagePath) {
-              lines.push(`![Image](${msg.imagePath})`);
-            } else if (msg.content) {
-              lines.push(msg.content);
-            }
-          } else {
-            lines.push(formatToolCall(item));
-          }
-        }
-        textToCopy = lines.join('\n\n');
-      } else if (action === 'copyLastReply') {
-        // Copy last assistant response
-        for (let i = allMessages.length - 1; i >= 0; i--) {
-          const item = allMessages[i];
-          if (item.type === 'message') {
-            const msg = item.data as TextMessage;
-            if (msg.role === 'assistant' && msg.content && msg.content.trim()) {
-              textToCopy = msg.content.trim();
-              break;
-            }
-          }
-        }
-      }
-
-      if (textToCopy) {
-        vscode.postMessage({
-          type: 'copyToClipboard',
-          data: { text: textToCopy },
-        });
-      }
-    };
-
-    window.addEventListener('message', handleCopyCommand);
-    return () => window.removeEventListener('message', handleCopyCommand);
-  }, [allMessages, vscode]);
-
   // Handle completion selection.
   // When fillOnly is true (Tab), slash commands are inserted into the input
   // instead of being sent immediately, so users can append arguments.
@@ -1085,6 +981,110 @@ export const App: React.FC = () => {
       (a, b) => (a.timestamp || 0) - (b.timestamp || 0),
     );
   }, [messageHandling.messages, inProgressToolCalls, completedToolCalls]);
+
+  // Handle copy command from extension (via native context menu)
+  useEffect(() => {
+    const handleCopyCommand = (event: MessageEvent) => {
+      const message = event.data;
+      if (message.type !== 'copyCommand') return;
+
+      const action = message.data?.action as string | undefined;
+      if (!action) return;
+
+      // Helper to format tool call as markdown
+      const formatToolCall = (item: MessageListItem): string => {
+        if (item.type === 'message') return '';
+        const toolCall = item.data as ToolCallData;
+        const title = toolCall.title || toolCall.kind || 'Tool';
+        const status = toolCall.status || 'unknown';
+        let content = '';
+
+        if (toolCall.content && Array.isArray(toolCall.content)) {
+          for (const c of toolCall.content) {
+            if (c && typeof c === 'object' && 'content' in c) {
+              const inner = c.content as
+                | { type?: string; text?: string }
+                | undefined;
+              if (inner?.type === 'text' && inner.text) {
+                content += inner.text + '\n';
+              } else if (inner?.type === 'diff' && inner.text) {
+                content += '```diff\n' + inner.text + '\n```\n';
+              }
+            }
+          }
+        }
+
+        if (content) {
+          return `## ${title}\n\n${content}`;
+        }
+        return `## ${title} (${status})`;
+      };
+
+      // Helper to convert message to markdown
+      const messageToMarkdown = (item: MessageListItem): string => {
+        if (item.type === 'message') {
+          const msg = item.data as TextMessage;
+          if (msg.role === 'thinking') return '';
+          if (msg.kind === 'image' && msg.imagePath) {
+            return `![Image](${msg.imagePath})`;
+          }
+          return msg.content || '';
+        }
+        return formatToolCall(item);
+      };
+
+      let textToCopy = '';
+
+      if (action === 'copyMessage') {
+        // Get the message index from the last context menu event
+        // The extension sends the messageIndex along with the action
+        const messageIndex = message.data?.messageIndex as number | undefined;
+        if (typeof messageIndex === 'number' && allMessages[messageIndex]) {
+          const item = allMessages[messageIndex];
+          textToCopy = messageToMarkdown(item);
+        }
+      } else if (action === 'copyAllMessages') {
+        // Copy all messages as markdown
+        const lines: string[] = [];
+        for (const item of allMessages) {
+          if (item.type === 'message') {
+            const msg = item.data as TextMessage;
+            if (msg.role === 'thinking') continue;
+            if (msg.kind === 'image' && msg.imagePath) {
+              lines.push(`![Image](${msg.imagePath})`);
+            } else if (msg.content) {
+              lines.push(msg.content);
+            }
+          } else {
+            lines.push(formatToolCall(item));
+          }
+        }
+        textToCopy = lines.join('\n\n');
+      } else if (action === 'copyLastReply') {
+        // Copy last assistant response
+        for (let i = allMessages.length - 1; i >= 0; i--) {
+          const item = allMessages[i];
+          if (item.type === 'message') {
+            const msg = item.data as TextMessage;
+            if (msg.role === 'assistant' && msg.content && msg.content.trim()) {
+              textToCopy = msg.content.trim();
+              break;
+            }
+          }
+        }
+      }
+
+      if (textToCopy) {
+        vscode.postMessage({
+          type: 'copyToClipboard',
+          data: { text: textToCopy },
+        });
+      }
+    };
+
+    window.addEventListener('message', handleCopyCommand);
+    return () => window.removeEventListener('message', handleCopyCommand);
+  }, [allMessages, vscode]);
 
   const handleFileClick = useCallback(
     (path: string): void => {
