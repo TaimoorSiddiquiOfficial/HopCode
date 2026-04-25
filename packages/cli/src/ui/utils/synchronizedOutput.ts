@@ -48,9 +48,9 @@ export function terminalSupportsSynchronizedOutput(
     return true;
   }
 
-  if (env['TMUX'] || env['SSH_TTY'] || env['SSH_CLIENT']) {
-    return false;
-  }
+  // tmux 3.3+ supports DEC SET 2026 (synchronized output). SSH sessions may
+  // or may not — it depends on the client. We allow them through; users can
+  // disable via HOPCODE_DISABLE_SYNCHRONIZED_OUTPUT=1 if they hit issues.
 
   const termProgram = env['TERM_PROGRAM'];
   if (termProgram === 'WezTerm' || termProgram === 'iTerm.app') {

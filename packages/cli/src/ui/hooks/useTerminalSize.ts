@@ -35,13 +35,6 @@ export function useTerminalSize(): { columns: number; rows: number } {
       const newCols = process.stdout.columns || 80;
       const newRows = process.stdout.rows || 24;
 
-      // Clear screen + home cursor BEFORE updating size state.
-      // This must happen synchronously so the escape sequence fires before
-      // Ink re-renders the component tree.
-      if (process.stdout.isTTY) {
-        process.stdout.write(CLEAR_SCREEN_AND_HOME);
-      }
-
       // Debounce: only commit the React state update after 100ms of no
       // further resize events. This prevents excessive re-renders during
       // manual window dragging.
@@ -49,6 +42,14 @@ export function useTerminalSize(): { columns: number; rows: number } {
         clearTimeout(resizeTimerRef.current);
       }
       resizeTimerRef.current = setTimeout(() => {
+        // Clear screen + home cursor AFTER the debounce period so it fires
+        // just before the React re-render (Ink reads the new columns/rows on
+        // the next layout pass). Clearing too early leaves a blank gap;
+        // clearing synchronously with the state update lets Ink repaint at
+        // the new dimensions immediately.
+        if (process.stdout.isTTY) {
+          process.stdout.write(CLEAR_SCREEN_AND_HOME);
+        }
         setSize({ columns: newCols, rows: newRows });
         resizeTimerRef.current = null;
       }, 100);

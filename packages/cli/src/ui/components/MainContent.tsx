@@ -62,27 +62,24 @@ export const MainContent = () => {
   // content changed, so we explicitly call refreshStatic() to clear the
   // terminal and re-render the merged view.
   //
-  // Detection: if history length grew but mergedHistory length did NOT grow
-  // proportionally (i.e., a merge consolidated items), trigger a refresh.
-  const prevHistoryLengthRef = useRef(uiState.history.length);
+  // To avoid visible flicker under heavy tool throughput we only trigger a
+  // full clear when the *merged* list shrinks (meaning items were truly
+  // consolidated). Growing merged lists are handled naturally by Static's
+  // append-only model.
   const prevMergedLengthRef = useRef(mergedHistory.length);
   useEffect(() => {
     if (!compactMode) {
-      prevHistoryLengthRef.current = uiState.history.length;
       prevMergedLengthRef.current = mergedHistory.length;
       return;
     }
-    const prevHLen = prevHistoryLengthRef.current;
-    const currHLen = uiState.history.length;
     const prevMLen = prevMergedLengthRef.current;
     const currMLen = mergedHistory.length;
-    // History grew, but merged length stayed same or shrank → a merge happened.
-    if (currHLen > prevHLen && currMLen <= prevMLen) {
+    // Shrink: items were consolidated — need full clear
+    if (currMLen < prevMLen) {
       uiActions.refreshStatic();
     }
-    prevHistoryLengthRef.current = currHLen;
     prevMergedLengthRef.current = currMLen;
-  }, [compactMode, uiState.history, mergedHistory, uiActions]);
+  }, [compactMode, mergedHistory, uiActions]);
 
   return (
     <>

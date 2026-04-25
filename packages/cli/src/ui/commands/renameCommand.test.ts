@@ -194,7 +194,7 @@ describe('renameCommand', () => {
         }),
         getFastModel: vi.fn().mockReturnValue(opts.fastModel),
         getModel: vi.fn().mockReturnValue(opts.model ?? 'main-model'),
-        getGeminiClient: vi.fn().mockReturnValue({
+        getHopCodeClient: vi.fn().mockReturnValue({
           getHistory: vi.fn().mockReturnValue([
             { role: 'user', parts: [{ text: 'fix the login bug' }] },
             {

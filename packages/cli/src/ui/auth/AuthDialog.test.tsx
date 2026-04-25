@@ -308,8 +308,8 @@ describe('AuthDialog', () => {
 
       const { lastFrame } = renderAuthDialog(settings);
 
-      // HOPCODE_OAUTH is the first option, so it should be selected
-      expect(lastFrame()).toContain('Qwen OAuth');
+      // HOPCODE_OAUTH is no longer a main menu option; API Key is the only option
+      expect(lastFrame()).toContain('API Key');
     });
 
     it('should fall back to default if HOPCODE_DEFAULT_AUTH_TYPE is not set', () => {
@@ -349,7 +349,7 @@ describe('AuthDialog', () => {
       const { lastFrame } = renderAuthDialog(settings);
 
       // Default is Coding Plan (first option); HopCode OAuth is last (discontinued)
-      expect(lastFrame()).toContain('Alibaba Cloud Coding Plan');
+      expect(lastFrame()).toContain('API Key');
     });
 
     it('should show an error and fall back to default if HOPCODE_DEFAULT_AUTH_TYPE is invalid', () => {
@@ -391,8 +391,8 @@ describe('AuthDialog', () => {
       const { lastFrame } = renderAuthDialog(settings);
 
       // Since the auth dialog doesn't show HOPCODE_DEFAULT_AUTH_TYPE errors anymore,
-      // it will just show the default HopCode OAuth option
-      expect(lastFrame()).toContain('Qwen OAuth');
+      // it will just show the default API Key option
+      expect(lastFrame()).toContain('API Key');
     });
   });
 

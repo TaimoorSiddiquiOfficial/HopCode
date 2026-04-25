@@ -146,6 +146,7 @@ describe('computeSessionStats', () => {
       totalCachedTokens: 0,
       totalLinesAdded: 0,
       totalLinesRemoved: 0,
+      estimatedCostUsd: 0,
     });
   });
 

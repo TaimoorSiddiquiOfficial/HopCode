@@ -78,12 +78,19 @@ export const Footer: React.FC = () => {
   const contextWindowSize =
     config.getContentGeneratorConfig()?.contextWindowSize;
 
+  // Determine if config is still initializing
+  const isInitializing = uiState.isConfigInitialized === false;
+
   // Hide "? for shortcuts" when a custom status line is active (it already
   // occupies the footer, so the hint is redundant). Matches upstream behavior.
-  const suppressHint = statusLineLines.length > 0;
+  const suppressHint = isInitializing || statusLineLines.length > 0;
 
   // Left bottom row: high-priority messages > approval mode > hint.
-  const leftBottomContent = uiState.ctrlCPressedOnce ? (
+  const leftBottomContent = isInitializing ? (
+    <Text color={theme.text.secondary} dimColor>
+      {t('Initializing...')}
+    </Text>
+  ) : uiState.ctrlCPressedOnce ? (
     <Text color={theme.status.warning}>{t('Press Ctrl+C again to exit.')}</Text>
   ) : uiState.ctrlDPressedOnce ? (
     <Text color={theme.status.warning}>{t('Press Ctrl+D again to exit.')}</Text>

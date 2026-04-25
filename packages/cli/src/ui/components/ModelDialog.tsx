@@ -271,8 +271,10 @@ export function ModelDialog({
   useEffect(() => {
     const liveProviders = configuredProviders.filter((p) => p.liveModels);
     if (liveProviders.length === 0) {
-      setLiveModelCategoriesMap(new Map());
-      setIsLoadingLiveModels(false);
+      setIsLoadingLiveModels((prev) => {
+        if (!prev) return prev;
+        return false;
+      });
       return;
     }
 

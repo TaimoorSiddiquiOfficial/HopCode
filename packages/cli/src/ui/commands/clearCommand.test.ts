@@ -235,9 +235,9 @@ describe('clearCommand', () => {
           config: {
             getHookSystem: mockGetHookSystem,
             startNewSession: mockStartNewSession,
-            getGeminiClient: vi.fn().mockReturnValue({
+            getHopCodeClient: vi.fn().mockReturnValue({
               resetChat: mockResetChat,
-            } as unknown as GeminiClient),
+            }),
             getModel: vi.fn().mockReturnValue('test-model'),
             getApprovalMode: vi.fn().mockReturnValue('default'),
             getToolRegistry: vi.fn().mockReturnValue({

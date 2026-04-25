@@ -83,7 +83,7 @@ describe('HopCodeOAuthProgress', () => {
       const { lastFrame } = renderComponent();
 
       const output = lastFrame();
-      expect(output).toContain('Waiting for Qwen OAuth authentication...');
+      expect(output).toContain('Waiting for HopCode OAuth authentication...');
       expect(output).toContain('Esc to cancel');
     });
 
@@ -92,7 +92,7 @@ describe('HopCodeOAuthProgress', () => {
       const output = lastFrame();
 
       // Should contain the auth title even in loading state
-      expect(output).toContain('Qwen OAuth Authentication');
+      expect(output).toContain('HopCode OAuth Authentication');
       // Loading state shows time remaining with default timeout
       expect(output).toContain('Time remaining:');
     });
@@ -415,7 +415,9 @@ describe('HopCodeOAuthProgress', () => {
         />,
       );
 
-      expect(lastFrame()).toContain('Waiting for Qwen OAuth authentication...');
+      expect(lastFrame()).toContain(
+        'Waiting for HopCode OAuth authentication...',
+      );
       expect(lastFrame()).not.toContain('Waiting for authorization');
     });
   });
@@ -428,7 +430,7 @@ describe('HopCodeOAuthProgress', () => {
       });
 
       const output = lastFrame();
-      expect(output).toContain('Qwen OAuth Authentication Timeout');
+      expect(output).toContain('HopCode OAuth Authentication Timeout');
       expect(output).toContain('Custom timeout message');
       expect(output).toContain(
         'Press any key to return to authentication type selection.',
@@ -441,7 +443,7 @@ describe('HopCodeOAuthProgress', () => {
       });
 
       const output = lastFrame();
-      expect(output).toContain('Qwen OAuth Authentication Timeout');
+      expect(output).toContain('HopCode OAuth Authentication Timeout');
       expect(output).toContain(
         'OAuth token expired (over 300 seconds). Please select authentication method again.',
       );

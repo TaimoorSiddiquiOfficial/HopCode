@@ -110,7 +110,9 @@ describe('docsCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: expect.stringContaining('qwenlm.github.io'),
+        content: expect.stringContaining(
+          'taimoor-siddiqui-official.github.io/HopCode',
+        ),
       });
       expect(open).not.toHaveBeenCalled();
       expect(nonInteractiveContext.ui.addItem).not.toHaveBeenCalled();

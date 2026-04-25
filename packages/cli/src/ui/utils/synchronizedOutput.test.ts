@@ -36,9 +36,9 @@ describe('terminalSupportsSynchronizedOutput', () => {
     [{ KITTY_WINDOW_ID: '1' }, true],
     [{ TERM_PROGRAM: 'Apple_Terminal' }, false],
     [{ TERM_PROGRAM: 'JetBrains-JediTerm' }, false],
-    [{ TERM_PROGRAM: 'WezTerm', TMUX: '/tmp/tmux' }, false],
-    [{ TERM_PROGRAM: 'WezTerm', SSH_TTY: '/dev/pts/1' }, false],
-    [{ TERM_PROGRAM: 'WezTerm', SSH_CLIENT: '127.0.0.1 1 2' }, false],
+    [{ TERM_PROGRAM: 'WezTerm', TMUX: '/tmp/tmux' }, true],
+    [{ TERM_PROGRAM: 'WezTerm', SSH_TTY: '/dev/pts/1' }, true],
+    [{ TERM_PROGRAM: 'WezTerm', SSH_CLIENT: '127.0.0.1 1 2' }, true],
     [{ TERM_PROGRAM: 'WezTerm', HOPCODE_SYNCHRONIZED_OUTPUT: '0' }, false],
     [
       {
