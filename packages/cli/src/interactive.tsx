@@ -46,7 +46,10 @@ import { VimModeProvider } from './ui/contexts/VimModeContext.js';
 import { AgentViewProvider } from './ui/contexts/AgentViewContext.js';
 import { useKittyKeyboardProtocol } from './ui/hooks/useKittyKeyboardProtocol.js';
 import { themeManager } from './ui/themes/theme-manager.js';
-import { detectAndEnableKittyProtocol } from './ui/utils/kittyProtocolDetector.js';
+import {
+  detectAndEnableKittyProtocol,
+  disableKittyProtocol,
+} from './ui/utils/kittyProtocolDetector.js';
 import { checkForUpdates } from './ui/utils/updateCheck.js';
 import {
   cleanupCheckpoints,
@@ -168,13 +171,13 @@ export async function startInteractiveUI(
 ) {
   const version = await getCliVersion();
   setWindowTitle(basename(workspaceRoot), settings);
-  const restoreSynchronizedOutput =
-    process.stdout.isTTY && !config.getScreenReader()
-      ? installSynchronizedOutput(process.stdout)
-      : () => {};
   const restoreTerminalRedrawOptimizer =
     process.stdout.isTTY && !config.getScreenReader()
       ? installTerminalRedrawOptimizer(process.stdout)
+      : () => {};
+  const restoreSynchronizedOutput =
+    process.stdout.isTTY && !config.getScreenReader()
+      ? installSynchronizedOutput(process.stdout)
       : () => {};
 
   // Create dual output bridge if --json-fd or --json-file is specified.
@@ -294,6 +297,9 @@ export async function startInteractiveUI(
   registerCleanup(async () => {
     remoteInputWatcher?.shutdown();
     await dualOutputBridge?.shutdown();
+    // Disable Kitty keyboard protocol before unmount so the terminal restore
+    // sequence is emitted while stdout is still operational.
+    disableKittyProtocol();
     instance.unmount();
     restoreSynchronizedOutput();
     restoreTerminalRedrawOptimizer();
