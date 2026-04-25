@@ -255,6 +255,7 @@ export class ChatRecordingService {
    */
   private chatsDirEnsured = false;
   private conversationFile: string | undefined;
+  private writeChain: Promise<void> = Promise.resolve();
 
   /**
    * Number of auto-title generation attempts made in this session.
@@ -289,12 +290,8 @@ export class ChatRecordingService {
     }
   }
 
-  /**
-   * Writes are synchronous today, but shutdown still awaits this hook so the
-   * caller contract stays stable if recording becomes buffered again later.
-   */
   async flush(): Promise<void> {
-    await Promise.resolve();
+    await this.writeChain;
   }
 
   /**
@@ -323,10 +320,12 @@ export class ChatRecordingService {
       return chatsDir;
     }
 
-    if (!fs.existsSync(chatsDir)) {
+    try {
       fs.mkdirSync(chatsDir, { recursive: true });
+      this.chatsDirEnsured = true;
+    } catch {
+      // ignored - a later append will retry
     }
-    this.chatsDirEnsured = true;
     return chatsDir;
   }
 
@@ -340,16 +339,10 @@ export class ChatRecordingService {
     const safeFilename = `${sessionId}.jsonl`;
     const conversationFile = path.join(chatsDir, safeFilename);
 
-    if (fs.existsSync(conversationFile)) {
-      this.conversationFile = conversationFile;
-      return conversationFile;
-    }
-
     try {
       // Use 'wx' flag for exclusive creation - atomic operation that fails if file exists
       // This avoids the TOCTOU race condition of existsSync + writeFileSync
       fs.writeFileSync(conversationFile, '', { flag: 'wx', encoding: 'utf8' });
-      this.conversationFile = conversationFile;
     } catch (error) {
       const nodeError = error as NodeJS.ErrnoException;
       // EEXIST means file already exists, which is expected and fine
@@ -359,9 +352,9 @@ export class ChatRecordingService {
           `Failed to create conversation file at ${conversationFile}: ${message}`,
         );
       }
-      this.conversationFile = conversationFile;
     }
 
+    this.conversationFile = conversationFile;
     return conversationFile;
   }
 
@@ -385,16 +378,25 @@ export class ChatRecordingService {
 
   /**
    * Appends a record to the session file and updates lastRecordUuid.
+   *
+   * lastRecordUuid is updated synchronously so parentUuid chaining remains
+   * correct even while the underlying append is queued asynchronously.
    */
   private appendRecord(record: ChatRecord): void {
+    let conversationFile: string;
     try {
-      const conversationFile = this.ensureConversationFile();
-      jsonl.writeLineSync(conversationFile, record);
-      this.lastRecordUuid = record.uuid;
+      conversationFile = this.ensureConversationFile();
     } catch (error) {
       debugLogger.error('Error appending record:', error);
       throw error;
     }
+    this.lastRecordUuid = record.uuid;
+    this.writeChain = this.writeChain
+      .catch(() => {})
+      .then(() => jsonl.writeLine(conversationFile, record))
+      .catch((error) => {
+        debugLogger.error('Error appending record (async):', error);
+      });
   }
 
   /**

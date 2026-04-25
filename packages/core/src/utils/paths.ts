@@ -15,6 +15,14 @@ export const HOPCODE_DIR = '.hopcode';
 export const GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json';
 
 /**
+ * Bounded cache for validatePath's isDirectory checks.
+ * Caches positive and negative stat results, but not ENOENT/errors, so newly
+ * created files and directories are still picked up immediately.
+ */
+const VALIDATE_PATH_CACHE = new Map<string, boolean>();
+const MAX_VALIDATE_PATH_CACHE_SIZE = 1024;
+
+/**
  * Special characters that need to be escaped in file paths for shell compatibility.
  * Includes: spaces, parentheses, brackets, braces, semicolons, ampersands, pipes,
  * asterisks, question marks, dollar signs, backticks, quotes, hash, and other shell metacharacters.
@@ -314,36 +322,28 @@ export function validatePath(
     return;
   }
 
-  // Check cache first
-  if (IS_DIRECTORY_CACHE.get(resolvedPath)) {
-    return;
+  let isDirectory = VALIDATE_PATH_CACHE.get(resolvedPath);
+  if (isDirectory === undefined) {
+    try {
+      isDirectory = fs.statSync(resolvedPath).isDirectory();
+    } catch (error: unknown) {
+      if (isNodeError(error) && error.code === 'ENOENT') {
+        throw new Error(`Path does not exist: ${resolvedPath}`);
+      }
+      throw error;
+    }
+
+    if (VALIDATE_PATH_CACHE.size >= MAX_VALIDATE_PATH_CACHE_SIZE) {
+      const firstKey = VALIDATE_PATH_CACHE.keys().next().value;
+      if (firstKey !== undefined) {
+        VALIDATE_PATH_CACHE.delete(firstKey);
+      }
+    }
+    VALIDATE_PATH_CACHE.set(resolvedPath, isDirectory);
   }
 
-  try {
-    const stats = fs.statSync(resolvedPath);
-    const isDirectory = stats.isDirectory();
-    if (!allowFiles && !isDirectory) {
-      throw new Error(`Path is not a directory: ${resolvedPath}`);
-    }
-
-    // Only cache positive directory results.
-    // We don't cache files because they are more likely to be deleted/re-created
-    // during a session, and we don't cache ENOENT so that a freshly created
-    // file/dir is picked up immediately.
-    if (isDirectory) {
-      if (IS_DIRECTORY_CACHE.size >= MAX_IS_DIRECTORY_CACHE_SIZE) {
-        const firstKey = IS_DIRECTORY_CACHE.keys().next().value;
-        if (firstKey !== undefined) {
-          IS_DIRECTORY_CACHE.delete(firstKey);
-        }
-      }
-      IS_DIRECTORY_CACHE.set(resolvedPath, true);
-    }
-  } catch (error: unknown) {
-    if (isNodeError(error) && error.code === 'ENOENT') {
-      throw new Error(`Path does not exist: ${resolvedPath}`);
-    }
-    throw error;
+  if (!allowFiles && !isDirectory) {
+    throw new Error(`Path is not a directory: ${resolvedPath}`);
   }
 }
 
@@ -372,17 +372,17 @@ export function resolveAndValidatePath(
 }
 
 /**
- * Bounded cache for isDirectory results to avoid repeated sync fs.statSync calls.
- * Only caches positive results (isDirectory === true).
- * Uses a simple FIFO eviction strategy.
- */
-const IS_DIRECTORY_CACHE = new Map<string, boolean>();
-const MAX_IS_DIRECTORY_CACHE_SIZE = 1024;
-
-/**
  * Resets the isDirectory cache for testing.
  * @internal
  */
 export function _resetIsDirectoryCacheForTest(): void {
-  IS_DIRECTORY_CACHE.clear();
+  VALIDATE_PATH_CACHE.clear();
+}
+
+/**
+ * Resets the validatePath cache for testing.
+ * @internal
+ */
+export function _resetValidatePathCacheForTest(): void {
+  VALIDATE_PATH_CACHE.clear();
 }

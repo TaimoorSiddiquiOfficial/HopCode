@@ -7,7 +7,15 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  beforeEach,
+  afterAll,
+  vi,
+} from 'vitest';
 import {
   escapePath,
   resolvePath,
@@ -18,6 +26,7 @@ import {
   shortenPath,
   tildeifyPath,
   getProjectHash,
+  _resetValidatePathCacheForTest,
 } from './paths.js';
 import type { Config } from '../config/config.js';
 
@@ -431,6 +440,10 @@ describe('validatePath', () => {
     });
   });
 
+  beforeEach(() => {
+    _resetValidatePathCacheForTest();
+  });
+
   afterAll(() => {
     fs.rmSync(workspaceRoot, { recursive: true, force: true });
   });
@@ -480,6 +493,34 @@ describe('validatePath', () => {
 
   it('validates paths at workspace root', () => {
     expect(() => validatePath(config, workspaceRoot)).not.toThrow();
+  });
+
+  it('does not cache ENOENT so a newly created path is accepted on retry', () => {
+    const lateCreatedDir = path.join(workspaceRoot, 'late-created');
+    expect(() => validatePath(config, lateCreatedDir)).toThrowError(
+      /Path does not exist:/,
+    );
+
+    fs.mkdirSync(lateCreatedDir);
+    try {
+      expect(() => validatePath(config, lateCreatedDir)).not.toThrow();
+    } finally {
+      fs.rmSync(lateCreatedDir, { recursive: true, force: true });
+    }
+  });
+
+  it('caches directory validation results across repeated calls', () => {
+    const statSpy = vi.spyOn(fs, 'statSync');
+    const dirPath = path.join(workspaceRoot, 'subdir');
+
+    try {
+      validatePath(config, dirPath);
+      const afterFirstCall = statSpy.mock.calls.length;
+      validatePath(config, dirPath);
+      expect(statSpy.mock.calls.length).toBe(afterFirstCall);
+    } finally {
+      statSpy.mockRestore();
+    }
   });
 
   it('validates paths in allowed directories', () => {

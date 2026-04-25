@@ -12,13 +12,6 @@ import { createDebugLogger } from './debugLogger.js';
 
 const debugLogger = createDebugLogger('WORKSPACE');
 
-/**
- * Bounded cache for fullyResolvedPath to avoid repeated sync fs.realpathSync calls.
- * Uses a simple FIFO eviction strategy.
- */
-const RESOLVED_PATH_CACHE = new Map<string, string>();
-const MAX_RESOLVED_PATH_CACHE_SIZE = 1024;
-
 export type Unsubscribe = () => void;
 
 /**
@@ -30,6 +23,13 @@ export class WorkspaceContext {
   private directories = new Set<string>();
   private initialDirectories: Set<string>;
   private onDirectoriesChangedListeners = new Set<() => void>();
+  /**
+   * Memoized realpath results for paths checked during this workspace
+   * session. Kept per-instance to avoid leaking stale state across unrelated
+   * workspaces and tests.
+   */
+  private resolvedPathCache = new Map<string, string>();
+  private static readonly RESOLVED_PATH_CACHE_MAX = 1024;
 
   /**
    * Creates a new WorkspaceContext with the given initial directory and optional additional directories.
@@ -210,8 +210,8 @@ export class WorkspaceContext {
    * if it did exist.
    */
   private fullyResolvedPath(pathToCheck: string): string {
-    const cached = RESOLVED_PATH_CACHE.get(pathToCheck);
-    if (cached) {
+    const cached = this.resolvedPathCache.get(pathToCheck);
+    if (cached !== undefined) {
       return cached;
     }
 
@@ -235,13 +235,15 @@ export class WorkspaceContext {
     }
 
     // Cache the result. FIFO eviction if full.
-    if (RESOLVED_PATH_CACHE.size >= MAX_RESOLVED_PATH_CACHE_SIZE) {
-      const firstKey = RESOLVED_PATH_CACHE.keys().next().value;
+    if (
+      this.resolvedPathCache.size >= WorkspaceContext.RESOLVED_PATH_CACHE_MAX
+    ) {
+      const firstKey = this.resolvedPathCache.keys().next().value;
       if (firstKey !== undefined) {
-        RESOLVED_PATH_CACHE.delete(firstKey);
+        this.resolvedPathCache.delete(firstKey);
       }
     }
-    RESOLVED_PATH_CACHE.set(pathToCheck, resolved);
+    this.resolvedPathCache.set(pathToCheck, resolved);
 
     return resolved;
   }

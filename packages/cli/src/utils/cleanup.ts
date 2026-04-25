@@ -23,43 +23,81 @@ export function registerCleanup(fn: (() => void) | (() => Promise<void>)) {
 }
 
 /**
+ * Per-cleanup ceiling. Caps any single hung cleanup so it can't starve the
+ * rest of the cleanup chain.
+ */
+const PER_CLEANUP_TIMEOUT_MS = 2_000;
+
+/**
+ * Wall-clock ceiling for the whole cleanup pass.
+ */
+const OVERALL_CLEANUP_TIMEOUT_MS = 5_000;
+
+/**
+ * Awaits a promise but resolves to `undefined` if the timeout elapses first.
+ * The timer is unref'd so it cannot keep the event loop alive by itself.
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(undefined), ms);
+    timer.unref?.();
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      () => {
+        clearTimeout(timer);
+        resolve(undefined);
+      },
+    );
+  });
+}
+
+export interface RunExitCleanupOptions {
+  /** TEST ONLY - override per-cleanup-function timeout (default 2s). */
+  _testPerFnTimeoutMs?: number;
+  /** TEST ONLY - override overall wall-clock timeout (default 5s). */
+  _testOverallTimeoutMs?: number;
+}
+
+/**
  * Runs all registered cleanup functions.
  *
  * Bounds execution with two failsafes:
- * 1. Per-function timeout (2s): prevents a single hung syscall (e.g. slow NFS,
- *    stuck MCP socket) from blocking other cleanups.
- * 2. Overall wall-clock timeout (5s): ensures the process eventually exits
- *    even if many cleanups are slow or the event loop is saturated.
+ * 1. Per-function timeout: prevents a single hung cleanup from blocking later ones.
+ * 2. Overall timeout: ensures the process eventually exits even if many cleanups hang.
  */
-export async function runExitCleanup() {
-  const overallTimeout = 5000;
-  const perFnTimeout = 2000;
+export async function runExitCleanup(
+  options: RunExitCleanupOptions = {},
+): Promise<void> {
+  const perFn = options._testPerFnTimeoutMs ?? PER_CLEANUP_TIMEOUT_MS;
+  const overall = options._testOverallTimeoutMs ?? OVERALL_CLEANUP_TIMEOUT_MS;
 
-  const cleanupPromise = (async () => {
+  const drain = (async () => {
     for (const fn of cleanupFunctions) {
       try {
-        // Race each cleanup function against a per-function timeout
-        await Promise.race([
-          Promise.resolve(fn()),
-          new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error('Cleanup function timed out')),
-              perFnTimeout,
-            ),
-          ),
-        ]);
-      } catch (_) {
-        // Ignore errors and timeouts during cleanup.
+        await withTimeout(Promise.resolve().then(fn), perFn);
+      } catch {
+        // Ignore errors during cleanup.
       }
     }
   })();
 
-  await Promise.race([
-    cleanupPromise,
-    new Promise((resolve) => setTimeout(resolve, overallTimeout)),
-  ]);
+  let wallClockTimer: NodeJS.Timeout | undefined;
+  const wallClock = new Promise<void>((resolve) => {
+    wallClockTimer = setTimeout(resolve, overall);
+    wallClockTimer.unref?.();
+  });
 
-  cleanupFunctions.length = 0; // Clear the array
+  try {
+    await Promise.race([drain, wallClock]);
+  } finally {
+    if (wallClockTimer) {
+      clearTimeout(wallClockTimer);
+    }
+    cleanupFunctions.length = 0;
+  }
 }
 
 export async function cleanupCheckpoints() {

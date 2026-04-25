@@ -657,6 +657,7 @@ export class Config {
   private gitService: GitService | undefined = undefined;
   private sessionService: SessionService | undefined = undefined;
   private chatRecordingService: ChatRecordingService | undefined = undefined;
+  private retiredChatRecordingServices = new Set<ChatRecordingService>();
   private readonly checkpointing: boolean;
   private readonly proxy: string | undefined;
   private readonly cwd: string;
@@ -1383,10 +1384,13 @@ export class Config {
     sessionData?: ResumedSessionData,
   ): string {
     // Finalize the outgoing session before switching.
-    try {
-      this.chatRecordingService?.finalize();
-    } catch {
-      // Best-effort — don't block session switch
+    if (this.chatRecordingService) {
+      try {
+        this.chatRecordingService.finalize();
+      } catch {
+        // Best-effort — don't block session switch
+      }
+      this.retireChatRecordingService(this.chatRecordingService);
     }
 
     this.sessionId = sessionId ?? randomUUID();
@@ -1400,6 +1404,18 @@ export class Config {
       logStartSession(this, new StartSessionEvent(this));
     }
     return this.sessionId;
+  }
+
+  private retireChatRecordingService(service: ChatRecordingService): void {
+    this.retiredChatRecordingServices.add(service);
+    void service
+      .flush()
+      .catch(() => {
+        // Best-effort — shutdown will still await any service that remains pending.
+      })
+      .finally(() => {
+        this.retiredChatRecordingServices.delete(service);
+      });
   }
 
   /**
@@ -1659,6 +1675,14 @@ export class Config {
       try {
         this.chatRecordingService?.finalize();
         await this.chatRecordingService?.flush();
+        if (this.retiredChatRecordingServices.size > 0) {
+          await Promise.allSettled(
+            Array.from(this.retiredChatRecordingServices, (service) =>
+              service.flush(),
+            ),
+          );
+          this.retiredChatRecordingServices.clear();
+        }
       } catch {
         // Best-effort — don't block shutdown
       }

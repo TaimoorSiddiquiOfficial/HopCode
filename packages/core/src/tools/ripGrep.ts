@@ -22,11 +22,11 @@ import type { PermissionDecision } from '../permissions/types.js';
 const debugLogger = createDebugLogger('RIPGREP');
 
 /**
- * Bounded caches for filesystem lookups to avoid repeated sync fs calls on the tool hot path.
- * Uses a simple FIFO eviction strategy.
+ * Bounded caches for filesystem lookups to avoid repeated sync fs calls on the
+ * tool hot path. Uses a simple FIFO eviction strategy.
  */
 const DIR_IS_DIR_CACHE = new Map<string, boolean>();
-const HOPCODE_IGNORE_EXISTS_CACHE = new Map<string, boolean>();
+const HOPCODE_IGNORE_PATH_CACHE = new Map<string, string | null>();
 const MAX_CACHE_SIZE = 256;
 
 /**
@@ -35,7 +35,7 @@ const MAX_CACHE_SIZE = 256;
  */
 export function _resetRipGrepCachesForTest(): void {
   DIR_IS_DIR_CACHE.clear();
-  HOPCODE_IGNORE_EXISTS_CACHE.clear();
+  HOPCODE_IGNORE_PATH_CACHE.clear();
 }
 
 /**
@@ -273,40 +273,31 @@ class GrepToolInvocation extends BaseToolInvocation<
         let isDir = DIR_IS_DIR_CACHE.get(searchPath);
         if (isDir === undefined) {
           try {
-            isDir =
-              fs.existsSync(searchPath) &&
-              fs.statSync(searchPath).isDirectory();
-            if (isDir) {
-              if (DIR_IS_DIR_CACHE.size >= MAX_CACHE_SIZE) {
-                const firstKey = DIR_IS_DIR_CACHE.keys().next().value;
-                if (firstKey !== undefined) DIR_IS_DIR_CACHE.delete(firstKey);
-              }
-              DIR_IS_DIR_CACHE.set(searchPath, true);
-            }
+            isDir = fs.statSync(searchPath).isDirectory();
           } catch {
             isDir = false;
           }
+          if (DIR_IS_DIR_CACHE.size >= MAX_CACHE_SIZE) {
+            const firstKey = DIR_IS_DIR_CACHE.keys().next().value;
+            if (firstKey !== undefined) DIR_IS_DIR_CACHE.delete(firstKey);
+          }
+          DIR_IS_DIR_CACHE.set(searchPath, isDir);
         }
 
         const dir = isDir ? searchPath : path.dirname(searchPath);
-        const hopcodeIgnorePath = path.join(dir, '.hopcodeignore');
-
-        if (seenIgnoreFiles.has(hopcodeIgnorePath)) {
-          continue;
-        }
-
-        let exists = HOPCODE_IGNORE_EXISTS_CACHE.get(hopcodeIgnorePath);
-        if (exists === undefined) {
-          exists = fs.existsSync(hopcodeIgnorePath);
-          if (HOPCODE_IGNORE_EXISTS_CACHE.size >= MAX_CACHE_SIZE) {
-            const firstKey = HOPCODE_IGNORE_EXISTS_CACHE.keys().next().value;
+        let hopcodeIgnorePath = HOPCODE_IGNORE_PATH_CACHE.get(dir);
+        if (hopcodeIgnorePath === undefined) {
+          const candidate = path.join(dir, '.hopcodeignore');
+          hopcodeIgnorePath = fs.existsSync(candidate) ? candidate : null;
+          if (HOPCODE_IGNORE_PATH_CACHE.size >= MAX_CACHE_SIZE) {
+            const firstKey = HOPCODE_IGNORE_PATH_CACHE.keys().next().value;
             if (firstKey !== undefined)
-              HOPCODE_IGNORE_EXISTS_CACHE.delete(firstKey);
+              HOPCODE_IGNORE_PATH_CACHE.delete(firstKey);
           }
-          HOPCODE_IGNORE_EXISTS_CACHE.set(hopcodeIgnorePath, exists);
+          HOPCODE_IGNORE_PATH_CACHE.set(dir, hopcodeIgnorePath);
         }
 
-        if (exists) {
+        if (hopcodeIgnorePath && !seenIgnoreFiles.has(hopcodeIgnorePath)) {
           rgArgs.push('--ignore-file', hopcodeIgnorePath);
           seenIgnoreFiles.add(hopcodeIgnorePath);
         }

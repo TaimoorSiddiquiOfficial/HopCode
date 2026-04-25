@@ -175,8 +175,10 @@ export async function runNonInteractive(
     let totalApiDurationMs = 0;
     const startTime = Date.now();
 
+    let pipeBroken = false;
     const stdoutErrorHandler = (err: NodeJS.ErrnoException) => {
-      if (err.code === 'EPIPE') {
+      if (err.code === 'EPIPE' && !pipeBroken) {
+        pipeBroken = true;
         process.stdout.removeListener('error', stdoutErrorHandler);
         // Routine CLI patterns like `hopcode -p ... | head -1` close the
         // downstream pipe and trigger EPIPE. Destroying stdout lets writes
