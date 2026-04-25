@@ -62,14 +62,15 @@ export class HopCodeSessionManager {
   async createSession(
     request: Record<string, any>,
   ): Promise<Record<string, any>> {
-    const sessionId = request.sessionId || randomUUID();
+    const sessionId = request['sessionId'] || randomUUID();
     const now = Date.now();
 
     const session: ActiveSession = {
       sessionId,
       status: 'initializing',
-      model: request.model || this.options.defaultModel || 'claude-sonnet-4-6',
-      cwd: request.cwd || this.options.cwd || process.cwd(),
+      model:
+        request['model'] || this.options.defaultModel || 'claude-sonnet-4-6',
+      cwd: request['cwd'] || this.options['cwd'] || process.cwd(),
       createdAt: now,
       updatedAt: now,
       child: null,
@@ -94,7 +95,7 @@ export class HopCodeSessionManager {
     write: (msg: Record<string, unknown>) => void,
   ): Promise<string> {
     const sessionInfo = await this.createSession(request);
-    const session = this.sessions.get(sessionInfo.sessionId)!;
+    const session = this.sessions.get(sessionInfo['sessionId'])!;
     session.writeCallback = write;
 
     // Spawn the HopCode CLI in stream-json mode
@@ -103,16 +104,16 @@ export class HopCodeSessionManager {
 
     write({
       sessionInfo: {
-        sessionId: sessionInfo.sessionId,
+        sessionId: sessionInfo['sessionId'],
         status: 'running',
-        model: sessionInfo.model,
-        cwd: sessionInfo.cwd,
-        createdAt: sessionInfo.createdAt,
-        updatedAt: sessionInfo.updatedAt,
+        model: sessionInfo['model'],
+        cwd: sessionInfo['cwd'],
+        createdAt: sessionInfo['createdAt'],
+        updatedAt: sessionInfo['updatedAt'],
       },
     });
 
-    return sessionInfo.sessionId;
+    return sessionInfo['sessionId'];
   }
 
   async handleClientMessage(
@@ -124,19 +125,19 @@ export class HopCodeSessionManager {
       throw new Error(`Session ${sessionId} not found`);
     }
 
-    const payload = clientMessage.payload;
+    const payload = clientMessage['payload'];
     if (!payload) return;
 
-    if (payload.userPrompt) {
-      await this.handleUserPrompt(session, payload.userPrompt);
-    } else if (payload.toolApproval) {
-      await this.handleToolApproval(session, payload.toolApproval);
-    } else if (payload.toolDenial) {
-      await this.handleToolDenial(session, payload.toolDenial);
-    } else if (payload.cancelRound) {
+    if (payload['userPrompt']) {
+      await this.handleUserPrompt(session, payload['userPrompt']);
+    } else if (payload['toolApproval']) {
+      await this.handleToolApproval(session, payload['toolApproval']);
+    } else if (payload['toolDenial']) {
+      await this.handleToolDenial(session, payload['toolDenial']);
+    } else if (payload['cancelRound']) {
       await this.handleCancelRound(session);
-    } else if (payload.shutdown) {
-      await this.handleShutdown(session, payload.shutdown);
+    } else if (payload['shutdown']) {
+      await this.handleShutdown(session, payload['shutdown']);
     }
   }
 
@@ -157,19 +158,19 @@ export class HopCodeSessionManager {
       '--model',
       session.model,
       '--permission-mode',
-      request.permissionMode ?? 'default',
+      request['permissionMode'] ?? 'default',
       '--cwd',
       session.cwd,
     ];
 
-    if (request.allowedTools?.length) {
-      args.push('--allowed-tools', request.allowedTools.join(','));
+    if (request['allowedTools']?.length) {
+      args.push('--allowed-tools', request['allowedTools'].join(','));
     }
-    if (request.excludeTools?.length) {
-      args.push('--exclude-tools', request.excludeTools.join(','));
+    if (request['excludeTools']?.length) {
+      args.push('--exclude-tools', request['excludeTools'].join(','));
     }
-    if (request.authType) {
-      args.push('--auth-type', request.authType);
+    if (request['authType']) {
+      args.push('--auth-type', request['authType']);
     }
 
     debugLogger.info(
@@ -273,7 +274,7 @@ export class HopCodeSessionManager {
       }
 
       case 'content_block_delta': {
-        const delta = (event as any).delta;
+        const delta = (event as any)['delta'];
         if (delta?.type === 'text_delta') {
           session.writeCallback({ textChunk: { text: delta.text } });
         } else if (delta?.type === 'thinking_delta') {
@@ -285,7 +286,7 @@ export class HopCodeSessionManager {
       }
 
       case 'assistant': {
-        const msg = (event as any).message;
+        const msg = (event as any)['message'];
         if (msg?.content) {
           for (const block of msg.content) {
             if (block.type === 'text') {
@@ -305,10 +306,10 @@ export class HopCodeSessionManager {
       }
 
       case 'tool_result': {
-        const result = (event as any).content;
+        const result = (event as any)['content'];
         session.writeCallback({
           toolResult: {
-            toolUseId: (event as any).tool_use_id ?? '',
+            toolUseId: (event as any)['tool_use_id'] ?? '',
             content:
               typeof result === 'string' ? result : JSON.stringify(result),
             isError: false,
@@ -318,9 +319,9 @@ export class HopCodeSessionManager {
       }
 
       case 'control_request': {
-        const subtype = (event as any).subtype;
+        const subtype = (event as any)['subtype'];
         if (subtype === 'can_use_tool') {
-          const data = (event as any).data ?? event;
+          const data = (event as any)['data'] ?? event;
           session.writeCallback({
             permissionRequest: {
               toolUseId: data.tool_use_id,
@@ -355,7 +356,7 @@ export class HopCodeSessionManager {
 
       case 'system': {
         // System messages carry metadata; surface usage if present
-        const data = (event as any).data;
+        const data = (event as any)['data'];
         if (data?.usage) {
           session.writeCallback({
             usage: {

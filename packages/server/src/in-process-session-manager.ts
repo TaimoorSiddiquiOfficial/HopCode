@@ -110,7 +110,7 @@ export class InProcessSessionManager {
       this.options.runtimeConfig.model ||
       'claude-sonnet-4-6';
 
-    const cwd = (request.cwd as string) || this.options.cwd || process.cwd();
+    const cwd = (request.cwd as string) || this.options['cwd'] || process.cwd();
 
     const emitter = new AgentEventEmitter();
 

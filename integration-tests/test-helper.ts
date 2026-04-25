@@ -181,7 +181,7 @@ export class TestRig {
         otlpEndpoint: '',
         outfile: telemetryPath,
       },
-      sandbox: env.HOPCODE_SANDBOX !== 'false' ? env.HOPCODE_SANDBOX : false,
+      sandbox: env.HOPCODE_SANDBOX !== 'false' ? env['HOPCODE_SANDBOX'] : false,
       ...options.settings, // Allow tests to override/add settings
     };
     writeFileSync(
