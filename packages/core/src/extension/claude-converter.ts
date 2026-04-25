@@ -314,10 +314,9 @@ export function convertClaudeToQwenConfig(
   let mcpServers: Record<string, MCPServerConfig> | undefined;
   if (claudeConfig.mcpServers) {
     if (typeof claudeConfig.mcpServers === 'string') {
-      // TODO: Load from file path
-      debugLogger.warn(
-        `[Claude Converter] MCP servers path not yet supported: ${claudeConfig.mcpServers}`,
-      );
+      // If it's a string, it's a file path that should have been resolved
+      // by the caller (e.g. convertClaudePluginPackage) before calling this.
+      mcpServers = undefined;
     } else {
       mcpServers = claudeConfig.mcpServers;
     }

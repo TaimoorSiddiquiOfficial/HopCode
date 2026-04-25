@@ -7,6 +7,7 @@
 export interface FileFilteringOptions {
   respectGitIgnore: boolean;
   respectHopCodeIgnore: boolean;
+  customExcludes?: string[];
 }
 
 // For memory files

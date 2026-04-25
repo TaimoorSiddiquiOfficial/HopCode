@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { DEFAULT_HOPCODE_MODEL, MAINLINE_CODER_MODEL } from '../config/models.js';
+import {
+  DEFAULT_HOPCODE_MODEL,
+  MAINLINE_CODER_MODEL,
+} from '../config/models.js';
 
 import type { ModelConfig } from './types.js';
 
@@ -63,7 +66,22 @@ export interface AuthEnvMapping {
 
 export const AUTH_ENV_MAPPINGS = {
   openai: {
-    apiKey: ['OPENAI_API_KEY'],
+    apiKey: [
+      'OPENAI_API_KEY',
+      'DEEPSEEK_API_KEY',
+      'GROQ_API_KEY',
+      'MISTRAL_API_KEY',
+      'OPENROUTER_API_KEY',
+      'TOGETHER_API_KEY',
+      'FIREWORKS_API_KEY',
+      'XAI_API_KEY',
+      'PERPLEXITY_API_KEY',
+      'COHERE_API_KEY',
+      'DASHSCOPE_API_KEY',
+      'MOONSHOT_API_KEY',
+      'AZURE_OPENAI_API_KEY',
+      'OLLAMA_API_KEY',
+    ],
     baseUrl: ['OPENAI_BASE_URL'],
     model: ['OPENAI_MODEL', 'HOPCODE_MODEL'],
   },

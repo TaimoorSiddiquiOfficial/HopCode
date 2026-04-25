@@ -5,7 +5,7 @@
  */
 
 import { getActiveProfile } from './profileStore.js';
-import type { LoadedSettings} from '../../config/settings.js';
+import type { LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
 import type { CliArgs } from '../../config/config.js';
 
@@ -56,10 +56,11 @@ export async function applyActiveProfile(
   }
 
   // Write modelProviders entry so the model registry picks it up
+  const providerLower = profile.provider.toLowerCase();
   const modelProvidersKey =
-    profile.provider === 'anthropic'
+    providerLower === 'anthropic'
       ? 'USE_ANTHROPIC'
-      : profile.provider === 'gemini'
+      : providerLower === 'gemini' || providerLower === 'vertex'
         ? 'USE_GEMINI'
         : 'USE_OPENAI';
 
