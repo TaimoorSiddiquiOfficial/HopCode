@@ -48,6 +48,20 @@ export function parseAndFormatApiError(
     return text;
   }
 
+  // If it's an object but not a structured error, try to get a message from it
+  if (typeof error === 'object' && error !== null) {
+    const errorMessage = getErrorMessage(error);
+    if (errorMessage && errorMessage !== '[object Object]') {
+      return `[API Error: ${errorMessage}]`;
+    }
+    // If we still have [object Object], try to stringify it
+    try {
+      return `[API Error: ${JSON.stringify(error)}]`;
+    } catch {
+      return `[API Error: ${String(error)}]`;
+    }
+  }
+
   // The error message might be a string containing a JSON object.
   if (typeof error === 'string') {
     const jsonStart = error.indexOf('{');

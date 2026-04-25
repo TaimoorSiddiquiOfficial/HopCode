@@ -1480,7 +1480,7 @@ export const useHopCodeStream = (
             setPendingRetryErrorItem({
               type: 'error' as const,
               text: parseAndFormatApiError(
-                getErrorMessage(error) || 'Unknown error',
+                error,
                 config.getContentGeneratorConfig()?.authType,
               ),
               hint: retryHint,

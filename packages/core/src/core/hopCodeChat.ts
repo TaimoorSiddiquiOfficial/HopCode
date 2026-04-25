@@ -49,7 +49,11 @@ export enum StreamEventType {
 
 export type StreamEvent =
   | { type: StreamEventType.CHUNK; value: GenerateContentResponse }
-  | { type: StreamEventType.RETRY; retryInfo?: RetryInfo; isContinuation?: boolean };
+  | {
+      type: StreamEventType.RETRY;
+      retryInfo?: RetryInfo;
+      isContinuation?: boolean;
+    };
 
 /**
  * Options for retrying due to invalid content from the model.
@@ -408,9 +412,7 @@ export class HopCodeChat {
             if (isRateLimit && rateLimitRetryCount < maxRateLimitRetries) {
               rateLimitRetryCount++;
               const delayMs = RATE_LIMIT_RETRY_OPTIONS.delayMs;
-              const message = parseAndFormatApiError(
-                error instanceof Error ? error.message : String(error),
-              );
+              const message = parseAndFormatApiError(error);
               debugLogger.warn(
                 `Rate limit throttling detected (retry ${rateLimitRetryCount}/${maxRateLimitRetries}). ` +
                   `Waiting ${delayMs / 1000}s before retrying...`,
