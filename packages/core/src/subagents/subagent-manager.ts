@@ -41,7 +41,10 @@ import {
   type ContentGeneratorConfig,
   createContentGenerator,
 } from '../core/contentGenerator.js';
-import { buildAgentContentGeneratorConfig } from '../models/content-generator-config.js';
+import {
+  buildAgentContentGeneratorConfig,
+  type AuthOverrides,
+} from '../models/content-generator-config.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { normalizeContent } from '../utils/textUtils.js';
 import { parseSubagentModelSelection } from './model-selection.js';
@@ -682,6 +685,7 @@ export class SubagentManager {
   ): Promise<Config> {
     // Check if the user has configured a per-agent model override in settings.json
     const settingsOverride = base.getAgentModelForType(config.name);
+    const fullModelConfig = base.getAgentModelFullConfig(config.name);
     const modelStr = settingsOverride ?? config.model;
 
     const selection = parseSubagentModelSelection(modelStr);
@@ -691,8 +695,10 @@ export class SubagentManager {
 
     const authType =
       selection.authType ?? base.getContentGeneratorConfig().authType;
-    const authOverrides = {
+    const authOverrides: AuthOverrides = {
       authType: authType as string,
+      apiKey: fullModelConfig?.apiKey,
+      baseUrl: fullModelConfig?.baseUrl,
     };
 
     const agentGeneratorConfig = buildAgentContentGeneratorConfig(

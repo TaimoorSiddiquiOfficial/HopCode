@@ -14,6 +14,7 @@ export interface HopCodeProfile {
   model: string;
   baseUrl?: string;
   apiKey?: string;
+  envKey?: string;
   description?: string;
   createdAt: string;
 }

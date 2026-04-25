@@ -414,8 +414,11 @@ export interface ConfigParameters {
     default: string;
     mode?: 'auto' | 'manual';
   };
-  /** Per-agent model overrides. Map of agent name → model string (e.g. "openai::gpt-4o"). */
-  agentModels?: Record<string, string>;
+  /** Per-agent model overrides. String: "modelId" or "authType::modelId". Object: { model, baseUrl?, apiKey? }. */
+  agentModels?: Record<
+    string,
+    string | { model: string; baseUrl?: string; apiKey?: string }
+  >;
   chatCompression?: ChatCompressionSettings;
   interactive?: boolean;
   trustedFolder?: boolean;
@@ -681,7 +684,10 @@ export class Config {
     mode?: 'auto' | 'manual';
   };
   /** Per-agent model overrides keyed by agent name. */
-  private readonly agentModels?: Record<string, string>;
+  private readonly agentModels?: Record<
+    string,
+    string | { model: string; baseUrl?: string; apiKey?: string }
+  >;
   private readonly chatCompression: ChatCompressionSettings | undefined;
   private readonly interactive: boolean;
   private readonly trustedFolder: boolean | undefined;
@@ -2313,10 +2319,27 @@ export class Config {
    * Returns the model override for a given agent type name (from settings.json
    * `agentModels` map), or `undefined` if no override is configured.
    * The special value `"inherit"` is treated the same as `undefined`.
+   * When the override is an object `{ model, baseUrl?, apiKey? }`, returns
+   * the `.model` field.
    */
   getAgentModelForType(agentName: string): string | undefined {
     const override = this.agentModels?.[agentName];
     if (!override || override === 'inherit') return undefined;
+    if (typeof override === 'string') return override;
+    return override.model || undefined;
+  }
+
+  /**
+   * Returns the full agent model config object when an object-form override
+   * is configured in `agentModels`, or `undefined` if the value is a plain
+   * string or absent.
+   */
+  getAgentModelFullConfig(
+    agentName: string,
+  ): { model: string; baseUrl?: string; apiKey?: string } | undefined {
+    const override = this.agentModels?.[agentName];
+    if (!override || typeof override === 'string') return undefined;
+    if (override === 'inherit') return undefined;
     return override;
   }
 

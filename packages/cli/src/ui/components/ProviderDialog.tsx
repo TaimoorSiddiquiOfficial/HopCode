@@ -30,8 +30,10 @@ import {
 import { getCatalog } from '../../commands/model/catalog.js';
 import { fetchOllamaModels } from '../../commands/model/ollama.js';
 import { fetchOpenAICompatibleModels } from '../../commands/model/discovery.js';
+import { saveProfile } from '../../commands/profile/profileStore.js';
+import type { HopCodeProfile } from '../../commands/profile/profileStore.js';
 
-type Step = 'provider' | 'apikey' | 'model';
+type Step = 'provider' | 'apikey' | 'model' | 'profile';
 
 interface ProviderDialogProps {
   onClose: () => void;
@@ -128,6 +130,9 @@ export function ProviderDialog({
     Array<DescriptiveRadioSelectItem<string>>
   >([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [profileName, setProfileName] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [selectedModelId, setSelectedModelId] = useState('');
 
   // ── Step 1: Provider list ────────────────────────────────────────────────
   const providerItems = PROVIDER_REGISTRY.map(
@@ -300,14 +305,68 @@ export function ProviderDialog({
           );
         });
 
-        onClose();
+        // Offer to save as profile
+        setSelectedModelId(modelId);
+        setProfileName(
+          `${selectedProvider.id}-${modelId.replace(/[^a-zA-Z0-9_-]/g, '-')}`,
+        );
+        setStep('profile');
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         setErrorMessage(msg);
       }
     },
-    [selectedProvider, apiKey, settings, config, uiState, onClose],
+    [selectedProvider, apiKey, settings, config, uiState],
   );
+
+  // ── Step 4: Save as profile ──────────────────────────────────────────────
+  const handleSaveProfile = useCallback(async () => {
+    if (!selectedProvider) return;
+    const trimmedName = profileName.trim();
+    if (!trimmedName) return;
+    setSavingProfile(true);
+    try {
+      const profile: HopCodeProfile = {
+        name: trimmedName,
+        provider: selectedProvider.id,
+        model: selectedModelId || selectedProvider.defaultModel,
+        baseUrl: selectedProvider.baseUrl || undefined,
+        apiKey: selectedProvider.requiresApiKey
+          ? apiKey.trim() ||
+            getStoredApiKey(settings, selectedProvider.envKey) ||
+            ''
+          : undefined,
+        envKey: selectedProvider.envKey || undefined,
+        description: `${selectedProvider.label} profile`,
+        createdAt: new Date().toISOString(),
+      };
+      await saveProfile(profile);
+      uiState?.historyManager.addItem(
+        {
+          type: 'info',
+          text: `✓ ${t('Profile saved')}: ${trimmedName}`,
+        },
+        Date.now(),
+      );
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      uiState?.historyManager.addItem(
+        { type: 'error', text: `${t('Failed to save profile')}: ${msg}` },
+        Date.now(),
+      );
+    } finally {
+      setSavingProfile(false);
+      onClose();
+    }
+  }, [
+    selectedProvider,
+    profileName,
+    selectedModelId,
+    apiKey,
+    settings,
+    uiState,
+    onClose,
+  ]);
 
   // ── Keyboard: Escape navigation ──────────────────────────────────────────
   useKeypress(
@@ -324,6 +383,9 @@ export function ProviderDialog({
         } else {
           setStep('provider');
         }
+      } else if (step === 'profile') {
+        // Escape on profile step: skip and close
+        onClose();
       }
     },
     { isActive: true },
@@ -439,6 +501,46 @@ export function ProviderDialog({
               </Text>
             </Box>
           )}
+        </>
+      )}
+
+      {step === 'profile' && selectedProvider && (
+        <>
+          <Text bold>{t('Save as Profile?')}</Text>
+          <Box marginTop={1} flexDirection="column">
+            <Text color={theme.text.secondary}>
+              {t(
+                'Save this provider configuration as a reusable profile? You can switch to it later with "hopcode profile use <name>"',
+              )}
+            </Text>
+            <Box marginTop={1}>
+              <TextInput
+                value={profileName}
+                onChange={setProfileName}
+                onSubmit={handleSaveProfile}
+                placeholder={t('Profile name…')}
+                isActive={true}
+              />
+            </Box>
+            {savingProfile && (
+              <Box marginTop={1}>
+                <Text color={theme.text.secondary}>
+                  {t('⟳ Saving profile…')}
+                </Text>
+              </Box>
+            )}
+            {errorMessage && (
+              <Box marginTop={1}>
+                <Text color={theme.status.error}>✕ {errorMessage}</Text>
+              </Box>
+            )}
+          </Box>
+          <Box marginTop={1} flexDirection="row" gap={1}>
+            <Text>{t('Enter to save,')}</Text>
+            <Text color={theme.text.secondary}>
+              {t('Esc to skip and close')}
+            </Text>
+          </Box>
         </>
       )}
     </Box>

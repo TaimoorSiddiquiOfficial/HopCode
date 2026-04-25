@@ -1638,9 +1638,14 @@ const SETTINGS_SCHEMA = {
     label: 'Agent Model Overrides',
     category: 'Advanced',
     requiresRestart: false,
-    default: undefined as Record<string, string> | undefined,
+    default: undefined as
+      | Record<
+          string,
+          string | { model: string; baseUrl?: string; apiKey?: string }
+        >
+      | undefined,
     description:
-      'Per-agent model overrides. Map of agent name → model string. Example: {"general-purpose": "openai::gpt-4o", "Explore": "inherit"}. Use "inherit" to use the parent model.',
+      'Per-agent model overrides. String form: "modelId" or "authType::modelId". Object form: {"model": "...", "baseUrl": "...", "apiKey": "..."}. Use "inherit" to use the parent model.',
     showInDialog: false,
   },
   agents: {

@@ -24,6 +24,7 @@ import React from 'react';
 import { validateAuthMethod } from './config/auth.js';
 import * as cliConfig from './config/config.js';
 import { loadCliConfig, parseArguments } from './config/config.js';
+import { applyActiveProfile } from './commands/profile/profileBootstrap.js';
 import type { DnsResolutionOrder, LoadedSettings } from './config/settings.js';
 import {
   createMinimalSettings,
@@ -313,6 +314,11 @@ export async function main() {
     : loadSettings();
   await cleanupCheckpoints();
   profileCheckpoint('after_load_settings');
+
+  // Apply active profile before loadCliConfig so profile values are picked up
+  if (!isBareMode(argv.bare)) {
+    await applyActiveProfile(settings, argv);
+  }
 
   // Check for invalid input combinations early to prevent crashes
   if (argv.promptInteractive && !process.stdin.isTTY) {

@@ -18,6 +18,34 @@ import {
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
+/** Map provider name → API key env var name */
+function getEnvKeyForProvider(provider: string): string {
+  const mapping: Record<string, string> = {
+    openai: 'OPENAI_API_KEY',
+    anthropic: 'ANTHROPIC_API_KEY',
+    gemini: 'GEMINI_API_KEY',
+    deepseek: 'DEEPSEEK_API_KEY',
+    groq: 'GROQ_API_KEY',
+    mistral: 'MISTRAL_API_KEY',
+    openrouter: 'OPENROUTER_API_KEY',
+    togetherai: 'TOGETHER_API_KEY',
+    fireworks: 'FIREWORKS_API_KEY',
+    xai: 'XAI_API_KEY',
+    perplexity: 'PERPLEXITY_API_KEY',
+    cohere: 'COHERE_API_KEY',
+    huggingface: 'HF_TOKEN',
+    replicate: 'REPLICATE_API_TOKEN',
+    ollama: 'OLLAMA_API_KEY',
+    cerebras: 'CEREBRAS_API_KEY',
+    'nvidia-nim': 'NVIDIA_API_KEY',
+    sambanova: 'SAMBANOVA_API_KEY',
+    ai21: 'AI21_API_KEY',
+    dashscope: 'DASHSCOPE_API_KEY',
+    moonshot: 'MOONSHOT_API_KEY',
+  };
+  return mapping[provider.toLowerCase()] || `${provider.toUpperCase()}_API_KEY`;
+}
+
 function prompt(rl: readline.Interface, question: string): Promise<string> {
   return rl.question(question);
 }
@@ -60,12 +88,14 @@ export async function handleProfileInit(name?: string): Promise<void> {
     const apiKey = await prompt(rl, 'API key (leave blank to use env var): ');
     const description = await prompt(rl, 'Description (optional): ');
 
+    const providerTrimmed = provider.trim();
     const profile: HopCodeProfile = {
       name: profileName.trim(),
-      provider: provider.trim(),
+      provider: providerTrimmed,
       model: model.trim(),
       baseUrl: baseUrl.trim() || undefined,
       apiKey: apiKey.trim() || undefined,
+      envKey: getEnvKeyForProvider(providerTrimmed),
       description: description.trim() || undefined,
       createdAt: new Date().toISOString(),
     };
@@ -143,6 +173,7 @@ export async function handleProfileShow(): Promise<void> {
   log(`  Provider:    ${active.provider}`);
   log(`  Model:       ${active.model}`);
   if (active.baseUrl) log(`  Base URL:    ${active.baseUrl}`);
+  if (active.apiKey) log(`  API Key:     ${active.apiKey ? '✓ set' : ''}`);
   if (active.description) log(`  Description: ${active.description}`);
   log('');
 }
