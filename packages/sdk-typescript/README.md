@@ -7,7 +7,7 @@ Feel free to submit a feature request/issue/PR.
 ## Installation
 
 ```bash
-npm install @hopcode/sdk
+npm install @hoptrendy/sdk
 ```
 
 ## Requirements

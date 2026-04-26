@@ -15,7 +15,7 @@ This is the recommended way for end-users to install HopCode. It involves downlo
 - **Global install:**
 
   ```bash
-  npm install -g @hoptrendy/hopcode
+  npm install -g @hoptrendy/hopcode-cli
   ```
 
   Then, run the CLI from anywhere:
@@ -28,7 +28,7 @@ This is the recommended way for end-users to install HopCode. It involves downlo
 
   ```bash
   # Execute the latest version from NPM without a global install
-  npx @hoptrendy/hopcode
+  npx @hoptrendy/hopcode-cli
   ```
 
 ---
@@ -41,7 +41,7 @@ For security and isolation, HopCode can be run inside a container. This is the d
   You can run the published sandbox image directly. This is useful for environments where you only have Docker and want to run the CLI.
   ```bash
   # Run the published sandbox image
-  docker run --rm -it ghcr.io/qwenlm/hopcode:0.0.11
+  docker run --rm -it ghcr.io/taimoorsiddiquiofficial/hopcode:0.18.10
   ```
 - **Using the `--sandbox` flag:**
   If you have HopCode installed locally (using the standard installation described above), you can instruct it to run inside the sandbox container.
@@ -92,7 +92,7 @@ The execution methods described above are made possible by the following archite
 HopCode project is a monorepo that publishes core packages to the NPM registry:
 
 - `@hoptrendy/hopcode-core`: The backend, handling logic and tool execution.
-- `@hoptrendy/hopcode`: The user-facing frontend.
+- `@hoptrendy/hopcode-cli`: The user-facing frontend.
 
 These packages are used when performing the standard installation and when running HopCode from the source.
 

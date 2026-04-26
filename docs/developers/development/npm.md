@@ -1,12 +1,12 @@
 ﻿# Package Overview
 
-This monorepo contains two main packages: `@hoptrendy/hopcode` and `@hoptrendy/hopcode-core`.
+This monorepo contains two main packages: `@hoptrendy/hopcode-cli` and `@hoptrendy/hopcode-core`.
 
-## `@hoptrendy/hopcode`
+## `@hoptrendy/hopcode-cli`
 
 This is the main package for HopCode. It is responsible for the user interface, command parsing, and all other user-facing functionality.
 
-When this package is published, it is bundled into a single executable file. This bundle includes all of the package's dependencies, including `@hoptrendy/hopcode-core`. This means that whether a user installs the package with `npm install -g @hoptrendy/hopcode` or runs it directly with `npx @hoptrendy/hopcode`, they are using this single, self-contained executable.
+When this package is published, it is bundled into a single executable file. This bundle includes all of the package's dependencies, including `@hoptrendy/hopcode-core`. This means that whether a user installs the package with `npm install -g @hoptrendy/hopcode-cli` or runs it directly with `npx @hoptrendy/hopcode-cli`, they are using this single, self-contained executable.
 
 ## `@hoptrendy/hopcode-core`
 
@@ -59,13 +59,13 @@ To install the latest version of each type:
 
 ```bash
 # Stable (default)
-npm install -g @hoptrendy/hopcode
+npm install -g @hoptrendy/hopcode-cli
 
 # Preview
-npm install -g @hoptrendy/hopcode@preview
+npm install -g @hoptrendy/hopcode-cli@preview
 
 # Nightly
-npm install -g @hoptrendy/hopcode@nightly
+npm install -g @hoptrendy/hopcode-cli@nightly
 ```
 
 ### Release Process Details
@@ -88,8 +88,8 @@ If any step in the release workflow fails, it will automatically create a new is
 After pushing a new release smoke testing should be performed to ensure that the packages are working as expected. This can be done by installing the packages locally and running a set of tests to ensure that they are functioning correctly.
 
 - `npx -y @hoptrendy/hopcode-cli@latest --version` to validate the push worked as expected if you were not doing a rc or dev tag
-- `npx -y @hoptrendy/hopcode@<release tag> --version` to validate the tag pushed appropriately
-- _This is destructive locally_ `npm uninstall @hoptrendy/hopcode && npm uninstall -g @hoptrendy/hopcode && npm cache clean --force &&  npm install @hoptrendy/hopcode@<version>`
+- `npx -y @hoptrendy/hopcode-cli@<release tag> --version` to validate the tag pushed appropriately
+- _This is destructive locally_ `npm uninstall @hoptrendy/hopcode-cli && npm uninstall -g @hoptrendy/hopcode-cli && npm cache clean --force &&  npm install @hoptrendy/hopcode-cli@<version>`
 - Smoke testing a basic run through of exercising a few llm commands and tools is recommended to ensure that the packages are working as expected. We'll codify this more in the future.
 
 ## When to merge the version change, or not?

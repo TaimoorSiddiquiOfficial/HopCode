@@ -33,10 +33,10 @@ Remove-Item -Path (Join-Path $env:LocalAppData "npm-cache\_npx") -Recurse -Force
 
 ## Method 2: Using npm (Global Install)
 
-If you installed the CLI globally (e.g. `npm install -g @hoptrendy/hopcode`), use the `npm uninstall` command with the `-g` flag to remove it.
+If you installed the CLI globally (e.g. `npm install -g @hoptrendy/hopcode-cli`), use the `npm uninstall` command with the `-g` flag to remove it.
 
 ```bash
-npm uninstall -g @hoptrendy/hopcode
+npm uninstall -g @hoptrendy/hopcode-cli
 ```
 
 This command completely removes the package from your system.

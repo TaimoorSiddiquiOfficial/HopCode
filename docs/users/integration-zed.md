@@ -23,7 +23,7 @@
 1. Install HopCode CLI:
 
 ```bash
-npm install -g @hoptrendy/hopcode
+npm install -g @hoptrendy/hopcode-cli
 ```
 
 2. Download and install [Zed Editor](https://zed.dev/)
@@ -39,7 +39,7 @@ npm install -g @hoptrendy/hopcode
 1. Install HopCode CLI:
 
 ```bash
-npm install -g @hoptrendy/hopcode
+npm install -g @hoptrendy/hopcode-cli
 ```
 
 2. Download and install [Zed Editor](https://zed.dev/)
