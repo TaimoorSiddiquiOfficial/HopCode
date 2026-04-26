@@ -10,31 +10,31 @@ The installation scripts automate the process of installing Node.js (if not pres
 
 We provide platform-specific installation scripts:
 
-- **Linux/macOS**: `install-qwen-with-source.sh`
-- **Windows**: `install-qwen-with-source.bat`
+- **Linux/macOS**: `install-hopcode-with-source.sh`
+- **Windows**: `install-hopcode-with-source.bat`
 
 ## Linux/macOS Installation
 
-### Script: install-qwen-with-source.sh
+### Script: install-hopcode-with-source.sh
 
 #### Features:
 
 - Checks for existing Node.js installation and version
 - Installs Node.js 20+ if needed using NVM
 - Installs HopCode globally with source information
-- Stores the source information in `~/.qwen/source.json`
+- Stores the source information in `~/.hopcode/source.json`
 
 #### Usage:
 
 ```bash
 # Install with a specific source
-sh install-qwen-with-source.sh --source github
+sh install-hopcode-with-source.sh --source github
 
 # Install with internal source
-sh install-qwen-with-source.sh -s internal
+sh install-hopcode-with-source.sh -s internal
 
 # Show help
-sh install-qwen-with-source.sh --help
+sh install-hopcode-with-source.sh --help
 ```
 
 #### Supported Source Values:
@@ -49,7 +49,7 @@ sh install-qwen-with-source.sh --help
 1. The script accepts a `--source` parameter to specify where HopCode is being installed from
 2. It installs Node.js if needed
 3. It installs HopCode globally
-4. It creates `~/.qwen/source.json` with the specified source information
+4. It creates `~/.hopcode/source.json` with the specified source information
 
 #### Important Notes:
 
@@ -70,14 +70,14 @@ This is required to load the newly installed Node.js and HopCode into your PATH.
 
 ## Windows Installation
 
-### Script: install-qwen-with-source.bat
+### Script: install-hopcode-with-source.bat
 
 #### Features:
 
-- Checks for existing Node.js installation and version (requires version 18+)
+- Checks for existing Node.js installation and version (requires version 20+)
 - Automatically downloads and installs Node.js 24 LTS if not present or version is too low
 - Installs HopCode globally with source information
-- Stores the source information in `%USERPROFILE%\.qwen\source.json`
+- Stores the source information in `%USERPROFILE%\.hopcode\source.json`
 
 #### Prerequisites:
 
@@ -97,13 +97,13 @@ This is required to load the newly installed Node.js and HopCode into your PATH.
 
 ```powershell
 # Install with a specific source using --source parameter
-./install-qwen-with-source.bat --source github
+./install-hopcode-with-source.bat --source github
 
 # Install with short parameter
-./install-qwen-with-source.bat -s internal
+./install-hopcode-with-source.bat -s internal
 
 # Use default source (unknown)
-./install-qwen-with-source.bat
+./install-hopcode-with-source.bat
 ```
 
 #### Supported Source Values:
@@ -116,10 +116,10 @@ This is required to load the newly installed Node.js and HopCode into your PATH.
 #### How it Works:
 
 1. The script accepts a `--source` or `-s` parameter to specify where HopCode is being installed from
-2. It checks if Node.js is already installed and if the version is 18 or higher
+2. It checks if Node.js is already installed and if the version is 20 or higher
 3. If Node.js is not installed or version is too low, it automatically downloads and installs Node.js 24 LTS
 4. It installs HopCode globally using npm
-5. It creates `%USERPROFILE%\.qwen\source.json` with the specified source information
+5. It creates `%USERPROFILE%\.hopcode\source.json` with the specified source information
 
 #### Why Administrator Privileges are Required:
 
@@ -137,8 +137,8 @@ This feature implements the ability to capture and store the installation source
 
 The installation source is stored in a separate file at:
 
-- **Unix/Linux/macOS**: `~/.qwen/source.json`
-- **Windows**: `%USERPROFILE%\.qwen\source.json` (equivalent to `C:\Users\{username}\.qwen\source.json`)
+- **Unix/Linux/macOS**: `~/.hopcode/source.json`
+- **Windows**: `%USERPROFILE%\.hopcode\source.json` (equivalent to `C:\Users\{username}\.hopcode\source.json`)
 
 ### File Format
 
@@ -159,7 +159,7 @@ The `source.json` file contains:
 ### Technical Implementation
 
 - The source information is stored as a separate JSON file
-- The `QwenLogger` class reads this file during telemetry initialization
+- The telemetry logger reads this file during telemetry initialization
 - The source is included in the `app.channel` field of the RUM payload
 - The implementation gracefully handles missing files, unknown values, and parsing errors
 
@@ -170,13 +170,13 @@ After installation and restarting your terminal (or sourcing your shell configur
 **Linux/macOS:**
 
 ```bash
-cat ~/.qwen/source.json
+cat ~/.hopcode/source.json
 ```
 
 **Windows:**
 
 ```cmd
-type %USERPROFILE%\.qwen\source.json
+type %USERPROFILE%\.hopcode\source.json
 ```
 
 ## Manual Installation (Without Source Tracking)
@@ -193,14 +193,10 @@ curl -qL https://www.npmjs.com/install.sh | sh
 ### NPM Installation
 
 ```bash
-npm install -g @hoptrendy/hopcode@latest
+npm install -g @hoptrendy/hopcode-cli@latest
 ```
 
-### Homebrew (macOS, Linux)
-
-```bash
-brew install hopcode
-```
+Homebrew packages are not published by this repository yet. Use the npm package above for the current supported install path.
 
 ## Troubleshooting
 
@@ -210,17 +206,17 @@ brew install hopcode
 
 ```bash
 # Run with sh
-sh install-qwen-with-source.sh --source github
+sh install-hopcode-with-source.sh --source github
 ```
 
 **Windows (PowerShell as Administrator):**
 
 ```powershell
 # Run the script with --source parameter
-./install-qwen-with-source.bat --source github
+./install-hopcode-with-source.bat --source github
 
 # Or with short parameter
-./install-qwen-with-source.bat -s github
+./install-hopcode-with-source.bat -s github
 ```
 
 ### Node.js Installation Issues

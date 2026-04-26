@@ -4,23 +4,23 @@
 # This script installs Node.js (via NVM) and HopCode CLI
 # Supports Linux and macOS
 #
-# Usage: install-qwen-with-source.sh --source [github|npm|internal|local-build]
-#        install-qwen-with-source.sh -s [github|npm|internal|local-build]
+# Usage: install-hopcode-with-source.sh --source [github|npm|internal|local-build]
+#        install-hopcode-with-source.sh -s [github|npm|internal|local-build]
 
 # Re-execute with bash if running with sh or other shells
 # This block must use POSIX-compliant syntax ([ not [[) since it runs before we know bash is available
-if [ -z "${BASH_VERSION}" ] && [ -z "${__QWEN_INSTALL_REEXEC:-}" ]; then
+if [ -z "${BASH_VERSION}" ] && [ -z "${__HOPCODE_INSTALL_REEXEC:-}" ]; then
     # Check if we're in a git hook environment
     case "${0}" in
-        *.git/hooks/*) export __QWEN_IN_GIT_HOOK=1 ;;
+        *.git/hooks/*) export __HOPCODE_IN_GIT_HOOK=1 ;;
     esac
     if [ -n "${GIT_DIR:-}" ]; then
-        export __QWEN_IN_GIT_HOOK=1
+        export __HOPCODE_IN_GIT_HOOK=1
     fi
 
     # Try to find bash
     if command -v bash >/dev/null 2>&1; then
-        export __QWEN_INSTALL_REEXEC=1
+        export __HOPCODE_INSTALL_REEXEC=1
         # Re-exec with bash, preserving all arguments
         exec bash -- "${0}" "$@"
     else
@@ -196,7 +196,7 @@ install_nvm() {
     # Use temporary file instead of pipe to avoid potential subshell issues
     local NVM_INSTALL_TEMP
     NVM_INSTALL_TEMP=$(mktemp)
-    if "${DOWNLOAD_CMD}" "${DOWNLOAD_ARGS}" "https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install_nvm.sh" > "${NVM_INSTALL_TEMP}"; then
+    if "${DOWNLOAD_CMD}" "${DOWNLOAD_ARGS}" "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" > "${NVM_INSTALL_TEMP}"; then
         # Run the script in current shell environment
         # shellcheck source=/dev/null
         . "${NVM_INSTALL_TEMP}"
@@ -442,10 +442,10 @@ install_hopcode() {
         export PATH="${NPM_GLOBAL_BIN}:${PATH}"
     fi
 
-    if command_exists qwen; then
-        local QWEN_VERSION
-        QWEN_VERSION=$(qwen --version 2>/dev/null || echo "unknown")
-        log_success "HopCode is already installed: ${QWEN_VERSION}"
+    if command_exists hopcode; then
+        local HOPCODE_VERSION
+        HOPCODE_VERSION=$(hopcode --version 2>/dev/null || echo "unknown")
+        log_success "HopCode is already installed: ${HOPCODE_VERSION}"
         log_info "Upgrading to the latest version..."
     fi
 
@@ -457,14 +457,14 @@ install_hopcode() {
 
     # Install HopCode
     log_info "Installing HopCode..."
-    if npm install -g @hopcode/hopcode@latest --registry https://registry.npmmirror.com; then
+    if npm install -g @hoptrendy/hopcode-cli@latest --registry https://registry.npmjs.org; then
         log_success "HopCode installed successfully!"
 
         # Verify installation
-        if command_exists qwen; then
-            local qwen_version
-            qwen_version=$(qwen --version 2>/dev/null) || qwen_version="unknown"
-            log_info "HopCode version: ${qwen_version}"
+        if command_exists hopcode; then
+            local hopcode_version
+            hopcode_version=$(hopcode --version 2>/dev/null) || hopcode_version="unknown"
+            log_info "HopCode version: ${hopcode_version}"
         fi
     else
         log_error "Failed to install HopCode!"
@@ -549,16 +549,16 @@ main() {
         export PATH="${NPM_GLOBAL_BIN}:${PATH}"
     fi
 
-    # Check if qwen is immediately available
-    if command_exists qwen; then
+    # Check if hopcode is immediately available
+    if command_exists hopcode; then
         log_success "HopCode is ready to use!"
         echo ""
-        echo "You can now run: qwen"
+        echo "You can now run: hopcode"
         echo ""
-        # Auto-start qwen
+        # Auto-start HopCode
         log_info "Starting HopCode..."
         echo ""
-        exec qwen
+        exec hopcode
     else
         log_warning "HopCode command not found in current session"
         echo ""
@@ -566,7 +566,7 @@ main() {
         echo "run the following command in your current shell:"
         echo "  eval \$(${0} --print-env)"
         echo ""
-        log_info "Or simply restart your terminal, then run: qwen"
+        log_info "Or simply restart your terminal, then run: hopcode"
     fi
 }
 

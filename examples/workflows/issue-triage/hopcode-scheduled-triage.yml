@@ -31,7 +31,7 @@ jobs:
           node-version: '20'
 
       - name: 'Install HopCode CLI'
-        run: 'npm install -g @hoptrendy/hopcode-cli'
+        run: 'npm install -g @hoptrendy/hopcode-cli@latest'
 
       - name: 'Configure HopCode'
         env:

@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/web-dashboard",
-  "version": "0.18.8",
+  "version": "0.18.9",
   "description": "Standalone web dashboard for HopCode — session browser, chat viewer, cost tracking",
   "type": "module",
   "bin": {
@@ -18,7 +18,7 @@
     "preview": "node dist/server/index.js"
   },
   "dependencies": {
-    "@hoptrendy/webui": "*",
+    "@hoptrendy/webui": "file:../webui",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "react": "^19.1.0",

@@ -34,9 +34,11 @@ jobs:
     runs-on: 'ubuntu-latest'
     outputs:
       packages_json: '${{ steps.packages.outputs.packages_json }}'
+      has_workspace_packages: '${{ steps.packages.outputs.has_workspace_packages }}'
+      publish_root: '${{ steps.packages.outputs.publish_root }}'
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@v4'
+        uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
         with:
           ref: '${{ github.event.inputs.ref || github.sha }}'
 
@@ -48,30 +50,47 @@ jobs:
         shell: 'bash'
         run: |
           ROOT=$(pwd)
+          ROOT_PACKAGE='@hoptrendy/hopcode'
+          PACKAGES_INPUT='${{ github.event.inputs.packages }}'
           ALL_PACKAGES=$(npm query '.workspace' | jq -c --arg root "${ROOT}/" \
             '[.[] | {name: .name, path: (.path | ltrimstr($root))}]')
-          if [[ "${{ github.event.inputs.packages }}" == "all" ]]; then
+          if [[ "$PACKAGES_INPUT" == "all" ]]; then
             PACKAGES_JSON="${ALL_PACKAGES}"
+            PUBLISH_ROOT='true'
           else
-            INPUT_NAMES=$(echo "${{ github.event.inputs.packages }}" | tr ',' '\n' | jq -R . | jq -s .)
+            INPUT_NAMES=$(printf '%s' "$PACKAGES_INPUT" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | jq -R 'select(length > 0)' | jq -s .)
             PACKAGES_JSON=$(echo "${ALL_PACKAGES}" | \
               jq -c --argjson names "${INPUT_NAMES}" \
               '[.[] | select(.name as $n | ($names | index($n)) != null)]')
+            if echo "${INPUT_NAMES}" | jq -e --arg root "${ROOT_PACKAGE}" 'index($root) != null' >/dev/null; then
+              PUBLISH_ROOT='true'
+            else
+              PUBLISH_ROOT='false'
+            fi
+          fi
+          if [[ "${PACKAGES_JSON}" == "[]" ]]; then
+            HAS_WORKSPACE_PACKAGES='false'
+          else
+            HAS_WORKSPACE_PACKAGES='true'
           fi
           echo "packages_json=${PACKAGES_JSON}" >> "$GITHUB_OUTPUT"
+          echo "has_workspace_packages=${HAS_WORKSPACE_PACKAGES}" >> "$GITHUB_OUTPUT"
+          echo "publish_root=${PUBLISH_ROOT}" >> "$GITHUB_OUTPUT"
           echo "Packages to publish: ${PACKAGES_JSON}"
+          echo "Publish root package: ${PUBLISH_ROOT}"
 
   publish-packages:
     name: 'Publish ${{ matrix.package.name }}'
     runs-on: 'ubuntu-latest'
     needs: 'prepare'
+    if: "${{ needs.prepare.outputs.has_workspace_packages == 'true' }}"
     strategy:
       matrix:
         package: '${{ fromJson(needs.prepare.outputs.packages_json) }}'
       fail-fast: false
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@v4'
+        uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
         with:
           ref: '${{ github.event.inputs.ref || github.sha }}'
 
@@ -80,7 +99,7 @@ jobs:
 
       - name: 'Generate build artifacts'
         shell: 'bash'
-        run: 'node scripts/generate-git-commit-info.js || true'
+        run: 'node scripts/generate-git-commit-info.js'
 
       - name: 'Build workspace dependencies'
         shell: 'bash'
@@ -89,7 +108,7 @@ jobs:
       - name: 'Build Package'
         working-directory: '${{ matrix.package.path }}'
         shell: 'bash'
-        run: 'npm run build || true'
+        run: 'npm run build'
 
       - name: 'Normalize workspace deps for publish'
         working-directory: '${{ matrix.package.path }}'
@@ -154,18 +173,58 @@ jobs:
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
 
+  publish-root-package:
+    name: 'Publish root CLI package'
+    runs-on: 'ubuntu-latest'
+    needs: 'prepare'
+    if: "${{ needs.prepare.outputs.publish_root == 'true' }}"
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
+        with:
+          ref: '${{ github.event.inputs.ref || github.sha }}'
+
+      - name: 'Setup'
+        uses: './.github/actions/npm-setup'
+
+      - name: 'Build root CLI package'
+        run: 'npm run build && npm run bundle && npm run prepare:package'
+
+      - name: 'Publish root CLI package'
+        working-directory: 'dist'
+        shell: 'bash'
+        run: |
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            npm publish --access public --dry-run
+          else
+            if output=$(npm publish --access public --provenance 2>&1); then
+              echo "$output"
+            else
+              if echo "$output" | grep -q "You cannot publish over the previously published versions"; then
+                version=$(node -p "require('./package.json').version")
+                echo "⏭️ @hoptrendy/hopcode@${version} already published, skipping"
+              else
+                echo "$output" >&2
+                exit 1
+              fi
+            fi
+          fi
+        env:
+          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+
   publish-vscode-extension:
     name: 'Publish VS Code Extension (Marketplace + Open VSX)'
     runs-on: 'ubuntu-latest'
-    needs: 'prepare'
+    needs: ['prepare', 'publish-root-package']
     if: >-
       !cancelled() &&
       needs.prepare.result == 'success' &&
+      needs.publish-root-package.result != 'failure' &&
       (github.event.inputs.packages == 'all' ||
        contains(github.event.inputs.packages, 'vscode-ide-companion'))
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@v4'
+        uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
         with:
           ref: '${{ github.event.inputs.ref || github.sha }}'
 
@@ -174,7 +233,7 @@ jobs:
 
       - name: 'Generate git commit info'
         shell: 'bash'
-        run: 'node scripts/generate-git-commit-info.js || true'
+        run: 'node scripts/generate-git-commit-info.js'
 
       - name: 'Build all packages'
         shell: 'bash'
@@ -190,15 +249,17 @@ jobs:
         working-directory: 'packages/vscode-ide-companion'
         shell: 'bash'
         run: |
-          output=$(npx @vscode/vsce publish --packagePath ./*.vsix --no-verify 2>&1) || true
-          echo "$output"
-          if echo "$output" | grep -q "Published "; then
+          if output=$(npx @vscode/vsce publish --packagePath ./*.vsix 2>&1); then
+            echo "$output"
             echo "✅ VS Code Marketplace: published successfully"
-          elif echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST|already.*0\.[0-9])"; then
-            version=$(node -p "require('./package.json').version")
-            echo "⏭️ VS Code Marketplace: v${version} already published, skipping"
-          elif echo "$output" | grep -qiE "(^error|failed to publish)" && ! echo "$output" | grep -qi "already"; then
-            echo "$output" >&2; exit 1
+          else
+            echo "$output"
+            if echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST|already.*0\.[0-9])"; then
+              version=$(node -p "require('./package.json').version")
+              echo "⏭️ VS Code Marketplace: v${version} already published, skipping"
+            else
+              echo "$output" >&2; exit 1
+            fi
           fi
         env:
           VSCE_PAT: '${{ secrets.VSCE_PAT }}'
@@ -238,13 +299,20 @@ jobs:
   notify:
     name: 'Notify Result'
     runs-on: 'ubuntu-latest'
-    needs: ['prepare', 'publish-packages', 'publish-vscode-extension']
+    needs:
+      [
+        'prepare',
+        'publish-packages',
+        'publish-root-package',
+        'publish-vscode-extension',
+      ]
     if: 'always()'
     steps:
       - name: 'Publish Result'
         shell: 'bash'
         run: |
           npm_result="${{ needs.publish-packages.result }}"
+          root_result="${{ needs.publish-root-package.result }}"
           vsix_result="${{ needs.publish-vscode-extension.result }}"
           failed=0
 
@@ -254,6 +322,14 @@ jobs:
             echo "✅ NPM packages published successfully"
           else
             echo "⏭️ NPM publish: ${npm_result}"
+          fi
+
+          if [[ "$root_result" == "failure" ]]; then
+            echo "❌ Root package publishing failed"; failed=1
+          elif [[ "$root_result" == "success" ]]; then
+            echo "✅ Root package published successfully"
+          else
+            echo "⏭️ Root package publish: ${root_result}"
           fi
 
           if [[ "$vsix_result" == "failure" ]]; then

@@ -237,13 +237,13 @@ Commands for obtaining information and performing system settings.
 
 In addition to the in-session `/auth` slash command, HopCode provides standalone CLI subcommands for managing authentication directly from the terminal:
 
-| Command                                              | Description                                                   |
-| ---------------------------------------------------- | ------------------------------------------------------------- |
-| `qwen auth`                                          | Interactive authentication setup                              |
-| `qwen auth qwen-oauth`                               | ~~Authenticate with Qwen OAuth~~ (discontinued on 2026-04-15) |
-| `qwen auth coding-plan`                              | Authenticate with Alibaba Cloud Coding Plan                   |
-| `qwen auth coding-plan --region china --key sk-sp-…` | Non-interactive Coding Plan setup (for scripting)             |
-| `qwen auth status`                                   | Show current authentication status                            |
+| Command                                                 | Description                                                   |
+| ------------------------------------------------------- | ------------------------------------------------------------- |
+| `hopcode auth`                                          | Interactive authentication setup                              |
+| `hopcode auth qwen-oauth`                               | ~~Authenticate with Qwen OAuth~~ (discontinued on 2026-04-15) |
+| `hopcode auth coding-plan`                              | Authenticate with Alibaba Cloud Coding Plan                   |
+| `hopcode auth coding-plan --region china --key sk-sp-…` | Non-interactive Coding Plan setup (for scripting)             |
+| `hopcode auth status`                                   | Show current authentication status                            |
 
 > [!tip]
 >

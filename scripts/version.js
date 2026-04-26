@@ -36,9 +36,8 @@ if (!versionType) {
 // 2. Bump the version in the root and all workspace package.json files.
 run(`npm version ${versionType} --no-git-tag-version --allow-same-version`);
 
-// 3. Get all workspaces and filter out the one we don't want to version.
-// We intend to maintain sdk version independently.
-const workspacesToExclude = ['@hoptrendy/sdk'];
+// 3. Get all workspaces and bump them to the release version.
+const workspacesToExclude = [];
 let lsOutput;
 try {
   lsOutput = JSON.parse(
@@ -104,9 +103,21 @@ if (cliPackageJson.config?.sandboxImageUri) {
   writeJson(cliPackageJsonPath, cliPackageJson);
 }
 
-// 7. Run `npm install` to update package-lock.json.
-run(
-  'npm install --workspace packages/cli --workspace packages/core --workspace packages/channels/base --workspace packages/channels/plugin-example --package-lock-only',
+// 7. Keep the export-html template dependency aligned with the bundled webui version.
+const exportHtmlPackageJsonPath = resolve(
+  process.cwd(),
+  'packages/web-templates/src/export-html/package.json',
 );
+const exportHtmlPackageJson = readJson(exportHtmlPackageJsonPath);
+if (exportHtmlPackageJson.dependencies?.['@hoptrendy/webui']) {
+  exportHtmlPackageJson.dependencies['@hoptrendy/webui'] = `^${newVersion}`;
+  writeJson(exportHtmlPackageJsonPath, exportHtmlPackageJson);
+}
+
+// 8. Run `npm install` to update package-lock.json.
+run('npm install --package-lock-only');
+
+// 9. Verify version consistency across all packages.
+run('node scripts/verify-release-consistency.js');
 
 console.log(`Successfully bumped versions to v${newVersion}.`);

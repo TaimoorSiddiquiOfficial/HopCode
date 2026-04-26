@@ -2,8 +2,8 @@
 REM Script to install Node.js and HopCode with source information
 REM This script handles the installation process and sets the installation source
 REM
-REM Usage: install-qwen-with-source.bat --source <source>
-REM        install-qwen-with-source.bat -s <source>
+REM Usage: install-hopcode-with-source.bat --source <source>
+REM        install-hopcode-with-source.bat -s <source>
 REM
 
 setlocal enabledelayedexpansion
@@ -100,8 +100,8 @@ if exist "!NODEJS_PATH!\npm.cmd" (
 
 REM Install HopCode with source information
 echo INFO: Installing HopCode with source: %SOURCE%
-echo INFO: Running: %NPM_CMD% install -g @hopcode/hopcode@latest --registry https://registry.npmmirror.com
-call "%NPM_CMD%" install -g @hopcode/hopcode@latest --registry https://registry.npmmirror.com
+echo INFO: Running: %NPM_CMD% install -g @hoptrendy/hopcode-cli@latest --registry https://registry.npmjs.org
+call "%NPM_CMD%" install -g @hoptrendy/hopcode-cli@latest --registry https://registry.npmjs.org
 
 if %ERRORLEVEL% EQU 0 (
     echo SUCCESS: HopCode installed successfully!
@@ -114,9 +114,9 @@ REM Create source.json only if --source or -s was explicitly provided
 if not "!SOURCE!"=="unknown" (
     echo INFO: Creating source.json in %USERPROFILE%\.hopcode...
 
-    set "QWEN_DIR=%USERPROFILE%\.hopcode"
-    if not exist "!QWEN_DIR!" (
-        mkdir "!QWEN_DIR!"
+    set "HOPCODE_DIR=%USERPROFILE%\.hopcode"
+    if not exist "!HOPCODE_DIR!" (
+        mkdir "!HOPCODE_DIR!"
     )
 
     REM Create the source.json file with the installation source
@@ -124,20 +124,20 @@ if not "!SOURCE!"=="unknown" (
     echo {
     echo   "source": "!SOURCE!"
     echo }
-    ) > "!QWEN_DIR!\source.json"
+    ) > "!HOPCODE_DIR!\source.json"
 
     echo SUCCESS: Installation source saved to %USERPROFILE%\.hopcode\source.json
 )
 
 REM Verify installation
-call :CheckCommandExists qwen
+call :CheckCommandExists hopcode
 if %ERRORLEVEL% EQU 0 (
-    echo SUCCESS: HopCode is available as 'qwen' command.
-    call qwen --version
+    echo SUCCESS: HopCode is available as 'hopcode' command.
+    call hopcode --version
     echo.
     echo INFO: Starting HopCode...
     echo.
-    call qwen
+    call hopcode
 ) else (
     echo WARNING: HopCode may not be in PATH. Please check your npm global bin directory.
     echo.
@@ -167,7 +167,7 @@ REM ============================================================
 echo INFO: Downloading Node.js LTS (20.x) from official website
 
 REM Create temp directory for download
-set "TEMP_DIR=%TEMP%\qwen-nodejs-install"
+set "TEMP_DIR=%TEMP%\hopcode-nodejs-install"
 if not exist "%TEMP_DIR%" mkdir "%TEMP_DIR%"
 
 REM Determine architecture
