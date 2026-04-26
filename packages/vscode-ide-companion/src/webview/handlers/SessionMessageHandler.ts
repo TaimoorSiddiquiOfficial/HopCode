@@ -15,6 +15,11 @@ import {
 } from '../utils/imageHandler.js';
 import { isAuthenticationRequiredError } from '../../utils/authErrors.js';
 import { getErrorMessage } from '../../utils/errorMessage.js';
+import {
+  exportSessionToFile,
+  parseExportSlashCommand,
+  type SessionExportFormat,
+} from '../../services/sessionExportService.js';
 
 /**
  * Session message handler
@@ -289,6 +294,70 @@ export class SessionMessageHandler extends BaseMessageHandler {
     return isAuthenticationRequiredError(error);
   }
 
+  private async resolveExportCwd(sessionId: string): Promise<string> {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    const fallbackCwd = workspaceFolder?.uri.fsPath || process.cwd();
+
+    try {
+      const sessions = await this.agentManager.getSessionList();
+      const session = sessions.find(
+        (item) => item['sessionId'] === sessionId || item['id'] === sessionId,
+      );
+      const cwd = session?.['cwd'];
+      if (typeof cwd === 'string' && cwd.length > 0) {
+        return cwd;
+      }
+    } catch (error) {
+      console.warn(
+        '[SessionMessageHandler] Failed to resolve export cwd:',
+        error,
+      );
+    }
+
+    return fallbackCwd;
+  }
+
+  private async handleSessionExport(
+    format: SessionExportFormat,
+  ): Promise<void> {
+    const sessionId =
+      this.agentManager.currentSessionId || this.currentConversationId;
+    if (!sessionId) {
+      this.sendToWebView({
+        type: 'error',
+        data: { message: 'No active session found to export.' },
+      });
+      return;
+    }
+
+    try {
+      const cwd = await this.resolveExportCwd(sessionId);
+      const result = await exportSessionToFile({ sessionId, cwd, format });
+
+      if (!result) {
+        return;
+      }
+
+      const uri = vscode.Uri.file(result.uri.fsPath).toString();
+      const content = `Session exported to ${format.toUpperCase()}: [${result.filename}](${uri})`;
+      this.sendToWebView({
+        type: 'message',
+        data: {
+          role: 'assistant',
+          content,
+          timestamp: Date.now(),
+        },
+      });
+    } catch (error) {
+      this.sendToWebView({
+        type: 'error',
+        data: {
+          message: `Failed to export session: ${this.getErrorMessage(error)}`,
+        },
+      });
+    }
+  }
+
   /**
    * Handle send message request
    */
@@ -317,6 +386,20 @@ export class SessionMessageHandler extends BaseMessageHandler {
     const hasAttachments = (attachments?.length ?? 0) > 0;
     if (!trimmedText && !hasAttachments) {
       console.warn('[SessionMessageHandler] Ignoring empty message');
+      return;
+    }
+
+    try {
+      const exportFormat = parseExportSlashCommand(trimmedText);
+      if (exportFormat) {
+        await this.handleSessionExport(exportFormat);
+        return;
+      }
+    } catch (error) {
+      this.sendToWebView({
+        type: 'error',
+        data: { message: this.getErrorMessage(error) },
+      });
       return;
     }
 

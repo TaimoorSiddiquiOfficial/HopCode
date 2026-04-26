@@ -22,6 +22,7 @@ import {
   type HopCodeSession,
 } from './hopcodeSessionReader.js';
 import { HopCodeSessionManager } from './hopcodeSessionManager.js';
+import { SessionService } from '@hoptrendy/hopcode-core';
 import type {
   ChatMessage,
   PlanEntry,
@@ -1508,6 +1509,66 @@ export class HopCodeAgentManager {
    */
   get isConnected(): boolean {
     return this.connection.isConnected;
+  }
+
+  async deleteSession(sessionId: string): Promise<boolean> {
+    try {
+      if (this.connection.isConnected) {
+        const result = await this.connection.deleteSession(sessionId);
+        if (result.success) {
+          return true;
+        }
+      }
+    } catch (error) {
+      console.warn('[HopCodeAgentManager] ACP deleteSession failed:', error);
+    }
+
+    try {
+      const sessionService = new SessionService(this.currentWorkingDir);
+      if (await sessionService.removeSession(sessionId)) {
+        return true;
+      }
+    } catch (error) {
+      console.warn(
+        '[HopCodeAgentManager] SessionService deleteSession failed:',
+        error,
+      );
+    }
+
+    return (
+      (await this.sessionReader.deleteSession(
+        sessionId,
+        this.currentWorkingDir,
+      )) ||
+      (await this.sessionManager.deleteSession(
+        sessionId,
+        this.currentWorkingDir,
+      ))
+    );
+  }
+
+  async renameSession(sessionId: string, title: string): Promise<boolean> {
+    try {
+      if (this.connection.isConnected) {
+        const result = await this.connection.renameSession(sessionId, title);
+        if (result.success) {
+          return true;
+        }
+      }
+    } catch (error) {
+      console.warn('[HopCodeAgentManager] ACP renameSession failed:', error);
+    }
+
+    try {
+      const sessionService = new SessionService(this.currentWorkingDir);
+      return await sessionService.renameSession(sessionId, title, 'manual');
+    } catch (error) {
+      console.warn(
+        '[HopCodeAgentManager] SessionService renameSession failed:',
+        error,
+      );
+      return false;
+    }
   }
 
   /**

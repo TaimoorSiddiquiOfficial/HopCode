@@ -26,13 +26,13 @@ export const Onboarding: FC = () => (
   >
     {/* Logo + title block — sits above the card for visual breathing room */}
     <div className="flex flex-col items-center gap-3 mb-6">
-      <img src={iconUrl} alt="Qwen Code" className="w-12 h-12 object-contain" />
+      <img src={iconUrl} alt="HopCode" className="w-12 h-12 object-contain" />
       <div className="text-center">
         <h1
           className="text-base font-semibold"
           style={{ color: 'var(--app-primary-foreground)' }}
         >
-          Qwen Code
+          HopCode
         </h1>
         <p
           className="text-xs mt-1"

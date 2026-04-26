@@ -6,6 +6,7 @@
 
 import * as vscode from 'vscode';
 import { HopCodeAgentManager } from '../../services/hopcodeAgentManager.js';
+import { isAcpConnectionDisconnectError } from '../../services/acpConnection.js';
 import { ConversationStore } from '../../services/conversationStore.js';
 import type {
   RequestPermissionRequest,
@@ -1205,6 +1206,13 @@ export class WebViewProvider {
         }
       } catch (_error) {
         const errorMsg = getErrorMessage(_error);
+        if (isAcpConnectionDisconnectError(_error)) {
+          console.log(
+            '[WebViewProvider] Agent connection cancelled during disconnect:',
+            errorMsg,
+          );
+          return;
+        }
         console.error('[WebViewProvider] Agent connection error:', _error);
         vscode.window.showWarningMessage(
           `Failed to connect to HopCode CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
@@ -1656,9 +1664,13 @@ export class WebViewProvider {
    * The webview resolves the content and posts back a 'copyToClipboard' message.
    */
   sendCopyCommand(action: string): boolean {
-    if (WebViewProvider.lastContextMenuProvider !== this) return false;
+    if (WebViewProvider.lastContextMenuProvider !== this) {
+      return false;
+    }
     const webview = this.getActiveWebview();
-    if (!webview) return false;
+    if (!webview) {
+      return false;
+    }
     webview.postMessage({
       type: 'copyCommand',
       data: {

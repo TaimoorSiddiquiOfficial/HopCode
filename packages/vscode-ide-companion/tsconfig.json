@@ -10,6 +10,7 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
+      "@hoptrendy/hopcode-cli/export": ["../cli/src/export/index.ts"],
       "@lydell/node-pty": ["../../node_modules/@lydell/node-pty/node-pty.d.ts"],
       "@hoptrendy/webui": ["../webui/dist/index.d.ts"],
       "@hoptrendy/webui/*": ["../webui/dist/*.d.ts"]

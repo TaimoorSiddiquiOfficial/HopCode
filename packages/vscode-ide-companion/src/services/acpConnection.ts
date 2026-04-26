@@ -42,6 +42,24 @@ import * as fs from 'node:fs';
 import { AcpFileHandler } from './acpFileHandler.js';
 import { ACP_ERROR_CODES } from '../constants/acpSchema.js';
 
+export class AcpConnectionDisconnectError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AcpConnectionDisconnectError';
+  }
+}
+
+export function isAcpConnectionDisconnectError(
+  error: unknown,
+): error is AcpConnectionDisconnectError {
+  return (
+    error instanceof AcpConnectionDisconnectError ||
+    (typeof error === 'object' &&
+      error !== null &&
+      (error as { name?: unknown }).name === 'AcpConnectionDisconnectError')
+  );
+}
+
 /**
  * ACP Connection Handler for VSCode Extension
  *
@@ -56,6 +74,7 @@ export class AcpConnection {
   private fileHandler = new AcpFileHandler();
   private lastExitCode: number | null = null;
   private lastExitSignal: string | null = null;
+  private disconnectRequested = false;
 
   onSessionUpdate: (data: SessionNotification) => void = () => {};
   onPermissionRequest: (data: RequestPermissionRequest) => Promise<{
@@ -89,6 +108,7 @@ export class AcpConnection {
 
     this.lastExitCode = null;
     this.lastExitSignal = null;
+    this.disconnectRequested = false;
     this.workingDir = workingDir;
 
     const env = { ...process.env };
@@ -141,6 +161,7 @@ export class AcpConnection {
     const processExitPromise = new Promise<never>((_resolve, reject) => {
       rejectOnExit = reject;
     });
+    void processExitPromise.catch(() => undefined);
 
     this.child!.stderr?.on('data', (data: Buffer) => {
       const message = data.toString();
@@ -170,10 +191,11 @@ export class AcpConnection {
       const stderrSuffix = stderrOutput
         ? `\nCLI stderr: ${stderrOutput.slice(-500)}`
         : '';
+      const exitMessage = `HopCode ACP process exited unexpectedly (exit code: ${code}, signal: ${signal})${stderrSuffix}`;
       rejectOnExit?.(
-        new Error(
-          `Qwen ACP process exited unexpectedly (exit code: ${code}, signal: ${signal})${stderrSuffix}`,
-        ),
+        this.disconnectRequested
+          ? new AcpConnectionDisconnectError(exitMessage)
+          : new Error(exitMessage),
       );
 
       if (this.child) {
@@ -197,15 +219,20 @@ export class AcpConnection {
       const stderrSuffix = stderrOutput
         ? `\nCLI stderr: ${stderrOutput.slice(-500)}`
         : '';
+      if (this.disconnectRequested) {
+        throw new AcpConnectionDisconnectError(
+          `HopCode ACP process startup was cancelled by disconnect (exit code: ${code}, signal: ${signal})${stderrSuffix}`,
+        );
+      }
       throw new Error(
-        `Qwen ACP process failed to start (exit code: ${code}, signal: ${signal})${stderrSuffix}`,
+        `HopCode ACP process failed to start (exit code: ${code}, signal: ${signal})${stderrSuffix}`,
       );
     }
 
     // Convert Node.js child process streams to Web Streams for SDK
     const stdout = Readable.toWeb(
       this.child.stdout!,
-    ) as ReadableStream<Uint8Array>;
+    ) as unknown as ReadableStream<Uint8Array>;
     const stdin = Writable.toWeb(this.child.stdin!) as WritableStream;
 
     const stream = ndJsonStream(stdin, stdout);
@@ -526,7 +553,7 @@ export class AcpConnection {
         // ACP ListSessionsRequest schema has no `size` field; the SDK's zod
         // validator strips unknown top-level keys, so the agent would never
         // see it. Carry it via `_meta` instead, matching the pattern used for
-        // other Qwen Code ACP extensions.
+        // other HopCode ACP extensions.
         const existingMeta = (params['_meta'] ?? {}) as Record<string, unknown>;
         params['_meta'] = { ...existingMeta, size: options.size };
       }
@@ -642,6 +669,7 @@ export class AcpConnection {
   }
 
   disconnect(): void {
+    this.disconnectRequested = true;
     if (this.child) {
       this.child.kill();
       this.child = null;
