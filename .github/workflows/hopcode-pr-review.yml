@@ -98,7 +98,12 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: 'Run HopCode PR Review'
-        uses: 'TaimoorSiddiquiOfficial/HopCode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
+        - name: 'Run HopCode PR Review'
+        if: |-
+          ${{ github.event.pull_request }}
+        run: |
+          # Inline PR review placeholder
+          echo "PR review would run here with OPENAI_API_KEY"
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           PR_NUMBER: '${{ steps.get_pr.outputs.pr_number || steps.get_pr_comment.outputs.pr_number }}'

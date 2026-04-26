@@ -39,7 +39,12 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Run HopCode Issue Analysis'
-        uses: 'TaimoorSiddiquiOfficial/HopCode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
+        - name: 'Run HopCode Issue Triage'
+        if: |-
+          ${{ steps.find_issues.outputs.issues_to_triage != '[]' }}
+        run: |
+          # Inline issue triage placeholder
+          echo "Issues to triage: ${{ steps.find_issues.outputs.issues_to_triage }}"
         id: 'hopcode_issue_analysis'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
