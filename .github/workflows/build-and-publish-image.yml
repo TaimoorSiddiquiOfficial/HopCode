@@ -17,7 +17,6 @@ on:
 
 env:
   REGISTRY: 'ghcr.io'
-  IMAGE_NAME: '${{ github.repository }}'
 
 jobs:
   build-and-push-to-ghcr:
@@ -55,41 +54,84 @@ jobs:
           echo "Clean version: ${CLEAN_VERSION}"
           echo "Major.minor: ${MAJOR_MINOR}"
 
+      - name: 'Read sandbox image config'
+        id: 'image'
+        shell: 'bash'
+        run: |
+          ROOT_IMAGE=$(node --input-type=module -e "import fs from 'node:fs'; const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); console.log(pkg.config?.sandboxImageUri || '');")
+          CLI_IMAGE=$(node --input-type=module -e "import fs from 'node:fs'; const pkg = JSON.parse(fs.readFileSync('packages/cli/package.json', 'utf8')); console.log(pkg.config?.sandboxImageUri || '');")
+
+          if [[ -z "$ROOT_IMAGE" ]]; then
+            echo "Error: package.json config.sandboxImageUri is missing"
+            exit 1
+          fi
+
+          if [[ "$CLI_IMAGE" != "$ROOT_IMAGE" ]]; then
+            echo "Error: sandbox image mismatch"
+            echo "Root: $ROOT_IMAGE"
+            echo "CLI:  $CLI_IMAGE"
+            exit 1
+          fi
+
+          IMAGE_REPOSITORY="${ROOT_IMAGE%:*}"
+          PACKAGE_IMAGE_TAG="${ROOT_IMAGE##*:}"
+
+          if [[ "$IMAGE_REPOSITORY" == "$PACKAGE_IMAGE_TAG" || -z "$PACKAGE_IMAGE_TAG" ]]; then
+            echo "Error: sandboxImageUri must include an explicit tag"
+            exit 1
+          fi
+
+          if [[ "$IMAGE_REPOSITORY" != ghcr.io/* ]]; then
+            echo "Error: sandboxImageUri must use ghcr.io"
+            echo "Actual: $ROOT_IMAGE"
+            exit 1
+          fi
+
+          IMAGE_TAG="${{ steps.version.outputs.clean }}"
+          if [[ -z "$IMAGE_TAG" ]]; then
+            IMAGE_TAG="$PACKAGE_IMAGE_TAG"
+          fi
+
+          MAJOR_MINOR=$(echo "$IMAGE_TAG" | grep -oE '^[0-9]+\.[0-9]+' || true)
+
+          echo "repository=${IMAGE_REPOSITORY}" >> "$GITHUB_OUTPUT"
+          echo "tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "major_minor=${MAJOR_MINOR}" >> "$GITHUB_OUTPUT"
+          echo "Sandbox image repository: ${IMAGE_REPOSITORY}"
+          echo "Sandbox image tag: ${IMAGE_TAG}"
+
       - name: 'Debug inputs'
         if: |-
           ${{ runner.debug == '1' }}
         run: |
           echo "Event name: ${{ github.event_name }}"
           echo "Version input (raw): ${{ steps.version.outputs.raw }}"
-          echo "Version (clean): ${{ steps.version.outputs.clean }}"
-          echo "Major.minor: ${{ steps.version.outputs.major_minor }}"
+          echo "Image repository: ${{ steps.image.outputs.repository }}"
+          echo "Image tag: ${{ steps.image.outputs.tag }}"
+          echo "Major.minor: ${{ steps.image.outputs.major_minor }}"
           echo "Publish input: ${{ github.event.inputs.publish }}"
           echo "GitHub ref: ${{ github.ref }}"
 
       - name: 'Set up QEMU'
-        uses: 'docker/setup-qemu-action@v3' # ratchet:exclude
+        uses: 'docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130' # ratchet:docker/setup-qemu-action@v3
 
       - name: 'Set up Docker Buildx'
-        uses: 'docker/setup-buildx-action@v3' # ratchet:exclude
+        uses: 'docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f' # ratchet:docker/setup-buildx-action@v3
 
       - name: 'Extract metadata (tags, labels) for Docker'
         id: 'meta'
-        uses: 'docker/metadata-action@v5' # ratchet:exclude
+        uses: 'docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051' # ratchet:docker/metadata-action@v5
         with:
-          images: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}'
+          images: '${{ steps.image.outputs.repository }}'
           tags: |
-            type=raw,value=${{ steps.version.outputs.clean }},enable=${{ steps.version.outputs.clean != '' }}
-            type=raw,value=${{ steps.version.outputs.major_minor }},enable=${{ steps.version.outputs.major_minor != '' }}
-            type=ref,event=branch,enable=${{ steps.version.outputs.clean == '' }}
-            type=ref,event=pr,enable=${{ steps.version.outputs.clean == '' }}
-            type=semver,pattern={{version}},enable=${{ steps.version.outputs.clean == '' }}
-            type=semver,pattern={{major}}.{{minor}},enable=${{ steps.version.outputs.clean == '' }}
-            type=sha,prefix=sha-,format=short,enable=${{ steps.version.outputs.clean == '' }}
+            type=raw,value=${{ steps.image.outputs.tag }},enable=${{ steps.image.outputs.tag != '' }}
+            type=raw,value=${{ steps.image.outputs.major_minor }},enable=${{ steps.image.outputs.major_minor != '' }}
+            type=sha,prefix=sha-,format=short
 
       - name: 'Log in to the Container registry'
         if: |-
           ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true') }}
-        uses: 'docker/login-action@v3' # ratchet:exclude
+        uses: 'docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9' # ratchet:docker/login-action@v3
         with:
           registry: '${{ env.REGISTRY }}'
           username: '${{ github.actor }}'
@@ -97,7 +139,7 @@ jobs:
 
       - name: 'Build and push Docker image'
         id: 'build-and-push'
-        uses: 'docker/build-push-action@v6' # ratchet:exclude
+        uses: 'docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8' # ratchet:docker/build-push-action@v6
         with:
           context: '.'
           platforms: 'linux/amd64,linux/arm64'
@@ -106,4 +148,4 @@ jobs:
           tags: '${{ steps.meta.outputs.tags }}'
           labels: '${{ steps.meta.outputs.labels }}'
           build-args: |
-            CLI_VERSION_ARG=${{ steps.version.outputs.clean || github.sha }}
+            CLI_VERSION_ARG=${{ steps.image.outputs.tag || github.sha }}

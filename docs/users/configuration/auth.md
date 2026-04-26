@@ -10,7 +10,7 @@ HopCode supports three authentication methods. Pick the one that matches how you
 
 > [!warning]
 >
-> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `qwen auth` to configure.
+> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `hopcode auth` to configure.
 
 - **How it works**: on first start, HopCode opens a browser login page. After you finish, credentials are cached locally so you usually won't need to log in again.
 - **Requirements**: a `qwen.ai` account + internet access (at least for the first login).
@@ -20,13 +20,13 @@ HopCode supports three authentication methods. Pick the one that matches how you
 Start the CLI and follow the browser flow:
 
 ```bash
-qwen
+hopcode
 ```
 
 Or authenticate directly without starting a session:
 
 ```bash
-qwen auth qwen-oauth
+hopcode auth qwen-oauth
 ```
 
 > [!note]
@@ -58,15 +58,15 @@ You can set up Coding Plan authentication in two ways:
 
 ```bash
 # Interactive — prompts for region and API key
-qwen auth coding-plan
+hopcode auth coding-plan
 
 # Or non-interactive — pass region and key directly
-qwen auth coding-plan --region china --key sk-sp-xxxxxxxxx
+hopcode auth coding-plan --region china --key sk-sp-xxxxxxxxx
 ```
 
 **Option B: Inside a HopCode session**
 
-Enter `qwen` in the terminal to launch HopCode, then run the `/auth` command and select **Alibaba Cloud Coding Plan**. Choose your region, then enter your `sk-sp-xxxxxxxxx` key.
+Enter `hopcode` in the terminal to launch HopCode, then run the `/auth` command and select **Alibaba Cloud Coding Plan**. Choose your region, then enter your `sk-sp-xxxxxxxxx` key.
 
 After authentication, use the `/model` command to switch between all Alibaba Cloud Coding Plan supported models (including qwen3.5-plus, qwen3-coder-plus, qwen3-coder-next, qwen3-max, glm-4.7, and kimi-k2.5).
 
@@ -149,7 +149,7 @@ What each field does:
 | `security.auth.selectedType` | Tells HopCode which protocol to use on startup (e.g. `openai`, `anthropic`, `gemini`). Without this, you'd need to run `/auth` interactively. |
 | `model.name`                 | The default model to activate when HopCode starts. Must match one of the `id` values in your `modelProviders`.                                |
 
-After saving the file, just run `qwen` — no interactive `/auth` setup needed.
+After saving the file, just run `hopcode` — no interactive `/auth` setup needed.
 
 > [!tip]
 >
@@ -305,23 +305,23 @@ You can also switch models directly with a command-line argument, which is conve
 ```bash
 # In one terminal
 
-qwen --model "qwen3-coder-plus"
+hopcode --model "qwen3-coder-plus"
 
 # In another terminal
 
-qwen --model "qwen3.5-plus"
+hopcode --model "qwen3.5-plus"
 ```
 
-## `qwen auth` CLI command
+## `hopcode auth` CLI command
 
-In addition to the in-session `/auth` slash command, HopCode provides a standalone `qwen auth` CLI command for managing authentication directly from the terminal — without starting an interactive session first.
+In addition to the in-session `/auth` slash command, HopCode provides a standalone `hopcode auth` CLI command for managing authentication directly from the terminal — without starting an interactive session first.
 
 ### Interactive mode
 
-Run `qwen auth` without arguments to get an interactive menu:
+Run `hopcode auth` without arguments to get an interactive menu:
 
 ```bash
-qwen auth
+hopcode auth
 ```
 
 You'll see a selector with arrow-key navigation:
@@ -337,28 +337,28 @@ Select authentication method:
 
 ### Subcommands
 
-| Command                                              | Description                                       |
-| ---------------------------------------------------- | ------------------------------------------------- |
-| `qwen auth`                                          | Interactive authentication setup                  |
-| `qwen auth qwen-oauth`                               | Authenticate with Qwen OAuth                      |
-| `qwen auth coding-plan`                              | Authenticate with Alibaba Cloud Coding Plan       |
-| `qwen auth coding-plan --region china --key sk-sp-…` | Non-interactive Coding Plan setup (for scripting) |
-| `qwen auth status`                                   | Show current authentication status                |
+| Command                                                 | Description                                       |
+| ------------------------------------------------------- | ------------------------------------------------- |
+| `hopcode auth`                                          | Interactive authentication setup                  |
+| `hopcode auth qwen-oauth`                               | Authenticate with Qwen OAuth                      |
+| `hopcode auth coding-plan`                              | Authenticate with Alibaba Cloud Coding Plan       |
+| `hopcode auth coding-plan --region china --key sk-sp-…` | Non-interactive Coding Plan setup (for scripting) |
+| `hopcode auth status`                                   | Show current authentication status                |
 
 **Examples:**
 
 ```bash
 # Authenticate with Qwen OAuth directly
-qwen auth qwen-oauth
+hopcode auth qwen-oauth
 
 # Set up Coding Plan interactively (prompts for region and key)
-qwen auth coding-plan
+hopcode auth coding-plan
 
 # Set up Coding Plan non-interactively (useful for CI/scripting)
-qwen auth coding-plan --region china --key sk-sp-xxxxxxxxx
+hopcode auth coding-plan --region china --key sk-sp-xxxxxxxxx
 
 # Check your current auth configuration
-qwen auth status
+hopcode auth status
 ```
 
 ## Security notes

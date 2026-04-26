@@ -1,10 +1,10 @@
 ﻿<div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
+[![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 [![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/HopCode.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
 [![VS Code](https://img.shields.io/visual-studio-marketplace/v/hopcode.hopcode-vscode-ide-companion?label=VS%20Code)](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion)
-[![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
+[![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 
 **An open-source AI agent that lives in your terminal — works with any model provider.**
 
@@ -69,25 +69,7 @@ Install the HopCode companion directly from VS Code:
 
 Or install via the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion).
 
-### Quick Install (CLI — Recommended)
-
-#### Linux / macOS
-
-```bash
-bash -c "$(curl -fsSL https://hopcode-assets.example.com/installation/install-hopcode.sh)"
-```
-
-#### Windows (Run as Administrator)
-
-Works in both Command Prompt and PowerShell:
-
-```cmd
-powershell -Command "Invoke-WebRequest 'https://hopcode-assets.example.com/installation/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
-```
-
-> **Note**: It's recommended to restart your terminal after installation to ensure environment variables take effect.
-
-### Manual Installation
+### CLI Installation (Recommended)
 
 #### Prerequisites
 
@@ -99,11 +81,7 @@ Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](
 npm install -g @hoptrendy/hopcode-cli@latest
 ```
 
-#### Homebrew (macOS, Linux)
-
-```bash
-brew install hopcode
-```
+Native installers and Homebrew packages are not published by this repository yet. Use the npm package above for the current supported CLI install path.
 
 ## Quick Start
 

@@ -86,7 +86,13 @@ if (!image.length) {
 }
 
 if (!argv.s) {
-  execSync('npm install', { stdio: 'inherit' });
+  // Use npm ci if lockfile exists for reproducible builds, otherwise fall back to npm install
+  const lockfileExists = existsSync(join(process.cwd(), 'package-lock.json'));
+  if (lockfileExists) {
+    execSync('npm ci', { stdio: 'inherit' });
+  } else {
+    execSync('npm install', { stdio: 'inherit' });
+  }
   execSync('npm run build', { stdio: 'inherit' });
 
   console.log('bundling...');

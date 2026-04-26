@@ -14,51 +14,23 @@ Make sure you have:
 
 ## Step 1: Install HopCode
 
-To install HopCode, use one of the following methods:
-
-### Quick Install (Recommended)
-
-**Linux / macOS**
-
-```sh
-curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.sh | bash
-```
-
-**Windows (Run as Administrator)**
-
-```cmd
-powershell -Command "Invoke-WebRequest 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.bat' -OutFile (Join-Path $env:TEMP 'install-qwen.bat'); & (Join-Path $env:TEMP 'install-qwen.bat')"
-```
-
-> [!note]
->
-> It's recommended to restart your terminal after installation to ensure environment variables take effect.
-
-### Manual Installation
+Install HopCode from npm. Native installers and Homebrew packages are not published by this repository yet.
 
 **Prerequisites**
 
 Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
 
-**NPM**
-
 ```bash
-npm install -g @hoptrendy/hopcode@latest
-```
-
-**Homebrew (macOS, Linux)**
-
-```bash
-brew install hopcode
+npm install -g @hoptrendy/hopcode-cli@latest
 ```
 
 ## Step 2: Set up authentication
 
-When you start an interactive session with the `qwen` command, you'll be prompted to configure authentication:
+When you start an interactive session with the `hopcode` command, you'll be prompted to configure authentication:
 
 ```bash
 # You'll be prompted to set up authentication on first use
-qwen
+hopcode
 ```
 
 ```bash
@@ -75,11 +47,11 @@ Choose your preferred authentication method:
 
 > [!note]
 >
-> When you first authenticate HopCode with your Qwen account, a workspace called ".qwen" is automatically created for you. This workspace provides centralized cost tracking and management for all HopCode usage in your organization.
+> HopCode stores local settings under `~/.hopcode`.
 
 > [!tip]
 >
-> You can also configure authentication directly from the terminal without starting a session by running `qwen auth`. Use `qwen auth status` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
+> You can also configure authentication directly from the terminal without starting a session by running `hopcode auth`. Use `hopcode auth status` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
 
 ## Step 3: Start your first session
 
@@ -88,8 +60,8 @@ Open your terminal in any project directory and start HopCode:
 ```bash
 # optiona
 cd /path/to/your/project
-# start qwen
-qwen
+# start HopCode
+hopcode
 ```
 
 You'll see the HopCode welcome screen with your session information, recent conversations, and latest updates. Type `/help` for available commands.
@@ -220,10 +192,10 @@ Here are the most important commands for daily use:
 
 | Command               | What it does                                     | Example                       |
 | --------------------- | ------------------------------------------------ | ----------------------------- |
-| `qwen`                | start HopCode                                    | `qwen`                        |
+| `hopcode`             | start HopCode                                    | `hopcode`                     |
 | `/auth`               | Change authentication method (in session)        | `/auth`                       |
-| `qwen auth`           | Configure authentication from the terminal       | `qwen auth`                   |
-| `qwen auth status`    | Check current authentication status              | `qwen auth status`            |
+| `hopcode auth`        | Configure authentication from the terminal       | `hopcode auth`                |
+| `hopcode auth status` | Check current authentication status              | `hopcode auth status`         |
 | `/help`               | Display help information for available commands  | `/help` or `/?`               |
 | `/compress`           | Replace chat history with summary to save Tokens | `/compress`                   |
 | `/clear`              | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |

@@ -3,33 +3,25 @@
 [![@hoptrendy/hopcode downloads](https://img.shields.io/npm/dw/@hoptrendy/hopcode.svg)](https://npm-compare.com/@hoptrendy/hopcode)
 [![@hoptrendy/hopcode version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 
-> Learn about HopCode, Qwen's agentic coding tool that lives in your terminal and helps you turn ideas into code faster than ever before.
+> Learn about HopCode, an agentic coding tool that lives in your terminal and helps you turn ideas into code faster than ever before.
 
 ## Get started in 30 seconds
 
-### Install HopCode:
+### Install HopCode
 
-**Linux / macOS**
-
-```sh
-curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.sh | bash
-```
-
-**Windows (Run as Administrator)**
-
-```cmd
-powershell -Command "Invoke-WebRequest 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.bat' -OutFile (Join-Path $env:TEMP 'install-qwen.bat'); & (Join-Path $env:TEMP 'install-qwen.bat')"
+```bash
+npm install -g @hoptrendy/hopcode-cli@latest
 ```
 
 > [!note]
 >
-> It's recommended to restart your terminal after installation to ensure environment variables take effect. If the installation fails, please refer to [Manual Installation](./quickstart#manual-installation) in the Quickstart guide.
+> It's recommended to restart your terminal after installation to ensure environment variables take effect. If the installation fails, please refer to the [Quickstart](./quickstart) guide.
 
 ### Start using HopCode:
 
 ```bash
 cd your-project
-qwen
+hopcode
 ```
 
 Choose your authentication method — **API Key** or **[Alibaba Cloud Coding Plan](https://bailian.console.aliyun.com/cn-beijing/?tab=coding-plan#/efm/coding-plan-index)** ([intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) — and follow the prompts to configure. See the API setup guide ([Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=doc#/doc/?type=model&url=3023091) / [intl](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model&url=2974721)) for step-by-step instructions. Then let's start with understanding your codebase. Try one of these commands:
@@ -62,4 +54,4 @@ You'll be prompted to log in on first use. That's it! [Continue with Quickstart 
 
 - **Works in your terminal**: Not another chat window. Not another IDE. HopCode meets you where you already work, with the tools you already love.
 - **Takes action**: HopCode can directly edit files, run commands, and create commits. Need more? [MCP](./features/mcp) lets HopCode read your design docs in Google Drive, update your tickets in Jira, or use _your_ custom developer tooling.
-- **Unix philosophy**: HopCode is composable and scriptable. `tail -f app.log | qwen -p "Slack me if you see any anomalies appear in this log stream"` _works_. Your CI can run `qwen -p "If there are new text strings, translate them into French and raise a PR for @lang-fr-team to review"`.
+- **Unix philosophy**: HopCode is composable and scriptable. `tail -f app.log | hopcode -p "Slack me if you see any anomalies appear in this log stream"` _works_. Your CI can run `hopcode -p "If there are new text strings, translate them into French and raise a PR for @lang-fr-team to review"`.

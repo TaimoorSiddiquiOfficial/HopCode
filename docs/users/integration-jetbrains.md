@@ -77,5 +77,5 @@
 ### HopCode not responding
 
 - Check your internet connection
-- Verify CLI works by running `qwen` in terminal
+- Verify CLI works by running `hopcode` in terminal
 - [File an issue on GitHub](https://github.com/qwenlm/hopcode/issues) if the problem persists
