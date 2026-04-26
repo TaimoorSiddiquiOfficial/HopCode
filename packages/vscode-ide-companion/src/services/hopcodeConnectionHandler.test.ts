@@ -14,6 +14,7 @@ vi.mock('vscode', () => ({
 
 import { HopCodeConnectionHandler } from './hopcodeConnectionHandler.js';
 import type { AcpConnection } from './acpConnection.js';
+import { AcpConnectionDisconnectError } from './acpConnection.js';
 
 describe('HopCodeConnectionHandler', () => {
   let handler: HopCodeConnectionHandler;
@@ -165,6 +166,21 @@ describe('HopCodeConnectionHandler', () => {
       await handler.connect(mockConnection, '/workspace', '/path/to/cli.js');
 
       expect(mockConnection.connect).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not retry when startup was cancelled by disconnect', async () => {
+      const cancelledError = new AcpConnectionDisconnectError(
+        'HopCode ACP process startup was cancelled by disconnect',
+      );
+      (mockConnection.connect as ReturnType<typeof vi.fn>).mockRejectedValue(
+        cancelledError,
+      );
+
+      await expect(
+        handler.connect(mockConnection, '/workspace', '/path/to/cli.js'),
+      ).rejects.toThrow(cancelledError);
+
+      expect(mockConnection.connect).toHaveBeenCalledTimes(1);
     });
 
     it('throws after exhausting all connect retry attempts (3 attempts)', async () => {

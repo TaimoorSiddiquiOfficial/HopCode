@@ -102,7 +102,7 @@ Notes:
     {
       name: 'statusline-setup',
       description:
-        "Use this agent to configure the user's Qwen Code status line setting.",
+        "Use this agent to configure the user's HopCode status line setting.",
       tools: [
         ToolNames.READ_FILE,
         ToolNames.WRITE_FILE,
@@ -110,12 +110,12 @@ Notes:
         ToolNames.ASK_USER_QUESTION,
       ],
       color: 'orange',
-      systemPrompt: `You are a status line setup agent for Qwen Code. Your job is to create or update the statusLine command in the user's Qwen Code settings.
+      systemPrompt: `You are a status line setup agent for HopCode. Your job is to create or update the statusLine command in the user's HopCode settings.
 
 CRITICAL � JSON SAFETY RULES:
 The statusLine command is stored as a JSON string value in settings.json.
 Shell commands with complex quoting (especially single-quote escaping like '\\'' or nested quotes)
-WILL corrupt settings.json and prevent Qwen Code from starting.
+WILL corrupt settings.json and prevent HopCode from starting.
 
 You MUST follow these rules:
 1. For ANY command that uses jq, pipes, single-quote escaping, or nested quotes:
@@ -253,7 +253,7 @@ Guidelines:
 - Preserve existing settings when updating
 - Return a summary of what was configured, including the name of the script file if used
 - If the script includes git commands, prefix them with GIT_OPTIONAL_LOCKS=0 to avoid index.lock contention (e.g. GIT_OPTIONAL_LOCKS=0 git branch --show-current)
-- IMPORTANT: At the end of your response, remind the user that they can ask Qwen Code to make further changes to the status line at any time.
+- IMPORTANT: At the end of your response, remind the user that they can ask HopCode to make further changes to the status line at any time.
 `,
     },
     {

@@ -12,7 +12,11 @@ import type { ContentBlock } from '@agentclientprotocol/sdk';
 // Mock vscode so it can be resolved without the actual VS Code runtime.
 vi.mock('vscode', () => ({}));
 
-import { AcpConnection } from './acpConnection.js';
+import {
+  AcpConnection,
+  AcpConnectionDisconnectError,
+  isAcpConnectionDisconnectError,
+} from './acpConnection.js';
 import { ACP_ERROR_CODES } from '../constants/acpSchema.js';
 
 type AcpConnectionInternal = {
@@ -21,6 +25,7 @@ type AcpConnectionInternal = {
   sessionId: string | null;
   lastExitCode: number | null;
   lastExitSignal: string | null;
+  disconnectRequested: boolean;
   mapReadTextFileError: (error: unknown, filePath: string) => unknown;
   ensureConnection: () => unknown;
 };
@@ -222,5 +227,27 @@ describe('AcpConnection lastExitCode/lastExitSignal', () => {
     const conn = createConnection();
     expect(conn.lastExitCode).toBeNull();
     expect(conn.lastExitSignal).toBeNull();
+  });
+});
+
+describe('AcpConnectionDisconnectError', () => {
+  it('identifies intentional disconnect errors', () => {
+    const error = new AcpConnectionDisconnectError('startup cancelled');
+
+    expect(isAcpConnectionDisconnectError(error)).toBe(true);
+    expect(isAcpConnectionDisconnectError(new Error('other'))).toBe(false);
+  });
+
+  it('marks disconnect requests before killing the child process', () => {
+    const mockKill = vi.fn();
+    const conn = createConnection({
+      child: createMockChild({ kill: mockKill }),
+      disconnectRequested: false,
+    });
+
+    (conn as unknown as AcpConnection).disconnect();
+
+    expect(conn.disconnectRequested).toBe(true);
+    expect(mockKill).toHaveBeenCalledOnce();
   });
 });

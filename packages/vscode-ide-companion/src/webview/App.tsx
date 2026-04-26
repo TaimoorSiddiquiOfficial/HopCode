@@ -968,14 +968,20 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleCopyCommand = (event: MessageEvent) => {
       const message = event.data;
-      if (message.type !== 'copyCommand') return;
+      if (message.type !== 'copyCommand') {
+        return;
+      }
 
       const action = message.data?.action as string | undefined;
-      if (!action) return;
+      if (!action) {
+        return;
+      }
 
       // Helper to format tool call as markdown
       const formatToolCall = (item: MessageListItem): string => {
-        if (item.type === 'message') return '';
+        if (item.type === 'message') {
+          return '';
+        }
         const toolCall = item.data as ToolCallData;
         const title = toolCall.title || toolCall.kind || 'Tool';
         const status = toolCall.status || 'unknown';
@@ -1006,7 +1012,9 @@ export const App: React.FC = () => {
       const messageToMarkdown = (item: MessageListItem): string => {
         if (item.type === 'message') {
           const msg = item.data as TextMessage;
-          if (msg.role === 'thinking') return '';
+          if (msg.role === 'thinking') {
+            return '';
+          }
           if (msg.kind === 'image' && msg.imagePath) {
             return `![Image](${msg.imagePath})`;
           }
@@ -1031,7 +1039,9 @@ export const App: React.FC = () => {
         for (const item of allMessages) {
           if (item.type === 'message') {
             const msg = item.data as TextMessage;
-            if (msg.role === 'thinking') continue;
+            if (msg.role === 'thinking') {
+              continue;
+            }
             if (msg.kind === 'image' && msg.imagePath) {
               lines.push(`![Image](${msg.imagePath})`);
             } else if (msg.content) {
@@ -1137,18 +1147,9 @@ export const App: React.FC = () => {
             <Onboarding />
           ) : isAuthenticated === null ? (
             <div className="flex flex-col items-center justify-center h-full gap-3">
-              <span
-                className="inline-block w-6 h-6 animate-spin rounded-full border-2"
-                style={{
-                  borderColor: 'var(--app-secondary-foreground)',
-                  borderTopColor: 'transparent',
-                }}
-              />
-              <span
-                className="text-sm"
-                style={{ color: 'var(--app-secondary-foreground)' }}
-              >
-                Preparing Qwen Code...
+              <span className="inline-block w-6 h-6 animate-spin rounded-full border-2 border-[var(--app-secondary-foreground)] border-t-transparent" />
+              <span className="text-sm text-[var(--app-secondary-foreground)]">
+                Preparing HopCode...
               </span>
             </div>
           ) : (

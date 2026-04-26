@@ -12,6 +12,7 @@
 
 import * as vscode from 'vscode';
 import type { AcpConnection } from './acpConnection.js';
+import { isAcpConnectionDisconnectError } from './acpConnection.js';
 import { isAuthenticationRequiredError } from '../utils/authErrors.js';
 import { authMethod } from '../types/acpTypes.js';
 import {
@@ -101,6 +102,9 @@ export class HopCodeConnectionHandler {
           `[HopCodeAgentManager] Connect attempt ${attempt} failed:`,
           getErrorMessage(connectError),
         );
+        if (isAcpConnectionDisconnectError(connectError)) {
+          throw connectError;
+        }
         if (attempt === maxConnectAttempts) {
           throw connectError;
         }

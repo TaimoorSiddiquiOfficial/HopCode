@@ -2,7 +2,7 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.18.6",
+  "version": "0.18.8",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
@@ -27,13 +27,7 @@
     "AI assistant"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onView:hopcode.chatView.sidebar",
-    "onView:hopcode.chatView.secondary",
-    "onCommand:hopcode.openChat",
-    "onCommand:hopcode.focusChat",
-    "onCommand:hopcode.newConversation",
-    "onCommand:hopcode.showLogs"
+    "onStartupFinished"
   ],
   "contributes": {
     "jsonValidation": [

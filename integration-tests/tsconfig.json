@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "allowJs": true,
+    "lib": ["ES2022"],
     "baseUrl": ".",
     "paths": {
       "@hoptrendy/sdk": ["../packages/sdk-typescript/dist/index.d.ts"]

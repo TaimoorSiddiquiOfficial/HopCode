@@ -182,7 +182,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
             value: 'api-key' as const,
           },
         ],
-        'Qwen Code: Auth',
+        'HopCode: Auth',
         'Select authentication method',
       );
       if (!provider) {
@@ -221,7 +221,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
           value: 'global' as const,
         },
       ],
-      'Qwen Code: Coding Plan Region',
+      'HopCode: Coding Plan Region',
       'Select region',
     );
     if (!region) {
@@ -229,7 +229,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
     }
 
     const apiKey = await this.input({
-      title: 'Qwen Code: API Key',
+      title: 'HopCode: API Key',
       prompt: 'Enter your Coding Plan API key',
       placeHolder: 'sk-...',
       password: true,
@@ -262,7 +262,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
           value: 'custom' as const,
         },
       ],
-      'Qwen Code: Select API Key Type',
+      'HopCode: Select API Key Type',
       'Select API key type',
     );
     if (!keyType) {
@@ -295,7 +295,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
         description: `Endpoint: ${endpoint}`,
         value: key,
       })),
-      'Qwen Code: Select Region',
+      'HopCode: Select Region',
       'Select region for Alibaba Cloud ModelStudio',
     );
     if (!region) {
@@ -303,7 +303,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
     }
 
     const apiKey = await this.input({
-      title: 'Qwen Code: API Key',
+      title: 'HopCode: API Key',
       prompt: 'Enter your Alibaba Cloud ModelStudio API key',
       placeHolder: 'sk-...',
       password: true,
@@ -314,7 +314,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
     }
 
     const modelIds = await this.input({
-      title: 'Qwen Code: Model IDs',
+      title: 'HopCode: Model IDs',
       prompt: 'Enter model IDs (comma-separated)',
       placeHolder: 'qwen3.5-plus,glm-5,kimi-k2.5',
       value: 'qwen3.5-plus',
@@ -344,7 +344,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
    */
   private async authCustom(): Promise<void> {
     const baseUrl = await this.input({
-      title: 'Qwen Code: Base URL',
+      title: 'HopCode: Base URL',
       prompt: 'Enter API base URL',
       placeHolder: 'https://api.openai.com/v1',
       value: 'https://api.openai.com/v1',
@@ -354,7 +354,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
     }
 
     const apiKey = await this.input({
-      title: 'Qwen Code: API Key',
+      title: 'HopCode: API Key',
       prompt: 'Enter your API key',
       placeHolder: 'sk-...',
       password: true,
@@ -365,7 +365,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
     }
 
     const model = await this.input({
-      title: 'Qwen Code: Model',
+      title: 'HopCode: Model',
       prompt: 'Enter model name',
       placeHolder: 'gpt-4o',
       required: true,
