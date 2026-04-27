@@ -1,20 +1,30 @@
 /**
  * @license
- * Copyright 2026 HopCode Team (adapted from protoCLI)
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ToolInvocation, ToolResult } from './tools.js';
-import { BaseDeclarativeTool, BaseToolInvocation, Kind } from './tools.js';
-import { ToolNames, ToolDisplayNames } from './tool-names.js';
+/**
+ * @fileoverview TaskStop tool — lets the model cancel a running background task.
+ */
+
 import type { Config } from '../config/config.js';
+import { ToolErrorType } from './tool-error.js';
+import { ToolNames, ToolDisplayNames } from './tool-names.js';
+import {
+  BaseDeclarativeTool,
+  BaseToolInvocation,
+  Kind,
+  type ToolInvocation,
+  type ToolResult,
+} from './tools.js';
 
 export interface TaskStopParams {
-  taskId: string;
-  reason?: string;
+  /** The ID of the background task to stop. */
+  task_id: string;
 }
 
-class TaskStopToolInvocation extends BaseToolInvocation<
+class TaskStopInvocation extends BaseToolInvocation<
   TaskStopParams,
   ToolResult
 > {
@@ -26,35 +36,45 @@ class TaskStopToolInvocation extends BaseToolInvocation<
   }
 
   getDescription(): string {
-    return `Stop task: ${this.params.taskId}${this.params.reason ? ` (${this.params.reason})` : ''}`;
+    return `Stop background task ${this.params.task_id}`;
   }
 
   async execute(_signal: AbortSignal): Promise<ToolResult> {
-    const store = this.config.getTaskStore();
-    const stopped = store.stop(this.params.taskId, this.params.reason);
+    const registry = this.config.getBackgroundTaskRegistry();
+    const entry = registry.get(this.params.task_id);
 
-    if (stopped.length === 0) {
+    if (!entry) {
       return {
-        llmContent: `Task "${this.params.taskId}" not found.`,
-        returnDisplay: `Task not found: ${this.params.taskId}`,
-        error: { message: `Task "${this.params.taskId}" not found.` },
+        llmContent: `Error: No background task found with ID "${this.params.task_id}".`,
+        returnDisplay: 'Task not found.',
+        error: {
+          message: `Task not found: ${this.params.task_id}`,
+          type: ToolErrorType.TASK_STOP_NOT_FOUND,
+        },
       };
     }
 
-    const ids = stopped.map((t) => t.id).join(', ');
+    if (entry.status !== 'running') {
+      return {
+        llmContent: `Error: Background task "${this.params.task_id}" is not running (status: ${entry.status}).`,
+        returnDisplay: `Task not running (${entry.status}).`,
+        error: {
+          message: `Task is ${entry.status}: ${this.params.task_id}`,
+          type: ToolErrorType.TASK_STOP_NOT_RUNNING,
+        },
+      };
+    }
+
+    registry.cancel(this.params.task_id);
+
+    // The terminal task-notification is emitted by the task's own handler
+    // (via registry.complete/fail) rather than cancel(), so the parent model
+    // still receives the task's real partial/final result — not just a bare
+    // "cancelled" message — once the reasoning loop unwinds.
+    const desc = entry.description;
     return {
-      llmContent: `Cancelled ${stopped.length} task(s): ${ids}\n\n<system-reminder>\nTasks cancelled. Subtasks were also cancelled cascadingly.\n</system-reminder>`,
-      returnDisplay: {
-        type: 'todo_list' as const,
-        todos: store.list().map((t) => ({
-          id: t.id,
-          content: t.title,
-          status:
-            t.status === 'blocked' || t.status === 'cancelled'
-              ? ('pending' as const)
-              : t.status,
-        })),
-      },
+      llmContent: `Cancellation requested for background task "${this.params.task_id}". A final task-notification carrying the task's last result will follow.\nDescription: ${desc}`,
+      returnDisplay: `Cancelled: ${desc}`,
     };
   }
 }
@@ -63,29 +83,25 @@ export class TaskStopTool extends BaseDeclarativeTool<
   TaskStopParams,
   ToolResult
 > {
-  static readonly Name: string = ToolNames.TASK_STOP;
+  static readonly Name = ToolNames.TASK_STOP;
 
   constructor(private readonly config: Config) {
     super(
       TaskStopTool.Name,
       ToolDisplayNames.TASK_STOP,
-      'Cancels a task and all its subtasks. Use when a task is no longer needed or the approach has changed.',
-      Kind.Think,
+      'Cancel a running background task by its ID. The task ID is returned when the task is launched.',
+      Kind.Other,
       {
         type: 'object',
         properties: {
-          taskId: {
+          task_id: {
             type: 'string',
-            description: 'The ID of the task to cancel.',
-            minLength: 1,
-          },
-          reason: {
-            type: 'string',
-            description: 'Optional reason for cancellation.',
+            description:
+              'The ID of the background task to stop (from the launch response or notification).',
           },
         },
-        required: ['taskId'],
-        $schema: 'http://json-schema.org/draft-07/schema#',
+        required: ['task_id'],
+        additionalProperties: false,
       },
     );
   }
@@ -93,6 +109,6 @@ export class TaskStopTool extends BaseDeclarativeTool<
   protected createInvocation(
     params: TaskStopParams,
   ): ToolInvocation<TaskStopParams, ToolResult> {
-    return new TaskStopToolInvocation(this.config, params);
+    return new TaskStopInvocation(this.config, params);
   }
 }

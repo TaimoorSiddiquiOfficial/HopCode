@@ -1,8 +1,8 @@
-﻿# Quickstart
+# Quickstart
 
-> 👏 Welcome to HopCode!
+> 👏 Welcome to Qwen Code!
 
-This quickstart guide will have you using AI-powered coding assistance in just a few minutes. By the end, you'll understand how to use HopCode for common development tasks.
+This quickstart guide will have you using AI-powered coding assistance in just a few minutes. By the end, you'll understand how to use Qwen Code for common development tasks.
 
 ## Before you begin
 
@@ -12,25 +12,53 @@ Make sure you have:
 - A code project to work with
 - An API key from Alibaba Cloud Model Studio ([Beijing](https://bailian.console.aliyun.com/) / [intl](https://modelstudio.console.alibabacloud.com/)), or an Alibaba Cloud Coding Plan ([Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=coding-plan#/efm/coding-plan-index) / [intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) subscription
 
-## Step 1: Install HopCode
+## Step 1: Install Qwen Code
 
-Install HopCode from npm. Native installers and Homebrew packages are not published by this repository yet.
+To install Qwen Code, use one of the following methods:
+
+### Quick Install (Recommended)
+
+**Linux / macOS**
+
+```sh
+curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.sh | bash
+```
+
+**Windows (Run as Administrator)**
+
+```cmd
+powershell -Command "Invoke-WebRequest 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.bat' -OutFile (Join-Path $env:TEMP 'install-qwen.bat'); & (Join-Path $env:TEMP 'install-qwen.bat')"
+```
+
+> [!note]
+>
+> It's recommended to restart your terminal after installation to ensure environment variables take effect.
+
+### Manual Installation
 
 **Prerequisites**
 
 Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
 
+**NPM**
+
 ```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+npm install -g @qwen-code/qwen-code@latest
+```
+
+**Homebrew (macOS, Linux)**
+
+```bash
+brew install qwen-code
 ```
 
 ## Step 2: Set up authentication
 
-When you start an interactive session with the `hopcode` command, you'll be prompted to configure authentication:
+When you start an interactive session with the `qwen` command, you'll be prompted to configure authentication:
 
 ```bash
 # You'll be prompted to set up authentication on first use
-hopcode
+qwen
 ```
 
 ```bash
@@ -47,54 +75,54 @@ Choose your preferred authentication method:
 
 > [!note]
 >
-> HopCode stores local settings under `~/.hopcode`.
+> When you first authenticate Qwen Code with your Qwen account, a workspace called ".qwen" is automatically created for you. This workspace provides centralized cost tracking and management for all Qwen Code usage in your organization.
 
 > [!tip]
 >
-> You can also configure authentication directly from the terminal without starting a session by running `hopcode auth`. Use `hopcode auth status` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
+> You can also configure authentication directly from the terminal without starting a session by running `qwen auth`. Use `qwen auth status` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
 
 ## Step 3: Start your first session
 
-Open your terminal in any project directory and start HopCode:
+Open your terminal in any project directory and start Qwen Code:
 
 ```bash
 # optiona
 cd /path/to/your/project
-# start HopCode
-hopcode
+# start qwen
+qwen
 ```
 
-You'll see the HopCode welcome screen with your session information, recent conversations, and latest updates. Type `/help` for available commands.
+You'll see the Qwen Code welcome screen with your session information, recent conversations, and latest updates. Type `/help` for available commands.
 
-## Chat with HopCode
+## Chat with Qwen Code
 
 ### Ask your first question
 
-HopCode will analyze your files and provide a summary. You can also ask more specific questions:
+Qwen Code will analyze your files and provide a summary. You can also ask more specific questions:
 
 ```
 explain the folder structure
 ```
 
-You can also ask HopCode about its own capabilities:
+You can also ask Qwen Code about its own capabilities:
 
 ```
-what can HopCode do?
+what can Qwen Code do?
 ```
 
 > [!note]
 >
-> HopCode reads your files as needed - you don't have to manually add context. HopCode also has access to its own documentation and can answer questions about its features and capabilities.
+> Qwen Code reads your files as needed - you don't have to manually add context. Qwen Code also has access to its own documentation and can answer questions about its features and capabilities.
 
 ### Make your first code change
 
-Now let's make HopCode do some actual coding. Try a simple task:
+Now let's make Qwen Code do some actual coding. Try a simple task:
 
 ```
 add a hello world function to the main file
 ```
 
-HopCode will:
+Qwen Code will:
 
 1. Find the appropriate file
 2. Show you the proposed changes
@@ -103,11 +131,11 @@ HopCode will:
 
 > [!note]
 >
-> HopCode always asks for permission before modifying files. You can approve individual changes or enable "Accept all" mode for a session.
+> Qwen Code always asks for permission before modifying files. You can approve individual changes or enable "Accept all" mode for a session.
 
-### Use Git with HopCode
+### Use Git with Qwen Code
 
-HopCode makes Git operations conversational:
+Qwen Code makes Git operations conversational:
 
 ```
 what files have I changed?
@@ -133,7 +161,7 @@ help me resolve merge conflicts
 
 ### Fix a bug or add a feature
 
-HopCode is proficient at debugging and feature implementation.
+Qwen Code is proficient at debugging and feature implementation.
 
 Describe what you want in natural language:
 
@@ -147,7 +175,7 @@ Or fix existing issues:
 there's a bug where users can submit empty forms - fix it
 ```
 
-HopCode will:
+Qwen Code will:
 
 - Locate the relevant code
 - Understand the context
@@ -156,7 +184,7 @@ HopCode will:
 
 ### Test out other common workflows
 
-There are a number of ways to work with HopCode:
+There are a number of ways to work with Qwen Code:
 
 **Refactor code**
 
@@ -184,7 +212,7 @@ review my changes and suggest improvements
 
 > [!tip]
 >
-> **Remember**: HopCode is your AI pair programmer. Talk to it like you would a helpful colleague - describe what you want to achieve, and it will help you get there.
+> **Remember**: Qwen Code is your AI pair programmer. Talk to it like you would a helpful colleague - describe what you want to achieve, and it will help you get there.
 
 ## Essential commands
 
@@ -192,18 +220,19 @@ Here are the most important commands for daily use:
 
 | Command               | What it does                                     | Example                       |
 | --------------------- | ------------------------------------------------ | ----------------------------- |
-| `hopcode`             | start HopCode                                    | `hopcode`                     |
+| `qwen`                | start Qwen Code                                  | `qwen`                        |
 | `/auth`               | Change authentication method (in session)        | `/auth`                       |
-| `hopcode auth`        | Configure authentication from the terminal       | `hopcode auth`                |
-| `hopcode auth status` | Check current authentication status              | `hopcode auth status`         |
+| `qwen auth`           | Configure authentication from the terminal       | `qwen auth`                   |
+| `qwen auth api-key`   | Configure API key authentication                 | `qwen auth api-key`           |
+| `qwen auth status`    | Check current authentication status              | `qwen auth status`            |
 | `/help`               | Display help information for available commands  | `/help` or `/?`               |
 | `/compress`           | Replace chat history with summary to save Tokens | `/compress`                   |
 | `/clear`              | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |
-| `/theme`              | Change HopCode visual theme                      | `/theme`                      |
+| `/theme`              | Change Qwen Code visual theme                    | `/theme`                      |
 | `/language`           | View or change language settings                 | `/language`                   |
 | → `ui [language]`     | Set UI interface language                        | `/language ui zh-CN`          |
 | → `output [language]` | Set LLM output language                          | `/language output Chinese`    |
-| `/quit`               | Exit HopCode immediately                         | `/quit` or `/exit`            |
+| `/quit`               | Exit Qwen Code immediately                       | `/quit` or `/exit`            |
 
 See the [CLI reference](./features/commands) for a complete list of commands.
 
@@ -224,9 +253,9 @@ See the [CLI reference](./features/commands) for a complete list of commands.
 3. build a webpage that allows users to see and edit their information
 ```
 
-**Let HopCode explore first**
+**Let Qwen Code explore first**
 
-- Before making changes, let HopCode understand your code:
+- Before making changes, let Qwen Code understand your code:
 
 ```
 analyze the database schema
@@ -245,6 +274,6 @@ build a dashboard showing products that are most frequently returned by our UK c
 
 ## Getting help
 
-- **In HopCode**: Type `/help` or ask "how do I..."
+- **In Qwen Code**: Type `/help` or ask "how do I..."
 - **Documentation**: You're here! Browse other guides
-- **Community**: Join our [GitHub Discussion](https://github.com/QwenLM/hopcode/discussions) for tips and support
+- **Community**: Join our [GitHub Discussion](https://github.com/QwenLM/qwen-code/discussions) for tips and support

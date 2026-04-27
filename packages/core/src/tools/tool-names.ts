@@ -22,20 +22,14 @@ export const ToolNames = {
   SKILL: 'skill',
   EXIT_PLAN_MODE: 'exit_plan_mode',
   WEB_FETCH: 'web_fetch',
-  WEB_SEARCH: 'web_search',
   LS: 'list_directory',
   LSP: 'lsp',
   ASK_USER_QUESTION: 'ask_user_question',
   CRON_CREATE: 'cron_create',
   CRON_LIST: 'cron_list',
   CRON_DELETE: 'cron_delete',
-  TASK_CREATE: 'task_create',
-  TASK_UPDATE: 'task_update',
-  TASK_LIST: 'task_list',
-  TASK_GET: 'task_get',
   TASK_STOP: 'task_stop',
-  TASK_OUTPUT: 'task_output',
-  TASK_READY: 'task_ready',
+  SEND_MESSAGE: 'send_message',
 } as const;
 
 /**
@@ -56,20 +50,14 @@ export const ToolDisplayNames = {
   SKILL: 'Skill',
   EXIT_PLAN_MODE: 'ExitPlanMode',
   WEB_FETCH: 'WebFetch',
-  WEB_SEARCH: 'WebSearch',
   LS: 'ListFiles',
   LSP: 'Lsp',
   ASK_USER_QUESTION: 'AskUserQuestion',
   CRON_CREATE: 'CronCreate',
   CRON_LIST: 'CronList',
   CRON_DELETE: 'CronDelete',
-  TASK_CREATE: 'TaskCreate',
-  TASK_UPDATE: 'TaskUpdate',
-  TASK_LIST: 'TaskList',
-  TASK_GET: 'TaskGet',
   TASK_STOP: 'TaskStop',
-  TASK_OUTPUT: 'TaskOutput',
-  TASK_READY: 'TaskReady',
+  SEND_MESSAGE: 'SendMessage',
 } as const;
 
 // Migration from old tool names to new tool names

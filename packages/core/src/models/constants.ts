@@ -33,6 +33,7 @@ export const MODEL_GENERATION_CONFIG_FIELDS = [
   'customHeaders',
   'extra_body',
   'modalities',
+  'splitToolMedia',
 ] as const satisfies ReadonlyArray<keyof ContentGeneratorConfig>;
 
 export type ModelGenerationConfigField =

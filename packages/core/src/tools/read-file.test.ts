@@ -40,9 +40,8 @@ describe('ReadFileTool', () => {
       getWorkspaceContext: () => createMockWorkspaceContext(tempRootDir),
       storage: {
         getProjectTempDir: () => path.join(tempRootDir, '.temp'),
-        getUserSkillsDirs: () => [
-          path.join(os.homedir(), '.hopcode', 'skills'),
-        ],
+        getProjectDir: () => path.join(tempRootDir, '.project'),
+        getUserSkillsDirs: () => [path.join(os.homedir(), '.qwen', 'skills')],
       },
       getTruncateToolOutputThreshold: () => 2500,
       getTruncateToolOutputLines: () => 500,
@@ -164,6 +163,21 @@ describe('ReadFileTool', () => {
       const tempDir = path.join(tempRootDir, '.temp');
       const params: ReadFileToolParams = {
         file_path: path.join(tempDir, 'temp-file.txt'),
+      };
+      const invocation = tool.build(params);
+      const permission = await invocation.getDefaultPermission();
+      expect(permission).toBe('allow');
+    });
+
+    it('should return allow for paths within the subagent transcripts dir', async () => {
+      const params: ReadFileToolParams = {
+        file_path: path.join(
+          tempRootDir,
+          '.project',
+          'subagents',
+          'session-1',
+          'agent-a.jsonl',
+        ),
       };
       const invocation = tool.build(params);
       const permission = await invocation.getDefaultPermission();
@@ -558,21 +572,21 @@ describe('ReadFileTool', () => {
       }
     });
 
-    describe('with .hopcodeignore', () => {
+    describe('with .qwenignore', () => {
       beforeEach(async () => {
         await fsp.writeFile(
-          path.join(tempRootDir, '.hopcodeignore'),
+          path.join(tempRootDir, '.qwenignore'),
           ['foo.*', 'ignored/'].join('\n'),
         );
       });
 
-      it('should throw error if path is ignored by a .hopcodeignore pattern', async () => {
+      it('should throw error if path is ignored by a .qwenignore pattern', async () => {
         const ignoredFilePath = path.join(tempRootDir, 'foo.bar');
         await fsp.writeFile(ignoredFilePath, 'content', 'utf-8');
         const params: ReadFileToolParams = {
           file_path: ignoredFilePath,
         };
-        const expectedError = `File path '${ignoredFilePath}' is ignored by .hopcodeignore pattern(s).`;
+        const expectedError = `File path '${ignoredFilePath}' is ignored by .qwenignore pattern(s).`;
         expect(() => tool.build(params)).toThrow(expectedError);
       });
 
@@ -584,7 +598,7 @@ describe('ReadFileTool', () => {
         const params: ReadFileToolParams = {
           file_path: ignoredFilePath,
         };
-        const expectedError = `File path '${ignoredFilePath}' is ignored by .hopcodeignore pattern(s).`;
+        const expectedError = `File path '${ignoredFilePath}' is ignored by .qwenignore pattern(s).`;
         expect(() => tool.build(params)).toThrow(expectedError);
       });
 
