@@ -39,6 +39,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Run HopCode Issue Triage'
+        id: 'hopcode_issue_analysis'
         uses: 'TaimoorSiddiquiOfficial/HopCode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
