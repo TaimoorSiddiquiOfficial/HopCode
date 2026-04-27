@@ -18,10 +18,22 @@ import {
   isOpenRouterConfig,
   mergeOpenRouterConfigs,
 } from '../../commands/auth/openrouterOAuth.js';
+import {
+  PROVIDER_REGISTRY,
+  getProvider,
+} from '../../commands/auth/registry.js';
+import { fetchOpenAICompatibleModels } from '../../commands/model/discovery.js';
 
-export const MANAGE_MODELS_SOURCES = ['openrouter'] as const;
+/**
+ * All provider IDs that support live model browsing via manage-models.
+ * Derived from PROVIDER_REGISTRY entries with liveModels: true and USE_OPENAI authType.
+ */
+export const MANAGE_MODELS_SOURCES: readonly string[] =
+  PROVIDER_REGISTRY.filter(
+    (p) => p.liveModels && p.authType === AuthType.USE_OPENAI,
+  ).map((p) => p.id);
 
-export type ManageModelsSource = (typeof MANAGE_MODELS_SOURCES)[number];
+export type ManageModelsSource = string;
 
 export interface ManageModelsCatalogEntry {
   id: string;
@@ -102,21 +114,54 @@ function createEntry(
 export async function fetchManageModelsCatalog(
   source: ManageModelsSource,
 ): Promise<ManageModelsCatalog> {
-  switch (source) {
-    case 'openrouter': {
-      const models = await fetchOpenRouterModels();
-      return {
-        source,
-        title: 'OpenRouter',
-        description:
-          'Browse the latest OpenRouter model catalog and choose which models are enabled locally.',
-        authType: AuthType.USE_OPENAI,
-        entries: models.map((model) => createEntry(source, model)),
-      };
-    }
-    default:
-      throw new Error(`Unsupported manage models source: ${source}`);
+  if (source === 'openrouter') {
+    const models = await fetchOpenRouterModels();
+    return {
+      source,
+      title: 'OpenRouter',
+      description:
+        'Browse the latest OpenRouter model catalog and choose which models are enabled locally.',
+      authType: AuthType.USE_OPENAI,
+      entries: models.map((model) => createEntry(source, model)),
+    };
   }
+
+  // Generic liveModels provider
+  const provider = getProvider(source);
+  if (!provider) {
+    throw new Error(`Unsupported manage models source: ${source}`);
+  }
+  const apiKey = provider.envKey
+    ? (process.env[provider.envKey] ?? undefined)
+    : undefined;
+  if (!provider.baseUrl) {
+    throw new Error(`Provider ${source} has no base URL configured.`);
+  }
+  const categories = await fetchOpenAICompatibleModels(
+    provider.baseUrl,
+    apiKey,
+  );
+  if (!categories || categories.length === 0) {
+    throw new Error(
+      `Could not fetch models for ${provider.label}. Check your API key and connection.`,
+    );
+  }
+  const models: ModelConfig[] = categories.flatMap((cat) =>
+    cat.models.map((m) => ({
+      id: m.id,
+      name: m.label || m.id,
+      description: m.description,
+      envKey: provider.envKey || undefined,
+      baseUrl: provider.baseUrl,
+    })),
+  );
+  return {
+    source,
+    title: provider.label,
+    description: `Browse ${provider.label} models and choose which ones are enabled locally.`,
+    authType: AuthType.USE_OPENAI,
+    entries: models.map((model) => createEntry(source, model)),
+  };
 }
 
 export function getEnabledModelIdsForSource(
@@ -128,14 +173,22 @@ export function getEnabledModelIdsForSource(
     | undefined;
   const openaiConfigs = modelProviders?.[AuthType.USE_OPENAI] || [];
 
-  switch (source) {
-    case 'openrouter':
-      return openaiConfigs
-        .filter((config) => isOpenRouterConfig(config))
-        .map((config) => config.id);
-    default:
-      return [];
+  if (source === 'openrouter') {
+    return openaiConfigs
+      .filter((config) => isOpenRouterConfig(config))
+      .map((config) => config.id);
   }
+
+  // Generic provider — match by envKey + baseUrl
+  const provider = getProvider(source);
+  if (!provider) return [];
+  return openaiConfigs
+    .filter(
+      (config) =>
+        config.envKey === provider.envKey &&
+        config.baseUrl === provider.baseUrl,
+    )
+    .map((config) => config.id);
 }
 
 export async function saveManageModelsSelection(params: {
@@ -205,7 +258,62 @@ export async function saveManageModelsSelection(params: {
         activeModelId,
       };
     }
-    default:
-      throw new Error(`Unsupported manage models source: ${source}`);
+    default: {
+      // Generic liveModels provider — tag each selected model with provider metadata
+      const provider = getProvider(source);
+      if (!provider) {
+        throw new Error(`Unsupported manage models source: ${source}`);
+      }
+
+      const selectedWithMeta: ModelConfig[] = selectedModels.map((m) => ({
+        ...m,
+        envKey: provider.envKey || undefined,
+        baseUrl: provider.baseUrl,
+      }));
+
+      // Keep all existing configs that don't belong to this provider
+      const nonProviderConfigs = existingOpenAIConfigs.filter(
+        (c) =>
+          !(c.envKey === provider.envKey && c.baseUrl === provider.baseUrl),
+      );
+      const updatedConfigs = [...selectedWithMeta, ...nonProviderConfigs];
+
+      if (updatedConfigs.length === 0) {
+        throw new Error('At least one model must remain enabled.');
+      }
+
+      settings.setValue(
+        persistScope,
+        `modelProviders.${AuthType.USE_OPENAI}`,
+        updatedConfigs,
+      );
+
+      const selectedIds = selectedModels.map((m) => m.id);
+      const currentAuthType = config.getContentGeneratorConfig()?.authType;
+      const currentModelId = config.getModel();
+      const currentModelStillAvailable = currentModelId
+        ? selectedWithMeta.some((m) => m.id === currentModelId)
+        : false;
+
+      let activeModelId = currentModelId;
+      if (!currentModelStillAvailable) {
+        activeModelId = selectedWithMeta[0]?.id;
+        if (activeModelId) {
+          settings.setValue(persistScope, 'model.name', activeModelId);
+        }
+      }
+
+      const updatedModelProviders: ModelProvidersConfig = {
+        ...(mergedModelProviders || {}),
+        [AuthType.USE_OPENAI]: updatedConfigs,
+      };
+      config.reloadModelProvidersConfig(updatedModelProviders);
+
+      if (currentAuthType === AuthType.USE_OPENAI) {
+        await config.refreshAuth(AuthType.USE_OPENAI);
+      }
+
+      return { updatedConfigs, selectedIds, activeModelId };
+    }
   }
 }

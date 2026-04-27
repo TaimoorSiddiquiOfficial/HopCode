@@ -177,8 +177,14 @@ export class AuthMessageHandler extends BaseMessageHandler {
             value: 'coding-plan' as const,
           },
           {
+            label: 'OpenRouter',
+            description:
+              'API key · 300+ models · GPT-4o, Claude, Llama and more',
+            value: 'openrouter' as const,
+          },
+          {
             label: 'API Key',
-            description: 'Bring your own API key',
+            description: 'Bring your own API key (OpenAI, Anthropic, Gemini…)',
             value: 'api-key' as const,
           },
         ],
@@ -191,6 +197,8 @@ export class AuthMessageHandler extends BaseMessageHandler {
 
       if (provider === 'coding-plan') {
         await this.authCodingPlan();
+      } else if (provider === 'openrouter') {
+        await this.authOpenRouter();
       } else {
         await this.authApiKey();
       }
@@ -241,6 +249,29 @@ export class AuthMessageHandler extends BaseMessageHandler {
 
     if (this.authInteractiveHandler) {
       await this.authInteractiveHandler('coding-plan', region, apiKey);
+    }
+  }
+
+  /**
+   * OpenRouter: prompt for API key -> connect.
+   *
+   * Provides the same one-step key entry as the CLI `hopcode auth openrouter --key`.
+   * After setting up the key the user can use /manage-models to pick models.
+   */
+  private async authOpenRouter(): Promise<void> {
+    const apiKey = await this.input({
+      title: 'HopCode: OpenRouter API Key',
+      prompt: 'Enter your OpenRouter API key (get one at openrouter.ai/keys)',
+      placeHolder: 'sk-or-v1-...',
+      password: true,
+      required: true,
+    });
+    if (!apiKey) {
+      return;
+    }
+
+    if (this.authInteractiveHandler) {
+      await this.authInteractiveHandler('openrouter', undefined, apiKey);
     }
   }
 

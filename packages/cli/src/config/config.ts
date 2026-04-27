@@ -38,7 +38,6 @@ import { loadSettings, SettingScope } from './settings.js';
 import { authCommand } from '../commands/auth.js';
 import { githubCommand } from '../commands/github/index.js';
 import { modelCommand } from '../commands/model/index.js';
-import { providerCommand } from '../commands/provider.js';
 import { skillsCommand } from '../commands/skills.js';
 import { profileCommand } from '../commands/profile/index.js';
 import { dashboardCommand } from '../commands/dashboard.js';
@@ -644,8 +643,6 @@ export async function parseArguments(): Promise<CliArgs> {
     .command(githubCommand)
     // Register model selector command
     .command(modelCommand)
-    // Register provider manager command
-    .command(providerCommand)
     .command(skillsCommand)
     // Register profile manager command
     .command(profileCommand)

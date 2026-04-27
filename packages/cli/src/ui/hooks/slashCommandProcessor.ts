@@ -627,9 +627,6 @@ export const useSlashCommandProcessor = (
                     case 'mcp':
                       actions.openMcpDialog();
                       return { type: 'handled' };
-                    case 'provider':
-                      actions.openManageModelsDialog();
-                      return { type: 'handled' };
                     case 'hooks':
                       actions.openHooksDialog();
                       return { type: 'handled' };

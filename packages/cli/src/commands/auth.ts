@@ -10,16 +10,16 @@ import {
   runInteractiveAuth,
   showAuthStatus,
 } from './auth/handler.js';
+import { PROVIDER_REGISTRY } from './auth/registry.js';
+import { handleApiKeyAuth } from './auth/providers.js';
 import { t } from '../i18n/index.js';
 
-// Define subcommands separately
-const qwenOauthCommand = {
-  command: 'qwen-oauth',
-  describe: t('Authenticate using Qwen OAuth'),
-  handler: async () => {
-    await handleQwenAuth('qwen-oauth', {});
-  },
-};
+/**
+ * Providers that have bespoke auth flows and their own explicitly defined
+ * subcommands below. All other PROVIDER_REGISTRY providers get a generic
+ * `hopcode auth <id> [--key <apikey>]` subcommand generated automatically.
+ */
+const SPECIAL_AUTH_PROVIDERS = new Set(['coding-plan', 'openrouter']);
 
 const codePlanCommand = {
   command: 'coding-plan',
@@ -39,29 +39,28 @@ const codePlanCommand = {
   handler: async (argv: { region?: string; key?: string }) => {
     const region = argv['region'] as string | undefined;
     const key = argv['key'] as string | undefined;
-
-    // If region and key are provided, use them directly
-    if (region && key) {
-      await handleQwenAuth('coding-plan', { region, key });
-    } else {
-      // Otherwise, prompt interactively
-      await handleQwenAuth('coding-plan', {});
-    }
+    await handleQwenAuth('coding-plan', { region, key });
   },
 };
 
 const openRouterCommand = {
   command: 'openrouter',
-  describe: t('Authenticate using OpenRouter API key setup'),
+  describe: t(
+    'Authenticate using OpenRouter (OAuth browser flow or --key for API key)',
+  ),
   builder: (yargs: Argv) =>
     yargs.option('key', {
       alias: 'k',
-      describe: t('API key for OpenRouter'),
+      describe: t('OpenRouter API key (skips browser OAuth flow)'),
       type: 'string',
     }),
   handler: async (argv: { key?: string }) => {
     const key = argv['key'] as string | undefined;
-    await handleQwenAuth('openrouter', { key });
+    if (key) {
+      await handleApiKeyAuth('openrouter', { apiKey: key });
+    } else {
+      await handleQwenAuth('openrouter', {});
+    }
   },
 };
 
@@ -76,18 +75,37 @@ const statusCommand = {
 export const authCommand: CommandModule = {
   command: 'auth',
   describe: t(
-    'Configure Qwen authentication information with Qwen-OAuth, OpenRouter, or Alibaba Cloud Coding Plan',
+    'Configure authentication — supports all AI providers (OpenRouter, Groq, Mistral, OpenAI, Anthropic, Gemini, and more)',
   ),
-  builder: (yargs: Argv) =>
-    yargs
-      .command(qwenOauthCommand)
+  builder: (yargs: Argv) => {
+    let y = yargs
       .command(codePlanCommand)
       .command(openRouterCommand)
-      .command(statusCommand)
-      .demandCommand(0) // Don't require a subcommand
-      .version(false),
+      .command(statusCommand);
+
+    // Auto-generate a subcommand for every provider in the registry that
+    // doesn't have a bespoke handler above.
+    for (const provider of PROVIDER_REGISTRY) {
+      if (SPECIAL_AUTH_PROVIDERS.has(provider.id)) continue;
+      const p = provider; // capture for closure
+      y = y.command({
+        command: p.id,
+        describe: p.description,
+        builder: (y2: Argv) =>
+          y2.option('key', {
+            alias: 'k',
+            describe: t('API key for {{label}}', { label: p.label }),
+            type: 'string',
+          }),
+        handler: async (argv: { key?: string }) => {
+          await handleApiKeyAuth(p.id, { apiKey: argv['key'] });
+        },
+      });
+    }
+
+    return y.demandCommand(0).version(false);
+  },
   handler: async () => {
-    // This handler is for when no subcommand is provided - show interactive menu
     await runInteractiveAuth();
   },
 };

@@ -24,8 +24,7 @@
 
 import type { CommandModule, Argv } from 'yargs';
 import { loadSettings, SettingScope } from '../../config/settings.js';
-import { detectActiveProvider, PROVIDER_REGISTRY } from '../auth/registry.js';
-import { isCodingPlanConfig } from '../../constants/codingPlan.js';
+import { PROVIDER_REGISTRY } from '../auth/registry.js';
 import { getCatalog } from './catalog.js';
 import { fetchOllamaModels } from './ollama.js';
 import {
@@ -36,6 +35,7 @@ import { InteractiveSelector } from '../auth/interactiveSelector.js';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { t } from '../../i18n/index.js';
 import type { ModelCategory } from './catalog.js';
+import { resolveActiveProvider } from '../../utils/providerDetection.js';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -44,71 +44,6 @@ interface ModelCommandArgs {
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-
-/** Determine the label + settings key for the active provider. */
-function resolveActiveProviderInfo(settings: ReturnType<typeof loadSettings>): {
-  providerId: string;
-  providerLabel: string;
-  currentModel: string;
-  authTypeKey: 'openai' | 'anthropic' | 'gemini';
-  baseUrl?: string;
-} | null {
-  const allSettings = settings.merged;
-  const authType = allSettings?.security?.auth?.selectedType as
-    | string
-    | undefined;
-  if (!authType) return null;
-
-  const modelName = (allSettings?.model?.name as string | undefined) ?? '';
-
-  // Check Coding Plan
-  const openaiProviders =
-    (allSettings?.modelProviders?.openai as
-      | Array<{ envKey?: string; baseUrl?: string; id?: string }>
-      | undefined) ?? [];
-  const first = openaiProviders[0];
-  if (first && isCodingPlanConfig(first.baseUrl, first.envKey)) {
-    return {
-      providerId: 'coding-plan',
-      providerLabel: 'Alibaba Cloud Coding Plan',
-      currentModel: modelName,
-      authTypeKey: 'openai',
-      baseUrl: first.baseUrl,
-    };
-  }
-
-  // Check registry providers
-  const regProvider = detectActiveProvider(
-    allSettings as Parameters<typeof detectActiveProvider>[0],
-  );
-  if (regProvider) {
-    const atKey =
-      regProvider.authType === 'anthropic'
-        ? ('anthropic' as const)
-        : regProvider.authType === 'gemini'
-          ? ('gemini' as const)
-          : ('openai' as const);
-    return {
-      providerId: regProvider.id,
-      providerLabel: regProvider.label,
-      currentModel: modelName,
-      authTypeKey: atKey,
-      baseUrl: regProvider.baseUrl,
-    };
-  }
-
-  // Gemini fallback
-  if (authType === 'gemini') {
-    return {
-      providerId: 'gemini',
-      providerLabel: 'Google Gemini',
-      currentModel: modelName,
-      authTypeKey: 'gemini',
-    };
-  }
-
-  return null;
-}
 
 /** Flatten categories into a flat selector option list. */
 function flattenToOptions(
@@ -148,7 +83,7 @@ function printCategories(
 
 async function handleModelCommand(argv: ModelCommandArgs): Promise<void> {
   const settings = loadSettings();
-  const info = resolveActiveProviderInfo(settings);
+  const info = resolveActiveProvider(settings);
 
   if (!info) {
     writeStderrLine(t('No provider configured. Run: hopcode auth'));

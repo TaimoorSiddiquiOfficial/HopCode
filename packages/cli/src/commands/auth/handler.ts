@@ -27,10 +27,11 @@ import { InteractiveSelector } from './interactiveSelector.js';
 import {
   applyOpenRouterModelsConfiguration,
   createOpenRouterOAuthSession,
-  isOpenRouterConfig,
-  OPENROUTER_ENV_KEY,
   runOpenRouterOAuthLogin,
 } from './openrouterOAuth.js';
+import { PROVIDER_REGISTRY, getProvider } from './registry.js';
+import { handleApiKeyAuth } from './providers.js';
+import { resolveActiveProvider } from '../../utils/providerDetection.js';
 
 function formatElapsedTime(startMs: number): string {
   return `${((Date.now() - startMs) / 1000).toFixed(2)}s`;
@@ -481,55 +482,72 @@ async function promptForAuthKey(prompt: string): Promise<string> {
 }
 
 /**
- * Runs the interactive authentication flow
+ * Runs the interactive authentication flow showing all registered providers.
+ *
+ * Providers are grouped into Cloud / Local / Legacy sections.
+ * Section headers (prefixed with `__`) are re-prompted when accidentally selected.
  */
 export async function runInteractiveAuth() {
+  const LOCAL_IDS = new Set(['ollama-local', 'lm-studio']);
+
+  const cloudOptions = PROVIDER_REGISTRY.filter(
+    (p) => !LOCAL_IDS.has(p.id),
+  ).map((p) => ({ value: p.id, label: p.label, description: p.description }));
+
+  const localOptions = PROVIDER_REGISTRY.filter((p) => LOCAL_IDS.has(p.id)).map(
+    (p) => ({ value: p.id, label: p.label, description: p.description }),
+  );
+
+  const allOptions = [
+    {
+      value: '__legacy__',
+      label: t('── Legacy / Enterprise ───────────────────'),
+      description: '',
+    },
+    {
+      value: 'coding-plan',
+      label: t('Alibaba Cloud Coding Plan'),
+      description: t('Paid · Alibaba Cloud Coding Plan models'),
+    },
+    {
+      value: '__cloud__',
+      label: t('── Cloud Providers ───────────────────────'),
+      description: '',
+    },
+    ...cloudOptions,
+    {
+      value: '__local__',
+      label: t('── Local Providers ───────────────────────'),
+      description: '',
+    },
+    ...localOptions,
+  ];
+
   const selector = new InteractiveSelector(
-    [
-      {
-        value: 'openrouter' as const,
-        label: t('OpenRouter'),
-        description: t(
-          'API key setup · OpenAI-compatible provider via OpenRouter',
-        ),
-      },
-      {
-        value: 'coding-plan' as const,
-        label: t('Alibaba Cloud Coding Plan'),
-        description: t(
-          'Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models',
-        ),
-      },
-      {
-        value: 'qwen-oauth' as const,
-        label: t('Qwen OAuth'),
-        description: t('Discontinued — switch to Coding Plan or API Key'),
-      },
-    ],
+    allOptions,
     t('Select authentication method:'),
   );
 
-  let choice = await selector.select();
-
-  // If user selects discontinued Qwen OAuth, warn and re-prompt
-  while (choice === 'qwen-oauth') {
-    writeStdoutLine(
-      t(
-        '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
-      ),
-    );
+  let choice: string | undefined;
+  do {
     choice = await selector.select();
-  }
+  } while (choice !== undefined && choice.startsWith('__'));
+
+  if (!choice) return;
 
   if (choice === 'coding-plan') {
     await handleQwenAuth('coding-plan', {});
-  } else if (choice === 'openrouter') {
-    await handleQwenAuth('openrouter', {});
+  } else {
+    await handleApiKeyAuth(choice, {});
   }
 }
 
 /**
- * Shows the current authentication status
+ * Shows the current authentication status.
+ *
+ * Uses the shared resolveActiveProvider utility so provider detection
+ * is consistent across the `hopcode auth status`, `hopcode model`, and
+ * `hopcode provider` code paths.
  */
 export async function showAuthStatus(): Promise<void> {
   try {
@@ -538,126 +556,79 @@ export async function showAuthStatus(): Promise<void> {
 
     writeStdoutLine(t('\n=== Authentication Status ===\n'));
 
-    // Check for selected auth type
     const selectedType = mergedSettings.security?.auth?.selectedType;
-
     if (!selectedType) {
       writeStdoutLine(t('⚠️  No authentication method configured.\n'));
-      writeStdoutLine(t('Run one of the following commands to get started:\n'));
-      writeStdoutLine(
-        t('  qwen auth openrouter      - Configure OpenRouter API key'),
-      );
-      writeStdoutLine(
-        t(
-          '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (free tier)',
-        ),
-      );
-      writeStdoutLine(
-        t(
-          '  qwen auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n',
-        ),
-      );
-      writeStdoutLine(t('Or simply run:'));
-      writeStdoutLine(
-        t('  qwen auth                - Interactive authentication setup\n'),
-      );
+      writeStdoutLine(t('Run `hopcode auth` to set up a provider.\n'));
       process.exit(0);
     }
 
-    // Display status based on auth type
-    if (selectedType === AuthType.HOPCODE_OAUTH) {
-      writeStdoutLine(t('✓ Authentication Method: Qwen OAuth'));
-      writeStdoutLine(t('  Type: Free tier (discontinued 2026-04-15)'));
-      writeStdoutLine(t('  Limit: No longer available'));
-      writeStdoutLine(t('  Models: Qwen latest models'));
-      writeStdoutLine(
-        t('\n  ⚠ Run /auth to switch to Coding Plan or another provider.\n'),
-      );
-    } else if (selectedType === AuthType.USE_OPENAI) {
-      const codingPlanRegion = mergedSettings.codingPlan?.region;
-      const codingPlanVersion = mergedSettings.codingPlan?.version;
-      const modelName = mergedSettings.model?.name;
-      const openAiProviders =
-        mergedSettings.modelProviders?.[AuthType.USE_OPENAI] || [];
-      const hasOpenRouterConfig = openAiProviders.some(isOpenRouterConfig);
-      const hasOpenRouterApiKey =
-        !!process.env[OPENROUTER_ENV_KEY] ||
-        !!mergedSettings.env?.[OPENROUTER_ENV_KEY];
+    const info = resolveActiveProvider(settings);
+    const modelName = mergedSettings.model?.name;
 
-      if (hasOpenRouterConfig) {
-        if (hasOpenRouterApiKey) {
-          writeStdoutLine(t('✓ Authentication Method: OpenRouter'));
-          if (modelName) {
-            writeStdoutLine(
-              t('  Current Model: {{model}}', { model: modelName }),
-            );
-          }
-          writeStdoutLine(t('  Status: API key configured\n'));
-        } else {
-          writeStdoutLine(
-            t('⚠️  Authentication Method: OpenRouter (Incomplete)'),
-          );
-          writeStdoutLine(
-            t('  Issue: API key not found in environment or settings\n'),
-          );
-          writeStdoutLine(t('  Run `qwen auth openrouter` to re-configure.\n'));
-        }
-      } else {
-        // Check for Coding Plan configuration
-        const hasApiKey =
-          !!process.env[CODING_PLAN_ENV_KEY] ||
-          !!mergedSettings.env?.[CODING_PLAN_ENV_KEY];
-
-        if (hasApiKey) {
-          writeStdoutLine(
-            t('✓ Authentication Method: Alibaba Cloud Coding Plan'),
-          );
-
-          if (codingPlanRegion) {
-            const regionDisplay =
-              codingPlanRegion === CodingPlanRegion.CHINA
-                ? t('中国 (China) - 阿里云百炼')
-                : t('Global - Alibaba Cloud');
-            writeStdoutLine(
-              t('  Region: {{region}}', { region: regionDisplay }),
-            );
-          }
-
-          if (modelName) {
-            writeStdoutLine(
-              t('  Current Model: {{model}}', { model: modelName }),
-            );
-          }
-
-          if (codingPlanVersion) {
-            writeStdoutLine(
-              t('  Config Version: {{version}}', {
-                version: codingPlanVersion.substring(0, 8) + '...',
-              }),
-            );
-          }
-
-          writeStdoutLine(t('  Status: API key configured\n'));
-        } else {
-          writeStdoutLine(
-            t(
-              '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)',
-            ),
-          );
-          writeStdoutLine(
-            t('  Issue: API key not found in environment or settings\n'),
-          );
-          writeStdoutLine(
-            t('  Run `qwen auth coding-plan` to re-configure.\n'),
-          );
-        }
-      }
-    } else {
+    if (!info) {
       writeStdoutLine(
         t('✓ Authentication Method: {{type}}', { type: selectedType }),
       );
       writeStdoutLine(t('  Status: Configured\n'));
+      process.exit(0);
     }
+
+    writeStdoutLine(
+      t('✓ Authentication Method: {{label}}', { label: info.providerLabel }),
+    );
+    if (modelName) {
+      writeStdoutLine(t('  Current Model: {{model}}', { model: modelName }));
+    }
+
+    if (info.providerId === 'coding-plan') {
+      const codingPlanRegion = mergedSettings.codingPlan?.region;
+      const hasApiKey =
+        !!process.env[CODING_PLAN_ENV_KEY] ||
+        !!mergedSettings.env?.[CODING_PLAN_ENV_KEY];
+      if (codingPlanRegion) {
+        const regionDisplay =
+          codingPlanRegion === CodingPlanRegion.CHINA
+            ? t('中国 (China) - 阿里云百炼')
+            : t('Global - Alibaba Cloud');
+        writeStdoutLine(t('  Region: {{region}}', { region: regionDisplay }));
+      }
+      writeStdoutLine(
+        hasApiKey
+          ? t('  Status: API key configured\n')
+          : t(
+              '  ⚠ API key not found. Run `hopcode auth coding-plan` to re-configure.\n',
+            ),
+      );
+    } else if (selectedType === AuthType.HOPCODE_OAUTH) {
+      writeStdoutLine(t('  Type: Legacy OAuth (discontinued 2026-04-15)'));
+      writeStdoutLine(
+        t('\n  ⚠ Run `hopcode auth` to switch to another provider.\n'),
+      );
+    } else {
+      const provider = getProvider(info.providerId);
+      if (info.baseUrl) {
+        writeStdoutLine(t('  Base URL: {{url}}', { url: info.baseUrl }));
+      }
+      const hasApiKey = provider?.envKey
+        ? !!process.env[provider.envKey] ||
+          !!mergedSettings.env?.[provider.envKey]
+        : true;
+      if (hasApiKey) {
+        writeStdoutLine(t('  Status: API key configured\n'));
+      } else {
+        writeStdoutLine(t('  ⚠ API key not found.', {}));
+        if (provider?.envKey) {
+          writeStdoutLine(
+            t('  Set {{envKey}} or run `hopcode auth {{id}`.\n', {
+              envKey: provider.envKey,
+              id: info.providerId,
+            }),
+          );
+        }
+      }
+    }
+
     process.exit(0);
   } catch (error) {
     writeStderrLine(
