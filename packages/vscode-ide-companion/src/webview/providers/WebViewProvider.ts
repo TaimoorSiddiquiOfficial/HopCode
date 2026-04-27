@@ -1209,7 +1209,7 @@ export class WebViewProvider {
       const bundledCliEntry = vscode.Uri.joinPath(
         this.extensionUri,
         'dist',
-        'qwen-cli',
+        'hopcode-cli',
         'cli.js',
       ).fsPath;
 
@@ -1281,7 +1281,7 @@ export class WebViewProvider {
         const errorMsg = getErrorMessage(_error);
         console.error('[WebViewProvider] Agent connection error:', _error);
         vscode.window.showWarningMessage(
-          `Failed to connect to Qwen CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
+          `Failed to connect to HopCode CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
         );
         // Fallback to empty conversation
         await this.initializeEmptyConversation();

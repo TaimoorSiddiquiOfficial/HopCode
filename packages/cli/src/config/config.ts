@@ -200,8 +200,11 @@ export async function parseArguments(): Promise<CliArgs> {
   if (
     rawArgv.length > 0 &&
     (rawArgv[0].endsWith('/dist/hopcode-cli/cli.js') ||
+      rawArgv[0].endsWith('\\dist\\hopcode-cli\\cli.js') ||
       rawArgv[0].endsWith('/dist/cli.js') ||
-      rawArgv[0].endsWith('/dist/cli/cli.js'))
+      rawArgv[0].endsWith('\\dist\\cli.js') ||
+      rawArgv[0].endsWith('/dist/cli/cli.js') ||
+      rawArgv[0].endsWith('\\dist\\cli\\cli.js'))
   ) {
     rawArgv = rawArgv.slice(1);
   }
