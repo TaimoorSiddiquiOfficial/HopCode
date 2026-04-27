@@ -225,7 +225,19 @@ export class HopCodeSessionUpdateHandler {
   }
 
   private emitUsageMeta(meta?: SessionUpdateMeta | null): void {
-    if (!meta || !this.callbacks.onUsageUpdate) {
+    if (!meta) {
+      return;
+    }
+
+    // Dispatch available skills whenever they arrive in the update metadata
+    if (
+      Array.isArray(meta.availableSkills) &&
+      this.callbacks.onAvailableSkills
+    ) {
+      this.callbacks.onAvailableSkills(meta.availableSkills);
+    }
+
+    if (!this.callbacks.onUsageUpdate) {
       return;
     }
 

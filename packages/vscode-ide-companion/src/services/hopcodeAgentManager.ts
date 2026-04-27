@@ -1474,6 +1474,14 @@ export class HopCodeAgentManager {
   }
 
   /**
+   * Register callback for available skills updates (from session update _meta)
+   */
+  onAvailableSkills(callback: (skills: string[]) => void): void {
+    this.callbacks.onAvailableSkills = callback;
+    this.sessionUpdateHandler.updateCallbacks(this.callbacks);
+  }
+
+  /**
    * Register callback for available models updates (from session/new response)
    */
   onAvailableModels(callback: (models: ModelInfo[]) => void): void {
