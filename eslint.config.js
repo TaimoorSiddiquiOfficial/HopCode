@@ -29,6 +29,7 @@ export default tseslint.config(
       'docs-site/.next/**',
       'docs-site/out/**',
       '.qwen/**',
+      '.hopcode/**',
       '.hopcode-backup-*/**',
     ],
   },
@@ -191,7 +192,13 @@ export default tseslint.config(
   },
   // extra settings for scripts that we run directly with node
   {
-    files: ['./scripts/**/*.js', './scripts/**/*.mjs', 'esbuild.config.js', 'packages/*/scripts/**/*.js'],
+    files: [
+      './scripts/**/*.js',
+      './scripts/**/*.mjs',
+      'esbuild.config.js',
+      'fix-index-signatures.js',
+      'packages/*/scripts/**/*.js',
+    ],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -210,6 +217,37 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+    },
+  },
+  {
+    // Upstream provider implementation keeps SDK/vendor-style code that does
+    // not follow this repo's stricter application lint profile.
+    files: ['packages/core/src/provider/**/*.ts'],
+    rules: {
+      '@typescript-eslint/array-type': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/consistent-type-imports': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-this-alias': 'off',
+      'arrow-body-style': 'off',
+      'default-case': 'off',
+      'import/no-internal-modules': 'off',
+      'no-fallthrough': 'off',
+      'object-shorthand': 'off',
+    },
+  },
+  {
+    files: ['packages/core/test-openai-provider.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  {
+    files: ['packages/web-dashboard/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'off',
     },
   },
   {
