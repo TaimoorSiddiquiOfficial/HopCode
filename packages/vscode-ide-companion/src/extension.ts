@@ -21,9 +21,9 @@ import { registerNewCommands } from './commands/index.js';
 import { ReadonlyFileSystemProvider } from './services/readonlyFileSystemProvider.js';
 import { isWindows } from './utils/platform.js';
 
-const CLI_IDE_COMPANION_IDENTIFIER = 'qwenlm.qwen-code-vscode-ide-companion';
-const INFO_MESSAGE_SHOWN_KEY = 'qwenCodeInfoMessageShown';
-export const DIFF_SCHEME = 'qwen-diff';
+const CLI_IDE_COMPANION_IDENTIFIER = 'hopcode.hopcode-vscode-ide-companion';
+const INFO_MESSAGE_SHOWN_KEY = 'hopCodeInfoMessageShown';
+export const DIFF_SCHEME = 'hopcode-diff';
 
 /**
  * IDE environments where the installation greeting is hidden.  In these
@@ -90,7 +90,7 @@ async function checkForUpdates(
 
     if (latestVersion && semver.gt(latestVersion, currentVersion)) {
       const selection = await vscode.window.showInformationMessage(
-        `A new version (${latestVersion}) of the Qwen Code Companion extension is available.`,
+        `A new version (${latestVersion}) of the HopCode Companion extension is available.`,
         'Update to latest version',
       );
       if (selection === 'Update to latest version') {
@@ -108,7 +108,7 @@ async function checkForUpdates(
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-  logger = vscode.window.createOutputChannel('Qwen Code Companion');
+  logger = vscode.window.createOutputChannel('HopCode Companion');
   log = createLogger(context, logger);
   log('Extension activated');
 
@@ -167,7 +167,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Register WebView panel serializer for persistence across reloads
   context.subscriptions.push(
-    vscode.window.registerWebviewPanelSerializer('qwenCode.chat', {
+    vscode.window.registerWebviewPanelSerializer('HopCode.chat', {
       async deserializeWebviewPanel(
         webviewPanel: vscode.WebviewPanel,
         state: unknown,
@@ -222,13 +222,13 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   };
   context.subscriptions.push(
-    vscode.commands.registerCommand('qwen-code.copyMessage', () =>
+    vscode.commands.registerCommand('hopcode.copyMessage', () =>
       sendCopyToActive('copyMessage'),
     ),
-    vscode.commands.registerCommand('qwen-code.copyAllMessages', () =>
+    vscode.commands.registerCommand('hopcode.copyAllMessages', () =>
       sendCopyToActive('copyAllMessages'),
     ),
-    vscode.commands.registerCommand('qwen-code.copyLastReply', () =>
+    vscode.commands.registerCommand('hopcode.copyLastReply', () =>
       sendCopyToActive('copyLastReply'),
     ),
   );
@@ -243,56 +243,65 @@ export async function activate(context: vscode.ExtensionContext) {
       DIFF_SCHEME,
       diffContentProvider,
     ),
-    (vscode.commands.registerCommand('qwen.diff.accept', (uri?: vscode.Uri) => {
-      const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
-      if (docUri && docUri.scheme === DIFF_SCHEME) {
-        diffManager.acceptDiff(docUri);
-      }
-      // If any chat surface is requesting permission, actively select allow (prefer once)
-      try {
-        for (const provider of chatProviderRegistry?.getPermissionAwareProviders() ??
-          []) {
-          if (provider?.hasPendingPermission()) {
-            provider.respondToPendingPermission('allow');
-          }
+    vscode.commands.registerCommand(
+      'hopcode.diff.accept',
+      (uri?: vscode.Uri) => {
+        const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
+        if (docUri && docUri.scheme === DIFF_SCHEME) {
+          diffManager.acceptDiff(docUri);
         }
-      } catch (err) {
-        console.warn('[Extension] Auto-allow on diff.accept failed:', err);
-      }
-      console.log('[Extension] Diff accepted');
-    }),
-    vscode.commands.registerCommand('qwen.diff.cancel', (uri?: vscode.Uri) => {
-      const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
-      if (docUri && docUri.scheme === DIFF_SCHEME) {
-        diffManager.cancelDiff(docUri);
-      }
-      // If any chat surface is requesting permission, actively select reject/cancel
-      try {
-        for (const provider of chatProviderRegistry?.getPermissionAwareProviders() ??
-          []) {
-          if (provider?.hasPendingPermission()) {
-            provider.respondToPendingPermission('cancel');
+        // If any chat surface is requesting permission, actively select allow (prefer once)
+        try {
+          for (const provider of chatProviderRegistry?.getPermissionAwareProviders() ??
+            []) {
+            if (provider?.hasPendingPermission()) {
+              provider.respondToPendingPermission('allow');
+            }
           }
+        } catch (err) {
+          console.warn('[Extension] Auto-allow on diff.accept failed:', err);
         }
-      } catch (err) {
-        console.warn('[Extension] Auto-reject on diff.cancel failed:', err);
-      }
-      console.log('[Extension] Diff cancelled');
-    })),
-    vscode.commands.registerCommand('qwen.diff.closeAll', async () => {
+        console.log('[Extension] Diff accepted');
+      },
+    ),
+    vscode.commands.registerCommand(
+      'hopcode.diff.cancel',
+      (uri?: vscode.Uri) => {
+        const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
+        if (docUri && docUri.scheme === DIFF_SCHEME) {
+          diffManager.cancelDiff(docUri);
+        }
+        // If any chat surface is requesting permission, actively select reject/cancel
+        try {
+          for (const provider of chatProviderRegistry?.getPermissionAwareProviders() ??
+            []) {
+            if (provider?.hasPendingPermission()) {
+              provider.respondToPendingPermission('cancel');
+            }
+          }
+        } catch (err) {
+          console.warn('[Extension] Auto-reject on diff.cancel failed:', err);
+        }
+        console.log('[Extension] Diff cancelled');
+      },
+    ),
+    vscode.commands.registerCommand('hopcode.diff.closeAll', async () => {
       try {
         await diffManager.closeAll();
       } catch (err) {
-        console.warn('[Extension] qwen.diff.closeAll failed:', err);
+        console.warn('[Extension] hopcode.diff.closeAll failed:', err);
       }
     }),
-    vscode.commands.registerCommand('qwen.diff.suppressBriefly', async () => {
-      try {
-        diffManager.suppressFor(1200);
-      } catch (err) {
-        console.warn('[Extension] qwen.diff.suppressBriefly failed:', err);
-      }
-    }),
+    vscode.commands.registerCommand(
+      'hopcode.diff.suppressBriefly',
+      async () => {
+        try {
+          diffManager.suppressFor(1200);
+        } catch (err) {
+          console.warn('[Extension] hopcode.diff.suppressBriefly failed:', err);
+        }
+      },
+    ),
   );
 
   ideServer = new IDEServer(log, diffManager);
@@ -309,7 +318,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!context.globalState.get(INFO_MESSAGE_SHOWN_KEY) && infoMessageEnabled) {
     void vscode.window.showInformationMessage(
-      'Qwen Code Companion extension successfully installed.',
+      'HopCode Companion extension successfully installed.',
     );
     context.globalState.update(INFO_MESSAGE_SHOWN_KEY, true);
   }
@@ -322,7 +331,7 @@ export async function activate(context: vscode.ExtensionContext) {
       ideServer.syncEnvVars();
     }),
     vscode.commands.registerCommand(
-      'qwen-code.runQwenCode',
+      'hopcode.runHopCode',
       async (
         location?:
           | vscode.TerminalLocation
@@ -331,7 +340,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders || workspaceFolders.length === 0) {
           vscode.window.showInformationMessage(
-            'No folder open. Please open a folder to run Qwen Code.',
+            'No folder open. Please open a folder to run HopCode.',
           );
           return;
         }
@@ -341,7 +350,7 @@ export async function activate(context: vscode.ExtensionContext) {
           selectedFolder = workspaceFolders[0];
         } else {
           selectedFolder = await vscode.window.showWorkspaceFolderPick({
-            placeHolder: 'Select a folder to run Qwen Code in',
+            placeHolder: 'Select a folder to run HopCode in',
           });
         }
 
@@ -349,18 +358,18 @@ export async function activate(context: vscode.ExtensionContext) {
           const cliEntry = vscode.Uri.joinPath(
             context.extensionUri,
             'dist',
-            'qwen-cli',
+            'hopcode-cli',
             'cli.js',
           ).fsPath;
           const execPath = process.execPath;
 
           const terminalOptions: vscode.TerminalOptions = {
-            name: `Qwen Code (${selectedFolder.name})`,
+            name: `HopCode (${selectedFolder.name})`,
             cwd: selectedFolder.uri.fsPath,
             location,
           };
 
-          let qwenCmd: string;
+          let hopcodeCmd: string;
 
           if (isWindows) {
             // On Windows, try multiple strategies to find a Node.js runtime:
@@ -370,7 +379,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const quoteCmd = (s: string) => `"${s.replace(/"/g, '""')}"`;
             const cliQuoted = quoteCmd(cliEntry);
             // TODO: @yiliang114, temporarily run through node, and later hope to decouple from the local node
-            qwenCmd = `node ${cliQuoted}`;
+            hopcodeCmd = `node ${cliQuoted}`;
             terminalOptions.shellPath = process.env.ComSpec;
           } else {
             // macOS/Linux: All VSCode-like IDEs (VSCode, Cursor, Windsurf, etc.)
@@ -378,16 +387,16 @@ export async function activate(context: vscode.ExtensionContext) {
             // to run Node.js scripts using the IDE's bundled runtime.
             const quotePosix = (s: string) => `"${s.replace(/"/g, '\\"')}"`;
             const baseCmd = `${quotePosix(execPath)} ${quotePosix(cliEntry)}`;
-            qwenCmd = `ELECTRON_RUN_AS_NODE=1 ${baseCmd}`;
+            hopcodeCmd = `ELECTRON_RUN_AS_NODE=1 ${baseCmd}`;
           }
 
           const terminal = vscode.window.createTerminal(terminalOptions);
           terminal.show();
-          terminal.sendText(qwenCmd);
+          terminal.sendText(hopcodeCmd);
         }
       },
     ),
-    vscode.commands.registerCommand('qwen-code.showNotices', async () => {
+    vscode.commands.registerCommand('hopcode.showNotices', async () => {
       const noticePath = vscode.Uri.joinPath(
         context.extensionUri,
         'NOTICES.txt',

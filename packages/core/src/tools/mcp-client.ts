@@ -113,7 +113,7 @@ export class McpClient {
     private readonly sendSdkMcpMessage?: SendSdkMcpMessage,
   ) {
     this.client = new Client({
-      name: `qwen-cli-mcp-client-${this.serverName}`,
+      name: `hopcode-cli-mcp-client-${this.serverName}`,
       version: '0.0.1',
     });
   }
