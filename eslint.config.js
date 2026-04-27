@@ -29,6 +29,7 @@ export default tseslint.config(
       'docs-site/.next/**',
       'docs-site/out/**',
       '.qwen/**',
+      '.hopcode-backup-*/**',
     ],
   },
   eslint.configs.recommended,
