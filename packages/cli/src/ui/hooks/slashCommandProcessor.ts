@@ -26,7 +26,7 @@ import {
   ToolConfirmationOutcome,
   IdeClient,
   type SessionListItem,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import type {
   Message,
@@ -291,6 +291,7 @@ export const useSlashCommandProcessor = (
         isIdleRef,
         toggleVimEnabled,
         setGeminiMdFileCount,
+        setContextMdFileCount: setGeminiMdFileCount,
         reloadCommands,
         setSessionName: setSessionName ?? (() => {}),
         extensionsUpdateState,
@@ -547,15 +548,27 @@ export const useSlashCommandProcessor = (
                     toolArgs: result.toolArgs,
                   };
                 case 'message':
-                  if (result.messageType === 'info') {
+                  if (result.messageType === 'error') {
                     addMessage({
-                      type: MessageType.INFO,
+                      type: MessageType.ERROR,
+                      content: result.content,
+                      timestamp: new Date(),
+                    });
+                  } else if (result.messageType === 'warning') {
+                    addMessage({
+                      type: MessageType.WARNING,
+                      content: result.content,
+                      timestamp: new Date(),
+                    });
+                  } else if (result.messageType === 'success') {
+                    addMessage({
+                      type: MessageType.SUCCESS,
                       content: result.content,
                       timestamp: new Date(),
                     });
                   } else {
                     addMessage({
-                      type: MessageType.ERROR,
+                      type: MessageType.INFO,
                       content: result.content,
                       timestamp: new Date(),
                     });
@@ -614,6 +627,9 @@ export const useSlashCommandProcessor = (
                     case 'mcp':
                       actions.openMcpDialog();
                       return { type: 'handled' };
+                    case 'provider':
+                      actions.openManageModelsDialog();
+                      return { type: 'handled' };
                     case 'hooks':
                       actions.openHooksDialog();
                       return { type: 'handled' };
@@ -664,6 +680,11 @@ export const useSlashCommandProcessor = (
                     type: 'submit_prompt',
                     content: result.content,
                     onComplete: result.onComplete,
+                  };
+                case 'startImmediateSubagent':
+                  return {
+                    type: 'submit_prompt',
+                    content: `Use the Agent tool with subagent_type: "${result.subagent}" and this prompt:\n\n${result.prompt}`,
                   };
                 case 'confirm_shell_commands': {
                   const { outcome, approvedCommands } = await new Promise<{

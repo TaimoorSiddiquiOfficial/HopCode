@@ -26,6 +26,7 @@ export function createNonInteractiveUI(): CommandContext['ui'] {
     btwAbortControllerRef: { current: null },
     isIdleRef: { current: true },
     toggleVimEnabled: async () => false,
+    setGeminiMdFileCount: (_count) => {},
     setContextMdFileCount: (_count) => {},
     reloadCommands: () => {},
     setSessionName: () => {},

@@ -9,7 +9,7 @@ import type {
   ContentGeneratorConfig,
   ModelProvidersConfig,
   ProviderModelConfig,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   AuthEvent,
   AuthType,
@@ -19,7 +19,7 @@ import {
   isCodingPlanConfig,
   CodingPlanRegion,
   CODING_PLAN_ENV_KEY,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { useCallback, useEffect, useState } from 'react';
 import type { LoadedSettings } from '../../config/settings.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
@@ -181,7 +181,7 @@ export const useAuthCommand = (
 
         // Only update credentials if not switching to QWEN_OAUTH,
         // so that OpenAI credentials are preserved when switching to QWEN_OAUTH.
-        if (authType !== AuthType.QWEN_OAUTH && credentials) {
+        if (authType !== AuthType.HOPCODE_OAUTH && credentials) {
           if (credentials?.apiKey != null) {
             settings.setValue(
               authTypeScope,
@@ -327,7 +327,7 @@ export const useAuthCommand = (
   }, []);
 
   const cancelAuthentication = useCallback(() => {
-    if (isAuthenticating && pendingAuthType === AuthType.QWEN_OAUTH) {
+    if (isAuthenticating && pendingAuthType === AuthType.HOPCODE_OAUTH) {
       cancelQwenAuth();
     }
 
@@ -912,7 +912,7 @@ export const useAuthCommand = (
     if (
       defaultAuthType &&
       ![
-        AuthType.QWEN_OAUTH,
+        AuthType.HOPCODE_OAUTH,
         AuthType.USE_OPENAI,
         AuthType.USE_ANTHROPIC,
         AuthType.USE_GEMINI,
@@ -925,7 +925,7 @@ export const useAuthCommand = (
           {
             value: defaultAuthType,
             validValues: [
-              AuthType.QWEN_OAUTH,
+              AuthType.HOPCODE_OAUTH,
               AuthType.USE_OPENAI,
               AuthType.USE_ANTHROPIC,
               AuthType.USE_GEMINI,

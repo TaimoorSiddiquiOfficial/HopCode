@@ -9,7 +9,7 @@ import {
   getErrorMessage,
   type Config,
   type ProviderModelConfig as ModelConfig,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { t } from '../../i18n/index.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
@@ -102,6 +102,10 @@ export async function handleQwenAuth(
       openaiLoggingDir: undefined,
       proxy: undefined,
       includeDirectories: undefined,
+      tavilyApiKey: undefined,
+      googleApiKey: undefined,
+      googleSearchEngineId: undefined,
+      webSearchDefault: undefined,
       screenReader: undefined,
       inputFormat: undefined,
       outputFormat: undefined,
@@ -160,14 +164,14 @@ async function handleQwenOAuth(
   writeStdoutLine(t('Starting Qwen OAuth authentication...'));
 
   try {
-    await config.refreshAuth(AuthType.QWEN_OAUTH);
+    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
     // Persist the auth type
     const authTypeScope = getPersistScopeForModelSelection(settings);
     settings.setValue(
       authTypeScope,
       'security.auth.selectedType',
-      AuthType.QWEN_OAUTH,
+      AuthType.HOPCODE_OAUTH,
     );
 
     writeStdoutLine(t('Successfully authenticated with Qwen OAuth.'));
@@ -561,7 +565,7 @@ export async function showAuthStatus(): Promise<void> {
     }
 
     // Display status based on auth type
-    if (selectedType === AuthType.QWEN_OAUTH) {
+    if (selectedType === AuthType.HOPCODE_OAUTH) {
       writeStdoutLine(t('✓ Authentication Method: Qwen OAuth'));
       writeStdoutLine(t('  Type: Free tier (discontinued 2026-04-15)'));
       writeStdoutLine(t('  Limit: No longer available'));

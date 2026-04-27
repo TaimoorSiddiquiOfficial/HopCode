@@ -5,7 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import { QwenAgentManager } from '../../services/qwenAgentManager.js';
+import { HopCodeAgentManager } from '../../services/hopcodeAgentManager.js';
 import { ConversationStore } from '../../services/conversationStore.js';
 import type {
   RequestPermissionRequest,
@@ -29,10 +29,10 @@ import { getErrorMessage } from '../../utils/errorMessage.js';
 import {
   writeCodingPlanConfig,
   writeModelProvidersConfig,
-  readQwenSettingsForVSCode,
+  readHopcodeSettingsForVSCode,
   clearPersistedAuth,
 } from '../../services/settingsWriter.js';
-import { parseInsightMessage } from '@qwen-code/qwen-code-core';
+import { parseInsightMessage } from '@hoptrendy/hopcode-core';
 
 const AUTH_RELATED_QWEN_SETTINGS = [
   'qwen-code.provider',
@@ -48,7 +48,7 @@ function isInsightCommand(command: string): boolean {
 export class WebViewProvider {
   private panelManager: PanelManager;
   private messageHandler: MessageHandler;
-  private agentManager: QwenAgentManager;
+  private agentManager: HopCodeAgentManager;
   private conversationStore: ConversationStore;
   private disposables: vscode.Disposable[] = [];
   private agentInitialized = false; // Track if agent has been initialized
@@ -96,7 +96,7 @@ export class WebViewProvider {
     private context: vscode.ExtensionContext,
     private extensionUri: vscode.Uri,
   ) {
-    this.agentManager = new QwenAgentManager();
+    this.agentManager = new HopCodeAgentManager();
     this.conversationStore = new ConversationStore(context);
     this.panelManager = new PanelManager(extensionUri, () => {
       // Panel dispose callback — unblock any pending ACP Promises
@@ -1019,7 +1019,7 @@ export class WebViewProvider {
    */
   private async syncQwenConfigToVSCodeSettings(): Promise<void> {
     try {
-      const qwenSettings = readQwenSettingsForVSCode();
+      const qwenSettings = readHopcodeSettingsForVSCode();
       if (!qwenSettings) {
         return;
       }

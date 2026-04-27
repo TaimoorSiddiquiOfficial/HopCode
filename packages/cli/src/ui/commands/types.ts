@@ -11,7 +11,7 @@ import type {
   GitService,
   Logger,
   SessionListItem,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type {
   HistoryItemWithoutId,
   HistoryItem,
@@ -90,6 +90,8 @@ export interface CommandContext {
     loadHistory: UseHistoryManagerReturn['loadHistory'];
     toggleVimEnabled: () => Promise<boolean>;
     setGeminiMdFileCount: (count: number) => void;
+    /** Alias for setGeminiMdFileCount — used by upstream-merged files. */
+    setContextMdFileCount: (count: number) => void;
     reloadCommands: () => void;
     setSessionName: (name: string | null) => void;
     extensionsUpdateState: Map<string, ExtensionUpdateStatus>;
@@ -131,7 +133,7 @@ export interface QuitActionReturn {
  */
 export interface MessageActionReturn {
   type: 'message';
-  messageType: 'info' | 'error';
+  messageType: 'info' | 'error' | 'warning' | 'success';
   content: string;
 }
 
@@ -184,7 +186,14 @@ export interface OpenDialogActionReturn {
     | 'extensions_manage'
     | 'hooks'
     | 'mcp'
+    | 'provider'
     | 'rewind';
+}
+
+export interface StartImmediateSubagentActionReturn {
+  type: 'startImmediateSubagent';
+  subagent: string;
+  prompt: string;
 }
 
 /**
@@ -241,6 +250,7 @@ export type SlashCommandActionReturn =
   | LoadHistoryActionReturn
   | SubmitPromptActionReturn
   | ConfirmShellCommandsActionReturn
+  | StartImmediateSubagentActionReturn
   | ConfirmActionReturn;
 
 export enum CommandKind {

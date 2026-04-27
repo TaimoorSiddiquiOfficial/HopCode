@@ -191,7 +191,7 @@ describe('modelConfigResolver', () => {
 
       it('QWEN_CODE_API_TIMEOUT_MS applies in Qwen OAuth path', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {
@@ -210,7 +210,7 @@ describe('modelConfigResolver', () => {
 
       it('modelProvider timeout takes precedence over QWEN_CODE_API_TIMEOUT_MS in OAuth', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {
@@ -231,7 +231,7 @@ describe('modelConfigResolver', () => {
 
       it('invalid QWEN_CODE_API_TIMEOUT_MS ignored in OAuth path', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {
@@ -244,7 +244,7 @@ describe('modelConfigResolver', () => {
 
       it('negative QWEN_CODE_API_TIMEOUT_MS ignored in OAuth path', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {
@@ -257,7 +257,7 @@ describe('modelConfigResolver', () => {
 
       it('zero QWEN_CODE_API_TIMEOUT_MS ignored in OAuth path', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {
@@ -270,7 +270,7 @@ describe('modelConfigResolver', () => {
 
       it('QWEN_CODE_API_TIMEOUT_MS works with float value in OAuth', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {
@@ -283,7 +283,7 @@ describe('modelConfigResolver', () => {
 
       it('QWEN_CODE_API_TIMEOUT_MS works with proxy in OAuth path', () => {
         const result = resolveModelConfig({
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
           cli: {},
           settings: {},
           env: {
@@ -694,7 +694,7 @@ describe('modelConfigResolver', () => {
       // Guards against the original bug where resolveQwenOAuthConfig()
       // returned before applying the env override.
       const result = resolveModelConfig({
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         cli: {},
         settings: {},
         env: {
@@ -748,7 +748,7 @@ describe('modelConfigResolver', () => {
 
       // OAuth
       const oauth = resolveModelConfig({
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         cli: {},
         settings: {},
         env: {

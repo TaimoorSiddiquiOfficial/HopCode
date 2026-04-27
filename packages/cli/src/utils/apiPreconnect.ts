@@ -19,7 +19,7 @@ import {
   createDebugLogger,
   detectRuntime,
   getOrCreateSharedDispatcher,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 
 import { ALIBABA_STANDARD_API_KEY_ENDPOINTS } from '../constants/alibabaStandardApiKey.js';
 

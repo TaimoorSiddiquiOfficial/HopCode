@@ -646,6 +646,13 @@ export class HopCodeChat {
     this.history = history;
   }
 
+  /** Truncate history to keep only the most recent `keepCount` turns. */
+  truncateHistory(keepCount: number): void {
+    if (keepCount >= 0 && this.history.length > keepCount) {
+      this.history = this.history.slice(-keepCount);
+    }
+  }
+
   stripThoughtsFromHistory(): void {
     this.history = this.history
       .map((content) => {

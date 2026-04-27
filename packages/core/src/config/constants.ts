@@ -7,6 +7,7 @@
 export interface FileFilteringOptions {
   respectGitIgnore: boolean;
   respectHopCodeIgnore: boolean;
+  respectQwenIgnore?: boolean;
   customExcludes?: string[];
 }
 
@@ -14,10 +15,12 @@ export interface FileFilteringOptions {
 export const DEFAULT_MEMORY_FILE_FILTERING_OPTIONS: FileFilteringOptions = {
   respectGitIgnore: false,
   respectHopCodeIgnore: true,
+  respectQwenIgnore: false,
 };
 
 // For all other files
 export const DEFAULT_FILE_FILTERING_OPTIONS: FileFilteringOptions = {
   respectGitIgnore: true,
   respectHopCodeIgnore: true,
+  respectQwenIgnore: true,
 };

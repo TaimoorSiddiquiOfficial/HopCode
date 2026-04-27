@@ -56,11 +56,11 @@ import {
   type PermissionMode,
   ToolConfirmationOutcome,
   type WaitingToolCall,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { buildResumedHistoryItems } from './utils/resumeHistoryUtils.js';
 import { getStickyTodos } from './utils/todoSnapshot.js';
 import { validateAuthMethod } from '../config/auth.js';
-import { loadHierarchicalGeminiMemory } from '../config/config.js';
+import { loadHierarchicalContextMemory } from '../config/config.js';
 import process from 'node:process';
 import { useHistory } from './hooks/useHistoryManager.js';
 import { useMemoryMonitor } from './hooks/useMemoryMonitor.js';
@@ -209,8 +209,8 @@ export const AppContainer = (props: AppContainerProps) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [embeddedShellFocused, setEmbeddedShellFocused] = useState(false);
 
-  const [geminiMdFileCount, setGeminiMdFileCount] = useState<number>(
-    initializationResult.geminiMdFileCount,
+  const [contextMdFileCount, setContextMdFileCount] = useState<number>(
+    initializationResult.contextMdFileCount,
   );
   const [shellModeActive, setShellModeActive] = useState(false);
   const [modelSwitchedFromQuotaError, setModelSwitchedFromQuotaError] =
@@ -737,7 +737,7 @@ export const AppContainer = (props: AppContainerProps) => {
     isProcessing,
     setIsProcessing,
     isIdleRef,
-    setGeminiMdFileCount,
+    setContextMdFileCount,
     slashCommandActions,
     extensionsUpdateStateInternal,
     isConfigInitialized,
@@ -763,7 +763,7 @@ export const AppContainer = (props: AppContainerProps) => {
     );
     try {
       const { memoryContent, fileCount, conditionalRules, projectRoot } =
-        await loadHierarchicalGeminiMemory(
+        await loadHierarchicalContextMemory(
           process.cwd(),
           settings.merged.context?.loadFromIncludeDirectories
             ? config.getWorkspaceContext().getDirectories()
@@ -776,11 +776,11 @@ export const AppContainer = (props: AppContainerProps) => {
         );
 
       config.setUserMemory(memoryContent);
-      config.setGeminiMdFileCount(fileCount);
+      config.setContextMdFileCount(fileCount);
       config.setConditionalRulesRegistry(
         new ConditionalRulesRegistry(conditionalRules, projectRoot),
       );
-      setGeminiMdFileCount(fileCount);
+      setContextMdFileCount(fileCount);
 
       historyManager.addItem(
         {
@@ -819,7 +819,7 @@ export const AppContainer = (props: AppContainerProps) => {
     streamingState,
     submitQuery,
     initError,
-    pendingHistoryItems: pendingGeminiHistoryItems,
+    pendingGeminiHistoryItems,
     thought,
     cancelOngoingRequest,
     retryLastPrompt,
@@ -2278,7 +2278,7 @@ export const AppContainer = (props: AppContainerProps) => {
       settingInputRequests,
       pluginChoiceRequests,
       loopDetectionConfirmationRequest,
-      geminiMdFileCount,
+      geminiMdFileCount: contextMdFileCount,
       streamingState,
       initError,
       pendingGeminiHistoryItems,
@@ -2399,7 +2399,7 @@ export const AppContainer = (props: AppContainerProps) => {
       settingInputRequests,
       pluginChoiceRequests,
       loopDetectionConfirmationRequest,
-      geminiMdFileCount,
+      contextMdFileCount,
       streamingState,
       initError,
       pendingGeminiHistoryItems,

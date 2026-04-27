@@ -126,8 +126,8 @@ export async function read<T = unknown>(filePath: string): Promise<T[]> {
  * Per-directory cache: once we've successfully created a parent dir we don't
  * need to mkdir again on subsequent writes. Cuts an async syscall off every
  * hot-path write (chat session JSONL appends).
+ * Note: defined earlier in this file; this alias satisfies upstream-merged code.
  */
-const ensuredDirs = new Set<string>();
 
 /**
  * Test-only: clear the per-directory mkdir cache. Needed when tests mutate

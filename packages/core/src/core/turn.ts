@@ -67,6 +67,9 @@ export enum HopCodeEventType {
   StopHookLoop = 'stop_hook_loop',
 }
 
+/** @deprecated Use HopCodeEventType */
+export const GeminiEventType = HopCodeEventType;
+
 export type ServerHopCodeRetryEvent = {
   type: HopCodeEventType.Retry;
   retryInfo?: RetryInfo;

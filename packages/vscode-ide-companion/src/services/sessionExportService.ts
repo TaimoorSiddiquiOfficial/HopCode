@@ -23,7 +23,7 @@ import {
   isSessionExportFormat,
   type SessionExportFormat,
 } from '../utils/exportSlashCommand.js';
-import { stripZeroWidthSpaces } from '@qwen-code/webui';
+import { stripZeroWidthSpaces } from '@hoptrendy/webui';
 
 export { EXPORT_SESSION_FORMATS as SESSION_EXPORT_FORMATS };
 export type { SessionExportFormat } from '../utils/exportSlashCommand.js';

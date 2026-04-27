@@ -332,6 +332,9 @@ class GrepToolInvocation extends BaseToolInvocation<
       respectGitIgnore:
         options?.respectGitIgnore ??
         DEFAULT_FILE_FILTERING_OPTIONS.respectGitIgnore,
+      respectHopCodeIgnore:
+        options?.respectHopCodeIgnore ??
+        DEFAULT_FILE_FILTERING_OPTIONS.respectHopCodeIgnore,
       respectQwenIgnore:
         options?.respectQwenIgnore ??
         DEFAULT_FILE_FILTERING_OPTIONS.respectQwenIgnore,

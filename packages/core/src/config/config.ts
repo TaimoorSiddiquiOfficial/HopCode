@@ -23,6 +23,7 @@ import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
 import type { AnyToolInvocation } from '../tools/tools.js';
 import type { ArenaManager } from '../agents/arena/ArenaManager.js';
+import type { WebSearchConfig } from '../tools/web-search/types.js';
 import { ArenaAgentClient } from '../agents/arena/ArenaAgentClient.js';
 
 // Core
@@ -43,6 +44,8 @@ import {
 } from '../services/fileSystemService.js';
 import { GitService } from '../services/gitService.js';
 import { CronScheduler } from '../services/cronScheduler.js';
+import { PermissionBlockerService } from '../services/permissionBlockerService.js';
+import { TaskStore } from '../services/task-store.js';
 
 // Tools — only lightweight imports; tool classes are lazy-loaded via dynamic import
 import type { SendSdkMcpMessage } from '../tools/mcp-client.js';
@@ -229,7 +232,15 @@ export interface GitCoAuthorSettings {
   email?: string;
 }
 
-export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
+export type ExtensionOriginSource =
+  | 'QwenCode'
+  | 'Claude'
+  | 'Gemini'
+  | 'HopCode';
+
+export type AgentModelOverride =
+  | string
+  | { model: string; baseUrl?: string; apiKey?: string };
 
 export interface ExtensionInstallMetadata {
   source: string;
@@ -445,6 +456,10 @@ export interface ConfigParameters {
   inputFile?: string;
   /** Model providers configuration grouped by authType */
   modelProvidersConfig?: ModelProvidersConfig;
+  /** Web search provider configuration. */
+  webSearch?: WebSearchConfig | null;
+  /** Per-agent model overrides. */
+  agentModels?: Record<string, AgentModelOverride>;
   /** Multi-agent collaboration settings (Arena, Team, Swarm) */
   agents?: AgentsCollabSettings;
   /** Enable managed auto-memory background extraction and dream. Defaults to true. */
@@ -561,6 +576,8 @@ export class Config {
 
   private modelsConfig!: ModelsConfig;
   private readonly modelProvidersConfig?: ModelProvidersConfig;
+  private readonly webSearch?: WebSearchConfig | null;
+  private readonly agentModels?: Record<string, AgentModelOverride>;
   private readonly sandbox: SandboxConfig | undefined;
   private readonly targetDir: string;
   private workspaceContext: WorkspaceContext;
@@ -607,10 +624,19 @@ export class Config {
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
+  // Provider-registry compat properties (populated from user settings file by provider.ts)
+  provider?: Record<string, unknown>;
+  model?: string;
+  small_model?: string;
+  disabled_providers?: string[];
+  enabled_providers?: string[];
   private fileDiscoveryService: FileDiscoveryService | null = null;
   private gitService: GitService | undefined = undefined;
   private sessionService: SessionService | undefined = undefined;
   private chatRecordingService: ChatRecordingService | undefined = undefined;
+  private permissionBlockerService: PermissionBlockerService | undefined =
+    undefined;
+  private taskStore: TaskStore | undefined = undefined;
   private readonly checkpointing: boolean;
   private readonly proxy: string | undefined;
   private readonly cwd: string;
@@ -691,6 +717,8 @@ export class Config {
     this.embeddingModel = params.embeddingModel ?? DEFAULT_QWEN_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
+    this.webSearch = params.webSearch;
+    this.agentModels = params.agentModels;
     this.targetDir = path.resolve(params.targetDir);
     this.explicitIncludeDirectories = Array.from(
       new Set(params.includeDirectories ?? []),
@@ -979,7 +1007,8 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['tool_response'] as Record<string, unknown>) || {},
                   (input['tool_use_id'] as string) || '',
-                  (input['permission_mode'] as PermissionMode) || 'default',
+                  (input['permission_mode'] as PermissionMode) ||
+                    PermissionMode.Default,
                   signal,
                 );
                 break;
@@ -990,7 +1019,8 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['error'] as string) || '',
                   input['is_interrupt'] as boolean | undefined,
-                  (input['permission_mode'] as PermissionMode) || 'default',
+                  (input['permission_mode'] as PermissionMode) ||
+                    PermissionMode.Default,
                   signal,
                 );
                 break;
@@ -998,7 +1028,7 @@ export class Config {
                 result = await hookSystem.fireNotificationEvent(
                   (input['message'] as string) || '',
                   (input['notification_type'] as NotificationType) ||
-                    'permission_prompt',
+                    NotificationType.PermissionPrompt,
                   (input['title'] as string) || undefined,
                   signal,
                 );
@@ -1433,7 +1463,7 @@ export class Config {
     // - Non-qwen providers may need to re-validate credentials / baseUrl / envKey.
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
-    if (authType === AuthType.QWEN_OAUTH && !requiresRefresh) {
+    if (authType === AuthType.HOPCODE_OAUTH && !requiresRefresh) {
       const { config, sources } = resolveContentGeneratorConfigWithSources(
         this,
         authType,
@@ -1814,6 +1844,20 @@ export class Config {
     this.geminiMdFileCount = count;
   }
 
+  /** Alias for setGeminiMdFileCount — used by upstream-merged files. */
+  setContextMdFileCount(count: number): void {
+    this.geminiMdFileCount = count;
+  }
+
+  /** Alias for getGeminiMdFileCount — used by upstream-merged files. */
+  getContextMdFileCount(): number {
+    return this.geminiMdFileCount;
+  }
+
+  getWebSearchConfig(): WebSearchConfig | null {
+    return this.webSearch ?? null;
+  }
+
   getArenaManager(): ArenaManager | null {
     return this.arenaManager;
   }
@@ -1977,6 +2021,11 @@ export class Config {
     return this.geminiClient;
   }
 
+  /** Alias for getGeminiClient — used by upstream-merged files. */
+  getHopCodeClient(): GeminiClient {
+    return this.geminiClient;
+  }
+
   getCronScheduler(): CronScheduler {
     if (!this.cronScheduler) {
       this.cronScheduler = new CronScheduler();
@@ -2008,6 +2057,7 @@ export class Config {
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
+      respectHopCodeIgnore: true,
       respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
     };
   }
@@ -2716,4 +2766,86 @@ export class Config {
     );
     return registry;
   }
+
+  // -------------------------------------------------------------------------
+  // Upstream compatibility stubs (HopCode fork)
+  // -------------------------------------------------------------------------
+
+  /** Lazy singleton PermissionBlockerService. */
+  getPermissionBlockerService(): PermissionBlockerService {
+    if (!this.permissionBlockerService) {
+      const homeDir = process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.';
+      const persistPath = path.join(
+        homeDir,
+        '.hopcode',
+        'permission-blocker.json',
+      );
+      this.permissionBlockerService = new PermissionBlockerService(persistPath);
+    }
+    return this.permissionBlockerService;
+  }
+
+  /** Lazy singleton TaskStore. */
+  getTaskStore(): TaskStore {
+    if (!this.taskStore) {
+      const runtimeDir = this.storage.getProjectDir?.() ?? this.cwd;
+      this.taskStore = new TaskStore(runtimeDir, this.getSessionId());
+    }
+    return this.taskStore;
+  }
+
+  /** Returns an overridden model string for a named agent type (e.g. "orchestrator"). */
+  getAgentModelForType(name: string): string | undefined {
+    const override = this.agentModels?.[name];
+    if (typeof override === 'string') {
+      return override === 'inherit' ? undefined : override;
+    }
+    return override?.model === 'inherit' ? undefined : override?.model;
+  }
+
+  /** Returns full model config (apiKey, baseUrl) for a named agent type. */
+  getAgentModelFullConfig(
+    name: string,
+  ): { apiKey?: string; baseUrl?: string } | undefined {
+    const override = this.agentModels?.[name];
+    if (!override || typeof override === 'string') {
+      return undefined;
+    }
+    return { apiKey: override.apiKey, baseUrl: override.baseUrl };
+  }
+
+  /**
+   * Static factory — returns the shared singleton Config. Not supported in
+   * the HopCode fork; Config is always constructed directly by the CLI layer.
+   */
+  static async get(): Promise<Config> {
+    throw new Error(
+      'Config.get() is not supported in the HopCode fork. ' +
+        'Construct Config directly via `new Config(...)` in the CLI layer.',
+    );
+  }
+}
+
+/**
+ * Creates a lightweight Proxy over `base` that overrides selected methods.
+ * This lets callers fork Config state (e.g. different approval mode, model)
+ * without mutating or copying the parent Config instance.
+ */
+export function createConfigOverride(
+  base: Config,
+  overrides: Partial<Record<keyof Config, unknown>>,
+): Config {
+  return new Proxy(base, {
+    get(target, prop, receiver) {
+      if (prop in overrides) {
+        const val = overrides[prop as keyof Config];
+        return val;
+      }
+      const value = Reflect.get(target, prop, receiver);
+      if (typeof value === 'function') {
+        return value.bind(target);
+      }
+      return value;
+    },
+  });
 }

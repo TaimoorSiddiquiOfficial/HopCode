@@ -1243,3 +1243,6 @@ export const TEST_ONLY = {
   COMPRESSION_PRESERVE_THRESHOLD,
   COMPRESSION_TOKEN_THRESHOLD,
 };
+
+/** Alias for upstream compatibility — config.ts imports GeminiClient from this file. */
+export { HopCodeClient as GeminiClient };
