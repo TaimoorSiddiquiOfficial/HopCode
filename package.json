@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode",
-  "version": "0.18.10",
+  "version": "0.19.3",
   "type": "module",
   "workspaces": [
     "packages/*",

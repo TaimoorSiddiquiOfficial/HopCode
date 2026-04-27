@@ -79,7 +79,7 @@ Choose your preferred authentication method:
 
 > [!tip]
 >
-> You can also configure authentication directly from the terminal without starting a session by running `qwen auth`. Use `qwen auth status` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
+> You can also configure authentication directly from the terminal without starting a session by running `hopcode auth`. Use `hopcode auth status` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
 
 ## Step 3: Start your first session
 
@@ -218,21 +218,21 @@ review my changes and suggest improvements
 
 Here are the most important commands for daily use:
 
-| Command               | What it does                                     | Example                       |
-| --------------------- | ------------------------------------------------ | ----------------------------- |
-| `qwen`                | start Qwen Code                                  | `qwen`                        |
-| `/auth`               | Change authentication method (in session)        | `/auth`                       |
-| `qwen auth`           | Configure authentication from the terminal       | `qwen auth`                   |
-| `qwen auth api-key`   | Configure API key authentication                 | `qwen auth api-key`           |
-| `qwen auth status`    | Check current authentication status              | `qwen auth status`            |
-| `/help`               | Display help information for available commands  | `/help` or `/?`               |
-| `/compress`           | Replace chat history with summary to save Tokens | `/compress`                   |
-| `/clear`              | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |
-| `/theme`              | Change Qwen Code visual theme                    | `/theme`                      |
-| `/language`           | View or change language settings                 | `/language`                   |
-| → `ui [language]`     | Set UI interface language                        | `/language ui zh-CN`          |
-| → `output [language]` | Set LLM output language                          | `/language output Chinese`    |
-| `/quit`               | Exit Qwen Code immediately                       | `/quit` or `/exit`            |
+| Command                | What it does                                     | Example                       |
+| ---------------------- | ------------------------------------------------ | ----------------------------- |
+| `qwen`                 | start Qwen Code                                  | `qwen`                        |
+| `/auth`                | Change authentication method (in session)        | `/auth`                       |
+| `hopcode auth`         | Configure authentication from the terminal       | `hopcode auth`                |
+| `hopcode auth api-key` | Configure API key authentication                 | `hopcode auth api-key`        |
+| `hopcode auth status`  | Check current authentication status              | `hopcode auth status`         |
+| `/help`                | Display help information for available commands  | `/help` or `/?`               |
+| `/compress`            | Replace chat history with summary to save Tokens | `/compress`                   |
+| `/clear`               | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |
+| `/theme`               | Change Qwen Code visual theme                    | `/theme`                      |
+| `/language`            | View or change language settings                 | `/language`                   |
+| → `ui [language]`      | Set UI interface language                        | `/language ui zh-CN`          |
+| → `output [language]`  | Set LLM output language                          | `/language output Chinese`    |
+| `/quit`                | Exit Qwen Code immediately                       | `/quit` or `/exit`            |
 
 See the [CLI reference](./features/commands) for a complete list of commands.
 

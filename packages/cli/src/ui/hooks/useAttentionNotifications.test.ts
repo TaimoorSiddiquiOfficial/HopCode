@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -82,7 +82,7 @@ describe('useAttentionNotifications', () => {
 
     expect(mockedSendNotification).toHaveBeenCalledTimes(1);
     expect(mockedSendNotification).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Qwen Code' }),
+      expect.objectContaining({ title: 'HopCode' }),
       mockTerminal,
       true,
     );
@@ -204,7 +204,7 @@ describe('useAttentionNotifications', () => {
     expect(mockedSendNotification).toHaveBeenCalledTimes(1);
     expect(mockedSendNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Qwen Code needs your permission to use Bash',
+        message: 'HopCode needs your permission to use Bash',
       }),
       mockTerminal,
       true,
@@ -227,7 +227,7 @@ describe('useAttentionNotifications', () => {
 
     expect(mockedSendNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Qwen Code is waiting for your input',
+        message: 'HopCode is waiting for your input',
       }),
       mockTerminal,
       true,
@@ -259,7 +259,7 @@ describe('useAttentionNotifications', () => {
 
     expect(mockedSendNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Qwen Code is waiting for your input',
+        message: 'HopCode is waiting for your input',
       }),
       mockTerminal,
       true,

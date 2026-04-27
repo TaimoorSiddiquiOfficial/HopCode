@@ -2,7 +2,7 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.19.2",
+  "version": "0.19.3",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
@@ -230,17 +230,17 @@
           "default": "china",
           "markdownDescription": "Region for Coding Plan. _(Only used when Provider is `coding-plan`)_"
         },
-        "qwen-code.dotIndicator": {
+        "hopcode.dotIndicator": {
           "order": 3,
           "type": "boolean",
           "default": true,
           "description": "Show a colored dot on the tab icon when a task completes (orange) or needs your attention (blue) while the tab is hidden."
         },
-        "qwen-code.notifications": {
+        "hopcode.notifications": {
           "order": 4,
           "type": "boolean",
           "default": true,
-          "description": "Show notifications with sound when a task completes (at least 20 seconds) or needs your attention, while you are not actively viewing the Qwen Code panel."
+          "description": "Show notifications with sound when a task completes (at least 20 seconds) or needs your attention, while you are not actively viewing the HopCode panel."
         }
       }
     },

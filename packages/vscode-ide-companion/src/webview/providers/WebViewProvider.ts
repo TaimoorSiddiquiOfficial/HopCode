@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 import { execFile } from 'child_process';
-import { QwenAgentManager } from '../../services/qwenAgentManager.js';
+import { HopCodeAgentManager } from '../../services/hopcodeAgentManager.js';
 import { ConversationStore } from '../../services/conversationStore.js';
 import type {
   RequestPermissionRequest,
@@ -30,10 +30,10 @@ import { getErrorMessage } from '../../utils/errorMessage.js';
 import {
   writeCodingPlanConfig,
   writeModelProvidersConfig,
-  readQwenSettingsForVSCode,
+  readHopcodeSettingsForVSCode,
   clearPersistedAuth,
 } from '../../services/settingsWriter.js';
-import { parseInsightMessage } from '@qwen-code/qwen-code-core';
+import { parseInsightMessage } from '@hoptrendy/hopcode-core';
 
 /** Threshold (ms) before a completed task triggers a notification. */
 const LONG_TASK_THRESHOLD_MS = 20_000;
@@ -54,10 +54,10 @@ const DOT_ICON: Record<DotColor | 'default', string> = {
   default: 'icon.png',
 };
 
-const AUTH_RELATED_QWEN_SETTINGS = [
-  'qwen-code.provider',
-  'qwen-code.apiKey',
-  'qwen-code.codingPlanRegion',
+const AUTH_RELATED_HOPCODE_SETTINGS = [
+  'hopcode.provider',
+  'hopcode.apiKey',
+  'hopcode.codingPlanRegion',
 ] as const;
 
 function isInsightCommand(command: string): boolean {
@@ -68,7 +68,7 @@ function isInsightCommand(command: string): boolean {
 export class WebViewProvider {
   private panelManager: PanelManager;
   private messageHandler: MessageHandler;
-  private agentManager: QwenAgentManager;
+  private agentManager: HopCodeAgentManager;
   private conversationStore: ConversationStore;
   private disposables: vscode.Disposable[] = [];
   private agentInitialized = false; // Track if agent has been initialized
@@ -124,7 +124,7 @@ export class WebViewProvider {
     private context: vscode.ExtensionContext,
     private extensionUri: vscode.Uri,
   ) {
-    this.agentManager = new QwenAgentManager();
+    this.agentManager = new HopCodeAgentManager();
     this.conversationStore = new ConversationStore(context);
     this.panelManager = new PanelManager(extensionUri, () => {
       // Panel dispose callback — unblock any pending ACP Promises
@@ -167,13 +167,13 @@ export class WebViewProvider {
     // The isSyncingToVSCode guard prevents a loop when we programmatically populate VSCode settings.
     const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(
       async (e) => {
-        const authSettingsChanged = AUTH_RELATED_QWEN_SETTINGS.some((setting) =>
-          e.affectsConfiguration(setting),
+        const authSettingsChanged = AUTH_RELATED_HOPCODE_SETTINGS.some(
+          (setting) => e.affectsConfiguration(setting),
         );
 
         if (authSettingsChanged && !this.isSyncingToVSCode) {
           console.log(
-            '[WebViewProvider] Auth-related qwen-code settings changed by user, syncing...',
+            '[WebViewProvider] Auth-related hopcode settings changed by user, syncing...',
           );
           const synced = await this.syncVSCodeSettingsToQwenConfig();
           if (synced && this.agentInitialized) {
@@ -194,14 +194,14 @@ export class WebViewProvider {
           } else if (
             !synced &&
             this.agentInitialized &&
-            e.affectsConfiguration('qwen-code.apiKey')
+            e.affectsConfiguration('hopcode.apiKey')
           ) {
-            // Only de-auth when qwen-code.apiKey itself was cleared.
+            // Only de-auth when hopcode.apiKey itself was cleared.
             // Other auth-related settings (provider, codingPlanRegion) returning
             // synced=false is normal for api-key providers — those are managed by
             // the interactive auth flow, not VS Code Settings sync.
             const apiKey = vscode.workspace
-              .getConfiguration('qwen-code')
+              .getConfiguration('hopcode')
               .get<string>('apiKey', '');
             if (!apiKey) {
               console.log(
@@ -409,7 +409,7 @@ export class WebViewProvider {
       this.handleAgentIdle();
     });
 
-    // Note: Tool call updates are handled in handleSessionUpdate within QwenAgentManager
+    // Note: Tool call updates are handled in handleSessionUpdate within HopCodeAgentManager
     // and sent via onStreamChunk callback
     this.agentManager.onToolCall((update) => {
       // Always surface tool calls; they are part of the live assistant flow.
@@ -891,7 +891,7 @@ export class WebViewProvider {
           ).trim();
           const panelRef = this.panelManager.getPanel();
           if (panelRef) {
-            panelRef.title = title ? truncatePanelTitle(title) : 'Qwen Code';
+            panelRef.title = title ? truncatePanelTitle(title) : 'HopCode';
           }
           return;
         }
@@ -1042,14 +1042,14 @@ export class WebViewProvider {
   }
 
   /**
-   * Sync VSCode extension settings (qwen-code.*) to ~/.qwen/settings.json
+   * Sync VSCode extension settings (hopcode.*) to ~/.qwen/settings.json
    * if an API key is configured. This enables auto-connect on startup
    * without requiring the user to click "Connect" each time.
    *
    * @returns true if settings were synced (apiKey is configured), false otherwise
    */
   private async syncVSCodeSettingsToQwenConfig(): Promise<boolean> {
-    const config = vscode.workspace.getConfiguration('qwen-code');
+    const config = vscode.workspace.getConfiguration('hopcode');
     const apiKey = config.get<string>('apiKey', '');
 
     if (!apiKey) {
@@ -1089,7 +1089,7 @@ export class WebViewProvider {
    */
   private async syncQwenConfigToVSCodeSettings(): Promise<void> {
     try {
-      const qwenSettings = readQwenSettingsForVSCode();
+      const qwenSettings = readHopcodeSettingsForVSCode();
       if (!qwenSettings) {
         return;
       }
@@ -1099,7 +1099,7 @@ export class WebViewProvider {
       );
 
       // Set guard to prevent onDidChangeConfiguration from triggering a write-back
-      const config = vscode.workspace.getConfiguration('qwen-code');
+      const config = vscode.workspace.getConfiguration('hopcode');
       const target = vscode.ConfigurationTarget.Global;
       const updates: Array<Thenable<void>> = [];
 
@@ -1791,7 +1791,7 @@ export class WebViewProvider {
 
   /** Update the tab-dot icon. Blue takes priority over orange. */
   private setTabDot(color: DotColor): void {
-    const config = vscode.workspace.getConfiguration('qwen-code');
+    const config = vscode.workspace.getConfiguration('hopcode');
     if (!config.get<boolean>('dotIndicator', true)) {
       return;
     }
@@ -1876,11 +1876,11 @@ export class WebViewProvider {
 
   /**
    * Show a VS Code notification with sound and a "Show" button that focuses
-   * the Qwen Code panel (or sidebar view) when clicked.
+   * the HopCode panel (or sidebar view) when clicked.
    */
   private notifyUser(message: string): void {
     void vscode.window
-      .showInformationMessage(`Qwen Code: ${message}`, 'Show')
+      .showInformationMessage(`HopCode: ${message}`, 'Show')
       .then((action) => {
         if (action === 'Show') {
           const panel = this.panelManager.getPanel();
@@ -1888,7 +1888,7 @@ export class WebViewProvider {
             panel.reveal();
           } else if (this.isViewHost) {
             // Sidebar / secondary bar — focus the view via its command.
-            void vscode.commands.executeCommand('qwen-code.focusChat');
+            void vscode.commands.executeCommand('hopcode.focusChat');
           }
         }
       });
@@ -1896,7 +1896,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Whether the user can currently see the Qwen Code panel.
+   * Whether the user can currently see the HopCode panel.
    * Only true when VS Code is the foreground app AND the panel tab is visible.
    * If either condition is false the user needs a notification.
    */
@@ -1907,10 +1907,10 @@ export class WebViewProvider {
     return windowFocused && panelVisible;
   }
 
-  /** Whether the qwen-code.notifications setting is enabled. */
+  /** Whether the hopcode.notifications setting is enabled. */
   private isNotificationsEnabled(): boolean {
     return vscode.workspace
-      .getConfiguration('qwen-code')
+      .getConfiguration('hopcode')
       .get<boolean>('notifications', true);
   }
 
@@ -2137,7 +2137,7 @@ export class WebViewProvider {
     // Ensure restored tab starts from default label and icon
     this.dotState = null;
     try {
-      panel.title = 'Qwen Code';
+      panel.title = 'HopCode';
       panel.iconPath = vscode.Uri.joinPath(
         this.extensionUri,
         'assets',
@@ -2167,7 +2167,7 @@ export class WebViewProvider {
           ).trim();
           const panelRef = this.panelManager.getPanel();
           if (panelRef) {
-            panelRef.title = title ? truncatePanelTitle(title) : 'Qwen Code';
+            panelRef.title = title ? truncatePanelTitle(title) : 'HopCode';
           }
           return;
         }

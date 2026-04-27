@@ -10,7 +10,7 @@ Qwen Code supports three authentication methods. Pick the one that matches how y
 
 > [!warning]
 >
-> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `qwen auth` to configure.
+> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `hopcode auth` to configure.
 
 - **How it works**: on first start, Qwen Code opens a browser login page. After you finish, credentials are cached locally so you usually won't need to log in again.
 - **Requirements**: a `qwen.ai` account + internet access (at least for the first login).
@@ -26,7 +26,7 @@ qwen
 Or authenticate directly without starting a session:
 
 ```bash
-qwen auth qwen-oauth
+hopcode auth qwen-oauth
 ```
 
 > [!note]
@@ -58,10 +58,10 @@ You can set up Coding Plan authentication in two ways:
 
 ```bash
 # Interactive — prompts for region and API key
-qwen auth coding-plan
+hopcode auth coding-plan
 
 # Or non-interactive — pass region and key directly
-qwen auth coding-plan --region china --key sk-sp-xxxxxxxxx
+hopcode auth coding-plan --region china --key sk-sp-xxxxxxxxx
 ```
 
 **Option B: Inside a Qwen Code session**
@@ -312,13 +312,13 @@ qwen --model "qwen3-coder-plus"
 qwen --model "qwen3.5-plus"
 ```
 
-## `qwen auth` CLI command
+## `hopcode auth` CLI command
 
-In addition to the in-session `/auth` slash command, Qwen Code provides a standalone `qwen auth` CLI command for managing authentication directly from the terminal — without starting an interactive session first.
+In addition to the in-session `/auth` slash command, Qwen Code provides a standalone `hopcode auth` CLI command for managing authentication directly from the terminal — without starting an interactive session first.
 
 ### Interactive mode
 
-Run `qwen auth` without arguments to get an interactive menu:
+Run `hopcode auth` without arguments to get an interactive menu:
 
 ```bash
 qwen auth
@@ -338,32 +338,32 @@ Select authentication method:
 
 ### Subcommands
 
-| Command                                              | Description                                       |
-| ---------------------------------------------------- | ------------------------------------------------- |
-| `qwen auth`                                          | Interactive authentication setup                  |
-| `qwen auth coding-plan`                              | Authenticate with Alibaba Cloud Coding Plan       |
-| `qwen auth coding-plan --region china --key sk-sp-…` | Non-interactive Coding Plan setup (for scripting) |
-| `qwen auth api-key`                                  | Authenticate with an API key                      |
-| `qwen auth qwen-oauth`                               | Authenticate with Qwen OAuth (discontinued)       |
-| `qwen auth status`                                   | Show current authentication status                |
+| Command                                                 | Description                                       |
+| ------------------------------------------------------- | ------------------------------------------------- |
+| `hopcode auth`                                          | Interactive authentication setup                  |
+| `hopcode auth coding-plan`                              | Authenticate with Alibaba Cloud Coding Plan       |
+| `hopcode auth coding-plan --region china --key sk-sp-…` | Non-interactive Coding Plan setup (for scripting) |
+| `hopcode auth api-key`                                  | Authenticate with an API key                      |
+| `hopcode auth qwen-oauth`                               | Authenticate with Qwen OAuth (discontinued)       |
+| `hopcode auth status`                                   | Show current authentication status                |
 
 **Examples:**
 
 ```bash
 # Authenticate with Qwen OAuth directly
-qwen auth qwen-oauth
+hopcode auth qwen-oauth
 
 # Set up Coding Plan interactively (prompts for region and key)
-qwen auth coding-plan
+hopcode auth coding-plan
 
 # Set up Coding Plan non-interactively (useful for CI/scripting)
-qwen auth coding-plan --region china --key sk-sp-xxxxxxxxx
+hopcode auth coding-plan --region china --key sk-sp-xxxxxxxxx
 
 # Set up API key (ModelStudio Standard or custom provider)
-qwen auth api-key
+hopcode auth api-key
 
 # Check your current auth configuration
-qwen auth status
+hopcode auth status
 ```
 
 ## Security notes

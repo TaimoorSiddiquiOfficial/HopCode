@@ -30,7 +30,7 @@ const {
   askUserQuestionCallbackRef,
   mockShowInformationMessage,
   mockWindowState,
-  mockQwenAgentManagerInstances,
+  mockHopCodeAgentManagerInstances,
 } = vi.hoisted(() => ({
   mockConfigChangeHandlers: [] as Array<
     (event: { affectsConfiguration: (section: string) => boolean }) => unknown
@@ -104,7 +104,7 @@ const {
     (message: string, ...items: string[]) => Thenable<string | undefined>
   >(() => Promise.resolve(undefined)),
   mockWindowState: { focused: true },
-  mockQwenAgentManagerInstances: [] as Array<{
+  mockHopCodeAgentManagerInstances: [] as Array<{
     permissionRequestCallback?: (request: unknown) => Promise<string>;
     cancelCurrentPrompt: ReturnType<typeof vi.fn>;
     disconnect: ReturnType<typeof vi.fn>;
@@ -163,8 +163,8 @@ vi.mock('../../services/settingsWriter.js', () => ({
   clearPersistedAuth: mockClearPersistedAuth,
 }));
 
-vi.mock('../../services/qwenAgentManager.js', () => ({
-  QwenAgentManager: class {
+vi.mock('../../services/HopCodeAgentManager.js', () => ({
+  HopCodeAgentManager: class {
     isConnected = false;
     currentSessionId = null;
     connect = vi.fn();
@@ -224,7 +224,7 @@ vi.mock('../../services/qwenAgentManager.js', () => ({
     cancelCurrentPrompt = vi.fn();
     disconnect = vi.fn();
     constructor() {
-      mockQwenAgentManagerInstances.push(this);
+      mockHopCodeAgentManagerInstances.push(this);
     }
   },
 }));
@@ -380,7 +380,7 @@ async function setupAttachedProvider(options?: {
       onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
       onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
     } as never,
-    'qwen-code.chatView.sidebar',
+    'hopcode.chatView.sidebar',
   );
 
   return { webview, postMessage, provider, messageHandler };
@@ -401,7 +401,7 @@ describe('WebViewProvider.attachToView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockMessageHandlerInstances.length = 0;
-    mockQwenAgentManagerInstances.length = 0;
+    mockHopCodeAgentManagerInstances.length = 0;
     mockGetPanel.mockReturnValue(null);
     mockConfigGet.mockImplementation(
       (_key: string, defaultValue: unknown) => defaultValue,
@@ -457,7 +457,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'hopcode.chatView.sidebar',
     );
 
     const roots = (
@@ -686,7 +686,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'hopcode.chatView.sidebar',
     );
 
     await messageHandler?.({
@@ -733,10 +733,10 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'hopcode.chatView.sidebar',
     );
 
-    const agentManager = mockQwenAgentManagerInstances.at(-1);
+    const agentManager = mockHopCodeAgentManagerInstances.at(-1);
     const messageHandler = mockMessageHandlerInstances.at(-1);
 
     expect(agentManager?.permissionRequestCallback).toBeTypeOf('function');
@@ -822,7 +822,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'hopcode.chatView.sidebar',
     );
 
     const agentManager = (
@@ -888,7 +888,7 @@ describe('WebViewProvider.attachToView', () => {
         onDidChangeVisibility: vi.fn(() => ({ dispose: vi.fn() })),
         onDidDispose: vi.fn(() => ({ dispose: vi.fn() })),
       } as never,
-      'qwen-code.chatView.sidebar',
+      'hopcode.chatView.sidebar',
     );
 
     const agentManager = (
@@ -1049,7 +1049,7 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.apiKey'),
+      createConfigChangeEvent('qwen-code', 'hopcode.apiKey'),
     );
 
     expect(syncSpy).toHaveBeenCalledTimes(1);
@@ -1085,14 +1085,14 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.apiKey'),
+      createConfigChangeEvent('qwen-code', 'hopcode.apiKey'),
     );
 
     // Should clear persisted auth
     expect(mockClearPersistedAuth).toHaveBeenCalledTimes(1);
 
     // Should disconnect the agent
-    const agentManager = mockQwenAgentManagerInstances.at(-1);
+    const agentManager = mockHopCodeAgentManagerInstances.at(-1);
     expect(agentManager?.disconnect).toHaveBeenCalledTimes(1);
 
     // agentInitialized should be reset
@@ -1135,12 +1135,12 @@ describe('WebViewProvider settings sync', () => {
 
     // Changing codingPlanRegion should NOT trigger de-auth
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'qwen-code.codingPlanRegion'),
+      createConfigChangeEvent('qwen-code', 'hopcode.codingPlanRegion'),
     );
 
     expect(mockClearPersistedAuth).not.toHaveBeenCalled();
 
-    const agentManager = mockQwenAgentManagerInstances.at(-1);
+    const agentManager = mockHopCodeAgentManagerInstances.at(-1);
     expect(agentManager?.disconnect).not.toHaveBeenCalled();
 
     // agentInitialized should remain true
