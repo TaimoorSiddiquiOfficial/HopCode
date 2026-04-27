@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "HopCode settings configuration",
+  "description": "Qwen Code settings configuration",
   "properties": {
     "mcpServers": {
       "description": "Configuration for MCP servers.",
@@ -62,7 +62,7 @@
           "default": 5
         },
         "gitCoAuthor": {
-          "description": "Automatically add a Co-authored-by trailer to git commit messages when commits are made through HopCode.",
+          "description": "Automatically add a Co-authored-by trailer to git commit messages when commits are made through Qwen Code.",
           "type": "boolean",
           "default": true
         },
@@ -83,16 +83,18 @@
           "default": false
         },
         "language": {
-          "description": "The language for the user interface. Use \"auto\" to detect from system settings. You can also use custom language codes (e.g., \"es\", \"fr\") by placing JS language files in ~/.hopcode/locales/ (e.g., ~/.hopcode/locales/es.js). Options: auto, en, zh, ru, de, ja, pt, fr",
+          "description": "The language for the user interface. Use \"auto\" to detect from system settings. You can also use custom language codes (e.g., \"es\", \"fr\") by placing JS language files in ~/.qwen/locales/ (e.g., ~/.qwen/locales/es.js). Options: auto, en, zh-TW, zh, ru, de, ja, pt, fr, ca",
           "enum": [
             "auto",
             "en",
+            "zh-TW",
             "zh",
             "ru",
             "de",
             "ja",
             "pt",
-            "fr"
+            "fr",
+            "ca"
           ],
           "default": "auto"
         },
@@ -174,7 +176,7 @@
           "default": false
         },
         "showStatusInTitle": {
-          "description": "Show HopCode status and thoughts in the terminal window title",
+          "description": "Show Qwen Code status and thoughts in the terminal window title",
           "type": "boolean",
           "default": false
         },
@@ -366,7 +368,7 @@
               "default": "auto"
             },
             "contextWindowSize": {
-              "description": "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from HopCode's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
+              "description": "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from Qwen Code's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
               "type": "number"
             }
           }
@@ -402,11 +404,6 @@
           "description": "Settings for clearing stale context after idle periods. Use -1 to disable a threshold.",
           "type": "object",
           "properties": {
-            "thinkingThresholdMinutes": {
-              "description": "Minutes of inactivity before clearing old thinking blocks. Use -1 to disable.",
-              "type": "number",
-              "default": 5
-            },
             "toolResultsThresholdMinutes": {
               "description": "Minutes of inactivity before clearing old tool result content. Use -1 to disable.",
               "type": "number",
@@ -428,8 +425,8 @@
               "type": "boolean",
               "default": true
             },
-            "respectHopCodeIgnore": {
-              "description": "Respect .hopcodeignore files when searching",
+            "respectQwenIgnore": {
+              "description": "Respect .qwenignore files when searching",
               "type": "boolean",
               "default": true
             },
@@ -513,7 +510,7 @@
           "additionalProperties": true
         },
         "sandboxImage": {
-          "description": "Sandbox image URI used by Docker/Podman when --sandbox-image and HOPCODE_SANDBOX_IMAGE are not set.",
+          "description": "Sandbox image URI used by Docker/Podman when --sandbox-image and QWEN_SANDBOX_IMAGE are not set.",
           "type": "string"
         },
         "shell": {
@@ -708,24 +705,10 @@
           "additionalProperties": true
         },
         "runtimeOutputDir": {
-          "description": "Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). Config files remain at ~/.hopcode. Env var HOPCODE_RUNTIME_DIR takes priority.",
-          "type": "string"
-        },
-        "tavilyApiKey": {
-          "description": "⚠️ DEPRECATED: Please use webSearch.provider configuration instead. Legacy API key for the Tavily API.",
+          "description": "Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). Config files remain at ~/.qwen. Env var QWEN_RUNTIME_DIR takes priority.",
           "type": "string"
         }
       }
-    },
-    "webSearch": {
-      "description": "Configuration for web search providers. Supports: tavily, google, dashscope, duckduckgo, exa, bing, jina, firecrawl, custom. Set mode=\"auto\" for failover chain.",
-      "type": "object",
-      "additionalProperties": true
-    },
-    "agentModels": {
-      "description": "Per-agent model overrides. String form: \"modelId\" or \"authType::modelId\". Object form: {\"model\": \"...\", \"baseUrl\": \"...\", \"apiKey\": \"...\"}. Use \"inherit\" to use the parent model.",
-      "type": "object",
-      "additionalProperties": true
     },
     "agents": {
       "description": "Settings for multi-agent collaboration features (Arena, Team, Swarm).",
@@ -742,7 +725,7 @@
           "type": "object",
           "properties": {
             "worktreeBaseDir": {
-              "description": "Custom base directory for Arena worktrees. Defaults to ~/.hopcode/arena.",
+              "description": "Custom base directory for Arena worktrees. Defaults to ~/.qwen/arena.",
               "type": "string"
             },
             "preserveArtifacts": {
@@ -2024,7 +2007,7 @@
       "type": "object",
       "properties": {
         "cron": {
-          "description": "Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via HOPCODE_ENABLE_CRON=1 environment variable.",
+          "description": "Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via QWEN_CODE_ENABLE_CRON=1 environment variable.",
           "type": "boolean",
           "default": false
         }

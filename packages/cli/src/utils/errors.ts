@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@qwen-code/qwen-code-core';
 import {
   OutputFormat,
   JsonFormatter,
@@ -13,7 +13,7 @@ import {
   FatalCancellationError,
   ToolErrorType,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import { runExitCleanup } from './cleanup.js';
 import { writeStderrLine } from './stdioHelpers.js';
 
@@ -82,21 +82,31 @@ function getNumericExitCode(errorCode: string | number): number {
   return typeof errorCode === 'number' ? errorCode : 1;
 }
 
-// Guards against double-entry when two terminating paths race. Only the first
-// caller drains cleanup and exits; later callers park until the process exits.
+/**
+ * Drains pending cleanup before terminating. Routing every "we're about
+ * to die" path through here keeps async exit-side I/O (chat-recording
+ * flush, telemetry shutdown, MCP disconnect) from being skipped — the
+ * earlier sync writes were inherently bounded so a bare `process.exit`
+ * was safe; with the async-jsonl change it is not.
+ */
+// Guards against double-entry when two terminating paths race (e.g. SIGINT
+// fires `handleCancellationError` while a stream rejection routes through
+// `handleError`): only the first caller drains cleanup + exits; the second
+// suspends forever in the unresolved promise and gets killed when the first
+// caller's process.exit fires.
 let exiting = false;
 
 async function exitAfterCleanup(code: number): Promise<never> {
-  if (exiting) {
-    return new Promise<never>(() => {});
-  }
-
+  if (exiting) return new Promise<never>(() => {});
   exiting = true;
   await runExitCleanup();
+  // `return` so process.exit's `never` narrows the function's terminating
+  // statement — without it TS reports "function returning 'never' cannot
+  // have a reachable end point" because await doesn't propagate `never`.
   return process.exit(code);
 }
 
-/** @internal test hook */
+/** Test-only — reset the exit-once latch between cases. */
 export function _resetExitLatchForTest(): void {
   exiting = false;
 }
@@ -129,6 +139,8 @@ export async function handleError(
     return exitAfterCleanup(getNumericExitCode(errorCode));
   } else {
     writeStderrLine(errorMessage);
+    // Drain queued writes before re-throwing so the unhandled rejection
+    // path doesn't lose chat-recording records that are still in the queue.
     await runExitCleanup();
     throw error;
   }
@@ -164,7 +176,7 @@ export function handleToolError(
     const warningMessage =
       `Warning: Tool "${toolName}" requires user approval but cannot execute in non-interactive mode.\n` +
       `To enable automatic tool execution, use the -y flag (YOLO mode):\n` +
-      `Example: hopcode -p 'your prompt' -y\n\n`;
+      `Example: qwen -p 'your prompt' -y\n\n`;
     process.stderr.write(warningMessage);
   }
 
@@ -190,7 +202,6 @@ export async function handleCancellationError(config: Config): Promise<never> {
   } else {
     writeStderrLine(cancellationError.message);
   }
-
   return exitAfterCleanup(cancellationError.exitCode);
 }
 
@@ -215,6 +226,5 @@ export async function handleMaxTurnsExceededError(
   } else {
     writeStderrLine(maxTurnsError.message);
   }
-
   return exitAfterCleanup(maxTurnsError.exitCode);
 }

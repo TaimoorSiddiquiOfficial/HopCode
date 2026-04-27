@@ -15,13 +15,14 @@ import { SettingInputPrompt } from './SettingInputPrompt.js';
 import { PluginChoicePrompt } from './PluginChoicePrompt.js';
 import { ThemeDialog } from './ThemeDialog.js';
 import { SettingsDialog } from './SettingsDialog.js';
-import { HopCodeOAuthProgress } from './HopCodeOAuthProgress.js';
+import { QwenOAuthProgress } from './QwenOAuthProgress.js';
+import { ExternalAuthProgress } from './ExternalAuthProgress.js';
 import { AuthDialog } from '../auth/AuthDialog.js';
 import { EditorSettingsDialog } from './EditorSettingsDialog.js';
 import { TrustDialog } from './TrustDialog.js';
 import { PermissionsDialog } from './PermissionsDialog.js';
 import { ModelDialog } from './ModelDialog.js';
-import { ProviderDialog } from './ProviderDialog.js';
+import { ManageModelsDialog } from './ManageModelsDialog.js';
 import { ArenaStartDialog } from './arena/ArenaStartDialog.js';
 import { ArenaSelectDialog } from './arena/ArenaSelectDialog.js';
 import { ArenaStopDialog } from './arena/ArenaStopDialog.js';
@@ -33,7 +34,7 @@ import { useUIActions } from '../contexts/UIActionsContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { AuthState } from '../types.js';
-import { AuthType } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@qwen-code/qwen-code-core';
 import process from 'node:process';
 import { type UseHistoryManagerReturn } from '../hooks/useHistoryManager.js';
 import { IdeTrustChangeDialog } from './IdeTrustChangeDialog.js';
@@ -44,6 +45,7 @@ import { ExtensionsManagerDialog } from './extensions/ExtensionsManagerDialog.js
 import { MCPManagementDialog } from './mcp/MCPManagementDialog.js';
 import { HooksManagementDialog } from './hooks/HooksManagementDialog.js';
 import { SessionPicker } from './SessionPicker.js';
+import { RewindSelector } from './RewindSelector.js';
 import { MemoryDialog } from './MemoryDialog.js';
 import { t } from '../../i18n/index.js';
 
@@ -205,14 +207,19 @@ export const DialogManager = ({
       </Box>
     );
   }
-  if (uiState.isProviderDialogOpen) {
-    return <ProviderDialog onClose={uiActions.closeProviderDialog} />;
-  }
   if (uiState.isModelDialogOpen) {
     return (
       <ModelDialog
         onClose={uiActions.closeModelDialog}
         isFastModelMode={uiState.isFastModelMode}
+      />
+    );
+  }
+  if (uiState.isManageModelsDialogOpen) {
+    return (
+      <ManageModelsDialog
+        config={config}
+        onClose={uiActions.closeManageModelsDialog}
       />
     );
   }
@@ -313,16 +320,33 @@ export const DialogManager = ({
   }
 
   if (uiState.isAuthenticating) {
-    // OpenAI authentication now handled through AuthDialog with coding-plan/custom sub-modes
-    // HopCode OAuth remains as a separate flow
-    if (uiState.pendingAuthType === AuthType.HOPCODE_OAUTH) {
+    if (
+      uiState.pendingAuthType === AuthType.USE_OPENAI &&
+      uiState.externalAuthState
+    ) {
       return (
-        <HopCodeOAuthProgress
-          deviceAuth={uiState.hopCodeAuthState.deviceAuth || undefined}
-          authStatus={uiState.hopCodeAuthState.authStatus}
-          authMessage={uiState.hopCodeAuthState.authMessage}
+        <ExternalAuthProgress
+          title={uiState.externalAuthState.title}
+          message={uiState.externalAuthState.message}
+          detail={uiState.externalAuthState.detail}
+          onCancel={() => {
+            uiActions.cancelAuthentication();
+            uiActions.setAuthState(AuthState.Updating);
+          }}
+        />
+      );
+    }
+
+    // OpenAI authentication now handled through AuthDialog with coding-plan/custom sub-modes
+    // Qwen OAuth remains as a separate flow
+    if (uiState.pendingAuthType === AuthType.QWEN_OAUTH) {
+      return (
+        <QwenOAuthProgress
+          deviceAuth={uiState.qwenAuthState.deviceAuth || undefined}
+          authStatus={uiState.qwenAuthState.authStatus}
+          authMessage={uiState.qwenAuthState.authMessage}
           onTimeout={() => {
-            uiActions.onAuthError('HopCode OAuth authentication timed out.');
+            uiActions.onAuthError('Qwen OAuth authentication timed out.');
             uiActions.cancelAuthentication();
             uiActions.setAuthState(AuthState.Updating);
           }}
@@ -385,6 +409,7 @@ export const DialogManager = ({
         onSelect={uiActions.handleResume}
         onCancel={uiActions.closeResumeDialog}
         initialSessions={uiState.resumeMatchedSessions}
+        enablePreview
       />
     );
   }
@@ -397,6 +422,16 @@ export const DialogManager = ({
         onSelect={uiActions.handleDelete}
         onCancel={uiActions.closeDeleteDialog}
         title={t('Delete Session')}
+      />
+    );
+  }
+
+  if (uiState.isRewindSelectorOpen) {
+    return (
+      <RewindSelector
+        history={uiState.history}
+        onRewind={uiActions.handleRewindConfirm}
+        onCancel={uiActions.closeRewindSelector}
       />
     );
   }

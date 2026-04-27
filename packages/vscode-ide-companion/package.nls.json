@@ -1,5 +1,5 @@
 {
-  "hopcode.copyMessage.title": "Copy Message",
-  "hopcode.copyAllMessages.title": "Copy All Messages",
-  "hopcode.copyLastReply.title": "Copy Last Reply"
+  "qwen-code.copyMessage.title": "Copy Message",
+  "qwen-code.copyAllMessages.title": "Copy All Messages",
+  "qwen-code.copyLastReply.title": "Copy Last Reply"
 }

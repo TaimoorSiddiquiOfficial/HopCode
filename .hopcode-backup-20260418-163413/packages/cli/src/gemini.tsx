@@ -8,7 +8,9 @@ import {
   AuthType,
   InputFormat,
   isDebugLoggingDegraded,
+  isBareMode,
   logUserPrompt,
+  QWEN_CODE_SIMPLE_ENV_VAR,
   Storage,
   SessionService,
   type Config,
@@ -24,7 +26,11 @@ import { validateAuthMethod } from './config/auth.js';
 import * as cliConfig from './config/config.js';
 import { loadCliConfig, parseArguments } from './config/config.js';
 import type { DnsResolutionOrder, LoadedSettings } from './config/settings.js';
-import { getSettingsWarnings, loadSettings } from './config/settings.js';
+import {
+  createMinimalSettings,
+  getSettingsWarnings,
+  loadSettings,
+} from './config/settings.js';
 import {
   initializeApp,
   type InitializationResult,
@@ -40,7 +46,10 @@ import { VimModeProvider } from './ui/contexts/VimModeContext.js';
 import { AgentViewProvider } from './ui/contexts/AgentViewContext.js';
 import { useKittyKeyboardProtocol } from './ui/hooks/useKittyKeyboardProtocol.js';
 import { themeManager, AUTO_THEME_NAME } from './ui/themes/theme-manager.js';
-import { detectAndEnableKittyProtocol } from './ui/utils/kittyProtocolDetector.js';
+import {
+  detectAndEnableKittyProtocol,
+  disableKittyProtocol,
+} from './ui/utils/kittyProtocolDetector.js';
 import { checkForUpdates } from './ui/utils/updateCheck.js';
 import {
   cleanupCheckpoints,
@@ -64,6 +73,11 @@ import { getUserStartupWarnings } from './utils/userStartupWarnings.js';
 import { getCliVersion } from './utils/version.js';
 import { writeStderrLine } from './utils/stdioHelpers.js';
 import { computeWindowTitle } from './utils/windowTitle.js';
+import {
+  startEarlyInputCapture,
+  stopAndGetCapturedInput,
+} from './utils/earlyInputCapture.js';
+import { preconnectApi } from './utils/apiPreconnect.js';
 import { validateNonInteractiveAuth } from './validateNonInterActiveAuth.js';
 import { showResumeSessionPicker } from './ui/components/StandaloneSessionPicker.js';
 import { initializeLlmOutputLanguage } from './utils/languageUtils.js';
@@ -72,6 +86,7 @@ import { DualOutputContext } from './dualOutput/DualOutputContext.js';
 import { RemoteInputWatcher } from './remoteInput/RemoteInputWatcher.js';
 import { RemoteInputContext } from './remoteInput/RemoteInputContext.js';
 import { installTerminalRedrawOptimizer } from './ui/utils/terminalRedrawOptimizer.js';
+import { installSynchronizedOutput } from './ui/utils/synchronizedOutput.js';
 
 const debugLogger = createDebugLogger('STARTUP');
 
@@ -161,6 +176,10 @@ export async function startInteractiveUI(
     process.stdout.isTTY && !config.getScreenReader()
       ? installTerminalRedrawOptimizer(process.stdout)
       : () => {};
+  const restoreSynchronizedOutput =
+    process.stdout.isTTY && !config.getScreenReader()
+      ? installSynchronizedOutput(process.stdout)
+      : () => {};
 
   // Create dual output bridge if --json-fd or --json-file is specified.
   // Errors are caught so a bad fd/path degrades gracefully instead of
@@ -205,6 +224,11 @@ export async function startInteractiveUI(
     }
   }
 
+  // Drain the early-captured input exactly once, before any React rendering.
+  // Must be outside any component/effect so StrictMode's mount/cleanup/remount
+  // always reads from the same stable prop rather than the (now empty) module buffer.
+  const initialCapturedInput = stopAndGetCapturedInput();
+
   // Create wrapper component to use hooks inside render
   const AppWrapper = () => {
     const kittyProtocolStatus = useKittyKeyboardProtocol();
@@ -222,6 +246,7 @@ export async function startInteractiveUI(
               pasteWorkaround={
                 process.platform === 'win32' || nodeMajorVersion < 20
               }
+              initialCapturedInput={initialCapturedInput}
             >
               <SessionStatsProvider sessionId={config.getSessionId()}>
                 <VimModeProvider settings={settings}>
@@ -273,7 +298,12 @@ export async function startInteractiveUI(
   registerCleanup(async () => {
     remoteInputWatcher?.shutdown();
     await dualOutputBridge?.shutdown();
+    // Explicitly disable the Kitty keyboard protocol before unmounting Ink so
+    // that the disable escape sequence is written while stdout is still fully
+    // operational, preventing garbled terminal output after the app exits.
+    disableKittyProtocol();
     instance.unmount();
+    restoreSynchronizedOutput();
     restoreTerminalRedrawOptimizer();
   });
 }
@@ -281,12 +311,23 @@ export async function startInteractiveUI(
 export async function main() {
   profileCheckpoint('main_entry');
   setupUnhandledRejectionHandler();
-  const settings = loadSettings();
-  await cleanupCheckpoints();
-  profileCheckpoint('after_load_settings');
+
+  if (process.argv.includes('--bare')) {
+    process.env[QWEN_CODE_SIMPLE_ENV_VAR] = '1';
+  }
 
   let argv = await parseArguments();
   profileCheckpoint('after_parse_arguments');
+
+  if (isBareMode(argv.bare)) {
+    process.env[QWEN_CODE_SIMPLE_ENV_VAR] = '1';
+  }
+
+  const settings = isBareMode(argv.bare)
+    ? createMinimalSettings()
+    : loadSettings();
+  await cleanupCheckpoints();
+  profileCheckpoint('after_load_settings');
 
   // Check for invalid input combinations early to prevent crashes
   if (argv.promptInteractive && !process.stdin.isTTY) {
@@ -466,7 +507,9 @@ export async function main() {
   profileCheckpoint('after_sandbox_check');
 
   // Initialize output language file before config loads to ensure it's included in context
-  initializeLlmOutputLanguage(settings.merged.general?.outputLanguage);
+  if (!isBareMode(argv.bare)) {
+    initializeLlmOutputLanguage(settings.merged.general?.outputLanguage);
+  }
 
   {
     const config = await loadCliConfig(
@@ -486,6 +529,21 @@ export async function main() {
     // This ensures MCP server subprocesses are properly terminated on exit
     registerCleanup(() => config.shutdown());
 
+    // Startup optimization: preconnect API to warm TCP+TLS connection
+    // Fires early; cost is one HEAD request even for local-only commands
+    try {
+      const modelsConfig = config.getModelsConfig();
+      const authType = modelsConfig.getCurrentAuthType();
+      const resolvedBaseUrl = modelsConfig.getGenerationConfig().baseUrl;
+      const proxy = config.getProxy();
+      preconnectApi(authType, { resolvedBaseUrl, proxy });
+    } catch (error) {
+      // If we can't get authType, skip preconnect - it's optional optimization
+      debugLogger.debug(
+        `Preconnect skipped due to error getting authType: ${error}`,
+      );
+    }
+
     // FIXME: list extensions after the config initialize
     // if (config.getListExtensions()) {
     //   console.log('Installed extensions:');
@@ -502,6 +560,11 @@ export async function main() {
       // Set this as early as possible to avoid spurious characters from
       // input showing up in the output.
       process.stdin.setRawMode(true);
+
+      // Startup optimization: start early input capture
+      startEarlyInputCapture();
+      // Ensure the stdin listener is removed on any exit path (error, signal, etc.)
+      registerCleanup(() => stopAndGetCapturedInput());
 
       // This cleanup isn't strictly needed but may help in certain situations.
       process.on('SIGTERM', () => {

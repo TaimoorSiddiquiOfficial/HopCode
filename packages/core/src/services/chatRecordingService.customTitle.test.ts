@@ -28,12 +28,6 @@ vi.mock('node:crypto', () => ({
 }));
 vi.mock('../utils/jsonl-utils.js');
 
-function writtenRecords(): ChatRecord[] {
-  return vi
-    .mocked(jsonl.writeLine)
-    .mock.calls.map((call) => call[1] as ChatRecord);
-}
-
 describe('ChatRecordingService - recordCustomTitle', () => {
   let chatRecordingService: ChatRecordingService;
   let mockConfig: Config;
@@ -50,10 +44,10 @@ describe('ChatRecordingService - recordCustomTitle', () => {
       storage: {
         getProjectTempDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.hopcode/tmp/hash'),
+          .mockReturnValue('/test/project/root/.qwen/tmp/hash'),
         getProjectDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.hopcode/projects/test-project'),
+          .mockReturnValue('/test/project/root/.qwen/projects/test-project'),
       },
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getFastModel: vi.fn().mockReturnValue(undefined),
@@ -85,6 +79,8 @@ describe('ChatRecordingService - recordCustomTitle', () => {
     vi.spyOn(fs, 'existsSync').mockReturnValue(false);
 
     chatRecordingService = new ChatRecordingService(mockConfig);
+
+    // writeLine is async; mockResolvedValue lets the writeChain settle on flush.
     vi.mocked(jsonl.writeLine).mockResolvedValue(undefined);
   });
 
@@ -98,7 +94,8 @@ describe('ChatRecordingService - recordCustomTitle', () => {
 
     expect(jsonl.writeLine).toHaveBeenCalledOnce();
 
-    const writtenRecord = writtenRecords()[0];
+    const writtenRecord = vi.mocked(jsonl.writeLine).mock
+      .calls[0][1] as ChatRecord;
     expect(writtenRecord.type).toBe('system');
     expect(writtenRecord.subtype).toBe('custom_title');
     expect(writtenRecord.systemPayload).toEqual({
@@ -115,7 +112,10 @@ describe('ChatRecordingService - recordCustomTitle', () => {
 
     expect(jsonl.writeLine).toHaveBeenCalledTimes(2);
 
-    const [userRecord, titleRecord] = writtenRecords();
+    const userRecord = vi.mocked(jsonl.writeLine).mock
+      .calls[0][1] as ChatRecord;
+    const titleRecord = vi.mocked(jsonl.writeLine).mock
+      .calls[1][1] as ChatRecord;
 
     expect(titleRecord.parentUuid).toBe(userRecord.uuid);
   });
@@ -124,7 +124,8 @@ describe('ChatRecordingService - recordCustomTitle', () => {
     chatRecordingService.recordCustomTitle('test-title');
     await chatRecordingService.flush();
 
-    const writtenRecord = writtenRecords()[0];
+    const writtenRecord = vi.mocked(jsonl.writeLine).mock
+      .calls[0][1] as ChatRecord;
 
     expect(writtenRecord.cwd).toBe('/test/project/root');
     expect(writtenRecord.version).toBe('1.0.0');
@@ -143,7 +144,7 @@ describe('ChatRecordingService - recordCustomTitle', () => {
       await chatRecordingService.flush();
 
       expect(jsonl.writeLine).toHaveBeenCalledOnce();
-      const record = writtenRecords()[0];
+      const record = vi.mocked(jsonl.writeLine).mock.calls[0][1] as ChatRecord;
       expect(record.type).toBe('system');
       expect(record.subtype).toBe('custom_title');
       expect(record.systemPayload).toEqual({
@@ -169,7 +170,7 @@ describe('ChatRecordingService - recordCustomTitle', () => {
       await chatRecordingService.flush();
 
       expect(jsonl.writeLine).toHaveBeenCalledOnce();
-      const record = writtenRecords()[0];
+      const record = vi.mocked(jsonl.writeLine).mock.calls[0][1] as ChatRecord;
       expect(record.systemPayload).toEqual({
         customTitle: 'second-name',
         titleSource: 'manual',

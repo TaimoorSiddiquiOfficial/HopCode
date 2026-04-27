@@ -11,16 +11,33 @@ import * as crypto from 'node:crypto';
 import type { Config } from '../config/config.js';
 import { isNodeError } from './errors.js';
 
-export const HOPCODE_DIR = '.hopcode';
+export const QWEN_DIR = '.qwen';
 export const GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json';
 
 /**
- * Bounded cache for validatePath's isDirectory checks.
- * Caches positive and negative stat results, but not ENOENT/errors, so newly
- * created files and directories are still picked up immediately.
+ * Cache for `validatePath`'s isDirectory check. Only positive results are
+ * cached — ENOENT and other errors fall through every time so a freshly
+ * created file is picked up immediately. Same path validated by back-to-back
+ * tool calls (very common: model reads several files in one dir) used to
+ * cost one syscall each.
+ *
+ * **Known tradeoff:** if a path is deleted and recreated as a different
+ * type (dir→file or file→dir) within the same process, the cache returns
+ * the stale type. The downstream tool will then hit a meaningful error
+ * (e.g., "not a directory") instead of a clean "does not exist", but no
+ * files are corrupted. This is rare enough in model-driven workflows that
+ * we accept the staleness for the common-case perf win.
  */
-const VALIDATE_PATH_CACHE = new Map<string, boolean>();
-const MAX_VALIDATE_PATH_CACHE_SIZE = 1024;
+const isDirectoryCache = new Map<string, boolean>();
+const VALIDATE_PATH_CACHE_MAX = 1024;
+
+/**
+ * Test-only: clear the validatePath stat cache. Module-level state would
+ * otherwise leak across vitest cases — `beforeEach(() => _resetValidatePathCacheForTest())`.
+ */
+export function _resetValidatePathCacheForTest(): void {
+  isDirectoryCache.clear();
+}
 
 /**
  * Special characters that need to be escaped in file paths for shell compatibility.
@@ -322,7 +339,7 @@ export function validatePath(
     return;
   }
 
-  let isDirectory = VALIDATE_PATH_CACHE.get(resolvedPath);
+  let isDirectory = isDirectoryCache.get(resolvedPath);
   if (isDirectory === undefined) {
     try {
       isDirectory = fs.statSync(resolvedPath).isDirectory();
@@ -332,16 +349,12 @@ export function validatePath(
       }
       throw error;
     }
-
-    if (VALIDATE_PATH_CACHE.size >= MAX_VALIDATE_PATH_CACHE_SIZE) {
-      const firstKey = VALIDATE_PATH_CACHE.keys().next().value;
-      if (firstKey !== undefined) {
-        VALIDATE_PATH_CACHE.delete(firstKey);
-      }
+    if (isDirectoryCache.size >= VALIDATE_PATH_CACHE_MAX) {
+      const oldest = isDirectoryCache.keys().next().value;
+      if (oldest !== undefined) isDirectoryCache.delete(oldest);
     }
-    VALIDATE_PATH_CACHE.set(resolvedPath, isDirectory);
+    isDirectoryCache.set(resolvedPath, isDirectory);
   }
-
   if (!allowFiles && !isDirectory) {
     throw new Error(`Path is not a directory: ${resolvedPath}`);
   }
@@ -369,20 +382,4 @@ export function resolveAndValidatePath(
   const resolvedPath = resolvePath(targetDir, relativePath);
   validatePath(config, resolvedPath, options);
   return resolvedPath;
-}
-
-/**
- * Resets the isDirectory cache for testing.
- * @internal
- */
-export function _resetIsDirectoryCacheForTest(): void {
-  VALIDATE_PATH_CACHE.clear();
-}
-
-/**
- * Resets the validatePath cache for testing.
- * @internal
- */
-export function _resetValidatePathCacheForTest(): void {
-  VALIDATE_PATH_CACHE.clear();
 }

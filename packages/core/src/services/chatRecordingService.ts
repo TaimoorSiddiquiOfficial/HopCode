@@ -38,7 +38,7 @@ const AUTO_TITLE_ATTEMPT_CAP = 3;
 
 /**
  * Users who don't want the fast model silently generating titles can opt
- * out at runtime: `HOPCODE_DISABLE_AUTO_TITLE=1` (or any truthy-ish value)
+ * out at runtime: `QWEN_DISABLE_AUTO_TITLE=1` (or any truthy-ish value)
  * makes {@link ChatRecordingService.maybeTriggerAutoTitle} a no-op without
  * touching the rest of the feature (so `/rename --auto` still works on
  * explicit user request). Read per-call rather than cached so tests can
@@ -46,7 +46,7 @@ const AUTO_TITLE_ATTEMPT_CAP = 3;
  * one env lookup per assistant turn is irrelevant next to an LLM call.
  */
 function autoTitleDisabledByEnv(): boolean {
-  const v = process.env['HOPCODE_DISABLE_AUTO_TITLE'];
+  const v = process.env['QWEN_DISABLE_AUTO_TITLE'];
   if (!v) return false;
   // Accept "0", "false", "no", "off" (case-insensitive) as "not disabled".
   const lowered = v.trim().toLowerCase();
@@ -91,7 +91,8 @@ export interface ChatRecord {
     | 'at_command'
     | 'notification'
     | 'cron'
-    | 'custom_title';
+    | 'custom_title'
+    | 'rewind';
   /** Working directory at time of message */
   cwd: string;
   /** CLI version for compatibility tracking */
@@ -133,7 +134,8 @@ export interface ChatRecord {
     | UiTelemetryRecordPayload
     | AtCommandRecordPayload
     | CustomTitleRecordPayload
-    | NotificationRecordPayload;
+    | NotificationRecordPayload
+    | RewindRecordPayload;
 }
 
 export interface NotificationRecordPayload {
@@ -213,6 +215,14 @@ export interface UiTelemetryRecordPayload {
 }
 
 /**
+ * Stored payload for conversation rewind events.
+ */
+export interface RewindRecordPayload {
+  /** Number of UI history items truncated. */
+  truncatedCount: number;
+}
+
+/**
  * Service for recording the current chat session to disk.
  *
  * This service provides comprehensive conversation recording that captures:
@@ -232,7 +242,7 @@ export interface UiTelemetryRecordPayload {
  * - Linear history reconstruction
  * - Future checkpointing (branch from any historical point)
  *
- * File location: ~/.hopcode/projects/<sanitized_project>/chats/
+ * File location: ~/.qwen/tmp/<project_id>/chats/
  *
  * For session management (list, load, remove), use SessionService.
  */
@@ -240,6 +250,32 @@ export class ChatRecordingService {
   /** UUID of the last written record in the chain */
   private lastRecordUuid: string | null = null;
   private readonly config: Config;
+  /**
+   * Tracks the `lastRecordUuid` value just before each user turn was recorded.
+   * Used by {@link rewindRecording} to re-root the parentUuid chain so that
+   * rewound messages end up on a dead branch in the tree, making
+   * `reconstructHistory()` skip them automatically on resume.
+   *
+   * Index `i` holds the UUID of the last record written before the (i+1)th
+   * user message was appended. For example, `turnParentUuids[0]` is the UUID
+   * right before the very first user message (often `null` or the startup
+   * context record).
+   */
+  private turnParentUuids: Array<string | null> = [];
+  /**
+   * Cached chats-dir / conversation-file path so per-record appendRecord
+   * doesn't re-stat them on every write. The first call performs the
+   * mkdir / wx-create; subsequent calls short-circuit.
+   */
+  private chatsDirEnsured = false;
+  private cachedConversationFile: string | undefined;
+  /**
+   * Serialized async write queue for appendRecord. We update lastRecordUuid
+   * synchronously so the next createBaseRecord sees the right parentUuid,
+   * but the actual fs write runs in this chain so the event loop is not
+   * blocked. Must be flushed before process exit (see {@link flush}).
+   */
+  private writeChain: Promise<void> = Promise.resolve();
   /** In-memory cache of the current session's custom title (for re-append on exit) */
   private currentCustomTitle: string | undefined;
   /**
@@ -248,24 +284,25 @@ export class ChatRecordingService {
    * (safe default) without rewriting the persisted record.
    */
   private currentTitleSource: TitleSource | undefined;
-
   /**
-   * Cache for ensureChatsDir and ensureConversationFile results to avoid
-   * repeated sync fs calls on the hot path.
-   */
-  private chatsDirEnsured = false;
-  private conversationFile: string | undefined;
-  private writeChain: Promise<void> = Promise.resolve();
-
-  /**
-   * Number of auto-title generation attempts made in this session.
-   * We retry up to {@link AUTO_TITLE_ATTEMPT_CAP} times if the model
-   * fails to produce a title (e.g. due to safety filters or transient errors).
+   * How many auto-title attempts have been made this process.
+   *
+   * We don't commit to "one attempt per session" because the first assistant
+   * turn may be a pure tool-call with no user-visible text (e.g., the model
+   * opens with a search) — the title service returns null, and we'd waste
+   * the whole session's chance on a turn that never had a shot. Instead we
+   * retry for a handful of turns until either the title lands or we hit the
+   * cap, which protects against a persistently failing fast-model looping
+   * on every turn. {@link AUTO_TITLE_ATTEMPT_CAP} sets the ceiling.
    */
   private autoTitleAttempts = 0;
-
   /**
-   * AbortController for the active auto-title generation task.
+   * AbortController for the in-flight auto-title LLM call, or `undefined`
+   * when no generation is pending. Doubles as the in-flight guard — a
+   * defined controller means "one is running; don't launch another".
+   * Stored on the instance so {@link finalize} (called on session switch
+   * and shutdown) can cancel a pending call cleanly rather than letting
+   * it burn tokens after the session has already moved on.
    */
   private autoTitleController: AbortController | undefined;
 
@@ -274,9 +311,16 @@ export class ChatRecordingService {
     this.lastRecordUuid =
       config.getResumedSessionData()?.lastCompletedUuid ?? null;
 
-    // On resume, restore the cached title/source and re-append it to EOF so
-    // readers scanning the file tail still see the latest metadata after a
-    // crash or abrupt shutdown.
+    // On resume, load the cached custom title AND its source from the
+    // session file. Preserving the persisted source is load-bearing: the
+    // SessionPicker dim-styling depends on it, and hardcoding `'manual'`
+    // would silently downgrade auto-titled sessions every time they get
+    // resumed. Legacy records (no `titleSource` field) stay `undefined` —
+    // treated as manual for safety without rewriting the JSONL.
+    //
+    // We then re-append a custom_title record to EOF so the title stays
+    // within the tail window that readers scan (guarding against a crash
+    // before the next finalize).
     if (config.getResumedSessionData()) {
       try {
         const sessionService = config.getSessionService();
@@ -290,62 +334,76 @@ export class ChatRecordingService {
     }
   }
 
-  async flush(): Promise<void> {
-    await this.writeChain;
-  }
-
   /**
-   * Returns the current custom title, if any.
+   * Returns the current custom title, if any. Read-only accessor for
+   * callers (e.g. auto-title trigger) that need to know whether a title is
+   * already set before attempting generation.
    */
   getCurrentCustomTitle(): string | undefined {
     return this.currentCustomTitle;
   }
 
   /**
-   * Returns the source of the current custom title, if any.
+   * Returns the source of the current custom title, or `undefined` when no
+   * title is set.
    */
   getCurrentTitleSource(): TitleSource | undefined {
     return this.currentTitleSource;
   }
 
+  /**
+   * Returns the session ID.
+   * @returns The session ID.
+   */
   private getSessionId(): string {
     return this.config.getSessionId();
   }
 
+  /**
+   * Ensures the chats directory exists, creating it if it doesn't exist.
+   * @returns The path to the chats directory.
+   * @throws Error if the directory cannot be created.
+   */
   private ensureChatsDir(): string {
-    const storage = this.config.storage;
-    const chatsDir = path.join(storage.getProjectDir(), 'chats');
+    const projectDir = this.config.storage.getProjectDir();
+    const chatsDir = path.join(projectDir, 'chats');
 
     if (this.chatsDirEnsured) {
       return chatsDir;
     }
-
     try {
       fs.mkdirSync(chatsDir, { recursive: true });
+      // Only cache success — keep transient mkdir failures self-healing.
       this.chatsDirEnsured = true;
     } catch {
-      // ignored - a later append will retry
+      // ignored
     }
     return chatsDir;
   }
 
+  /**
+   * Ensures the conversation file exists, creating it if it doesn't exist.
+   * Uses atomic file creation to avoid race conditions. Result is cached so
+   * subsequent appendRecord calls skip the wx-create entirely.
+   * @returns The path to the conversation file.
+   * @throws Error if the file cannot be created or accessed.
+   */
   private ensureConversationFile(): string {
-    if (this.conversationFile) {
-      return this.conversationFile;
+    if (this.cachedConversationFile) {
+      return this.cachedConversationFile;
     }
-
     const chatsDir = this.ensureChatsDir();
     const sessionId = this.getSessionId();
     const safeFilename = `${sessionId}.jsonl`;
     const conversationFile = path.join(chatsDir, safeFilename);
 
     try {
-      // Use 'wx' flag for exclusive creation - atomic operation that fails if file exists
-      // This avoids the TOCTOU race condition of existsSync + writeFileSync
+      // Use 'wx' flag for exclusive creation - atomic operation that fails if
+      // the file already exists. EEXIST is the expected steady-state path on
+      // resume; we treat it as success.
       fs.writeFileSync(conversationFile, '', { flag: 'wx', encoding: 'utf8' });
     } catch (error) {
       const nodeError = error as NodeJS.ErrnoException;
-      // EEXIST means file already exists, which is expected and fine
       if (nodeError.code !== 'EEXIST') {
         const message = error instanceof Error ? error.message : String(error);
         throw new Error(
@@ -354,7 +412,7 @@ export class ChatRecordingService {
       }
     }
 
-    this.conversationFile = conversationFile;
+    this.cachedConversationFile = conversationFile;
     return conversationFile;
   }
 
@@ -379,8 +437,20 @@ export class ChatRecordingService {
   /**
    * Appends a record to the session file and updates lastRecordUuid.
    *
-   * lastRecordUuid is updated synchronously so parentUuid chaining remains
-   * correct even while the underlying append is queued asynchronously.
+   * lastRecordUuid is updated synchronously so the next createBaseRecord sees
+   * the correct parentUuid without waiting for the previous write. The actual
+   * fs write is enqueued on {@link writeChain} and runs async; per-file
+   * mutex inside {@link jsonl.writeLine} preserves on-disk ordering.
+   *
+   * **Known tradeoff (parentUuid chain integrity on write failure):** if the
+   * enqueued write rejects (e.g., disk full, permission dropped), the error
+   * is logged but subsequent records still claim the failed record's uuid
+   * as their parent. On resume, readers that walk parentUuid (e.g.
+   * sessionService.reconstructHistory) will silently drop records whose
+   * ancestor is missing on disk. This matches the sync version's behavior
+   * when its own throw was caught and logged by the caller — under normal
+   * local-disk writes failures are rare enough to accept the fire-and-forget
+   * simplification.
    */
   private appendRecord(record: ChatRecord): void {
     let conversationFile: string;
@@ -394,9 +464,17 @@ export class ChatRecordingService {
     this.writeChain = this.writeChain
       .catch(() => {})
       .then(() => jsonl.writeLine(conversationFile, record))
-      .catch((error) => {
-        debugLogger.error('Error appending record (async):', error);
+      .catch((err) => {
+        debugLogger.error('Error appending record (async):', err);
       });
+  }
+
+  /**
+   * Awaits all queued async writes. Call before process exit / session
+   * teardown to ensure no records are dropped.
+   */
+  async flush(): Promise<void> {
+    await this.writeChain;
   }
 
   /**
@@ -407,6 +485,7 @@ export class ChatRecordingService {
    */
   recordUserMessage(message: PartListUnion): void {
     try {
+      this.turnParentUuids.push(this.lastRecordUuid);
       const record: ChatRecord = {
         ...this.createBaseRecord('user'),
         message: createUserContent(message),
@@ -680,6 +759,70 @@ export class ChatRecordingService {
       this.appendRecord(record);
     } catch (error) {
       debugLogger.error('Error saving ui telemetry record:', error);
+    }
+  }
+
+  /**
+   * Records a conversation rewind and re-roots the parentUuid chain.
+   *
+   * Sets `lastRecordUuid` back to the UUID that was current just before the
+   * target user turn was recorded, then appends a rewind system record.
+   * This makes all messages after that point sit on a dead branch in the
+   * UUID tree, so `reconstructHistory()` will skip them on resume.
+   *
+   * @param targetTurnIndex 0-based index of the user turn to rewind to.
+   *   For example, 0 means rewind to the very first user message (keeping
+   *   nothing before it), 1 means keep the first user turn, etc.
+   * @param payload Additional metadata to persist with the rewind record.
+   */
+  rewindRecording(targetTurnIndex: number, payload: RewindRecordPayload): void {
+    try {
+      // Re-root: point back to the record just before the target user turn.
+      this.lastRecordUuid = this.turnParentUuids[targetTurnIndex] ?? null;
+      // Trim future boundaries — they no longer exist in the active branch.
+      this.turnParentUuids = this.turnParentUuids.slice(0, targetTurnIndex);
+
+      const record: ChatRecord = {
+        ...this.createBaseRecord('system'),
+        type: 'system',
+        subtype: 'rewind',
+        systemPayload: payload,
+      };
+
+      this.appendRecord(record);
+    } catch (error) {
+      debugLogger.error('Error saving rewind record:', error);
+    }
+  }
+
+  /**
+   * Rebuilds `turnParentUuids` from a reconstructed message list.
+   *
+   * Call this after resuming a session so that subsequent rewinds within
+   * the resumed session have correct boundary data. Also updates
+   * `lastRecordUuid` to the last record in the chain.
+   */
+  rebuildTurnBoundaries(messages: ChatRecord[]): void {
+    this.turnParentUuids = [];
+    let prevUuid: string | null =
+      this.config.getResumedSessionData()?.lastCompletedUuid !== undefined
+        ? null
+        : this.lastRecordUuid;
+
+    for (let i = 0; i < messages.length; i++) {
+      const record = messages[i];
+      if (
+        record.type === 'user' &&
+        record.subtype !== 'notification' &&
+        record.subtype !== 'cron'
+      ) {
+        this.turnParentUuids.push(prevUuid);
+      }
+      prevUuid = record.uuid;
+    }
+    // Ensure lastRecordUuid points to the end of the reconstructed chain.
+    if (messages.length > 0) {
+      this.lastRecordUuid = messages[messages.length - 1].uuid;
     }
   }
 

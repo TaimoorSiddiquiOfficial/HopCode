@@ -6,7 +6,7 @@
 
 import type { ICommandLoader } from './types.js';
 import type { SlashCommand } from '../ui/commands/types.js';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@qwen-code/qwen-code-core';
 import { aboutCommand } from '../ui/commands/aboutCommand.js';
 import { agentsCommand } from '../ui/commands/agentsCommand.js';
 import { arenaCommand } from '../ui/commands/arenaCommand.js';
@@ -28,7 +28,7 @@ import { extensionsCommand } from '../ui/commands/extensionsCommand.js';
 import { helpCommand } from '../ui/commands/helpCommand.js';
 import { hooksCommand } from '../ui/commands/hooksCommand.js';
 import { ideCommand } from '../ui/commands/ideCommand.js';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@qwen-code/qwen-code-core';
 import { initCommand } from '../ui/commands/initCommand.js';
 import { languageCommand } from '../ui/commands/languageCommand.js';
 import { mcpCommand } from '../ui/commands/mcpCommand.js';
@@ -36,7 +36,7 @@ import { dreamCommand } from '../ui/commands/dreamCommand.js';
 import { forgetCommand } from '../ui/commands/forgetCommand.js';
 import { memoryCommand } from '../ui/commands/memoryCommand.js';
 import { modelCommand } from '../ui/commands/modelCommand.js';
-import { providerCommand } from '../ui/commands/providerCommand.js';
+import { manageModelsCommand } from '../ui/commands/manageModelsCommand.js';
 import { rememberCommand } from '../ui/commands/rememberCommand.js';
 import { planCommand } from '../ui/commands/planCommand.js';
 import { permissionsCommand } from '../ui/commands/permissionsCommand.js';
@@ -46,6 +46,7 @@ import { recapCommand } from '../ui/commands/recapCommand.js';
 import { renameCommand } from '../ui/commands/renameCommand.js';
 import { restoreCommand } from '../ui/commands/restoreCommand.js';
 import { resumeCommand } from '../ui/commands/resumeCommand.js';
+import { rewindCommand } from '../ui/commands/rewindCommand.js';
 import { settingsCommand } from '../ui/commands/settingsCommand.js';
 import { skillsCommand } from '../ui/commands/skillsCommand.js';
 import { statsCommand } from '../ui/commands/statsCommand.js';
@@ -57,21 +58,12 @@ import { vimCommand } from '../ui/commands/vimCommand.js';
 import { setupGithubCommand } from '../ui/commands/setupGithubCommand.js';
 import { insightCommand } from '../ui/commands/insightCommand.js';
 import { statuslineCommand } from '../ui/commands/statuslineCommand.js';
-import { ciCommand } from '../ui/commands/ciCommand.js';
-import { githubCommand } from '../ui/commands/githubCommand.js';
-import { githubAuthCommand } from '../ui/commands/githubAuthCommand.js';
-import { githubDeviceAuthCommand } from '../ui/commands/githubDeviceAuthCommand.js';
-import { mcpSecurityAuditCommand } from '../ui/commands/mcpSecurityAuditCommand.js';
-import { agentOwaspComplianceCommand } from '../ui/commands/agentOwaspComplianceCommand.js';
-import { makeSkillTemplateCommand } from '../ui/commands/makeSkillTemplateCommand.js';
-import { securityReviewCommand } from '../ui/commands/securityReviewCommand.js';
-import { pythonMcpServerCommand } from '../ui/commands/pythonMcpServerCommand.js';
 
 const builtinDebugLogger = createDebugLogger('BUILTIN_COMMAND_LOADER');
 
 /**
  * Loads the core, hard-coded slash commands that are an integral part
- * of the HopCode application.
+ * of the Qwen Code application.
  */
 export class BuiltinCommandLoader implements ICommandLoader {
   constructor(private config: Config | null) {}
@@ -127,7 +119,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
         : []),
       memoryCommand,
       modelCommand,
-      providerCommand,
+      manageModelsCommand,
       rememberCommand,
       planCommand,
       permissionsCommand,
@@ -137,6 +129,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       renameCommand,
       restoreCommand(this.config),
       resumeCommand,
+      rewindCommand,
       skillsCommand,
       statsCommand,
       summaryCommand,
@@ -148,15 +141,6 @@ export class BuiltinCommandLoader implements ICommandLoader {
       terminalSetupCommand,
       insightCommand,
       statuslineCommand,
-      ciCommand,
-      githubCommand,
-      githubAuthCommand,
-      githubDeviceAuthCommand,
-      mcpSecurityAuditCommand,
-      agentOwaspComplianceCommand,
-      makeSkillTemplateCommand,
-      securityReviewCommand,
-      pythonMcpServerCommand,
     ];
 
     return allDefinitions

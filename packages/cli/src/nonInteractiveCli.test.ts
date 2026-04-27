@@ -7,21 +7,21 @@
 import type {
   Config,
   ToolRegistry,
-  ServerHopCodeStreamEvent,
+  ServerGeminiStreamEvent,
   SessionMetrics,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import type { CLIUserMessage } from './nonInteractive/types.js';
 import {
   executeToolCall,
   ToolErrorType,
   shutdownTelemetry,
-  HopCodeEventType,
+  GeminiEventType,
   OutputFormat,
   uiTelemetryService,
   FatalInputError,
   ApprovalMode,
   SendMessageType,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import type { Part } from '@google/genai';
 import { runNonInteractive } from './nonInteractiveCli.js';
 import { vi, type Mock, type MockInstance } from 'vitest';
@@ -33,9 +33,9 @@ import { _resetExitLatchForTest } from './utils/errors.js';
 
 // Mock core modules
 vi.mock('./ui/hooks/atCommandProcessor.js');
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@qwen-code/qwen-code-core')>();
 
   class MockChatRecordingService {
     initialize = vi.fn();
@@ -73,7 +73,7 @@ describe('runNonInteractive', () => {
   let mockShutdownTelemetry: Mock;
   let processStdoutSpy: MockInstance;
   let processStderrSpy: MockInstance;
-  let mockHopCodeClient: {
+  let mockGeminiClient: {
     sendMessageStream: Mock;
     getChatRecordingService: Mock;
     getChat: Mock;
@@ -81,6 +81,9 @@ describe('runNonInteractive', () => {
   let mockGetDebugResponses: Mock;
 
   beforeEach(async () => {
+    // Reset module-level state from any prior test in this file. Without
+    // these resets the once-set exit latch parks subsequent JSON-mode
+    // handleError tests in the never-resolving promise (5s vitest timeout).
     _resetCleanupFunctionsForTest();
     _resetExitLatchForTest();
 
@@ -112,7 +115,7 @@ describe('runNonInteractive', () => {
 
     mockGetDebugResponses = vi.fn(() => []);
 
-    mockHopCodeClient = {
+    mockGeminiClient = {
       sendMessageStream: vi.fn(),
       getChatRecordingService: vi.fn(() => ({
         initialize: vi.fn(),
@@ -130,7 +133,7 @@ describe('runNonInteractive', () => {
     mockConfig = {
       initialize: vi.fn().mockResolvedValue(undefined),
       getApprovalMode: vi.fn().mockReturnValue(ApprovalMode.DEFAULT),
-      getHopCodeClient: vi.fn().mockReturnValue(mockHopCodeClient),
+      getGeminiClient: vi.fn().mockReturnValue(mockGeminiClient),
       getToolRegistry: vi.fn().mockReturnValue(mockToolRegistry),
       getMaxSessionTurns: vi.fn().mockReturnValue(10),
       getProjectRoot: vi.fn().mockReturnValue('/test/project'),
@@ -240,8 +243,8 @@ describe('runNonInteractive', () => {
   }
 
   async function* createStreamFromEvents(
-    events: ServerHopCodeStreamEvent[],
-  ): AsyncGenerator<ServerHopCodeStreamEvent> {
+    events: ServerGeminiStreamEvent[],
+  ): AsyncGenerator<ServerGeminiStreamEvent> {
     for (const event of events) {
       yield event;
     }
@@ -249,15 +252,15 @@ describe('runNonInteractive', () => {
 
   it('should process input and write text output', async () => {
     setupMetricsMock();
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Hello' },
-      { type: HopCodeEventType.Content, value: ' World' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Hello' },
+      { type: GeminiEventType.Content, value: ' World' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -268,7 +271,7 @@ describe('runNonInteractive', () => {
       'prompt-id-1',
     );
 
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: 'Test input' }],
       expect.any(AbortSignal),
       'prompt-id-1',
@@ -278,10 +281,42 @@ describe('runNonInteractive', () => {
     expect(mockShutdownTelemetry).toHaveBeenCalled();
   });
 
+  it('on EPIPE, destroys stdout and returns normally instead of process.exit', async () => {
+    // Regression: process.exit(0) on EPIPE bypassed runExitCleanup → flush()
+    // and dropped queued JSONL writes for `qwen -p ... | head -1` patterns.
+    // process.exit is mocked to throw in beforeEach, so reaching the
+    // assertion also proves the bypass route is gone.
+    setupMetricsMock();
+    const stdoutDestroySpy = vi
+      .spyOn(process.stdout, 'destroy')
+      .mockReturnValue(process.stdout);
+
+    mockGeminiClient.sendMessageStream.mockImplementation(
+      async function* mockStream(): AsyncGenerator<ServerGeminiStreamEvent> {
+        process.stdout.emit(
+          'error',
+          Object.assign(new Error('EPIPE'), { code: 'EPIPE' }),
+        );
+        yield { type: GeminiEventType.Content, value: 'Hello' };
+        yield {
+          type: GeminiEventType.Finished,
+          value: {
+            reason: undefined,
+            usageMetadata: { totalTokenCount: 0 },
+          },
+        };
+      },
+    );
+
+    await runNonInteractive(mockConfig, mockSettings, 'test', 'p1');
+
+    expect(stdoutDestroySpy).toHaveBeenCalled();
+  });
+
   it('should handle a single tool call and respond', async () => {
     setupMetricsMock();
-    const toolCallEvent: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-1',
         name: 'testTool',
@@ -293,16 +328,16 @@ describe('runNonInteractive', () => {
     const toolResponse: Part[] = [{ text: 'Tool response' }];
     mockCoreExecuteToolCall.mockResolvedValue({ responseParts: toolResponse });
 
-    const firstCallEvents: ServerHopCodeStreamEvent[] = [toolCallEvent];
-    const secondCallEvents: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Final answer' },
+    const firstCallEvents: ServerGeminiStreamEvent[] = [toolCallEvent];
+    const secondCallEvents: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Final answer' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
 
-    mockHopCodeClient.sendMessageStream
+    mockGeminiClient.sendMessageStream
       .mockReturnValueOnce(createStreamFromEvents(firstCallEvents))
       .mockReturnValueOnce(createStreamFromEvents(secondCallEvents));
 
@@ -313,7 +348,7 @@ describe('runNonInteractive', () => {
       'prompt-id-2',
     );
 
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledTimes(2);
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(2);
     expect(mockCoreExecuteToolCall).toHaveBeenCalledWith(
       mockConfig,
       expect.objectContaining({ name: 'testTool' }),
@@ -323,7 +358,7 @@ describe('runNonInteractive', () => {
       }),
     );
     // Verify first call has type: UserQuery
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenNthCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenNthCalledWith(
       1,
       [{ text: 'Use a tool' }],
       expect.any(AbortSignal),
@@ -331,7 +366,7 @@ describe('runNonInteractive', () => {
       { type: SendMessageType.UserQuery },
     );
     // Verify second call (after tool execution) has type: ToolResult
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenNthCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenNthCalledWith(
       2,
       [{ text: 'Tool response' }],
       expect.any(AbortSignal),
@@ -343,8 +378,8 @@ describe('runNonInteractive', () => {
 
   it('should handle error during tool execution and should send error back to the model', async () => {
     setupMetricsMock();
-    const toolCallEvent: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-1',
         name: 'errorTool',
@@ -368,17 +403,17 @@ describe('runNonInteractive', () => {
       ],
       resultDisplay: 'Execution failed',
     });
-    const finalResponse: ServerHopCodeStreamEvent[] = [
+    const finalResponse: ServerGeminiStreamEvent[] = [
       {
-        type: HopCodeEventType.Content,
+        type: GeminiEventType.Content,
         value: 'Sorry, let me try again.',
       },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream
+    mockGeminiClient.sendMessageStream
       .mockReturnValueOnce(createStreamFromEvents([toolCallEvent]))
       .mockReturnValueOnce(createStreamFromEvents(finalResponse));
 
@@ -390,8 +425,8 @@ describe('runNonInteractive', () => {
     );
 
     expect(mockCoreExecuteToolCall).toHaveBeenCalled();
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledTimes(2);
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenNthCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(2);
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenNthCalledWith(
       2,
       [
         {
@@ -413,7 +448,7 @@ describe('runNonInteractive', () => {
   it('should exit with error if sendMessageStream throws initially', async () => {
     setupMetricsMock();
     const apiError = new Error('API connection failed');
-    mockHopCodeClient.sendMessageStream.mockImplementation(() => {
+    mockGeminiClient.sendMessageStream.mockImplementation(() => {
       throw apiError;
     });
 
@@ -429,8 +464,8 @@ describe('runNonInteractive', () => {
 
   it('should not exit if a tool is not found, and should send error back to model', async () => {
     setupMetricsMock();
-    const toolCallEvent: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-1',
         name: 'nonexistentTool',
@@ -444,18 +479,18 @@ describe('runNonInteractive', () => {
       resultDisplay: 'Tool "nonexistentTool" not found in registry.',
       responseParts: [],
     });
-    const finalResponse: ServerHopCodeStreamEvent[] = [
+    const finalResponse: ServerGeminiStreamEvent[] = [
       {
-        type: HopCodeEventType.Content,
+        type: GeminiEventType.Content,
         value: "Sorry, I can't find that tool.",
       },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
 
-    mockHopCodeClient.sendMessageStream
+    mockGeminiClient.sendMessageStream
       .mockReturnValueOnce(createStreamFromEvents([toolCallEvent]))
       .mockReturnValueOnce(createStreamFromEvents(finalResponse));
 
@@ -467,7 +502,7 @@ describe('runNonInteractive', () => {
     );
 
     expect(mockCoreExecuteToolCall).toHaveBeenCalled();
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledTimes(2);
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(2);
     expect(processStdoutSpy).toHaveBeenCalledWith(
       "Sorry, I can't find that tool.\n",
     );
@@ -510,14 +545,14 @@ describe('runNonInteractive', () => {
     });
 
     // Mock a simple stream response from the Gemini client
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Summary complete.' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Summary complete.' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -525,7 +560,7 @@ describe('runNonInteractive', () => {
     await runNonInteractive(mockConfig, mockSettings, rawInput, 'prompt-id-7');
 
     // 5. Assert that sendMessageStream was called with the PROCESSED parts, not the raw input
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       processedParts,
       expect.any(AbortSignal),
       'prompt-id-7',
@@ -537,14 +572,14 @@ describe('runNonInteractive', () => {
   });
 
   it('should process input and write JSON output with stats', async () => {
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Hello World' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Hello World' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
     (mockConfig.getOutputFormat as Mock).mockReturnValue(OutputFormat.JSON);
@@ -557,7 +592,7 @@ describe('runNonInteractive', () => {
       'prompt-id-1',
     );
 
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: 'Test input' }],
       expect.any(AbortSignal),
       'prompt-id-1',
@@ -589,8 +624,8 @@ describe('runNonInteractive', () => {
   it('should write JSON output with stats for tool-only commands (no text response)', async () => {
     // Test the scenario where a command completes successfully with only tool calls
     // but no text response - this would have caught the original bug
-    const toolCallEvent: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-1',
         name: 'testTool',
@@ -603,23 +638,23 @@ describe('runNonInteractive', () => {
     mockCoreExecuteToolCall.mockResolvedValue({ responseParts: toolResponse });
 
     // First call returns only tool call, no content
-    const firstCallEvents: ServerHopCodeStreamEvent[] = [
+    const firstCallEvents: ServerGeminiStreamEvent[] = [
       toolCallEvent,
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
       },
     ];
 
     // Second call returns no content (tool-only completion)
-    const secondCallEvents: ServerHopCodeStreamEvent[] = [
+    const secondCallEvents: ServerGeminiStreamEvent[] = [
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 3 } },
       },
     ];
 
-    mockHopCodeClient.sendMessageStream
+    mockGeminiClient.sendMessageStream
       .mockReturnValueOnce(createStreamFromEvents(firstCallEvents))
       .mockReturnValueOnce(createStreamFromEvents(secondCallEvents));
 
@@ -660,7 +695,7 @@ describe('runNonInteractive', () => {
       'prompt-id-tool-only',
     );
 
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledTimes(2);
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(2);
     expect(mockCoreExecuteToolCall).toHaveBeenCalledWith(
       mockConfig,
       expect.objectContaining({ name: 'testTool' }),
@@ -693,13 +728,13 @@ describe('runNonInteractive', () => {
 
   it('should write JSON output with stats for empty response commands', async () => {
     // Test the scenario where a command completes but produces no content at all
-    const events: ServerHopCodeStreamEvent[] = [
+    const events: ServerGeminiStreamEvent[] = [
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 1 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
     (mockConfig.getOutputFormat as Mock).mockReturnValue(OutputFormat.JSON);
@@ -712,7 +747,7 @@ describe('runNonInteractive', () => {
       'prompt-id-empty',
     );
 
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: 'Empty response test' }],
       expect.any(AbortSignal),
       'prompt-id-empty',
@@ -746,7 +781,7 @@ describe('runNonInteractive', () => {
     setupMetricsMock();
     const testError = new Error('Invalid input provided');
 
-    mockHopCodeClient.sendMessageStream.mockImplementation(() => {
+    mockGeminiClient.sendMessageStream.mockImplementation(() => {
       throw testError;
     });
 
@@ -786,8 +821,8 @@ describe('runNonInteractive', () => {
     setupMetricsMock();
 
     // Simulate an API error event (like 401 unauthorized)
-    const apiErrorEvent: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.Error,
+    const apiErrorEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.Error,
       value: {
         error: {
           message: '401 Incorrect API key provided',
@@ -796,7 +831,7 @@ describe('runNonInteractive', () => {
       },
     };
 
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents([apiErrorEvent]),
     );
 
@@ -832,7 +867,7 @@ describe('runNonInteractive', () => {
     setupMetricsMock();
     const fatalError = new FatalInputError('Invalid command syntax provided');
 
-    mockHopCodeClient.sendMessageStream.mockImplementation(() => {
+    mockGeminiClient.sendMessageStream.mockImplementation(() => {
       throw fatalError;
     });
 
@@ -880,14 +915,14 @@ describe('runNonInteractive', () => {
     };
     mockGetCommands.mockReturnValue([mockCommand]);
 
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Response from command' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Response from command' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -899,7 +934,7 @@ describe('runNonInteractive', () => {
     );
 
     // Ensure the prompt sent to the model is from the command, not the raw input
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: 'Prompt from command' }],
       expect.any(AbortSignal),
       'prompt-id-slash',
@@ -940,14 +975,14 @@ describe('runNonInteractive', () => {
     // No commands are mocked, so any slash command is "unknown"
     mockGetCommands.mockReturnValue([]);
 
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Response to unknown' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Response to unknown' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -959,7 +994,7 @@ describe('runNonInteractive', () => {
     );
 
     // Ensure the raw input is sent to the model
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: '/unknowncommand' }],
       expect.any(AbortSignal),
       'prompt-id-unknown',
@@ -1032,14 +1067,14 @@ describe('runNonInteractive', () => {
     };
     mockGetCommands.mockReturnValue([mockCommand]);
 
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Acknowledged' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Acknowledged' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 1 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -1070,14 +1105,14 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Hello stream' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Hello stream' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 4 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -1128,11 +1163,11 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents([
-        { type: HopCodeEventType.Content, value: 'Handled once' },
+        { type: GeminiEventType.Content, value: 'Handled once' },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: { reason: undefined, usageMetadata: { totalTokenCount: 2 } },
         },
       ]),
@@ -1219,9 +1254,9 @@ describe('runNonInteractive', () => {
       return current;
     });
 
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents([
-        { type: HopCodeEventType.Content, value: 'All done' },
+        { type: GeminiEventType.Content, value: 'All done' },
       ]),
     );
 
@@ -1265,14 +1300,14 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Response from envelope' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Response from envelope' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -1317,7 +1352,7 @@ describe('runNonInteractive', () => {
     expect(assistantEnvelope).toBeTruthy();
 
     // Verify the model received the correct parts from userMessage
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: 'Message from stream-json input' }],
       expect.any(AbortSignal),
       'prompt-envelope',
@@ -1340,8 +1375,8 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const toolCallEvent: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-1',
         name: 'testTool',
@@ -1360,16 +1395,16 @@ describe('runNonInteractive', () => {
     ];
     mockCoreExecuteToolCall.mockResolvedValue({ responseParts: toolResponse });
 
-    const firstCallEvents: ServerHopCodeStreamEvent[] = [toolCallEvent];
-    const secondCallEvents: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Final response' },
+    const firstCallEvents: ServerGeminiStreamEvent[] = [toolCallEvent];
+    const secondCallEvents: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Final response' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
 
-    mockHopCodeClient.sendMessageStream
+    mockGeminiClient.sendMessageStream
       .mockReturnValueOnce(createStreamFromEvents(firstCallEvents))
       .mockReturnValueOnce(createStreamFromEvents(secondCallEvents));
 
@@ -1440,8 +1475,8 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const toolCallEvent: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-error',
         name: 'errorTool',
@@ -1466,17 +1501,17 @@ describe('runNonInteractive', () => {
       resultDisplay: 'Tool execution failed',
     });
 
-    const finalResponse: ServerHopCodeStreamEvent[] = [
+    const finalResponse: ServerGeminiStreamEvent[] = [
       {
-        type: HopCodeEventType.Content,
+        type: GeminiEventType.Content,
         value: 'I encountered an error',
       },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 10 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream
+    mockGeminiClient.sendMessageStream
       .mockReturnValueOnce(createStreamFromEvents([toolCallEvent]))
       .mockReturnValueOnce(createStreamFromEvents(finalResponse));
 
@@ -1534,15 +1569,15 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Hello' },
-      { type: HopCodeEventType.Content, value: ' World' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Hello' },
+      { type: GeminiEventType.Content, value: ' World' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -1591,18 +1626,18 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const events: ServerHopCodeStreamEvent[] = [
+    const events: ServerGeminiStreamEvent[] = [
       {
-        type: HopCodeEventType.Thought,
+        type: GeminiEventType.Thought,
         value: { subject: 'Analysis', description: 'Processing request' },
       },
-      { type: HopCodeEventType.Content, value: 'Response text' },
+      { type: GeminiEventType.Content, value: 'Response text' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 8 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -1649,8 +1684,8 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const toolCall1: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCall1: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-1',
         name: 'firstTool',
@@ -1659,8 +1694,8 @@ describe('runNonInteractive', () => {
         prompt_id: 'prompt-id-multi',
       },
     };
-    const toolCall2: ServerHopCodeStreamEvent = {
-      type: HopCodeEventType.ToolCallRequest,
+    const toolCall2: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
       value: {
         callId: 'tool-2',
         name: 'secondTool',
@@ -1678,16 +1713,16 @@ describe('runNonInteractive', () => {
         responseParts: [{ text: 'Second tool result' }],
       });
 
-    const firstCallEvents: ServerHopCodeStreamEvent[] = [toolCall1, toolCall2];
-    const secondCallEvents: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Combined response' },
+    const firstCallEvents: ServerGeminiStreamEvent[] = [toolCall1, toolCall2];
+    const secondCallEvents: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Combined response' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 15 } },
       },
     ];
 
-    mockHopCodeClient.sendMessageStream
+    mockGeminiClient.sendMessageStream
       .mockReturnValueOnce(createStreamFromEvents(firstCallEvents))
       .mockReturnValueOnce(createStreamFromEvents(secondCallEvents));
 
@@ -1760,14 +1795,14 @@ describe('runNonInteractive', () => {
       return true;
     });
 
-    const events: ServerHopCodeStreamEvent[] = [
-      { type: HopCodeEventType.Content, value: 'Response' },
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Response' },
       {
-        type: HopCodeEventType.Finished,
+        type: GeminiEventType.Finished,
         value: { reason: undefined, usageMetadata: { totalTokenCount: 3 } },
       },
     ];
-    mockHopCodeClient.sendMessageStream.mockReturnValue(
+    mockGeminiClient.sendMessageStream.mockReturnValue(
       createStreamFromEvents(events),
     );
 
@@ -1793,7 +1828,7 @@ describe('runNonInteractive', () => {
       },
     );
 
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: 'Simple string content' }],
       expect.any(AbortSignal),
       'prompt-string-content',
@@ -1801,7 +1836,7 @@ describe('runNonInteractive', () => {
     );
 
     // UserMessage with array of text blocks
-    mockHopCodeClient.sendMessageStream.mockClear();
+    mockGeminiClient.sendMessageStream.mockClear();
     const userMessageBlocks: CLIUserMessage = {
       type: 'user',
       uuid: 'test-uuid-2',
@@ -1826,7 +1861,7 @@ describe('runNonInteractive', () => {
       },
     );
 
-    expect(mockHopCodeClient.sendMessageStream).toHaveBeenCalledWith(
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
       [{ text: 'First part' }, { text: 'Second part' }],
       expect.any(AbortSignal),
       'prompt-blocks-content',

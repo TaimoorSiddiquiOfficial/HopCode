@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Code
+ * Copyright 2025 Qwen Code
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +11,7 @@ import {
   type SessionListItem,
   SessionStartSource,
   type PermissionMode,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import { buildResumedHistoryItems } from '../utils/resumeHistoryUtils.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 
@@ -95,7 +95,11 @@ export function useResumeCommand(
 
       // Update session history core.
       config.startNewSession(sessionId, sessionData);
-      await config.getHopCodeClient()?.initialize?.();
+      // Rebuild turn boundary tracking so rewind works within resumed sessions.
+      config
+        .getChatRecordingService()
+        ?.rebuildTurnBoundaries(sessionData.conversation.messages);
+      await config.getGeminiClient()?.initialize?.();
 
       // Fire SessionStart event after resuming session
       try {

@@ -14,13 +14,14 @@ import {
   type Mock,
 } from 'vitest';
 import { render, cleanup } from 'ink-testing-library';
-import { AppContainer } from './AppContainer.js';
+import { AppContainer, dedupeNewestFirst } from './AppContainer.js';
+import ansiEscapes from 'ansi-escapes';
 import {
   type Config,
   makeFakeConfig,
-  type HopCodeClient,
+  type GeminiClient,
   type SubagentManager,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import type { LoadedSettings } from '../config/settings.js';
 import type { InitializationResult } from '../core/initializer.js';
 import { UIStateContext, type UIState } from './contexts/UIStateContext.js';
@@ -28,7 +29,9 @@ import {
   UIActionsContext,
   type UIActions,
 } from './contexts/UIActionsContext.js';
+import { ToolCallStatus } from './types.js';
 import { useContext } from 'react';
+import { Box, measureElement } from 'ink';
 
 // Mock useStdout to capture terminal title writes
 let mockStdout: { write: ReturnType<typeof vi.fn> };
@@ -48,7 +51,7 @@ let capturedUIActions: UIActions;
 function TestContextConsumer() {
   capturedUIState = useContext(UIStateContext)!;
   capturedUIActions = useContext(UIActionsContext)!;
-  return null;
+  return <Box ref={capturedUIState.mainControlsRef} />;
 }
 
 vi.mock('./App.js', () => ({
@@ -65,7 +68,7 @@ vi.mock('./hooks/slashCommandProcessor.js');
 vi.mock('./hooks/useTerminalSize.js', () => ({
   useTerminalSize: vi.fn(() => ({ columns: 80, rows: 24 })),
 }));
-vi.mock('./hooks/useHopCodeStream.js');
+vi.mock('./hooks/useGeminiStream.js');
 vi.mock('./hooks/vim.js');
 vi.mock('./hooks/useFocus.js');
 vi.mock('./hooks/useBracketedPaste.js');
@@ -108,7 +111,7 @@ import { useEditorSettings } from './hooks/useEditorSettings.js';
 import { useSettingsCommand } from './hooks/useSettingsCommand.js';
 import { useModelCommand } from './hooks/useModelCommand.js';
 import { useSlashCommandProcessor } from './hooks/slashCommandProcessor.js';
-import { useHopCodeStream } from './hooks/useHopCodeStream.js';
+import { useGeminiStream } from './hooks/useGeminiStream.js';
 import { useVim } from './hooks/vim.js';
 import { useFolderTrust } from './hooks/useFolderTrust.js';
 import { useIdeTrustListener } from './hooks/useIdeTrustListener.js';
@@ -120,9 +123,8 @@ import { useSessionStats } from './contexts/SessionContext.js';
 import { useTextBuffer } from './components/shared/text-buffer.js';
 import { useLogger } from './hooks/useLogger.js';
 import { useLoadingIndicator } from './hooks/useLoadingIndicator.js';
-import { measureElement } from 'ink';
 import { useTerminalSize } from './hooks/useTerminalSize.js';
-import { ShellExecutionService } from '@hoptrendy/hopcode-core';
+import { ShellExecutionService } from '@qwen-code/qwen-code-core';
 
 describe('AppContainer State Management', () => {
   let mockConfig: Config;
@@ -137,7 +139,7 @@ describe('AppContainer State Management', () => {
   const mockedUseSettingsCommand = useSettingsCommand as Mock;
   const mockedUseModelCommand = useModelCommand as Mock;
   const mockedUseSlashCommandProcessor = useSlashCommandProcessor as Mock;
-  const mockedUseHopCodeStream = useHopCodeStream as Mock;
+  const mockedUseGeminiStream = useGeminiStream as Mock;
   const mockedUseVim = useVim as Mock;
   const mockedUseFolderTrust = useFolderTrust as Mock;
   const mockedUseIdeTrustListener = useIdeTrustListener as Mock;
@@ -189,9 +191,17 @@ describe('AppContainer State Management', () => {
       onAuthError: vi.fn(),
       isAuthDialogOpen: false,
       isAuthenticating: false,
+      pendingAuthType: undefined,
+      externalAuthState: null,
+      qwenAuthState: {
+        deviceAuth: null,
+        authStatus: 'idle',
+        authMessage: null,
+      },
       handleAuthSelect: vi.fn(),
       handleCodingPlanSubmit: vi.fn(),
       handleAlibabaStandardSubmit: vi.fn(),
+      handleOpenRouterSubmit: vi.fn(),
       openAuthDialog: vi.fn(),
       cancelAuthentication: vi.fn(),
     });
@@ -214,16 +224,16 @@ describe('AppContainer State Management', () => {
     mockedUseSlashCommandProcessor.mockReturnValue({
       handleSlashCommand: vi.fn(),
       slashCommands: [],
-      pendingGeminiHistoryItems: [],
+      pendingHistoryItems: [],
       commandContext: {},
       shellConfirmationRequest: null,
       confirmationRequest: null,
     });
-    mockedUseHopCodeStream.mockReturnValue({
+    mockedUseGeminiStream.mockReturnValue({
       streamingState: 'idle',
       submitQuery: vi.fn(),
       initError: null,
-      pendingGeminiHistoryItems: [],
+      pendingHistoryItems: [],
       thought: null,
       cancelOngoingRequest: vi.fn(),
       retryLastPrompt: vi.fn(),
@@ -245,6 +255,7 @@ describe('AppContainer State Management', () => {
       getQueuedMessagesText: vi.fn().mockReturnValue(''),
       popAllMessages: vi.fn().mockReturnValue(null),
       drainQueue: vi.fn().mockReturnValue([]),
+      popNextSegment: vi.fn().mockReturnValue(null),
     });
     mockedUseAutoAcceptIndicator.mockReturnValue(false);
     mockedUseGitBranchName.mockReturnValue('main');
@@ -272,14 +283,14 @@ describe('AppContainer State Management', () => {
     // Mock config's getTargetDir to return consistent workspace directory
     vi.spyOn(mockConfig, 'getTargetDir').mockReturnValue('/test/workspace');
 
-    // Mock HopCodeClient to prevent unhandled errors from AgentTool.refreshSubagents
-    const mockHopCodeClient: Partial<HopCodeClient> = {
+    // Mock GeminiClient to prevent unhandled errors from AgentTool.refreshSubagents
+    const mockGeminiClient: Partial<GeminiClient> = {
       initialize: vi.fn().mockResolvedValue(undefined),
       setTools: vi.fn().mockResolvedValue(undefined),
       isInitialized: vi.fn().mockReturnValue(false), // Return false to prevent setTools from being called
     };
-    vi.spyOn(mockConfig, 'getHopCodeClient').mockReturnValue(
-      mockHopCodeClient as HopCodeClient,
+    vi.spyOn(mockConfig, 'getGeminiClient').mockReturnValue(
+      mockGeminiClient as GeminiClient,
     );
 
     // Mock SubagentManager to prevent errors during AgentTool initialization
@@ -310,7 +321,7 @@ describe('AppContainer State Management', () => {
       themeError: null,
       authError: null,
       shouldOpenAuthDialog: false,
-      contextMdFileCount: 0,
+      geminiMdFileCount: 0,
     } as InitializationResult;
   });
 
@@ -426,6 +437,83 @@ describe('AppContainer State Management', () => {
       }).not.toThrow();
     });
 
+    it('refreshStatic clears the terminal before remounting history', () => {
+      render(
+        <AppContainer
+          config={mockConfig}
+          settings={mockSettings}
+          version="1.0.0"
+          initializationResult={mockInitResult}
+        />,
+      );
+
+      capturedUIActions.refreshStatic();
+
+      expect(mockStdout.write).toHaveBeenCalledWith(ansiEscapes.clearTerminal);
+    });
+
+    it('handleClearScreen avoids a second clearTerminal write', () => {
+      const clearSpy = vi.spyOn(console, 'clear').mockImplementation(() => {});
+
+      render(
+        <AppContainer
+          config={mockConfig}
+          settings={mockSettings}
+          version="1.0.0"
+          initializationResult={mockInitResult}
+        />,
+      );
+
+      capturedUIActions.handleClearScreen();
+
+      expect(clearSpy).toHaveBeenCalledTimes(1);
+      expect(mockStdout.write).not.toHaveBeenCalledWith(
+        ansiEscapes.clearTerminal,
+      );
+
+      clearSpy.mockRestore();
+    });
+
+    it('passes a remount-only refresh callback to slash commands', () => {
+      let slashRefreshStatic: (() => void) | undefined;
+      mockedUseSlashCommandProcessor.mockImplementation(
+        (
+          _config,
+          _settings,
+          _addItem,
+          _clearItems,
+          _loadHistory,
+          refreshStatic,
+        ) => {
+          slashRefreshStatic = refreshStatic;
+          return {
+            handleSlashCommand: vi.fn(),
+            slashCommands: [],
+            pendingHistoryItems: [],
+            commandContext: {},
+            shellConfirmationRequest: null,
+            confirmationRequest: null,
+          };
+        },
+      );
+
+      render(
+        <AppContainer
+          config={mockConfig}
+          settings={mockSettings}
+          version="1.0.0"
+          initializationResult={mockInitResult}
+        />,
+      );
+
+      slashRefreshStatic?.();
+
+      expect(slashRefreshStatic).toBeDefined();
+      expect(mockStdout.write).not.toHaveBeenCalledWith(
+        ansiEscapes.clearTerminal,
+      );
+    });
+
     it('provides ConfigContext with config object', () => {
       expect(() => {
         render(
@@ -443,11 +531,11 @@ describe('AppContainer State Management', () => {
       const mockSubmitQuery = vi.fn();
       const mockQueueMessage = vi.fn();
 
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'responding',
         submitQuery: mockSubmitQuery,
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -459,6 +547,7 @@ describe('AppContainer State Management', () => {
         getQueuedMessagesText: vi.fn().mockReturnValue(''),
         popAllMessages: vi.fn().mockReturnValue(null),
         drainQueue: vi.fn().mockReturnValue([]),
+        popNextSegment: vi.fn().mockReturnValue(null),
       });
 
       render(
@@ -476,6 +565,44 @@ describe('AppContainer State Management', () => {
       expect(mockQueueMessage).not.toHaveBeenCalled();
     });
 
+    it('submits slash commands immediately instead of queueing while idle', () => {
+      const mockSubmitQuery = vi.fn();
+      const mockQueueMessage = vi.fn();
+
+      mockedUseGeminiStream.mockReturnValue({
+        streamingState: 'idle',
+        submitQuery: mockSubmitQuery,
+        initError: null,
+        pendingHistoryItems: [],
+        thought: null,
+        cancelOngoingRequest: vi.fn(),
+        retryLastPrompt: vi.fn(),
+      });
+      mockedUseMessageQueue.mockReturnValue({
+        messageQueue: [],
+        addMessage: mockQueueMessage,
+        clearQueue: vi.fn(),
+        getQueuedMessagesText: vi.fn().mockReturnValue(''),
+        popAllMessages: vi.fn().mockReturnValue(null),
+        drainQueue: vi.fn().mockReturnValue([]),
+        popNextSegment: vi.fn().mockReturnValue(null),
+      });
+
+      render(
+        <AppContainer
+          config={mockConfig}
+          settings={mockSettings}
+          version="1.0.0"
+          initializationResult={mockInitResult}
+        />,
+      );
+
+      capturedUIActions.handleFinalSubmit('/model');
+
+      expect(mockSubmitQuery).toHaveBeenCalledWith('/model');
+      expect(mockQueueMessage).not.toHaveBeenCalled();
+    });
+
     it.each(['exit', 'quit', ':q', ':q!', ':wq', ':wq!'])(
       'routes bare "%s" to /quit instead of sending as a message',
       (command) => {
@@ -485,7 +612,7 @@ describe('AppContainer State Management', () => {
         mockedUseSlashCommandProcessor.mockReturnValue({
           handleSlashCommand: mockHandleSlashCommand,
           slashCommands: [],
-          pendingGeminiHistoryItems: [],
+          pendingHistoryItems: [],
           commandContext: {},
           shellConfirmationRequest: null,
           confirmationRequest: null,
@@ -497,6 +624,7 @@ describe('AppContainer State Management', () => {
           getQueuedMessagesText: vi.fn().mockReturnValue(''),
           popAllMessages: vi.fn().mockReturnValue(null),
           drainQueue: vi.fn().mockReturnValue([]),
+          popNextSegment: vi.fn().mockReturnValue(null),
         });
 
         render(
@@ -517,8 +645,8 @@ describe('AppContainer State Management', () => {
   });
 
   describe('Cancel Handler (issue #3204)', () => {
-    // The cancel handler is wired through useHopCodeStream's onCancelSubmit
-    // arg (positional index 14 — see the useHopCodeStream call site in
+    // The cancel handler is wired through useGeminiStream's onCancelSubmit
+    // arg (positional index 14 — see the useGeminiStream call site in
     // AppContainer.tsx). We capture it via mockImplementation so a future
     // signature change surfaces as a clear test failure rather than silently
     // grabbing the wrong callback.
@@ -529,7 +657,7 @@ describe('AppContainer State Management', () => {
       streamReturnValue: Record<string, unknown>,
     ) => {
       capturedOnCancelSubmit = null;
-      mockedUseHopCodeStream.mockImplementation((...args: unknown[]) => {
+      mockedUseGeminiStream.mockImplementation((...args: unknown[]) => {
         const candidate = args[ON_CANCEL_SUBMIT_ARG_INDEX];
         if (typeof candidate === 'function') {
           capturedOnCancelSubmit = candidate as () => void;
@@ -541,7 +669,7 @@ describe('AppContainer State Management', () => {
     const triggerCancel = () => {
       if (!capturedOnCancelSubmit) {
         throw new Error(
-          `onCancelSubmit was not captured at arg index ${ON_CANCEL_SUBMIT_ARG_INDEX} — useHopCodeStream signature may have changed`,
+          `onCancelSubmit was not captured at arg index ${ON_CANCEL_SUBMIT_ARG_INDEX} — useGeminiStream signature may have changed`,
         );
       }
       capturedOnCancelSubmit();
@@ -565,7 +693,7 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -577,6 +705,7 @@ describe('AppContainer State Management', () => {
         getQueuedMessagesText: vi.fn().mockReturnValue(''),
         popAllMessages: vi.fn().mockReturnValue(null),
         drainQueue: vi.fn().mockReturnValue([]),
+        popNextSegment: vi.fn().mockReturnValue(null),
       });
 
       render(
@@ -605,6 +734,7 @@ describe('AppContainer State Management', () => {
     it('moves queued follow-up messages into an empty buffer on cancel', async () => {
       const mockSetText = vi.fn();
       const mockPopAllMessages = vi.fn().mockReturnValue('queued follow-up');
+      const mockClearQueue = vi.fn();
       mockedUseTextBuffer.mockReturnValue({
         text: '',
         setText: mockSetText,
@@ -618,7 +748,7 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -626,10 +756,11 @@ describe('AppContainer State Management', () => {
       mockedUseMessageQueue.mockReturnValue({
         messageQueue: ['queued follow-up'],
         addMessage: vi.fn(),
-        clearQueue: vi.fn(),
+        clearQueue: mockClearQueue,
         getQueuedMessagesText: vi.fn().mockReturnValue('queued follow-up'),
         popAllMessages: mockPopAllMessages,
         drainQueue: vi.fn().mockReturnValue(['queued follow-up']),
+        popNextSegment: vi.fn().mockReturnValue('queued follow-up'),
       });
 
       render(
@@ -653,6 +784,75 @@ describe('AppContainer State Management', () => {
         expect.stringContaining('the previous prompt'),
       );
       expect(mockPopAllMessages).toHaveBeenCalled();
+      // popAllForEdit drains the queue internally, so the cancel handler
+      // does not need to call clearQueue separately on this path.
+      expect(mockClearQueue).not.toHaveBeenCalled();
+    });
+
+    it('drops the queue when cancelling during tool execution', async () => {
+      // Simulates: user asks for a shell tool (e.g. sleep 30), queues
+      // `/model` and `hi` while the tool is running, then hits Ctrl+C.
+      // The cancel must clear BOTH the buffer and the queue so that
+      // `hi` does not auto-fire once the tool settles and the app
+      // returns to idle.
+      const mockSetText = vi.fn();
+      const mockClearQueue = vi.fn();
+      mockedUseTextBuffer.mockReturnValue({
+        text: '',
+        setText: mockSetText,
+      });
+      installCancelCapture({
+        streamingState: 'responding',
+        submitQuery: vi.fn(),
+        initError: null,
+        pendingHistoryItems: [
+          {
+            type: 'tool_group',
+            tools: [
+              {
+                callId: 'call-1',
+                name: 'run_shell_command',
+                description: 'sleep 30',
+                status: ToolCallStatus.Executing,
+                resultDisplay: undefined,
+                confirmationDetails: undefined,
+                renderOutputAsMarkdown: false,
+              },
+            ],
+          },
+        ],
+        thought: null,
+        cancelOngoingRequest: vi.fn(),
+        retryLastPrompt: vi.fn(),
+      });
+      mockedUseMessageQueue.mockReturnValue({
+        messageQueue: ['/model', 'hi'],
+        addMessage: vi.fn(),
+        clearQueue: mockClearQueue,
+        getQueuedMessagesText: vi.fn().mockReturnValue('/model\n\nhi'),
+        popAllMessages: vi.fn().mockReturnValue('/model'),
+        drainQueue: vi.fn().mockReturnValue([]),
+        popNextSegment: vi.fn().mockReturnValue('/model'),
+      });
+
+      render(
+        <AppContainer
+          config={mockConfig}
+          settings={mockSettings}
+          version="1.0.0"
+          initializationResult={mockInitResult}
+        />,
+      );
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      triggerCancel();
+
+      // Buffer cleared and queue dropped — same "abort and redirect"
+      // contract as the non-tool cancel path.
+      expect(mockSetText).toHaveBeenCalledWith('');
+      expect(mockClearQueue).toHaveBeenCalled();
     });
 
     it('preserves an in-progress draft when restoring queued messages on cancel', async () => {
@@ -668,7 +868,7 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -680,6 +880,7 @@ describe('AppContainer State Management', () => {
         getQueuedMessagesText: vi.fn().mockReturnValue('queued follow-up'),
         popAllMessages: vi.fn().mockReturnValue('queued follow-up'),
         drainQueue: vi.fn().mockReturnValue(['queued follow-up']),
+        popNextSegment: vi.fn().mockReturnValue('queued follow-up'),
       });
 
       render(
@@ -884,11 +1085,11 @@ describe('AppContainer State Management', () => {
 
       // Mock the streaming state and thought
       const thoughtSubject = 'Processing request';
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: { subject: thoughtSubject },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -930,11 +1131,11 @@ describe('AppContainer State Management', () => {
       } as unknown as LoadedSettings;
 
       // Mock the streaming state as Idle with no thought
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'idle',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -977,11 +1178,11 @@ describe('AppContainer State Management', () => {
 
       // Mock the streaming state and thought
       const thoughtSubject = 'Confirm tool execution';
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'waitingForConfirmation',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: { subject: thoughtSubject },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -1024,11 +1225,11 @@ describe('AppContainer State Management', () => {
 
       // Mock the streaming state and thought with a short subject
       const shortTitle = 'Short';
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: { subject: shortTitle },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -1075,11 +1276,11 @@ describe('AppContainer State Management', () => {
 
       // Mock the streaming state and thought
       const title = 'Test Title';
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: { subject: title },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -1123,11 +1324,11 @@ describe('AppContainer State Management', () => {
       vi.stubEnv('CLI_TITLE', 'Custom Gemini Title');
 
       // Mock the streaming state as Idle with no thought
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'idle',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -1165,11 +1366,11 @@ describe('AppContainer State Management', () => {
       mockedUseTerminalSize.mockReturnValue({ columns: 80, rows: 5 });
       mockedMeasureElement.mockReturnValue({ width: 80, height: 10 }); // Footer is taller than the screen
 
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'idle',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
@@ -1204,7 +1405,17 @@ describe('AppContainer State Management', () => {
         onAuthError: vi.fn(),
         isAuthDialogOpen: false,
         isAuthenticating: true,
+        pendingAuthType: undefined,
+        externalAuthState: null,
+        qwenAuthState: {
+          deviceAuth: null,
+          authStatus: 'idle',
+          authMessage: null,
+        },
         handleAuthSelect: vi.fn(),
+        handleCodingPlanSubmit: vi.fn(),
+        handleAlibabaStandardSubmit: vi.fn(),
+        handleOpenRouterSubmit: vi.fn(),
         openAuthDialog: vi.fn(),
         cancelAuthentication: vi.fn(),
       });
@@ -1213,7 +1424,7 @@ describe('AppContainer State Management', () => {
       mockedUseSlashCommandProcessor.mockReturnValue({
         handleSlashCommand: mockHandleSlashCommand,
         slashCommands: [],
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         commandContext: {},
         shellConfirmationRequest: null,
         confirmationRequest: null,
@@ -1241,7 +1452,7 @@ describe('AppContainer State Management', () => {
       mockedUseSlashCommandProcessor.mockReturnValue({
         handleSlashCommand: mockHandleSlashCommand,
         slashCommands: [],
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         commandContext: {},
         shellConfirmationRequest: null,
         confirmationRequest: null,
@@ -1273,7 +1484,7 @@ describe('AppContainer State Management', () => {
       mockedUseSlashCommandProcessor.mockReturnValue({
         handleSlashCommand: mockHandleSlashCommand,
         slashCommands: [],
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         commandContext: {},
         shellConfirmationRequest: null,
         confirmationRequest: null,
@@ -1297,11 +1508,11 @@ describe('AppContainer State Management', () => {
 
     it('should cancel ongoing request on first Ctrl+C', () => {
       const mockCancelOngoingRequest = vi.fn();
-      mockedUseHopCodeStream.mockReturnValue({
+      mockedUseGeminiStream.mockReturnValue({
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         thought: null,
         cancelOngoingRequest: mockCancelOngoingRequest,
         retryLastPrompt: vi.fn(),
@@ -1311,7 +1522,7 @@ describe('AppContainer State Management', () => {
       mockedUseSlashCommandProcessor.mockReturnValue({
         handleSlashCommand: mockHandleSlashCommand,
         slashCommands: [],
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         commandContext: {},
         shellConfirmationRequest: null,
         confirmationRequest: null,
@@ -1336,7 +1547,7 @@ describe('AppContainer State Management', () => {
       mockedUseSlashCommandProcessor.mockReturnValue({
         handleSlashCommand: mockHandleSlashCommand,
         slashCommands: [],
-        pendingGeminiHistoryItems: [],
+        pendingHistoryItems: [],
         commandContext: {},
         shellConfirmationRequest: null,
         confirmationRequest: null,
@@ -1403,5 +1614,30 @@ describe('AppContainer State Management', () => {
       capturedUIActions.closeModelDialog();
       expect(mockCloseModelDialog).toHaveBeenCalled();
     });
+  });
+});
+
+describe('dedupeNewestFirst', () => {
+  it('returns empty array for empty input', () => {
+    expect(dedupeNewestFirst([])).toEqual([]);
+  });
+
+  it('preserves order when there are no duplicates', () => {
+    expect(dedupeNewestFirst(['a', 'b', 'c'])).toEqual(['a', 'b', 'c']);
+  });
+
+  it('removes consecutive duplicates', () => {
+    expect(dedupeNewestFirst(['a', 'a', 'b'])).toEqual(['a', 'b']);
+  });
+
+  it('removes non-consecutive duplicates keeping the first (newest) occurrence', () => {
+    expect(
+      dedupeNewestFirst([
+        'first prompt',
+        'third prompt',
+        'second prompt',
+        'first prompt',
+      ]),
+    ).toEqual(['first prompt', 'third prompt', 'second prompt']);
   });
 });

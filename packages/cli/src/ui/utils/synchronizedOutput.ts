@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,22 +35,22 @@ export function terminalSupportsSynchronizedOutput(
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
   if (
-    env['HOPCODE_DISABLE_SYNCHRONIZED_OUTPUT'] === '1' ||
-    env['HOPCODE_SYNCHRONIZED_OUTPUT'] === '0'
+    env['QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT'] === '1' ||
+    env['QWEN_CODE_SYNCHRONIZED_OUTPUT'] === '0'
   ) {
     return false;
   }
 
   if (
-    env['HOPCODE_FORCE_SYNCHRONIZED_OUTPUT'] === '1' ||
-    env['HOPCODE_SYNCHRONIZED_OUTPUT'] === '1'
+    env['QWEN_CODE_FORCE_SYNCHRONIZED_OUTPUT'] === '1' ||
+    env['QWEN_CODE_SYNCHRONIZED_OUTPUT'] === '1'
   ) {
     return true;
   }
 
-  // tmux 3.3+ supports DEC SET 2026 (synchronized output). SSH sessions may
-  // or may not — it depends on the client. We allow them through; users can
-  // disable via HOPCODE_DISABLE_SYNCHRONIZED_OUTPUT=1 if they hit issues.
+  if (env['TMUX'] || env['SSH_TTY'] || env['SSH_CLIENT']) {
+    return false;
+  }
 
   const termProgram = env['TERM_PROGRAM'];
   if (termProgram === 'WezTerm' || termProgram === 'iTerm.app') {

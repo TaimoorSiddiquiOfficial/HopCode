@@ -173,34 +173,84 @@ describe('terminalSerializer', () => {
       expect(result[0][0].text).toBe('Styled text');
     });
 
-    it('unwraps wrapped lines when requested', async () => {
+    it('can unwrap soft-wrapped ANSI rows for live output comparison', async () => {
       const terminal = new Terminal({
-        cols: 5,
-        rows: 24,
+        cols: 8,
+        rows: 4,
         allowProposedApi: true,
+        scrollback: 100,
+        convertEol: true,
       });
-      await writeToTerminal(terminal, 'abcdefgh');
+
+      await writeToTerminal(terminal, 'abcdefghijkl\nshort\n');
 
       const result = serializeTerminalToObject(terminal, 0, {
         unwrapWrappedLines: true,
       });
+      const visibleText = result
+        .map((line) =>
+          line
+            .map((token) => token.text)
+            .join('')
+            .trimEnd(),
+        )
+        .filter(Boolean);
 
-      expect(result[0][0].text).toBe('abcdefgh');
+      expect(visibleText).toEqual(['abcdefghijkl', 'short']);
+      expect(result[0]).toHaveLength(1);
     });
   });
 
   describe('serializeTerminalToText', () => {
-    it('preserves logical lines across soft wraps', async () => {
+    it('unwraps soft-wrapped narrow terminal lines for transcript text', async () => {
       const terminal = new Terminal({
-        cols: 5,
-        rows: 24,
+        cols: 10,
+        rows: 4,
         allowProposedApi: true,
+        scrollback: 100,
+        convertEol: true,
       });
-      await writeToTerminal(terminal, 'abcdefgh');
 
-      expect(serializeTerminalToText(terminal)).toBe('abcdefgh');
+      await writeToTerminal(terminal, 'abcdefghijklmnopqrstuvwxyz\n');
+
+      expect(serializeTerminalToText(terminal)).toBe(
+        'abcdefghijklmnopqrstuvwxyz',
+      );
+    });
+
+    it('keeps explicit newlines while unwrapping visual continuation rows', async () => {
+      const terminal = new Terminal({
+        cols: 8,
+        rows: 4,
+        allowProposedApi: true,
+        scrollback: 100,
+        convertEol: true,
+      });
+
+      await writeToTerminal(terminal, 'abcdefghijkl\nshort\n');
+
+      expect(serializeTerminalToText(terminal)).toBe('abcdefghijkl\nshort');
+    });
+
+    it('does not treat resize reflow as duplicated transcript lines', async () => {
+      const terminal = new Terminal({
+        cols: 12,
+        rows: 4,
+        allowProposedApi: true,
+        scrollback: 100,
+        convertEol: true,
+      });
+
+      await writeToTerminal(terminal, 'abcdefghijklmnopqrstuvwxyz\n123456\n');
+      terminal.resize(6, 4);
+      await writeToTerminal(terminal, 'done\n');
+
+      expect(serializeTerminalToText(terminal)).toBe(
+        'abcdefghijklmnopqrstuvwxyz\n123456\ndone',
+      );
     });
   });
+
   describe('convertColorToHex', () => {
     it('should convert RGB color to hex', () => {
       const color = (100 << 16) | (200 << 8) | 50;

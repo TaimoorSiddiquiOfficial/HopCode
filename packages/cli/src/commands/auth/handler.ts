@@ -9,26 +9,34 @@ import {
   getErrorMessage,
   type Config,
   type ProviderModelConfig as ModelConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
-import { promptForSecretInput } from '../../utils/promptUtils.js';
 import { t } from '../../i18n/index.js';
+import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import {
   getCodingPlanConfig,
   isCodingPlanConfig,
   CodingPlanRegion,
   CODING_PLAN_ENV_KEY,
-} from '@hoptrendy/hopcode-core';
-import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
+} from '../../constants/codingPlan.js';
 import { backupSettingsFile } from '../../utils/settingsUtils.js';
 import { loadSettings, type LoadedSettings } from '../../config/settings.js';
 import { loadCliConfig } from '../../config/config.js';
 import type { CliArgs } from '../../config/config.js';
 import { InteractiveSelector } from './interactiveSelector.js';
-import { PROVIDER_REGISTRY, detectActiveProvider } from './registry.js';
-import { handleApiKeyAuth } from './providers.js';
+import {
+  applyOpenRouterModelsConfiguration,
+  createOpenRouterOAuthSession,
+  isOpenRouterConfig,
+  OPENROUTER_ENV_KEY,
+  runOpenRouterOAuthLogin,
+} from './openrouterOAuth.js';
 
-interface HopcodeAuthOptions {
+function formatElapsedTime(startMs: number): string {
+  return `${((Date.now() - startMs) / 1000).toFixed(2)}s`;
+}
+
+interface QwenAuthOptions {
   region?: string;
   key?: string;
 }
@@ -55,9 +63,9 @@ interface MergedSettingsWithCodingPlan {
 /**
  * Handles the authentication process based on the specified command and options
  */
-export async function handleHopcodeAuth(
-  command: 'hopcode-oauth' | 'coding-plan',
-  options: HopcodeAuthOptions,
+export async function handleQwenAuth(
+  command: 'qwen-oauth' | 'coding-plan' | 'openrouter',
+  options: QwenAuthOptions,
 ) {
   try {
     const settings = loadSettings();
@@ -94,10 +102,6 @@ export async function handleHopcodeAuth(
       openaiLoggingDir: undefined,
       proxy: undefined,
       includeDirectories: undefined,
-      tavilyApiKey: undefined,
-      googleApiKey: undefined,
-      googleSearchEngineId: undefined,
-      webSearchDefault: undefined,
       screenReader: undefined,
       inputFormat: undefined,
       outputFormat: undefined,
@@ -129,10 +133,12 @@ export async function handleHopcodeAuth(
       },
     );
 
-    if (command === 'hopcode-oauth') {
-      await handleHopcodeOAuth(config, settings);
+    if (command === 'qwen-oauth') {
+      await handleQwenOAuth(config, settings);
     } else if (command === 'coding-plan') {
       await handleCodePlanAuth(config, settings, options);
+    } else if (command === 'openrouter') {
+      await handleOpenRouterAuth(config, settings, options);
     }
 
     // Exit after authentication is complete
@@ -145,23 +151,23 @@ export async function handleHopcodeAuth(
 }
 
 /**
- * Handles HopCode OAuth authentication
+ * Handles Qwen OAuth authentication
  */
-async function handleHopcodeOAuth(
+async function handleQwenOAuth(
   config: Config,
   settings: LoadedSettings,
 ): Promise<void> {
-  writeStdoutLine(t('Starting HopCode OAuth authentication...'));
+  writeStdoutLine(t('Starting Qwen OAuth authentication...'));
 
   try {
-    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
+    await config.refreshAuth(AuthType.QWEN_OAUTH);
 
     // Persist the auth type
     const authTypeScope = getPersistScopeForModelSelection(settings);
     settings.setValue(
       authTypeScope,
       'security.auth.selectedType',
-      AuthType.HOPCODE_OAUTH,
+      AuthType.QWEN_OAUTH,
     );
 
     writeStdoutLine(t('Successfully authenticated with Qwen OAuth.'));
@@ -182,7 +188,7 @@ async function handleHopcodeOAuth(
 async function handleCodePlanAuth(
   config: Config,
   settings: LoadedSettings,
-  options: HopcodeAuthOptions,
+  options: QwenAuthOptions,
 ): Promise<void> {
   const { region, key } = options;
 
@@ -199,7 +205,7 @@ async function handleCodePlanAuth(
   } else {
     // Otherwise, prompt interactively
     selectedRegion = await promptForRegion();
-    selectedKey = await promptForKey();
+    selectedKey = await promptForAuthKey(t('Enter your Coding Plan API key: '));
   }
 
   writeStdoutLine(t('Processing Alibaba Cloud Coding Plan authentication...'));
@@ -287,6 +293,105 @@ async function handleCodePlanAuth(
 }
 
 /**
+ * Handles OpenRouter API key setup.
+ */
+async function handleOpenRouterAuth(
+  config: Config,
+  settings: LoadedSettings,
+  options: QwenAuthOptions,
+): Promise<void> {
+  writeStdoutLine(t('Processing OpenRouter authentication...'));
+
+  try {
+    const authStartMs = Date.now();
+    let selectedKey = options.key;
+
+    if (!selectedKey) {
+      const oauthStartMs = Date.now();
+      const oauthSession = createOpenRouterOAuthSession();
+      writeStdoutLine(
+        t(
+          'Starting OpenRouter OAuth in your browser. If needed, open this link manually: {{authorizationUrl}}',
+          {
+            authorizationUrl: oauthSession.authorizationUrl,
+          },
+        ),
+      );
+      const oauthResult = await runOpenRouterOAuthLogin(undefined, {
+        session: oauthSession,
+      });
+      writeStdoutLine(
+        t('Waited for OpenRouter browser authorization in {{elapsed}}.', {
+          elapsed:
+            typeof oauthResult.authorizationCodeWaitMs === 'number'
+              ? `${(oauthResult.authorizationCodeWaitMs / 1000).toFixed(2)}s`
+              : formatElapsedTime(oauthStartMs),
+        }),
+      );
+      writeStdoutLine(
+        t('Exchanged OpenRouter auth code for API key in {{elapsed}}.', {
+          elapsed:
+            typeof oauthResult.apiKeyExchangeMs === 'number'
+              ? `${(oauthResult.apiKeyExchangeMs / 1000).toFixed(2)}s`
+              : formatElapsedTime(oauthStartMs),
+        }),
+      );
+      writeStdoutLine(
+        t('OpenRouter OAuth callback completed in {{elapsed}}.', {
+          elapsed: formatElapsedTime(oauthStartMs),
+        }),
+      );
+      selectedKey = oauthResult.apiKey;
+    }
+
+    if (!selectedKey) {
+      throw new Error(
+        'OpenRouter authentication completed without an API key.',
+      );
+    }
+
+    const authTypeScope = getPersistScopeForModelSelection(settings);
+    const settingsFile = settings.forScope(authTypeScope);
+    backupSettingsFile(settingsFile.path);
+
+    const modelsStartMs = Date.now();
+    await applyOpenRouterModelsConfiguration({
+      settings,
+      config,
+      apiKey: selectedKey,
+      reloadConfig: true,
+    });
+    writeStdoutLine(
+      t('Fetched OpenRouter models in {{elapsed}}.', {
+        elapsed: formatElapsedTime(modelsStartMs),
+      }),
+    );
+
+    const refreshStartMs = Date.now();
+    await config.refreshAuth(AuthType.USE_OPENAI);
+    writeStdoutLine(
+      t('Refreshed OpenRouter auth in {{elapsed}}.', {
+        elapsed: formatElapsedTime(refreshStartMs),
+      }),
+    );
+    writeStdoutLine(
+      t('Total OpenRouter setup time: {{elapsed}}.', {
+        elapsed: formatElapsedTime(authStartMs),
+      }),
+    );
+
+    writeStdoutLine(t('Successfully configured OpenRouter.'));
+  } catch (error) {
+    writeStderrLine(
+      t('Failed to configure OpenRouter: {{error}}', {
+        error: getErrorMessage(error),
+      }),
+    );
+    process.exit(1);
+  }
+}
+
+/**
  * Prompts the user to select a region using an interactive selector
  */
 async function promptForRegion(): Promise<CodingPlanRegion> {
@@ -310,31 +415,80 @@ async function promptForRegion(): Promise<CodingPlanRegion> {
 }
 
 /**
- * Prompts the user to enter an API key with masked input.
- * Uses readline-based approach so paste works correctly on all platforms.
+ * Prompts the user to enter an API key
  */
-async function promptForKey(): Promise<string> {
-  return promptForSecretInput(t('Enter your Coding Plan API key: '));
+async function promptForAuthKey(prompt: string): Promise<string> {
+  // Create a simple password-style input (without echoing characters)
+  const stdin = process.stdin;
+  const stdout = process.stdout;
+
+  stdout.write(prompt);
+
+  // Set raw mode to capture keystrokes
+  const wasRaw = stdin.isRaw;
+  if (stdin.setRawMode) {
+    stdin.setRawMode(true);
+  }
+  stdin.resume();
+
+  return new Promise<string>((resolve, reject) => {
+    let input = '';
+
+    const onData = (chunk: string) => {
+      for (const char of chunk) {
+        switch (char) {
+          case '\r': // Enter
+          case '\n':
+            stdin.removeListener('data', onData);
+            if (stdin.setRawMode) {
+              stdin.setRawMode(wasRaw);
+            }
+            stdout.write('\n'); // New line after input
+            resolve(input);
+            return;
+          case '\x03': // Ctrl+C
+            stdin.removeListener('data', onData);
+            if (stdin.setRawMode) {
+              stdin.setRawMode(wasRaw);
+            }
+            stdout.write('^C\n');
+            reject(new Error('Interrupted'));
+            return;
+          case '\x08': // Backspace
+          case '\x7F': // Delete
+            if (input.length > 0) {
+              input = input.slice(0, -1);
+              // Move cursor back, print space, move back again
+              stdout.write('\x1B[D \x1B[D');
+            }
+            break;
+          default:
+            // Add character to input
+            input += char;
+            // Print asterisk instead of the actual character for security
+            stdout.write('*');
+            break;
+        }
+      }
+    };
+
+    stdin.on('data', onData);
+  });
 }
 
 /**
  * Runs the interactive authentication flow
  */
 export async function runInteractiveAuth() {
-  // Build selector options: start with Coding Plan + HopCode OAuth, then add all registry providers
-  type AuthChoice =
-    | 'coding-plan'
-    | 'qwen-oauth'
-    | (typeof PROVIDER_REGISTRY)[number]['id'];
-
-  const providerOptions = PROVIDER_REGISTRY.map((p) => ({
-    value: p.id as AuthChoice,
-    label: t(p.label),
-    description: t(p.description),
-  }));
-
-  const selector = new InteractiveSelector<AuthChoice>(
+  const selector = new InteractiveSelector(
     [
+      {
+        value: 'openrouter' as const,
+        label: t('OpenRouter'),
+        description: t(
+          'API key setup · OpenAI-compatible provider via OpenRouter',
+        ),
+      },
       {
         value: 'coding-plan' as const,
         label: t('Alibaba Cloud Coding Plan'),
@@ -343,32 +497,30 @@ export async function runInteractiveAuth() {
         ),
       },
       {
-        value: 'hopcode-oauth' as const,
-        label: t('HopCode OAuth'),
+        value: 'qwen-oauth' as const,
+        label: t('Qwen OAuth'),
         description: t('Discontinued — switch to Coding Plan or API Key'),
       },
-      ...providerOptions,
     ],
     t('Select authentication method:'),
   );
 
   let choice = await selector.select();
 
-  // If user selects discontinued HopCode OAuth, warn and re-prompt
-  while (choice === 'hopcode-oauth') {
+  // If user selects discontinued Qwen OAuth, warn and re-prompt
+  while (choice === 'qwen-oauth') {
     writeStdoutLine(
       t(
-        '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
+        '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
       ),
     );
     choice = await selector.select();
   }
 
   if (choice === 'coding-plan') {
-    await handleHopcodeAuth('coding-plan', {});
-  } else {
-    // Delegate all registry providers to handleApiKeyAuth
-    await handleApiKeyAuth(choice, {});
+    await handleQwenAuth('coding-plan', {});
+  } else if (choice === 'openrouter') {
+    await handleQwenAuth('openrouter', {});
   }
 }
 
@@ -389,50 +541,65 @@ export async function showAuthStatus(): Promise<void> {
       writeStdoutLine(t('⚠️  No authentication method configured.\n'));
       writeStdoutLine(t('Run one of the following commands to get started:\n'));
       writeStdoutLine(
+        t('  qwen auth openrouter      - Configure OpenRouter API key'),
+      );
+      writeStdoutLine(
         t(
-          '  hopcode auth hopcode-oauth  - Authenticate with HopCode OAuth (free tier)',
+          '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (free tier)',
         ),
       );
       writeStdoutLine(
         t(
-          '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n',
+          '  qwen auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n',
         ),
       );
       writeStdoutLine(t('Or simply run:'));
       writeStdoutLine(
-        t('  hopcode auth                - Interactive authentication setup\n'),
+        t('  qwen auth                - Interactive authentication setup\n'),
       );
       process.exit(0);
     }
 
     // Display status based on auth type
-    if (selectedType === AuthType.HOPCODE_OAUTH) {
-      writeStdoutLine(t('✓ Authentication Method: HopCode OAuth'));
+    if (selectedType === AuthType.QWEN_OAUTH) {
+      writeStdoutLine(t('✓ Authentication Method: Qwen OAuth'));
       writeStdoutLine(t('  Type: Free tier (discontinued 2026-04-15)'));
       writeStdoutLine(t('  Limit: No longer available'));
-      writeStdoutLine(t('  Models: HopCode latest models'));
+      writeStdoutLine(t('  Models: Qwen latest models'));
       writeStdoutLine(
         t('\n  ⚠ Run /auth to switch to Coding Plan or another provider.\n'),
       );
     } else if (selectedType === AuthType.USE_OPENAI) {
-      // Detect which provider is actually configured
-      const openaiModelProviders = (
-        mergedSettings.modelProviders as
-          | Record<string, ModelConfig[]>
-          | undefined
-      )?.[AuthType.USE_OPENAI];
+      const codingPlanRegion = mergedSettings.codingPlan?.region;
+      const codingPlanVersion = mergedSettings.codingPlan?.version;
+      const modelName = mergedSettings.model?.name;
+      const openAiProviders =
+        mergedSettings.modelProviders?.[AuthType.USE_OPENAI] || [];
+      const hasOpenRouterConfig = openAiProviders.some(isOpenRouterConfig);
+      const hasOpenRouterApiKey =
+        !!process.env[OPENROUTER_ENV_KEY] ||
+        !!mergedSettings.env?.[OPENROUTER_ENV_KEY];
 
-      const activeProvider = detectActiveProvider(openaiModelProviders);
-
-      // Check for Coding Plan first (uses CODING_PLAN_ENV_KEY)
-      const firstEntry = openaiModelProviders?.[0];
-      const isCodingPlan =
-        firstEntry && isCodingPlanConfig(firstEntry.baseUrl, firstEntry.envKey);
-
-      if (isCodingPlan) {
-        const codingPlanRegion = mergedSettings.codingPlan?.region;
-        const codingPlanVersion = mergedSettings.codingPlan?.version;
-        const modelName = mergedSettings.model?.name;
+      if (hasOpenRouterConfig) {
+        if (hasOpenRouterApiKey) {
+          writeStdoutLine(t('✓ Authentication Method: OpenRouter'));
+          if (modelName) {
+            writeStdoutLine(
+              t('  Current Model: {{model}}', { model: modelName }),
+            );
+          }
+          writeStdoutLine(t('  Status: API key configured\n'));
+        } else {
+          writeStdoutLine(
+            t('⚠️  Authentication Method: OpenRouter (Incomplete)'),
+          );
+          writeStdoutLine(
+            t('  Issue: API key not found in environment or settings\n'),
+          );
+          writeStdoutLine(t('  Run `qwen auth openrouter` to re-configure.\n'));
+        }
+      } else {
+        // Check for Coding Plan configuration
         const hasApiKey =
           !!process.env[CODING_PLAN_ENV_KEY] ||
           !!mergedSettings.env?.[CODING_PLAN_ENV_KEY];
@@ -477,47 +644,9 @@ export async function showAuthStatus(): Promise<void> {
             t('  Issue: API key not found in environment or settings\n'),
           );
           writeStdoutLine(
-            t('  Run `hopcode auth coding-plan` to re-configure.\n'),
+            t('  Run `qwen auth coding-plan` to re-configure.\n'),
           );
         }
-      } else if (activeProvider) {
-        // A known registry provider is configured
-        const hasApiKey = activeProvider.envKey
-          ? !!process.env[activeProvider.envKey] ||
-            !!mergedSettings.env?.[activeProvider.envKey]
-          : true; // Ollama local has no real key requirement
-
-        if (hasApiKey) {
-          writeStdoutLine(
-            t('✓ Authentication Method: {{provider}}', {
-              provider: activeProvider.label,
-            }),
-          );
-          const modelName =
-            mergedSettings.model?.name ?? activeProvider.defaultModel;
-          writeStdoutLine(
-            t('  Default Model: {{model}}', { model: modelName }),
-          );
-          writeStdoutLine(t('  Status: API key configured\n'));
-        } else {
-          writeStdoutLine(
-            t('⚠️  Authentication Method: {{provider}} (Incomplete)', {
-              provider: activeProvider.label,
-            }),
-          );
-          writeStdoutLine(
-            t('  Issue: {{key}} not found\n', { key: activeProvider.envKey }),
-          );
-          writeStdoutLine(
-            t('  Run `hopcode auth {{id}}` to re-configure.\n', {
-              id: activeProvider.id,
-            }),
-          );
-        }
-      } else {
-        // Unknown OpenAI-compatible configuration
-        writeStdoutLine(t('✓ Authentication Method: OpenAI-compatible'));
-        writeStdoutLine(t('  Status: Configured\n'));
       }
     } else {
       writeStdoutLine(

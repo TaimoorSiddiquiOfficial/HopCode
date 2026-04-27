@@ -24,9 +24,12 @@ export class WorkspaceContext {
   private initialDirectories: Set<string>;
   private onDirectoriesChangedListeners = new Set<() => void>();
   /**
-   * Memoized realpath results for paths checked during this workspace
-   * session. Kept per-instance to avoid leaking stale state across unrelated
-   * workspaces and tests.
+   * Memoized realpath results. Every workspace-bounded tool call ultimately
+   * routes through {@link fullyResolvedPath} → `fs.realpathSync`; without
+   * this cache the same path gets re-resolved on every Read/Glob/Grep/Ls
+   * invocation. Bounded so long sessions touching many files don't grow
+   * without limit; FIFO eviction is good enough — the working set tends to
+   * be the small set of paths the model is actively manipulating.
    */
   private resolvedPathCache = new Map<string, string>();
   private static readonly RESOLVED_PATH_CACHE_MAX = 1024;
@@ -208,13 +211,18 @@ export class WorkspaceContext {
    * Fully resolves a path, including symbolic links.
    * If the path does not exist, it returns the fully resolved path as it would be
    * if it did exist.
+   *
+   * Result is memoized in {@link resolvedPathCache}. Filesystem-state cache:
+   * if a file is renamed / a symlink is retargeted mid-session the cache
+   * goes stale, which is the same correctness profile as any single
+   * `realpathSync` call (it captures a moment in time). The win is cutting
+   * 8+ syscalls per tool-heavy prompt down to 1.
    */
   private fullyResolvedPath(pathToCheck: string): string {
     const cached = this.resolvedPathCache.get(pathToCheck);
     if (cached !== undefined) {
       return cached;
     }
-
     let resolved: string;
     try {
       resolved = fs.realpathSync(pathToCheck);
@@ -230,21 +238,18 @@ export class WorkspaceContext {
         // If it doesn't exist, e.path contains the fully resolved path.
         resolved = e.path;
       } else {
+        // Don't cache exceptions — the path may exist on retry.
         throw e;
       }
     }
-
-    // Cache the result. FIFO eviction if full.
     if (
       this.resolvedPathCache.size >= WorkspaceContext.RESOLVED_PATH_CACHE_MAX
     ) {
-      const firstKey = this.resolvedPathCache.keys().next().value;
-      if (firstKey !== undefined) {
-        this.resolvedPathCache.delete(firstKey);
-      }
+      // FIFO eviction: drop the oldest insertion (Map preserves insert order).
+      const oldest = this.resolvedPathCache.keys().next().value;
+      if (oldest !== undefined) this.resolvedPathCache.delete(oldest);
     }
     this.resolvedPathCache.set(pathToCheck, resolved);
-
     return resolved;
   }
 

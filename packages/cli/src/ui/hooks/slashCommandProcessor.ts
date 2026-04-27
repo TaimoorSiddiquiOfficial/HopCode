@@ -26,7 +26,7 @@ import {
   ToolConfirmationOutcome,
   IdeClient,
   type SessionListItem,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import type {
   Message,
@@ -86,7 +86,7 @@ interface SlashCommandProcessorActions {
   openMemoryDialog: () => void;
   openSettingsDialog: () => void;
   openModelDialog: (options?: { fastModelMode?: boolean }) => void;
-  openProviderDialog: () => void;
+  openManageModelsDialog: () => void;
   openTrustDialog: () => void;
   openPermissionsDialog: () => void;
   openApprovalModeDialog: () => void;
@@ -102,6 +102,7 @@ interface SlashCommandProcessorActions {
   openExtensionsManagerDialog: () => void;
   openMcpDialog: () => void;
   openHooksDialog: () => void;
+  openRewindSelector: () => void;
 }
 
 /**
@@ -118,7 +119,7 @@ export const useSlashCommandProcessor = (
   isProcessing: boolean,
   setIsProcessing: (isProcessing: boolean) => void,
   isIdleRef: MutableRefObject<boolean>,
-  setContextMdFileCount: (count: number) => void,
+  setGeminiMdFileCount: (count: number) => void,
   actions: SlashCommandProcessorActions,
   extensionsUpdateState: Map<string, ExtensionUpdateStatus>,
   isConfigInitialized: boolean,
@@ -197,7 +198,7 @@ export const useSlashCommandProcessor = (
     { isActive: isProcessing },
   );
 
-  const pendingGeminiHistoryItems = useMemo(() => {
+  const pendingHistoryItems = useMemo(() => {
     const items: HistoryItemWithoutId[] = [];
     if (pendingItem != null) {
       items.push(pendingItem);
@@ -289,7 +290,7 @@ export const useSlashCommandProcessor = (
         btwAbortControllerRef,
         isIdleRef,
         toggleVimEnabled,
-        setContextMdFileCount,
+        setGeminiMdFileCount,
         reloadCommands,
         setSessionName: setSessionName ?? (() => {}),
         extensionsUpdateState,
@@ -323,7 +324,7 @@ export const useSlashCommandProcessor = (
       cancelBtw,
       toggleVimEnabled,
       sessionShellAllowlist,
-      setContextMdFileCount,
+      setGeminiMdFileCount,
       reloadCommands,
       setSessionName,
       extensionsUpdateState,
@@ -595,6 +596,9 @@ export const useSlashCommandProcessor = (
                     case 'fast-model':
                       actions.openModelDialog({ fastModelMode: true });
                       return { type: 'handled' };
+                    case 'manage-models':
+                      actions.openManageModelsDialog();
+                      return { type: 'handled' };
                     case 'trust':
                       actions.openTrustDialog();
                       return { type: 'handled' };
@@ -609,9 +613,6 @@ export const useSlashCommandProcessor = (
                       return { type: 'handled' };
                     case 'mcp':
                       actions.openMcpDialog();
-                      return { type: 'handled' };
-                    case 'provider':
-                      actions.openProviderDialog();
                       return { type: 'handled' };
                     case 'hooks':
                       actions.openHooksDialog();
@@ -632,6 +633,9 @@ export const useSlashCommandProcessor = (
                     case 'extensions_manage':
                       actions.openExtensionsManagerDialog();
                       return { type: 'handled' };
+                    case 'rewind':
+                      actions.openRewindSelector();
+                      return { type: 'handled' };
                     case 'help':
                       return { type: 'handled' };
                     default: {
@@ -642,8 +646,8 @@ export const useSlashCommandProcessor = (
                     }
                   }
                 case 'load_history': {
-                  config?.getHopCodeClient()?.setHistory(result.clientHistory);
-                  config?.getHopCodeClient()?.stripThoughtsFromHistory();
+                  config?.getGeminiClient()?.setHistory(result.clientHistory);
+                  config?.getGeminiClient()?.stripThoughtsFromHistory();
                   fullCommandContext.ui.clear();
                   result.history.forEach((item, index) => {
                     fullCommandContext.ui.addItem(item, index);
@@ -730,10 +734,6 @@ export const useSlashCommandProcessor = (
                     undefined,
                     true,
                   );
-                }
-                case 'startImmediateSubagent': {
-                  // startImmediateSubagent is handled by launching the subagent directly
-                  return { type: 'handled' };
                 }
                 case 'stream_messages': {
                   // stream_messages is only used in ACP/Zed integration mode
@@ -853,7 +853,7 @@ export const useSlashCommandProcessor = (
   return {
     handleSlashCommand,
     slashCommands: commands,
-    pendingGeminiHistoryItems,
+    pendingHistoryItems,
     btwItem,
     setBtwItem,
     cancelBtw,

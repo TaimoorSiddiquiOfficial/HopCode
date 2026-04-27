@@ -17,7 +17,8 @@ import type {
   SettingInputRequest,
   PluginChoiceRequest,
 } from '../types.js';
-import type { HopCodeAuthState } from '../hooks/useHopCodeAuth.js';
+import type { TodoItem } from '../components/TodoDisplay.js';
+import type { ExternalAuthState, QwenAuthState } from '../hooks/useQwenAuth.js';
 import type { CommandContext, SlashCommand } from '../commands/types.js';
 import type { TextBuffer } from '../components/shared/text-buffer.js';
 import type {
@@ -26,7 +27,7 @@ import type {
   ApprovalMode,
   IdeInfo,
   SessionListItem,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import type { DOMElement } from 'ink';
 import type { SessionStatsState } from '../contexts/SessionContext.js';
 import type { ExtensionUpdateState } from '../state/extensions.js';
@@ -47,8 +48,9 @@ export interface UIState {
   authError: string | null;
   isAuthDialogOpen: boolean;
   pendingAuthType: AuthType | undefined;
-  // HopCode OAuth state
-  hopCodeAuthState: HopCodeAuthState;
+  externalAuthState: ExternalAuthState | null;
+  // Qwen OAuth state
+  qwenAuthState: QwenAuthState;
   editorError: string | null;
   isEditorDialogOpen: boolean;
   debugMessage: string;
@@ -57,7 +59,7 @@ export interface UIState {
   isMemoryDialogOpen: boolean;
   isModelDialogOpen: boolean;
   isFastModelMode: boolean;
-  isProviderDialogOpen: boolean;
+  isManageModelsDialogOpen: boolean;
   isTrustDialogOpen: boolean;
   activeArenaDialog: ArenaDialogType;
   isPermissionsDialogOpen: boolean;
@@ -75,9 +77,10 @@ export interface UIState {
   settingInputRequests: SettingInputRequest[];
   pluginChoiceRequests: PluginChoiceRequest[];
   loopDetectionConfirmationRequest: LoopDetectionConfirmationRequest | null;
-  contextMdFileCount: number;
+  geminiMdFileCount: number;
   streamingState: StreamingState;
   initError: string | null;
+  pendingGeminiHistoryItems: HistoryItemWithoutId[];
   thought: ThoughtSummary | null;
   shellModeActive: boolean;
   userMessages: string[];
@@ -109,7 +112,8 @@ export interface UIState {
   staticAreaMaxItemHeight: number;
   staticExtraHeight: number;
   dialogsVisible: boolean;
-  pendingGeminiHistoryItems: HistoryItemWithoutId[];
+  pendingHistoryItems: HistoryItemWithoutId[];
+  stickyTodos: TodoItem[] | null;
   btwItem: HistoryItemBtw | null;
   setBtwItem: (item: HistoryItemBtw | null) => void;
   cancelBtw: () => void;
@@ -158,6 +162,9 @@ export interface UIState {
   promptSuggestion: string | null;
   /** Dismiss prompt suggestion (clears state, aborts speculation) */
   dismissPromptSuggestion: () => void;
+  // Rewind selector
+  isRewindSelectorOpen: boolean;
+  rewindEscPending: boolean;
 }
 
 export const UIStateContext = createContext<UIState | null>(null);

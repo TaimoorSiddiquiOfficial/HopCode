@@ -66,11 +66,6 @@ async function flushMicrotasks(): Promise<void> {
   }
 }
 
-async function settleWrites(service: ChatRecordingService): Promise<void> {
-  await flushMicrotasks();
-  await service.flush();
-}
-
 function findCustomTitleRecord(): ChatRecord | undefined {
   return vi
     .mocked(jsonl.writeLine)
@@ -96,10 +91,10 @@ describe('ChatRecordingService - auto-title trigger', () => {
       storage: {
         getProjectTempDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.hopcode/tmp/hash'),
+          .mockReturnValue('/test/project/root/.qwen/tmp/hash'),
         getProjectDir: vi
           .fn()
-          .mockReturnValue('/test/project/root/.hopcode/projects/test-project'),
+          .mockReturnValue('/test/project/root/.qwen/projects/test-project'),
       },
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getFastModel: vi.fn(() => fastModelValue),
@@ -138,6 +133,9 @@ describe('ChatRecordingService - auto-title trigger', () => {
     vi.spyOn(fs, 'existsSync').mockReturnValue(false);
 
     chatRecordingService = new ChatRecordingService(mockConfig);
+
+    // writeLine is async; mockResolvedValue lets the writeChain settle when
+    // tests await flushMicrotasks() / chatRecordingService.flush().
     vi.mocked(jsonl.writeLine).mockResolvedValue(undefined);
   });
 
@@ -153,7 +151,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
       message: [{ text: 'Looking at the button handler now.' }],
     });
 
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     const titleRecord = findCustomTitleRecord();
     expect(titleRecord).toBeDefined();
@@ -172,7 +170,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
       model: 'qwen-plus',
       message: [{ text: 'hi' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     expect(tryGenerateSessionTitleMock).not.toHaveBeenCalled();
     expect(findCustomTitleRecord()).toBeUndefined();
@@ -187,7 +185,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
       model: 'qwen-plus',
       message: [{ text: 'reply' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     expect(tryGenerateSessionTitleMock).not.toHaveBeenCalled();
     expect(findCustomTitleRecord()).toBeUndefined();
@@ -208,7 +206,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
         model: 'qwen-plus',
         message: [{ text: `turn ${i}` }],
       });
-      await settleWrites(chatRecordingService);
+      await flushMicrotasks();
     }
 
     // Cap is 3.
@@ -232,12 +230,12 @@ describe('ChatRecordingService - auto-title trigger', () => {
       model: 'qwen-plus',
       message: [{ text: 'turn 1' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
     chatRecordingService.recordAssistantTurn({
       model: 'qwen-plus',
       message: [{ text: 'turn 2' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     expect(tryGenerateSessionTitleMock).toHaveBeenCalledTimes(2);
     const titleRecord = findCustomTitleRecord();
@@ -247,37 +245,37 @@ describe('ChatRecordingService - auto-title trigger', () => {
     });
   });
 
-  it('does not trigger when HOPCODE_DISABLE_AUTO_TITLE is set', async () => {
-    const prev = process.env['HOPCODE_DISABLE_AUTO_TITLE'];
-    process.env['HOPCODE_DISABLE_AUTO_TITLE'] = '1';
+  it('does not trigger when QWEN_DISABLE_AUTO_TITLE is set', async () => {
+    const prev = process.env['QWEN_DISABLE_AUTO_TITLE'];
+    process.env['QWEN_DISABLE_AUTO_TITLE'] = '1';
     try {
       chatRecordingService.recordAssistantTurn({
         model: 'qwen-plus',
         message: [{ text: 'reply' }],
       });
-      await settleWrites(chatRecordingService);
+      await flushMicrotasks();
       expect(tryGenerateSessionTitleMock).not.toHaveBeenCalled();
       expect(findCustomTitleRecord()).toBeUndefined();
     } finally {
-      if (prev === undefined) delete process.env['HOPCODE_DISABLE_AUTO_TITLE'];
-      else process.env['HOPCODE_DISABLE_AUTO_TITLE'] = prev;
+      if (prev === undefined) delete process.env['QWEN_DISABLE_AUTO_TITLE'];
+      else process.env['QWEN_DISABLE_AUTO_TITLE'] = prev;
     }
   });
 
-  it('still triggers when HOPCODE_DISABLE_AUTO_TITLE is falsy ("0")', async () => {
+  it('still triggers when QWEN_DISABLE_AUTO_TITLE is falsy ("0")', async () => {
     mockOk('Fix login button');
-    const prev = process.env['HOPCODE_DISABLE_AUTO_TITLE'];
-    process.env['HOPCODE_DISABLE_AUTO_TITLE'] = '0';
+    const prev = process.env['QWEN_DISABLE_AUTO_TITLE'];
+    process.env['QWEN_DISABLE_AUTO_TITLE'] = '0';
     try {
       chatRecordingService.recordAssistantTurn({
         model: 'qwen-plus',
         message: [{ text: 'reply' }],
       });
-      await settleWrites(chatRecordingService);
+      await flushMicrotasks();
       expect(tryGenerateSessionTitleMock).toHaveBeenCalledOnce();
     } finally {
-      if (prev === undefined) delete process.env['HOPCODE_DISABLE_AUTO_TITLE'];
-      else process.env['HOPCODE_DISABLE_AUTO_TITLE'] = prev;
+      if (prev === undefined) delete process.env['QWEN_DISABLE_AUTO_TITLE'];
+      else process.env['QWEN_DISABLE_AUTO_TITLE'] = prev;
     }
   });
 
@@ -288,7 +286,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
       model: 'qwen-plus',
       message: [{ text: 'reply' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     expect(tryGenerateSessionTitleMock).not.toHaveBeenCalled();
     expect(findCustomTitleRecord()).toBeUndefined();
@@ -304,7 +302,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
         model: 'qwen-plus',
         message: [{ text: `turn ${i}` }],
       });
-      await settleWrites(chatRecordingService);
+      await flushMicrotasks();
     }
 
     // Only the first turn should have launched a generation; subsequent
@@ -329,13 +327,15 @@ describe('ChatRecordingService - auto-title trigger', () => {
     } as unknown as Config;
 
     const svc = new ChatRecordingService(resumedConfig);
-    await svc.flush();
 
     expect(svc.getCurrentCustomTitle()).toBe('Auto-generated title');
     expect(svc.getCurrentTitleSource()).toBe('auto');
 
-    // finalize() was called by the constructor — the re-appended record
-    // must carry titleSource: 'auto', not 'manual'.
+    // finalize() was called by the constructor — drain the queued async
+    // write before inspecting the mock.
+    await svc.flush();
+
+    // The re-appended record must carry titleSource: 'auto', not 'manual'.
     const finalizeRecord = vi
       .mocked(jsonl.writeLine)
       .mock.calls.map((c) => c[1] as ChatRecord)
@@ -367,10 +367,10 @@ describe('ChatRecordingService - auto-title trigger', () => {
     } as unknown as Config;
 
     const svc = new ChatRecordingService(resumedConfig);
-    await svc.flush();
 
     expect(svc.getCurrentCustomTitle()).toBe('User chose this');
     expect(svc.getCurrentTitleSource()).toBe('manual');
+    await svc.flush();
 
     const finalizeRecord = vi
       .mocked(jsonl.writeLine)
@@ -399,12 +399,12 @@ describe('ChatRecordingService - auto-title trigger', () => {
     } as unknown as Config;
 
     const svc = new ChatRecordingService(resumedConfig);
-    await svc.flush();
 
     expect(svc.getCurrentCustomTitle()).toBe('Legacy title');
     // Must stay undefined so the JSONL isn't upgraded to a misleading
     // `titleSource: 'manual'` we can't actually verify.
     expect(svc.getCurrentTitleSource()).toBeUndefined();
+    await svc.flush();
 
     const finalizeRecord = vi
       .mocked(jsonl.writeLine)
@@ -435,7 +435,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
       model: 'qwen-plus',
       message: [{ text: 'reply' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     expect(tryGenerateSessionTitleMock).toHaveBeenCalledOnce();
     expect(otherProcessManual).toHaveBeenCalled();
@@ -469,7 +469,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
       model: 'qwen-plus',
       message: [{ text: 'turn' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     expect(capturedSignal).toBeDefined();
     expect(capturedSignal?.aborted).toBe(false);
@@ -479,7 +479,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     chatRecordingService.finalize();
     expect(capturedSignal?.aborted).toBe(true);
 
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
     // The aborted generation must NOT result in a custom_title record —
     // even though the mock technically "completed" (via rejection).
     expect(findCustomTitleRecord()).toBeUndefined();
@@ -500,7 +500,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
       model: 'qwen-plus',
       message: [{ text: 'turn' }],
     });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     // User renames while the title LLM call is still pending.
     chatRecordingService.recordCustomTitle('user-chosen', 'manual');
@@ -509,7 +509,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
 
     // Now the LLM call returns a title.
     resolveLlm({ ok: true, title: 'Auto Title', modelUsed: 'qwen-turbo' });
-    await settleWrites(chatRecordingService);
+    await flushMicrotasks();
 
     // No auto-title record should have been written.
     expect(findCustomTitleRecord()).toBeUndefined();

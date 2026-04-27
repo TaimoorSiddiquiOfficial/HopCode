@@ -13,6 +13,10 @@ import {
 
 describe('cleanup', () => {
   beforeEach(() => {
+    // The previous `global['cleanupFunctions'] = []` setup was dead code —
+    // the array is module-private, not on `global`. Tests passed by accident
+    // because `runExitCleanup` itself clears at the end. A test that throws
+    // before reaching `runExitCleanup` would leak state into the next case.
     _resetCleanupFunctionsForTest();
   });
 
@@ -63,7 +67,10 @@ describe('cleanup', () => {
   });
 
   describe('timeout failsafes', () => {
-    it('caps a hung cleanup at the per-function timeout and proceeds', async () => {
+    // Without these the async-jsonl flush() could hang exit forever on slow
+    // disks / dead sockets — sync writes were inherently bounded, async aren't.
+
+    it('caps a hung cleanup at the per-fn timeout and proceeds to the next one', async () => {
       const hangFn = vi.fn(() => new Promise<void>(() => {}));
       const nextFn = vi.fn();
 
@@ -82,7 +89,11 @@ describe('cleanup', () => {
       expect(elapsed).toBeLessThan(500);
     });
 
-    it('caps total wall-clock time when many cleanups hang', async () => {
+    it('caps overall wall-clock time when many cleanups all hang', async () => {
+      // 100 × 50ms perFn ≈ 5000ms drain — structurally impossible for "drain
+      // finished naturally" to satisfy < 800ms, so the upper bound proves
+      // wallClock actually fired. Lower bound proves we waited for it and
+      // didn't short-circuit. 800ms slack absorbs CI scheduler jitter.
       for (let i = 0; i < 100; i++) {
         registerCleanup(() => new Promise<void>(() => {}));
       }
@@ -98,7 +109,7 @@ describe('cleanup', () => {
       expect(elapsed).toBeGreaterThanOrEqual(80);
     });
 
-    it('still runs fast cleanups normally when timeouts are configured', async () => {
+    it('still calls fast cleanups normally when timeouts are configured', async () => {
       const fastFn = vi.fn().mockResolvedValue(undefined);
       registerCleanup(fastFn);
 
@@ -111,6 +122,8 @@ describe('cleanup', () => {
     });
 
     it('does not let a rejected cleanup poison the chain', async () => {
+      // The original `for…await` already swallowed sync throws; this guards
+      // the new withTimeout wrapper against rejected-async-cleanup leaks.
       const rejectFn = vi.fn().mockRejectedValue(new Error('boom'));
       const nextFn = vi.fn();
 
@@ -123,7 +136,6 @@ describe('cleanup', () => {
           _testOverallTimeoutMs: 1_000,
         }),
       ).resolves.toBeUndefined();
-
       expect(rejectFn).toHaveBeenCalledTimes(1);
       expect(nextFn).toHaveBeenCalledTimes(1);
     });

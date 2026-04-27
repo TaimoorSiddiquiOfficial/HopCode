@@ -11,7 +11,7 @@ import type {
   GitService,
   Logger,
   SessionListItem,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import type {
   HistoryItemWithoutId,
   HistoryItem,
@@ -89,7 +89,7 @@ export interface CommandContext {
      */
     loadHistory: UseHistoryManagerReturn['loadHistory'];
     toggleVimEnabled: () => Promise<boolean>;
-    setContextMdFileCount: (count: number) => void;
+    setGeminiMdFileCount: (count: number) => void;
     reloadCommands: () => void;
     setSessionName: (name: string | null) => void;
     extensionsUpdateState: Map<string, ExtensionUpdateStatus>;
@@ -131,7 +131,7 @@ export interface QuitActionReturn {
  */
 export interface MessageActionReturn {
   type: 'message';
-  messageType: 'info' | 'error' | 'warning' | 'success';
+  messageType: 'info' | 'error';
   content: string;
 }
 
@@ -173,6 +173,7 @@ export interface OpenDialogActionReturn {
     | 'memory'
     | 'model'
     | 'fast-model'
+    | 'manage-models'
     | 'subagent_create'
     | 'subagent_list'
     | 'trust'
@@ -183,7 +184,7 @@ export interface OpenDialogActionReturn {
     | 'extensions_manage'
     | 'hooks'
     | 'mcp'
-    | 'provider';
+    | 'rewind';
 }
 
 /**
@@ -231,15 +232,6 @@ export interface ConfirmActionReturn {
   };
 }
 
-/**
- * The return type for a command action that starts an immediate subagent.
- */
-export interface StartImmediateSubagentActionReturn {
-  type: 'startImmediateSubagent';
-  subagent: string;
-  prompt: string;
-}
-
 export type SlashCommandActionReturn =
   | ToolActionReturn
   | MessageActionReturn
@@ -249,8 +241,7 @@ export type SlashCommandActionReturn =
   | LoadHistoryActionReturn
   | SubmitPromptActionReturn
   | ConfirmShellCommandsActionReturn
-  | ConfirmActionReturn
-  | StartImmediateSubagentActionReturn;
+  | ConfirmActionReturn;
 
 export enum CommandKind {
   BUILT_IN = 'built-in',

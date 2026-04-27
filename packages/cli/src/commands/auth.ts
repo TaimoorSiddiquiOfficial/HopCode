@@ -6,20 +6,18 @@
 
 import type { CommandModule, Argv } from 'yargs';
 import {
-  handleHopcodeAuth,
+  handleQwenAuth,
   runInteractiveAuth,
   showAuthStatus,
 } from './auth/handler.js';
-import { PROVIDER_REGISTRY } from './auth/registry.js';
-import { handleApiKeyAuth } from './auth/providers.js';
 import { t } from '../i18n/index.js';
 
 // Define subcommands separately
-const hopcodeOauthCommand = {
-  command: 'hopcode-oauth',
-  describe: t('Authenticate using HopCode OAuth'),
+const qwenOauthCommand = {
+  command: 'qwen-oauth',
+  describe: t('Authenticate using Qwen OAuth'),
   handler: async () => {
-    await handleHopcodeAuth('hopcode-oauth', {});
+    await handleQwenAuth('qwen-oauth', {});
   },
 };
 
@@ -44,11 +42,26 @@ const codePlanCommand = {
 
     // If region and key are provided, use them directly
     if (region && key) {
-      await handleHopcodeAuth('coding-plan', { region, key });
+      await handleQwenAuth('coding-plan', { region, key });
     } else {
       // Otherwise, prompt interactively
-      await handleHopcodeAuth('coding-plan', {});
+      await handleQwenAuth('coding-plan', {});
     }
+  },
+};
+
+const openRouterCommand = {
+  command: 'openrouter',
+  describe: t('Authenticate using OpenRouter API key setup'),
+  builder: (yargs: Argv) =>
+    yargs.option('key', {
+      alias: 'k',
+      describe: t('API key for OpenRouter'),
+      type: 'string',
+    }),
+  handler: async (argv: { key?: string }) => {
+    const key = argv['key'] as string | undefined;
+    await handleQwenAuth('openrouter', { key });
   },
 };
 
@@ -60,41 +73,21 @@ const statusCommand = {
   },
 };
 
-// Dynamically build one subcommand per provider in PROVIDER_REGISTRY
-const providerCommands = PROVIDER_REGISTRY.map((provider) => ({
-  command: provider.id,
-  describe: t('Authenticate using {{label}}', { label: provider.label }),
-  builder: (yargs: Argv) =>
-    yargs.option('key', {
-      alias: 'k',
-      describe: t('API key for {{label}}', { label: provider.label }),
-      type: 'string',
-    }),
-  handler: async (argv: { key?: string }) => {
-    await handleApiKeyAuth(provider.id, { apiKey: argv['key'] });
-  },
-}));
-
 export const authCommand: CommandModule = {
   command: 'auth',
   describe: t(
-    'Configure HopCode authentication — Coding Plan, HopCode OAuth, or any AI provider',
+    'Configure Qwen authentication information with Qwen-OAuth, OpenRouter, or Alibaba Cloud Coding Plan',
   ),
-  builder: (yargs: Argv) => {
-    let y = yargs
-      .command(hopcodeOauthCommand)
+  builder: (yargs: Argv) =>
+    yargs
+      .command(qwenOauthCommand)
       .command(codePlanCommand)
-      .command(statusCommand);
-
-    // Register all provider subcommands
-    for (const cmd of providerCommands) {
-      y = y.command(cmd);
-    }
-
-    return y.demandCommand(0).version(false);
-  },
+      .command(openRouterCommand)
+      .command(statusCommand)
+      .demandCommand(0) // Don't require a subcommand
+      .version(false),
   handler: async () => {
-    // No subcommand provided — show interactive menu
+    // This handler is for when no subcommand is provided - show interactive menu
     await runInteractiveAuth();
   },
 };

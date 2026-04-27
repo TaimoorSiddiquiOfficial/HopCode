@@ -28,10 +28,7 @@ export default tseslint.config(
       'dist/**',
       'docs-site/.next/**',
       'docs-site/out/**',
-      '.hopcode/**',
-      '.hopcode-backup-*/**',
-      'packages/core/test-openai-provider.ts',
-      'packages/core/src/provider/sdk/**',
+      '.qwen/**',
     ],
   },
   eslint.configs.recommended,
@@ -193,15 +190,11 @@ export default tseslint.config(
   },
   // extra settings for scripts that we run directly with node
   {
-    files: [
-      '*.{js,mjs}',
-      './scripts/**/*.{js,mjs}',
-      'esbuild.config.js',
-      'packages/*/scripts/**/*.{js,mjs}',
-    ],
+    files: ['./scripts/**/*.js', './scripts/**/*.mjs', 'esbuild.config.js', 'packages/*/scripts/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.node,
+        ...globals.browser,
         process: 'readonly',
         console: 'readonly',
       },
@@ -214,31 +207,6 @@ export default tseslint.config(
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
-        },
-      ],
-    },
-  },
-  // Provider directory - uses TypeScript namespaces and complex AI SDK types by design
-  {
-    files: ['packages/core/src/provider/**/*.ts'],
-    rules: {
-      '@typescript-eslint/no-namespace': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/array-type': 'off',
-      '@typescript-eslint/no-this-alias': 'off',
-      'no-fallthrough': ['error', { allowEmptyCase: true }],
-      'import/no-internal-modules': [
-        'error',
-        {
-          allow: [
-            'zod/v4',
-            'zod/v4/core',
-            'ai/internal',
-            '@ai-sdk/**',
-            'date-fns/**',
-            'lodash/**',
-          ],
         },
       ],
     },
@@ -268,11 +236,6 @@ export default tseslint.config(
   // WebUI package - UI component library with Storybook
   {
     files: ['packages/webui/**/*.ts', 'packages/webui/**/*.tsx', 'packages/webui/**/*.js'],
-    rules: { 'no-console': 'off' },
-  },
-  // Web Dashboard - browser React app, console is fine for error handling
-  {
-    files: ['packages/web-dashboard/src/**/*.{ts,tsx}', 'packages/web-dashboard/server/**/*.ts'],
     rules: { 'no-console': 'off' },
   },
   // Specific CLI files that intentionally wrap console usage

@@ -8,14 +8,14 @@ import type {
   BackgroundAgentStatus,
   Config,
   ToolCallRequestInfo,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import { isSlashCommand } from './ui/utils/commandUtils.js';
 import type { LoadedSettings } from './config/settings.js';
 import {
   executeToolCall,
   shutdownTelemetry,
   isTelemetrySdkInitialized,
-  HopCodeEventType,
+  GeminiEventType,
   FatalInputError,
   promptIdContext,
   OutputFormat,
@@ -25,7 +25,7 @@ import {
   parseAndFormatApiError,
   createDebugLogger,
   SendMessageType,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import type { Content, Part, PartListUnion } from '@google/genai';
 import type { CLIUserMessage, PermissionMode } from './nonInteractive/types.js';
 import type { JsonOutputAdapterInterface } from './nonInteractive/io/BaseJsonOutputAdapter.js';
@@ -101,7 +101,7 @@ async function emitNonInteractiveFinalMessage(params: {
   // (systemMessage should already be emitted by caller)
   adapter.startAssistantMessage();
   adapter.processEvent({
-    type: HopCodeEventType.Content,
+    type: GeminiEventType.Content,
     value: message,
   } as unknown as Parameters<JsonOutputAdapterInterface['processEvent']>[0]);
   adapter.finalizeAssistantMessage();
@@ -175,22 +175,21 @@ export async function runNonInteractive(
     let totalApiDurationMs = 0;
     const startTime = Date.now();
 
+    const geminiClient = config.getGeminiClient();
+    const abortController = options.abortController ?? new AbortController();
+
+    // EPIPE: don't process.exit here — that bypasses the caller's
+    // runExitCleanup → flush() and drops queued JSONL writes. Destroy
+    // stdout instead and let the natural return drive cleanup. (Aborting
+    // is also wrong: the abort path runs handleCancellationError → exit
+    // 130 and re-introduces the same bypass.)
     let pipeBroken = false;
     const stdoutErrorHandler = (err: NodeJS.ErrnoException) => {
       if (err.code === 'EPIPE' && !pipeBroken) {
         pipeBroken = true;
-        process.stdout.removeListener('error', stdoutErrorHandler);
-        // Routine CLI patterns like `hopcode -p ... | head -1` close the
-        // downstream pipe and trigger EPIPE. Destroying stdout lets writes
-        // fail fast and the natural function return drive cleanup (including
-        // chat-recording flush). We deliberately do not process.exit(0) here
-        // as that would bypass the caller's runExitCleanup chain.
         process.stdout.destroy();
       }
     };
-
-    const geminiClient = config.getHopCodeClient();
-    const abortController = options.abortController ?? new AbortController();
 
     // Setup signal handlers for graceful shutdown
     const shutdownHandler = () => {
@@ -377,15 +376,15 @@ export async function runNonInteractive(
           }
           // Use adapter for all event processing
           adapter.processEvent(event);
-          if (event.type === HopCodeEventType.ToolCallRequest) {
+          if (event.type === GeminiEventType.ToolCallRequest) {
             toolCallRequests.push(event.value);
           }
-          if (event.type === HopCodeEventType.LoopDetected) {
+          if (event.type === GeminiEventType.LoopDetected) {
             emitLoopDetectedMessage(config, event.value?.loopType);
           }
           if (
             outputFormat === OutputFormat.TEXT &&
-            event.type === HopCodeEventType.Error
+            event.type === GeminiEventType.Error
           ) {
             const errorText = parseAndFormatApiError(
               event.value.error,
@@ -546,15 +545,15 @@ export async function runNonInteractive(
                   return;
                 }
                 adapter.processEvent(event);
-                if (event.type === HopCodeEventType.ToolCallRequest) {
+                if (event.type === GeminiEventType.ToolCallRequest) {
                   itemToolCallRequests.push(event.value);
                 }
-                if (event.type === HopCodeEventType.LoopDetected) {
+                if (event.type === GeminiEventType.LoopDetected) {
                   emitLoopDetectedMessage(config, event.value?.loopType);
                 }
                 if (
                   outputFormat === OutputFormat.TEXT &&
-                  event.type === HopCodeEventType.Error
+                  event.type === GeminiEventType.Error
                 ) {
                   const errorText = parseAndFormatApiError(
                     event.value.error,

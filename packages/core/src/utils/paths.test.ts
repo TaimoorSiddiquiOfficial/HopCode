@@ -441,6 +441,10 @@ describe('validatePath', () => {
   });
 
   beforeEach(() => {
+    // Module-level isDirectory cache persists across tests; tests here
+    // mutate the same absolute paths between cases (create file, remove,
+    // re-create as potentially-different type) so we reset to avoid stale
+    // lookups masking regressions.
     _resetValidatePathCacheForTest();
   });
 
@@ -495,31 +499,33 @@ describe('validatePath', () => {
     expect(() => validatePath(config, workspaceRoot)).not.toThrow();
   });
 
-  it('does not cache ENOENT so a newly created path is accepted on retry', () => {
-    const lateCreatedDir = path.join(workspaceRoot, 'late-created');
-    expect(() => validatePath(config, lateCreatedDir)).toThrowError(
+  it('does not cache ENOENT — recreating the path between calls succeeds', () => {
+    // Regression guard: a path that's missing at first-check, then created,
+    // must NOT be rejected on the second call. Positive stats are cached;
+    // ENOENT paths are not. This lets the model create a file with Edit
+    // and then have the next tool call see it.
+    const ephemeralDir = path.join(workspaceRoot, 'late-created');
+    expect(() => validatePath(config, ephemeralDir)).toThrowError(
       /Path does not exist:/,
     );
-
-    fs.mkdirSync(lateCreatedDir);
+    fs.mkdirSync(ephemeralDir);
     try {
-      expect(() => validatePath(config, lateCreatedDir)).not.toThrow();
+      expect(() => validatePath(config, ephemeralDir)).not.toThrow();
     } finally {
-      fs.rmSync(lateCreatedDir, { recursive: true, force: true });
+      fs.rmSync(ephemeralDir, { recursive: true, force: true });
     }
   });
 
-  it('caches directory validation results across repeated calls', () => {
-    const statSpy = vi.spyOn(fs, 'statSync');
-    const dirPath = path.join(workspaceRoot, 'subdir');
-
+  it('caches positive isDirectory — repeat call does not re-stat', () => {
+    const spy = vi.spyOn(fs, 'statSync');
+    const dir = path.join(workspaceRoot, 'subdir');
     try {
-      validatePath(config, dirPath);
-      const afterFirstCall = statSpy.mock.calls.length;
-      validatePath(config, dirPath);
-      expect(statSpy.mock.calls.length).toBe(afterFirstCall);
+      validatePath(config, dir);
+      const afterFirst = spy.mock.calls.length;
+      validatePath(config, dir);
+      expect(spy.mock.calls.length).toBe(afterFirst);
     } finally {
-      statSpy.mockRestore();
+      spy.mockRestore();
     }
   });
 
@@ -682,7 +688,7 @@ describe('shortenPath', () => {
   });
 
   it('shortens long paths by showing start and end with ellipsis in between', () => {
-    const longPath = `${sep}home${sep}user${sep}projects${sep}hopcode${sep}packages${sep}core${sep}src${sep}file.ts`;
+    const longPath = `${sep}home${sep}user${sep}projects${sep}qwen-code${sep}packages${sep}core${sep}src${sep}file.ts`;
     const result = shortenPath(longPath, 40);
 
     // Should include root + first segment and ellipsis

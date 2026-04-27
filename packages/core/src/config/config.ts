@@ -11,8 +11,7 @@ import * as path from 'node:path';
 import process from 'node:process';
 
 // External dependencies
-// Note: undici ProxyAgent/setGlobalDispatcher removed - proxy handling is now
-// done per-request via buildRuntimeFetchOptions in runtimeFetchOptions.ts
+import { ProxyAgent, setGlobalDispatcher } from 'undici';
 
 // Types
 import type {
@@ -28,7 +27,7 @@ import { ArenaAgentClient } from '../agents/arena/ArenaAgentClient.js';
 
 // Core
 import { BaseLlmClient } from '../core/baseLlmClient.js';
-import { HopCodeClient } from '../core/client.js';
+import { GeminiClient } from '../core/client.js';
 import {
   AuthType,
   createContentGenerator,
@@ -44,10 +43,8 @@ import {
 } from '../services/fileSystemService.js';
 import { GitService } from '../services/gitService.js';
 import { CronScheduler } from '../services/cronScheduler.js';
-import { TaskStore } from '../services/task-store.js';
-import { PermissionBlockerService } from '../services/permissionBlockerService.js';
 
-// Tools � only lightweight imports; tool classes are lazy-loaded via dynamic import
+// Tools — only lightweight imports; tool classes are lazy-loaded via dynamic import
 import type { SendSdkMcpMessage } from '../tools/mcp-client.js';
 import { setGeminiMdFilename } from '../memory/const.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
@@ -74,24 +71,6 @@ import {
   StartSessionEvent,
   type TelemetryTarget,
 } from '../telemetry/index.js';
-
-/**
- * Type for partial overrides of Config methods.
- * Each key corresponds to a Config method that can be overridden.
- */
-export type ConfigOverride = Partial<{
-  getWorkingDir: () => string;
-  getTargetDir: () => string;
-  getProjectRoot: () => string;
-  getWorkspaceContext: () => import('../utils/workspaceContext.js').WorkspaceContext;
-  getFileService: () => import('../services/fileDiscoveryService.js').FileDiscoveryService;
-  getToolRegistry: () => import('../tools/tool-registry.js').ToolRegistry;
-  getContentGenerator: () => import('../core/contentGenerator.js').ContentGenerator;
-  getContentGeneratorConfig: () => import('../core/contentGenerator.js').ContentGeneratorConfig;
-  getAuthType: () => import('../core/contentGenerator.js').AuthType | undefined;
-  getModel: () => string;
-  getApprovalMode: () => ApprovalMode;
-}>;
 import {
   ExtensionManager,
   type Extension,
@@ -127,14 +106,13 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
-import { DEFAULT_HOPCODE_EMBEDDING_MODEL } from './models.js';
+import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
   SessionService,
   type ResumedSessionData,
 } from '../services/sessionService.js';
-import type { WebSearchProviderConfig } from '../tools/web-search/types.js';
 import { randomUUID } from 'node:crypto';
 import { loadServerHierarchicalMemory } from '../utils/memoryDiscovery.js';
 import { ConditionalRulesRegistry } from '../utils/rulesDiscovery.js';
@@ -225,8 +203,6 @@ export interface ChatCompressionSettings {
  * Threshold values of -1 mean "never clear" (disabled).
  */
 export interface ClearContextOnIdleSettings {
-  /** Minutes idle before clearing old thinking blocks. Default 5. Use -1 to disable. */
-  thinkingThresholdMinutes?: number;
   /** Minutes idle before clearing old tool results. Default 60. Use -1 to disable. */
   toolResultsThresholdMinutes?: number;
   /** Number of most-recent tool results to preserve. Default 5. */
@@ -253,7 +229,7 @@ export interface GitCoAuthorSettings {
   email?: string;
 }
 
-export type ExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
+export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
 
 export interface ExtensionInstallMetadata {
   source: string;
@@ -333,7 +309,7 @@ export interface AgentsCollabSettings {
   displayMode?: string;
   /** Arena-specific settings */
   arena?: {
-    /** Custom base directory for Arena worktrees (default: ~/.hopcode/arena) */
+    /** Custom base directory for Arena worktrees (default: ~/.qwen/arena) */
     worktreeBaseDir?: string;
     /** Preserve worktrees and state files after session ends */
     preserveArtifacts?: boolean;
@@ -363,7 +339,7 @@ export interface ConfigParameters {
    * CLI surface. Matched case-insensitively on the final (post-rename)
    * command name. Sourced from settings (`slashCommands.disabled`, UNION
    * merged across scopes), the `--disabled-slash-commands` CLI flag, and
-   * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
+   * the `QWEN_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
   /** Merged permission rules from all sources (settings + CLI args). */
@@ -381,7 +357,7 @@ export interface ConfigParameters {
   };
   lspClient?: LspClient;
   userMemory?: string;
-  contextMdFileCount?: number;
+  geminiMdFileCount?: number;
   approvalMode?: ApprovalMode;
   contextFileName?: string | string[];
   accessibility?: AccessibilitySettings;
@@ -390,10 +366,9 @@ export interface ConfigParameters {
   usageStatisticsEnabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    respectHopCodeIgnore?: boolean;
+    respectQwenIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
-    customExcludes?: string[];
   };
   checkpointing?: boolean;
   proxy?: string;
@@ -427,17 +402,6 @@ export interface ConfigParameters {
   loadMemoryFromIncludeDirectories?: boolean;
   importFormat?: 'tree' | 'flat';
   chatRecording?: boolean;
-  // Web search providers
-  webSearch?: {
-    provider: WebSearchProviderConfig[];
-    default: string;
-    mode?: 'auto' | 'manual';
-  };
-  /** Per-agent model overrides. String: "modelId" or "authType::modelId". Object: { model, baseUrl?, apiKey? }. */
-  agentModels?: Record<
-    string,
-    string | { model: string; baseUrl?: string; apiKey?: string }
-  >;
   chatCompression?: ChatCompressionSettings;
   interactive?: boolean;
   trustedFolder?: boolean;
@@ -461,7 +425,7 @@ export interface ConfigParameters {
   channel?: string;
   /**
    * File descriptor number for structured JSON event output (dual output mode).
-   * When set, HopCode Code outputs structured JSON events to this fd while
+   * When set, Qwen Code outputs structured JSON events to this fd while
    * continuing to render the TUI on stdout. The caller must provide this fd
    * via spawn stdio configuration.
    * Mutually exclusive with jsonFile.
@@ -498,7 +462,7 @@ export interface ConfigParameters {
    * Disable all hooks (default: false, hooks enabled).
    * Migration note: This replaces the deprecated hooksConfig.enabled setting.
    * Users with old settings.json containing hooksConfig.enabled should migrate
-   * to use disableAllHooks instead (note: inverted logic - enabled:true ? disableAllHooks:false).
+   * to use disableAllHooks instead (note: inverted logic - enabled:true → disableAllHooks:false).
    */
   disableAllHooks?: boolean;
   /**
@@ -514,7 +478,7 @@ export interface ConfigParameters {
   projectHooks?: Record<string, unknown>;
 
   hooks?: Record<string, unknown>;
-  /** Glob patterns to exclude from .hopcode/rules/ loading. */
+  /** Glob patterns to exclude from .qwen/rules/ loading. */
   contextRuleExcludes?: string[];
   /** Warnings generated during configuration resolution */
   warnings?: string[];
@@ -573,33 +537,8 @@ const DEFAULT_BARE_CORE_TOOLS = [
 ];
 
 export class Config {
-  private static _instance: Config | undefined;
-
-  static async get(): Promise<Config> {
-    if (!this._instance) {
-      // Create a minimal default instance for internal core use
-      this._instance = new Config({
-        targetDir: process.cwd(),
-      } as ConfigParameters);
-      await this._instance.initialize();
-    }
-    return this._instance;
-  }
-
-  static setInstance(instance: Config) {
-    this._instance = instance;
-  }
-
   private sessionId: string;
   private sessionData?: ResumedSessionData;
-
-  // Provider system compatibility fields
-  provider?: Record<string, unknown>;
-  disabled_providers?: string[];
-  enabled_providers?: string[];
-  small_model?: string;
-  model?: string;
-
   private debugLogger: DebugLogger;
   private toolRegistry!: ToolRegistry;
   private promptRegistry!: PromptRegistry;
@@ -650,7 +589,7 @@ export class Config {
   private sessionSubagents: SubagentConfig[];
   private userMemory: string;
   private sdkMode: boolean;
-  private contextMdFileCount: number;
+  private geminiMdFileCount: number;
   private conditionalRulesRegistry: ConditionalRulesRegistry | undefined;
   private readonly contextRuleExcludes: string[];
   private approvalMode: ApprovalMode;
@@ -659,23 +598,19 @@ export class Config {
   private readonly telemetrySettings: TelemetrySettings;
   private readonly gitCoAuthor: GitCoAuthorSettings;
   private readonly usageStatisticsEnabled: boolean;
-  private geminiClient!: HopCodeClient;
+  private geminiClient!: GeminiClient;
   private baseLlmClient!: BaseLlmClient;
   private cronScheduler: CronScheduler | null = null;
-  private taskStore: TaskStore | null = null;
-  private permissionBlockerService: PermissionBlockerService | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectHopCodeIgnore: boolean;
+    respectQwenIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
-    customExcludes: string[];
   };
   private fileDiscoveryService: FileDiscoveryService | null = null;
   private gitService: GitService | undefined = undefined;
   private sessionService: SessionService | undefined = undefined;
   private chatRecordingService: ChatRecordingService | undefined = undefined;
-  private retiredChatRecordingServices = new Set<ChatRecordingService>();
   private readonly checkpointing: boolean;
   private readonly proxy: string | undefined;
   private readonly cwd: string;
@@ -699,16 +634,6 @@ export class Config {
   private readonly chatRecordingEnabled: boolean;
   private readonly loadMemoryFromIncludeDirectories: boolean = false;
   private readonly importFormat: 'tree' | 'flat';
-  private readonly webSearch?: {
-    provider: WebSearchProviderConfig[];
-    default: string;
-    mode?: 'auto' | 'manual';
-  };
-  /** Per-agent model overrides keyed by agent name. */
-  private readonly agentModels?: Record<
-    string,
-    string | { model: string; baseUrl?: string; apiKey?: string }
-  >;
   private readonly chatCompression: ChatCompressionSettings | undefined;
   private readonly interactive: boolean;
   private readonly trustedFolder: boolean | undefined;
@@ -763,8 +688,7 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel =
-      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
+    this.embeddingModel = params.embeddingModel ?? DEFAULT_QWEN_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
@@ -805,7 +729,7 @@ export class Config {
     this.sessionSubagents = params.sessionSubagents ?? [];
     this.sdkMode = params.sdkMode ?? false;
     this.userMemory = params.userMemory ?? '';
-    this.contextMdFileCount = params.contextMdFileCount ?? 0;
+    this.geminiMdFileCount = params.geminiMdFileCount ?? 0;
     this.contextRuleExcludes = params.contextRuleExcludes ?? [];
     this.approvalMode = params.approvalMode ?? ApprovalMode.DEFAULT;
     this.accessibility = params.accessibility ?? {};
@@ -820,19 +744,18 @@ export class Config {
     };
     this.gitCoAuthor = {
       enabled: params.gitCoAuthor ?? true,
-      name: 'HopCode',
-      email: 'hopcode@hoptrendy.com',
+      name: 'Qwen-Coder',
+      email: 'qwen-coder@alibabacloud.com',
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
     this.outputLanguageFilePath = params.outputLanguageFilePath;
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectHopCodeIgnore: params.fileFiltering?.respectHopCodeIgnore ?? true,
+      respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
-      customExcludes: params.fileFiltering?.customExcludes ?? [],
     };
     this.checkpointing = params.checkpointing ?? false;
     this.proxy = params.proxy;
@@ -841,8 +764,6 @@ export class Config {
     this.bugCommand = params.bugCommand;
     this.maxSessionTurns = params.maxSessionTurns ?? -1;
     this.clearContextOnIdle = {
-      thinkingThresholdMinutes:
-        params.clearContextOnIdle?.thinkingThresholdMinutes ?? 5,
       toolResultsThresholdMinutes:
         params.clearContextOnIdle?.toolResultsThresholdMinutes ?? 60,
       toolResultsNumToKeep:
@@ -876,9 +797,7 @@ export class Config {
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
 
-    // Web search
-    this.webSearch = params.webSearch;
-    this.agentModels = params.agentModels;
+    // (web search removed)
     this.useRipgrep = params.useRipgrep ?? true;
     this.useBuiltinRipgrep = params.useBuiltinRipgrep ?? true;
     this.shouldUseNodePtyShell =
@@ -930,13 +849,11 @@ export class Config {
       initializeTelemetry(this);
     }
 
-    // Note: We no longer set a global proxy dispatcher here.
-    // The OpenAI SDK and other HTTP clients configure proxies per-request
-    // via buildRuntimeFetchOptions in runtimeFetchOptions.ts.
-    // Setting a global dispatcher interferes with direct API connections
-    // and causes "fetch failed" errors when no proxy is actually needed.
-
-    this.geminiClient = new HopCodeClient(this);
+    const proxyUrl = this.getProxy();
+    if (proxyUrl) {
+      setGlobalDispatcher(new ProxyAgent(proxyUrl));
+    }
+    this.geminiClient = new GeminiClient(this);
     this.chatRecordingService = this.chatRecordingEnabled
       ? new ChatRecordingService(this)
       : undefined;
@@ -1062,8 +979,7 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['tool_response'] as Record<string, unknown>) || {},
                   (input['tool_use_id'] as string) || '',
-                  (input['permission_mode'] as PermissionMode | undefined) ??
-                    PermissionMode.Default,
+                  (input['permission_mode'] as PermissionMode) || 'default',
                   signal,
                 );
                 break;
@@ -1074,17 +990,15 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['error'] as string) || '',
                   input['is_interrupt'] as boolean | undefined,
-                  (input['permission_mode'] as PermissionMode | undefined) ??
-                    PermissionMode.Default,
+                  (input['permission_mode'] as PermissionMode) || 'default',
                   signal,
                 );
                 break;
               case 'Notification':
                 result = await hookSystem.fireNotificationEvent(
                   (input['message'] as string) || '',
-                  (input['notification_type'] as
-                    | NotificationType
-                    | undefined) ?? NotificationType.PermissionPrompt,
+                  (input['notification_type'] as NotificationType) ||
+                    'permission_prompt',
                   (input['title'] as string) || undefined,
                   signal,
                 );
@@ -1228,7 +1142,7 @@ export class Config {
     } else {
       this.setUserMemory(memoryContent);
     }
-    this.setContextMdFileCount(fileCount);
+    this.setGeminiMdFileCount(fileCount);
     this.conditionalRulesRegistry = new ConditionalRulesRegistry(
       conditionalRules,
       projectRoot,
@@ -1402,13 +1316,10 @@ export class Config {
     sessionData?: ResumedSessionData,
   ): string {
     // Finalize the outgoing session before switching.
-    if (this.chatRecordingService) {
-      try {
-        this.chatRecordingService.finalize();
-      } catch {
-        // Best-effort — don't block session switch
-      }
-      this.retireChatRecordingService(this.chatRecordingService);
+    try {
+      this.chatRecordingService?.finalize();
+    } catch {
+      // Best-effort — don't block session switch
     }
 
     this.sessionId = sessionId ?? randomUUID();
@@ -1422,18 +1333,6 @@ export class Config {
       logStartSession(this, new StartSessionEvent(this));
     }
     return this.sessionId;
-  }
-
-  private retireChatRecordingService(service: ChatRecordingService): void {
-    this.retiredChatRecordingServices.add(service);
-    void service
-      .flush()
-      .catch(() => {
-        // Best-effort — shutdown will still await any service that remains pending.
-      })
-      .finally(() => {
-        this.retiredChatRecordingServices.delete(service);
-      });
   }
 
   /**
@@ -1534,7 +1433,7 @@ export class Config {
     // - Non-qwen providers may need to re-validate credentials / baseUrl / envKey.
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
-    if (authType === AuthType.HOPCODE_OAUTH && !requiresRefresh) {
+    if (authType === AuthType.QWEN_OAUTH && !requiresRefresh) {
       const { config, sources } = resolveContentGeneratorConfigWithSources(
         this,
         authType,
@@ -1689,18 +1588,11 @@ export class Config {
       return;
     }
     try {
-      // Finalize the current session's metadata before cleanup.
+      // Finalize the current session's metadata before cleanup, then drain
+      // the async write queue so no records are lost on exit.
       try {
         this.chatRecordingService?.finalize();
         await this.chatRecordingService?.flush();
-        if (this.retiredChatRecordingServices.size > 0) {
-          await Promise.allSettled(
-            Array.from(this.retiredChatRecordingServices, (service) =>
-              service.flush(),
-            ),
-          );
-          this.retiredChatRecordingServices.clear();
-        }
       } catch {
         // Best-effort — don't block shutdown
       }
@@ -1756,7 +1648,7 @@ export class Config {
    *   - settings.permissions.allow  (persistent rules from all scopes)
    *   - allowedTools param  (SDK / argv auto-approve list)
    *
-   * Note: coreTools is intentionally excluded here � it has whitelist semantics
+   * Note: coreTools is intentionally excluded here — it has whitelist semantics
    * (only listed tools are registered), not auto-approve semantics. It is
    * handled separately via PermissionManager.coreToolsAllowList.
    *
@@ -1914,12 +1806,12 @@ export class Config {
     this.userMemory = newUserMemory;
   }
 
-  getContextMdFileCount(): number {
-    return this.contextMdFileCount;
+  getGeminiMdFileCount(): number {
+    return this.geminiMdFileCount;
   }
 
-  setContextMdFileCount(count: number): void {
-    this.contextMdFileCount = count;
+  setGeminiMdFileCount(count: number): void {
+    this.geminiMdFileCount = count;
   }
 
   getArenaManager(): ArenaManager | null {
@@ -2081,7 +1973,7 @@ export class Config {
     return this.telemetrySettings.useCollector ?? false;
   }
 
-  getHopCodeClient(): HopCodeClient {
+  getGeminiClient(): GeminiClient {
     return this.geminiClient;
   }
 
@@ -2092,28 +1984,9 @@ export class Config {
     return this.cronScheduler;
   }
 
-  getTaskStore(): TaskStore {
-    if (!this.taskStore) {
-      const runtimeDir = Storage.getRuntimeBaseDir();
-      this.taskStore = new TaskStore(runtimeDir, this.sessionId);
-    }
-    return this.taskStore;
-  }
-
-  getPermissionBlockerService(): PermissionBlockerService {
-    if (!this.permissionBlockerService) {
-      const persistPath = path.join(
-        Storage.getGlobalHopCodeDir(),
-        'permission-blockers.json',
-      );
-      this.permissionBlockerService = new PermissionBlockerService(persistPath);
-    }
-    return this.permissionBlockerService;
-  }
-
   isCronEnabled(): boolean {
     // Cron is experimental and opt-in: enabled via settings or env var
-    if (process.env['HOPCODE_ENABLE_CRON'] === '1') return true;
+    if (process.env['QWEN_CODE_ENABLE_CRON'] === '1') return true;
     return this.cronEnabled;
   }
 
@@ -2128,23 +2001,30 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
-  getFileFilteringRespectHopCodeIgnore(): boolean {
-    return this.fileFiltering.respectHopCodeIgnore;
+  getFileFilteringRespectQwenIgnore(): boolean {
+    return this.fileFiltering.respectQwenIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
-      customExcludes: this.fileFiltering.customExcludes,
+      respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
     };
   }
 
   /**
    * Gets custom file exclusion patterns from configuration.
+   * TODO: This is a placeholder implementation. In the future, this could
+   * read from settings files, CLI arguments, or environment variables.
    */
   getCustomExcludes(): string[] {
-    return this.fileFiltering.customExcludes;
+    // Placeholder implementation - returns empty array for now
+    // Future implementation could read from:
+    // - User settings file
+    // - Project-specific configuration
+    // - Environment variables
+    // - CLI arguments
+    return [];
   }
 
   getCheckpointingEnabled(): boolean {
@@ -2347,38 +2227,6 @@ export class Config {
 
   isBrowserLaunchSuppressed(): boolean {
     return this.getNoBrowser() || !shouldAttemptBrowserLaunch();
-  }
-
-  // Web search provider configuration
-  getWebSearchConfig() {
-    return this.getBareMode() ? undefined : this.webSearch;
-  }
-
-  /**
-   * Returns the model override for a given agent type name (from settings.json
-   * `agentModels` map), or `undefined` if no override is configured.
-   * The special value `"inherit"` is treated the same as `undefined`.
-   * When the override is an object `{ model, baseUrl?, apiKey? }`, returns
-   * the `.model` field.
-   */
-  getAgentModelForType(agentName: string): string | undefined {
-    const override = this.agentModels?.[agentName];
-    if (!override || override === 'inherit') return undefined;
-    if (typeof override === 'string') return override;
-    return override.model || undefined;
-  }
-
-  /**
-   * Returns the full agent model config object when an object-form override
-   * is configured in `agentModels`, or `undefined` if the value is a plain
-   * string or absent.
-   */
-  getAgentModelFullConfig(
-    agentName: string,
-  ): { model: string; baseUrl?: string; apiKey?: string } | undefined {
-    const override = this.agentModels?.[agentName];
-    if (!override || typeof override === 'string') return undefined;
-    return override;
   }
 
   getIdeMode(): boolean {
@@ -2704,7 +2552,7 @@ export class Config {
     );
 
     // Helper: check permission then register a lazy factory (no module import
-    // happens here � the dynamic import() only runs when the tool is first used).
+    // happens here — the dynamic import() only runs when the tool is first used).
     const registerLazy = async (
       toolName: ToolName,
       factory: ToolFactory,
@@ -2837,13 +2685,6 @@ export class Config {
       const { WebFetchTool } = await import('../tools/web-fetch.js');
       return new WebFetchTool(this);
     });
-    // Conditionally register web search tool if web search provider is configured
-    if (this.getWebSearchConfig()) {
-      await registerLazy(ToolNames.WEB_SEARCH, async () => {
-        const { WebSearchTool } = await import('../tools/web-search/index.js');
-        return new WebSearchTool(this);
-      });
-    }
     if (this.isLspEnabled() && this.getLspClient()) {
       await registerLazy(ToolNames.LSP, async () => {
         const { LspTool } = await import('../tools/lsp.js');
@@ -2867,36 +2708,6 @@ export class Config {
       });
     }
 
-    // Register task management tools (always available)
-    await registerLazy(ToolNames.TASK_CREATE, async () => {
-      const { TaskCreateTool } = await import('../tools/task-create.js');
-      return new TaskCreateTool(this);
-    });
-    await registerLazy(ToolNames.TASK_UPDATE, async () => {
-      const { TaskUpdateTool } = await import('../tools/task-update.js');
-      return new TaskUpdateTool(this);
-    });
-    await registerLazy(ToolNames.TASK_LIST, async () => {
-      const { TaskListTool } = await import('../tools/task-list.js');
-      return new TaskListTool(this);
-    });
-    await registerLazy(ToolNames.TASK_GET, async () => {
-      const { TaskGetTool } = await import('../tools/task-get.js');
-      return new TaskGetTool(this);
-    });
-    await registerLazy(ToolNames.TASK_STOP, async () => {
-      const { TaskStopTool } = await import('../tools/task-stop.js');
-      return new TaskStopTool(this);
-    });
-    await registerLazy(ToolNames.TASK_OUTPUT, async () => {
-      const { TaskOutputTool } = await import('../tools/task-output.js');
-      return new TaskOutputTool(this);
-    });
-    await registerLazy(ToolNames.TASK_READY, async () => {
-      const { TaskReadyTool } = await import('../tools/task-ready.js');
-      return new TaskReadyTool(this);
-    });
-
     if (!options?.skipDiscovery) {
       await registry.discoverAllTools();
     }
@@ -2905,34 +2716,4 @@ export class Config {
     );
     return registry;
   }
-}
-
-/**
- * Creates a Config override with typed method replacements.
- * Uses prototype delegation to avoid mutating the parent config while
- * providing type safety for overridden methods.
- *
- * @param base - The base Config to delegate to for non-overridden methods
- * @param overrides - Partial set of methods to override
- * @returns A new Config instance that delegates to base for non-overridden methods
- */
-export function createConfigOverride(
-  base: Config,
-  overrides: ConfigOverride,
-): Config {
-  // Create a new object that delegates to base for non-overridden properties
-  const override = Object.create(base) as Config;
-
-  // Apply each override with type checking using index signature
-  const entries = Object.entries(overrides) as Array<
-    [string, (() => unknown) | undefined]
-  >;
-
-  for (const [key, value] of entries) {
-    if (value !== undefined) {
-      (override as unknown as Record<string, unknown>)[key] = value;
-    }
-  }
-
-  return override;
 }

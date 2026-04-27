@@ -1,19 +1,20 @@
-﻿export default {
-  'Contribute to HopCode': {
-    title: 'Contribute to HopCode',
+export default {
+  'Contribute to Qwen Code': {
+    title: 'Contribute to Qwen Code',
     type: 'separator',
   },
   architecture: 'Architecture',
   roadmap: 'Roadmap',
   contributing: 'Contributing Guide',
-  'HopCode SDK': {
+  'Qwen Code SDK': {
     title: 'Agent SDK',
     type: 'separator',
   },
   'sdk-typescript': 'Typescript SDK',
-  'sdk-java': 'Java SDK(alpha)',
-  'Dive Into HopCode': {
-    title: 'Dive Into HopCode',
+  'sdk-python': 'Python SDK (alpha)',
+  'sdk-java': 'Java SDK (alpha)',
+  'Dive Into Qwen Code': {
+    title: 'Dive Into Qwen Code',
     type: 'separator',
   },
 

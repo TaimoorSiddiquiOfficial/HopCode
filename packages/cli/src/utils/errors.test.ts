@@ -5,12 +5,12 @@
  */
 
 import { vi, type Mock, type MockInstance } from 'vitest';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@qwen-code/qwen-code-core';
 import {
   OutputFormat,
   FatalInputError,
   ToolErrorType,
-} from '@hoptrendy/hopcode-core';
+} from '@qwen-code/qwen-code-core';
 import {
   _resetExitLatchForTest,
   getErrorMessage,
@@ -29,9 +29,10 @@ const debugLoggerSpy = vi.hoisted(() => ({
   error: vi.fn(),
 }));
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+// Mock the core modules
+vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@qwen-code/qwen-code-core')>();
 
   return {
     ...original,
@@ -63,22 +64,20 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
       ),
     })),
     FatalToolExecutionError: class extends Error {
-      exitCode: number;
-
       constructor(message: string) {
         super(message);
         this.name = 'FatalToolExecutionError';
         this.exitCode = 54;
       }
+      exitCode: number;
     },
     FatalCancellationError: class extends Error {
-      exitCode: number;
-
       constructor(message: string) {
         super(message);
         this.name = 'FatalCancellationError';
         this.exitCode = 130;
       }
+      exitCode: number;
     },
   };
 });
@@ -95,6 +94,7 @@ describe('errors', () => {
   let processStderrWriteSpy: MockInstance;
 
   beforeEach(() => {
+    // Reset mocks
     vi.clearAllMocks();
     mockWriteStderrLine.mockClear();
     debugLoggerSpy.debug.mockClear();
@@ -104,14 +104,17 @@ describe('errors', () => {
     _resetCleanupFunctionsForTest();
     _resetExitLatchForTest();
 
+    // Mock process.stderr.write
     processStderrWriteSpy = vi
       .spyOn(process.stderr, 'write')
       .mockImplementation(() => true);
 
+    // Mock process.exit to throw instead of actually exiting
     processExitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
       throw new Error(`process.exit called with code: ${code}`);
     });
 
+    // Create mock config
     mockConfig = {
       getOutputFormat: vi.fn().mockReturnValue(OutputFormat.TEXT),
       getContentGeneratorConfig: vi.fn().mockReturnValue({ authType: 'test' }),
@@ -293,7 +296,7 @@ describe('errors', () => {
         errorWithStatus.status = 'TIMEOUT';
 
         await expect(handleError(errorWithStatus, mockConfig)).rejects.toThrow(
-          'process.exit called with code: 1',
+          'process.exit called with code: 1', // string codes become 1
         );
 
         expect(mockWriteStderrLine).toHaveBeenCalledWith(
@@ -364,6 +367,7 @@ describe('errors', () => {
         it('should log error message to stderr and not exit', () => {
           handleToolError(toolName, toolError, mockConfig);
 
+          // In JSON mode, should not exit (just log to stderr when debug mode is on)
           expect(debugLoggerSpy.error).toHaveBeenCalledWith(
             'Error executing tool test-tool: Tool failed',
           );
@@ -373,6 +377,7 @@ describe('errors', () => {
         it('should log error with custom error code and not exit', () => {
           handleToolError(toolName, toolError, mockConfig, 'CUSTOM_TOOL_ERROR');
 
+          // In JSON mode, should not exit (just log to stderr when debug mode is on)
           expect(debugLoggerSpy.error).toHaveBeenCalledWith(
             'Error executing tool test-tool: Tool failed',
           );
@@ -382,6 +387,7 @@ describe('errors', () => {
         it('should log error with numeric error code and not exit', () => {
           handleToolError(toolName, toolError, mockConfig, 500);
 
+          // In JSON mode, should not exit (just log to stderr when debug mode is on)
           expect(debugLoggerSpy.error).toHaveBeenCalledWith(
             'Error executing tool test-tool: Tool failed',
           );
@@ -397,6 +403,7 @@ describe('errors', () => {
             'Display message',
           );
 
+          // In JSON mode, should not exit (just log to stderr when debug mode is on)
           expect(debugLoggerSpy.error).toHaveBeenCalledWith(
             'Error executing tool test-tool: Display message',
           );
@@ -414,6 +421,7 @@ describe('errors', () => {
         it('should log error message to stderr and not exit', () => {
           handleToolError(toolName, toolError, mockConfig);
 
+          // Should not exit in STREAM_JSON mode (just log to stderr when debug mode is on)
           expect(debugLoggerSpy.error).toHaveBeenCalledWith(
             'Error executing tool test-tool: Tool failed',
           );
@@ -473,18 +481,21 @@ describe('errors', () => {
       });
 
       it('should never exit regardless of output format', () => {
+        // Test in TEXT mode
         (
           mockConfig.getOutputFormat as ReturnType<typeof vi.fn>
         ).mockReturnValue(OutputFormat.TEXT);
         handleToolError(toolName, toolError, mockConfig);
         expect(processExitSpy).not.toHaveBeenCalled();
 
+        // Test in JSON mode
         (
           mockConfig.getOutputFormat as ReturnType<typeof vi.fn>
         ).mockReturnValue(OutputFormat.JSON);
         handleToolError(toolName, toolError, mockConfig);
         expect(processExitSpy).not.toHaveBeenCalled();
 
+        // Test in STREAM_JSON mode
         (
           mockConfig.getOutputFormat as ReturnType<typeof vi.fn>
         ).mockReturnValue(OutputFormat.STREAM_JSON);
@@ -673,6 +684,10 @@ describe('errors', () => {
   });
 
   describe('cleanup-before-exit invariant', () => {
+    // Regression: previously these handlers called process.exit synchronously,
+    // bypassing the caller's runExitCleanup → flush() chain on SIGINT, max-
+    // turn, and fatal-error paths. Same family as the EPIPE/process.exit
+    // bug fixed for stdout in nonInteractiveCli.
     it('handleCancellationError drains registered cleanups before exit', async () => {
       const cleanupOrder: string[] = [];
       registerCleanup(() => {
@@ -707,7 +722,7 @@ describe('errors', () => {
       expect(cleanupOrder).toEqual(['cleanup', 'exit:53']);
     });
 
-    it('handleError drains registered cleanups before exit in JSON mode', async () => {
+    it('handleError drains registered cleanups before exit (JSON mode)', async () => {
       (mockConfig.getOutputFormat as ReturnType<typeof vi.fn>).mockReturnValue(
         OutputFormat.JSON,
       );
@@ -728,6 +743,12 @@ describe('errors', () => {
     });
 
     it('a second terminating handler does not race the first into double-exit', async () => {
+      // Models the real concurrency: SIGINT → handleCancellationError fires
+      // while a stream rejection lands in the catch → handleError(JSON).
+      // Without the exit-once latch we'd get duplicate cleanup runs +
+      // duplicate process.exit calls + interleaved stderr writes.
+      // (Text-mode handleError throws instead of exiting, so it isn't part
+      // of the race — the latch lives on the exit path.)
       (mockConfig.getOutputFormat as ReturnType<typeof vi.fn>).mockReturnValue(
         OutputFormat.JSON,
       );
@@ -743,6 +764,7 @@ describe('errors', () => {
 
       await expect(first).rejects.toThrow('process.exit called with code: 130');
 
+      // The second handler is parked in the latch's unresolved promise.
       let secondSettled = false;
       void second.then(
         () => {
@@ -752,13 +774,15 @@ describe('errors', () => {
           secondSettled = true;
         },
       );
-      await new Promise((resolve) => setTimeout(resolve, 20));
+      await new Promise((r) => setTimeout(r, 20));
 
       expect(exitCalls).toBe(1);
       expect(secondSettled).toBe(false);
     });
 
-    it('handleError drains registered cleanups before re-throw in text mode', async () => {
+    it('handleError drains registered cleanups before re-throw (text mode)', async () => {
+      // Text mode re-throws to the caller; we still want the queue drained
+      // first so the unhandled-rejection path doesn't lose records.
       (mockConfig.getOutputFormat as ReturnType<typeof vi.fn>).mockReturnValue(
         OutputFormat.TEXT,
       );
