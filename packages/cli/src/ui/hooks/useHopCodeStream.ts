@@ -4,7 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useLayoutEffect,
+} from 'react';
 import type {
   Config,
   EditorType,
@@ -42,6 +49,7 @@ import {
   ApiCancelEvent,
   isSupportedImageMimeType,
   getUnsupportedImageFormatWarning,
+  generateToolUseSummary,
 } from '@hoptrendy/hopcode-core';
 import { type Part, type PartListUnion, FinishReason } from '@google/genai';
 import type {
@@ -79,6 +87,48 @@ import { t } from '../../i18n/index.js';
 import { useDualOutput } from '../../dualOutput/DualOutputContext.js';
 
 const debugLogger = createDebugLogger('GEMINI_STREAM');
+
+/**
+ * Pull the assistant's most recent visible text from the UI history. Used as
+ * an intent prefix for tool-use summary generation so the summarizer knows
+ * what the user was trying to accomplish.
+ */
+function extractLastAssistantText(history: HistoryItem[]): string | undefined {
+  for (let i = history.length - 1; i >= 0; i--) {
+    const item = history[i];
+    if (
+      (item.type === 'gemini' || item.type === 'gemini_content') &&
+      typeof item.text === 'string' &&
+      item.text.trim().length > 0
+    ) {
+      return item.text;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Flatten `functionResponse` parts into a compact string for the summarizer.
+ * The summarizer itself truncates to 300 chars per field, so we just join
+ * whatever is available without re-serializing.
+ */
+function extractToolResultText(parts: Part[] | Part | undefined): unknown {
+  if (!parts) return '';
+  const list = Array.isArray(parts) ? parts : [parts];
+  const chunks: unknown[] = [];
+  for (const part of list) {
+    if ('functionResponse' in part && part.functionResponse) {
+      const response = (part.functionResponse as { response?: unknown })
+        .response;
+      if (response !== undefined) chunks.push(response);
+    } else if ('text' in part && typeof part.text === 'string') {
+      chunks.push(part.text);
+    }
+  }
+  if (chunks.length === 0) return '';
+  if (chunks.length === 1) return chunks[0];
+  return chunks;
+}
 
 /**
  * Classify API error to StopFailureErrorType
@@ -229,6 +279,13 @@ export const useHopCodeStream = (
   const dualOutput = useDualOutput();
   const [isResponding, setIsResponding] = useState<boolean>(false);
   const [thought, setThought] = useState<ThoughtSummary | null>(null);
+  // Hold the latest history in a ref so handleCompletedTools can read it
+  // without depending on `history` and recreating the tool scheduler every render.
+  const historyRef = useRef<HistoryItem[]>(history);
+  useLayoutEffect(() => {
+    historyRef.current = history;
+  }, [history]);
+  const summaryAbortRefsRef = useRef<Set<AbortController>>(new Set());
   const [pendingHistoryItem, pendingHistoryItemRef, setPendingHistoryItem] =
     useStateAndRef<HistoryItemWithoutId | null>(null);
   const [
@@ -489,6 +546,10 @@ export const useHopCodeStream = (
     turnCancelledRef.current = true;
     isSubmittingQueryRef.current = false;
     abortControllerRef.current?.abort();
+    for (const abortController of summaryAbortRefsRef.current) {
+      abortController.abort();
+    }
+    summaryAbortRefsRef.current.clear();
 
     // Report cancellation to arena status reporter (if in arena mode).
     // This is needed because cancellation during tool execution won't
@@ -1826,6 +1887,67 @@ export const useHopCodeStream = (
       }
 
       markToolsAsSubmitted(callIdsToMarkAsSubmitted);
+
+      // Fire tool-use summary generation in parallel with the next API call.
+      // Failures are intentionally silent and never block the turn.
+      if (config.getEmitToolUseSummaries()) {
+        const successfulTools = geminiTools.filter(
+          (tc) => tc.status === 'success',
+        );
+        if (successfulTools.length > 0) {
+          const toolInfoForSummary = successfulTools.map((tc) => ({
+            name: tc.request.name,
+            input: tc.request.args,
+            output: extractToolResultText(tc.response.responseParts),
+          }));
+          const toolUseIds = successfulTools.map((tc) => tc.request.callId);
+          const lastAssistantText = extractLastAssistantText(
+            historyRef.current,
+          );
+          const summaryAbort = new AbortController();
+          summaryAbortRefsRef.current.add(summaryAbort);
+          const anchorCallId = toolUseIds[0];
+
+          void generateToolUseSummary({
+            config,
+            tools: toolInfoForSummary,
+            signal: summaryAbort.signal,
+            lastAssistantText,
+          })
+            .then((summary) => {
+              summaryAbortRefsRef.current.delete(summaryAbort);
+              const cancelled =
+                turnCancelledRef.current ||
+                abortControllerRef.current?.signal.aborted ||
+                summaryAbort.signal.aborted;
+              if (!summary || cancelled) return;
+
+              const currentHistory = historyRef.current;
+              const ourIdx = currentHistory.findIndex(
+                (h) =>
+                  h.type === 'tool_group' &&
+                  h.tools.some((t) => t.callId === anchorCallId),
+              );
+              if (ourIdx < 0) return;
+              const laterToolGroupExists = currentHistory
+                .slice(ourIdx + 1)
+                .some((h) => h.type === 'tool_group');
+              if (laterToolGroupExists) return;
+
+              addItem(
+                {
+                  type: 'tool_use_summary',
+                  summary,
+                  precedingToolUseIds: toolUseIds,
+                } as HistoryItemWithoutId,
+                Date.now(),
+              );
+            })
+            .catch(() => {
+              summaryAbortRefsRef.current.delete(summaryAbort);
+            });
+        }
+      }
 
       // Don't continue if model was switched due to quota error
       if (modelSwitchedFromQuotaError) {
