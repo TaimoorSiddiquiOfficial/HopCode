@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/sdk",
-  "version": "0.19.5",
+  "version": "0.19.9",
   "description": "TypeScript SDK for programmatic access to HopCode CLI",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

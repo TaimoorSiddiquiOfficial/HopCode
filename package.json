@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode",
-  "version": "0.19.8",
+  "version": "0.19.9",
   "type": "module",
   "workspaces": [
     "packages/*",
@@ -16,7 +16,7 @@
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
   "config": {
-    "sandboxImageUri": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.19.8"
+    "sandboxImageUri": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.19.9"
   },
   "scripts": {
     "verify:privacy": "tsx scripts/verify-privacy.ts",

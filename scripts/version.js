@@ -37,7 +37,9 @@ if (!versionType) {
 run(`npm version ${versionType} --no-git-tag-version --allow-same-version`);
 
 // 3. Get all workspaces and bump them to the release version.
-const workspacesToExclude = [];
+// Exclude third-party packages that may appear in npm ls --workspaces output
+// but are not owned by this repo (e.g., patched/vendored packages).
+const workspacesToExclude = ['ansi-sequence-parser'];
 let lsOutput;
 try {
   lsOutput = JSON.parse(
