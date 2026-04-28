@@ -61,18 +61,15 @@ describe('showAuthStatus', () => {
       expect.stringContaining('No authentication method configured'),
     );
     expect(writeStdoutLine).toHaveBeenCalledWith(
-      expect.stringContaining('qwen auth openrouter'),
+      expect.stringContaining('hopcode auth openrouter'),
     );
     expect(writeStdoutLine).toHaveBeenCalledWith(
-      expect.stringContaining('qwen auth qwen-oauth'),
-    );
-    expect(writeStdoutLine).toHaveBeenCalledWith(
-      expect.stringContaining('qwen auth coding-plan'),
+      expect.stringContaining('hopcode auth coding-plan'),
     );
     expect(process.exit).toHaveBeenCalledWith(0);
   });
 
-  it('should show Qwen OAuth status when configured', async () => {
+  it('should show HopCode OAuth status when configured', async () => {
     vi.mocked(loadSettings).mockReturnValue(
       createMockSettings({
         security: {
@@ -86,13 +83,10 @@ describe('showAuthStatus', () => {
     await showAuthStatus();
 
     expect(writeStdoutLine).toHaveBeenCalledWith(
-      expect.stringContaining('Qwen OAuth'),
+      expect.stringContaining('HopCode OAuth'),
     );
     expect(writeStdoutLine).toHaveBeenCalledWith(
-      expect.stringContaining('Free tier (discontinued 2026-04-15)'),
-    );
-    expect(writeStdoutLine).toHaveBeenCalledWith(
-      expect.stringContaining('No longer available'),
+      expect.stringContaining('Legacy OAuth (discontinued 2026-04-15)'),
     );
     expect(process.exit).toHaveBeenCalledWith(0);
   });
@@ -195,7 +189,7 @@ describe('showAuthStatus', () => {
       expect.stringContaining('OpenRouter (Incomplete)'),
     );
     expect(writeStdoutLine).toHaveBeenCalledWith(
-      expect.stringContaining('qwen auth openrouter'),
+      expect.stringContaining('hopcode auth openrouter'),
     );
   });
 
