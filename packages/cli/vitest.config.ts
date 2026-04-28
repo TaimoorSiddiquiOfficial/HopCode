@@ -12,6 +12,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@hoptrendy/hopcode-core': path.resolve(__dirname, '../core/index.ts'),
+      '@hoptrendy/hopcode-server': path.resolve(
+        __dirname,
+        '../server/dist/index.js',
+      ),
     },
   },
   test: {
@@ -47,7 +51,7 @@ export default defineConfig({
     },
     server: {
       deps: {
-        inline: [/@hoptrendy\/hopcode-core/],
+        inline: [/@hoptrendy\/hopcode-core/, /@hoptrendy\/hopcode-server/],
       },
     },
   },

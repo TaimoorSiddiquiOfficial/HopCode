@@ -50,7 +50,7 @@ describe('handleAtCommand', () => {
       isSandboxed: () => false,
       getFileService: () => new FileDiscoveryService(testRootDir),
       getFileFilteringRespectGitIgnore: () => true,
-      getFileFilteringRespectHopCodeIgnore: () => true,
+      getFileFilteringRespectQwenIgnore: () => true,
       getFileFilteringOptions: () => ({
         respectGitIgnore: true,
         respectHopCodeIgnore: true,

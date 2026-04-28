@@ -606,7 +606,7 @@ describe('loadCliConfig', () => {
     vi.restoreAllMocks();
   });
 
-  it('should reset context file names to QWEN.md and AGENTS.md by default', async () => {
+  it('should reset context file names to HOPCODE.md (plus legacy QWEN.md) and AGENTS.md by default', async () => {
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = {};
@@ -620,6 +620,7 @@ describe('loadCliConfig', () => {
     expect(setGeminiMdFilenameSpy).toHaveBeenCalledTimes(1);
     expect(setGeminiMdFilenameSpy).toHaveBeenCalledWith([
       ServerConfig.DEFAULT_CONTEXT_FILENAME,
+      ServerConfig.LEGACY_CONTEXT_FILENAME,
       ServerConfig.AGENT_CONTEXT_FILENAME,
     ]);
   });
@@ -2279,13 +2280,13 @@ describe('loadCliConfig fileFiltering', () => {
       value: false,
     },
     {
-      property: 'respectHopCodeIgnore',
-      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
+      property: 'respectQwenIgnore',
+      getter: (c) => c.getFileFilteringRespectQwenIgnore(),
       value: true,
     },
     {
-      property: 'respectHopCodeIgnore',
-      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
+      property: 'respectQwenIgnore',
+      getter: (c) => c.getFileFilteringRespectQwenIgnore(),
       value: false,
     },
     {
