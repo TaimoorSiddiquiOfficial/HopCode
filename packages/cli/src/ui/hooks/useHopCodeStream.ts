@@ -1266,7 +1266,7 @@ export const useHopCodeStream = (
           dualOutput?.processEvent(event);
           switch (event.type) {
             case ServerHopCodeEventType.Thought:
-              if (event.value.subject) {
+              if (event.value.subject && !event.value.description) {
                 flushBufferedStreamEvents();
                 setThought(event.value);
               } else {
