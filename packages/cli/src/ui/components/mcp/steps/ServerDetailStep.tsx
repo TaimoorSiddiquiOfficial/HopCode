@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -17,7 +17,7 @@ import {
   formatServerCommand,
 } from '../utils.js';
 
-// 标签列宽度
+// ?????
 const LABEL_WIDTH = 15;
 
 type ServerAction =
@@ -42,7 +42,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       : getStatusColor(server.status)
     : 'gray';
 
-  // 根据服务器状态动态生成可用操作
+  // ???????????????
   const actions = useMemo(() => {
     const result: Array<{
       key: string;
@@ -54,7 +54,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       return result;
     }
 
-    // 只在服务器未禁用且有工具时显示"查看工具"选项
+    // ???????????????"????"??
     if (!server.isDisabled && (server.toolCount ?? 0) > 0) {
       result.push({
         key: 'view-tools',
@@ -63,7 +63,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       });
     }
 
-    // 只在服务器未禁用且已断开连接时显示"重新连接"选项
+    // ?????????????????"????"??
     if (!server.isDisabled && server.status === 'disconnected') {
       result.push({
         key: 'reconnect',
@@ -72,14 +72,14 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       });
     }
 
-    // 始终显示启用/禁用选项
+    // ??????/????
     result.push({
       key: 'toggle-disable',
       label: server?.isDisabled ? t('Enable') : t('Disable'),
       value: 'toggle-disable',
     });
 
-    // 已认证的服务器显示"重新认证"，未认证的显示"认证"
+    // ?????????"????",??????"??"
     if (!server.isDisabled) {
       result.push({
         key: 'authenticate',
@@ -88,7 +88,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       });
     }
 
-    // 只在存储有 OAuth 认证信息时显示“清空认证”选项
+    // ????? OAuth ???????�????�??
     if (!server.isDisabled && server.hasOAuthTokens) {
       result.push({
         key: 'clear-auth',
@@ -119,7 +119,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
 
   return (
     <Box flexDirection="column" gap={1}>
-      {/* 服务器详情 */}
+      {/* ????? */}
       <Box flexDirection="column">
         <Box>
           <Box width={LABEL_WIDTH}>
@@ -214,7 +214,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
         )}
       </Box>
 
-      {/* 操作列表 */}
+      {/* ???? */}
       <Box>
         <RadioButtonSelect<ServerAction>
           items={actions}

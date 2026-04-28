@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -30,7 +30,7 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
   const serverNameWidth = useMemo(() => {
     if (servers.length === 0) return 20;
     const maxLength = Math.max(...servers.map((s) => s.name.length));
-    // 最小 20，最大 35，留一些余量
+    // ?? 20,?? 35,?????
     return Math.min(Math.max(maxLength + 2, 20), 35);
   }, [servers]);
 
@@ -86,7 +86,7 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
 
   return (
     <Box flexDirection="column">
-      {/* 分组服务器列表 */}
+      {/* ??????? */}
       {groupedServers.map((group, groupIndex) => (
         <Box
           key={group.source}
@@ -119,10 +119,10 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
                         isSelected ? theme.text.accent : theme.text.primary
                       }
                     >
-                      {isSelected ? '❯' : ' '}
+                      {isSelected ? '?' : ' '}
                     </Text>
                   </Box>
-                  {/* 服务器名称 - 固定宽度 */}
+                  {/* ????? - ???? */}
                   <Box width={serverNameWidth}>
                     <Text
                       color={
@@ -133,8 +133,8 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
                       {server.name}
                     </Text>
                   </Box>
-                  <Text color={theme.text.secondary}> · </Text>
-                  {/* 状态图标和文本 */}
+                  <Text color={theme.text.secondary}> � </Text>
+                  {/* ??????? */}
                   <Text
                     color={
                       statusColor === 'green'
@@ -147,7 +147,7 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
                     {getStatusIcon(server.status)}{' '}
                     {server.isDisabled ? t('disabled') : t(server.status)}
                   </Text>
-                  {/* 显示无效工具警告 */}
+                  {/* ???????? */}
                   {!!server.invalidToolCount && server.invalidToolCount > 0 && (
                     <Text color={theme.status.warning}>
                       {' '}
@@ -163,11 +163,11 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
         </Box>
       ))}
 
-      {/* 提示信息 */}
+      {/* ???? */}
       {servers.some((s) => s.status === 'disconnected' && !s.isDisabled) && (
         <Box marginTop={1}>
           <Text color={theme.status.warning}>
-            ※ {t('Run hopcode --debug to see error logs')}
+            ? {t('Run hopcode --debug to see error logs')}
           </Text>
         </Box>
       )}

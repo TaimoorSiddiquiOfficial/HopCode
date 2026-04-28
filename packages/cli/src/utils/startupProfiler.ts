@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Lightweight startup performance profiler.
  *
  * Activated by setting HOPCODE_PROFILE_STARTUP=1. When enabled, collects
@@ -6,9 +6,9 @@
  * report to ~/.hopcode/startup-perf/ on finalization.
  *
  * Usage (already wired in index.ts / interactive.tsx):
- *   initStartupProfiler()        â€” call once at process start to record T0
- *   profileCheckpoint('name')    â€” call at each phase boundary
- *   finalizeStartupProfile(id)   â€” call after last checkpoint to write report
+ *   initStartupProfiler()        — call once at process start to record T0
+ *   profileCheckpoint('name')    — call at each phase boundary
+ *   finalizeStartupProfile(id)   — call after last checkpoint to write report
  *
  * Only profiles inside the sandbox child process to avoid duplicate reports.
  * Zero overhead when disabled (single env var check).
@@ -54,7 +54,7 @@ export function initStartupProfiler(): void {
   if (process.env['HOPCODE_PROFILE_STARTUP'] !== '1') {
     return;
   }
-  // Skip profiling in the outer (pre-sandbox) process â€” the child will
+  // Skip profiling in the outer (pre-sandbox) process — the child will
   // re-run index.ts inside the sandbox and collect its own profile.
   if (!process.env['SANDBOX']) {
     return;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -37,7 +37,7 @@ const CollapsibleOutput: FC<{
         className="inline-flex text-[var(--app-secondary-foreground)] text-[0.85em] opacity-70 mt-[2px] mb-[2px] flex-row items-start w-full gap-1 cursor-pointer hover:opacity-100 transition-opacity"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span className="flex-shrink-0 relative top-[-0.1em]">⎿</span>
+        <span className="flex-shrink-0 relative top-[-0.1em]">?</span>
         <span className="flex-shrink-0">{summary}</span>
       </div>
       {isExpanded && (

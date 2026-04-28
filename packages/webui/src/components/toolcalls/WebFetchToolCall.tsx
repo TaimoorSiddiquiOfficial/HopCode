@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -104,7 +104,7 @@ const OutputCard: FC<{
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-[var(--app-secondary-foreground)] text-[0.8em] hover:text-[var(--app-primary-foreground)] cursor-pointer bg-transparent border-none px-2 py-1 rounded hover:bg-[var(--app-input-background)] transition-colors"
             >
-              {isExpanded ? '▲ Collapse' : '▼ Show more'}
+              {isExpanded ? '? Collapse' : '? Show more'}
             </button>
           </div>
         )}

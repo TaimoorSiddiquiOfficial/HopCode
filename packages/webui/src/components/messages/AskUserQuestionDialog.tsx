@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -285,7 +285,7 @@ export const AskUserQuestionDialog: FC<AskUserQuestionDialogProps> = ({
             onClick={() => setCurrentQuestionIndex(idx)}
           >
             <span>{q.header}</span>
-            {isAnswered && <span className="text-green-500">✓</span>}
+            {isAnswered && <span className="text-green-500">?</span>}
           </button>
         );
       })}
@@ -419,10 +419,10 @@ export const AskUserQuestionDialog: FC<AskUserQuestionDialogProps> = ({
               >
                 {isMultiSelect ? (
                   <span className="min-w-[18px]">
-                    {isMultiChecked ? '☑' : '☐'}
+                    {isMultiChecked ? '?' : '?'}
                   </span>
                 ) : (
-                  <span className="min-w-[18px]">{isSelected ? '●' : '○'}</span>
+                  <span className="min-w-[18px]">{isSelected ? '?' : '?'}</span>
                 )}
                 <span className="flex-1">{opt.label}</span>
               </button>
@@ -456,7 +456,7 @@ export const AskUserQuestionDialog: FC<AskUserQuestionDialogProps> = ({
                     });
                   }}
                 >
-                  {currentAnswer.customInputChecked ? '☑' : '☐'}
+                  {currentAnswer.customInputChecked ? '?' : '?'}
                 </span>
               )}
               <input
@@ -486,7 +486,7 @@ export const AskUserQuestionDialog: FC<AskUserQuestionDialogProps> = ({
                 bg-[var(--app-button-secondary-background)] text-[var(--app-secondary-foreground)] hover:bg-[var(--app-list-active-background)] hover:text-[var(--app-list-active-foreground)]"
               onClick={() => setShowCustomInput(true)}
             >
-              <span className="min-w-[18px]">✎</span>
+              <span className="min-w-[18px]">?</span>
               <span className="flex-1 opacity-70">
                 {currentAnswer.customInput || 'Other...'}
               </span>

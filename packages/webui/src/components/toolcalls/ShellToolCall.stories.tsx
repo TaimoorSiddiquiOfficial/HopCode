@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -120,7 +120,7 @@ export const ExecuteWithDescription: Story = {
           type: 'content',
           content: {
             type: 'text',
-            text: 'PASS src/utils.test.ts\n  ✓ should format date correctly (5ms)\n  ✓ should parse input (2ms)\n\nTest Suites: 1 passed, 1 total\nTests:       2 passed, 2 total',
+            text: 'PASS src/utils.test.ts\n  ? should format date correctly (5ms)\n  ? should parse input (2ms)\n\nTest Suites: 1 passed, 1 total\nTests:       2 passed, 2 total',
           },
         },
       ],

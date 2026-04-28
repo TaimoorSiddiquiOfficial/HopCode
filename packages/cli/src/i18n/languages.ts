@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team team
  * SPDX-License-Identifier: Apache-2.0
@@ -23,7 +23,7 @@ export interface LanguageDefinition {
   id: string;
   /** The full English name of the language (e.g., 'English', 'Chinese'). */
   fullName: string;
-  /** The native name of the language (e.g., 'English', '中文'). */
+  /** The native name of the language (e.g., 'English', '??'). */
   nativeName?: string;
 }
 
@@ -38,19 +38,19 @@ export const SUPPORTED_LANGUAGES: readonly LanguageDefinition[] = [
     code: 'zh-TW',
     id: 'zh-TW',
     fullName: 'Traditional Chinese',
-    nativeName: '繁體中文',
+    nativeName: '????',
   },
   {
     code: 'zh',
     id: 'zh-CN',
     fullName: 'Chinese',
-    nativeName: '中文',
+    nativeName: '??',
   },
   {
     code: 'ru',
     id: 'ru-RU',
     fullName: 'Russian',
-    nativeName: 'Русский',
+    nativeName: '???????',
   },
   {
     code: 'de',
@@ -62,25 +62,25 @@ export const SUPPORTED_LANGUAGES: readonly LanguageDefinition[] = [
     code: 'ja',
     id: 'ja-JP',
     fullName: 'Japanese',
-    nativeName: '日本語',
+    nativeName: '???',
   },
   {
     code: 'pt',
     id: 'pt-BR',
     fullName: 'Portuguese',
-    nativeName: 'Português',
+    nativeName: 'Portugu�s',
   },
   {
     code: 'fr',
     id: 'fr-FR',
     fullName: 'French',
-    nativeName: 'Français',
+    nativeName: 'Fran�ais',
   },
   {
     code: 'ca',
     id: 'ca-ES',
     fullName: 'Catalan',
-    nativeName: 'Català',
+    nativeName: 'Catal�',
   },
 ];
 

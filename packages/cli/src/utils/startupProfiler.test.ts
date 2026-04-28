@@ -1,4 +1,4 @@
-﻿import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs';
 import {
   initStartupProfiler,

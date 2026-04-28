@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run real end-to-end smoke tests against qwen CLI using qwen_code_sdk.
+"""Run real end-to-end smoke tests against qwen CLI using hopcode_sdk.
 
 This script is intentionally lightweight and avoids any test doubles.
 It is useful for manual verification after changing SDK runtime behavior.
@@ -38,7 +38,7 @@ SRC_ROOT = SDK_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from qwen_code_sdk import (  # noqa: E402
+from hopcode_sdk import (  # noqa: E402
     SDKUserMessage,
     SyncQuery,
     is_sdk_assistant_message,
@@ -47,7 +47,7 @@ from qwen_code_sdk import (  # noqa: E402
     query,
     query_sync,
 )
-from qwen_code_sdk.transport import prepare_spawn_info  # noqa: E402
+from hopcode_sdk.transport import prepare_spawn_info  # noqa: E402
 
 T = TypeVar("T")
 
@@ -79,7 +79,7 @@ class SyncResult:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run real qwen_code_sdk smoke tests using qwen CLI",
+        description="Run real hopcode_sdk smoke tests using qwen CLI",
     )
     parser.add_argument(
         "--qwen",

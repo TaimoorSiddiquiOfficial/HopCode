@@ -1,7 +1,7 @@
 {
   "name": "@hoptrendy/channel-base",
   "version": "0.19.9",
-  "description": "Base channel infrastructure for Qwen Code",
+  "description": "Base channel infrastructure for HopCode",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

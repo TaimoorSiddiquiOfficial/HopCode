@@ -4,9 +4,9 @@ import threading
 import time
 
 import pytest
-import qwen_code_sdk.sync_query as sync_query_module
-from qwen_code_sdk import is_sdk_result_message, query_sync
-from qwen_code_sdk.sync_query import SyncQuery
+import hopcode_sdk.sync_query as sync_query_module
+from hopcode_sdk import is_sdk_result_message, query_sync
+from hopcode_sdk.sync_query import SyncQuery
 
 
 def test_sync_query_single_turn(fake_qwen_path: str) -> None:

@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -86,13 +86,13 @@ export const ContextIndicator: FC<ContextIndicatorProps> = ({
   const tooltipContent = (
     <div className="flex flex-col gap-1">
       <div className="font-medium">
-        {percentFormatted}% â€¢ {formatNumber(contextUsage.usedTokens)} /{' '}
+        {percentFormatted}% • {formatNumber(contextUsage.usedTokens)} /{' '}
         {formatNumber(contextUsage.tokenLimit)} context used
       </div>
     </div>
   );
 
-  const ariaLabel = `${percentFormatted}% â€¢ ${formatNumber(contextUsage.usedTokens)} / ${formatNumber(contextUsage.tokenLimit)} context used`;
+  const ariaLabel = `${percentFormatted}% • ${formatNumber(contextUsage.usedTokens)} / ${formatNumber(contextUsage.tokenLimit)} context used`;
 
   return (
     <Tooltip content={tooltipContent} position="top">

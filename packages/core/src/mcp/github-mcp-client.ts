@@ -274,30 +274,6 @@ export class GitHubMCPClient {
     return (await response.json()) as T;
   }
 
-  /**
-   * Make authenticated DELETE request
-   */
-  private async delete(
-    owner: string,
-    repo: string,
-    path: string,
-  ): Promise<void> {
-    const url = `${this.baseUrl}/repos/${owner}/${repo}${path}`;
-    const headers = await this.getAuthHeaders(owner, repo);
-
-    debugLogger.debug(`DELETE ${url}`);
-
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers,
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`GitHub API error: ${response.status} ${error}`);
-    }
-  }
-
   // ==================== ISSUES ====================
 
   /**

@@ -754,10 +754,11 @@ function updateMcpConfig(
 
     if (existsSync(configPath)) {
       const content = readFileSync(configPath, 'utf-8');
-      config = JSON.parse(content);
+      config = JSON.parse(content) as Record<string, unknown>;
     }
 
-    config.mcpServers[skillName] = {
+    const servers = config.mcpServers as Record<string, unknown>;
+    servers[skillName] = {
       command: 'node',
       args: [`dist/${skillName}-skill.js`],
       cwd: `./.agents/skills/${skillName}`,

@@ -1,4 +1,4 @@
-Ôªø/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -284,7 +284,7 @@ describe('mergeCompactToolGroups', () => {
   it('merges tool_groups separated by gemini_thought (hidden in compact)', () => {
     // This is the real-world case: model emits a thought between consecutive
     // tool calls. Since gemini_thought is hidden in compact mode, the user
-    // visually sees adjacent boxes ‚Äî so we merge them.
+    // visually sees adjacent boxes ó so we merge them.
     const items: HistoryItem[] = [
       createToolGroup(1, [createTool('c1', 'Shell', ToolCallStatus.Success)]),
       { type: 'gemini_thought', id: 2, text: 'thinking...' },
@@ -325,7 +325,7 @@ describe('mergeCompactToolGroups', () => {
   });
 
   it('does NOT merge across visible non-tool-group items (gemini text)', () => {
-    // gemini text IS visible in compact mode ‚Üí it breaks the streak
+    // gemini text IS visible in compact mode ? it breaks the streak
     const items: HistoryItem[] = [
       createToolGroup(1, [createTool('c1', 'Shell', ToolCallStatus.Success)]),
       { type: 'gemini_thought', id: 2, text: 'thinking...' },
@@ -346,7 +346,7 @@ describe('mergeCompactToolGroups', () => {
   it('drops trailing tool_use_summary after a single absorbed tool_group', () => {
     // Single-batch turn: one tool_group, then its summary arrives. The group
     // is non-force-expanded (compact-mode candidate), so its callId is in
-    // absorbedCallIds ‚Äî the summary is consumed by the compact header and
+    // absorbedCallIds ó the summary is consumed by the compact header and
     // dropped from merged output. Without this drop, mergedHistory.length
     // would grow lock-step with history.length and MainContent's
     // refreshStatic heuristic would never fire.
@@ -399,8 +399,8 @@ describe('mergeCompactToolGroups', () => {
   it('preserves tool_use_summary for force-expanded (non-absorbed) tool_group', () => {
     // The errored tool_group is force-expanded: it renders through the full
     // ToolGroupMessage path, ignoring `compactLabel`. Its callId is NOT in
-    // absorbedCallIds, so the summary must survive in merged output ‚Äî
-    // HistoryItemDisplay then renders it as a standalone `‚óè <label>` line,
+    // absorbedCallIds, so the summary must survive in merged output ó
+    // HistoryItemDisplay then renders it as a standalone `? <label>` line,
     // which is the only way the label reaches the screen for this group.
     const items: HistoryItem[] = [
       createToolGroup(1, [
@@ -414,7 +414,7 @@ describe('mergeCompactToolGroups', () => {
       },
     ];
 
-    // Empty absorbedCallIds ‚Äî the errored group's callId is not absorbed.
+    // Empty absorbedCallIds ó the errored group's callId is not absorbed.
     const merged = mergeCompactToolGroups(items, false, undefined, new Set());
 
     expect(merged.length).toBe(2);
@@ -423,7 +423,7 @@ describe('mergeCompactToolGroups', () => {
   });
 
   it('preserves tool_use_summary when no absorbedCallIds set is provided (default)', () => {
-    // Default empty set ‚Äî preserves all summaries. This is the safe default
+    // Default empty set ó preserves all summaries. This is the safe default
     // for callers that don't compute absorption (e.g., older test fixtures
     // and any future callers outside MainContent).
     const items: HistoryItem[] = [
@@ -444,7 +444,7 @@ describe('mergeCompactToolGroups', () => {
   });
 
   it('merges tool_groups separated by tool_use_summary (hidden in compact)', () => {
-    // Two mergeable batches separated by an absorbed summary ‚Äî the summary
+    // Two mergeable batches separated by an absorbed summary ó the summary
     // is dropped during merge, the two groups concatenate.
     const items: HistoryItem[] = [
       createToolGroup(1, [createTool('c1', 'Shell', ToolCallStatus.Success)]),

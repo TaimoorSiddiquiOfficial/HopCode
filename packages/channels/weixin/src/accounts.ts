@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Credential storage for WeChat account.
  * Stores account data in ~/.hopcode/channels/weixin/
  */

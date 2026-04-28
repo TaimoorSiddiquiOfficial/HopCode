@@ -9,15 +9,17 @@ export const metadata = {
 };
 
 const banner = (
-  <Banner storageKey="some-key">Qwen Code 0.5.0 is released 🎉</Banner>
+  <Banner storageKey="some-key">HopCode 0.19.9 is released 🎉</Banner>
 );
 const navbar = (
   <Navbar
-    logo={<b>Qwen Code</b>}
+    logo={<b>HopCode</b>}
     // ... Your additional navbar options
   />
 );
-const footer = <Footer>MIT {new Date().getFullYear()} © Qwen Team.</Footer>;
+const footer = (
+  <Footer>Apache-2.0 {new Date().getFullYear()} © HopCode.</Footer>
+);
 
 export default async function RootLayout({ children }) {
   return (

@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Any, cast
 
 import pytest
-from qwen_code_sdk.errors import ValidationError
-from qwen_code_sdk.types import QueryOptions, TimeoutOptions
-from qwen_code_sdk.validation import validate_query_options
+from hopcode_sdk.errors import ValidationError
+from hopcode_sdk.types import QueryOptions, TimeoutOptions
+from hopcode_sdk.validation import validate_query_options
 
 VALID_UUID = "123e4567-e89b-12d3-a456-426614174000"
 

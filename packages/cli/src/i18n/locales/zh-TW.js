@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 

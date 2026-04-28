@@ -14,10 +14,10 @@
   "files": [
     "dist",
     "src",
-    "qwen-extension.json"
+    "hopcode-extension.json"
   ],
   "bin": {
-    "qwen-channel-plugin-example-server": "dist/start-server.js"
+    "hopcode-channel-plugin-example-server": "dist/start-server.js"
   },
   "scripts": {
     "build": "tsc --build",

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
@@ -23,13 +23,13 @@ export const InsightProgressMessage: React.FC<InsightProgressMessageProps> = ({
   const remainingWidth = width - completedWidth;
 
   const bar =
-    '█'.repeat(Math.max(0, completedWidth)) +
-    '░'.repeat(Math.max(0, remainingWidth));
+    '�'.repeat(Math.max(0, completedWidth)) +
+    '�'.repeat(Math.max(0, remainingWidth));
 
   if (error) {
     return (
       <Box flexDirection="column">
-        <Text color={theme.status.error}>✕ {stage}</Text>
+        <Text color={theme.status.error}>? {stage}</Text>
         <Text color={theme.text.secondary}>{error}</Text>
       </Box>
     );
@@ -38,7 +38,7 @@ export const InsightProgressMessage: React.FC<InsightProgressMessageProps> = ({
   if (isComplete) {
     return (
       <Box flexDirection="row">
-        <Text color={theme.status.success}>✓ {stage}</Text>
+        <Text color={theme.status.success}>? {stage}</Text>
       </Box>
     );
   }

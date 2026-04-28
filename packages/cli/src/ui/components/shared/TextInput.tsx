@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -23,9 +23,9 @@ export interface TextInputProps {
   onSubmit?: () => void;
   /** Called when Tab is pressed; if provided, prevents the default tab-insertion behaviour. */
   onTab?: (key: Key) => void;
-  /** Called when ↑ is pressed; if provided, prevents cursor-up in the buffer. */
+  /** Called when ? is pressed; if provided, prevents cursor-up in the buffer. */
   onUp?: () => void;
-  /** Called when ↓ is pressed; if provided, prevents cursor-down in the buffer. */
+  /** Called when ? is pressed; if provided, prevents cursor-down in the buffer. */
   onDown?: () => void;
   placeholder?: string;
   height?: number; // lines in viewport; >1 enables multiline
@@ -33,7 +33,7 @@ export interface TextInputProps {
   validationErrors?: string[];
   inputWidth?: number;
   initialCursorOffset?: number;
-  /** When true, renders each character as ● to hide sensitive input like API keys. */
+  /** When true, renders each character as ? to hide sensitive input like API keys. */
   mask?: boolean;
 }
 
@@ -97,7 +97,7 @@ export function TextInput({
         return;
       }
 
-      // Multiline newline insertion (Shift+Enter etc.) — check before SUBMIT
+      // Multiline newline insertion (Shift+Enter etc.) � check before SUBMIT
       // so that modified-Return keys aren't swallowed by the submit branch.
       if (allowMultiline && keyMatchers[Command.NEWLINE](key)) {
         buffer.newline();
@@ -169,8 +169,8 @@ export function TextInput({
             linesToRender.map((lineText, visualIdxInRenderedSet) => {
               const cursorVisualRow = cursorVisualRowAbsolute - scrollVisualRow;
               const rawSlice = cpSlice(lineText, 0, inputWidth);
-              // When masking, replace each character with ● but preserve length for cursor math
-              let display = mask ? '●'.repeat(cpLen(rawSlice)) : rawSlice;
+              // When masking, replace each character with ? but preserve length for cursor math
+              let display = mask ? '?'.repeat(cpLen(rawSlice)) : rawSlice;
               const currentVisualWidth = stringWidth(display);
               if (currentVisualWidth < inputWidth) {
                 display = display + ' '.repeat(inputWidth - currentVisualWidth);
@@ -211,7 +211,7 @@ export function TextInput({
         <Box flexDirection="column">
           {validationErrors.map((error, index) => (
             <Text key={index} color={theme.status.error}>
-              ⚠ {error}
+              ? {error}
             </Text>
           ))}
         </Box>

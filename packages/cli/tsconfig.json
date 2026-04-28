@@ -5,19 +5,9 @@
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "types": ["node", "vitest/globals"],
-    "strict": false,
-    "noImplicitAny": false,
-    "noImplicitOverride": false,
-    "noImplicitReturns": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
     "skipLibCheck": true,
-    "noEmitOnError": false,
     "noPropertyAccessFromIndexSignature": false,
-    "strictNullChecks": false,
-    "strictFunctionTypes": false,
-    "strictBindCallApply": false,
-    "strictPropertyInitialization": false
+    "noEmitOnError": false
   },
   "include": [
     "index.ts",
@@ -29,7 +19,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    // TODO(5691): Fix type errors and remove excludes.
     "src/commands/mcp.test.ts",
     "src/commands/mcp/add.test.ts",
     "src/commands/mcp/list.test.ts",

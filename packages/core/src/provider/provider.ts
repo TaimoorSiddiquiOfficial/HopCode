@@ -1108,8 +1108,11 @@ export namespace Provider {
     }
 
     for (const plugin of await Plugin.list()) {
-      if (!plugin.auth) continue;
-      const providerID = plugin.auth.provider;
+      const p = plugin as {
+        auth?: { provider: string; loader?: (...args: unknown[]) => unknown };
+      };
+      if (!p.auth) continue;
+      const providerID = p.auth.provider;
       if (disabled.has(providerID)) continue;
 
       // For github-copilot plugin, check if auth exists for either github-copilot or github-copilot-enterprise
@@ -1124,13 +1127,13 @@ export namespace Provider {
       }
 
       if (!hasAuth) continue;
-      if (!plugin.auth.loader) continue;
+      if (!p.auth.loader) continue;
 
       // Load for the main provider if auth exists
       if (auth) {
-        const options = await plugin.auth.loader(
+        const options = await p.auth.loader(
           () => Auth.get(providerID) as any,
-          database[plugin.auth.provider],
+          database[p.auth!.provider],
         );
         const opts = options ?? {};
         const patch: Partial<Info> = providers[providerID]
@@ -1145,7 +1148,7 @@ export namespace Provider {
         if (!disabled.has(enterpriseProviderID)) {
           const enterpriseAuth = await Auth.get(enterpriseProviderID);
           if (enterpriseAuth) {
-            const enterpriseOptions = await plugin.auth.loader(
+            const enterpriseOptions = await p.auth!.loader!(
               () => Auth.get(enterpriseProviderID) as any,
               database[enterpriseProviderID],
             );
@@ -1439,7 +1442,10 @@ export namespace Provider {
     }
   }
 
-  export async function closest(providerID: string, query: string[]) {
+  export async function closest(
+    providerID: string,
+    query: string[],
+  ): Promise<{ providerID: string; modelID: string } | undefined> {
     const s = await state();
     const provider = s.providers[providerID];
     if (!provider) return undefined;
@@ -1452,6 +1458,7 @@ export namespace Provider {
           };
       }
     }
+    return undefined;
   }
 
   export async function getSmallModel(providerID: string) {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -173,7 +173,7 @@ const ShellToolCallImpl: FC<BaseToolCallProps & { variant: ShellVariant }> = ({
       >
         {/* Branch connector summary */}
         <div className="inline-flex text-[var(--app-secondary-foreground)] text-[0.85em] opacity-70 mt-[2px] mb-[2px] flex-row items-start w-full gap-1">
-          <span className="flex-shrink-0 relative top-[-0.1em]">⎿</span>
+          <span className="flex-shrink-0 relative top-[-0.1em]">?</span>
           <span className="flex-shrink-0 w-full">{commandText}</span>
         </div>
 
@@ -225,7 +225,7 @@ const ShellToolCallImpl: FC<BaseToolCallProps & { variant: ShellVariant }> = ({
       >
         {/* Branch connector summary */}
         <div className="inline-flex text-[var(--app-secondary-foreground)] text-[0.85em] opacity-70 mt-[2px] mb-[2px] flex-row items-start w-full gap-1">
-          <span className="flex-shrink-0 relative top-[-0.1em]">⎿</span>
+          <span className="flex-shrink-0 relative top-[-0.1em]">?</span>
           <span className="flex-shrink-0 w-full">{commandText}</span>
         </div>
 
@@ -279,7 +279,7 @@ const ShellToolCallImpl: FC<BaseToolCallProps & { variant: ShellVariant }> = ({
         onClick={handleInClick}
         style={{ cursor: 'pointer' }}
       >
-        <span className="flex-shrink-0 relative top-[-0.1em]">⎿</span>
+        <span className="flex-shrink-0 relative top-[-0.1em]">?</span>
         <span className="flex-shrink-0 w-full">{commandText}</span>
       </div>
     </Container>

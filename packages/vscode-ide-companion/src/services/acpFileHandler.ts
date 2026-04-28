@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -82,7 +82,7 @@ export class AcpFileHandler {
 
       if (errorCode === 'ENOENT' || errorCode === 'FileNotFound') {
         // Normalise to a Node-style ENOENT so downstream ACP layers
-        // (mapReadTextFileError → AcpFileSystemService) can recognise it.
+        // (mapReadTextFileError ? AcpFileSystemService) can recognise it.
         const enoent = new Error(
           `ENOENT: no such file or directory, open '${params.path}'`,
         ) as NodeJS.ErrnoException;
@@ -157,7 +157,7 @@ export class AcpFileHandler {
           }
         }
       } else {
-        // New file – write UTF-8 bytes directly.
+        // New file � write UTF-8 bytes directly.
         const bytes = Buffer.from(params.content, 'utf-8');
         await vscode.workspace.fs.writeFile(uri, bytes);
       }

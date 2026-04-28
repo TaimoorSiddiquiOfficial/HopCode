@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team team
  * SPDX-License-Identifier: Apache-2.0
@@ -57,7 +57,7 @@ const getLocalePath = (
 export function detectSystemLanguage(): SupportedLanguage {
   const envLang = process.env['HOPCODE_LANG'] || process.env['LANG'];
   if (envLang) {
-    // Normalize POSIX locales (e.g. zh_TW.UTF-8 → zh-tw) before matching
+    // Normalize POSIX locales (e.g. zh_TW.UTF-8 ? zh-tw) before matching
     const normalized = envLang.replace(/_/g, '-').toLowerCase();
     for (const lang of SUPPORTED_LANGUAGES) {
       if (normalized.startsWith(lang.code.toLowerCase())) return lang.code;

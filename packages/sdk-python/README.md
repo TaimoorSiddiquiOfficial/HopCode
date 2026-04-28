@@ -22,7 +22,7 @@ You can also point the SDK at an explicit CLI binary or script with
 ```python
 import asyncio
 
-from qwen_code_sdk import is_sdk_result_message, query
+from hopcode_sdk import is_sdk_result_message, query
 
 
 async def main() -> None:
@@ -45,7 +45,7 @@ asyncio.run(main())
 ## Sync API
 
 ```python
-from qwen_code_sdk import query_sync
+from hopcode_sdk import query_sync
 
 
 with query_sync(
@@ -71,7 +71,7 @@ for multi-turn sessions.
 ## Permission Callback
 
 ```python
-from qwen_code_sdk import query
+from hopcode_sdk import query
 
 
 async def can_use_tool(tool_name, tool_input, context):

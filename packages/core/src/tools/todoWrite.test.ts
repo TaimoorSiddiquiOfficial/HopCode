@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -305,7 +305,7 @@ describe('TodoWriteTool', () => {
   });
 });
 
-describe('TodoWriteTool � runtime output directory', () => {
+describe('TodoWriteTool ? runtime output directory', () => {
   let tool: TodoWriteTool;
   let mockAbortSignal: AbortSignal;
   let mockConfig: Config;

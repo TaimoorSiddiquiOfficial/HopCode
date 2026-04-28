@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -134,7 +134,7 @@ export const SessionSelector: FC<SessionSelectorProps> = ({
           <input
             type="text"
             className="session-search-input flex-1 bg-transparent border-none outline-none text-[var(--app-menu-foreground)] text-[var(--vscode-chat-font-size,13px)] font-[var(--vscode-chat-font-family)] p-0 placeholder:text-[var(--app-input-placeholder-foreground)] placeholder:opacity-60"
-            placeholder="Search sessionsâ€¦"
+            placeholder="Search sessions…"
             aria-label="Search sessions"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -315,7 +315,7 @@ export const SessionSelector: FC<SessionSelectorProps> = ({
           )}
           {hasMore && (
             <div className="p-2 text-center opacity-60 text-[0.9em]">
-              {isLoading ? 'Loadingâ€¦' : ''}
+              {isLoading ? 'Loading…' : ''}
             </div>
           )}
         </div>

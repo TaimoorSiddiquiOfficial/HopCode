@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -69,7 +69,7 @@ export const InfoMessage: React.FC<StatusTextProps> = ({
 }) => (
   <StatusMessage
     text={text}
-    prefix="●"
+    prefix="?"
     prefixColor={theme.text.primary}
     textColor={theme.text.primary}
     footer={
@@ -87,7 +87,7 @@ export const InfoMessage: React.FC<StatusTextProps> = ({
 export const SuccessMessage: React.FC<StatusTextProps> = ({ text }) => (
   <StatusMessage
     text={text}
-    prefix="✓"
+    prefix="?"
     prefixColor={theme.status.success}
     textColor={theme.status.success}
   />
@@ -96,7 +96,7 @@ export const SuccessMessage: React.FC<StatusTextProps> = ({ text }) => (
 export const WarningMessage: React.FC<StatusTextProps> = ({ text }) => (
   <StatusMessage
     text={text}
-    prefix="△"
+    prefix="?"
     prefixColor={theme.status.warning}
     textColor={theme.status.warning}
   />
@@ -108,7 +108,7 @@ export const ErrorMessage: React.FC<StatusTextProps & { hint?: string }> = ({
 }) => (
   <StatusMessage
     text={text}
-    prefix="✕"
+    prefix="?"
     prefixColor={theme.status.error}
     textColor={theme.status.error}
   >
@@ -119,20 +119,20 @@ export const ErrorMessage: React.FC<StatusTextProps & { hint?: string }> = ({
 export const RetryCountdownMessage: React.FC<StatusTextProps> = ({ text }) => (
   <StatusMessage
     text={text}
-    prefix="↻"
+    prefix="?"
     prefixColor={theme.text.secondary}
     textColor={theme.text.secondary}
   />
 );
 
-// Mirrors Claude Code's away-summary rendering: a `※` prefix in a fixed
+// Mirrors Claude Code's away-summary rendering: a `?` prefix in a fixed
 // 2-column gutter, then bold "recap: " label and italic content, all
 // dim-colored. Rendered as a regular history item so it scrolls with
 // the conversation instead of pinning above the input.
 export const AwayRecapMessage: React.FC<StatusTextProps> = ({ text }) => (
   <Box flexDirection="row">
     <Box width={2} flexShrink={0}>
-      <Text color={theme.text.secondary}>※</Text>
+      <Text color={theme.text.secondary}>?</Text>
     </Box>
     <Text wrap="wrap">
       <Text color={theme.text.secondary} bold>

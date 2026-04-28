@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -188,7 +188,7 @@ describe('AcpFileHandler', () => {
 
   describe('handleWriteTextFile', () => {
     it('creates directory and uses WorkspaceEdit for existing file', async () => {
-      // stat resolves → file exists
+      // stat resolves ? file exists
       mockStatFile.mockResolvedValue({});
       mockGetText.mockReturnValue('old content');
 
@@ -204,7 +204,7 @@ describe('AcpFileHandler', () => {
     });
 
     it('writes bytes directly for new (non-existing) file', async () => {
-      // stat rejects → file does not exist
+      // stat rejects ? file does not exist
       mockStatFile.mockRejectedValue(new Error('FileNotFound'));
 
       const result = await handler.handleWriteTextFile({

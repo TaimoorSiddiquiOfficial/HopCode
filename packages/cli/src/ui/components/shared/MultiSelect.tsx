@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -61,7 +61,7 @@ export function MultiSelect<T>({
     items,
     initialIndex,
     isFocused,
-    // Disable numeric quick-select in useSelectionList — in a multi-select
+    // Disable numeric quick-select in useSelectionList � in a multi-select
     // context, onSelect triggers onConfirm (submit), so numeric keys would
     // accidentally submit the dialog instead of toggling checkboxes.
     // Numbers are still rendered visually via the showNumbers prop below.
@@ -129,7 +129,7 @@ export function MultiSelect<T>({
   return (
     <Box flexDirection="column">
       {showScrollArrows && hasMoreAbove && (
-        <Text color={theme.text.secondary}>↑ {moreAboveCount} more above</Text>
+        <Text color={theme.text.secondary}>? {moreAboveCount} more above</Text>
       )}
 
       {visibleItems.map((item, index) => {
@@ -140,7 +140,7 @@ export function MultiSelect<T>({
         const itemNumberText = `${String(itemIndex + 1).padStart(
           numberColumnWidth,
         )}.`;
-        const checkboxText = item.disabled ? '[x]' : isChecked ? '[✓]' : '[ ]';
+        const checkboxText = item.disabled ? '[x]' : isChecked ? '[?]' : '[ ]';
 
         let textColor = theme.text.primary;
         if (item.disabled) {
@@ -169,7 +169,7 @@ export function MultiSelect<T>({
       })}
 
       {showScrollArrows && hasMoreBelow && (
-        <Text color={theme.text.secondary}>↓ {moreBelowCount} more below</Text>
+        <Text color={theme.text.secondary}>? {moreBelowCount} more below</Text>
       )}
     </Box>
   );

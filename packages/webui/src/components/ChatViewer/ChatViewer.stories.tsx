@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -382,15 +382,15 @@ Looking at the project structure, I found the following relevant files:
 
 \`\`\`
 packages/chrome-extension/
-├── src/
-│   ├── service-worker.ts      # Main service worker
-│   ├── native-messaging/
-│   │   ├── host.ts            # Native host communication
-│   │   └── protocol.ts        # Message protocol
-│   └── manifest.json          # Extension manifest
-└── native-host/
-    ├── index.js               # Native host entry
-    └── com.qwen.cli.bridge.json  # Host manifest
++-- src/
+�   +-- service-worker.ts      # Main service worker
+�   +-- native-messaging/
+�   �   +-- host.ts            # Native host communication
+�   �   +-- protocol.ts        # Message protocol
+�   +-- manifest.json          # Extension manifest
++-- native-host/
+    +-- index.js               # Native host entry
+    +-- com.qwen.cli.bridge.json  # Host manifest
 \`\`\`
 
 The issue appears to be in the handshake timing. The native host is exiting before the handshake completes.`,
@@ -783,9 +783,9 @@ export type { ButtonProps } from './Button';`,
 
 \`\`\`
 src/components/Button/
-├── Button.tsx      # Main component
-├── Button.css      # Styles
-└── index.ts        # Exports
++-- Button.tsx      # Main component
++-- Button.css      # Styles
++-- index.ts        # Exports
 \`\`\`
 
 You can use it like this:
@@ -1083,11 +1083,11 @@ export type { AuthUser, AuthToken } from './types';`,
 
 \`\`\`
 src/auth/
-├── index.ts      # Export entry
-├── login.ts      # Login logic
-├── logout.ts     # Logout logic
-├── middleware.ts # Auth middleware
-└── types.ts      # Type definitions
++-- index.ts      # Export entry
++-- login.ts      # Login logic
++-- logout.ts     # Logout logic
++-- middleware.ts # Auth middleware
++-- types.ts      # Type definitions
 \`\`\`
 
 **Issues Found:**
@@ -1320,7 +1320,7 @@ const PLAYGROUND_SAMPLE = `[
         "type": "diff",
         "path": "src/components/Modal.tsx",
         "oldText": null,
-        "newText": "import type { FC, ReactNode } from 'react';\\nimport './Modal.css';\\n\\nexport interface ModalProps {\\n  isOpen: boolean;\\n  onClose: () => void;\\n  title: string;\\n  children: ReactNode;\\n}\\n\\nexport const Modal: FC<ModalProps> = ({\\n  isOpen,\\n  onClose,\\n  title,\\n  children,\\n}) => {\\n  if (!isOpen) return null;\\n\\n  return (\\n    <div className=\\"modal-overlay\\">\\n      <div className=\\"modal-content\\">\\n        <header className=\\"modal-header\\">\\n          <h2>{title}</h2>\\n          <button onClick={onClose}>×</button>\\n        </header>\\n        <div className=\\"modal-body\\">\\n          {children}\\n        </div>\\n      </div>\\n    </div>\\n  );\\n};"
+        "newText": "import type { FC, ReactNode } from 'react';\\nimport './Modal.css';\\n\\nexport interface ModalProps {\\n  isOpen: boolean;\\n  onClose: () => void;\\n  title: string;\\n  children: ReactNode;\\n}\\n\\nexport const Modal: FC<ModalProps> = ({\\n  isOpen,\\n  onClose,\\n  title,\\n  children,\\n}) => {\\n  if (!isOpen) return null;\\n\\n  return (\\n    <div className=\\"modal-overlay\\">\\n      <div className=\\"modal-content\\">\\n        <header className=\\"modal-header\\">\\n          <h2>{title}</h2>\\n          <button onClick={onClose}>�</button>\\n        </header>\\n        <div className=\\"modal-body\\">\\n          {children}\\n        </div>\\n      </div>\\n    </div>\\n  );\\n};"
       }],
       "locations": [{ "path": "src/components/Modal.tsx" }]
     }
@@ -1366,7 +1366,7 @@ const PLAYGROUND_SAMPLE = `[
         "type": "content",
         "content": {
           "type": "text",
-          "text": "PASS src/components/Modal.test.tsx\\n  Modal Component\\n    ✓ renders when isOpen is true (15ms)\\n    ✓ does not render when isOpen is false (3ms)\\n    ✓ calls onClose when close button clicked (8ms)\\n\\nTest Suites: 1 passed, 1 total\\nTests:       3 passed, 3 total\\nCoverage:    92.5%"
+          "text": "PASS src/components/Modal.test.tsx\\n  Modal Component\\n    ? renders when isOpen is true (15ms)\\n    ? does not render when isOpen is false (3ms)\\n    ? calls onClose when close button clicked (8ms)\\n\\nTest Suites: 1 passed, 1 total\\nTests:       3 passed, 3 total\\nCoverage:    92.5%"
         }
       }]
     }
@@ -1559,10 +1559,10 @@ const PlaygroundTemplate = () => {
           }}
         >
           <strong>Supported message types:</strong>
-          <br />• <code>user</code> - User messages with{' '}
+          <br />� <code>user</code> - User messages with{' '}
           <code>message.parts[].text</code> or <code>message.content</code>
-          <br />• <code>assistant</code> - AI responses
-          <br />• <code>tool_call</code> - Tool calls with{' '}
+          <br />� <code>assistant</code> - AI responses
+          <br />� <code>tool_call</code> - Tool calls with{' '}
           <code>toolCall.kind</code> (read, write, edit, bash, grep, etc.)
         </div>
       </div>

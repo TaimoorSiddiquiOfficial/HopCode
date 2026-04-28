@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -25,7 +25,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    icon: '🔧',
+    icon: '??',
     children: (
       <ToolCallRow label="Task">
         <div>Processing data...</div>
@@ -36,7 +36,7 @@ export const Default: Story = {
 
 export const WithMultipleRows: Story = {
   args: {
-    icon: '📝',
+    icon: '??',
     children: (
       <>
         <ToolCallRow label="Edit">
@@ -52,7 +52,7 @@ export const WithMultipleRows: Story = {
 
 export const WithError: Story = {
   args: {
-    icon: '❌',
+    icon: '?',
     children: (
       <>
         <ToolCallRow label="Command">
@@ -68,7 +68,7 @@ export const WithError: Story = {
 
 export const ThinkingCard: Story = {
   args: {
-    icon: '💭',
+    icon: '??',
     children: (
       <ToolCallRow label="SaveMemory">
         <div className="italic opacity-90">

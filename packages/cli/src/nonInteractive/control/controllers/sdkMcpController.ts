@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -8,13 +8,13 @@
  * SDK MCP Controller
  *
  * Handles MCP communication between CLI MCP clients and SDK MCP servers:
- * - Provides sendSdkMcpMessage callback for CLI → SDK MCP message routing
+ * - Provides sendSdkMcpMessage callback for CLI ? SDK MCP message routing
  * - mcp_server_status: Returns status of SDK MCP servers
  *
- * Message Flow (CLI MCP Client → SDK MCP Server):
- * CLI MCP Client → SdkControlClientTransport.send() →
- * sendSdkMcpMessage callback → control_request (mcp_message) → SDK →
- * SDK MCP Server processes → control_response → CLI MCP Client
+ * Message Flow (CLI MCP Client ? SDK MCP Server):
+ * CLI MCP Client ? SdkControlClientTransport.send() ?
+ * sendSdkMcpMessage callback ? control_request (mcp_message) ? SDK ?
+ * SDK MCP Server processes ? control_response ? CLI MCP Client
  */
 
 import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js';

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -12,9 +12,9 @@ import { getArenaStatusLabel } from '../../utils/displayUtils.js';
 import type { ArenaAgentCardData } from '../../types.js';
 import type { ArenaDiffSummary } from '@hoptrendy/hopcode-core';
 
-// ─── Helpers ────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------
 
-// ─── Agent Complete Card ────────────────────────────────────
+// --- Agent Complete Card ------------------------------------
 
 interface ArenaAgentCardProps {
   agent: ArenaAgentCardData;
@@ -36,7 +36,7 @@ export const ArenaAgentCard: React.FC<ArenaAgentCardProps> = ({
       {/* Line 1: Status icon + text + label + duration */}
       <Box>
         <Text color={color}>
-          {icon} {agent.label} · {text} · {duration}
+          {icon} {agent.label} � {text} � {duration}
         </Text>
       </Box>
 
@@ -56,10 +56,10 @@ export const ArenaAgentCard: React.FC<ArenaAgentCardProps> = ({
               {' '}
               (
               <Text color={theme.status.success}>
-                ✓ {agent.successfulToolCalls}
+                ? {agent.successfulToolCalls}
               </Text>
               <Text color={theme.text.secondary}> </Text>
-              <Text color={theme.status.error}>✕ {agent.failedToolCalls}</Text>)
+              <Text color={theme.status.error}>? {agent.failedToolCalls}</Text>)
             </>
           )}
         </Text>
@@ -75,7 +75,7 @@ export const ArenaAgentCard: React.FC<ArenaAgentCardProps> = ({
   );
 };
 
-// ─── Session Complete Card ──────────────────────────────────
+// --- Session Complete Card ----------------------------------
 
 interface ArenaSessionCardProps {
   sessionStatus: string;
@@ -169,7 +169,7 @@ function getComparisonFileGroups(
 }
 
 function getTreeBranch(index: number, total: number): string {
-  return index === total - 1 ? '└─' : '├─';
+  return index === total - 1 ? '+-' : '+-';
 }
 
 export const ArenaSessionCard: React.FC<ArenaSessionCardProps> = ({
@@ -215,7 +215,7 @@ export const ArenaSessionCard: React.FC<ArenaSessionCardProps> = ({
               return (
                 <Box key={agent.label} marginLeft={2}>
                   <Text color={theme.text.secondary}>
-                    {index === agents.length - 1 ? '└─' : '├─'} {agent.label}
+                    {index === agents.length - 1 ? '+-' : '+-'} {agent.label}
                     :{' '}
                   </Text>
                   <Text color={color}>{statusText}</Text>
@@ -251,7 +251,7 @@ export const ArenaSessionCard: React.FC<ArenaSessionCardProps> = ({
             {agents.map((agent, index) => {
               const diffStats = getDiffStats(agent.diff, agent.diffSummary);
               const files = getAgentFiles(agent).length;
-              const branch = index === agents.length - 1 ? '└─' : '├─';
+              const branch = index === agents.length - 1 ? '+-' : '+-';
               const summary =
                 agent.approachSummary ?? 'No approach summary available.';
               return (
@@ -293,11 +293,11 @@ export const ArenaSessionCard: React.FC<ArenaSessionCardProps> = ({
             {agents.map((agent, index) => (
               <Box key={agent.label} marginLeft={2}>
                 <Text color={theme.text.secondary}>
-                  {index === agents.length - 1 ? '└─' : '├─'} {agent.label}
+                  {index === agents.length - 1 ? '+-' : '+-'} {agent.label}
                   :{' '}
                 </Text>
                 <Text color={theme.text.primary}>
-                  {agent.totalTokens.toLocaleString()} tokens · runtime{' '}
+                  {agent.totalTokens.toLocaleString()} tokens � runtime{' '}
                   {formatDuration(agent.durationMs)}
                 </Text>
               </Box>

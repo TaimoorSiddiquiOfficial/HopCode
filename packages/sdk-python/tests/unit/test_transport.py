@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from qwen_code_sdk.transport import build_cli_arguments, prepare_spawn_info
-from qwen_code_sdk.types import QueryOptions, TimeoutOptions
+from hopcode_sdk.transport import build_cli_arguments, prepare_spawn_info
+from hopcode_sdk.types import QueryOptions, TimeoutOptions
 
 VALID_UUID = "123e4567-e89b-12d3-a456-426614174000"
 
@@ -127,7 +127,7 @@ async def test_transport_discards_stderr_when_debug_is_disabled(
     )
 
     transport_module = __import__(
-        "qwen_code_sdk.transport",
+        "hopcode_sdk.transport",
         fromlist=["ProcessTransport"],
     )
     transport = transport_module.ProcessTransport(
@@ -180,7 +180,7 @@ async def test_transport_start_raises_after_close(
     )
 
     transport_module = __import__(
-        "qwen_code_sdk.transport",
+        "hopcode_sdk.transport",
         fromlist=["ProcessTransport"],
     )
     transport = transport_module.ProcessTransport(
@@ -204,7 +204,7 @@ async def test_read_messages_skips_malformed_json_lines() -> None:
             return next(self._lines, b"")
 
     transport_module = __import__(
-        "qwen_code_sdk.transport",
+        "hopcode_sdk.transport",
         fromlist=["ProcessTransport"],
     )
     transport = transport_module.ProcessTransport(
@@ -253,7 +253,7 @@ async def test_stderr_callback_exceptions_do_not_fail_transport() -> None:
             return next(self._lines, b"")
 
     transport_module = __import__(
-        "qwen_code_sdk.transport",
+        "hopcode_sdk.transport",
         fromlist=["ProcessTransport"],
     )
 

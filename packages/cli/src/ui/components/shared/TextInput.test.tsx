@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -71,7 +71,7 @@ describe('TextInput', () => {
       expect(onSubmit).toHaveBeenCalledTimes(1);
     });
 
-    it('does NOT submit on Shift+Enter â€” inserts newline instead', () => {
+    it('does NOT submit on Shift+Enter — inserts newline instead', () => {
       render(
         <TextInput
           value=""
@@ -89,7 +89,7 @@ describe('TextInput', () => {
       expect(onChange).toHaveBeenCalled();
     });
 
-    it('does NOT submit on Ctrl+Enter â€” inserts newline instead', () => {
+    it('does NOT submit on Ctrl+Enter — inserts newline instead', () => {
       render(
         <TextInput
           value=""

@@ -17,8 +17,14 @@ export namespace ProviderAuth {
   const state = Instance.state(async () => {
     const methods = pipe(
       await Plugin.list(),
-      filter((x) => x.auth?.provider !== undefined),
-      map((x) => [x.auth!.provider, x.auth!] as const),
+      filter((x) => (x as Record<string, unknown>).auth !== undefined),
+      map(
+        (x) =>
+          [
+            (x as Record<string, any>).auth.provider,
+            (x as Record<string, any>).auth,
+          ] as const,
+      ),
       fromEntries(),
     );
     return { methods, pending: {} as Record<string, AuthOuathResult> };
@@ -38,9 +44,9 @@ export namespace ProviderAuth {
     const s = await state().then((x) => x.methods);
     return mapValues(s, (x) =>
       x.methods.map(
-        (y): Method => ({
-          type: y.type,
-          label: y.label,
+        (y: Record<string, unknown>): Method => ({
+          type: y.type as string as 'oauth' | 'api',
+          label: y.label as string,
         }),
       ),
     );
@@ -63,17 +69,28 @@ export namespace ProviderAuth {
       method: z.number(),
     }),
     async (input): Promise<Authorization | undefined> => {
-      const auth = await state().then((s) => s.methods[input.providerID]);
+      const auth = (await state().then((s) => s.methods[input.providerID])) as {
+        methods: Array<{
+          type: string;
+          label: string;
+          authorize: () => Promise<{
+            url: string;
+            method: string;
+            instructions: string;
+          }>;
+        }>;
+      };
       const method = auth.methods[input.method];
       if (method.type === 'oauth') {
-        const result = await method.authorize();
+        const result = (await method.authorize()) as AuthOuathResult;
         await state().then((s) => (s.pending[input.providerID] = result));
         return {
           url: result.url,
-          method: result.method,
+          method: result.method as 'auto' | 'code',
           instructions: result.instructions,
         };
       }
+      return undefined;
     },
   );
 

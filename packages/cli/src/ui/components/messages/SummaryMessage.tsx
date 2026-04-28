@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -41,7 +41,7 @@ export const SummaryMessage: React.FC<SummaryDisplayProps> = ({ summary }) => {
     if (summary.isPending) {
       return <Spinner type="dots" />;
     }
-    return <Text color={Colors.AccentGreen}>✅</Text>;
+    return <Text color={Colors.AccentGreen}>?</Text>;
   };
 
   return (

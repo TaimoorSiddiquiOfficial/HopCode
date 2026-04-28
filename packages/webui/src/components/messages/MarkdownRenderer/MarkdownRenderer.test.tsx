@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 

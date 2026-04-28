@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -401,7 +401,7 @@ export const ChatViewer = forwardRef<ChatViewerHandle, ChatViewerProps>(
             <div className="chat-viewer-empty">
               {showEmptyIcon && (
                 <div className="chat-viewer-empty-icon" aria-hidden="true">
-                  💬
+                  ??
                 </div>
               )}
               <div className="chat-viewer-empty-text">{emptyMessage}</div>

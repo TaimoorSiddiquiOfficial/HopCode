@@ -1,4 +1,4 @@
-﻿import './styles.css';
+import './styles.css';
 import logoSvg from './favicon.svg';
 import { TempFileModal } from './components/TempFileModal.js';
 import { usePlatformContext } from './components/hooks.js';

@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -114,7 +114,7 @@ export const modelCommand: SlashCommand = {
     if (context.executionMode !== 'interactive') {
       const modelName = args.trim();
       if (modelName) {
-        // /model <model-id> â€” set the main model
+        // /model <model-id> — set the main model
         if (!settings) {
           return {
             type: 'message',
@@ -134,7 +134,7 @@ export const modelCommand: SlashCommand = {
           content: t('Model') + ': ' + modelName,
         };
       }
-      // /model with no args â€” show current model
+      // /model with no args — show current model
       const currentModel = config.getModel() ?? 'unknown';
       return {
         type: 'message',

@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -118,7 +118,7 @@ export interface InputFormProps {
   completionItems?: CompletionItem[];
   /** Completion select callback (Enter / click) */
   onCompletionSelect?: (item: CompletionItem) => void;
-  /** Completion fill callback (Tab â€” fill without executing). Falls back to onCompletionSelect. */
+  /** Completion fill callback (Tab — fill without executing). Falls back to onCompletionSelect. */
   onCompletionFill?: (item: CompletionItem) => void;
   /** Completion close callback */
   onCompletionClose?: () => void;
@@ -196,7 +196,7 @@ export const InputForm: FC<InputFormProps> = ({
   onCompletionClose,
   onPaste,
   extraContent,
-  placeholder = 'Ask HopCode â€¦',
+  placeholder = 'Ask HopCode …',
   canSubmit,
   followupState,
   onAcceptFollowup,
@@ -271,7 +271,7 @@ export const InputForm: FC<InputFormProps> = ({
       // Accept and submit prompt suggestion on Enter when input is empty
       if (hasFollowup && !inputText && followupSuggestion) {
         e.preventDefault();
-        // Skip onAccept callback â€” we pass the text directly to onSubmit.
+        // Skip onAccept callback — we pass the text directly to onSubmit.
         // Without skipOnAccept the microtask in accept() would re-insert
         // the suggestion into the input after it was already cleared.
         onAcceptFollowup?.('enter', { skipOnAccept: true });

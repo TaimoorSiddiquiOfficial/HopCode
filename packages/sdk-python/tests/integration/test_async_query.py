@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator, Callable
 from typing import Any
 
 import pytest
-from qwen_code_sdk import (
+from hopcode_sdk import (
     ProcessExitError,
     SDKUserMessage,
     is_sdk_assistant_message,

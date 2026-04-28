@@ -1,4 +1,4 @@
-﻿/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 export interface Annotation {

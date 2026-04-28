@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -17,7 +17,7 @@ type WebviewHost = vscode.Webview | { webview: vscode.Webview };
 export class WebViewContent {
   /**
    * Extract the underlying Webview from various host types.
-   * Accepts a raw Webview, a WebviewPanel, or a WebviewView — so callers
+   * Accepts a raw Webview, a WebviewPanel, or a WebviewView � so callers
    * never have to worry about passing the wrong wrapper.
    */
   private static getWebview(host: WebviewHost): vscode.Webview {

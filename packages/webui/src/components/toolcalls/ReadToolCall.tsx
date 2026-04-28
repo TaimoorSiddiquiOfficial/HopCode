@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -270,7 +270,7 @@ export const ReadToolCall: FC<BaseToolCallProps> = ({
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="flex items-center justify-center w-full py-1 px-2 border-t border-[var(--app-input-border)] cursor-pointer text-[var(--app-secondary-foreground)] text-[0.75em] opacity-70 hover:opacity-100 hover:bg-[var(--app-code-background)] transition-opacity bg-transparent"
               >
-                {isExpanded ? '▲ Collapse' : '▼ Show more'}
+                {isExpanded ? '? Collapse' : '? Show more'}
               </button>
             )}
           </div>
@@ -327,7 +327,7 @@ export const ReadToolCall: FC<BaseToolCallProps> = ({
               onClick={() => setIsExpanded(!isExpanded)}
               className="flex items-center justify-center w-full py-1 px-2 border-t border-[var(--app-input-border)] cursor-pointer text-[var(--app-secondary-foreground)] text-[0.75em] opacity-70 hover:opacity-100 hover:bg-[var(--app-code-background)] transition-opacity bg-transparent"
             >
-              {isExpanded ? '▲ Collapse' : '▼ Show more'}
+              {isExpanded ? '? Collapse' : '? Show more'}
             </button>
           )}
         </div>

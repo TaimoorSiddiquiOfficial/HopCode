@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -173,7 +173,7 @@ export const EditToolCall: React.FC<BaseToolCallProps> = ({
             </div>
           </div>
           <div className="inline-flex text-[var(--app-secondary-foreground)] text-[0.85em] opacity-70 flex-row items-start w-full gap-1 flex items-baseline">
-            <span className="flex-shrink-0 relative top-[-0.1em]">⎿</span>
+            <span className="flex-shrink-0 relative top-[-0.1em]">?</span>
             <span className="flex-shrink-0 w-full">{summary}</span>
           </div>
         </div>
@@ -200,7 +200,7 @@ export const EditToolCall: React.FC<BaseToolCallProps> = ({
         }
       >
         <div className="inline-flex text-[var(--app-secondary-foreground)] text-[0.85em] opacity-70 flex-row items-start w-full gap-1 flex items-center">
-          <span className="flex-shrink-0 relative top-[-0.1em]">⎿</span>
+          <span className="flex-shrink-0 relative top-[-0.1em]">?</span>
           <FileLink
             path={locations[0].path}
             line={locations[0].line}

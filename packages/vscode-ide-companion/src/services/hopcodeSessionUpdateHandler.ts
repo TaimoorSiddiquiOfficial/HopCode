@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -88,7 +88,7 @@ export class HopCodeSessionUpdateHandler {
           } else if (this.callbacks.onStreamChunk) {
             // Fallback to regular stream processing
             console.log(
-              '[SessionUpdateHandler] 🧠 Falling back to onStreamChunk',
+              '[SessionUpdateHandler] ?? Falling back to onStreamChunk',
             );
             this.callbacks.onStreamChunk(text);
           }
@@ -161,7 +161,7 @@ export class HopCodeSessionUpdateHandler {
           } else if (this.callbacks.onStreamChunk) {
             // Fallback to stream processing
             const planText =
-              '\n📋 Plan:\n' +
+              '\n?? Plan:\n' +
               entries
                 .map(
                   (entry, i) =>

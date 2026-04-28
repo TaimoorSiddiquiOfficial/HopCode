@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -714,7 +714,7 @@ export async function parseArguments(): Promise<CliArgs> {
   // Handle deprecated --experimental-acp flag
   if (result['experimentalAcp']) {
     writeStderrLine(
-      '\x1b[33m⚠ Warning: --experimental-acp is deprecated and will be removed in a future release. Please use --acp instead.\x1b[0m',
+      '\x1b[33m? Warning: --experimental-acp is deprecated and will be removed in a future release. Please use --acp instead.\x1b[0m',
     );
     // Map experimental-acp to acp if acp is not explicitly set
     if (!result['acp']) {
@@ -843,7 +843,7 @@ export async function loadCliConfig(
           soulPersona = soulContent;
         }
       } catch {
-        // best-effort — ignore read errors
+        // best-effort � ignore read errors
       }
     }
   }
@@ -949,22 +949,22 @@ export async function loadCliConfig(
     // (fallback for edge cases where query/prompt is provided with TEXT output)
     interactive = false;
   }
-  // ── Unified permissions construction ─────────────────────────────────────
+  // -- Unified permissions construction -------------------------------------
   // All permission sources are merged here, before constructing Config.
   // The resulting three arrays are the single source of truth that Config /
   // PermissionManager will use.
   //
   // Sources (in order of precedence within each list):
   //   1. settings.permissions.{allow,ask,deny}  (persistent, merged by LoadedSettings)
-  //   2. argv.coreTools   → allow  (allowlist mode: only these tools are available)
-  //   3. argv.allowedTools → allow  (auto-approve these tools/commands)
-  //   4. argv.excludeTools → deny   (block these tools completely)
-  //   5. Non-interactive mode exclusions → deny (unless explicitly allowed above)
+  //   2. argv.coreTools   ? allow  (allowlist mode: only these tools are available)
+  //   3. argv.allowedTools ? allow  (auto-approve these tools/commands)
+  //   4. argv.excludeTools ? deny   (block these tools completely)
+  //   5. Non-interactive mode exclusions ? deny (unless explicitly allowed above)
 
   // Start from settings-level rules.
   // Read from both new `permissions` and legacy `tools` paths for compatibility.
   // Note: settings.tools.core / argv.coreTools are intentionally NOT merged into
-  // mergedAllow — they have whitelist semantics (only listed tools are registered),
+  // mergedAllow � they have whitelist semantics (only listed tools are registered),
   // not auto-approve semantics. They are passed via the `coreTools` Config param
   // and handled by PermissionManager.coreToolsAllowList.
   const resolvedCoreTools: string[] = [
@@ -1180,7 +1180,7 @@ export async function loadCliConfig(
     question,
     systemPrompt: argv.systemPrompt,
     appendSystemPrompt: effectiveAppendSystemPrompt,
-    // Legacy fields – kept for backward compatibility with getCoreTools() etc.
+    // Legacy fields � kept for backward compatibility with getCoreTools() etc.
     coreTools: bareMode
       ? undefined
       : argv.coreTools || settings.tools?.core || undefined,
@@ -1302,7 +1302,7 @@ export async function loadCliConfig(
     disableAllHooks: bareMode ? true : (settings.disableAllHooks ?? false),
     channel: argv.channel,
     // CLI flag wins over settings.json. `--json-fd` is fd-only (no settings
-    // equivalent — fd passing is a spawn-time concern). `--json-file` and
+    // equivalent � fd passing is a spawn-time concern). `--json-file` and
     // `--input-file` fall back to settings.dualOutput.* when the flag is
     // absent.
     jsonFd: argv.jsonFd,

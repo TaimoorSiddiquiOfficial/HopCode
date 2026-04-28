@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -54,7 +54,7 @@ export const ThinkToolCall: FC<BaseToolCallProps> = ({
         thoughts.length > 500 ? thoughts.substring(0, 500) + '...' : thoughts;
 
       return (
-        <ToolCallCard icon="💭">
+        <ToolCallCard icon="??">
           <ToolCallRow label="Think">
             <div className="italic opacity-90 leading-relaxed">
               {truncatedThoughts}

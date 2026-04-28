@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -9,14 +9,14 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { Storage } from './storage.js';
 
-describe('Storage � getGlobalSettingsPath', () => {
+describe('Storage ? getGlobalSettingsPath', () => {
   it('returns path to ~/.hopcode/settings.json', () => {
     const expected = path.join(os.homedir(), '.hopcode', 'settings.json');
     expect(Storage.getGlobalSettingsPath()).toBe(expected);
   });
 });
 
-describe('Storage � additional helpers', () => {
+describe('Storage ? additional helpers', () => {
   const projectRoot = '/tmp/project';
   const storage = new Storage(projectRoot);
 
@@ -45,7 +45,7 @@ describe('Storage � additional helpers', () => {
   });
 });
 
-describe('Storage � getRuntimeBaseDir / setRuntimeBaseDir', () => {
+describe('Storage ? getRuntimeBaseDir / setRuntimeBaseDir', () => {
   const originalEnv = process.env['HOPCODE_RUNTIME_DIR'];
 
   beforeEach(() => {
@@ -161,7 +161,7 @@ describe('Storage � getRuntimeBaseDir / setRuntimeBaseDir', () => {
   });
 });
 
-describe('Storage � runtime path methods use getRuntimeBaseDir', () => {
+describe('Storage ? runtime path methods use getRuntimeBaseDir', () => {
   const originalEnv = process.env['HOPCODE_RUNTIME_DIR'];
 
   beforeEach(() => {
@@ -244,7 +244,7 @@ describe('Storage � runtime path methods use getRuntimeBaseDir', () => {
   });
 });
 
-describe('Storage � config paths remain at ~/.hopcode regardless of runtime dir', () => {
+describe('Storage ? config paths remain at ~/.hopcode regardless of runtime dir', () => {
   const originalEnv = process.env['HOPCODE_RUNTIME_DIR'];
   const globalQwenDir = Storage.getGlobalHopCodeDir();
 
@@ -317,7 +317,7 @@ describe('Storage � config paths remain at ~/.hopcode regardless of runtime di
   });
 });
 
-describe('Storage � runtime base dir async context isolation', () => {
+describe('Storage ? runtime base dir async context isolation', () => {
   const originalEnv = process.env['HOPCODE_RUNTIME_DIR'];
 
   beforeEach(() => {

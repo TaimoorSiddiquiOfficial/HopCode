@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -157,9 +157,9 @@ const CollapsibleFileReference: FC<CollapsibleFileReferenceProps> = ({
             transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
           }}
         >
-          ▶
+          ?
         </span>
-        <span className="text-sm flex-shrink-0">📄</span>
+        <span className="text-sm flex-shrink-0">??</span>
         <span
           className="font-medium cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0 hover:underline"
           style={{ color: 'var(--app-link-color, #0066cc)' }}

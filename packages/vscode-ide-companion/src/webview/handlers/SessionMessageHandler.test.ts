@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -155,8 +155,8 @@ describe('SessionMessageHandler', () => {
 
   it('sends formatted prompt text so session restore can reconstruct pasted images', async () => {
     mockProcessImageAttachments.mockResolvedValue({
-      formattedText: '这是什么内容\n\n@/tmp/clipboard/clipboard-123.png',
-      displayText: '这是什么内容\n\n@/tmp/clipboard/clipboard-123.png',
+      formattedText: '??????\n\n@/tmp/clipboard/clipboard-123.png',
+      displayText: '??????\n\n@/tmp/clipboard/clipboard-123.png',
       savedImageCount: 1,
       promptImages: [
         {
@@ -189,7 +189,7 @@ describe('SessionMessageHandler', () => {
     await handler.handle({
       type: 'sendMessage',
       data: {
-        text: '这是什么内容',
+        text: '??????',
         attachments: [
           {
             id: 'img-1',
@@ -206,7 +206,7 @@ describe('SessionMessageHandler', () => {
     expect(agentManager.sendMessage).toHaveBeenCalledWith([
       {
         type: 'text',
-        text: '这是什么内容\n\n@/tmp/clipboard/clipboard-123.png',
+        text: '??????\n\n@/tmp/clipboard/clipboard-123.png',
       },
       {
         type: 'resource_link',

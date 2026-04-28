@@ -78,10 +78,6 @@ async function verifyGitHubAuthentication(): Promise<boolean> {
  * Generate installation instructions for unconfigured users
  */
 function generateInstallationInstructions(): string {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const appId = '3424564';
-  const appName = 'hopcode-ai-agent'; // Replace with your actual app name
-
   return `# 🔐 GitHub Authentication Required
 
 ## Step 1: Install HopCode GitHub App
@@ -90,7 +86,7 @@ Before using GitHub features, you need to install the HopCode GitHub App on your
 
 ### Quick Install Link:
 
-👉 **https://github.com/apps/${appName}/installations/select_target**
+👉 **https://github.com/apps/hopcode-ai-agent/installations/select_target**
 
 Click the link above and:
 1. Choose where to install (your account or organization)

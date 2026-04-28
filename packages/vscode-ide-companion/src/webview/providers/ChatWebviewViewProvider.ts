@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -41,7 +41,7 @@ export class ChatWebviewViewProvider implements vscode.WebviewViewProvider {
     }
 
     // Webview options (enableScripts, localResourceRoots) are configured
-    // inside WebViewProvider.attachToView — no duplication needed here.
+    // inside WebViewProvider.attachToView � no duplication needed here.
     await this.webViewProvider.attachToView(webviewView, webviewView.viewType);
   }
 }
