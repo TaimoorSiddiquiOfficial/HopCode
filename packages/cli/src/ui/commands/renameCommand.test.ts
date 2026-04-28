@@ -58,6 +58,9 @@ describe('renameCommand', () => {
       getGeminiClient: vi.fn().mockReturnValue({
         getHistory: vi.fn().mockReturnValue([]),
       }),
+      getHopCodeClient: vi.fn().mockReturnValue({
+        getHistory: vi.fn().mockReturnValue([]),
+      }),
       getContentGenerator: vi.fn(),
       getModel: vi.fn(),
     };
@@ -82,6 +85,9 @@ describe('renameCommand', () => {
         renameSession: vi.fn().mockResolvedValue(true),
       }),
       getGeminiClient: vi.fn().mockReturnValue({
+        getHistory: vi.fn().mockReturnValue([]),
+      }),
+      getHopCodeClient: vi.fn().mockReturnValue({
         getHistory: vi.fn().mockReturnValue([]),
       }),
       getContentGenerator: vi.fn(),

@@ -35,6 +35,11 @@ function makeConfig(opts: MockOptions): {
         getHistory: () => opts.history ?? [],
       }),
     })),
+    getHopCodeClient: vi.fn(() => ({
+      getChat: () => ({
+        getHistory: () => opts.history ?? [],
+      }),
+    })),
     getBaseLlmClient: vi.fn(() => ({ generateJson })),
   } as unknown as Config;
 

@@ -205,7 +205,7 @@ describe('modelConfigResolver', () => {
         expect(result.sources['timeout'].envKey).toBe(
           'QWEN_CODE_API_TIMEOUT_MS',
         );
-        expect(result.config.model).toBe(DEFAULT_QWEN_MODEL);
+        expect(result.config.model).toBe(DEFAULT_HOPCODE_MODEL);
       });
 
       it('modelProvider timeout takes precedence over QWEN_CODE_API_TIMEOUT_MS in OAuth', () => {
@@ -706,7 +706,7 @@ describe('modelConfigResolver', () => {
       expect(result.sources['timeout']).toBeDefined();
       expect(result.sources['timeout'].kind).toBe('env');
       expect(result.sources['timeout'].envKey).toBe('QWEN_CODE_API_TIMEOUT_MS');
-      expect(result.config.model).toBe(DEFAULT_QWEN_MODEL);
+      expect(result.config.model).toBe(DEFAULT_HOPCODE_MODEL);
     });
 
     it('[Regression] non-OAuth path must apply QWEN_CODE_API_TIMEOUT_MS', () => {
