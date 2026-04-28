@@ -40,15 +40,15 @@ class CORSError extends Error {
 const MCP_SESSION_ID_HEADER = 'mcp-session-id';
 const IDE_SERVER_PORT_ENV_VAR = 'HOPCODE_IDE_SERVER_PORT';
 const IDE_WORKSPACE_PATH_ENV_VAR = 'HOPCODE_IDE_WORKSPACE_PATH';
-const QWEN_DIR = '.hopcode';
+const HOPCODE_DIR = '.hopcode';
 const IDE_DIR = 'ide';
 
 async function getGlobalIdeDir(): Promise<string> {
   const homeDir = os.homedir();
   // Prefer home dir, but fall back to tmpdir if unavailable (matches core Storage behavior).
   const baseDir = homeDir
-    ? path.join(homeDir, QWEN_DIR)
-    : path.join(os.tmpdir(), QWEN_DIR);
+    ? path.join(homeDir, HOPCODE_DIR)
+    : path.join(os.tmpdir(), HOPCODE_DIR);
   const ideDir = path.join(baseDir, IDE_DIR);
   await fs.mkdir(ideDir, { recursive: true });
   return ideDir;

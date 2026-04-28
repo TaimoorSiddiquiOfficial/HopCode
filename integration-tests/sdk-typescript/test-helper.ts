@@ -34,13 +34,13 @@ import {
 
 export interface SDKTestHelperOptions {
   /**
-   * Optional settings for .qwen/settings.json
+   * Optional settings for .hopcode/settings.json
    */
   settings?: Record<string, unknown>;
   /**
-   * Whether to create .qwen/settings.json
+   * Whether to create .hopcode/settings.json
    */
-  createQwenConfig?: boolean;
+  createHopCodeConfig?: boolean;
   /**
    * Whether to enable chat recording for this test.
    * - Set to `true` to enable recording (needed for session-id duplicate detection tests)
@@ -79,10 +79,10 @@ export class SDKTestHelper {
 
     await mkdir(this.testDir, { recursive: true });
 
-    // Optionally create .qwen/settings.json for CLI configuration
-    if (options.createQwenConfig !== false) {
-      const qwenDir = join(this.testDir, '.qwen');
-      await mkdir(qwenDir, { recursive: true });
+    // Optionally create .hopcode/settings.json for CLI configuration
+    if (options.createHopCodeConfig !== false) {
+      const hopcodeDir = join(this.testDir, '.hopcode');
+      await mkdir(hopcodeDir, { recursive: true });
 
       const optionsSettings = options.settings ?? {};
       const generalSettings =
@@ -104,7 +104,7 @@ export class SDKTestHelper {
       };
 
       await writeFile(
-        join(qwenDir, 'settings.json'),
+        join(hopcodeDir, 'settings.json'),
         JSON.stringify(settings, null, 2),
         'utf-8',
       );

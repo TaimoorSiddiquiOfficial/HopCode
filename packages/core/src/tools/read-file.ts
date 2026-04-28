@@ -118,7 +118,7 @@ class ReadFileToolInvocation extends BaseToolInvocation<
       isSubpaths(allowedRoots, filePath) ||
       // isAutoMemPath uses the narrower managed auto-memory root for this
       // project — not the broad getMemoryBaseDir() — to avoid exposing
-      // sensitive ~/.qwen files such as settings.json or OAuth credentials.
+      // sensitive ~/.hopcode files such as settings.json or OAuth credentials.
       isAutoMemPath(filePath, this.config.getTargetDir())
     ) {
       return 'allow';

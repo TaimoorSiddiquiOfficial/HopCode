@@ -65,7 +65,7 @@ class RunConfig:
     concurrency: int = 4
     yolo: bool = True
     source_repo: Path = field(default_factory=lambda: Path.cwd())
-    worktree_base: Path = field(default_factory=lambda: Path.home() / ".qwen" / "worktrees")
+    worktree_base: Path = field(default_factory=lambda: Path.home() / ".hopcode" / "worktrees")
     outputs_dir: Path = field(default_factory=lambda: Path("./outputs"))
     results_file: Path = field(default_factory=lambda: Path("./results.json"))
     branch: Optional[str] = None  # Git branch to checkout (uses default if not set)
@@ -266,7 +266,7 @@ class GitWorktreeManager:
         """Collect the session log file from the worktree's chat recording.
 
         Session logs are stored at:
-        ~/.qwen/projects/{projectId}/chats/{sessionId}.jsonl
+        ~/.hopcode/projects/{projectId}/chats/{sessionId}.jsonl
 
         Where projectId is the sanitized worktree path.
 
@@ -279,8 +279,8 @@ class GitWorktreeManager:
         project_id = re.sub(r'[^a-zA-Z0-9]', '-', str(worktree_dir))
 
         # Build the chats directory path
-        qwen_dir = Path.home() / ".qwen"
-        chats_dir = qwen_dir / "projects" / project_id / "chats"
+        hopcode_dir = Path.home() / ".hopcode"
+        chats_dir = hopcode_dir / "projects" / project_id / "chats"
 
         if not chats_dir.exists():
             self.console.print(f"[dim]No chats directory found at {chats_dir}[/dim]")
@@ -881,7 +881,7 @@ def load_config(config_path: Path) -> RunConfig:
         concurrency=data.get("concurrency", 4),
         yolo=data.get("yolo", True),
         source_repo=Path(data.get("source_repo", ".")).resolve(),
-        worktree_base=Path(data.get("worktree_base", "~/.qwen/worktrees")).expanduser(),
+        worktree_base=Path(data.get("worktree_base", "~/.hopcode/worktrees")).expanduser(),
         outputs_dir=Path(data.get("outputs_dir", "./outputs")),
         results_file=Path(data.get("results_file", "./results.json")),
         branch=data.get("branch"),
