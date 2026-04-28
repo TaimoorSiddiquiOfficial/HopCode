@@ -51,6 +51,8 @@ interface MergedSettingsWithCodingPlan {
   security?: {
     auth?: {
       selectedType?: string;
+      apiKey?: string;
+      baseUrl?: string;
     };
   };
   codingPlan?: CodingPlanSettings;

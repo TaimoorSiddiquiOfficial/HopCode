@@ -532,7 +532,7 @@ describe('Server Config (config.ts)', () => {
       expect(vi.mocked(createContentGenerator)).toHaveBeenCalledTimes(1);
     });
 
-    it('should strip thoughts from history on model switch (#3304)', async () => {
+    it('should preserve thoughts from history on model switch', async () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
@@ -568,7 +568,7 @@ describe('Server Config (config.ts)', () => {
 
       await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
 
-      expect(stripSpy).toHaveBeenCalledTimes(1);
+      expect(stripSpy).not.toHaveBeenCalled();
     });
   });
 

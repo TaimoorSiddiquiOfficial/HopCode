@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview AgentCore � the shared execution engine for subagents.
+ * @fileoverview AgentCore — the shared execution engine for subagents.
  *
  * AgentCore encapsulates the model reasoning loop, tool scheduling, stats,
  * and event emission. It is composed by both AgentHeadless (one-shot tasks)
@@ -29,6 +29,7 @@ import {
 import type {
   ToolConfirmationOutcome,
   ToolCallConfirmationDetails,
+  ToolResultDisplay,
 } from '../../tools/tools.js';
 import { getInitialChatHistory } from '../../utils/environmentContext.js';
 import { FinishReason } from '@google/genai';
@@ -40,12 +41,13 @@ import type {
   FunctionDeclaration,
   GenerateContentResponseUsageMetadata,
 } from '@google/genai';
-import { HopCodeChat } from '../../core/hopCodeChat.js';
+import { GeminiChat } from '../../core/geminiChat.js';
 import type {
   PromptConfig,
   ModelConfig,
   RunConfig,
   ToolConfig,
+  AgentMessage,
 } from './agent-types.js';
 import { AgentTerminateMode } from './agent-types.js';
 import type {
@@ -56,12 +58,13 @@ import type {
   AgentToolOutputUpdateEvent,
   AgentUsageEvent,
   AgentHooks,
+  AgentExternalMessageEvent,
 } from './agent-events.js';
-import { type AgentEventEmitter, AgentEventType } from './agent-events.js';
+import { AgentEventEmitter, AgentEventType } from './agent-events.js';
 import { AgentStatistics, type AgentStatsSummary } from './agent-statistics.js';
 import { matchesMcpPattern } from '../../permissions/rule-parser.js';
 import { ToolNames } from '../../tools/tool-names.js';
-import { DEFAULT_HOPCODE_MODEL } from '../../config/models.js';
+import { DEFAULT_QWEN_MODEL } from '../../config/models.js';
 import { type ContextState, templateString } from './agent-headless.js';
 
 /**
@@ -152,7 +155,7 @@ export interface ExecutionStats {
 }
 
 /**
- * AgentCore � shared execution engine for model reasoning and tool scheduling.
+ * AgentCore — shared execution engine for model reasoning and tool scheduling.
  *
  * This class encapsulates:
  * - Chat/model session creation (`createChat`)
@@ -162,7 +165,7 @@ export interface ExecutionStats {
  * - Statistics tracking and event emission
  *
  * It does NOT manage lifecycle (start/stop/terminate), abort signals,
- * or final result interpretation � those are the caller's responsibility.
+ * or final result interpretation — those are the caller's responsibility.
  */
 export class AgentCore {
   readonly subagentId: string;
@@ -172,9 +175,25 @@ export class AgentCore {
   readonly modelConfig: ModelConfig;
   readonly runConfig: RunConfig;
   readonly toolConfig?: ToolConfig;
-  readonly eventEmitter?: AgentEventEmitter;
+  /**
+   * Event emitter for this agent. Always present — if the caller doesn't
+   * pass one, AgentCore allocates its own so the observable state below
+   * is populated regardless of who constructs the agent.
+   */
+  readonly eventEmitter: AgentEventEmitter;
   readonly hooks?: AgentHooks;
   readonly stats = new AgentStatistics();
+
+  // Observable state lives on Core (not a wrapper) so headless and
+  // background agents can be observed with the same accessors as
+  // interactive ones. Populated by listeners set up in the constructor.
+  private readonly messages: AgentMessage[] = [];
+  private readonly pendingApprovals = new Map<
+    string,
+    ToolCallConfirmationDetails
+  >();
+  private readonly liveOutputs = new Map<string, ToolResultDisplay>();
+  private readonly shellPids = new Map<string, number>();
 
   /**
    * Legacy execution stats maintained for aggregate tracking.
@@ -226,24 +245,25 @@ export class AgentCore {
     this.modelConfig = modelConfig;
     this.runConfig = runConfig;
     this.toolConfig = toolConfig;
-    this.eventEmitter = eventEmitter;
+    this.eventEmitter = eventEmitter ?? new AgentEventEmitter();
     this.hooks = hooks;
+    this.setupStateListeners();
   }
 
-  // --- Chat Creation ----------------------------------------
+  // ─── Chat Creation ────────────────────────────────────────
 
   /**
-   * Creates a HopCodeChat instance configured for this agent.
+   * Creates a GeminiChat instance configured for this agent.
    *
    * @param context - Context state for template variable substitution.
    * @param options - Chat creation options.
    *   - `interactive`: When true, omits the "non-interactive mode" system prompt suffix.
-   * @returns A configured HopCodeChat, or undefined if initialization fails.
+   * @returns A configured GeminiChat, or undefined if initialization fails.
    */
   async createChat(
     context: ContextState,
     options?: CreateChatOptions,
-  ): Promise<HopCodeChat | undefined> {
+  ): Promise<GeminiChat | undefined> {
     if (
       !this.promptConfig.systemPrompt &&
       !this.promptConfig.renderedSystemPrompt &&
@@ -281,7 +301,7 @@ export class AgentCore {
     // Build generationConfig. For fork subagents, `renderedSystemPrompt`
     // carries the parent's exact rendered systemInstruction so the fork
     // shares a byte-identical cache prefix. Otherwise, template
-    // `systemPrompt` via buildChatSystemPrompt (which may throw � kept
+    // `systemPrompt` via buildChatSystemPrompt (which may throw — kept
     // outside the try/catch so template errors surface to the caller).
     const generationConfig: GenerateContentConfig & {
       systemInstruction?: string | Content;
@@ -297,7 +317,7 @@ export class AgentCore {
     }
 
     try {
-      return new HopCodeChat(
+      return new GeminiChat(
         this.runtimeContext,
         generationConfig,
         startHistory,
@@ -313,7 +333,7 @@ export class AgentCore {
     }
   }
 
-  // --- Tool Preparation -------------------------------------
+  // ─── Tool Preparation ─────────────────────────────────────
 
   /**
    * Prepares the list of tools available to this agent.
@@ -379,13 +399,13 @@ export class AgentCore {
     return toolsList;
   }
 
-  // --- Reasoning Loop ---------------------------------------
+  // ─── Reasoning Loop ───────────────────────────────────────
 
   /**
    * Runs the inner model reasoning loop.
    *
    * This is the core execution cycle:
-   * send messages ? stream response ? collect tool calls ? execute tools ? repeat.
+   * send messages → stream response → collect tool calls → execute tools → repeat.
    *
    * The loop terminates when:
    * - The model produces a text response without tool calls (normal completion)
@@ -393,7 +413,7 @@ export class AgentCore {
    * - maxTimeMinutes is exceeded
    * - The abortController signal fires
    *
-   * @param chat - The HopCodeChat session to use.
+   * @param chat - The GeminiChat session to use.
    * @param initialMessages - The first messages to send (e.g., user task prompt).
    * @param toolsList - Available tool declarations.
    * @param abortController - Controls cancellation of the current loop.
@@ -401,7 +421,7 @@ export class AgentCore {
    * @returns ReasoningLoopResult with the final text, terminate mode, and turns used.
    */
   async runReasoningLoop(
-    chat: HopCodeChat,
+    chat: GeminiChat,
     initialMessages: Content[],
     toolsList: FunctionDeclaration[],
     abortController: AbortController,
@@ -423,29 +443,7 @@ export class AgentCore {
   }
 
   private async _runReasoningLoopInner(
-    chat: HopCodeChat,
-    initialMessages: Content[],
-    toolsList: FunctionDeclaration[],
-    abortController: AbortController,
-    options?: ReasoningLoopOptions,
-  ): Promise<ReasoningLoopResult> {
-    // Tag every API call emitted from this loop with the owning subagent's
-    // name so the `/stats` panel can attribute tokens/requests to the
-    // originating subagent. The store is read inside
-    // `LoggingContentGenerator` via `subagentNameContext.getStore()`.
-    return subagentNameContext.run(this.name, () =>
-      this._runReasoningLoopInnerImpl(
-        chat,
-        initialMessages,
-        toolsList,
-        abortController,
-        options,
-      ),
-    );
-  }
-
-  private async _runReasoningLoopInnerImpl(
-    chat: HopCodeChat,
+    chat: GeminiChat,
     initialMessages: Content[],
     toolsList: FunctionDeclaration[],
     abortController: AbortController,
@@ -458,7 +456,7 @@ export class AgentCore {
     let terminateMode: AgentTerminateMode | null = null;
 
     while (true) {
-      // Check abort before starting a new round � prevents unnecessary API
+      // Check abort before starting a new round — prevents unnecessary API
       // calls after processFunctionCalls was unblocked by an abort signal.
       if (abortController.signal.aborted) {
         terminateMode = AgentTerminateMode.CANCELLED;
@@ -500,7 +498,7 @@ export class AgentCore {
       const responseStream = await chat.sendMessageStream(
         this.modelConfig.model ||
           this.runtimeContext.getModel() ||
-          DEFAULT_HOPCODE_MODEL,
+          DEFAULT_QWEN_MODEL,
         messageParams,
         promptId,
       );
@@ -633,7 +631,7 @@ export class AgentCore {
           }
         }
       } else {
-        // No tool calls � treat this as the model's final answer.
+        // No tool calls — treat this as the model's final answer.
         if (roundText && roundText.trim().length > 0) {
           finalText = roundText.trim();
           // Emit ROUND_END for the final round so all consumers see it.
@@ -681,7 +679,7 @@ export class AgentCore {
     };
   }
 
-  // --- Tool Execution ---------------------------------------
+  // ─── Tool Execution ───────────────────────────────────────
 
   /**
    * Processes a list of function calls via CoreToolScheduler.
@@ -763,7 +761,7 @@ export class AgentCore {
     const responded = new Set<string>();
     let resolveBatch: (() => void) | null = null;
     const emittedCallIds = new Set<string>();
-    // pidMap: callId ? PTY PID, populated by onToolCallsUpdate when a shell
+    // pidMap: callId → PTY PID, populated by onToolCallsUpdate when a shell
     // tool spawns a PTY. Shared with outputUpdateHandler via closure so the
     // PID is included in TOOL_OUTPUT_UPDATE events for interactive shell support.
     const pidMap = new Map<string, number>();
@@ -1022,9 +1020,67 @@ export class AgentCore {
     return [{ role: 'user', parts: toolResponseParts }];
   }
 
-  // --- Stats & Events ---------------------------------------
+  // ─── Observable state accessors ────────────────────────────
 
-  getEventEmitter(): AgentEventEmitter | undefined {
+  getMessages(): readonly AgentMessage[] {
+    return this.messages;
+  }
+
+  /**
+   * Tool calls currently awaiting user approval. Mutated by
+   * AgentInteractive's TOOL_WAITING_APPROVAL handler; headless agents
+   * never populate this because they run with
+   * `getShouldAvoidPermissionPrompts === true`.
+   */
+  getPendingApprovals(): ReadonlyMap<string, ToolCallConfirmationDetails> {
+    return this.pendingApprovals;
+  }
+
+  getLiveOutputs(): ReadonlyMap<string, ToolResultDisplay> {
+    return this.liveOutputs;
+  }
+
+  getShellPids(): ReadonlyMap<string, number> {
+    return this.shellPids;
+  }
+
+  pushMessage(
+    role: AgentMessage['role'],
+    content: string,
+    options?: { thought?: boolean; metadata?: Record<string, unknown> },
+  ): void {
+    const message: AgentMessage = {
+      role,
+      content,
+      timestamp: Date.now(),
+    };
+    if (options?.thought) {
+      message.thought = true;
+    }
+    if (options?.metadata) {
+      message.metadata = options.metadata;
+    }
+    this.messages.push(message);
+  }
+
+  setPendingApproval(
+    callId: string,
+    details: ToolCallConfirmationDetails,
+  ): void {
+    this.pendingApprovals.set(callId, details);
+  }
+
+  deletePendingApproval(callId: string): void {
+    this.pendingApprovals.delete(callId);
+  }
+
+  clearPendingApprovals(): void {
+    this.pendingApprovals.clear();
+  }
+
+  // ─── Stats & Events ───────────────────────────────────────
+
+  getEventEmitter(): AgentEventEmitter {
     return this.eventEmitter;
   }
 
@@ -1135,7 +1191,82 @@ export class AgentCore {
     );
   }
 
-  // --- Private Helpers --------------------------------------
+  // ─── Private Helpers ──────────────────────────────────────
+
+  /**
+   * TOOL_WAITING_APPROVAL is deliberately NOT listened to here because
+   * the correct response depends on whether the consumer is interactive
+   * (needs to wrap onConfirm with cancel-round behavior) or headless
+   * (approvals never fire). AgentInteractive owns that listener and
+   * writes into `pendingApprovals` via the public mutator API.
+   */
+  private setupStateListeners(): void {
+    const emitter = this.eventEmitter;
+
+    emitter.on(AgentEventType.ROUND_TEXT, (event: AgentRoundTextEvent) => {
+      if (event.thoughtText) {
+        this.pushMessage('assistant', event.thoughtText, { thought: true });
+      }
+      if (event.text) {
+        this.pushMessage('assistant', event.text);
+      }
+    });
+
+    emitter.on(AgentEventType.TOOL_CALL, (event: AgentToolCallEvent) => {
+      this.pushMessage('tool_call', `Tool call: ${event.name}`, {
+        metadata: {
+          callId: event.callId,
+          toolName: event.name,
+          args: event.args,
+          description: event.description,
+          renderOutputAsMarkdown: event.isOutputMarkdown,
+          round: event.round,
+        },
+      });
+    });
+
+    emitter.on(
+      AgentEventType.TOOL_OUTPUT_UPDATE,
+      (event: AgentToolOutputUpdateEvent) => {
+        this.liveOutputs.set(event.callId, event.outputChunk);
+        if (event.pid !== undefined) {
+          this.shellPids.set(event.callId, event.pid);
+        }
+      },
+    );
+
+    emitter.on(AgentEventType.TOOL_RESULT, (event: AgentToolResultEvent) => {
+      this.liveOutputs.delete(event.callId);
+      this.shellPids.delete(event.callId);
+      this.pendingApprovals.delete(event.callId);
+
+      const statusText = event.success ? 'succeeded' : 'failed';
+      const summary = event.error
+        ? `Tool ${event.name} ${statusText}: ${event.error}`
+        : `Tool ${event.name} ${statusText}`;
+      this.pushMessage('tool_result', summary, {
+        metadata: {
+          callId: event.callId,
+          toolName: event.name,
+          success: event.success,
+          resultDisplay: event.resultDisplay,
+          outputFile: event.outputFile,
+          round: event.round,
+        },
+      });
+    });
+
+    // Mirror send_message injections into the observable message stream so
+    // the TUI detail dialog shows parent→child messages alongside what the
+    // JSONL transcript records. The framing prefix is stripped — that's a
+    // model-facing detail, not what the user wants to see in the dialog.
+    emitter.on(
+      AgentEventType.EXTERNAL_MESSAGE,
+      (event: AgentExternalMessageEvent) => {
+        this.pushMessage('user', event.text);
+      },
+    );
+  }
 
   /**
    * Builds the system prompt with template substitution and optional
@@ -1183,7 +1314,7 @@ Important Rules:
     const thoughtTok = Number(usage.thoughtsTokenCount || 0);
     const cachedTok = Number(usage.cachedContentTokenCount || 0);
     const totalTok = Number(usage.totalTokenCount || 0);
-    // Prefer totalTokenCount (prompt + output) for context usage � the
+    // Prefer totalTokenCount (prompt + output) for context usage — the
     // output from this round becomes history for the next, matching
     // the approach in geminiChat.ts.
     const contextTok = isFinite(totalTok) && totalTok > 0 ? totalTok : inTok;
