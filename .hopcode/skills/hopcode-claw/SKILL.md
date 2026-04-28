@@ -124,13 +124,13 @@ acpx hopcode --no-wait 'after tests, summarize root causes and next steps'
 ### Machine-Readable Output for Orchestration
 
 ```bash
-acpx --format json qwen 'review current branch changes' > events.ndjson
+acpx --format json hopcode 'review current branch changes' > events.ndjson
 ```
 
 ### Repository-Wide Review with Permissive Mode
 
 ```bash
-acpx --cwd ~/repos/my-project --approve-all qwen -s pr-123 \
+acpx --cwd ~/repos/my-project --approve-all hopcode -s pr-123 \
   'review PR #123 for regressions and propose minimal patch'
 ```
 

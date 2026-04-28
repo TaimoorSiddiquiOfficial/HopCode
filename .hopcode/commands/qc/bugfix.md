@@ -16,7 +16,7 @@ Create `.hopcode/issues/` if it doesn't exist, then pipe the issue directly
 into a markdown file using `gh`:
 
 ```bash
-mkdir -p .qwen/issues
+mkdir -p .hopcode/issues
 gh issue view <number> \
   --json number,title,body \
   -t '# Issue #{{.number}}: {{.title}}

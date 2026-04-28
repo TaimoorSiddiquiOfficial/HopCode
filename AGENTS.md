@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Qwen Code when working with code in this
+This file provides guidance to HopCode when working with code in this
 repository.
 
 ## Common Commands
@@ -73,7 +73,7 @@ Or combined in one command:
 
 ```bash
 cd integration-tests && \
-  cross-env QWEN_SANDBOX=false npx vitest run cli interactive
+  cross-env HOPCODE_SANDBOX=false npx vitest run cli interactive
 ```
 
 **Gotcha:** In interactive tests, always call `session.idle()` between sends —
@@ -108,12 +108,12 @@ npm run preflight  # Full check: clean → install → format → lint → build
 
 ### General workflow
 
-1. **Design doc for non-trivial work** — write one in `.qwen/design/` if the
+1. **Design doc for non-trivial work** — write one in `.hopcode/design/` if the
    change touches multiple files or involves design decisions. Skip for small
    bugfixes.
 2. **Test plan for behavioral changes** — write an E2E test plan in
-   `.qwen/e2e-tests/` when the change affects user-observable behavior. Dry-run
-   against the global `qwen` CLI first to confirm the baseline.
+   `.hopcode/e2e-tests/` when the change affects user-observable behavior. Dry-run
+   against the global `hopcode` CLI first to confirm the baseline.
 3. **Build + typecheck before declaring done**:
    `npm run build && npm run typecheck`.
 4. **Code review** — run `/review` when available. Triage each comment:
@@ -163,14 +163,14 @@ applicable.
 
 ## Project Directories
 
-Project artifacts live under `.qwen/`:
+Project artifacts live under `.hopcode/`:
 
-| Directory               | Purpose                              |
-| ----------------------- | ------------------------------------ |
-| `.qwen/design/`         | Design docs for planned features     |
-| `.qwen/e2e-tests/`      | E2E test plans and results           |
-| `.qwen/issues/`         | Issue drafts before filing on GitHub |
-| `.qwen/pr-drafts/`      | PR drafts before submitting          |
-| `.qwen/pr-reviews/`     | PR review notes                      |
-| `.qwen/investigations/` | Structured debugging journals        |
-| `.qwen/scripts/`        | Utility scripts                      |
+| Directory                  | Purpose                              |
+| -------------------------- | ------------------------------------ |
+| `.hopcode/design/`         | Design docs for planned features     |
+| `.hopcode/e2e-tests/`      | E2E test plans and results           |
+| `.hopcode/issues/`         | Issue drafts before filing on GitHub |
+| `.hopcode/pr-drafts/`      | PR drafts before submitting          |
+| `.hopcode/pr-reviews/`     | PR review notes                      |
+| `.hopcode/investigations/` | Structured debugging journals        |
+| `.hopcode/scripts/`        | Utility scripts                      |

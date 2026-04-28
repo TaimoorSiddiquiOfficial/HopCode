@@ -9,7 +9,7 @@ the **only** location that works for E2E testing.
 
 Common mistakes that waste time:
 
-- `.mcp.json` — Claude Code convention, not Qwen Code
+- `.mcp.json` — Claude Code convention, not HopCode
 - `settings.local.json` — schema validation rejects `mcpServers` here
 - `--mcp-config` CLI flag — does not exist
 
@@ -19,7 +19,7 @@ The CLI needs a git repo to load project settings. Create a temp directory:
 
 ```bash
 mkdir -p /tmp/test-dir && cd /tmp/test-dir && git init -q
-mkdir -p .qwen
+mkdir -p .hopcode
 cat > .hopcode/settings.json << 'EOF'
 {
   "mcpServers": {
@@ -36,7 +36,7 @@ EOF
 Run from that directory:
 
 ```bash
-cd /tmp/test-dir && <qwen> "prompt" \
+cd /tmp/test-dir && <hopcode> "prompt" \
   --approval-mode yolo --output-format json
 ```
 
