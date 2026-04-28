@@ -169,7 +169,7 @@ vi.mock('../../services/settingsWriter.js', () => ({
   clearPersistedAuth: mockClearPersistedAuth,
 }));
 
-vi.mock('../../services/HopCodeAgentManager.js', () => ({
+vi.mock('../../services/hopcodeAgentManager.js', () => ({
   HopCodeAgentManager: class {
     isConnected = false;
     currentSessionId = null;
