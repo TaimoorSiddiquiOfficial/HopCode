@@ -141,7 +141,9 @@ function buildImage(imageName, dockerfile) {
   ).version;
 
   const imageTag =
-    process.env.QWEN_SANDBOX_IMAGE_TAG || imageName.split(':')[1] || 'latest';
+    process.env.HOPCODE_SANDBOX_IMAGE_TAG ||
+    imageName.split(':')[1] ||
+    'latest';
   const finalImageName = `${imageName.split(':')[0]}:${imageTag}`;
 
   try {
