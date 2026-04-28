@@ -16,7 +16,7 @@
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
   "config": {
-    "sandboxImageUri": "ghcr.io/TaimoorSiddiquiOfficial/HopCode:0.18.10"
+    "sandboxImageUri": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.19.8"
   },
   "scripts": {
     "verify:privacy": "tsx scripts/verify-privacy.ts",

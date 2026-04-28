@@ -144,7 +144,7 @@ function buildImage(imageName, dockerfile) {
     process.env.HOPCODE_SANDBOX_IMAGE_TAG ||
     imageName.split(':')[1] ||
     'latest';
-  const finalImageName = `${imageName.split(':')[0]}:${imageTag}`;
+  const finalImageName = `${imageName.split(':')[0].toLowerCase()}:${imageTag}`;
 
   try {
     execSync(
