@@ -10,7 +10,7 @@ import type { SpawnInfo } from '../utils/cliPath.js';
 export type { PermissionMode, AuthType };
 
 export type TransportOptions = {
-  pathToQwenExecutable?: string;
+  pathToHopCodeExecutable?: string;
   spawnInfo?: SpawnInfo;
   cwd?: string;
   model?: string;
@@ -203,7 +203,7 @@ export interface QueryOptions {
   /**
    * The AI model to use for the query session.
    * This takes precedence over the environment variables `OPENAI_MODEL` and `HOPCODE_MODEL`
-   * @example 'qwen-max', 'qwen-plus', 'qwen-turbo'
+   * @example 'qwen-max', 'qwen-plus', 'qwen-turbo', 'gpt-4o'
    */
   model?: string;
 
@@ -213,10 +213,10 @@ export interface QueryOptions {
    * If not provided, the SDK automatically uses the bundled CLI included in the package.
    *
    * Supports multiple formats:
-   * - Command name (no path separators): `'qwen'` -> executes from PATH
+   * - Command name (no path separators): `'hopcode'` -> executes from PATH
    * - JavaScript file: `'/path/to/cli.js'` -> uses Node.js (or Bun if running under Bun)
    * - TypeScript file: `'/path/to/index.ts'` -> uses tsx if available (silent support for dev/debug)
-   * - Native binary: `'/path/to/qwen'` -> executes directly
+   * - Native binary: `'/path/to/hopcode'` -> executes directly
    *
    * Runtime detection:
    * - `.js/.mjs/.cjs` files: Node.js (or Bun if running under Bun)
@@ -225,10 +225,10 @@ export interface QueryOptions {
    * - Other files: executed as native binaries
    *
    * @example '/path/to/cli.js'
-   * @example 'qwen'
+   * @example 'hopcode'
    * @example './packages/cli/index.ts'
    */
-  pathToQwenExecutable?: string;
+  pathToHopCodeExecutable?: string;
 
   /**
    * Environment variables to pass to the HopCode CLI process.
@@ -418,7 +418,7 @@ export interface QueryOptions {
   /**
    * Authentication type for the AI service.
    * - 'openai': Use OpenAI-compatible authentication
-   * - 'qwen-oauth': Use HopCode OAuth authentication
+   * - 'qwen-oauth': Use Qwen OAuth authentication
    *
    * Though we support 'qwen-oauth', it's not recommended to use it in the SDK.
    * Because the credentials are stored in `~/.hopcode` and may need to refresh periodically.

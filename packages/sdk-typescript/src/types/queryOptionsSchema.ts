@@ -132,7 +132,7 @@ export const QueryOptionsSchema = z
   .object({
     cwd: z.string().optional(),
     model: z.string().optional(),
-    pathToQwenExecutable: z.string().optional(),
+    pathToHopCodeExecutable: z.string().optional(),
     env: z.record(z.string(), z.string()).optional(),
     systemPrompt: z
       .union([

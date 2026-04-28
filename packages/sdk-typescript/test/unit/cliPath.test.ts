@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -57,7 +57,9 @@ describe('CLI Path Utilities', () => {
     it('should throw descriptive error when bundled CLI not found', () => {
       mockFs.existsSync.mockReturnValue(false);
 
-      expect(() => findBundledCliPath()).toThrow('Bundled qwen CLI not found');
+      expect(() => findBundledCliPath()).toThrow(
+        'Bundled hopcode CLI not found',
+      );
       expect(() => findBundledCliPath()).toThrow('Searched locations:');
     });
   });
@@ -84,7 +86,9 @@ describe('CLI Path Utilities', () => {
       it('should throw when bundled CLI not found', () => {
         mockFs.existsSync.mockReturnValue(false);
 
-        expect(() => prepareSpawnInfo()).toThrow('Bundled qwen CLI not found');
+        expect(() => prepareSpawnInfo()).toThrow(
+          'Bundled hopcode CLI not found',
+        );
       });
     });
 
