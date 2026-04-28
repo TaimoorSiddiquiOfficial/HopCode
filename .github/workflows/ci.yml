@@ -123,6 +123,8 @@ jobs:
       contents: 'read'
       checks: 'write'
       pull-requests: 'write'
+    env:
+      NODE_OPTIONS: '--max-old-space-size=8192'
     strategy:
       fail-fast: false # So we can see all test failures
       matrix:

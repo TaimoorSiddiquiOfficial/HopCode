@@ -178,6 +178,8 @@ jobs:
     runs-on: 'ubuntu-latest'
     needs: 'prepare'
     if: "${{ needs.prepare.outputs.publish_root == 'true' }}"
+    env:
+      NODE_OPTIONS: '--max-old-space-size=8192'
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
@@ -222,6 +224,8 @@ jobs:
       needs.publish-root-package.result != 'failure' &&
       (github.event.inputs.packages == 'all' ||
        contains(github.event.inputs.packages, 'vscode-ide-companion'))
+    env:
+      NODE_OPTIONS: '--max-old-space-size=8192'
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
