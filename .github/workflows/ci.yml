@@ -87,6 +87,7 @@ jobs:
         run: |
           npm run build --workspace=packages/core
           npm run build --workspace=packages/web-templates
+          npm run build --workspace=packages/server
           npm run build --workspace=packages/channels/base
           npm run build --workspace=packages/channels/discord
           npm run build --workspace=packages/channels/telegram

@@ -111,10 +111,10 @@ const {
   }>,
 }));
 
-vi.mock('@qwen-code/qwen-code-core', async () => {
+vi.mock('@hoptrendy/hopcode-core', async () => {
   const actual = await vi.importActual<
-    typeof import('@qwen-code/qwen-code-core')
-  >('@qwen-code/qwen-code-core');
+    typeof import('@hoptrendy/hopcode-core')
+  >('@hoptrendy/hopcode-core');
   return {
     ...actual,
     Storage: {
@@ -165,7 +165,7 @@ vi.mock('vscode', () => ({
 vi.mock('../../services/settingsWriter.js', () => ({
   writeCodingPlanConfig: mockWriteCodingPlanConfig,
   writeModelProvidersConfig: mockWriteModelProvidersConfig,
-  readQwenSettingsForVSCode: mockReadQwenSettingsForVSCode,
+  readHopcodeSettingsForVSCode: mockReadQwenSettingsForVSCode,
   clearPersistedAuth: mockClearPersistedAuth,
 }));
 
@@ -1401,7 +1401,7 @@ describe('Notification & dot indicator', () => {
 
     // Notification with tool name
     expect(mockShowInformationMessage).toHaveBeenCalledWith(
-      'Qwen Code: Needs your permission to use Bash.',
+      'HopCode: Needs your permission to use Bash.',
       'Show',
     );
   });
