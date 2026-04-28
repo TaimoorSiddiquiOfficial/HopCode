@@ -19,8 +19,6 @@
   ],
   "scripts": {
     "build": "node ../../scripts/build_package.js",
-    "test": "vitest run",
-    "test:ci": "vitest run",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
