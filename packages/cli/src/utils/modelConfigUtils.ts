@@ -50,11 +50,7 @@ export function getAuthTypeFromEnv(): AuthType | undefined {
     return AuthType.HOPCODE_OAUTH;
   }
 
-  if (
-    process.env['OPENAI_API_KEY'] &&
-    process.env['OPENAI_MODEL'] &&
-    process.env['OPENAI_BASE_URL']
-  ) {
+  if (process.env['OPENAI_API_KEY']) {
     return AuthType.USE_OPENAI;
   }
 

@@ -55,12 +55,11 @@ describe('modelConfigUtils', () => {
       expect(getAuthTypeFromEnv()).toBe(AuthType.USE_OPENAI);
     });
 
-    it('should return undefined when OpenAI env vars are incomplete', () => {
+    it('should return USE_OPENAI when only OPENAI_API_KEY is set', () => {
       process.env['OPENAI_API_KEY'] = 'test-key';
-      process.env['OPENAI_MODEL'] = 'gpt-4';
-      // Missing OPENAI_BASE_URL
+      // OPENAI_MODEL and OPENAI_BASE_URL are optional
 
-      expect(getAuthTypeFromEnv()).toBeUndefined();
+      expect(getAuthTypeFromEnv()).toBe(AuthType.USE_OPENAI);
     });
 
     it('should return HOPCODE_OAUTH when HOPCODE_OAUTH is set', () => {

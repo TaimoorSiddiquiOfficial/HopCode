@@ -97,10 +97,18 @@ jobs:
           echo "$CHANGED_FILES" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
+      - name: 'Setup Node.js'
+        uses: 'actions/setup-node@v4'
+        with:
+          node-version: '20'
+
+      - name: 'Install dependencies and build'
+        run: |-
+          npm ci
+          npm run build
+          npm run bundle
+
       - name: 'Run HopCode PR Review'
-        uses: 'TaimoorSiddiquiOfficial/HopCode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
-        if: |-
-          ${{ github.event.pull_request }}
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           PR_NUMBER: '${{ steps.get_pr.outputs.pr_number || steps.get_pr_comment.outputs.pr_number }}'
@@ -108,19 +116,11 @@ jobs:
           CHANGED_FILES: '${{ steps.get_pr.outputs.changed_files || steps.get_pr_comment.outputs.changed_files }}'
           ADDITIONAL_INSTRUCTIONS: '${{ steps.get_pr.outputs.additional_instructions || steps.get_pr_comment.outputs.additional_instructions }}'
           REPOSITORY: '${{ github.repository }}'
-        with:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
           OPENAI_MODEL: '${{ secrets.OPENAI_MODEL }}'
-          settings_json: |-
-            {
-              "coreTools": [
-                "run_shell_command",
-                "write_file"
-              ],
-              "sandbox": false
-            }
-          prompt: |-
+        run: |-
+          node dist/cli.js --approval-mode yolo --output-format json -p "$(cat <<'PROMPT_EOF'
             You are an expert code reviewer. You have access to shell commands to gather PR information and perform the review.
 
             IMPORTANT: Use the available shell commands to gather information. Do not ask for information to be provided.
@@ -190,3 +190,6 @@ jobs:
             - Mention specific good practices or implementations
             - Acknowledge well-written code sections
             - Note improvements from previous versions
+
+          PROMPT_EOF
+          )"

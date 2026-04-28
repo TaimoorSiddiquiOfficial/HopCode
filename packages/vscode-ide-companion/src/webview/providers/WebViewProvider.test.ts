@@ -141,6 +141,12 @@ vi.mock('vscode', () => ({
     onDidChangeTextEditorSelection: mockOnDidChangeTextEditorSelection,
     activeTextEditor: undefined,
     showInformationMessage: mockShowInformationMessage,
+    showErrorMessage: vi.fn<
+      (message: string, ...items: string[]) => Thenable<string | undefined>
+    >(() => Promise.resolve(undefined)),
+    showWarningMessage: vi.fn<
+      (message: string, ...items: string[]) => Thenable<string | undefined>
+    >(() => Promise.resolve(undefined)),
     state: mockWindowState,
   },
   workspace: {
