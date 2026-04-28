@@ -8,7 +8,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { tasksCommand } from './tasksCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
-import type { BackgroundShellEntry } from '@qwen-code/qwen-code-core';
+import type { BackgroundShellEntry } from '@hoptrendy/hopcode-core';
 
 function entry(
   overrides: Partial<BackgroundShellEntry> = {},

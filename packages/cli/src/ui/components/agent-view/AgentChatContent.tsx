@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +19,7 @@ import {
   type AgentCore,
   type AgentInteractive,
   type AgentStatusChangeEvent,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { useUIState } from '../../contexts/UIStateContext.js';
 import { useTerminalSize } from '../../hooks/useTerminalSize.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
@@ -27,7 +27,7 @@ import { useAgentViewActions } from '../../contexts/AgentViewContext.js';
 import { HistoryItemDisplay } from '../HistoryItemDisplay.js';
 import { ToolCallStatus } from '../../types.js';
 import { theme } from '../../semantic-colors.js';
-import { GeminiRespondingSpinner } from '../GeminiRespondingSpinner.js';
+import { HopCodeRespondingSpinner } from '../HopCodeRespondingSpinner.js';
 import { agentMessagesToHistoryItems } from './agentHistoryAdapter.js';
 import { AgentHeader } from './AgentHeader.js';
 
@@ -257,7 +257,7 @@ export const AgentChatContent = ({
       {/* Spinner */}
       {isRunning && (
         <Box marginX={2} marginTop={1}>
-          <GeminiRespondingSpinner />
+          <HopCodeRespondingSpinner />
         </Box>
       )}
     </Box>

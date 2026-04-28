@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +13,7 @@ import {
 } from '../../contexts/BackgroundTaskViewContext.js';
 import { useKeypress, type Key } from '../../hooks/useKeypress.js';
 import { theme } from '../../semantic-colors.js';
-import type { BackgroundTaskEntry } from '@qwen-code/qwen-code-core';
+import type { BackgroundTaskEntry } from '@hoptrendy/hopcode-core';
 
 /**
  * Pill label: counts running entries while any are running; once everything

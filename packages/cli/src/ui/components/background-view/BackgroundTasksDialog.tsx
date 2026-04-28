@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +27,7 @@ import {
   ToolDisplayNames,
   ToolNames,
   type BackgroundTaskEntry,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 
 // Tool-name → display-name lookup (`run_shell_command` → `Shell`).
 const TOOL_DISPLAY_BY_NAME: Record<string, string> = Object.fromEntries(

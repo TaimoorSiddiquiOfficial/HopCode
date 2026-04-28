@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { BackgroundTaskEntry } from '@qwen-code/qwen-code-core';
+import type { BackgroundTaskEntry } from '@hoptrendy/hopcode-core';
 import { getPillLabel } from './BackgroundTasksPill.js';
 
 function entry(overrides: Partial<BackgroundTaskEntry>): BackgroundTaskEntry {

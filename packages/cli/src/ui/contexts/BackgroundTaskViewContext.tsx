@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,10 +19,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import {
-  type BackgroundTaskEntry,
-  type Config,
-} from '@qwen-code/qwen-code-core';
+import { type BackgroundTaskEntry, type Config } from '@hoptrendy/hopcode-core';
 import { useBackgroundTaskView } from '../hooks/useBackgroundTaskView.js';
 
 // ─── Types ──────────────────────────────────────────────────

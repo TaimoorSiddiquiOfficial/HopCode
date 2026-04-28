@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { BackgroundShellEntry } from '@qwen-code/qwen-code-core';
+import type { BackgroundShellEntry } from '@hoptrendy/hopcode-core';
 import type { SlashCommand } from './types.js';
 import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';

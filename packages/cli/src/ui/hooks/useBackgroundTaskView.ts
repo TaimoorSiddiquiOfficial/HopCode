@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,10 +19,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  type BackgroundTaskEntry,
-  type Config,
-} from '@qwen-code/qwen-code-core';
+import { type BackgroundTaskEntry, type Config } from '@hoptrendy/hopcode-core';
 
 export interface UseBackgroundTaskViewResult {
   entries: readonly BackgroundTaskEntry[];
