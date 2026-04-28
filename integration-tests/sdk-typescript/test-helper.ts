@@ -1009,7 +1009,7 @@ export function createSharedTestOptions(
   }
 
   return {
-    pathToQwenExecutable: TEST_CLI_PATH,
+    pathToHopCodeExecutable: TEST_CLI_PATH,
     ...overrides,
   };
 }

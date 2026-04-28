@@ -462,7 +462,7 @@ describe('Single-Turn Query (E2E)', () => {
         const q = query({
           prompt: 'Hello',
           options: {
-            pathToQwenExecutable: '/nonexistent/path/to/cli',
+            pathToHopCodeExecutable: '/nonexistent/path/to/cli',
             debug: false,
           },
         });
@@ -476,7 +476,7 @@ describe('Single-Turn Query (E2E)', () => {
         expect(error).toBeDefined();
         expect(error instanceof Error).toBe(true);
         expect((error as Error).message).toContain(
-          'Invalid pathToQwenExecutable',
+          'Invalid pathToHopCodeExecutable',
         );
       }
     });
