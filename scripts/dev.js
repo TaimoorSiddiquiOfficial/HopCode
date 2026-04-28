@@ -59,7 +59,7 @@ if (existsSync(userDocsTarget) && !existsSync(qcHelperDocsLink)) {
 const cliEntry = join(cliPackageDir, 'index.ts');
 
 // Create a temporary loader file
-const tmpDir = mkdtempSync(join(tmpdir(), 'qwen-dev-'));
+const tmpDir = mkdtempSync(join(tmpdir(), 'hopcode-dev-'));
 const loaderPath = join(tmpDir, 'loader.mjs');
 
 const coreSourcePath = join(root, 'packages', 'core', 'index.ts');

@@ -34,18 +34,18 @@ function getProjectHash(projectRoot) {
 
 const projectHash = getProjectHash(projectRoot);
 
-// User-level .gemini directory in home
-const USER_GEMINI_DIR = path.join(os.homedir(), '.qwen');
-// Project-level .gemini directory in the workspace
-const WORKSPACE_QWEN_DIR = path.join(projectRoot, '.qwen');
+// User-level .hopcode directory in home
+const USER_HOPCODE_DIR = path.join(os.homedir(), '.hopcode');
+// Project-level .hopcode directory in the workspace
+const WORKSPACE_HOPCODE_DIR = path.join(projectRoot, '.hopcode');
 
-// Telemetry artifacts are stored in a hashed directory under the user's ~/.qwen/tmp
-export const OTEL_DIR = path.join(USER_GEMINI_DIR, 'tmp', projectHash, 'otel');
+// Telemetry artifacts are stored in a hashed directory under the user's ~/.hopcode/tmp
+export const OTEL_DIR = path.join(USER_HOPCODE_DIR, 'tmp', projectHash, 'otel');
 export const BIN_DIR = path.join(OTEL_DIR, 'bin');
 
-// Workspace settings remain in the project's .gemini directory
+// Workspace settings remain in the project's .hopcode directory
 export const WORKSPACE_SETTINGS_FILE = path.join(
-  WORKSPACE_QWEN_DIR,
+  WORKSPACE_HOPCODE_DIR,
   'settings.json',
 );
 

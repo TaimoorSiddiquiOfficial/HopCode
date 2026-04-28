@@ -617,7 +617,7 @@ Sandboxing isolates tool execution:
 
 ```bash
 # Enable sandboxing
-export QWEN_SANDBOX=true
+export HOPCODE_SANDBOX=true
 
 # Or in settings.json
 {

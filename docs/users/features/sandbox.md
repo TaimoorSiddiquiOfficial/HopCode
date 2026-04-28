@@ -65,10 +65,10 @@ The container sandbox mounts your workspace and your `~/.hopcode` directory into
 
 ```bash
 # Enable sandboxing with command flag
-qwen -s -p "analyze the code structure"
+hopcode -s -p "analyze the code structure"
 
 # Or enable sandboxing for your shell session (recommended for CI / scripts)
-export QWEN_SANDBOX=true   # true auto-picks a provider (see notes below)
+export HOPCODE_SANDBOX=true   # true auto-picks a provider (see notes below)
 hopcode -p "run the test suite"
 
 # Configure in settings.json
@@ -83,28 +83,27 @@ hopcode -p "run the test suite"
 >
 > **Provider selection notes:**
 >
-> - On **macOS**, `QWEN_SANDBOX=true` typically selects `sandbox-exec` (Seatbelt) if available.
-> - On **Linux/Windows**, `QWEN_SANDBOX=true` requires `docker` or `podman` to be installed.
-> - To force a provider, set `QWEN_SANDBOX=docker|podman|sandbox-exec`.
+> - On **macOS**, `HOPCODE_SANDBOX=true` typically selects `sandbox-exec` (Seatbelt) if available.
+> - On **Linux/Windows**, `HOPCODE_SANDBOX=true` requires `docker` or `podman` to be installed.
+> - To force a provider, set `HOPCODE_SANDBOX=docker|podman|sandbox-exec`.
 
 ## Configuration
 
 ### Enable sandboxing (in order of precedence)
 
-1. **Environment variable**: `QWEN_SANDBOX=true|false|docker|podman|sandbox-exec`
+1. **Environment variable**: `HOPCODE_SANDBOX=true|false|docker|podman|sandbox-exec`
 2. **Command flag / argument**: `-s`, `--sandbox`, or `--sandbox=<provider>`
 3. **Settings file**: `tools.sandbox` in your `settings.json` (e.g., `{"tools": {"sandbox": true}}`).
 
 > [!important]
 >
-> If `QWEN_SANDBOX` is set, it **overrides** the CLI flag and `settings.json`.
+> If `HOPCODE_SANDBOX` is set, it **overrides** the CLI flag and `settings.json`.
 
 ### Configure the sandbox image (Docker/Podman)
 
 - **CLI flag**: `--sandbox-image <image>`
-- **Environment variable**: `QWEN_SANDBOX_IMAGE=<image>`
-- **Settings file**: `tools.sandboxImage` in your `settings.json` (e.g., `{"tools": {"sandboxImage": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.18.9"}}`)
-  4. Built-in default image from the CLI package (for example `ghcr.io/taimoorsiddiquiofficial/hopcode:<version>`)
+- **Environment variable**: `HOPCODE_SANDBOX_IMAGE=<image>`
+- **Settings file**: `tools.sandboxImage` in your `settings.json` (e.g., `{"tools": {"sandboxImage": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.18.9"}}`) 4. Built-in default image from the CLI package (for example `ghcr.io/taimoorsiddiquiofficial/hopcode:<version>`)
 
   ## Building custom sandbox images
 
@@ -173,7 +172,7 @@ RUN apt-get update && \
 Then rebuild the sandbox image:
 
 ```bash
-QWEN_SANDBOX=docker BUILD_SANDBOX=1 qwen -s
+HOPCODE_SANDBOX=docker BUILD_SANDBOX=1 hopcode -s
 ```
 
 For more details on customizing the sandbox, see [Customizing the sandbox environment](/developers/tools/sandbox).
@@ -186,7 +185,7 @@ For more details on customizing the sandbox, see [Customizing the sandbox enviro
 ### Debug mode
 
 ```bash
-DEBUG=1 qwen -s -p "debug command"
+DEBUG=1 hopcode -s -p "debug command"
 ```
 
 **Note:** If you have `DEBUG=true` in a project's `.env` file, it won't affect the CLI due to automatic exclusion. Use `.hopcode/.env` files for HopCode-specific debug settings.
@@ -195,10 +194,10 @@ DEBUG=1 qwen -s -p "debug command"
 
 ```bash
 # Check environment
-qwen -s -p "run shell command: env | grep SANDBOX"
+hopcode -s -p "run shell command: env | grep SANDBOX"
 
 # List mounts
-qwen -s -p "run shell command: mount | grep workspace"
+hopcode -s -p "run shell command: mount | grep workspace"
 ```
 
 ## Security notes
