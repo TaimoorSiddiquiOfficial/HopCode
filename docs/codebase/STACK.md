@@ -19,7 +19,7 @@
 | ------------------------------ | ------- | ------------------------------------------------------------------- |
 | `@hoptrendy/hopcode-cli`       | 0.15.3  | CLI entry point with Ink-based terminal UI                          |
 | `@hoptrendy/hopcode-core`      | 0.15.3  | Core logic: providers, agents, tools, MCP                           |
-| `@hoptrendy/sdk`               | 0.15.1  | TypeScript SDK for programmatic access                              |
+| `@hoptrendy/sdk`               | 0.19.5  | TypeScript SDK for programmatic access                              |
 | `hopcode-vscode-ide-companion` | 0.15.3  | VS Code extension (native sidebar integration)                      |
 | `@hoptrendy/web-templates`     | -       | Web UI component templates                                          |
 | `@hoptrendy/webui`             | -       | Shared web UI components                                            |

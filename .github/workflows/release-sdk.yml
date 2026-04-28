@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'The version to release (e.g., v0.1.11 or v0.1.11-preview.0). Required for manual patch releases.'
+        description: 'The version to release (e.g., v0.19.5 or v0.19.5-preview.0). Required for manual patch releases.'
         required: false
         type: 'string'
       ref:
