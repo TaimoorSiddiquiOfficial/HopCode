@@ -36,7 +36,7 @@ export const ArenaAgentCard: React.FC<ArenaAgentCardProps> = ({
       {/* Line 1: Status icon + text + label + duration */}
       <Box>
         <Text color={color}>
-          {icon} {agent.label} · {text} · {duration}
+          {icon} {agent.label} Â· {text} Â· {duration}
         </Text>
       </Box>
 
@@ -297,7 +297,7 @@ export const ArenaSessionCard: React.FC<ArenaSessionCardProps> = ({
                   :{' '}
                 </Text>
                 <Text color={theme.text.primary}>
-                  {agent.totalTokens.toLocaleString()} tokens · runtime{' '}
+                  {agent.totalTokens.toLocaleString()} tokens Â· runtime{' '}
                   {formatDuration(agent.durationMs)}
                 </Text>
               </Box>

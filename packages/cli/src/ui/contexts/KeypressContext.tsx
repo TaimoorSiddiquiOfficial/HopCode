@@ -165,7 +165,7 @@ export function KeypressProvider({
 
   useEffect(() => {
     const wasRaw = stdin.isRaw;
-    if (wasRaw === false) {
+    if (wasRaw !== true) {
       setRawMode(true);
     }
 

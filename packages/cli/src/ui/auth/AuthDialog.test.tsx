@@ -35,6 +35,7 @@ const createMockUIActions = (overrides: Partial<UIActions> = {}): UIActions => {
     handleCodingPlanSubmit: vi.fn(),
     handleAlibabaStandardSubmit: vi.fn(),
     handleOpenRouterSubmit: vi.fn(),
+    handleCustomApiKeySubmit: vi.fn(),
     onAuthError: vi.fn(),
     handleRetryLastPrompt: vi.fn(),
   } as Partial<UIActions>;

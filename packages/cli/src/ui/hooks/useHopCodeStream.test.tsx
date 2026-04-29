@@ -210,6 +210,7 @@ describe('useHopCodeStream', () => {
       getBackgroundTaskRegistry: vi.fn(() => ({
         setNotificationCallback: vi.fn(),
       })),
+      getEmitToolUseSummaries: vi.fn(() => true),
     } as unknown as Config;
     mockOnDebugMessage = vi.fn();
     mockHandleSlashCommand = vi.fn().mockResolvedValue(false);

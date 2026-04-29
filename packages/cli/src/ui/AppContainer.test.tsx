@@ -162,8 +162,8 @@ describe('AppContainer State Management', () => {
     vi.mock('../utils/windowTitle.js', async () => ({
       computeWindowTitle: vi.fn(
         (folderName: string) =>
-          // Default behavior: return "Gemini - {folderName}" unless CLI_TITLE is set
-          process.env['CLI_TITLE'] || `Gemini - ${folderName}`,
+          // Default behavior: return "HopCode - {folderName}" unless CLI_TITLE is set
+          process.env['CLI_TITLE'] || `HopCode - ${folderName}`,
       ),
     }));
 
@@ -233,10 +233,16 @@ describe('AppContainer State Management', () => {
       streamingState: 'idle',
       submitQuery: vi.fn(),
       initError: null,
-      pendingHistoryItems: [],
+      pendingGeminiHistoryItems: [],
       thought: null,
       cancelOngoingRequest: vi.fn(),
       retryLastPrompt: vi.fn(),
+      handleApprovalModeChange: vi.fn(),
+      activePtyId: undefined,
+      loopDetectionConfirmationRequest: null,
+      pendingToolCalls: [],
+      streamingResponseLengthRef: { current: 0 },
+      isReceivingContent: false,
     });
     mockedUseVim.mockReturnValue({ handleInput: vi.fn() });
     mockedUseFolderTrust.mockReturnValue({
@@ -535,10 +541,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: mockSubmitQuery,
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
       mockedUseMessageQueue.mockReturnValue({
         messageQueue: [],
@@ -573,10 +585,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'idle',
         submitQuery: mockSubmitQuery,
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
       mockedUseMessageQueue.mockReturnValue({
         messageQueue: [],
@@ -693,10 +711,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
       mockedUseMessageQueue.mockReturnValue({
         messageQueue: [],
@@ -748,10 +772,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
       mockedUseMessageQueue.mockReturnValue({
         messageQueue: ['queued follow-up'],
@@ -805,7 +835,7 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [
+        pendingGeminiHistoryItems: [
           {
             type: 'tool_group',
             tools: [
@@ -824,6 +854,12 @@ describe('AppContainer State Management', () => {
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
       mockedUseMessageQueue.mockReturnValue({
         messageQueue: ['/model', 'hi'],
@@ -868,10 +904,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
       mockedUseMessageQueue.mockReturnValue({
         messageQueue: ['queued follow-up'],
@@ -1089,10 +1131,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: { subject: thoughtSubject },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       // Act: Render the container
@@ -1135,10 +1183,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'idle',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       // Act: Render the container
@@ -1157,7 +1211,7 @@ describe('AppContainer State Management', () => {
       );
       expect(titleWrites).toHaveLength(1);
       expect(titleWrites[0][0]).toBe(
-        `\x1b]2;${'Gemini - workspace'.padEnd(80, ' ')}\x07`,
+        `\x1b]2;${'HopCode - workspace'.padEnd(80, ' ')}\x07`,
       );
       unmount();
     });
@@ -1182,10 +1236,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'waitingForConfirmation',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: { subject: thoughtSubject },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       // Act: Render the container
@@ -1229,10 +1289,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: { subject: shortTitle },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       // Act: Render the container
@@ -1280,10 +1346,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: { subject: title },
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       // Act: Render the container
@@ -1321,17 +1393,23 @@ describe('AppContainer State Management', () => {
       } as unknown as LoadedSettings;
 
       // Mock CLI_TITLE environment variable
-      vi.stubEnv('CLI_TITLE', 'Custom Gemini Title');
+      vi.stubEnv('CLI_TITLE', 'Custom HopCode Title');
 
       // Mock the streaming state as Idle with no thought
       mockedUseGeminiStream.mockReturnValue({
         streamingState: 'idle',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       // Act: Render the container
@@ -1350,7 +1428,7 @@ describe('AppContainer State Management', () => {
       );
       expect(titleWrites).toHaveLength(1);
       expect(titleWrites[0][0]).toBe(
-        `\x1b]2;${'Custom Gemini Title'.padEnd(80, ' ')}\x07`,
+        `\x1b]2;${'Custom HopCode Title'.padEnd(80, ' ')}\x07`,
       );
       unmount();
     });
@@ -1370,11 +1448,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'idle',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
         activePtyId: 'some-id',
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       render(
@@ -1512,10 +1595,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: mockCancelOngoingRequest,
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        pendingToolCalls: [],
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       const mockHandleSlashCommand = vi.fn();

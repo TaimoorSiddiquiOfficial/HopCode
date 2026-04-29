@@ -477,7 +477,7 @@ describe('useSlashCommandProcessor', () => {
         setHistory: vi.fn(),
         stripThoughtsFromHistory: vi.fn(),
       } as unknown as HopCodeClient;
-      vi.spyOn(mockConfig, 'getHopCodeClient').mockReturnValue(mockClient);
+      vi.spyOn(mockConfig, 'getGeminiClient').mockReturnValue(mockClient);
 
       const command = createTestCommand({
         name: 'load',
@@ -506,7 +506,7 @@ describe('useSlashCommandProcessor', () => {
         setHistory: vi.fn(),
         stripThoughtsFromHistory: vi.fn(),
       } as unknown as HopCodeClient;
-      vi.spyOn(mockConfig, 'getHopCodeClient').mockReturnValue(mockClient);
+      vi.spyOn(mockConfig, 'getGeminiClient').mockReturnValue(mockClient);
 
       const historyWithThoughts = [
         {

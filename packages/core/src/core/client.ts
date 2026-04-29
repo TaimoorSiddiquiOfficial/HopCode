@@ -266,7 +266,9 @@ export class HopCodeClient {
     // Build extra injections: capability manifest + permission blocker note
     const extraSections = this.buildSystemPromptExtras();
     const fullAppend = appendSystemPrompt
-      ? `${appendSystemPrompt}\n\n${extraSections}`
+      ? extraSections
+        ? `${appendSystemPrompt}\n\n${extraSections}`
+        : appendSystemPrompt
       : extraSections || undefined;
 
     if (overrideSystemPrompt) {

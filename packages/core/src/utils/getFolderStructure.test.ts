@@ -48,10 +48,10 @@ describe('getFolderStructure', () => {
 Showing up to 20 items:
 
 ${testRootDir}${path.sep}
-+---fileA1.ts
-+---fileA2.js
-+---subfolderB${path.sep}
-    +---fileB1.md
+├───fileA1.ts
+├───fileA2.js
+└───subfolderB${path.sep}
+    └───fileB1.md
 `.trim(),
     );
   });
@@ -84,15 +84,15 @@ ${testRootDir}${path.sep}
 Showing up to 20 items:
 
 ${testRootDir}${path.sep}
-+---.hiddenfile
-+---file1.txt
-+---emptyFolder${path.sep}
-+---node_modules${path.sep}...
-+---subfolderA${path.sep}
-    +---fileA1.ts
-    +---fileA2.js
-    +---subfolderB${path.sep}
-        +---fileB1.md
+├───.hiddenfile
+├───file1.txt
+├───emptyFolder${path.sep}
+├───node_modules${path.sep}...
+└───subfolderA${path.sep}
+    ├───fileA1.ts
+    ├───fileA2.js
+    └───subfolderB${path.sep}
+        └───fileB1.md
 `.trim(),
     );
   });
@@ -111,11 +111,11 @@ ${testRootDir}${path.sep}
 Showing up to 20 items:
 
 ${testRootDir}${path.sep}
-+---.hiddenfile
-+---file1.txt
-+---emptyFolder${path.sep}
-+---node_modules${path.sep}...
-+---subfolderA${path.sep}...
+├───.hiddenfile
+├───file1.txt
+├───emptyFolder${path.sep}
+├───node_modules${path.sep}...
+└───subfolderA${path.sep}...
 `.trim();
     expect(structure.trim()).toBe(expected);
   });
@@ -132,8 +132,8 @@ ${testRootDir}${path.sep}
 Showing up to 20 items:
 
 ${testRootDir}${path.sep}
-+---fileA1.ts
-+---subfolderB${path.sep}
+├───fileA1.ts
+└───subfolderB${path.sep}
 `.trim();
     expect(structure.trim()).toBe(expected);
   });
@@ -150,9 +150,9 @@ ${testRootDir}${path.sep}
 Showing up to 3 items:
 
 ${testRootDir}${path.sep}
-+---fileA1.ts
-+---fileA2.js
-+---subfolderB${path.sep}
+├───fileA1.ts
+├───fileA2.js
+└───subfolderB${path.sep}
 `.trim();
     expect(structure.trim()).toBe(expected);
   });
@@ -169,11 +169,11 @@ ${testRootDir}${path.sep}
 Showing up to 4 items:
 
 ${testRootDir}${path.sep}
-+---folder-0${path.sep}
-+---folder-1${path.sep}
-+---folder-2${path.sep}
-+---folder-3${path.sep}
-+---...
+├───folder-0${path.sep}
+├───folder-1${path.sep}
+├───folder-2${path.sep}
+├───folder-3${path.sep}
+└───...
 `.trim();
     expect(structure.trim()).toBe(expectedRevised);
   });
@@ -190,9 +190,9 @@ ${testRootDir}${path.sep}
 Showing up to 1 items:
 
 ${testRootDir}${path.sep}
-+---fileA1.ts
-+---...
-+---...
+├───fileA1.ts
+├───...
+└───...
 `.trim();
     expect(structure.trim()).toBe(expected);
   });
@@ -215,10 +215,10 @@ ${testRootDir}${path.sep}
 Showing up to 10 items:
 
 ${testRootDir}${path.sep}
-+---level1${path.sep}
-    +---level2${path.sep}
-        +---level3${path.sep}
-            +---file.txt
+└───level1${path.sep}
+    └───level2${path.sep}
+        └───level3${path.sep}
+            └───file.txt
 `.trim();
     expect(structure.trim()).toBe(expected);
   });
@@ -233,9 +233,9 @@ ${testRootDir}${path.sep}
 Showing up to 3 items:
 
 ${testRootDir}${path.sep}
-+---level1${path.sep}
-    +---level2${path.sep}
-        +---level3${path.sep}
+└───level1${path.sep}
+    └───level2${path.sep}
+        └───level3${path.sep}
 `.trim();
     expect(structure.trim()).toBe(expected);
   });
