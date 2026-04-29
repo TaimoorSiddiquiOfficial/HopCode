@@ -6,14 +6,110 @@
 
 /* eslint-disable no-control-regex */
 
-import { render } from 'ink-testing-library';
 import type React from 'react';
+import { EventEmitter } from 'node:events';
+import { render as inkRender } from 'ink';
 import type { Config } from '@hoptrendy/hopcode-core';
 import { LoadedSettings } from '../config/settings.js';
 import { KeypressProvider } from '../ui/contexts/KeypressContext.js';
 import { SettingsContext } from '../ui/contexts/SettingsContext.js';
 import { ShellFocusContext } from '../ui/contexts/ShellFocusContext.js';
 import { ConfigContext } from '../ui/contexts/ConfigContext.js';
+
+// ---------------------------------------------------------------------------
+// Re-implement ink-testing-library's render using the CLI's own `ink` module.
+// This ensures `StdinContext` identity matches between the test harness
+// (ink@6.8.0 in packages/cli/node_modules/ink) and the KeypressProvider,
+// so the stdin.write() → keypress patch actually targets the right object.
+// ---------------------------------------------------------------------------
+
+class Stdout extends EventEmitter {
+  get columns() {
+    return 100;
+  }
+  frames: string[] = [];
+  _lastFrame: string | undefined;
+  write = (frame: string) => {
+    this.frames.push(frame);
+    this._lastFrame = frame;
+  };
+  lastFrame = (): string | undefined => this._lastFrame;
+}
+
+class Stderr extends EventEmitter {
+  frames: string[] = [];
+  _lastFrame: string | undefined;
+  write = (frame: string) => {
+    this.frames.push(frame);
+    this._lastFrame = frame;
+  };
+  lastFrame = (): string | undefined => this._lastFrame;
+}
+
+class Stdin extends EventEmitter {
+  isTTY = true;
+  data: Buffer | string | null = null;
+  constructor(options: { isTTY?: boolean } = {}) {
+    super();
+    this.isTTY = options.isTTY ?? true;
+  }
+  write = (data: string) => {
+    this.data = data;
+    this.emit('readable');
+    this.emit('data', data);
+  };
+  setEncoding() {}
+  setRawMode() {}
+  resume() {}
+  pause() {}
+  ref() {}
+  unref() {}
+  read = () => {
+    const { data } = this;
+    this.data = null;
+    return data;
+  };
+}
+
+const instances: Array<ReturnType<typeof inkRender>> = [];
+
+function render(tree: React.ReactNode) {
+  const stdout = new Stdout();
+  const stderr = new Stderr();
+  const stdin = new Stdin();
+
+  const instance = inkRender(tree, {
+    stdout: stdout as unknown as NodeJS.WriteStream,
+    stderr: stderr as unknown as NodeJS.WriteStream,
+    stdin: stdin as unknown as NodeJS.ReadStream,
+    debug: true,
+    exitOnCtrlC: false,
+    patchConsole: false,
+  });
+
+  instances.push(instance);
+
+  return {
+    rerender: instance.rerender,
+    unmount: instance.unmount,
+     
+    cleanup: instance.cleanup,
+    stdout,
+    stderr,
+    stdin,
+    frames: stdout.frames,
+    lastFrame: stdout.lastFrame,
+  };
+}
+
+export function cleanup() {
+  for (const instance of instances) {
+    instance.unmount();
+     
+    instance.cleanup?.();
+  }
+  instances.length = 0;
+}
 
 const mockSettings = new LoadedSettings(
   { path: '', settings: {}, originalSettings: {} },
@@ -182,7 +278,7 @@ export const renderWithProviders = (
     settings?: LoadedSettings;
     config?: Config;
   } = {},
-): ReturnType<typeof render> => {
+) => {
   const result = render(
     <SettingsContext.Provider value={settings}>
       <ConfigContext.Provider value={config}>
@@ -196,21 +292,24 @@ export const renderWithProviders = (
   );
 
   // Patch the mock stdin to emit 'keypress' events when data is written.
-  // This bridges ink-testing-library's stdin.write() to the KeypressProvider's
-  // event handling, which relies on readline's emitKeypressEvents in production
-  // but that doesn't work with the test mock stdin.
+  // The stock Mock stdin.write() emits 'data' which readline would convert
+  // to keypress events. But readline.emitKeypressEvents installs its internal
+  // 'data' listener on construction — we can't remove it. If we emit 'data'
+  // AND 'keypress', every write produces two keypresses, which breaks toggle
+  // (p toggles preview on→off), counts (toHaveBeenCalledTimes(1) sees 2), etc.
+  //
+  // Solution: override write() to emit 'keypress' directly and set stdin.data
+  // for ink's internal read() path, BUT skip the original write (no 'data'
+  // event) so readline doesn't produce a duplicate keypress.
   const origStdin = result.stdin;
-  const originalWrite = origStdin.write.bind(origStdin);
   origStdin.write = (data: string) => {
-    const str = data;
-    const keys = parseKeys(str);
-    // Emit keypress events directly on the stdin so KeypressProvider
-    // receives them. This bypasses the broken readline integration.
+    const keys = parseKeys(data);
     for (const key of keys) {
       origStdin.emit('keypress', null, key);
     }
-    // Also call the original write so ink's internal handling works.
-    return originalWrite(data);
+    // Set data so stdin.read() returns the last written data for ink internals.
+    (origStdin as unknown as { data: unknown }).data = data;
+    return true;
   };
 
   return result;

@@ -66,11 +66,11 @@ export function getStatusColor(
 export function getStatusIcon(status: string): string {
   switch (status) {
     case 'connected':
-      return '?';
+      return '\u2713';
     case 'connecting':
-      return '…';
+      return '\u2026';
     case 'disconnected':
-      return '?';
+      return '\u2717';
     default:
       return '?';
   }

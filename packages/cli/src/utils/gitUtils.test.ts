@@ -217,23 +217,19 @@ describe('getLatestRelease', async () => {
     vi.restoreAllMocks();
   });
 
-  it('throws an error if the fetch fails', async () => {
+  it('falls back to main when the fetch fails', async () => {
     global.fetch = vi.fn(() => Promise.reject('nope'));
-    await expect(getLatestGitHubRelease()).rejects.toThrowError(
-      /Unable to determine the latest/,
-    );
+    await expect(getLatestGitHubRelease()).resolves.toBe('main');
   });
 
-  it('throws an error if the fetch does not return a json body', async () => {
+  it('falls back to main when the response has no tag_name', async () => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ foo: 'bar' }),
       } as Response),
     );
-    await expect(getLatestGitHubRelease()).rejects.toThrowError(
-      /Unable to determine the latest/,
-    );
+    await expect(getLatestGitHubRelease()).resolves.toBe('main');
   });
 
   it('returns the release version', async () => {
