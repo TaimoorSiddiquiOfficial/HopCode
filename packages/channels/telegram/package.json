@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-telegram",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "description": "Telegram channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",
