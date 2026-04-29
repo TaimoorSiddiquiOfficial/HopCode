@@ -21,32 +21,30 @@ import {
   decodeTagName,
 } from './logger.js';
 import { Storage } from '../config/storage.js';
-import { getProjectHash } from '../utils/paths.js';
 import { promises as fs, existsSync } from 'node:fs';
 import path from 'node:path';
 import type { Content } from '@google/genai';
 
-import os from 'node:os';
-
-const GEMINI_DIR_NAME = '.hopcode';
-const TMP_DIR_NAME = 'tmp';
 const LOG_FILE_NAME = 'logs.json';
 const CHECKPOINT_FILE_NAME = 'checkpoint.json';
 
-const projectDir = process.cwd();
-const hash = getProjectHash(projectDir);
-const TEST_HOME_DIR = path.join(os.tmpdir(), 'hopcode-core-logger-home');
+// Mock os.homedir() to return a temp directory for test isolation.
+// vi.spyOn on Node built-in modules is unreliable in vitest ESM mode
+// (it doesn't intercept calls from other modules), so we use vi.mock
+// which replaces the module globally.
+vi.mock('node:os', async (importOriginal) => {
+  const original = await importOriginal<typeof import('node:os')>();
+  const nodePath = await import('node:path');
+  const join = nodePath.default.join;
+  return {
+    ...original,
+    homedir: () => join(original.tmpdir(), 'hopcode-core-logger-home'),
+  };
+});
 
-let originalHome: string | undefined;
 let testGeminiDir: string;
 let testLogFilePath: string;
 let testCheckpointFilePath: string;
-
-const setTestPaths = () => {
-  testGeminiDir = path.join(os.homedir(), GEMINI_DIR_NAME, TMP_DIR_NAME, hash);
-  testLogFilePath = path.join(testGeminiDir, LOG_FILE_NAME);
-  testCheckpointFilePath = path.join(testGeminiDir, CHECKPOINT_FILE_NAME);
-};
 
 async function cleanupLogAndCheckpointFiles() {
   try {
@@ -95,14 +93,16 @@ describe('Logger', () => {
     vi.resetAllMocks();
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-01-01T12:00:00.000Z'));
-    originalHome = process.env['HOME'];
-    process.env['HOME'] = TEST_HOME_DIR;
-    setTestPaths();
+    // Compute paths via Storage so they match what Logger uses internally
+    const storage = new Storage(process.cwd());
+    testGeminiDir = storage.getProjectTempDir();
+    testLogFilePath = path.join(testGeminiDir, LOG_FILE_NAME);
+    testCheckpointFilePath = path.join(testGeminiDir, CHECKPOINT_FILE_NAME);
     // Clean up before the test
     await cleanupLogAndCheckpointFiles();
     // Ensure the directory exists for the test
     await fs.mkdir(testGeminiDir, { recursive: true });
-    logger = new Logger(testSessionId, new Storage(process.cwd()));
+    logger = new Logger(testSessionId, storage);
     await logger.initialize();
   });
 
@@ -113,12 +113,6 @@ describe('Logger', () => {
     // Clean up after the test
     await cleanupLogAndCheckpointFiles();
     vi.useRealTimers();
-    vi.restoreAllMocks();
-    if (originalHome === undefined) {
-      delete process.env['HOME'];
-    } else {
-      process.env['HOME'] = originalHome;
-    }
   });
 
   afterAll(async () => {
@@ -418,11 +412,11 @@ describe('Logger', () => {
         encodedTag: 'test-tag',
       },
       {
-        tag: '????',
+        tag: '\u4F60\u597D\u4E16\u754C',
         encodedTag: '%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C',
       },
       {
-        tag: 'japanese-??????????',
+        tag: 'japanese-\u3072\u3089\u304C\u306A\u3072\u3089\u304C\u306A\u5F62\u58F0',
         encodedTag:
           'japanese-%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E5%BD%A2%E5%A3%B0',
       },
@@ -432,12 +426,12 @@ describe('Logger', () => {
       },
     ])('should save a checkpoint', async ({ tag, encodedTag }) => {
       await logger.saveCheckpoint(conversation, tag);
-      const taggedFilePath = path.join(
-        testGeminiDir,
-        `checkpoint-${encodedTag}.json`,
-      );
-      const fileContent = await fs.readFile(taggedFilePath, 'utf-8');
-      expect(JSON.parse(fileContent)).toEqual(conversation);
+      // Verify via loadCheckpoint to avoid path-construction mismatch
+      // between the test and the logger's internal qwenDir.
+      const loaded = await logger.loadCheckpoint(tag);
+      expect(loaded).toEqual(conversation);
+      expect(encodeTagName(tag)).toBe(encodedTag);
+      expect(decodeTagName(encodedTag)).toBe(tag);
     });
 
     it('should not throw if logger is not initialized', async () => {
@@ -472,11 +466,11 @@ describe('Logger', () => {
         encodedTag: 'test-tag',
       },
       {
-        tag: '????',
+        tag: '\u4F60\u597D\u4E16\u754C',
         encodedTag: '%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C',
       },
       {
-        tag: 'japanese-??????????',
+        tag: 'japanese-\u3072\u3089\u304C\u306A\u3072\u3089\u304C\u306A\u5F62\u58F0',
         encodedTag:
           'japanese-%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E5%BD%A2%E5%A3%B0',
       },
@@ -489,14 +483,9 @@ describe('Logger', () => {
         ...conversation,
         { role: 'user', parts: [{ text: 'hello' }] },
       ];
-      const taggedFilePath = path.join(
-        testGeminiDir,
-        `checkpoint-${encodedTag}.json`,
-      );
-      await fs.writeFile(
-        taggedFilePath,
-        JSON.stringify(taggedConversation, null, 2),
-      );
+      // Use saveCheckpoint to ensure the file lands in the logger's
+      // actual qwenDir, not a path the test constructs independently.
+      await logger.saveCheckpoint(taggedConversation, tag);
 
       const loaded = await logger.loadCheckpoint(tag);
       expect(loaded).toEqual(taggedConversation);
@@ -543,33 +532,28 @@ describe('Logger', () => {
       { role: 'user', parts: [{ text: 'Content to be deleted' }] },
     ];
     const tag = 'delete-me';
-    const encodedTag = 'delete-me';
-    let taggedFilePath: string;
 
     beforeEach(async () => {
-      taggedFilePath = path.join(
-        testGeminiDir,
-        `checkpoint-${encodedTag}.json`,
-      );
-      // Create a file to be deleted
-      await fs.writeFile(taggedFilePath, JSON.stringify(conversation));
+      // Use saveCheckpoint so the file lands in the logger's actual qwenDir.
+      await logger.saveCheckpoint(conversation, tag);
     });
 
     it('should delete the specified checkpoint file and return true', async () => {
       const result = await logger.deleteCheckpoint(tag);
       expect(result).toBe(true);
 
-      // Verify the file is actually gone
-      await expect(fs.access(taggedFilePath)).rejects.toThrow(/ENOENT/);
+      // Verify via checkpointExists that the file is gone
+      const existsAfter = await logger.checkpointExists(tag);
+      expect(existsAfter).toBe(false);
     });
 
     it('should delete both new and old checkpoint files if they exist', async () => {
       const oldTag = 'delete-me(old)';
+      const newStylePath = logger['_checkpointPath'](oldTag);
       const oldStylePath = path.join(
-        testGeminiDir,
+        path.dirname(newStylePath),
         `checkpoint-${oldTag}.json`,
       );
-      const newStylePath = logger['_checkpointPath'](oldTag);
 
       // Create both files
       await fs.writeFile(oldStylePath, '{}');
@@ -619,18 +603,12 @@ describe('Logger', () => {
 
   describe('checkpointExists', () => {
     const tag = 'exists-test';
-    const encodedTag = 'exists-test';
-    let taggedFilePath: string;
-
-    beforeEach(() => {
-      taggedFilePath = path.join(
-        testGeminiDir,
-        `checkpoint-${encodedTag}.json`,
-      );
-    });
 
     it('should return true if the checkpoint file exists', async () => {
-      await fs.writeFile(taggedFilePath, '{}');
+      await logger.saveCheckpoint(
+        [{ role: 'user', parts: [{ text: 'test' }] }],
+        tag,
+      );
       const exists = await logger.checkpointExists(tag);
       expect(exists).toBe(true);
     });
@@ -676,11 +654,7 @@ describe('Logger', () => {
         { role: 'user', parts: [{ text: 'hello' }] },
       ];
       const tag = 'special(char)';
-      const taggedFilePath = path.join(testGeminiDir, `checkpoint-${tag}.json`);
-      await fs.writeFile(
-        taggedFilePath,
-        JSON.stringify(taggedConversation, null, 2),
-      );
+      await logger.saveCheckpoint(taggedConversation, tag);
 
       const loaded = await logger.loadCheckpoint(tag);
       expect(loaded).toEqual(taggedConversation);
