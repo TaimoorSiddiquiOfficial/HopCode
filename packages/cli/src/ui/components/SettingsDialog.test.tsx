@@ -26,6 +26,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SettingsDialog } from './SettingsDialog.js';
 import { LoadedSettings, SettingScope } from '../../config/settings.js';
 import { VimModeProvider } from '../contexts/VimModeContext.js';
+import { KeypressProvider } from '../contexts/KeypressContext.js';
 import { act } from 'react';
 import {
   getDialogSettingKeys,
@@ -1299,7 +1300,11 @@ describe('SettingsDialog', () => {
         {},
         {},
       );
-      rerender(<SettingsDialog settings={settings} onSelect={onSelect} />);
+      rerender(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
+      );
       await wait();
 
       // Press Escape to exit
