@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HopCodeContentGenerator } from './hopCodeContentGenerator.js';
+import { GeminiContentGenerator } from './geminiContentGenerator.js';
 import type {
   ContentGenerator,
   ContentGeneratorConfig,
@@ -12,12 +12,12 @@ import type {
 import type { Config } from '../../config/config.js';
 import { InstallationManager } from '../../utils/installationManager.js';
 
-export { HopCodeContentGenerator } from './hopCodeContentGenerator.js';
+export { GeminiContentGenerator } from './geminiContentGenerator.js';
 
 /**
  * Create a Gemini content generator.
  */
-export function createHopCodeContentGenerator(
+export function createGeminiContentGenerator(
   config: ContentGeneratorConfig,
   gcConfig: Config,
 ): ContentGenerator {
@@ -45,7 +45,7 @@ export function createHopCodeContentGenerator(
       }
     : { headers };
 
-  const geminiContentGenerator = new HopCodeContentGenerator(
+  const geminiContentGenerator = new GeminiContentGenerator(
     {
       apiKey: config.apiKey === '' ? undefined : config.apiKey,
       vertexai: config.vertexai,

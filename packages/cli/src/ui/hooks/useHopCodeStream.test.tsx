@@ -27,7 +27,7 @@ import type {
 import {
   ApprovalMode,
   AuthType,
-  HopCodeEventType as ServerHopCodeEventType,
+  GeminiEventType as ServerGeminiEventType,
   SendMessageType,
   ToolErrorType,
   ToolConfirmationOutcome,
@@ -1783,11 +1783,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'This is a truncated response...',
           };
           yield {
-            type: ServerHopCodeEventType.Finished,
+            type: ServerGeminiEventType.Finished,
             value: { reason: 'MAX_TOKENS', usageMetadata: undefined },
           };
         })(),
@@ -1838,11 +1838,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Complete response',
           };
           yield {
-            type: ServerHopCodeEventType.Finished,
+            type: ServerGeminiEventType.Finished,
             value: { reason: 'STOP', usageMetadata: undefined },
           };
         })(),
@@ -1891,11 +1891,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Response with unspecified finish',
           };
           yield {
-            type: ServerHopCodeEventType.Finished,
+            type: ServerGeminiEventType.Finished,
             value: {
               reason: 'FINISH_REASON_UNSPECIFIED',
               usageMetadata: undefined,
@@ -1990,11 +1990,11 @@ describe('useHopCodeStream', () => {
         mockSendMessageStream.mockReturnValue(
           (async function* () {
             yield {
-              type: ServerHopCodeEventType.Content,
+              type: ServerGeminiEventType.Content,
               value: `Response for ${reason}`,
             };
             yield {
-              type: ServerHopCodeEventType.Finished,
+              type: ServerGeminiEventType.Finished,
               value: { reason, usageMetadata: undefined },
             };
           })(),
@@ -2110,18 +2110,18 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Thought,
+            type: ServerGeminiEventType.Thought,
             value: {
               subject: 'Previous thought',
               description: 'Old description',
             },
           };
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Some response content',
           };
           yield {
-            type: ServerHopCodeEventType.Finished,
+            type: ServerGeminiEventType.Finished,
             value: { reason: 'STOP', usageMetadata: undefined },
           };
         })(),
@@ -2170,11 +2170,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'New response content',
           };
           yield {
-            type: ServerHopCodeEventType.Finished,
+            type: ServerGeminiEventType.Finished,
             value: { reason: 'STOP', usageMetadata: undefined },
           };
         })(),
@@ -2204,15 +2204,15 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Thought,
+            type: ServerGeminiEventType.Thought,
             value: { subject: '', description: 'thinking ' },
           };
           yield {
-            type: ServerHopCodeEventType.Thought,
+            type: ServerGeminiEventType.Thought,
             value: { subject: '', description: 'more' },
           };
           yield {
-            type: ServerHopCodeEventType.Finished,
+            type: ServerGeminiEventType.Finished,
             value: { reason: 'STOP', usageMetadata: undefined },
           };
         })(),
@@ -2258,7 +2258,7 @@ describe('useHopCodeStream', () => {
         mockSendMessageStream.mockReturnValue(
           (async function* () {
             yield {
-              type: ServerHopCodeEventType.Retry,
+              type: ServerGeminiEventType.Retry,
               retryInfo: {
                 message: '[API Error: Rate limit exceeded]',
                 attempt: 1,
@@ -2270,13 +2270,13 @@ describe('useHopCodeStream', () => {
               continueToRetryAttempt = resolve;
             });
             yield {
-              type: ServerHopCodeEventType.Retry,
+              type: ServerGeminiEventType.Retry,
             };
             await new Promise<void>((resolve) => {
               resolveStream = resolve;
             });
             yield {
-              type: ServerHopCodeEventType.Finished,
+              type: ServerGeminiEventType.Finished,
               value: { reason: 'STOP', usageMetadata: undefined },
             };
           })(),
@@ -2374,7 +2374,7 @@ describe('useHopCodeStream', () => {
         mockSendMessageStream.mockReturnValue(
           (async function* () {
             yield {
-              type: ServerHopCodeEventType.Retry,
+              type: ServerGeminiEventType.Retry,
               retryInfo: {
                 message: '[API Error: Rate limit exceeded]',
                 attempt: 1,
@@ -2386,14 +2386,14 @@ describe('useHopCodeStream', () => {
               continueAfterCountdown = resolve;
             });
             yield {
-              type: ServerHopCodeEventType.Retry,
+              type: ServerGeminiEventType.Retry,
             };
             yield {
-              type: ServerHopCodeEventType.Text,
+              type: ServerGeminiEventType.Text,
               value: 'Success after retry',
             };
             yield {
-              type: ServerHopCodeEventType.Finished,
+              type: ServerGeminiEventType.Finished,
               value: { reason: 'STOP', usageMetadata: undefined },
             };
           })(),
@@ -2535,10 +2535,10 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Thought,
+            type: ServerGeminiEventType.Thought,
             value: { subject: 'Some thought', description: 'Description' },
           };
-          yield { type: ServerHopCodeEventType.UserCancelled };
+          yield { type: ServerGeminiEventType.UserCancelled };
         })(),
       );
 
@@ -2590,11 +2590,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Thought,
+            type: ServerGeminiEventType.Thought,
             value: { subject: 'Some thought', description: 'Description' },
           };
           yield {
-            type: ServerHopCodeEventType.Error,
+            type: ServerGeminiEventType.Error,
             value: { error: { message: 'Test error' } },
           };
         })(),
@@ -2649,7 +2649,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValueOnce(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Error,
+            type: ServerGeminiEventType.Error,
             value: { error: { message: 'First error' } },
           };
         })(),
@@ -2695,7 +2695,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValueOnce(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Text,
+            type: ServerGeminiEventType.Text,
             value: 'Success response',
           };
         })(),
@@ -2726,7 +2726,7 @@ describe('useHopCodeStream', () => {
 
       const firstStream = (async function* () {
         yield {
-          type: ServerHopCodeEventType.Content,
+          type: ServerGeminiEventType.Content,
           value: 'First call content',
         };
         await firstCallPromise;
@@ -2779,7 +2779,7 @@ describe('useHopCodeStream', () => {
         mainAbortSignal = signal;
         return (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'First call content',
           };
           await firstCallPromise;
@@ -2835,21 +2835,21 @@ describe('useHopCodeStream', () => {
       // Mock a long-running stream for the first call
       const firstStream = (async function* () {
         yield {
-          type: ServerHopCodeEventType.Content,
+          type: ServerGeminiEventType.Content,
           value: 'First call content',
         };
         await firstCallPromise; // Wait until we manually resolve
-        yield { type: ServerHopCodeEventType.Finished, value: 'STOP' };
+        yield { type: ServerGeminiEventType.Finished, value: 'STOP' };
       })();
 
       // Mock a stream for the second call (should not be used)
       const secondStream = (async function* () {
         yield {
-          type: ServerHopCodeEventType.Content,
+          type: ServerGeminiEventType.Content,
           value: 'Second call content',
         };
         await secondCallPromise;
-        yield { type: ServerHopCodeEventType.Finished, value: 'STOP' };
+        yield { type: ServerGeminiEventType.Finished, value: 'STOP' };
       })();
 
       let callCount = 0;
@@ -2906,19 +2906,19 @@ describe('useHopCodeStream', () => {
         .mockReturnValueOnce(
           (async function* () {
             yield {
-              type: ServerHopCodeEventType.Content,
+              type: ServerGeminiEventType.Content,
               value: 'First response',
             };
-            yield { type: ServerHopCodeEventType.Finished, value: 'STOP' };
+            yield { type: ServerGeminiEventType.Finished, value: 'STOP' };
           })(),
         )
         .mockReturnValueOnce(
           (async function* () {
             yield {
-              type: ServerHopCodeEventType.Content,
+              type: ServerGeminiEventType.Content,
               value: 'Second response',
             };
-            yield { type: ServerHopCodeEventType.Finished, value: 'STOP' };
+            yield { type: ServerGeminiEventType.Finished, value: 'STOP' };
           })(),
         );
 
@@ -2993,11 +2993,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Some content',
           };
           yield {
-            type: ServerHopCodeEventType.LoopDetected,
+            type: ServerGeminiEventType.LoopDetected,
           };
         })(),
       );
@@ -3029,7 +3029,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValueOnce(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.LoopDetected,
+            type: ServerGeminiEventType.LoopDetected,
           };
         })(),
       );
@@ -3083,7 +3083,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.LoopDetected,
+            type: ServerGeminiEventType.LoopDetected,
           };
         })(),
       );
@@ -3129,7 +3129,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValueOnce(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.LoopDetected,
+            type: ServerGeminiEventType.LoopDetected,
           };
         })(),
       );
@@ -3165,7 +3165,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValueOnce(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.LoopDetected,
+            type: ServerGeminiEventType.LoopDetected,
           };
         })(),
       );
@@ -3202,11 +3202,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Some response content',
           };
           yield {
-            type: ServerHopCodeEventType.LoopDetected,
+            type: ServerGeminiEventType.LoopDetected,
           };
         })(),
       );
@@ -3240,7 +3240,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.UserPromptSubmitBlocked,
+            type: ServerGeminiEventType.UserPromptSubmitBlocked,
             value: {
               reason: 'Hook blocked due to security policy',
               originalPrompt: 'This is the original user prompt',
@@ -3274,11 +3274,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Partial response before block',
           };
           yield {
-            type: ServerHopCodeEventType.UserPromptSubmitBlocked,
+            type: ServerGeminiEventType.UserPromptSubmitBlocked,
             value: {
               reason: 'Security violation detected',
               originalPrompt: 'Execute system command',
@@ -3323,7 +3323,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.StopHookLoop,
+            type: ServerGeminiEventType.StopHookLoop,
             value: {
               iterationCount: 3,
               reasons: [
@@ -3366,11 +3366,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Initial response before loop',
           };
           yield {
-            type: ServerHopCodeEventType.StopHookLoop,
+            type: ServerGeminiEventType.StopHookLoop,
             value: {
               iterationCount: 5,
               reasons: ['Hook reason 1', 'Hook reason 2'],
@@ -3414,7 +3414,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.StopHookLoop,
+            type: ServerGeminiEventType.StopHookLoop,
             value: {
               iterationCount: 1,
               reasons: ['Single hook execution'],
@@ -3447,7 +3447,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.HookSystemMessage,
+            type: ServerGeminiEventType.HookSystemMessage,
             value: '🔄 Ralph iteration 3 | No completion promise set',
           };
         })(),
@@ -3476,11 +3476,11 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValue(
         (async function* () {
           yield {
-            type: ServerHopCodeEventType.Content,
+            type: ServerGeminiEventType.Content,
             value: 'Here is the response',
           };
           yield {
-            type: ServerHopCodeEventType.HookSystemMessage,
+            type: ServerGeminiEventType.HookSystemMessage,
             value: 'Stop hook feedback message',
           };
         })(),

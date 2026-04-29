@@ -13,7 +13,7 @@ import {
 } from 'node:fs';
 import type {
   Config,
-  ServerHopCodeStreamEvent,
+  ServerGeminiStreamEvent,
   ToolCallRequestInfo,
   ToolCallResponseInfo,
 } from '@hoptrendy/hopcode-core';
@@ -163,7 +163,7 @@ export class DualOutputBridge {
     }
   }
 
-  processEvent(event: ServerHopCodeStreamEvent): void {
+  processEvent(event: ServerGeminiStreamEvent): void {
     if (!this.active) return;
     try {
       this.adapter.processEvent(event);

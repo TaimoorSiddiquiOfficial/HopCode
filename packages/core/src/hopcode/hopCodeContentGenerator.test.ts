@@ -17,6 +17,7 @@ import type {
 } from '@google/genai';
 import { FinishReason } from '@google/genai';
 import type { HopCodeContentGenerator } from './hopCodeContentGenerator.js';
+import { HopCodeContentGenerator as HopCodeGeneratorClass } from './hopCodeContentGenerator.js';
 import { SharedTokenManager } from './sharedTokenManager.js';
 import type { Config } from '../config/config.js';
 import { AuthType } from '../core/contentGenerator.js';
@@ -344,7 +345,7 @@ describe('HopCodeContentGenerator', () => {
       timeout: 120000,
       maxRetries: 3,
     };
-    HopCodeContentGenerator = new HopCodeContentGenerator(
+    HopCodeContentGenerator = new HopCodeGeneratorClass(
       mockQwenClient,
       contentGeneratorConfig,
       mockConfig,
@@ -1129,7 +1130,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       // Create new instance to pick up the mock
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1164,7 +1165,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1197,7 +1198,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1501,7 +1502,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1522,7 +1523,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1545,7 +1546,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1566,7 +1567,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1582,7 +1583,7 @@ describe('HopCodeContentGenerator', () => {
 
   describe('Constructor and Initialization', () => {
     it('should initialize with configured base URL when provided', () => {
-      const generator = new HopCodeContentGenerator(
+      const generator = new HopCodeGeneratorClass(
         mockQwenClient,
         {
           model: 'qwen-turbo',
@@ -1602,7 +1603,7 @@ describe('HopCodeContentGenerator', () => {
     });
 
     it('should get SharedTokenManager instance', () => {
-      const generator = new HopCodeContentGenerator(
+      const generator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1628,7 +1629,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
@@ -1657,7 +1658,7 @@ describe('HopCodeContentGenerator', () => {
         .fn()
         .mockReturnValue(mockTokenManager);
 
-      const newGenerator = new HopCodeContentGenerator(
+      const newGenerator = new HopCodeGeneratorClass(
         mockQwenClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,

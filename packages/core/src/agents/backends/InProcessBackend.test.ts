@@ -19,6 +19,13 @@ vi.mock('../../core/contentGenerator.js', () => ({
   createContentGenerator: vi.fn().mockResolvedValue({
     generateContentStream: vi.fn(),
   }),
+  AuthType: {
+    USE_OPENAI: 'openai',
+    HOPCODE_OAUTH: 'qwen-oauth',
+    USE_GEMINI: 'gemini',
+    USE_VERTEX_AI: 'vertex-ai',
+    USE_ANTHROPIC: 'anthropic',
+  },
 }));
 
 // Mock AgentCore and AgentInteractive to avoid real model calls.

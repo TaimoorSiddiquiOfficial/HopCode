@@ -5,7 +5,7 @@
  */
 
 import type { Content } from '@google/genai';
-import type { HopCodeChat } from '../core/hopCodeChat.js';
+import type { GeminiChat } from '../core/geminiChat.js';
 import { isFunctionResponse } from './messageInspectors.js';
 import type { Config } from '../config/config.js';
 import { createDebugLogger } from './debugLogger.js';
@@ -43,7 +43,7 @@ export interface NextSpeakerResponse {
 }
 
 export async function checkNextSpeaker(
-  chat: HopCodeChat,
+  chat: GeminiChat,
   config: Config,
   abortSignal: AbortSignal,
   promptId: string,

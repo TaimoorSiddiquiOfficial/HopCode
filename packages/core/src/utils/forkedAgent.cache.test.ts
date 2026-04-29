@@ -13,14 +13,13 @@ import {
 } from './forkedAgent.js';
 import type { GenerateContentConfig } from '@google/genai';
 import type { Config } from '../config/config.js';
-import { HopCodeChat, StreamEventType } from '../core/hopCodeChat.js';
+import { GeminiChat, StreamEventType } from '../core/geminiChat.js';
 
-vi.mock('../core/hopCodeChat.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../core/hopCodeChat.js')>();
+vi.mock('../core/geminiChat.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../core/geminiChat.js')>();
   return {
     ...actual,
-    HopCodeChat: vi.fn(),
+    GeminiChat: vi.fn(),
   };
 });
 
@@ -129,7 +128,7 @@ describe('CacheSafeParams', () => {
 describe('runForkedAgent (cache path)', () => {
   beforeEach(() => {
     clearCacheSafeParams();
-    vi.mocked(HopCodeChat).mockReset();
+    vi.mocked(GeminiChat).mockReset();
   });
 
   it('passes tools: [] in per-request config so the model cannot produce function calls', async () => {
@@ -180,11 +179,11 @@ describe('runForkedAgent (cache path)', () => {
       },
     );
 
-    vi.mocked(HopCodeChat).mockImplementation(
+    vi.mocked(GeminiChat).mockImplementation(
       () =>
         ({
           sendMessageStream: mockSendMessageStream,
-        }) as unknown as HopCodeChat,
+        }) as unknown as GeminiChat,
     );
 
     const mockConfig = {} as unknown as Config;
@@ -195,10 +194,10 @@ describe('runForkedAgent (cache path)', () => {
       cacheSafeParams: getCacheSafeParams()!,
     });
 
-    // Verify HopCodeChat was constructed with the full generationConfig
+    // Verify GeminiChat was constructed with the full generationConfig
     // (including tools) � createForkedChat retains tools for speculation callers
-    expect(HopCodeChat).toHaveBeenCalledOnce();
-    const ctorArgs = vi.mocked(HopCodeChat).mock.calls[0];
+    expect(GeminiChat).toHaveBeenCalledOnce();
+    const ctorArgs = vi.mocked(GeminiChat).mock.calls[0];
     const chatGenerationConfig = ctorArgs[1] as GenerateContentConfig;
     expect(chatGenerationConfig.tools).toEqual([
       {
@@ -276,11 +275,11 @@ describe('runForkedAgent (cache path)', () => {
       },
     );
 
-    vi.mocked(HopCodeChat).mockImplementation(
+    vi.mocked(GeminiChat).mockImplementation(
       () =>
         ({
           sendMessageStream: mockSendMessageStream,
-        }) as unknown as HopCodeChat,
+        }) as unknown as GeminiChat,
     );
 
     const schema = {
@@ -321,7 +320,7 @@ describe('runForkedAgent (cache path)', () => {
     // runForkedAgent cache path requires cacheSafeParams to be passed explicitly;
     // the caller (btwCommand, suggestionGenerator) is responsible for checking
     // getCacheSafeParams() and handling null before calling runForkedAgent.
-    // This test verifies the HopCodeChat path is taken when cacheSafeParams present.
+    // This test verifies the GeminiChat path is taken when cacheSafeParams present.
     // The null guard lives in the callers.
     void mockConfig; // suppress unused
   });

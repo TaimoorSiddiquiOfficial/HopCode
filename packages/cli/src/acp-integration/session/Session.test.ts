@@ -9,7 +9,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Session } from './Session.js';
-import type { Config, HopCodeChat } from '@hoptrendy/hopcode-core';
+import type { Config, GeminiChat } from '@hoptrendy/hopcode-core';
 import { ApprovalMode, AuthType } from '@hoptrendy/hopcode-core';
 import * as core from '@hoptrendy/hopcode-core';
 import type {
@@ -47,7 +47,7 @@ function createStreamWithChunks(
 }
 
 describe('Session', () => {
-  let mockChat: HopCodeChat;
+  let mockChat: GeminiChat;
   let mockConfig: Config;
   let mockClient: AgentSideConnection;
   let mockSettings: LoadedSettings;
@@ -74,7 +74,7 @@ describe('Session', () => {
       sendMessageStream: vi.fn(),
       addHistory: vi.fn(),
       getHistory: vi.fn().mockReturnValue([]),
-    } as unknown as HopCodeChat;
+    } as unknown as GeminiChat;
 
     mockToolRegistry = {
       getTool: vi.fn(),
@@ -154,7 +154,7 @@ describe('Session', () => {
     core.Storage.setRuntimeBaseDir(null);
     // Clear session reference to allow garbage collection
     session = undefined as unknown as Session;
-    mockChat = undefined as unknown as HopCodeChat;
+    mockChat = undefined as unknown as GeminiChat;
     mockConfig = undefined as unknown as Config;
     mockClient = undefined as unknown as AgentSideConnection;
     mockSettings = undefined as unknown as LoadedSettings;

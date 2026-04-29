@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { Config } from '@hoptrendy/hopcode-core';
-import { HopCodeEventType } from '@hoptrendy/hopcode-core';
+import { GeminiEventType } from '@hoptrendy/hopcode-core';
 import { StreamJsonOutputAdapter } from './StreamJsonOutputAdapter.js';
 
 /**
@@ -56,7 +56,7 @@ describe('StreamJsonOutputAdapter — dual-output extensions', () => {
       );
       adapter.startAssistantMessage();
       adapter.processEvent({
-        type: HopCodeEventType.Content,
+        type: GeminiEventType.Content,
         value: 'sidecar',
       });
       adapter.finalizeAssistantMessage();

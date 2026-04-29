@@ -164,17 +164,18 @@ vi.mock('../tools/memory-config', () => ({
 
 vi.mock('../core/contentGenerator.js');
 
-const mockHopCodeClient = vi.fn().mockImplementation(() => ({
-  initialize: vi.fn().mockResolvedValue(undefined),
-  isInitialized: vi.fn().mockReturnValue(true),
-  stripThoughtsFromHistory: vi.fn(),
-  setTools: vi.fn(),
-}));
-
-vi.mock('../core/client.js', () => ({
-  HopCodeClient: mockHopCodeClient,
-  GeminiClient: mockHopCodeClient,
-}));
+vi.mock('../core/client.js', () => {
+  const mockClient = vi.fn().mockImplementation(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    isInitialized: vi.fn().mockReturnValue(true),
+    stripThoughtsFromHistory: vi.fn(),
+    setTools: vi.fn(),
+  }));
+  return {
+    HopCodeClient: mockClient,
+    GeminiClient: mockClient,
+  };
+});
 
 vi.mock('../telemetry/index.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../telemetry/index.js')>();

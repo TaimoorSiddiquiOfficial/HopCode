@@ -37,7 +37,7 @@ import {
 } from '../telemetry/types.js';
 import type { UiTelemetryService } from '../telemetry/uiTelemetry.js';
 
-const debugLogger = createDebugLogger('HOPCODE_CHAT');
+const debugLogger = createDebugLogger('GEMINI_CHAT');
 
 export enum StreamEventType {
   /** A regular content chunk from the API. */
@@ -274,13 +274,13 @@ export class InvalidStreamError extends Error {
  * @remarks
  * The session maintains all the turns between user and model.
  */
-export class HopCodeChat {
+export class GeminiChat {
   // A promise to represent the current state of the message being sent to the
   // model.
   private sendPromise: Promise<void> = Promise.resolve();
 
   /**
-   * Creates a new HopCodeChat instance.
+   * Creates a new GeminiChat instance.
    *
    * @param config - The configuration object.
    * @param generationConfig - Optional generation configuration.

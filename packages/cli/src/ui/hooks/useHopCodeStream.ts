@@ -17,17 +17,17 @@ import type {
   EditorType,
   HopCodeClient,
   RetryInfo,
-  ServerHopCodeChatCompressedEvent,
-  ServerHopCodeContentEvent as ContentEvent,
-  ServerHopCodeFinishedEvent,
-  ServerHopCodeStreamEvent as GeminiEvent,
+  ServerGeminiChatCompressedEvent,
+  ServerGeminiContentEvent as ContentEvent,
+  ServerGeminiFinishedEvent,
+  ServerGeminiStreamEvent as GeminiEvent,
   ThoughtSummary,
   ToolCallRequestInfo,
-  HopCodeErrorEventValue,
+  GeminiErrorEventValue,
   StopFailureErrorType,
 } from '@hoptrendy/hopcode-core';
 import {
-  HopCodeEventType as ServerHopCodeEventType,
+  GeminiEventType as ServerGeminiEventType,
   SendMessageType,
   createDebugLogger,
   getErrorMessage,
@@ -920,7 +920,7 @@ export const useHopCodeStream = (
   );
 
   const handleErrorEvent = useCallback(
-    (eventValue: HopCodeErrorEventValue, userMessageTimestamp: number) => {
+    (eventValue: GeminiErrorEventValue, userMessageTimestamp: number) => {
       lastPromptErroredRef.current = true;
       if (pendingHistoryItemRef.current) {
         addItem(pendingHistoryItemRef.current, userMessageTimestamp);
@@ -989,7 +989,7 @@ export const useHopCodeStream = (
   );
 
   const handleFinishedEvent = useCallback(
-    (event: ServerHopCodeFinishedEvent, userMessageTimestamp: number) => {
+    (event: ServerGeminiFinishedEvent, userMessageTimestamp: number) => {
       const finishReason = event.value.reason;
       if (!finishReason) {
         return;
@@ -1040,7 +1040,7 @@ export const useHopCodeStream = (
 
   const handleChatCompressionEvent = useCallback(
     (
-      eventValue: ServerHopCodeChatCompressedEvent['value'],
+      eventValue: ServerGeminiChatCompressedEvent['value'],
       userMessageTimestamp: number,
     ) => {
       if (pendingHistoryItemRef.current) {
@@ -1265,7 +1265,7 @@ export const useHopCodeStream = (
         for await (const event of stream) {
           dualOutput?.processEvent(event);
           switch (event.type) {
-            case ServerHopCodeEventType.Thought:
+            case ServerGeminiEventType.Thought:
               if (event.value.subject && !event.value.description) {
                 flushBufferedStreamEvents();
                 setThought(event.value);
@@ -1274,54 +1274,54 @@ export const useHopCodeStream = (
                 scheduleBufferedStreamFlush();
               }
               break;
-            case ServerHopCodeEventType.Content:
+            case ServerGeminiEventType.Content:
               bufferedEvents.push({ kind: 'content', value: event.value });
               scheduleBufferedStreamFlush();
               break;
-            case ServerHopCodeEventType.ToolCallRequest:
+            case ServerGeminiEventType.ToolCallRequest:
               flushBufferedStreamEvents();
               toolCallRequests.push(event.value);
               break;
-            case ServerHopCodeEventType.UserCancelled:
+            case ServerGeminiEventType.UserCancelled:
               flushBufferedStreamEvents();
               handleUserCancelledEvent(userMessageTimestamp);
               break;
-            case ServerHopCodeEventType.Error:
+            case ServerGeminiEventType.Error:
               flushBufferedStreamEvents();
               handleErrorEvent(event.value, userMessageTimestamp);
               break;
-            case ServerHopCodeEventType.ChatCompressed:
+            case ServerGeminiEventType.ChatCompressed:
               flushBufferedStreamEvents();
               handleChatCompressionEvent(event.value, userMessageTimestamp);
               break;
-            case ServerHopCodeEventType.ToolCallConfirmation:
-            case ServerHopCodeEventType.ToolCallResponse:
+            case ServerGeminiEventType.ToolCallConfirmation:
+            case ServerGeminiEventType.ToolCallResponse:
               flushBufferedStreamEvents();
               break;
-            case ServerHopCodeEventType.MaxSessionTurns:
+            case ServerGeminiEventType.MaxSessionTurns:
               flushBufferedStreamEvents();
               handleMaxSessionTurnsEvent();
               break;
-            case ServerHopCodeEventType.SessionTokenLimitExceeded:
+            case ServerGeminiEventType.SessionTokenLimitExceeded:
               flushBufferedStreamEvents();
               handleSessionTokenLimitExceededEvent(event.value);
               break;
-            case ServerHopCodeEventType.Finished:
+            case ServerGeminiEventType.Finished:
               flushBufferedStreamEvents();
               handleFinishedEvent(
-                event as ServerHopCodeFinishedEvent,
+                event as ServerGeminiFinishedEvent,
                 userMessageTimestamp,
               );
               break;
-            case ServerHopCodeEventType.Citation:
+            case ServerGeminiEventType.Citation:
               flushBufferedStreamEvents();
               handleCitationEvent(event.value, userMessageTimestamp);
               break;
-            case ServerHopCodeEventType.LoopDetected:
+            case ServerGeminiEventType.LoopDetected:
               flushBufferedStreamEvents();
               loopDetectedRef.current = true;
               break;
-            case ServerHopCodeEventType.Retry:
+            case ServerGeminiEventType.Retry:
               if (!event.isContinuation) {
                 discardBufferedStreamEvents();
                 if (pendingHistoryItemRef.current) {
@@ -1341,7 +1341,7 @@ export const useHopCodeStream = (
                 clearRetryCountdown();
               }
               break;
-            case ServerHopCodeEventType.HookSystemMessage:
+            case ServerGeminiEventType.HookSystemMessage:
               flushBufferedStreamEvents();
               if (pendingHistoryItemRef.current) {
                 addItem(pendingHistoryItemRef.current, userMessageTimestamp);
@@ -1355,14 +1355,14 @@ export const useHopCodeStream = (
                 userMessageTimestamp,
               );
               break;
-            case ServerHopCodeEventType.UserPromptSubmitBlocked:
+            case ServerGeminiEventType.UserPromptSubmitBlocked:
               flushBufferedStreamEvents();
               handleUserPromptSubmitBlockedEvent(
                 event.value,
                 userMessageTimestamp,
               );
               break;
-            case ServerHopCodeEventType.StopHookLoop:
+            case ServerGeminiEventType.StopHookLoop:
               flushBufferedStreamEvents();
               handleStopHookLoopEvent(event.value, userMessageTimestamp);
               break;

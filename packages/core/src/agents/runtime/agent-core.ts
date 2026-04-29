@@ -41,7 +41,7 @@ import type {
   FunctionDeclaration,
   GenerateContentResponseUsageMetadata,
 } from '@google/genai';
-import { HopCodeChat } from '../../core/hopCodeChat.js';
+import { GeminiChat } from '../../core/geminiChat.js';
 import type {
   PromptConfig,
   ModelConfig,
@@ -253,17 +253,17 @@ export class AgentCore {
   // ─── Chat Creation ────────────────────────────────────────
 
   /**
-   * Creates a HopCodeChat instance configured for this agent.
+   * Creates a GeminiChat instance configured for this agent.
    *
    * @param context - Context state for template variable substitution.
    * @param options - Chat creation options.
    *   - `interactive`: When true, omits the "non-interactive mode" system prompt suffix.
-   * @returns A configured HopCodeChat, or undefined if initialization fails.
+   * @returns A configured GeminiChat, or undefined if initialization fails.
    */
   async createChat(
     context: ContextState,
     options?: CreateChatOptions,
-  ): Promise<HopCodeChat | undefined> {
+  ): Promise<GeminiChat | undefined> {
     if (
       !this.promptConfig.systemPrompt &&
       !this.promptConfig.renderedSystemPrompt &&
@@ -317,7 +317,7 @@ export class AgentCore {
     }
 
     try {
-      return new HopCodeChat(
+      return new GeminiChat(
         this.runtimeContext,
         generationConfig,
         startHistory,
@@ -413,7 +413,7 @@ export class AgentCore {
    * - maxTimeMinutes is exceeded
    * - The abortController signal fires
    *
-   * @param chat - The HopCodeChat session to use.
+   * @param chat - The GeminiChat session to use.
    * @param initialMessages - The first messages to send (e.g., user task prompt).
    * @param toolsList - Available tool declarations.
    * @param abortController - Controls cancellation of the current loop.
@@ -421,7 +421,7 @@ export class AgentCore {
    * @returns ReasoningLoopResult with the final text, terminate mode, and turns used.
    */
   async runReasoningLoop(
-    chat: HopCodeChat,
+    chat: GeminiChat,
     initialMessages: Content[],
     toolsList: FunctionDeclaration[],
     abortController: AbortController,
@@ -443,7 +443,7 @@ export class AgentCore {
   }
 
   private async _runReasoningLoopInner(
-    chat: HopCodeChat,
+    chat: GeminiChat,
     initialMessages: Content[],
     toolsList: FunctionDeclaration[],
     abortController: AbortController,
@@ -1316,7 +1316,7 @@ Important Rules:
     const totalTok = Number(usage.totalTokenCount || 0);
     // Prefer totalTokenCount (prompt + output) for context usage — the
     // output from this round becomes history for the next, matching
-    // the approach in HopCodeChat.ts.
+    // the approach in geminiChat.ts.
     const contextTok = isFinite(totalTok) && totalTok > 0 ? totalTok : inTok;
     if (isFinite(contextTok) && contextTok > 0) {
       this.lastPromptTokenCount = contextTok;

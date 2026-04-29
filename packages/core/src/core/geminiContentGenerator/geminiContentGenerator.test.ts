@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { HopCodeContentGenerator } from './hopCodeContentGenerator.js';
+import { GeminiContentGenerator } from './geminiContentGenerator.js';
 import { GoogleGenAI } from '@google/genai';
 
 vi.mock('@google/genai', () => {
@@ -26,14 +26,14 @@ vi.mock('@google/genai', () => {
   };
 });
 
-describe('HopCodeContentGenerator', () => {
-  let generator: HopCodeContentGenerator;
+describe('GeminiContentGenerator', () => {
+  let generator: GeminiContentGenerator;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockGoogleGenAI: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    generator = new HopCodeContentGenerator({
+    generator = new GeminiContentGenerator({
       apiKey: 'test-api-key',
     });
     mockGoogleGenAI = vi.mocked(GoogleGenAI).mock.results[0].value;
@@ -42,7 +42,7 @@ describe('HopCodeContentGenerator', () => {
   it('should merge customHeaders into existing httpOptions.headers', async () => {
     vi.mocked(GoogleGenAI).mockClear();
 
-    void new HopCodeContentGenerator(
+    void new GeminiContentGenerator(
       {
         apiKey: 'test-api-key',
         httpOptions: {
@@ -145,17 +145,14 @@ describe('HopCodeContentGenerator', () => {
   });
 
   it('should prioritize contentGeneratorConfig samplingParams over request config', async () => {
-    const generatorWithParams = new HopCodeContentGenerator(
-      { apiKey: 'test' },
-      {
-        model: 'gemini-1.5-flash',
-        samplingParams: {
-          temperature: 0.1,
-          top_p: 0.2,
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
-    );
+    const generatorWithParams = new GeminiContentGenerator({ apiKey: 'test' }, {
+      model: 'gemini-1.5-flash',
+      samplingParams: {
+        temperature: 0.1,
+        top_p: 0.2,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
     const request = {
       model: 'gemini-1.5-flash',
@@ -179,7 +176,7 @@ describe('HopCodeContentGenerator', () => {
   });
 
   it('should map reasoning effort to thinkingConfig', async () => {
-    const generatorWithReasoning = new HopCodeContentGenerator(
+    const generatorWithReasoning = new GeminiContentGenerator(
       { apiKey: 'test' },
       {
         model: 'gemini-2.5-pro',

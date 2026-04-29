@@ -355,10 +355,10 @@ export async function createContentGenerator(
     authType === AuthType.USE_GEMINI ||
     authType === AuthType.USE_VERTEX_AI
   ) {
-    const { createHopCodeContentGenerator } = await import(
-      './hopCodeContentGenerator/index.js'
+    const { createGeminiContentGenerator } = await import(
+      './geminiContentGenerator/index.js'
     );
-    baseGenerator = createHopCodeContentGenerator(generatorConfig, config);
+    baseGenerator = createGeminiContentGenerator(generatorConfig, config);
   } else {
     throw new Error(
       `Error creating contentGenerator: Unsupported authType: ${authType}`,

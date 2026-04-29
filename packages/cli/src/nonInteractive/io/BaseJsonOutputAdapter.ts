@@ -10,12 +10,12 @@ import type {
   ToolCallRequestInfo,
   ToolCallResponseInfo,
   SessionMetrics,
-  ServerHopCodeStreamEvent,
+  ServerGeminiStreamEvent,
   AgentResultDisplay,
   McpToolProgressData,
 } from '@hoptrendy/hopcode-core';
 import {
-  HopCodeEventType,
+  GeminiEventType,
   ToolErrorType,
   parseAndFormatApiError,
 } from '@hoptrendy/hopcode-core';
@@ -105,7 +105,7 @@ export interface MessageEmitter {
  */
 export interface JsonOutputAdapterInterface extends MessageEmitter {
   startAssistantMessage(): void;
-  processEvent(event: ServerHopCodeStreamEvent): void;
+  processEvent(event: ServerGeminiStreamEvent): void;
   finalizeAssistantMessage(): CLIAssistantMessage;
   emitResult(options: ResultOptions): void;
 
@@ -597,22 +597,22 @@ export abstract class BaseJsonOutputAdapter {
    *
    * @param event - Stream event from Gemini API
    */
-  processEvent(event: ServerHopCodeStreamEvent): void {
+  processEvent(event: ServerGeminiStreamEvent): void {
     const state = this.mainAgentMessageState;
     if (state.finalized) {
       return;
     }
 
     switch (event.type) {
-      case HopCodeEventType.Content:
+      case GeminiEventType.Content:
         this.appendText(state, event.value, null);
         break;
-      case HopCodeEventType.Citation:
+      case GeminiEventType.Citation:
         if (typeof event.value === 'string') {
           this.appendText(state, `\n${event.value}`, null);
         }
         break;
-      case HopCodeEventType.Thought:
+      case GeminiEventType.Thought:
         this.appendThinking(
           state,
           event.value.subject,
@@ -620,16 +620,16 @@ export abstract class BaseJsonOutputAdapter {
           null,
         );
         break;
-      case HopCodeEventType.ToolCallRequest:
+      case GeminiEventType.ToolCallRequest:
         this.appendToolUse(state, event.value, null);
         break;
-      case HopCodeEventType.Finished:
+      case GeminiEventType.Finished:
         if (event.value?.usageMetadata) {
           state.usage = this.createUsage(event.value.usageMetadata);
         }
         this.finalizePendingBlocks(state, null);
         break;
-      case HopCodeEventType.Error: {
+      case GeminiEventType.Error: {
         // Format the error message using parseAndFormatApiError for consistency
         // with interactive mode error display
         const errorText = parseAndFormatApiError(

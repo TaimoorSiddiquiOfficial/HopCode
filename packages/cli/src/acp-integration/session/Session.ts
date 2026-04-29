@@ -12,7 +12,7 @@ import type {
 } from '@google/genai';
 import type {
   Config,
-  HopCodeChat,
+  GeminiChat,
   ToolCallConfirmationDetails,
   ToolResult,
   ChatRecord,
@@ -561,7 +561,7 @@ export class Session implements SessionContext {
    * If a Stop hook requests continuation, it sends a follow-up message and loops back.
    * Maximum iterations (100) prevent infinite loops.
    *
-   * @param chat - The HopCodeChat instance
+   * @param chat - The GeminiChat instance
    * @param pendingSend - The abort controller for the current prompt
    * @param promptId - The prompt ID for tracking
    * @param hooksEnabled - Whether hooks are enabled
@@ -569,7 +569,7 @@ export class Session implements SessionContext {
    * @returns The stop reason ('end_turn' or 'cancelled')
    */
   async #handleStopHookLoop(
-    chat: HopCodeChat,
+    chat: GeminiChat,
     pendingSend: AbortController,
     promptId: string,
     hooksEnabled: boolean,

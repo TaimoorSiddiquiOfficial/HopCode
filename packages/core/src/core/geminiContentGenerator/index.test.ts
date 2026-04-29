@@ -5,16 +5,16 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createHopCodeContentGenerator } from './index.js';
-import { HopCodeContentGenerator } from './hopCodeContentGenerator.js';
+import { createGeminiContentGenerator } from './index.js';
+import { GeminiContentGenerator } from './geminiContentGenerator.js';
 import type { Config } from '../../config/config.js';
 import { AuthType } from '../contentGenerator.js';
 
-vi.mock('./hopCodeContentGenerator.js', () => ({
-  HopCodeContentGenerator: vi.fn().mockImplementation(() => ({})),
+vi.mock('./geminiContentGenerator.js', () => ({
+  GeminiContentGenerator: vi.fn().mockImplementation(() => ({})),
 }));
 
-describe('createHopCodeContentGenerator', () => {
+describe('createGeminiContentGenerator', () => {
   let mockConfig: Config;
 
   beforeEach(() => {
@@ -26,16 +26,16 @@ describe('createHopCodeContentGenerator', () => {
     } as unknown as Config;
   });
 
-  it('should create a HopCodeContentGenerator', () => {
+  it('should create a GeminiContentGenerator', () => {
     const config = {
       model: 'gemini-1.5-flash',
       apiKey: 'test-key',
       authType: AuthType.USE_GEMINI,
     };
 
-    const generator = createHopCodeContentGenerator(config, mockConfig);
+    const generator = createGeminiContentGenerator(config, mockConfig);
 
-    expect(HopCodeContentGenerator).toHaveBeenCalled();
+    expect(GeminiContentGenerator).toHaveBeenCalled();
     expect(generator).toBeDefined();
   });
 
@@ -47,9 +47,9 @@ describe('createHopCodeContentGenerator', () => {
       baseUrl: 'https://proxy.example.com/gemini',
     };
 
-    createHopCodeContentGenerator(config, mockConfig);
+    createGeminiContentGenerator(config, mockConfig);
 
-    expect(HopCodeContentGenerator).toHaveBeenCalledWith(
+    expect(GeminiContentGenerator).toHaveBeenCalledWith(
       expect.objectContaining({
         httpOptions: expect.objectContaining({
           headers: expect.objectContaining({
@@ -69,9 +69,9 @@ describe('createHopCodeContentGenerator', () => {
       authType: AuthType.USE_GEMINI,
     };
 
-    createHopCodeContentGenerator(config, mockConfig);
+    createGeminiContentGenerator(config, mockConfig);
 
-    expect(HopCodeContentGenerator).toHaveBeenCalledWith(
+    expect(GeminiContentGenerator).toHaveBeenCalledWith(
       expect.objectContaining({
         httpOptions: expect.objectContaining({
           headers: expect.objectContaining({
@@ -81,7 +81,7 @@ describe('createHopCodeContentGenerator', () => {
       }),
       config,
     );
-    expect(vi.mocked(HopCodeContentGenerator).mock.calls[0]?.[0]).not.toEqual(
+    expect(vi.mocked(GeminiContentGenerator).mock.calls[0]?.[0]).not.toEqual(
       expect.objectContaining({
         httpOptions: expect.objectContaining({
           baseUrl: expect.any(String),

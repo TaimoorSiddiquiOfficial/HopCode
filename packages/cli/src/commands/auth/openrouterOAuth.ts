@@ -299,7 +299,7 @@ function buildOpenRouterHeaders() {
   return {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'HTTP-Referer': 'https://github.com/QwenLM/qwen-code.git',
+    'HTTP-Referer': 'https://github.com/hopcode/hopcode.git',
     'X-OpenRouter-Title': 'HopCode',
   };
 }

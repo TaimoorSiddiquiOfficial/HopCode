@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,17 +9,23 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type OpenAI from 'openai';
 import type { GenerateContentParameters } from '@google/genai';
 import { GenerateContentResponse, Type, FinishReason } from '@google/genai';
-import type { PipelineConfig } from './pipeline.js';
+import type { ErrorHandler, PipelineConfig } from './types.js';
 import { ContentGenerationPipeline, StreamContentError } from './pipeline.js';
 import { OpenAIContentConverter } from './converter.js';
 import { StreamingToolCallParser } from './streamingToolCallParser.js';
 import type { Config } from '../../config/config.js';
 import type { ContentGeneratorConfig, AuthType } from '../contentGenerator.js';
 import type { OpenAICompatibleProvider } from './provider/index.js';
-import type { ErrorHandler } from './errorHandler.js';
 
 // Mock dependencies
-vi.mock('./converter.js');
+vi.mock('./converter.js', () => ({
+  OpenAIContentConverter: {
+    convertGeminiRequestToOpenAI: vi.fn(),
+    convertOpenAIResponseToGemini: vi.fn(),
+    convertOpenAIChunkToGemini: vi.fn(),
+    convertGeminiToolsToOpenAI: vi.fn(),
+  },
+}));
 vi.mock('openai');
 
 describe('ContentGenerationPipeline', () => {
@@ -27,7 +33,7 @@ describe('ContentGenerationPipeline', () => {
   let mockConfig: PipelineConfig;
   let mockProvider: OpenAICompatibleProvider;
   let mockClient: OpenAI;
-  let mockConverter: OpenAIContentConverter;
+  let mockConverter: typeof OpenAIContentConverter;
   let mockErrorHandler: ErrorHandler;
   let mockContentGeneratorConfig: ContentGeneratorConfig;
   let mockCliConfig: Config;
@@ -45,19 +51,9 @@ describe('ContentGenerationPipeline', () => {
       },
     } as unknown as OpenAI;
 
-    // Mock converter. `createStreamContext` returns a fresh parser each
-    // stream; tests that don't care about tool-call buffers just ignore it.
-    mockConverter = {
-      setModel: vi.fn(),
-      setModalities: vi.fn(),
-      convertGeminiRequestToOpenAI: vi.fn(),
-      convertOpenAIResponseToGemini: vi.fn(),
-      convertOpenAIChunkToGemini: vi.fn(),
-      convertGeminiToolsToOpenAI: vi.fn(),
-      createStreamContext: vi.fn(() => ({
-        toolCallParser: new StreamingToolCallParser(),
-      })),
-    } as unknown as OpenAIContentConverter;
+    // Mock converter methods. The pipeline now snapshots request-scoped state
+    // into context and calls the stateless converter namespace directly.
+    mockConverter = OpenAIContentConverter;
 
     // Mock provider
     mockProvider = {
@@ -87,11 +83,6 @@ describe('ContentGenerationPipeline', () => {
       },
     } as ContentGeneratorConfig;
 
-    // Mock the OpenAIContentConverter constructor
-    (OpenAIContentConverter as unknown as Mock).mockImplementation(
-      () => mockConverter,
-    );
-
     mockConfig = {
       cliConfig: mockCliConfig,
       provider: mockProvider,
@@ -105,12 +96,6 @@ describe('ContentGenerationPipeline', () => {
   describe('constructor', () => {
     it('should initialize with correct configuration', () => {
       expect(mockProvider.buildClient).toHaveBeenCalled();
-      // Converter is constructed once and the model is updated per-request via setModel().
-      expect(OpenAIContentConverter).toHaveBeenCalledWith(
-        'test-model',
-        undefined,
-        {},
-      );
     });
   });
 
@@ -152,11 +137,12 @@ describe('ContentGenerationPipeline', () => {
 
       // Assert
       expect(result).toBe(mockGeminiResponse);
-      expect(
-        (mockConverter as unknown as { setModel: Mock }).setModel,
-      ).toHaveBeenCalledWith('test-model');
       expect(mockConverter.convertGeminiRequestToOpenAI).toHaveBeenCalledWith(
         request,
+        expect.objectContaining({
+          model: 'test-model',
+          modalities: {},
+        }),
       );
       expect(mockClient.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -172,6 +158,10 @@ describe('ContentGenerationPipeline', () => {
       );
       expect(mockConverter.convertOpenAIResponseToGemini).toHaveBeenCalledWith(
         mockOpenAIResponse,
+        expect.objectContaining({
+          model: 'test-model',
+          modalities: {},
+        }),
       );
     });
 
@@ -209,11 +199,14 @@ describe('ContentGenerationPipeline', () => {
       // Act
       const result = await pipeline.execute(request, userPromptId);
 
-      // Assert � request.model takes precedence over contentGeneratorConfig.model
+      // Assert — request.model takes precedence over contentGeneratorConfig.model
       expect(result).toBe(mockGeminiResponse);
-      expect(
-        (mockConverter as unknown as { setModel: Mock }).setModel,
-      ).toHaveBeenCalledWith('override-model');
+      expect(mockConverter.convertGeminiRequestToOpenAI).toHaveBeenCalledWith(
+        request,
+        expect.objectContaining({
+          model: 'override-model',
+        }),
+      );
       expect(mockClient.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
           model: 'override-model',
@@ -223,7 +216,7 @@ describe('ContentGenerationPipeline', () => {
     });
 
     it('should fall back to configured model when request.model is empty', async () => {
-      // Arrange � empty model string is falsy, should fall back to contentGeneratorConfig.model
+      // Arrange — empty model string is falsy, should fall back to contentGeneratorConfig.model
       const request: GenerateContentParameters = {
         model: '',
         contents: [{ parts: [{ text: 'Hello' }], role: 'user' }],
@@ -256,11 +249,14 @@ describe('ContentGenerationPipeline', () => {
       // Act
       const result = await pipeline.execute(request, userPromptId);
 
-      // Assert � falls back to contentGeneratorConfig.model
+      // Assert — falls back to contentGeneratorConfig.model
       expect(result).toBe(mockGeminiResponse);
-      expect(
-        (mockConverter as unknown as { setModel: Mock }).setModel,
-      ).toHaveBeenCalledWith('test-model');
+      expect(mockConverter.convertGeminiRequestToOpenAI).toHaveBeenCalledWith(
+        request,
+        expect.objectContaining({
+          model: 'test-model',
+        }),
+      );
       expect(mockClient.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
           model: 'test-model',
@@ -322,11 +318,15 @@ describe('ContentGenerationPipeline', () => {
 
       // Assert
       expect(result).toBe(mockGeminiResponse);
-      expect(
-        (mockConverter as unknown as { setModel: Mock }).setModel,
-      ).toHaveBeenCalledWith('test-model');
+      expect(mockConverter.convertGeminiRequestToOpenAI).toHaveBeenCalledWith(
+        request,
+        expect.objectContaining({
+          model: 'test-model',
+        }),
+      );
       expect(mockConverter.convertGeminiToolsToOpenAI).toHaveBeenCalledWith(
         request.config!.tools,
+        'auto',
       );
       expect(mockClient.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -339,7 +339,7 @@ describe('ContentGenerationPipeline', () => {
     });
 
     it('should skip empty tools array in request', async () => {
-      // Arrange � tools: [] should NOT be included in the API request
+      // Arrange — tools: [] should NOT be included in the API request
       const request: GenerateContentParameters = {
         model: 'test-model',
         contents: [{ parts: [{ text: 'Hello' }], role: 'user' }],
@@ -369,7 +369,7 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, userPromptId);
 
-      // Assert � tools should NOT be in the request
+      // Assert — tools should NOT be in the request
       expect(mockConverter.convertGeminiToolsToOpenAI).not.toHaveBeenCalled();
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
@@ -377,7 +377,7 @@ describe('ContentGenerationPipeline', () => {
     });
 
     it('should override enable_thinking when thinkingConfig disables it', async () => {
-      // Arrange � provider injects enable_thinking: true via extra_body,
+      // Arrange — provider injects enable_thinking: true via extra_body,
       // but request explicitly disables thinking
       (mockProvider.buildRequest as Mock).mockImplementation((req) => ({
         ...req,
@@ -418,14 +418,14 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, userPromptId);
 
-      // Assert � enable_thinking should be overridden to false
+      // Assert — enable_thinking should be overridden to false
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
       expect(apiCall.enable_thinking).toBe(false);
     });
 
     it('should strip reasoning key from extra_body when thinking is disabled', async () => {
-      // Arrange � provider injects reasoning via extra_body
+      // Arrange — provider injects reasoning via extra_body
       (mockProvider.buildRequest as Mock).mockImplementation((req) => ({
         ...req,
         reasoning: { effort: 'high' },
@@ -459,14 +459,14 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, 'forked_query');
 
-      // Assert � reasoning should be stripped
+      // Assert — reasoning should be stripped
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
       expect(apiCall.reasoning).toBeUndefined();
     });
 
     it('should preserve enable_thinking when thinking is not explicitly disabled', async () => {
-      // Arrange � normal request (not forked query), enable_thinking should be preserved
+      // Arrange — normal request (not forked query), enable_thinking should be preserved
       (mockProvider.buildRequest as Mock).mockImplementation((req) => ({
         ...req,
         enable_thinking: true,
@@ -475,7 +475,7 @@ describe('ContentGenerationPipeline', () => {
       const request: GenerateContentParameters = {
         model: 'test-model',
         contents: [{ parts: [{ text: 'Hello' }], role: 'user' }],
-        // No thinkingConfig � normal request
+        // No thinkingConfig — normal request
       };
 
       const mockMessages = [
@@ -500,7 +500,7 @@ describe('ContentGenerationPipeline', () => {
       // Act
       await pipeline.execute(request, 'main');
 
-      // Assert � enable_thinking should be PRESERVED (not disabled)
+      // Assert — enable_thinking should be PRESERVED (not disabled)
       const apiCall = (mockClient.chat.completions.create as Mock).mock
         .calls[0][0];
       expect(apiCall.enable_thinking).toBe(true);
@@ -611,9 +611,22 @@ describe('ContentGenerationPipeline', () => {
       expect(results).toHaveLength(2);
       expect(results[0]).toBe(mockGeminiResponse1);
       expect(results[1]).toBe(mockGeminiResponse2);
-      // Parser is now created per-stream via createStreamContext — assert
-      // that the pipeline asked for a fresh one at stream entry.
-      expect(mockConverter.createStreamContext).toHaveBeenCalled();
+      const [, firstChunkContext] = (
+        mockConverter.convertOpenAIChunkToGemini as Mock
+      ).mock.calls[0];
+      const [, secondChunkContext] = (
+        mockConverter.convertOpenAIChunkToGemini as Mock
+      ).mock.calls[1];
+      expect(firstChunkContext).toEqual(
+        expect.objectContaining({
+          model: 'test-model',
+          modalities: {},
+          toolCallParser: expect.any(StreamingToolCallParser),
+        }),
+      );
+      expect(secondChunkContext.toolCallParser).toBe(
+        firstChunkContext.toolCallParser,
+      );
       expect(mockClient.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
           stream: true,
@@ -725,7 +738,6 @@ describe('ContentGenerationPipeline', () => {
       }
 
       expect(results).toHaveLength(0); // No results due to error
-      expect(mockConverter.createStreamContext).toHaveBeenCalledTimes(1); // Once per stream entry
       expect(mockErrorHandler.handle).toHaveBeenCalledWith(
         testError,
         expect.any(Object),
@@ -1313,7 +1325,7 @@ describe('ContentGenerationPipeline', () => {
         results.push(result);
       }
 
-      // Assert: exactly 2 results � content chunk + ONE merged finish chunk.
+      // Assert: exactly 2 results — content chunk + ONE merged finish chunk.
       // Before the fix this was 3 (the trailing chunk triggered a duplicate).
       expect(results).toHaveLength(2);
       expect(results[0]).toBe(mockContentResponse);
@@ -1332,7 +1344,7 @@ describe('ContentGenerationPipeline', () => {
         totalTokenCount: 30,
       });
 
-      // Count function-call parts across ALL yielded results � must be exactly 1
+      // Count function-call parts across ALL yielded results — must be exactly 1
       let totalFunctionCalls = 0;
       for (const result of results) {
         const parts = result.candidates?.[0]?.content?.parts ?? [];

@@ -37,7 +37,10 @@ describe('useFocus', () => {
     stdin.resume = vi.fn();
     stdin.pause = vi.fn();
     stdout = { write: vi.fn() };
-    mockedUseStdin.mockReturnValue({ stdin } as ReturnType<typeof useStdin>);
+    mockedUseStdin.mockReturnValue({
+      stdin,
+      setRawMode: vi.fn(),
+    } as ReturnType<typeof useStdin>);
     mockedUseStdout.mockReturnValue({ stdout } as unknown as ReturnType<
       typeof useStdout
     >);

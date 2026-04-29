@@ -6,14 +6,14 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type {
-  ServerHopCodeToolCallRequestEvent,
-  ServerHopCodeErrorEvent,
+  ServerGeminiToolCallRequestEvent,
+  ServerGeminiErrorEvent,
 } from './turn.js';
-import { Turn, HopCodeEventType } from './turn.js';
+import { Turn, GeminiEventType } from './turn.js';
 import type { GenerateContentResponse, Part, Content } from '@google/genai';
 import { reportError } from '../utils/errorReporting.js';
-import type { HopCodeChat } from './hopCodeChat.js';
-import { StreamEventType } from './hopCodeChat.js';
+import type { GeminiChat } from './geminiChat.js';
+import { StreamEventType } from './geminiChat.js';
 
 const mockSendMessageStream = vi.fn();
 const mockGetHistory = vi.fn();
@@ -53,7 +53,7 @@ describe('Turn', () => {
       getHistory: mockGetHistory,
       maybeIncludeSchemaDepthContext: mockMaybeIncludeSchemaDepthContext,
     };
-    turn = new Turn(mockChatInstance as unknown as HopCodeChat, 'prompt-id-1');
+    turn = new Turn(mockChatInstance as unknown as GeminiChat, 'prompt-id-1');
     mockGetHistory.mockReturnValue([]);
     mockSendMessageStream.mockResolvedValue((async function* () {})());
   });
@@ -107,8 +107,8 @@ describe('Turn', () => {
       );
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'Hello' },
-        { type: HopCodeEventType.Content, value: ' world' },
+        { type: GeminiEventType.Content, value: 'Hello' },
+        { type: GeminiEventType.Content, value: ' world' },
       ]);
       expect(turn.getDebugResponses().length).toBe(2);
     });
@@ -146,10 +146,10 @@ describe('Turn', () => {
 
       expect(events).toEqual([
         {
-          type: HopCodeEventType.Thought,
+          type: GeminiEventType.Thought,
           value: { subject: '', description: 'reasoning...' },
         },
-        { type: HopCodeEventType.Content, value: 'final answer' },
+        { type: GeminiEventType.Content, value: 'final answer' },
       ]);
     });
 
@@ -195,11 +195,11 @@ describe('Turn', () => {
 
       expect(events).toEqual([
         {
-          type: HopCodeEventType.Thought,
+          type: GeminiEventType.Thought,
           value: { subject: '', description: 'part1' },
         },
         {
-          type: HopCodeEventType.Thought,
+          type: GeminiEventType.Thought,
           value: { subject: '', description: 'part2' },
         },
       ]);
@@ -239,8 +239,8 @@ describe('Turn', () => {
       }
 
       expect(events.length).toBe(2);
-      const event1 = events[0] as ServerHopCodeToolCallRequestEvent;
-      expect(event1.type).toBe(HopCodeEventType.ToolCallRequest);
+      const event1 = events[0] as ServerGeminiToolCallRequestEvent;
+      expect(event1.type).toBe(GeminiEventType.ToolCallRequest);
       expect(event1.value).toEqual(
         expect.objectContaining({
           callId: 'fc1',
@@ -251,8 +251,8 @@ describe('Turn', () => {
       );
       expect(turn.pendingToolCalls[0]).toEqual(event1.value);
 
-      const event2 = events[1] as ServerHopCodeToolCallRequestEvent;
-      expect(event2.type).toBe(HopCodeEventType.ToolCallRequest);
+      const event2 = events[1] as ServerGeminiToolCallRequestEvent;
+      expect(event2.type).toBe(GeminiEventType.ToolCallRequest);
       expect(event2.value).toEqual(
         expect.objectContaining({
           name: 'tool2',
@@ -302,8 +302,8 @@ describe('Turn', () => {
         events.push(event);
       }
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'First part' },
-        { type: HopCodeEventType.UserCancelled },
+        { type: GeminiEventType.Content, value: 'First part' },
+        { type: GeminiEventType.UserCancelled },
       ]);
       expect(turn.getDebugResponses().length).toBe(1);
     });
@@ -327,8 +327,8 @@ describe('Turn', () => {
       }
 
       expect(events.length).toBe(1);
-      const errorEvent = events[0] as ServerHopCodeErrorEvent;
-      expect(errorEvent.type).toBe(HopCodeEventType.Error);
+      const errorEvent = events[0] as ServerGeminiErrorEvent;
+      expect(errorEvent.type).toBe(GeminiEventType.Error);
       expect(errorEvent.value).toEqual({
         error: { message: 'API Error', status: undefined },
       });
@@ -370,21 +370,21 @@ describe('Turn', () => {
       expect(events.length).toBe(3);
 
       // Assertions for each specific tool call event
-      const event1 = events[0] as ServerHopCodeToolCallRequestEvent;
+      const event1 = events[0] as ServerGeminiToolCallRequestEvent;
       expect(event1.value).toMatchObject({
         callId: 'fc1',
         name: 'undefined_tool_name',
         args: { arg1: 'val1' },
       });
 
-      const event2 = events[1] as ServerHopCodeToolCallRequestEvent;
+      const event2 = events[1] as ServerGeminiToolCallRequestEvent;
       expect(event2.value).toMatchObject({
         callId: 'fc2',
         name: 'tool2',
         args: {},
       });
 
-      const event3 = events[2] as ServerHopCodeToolCallRequestEvent;
+      const event3 = events[2] as ServerGeminiToolCallRequestEvent;
       expect(event3.value).toMatchObject({
         callId: 'fc3',
         name: 'undefined_tool_name',
@@ -425,9 +425,9 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'Partial response' },
+        { type: GeminiEventType.Content, value: 'Partial response' },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: {
             reason: 'STOP',
             usageMetadata: {
@@ -474,11 +474,11 @@ describe('Turn', () => {
 
       expect(events).toEqual([
         {
-          type: HopCodeEventType.Content,
+          type: GeminiEventType.Content,
           value: 'This is a long response that was cut off...',
         },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: { reason: 'MAX_TOKENS', usageMetadata: undefined },
         },
       ]);
@@ -511,9 +511,9 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'Content blocked' },
+        { type: GeminiEventType.Content, value: 'Content blocked' },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: { reason: 'SAFETY', usageMetadata: undefined },
         },
       ]);
@@ -549,7 +549,7 @@ describe('Turn', () => {
 
       expect(events).toEqual([
         {
-          type: HopCodeEventType.Content,
+          type: GeminiEventType.Content,
           value: 'Response without finish reason',
         },
       ]);
@@ -593,10 +593,10 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'First part' },
-        { type: HopCodeEventType.Content, value: 'Second part' },
+        { type: GeminiEventType.Content, value: 'First part' },
+        { type: GeminiEventType.Content, value: 'Second part' },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: { reason: 'OTHER', usageMetadata: undefined },
         },
       ]);
@@ -636,13 +636,13 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'Some text.' },
+        { type: GeminiEventType.Content, value: 'Some text.' },
         {
-          type: HopCodeEventType.Citation,
+          type: GeminiEventType.Citation,
           value: 'Citations:\n(Source 1 Title) https://example.com/source1',
         },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: { reason: 'STOP', usageMetadata: undefined },
         },
       ]);
@@ -686,14 +686,14 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'Some text.' },
+        { type: GeminiEventType.Content, value: 'Some text.' },
         {
-          type: HopCodeEventType.Citation,
+          type: GeminiEventType.Citation,
           value:
             'Citations:\n(Title1) https://example.com/source1\n(Title2) https://example.com/source2',
         },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: { reason: 'STOP', usageMetadata: undefined },
         },
       ]);
@@ -733,10 +733,10 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'Some text.' },
+        { type: GeminiEventType.Content, value: 'Some text.' },
       ]);
       // No Citation event (but we do get a Finished event with undefined reason)
-      expect(events.some((e) => e.type === HopCodeEventType.Citation)).toBe(
+      expect(events.some((e) => e.type === GeminiEventType.Citation)).toBe(
         false,
       );
     });
@@ -779,13 +779,13 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Content, value: 'Some text.' },
+        { type: GeminiEventType.Content, value: 'Some text.' },
         {
-          type: HopCodeEventType.Citation,
+          type: GeminiEventType.Citation,
           value: 'Citations:\n(Good Source) https://example.com/source1',
         },
         {
-          type: HopCodeEventType.Finished,
+          type: GeminiEventType.Finished,
           value: { reason: 'STOP', usageMetadata: undefined },
         },
       ]);
@@ -816,7 +816,7 @@ describe('Turn', () => {
         events.push(event);
       }
 
-      expect(events).toEqual([{ type: HopCodeEventType.UserCancelled }]);
+      expect(events).toEqual([{ type: GeminiEventType.UserCancelled }]);
 
       expect(reportError).not.toHaveBeenCalled();
     });
@@ -843,8 +843,8 @@ describe('Turn', () => {
       }
 
       expect(events).toEqual([
-        { type: HopCodeEventType.Retry },
-        { type: HopCodeEventType.Content, value: 'Success' },
+        { type: GeminiEventType.Retry },
+        { type: GeminiEventType.Content, value: 'Success' },
       ]);
     });
   });
