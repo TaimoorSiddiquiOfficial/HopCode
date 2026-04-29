@@ -23,7 +23,7 @@ import { createDebugLogger } from '../utils/debugLogger.js';
 import { parseAndFormatApiError } from '../utils/errorParsing.js';
 import { isRateLimitError, type RetryInfo } from '../utils/rateLimit.js';
 import type { Config } from '../config/config.js';
-import { ESCALATED_MAX_TOKENS } from './tokenLimits.js';
+import { ESCALATED_MAX_TOKENS, tokenLimit } from './tokenLimits.js';
 import { hasCycleInSchema } from '../tools/tools.js';
 import type { StructuredError } from './turn.js';
 import {
@@ -89,6 +89,13 @@ const RATE_LIMIT_RETRY_OPTIONS = {
   maxRetries: 10,
   delayMs: 60000,
 };
+
+// Max output token recovery: when the escalated response is still truncated,
+// keep the partial response and inject a continuation message up to 3 times
+// so the model can resume from where it left off.
+const MAX_OUTPUT_RECOVERY_ATTEMPTS = 3;
+const OUTPUT_RECOVERY_MESSAGE =
+  'Resume directly. Output token limit hit — continue from where you stopped.';
 
 /**
  * Creates a promise that resolves after the specified delay, but can be
@@ -499,7 +506,8 @@ export class GeminiChat {
         }
 
         // Max output tokens escalation: if the retry loop succeeded with
-        // the capped default (8K) but hit MAX_TOKENS, retry once at 64K.
+        // the capped default (8K) but hit MAX_TOKENS, retry once at the
+        // model's full output limit (with 64K floor).
         // Placed outside the retry loop so that any errors from the
         // escalated stream propagate directly (not caught by retry logic).
         if (
@@ -509,8 +517,12 @@ export class GeminiChat {
           !hasUserMaxTokensOverride
         ) {
           maxTokensEscalated = true;
+          const escalatedLimit = Math.max(
+            ESCALATED_MAX_TOKENS,
+            tokenLimit(model, 'output'),
+          );
           debugLogger.info(
-            `Output truncated at capped default. Escalating to ${ESCALATED_MAX_TOKENS} tokens.`,
+            `Output truncated at capped default. Escalating to ${escalatedLimit} tokens.`,
           );
           // Remove partial model response from history
           // (processStreamResponse already pushed it)
@@ -527,7 +539,7 @@ export class GeminiChat {
             ...params,
             config: {
               ...params.config,
-              maxOutputTokens: ESCALATED_MAX_TOKENS,
+              maxOutputTokens: escalatedLimit,
             },
           };
           const escalatedStream = await self.makeApiCallAndProcessStream(
@@ -536,8 +548,132 @@ export class GeminiChat {
             escalatedParams,
             prompt_id,
           );
+          lastFinishReason = undefined;
           for await (const chunk of escalatedStream) {
+            const fr = chunk.candidates?.[0]?.finishReason;
+            if (fr) lastFinishReason = fr;
             yield { type: StreamEventType.CHUNK, value: chunk };
+          }
+        }
+
+        // Max output token recovery: if the escalated response is still
+        // truncated, keep the partial response in history and inject a
+        // continuation message so the model can resume. Up to
+        // MAX_OUTPUT_RECOVERY_ATTEMPTS attempts.
+        if (
+          lastError === null &&
+          lastFinishReason === FinishReason.MAX_TOKENS &&
+          !hasUserMaxTokensOverride
+        ) {
+          const lastModelTurn = self.history[self.history.length - 1];
+          const hasFunctionCall =
+            lastModelTurn?.role === 'model' &&
+            lastModelTurn?.parts?.some(
+              (p) => p !== undefined && 'functionCall' in p && p.functionCall,
+            );
+
+          if (!hasFunctionCall) {
+            const escalatedModelIndex = self.history.length - 1;
+            let recoveryRan = false;
+
+            for (
+              let recoveryAttempt = 0;
+              recoveryAttempt < MAX_OUTPUT_RECOVERY_ATTEMPTS;
+              recoveryAttempt++
+            ) {
+              // Guard: don't inject a recovery user message after a model
+              // turn that already contains a functionCall.
+              const currentLast = self.history[self.history.length - 1];
+              if (
+                currentLast?.role === 'model' &&
+                currentLast?.parts?.some(
+                  (p) =>
+                    p !== undefined && 'functionCall' in p && p.functionCall,
+                )
+              ) {
+                break;
+              }
+
+              try {
+                // Inject continuation message as a user turn so the model
+                // can resume from its partial output.
+                self.history.push(createUserContent(OUTPUT_RECOVERY_MESSAGE));
+
+                recoveryRan = true;
+                yield { type: StreamEventType.RETRY, isContinuation: true };
+
+                const recoveryContents = self.getHistory(true);
+                const recoveryStream = await self.makeApiCallAndProcessStream(
+                  model,
+                  recoveryContents,
+                  params,
+                  prompt_id,
+                );
+
+                lastFinishReason = undefined;
+                for await (const chunk of recoveryStream) {
+                  const fr = chunk.candidates?.[0]?.finishReason;
+                  if (fr) lastFinishReason = fr;
+                  yield { type: StreamEventType.CHUNK, value: chunk };
+                }
+
+                // If recovery produced a clean finish, stop the loop.
+                if (lastFinishReason !== FinishReason.MAX_TOKENS) {
+                  break;
+                }
+                // Otherwise, continue to the next recovery attempt.
+              } catch {
+                // Recovery stream failed (empty stream, network error,
+                // etc.). Pop the dangling recovery user message so
+                // history stays valid, then emit a synthetic STOP chunk
+                // to signal truncation to the caller.
+                if (
+                  self.history.length > 0 &&
+                  self.history[self.history.length - 1].role === 'user'
+                ) {
+                  self.history.pop();
+                }
+                yield {
+                  type: StreamEventType.CHUNK,
+                  value: {
+                    candidates: [{ finishReason: 'STOP' }],
+                  } as unknown as GenerateContentResponse,
+                };
+                break;
+              }
+            }
+
+            // Coalesce successful recovery iterations into the preceding
+            // model turn. Without this, the internal recovery user
+            // messages would persist as real conversation turns, biasing
+            // every subsequent model call. After coalescing, the history
+            // contains a single model turn with the combined text.
+            if (recoveryRan && lastFinishReason !== FinishReason.MAX_TOKENS) {
+              const baseModelTurn = self.history[escalatedModelIndex];
+              if (baseModelTurn && baseModelTurn.role === 'model') {
+                const allParts = [...(baseModelTurn.parts ?? [])];
+                // Collect parts from recovery model turns and drop
+                // recovery user messages.
+                const keep: Content[] = self.history.slice(
+                  0,
+                  escalatedModelIndex + 1,
+                );
+                for (
+                  let i = escalatedModelIndex + 1;
+                  i < self.history.length;
+                  i++
+                ) {
+                  const entry = self.history[i];
+                  if (entry && entry.role === 'model') {
+                    allParts.push(...(entry.parts ?? []));
+                  }
+                  // Skip recovery user messages.
+                }
+                baseModelTurn.parts = allParts;
+                // Remove all recovery entries.
+                self.history = keep;
+              }
+            }
           }
         }
 

@@ -641,7 +641,7 @@ describe('AgentTool', () => {
 
       // Fork returns the placeholder synchronously.
       const llmText = partToString(result.llmContent);
-      expect(llmText).toBe('Fork started — processing in background');
+      expect(llmText).toBe('Fork started \u2014 processing in background');
 
       // Drain the background executeSubagent() promise so its assertions
       // become visible before the test ends.
