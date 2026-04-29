@@ -22,11 +22,11 @@ describe('SubagentValidator', () => {
         'code_reviewer',
         'agent123',
         'my-helper',
-        '????',
-        '???????',
-        '????',
-        '??-manager',
-        '??????_????????',
+        '\u4E2D\u6587\u4EE3\u7406',
+        '\uD55C\uAD6D\uC5B4\uB3C4\uC6B0\uBBF8\uB2E4',
+        '\u65E5\u672C\u8A9E\u3067',
+        '\u4E2D\u6587-manager',
+        '\uAC00\uB098\uB2E4\uB77C\uB9C8\uBC14_\uC0AC\uC544\uC790\uCC28\uCE74\uD0C0\uD30C\uD558',
       ];
 
       for (const name of validNames) {
@@ -127,7 +127,7 @@ describe('SubagentValidator', () => {
     });
 
     it('should not warn about case for non-Latin names', () => {
-      const result = validator.validateName('????');
+      const result = validator.validateName('\u4E2D\u6587\u4EE3\u7406');
       expect(result.isValid).toBe(true);
       expect(result.warnings).not.toContain(
         'Consider using lowercase names for consistency',
