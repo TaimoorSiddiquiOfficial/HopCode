@@ -101,6 +101,7 @@ export async function handleApiKeyAuth(
       experimentalAcp: undefined,
       experimentalLsp: undefined,
       extensions: [],
+      mcpConfig: undefined,
       listExtensions: undefined,
       openaiLogging: undefined,
       openaiApiKey: undefined,

@@ -56,7 +56,7 @@ function formatActivityLabel(name: string, description: string | undefined) {
 }
 import { formatDuration, formatTokenCount } from '../../utils/formatters.js';
 
-const STATUS_VERBS: Record<EntryStatus, string> = {
+const STATUS_VERBS: Record<string, string> = {
   running: 'Running',
   completed: 'Completed',
   failed: 'Failed',
@@ -371,7 +371,7 @@ const AgentDetailBody: React.FC<{
 };
 
 const ShellDetailBody: React.FC<{
-  entry: import('@qwen-code/qwen-code-core').BackgroundShellEntry;
+  entry: import('@hoptrendy/hopcode-core').BackgroundShellEntry;
   maxHeight: number;
   maxWidth: number;
 }> = ({ entry, maxHeight, maxWidth }) => {

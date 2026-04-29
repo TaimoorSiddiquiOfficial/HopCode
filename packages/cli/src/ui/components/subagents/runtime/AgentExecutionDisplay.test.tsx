@@ -7,8 +7,8 @@
 import { act } from 'react';
 import { render } from 'ink-testing-library';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AgentResultDisplay } from '@qwen-code/qwen-code-core';
-import { makeFakeConfig } from '@qwen-code/qwen-code-core';
+import type { AgentResultDisplay } from '@hoptrendy/hopcode-core';
+import { makeFakeConfig } from '@hoptrendy/hopcode-core';
 import { AgentExecutionDisplay } from './AgentExecutionDisplay.js';
 
 let keypressHandler:
@@ -62,6 +62,7 @@ function makeCompletedData(toolCount: number): AgentResultDisplay {
       thoughtTokens: 0,
       cachedTokens: 0,
       totalTokens: 4_321,
+      estimatedCost: 0,
       toolUsage: [],
     },
   };
