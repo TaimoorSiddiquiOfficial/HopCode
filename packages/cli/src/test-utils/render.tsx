@@ -25,7 +25,7 @@ import { ConfigContext } from '../ui/contexts/ConfigContext.js';
 
 class Stdout extends EventEmitter {
   get columns() {
-    return 100;
+    return process.stdout?.columns ?? 100;
   }
   frames: string[] = [];
   _lastFrame: string | undefined;
@@ -92,7 +92,7 @@ function render(tree: React.ReactNode) {
   return {
     rerender: instance.rerender,
     unmount: instance.unmount,
-     
+
     cleanup: instance.cleanup,
     stdout,
     stderr,
@@ -105,7 +105,7 @@ function render(tree: React.ReactNode) {
 export function cleanup() {
   for (const instance of instances) {
     instance.unmount();
-     
+
     instance.cleanup?.();
   }
   instances.length = 0;
@@ -120,22 +120,85 @@ const mockSettings = new LoadedSettings(
   new Set(),
 );
 
-// Minimal key-sequence parser for test keypress simulation.
-// Handles escape sequences, arrow keys, Enter, Escape, Tab, Ctrl+C, etc.
-function parseKeys(data: string): Array<{
+// Keypress shape emitted by our fake stdin.
+export type TestKeypress = {
   name: string;
   ctrl: boolean;
   meta: boolean;
   shift: boolean;
   sequence: string;
-}> {
-  const keys: Array<{
-    name: string;
-    ctrl: boolean;
-    meta: boolean;
-    shift: boolean;
-    sequence: string;
-  }> = [];
+  paste?: boolean;
+  pasteImage?: boolean;
+  input?: string;
+};
+
+// Minimal key-sequence parser for test keypress simulation.
+// Handles escape sequences, arrow keys, Enter, Escape, Tab, Ctrl+C,
+// Meta+key (Alt+V / Cmd+V), bracketed paste, and multi-char paste data.
+function parseKeys(data: string): TestKeypress[] {
+  if (data.length === 0) return [];
+
+  // 1. Bracketed paste: \x1b[200~ ... \x1b[201~
+  const bracketedMatch = data.match(/^\x1b\[200~([\s\S]*?)\x1b\[201~$/);
+  if (bracketedMatch) {
+    return [
+      {
+        name: 'paste-start',
+        ctrl: false,
+        meta: false,
+        shift: false,
+        paste: true,
+        sequence: '\x1b[200~',
+      },
+      {
+        name: '',
+        ctrl: false,
+        meta: false,
+        shift: false,
+        sequence: bracketedMatch[1],
+      },
+      {
+        name: 'paste-end',
+        ctrl: false,
+        meta: false,
+        shift: false,
+        paste: true,
+        sequence: '\x1b[201~',
+      },
+    ];
+  }
+
+  // 2. Multi-char paste (no escape sequences, not a single key combo)
+  const hasEscape = data.includes('\x1b');
+  if (!hasEscape && data.length > 1) {
+    return [
+      {
+        name: 'paste-start',
+        ctrl: false,
+        meta: false,
+        shift: false,
+        paste: true,
+        sequence: '\x1b[200~',
+      },
+      {
+        name: '',
+        ctrl: false,
+        meta: false,
+        shift: false,
+        sequence: data,
+      },
+      {
+        name: 'paste-end',
+        ctrl: false,
+        meta: false,
+        shift: false,
+        paste: true,
+        sequence: '\x1b[201~',
+      },
+    ];
+  }
+
+  const keys: TestKeypress[] = [];
   let i = 0;
   while (i < data.length) {
     if (data[i] === '\x1b') {
@@ -212,6 +275,18 @@ function parseKeys(data: string): Array<{
           meta: false,
           shift: false,
           sequence: '\x1b\x03',
+        });
+        i += 2;
+      } else if (data[i + 1] !== undefined) {
+        // Meta+key: \x1b followed by a printable character
+        const letter = data[i + 1];
+        const lower = letter.toLowerCase();
+        keys.push({
+          name: lower,
+          ctrl: false,
+          meta: true,
+          shift: letter !== lower,
+          sequence: '\x1b' + letter,
         });
         i += 2;
       } else {
