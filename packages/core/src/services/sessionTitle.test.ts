@@ -206,7 +206,7 @@ describe('tryGenerateSessionTitle', () => {
     const config = {
       getFastModel: vi.fn(() => 'qwen-turbo'),
       getModel: vi.fn(() => 'qwen-plus'),
-      getGeminiClient: vi.fn(() => ({
+      getHopCodeClient: vi.fn(() => ({
         getChat: () => ({ getHistory: () => history }),
       })),
       getBaseLlmClient: vi.fn(() => ({ generateJson })),
@@ -244,7 +244,7 @@ describe('tryGenerateSessionTitle', () => {
     const config = {
       getFastModel: vi.fn(() => 'qwen-turbo'),
       getModel: vi.fn(() => 'qwen-plus'),
-      getGeminiClient: vi.fn(() => ({
+      getHopCodeClient: vi.fn(() => ({
         getChat: () => ({ getHistory: () => history }),
       })),
       getBaseLlmClient: vi.fn(() => ({ generateJson })),

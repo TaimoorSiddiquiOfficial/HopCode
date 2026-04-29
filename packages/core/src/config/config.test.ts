@@ -579,9 +579,9 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         model: 'coder-model',
-        apiKey: 'QWEN_OAUTH_DYNAMIC_TOKEN',
+        apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
         baseUrl: DEFAULT_DASHSCOPE_BASE_URL,
         timeout: 60000,
         maxRetries: 3,
@@ -604,12 +604,12 @@ describe('Server Config (config.ts)', () => {
         embedContent: vi.fn(),
       } as unknown as ContentGenerator);
 
-      await config.refreshAuth(AuthType.QWEN_OAUTH);
+      await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
       const listener = vi.fn();
       const unsubscribe = config.onModelChange(listener);
 
-      await config.switchModel(AuthType.QWEN_OAUTH, 'coder-model');
+      await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
 
       expect(listener).toHaveBeenCalledWith('coder-model');
 

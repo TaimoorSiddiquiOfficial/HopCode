@@ -280,8 +280,11 @@ class GrepToolInvocation extends BaseToolInvocation<
       rgArgs.push('--no-ignore-vcs');
     }
 
-    if (filteringOptions.respectQwenIgnore) {
-      // Load .qwenignore from each workspace directory, not just the primary one
+    if (
+      filteringOptions.respectHopCodeIgnore ||
+      filteringOptions.respectQwenIgnore
+    ) {
+      // Load .hopcodeignore from each workspace directory, not just the primary one
       const seenIgnoreFiles = new Set<string>();
       for (const searchPath of paths) {
         let isDir = dirIsDirCache.get(searchPath);
@@ -297,7 +300,7 @@ class GrepToolInvocation extends BaseToolInvocation<
         const dir = isDir ? searchPath : path.dirname(searchPath);
         let qwenIgnorePath = qwenIgnoreCache.get(dir);
         if (qwenIgnorePath === undefined) {
-          const candidate = path.join(dir, '.qwenignore');
+          const candidate = path.join(dir, '.hopcodeignore');
           qwenIgnorePath = fs.existsSync(candidate) ? candidate : null;
           qwenIgnoreCache.set(dir, qwenIgnorePath);
           trimCache(qwenIgnoreCache);
