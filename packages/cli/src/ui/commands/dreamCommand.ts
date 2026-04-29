@@ -4,11 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  getAutoMemoryRoot,
-  getProjectHash,
-  HOPCODE_DIR,
-} from '@hoptrendy/hopcode-core';
+import * as path from 'node:path';
+import { getAutoMemoryRoot, Storage } from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import type { SlashCommand } from './types.js';
 import { CommandKind } from './types.js';
@@ -31,8 +28,10 @@ export const dreamCommand: SlashCommand = {
 
     const projectRoot = config.getProjectRoot();
     const memoryRoot = getAutoMemoryRoot(projectRoot);
-    const projectHash = getProjectHash(projectRoot);
-    const transcriptDir = `${HOPCODE_DIR}/tmp/${projectHash}/chats`;
+    const transcriptDir = path.join(
+      new Storage(projectRoot).getProjectDir(),
+      'chats',
+    );
 
     const prompt = config
       .getMemoryManager()

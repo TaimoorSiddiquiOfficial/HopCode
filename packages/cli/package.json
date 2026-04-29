@@ -1,6 +1,7 @@
 {
   "name": "@hoptrendy/hopcode-cli",
   "version": "0.21.0",
+  "description": "HopCode CLI",
   "repository": {
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
