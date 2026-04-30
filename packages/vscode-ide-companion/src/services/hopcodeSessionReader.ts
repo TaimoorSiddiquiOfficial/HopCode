@@ -22,7 +22,6 @@ export interface HopCodeMessage {
     output: number;
     cached: number;
     thoughts: number;
-    tool: number;
     total: number;
   };
   model?: string;

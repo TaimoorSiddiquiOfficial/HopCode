@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-weixin",
-  "version": "0.21.1",
+  "version": "0.21.2",
   "description": "WeChat (Weixin) channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",

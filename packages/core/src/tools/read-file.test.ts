@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import type { Config } from '../config/config.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
+import { FileReadCache } from '../services/fileReadCache.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
 import { createMockWorkspaceContext } from '../test-utils/mockWorkspaceContext.js';
 import type { ToolInvocation, ToolResult } from './tools.js';
@@ -25,6 +26,7 @@ vi.mock('../telemetry/loggers.js', () => ({
 describe('ReadFileTool', () => {
   let tempRootDir: string;
   let tool: ReadFileTool;
+  let fileReadCache: FileReadCache;
   const abortSignal = new AbortController().signal;
 
   beforeEach(async () => {
@@ -32,6 +34,7 @@ describe('ReadFileTool', () => {
     tempRootDir = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'read-file-tool-root-'),
     );
+    fileReadCache = new FileReadCache();
 
     const mockConfigInstance = {
       getFileService: () => new FileDiscoveryService(tempRootDir),
@@ -41,13 +44,17 @@ describe('ReadFileTool', () => {
       storage: {
         getProjectTempDir: () => path.join(tempRootDir, '.temp'),
         getProjectDir: () => path.join(tempRootDir, '.project'),
-        getUserSkillsDirs: () => [path.join(os.homedir(), '.qwen', 'skills')],
+        getUserSkillsDirs: () => [
+          path.join(os.homedir(), '.hopcode', 'skills'),
+        ],
       },
       getTruncateToolOutputThreshold: () => 2500,
       getTruncateToolOutputLines: () => 500,
       getContentGeneratorConfig: () => ({
         modalities: { image: true, pdf: true, audio: true, video: true },
       }),
+      getFileReadCache: () => fileReadCache,
+      getFileReadCacheDisabled: () => false,
     } as unknown as Config;
     tool = new ReadFileTool(mockConfigInstance);
   });
@@ -570,6 +577,175 @@ describe('ReadFileTool', () => {
       } finally {
         await fsp.rm(osTempFile, { recursive: true, force: true });
       }
+    });
+
+    describe('with FileReadCache', () => {
+      // Helper to build + execute a Read in one shot.
+      async function read(
+        params: ReadFileToolParams,
+        toolOverride: ReadFileTool = tool,
+      ): Promise<ToolResult> {
+        const invocation = toolOverride.build(params) as ToolInvocation<
+          ReadFileToolParams,
+          ToolResult
+        >;
+        return invocation.execute(abortSignal);
+      }
+
+      it('returns the file_unchanged placeholder on a second full Read of an unchanged text file', async () => {
+        const filePath = path.join(tempRootDir, 'note.txt');
+        await fsp.writeFile(filePath, 'hello world', 'utf-8');
+
+        const first = await read({ file_path: filePath });
+        expect(first.llmContent).toBe('hello world');
+
+        const second = await read({ file_path: filePath });
+        expect(typeof second.llmContent).toBe('string');
+        expect(second.llmContent).toMatch(
+          /unchanged since last read in this session/,
+        );
+        // Placeholder must not echo the original content.
+        expect(second.llmContent).not.toContain('hello world');
+        expect(second.returnDisplay).toMatch(/^Unchanged: /);
+      });
+
+      it('serves a fresh full Read after an external modification (stale)', async () => {
+        const filePath = path.join(tempRootDir, 'mut.txt');
+        await fsp.writeFile(filePath, 'one', 'utf-8');
+        await read({ file_path: filePath });
+
+        // Bump mtime well into the future to defeat low-precision filesystems
+        // that share the second across rapid writes.
+        await fsp.writeFile(filePath, 'two', 'utf-8');
+        const future = new Date(Date.now() + 60_000);
+        await fsp.utimes(filePath, future, future);
+
+        const after = await read({ file_path: filePath });
+        expect(after.llmContent).toBe('two');
+      });
+
+      it('forces a full Read after recordWrite even if mtime/size still match', async () => {
+        const filePath = path.join(tempRootDir, 'edited.txt');
+        await fsp.writeFile(filePath, 'before', 'utf-8');
+        await read({ file_path: filePath });
+
+        const stats = fs.statSync(filePath);
+        fileReadCache.recordWrite(filePath, stats);
+
+        const after = await read({ file_path: filePath });
+        expect(after.llmContent).toBe('before');
+        expect(after.llmContent).not.toMatch(/unchanged since/);
+      });
+
+      it('never short-circuits a ranged Read (offset/limit set)', async () => {
+        const filePath = path.join(tempRootDir, 'multi.txt');
+        await fsp.writeFile(filePath, 'a\nb\nc\nd\ne', 'utf-8');
+        await read({ file_path: filePath });
+
+        const ranged = await read({
+          file_path: filePath,
+          offset: 1,
+          limit: 2,
+        });
+        expect(typeof ranged.llmContent).toBe('string');
+        expect(ranged.llmContent).not.toMatch(/unchanged since/);
+        expect(ranged.llmContent).toContain('b');
+      });
+
+      it('does not arm the placeholder if the first Read was truncated', async () => {
+        const filePath = path.join(tempRootDir, 'long.txt');
+        // Write more lines than the mock Config's truncate-lines limit
+        // (500) so the read pipeline reports isTruncated = true.
+        const bigContent = Array.from(
+          { length: 700 },
+          (_, i) => `line ${i + 1}`,
+        ).join('\n');
+        await fsp.writeFile(filePath, bigContent, 'utf-8');
+
+        const first = await read({ file_path: filePath });
+        expect(typeof first.llmContent).toBe('string');
+        expect(first.returnDisplay).toMatch(/Read lines .* of 700/);
+
+        const second = await read({ file_path: filePath });
+        expect(typeof second.llmContent).toBe('string');
+        expect(second.llmContent).not.toMatch(/unchanged since/);
+        expect(second.returnDisplay).toMatch(/Read lines .* of 700/);
+      });
+
+      it('does not arm the placeholder if the first Read was ranged', async () => {
+        const filePath = path.join(tempRootDir, 'big.txt');
+        await fsp.writeFile(filePath, 'a\nb\nc\nd\ne', 'utf-8');
+
+        await read({ file_path: filePath, offset: 0, limit: 2 });
+        const followUp = await read({ file_path: filePath });
+        expect(typeof followUp.llmContent).toBe('string');
+        expect(followUp.llmContent).not.toMatch(/unchanged since/);
+        expect(followUp.llmContent).toContain('e');
+      });
+
+      it('does not return the placeholder for binary files', async () => {
+        const binPath = path.join(tempRootDir, 'blob.bin');
+        await fsp.writeFile(binPath, Buffer.from([0x00, 0xff, 0x00, 0xff]));
+        const first = await read({ file_path: binPath });
+        expect(typeof first.llmContent).toBe('string');
+        expect(first.llmContent).toMatch(/Cannot display content of binary/);
+
+        const second = await read({ file_path: binPath });
+        expect(second.llmContent).not.toMatch(/unchanged since/);
+        expect(second.llmContent).toMatch(/Cannot display content of binary/);
+      });
+
+      it('does not return the placeholder for image files', async () => {
+        const imagePath = path.join(tempRootDir, 'pic.png');
+        const pngHeader = Buffer.from([
+          0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+        ]);
+        await fsp.writeFile(imagePath, pngHeader);
+
+        const first = await read({ file_path: imagePath });
+        // Image returns a Part, not a string.
+        expect(typeof first.llmContent).not.toBe('string');
+
+        const second = await read({ file_path: imagePath });
+        // Must remain a Part — never collapsed to a string placeholder.
+        expect(typeof second.llmContent).not.toBe('string');
+      });
+
+      it('completely bypasses the cache when getFileReadCacheDisabled() is true', async () => {
+        const isolatedCache = new FileReadCache();
+        const disabledConfig = {
+          getFileService: () => new FileDiscoveryService(tempRootDir),
+          getFileSystemService: () => new StandardFileSystemService(),
+          getTargetDir: () => tempRootDir,
+          getWorkspaceContext: () => createMockWorkspaceContext(tempRootDir),
+          storage: {
+            getProjectTempDir: () => path.join(tempRootDir, '.temp'),
+            getProjectDir: () => path.join(tempRootDir, '.project'),
+            getUserSkillsDirs: () => [
+              path.join(os.homedir(), '.hopcode', 'skills'),
+            ],
+          },
+          getTruncateToolOutputThreshold: () => 2500,
+          getTruncateToolOutputLines: () => 500,
+          getContentGeneratorConfig: () => ({
+            modalities: { image: true, pdf: true, audio: true, video: true },
+          }),
+          getFileReadCache: () => isolatedCache,
+          getFileReadCacheDisabled: () => true,
+        } as unknown as Config;
+        const disabledTool = new ReadFileTool(disabledConfig);
+
+        const filePath = path.join(tempRootDir, 'bypass.txt');
+        await fsp.writeFile(filePath, 'plain text', 'utf-8');
+
+        const first = await read({ file_path: filePath }, disabledTool);
+        const second = await read({ file_path: filePath }, disabledTool);
+
+        expect(first.llmContent).toBe('plain text');
+        expect(second.llmContent).toBe('plain text');
+        expect(second.llmContent).not.toMatch(/unchanged since/);
+        expect(isolatedCache.size()).toBe(0);
+      });
     });
 
     describe('with .hopcodeignore', () => {

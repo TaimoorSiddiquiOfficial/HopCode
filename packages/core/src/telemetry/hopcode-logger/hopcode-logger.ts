@@ -624,7 +624,6 @@ export class HopCodeLogger {
         output_token_count: event.output_token_count,
         cached_content_token_count: event.cached_content_token_count,
         thoughts_token_count: event.thoughts_token_count,
-        tool_token_count: event.tool_token_count,
       }),
     });
 
