@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,8 +37,6 @@ import {
   readManyFiles,
   Storage,
   ToolNames,
-  buildPermissionCheckContext,
-  evaluatePermissionRules,
   fireNotificationHook,
   firePermissionRequestHook,
   firePreToolUseHook,
@@ -53,6 +51,9 @@ import {
   getPlanModeSystemReminder,
   getSubagentSystemReminder,
   getArenaSystemReminder,
+  evaluatePermissionFlow,
+  needsConfirmation,
+  isPlanModeBlocked,
 } from '@hoptrendy/hopcode-core';
 
 import { RequestError } from '@agentclientprotocol/sdk';
@@ -83,7 +84,7 @@ import {
 import { isSlashCommand } from '../../ui/utils/commandUtils.js';
 import { CommandKind } from '../../ui/commands/types.js';
 import { parseAcpModelOption } from '../../utils/acpModelUtils.js';
-import { classifyApiError } from '../../ui/hooks/useHopCodeStream.js';
+import { classifyApiError } from '../../ui/hooks/useGeminiStream.js';
 
 // Import modular session components
 import type {
@@ -296,7 +297,7 @@ export class Session implements SessionContext {
 
         // Always fetch the current chat from GeminiClient so that /clear's
         // resetChat() (which replaces the chat instance) is reflected here.
-        const chat = this.config.getHopCodeClient()!.getChat();
+        const chat = this.config.getGeminiClient()!.getChat();
         const promptId = this.config.getSessionId() + '########' + this.turn;
 
         // Extract text from all text blocks to construct the full prompt text for logging
@@ -473,7 +474,7 @@ export class Session implements SessionContext {
             }
           } catch (error) {
             // Fire StopFailure hook (fire-and-forget, replaces Stop event for API errors)
-            // Aligned with useHopCodeStream.ts handleFinishedWithErrorEvent
+            // Aligned with useGeminiStream.ts handleFinishedWithErrorEvent
             const errorStatus = getErrorStatus(error);
             const errorMessage =
               error instanceof Error ? error.message : String(error);
@@ -523,17 +524,11 @@ export class Session implements SessionContext {
           }
 
           if (functionCalls.length > 0) {
-            const toolResponseParts: Part[] = [];
-
-            for (const fc of functionCalls) {
-              const response = await this.runTool(
-                pendingSend.signal,
-                promptId,
-                fc,
-              );
-              toolResponseParts.push(...response);
-            }
-
+            const toolResponseParts = await this.runToolCalls(
+              pendingSend.signal,
+              promptId,
+              functionCalls,
+            );
             nextMessage = { role: 'user', parts: toolResponseParts };
           }
         }
@@ -764,17 +759,11 @@ export class Session implements SessionContext {
 
           // Process tool calls from the follow-up message
           if (functionCalls.length > 0) {
-            const toolResponseParts: Part[] = [];
-
-            for (const fc of functionCalls) {
-              const toolResponse = await this.runTool(
-                pendingSend.signal,
-                promptId,
-                fc,
-              );
-              toolResponseParts.push(...toolResponse);
-            }
-
+            const toolResponseParts = await this.runToolCalls(
+              pendingSend.signal,
+              promptId,
+              functionCalls,
+            );
             nextMessage = { role: 'user', parts: toolResponseParts };
           }
         }
@@ -897,7 +886,7 @@ export class Session implements SessionContext {
             const streamStartTime = Date.now();
 
             const responseStream = await this.config
-              .getHopCodeClient()!
+              .getGeminiClient()!
               .getChat()
               .sendMessageStream(
                 this.config.getModel(),
@@ -957,11 +946,11 @@ export class Session implements SessionContext {
             }
 
             if (functionCalls.length > 0) {
-              const toolResponseParts: Part[] = [];
-              for (const fc of functionCalls) {
-                const response = await this.runTool(ac.signal, promptId, fc);
-                toolResponseParts.push(...response);
-              }
+              const toolResponseParts = await this.runToolCalls(
+                ac.signal,
+                promptId,
+                functionCalls,
+              );
               nextMessage = { role: 'user', parts: toolResponseParts };
             }
           }
@@ -1137,6 +1126,79 @@ export class Session implements SessionContext {
   }
 
   /**
+   * Execute a batch of model-returned tool calls, running Agent calls
+   * concurrently while keeping other tools sequential.
+   *
+   * Mirrors the partition logic in `coreToolScheduler.partitionToolCalls`:
+   * consecutive Agent calls form a parallel batch (they spawn independent
+   * sub-agents with no shared mutable state); any other tool forms its own
+   * sequential batch to preserve the implicit ordering the model may rely
+   * on. Response-part ordering matches the original `functionCalls` order.
+   */
+  private async runToolCalls(
+    abortSignal: AbortSignal,
+    promptId: string,
+    functionCalls: FunctionCall[],
+  ): Promise<Part[]> {
+    type Batch = { concurrent: boolean; calls: FunctionCall[] };
+    const batches: Batch[] = [];
+    for (const fc of functionCalls) {
+      const isAgent = fc.name === ToolNames.AGENT;
+      const last = batches[batches.length - 1];
+      if (isAgent && last?.concurrent) {
+        last.calls.push(fc);
+      } else {
+        batches.push({ concurrent: isAgent, calls: [fc] });
+      }
+    }
+
+    // Bounded-concurrency runner: matches core's `runConcurrently`
+    // behaviour (`coreToolScheduler.ts:1506`), capped by
+    // `HOPCODE_MAX_TOOL_CONCURRENCY` (default 10). Results are returned
+    // in input order regardless of resolution order.
+    const runBounded = async (calls: FunctionCall[]): Promise<Part[][]> => {
+      const parsed = parseInt(
+        process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] || '',
+        10,
+      );
+      const maxConcurrency =
+        Number.isFinite(parsed) && parsed >= 1 ? parsed : 10;
+      const results: Part[][] = new Array(calls.length);
+      const executing = new Set<Promise<void>>();
+      for (let i = 0; i < calls.length; i++) {
+        const idx = i;
+        const p = this.runTool(abortSignal, promptId, calls[idx])
+          .then((r) => {
+            results[idx] = r;
+          })
+          .finally(() => {
+            executing.delete(p);
+          });
+        executing.add(p);
+        if (executing.size >= maxConcurrency) {
+          await Promise.race(executing);
+        }
+      }
+      await Promise.all(executing);
+      return results;
+    };
+
+    const parts: Part[] = [];
+    for (const batch of batches) {
+      if (batch.concurrent && batch.calls.length > 1) {
+        const results = await runBounded(batch.calls);
+        for (const r of results) parts.push(...r);
+      } else {
+        for (const fc of batch.calls) {
+          const r = await this.runTool(abortSignal, promptId, fc);
+          parts.push(...r);
+        }
+      }
+    }
+    return parts;
+  }
+
+  /**
    * Assemble the per-turn system reminders the model needs to see at the
    * start of a user query or cron fire. Mirrors the subagent/plan/arena
    * branches in `GeminiClient.sendMessageStream` (`client.ts:848-878`) —
@@ -1257,7 +1319,7 @@ export class Session implements SessionContext {
     if (pm && !(await pm.isToolEnabled(fc.name as string))) {
       return earlyErrorResponse(
         new Error(
-          `HopCode requires permission to use "${fc.name}", but that permission was declined.`,
+          `Qwen Code requires permission to use "${fc.name}", but that permission was declined.`,
         ),
         fc.name,
       );
@@ -1280,14 +1342,19 @@ export class Session implements SessionContext {
     try {
       const invocation = tool.build(args);
 
-      if (isAgentTool && 'eventEmitter' in invocation) {
-        // Access eventEmitter from AgentTool invocation
-        const taskEventEmitter = (
-          invocation as {
-            eventEmitter: AgentEventEmitter;
-          }
-        ).eventEmitter;
-
+      // Production AgentTool always initializes `eventEmitter` on its
+      // invocation (`agent.ts:392`). Be defensive about the `undefined`
+      // case too so an incomplete/custom AgentTool invocation degrades
+      // gracefully (no sub-agent event forwarding) instead of throwing
+      // inside SubAgentTracker.setup — the `'eventEmitter' in invocation`
+      // key-presence check passed for `{ eventEmitter: undefined }` and
+      // the ensuing `eventEmitter.on(...)` blew up.
+      const taskEventEmitter = (
+        invocation as {
+          eventEmitter?: AgentEventEmitter;
+        }
+      ).eventEmitter;
+      if (isAgentTool && taskEventEmitter) {
         // Extract subagent metadata from AgentTool call
         const parentToolCallId = callId;
         const subagentType = (args['subagent_type'] as string) ?? '';
@@ -1317,39 +1384,22 @@ export class Session implements SessionContext {
       // The VS Code extension is just a UI layer for requestPermission.
       const isAskUserQuestionTool = fc.name === ToolNames.ASK_USER_QUESTION;
 
-      // ---- L3: Tool's default permission ----
-      // In YOLO mode, force 'allow' for everything except ask_user_question.
-      const defaultPermission =
-        this.config.getApprovalMode() !== ApprovalMode.YOLO ||
-        isAskUserQuestionTool
-          ? await invocation.getDefaultPermission()
-          : 'allow';
-
-      // ---- L4: PermissionManager override (if relevant rules exist) ----
+      // ---- L3→L4: Shared permission flow ----
       const toolParams = invocation.params as Record<string, unknown>;
-      const pmCtx = buildPermissionCheckContext(
+      const flowResult = await evaluatePermissionFlow(
+        this.config,
+        invocation,
         fc.name,
         toolParams,
-        this.config.getTargetDir?.() ?? '',
       );
-      const { finalPermission, pmForcedAsk } = await evaluatePermissionRules(
-        pm,
-        defaultPermission,
-        pmCtx,
-      );
-
-      const needsConfirmation = finalPermission === 'ask';
+      const { finalPermission, pmForcedAsk, pmCtx, denyMessage } = flowResult;
 
       // ---- L5: ApprovalMode overrides ----
       const isPlanMode = approvalMode === ApprovalMode.PLAN;
 
       if (finalPermission === 'deny') {
         return earlyErrorResponse(
-          new Error(
-            defaultPermission === 'deny'
-              ? `Tool "${fc.name}" is denied: command substitution is not allowed for security reasons.`
-              : `Tool "${fc.name}" is denied by permission rules.`,
-          ),
+          new Error(denyMessage ?? `Tool "${fc.name}" is denied.`),
           fc.name,
         );
       }
@@ -1357,7 +1407,7 @@ export class Session implements SessionContext {
       let didRequestPermission = false;
       let confirmationDetails: ToolCallConfirmationDetails | undefined;
 
-      if (needsConfirmation) {
+      if (needsConfirmation(finalPermission, approvalMode, fc.name)) {
         confirmationDetails =
           await invocation.getConfirmationDetails(abortSignal);
 
@@ -1365,10 +1415,12 @@ export class Session implements SessionContext {
         injectPermissionRulesIfMissing(confirmationDetails, pmCtx);
 
         if (
-          isPlanMode &&
-          !isExitPlanModeTool &&
-          !isAskUserQuestionTool &&
-          confirmationDetails.type !== 'info'
+          isPlanModeBlocked(
+            isPlanMode,
+            isExitPlanModeTool,
+            isAskUserQuestionTool,
+            confirmationDetails,
+          )
         ) {
           return earlyErrorResponse(
             new Error(
@@ -1438,7 +1490,7 @@ export class Session implements SessionContext {
           if (hooksEnabled && messageBus) {
             void fireNotificationHook(
               messageBus,
-              `HopCode needs your permission to use ${fc.name}`,
+              `Qwen Code needs your permission to use ${fc.name}`,
               NotificationType.PermissionPrompt,
               'Permission needed',
             );

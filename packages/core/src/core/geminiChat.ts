@@ -17,7 +17,7 @@ import type {
   GenerateContentResponseUsageMetadata,
 } from '@google/genai';
 import { createUserContent, FinishReason } from '@google/genai';
-import { retryWithBackoff } from '../utils/retry.js';
+import { retryWithBackoff, isUnattendedMode } from '../utils/retry.js';
 import { getErrorStatus } from '../utils/errors.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { parseAndFormatApiError } from '../utils/errorParsing.js';
@@ -37,7 +37,7 @@ import {
 } from '../telemetry/types.js';
 import type { UiTelemetryService } from '../telemetry/uiTelemetry.js';
 
-const debugLogger = createDebugLogger('GEMINI_CHAT');
+const debugLogger = createDebugLogger('HOPCODE_CHAT');
 
 export enum StreamEventType {
   /** A regular content chunk from the API. */
@@ -52,6 +52,9 @@ export type StreamEvent =
   | {
       type: StreamEventType.RETRY;
       retryInfo?: RetryInfo;
+      /** When true, the retry is a continuation (recovery) rather than a
+       *  fresh restart (escalation). The UI should keep the accumulated text
+       *  buffer so the continuation appends to it. */
       isContinuation?: boolean;
     };
 
@@ -81,6 +84,23 @@ const INVALID_STREAM_RETRY_CONFIG = {
 };
 
 /**
+ * Max recovery attempts when the escalated response is also truncated.
+ * Each attempt keeps the partial response in history and injects a recovery
+ * message so the model can continue from where it left off.
+ */
+const MAX_OUTPUT_RECOVERY_ATTEMPTS = 3;
+
+/**
+ * Recovery message injected as a user turn when the model's output is
+ * truncated even after token escalation. Instructs the model to resume
+ * without repeating itself and to break remaining work into smaller steps.
+ */
+const OUTPUT_RECOVERY_MESSAGE =
+  'Output token limit hit. Resume directly — no apology, no recap of what ' +
+  'you were doing. Pick up mid-thought if that is where the cut happened. ' +
+  'Break remaining work into smaller pieces.';
+
+/**
  * Options for retrying on rate-limit throttling errors returned as stream content.
  * Fixed 60s delay matches the DashScope per-minute quota window.
  * 10 retries aligns with Claude Code's retry behavior.
@@ -89,13 +109,6 @@ const RATE_LIMIT_RETRY_OPTIONS = {
   maxRetries: 10,
   delayMs: 60000,
 };
-
-// Max output token recovery: when the escalated response is still truncated,
-// keep the partial response and inject a continuation message up to 3 times
-// so the model can resume from where it left off.
-const MAX_OUTPUT_RECOVERY_ATTEMPTS = 3;
-const OUTPUT_RECOVERY_MESSAGE =
-  'Resume directly. Output token limit hit — continue from where you stopped.';
 
 /**
  * Creates a promise that resolves after the specified delay, but can be
@@ -419,7 +432,9 @@ export class GeminiChat {
             if (isRateLimit && rateLimitRetryCount < maxRateLimitRetries) {
               rateLimitRetryCount++;
               const delayMs = RATE_LIMIT_RETRY_OPTIONS.delayMs;
-              const message = parseAndFormatApiError(error);
+              const message = parseAndFormatApiError(
+                error instanceof Error ? error.message : String(error),
+              );
               debugLogger.warn(
                 `Rate limit throttling detected (retry ${rateLimitRetryCount}/${maxRateLimitRetries}). ` +
                   `Waiting ${delayMs / 1000}s before retrying...`,
@@ -476,7 +491,7 @@ export class GeminiChat {
               await delay(delayMs, params.config?.abortSignal).promise;
               continue;
             }
-            // Transient budget exhausted � stop immediately.
+            // Transient budget exhausted — stop immediately.
             if (isTransientStreamError) {
               break;
             }
@@ -507,7 +522,10 @@ export class GeminiChat {
 
         // Max output tokens escalation: if the retry loop succeeded with
         // the capped default (8K) but hit MAX_TOKENS, retry once at the
-        // model's full output limit (with 64K floor).
+        // model's full output limit. This ensures models with large output
+        // limits (e.g., 128K for Claude Opus, GPT-5) are fully utilized,
+        // while using ESCALATED_MAX_TOKENS (64K) as a floor for unknown
+        // models.
         // Placed outside the retry loop so that any errors from the
         // escalated stream propagate directly (not caught by retry logic).
         if (
@@ -542,138 +560,119 @@ export class GeminiChat {
               maxOutputTokens: escalatedLimit,
             },
           };
+          let escalatedFinishReason: string | undefined;
           const escalatedStream = await self.makeApiCallAndProcessStream(
             model,
             requestContents,
             escalatedParams,
             prompt_id,
           );
-          lastFinishReason = undefined;
           for await (const chunk of escalatedStream) {
             const fr = chunk.candidates?.[0]?.finishReason;
-            if (fr) lastFinishReason = fr;
+            if (fr) escalatedFinishReason = fr;
             yield { type: StreamEventType.CHUNK, value: chunk };
           }
-        }
 
-        // Max output token recovery: if the escalated response is still
-        // truncated, keep the partial response in history and inject a
-        // continuation message so the model can resume. Up to
-        // MAX_OUTPUT_RECOVERY_ATTEMPTS attempts.
-        if (
-          lastError === null &&
-          lastFinishReason === FinishReason.MAX_TOKENS &&
-          !hasUserMaxTokensOverride
-        ) {
-          const lastModelTurn = self.history[self.history.length - 1];
-          const hasFunctionCall =
-            lastModelTurn?.role === 'model' &&
-            lastModelTurn?.parts?.some(
-              (p) => p !== undefined && 'functionCall' in p && p.functionCall,
+          // Recovery: if the escalated response is also truncated, keep the
+          // partial response in history and inject a recovery message so the
+          // model can continue from where it left off.
+          let recoveryCount = 0;
+          let successfulRecoveries = 0;
+          while (
+            escalatedFinishReason === FinishReason.MAX_TOKENS &&
+            recoveryCount < MAX_OUTPUT_RECOVERY_ATTEMPTS
+          ) {
+            // Skip recovery when the truncated turn already contains a
+            // functionCall. Injecting a plain user message between a
+            // functionCall and its functionResponse produces an invalid API
+            // sequence that providers commonly reject. The existing layer-3
+            // tool scheduler fallback handles these cases correctly.
+            const lastEntry = self.history[self.history.length - 1];
+            const hasFunctionCall =
+              lastEntry?.role === 'model' &&
+              lastEntry.parts?.some((p) => p.functionCall) === true;
+            if (hasFunctionCall) {
+              debugLogger.info(
+                'Skipping recovery: truncated turn contains functionCall; ' +
+                  'deferring to tool scheduler fallback.',
+              );
+              break;
+            }
+
+            recoveryCount++;
+            debugLogger.info(
+              `Output still truncated after escalation. ` +
+                `Recovery attempt ${recoveryCount}/${MAX_OUTPUT_RECOVERY_ATTEMPTS}.`,
             );
-
-          if (!hasFunctionCall) {
-            const escalatedModelIndex = self.history.length - 1;
-            let recoveryRan = false;
-
-            for (
-              let recoveryAttempt = 0;
-              recoveryAttempt < MAX_OUTPUT_RECOVERY_ATTEMPTS;
-              recoveryAttempt++
-            ) {
-              // Guard: don't inject a recovery user message after a model
-              // turn that already contains a functionCall.
-              const currentLast = self.history[self.history.length - 1];
+            // The partial model response is already in history
+            // (pushed by processStreamResponse). Push a recovery user
+            // message so the model sees its partial output and continues.
+            self.history.push(
+              createUserContent([{ text: OUTPUT_RECOVERY_MESSAGE }]),
+            );
+            // Signal UI/turn to clear pending (incomplete) tool calls.
+            // isContinuation tells the UI to keep the text buffer so the
+            // model's continuation appends to the previous partial output.
+            yield { type: StreamEventType.RETRY, isContinuation: true };
+            // Re-send with the updated history (includes partial + recovery)
+            const recoveryContents = self.getHistory(true);
+            escalatedFinishReason = undefined;
+            try {
+              const recoveryStream = await self.makeApiCallAndProcessStream(
+                model,
+                recoveryContents,
+                escalatedParams,
+                prompt_id,
+              );
+              for await (const chunk of recoveryStream) {
+                const fr = chunk.candidates?.[0]?.finishReason;
+                if (fr) escalatedFinishReason = fr;
+                yield { type: StreamEventType.CHUNK, value: chunk };
+              }
+              // Iteration fully succeeded: both the user recovery turn and
+              // the model continuation turn are now in history and can be
+              // coalesced back into the preceding model entry after the loop.
+              successfulRecoveries++;
+            } catch (recoveryError) {
+              // If a recovery attempt fails (e.g., empty response, network
+              // error), stop recovering and let the partial output stand.
+              // Pop the dangling recovery message to keep history valid.
               if (
-                currentLast?.role === 'model' &&
-                currentLast?.parts?.some(
-                  (p) =>
-                    p !== undefined && 'functionCall' in p && p.functionCall,
-                )
+                self.history.length > 0 &&
+                self.history[self.history.length - 1].role === 'user'
               ) {
-                break;
+                self.history.pop();
               }
-
-              try {
-                // Inject continuation message as a user turn so the model
-                // can resume from its partial output.
-                self.history.push(createUserContent(OUTPUT_RECOVERY_MESSAGE));
-
-                recoveryRan = true;
-                yield { type: StreamEventType.RETRY, isContinuation: true };
-
-                const recoveryContents = self.getHistory(true);
-                const recoveryStream = await self.makeApiCallAndProcessStream(
-                  model,
-                  recoveryContents,
-                  params,
-                  prompt_id,
-                );
-
-                lastFinishReason = undefined;
-                for await (const chunk of recoveryStream) {
-                  const fr = chunk.candidates?.[0]?.finishReason;
-                  if (fr) lastFinishReason = fr;
-                  yield { type: StreamEventType.CHUNK, value: chunk };
-                }
-
-                // If recovery produced a clean finish, stop the loop.
-                if (lastFinishReason !== FinishReason.MAX_TOKENS) {
-                  break;
-                }
-                // Otherwise, continue to the next recovery attempt.
-              } catch {
-                // Recovery stream failed (empty stream, network error,
-                // etc.). Pop the dangling recovery user message so
-                // history stays valid, then emit a synthetic STOP chunk
-                // to signal truncation to the caller.
-                if (
-                  self.history.length > 0 &&
-                  self.history[self.history.length - 1].role === 'user'
-                ) {
-                  self.history.pop();
-                }
-                yield {
-                  type: StreamEventType.CHUNK,
-                  value: {
-                    candidates: [{ finishReason: 'STOP' }],
-                  } as unknown as GenerateContentResponse,
-                };
-                break;
-              }
+              debugLogger.warn(
+                `Recovery attempt ${recoveryCount} failed: ${recoveryError}`,
+              );
+              // Emit a synthetic finish-reason chunk so the UI gets a
+              // terminal signal (Finished event) instead of a partial
+              // response with no end marker. Uses STOP because partial
+              // chunks from prior successful iterations are already in
+              // the transcript and represent the user-visible response.
+              yield {
+                type: StreamEventType.CHUNK,
+                value: {
+                  candidates: [
+                    {
+                      content: { role: 'model', parts: [] },
+                      finishReason: FinishReason.STOP,
+                    },
+                  ],
+                } as unknown as GenerateContentResponse,
+              };
+              break;
             }
+          }
 
-            // Coalesce successful recovery iterations into the preceding
-            // model turn. Without this, the internal recovery user
-            // messages would persist as real conversation turns, biasing
-            // every subsequent model call. After coalescing, the history
-            // contains a single model turn with the combined text.
-            if (recoveryRan && lastFinishReason !== FinishReason.MAX_TOKENS) {
-              const baseModelTurn = self.history[escalatedModelIndex];
-              if (baseModelTurn && baseModelTurn.role === 'model') {
-                const allParts = [...(baseModelTurn.parts ?? [])];
-                // Collect parts from recovery model turns and drop
-                // recovery user messages.
-                const keep: Content[] = self.history.slice(
-                  0,
-                  escalatedModelIndex + 1,
-                );
-                for (
-                  let i = escalatedModelIndex + 1;
-                  i < self.history.length;
-                  i++
-                ) {
-                  const entry = self.history[i];
-                  if (entry && entry.role === 'model') {
-                    allParts.push(...(entry.parts ?? []));
-                  }
-                  // Skip recovery user messages.
-                }
-                baseModelTurn.parts = allParts;
-                // Remove all recovery entries.
-                self.history = keep;
-              }
-            }
+          // Coalesce completed recovery pairs back into the preceding model
+          // turn so the OUTPUT_RECOVERY_MESSAGE control prompt does not
+          // persist as a synthetic user turn in durable history. The user
+          // never sent that message, and leaving it in history would bias
+          // later turns and pollute compression / replay / export.
+          if (successfulRecoveries > 0) {
+            self.coalesceRecoveryPairs(successfulRecoveries);
           }
         }
 
@@ -727,6 +726,13 @@ export class GeminiChat {
         return false;
       },
       authType: this.config.getContentGeneratorConfig()?.authType,
+      persistentMode: isUnattendedMode(),
+      signal: params.config?.abortSignal,
+      heartbeatFn: (info) => {
+        process.stderr.write(
+          `[qwen-code] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
+        );
+      },
     });
 
     return this.processStreamResponse(model, streamResponse);
@@ -782,11 +788,8 @@ export class GeminiChat {
     this.history = history;
   }
 
-  /** Truncate history to keep only the most recent `keepCount` turns. */
   truncateHistory(keepCount: number): void {
-    if (keepCount >= 0 && this.history.length > keepCount) {
-      this.history = this.history.slice(-keepCount);
-    }
+    this.history = this.history.slice(0, keepCount);
   }
 
   /**
@@ -826,9 +829,8 @@ export class GeminiChat {
       for (const tool of tools) {
         if (
           (tool.schema.parametersJsonSchema &&
-            hasCycleInSchema(tool.schema.parametersJsonSchema as object)) ||
-          (tool.schema.parameters &&
-            hasCycleInSchema(tool.schema.parameters as object))
+            hasCycleInSchema(tool.schema.parametersJsonSchema)) ||
+          (tool.schema.parameters && hasCycleInSchema(tool.schema.parameters))
         ) {
           cyclicSchemaTools.push(tool.displayName);
         }
@@ -987,6 +989,44 @@ export class GeminiChat {
         ...consolidatedHistoryParts,
       ],
     });
+  }
+
+  /**
+   * Merge `pairCount` trailing (user_recovery, model_continuation) pairs back
+   * into the model turn that precedes them. Used after the output-token
+   * recovery loop so the internal OUTPUT_RECOVERY_MESSAGE control prompt
+   * does not persist in durable history as if the user sent it.
+   *
+   * Expected tail shape per iteration (walking from the back):
+   *   [..., precedingModel, userRecovery, modelContinuation]
+   *
+   * If any pair doesn't match that shape the method bails defensively
+   * rather than corrupting history.
+   */
+  private coalesceRecoveryPairs(pairCount: number): void {
+    for (let i = 0; i < pairCount; i++) {
+      const len = this.history.length;
+      if (len < 3) return;
+
+      const modelContinuation = this.history[len - 1]!;
+      const userRecovery = this.history[len - 2]!;
+      const precedingModel = this.history[len - 3]!;
+
+      if (
+        modelContinuation.role !== 'model' ||
+        userRecovery.role !== 'user' ||
+        precedingModel.role !== 'model'
+      ) {
+        return;
+      }
+
+      precedingModel.parts = [
+        ...(precedingModel.parts ?? []),
+        ...(modelContinuation.parts ?? []),
+      ];
+      // Drop the (userRecovery, modelContinuation) pair.
+      this.history.splice(len - 2, 2);
+    }
   }
 }
 

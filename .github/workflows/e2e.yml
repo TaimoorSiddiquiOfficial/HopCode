@@ -45,9 +45,9 @@ jobs:
         run: |-
           npm run build
 
-      - name: 'Bundle CLI'
+      - name: 'Bundle CLI for E2E tests'
         run: |-
-          node esbuild.config.js && node scripts/copy_bundle_assets.js
+          npm run bundle
 
       - name: 'Set up Docker'
         if: |-
@@ -71,11 +71,6 @@ jobs:
           KEEP_OUTPUT: 'true'
           VERBOSE: 'true'
         run: |-
-          if [[ -z "${OPENAI_API_KEY}" ]]; then
-            echo 'Skipping E2E tests because OPENAI_API_KEY is not configured.'
-            exit 0
-          fi
-
           if [[ "${{ matrix.sandbox }}" == "sandbox:docker" ]]; then
             npm run test:integration:sandbox:docker
           else
@@ -112,19 +107,13 @@ jobs:
         run: |-
           npm run build
 
-      - name: 'Bundle CLI'
+      - name: 'Bundle CLI for E2E tests'
         run: |-
-          node esbuild.config.js && node scripts/copy_bundle_assets.js
+          npm run bundle
 
       - name: 'Run E2E tests'
         env:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
           OPENAI_MODEL: '${{ secrets.OPENAI_MODEL }}'
-        run: |-
-          if [[ -z "${OPENAI_API_KEY}" ]]; then
-            echo 'Skipping E2E tests because OPENAI_API_KEY is not configured.'
-            exit 0
-          fi
-
-          npm run test:e2e
+        run: 'npm run test:e2e'

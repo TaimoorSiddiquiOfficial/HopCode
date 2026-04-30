@@ -1,5 +1,7 @@
-description="Injects context of all relevant cli files"
-prompt = """
+---
+description: Injects context of all relevant cli files
+---
+
 The following output contains the complete
 source code of the HopCode CLI library (`packages/cli`), and packages/core and representative test files
 (`packages/cli/src/ui/components/InputPrompt.test.tsx` and `packages/cli/src/ui/App.test.tsx`) that best conform to the project's testing standards.
@@ -13,11 +15,10 @@ included as they are test files that conform to the project's testing standards:
 You should very rarely need to read any other files from packages/cli to resolve
 prompts.
 
-!{find packages/cli packages/core \\( -path packages/cli/dist -o -path packages/core/dist -o -name node_modules \\) -prune -o -type f \\( -name "*.ts" -o -name "*.tsx" \\) ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "*.d.ts" -exec echo "--- {} ---" \\; -exec cat {} \\; && echo "--- packages/cli/src/ui/components/InputPrompt.test.tsx ---" && cat packages/cli/src/ui/components/InputPrompt.test.tsx && echo "--- packages/cli/src/ui/App.test.tsx ---" && cat packages/cli/src/ui/App.test.tsx}
+!{find packages/cli packages/core \( -path packages/cli/dist -o -path packages/core/dist -o -name node_modules \) -prune -o -type f \( -name "_.ts" -o -name "_.tsx" \) ! -name "_.test.ts" ! -name "_.test.tsx" ! -name "\*.d.ts" -exec echo "--- {} ---" \; -exec cat {} \; && echo "--- packages/cli/src/ui/components/InputPrompt.test.tsx ---" && cat packages/cli/src/ui/components/InputPrompt.test.tsx && echo "--- packages/cli/src/ui/App.test.tsx ---" && cat packages/cli/src/ui/App.test.tsx}
 
 In addition to the code context, you MUST strictly adhere to the following development guidelines when writing code in packages/cli.
 
 !{cat .hopcode/commands/strict-development-rules.md}
 
-{{args}}. 
- """
+{{args}}.

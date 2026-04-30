@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1248,7 +1248,7 @@ export const App: React.FC = () => {
             } else if (msg.role === 'thinking') {
               parts.push(`**Thinking:** ${content}`);
             } else {
-              parts.push(`**HopCode:** ${content}`);
+              parts.push(`**Qwen Code:** ${content}`);
             }
           } else if (
             item.type === 'completed-tool-call' ||
@@ -1299,7 +1299,7 @@ export const App: React.FC = () => {
             <p className="text-muted-foreground text-sm">
               {sessionManagement.isSwitchingSession
                 ? 'Loading conversation...'
-                : 'Preparing HopCode...'}
+                : 'Preparing Qwen Code...'}
             </p>
           </div>
         </div>
@@ -1354,7 +1354,7 @@ export const App: React.FC = () => {
                 className="text-sm"
                 style={{ color: 'var(--app-secondary-foreground)' }}
               >
-                Preparing HopCode...
+                Preparing Qwen Code...
               </span>
             </div>
           ) : (

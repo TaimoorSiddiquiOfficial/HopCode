@@ -26,6 +26,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import { HopCodeClient } from '../core/client.js';
 import { createMockWorkspaceContext } from '../test-utils/mockWorkspaceContext.js';
+import { FileReadCache } from '../services/fileReadCache.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
 import { FileReadCache } from '../services/fileReadCache.js';
 

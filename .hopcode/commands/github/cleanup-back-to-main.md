@@ -1,6 +1,7 @@
-description = "Go back to main and clean up the branch."
+---
+description: Go back to main and clean up the branch.
+---
 
-prompt = """
 I'm done with the work on this branch, and I'm ready to go back to main and clean up.
 
 Here is the workflow I'd like you to follow:
@@ -10,4 +11,3 @@ Here is the workflow I'd like you to follow:
 3.  **Go to Main:** Next, I need you to checkout the main branch.
 4.  **Pull Latest:** Once you are on the main branch, I need you to pull down the latest changes to make sure I'm up to date.
 5.  **Branch Cleanup:** Finally, I need you to delete the branch that you noted in the first step.
-"""

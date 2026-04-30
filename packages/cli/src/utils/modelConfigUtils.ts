@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -58,11 +58,15 @@ export interface ResolvedCliGenerationConfig {
 }
 
 export function getAuthTypeFromEnv(): AuthType | undefined {
-  if (process.env['HOPCODE_OAUTH']) {
+  if (process.env['QWEN_OAUTH']) {
     return AuthType.HOPCODE_OAUTH;
   }
 
-  if (process.env['OPENAI_API_KEY']) {
+  if (
+    process.env['OPENAI_API_KEY'] &&
+    process.env['OPENAI_MODEL'] &&
+    process.env['OPENAI_BASE_URL']
+  ) {
     return AuthType.USE_OPENAI;
   }
 
