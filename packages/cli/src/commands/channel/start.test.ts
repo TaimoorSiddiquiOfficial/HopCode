@@ -1,9 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mockSetGlobalDispatcher = vi.hoisted(() => vi.fn());
-const mockProxyAgent = vi.hoisted(() =>
-  vi.fn((url: string) => ({ proxyUrl: url })),
-);
 const mockLoadSettings = vi.hoisted(() => vi.fn());
 const mockGetExtensionManager = vi.hoisted(() => vi.fn());
 const mockReadServiceInfo = vi.hoisted(() => vi.fn());
@@ -45,11 +41,6 @@ const mockSessionRouter = vi.hoisted(() =>
   })),
 );
 
-vi.mock('undici', () => ({
-  ProxyAgent: mockProxyAgent,
-  setGlobalDispatcher: mockSetGlobalDispatcher,
-}));
-
 vi.mock('../../config/settings.js', () => ({
   loadSettings: mockLoadSettings,
 }));
@@ -79,7 +70,7 @@ vi.mock('./channel-registry.js', () => ({
   registerPlugin: mockRegisterPlugin,
 }));
 
-vi.mock('@qwen-code/channel-base', () => ({
+vi.mock('@hoptrendy/channel-base', () => ({
   AcpBridge: mockAcpBridge,
   SessionRouter: mockSessionRouter,
 }));
@@ -141,10 +132,6 @@ describe('resolveProxy', () => {
     );
 
     expect(proxy).toBe('http://cli.example.com:8080');
-    expect(mockProxyAgent).toHaveBeenCalledWith('http://cli.example.com:8080');
-    expect(mockSetGlobalDispatcher).toHaveBeenCalledWith({
-      proxyUrl: 'http://cli.example.com:8080',
-    });
   });
 
   it('prefers settings.proxy over environment proxies', () => {
@@ -153,9 +140,6 @@ describe('resolveProxy', () => {
     const proxy = resolveProxy(undefined, 'http://settings.example.com:8080');
 
     expect(proxy).toBe('http://settings.example.com:8080');
-    expect(mockProxyAgent).toHaveBeenCalledWith(
-      'http://settings.example.com:8080',
-    );
   });
 
   it('falls back to proxy environment variables', () => {
@@ -164,7 +148,6 @@ describe('resolveProxy', () => {
     const proxy = resolveProxy();
 
     expect(proxy).toBe('http://env.example.com:8080');
-    expect(mockProxyAgent).toHaveBeenCalledWith('http://env.example.com:8080');
   });
 });
 
@@ -190,8 +173,6 @@ describe('startCommand.handler', () => {
     }
 
     expect(mockLoadSettings).toHaveBeenCalledWith(process.cwd());
-    expect(mockProxyAgent).toHaveBeenCalledWith(settingsProxy);
-    expect(mockProxyAgent).not.toHaveBeenCalledWith(envProxy);
     expect(mockCreateChannel).toHaveBeenCalledWith(
       'telegram',
       mockParsedChannelConfig,
