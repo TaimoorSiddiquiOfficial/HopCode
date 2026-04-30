@@ -303,19 +303,47 @@ app.get('/api/sessions/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const projectHint = String(req.query['project'] ?? '');
+
+    // Prevent path traversal: sessionId must be a safe basename
+    if (!/^[\w-]+$/.test(sessionId)) {
+      res.status(400).json({ error: 'Invalid session ID' });
+      return;
+    }
+
     const projectsDir = getProjectsDir();
+
+    // Resolve a candidate file path and verify it stays within projectsDir.
+    function resolveSafePath(
+      projectName: string,
+      session: string,
+    ): string | null {
+      // Prevent path traversal in project name
+      if (
+        projectName.includes('..') ||
+        projectName.includes('/') ||
+        projectName.includes('\\')
+      ) {
+        return null;
+      }
+      const resolved = path.resolve(
+        projectsDir,
+        projectName,
+        'chats',
+        `${session}.jsonl`,
+      );
+      // Verify the resolved path is still under projectsDir
+      if (!resolved.startsWith(path.resolve(projectsDir) + path.sep)) {
+        return null;
+      }
+      return resolved;
+    }
 
     // Find the file
     let filePath: string | null = null;
 
     if (projectHint && fs.existsSync(projectsDir)) {
-      const candidate = path.join(
-        projectsDir,
-        projectHint,
-        'chats',
-        `${sessionId}.jsonl`,
-      );
-      if (fs.existsSync(candidate)) filePath = candidate;
+      const candidate = resolveSafePath(projectHint, sessionId);
+      if (candidate && fs.existsSync(candidate)) filePath = candidate;
     }
 
     if (!filePath && fs.existsSync(projectsDir)) {
