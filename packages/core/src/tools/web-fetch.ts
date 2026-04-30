@@ -84,10 +84,8 @@ class WebFetchToolInvocation extends BaseToolInvocation<
     let url = this.params.url;
 
     // Convert GitHub blob URL to raw URL
-    if (url.includes('github.com') && url.includes('/blob/')) {
-      url = url
-        .replace('github.com', 'raw.githubusercontent.com')
-        .replace('/blob/', '/');
+    if (isGitHubBlobUrl(url)) {
+      url = convertGitHubBlobToRaw(url);
       this.debugLogger.debug(
         `[WebFetchTool] Converted GitHub blob URL to raw URL: ${url}`,
       );
@@ -315,4 +313,24 @@ export class WebFetchTool extends BaseDeclarativeTool<
   ): ToolInvocation<WebFetchToolParams, ToolResult> {
     return new WebFetchToolInvocation(this.config, params);
   }
+}
+
+// ── URL helpers ────────────────────────────────────────────────────────────────
+
+function isGitHubBlobUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.hostname === 'github.com' && parsed.pathname.includes('/blob/')
+    );
+  } catch {
+    return false;
+  }
+}
+
+function convertGitHubBlobToRaw(url: string): string {
+  const parsed = new URL(url);
+  parsed.hostname = 'raw.githubusercontent.com';
+  parsed.pathname = parsed.pathname.replace('/blob/', '/');
+  return parsed.toString();
 }
