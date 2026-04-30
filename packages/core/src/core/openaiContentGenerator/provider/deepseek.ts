@@ -23,7 +23,7 @@ export class DeepSeekOpenAICompatibleProvider extends DefaultOpenAICompatiblePro
     contentGeneratorConfig: ContentGeneratorConfig,
   ): boolean {
     const baseUrl = contentGeneratorConfig.baseUrl ?? '';
-    if (baseUrl.toLowerCase().includes('api.deepseek.com')) {
+    if (isDeepSeekHostname(baseUrl)) {
       return true;
     }
 
@@ -65,6 +65,19 @@ export class DeepSeekOpenAICompatibleProvider extends DefaultOpenAICompatiblePro
     return {
       temperature: 0,
     };
+  }
+}
+
+function isDeepSeekHostname(baseUrl: string): boolean {
+  if (!baseUrl) return false;
+  try {
+    const normalized = baseUrl.includes('://') ? baseUrl : `https://${baseUrl}`;
+    const hostname = new URL(normalized).hostname;
+    return (
+      hostname === 'api.deepseek.com' || hostname.endsWith('.api.deepseek.com')
+    );
+  } catch {
+    return false;
   }
 }
 
