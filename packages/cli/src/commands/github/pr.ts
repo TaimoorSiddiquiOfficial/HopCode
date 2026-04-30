@@ -18,11 +18,11 @@ import { listPRs, createPR, getPRDiff } from '../../utils/githubApi.js';
 import { loadGitHubToken } from '../../utils/githubTokenStore.js';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { t } from '../../i18n/index.js';
-import { execSync, exec } from 'node:child_process';
+import { execSync, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createInterface } from 'node:readline';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 // ── Git helpers ───────────────────────────────────────────────────────────────
 
@@ -101,8 +101,9 @@ async function generatePRContent(
   ].join('\n');
 
   try {
-    const { stdout } = await execAsync(
-      `hopcode --non-interactive --output-format text "${prompt.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`,
+    const { stdout } = await execFileAsync(
+      'hopcode',
+      ['--non-interactive', '--output-format', 'text', prompt],
       { timeout: 45000 },
     );
     const text = stdout.trim();
@@ -292,8 +293,9 @@ const reviewCommand: CommandModule = {
 
     writeStdoutLine(t('  Generating AI review...\n'));
     try {
-      const { stdout } = await execAsync(
-        `hopcode --non-interactive --output-format text "${prompt.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`,
+      const { stdout } = await execFileAsync(
+        'hopcode',
+        ['--non-interactive', '--output-format', 'text', prompt],
         { timeout: 60000 },
       );
       writeStdoutLine(stdout);
