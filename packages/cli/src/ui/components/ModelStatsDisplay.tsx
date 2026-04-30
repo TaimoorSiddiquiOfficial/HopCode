@@ -21,7 +21,7 @@ import { t } from '../../i18n/index.js';
 const METRIC_COL_WIDTH = 28;
 // 28 + 2*24 = 76, fitting the 76-column panel at 80-column terminal width
 // when the session has a single (model, source) pair split into two columns.
-// Sessions with three or more sources will exceed the panel — acceptable per
+// Sessions with three or more sources will exceed the panel ï¿½ acceptable per
 // the design doc, which accepts the crowded layout for many-subagent cases.
 const MODEL_COL_WIDTH = 24;
 
@@ -44,7 +44,7 @@ const StatRow: React.FC<StatRowProps> = ({
         bold={isSection}
         color={isSection ? theme.text.primary : theme.text.link}
       >
-        {isSubtle ? `  ? ${title}` : title}
+        {isSubtle ? `  â†³ ${title}` : title}
       </Text>
     </Box>
     {values.map((value, index) => (

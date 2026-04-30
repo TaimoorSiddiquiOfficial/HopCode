@@ -55,15 +55,15 @@ describe('modelConfigUtils', () => {
       expect(getAuthTypeFromEnv()).toBe(AuthType.USE_OPENAI);
     });
 
-    it('should return USE_OPENAI when only OPENAI_API_KEY is set', () => {
+    it('should return undefined when only OPENAI_API_KEY is set', () => {
       process.env['OPENAI_API_KEY'] = 'test-key';
-      // OPENAI_MODEL and OPENAI_BASE_URL are optional
+      // OPENAI_MODEL and OPENAI_BASE_URL are required
 
-      expect(getAuthTypeFromEnv()).toBe(AuthType.USE_OPENAI);
+      expect(getAuthTypeFromEnv()).toBeUndefined();
     });
 
-    it('should return HOPCODE_OAUTH when HOPCODE_OAUTH is set', () => {
-      process.env['HOPCODE_OAUTH'] = 'true';
+    it('should return HOPCODE_OAUTH when QWEN_OAUTH is set', () => {
+      process.env['QWEN_OAUTH'] = 'true';
 
       expect(getAuthTypeFromEnv()).toBe(AuthType.HOPCODE_OAUTH);
     });
@@ -112,13 +112,13 @@ describe('modelConfigUtils', () => {
       expect(getAuthTypeFromEnv()).toBeUndefined();
     });
 
-    it('should prioritize HOPCODE_OAUTH over other auth types when explicitly set', () => {
-      process.env['HOPCODE_OAUTH'] = 'true';
+    it('should prioritize QWEN_OAUTH over other auth types when explicitly set', () => {
+      process.env['QWEN_OAUTH'] = 'true';
       process.env['OPENAI_API_KEY'] = 'test-key';
       process.env['OPENAI_MODEL'] = 'gpt-4';
       process.env['OPENAI_BASE_URL'] = 'https://api.openai.com';
 
-      // HOPCODE_OAUTH is checked first, so it should be returned even when other auth vars are set
+      // QWEN_OAUTH is checked first, so it should be returned even when other auth vars are set
       expect(getAuthTypeFromEnv()).toBe(AuthType.HOPCODE_OAUTH);
     });
 
