@@ -180,7 +180,7 @@ describe('Single-Turn Query (E2E)', () => {
         expect(Array.isArray(systemMessage!.mcp_servers)).toBe(true);
         expect(systemMessage!.model).toBeDefined();
         expect(systemMessage!.permission_mode).toBeDefined();
-        expect(systemMessage!.hopcode_version).toBeDefined();
+        expect(systemMessage!.HOPCODE_version).toBeDefined();
 
         // Validate system message appears early in sequence
         const systemMessageIndex = messages.findIndex(
