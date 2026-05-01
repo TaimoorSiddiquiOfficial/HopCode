@@ -49,7 +49,9 @@ export function classifySituation(input: ClassifyInput): SituationAnalysis {
     text.includes('bug') ||
     text.includes('not working') ||
     text.includes('error') ||
-    text.includes('failed')
+    text.includes('fail') ||
+    text.includes('crash') ||
+    text.includes("what's wrong")
   ) {
     return {
       situation: 'uncertain_bug',
@@ -62,7 +64,8 @@ export function classifySituation(input: ClassifyInput): SituationAnalysis {
   if (
     text.includes('review') ||
     text.includes('improve') ||
-    text.includes('refactor')
+    text.includes('refactor') ||
+    text.includes('rewrite')
   ) {
     return {
       situation: 'code_review',
