@@ -85,6 +85,7 @@ jobs:
 
       - name: 'Build CLI dependencies'
         run: |
+          npm run build --workspace=packages/quran-guidance
           npm run build --workspace=packages/core
           npm run build --workspace=packages/web-templates
           npm run build --workspace=packages/server

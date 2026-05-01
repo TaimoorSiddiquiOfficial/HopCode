@@ -34,7 +34,8 @@ if (!existsSync(join(root, 'node_modules'))) {
 execSync('npm run generate', { stdio: 'inherit', cwd: root });
 
 // Build in dependency order:
-// 1. core (foundation package, includes test-utils)
+// 1. quran-guidance (behavioral guidance — core depends on it)
+// 2. core (foundation package, includes test-utils)
 // 2. web-templates (embeddable web templates - used by cli)
 // 3. channel-base (base channel infrastructure - used by channel adapters and cli)
 // 4. channel adapters (depend on channel-base)
@@ -44,6 +45,7 @@ execSync('npm run generate', { stdio: 'inherit', cwd: root });
 // 8. sdk (no internal dependencies)
 // 9. vscode-ide-companion (depends on webui)
 const buildOrder = [
+  'packages/quran-guidance',
   'packages/core',
   'packages/web-templates',
   'packages/channels/base',
