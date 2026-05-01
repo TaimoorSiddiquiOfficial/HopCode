@@ -39,6 +39,9 @@ export interface TelemetryArgOverrides {
   telemetryTarget?: string | TelemetryTarget;
   telemetryOtlpEndpoint?: string;
   telemetryOtlpProtocol?: string;
+  telemetryOtlpTracesEndpoint?: string;
+  telemetryOtlpLogsEndpoint?: string;
+  telemetryOtlpMetricsEndpoint?: string;
   telemetryLogPrompts?: boolean;
   telemetryOutfile?: string;
 }
@@ -118,11 +121,36 @@ export async function resolveTelemetrySettings(options: {
         env['QWEN_TELEMETRY_USE_COLLECTOR'],
     ) ?? settings.useCollector;
 
+  // Per-signal endpoint resolution: arg > HOPCODE_* env > QWEN_* env > OTEL_* env > settings
+  const otlpTracesEndpoint =
+    argv.telemetryOtlpTracesEndpoint ??
+    env['HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
+    env['QWEN_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
+    env['OTEL_EXPORTER_OTLP_TRACES_ENDPOINT'] ??
+    settings.otlpTracesEndpoint;
+
+  const otlpLogsEndpoint =
+    argv.telemetryOtlpLogsEndpoint ??
+    env['HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT'] ??
+    env['QWEN_TELEMETRY_OTLP_LOGS_ENDPOINT'] ??
+    env['OTEL_EXPORTER_OTLP_LOGS_ENDPOINT'] ??
+    settings.otlpLogsEndpoint;
+
+  const otlpMetricsEndpoint =
+    argv.telemetryOtlpMetricsEndpoint ??
+    env['HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT'] ??
+    env['QWEN_TELEMETRY_OTLP_METRICS_ENDPOINT'] ??
+    env['OTEL_EXPORTER_OTLP_METRICS_ENDPOINT'] ??
+    settings.otlpMetricsEndpoint;
+
   return {
     enabled,
     target,
     otlpEndpoint,
     otlpProtocol,
+    otlpTracesEndpoint,
+    otlpLogsEndpoint,
+    otlpMetricsEndpoint,
     logPrompts,
     outfile,
     useCollector,

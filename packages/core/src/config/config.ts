@@ -222,6 +222,9 @@ export interface TelemetrySettings {
   target?: TelemetryTarget;
   otlpEndpoint?: string;
   otlpProtocol?: 'grpc' | 'http';
+  otlpTracesEndpoint?: string;
+  otlpLogsEndpoint?: string;
+  otlpMetricsEndpoint?: string;
   logPrompts?: boolean;
   outfile?: string;
   useCollector?: boolean;
@@ -799,6 +802,9 @@ export class Config {
       target: params.telemetry?.target ?? DEFAULT_TELEMETRY_TARGET,
       otlpEndpoint: params.telemetry?.otlpEndpoint ?? DEFAULT_OTLP_ENDPOINT,
       otlpProtocol: params.telemetry?.otlpProtocol,
+      otlpTracesEndpoint: params.telemetry?.otlpTracesEndpoint,
+      otlpLogsEndpoint: params.telemetry?.otlpLogsEndpoint,
+      otlpMetricsEndpoint: params.telemetry?.otlpMetricsEndpoint,
       logPrompts: params.telemetry?.logPrompts ?? true,
       outfile: params.telemetry?.outfile,
       useCollector: params.telemetry?.useCollector,
@@ -1705,6 +1711,13 @@ export class Config {
     } catch (error) {
       // Log but don't throw - cleanup should be best-effort
       this.debugLogger.error('Error during Config shutdown:', error);
+    } finally {
+      try {
+        const { shutdownTelemetry } = await import('../telemetry/sdk.js');
+        await shutdownTelemetry();
+      } catch {
+        // Best-effort — don't block shutdown if telemetry was never started
+      }
     }
   }
 
@@ -2065,6 +2078,18 @@ export class Config {
 
   getTelemetryOtlpProtocol(): 'grpc' | 'http' {
     return this.telemetrySettings.otlpProtocol ?? 'grpc';
+  }
+
+  getTelemetryOtlpTracesEndpoint(): string | undefined {
+    return this.telemetrySettings.otlpTracesEndpoint;
+  }
+
+  getTelemetryOtlpLogsEndpoint(): string | undefined {
+    return this.telemetrySettings.otlpLogsEndpoint;
+  }
+
+  getTelemetryOtlpMetricsEndpoint(): string | undefined {
+    return this.telemetrySettings.otlpMetricsEndpoint;
   }
 
   getTelemetryTarget(): TelemetryTarget {

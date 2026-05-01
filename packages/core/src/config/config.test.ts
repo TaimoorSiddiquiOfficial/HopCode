@@ -1088,6 +1088,48 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(paramsWithoutTelemetry);
       expect(config.getTelemetryOtlpProtocol()).toBe('grpc');
     });
+
+    it('should return per-signal endpoints when provided', () => {
+      const params: ConfigParameters = {
+        ...baseParams,
+        telemetry: {
+          enabled: true,
+          otlpTracesEndpoint: 'http://traces:4317/v1/traces',
+          otlpLogsEndpoint: 'http://logs:4317/v1/logs',
+          otlpMetricsEndpoint: 'http://metrics:4317/v1/metrics',
+        },
+      };
+      const config = new Config(params);
+      expect(config.getTelemetryOtlpTracesEndpoint()).toBe(
+        'http://traces:4317/v1/traces',
+      );
+      expect(config.getTelemetryOtlpLogsEndpoint()).toBe(
+        'http://logs:4317/v1/logs',
+      );
+      expect(config.getTelemetryOtlpMetricsEndpoint()).toBe(
+        'http://metrics:4317/v1/metrics',
+      );
+    });
+
+    it('should return undefined for per-signal endpoints when not provided', () => {
+      const params: ConfigParameters = {
+        ...baseParams,
+        telemetry: { enabled: true },
+      };
+      const config = new Config(params);
+      expect(config.getTelemetryOtlpTracesEndpoint()).toBeUndefined();
+      expect(config.getTelemetryOtlpLogsEndpoint()).toBeUndefined();
+      expect(config.getTelemetryOtlpMetricsEndpoint()).toBeUndefined();
+    });
+
+    it('should return undefined for per-signal endpoints when telemetry not provided', () => {
+      const paramsWithoutTelemetry: ConfigParameters = { ...baseParams };
+      delete paramsWithoutTelemetry.telemetry;
+      const config = new Config(paramsWithoutTelemetry);
+      expect(config.getTelemetryOtlpTracesEndpoint()).toBeUndefined();
+      expect(config.getTelemetryOtlpLogsEndpoint()).toBeUndefined();
+      expect(config.getTelemetryOtlpMetricsEndpoint()).toBeUndefined();
+    });
   });
 
   describe('UseRipgrep Configuration', () => {

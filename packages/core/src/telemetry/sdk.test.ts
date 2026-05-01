@@ -6,7 +6,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Config } from '../config/config.js';
-import { initializeTelemetry, shutdownTelemetry } from './sdk.js';
+import {
+  initializeTelemetry,
+  shutdownTelemetry,
+  resolveHttpOtlpUrl,
+} from './sdk.js';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
@@ -37,6 +41,9 @@ describe('Telemetry SDK', () => {
       getTelemetryEnabled: () => true,
       getTelemetryOtlpEndpoint: () => 'http://localhost:4317',
       getTelemetryOtlpProtocol: () => 'grpc',
+      getTelemetryOtlpTracesEndpoint: () => undefined,
+      getTelemetryOtlpLogsEndpoint: () => undefined,
+      getTelemetryOtlpMetricsEndpoint: () => undefined,
       getTelemetryTarget: () => 'local',
       getTelemetryUseCollector: () => false,
       getTelemetryOutfile: () => undefined,
@@ -77,13 +84,13 @@ describe('Telemetry SDK', () => {
     initializeTelemetry(mockConfig);
 
     expect(OTLPTraceExporterHttp).toHaveBeenCalledWith({
-      url: 'http://localhost:4318/',
+      url: 'http://localhost:4318/v1/traces',
     });
     expect(OTLPLogExporterHttp).toHaveBeenCalledWith({
-      url: 'http://localhost:4318/',
+      url: 'http://localhost:4318/v1/logs',
     });
     expect(OTLPMetricExporterHttp).toHaveBeenCalledWith({
-      url: 'http://localhost:4318/',
+      url: 'http://localhost:4318/v1/metrics',
     });
     expect(NodeSDK.prototype.start).toHaveBeenCalled();
   });
@@ -98,14 +105,14 @@ describe('Telemetry SDK', () => {
     );
   });
 
-  it('should parse HTTP endpoint correctly', () => {
+  it('should parse HTTP endpoint correctly with signal paths', () => {
     vi.spyOn(mockConfig, 'getTelemetryOtlpProtocol').mockReturnValue('http');
     vi.spyOn(mockConfig, 'getTelemetryOtlpEndpoint').mockReturnValue(
       'https://my-collector.com',
     );
     initializeTelemetry(mockConfig);
     expect(OTLPTraceExporterHttp).toHaveBeenCalledWith(
-      expect.objectContaining({ url: 'https://my-collector.com/' }),
+      expect.objectContaining({ url: 'https://my-collector.com/v1/traces' }),
     );
   });
 
@@ -144,5 +151,40 @@ describe('Telemetry SDK', () => {
     expect(OTLPLogExporterHttp).not.toHaveBeenCalled();
     expect(OTLPMetricExporterHttp).not.toHaveBeenCalled();
     expect(NodeSDK.prototype.start).toHaveBeenCalled();
+  });
+});
+
+describe('resolveHttpOtlpUrl', () => {
+  it('appends signal-specific path to base URL', () => {
+    expect(resolveHttpOtlpUrl('http://localhost:4318', 'traces')).toBe(
+      'http://localhost:4318/v1/traces',
+    );
+    expect(resolveHttpOtlpUrl('https://collector.example.com', 'logs')).toBe(
+      'https://collector.example.com/v1/logs',
+    );
+    expect(resolveHttpOtlpUrl('http://localhost:4318/', 'metrics')).toBe(
+      'http://localhost:4318/v1/metrics',
+    );
+  });
+
+  it('does not double-append the signal path', () => {
+    expect(
+      resolveHttpOtlpUrl('http://localhost:4318/v1/traces', 'traces'),
+    ).toBe('http://localhost:4318/v1/traces');
+  });
+
+  it('strips trailing slash before appending', () => {
+    expect(resolveHttpOtlpUrl('http://localhost:4318/', 'traces')).toBe(
+      'http://localhost:4318/v1/traces',
+    );
+  });
+
+  it('preserves query string and hash', () => {
+    expect(resolveHttpOtlpUrl('http://localhost:4318?opt=1', 'traces')).toBe(
+      'http://localhost:4318/v1/traces?opt=1',
+    );
+    expect(resolveHttpOtlpUrl('http://localhost:4318#s', 'traces')).toBe(
+      'http://localhost:4318/v1/traces#s',
+    );
   });
 });
