@@ -257,7 +257,7 @@ describe('useResumeCommand', () => {
         debug: vi.fn(),
         error: vi.fn(),
       }),
-    } as unknown as import('@qwen-code/qwen-code-core').Config;
+    } as unknown as import('@hoptrendy/hopcode-core').Config;
 
     const { result } = renderHook(() =>
       useResumeCommand({
@@ -305,7 +305,7 @@ describe('useResumeCommand', () => {
         debug: vi.fn(),
         error: vi.fn(),
       }),
-    } as unknown as import('@qwen-code/qwen-code-core').Config;
+    } as unknown as import('@hoptrendy/hopcode-core').Config;
 
     const { result } = renderHook(() =>
       useResumeCommand({
