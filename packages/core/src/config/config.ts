@@ -240,11 +240,7 @@ export interface GitCoAuthorSettings {
   email?: string;
 }
 
-export type ExtensionOriginSource =
-  | 'QwenCode'
-  | 'Claude'
-  | 'Gemini'
-  | 'HopCode';
+export type ExtensionOriginSource = 'Claude' | 'Gemini' | 'HopCode';
 
 export type AgentModelOverride =
   | string

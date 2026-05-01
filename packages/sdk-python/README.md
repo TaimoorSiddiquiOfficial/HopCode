@@ -1,12 +1,12 @@
-# qwen-code-sdk
+# hopcode-sdk
 
-Experimental Python SDK for programmatic access to Qwen Code through the
+Experimental Python SDK for programmatic access to HopCode through the
 `stream-json` protocol.
 
 ## Installation
 
 ```bash
-pip install qwen-code-sdk
+pip install hopcode-sdk
 ```
 
 ## Requirements
