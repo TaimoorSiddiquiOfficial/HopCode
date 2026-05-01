@@ -70,6 +70,7 @@ import {
 import * as Diff from 'diff';
 import levenshtein from 'fast-levenshtein';
 import { getPlanModeSystemReminder } from './prompts.js';
+import { checkIznGate, reportIznScope } from '@hoptrendy/quran-guidance';
 import { ShellToolInvocation } from '../tools/shell.js';
 import { IdeClient } from '../ide/ide-client.js';
 
@@ -1040,6 +1041,31 @@ export class CoreToolScheduler {
           let confirmationDetails: ToolCallConfirmationDetails | undefined;
 
           if (!needsConfirmation(finalPermission, approvalMode, reqInfo.name)) {
+            // ── IZN mode destructive-action gate ─────────────────────────
+            // When the user has granted full Izn, auto-approve is the default
+            // but the agent must self-verify before destructive actions
+            // (file deletion, force-push, DROP/TRUNCATE, permission changes).
+            if (approvalMode === ApprovalMode.IZN) {
+              const gateResult = checkIznGate({
+                toolName: reqInfo.name,
+                toolArgs: toolParams,
+              });
+              if (!gateResult.allowed) {
+                this.setStatusInternal(reqInfo.callId, 'error', {
+                  callId: reqInfo.callId,
+                  responseParts: convertToFunctionResponse(
+                    reqInfo.name,
+                    reqInfo.callId,
+                    gateResult.requiredConfirmation,
+                  ),
+                  resultDisplay: `Izn gate blocked ${reqInfo.name}: ${gateResult.reason}`,
+                  error: undefined,
+                  errorType: undefined,
+                });
+                continue;
+              }
+            }
+
             this.setToolCallOutcome(
               reqInfo.callId,
               ToolConfirmationOutcome.ProceedAlways,
@@ -1699,6 +1725,21 @@ export class CoreToolScheduler {
             content = appendAdditionalContext(
               content,
               `<system-reminder>\n${rulesCtx}\n</system-reminder>`,
+            );
+          }
+        }
+
+        // Izn mode: inject post-execution scope-report context
+        // so the model self-verifies after each tool call.
+        if (this.config.getApprovalMode() === ApprovalMode.IZN) {
+          const scopeReport = reportIznScope({
+            toolName,
+            toolArgs: toolInput,
+          });
+          if (scopeReport) {
+            content = appendAdditionalContext(
+              content,
+              `<system-reminder>\n${scopeReport.context}\n</system-reminder>`,
             );
           }
         }

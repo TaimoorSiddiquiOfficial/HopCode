@@ -103,7 +103,8 @@
     "fuzzysort": "^3.1.0",
     "remeda": "^2.33.7",
     "yaml": "^2.8.1",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@hoptrendy/quran-guidance": "*"
   },
   "optionalDependencies": {
     "@lydell/node-pty": "1.2.0-beta.10"

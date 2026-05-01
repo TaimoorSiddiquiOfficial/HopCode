@@ -50,7 +50,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     const prompt = getCoreSystemPrompt();
     expect(prompt).toContain('You are HopCode, an interactive CLI agent'); // Check for core content
     expect(prompt).toContain('# Executing actions with care');
-    expect(prompt).toContain('# Quran-Guided Behavior');
+    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot(); // Use snapshot for base prompt structure
   });
 
@@ -58,7 +58,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt('');
     expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toContain('# Quran-Guided Behavior');
+    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot();
   });
 
@@ -66,7 +66,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt('   \n  \t ');
     expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toContain('# Quran-Guided Behavior');
+    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot();
   });
 

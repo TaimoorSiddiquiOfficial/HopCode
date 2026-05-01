@@ -6,7 +6,7 @@ export { classifySituation } from './engine/classify-situation.js';
 export { resolveGuidance } from './engine/resolve-guidance.js';
 export { composeAgentBehavior } from './engine/compose-agent-behavior.js';
 export { buildQuranGuidedAgentPrompt } from './engine/build-agent-prompt.js';
-export { checkIznGate } from './engine/izn-gate.js';
+export { checkIznGate, reportIznScope } from './engine/izn-gate.js';
 
 export type {
   QuranicAngle,
@@ -28,6 +28,11 @@ export {
   IZN_MODE_AVOID,
   IZN_MODE_TONE,
 } from './types/izn-types.js';
+
+export {
+  QURAN_GUIDED_AGENT_PROMPT,
+  IZN_MODE_GUIDE_PROMPT,
+} from './prompts/index.js';
 
 export { ayahGuidance } from './data/ayah-guidance.js';
 export { situationAngleMap } from './data/situation-angle-map.js';
