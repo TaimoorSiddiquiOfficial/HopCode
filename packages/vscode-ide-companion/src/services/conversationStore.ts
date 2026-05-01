@@ -6,6 +6,7 @@
 
 import type * as vscode from 'vscode';
 import type { ChatMessage } from './hopcodeAgentManager.js';
+import { randomUUID } from 'node:crypto';
 
 export interface Conversation {
   id: string;
@@ -25,7 +26,7 @@ export class ConversationStore {
 
   async createConversation(title: string = 'New Chat'): Promise<Conversation> {
     const conversation: Conversation = {
-      id: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `conv_${Date.now()}_${randomUUID()}`,
       title,
       messages: [],
       createdAt: Date.now(),

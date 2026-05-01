@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { randomBytes } from 'node:crypto';
+import { randomInt } from 'node:crypto';
 
 /**
  * GitHub Device Flow response
@@ -253,9 +253,7 @@ export class GitHubDeviceFlowAuth {
   static generateUserCode(): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No I, O, 0, 1
     const length = 8;
-    const bytes = randomBytes(length);
-    return Array.from(bytes)
-      .map((b) => chars[b % chars.length])
+    return Array.from({ length }, () => chars[randomInt(chars.length)])
       .join('-')
       .replace(/(.{4})/, '$1-');
   }

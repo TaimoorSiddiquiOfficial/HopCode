@@ -261,7 +261,7 @@ async function createImageAttachment(
   try {
     const base64Data = await fileToBase64(file);
     return {
-      id: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `img_${Date.now()}_${crypto.randomUUID()}`,
       name: file.name || `image_${Date.now()}`,
       type: file.type,
       size: file.size,

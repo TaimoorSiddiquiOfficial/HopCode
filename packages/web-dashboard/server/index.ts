@@ -227,6 +227,51 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ─── Rate limiting ────────────────────────────────────────────────────────────
+
+const REQUEST_WINDOW_MS = 60_000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 300; // per IP
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+// Clean up expired entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap) {
+    if (now >= entry.resetAt) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}, 60_000).unref();
+
+app.use((req, res, next) => {
+  const ip = req.ip ?? req.socket.remoteAddress ?? 'unknown';
+  const now = Date.now();
+  let entry = rateLimitMap.get(ip);
+
+  if (!entry || now >= entry.resetAt) {
+    entry = { count: 1, resetAt: now + REQUEST_WINDOW_MS };
+    rateLimitMap.set(ip, entry);
+    res.setHeader('X-RateLimit-Remaining', MAX_REQUESTS_PER_WINDOW - 1);
+    res.setHeader('X-RateLimit-Reset', Math.ceil(entry.resetAt / 1000));
+    return next();
+  }
+
+  entry.count++;
+  const remaining = MAX_REQUESTS_PER_WINDOW - entry.count;
+  res.setHeader('X-RateLimit-Remaining', Math.max(0, remaining));
+  res.setHeader('X-RateLimit-Reset', Math.ceil(entry.resetAt / 1000));
+
+  if (entry.count > MAX_REQUESTS_PER_WINDOW) {
+    res
+      .status(429)
+      .json({ error: 'Too many requests, please try again later.' });
+    return;
+  }
+
+  next();
+});
+
 /** Serve built React frontend */
 const clientDistDir = path.join(__dirname, '../client');
 if (fs.existsSync(clientDistDir)) {

@@ -339,7 +339,10 @@ export class TelegramChannel extends ChannelBase {
         });
       } catch {
         // Fallback to plain text for the failed chunk only
-        await this.bot.api.sendMessage(chatId, chunk.replace(/<[^>]*>/g, ''));
+        await this.bot.api.sendMessage(
+          chatId,
+          chunk.replace(/<[^>]*>/g, '').replace(/<[^>]*>/g, ''),
+        );
       }
     }
   }

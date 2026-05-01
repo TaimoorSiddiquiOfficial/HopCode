@@ -134,9 +134,8 @@ async function handleSessions(
       updatedAt: f.mtime.toISOString(),
     }));
     sendJson(res, 200, { sessions }, corsOrigin);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    sendJson(res, 500, { error: msg }, corsOrigin);
+  } catch {
+    sendJson(res, 500, { error: 'Internal server error' }, corsOrigin);
   }
 }
 

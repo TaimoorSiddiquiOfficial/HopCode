@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode",
-  "version": "0.21.2",
+  "version": "0.21.3",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -19,7 +19,7 @@
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
   "config": {
-    "sandboxImageUri": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.19.9"
+    "sandboxImageUri": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.21.3"
   },
   "scripts": {
     "verify:privacy": "tsx scripts/verify-privacy.ts",

@@ -385,7 +385,8 @@ export async function activate(context: vscode.ExtensionContext) {
             // macOS/Linux: All VSCode-like IDEs (VSCode, Cursor, Windsurf, etc.)
             // are Electron-based, so we always need ELECTRON_RUN_AS_NODE=1
             // to run Node.js scripts using the IDE's bundled runtime.
-            const quotePosix = (s: string) => `"${s.replace(/"/g, '\\"')}"`;
+            const quotePosix = (s: string) =>
+              `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
             const baseCmd = `${quotePosix(execPath)} ${quotePosix(cliEntry)}`;
             hopcodeCmd = `ELECTRON_RUN_AS_NODE=1 ${baseCmd}`;
           }

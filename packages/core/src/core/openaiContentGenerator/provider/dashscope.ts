@@ -34,7 +34,13 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
     if (!baseUrl) return true;
 
     // Matches: dashscope.aliyuncs.com, *.dashscope.aliyuncs.com, or *.dashscope-intl.aliyuncs.com
-    return /([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com/i.test(baseUrl);
+    try {
+      const hostname = new URL(baseUrl).hostname;
+      return /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(hostname);
+    } catch {
+      // If baseUrl is not a valid URL (e.g., just a hostname), test directly
+      return /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(baseUrl);
+    }
   }
 
   override buildHeaders(): Record<string, string | undefined> {

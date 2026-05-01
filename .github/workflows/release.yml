@@ -224,6 +224,10 @@ jobs:
         run: |-
           npm ci --no-audit --progress=false
 
+      - name: 'Build CLI Bundle'
+        run: |-
+          npm run build && npm run bundle
+
       - name: 'Run CLI Integration Tests'
         run: |-
           npm run test:integration:cli:sandbox:none

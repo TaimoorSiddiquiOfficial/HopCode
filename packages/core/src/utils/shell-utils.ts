@@ -188,8 +188,18 @@ export function escapeShellArg(arg: string, shell: ShellType): string {
       // For PowerShell, wrap in single quotes and escape internal single quotes by doubling them.
       return `'${arg.replace(/'/g, "''")}'`;
     case 'cmd':
-      // Simple Windows escaping for cmd.exe: wrap in double quotes and escape inner double quotes.
-      return `"${arg.replace(/"/g, '""')}"`;
+      // Escape cmd.exe meta-characters: double-quote internal quotes and
+      // escape % (environment variable), ^ (escape char), & | < > (pipes/redirects),
+      // and ! (delayed expansion) within the quoted value.
+      return `"${arg
+        .replace(/"/g, '""')
+        .replace(/%/g, '%%')
+        .replace(/\^/g, '^^')
+        .replace(/&/g, '^&')
+        .replace(/\|/g, '^|')
+        .replace(/</g, '^<')
+        .replace(/>/g, '^>')
+        .replace(/!/g, '^!')}"`;
     case 'bash':
     default:
       // POSIX shell escaping using shell-quote.

@@ -67,6 +67,10 @@ export function applyUpdates(
   const result = current;
 
   for (const key of Object.getOwnPropertyNames(updates)) {
+    // Prevent prototype pollution via __proto__, constructor, or prototype keys
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      continue;
+    }
     const value = updates[key];
     if (
       typeof value === 'object' &&

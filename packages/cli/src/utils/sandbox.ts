@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { exec, execSync, spawn, type ChildProcess } from 'node:child_process';
+import {
+  exec,
+  execSync,
+  execFileSync,
+  spawn,
+  type ChildProcess,
+} from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -363,25 +369,28 @@ export async function start_sandbox(
       writeStderrLine('building sandbox ...');
       const gcRoot = gcPath.split('/packages/')[0];
       // if project folder has sandbox.Dockerfile under project settings folder, use that
-      let buildArgs = '';
+      const buildArgs: string[] = ['-s'];
       const projectSandboxDockerfile = path.join(
         SETTINGS_DIRECTORY_NAME,
         'sandbox.Dockerfile',
       );
       if (isCustomProjectSandbox) {
         writeStderrLine(`using ${projectSandboxDockerfile} for sandbox`);
-        buildArgs += `-f ${path.resolve(projectSandboxDockerfile)} -i ${image}`;
+        buildArgs.push(
+          '-f',
+          path.resolve(projectSandboxDockerfile),
+          '-i',
+          image,
+        );
       }
-      execSync(
-        `cd ${gcRoot} && node scripts/build_sandbox.js -s ${buildArgs}`,
-        {
-          stdio: 'inherit',
-          env: {
-            ...process.env,
-            HOPCODE_SANDBOX: config.command, // in case sandbox is enabled via flags (see config.ts under cli package)
-          },
+      execFileSync('node', ['scripts/build_sandbox.js', ...buildArgs], {
+        cwd: gcRoot,
+        stdio: 'inherit',
+        env: {
+          ...process.env,
+          HOPCODE_SANDBOX: config.command, // in case sandbox is enabled via flags (see config.ts under cli package)
         },
-      );
+      });
     }
   }
 

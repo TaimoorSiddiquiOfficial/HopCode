@@ -22,11 +22,11 @@
 import type { CommandModule, Argv } from 'yargs';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { t } from '../../i18n/index.js';
-import { execSync, exec } from 'node:child_process';
+import { execSync, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createInterface } from 'node:readline';
 
-const execAsync = promisify(exec);
+const execAsync = promisify(execFile);
 
 // ── Git helpers ───────────────────────────────────────────────────────────────
 
@@ -111,7 +111,8 @@ async function generateCommitMessage(
   try {
     // Use the CLI itself in non-interactive mode
     const { stdout } = await execAsync(
-      `hopcode --non-interactive --output-format text "${prompt.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`,
+      'hopcode',
+      ['--non-interactive', '--output-format', 'text', prompt],
       { timeout: 30000 },
     );
     const msg = stdout.trim();

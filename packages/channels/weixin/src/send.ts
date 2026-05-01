@@ -9,7 +9,7 @@ import { MessageType, MessageState, MessageItemType } from './types.js';
 /** Convert markdown to plain text (WeChat doesn't support markdown) */
 export function markdownToPlainText(text: string): string {
   return text
-    .replace(/```[\s\S]*?\n([\s\S]*?)```/g, '$1')
+    .replace(/```[^\n`]*\n([\s\S]*?)```/g, '$1')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/\*\*\*(.+?)\*\*\*/g, '$1')
     .replace(/\*\*(.+?)\*\*/g, '$1')
