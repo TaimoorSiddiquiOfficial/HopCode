@@ -12,7 +12,10 @@ import process from 'node:process';
 import { isGitRepository } from '../utils/gitUtils.js';
 import { HOPCODE_CONFIG_DIR } from '../memory/const.js';
 import type { GenerateContentConfig } from '@google/genai';
-import { QURAN_GUIDED_AGENT_PROMPT } from '@hoptrendy/quran-guidance';
+import {
+  getQuranGuidedBehavior,
+  QURAN_GUIDED_AGENT_PROMPT,
+} from '@hoptrendy/quran-guidance';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
 const debugLogger = createDebugLogger('PROMPTS');
@@ -1121,4 +1124,46 @@ export function getInsightPrompt(type: InsightPromptType): string {
  */
 export function getQuranGuidanceSection(): string {
   return QURAN_GUIDED_AGENT_PROMPT;
+}
+
+/**
+ * Generates a per-turn Quran-guided behavioral reminder based on the
+ * user's current message. Classifies the situation, resolves relevant
+ * guidance, and returns a &lt;system-reminder&gt; to inject before the
+ * model processes the turn.
+ *
+ * Suppressed when HOPCODE_SYSTEM_MD is active (static guidance is
+ * already suppressed in that mode).
+ *
+ * @param userMessage - The user's current message text
+ * @param iznModeActive - Whether Izn approval mode is active
+ * @returns A &lt;system-reminder&gt; string, or '' if suppressed/empty
+ */
+export function getQuranGuidancePerTurnReminder(
+  userMessage: string,
+  iznModeActive: boolean,
+): string {
+  const systemMdEnv = process.env['HOPCODE_SYSTEM_MD'];
+  if (systemMdEnv && systemMdEnv !== '0' && systemMdEnv !== 'false') {
+    return '';
+  }
+
+  try {
+    const { behaviorPrompt } = getQuranGuidedBehavior({
+      userMessage,
+      iznModeActive,
+    });
+
+    if (!behaviorPrompt) return '';
+
+    return `<system-reminder>
+${behaviorPrompt}
+</system-reminder>`;
+  } catch (err) {
+    debugLogger.warn(
+      'Failed to generate Quran guidance per-turn reminder:',
+      err,
+    );
+    return '';
+  }
 }

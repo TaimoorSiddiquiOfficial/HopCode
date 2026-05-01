@@ -28,6 +28,7 @@ import {
   getCoreSystemPrompt,
   getCustomSystemPrompt,
   getPlanModeSystemReminder,
+  getQuranGuidancePerTurnReminder,
   getSubagentSystemReminder,
 } from './prompts.js';
 import {
@@ -882,6 +883,17 @@ export class HopCodeClient {
         } catch {
           // Arena config not yet initialized — skip
         }
+      }
+
+      // add per-turn quran guidance reminder for context-aware behavior
+      const messageText = partToString(request);
+      const iznActive = this.config.getApprovalMode() === ApprovalMode.IZN;
+      const quranGuidanceReminder = getQuranGuidancePerTurnReminder(
+        messageText,
+        iznActive,
+      );
+      if (quranGuidanceReminder) {
+        systemReminders.push(quranGuidanceReminder);
       }
 
       requestToSent = [...systemReminders, ...requestToSent];
