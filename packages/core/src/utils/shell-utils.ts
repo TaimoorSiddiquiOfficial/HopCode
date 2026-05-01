@@ -759,12 +759,50 @@ export async function checkCommandPermissions(
   command: string,
   config: Config,
   sessionAllowlist?: Set<string>,
+  shellType?: ShellType,
 ): Promise<{
   allAllowed: boolean;
   disallowedCommands: string[];
   blockReason?: string;
   isHardDenial?: boolean;
 }> {
+  // ── PowerShell security layer ─────────────────────────────────────────────
+  // Check PowerShell policy BEFORE any other permission checks when the
+  // current shell is PowerShell. This gives the PC owner a dedicated
+  // master switch + mode + allowlist/blocklist control over PowerShell.
+  if (shellType === 'powershell') {
+    const psConfig = config.getPowerShellConfig();
+    const { evaluatePowerShellCommand } = await import(
+      '../security/powershell-security.js'
+    );
+    const psResult = evaluatePowerShellCommand(command, psConfig);
+
+    if (psResult.isHardDenial || !psResult.allowed) {
+      return {
+        allAllowed: false,
+        disallowedCommands: [command],
+        blockReason:
+          psResult.reason ?? 'PowerShell command blocked by security policy.',
+        isHardDenial: psResult.isHardDenial,
+      };
+    }
+
+    // If confirmation is required and we're not in YOLO, force 'ask'
+    if (psResult.requiresConfirmation) {
+      // Mark as disallowed (requires confirmation) but not hard denial
+      return {
+        allAllowed: false,
+        disallowedCommands: [command],
+        blockReason:
+          psResult.reason ??
+          'PowerShell command requires PC owner confirmation.',
+        isHardDenial: false,
+      };
+    }
+
+    // PowerShell policy passes — fall through to normal permission checks
+  }
+
   // Disallow command substitution for security.
   if (detectCommandSubstitution(command)) {
     return {

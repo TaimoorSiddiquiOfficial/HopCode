@@ -182,6 +182,37 @@ export interface CliArgs {
   inputFile?: string | undefined;
 }
 
+/**
+ * Resolve PowerShell security settings from settings.json to the
+ * PowerShellSecurityConfig format expected by the core Config class.
+ *
+ * Settings values may be `undefined` (when not configured) — this
+ * function strips those so the core `resolvePowerShellConfig`
+ * utility can fill in defaults.
+ */
+function resolvePowerShellSettings(
+  settings: Record<string, unknown> | undefined,
+):
+  | Partial<import('@hoptrendy/hopcode-core').PowerShellSecurityConfig>
+  | undefined {
+  if (!settings) return undefined;
+
+  const enabled =
+    typeof settings['enabled'] === 'boolean' ? settings['enabled'] : undefined;
+  const mode =
+    typeof settings['mode'] === 'string'
+      ? (settings['mode'] as 'allow' | 'ask' | 'deny')
+      : undefined;
+  const allowlist = Array.isArray(settings['allowlist'])
+    ? (settings['allowlist'] as string[])
+    : undefined;
+  const blocklist = Array.isArray(settings['blocklist'])
+    ? (settings['blocklist'] as string[])
+    : undefined;
+
+  return { enabled, mode, allowlist, blocklist };
+}
+
 function normalizeOutputFormat(
   format: string | OutputFormat | undefined,
 ): OutputFormat | undefined {
@@ -1365,6 +1396,9 @@ export async function loadCliConfig(
     allowedHttpHookUrls: bareMode
       ? []
       : (settings.security?.allowedHttpHookUrls ?? []),
+    powershellConfig: bareMode
+      ? undefined
+      : resolvePowerShellSettings(settings.security?.powershell),
     cliVersion: await getCliVersion(),
     webSearch: bareMode
       ? undefined

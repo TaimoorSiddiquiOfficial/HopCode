@@ -2132,6 +2132,14 @@ export const useHopCodeStream = (
   >([]);
   const [notificationTrigger, setNotificationTrigger] = useState(0);
 
+  // Reset notification queue when session changes so stale
+  // cron / background-agent notifications from a previous session
+  // don't fire into the new session.
+  const sessionId = config.getSessionId();
+  useEffect(() => {
+    notificationQueueRef.current = [];
+  }, [sessionId]);
+
   // Start the cron scheduler on mount, stop on unmount.
   // Cron fires enqueue onto the shared notification queue.
   useEffect(() => {

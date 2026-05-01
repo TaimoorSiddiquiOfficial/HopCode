@@ -1552,6 +1552,83 @@ const SETTINGS_SCHEMA = {
           description: 'URL pattern (supports * wildcard)',
         },
       },
+      powershell: {
+        type: 'object',
+        label: 'PowerShell Security',
+        category: 'Security',
+        requiresRestart: false,
+        default: {
+          enabled: false,
+          mode: 'ask',
+          allowlist: [],
+          blocklist: [],
+        },
+        description:
+          'Controls whether and how the AI agent can execute PowerShell commands. ' +
+          'When disabled, all PowerShell commands are blocked. Use allowlist/blocklist ' +
+          'for fine-grained command control.',
+        showInDialog: false,
+        properties: {
+          enabled: {
+            type: 'boolean',
+            label: 'Enable PowerShell',
+            category: 'Security',
+            requiresRestart: false,
+            default: false,
+            description:
+              'Master switch. When disabled, ALL PowerShell commands are blocked.',
+            showInDialog: false,
+          },
+          mode: {
+            type: 'string',
+            label: 'PowerShell Mode',
+            category: 'Security',
+            requiresRestart: false,
+            default: 'ask',
+            options: [
+              { value: 'allow', label: 'Allow — Execute without confirmation' },
+              { value: 'ask', label: 'Ask — Prompt for confirmation' },
+              {
+                value: 'deny',
+                label: 'Deny — Block all command unmatched by allowlist',
+              },
+            ],
+            description:
+              'Default behavior for PowerShell commands not matched by allowlist/blocklist.',
+            showInDialog: false,
+          },
+          allowlist: {
+            type: 'array',
+            label: 'PowerShell Allowlist',
+            category: 'Security',
+            requiresRestart: false,
+            default: [] as string[],
+            description:
+              'Command patterns automatically allowed (bypass mode). Supports * wildcard. ' +
+              'Example: "get-*" allows all Get-* cmdlets.',
+            showInDialog: false,
+            items: {
+              type: 'string',
+              description: 'Command pattern (supports * wildcard)',
+            },
+          },
+          blocklist: {
+            type: 'array',
+            label: 'PowerShell Blocklist',
+            category: 'Security',
+            requiresRestart: false,
+            default: [] as string[],
+            description:
+              'Command patterns always blocked regardless of mode. Supports * wildcard. ' +
+              'Example: "rm -rf *" blocks recursive force remove.',
+            showInDialog: false,
+            items: {
+              type: 'string',
+              description: 'Command pattern (supports * wildcard)',
+            },
+          },
+        },
+      },
     },
   },
 

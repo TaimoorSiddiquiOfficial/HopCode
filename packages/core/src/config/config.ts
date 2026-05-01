@@ -24,6 +24,8 @@ import type { ShellExecutionConfig } from '../services/shellExecutionService.js'
 import type { AnyToolInvocation } from '../tools/tools.js';
 import type { ArenaManager } from '../agents/arena/ArenaManager.js';
 import type { WebSearchConfig } from '../tools/web-search/types.js';
+import type { PowerShellSecurityConfig } from '../security/powershell-security.js';
+import { resolvePowerShellConfig } from '../security/powershell-security.js';
 import { ArenaAgentClient } from '../agents/arena/ArenaAgentClient.js';
 
 // Core
@@ -512,6 +514,12 @@ export interface ConfigParameters {
   /** Allowed HTTP hook URLs whitelist (from security.allowedHttpHookUrls) */
   allowedHttpHookUrls?: string[];
   /**
+   * PowerShell security policy configuration (from security.powershell).
+   * Controls whether and how the AI agent can execute PowerShell commands.
+   * May be partial — missing fields are filled in by resolvePowerShellConfig.
+   */
+  powershellConfig?: Partial<PowerShellSecurityConfig>;
+  /**
    * Callback for persisting a permission rule to settings.
    * Injected by the CLI layer; core uses this to write allow/ask/deny rules
    * to project or user settings when the user clicks "Always Allow".
@@ -700,6 +708,9 @@ export class Config {
   private readonly bareMode: boolean;
   private readonly warnings: string[];
   private readonly allowedHttpHookUrls: string[];
+  private readonly powershellConfig:
+    | Partial<PowerShellSecurityConfig>
+    | undefined;
   private readonly onPersistPermissionRuleCallback?: (
     scope: 'project' | 'user',
     ruleType: 'allow' | 'ask' | 'deny',
@@ -847,6 +858,7 @@ export class Config {
     this.bareMode = params.bareMode ?? false;
     this.warnings = params.warnings ?? [];
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
+    this.powershellConfig = params.powershellConfig;
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
 
     // (web search removed)
@@ -2371,6 +2383,16 @@ export class Config {
    */
   getAllowedHttpHookUrls(): string[] {
     return this.getBareMode() ? [] : this.allowedHttpHookUrls;
+  }
+
+  /**
+   * Returns the PowerShell security policy configuration.
+   *
+   * Uses the `resolvePowerShellConfig` utility to fill in defaults
+   * when no user configuration is present.
+   */
+  getPowerShellConfig(): PowerShellSecurityConfig {
+    return resolvePowerShellConfig(this.powershellConfig);
   }
 
   isTrustedFolder(): boolean {

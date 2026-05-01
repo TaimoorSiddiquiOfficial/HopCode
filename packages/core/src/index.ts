@@ -15,6 +15,9 @@ export { Storage, HOPCODE_DIR } from './config/storage.js';
 // Permission system
 export * from './permissions/index.js';
 
+// Security features
+export * from './security/powershell-security.js';
+
 // Model configuration
 export {
   DEFAULT_HOPCODE_MODEL,

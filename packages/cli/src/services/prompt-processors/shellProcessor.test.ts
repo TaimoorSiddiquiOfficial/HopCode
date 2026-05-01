@@ -39,7 +39,16 @@ function getExpectedEscapedArgForPlatform(arg: string): string {
     if (isPowerShell) {
       return `'${arg.replace(/'/g, "''")}'`;
     } else {
-      return `"${arg.replace(/"/g, '""')}"`;
+      // cmd.exe: match escapeShellArg from shell-utils.ts (security hardening)
+      return `"${arg
+        .replace(/"/g, '""')
+        .replace(/%/g, '%%')
+        .replace(/\^/g, '^^')
+        .replace(/&/g, '^&')
+        .replace(/\|/g, '^|')
+        .replace(/</g, '^<')
+        .replace(/>/g, '^>')
+        .replace(/!/g, '^!')}"`;
     }
   } else {
     return quote([arg]);
@@ -157,6 +166,7 @@ describe('ShellProcessor', () => {
       'git status',
       expect.any(Object),
       context.session.sessionShellAllowlist,
+      expect.any(String),
     );
     expect(mockShellExecute).toHaveBeenCalledWith(
       'git status',
@@ -417,11 +427,13 @@ describe('ShellProcessor', () => {
       'cmd1',
       expect.any(Object),
       context.session.sessionShellAllowlist,
+      expect.any(String),
     );
     expect(mockCheckCommandPermissions).toHaveBeenCalledWith(
       'cmd2',
       expect.any(Object),
       context.session.sessionShellAllowlist,
+      expect.any(String),
     );
     expect(mockShellExecute).toHaveBeenCalledTimes(2);
     expect(result).toEqual([{ text: 'Run output1 and output2' }]);
@@ -453,6 +465,7 @@ describe('ShellProcessor', () => {
       expectedCommand,
       expect.any(Object),
       context.session.sessionShellAllowlist,
+      expect.any(String),
     );
     expect(mockShellExecute).toHaveBeenCalledWith(
       expectedCommand,
@@ -679,6 +692,7 @@ describe('ShellProcessor', () => {
         expectedResolvedCommand,
         expect.any(Object),
         context.session.sessionShellAllowlist,
+        expect.any(String),
       );
     });
 

@@ -132,8 +132,14 @@ export class ShellProcessor implements IPromptProcessor {
       if (!command) continue;
 
       // Security check on the final, escaped command string.
+      const shellConfig = getShellConfiguration();
       const { allAllowed, disallowedCommands, blockReason, isHardDenial } =
-        await checkCommandPermissions(command, config, sessionShellAllowlist);
+        await checkCommandPermissions(
+          command,
+          config,
+          sessionShellAllowlist,
+          shellConfig.shell,
+        );
 
       // Determine if this command is explicitly auto-approved via PermissionManager
       const pm = config.getPermissionManager?.();

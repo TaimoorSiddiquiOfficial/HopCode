@@ -686,6 +686,38 @@
             "description": "URL pattern (supports * wildcard)",
             "type": "string"
           }
+        },
+        "powershell": {
+          "description": "Controls whether and how the AI agent can execute PowerShell commands. When disabled, all PowerShell commands are blocked. Use allowlist/blocklist for fine-grained command control.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Master switch. When disabled, ALL PowerShell commands are blocked.",
+              "type": "boolean",
+              "default": false
+            },
+            "mode": {
+              "description": "Default behavior for PowerShell commands not matched by allowlist/blocklist.",
+              "type": "string",
+              "default": "ask"
+            },
+            "allowlist": {
+              "description": "Command patterns automatically allowed (bypass mode). Supports * wildcard. Example: \"get-*\" allows all Get-* cmdlets.",
+              "type": "array",
+              "items": {
+                "description": "Command pattern (supports * wildcard)",
+                "type": "string"
+              }
+            },
+            "blocklist": {
+              "description": "Command patterns always blocked regardless of mode. Supports * wildcard. Example: \"rm -rf *\" blocks recursive force remove.",
+              "type": "array",
+              "items": {
+                "description": "Command pattern (supports * wildcard)",
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
