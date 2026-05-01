@@ -100,6 +100,7 @@ describe('AgentTool', () => {
       getCliVersion: vi.fn().mockReturnValue('test-version'),
       getSubagentManager: vi.fn(),
       getHopCodeClient: vi.fn().mockReturnValue(undefined),
+      getGeminiClient: vi.fn().mockReturnValue(undefined),
       getHookSystem: vi.fn().mockReturnValue(undefined),
       getTranscriptPath: vi.fn().mockReturnValue('/test/transcript'),
       getApprovalMode: vi.fn().mockReturnValue('default'),
@@ -1718,24 +1719,6 @@ describe('AgentTool', () => {
         prompt: 'Investigate issue',
         run_in_background: true,
       };
-      const generationConfig = {
-        systemInstruction: {
-          role: 'system',
-          parts: [{ text: 'parent system' }],
-        },
-        tools: [{ functionDeclarations: [{ name: 'Bash' }, { name: 'Read' }] }],
-      };
-      const geminiClient = {
-        getHistory: vi
-          .fn()
-          .mockReturnValue([{ role: 'model', parts: [{ text: 'Ready' }] }]),
-        getChat: vi.fn().mockReturnValue({
-          getGenerationConfig: () => generationConfig,
-        }),
-      };
-      vi.mocked(config.getGeminiClient).mockReturnValue(
-        geminiClient as unknown as ReturnType<Config['getGeminiClient']>,
-      );
 
       const attachSpy = vi.spyOn(transcript, 'attachJsonlTranscriptWriter');
       const createSpy = vi
@@ -1751,8 +1734,12 @@ describe('AgentTool', () => {
         expect.anything(),
         expect.any(String),
         expect.objectContaining({
-          bootstrapSystemInstruction: generationConfig.systemInstruction,
-          bootstrapTools: generationConfig.tools[0].functionDeclarations,
+          agentName: 'fork',
+          agentId: expect.any(String) as string,
+          bootstrapTools: ['*'],
+          sessionId: 'test-session-id',
+          cwd: '/test/project',
+          version: 'test-version',
         }),
       );
 
