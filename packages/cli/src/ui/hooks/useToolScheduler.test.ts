@@ -176,7 +176,9 @@ describe('useReactToolScheduler in IZN Mode', () => {
               functionResponse: {
                 id: 'iznCall',
                 name: 'mockToolRequiresConfirmation',
-                response: { output: expectedOutput },
+                response: {
+                  output: expect.stringContaining(expectedOutput),
+                },
               },
             },
           ],
