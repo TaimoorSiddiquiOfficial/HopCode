@@ -64,6 +64,7 @@ import { loadSandboxConfig } from './sandboxConfig.js';
 import { appEvents } from '../utils/events.js';
 import { mcpCommand } from '../commands/mcp.js';
 import { channelCommand } from '../commands/channel.js';
+import { reviewCommand } from '../commands/review.js';
 
 // UUID v4 regex pattern for validation
 const SESSION_ID_REGEX =
@@ -668,7 +669,9 @@ export async function parseArguments(): Promise<CliArgs> {
     // Register persistent cron scheduler command
     .command(cronCommand)
     // Register cross-session search command
-    .command(searchCommand);
+    .command(searchCommand)
+    // Register /review skill helpers (presubmit checks, cleanup)
+    .command(reviewCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json
@@ -690,9 +693,13 @@ export async function parseArguments(): Promise<CliArgs> {
     (result._[0] === 'mcp' ||
       result._[0] === 'extensions' ||
       result._[0] === 'hooks' ||
-      result._[0] === 'channel')
+      result._[0] === 'channel' ||
+      result._[0] === 'review')
   ) {
-    // MCP/Extensions/Hooks commands handle their own execution and process exit
+    // MCP/Extensions/Hooks/Channel/Review commands handle their own
+    // execution and exit. Returning here would let the main interactive
+    // flow run, which would prompt for stdin input despite the user
+    // having already invoked a subcommand.
     process.exit(0);
   }
 
