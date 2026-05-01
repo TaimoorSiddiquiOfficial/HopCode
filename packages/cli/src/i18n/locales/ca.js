@@ -22,7 +22,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'YOLO mode': 'Mode YOLO',
+  'IZN mode': 'Mode IZN',
   'plan mode': 'mode de planificació',
   'auto-accept edits': 'acceptació automàtica de canvis',
   'Accepting edits': 'Acceptant canvis',
@@ -443,7 +443,7 @@ export default {
   Plan: 'Planificació',
   Default: 'Per defecte',
   'Auto Edit': 'Edició automàtica',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'activar/desactivar el mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'comprovar les estadístiques de la sessió. Ús: /stats [model|tools]',
@@ -890,8 +890,8 @@ export default {
     'Mode per defecte - Requerir aprovació per a edicions de fitxers o ordres shell',
   'Auto-edit mode - Automatically approve file edits':
     "Mode d'edició automàtica - Aprovar automàticament les edicions de fitxers",
-  'YOLO mode - Automatically approve all tools':
-    'Mode YOLO - Aprovar automàticament totes les eines',
+  'IZN mode - Automatically approve all tools':
+    'Mode IZN - Aprovar automàticament totes les eines',
   '{{mode}} mode': 'Mode {{mode}}',
   'Settings service is not available; unable to persist the approval mode.':
     "El servei de configuració no està disponible; no es pot persistir el mode d'aprovació.",

@@ -139,10 +139,10 @@ class ExitPlanModeToolInvocation extends BaseToolInvocation<
     const { plan } = this.params;
 
     try {
-      // In YOLO mode the scheduler auto-approves without calling onConfirm(),
-      // so wasApproved stays false. Treat YOLO as implicit approval.
-      const isYolo = this.config.getApprovalMode() === ApprovalMode.YOLO;
-      const effectivelyApproved = this.wasApproved || isYolo;
+      // In IZN mode the scheduler auto-approves without calling onConfirm(),
+      // so wasApproved stays false. Treat IZN as implicit approval.
+      const isIzn = this.config.getApprovalMode() === ApprovalMode.IZN;
+      const effectivelyApproved = this.wasApproved || isIzn;
 
       if (!effectivelyApproved) {
         const rejectionMessage =

@@ -47,7 +47,7 @@ jobs:
           PR_NUMBER: '${{ github.event.pull_request.number }}'
         run: |
           hopcode github auth --token "$GITHUB_TOKEN"
-          cat <<'EOF' | hopcode --yolo
+          cat <<'EOF' | hopcode --izn
           Review pull request #$PR_NUMBER using "hopcode github pr" commands.
           Please:
           1. Fetch the PR diff and review for bugs, security issues, and logic errors

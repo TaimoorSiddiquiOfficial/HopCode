@@ -364,7 +364,7 @@ describe('HopCodeSessionUpdateHandler', () => {
         sessionId: 'test-session',
         update: {
           sessionUpdate: 'current_mode_update',
-          currentModeId: 'yolo' as ApprovalModeValue,
+          currentModeId: 'izn' as ApprovalModeValue,
         },
       } as SessionNotification;
 

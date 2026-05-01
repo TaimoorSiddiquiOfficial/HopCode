@@ -59,7 +59,7 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         run: |
           hopcode github auth --token "$GITHUB_TOKEN"
-          echo "${{ steps.parse.outputs.task }}" | hopcode --yolo
+          echo "${{ steps.parse.outputs.task }}" | hopcode --izn
 
       - name: 'React to comment'
         env:

@@ -71,16 +71,16 @@ describe('approvalModeCommand', () => {
       expect(mockSetApprovalMode).toHaveBeenCalledWith('plan');
     });
 
-    it('should set approval mode to "yolo" when argument is "yolo"', async () => {
+    it('should set approval mode to "izn" when argument is "izn"', async () => {
       const result = (await approvalModeCommand.action?.(
         mockContext,
-        'yolo',
+        'izn',
       )) as MessageActionReturn;
 
       expect(result.type).toBe('message');
       expect(result.messageType).toBe('info');
-      expect(result.content).toContain('yolo');
-      expect(mockSetApprovalMode).toHaveBeenCalledWith('yolo');
+      expect(result.content).toContain('izn');
+      expect(mockSetApprovalMode).toHaveBeenCalledWith('izn');
     });
 
     it('should set approval mode to "auto-edit" when argument is "auto-edit"', async () => {
@@ -110,12 +110,12 @@ describe('approvalModeCommand', () => {
     it('should be case-insensitive for mode argument', async () => {
       const result = (await approvalModeCommand.action?.(
         mockContext,
-        'YOLO',
+        'IZN',
       )) as MessageActionReturn;
 
       expect(result.type).toBe('message');
       expect(result.messageType).toBe('info');
-      expect(mockSetApprovalMode).toHaveBeenCalledWith('yolo');
+      expect(mockSetApprovalMode).toHaveBeenCalledWith('izn');
     });
 
     it('should handle argument with leading/trailing whitespace', async () => {
@@ -141,7 +141,7 @@ describe('approvalModeCommand', () => {
       expect(result.messageType).toBe('error');
       expect(result.content).toContain('invalid-mode');
       expect(result.content).toContain('plan');
-      expect(result.content).toContain('yolo');
+      expect(result.content).toContain('izn');
       expect(mockSetApprovalMode).not.toHaveBeenCalled();
     });
   });
@@ -156,7 +156,7 @@ describe('approvalModeCommand', () => {
 
       const result = (await approvalModeCommand.action?.(
         mockContext,
-        'yolo',
+        'izn',
       )) as MessageActionReturn;
 
       expect(result.type).toBe('message');

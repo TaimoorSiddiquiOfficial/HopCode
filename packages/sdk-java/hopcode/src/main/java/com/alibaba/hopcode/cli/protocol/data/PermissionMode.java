@@ -20,9 +20,9 @@ public enum PermissionMode {
      */
     AUTO_EDIT("auto-edit"),
     /**
-     * YOLO permission mode.
+     * IZN permission mode.
      */
-    YOLO("yolo");
+    IZN("izn");
 
     private final String value;
 

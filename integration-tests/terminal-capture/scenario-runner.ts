@@ -66,7 +66,7 @@ export interface FlowStep {
 export interface ScenarioConfig {
   /** Scenario name */
   name: string;
-  /** Launch command, e.g., ["node", "dist/cli.js", "--yolo"] */
+  /** Launch command, e.g., ["node", "dist/cli.js", "--izn"] */
   spawn: string[];
   /** Execution flow: array, each item can contain type / capture / captureFull */
   flow: FlowStep[];

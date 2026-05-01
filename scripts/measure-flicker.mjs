@@ -11,15 +11,15 @@
  * TUIs — it just analyses what you recorded):
  *
  *   # macOS / BSD `script`:
- *   script -q /tmp/qwen.before.raw node dist/cli.js --yolo
+ *   script -q /tmp/qwen.before.raw node dist/cli.js --izn
  *   # …drive a SubAgent scenario, then exit qwen with /quit or Ctrl-D
  *
  *   # Linux / util-linux `script`:
- *   script -q -c 'node dist/cli.js --yolo' /tmp/qwen.before.raw
+ *   script -q -c 'node dist/cli.js --izn' /tmp/qwen.before.raw
  *
  *   # tmux variant: a tmux session preserves whatever you do live; pipe-pane
  *   # gives you the same raw bytes.
- *   tmux new -s flicker -d 'node dist/cli.js --yolo'
+ *   tmux new -s flicker -d 'node dist/cli.js --izn'
  *   tmux pipe-pane -t flicker -o 'cat > /tmp/qwen.before.raw'
  *   tmux attach -t flicker
  *

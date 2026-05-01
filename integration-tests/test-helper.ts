@@ -229,7 +229,7 @@ export class TestRig {
       | { prompt?: string; stdin?: string; stdinDoesNotEnd?: boolean },
     ...args: string[]
   ): Promise<string> {
-    const { command, initialArgs } = this._getCommandAndArgs(['--yolo']);
+    const { command, initialArgs } = this._getCommandAndArgs(['--izn']);
     const commandArgs = [...initialArgs];
     const execOptions: {
       cwd: string;
@@ -829,7 +829,7 @@ export class TestRig {
     ptyProcess: pty.IPty;
     promise: Promise<{ exitCode: number; signal?: number; output: string }>;
   } {
-    const { command, initialArgs } = this._getCommandAndArgs(['--yolo']);
+    const { command, initialArgs } = this._getCommandAndArgs(['--izn']);
     const commandArgs = [...initialArgs, ...args];
 
     this._interactiveOutput = ''; // Reset output for the new run

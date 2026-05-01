@@ -1476,10 +1476,10 @@ describe('setApprovalMode with folder trust', () => {
     cwd: '.',
   };
 
-  it('should throw an error when setting YOLO mode in an untrusted folder', () => {
+  it('should throw an error when setting IZN mode in an untrusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
-    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).toThrow(
+    expect(() => config.setApprovalMode(ApprovalMode.IZN)).toThrow(
       'Cannot enable privileged approval modes in an untrusted folder.',
     );
   });
@@ -1512,7 +1512,7 @@ describe('setApprovalMode with folder trust', () => {
   it('should NOT throw an error when setting any mode in a trusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).not.toThrow();
+    expect(() => config.setApprovalMode(ApprovalMode.IZN)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.DEFAULT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.PLAN)).not.toThrow();
@@ -1521,7 +1521,7 @@ describe('setApprovalMode with folder trust', () => {
   it('should NOT throw an error when setting any mode if trustedFolder is undefined', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true); // isTrustedFolder defaults to true
-    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).not.toThrow();
+    expect(() => config.setApprovalMode(ApprovalMode.IZN)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.DEFAULT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.PLAN)).not.toThrow();
@@ -1556,11 +1556,11 @@ describe('setApprovalMode with folder trust', () => {
       const config = new Config(baseParams);
       vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
 
-      config.setApprovalMode(ApprovalMode.YOLO);
+      config.setApprovalMode(ApprovalMode.IZN);
       config.setApprovalMode(ApprovalMode.PLAN);
       // Setting PLAN again should not overwrite prePlanMode
       config.setApprovalMode(ApprovalMode.PLAN);
-      expect(config.getPrePlanMode()).toBe(ApprovalMode.YOLO);
+      expect(config.getPrePlanMode()).toBe(ApprovalMode.IZN);
     });
   });
 

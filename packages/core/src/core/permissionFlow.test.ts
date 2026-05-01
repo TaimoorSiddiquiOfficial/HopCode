@@ -130,16 +130,16 @@ describe('evaluatePermissionFlow', () => {
 });
 
 describe('needsConfirmation', () => {
-  it('should return false for YOLO mode non-ask_user_question tools', () => {
-    expect(needsConfirmation('ask', ApprovalMode.YOLO, 'shell')).toBe(false);
-    expect(needsConfirmation('default', ApprovalMode.YOLO, 'read_file')).toBe(
+  it('should return false for IZN mode non-ask_user_question tools', () => {
+    expect(needsConfirmation('ask', ApprovalMode.IZN, 'shell')).toBe(false);
+    expect(needsConfirmation('default', ApprovalMode.IZN, 'read_file')).toBe(
       false,
     );
   });
 
-  it('should return true for ask_user_question in YOLO mode', () => {
+  it('should return true for ask_user_question in IZN mode', () => {
     expect(
-      needsConfirmation('ask', ApprovalMode.YOLO, ToolNames.ASK_USER_QUESTION),
+      needsConfirmation('ask', ApprovalMode.IZN, ToolNames.ASK_USER_QUESTION),
     ).toBe(true);
   });
 

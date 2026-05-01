@@ -240,10 +240,10 @@ export const AgentComposer: React.FC<AgentComposerProps> = ({ agentId }) => {
 
   // ── Approval-mode styling (mirrors main InputPrompt) ──
 
-  const isYolo = agentApprovalMode === ApprovalMode.YOLO;
+  const isIzn = agentApprovalMode === ApprovalMode.IZN;
   const isAutoAccept = agentApprovalMode !== ApprovalMode.DEFAULT;
 
-  const statusColor = isYolo
+  const statusColor = isIzn
     ? theme.status.errorDim
     : isAutoAccept
       ? theme.status.warningDim
@@ -255,7 +255,7 @@ export const AgentComposer: React.FC<AgentComposerProps> = ({ agentId }) => {
       : (statusColor ?? theme.border.focused);
 
   const prefixNode = (
-    <Text color={statusColor ?? theme.text.accent}>{isYolo ? '*' : '>'} </Text>
+    <Text color={statusColor ?? theme.text.accent}>{isIzn ? '*' : '>'} </Text>
   );
 
   return (

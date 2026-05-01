@@ -7,7 +7,7 @@
  */
 export default {
   name: 'streaming-shell',
-  spawn: ['node', 'dist/cli.js', '--yolo'],
+  spawn: ['node', 'dist/cli.js', '--izn'],
   terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {

@@ -86,7 +86,7 @@ export async function handleApiKeyAuth(
       debug: undefined,
       prompt: undefined,
       promptInteractive: undefined,
-      yolo: undefined,
+      izn: undefined,
       approvalMode: undefined,
       telemetry: undefined,
       checkpointing: undefined,

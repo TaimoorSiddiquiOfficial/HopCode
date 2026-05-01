@@ -525,7 +525,7 @@ describe('errors', () => {
           ),
         );
         expect(processStderrWriteSpy).toHaveBeenCalledWith(
-          expect.stringContaining('use the -y flag (YOLO mode)'),
+          expect.stringContaining('use the -z flag (Izn mode)'),
         );
         expect(processExitSpy).not.toHaveBeenCalled();
       });

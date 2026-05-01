@@ -787,7 +787,7 @@ export async function checkCommandPermissions(
       };
     }
 
-    // If confirmation is required and we're not in YOLO, force 'ask'
+    // If confirmation is required and we're not in IZN, force 'ask'
     if (psResult.requiresConfirmation) {
       // Mark as disallowed (requires confirmation) but not hard denial
       return {

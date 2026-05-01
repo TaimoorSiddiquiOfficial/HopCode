@@ -39,7 +39,7 @@ const formatModeDescription = (mode: ApprovalMode): string => {
       return t('Require approval for file edits or shell commands');
     case ApprovalMode.AUTO_EDIT:
       return t('Automatically approve file edits');
-    case ApprovalMode.YOLO:
+    case ApprovalMode.IZN:
       return t('Automatically approve all tools');
     default:
       return t('{{mode}} mode', { mode });

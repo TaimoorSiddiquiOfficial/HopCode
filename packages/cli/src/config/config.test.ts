@@ -425,14 +425,8 @@ describe('parseArguments', () => {
     expect(argv.promptInteractive).toBeUndefined();
   });
 
-  it('should throw an error when both --yolo and --approval-mode are used together', async () => {
-    process.argv = [
-      'node',
-      'script.js',
-      '--yolo',
-      '--approval-mode',
-      'default',
-    ];
+  it('should throw an error when both --izn and --approval-mode are used together', async () => {
+    process.argv = ['node', 'script.js', '--izn', '--approval-mode', 'default'];
 
     const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
       throw new Error('process.exit called');
@@ -443,15 +437,15 @@ describe('parseArguments', () => {
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Cannot use both --yolo (-y) and --approval-mode together. Use --approval-mode=yolo instead.',
+        'Cannot use both --izn (-z) and --approval-mode together. Use --approval-mode=izn instead.',
       ),
     );
 
     mockExit.mockRestore();
   });
 
-  it('should throw an error when using short flags -y and --approval-mode together', async () => {
-    process.argv = ['node', 'script.js', '-y', '--approval-mode', 'yolo'];
+  it('should throw an error when using short flags -z and --approval-mode together', async () => {
+    process.argv = ['node', 'script.js', '-z', '--approval-mode', 'izn'];
 
     const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
       throw new Error('process.exit called');
@@ -462,7 +456,7 @@ describe('parseArguments', () => {
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Cannot use both --yolo (-y) and --approval-mode together. Use --approval-mode=yolo instead.',
+        'Cannot use both --izn (-z) and --approval-mode together. Use --approval-mode=izn instead.',
       ),
     );
 
@@ -521,17 +515,17 @@ describe('parseArguments', () => {
     expect(argv.includePartialMessages).toBe(true);
   });
 
-  it('should allow --approval-mode without --yolo', async () => {
+  it('should allow --approval-mode without --izn', async () => {
     process.argv = ['node', 'script.js', '--approval-mode', 'auto-edit'];
     const argv = await parseArguments();
     expect(argv.approvalMode).toBe('auto-edit');
-    expect(argv.yolo).toBe(false);
+    expect(argv.izn).toBe(false);
   });
 
-  it('should allow --yolo without --approval-mode', async () => {
-    process.argv = ['node', 'script.js', '--yolo'];
+  it('should allow --izn without --approval-mode', async () => {
+    process.argv = ['node', 'script.js', '--izn'];
     const argv = await parseArguments();
-    expect(argv.yolo).toBe(true);
+    expect(argv.izn).toBe(true);
     expect(argv.approvalMode).toBeUndefined();
   });
 
@@ -1223,12 +1217,12 @@ describe('Approval mode tool exclusion logic', () => {
     expect(excludedTools).not.toContain(ToolNames.WRITE_FILE);
   });
 
-  it('should exclude no interactive tools in non-interactive mode with yolo approval mode', async () => {
+  it('should exclude no interactive tools in non-interactive mode with izn approval mode', async () => {
     process.argv = [
       'node',
       'script.js',
       '--approval-mode',
-      'yolo',
+      'izn',
       '-p',
       'test',
     ];
@@ -1243,8 +1237,8 @@ describe('Approval mode tool exclusion logic', () => {
     expect(excludedTools).not.toContain(ToolNames.WRITE_FILE);
   });
 
-  it('should exclude no interactive tools in non-interactive mode with legacy yolo flag', async () => {
-    process.argv = ['node', 'script.js', '--yolo', '-p', 'test'];
+  it('should exclude no interactive tools in non-interactive mode with legacy izn flag', async () => {
+    process.argv = ['node', 'script.js', '--izn', '-p', 'test'];
     const argv = await parseArguments();
     const settings: Settings = {};
 
@@ -1264,8 +1258,8 @@ describe('Approval mode tool exclusion logic', () => {
       { args: ['node', 'script.js', '--approval-mode', 'plan'] },
       { args: ['node', 'script.js', '--approval-mode', 'default'] },
       { args: ['node', 'script.js', '--approval-mode', 'auto-edit'] },
-      { args: ['node', 'script.js', '--approval-mode', 'yolo'] },
-      { args: ['node', 'script.js', '--yolo'] },
+      { args: ['node', 'script.js', '--approval-mode', 'izn'] },
+      { args: ['node', 'script.js', '--izn'] },
     ];
 
     for (const testCase of testCases) {
@@ -1319,14 +1313,14 @@ describe('Approval mode tool exclusion logic', () => {
       approvalMode: 'invalid_mode',
       promptInteractive: '',
       prompt: '',
-      yolo: false,
+      izn: false,
     };
 
     const settings: Settings = {};
     await expect(
       loadCliConfig(settings, invalidArgv as CliArgs, undefined, []),
     ).rejects.toThrow(
-      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, yolo',
+      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, izn',
     );
   });
 });
@@ -2069,7 +2063,7 @@ describe('loadCliConfig tool exclusions', () => {
     vi.restoreAllMocks();
   });
 
-  it('should not exclude interactive tools in interactive mode without YOLO', async () => {
+  it('should not exclude interactive tools in interactive mode without IZN', async () => {
     process.stdin.isTTY = true;
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
@@ -2079,9 +2073,9 @@ describe('loadCliConfig tool exclusions', () => {
     expect(config.getPermissionsDeny()).not.toContain('write_file');
   });
 
-  it('should not exclude interactive tools in interactive mode with YOLO', async () => {
+  it('should not exclude interactive tools in interactive mode with IZN', async () => {
     process.stdin.isTTY = true;
-    process.argv = ['node', 'script.js', '--yolo'];
+    process.argv = ['node', 'script.js', '--izn'];
     const argv = await parseArguments();
     const config = await loadCliConfig({}, argv, undefined, []);
     expect(config.getPermissionsDeny()).not.toContain('run_shell_command');
@@ -2089,7 +2083,7 @@ describe('loadCliConfig tool exclusions', () => {
     expect(config.getPermissionsDeny()).not.toContain('write_file');
   });
 
-  it('should exclude interactive tools in non-interactive mode without YOLO', async () => {
+  it('should exclude interactive tools in non-interactive mode without IZN', async () => {
     process.stdin.isTTY = false;
     process.argv = ['node', 'script.js', '-p', 'test'];
     const argv = await parseArguments();
@@ -2099,9 +2093,9 @@ describe('loadCliConfig tool exclusions', () => {
     expect(config.getPermissionsDeny()).toContain('write_file');
   });
 
-  it('should not exclude interactive tools in non-interactive mode with YOLO', async () => {
+  it('should not exclude interactive tools in non-interactive mode with IZN', async () => {
     process.stdin.isTTY = false;
-    process.argv = ['node', 'script.js', '-p', 'test', '--yolo'];
+    process.argv = ['node', 'script.js', '-p', 'test', '--izn'];
     const argv = await parseArguments();
     const config = await loadCliConfig({}, argv, undefined, []);
     expect(config.getPermissionsDeny()).not.toContain('run_shell_command');
@@ -2175,7 +2169,7 @@ describe('loadCliConfig interactive', () => {
       'script.js',
       '--model',
       'gemini-1.5-pro',
-      '--yolo',
+      '--izn',
       'Hello world',
     ];
     const argv = await parseArguments();
@@ -2229,18 +2223,18 @@ describe('loadCliConfig approval mode', () => {
     expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.PLAN);
   });
 
-  it('should set YOLO approval mode when --yolo flag is used', async () => {
-    process.argv = ['node', 'script.js', '--yolo'];
+  it('should set IZN approval mode when --izn flag is used', async () => {
+    process.argv = ['node', 'script.js', '--izn'];
     const argv = await parseArguments();
     const config = await loadCliConfig({}, argv, undefined, []);
-    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.YOLO);
+    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.IZN);
   });
 
-  it('should set YOLO approval mode when -y flag is used', async () => {
-    process.argv = ['node', 'script.js', '-y'];
+  it('should set IZN approval mode when -z flag is used', async () => {
+    process.argv = ['node', 'script.js', '-z'];
     const argv = await parseArguments();
     const config = await loadCliConfig({}, argv, undefined, []);
-    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.YOLO);
+    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.IZN);
   });
 
   it('should set DEFAULT approval mode when --approval-mode=default', async () => {
@@ -2257,11 +2251,11 @@ describe('loadCliConfig approval mode', () => {
     expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.AUTO_EDIT);
   });
 
-  it('should set YOLO approval mode when --approval-mode=yolo', async () => {
-    process.argv = ['node', 'script.js', '--approval-mode', 'yolo'];
+  it('should set IZN approval mode when --approval-mode=izn', async () => {
+    process.argv = ['node', 'script.js', '--approval-mode', 'izn'];
     const argv = await parseArguments();
     const config = await loadCliConfig({}, argv, undefined, []);
-    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.YOLO);
+    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.IZN);
   });
 
   it('should use approval mode from settings when CLI flags are not provided', async () => {
@@ -2290,26 +2284,26 @@ describe('loadCliConfig approval mode', () => {
       tools: { approvalMode: 'invalid_mode' },
     } as unknown as Settings;
     await expect(loadCliConfig(settings, argv, undefined, [])).rejects.toThrow(
-      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, yolo',
+      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, izn',
     );
   });
 
-  it('should prioritize --approval-mode over --yolo when both would be valid (but validation prevents this)', async () => {
+  it('should prioritize --approval-mode over --izn when both would be valid (but validation prevents this)', async () => {
     // Note: This test documents the intended behavior, but in practice the validation
     // prevents both flags from being used together
     process.argv = ['node', 'script.js', '--approval-mode', 'default'];
     const argv = await parseArguments();
-    // Manually set yolo to true to simulate what would happen if validation didn't prevent it
-    argv.yolo = true;
+    // Manually set izn to true to simulate what would happen if validation didn't prevent it
+    argv.izn = true;
     const config = await loadCliConfig({}, argv, undefined, []);
     expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.DEFAULT);
   });
 
-  it('should fall back to --yolo behavior when --approval-mode is not set', async () => {
-    process.argv = ['node', 'script.js', '--yolo'];
+  it('should fall back to --izn behavior when --approval-mode is not set', async () => {
+    process.argv = ['node', 'script.js', '--izn'];
     const argv = await parseArguments();
     const config = await loadCliConfig({}, argv, undefined, []);
-    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.YOLO);
+    expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.IZN);
   });
 
   // --- Untrusted Folder Scenarios ---
@@ -2321,8 +2315,8 @@ describe('loadCliConfig approval mode', () => {
       });
     });
 
-    it('should override --approval-mode=yolo to DEFAULT', async () => {
-      process.argv = ['node', 'script.js', '--approval-mode', 'yolo'];
+    it('should override --approval-mode=izn to DEFAULT', async () => {
+      process.argv = ['node', 'script.js', '--approval-mode', 'izn'];
       const argv = await parseArguments();
       const config = await loadCliConfig({}, argv, undefined, []);
       expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.DEFAULT);
@@ -2335,8 +2329,8 @@ describe('loadCliConfig approval mode', () => {
       expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.DEFAULT);
     });
 
-    it('should override --yolo flag to DEFAULT', async () => {
-      process.argv = ['node', 'script.js', '--yolo'];
+    it('should override --izn flag to DEFAULT', async () => {
+      process.argv = ['node', 'script.js', '--izn'];
       const argv = await parseArguments();
       const config = await loadCliConfig({}, argv, undefined, []);
       expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.DEFAULT);

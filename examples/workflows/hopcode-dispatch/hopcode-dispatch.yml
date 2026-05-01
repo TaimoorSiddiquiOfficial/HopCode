@@ -56,4 +56,4 @@ jobs:
           HOPCODE_MODEL: '${{ inputs.model }}'
         run: |
           hopcode github auth --token "$GITHUB_TOKEN"
-          echo "${{ inputs.task }}" | hopcode --model "$HOPCODE_MODEL" --yolo
+          echo "${{ inputs.task }}" | hopcode --model "$HOPCODE_MODEL" --izn

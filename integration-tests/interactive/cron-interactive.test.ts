@@ -47,7 +47,7 @@ function makeEnv(): NodeJS.ProcessEnv {
   it('loop fires inline in conversation', { timeout: 180_000 }, async () => {
     session = await InteractiveSession.start({
       env: makeEnv(),
-      args: ['--approval-mode', 'yolo'],
+      args: ['--approval-mode', 'izn'],
     });
 
     await session.send(
@@ -71,7 +71,7 @@ function makeEnv(): NodeJS.ProcessEnv {
   it('user input takes priority over cron', { timeout: 180_000 }, async () => {
     session = await InteractiveSession.start({
       env: makeEnv(),
-      args: ['--approval-mode', 'yolo'],
+      args: ['--approval-mode', 'izn'],
     });
 
     await session.send(
@@ -102,7 +102,7 @@ function makeEnv(): NodeJS.ProcessEnv {
     async () => {
       session = await InteractiveSession.start({
         env: makeEnv(),
-        args: ['--approval-mode', 'yolo'],
+        args: ['--approval-mode', 'izn'],
       });
 
       await session.send(

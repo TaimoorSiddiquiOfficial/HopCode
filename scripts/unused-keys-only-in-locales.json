@@ -213,7 +213,7 @@
     "Workspace - Applies to current project only",
     "Workspace Scope",
     "Y/Enter to confirm, N/Esc to cancel",
-    "YOLO mode - Automatically approve all tools",
+    "IZN mode - Automatically approve all tools",
     "Yes, allow always ...",
     "Yes, allow always for this session",
     "Yes, always allow all tools from server \"{{server}}\"",

@@ -11,7 +11,7 @@
  *
  * SECURITY: Speculation bypasses the normal permission/approval flow.
  * Write tools are ONLY redirected to overlay when the user's approval mode
- * already permits automatic edits (auto-edit or yolo). In default/plan mode,
+ * already permits automatic edits (auto-edit or izn). In default/plan mode,
  * write tools hit boundary — no silent writes without user consent.
  */
 
@@ -76,7 +76,7 @@ export async function evaluateToolCall(
   if (WRITE_TOOLS.has(toolName)) {
     if (
       approvalMode === ApprovalMode.AUTO_EDIT ||
-      approvalMode === ApprovalMode.YOLO
+      approvalMode === ApprovalMode.IZN
     ) {
       return { action: 'redirect', reason: `write_tool:${toolName}` };
     }

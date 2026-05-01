@@ -1,6 +1,6 @@
 {
   "concurrency": 2,
-  "yolo": true,
+  "izn": true,
   "source_repo": "/Users/andy/workspace/projects/qwen-code/integration-tests/concurrent-runner/examples/toy-project",
   "worktree_base": "~/.hopcode/worktrees",
   "outputs_dir": "./examples/test-run",

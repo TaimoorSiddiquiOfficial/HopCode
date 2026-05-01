@@ -198,7 +198,7 @@ export function convertClaudeAgentConfig(
       plan: 'plan',
       acceptEdits: 'auto-edit',
       dontAsk: 'default',
-      bypassPermissions: 'yolo',
+      bypassPermissions: 'izn',
       auto: 'auto-edit',
     };
     const mapped =

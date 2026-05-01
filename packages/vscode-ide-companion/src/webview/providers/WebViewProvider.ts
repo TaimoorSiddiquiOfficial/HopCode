@@ -314,7 +314,7 @@ export class WebViewProvider {
           | 'plan'
           | 'default'
           | 'auto-edit'
-          | 'yolo'
+          | 'izn'
           | null;
         this.currentModeId = current;
       } catch (_error) {
@@ -2031,7 +2031,7 @@ export class WebViewProvider {
 
   /** True if diffs/permissions should be auto-handled without prompting. */
   isAutoMode(): boolean {
-    return this.currentModeId === 'auto-edit' || this.currentModeId === 'yolo';
+    return this.currentModeId === 'auto-edit' || this.currentModeId === 'izn';
   }
 
   /** Used by extension to decide if diffs should be suppressed. */

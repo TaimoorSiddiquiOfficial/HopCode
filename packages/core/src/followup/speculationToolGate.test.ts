@@ -58,12 +58,12 @@ describe('speculationToolGate', () => {
       expect(result.action).toBe('redirect');
     });
 
-    it('redirects write_file in yolo mode', async () => {
+    it('redirects write_file in izn mode', async () => {
       const result = await evaluateToolCall(
         ToolNames.WRITE_FILE,
         {},
         overlayFs,
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
       );
       expect(result.action).toBe('redirect');
     });

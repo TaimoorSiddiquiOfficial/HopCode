@@ -286,7 +286,7 @@ OTHER AGENTS CANNOT:
           cwd: testWorkDir,
           agents: [secureFileAuditAgent],
           debug: false,
-          permissionMode: 'yolo',
+          permissionMode: 'izn',
         },
       });
 
@@ -380,7 +380,7 @@ OTHER AGENTS CANNOT:
           cwd: testWorkDir,
           agents: [simpleTaskAgent],
           debug: false,
-          permissionMode: 'yolo',
+          permissionMode: 'izn',
         },
       });
 

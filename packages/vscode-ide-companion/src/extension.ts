@@ -140,7 +140,7 @@ export async function activate(context: vscode.ExtensionContext) {
       chatProviderRegistry
         ?.getPermissionAwareProviders()
         .some((p) => p.hasPendingPermission()) ?? false,
-    // Suppress diffs when active mode is auto or yolo in any chat surface
+    // Suppress diffs when active mode is auto or izn in any chat surface
     () => {
       const providers =
         chatProviderRegistry

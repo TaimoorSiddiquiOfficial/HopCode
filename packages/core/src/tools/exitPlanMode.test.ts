@@ -203,7 +203,7 @@ describe('ExitPlanModeTool', () => {
 
     it('should restore pre-plan mode on RestorePrevious', async () => {
       (mockConfig.getPrePlanMode as ReturnType<typeof vi.fn>).mockReturnValue(
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
       );
 
       const params: ExitPlanModeParams = { plan: 'Restore previous test' };
@@ -216,10 +216,8 @@ describe('ExitPlanModeTool', () => {
         await confirmation.onConfirm(ToolConfirmationOutcome.RestorePrevious);
       }
 
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.YOLO,
-      );
-      expect(approvalMode).toBe(ApprovalMode.YOLO);
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.IZN);
+      expect(approvalMode).toBe(ApprovalMode.IZN);
     });
 
     it('should include prePlanMode in confirmation details', async () => {
@@ -332,15 +330,15 @@ describe('ExitPlanModeTool', () => {
     });
   });
 
-  describe('YOLO mode', () => {
-    it('should exit plan mode without onConfirm being called when approval mode is YOLO', async () => {
-      // Simulate YOLO: scheduler sets approvalMode=YOLO but never calls onConfirm
-      approvalMode = ApprovalMode.YOLO;
-      const params: ExitPlanModeParams = { plan: 'YOLO test plan' };
+  describe('IZN mode', () => {
+    it('should exit plan mode without onConfirm being called when approval mode is IZN', async () => {
+      // Simulate IZN: scheduler sets approvalMode=IZN but never calls onConfirm
+      approvalMode = ApprovalMode.IZN;
+      const params: ExitPlanModeParams = { plan: 'IZN test plan' };
       const signal = new AbortController().signal;
 
       const invocation = tool.build(params);
-      // Do NOT call onConfirm — this mirrors what the YOLO scheduler does
+      // Do NOT call onConfirm ï¿½ this mirrors what the IZN scheduler does
       const result = await invocation.execute(signal);
 
       expect(result.llmContent).toContain(
@@ -349,17 +347,17 @@ describe('ExitPlanModeTool', () => {
       expect(result.llmContent).not.toContain('not approved');
     });
 
-    it('should not downgrade approval mode to AUTO_EDIT when YOLO', async () => {
-      approvalMode = ApprovalMode.YOLO;
-      const params: ExitPlanModeParams = { plan: 'YOLO test plan' };
+    it('should not downgrade approval mode to AUTO_EDIT when IZN', async () => {
+      approvalMode = ApprovalMode.IZN;
+      const params: ExitPlanModeParams = { plan: 'IZN test plan' };
       const signal = new AbortController().signal;
 
       const invocation = tool.build(params);
       await invocation.execute(signal);
 
-      // Approval mode must remain YOLO — do not downgrade to AUTO_EDIT
+      // Approval mode must remain IZN ï¿½ do not downgrade to AUTO_EDIT
       expect(mockConfig.setApprovalMode).not.toHaveBeenCalled();
-      expect(approvalMode).toBe(ApprovalMode.YOLO);
+      expect(approvalMode).toBe(ApprovalMode.IZN);
     });
   });
 });

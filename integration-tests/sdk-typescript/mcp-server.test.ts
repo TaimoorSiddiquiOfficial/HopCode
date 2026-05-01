@@ -32,7 +32,7 @@ import {
 
 const SHARED_TEST_OPTIONS = {
   ...createSharedTestOptions(),
-  permissionMode: 'yolo' as const,
+  permissionMode: 'izn' as const,
 };
 
 // MCP tool names are generated with the pattern: mcp__<serverName>__<toolName>

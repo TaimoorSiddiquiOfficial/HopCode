@@ -1272,17 +1272,16 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
 
   const showAutoAcceptStyling =
     !shellModeActive && approvalMode === ApprovalMode.AUTO_EDIT;
-  const showYoloStyling =
-    !shellModeActive && approvalMode === ApprovalMode.YOLO;
+  const showIznStyling = !shellModeActive && approvalMode === ApprovalMode.IZN;
 
   let statusColor: string | undefined;
   let statusText = '';
   if (shellModeActive) {
     statusColor = theme.ui.symbol;
     statusText = t('Shell mode');
-  } else if (showYoloStyling) {
+  } else if (showIznStyling) {
     statusColor = theme.status.errorDim;
-    statusText = t('YOLO mode');
+    statusText = t('Izn mode');
   } else if (showAutoAcceptStyling) {
     statusColor = theme.status.warningDim;
     statusText = t('Accepting edits');
@@ -1308,7 +1307,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
         )
       ) : commandSearchActive ? (
         <Text color={theme.text.accent}>(r:) </Text>
-      ) : showYoloStyling ? (
+      ) : showIznStyling ? (
         '*'
       ) : (
         '>'

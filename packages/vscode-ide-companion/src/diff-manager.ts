@@ -67,7 +67,7 @@ export class DiffManager {
   private static readonly DEDUPE_WINDOW_MS = 1500;
   // Optional hooks from extension to influence diff behavior
   // - shouldDelay: when true, we defer opening diffs briefly (e.g., while a permission drawer is open)
-  // - shouldSuppress: when true, we skip opening diffs entirely (e.g., in auto/yolo mode)
+  // - shouldSuppress: when true, we skip opening diffs entirely (e.g., in auto/izn mode)
   private shouldDelay?: () => boolean;
   private shouldSuppress?: () => boolean;
   // Timed suppression window (e.g. immediately after permission allow)

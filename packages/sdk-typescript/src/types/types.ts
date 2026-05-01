@@ -254,12 +254,12 @@ export interface QueryOptions {
    * - 'plan': Blocks all write tools, instructing AI to present a plan first.
    *   Read-only tools execute normally.
    * - 'auto-edit': Auto-approve edit tools (edit, write_file) while other tools require confirmation.
-   * - 'yolo': All tools execute automatically without confirmation.
+   * - 'izn': All tools execute automatically without confirmation.
    *
    * **Priority Chain (highest to lowest):**
    * 1. `excludeTools` - Blocks tools completely (returns permission error)
    * 2. `permissionMode: 'plan'` - Blocks non-read-only tools (except exit_plan_mode)
-   * 3. `permissionMode: 'yolo'` - Auto-approves all tools
+   * 3. `permissionMode: 'izn'` - Auto-approves all tools
    * 4. `allowedTools` - Auto-approves matching tools
    * 5. `canUseTool` callback - Custom approval logic
    * 6. Default behavior - Auto-deny in SDK mode
@@ -269,7 +269,7 @@ export interface QueryOptions {
    * @see allowedTools For auto-approving specific tools
    * @see excludeTools For blocking specific tools
    */
-  permissionMode?: 'default' | 'plan' | 'auto-edit' | 'yolo';
+  permissionMode?: 'default' | 'plan' | 'auto-edit' | 'izn';
 
   /**
    * Custom permission handler for tool execution approval.
@@ -281,14 +281,14 @@ export interface QueryOptions {
    * **When is this called?**
    * - Only for tools requiring confirmation (write operations, shell commands, etc.)
    * - After `excludeTools` and `allowedTools` checks
-   * - Not called in 'yolo' mode or 'plan' mode
+   * - Not called in 'izn' mode or 'plan' mode
    * - Not called for tools already in `allowedTools`
    *
    * **Usage with permissionMode:**
    * - 'default': Invoked for all write tools not in `allowedTools`; if not provided, auto-denied.
    * - 'auto-edit': Invoked for non-edit tools (edit/write_file auto-approved); if not provided, auto-denied.
    * - 'plan': Not invoked; write tools are blocked by plan mode.
-   * - 'yolo': Not invoked; all tools auto-approved.
+   * - 'izn': Not invoked; all tools auto-approved.
    *
    * @see allowedTools For auto-approving tools without callback
    */
@@ -397,7 +397,7 @@ export interface QueryOptions {
    * - Only applies when tool requires confirmation (write operations, shell commands)
    * - Checked after `excludeTools` but before `canUseTool` callback
    * - Does not override `permissionMode: 'plan'` (plan mode blocks all write tools)
-   * - Has no effect in `permissionMode: 'yolo'` (already auto-approved)
+   * - Has no effect in `permissionMode: 'izn'` (already auto-approved)
    *
    * **Pattern matching:**
    * - Tool name: `'write_file'`, `'run_shell_command'`

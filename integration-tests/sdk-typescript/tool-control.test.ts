@@ -58,7 +58,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Only allow read_file and write_file, exclude list_directory
             coreTools: ['read_file', 'write_file'],
             debug: false,
@@ -146,7 +146,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             coreTools: ['read_file', 'write_file'],
             // Block all write_file tool
             excludeTools: ['write_file'],
@@ -199,7 +199,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Block multiple tools
             excludeTools: ['list_directory', 'run_shell_command'],
             debug: false,
@@ -252,7 +252,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Block all shell commands - excludeTools blocks entire tools
             excludeTools: ['run_shell_command'],
             debug: false,
@@ -340,7 +340,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Block reading .env files
             excludeTools: ['Read(.env)'],
             debug: false,
@@ -395,7 +395,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             coreTools: ['read_file', 'edit', 'write_file', 'list_directory'],
             // Block editing files in /src/** directory
             excludeTools: ['Edit(/src/**)'],
@@ -453,7 +453,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Block all rm commands
             excludeTools: ['Bash(rm *)'],
             debug: false,
@@ -857,7 +857,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Allow file operations
             coreTools: ['read_file', 'write_file', 'edit', 'list_directory'],
             // But exclude edit
@@ -960,7 +960,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Non-existent tool names should be ignored
             excludeTools: ['non_existent_tool', 'another_fake_tool'],
             debug: false,
@@ -996,7 +996,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // Non-existent tool names should be ignored
             allowedTools: ['non_existent_tool', 'read_file'],
             debug: false,
@@ -1071,7 +1071,7 @@ describe('Tool Control Parameters (E2E)', () => {
     );
 
     it(
-      'permissionMode yolo should be overridden by excludeTools',
+      'permissionMode izn should be overridden by excludeTools',
       async () => {
         await helper.createFile('test.txt', 'original');
 
@@ -1080,8 +1080,8 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
-            // Even in yolo mode, excludeTools should block tools
+            permissionMode: 'izn',
+            // Even in izn mode, excludeTools should block tools
             excludeTools: ['run_shell_command'],
             debug: false,
           },
@@ -1227,7 +1227,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // edit is in coreTools but also in excludeTools
             coreTools: ['read_file', 'write_file', 'edit', 'list_directory'],
             excludeTools: ['edit'],
@@ -1265,7 +1265,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // write_file is in allowedTools but NOT in coreTools
             coreTools: ['read_file'],
             allowedTools: ['write_file'],
@@ -1306,7 +1306,7 @@ describe('Tool Control Parameters (E2E)', () => {
           options: {
             ...SHARED_TEST_OPTIONS,
             cwd: testDir,
-            permissionMode: 'yolo',
+            permissionMode: 'izn',
             // coreTools is the whitelist - only these tools can be used
             coreTools: ['read_file'],
             // allowedTools pattern that would match b.txt

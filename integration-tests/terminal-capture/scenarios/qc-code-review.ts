@@ -2,7 +2,7 @@
 
 export default {
   name: '/qc:code-review',
-  spawn: ['node', 'dist/cli.js', '--yolo'],
+  spawn: ['node', 'dist/cli.js', '--izn'],
   terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {

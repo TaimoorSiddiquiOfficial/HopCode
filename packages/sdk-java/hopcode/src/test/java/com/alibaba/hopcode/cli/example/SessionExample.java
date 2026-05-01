@@ -141,7 +141,7 @@ public class SessionExample {
     public static void runSetPermissionModeExample(Session session) {
         try {
             // Switch to a permissive mode
-            Optional<Boolean> permissionChangeResult = session.setPermissionMode(PermissionMode.YOLO);
+            Optional<Boolean> permissionChangeResult = session.setPermissionMode(PermissionMode.IZN);
             logger.info("{}", permissionChangeResult.map(s -> s ? "setPermissionMode success" : "setPermissionMode error")
                     .orElse("setPermissionMode unknown"));
 
@@ -162,7 +162,7 @@ public class SessionExample {
 
     public static void runPromptUseLowLevelEventExample(Session session) {
         try {
-            session.setPermissionMode(PermissionMode.YOLO);
+            session.setPermissionMode(PermissionMode.IZN);
             session.sendPrompt("devlop Fibonacci function by python", new SessionEventSimpleConsumers() {
                 @Override
                 public void onAssistantMessage(Session session, SDKAssistantMessage assistantMessage) {

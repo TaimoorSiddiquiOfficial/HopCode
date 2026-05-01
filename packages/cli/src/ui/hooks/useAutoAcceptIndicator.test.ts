@@ -146,15 +146,15 @@ describe('useAutoAcceptIndicator', () => {
     expect(mockConfigInstance.getApprovalMode).toHaveBeenCalledTimes(1);
   });
 
-  it('should initialize with ApprovalMode.YOLO if config.getApprovalMode returns ApprovalMode.YOLO', () => {
-    mockConfigInstance.getApprovalMode.mockReturnValue(ApprovalMode.YOLO);
+  it('should initialize with ApprovalMode.IZN if config.getApprovalMode returns ApprovalMode.IZN', () => {
+    mockConfigInstance.getApprovalMode.mockReturnValue(ApprovalMode.IZN);
     const { result } = renderHook(() =>
       useAutoAcceptIndicator({
         config: mockConfigInstance as unknown as ActualConfigType,
         addItem: vi.fn(),
       }),
     );
-    expect(result.current).toBe(ApprovalMode.YOLO);
+    expect(result.current).toBe(ApprovalMode.IZN);
     expect(mockConfigInstance.getApprovalMode).toHaveBeenCalledTimes(1);
   });
 
@@ -198,9 +198,9 @@ describe('useAutoAcceptIndicator', () => {
       } as Key);
     });
     expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
-      ApprovalMode.YOLO,
+      ApprovalMode.IZN,
     );
-    expect(result.current).toBe(ApprovalMode.YOLO);
+    expect(result.current).toBe(ApprovalMode.IZN);
 
     act(() => {
       capturedUseKeypressHandler({
@@ -351,7 +351,7 @@ describe('useAutoAcceptIndicator', () => {
       );
     });
 
-    it('should show a warning when cycling from AUTO_EDIT to YOLO', () => {
+    it('should show a warning when cycling from AUTO_EDIT to IZN', () => {
       const errorMessage =
         'Cannot enable privileged approval modes in an untrusted folder.';
       mockConfigInstance.getApprovalMode.mockReturnValue(
@@ -374,7 +374,7 @@ describe('useAutoAcceptIndicator', () => {
       });
 
       expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
       );
       expect(mockAddItem).toHaveBeenCalledWith(
         {
@@ -385,8 +385,8 @@ describe('useAutoAcceptIndicator', () => {
       );
     });
 
-    it('should cycle from YOLO to PLAN when Shift+Tab is pressed', () => {
-      mockConfigInstance.getApprovalMode.mockReturnValue(ApprovalMode.YOLO);
+    it('should cycle from IZN to PLAN when Shift+Tab is pressed', () => {
+      mockConfigInstance.getApprovalMode.mockReturnValue(ApprovalMode.IZN);
       const mockAddItem = vi.fn();
       renderHook(() =>
         useAutoAcceptIndicator({
@@ -467,7 +467,7 @@ describe('useAutoAcceptIndicator', () => {
       capturedUseKeypressHandler({ name: 'tab', shift: true } as Key);
     });
 
-    // Switch to YOLO
+    // Switch to IZN
     act(() => {
       capturedUseKeypressHandler({ name: 'tab', shift: true } as Key);
     });
@@ -479,7 +479,7 @@ describe('useAutoAcceptIndicator', () => {
     );
     expect(mockOnApprovalModeChange).toHaveBeenNthCalledWith(
       2,
-      ApprovalMode.YOLO,
+      ApprovalMode.IZN,
     );
   });
 

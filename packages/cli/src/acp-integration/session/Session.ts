@@ -1052,7 +1052,7 @@ export class Session implements SessionContext {
       plan: ApprovalMode.PLAN,
       default: ApprovalMode.DEFAULT,
       'auto-edit': ApprovalMode.AUTO_EDIT,
-      yolo: ApprovalMode.YOLO,
+      izn: ApprovalMode.IZN,
     };
 
     const approvalMode = modeMap[params.modeId as ApprovalModeValue];
@@ -1378,7 +1378,7 @@ export class Session implements SessionContext {
       //
       // L3: Tool's intrinsic default permission
       // L4: PermissionManager rule override
-      // L5: ApprovalMode override (YOLO / AUTO_EDIT / PLAN)
+      // L5: ApprovalMode override (IZN / AUTO_EDIT / PLAN)
       //
       // AUTO_EDIT auto-approval is handled HERE, same as coreToolScheduler.
       // The VS Code extension is just a UI layer for requestPermission.
@@ -1583,7 +1583,7 @@ export class Session implements SessionContext {
       }
 
       if (!didRequestPermission && !isTodoWriteTool) {
-        // Auto-approved (L3 allow / L4 PM allow / L5 YOLO|AUTO_EDIT)
+        // Auto-approved (L3 allow / L4 PM allow / L5 IZN|AUTO_EDIT)
         // → emit tool_call start notification
         const startParams: ToolCallStartParams = {
           callId,

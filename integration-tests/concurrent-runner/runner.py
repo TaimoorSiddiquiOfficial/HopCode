@@ -63,7 +63,7 @@ class RunConfig:
     tasks: List[Task]
     models: List[ModelSpec]  # name + optional auth_type per model
     concurrency: int = 4
-    yolo: bool = True
+    izn: bool = True
     source_repo: Path = field(default_factory=lambda: Path.cwd())
     worktree_base: Path = field(default_factory=lambda: Path.home() / ".hopcode" / "worktrees")
     outputs_dir: Path = field(default_factory=lambda: Path("./outputs"))
@@ -820,9 +820,9 @@ class QwenRunner:
         if run.auth_type:
             cmd.extend(["--auth-type", run.auth_type])
 
-        # Add yolo if enabled
-        if self.config.yolo:
-            cmd.append("--yolo")
+        # Add izn if enabled
+        if self.config.izn:
+            cmd.append("--izn")
 
         # Always enable OpenAI logging to run-specific logs directory
         cmd.append("--openai-logging")
@@ -879,7 +879,7 @@ def load_config(config_path: Path) -> RunConfig:
         tasks=tasks,
         models=models,
         concurrency=data.get("concurrency", 4),
-        yolo=data.get("yolo", True),
+        izn=data.get("izn", True),
         source_repo=Path(data.get("source_repo", ".")).resolve(),
         worktree_base=Path(data.get("worktree_base", "~/.hopcode/worktrees")).expanduser(),
         outputs_dir=Path(data.get("outputs_dir", "./outputs")),

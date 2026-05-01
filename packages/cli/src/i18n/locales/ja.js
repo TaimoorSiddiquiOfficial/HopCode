@@ -17,7 +17,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'シェルモード',
-  'YOLO mode': 'YOLOモード',
+  'IZN mode': 'IZNモード',
   'plan mode': 'プランモード',
   'auto-accept edits': '編集を自動承認',
   'Accepting edits': '編集を承認中',
@@ -269,7 +269,7 @@ export default {
   Plan: 'プラン',
   Default: 'デフォルト',
   'Auto Edit': '自動編集',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'Vim モードのオン/オフを切り替え',
   'exit the cli': 'CLIを終了',
   Timeout: 'タイムアウト',
@@ -588,8 +588,8 @@ export default {
     'デフォルトモード - ファイル編集やシェルコマンドには承認が必要',
   'Auto-edit mode - Automatically approve file edits':
     '自動編集モード - ファイル編集を自動承認',
-  'YOLO mode - Automatically approve all tools':
-    'YOLOモード - すべてのツールを自動承認',
+  'IZN mode - Automatically approve all tools':
+    'IZNモード - すべてのツールを自動承認',
   '{{mode}} mode': '{{mode}}モード',
   'Settings service is not available; unable to persist the approval mode.':
     '設定サービスが利用できません。承認モードを保存できません',

@@ -18,7 +18,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'YOLO mode': 'YOLO 模式',
+  'IZN mode': 'IZN 模式',
   'plan mode': '規劃模式',
   'auto-accept edits': '自動接受編輯',
   'Accepting edits': '接受編輯',
@@ -380,7 +380,7 @@ export default {
   Plan: '規劃',
   Default: '默認',
   'Auto Edit': '自動編輯',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': '切換 vim 模式開關',
   'check session stats. Usage: /stats [model|tools]':
     '檢查會話統計信息。用法：/stats [model|tools]',
@@ -766,7 +766,7 @@ export default {
     '默認模式 - 需要批准文件編輯或 shell 命令',
   'Auto-edit mode - Automatically approve file edits':
     '自動編輯模式 - 自動批准文件編輯',
-  'YOLO mode - Automatically approve all tools': 'YOLO 模式 - 自動批准所有工具',
+  'IZN mode - Automatically approve all tools': 'IZN 模式 - 自動批准所有工具',
   '{{mode}} mode': '{{mode}} 模式',
   'Settings service is not available; unable to persist the approval mode.':
     '設置服務不可用；無法持久化審批模式。',

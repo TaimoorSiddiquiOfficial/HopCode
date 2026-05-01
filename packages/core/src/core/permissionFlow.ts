@@ -13,7 +13,7 @@
  * L3: Tool's intrinsic default permission
  * L4: PermissionManager rule override
  *
- * L5 overrides (ApprovalMode: YOLO, AUTO_EDIT, PLAN) are handled by
+ * L5 overrides (ApprovalMode: IZN, AUTO_EDIT, PLAN) are handled by
  * the callers because some (plan mode, AUTO_EDIT) need
  * `confirmationDetails.type` which is only available after calling
  * `invocation.getConfirmationDetails()`.
@@ -102,7 +102,7 @@ export async function evaluatePermissionFlow(
  * Check if the tool needs user confirmation based on the permission flow
  * result and the current ApprovalMode.
  *
- * This handles the YOLO mode override (L5) which doesn't require
+ * This handles the IZN mode override (L5) which doesn't require
  * confirmationDetails.
  *
  * Note: Plan mode and AUTO_EDIT mode are L5 overrides that need
@@ -115,8 +115,8 @@ export function needsConfirmation(
 ): boolean {
   const isAskUserQuestionTool = toolName === ToolNames.ASK_USER_QUESTION;
 
-  // YOLO mode auto-approves everything except ask_user_question
-  if (approvalMode === ApprovalMode.YOLO && !isAskUserQuestionTool) {
+  // IZN mode auto-approves everything except ask_user_question
+  if (approvalMode === ApprovalMode.IZN && !isAskUserQuestionTool) {
     return false;
   }
 

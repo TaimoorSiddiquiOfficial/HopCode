@@ -87,7 +87,7 @@ export async function handleQwenAuth(
       debug: undefined,
       prompt: undefined,
       promptInteractive: undefined,
-      yolo: undefined,
+      izn: undefined,
       bare: undefined,
       approvalMode: undefined,
       telemetry: undefined,

@@ -47,7 +47,7 @@ message CreateSessionRequest {
   string cwd = 3;                    // working directory
   repeated string allowed_tools = 4; // whitelist tool names
   repeated string exclude_tools = 5; // blacklist tool names
-  string permission_mode = 6;        // "default" | "plan" | "auto-edit" | "yolo"
+  string permission_mode = 6;        // "default" | "plan" | "auto-edit" | "izn"
   string auth_type = 7;              // e.g. "anthropic" | "openai" | "gemini"
   map<string, string> env = 8;       // extra env vars
   bool resume = 9;                   // resume previous session

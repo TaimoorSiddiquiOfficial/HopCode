@@ -514,7 +514,7 @@ export const useHopCodeStream = (
 
   useEffect(() => {
     if (
-      config.getApprovalMode() === ApprovalMode.YOLO &&
+      config.getApprovalMode() === ApprovalMode.IZN &&
       streamingState === StreamingState.Idle
     ) {
       const lastUserMessageIndex = history.findLastIndex(
@@ -1735,7 +1735,7 @@ export const useHopCodeStream = (
     async (newApprovalMode: ApprovalMode) => {
       // Auto-approve pending tool calls when switching to auto-approval modes
       if (
-        newApprovalMode === ApprovalMode.YOLO ||
+        newApprovalMode === ApprovalMode.IZN ||
         newApprovalMode === ApprovalMode.AUTO_EDIT
       ) {
         let awaitingApprovalCalls = toolCalls.filter(

@@ -1020,7 +1020,7 @@ export const App: React.FC = () => {
     });
   }, [insightReportPath, vscode]);
 
-  // Handle toggle edit mode (Default -> Auto-edit -> YOLO -> Default)
+  // Handle toggle edit mode (Default -> Auto-edit -> Izn -> Default)
   const handleToggleEditMode = useCallback(() => {
     setEditMode((prev) => {
       const next: ApprovalModeValue = NEXT_APPROVAL_MODE[prev];

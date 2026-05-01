@@ -159,8 +159,8 @@ export class ShellProcessor implements IPromptProcessor {
           continue;
         }
 
-        // If not a hard denial, respect YOLO mode and auto-approve.
-        if (config.getApprovalMode() === ApprovalMode.YOLO) {
+        // If not a hard denial, respect Izn mode and auto-approve.
+        if (config.getApprovalMode() === ApprovalMode.IZN) {
           continue;
         }
 

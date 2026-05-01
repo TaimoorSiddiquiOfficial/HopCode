@@ -1,6 +1,6 @@
 {
   "concurrency": 3,
-  "yolo": true,
+  "izn": true,
   "source_repo": ".",
   "branch": "main",
   "worktree_base": "~/.hopcode/worktrees",

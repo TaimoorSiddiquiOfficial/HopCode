@@ -126,7 +126,7 @@ def build_options(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "cwd": args.cwd,
         "path_to_qwen_executable": args.qwen,
-        "permission_mode": "yolo",
+        "permission_mode": "izn",
         "max_session_turns": 1,
         "timeout": {
             "control_request": args.timeout_seconds,
@@ -203,7 +203,7 @@ async def run_async_controls(args: argparse.Namespace) -> AsyncControlResult:
     try:
         supported = await q.supported_commands()
         await q.set_permission_mode("plan")
-        await q.set_permission_mode("yolo")
+        await q.set_permission_mode("izn")
         if args.model:
             await q.set_model(args.model)
 

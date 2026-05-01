@@ -40,7 +40,7 @@ export interface EditModeInfo {
 /**
  * Built-in icon types for edit modes
  */
-export type EditModeIconType = 'edit' | 'auto' | 'plan' | 'yolo';
+export type EditModeIconType = 'edit' | 'auto' | 'plan' | 'izn';
 
 /**
  * Get icon component for edit mode type
@@ -50,7 +50,7 @@ export const getEditModeIcon = (iconType: EditModeIconType): ReactNode => {
     case 'edit':
       return <EditPencilIcon />;
     case 'auto':
-    case 'yolo':
+    case 'izn':
       return <AutoEditIcon />;
     case 'plan':
       return <PlanModeIcon />;

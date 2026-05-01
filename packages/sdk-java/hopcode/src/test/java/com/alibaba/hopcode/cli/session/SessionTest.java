@@ -73,7 +73,7 @@ class SessionTest {
     void setPermissionModeSuccessfully() throws SessionControlException, SessionSendPromptException {
         Session session = HopCodeCli.newSession(new TransportOptions());
 
-        log.info(session.setPermissionMode(PermissionMode.YOLO).map(s -> s ? "setPermissionMode 1 success" : "setPermissionMode 1 error")
+        log.info(session.setPermissionMode(PermissionMode.IZN).map(s -> s ? "setPermissionMode 1 success" : "setPermissionMode 1 error")
                 .orElse("setPermissionMode 1 unknown"));
         session.sendPrompt("in the dir src/test/temp/, create file empty file test.touch", new SessionEventSimpleConsumers());
 

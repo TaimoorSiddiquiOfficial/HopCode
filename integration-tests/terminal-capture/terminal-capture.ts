@@ -340,7 +340,7 @@ export class TerminalCapture {
    *
    * @example
    * ```ts
-   * await terminal.spawn('node', ['dist/cli.js', '--yolo']);
+   * await terminal.spawn('node', ['dist/cli.js', '--izn']);
    * ```
    */
   async spawn(command: string, args: string[] = []): Promise<void> {

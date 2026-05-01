@@ -253,7 +253,7 @@ describe('ShellProcessor', () => {
     expect(result).toEqual([{ text: 'Do something dangerous: deleted' }]);
   });
 
-  it('should NOT throw ConfirmationRequiredError if a command is not allowed but approval mode is YOLO', async () => {
+  it('should NOT throw ConfirmationRequiredError if a command is not allowed but approval mode is IZN', async () => {
     const processor = new ShellProcessor('test-command');
     const prompt: PromptPipelineContent = createPromptPipelineContent(
       'Do something dangerous: !{rm -rf /}',
@@ -263,7 +263,7 @@ describe('ShellProcessor', () => {
       disallowedCommands: ['rm -rf /'],
     });
     // Override the approval mode for this test
-    (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.YOLO);
+    (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.IZN);
     mockShellExecute.mockReturnValue({
       result: Promise.resolve({ ...SUCCESS_RESULT, output: 'deleted' }),
     });
@@ -282,7 +282,7 @@ describe('ShellProcessor', () => {
     expect(result).toEqual([{ text: 'Do something dangerous: deleted' }]);
   });
 
-  it('should still throw an error for a hard-denied command even in YOLO mode', async () => {
+  it('should still throw an error for a hard-denied command even in IZN mode', async () => {
     const processor = new ShellProcessor('test-command');
     const prompt: PromptPipelineContent = createPromptPipelineContent(
       'Do something forbidden: !{reboot}',
@@ -293,8 +293,8 @@ describe('ShellProcessor', () => {
       isHardDenial: true, // This is the key difference
       blockReason: 'System commands are blocked',
     });
-    // Set approval mode to YOLO
-    (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.YOLO);
+    // Set approval mode to IZN
+    (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.IZN);
 
     await expect(processor.process(prompt, context)).rejects.toThrow(
       /Blocked command: "reboot". Reason: System commands are blocked/,

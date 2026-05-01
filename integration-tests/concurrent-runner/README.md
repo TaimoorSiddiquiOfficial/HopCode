@@ -32,7 +32,7 @@ Create a JSON configuration file (see `config.example.json`):
 ```json
 {
   "concurrency": 3,
-  "yolo": true,
+  "izn": true,
   "source_repo": ".",
   "worktree_base": "~/.hopcode/worktrees",
   "outputs_dir": "./outputs",
@@ -53,7 +53,7 @@ Create a JSON configuration file (see `config.example.json`):
 | Option          | Type   | Default              | Description                                   |
 | --------------- | ------ | -------------------- | --------------------------------------------- |
 | `concurrency`   | int    | 4                    | Maximum parallel executions                   |
-| `yolo`          | bool   | true                 | Auto-approve all actions                      |
+| `izn`           | bool   | true                 | Auto-approve all actions                      |
 | `source_repo`   | string | .                    | Source git repository path                    |
 | `branch`        | string | null                 | Git branch to checkout (uses default if null) |
 | `worktree_base` | string | ~/.hopcode/worktrees | Base directory for git worktrees              |

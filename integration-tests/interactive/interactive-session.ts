@@ -39,7 +39,7 @@ export interface InteractiveSessionOptions {
   cwd?: string;
   /** Environment variables */
   env?: NodeJS.ProcessEnv;
-  /** Extra CLI arguments (e.g. ['--approval-mode', 'yolo']) */
+  /** Extra CLI arguments (e.g. ['--approval-mode', 'izn']) */
   args?: string[];
 }
 
@@ -77,7 +77,7 @@ export class InteractiveSession {
    * ```ts
    * const session = await InteractiveSession.start({
    *   env: { hopcode_ENABLE_CRON: '1' },
-   *   args: ['--approval-mode', 'yolo'],
+   *   args: ['--approval-mode', 'izn'],
    * });
    * ```
    */

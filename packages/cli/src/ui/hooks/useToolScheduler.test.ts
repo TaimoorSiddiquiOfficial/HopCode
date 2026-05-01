@@ -94,7 +94,7 @@ const mockToolRequiresConfirmation = new MockTool({
   getConfirmationDetails: vi.fn(),
 });
 
-describe('useReactToolScheduler in YOLO Mode', () => {
+describe('useReactToolScheduler in IZN Mode', () => {
   let onComplete: Mock;
   let setPendingHistoryItem: Mock;
 
@@ -106,8 +106,8 @@ describe('useReactToolScheduler in YOLO Mode', () => {
     (mockToolRequiresConfirmation.execute as Mock).mockClear();
     (mockToolRequiresConfirmation.getConfirmationDetails as Mock).mockClear();
 
-    // IMPORTANT: Enable YOLO mode for this test suite
-    (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.YOLO);
+    // IMPORTANT: Enable IZN mode for this test suite
+    (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.IZN);
 
     vi.useFakeTimers();
   });
@@ -115,11 +115,11 @@ describe('useReactToolScheduler in YOLO Mode', () => {
   afterEach(() => {
     vi.clearAllTimers();
     vi.useRealTimers();
-    // IMPORTANT: Disable YOLO mode after this test suite
+    // IMPORTANT: Disable IZN mode after this test suite
     (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.DEFAULT);
   });
 
-  const renderSchedulerInYoloMode = () =>
+  const renderSchedulerInIznMode = () =>
     renderHook(() =>
       useReactToolScheduler(
         onComplete,
@@ -129,18 +129,18 @@ describe('useReactToolScheduler in YOLO Mode', () => {
       ),
     );
 
-  it('should skip confirmation and execute tool directly when yoloMode is true', async () => {
+  it('should skip confirmation and execute tool directly when iznMode is true', async () => {
     mockToolRegistry.getTool.mockReturnValue(mockToolRequiresConfirmation);
-    const expectedOutput = 'YOLO Confirmed output';
+    const expectedOutput = 'IZN Confirmed output';
     (mockToolRequiresConfirmation.execute as Mock).mockResolvedValue({
       llmContent: expectedOutput,
-      returnDisplay: 'YOLO Formatted tool output',
+      returnDisplay: 'IZN Formatted tool output',
     } as ToolResult);
 
-    const { result } = renderSchedulerInYoloMode();
+    const { result } = renderSchedulerInIznMode();
     const schedule = result.current[1];
     const request: ToolCallRequestInfo = {
-      callId: 'yoloCall',
+      callId: 'iznCall',
       name: 'mockToolRequiresConfirmation',
       args: { data: 'any data' },
     } as any;
@@ -170,11 +170,11 @@ describe('useReactToolScheduler in YOLO Mode', () => {
         status: 'success',
         request,
         response: expect.objectContaining({
-          resultDisplay: 'YOLO Formatted tool output',
+          resultDisplay: 'IZN Formatted tool output',
           responseParts: [
             {
               functionResponse: {
-                id: 'yoloCall',
+                id: 'iznCall',
                 name: 'mockToolRequiresConfirmation',
                 response: { output: expectedOutput },
               },

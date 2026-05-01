@@ -46,7 +46,7 @@ For security and isolation, HopCode can be run inside a container. This is the d
 - **Using the `--sandbox` flag:**
   If you have HopCode installed locally (using the standard installation described above), you can instruct it to run inside the sandbox container.
   ```bash
-  hopcode --sandbox -y -p "your prompt here"
+  hopcode --sandbox -z -p "your prompt here"
   ```
 
 ---

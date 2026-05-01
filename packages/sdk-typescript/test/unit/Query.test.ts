@@ -1059,7 +1059,7 @@ describe('Query', () => {
 
       await respondToInitialize(transport, query);
 
-      const setModePromise = query.setPermissionMode('yolo');
+      const setModePromise = query.setPermissionMode('izn');
 
       await vi.waitFor(() => {
         const messages = transport.getAllWrittenMessages();
@@ -1252,7 +1252,7 @@ describe('Query', () => {
       await query.close();
 
       await expect(query.interrupt()).rejects.toThrow('Query is closed');
-      await expect(query.setPermissionMode('yolo')).rejects.toThrow(
+      await expect(query.setPermissionMode('izn')).rejects.toThrow(
         'Query is closed',
       );
       await expect(query.setModel('model')).rejects.toThrow('Query is closed');

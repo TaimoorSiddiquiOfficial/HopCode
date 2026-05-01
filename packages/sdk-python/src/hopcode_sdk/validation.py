@@ -12,7 +12,7 @@ from .types import (
     _validate_stderr_callable,
 )
 
-_VALID_PERMISSION_MODES = {"default", "plan", "auto-edit", "yolo"}
+_VALID_PERMISSION_MODES = {"default", "plan", "auto-edit", "izn"}
 _VALID_AUTH_TYPES = {"openai", "anthropic", "qwen-oauth", "gemini", "vertex-ai"}
 
 
@@ -23,7 +23,7 @@ def validate_query_options(options: QueryOptions) -> None:
     ):
         raise ValidationError(
             f"Invalid permission_mode: {options.permission_mode!r}. "
-            "Expected one of: default, plan, auto-edit, yolo."
+            "Expected one of: default, plan, auto-edit, izn."
         )
 
     if options.auth_type and options.auth_type not in _VALID_AUTH_TYPES:

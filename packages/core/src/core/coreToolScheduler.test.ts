@@ -1189,7 +1189,7 @@ describe('CoreToolScheduler edit cancellation', () => {
   });
 });
 
-describe('CoreToolScheduler YOLO mode', () => {
+describe('CoreToolScheduler IZN mode', () => {
   it('should execute tool requiring confirmation directly without waiting', async () => {
     // Arrange
     const executeFn = vi.fn().mockResolvedValue({
@@ -1223,12 +1223,12 @@ describe('CoreToolScheduler YOLO mode', () => {
     const onAllToolCallsComplete = vi.fn();
     const onToolCallsUpdate = vi.fn();
 
-    // Configure the scheduler for YOLO mode.
+    // Configure the scheduler for IZN mode.
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -1266,7 +1266,7 @@ describe('CoreToolScheduler YOLO mode', () => {
       name: 'mockTool',
       args: { param: 'value' },
       isClientInitiated: false,
-      prompt_id: 'prompt-id-yolo',
+      prompt_id: 'prompt-id-izn',
     };
 
     // Act
@@ -1475,7 +1475,7 @@ describe('CoreToolScheduler request queueing', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO, // Use YOLO to avoid confirmation prompts
+      getApprovalMode: () => ApprovalMode.IZN, // Use IZN to avoid confirmation prompts
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -1600,7 +1600,7 @@ describe('CoreToolScheduler request queueing', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -2097,7 +2097,7 @@ describe('CoreToolScheduler Sequential Execution', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO, // Use YOLO to avoid confirmation prompts
+      getApprovalMode: () => ApprovalMode.IZN, // Use IZN to avoid confirmation prompts
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -2220,7 +2220,7 @@ describe('CoreToolScheduler Sequential Execution', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -3997,7 +3997,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -4248,7 +4248,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',

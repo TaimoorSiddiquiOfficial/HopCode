@@ -612,14 +612,14 @@ describe('HookSystem', () => {
         'write_file',
         { path: '/test.txt', content: 'test' },
         'toolu_test456',
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       expect(mockHookEventHandler.firePreToolUseEvent).toHaveBeenCalledWith(
         'write_file',
         { path: '/test.txt', content: 'test' },
         'toolu_test456',
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
         undefined,
       );
     });
@@ -881,7 +881,7 @@ describe('HookSystem', () => {
         { path: '/test.txt' },
         'Permission denied',
         true,
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       expect(
@@ -892,7 +892,7 @@ describe('HookSystem', () => {
         { path: '/test.txt' },
         'Permission denied',
         true,
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
         undefined,
       );
     });
@@ -1373,11 +1373,11 @@ describe('HookSystem', () => {
         PermissionMode.Plan,
       );
 
-      // Test Yolo mode
+      // Test Izn mode
       await hookSystem.firePermissionRequestEvent(
         'Bash',
         { command: 'test' },
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       expect(
@@ -1450,13 +1450,13 @@ describe('HookSystem', () => {
       await hookSystem.fireSubagentStartEvent(
         'agent-456',
         AgentType.Bash,
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       expect(mockHookEventHandler.fireSubagentStartEvent).toHaveBeenCalledWith(
         'agent-456',
         AgentType.Bash,
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
         undefined,
       );
     });

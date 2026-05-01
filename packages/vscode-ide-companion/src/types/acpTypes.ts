@@ -54,8 +54,8 @@ export const NEXT_APPROVAL_MODE: {
 } = {
   plan: 'default',
   default: 'auto-edit',
-  'auto-edit': 'yolo',
-  yolo: 'plan',
+  'auto-edit': 'izn',
+  izn: 'plan',
 };
 
 // Ask User Question types

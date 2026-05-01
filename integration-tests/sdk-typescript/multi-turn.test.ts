@@ -265,7 +265,7 @@ describe('Multi-Turn Conversations (E2E)', () => {
         prompt: createToolConversation(),
         options: {
           ...SHARED_TEST_OPTIONS,
-          permissionMode: 'yolo',
+          permissionMode: 'izn',
           cwd: testDir,
           debug: false,
         },

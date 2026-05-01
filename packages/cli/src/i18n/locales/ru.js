@@ -24,7 +24,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Режим терминала',
-  'YOLO mode': 'Режим YOLO',
+  'IZN mode': 'Режим IZN',
   'plan mode': 'Режим планирования',
   'auto-accept edits': 'Режим принятия правок',
   'Accepting edits': 'Принятие правок',
@@ -377,7 +377,7 @@ export default {
   Plan: 'План',
   Default: 'По умолчанию',
   'Auto Edit': 'Авторедактирование',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'Включение/выключение режима vim',
   'check session stats. Usage: /stats [model|tools]':
     'Просмотр статистики сессии. Использование: /stats [model|tools]',
@@ -828,8 +828,8 @@ export default {
     'Режим по умолчанию - требуется подтверждение для редактирования файлов или команд терминала',
   'Auto-edit mode - Automatically approve file edits':
     'Режим авторедактирования - автоматическое подтверждение изменений файлов',
-  'YOLO mode - Automatically approve all tools':
-    'Режим YOLO - автоматическое подтверждение всех инструментов',
+  'IZN mode - Automatically approve all tools':
+    'Режим IZN - автоматическое подтверждение всех инструментов',
   '{{mode}} mode': 'Режим {{mode}}',
   'Settings service is not available; unable to persist the approval mode.':
     'Служба настроек недоступна; невозможно сохранить режим подтверждения.',

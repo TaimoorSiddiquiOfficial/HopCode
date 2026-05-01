@@ -89,7 +89,7 @@ const VALID_APPROVAL_MODE_VALUES = [
   'plan',
   'default',
   'auto-edit',
-  'yolo',
+  'izn',
 ] as const;
 
 function formatApprovalModeError(value: string): Error {
@@ -107,8 +107,8 @@ function parseApprovalModeValue(value: string): ApprovalMode {
       return ApprovalMode.PLAN;
     case 'default':
       return ApprovalMode.DEFAULT;
-    case 'yolo':
-      return ApprovalMode.YOLO;
+    case 'izn':
+      return ApprovalMode.IZN;
     case 'auto_edit':
     case 'autoedit':
     case 'auto-edit':
@@ -128,7 +128,7 @@ export interface CliArgs {
   promptInteractive: string | undefined;
   systemPrompt: string | undefined;
   appendSystemPrompt: string | undefined;
-  yolo: boolean | undefined;
+  izn: boolean | undefined;
   bare: boolean | undefined;
   approvalMode: string | undefined;
   telemetry: boolean | undefined;
@@ -371,18 +371,18 @@ export async function parseArguments(): Promise<CliArgs> {
           type: 'string',
           description: 'Sandbox image URI.',
         })
-        .option('yolo', {
-          alias: 'y',
+        .option('izn', {
+          alias: 'z',
           type: 'boolean',
           description:
-            'Automatically accept all actions (aka YOLO mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?',
+            'Automatically accept all actions (aka Izn mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?',
           default: false,
         })
         .option('approval-mode', {
           type: 'string',
-          choices: ['plan', 'default', 'auto-edit', 'yolo'],
+          choices: ['plan', 'default', 'auto-edit', 'izn'],
           description:
-            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), yolo (auto-approve all tools)',
+            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), izn (auto-approve all tools)',
         })
         .option('checkpointing', {
           type: 'boolean',
@@ -638,8 +638,8 @@ export async function parseArguments(): Promise<CliArgs> {
           if (argv['prompt'] && argv['promptInteractive']) {
             return 'Cannot use both --prompt (-p) and --prompt-interactive (-i) together';
           }
-          if (argv['yolo'] && argv['approvalMode']) {
-            return 'Cannot use both --yolo (-y) and --approval-mode together. Use --approval-mode=yolo instead.';
+          if (argv['izn'] && argv['approvalMode']) {
+            return 'Cannot use both --izn (-z) and --approval-mode together. Use --approval-mode=izn instead.';
           }
           if (
             argv['includePartialMessages'] &&
@@ -1012,8 +1012,8 @@ export async function loadCliConfig(
   let approvalMode: ApprovalMode;
   if (argv.approvalMode) {
     approvalMode = parseApprovalModeValue(argv.approvalMode);
-  } else if (argv.yolo) {
-    approvalMode = ApprovalMode.YOLO;
+  } else if (argv.izn) {
+    approvalMode = ApprovalMode.IZN;
   } else if (!bareMode && settings.tools?.approvalMode) {
     approvalMode = parseApprovalModeValue(settings.tools.approvalMode);
   } else {
@@ -1197,8 +1197,8 @@ export async function loadCliConfig(
         // Only shell requires a prompt in auto-edit mode.
         denyUnlessAllowed(ToolNames.SHELL as ToolName);
         break;
-      case ApprovalMode.YOLO:
-        // No extra denials for YOLO mode.
+      case ApprovalMode.IZN:
+        // No extra denials for Izn mode.
         break;
       default:
         break;

@@ -140,7 +140,7 @@ export const QueryOptionsSchema = z
         QuerySystemPromptPresetSchema,
       ])
       .optional(),
-    permissionMode: z.enum(['default', 'plan', 'auto-edit', 'yolo']).optional(),
+    permissionMode: z.enum(['default', 'plan', 'auto-edit', 'izn']).optional(),
     canUseTool: z
       .custom<CanUseTool>((val) => typeof val === 'function', {
         message: 'canUseTool must be a function',

@@ -274,7 +274,7 @@ describe('Configuration Integration Tests', () => {
         // Verify that the argument was parsed correctly
         expect(argv.approvalMode).toBe('auto-edit');
         expect(argv.prompt).toBe('test');
-        expect(argv.yolo).toBe(false);
+        expect(argv.izn).toBe(false);
       } finally {
         process.argv = originalArgv;
       }
@@ -297,13 +297,13 @@ describe('Configuration Integration Tests', () => {
 
         expect(argv.approvalMode).toBe('plan');
         expect(argv.prompt).toBe('test');
-        expect(argv.yolo).toBe(false);
+        expect(argv.izn).toBe(false);
       } finally {
         process.argv = originalArgv;
       }
     });
 
-    it('should parse --approval-mode=yolo correctly through the full argument parsing flow', async () => {
+    it('should parse --approval-mode=izn correctly through the full argument parsing flow', async () => {
       const originalArgv = process.argv;
 
       try {
@@ -311,16 +311,16 @@ describe('Configuration Integration Tests', () => {
           'node',
           'script.js',
           '--approval-mode',
-          'yolo',
+          'izn',
           '-p',
           'test',
         ];
 
         const argv = await parseArguments();
 
-        expect(argv.approvalMode).toBe('yolo');
+        expect(argv.approvalMode).toBe('izn');
         expect(argv.prompt).toBe('test');
-        expect(argv.yolo).toBe(false); // Should NOT be set when using --approval-mode
+        expect(argv.izn).toBe(false); // Should NOT be set when using --approval-mode
       } finally {
         process.argv = originalArgv;
       }
@@ -343,22 +343,22 @@ describe('Configuration Integration Tests', () => {
 
         expect(argv.approvalMode).toBe('default');
         expect(argv.prompt).toBe('test');
-        expect(argv.yolo).toBe(false);
+        expect(argv.izn).toBe(false);
       } finally {
         process.argv = originalArgv;
       }
     });
 
-    it('should parse legacy --yolo flag correctly', async () => {
+    it('should parse legacy --izn flag correctly', async () => {
       const originalArgv = process.argv;
 
       try {
-        process.argv = ['node', 'script.js', '--yolo', '-p', 'test'];
+        process.argv = ['node', 'script.js', '--izn', '-p', 'test'];
 
         const argv = await parseArguments();
 
-        expect(argv.yolo).toBe(true);
-        expect(argv.approvalMode).toBeUndefined(); // Should NOT be set when using --yolo
+        expect(argv.izn).toBe(true);
+        expect(argv.approvalMode).toBeUndefined(); // Should NOT be set when using --izn
         expect(argv.prompt).toBe('test');
       } finally {
         process.argv = originalArgv;
@@ -378,14 +378,14 @@ describe('Configuration Integration Tests', () => {
       }
     });
 
-    it('should reject conflicting --yolo and --approval-mode flags', async () => {
+    it('should reject conflicting --izn and --approval-mode flags', async () => {
       const originalArgv = process.argv;
 
       try {
         process.argv = [
           'node',
           'script.js',
-          '--yolo',
+          '--izn',
           '--approval-mode',
           'default',
         ];
@@ -407,7 +407,7 @@ describe('Configuration Integration Tests', () => {
         const argv = await parseArguments();
 
         expect(argv.approvalMode).toBeUndefined();
-        expect(argv.yolo).toBe(false);
+        expect(argv.izn).toBe(false);
         expect(argv.prompt).toBe('test');
       } finally {
         process.argv = originalArgv;

@@ -53,7 +53,7 @@ January 5, 2026
 #### New Features
 
 - Enhanced session management with dynamic model switching
-- Improved permission mode controls with multiple options (default, plan, auto-edit, yolo)
+- Improved permission mode controls with multiple options (default, plan, auto-edit, izn)
 - Support for streaming content handling with custom content consumers
 - Thread pool configuration for managing concurrent operations
 - Session resumption capabilities using resumeSessionId
@@ -84,7 +84,7 @@ January 5, 2026
 
 4. **Timeout Configuration**: Users experiencing timeout issues should adjust the `turnTimeout` and `messageTimeout` values in `TransportOptions` based on their specific use cases.
 
-5. **Permission Mode Confusion**: The different permission modes (default, plan, auto-edit, yolo) may cause confusion for new users. Clear documentation and examples are needed to guide users in selecting appropriate permission modes.
+5. **Permission Mode Confusion**: The different permission modes (default, plan, auto-edit, izn) may cause confusion for new users. Clear documentation and examples are needed to guide users in selecting appropriate permission modes.
 
 6. **Environment Variable Limitations**: Environment variables passed to the CLI process may have platform-specific limitations on length and character sets.
 

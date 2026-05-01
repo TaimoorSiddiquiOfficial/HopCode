@@ -605,7 +605,7 @@ describe('AgentTool', () => {
 
       MockedContextState.mockImplementation(() => mockContextState);
 
-      // Parent conversation history: empty (first-turn fork — falls back to
+      // Parent conversation history: empty (first-turn fork ï¿½ falls back to
       // the fork agent's own systemPrompt + wildcard tools because no
       // cache params have been captured yet).
       vi.mocked(config.getHopCodeClient).mockReturnValue({
@@ -1750,13 +1750,13 @@ describe('AgentTool', () => {
 });
 
 describe('resolveSubagentApprovalMode', () => {
-  it('should return yolo when parent is yolo, regardless of agent config', () => {
-    expect(resolveSubagentApprovalMode(ApprovalMode.YOLO, 'plan', true)).toBe(
-      PermissionMode.Yolo,
+  it('should return izn when parent is izn, regardless of agent config', () => {
+    expect(resolveSubagentApprovalMode(ApprovalMode.IZN, 'plan', true)).toBe(
+      PermissionMode.Izn,
     );
     expect(
-      resolveSubagentApprovalMode(ApprovalMode.YOLO, undefined, false),
-    ).toBe(PermissionMode.Yolo);
+      resolveSubagentApprovalMode(ApprovalMode.IZN, undefined, false),
+    ).toBe(PermissionMode.Izn);
   });
 
   it('should return auto-edit when parent is auto-edit, regardless of agent config', () => {
@@ -1775,9 +1775,9 @@ describe('resolveSubagentApprovalMode', () => {
     expect(
       resolveSubagentApprovalMode(ApprovalMode.DEFAULT, 'auto-edit', true),
     ).toBe(PermissionMode.AutoEdit);
-    expect(
-      resolveSubagentApprovalMode(ApprovalMode.DEFAULT, 'yolo', true),
-    ).toBe(PermissionMode.Yolo);
+    expect(resolveSubagentApprovalMode(ApprovalMode.DEFAULT, 'izn', true)).toBe(
+      PermissionMode.Izn,
+    );
   });
 
   it('should block privileged agent-declared modes in untrusted folders', () => {
@@ -1785,7 +1785,7 @@ describe('resolveSubagentApprovalMode', () => {
       resolveSubagentApprovalMode(ApprovalMode.DEFAULT, 'auto-edit', false),
     ).toBe(PermissionMode.Default);
     expect(
-      resolveSubagentApprovalMode(ApprovalMode.DEFAULT, 'yolo', false),
+      resolveSubagentApprovalMode(ApprovalMode.DEFAULT, 'izn', false),
     ).toBe(PermissionMode.Default);
   });
 

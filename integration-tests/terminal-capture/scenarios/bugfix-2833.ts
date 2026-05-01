@@ -7,7 +7,7 @@
  */
 export default {
   name: 'streaming-bugfix-2833',
-  spawn: ['node', 'dist/cli.js', '--yolo'],
+  spawn: ['node', 'dist/cli.js', '--izn'],
   terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {

@@ -968,7 +968,7 @@ describe('runNonInteractive', () => {
 
     // Should write error message through adapter to stdout (TEXT mode goes through JsonOutputAdapter)
     expect(processStderrSpy).toHaveBeenCalledWith(
-      'Shell command confirmation is not supported in non-interactive mode. Use YOLO mode or pre-approve commands.\n',
+      'Shell command confirmation is not supported in non-interactive mode. Use Izn mode or pre-approve commands.\n',
     );
   });
 

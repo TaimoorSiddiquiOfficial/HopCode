@@ -39,14 +39,14 @@ describe('permissionUtils', () => {
         type: 'plan',
         title: 'Would you like to proceed?',
         plan: 'Test plan',
-        prePlanMode: 'yolo',
+        prePlanMode: 'izn',
         onConfirm: async () => undefined,
       });
 
       expect(options).toHaveLength(4);
       expect(options[0]).toMatchObject({
         optionId: ToolConfirmationOutcome.RestorePrevious,
-        name: 'Yes, restore previous mode (yolo)',
+        name: 'Yes, restore previous mode (izn)',
         kind: 'allow_once',
       });
       expect(options[1]).toMatchObject({

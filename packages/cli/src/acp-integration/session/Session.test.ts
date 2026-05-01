@@ -168,7 +168,7 @@ describe('Session', () => {
       ['plan', ApprovalMode.PLAN],
       ['default', ApprovalMode.DEFAULT],
       ['auto-edit', ApprovalMode.AUTO_EDIT],
-      ['yolo', ApprovalMode.YOLO],
+      ['izn', ApprovalMode.IZN],
     ] as const)('maps %s mode', async (modeId, expected) => {
       await session.setMode({
         sessionId: 'test-session-id',
@@ -796,7 +796,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'result',
@@ -858,7 +858,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn();
           const tool = {
@@ -910,7 +910,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'file contents',
@@ -975,7 +975,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'file contents',
@@ -1040,7 +1040,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi
             .fn()

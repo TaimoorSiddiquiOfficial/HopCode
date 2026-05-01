@@ -60,7 +60,7 @@ def run_agent(prompt: str, model: str = "claude-sonnet-4-6") -> str:
         "hopcode",
         "--json",
         "--model", model,
-        "--permission-mode", "yolo",
+        "--permission-mode", "izn",
         "-p", prompt,
     ]
 

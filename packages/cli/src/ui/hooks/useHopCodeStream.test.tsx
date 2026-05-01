@@ -1339,7 +1339,7 @@ describe('useHopCodeStream', () => {
   });
 
   describe('handleApprovalModeChange', () => {
-    it('should auto-approve all pending tool calls when switching to YOLO mode', async () => {
+    it('should auto-approve all pending tool calls when switching to IZN mode', async () => {
       const mockOnConfirm = vi.fn().mockResolvedValue(undefined);
       const awaitingApprovalToolCalls: TrackedToolCall[] = [
         {
@@ -1399,7 +1399,7 @@ describe('useHopCodeStream', () => {
       const { result } = renderTestHook(awaitingApprovalToolCalls);
 
       await act(async () => {
-        await result.current.handleApprovalModeChange(ApprovalMode.YOLO);
+        await result.current.handleApprovalModeChange(ApprovalMode.IZN);
       });
 
       // Both tool calls should be auto-approved
@@ -1625,7 +1625,7 @@ describe('useHopCodeStream', () => {
       const { result } = renderTestHook(awaitingApprovalToolCalls);
 
       await act(async () => {
-        await result.current.handleApprovalModeChange(ApprovalMode.YOLO);
+        await result.current.handleApprovalModeChange(ApprovalMode.IZN);
       });
 
       // Both confirmation methods should be called
@@ -1662,7 +1662,7 @@ describe('useHopCodeStream', () => {
 
       // Should not throw an error
       await act(async () => {
-        await result.current.handleApprovalModeChange(ApprovalMode.YOLO);
+        await result.current.handleApprovalModeChange(ApprovalMode.IZN);
       });
     });
 
@@ -1700,7 +1700,7 @@ describe('useHopCodeStream', () => {
 
       // Should not throw an error
       await act(async () => {
-        await result.current.handleApprovalModeChange(ApprovalMode.YOLO);
+        await result.current.handleApprovalModeChange(ApprovalMode.IZN);
       });
     });
 
@@ -1768,7 +1768,7 @@ describe('useHopCodeStream', () => {
       const { result } = renderTestHook(mixedStatusToolCalls);
 
       await act(async () => {
-        await result.current.handleApprovalModeChange(ApprovalMode.YOLO);
+        await result.current.handleApprovalModeChange(ApprovalMode.IZN);
       });
 
       // Only the awaiting_approval tool should be processed

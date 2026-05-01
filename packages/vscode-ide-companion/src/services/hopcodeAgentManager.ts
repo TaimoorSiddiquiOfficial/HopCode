@@ -288,9 +288,9 @@ export class HopCodeAgentManager {
         const obj = (init || {}) as Record<string, unknown>;
         const modes = obj['modes'] as
           | {
-              currentModeId?: 'plan' | 'default' | 'auto-edit' | 'yolo';
+              currentModeId?: 'plan' | 'default' | 'auto-edit' | 'izn';
               availableModes?: Array<{
-                id: 'plan' | 'default' | 'auto-edit' | 'yolo';
+                id: 'plan' | 'default' | 'auto-edit' | 'izn';
                 name: string;
                 description: string;
               }>;
@@ -1419,9 +1419,9 @@ export class HopCodeAgentManager {
    */
   onModeInfo(
     callback: (info: {
-      currentModeId?: 'plan' | 'default' | 'auto-edit' | 'yolo';
+      currentModeId?: 'plan' | 'default' | 'auto-edit' | 'izn';
       availableModes?: Array<{
-        id: 'plan' | 'default' | 'auto-edit' | 'yolo';
+        id: 'plan' | 'default' | 'auto-edit' | 'izn';
         name: string;
         description: string;
       }>;
@@ -1435,7 +1435,7 @@ export class HopCodeAgentManager {
    * Register mode changed callback
    */
   onModeChanged(
-    callback: (modeId: 'plan' | 'default' | 'auto-edit' | 'yolo') => void,
+    callback: (modeId: 'plan' | 'default' | 'auto-edit' | 'izn') => void,
   ): void {
     this.callbacks.onModeChanged = callback;
     this.sessionUpdateHandler.updateCallbacks(this.callbacks);

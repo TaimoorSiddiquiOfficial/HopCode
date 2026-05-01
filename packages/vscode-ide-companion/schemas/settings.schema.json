@@ -570,12 +570,12 @@
           }
         },
         "approvalMode": {
-          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, yolo",
+          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, izn",
           "enum": [
             "plan",
             "default",
             "auto-edit",
-            "yolo"
+            "izn"
           ],
           "default": "default"
         },

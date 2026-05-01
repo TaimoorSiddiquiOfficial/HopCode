@@ -13,7 +13,7 @@ export enum ApprovalMode {
   PLAN = 'plan',
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
-  YOLO = 'yolo',
+  IZN = 'izn',
 }
 
 /**
@@ -23,7 +23,7 @@ export const APPROVAL_MODE_MAP: Record<string, ApprovalMode> = {
   plan: ApprovalMode.PLAN,
   default: ApprovalMode.DEFAULT,
   'auto-edit': ApprovalMode.AUTO_EDIT,
-  yolo: ApprovalMode.YOLO,
+  izn: ApprovalMode.IZN,
 };
 
 /**
@@ -34,7 +34,7 @@ export const APPROVAL_MODE_INFO: Record<
   {
     label: string;
     title: string;
-    iconType?: 'edit' | 'auto' | 'plan' | 'yolo';
+    iconType?: 'edit' | 'auto' | 'plan' | 'izn';
   }
 > = {
   [ApprovalMode.PLAN]: {
@@ -52,10 +52,10 @@ export const APPROVAL_MODE_INFO: Record<
     title: 'HopCode will edit files automatically. Click to switch modes.',
     iconType: 'auto',
   },
-  [ApprovalMode.YOLO]: {
-    label: 'YOLO',
+  [ApprovalMode.IZN]: {
+    label: 'Izn',
     title: 'Automatically approve all tools. Click to switch modes.',
-    iconType: 'yolo',
+    iconType: 'izn',
   },
 };
 
@@ -65,7 +65,7 @@ export const APPROVAL_MODE_INFO: Record<
 export function getApprovalModeInfoFromString(mode: string): {
   label: string;
   title: string;
-  iconType?: 'edit' | 'auto' | 'plan' | 'yolo';
+  iconType?: 'edit' | 'auto' | 'plan' | 'izn';
 } {
   const enumValue = APPROVAL_MODE_MAP[mode];
   if (enumValue !== undefined) {

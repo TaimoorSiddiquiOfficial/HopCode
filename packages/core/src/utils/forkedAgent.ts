@@ -218,7 +218,7 @@ export interface CachePathParams {
 export interface AgentPathParams {
   /** Unique name for this agent run (for logging and telemetry). */
   name: string;
-  /** Runtime config. ApprovalMode is forced to YOLO internally. */
+  /** Runtime config. ApprovalMode is forced to IZN internally. */
   config: Config;
   /** Task prompt sent as the initial user message. */
   taskPrompt: string;
@@ -257,14 +257,14 @@ export interface ForkedAgentResult {
 }
 
 /**
- * Returns a shallow clone of config with ApprovalMode forced to YOLO.
+ * Returns a shallow clone of config with ApprovalMode forced to IZN.
  * Background agents must never block on permission prompts — there is
  * no user present to answer them.
  */
-function createYoloConfig(config: Config): Config {
-  const yoloConfig = Object.create(config) as Config;
-  yoloConfig.getApprovalMode = () => ApprovalMode.YOLO;
-  return yoloConfig;
+function createIznConfig(config: Config): Config {
+  const iznConfig = Object.create(config) as Config;
+  iznConfig.getApprovalMode = () => ApprovalMode.IZN;
+  return iznConfig;
 }
 
 /**
@@ -376,7 +376,7 @@ export async function runForkedAgent(
   }
 
   // ── AgentHeadless path ────────────────────────────────────────────────────
-  const yoloConfig = createYoloConfig(params.config);
+  const iznConfig = createIznConfig(params.config);
   const filesTouched = new Set<string>();
 
   const emitter = new AgentEventEmitter();
@@ -403,7 +403,7 @@ export async function runForkedAgent(
 
   const headless = await AgentHeadless.create(
     params.name,
-    yoloConfig,
+    iznConfig,
     promptConfig,
     modelConfig,
     runConfig,

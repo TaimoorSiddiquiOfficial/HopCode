@@ -45,7 +45,7 @@ jobs:
           ISSUE_BODY: '${{ github.event.issue.body }}'
         run: |
           hopcode github auth --token "$GITHUB_TOKEN"
-          cat <<'EOF' | hopcode --yolo
+          cat <<'EOF' | hopcode --izn
           Triage GitHub issue #$ISSUE_NUMBER:
           Title: $ISSUE_TITLE
           Body: $ISSUE_BODY

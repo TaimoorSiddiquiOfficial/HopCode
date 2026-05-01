@@ -7,7 +7,7 @@
  */
 export default {
   name: 'streaming-insight',
-  spawn: ['node', 'dist/cli.js', '--yolo'],
+  spawn: ['node', 'dist/cli.js', '--izn'],
   terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {

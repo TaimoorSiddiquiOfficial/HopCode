@@ -60,7 +60,7 @@ const LEGACY_FORK_RESUME_BLOCKED_REASON =
 const LEGACY_FORK_CAPABILITIES_BLOCKED_REASON =
   'Fork background task cannot be safely resumed because its launch-time runtime constraints are missing.';
 
-type ApprovalModeValue = 'plan' | 'default' | 'auto-edit' | 'yolo';
+type ApprovalModeValue = 'plan' | 'default' | 'auto-edit' | 'izn';
 
 interface TranscriptRecovery {
   history: Content[];
@@ -94,8 +94,8 @@ interface RestorePausedEntryOptions {
 
 function approvalModeToPermissionMode(mode?: string): PermissionMode {
   switch (mode) {
-    case 'yolo':
-      return PermissionMode.Yolo;
+    case 'izn':
+      return PermissionMode.Izn;
     case 'auto-edit':
       return PermissionMode.AutoEdit;
     case 'plan':
@@ -114,7 +114,7 @@ function normalizeApprovalMode(
     case 'plan':
     case 'default':
     case 'auto-edit':
-    case 'yolo':
+    case 'izn':
       return value;
     default:
       return fallback;
@@ -128,7 +128,7 @@ function reconcileResumedApprovalMode(
 ): ApprovalModeValue {
   if (
     isTrustedFolder ||
-    (persistedMode !== 'auto-edit' && persistedMode !== 'yolo')
+    (persistedMode !== 'auto-edit' && persistedMode !== 'izn')
   ) {
     return persistedMode;
   }

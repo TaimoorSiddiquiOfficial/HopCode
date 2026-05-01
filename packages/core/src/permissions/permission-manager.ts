@@ -62,7 +62,7 @@ export interface PermissionManagerConfig {
   /** Current working directory (for resolving path patterns). */
   getCwd?(): string;
   /**
-   * Returns the current approval mode (plan/default/auto-edit/yolo).
+   * Returns the current approval mode (plan/default/auto-edit/izn).
    * Used by `getDefaultMode()` to determine the fallback when no rule matches.
    */
   getApprovalMode?(): string;

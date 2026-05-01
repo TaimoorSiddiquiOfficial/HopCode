@@ -577,7 +577,7 @@ Profiles are stored in `~/.hopcode-profiles.json` and persist across sessions.
 
 > Learn more about [Commands](https://hopcode.dev/docs/en/users/features/commands/)
 >
-> **Tip**: In YOLO mode (`--yolo`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/docs/en/users/features/approval-mode/)
+> **Tip**: In IZN mode (`--izn`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/docs/en/users/features/approval-mode/)
 
 ## Configuration
 

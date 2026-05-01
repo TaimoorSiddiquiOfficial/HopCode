@@ -971,7 +971,7 @@ describe('toolHookTriggers', () => {
         mockMessageBus,
         'test-tool',
         {},
-        'yolo',
+        'izn',
       );
 
       expect(result2.hasDecision).toBe(true);

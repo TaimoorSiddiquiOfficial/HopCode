@@ -466,7 +466,7 @@ function qwenArgs(baseUrl: string): string[] {
   return [
     'dist/cli.js',
     '--approval-mode',
-    'yolo',
+    'izn',
     '--auth-type',
     'openai',
     '--openai-api-key',

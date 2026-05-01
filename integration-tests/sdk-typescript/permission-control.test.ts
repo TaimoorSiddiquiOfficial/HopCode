@@ -324,7 +324,7 @@ describe('Permission Control (E2E)', () => {
   });
 
   describe('setPermissionMode API', () => {
-    it('should change permission mode from default to yolo', async () => {
+    it('should change permission mode from default to izn', async () => {
       const resultWaiter = createResultWaiter(2);
       const { generator, resume } = createStreamingInputWithControlPoint(
         'What is 1 + 1?',
@@ -386,7 +386,7 @@ describe('Permission Control (E2E)', () => {
 
         expect(firstResponseReceived).toBe(true);
 
-        await q.setPermissionMode('yolo');
+        await q.setPermissionMode('izn');
 
         resume();
 
@@ -406,7 +406,7 @@ describe('Permission Control (E2E)', () => {
       }
     });
 
-    it('should change permission mode from yolo to plan', async () => {
+    it('should change permission mode from izn to plan', async () => {
       const resultWaiter = createResultWaiter(2);
       const { generator, resume } = createStreamingInputWithControlPoint(
         'What is 3 + 3?',
@@ -419,7 +419,7 @@ describe('Permission Control (E2E)', () => {
         options: {
           ...SHARED_TEST_OPTIONS,
           cwd: testDir,
-          permissionMode: 'yolo',
+          permissionMode: 'izn',
         },
       });
 
@@ -589,7 +589,7 @@ describe('Permission Control (E2E)', () => {
 
       await q.close();
 
-      await expect(q.setPermissionMode('yolo')).rejects.toThrow(
+      await expect(q.setPermissionMode('izn')).rejects.toThrow(
         'Query is closed',
       );
 
@@ -670,7 +670,7 @@ describe('Permission Control (E2E)', () => {
         expect(firstResponseReceived).toBe(true);
         expect(toolCalls.length).toBeGreaterThan(0);
 
-        await q.setPermissionMode('yolo');
+        await q.setPermissionMode('izn');
 
         resume();
 
@@ -795,16 +795,15 @@ describe('Permission Control (E2E)', () => {
       );
     });
 
-    describe('yolo mode', () => {
+    describe('izn mode', () => {
       it(
         'should auto-approve all tools without canUseTool callback',
         async () => {
           const q = query({
-            prompt:
-              'Create a file named test-yolo.txt with content "yolo mode"',
+            prompt: 'Create a file named test-izn.txt with content "izn mode"',
             options: {
               ...SHARED_TEST_OPTIONS,
-              permissionMode: 'yolo',
+              permissionMode: 'izn',
               cwd: testDir,
               // No canUseTool callback - tools should still execute
             },
@@ -825,15 +824,15 @@ describe('Permission Control (E2E)', () => {
       );
 
       it(
-        'should not invoke canUseTool callback in yolo mode',
+        'should not invoke canUseTool callback in izn mode',
         async () => {
           let callbackInvoked = false;
 
           const q = query({
-            prompt: 'Create a file named test-yolo-no-callback.txt',
+            prompt: 'Create a file named test-izn-no-callback.txt',
             options: {
               ...SHARED_TEST_OPTIONS,
-              permissionMode: 'yolo',
+              permissionMode: 'izn',
               cwd: testDir,
               canUseTool: async (toolName, input) => {
                 callbackInvoked = true;
@@ -852,7 +851,7 @@ describe('Permission Control (E2E)', () => {
             }
 
             expect(hasAnyToolResults(messages)).toBe(true);
-            // canUseTool should not be invoked in yolo mode
+            // canUseTool should not be invoked in izn mode
             expect(callbackInvoked).toBe(false);
           } finally {
             await q.close();
@@ -868,7 +867,7 @@ describe('Permission Control (E2E)', () => {
             prompt: 'Run command: echo "dangerous operation"',
             options: {
               ...SHARED_TEST_OPTIONS,
-              permissionMode: 'yolo',
+              permissionMode: 'izn',
               cwd: testDir,
             },
           });
@@ -1228,10 +1227,10 @@ describe('Permission Control (E2E)', () => {
       it.skip(
         'should demonstrate different behaviors across all modes for write operations',
         async () => {
-          const modes: Array<'default' | 'auto-edit' | 'yolo'> = [
+          const modes: Array<'default' | 'auto-edit' | 'izn'> = [
             'default',
             'auto-edit',
-            'yolo',
+            'izn',
           ];
           const results: Record<string, boolean> = {};
 
@@ -1243,7 +1242,7 @@ describe('Permission Control (E2E)', () => {
                 permissionMode: mode,
                 cwd: testDir,
                 canUseTool:
-                  mode === 'yolo' || mode === 'auto-edit'
+                  mode === 'izn' || mode === 'auto-edit'
                     ? undefined
                     : async (toolName, input) => {
                         return {
@@ -1270,7 +1269,7 @@ describe('Permission Control (E2E)', () => {
           expect(results['default']).toBe(true); // Allowed via canUseTool
           // expect(results['plan']).toBe(false); // Blocked by plan mode
           expect(results['auto-edit']).toBe(true); // Auto-approved for write/edit tools
-          expect(results['yolo']).toBe(true); // Auto-approved for all tools
+          expect(results['izn']).toBe(true); // Auto-approved for all tools
         },
         TEST_TIMEOUT * 4,
       );

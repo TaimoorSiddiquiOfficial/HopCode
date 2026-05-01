@@ -152,7 +152,7 @@ export enum ApprovalMode {
   PLAN = 'plan',
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
-  YOLO = 'yolo',
+  IZN = 'izn',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -186,9 +186,9 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     name: 'Auto Edit',
     description: 'Automatically approve file edits',
   },
-  [ApprovalMode.YOLO]: {
-    id: ApprovalMode.YOLO,
-    name: 'YOLO',
+  [ApprovalMode.IZN]: {
+    id: ApprovalMode.IZN,
+    name: 'Izn',
     description: 'Automatically approve all tools',
   },
 };

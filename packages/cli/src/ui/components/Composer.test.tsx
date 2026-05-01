@@ -327,7 +327,7 @@ describe('Composer', () => {
     // These are tested in Footer.test.tsx
     it('renders Footer which contains AutoAcceptIndicator when approval mode is not default', () => {
       const uiState = createMockUIState({
-        showAutoAcceptIndicator: ApprovalMode.YOLO,
+        showAutoAcceptIndicator: ApprovalMode.IZN,
         shellModeActive: false,
       });
 

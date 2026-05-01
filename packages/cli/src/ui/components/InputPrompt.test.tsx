@@ -2198,8 +2198,8 @@ describe('InputPrompt', () => {
       unmount();
     });
 
-    it('should render correctly in yolo mode', async () => {
-      props.approvalMode = ApprovalMode.YOLO;
+    it('should render correctly in izn mode', async () => {
+      props.approvalMode = ApprovalMode.IZN;
       const { stdout, unmount } = renderWithProviders(
         <InputPrompt {...props} />,
       );

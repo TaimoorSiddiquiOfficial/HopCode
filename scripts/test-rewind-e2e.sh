@@ -54,7 +54,7 @@ start_session() {
   # Must be set as a server option (not session) in tmux 2.6+.
   tmux set-option -sg escape-time 0 2>/dev/null || true
   tmux new-session -d -s "$SESSION" -x 120 -y 40 \
-    "cd '$WORKDIR' && node '$BUNDLE' --approval-mode yolo 2>'$WORKDIR/stderr.log'"
+    "cd '$WORKDIR' && node '$BUNDLE' --approval-mode izn 2>'$WORKDIR/stderr.log'"
   wait_for_prompt 60
 }
 

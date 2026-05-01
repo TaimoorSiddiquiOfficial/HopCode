@@ -37,9 +37,9 @@ export const AutoAcceptIndicator: React.FC<AutoAcceptIndicatorProps> = ({
       textContent = t('auto-accept edits');
       subText = cycleText;
       break;
-    case ApprovalMode.YOLO:
+    case ApprovalMode.IZN:
       textColor = theme.status.error;
-      textContent = t('YOLO mode');
+      textContent = t('Izn mode');
       subText = cycleText;
       break;
     case ApprovalMode.DEFAULT:

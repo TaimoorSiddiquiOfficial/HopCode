@@ -573,7 +573,7 @@ describe('interactive.tsx main function kitty protocol', () => {
       systemPrompt: undefined,
       appendSystemPrompt: undefined,
       query: undefined,
-      yolo: undefined,
+      izn: undefined,
       bare: undefined,
       approvalMode: undefined,
       telemetry: undefined,

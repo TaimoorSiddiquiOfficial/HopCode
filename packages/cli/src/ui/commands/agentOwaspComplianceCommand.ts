@@ -500,8 +500,8 @@ async function checkOwaspRisk(
 async function checkForPermissionChecks(
   _context: CommandContext,
 ): Promise<boolean> {
-  // Implemented: check if approval mode is NOT yolo
-  return process.env.HOPCODE_APPROVAL_MODE !== 'yolo';
+  // Implemented: check if approval mode is NOT izn
+  return process.env.HOPCODE_APPROVAL_MODE !== 'izn';
 }
 
 async function checkForLeastPrivilege(

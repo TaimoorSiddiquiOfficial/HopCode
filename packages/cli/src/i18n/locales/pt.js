@@ -17,7 +17,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Modo shell',
-  'YOLO mode': 'Modo YOLO',
+  'IZN mode': 'Modo IZN',
   'plan mode': 'modo planejamento',
   'auto-accept edits': 'aceitar edições automaticamente',
   'Accepting edits': 'Aceitando edições',
@@ -381,7 +381,7 @@ export default {
   Plan: 'Planejamento',
   Default: 'Padrão',
   'Auto Edit': 'Edição Automática',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'alternar modo vim ligado/desligado',
   'check session stats. Usage: /stats [model|tools]':
     'verificar estatísticas da sessão. Uso: /stats [model|tools]',
@@ -823,8 +823,8 @@ export default {
     'Modo padrão - Exige aprovação para edições de arquivos ou comandos shell',
   'Auto-edit mode - Automatically approve file edits':
     'Modo auto-edição - Aprova automaticamente edições de arquivos',
-  'YOLO mode - Automatically approve all tools':
-    'Modo YOLO - Aprova automaticamente todas as ferramentas',
+  'IZN mode - Automatically approve all tools':
+    'Modo IZN - Aprova automaticamente todas as ferramentas',
   '{{mode}} mode': 'Modo {{mode}}',
   'Settings service is not available; unable to persist the approval mode.':
     'Serviço de configurações não disponível; não foi possível persistir o modo de aprovação.',

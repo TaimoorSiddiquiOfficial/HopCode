@@ -146,7 +146,7 @@ function handleCommandResult(
       return {
         type: 'unsupported',
         reason:
-          'Shell command confirmation is not supported in non-interactive mode. Use YOLO mode or pre-approve commands.',
+          'Shell command confirmation is not supported in non-interactive mode. Use Izn mode or pre-approve commands.',
         originalType: 'confirm_shell_commands',
       };
 

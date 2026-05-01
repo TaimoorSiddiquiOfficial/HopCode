@@ -53,12 +53,12 @@ Run HopCode as a containerized service stack with Docker Compose.
 
 ## Environment Variables
 
-| Variable                  | Required | Description                            |
-| ------------------------- | -------- | -------------------------------------- |
-| `ANTHROPIC_API_KEY`       | Optional | For Claude models                      |
-| `OPENAI_API_KEY`          | Optional | For GPT models                         |
-| `HOPCODE_MODEL`           | Optional | Default model ID                       |
-| `HOPCODE_PERMISSION_MODE` | Optional | `default`, `plan`, `auto-edit`, `yolo` |
+| Variable                  | Required | Description                           |
+| ------------------------- | -------- | ------------------------------------- |
+| `ANTHROPIC_API_KEY`       | Optional | For Claude models                     |
+| `OPENAI_API_KEY`          | Optional | For GPT models                        |
+| `HOPCODE_MODEL`           | Optional | Default model ID                      |
+| `HOPCODE_PERMISSION_MODE` | Optional | `default`, `plan`, `auto-edit`, `izn` |
 
 ## Scaling
 

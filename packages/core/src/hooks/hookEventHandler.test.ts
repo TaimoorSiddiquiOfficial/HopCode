@@ -584,7 +584,7 @@ describe('HookEventHandler', () => {
         { command: 'ls' },
         'Command failed',
         true,
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       const mockCalls = (mockHookRunner.executeHooksParallel as Mock).mock
@@ -598,7 +598,7 @@ describe('HookEventHandler', () => {
         is_interrupt: boolean;
       };
 
-      expect(input.permission_mode).toBe(PermissionMode.Yolo);
+      expect(input.permission_mode).toBe(PermissionMode.Izn);
       expect(input.tool_use_id).toBe('toolu_test456');
       expect(input.tool_name).toBe('shell');
       expect(input.tool_input).toEqual({ command: 'ls' });
@@ -989,7 +989,7 @@ describe('HookEventHandler', () => {
         { command: 'ls -la' },
         { files: ['a.txt', 'b.txt'] },
         'toolu_abc456',
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       const mockCalls = (mockHookRunner.executeHooksParallel as Mock).mock
@@ -1002,7 +1002,7 @@ describe('HookEventHandler', () => {
         tool_use_id: string;
       };
 
-      expect(input.permission_mode).toBe(PermissionMode.Yolo);
+      expect(input.permission_mode).toBe(PermissionMode.Izn);
       expect(input.tool_name).toBe('shell');
       expect(input.tool_input).toEqual({ command: 'ls -la' });
       expect(input.tool_response).toEqual({ files: ['a.txt', 'b.txt'] });
@@ -1640,7 +1640,7 @@ describe('HookEventHandler', () => {
       await hookEventHandler.firePermissionRequestEvent(
         'Write',
         { file_path: '/test.txt', content: 'hello' },
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       const mockCalls = (mockHookRunner.executeHooksParallel as Mock).mock
@@ -1652,7 +1652,7 @@ describe('HookEventHandler', () => {
         permission_suggestions: PermissionSuggestion[];
       };
 
-      expect(input.permission_mode).toBe(PermissionMode.Yolo);
+      expect(input.permission_mode).toBe(PermissionMode.Izn);
       expect(input.tool_name).toBe('Write');
       expect(input.tool_input).toEqual({
         file_path: '/test.txt',
@@ -1876,17 +1876,17 @@ describe('HookEventHandler', () => {
       };
       expect(input.permission_mode).toBe(PermissionMode.Plan);
 
-      // Test Yolo mode
+      // Test Izn mode
       await hookEventHandler.firePermissionRequestEvent(
         'Bash',
         { command: 'test' },
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
       mockCalls = (mockHookRunner.executeHooksParallel as Mock).mock.calls;
       input = mockCalls[mockCalls.length - 1][2] as {
         permission_mode: PermissionMode;
       };
-      expect(input.permission_mode).toBe(PermissionMode.Yolo);
+      expect(input.permission_mode).toBe(PermissionMode.Izn);
     });
   });
 
@@ -2097,7 +2097,7 @@ describe('HookEventHandler', () => {
         '/transcript/path.jsonl',
         'last message from agent',
         true,
-        PermissionMode.Yolo,
+        PermissionMode.Izn,
       );
 
       const mockCalls = (mockHookRunner.executeHooksParallel as Mock).mock
@@ -2117,7 +2117,7 @@ describe('HookEventHandler', () => {
       expect(input.agent_transcript_path).toBe('/transcript/path.jsonl');
       expect(input.last_assistant_message).toBe('last message from agent');
       expect(input.stop_hook_active).toBe(true);
-      expect(input.permission_mode).toBe(PermissionMode.Yolo);
+      expect(input.permission_mode).toBe(PermissionMode.Izn);
       expect(input.hook_event_name).toBe(HookEventName.SubagentStop);
     });
 

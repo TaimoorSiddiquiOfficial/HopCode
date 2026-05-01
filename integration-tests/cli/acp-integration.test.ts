@@ -348,10 +348,10 @@ function setupAcpTest(
       expect(newSession.sessionId).toBeTruthy();
       expect(newSession.models.availableModels.length).toBeGreaterThan(0);
 
-      // Test 4: Set approval mode to 'yolo'
+      // Test 4: Set approval mode to 'izn'
       const setModeResult = (await sendRequest('session/set_mode', {
         sessionId: newSession.sessionId,
-        modeId: 'yolo',
+        modeId: 'izn',
       })) as unknown;
       expect(setModeResult).toEqual({});
 
@@ -466,7 +466,7 @@ function setupAcpTest(
       const setModeResult = (await sendRequest('session/set_config_option', {
         sessionId: newSession.sessionId,
         configId: 'mode',
-        value: 'yolo',
+        value: 'izn',
       })) as {
         configOptions: Array<{
           id: string;
@@ -484,9 +484,9 @@ function setupAcpTest(
         (opt) => opt.id === 'mode',
       );
       expect(modeOption).toBeDefined();
-      expect(modeOption!.currentValue).toBe('yolo');
+      expect(modeOption!.currentValue).toBe('izn');
       expect(Array.isArray(modeOption!.options)).toBe(true);
-      expect(modeOption!.options.some((o) => o.value === 'yolo')).toBe(true);
+      expect(modeOption!.options.some((o) => o.value === 'izn')).toBe(true);
 
       // Find model option
       const modelOption = setModeResult.configOptions.find(

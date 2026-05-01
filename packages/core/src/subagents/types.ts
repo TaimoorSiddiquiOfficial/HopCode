@@ -62,7 +62,7 @@ export interface SubagentConfig {
   /**
    * Optional permission mode for this subagent.
    * Controls how tool calls are approved during execution.
-   * Valid values: 'default', 'plan', 'auto-edit', 'yolo'.
+   * Valid values: 'default', 'plan', 'auto-edit', 'izn'.
    * If omitted, the resolved mode depends on the parent's mode
    * (permissive parent modes win; otherwise defaults to 'auto-edit').
    */

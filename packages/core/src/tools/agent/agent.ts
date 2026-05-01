@@ -92,8 +92,8 @@ const debugLogger = createDebugLogger('AGENT');
  */
 function approvalModeToPermissionMode(mode: ApprovalMode): PermissionMode {
   switch (mode) {
-    case ApprovalMode.YOLO:
-      return PermissionMode.Yolo;
+    case ApprovalMode.IZN:
+      return PermissionMode.Izn;
     case ApprovalMode.AUTO_EDIT:
       return PermissionMode.AutoEdit;
     case ApprovalMode.PLAN:
@@ -108,7 +108,7 @@ function approvalModeToPermissionMode(mode: ApprovalMode): PermissionMode {
  * Resolves the effective permission mode for a sub-agent.
  *
  * Rules (matching claw-code):
- * - Permissive parent modes (yolo, auto-edit) always win
+ * - Permissive parent modes (izn, auto-edit) always win
  * - Otherwise, the agent definition's mode applies if set
  * - Default fallback is auto-edit (sub-agents need autonomy)
  */
@@ -119,7 +119,7 @@ export function resolveSubagentApprovalMode(
 ): PermissionMode {
   // Permissive parent modes always win
   if (
-    parentApprovalMode === ApprovalMode.YOLO ||
+    parentApprovalMode === ApprovalMode.IZN ||
     parentApprovalMode === ApprovalMode.AUTO_EDIT
   ) {
     return approvalModeToPermissionMode(parentApprovalMode);
@@ -133,7 +133,7 @@ export function resolveSubagentApprovalMode(
     // Privileged modes require trusted folder
     if (
       !isTrustedFolder &&
-      (resolved === PermissionMode.Yolo || resolved === PermissionMode.AutoEdit)
+      (resolved === PermissionMode.Izn || resolved === PermissionMode.AutoEdit)
     ) {
       return approvalModeToPermissionMode(parentApprovalMode);
     }
@@ -156,8 +156,8 @@ export function resolveSubagentApprovalMode(
  */
 function permissionModeToApprovalMode(mode: PermissionMode): ApprovalMode {
   switch (mode) {
-    case PermissionMode.Yolo:
-      return ApprovalMode.YOLO;
+    case PermissionMode.Izn:
+      return ApprovalMode.IZN;
     case PermissionMode.AutoEdit:
       return ApprovalMode.AUTO_EDIT;
     case PermissionMode.Plan:
@@ -1057,7 +1057,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         const bgAbortController = new AbortController();
 
         // Background agents have no UI, so interactive permission prompts must be
-        // auto-denied rather than auto-approved (YOLO). PermissionRequest hooks
+        // auto-denied rather than auto-approved (IZN). PermissionRequest hooks
         // still run and can override. Use Object.create so the resolved approval
         // mode override (e.g. subagent-level `approvalMode: auto-edit`) is preserved.
         const bgConfig = Object.create(agentConfig) as Config;

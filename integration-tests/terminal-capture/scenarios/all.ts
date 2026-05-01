@@ -3,7 +3,7 @@
 export default [
   {
     name: '/about',
-    spawn: ['node', 'dist/cli.js', '--yolo'],
+    spawn: ['node', 'dist/cli.js', '--izn'],
     terminal: { title: 'hopcode', cwd: '../../..' },
     flow: [
       { type: 'Hi, can you help me understand this codebase?' },
@@ -12,7 +12,7 @@ export default [
   },
   {
     name: '/context',
-    spawn: ['node', 'dist/cli.js', '--yolo'],
+    spawn: ['node', 'dist/cli.js', '--izn'],
     terminal: { title: 'hopcode', cwd: '../../..' },
     flow: [
       { type: 'How do you understand this project?' },
@@ -22,7 +22,7 @@ export default [
 
   {
     name: '/export (tab select)',
-    spawn: ['node', 'dist/cli.js', '--yolo'],
+    spawn: ['node', 'dist/cli.js', '--izn'],
     terminal: { title: 'hopcode', cwd: '../../..' },
     flow: [
       { type: 'Please give me a brief introduction about yourself.' },
@@ -34,7 +34,7 @@ export default [
   },
   {
     name: '/auth',
-    spawn: ['node', 'dist/cli.js', '--yolo'],
+    spawn: ['node', 'dist/cli.js', '--izn'],
     terminal: { title: 'hopcode', cwd: '../../..' },
     flow: [
       { type: '/auth' },

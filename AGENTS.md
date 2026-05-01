@@ -101,7 +101,8 @@ npm run preflight  # Full check: clean → install → format → lint → build
   between packages
 - **Tests**: Collocated with source (`file.test.ts` next to `file.ts`),
   vitest framework
-- **Commits**: Conventional Commits (e.g., `feat(cli): Add --json flag`)
+- **Commits**: Conventional Commits (e.g., `feat(cli): Add --json flag`).
+  Never use the word "quran" in commit messages or changelog entries.
 - **Node.js**: Development requires `~20.19.0`; production requires `>=20`
 
 ## Development Guidelines

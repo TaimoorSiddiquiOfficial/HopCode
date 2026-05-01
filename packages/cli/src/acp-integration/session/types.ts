@@ -13,7 +13,7 @@ import type {
 } from '@agentclientprotocol/sdk';
 import type { MessageRewriteMiddleware } from './rewrite/index.js';
 
-export type ApprovalModeValue = 'plan' | 'default' | 'auto-edit' | 'yolo';
+export type ApprovalModeValue = 'plan' | 'default' | 'auto-edit' | 'izn';
 
 /**
  * Interface for sending session updates to the ACP client.

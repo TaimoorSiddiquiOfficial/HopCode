@@ -230,7 +230,7 @@ export interface SDKPartialAssistantMessage {
   parent_tool_use_id: string | null;
 }
 
-export type PermissionMode = 'default' | 'plan' | 'auto-edit' | 'yolo';
+export type PermissionMode = 'default' | 'plan' | 'auto-edit' | 'izn';
 
 /**
  * TODO: Align with `ToolCallConfirmationDetails`
