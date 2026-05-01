@@ -111,7 +111,7 @@ function classifyCi(checkRuns: CheckRun[], statuses: CommitStatus[]) {
 }
 
 function classifyExistingComments(
-  qwenComments: RawComment[],
+  hopcodeComments: RawComment[],
   repliedToIds: Set<number>,
   newFindingKeys: Set<string>,
   commitSha: string,
@@ -121,7 +121,7 @@ function classifyExistingComments(
     CommentSummary[]
   > = { stale: [], resolved: [], overlap: [], noConflict: [] };
 
-  for (const c of qwenComments) {
+  for (const c of hopcodeComments) {
     const summary: CommentSummary = {
       id: c.id,
       path: c.path ?? '',
@@ -188,7 +188,7 @@ async function runPresubmit(args: PresubmitArgs): Promise<void> {
   const allComments = ghApiAll(
     `repos/${owner}/${repo}/pulls/${prNumber}/comments`,
   ) as RawComment[];
-  const qwenComments = allComments.filter((c) =>
+  const hopcodeComments = allComments.filter((c) =>
     /via HopCode \/review/.test(c.body ?? ''),
   );
 
@@ -201,12 +201,10 @@ async function runPresubmit(args: PresubmitArgs): Promise<void> {
   if (newFindingsPath) {
     newFindings = JSON.parse(readFileSync(newFindingsPath, 'utf8'));
   }
-  const newFindingKeys = new Set(
-    newFindings.map((f) => `${f.path}:${f.line}`),
-  );
+  const newFindingKeys = new Set(newFindings.map((f) => `${f.path}:${f.line}`));
 
   const buckets = classifyExistingComments(
-    qwenComments,
+    hopcodeComments,
     repliedToIds,
     newFindingKeys,
     commitSha,
@@ -216,7 +214,9 @@ async function runPresubmit(args: PresubmitArgs): Promise<void> {
   const downgradeReasons: string[] = [];
   if (isSelfPr) downgradeReasons.push('self-PR');
   if (ciStatus.class === 'any_failure') {
-    downgradeReasons.push(`CI failing: ${ciStatus.failedCheckNames.join(', ')}`);
+    downgradeReasons.push(
+      `CI failing: ${ciStatus.failedCheckNames.join(', ')}`,
+    );
   }
   if (ciStatus.class === 'all_pending') {
     downgradeReasons.push('CI still running');
@@ -229,7 +229,7 @@ async function runPresubmit(args: PresubmitArgs): Promise<void> {
     isSelfPr,
     ciStatus,
     existingComments: {
-      total: qwenComments.length,
+      total: hopcodeComments.length,
       byBucket: {
         stale: buckets.stale.length,
         resolved: buckets.resolved.length,

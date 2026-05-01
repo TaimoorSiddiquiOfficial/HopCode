@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 Hop Trendy
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -793,7 +793,7 @@ describe('BackgroundAgentResumeService', () => {
       | undefined;
     expect(contextArg).toBeDefined();
     if (!contextArg) {
-      throw new Error('Expected resume execute context');
+      throw new Error('Expected fork resume execute context');
     }
     expect(contextArg.get('task_prompt')).toBe('continue');
     createSpy.mockRestore();

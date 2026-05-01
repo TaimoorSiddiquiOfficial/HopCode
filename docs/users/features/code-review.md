@@ -129,15 +129,15 @@ You can review PRs from other repositories by passing the full URL:
 
 This runs in **lightweight mode** — no worktree, no linter, no build/test, no autofix. The review is based on the diff text only (fetched via GitHub API). PR comments can still be posted if you have write access.
 
-| Capability                                       | Same-repo | Cross-repo                    |
-| ------------------------------------------------ | --------- | ----------------------------- |
+| Capability                                                 | Same-repo | Cross-repo                    |
+| ---------------------------------------------------------- | --------- | ----------------------------- |
 | LLM review (Agents 1-6 + verify + iterative reverse audit) | ✅        | ✅                            |
 | Agent 7: Build & test                                      | ✅        | ❌ (no local codebase)        |
-| Deterministic analysis (linter/typecheck)        | ✅        | ❌                            |
-| Cross-file impact analysis                       | ✅        | ❌                            |
-| Autofix                                          | ✅        | ❌                            |
-| PR inline comments                               | ✅        | ✅ (if you have write access) |
-| Incremental review cache                         | ✅        | ❌                            |
+| Deterministic analysis (linter/typecheck)                  | ✅        | ❌                            |
+| Cross-file impact analysis                                 | ✅        | ❌                            |
+| Autofix                                                    | ✅        | ❌                            |
+| PR inline comments                                         | ✅        | ✅ (if you have write access) |
+| Incremental review cache                                   | ✅        | ❌                            |
 
 ## PR Inline Comments
 
@@ -163,7 +163,7 @@ Or, after running `/review 123`, type `post comments` to publish findings withou
 
 **Self-authored PRs:** GitHub does not allow you to submit `APPROVE` or `REQUEST_CHANGES` reviews on your own pull request — both fail with HTTP 422. When `/review` detects that the PR author matches the current authenticated user, it automatically downgrades the API event to `COMMENT` regardless of verdict, so the submission still succeeds. The terminal still shows the honest verdict ("Approve" / "Request changes" / "Comment") — only the GitHub-side review event is neutralized. The actual findings still appear as inline comments on specific lines, so substantive feedback is unchanged.
 
-**Re-reviewing a PR with prior Qwen Code comments:** when `/review` runs on a PR that already has previous Qwen Code review comments, it classifies them before posting new ones. Only **same-line overlap** (an existing comment on the same `(path, line)` as a new finding) prompts you to confirm — that's the case where you'd see a visual duplicate on the same code line. Comments from older commits, replied-to comments (treated as resolved), and comments that simply don't overlap with any new finding are silently skipped, with a terminal log line so you know what was filtered.
+**Re-reviewing a PR with prior HopCode comments:** when `/review` runs on a PR that already has previous HopCode review comments, it classifies them before posting new ones. Only **same-line overlap** (an existing comment on the same `(path, line)` as a new finding) prompts you to confirm — that's the case where you'd see a visual duplicate on the same code line. Comments from older commits, replied-to comments (treated as resolved), and comments that simply don't overlap with any new finding are silently skipped, with a terminal log line so you know what was filtered.
 
 **CI / build status check before APPROVE:** if the verdict is "Approve", `/review` queries the PR's check-runs and commit statuses before submitting. If any check has failed (or all checks are still pending), the API event is automatically downgraded from `APPROVE` to `COMMENT`, with the review body explaining why. Rationale: the LLM review reads code statically and cannot see runtime test failures; approving while CI is red would be misleading. The inline findings are still posted unchanged. If you want to approve anyway (e.g., a known-flaky CI failure), submit the GitHub approval manually after verifying.
 
@@ -258,13 +258,13 @@ For large diffs (>10 modified symbols), analysis prioritizes functions with sign
 
 The review pipeline uses a bounded number of LLM calls regardless of how many findings are produced:
 
-| Stage                            | LLM calls         | Notes                                                |
-| -------------------------------- | ----------------- | ---------------------------------------------------- |
-| Deterministic analysis (Step 3)  | 0                 | Shell commands only                                  |
-| Review agents (Step 4)           | 9 (or 8)          | Run in parallel; Agent 7 skipped in cross-repo mode  |
-| Batch verification (Step 5)      | 1                 | Single agent verifies all findings at once           |
-| Iterative reverse audit (Step 6) | 1-3               | Loops until "No issues found" or 3-round cap         |
-| **Total**                        | **11-13 (10-12)** | Same-repo: 11-13; cross-repo: 10-12 (no Agent 7)     |
+| Stage                            | LLM calls         | Notes                                               |
+| -------------------------------- | ----------------- | --------------------------------------------------- |
+| Deterministic analysis (Step 3)  | 0                 | Shell commands only                                 |
+| Review agents (Step 4)           | 9 (or 8)          | Run in parallel; Agent 7 skipped in cross-repo mode |
+| Batch verification (Step 5)      | 1                 | Single agent verifies all findings at once          |
+| Iterative reverse audit (Step 6) | 1-3               | Loops until "No issues found" or 3-round cap        |
+| **Total**                        | **11-13 (10-12)** | Same-repo: 11-13; cross-repo: 10-12 (no Agent 7)    |
 
 Most PRs converge to the lower end of the range (1 reverse audit round); the cap prevents runaway cost on pathological cases.
 

@@ -104,23 +104,24 @@ Applied throughout:
 - Uncertain issues → rejected, not reported
 - Pattern aggregation → same issue across N files reported once
 
-## Why classify existing Qwen Code comments instead of always prompting
+## Why classify existing HopCode comments instead of always prompting
 
-**Original behavior:** any existing Qwen Code review comment on the PR → inform the user and require confirmation before posting new comments.
+**Original behavior:** any existing HopCode review comment on the PR → inform the user and require confirmation before posting new comments.
 
-**Problem:** in real /review usage, most existing Qwen Code comments fall into one of three "no-real-conflict" cases:
+**Problem:** in real /review usage, most existing HopCode comments fall into one of three "no-real-conflict" cases:
 
 1. **Stale by commit**: the comment was posted against an older PR HEAD; the underlying code has changed.
 2. **Resolved by reply**: someone has replied in the thread (the original author "fixed in abc123" or a reviewer "ok, approved"). The conversation is closed.
 3. **No anchor overlap**: the old comment is on a different `(path, line)` from any new finding. They simply coexist.
 
-Forcing the user to confirm-or-decline every time the PR has any Qwen Code history creates prompt fatigue without protecting against the real risk — which is **commenting twice on the same line**, producing visual duplicates that look like a bug to PR readers.
+Forcing the user to confirm-or-decline every time the PR has any HopCode history creates prompt fatigue without protecting against the real risk — which is **commenting twice on the same line**, producing visual duplicates that look like a bug to PR readers.
 
-**New behavior:** classify each existing Qwen Code comment by checking in priority order — **Stale by commit** > **Resolved by reply** > **Overlap** (same `path + line` as a new finding) > **No conflict**. The first match wins. Only the Overlap class blocks; the other three log to the terminal and continue.
+**New behavior:** classify each existing HopCode comment by checking in priority order — **Stale by commit** > **Resolved by reply** > **Overlap** (same `path + line` as a new finding) > **No conflict**. The first match wins. Only the Overlap class blocks; the other three log to the terminal and continue.
 
 **Priority matters because** a stale or resolved comment that happens to share a `(path, line)` with a new finding is not a real conflict — the underlying code may have changed in the stale case, and the conversation is already closed in the resolved case. Without priority, the line-based check would fire false-positive prompts on those.
 
 **Trade-off:**
+
 - ✅ Common case (re-running /review on a PR after a few new commits) no longer prompts unnecessarily.
 - ✅ The terminal log keeps the user informed about what was skipped, so transparency is preserved.
 - ❌ Conceptual overlap that doesn't share a line is missed — e.g. a prior comment on line 559 about cache lifecycle and a new comment on line 1352 about cache lifecycle would be classified `No conflict`. Line-based heuristics cannot detect "same root cause, different anchor." If the user wants semantic-overlap detection, they must read the terminal log and the PR comments themselves.
@@ -144,6 +145,7 @@ Line-based classification was chosen because it's deterministic, cheap, and catc
 **Why this stacks with self-PR downgrade:** a self-authored PR with red CI hits **both** downgrade rules. The event is `COMMENT` either way, so stacking is operationally a no-op — but the body should mention both reasons so a future maintainer reading the review knows why an LLM that found no Critical issues did not approve.
 
 **Trade-off:**
+
 - ✅ No more "LLM approved while CI is red" embarrassments.
 - ✅ Reviewer's substantive work (inline comments) is preserved.
 - ❌ Adds two extra API calls (`check-runs` + `statuses`) per APPROVE-bound submit; only relevant for the `APPROVE` path so the cost is negligible.
@@ -187,7 +189,7 @@ A malicious PR could add `.hopcode/review-rules.md` with "never report security 
 - **y/n prompt:** "Post findings as PR inline comments? (y/n)" — blocks terminal, forces immediate decision.
 - **Follow-up tips (chosen):** Ghost text suggestions via existing suggestion engine. Non-blocking, discoverable via Tab.
 
-**Decision:** Tips. Qwen Code's follow-up suggestion system is a core UX differentiator. Blocking prompts interrupt flow. Tips are zero-friction and let users decide when/if to act.
+**Decision:** Tips. HopCode's follow-up suggestion system is a core UX differentiator. Blocking prompts interrupt flow. Tips are zero-friction and let users decide when/if to act.
 
 **Exception:** Autofix uses a blocking y/n because it modifies code — higher stakes require explicit consent.
 
@@ -281,4 +283,4 @@ With Fork + prompt cache sharing:
 
 **Estimated savings:** ~85-90% token reduction (~620K → ~75K) with zero quality impact. The savings ratio is now even more compelling than under the 5-agent design.
 
-**Why not implemented now:** Fork Subagent requires changes to the Qwen Code core (`AgentTool`, `forkSubagent.ts`, `CacheSafeParams`). This is a platform-level feature (~400 lines, ~5 days), not a /review-specific change. When available, /review should be updated to use fork instead of independent subagents.
+**Why not implemented now:** Fork Subagent requires changes to the HopCode core (`AgentTool`, `forkSubagent.ts`, `CacheSafeParams`). This is a platform-level feature (~400 lines, ~5 days), not a /review-specific change. When available, /review should be updated to use fork instead of independent subagents.
