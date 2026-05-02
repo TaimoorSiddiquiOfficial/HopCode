@@ -169,7 +169,7 @@ async function getGeminiMdFilePathsInternalForEachDir(
     }
 
     if (isHomeDirectory) {
-      // For home directory, only check for QWEN.md directly in the home directory
+      // For home directory, only check for HOPCODE.md directly in the home directory
       const homeContextPath = path.join(resolvedHome, geminiMdFilename);
       try {
         await fs.access(homeContextPath, fsSync.constants.R_OK);
@@ -338,7 +338,7 @@ export interface LoadServerHierarchicalMemoryOptions {
 }
 
 /**
- * Loads hierarchical QWEN.md files and concatenates their content.
+ * Loads hierarchical HOPCODE.md files and concatenates their content.
  * Also loads path-based context rules from `.hopcode/rules/` directories.
  * This function is intended for use by the server.
  *
@@ -383,7 +383,7 @@ export async function loadServerHierarchicalMemory(
       currentWorkingDirectory,
     );
 
-    // Only count files that match configured memory filenames (e.g., QWEN.md),
+    // Only count files that match configured memory filenames (e.g., HOPCODE.md),
     // excluding system context files like output-language.md
     const memoryFilenames = new Set(getAllGeminiMdFilenames());
     fileCount = contentsWithPaths.filter((item) =>
@@ -413,7 +413,7 @@ export async function loadServerHierarchicalMemory(
   }
 
   if (!memoryContent && filePaths.length === 0 && ruleCount === 0) {
-    logger.debug('No QWEN.md files or rules found.');
+    logger.debug('No HOPCODE.md files or rules found.');
   }
 
   return {

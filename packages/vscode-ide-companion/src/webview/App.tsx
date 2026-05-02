@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -210,7 +210,7 @@ function findMessageIndex(
 ): number {
   // Walk up from the click target to find the direct child of the container.
   // This works for all message types regardless of whether they have
-  // .qwen-message class (e.g. InterruptedMessage does not).
+  // .hopcode-message class (e.g. InterruptedMessage does not).
   let directChild: Element | null = target;
   while (directChild && directChild.parentElement !== container) {
     directChild = directChild.parentElement;

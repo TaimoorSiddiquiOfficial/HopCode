@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Chinese translations for Qwen Code CLI
+// Chinese translations for HopCode CLI
 
 export default {
   // ============================================================================
@@ -81,16 +81,16 @@ export default {
   'For a full list of shortcuts, see {{docPath}}':
     '完整快捷键列表，请参阅 {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on Qwen Code': '获取 Qwen Code 帮助',
+  'for help on HopCode': '获取 HopCode 帮助',
   'show version info': '显示版本信息',
   'submit a bug report': '提交错误报告',
-  'About Qwen Code': '关于 Qwen Code',
+  'About HopCode': '关于 HopCode',
   Status: '状态',
 
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'Qwen Code': 'Qwen Code',
+  HopCode: 'HopCode',
   Runtime: '运行环境',
   OS: '操作系统',
   Auth: '认证',
@@ -114,12 +114,12 @@ export default {
   // ============================================================================
   // Commands - General
   // ============================================================================
-  'Analyzes the project and creates a tailored QWEN.md file.':
-    '分析项目并创建定制的 QWEN.md 文件',
-  'List available Qwen Code tools. Usage: /tools [desc]':
-    '列出可用的 Qwen Code 工具。用法：/tools [desc]',
+  'Analyzes the project and creates a tailored HOPCODE.md file.':
+    '分析项目并创建定制的 HOPCODE.md 文件',
+  'List available HopCode tools. Usage: /tools [desc]':
+    '列出可用的 HopCode 工具。用法：/tools [desc]',
   'List available skills.': '列出可用技能。',
-  'Available Qwen Code CLI tools:': '可用的 Qwen Code CLI 工具：',
+  'Available HopCode CLI tools:': '可用的 HopCode CLI 工具：',
   'No tools available': '没有可用工具',
   'View or change the approval mode for tool usage':
     '查看或更改工具使用的审批模式',
@@ -142,8 +142,8 @@ export default {
   'Clear conversation history and free up context': '清除对话历史并释放上下文',
   'Compresses the context by replacing it with a summary.':
     '通过摘要替换来压缩上下文',
-  'open full Qwen Code documentation in your browser':
-    '在浏览器中打开完整的 Qwen Code 文档',
+  'open full HopCode documentation in your browser':
+    '在浏览器中打开完整的 HopCode 文档',
   'Configuration not available.': '配置不可用',
   'change the auth method': '更改认证方法',
   'Configure authentication information for login': '配置登录认证信息',
@@ -228,7 +228,7 @@ export default {
   // Agents - Creation Wizard Steps
   'Step {{n}}: Choose Location': '步骤 {{n}}: 选择位置',
   'Step {{n}}: Choose Generation Method': '步骤 {{n}}: 选择生成方式',
-  'Generate with Qwen Code (Recommended)': '使用 Qwen Code 生成（推荐）',
+  'Generate with HopCode (Recommended)': '使用 HopCode 生成（推荐）',
   'Manual Creation': '手动创建',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     '描述此子智能体应该做什么以及何时使用它。（为了获得最佳效果，请全面描述）',
@@ -345,10 +345,10 @@ export default {
   // ============================================================================
   // Commands - General (continued)
   // ============================================================================
-  'View and edit Qwen Code settings': '查看和编辑 Qwen Code 设置',
+  'View and edit HopCode settings': '查看和编辑 HopCode 设置',
   Settings: '设置',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    '要查看更改，必须重启 Qwen Code。按 r 退出并立即应用更改。',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    '要查看更改，必须重启 HopCode。按 r 退出并立即应用更改。',
   'The command "/{{command}}" is not supported in non-interactive mode.':
     '不支持在非交互模式下使用命令 "/{{command}}"。',
   // ============================================================================
@@ -488,16 +488,16 @@ export default {
   remote: '远程',
   'This extension will add the following commands: {{commands}}.':
     '此扩展将添加以下命令：{{commands}}。',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    '此扩展将使用 {{fileName}} 向您的 QWEN.md 上下文追加信息',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    '此扩展将使用 {{fileName}} 向您的 HOPCODE.md 上下文追加信息',
   'This extension will exclude the following core tools: {{tools}}':
     '此扩展将排除以下核心工具：{{tools}}',
   'This extension will install the following skills:': '此扩展将安装以下技能：',
   'This extension will install the following subagents:':
     '此扩展将安装以下子智能体：',
   'Installation cancelled for "{{name}}".': '已取消安装 "{{name}}"。',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
-    '您正在安装来自 {{originSource}} 的扩展。某些功能可能无法完美兼容 Qwen Code。',
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.':
+    '您正在安装来自 {{originSource}} 的扩展。某些功能可能无法完美兼容 HopCode。',
   '--ref and --auto-update are not applicable for marketplace extensions.':
     '--ref 和 --auto-update 不适用于市场扩展。',
   'Extension "{{name}}" installed successfully and enabled.':
@@ -600,8 +600,8 @@ export default {
     '安装 {{ideName}} 所需的 IDE 配套工具',
   'enable IDE integration': '启用 IDE 集成',
   'disable IDE integration': '禁用 IDE 集成',
-  'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.':
-    '您当前环境不支持 IDE 集成。要使用此功能，请在以下支持的 IDE 之一中运行 Qwen Code：VS Code 或 VS Code 分支版本。',
+  'IDE integration is not supported in your current environment. To use this feature, run HopCode in one of these supported IDEs: VS Code or VS Code forks.':
+    '您当前环境不支持 IDE 集成。要使用此功能，请在以下支持的 IDE 之一中运行 HopCode：VS Code 或 VS Code 分支版本。',
   'Set up GitHub Actions': '设置 GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
     '配置终端按键绑定以支持多行输入（VS Code、Cursor、Windsurf、Trae）',
@@ -633,7 +633,7 @@ export default {
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
-  'Manage Qwen Code hooks': '管理 Qwen Code Hook',
+  'Manage HopCode hooks': '管理 HopCode Hook',
   'List all configured hooks': '列出所有已配置的 Hook',
   'Enable a disabled hook': '启用已禁用的 Hook',
   'Disable an active hook': '禁用已启用的 Hook',
@@ -650,8 +650,8 @@ export default {
   'No hook events found.': '未找到 Hook 事件。',
   '{{count}} hook configured': '{{count}} 个 Hook 已配置',
   '{{count}} hooks configured': '{{count}} 个 Hook 已配置',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
-    '此菜单为只读。要添加或修改 Hook，请直接编辑 settings.json 或询问 Qwen Code。',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
+    '此菜单为只读。要添加或修改 Hook，请直接编辑 settings.json 或询问 HopCode。',
   'Enter to select · Esc to cancel': 'Enter 选择 · Esc 取消',
   // Hooks - Detail Step
   'Exit codes:': '退出码：',
@@ -679,8 +679,8 @@ export default {
   'StatusLine will not be displayed': '不会显示状态栏',
   'Tool operations will proceed without hook validation':
     '工具操作将在没有 Hook 验证的情况下继续',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
-    '要重新启用 Hook，请从 settings.json 中删除 "disableAllHooks" 或询问 Qwen Code。',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.':
+    '要重新启用 Hook，请从 settings.json 中删除 "disableAllHooks" 或询问 HopCode。',
   // Hooks - Source
   Project: '项目',
   User: '用户',
@@ -701,7 +701,7 @@ export default {
   'When notifications are sent': '发送通知时',
   'When the user submits a prompt': '用户提交提示时',
   'When a new session is started': '新会话开始时',
-  'Right before Qwen Code concludes its response': 'Qwen Code 结束响应之前',
+  'Right before HopCode concludes its response': 'HopCode 结束响应之前',
   'When a subagent (Agent tool call) is started':
     '子智能体（Agent 工具调用）启动时',
   'Right before a subagent concludes its response': '子智能体结束响应之前',
@@ -1184,8 +1184,8 @@ export default {
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
     '/directory add 命令在限制性沙箱配置文件中不受支持。请改为在启动会话时使用 --include-directories。',
   "Error adding '{{path}}': {{error}}": "添加 '{{path}}' 时出错：{{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
-    '如果存在，已成功从以下目录添加 QWEN.md 文件：\n- {{directories}}',
+  'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
+    '如果存在，已成功从以下目录添加 HOPCODE.md 文件：\n- {{directories}}',
   'Error refreshing memory: {{error}}': '刷新内存时出错：{{error}}',
   'Successfully added directories:\n- {{directories}}':
     '成功添加目录：\n- {{directories}}',
@@ -1389,12 +1389,12 @@ export default {
   Ask: '询问',
   Deny: '拒绝',
   Workspace: '工作区',
-  "Qwen Code won't ask before using allowed tools.":
-    'Qwen Code 使用已允许的工具前不会询问。',
-  'Qwen Code will ask before using these tools.':
-    'Qwen Code 使用这些工具前会先询问。',
-  'Qwen Code is not allowed to use denied tools.':
-    'Qwen Code 不允许使用被拒绝的工具。',
+  "HopCode won't ask before using allowed tools.":
+    'HopCode 使用已允许的工具前不会询问。',
+  'HopCode will ask before using these tools.':
+    'HopCode 使用这些工具前会先询问。',
+  'HopCode is not allowed to use denied tools.':
+    'HopCode 不允许使用被拒绝的工具。',
   'Manage trusted directories for this workspace.':
     '管理此工作区的受信任目录。',
   'Any use of the {{tool}} tool': '{{tool}} 工具的任何使用',
@@ -1433,10 +1433,10 @@ export default {
   // Workspace directory management
   'Add directory…': '添加目录…',
   'Add directory to workspace': '添加工作区目录',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
-    'Qwen Code 可以读取工作区中的文件，并在自动接受编辑模式开启时进行编辑。',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'Qwen Code 将能够读取此目录中的文件，并在自动接受编辑模式开启时进行编辑。',
+  'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
+    'HopCode 可以读取工作区中的文件，并在自动接受编辑模式开启时进行编辑。',
+  'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'HopCode 将能够读取此目录中的文件，并在自动接受编辑模式开启时进行编辑。',
   'Enter the path to the directory:': '输入目录路径：',
   'Enter directory path…': '输入目录路径…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -1521,8 +1521,8 @@ export default {
   'Use /bug to submit issues to the maintainers when something goes off.':
     '遇到问题时，用 /bug 将问题提交给维护者。',
   'Switch auth type quickly with /auth.': '用 /auth 快速切换认证方式。',
-  'You can run any shell commands from Qwen Code using ! (e.g. !ls).':
-    '在 Qwen Code 中使用 ! 可运行任意 shell 命令（例如 !ls）。',
+  'You can run any shell commands from HopCode using ! (e.g. !ls).':
+    '在 HopCode 中使用 ! 可运行任意 shell 命令（例如 !ls）。',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     '输入 / 打开命令弹窗；按 Tab 自动补全斜杠命令和保存的提示词。',
   'You can resume a previous conversation by running qwen --continue or qwen --resume.':
@@ -1535,8 +1535,8 @@ export default {
     '试试 /insight，从聊天记录中生成个性化洞察。',
   'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
     '按 Ctrl+O 切换紧凑模式 ── 隐藏工具输出和思考过程，界面更简洁。',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
-    '添加 QWEN.md 文件，为 Qwen Code 提供持久的项目上下文。',
+  'Add a HOPCODE.md file to give HopCode persistent project context.':
+    '添加 HOPCODE.md 文件，为 HopCode 提供持久的项目上下文。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     '用 /btw 快速问一个小问题，不会打断当前对话。',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1549,7 +1549,7 @@ export default {
   // ============================================================================
   // Exit Screen / Stats
   // ============================================================================
-  'Agent powering down. Goodbye!': 'Qwen Code 正在关闭，再见！',
+  'Agent powering down. Goodbye!': 'HopCode 正在关闭，再见！',
   'To continue this session, run': '要继续此会话，请运行',
   'Interaction Summary': '交互摘要',
   'Session ID:': '会话 ID：',
@@ -1915,5 +1915,5 @@ export default {
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     '未处于计划模式。请先使用 "/plan" 进入计划模式。',
 
-  "Set up Qwen Code's status line UI": '配置 Qwen Code 的状态栏',
+  "Set up HopCode's status line UI": '配置 HopCode 的状态栏',
 };

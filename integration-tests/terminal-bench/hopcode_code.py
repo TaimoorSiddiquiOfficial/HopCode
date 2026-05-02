@@ -7,10 +7,10 @@ from terminal_bench.agents.installed_agents.abstract_installed_agent import (
 from terminal_bench.terminal.models import TerminalCommand
 
 
-class QwenCodeAgent(AbstractInstalledAgent):
+class HopCodeAgent(AbstractInstalledAgent):
     @staticmethod
     def name() -> str:
-        return "Qwen Code"
+        return "HopCode"
 
     def __init__(self, model_name: str | None = None, *args, **kwargs):
         super().__init__(*args, **kwargs)

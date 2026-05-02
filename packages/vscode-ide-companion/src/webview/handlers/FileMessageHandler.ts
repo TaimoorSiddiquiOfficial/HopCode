@@ -78,7 +78,7 @@ export class FileMessageHandler extends BaseMessageHandler {
         projectRoot: rootPath,
         ignoreDirs: ['.git', 'node_modules'],
         useGitignore: true,
-        useQwenignore: false,
+        useHopcodeignore: false,
         cache: true,
         cacheTtl: 30000,
         enableRecursiveFileSearch: true,

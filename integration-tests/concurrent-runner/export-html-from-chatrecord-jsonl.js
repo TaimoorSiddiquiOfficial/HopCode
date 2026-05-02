@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env node
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +20,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${encodeURIComponent(FAVICON_SVG)}">
-  <title>Qwen Code Chat Export</title>
+  <title>HopCode Chat Export</title>
   <!-- Load React and ReactDOM from CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -269,8 +269,8 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
       <div class="header-left">
         <div class="logo-icon">${FAVICON_SVG}</div>
         <div class="logo">
-          <div class="logo-text" data-text="QWEN">
-            <span class="logo-text-inner">QWEN</span>
+          <div class="logo-text" data-text="HOPCODE">
+            <span class="logo-text-inner">HOPCODE</span>
           </div>
         </div>
       </div>
@@ -324,7 +324,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
     }
 
     // Get the ChatViewer and Platform components from the global object
-    const { ChatViewer, PlatformProvider } = QwenCodeWebUI;
+    const { ChatViewer, PlatformProvider } = HopCodeWebUI;
 
     // Define a minimal platform context for web usage
     const platformContext = {

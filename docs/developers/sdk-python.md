@@ -1,34 +1,34 @@
 # Python SDK
 
-## `qwen-code-sdk`
+## `hopcode-sdk`
 
-`qwen-code-sdk` is an experimental Python SDK for Qwen Code. v1 targets the
+`hopcode-sdk` is an experimental Python SDK for HopCode. v1 targets the
 existing `stream-json` CLI protocol and keeps the transport surface small and
 testable.
 
 ## Scope
 
-- Package name: `qwen-code-sdk`
-- Import path: `qwen_code_sdk`
+- Package name: `hopcode-sdk`
+- Import path: `hopcode_code_sdk`
 - Runtime requirement: Python `>=3.10`
-- CLI dependency: external `qwen` executable is required in v1
+- CLI dependency: external `hopcode` executable is required in v1
 - Transport scope: process transport only
 - Not included in v1: ACP transport, SDK-embedded MCP servers
 
 ## Install
 
 ```bash
-pip install qwen-code-sdk
+pip install hopcode-sdk
 ```
 
-If `qwen` is not on `PATH`, pass `path_to_qwen_executable` explicitly.
+If `hopcode` is not on `PATH`, pass `path_to_hopcode_executable` explicitly.
 
 ## Quick Start
 
 ```python
 import asyncio
 
-from qwen_code_sdk import is_sdk_result_message, query
+from hopcode_code_sdk import is_sdk_result_message, query
 
 
 async def main() -> None:
@@ -36,7 +36,7 @@ async def main() -> None:
         "Explain the repository structure.",
         {
             "cwd": "/path/to/project",
-            "path_to_qwen_executable": "qwen",
+            "path_to_hopcode_executable": "hopcode",
         },
     )
 
@@ -78,7 +78,7 @@ Supported options in v1:
 
 - `cwd`
 - `model`
-- `path_to_qwen_executable`
+- `path_to_hopcode_executable`
 - `permission_mode`
 - `can_use_tool`
 - `env`
@@ -129,14 +129,14 @@ When the CLI emits a `can_use_tool` control request, the SDK routes it through
 
 If the SDK cannot start the CLI:
 
-- Verify `qwen --version` works in the target environment
-- Pass `path_to_qwen_executable` if your shell uses `nvm`, `pyenv`, or other
+- Verify `hopcode --version` works in the target environment
+- Pass `path_to_hopcode_executable` if your shell uses `nvm`, `pyenv`, or other
   non-standard PATH setup
 - Use `debug=True` or `stderr=print` to surface CLI stderr while debugging
 
 If session control calls time out:
 
-- Check that the target `qwen` version supports `--input-format stream-json`
+- Check that the target `hopcode` version supports `--input-format stream-json`
 - Increase `timeout.control_request`
 - Verify that no wrapper script is swallowing stdout/stderr
 
@@ -147,16 +147,16 @@ Repository-level helper commands:
 - `npm run test:sdk:python`
 - `npm run lint:sdk:python`
 - `npm run typecheck:sdk:python`
-- `npm run smoke:sdk:python -- --qwen qwen`
+- `npm run smoke:sdk:python -- --hopcode hopcode`
 
 ## Real E2E Smoke
 
-For a real runtime check (actual `qwen` process + real model call), run from
+For a real runtime check (actual `hopcode` process + real model call), run from
 the repository root. The npm helper uses `python3`, so ensure it resolves to a
 Python `>=3.10` interpreter:
 
 ```bash
-npm run smoke:sdk:python -- --qwen qwen
+npm run smoke:sdk:python -- --hopcode hopcode
 ```
 
 This script runs:

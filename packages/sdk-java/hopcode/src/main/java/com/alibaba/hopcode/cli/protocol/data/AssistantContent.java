@@ -3,7 +3,7 @@ package com.alibaba.hopcode.cli.protocol.data;
 import java.util.Map;
 
 /**
- * Represents content from the assistant in a Qwen Code session.
+ * Represents content from the assistant in a HopCode session.
  *
  * @param <C> The type of content
  * @author skyfire

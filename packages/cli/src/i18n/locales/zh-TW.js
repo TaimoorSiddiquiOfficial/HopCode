@@ -1,10 +1,10 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Traditional Chinese (zh-TW) translations for Qwen Code CLI
+// Traditional Chinese (zh-TW) translations for HopCode CLI
 // Auto-generated: structure from en.js, values from zh-TW (manual) or opencc(zh.js s2t)
 
 export default {
@@ -76,12 +76,12 @@ export default {
   'For a full list of shortcuts, see {{docPath}}':
     '完整快捷鍵列表，請參閱 {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on Qwen Code': '獲取 Qwen Code 幫助',
+  'for help on HopCode': '獲取 HopCode 幫助',
   'show version info': '顯示版本信息',
   'submit a bug report': '提交錯誤報告',
-  'About Qwen Code': '關於 Qwen Code',
+  'About HopCode': '關於 HopCode',
   Status: '狀態',
-  'Qwen Code': 'Qwen Code',
+  HopCode: 'HopCode',
   Runtime: '運行環境',
   OS: '操作系統',
   Auth: '認證',
@@ -101,12 +101,12 @@ export default {
   Proxy: '代理',
   'Memory Usage': '內存使用',
   'IDE Client': 'IDE 客戶端',
-  'Analyzes the project and creates a tailored QWEN.md file.':
-    '分析項目並創建定製的 QWEN.md 文件',
-  'List available Qwen Code tools. Usage: /tools [desc]':
-    '列出可用的 Qwen Code 工具。用法：/tools [desc]',
+  'Analyzes the project and creates a tailored HOPCODE.md file.':
+    '分析項目並創建定製的 HOPCODE.md 文件',
+  'List available HopCode tools. Usage: /tools [desc]':
+    '列出可用的 HopCode 工具。用法：/tools [desc]',
   'List available skills.': '列出可用技能。',
-  'Available Qwen Code CLI tools:': '可用的 Qwen Code CLI 工具：',
+  'Available HopCode CLI tools:': '可用的 HopCode CLI 工具：',
   'No tools available': '沒有可用工具',
   'View or change the approval mode for tool usage':
     '查看或更改工具使用的審批模式',
@@ -129,8 +129,8 @@ export default {
   'Clear conversation history and free up context': '清除對話歷史並釋放上下文',
   'Compresses the context by replacing it with a summary.':
     '通過摘要替換來壓縮上下文',
-  'open full Qwen Code documentation in your browser':
-    '在瀏覽器中打開完整的 Qwen Code 文檔',
+  'open full HopCode documentation in your browser':
+    '在瀏覽器中打開完整的 HopCode 文檔',
   'Configuration not available.': '配置不可用',
   'change the auth method': '更改認證方法',
   'Configure authentication information for login': '配置登錄認證信息',
@@ -183,8 +183,8 @@ export default {
   '❌ Error:': '❌ 錯誤:',
   'Are you sure you want to delete agent "{{name}}"?':
     '您確定要刪除智能體 "{{name}}" 嗎？',
-  'Project Level (.qwen/agents/)': '項目級 (.qwen/agents/)',
-  'User Level (~/.qwen/agents/)': '用戶級 (~/.qwen/agents/)',
+  'Project Level (.hopcode/agents/)': '項目級 (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': '用戶級 (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ 子智能體創建成功！',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     '子智能體 "{{name}}" 已保存到 {{level}} 級別。',
@@ -203,7 +203,7 @@ export default {
     '系統提示超過 {{length}} 個字符',
   'Step {{n}}: Choose Location': '步驟 {{n}}: 選擇位置',
   'Step {{n}}: Choose Generation Method': '步驟 {{n}}: 選擇生成方式',
-  'Generate with Qwen Code (Recommended)': '使用 Qwen Code 生成（推薦）',
+  'Generate with HopCode (Recommended)': '使用 HopCode 生成（推薦）',
   'Manual Creation': '手動創建',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     '描述此子智能體應該做什麼以及何時使用它。（爲了獲得最佳效果，請全面描述）',
@@ -309,10 +309,10 @@ export default {
   'checking...': '檢查中...',
   'not updatable': '不可更新',
   error: '錯誤',
-  'View and edit Qwen Code settings': '查看和編輯 Qwen Code 設置',
+  'View and edit HopCode settings': '查看和編輯 HopCode 設置',
   Settings: '設置',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    '要查看更改，必須重啓 Qwen Code。按 r 退出並立即應用更改。',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    '要查看更改，必須重啓 HopCode。按 r 退出並立即應用更改。',
   'The command "/{{command}}" is not supported in non-interactive mode.':
     '不支持在非交互模式下使用命令 "/{{command}}"。',
   'Vim Mode': 'Vim 模式',
@@ -358,7 +358,7 @@ export default {
   'Memory Discovery Max Dirs': '內存發現最大目錄數',
   'Load Memory From Include Directories': '從包含目錄加載內存',
   'Respect .gitignore': '遵守 .gitignore',
-  'Respect .qwenignore': '遵守 .qwenignore',
+  'Respect .hopcodeignore': '遵守 .hopcodeignore',
   'Enable Recursive File Search': '啓用遞歸文件搜索',
   'Disable Fuzzy Search': '禁用模糊搜索',
   'Interactive Shell (PTY)': '交互式 Shell (PTY)',
@@ -448,16 +448,16 @@ export default {
   remote: '遠程',
   'This extension will add the following commands: {{commands}}.':
     '此擴展將添加以下命令：{{commands}}。',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    '此擴展將使用 {{fileName}} 向您的 QWEN.md 上下文追加信息',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    '此擴展將使用 {{fileName}} 向您的 HOPCODE.md 上下文追加信息',
   'This extension will exclude the following core tools: {{tools}}':
     '此擴展將排除以下核心工具：{{tools}}',
   'This extension will install the following skills:': '此擴展將安裝以下技能：',
   'This extension will install the following subagents:':
     '此擴展將安裝以下子智能體：',
   'Installation cancelled for "{{name}}".': '已取消安裝 "{{name}}"。',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
-    '您正在安裝來自 {{originSource}} 的擴展。某些功能可能無法完美兼容 Qwen Code。',
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.':
+    '您正在安裝來自 {{originSource}} 的擴展。某些功能可能無法完美兼容 HopCode。',
   '--ref and --auto-update are not applicable for marketplace extensions.':
     '--ref 和 --auto-update 不適用於市場擴展。',
   'Extension "{{name}}" installed successfully and enabled.':
@@ -557,8 +557,8 @@ export default {
     '安裝 {{ideName}} 所需的 IDE 配套工具',
   'enable IDE integration': '啓用 IDE 集成',
   'disable IDE integration': '禁用 IDE 集成',
-  'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.':
-    '您當前環境不支持 IDE 集成。要使用此功能，請在以下支持的 IDE 之一中運行 Qwen Code：VS Code 或 VS Code 分支版本。',
+  'IDE integration is not supported in your current environment. To use this feature, run HopCode in one of these supported IDEs: VS Code or VS Code forks.':
+    '您當前環境不支持 IDE 集成。要使用此功能，請在以下支持的 IDE 之一中運行 HopCode：VS Code 或 VS Code 分支版本。',
   'Set up GitHub Actions': '設置 GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
     '配置終端按鍵綁定以支持多行輸入（VS Code、Cursor、Windsurf、Trae）',
@@ -587,7 +587,7 @@ export default {
   'Failed to configure {{terminalName}}.': '配置 {{terminalName}} 失敗。',
   'Your terminal is already configured for an optimal experience with multiline input (Shift+Enter and Ctrl+Enter).':
     '您的終端已配置爲支持多行輸入（Shift+Enter 和 Ctrl+Enter）的最佳體驗。',
-  'Manage Qwen Code hooks': '管理 Qwen Code Hook',
+  'Manage HopCode hooks': '管理 HopCode Hook',
   'List all configured hooks': '列出所有已配置的 Hook',
   'Enable a disabled hook': '啓用已禁用的 Hook',
   'Disable an active hook': '禁用已啓用的 Hook',
@@ -602,8 +602,8 @@ export default {
   'No hook events found.': '未找到 Hook 事件。',
   '{{count}} hook configured': '{{count}} 個 Hook 已配置',
   '{{count}} hooks configured': '{{count}} 個 Hook 已配置',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
-    '此菜單爲只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 Qwen Code。',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
+    '此菜單爲只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 HopCode。',
   'Enter to select · Esc to cancel': 'Enter 選擇 · Esc 取消',
   'Exit codes:': '退出碼：',
   'Configured hooks:': '已配置的 Hook：',
@@ -628,8 +628,8 @@ export default {
   'StatusLine will not be displayed': '不會顯示狀態欄',
   'Tool operations will proceed without hook validation':
     '工具操作將在沒有 Hook 驗證的情況下繼續',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
-    '要重新啓用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 Qwen Code。',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.':
+    '要重新啓用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 HopCode。',
   Project: '項目',
   User: '用戶',
   System: '系統',
@@ -647,7 +647,7 @@ export default {
   'When notifications are sent': '發送通知時',
   'When the user submits a prompt': '用戶提交提示時',
   'When a new session is started': '新會話開始時',
-  'Right before Qwen Code concludes its response': 'Qwen Code 結束響應之前',
+  'Right before HopCode concludes its response': 'HopCode 結束響應之前',
   'When a subagent (Agent tool call) is started':
     '子智能體（Agent 工具調用）啓動時',
   'Right before a subagent concludes its response': '子智能體結束響應之前',
@@ -1012,8 +1012,8 @@ export default {
   'No conversation found to share.': '未找到要分享的對話',
   'Share the current conversation to a markdown or json file. Usage: /chat share <file>':
     '將當前對話分享到 markdown 或 json 文件。用法：/chat share <file>',
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    '生成項目摘要並保存到 .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    '生成項目摘要並保存到 .hopcode/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     '沒有可用的聊天客戶端來生成摘要',
   'Already generating summary, wait for previous request to complete':
@@ -1057,8 +1057,8 @@ export default {
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
     '/directory add 命令在限制性沙箱配置文件中不受支持。請改爲在啓動會話時使用 --include-directories。',
   "Error adding '{{path}}': {{error}}": "添加 '{{path}}' 時出錯：{{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
-    '如果存在，已成功從以下目錄添加 QWEN.md 文件：\n- {{directories}}',
+  'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
+    '如果存在，已成功從以下目錄添加 HOPCODE.md 文件：\n- {{directories}}',
   'Error refreshing memory: {{error}}': '刷新內存時出錯：{{error}}',
   'Successfully added directories:\n- {{directories}}':
     '成功添加目錄：\n- {{directories}}',
@@ -1231,12 +1231,12 @@ export default {
   Ask: '詢問',
   Deny: '拒絕',
   Workspace: '工作區',
-  "Qwen Code won't ask before using allowed tools.":
-    'Qwen Code 使用已允許的工具前不會詢問。',
-  'Qwen Code will ask before using these tools.':
-    'Qwen Code 使用這些工具前會先詢問。',
-  'Qwen Code is not allowed to use denied tools.':
-    'Qwen Code 不允許使用被拒絕的工具。',
+  "HopCode won't ask before using allowed tools.":
+    'HopCode 使用已允許的工具前不會詢問。',
+  'HopCode will ask before using these tools.':
+    'HopCode 使用這些工具前會先詢問。',
+  'HopCode is not allowed to use denied tools.':
+    'HopCode 不允許使用被拒絕的工具。',
   'Manage trusted directories for this workspace.':
     '管理此工作區的受信任目錄。',
   'Any use of the {{tool}} tool': '{{tool}} 工具的任何使用',
@@ -1246,11 +1246,12 @@ export default {
   'From project settings': '來自項目設置',
   'From session': '來自會話',
   'Project settings (local)': '項目設置（本地）',
-  'Saved in .qwen/settings.local.json': '保存在 .qwen/settings.local.json',
+  'Saved in .hopcode/settings.local.json':
+    '保存在 .hopcode/settings.local.json',
   'Project settings': '項目設置',
-  'Checked in at .qwen/settings.json': '保存在 .qwen/settings.json',
+  'Checked in at .hopcode/settings.json': '保存在 .hopcode/settings.json',
   'User settings': '用戶設置',
-  'Saved in at ~/.qwen/settings.json': '保存在 ~/.qwen/settings.json',
+  'Saved in at ~/.hopcode/settings.json': '保存在 ~/.hopcode/settings.json',
   'Add a new rule…': '添加新規則…',
   'Add {{type}} permission rule': '添加{{type}}權限規則',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1273,10 +1274,10 @@ export default {
     '使用 /trust 管理此工作區的文件夾信任設置。',
   'Add directory…': '添加目錄…',
   'Add directory to workspace': '添加工作區目錄',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
-    'Qwen Code 可以讀取工作區中的文件，並在自動接受編輯模式開啓時進行編輯。',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'Qwen Code 將能夠讀取此目錄中的文件，並在自動接受編輯模式開啓時進行編輯。',
+  'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
+    'HopCode 可以讀取工作區中的文件，並在自動接受編輯模式開啓時進行編輯。',
+  'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'HopCode 將能夠讀取此目錄中的文件，並在自動接受編輯模式開啓時進行編輯。',
   'Enter the path to the directory:': '輸入目錄路徑：',
   'Enter directory path…': '輸入目錄路徑…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -1349,8 +1350,8 @@ export default {
   'Use /bug to submit issues to the maintainers when something goes off.':
     '遇到問題時，用 /bug 將問題提交給維護者。',
   'Switch auth type quickly with /auth.': '用 /auth 快速切換認證方式。',
-  'You can run any shell commands from Qwen Code using ! (e.g. !ls).':
-    '在 Qwen Code 中使用 ! 可運行任意 shell 命令（例如 !ls）。',
+  'You can run any shell commands from HopCode using ! (e.g. !ls).':
+    '在 HopCode 中使用 ! 可運行任意 shell 命令（例如 !ls）。',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     '輸入 / 打開命令彈窗；按 Tab 自動補全斜槓命令和保存的提示詞。',
   'You can resume a previous conversation by running qwen --continue or qwen --resume.':
@@ -1363,8 +1364,8 @@ export default {
     '試試 /insight，從聊天記錄中生成個性化洞察。',
   'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
     '按 Ctrl+O 切換緊湊模式 ── 隱藏工具輸出和思考過程，界面更簡潔。',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
-    '添加 QWEN.md 文件，爲 Qwen Code 提供持久的項目上下文。',
+  'Add a HOPCODE.md file to give HopCode persistent project context.':
+    '添加 HOPCODE.md 文件，爲 HopCode 提供持久的項目上下文。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     '用 /btw 快速問一個小問題，不會打斷當前對話。',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1373,7 +1374,7 @@ export default {
     '上下文空間不足，用 /compress 釋放空間。',
   'Long conversation? /compress summarizes history to free context.':
     '對話太長？用 /compress 總結歷史，釋放上下文。',
-  'Agent powering down. Goodbye!': 'Qwen Code 正在關閉，再見！',
+  'Agent powering down. Goodbye!': 'HopCode 正在關閉，再見！',
   'To continue this session, run': '要繼續此會話，請運行',
   'Interaction Summary': '交互摘要',
   'Session ID:': '會話 ID：',
@@ -1675,5 +1676,5 @@ export default {
     '已處於計劃模式。使用 "/plan exit" 退出計劃模式。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     '未處於計劃模式。請先使用 "/plan" 進入計劃模式。',
-  "Set up Qwen Code's status line UI": '配置 Qwen Code 的狀態欄',
+  "Set up HopCode's status line UI": '配置 HopCode 的狀態欄',
 };

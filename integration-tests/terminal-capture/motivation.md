@@ -66,7 +66,7 @@ import type { ScenarioConfig } from '../scenario-runner.js';
 export default {
   name: '/about',
   spawn: ['node', 'dist/cli.js', '--izn'],
-  terminal: { title: 'qwen-code', cwd: '../../..' },
+  terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     { type: 'Hi, can you help me understand this codebase?' },
     { type: '/about' },

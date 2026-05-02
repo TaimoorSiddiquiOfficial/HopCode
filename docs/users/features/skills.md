@@ -52,10 +52,10 @@ Use personal Skills for:
 
 ### Project Skills
 
-Project Skills are shared with your team. Store them in `.qwen/skills/` within your project:
+Project Skills are shared with your team. Store them in `.hopcode/skills/` within your project:
 
 ```bash
-mkdir -p .qwen/skills/my-skill-name
+mkdir -p .hopcode/skills/my-skill-name
 ```
 
 Use project Skills for:
@@ -129,7 +129,7 @@ python scripts/helper.py input.txt
 HopCode discovers Skills from:
 
 - Personal Skills: `~/.hopcode/skills/`
-- Project Skills: `.qwen/skills/`
+- Project Skills: `.hopcode/skills/`
 - Extension Skills: Skills provided by installed extensions
 
 ### Extension Skills
@@ -153,7 +153,7 @@ Or inspect the filesystem:
 ls ~/.hopcode/skills/
 
 # List project Skills (if in a project directory)
-ls .qwen/skills/
+ls .hopcode/skills/
 
 # View a specific Skill's content
 cat ~/.hopcode/skills/my-skill/SKILL.md
@@ -192,14 +192,14 @@ description: Extract text and tables from PDF files, fill forms, merge documents
 ### Verify file path
 
 - Personal Skills: `~/.hopcode/skills/<skill-name>/SKILL.md`
-- Project Skills: `.qwen/skills/<skill-name>/SKILL.md`
+- Project Skills: `.hopcode/skills/<skill-name>/SKILL.md`
 
 ```bash
 # Personal
 ls ~/.hopcode/skills/my-skill/SKILL.md
 
 # Project
-ls .qwen/skills/my-skill/SKILL.md
+ls .hopcode/skills/my-skill/SKILL.md
 ```
 
 ### Check YAML syntax
@@ -221,19 +221,19 @@ Ensure:
 Run HopCode with debug mode to see Skill loading errors:
 
 ```bash
-qwen --debug
+hopcode --debug
 ```
 
 ## Share Skills with your team
 
 You can share Skills through project repositories:
 
-1. Add the Skill under `.qwen/skills/`
+1. Add the Skill under `.hopcode/skills/`
 2. Commit and push
 3. Teammates pull the changes
 
 ```bash
-git add .qwen/skills/
+git add .hopcode/skills/
 git commit -m "Add team Skill for PDF processing"
 git push
 ```
@@ -247,7 +247,7 @@ Edit `SKILL.md` directly:
 code ~/.hopcode/skills/my-skill/SKILL.md
 
 # Project Skill
-code .qwen/skills/my-skill/SKILL.md
+code .hopcode/skills/my-skill/SKILL.md
 ```
 
 Changes take effect the next time you start HopCode. If HopCode is already running, restart it to load the updates.
@@ -261,7 +261,7 @@ Delete the Skill directory:
 rm -rf ~/.hopcode/skills/my-skill
 
 # Project
-rm -rf .qwen/skills/my-skill
+rm -rf .hopcode/skills/my-skill
 git commit -m "Remove unused Skill"
 ```
 

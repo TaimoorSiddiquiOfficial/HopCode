@@ -111,7 +111,7 @@ vi.mock('./core/initializer.js', () => ({
 describe('interactive.tsx main function', () => {
   let originalEnvGeminiSandbox: string | undefined;
   let originalEnvSandbox: string | undefined;
-  let originalEnvQwenCodeSimple: string | undefined;
+  let originalEnvHopCodeSimple: string | undefined;
   let initialUnhandledRejectionListeners: NodeJS.UnhandledRejectionListener[] =
     [];
 
@@ -119,7 +119,7 @@ describe('interactive.tsx main function', () => {
     // Store and clear sandbox-related env variables to ensure a consistent test environment
     originalEnvGeminiSandbox = process.env['HOPCODE_SANDBOX'];
     originalEnvSandbox = process.env['SANDBOX'];
-    originalEnvQwenCodeSimple = process.env['HOPCODE_SIMPLE'];
+    originalEnvHopCodeSimple = process.env['HOPCODE_SIMPLE'];
     delete process.env['HOPCODE_SANDBOX'];
     delete process.env['SANDBOX'];
     delete process.env['HOPCODE_SIMPLE'];
@@ -140,8 +140,8 @@ describe('interactive.tsx main function', () => {
     } else {
       delete process.env['SANDBOX'];
     }
-    if (originalEnvQwenCodeSimple !== undefined) {
-      process.env['HOPCODE_SIMPLE'] = originalEnvQwenCodeSimple;
+    if (originalEnvHopCodeSimple !== undefined) {
+      process.env['HOPCODE_SIMPLE'] = originalEnvHopCodeSimple;
     } else {
       delete process.env['HOPCODE_SIMPLE'];
     }

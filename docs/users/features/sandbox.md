@@ -151,7 +151,7 @@ export SANDBOX_SET_UID_GID=false  # Disable UID/GID mapping
 
 **Missing commands**
 
-- Container sandbox: add them via `.hopcode/sandbox.Dockerfile` or `.qwen/sandbox.bashrc`.
+- Container sandbox: add them via `.hopcode/sandbox.Dockerfile` or `.hopcode/sandbox.bashrc`.
 - Seatbelt: your host binaries are used, but the sandbox may restrict access to some paths.
 
 **Java not available in Docker sandbox**
@@ -161,7 +161,7 @@ The official HopCode Docker image is intentionally minimal to keep the image sma
 If your workflow requires Java, you can extend the base image by creating a `.hopcode/sandbox.Dockerfile` in your project:
 
 ```dockerfile
-FROM ghcr.io/qwenlm/hopcode:latest
+FROM ghcr.io/taimoorsiddiquiofficial/hopcode:latest
 
 RUN apt-get update && \
     apt-get install -y openjdk-17-jre && \

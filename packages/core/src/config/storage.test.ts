@@ -246,7 +246,7 @@ describe('Storage ? runtime path methods use getRuntimeBaseDir', () => {
 
 describe('Storage ? config paths remain at ~/.hopcode regardless of runtime dir', () => {
   const originalEnv = process.env['HOPCODE_RUNTIME_DIR'];
-  const globalQwenDir = Storage.getGlobalHopCodeDir();
+  const globalHopcodeDir = Storage.getGlobalHopCodeDir();
 
   beforeEach(() => {
     Storage.setRuntimeBaseDir(path.resolve('custom-runtime'));
@@ -264,55 +264,55 @@ describe('Storage ? config paths remain at ~/.hopcode regardless of runtime dir'
 
   it('getGlobalSettingsPath still uses ~/.hopcode', () => {
     expect(Storage.getGlobalSettingsPath()).toBe(
-      path.join(globalQwenDir, 'settings.json'),
+      path.join(globalHopcodeDir, 'settings.json'),
     );
   });
 
   it('getInstallationIdPath still uses ~/.hopcode', () => {
     expect(Storage.getInstallationIdPath()).toBe(
-      path.join(globalQwenDir, 'installation_id'),
+      path.join(globalHopcodeDir, 'installation_id'),
     );
   });
 
   it('getGoogleAccountsPath still uses ~/.hopcode', () => {
     expect(Storage.getGoogleAccountsPath()).toBe(
-      path.join(globalQwenDir, 'google_accounts.json'),
+      path.join(globalHopcodeDir, 'google_accounts.json'),
     );
   });
 
   it('getMcpOAuthTokensPath still uses ~/.hopcode', () => {
     expect(Storage.getMcpOAuthTokensPath()).toBe(
-      path.join(globalQwenDir, 'mcp-oauth-tokens.json'),
+      path.join(globalHopcodeDir, 'mcp-oauth-tokens.json'),
     );
   });
 
   it('getOAuthCredsPath still uses ~/.hopcode', () => {
     expect(Storage.getOAuthCredsPath()).toBe(
-      path.join(globalQwenDir, 'oauth_creds.json'),
+      path.join(globalHopcodeDir, 'oauth_creds.json'),
     );
   });
 
   it('getUserCommandsDir still uses ~/.hopcode', () => {
     expect(Storage.getUserCommandsDir()).toBe(
-      path.join(globalQwenDir, 'commands'),
+      path.join(globalHopcodeDir, 'commands'),
     );
   });
 
   it('getGlobalMemoryFilePath still uses ~/.hopcode', () => {
     expect(Storage.getGlobalMemoryFilePath()).toBe(
-      path.join(globalQwenDir, 'memory.md'),
+      path.join(globalHopcodeDir, 'memory.md'),
     );
   });
 
   it('getGlobalBinDir still uses ~/.hopcode', () => {
-    expect(Storage.getGlobalBinDir()).toBe(path.join(globalQwenDir, 'bin'));
+    expect(Storage.getGlobalBinDir()).toBe(path.join(globalHopcodeDir, 'bin'));
   });
 
   it('getUserSkillsDirs still includes ~/.hopcode/skills', () => {
     const storage = new Storage('/tmp/project');
     const skillsDirs = storage.getUserSkillsDirs();
     expect(
-      skillsDirs.some((dir) => dir === path.join(globalQwenDir, 'skills')),
+      skillsDirs.some((dir) => dir === path.join(globalHopcodeDir, 'skills')),
     ).toBe(true);
   });
 });

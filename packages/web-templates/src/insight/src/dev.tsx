@@ -196,20 +196,20 @@ const MOCK_DATA: InsightData = {
             '## Code Review Standards\n- Always check for test coverage when reviewing new features\n- Flag missing error handling in async functions\n- Prefer focused PRs over large multi-file changes',
           why: 'Code review friction showed issues with subagent failures and excessive exploration on large PRs',
           prompt_scaffold:
-            'Create new ## Code Review Standards section in QWEN.md',
+            'Create new ## Code Review Standards section in HOPCODE.md',
         },
         {
           addition:
             '## Testing Conventions\n- Use vi.mock() for module mocks before vi.mocked() for function mocking\n- Always wrap components with required providers (e.g., KeypressProvider) in tests\n- Run tests after modifying related files to catch issues early',
           why: 'Multiple test sessions had buggy mock implementation issues that required iterative fixes',
           prompt_scaffold:
-            'Create new ## Testing Conventions section in QWEN.md',
+            'Create new ## Testing Conventions section in HOPCODE.md',
         },
         {
           addition:
             '## PR Workflow\n- Always read and apply PR template before creating PR content\n- Use English as default language for PR descriptions unless specified otherwise',
           why: 'One session created empty PR initially, another required English specification - both are repetitive clarifications',
-          prompt_scaffold: 'Create new ## PR Workflow section in QWEN.md',
+          prompt_scaffold: 'Create new ## PR Workflow section in HOPCODE.md',
         },
       ],
       features_to_try: [
@@ -285,11 +285,11 @@ const MOCK_DATA: InsightData = {
         {
           title: 'Preempt Common Issues',
           suggestion:
-            'Add testing conventions to QWEN.md to avoid iterative mock fixes',
+            'Add testing conventions to HOPCODE.md to avoid iterative mock fixes',
           detail:
-            '5 buggy_code friction points mostly came from test mock implementation issues. Documenting your testing patterns in QWEN.md would help Qwen generate correct tests on the first attempt.',
+            '5 buggy_code friction points mostly came from test mock implementation issues. Documenting your testing patterns in HOPCODE.md would help Qwen generate correct tests on the first attempt.',
           copyable_prompt:
-            "Add to QWEN.md: 'When generating tests, use vi.mock() before vi.mocked() and always include required providers'",
+            "Add to HOPCODE.md: 'When generating tests, use vi.mock() before vi.mocked() and always include required providers'",
         },
       ],
     },

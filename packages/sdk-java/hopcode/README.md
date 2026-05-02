@@ -22,7 +22,7 @@ Add the following dependency to your Maven `pom.xml`:
 ```xml
 <dependency>
     <groupId>com.alibaba</groupId>
-    <artifactId>qwencode-sdk</artifactId>
+    <artifactId>hopcode-sdk</artifactId>
     <version>{$version}</version>
 </dependency>
 ```
@@ -30,7 +30,7 @@ Add the following dependency to your Maven `pom.xml`:
 Or if using Gradle, add to your `build.gradle`:
 
 ```gradle
-implementation 'com.alibaba:qwencode-sdk:{$version}'
+implementation 'com.alibaba:hopcode-sdk:{$version}'
 ```
 
 ## Building and Running
@@ -53,11 +53,11 @@ mvn install
 
 ## Quick Start
 
-The simplest way to use the SDK is through the `QwenCodeCli.simpleQuery()` method:
+The simplest way to use the SDK is through the `HopCodeCli.simpleQuery()` method:
 
 ```java
 public static void runSimpleExample() {
-    List<String> result = QwenCodeCli.simpleQuery("hello world");
+    List<String> result = HopCodeCli.simpleQuery("hello world");
     result.forEach(logger::info);
 }
 ```
@@ -76,7 +76,7 @@ public static void runTransportOptionsExample() {
             .setMessageTimeout(new Timeout(90L, TimeUnit.SECONDS))
             .setAllowedTools(Arrays.asList("read_file", "write_file", "list_directory"));
 
-    List<String> result = QwenCodeCli.simpleQuery("who are you, what are your capabilities?", options);
+    List<String> result = HopCodeCli.simpleQuery("who are you, what are your capabilities?", options);
     result.forEach(logger::info);
 }
 ```
@@ -85,7 +85,7 @@ For streaming content handling with custom content consumers:
 
 ```java
 public static void runStreamingExample() {
-    QwenCodeCli.simpleQuery("who are you, what are your capabilities?",
+    HopCodeCli.simpleQuery("who are you, what are your capabilities?",
             new TransportOptions().setMessageTimeout(new Timeout(10L, TimeUnit.SECONDS)), new AssistantContentSimpleConsumers() {
 
                 @Override
@@ -130,7 +130,7 @@ other examples see src/test/java/com/alibaba/qwen/code/cli/example
 
 The SDK follows a layered architecture:
 
-- **API Layer**: Provides the main entry points through `QwenCodeCli` class with simple static methods for basic usage
+- **API Layer**: Provides the main entry points through `HopCodeCli` class with simple static methods for basic usage
 - **Session Layer**: Manages communication sessions with the HopCode CLI through the `Session` class
 - **Transport Layer**: Handles the communication mechanism between the SDK and CLI process (currently using process transport via `ProcessTransport`)
 - **Protocol Layer**: Defines data structures for communication based on the CLI protocol
@@ -252,7 +252,7 @@ The `TransportOptions` class allows configuration of how the SDK communicates wi
 
 ### Session Control Features
 
-- **Session creation**: Use `QwenCodeCli.newSession()` to create a new session with custom options
+- **Session creation**: Use `HopCodeCli.newSession()` to create a new session with custom options
 - **Session management**: The `Session` class provides methods to send prompts, handle responses, and manage session state
 - **Session cleanup**: Always close sessions using `session.close()` to properly terminate the CLI process
 - **Session resumption**: Use `setResumeSessionId()` in `TransportOptions` to resume a previous session
@@ -268,7 +268,7 @@ The SDK uses a thread pool for managing concurrent operations with the following
 - **Maximum Pool Size**: 100 threads
 - **Keep-Alive Time**: 60 seconds
 - **Queue Capacity**: 300 tasks (using LinkedBlockingQueue)
-- **Thread Naming**: "qwen_code_cli-pool-{number}"
+- **Thread Naming**: "hopcode_cli-pool-{number}"
 - **Daemon Threads**: false
 - **Rejected Execution Handler**: CallerRunsPolicy
 

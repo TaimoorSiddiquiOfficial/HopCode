@@ -199,7 +199,7 @@ describe('useAtCompletion', () => {
         projectRoot: testRootDir,
         ignoreDirs: [],
         useGitignore: true,
-        useQwenignore: true,
+        useHopcodeignore: true,
         cache: false,
         cacheTtl: 0,
         enableRecursiveFileSearch: true,

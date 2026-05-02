@@ -99,11 +99,11 @@ When the user asks about configuration, the primary reference is `docs/configura
 
 ### Config File Locations & Priority
 
-| Level   | Path                                                         | Description                            |
-| ------- | ------------------------------------------------------------ | -------------------------------------- |
-| User    | `~/.hopcode/settings.json`                                   | Personal global config                 |
-| Project | `<project>/.hopcode/settings.json`                           | Project-specific, overrides user level |
-| System  | macOS: `/Library/Application Support/QwenCode/settings.json` | Admin-level config                     |
+| Level   | Path                                                        | Description                            |
+| ------- | ----------------------------------------------------------- | -------------------------------------- |
+| User    | `~/.hopcode/settings.json`                                  | Personal global config                 |
+| Project | `<project>/.hopcode/settings.json`                          | Project-specific, overrides user level |
+| System  | macOS: `/Library/Application Support/HopCode/settings.json` | Admin-level config                     |
 
 **Priority** (highest to lowest): CLI args > env vars > system settings > project settings > user settings > defaults
 
@@ -142,11 +142,11 @@ When the user wants to modify their configuration:
 4. **Use `edit_file`** to apply the change with correct JSON syntax
 5. **After every configuration change**, you MUST remind the user:
 
-> **Note: Most configuration changes require restarting Qwen Code (`/exit` then re-launch) to take effect.** Only a few settings (like `permissions`) are picked up dynamically.
+> **Note: Most configuration changes require restarting HopCode (`/exit` then re-launch) to take effect.** Only a few settings (like `permissions`) are picked up dynamically.
 
 ### Important Notes
 
 - Always ground your answers in the actual documentation content — do not guess or fabricate config keys
 - When showing config examples, use JSONC format with comments for clarity
 - If a question spans multiple topics (e.g., "How do I set up MCP with sandbox?"), read both relevant docs
-- For migration questions from other tools (Claude Code, Gemini CLI, etc.), check `docs/configuration/settings.md` for equivalent config keys
+- For migration questions from other tools (Claude Code, HopCode, etc.), check `docs/configuration/settings.md` for equivalent config keys

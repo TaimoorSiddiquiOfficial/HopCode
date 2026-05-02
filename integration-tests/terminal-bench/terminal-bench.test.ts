@@ -213,9 +213,9 @@ describe('terminal-bench integration', () => {
     it(
       `should complete ${taskId} task with hopcode agent`,
       async () => {
-        rig.setup(`terminal-bench-qwen-${taskId}`);
+        rig.setup(`terminal-bench-hopcode-${taskId}`);
 
-        const outputPath = join(outputBase, `qwen-${taskId}`);
+        const outputPath = join(outputBase, `hopcode-${taskId}`);
 
         // Check if API key is available
         const apiKey = process.env['OPENAI_API_KEY'];
@@ -229,7 +229,7 @@ describe('terminal-bench integration', () => {
         const args = [
           'run',
           '--agent-import-path',
-          'integration-tests.terminal-bench.hopcode:QwenCodeAgent',
+          'integration-tests.terminal-bench.hopcode:HopCodeAgent',
           '--agent-kwarg',
           `api_key=${apiKey}`,
           '--agent-kwarg',

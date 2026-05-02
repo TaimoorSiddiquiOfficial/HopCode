@@ -114,7 +114,7 @@ This type of action can be used to invoke a general-purpose, conversational HopC
 
 - <a name="__input_HOPCODE_API_KEY"></a><a href="#user-content-__input_HOPCODE_API_KEY"><code>hopcode_api_key</code></a>: \*(Optional)\_ The API key for the Qwen API.
 
-- <a name="__input_hopcode_cli_version"></a><a href="#user-content-__input_hopcode_cli_version"><code>hopcode_cli_version</code></a>: \*(Optional, default: `latest`)\_ The version of the HopCode CLI to install. Can be "latest", "preview", "nightly", a specific version number, or a git branch, tag, or commit. For more information, see [HopCode CLI releases](https://github.com/QwenLM/hopcode-action/blob/main/docs/releases.md).
+- <a name="__input_hopcode_cli_version"></a><a href="#user-content-__input_hopcode_cli_version"><code>hopcode_cli_version</code></a>: \*(Optional, default: `latest`)\_ The version of the HopCode CLI to install. Can be "latest", "preview", "nightly", a specific version number, or a git branch, tag, or commit. For more information, see [HopCode CLI releases](https://github.com/TaimoorSiddiquiOfficial/HopCode/blob/main/docs/releases.md).
 
 - <a name="__input_hopcode_debug"></a><a href="#user-content-__input_hopcode_debug"><code>hopcode_debug</code></a>: \*(Optional)\_ Enable debug logging and output streaming.
 
@@ -233,9 +233,9 @@ follow for a given repository.
 Contributions are welcome! Check out the HopCode CLI **Contributing Guide** for more details on how to get started.
 
 [secrets]: https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
-[HopCode]: https://github.com/QwenLM/hopcode
+[HopCode]: https://github.com/TaimoorSiddiquiOfficial/HopCode
 [DashScope]: https://dashscope.console.aliyun.com/apiKey
-[HopCode CLI]: https://github.com/QwenLM/hopcode-action/
+[HopCode CLI]: https://github.com/TaimoorSiddiquiOfficial/HopCode-action/
 [variables]: https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-variables#creating-configuration-variables-for-a-repository
 [GitHub CLI]: https://docs.github.com/en/github-cli/github-cli
-[HOPCODE.md]: https://github.com/QwenLM/hopcode-action/blob/main/docs/cli/configuration.md#context-files-hierarchical-instructional-context
+[HOPCODE.md]: https://github.com/TaimoorSiddiquiOfficial/HopCode-action/blob/main/docs/cli/configuration.md#context-files-hierarchical-instructional-context

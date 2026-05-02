@@ -1,6 +1,6 @@
 # Observability with OpenTelemetry
 
-Learn how to enable and setup OpenTelemetry for Qwen Code.
+Learn how to enable and setup OpenTelemetry for HopCode.
 
 - [Observability with OpenTelemetry](#observability-with-opentelemetry)
   - [Key Benefits](#key-benefits)
@@ -31,7 +31,7 @@ Learn how to enable and setup OpenTelemetry for Qwen Code.
 ## OpenTelemetry Integration
 
 Built on **[OpenTelemetry]** — the vendor-neutral, industry-standard
-observability framework — Qwen Code's observability system provides:
+observability framework — HopCode's observability system provides:
 
 - **Universal Compatibility**: Export to any OpenTelemetry backend (Aliyun,
   Jaeger, Prometheus, Datadog, etc.)
@@ -55,7 +55,7 @@ observability framework — Qwen Code's observability system provides:
 >
 > **⚠️ Special Note: This feature requires corresponding code changes. This documentation is provided in advance; please refer to future code updates for actual functionality.**
 
-All telemetry behavior is controlled through your `.qwen/settings.json` file.
+All telemetry behavior is controlled through your `.hopcode/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
 | Setting               | Environment Variable                   | CLI Flag                                                 | Description                                          | Values            | Default                 |
@@ -76,7 +76,7 @@ These settings can be overridden by environment variables or CLI flags.
 `true` or `1` will enable the feature. Any other value will disable it.
 
 **HTTP OTLP signal routing:** When using HTTP protocol (`otlpProtocol: "http"`),
-Qwen Code automatically appends signal-specific paths (`/v1/traces`, `/v1/logs`,
+HopCode automatically appends signal-specific paths (`/v1/traces`, `/v1/logs`,
 `/v1/metrics`) to the base `otlpEndpoint`. For example, `http://collector:4318`
 becomes `http://collector:4318/v1/traces` for traces. If the URL already ends
 with a signal path, it is used as-is. Per-signal endpoint overrides
@@ -95,17 +95,17 @@ For detailed information about all configuration options, see the
 
 ### Manual OTLP Export
 
-To view Qwen Code telemetry in Alibaba Cloud Managed Service for
-OpenTelemetry, configure Qwen Code to export to the OTLP endpoint
+To view HopCode telemetry in Alibaba Cloud Managed Service for
+OpenTelemetry, configure HopCode to export to the OTLP endpoint
 provided by ARMS.
 
 Setting `"target": "gcp"` alone does not configure the export
-destination. If `otlpEndpoint` is not set, Qwen Code still defaults to
+destination. If `otlpEndpoint` is not set, HopCode still defaults to
 `http://localhost:4317`. If `outfile` is set, it overrides
 `otlpEndpoint` and telemetry is written to the file instead of being
 sent to Alibaba Cloud.
 
-1. Enable telemetry in your `.qwen/settings.json` and set the OTLP
+1. Enable telemetry in your `.hopcode/settings.json` and set the OTLP
    endpoint:
 
    **Option A: gRPC protocol** (standard OTLP endpoint):
@@ -138,17 +138,17 @@ sent to Alibaba Cloud.
    ```
 
    > **Note:** When using HTTP protocol with only `otlpEndpoint` (no
-   > per-signal overrides), Qwen Code appends standard OTLP paths
+   > per-signal overrides), HopCode appends standard OTLP paths
    > (`/v1/traces`, `/v1/logs`, `/v1/metrics`) to the base URL. If your
    > backend uses different paths, use per-signal endpoint overrides as
    > shown in Option B.
 
 2. If your Alibaba Cloud endpoint requires authentication, provide OTLP
    headers through standard OpenTelemetry environment variables such as
-   `OTEL_EXPORTER_OTLP_HEADERS` (or the signal-specific variants). Qwen
-   Code does not currently expose OTLP auth headers directly in
-   `.qwen/settings.json`.
-3. Run Qwen Code and send prompts.
+   `OTEL_EXPORTER_OTLP_HEADERS` (or the signal-specific variants). HopCode
+   does not currently expose OTLP auth headers directly in
+   `.hopcode/settings.json`.
+3. Run HopCode and send prompts.
 4. View telemetry in Managed Service for OpenTelemetry:
    - Product overview:
      [What is Managed Service for OpenTelemetry?][aliyun-opentelemetry-overview]
@@ -175,19 +175,19 @@ For local development and debugging, you can capture telemetry data locally:
 
 ### File-based Output (Recommended)
 
-1. Enable telemetry in your `.qwen/settings.json`:
+1. Enable telemetry in your `.hopcode/settings.json`:
    ```json
    {
      "telemetry": {
        "enabled": true,
        "target": "local",
        "otlpEndpoint": "",
-       "outfile": ".qwen/telemetry.log"
+       "outfile": ".hopcode/telemetry.log"
      }
    }
    ```
-2. Run Qwen Code and send prompts.
-3. View logs and metrics in the specified file (e.g., `.qwen/telemetry.log`).
+2. Run HopCode and send prompts.
+3. View logs and metrics in the specified file (e.g., `.hopcode/telemetry.log`).
 
 ### Collector-Based Export (Advanced)
 
@@ -199,22 +199,22 @@ For local development and debugging, you can capture telemetry data locally:
    - Download and start Jaeger and OTEL collector
    - Configure your workspace for local telemetry
    - Provide a Jaeger UI at http://localhost:16686
-   - Save logs/metrics to `~/.qwen/tmp/<projectHash>/otel/collector.log`
+   - Save logs/metrics to `~/.hopcode/tmp/<projectHash>/otel/collector.log`
    - Stop collector on exit (e.g. `Ctrl+C`)
-2. Run Qwen Code and send prompts.
+2. Run HopCode and send prompts.
 3. View traces at http://localhost:16686 and logs/metrics in the collector log
    file.
 
 ## Logs and Metrics
 
 The following section describes the structure of logs and metrics generated for
-Qwen Code.
+HopCode.
 
 - A `sessionId` is included as a common attribute on all logs and metrics.
 
 ### Logs
 
-Logs are timestamped records of specific events. The following events are logged for Qwen Code:
+Logs are timestamped records of specific events. The following events are logged for HopCode:
 
 - `qwen-code.config`: This event occurs once at startup with the CLI's configuration.
   - **Attributes**:
@@ -267,7 +267,7 @@ Logs are timestamped records of specific events. The following events are logged
       - `user_added_lines` (int)
       - `user_removed_lines` (int)
 
-- `qwen-code.api_request`: This event occurs when making a request to Qwen API.
+- `qwen-code.api_request`: This event occurs when making a request to the API.
   - **Attributes**:
     - `model`
     - `request_text` (if applicable)
@@ -281,7 +281,7 @@ Logs are timestamped records of specific events. The following events are logged
     - `duration_ms`
     - `auth_type`
 
-- `qwen-code.api_response`: This event occurs upon receiving a response from Qwen API.
+- `qwen-code.api_response`: This event occurs upon receiving a response from the API.
   - **Attributes**:
     - `model`
     - `status_code`
@@ -303,11 +303,11 @@ Logs are timestamped records of specific events. The following events are logged
     - `lines` (int)
     - `prompt_id` (string)
 
-- `qwen-code.malformed_json_response`: This event occurs when a `generateJson` response from Qwen API cannot be parsed as a json.
+- `qwen-code.malformed_json_response`: This event occurs when a `generateJson` response from the API cannot be parsed as a json.
   - **Attributes**:
     - `model`
 
-- `qwen-code.flash_fallback`: This event occurs when Qwen Code switches to flash as fallback.
+- `qwen-code.flash_fallback`: This event occurs when HopCode switches to flash as fallback.
   - **Attributes**:
     - `auth_type`
 
@@ -327,7 +327,7 @@ Logs are timestamped records of specific events. The following events are logged
 
 ### Metrics
 
-Metrics are numerical measurements of behavior over time. The following metrics are collected for Qwen Code (metric names remain `qwen-code.*` for compatibility):
+Metrics are numerical measurements of behavior over time. The following metrics are collected for HopCode (metric names remain `qwen-code.*` for compatibility):
 
 - `qwen-code.session.count` (Counter, Int): Incremented once per CLI startup.
 

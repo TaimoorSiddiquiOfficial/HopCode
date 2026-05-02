@@ -71,7 +71,7 @@ This section guides contributors on how to build, modify, and understand the dev
 To clone the repository:
 
 ```bash
-git clone https://github.com/QwenLM/hopcode.git # Or your fork's URL
+git clone https://github.com/TaimoorSiddiquiOfficial/HopCode.git # Or your fork's URL
 cd hopcode
 ```
 

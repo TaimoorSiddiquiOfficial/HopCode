@@ -16,7 +16,7 @@ const hasFileExtension = picomatch('**/*[*.]*');
 export interface LoadIgnoreRulesOptions {
   projectRoot: string;
   useGitignore: boolean;
-  useQwenignore: boolean;
+  useHopcodeignore: boolean;
   ignoreDirs: string[];
 }
 
@@ -29,10 +29,10 @@ export function loadIgnoreRules(options: LoadIgnoreRulesOptions): Ignore {
     }
   }
 
-  if (options.useQwenignore) {
-    const qwenignorePath = path.join(options.projectRoot, '.hopcodeignore');
-    if (fs.existsSync(qwenignorePath)) {
-      ignorer.add(fs.readFileSync(qwenignorePath, 'utf8'));
+  if (options.useHopcodeignore) {
+    const hopcodeignorePath = path.join(options.projectRoot, '.hopcodeignore');
+    if (fs.existsSync(hopcodeignorePath)) {
+      ignorer.add(fs.readFileSync(hopcodeignorePath, 'utf8'));
     }
   }
 

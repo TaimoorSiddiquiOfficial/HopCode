@@ -58,7 +58,7 @@
  *   npx tsx subagent-flicker-regression.ts
  *
  * Useful env:
- *   QWEN_TUI_E2E_REPO=/path/to/qwen-code
+ *   QWEN_TUI_E2E_REPO=/path/to/hopcode
  *   QWEN_TUI_E2E_OUT=/tmp/qwen-tui-subagent-flicker
  *   QWEN_TUI_E2E_MAX_CLEAR_PAIRS=10       (default: 10)
  *   QWEN_TUI_E2E_MAX_CLEAR_SCREEN=20      (default: 20)
@@ -160,7 +160,7 @@ function captureCounts(raw: string): Counts {
 }
 
 function chatCompletionId(suffix: string): string {
-  return `chatcmpl-qwen-tui-subagent-${suffix}-${Date.now()}`;
+  return `chatcmpl-hopcode-tui-subagent-${suffix}-${Date.now()}`;
 }
 
 function sendJson(res: ServerResponse, body: unknown): void {
@@ -269,7 +269,7 @@ function sendResponse(
 
 function buildMainAgentToolCall(packageJsonPath: string) {
   return {
-    id: 'chatcmpl-qwen-tui-subagent-dispatch',
+    id: 'chatcmpl-hopcode-tui-subagent-dispatch',
     object: 'chat.completion',
     created: Math.floor(Date.now() / 1000),
     model: 'dummy',
@@ -457,7 +457,7 @@ async function startFakeOpenAIServer(
   };
 }
 
-function qwenArgs(baseUrl: string): string[] {
+function hopcodeArgs(baseUrl: string): string[] {
   // NOTE: --bare is intentionally omitted. Bare mode hard-codes the registered
   // tool set to read_file / edit / shell, which means the model's `agent`
   // tool_call is rejected as "Tool not found in registry" and the SubAgent
@@ -484,7 +484,7 @@ async function main(): Promise<void> {
   const repoRoot = resolve(process.env['QWEN_TUI_E2E_REPO'] ?? defaultRepoRoot);
   const defaultOut = join(
     tmpdir(),
-    'qwen-tui-subagent-flicker',
+    'hopcode-tui-subagent-flicker',
     basename(repoRoot),
   );
   const outputDir = resolve(process.env['QWEN_TUI_E2E_OUT'] ?? defaultOut);
@@ -509,7 +509,7 @@ async function main(): Promise<void> {
   );
   console.error('[fake-openai] baseUrl =', fakeServer.baseUrl);
 
-  // Sandbox HOME to keep ~/.qwen settings out of the run.
+  // Sandbox HOME to keep ~/.hopcode settings out of the run.
   const homeDir = join(outputDir, 'home');
   mkdirSync(homeDir, { recursive: true });
 
@@ -520,7 +520,7 @@ async function main(): Promise<void> {
     QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
     QWEN_CODE_NO_RELAUNCH: '1',
     // Intentionally NOT setting QWEN_CODE_SIMPLE so the agent tool stays in
-    // the registry — see comment in qwenArgs() above.
+    // the registry — see comment in hopcodeArgs() above.
     QWEN_SANDBOX: 'false',
     TERM: 'xterm-256color',
     HOME: homeDir,
@@ -556,7 +556,7 @@ async function main(): Promise<void> {
   });
 
   try {
-    await terminal.spawn('node', qwenArgs(fakeServer.baseUrl));
+    await terminal.spawn('node', hopcodeArgs(fakeServer.baseUrl));
     await terminal.waitFor('Type your message', { timeout: 30000 });
 
     const rawBefore = terminal.getRawOutput().length;

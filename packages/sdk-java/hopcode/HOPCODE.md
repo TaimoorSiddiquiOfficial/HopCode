@@ -13,7 +13,7 @@ The HopCode Java SDK is a minimum experimental SDK for programmatic access to Ho
 ## Project Details
 
 - **Group ID**: com.alibaba
-- **Artifact ID**: qwencode-sdk (as per pom.xml)
+- **Artifact ID**: hopcode-sdk (as per pom.xml)
 - **Version**: 0.0.1-SNAPSHOT
 - **Packaging**: JAR
 - **Java Version**: 1.8+ (source and target)
@@ -23,7 +23,7 @@ The HopCode Java SDK is a minimum experimental SDK for programmatic access to Ho
 
 The SDK follows a layered architecture:
 
-- **API Layer**: Provides the main entry points through `HopCodeCli` class (alias: `QwenCodeCli`) with simple static methods for basic usage
+- **API Layer**: Provides the main entry points through `HopCodeCli` class (alias: `HopCodeCli`) with simple static methods for basic usage
 - **Session Layer**: Manages communication sessions with the HopCode CLI through the `Session` class
 - **Transport Layer**: Handles the communication mechanism between the SDK and CLI process (currently using process transport via `ProcessTransport`)
 - **Protocol Layer**: Defines data structures for communication based on the CLI protocol
@@ -33,7 +33,7 @@ The SDK follows a layered architecture:
 
 ### Main Classes
 
-- `QwenCodeCli`: Main entry point with static methods for simple queries
+- `HopCodeCli`: Main entry point with static methods for simple queries
 - `Session`: Manages communication sessions with the CLI
 - `Transport`: Abstracts the communication mechanism (currently using process transport)
 - `ProcessTransport`: Implementation that communicates via process execution

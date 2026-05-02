@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -83,16 +83,16 @@ export default {
   'For a full list of shortcuts, see {{docPath}}':
     'For a full list of shortcuts, see {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on Qwen Code': 'for help on HopCode',
+  'for help on HopCode': 'for help on HopCode',
   'show version info': 'show version info',
   'submit a bug report': 'submit a bug report',
-  'About Qwen Code': 'About HopCode',
+  'About HopCode': 'About HopCode',
   Status: 'Status',
 
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'Qwen Code': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Runtime',
   OS: 'OS',
   Auth: 'Auth',
@@ -116,12 +116,12 @@ export default {
   // ============================================================================
   // Commands - General
   // ============================================================================
-  'Analyzes the project and creates a tailored QWEN.md file.':
+  'Analyzes the project and creates a tailored HOPCODE.md file.':
     'Analyzes the project and creates a tailored HOPCODE.md file.',
-  'List available Qwen Code tools. Usage: /tools [desc]':
+  'List available HopCode tools. Usage: /tools [desc]':
     'List available HopCode tools. Usage: /tools [desc]',
   'List available skills.': 'List available skills.',
-  'Available Qwen Code CLI tools:': 'Available HopCode CLI tools:',
+  'Available HopCode CLI tools:': 'Available HopCode CLI tools:',
   'No tools available': 'No tools available',
   'View or change the approval mode for tool usage':
     'View or change the approval mode for tool usage',
@@ -145,7 +145,7 @@ export default {
     'Clear conversation history and free up context',
   'Compresses the context by replacing it with a summary.':
     'Compresses the context by replacing it with a summary.',
-  'open full Qwen Code documentation in your browser':
+  'open full HopCode documentation in your browser':
     'open full HopCode documentation in your browser',
   'Configuration not available.': 'Configuration not available.',
   'change the auth method': 'change the auth method',
@@ -235,8 +235,7 @@ export default {
   'Step {{n}}: Choose Location': 'Step {{n}}: Choose Location',
   'Step {{n}}: Choose Generation Method':
     'Step {{n}}: Choose Generation Method',
-  'Generate with Qwen Code (Recommended)':
-    'Generate with HopCode (Recommended)',
+  'Generate with HopCode (Recommended)': 'Generate with HopCode (Recommended)',
   'Manual Creation': 'Manual Creation',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)',
@@ -362,9 +361,9 @@ export default {
   // ============================================================================
   // Commands - General (continued)
   // ============================================================================
-  'View and edit Qwen Code settings': 'View and edit HopCode settings',
+  'View and edit HopCode settings': 'View and edit HopCode settings',
   Settings: 'Settings',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
     'To see changes, HopCode must be restarted. Press r to exit and apply changes now.',
   'The command "/{{command}}" is not supported in non-interactive mode.':
     'The command "/{{command}}" is not supported in non-interactive mode.',
@@ -512,7 +511,7 @@ export default {
   remote: 'remote',
   'This extension will add the following commands: {{commands}}.':
     'This extension will add the following commands: {{commands}}.',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
     'This extension will append info to your HOPCODE.md context using {{fileName}}',
   'This extension will exclude the following core tools: {{tools}}':
     'This extension will exclude the following core tools: {{tools}}',
@@ -522,7 +521,7 @@ export default {
     'This extension will install the following subagents:',
   'Installation cancelled for "{{name}}".':
     'Installation cancelled for "{{name}}".',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.':
     'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.',
   '--ref and --auto-update are not applicable for marketplace extensions.':
     '--ref and --auto-update are not applicable for marketplace extensions.',
@@ -635,7 +634,7 @@ export default {
     'install required IDE companion for {{ideName}}',
   'enable IDE integration': 'enable IDE integration',
   'disable IDE integration': 'disable IDE integration',
-  'IDE integration is not supported in your current environment. To use this feature, run Qwen Code in one of these supported IDEs: VS Code or VS Code forks.':
+  'IDE integration is not supported in your current environment. To use this feature, run HopCode in one of these supported IDEs: VS Code or VS Code forks.':
     'IDE integration is not supported in your current environment. To use this feature, run HopCode in one of these supported IDEs: VS Code or VS Code forks.',
   'Set up GitHub Actions': 'Set up GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
@@ -670,7 +669,7 @@ export default {
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
-  'Manage Qwen Code hooks': 'Manage HopCode hooks',
+  'Manage HopCode hooks': 'Manage HopCode hooks',
   'List all configured hooks': 'List all configured hooks',
   'Enable a disabled hook': 'Enable a disabled hook',
   'Disable an active hook': 'Disable an active hook',
@@ -688,7 +687,7 @@ export default {
   'No hook events found.': 'No hook events found.',
   '{{count}} hook configured': '{{count}} hook configured',
   '{{count}} hooks configured': '{{count}} hooks configured',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
     'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.',
   'Enter to select · Esc to cancel': 'Enter to select · Esc to cancel',
   // Hooks - Detail Step
@@ -717,7 +716,7 @@ export default {
   'StatusLine will not be displayed': 'StatusLine will not be displayed',
   'Tool operations will proceed without hook validation':
     'Tool operations will proceed without hook validation',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.':
     'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.',
   // Hooks - Source
   Project: 'Project',
@@ -739,7 +738,7 @@ export default {
   'When notifications are sent': 'When notifications are sent',
   'When the user submits a prompt': 'When the user submits a prompt',
   'When a new session is started': 'When a new session is started',
-  'Right before Qwen Code concludes its response':
+  'Right before HopCode concludes its response':
     'Right before HopCode concludes its response',
   'When a subagent (Agent tool call) is started':
     'When a subagent (Agent tool call) is started',
@@ -1246,7 +1245,7 @@ export default {
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
     'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.',
   "Error adding '{{path}}': {{error}}": "Error adding '{{path}}': {{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
+  'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
     'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}',
   'Error refreshing memory: {{error}}': 'Error refreshing memory: {{error}}',
   'Successfully added directories:\n- {{directories}}':
@@ -1466,11 +1465,11 @@ export default {
   Ask: 'Ask',
   Deny: 'Deny',
   Workspace: 'Workspace',
-  "Qwen Code won't ask before using allowed tools.":
+  "HopCode won't ask before using allowed tools.":
     "HopCode won't ask before using allowed tools.",
-  'Qwen Code will ask before using these tools.':
+  'HopCode will ask before using these tools.':
     'HopCode will ask before using these tools.',
-  'Qwen Code is not allowed to use denied tools.':
+  'HopCode is not allowed to use denied tools.':
     'HopCode is not allowed to use denied tools.',
   'Manage trusted directories for this workspace.':
     'Manage trusted directories for this workspace.',
@@ -1512,9 +1511,9 @@ export default {
   // Workspace directory management
   'Add directory…': 'Add directory…',
   'Add directory to workspace': 'Add directory to workspace',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
+  'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
     'HopCode can read files in the workspace, and make edits when auto-accept edits is on.',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
+  'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
     'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.',
   'Enter the path to the directory:': 'Enter the path to the directory:',
   'Enter directory path…': 'Enter directory path…',
@@ -1605,7 +1604,7 @@ export default {
     'Use /bug to submit issues to the maintainers when something goes off.',
   'Switch auth type quickly with /auth.':
     'Switch auth type quickly with /auth.',
-  'You can run any shell commands from Qwen Code using ! (e.g. !ls).':
+  'You can run any shell commands from HopCode using ! (e.g. !ls).':
     'You can run any shell commands from HopCode using ! (e.g. !ls).',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.',
@@ -1619,7 +1618,7 @@ export default {
     'Try /insight to generate personalized insights from your chat history.',
   'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
     'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
+  'Add a HOPCODE.md file to give HopCode persistent project context.':
     'Add a HOPCODE.md file to give HopCode persistent project context.',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     'Use /btw to ask a quick side question without disrupting the conversation.',
@@ -2117,5 +2116,5 @@ export default {
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Not in plan mode. Use "/plan" to enter plan mode first.',
 
-  "Set up Qwen Code's status line UI": "Set up HopCode's status line UI",
+  "Set up HopCode's status line UI": "Set up HopCode's status line UI",
 };

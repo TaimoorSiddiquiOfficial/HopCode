@@ -427,7 +427,7 @@ describe('Logger', () => {
     ])('should save a checkpoint', async ({ tag, encodedTag }) => {
       await logger.saveCheckpoint(conversation, tag);
       // Verify via loadCheckpoint to avoid path-construction mismatch
-      // between the test and the logger's internal qwenDir.
+      // between the test and the logger's internal hopcodeDir.
       const loaded = await logger.loadCheckpoint(tag);
       expect(loaded).toEqual(conversation);
       expect(encodeTagName(tag)).toBe(encodedTag);
@@ -484,7 +484,7 @@ describe('Logger', () => {
         { role: 'user', parts: [{ text: 'hello' }] },
       ];
       // Use saveCheckpoint to ensure the file lands in the logger's
-      // actual qwenDir, not a path the test constructs independently.
+      // actual hopcodeDir, not a path the test constructs independently.
       await logger.saveCheckpoint(taggedConversation, tag);
 
       const loaded = await logger.loadCheckpoint(tag);
@@ -534,7 +534,7 @@ describe('Logger', () => {
     const tag = 'delete-me';
 
     beforeEach(async () => {
-      // Use saveCheckpoint so the file lands in the logger's actual qwenDir.
+      // Use saveCheckpoint so the file lands in the logger's actual hopcodeDir.
       await logger.saveCheckpoint(conversation, tag);
     });
 

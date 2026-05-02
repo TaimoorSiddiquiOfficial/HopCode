@@ -165,11 +165,11 @@ hopcode extensions update --all
 
 ## How it works
 
-On startup, HopCode looks for extensions in `<home>/.qwen/extensions`
+On startup, HopCode looks for extensions in `<home>/.hopcode/extensions`
 
 Extensions exist as a directory that contains a `qwen-extension.json` file. For example:
 
-`<home>/.qwen/extensions/my-extension/qwen-extension.json`
+`<home>/.hopcode/extensions/my-extension/qwen-extension.json`
 
 ### `qwen-extension.json`
 
@@ -269,7 +269,7 @@ Extensions can provide [custom commands](./cli/commands.md#custom-commands) by p
 An extension named `gcp` with the following structure:
 
 ```
-.qwen/extensions/gcp/
+.hopcode/extensions/gcp/
 ├── qwen-extension.json
 └── commands/
     ├── deploy.md
@@ -289,7 +289,7 @@ Extensions can provide custom skills by placing skill files in a `skills/` subdi
 **Example**
 
 ```
-.qwen/extensions/my-extension/
+.hopcode/extensions/my-extension/
 ├── qwen-extension.json
 └── skills/
     └── pdf-processor/
@@ -305,7 +305,7 @@ Extensions can provide custom subagents by placing agent configuration files in 
 **Example**
 
 ```
-.qwen/extensions/my-extension/
+.hopcode/extensions/my-extension/
 ├── qwen-extension.json
 └── agents/
     └── testing-expert.yaml
@@ -331,8 +331,8 @@ HopCode extensions allow variable substitution in `qwen-extension.json`. This ca
 
 **Supported variables:**
 
-| variable                   | description                                                                                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `${extensionPath}`         | The fully-qualified path of the extension in the user's filesystem e.g., '/Users/username/.qwen/extensions/example-extension'. This will not unwrap symlinks. |
-| `${workspacePath}`         | The fully-qualified path of the current workspace.                                                                                                            |
-| `${/} or ${pathSeparator}` | The path separator (differs per OS).                                                                                                                          |
+| variable                   | description                                                                                                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `${extensionPath}`         | The fully-qualified path of the extension in the user's filesystem e.g., '/Users/username/.hopcode/extensions/example-extension'. This will not unwrap symlinks. |
+| `${workspacePath}`         | The fully-qualified path of the current workspace.                                                                                                               |
+| `${/} or ${pathSeparator}` | The path separator (differs per OS).                                                                                                                             |

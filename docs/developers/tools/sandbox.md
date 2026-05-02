@@ -8,7 +8,7 @@
 
 If you need extra tools inside the container (e.g., `git`, `python`, `rg`), create a custom Dockerfile, The specific operation is as follows
 
-#### 1、Clone HopCode project first, https://github.com/QwenLM/hopcode.git
+#### 1、Clone HopCode project first, https://github.com/TaimoorSiddiquiOfficial/HopCode.git
 
 #### 2、Make sure you perform the following operation in the source code repository directory
 
@@ -27,17 +27,17 @@ cd packages/cli
 npm link
 
 # 5. Verification link (it should now point to the source code)
-which qwen
-# Expected output: /xxx/xxx/.nvm/versions/node/v24.11.1/bin/qwen
+which hopcode
+# Expected output: /xxx/xxx/.nvm/versions/node/v24.11.1/bin/hopcode
 # Or similar paths, but it should be a symbolic link
 
 # 6. For details of the symbolic link, you can see the specific source code path
-ls -la $(dirname $(which qwen))/../lib/node_modules/@hoptrendy/hopcode
+ls -la $(dirname $(which hopcode))/../lib/node_modules/@hoptrendy/hopcode
 # It should show that this is a symbolic link pointing to your source code directory
 
-# 7.Test the version of qwen
+# 7.Test the version of hopcode
 hopcode -v
-# npm link will overwrite the global qwen. To avoid being unable to distinguish the same version number, you can uninstall the global CLI first
+# npm link will overwrite the global hopcode. To avoid being unable to distinguish the same version number, you can uninstall the global CLI first
 
 ```
 
@@ -45,11 +45,11 @@ hopcode -v
 
 - Path: `.hopcode/sandbox.Dockerfile`
 
-- Official mirror image address:https://github.com/QwenLM/hopcode/pkgs/container/hopcode
+- Official mirror image address:https://github.com/TaimoorSiddiquiOfficial/HopCode/pkgs/container/hopcode
 
 ```bash
-# Based on the official Qwen sandbox image (It is recommended to explicitly specify the version)
-FROM ghcr.io/qwenlm/hopcode:sha-570ec43
+# Based on the official HopCode sandbox image (It is recommended to explicitly specify the version)
+FROM ghcr.io/taimoorsiddiquiofficial/hopcode:sha-570ec43
 # Add your extra tools here
 RUN apt-get update && apt-get install -y \
     git \
@@ -68,7 +68,7 @@ This builds a project-specific image based on the default sandbox image.
 
 #### Remove npm link
 
-- If you want to restore the official CLI of qwen, please remove the npm link
+- If you want to restore the official CLI of hopcode, please remove the npm link
 
 ```bash
 # Method 1: Unlink globally
@@ -79,13 +79,13 @@ cd packages/cli
 npm unlink
 
 # Verification has been lifted
-which qwen
-# It should display "qwen not found"
+which hopcode
+# It should display "hopcode not found"
 
 # Reinstall the global version if necessary
 npm install -g @hoptrendy/hopcode
 
 # Verification Recovery
-which qwen
+which hopcode
 hopcode --version
 ```

@@ -64,7 +64,7 @@ describe('dreamAgentPlanner', () => {
       path.join(runtimeDir, 'projects'),
     );
     expect(getTranscriptDir(projectRoot)).not.toContain(
-      `${path.sep}.qwen${path.sep}tmp${path.sep}`,
+      `${path.sep}.hopcode${path.sep}tmp${path.sep}`,
     );
   });
 

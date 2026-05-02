@@ -569,13 +569,17 @@ Skill 3 content`);
     it('should deduplicate same-name skills across provider dirs within a level', async () => {
       // Override readdir to return the same skill name from both .hopcode and .agents dirs
       vi.mocked(fs.readdir).mockReset();
-      const projectQwenDir = path.join('/test/project', '.hopcode', 'skills');
+      const projectHopcodeDir = path.join(
+        '/test/project',
+        '.hopcode',
+        'skills',
+      );
       const projectAgentDir = path.join('/test/project', '.agents', 'skills');
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(fs.readdir).mockImplementation((dirPath: any) => {
         const pathStr = String(dirPath);
-        if (pathStr === projectQwenDir) {
+        if (pathStr === projectHopcodeDir) {
           return Promise.resolve([
             {
               name: 'shared-skill',

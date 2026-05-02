@@ -11,7 +11,7 @@ Currently, the only supported IDE is [Visual Studio Code](https://code.visualstu
   - Your active cursor position.
   - Any text you have selected (up to a 16KB limit; longer selections will be truncated).
 
-- **Native Diffing:** When Qwen suggests code modifications, you can view the changes directly within your IDE's native diff viewer. This allows you to review, edit, and accept or reject the suggested changes seamlessly.
+- **Native Diffing:** When HopCode suggests code modifications, you can view the changes directly within your IDE's native diff viewer. This allows you to review, edit, and accept or reject the suggested changes seamlessly.
 
 - **VS Code Commands:** You can access HopCode features directly from the VS Code Command Palette (`Cmd+Shift+P` or `Ctrl+Shift+P`):
   - `HopCode: Run`: Starts a new HopCode session in the integrated terminal.
@@ -80,7 +80,7 @@ If connected, this command will show the IDE it's connected to and a list of rec
 
 ### Working with Diffs
 
-When you ask Qwen model to modify a file, it can open a diff view directly in your editor.
+When you ask HopCode to modify a file, it can open a diff view directly in your editor.
 
 **To accept a diff**, you can perform any of the following actions:
 

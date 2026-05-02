@@ -1,6 +1,6 @@
-# Qwen Code Docs Site
+# HopCode Docs Site
 
-A documentation website for Qwen Code built with [Next.js](https://nextjs.org/) and [Nextra](https://nextra.site/).
+A documentation website for HopCode built with [Next.js](https://nextjs.org/) and [Nextra](https://nextra.site/).
 
 ## Getting Started
 

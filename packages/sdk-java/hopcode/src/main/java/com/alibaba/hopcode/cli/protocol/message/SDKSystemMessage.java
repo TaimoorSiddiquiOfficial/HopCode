@@ -59,10 +59,10 @@ public class SDKSystemMessage extends MessageBase {
     @JSONField(name = "slash_commands")
     private List<String> slashCommands;
     /**
-     * Qwen Code version.
+     * HopCode version.
      */
     @JSONField(name = "qwen_code_version")
-    private String qwenCodeVersion;
+    private String hopcodeVersion;
     /**
      * Output style.
      */
@@ -275,21 +275,21 @@ public class SDKSystemMessage extends MessageBase {
     }
 
     /**
-     * Gets the Qwen Code version.
+     * Gets the HopCode version.
      *
-     * @return The Qwen Code version
+     * @return The HopCode version
      */
-    public String getQwenCodeVersion() {
-        return qwenCodeVersion;
+    public String getHopcodeVersion() {
+        return hopcodeVersion;
     }
 
     /**
-     * Sets the Qwen Code version.
+     * Sets the HopCode version.
      *
-     * @param qwenCodeVersion The Qwen Code version
+     * @param hopcodeVersion The HopCode version
      */
-    public void setQwenCodeVersion(String qwenCodeVersion) {
-        this.qwenCodeVersion = qwenCodeVersion;
+    public void setHopcodeVersion(String hopcodeVersion) {
+        this.hopcodeVersion = hopcodeVersion;
     }
 
     /**

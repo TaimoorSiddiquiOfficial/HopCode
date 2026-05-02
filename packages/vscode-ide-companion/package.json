@@ -2,7 +2,7 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
@@ -204,7 +204,7 @@
             "api-key"
           ],
           "enumDescriptions": [
-            "Alibaba Cloud Coding Plan — configurable from VS Code Settings",
+            "Alibaba Cloud Coding Plan â€” configurable from VS Code Settings",
             "Configured via HopCode: Auth or the onboarding button"
           ],
           "default": "coding-plan",
@@ -224,8 +224,8 @@
             "global"
           ],
           "enumDescriptions": [
-            "China — 阿里云百炼 (aliyun.com)",
-            "Global — Alibaba Cloud (alibabacloud.com)"
+            "China â€” é˜¿é‡Œäº‘ç™¾ç‚¼ (aliyun.com)",
+            "Global â€” Alibaba Cloud (alibabacloud.com)"
           ],
           "default": "china",
           "markdownDescription": "Region for Coding Plan. _(Only used when Provider is `coding-plan`)_"

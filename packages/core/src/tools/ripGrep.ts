@@ -22,21 +22,21 @@ import type { PermissionDecision } from '../permissions/types.js';
 const debugLogger = createDebugLogger('RIPGREP');
 
 /**
- * Per-process cache for `.qwenignore` discovery. The same directories show
+ * Per-process cache for `.hopcodeignore` discovery. The same directories show
  * up across many Grep invocations in a typical session — without caching,
  * each invocation pays 2-3 sync syscalls per searchPath. Bounded so a
  * pathologically long session can't grow without limit.
  *
  * `dirIsDir`: searchPath → boolean (is the path itself a directory?)
- * `qwenIgnore`: dir → string | null (cached `.qwenignore` path or null)
+ * `hopcodeIgnore`: dir → string | null (cached `.hopcodeignore` path or null)
  *
- * **Known staleness window:** a `.qwenignore` created mid-session, or a
+ * **Known staleness window:** a `.hopcodeignore` created mid-session, or a
  * searchPath whose type flips (dir→file or vice versa), will not be
  * picked up until the entry rotates out of the FIFO (256 entries). Users
  * rarely add ignore files mid-session; a process restart resets the cache.
  */
 const dirIsDirCache = new Map<string, boolean>();
-const qwenIgnoreCache = new Map<string, string | null>();
+const hopcodeIgnoreCache = new Map<string, string | null>();
 const RIPGREP_CACHE_MAX = 256;
 function trimCache<K, V>(m: Map<K, V>): void {
   if (m.size <= RIPGREP_CACHE_MAX) return;
@@ -49,7 +49,7 @@ function trimCache<K, V>(m: Map<K, V>): void {
  */
 export function _resetRipGrepCachesForTest(): void {
   dirIsDirCache.clear();
-  qwenIgnoreCache.clear();
+  hopcodeIgnoreCache.clear();
 }
 
 /**
@@ -274,16 +274,13 @@ class GrepToolInvocation extends BaseToolInvocation<
       pattern,
     ];
 
-    // Add file exclusions from .gitignore and .qwenignore
+    // Add file exclusions from .gitignore and .hopcodeignore
     const filteringOptions = this.getFileFilteringOptions();
     if (!filteringOptions.respectGitIgnore) {
       rgArgs.push('--no-ignore-vcs');
     }
 
-    if (
-      filteringOptions.respectHopCodeIgnore ||
-      filteringOptions.respectQwenIgnore
-    ) {
+    if (filteringOptions.respectHopCodeIgnore) {
       // Load .hopcodeignore from each workspace directory, not just the primary one
       const seenIgnoreFiles = new Set<string>();
       for (const searchPath of paths) {
@@ -298,16 +295,16 @@ class GrepToolInvocation extends BaseToolInvocation<
           trimCache(dirIsDirCache);
         }
         const dir = isDir ? searchPath : path.dirname(searchPath);
-        let qwenIgnorePath = qwenIgnoreCache.get(dir);
-        if (qwenIgnorePath === undefined) {
+        let hopcodeIgnorePath = hopcodeIgnoreCache.get(dir);
+        if (hopcodeIgnorePath === undefined) {
           const candidate = path.join(dir, '.hopcodeignore');
-          qwenIgnorePath = fs.existsSync(candidate) ? candidate : null;
-          qwenIgnoreCache.set(dir, qwenIgnorePath);
-          trimCache(qwenIgnoreCache);
+          hopcodeIgnorePath = fs.existsSync(candidate) ? candidate : null;
+          hopcodeIgnoreCache.set(dir, hopcodeIgnorePath);
+          trimCache(hopcodeIgnoreCache);
         }
-        if (qwenIgnorePath && !seenIgnoreFiles.has(qwenIgnorePath)) {
-          rgArgs.push('--ignore-file', qwenIgnorePath);
-          seenIgnoreFiles.add(qwenIgnorePath);
+        if (hopcodeIgnorePath && !seenIgnoreFiles.has(hopcodeIgnorePath)) {
+          rgArgs.push('--ignore-file', hopcodeIgnorePath);
+          seenIgnoreFiles.add(hopcodeIgnorePath);
         }
       }
     }
@@ -338,9 +335,6 @@ class GrepToolInvocation extends BaseToolInvocation<
       respectHopCodeIgnore:
         options?.respectHopCodeIgnore ??
         DEFAULT_FILE_FILTERING_OPTIONS.respectHopCodeIgnore,
-      respectQwenIgnore:
-        options?.respectQwenIgnore ??
-        DEFAULT_FILE_FILTERING_OPTIONS.respectQwenIgnore,
     };
   }
 

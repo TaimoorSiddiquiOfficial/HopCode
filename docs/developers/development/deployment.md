@@ -80,7 +80,7 @@ You can run the most recently committed version of HopCode directly from the Git
 
 ```bash
 # Execute the CLI directly from the main branch on GitHub
-npx https://github.com/QwenLM/hopcode
+npx https://github.com/TaimoorSiddiquiOfficial/HopCode
 ```
 
 ## Deployment architecture
