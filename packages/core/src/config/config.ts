@@ -66,6 +66,7 @@ import { PermissionManager } from '../permissions/permission-manager.js';
 import { SubagentManager } from '../subagents/subagent-manager.js';
 import type { SubagentConfig } from '../subagents/types.js';
 import { BackgroundTaskRegistry } from '../agents/background-tasks.js';
+import { MonitorRegistry } from '../services/monitorRegistry.js';
 import { BackgroundAgentResumeService } from '../agents/background-agent-resume.js';
 import { BackgroundShellRegistry } from '../services/backgroundShellRegistry.js';
 import { FileReadCache } from '../services/fileReadCache.js';
@@ -578,6 +579,7 @@ export class Config {
   private promptRegistry!: PromptRegistry;
   private subagentManager!: SubagentManager;
   private readonly backgroundTaskRegistry = new BackgroundTaskRegistry();
+  private readonly monitorRegistry = new MonitorRegistry();
   private backgroundAgentResumeService?: BackgroundAgentResumeService;
   private readonly backgroundShellRegistry = new BackgroundShellRegistry();
   // Field initializer runs once on the parent Config; child Configs
@@ -1701,6 +1703,7 @@ export class Config {
       }
 
       this.backgroundTaskRegistry.abortAll();
+      this.monitorRegistry.abortAll({ notify: false });
       this.backgroundShellRegistry.abortAll();
 
       await this.cleanupArenaRuntime();
@@ -2630,6 +2633,10 @@ export class Config {
     return this.backgroundTaskRegistry;
   }
 
+  getMonitorRegistry(): MonitorRegistry {
+    return this.monitorRegistry;
+  }
+
   getBackgroundAgentResumeService(): BackgroundAgentResumeService {
     if (!this.backgroundAgentResumeService) {
       this.backgroundAgentResumeService = new BackgroundAgentResumeService(
@@ -2960,6 +2967,12 @@ export class Config {
         return new CronDeleteTool(this);
       });
     }
+
+    // Register monitor tool
+    await registerLazy(ToolNames.MONITOR, async () => {
+      const { MonitorTool } = await import('../tools/monitor.js');
+      return new MonitorTool(this);
+    });
 
     if (!options?.skipDiscovery) {
       await registry.discoverAllTools();

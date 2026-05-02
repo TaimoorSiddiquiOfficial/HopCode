@@ -211,6 +211,9 @@ describe('useHopCodeStream', () => {
         setNotificationCallback: vi.fn(),
       })),
       getEmitToolUseSummaries: vi.fn(() => true),
+      getMonitorRegistry: vi.fn(() => ({
+        setNotificationCallback: vi.fn(),
+      })),
     } as unknown as Config;
     mockOnDebugMessage = vi.fn();
     mockHandleSlashCommand = vi.fn().mockResolvedValue(false);
@@ -2389,7 +2392,7 @@ describe('useHopCodeStream', () => {
               type: ServerGeminiEventType.Retry,
             };
             yield {
-              type: ServerGeminiEventType.Text,
+              type: ServerGeminiEventType.Content,
               value: 'Success after retry',
             };
             yield {
@@ -2695,7 +2698,7 @@ describe('useHopCodeStream', () => {
       mockSendMessageStream.mockReturnValueOnce(
         (async function* () {
           yield {
-            type: ServerGeminiEventType.Text,
+            type: ServerGeminiEventType.Content,
             value: 'Success response',
           };
         })(),
