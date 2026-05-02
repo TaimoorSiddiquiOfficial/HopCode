@@ -78,7 +78,7 @@ describe('query()', () => {
     expect(transportOptions.systemPrompt).toBeUndefined();
   });
 
-  it('rejects non-qwen preset names at runtime validation', async () => {
+  it('rejects non-hopcode preset names at runtime validation', async () => {
     const { query } = await import('../../src/query/createQuery.js');
 
     expect(() =>
