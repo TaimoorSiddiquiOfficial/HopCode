@@ -12,8 +12,7 @@ import type {
  * before proceeding.
  *
  * Non-destructive actions (reads, normal writes, searches) pass through.
- * Destructive categories (file deletion, force-push, DROP/TRUNCATE, permission changes)
- * require verification.
+ * Destructive categories require verification.
  */
 export function checkIznGate(input: {
   toolName: string;
@@ -108,24 +107,29 @@ function buildTextToCheck(input: {
   ].join(' ');
 }
 
-/** Match tool input against izn behavior rule detection patterns. */
+/**
+ * Match tool input against destructive action detection patterns.
+ *
+ * All destructive categories (file removal, remote overwrites,
+ * schema changes, access changes) only apply to run_shell_command.
+ * Other tools (write_file, edit, etc.) may contain matching keywords
+ * in their content or documentation arguments — those are not
+ * destructive actions and must not be flagged.
+ */
 function matchCategories(
   textToCheck: string,
   toolName: string,
 ): DestructiveActionCategory[] {
+  // Only run_shell_command can execute destructive operations.
+  // Content-modifying tools (write_file, edit) never perform
+  // file system or database destruction regardless of content.
+  if (toolName !== 'run_shell_command') {
+    return [];
+  }
+
   const matched: DestructiveActionCategory[] = [];
   for (const rule of iznBehaviorRules) {
     if (rule.detectPattern.test(textToCheck)) {
-      // file_deletion pattern only applies to run_shell_command
-      // (the rm/del/unlink commands). edit/write_file may contain
-      // "delete" in their content args, which is content deletion
-      // not file deletion.
-      if (
-        rule.category === 'file_deletion' &&
-        toolName !== 'run_shell_command'
-      ) {
-        continue;
-      }
       matched.push(rule.category);
     }
   }
