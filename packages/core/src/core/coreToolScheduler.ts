@@ -475,6 +475,14 @@ export class CoreToolScheduler {
   private isFinalizingToolCalls = false;
   private isScheduling = false;
   private validationRetryCounts = new Map<string, number>();
+  /**
+   * Tracks shell commands that have passed the Izn verification gate
+   * and are pending retry. When the model re-issues the same command
+   * after self-verification, the hash match allows it to skip the
+   * gate and execute. Hashes are removed on pass-through so they
+   * cannot leak across turns.
+   */
+  private iznVerifiedHashes = new Set<string>();
   private requestQueue: Array<{
     request: ToolCallRequestInfo | ToolCallRequestInfo[];
     signal: AbortSignal;
@@ -1101,35 +1109,51 @@ export class CoreToolScheduler {
             // but the agent must self-verify before destructive actions
             // (file deletion, force-push, DROP/TRUNCATE, permission changes).
             if (approvalMode === ApprovalMode.IZN) {
-              const gateResult = checkIznGate({
-                toolName: reqInfo.name,
-                toolArgs: toolParams,
-              });
-              if (!gateResult.allowed) {
-                // ── Izn intent-clarification gate ──────────────────
-                // Instead of hard-blocking, return a system-reminder
-                // with the clarification plan so the model can
-                // investigate, trace dependencies, predict cascade
-                // effects, and ask the user to confirm intent before
-                // retrying.
-                const clarificationMsg =
-                  buildIznClarificationMessage(gateResult);
-                this.setToolCallOutcome(
-                  reqInfo.callId,
-                  ToolConfirmationOutcome.ProceedAlways,
-                );
-                this.setStatusInternal(reqInfo.callId, 'success', {
-                  callId: reqInfo.callId,
-                  responseParts: convertToFunctionResponse(
-                    reqInfo.name,
-                    reqInfo.callId,
-                    clarificationMsg,
-                  ),
-                  resultDisplay: undefined,
-                  error: undefined,
-                  errorType: undefined,
+              // ── Retry-after-verification bypass ──────────────────
+              // Hash the command text so the model can retry the same
+              // shell command after completing self-verification. If
+              // the hash matches a previously-blocked command, skip
+              // the gate and allow execution.
+              const commandStr =
+                typeof toolParams.command === 'string'
+                  ? toolParams.command
+                  : '';
+              const iznHash = `${reqInfo.name}|${commandStr}`;
+              if (this.iznVerifiedHashes.has(iznHash)) {
+                this.iznVerifiedHashes.delete(iznHash);
+              } else {
+                const gateResult = checkIznGate({
+                  toolName: reqInfo.name,
+                  toolArgs: toolParams,
                 });
-                continue;
+                if (!gateResult.allowed) {
+                  // ── Izn intent-clarification gate ──────────────────
+                  // Instead of hard-blocking, return a system-reminder
+                  // with the clarification plan so the model can
+                  // investigate, trace dependencies, predict cascade
+                  // effects, and ask the user to confirm intent before
+                  // retrying. Store the hash so the retry passes the
+                  // gate after verification completes.
+                  this.iznVerifiedHashes.add(iznHash);
+                  const clarificationMsg =
+                    buildIznClarificationMessage(gateResult);
+                  this.setToolCallOutcome(
+                    reqInfo.callId,
+                    ToolConfirmationOutcome.ProceedAlways,
+                  );
+                  this.setStatusInternal(reqInfo.callId, 'success', {
+                    callId: reqInfo.callId,
+                    responseParts: convertToFunctionResponse(
+                      reqInfo.name,
+                      reqInfo.callId,
+                      clarificationMsg,
+                    ),
+                    resultDisplay: undefined,
+                    error: undefined,
+                    errorType: undefined,
+                  });
+                  continue;
+                }
               }
             }
 
