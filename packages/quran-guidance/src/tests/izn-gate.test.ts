@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkIznGate } from '../engine/izn-gate.js';
+import { checkIznGate, reportIznScope } from '../engine/izn-gate.js';
 
 describe('checkIznGate', () => {
   it('allows non-destructive tool calls', () => {
@@ -10,40 +10,51 @@ describe('checkIznGate', () => {
     expect(result.allowed).toBe(true);
   });
 
-  it('blocks file deletion', () => {
+  it('blocks file deletion with clarification plan', () => {
     const result = checkIznGate({
       toolName: 'run_shell_command',
       command: 'rm -rf /some/dir',
     });
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('file_deletion');
+    // New clarification fields
+    expect(result.category).toContain('file_deletion');
+    expect(result.analysisPlan.length).toBeGreaterThan(0);
+    expect(result.intentQuestions.length).toBeGreaterThan(0);
+    expect(result.impactScope.length).toBeGreaterThan(0);
   });
 
-  it('blocks force-push', () => {
+  it('blocks force-push with clarification plan', () => {
     const result = checkIznGate({
       toolName: 'run_shell_command',
       command: 'git push --force origin main',
     });
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('force_push');
+    expect(result.category).toContain('force_push');
+    expect(result.analysisPlan.length).toBeGreaterThan(0);
   });
 
-  it('blocks database drop', () => {
+  it('blocks database drop with clarification plan', () => {
     const result = checkIznGate({
       toolName: 'run_shell_command',
       command: 'DROP TABLE users;',
     });
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('database_drop');
+    expect(result.category).toContain('database_drop');
+    expect(result.intentQuestions.length).toBeGreaterThan(0);
   });
 
-  it('blocks permission change', () => {
+  it('blocks permission change with clarification plan', () => {
     const result = checkIznGate({
       toolName: 'run_shell_command',
       command: 'chmod 777 /etc/something',
     });
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain('permission_change');
+    expect(result.category).toContain('permission_change');
+    expect(result.impactScope.length).toBeGreaterThan(0);
   });
 
   it('provides verification steps when blocked', () => {
@@ -56,6 +67,13 @@ describe('checkIznGate', () => {
       expect(result.requiredConfirmation).toContain(
         'Self-Verification Required',
       );
+      // Intent questions probe the user's goal
+      expect(
+        result.intentQuestions.some((q) => q.toLowerCase().includes('goal')),
+      ).toBe(true);
+      // Impact scope covers dependency and cascade analysis
+      const impactText = result.impactScope.join(' ').toLowerCase();
+      expect(impactText).toMatch(/import|depend|child|subclass|parent/);
     }
   });
 
@@ -73,5 +91,72 @@ describe('checkIznGate', () => {
       toolArgs: { file_path: '/tmp/test.txt', content: 'hello' },
     });
     expect(result.allowed).toBe(true);
+  });
+
+  it('deduplicates across multiple matched categories', () => {
+    // A command triggering both file_deletion and permission_change
+    const result = checkIznGate({
+      toolName: 'run_shell_command',
+      command: 'find . -name "*.tmp" -delete && chmod 644 config.yaml',
+    });
+    expect(result.allowed).toBe(false);
+    expect(result.category.length).toBeGreaterThanOrEqual(1);
+    // No duplicate steps in analysisPlan
+    const uniqueSteps = new Set(result.analysisPlan);
+    expect(uniqueSteps.size).toBe(result.analysisPlan.length);
+  });
+});
+
+describe('reportIznScope', () => {
+  it('returns generic scope reminder for non-destructive tools', () => {
+    const result = reportIznScope({
+      toolName: 'write_file',
+      toolArgs: { file_path: '/tmp/test.txt', content: 'hello' },
+    });
+    expect(result).not.toBeNull();
+    expect(result!.context).toContain('Izn scope');
+    expect(result!.context).toContain('Verify this change matches your intent');
+  });
+
+  it('returns category-specific report for destructive tools', () => {
+    const result = reportIznScope({
+      toolName: 'run_shell_command',
+      command: 'rm -rf /some/dir',
+    });
+    expect(result).not.toBeNull();
+    expect(result!.context).toContain('file_deletion completed');
+    expect(result!.context).toContain('List what was deleted');
+  });
+
+  it('includes intent verification guidance in destructive report', () => {
+    const result = reportIznScope({
+      toolName: 'run_shell_command',
+      command: 'DROP TABLE users;',
+    });
+    expect(result).not.toBeNull();
+    expect(result!.context).toContain('Intent verification:');
+    expect(result!.context).toContain(
+      'If intent was clarified before this action',
+    );
+    expect(result!.context).toContain(
+      'confirm the result matches what was agreed',
+    );
+  });
+
+  it('includes revert conditions from matched rules', () => {
+    const result = reportIznScope({
+      toolName: 'run_shell_command',
+      command: 'rm -rf critical-project/',
+    });
+    expect(result).not.toBeNull();
+    expect(result!.context).toContain('Revert conditions');
+    expect(result!.context).toContain('critical project files');
+  });
+
+  it('returns null for tools without a command or args', () => {
+    const result = reportIznScope({ toolName: 'read_file' });
+    // No destructive match → generic reminder, not null
+    expect(result).not.toBeNull();
+    expect(result!.context).toContain('Izn scope');
   });
 });

@@ -8,11 +8,13 @@ import type {
  * Izn pre-execution gate.
  *
  * When the agent is in Izn mode, this function checks whether a
- * tool call is a destructive action that requires self-verification
- * before proceeding.
+ * tool call is a destructive action. Instead of hard-blocking, it
+ * returns an intent-clarification plan — the model reads affected
+ * files, traces dependencies, predicts cascade effects, and asks
+ * the user to confirm their actual goal before acting.
  *
  * Non-destructive actions (reads, normal writes, searches) pass through.
- * Destructive categories require verification.
+ * Destructive categories trigger the clarification workflow.
  */
 export function checkIznGate(input: {
   toolName: string;
@@ -26,12 +28,28 @@ export function checkIznGate(input: {
     return { allowed: true };
   }
 
-  // Build the verification requirements
-  const allPreVerify = matchedCategories.flatMap((cat) => {
+  // Build the intent-clarification plan from the matched rules.
+  const allAnalysisPlan = matchedCategories.flatMap((cat) => {
     const rule = iznBehaviorRules.find((r) => r.category === cat);
     return rule?.preVerify ?? [];
   });
-  const uniquePreVerify = [...new Set(allPreVerify)];
+  const allIntentQuestions = matchedCategories.flatMap((cat) => {
+    const rule = iznBehaviorRules.find((r) => r.category === cat);
+    return rule?.intentQuestions ?? [];
+  });
+  const allImpactScope = matchedCategories.flatMap((cat) => {
+    const rule = iznBehaviorRules.find((r) => r.category === cat);
+    if (!rule?.impactAnalysis) return [];
+    return [
+      ...rule.impactAnalysis.readTargets,
+      ...rule.impactAnalysis.dependencyChecks,
+      ...rule.impactAnalysis.cascadeScenarios,
+    ];
+  });
+
+  const uniqueAnalysisPlan = [...new Set(allAnalysisPlan)];
+  const uniqueIntentQuestions = [...new Set(allIntentQuestions)];
+  const uniqueImpactScope = [...new Set(allImpactScope)];
 
   return {
     allowed: false,
@@ -39,10 +57,14 @@ export function checkIznGate(input: {
     requiredConfirmation: [
       'Izn Mode — Self-Verification Required:',
       '',
-      ...uniquePreVerify.map((step, i) => `${i + 1}. ${step}`),
+      ...uniqueAnalysisPlan.map((step, i) => `${i + 1}. ${step}`),
       '',
       'Confirm scope before proceeding.',
     ].join('\n'),
+    category: matchedCategories,
+    analysisPlan: uniqueAnalysisPlan,
+    intentQuestions: uniqueIntentQuestions,
+    impactScope: uniqueImpactScope,
   };
 }
 
@@ -79,13 +101,33 @@ export function reportIznScope(input: {
   });
   const uniquePostReport = [...new Set(allPostReport)];
 
+  // Gather intent-retention guidance from matched rules
+  const allRevertConditions = matchedCategories.flatMap((cat) => {
+    const rule = iznBehaviorRules.find((r) => r.category === cat);
+    return rule?.revertCondition ? [rule.revertCondition] : [];
+  });
+  const uniqueRevertConditions = [...new Set(allRevertConditions)];
+
   const lines = [
     `Izn scope — ${matchedCategories.join(', ')} completed:`,
     '',
     ...uniquePostReport.map((step, i) => `${i + 1}. ${step}`),
     '',
-    'Verify scope and report any deviations.',
+    'Intent verification:',
+    '- If intent was clarified before this action, confirm the result matches what was agreed.',
+    '- If any cascade effects occurred that were not predicted, report them now.',
+    '- If the action was partial or skipped steps, note what was skipped and why.',
   ];
+
+  if (uniqueRevertConditions.length > 0) {
+    lines.push(
+      '',
+      'Revert conditions (check if any apply):',
+      ...uniqueRevertConditions.map((c) => `- ${c}`),
+    );
+  }
+
+  lines.push('', 'Verify scope and report any deviations.');
 
   return { context: lines.join('\n') };
 }

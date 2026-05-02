@@ -70,7 +70,11 @@ import {
 import * as Diff from 'diff';
 import levenshtein from 'fast-levenshtein';
 import { getPlanModeSystemReminder } from './prompts.js';
-import { checkIznGate, reportIznScope } from '@hoptrendy/quran-guidance';
+import {
+  checkIznGate,
+  reportIznScope,
+  type IznGateResult,
+} from '@hoptrendy/quran-guidance';
 import { ShellToolInvocation } from '../tools/shell.js';
 import { IdeClient } from '../ide/ide-client.js';
 
@@ -310,6 +314,57 @@ function toParts(input: PartListUnion): Part[] {
     }
   }
   return parts;
+}
+
+/**
+ * Build the Izn intent-clarification system-reminder from the gate result.
+ *
+ * When the Izn gate matches a destructive action, instead of hard-blocking
+ * the tool, this message is returned as the tool's response. The model
+ * reads it, investigates the impact (reads affected files, traces
+ * dependencies, predicts cascade effects), asks the user clarifying
+ * questions via ask_user_question, and only retries once intent is
+ * confirmed.
+ */
+export function buildIznClarificationMessage(
+  gateResult: IznGateResult & { allowed: false },
+): string {
+  const lines: string[] = [
+    '<system-reminder>',
+    `Izn gate — ${gateResult.category.join(', ')} detected. Pause and verify before retrying.`,
+    '',
+    '## Self-Verification Steps',
+    '',
+    ...gateResult.analysisPlan.map((step, i) => `${i + 1}. ${step}`),
+  ];
+
+  if (gateResult.impactScope.length > 0) {
+    lines.push(
+      '',
+      '## Impact Analysis (investigate before acting)',
+      '',
+      ...gateResult.impactScope.map((item, i) => `${i + 1}. ${item}`),
+    );
+  }
+
+  if (gateResult.intentQuestions.length > 0) {
+    lines.push(
+      '',
+      '## Clarify Intent (ask the user)',
+      '',
+      ...gateResult.intentQuestions.map((q, i) => `${i + 1}. ${q}`),
+    );
+  }
+
+  lines.push(
+    '',
+    'After completing verification and receiving confirmed intent, retry the tool call.',
+    '',
+    'If you cannot verify safety: do NOT retry. Use ask_user_question to revert to consultation.',
+    '</system-reminder>',
+  );
+
+  return lines.join('\n');
 }
 
 const VALIDATION_RETRY_LOOP_THRESHOLD = 3;
@@ -1051,14 +1106,26 @@ export class CoreToolScheduler {
                 toolArgs: toolParams,
               });
               if (!gateResult.allowed) {
-                this.setStatusInternal(reqInfo.callId, 'error', {
+                // ── Izn intent-clarification gate ──────────────────
+                // Instead of hard-blocking, return a system-reminder
+                // with the clarification plan so the model can
+                // investigate, trace dependencies, predict cascade
+                // effects, and ask the user to confirm intent before
+                // retrying.
+                const clarificationMsg =
+                  buildIznClarificationMessage(gateResult);
+                this.setToolCallOutcome(
+                  reqInfo.callId,
+                  ToolConfirmationOutcome.ProceedAlways,
+                );
+                this.setStatusInternal(reqInfo.callId, 'success', {
                   callId: reqInfo.callId,
                   responseParts: convertToFunctionResponse(
                     reqInfo.name,
                     reqInfo.callId,
-                    gateResult.requiredConfirmation,
+                    clarificationMsg,
                   ),
-                  resultDisplay: `Izn gate blocked ${reqInfo.name}: ${gateResult.reason}`,
+                  resultDisplay: undefined,
                   error: undefined,
                   errorType: undefined,
                 });

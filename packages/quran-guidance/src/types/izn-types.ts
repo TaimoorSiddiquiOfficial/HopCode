@@ -23,6 +23,14 @@ export type IznGateResult =
       allowed: false;
       reason: string;
       requiredConfirmation: string;
+      /** Intent clarification fields — model investigates before retrying. */
+      category: DestructiveActionCategory[];
+      /** Steps the model should take to understand impact before acting. */
+      analysisPlan: string[];
+      /** Questions to ask the user to clarify their intent. */
+      intentQuestions: string[];
+      /** What the model should investigate (files to read, deps to trace). */
+      impactScope: string[];
     };
 
 /** Izn mode behavior rules that layer onto the base guidance. */
@@ -37,6 +45,17 @@ export type IznBehaviorRule = {
   postReport: string[];
   /** When to revert to consultation despite having Izn. */
   revertCondition: string;
+  /** Impact analysis: what the model should investigate before acting. */
+  impactAnalysis: {
+    /** Files/patterns to read to understand what will be affected. */
+    readTargets: string[];
+    /** Dependency patterns to trace (imports, references, FK chains). */
+    dependencyChecks: string[];
+    /** Cascade-effect scenarios to predict and warn about. */
+    cascadeScenarios: string[];
+  };
+  /** Questions to ask the user to clarify their intent. */
+  intentQuestions: string[];
 };
 
 /** Extended situation angles when Izn mode is active. */

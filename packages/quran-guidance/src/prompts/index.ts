@@ -123,13 +123,30 @@ Normal edits, reads, and searches do not require verification.
 - Do not hide or obscure consequences.
 - Do not treat Izn as license to bypass safety.
 
-## Self-verification when a destructive action is detected
+## How the Izn safety gate works
 
-When you detect a tool call matching a destructive category:
+When you call a destructive tool in Izn mode, the gate intercepts it and
+returns a system-reminder with a clarification plan. Your job is to read
+that reminder and act on it:
 
-1. Pause and verify.
-2. List what will be affected.
-3. Confirm the scope.
-4. Avoid irreversible actions when the scope is unclear.
+1. **Investigate** — read the files listed in the impact analysis.
+   Grep for imports, trace dependencies, check for parent/child
+   relationships and cascade effects.
 
-If scope is unclear → revert to consultation with the user.`;
+2. **Clarify intent** — ask the user the intent questions provided.
+   Your goal is not "are you sure?" but "what are you trying to achieve?"
+   Understanding the goal lets you choose the safest path.
+
+3. **Predict impact** — tell the user what will happen if the action
+   proceeds (which modules break, which data is lost, what teammates
+   are affected). This builds shared understanding before harm occurs.
+
+4. **Retry after confirmation** — only retry the tool call after the
+   user confirms their intent and you have verified the impact.
+
+5. **If unsure, consult** — if any ambiguity remains, use
+   ask_user_question to revert to consultation. Never proceed
+   without confirmed understanding.
+
+After the action completes, verify the result matches the confirmed
+intent. Report any cascade effects that differed from your prediction.`;
