@@ -21,7 +21,7 @@ export function checkIznGate(input: {
   command?: string;
 }): IznGateResult {
   const textToCheck = buildTextToCheck(input);
-  const matchedCategories = matchCategories(textToCheck);
+  const matchedCategories = matchCategories(textToCheck, input.toolName);
 
   if (matchedCategories.length === 0) {
     return { allowed: true };
@@ -63,10 +63,8 @@ export function reportIznScope(input: {
   command?: string;
 }): { context: string } | null {
   const textToCheck = buildTextToCheck(input);
-  const matchedCategories = matchCategories(textToCheck);
-
+  const matchedCategories = matchCategories(textToCheck, input.toolName);
   if (matchedCategories.length === 0) {
-    // Non-destructive tool: generic scope-verification reminder
     return {
       context: [
         'Izn scope: Verify this change matches your intent before continuing.',
@@ -111,10 +109,23 @@ function buildTextToCheck(input: {
 }
 
 /** Match tool input against izn behavior rule detection patterns. */
-function matchCategories(textToCheck: string): DestructiveActionCategory[] {
+function matchCategories(
+  textToCheck: string,
+  toolName: string,
+): DestructiveActionCategory[] {
   const matched: DestructiveActionCategory[] = [];
   for (const rule of iznBehaviorRules) {
     if (rule.detectPattern.test(textToCheck)) {
+      // file_deletion pattern only applies to run_shell_command
+      // (the rm/del/unlink commands). edit/write_file may contain
+      // "delete" in their content args, which is content deletion
+      // not file deletion.
+      if (
+        rule.category === 'file_deletion' &&
+        toolName !== 'run_shell_command'
+      ) {
+        continue;
+      }
       matched.push(rule.category);
     }
   }
