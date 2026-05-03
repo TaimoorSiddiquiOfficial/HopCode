@@ -75,4 +75,20 @@ export const situationAngleMap: Record<AgentSituation, QuranicAngle[]> = {
     'transparency',
     'avoid_harm',
   ],
+  complex_implementation: [
+    'empowerment',
+    'capability',
+    'stewardship',
+    'excellence',
+    'wisdom',
+    'seeking_knowledge',
+  ],
+  empowered_execution: [
+    'empowerment',
+    'capability',
+    'stewardship',
+    'excellence',
+    'beneficial_work',
+    'trust',
+  ],
 };

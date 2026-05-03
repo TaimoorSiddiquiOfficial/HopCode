@@ -21,7 +21,10 @@ export type QuranicAngle =
   | 'accountability'
   | 'steadfastness'
   | 'seeking_knowledge'
-  | 'cooperation';
+  | 'cooperation'
+  | 'empowerment'
+  | 'capability'
+  | 'stewardship';
 
 export type AgentSituation =
   | 'uncertain_bug'
@@ -37,7 +40,9 @@ export type AgentSituation =
   | 'performance_issue'
   | 'ethical_risk'
   | 'general_advice'
-  | 'izn_mode_active';
+  | 'izn_mode_active'
+  | 'complex_implementation'
+  | 'empowered_execution';
 
 export type AyahGuidance = {
   ref: string;

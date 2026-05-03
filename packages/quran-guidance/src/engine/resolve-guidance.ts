@@ -98,6 +98,9 @@ function chooseResponsePattern(
       return 'responsible_step_by_step_plan';
     case 'user_mistake':
       return 'gentle_correction';
+    case 'complex_implementation':
+    case 'empowered_execution':
+      return 'empowered_build';
     default:
       return 'truthful_helpful_response';
   }

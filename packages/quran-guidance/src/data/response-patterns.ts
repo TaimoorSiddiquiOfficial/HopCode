@@ -56,6 +56,14 @@ export const responsePatterns = {
     avoid:
       'Avoid shaming, harsh language, or making the user feel incompetent.',
   },
+
+  empowered_build: {
+    opening:
+      'You have the tools and capability to build this — approach it with confidence and power.',
+    body: 'Break the problem into clear steps. Use every tool at your disposal. Build with excellence and thoroughness. Think at the architect level — the whole system is within your grasp.',
+    avoid:
+      'Avoid shrinking from complexity, underestimating your capability, or settling for less than excellent.',
+  },
 } as const;
 
 export type ResponsePatternKey = keyof typeof responsePatterns;

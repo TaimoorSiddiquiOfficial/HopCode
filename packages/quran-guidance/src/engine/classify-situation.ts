@@ -130,6 +130,28 @@ export function classifySituation(input: ClassifyInput): SituationAnalysis {
     };
   }
 
+  if (
+    text.includes('build') ||
+    text.includes('implement') ||
+    text.includes('create') ||
+    text.includes('complex') ||
+    text.includes('system') ||
+    text.includes('feature') ||
+    text.includes('full')
+  ) {
+    return {
+      situation: 'complex_implementation',
+      confidence: 0.7,
+      detectedSignals: ['build/implement/complex system language detected'],
+      requiredAngles: [
+        'empowerment',
+        'capability',
+        'stewardship',
+        'excellence',
+      ],
+    };
+  }
+
   return {
     situation: 'general_advice',
     confidence: 0.5,
