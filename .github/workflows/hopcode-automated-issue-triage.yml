@@ -64,7 +64,7 @@ jobs:
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
           OPENAI_MODEL: '${{ secrets.OPENAI_MODEL }}'
         run: |-
-          node dist/cli.js --approval-mode yolo --output-format json --max-session-turns 25 -p "$(cat <<'PROMPT_EOF'
+          node dist/cli.js --approval-mode izn --output-format json --max-session-turns 25 -p "$(cat <<'PROMPT_EOF'
 
           ## Role
 

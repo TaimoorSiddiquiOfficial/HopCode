@@ -120,7 +120,7 @@ jobs:
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
           OPENAI_MODEL: '${{ secrets.OPENAI_MODEL }}'
         run: |-
-          node dist/cli.js --approval-mode yolo --output-format json -p "$(cat <<'PROMPT_EOF'
+          node dist/cli.js --approval-mode izn --output-format json -p "$(cat <<'PROMPT_EOF'
             You are an expert code reviewer. You have access to shell commands to gather PR information and perform the review.
 
             IMPORTANT: Use the available shell commands to gather information. Do not ask for information to be provided.
