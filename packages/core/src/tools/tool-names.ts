@@ -38,6 +38,9 @@ export const ToolNames = {
   TASK_READY: 'task_ready',
   TASK_UPDATE: 'task_update',
   WEB_SEARCH: 'web_search',
+  REPO_MAP: 'repo_map',
+  BROWSER: 'browser',
+  BG_STOP: 'bg_stop',
 } as const;
 
 /**
@@ -74,6 +77,9 @@ export const ToolDisplayNames = {
   TASK_READY: 'TaskReady',
   TASK_UPDATE: 'TaskUpdate',
   WEB_SEARCH: 'WebSearch',
+  REPO_MAP: 'RepoMap',
+  BROWSER: 'Browser',
+  BG_STOP: 'BgStop',
 } as const;
 
 // Migration from old tool names to new tool names
@@ -83,6 +89,7 @@ export const ToolNamesMigration = {
   search_file_content: ToolNames.GREP, // Legacy name from grep tool
   replace: ToolNames.EDIT, // Legacy name from edit tool
   task: ToolNames.AGENT, // Legacy name from agent tool (renamed from task)
+  todo_write: ToolNames.TASK_LIST, // Legacy name from todo_write tool (replaced by task management tools)
 } as const;
 
 // Migration from old tool display names to new tool display names
@@ -92,4 +99,5 @@ export const ToolDisplayNamesMigration = {
   FindFiles: ToolDisplayNames.GLOB, // Old display name for Glob
   ReadFolder: ToolDisplayNames.LS, // Old display name for ListFiles
   Task: ToolDisplayNames.AGENT, // Old display name for Agent (renamed from Task)
+  TodoWrite: ToolDisplayNames.TASK_LIST, // Old display name for TodoWrite (replaced by task management tools)
 } as const;

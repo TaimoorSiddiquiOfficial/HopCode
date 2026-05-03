@@ -2948,6 +2948,18 @@ export class Config {
       const { WebFetchTool } = await import('../tools/web-fetch.js');
       return new WebFetchTool(this);
     });
+    await registerLazy(ToolNames.REPO_MAP, async () => {
+      const { RepoMapTool } = await import('../tools/repoMap.js');
+      return new RepoMapTool(this);
+    });
+    await registerLazy(ToolNames.BROWSER, async () => {
+      const { BrowserTool } = await import('../tools/browser.js');
+      return new BrowserTool(this);
+    });
+    await registerLazy(ToolNames.BG_STOP, async () => {
+      const { BgStopTool } = await import('../tools/bg-stop.js');
+      return new BgStopTool(this);
+    });
     if (this.isLspEnabled() && this.getLspClient()) {
       await registerLazy(ToolNames.LSP, async () => {
         const { LspTool } = await import('../tools/lsp.js');

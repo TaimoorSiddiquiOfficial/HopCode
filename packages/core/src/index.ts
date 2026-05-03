@@ -138,6 +138,9 @@ export type { WriteFileTool, WriteFileToolParams } from './tools/write-file.js';
 export type { CronCreateTool, CronCreateParams } from './tools/cron-create.js';
 export type { CronListTool, CronListParams } from './tools/cron-list.js';
 export type { CronDeleteTool, CronDeleteParams } from './tools/cron-delete.js';
+export type { RepoMapTool, RepoMapToolParams } from './tools/repoMap.js';
+export type { BrowserTool, BrowserToolParams } from './tools/browser.js';
+export type { BgStopTool, BgStopParams } from './tools/bg-stop.js';
 
 // ============================================================================
 // Services
@@ -158,6 +161,7 @@ export * from './services/shellExecutionService.js';
 export * from './services/monitorRegistry.js';
 export * from './services/backgroundShellRegistry.js';
 export * from './services/toolUseSummary.js';
+export * from './services/repoMapService.js';
 export * from './utils/bareMode.js';
 
 // ============================================================================
