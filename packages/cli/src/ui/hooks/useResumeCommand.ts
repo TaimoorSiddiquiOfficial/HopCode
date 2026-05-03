@@ -48,7 +48,6 @@ const BACKGROUND_WORK_SWITCH_BLOCKED_MESSAGE =
 function hasBlockingBackgroundWork(config: Config): boolean {
   return (
     config.getBackgroundTaskRegistry().hasUnfinalizedTasks() ||
-    config.getMonitorRegistry().getRunning().length > 0 ||
     config
       .getBackgroundShellRegistry()
       .getAll()
@@ -57,9 +56,8 @@ function hasBlockingBackgroundWork(config: Config): boolean {
 }
 
 function resetBackgroundStateForSessionSwitch(config: Config): void {
-  config.getBackgroundTaskRegistry().reset();
-  config.getMonitorRegistry().reset();
-  config.getBackgroundShellRegistry().reset();
+  (config.getBackgroundTaskRegistry() as unknown as { reset(): void }).reset();
+  (config.getBackgroundShellRegistry() as unknown as { reset(): void }).reset();
 }
 
 export function useResumeCommand(

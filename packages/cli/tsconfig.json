@@ -6,9 +6,6 @@
     "baseUrl": ".",
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "types": ["node", "vitest/globals"],
-    "skipLibCheck": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "noEmitOnError": false,
     "paths": {
       "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
       "@hoptrendy/hopcode-core/*": ["../core/src/*"]

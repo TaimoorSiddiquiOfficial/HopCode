@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Hop Trendy
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,7 +60,7 @@ const LEGACY_FORK_RESUME_BLOCKED_REASON =
 const LEGACY_FORK_CAPABILITIES_BLOCKED_REASON =
   'Fork background task cannot be safely resumed because its launch-time runtime constraints are missing.';
 
-type ApprovalModeValue = 'plan' | 'default' | 'auto-edit' | 'izn';
+type ApprovalModeValue = 'plan' | 'default' | 'auto-edit' | 'yolo';
 
 interface TranscriptRecovery {
   history: Content[];
@@ -94,8 +94,8 @@ interface RestorePausedEntryOptions {
 
 function approvalModeToPermissionMode(mode?: string): PermissionMode {
   switch (mode) {
-    case 'izn':
-      return PermissionMode.Izn;
+    case 'yolo':
+      return PermissionMode.Yolo;
     case 'auto-edit':
       return PermissionMode.AutoEdit;
     case 'plan':
@@ -114,7 +114,7 @@ function normalizeApprovalMode(
     case 'plan':
     case 'default':
     case 'auto-edit':
-    case 'izn':
+    case 'yolo':
       return value;
     default:
       return fallback;
@@ -128,7 +128,7 @@ function reconcileResumedApprovalMode(
 ): ApprovalModeValue {
   if (
     isTrustedFolder ||
-    (persistedMode !== 'auto-edit' && persistedMode !== 'izn')
+    (persistedMode !== 'auto-edit' && persistedMode !== 'yolo')
   ) {
     return persistedMode;
   }

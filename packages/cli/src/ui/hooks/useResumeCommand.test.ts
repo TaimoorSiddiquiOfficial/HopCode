@@ -166,10 +166,6 @@ describe('useResumeCommand', () => {
         getAll: vi.fn().mockReturnValue([]),
         reset: vi.fn(),
       }),
-      getMonitorRegistry: () => ({
-        getRunning: vi.fn().mockReturnValue([]),
-        reset: resetMonitorRegistry,
-      }),
       loadPausedBackgroundAgents: vi.fn().mockResolvedValue([]),
       getBackgroundAgentResumeService: () => ({
         buildRecoveredBackgroundAgentsNotice: vi.fn(),

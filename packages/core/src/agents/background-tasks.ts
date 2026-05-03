@@ -156,6 +156,10 @@ export interface BackgroundTaskEntry {
   >;
 }
 
+interface CancelOptions {
+  persistedStatus?: Extract<BackgroundTaskStatus, 'running' | 'cancelled'>;
+}
+
 export interface NotificationMeta {
   agentId: string;
   status: BackgroundTaskStatus;
@@ -266,7 +270,7 @@ export class BackgroundTaskRegistry {
   // case where a tool ignores AbortSignal and bgBody never settles — the
   // timeout lands on finalizeCancellationIfPending(), which is a no-op
   // once the natural handler has already emitted.
-  cancel(agentId: string, options: BackgroundTaskCancelOptions = {}): void {
+  cancel(agentId: string, options: CancelOptions = {}): void {
     const entry = this.agents.get(agentId);
     if (!entry || entry.status !== 'running') return;
     const persistedStatus = options.persistedStatus ?? 'cancelled';
@@ -472,15 +476,7 @@ export class BackgroundTaskRegistry {
       ...options,
     };
     for (const entry of Array.from(this.agents.values())) {
-      if (entry.status === 'running') {
-        this.cancel(entry.agentId, cancelOptions);
-      }
-
-      if (cancelOptions.notify === false) {
-        entry.notified = true;
-        continue;
-      }
-
+      this.cancel(entry.agentId, cancelOptions);
       // Shutdown path: no natural handler will run, so emit the cancelled
       // notification here to honour the one-notification-per-agent contract.
       this.finalizeCancellationIfPending(entry.agentId);

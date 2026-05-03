@@ -51,117 +51,6 @@ const debugLogger = createDebugLogger('SHELL');
 export const OUTPUT_UPDATE_INTERVAL_MS = 1000;
 const DEFAULT_FOREGROUND_TIMEOUT_MS = 120000;
 
-/**
- * Detect standalone or leading `sleep N` patterns that should use Monitor
- * instead. Catches `sleep 5`, `sleep 2.5`, `sleep 2s`,
- * `sleep 5 && check`, `sleep 5; check`, `sleep 5 # wait` — but not sleep
- * inside pipelines, subshells, backgrounded commands, or scripts (those are
- * fine).
- */
-export function detectBlockedSleepPattern(command: string): string | null {
-  // Strip trailing shell comments first; otherwise `sleep 5 # wait` would
-  // present `# wait` as the suffix, which `getSleepSequentialSeparator`
-  // rejects (only &&/||/;/\n are recognized), letting the foreground sleep
-  // bypass the guard. Shell ignores top-level trailing comments, so for the
-  // purposes of detection they are equivalent to end-of-command.
-  const trimmed = trimTrailingShellComment(command).trim();
-  if (!trimmed.startsWith('sleep')) return null;
-  const afterSleep = trimmed.slice('sleep'.length);
-  if (!afterSleep || !/\s/.test(afterSleep[0]!)) return null;
-
-  let index = 0;
-  while (index < afterSleep.length && /\s/.test(afterSleep[index]!)) {
-    index++;
-  }
-  const durationStart = index;
-  while (
-    index < afterSleep.length &&
-    !/\s/.test(afterSleep[index]!) &&
-    ![';', '&', '|', '\n'].includes(afterSleep[index]!)
-  ) {
-    index++;
-  }
-
-  const durationToken = afterSleep.slice(durationStart, index);
-  const secs = parseSleepDurationToSeconds(durationToken);
-  if (secs === null || secs < 2) return null;
-
-  const suffix = afterSleep.slice(index);
-  const separator = getSleepSequentialSeparator(suffix);
-  if (separator === null) return null;
-
-  const rest = separator.rest.trim();
-  return rest
-    ? `sleep ${durationToken} followed by: ${rest}`
-    : `standalone sleep ${durationToken}`;
-}
-
-function parseSleepDurationToSeconds(token: string): number | null {
-  if (!token) return null;
-
-  let index = 0;
-  let seenDigit = false;
-  let seenDot = false;
-  while (index < token.length) {
-    const char = token[index]!;
-    if (char >= '0' && char <= '9') {
-      seenDigit = true;
-      index++;
-      continue;
-    }
-    if (char === '.' && !seenDot) {
-      seenDot = true;
-      index++;
-      continue;
-    }
-    break;
-  }
-
-  if (!seenDigit) return null;
-  const value = Number.parseFloat(token.slice(0, index));
-  if (!Number.isFinite(value)) return null;
-
-  const unit = token.slice(index).toLowerCase();
-  switch (unit || 's') {
-    case 'ms':
-      return value / 1000;
-    case 's':
-      return value;
-    case 'm':
-      return value * 60;
-    case 'h':
-      return value * 60 * 60;
-    case 'd':
-      return value * 60 * 60 * 24;
-    default:
-      return null;
-  }
-}
-
-function getSleepSequentialSeparator(suffix: string): { rest: string } | null {
-  let index = 0;
-  while (
-    index < suffix.length &&
-    suffix[index] !== '\n' &&
-    /\s/.test(suffix[index]!)
-  ) {
-    index++;
-  }
-
-  const restWithSeparator = suffix.slice(index);
-  if (!restWithSeparator) return { rest: '' };
-  if (
-    restWithSeparator.startsWith('&&') ||
-    restWithSeparator.startsWith('||')
-  ) {
-    return { rest: restWithSeparator.slice(2) };
-  }
-  if (restWithSeparator[0] === ';' || restWithSeparator[0] === '\n') {
-    return { rest: restWithSeparator.slice(1) };
-  }
-  return null;
-}
-
 function trimTrailingShellComment(command: string): string {
   let inSingleQuote = false;
   let inDoubleQuote = false;
@@ -738,9 +627,8 @@ export class ShellToolInvocation extends BaseToolInvocation<
     signal: AbortSignal,
     shellExecutionConfig?: ShellExecutionConfig,
   ): Promise<ToolResult> {
-    const processedCommand = this.addCoAuthorToGitCommit(
-      this.params.command.trim(),
-    );
+    const strippedCommand = stripShellWrapper(this.params.command);
+    const processedCommand = this.addCoAuthorToGitCommit(strippedCommand);
     const cwd = this.params.directory || this.config.getTargetDir();
 
     // Output goes under the project temp dir (which `ReadFileTool`

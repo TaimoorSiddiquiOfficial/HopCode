@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Hop Trendy
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -521,7 +521,7 @@ describe('BackgroundAgentResumeService', () => {
       createdAt: '2026-04-20T00:00:00.000Z',
       status: 'running',
       subagentName: 'researcher',
-      resolvedApprovalMode: 'izn',
+      resolvedApprovalMode: 'yolo',
     });
     fs.writeFileSync(
       outputFile,
@@ -793,7 +793,7 @@ describe('BackgroundAgentResumeService', () => {
       | undefined;
     expect(contextArg).toBeDefined();
     if (!contextArg) {
-      throw new Error('Expected fork resume execute context');
+      throw new Error('Expected resume execute context');
     }
     expect(contextArg.get('task_prompt')).toBe('continue');
     createSpy.mockRestore();
