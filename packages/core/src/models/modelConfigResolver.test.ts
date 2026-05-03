@@ -202,9 +202,7 @@ describe('modelConfigResolver', () => {
         expect(result.config.timeout).toBe(45000);
         expect(result.sources['timeout']).toBeDefined();
         expect(result.sources['timeout'].kind).toBe('env');
-        expect(result.sources['timeout'].envKey).toBe(
-          'QWEN_CODE_API_TIMEOUT_MS',
-        );
+        expect(result.sources['timeout'].envKey).toBe('HOPCODE_API_TIMEOUT_MS');
         expect(result.config.model).toBe(DEFAULT_HOPCODE_MODEL);
       });
 
@@ -388,9 +386,7 @@ describe('modelConfigResolver', () => {
 
         expect(result.config.timeout).toBe(900000);
         expect(result.sources['timeout'].kind).toBe('env');
-        expect(result.sources['timeout'].envKey).toBe(
-          'QWEN_CODE_API_TIMEOUT_MS',
-        );
+        expect(result.sources['timeout'].envKey).toBe('HOPCODE_API_TIMEOUT_MS');
       });
 
       it('modelProvider timeout wins over QWEN_CODE_API_TIMEOUT_MS', () => {
@@ -438,9 +434,7 @@ describe('modelConfigResolver', () => {
 
         expect(result.config.timeout).toBe(900000);
         expect(result.sources['timeout'].kind).toBe('env');
-        expect(result.sources['timeout'].envKey).toBe(
-          'QWEN_CODE_API_TIMEOUT_MS',
-        );
+        expect(result.sources['timeout'].envKey).toBe('HOPCODE_API_TIMEOUT_MS');
       });
 
       it('ignores invalid QWEN_CODE_API_TIMEOUT_MS values', () => {
@@ -516,9 +510,7 @@ describe('modelConfigResolver', () => {
 
         expect(result.config.timeout).toBe(600000);
         expect(result.sources['timeout'].kind).toBe('env');
-        expect(result.sources['timeout'].envKey).toBe(
-          'QWEN_CODE_API_TIMEOUT_MS',
-        );
+        expect(result.sources['timeout'].envKey).toBe('HOPCODE_API_TIMEOUT_MS');
       });
 
       it('env var actually changes resolved timeout value', () => {
@@ -541,9 +533,7 @@ describe('modelConfigResolver', () => {
         // Timeout should be the env var value, not the settings value
         expect(result.config.timeout).toBe(900000);
         expect(result.sources['timeout'].kind).toBe('env');
-        expect(result.sources['timeout'].envKey).toBe(
-          'QWEN_CODE_API_TIMEOUT_MS',
-        );
+        expect(result.sources['timeout'].envKey).toBe('HOPCODE_API_TIMEOUT_MS');
 
         // Prove it would be used by the client (default.ts:48 reads config.timeout)
         const clientTimeout = result.config.timeout;
@@ -705,7 +695,7 @@ describe('modelConfigResolver', () => {
       expect(result.config.timeout).toBe(45000);
       expect(result.sources['timeout']).toBeDefined();
       expect(result.sources['timeout'].kind).toBe('env');
-      expect(result.sources['timeout'].envKey).toBe('QWEN_CODE_API_TIMEOUT_MS');
+      expect(result.sources['timeout'].envKey).toBe('HOPCODE_API_TIMEOUT_MS');
       expect(result.config.model).toBe(DEFAULT_HOPCODE_MODEL);
     });
 
@@ -722,7 +712,7 @@ describe('modelConfigResolver', () => {
 
       expect(result.config.timeout).toBe(900000);
       expect(result.sources['timeout'].kind).toBe('env');
-      expect(result.sources['timeout'].envKey).toBe('QWEN_CODE_API_TIMEOUT_MS');
+      expect(result.sources['timeout'].envKey).toBe('HOPCODE_API_TIMEOUT_MS');
     });
 
     it('[Regression] modelProvider timeout must win over env in both paths', () => {
