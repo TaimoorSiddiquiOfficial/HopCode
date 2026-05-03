@@ -67,7 +67,13 @@ export const clearCommand: SlashCommand = {
           config.getDebugLogger().warn(`SessionEnd hook failed: ${err}`);
         });
 
+      // Abort old-session async work before creating the new session so
+      // cancellation notifications cannot leak across the reset boundary.
+      config.getBackgroundTaskRegistry().abortAll({ notify: false });
+      config.getMonitorRegistry().abortAll({ notify: false });
+      config.getBackgroundShellRegistry().abortAll();
       resetBackgroundStateForSessionSwitch(config);
+
       const newSessionId = config.startNewSession();
 
       // Reset UI telemetry metrics for the new session

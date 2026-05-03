@@ -61,11 +61,13 @@ describe('clearCommand', () => {
             }) as unknown as GeminiClient,
           getBackgroundTaskRegistry: vi.fn().mockReturnValue({
             hasUnfinalizedTasks: vi.fn().mockReturnValue(false),
-            reset: vi.fn(),
+            abortAll: mockAbortBackgroundTasks,
+            reset: mockResetBackgroundTasks,
           }),
           getBackgroundShellRegistry: vi.fn().mockReturnValue({
             getAll: vi.fn().mockReturnValue([]),
-            reset: vi.fn(),
+            abortAll: mockAbortBackgroundShells,
+            reset: mockResetBackgroundShells,
           }),
           startNewSession: mockStartNewSession,
           getHookSystem: mockGetHookSystem,
@@ -295,11 +297,13 @@ describe('clearCommand', () => {
             getHookSystem: mockGetHookSystem,
             getBackgroundTaskRegistry: vi.fn().mockReturnValue({
               hasUnfinalizedTasks: vi.fn().mockReturnValue(false),
-              reset: vi.fn(),
+              abortAll: mockAbortBackgroundTasks,
+              reset: mockResetBackgroundTasks,
             }),
             getBackgroundShellRegistry: vi.fn().mockReturnValue({
               getAll: vi.fn().mockReturnValue([]),
-              reset: vi.fn(),
+              abortAll: mockAbortBackgroundShells,
+              reset: mockResetBackgroundShells,
             }),
             startNewSession: mockStartNewSession,
             getHopCodeClient: vi.fn().mockReturnValue({
