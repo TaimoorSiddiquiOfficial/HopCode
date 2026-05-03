@@ -375,7 +375,8 @@ export default {
   'Custom Witty Phrases': '自定义诙谐短语',
   'Show Welcome Back Dialog': '显示欢迎回来对话框',
   'Enable User Feedback': '启用用户反馈',
-  'How is Qwen doing this session? (optional)': 'Qwen 这次表现如何？（可选）',
+  'How is HopCode doing this session? (optional)':
+    'Qwen 这次表现如何？（可选）',
   Bad: '不满意',
   Fine: '还行',
   Good: '满意',
@@ -657,8 +658,8 @@ export default {
   'Exit codes:': '退出码：',
   'Configured hooks:': '已配置的 Hook：',
   'No hooks configured for this event.': '此事件未配置 Hook。',
-  'To add hooks, edit settings.json directly or ask Qwen.':
-    '要添加 Hook，请直接编辑 settings.json 或询问 Qwen。',
+  'To add hooks, edit settings.json directly or ask HopCode.':
+    '要添加 Hook，请直接编辑 settings.json 或询问 HopCode。',
   'Enter to select · Esc to go back': 'Enter 选择 · Esc 返回',
   // Hooks - Config Detail Step
   'Hook details': 'Hook 详情',
@@ -666,8 +667,8 @@ export default {
   'Extension:': '扩展：',
   'Desc:': '描述：',
   'No hook config selected': '未选择 Hook 配置',
-  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
-    '要修改或删除此 Hook，请直接编辑 settings.json 或询问 Qwen。',
+  'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
+    '要修改或删除此 Hook，请直接编辑 settings.json 或询问 HopCode。',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'Hook 配置 - 已禁用',
   'All hooks are currently disabled. You have {{count}} that are not running.':
@@ -742,7 +743,7 @@ export default {
     '仅向用户显示 stderr 但继续工具调用',
   'block processing, erase original prompt, and show stderr to user only':
     '阻止处理，擦除原始提示，仅向用户显示 stderr',
-  'stdout shown to Qwen': '向 Qwen 显示 stdout',
+  'stdout shown to HopCode': '向 HopCode 显示 stdout',
   'show stderr to user only (blocking errors ignored)':
     '仅向用户显示 stderr（忽略阻塞错误）',
   'command completes successfully': '命令成功完成',
@@ -1018,7 +1019,7 @@ export default {
   servers: '个服务器',
   'Add MCP servers to your settings to get started.':
     '请在设置中添加 MCP 服务器以开始使用。',
-  'Run qwen --debug to see error logs': '运行 qwen --debug 查看错误日志',
+  'Run hopcode --debug to see error logs': '运行 hopcode --debug 查看错误日志',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth 认证',
@@ -1339,8 +1340,8 @@ export default {
   'Failed to authenticate. Message: {{message}}': '认证失败。消息：{{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     '使用 {{authType}} 凭据成功认证。',
-  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    '无效的 QWEN_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值为：{{validValues}}',
+  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    '无效的 HOPCODE_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值为：{{validValues}}',
   'OpenAI Configuration Required': '需要配置 OpenAI',
   'Please enter your OpenAI configuration. You can get an API key from':
     '请输入您的 OpenAI 配置。您可以从以下地址获取 API 密钥：',
@@ -1525,8 +1526,8 @@ export default {
     '在 HopCode 中使用 ! 可运行任意 shell 命令（例如 !ls）。',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     '输入 / 打开命令弹窗；按 Tab 自动补全斜杠命令和保存的提示词。',
-  'You can resume a previous conversation by running qwen --continue or qwen --resume.':
-    '运行 qwen --continue 或 qwen --resume 可继续之前的会话。',
+  'You can resume a previous conversation by running hopcode --continue or hopcode --resume.':
+    '运行 hopcode --continue 或 hopcode --resume 可继续之前的会话。',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
     '按 Shift+Tab 或输入 /approval-mode 可快速切换权限模式。',
   'You can switch permission mode quickly with Tab or /approval-mode.':
@@ -1832,8 +1833,8 @@ export default {
   // ============================================================================
   // Commands - Auth
   // ============================================================================
-  'Configure Qwen authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
-    '使用 Qwen OAuth 或阿里云百炼 Coding Plan 配置 Qwen 认证信息',
+  'Configure authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
+    '使用 Qwen OAuth 或阿里云百炼 Coding Plan 配置认证信息',
   'Authenticate using Qwen OAuth': '使用 Qwen OAuth 进行认证',
   'Authenticate using Alibaba Cloud Coding Plan':
     '使用阿里云百炼 Coding Plan 进行认证',
@@ -1862,13 +1863,13 @@ export default {
   '⚠️  No authentication method configured.\n': '⚠️  未配置认证方式。\n',
   'Run one of the following commands to get started:\n':
     '运行以下命令之一开始配置：\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - 使用 Qwen OAuth 登录（已停用）',
-  '  qwen auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
-    '  qwen auth coding-plan      - 使用阿里云百炼 Coding Plan 认证\n',
+  '  hopcode auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  hopcode auth qwen-oauth     - 使用 Qwen OAuth 登录（已停用）',
+  '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
+    '  hopcode auth coding-plan      - 使用阿里云百炼 Coding Plan 认证\n',
   'Or simply run:': '或者直接运行：',
-  '  qwen auth                - Interactive authentication setup\n':
-    '  qwen auth                - 交互式认证配置\n',
+  '  hopcode auth                - Interactive authentication setup\n':
+    '  hopcode auth                - 交互式认证配置\n',
   '✓ Authentication Method: Qwen OAuth': '✓ 认证方式：Qwen OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  类型：免费额度（2026-04-15 已停用）',
@@ -1888,8 +1889,8 @@ export default {
     '⚠️  认证方式：阿里云百炼 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  问题：在环境变量或设置中未找到 API 密钥\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  运行 `qwen auth coding-plan` 重新配置。\n',
+  '  Run `hopcode auth coding-plan` to re-configure.\n':
+    '  运行 `hopcode auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 认证方式：{{type}}',
   '  Status: Configured\n': '  状态：已配置\n',
   'Failed to check authentication status: {{error}}':

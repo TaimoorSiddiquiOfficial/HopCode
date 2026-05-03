@@ -89,7 +89,7 @@ export async function getIdeClientName(
 /**
  * Gets the sandbox environment information.
  * Handles different sandbox types including sandbox-exec and custom sandbox environments.
- * For bug reports, removes 'hopcode-' or 'qwen-' prefixes from sandbox names.
+ * For bug reports, removes 'hopcode-' prefixes from sandbox names.
  *
  * @param stripPrefix - Whether to strip 'hopcode-' prefix (used for bug reports)
  */

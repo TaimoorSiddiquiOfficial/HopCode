@@ -108,7 +108,7 @@ beforeEach(() => {
   mockBridgeStart.mockResolvedValue(undefined);
   mockChannelConnect.mockRejectedValue(new Error('stop after channel setup'));
   mockCreateChannel.mockReturnValue(mockChannel);
-  mockFindCliEntryPath.mockReturnValue('/tmp/qwen-cli-entry.js');
+  mockFindCliEntryPath.mockReturnValue('/tmp/hopcode-cli-entry.js');
   mockGetExtensionManager.mockResolvedValue({ getLoadedExtensions: () => [] });
   mockGetPlugin.mockResolvedValue({ createChannel: mockCreateChannel });
   mockLoadSettings.mockReturnValue({ merged: { channels: {} } });

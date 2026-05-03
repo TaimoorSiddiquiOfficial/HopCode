@@ -1,9 +1,9 @@
 ﻿#!/usr/bin/env python3
 """
-Qwen Concurrent Runner - Execute multiple CLI tasks across different models concurrently.
+HopCode Concurrent Runner - Execute multiple CLI tasks across different models concurrently.
 
 This tool creates isolated git worktrees for each task/model combination and executes
-the Qwen CLI in parallel with status tracking and output capture.
+the HopCode CLI in parallel with status tracking and output capture.
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ class RunRecord:
     task_name: str
     model: str
     status: RunStatus
-    auth_type: Optional[str] = None  # e.g. "anthropic" for qwen --auth-type
+    auth_type: Optional[str] = None  # e.g. "anthropic" for hopcode --auth-type
     worktree_path: Optional[str] = None
     output_dir: Optional[str] = None
     logs_dir: Optional[str] = None
@@ -512,7 +512,7 @@ class StatusTracker:
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Qwen Runner Report</title>
+    <title>HopCode Runner Report</title>
     <style>
         body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f7f9; }}
         h1 {{ color: #1a202c; }}
@@ -537,7 +537,7 @@ class StatusTracker:
     </style>
 </head>
 <body>
-    <h1>Qwen Runner Execution Report</h1>
+    <h1>HopCode Runner Execution Report</h1>
     <div class="summary">
         <div class="summary-card"><h3>Total</h3><div class="value">{total}</div></div>
         <div class="summary-card"><h3 style="color: #38a169;">Succeeded</h3><div class="value" style="color: #38a169;">{succeeded}</div></div>
@@ -712,8 +712,8 @@ class ProgressDisplay:
         ))
 
 
-class QwenRunner:
-    """Executes the Qwen CLI for a specific task and model."""
+class HopCodeRunner:
+    """Executes the HopCode CLI for a specific task and model."""
 
     def __init__(self, config: RunConfig, console: Console):
         self.config = config
@@ -725,7 +725,7 @@ class QwenRunner:
         worktree_dir: Path,
         output_dir: Path,
     ) -> None:
-        """Execute the Qwen CLI for each prompt sequentially."""
+        """Execute the HopCode CLI for each prompt sequentially."""
         output_dir.mkdir(parents=True, exist_ok=True)
         run.output_dir = str(output_dir)
 
@@ -810,8 +810,8 @@ class QwenRunner:
             run.stderr_file = run.prompt_results[0].stderr_file
 
     def _build_command(self, run: RunRecord, prompt_text: str, use_continue: bool = False) -> List[str]:
-        """Build the qwen CLI command for a single prompt."""
-        cmd = ["qwen"]
+        """Build the hopcode CLI command for a single prompt."""
+        cmd = ["hopcode"]
 
         # Add model
         cmd.extend(["--model", run.model])
@@ -894,7 +894,7 @@ async def execute_single_run(
     config: RunConfig,
     tracker: StatusTracker,
     worktree_manager: GitWorktreeManager,
-    qwen_runner: QwenRunner,
+    hopcode_runner: HopCodeRunner,
     console: Console,
 ) -> None:
     """Execute a single run with proper cleanup."""
@@ -911,7 +911,7 @@ async def execute_single_run(
         # Step 2: Run CLI
         await tracker.update_status(run.run_id, RunStatus.RUNNING)
         output_dir = config.outputs_dir / run.run_id
-        await qwen_runner.run(run, worktree_dir, output_dir)
+        await hopcode_runner.run(run, worktree_dir, output_dir)
         
         # Step 3: Success
         run.ended_at = datetime.now().isoformat()
@@ -997,7 +997,7 @@ async def run_all(config: RunConfig, console: Console) -> ExecutionState:
     
     worktree_manager = GitWorktreeManager(console, config.source_repo)
     await worktree_manager.ensure_git_repo()
-    qwen_runner = QwenRunner(config, console)
+    hopcode_runner = HopCodeRunner(config, console)
     display = ProgressDisplay(console)
 
     # Start progress display
@@ -1024,7 +1024,7 @@ async def run_all(config: RunConfig, console: Console) -> ExecutionState:
     async def execute_with_limit(run: RunRecord):
         async with semaphore:
             await execute_single_run(
-                run, config, tracker, worktree_manager, qwen_runner, console
+                run, config, tracker, worktree_manager, hopcode_runner, console
             )
 
     # Run everything
@@ -1046,7 +1046,7 @@ async def run_all(config: RunConfig, console: Console) -> ExecutionState:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Qwen Concurrent Runner - Execute multiple CLI tasks across models"
+        description="HopCode Concurrent Runner - Execute multiple CLI tasks across models"
     )
     parser.add_argument(
         "config",

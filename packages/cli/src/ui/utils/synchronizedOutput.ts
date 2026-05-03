@@ -34,17 +34,20 @@ export function resetSynchronizedOutputStats(): void {
 export function terminalSupportsSynchronizedOutput(
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
-  if (
-    env['QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT'] === '1' ||
-    env['QWEN_CODE_SYNCHRONIZED_OUTPUT'] === '0'
-  ) {
+  const disableSynced =
+    env['HOPCODE_DISABLE_SYNCHRONIZED_OUTPUT'] ??
+    env['QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT'];
+  const synced =
+    env['HOPCODE_SYNCHRONIZED_OUTPUT'] ?? env['QWEN_CODE_SYNCHRONIZED_OUTPUT'];
+  const forceSynced =
+    env['HOPCODE_FORCE_SYNCHRONIZED_OUTPUT'] ??
+    env['QWEN_CODE_FORCE_SYNCHRONIZED_OUTPUT'];
+
+  if (disableSynced === '1' || synced === '0') {
     return false;
   }
 
-  if (
-    env['QWEN_CODE_FORCE_SYNCHRONIZED_OUTPUT'] === '1' ||
-    env['QWEN_CODE_SYNCHRONIZED_OUTPUT'] === '1'
-  ) {
+  if (forceSynced === '1' || synced === '1') {
     return true;
   }
 

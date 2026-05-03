@@ -107,7 +107,7 @@ export interface ModelConfigResolutionResult {
 }
 
 /**
- * Applies QWEN_CODE_API_TIMEOUT_MS env override if modelProvider has not set a timeout.
+ * Applies HOPCODE_API_TIMEOUT_MS env override if modelProvider has not set a timeout.
  * Precedence: modelProvider > env > settings > default
  * Mutates generationConfig and sources in-place.
  */
@@ -119,7 +119,7 @@ function applyTimeoutEnvOverride(
 ): void {
   if (modelProvider?.generationConfig?.timeout !== undefined) return;
 
-  const raw = env['QWEN_CODE_API_TIMEOUT_MS'];
+  const raw = env['HOPCODE_API_TIMEOUT_MS'] ?? env['QWEN_CODE_API_TIMEOUT_MS'];
   if (raw === undefined) return;
 
   const parsed = Number(raw);
@@ -127,7 +127,7 @@ function applyTimeoutEnvOverride(
     generationConfig.timeout = Math.floor(parsed);
     sources['timeout'] = {
       kind: 'env',
-      envKey: 'QWEN_CODE_API_TIMEOUT_MS',
+      envKey: 'HOPCODE_API_TIMEOUT_MS',
     };
   }
 }

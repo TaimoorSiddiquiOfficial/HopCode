@@ -730,7 +730,7 @@ export class GeminiChat {
       signal: params.config?.abortSignal,
       heartbeatFn: (info) => {
         process.stderr.write(
-          `[qwen-code] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
+          `[hopcode] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
         );
       },
     });

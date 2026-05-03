@@ -1015,7 +1015,7 @@ describe('WebViewProvider settings sync', () => {
     );
   });
 
-  it('ignores non-auth qwen-code setting changes', async () => {
+  it('ignores non-auth hopcode setting changes', async () => {
     const provider = new WebViewProvider(
       { subscriptions: [] } as never,
       { fsPath: '/extension-root' } as never,
@@ -1032,12 +1032,12 @@ describe('WebViewProvider settings sync', () => {
     const configChangeHandler = mockConfigChangeHandlers.at(-1);
     expect(configChangeHandler).toBeDefined();
 
-    await configChangeHandler?.(createConfigChangeEvent('qwen-code'));
+    await configChangeHandler?.(createConfigChangeEvent('hopcode'));
 
     expect(syncSpy).not.toHaveBeenCalled();
   });
 
-  it('reacts to auth-related qwen-code setting changes', async () => {
+  it('reacts to auth-related hopcode setting changes', async () => {
     const provider = new WebViewProvider(
       { subscriptions: [] } as never,
       { fsPath: '/extension-root' } as never,
@@ -1055,7 +1055,7 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'hopcode.apiKey'),
+      createConfigChangeEvent('hopcode', 'hopcode.apiKey'),
     );
 
     expect(syncSpy).toHaveBeenCalledTimes(1);
@@ -1091,7 +1091,7 @@ describe('WebViewProvider settings sync', () => {
     expect(configChangeHandler).toBeDefined();
 
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'hopcode.apiKey'),
+      createConfigChangeEvent('hopcode', 'hopcode.apiKey'),
     );
 
     // Should clear persisted auth
@@ -1141,7 +1141,7 @@ describe('WebViewProvider settings sync', () => {
 
     // Changing codingPlanRegion should NOT trigger de-auth
     await configChangeHandler?.(
-      createConfigChangeEvent('qwen-code', 'hopcode.codingPlanRegion'),
+      createConfigChangeEvent('hopcode', 'hopcode.codingPlanRegion'),
     );
 
     expect(mockClearPersistedAuth).not.toHaveBeenCalled();

@@ -908,7 +908,9 @@ export const useAuthCommand = (
     * or broken authentication cycles.
     */
   useEffect(() => {
-    const defaultAuthType = process.env['QWEN_DEFAULT_AUTH_TYPE'];
+    const defaultAuthType =
+      process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ??
+      process.env['QWEN_DEFAULT_AUTH_TYPE'];
     if (
       defaultAuthType &&
       ![
@@ -921,7 +923,7 @@ export const useAuthCommand = (
     ) {
       onAuthError(
         t(
-          'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}',
+          'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}',
           {
             value: defaultAuthType,
             validValues: [

@@ -141,7 +141,10 @@ export function preconnectApi(
   }
 
   // Check if disabled
-  if (process.env['QWEN_CODE_DISABLE_PRECONNECT'] === '1') {
+  if (
+    process.env['HOPCODE_DISABLE_PRECONNECT'] === '1' ||
+    process.env['QWEN_CODE_DISABLE_PRECONNECT'] === '1'
+  ) {
     debugLogger.debug('Preconnect disabled by environment variable');
     preconnectFired = true;
     return;

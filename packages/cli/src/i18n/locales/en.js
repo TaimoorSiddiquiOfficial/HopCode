@@ -391,7 +391,7 @@ export default {
   'Custom Witty Phrases': 'Custom Witty Phrases',
   'Show Welcome Back Dialog': 'Show Welcome Back Dialog',
   'Enable User Feedback': 'Enable User Feedback',
-  'How is Qwen doing this session? (optional)':
+  'How is HopCode doing this session? (optional)':
     'How is HopCode doing this session? (optional)',
   Bad: 'Bad',
   Fine: 'Fine',
@@ -694,7 +694,7 @@ export default {
   'Exit codes:': 'Exit codes:',
   'Configured hooks:': 'Configured hooks:',
   'No hooks configured for this event.': 'No hooks configured for this event.',
-  'To add hooks, edit settings.json directly or ask Qwen.':
+  'To add hooks, edit settings.json directly or ask HopCode.':
     'To add hooks, edit settings.json directly or ask HopCode.',
   'Enter to select · Esc to go back': 'Enter to select · Esc to go back',
   // Hooks - Config Detail Step
@@ -703,7 +703,7 @@ export default {
   'Extension:': 'Extension:',
   'Desc:': 'Desc:',
   'No hook config selected': 'No hook config selected',
-  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+  'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
     'To modify or remove this hook, edit settings.json directly or ask HopCode to help.',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'Hook Configuration - Disabled',
@@ -783,7 +783,7 @@ export default {
     'show stderr to user only but continue with tool call',
   'block processing, erase original prompt, and show stderr to user only':
     'block processing, erase original prompt, and show stderr to user only',
-  'stdout shown to Qwen': 'stdout shown to HopCode',
+  'stdout shown to HopCode': 'stdout shown to HopCode',
   'show stderr to user only (blocking errors ignored)':
     'show stderr to user only (blocking errors ignored)',
   'command completes successfully': 'command completes successfully',
@@ -1079,7 +1079,8 @@ export default {
   servers: 'servers',
   'Add MCP servers to your settings to get started.':
     'Add MCP servers to your settings to get started.',
-  'Run qwen --debug to see error logs': 'Run hopcode --debug to see error logs',
+  'Run hopcode --debug to see error logs':
+    'Run hopcode --debug to see error logs',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth Authentication',
@@ -1414,8 +1415,8 @@ export default {
     'Failed to authenticate. Message: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     'Authenticated successfully with {{authType}} credentials.',
-  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}',
+  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}',
   'OpenAI Configuration Required': 'OpenAI Configuration Required',
   'Please enter your OpenAI configuration. You can get an API key from':
     'Please enter your OpenAI configuration. You can get an API key from',
@@ -1608,7 +1609,7 @@ export default {
     'You can run any shell commands from HopCode using ! (e.g. !ls).',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.',
-  'You can resume a previous conversation by running qwen --continue or qwen --resume.':
+  'You can resume a previous conversation by running hopcode --continue or hopcode --resume.':
     'You can resume a previous conversation by running hopcode --continue or hopcode --resume.',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
     'You can switch permission mode quickly with Shift+Tab or /approval-mode.',
@@ -2025,7 +2026,7 @@ export default {
   // ============================================================================
   // Commands - Auth
   // ============================================================================
-  'Configure Qwen authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
+  'Configure authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
     'Configure HopCode authentication information with Legacy OAuth or Alibaba Cloud Coding Plan',
   'Authenticate using Qwen OAuth': 'Authenticate using Legacy OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
@@ -2060,12 +2061,12 @@ export default {
     '⚠️  No authentication method configured.\n',
   'Run one of the following commands to get started:\n':
     'Run one of the following commands to get started:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+  '  hopcode auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
     '  hopcode auth Legacy OAuth     - Authenticate with Legacy OAuth (discontinued)',
-  '  qwen auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
+  '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
     '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n',
   'Or simply run:': 'Or simply run:',
-  '  qwen auth                - Interactive authentication setup\n':
+  '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Interactive authentication setup\n',
   '✓ Authentication Method: Qwen OAuth':
     '✓ Authentication Method: Legacy OAuth',
@@ -2087,7 +2088,7 @@ export default {
     '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)',
   '  Issue: API key not found in environment or settings\n':
     '  Issue: API key not found in environment or settings\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
+  '  Run `hopcode auth coding-plan` to re-configure.\n':
     '  Run `hopcode auth coding-plan` to re-configure.\n',
   '✓ Authentication Method: {{type}}': '✓ Authentication Method: {{type}}',
   '  Status: Configured\n': '  Status: Configured\n',

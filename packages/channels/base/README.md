@@ -135,7 +135,7 @@ constructor(name: string, config: ChannelConfig, bridge: AcpBridge, options?: Ch
 
 ### AcpBridge
 
-Manages the `qwen-code --acp` child process and ACP sessions.
+Manages the `hopcode --acp` child process and ACP sessions.
 
 ```typescript
 constructor(options: { cliEntryPath: string; cwd: string; model?: string })

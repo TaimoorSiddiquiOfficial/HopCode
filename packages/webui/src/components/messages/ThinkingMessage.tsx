@@ -49,7 +49,7 @@ const ThinkingMessageBase: FC<ThinkingMessageProps> = ({
 
   return (
     <div
-      className={`qwen-message message-item thinking-message thinking-status-${status}`}
+      className={`hopcode-message message-item thinking-message thinking-status-${status}`}
     >
       <div className="thinking-content-wrapper">
         <button

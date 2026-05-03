@@ -46,7 +46,7 @@ export class WeixinChannel extends ChannelBase {
     const account = loadAccount();
     if (!account) {
       throw new Error(
-        'WeChat account not configured. Run "qwen channel configure-weixin" first.',
+        'WeChat account not configured. Run "hopcode channel configure-weixin" first.',
       );
     }
     this.token = account.token;

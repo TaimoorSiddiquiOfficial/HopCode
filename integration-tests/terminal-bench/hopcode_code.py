@@ -62,7 +62,7 @@ class HopCodeAgent(AbstractInstalledAgent):
         escaped_description = shlex.quote(task_description)
         return [
             TerminalCommand(
-                command=f"qwen -y --prompt {escaped_description}",
+                command=f"hopcode -y --prompt {escaped_description}",
                 max_timeout_sec=float("inf"),
                 block=True,
                 append_enter=True

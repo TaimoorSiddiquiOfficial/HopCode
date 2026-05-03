@@ -814,8 +814,8 @@ export class Config {
     };
     this.gitCoAuthor = {
       enabled: params.gitCoAuthor ?? true,
-      name: 'Qwen-Coder',
-      email: 'qwen-coder@alibabacloud.com',
+      name: 'HopCode',
+      email: 'hopcode@hoptrendy.com',
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
     this.fileReadCacheDisabled = params.fileReadCacheDisabled ?? false;
@@ -2123,7 +2123,11 @@ export class Config {
 
   isCronEnabled(): boolean {
     // Cron is experimental and opt-in: enabled via settings or env var
-    if (process.env['QWEN_CODE_ENABLE_CRON'] === '1') return true;
+    if (
+      process.env['HOPCODE_ENABLE_CRON'] === '1' ||
+      process.env['QWEN_CODE_ENABLE_CRON'] === '1'
+    )
+      return true;
     return this.cronEnabled;
   }
 

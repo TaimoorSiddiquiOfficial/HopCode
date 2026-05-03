@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -321,6 +321,7 @@ class MonitorToolInvocation extends BaseToolInvocation<
         detached: true,
         env: {
           ...process.env,
+          HOPCODE_CODE: '1',
           QWEN_CODE: '1',
           TERM: 'dumb', // no color codes for streaming
           PAGER: 'cat',

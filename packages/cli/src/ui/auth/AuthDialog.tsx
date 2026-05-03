@@ -32,8 +32,10 @@ import {
   maskApiKey,
 } from './useAuth.js';
 
+// TODO: Replace with HopCode docs when available
+// Original: https://qwenlm.github.io/qwen-code-docs/en/users/configuration/model-providers/
 const MODEL_PROVIDERS_DOCUMENTATION_URL =
-  'https://qwenlm.github.io/qwen-code-docs/en/users/configuration/model-providers/';
+  'https://github.com/TaimoorSiddiquiOfficial/HopCode';
 
 function parseDefaultAuthType(
   defaultAuthType: string | undefined,
@@ -368,9 +370,10 @@ export function AuthDialog(): React.JSX.Element {
         return item.value === authTypeToMainOption(currentAuthType);
       }
 
-      // Priority 3: QWEN_DEFAULT_AUTH_TYPE env var
+      // Priority 3: HOPCODE_DEFAULT_AUTH_TYPE env var
       const defaultAuthType = parseDefaultAuthType(
-        process.env['QWEN_DEFAULT_AUTH_TYPE'],
+        process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ??
+          process.env['QWEN_DEFAULT_AUTH_TYPE'],
       );
       if (defaultAuthType) {
         return item.value === authTypeToMainOption(defaultAuthType);
@@ -1306,11 +1309,14 @@ export function AuthDialog(): React.JSX.Element {
           </Box>
           <Box>
             <Link
-              url="https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/"
+              // TODO: Replace with HopCode docs when available
+              // Original: https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/
+              url="https://github.com/TaimoorSiddiquiOfficial/HopCode"
               fallback={false}
             >
               <Text color={theme.text.secondary} underline>
-                https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/
+                {/* Original: https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/ */}
+                https://github.com/TaimoorSiddiquiOfficial/HopCode
               </Text>
             </Link>
           </Box>

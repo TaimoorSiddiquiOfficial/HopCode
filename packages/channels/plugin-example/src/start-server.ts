@@ -4,7 +4,7 @@
  * Start the mock WebSocket server for testing the plugin-example channel.
  *
  * Usage:
- *   npx qwen-channel-plugin-example-server
+ *   npx hopcode-channel-plugin-example-server
  *   # or
  *   node node_modules/@hoptrendy/channel-plugin-example/dist/start-server.js
  *
