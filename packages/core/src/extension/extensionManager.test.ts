@@ -635,7 +635,7 @@ describe('extension tests', () => {
         const mockRefreshHierarchicalMemory = vi.fn();
 
         const mockConfig = {
-          getHopCodeClient: () => ({
+          getGeminiClient: () => ({
             isInitialized: () => false,
             setTools: vi.fn(),
           }),

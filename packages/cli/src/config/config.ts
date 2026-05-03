@@ -13,7 +13,7 @@ import {
   getAllGeminiMdFilenames,
   loadServerHierarchicalMemory,
   type LoadServerHierarchicalMemoryResponse,
-  setGeminiMdFilename as setServerHopCodeMdFilename,
+  setGeminiMdFilename,
   resolveTelemetrySettings,
   FatalConfigError,
   Storage,
@@ -928,10 +928,10 @@ export async function loadCliConfig(
   // directly to the Config constructor in core, and have core handle setGeminiMdFilename.
   // However, loadHierarchicalContextMemory is called *before* createServerConfig.
   if (settings.context?.fileName) {
-    setServerHopCodeMdFilename(settings.context.fileName);
+    setGeminiMdFilename(settings.context.fileName);
   } else {
     // Reset to default context filenames if not provided in settings.
-    setServerHopCodeMdFilename(getAllGeminiMdFilenames());
+    setGeminiMdFilename(getAllGeminiMdFilenames());
   }
 
   // Automatically load output-language.md if it exists

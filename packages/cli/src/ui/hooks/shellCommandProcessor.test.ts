@@ -37,7 +37,7 @@ import {
 } from './shellCommandProcessor.js';
 import {
   type Config,
-  type HopCodeClient,
+  type GeminiClient,
   type ShellExecutionResult,
   type ShellOutputEvent,
 } from '@hoptrendy/hopcode-core';
@@ -53,7 +53,7 @@ describe('useShellCommandProcessor', () => {
   let onExecMock: Mock;
   let onDebugMessageMock: Mock;
   let mockConfig: Config;
-  let mockHopCodeClient: HopCodeClient;
+  let mockGeminiClient: GeminiClient;
 
   let mockShellOutputCallback: (event: ShellOutputEvent) => void;
   let resolveExecutionPromise: (result: ShellExecutionResult) => void;
@@ -76,7 +76,7 @@ describe('useShellCommandProcessor', () => {
         terminalWidth: 80,
       }),
     } as Config;
-    mockHopCodeClient = { addHistory: vi.fn() } as unknown as HopCodeClient;
+    mockGeminiClient = { addHistory: vi.fn() } as unknown as GeminiClient;
 
     vi.mocked(os.platform).mockReturnValue('linux');
     vi.mocked(os.tmpdir).mockReturnValue('/tmp');
@@ -105,7 +105,7 @@ describe('useShellCommandProcessor', () => {
         onExecMock,
         onDebugMessageMock,
         mockConfig,
-        mockHopCodeClient,
+        mockGeminiClient,
         setShellInputFocusedMock,
       ),
     );
@@ -186,7 +186,7 @@ describe('useShellCommandProcessor', () => {
         ],
       }),
     );
-    expect(mockHopCodeClient.addHistory).toHaveBeenCalled();
+    expect(mockGeminiClient.addHistory).toHaveBeenCalled();
     expect(setShellInputFocusedMock).toHaveBeenCalledWith(false);
   });
 

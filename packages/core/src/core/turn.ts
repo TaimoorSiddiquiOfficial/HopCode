@@ -67,9 +67,6 @@ export enum GeminiEventType {
   StopHookLoop = 'stop_hook_loop',
 }
 
-/** @deprecated Use GeminiEventType */
-export const HopCodeEventType = GeminiEventType;
-
 export type ServerGeminiRetryEvent = {
   type: GeminiEventType.Retry;
   retryInfo?: RetryInfo;
@@ -256,9 +253,6 @@ export type ServerGeminiStreamEvent =
   | ServerGeminiUserCancelledEvent
   | ServerGeminiSessionTokenLimitExceededEvent
   | ServerGeminiRetryEvent;
-
-/** @deprecated Use ServerGeminiStreamEvent */
-export type ServerHopCodeStreamEvent = ServerGeminiStreamEvent;
 
 // A turn manages the agentic loop turn within the server context.
 export class Turn {

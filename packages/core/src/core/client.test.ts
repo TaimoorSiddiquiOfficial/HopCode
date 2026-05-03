@@ -15,7 +15,7 @@ import {
 } from 'vitest';
 
 import type { Content, GenerateContentResponse, Part } from '@google/genai';
-import { HopCodeClient, SendMessageType } from './client.js';
+import { GeminiClient, SendMessageType } from './client.js';
 import { findCompressSplitPoint } from '../services/chatCompressionService.js';
 import {
   AuthType,
@@ -266,7 +266,7 @@ describe('findCompressSplitPoint', () => {
 describe('Gemini Client (client.ts)', () => {
   let mockContentGenerator: ContentGenerator;
   let mockConfig: Config;
-  let client: HopCodeClient;
+  let client: GeminiClient;
   let mockGenerateContentFn: Mock;
   let mockMemoryManager: {
     scheduleExtract: ReturnType<typeof vi.fn>;
@@ -307,7 +307,7 @@ describe('Gemini Client (client.ts)', () => {
       countTokens: vi.fn().mockResolvedValue({ totalTokens: 100 }),
     } as unknown as ContentGenerator;
 
-    // Because the HopCodeClient constructor kicks off an async process (startChat)
+    // Because the GeminiClient constructor kicks off an async process (startChat)
     // that depends on a fully-formed Config object, we need to mock the
     // entire implementation of Config for these tests.
     const mockToolRegistry = {
@@ -361,7 +361,7 @@ describe('Gemini Client (client.ts)', () => {
       getWorkspaceContext: vi.fn().mockReturnValue({
         getDirectories: vi.fn().mockReturnValue(['/test/dir']),
       }),
-      getHopCodeClient: vi.fn(),
+      getGeminiClient: vi.fn(),
       getModelRouterService: vi.fn().mockReturnValue({
         route: vi.fn().mockResolvedValue({ model: 'default-routed-model' }),
       }),
@@ -406,9 +406,9 @@ describe('Gemini Client (client.ts)', () => {
       }),
     } as unknown as Config;
 
-    client = new HopCodeClient(mockConfig);
+    client = new GeminiClient(mockConfig);
     await client.initialize();
-    vi.mocked(mockConfig.getHopCodeClient).mockReturnValue(client);
+    vi.mocked(mockConfig.getGeminiClient).mockReturnValue(client);
   });
 
   afterEach(() => {

@@ -50,7 +50,7 @@ export async function generateSessionRecap(
   abortSignal: AbortSignal,
 ): Promise<SessionRecapResult | null> {
   try {
-    const geminiClient = config.getHopCodeClient();
+    const geminiClient = config.getGeminiClient();
     if (!geminiClient) return null;
 
     const fullHistory = geminiClient.getChat().getHistory();

@@ -2114,11 +2114,6 @@ export class Config {
     return this.geminiClient;
   }
 
-  /** Alias for getGeminiClient — used by upstream-merged files. */
-  getHopCodeClient(): GeminiClient {
-    return this.geminiClient;
-  }
-
   getCronScheduler(): CronScheduler {
     if (!this.cronScheduler) {
       this.cronScheduler = new CronScheduler();

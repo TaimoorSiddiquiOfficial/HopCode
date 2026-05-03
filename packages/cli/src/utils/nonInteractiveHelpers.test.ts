@@ -26,7 +26,7 @@ import type { JsonOutputAdapterInterface } from '../nonInteractive/io/BaseJsonOu
 import {
   normalizePartList,
   extractPartsFromUserMessage,
-  extractUsageFromHopCodeClient,
+  extractUsageFromGeminiClient,
   computeUsageFromMetrics,
   buildSystemMessage,
   createToolProgressHandler,
@@ -240,25 +240,25 @@ describe('extractPartsFromUserMessage', () => {
   });
 });
 
-describe('extractUsageFromHopCodeClient', () => {
+describe('extractUsageFromGeminiClient', () => {
   it('should return undefined for null client', () => {
-    expect(extractUsageFromHopCodeClient(null)).toBeUndefined();
+    expect(extractUsageFromGeminiClient(null)).toBeUndefined();
   });
 
   it('should return undefined for non-object client', () => {
-    expect(extractUsageFromHopCodeClient('not an object')).toBeUndefined();
+    expect(extractUsageFromGeminiClient('not an object')).toBeUndefined();
   });
 
   it('should return undefined when getChat is not a function', () => {
     const client = { getChat: 'not a function' };
-    expect(extractUsageFromHopCodeClient(client)).toBeUndefined();
+    expect(extractUsageFromGeminiClient(client)).toBeUndefined();
   });
 
   it('should return undefined when chat does not have getDebugResponses', () => {
     const client = {
       getChat: vi.fn().mockReturnValue({}),
     };
-    expect(extractUsageFromHopCodeClient(client)).toBeUndefined();
+    expect(extractUsageFromGeminiClient(client)).toBeUndefined();
   });
 
   it('should extract usage from latest response with usageMetadata', () => {
@@ -277,7 +277,7 @@ describe('extractUsageFromHopCodeClient', () => {
         ]),
       }),
     };
-    const result = extractUsageFromHopCodeClient(client);
+    const result = extractUsageFromGeminiClient(client);
     expect(result).toEqual({
       input_tokens: 100,
       output_tokens: 200,
@@ -299,7 +299,7 @@ describe('extractUsageFromHopCodeClient', () => {
         ]),
       }),
     };
-    const result = extractUsageFromHopCodeClient(client);
+    const result = extractUsageFromGeminiClient(client);
     expect(result).toEqual({
       input_tokens: 0,
       output_tokens: 0,
@@ -312,7 +312,7 @@ describe('extractUsageFromHopCodeClient', () => {
         throw new Error('Test error');
       }),
     };
-    const result = extractUsageFromHopCodeClient(client);
+    const result = extractUsageFromGeminiClient(client);
     expect(result).toBeUndefined();
   });
 
@@ -330,7 +330,7 @@ describe('extractUsageFromHopCodeClient', () => {
         ]),
       }),
     };
-    const result = extractUsageFromHopCodeClient(client);
+    const result = extractUsageFromGeminiClient(client);
     expect(result).toEqual({
       input_tokens: 50,
       output_tokens: 75,

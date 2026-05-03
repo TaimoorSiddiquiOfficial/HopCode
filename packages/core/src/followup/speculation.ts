@@ -17,7 +17,7 @@
 
 import type { Content, Part } from '@google/genai';
 import type { Config } from '../config/config.js';
-import type { HopCodeClient } from '../core/client.js';
+import type { GeminiClient } from '../core/client.js';
 import { StreamEventType } from '../core/geminiChat.js';
 import { OverlayFs } from './overlayFs.js';
 import { evaluateToolCall, rewritePathArgs } from './speculationToolGate.js';
@@ -405,7 +405,7 @@ async function runSpeculativeLoop(
  */
 export async function acceptSpeculation(
   state: SpeculationState,
-  geminiClient: HopCodeClient,
+  geminiClient: GeminiClient,
 ): Promise<SpeculationResult> {
   const timeSavedMs = state.boundary
     ? Math.max(0, state.boundary.completedAt - state.startTime)

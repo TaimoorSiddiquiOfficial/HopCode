@@ -69,7 +69,7 @@ let currentVersion = 0;
 
 /**
  * Save cache-safe params after a successful main conversation turn.
- * Called from HopCodeClient.sendMessageStream() on successful completion.
+ * Called from GeminiClient.sendMessageStream() on successful completion.
  */
 export function saveCacheSafeParams(
   generationConfig: GenerateContentConfig,

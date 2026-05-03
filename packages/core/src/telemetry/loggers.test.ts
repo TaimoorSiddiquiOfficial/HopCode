@@ -16,7 +16,7 @@ import type {
 } from '../index.js';
 import {
   AuthType,
-  HopCodeClient,
+  GeminiClient,
   ToolConfirmationOutcome,
   ToolErrorType,
   ToolRegistry,
@@ -585,7 +585,7 @@ describe('loggers', () => {
     const cfg1 = {
       getSessionId: () => 'test-session-id',
       getTargetDir: () => 'target-dir',
-      getHopCodeClient: () => mockHopCodeClient,
+      getGeminiClient: () => mockGeminiClient,
     } as Config;
     const cfg2 = {
       getSessionId: () => 'test-session-id',
@@ -615,11 +615,11 @@ describe('loggers', () => {
       getUserMemory: () => 'user-memory',
     } as unknown as Config;
 
-    const mockHopCodeClient = new HopCodeClient(cfg2);
+    const mockGeminiClient = new GeminiClient(cfg2);
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getTargetDir: () => 'target-dir',
-      getHopCodeClient: () => mockHopCodeClient,
+      getGeminiClient: () => mockGeminiClient,
       getUsageStatisticsEnabled: () => true,
       getTelemetryEnabled: () => true,
       getTelemetryLogPromptsEnabled: () => true,

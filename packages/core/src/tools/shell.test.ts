@@ -69,7 +69,7 @@ describe('ShellTool', () => {
       getTruncateToolOutputThreshold: vi.fn().mockReturnValue(0),
       getTruncateToolOutputLines: vi.fn().mockReturnValue(0),
       getPermissionManager: vi.fn().mockReturnValue(undefined),
-      getHopCodeClient: vi.fn(),
+      getGeminiClient: vi.fn(),
       getGitCoAuthor: vi.fn().mockReturnValue({
         enabled: true,
         name: 'HopCode',

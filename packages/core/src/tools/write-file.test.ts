@@ -24,7 +24,7 @@ import type { ToolRegistry } from './tool-registry.js';
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
-import { HopCodeClient } from '../core/client.js';
+import { GeminiClient } from '../core/client.js';
 import { createMockWorkspaceContext } from '../test-utils/mockWorkspaceContext.js';
 import { FileReadCache } from '../services/fileReadCache.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
@@ -35,7 +35,7 @@ const rootDir = path.resolve(os.tmpdir(), 'hopcode-test-root');
 // --- MOCKS ---
 vi.mock('../core/client.js');
 
-let mockHopCodeClientInstance: Mocked<HopCodeClient>;
+let mockGeminiClientInstance: Mocked<GeminiClient>;
 
 // Mock Config
 const fsService = new StandardFileSystemService();
@@ -45,7 +45,7 @@ const mockConfigInternal = {
   getProjectRoot: () => rootDir,
   getApprovalMode: vi.fn(() => ApprovalMode.DEFAULT),
   setApprovalMode: vi.fn(),
-  getHopCodeClient: vi.fn(), // Initialize as a plain mock function
+  getGeminiClient: vi.fn(), // Initialize as a plain mock function
   getBaseLlmClient: vi.fn(), // Initialize as a plain mock function
   getFileSystemService: () => fsService,
   getWorkspaceContext: () => createMockWorkspaceContext(rootDir),
@@ -95,17 +95,15 @@ describe('WriteFileTool', () => {
       fs.mkdirSync(rootDir, { recursive: true });
     }
 
-    // Setup HopCodeClient mock
-    mockHopCodeClientInstance = new (vi.mocked(HopCodeClient))(
+    // Setup GeminiClient mock
+    mockGeminiClientInstance = new (vi.mocked(GeminiClient))(
       mockConfig,
-    ) as Mocked<HopCodeClient>;
-    vi.mocked(HopCodeClient).mockImplementation(
-      () => mockHopCodeClientInstance,
-    );
+    ) as Mocked<GeminiClient>;
+    vi.mocked(GeminiClient).mockImplementation(() => mockGeminiClientInstance);
 
-    // Now that mockHopCodeClientInstance is initialized, set the mock implementation for getHopCodeClient
-    mockConfigInternal.getHopCodeClient.mockReturnValue(
-      mockHopCodeClientInstance,
+    // Now that mockGeminiClientInstance is initialized, set the mock implementation for getGeminiClient
+    mockConfigInternal.getGeminiClient.mockReturnValue(
+      mockGeminiClientInstance,
     );
 
     tool = new WriteFileTool(mockConfig);

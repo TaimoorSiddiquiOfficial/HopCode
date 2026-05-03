@@ -102,7 +102,7 @@ export function extractPartsFromUserMessage(
  * @param geminiClient - The Gemini client instance
  * @returns Usage information or undefined if not available
  */
-export function extractUsageFromHopCodeClient(
+export function extractUsageFromGeminiClient(
   geminiClient: unknown,
 ): Usage | undefined {
   if (

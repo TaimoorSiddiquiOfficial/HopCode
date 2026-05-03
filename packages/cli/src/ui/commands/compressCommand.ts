@@ -45,7 +45,7 @@ export const compressCommand: SlashCommand = {
     };
 
     const config = context.services.config;
-    const geminiClient = config?.getHopCodeClient();
+    const geminiClient = config?.getGeminiClient();
     if (!config || !geminiClient) {
       return {
         type: 'message',

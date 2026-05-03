@@ -50,7 +50,7 @@ async function generateKebabTitle(
   signal?: AbortSignal,
 ): Promise<string | null> {
   try {
-    const history = config.getHopCodeClient().getHistory(true);
+    const history = config.getGeminiClient().getHistory(true);
     const conversationText = extractConversationText(history);
     if (!conversationText) {
       return null;

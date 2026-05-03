@@ -7,7 +7,7 @@
 import {
   CompressionStatus,
   type ChatCompressionInfo,
-  type HopCodeClient,
+  type GeminiClient,
 } from '@hoptrendy/hopcode-core';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { compressCommand } from './compressCommand.js';
@@ -23,10 +23,10 @@ describe('compressCommand', () => {
     context = createMockCommandContext({
       services: {
         config: {
-          getHopCodeClient: () =>
+          getGeminiClient: () =>
             ({
               tryCompressChat: mockTryCompressChat,
-            }) as unknown as HopCodeClient,
+            }) as unknown as GeminiClient,
         },
       },
     });

@@ -58,9 +58,6 @@ describe('renameCommand', () => {
       getGeminiClient: vi.fn().mockReturnValue({
         getHistory: vi.fn().mockReturnValue([]),
       }),
-      getHopCodeClient: vi.fn().mockReturnValue({
-        getHistory: vi.fn().mockReturnValue([]),
-      }),
       getContentGenerator: vi.fn(),
       getModel: vi.fn(),
     };
@@ -85,9 +82,6 @@ describe('renameCommand', () => {
         renameSession: vi.fn().mockResolvedValue(true),
       }),
       getGeminiClient: vi.fn().mockReturnValue({
-        getHistory: vi.fn().mockReturnValue([]),
-      }),
-      getHopCodeClient: vi.fn().mockReturnValue({
         getHistory: vi.fn().mockReturnValue([]),
       }),
       getContentGenerator: vi.fn(),
@@ -200,7 +194,7 @@ describe('renameCommand', () => {
         }),
         getFastModel: vi.fn().mockReturnValue(opts.fastModel),
         getModel: vi.fn().mockReturnValue(opts.model ?? 'main-model'),
-        getHopCodeClient: vi.fn().mockReturnValue({
+        getGeminiClient: vi.fn().mockReturnValue({
           getHistory: vi.fn().mockReturnValue([
             { role: 'user', parts: [{ text: 'fix the login bug' }] },
             {

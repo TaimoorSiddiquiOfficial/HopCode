@@ -43,7 +43,7 @@ describe('directoryCommand', () => {
     mockConfig = {
       getWorkspaceContext: () => mockWorkspaceContext,
       isRestrictiveSandbox: vi.fn().mockReturnValue(false),
-      getHopCodeClient: vi.fn().mockReturnValue({
+      getGeminiClient: vi.fn().mockReturnValue({
         addDirectoryContext: vi.fn(),
       }),
       getWorkingDir: () => '/test/dir',

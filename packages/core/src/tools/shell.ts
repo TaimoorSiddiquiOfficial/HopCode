@@ -733,8 +733,9 @@ export class ShellToolInvocation extends BaseToolInvocation<
     signal: AbortSignal,
     shellExecutionConfig?: ShellExecutionConfig,
   ): Promise<ToolResult> {
-    const strippedCommand = stripShellWrapper(this.params.command);
-    const processedCommand = this.addCoAuthorToGitCommit(strippedCommand);
+    const processedCommand = this.addCoAuthorToGitCommit(
+      this.params.command.trim(),
+    );
     const cwd = this.params.directory || this.config.getTargetDir();
 
     // Output goes under the project temp dir (which `ReadFileTool`

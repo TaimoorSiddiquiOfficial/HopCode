@@ -13,7 +13,7 @@ import { ToolErrorType } from './tool-error.js';
 import * as fetchUtils from '../utils/fetch.js';
 
 const mockGenerateContent = vi.fn();
-const mockGetHopCodeClient = vi.fn(() => ({
+const mockGetGeminiClient = vi.fn(() => ({
   generateContent: mockGenerateContent,
 }));
 
@@ -35,7 +35,7 @@ describe('WebFetchTool', () => {
       getApprovalMode: vi.fn(),
       setApprovalMode: vi.fn(),
       getProxy: vi.fn(),
-      getHopCodeClient: mockGetHopCodeClient,
+      getGeminiClient: mockGetGeminiClient,
       getSessionId: vi.fn(() => 'test-session-id'),
       getModel: vi.fn(() => 'qwen-coder'),
     } as unknown as Config;

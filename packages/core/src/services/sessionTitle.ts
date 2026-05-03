@@ -109,7 +109,7 @@ export async function tryGenerateSessionTitle(
     const model = config.getFastModel();
     if (!model) return { ok: false, reason: 'no_fast_model' };
 
-    const geminiClient = config.getHopCodeClient();
+    const geminiClient = config.getGeminiClient();
     if (!geminiClient) return { ok: false, reason: 'no_client' };
 
     const fullHistory = geminiClient.getChat().getHistory();

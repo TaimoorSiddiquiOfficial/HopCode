@@ -673,7 +673,7 @@ class QwenAgent implements Agent {
     conversation?: ConversationRecord,
   ): Promise<Session> {
     const sessionId = config.getSessionId();
-    const geminiClient = config.getHopCodeClient();
+    const geminiClient = config.getGeminiClient();
 
     if (!geminiClient.isInitialized()) {
       await geminiClient.initialize();

@@ -56,7 +56,7 @@ describe('EditTool', () => {
     };
 
     mockConfig = {
-      getHopCodeClient: vi.fn().mockReturnValue(geminiClient),
+      getGeminiClient: vi.fn().mockReturnValue(geminiClient),
       getBaseLlmClient: vi.fn().mockReturnValue(baseLlmClient),
       getTargetDir: () => rootDir,
       getApprovalMode: vi.fn(),

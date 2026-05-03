@@ -41,7 +41,7 @@ vi.mock('node:fs', () => {
   };
 });
 
-// Mock HopCodeClient and Config constructor
+// Mock GeminiClient and Config constructor
 vi.mock('../core/baseLlmClient.js');
 vi.mock('../config/config.js');
 

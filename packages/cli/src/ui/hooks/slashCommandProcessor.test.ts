@@ -20,7 +20,7 @@ import { BuiltinCommandLoader } from '../../services/BuiltinCommandLoader.js';
 import { FileCommandLoader } from '../../services/FileCommandLoader.js';
 import { McpPromptLoader } from '../../services/McpPromptLoader.js';
 import {
-  type HopCodeClient,
+  type GeminiClient,
   SlashCommandStatus,
   ToolConfirmationOutcome,
   makeFakeConfig,
@@ -476,7 +476,7 @@ describe('useSlashCommandProcessor', () => {
       const mockClient = {
         setHistory: vi.fn(),
         stripThoughtsFromHistory: vi.fn(),
-      } as unknown as HopCodeClient;
+      } as unknown as GeminiClient;
       vi.spyOn(mockConfig, 'getGeminiClient').mockReturnValue(mockClient);
 
       const command = createTestCommand({
@@ -505,7 +505,7 @@ describe('useSlashCommandProcessor', () => {
       const mockClient = {
         setHistory: vi.fn(),
         stripThoughtsFromHistory: vi.fn(),
-      } as unknown as HopCodeClient;
+      } as unknown as GeminiClient;
       vi.spyOn(mockConfig, 'getGeminiClient').mockReturnValue(mockClient);
 
       const historyWithThoughts = [

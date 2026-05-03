@@ -38,7 +38,7 @@ export const summaryCommand: SlashCommand = {
       };
     }
 
-    const geminiClient = config.getHopCodeClient();
+    const geminiClient = config.getGeminiClient();
     if (!geminiClient) {
       return {
         type: 'message',

@@ -55,7 +55,7 @@ describe('clearCommand', () => {
     mockContext = createMockCommandContext({
       services: {
         config: {
-          getHopCodeClient: () =>
+          getGeminiClient: () =>
             ({
               resetChat: mockResetChat,
             }) as unknown as GeminiClient,
@@ -306,7 +306,7 @@ describe('clearCommand', () => {
               reset: mockResetBackgroundShells,
             }),
             startNewSession: mockStartNewSession,
-            getHopCodeClient: vi.fn().mockReturnValue({
+            getGeminiClient: vi.fn().mockReturnValue({
               resetChat: mockResetChat,
             }),
             getModel: vi.fn().mockReturnValue('test-model'),

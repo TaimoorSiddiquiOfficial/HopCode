@@ -29,7 +29,7 @@ import {
   createContentGeneratorConfig,
   resolveContentGeneratorConfigWithSources,
 } from '../core/contentGenerator.js';
-import { HopCodeClient } from '../core/client.js';
+import { GeminiClient } from '../core/client.js';
 import { GitService } from '../services/gitService.js';
 import { ShellTool } from '../tools/shell.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
@@ -173,7 +173,6 @@ vi.mock('../core/client.js', () => {
     setTools: vi.fn(),
   }));
   return {
-    HopCodeClient: mockClient,
     GeminiClient: mockClient,
   };
 });
@@ -484,7 +483,7 @@ describe('Server Config (config.ts)', () => {
       );
       // Verify that contentGeneratorConfig is updated
       expect(config.getContentGeneratorConfig()).toEqual(mockContentConfig);
-      expect(HopCodeClient).toHaveBeenCalledWith(config);
+      expect(GeminiClient).toHaveBeenCalledWith(config);
     });
 
     it('should fire auth_success notification hook when hooks are enabled', async () => {

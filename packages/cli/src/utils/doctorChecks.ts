@@ -121,7 +121,7 @@ async function checkApiClient(
   }
 
   try {
-    const client = config.getHopCodeClient();
+    const client = config.getGeminiClient();
     if (client.isInitialized()) {
       return {
         category: t('Authentication'),

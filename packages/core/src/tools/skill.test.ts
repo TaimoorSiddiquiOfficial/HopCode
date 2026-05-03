@@ -75,7 +75,7 @@ describe('SkillTool', () => {
       getProjectRoot: vi.fn().mockReturnValue('/test/project'),
       getSessionId: vi.fn().mockReturnValue('test-session-id'),
       getSkillManager: vi.fn(),
-      getHopCodeClient: vi.fn().mockReturnValue(undefined),
+      getGeminiClient: vi.fn().mockReturnValue(undefined),
       getModelInvocableCommandsProvider: vi.fn().mockReturnValue(null),
       getModelInvocableCommandsExecutor: vi.fn().mockReturnValue(null),
     } as unknown as Config;

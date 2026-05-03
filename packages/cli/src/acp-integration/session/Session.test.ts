@@ -120,9 +120,6 @@ describe('Session', () => {
       getGeminiClient: vi
         .fn()
         .mockReturnValue({ getChat: vi.fn().mockReturnValue(mockChat) }),
-      getHopCodeClient: vi
-        .fn()
-        .mockReturnValue({ getChat: vi.fn().mockReturnValue(mockChat) }),
     } as unknown as Config;
 
     mockClient = {
