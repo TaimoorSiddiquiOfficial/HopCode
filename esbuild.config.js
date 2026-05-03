@@ -56,6 +56,8 @@ const wasmBinaryPlugin = {
 };
 
 const external = [
+  'playwright',
+  'playwright-core',
   '@lydell/node-pty',
   'node-pty',
   '@lydell/node-pty-darwin-arm64',
