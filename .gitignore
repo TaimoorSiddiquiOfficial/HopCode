@@ -109,3 +109,5 @@ storybook-static
 packages/core/src/skills/bundled/qc-helper/docs
 tmp/"ci-failed-logs.txt"  
 "release-failed-logs.txt"  
+ci-failed-logs.txt 
+release-failed-logs.txt

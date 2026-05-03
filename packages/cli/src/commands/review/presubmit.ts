@@ -111,7 +111,7 @@ function classifyCi(checkRuns: CheckRun[], statuses: CommitStatus[]) {
 }
 
 function classifyExistingComments(
-  hopcodeComments: RawComment[],
+  hopCodeComments: RawComment[],
   repliedToIds: Set<number>,
   newFindingKeys: Set<string>,
   commitSha: string,
@@ -121,7 +121,7 @@ function classifyExistingComments(
     CommentSummary[]
   > = { stale: [], resolved: [], overlap: [], noConflict: [] };
 
-  for (const c of hopcodeComments) {
+  for (const c of hopCodeComments) {
     const summary: CommentSummary = {
       id: c.id,
       path: c.path ?? '',
@@ -188,7 +188,7 @@ async function runPresubmit(args: PresubmitArgs): Promise<void> {
   const allComments = ghApiAll(
     `repos/${owner}/${repo}/pulls/${prNumber}/comments`,
   ) as RawComment[];
-  const hopcodeComments = allComments.filter((c) =>
+  const hopCodeComments = allComments.filter((c) =>
     /via HopCode \/review/.test(c.body ?? ''),
   );
 
@@ -204,7 +204,7 @@ async function runPresubmit(args: PresubmitArgs): Promise<void> {
   const newFindingKeys = new Set(newFindings.map((f) => `${f.path}:${f.line}`));
 
   const buckets = classifyExistingComments(
-    hopcodeComments,
+    hopCodeComments,
     repliedToIds,
     newFindingKeys,
     commitSha,
@@ -229,7 +229,7 @@ async function runPresubmit(args: PresubmitArgs): Promise<void> {
     isSelfPr,
     ciStatus,
     existingComments: {
-      total: hopcodeComments.length,
+      total: hopCodeComments.length,
       byBucket: {
         stale: buckets.stale.length,
         resolved: buckets.resolved.length,
