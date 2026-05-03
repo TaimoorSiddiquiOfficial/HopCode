@@ -22,7 +22,9 @@ const INSTALLATION_URL =
  * variables (GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY).
  */
 function hasGitHubCredentials(_context: CommandContext): boolean {
-  return !!process.env.GITHUB_APP_ID && !!process.env.GITHUB_APP_PRIVATE_KEY;
+  return (
+    !!process.env['GITHUB_APP_ID'] && !!process.env['GITHUB_APP_PRIVATE_KEY']
+  );
 }
 
 /**

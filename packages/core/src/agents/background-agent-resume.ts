@@ -94,8 +94,8 @@ interface RestorePausedEntryOptions {
 
 function approvalModeToPermissionMode(mode?: string): PermissionMode {
   switch (mode) {
-    case 'yolo':
-      return PermissionMode.Yolo;
+    case 'izn':
+      return PermissionMode.Izn;
     case 'auto-edit':
       return PermissionMode.AutoEdit;
     case 'plan':

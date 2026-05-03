@@ -54,7 +54,9 @@ export const githubAuthCommand: SlashCommand = {
  * Check if user has GitHub credentials configured via environment variables.
  */
 async function checkGitHubCredentials(): Promise<boolean> {
-  return !!process.env.GITHUB_APP_ID && !!process.env.GITHUB_APP_PRIVATE_KEY;
+  return (
+    !!process.env['GITHUB_APP_ID'] && !!process.env['GITHUB_APP_PRIVATE_KEY']
+  );
 }
 
 /**
@@ -230,7 +232,7 @@ See: \`docs/users/GITHUB_QUICK_START.md\` for detailed setup.`;
  * Generate success message for authenticated users
  */
 function generateAuthenticatedMessage(): string {
-  const appId = process.env.GITHUB_APP_ID || 'Unknown';
+  const appId = process.env['GITHUB_APP_ID'] || 'Unknown';
 
   return `# ✅ GitHub Authentication Successful
 

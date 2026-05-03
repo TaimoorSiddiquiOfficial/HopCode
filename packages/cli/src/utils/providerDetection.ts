@@ -52,7 +52,7 @@ export function resolveActiveProvider(
 
   // Extract the openai providers array from settings (not the full settings object).
   const openaiProviders =
-    (allSettings?.modelProviders?.openai as
+    (allSettings?.modelProviders?.['openai'] as
       | Array<{ envKey?: string; baseUrl?: string; id?: string }>
       | undefined) ?? [];
 
@@ -101,7 +101,7 @@ export function resolveActiveProvider(
   // 4. Anthropic fallback
   if (authType === 'anthropic') {
     const anthropicProviders =
-      (allSettings?.modelProviders?.anthropic as
+      (allSettings?.modelProviders?.['anthropic'] as
         | Array<{ envKey?: string; baseUrl?: string }>
         | undefined) ?? [];
     const anthropicFirst = anthropicProviders[0];

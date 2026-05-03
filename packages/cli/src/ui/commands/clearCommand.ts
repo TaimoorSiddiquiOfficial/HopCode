@@ -33,21 +33,6 @@ function resetBackgroundStateForSessionSwitch(config: Config): void {
   config.getBackgroundShellRegistry().reset();
 }
 
-function hasBlockingBackgroundWork(config: Config): boolean {
-  return (
-    config.getBackgroundTaskRegistry().hasUnfinalizedTasks() ||
-    config
-      .getBackgroundShellRegistry()
-      .getAll()
-      .some((entry) => entry.status === 'running')
-  );
-}
-
-function resetBackgroundStateForSessionSwitch(config: Config): void {
-  (config.getBackgroundTaskRegistry() as unknown as { reset(): void }).reset();
-  (config.getBackgroundShellRegistry() as unknown as { reset(): void }).reset();
-}
-
 export const clearCommand: SlashCommand = {
   name: 'clear',
   altNames: ['reset', 'new'],

@@ -757,7 +757,7 @@ function updateMcpConfig(
       config = JSON.parse(content) as Record<string, unknown>;
     }
 
-    const servers = config.mcpServers as Record<string, unknown>;
+    const servers = config['mcpServers'] as Record<string, unknown>;
     servers[skillName] = {
       command: 'node',
       args: [`dist/${skillName}-skill.js`],

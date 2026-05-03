@@ -21,7 +21,7 @@ import type {
 
 // GitHub OAuth App configuration
 const GITHUB_OAUTH_CLIENT_ID = 'Iv23livRiRBTa9cyBnk1';
-const GITHUB_OAUTH_CLIENT_SECRET = process.env.GITHUB_OAUTH_CLIENT_SECRET;
+const GITHUB_OAUTH_CLIENT_SECRET = process.env['GITHUB_OAUTH_CLIENT_SECRET'];
 
 /**
  * GitHub Device Flow authentication command

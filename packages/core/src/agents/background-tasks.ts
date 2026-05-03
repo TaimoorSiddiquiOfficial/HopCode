@@ -157,6 +157,7 @@ export interface BackgroundTaskEntry {
 }
 
 interface CancelOptions {
+  notify?: boolean;
   persistedStatus?: Extract<BackgroundTaskStatus, 'running' | 'cancelled'>;
 }
 
