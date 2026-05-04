@@ -54,7 +54,7 @@ export interface ContentGenerator {
 
 export enum AuthType {
   USE_OPENAI = 'openai',
-  HOPCODE_OAUTH = 'qwen-oauth',
+  QWEN_OAUTH = 'qwen-oauth',
   USE_GEMINI = 'gemini',
   USE_VERTEX_AI = 'vertex-ai',
   USE_ANTHROPIC = 'anthropic',
@@ -99,7 +99,16 @@ export type ContentGeneratorConfig = {
   reasoning?:
     | false
     | {
-        effort?: 'low' | 'medium' | 'high';
+        // 'max' is supported by providers that document an extra-strong
+        // reasoning tier — currently DeepSeek's `reasoning_effort` (see
+        // https://api-docs.deepseek.com/zh-cn/api/create-chat-completion).
+        // Real Anthropic only accepts low/medium/high; the Anthropic
+        // generator clamps 'max' down to 'high' (logged once per generator
+        // via debugLogger.warn) when the baseURL doesn't look like a
+        // DeepSeek-compatible endpoint, so configurations targeting
+        // DeepSeek don't 400 when the same auth profile is reused against
+        // api.anthropic.com.
+        effort?: 'low' | 'medium' | 'high' | 'max';
         budget_tokens?: number;
       };
   proxy?: string | undefined;
@@ -233,8 +242,8 @@ export function validateModelConfig(
 ): ModelConfigValidationResult {
   const errors: Error[] = [];
 
-  // HopCode OAuth doesn't need validation - it uses dynamic tokens
-  if (config.authType === AuthType.HOPCODE_OAUTH) {
+  // Qwen OAuth doesn't need validation - it uses dynamic tokens
+  if (config.authType === AuthType.QWEN_OAUTH) {
     return { valid: true, errors: [] };
   }
 
@@ -323,7 +332,7 @@ export async function createContentGenerator(
       './openaiContentGenerator/index.js'
     );
     baseGenerator = createOpenAIContentGenerator(generatorConfig, config);
-  } else if (authType === AuthType.HOPCODE_OAUTH) {
+  } else if (authType === AuthType.QWEN_OAUTH) {
     const { getQwenOAuthClient: getQwenOauthClient } = await import(
       '../hopcode/hopCodeOAuth2.js'
     );
