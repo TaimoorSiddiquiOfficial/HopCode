@@ -155,7 +155,8 @@ class QueryOptions:
             model=_as_optional_str(data, "model"),
             path_to_hopcode_executable=_as_optional_str(
                 data, "path_to_hopcode_executable"
-            ) or _as_optional_str(data, "path_to_qwen_executable"),
+            )
+            or _as_optional_str(data, "path_to_qwen_executable"),
             permission_mode=cast(
                 PermissionMode | None,
                 _as_optional_str(data, "permission_mode"),
