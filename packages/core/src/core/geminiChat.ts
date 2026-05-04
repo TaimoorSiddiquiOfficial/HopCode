@@ -771,6 +771,20 @@ export class GeminiChat {
   }
 
   /**
+   * Returns the history array directly without cloning.
+   *
+   * This is a read-only view for internal callers that only need to
+   * inspect history (read length, filter, slice, etc.) and will NOT
+   * mutate the returned array or its Content objects.
+   *
+   * Use {@link getHistory} when the caller (or downstream code) might
+   * mutate the returned array.
+   */
+  peekHistory(curated: boolean = false): Content[] {
+    return curated ? extractCuratedHistory(this.history) : this.history;
+  }
+
+  /**
    * Clears the chat history.
    */
   clearHistory(): void {

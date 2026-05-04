@@ -208,6 +208,17 @@ export class GeminiClient {
     return this.getChat().getHistory(curated);
   }
 
+  /**
+   * Returns the chat history without deep-cloning.
+   *
+   * For internal read-only callers only — the returned array and its
+   * Content objects MUST NOT be mutated. Use {@link getHistory} when
+   * the caller or downstream code may need to modify the returned array.
+   */
+  peekHistory(curated: boolean = false): Content[] {
+    return this.getChat().peekHistory(curated);
+  }
+
   private stripOrphanedUserEntriesFromHistory() {
     this.getChat().stripOrphanedUserEntriesFromHistory();
     // Stripped trailing user entries can include read_file
@@ -762,12 +773,12 @@ export class GeminiClient {
       // retries/hooks) so that model latency during a tool-call loop
       // doesn't count as user idle time.
       const mcResult = microcompactHistory(
-        this.getChat().getHistory(),
+        this.getChat().peekHistory(),
         this.lastApiCompletionTimestamp,
         this.config.getClearContextOnIdle(),
       );
       if (mcResult.meta) {
-        this.getChat().setHistory(mcResult.history);
+        this.setHistory(mcResult.history);
         const m = mcResult.meta;
         debugLogger.debug(
           `[TIME-BASED MC] gap ${m.gapMinutes}min > ${m.thresholdMinutes}min, ` +
@@ -825,7 +836,7 @@ export class GeminiClient {
     // part from the user immediately follows a functionCall part from the model
     // in the conversation history . The IDE context is not discarded; it will
     // be included in the next regular message sent to the model.
-    const history = this.getHistory();
+    const history = this.peekHistory();
     const lastMessage =
       history.length > 0 ? history[history.length - 1] : undefined;
     const hasPendingToolCall =
@@ -979,7 +990,7 @@ export class GeminiClient {
       this.config.hasHooksForEvent('Stop')
     ) {
       // Get response text from the chat history
-      const history = this.getHistory();
+      const history = this.peekHistory();
       const lastModelMessage = history
         .filter((msg) => msg.role === 'model')
         .pop();
@@ -1083,7 +1094,7 @@ export class GeminiClient {
       // see the current turn's history regardless of which path exits below.
       try {
         const chat = this.getChat();
-        const fullHistory = chat.getHistory(true);
+        const fullHistory = chat.peekHistory(true);
         const maxHistoryForCache = 40;
         const cachedHistory =
           fullHistory.length > maxHistoryForCache
@@ -1139,7 +1150,7 @@ export class GeminiClient {
       // Fire-and-forget skill evolution pass every N turns
       void (async () => {
         try {
-          const recentHistory = this.getHistory().slice(-20);
+          const recentHistory = this.peekHistory().slice(-20);
           const recentMessages = recentHistory
             .filter((c) => c.role === 'user' || c.role === 'model')
             .map((c) => ({
