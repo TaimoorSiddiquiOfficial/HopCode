@@ -10,17 +10,17 @@ export default {
   // ============================================================================
   // Help / UI Components
   // ============================================================================
-  'Basics:': 'Noções básicas:',
+  'Basics:': 'Noï¿½ï¿½es bï¿½sicas:',
   'Add context': 'Adicionar contexto',
   'Use {{symbol}} to specify files for context (e.g., {{example}}) to target specific files or folders.':
-    'Use {{symbol}} para especificar arquivos para o contexto (ex: {{example}}) para atingir arquivos ou pastas específicos.',
+    'Use {{symbol}} para especificar arquivos para o contexto (ex: {{example}}) para atingir arquivos ou pastas especï¿½ficos.',
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Modo shell',
   'IZN mode': 'Modo IZN',
   'plan mode': 'modo planejamento',
-  'auto-accept edits': 'aceitar edições automaticamente',
-  'Accepting edits': 'Aceitando edições',
+  'auto-accept edits': 'aceitar ediï¿½ï¿½es automaticamente',
+  'Accepting edits': 'Aceitando ediï¿½ï¿½es',
   '(shift + tab to cycle)': '(shift + tab para alternar)',
   'Execute shell commands via {{symbol}} (e.g., {{example1}}) or use natural language (e.g., {{example2}}).':
     'Execute comandos shell via {{symbol}} (ex: {{example1}}) ou use linguagem natural (ex: {{example2}}).',
@@ -32,29 +32,29 @@ export default {
   'Model Context Protocol command (from external servers)':
     'Comando Model Context Protocol (de servidores externos)',
   'Keyboard Shortcuts:': 'Atalhos de teclado:',
-  'Toggle this help display': 'Alternar exibição desta ajuda',
+  'Toggle this help display': 'Alternar exibiï¿½ï¿½o desta ajuda',
   'Toggle shell mode': 'Alternar modo shell',
   'Open command menu': 'Abrir menu de comandos',
   'Add file context': 'Adicionar contexto de arquivo',
-  'Accept suggestion / Autocomplete': 'Aceitar sugestão / Autocompletar',
-  'Reverse search history': 'Pesquisa reversa no histórico',
+  'Accept suggestion / Autocomplete': 'Aceitar sugestï¿½o / Autocompletar',
+  'Reverse search history': 'Pesquisa reversa no histï¿½rico',
   'Press ? again to close': 'Pressione ? novamente para fechar',
   // Keyboard shortcuts panel descriptions
   'for shell mode': 'para modo shell',
   'for commands': 'para comandos',
   'for file paths': 'para caminhos de arquivo',
   'to clear input': 'para limpar entrada',
-  'to cycle approvals': 'para alternar aprovações',
+  'to cycle approvals': 'para alternar aprovaï¿½ï¿½es',
   'to quit': 'para sair',
   'for newline': 'para nova linha',
   'to clear screen': 'para limpar a tela',
-  'to search history': 'para pesquisar no histórico',
+  'to search history': 'para pesquisar no histï¿½rico',
   'to paste images': 'para colar imagens',
   'for external editor': 'para editor externo',
   'to toggle compact mode': 'alternar modo compacto',
   'Jump through words in the input': 'Pular palavras na entrada',
   'Close dialogs, cancel requests, or quit application':
-    'Fechar diálogos, cancelar solicitações ou sair do aplicativo',
+    'Fechar diï¿½logos, cancelar solicitaï¿½ï¿½es ou sair do aplicativo',
   'New line': 'Nova linha',
   'New line (Alt+Enter works for certain linux distros)':
     'Nova linha (Alt+Enter funciona em certas distros linux)',
@@ -68,17 +68,17 @@ export default {
     'Digite sua mensagem ou @caminho/do/arquivo',
   '? for shortcuts': '? para atalhos',
   "Press 'i' for INSERT mode and 'Esc' for NORMAL mode.":
-    "Pressione 'i' para modo INSERÇÃO e 'Esc' para modo NORMAL.",
+    "Pressione 'i' para modo INSERï¿½ï¿½O e 'Esc' para modo NORMAL.",
   'Cancel operation / Clear input (double press)':
-    'Cancelar operação / Limpar entrada (pressionar duas vezes)',
-  'Cycle approval modes': 'Alternar modos de aprovação',
-  'Cycle through your prompt history': 'Alternar histórico de prompts',
+    'Cancelar operaï¿½ï¿½o / Limpar entrada (pressionar duas vezes)',
+  'Cycle approval modes': 'Alternar modos de aprovaï¿½ï¿½o',
+  'Cycle through your prompt history': 'Alternar histï¿½rico de prompts',
   'For a full list of shortcuts, see {{docPath}}':
     'Para uma lista completa de atalhos, consulte {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
   'for help on HopCode': 'para ajuda sobre o HopCode',
-  'show version info': 'mostrar informações de versão',
-  'submit a bug report': 'enviar um relatório de erro',
+  'show version info': 'mostrar informaï¿½ï¿½es de versï¿½o',
+  'submit a bug report': 'enviar um relatï¿½rio de erro',
   'About HopCode': 'Sobre o HopCode',
   Status: 'Status',
 
@@ -88,22 +88,22 @@ export default {
   HopCode: 'HopCode',
   Runtime: 'Runtime',
   OS: 'SO',
-  Auth: 'Autenticação',
-  'CLI Version': 'Versão da CLI',
+  Auth: 'Autenticaï¿½ï¿½o',
+  'CLI Version': 'Versï¿½o da CLI',
   'Git Commit': 'Commit do Git',
   Model: 'Modelo',
-  'Fast Model': 'Modelo Rápido',
+  'Fast Model': 'Modelo Rï¿½pido',
   Sandbox: 'Sandbox',
   'OS Platform': 'Plataforma do SO',
   'OS Arch': 'Arquitetura do SO',
-  'OS Release': 'Versão do SO',
-  'Node.js Version': 'Versão do Node.js',
-  'NPM Version': 'Versão do NPM',
-  'Session ID': 'ID da Sessão',
-  'Auth Method': 'Método de Autenticação',
+  'OS Release': 'Versï¿½o do SO',
+  'Node.js Version': 'Versï¿½o do Node.js',
+  'NPM Version': 'Versï¿½o do NPM',
+  'Session ID': 'ID da Sessï¿½o',
+  'Auth Method': 'Mï¿½todo de Autenticaï¿½ï¿½o',
   'Base URL': 'URL Base',
   Proxy: 'Proxy',
-  'Memory Usage': 'Uso de Memória',
+  'Memory Usage': 'Uso de Memï¿½ria',
   'IDE Client': 'Cliente IDE',
 
   // ============================================================================
@@ -112,18 +112,18 @@ export default {
   'Analyzes the project and creates a tailored HOPCODE.md file.':
     'Analisa o projeto e cria um arquivo HOPCODE.md personalizado.',
   'List available HopCode tools. Usage: /tools [desc]':
-    'Listar ferramentas HopCode disponíveis. Uso: /tools [desc]',
-  'List available skills.': 'Listar habilidades disponíveis.',
-  'Available HopCode CLI tools:': 'Ferramentas CLI do HopCode disponíveis:',
-  'No tools available': 'Nenhuma ferramenta disponível',
+    'Listar ferramentas HopCode disponï¿½veis. Uso: /tools [desc]',
+  'List available skills.': 'Listar habilidades disponï¿½veis.',
+  'Available HopCode CLI tools:': 'Ferramentas CLI do HopCode disponï¿½veis:',
+  'No tools available': 'Nenhuma ferramenta disponï¿½vel',
   'View or change the approval mode for tool usage':
-    'Ver ou alterar o modo de aprovação para uso de ferramentas',
+    'Ver ou alterar o modo de aprovaï¿½ï¿½o para uso de ferramentas',
   'Invalid approval mode "{{arg}}". Valid modes: {{modes}}':
-    'Modo de aprovação inválido "{{arg}}". Modos válidos: {{modes}}',
+    'Modo de aprovaï¿½ï¿½o invï¿½lido "{{arg}}". Modos vï¿½lidos: {{modes}}',
   'Approval mode set to "{{mode}}"':
-    'Modo de aprovação definido como "{{mode}}"',
+    'Modo de aprovaï¿½ï¿½o definido como "{{mode}}"',
   'View or change the language setting':
-    'Ver ou alterar a configuração de idioma',
+    'Ver ou alterar a configuraï¿½ï¿½o de idioma',
   'change the theme': 'alterar o tema',
   'Select Theme': 'Selecionar Tema',
   Preview: 'Visualizar',
@@ -132,38 +132,38 @@ export default {
   '(Use Enter to apply scope, Tab to go back)':
     '(Use Enter para aplicar o escopo, Tab para voltar)',
   'Theme configuration unavailable due to NO_COLOR env variable.':
-    'Configuração de tema indisponível devido à variável de ambiente NO_COLOR.',
-  'Theme "{{themeName}}" not found.': 'Tema "{{themeName}}" não encontrado.',
+    'Configuraï¿½ï¿½o de tema indisponï¿½vel devido ï¿½ variï¿½vel de ambiente NO_COLOR.',
+  'Theme "{{themeName}}" not found.': 'Tema "{{themeName}}" nï¿½o encontrado.',
   'Theme "{{themeName}}" not found in selected scope.':
-    'Tema "{{themeName}}" não encontrado no escopo selecionado.',
+    'Tema "{{themeName}}" nï¿½o encontrado no escopo selecionado.',
   'Clear conversation history and free up context':
-    'Limpar histórico de conversa e liberar contexto',
+    'Limpar histï¿½rico de conversa e liberar contexto',
   'Compresses the context by replacing it with a summary.':
     'Comprime o contexto substituindo-o por um resumo.',
   'open full HopCode documentation in your browser':
-    'abrir documentação completa do HopCode no seu navegador',
-  'Configuration not available.': 'Configuração não disponível.',
-  'change the auth method': 'alterar o método de autenticação',
+    'abrir documentaï¿½ï¿½o completa do HopCode no seu navegador',
+  'Configuration not available.': 'Configuraï¿½ï¿½o nï¿½o disponï¿½vel.',
+  'change the auth method': 'alterar o mï¿½todo de autenticaï¿½ï¿½o',
   'Configure authentication information for login':
-    'Configurar informações de autenticação para login',
+    'Configurar informaï¿½ï¿½es de autenticaï¿½ï¿½o para login',
   'Copy the last result or code snippet to clipboard':
-    'Copiar o último resultado ou trecho de código para a área de transferência',
+    'Copiar o ï¿½ltimo resultado ou trecho de cï¿½digo para a ï¿½rea de transferï¿½ncia',
 
   // ============================================================================
   // Commands - Agents
   // ============================================================================
   'Manage subagents for specialized task delegation.':
-    'Gerenciar subagentes para delegação de tarefas especializadas.',
+    'Gerenciar subagentes para delegaï¿½ï¿½o de tarefas especializadas.',
   'Manage existing subagents (view, edit, delete).':
     'Gerenciar subagentes existentes (ver, editar, excluir).',
   'Create a new subagent with guided setup.':
-    'Criar um novo subagente com configuração guiada.',
+    'Criar um novo subagente com configuraï¿½ï¿½o guiada.',
 
   // ============================================================================
   // Agents - Management Dialog
   // ============================================================================
   Agents: 'Agentes',
-  'Choose Action': 'Escolher Ação',
+  'Choose Action': 'Escolher Aï¿½ï¿½o',
   'Edit {{name}}': 'Editar {{name}}',
   'Edit Tools: {{name}}': 'Editar Ferramentas: {{name}}',
   'Edit Color: {{name}}': 'Editar Cor: {{name}}',
@@ -177,17 +177,17 @@ export default {
   'Enter to select, ?? to navigate, Esc to go back':
     'Enter para selecionar, ?? para navegar, Esc para voltar',
   'Enter to submit, Esc to go back': 'Enter para enviar, Esc para voltar',
-  'Invalid step: {{step}}': 'Etapa inválida: {{step}}',
+  'Invalid step: {{step}}': 'Etapa invï¿½lida: {{step}}',
   'No subagents found.': 'Nenhum subagente encontrado.',
   "Use '/agents create' to create your first subagent.":
     "Use '/agents create' para criar seu primeiro subagente.",
   '(built-in)': '(integrado)',
   '(overridden by project level agent)':
-    '(substituído por agente de nível de projeto)',
-  'Project Level ({{path}})': 'Nível de Projeto ({{path}})',
-  'User Level ({{path}})': 'Nível de Usuário ({{path}})',
+    '(substituï¿½do por agente de nï¿½vel de projeto)',
+  'Project Level ({{path}})': 'Nï¿½vel de Projeto ({{path}})',
+  'User Level ({{path}})': 'Nï¿½vel de Usuï¿½rio ({{path}})',
   'Built-in Agents': 'Agentes Integrados',
-  'Extension Agents': 'Agentes de Extensão',
+  'Extension Agents': 'Agentes de Extensï¿½o',
   'Using: {{count}} agents': 'Usando: {{count}} agentes',
   'View Agent': 'Ver Agente',
   'Edit Agent': 'Editar Agente',
@@ -197,7 +197,7 @@ export default {
   'File Path: ': 'Caminho do Arquivo: ',
   'Tools: ': 'Ferramentas: ',
   'Color: ': 'Cor: ',
-  'Description:': 'Descrição:',
+  'Description:': 'Descriï¿½ï¿½o:',
   'System Prompt:': 'Prompt do Sistema:',
   'Open in editor': 'Abrir no editor',
   'Edit tools': 'Editar ferramentas',
@@ -209,62 +209,62 @@ export default {
   // ============================================================================
   // Agents - Creation Wizard
   // ============================================================================
-  'Project Level (.hopcode/agents/)': 'Nível de Projeto (.hopcode/agents/)',
-  'User Level (~/.hopcode/agents/)': 'Nível de Usuário (~/.hopcode/agents/)',
+  'Project Level (.hopcode/agents/)': 'Nï¿½vel de Projeto (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': 'Nï¿½vel de Usuï¿½rio (~/.hopcode/agents/)',
   '? Subagent Created Successfully!': '? Subagente criado com sucesso!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
-    'O subagente "{{name}}" foi salvo no nível {{level}}.',
+    'O subagente "{{name}}" foi salvo no nï¿½vel {{level}}.',
   'Name: ': 'Nome: ',
-  'Location: ': 'Localização: ',
+  'Location: ': 'Localizaï¿½ï¿½o: ',
   '? Error saving subagent:': '? Erro ao salvar subagente:',
   'Warnings:': 'Avisos:',
   'Name "{{name}}" already exists at {{level}} level - will overwrite existing subagent':
-    'O nome "{{name}}" já existe no nível {{level}} - o subagente existente será substituído',
+    'O nome "{{name}}" jï¿½ existe no nï¿½vel {{level}} - o subagente existente serï¿½ substituï¿½do',
   'Name "{{name}}" exists at user level - project level will take precedence':
-    'O nome "{{name}}" existe no nível de usuário - o nível de projeto terá precedência',
+    'O nome "{{name}}" existe no nï¿½vel de usuï¿½rio - o nï¿½vel de projeto terï¿½ precedï¿½ncia',
   'Name "{{name}}" exists at project level - existing subagent will take precedence':
-    'O nome "{{name}}" existe no nível de projeto - o subagente existente terá precedência',
+    'O nome "{{name}}" existe no nï¿½vel de projeto - o subagente existente terï¿½ precedï¿½ncia',
   'Description is over {{length}} characters':
-    'A descrição tem mais de {{length}} caracteres',
+    'A descriï¿½ï¿½o tem mais de {{length}} caracteres',
   'System prompt is over {{length}} characters':
     'O prompt do sistema tem mais de {{length}} caracteres',
 
   // ============================================================================
   // Agents - Creation Wizard Steps
   // ============================================================================
-  'Step {{n}}: Choose Location': 'Etapa {{n}}: Escolher Localização',
+  'Step {{n}}: Choose Location': 'Etapa {{n}}: Escolher Localizaï¿½ï¿½o',
   'Step {{n}}: Choose Generation Method':
-    'Etapa {{n}}: Escolher Método de Geração',
+    'Etapa {{n}}: Escolher Mï¿½todo de Geraï¿½ï¿½o',
   'Generate with HopCode (Recommended)': 'Gerar com HopCode (Recomendado)',
-  'Manual Creation': 'Criação Manual',
+  'Manual Creation': 'Criaï¿½ï¿½o Manual',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Descreva o que este subagente deve fazer e quando deve ser usado. (Seja abrangente para melhores resultados)',
   'e.g., Expert code reviewer that reviews code based on best practices...':
-    'ex: Revisor de código especialista que revisa código com base em melhores práticas...',
+    'ex: Revisor de cï¿½digo especialista que revisa cï¿½digo com base em melhores prï¿½ticas...',
   'Generating subagent configuration...':
-    'Gerando configuração do subagente...',
+    'Gerando configuraï¿½ï¿½o do subagente...',
   'Failed to generate subagent: {{error}}':
     'Falha ao gerar subagente: {{error}}',
   'Step {{n}}: Describe Your Subagent': 'Etapa {{n}}: Descreva Seu Subagente',
   'Step {{n}}: Enter Subagent Name': 'Etapa {{n}}: Digite o Nome do Subagente',
   'Step {{n}}: Enter System Prompt': 'Etapa {{n}}: Digite o Prompt do Sistema',
-  'Step {{n}}: Enter Description': 'Etapa {{n}}: Digite a Descrição',
+  'Step {{n}}: Enter Description': 'Etapa {{n}}: Digite a Descriï¿½ï¿½o',
 
   // ============================================================================
   // Agents - Tool Selection
   // ============================================================================
   'Step {{n}}: Select Tools': 'Etapa {{n}}: Selecionar Ferramentas',
-  'All Tools (Default)': 'Todas as Ferramentas (Padrão)',
+  'All Tools (Default)': 'Todas as Ferramentas (Padrï¿½o)',
   'All Tools': 'Todas as Ferramentas',
   'Read-only Tools': 'Ferramentas de Somente Leitura',
-  'Read & Edit Tools': 'Ferramentas de Leitura e Edição',
-  'Read & Edit & Execution Tools': 'Ferramentas de Leitura, Edição e Execução',
+  'Read & Edit Tools': 'Ferramentas de Leitura e Ediï¿½ï¿½o',
+  'Read & Edit & Execution Tools': 'Ferramentas de Leitura, Ediï¿½ï¿½o e Execuï¿½ï¿½o',
   'All tools selected, including MCP tools':
     'Todas as ferramentas selecionadas, incluindo ferramentas MCP',
   'Selected tools:': 'Ferramentas selecionadas:',
   'Read-only tools:': 'Ferramentas de somente leitura:',
-  'Edit tools:': 'Ferramentas de edição:',
-  'Execution tools:': 'Ferramentas de execução:',
+  'Edit tools:': 'Ferramentas de ediï¿½ï¿½o:',
+  'Execution tools:': 'Ferramentas de execuï¿½ï¿½o:',
   'Step {{n}}: Choose Background Color': 'Etapa {{n}}: Escolher Cor de Fundo',
   'Step {{n}}: Confirm and Save': 'Etapa {{n}}: Confirmar e Salvar',
 
@@ -280,19 +280,19 @@ export default {
   'go back': 'voltar',
   '?? to navigate, ': '?? para navegar, ',
   'Enter a clear, unique name for this subagent.':
-    'Digite um nome claro e único para este subagente.',
-  'e.g., Code Reviewer': 'ex: Revisor de Código',
-  'Name cannot be empty.': 'O nome não pode estar vazio.',
+    'Digite um nome claro e ï¿½nico para este subagente.',
+  'e.g., Code Reviewer': 'ex: Revisor de Cï¿½digo',
+  'Name cannot be empty.': 'O nome nï¿½o pode estar vazio.',
   "Write the system prompt that defines this subagent's behavior. Be comprehensive for best results.":
     'Escreva o prompt do sistema que define o comportamento deste subagente. Seja abrangente para melhores resultados.',
   'e.g., You are an expert code reviewer...':
-    'ex: Você é um revisor de código especialista...',
-  'System prompt cannot be empty.': 'O prompt do sistema não pode estar vazio.',
+    'ex: Vocï¿½ ï¿½ um revisor de cï¿½digo especialista...',
+  'System prompt cannot be empty.': 'O prompt do sistema nï¿½o pode estar vazio.',
   'Describe when and how this subagent should be used.':
     'Descreva quando e como este subagente deve ser usado.',
   'e.g., Reviews code for best practices and potential bugs.':
-    'ex: Revisa o código em busca de melhores práticas e erros potenciais.',
-  'Description cannot be empty.': 'A descrição não pode estar vazia.',
+    'ex: Revisa o cï¿½digo em busca de melhores prï¿½ticas e erros potenciais.',
+  'Description cannot be empty.': 'A descriï¿½ï¿½o nï¿½o pode estar vazia.',
   'Failed to launch editor: {{error}}': 'Falha ao iniciar editor: {{error}}',
   'Failed to save and edit subagent: {{error}}':
     'Falha ao salvar e editar subagente: {{error}}',
@@ -300,60 +300,60 @@ export default {
   // ============================================================================
   // Commands - General (continued)
   // ============================================================================
-  'View and edit HopCode settings': 'Ver e editar configurações do HopCode',
-  Settings: 'Configurações',
+  'View and edit HopCode settings': 'Ver e editar configuraï¿½ï¿½es do HopCode',
+  Settings: 'Configuraï¿½ï¿½es',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    'Para ver as alterações, o HopCode deve ser reiniciado. Pressione r para sair e aplicar as alterações agora.',
+    'Para ver as alteraï¿½ï¿½es, o HopCode deve ser reiniciado. Pressione r para sair e aplicar as alteraï¿½ï¿½es agora.',
   'The command "/{{command}}" is not supported in non-interactive mode.':
-    'O comando "/{{command}}" não é suportado no modo não interativo.',
+    'O comando "/{{command}}" nï¿½o ï¿½ suportado no modo nï¿½o interativo.',
 
   // ============================================================================
   // Settings Labels
   // ============================================================================
   'Vim Mode': 'Modo Vim',
-  'Disable Auto Update': 'Desativar Atualização Automática',
-  'Attribution: commit': 'Atribuição: commit',
-  'Terminal Bell Notification': 'Notificação Sonora do Terminal',
-  'Enable Usage Statistics': 'Ativar Estatísticas de Uso',
+  'Disable Auto Update': 'Desativar Atualizaï¿½ï¿½o Automï¿½tica',
+  'Attribution: commit': 'Atribuiï¿½ï¿½o: commit',
+  'Terminal Bell Notification': 'Notificaï¿½ï¿½o Sonora do Terminal',
+  'Enable Usage Statistics': 'Ativar Estatï¿½sticas de Uso',
   Theme: 'Tema',
   'Preferred Editor': 'Editor Preferido',
-  'Auto-connect to IDE': 'Conexão Automática com IDE',
+  'Auto-connect to IDE': 'Conexï¿½o Automï¿½tica com IDE',
   'Enable Prompt Completion': 'Ativar Autocompletar de Prompts',
-  'Debug Keystroke Logging': 'Log de Depuração de Teclas',
+  'Debug Keystroke Logging': 'Log de Depuraï¿½ï¿½o de Teclas',
   'Language: UI': 'Idioma: Interface',
   'Language: Model': 'Idioma: Modelo',
-  'Output Format': 'Formato de Saída',
-  'Hide Window Title': 'Ocultar Título da Janela',
-  'Show Status in Title': 'Mostrar Status no Título',
+  'Output Format': 'Formato de Saï¿½da',
+  'Hide Window Title': 'Ocultar Tï¿½tulo da Janela',
+  'Show Status in Title': 'Mostrar Status no Tï¿½tulo',
   'Hide Tips': 'Ocultar Dicas',
-  'Show Line Numbers in Code': 'Mostrar Números de Linhas no Código',
-  'Show Citations': 'Mostrar Citações',
+  'Show Line Numbers in Code': 'Mostrar Nï¿½meros de Linhas no Cï¿½digo',
+  'Show Citations': 'Mostrar Citaï¿½ï¿½es',
   'Custom Witty Phrases': 'Frases de Efeito Personalizadas',
-  'Show Welcome Back Dialog': 'Mostrar Diálogo de Bem-vindo de Volta',
-  'Enable User Feedback': 'Ativar Feedback do Usuário',
+  'Show Welcome Back Dialog': 'Mostrar Diï¿½logo de Bem-vindo de Volta',
+  'Enable User Feedback': 'Ativar Feedback do Usuï¿½rio',
   'How is HopCode doing this session? (optional)':
-    'Como o HopCode está se saindo nesta sessão? (opcional)',
+    'Como o HopCode estï¿½ se saindo nesta sessï¿½o? (opcional)',
   Bad: 'Ruim',
   Fine: 'Bom',
-  Good: 'Ótimo',
+  Good: 'ï¿½timo',
   Dismiss: 'Ignorar',
-  'Not Sure Yet': 'Não tenho certeza ainda',
+  'Not Sure Yet': 'Nï¿½o tenho certeza ainda',
   'Any other key': 'Qualquer outra tecla',
   'Disable Loading Phrases': 'Desativar Frases de Carregamento',
   'Screen Reader Mode': 'Modo de Leitor de Tela',
   'IDE Mode': 'Modo IDE',
-  'Max Session Turns': 'Máximo de Turnos da Sessão',
-  'Skip Next Speaker Check': 'Pular Verificação do Próximo Falante',
-  'Skip Loop Detection': 'Pular Detecção de Loop',
-  'Skip Startup Context': 'Pular Contexto de Inicialização',
+  'Max Session Turns': 'Mï¿½ximo de Turnos da Sessï¿½o',
+  'Skip Next Speaker Check': 'Pular Verificaï¿½ï¿½o do Prï¿½ximo Falante',
+  'Skip Loop Detection': 'Pular Detecï¿½ï¿½o de Loop',
+  'Skip Startup Context': 'Pular Contexto de Inicializaï¿½ï¿½o',
   'Enable OpenAI Logging': 'Ativar Log do OpenAI',
-  'OpenAI Logging Directory': 'Diretório de Log do OpenAI',
+  'OpenAI Logging Directory': 'Diretï¿½rio de Log do OpenAI',
   Timeout: 'Tempo Limite',
-  'Max Retries': 'Máximo de Tentativas',
+  'Max Retries': 'Mï¿½ximo de Tentativas',
   'Disable Cache Control': 'Desativar Controle de Cache',
-  'Memory Discovery Max Dirs': 'Descoberta de Memória Máx. Diretorios',
+  'Memory Discovery Max Dirs': 'Descoberta de Memï¿½ria Mï¿½x. Diretorios',
   'Load Memory From Include Directories':
-    'Carregar Memória de Diretórios Incluídos',
+    'Carregar Memï¿½ria de Diretï¿½rios Incluï¿½dos',
   'Respect .gitignore': 'Respeitar .gitignore',
   'Respect .hopcodeignore': 'Respeitar .hopcodeignore',
   'Enable Recursive File Search': 'Ativar Pesquisa Recursiva de Arquivos',
@@ -363,239 +363,239 @@ export default {
   'Auto Accept': 'Aceitar Automaticamente',
   'Use Ripgrep': 'Usar Ripgrep',
   'Use Builtin Ripgrep': 'Usar Ripgrep Integrado',
-  'Enable Tool Output Truncation': 'Ativar Truncamento de Saída de Ferramenta',
+  'Enable Tool Output Truncation': 'Ativar Truncamento de Saï¿½da de Ferramenta',
   'Tool Output Truncation Threshold':
-    'Limite de Truncamento de Saída de Ferramenta',
+    'Limite de Truncamento de Saï¿½da de Ferramenta',
   'Tool Output Truncation Lines':
-    'Linhas de Truncamento de Saída de Ferramenta',
-  'Folder Trust': 'Confiança de Pasta',
-  'Vision Model Preview': 'Visualização de Modelo de Visão',
+    'Linhas de Truncamento de Saï¿½da de Ferramenta',
+  'Folder Trust': 'Confianï¿½a de Pasta',
+  'Vision Model Preview': 'Visualizaï¿½ï¿½o de Modelo de Visï¿½o',
   'Tool Schema Compliance': 'Conformidade de Esquema de Ferramenta',
 
   // Settings enum options
-  'Auto (detect from system)': 'Automático (detectar do sistema)',
-  'Auto (detect terminal theme)': 'Automático (detectar tema do terminal)',
-  Auto: 'Automático',
+  'Auto (detect from system)': 'Automï¿½tico (detectar do sistema)',
+  'Auto (detect terminal theme)': 'Automï¿½tico (detectar tema do terminal)',
+  Auto: 'Automï¿½tico',
   Text: 'Texto',
   JSON: 'JSON',
   Plan: 'Planejamento',
-  Default: 'Padrão',
-  'Auto Edit': 'Edição Automática',
+  Default: 'Padrï¿½o',
+  'Auto Edit': 'Ediï¿½ï¿½o Automï¿½tica',
   IZN: 'IZN',
   'toggle vim mode on/off': 'alternar modo vim ligado/desligado',
   'check session stats. Usage: /stats [model|tools]':
-    'verificar estatísticas da sessão. Uso: /stats [model|tools]',
+    'verificar estatï¿½sticas da sessï¿½o. Uso: /stats [model|tools]',
   'Show model-specific usage statistics.':
-    'Mostrar estatísticas de uso específicas do modelo.',
+    'Mostrar estatï¿½sticas de uso especï¿½ficas do modelo.',
   'Show tool-specific usage statistics.':
-    'Mostrar estatísticas de uso específicas da ferramenta.',
+    'Mostrar estatï¿½sticas de uso especï¿½ficas da ferramenta.',
   'exit the cli': 'sair da cli',
   'Open MCP management dialog, or authenticate with OAuth-enabled servers':
-    'Abrir diálogo de gerenciamento MCP ou autenticar com servidor habilitado para OAuth',
+    'Abrir diï¿½logo de gerenciamento MCP ou autenticar com servidor habilitado para OAuth',
   'List configured MCP servers and tools, or authenticate with OAuth-enabled servers':
     'Listar servidores e ferramentas MCP configurados, ou autenticar com servidores habilitados para OAuth',
-  'Manage workspace directories': 'Gerenciar diretórios do workspace',
+  'Manage workspace directories': 'Gerenciar diretï¿½rios do workspace',
   'Add directories to the workspace. Use comma to separate multiple paths':
-    'Adicionar diretórios ao workspace. Use vírgula para separar vários caminhos',
+    'Adicionar diretï¿½rios ao workspace. Use vï¿½rgula para separar vï¿½rios caminhos',
   'Show all directories in the workspace':
-    'Mostrar todos os diretórios no workspace',
-  'set external editor preference': 'definir preferência de editor externo',
+    'Mostrar todos os diretï¿½rios no workspace',
+  'set external editor preference': 'definir preferï¿½ncia de editor externo',
   'Select Editor': 'Selecionar Editor',
-  'Editor Preference': 'Preferência de Editor',
+  'Editor Preference': 'Preferï¿½ncia de Editor',
   'These editors are currently supported. Please note that some editors cannot be used in sandbox mode.':
-    'Estes editores são suportados atualmente. Note que alguns editores não podem ser usados no modo sandbox.',
-  'Your preferred editor is:': 'Seu editor preferido é:',
-  'Manage extensions': 'Gerenciar extensões',
-  'Manage installed extensions': 'Gerenciar extensões instaladas',
-  'List active extensions': 'Listar extensões ativas',
+    'Estes editores sï¿½o suportados atualmente. Note que alguns editores nï¿½o podem ser usados no modo sandbox.',
+  'Your preferred editor is:': 'Seu editor preferido ï¿½:',
+  'Manage extensions': 'Gerenciar extensï¿½es',
+  'Manage installed extensions': 'Gerenciar extensï¿½es instaladas',
+  'List active extensions': 'Listar extensï¿½es ativas',
   'Update extensions. Usage: update <extension-names>|--all':
-    'Atualizar extensões. Uso: update <nomes-das-extensoes>|--all',
-  'Disable an extension': 'Desativar uma extensão',
-  'Enable an extension': 'Ativar uma extensão',
+    'Atualizar extensï¿½es. Uso: update <nomes-das-extensoes>|--all',
+  'Disable an extension': 'Desativar uma extensï¿½o',
+  'Enable an extension': 'Ativar uma extensï¿½o',
   'Install an extension from a git repo or local path':
-    'Instalar uma extensão de um repositório git ou caminho local',
-  'Uninstall an extension': 'Desinstalar uma extensão',
-  'No extensions installed.': 'Nenhuma extensão instalada.',
+    'Instalar uma extensï¿½o de um repositï¿½rio git ou caminho local',
+  'Uninstall an extension': 'Desinstalar uma extensï¿½o',
+  'No extensions installed.': 'Nenhuma extensï¿½o instalada.',
   'Usage: /extensions update <extension-names>|--all':
     'Uso: /extensions update <nomes-das-extensoes>|--all',
-  'Extension "{{name}}" not found.': 'Extensão "{{name}}" não encontrada.',
-  'No extensions to update.': 'Nenhuma extensão para atualizar.',
+  'Extension "{{name}}" not found.': 'Extensï¿½o "{{name}}" nï¿½o encontrada.',
+  'No extensions to update.': 'Nenhuma extensï¿½o para atualizar.',
   'Usage: /extensions install <source>': 'Uso: /extensions install <fonte>',
   'Installing extension from "{{source}}"...':
-    'Instalando extensão de "{{source}}"...',
+    'Instalando extensï¿½o de "{{source}}"...',
   'Extension "{{name}}" installed successfully.':
-    'Extensão "{{name}}" instalada com sucesso.',
+    'Extensï¿½o "{{name}}" instalada com sucesso.',
   'Failed to install extension from "{{source}}": {{error}}':
-    'Falha ao instalar extensão de "{{source}}": {{error}}',
+    'Falha ao instalar extensï¿½o de "{{source}}": {{error}}',
   'Usage: /extensions uninstall <extension-name>':
     'Uso: /extensions uninstall <nome-da-extensao>',
   'Uninstalling extension "{{name}}"...':
-    'Desinstalando extensão "{{name}}"...',
+    'Desinstalando extensï¿½o "{{name}}"...',
   'Extension "{{name}}" uninstalled successfully.':
-    'Extensão "{{name}}" desinstalada com sucesso.',
+    'Extensï¿½o "{{name}}" desinstalada com sucesso.',
   'Failed to uninstall extension "{{name}}": {{error}}':
-    'Falha ao desinstalar extensão "{{name}}": {{error}}',
+    'Falha ao desinstalar extensï¿½o "{{name}}": {{error}}',
   'Usage: /extensions {{command}} <extension> [--scope=<user|workspace>]':
     'Uso: /extensions {{command}} <extensao> [--scope=<user|workspace>]',
   'Unsupported scope "{{scope}}", deve ser um de "user" ou "workspace"':
-    'Escopo não suportado "{{scope}}", deve ser um de "user" ou "workspace"',
+    'Escopo nï¿½o suportado "{{scope}}", deve ser um de "user" ou "workspace"',
   'Extension "{{name}}" disabled for scope "{{scope}}"':
-    'Extensão "{{name}}" desativada para o escopo "{{scope}}"',
+    'Extensï¿½o "{{name}}" desativada para o escopo "{{scope}}"',
   'Extension "{{name}}" enabled for scope "{{scope}}"':
-    'Extensão "{{name}}" ativada para o escopo "{{scope}}"',
-  'Do you want to continue? [Y/n]: ': 'Você deseja continuar? [Y/n]: ',
-  'Do you want to continue?': 'Você deseja continuar?',
-  'Installing extension "{{name}}".': 'Instalando extensão "{{name}}".',
+    'Extensï¿½o "{{name}}" ativada para o escopo "{{scope}}"',
+  'Do you want to continue? [Y/n]: ': 'Vocï¿½ deseja continuar? [Y/n]: ',
+  'Do you want to continue?': 'Vocï¿½ deseja continuar?',
+  'Installing extension "{{name}}".': 'Instalando extensï¿½o "{{name}}".',
   '**Extensions may introduce unexpected behavior. Ensure you have investigated the extension source and trust the author.**':
-    '**As extensões podem introduzir comportamentos inesperados. Certifique-se de ter investigado a fonte da extensão e confie no autor.**',
+    '**As extensï¿½es podem introduzir comportamentos inesperados. Certifique-se de ter investigado a fonte da extensï¿½o e confie no autor.**',
   'This extension will run the following MCP servers:':
-    'Esta extensão executará os seguintes servidores MCP:',
+    'Esta extensï¿½o executarï¿½ os seguintes servidores MCP:',
   local: 'local',
   remote: 'remoto',
   'This extension will add the following commands: {{commands}}.':
-    'Esta extensão adicionará os seguintes comandos: {{commands}}.',
+    'Esta extensï¿½o adicionarï¿½ os seguintes comandos: {{commands}}.',
   'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    'Esta extensão anexará informações ao seu contexto HOPCODE.md usando {{fileName}}',
+    'Esta extensï¿½o anexarï¿½ informaï¿½ï¿½es ao seu contexto HOPCODE.md usando {{fileName}}',
   'This extension will exclude the following core tools: {{tools}}':
-    'Esta extensão excluirá as seguintes ferramentas principais: {{tools}}',
+    'Esta extensï¿½o excluirï¿½ as seguintes ferramentas principais: {{tools}}',
   'This extension will install the following skills:':
-    'Esta extensão instalará as seguintes habilidades:',
+    'Esta extensï¿½o instalarï¿½ as seguintes habilidades:',
   'This extension will install the following subagents:':
-    'Esta extensão instalará os seguintes subagentes:',
+    'Esta extensï¿½o instalarï¿½ os seguintes subagentes:',
   'Installation cancelled for "{{name}}".':
-    'Instalação cancelada para "{{name}}".',
+    'Instalaï¿½ï¿½o cancelada para "{{name}}".',
   'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.':
-    'Você está instalando uma extensão de {{originSource}}. Alguns recursos podem não funcionar perfeitamente com o HopCode.',
+    'Vocï¿½ estï¿½ instalando uma extensï¿½o de {{originSource}}. Alguns recursos podem nï¿½o funcionar perfeitamente com o HopCode.',
   '--ref and --auto-update are not applicable for marketplace extensions.':
-    '--ref e --auto-update não são aplicáveis para extensões de marketplace.',
+    '--ref e --auto-update nï¿½o sï¿½o aplicï¿½veis para extensï¿½es de marketplace.',
   'Extension "{{name}}" installed successfully and enabled.':
-    'Extensão "{{name}}" instalada com sucesso e ativada.',
+    'Extensï¿½o "{{name}}" instalada com sucesso e ativada.',
   'Installs an extension from a git repository URL, local path, or claude marketplace (marketplace-url:plugin-name).':
-    'Instala uma extensão de uma URL de repositório git, caminho local ou marketplace do claude (marketplace-url:plugin-name).',
+    'Instala uma extensï¿½o de uma URL de repositï¿½rio git, caminho local ou marketplace do claude (marketplace-url:plugin-name).',
   'The github URL, local path, or marketplace source (marketplace-url:plugin-name) of the extension to install.':
-    'A URL do github, caminho local ou fonte do marketplace (marketplace-url:plugin-name) da extensão para instalar.',
-  'The git ref to install from.': 'A referência git para instalar.',
+    'A URL do github, caminho local ou fonte do marketplace (marketplace-url:plugin-name) da extensï¿½o para instalar.',
+  'The git ref to install from.': 'A referï¿½ncia git para instalar.',
   'Enable auto-update for this extension.':
-    'Ativar atualização automática para esta extensão.',
+    'Ativar atualizaï¿½ï¿½o automï¿½tica para esta extensï¿½o.',
   'Enable pre-release versions for this extension.':
-    'Ativar versões de pré-lançamento para esta extensão.',
+    'Ativar versï¿½es de prï¿½-lanï¿½amento para esta extensï¿½o.',
   'Acknowledge the security risks of installing an extension and skip the confirmation prompt.':
-    'Reconhecer os riscos de segurança de instalar uma extensão e pular o prompt de confirmação.',
+    'Reconhecer os riscos de seguranï¿½a de instalar uma extensï¿½o e pular o prompt de confirmaï¿½ï¿½o.',
   'The source argument must be provided.':
     'O argumento fonte deve ser fornecido.',
   'Extension "{{name}}" successfully uninstalled.':
-    'Extensão "{{name}}" desinstalada com sucesso.',
-  'Uninstalls an extension.': 'Desinstala uma extensão.',
+    'Extensï¿½o "{{name}}" desinstalada com sucesso.',
+  'Uninstalls an extension.': 'Desinstala uma extensï¿½o.',
   'The name or source path of the extension to uninstall.':
-    'O nome ou caminho da fonte da extensão para desinstalar.',
+    'O nome ou caminho da fonte da extensï¿½o para desinstalar.',
   'Please include the name of the extension to uninstall as a positional argument.':
-    'Inclua o nome da extensão para desinstalar como um argumento posicional.',
-  'Enables an extension.': 'Ativa uma extensão.',
-  'The name of the extension to enable.': 'O nome da extensão para ativar.',
+    'Inclua o nome da extensï¿½o para desinstalar como um argumento posicional.',
+  'Enables an extension.': 'Ativa uma extensï¿½o.',
+  'The name of the extension to enable.': 'O nome da extensï¿½o para ativar.',
   'The scope to enable the extenison in. If not set, will be enabled in all scopes.':
-    'O escopo para ativar a extensão. Se não definido, será ativada em todos os escopos.',
+    'O escopo para ativar a extensï¿½o. Se nï¿½o definido, serï¿½ ativada em todos os escopos.',
   'Extension "{{name}}" successfully enabled for scope "{{scope}}".':
-    'Extensão "{{name}}" ativada com sucesso para o escopo "{{scope}}".',
+    'Extensï¿½o "{{name}}" ativada com sucesso para o escopo "{{scope}}".',
   'Extension "{{name}}" successfully enabled in all scopes.':
-    'Extensão "{{name}}" ativada com sucesso em todos os escopos.',
+    'Extensï¿½o "{{name}}" ativada com sucesso em todos os escopos.',
   'Invalid scope: {{scope}}. Please use one of {{scopes}}.':
-    'Escopo inválido: {{scope}}. Use um de {{scopes}}.',
-  'Disables an extension.': 'Desativa uma extensão.',
-  'The name of the extension to disable.': 'O nome da extensão para desativar.',
+    'Escopo invï¿½lido: {{scope}}. Use um de {{scopes}}.',
+  'Disables an extension.': 'Desativa uma extensï¿½o.',
+  'The name of the extension to disable.': 'O nome da extensï¿½o para desativar.',
   'The scope to disable the extenison in.':
-    'O escopo para desativar a extensão.',
+    'O escopo para desativar a extensï¿½o.',
   'Extension "{{name}}" successfully disabled for scope "{{scope}}".':
-    'Extensão "{{name}}" desativada com sucesso para o escopo "{{scope}}".',
+    'Extensï¿½o "{{name}}" desativada com sucesso para o escopo "{{scope}}".',
   'Extension "{{name}}" successfully updated: {{oldVersion}} ? {{newVersion}}.':
-    'Extensão "{{name}}" atualizada com sucesso: {{oldVersion}} ? {{newVersion}}.',
+    'Extensï¿½o "{{name}}" atualizada com sucesso: {{oldVersion}} ? {{newVersion}}.',
   'Unable to install extension "{{name}}" due to missing install metadata':
-    'Não foi possível instalar a extensão "{{name}}" devido à falta de metadados de instalação',
+    'Nï¿½o foi possï¿½vel instalar a extensï¿½o "{{name}}" devido ï¿½ falta de metadados de instalaï¿½ï¿½o',
   'Extension "{{name}}" is already up to date.':
-    'A extensão "{{name}}" já está atualizada.',
+    'A extensï¿½o "{{name}}" jï¿½ estï¿½ atualizada.',
   'Updates all extensions or a named extension to the latest version.':
-    'Atualiza todas as extensões ou uma extensão nomeada para a última versão.',
-  'Update all extensions.': 'Atualizar todas as extensões.',
+    'Atualiza todas as extensï¿½es ou uma extensï¿½o nomeada para a ï¿½ltima versï¿½o.',
+  'Update all extensions.': 'Atualizar todas as extensï¿½es.',
   'Either an extension name or --all must be provided':
-    'Um nome de extensão ou --all deve ser fornecido',
-  'Lists installed extensions.': 'Lista as extensões instaladas.',
-  'Link extension failed to install.': 'Falha ao instalar link da extensão.',
+    'Um nome de extensï¿½o ou --all deve ser fornecido',
+  'Lists installed extensions.': 'Lista as extensï¿½es instaladas.',
+  'Link extension failed to install.': 'Falha ao instalar link da extensï¿½o.',
   'Extension "{{name}}" linked successfully and enabled.':
-    'Extensão "{{name}}" vinculada com sucesso e ativada.',
+    'Extensï¿½o "{{name}}" vinculada com sucesso e ativada.',
   'Links an extension from a local path. Updates made to the local path will always be reflected.':
-    'Vincula uma extensão de um caminho local. Atualizações feitas no caminho local sempre serão refletidas.',
-  'The name of the extension to link.': 'O nome da extensão para vincular.',
+    'Vincula uma extensï¿½o de um caminho local. Atualizaï¿½ï¿½es feitas no caminho local sempre serï¿½o refletidas.',
+  'The name of the extension to link.': 'O nome da extensï¿½o para vincular.',
   'Set a specific setting for an extension.':
-    'Define uma configuração específica para uma extensão.',
-  'Name of the extension to configure.': 'Nome da extensão para configurar.',
+    'Define uma configuraï¿½ï¿½o especï¿½fica para uma extensï¿½o.',
+  'Name of the extension to configure.': 'Nome da extensï¿½o para configurar.',
   'The setting to configure (name or env var).':
-    'A configuração para configurar (nome ou var env).',
-  'The scope to set the setting in.': 'O escopo para definir a configuração.',
+    'A configuraï¿½ï¿½o para configurar (nome ou var env).',
+  'The scope to set the setting in.': 'O escopo para definir a configuraï¿½ï¿½o.',
   'List all settings for an extension.':
-    'Listar todas as configurações de uma extensão.',
-  'Name of the extension.': 'Nome da extensão.',
+    'Listar todas as configuraï¿½ï¿½es de uma extensï¿½o.',
+  'Name of the extension.': 'Nome da extensï¿½o.',
   'Extension "{{name}}" has no settings to configure.':
-    'A extensão "{{name}}" não tem configurações para configurar.',
-  'Settings for "{{name}}":': 'Configurações para "{{name}}":',
+    'A extensï¿½o "{{name}}" nï¿½o tem configuraï¿½ï¿½es para configurar.',
+  'Settings for "{{name}}":': 'Configuraï¿½ï¿½es para "{{name}}":',
   '(workspace)': '(workspace)',
-  '(user)': '(usuário)',
-  '[not set]': '[não definido]',
+  '(user)': '(usuï¿½rio)',
+  '[not set]': '[nï¿½o definido]',
   '[value stored in keychain]': '[valor armazenado no chaveiro]',
   'Value:': 'Valor:',
-  'Manage extension settings.': 'Gerenciar configurações de extensão.',
+  'Manage extension settings.': 'Gerenciar configuraï¿½ï¿½es de extensï¿½o.',
   'You need to specify a command (set or list).':
-    'Você precisa especificar um comando (set ou list).',
+    'Vocï¿½ precisa especificar um comando (set ou list).',
 
   // ============================================================================
   // Plugin Choice / Marketplace
   // ============================================================================
   'No plugins available in this marketplace.':
-    'Nenhum plugin disponível neste marketplace.',
+    'Nenhum plugin disponï¿½vel neste marketplace.',
   'Select a plugin to install from marketplace "{{name}}":':
     'Selecione um plugin para instalar do marketplace "{{name}}":',
-  'Plugin selection cancelled.': 'Seleção de plugin cancelada.',
+  'Plugin selection cancelled.': 'Seleï¿½ï¿½o de plugin cancelada.',
   'Select a plugin from "{{name}}"': 'Selecione um plugin de "{{name}}"',
   'Use ?? or j/k to navigate, Enter to select, Escape to cancel':
     'Use ?? ou j/k para navegar, Enter para selecionar, Escape para cancelar',
   '{{count}} more above': '{{count}} mais acima',
   '{{count}} more below': '{{count}} mais abaixo',
-  'manage IDE integration': 'gerenciar integração com IDE',
-  'check status of IDE integration': 'verificar status da integração com IDE',
+  'manage IDE integration': 'gerenciar integraï¿½ï¿½o com IDE',
+  'check status of IDE integration': 'verificar status da integraï¿½ï¿½o com IDE',
   'install required IDE companion for {{ideName}}':
-    'instalar companion IDE necessário para {{ideName}}',
-  'enable IDE integration': 'ativar integração com IDE',
-  'disable IDE integration': 'desativar integração com IDE',
+    'instalar companion IDE necessï¿½rio para {{ideName}}',
+  'enable IDE integration': 'ativar integraï¿½ï¿½o com IDE',
+  'disable IDE integration': 'desativar integraï¿½ï¿½o com IDE',
   'IDE integration is not supported in your current environment. To use this feature, run HopCode in one of these supported IDEs: VS Code or VS Code forks.':
-    'A integração com IDE não é suportada no seu ambiente atual. Para usar este recurso, execute o HopCode em um destes IDEs suportados: VS Code ou forks do VS Code.',
+    'A integraï¿½ï¿½o com IDE nï¿½o ï¿½ suportada no seu ambiente atual. Para usar este recurso, execute o HopCode em um destes IDEs suportados: VS Code ou forks do VS Code.',
   'Set up GitHub Actions': 'Configurar GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
     'Configurar atalhos de terminal para entrada multilinhas (VS Code, Cursor, Windsurf, Trae)',
   'Please restart your terminal for the changes to take effect.':
-    'Reinicie seu terminal para que as alterações tenham efeito.',
+    'Reinicie seu terminal para que as alteraï¿½ï¿½es tenham efeito.',
   'Failed to configure terminal: {{error}}':
     'Falha ao configurar terminal: {{error}}',
   'Could not determine {{terminalName}} config path on Windows: APPDATA environment variable is not set.':
-    'Não foi possível determinar o caminho de configuração de {{terminalName}} no Windows: variável de ambiente APPDATA não está definida.',
+    'Nï¿½o foi possï¿½vel determinar o caminho de configuraï¿½ï¿½o de {{terminalName}} no Windows: variï¿½vel de ambiente APPDATA nï¿½o estï¿½ definida.',
   '{{terminalName}} keybindings.json exists but is not a valid JSON array. Please fix the file manually or delete it to allow automatic configuration.':
-    '{{terminalName}} keybindings.json existe mas não é um array JSON válido. Corrija o arquivo manualmente ou exclua-o para permitir a configuração automática.',
+    '{{terminalName}} keybindings.json existe mas nï¿½o ï¿½ um array JSON vï¿½lido. Corrija o arquivo manualmente ou exclua-o para permitir a configuraï¿½ï¿½o automï¿½tica.',
   'File: {{file}}': 'Arquivo: {{file}}',
   'Failed to parse {{terminalName}} keybindings.json. The file contains invalid JSON. Please fix the file manually or delete it to allow automatic configuration.':
-    'Falha ao analisar {{terminalName}} keybindings.json. O arquivo contém JSON inválido. Corrija o arquivo manualmente ou exclua-o para permitir a configuração automática.',
+    'Falha ao analisar {{terminalName}} keybindings.json. O arquivo contï¿½m JSON invï¿½lido. Corrija o arquivo manualmente ou exclua-o para permitir a configuraï¿½ï¿½o automï¿½tica.',
   'Error: {{error}}': 'Erro: {{error}}',
-  'Shift+Enter binding already exists': 'Atalho Shift+Enter já existe',
-  'Ctrl+Enter binding already exists': 'Atalho Ctrl+Enter já existe',
+  'Shift+Enter binding already exists': 'Atalho Shift+Enter jï¿½ existe',
+  'Ctrl+Enter binding already exists': 'Atalho Ctrl+Enter jï¿½ existe',
   'Existing keybindings detected. Will not modify to avoid conflicts.':
-    'Atalhos existentes detectados. Não serão modificados para evitar conflitos.',
+    'Atalhos existentes detectados. Nï¿½o serï¿½o modificados para evitar conflitos.',
   'Please check and modify manually if needed: {{file}}':
-    'Verifique e modifique manualmente se necessário: {{file}}',
+    'Verifique e modifique manualmente se necessï¿½rio: {{file}}',
   'Added Shift+Enter and Ctrl+Enter keybindings to {{terminalName}}.':
     'Adicionados atalhos Shift+Enter e Ctrl+Enter para {{terminalName}}.',
   'Modified: {{file}}': 'Modificado: {{file}}',
   '{{terminalName}} keybindings already configured.':
-    'Atalhos de {{terminalName}} já configurados.',
+    'Atalhos de {{terminalName}} jï¿½ configurados.',
   'Failed to configure {{terminalName}}.':
     'Falha ao configurar {{terminalName}}.',
   'Your terminal is already configured for an optimal experience with multiline input (Shift+Enter and Ctrl+Enter).':
-    'Seu terminal já está configurado para uma experiência ideal com entrada multilinhas (Shift+Enter e Ctrl+Enter).',
+    'Seu terminal jï¿½ estï¿½ configurado para uma experiï¿½ncia ideal com entrada multilinhas (Shift+Enter e Ctrl+Enter).',
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
@@ -611,127 +611,127 @@ export default {
   'Press Escape, Ctrl+C, or Ctrl+D to cancel':
     'Pressione Escape, Ctrl+C ou Ctrl+D para cancelar',
   'Press Space, Enter, or Escape to dismiss':
-    'Pressione Espaço, Enter ou Escape para dispensar',
+    'Pressione Espaï¿½o, Enter ou Escape para dispensar',
   'No hook selected': 'Nenhum hook selecionado',
   // Hooks - List Step
   'No hook events found.': 'Nenhum evento de hook encontrado.',
   '{{count}} hook configured': '{{count}} hook configurado',
   '{{count}} hooks configured': '{{count}} hooks configurados',
   'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
-    'Este menu é somente leitura. Para adicionar ou modificar hooks, edite settings.json diretamente ou pergunte ao HopCode.',
-  'Enter to select · Esc to cancel':
-    'Enter para selecionar · Esc para cancelar',
+    'Este menu ï¿½ somente leitura. Para adicionar ou modificar hooks, edite settings.json diretamente ou pergunte ao HopCode.',
+  'Enter to select ï¿½ Esc to cancel':
+    'Enter para selecionar ï¿½ Esc para cancelar',
   // Hooks - Detail Step
-  'Exit codes:': 'Códigos de saída:',
+  'Exit codes:': 'Cï¿½digos de saï¿½da:',
   'Configured hooks:': 'Hooks configurados:',
   'No hooks configured for this event.':
     'Nenhum hook configurado para este evento.',
   'To add hooks, edit settings.json directly or ask HopCode.':
     'Para adicionar hooks, edite settings.json diretamente ou pergunte ao HopCode.',
-  'Enter to select · Esc to go back': 'Enter para selecionar · Esc para voltar',
+  'Enter to select ï¿½ Esc to go back': 'Enter para selecionar ï¿½ Esc para voltar',
   // Hooks - Config Detail Step
   'Hook details': 'Detalhes do Hook',
   'Event:': 'Evento:',
-  'Extension:': 'Extensão:',
-  'Desc:': 'Descrição:',
-  'No hook config selected': 'Nenhuma configuração de hook selecionada',
+  'Extension:': 'Extensï¿½o:',
+  'Desc:': 'Descriï¿½ï¿½o:',
+  'No hook config selected': 'Nenhuma configuraï¿½ï¿½o de hook selecionada',
   'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
     'Para modificar ou remover este hook, edite settings.json diretamente ou pergunte ao HopCode.',
   // Hooks - Disabled Step
-  'Hook Configuration - Disabled': 'Configuração de Hook - Desativado',
+  'Hook Configuration - Disabled': 'Configuraï¿½ï¿½o de Hook - Desativado',
   'All hooks are currently disabled. You have {{count}} that are not running.':
-    'Todos os hooks estão desativados. Você tem {{count}} que não estão em execução.',
+    'Todos os hooks estï¿½o desativados. Vocï¿½ tem {{count}} que nï¿½o estï¿½o em execuï¿½ï¿½o.',
   '{{count}} configured hook': '{{count}} hook configurado',
   '{{count}} configured hooks': '{{count}} hooks configurados',
-  'When hooks are disabled:': 'Quando os hooks estão desativados:',
-  'No hook commands will execute': 'Nenhum comando de hook será executado',
-  'StatusLine will not be displayed': 'StatusLine não será exibido',
+  'When hooks are disabled:': 'Quando os hooks estï¿½o desativados:',
+  'No hook commands will execute': 'Nenhum comando de hook serï¿½ executado',
+  'StatusLine will not be displayed': 'StatusLine nï¿½o serï¿½ exibido',
   'Tool operations will proceed without hook validation':
-    'As operações de ferramentas prosseguirão sem validação de hook',
+    'As operaï¿½ï¿½es de ferramentas prosseguirï¿½o sem validaï¿½ï¿½o de hook',
   'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.':
     'Para reativar os hooks, remova "disableAllHooks" do settings.json ou pergunte ao HopCode.',
   // Hooks - Source
   Project: 'Projeto',
-  User: 'Usuário',
+  User: 'Usuï¿½rio',
   System: 'Sistema',
-  Extension: 'Extensão',
-  'Local Settings': 'Configurações Locais',
-  'User Settings': 'Configurações do Usuário',
-  'System Settings': 'Configurações do Sistema',
-  Extensions: 'Extensões',
-  'Session (temporary)': 'Sessão (temporário)',
+  Extension: 'Extensï¿½o',
+  'Local Settings': 'Configuraï¿½ï¿½es Locais',
+  'User Settings': 'Configuraï¿½ï¿½es do Usuï¿½rio',
+  'System Settings': 'Configuraï¿½ï¿½es do Sistema',
+  Extensions: 'Extensï¿½es',
+  'Session (temporary)': 'Sessï¿½o (temporï¿½rio)',
   // Hooks - Status
   '? Enabled': '? Ativado',
   '? Disabled': '? Desativado',
   // Hooks - Event Descriptions (short)
-  'Before tool execution': 'Antes da execução da ferramenta',
-  'After tool execution': 'Após a execução da ferramenta',
-  'After tool execution fails': 'Após a falha da execução da ferramenta',
-  'When notifications are sent': 'Quando notificações são enviadas',
-  'When the user submits a prompt': 'Quando o usuário envia um prompt',
-  'When a new session is started': 'Quando uma nova sessão é iniciada',
+  'Before tool execution': 'Antes da execuï¿½ï¿½o da ferramenta',
+  'After tool execution': 'Apï¿½s a execuï¿½ï¿½o da ferramenta',
+  'After tool execution fails': 'Apï¿½s a falha da execuï¿½ï¿½o da ferramenta',
+  'When notifications are sent': 'Quando notificaï¿½ï¿½es sï¿½o enviadas',
+  'When the user submits a prompt': 'Quando o usuï¿½rio envia um prompt',
+  'When a new session is started': 'Quando uma nova sessï¿½o ï¿½ iniciada',
   'Right before HopCode concludes its response':
     'Logo antes do HopCode concluir sua resposta',
   'When a subagent (Agent tool call) is started':
-    'Quando um subagente (chamada de ferramenta Agent) é iniciado',
+    'Quando um subagente (chamada de ferramenta Agent) ï¿½ iniciado',
   'Right before a subagent concludes its response':
     'Logo antes de um subagente concluir sua resposta',
-  'Before conversation compaction': 'Antes da compactação da conversa',
-  'When a session is ending': 'Quando uma sessão está terminando',
+  'Before conversation compaction': 'Antes da compactaï¿½ï¿½o da conversa',
+  'When a session is ending': 'Quando uma sessï¿½o estï¿½ terminando',
   'When a permission dialog is displayed':
-    'Quando um diálogo de permissão é exibido',
+    'Quando um diï¿½logo de permissï¿½o ï¿½ exibido',
   // Hooks - Event Descriptions (detailed)
   'Input to command is JSON of tool call arguments.':
-    'A entrada para o comando é JSON dos argumentos da chamada da ferramenta.',
+    'A entrada para o comando ï¿½ JSON dos argumentos da chamada da ferramenta.',
   'Input to command is JSON with fields "inputs" (tool call arguments) and "response" (tool call response).':
-    'A entrada para o comando é JSON com campos "inputs" (argumentos da chamada da ferramenta) e "response" (resposta da chamada da ferramenta).',
+    'A entrada para o comando ï¿½ JSON com campos "inputs" (argumentos da chamada da ferramenta) e "response" (resposta da chamada da ferramenta).',
   'Input to command is JSON with tool_name, tool_input, tool_use_id, error, error_type, is_interrupt, and is_timeout.':
-    'A entrada para o comando é JSON com tool_name, tool_input, tool_use_id, error, error_type, is_interrupt e is_timeout.',
+    'A entrada para o comando ï¿½ JSON com tool_name, tool_input, tool_use_id, error, error_type, is_interrupt e is_timeout.',
   'Input to command is JSON with notification message and type.':
-    'A entrada para o comando é JSON com mensagem e tipo de notificação.',
+    'A entrada para o comando ï¿½ JSON com mensagem e tipo de notificaï¿½ï¿½o.',
   'Input to command is JSON with original user prompt text.':
-    'A entrada para o comando é JSON com o texto original do prompt do usuário.',
+    'A entrada para o comando ï¿½ JSON com o texto original do prompt do usuï¿½rio.',
   'Input to command is JSON with session start source.':
-    'A entrada para o comando é JSON com a fonte de início da sessão.',
+    'A entrada para o comando ï¿½ JSON com a fonte de inï¿½cio da sessï¿½o.',
   'Input to command is JSON with session end reason.':
-    'A entrada para o comando é JSON com o motivo do fim da sessão.',
+    'A entrada para o comando ï¿½ JSON com o motivo do fim da sessï¿½o.',
   'Input to command is JSON with agent_id and agent_type.':
-    'A entrada para o comando é JSON com agent_id e agent_type.',
+    'A entrada para o comando ï¿½ JSON com agent_id e agent_type.',
   'Input to command is JSON with agent_id, agent_type, and agent_transcript_path.':
-    'A entrada para o comando é JSON com agent_id, agent_type e agent_transcript_path.',
+    'A entrada para o comando ï¿½ JSON com agent_id, agent_type e agent_transcript_path.',
   'Input to command is JSON with compaction details.':
-    'A entrada para o comando é JSON com detalhes da compactação.',
+    'A entrada para o comando ï¿½ JSON com detalhes da compactaï¿½ï¿½o.',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
-    'A entrada para o comando é JSON com tool_name, tool_input e tool_use_id. Saída é JSON com hookSpecificOutput contendo decisão de permitir ou negar.',
+    'A entrada para o comando ï¿½ JSON com tool_name, tool_input e tool_use_id. Saï¿½da ï¿½ JSON com hookSpecificOutput contendo decisï¿½o de permitir ou negar.',
   // Hooks - Exit Code Descriptions
-  'stdout/stderr not shown': 'stdout/stderr não exibido',
+  'stdout/stderr not shown': 'stdout/stderr nï¿½o exibido',
   'show stderr to model and continue conversation':
     'mostrar stderr ao modelo e continuar conversa',
-  'show stderr to user only': 'mostrar stderr apenas ao usuário',
+  'show stderr to user only': 'mostrar stderr apenas ao usuï¿½rio',
   'stdout shown in transcript mode (ctrl+o)':
-    'stdout exibido no modo transcrição (ctrl+o)',
+    'stdout exibido no modo transcriï¿½ï¿½o (ctrl+o)',
   'show stderr to model immediately': 'mostrar stderr ao modelo imediatamente',
   'show stderr to user only but continue with tool call':
-    'mostrar stderr apenas ao usuário mas continuar com chamada de ferramenta',
+    'mostrar stderr apenas ao usuï¿½rio mas continuar com chamada de ferramenta',
   'block processing, erase original prompt, and show stderr to user only':
-    'bloquear processamento, apagar prompt original e mostrar stderr apenas ao usuário',
+    'bloquear processamento, apagar prompt original e mostrar stderr apenas ao usuï¿½rio',
   'stdout shown to HopCode': 'stdout mostrado ao HopCode',
   'show stderr to user only (blocking errors ignored)':
-    'mostrar stderr apenas ao usuário (erros de bloqueio ignorados)',
-  'command completes successfully': 'comando concluído com sucesso',
+    'mostrar stderr apenas ao usuï¿½rio (erros de bloqueio ignorados)',
+  'command completes successfully': 'comando concluï¿½do com sucesso',
   'stdout shown to subagent': 'stdout mostrado ao subagente',
   'show stderr to subagent and continue having it run':
     'mostrar stderr ao subagente e continuar executando',
   'stdout appended as custom compact instructions':
-    'stdout anexado como instruções de compactação personalizadas',
-  'block compaction': 'bloquear compactação',
+    'stdout anexado como instruï¿½ï¿½es de compactaï¿½ï¿½o personalizadas',
+  'block compaction': 'bloquear compactaï¿½ï¿½o',
   'show stderr to user only but continue with compaction':
-    'mostrar stderr apenas ao usuário mas continuar com compactação',
-  'use hook decision if provided': 'usar decisão do hook se fornecida',
+    'mostrar stderr apenas ao usuï¿½rio mas continuar com compactaï¿½ï¿½o',
+  'use hook decision if provided': 'usar decisï¿½o do hook se fornecida',
   // Hooks - Messages
-  'Config not loaded.': 'Configuração não carregada.',
+  'Config not loaded.': 'Configuraï¿½ï¿½o nï¿½o carregada.',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
-    'Hooks não estão ativados. Ative hooks nas configurações para usar este recurso.',
+    'Hooks nï¿½o estï¿½o ativados. Ative hooks nas configuraï¿½ï¿½es para usar este recurso.',
   'No hooks configured. Add hooks in your settings.json file.':
     'Nenhum hook configurado. Adicione hooks no seu arquivo settings.json.',
   'Configured Hooks ({{count}} total)': 'Hooks Configurados ({{count}} total)',
@@ -740,199 +740,199 @@ export default {
   // Commands - Session Export
   // ============================================================================
   'Export current session message history to a file':
-    'Exportar o histórico de mensagens da sessão atual para um arquivo',
-  'Export session to HTML format': 'Exportar a sessão para o formato HTML',
-  'Export session to JSON format': 'Exportar a sessão para o formato JSON',
+    'Exportar o histï¿½rico de mensagens da sessï¿½o atual para um arquivo',
+  'Export session to HTML format': 'Exportar a sessï¿½o para o formato HTML',
+  'Export session to JSON format': 'Exportar a sessï¿½o para o formato JSON',
   'Export session to JSONL format (one message per line)':
-    'Exportar a sessão para o formato JSONL (uma mensagem por linha)',
+    'Exportar a sessï¿½o para o formato JSONL (uma mensagem por linha)',
   'Export session to markdown format':
-    'Exportar a sessão para o formato Markdown',
+    'Exportar a sessï¿½o para o formato Markdown',
 
   // ============================================================================
   // Commands - Insights
   // ============================================================================
   'generate personalized programming insights from your chat history':
-    'Gerar insights personalizados de programação a partir do seu histórico de chat',
+    'Gerar insights personalizados de programaï¿½ï¿½o a partir do seu histï¿½rico de chat',
 
   // ============================================================================
   // Commands - Session History
   // ============================================================================
-  'Resume a previous session': 'Retomar uma sessão anterior',
+  'Resume a previous session': 'Retomar uma sessï¿½o anterior',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
-    'Restaurar uma chamada de ferramenta. Isso redefinirá o histórico da conversa e dos arquivos para o estado em que a chamada da ferramenta foi sugerida',
+    'Restaurar uma chamada de ferramenta. Isso redefinirï¿½ o histï¿½rico da conversa e dos arquivos para o estado em que a chamada da ferramenta foi sugerida',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
-    'Não foi possível detectar o tipo de terminal. Terminais suportados: VS Code, Cursor, Windsurf e Trae.',
+    'Nï¿½o foi possï¿½vel detectar o tipo de terminal. Terminais suportados: VS Code, Cursor, Windsurf e Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
-    'O terminal "{{terminal}}" ainda não é suportado.',
+    'O terminal "{{terminal}}" ainda nï¿½o ï¿½ suportado.',
 
   // ============================================================================
   // Commands - Language
   // ============================================================================
   'Invalid language. Available: {{options}}':
-    'Idioma inválido. Disponíveis: {{options}}',
+    'Idioma invï¿½lido. Disponï¿½veis: {{options}}',
   'Language subcommands do not accept additional arguments.':
-    'Subcomandos de idioma não aceitam argumentos adicionais.',
+    'Subcomandos de idioma nï¿½o aceitam argumentos adicionais.',
   'Current UI language: {{lang}}': 'Idioma atual da interface: {{lang}}',
   'Current LLM output language: {{lang}}':
-    'Idioma atual da saída do LLM: {{lang}}',
-  'LLM output language not set': 'Idioma de saída do LLM não definido',
+    'Idioma atual da saï¿½da do LLM: {{lang}}',
+  'LLM output language not set': 'Idioma de saï¿½da do LLM nï¿½o definido',
   'Set UI language': 'Definir idioma da interface',
-  'Set LLM output language': 'Definir idioma de saída do LLM',
+  'Set LLM output language': 'Definir idioma de saï¿½da do LLM',
   'Usage: /language ui [{{options}}]': 'Uso: /language ui [{{options}}]',
   'Usage: /language output <language>': 'Uso: /language output <idioma>',
-  'Example: /language output ??': 'Exemplo: /language output Português',
-  'Example: /language output English': 'Exemplo: /language output Inglês',
-  'Example: /language output ???': 'Exemplo: /language output Japonês',
-  'Example: /language output Português': 'Exemplo: /language output Português',
+  'Example: /language output ??': 'Exemplo: /language output Portuguï¿½s',
+  'Example: /language output English': 'Exemplo: /language output Inglï¿½s',
+  'Example: /language output ???': 'Exemplo: /language output Japonï¿½s',
+  'Example: /language output Portuguï¿½s': 'Exemplo: /language output Portuguï¿½s',
   'UI language changed to {{lang}}':
     'Idioma da interface alterado para {{lang}}',
   'LLM output language set to {{lang}}':
-    'Idioma de saída do LLM definido para {{lang}}',
+    'Idioma de saï¿½da do LLM definido para {{lang}}',
   'LLM output language rule file generated at {{path}}':
-    'Arquivo de regra de idioma de saída do LLM gerado em {{path}}',
+    'Arquivo de regra de idioma de saï¿½da do LLM gerado em {{path}}',
   'Please restart the application for the changes to take effect.':
-    'Reinicie o aplicativo para que as alterações tenham efeito.',
+    'Reinicie o aplicativo para que as alteraï¿½ï¿½es tenham efeito.',
   'Failed to generate LLM output language rule file: {{error}}':
-    'Falha ao gerar arquivo de regra de idioma de saída do LLM: {{error}}',
+    'Falha ao gerar arquivo de regra de idioma de saï¿½da do LLM: {{error}}',
   'Invalid command. Available subcommands:':
-    'Comando inválido. Subcomandos disponíveis:',
-  'Available subcommands:': 'Subcomandos disponíveis:',
+    'Comando invï¿½lido. Subcomandos disponï¿½veis:',
+  'Available subcommands:': 'Subcomandos disponï¿½veis:',
   'To request additional UI language packs, please open an issue on GitHub.':
     'Para solicitar pacotes de idiomas de interface adicionais, abra um problema no GitHub.',
-  'Available options:': 'Opções disponíveis:',
+  'Available options:': 'Opï¿½ï¿½es disponï¿½veis:',
   'Set UI language to {{name}}': 'Definir idioma da interface para {{name}}',
 
   // ============================================================================
   // Commands - Approval Mode
   // ============================================================================
-  'Tool Approval Mode': 'Modo de Aprovação de Ferramenta',
-  'Current approval mode: {{mode}}': 'Modo de aprovação atual: {{mode}}',
-  'Available approval modes:': 'Modos de aprovação disponíveis:',
+  'Tool Approval Mode': 'Modo de Aprovaï¿½ï¿½o de Ferramenta',
+  'Current approval mode: {{mode}}': 'Modo de aprovaï¿½ï¿½o atual: {{mode}}',
+  'Available approval modes:': 'Modos de aprovaï¿½ï¿½o disponï¿½veis:',
   'Approval mode changed to: {{mode}}':
-    'Modo de aprovação alterado para: {{mode}}',
+    'Modo de aprovaï¿½ï¿½o alterado para: {{mode}}',
   'Approval mode changed to: {{mode}} (saved to {{scope}} settings{{location}})':
-    'Modo de aprovação alterado para: {{mode}} (salvo nas configurações de {{scope}}{{location}})',
+    'Modo de aprovaï¿½ï¿½o alterado para: {{mode}} (salvo nas configuraï¿½ï¿½es de {{scope}}{{location}})',
   'Usage: /approval-mode <mode> [--session|--user|--project]':
     'Uso: /approval-mode <mode> [--session|--user|--project]',
 
   'Scope subcommands do not accept additional arguments.':
-    'Subcomandos de escopo não aceitam argumentos adicionais.',
+    'Subcomandos de escopo nï¿½o aceitam argumentos adicionais.',
   'Plan mode - Analyze only, do not modify files or execute commands':
-    'Modo planejamento - Apenas analisa, não modifica arquivos nem executa comandos',
+    'Modo planejamento - Apenas analisa, nï¿½o modifica arquivos nem executa comandos',
   'Default mode - Require approval for file edits or shell commands':
-    'Modo padrão - Exige aprovação para edições de arquivos ou comandos shell',
+    'Modo padrï¿½o - Exige aprovaï¿½ï¿½o para ediï¿½ï¿½es de arquivos ou comandos shell',
   'Auto-edit mode - Automatically approve file edits':
-    'Modo auto-edição - Aprova automaticamente edições de arquivos',
+    'Modo auto-ediï¿½ï¿½o - Aprova automaticamente ediï¿½ï¿½es de arquivos',
   'IZN mode - Automatically approve all tools':
     'Modo IZN - Aprova automaticamente todas as ferramentas',
   '{{mode}} mode': 'Modo {{mode}}',
   'Settings service is not available; unable to persist the approval mode.':
-    'Serviço de configurações não disponível; não foi possível persistir o modo de aprovação.',
+    'Serviï¿½o de configuraï¿½ï¿½es nï¿½o disponï¿½vel; nï¿½o foi possï¿½vel persistir o modo de aprovaï¿½ï¿½o.',
   'Failed to save approval mode: {{error}}':
-    'Falha ao salvar modo de aprovação: {{error}}',
+    'Falha ao salvar modo de aprovaï¿½ï¿½o: {{error}}',
   'Failed to change approval mode: {{error}}':
-    'Falha ao alterar modo de aprovação: {{error}}',
+    'Falha ao alterar modo de aprovaï¿½ï¿½o: {{error}}',
   'Apply to current session only (temporary)':
-    'Aplicar apenas à sessão atual (temporário)',
+    'Aplicar apenas ï¿½ sessï¿½o atual (temporï¿½rio)',
   'Persist for this project/workspace': 'Persistir para este projeto/workspace',
   'Persist for this user on this machine':
-    'Persistir para este usuário nesta máquina',
+    'Persistir para este usuï¿½rio nesta mï¿½quina',
   'Analyze only, do not modify files or execute commands':
-    'Apenas analisar, não modificar arquivos nem executar comandos',
+    'Apenas analisar, nï¿½o modificar arquivos nem executar comandos',
   'Require approval for file edits or shell commands':
-    'Exigir aprovação para edições de arquivos ou comandos shell',
+    'Exigir aprovaï¿½ï¿½o para ediï¿½ï¿½es de arquivos ou comandos shell',
   'Automatically approve file edits':
-    'Aprovar automaticamente edições de arquivos',
+    'Aprovar automaticamente ediï¿½ï¿½es de arquivos',
   'Automatically approve all tools':
     'Aprovar automaticamente todas as ferramentas',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
-    'O modo de aprovação do workspace existe e tem prioridade. A alteração no nível do usuário não terá efeito.',
+    'O modo de aprovaï¿½ï¿½o do workspace existe e tem prioridade. A alteraï¿½ï¿½o no nï¿½vel do usuï¿½rio nï¿½o terï¿½ efeito.',
   'Apply To': 'Aplicar A',
-  'Workspace Settings': 'Configurações do Workspace',
+  'Workspace Settings': 'Configuraï¿½ï¿½es do Workspace',
 
   // ============================================================================
   // Commands - Memory
   // ============================================================================
   'Commands for interacting with memory.':
-    'Comandos para interagir com a memória.',
+    'Comandos para interagir com a memï¿½ria.',
   'Show the current memory contents.':
-    'Mostrar os conteúdos atuais da memória.',
+    'Mostrar os conteï¿½dos atuais da memï¿½ria.',
   'Show project-level memory contents.':
-    'Mostrar conteúdos da memória de nível de projeto.',
-  'Show global memory contents.': 'Mostrar conteúdos da memória global.',
+    'Mostrar conteï¿½dos da memï¿½ria de nï¿½vel de projeto.',
+  'Show global memory contents.': 'Mostrar conteï¿½dos da memï¿½ria global.',
   'Add content to project-level memory.':
-    'Adicionar conteúdo à memória de nível de projeto.',
-  'Add content to global memory.': 'Adicionar conteúdo à memória global.',
-  'Refresh the memory from the source.': 'Atualizar a memória da fonte.',
+    'Adicionar conteï¿½do ï¿½ memï¿½ria de nï¿½vel de projeto.',
+  'Add content to global memory.': 'Adicionar conteï¿½do ï¿½ memï¿½ria global.',
+  'Refresh the memory from the source.': 'Atualizar a memï¿½ria da fonte.',
   'Usage: /memory add --project <text to remember>':
     'Uso: /memory add --project <texto para lembrar>',
   'Usage: /memory add --global <text to remember>':
     'Uso: /memory add --global <texto para lembrar>',
   'Attempting to save to project memory: "{{text}}"':
-    'Tentando salvar na memória do projeto: "{{text}}"',
+    'Tentando salvar na memï¿½ria do projeto: "{{text}}"',
   'Attempting to save to global memory: "{{text}}"':
-    'Tentando salvar na memória global: "{{text}}"',
+    'Tentando salvar na memï¿½ria global: "{{text}}"',
   'Current memory content from {{count}} file(s):':
-    'Conteúdo da memória atual de {{count}} arquivo(s):',
-  'Memory is currently empty.': 'A memória está vazia no momento.',
+    'Conteï¿½do da memï¿½ria atual de {{count}} arquivo(s):',
+  'Memory is currently empty.': 'A memï¿½ria estï¿½ vazia no momento.',
   'Project memory file not found or is currently empty.':
-    'Arquivo de memória do projeto não encontrado ou está vazio.',
+    'Arquivo de memï¿½ria do projeto nï¿½o encontrado ou estï¿½ vazio.',
   'Global memory file not found or is currently empty.':
-    'Arquivo de memória global não encontrado ou está vazio.',
+    'Arquivo de memï¿½ria global nï¿½o encontrado ou estï¿½ vazio.',
   'Global memory is currently empty.':
-    'A memória global está vazia no momento.',
+    'A memï¿½ria global estï¿½ vazia no momento.',
   'Global memory content:\n\n---\n{{content}}\n---':
-    'Conteúdo da memória global:\n\n---\n{{content}}\n---',
+    'Conteï¿½do da memï¿½ria global:\n\n---\n{{content}}\n---',
   'Project memory content from {{path}}:\n\n---\n{{content}}\n---':
-    'Conteúdo da memória do projeto de {{path}}:\n\n---\n{{content}}\n---',
+    'Conteï¿½do da memï¿½ria do projeto de {{path}}:\n\n---\n{{content}}\n---',
   'Project memory is currently empty.':
-    'A memória do projeto está vazia no momento.',
+    'A memï¿½ria do projeto estï¿½ vazia no momento.',
   'Refreshing memory from source files...':
-    'Atualizando memória dos arquivos fonte...',
+    'Atualizando memï¿½ria dos arquivos fonte...',
   'Add content to the memory. Use --global for global memory or --project for project memory.':
-    'Adicionar conteúdo à memória. Use --global para memória global ou --project para memória do projeto.',
+    'Adicionar conteï¿½do ï¿½ memï¿½ria. Use --global para memï¿½ria global ou --project para memï¿½ria do projeto.',
   'Usage: /memory add [--global|--project] <text to remember>':
     'Uso: /memory add [--global|--project] <texto para lembrar>',
   'Attempting to save to memory {{scope}}: "{{fact}}"':
-    'Tentando salvar na memória {{scope}}: "{{fact}}"',
-  'Open auto-memory folder': 'Abrir pasta de memória automática',
-  'Auto-memory: {{status}}': 'Memória automática: {{status}}',
-  'Auto-dream: {{status}} · {{lastDream}} · /dream to run':
-    'Consolidação automática: {{status}} · {{lastDream}} · /dream para executar',
+    'Tentando salvar na memï¿½ria {{scope}}: "{{fact}}"',
+  'Open auto-memory folder': 'Abrir pasta de memï¿½ria automï¿½tica',
+  'Auto-memory: {{status}}': 'Memï¿½ria automï¿½tica: {{status}}',
+  'Auto-dream: {{status}} ï¿½ {{lastDream}} ï¿½ /dream to run':
+    'Consolidaï¿½ï¿½o automï¿½tica: {{status}} ï¿½ {{lastDream}} ï¿½ /dream para executar',
   never: 'nunca',
   on: 'ativado',
   off: 'desativado',
   '? dreaming': '? consolidando',
   'Remove matching entries from managed auto-memory.':
-    'Remover entradas correspondentes da memória automática gerenciada.',
+    'Remover entradas correspondentes da memï¿½ria automï¿½tica gerenciada.',
   'Usage: /forget <memory text to remove>':
-    'Uso: /forget <texto de memória a remover>',
+    'Uso: /forget <texto de memï¿½ria a remover>',
   'No managed auto-memory entries matched: {{query}}':
-    'Nenhuma entrada de memória automática gerenciada correspondeu: {{query}}',
+    'Nenhuma entrada de memï¿½ria automï¿½tica gerenciada correspondeu: {{query}}',
   'Show managed auto-memory status.':
-    'Mostrar status da memória automática gerenciada.',
+    'Mostrar status da memï¿½ria automï¿½tica gerenciada.',
   'Run managed auto-memory extraction for the current session.':
-    'Executar extração de memória automática gerenciada para a sessão atual.',
+    'Executar extraï¿½ï¿½o de memï¿½ria automï¿½tica gerenciada para a sessï¿½o atual.',
   'Managed auto-memory root: {{root}}':
-    'Raiz da memória automática gerenciada: {{root}}',
-  'Managed auto-memory topics:': 'Tópicos de memória automática gerenciada:',
+    'Raiz da memï¿½ria automï¿½tica gerenciada: {{root}}',
+  'Managed auto-memory topics:': 'Tï¿½picos de memï¿½ria automï¿½tica gerenciada:',
   'No extraction cursor found yet.':
-    'Nenhum cursor de extração encontrado ainda.',
+    'Nenhum cursor de extraï¿½ï¿½o encontrado ainda.',
   'Cursor: session={{sessionId}}, offset={{offset}}, updated={{updatedAt}}':
-    'Cursor: sessão={{sessionId}}, offset={{offset}}, atualizado={{updatedAt}}',
+    'Cursor: sessï¿½o={{sessionId}}, offset={{offset}}, atualizado={{updatedAt}}',
   'No chat client available to extract memory.':
-    'Nenhum cliente de chat disponível para extrair memória.',
+    'Nenhum cliente de chat disponï¿½vel para extrair memï¿½ria.',
   'Managed auto-memory extraction is already running.':
-    'A extração de memória automática gerenciada já está em execução.',
+    'A extraï¿½ï¿½o de memï¿½ria automï¿½tica gerenciada jï¿½ estï¿½ em execuï¿½ï¿½o.',
   'Managed auto-memory extraction found no new durable memories.':
-    'A extração de memória automática gerenciada não encontrou novas memórias duráveis.',
+    'A extraï¿½ï¿½o de memï¿½ria automï¿½tica gerenciada nï¿½o encontrou novas memï¿½rias durï¿½veis.',
   'Consolidate managed auto-memory topic files.':
-    'Consolidar arquivos de tópicos de memória automática gerenciada.',
+    'Consolidar arquivos de tï¿½picos de memï¿½ria automï¿½tica gerenciada.',
   'Managed auto-memory dream found nothing to improve.':
-    'A consolidação de memória automática não encontrou nada para melhorar.',
+    'A consolidaï¿½ï¿½o de memï¿½ria automï¿½tica nï¿½o encontrou nada para melhorar.',
   'Deduplicated entries: {{count}}': 'Entradas desduplicadas: {{count}}',
   'Save a durable memory using the save_memory tool.':
-    'Salvar uma memória durável usando a ferramenta save_memory.',
+    'Salvar uma memï¿½ria durï¿½vel usando a ferramenta save_memory.',
   'Usage: /remember [--global|--project] <text to remember>':
     'Uso: /remember [--global|--project] <texto a lembrar>',
 
@@ -945,14 +945,14 @@ export default {
     'Listar servidores e ferramentas MCP configurados',
   'Restarts MCP servers.': 'Reinicia os servidores MCP.',
   'Could not retrieve tool registry.':
-    'Não foi possível recuperar o registro de ferramentas.',
+    'Nï¿½o foi possï¿½vel recuperar o registro de ferramentas.',
   'No MCP servers configured with OAuth authentication.':
-    'Nenhum servidor MCP configurado com autenticação OAuth.',
+    'Nenhum servidor MCP configurado com autenticaï¿½ï¿½o OAuth.',
   'MCP servers with OAuth authentication:':
-    'Servidores MCP com autenticação OAuth:',
+    'Servidores MCP com autenticaï¿½ï¿½o OAuth:',
   'Use /mcp auth <server-name> to authenticate.':
     'Use /mcp auth <nome-do-servidor> para autenticar.',
-  "MCP server '{{name}}' not found.": "Servidor MCP '{{name}}' não encontrado.",
+  "MCP server '{{name}}' not found.": "Servidor MCP '{{name}}' nï¿½o encontrado.",
   "Successfully authenticated and refreshed tools for '{{name}}'.":
     "Autenticado com sucesso e ferramentas atualizadas para '{{name}}'.",
   "Failed to authenticate with MCP server '{{name}}': {{error}}":
@@ -962,24 +962,24 @@ export default {
   "Discovered {{count}} tool(s) from '{{name}}'.":
     "{{count}} ferramenta(s) descoberta(s) de '{{name}}'.",
   'Authentication complete. Returning to server details...':
-    'Autenticação concluída. Retornando aos detalhes do servidor...',
-  'Authentication successful.': 'Autenticação bem-sucedida.',
+    'Autenticaï¿½ï¿½o concluï¿½da. Retornando aos detalhes do servidor...',
+  'Authentication successful.': 'Autenticaï¿½ï¿½o bem-sucedida.',
   'If the browser does not open, copy and paste this URL into your browser:':
-    'Se o navegador não abrir, copie e cole esta URL no seu navegador:',
+    'Se o navegador nï¿½o abrir, copie e cole esta URL no seu navegador:',
   'Make sure to copy the COMPLETE URL - it may wrap across multiple lines.':
-    '??  Certifique-se de copiar a URL COMPLETA – ela pode ocupar várias linhas.',
+    '??  Certifique-se de copiar a URL COMPLETA ï¿½ ela pode ocupar vï¿½rias linhas.',
 
   // ============================================================================
   // Commands - Chat
   // ============================================================================
-  'Manage conversation history.': 'Gerenciar histórico de conversas.',
+  'Manage conversation history.': 'Gerenciar histï¿½rico de conversas.',
   'List saved conversation checkpoints':
     'Listar checkpoints de conversa salvos',
   'No saved conversation checkpoints found.':
     'Nenhum checkpoint de conversa salvo encontrado.',
   'List of saved conversations:': 'Lista de conversas salvas:',
   'Note: Newest last, oldest first':
-    'Nota: Mais novos por último, mais antigos primeiro',
+    'Nota: Mais novos por ï¿½ltimo, mais antigos primeiro',
   'Save the current conversation as a checkpoint. Usage: /chat save <tag>':
     'Salvar a conversa atual como um checkpoint. Uso: /chat save <tag>',
   'Missing tag. Usage: /chat save <tag>': 'Tag ausente. Uso: /chat save <tag>',
@@ -988,7 +988,7 @@ export default {
   'Missing tag. Usage: /chat delete <tag>':
     'Tag ausente. Uso: /chat delete <tag>',
   "Conversation checkpoint '{{tag}}' has been deleted.":
-    "O checkpoint de conversa '{{tag}}' foi excluído.",
+    "O checkpoint de conversa '{{tag}}' foi excluï¿½do.",
   "Error: No checkpoint found with tag '{{tag}}'.":
     "Erro: Nenhum checkpoint encontrado com a tag '{{tag}}'.",
   'Resume a conversation from a checkpoint. Usage: /chat resume <tag>':
@@ -998,16 +998,16 @@ export default {
   'No saved checkpoint found with tag: {{tag}}.':
     'Nenhum checkpoint salvo encontrado com a tag: {{tag}}.',
   'A checkpoint with the tag {{tag}} already exists. Do you want to overwrite it?':
-    'Um checkpoint com a tag {{tag}} já existe. Você deseja substituí-lo?',
+    'Um checkpoint com a tag {{tag}} jï¿½ existe. Vocï¿½ deseja substituï¿½-lo?',
   'No chat client available to save conversation.':
-    'Nenhum cliente de chat disponível para salvar a conversa.',
+    'Nenhum cliente de chat disponï¿½vel para salvar a conversa.',
   'Conversation checkpoint saved with tag: {{tag}}.':
     'Checkpoint de conversa salvo com a tag: {{tag}}.',
   'No conversation found to save.': 'Nenhuma conversa encontrada para salvar.',
   'No chat client available to share conversation.':
-    'Nenhum cliente de chat disponível para compartilhar a conversa.',
+    'Nenhum cliente de chat disponï¿½vel para compartilhar a conversa.',
   'Invalid file format. Only .md and .json are supported.':
-    'Formato de arquivo inválido. Apenas .md e .json são suportados.',
+    'Formato de arquivo invï¿½lido. Apenas .md e .json sï¿½o suportados.',
   'Error sharing conversation: {{error}}':
     'Erro ao compartilhar conversa: {{error}}',
   'Conversation shared to {{filePath}}':
@@ -1021,11 +1021,11 @@ export default {
   // Commands - Summary
   // ============================================================================
   'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
-    'Gerar um resumo do projeto e salvá-lo em .hopcode/PROJECT_SUMMARY.md',
+    'Gerar um resumo do projeto e salvï¿½-lo em .hopcode/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
-    'Nenhum cliente de chat disponível para gerar o resumo.',
+    'Nenhum cliente de chat disponï¿½vel para gerar o resumo.',
   'Already generating summary, wait for previous request to complete':
-    'Já gerando resumo, aguarde a conclusão da solicitação anterior',
+    'Jï¿½ gerando resumo, aguarde a conclusï¿½o da solicitaï¿½ï¿½o anterior',
   'No conversation found to summarize.':
     'Nenhuma conversa encontrada para resumir.',
   'Failed to generate project context summary: {{error}}':
@@ -1035,85 +1035,85 @@ export default {
   'Saving project summary...': 'Salvando resumo do projeto...',
   'Generating project summary...': 'Gerando resumo do projeto...',
   'Failed to generate summary - no text content received from LLM response':
-    'Falha ao gerar resumo - nenhum conteúdo de texto recebido da resposta do LLM',
+    'Falha ao gerar resumo - nenhum conteï¿½do de texto recebido da resposta do LLM',
 
   // ============================================================================
   // Commands - Model
   // ============================================================================
   'Switch the model for this session (--fast for suggestion model)':
-    'Trocar o modelo para esta sessão (--fast para modelo de sugestões)',
+    'Trocar o modelo para esta sessï¿½o (--fast para modelo de sugestï¿½es)',
   'Set a lighter model for prompt suggestions and speculative execution':
-    'Definir modelo mais leve para sugestões de prompt e execução especulativa',
+    'Definir modelo mais leve para sugestï¿½es de prompt e execuï¿½ï¿½o especulativa',
   'Content generator configuration not available.':
-    'Configuração do gerador de conteúdo não disponível.',
-  'Authentication type not available.': 'Tipo de autenticação não disponível.',
+    'Configuraï¿½ï¿½o do gerador de conteï¿½do nï¿½o disponï¿½vel.',
+  'Authentication type not available.': 'Tipo de autenticaï¿½ï¿½o nï¿½o disponï¿½vel.',
   'No models available for the current authentication type ({{authType}}).':
-    'Nenhum modelo disponível para o tipo de autenticação atual ({{authType}}).',
+    'Nenhum modelo disponï¿½vel para o tipo de autenticaï¿½ï¿½o atual ({{authType}}).',
 
   // ============================================================================
   // Commands - Clear
   // ============================================================================
   'Starting a new session, resetting chat, and clearing terminal.':
-    'Iniciando uma nova sessão, resetando o chat e limpando o terminal.',
+    'Iniciando uma nova sessï¿½o, resetando o chat e limpando o terminal.',
   'Starting a new session and clearing.':
-    'Iniciando uma nova sessão e limpando.',
+    'Iniciando uma nova sessï¿½o e limpando.',
 
   // ============================================================================
   // Commands - Compress
   // ============================================================================
   'Already compressing, wait for previous request to complete':
-    'Já comprimindo, aguarde a conclusão da solicitação anterior',
-  'Failed to compress chat history.': 'Falha ao comprimir histórico do chat.',
+    'Jï¿½ comprimindo, aguarde a conclusï¿½o da solicitaï¿½ï¿½o anterior',
+  'Failed to compress chat history.': 'Falha ao comprimir histï¿½rico do chat.',
   'Failed to compress chat history: {{error}}':
-    'Falha ao comprimir histórico do chat: {{error}}',
-  'Compressing chat history': 'Comprimindo histórico do chat',
+    'Falha ao comprimir histï¿½rico do chat: {{error}}',
+  'Compressing chat history': 'Comprimindo histï¿½rico do chat',
   'Chat history compressed from {{originalTokens}} to {{newTokens}} tokens.':
-    'Histórico do chat comprimido de {{originalTokens}} para {{newTokens}} tokens.',
+    'Histï¿½rico do chat comprimido de {{originalTokens}} para {{newTokens}} tokens.',
   'Compression was not beneficial for this history size.':
-    'A compressão não foi benéfica para este tamanho de histórico.',
+    'A compressï¿½o nï¿½o foi benï¿½fica para este tamanho de histï¿½rico.',
   'Chat history compression did not reduce size. This may indicate issues with the compression prompt.':
-    'A compressão do histórico do chat não reduziu o tamanho. Isso pode indicar problemas com o prompt de compressão.',
+    'A compressï¿½o do histï¿½rico do chat nï¿½o reduziu o tamanho. Isso pode indicar problemas com o prompt de compressï¿½o.',
   'Could not compress chat history due to a token counting error.':
-    'Não foi possível comprimir o histórico do chat devido a um erro de contagem de tokens.',
+    'Nï¿½o foi possï¿½vel comprimir o histï¿½rico do chat devido a um erro de contagem de tokens.',
   'Chat history is already compressed.':
-    'O histórico do chat já está comprimido.',
+    'O histï¿½rico do chat jï¿½ estï¿½ comprimido.',
 
   // ============================================================================
   // Commands - Directory
   // ============================================================================
-  'Configuration is not available.': 'A configuração não está disponível.',
+  'Configuration is not available.': 'A configuraï¿½ï¿½o nï¿½o estï¿½ disponï¿½vel.',
   'Please provide at least one path to add.':
-    'Forneça pelo menos um caminho para adicionar.',
+    'Forneï¿½a pelo menos um caminho para adicionar.',
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
-    'O comando /directory add não é suportado em perfis de sandbox restritivos. Use --include-directories ao iniciar a sessão.',
+    'O comando /directory add nï¿½o ï¿½ suportado em perfis de sandbox restritivos. Use --include-directories ao iniciar a sessï¿½o.',
   "Error adding '{{path}}': {{error}}":
     "Erro ao adicionar '{{path}}': {{error}}",
   'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
-    'Arquivos HOPCODE.md adicionados com sucesso dos seguintes diretórios, se houverem:\n- {{directories}}',
-  'Error refreshing memory: {{error}}': 'Erro ao atualizar memória: {{error}}',
+    'Arquivos HOPCODE.md adicionados com sucesso dos seguintes diretï¿½rios, se houverem:\n- {{directories}}',
+  'Error refreshing memory: {{error}}': 'Erro ao atualizar memï¿½ria: {{error}}',
   'Successfully added directories:\n- {{directories}}':
-    'Diretórios adicionados com sucesso:\n- {{directories}}',
+    'Diretï¿½rios adicionados com sucesso:\n- {{directories}}',
   'Current workspace directories:\n{{directories}}':
-    'Diretórios atuais do workspace:\n{{directories}}',
+    'Diretï¿½rios atuais do workspace:\n{{directories}}',
 
   // ============================================================================
   // Commands - Docs
   // ============================================================================
   'Please open the following URL in your browser to view the documentation:\n{{url}}':
-    'Abra a seguinte URL no seu navegador para ver a documentação:\n{{url}}',
+    'Abra a seguinte URL no seu navegador para ver a documentaï¿½ï¿½o:\n{{url}}',
   'Opening documentation in your browser: {{url}}':
-    'Abrindo documentação no seu navegador: {{url}}',
+    'Abrindo documentaï¿½ï¿½o no seu navegador: {{url}}',
 
   // ============================================================================
   // Dialogs - Tool Confirmation
   // ============================================================================
-  'Do you want to proceed?': 'Você deseja prosseguir?',
+  'Do you want to proceed?': 'Vocï¿½ deseja prosseguir?',
   'Yes, allow once': 'Sim, permitir uma vez',
   'Allow always': 'Permitir sempre',
   Yes: 'Sim',
-  No: 'Não',
-  'No (esc)': 'Não (esc)',
-  'Yes, allow always for this session': 'Sim, permitir sempre para esta sessão',
+  No: 'Nï¿½o',
+  'No (esc)': 'Nï¿½o (esc)',
+  'Yes, allow always for this session': 'Sim, permitir sempre para esta sessï¿½o',
 
   // MCP Management - Core translations
   'Manage MCP servers': 'Gerenciar servidores MCP',
@@ -1125,25 +1125,25 @@ export default {
   'Loading...': 'Carregando...',
   'Unknown step': 'Etapa desconhecida',
   'Esc to back': 'Esc para voltar',
-  '?? to navigate · Enter to select · Esc to close':
-    '?? navegar · Enter selecionar · Esc fechar',
-  '?? to navigate · Enter to select · Esc to back':
-    '?? navegar · Enter selecionar · Esc voltar',
-  '?? to navigate · Enter to confirm · Esc to back':
-    '?? navegar · Enter confirmar · Esc voltar',
-  'User Settings (global)': 'Configurações do usuário (global)',
+  '?? to navigate ï¿½ Enter to select ï¿½ Esc to close':
+    '?? navegar ï¿½ Enter selecionar ï¿½ Esc fechar',
+  '?? to navigate ï¿½ Enter to select ï¿½ Esc to back':
+    '?? navegar ï¿½ Enter selecionar ï¿½ Esc voltar',
+  '?? to navigate ï¿½ Enter to confirm ï¿½ Esc to back':
+    '?? navegar ï¿½ Enter confirmar ï¿½ Esc voltar',
+  'User Settings (global)': 'Configuraï¿½ï¿½es do usuï¿½rio (global)',
   'Workspace Settings (project-specific)':
-    'Configurações do workspace (específico do projeto)',
+    'Configuraï¿½ï¿½es do workspace (especï¿½fico do projeto)',
   'Disable server:': 'Desativar servidor:',
   'Select where to add the server to the exclude list:':
-    'Selecione onde adicionar o servidor à lista de exclusão:',
+    'Selecione onde adicionar o servidor ï¿½ lista de exclusï¿½o:',
   'Press Enter to confirm, Esc to cancel':
     'Enter para confirmar, Esc para cancelar',
   Disable: 'Desativar',
   Enable: 'Ativar',
   Authenticate: 'Autenticar',
   'Re-authenticate': 'Reautenticar',
-  'Clear Authentication': 'Limpar autenticação',
+  'Clear Authentication': 'Limpar autenticaï¿½ï¿½o',
   disabled: 'desativado',
   'Server:': 'Servidor:',
   Reconnect: 'Reconectar',
@@ -1151,7 +1151,7 @@ export default {
   'Status:': 'Status:',
   'Source:': 'Fonte:',
   'Command:': 'Comando:',
-  'Working Directory:': 'Diretório de trabalho:',
+  'Working Directory:': 'Diretï¿½rio de trabalho:',
   'Capabilities:': 'Capacidades:',
   'No server selected': 'Nenhum servidor selecionado',
   '(disabled)': '(desativado)',
@@ -1164,27 +1164,27 @@ export default {
   error: 'erro',
 
   // MCP Server List
-  'User MCPs': 'MCPs do usuário',
+  'User MCPs': 'MCPs do usuï¿½rio',
   'Project MCPs': 'MCPs do projeto',
-  'Extension MCPs': 'MCPs de extensão',
+  'Extension MCPs': 'MCPs de extensï¿½o',
   server: 'servidor',
   servers: 'servidores',
   'Add MCP servers to your settings to get started.':
-    'Adicione servidores MCP às suas configurações para começar.',
+    'Adicione servidores MCP ï¿½s suas configuraï¿½ï¿½es para comeï¿½ar.',
   'Run hopcode --debug to see error logs':
     'Execute hopcode --debug para ver os logs de erro',
 
   // MCP OAuth Authentication
-  'OAuth Authentication': 'Autenticação OAuth',
+  'OAuth Authentication': 'Autenticaï¿½ï¿½o OAuth',
   'Press Enter to start authentication, Esc to go back':
-    'Pressione Enter para iniciar a autenticação, Esc para voltar',
+    'Pressione Enter para iniciar a autenticaï¿½ï¿½o, Esc para voltar',
   'Authenticating... Please complete the login in your browser.':
     'Autenticando... Por favor, conclua o login no seu navegador.',
   'Press Enter or Esc to go back': 'Pressione Enter ou Esc para voltar',
 
   // MCP Tool List
   'No tools available for this server.':
-    'Nenhuma ferramenta disponível para este servidor.',
+    'Nenhuma ferramenta disponï¿½vel para este servidor.',
   destructive: 'destrutivo',
   'read-only': 'somente leitura',
   'open-world': 'mundo aberto',
@@ -1194,13 +1194,13 @@ export default {
   '{{current}}/{{total}}': '{{current}}/{{total}}',
 
   // MCP Tool Detail
-  required: 'obrigatório',
+  required: 'obrigatï¿½rio',
   Type: 'Tipo',
-  Enum: 'Enumeração',
-  Parameters: 'Parâmetros',
+  Enum: 'Enumeraï¿½ï¿½o',
+  Parameters: 'Parï¿½metros',
   'No tool selected': 'Nenhuma ferramenta selecionada',
-  Annotations: 'Anotações',
-  Title: 'Título',
+  Annotations: 'Anotaï¿½ï¿½es',
+  Title: 'Tï¿½tulo',
   'Read Only': 'Somente leitura',
   Destructive: 'Destrutivo',
   Idempotent: 'Idempotente',
@@ -1208,43 +1208,43 @@ export default {
   Server: 'Servidor',
 
   // Invalid tool related translations
-  '{{count}} invalid tools': '{{count}} ferramentas inválidas',
-  invalid: 'inválido',
-  'invalid: {{reason}}': 'inválido: {{reason}}',
+  '{{count}} invalid tools': '{{count}} ferramentas invï¿½lidas',
+  invalid: 'invï¿½lido',
+  'invalid: {{reason}}': 'invï¿½lido: {{reason}}',
   'missing name': 'nome ausente',
-  'missing description': 'descrição ausente',
+  'missing description': 'descriï¿½ï¿½o ausente',
   '(unnamed)': '(sem nome)',
   'Warning: This tool cannot be called by the LLM':
-    'Aviso: Esta ferramenta não pode ser chamada pelo LLM',
+    'Aviso: Esta ferramenta nï¿½o pode ser chamada pelo LLM',
   Reason: 'Motivo',
   'Tools must have both name and description to be used by the LLM.':
-    'As ferramentas devem ter tanto nome quanto descrição para serem usadas pelo LLM.',
-  'Modify in progress:': 'Modificação em progresso:',
+    'As ferramentas devem ter tanto nome quanto descriï¿½ï¿½o para serem usadas pelo LLM.',
+  'Modify in progress:': 'Modificaï¿½ï¿½o em progresso:',
   'Save and close external editor to continue':
     'Salve e feche o editor externo para continuar',
-  'Apply this change?': 'Aplicar esta alteração?',
+  'Apply this change?': 'Aplicar esta alteraï¿½ï¿½o?',
   'Yes, allow always': 'Sim, permitir sempre',
   'Modify with external editor': 'Modificar com editor externo',
-  'No, suggest changes (esc)': 'Não, sugerir alterações (esc)',
+  'No, suggest changes (esc)': 'Nï¿½o, sugerir alteraï¿½ï¿½es (esc)',
   "Allow execution of: '{{command}}'?":
-    "Permitir a execução de: '{{command}}'?",
+    "Permitir a execuï¿½ï¿½o de: '{{command}}'?",
   'Yes, allow always ...': 'Sim, permitir sempre ...',
   'Always allow in this project': 'Sempre permitir neste projeto',
   'Always allow {{action}} in this project':
     'Sempre permitir {{action}} neste projeto',
-  'Always allow for this user': 'Sempre permitir para este usuário',
+  'Always allow for this user': 'Sempre permitir para este usuï¿½rio',
   'Always allow {{action}} for this user':
-    'Sempre permitir {{action}} para este usuário',
+    'Sempre permitir {{action}} para este usuï¿½rio',
   'Yes, restore previous mode ({{mode}})':
     'Sim, restaurar modo anterior ({{mode}})',
-  'Yes, and auto-accept edits': 'Sim, e aceitar edições automaticamente',
-  'Yes, and manually approve edits': 'Sim, e aprovar edições manualmente',
-  'No, keep planning (esc)': 'Não, continuar planejando (esc)',
+  'Yes, and auto-accept edits': 'Sim, e aceitar ediï¿½ï¿½es automaticamente',
+  'Yes, and manually approve edits': 'Sim, e aprovar ediï¿½ï¿½es manualmente',
+  'No, keep planning (esc)': 'Nï¿½o, continuar planejando (esc)',
   'URLs to fetch:': 'URLs para buscar:',
   'MCP Server: {{server}}': 'Servidor MCP: {{server}}',
   'Tool: {{tool}}': 'Ferramenta: {{tool}}',
   'Allow execution of MCP tool "{{tool}}" from server "{{server}}"?':
-    'Permitir a execução da ferramenta MCP "{{tool}}" do servidor "{{server}}"?',
+    'Permitir a execuï¿½ï¿½o da ferramenta MCP "{{tool}}" do servidor "{{server}}"?',
   'Yes, always allow tool "{{tool}}" from server "{{server}}"':
     'Sim, sempre permitir a ferramenta "{{tool}}" do servidor "{{server}}"',
   'Yes, always allow all tools from server "{{server}}"':
@@ -1253,7 +1253,7 @@ export default {
   // ============================================================================
   // Dialogs - Shell Confirmation
   // ============================================================================
-  'Shell Command Execution': 'Execução de Comando Shell',
+  'Shell Command Execution': 'Execuï¿½ï¿½o de Comando Shell',
   'A custom command wants to run the following shell commands:':
     'Um comando personalizado deseja executar os seguintes comandos shell:',
 
@@ -1263,7 +1263,7 @@ export default {
   'Pro quota limit reached for {{model}}.':
     'Limite de cota Pro atingido para {{model}}.',
   'Change auth (executes the /auth command)':
-    'Alterar autenticação (executa o comando /auth)',
+    'Alterar autenticaï¿½ï¿½o (executa o comando /auth)',
   'Continue with {{model}}': 'Continuar com {{model}}',
 
   // ============================================================================
@@ -1271,107 +1271,108 @@ export default {
   // ============================================================================
   'Current Plan:': 'Plano Atual:',
   'Progress: {{done}}/{{total}} tasks completed':
-    'Progresso: {{done}}/{{total}} tarefas concluídas',
+    'Progresso: {{done}}/{{total}} tarefas concluï¿½das',
   ', {{inProgress}} in progress': ', {{inProgress}} em progresso',
   'Pending Tasks:': 'Tarefas Pendentes:',
-  'What would you like to do?': 'O que você gostaria de fazer?',
+  'What would you like to do?': 'O que vocï¿½ gostaria de fazer?',
   'Choose how to proceed with your session:':
-    'Escolha como proceder com sua sessão:',
-  'Start new chat session': 'Iniciar nova sessão de chat',
+    'Escolha como proceder com sua sessï¿½o:',
+  'Start new chat session': 'Iniciar nova sessï¿½o de chat',
   'Continue previous conversation': 'Continuar conversa anterior',
   '?? Welcome back! (Last updated: {{timeAgo}})':
-    '?? Bem-vindo de volta! (Última atualização: {{timeAgo}})',
+    '?? Bem-vindo de volta! (ï¿½ltima atualizaï¿½ï¿½o: {{timeAgo}})',
   '?? Overall Goal:': '?? Objetivo Geral:',
 
   // ============================================================================
   // Dialogs - Auth
   // ============================================================================
-  'Get started': 'Começar',
-  'Select Authentication Method': 'Selecionar Método de Autenticação',
+  'Get started': 'Comeï¿½ar',
+  'Select Authentication Method': 'Selecionar Mï¿½todo de Autenticaï¿½ï¿½o',
   'OpenAI API key is required to use OpenAI authentication.':
-    'A chave da API do OpenAI é necessária para usar a autenticação do OpenAI.',
+    'A chave da API do OpenAI ï¿½ necessï¿½ria para usar a autenticaï¿½ï¿½o do OpenAI.',
   'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    'Você deve selecionar um método de autenticação para prosseguir. Pressione Ctrl+C novamente para sair.',
+    'Vocï¿½ deve selecionar um mï¿½todo de autenticaï¿½ï¿½o para prosseguir. Pressione Ctrl+C novamente para sair.',
   'Terms of Services and Privacy Notice':
-    'Termos de Serviço e Aviso de Privacidade',
-  'Qwen OAuth': 'Qwen OAuth',
-  'Discontinued — switch to Coding Plan or API Key':
-    'Descontinuado — mude para Coding Plan ou API Key',
+    'Termos de Serviï¿½o e Aviso de Privacidade',
+  'Qwen OAuth': 'Legacy OAuth',
+  'Discontinued ï¿½ switch to Coding Plan or API Key':
+    'Descontinuado ï¿½ mude para Coding Plan ou API Key',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.':
-    'O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Execute /auth para trocar de provedor.',
+    'O nï¿½vel gratuito do Legacy OAuth foi descontinuado em 2026-04-15. Execute /auth para trocar de provedor.',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Selecione Coding Plan ou API Key.',
+    'O nï¿½vel gratuito do Legacy OAuth foi descontinuado em 2026-04-15. Selecione Coding Plan ou API Key.',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Por favor, selecione um modelo de outro provedor ou execute /auth para trocar.',
+    'O nï¿½vel gratuito do Legacy OAuth foi descontinuado em 2026-04-15. Por favor, selecione um modelo de outro provedor ou execute /auth para trocar.',
   '\n? Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n? O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Selecione outra opção.\n',
+    '\n? O nï¿½vel gratuito do Legacy OAuth foi descontinuado em 2026-04-15. Selecione outra opï¿½ï¿½o.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
-    'Pago \u00B7 Até 6.000 solicitações/5 hrs \u00B7 Todos os modelos Alibaba Cloud Coding Plan',
+    'Pago \u00B7 Atï¿½ 6.000 solicitaï¿½ï¿½es/5 hrs \u00B7 Todos os modelos Alibaba Cloud Coding Plan',
   'Alibaba Cloud Coding Plan': 'Alibaba Cloud Coding Plan',
-  'Bring your own API key': 'Traga sua própria chave API',
+  'Bring your own API key': 'Traga sua prï¿½pria chave API',
   'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)':
-    'Autenticação baseada em navegador com provedores terceiros (por exemplo, OpenRouter, ModelScope)',
+    'Autenticaï¿½ï¿½o baseada em navegador com provedores terceiros (por exemplo, OpenRouter, ModelScope)',
   'API-KEY': 'API-KEY',
   'Use coding plan credentials or your own api-keys/providers.':
-    'Use credenciais do Coding Plan ou suas próprias chaves API/provedores.',
+    'Use credenciais do Coding Plan ou suas prï¿½prias chaves API/provedores.',
   OpenAI: 'OpenAI',
   'Failed to login. Message: {{message}}':
     'Falha ao fazer login. Mensagem: {{message}}',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
-    'A autenticação é forçada para {{enforcedType}}, mas você está usando {{currentType}} no momento.',
+    'A autenticaï¿½ï¿½o ï¿½ forï¿½ada para {{enforcedType}}, mas vocï¿½ estï¿½ usando {{currentType}} no momento.',
   'Qwen OAuth authentication timed out. Please try again.':
-    'A autenticação Qwen OAuth expirou. Tente novamente.',
-  'Qwen OAuth authentication cancelled.': 'Autenticação Qwen OAuth cancelada.',
-  'Qwen OAuth Authentication': 'Autenticação Qwen OAuth',
+    'A autenticaï¿½ï¿½o Legacy OAuth expirou. Tente novamente.',
+  'Qwen OAuth authentication cancelled.':
+    'Autenticaï¿½ï¿½o Legacy OAuth cancelada.',
+  'Qwen OAuth Authentication': 'Autenticaï¿½ï¿½o Legacy OAuth',
   'Please visit this URL to authorize:': 'Visite esta URL para autorizar:',
-  'Or scan the QR code below:': 'Ou escaneie o código QR abaixo:',
-  'Waiting for authorization': 'Aguardando autorização',
+  'Or scan the QR code below:': 'Ou escaneie o cï¿½digo QR abaixo:',
+  'Waiting for authorization': 'Aguardando autorizaï¿½ï¿½o',
   'Time remaining:': 'Tempo restante:',
   '(Press ESC or CTRL+C to cancel)': '(Pressione ESC ou CTRL+C para cancelar)',
   'Qwen OAuth Authentication Timeout':
-    'Tempo Limite de Autenticação Qwen OAuth',
+    'Tempo Limite de Autenticaï¿½ï¿½o Legacy OAuth',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
-    'Token OAuth expirado (mais de {{seconds}} segundos). Selecione o método de autenticação novamente.',
+    'Token OAuth expirado (mais de {{seconds}} segundos). Selecione o mï¿½todo de autenticaï¿½ï¿½o novamente.',
   'Press any key to return to authentication type selection.':
-    'Pressione qualquer tecla para retornar à seleção do tipo de autenticação.',
+    'Pressione qualquer tecla para retornar ï¿½ seleï¿½ï¿½o do tipo de autenticaï¿½ï¿½o.',
   'Waiting for Qwen OAuth authentication...':
-    'Aguardando autenticação Qwen OAuth...',
+    'Aguardando autenticaï¿½ï¿½o Legacy OAuth...',
   'Note: Your existing API key in settings.json will not be cleared when using Qwen OAuth. You can switch back to OpenAI authentication later if needed.':
-    'Nota: Sua chave de API existente no settings.json não será limpa ao usar o Qwen OAuth. Você pode voltar para a autenticação do OpenAI mais tarde, se necessário.',
+    'Nota: Sua chave de API existente no settings.json nï¿½o serï¿½ limpa ao usar o Legacy OAuth. Vocï¿½ pode voltar para a autenticaï¿½ï¿½o do OpenAI mais tarde, se necessï¿½rio.',
   'Note: Your existing API key will not be cleared when using Qwen OAuth.':
-    'Nota: Sua chave de API existente não será limpa ao usar o Qwen OAuth.',
+    'Nota: Sua chave de API existente nï¿½o serï¿½ limpa ao usar o Legacy OAuth.',
   'Authentication timed out. Please try again.':
-    'A autenticação expirou. Tente novamente.',
+    'A autenticaï¿½ï¿½o expirou. Tente novamente.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
-    'Aguardando autenticação... (Pressione ESC ou CTRL+C para cancelar)',
+    'Aguardando autenticaï¿½ï¿½o... (Pressione ESC ou CTRL+C para cancelar)',
   'Missing API key for OpenAI-compatible auth. Set settings.security.auth.apiKey, or set the {{envKeyHint}} environment variable.':
-    'Chave de API ausente para autenticação compatível com OpenAI. Defina settings.security.auth.apiKey ou a variável de ambiente {{envKeyHint}}.',
+    'Chave de API ausente para autenticaï¿½ï¿½o compatï¿½vel com OpenAI. Defina settings.security.auth.apiKey ou a variï¿½vel de ambiente {{envKeyHint}}.',
   '{{envKeyHint}} environment variable not found.':
-    'Variável de ambiente {{envKeyHint}} não encontrada.',
+    'Variï¿½vel de ambiente {{envKeyHint}} nï¿½o encontrada.',
   '{{envKeyHint}} environment variable not found. Please set it in your .env file or environment variables.':
-    'Variável de ambiente {{envKeyHint}} não encontrada. Defina-a no seu arquivo .env ou variáveis de ambiente.',
+    'Variï¿½vel de ambiente {{envKeyHint}} nï¿½o encontrada. Defina-a no seu arquivo .env ou variï¿½veis de ambiente.',
   '{{envKeyHint}} environment variable not found (or set settings.security.auth.apiKey). Please set it in your .env file or environment variables.':
-    'Variável de ambiente {{envKeyHint}} não encontrada (ou defina settings.security.auth.apiKey). Defina-a no seu arquivo .env ou variáveis de ambiente.',
+    'Variï¿½vel de ambiente {{envKeyHint}} nï¿½o encontrada (ou defina settings.security.auth.apiKey). Defina-a no seu arquivo .env ou variï¿½veis de ambiente.',
   'Missing API key for OpenAI-compatible auth. Set the {{envKeyHint}} environment variable.':
-    'Chave de API ausente para autenticação compatível com OpenAI. Defina a variável de ambiente {{envKeyHint}}.',
+    'Chave de API ausente para autenticaï¿½ï¿½o compatï¿½vel com OpenAI. Defina a variï¿½vel de ambiente {{envKeyHint}}.',
   'Anthropic provider missing required baseUrl in modelProviders[].baseUrl.':
-    'Provedor Anthropic sem a baseUrl necessária em modelProviders[].baseUrl.',
+    'Provedor Anthropic sem a baseUrl necessï¿½ria em modelProviders[].baseUrl.',
   'ANTHROPIC_BASE_URL environment variable not found.':
-    'Variável de ambiente ANTHROPIC_BASE_URL não encontrada.',
+    'Variï¿½vel de ambiente ANTHROPIC_BASE_URL nï¿½o encontrada.',
   'Invalid auth method selected.':
-    'Método de autenticação inválido selecionado.',
+    'Mï¿½todo de autenticaï¿½ï¿½o invï¿½lido selecionado.',
   'Failed to authenticate. Message: {{message}}':
     'Falha ao autenticar. Mensagem: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     'Autenticado com sucesso com credenciais {{authType}}.',
   'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    'Valor HOPCODE_DEFAULT_AUTH_TYPE inválido: "{{value}}". Valores válidos são: {{validValues}}',
-  'OpenAI Configuration Required': 'Configuração do OpenAI Necessária',
+    'Valor HOPCODE_DEFAULT_AUTH_TYPE invï¿½lido: "{{value}}". Valores vï¿½lidos sï¿½o: {{validValues}}',
+  'OpenAI Configuration Required': 'Configuraï¿½ï¿½o do OpenAI Necessï¿½ria',
   'Please enter your OpenAI configuration. You can get an API key from':
-    'Insira sua configuração do OpenAI. Você pode obter uma chave de API de',
+    'Insira sua configuraï¿½ï¿½o do OpenAI. Vocï¿½ pode obter uma chave de API de',
   'API Key:': 'Chave da API:',
   'Invalid credentials: {{errorMessage}}':
-    'Credenciais inválidas: {{errorMessage}}',
+    'Credenciais invï¿½lidas: {{errorMessage}}',
   'Failed to validate credentials': 'Falha ao validar credenciais',
   'Press Enter to continue, Tab/?? to navigate, Esc to cancel':
     'Pressione Enter para continuar, Tab/?? para navegar, Esc para cancelar',
@@ -1381,106 +1382,106 @@ export default {
   // ============================================================================
   'Select Model': 'Selecionar Modelo',
   '(Press Esc to close)': '(Pressione Esc para fechar)',
-  'Current (effective) configuration': 'Configuração atual (efetiva)',
+  'Current (effective) configuration': 'Configuraï¿½ï¿½o atual (efetiva)',
   AuthType: 'AuthType',
   'API Key': 'Chave da API',
-  unset: 'não definido',
-  '(default)': '(padrão)',
+  unset: 'nï¿½o definido',
+  '(default)': '(padrï¿½o)',
   '(set)': '(definido)',
-  '(not set)': '(não definido)',
+  '(not set)': '(nï¿½o definido)',
   Modality: 'Modalidade',
   'Context Window': 'Janela de Contexto',
   text: 'texto',
   'text-only': 'somente texto',
   image: 'imagem',
   pdf: 'PDF',
-  audio: 'áudio',
-  video: 'vídeo',
-  'not set': 'não definido',
+  audio: 'ï¿½udio',
+  video: 'vï¿½deo',
+  'not set': 'nï¿½o definido',
   none: 'nenhum',
   unknown: 'desconhecido',
   "Failed to switch model to '{{modelId}}'.\n\n{{error}}":
     "Falha ao trocar o modelo para '{{modelId}}'.\n\n{{error}}",
-  'Qwen 3.6 Plus — efficient hybrid model with leading coding performance':
-    'Qwen 3.6 Plus — modelo híbrido eficiente com desempenho líder em programação',
+  'Qwen 3.6 Plus ï¿½ efficient hybrid model with leading coding performance':
+    'Qwen 3.6 Plus ï¿½ modelo hï¿½brido eficiente com desempenho lï¿½der em programaï¿½ï¿½o',
   'The latest Qwen Vision model from Alibaba Cloud ModelStudio (version: qwen3-vl-plus-2025-09-23)':
-    'O modelo Qwen Vision mais recente do Alibaba Cloud ModelStudio (versão: qwen3-vl-plus-2025-09-23)',
+    'O modelo Qwen Vision mais recente do Alibaba Cloud ModelStudio (versï¿½o: qwen3-vl-plus-2025-09-23)',
 
   // ============================================================================
   // Dialogs - Permissions
   // ============================================================================
   'Manage folder trust settings':
-    'Gerenciar configurações de confiança de pasta',
-  'Manage permission rules': 'Gerenciar regras de permissão',
+    'Gerenciar configuraï¿½ï¿½es de confianï¿½a de pasta',
+  'Manage permission rules': 'Gerenciar regras de permissï¿½o',
   Allow: 'Permitir',
   Ask: 'Perguntar',
   Deny: 'Negar',
-  Workspace: 'Área de trabalho',
+  Workspace: 'ï¿½rea de trabalho',
   "HopCode won't ask before using allowed tools.":
-    'O HopCode não perguntará antes de usar ferramentas permitidas.',
+    'O HopCode nï¿½o perguntarï¿½ antes de usar ferramentas permitidas.',
   'HopCode will ask before using these tools.':
-    'O HopCode perguntará antes de usar essas ferramentas.',
+    'O HopCode perguntarï¿½ antes de usar essas ferramentas.',
   'HopCode is not allowed to use denied tools.':
-    'O HopCode não tem permissão para usar ferramentas negadas.',
+    'O HopCode nï¿½o tem permissï¿½o para usar ferramentas negadas.',
   'Manage trusted directories for this workspace.':
-    'Gerenciar diretórios confiáveis para esta área de trabalho.',
+    'Gerenciar diretï¿½rios confiï¿½veis para esta ï¿½rea de trabalho.',
   'Any use of the {{tool}} tool': 'Qualquer uso da ferramenta {{tool}}',
   "{{tool}} commands matching '{{pattern}}'":
     "Comandos {{tool}} correspondentes a '{{pattern}}'",
-  'From user settings': 'Das configurações do usuário',
-  'From project settings': 'Das configurações do projeto',
-  'From session': 'Da sessão',
-  'Project settings (local)': 'Configurações do projeto (local)',
+  'From user settings': 'Das configuraï¿½ï¿½es do usuï¿½rio',
+  'From project settings': 'Das configuraï¿½ï¿½es do projeto',
+  'From session': 'Da sessï¿½o',
+  'Project settings (local)': 'Configuraï¿½ï¿½es do projeto (local)',
   'Saved in .hopcode/settings.local.json':
     'Salvo em .hopcode/settings.local.json',
-  'Project settings': 'Configurações do projeto',
+  'Project settings': 'Configuraï¿½ï¿½es do projeto',
   'Checked in at .hopcode/settings.json':
     'Registrado em .hopcode/settings.json',
-  'User settings': 'Configurações do usuário',
+  'User settings': 'Configuraï¿½ï¿½es do usuï¿½rio',
   'Saved in at ~/.hopcode/settings.json': 'Salvo em ~/.hopcode/settings.json',
-  'Add a new rule…': 'Adicionar nova regra…',
-  'Add {{type}} permission rule': 'Adicionar regra de permissão {{type}}',
+  'Add a new ruleï¿½': 'Adicionar nova regraï¿½',
+  'Add {{type}} permission rule': 'Adicionar regra de permissï¿½o {{type}}',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
-    'Regras de permissão são um nome de ferramenta, opcionalmente seguido por um especificador entre parênteses.',
+    'Regras de permissï¿½o sï¿½o um nome de ferramenta, opcionalmente seguido por um especificador entre parï¿½nteses.',
   'e.g.,': 'ex.',
   or: 'ou',
-  'Enter permission rule…': 'Insira a regra de permissão…',
-  'Enter to submit · Esc to cancel': 'Enter para enviar · Esc para cancelar',
+  'Enter permission ruleï¿½': 'Insira a regra de permissï¿½oï¿½',
+  'Enter to submit ï¿½ Esc to cancel': 'Enter para enviar ï¿½ Esc para cancelar',
   'Where should this rule be saved?': 'Onde esta regra deve ser salva?',
-  'Enter to confirm · Esc to cancel':
-    'Enter para confirmar · Esc para cancelar',
+  'Enter to confirm ï¿½ Esc to cancel':
+    'Enter para confirmar ï¿½ Esc para cancelar',
   'Delete {{type}} rule?': 'Excluir regra {{type}}?',
   'Are you sure you want to delete this permission rule?':
-    'Tem certeza de que deseja excluir esta regra de permissão?',
-  'Permissions:': 'Permissões:',
+    'Tem certeza de que deseja excluir esta regra de permissï¿½o?',
+  'Permissions:': 'Permissï¿½es:',
   '(?/? or tab to cycle)': '(?/? ou Tab para alternar)',
-  'Press ?? to navigate · Enter to select · Type to search · Esc to cancel':
-    '?? para navegar · Enter para selecionar · Digite para pesquisar · Esc para cancelar',
-  'Search…': 'Pesquisar…',
+  'Press ?? to navigate ï¿½ Enter to select ï¿½ Type to search ï¿½ Esc to cancel':
+    '?? para navegar ï¿½ Enter para selecionar ï¿½ Digite para pesquisar ï¿½ Esc para cancelar',
+  'Searchï¿½': 'Pesquisarï¿½',
   'Use /trust to manage folder trust settings for this workspace.':
-    'Use /trust para gerenciar as configurações de confiança de pasta desta área de trabalho.',
+    'Use /trust para gerenciar as configuraï¿½ï¿½es de confianï¿½a de pasta desta ï¿½rea de trabalho.',
   // Workspace directory management
-  'Add directory…': 'Adicionar diretório…',
-  'Add directory to workspace': 'Adicionar diretório à área de trabalho',
+  'Add directoryï¿½': 'Adicionar diretï¿½rioï¿½',
+  'Add directory to workspace': 'Adicionar diretï¿½rio ï¿½ ï¿½rea de trabalho',
   'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
-    'O HopCode pode ler arquivos na área de trabalho e fazer edições quando a aceitação automática está ativada.',
+    'O HopCode pode ler arquivos na ï¿½rea de trabalho e fazer ediï¿½ï¿½es quando a aceitaï¿½ï¿½o automï¿½tica estï¿½ ativada.',
   'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'O HopCode poderá ler arquivos neste diretório e fazer edições quando a aceitação automática está ativada.',
-  'Enter the path to the directory:': 'Insira o caminho do diretório:',
-  'Enter directory path…': 'Insira o caminho do diretório…',
-  'Tab to complete · Enter to add · Esc to cancel':
-    'Tab para completar · Enter para adicionar · Esc para cancelar',
-  'Remove directory?': 'Remover diretório?',
+    'O HopCode poderï¿½ ler arquivos neste diretï¿½rio e fazer ediï¿½ï¿½es quando a aceitaï¿½ï¿½o automï¿½tica estï¿½ ativada.',
+  'Enter the path to the directory:': 'Insira o caminho do diretï¿½rio:',
+  'Enter directory pathï¿½': 'Insira o caminho do diretï¿½rioï¿½',
+  'Tab to complete ï¿½ Enter to add ï¿½ Esc to cancel':
+    'Tab para completar ï¿½ Enter para adicionar ï¿½ Esc para cancelar',
+  'Remove directory?': 'Remover diretï¿½rio?',
   'Are you sure you want to remove this directory from the workspace?':
-    'Tem certeza de que deseja remover este diretório da área de trabalho?',
-  '  (Original working directory)': '  (Diretório de trabalho original)',
-  '  (from settings)': '  (das configurações)',
-  'Directory does not exist.': 'O diretório não existe.',
-  'Path is not a directory.': 'O caminho não é um diretório.',
+    'Tem certeza de que deseja remover este diretï¿½rio da ï¿½rea de trabalho?',
+  '  (Original working directory)': '  (Diretï¿½rio de trabalho original)',
+  '  (from settings)': '  (das configuraï¿½ï¿½es)',
+  'Directory does not exist.': 'O diretï¿½rio nï¿½o existe.',
+  'Path is not a directory.': 'O caminho nï¿½o ï¿½ um diretï¿½rio.',
   'This directory is already in the workspace.':
-    'Este diretório já está na área de trabalho.',
+    'Este diretï¿½rio jï¿½ estï¿½ na ï¿½rea de trabalho.',
   'Already covered by existing directory: {{dir}}':
-    'Já coberto pelo diretório existente: {{dir}}',
+    'Jï¿½ coberto pelo diretï¿½rio existente: {{dir}}',
 
   // ============================================================================
   // Status Bar
@@ -1507,13 +1508,13 @@ export default {
   // ============================================================================
   'No MCP servers configured.': 'Nenhum servidor MCP configurado.',
   '? MCP servers are starting up ({{count}} initializing)...':
-    '? Servidores MCP estão iniciando ({{count}} inicializando)...',
+    '? Servidores MCP estï¿½o iniciando ({{count}} inicializando)...',
   'Note: First startup may take longer. Tool availability will update automatically.':
-    'Nota: A primeira inicialização pode demorar mais. A disponibilidade da ferramenta será atualizada automaticamente.',
+    'Nota: A primeira inicializaï¿½ï¿½o pode demorar mais. A disponibilidade da ferramenta serï¿½ atualizada automaticamente.',
   'Configured MCP servers:': 'Servidores MCP configurados:',
   Ready: 'Pronto',
   'Starting... (first startup may take longer)':
-    'Iniciando... (a primeira inicialização pode demorar mais)',
+    'Iniciando... (a primeira inicializaï¿½ï¿½o pode demorar mais)',
   Disconnected: 'Desconectado',
   '{{count}} tool': '{{count}} ferramenta',
   '{{count}} tools': '{{count}} ferramentas',
@@ -1522,28 +1523,28 @@ export default {
   '(from {{extensionName}})': '(de {{extensionName}})',
   OAuth: 'OAuth',
   'OAuth expired': 'OAuth expirado',
-  'OAuth not authenticated': 'OAuth não autenticado',
+  'OAuth not authenticated': 'OAuth nï¿½o autenticado',
   'tools and prompts will appear when ready':
-    'ferramentas e prompts aparecerão quando estiverem prontos',
+    'ferramentas e prompts aparecerï¿½o quando estiverem prontos',
   '{{count}} tools cached': '{{count}} ferramentas em cache',
   'Tools:': 'Ferramentas:',
-  'Parameters:': 'Parâmetros:',
+  'Parameters:': 'Parï¿½metros:',
   'Prompts:': 'Prompts:',
   Blocked: 'Bloqueado',
   '?? Tips:': '?? Dicas:',
   Use: 'Use',
   'to show server and tool descriptions':
-    'para mostrar descrições de servidores e ferramentas',
+    'para mostrar descriï¿½ï¿½es de servidores e ferramentas',
   'to show tool parameter schemas':
-    'para mostrar esquemas de parâmetros de ferramentas',
-  'to hide descriptions': 'para ocultar descrições',
+    'para mostrar esquemas de parï¿½metros de ferramentas',
+  'to hide descriptions': 'para ocultar descriï¿½ï¿½es',
   'to authenticate with OAuth-enabled servers':
     'para autenticar com servidores habilitados para OAuth',
   Press: 'Pressione',
   'to toggle tool descriptions on/off':
-    'para alternar descrições de ferramentas ligadas/desligadas',
+    'para alternar descriï¿½ï¿½es de ferramentas ligadas/desligadas',
   "Starting OAuth authentication for MCP server '{{name}}'...":
-    "Iniciando autenticação OAuth para servidor MCP '{{name}}'...",
+    "Iniciando autenticaï¿½ï¿½o OAuth para servidor MCP '{{name}}'...",
   'Restarting MCP servers...': 'Reiniciando servidores MCP...',
 
   // ============================================================================
@@ -1551,98 +1552,98 @@ export default {
   // ============================================================================
   'Tips:': 'Dicas:',
   'Use /compress when the conversation gets long to summarize history and free up context.':
-    'Use /compress quando a conversa ficar longa para resumir o histórico e liberar contexto.',
+    'Use /compress quando a conversa ficar longa para resumir o histï¿½rico e liberar contexto.',
   'Start a fresh idea with /clear or /new; the previous session stays available in history.':
-    'Comece uma nova ideia com /clear ou /new; a sessão anterior permanece disponível no histórico.',
+    'Comece uma nova ideia com /clear ou /new; a sessï¿½o anterior permanece disponï¿½vel no histï¿½rico.',
   'Use /bug to submit issues to the maintainers when something goes off.':
     'Use /bug para enviar problemas aos mantenedores quando algo der errado.',
   'Switch auth type quickly with /auth.':
-    'Troque o tipo de autenticação rapidamente com /auth.',
+    'Troque o tipo de autenticaï¿½ï¿½o rapidamente com /auth.',
   'You can run any shell commands from HopCode using ! (e.g. !ls).':
-    'Você pode executar quaisquer comandos shell do HopCode usando ! (ex: !ls).',
+    'Vocï¿½ pode executar quaisquer comandos shell do HopCode usando ! (ex: !ls).',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
     'Digite / para abrir o popup de comandos; Tab autocompleta comandos de barra e prompts salvos.',
   'You can resume a previous conversation by running hopcode --continue or hopcode --resume.':
-    'Você pode retomar uma conversa anterior executando hopcode --continue ou hopcode --resume.',
+    'Vocï¿½ pode retomar uma conversa anterior executando hopcode --continue ou hopcode --resume.',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
-    'Você pode alternar o modo de permissão rapidamente com Shift+Tab ou /approval-mode.',
+    'Vocï¿½ pode alternar o modo de permissï¿½o rapidamente com Shift+Tab ou /approval-mode.',
   'Try /insight to generate personalized insights from your chat history.':
-    'Experimente /insight para gerar insights personalizados do seu histórico de conversas.',
-  'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
-    'Pressione Ctrl+O para alternar o modo compacto — ocultar saída de ferramentas e raciocínio.',
+    'Experimente /insight para gerar insights personalizados do seu histï¿½rico de conversas.',
+  'Press Ctrl+O to toggle compact mode ï¿½ hide tool output and thinking for a cleaner view.':
+    'Pressione Ctrl+O para alternar o modo compacto ï¿½ ocultar saï¿½da de ferramentas e raciocï¿½nio.',
   'Add a HOPCODE.md file to give HopCode persistent project context.':
     'Adicione um arquivo HOPCODE.md para dar ao HopCode um contexto persistente do projeto.',
   'Use /btw to ask a quick side question without disrupting the conversation.':
-    'Use /btw para fazer uma pergunta lateral rápida sem interromper a conversa.',
+    'Use /btw para fazer uma pergunta lateral rï¿½pida sem interromper a conversa.',
   'Context is almost full! Run /compress now or start /new to continue.':
-    'O contexto está quase cheio! Execute /compress agora ou inicie /new para continuar.',
+    'O contexto estï¿½ quase cheio! Execute /compress agora ou inicie /new para continuar.',
   'Context is getting full. Use /compress to free up space.':
-    'O contexto está ficando cheio. Use /compress para liberar espaço.',
+    'O contexto estï¿½ ficando cheio. Use /compress para liberar espaï¿½o.',
   'Long conversation? /compress summarizes history to free context.':
-    'Conversa longa? /compress resume o histórico para liberar contexto.',
+    'Conversa longa? /compress resume o histï¿½rico para liberar contexto.',
 
   // ============================================================================
   // Exit Screen / Stats
   // ============================================================================
   'Agent powering down. Goodbye!': 'Agente desligando. Adeus!',
-  'To continue this session, run': 'Para continuar esta sessão, execute',
-  'Interaction Summary': 'Resumo da Interação',
-  'Session ID:': 'ID da Sessão:',
+  'To continue this session, run': 'Para continuar esta sessï¿½o, execute',
+  'Interaction Summary': 'Resumo da Interaï¿½ï¿½o',
+  'Session ID:': 'ID da Sessï¿½o:',
   'Tool Calls:': 'Chamadas de Ferramenta:',
   'Success Rate:': 'Taxa de Sucesso:',
-  'User Agreement:': 'Acordo do Usuário:',
+  'User Agreement:': 'Acordo do Usuï¿½rio:',
   reviewed: 'revisado',
-  'Code Changes:': 'Alterações de Código:',
+  'Code Changes:': 'Alteraï¿½ï¿½es de Cï¿½digo:',
   Performance: 'Desempenho',
   'Wall Time:': 'Tempo Total:',
   'Agent Active:': 'Agente Ativo:',
   'API Time:': 'Tempo de API:',
   'Tool Time:': 'Tempo de Ferramenta:',
-  'Session Stats': 'Estatísticas da Sessão',
+  'Session Stats': 'Estatï¿½sticas da Sessï¿½o',
   'Model Usage': 'Uso do Modelo',
   Reqs: 'Reqs',
   'Input Tokens': 'Tokens de Entrada',
-  'Output Tokens': 'Tokens de Saída',
+  'Output Tokens': 'Tokens de Saï¿½da',
   'Savings Highlight:': 'Destaque de Economia:',
   'of input tokens were served from the cache, reducing costs.':
     'de tokens de entrada foram servidos do cache, reduzindo custos.',
   'Tip: For a full token breakdown, run `/stats model`.':
     'Dica: Para um detalhamento completo de tokens, execute `/stats model`.',
-  'Model Stats For Nerds': 'Estatísticas de Modelo Para Nerds',
-  'Tool Stats For Nerds': 'Estatísticas de Ferramenta Para Nerds',
-  Metric: 'Métrica',
+  'Model Stats For Nerds': 'Estatï¿½sticas de Modelo Para Nerds',
+  'Tool Stats For Nerds': 'Estatï¿½sticas de Ferramenta Para Nerds',
+  Metric: 'Mï¿½trica',
   API: 'API',
-  Requests: 'Solicitações',
+  Requests: 'Solicitaï¿½ï¿½es',
   Errors: 'Erros',
-  'Avg Latency': 'Latência Média',
+  'Avg Latency': 'Latï¿½ncia Mï¿½dia',
   Tokens: 'Tokens',
   Total: 'Total',
   Prompt: 'Prompt',
   Cached: 'Cacheado',
   Thoughts: 'Pensamentos',
   Tool: 'Ferramenta',
-  Output: 'Saída',
+  Output: 'Saï¿½da',
   'No API calls have been made in this session.':
-    'Nenhuma chamada de API foi feita nesta sessão.',
+    'Nenhuma chamada de API foi feita nesta sessï¿½o.',
   'Tool Name': 'Nome da Ferramenta',
   Calls: 'Chamadas',
   'Success Rate': 'Taxa de Sucesso',
-  'Avg Duration': 'Duração Média',
-  'User Decision Summary': 'Resumo de Decisão do Usuário',
-  'Total Reviewed Suggestions:': 'Total de Sugestões Revisadas:',
-  ' » Accepted:': ' » Aceitas:',
-  ' » Rejected:': ' » Rejeitadas:',
-  ' » Modified:': ' » Modificadas:',
+  'Avg Duration': 'Duraï¿½ï¿½o Mï¿½dia',
+  'User Decision Summary': 'Resumo de Decisï¿½o do Usuï¿½rio',
+  'Total Reviewed Suggestions:': 'Total de Sugestï¿½es Revisadas:',
+  ' ï¿½ Accepted:': ' ï¿½ Aceitas:',
+  ' ï¿½ Rejected:': ' ï¿½ Rejeitadas:',
+  ' ï¿½ Modified:': ' ï¿½ Modificadas:',
   ' Overall Agreement Rate:': ' Taxa Geral de Acordo:',
   'No tool calls have been made in this session.':
-    'Nenhuma chamada de ferramenta foi feita nesta sessão.',
+    'Nenhuma chamada de ferramenta foi feita nesta sessï¿½o.',
   'Session start time is unavailable, cannot calculate stats.':
-    'Hora de início da sessão indisponível, não é possível calcular estatísticas.',
+    'Hora de inï¿½cio da sessï¿½o indisponï¿½vel, nï¿½o ï¿½ possï¿½vel calcular estatï¿½sticas.',
 
   // ============================================================================
   // Command Format Migration
   // ============================================================================
-  'Command Format Migration': 'Migração de Formato de Comando',
+  'Command Format Migration': 'Migraï¿½ï¿½o de Formato de Comando',
   'Found {{count}} TOML command file:':
     'Encontrado {{count}} arquivo de comando TOML:',
   'Found {{count}} TOML command files:':
@@ -1650,14 +1651,14 @@ export default {
   'Current tasks': 'Tarefas atuais',
   '... and {{count}} more': '... e mais {{count}}',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
-    'O formato TOML está obsoleto. Você gostaria de migrá-los para o formato Markdown?',
+    'O formato TOML estï¿½ obsoleto. Vocï¿½ gostaria de migrï¿½-los para o formato Markdown?',
   '(Backups will be created and original files will be preserved)':
-    '(Backups serão criados e arquivos originais serão preservados)',
+    '(Backups serï¿½o criados e arquivos originais serï¿½o preservados)',
 
   // ============================================================================
   // Loading Phrases
   // ============================================================================
-  'Waiting for user confirmation...': 'Aguardando confirmação do usuário...',
+  'Waiting for user confirmation...': 'Aguardando confirmaï¿½ï¿½o do usuï¿½rio...',
   '(esc to cancel, {{time}})': '(esc para cancelar, {{time}})',
 
   WITTY_LOADING_PHRASES: [
@@ -1665,128 +1666,128 @@ export default {
     'Enviando maravilhas...',
     'Pintando os serifos de volta...',
     'Navegando pelo mofo limoso...',
-    'Consultando os espíritos digitais...',
+    'Consultando os espï¿½ritos digitais...',
     'Reticulando splines...',
     'Aquecendo os hamsters da IA...',
-    'Perguntando à concha mágica...',
-    'Gerando réplica espirituosa...',
+    'Perguntando ï¿½ concha mï¿½gica...',
+    'Gerando rï¿½plica espirituosa...',
     'Polindo os algoritmos...',
-    'Não apresse a perfeição (ou meu código)...',
+    'Nï¿½o apresse a perfeiï¿½ï¿½o (ou meu cï¿½digo)...',
     'Preparando bytes frescos...',
-    'Contando elétrons...',
+    'Contando elï¿½trons...',
     'Engajando processadores cognitivos...',
     'Verificando erros de sintaxe no universo...',
     'Um momento, otimizando o humor...',
     'Embaralhando piadas...',
-    'Desembaraçando redes neurais...',
+    'Desembaraï¿½ando redes neurais...',
     'Compilando brilhantismo...',
     'Carregando humor.exe...',
     'Invocando a nuvem da sabedoria...',
     'Preparando uma resposta espirituosa...',
-    'Só um segundo, estou depurando a realidade...',
-    'Confundindo as opções...',
-    'Sintonizando as frequências cósmicas...',
-    'Criando uma resposta digna da sua paciência...',
+    'Sï¿½ um segundo, estou depurando a realidade...',
+    'Confundindo as opï¿½ï¿½es...',
+    'Sintonizando as frequï¿½ncias cï¿½smicas...',
+    'Criando uma resposta digna da sua paciï¿½ncia...',
     'Compilando os 1s e 0s...',
-    'Resolvendo dependências... e crises existenciais...',
-    'Desfragmentando memórias... tanto RAM quanto pessoais...',
-    'Reiniciando o módulo de humor...',
+    'Resolvendo dependï¿½ncias... e crises existenciais...',
+    'Desfragmentando memï¿½rias... tanto RAM quanto pessoais...',
+    'Reiniciando o mï¿½dulo de humor...',
     'Fazendo cache do essencial (principalmente memes de gatos)...',
     'Otimizando para velocidade absurda',
-    'Trocando bits... não conte para os bytes...',
-    'Coletando lixo... volto já...',
+    'Trocando bits... nï¿½o conte para os bytes...',
+    'Coletando lixo... volto jï¿½...',
     'Montando a internet...',
-    'Convertendo café em código...',
+    'Convertendo cafï¿½ em cï¿½digo...',
     'Atualizando a sintaxe da realidade...',
     'Reconectando as sinapses...',
-    'Procurando um ponto e vírgula perdido...',
-    'Lubrificando as engrenagens da máquina...',
-    'Pré-aquecendo os servidores...',
+    'Procurando um ponto e vï¿½rgula perdido...',
+    'Lubrificando as engrenagens da mï¿½quina...',
+    'Prï¿½-aquecendo os servidores...',
     'Calibrando o capacitor de fluxo...',
     'Engajando o motor de improbabilidade...',
-    'Canalizando a Força...',
+    'Canalizando a Forï¿½a...',
     'Alinhando as estrelas para uma resposta ideal...',
     'Assim dizemos todos...',
-    'Carregando a próxima grande ideia...',
-    'Só um momento, estou na zona...',
-    'Preparando para deslumbrá-lo com brilhantismo...',
-    'Só um tique, estou polindo minha inteligência...',
+    'Carregando a prï¿½xima grande ideia...',
+    'Sï¿½ um momento, estou na zona...',
+    'Preparando para deslumbrï¿½-lo com brilhantismo...',
+    'Sï¿½ um tique, estou polindo minha inteligï¿½ncia...',
     'Segure firme, estou criando uma obra-prima...',
-    'Só um instante, estou depurando o universo...',
-    'Só um momento, estou alinhando os pixels...',
-    'Só um segundo, estou otimizando o humor...',
-    'Só um momento, estou ajustando os algoritmos...',
+    'Sï¿½ um instante, estou depurando o universo...',
+    'Sï¿½ um momento, estou alinhando os pixels...',
+    'Sï¿½ um segundo, estou otimizando o humor...',
+    'Sï¿½ um momento, estou ajustando os algoritmos...',
     'Velocidade de dobra engajada...',
     'Minerando mais cristais de Dilithium...',
-    'Não entre em pânico...',
+    'Nï¿½o entre em pï¿½nico...',
     'Seguindo o coelho branco...',
-    'A verdade está lá fora... em algum lugar...',
+    'A verdade estï¿½ lï¿½ fora... em algum lugar...',
     'Soprando o cartucho...',
-    'Carregando... Faça um barrel roll!',
+    'Carregando... Faï¿½a um barrel roll!',
     'Aguardando o respawn...',
     'Terminando a Kessel Run em menos de 12 parsecs...',
-    'O bolo não é uma mentira, só ainda está carregando...',
-    'Mexendo na tela de criação de personagem...',
-    'Só um momento, estou encontrando o meme certo...',
+    'O bolo nï¿½o ï¿½ uma mentira, sï¿½ ainda estï¿½ carregando...',
+    'Mexendo na tela de criaï¿½ï¿½o de personagem...',
+    'Sï¿½ um momento, estou encontrando o meme certo...',
     "Pressionando 'A' para continuar...",
     'Pastoreando gatos digitais...',
     'Polindo os pixels...',
     'Encontrando um trocadilho adequado para a tela de carregamento...',
-    'Distraindo você com esta frase espirituosa...',
-    'Quase lá... provavelmente...',
-    'Nossos hamsters estão trabalhando o mais rápido que podem...',
-    'Dando um tapinha na cabeça do Cloudy...',
+    'Distraindo vocï¿½ com esta frase espirituosa...',
+    'Quase lï¿½... provavelmente...',
+    'Nossos hamsters estï¿½o trabalhando o mais rï¿½pido que podem...',
+    'Dando um tapinha na cabeï¿½a do Cloudy...',
     'Acariciando o gato...',
     'Dando um Rickroll no meu chefe...',
     'Never gonna give you up, never gonna let you down...',
     'Tocando o baixo...',
     'Provando as amoras...',
     'Estou indo longe, estou indo pela velocidade...',
-    'Isso é vida real? Ou é apenas fantasia?...',
+    'Isso ï¿½ vida real? Ou ï¿½ apenas fantasia?...',
     'Tenho um bom pressentimento sobre isso...',
     'Cutucando o urso...',
-    'Fazendo pesquisa sobre os últimos memes...',
+    'Fazendo pesquisa sobre os ï¿½ltimos memes...',
     'Descobrindo como tornar isso mais espirituoso...',
     'Hmmm... deixe-me pensar...',
-    'O que você chama de um peixe sem olhos? Um pxe...',
-    'Por que o computador foi à terapia? Porque tinha muitos bytes...',
-    'Por que programadores não gostam da natureza? Porque tem muitos bugs...',
+    'O que vocï¿½ chama de um peixe sem olhos? Um pxe...',
+    'Por que o computador foi ï¿½ terapia? Porque tinha muitos bytes...',
+    'Por que programadores nï¿½o gostam da natureza? Porque tem muitos bugs...',
     'Por que programadores preferem o modo escuro? Porque a luz atrai bugs...',
     'Por que o desenvolvedor faliu? Porque usou todo o seu cache...',
-    'O que você pode fazer com um lápis quebrado? Nada, ele não tem ponta...',
-    'Aplicando manutenção percussiva...',
-    'Procurando a orientação correta do USB...',
-    'Garantindo que a fumaça mágica permaneça dentro dos fios...',
+    'O que vocï¿½ pode fazer com um lï¿½pis quebrado? Nada, ele nï¿½o tem ponta...',
+    'Aplicando manutenï¿½ï¿½o percussiva...',
+    'Procurando a orientaï¿½ï¿½o correta do USB...',
+    'Garantindo que a fumaï¿½a mï¿½gica permaneï¿½a dentro dos fios...',
     'Tentando sair do Vim...',
     'Girando a roda do hamster...',
-    'Isso não é um bug, é um recurso não documentado...',
+    'Isso nï¿½o ï¿½ um bug, ï¿½ um recurso nï¿½o documentado...',
     'Engajar.',
     'Eu voltarei... com uma resposta.',
-    'Meu outro processo é uma TARDIS...',
-    'Comungando com o espírito da máquina...',
+    'Meu outro processo ï¿½ uma TARDIS...',
+    'Comungando com o espï¿½rito da mï¿½quina...',
     'Deixando os pensamentos marinarem...',
     'Lembrei agora onde coloquei minhas chaves...',
     'Ponderando a orbe...',
-    'Eu vi coisas que vocês não acreditariam... como um usuário que lê mensagens de carregamento.',
+    'Eu vi coisas que vocï¿½s nï¿½o acreditariam... como um usuï¿½rio que lï¿½ mensagens de carregamento.',
     'Iniciando olhar pensativo...',
-    'Qual é o lanche favorito de um computador? Microchips.',
-    'Por que desenvolvedores Java usam óculos? Porque eles não C#.',
+    'Qual ï¿½ o lanche favorito de um computador? Microchips.',
+    'Por que desenvolvedores Java usam ï¿½culos? Porque eles nï¿½o C#.',
     'Carregando o laser... pew pew!',
-    'Dividindo por zero... só brincando!',
+    'Dividindo por zero... sï¿½ brincando!',
     'Procurando por um supervisor adulto... digo, processando.',
     'Fazendo bip boop.',
-    'Buffering... porque até as IAs precisam de um momento.',
-    'Entrelaçando partículas quânticas para uma resposta mais rápida...',
+    'Buffering... porque atï¿½ as IAs precisam de um momento.',
+    'Entrelaï¿½ando partï¿½culas quï¿½nticas para uma resposta mais rï¿½pida...',
     'Polindo o cromo... nos algoritmos.',
-    'Você não está entretido? (Trabalhando nisso!)',
-    'Invocando os gremlins do código... para ajudar, é claro.',
-    'Só esperando o som da conexão discada terminar...',
-    'Recalibrando o humorômetro.',
-    'Minha outra tela de carregamento é ainda mais engraçada.',
+    'Vocï¿½ nï¿½o estï¿½ entretido? (Trabalhando nisso!)',
+    'Invocando os gremlins do cï¿½digo... para ajudar, ï¿½ claro.',
+    'Sï¿½ esperando o som da conexï¿½o discada terminar...',
+    'Recalibrando o humorï¿½metro.',
+    'Minha outra tela de carregamento ï¿½ ainda mais engraï¿½ada.',
     'Tenho quase certeza que tem um gato andando no teclado em algum lugar...',
     'Aumentando... Aumentando... Ainda carregando.',
-    'Não é um bug, é um recurso... desta tela de carregamento.',
-    'Você já tentou desligar e ligar de novo? (A tela de carregamento, não eu.)',
+    'Nï¿½o ï¿½ um bug, ï¿½ um recurso... desta tela de carregamento.',
+    'Vocï¿½ jï¿½ tentou desligar e ligar de novo? (A tela de carregamento, nï¿½o eu.)',
     'Construindo pilares adicionais...',
   ],
 
@@ -1794,7 +1795,7 @@ export default {
   // Extension Settings Input
   // ============================================================================
   'Enter value...': 'Digite o valor...',
-  'Enter sensitive value...': 'Digite o valor sensível...',
+  'Enter sensitive value...': 'Digite o valor sensï¿½vel...',
   'Press Enter to submit, Escape to cancel':
     'Pressione Enter para enviar, Escape para cancelar',
 
@@ -1802,68 +1803,68 @@ export default {
   // Command Migration Tool
   // ============================================================================
   'Markdown file already exists: {{filename}}':
-    'Arquivo Markdown já existe: {{filename}}',
+    'Arquivo Markdown jï¿½ existe: {{filename}}',
   'TOML Command Format Deprecation Notice':
-    'Aviso de Obsolescência do Formato de Comando TOML',
+    'Aviso de Obsolescï¿½ncia do Formato de Comando TOML',
   'Found {{count}} command file(s) in TOML format:':
     'Encontrado(s) {{count}} arquivo(s) de comando no formato TOML:',
   'The TOML format for commands is being deprecated in favor of Markdown format.':
-    'O formato TOML para comandos está sendo descontinuado em favor do formato Markdown.',
+    'O formato TOML para comandos estï¿½ sendo descontinuado em favor do formato Markdown.',
   'Markdown format is more readable and easier to edit.':
-    'O formato Markdown é mais legível e fácil de editar.',
+    'O formato Markdown ï¿½ mais legï¿½vel e fï¿½cil de editar.',
   'You can migrate these files automatically using:':
-    'Você pode migrar esses arquivos automaticamente usando:',
+    'Vocï¿½ pode migrar esses arquivos automaticamente usando:',
   'Or manually convert each file:': 'Ou converter manualmente cada arquivo:',
   'TOML: prompt = "..." / description = "..."':
     'TOML: prompt = "..." / description = "..."',
   'Markdown: YAML frontmatter + content':
-    'Markdown: YAML frontmatter + conteúdo',
-  'The migration tool will:': 'A ferramenta de migração irá:',
+    'Markdown: YAML frontmatter + conteï¿½do',
+  'The migration tool will:': 'A ferramenta de migraï¿½ï¿½o irï¿½:',
   'Convert TOML files to Markdown': 'Converter arquivos TOML para Markdown',
   'Create backups of original files': 'Criar backups dos arquivos originais',
   'Preserve all command functionality':
     'Preservar toda a funcionalidade do comando',
   'TOML format will continue to work for now, but migration is recommended.':
-    'O formato TOML continuará a funcionar por enquanto, mas a migração é recomendada.',
+    'O formato TOML continuarï¿½ a funcionar por enquanto, mas a migraï¿½ï¿½o ï¿½ recomendada.',
 
   // ============================================================================
   // Extensions - Explore Command
   // ============================================================================
   'Open extensions page in your browser':
-    'Abrir página de extensões no seu navegador',
+    'Abrir pï¿½gina de extensï¿½es no seu navegador',
   'Unknown extensions source: {{source}}.':
-    'Fonte de extensões desconhecida: {{source}}.',
+    'Fonte de extensï¿½es desconhecida: {{source}}.',
   'Would open extensions page in your browser: {{url}} (skipped in test environment)':
-    'Abriria a página de extensões no seu navegador: {{url}} (pulado no ambiente de teste)',
+    'Abriria a pï¿½gina de extensï¿½es no seu navegador: {{url}} (pulado no ambiente de teste)',
   'View available extensions at {{url}}':
-    'Ver extensões disponíveis em {{url}}',
+    'Ver extensï¿½es disponï¿½veis em {{url}}',
   'Opening extensions page in your browser: {{url}}':
-    'Abrindo página de extensões no seu navegador: {{url}}',
+    'Abrindo pï¿½gina de extensï¿½es no seu navegador: {{url}}',
   'Failed to open browser. Check out the extensions gallery at {{url}}':
-    'Falha ao abrir o navegador. Confira a galeria de extensões em {{url}}',
+    'Falha ao abrir o navegador. Confira a galeria de extensï¿½es em {{url}}',
 
   // ============================================================================
   // Custom API Key Configuration
   // ============================================================================
   'You can configure your API key and models in settings.json':
-    'Você pode configurar sua chave de API e modelos em settings.json',
+    'Vocï¿½ pode configurar sua chave de API e modelos em settings.json',
   'Refer to the documentation for setup instructions':
-    'Consulte a documentação para instruções de configuração',
+    'Consulte a documentaï¿½ï¿½o para instruï¿½ï¿½es de configuraï¿½ï¿½o',
 
   // ============================================================================
   // Coding Plan Authentication
   // ============================================================================
-  'API key cannot be empty.': 'A chave de API não pode estar vazia.',
+  'API key cannot be empty.': 'A chave de API nï¿½o pode estar vazia.',
   'You can get your Coding Plan API key here':
-    'Você pode obter sua chave de API do Coding Plan aqui',
+    'Vocï¿½ pode obter sua chave de API do Coding Plan aqui',
   'New model configurations are available for Alibaba Cloud Coding Plan. Update now?':
-    'Novas configurações de modelo estão disponíveis para o Alibaba Cloud Coding Plan. Atualizar agora?',
+    'Novas configuraï¿½ï¿½es de modelo estï¿½o disponï¿½veis para o Alibaba Cloud Coding Plan. Atualizar agora?',
   'Coding Plan configuration updated successfully. New models are now available.':
-    'Configuração do Coding Plan atualizada com sucesso. Novos modelos agora estão disponíveis.',
+    'Configuraï¿½ï¿½o do Coding Plan atualizada com sucesso. Novos modelos agora estï¿½o disponï¿½veis.',
   'Coding Plan API key not found. Please re-authenticate with Coding Plan.':
-    'Chave de API do Coding Plan não encontrada. Por favor, re-autentique com o Coding Plan.',
+    'Chave de API do Coding Plan nï¿½o encontrada. Por favor, re-autentique com o Coding Plan.',
   'Failed to update Coding Plan configuration: {{message}}':
-    'Falha ao atualizar a configuração do Coding Plan: {{message}}',
+    'Falha ao atualizar a configuraï¿½ï¿½o do Coding Plan: {{message}}',
 
   // ============================================================================
   // Auth Dialog - View Titles and Labels
@@ -1873,27 +1874,27 @@ export default {
     'Cole sua chave de API do ModelStudio Coding Plan e pronto!',
   Custom: 'Personalizado',
   'More instructions about configuring `modelProviders` manually.':
-    'Mais instruções sobre como configurar `modelProviders` manualmente.',
+    'Mais instruï¿½ï¿½es sobre como configurar `modelProviders` manualmente.',
   'Select API-KEY configuration mode:':
-    'Selecione o modo de configuração da API-KEY:',
+    'Selecione o modo de configuraï¿½ï¿½o da API-KEY:',
   '(Press Escape to go back)': '(Pressione Escape para voltar)',
   '(Press Enter to submit, Escape to cancel)':
     '(Pressione Enter para enviar, Escape para cancelar)',
-  'More instructions please check:': 'Mais instruções, consulte:',
-  'Select Region for Coding Plan': 'Selecionar região do Coding Plan',
+  'More instructions please check:': 'Mais instruï¿½ï¿½es, consulte:',
+  'Select Region for Coding Plan': 'Selecionar regiï¿½o do Coding Plan',
   'Choose based on where your account is registered':
-    'Escolha com base em onde sua conta está registrada',
+    'Escolha com base em onde sua conta estï¿½ registrada',
   'Enter Coding Plan API Key': 'Inserir chave de API do Coding Plan',
 
   // ============================================================================
   // Coding Plan International Updates
   // ============================================================================
   'New model configurations are available for {{region}}. Update now?':
-    'Novas configurações de modelo estão disponíveis para o {{region}}. Atualizar agora?',
+    'Novas configuraï¿½ï¿½es de modelo estï¿½o disponï¿½veis para o {{region}}. Atualizar agora?',
   '{{region}} configuration updated successfully. Model switched to "{{model}}".':
-    'Configuração do {{region}} atualizada com sucesso. Modelo alterado para "{{model}}".',
+    'Configuraï¿½ï¿½o do {{region}} atualizada com sucesso. Modelo alterado para "{{model}}".',
   'Authenticated successfully with {{region}}. API key and model configs saved to settings.json (backed up).':
-    'Autenticado com sucesso com {{region}}. Chave de API e configurações de modelo salvas em settings.json (com backup).',
+    'Autenticado com sucesso com {{region}}. Chave de API e configuraï¿½ï¿½es de modelo salvas em settings.json (com backup).',
 
   // ============================================================================
   // Context Usage Component
@@ -1905,53 +1906,53 @@ export default {
     'Contexto excede o limite! Use /compress ou /clear para reduzir.',
   'Use /compress or /clear': 'Use /compress ou /clear',
   'No API response yet. Send a message to see actual usage.':
-    'Ainda não há resposta da API. Envie uma mensagem para ver o uso real.',
-  'Estimated pre-conversation overhead': 'Sobrecarga estimada pré-conversa',
+    'Ainda nï¿½o hï¿½ resposta da API. Envie uma mensagem para ver o uso real.',
+  'Estimated pre-conversation overhead': 'Sobrecarga estimada prï¿½-conversa',
   'Context window': 'Janela de Contexto',
   tokens: 'tokens',
   Used: 'Usado',
   Free: 'Livre',
-  'Autocompact buffer': 'Buffer de autocompactação',
+  'Autocompact buffer': 'Buffer de autocompactaï¿½ï¿½o',
   'Usage by category': 'Uso por categoria',
   'System prompt': 'Prompt do sistema',
   'Built-in tools': 'Ferramentas integradas',
   'MCP tools': 'Ferramentas MCP',
-  'Memory files': 'Arquivos de memória',
+  'Memory files': 'Arquivos de memï¿½ria',
   Skills: 'Habilidades',
   Messages: 'Mensagens',
   'Show context window usage breakdown.':
-    'Exibe a divisão de uso da janela de contexto.',
+    'Exibe a divisï¿½o de uso da janela de contexto.',
   'Run /context detail for per-item breakdown.':
     'Execute /context detail para detalhamento por item.',
   active: 'ativo',
-  'body loaded': 'conteúdo carregado',
-  memory: 'memória',
+  'body loaded': 'conteï¿½do carregado',
+  memory: 'memï¿½ria',
   '{{region}} configuration updated successfully.':
-    'Configuração do {{region}} atualizada com sucesso.',
+    'Configuraï¿½ï¿½o do {{region}} atualizada com sucesso.',
   'Authenticated successfully with {{region}}. API key and model configs saved to settings.json.':
-    'Autenticado com sucesso com {{region}}. Chave de API e configurações de modelo salvas em settings.json.',
+    'Autenticado com sucesso com {{region}}. Chave de API e configuraï¿½ï¿½es de modelo salvas em settings.json.',
   'Tip: Use /model to switch between available Coding Plan models.':
-    'Dica: Use /model para alternar entre os modelos disponíveis do Coding Plan.',
+    'Dica: Use /model para alternar entre os modelos disponï¿½veis do Coding Plan.',
 
   // ============================================================================
   // Ask User Question Tool
   // ============================================================================
   'Please answer the following question(s):':
-    'Por favor, responda à(s) seguinte(s) pergunta(s):',
+    'Por favor, responda ï¿½(s) seguinte(s) pergunta(s):',
   'Cannot ask user questions in non-interactive mode. Please run in interactive mode to use this tool.':
-    'Não é possível fazer perguntas ao usuário no modo não interativo. Por favor, execute no modo interativo para usar esta ferramenta.',
+    'Nï¿½o ï¿½ possï¿½vel fazer perguntas ao usuï¿½rio no modo nï¿½o interativo. Por favor, execute no modo interativo para usar esta ferramenta.',
   'User declined to answer the questions.':
-    'O usuário recusou responder às perguntas.',
+    'O usuï¿½rio recusou responder ï¿½s perguntas.',
   'User has provided the following answers:':
-    'O usuário forneceu as seguintes respostas:',
+    'O usuï¿½rio forneceu as seguintes respostas:',
   'Failed to process user answers:':
-    'Falha ao processar as respostas do usuário:',
+    'Falha ao processar as respostas do usuï¿½rio:',
   'Type something...': 'Digite algo...',
   Submit: 'Enviar',
   'Submit answers': 'Enviar respostas',
   Cancel: 'Cancelar',
   'Your answers:': 'Suas respostas:',
-  '(not answered)': '(não respondido)',
+  '(not answered)': '(nï¿½o respondido)',
   'Ready to submit your answers?': 'Pronto para enviar suas respostas?',
   '?/?: Navigate | ?/?: Switch tabs | Enter: Select':
     '?/?: Navegar | ?/?: Alternar abas | Enter: Selecionar',
@@ -1966,24 +1967,24 @@ export default {
   // Commands - Auth
   // ============================================================================
   'Configure authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
-    'Configurar autenticação Qwen com Qwen-OAuth ou Alibaba Cloud Coding Plan',
-  'Authenticate using Qwen OAuth': 'Autenticar usando Qwen OAuth',
+    'Configurar autenticaï¿½ï¿½o Qwen com Qwen-OAuth ou Alibaba Cloud Coding Plan',
+  'Authenticate using Qwen OAuth': 'Autenticar usando Legacy OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Autenticar usando Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
-    'Região para Coding Plan (china/global)',
+    'Regiï¿½o para Coding Plan (china/global)',
   'API key for Coding Plan': 'Chave de API para Coding Plan',
-  'Show current authentication status': 'Mostrar status atual de autenticação',
+  'Show current authentication status': 'Mostrar status atual de autenticaï¿½ï¿½o',
   'Authentication completed successfully.':
-    'Autenticação concluída com sucesso.',
+    'Autenticaï¿½ï¿½o concluï¿½da com sucesso.',
   'Starting Qwen OAuth authentication...':
-    'Iniciando autenticação Qwen OAuth...',
+    'Iniciando autenticaï¿½ï¿½o Legacy OAuth...',
   'Successfully authenticated with Qwen OAuth.':
-    'Autenticado com sucesso via Qwen OAuth.',
+    'Autenticado com sucesso via Legacy OAuth.',
   'Failed to authenticate with Qwen OAuth: {{error}}':
-    'Falha ao autenticar com Qwen OAuth: {{error}}',
+    'Falha ao autenticar com Legacy OAuth: {{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
-    'Processando autenticação Alibaba Cloud Coding Plan...',
+    'Processando autenticaï¿½ï¿½o Alibaba Cloud Coding Plan...',
   'Successfully authenticated with Alibaba Cloud Coding Plan.':
     'Autenticado com sucesso via Alibaba Cloud Coding Plan.',
   'Failed to authenticate with Coding Plan: {{error}}':
@@ -1992,58 +1993,59 @@ export default {
   '????? (aliyun.com)': '????? (aliyun.com)',
   Global: 'Global',
   'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
-  'Select region for Coding Plan:': 'Selecione a região para Coding Plan:',
+  'Select region for Coding Plan:': 'Selecione a regiï¿½o para Coding Plan:',
   'Enter your Coding Plan API key: ':
     'Insira sua chave de API do Coding Plan: ',
-  'Select authentication method:': 'Selecione o método de autenticação:',
-  '\n=== Authentication Status ===\n': '\n=== Status de Autenticação ===\n',
+  'Select authentication method:': 'Selecione o mï¿½todo de autenticaï¿½ï¿½o:',
+  '\n=== Authentication Status ===\n': '\n=== Status de Autenticaï¿½ï¿½o ===\n',
   '??  No authentication method configured.\n':
-    '??  Nenhum método de autenticação configurado.\n',
+    '??  Nenhum mï¿½todo de autenticaï¿½ï¿½o configurado.\n',
   'Run one of the following commands to get started:\n':
-    'Execute um dos seguintes comandos para começar:\n',
+    'Execute um dos seguintes comandos para comeï¿½ar:\n',
   '  hopcode auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  hopcode auth qwen-oauth     - Autenticar com Qwen OAuth (descontinuado)',
+    '  hopcode auth qwen-oauth     - Autenticar com Legacy OAuth (descontinuado)',
   '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
     '  hopcode auth coding-plan      - Autenticar com Alibaba Cloud Coding Plan\n',
   'Or simply run:': 'Ou simplesmente execute:',
   '  hopcode auth                - Interactive authentication setup\n':
-    '  hopcode auth                - Configuração interativa de autenticação\n',
-  '? Authentication Method: Qwen OAuth': '? Método de autenticação: Qwen OAuth',
+    '  hopcode auth                - Configuraï¿½ï¿½o interativa de autenticaï¿½ï¿½o\n',
+  '? Authentication Method: Qwen OAuth':
+    '? Mï¿½todo de autenticaï¿½ï¿½o: Legacy OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
-    '  Tipo: Nível gratuito (descontinuado 2026-04-15)',
-  '  Limit: No longer available': '  Limite: Não mais disponível',
+    '  Tipo: Nï¿½vel gratuito (descontinuado 2026-04-15)',
+  '  Limit: No longer available': '  Limite: Nï¿½o mais disponï¿½vel',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Execute /auth para mudar para Coding Plan, OpenRouter, Fireworks AI ou outro provedor.',
+    'O nï¿½vel gratuito do Legacy OAuth foi descontinuado em 2026-04-15. Execute /auth para mudar para Coding Plan, OpenRouter, Fireworks AI ou outro provedor.',
   '  Models: Qwen latest models\n': '  Modelos: Modelos Qwen mais recentes\n',
   '? Authentication Method: Alibaba Cloud Coding Plan':
-    '? Método de autenticação: Alibaba Cloud Coding Plan',
+    '? Mï¿½todo de autenticaï¿½ï¿½o: Alibaba Cloud Coding Plan',
   '?? (China) - ?????': '?? (China) - ?????',
   'Global - Alibaba Cloud': 'Global - Alibaba Cloud',
-  '  Region: {{region}}': '  Região: {{region}}',
+  '  Region: {{region}}': '  Regiï¿½o: {{region}}',
   '  Current Model: {{model}}': '  Modelo atual: {{model}}',
-  '  Config Version: {{version}}': '  Versão da configuração: {{version}}',
+  '  Config Version: {{version}}': '  Versï¿½o da configuraï¿½ï¿½o: {{version}}',
   '  Status: API key configured\n': '  Status: Chave de API configurada\n',
   '??  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
-    '??  Método de autenticação: Alibaba Cloud Coding Plan (Incompleto)',
+    '??  Mï¿½todo de autenticaï¿½ï¿½o: Alibaba Cloud Coding Plan (Incompleto)',
   '  Issue: API key not found in environment or settings\n':
-    '  Problema: Chave de API não encontrada no ambiente ou configurações\n',
+    '  Problema: Chave de API nï¿½o encontrada no ambiente ou configuraï¿½ï¿½es\n',
   '  Run `hopcode auth coding-plan` to re-configure.\n':
     '  Execute `hopcode auth coding-plan` para reconfigurar.\n',
-  '? Authentication Method: {{type}}': '? Método de autenticação: {{type}}',
+  '? Authentication Method: {{type}}': '? Mï¿½todo de autenticaï¿½ï¿½o: {{type}}',
   '  Status: Configured\n': '  Status: Configurado\n',
   'Failed to check authentication status: {{error}}':
-    'Falha ao verificar status de autenticação: {{error}}',
-  'Select an option:': 'Selecione uma opção:',
+    'Falha ao verificar status de autenticaï¿½ï¿½o: {{error}}',
+  'Select an option:': 'Selecione uma opï¿½ï¿½o:',
   'Raw mode not available. Please run in an interactive terminal.':
-    'Modo raw não disponível. Execute em um terminal interativo.',
+    'Modo raw nï¿½o disponï¿½vel. Execute em um terminal interativo.',
   '(Use ? ? arrows to navigate, Enter to select, Ctrl+C to exit)\n':
     '(Use ? ? para navegar, Enter para selecionar, Ctrl+C para sair)\n',
   compact: 'compacto',
   'compact mode: on (Ctrl+O off)': 'modo compacto: ligado (Ctrl+O desligar)',
   'Hide tool output and thinking for a cleaner view (toggle with Ctrl+O).':
-    'Ocultar saída da ferramenta e raciocínio para uma visualização mais limpa (alternar com Ctrl+O).',
+    'Ocultar saï¿½da da ferramenta e raciocï¿½nio para uma visualizaï¿½ï¿½o mais limpa (alternar com Ctrl+O).',
   'Press Ctrl+O to show full tool output':
-    'Pressione Ctrl+O para exibir a saída completa da ferramenta',
+    'Pressione Ctrl+O para exibir a saï¿½da completa da ferramenta',
 
   'Switch to plan mode or exit plan mode':
     'Switch to plan mode or exit plan mode',

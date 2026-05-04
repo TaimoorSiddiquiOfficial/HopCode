@@ -142,9 +142,12 @@ function buildTextToCheck(input: {
     input.toolName,
     input.command ?? '',
     ...(input.toolArgs
-      ? Object.values(input.toolArgs).filter(
-          (v): v is string => typeof v === 'string',
-        )
+      ? Object.entries(input.toolArgs)
+          .filter(
+            (entry): entry is [string, string] =>
+              entry[0] !== 'description' && typeof entry[1] === 'string',
+          )
+          .map(([, value]) => value)
       : []),
   ].join(' ');
 }

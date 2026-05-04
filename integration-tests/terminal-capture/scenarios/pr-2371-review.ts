@@ -6,7 +6,7 @@ export default {
   terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {
-      type: '/review https://github.com/QwenLM/hopcode/pull/2371',
+      type: '/review https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/2371',
       streaming: {
         delayMs: 5000,
         intervalMs: 10000, // Every 10s

@@ -18,16 +18,14 @@ To install HopCode, use one of the following methods:
 
 ### Quick Install (Recommended)
 
-**Linux / macOS**
+**Prerequisites**
 
-```sh
-curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.sh | bash
-```
+Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
 
-**Windows (Run as Administrator)**
+**NPM**
 
-```cmd
-powershell -Command "Invoke-WebRequest 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.bat' -OutFile (Join-Path $env:TEMP 'install-qwen.bat'); & (Join-Path $env:TEMP 'install-qwen.bat')"
+```bash
+npm install -g @hoptrendy/hopcode-cli@latest
 ```
 
 > [!note]

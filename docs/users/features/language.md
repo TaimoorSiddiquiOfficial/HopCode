@@ -118,7 +118,7 @@ User directory takes precedence over built-in translations.
 > [!tip]
 >
 > Contributions are welcome! If you’d like to improve built-in translations or add new languages.
-> For a concrete example, see [PR #1238: feat(i18n): add Russian language support](https://github.com/QwenLM/hopcode/pull/1238).
+> For a concrete example, see [PR #1238: feat(i18n): add Russian language support](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1238).
 
 ### Language Pack Format
 

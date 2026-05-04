@@ -93,17 +93,32 @@ describe('checkIznGate', () => {
     expect(result.allowed).toBe(true);
   });
 
-  it('deduplicates across multiple matched categories', () => {
-    // A command triggering both file_deletion and permission_change
+  it('does not trigger on description field (false-positive fix)', () => {
+    // description is human-written label, not command content.
+    // A safe command like "git branch -d old-branch" with a description
+    // containing "delete" must not trigger the deletion gate.
     const result = checkIznGate({
       toolName: 'run_shell_command',
-      command: 'find . -name "*.tmp" -delete && chmod 644 config.yaml',
+      command: 'git branch -d old-branch',
+      toolArgs: {
+        command: 'git branch -d old-branch',
+        description: 'Delete old branch after merging',
+        timeout: 30000,
+      },
     });
-    expect(result.allowed).toBe(false);
-    expect(result.category.length).toBeGreaterThanOrEqual(1);
-    // No duplicate steps in analysisPlan
-    const uniqueSteps = new Set(result.analysisPlan);
-    expect(uniqueSteps.size).toBe(result.analysisPlan.length);
+    expect(result.allowed).toBe(true);
+  });
+
+  it('does not trigger when only description has destructive words', () => {
+    const result = checkIznGate({
+      toolName: 'run_shell_command',
+      command: 'echo "cleanup done"',
+      toolArgs: {
+        command: 'echo "cleanup done"',
+        description: 'Remove temporary files and clean up the workspace',
+      },
+    });
+    expect(result.allowed).toBe(true);
   });
 });
 

@@ -137,7 +137,7 @@ packages/core/
 │   │       ├── loop/           # Recurring task loops
 │   │       ├── learn/          # Learn from sessions
 │   │       ├── batch/          # Batch operations
-│   │       └── qc-helper/      # Qwen Code helper
+│   │       └── qc-helper/      # HopCode helper
 │   │
 │   ├── tools/                  # Tool system (63 files)
 │   │   ├── tools.ts            # Tool base classes and interfaces

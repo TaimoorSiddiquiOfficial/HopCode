@@ -1328,17 +1328,17 @@ export default {
     "Vous devez s�lectionner une m�thode d'authentification pour continuer. Appuyez � nouveau sur Ctrl+C pour quitter.",
   'Terms of Services and Privacy Notice':
     "Conditions d'utilisation et avis de confidentialit�",
-  'Qwen OAuth': 'Qwen OAuth',
+  'Qwen OAuth': 'Legacy OAuth',
   'Discontinued � switch to Coding Plan or API Key':
     'Abandonn� � passez � Coding Plan ou API Key',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.':
-    'Le niveau gratuit Qwen OAuth a �t� abandonn� le 2026-04-15. Ex�cutez /auth pour changer de fournisseur.',
+    'Le niveau gratuit Legacy OAuth a �t� abandonn� le 2026-04-15. Ex�cutez /auth pour changer de fournisseur.',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Le niveau gratuit Qwen OAuth a �t� abandonn� le 2026-04-15. Veuillez s�lectionner Coding Plan ou API Key.',
+    'Le niveau gratuit Legacy OAuth a �t� abandonn� le 2026-04-15. Veuillez s�lectionner Coding Plan ou API Key.',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    "Le niveau gratuit de Qwen OAuth a �t� abandonn� le 2026-04-15. Veuillez s�lectionner un mod�le d'un autre fournisseur ou ex�cuter /auth pour changer.",
+    "Le niveau gratuit de Legacy OAuth a �t� abandonn� le 2026-04-15. Veuillez s�lectionner un mod�le d'un autre fournisseur ou ex�cuter /auth pour changer.",
   '\n? Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n? Le niveau gratuit Qwen OAuth a �t� abandonn� le 2026-04-15. Veuillez s�lectionner une autre option.\n',
+    '\n? Le niveau gratuit Legacy OAuth a �t� abandonn� le 2026-04-15. Veuillez s�lectionner une autre option.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     "Payant � Jusqu'� 6 000 requ�tes/5h � Tous les mod�les Alibaba Cloud Coding Plan",
   'Alibaba Cloud Coding Plan': 'Plan de codage Alibaba Cloud',
@@ -1354,10 +1354,10 @@ export default {
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     "L'authentification est impos�e � {{enforcedType}}, mais vous utilisez actuellement {{currentType}}.",
   'Qwen OAuth authentication timed out. Please try again.':
-    "L'authentification Qwen OAuth a expir�. Veuillez r�essayer.",
+    "L'authentification Legacy OAuth a expir�. Veuillez r�essayer.",
   'Qwen OAuth authentication cancelled.':
-    'Authentification Qwen OAuth annul�e.',
-  'Qwen OAuth Authentication': 'Authentification Qwen OAuth',
+    'Authentification Legacy OAuth annul�e.',
+  'Qwen OAuth Authentication': 'Authentification Legacy OAuth',
   'Please visit this URL to authorize:':
     'Veuillez visiter cette URL pour autoriser :',
   'Or scan the QR code below:': 'Ou scannez le QR code ci-dessous :',
@@ -1365,17 +1365,17 @@ export default {
   'Time remaining:': 'Temps restant :',
   '(Press ESC or CTRL+C to cancel)':
     '(Appuyez sur �CHAP ou CTRL+C pour annuler)',
-  'Qwen OAuth Authentication Timeout': "D�lai d'authentification Qwen OAuth",
+  'Qwen OAuth Authentication Timeout': "D�lai d'authentification Legacy OAuth",
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     "Token OAuth expir� (plus de {{seconds}} secondes). Veuillez s�lectionner � nouveau la m�thode d'authentification.",
   'Press any key to return to authentication type selection.':
     "Appuyez sur n'importe quelle touche pour revenir � la s�lection du type d'authentification.",
   'Waiting for Qwen OAuth authentication...':
-    "En attente de l'authentification Qwen OAuth...",
+    "En attente de l'authentification Legacy OAuth...",
   'Note: Your existing API key in settings.json will not be cleared when using Qwen OAuth. You can switch back to OpenAI authentication later if needed.':
-    "Remarque : Votre cl� API existante dans settings.json ne sera pas effac�e lors de l'utilisation de Qwen OAuth. Vous pouvez revenir � l'authentification OpenAI plus tard si n�cessaire.",
+    "Remarque : Votre cl� API existante dans settings.json ne sera pas effac�e lors de l'utilisation de Legacy OAuth. Vous pouvez revenir � l'authentification OpenAI plus tard si n�cessaire.",
   'Note: Your existing API key will not be cleared when using Qwen OAuth.':
-    "Remarque : Votre cl� API existante ne sera pas effac�e lors de l'utilisation de Qwen OAuth.",
+    "Remarque : Votre cl� API existante ne sera pas effac�e lors de l'utilisation de Legacy OAuth.",
   'Authentication timed out. Please try again.':
     "L'authentification a expir�. Veuillez r�essayer.",
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -2004,7 +2004,7 @@ export default {
   // ============================================================================
   'Configure authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
     "Configurer les informations d'authentification Qwen avec Qwen-OAuth ou Alibaba Cloud Coding Plan",
-  'Authenticate using Qwen OAuth': 'Authentifier avec Qwen OAuth',
+  'Authenticate using Qwen OAuth': 'Authentifier avec Legacy OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Authentifier avec Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
@@ -2015,11 +2015,11 @@ export default {
   'Authentication completed successfully.':
     'Authentification termin�e avec succ�s.',
   'Starting Qwen OAuth authentication...':
-    "D�marrage de l'authentification Qwen OAuth...",
+    "D�marrage de l'authentification Legacy OAuth...",
   'Successfully authenticated with Qwen OAuth.':
-    'Authentification r�ussie avec Qwen OAuth.',
+    'Authentification r�ussie avec Legacy OAuth.',
   'Failed to authenticate with Qwen OAuth: {{error}}':
-    "�chec de l'authentification avec Qwen OAuth : {{error}}",
+    "�chec de l'authentification avec Legacy OAuth : {{error}}",
   'Processing Alibaba Cloud Coding Plan authentication...':
     "Traitement de l'authentification Alibaba Cloud Coding Plan...",
   'Successfully authenticated with Alibaba Cloud Coding Plan.':
@@ -2040,19 +2040,19 @@ export default {
   'Run one of the following commands to get started:\n':
     "Ex�cutez l'une des commandes suivantes pour commencer :\n",
   '  hopcode auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  hopcode auth qwen-oauth     - Authentification avec Qwen OAuth (abandonn�)',
+    '  hopcode auth qwen-oauth     - Authentification avec Legacy OAuth (abandonn�)',
   '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
     '  hopcode auth coding-plan      - Authentifier avec Alibaba Cloud Coding Plan\n',
   'Or simply run:': 'Ou simplement ex�cutez :',
   '  hopcode auth                - Interactive authentication setup\n':
     "  hopcode auth                - Configuration d'authentification interactive\n",
   '? Authentication Method: Qwen OAuth':
-    "? M�thode d'authentification : Qwen OAuth",
+    "? M�thode d'authentification : Legacy OAuth",
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type : Niveau gratuit (abandonn� 2026-04-15)',
   '  Limit: No longer available': '  Limite : Plus disponible',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Le niveau gratuit Qwen OAuth a �t� abandonn� le 2026-04-15. Ex�cutez /auth pour passer � Coding Plan, OpenRouter, Fireworks AI ou un autre fournisseur.',
+    'Le niveau gratuit Legacy OAuth a �t� abandonn� le 2026-04-15. Ex�cutez /auth pour passer � Coding Plan, OpenRouter, Fireworks AI ou un autre fournisseur.',
   '  Models: Qwen latest models\n': '  Mod�les : Derniers mod�les Qwen\n',
   '? Authentication Method: Alibaba Cloud Coding Plan':
     "? M�thode d'authentification : Alibaba Cloud Coding Plan",

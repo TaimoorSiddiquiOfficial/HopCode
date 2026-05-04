@@ -5,33 +5,33 @@
  */
 
 // German translations for HopCode CLI
-// Deutsche Übersetzungen für HopCode CLI
+// Deutsche ï¿½bersetzungen fï¿½r HopCode CLI
 
 export default {
   // ============================================================================
   // Help / UI Components
   // ============================================================================
   // Attachment hints
-  '? to manage attachments': '? Anhänge verwalten',
+  '? to manage attachments': '? Anhï¿½nge verwalten',
   '? ? select, Delete to remove, ? to exit':
-    '? ? auswählen, Entf zum Löschen, ? beenden',
-  'Attachments: ': 'Anhänge: ',
+    '? ? auswï¿½hlen, Entf zum Lï¿½schen, ? beenden',
+  'Attachments: ': 'Anhï¿½nge: ',
 
   'Basics:': 'Grundlagen:',
-  'Add context': 'Kontext hinzufügen',
+  'Add context': 'Kontext hinzufï¿½gen',
   'Use {{symbol}} to specify files for context (e.g., {{example}}) to target specific files or folders.':
-    'Verwenden Sie {{symbol}}, um Dateien als Kontext anzugeben (z.B. {{example}}), um bestimmte Dateien oder Ordner auszuwählen.',
+    'Verwenden Sie {{symbol}}, um Dateien als Kontext anzugeben (z.B. {{example}}), um bestimmte Dateien oder Ordner auszuwï¿½hlen.',
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell-Modus',
   'IZN mode': 'IZN-Modus',
   'plan mode': 'Planungsmodus',
-  'auto-accept edits': 'Änderungen automatisch akzeptieren',
-  'Accepting edits': 'Änderungen werden akzeptiert',
+  'auto-accept edits': 'ï¿½nderungen automatisch akzeptieren',
+  'Accepting edits': 'ï¿½nderungen werden akzeptiert',
   '(shift + tab to cycle)': '(Umschalt + Tab zum Wechseln)',
   '(tab to cycle)': '(Tab zum Wechseln)',
   'Execute shell commands via {{symbol}} (e.g., {{example1}}) or use natural language (e.g., {{example2}}).':
-    'Shell-Befehle über {{symbol}} ausführen (z.B. {{example1}}) oder natürliche Sprache verwenden (z.B. {{example2}}).',
+    'Shell-Befehle ï¿½ber {{symbol}} ausfï¿½hren (z.B. {{example1}}) oder natï¿½rliche Sprache verwenden (z.B. {{example2}}).',
   '!': '!',
   '!npm run start': '!npm run start',
   'start server': 'Server starten',
@@ -39,15 +39,15 @@ export default {
   'shell command': 'Shell-Befehl',
   'Model Context Protocol command (from external servers)':
     'Model Context Protocol Befehl (von externen Servern)',
-  'Keyboard Shortcuts:': 'Tastenkürzel:',
-  'Jump through words in the input': 'Wörter in der Eingabe überspringen',
+  'Keyboard Shortcuts:': 'Tastenkï¿½rzel:',
+  'Jump through words in the input': 'Wï¿½rter in der Eingabe ï¿½berspringen',
   'Close dialogs, cancel requests, or quit application':
-    'Dialoge schließen, Anfragen abbrechen oder Anwendung beenden',
+    'Dialoge schlieï¿½en, Anfragen abbrechen oder Anwendung beenden',
   'New line': 'Neue Zeile',
   'New line (Alt+Enter works for certain linux distros)':
     'Neue Zeile (Alt+Enter funktioniert bei bestimmten Linux-Distributionen)',
-  'Clear the screen': 'Bildschirm löschen',
-  'Open input in external editor': 'Eingabe in externem Editor öffnen',
+  'Clear the screen': 'Bildschirm lï¿½schen',
+  'Open input in external editor': 'Eingabe in externem Editor ï¿½ffnen',
   'Send message': 'Nachricht senden',
   'Initializing...': 'Initialisierung...',
   'Connecting to MCP servers... ({{connected}}/{{total}})':
@@ -55,18 +55,18 @@ export default {
   'Type your message or @path/to/file':
     'Nachricht eingeben oder @Pfad/zur/Datei',
   "Press 'i' for INSERT mode and 'Esc' for NORMAL mode.":
-    "Drücken Sie 'i' für den EINFÜGE-Modus und 'Esc' für den NORMAL-Modus.",
+    "Drï¿½cken Sie 'i' fï¿½r den EINFï¿½GE-Modus und 'Esc' fï¿½r den NORMAL-Modus.",
   'Cancel operation / Clear input (double press)':
-    'Vorgang abbrechen / Eingabe löschen (doppelt drücken)',
+    'Vorgang abbrechen / Eingabe lï¿½schen (doppelt drï¿½cken)',
   'Cycle approval modes': 'Genehmigungsmodi durchschalten',
-  'Cycle through your prompt history': 'Eingabeverlauf durchblättern',
+  'Cycle through your prompt history': 'Eingabeverlauf durchblï¿½ttern',
   'For a full list of shortcuts, see {{docPath}}':
-    'Eine vollständige Liste der Tastenkürzel finden Sie unter {{docPath}}',
+    'Eine vollstï¿½ndige Liste der Tastenkï¿½rzel finden Sie unter {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on HopCode': 'für Hilfe zu HopCode',
+  'for help on HopCode': 'fï¿½r Hilfe zu HopCode',
   'show version info': 'Versionsinformationen anzeigen',
   'submit a bug report': 'Fehlerbericht einreichen',
-  'About HopCode': 'Über HopCode',
+  'About HopCode': 'ï¿½ber HopCode',
   Status: 'Status',
 
   // ============================================================================
@@ -97,38 +97,38 @@ export default {
   // Commands - General
   // ============================================================================
   'Analyzes the project and creates a tailored HOPCODE.md file.':
-    'Analysiert das Projekt und erstellt eine maßgeschneiderte HOPCODE.md-Datei.',
+    'Analysiert das Projekt und erstellt eine maï¿½geschneiderte HOPCODE.md-Datei.',
   'List available HopCode tools. Usage: /tools [desc]':
-    'Verfügbare HopCode Werkzeuge auflisten. Verwendung: /tools [desc]',
-  'List available skills.': 'Verfügbare Skills auflisten.',
-  'Available HopCode CLI tools:': 'Verfügbare HopCode CLI-Werkzeuge:',
-  'No tools available': 'Keine Werkzeuge verfügbar',
+    'Verfï¿½gbare HopCode Werkzeuge auflisten. Verwendung: /tools [desc]',
+  'List available skills.': 'Verfï¿½gbare Skills auflisten.',
+  'Available HopCode CLI tools:': 'Verfï¿½gbare HopCode CLI-Werkzeuge:',
+  'No tools available': 'Keine Werkzeuge verfï¿½gbar',
   'View or change the approval mode for tool usage':
-    'Genehmigungsmodus für Werkzeugnutzung anzeigen oder ändern',
+    'Genehmigungsmodus fï¿½r Werkzeugnutzung anzeigen oder ï¿½ndern',
   'View or change the language setting':
-    'Spracheinstellung anzeigen oder ändern',
-  'change the theme': 'Design ändern',
-  'Select Theme': 'Design auswählen',
+    'Spracheinstellung anzeigen oder ï¿½ndern',
+  'change the theme': 'Design ï¿½ndern',
+  'Select Theme': 'Design auswï¿½hlen',
   Preview: 'Vorschau',
   '(Use Enter to select, Tab to configure scope)':
-    '(Enter zum Auswählen, Tab zum Konfigurieren des Bereichs)',
+    '(Enter zum Auswï¿½hlen, Tab zum Konfigurieren des Bereichs)',
   '(Use Enter to apply scope, Tab to go back)':
-    '(Enter zum Anwenden des Bereichs, Tab zum Zurückgehen)',
+    '(Enter zum Anwenden des Bereichs, Tab zum Zurï¿½ckgehen)',
   'Theme configuration unavailable due to NO_COLOR env variable.':
-    'Design-Konfiguration aufgrund der NO_COLOR-Umgebungsvariable nicht verfügbar.',
+    'Design-Konfiguration aufgrund der NO_COLOR-Umgebungsvariable nicht verfï¿½gbar.',
   'Theme "{{themeName}}" not found.': 'Design "{{themeName}}" nicht gefunden.',
   'Theme "{{themeName}}" not found in selected scope.':
-    'Design "{{themeName}}" im ausgewählten Bereich nicht gefunden.',
+    'Design "{{themeName}}" im ausgewï¿½hlten Bereich nicht gefunden.',
   'Clear conversation history and free up context':
-    'Gesprächsverlauf löschen und Kontext freigeben',
+    'Gesprï¿½chsverlauf lï¿½schen und Kontext freigeben',
   'Compresses the context by replacing it with a summary.':
     'Komprimiert den Kontext durch Ersetzen mit einer Zusammenfassung.',
   'open full HopCode documentation in your browser':
-    'Vollständige HopCode Dokumentation im Browser öffnen',
-  'Configuration not available.': 'Konfiguration nicht verfügbar.',
-  'change the auth method': 'Authentifizierungsmethode ändern',
+    'Vollstï¿½ndige HopCode Dokumentation im Browser ï¿½ffnen',
+  'Configuration not available.': 'Konfiguration nicht verfï¿½gbar.',
+  'change the auth method': 'Authentifizierungsmethode ï¿½ndern',
   'Configure authentication information for login':
-    'Authentifizierungsinformationen für die Anmeldung konfigurieren',
+    'Authentifizierungsinformationen fï¿½r die Anmeldung konfigurieren',
   'Copy the last result or code snippet to clipboard':
     'Letztes Ergebnis oder Codeausschnitt in die Zwischenablage kopieren',
 
@@ -136,36 +136,36 @@ export default {
   // Commands - Agents
   // ============================================================================
   'Manage subagents for specialized task delegation.':
-    'Unteragenten für spezialisierte Aufgabendelegation verwalten.',
+    'Unteragenten fï¿½r spezialisierte Aufgabendelegation verwalten.',
   'Manage existing subagents (view, edit, delete).':
-    'Bestehende Unteragenten verwalten (anzeigen, bearbeiten, löschen).',
+    'Bestehende Unteragenten verwalten (anzeigen, bearbeiten, lï¿½schen).',
   'Create a new subagent with guided setup.':
-    'Neuen Unteragenten mit geführter Einrichtung erstellen.',
+    'Neuen Unteragenten mit gefï¿½hrter Einrichtung erstellen.',
 
   // ============================================================================
   // Agents - Management Dialog
   // ============================================================================
   Agents: 'Agenten',
-  'Choose Action': 'Aktion wählen',
+  'Choose Action': 'Aktion wï¿½hlen',
   'Edit {{name}}': '{{name}} bearbeiten',
   'Edit Tools: {{name}}': 'Werkzeuge bearbeiten: {{name}}',
   'Edit Color: {{name}}': 'Farbe bearbeiten: {{name}}',
-  'Delete {{name}}': '{{name}} löschen',
+  'Delete {{name}}': '{{name}} lï¿½schen',
   'Unknown Step': 'Unbekannter Schritt',
-  'Esc to close': 'Esc zum Schließen',
+  'Esc to close': 'Esc zum Schlieï¿½en',
   'Enter to select, ?? to navigate, Esc to close':
-    'Enter zum Auswählen, ?? zum Navigieren, Esc zum Schließen',
-  'Esc to go back': 'Esc zum Zurückgehen',
-  'Enter to confirm, Esc to cancel': 'Enter zum Bestätigen, Esc zum Abbrechen',
+    'Enter zum Auswï¿½hlen, ?? zum Navigieren, Esc zum Schlieï¿½en',
+  'Esc to go back': 'Esc zum Zurï¿½ckgehen',
+  'Enter to confirm, Esc to cancel': 'Enter zum Bestï¿½tigen, Esc zum Abbrechen',
   'Enter to select, ?? to navigate, Esc to go back':
-    'Enter zum Auswählen, ?? zum Navigieren, Esc zum Zurückgehen',
-  'Enter to submit, Esc to go back': 'Enter zum Absenden, Esc zum Zurückgehen',
-  'Invalid step: {{step}}': 'Ungültiger Schritt: {{step}}',
+    'Enter zum Auswï¿½hlen, ?? zum Navigieren, Esc zum Zurï¿½ckgehen',
+  'Enter to submit, Esc to go back': 'Enter zum Absenden, Esc zum Zurï¿½ckgehen',
+  'Invalid step: {{step}}': 'Ungï¿½ltiger Schritt: {{step}}',
   'No subagents found.': 'Keine Unteragenten gefunden.',
   "Use '/agents create' to create your first subagent.":
     "Verwenden Sie '/agents create', um Ihren ersten Unteragenten zu erstellen.",
   '(built-in)': '(integriert)',
-  '(overridden by project level agent)': '(überschrieben durch Projektagent)',
+  '(overridden by project level agent)': '(ï¿½berschrieben durch Projektagent)',
   'Project Level ({{path}})': 'Projektebene ({{path}})',
   'User Level ({{path}})': 'Benutzerebene ({{path}})',
   'Built-in Agents': 'Integrierte Agenten',
@@ -173,20 +173,20 @@ export default {
   'Using: {{count}} agents': 'Verwendet: {{count}} Agenten',
   'View Agent': 'Agent anzeigen',
   'Edit Agent': 'Agent bearbeiten',
-  'Delete Agent': 'Agent löschen',
-  Back: 'Zurück',
-  'No agent selected': 'Kein Agent ausgewählt',
+  'Delete Agent': 'Agent lï¿½schen',
+  Back: 'Zurï¿½ck',
+  'No agent selected': 'Kein Agent ausgewï¿½hlt',
   'File Path: ': 'Dateipfad: ',
   'Tools: ': 'Werkzeuge: ',
   'Color: ': 'Farbe: ',
   'Description:': 'Beschreibung:',
   'System Prompt:': 'System-Prompt:',
-  'Open in editor': 'Im Editor öffnen',
+  'Open in editor': 'Im Editor ï¿½ffnen',
   'Edit tools': 'Werkzeuge bearbeiten',
   'Edit color': 'Farbe bearbeiten',
   '? Error:': '? Fehler:',
   'Are you sure you want to delete agent "{{name}}"?':
-    'Sind Sie sicher, dass Sie den Agenten "{{name}}" löschen möchten?',
+    'Sind Sie sicher, dass Sie den Agenten "{{name}}" lï¿½schen mï¿½chten?',
   // ============================================================================
   // Agents - Creation Wizard
   // ============================================================================
@@ -200,25 +200,25 @@ export default {
   '? Error saving subagent:': '? Fehler beim Speichern des Unteragenten:',
   'Warnings:': 'Warnungen:',
   'Name "{{name}}" already exists at {{level}} level - will overwrite existing subagent':
-    'Name "{{name}}" existiert bereits auf {{level}}-Ebene - bestehender Unteragent wird überschrieben',
+    'Name "{{name}}" existiert bereits auf {{level}}-Ebene - bestehender Unteragent wird ï¿½berschrieben',
   'Name "{{name}}" exists at user level - project level will take precedence':
     'Name "{{name}}" existiert auf Benutzerebene - Projektebene hat Vorrang',
   'Name "{{name}}" exists at project level - existing subagent will take precedence':
     'Name "{{name}}" existiert auf Projektebene - bestehender Unteragent hat Vorrang',
   'Description is over {{length}} characters':
-    'Beschreibung ist über {{length}} Zeichen',
+    'Beschreibung ist ï¿½ber {{length}} Zeichen',
   'System prompt is over {{length}} characters':
-    'System-Prompt ist über {{length}} Zeichen',
+    'System-Prompt ist ï¿½ber {{length}} Zeichen',
   // Agents - Creation Wizard Steps
-  'Step {{n}}: Choose Location': 'Schritt {{n}}: Speicherort wählen',
+  'Step {{n}}: Choose Location': 'Schritt {{n}}: Speicherort wï¿½hlen',
   'Step {{n}}: Choose Generation Method':
-    'Schritt {{n}}: Generierungsmethode wählen',
+    'Schritt {{n}}: Generierungsmethode wï¿½hlen',
   'Generate with HopCode (Recommended)': 'Mit HopCode generieren (Empfohlen)',
   'Manual Creation': 'Manuelle Erstellung',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
-    'Beschreiben Sie, was dieser Unteragent tun soll und wann er verwendet werden soll. (Ausführliche Beschreibung für beste Ergebnisse)',
+    'Beschreiben Sie, was dieser Unteragent tun soll und wann er verwendet werden soll. (Ausfï¿½hrliche Beschreibung fï¿½r beste Ergebnisse)',
   'e.g., Expert code reviewer that reviews code based on best practices...':
-    'z.B. Experte für Code-Reviews, der Code nach Best Practices überprüft...',
+    'z.B. Experte fï¿½r Code-Reviews, der Code nach Best Practices ï¿½berprï¿½ft...',
   'Generating subagent configuration...':
     'Unteragent-Konfiguration wird generiert...',
   'Failed to generate subagent: {{error}}':
@@ -228,44 +228,44 @@ export default {
   'Step {{n}}: Enter System Prompt': 'Schritt {{n}}: System-Prompt eingeben',
   'Step {{n}}: Enter Description': 'Schritt {{n}}: Beschreibung eingeben',
   // Agents - Tool Selection
-  'Step {{n}}: Select Tools': 'Schritt {{n}}: Werkzeuge auswählen',
+  'Step {{n}}: Select Tools': 'Schritt {{n}}: Werkzeuge auswï¿½hlen',
   'All Tools (Default)': 'Alle Werkzeuge (Standard)',
   'All Tools': 'Alle Werkzeuge',
   'Read-only Tools': 'Nur-Lese-Werkzeuge',
   'Read & Edit Tools': 'Lese- und Bearbeitungswerkzeuge',
   'Read & Edit & Execution Tools':
-    'Lese-, Bearbeitungs- und Ausführungswerkzeuge',
+    'Lese-, Bearbeitungs- und Ausfï¿½hrungswerkzeuge',
   'All tools selected, including MCP tools':
-    'Alle Werkzeuge ausgewählt, einschließlich MCP-Werkzeuge',
-  'Selected tools:': 'Ausgewählte Werkzeuge:',
+    'Alle Werkzeuge ausgewï¿½hlt, einschlieï¿½lich MCP-Werkzeuge',
+  'Selected tools:': 'Ausgewï¿½hlte Werkzeuge:',
   'Read-only tools:': 'Nur-Lese-Werkzeuge:',
   'Edit tools:': 'Bearbeitungswerkzeuge:',
-  'Execution tools:': 'Ausführungswerkzeuge:',
+  'Execution tools:': 'Ausfï¿½hrungswerkzeuge:',
   'Step {{n}}: Choose Background Color':
-    'Schritt {{n}}: Hintergrundfarbe wählen',
-  'Step {{n}}: Confirm and Save': 'Schritt {{n}}: Bestätigen und Speichern',
+    'Schritt {{n}}: Hintergrundfarbe wï¿½hlen',
+  'Step {{n}}: Confirm and Save': 'Schritt {{n}}: Bestï¿½tigen und Speichern',
   // Agents - Navigation & Instructions
   'Esc to cancel': 'Esc zum Abbrechen',
   'Press Enter to save, e to save and edit, Esc to go back':
-    'Enter zum Speichern, e zum Speichern und Bearbeiten, Esc zum Zurückgehen',
+    'Enter zum Speichern, e zum Speichern und Bearbeiten, Esc zum Zurï¿½ckgehen',
   'Press Enter to continue, {{navigation}}Esc to {{action}}':
     'Enter zum Fortfahren, {{navigation}}Esc zum {{action}}',
   cancel: 'Abbrechen',
-  'go back': 'Zurückgehen',
+  'go back': 'Zurï¿½ckgehen',
   '?? to navigate, ': '?? zum Navigieren, ',
   'Enter a clear, unique name for this subagent.':
-    'Geben Sie einen eindeutigen Namen für diesen Unteragenten ein.',
+    'Geben Sie einen eindeutigen Namen fï¿½r diesen Unteragenten ein.',
   'e.g., Code Reviewer': 'z.B. Code-Reviewer',
   'Name cannot be empty.': 'Name darf nicht leer sein.',
   "Write the system prompt that defines this subagent's behavior. Be comprehensive for best results.":
-    'Schreiben Sie den System-Prompt, der das Verhalten dieses Unteragenten definiert. Ausführlich für beste Ergebnisse.',
+    'Schreiben Sie den System-Prompt, der das Verhalten dieses Unteragenten definiert. Ausfï¿½hrlich fï¿½r beste Ergebnisse.',
   'e.g., You are an expert code reviewer...':
-    'z.B. Sie sind ein Experte für Code-Reviews...',
+    'z.B. Sie sind ein Experte fï¿½r Code-Reviews...',
   'System prompt cannot be empty.': 'System-Prompt darf nicht leer sein.',
   'Describe when and how this subagent should be used.':
     'Beschreiben Sie, wann und wie dieser Unteragent verwendet werden soll.',
   'e.g., Reviews code for best practices and potential bugs.':
-    'z.B. Überprüft Code auf Best Practices und mögliche Fehler.',
+    'z.B. ï¿½berprï¿½ft Code auf Best Practices und mï¿½gliche Fehler.',
   'Description cannot be empty.': 'Beschreibung darf nicht leer sein.',
   'Failed to launch editor: {{error}}':
     'Fehler beim Starten des Editors: {{error}}',
@@ -279,9 +279,9 @@ export default {
     'HopCode Einstellungen anzeigen und bearbeiten',
   Settings: 'Einstellungen',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    'Um Änderungen zu sehen, muss HopCode neu gestartet werden. Drücken Sie r, um jetzt zu beenden und Änderungen anzuwenden.',
+    'Um ï¿½nderungen zu sehen, muss HopCode neu gestartet werden. Drï¿½cken Sie r, um jetzt zu beenden und ï¿½nderungen anzuwenden.',
   'The command "/{{command}}" is not supported in non-interactive mode.':
-    'Der Befehl "/{{command}}" wird im nicht-interaktiven Modus nicht unterstützt.',
+    'Der Befehl "/{{command}}" wird im nicht-interaktiven Modus nicht unterstï¿½tzt.',
   // ============================================================================
   // Settings Labels
   // ============================================================================
@@ -293,9 +293,9 @@ export default {
   Theme: 'Farbschema',
   'Preferred Editor': 'Bevorzugter Editor',
   'Auto-connect to IDE': 'Automatische Verbindung zur IDE',
-  'Enable Prompt Completion': 'Eingabevervollständigung aktivieren',
+  'Enable Prompt Completion': 'Eingabevervollstï¿½ndigung aktivieren',
   'Debug Keystroke Logging': 'Debug-Protokollierung von Tastatureingaben',
-  'Language: UI': 'Sprache: Benutzeroberfläche',
+  'Language: UI': 'Sprache: Benutzeroberflï¿½che',
   'Language: Model': 'Sprache: Modell',
   'Output Format': 'Ausgabeformat',
   'Hide Window Title': 'Fenstertitel ausblenden',
@@ -303,8 +303,8 @@ export default {
   'Hide Tips': 'Tipps ausblenden',
   'Show Line Numbers in Code': 'Zeilennummern im Code anzeigen',
   'Show Citations': 'Quellenangaben anzeigen',
-  'Custom Witty Phrases': 'Benutzerdefinierte Witzige Sprüche',
-  'Show Welcome Back Dialog': 'Willkommen-zurück-Dialog anzeigen',
+  'Custom Witty Phrases': 'Benutzerdefinierte Witzige Sprï¿½che',
+  'Show Welcome Back Dialog': 'Willkommen-zurï¿½ck-Dialog anzeigen',
   'Enable User Feedback': 'Benutzerfeedback aktivieren',
   'How is HopCode doing this session? (optional)':
     'Wie macht sich HopCode in dieser Sitzung? (optional)',
@@ -314,19 +314,19 @@ export default {
   Dismiss: 'Ignorieren',
   'Not Sure Yet': 'Noch nicht sicher',
   'Any other key': 'Beliebige andere Taste',
-  'Disable Loading Phrases': 'Ladesprüche deaktivieren',
+  'Disable Loading Phrases': 'Ladesprï¿½che deaktivieren',
   'Screen Reader Mode': 'Bildschirmleser-Modus',
   'IDE Mode': 'IDE-Modus',
   'Max Session Turns': 'Maximale Sitzungsrunden',
-  'Skip Next Speaker Check': 'Nächste-Sprecher-Prüfung überspringen',
-  'Skip Loop Detection': 'Schleifenerkennung überspringen',
-  'Skip Startup Context': 'Startkontext überspringen',
+  'Skip Next Speaker Check': 'Nï¿½chste-Sprecher-Prï¿½fung ï¿½berspringen',
+  'Skip Loop Detection': 'Schleifenerkennung ï¿½berspringen',
+  'Skip Startup Context': 'Startkontext ï¿½berspringen',
   'Enable OpenAI Logging': 'OpenAI-Protokollierung aktivieren',
   'OpenAI Logging Directory': 'OpenAI-Protokollierungsverzeichnis',
   Timeout: 'Zeitlimit',
   'Max Retries': 'Maximale Wiederholungen',
   'Disable Cache Control': 'Cache-Steuerung deaktivieren',
-  'Memory Discovery Max Dirs': 'Maximale Verzeichnisse für Speichererkennung',
+  'Memory Discovery Max Dirs': 'Maximale Verzeichnisse fï¿½r Speichererkennung',
   'Load Memory From Include Directories':
     'Speicher aus Include-Verzeichnissen laden',
   'Respect .gitignore': '.gitignore beachten',
@@ -338,13 +338,13 @@ export default {
   'Auto Accept': 'Automatisch akzeptieren',
   'Use Ripgrep': 'Ripgrep verwenden',
   'Use Builtin Ripgrep': 'Integriertes Ripgrep verwenden',
-  'Enable Tool Output Truncation': 'Werkzeugausgabe-Kürzung aktivieren',
+  'Enable Tool Output Truncation': 'Werkzeugausgabe-Kï¿½rzung aktivieren',
   'Tool Output Truncation Threshold':
-    'Schwellenwert für Werkzeugausgabe-Kürzung',
-  'Tool Output Truncation Lines': 'Zeilen für Werkzeugausgabe-Kürzung',
+    'Schwellenwert fï¿½r Werkzeugausgabe-Kï¿½rzung',
+  'Tool Output Truncation Lines': 'Zeilen fï¿½r Werkzeugausgabe-Kï¿½rzung',
   'Folder Trust': 'Ordnervertrauen',
   'Vision Model Preview': 'Vision-Modell-Vorschau',
-  'Tool Schema Compliance': 'Werkzeug-Schema-Konformität',
+  'Tool Schema Compliance': 'Werkzeug-Schema-Konformitï¿½t',
   // Settings enum options
   'Auto (detect from system)': 'Automatisch (vom System erkennen)',
   'Auto (detect terminal theme)': 'Automatisch (Terminal-Theme erkennen)',
@@ -357,26 +357,26 @@ export default {
   IZN: 'IZN',
   'toggle vim mode on/off': 'Vim-Modus ein-/ausschalten',
   'check session stats. Usage: /stats [model|tools]':
-    'Sitzungsstatistiken prüfen. Verwendung: /stats [model|tools]',
+    'Sitzungsstatistiken prï¿½fen. Verwendung: /stats [model|tools]',
   'Show model-specific usage statistics.':
     'Modellspezifische Nutzungsstatistiken anzeigen.',
   'Show tool-specific usage statistics.':
     'Werkzeugspezifische Nutzungsstatistiken anzeigen.',
   'exit the cli': 'CLI beenden',
   'Open MCP management dialog, or authenticate with OAuth-enabled servers':
-    'MCP-Verwaltungsdialog öffnen oder mit OAuth-fähigem Server authentifizieren',
+    'MCP-Verwaltungsdialog ï¿½ffnen oder mit OAuth-fï¿½higem Server authentifizieren',
   'List configured MCP servers and tools, or authenticate with OAuth-enabled servers':
-    'Konfigurierte MCP-Server und Werkzeuge auflisten oder mit OAuth-fähigen Servern authentifizieren',
+    'Konfigurierte MCP-Server und Werkzeuge auflisten oder mit OAuth-fï¿½higen Servern authentifizieren',
   'Manage workspace directories': 'Arbeitsbereichsverzeichnisse verwalten',
   'Add directories to the workspace. Use comma to separate multiple paths':
-    'Verzeichnisse zum Arbeitsbereich hinzufügen. Komma zum Trennen mehrerer Pfade verwenden',
+    'Verzeichnisse zum Arbeitsbereich hinzufï¿½gen. Komma zum Trennen mehrerer Pfade verwenden',
   'Show all directories in the workspace':
     'Alle Verzeichnisse im Arbeitsbereich anzeigen',
   'set external editor preference': 'Externen Editor festlegen',
-  'Select Editor': 'Editor auswählen',
+  'Select Editor': 'Editor auswï¿½hlen',
   'Editor Preference': 'Editor-Einstellung',
   'These editors are currently supported. Please note that some editors cannot be used in sandbox mode.':
-    'Diese Editoren werden derzeit unterstützt. Bitte beachten Sie, dass einige Editoren nicht im Sandbox-Modus verwendet werden können.',
+    'Diese Editoren werden derzeit unterstï¿½tzt. Bitte beachten Sie, dass einige Editoren nicht im Sandbox-Modus verwendet werden kï¿½nnen.',
   'Your preferred editor is:': 'Ihr bevorzugter Editor ist:',
   'Manage extensions': 'Erweiterungen verwalten',
   'Manage installed extensions': 'Installierte Erweiterungen verwalten',
@@ -412,50 +412,50 @@ export default {
   'Usage: /extensions {{command}} <extension> [--scope=<user|workspace>]':
     'Verwendung: /extensions {{command}} <Erweiterung> [--scope=<user|workspace>]',
   'Unsupported scope "{{scope}}", should be one of "user" or "workspace"':
-    'Nicht unterstützter Bereich "{{scope}}", sollte "user" oder "workspace" sein',
+    'Nicht unterstï¿½tzter Bereich "{{scope}}", sollte "user" oder "workspace" sein',
   'Extension "{{name}}" disabled for scope "{{scope}}"':
-    'Erweiterung "{{name}}" für Bereich "{{scope}}" deaktiviert',
+    'Erweiterung "{{name}}" fï¿½r Bereich "{{scope}}" deaktiviert',
   'Extension "{{name}}" enabled for scope "{{scope}}"':
-    'Erweiterung "{{name}}" für Bereich "{{scope}}" aktiviert',
-  'Do you want to continue? [Y/n]: ': 'Möchten Sie fortfahren? [Y/n]: ',
-  'Do you want to continue?': 'Möchten Sie fortfahren?',
+    'Erweiterung "{{name}}" fï¿½r Bereich "{{scope}}" aktiviert',
+  'Do you want to continue? [Y/n]: ': 'Mï¿½chten Sie fortfahren? [Y/n]: ',
+  'Do you want to continue?': 'Mï¿½chten Sie fortfahren?',
   'Installing extension "{{name}}".':
     'Erweiterung "{{name}}" wird installiert.',
   '**Extensions may introduce unexpected behavior. Ensure you have investigated the extension source and trust the author.**':
-    '**Erweiterungen können unerwartetes Verhalten verursachen. Stellen Sie sicher, dass Sie die Erweiterungsquelle untersucht haben und dem Autor vertrauen.**',
+    '**Erweiterungen kï¿½nnen unerwartetes Verhalten verursachen. Stellen Sie sicher, dass Sie die Erweiterungsquelle untersucht haben und dem Autor vertrauen.**',
   'This extension will run the following MCP servers:':
-    'Diese Erweiterung wird folgende MCP-Server ausführen:',
+    'Diese Erweiterung wird folgende MCP-Server ausfï¿½hren:',
   local: 'lokal',
   remote: 'remote',
   'This extension will add the following commands: {{commands}}.':
-    'Diese Erweiterung wird folgende Befehle hinzufügen: {{commands}}.',
+    'Diese Erweiterung wird folgende Befehle hinzufï¿½gen: {{commands}}.',
   'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    'Diese Erweiterung wird Informationen zu Ihrem HOPCODE.md-Kontext mit {{fileName}} hinzufügen',
+    'Diese Erweiterung wird Informationen zu Ihrem HOPCODE.md-Kontext mit {{fileName}} hinzufï¿½gen',
   'This extension will exclude the following core tools: {{tools}}':
-    'Diese Erweiterung wird folgende Kernwerkzeuge ausschließen: {{tools}}',
+    'Diese Erweiterung wird folgende Kernwerkzeuge ausschlieï¿½en: {{tools}}',
   'This extension will install the following skills:':
-    'Diese Erweiterung wird folgende Fähigkeiten installieren:',
+    'Diese Erweiterung wird folgende Fï¿½higkeiten installieren:',
   'This extension will install the following subagents:':
     'Diese Erweiterung wird folgende Unteragenten installieren:',
   'Installation cancelled for "{{name}}".':
     'Installation von "{{name}}" abgebrochen.',
   'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.':
-    'Sie installieren eine Erweiterung von {{originSource}}. Einige Funktionen funktionieren möglicherweise nicht perfekt mit HopCode.',
+    'Sie installieren eine Erweiterung von {{originSource}}. Einige Funktionen funktionieren mï¿½glicherweise nicht perfekt mit HopCode.',
   '--ref and --auto-update are not applicable for marketplace extensions.':
-    '--ref und --auto-update sind nicht anwendbar für Marketplace-Erweiterungen.',
+    '--ref und --auto-update sind nicht anwendbar fï¿½r Marketplace-Erweiterungen.',
   'Extension "{{name}}" installed successfully and enabled.':
     'Erweiterung "{{name}}" erfolgreich installiert und aktiviert.',
   'Installs an extension from a git repository URL, local path, or claude marketplace (marketplace-url:plugin-name).':
     'Installiert eine Erweiterung von einer Git-Repository-URL, einem lokalen Pfad oder dem Claude-Marketplace (marketplace-url:plugin-name).',
   'The github URL, local path, or marketplace source (marketplace-url:plugin-name) of the extension to install.':
     'Die GitHub-URL, der lokale Pfad oder die Marketplace-Quelle (marketplace-url:plugin-name) der zu installierenden Erweiterung.',
-  'The git ref to install from.': 'Die Git-Referenz für die Installation.',
+  'The git ref to install from.': 'Die Git-Referenz fï¿½r die Installation.',
   'Enable auto-update for this extension.':
-    'Automatisches Update für diese Erweiterung aktivieren.',
+    'Automatisches Update fï¿½r diese Erweiterung aktivieren.',
   'Enable pre-release versions for this extension.':
-    'Pre-Release-Versionen für diese Erweiterung aktivieren.',
+    'Pre-Release-Versionen fï¿½r diese Erweiterung aktivieren.',
   'Acknowledge the security risks of installing an extension and skip the confirmation prompt.':
-    'Sicherheitsrisiken der Erweiterungsinstallation bestätigen und Bestätigungsaufforderung überspringen.',
+    'Sicherheitsrisiken der Erweiterungsinstallation bestï¿½tigen und Bestï¿½tigungsaufforderung ï¿½berspringen.',
   'The source argument must be provided.':
     'Das Quellargument muss angegeben werden.',
   'Extension "{{name}}" successfully uninstalled.':
@@ -471,18 +471,18 @@ export default {
   'The scope to enable the extenison in. If not set, will be enabled in all scopes.':
     'Der Bereich, in dem die Erweiterung aktiviert werden soll. Wenn nicht gesetzt, wird sie in allen Bereichen aktiviert.',
   'Extension "{{name}}" successfully enabled for scope "{{scope}}".':
-    'Erweiterung "{{name}}" erfolgreich für Bereich "{{scope}}" aktiviert.',
+    'Erweiterung "{{name}}" erfolgreich fï¿½r Bereich "{{scope}}" aktiviert.',
   'Extension "{{name}}" successfully enabled in all scopes.':
     'Erweiterung "{{name}}" erfolgreich in allen Bereichen aktiviert.',
   'Invalid scope: {{scope}}. Please use one of {{scopes}}.':
-    'Ungültiger Bereich: {{scope}}. Bitte verwenden Sie einen von {{scopes}}.',
+    'Ungï¿½ltiger Bereich: {{scope}}. Bitte verwenden Sie einen von {{scopes}}.',
   'Disables an extension.': 'Deaktiviert eine Erweiterung.',
   'The name of the extension to disable.':
     'Der Name der zu deaktivierenden Erweiterung.',
   'The scope to disable the extenison in.':
     'Der Bereich, in dem die Erweiterung deaktiviert werden soll.',
   'Extension "{{name}}" successfully disabled for scope "{{scope}}".':
-    'Erweiterung "{{name}}" erfolgreich für Bereich "{{scope}}" deaktiviert.',
+    'Erweiterung "{{name}}" erfolgreich fï¿½r Bereich "{{scope}}" deaktiviert.',
   'Extension "{{name}}" successfully updated: {{oldVersion}} ? {{newVersion}}.':
     'Erweiterung "{{name}}" erfolgreich aktualisiert: {{oldVersion}} ? {{newVersion}}.',
   'Unable to install extension "{{name}}" due to missing install metadata':
@@ -509,15 +509,15 @@ export default {
   'Agents:': 'Agents:',
   'MCP servers:': 'MCP-Server:',
   'Link extension failed to install.':
-    'Verknüpfte Erweiterung konnte nicht installiert werden.',
+    'Verknï¿½pfte Erweiterung konnte nicht installiert werden.',
   'Extension "{{name}}" linked successfully and enabled.':
-    'Erweiterung "{{name}}" erfolgreich verknüpft und aktiviert.',
+    'Erweiterung "{{name}}" erfolgreich verknï¿½pft und aktiviert.',
   'Links an extension from a local path. Updates made to the local path will always be reflected.':
-    'Verknüpft eine Erweiterung von einem lokalen Pfad. Änderungen am lokalen Pfad werden immer widergespiegelt.',
+    'Verknï¿½pft eine Erweiterung von einem lokalen Pfad. ï¿½nderungen am lokalen Pfad werden immer widergespiegelt.',
   'The name of the extension to link.':
-    'Der Name der zu verknüpfenden Erweiterung.',
+    'Der Name der zu verknï¿½pfenden Erweiterung.',
   'Set a specific setting for an extension.':
-    'Legt eine bestimmte Einstellung für eine Erweiterung fest.',
+    'Legt eine bestimmte Einstellung fï¿½r eine Erweiterung fest.',
   'Name of the extension to configure.':
     'Name der zu konfigurierenden Erweiterung.',
   'The setting to configure (name or env var).':
@@ -529,66 +529,66 @@ export default {
   'Name of the extension.': 'Name der Erweiterung.',
   'Extension "{{name}}" has no settings to configure.':
     'Erweiterung "{{name}}" hat keine zu konfigurierenden Einstellungen.',
-  'Settings for "{{name}}":': 'Einstellungen für "{{name}}":',
+  'Settings for "{{name}}":': 'Einstellungen fï¿½r "{{name}}":',
   '(workspace)': '(Arbeitsbereich)',
   '(user)': '(Benutzer)',
   '[not set]': '[nicht gesetzt]',
-  '[value stored in keychain]': '[Wert in Schlüsselbund gespeichert]',
+  '[value stored in keychain]': '[Wert in Schlï¿½sselbund gespeichert]',
   'Manage extension settings.': 'Erweiterungseinstellungen verwalten.',
   'You need to specify a command (set or list).':
-    'Sie müssen einen Befehl angeben (set oder list).',
+    'Sie mï¿½ssen einen Befehl angeben (set oder list).',
   // ============================================================================
   // Plugin Choice / Marketplace
   // ============================================================================
   'No plugins available in this marketplace.':
-    'In diesem Marktplatz sind keine Plugins verfügbar.',
+    'In diesem Marktplatz sind keine Plugins verfï¿½gbar.',
   'Select a plugin to install from marketplace "{{name}}":':
-    'Wählen Sie ein Plugin zur Installation aus Marktplatz "{{name}}":',
+    'Wï¿½hlen Sie ein Plugin zur Installation aus Marktplatz "{{name}}":',
   'Plugin selection cancelled.': 'Plugin-Auswahl abgebrochen.',
-  'Select a plugin from "{{name}}"': 'Plugin aus "{{name}}" auswählen',
+  'Select a plugin from "{{name}}"': 'Plugin aus "{{name}}" auswï¿½hlen',
   'Use ?? or j/k to navigate, Enter to select, Escape to cancel':
-    'Verwenden Sie ?? oder j/k zum Navigieren, Enter zum Auswählen, Escape zum Abbrechen',
+    'Verwenden Sie ?? oder j/k zum Navigieren, Enter zum Auswï¿½hlen, Escape zum Abbrechen',
   '{{count}} more above': '{{count}} weitere oben',
   '{{count}} more below': '{{count}} weitere unten',
   'manage IDE integration': 'IDE-Integration verwalten',
-  'check status of IDE integration': 'Status der IDE-Integration prüfen',
+  'check status of IDE integration': 'Status der IDE-Integration prï¿½fen',
   'install required IDE companion for {{ideName}}':
-    'Erforderlichen IDE-Begleiter für {{ideName}} installieren',
+    'Erforderlichen IDE-Begleiter fï¿½r {{ideName}} installieren',
   'enable IDE integration': 'IDE-Integration aktivieren',
   'disable IDE integration': 'IDE-Integration deaktivieren',
   'IDE integration is not supported in your current environment. To use this feature, run HopCode in one of these supported IDEs: VS Code or VS Code forks.':
-    'IDE-Integration wird in Ihrer aktuellen Umgebung nicht unterstützt. Um diese Funktion zu nutzen, führen Sie HopCode in einer dieser unterstützten IDEs aus: VS Code oder VS Code-Forks.',
+    'IDE-Integration wird in Ihrer aktuellen Umgebung nicht unterstï¿½tzt. Um diese Funktion zu nutzen, fï¿½hren Sie HopCode in einer dieser unterstï¿½tzten IDEs aus: VS Code oder VS Code-Forks.',
   'Set up GitHub Actions': 'GitHub Actions einrichten',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
-    'Terminal-Tastenbelegungen für mehrzeilige Eingabe konfigurieren (VS Code, Cursor, Windsurf, Trae)',
+    'Terminal-Tastenbelegungen fï¿½r mehrzeilige Eingabe konfigurieren (VS Code, Cursor, Windsurf, Trae)',
   'Please restart your terminal for the changes to take effect.':
-    'Bitte starten Sie Ihr Terminal neu, damit die Änderungen wirksam werden.',
+    'Bitte starten Sie Ihr Terminal neu, damit die ï¿½nderungen wirksam werden.',
   'Failed to configure terminal: {{error}}':
     'Fehler beim Konfigurieren des Terminals: {{error}}',
   'Could not determine {{terminalName}} config path on Windows: APPDATA environment variable is not set.':
     'Konnte {{terminalName}}-Konfigurationspfad unter Windows nicht ermitteln: APPDATA-Umgebungsvariable ist nicht gesetzt.',
   '{{terminalName}} keybindings.json exists but is not a valid JSON array. Please fix the file manually or delete it to allow automatic configuration.':
-    '{{terminalName}} keybindings.json existiert, ist aber kein gültiges JSON-Array. Bitte korrigieren Sie die Datei manuell oder löschen Sie sie, um automatische Konfiguration zu ermöglichen.',
+    '{{terminalName}} keybindings.json existiert, ist aber kein gï¿½ltiges JSON-Array. Bitte korrigieren Sie die Datei manuell oder lï¿½schen Sie sie, um automatische Konfiguration zu ermï¿½glichen.',
   'File: {{file}}': 'Datei: {{file}}',
   'Failed to parse {{terminalName}} keybindings.json. The file contains invalid JSON. Please fix the file manually or delete it to allow automatic configuration.':
-    'Fehler beim Parsen von {{terminalName}} keybindings.json. Die Datei enthält ungültiges JSON. Bitte korrigieren Sie die Datei manuell oder löschen Sie sie, um automatische Konfiguration zu ermöglichen.',
+    'Fehler beim Parsen von {{terminalName}} keybindings.json. Die Datei enthï¿½lt ungï¿½ltiges JSON. Bitte korrigieren Sie die Datei manuell oder lï¿½schen Sie sie, um automatische Konfiguration zu ermï¿½glichen.',
   'Error: {{error}}': 'Fehler: {{error}}',
   'Shift+Enter binding already exists':
     'Umschalt+Enter-Belegung existiert bereits',
   'Ctrl+Enter binding already exists': 'Strg+Enter-Belegung existiert bereits',
   'Existing keybindings detected. Will not modify to avoid conflicts.':
-    'Bestehende Tastenbelegungen erkannt. Keine Änderungen, um Konflikte zu vermeiden.',
+    'Bestehende Tastenbelegungen erkannt. Keine ï¿½nderungen, um Konflikte zu vermeiden.',
   'Please check and modify manually if needed: {{file}}':
-    'Bitte prüfen und bei Bedarf manuell ändern: {{file}}',
+    'Bitte prï¿½fen und bei Bedarf manuell ï¿½ndern: {{file}}',
   'Added Shift+Enter and Ctrl+Enter keybindings to {{terminalName}}.':
-    'Umschalt+Enter und Strg+Enter Tastenbelegungen zu {{terminalName}} hinzugefügt.',
-  'Modified: {{file}}': 'Geändert: {{file}}',
+    'Umschalt+Enter und Strg+Enter Tastenbelegungen zu {{terminalName}} hinzugefï¿½gt.',
+  'Modified: {{file}}': 'Geï¿½ndert: {{file}}',
   '{{terminalName}} keybindings already configured.':
     '{{terminalName}}-Tastenbelegungen bereits konfiguriert.',
   'Failed to configure {{terminalName}}.':
     'Fehler beim Konfigurieren von {{terminalName}}.',
   'Your terminal is already configured for an optimal experience with multiline input (Shift+Enter and Ctrl+Enter).':
-    'Ihr Terminal ist bereits für optimale Erfahrung mit mehrzeiliger Eingabe konfiguriert (Umschalt+Enter und Strg+Enter).',
+    'Ihr Terminal ist bereits fï¿½r optimale Erfahrung mit mehrzeiliger Eingabe konfiguriert (Umschalt+Enter und Strg+Enter).',
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
@@ -600,43 +600,43 @@ export default {
   Hooks: 'Hooks',
   'Loading hooks...': 'Hooks werden geladen...',
   'Error loading hooks:': 'Fehler beim Laden der Hooks:',
-  'Press Escape to close': 'Escape zum Schließen drücken',
+  'Press Escape to close': 'Escape zum Schlieï¿½en drï¿½cken',
   'Press Escape, Ctrl+C, or Ctrl+D to cancel':
     'Escape, Ctrl+C oder Ctrl+D zum Abbrechen',
   'Press Space, Enter, or Escape to dismiss':
-    'Leertaste, Enter oder Escape zum Schließen',
-  'No hook selected': 'Kein Hook ausgewählt',
+    'Leertaste, Enter oder Escape zum Schlieï¿½en',
+  'No hook selected': 'Kein Hook ausgewï¿½hlt',
   // Hooks - List Step
   'No hook events found.': 'Keine Hook-Ereignisse gefunden.',
   '{{count}} hook configured': '{{count}} Hook konfiguriert',
   '{{count}} hooks configured': '{{count}} Hooks konfiguriert',
   'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
-    'Dieses Menü ist schreibgeschützt. Um Hooks hinzuzufügen oder zu ändern, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
-  'Enter to select · Esc to cancel': 'Enter zum Auswählen · Esc zum Abbrechen',
+    'Dieses Menï¿½ ist schreibgeschï¿½tzt. Um Hooks hinzuzufï¿½gen oder zu ï¿½ndern, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
+  'Enter to select ï¿½ Esc to cancel': 'Enter zum Auswï¿½hlen ï¿½ Esc zum Abbrechen',
   // Hooks - Detail Step
   'Exit codes:': 'Exit-Codes:',
   'Configured hooks:': 'Konfigurierte Hooks:',
   'No hooks configured for this event.':
-    'Für dieses Ereignis sind keine Hooks konfiguriert.',
+    'Fï¿½r dieses Ereignis sind keine Hooks konfiguriert.',
   'To add hooks, edit settings.json directly or ask HopCode.':
-    'Um Hooks hinzuzufügen, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
-  'Enter to select · Esc to go back': 'Enter zum Auswählen · Esc zum Zurück',
+    'Um Hooks hinzuzufï¿½gen, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
+  'Enter to select ï¿½ Esc to go back': 'Enter zum Auswï¿½hlen ï¿½ Esc zum Zurï¿½ck',
   // Hooks - Config Detail Step
   'Hook details': 'Hook-Details',
   'Event:': 'Ereignis:',
   'Extension:': 'Erweiterung:',
   'Desc:': 'Beschreibung:',
-  'No hook config selected': 'Keine Hook-Konfiguration ausgewählt',
+  'No hook config selected': 'Keine Hook-Konfiguration ausgewï¿½hlt',
   'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'Um diesen Hook zu ändern oder zu entfernen, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
+    'Um diesen Hook zu ï¿½ndern oder zu entfernen, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'Hook-Konfiguration - Deaktiviert',
   'All hooks are currently disabled. You have {{count}} that are not running.':
-    'Alle Hooks sind derzeit deaktiviert. Sie haben {{count}} die nicht ausgeführt werden.',
+    'Alle Hooks sind derzeit deaktiviert. Sie haben {{count}} die nicht ausgefï¿½hrt werden.',
   '{{count}} configured hook': '{{count}} konfigurierter Hook',
   '{{count}} configured hooks': '{{count}} konfigurierte Hooks',
   'When hooks are disabled:': 'Wenn Hooks deaktiviert sind:',
-  'No hook commands will execute': 'Keine Hook-Befehle werden ausgeführt',
+  'No hook commands will execute': 'Keine Hook-Befehle werden ausgefï¿½hrt',
   'StatusLine will not be displayed': 'StatusLine wird nicht angezeigt',
   'Tool operations will proceed without hook validation':
     'Tool-Operationen werden ohne Hook-Validierung fortgesetzt',
@@ -651,24 +651,24 @@ export default {
   'User Settings': 'Benutzereinstellungen',
   'System Settings': 'Systemeinstellungen',
   Extensions: 'Erweiterungen',
-  'Session (temporary)': 'Sitzung (temporär)',
+  'Session (temporary)': 'Sitzung (temporï¿½r)',
   // Hooks - Status
   '? Enabled': '? Aktiviert',
   '? Disabled': '? Deaktiviert',
   // Hooks - Event Descriptions (short)
-  'Before tool execution': 'Vor der Tool-Ausführung',
-  'After tool execution': 'Nach der Tool-Ausführung',
-  'After tool execution fails': 'Wenn die Tool-Ausführung fehlschlägt',
+  'Before tool execution': 'Vor der Tool-Ausfï¿½hrung',
+  'After tool execution': 'Nach der Tool-Ausfï¿½hrung',
+  'After tool execution fails': 'Wenn die Tool-Ausfï¿½hrung fehlschlï¿½gt',
   'When notifications are sent': 'Wenn Benachrichtigungen gesendet werden',
   'When the user submits a prompt': 'Wenn der Benutzer einen Prompt absendet',
   'When a new session is started': 'Wenn eine neue Sitzung gestartet wird',
   'Right before HopCode concludes its response':
-    'Direkt bevor HopCode seine Antwort abschließt',
+    'Direkt bevor HopCode seine Antwort abschlieï¿½t',
   'When a subagent (Agent tool call) is started':
     'Wenn ein Subagent (Agent-Tool-Aufruf) gestartet wird',
   'Right before a subagent concludes its response':
-    'Direkt bevor ein Subagent seine Antwort abschließt',
-  'Before conversation compaction': 'Vor der Gesprächskomprimierung',
+    'Direkt bevor ein Subagent seine Antwort abschlieï¿½t',
+  'Before conversation compaction': 'Vor der Gesprï¿½chskomprimierung',
   'When a session is ending': 'Wenn eine Sitzung endet',
   'When a permission dialog is displayed':
     'Wenn ein Berechtigungsdialog angezeigt wird',
@@ -682,7 +682,7 @@ export default {
   'Input to command is JSON with notification message and type.':
     'Die Eingabe an den Befehl ist JSON mit Benachrichtigungsnachricht und -typ.',
   'Input to command is JSON with original user prompt text.':
-    'Die Eingabe an den Befehl ist JSON mit dem ursprünglichen Benutzer-Prompt-Text.',
+    'Die Eingabe an den Befehl ist JSON mit dem ursprï¿½nglichen Benutzer-Prompt-Text.',
   'Input to command is JSON with session start source.':
     'Die Eingabe an den Befehl ist JSON mit der Sitzungsstart-Quelle.',
   'Input to command is JSON with session end reason.':
@@ -694,7 +694,7 @@ export default {
   'Input to command is JSON with compaction details.':
     'Die Eingabe an den Befehl ist JSON mit Komprimierungsdetails.',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
-    'Die Eingabe an den Befehl ist JSON mit tool_name, tool_input und tool_use_id. Ausgabe ist JSON mit hookSpecificOutput, das die Entscheidung zum Zulassen oder Ablehnen enthält.',
+    'Die Eingabe an den Befehl ist JSON mit tool_name, tool_input und tool_use_id. Ausgabe ist JSON mit hookSpecificOutput, das die Entscheidung zum Zulassen oder Ablehnen enthï¿½lt.',
   // Hooks - Exit Code Descriptions
   'stdout/stderr not shown': 'stdout/stderr nicht angezeigt',
   'show stderr to model and continue conversation':
@@ -706,7 +706,7 @@ export default {
   'show stderr to user only but continue with tool call':
     'stderr nur dem Benutzer anzeigen, aber mit Tool-Aufruf fortfahren',
   'block processing, erase original prompt, and show stderr to user only':
-    'Verarbeitung blockieren, ursprünglichen Prompt löschen und stderr nur dem Benutzer anzeigen',
+    'Verarbeitung blockieren, ursprï¿½nglichen Prompt lï¿½schen und stderr nur dem Benutzer anzeigen',
   'stdout shown to HopCode': 'stdout dem HopCode anzeigen',
   'show stderr to user only (blocking errors ignored)':
     'stderr nur dem Benutzer anzeigen (Blockierungsfehler ignoriert)',
@@ -715,7 +715,7 @@ export default {
   'show stderr to subagent and continue having it run':
     'stderr dem Subagenten anzeigen und ihn weiterlaufen lassen',
   'stdout appended as custom compact instructions':
-    'stdout als benutzerdefinierte Komprimierungsanweisungen angehängt',
+    'stdout als benutzerdefinierte Komprimierungsanweisungen angehï¿½ngt',
   'block compaction': 'Komprimierung blockieren',
   'show stderr to user only but continue with compaction':
     'stderr nur dem Benutzer anzeigen, aber mit Komprimierung fortfahren',
@@ -726,7 +726,7 @@ export default {
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
     'Hooks sind nicht aktiviert. Aktivieren Sie Hooks in den Einstellungen, um diese Funktion zu nutzen.',
   'No hooks configured. Add hooks in your settings.json file.':
-    'Keine Hooks konfiguriert. Fügen Sie Hooks in Ihrer settings.json-Datei hinzu.',
+    'Keine Hooks konfiguriert. Fï¿½gen Sie Hooks in Ihrer settings.json-Datei hinzu.',
   'Configured Hooks ({{count}} total)':
     'Konfigurierte Hooks ({{count}} insgesamt)',
 
@@ -753,19 +753,19 @@ export default {
   // ============================================================================
   'Resume a previous session': 'Eine vorherige Sitzung fortsetzen',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
-    'Einen Tool-Aufruf wiederherstellen. Dadurch werden Konversations- und Dateiverlauf auf den Zustand zurückgesetzt, in dem der Tool-Aufruf vorgeschlagen wurde',
+    'Einen Tool-Aufruf wiederherstellen. Dadurch werden Konversations- und Dateiverlauf auf den Zustand zurï¿½ckgesetzt, in dem der Tool-Aufruf vorgeschlagen wurde',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
-    'Terminal-Typ konnte nicht erkannt werden. Unterstützte Terminals: VS Code, Cursor, Windsurf und Trae.',
+    'Terminal-Typ konnte nicht erkannt werden. Unterstï¿½tzte Terminals: VS Code, Cursor, Windsurf und Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
-    'Terminal "{{terminal}}" wird noch nicht unterstützt.',
+    'Terminal "{{terminal}}" wird noch nicht unterstï¿½tzt.',
 
   // ============================================================================
   // Commands - Language
   // ============================================================================
   'Invalid language. Available: {{options}}':
-    'Ungültige Sprache. Verfügbar: {{options}}',
+    'Ungï¿½ltige Sprache. Verfï¿½gbar: {{options}}',
   'Language subcommands do not accept additional arguments.':
-    'Sprach-Unterbefehle akzeptieren keine zusätzlichen Argumente.',
+    'Sprach-Unterbefehle akzeptieren keine zusï¿½tzlichen Argumente.',
   'Current UI language: {{lang}}': 'Aktuelle UI-Sprache: {{lang}}',
   'Current LLM output language: {{lang}}':
     'Aktuelle LLM-Ausgabesprache: {{lang}}',
@@ -778,23 +778,23 @@ export default {
   'Example: /language output ??': 'Beispiel: /language output Deutsch',
   'Example: /language output English': 'Beispiel: /language output Englisch',
   'Example: /language output ???': 'Beispiel: /language output Japanisch',
-  'Example: /language output Português':
+  'Example: /language output Portuguï¿½s':
     'Beispiel: /language output Portugiesisch',
-  'UI language changed to {{lang}}': 'UI-Sprache geändert zu {{lang}}',
+  'UI language changed to {{lang}}': 'UI-Sprache geï¿½ndert zu {{lang}}',
   'LLM output language set to {{lang}}':
     'LLM-Ausgabesprache auf {{lang}} gesetzt',
   'LLM output language rule file generated at {{path}}':
     'LLM-Ausgabesprach-Regeldatei generiert unter {{path}}',
   'Please restart the application for the changes to take effect.':
-    'Bitte starten Sie die Anwendung neu, damit die Änderungen wirksam werden.',
+    'Bitte starten Sie die Anwendung neu, damit die ï¿½nderungen wirksam werden.',
   'Failed to generate LLM output language rule file: {{error}}':
     'Fehler beim Generieren der LLM-Ausgabesprach-Regeldatei: {{error}}',
   'Invalid command. Available subcommands:':
-    'Ungültiger Befehl. Verfügbare Unterbefehle:',
-  'Available subcommands:': 'Verfügbare Unterbefehle:',
+    'Ungï¿½ltiger Befehl. Verfï¿½gbare Unterbefehle:',
+  'Available subcommands:': 'Verfï¿½gbare Unterbefehle:',
   'To request additional UI language packs, please open an issue on GitHub.':
-    'Um zusätzliche UI-Sprachpakete anzufordern, öffnen Sie bitte ein Issue auf GitHub.',
-  'Available options:': 'Verfügbare Optionen:',
+    'Um zusï¿½tzliche UI-Sprachpakete anzufordern, ï¿½ffnen Sie bitte ein Issue auf GitHub.',
+  'Available options:': 'Verfï¿½gbare Optionen:',
   'Set UI language to {{name}}': 'UI-Sprache auf {{name}} setzen',
 
   // ============================================================================
@@ -802,46 +802,46 @@ export default {
   // ============================================================================
   'Tool Approval Mode': 'Werkzeug-Genehmigungsmodus',
   'Current approval mode: {{mode}}': 'Aktueller Genehmigungsmodus: {{mode}}',
-  'Available approval modes:': 'Verfügbare Genehmigungsmodi:',
+  'Available approval modes:': 'Verfï¿½gbare Genehmigungsmodi:',
   'Approval mode changed to: {{mode}}':
-    'Genehmigungsmodus geändert zu: {{mode}}',
+    'Genehmigungsmodus geï¿½ndert zu: {{mode}}',
   'Approval mode changed to: {{mode}} (saved to {{scope}} settings{{location}})':
-    'Genehmigungsmodus geändert zu: {{mode}} (gespeichert in {{scope}} Einstellungen{{location}})',
+    'Genehmigungsmodus geï¿½ndert zu: {{mode}} (gespeichert in {{scope}} Einstellungen{{location}})',
   'Usage: /approval-mode <mode> [--session|--user|--project]':
     'Verwendung: /approval-mode <Modus> [--session|--user|--project]',
 
   'Scope subcommands do not accept additional arguments.':
-    'Bereichs-Unterbefehle akzeptieren keine zusätzlichen Argumente.',
+    'Bereichs-Unterbefehle akzeptieren keine zusï¿½tzlichen Argumente.',
   'Plan mode - Analyze only, do not modify files or execute commands':
-    'Planungsmodus - Nur analysieren, keine Dateien ändern oder Befehle ausführen',
+    'Planungsmodus - Nur analysieren, keine Dateien ï¿½ndern oder Befehle ausfï¿½hren',
   'Default mode - Require approval for file edits or shell commands':
-    'Standardmodus - Genehmigung für Dateibearbeitungen oder Shell-Befehle erforderlich',
+    'Standardmodus - Genehmigung fï¿½r Dateibearbeitungen oder Shell-Befehle erforderlich',
   'Auto-edit mode - Automatically approve file edits':
     'Automatischer Bearbeitungsmodus - Dateibearbeitungen automatisch genehmigen',
   'IZN mode - Automatically approve all tools':
     'IZN-Modus - Alle Werkzeuge automatisch genehmigen',
   '{{mode}} mode': '{{mode}}-Modus',
   'Settings service is not available; unable to persist the approval mode.':
-    'Einstellungsdienst nicht verfügbar; Genehmigungsmodus kann nicht gespeichert werden.',
+    'Einstellungsdienst nicht verfï¿½gbar; Genehmigungsmodus kann nicht gespeichert werden.',
   'Failed to save approval mode: {{error}}':
     'Fehler beim Speichern des Genehmigungsmodus: {{error}}',
   'Failed to change approval mode: {{error}}':
-    'Fehler beim Ändern des Genehmigungsmodus: {{error}}',
+    'Fehler beim ï¿½ndern des Genehmigungsmodus: {{error}}',
   'Apply to current session only (temporary)':
-    'Nur auf aktuelle Sitzung anwenden (temporär)',
+    'Nur auf aktuelle Sitzung anwenden (temporï¿½r)',
   'Persist for this project/workspace':
-    'Für dieses Projekt/Arbeitsbereich speichern',
+    'Fï¿½r dieses Projekt/Arbeitsbereich speichern',
   'Persist for this user on this machine':
-    'Für diesen Benutzer auf diesem Computer speichern',
+    'Fï¿½r diesen Benutzer auf diesem Computer speichern',
   'Analyze only, do not modify files or execute commands':
-    'Nur analysieren, keine Dateien ändern oder Befehle ausführen',
+    'Nur analysieren, keine Dateien ï¿½ndern oder Befehle ausfï¿½hren',
   'Require approval for file edits or shell commands':
-    'Genehmigung für Dateibearbeitungen oder Shell-Befehle erforderlich',
+    'Genehmigung fï¿½r Dateibearbeitungen oder Shell-Befehle erforderlich',
   'Automatically approve file edits':
     'Dateibearbeitungen automatisch genehmigen',
   'Automatically approve all tools': 'Alle Werkzeuge automatisch genehmigen',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
-    'Arbeitsbereich-Genehmigungsmodus existiert und hat Vorrang. Benutzerebene-Änderung hat keine Wirkung.',
+    'Arbeitsbereich-Genehmigungsmodus existiert und hat Vorrang. Benutzerebene-ï¿½nderung hat keine Wirkung.',
   'Apply To': 'Anwenden auf',
   'Workspace Settings': 'Arbeitsbereich-Einstellungen',
 
@@ -849,14 +849,14 @@ export default {
   // Commands - Memory
   // ============================================================================
   'Commands for interacting with memory.':
-    'Befehle für die Interaktion mit dem Speicher.',
+    'Befehle fï¿½r die Interaktion mit dem Speicher.',
   'Show the current memory contents.': 'Aktuellen Speicherinhalt anzeigen.',
   'Show project-level memory contents.':
     'Projektebene-Speicherinhalt anzeigen.',
   'Show global memory contents.': 'Globalen Speicherinhalt anzeigen.',
   'Add content to project-level memory.':
-    'Inhalt zum Projektebene-Speicher hinzufügen.',
-  'Add content to global memory.': 'Inhalt zum globalen Speicher hinzufügen.',
+    'Inhalt zum Projektebene-Speicher hinzufï¿½gen.',
+  'Add content to global memory.': 'Inhalt zum globalen Speicher hinzufï¿½gen.',
   'Refresh the memory from the source.':
     'Speicher aus der Quelle aktualisieren.',
   'Usage: /memory add --project <text to remember>':
@@ -883,29 +883,29 @@ export default {
   'Refreshing memory from source files...':
     'Speicher wird aus Quelldateien aktualisiert...',
   'Add content to the memory. Use --global for global memory or --project for project memory.':
-    'Inhalt zum Speicher hinzufügen. --global für globalen Speicher oder --project für Projektspeicher verwenden.',
+    'Inhalt zum Speicher hinzufï¿½gen. --global fï¿½r globalen Speicher oder --project fï¿½r Projektspeicher verwenden.',
   'Usage: /memory add [--global|--project] <text to remember>':
     'Verwendung: /memory add [--global|--project] <zu merkender Text>',
   'Attempting to save to memory {{scope}}: "{{fact}}"':
     'Versuche im Speicher {{scope}} zu speichern: "{{fact}}"',
-  'Open auto-memory folder': 'Auto-Speicher-Ordner öffnen',
+  'Open auto-memory folder': 'Auto-Speicher-Ordner ï¿½ffnen',
   'Auto-memory: {{status}}': 'Auto-Speicher: {{status}}',
-  'Auto-dream: {{status}} · {{lastDream}} · /dream to run':
-    'Auto-Konsolidierung: {{status}} · {{lastDream}} · /dream zum Ausführen',
+  'Auto-dream: {{status}} ï¿½ {{lastDream}} ï¿½ /dream to run':
+    'Auto-Konsolidierung: {{status}} ï¿½ {{lastDream}} ï¿½ /dream zum Ausfï¿½hren',
   never: 'nie',
   on: 'ein',
   off: 'aus',
   '? dreaming': '? konsolidiert',
   'Remove matching entries from managed auto-memory.':
-    'Passende Einträge aus dem verwalteten Auto-Speicher entfernen.',
+    'Passende Eintrï¿½ge aus dem verwalteten Auto-Speicher entfernen.',
   'Usage: /forget <memory text to remove>':
     'Verwendung: /forget <zu entfernender Erinnerungstext>',
   'No managed auto-memory entries matched: {{query}}':
-    'Keine verwalteten Auto-Speicher-Einträge gefunden: {{query}}',
+    'Keine verwalteten Auto-Speicher-Eintrï¿½ge gefunden: {{query}}',
   'Show managed auto-memory status.':
     'Status des verwalteten Auto-Speichers anzeigen.',
   'Run managed auto-memory extraction for the current session.':
-    'Verwaltete Auto-Speicher-Extraktion für die aktuelle Sitzung ausführen.',
+    'Verwaltete Auto-Speicher-Extraktion fï¿½r die aktuelle Sitzung ausfï¿½hren.',
   'Managed auto-memory root: {{root}}':
     'Verwalteter Auto-Speicher-Stamm: {{root}}',
   'Managed auto-memory topics:': 'Verwaltete Auto-Speicher-Themen:',
@@ -913,16 +913,16 @@ export default {
   'Cursor: session={{sessionId}}, offset={{offset}}, updated={{updatedAt}}':
     'Cursor: Sitzung={{sessionId}}, Offset={{offset}}, Aktualisiert={{updatedAt}}',
   'No chat client available to extract memory.':
-    'Kein Chat-Client verfügbar, um Erinnerungen zu extrahieren.',
+    'Kein Chat-Client verfï¿½gbar, um Erinnerungen zu extrahieren.',
   'Managed auto-memory extraction is already running.':
-    'Verwaltete Auto-Speicher-Extraktion läuft bereits.',
+    'Verwaltete Auto-Speicher-Extraktion lï¿½uft bereits.',
   'Managed auto-memory extraction found no new durable memories.':
     'Verwaltete Auto-Speicher-Extraktion hat keine neuen dauerhaften Erinnerungen gefunden.',
   'Consolidate managed auto-memory topic files.':
     'Verwaltete Auto-Speicher-Themendateien konsolidieren.',
   'Managed auto-memory dream found nothing to improve.':
     'Auto-Speicher-Konsolidierung hat nichts zu verbessern gefunden.',
-  'Deduplicated entries: {{count}}': 'Deduplizierte Einträge: {{count}}',
+  'Deduplicated entries: {{count}}': 'Deduplizierte Eintrï¿½ge: {{count}}',
   'Save a durable memory using the save_memory tool.':
     'Eine dauerhafte Erinnerung mit dem save_memory-Tool speichern.',
   'Usage: /remember [--global|--project] <text to remember>':
@@ -932,7 +932,7 @@ export default {
   // Commands - MCP
   // ============================================================================
   'Authenticate with an OAuth-enabled MCP server':
-    'Mit einem OAuth-fähigen MCP-Server authentifizieren',
+    'Mit einem OAuth-fï¿½higen MCP-Server authentifizieren',
   'List configured MCP servers and tools':
     'Konfigurierte MCP-Server und Werkzeuge auflisten',
   'Restarts MCP servers.': 'MCP-Server neu starten.',
@@ -946,7 +946,7 @@ export default {
     'Verwenden Sie /mcp auth <Servername> zur Authentifizierung.',
   "MCP server '{{name}}' not found.": "MCP-Server '{{name}}' nicht gefunden.",
   "Successfully authenticated and refreshed tools for '{{name}}'.":
-    "Erfolgreich authentifiziert und Werkzeuge für '{{name}}' aktualisiert.",
+    "Erfolgreich authentifiziert und Werkzeuge fï¿½r '{{name}}' aktualisiert.",
   "Failed to authenticate with MCP server '{{name}}': {{error}}":
     "Authentifizierung mit MCP-Server '{{name}}' fehlgeschlagen: {{error}}",
   "Re-discovering tools from '{{name}}'...":
@@ -954,58 +954,58 @@ export default {
   "Discovered {{count}} tool(s) from '{{name}}'.":
     "{{count}} Werkzeug(e) von '{{name}}' entdeckt.",
   'Authentication complete. Returning to server details...':
-    'Authentifizierung abgeschlossen. Zurück zu den Serverdetails...',
+    'Authentifizierung abgeschlossen. Zurï¿½ck zu den Serverdetails...',
   'Authentication successful.': 'Authentifizierung erfolgreich.',
   'If the browser does not open, copy and paste this URL into your browser:':
-    'Falls der Browser sich nicht öffnet, kopieren Sie diese URL und fügen Sie sie in Ihren Browser ein:',
+    'Falls der Browser sich nicht ï¿½ffnet, kopieren Sie diese URL und fï¿½gen Sie sie in Ihren Browser ein:',
   'Make sure to copy the COMPLETE URL - it may wrap across multiple lines.':
-    '??  Stellen Sie sicher, dass Sie die VOLLSTÄNDIGE URL kopieren – sie kann über mehrere Zeilen gehen.',
+    '??  Stellen Sie sicher, dass Sie die VOLLSTï¿½NDIGE URL kopieren ï¿½ sie kann ï¿½ber mehrere Zeilen gehen.',
 
   // ============================================================================
   // Commands - Chat
   // ============================================================================
-  'Manage conversation history.': 'Gesprächsverlauf verwalten.',
+  'Manage conversation history.': 'Gesprï¿½chsverlauf verwalten.',
   'List saved conversation checkpoints':
-    'Gespeicherte Gesprächsprüfpunkte auflisten',
+    'Gespeicherte Gesprï¿½chsprï¿½fpunkte auflisten',
   'No saved conversation checkpoints found.':
-    'Keine gespeicherten Gesprächsprüfpunkte gefunden.',
-  'List of saved conversations:': 'Liste gespeicherter Gespräche:',
-  'Note: Newest last, oldest first': 'Hinweis: Neueste zuletzt, älteste zuerst',
+    'Keine gespeicherten Gesprï¿½chsprï¿½fpunkte gefunden.',
+  'List of saved conversations:': 'Liste gespeicherter Gesprï¿½che:',
+  'Note: Newest last, oldest first': 'Hinweis: Neueste zuletzt, ï¿½lteste zuerst',
   'Save the current conversation as a checkpoint. Usage: /chat save <tag>':
-    'Aktuelles Gespräch als Prüfpunkt speichern. Verwendung: /chat save <Tag>',
+    'Aktuelles Gesprï¿½ch als Prï¿½fpunkt speichern. Verwendung: /chat save <Tag>',
   'Missing tag. Usage: /chat save <tag>':
     'Tag fehlt. Verwendung: /chat save <Tag>',
   'Delete a conversation checkpoint. Usage: /chat delete <tag>':
-    'Gesprächsprüfpunkt löschen. Verwendung: /chat delete <Tag>',
+    'Gesprï¿½chsprï¿½fpunkt lï¿½schen. Verwendung: /chat delete <Tag>',
   'Missing tag. Usage: /chat delete <tag>':
     'Tag fehlt. Verwendung: /chat delete <Tag>',
   "Conversation checkpoint '{{tag}}' has been deleted.":
-    "Gesprächsprüfpunkt '{{tag}}' wurde gelöscht.",
+    "Gesprï¿½chsprï¿½fpunkt '{{tag}}' wurde gelï¿½scht.",
   "Error: No checkpoint found with tag '{{tag}}'.":
-    "Fehler: Kein Prüfpunkt mit Tag '{{tag}}' gefunden.",
+    "Fehler: Kein Prï¿½fpunkt mit Tag '{{tag}}' gefunden.",
   'Resume a conversation from a checkpoint. Usage: /chat resume <tag>':
-    'Gespräch von einem Prüfpunkt fortsetzen. Verwendung: /chat resume <Tag>',
+    'Gesprï¿½ch von einem Prï¿½fpunkt fortsetzen. Verwendung: /chat resume <Tag>',
   'Missing tag. Usage: /chat resume <tag>':
     'Tag fehlt. Verwendung: /chat resume <Tag>',
   'No saved checkpoint found with tag: {{tag}}.':
-    'Kein gespeicherter Prüfpunkt mit Tag gefunden: {{tag}}.',
+    'Kein gespeicherter Prï¿½fpunkt mit Tag gefunden: {{tag}}.',
   'A checkpoint with the tag {{tag}} already exists. Do you want to overwrite it?':
-    'Ein Prüfpunkt mit dem Tag {{tag}} existiert bereits. Möchten Sie ihn überschreiben?',
+    'Ein Prï¿½fpunkt mit dem Tag {{tag}} existiert bereits. Mï¿½chten Sie ihn ï¿½berschreiben?',
   'No chat client available to save conversation.':
-    'Kein Chat-Client verfügbar, um Gespräch zu speichern.',
+    'Kein Chat-Client verfï¿½gbar, um Gesprï¿½ch zu speichern.',
   'Conversation checkpoint saved with tag: {{tag}}.':
-    'Gesprächsprüfpunkt gespeichert mit Tag: {{tag}}.',
-  'No conversation found to save.': 'Kein Gespräch zum Speichern gefunden.',
+    'Gesprï¿½chsprï¿½fpunkt gespeichert mit Tag: {{tag}}.',
+  'No conversation found to save.': 'Kein Gesprï¿½ch zum Speichern gefunden.',
   'No chat client available to share conversation.':
-    'Kein Chat-Client verfügbar, um Gespräch zu teilen.',
+    'Kein Chat-Client verfï¿½gbar, um Gesprï¿½ch zu teilen.',
   'Invalid file format. Only .md and .json are supported.':
-    'Ungültiges Dateiformat. Nur .md und .json werden unterstützt.',
+    'Ungï¿½ltiges Dateiformat. Nur .md und .json werden unterstï¿½tzt.',
   'Error sharing conversation: {{error}}':
-    'Fehler beim Teilen des Gesprächs: {{error}}',
-  'Conversation shared to {{filePath}}': 'Gespräch geteilt nach {{filePath}}',
-  'No conversation found to share.': 'Kein Gespräch zum Teilen gefunden.',
+    'Fehler beim Teilen des Gesprï¿½chs: {{error}}',
+  'Conversation shared to {{filePath}}': 'Gesprï¿½ch geteilt nach {{filePath}}',
+  'No conversation found to share.': 'Kein Gesprï¿½ch zum Teilen gefunden.',
   'Share the current conversation to a markdown or json file. Usage: /chat share <file>':
-    'Aktuelles Gespräch in eine Markdown- oder JSON-Datei teilen. Verwendung: /chat share <Datei>',
+    'Aktuelles Gesprï¿½ch in eine Markdown- oder JSON-Datei teilen. Verwendung: /chat share <Datei>',
 
   // ============================================================================
   // Commands - Summary
@@ -1013,11 +1013,11 @@ export default {
   'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
     'Projektzusammenfassung generieren und in .hopcode/PROJECT_SUMMARY.md speichern',
   'No chat client available to generate summary.':
-    'Kein Chat-Client verfügbar, um Zusammenfassung zu generieren.',
+    'Kein Chat-Client verfï¿½gbar, um Zusammenfassung zu generieren.',
   'Already generating summary, wait for previous request to complete':
     'Zusammenfassung wird bereits generiert, warten Sie auf Abschluss der vorherigen Anfrage',
   'No conversation found to summarize.':
-    'Kein Gespräch zum Zusammenfassen gefunden.',
+    'Kein Gesprï¿½ch zum Zusammenfassen gefunden.',
   'Failed to generate project context summary: {{error}}':
     'Fehler beim Generieren der Projektkontextzusammenfassung: {{error}}',
   'Saved project summary to {{filePathForDisplay}}.':
@@ -1031,29 +1031,29 @@ export default {
   // Commands - Model
   // ============================================================================
   'Switch the model for this session (--fast for suggestion model)':
-    'Modell für diese Sitzung wechseln (--fast für Vorschlagsmodell)',
+    'Modell fï¿½r diese Sitzung wechseln (--fast fï¿½r Vorschlagsmodell)',
   'Set a lighter model for prompt suggestions and speculative execution':
-    'Leichteres Modell für Eingabevorschläge und spekulative Ausführung festlegen',
+    'Leichteres Modell fï¿½r Eingabevorschlï¿½ge und spekulative Ausfï¿½hrung festlegen',
   'Content generator configuration not available.':
-    'Inhaltsgenerator-Konfiguration nicht verfügbar.',
+    'Inhaltsgenerator-Konfiguration nicht verfï¿½gbar.',
   'Authentication type not available.':
-    'Authentifizierungstyp nicht verfügbar.',
+    'Authentifizierungstyp nicht verfï¿½gbar.',
   'No models available for the current authentication type ({{authType}}).':
-    'Keine Modelle für den aktuellen Authentifizierungstyp ({{authType}}) verfügbar.',
+    'Keine Modelle fï¿½r den aktuellen Authentifizierungstyp ({{authType}}) verfï¿½gbar.',
 
   // ============================================================================
   // Commands - Clear
   // ============================================================================
   'Starting a new session, resetting chat, and clearing terminal.':
-    'Neue Sitzung wird gestartet, Chat wird zurückgesetzt und Terminal wird gelöscht.',
+    'Neue Sitzung wird gestartet, Chat wird zurï¿½ckgesetzt und Terminal wird gelï¿½scht.',
   'Starting a new session and clearing.':
-    'Neue Sitzung wird gestartet und gelöscht.',
+    'Neue Sitzung wird gestartet und gelï¿½scht.',
 
   // ============================================================================
   // Commands - Compress
   // ============================================================================
   'Already compressing, wait for previous request to complete':
-    'Komprimierung läuft bereits, warten Sie auf Abschluss der vorherigen Anfrage',
+    'Komprimierung lï¿½uft bereits, warten Sie auf Abschluss der vorherigen Anfrage',
   'Failed to compress chat history.':
     'Fehler beim Komprimieren des Chatverlaufs.',
   'Failed to compress chat history: {{error}}':
@@ -1062,29 +1062,29 @@ export default {
   'Chat history compressed from {{originalTokens}} to {{newTokens}} tokens.':
     'Chatverlauf komprimiert von {{originalTokens}} auf {{newTokens}} Token.',
   'Compression was not beneficial for this history size.':
-    'Komprimierung war für diese Verlaufsgröße nicht vorteilhaft.',
+    'Komprimierung war fï¿½r diese Verlaufsgrï¿½ï¿½e nicht vorteilhaft.',
   'Chat history compression did not reduce size. This may indicate issues with the compression prompt.':
-    'Chatverlauf-Komprimierung hat die Größe nicht reduziert. Dies kann auf Probleme mit dem Komprimierungs-Prompt hindeuten.',
+    'Chatverlauf-Komprimierung hat die Grï¿½ï¿½e nicht reduziert. Dies kann auf Probleme mit dem Komprimierungs-Prompt hindeuten.',
   'Could not compress chat history due to a token counting error.':
-    'Chatverlauf konnte aufgrund eines Token-Zählfehlers nicht komprimiert werden.',
+    'Chatverlauf konnte aufgrund eines Token-Zï¿½hlfehlers nicht komprimiert werden.',
   'Chat history is already compressed.': 'Chatverlauf ist bereits komprimiert.',
 
   // ============================================================================
   // Commands - Directory
   // ============================================================================
-  'Configuration is not available.': 'Konfiguration ist nicht verfügbar.',
+  'Configuration is not available.': 'Konfiguration ist nicht verfï¿½gbar.',
   'Please provide at least one path to add.':
-    'Bitte geben Sie mindestens einen Pfad zum Hinzufügen an.',
+    'Bitte geben Sie mindestens einen Pfad zum Hinzufï¿½gen an.',
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
-    'Der Befehl /directory add wird in restriktiven Sandbox-Profilen nicht unterstützt. Bitte verwenden Sie --include-directories beim Starten der Sitzung.',
+    'Der Befehl /directory add wird in restriktiven Sandbox-Profilen nicht unterstï¿½tzt. Bitte verwenden Sie --include-directories beim Starten der Sitzung.',
   "Error adding '{{path}}': {{error}}":
-    "Fehler beim Hinzufügen von '{{path}}': {{error}}",
+    "Fehler beim Hinzufï¿½gen von '{{path}}': {{error}}",
   'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
-    'HOPCODE.md-Dateien aus folgenden Verzeichnissen erfolgreich hinzugefügt, falls vorhanden:\n- {{directories}}',
+    'HOPCODE.md-Dateien aus folgenden Verzeichnissen erfolgreich hinzugefï¿½gt, falls vorhanden:\n- {{directories}}',
   'Error refreshing memory: {{error}}':
     'Fehler beim Aktualisieren des Speichers: {{error}}',
   'Successfully added directories:\n- {{directories}}':
-    'Verzeichnisse erfolgreich hinzugefügt:\n- {{directories}}',
+    'Verzeichnisse erfolgreich hinzugefï¿½gt:\n- {{directories}}',
   'Current workspace directories:\n{{directories}}':
     'Aktuelle Arbeitsbereichsverzeichnisse:\n{{directories}}',
 
@@ -1092,20 +1092,20 @@ export default {
   // Commands - Docs
   // ============================================================================
   'Please open the following URL in your browser to view the documentation:\n{{url}}':
-    'Bitte öffnen Sie folgende URL in Ihrem Browser, um die Dokumentation anzusehen:\n{{url}}',
+    'Bitte ï¿½ffnen Sie folgende URL in Ihrem Browser, um die Dokumentation anzusehen:\n{{url}}',
   'Opening documentation in your browser: {{url}}':
-    'Dokumentation wird in Ihrem Browser geöffnet: {{url}}',
+    'Dokumentation wird in Ihrem Browser geï¿½ffnet: {{url}}',
 
   // ============================================================================
   // Dialogs - Tool Confirmation
   // ============================================================================
-  'Do you want to proceed?': 'Möchten Sie fortfahren?',
+  'Do you want to proceed?': 'Mï¿½chten Sie fortfahren?',
   'Yes, allow once': 'Ja, einmal erlauben',
   'Allow always': 'Immer erlauben',
   Yes: 'Ja',
   No: 'Nein',
   'No (esc)': 'Nein (Esc)',
-  'Yes, allow always for this session': 'Ja, für diese Sitzung immer erlauben',
+  'Yes, allow always for this session': 'Ja, fï¿½r diese Sitzung immer erlauben',
 
   // MCP Management Dialog (translations for MCP UI components)
   'Manage MCP servers': 'MCP-Server verwalten',
@@ -1114,28 +1114,28 @@ export default {
   Tools: 'Werkzeuge',
   'Tool Detail': 'Werkzeugdetails',
   'MCP Management': 'MCP-Verwaltung',
-  'Loading...': 'Lädt...',
+  'Loading...': 'Lï¿½dt...',
   'Unknown step': 'Unbekannter Schritt',
-  'Esc to back': 'Esc zurück',
-  '?? to navigate · Enter to select · Esc to close':
-    '?? navigieren · Enter auswählen · Esc schließen',
-  '?? to navigate · Enter to select · Esc to back':
-    '?? navigieren · Enter auswählen · Esc zurück',
-  '?? to navigate · Enter to confirm · Esc to back':
-    '?? navigieren · Enter bestätigen · Esc zurück',
+  'Esc to back': 'Esc zurï¿½ck',
+  '?? to navigate ï¿½ Enter to select ï¿½ Esc to close':
+    '?? navigieren ï¿½ Enter auswï¿½hlen ï¿½ Esc schlieï¿½en',
+  '?? to navigate ï¿½ Enter to select ï¿½ Esc to back':
+    '?? navigieren ï¿½ Enter auswï¿½hlen ï¿½ Esc zurï¿½ck',
+  '?? to navigate ï¿½ Enter to confirm ï¿½ Esc to back':
+    '?? navigieren ï¿½ Enter bestï¿½tigen ï¿½ Esc zurï¿½ck',
   'User Settings (global)': 'Benutzereinstellungen (global)',
   'Workspace Settings (project-specific)':
     'Arbeitsbereichseinstellungen (projektspezifisch)',
   'Disable server:': 'Server deaktivieren:',
   'Select where to add the server to the exclude list:':
-    'Wählen Sie, wo der Server zur Ausschlussliste hinzugefügt werden soll:',
+    'Wï¿½hlen Sie, wo der Server zur Ausschlussliste hinzugefï¿½gt werden soll:',
   'Press Enter to confirm, Esc to cancel':
-    'Enter zum Bestätigen, Esc zum Abbrechen',
+    'Enter zum Bestï¿½tigen, Esc zum Abbrechen',
   Disable: 'Deaktivieren',
   Enable: 'Aktivieren',
   Authenticate: 'Authentifizieren',
   'Re-authenticate': 'Erneut authentifizieren',
-  'Clear Authentication': 'Authentifizierung löschen',
+  'Clear Authentication': 'Authentifizierung lï¿½schen',
   disabled: 'deaktiviert',
   'Server:': 'Server:',
   Reconnect: 'Neu verbinden',
@@ -1143,8 +1143,8 @@ export default {
   'Status:': 'Status:',
   'Command:': 'Befehl:',
   'Working Directory:': 'Arbeitsverzeichnis:',
-  'Capabilities:': 'Fähigkeiten:',
-  'No server selected': 'Kein Server ausgewählt',
+  'Capabilities:': 'Fï¿½higkeiten:',
+  'No server selected': 'Kein Server ausgewï¿½hlt',
   '(disabled)': '(deaktiviert)',
   'Error:': 'Fehler:',
   tool: 'Werkzeug',
@@ -1161,47 +1161,47 @@ export default {
   server: 'Server',
   servers: 'Server',
   'Add MCP servers to your settings to get started.':
-    'Fügen Sie MCP-Server zu Ihren Einstellungen hinzu, um zu beginnen.',
+    'Fï¿½gen Sie MCP-Server zu Ihren Einstellungen hinzu, um zu beginnen.',
   'Run hopcode --debug to see error logs':
-    'Führen Sie hopcode --debug aus, um Fehlerprotokolle anzuzeigen',
+    'Fï¿½hren Sie hopcode --debug aus, um Fehlerprotokolle anzuzeigen',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth-Authentifizierung',
   'Press Enter to start authentication, Esc to go back':
-    'Drücken Sie Enter, um die Authentifizierung zu starten, Esc zum Zurückgehen',
+    'Drï¿½cken Sie Enter, um die Authentifizierung zu starten, Esc zum Zurï¿½ckgehen',
   'Authenticating... Please complete the login in your browser.':
-    'Authentifizierung läuft... Bitte schließen Sie die Anmeldung in Ihrem Browser ab.',
-  'Press Enter or Esc to go back': 'Drücken Sie Enter oder Esc zum Zurückgehen',
+    'Authentifizierung lï¿½uft... Bitte schlieï¿½en Sie die Anmeldung in Ihrem Browser ab.',
+  'Press Enter or Esc to go back': 'Drï¿½cken Sie Enter oder Esc zum Zurï¿½ckgehen',
 
   // MCP Tool List
   'No tools available for this server.':
-    'Keine Werkzeuge für diesen Server verfügbar.',
+    'Keine Werkzeuge fï¿½r diesen Server verfï¿½gbar.',
   destructive: 'destruktiv',
-  'read-only': 'schreibgeschützt',
+  'read-only': 'schreibgeschï¿½tzt',
   'open-world': 'offene Welt',
   idempotent: 'idempotent',
-  'Tools for {{name}}': 'Werkzeuge für {{name}}',
-  'Tools for {{serverName}}': 'Werkzeuge für {{serverName}}',
+  'Tools for {{name}}': 'Werkzeuge fï¿½r {{name}}',
+  'Tools for {{serverName}}': 'Werkzeuge fï¿½r {{serverName}}',
   '{{current}}/{{total}}': '{{current}}/{{total}}',
 
   // MCP Tool Detail
   required: 'erforderlich',
   Type: 'Typ',
-  Enum: 'Aufzählung',
+  Enum: 'Aufzï¿½hlung',
   Parameters: 'Parameter',
-  'No tool selected': 'Kein Werkzeug ausgewählt',
+  'No tool selected': 'Kein Werkzeug ausgewï¿½hlt',
   Annotations: 'Anmerkungen',
   Title: 'Titel',
-  'Read Only': 'Schreibgeschützt',
+  'Read Only': 'Schreibgeschï¿½tzt',
   Destructive: 'Destruktiv',
   Idempotent: 'Idempotent',
   'Open World': 'Offene Welt',
   Server: 'Server',
 
   // Invalid tool related translations
-  '{{count}} invalid tools': '{{count}} ungültige Werkzeuge',
-  invalid: 'ungültig',
-  'invalid: {{reason}}': 'ungültig: {{reason}}',
+  '{{count}} invalid tools': '{{count}} ungï¿½ltige Werkzeuge',
+  invalid: 'ungï¿½ltig',
+  'invalid: {{reason}}': 'ungï¿½ltig: {{reason}}',
   'missing name': 'Name fehlt',
   'missing description': 'Beschreibung fehlt',
   '(unnamed)': '(unbenannt)',
@@ -1209,33 +1209,33 @@ export default {
     'Warnung: Dieses Werkzeug kann nicht vom LLM aufgerufen werden',
   Reason: 'Grund',
   'Tools must have both name and description to be used by the LLM.':
-    'Werkzeuge müssen sowohl einen Namen als auch eine Beschreibung haben, um vom LLM verwendet zu werden.',
-  'Modify in progress:': 'Änderung in Bearbeitung:',
+    'Werkzeuge mï¿½ssen sowohl einen Namen als auch eine Beschreibung haben, um vom LLM verwendet zu werden.',
+  'Modify in progress:': 'ï¿½nderung in Bearbeitung:',
   'Save and close external editor to continue':
-    'Speichern und externen Editor schließen, um fortzufahren',
-  'Apply this change?': 'Diese Änderung anwenden?',
+    'Speichern und externen Editor schlieï¿½en, um fortzufahren',
+  'Apply this change?': 'Diese ï¿½nderung anwenden?',
   'Yes, allow always': 'Ja, immer erlauben',
   'Modify with external editor': 'Mit externem Editor bearbeiten',
-  'No, suggest changes (esc)': 'Nein, Änderungen vorschlagen (Esc)',
+  'No, suggest changes (esc)': 'Nein, ï¿½nderungen vorschlagen (Esc)',
   "Allow execution of: '{{command}}'?":
-    "Ausführung erlauben von: '{{command}}'?",
+    "Ausfï¿½hrung erlauben von: '{{command}}'?",
   'Yes, allow always ...': 'Ja, immer erlauben ...',
   'Always allow in this project': 'In diesem Projekt immer erlauben',
   'Always allow {{action}} in this project':
     '{{action}} in diesem Projekt immer erlauben',
-  'Always allow for this user': 'Für diesen Benutzer immer erlauben',
+  'Always allow for this user': 'Fï¿½r diesen Benutzer immer erlauben',
   'Always allow {{action}} for this user':
-    '{{action}} für diesen Benutzer immer erlauben',
+    '{{action}} fï¿½r diesen Benutzer immer erlauben',
   'Yes, restore previous mode ({{mode}})':
     'Ja, vorherigen Modus wiederherstellen ({{mode}})',
-  'Yes, and auto-accept edits': 'Ja, und Änderungen automatisch akzeptieren',
-  'Yes, and manually approve edits': 'Ja, und Änderungen manuell genehmigen',
+  'Yes, and auto-accept edits': 'Ja, und ï¿½nderungen automatisch akzeptieren',
+  'Yes, and manually approve edits': 'Ja, und ï¿½nderungen manuell genehmigen',
   'No, keep planning (esc)': 'Nein, weiter planen (Esc)',
   'URLs to fetch:': 'Abzurufende URLs:',
   'MCP Server: {{server}}': 'MCP-Server: {{server}}',
   'Tool: {{tool}}': 'Werkzeug: {{tool}}',
   'Allow execution of MCP tool "{{tool}}" from server "{{server}}"?':
-    'Ausführung des MCP-Werkzeugs "{{tool}}" von Server "{{server}}" erlauben?',
+    'Ausfï¿½hrung des MCP-Werkzeugs "{{tool}}" von Server "{{server}}" erlauben?',
   'Yes, always allow tool "{{tool}}" from server "{{server}}"':
     'Ja, Werkzeug "{{tool}}" von Server "{{server}}" immer erlauben',
   'Yes, always allow all tools from server "{{server}}"':
@@ -1244,17 +1244,17 @@ export default {
   // ============================================================================
   // Dialogs - Shell Confirmation
   // ============================================================================
-  'Shell Command Execution': 'Shell-Befehlsausführung',
+  'Shell Command Execution': 'Shell-Befehlsausfï¿½hrung',
   'A custom command wants to run the following shell commands:':
-    'Ein benutzerdefinierter Befehl möchte folgende Shell-Befehle ausführen:',
+    'Ein benutzerdefinierter Befehl mï¿½chte folgende Shell-Befehle ausfï¿½hren:',
 
   // ============================================================================
   // Dialogs - Pro Quota
   // ============================================================================
   'Pro quota limit reached for {{model}}.':
-    'Pro-Kontingentlimit für {{model}} erreicht.',
+    'Pro-Kontingentlimit fï¿½r {{model}} erreicht.',
   'Change auth (executes the /auth command)':
-    'Authentifizierung ändern (führt den /auth-Befehl aus)',
+    'Authentifizierung ï¿½ndern (fï¿½hrt den /auth-Befehl aus)',
   'Continue with {{model}}': 'Mit {{model}} fortfahren',
 
   // ============================================================================
@@ -1265,80 +1265,80 @@ export default {
     'Fortschritt: {{done}}/{{total}} Aufgaben abgeschlossen',
   ', {{inProgress}} in progress': ', {{inProgress}} in Bearbeitung',
   'Pending Tasks:': 'Ausstehende Aufgaben:',
-  'What would you like to do?': 'Was möchten Sie tun?',
+  'What would you like to do?': 'Was mï¿½chten Sie tun?',
   'Choose how to proceed with your session:':
-    'Wählen Sie, wie Sie mit Ihrer Sitzung fortfahren möchten:',
+    'Wï¿½hlen Sie, wie Sie mit Ihrer Sitzung fortfahren mï¿½chten:',
   'Start new chat session': 'Neue Chat-Sitzung starten',
-  'Continue previous conversation': 'Vorheriges Gespräch fortsetzen',
+  'Continue previous conversation': 'Vorheriges Gesprï¿½ch fortsetzen',
   '?? Welcome back! (Last updated: {{timeAgo}})':
-    '?? Willkommen zurück! (Zuletzt aktualisiert: {{timeAgo}})',
+    '?? Willkommen zurï¿½ck! (Zuletzt aktualisiert: {{timeAgo}})',
   '?? Overall Goal:': '?? Gesamtziel:',
 
   // ============================================================================
   // Dialogs - Auth
   // ============================================================================
   'Get started': 'Loslegen',
-  'Select Authentication Method': 'Authentifizierungsmethode auswählen',
+  'Select Authentication Method': 'Authentifizierungsmethode auswï¿½hlen',
   'OpenAI API key is required to use OpenAI authentication.':
-    'OpenAI API-Schlüssel ist für die OpenAI-Authentifizierung erforderlich.',
+    'OpenAI API-Schlï¿½ssel ist fï¿½r die OpenAI-Authentifizierung erforderlich.',
   'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    'Sie müssen eine Authentifizierungsmethode wählen, um fortzufahren. Drücken Sie erneut Strg+C zum Beenden.',
+    'Sie mï¿½ssen eine Authentifizierungsmethode wï¿½hlen, um fortzufahren. Drï¿½cken Sie erneut Strg+C zum Beenden.',
   'Terms of Services and Privacy Notice':
     'Nutzungsbedingungen und Datenschutzhinweis',
-  'Qwen OAuth': 'Qwen OAuth',
-  'Discontinued — switch to Coding Plan or API Key':
-    'Eingestellt — wechseln Sie zu Coding Plan oder API Key',
+  'Qwen OAuth': 'Legacy OAuth',
+  'Discontinued ï¿½ switch to Coding Plan or API Key':
+    'Eingestellt ï¿½ wechseln Sie zu Coding Plan oder API Key',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.':
-    'Das kostenlose Qwen OAuth-Kontingent wurde am 2026-04-15 eingestellt. Führen Sie /auth aus, um den Anbieter zu wechseln.',
+    'Das kostenlose Legacy OAuth-Kontingent wurde am 2026-04-15 eingestellt. Fï¿½hren Sie /auth aus, um den Anbieter zu wechseln.',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Das kostenlose Qwen OAuth-Kontingent wurde am 2026-04-15 eingestellt. Bitte wählen Sie Coding Plan oder API Key.',
+    'Das kostenlose Legacy OAuth-Kontingent wurde am 2026-04-15 eingestellt. Bitte wï¿½hlen Sie Coding Plan oder API Key.',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Das kostenlose Qwen OAuth-Angebot wurde am 2026-04-15 eingestellt. Bitte wählen Sie ein Modell eines anderen Anbieter oder führen Sie /auth aus, um zu wechseln.',
+    'Das kostenlose Legacy OAuth-Angebot wurde am 2026-04-15 eingestellt. Bitte wï¿½hlen Sie ein Modell eines anderen Anbieter oder fï¿½hren Sie /auth aus, um zu wechseln.',
   '\n? Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n? Das kostenlose Qwen OAuth-Kontingent wurde am 2026-04-15 eingestellt. Bitte wählen Sie eine andere Option.\n',
+    '\n? Das kostenlose Legacy OAuth-Kontingent wurde am 2026-04-15 eingestellt. Bitte wï¿½hlen Sie eine andere Option.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     'Kostenpflichtig \u00B7 Bis zu 6.000 Anfragen/5 Std. \u00B7 Alle Alibaba Cloud Coding Plan Modelle',
   'Alibaba Cloud Coding Plan': 'Alibaba Cloud Coding Plan',
-  'Bring your own API key': 'Eigenen API-Schlüssel verwenden',
+  'Bring your own API key': 'Eigenen API-Schlï¿½ssel verwenden',
   'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)':
     'Browserbasierte Authentifizierung mit externen Anbietern (z. B. OpenRouter, ModelScope)',
   'API-KEY': 'API-KEY',
   'Use coding plan credentials or your own api-keys/providers.':
-    'Verwenden Sie Coding Plan-Anmeldedaten oder Ihre eigenen API-Schlüssel/Anbieter.',
+    'Verwenden Sie Coding Plan-Anmeldedaten oder Ihre eigenen API-Schlï¿½ssel/Anbieter.',
   OpenAI: 'OpenAI',
   'Failed to login. Message: {{message}}':
     'Anmeldung fehlgeschlagen. Meldung: {{message}}',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     'Authentifizierung ist auf {{enforcedType}} festgelegt, aber Sie verwenden derzeit {{currentType}}.',
   'Qwen OAuth authentication timed out. Please try again.':
-    'Qwen OAuth-Authentifizierung abgelaufen. Bitte versuchen Sie es erneut.',
+    'Legacy OAuth-Authentifizierung abgelaufen. Bitte versuchen Sie es erneut.',
   'Qwen OAuth authentication cancelled.':
-    'Qwen OAuth-Authentifizierung abgebrochen.',
-  'Qwen OAuth Authentication': 'Qwen OAuth-Authentifizierung',
+    'Legacy OAuth-Authentifizierung abgebrochen.',
+  'Qwen OAuth Authentication': 'Legacy OAuth-Authentifizierung',
   'Please visit this URL to authorize:':
     'Bitte besuchen Sie diese URL zur Autorisierung:',
   'Or scan the QR code below:': 'Oder scannen Sie den QR-Code unten:',
   'Waiting for authorization': 'Warten auf Autorisierung',
   'Time remaining:': 'Verbleibende Zeit:',
-  '(Press ESC or CTRL+C to cancel)': '(ESC oder STRG+C zum Abbrechen drücken)',
+  '(Press ESC or CTRL+C to cancel)': '(ESC oder STRG+C zum Abbrechen drï¿½cken)',
   'Qwen OAuth Authentication Timeout':
-    'Qwen OAuth-Authentifizierung abgelaufen',
+    'Legacy OAuth-Authentifizierung abgelaufen',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
-    'OAuth-Token abgelaufen (über {{seconds}} Sekunden). Bitte wählen Sie erneut eine Authentifizierungsmethode.',
+    'OAuth-Token abgelaufen (ï¿½ber {{seconds}} Sekunden). Bitte wï¿½hlen Sie erneut eine Authentifizierungsmethode.',
   'Press any key to return to authentication type selection.':
-    'Drücken Sie eine beliebige Taste, um zur Authentifizierungstypauswahl zurückzukehren.',
+    'Drï¿½cken Sie eine beliebige Taste, um zur Authentifizierungstypauswahl zurï¿½ckzukehren.',
   'Waiting for Qwen OAuth authentication...':
-    'Warten auf Qwen OAuth-Authentifizierung...',
+    'Warten auf Legacy OAuth-Authentifizierung...',
   'Note: Your existing API key in settings.json will not be cleared when using Qwen OAuth. You can switch back to OpenAI authentication later if needed.':
-    'Hinweis: Ihr bestehender API-Schlüssel in settings.json wird bei Verwendung von Qwen OAuth nicht gelöscht. Sie können später bei Bedarf zur OpenAI-Authentifizierung zurückwechseln.',
+    'Hinweis: Ihr bestehender API-Schlï¿½ssel in settings.json wird bei Verwendung von Legacy OAuth nicht gelï¿½scht. Sie kï¿½nnen spï¿½ter bei Bedarf zur OpenAI-Authentifizierung zurï¿½ckwechseln.',
   'Note: Your existing API key will not be cleared when using Qwen OAuth.':
-    'Hinweis: Ihr bestehender API-Schlüssel wird bei Verwendung von Qwen OAuth nicht gelöscht.',
+    'Hinweis: Ihr bestehender API-Schlï¿½ssel wird bei Verwendung von Legacy OAuth nicht gelï¿½scht.',
   'Authentication timed out. Please try again.':
     'Authentifizierung abgelaufen. Bitte versuchen Sie es erneut.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
-    'Warten auf Authentifizierung... (ESC oder STRG+C zum Abbrechen drücken)',
+    'Warten auf Authentifizierung... (ESC oder STRG+C zum Abbrechen drï¿½cken)',
   'Missing API key for OpenAI-compatible auth. Set settings.security.auth.apiKey, or set the {{envKeyHint}} environment variable.':
-    'API-Schlüssel für OpenAI-kompatible Authentifizierung fehlt. Setzen Sie settings.security.auth.apiKey oder die Umgebungsvariable {{envKeyHint}}.',
+    'API-Schlï¿½ssel fï¿½r OpenAI-kompatible Authentifizierung fehlt. Setzen Sie settings.security.auth.apiKey oder die Umgebungsvariable {{envKeyHint}}.',
   '{{envKeyHint}} environment variable not found.':
     'Umgebungsvariable {{envKeyHint}} wurde nicht gefunden.',
   '{{envKeyHint}} environment variable not found. Please set it in your .env file or environment variables.':
@@ -1346,25 +1346,25 @@ export default {
   '{{envKeyHint}} environment variable not found (or set settings.security.auth.apiKey). Please set it in your .env file or environment variables.':
     'Umgebungsvariable {{envKeyHint}} wurde nicht gefunden (oder setzen Sie settings.security.auth.apiKey). Bitte legen Sie sie in Ihrer .env-Datei oder den Systemumgebungsvariablen fest.',
   'Missing API key for OpenAI-compatible auth. Set the {{envKeyHint}} environment variable.':
-    'API-Schlüssel für OpenAI-kompatible Authentifizierung fehlt. Setzen Sie die Umgebungsvariable {{envKeyHint}}.',
+    'API-Schlï¿½ssel fï¿½r OpenAI-kompatible Authentifizierung fehlt. Setzen Sie die Umgebungsvariable {{envKeyHint}}.',
   'Anthropic provider missing required baseUrl in modelProviders[].baseUrl.':
     'Anthropic-Anbieter fehlt erforderliche baseUrl in modelProviders[].baseUrl.',
   'ANTHROPIC_BASE_URL environment variable not found.':
     'Umgebungsvariable ANTHROPIC_BASE_URL wurde nicht gefunden.',
   'Invalid auth method selected.':
-    'Ungültige Authentifizierungsmethode ausgewählt.',
+    'Ungï¿½ltige Authentifizierungsmethode ausgewï¿½hlt.',
   'Failed to authenticate. Message: {{message}}':
     'Authentifizierung fehlgeschlagen. Meldung: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     'Erfolgreich mit {{authType}}-Anmeldedaten authentifiziert.',
   'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    'Ungültiger HOPCODE_DEFAULT_AUTH_TYPE-Wert: "{{value}}". Gültige Werte sind: {{validValues}}',
+    'Ungï¿½ltiger HOPCODE_DEFAULT_AUTH_TYPE-Wert: "{{value}}". Gï¿½ltige Werte sind: {{validValues}}',
   'OpenAI Configuration Required': 'OpenAI-Konfiguration erforderlich',
   'Please enter your OpenAI configuration. You can get an API key from':
-    'Bitte geben Sie Ihre OpenAI-Konfiguration ein. Sie können einen API-Schlüssel erhalten von',
-  'API Key:': 'API-Schlüssel:',
+    'Bitte geben Sie Ihre OpenAI-Konfiguration ein. Sie kï¿½nnen einen API-Schlï¿½ssel erhalten von',
+  'API Key:': 'API-Schlï¿½ssel:',
   'Invalid credentials: {{errorMessage}}':
-    'Ungültige Anmeldedaten: {{errorMessage}}',
+    'Ungï¿½ltige Anmeldedaten: {{errorMessage}}',
   'Failed to validate credentials':
     'Anmeldedaten konnten nicht validiert werden',
   'Press Enter to continue, Tab/?? to navigate, Esc to cancel':
@@ -1373,16 +1373,16 @@ export default {
   // ============================================================================
   // Dialogs - Model
   // ============================================================================
-  'Select Model': 'Modell auswählen',
-  '(Press Esc to close)': '(Esc zum Schließen drücken)',
+  'Select Model': 'Modell auswï¿½hlen',
+  '(Press Esc to close)': '(Esc zum Schlieï¿½en drï¿½cken)',
   'Current (effective) configuration': 'Aktuelle (wirksame) Konfiguration',
   AuthType: 'Authentifizierungstyp',
-  'API Key': 'API-Schlüssel',
+  'API Key': 'API-Schlï¿½ssel',
   unset: 'nicht gesetzt',
   '(default)': '(Standard)',
   '(set)': '(gesetzt)',
   '(not set)': '(nicht gesetzt)',
-  Modality: 'Modalität',
+  Modality: 'Modalitï¿½t',
   'Context Window': 'Kontextfenster',
   text: 'Text',
   'text-only': 'nur Text',
@@ -1395,8 +1395,8 @@ export default {
   unknown: 'unbekannt',
   "Failed to switch model to '{{modelId}}'.\n\n{{error}}":
     "Modell konnte nicht auf '{{modelId}}' umgestellt werden.\n\n{{error}}",
-  'Qwen 3.6 Plus — efficient hybrid model with leading coding performance':
-    'Qwen 3.6 Plus — effizientes Hybridmodell mit führender Programmierleistung',
+  'Qwen 3.6 Plus ï¿½ efficient hybrid model with leading coding performance':
+    'Qwen 3.6 Plus ï¿½ effizientes Hybridmodell mit fï¿½hrender Programmierleistung',
   'The latest Qwen Vision model from Alibaba Cloud ModelStudio (version: qwen3-vl-plus-2025-09-23)':
     'Das neueste Qwen Vision Modell von Alibaba Cloud ModelStudio (Version: qwen3-vl-plus-2025-09-23)',
 
@@ -1416,7 +1416,7 @@ export default {
   'HopCode is not allowed to use denied tools.':
     'HopCode darf verweigerte Tools nicht verwenden.',
   'Manage trusted directories for this workspace.':
-    'Vertrauenswürdige Verzeichnisse für diesen Arbeitsbereich verwalten.',
+    'Vertrauenswï¿½rdige Verzeichnisse fï¿½r diesen Arbeitsbereich verwalten.',
   'Any use of the {{tool}} tool': 'Jede Verwendung des {{tool}}-Tools',
   "{{tool}} commands matching '{{pattern}}'":
     "{{tool}}-Befehle, die '{{pattern}}' entsprechen",
@@ -1432,42 +1432,42 @@ export default {
   'User settings': 'Benutzereinstellungen',
   'Saved in at ~/.hopcode/settings.json':
     'Gespeichert in ~/.hopcode/settings.json',
-  'Add a new rule…': 'Neue Regel hinzufügen…',
-  'Add {{type}} permission rule': '{{type}}-Berechtigungsregel hinzufügen',
+  'Add a new ruleï¿½': 'Neue Regel hinzufï¿½genï¿½',
+  'Add {{type}} permission rule': '{{type}}-Berechtigungsregel hinzufï¿½gen',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
     'Berechtigungsregeln sind ein Toolname, optional gefolgt von einem Bezeichner in Klammern.',
   'e.g.,': 'z.B.',
   or: 'oder',
-  'Enter permission rule…': 'Berechtigungsregel eingeben…',
-  'Enter to submit · Esc to cancel': 'Enter zum Absenden · Esc zum Abbrechen',
+  'Enter permission ruleï¿½': 'Berechtigungsregel eingebenï¿½',
+  'Enter to submit ï¿½ Esc to cancel': 'Enter zum Absenden ï¿½ Esc zum Abbrechen',
   'Where should this rule be saved?': 'Wo soll diese Regel gespeichert werden?',
-  'Enter to confirm · Esc to cancel':
-    'Enter zum Bestätigen · Esc zum Abbrechen',
-  'Delete {{type}} rule?': '{{type}}-Regel löschen?',
+  'Enter to confirm ï¿½ Esc to cancel':
+    'Enter zum Bestï¿½tigen ï¿½ Esc zum Abbrechen',
+  'Delete {{type}} rule?': '{{type}}-Regel lï¿½schen?',
   'Are you sure you want to delete this permission rule?':
-    'Sind Sie sicher, dass Sie diese Berechtigungsregel löschen möchten?',
+    'Sind Sie sicher, dass Sie diese Berechtigungsregel lï¿½schen mï¿½chten?',
   'Permissions:': 'Berechtigungen:',
   '(?/? or tab to cycle)': '(?/? oder Tab zum Wechseln)',
-  'Press ?? to navigate · Enter to select · Type to search · Esc to cancel':
-    '?? navigieren · Enter auswählen · Tippen suchen · Esc abbrechen',
-  'Search…': 'Suche…',
+  'Press ?? to navigate ï¿½ Enter to select ï¿½ Type to search ï¿½ Esc to cancel':
+    '?? navigieren ï¿½ Enter auswï¿½hlen ï¿½ Tippen suchen ï¿½ Esc abbrechen',
+  'Searchï¿½': 'Sucheï¿½',
   'Use /trust to manage folder trust settings for this workspace.':
-    'Verwenden Sie /trust, um die Ordnervertrauenseinstellungen für diesen Arbeitsbereich zu verwalten.',
+    'Verwenden Sie /trust, um die Ordnervertrauenseinstellungen fï¿½r diesen Arbeitsbereich zu verwalten.',
   // Workspace directory management
-  'Add directory…': 'Verzeichnis hinzufügen…',
-  'Add directory to workspace': 'Verzeichnis zum Arbeitsbereich hinzufügen',
+  'Add directoryï¿½': 'Verzeichnis hinzufï¿½genï¿½',
+  'Add directory to workspace': 'Verzeichnis zum Arbeitsbereich hinzufï¿½gen',
   'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
     'HopCode kann Dateien im Arbeitsbereich lesen und Bearbeitungen vornehmen, wenn die automatische Akzeptierung aktiviert ist.',
   'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
     'HopCode kann Dateien in diesem Verzeichnis lesen und Bearbeitungen vornehmen, wenn die automatische Akzeptierung aktiviert ist.',
   'Enter the path to the directory:': 'Pfad zum Verzeichnis eingeben:',
-  'Enter directory path…': 'Verzeichnispfad eingeben…',
-  'Tab to complete · Enter to add · Esc to cancel':
-    'Tab zum Vervollständigen · Enter zum Hinzufügen · Esc zum Abbrechen',
+  'Enter directory pathï¿½': 'Verzeichnispfad eingebenï¿½',
+  'Tab to complete ï¿½ Enter to add ï¿½ Esc to cancel':
+    'Tab zum Vervollstï¿½ndigen ï¿½ Enter zum Hinzufï¿½gen ï¿½ Esc zum Abbrechen',
   'Remove directory?': 'Verzeichnis entfernen?',
   'Are you sure you want to remove this directory from the workspace?':
-    'Möchten Sie dieses Verzeichnis wirklich aus dem Arbeitsbereich entfernen?',
-  '  (Original working directory)': '  (Ursprüngliches Arbeitsverzeichnis)',
+    'Mï¿½chten Sie dieses Verzeichnis wirklich aus dem Arbeitsbereich entfernen?',
+  '  (Original working directory)': '  (Ursprï¿½ngliches Arbeitsverzeichnis)',
   '  (from settings)': '  (aus Einstellungen)',
   'Directory does not exist.': 'Verzeichnis existiert nicht.',
   'Path is not a directory.': 'Pfad ist kein Verzeichnis.',
@@ -1480,8 +1480,8 @@ export default {
   // Status Bar
   // ============================================================================
   'Using:': 'Verwendet:',
-  '{{count}} open file': '{{count}} geöffnete Datei',
-  '{{count}} open files': '{{count}} geöffnete Dateien',
+  '{{count}} open file': '{{count}} geï¿½ffnete Datei',
+  '{{count}} open files': '{{count}} geï¿½ffnete Dateien',
   '(ctrl+g to view)': '(Strg+G zum Anzeigen)',
   '{{count}} {{name}} file': '{{count}} {{name}}-Datei',
   '{{count}} {{name}} files': '{{count}} {{name}}-Dateien',
@@ -1490,11 +1490,11 @@ export default {
   '{{count}} Blocked': '{{count}} blockiert',
   '(ctrl+t to view)': '(Strg+T zum Anzeigen)',
   '(ctrl+t to toggle)': '(Strg+T zum Umschalten)',
-  'Press Ctrl+C again to exit.': 'Drücken Sie erneut Strg+C zum Beenden.',
-  'Press Ctrl+D again to exit.': 'Drücken Sie erneut Strg+D zum Beenden.',
-  'Press Esc again to clear.': 'Drücken Sie erneut Esc zum Löschen.',
+  'Press Ctrl+C again to exit.': 'Drï¿½cken Sie erneut Strg+C zum Beenden.',
+  'Press Ctrl+D again to exit.': 'Drï¿½cken Sie erneut Strg+D zum Beenden.',
+  'Press Esc again to clear.': 'Drï¿½cken Sie erneut Esc zum Lï¿½schen.',
   'Press ? to edit queued messages':
-    'Drücken Sie ?, um Nachrichten in der Warteschlange zu bearbeiten',
+    'Drï¿½cken Sie ?, um Nachrichten in der Warteschlange zu bearbeiten',
 
   // ============================================================================
   // MCP Status
@@ -1503,11 +1503,11 @@ export default {
   '? MCP servers are starting up ({{count}} initializing)...':
     '? MCP-Server werden gestartet ({{count}} werden initialisiert)...',
   'Note: First startup may take longer. Tool availability will update automatically.':
-    'Hinweis: Der erste Start kann länger dauern. Werkzeugverfügbarkeit wird automatisch aktualisiert.',
+    'Hinweis: Der erste Start kann lï¿½nger dauern. Werkzeugverfï¿½gbarkeit wird automatisch aktualisiert.',
   'Configured MCP servers:': 'Konfigurierte MCP-Server:',
   Ready: 'Bereit',
   'Starting... (first startup may take longer)':
-    'Wird gestartet... (erster Start kann länger dauern)',
+    'Wird gestartet... (erster Start kann lï¿½nger dauern)',
   Disconnected: 'Getrennt',
   '{{count}} tool': '{{count}} Werkzeug',
   '{{count}} tools': '{{count}} Werkzeuge',
@@ -1531,12 +1531,12 @@ export default {
   'to show tool parameter schemas': 'um Werkzeug-Parameter-Schemas anzuzeigen',
   'to hide descriptions': 'um Beschreibungen auszublenden',
   'to authenticate with OAuth-enabled servers':
-    'um sich bei OAuth-fähigen Servern zu authentifizieren',
-  Press: 'Drücken Sie',
+    'um sich bei OAuth-fï¿½higen Servern zu authentifizieren',
+  Press: 'Drï¿½cken Sie',
   'to toggle tool descriptions on/off':
     'um Werkzeugbeschreibungen ein-/auszuschalten',
   "Starting OAuth authentication for MCP server '{{name}}'...":
-    "OAuth-Authentifizierung für MCP-Server '{{name}}' wird gestartet...",
+    "OAuth-Authentifizierung fï¿½r MCP-Server '{{name}}' wird gestartet...",
   'Restarting MCP servers...': 'MCP-Server werden neu gestartet...',
 
   // ============================================================================
@@ -1544,12 +1544,12 @@ export default {
   // ============================================================================
   'Tips for getting started:': 'Tipps zum Einstieg:',
   '1. Ask questions, edit files, or run commands.':
-    '1. Stellen Sie Fragen, bearbeiten Sie Dateien oder führen Sie Befehle aus.',
+    '1. Stellen Sie Fragen, bearbeiten Sie Dateien oder fï¿½hren Sie Befehle aus.',
   '2. Be specific for the best results.':
-    '2. Seien Sie spezifisch für die besten Ergebnisse.',
+    '2. Seien Sie spezifisch fï¿½r die besten Ergebnisse.',
   'files to customize your interactions with HopCode.':
     'Dateien, um Ihre Interaktionen mit HopCode anzupassen.',
-  'for more information.': 'für weitere Informationen.',
+  'for more information.': 'fï¿½r weitere Informationen.',
 
   // ============================================================================
   // Exit Screen / Stats
@@ -1557,14 +1557,14 @@ export default {
   'Agent powering down. Goodbye!':
     'Agent wird heruntergefahren. Auf Wiedersehen!',
   'To continue this session, run':
-    'Um diese Sitzung fortzusetzen, führen Sie aus',
+    'Um diese Sitzung fortzusetzen, fï¿½hren Sie aus',
   'Interaction Summary': 'Interaktionszusammenfassung',
   'Session ID:': 'Sitzungs-ID:',
   'Tool Calls:': 'Werkzeugaufrufe:',
   'Success Rate:': 'Erfolgsrate:',
   'User Agreement:': 'Benutzerzustimmung:',
-  reviewed: 'überprüft',
-  'Code Changes:': 'Codeänderungen:',
+  reviewed: 'ï¿½berprï¿½ft',
+  'Code Changes:': 'Codeï¿½nderungen:',
   Performance: 'Leistung',
   'Wall Time:': 'Gesamtzeit:',
   'Agent Active:': 'Agent aktiv:',
@@ -1579,9 +1579,9 @@ export default {
   'of input tokens were served from the cache, reducing costs.':
     'der Eingabe-Token wurden aus dem Cache bedient, was die Kosten reduziert.',
   'Tip: For a full token breakdown, run `/stats model`.':
-    'Tipp: Für eine vollständige Token-Aufschlüsselung führen Sie `/stats model` aus.',
-  'Model Stats For Nerds': 'Modellstatistiken für Nerds',
-  'Tool Stats For Nerds': 'Werkzeugstatistiken für Nerds',
+    'Tipp: Fï¿½r eine vollstï¿½ndige Token-Aufschlï¿½sselung fï¿½hren Sie `/stats model` aus.',
+  'Model Stats For Nerds': 'Modellstatistiken fï¿½r Nerds',
+  'Tool Stats For Nerds': 'Werkzeugstatistiken fï¿½r Nerds',
   Metric: 'Metrik',
   API: 'API',
   Requests: 'Anfragen',
@@ -1601,15 +1601,15 @@ export default {
   'Success Rate': 'Erfolgsrate',
   'Avg Duration': 'Durchschn. Dauer',
   'User Decision Summary': 'Benutzerentscheidungs-Zusammenfassung',
-  'Total Reviewed Suggestions:': 'Insgesamt überprüfter Vorschläge:',
-  ' » Accepted:': ' » Akzeptiert:',
-  ' » Rejected:': ' » Abgelehnt:',
-  ' » Modified:': ' » Geändert:',
+  'Total Reviewed Suggestions:': 'Insgesamt ï¿½berprï¿½fter Vorschlï¿½ge:',
+  ' ï¿½ Accepted:': ' ï¿½ Akzeptiert:',
+  ' ï¿½ Rejected:': ' ï¿½ Abgelehnt:',
+  ' ï¿½ Modified:': ' ï¿½ Geï¿½ndert:',
   ' Overall Agreement Rate:': ' Gesamtzustimmungsrate:',
   'No tool calls have been made in this session.':
     'In dieser Sitzung wurden keine Werkzeugaufrufe gemacht.',
   'Session start time is unavailable, cannot calculate stats.':
-    'Sitzungsstartzeit nicht verfügbar, Statistiken können nicht berechnet werden.',
+    'Sitzungsstartzeit nicht verfï¿½gbar, Statistiken kï¿½nnen nicht berechnet werden.',
 
   // ============================================================================
   // Command Format Migration
@@ -1621,35 +1621,35 @@ export default {
   'Current tasks': 'Aktuelle Aufgaben',
   '... and {{count}} more': '... und {{count}} weitere',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
-    'Das TOML-Format ist veraltet. Möchten Sie sie ins Markdown-Format migrieren?',
+    'Das TOML-Format ist veraltet. Mï¿½chten Sie sie ins Markdown-Format migrieren?',
   '(Backups will be created and original files will be preserved)':
     '(Backups werden erstellt und Originaldateien werden beibehalten)',
 
   // ============================================================================
   // Loading Phrases
   // ============================================================================
-  'Waiting for user confirmation...': 'Warten auf Benutzerbestätigung...',
+  'Waiting for user confirmation...': 'Warten auf Benutzerbestï¿½tigung...',
   '(esc to cancel, {{time}})': '(Esc zum Abbrechen, {{time}})',
 
   // ============================================================================
   // Loading Phrases
   // ============================================================================
   WITTY_LOADING_PHRASES: [
-    'Auf gut Glück!',
-    'Genialität wird ausgeliefert...',
+    'Auf gut Glï¿½ck!',
+    'Genialitï¿½t wird ausgeliefert...',
     'Die Serifen werden aufgemalt...',
     'Durch den Schleimpilz navigieren...',
     'Die digitalen Geister werden befragt...',
     'Splines werden retikuliert...',
-    'Die KI-Hamster werden aufgewärmt...',
+    'Die KI-Hamster werden aufgewï¿½rmt...',
     'Die Zaubermuschel wird befragt...',
     'Witzige Erwiderung wird generiert...',
     'Die Algorithmen werden poliert...',
     'Perfektion braucht Zeit (mein Code auch)...',
-    'Frische Bytes werden gebrüht...',
-    'Elektronen werden gezählt...',
+    'Frische Bytes werden gebrï¿½ht...',
+    'Elektronen werden gezï¿½hlt...',
     'Kognitive Prozessoren werden aktiviert...',
-    'Auf Syntaxfehler im Universum wird geprüft...',
+    'Auf Syntaxfehler im Universum wird geprï¿½ft...',
     'Einen Moment, Humor wird optimiert...',
     'Pointen werden gemischt...',
     'Neuronale Netze werden entwirrt...',
@@ -1657,31 +1657,31 @@ export default {
     'wit.exe wird geladen...',
     'Die Wolke der Weisheit wird beschworen...',
     'Eine witzige Antwort wird vorbereitet...',
-    'Einen Moment, ich debugge die Realität...',
+    'Einen Moment, ich debugge die Realitï¿½t...',
     'Die Optionen werden verwirrt...',
     'Kosmische Frequenzen werden eingestellt...',
-    'Eine Antwort wird erstellt, die Ihrer Geduld würdig ist...',
+    'Eine Antwort wird erstellt, die Ihrer Geduld wï¿½rdig ist...',
     'Die Einsen und Nullen werden kompiliert...',
-    'Abhängigkeiten werden aufgelöst... und existenzielle Krisen...',
-    'Erinnerungen werden defragmentiert... sowohl RAM als auch persönliche...',
+    'Abhï¿½ngigkeiten werden aufgelï¿½st... und existenzielle Krisen...',
+    'Erinnerungen werden defragmentiert... sowohl RAM als auch persï¿½nliche...',
     'Das Humor-Modul wird neu gestartet...',
-    'Das Wesentliche wird zwischengespeichert (hauptsächlich Katzen-Memes)...',
-    'Für lächerliche Geschwindigkeit wird optimiert',
+    'Das Wesentliche wird zwischengespeichert (hauptsï¿½chlich Katzen-Memes)...',
+    'Fï¿½r lï¿½cherliche Geschwindigkeit wird optimiert',
     'Bits werden getauscht... sagen Sie es nicht den Bytes...',
-    'Garbage Collection läuft... bin gleich zurück...',
+    'Garbage Collection lï¿½uft... bin gleich zurï¿½ck...',
     'Das Internet wird zusammengebaut...',
     'Kaffee wird in Code umgewandelt...',
-    'Die Syntax der Realität wird aktualisiert...',
+    'Die Syntax der Realitï¿½t wird aktualisiert...',
     'Die Synapsen werden neu verdrahtet...',
     'Ein verlegtes Semikolon wird gesucht...',
-    'Die Zahnräder werden geschmiert...',
+    'Die Zahnrï¿½der werden geschmiert...',
     'Die Server werden vorgeheizt...',
     'Der Fluxkompensator wird kalibriert...',
     'Der Unwahrscheinlichkeitsantrieb wird aktiviert...',
     'Die Macht wird kanalisiert...',
-    'Die Sterne werden für optimale Antwort ausgerichtet...',
+    'Die Sterne werden fï¿½r optimale Antwort ausgerichtet...',
     'So sagen wir alle...',
-    'Die nächste große Idee wird geladen...',
+    'Die nï¿½chste groï¿½e Idee wird geladen...',
     'Einen Moment, ich bin in der Zone...',
     'Bereite mich vor, Sie mit Brillanz zu blenden...',
     'Einen Augenblick, ich poliere meinen Witz...',
@@ -1693,22 +1693,22 @@ export default {
     'Warp-Geschwindigkeit aktiviert...',
     'Mehr Dilithium-Kristalle werden gesucht...',
     'Keine Panik...',
-    'Dem weißen Kaninchen wird gefolgt...',
+    'Dem weiï¿½en Kaninchen wird gefolgt...',
     'Die Wahrheit ist hier drin... irgendwo...',
     'Auf die Kassette wird gepustet...',
     'Ladevorgang... Machen Sie eine Fassrolle!',
     'Auf den Respawn wird gewartet...',
     'Der Kessel-Flug wird in weniger als 12 Parsec beendet...',
-    'Der Kuchen ist keine Lüge, er lädt nur noch...',
+    'Der Kuchen ist keine Lï¿½ge, er lï¿½dt nur noch...',
     'Am Charaktererstellungsbildschirm wird herumgefummelt...',
     'Einen Moment, ich suche das richtige Meme...',
-    "'A' wird zum Fortfahren gedrückt...",
-    'Digitale Katzen werden gehütet...',
+    "'A' wird zum Fortfahren gedrï¿½ckt...",
+    'Digitale Katzen werden gehï¿½tet...',
     'Die Pixel werden poliert...',
     'Ein passender Ladebildschirm-Witz wird gesucht...',
     'Ich lenke Sie mit diesem witzigen Spruch ab...',
     'Fast da... wahrscheinlich...',
-    'Unsere Hamster arbeiten so schnell sie können...',
+    'Unsere Hamster arbeiten so schnell sie kï¿½nnen...',
     'Cloudy wird am Kopf gestreichelt...',
     'Die Katze wird gestreichelt...',
     'Meinen Chef rickrollen...',
@@ -1717,14 +1717,14 @@ export default {
     'Die Schnozbeeren werden probiert...',
     "I'm going the distance, I'm going for speed...",
     'Ist dies das wahre Leben? Ist dies nur Fantasie?...',
-    'Ich habe ein gutes Gefühl dabei...',
-    'Den Bären wird gestupst...',
+    'Ich habe ein gutes Gefï¿½hl dabei...',
+    'Den Bï¿½ren wird gestupst...',
     'Recherche zu den neuesten Memes...',
-    'Überlege, wie ich das witziger machen kann...',
+    'ï¿½berlege, wie ich das witziger machen kann...',
     'Hmmm... lassen Sie mich nachdenken...',
     'Wie nennt man einen Fisch ohne Augen? Ein Fsh...',
     'Warum ging der Computer zur Therapie? Er hatte zu viele Bytes...',
-    'Warum mögen Programmierer keine Natur? Sie hat zu viele Bugs...',
+    'Warum mï¿½gen Programmierer keine Natur? Sie hat zu viele Bugs...',
     'Warum bevorzugen Programmierer den Dunkelmodus? Weil Licht Bugs anzieht...',
     'Warum ging der Entwickler pleite? Er hat seinen ganzen Cache aufgebraucht...',
     'Was kann man mit einem kaputten Bleistift machen? Nichts, er ist sinnlos...',
@@ -1739,29 +1739,29 @@ export default {
     'Mein anderer Prozess ist eine TARDIS...',
     'Mit dem Maschinengeist wird kommuniziert...',
     'Die Gedanken marinieren lassen...',
-    'Gerade erinnert, wo ich meine Schlüssel hingelegt habe...',
-    'Über die Kugel wird nachgedacht...',
-    'Ich habe Dinge gesehen, die Sie nicht glauben würden... wie einen Benutzer, der Lademeldungen liest.',
+    'Gerade erinnert, wo ich meine Schlï¿½ssel hingelegt habe...',
+    'ï¿½ber die Kugel wird nachgedacht...',
+    'Ich habe Dinge gesehen, die Sie nicht glauben wï¿½rden... wie einen Benutzer, der Lademeldungen liest.',
     'Nachdenklicher Blick wird initiiert...',
     'Was ist der Lieblingssnack eines Computers? Mikrochips.',
     'Warum tragen Java-Entwickler Brillen? Weil sie nicht C#.',
     'Der Laser wird aufgeladen... pew pew!',
-    'Durch Null wird geteilt... nur Spaß!',
+    'Durch Null wird geteilt... nur Spaï¿½!',
     'Suche nach einem erwachsenen Aufseh... ich meine, Verarbeitung.',
     'Es piept und boopt.',
     'Pufferung... weil auch KIs einen Moment brauchen.',
-    'Quantenteilchen werden für schnellere Antwort verschränkt...',
+    'Quantenteilchen werden fï¿½r schnellere Antwort verschrï¿½nkt...',
     'Das Chrom wird poliert... an den Algorithmen.',
     'Sind Sie nicht unterhalten? (Arbeite daran!)',
-    'Die Code-Gremlins werden beschworen... zum Helfen, natürlich.',
+    'Die Code-Gremlins werden beschworen... zum Helfen, natï¿½rlich.',
     'Warte nur auf das Einwahlton-Ende...',
     'Das Humor-O-Meter wird neu kalibriert.',
     'Mein anderer Ladebildschirm ist noch lustiger.',
-    'Ziemlich sicher, dass irgendwo eine Katze über die Tastatur läuft...',
-    'Verbessern... Verbessern... Lädt noch.',
+    'Ziemlich sicher, dass irgendwo eine Katze ï¿½ber die Tastatur lï¿½uft...',
+    'Verbessern... Verbessern... Lï¿½dt noch.',
     'Das ist kein Bug, das ist ein Feature... dieses Ladebildschirms.',
     'Haben Sie versucht, es aus- und wieder einzuschalten? (Den Ladebildschirm, nicht mich.)',
-    'Zusätzliche Pylonen werden gebaut...',
+    'Zusï¿½tzliche Pylonen werden gebaut...',
   ],
 
   // ============================================================================
@@ -1770,7 +1770,7 @@ export default {
   'Enter value...': 'Wert eingeben...',
   'Enter sensitive value...': 'Sensiblen Wert eingeben...',
   'Press Enter to submit, Escape to cancel':
-    'Enter zum Absenden, Escape zum Abbrechen drücken',
+    'Enter zum Absenden, Escape zum Abbrechen drï¿½cken',
 
   // ============================================================================
   // Command Migration Tool
@@ -1782,11 +1782,11 @@ export default {
   'Found {{count}} command file(s) in TOML format:':
     '{{count}} Befehlsdatei(en) im TOML-Format gefunden:',
   'The TOML format for commands is being deprecated in favor of Markdown format.':
-    'Das TOML-Format für Befehle wird zugunsten des Markdown-Formats eingestellt.',
+    'Das TOML-Format fï¿½r Befehle wird zugunsten des Markdown-Formats eingestellt.',
   'Markdown format is more readable and easier to edit.':
     'Das Markdown-Format ist lesbarer und einfacher zu bearbeiten.',
   'You can migrate these files automatically using:':
-    'Sie können diese Dateien automatisch migrieren mit:',
+    'Sie kï¿½nnen diese Dateien automatisch migrieren mit:',
   'Or manually convert each file:': 'Oder jede Datei manuell konvertieren:',
   'TOML: prompt = "..." / description = "..."':
     'TOML: prompt = "..." / description = "..."',
@@ -1802,47 +1802,47 @@ export default {
   // ============================================================================
   // Extensions - Explore Command
   // ============================================================================
-  'Open extensions page in your browser': 'Erweiterungsseite im Browser öffnen',
+  'Open extensions page in your browser': 'Erweiterungsseite im Browser ï¿½ffnen',
   'Unknown extensions source: {{source}}.':
     'Unbekannte Erweiterungsquelle: {{source}}.',
   'Would open extensions page in your browser: {{url}} (skipped in test environment)':
-    'Würde Erweiterungsseite im Browser öffnen: {{url}} (übersprungen in Testumgebung)',
+    'Wï¿½rde Erweiterungsseite im Browser ï¿½ffnen: {{url}} (ï¿½bersprungen in Testumgebung)',
   'View available extensions at {{url}}':
-    'Verfügbare Erweiterungen ansehen unter {{url}}',
+    'Verfï¿½gbare Erweiterungen ansehen unter {{url}}',
   'Opening extensions page in your browser: {{url}}':
-    'Erweiterungsseite wird im Browser geöffnet: {{url}}',
+    'Erweiterungsseite wird im Browser geï¿½ffnet: {{url}}',
   'Failed to open browser. Check out the extensions gallery at {{url}}':
-    'Browser konnte nicht geöffnet werden. Besuchen Sie die Erweiterungsgalerie unter {{url}}',
+    'Browser konnte nicht geï¿½ffnet werden. Besuchen Sie die Erweiterungsgalerie unter {{url}}',
   'Use /compress when the conversation gets long to summarize history and free up context.':
     'Verwenden Sie /compress, wenn die Unterhaltung lang wird, um den Verlauf zusammenzufassen und Kontext freizugeben.',
   'Start a fresh idea with /clear or /new; the previous session stays available in history.':
-    'Starten Sie eine neue Idee mit /clear oder /new; die vorherige Sitzung bleibt im Verlauf verfügbar.',
+    'Starten Sie eine neue Idee mit /clear oder /new; die vorherige Sitzung bleibt im Verlauf verfï¿½gbar.',
   'Use /bug to submit issues to the maintainers when something goes off.':
     'Verwenden Sie /bug, um Probleme an die Betreuer zu melden, wenn etwas schiefgeht.',
   'Switch auth type quickly with /auth.':
     'Wechseln Sie den Authentifizierungstyp schnell mit /auth.',
   'You can run any shell commands from HopCode using ! (e.g. !ls).':
-    'Sie können beliebige Shell-Befehle in HopCode mit ! ausführen (z. B. !ls).',
+    'Sie kï¿½nnen beliebige Shell-Befehle in HopCode mit ! ausfï¿½hren (z. B. !ls).',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
-    'Geben Sie / ein, um das Befehlsmenü zu öffnen; Tab vervollständigt Slash-Befehle und gespeicherte Prompts.',
+    'Geben Sie / ein, um das Befehlsmenï¿½ zu ï¿½ffnen; Tab vervollstï¿½ndigt Slash-Befehle und gespeicherte Prompts.',
   'You can resume a previous conversation by running hopcode --continue or hopcode --resume.':
-    'Sie können eine frühere Unterhaltung mit hopcode --continue oder hopcode --resume fortsetzen.',
+    'Sie kï¿½nnen eine frï¿½here Unterhaltung mit hopcode --continue oder hopcode --resume fortsetzen.',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
-    'Sie können den Berechtigungsmodus schnell mit Shift+Tab oder /approval-mode wechseln.',
+    'Sie kï¿½nnen den Berechtigungsmodus schnell mit Shift+Tab oder /approval-mode wechseln.',
   'You can switch permission mode quickly with Tab or /approval-mode.':
-    'Sie können den Berechtigungsmodus schnell mit Tab oder /approval-mode wechseln.',
+    'Sie kï¿½nnen den Berechtigungsmodus schnell mit Tab oder /approval-mode wechseln.',
   'Try /insight to generate personalized insights from your chat history.':
     'Probieren Sie /insight, um personalisierte Erkenntnisse aus Ihrem Chatverlauf zu erstellen.',
-  'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
-    'Strg+O drücken, um den Kompaktmodus umzuschalten — Tool-Ausgabe und Denkprozess ausblenden.',
+  'Press Ctrl+O to toggle compact mode ï¿½ hide tool output and thinking for a cleaner view.':
+    'Strg+O drï¿½cken, um den Kompaktmodus umzuschalten ï¿½ Tool-Ausgabe und Denkprozess ausblenden.',
   'Add a HOPCODE.md file to give HopCode persistent project context.':
-    'Fügen Sie eine HOPCODE.md-Datei hinzu, um HopCode dauerhaften Projektkontext zu geben.',
+    'Fï¿½gen Sie eine HOPCODE.md-Datei hinzu, um HopCode dauerhaften Projektkontext zu geben.',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     'Verwenden Sie /btw, um eine kurze Nebenfrage zu stellen, ohne die Unterhaltung zu unterbrechen.',
   'Context is almost full! Run /compress now or start /new to continue.':
-    'Der Kontext ist fast voll! Führen Sie jetzt /compress aus oder starten Sie /new, um fortzufahren.',
+    'Der Kontext ist fast voll! Fï¿½hren Sie jetzt /compress aus oder starten Sie /new, um fortzufahren.',
   'Context is getting full. Use /compress to free up space.':
-    'Der Kontext füllt sich. Verwenden Sie /compress, um Platz freizugeben.',
+    'Der Kontext fï¿½llt sich. Verwenden Sie /compress, um Platz freizugeben.',
   'Long conversation? /compress summarizes history to free context.':
     'Lange Unterhaltung? /compress fasst den Verlauf zusammen, um Kontext freizugeben.',
 
@@ -1850,22 +1850,22 @@ export default {
   // Custom API Key Configuration
   // ============================================================================
   'You can configure your API key and models in settings.json':
-    'Sie können Ihren API-Schlüssel und Modelle in settings.json konfigurieren',
+    'Sie kï¿½nnen Ihren API-Schlï¿½ssel und Modelle in settings.json konfigurieren',
   'Refer to the documentation for setup instructions':
     'Einrichtungsanweisungen finden Sie in der Dokumentation',
 
   // ============================================================================
   // Coding Plan Authentication
   // ============================================================================
-  'API key cannot be empty.': 'API-Schlüssel darf nicht leer sein.',
+  'API key cannot be empty.': 'API-Schlï¿½ssel darf nicht leer sein.',
   'You can get your Coding Plan API key here':
-    'Sie können Ihren Coding-Plan-API-Schlüssel hier erhalten',
+    'Sie kï¿½nnen Ihren Coding-Plan-API-Schlï¿½ssel hier erhalten',
   'New model configurations are available for Alibaba Cloud Coding Plan. Update now?':
-    'Neue Modellkonfigurationen sind für Alibaba Cloud Coding Plan verfügbar. Jetzt aktualisieren?',
+    'Neue Modellkonfigurationen sind fï¿½r Alibaba Cloud Coding Plan verfï¿½gbar. Jetzt aktualisieren?',
   'Coding Plan configuration updated successfully. New models are now available.':
-    'Coding Plan-Konfiguration erfolgreich aktualisiert. Neue Modelle sind jetzt verfügbar.',
+    'Coding Plan-Konfiguration erfolgreich aktualisiert. Neue Modelle sind jetzt verfï¿½gbar.',
   'Coding Plan API key not found. Please re-authenticate with Coding Plan.':
-    'Coding Plan API-Schlüssel nicht gefunden. Bitte authentifizieren Sie sich erneut mit Coding Plan.',
+    'Coding Plan API-Schlï¿½ssel nicht gefunden. Bitte authentifizieren Sie sich erneut mit Coding Plan.',
   'Failed to update Coding Plan configuration: {{message}}':
     'Fehler beim Aktualisieren der Coding Plan-Konfiguration: {{message}}',
 
@@ -1874,30 +1874,30 @@ export default {
   // ============================================================================
   'Coding Plan': 'Coding Plan',
   "Paste your api key of ModelStudio Coding Plan and you're all set!":
-    'Fügen Sie Ihren ModelStudio Coding Plan API-Schlüssel ein und Sie sind bereit!',
+    'Fï¿½gen Sie Ihren ModelStudio Coding Plan API-Schlï¿½ssel ein und Sie sind bereit!',
   Custom: 'Benutzerdefiniert',
   'More instructions about configuring `modelProviders` manually.':
     'Weitere Anweisungen zur manuellen Konfiguration von `modelProviders`.',
   'Select API-KEY configuration mode:':
-    'API-KEY-Konfigurationsmodus auswählen:',
-  '(Press Escape to go back)': '(Escape drücken zum Zurückgehen)',
+    'API-KEY-Konfigurationsmodus auswï¿½hlen:',
+  '(Press Escape to go back)': '(Escape drï¿½cken zum Zurï¿½ckgehen)',
   '(Press Enter to submit, Escape to cancel)':
     '(Enter zum Absenden, Escape zum Abbrechen)',
   'More instructions please check:': 'Weitere Anweisungen finden Sie unter:',
-  'Select Region for Coding Plan': 'Region für Coding Plan auswählen',
+  'Select Region for Coding Plan': 'Region fï¿½r Coding Plan auswï¿½hlen',
   'Choose based on where your account is registered':
-    'Wählen Sie basierend auf dem Registrierungsort Ihres Kontos',
-  'Enter Coding Plan API Key': 'Coding-Plan-API-Schlüssel eingeben',
+    'Wï¿½hlen Sie basierend auf dem Registrierungsort Ihres Kontos',
+  'Enter Coding Plan API Key': 'Coding-Plan-API-Schlï¿½ssel eingeben',
 
   // ============================================================================
   // Coding Plan International Updates
   // ============================================================================
   'New model configurations are available for {{region}}. Update now?':
-    'Neue Modellkonfigurationen sind für {{region}} verfügbar. Jetzt aktualisieren?',
+    'Neue Modellkonfigurationen sind fï¿½r {{region}} verfï¿½gbar. Jetzt aktualisieren?',
   '{{region}} configuration updated successfully. Model switched to "{{model}}".':
     '{{region}}-Konfiguration erfolgreich aktualisiert. Modell auf "{{model}}" umgeschaltet.',
   'Authenticated successfully with {{region}}. API key and model configs saved to settings.json (backed up).':
-    'Erfolgreich mit {{region}} authentifiziert. API-Schlüssel und Modellkonfigurationen wurden in settings.json gespeichert (gesichert).',
+    'Erfolgreich mit {{region}} authentifiziert. API-Schlï¿½ssel und Modellkonfigurationen wurden in settings.json gespeichert (gesichert).',
 
   // ============================================================================
   // Context Usage Component
@@ -1906,12 +1906,12 @@ export default {
   '% used': '% verwendet',
   '% context used': '% Kontext verwendet',
   'Context exceeds limit! Use /compress or /clear to reduce.':
-    'Kontext überschreitet Limit! Verwenden Sie /compress oder /clear zum Reduzieren.',
+    'Kontext ï¿½berschreitet Limit! Verwenden Sie /compress oder /clear zum Reduzieren.',
   'Use /compress or /clear': 'Verwenden Sie /compress oder /clear',
   'No API response yet. Send a message to see actual usage.':
-    'Noch keine API-Antwort. Senden Sie eine Nachricht, um die tatsächliche Nutzung anzuzeigen.',
+    'Noch keine API-Antwort. Senden Sie eine Nachricht, um die tatsï¿½chliche Nutzung anzuzeigen.',
   'Estimated pre-conversation overhead':
-    'Geschätzte Vorabkosten vor der Unterhaltung',
+    'Geschï¿½tzte Vorabkosten vor der Unterhaltung',
   'Context window': 'Kontextfenster',
   tokens: 'Tokens',
   Used: 'Verwendet',
@@ -1922,21 +1922,21 @@ export default {
   'Built-in tools': 'Integrierte Tools',
   'MCP tools': 'MCP-Tools',
   'Memory files': 'Speicherdateien',
-  Skills: 'Fähigkeiten',
+  Skills: 'Fï¿½higkeiten',
   Messages: 'Nachrichten',
   'Show context window usage breakdown.':
-    'Zeigt die Aufschlüsselung der Kontextfenster-Nutzung an.',
+    'Zeigt die Aufschlï¿½sselung der Kontextfenster-Nutzung an.',
   'Run /context detail for per-item breakdown.':
-    'Führen Sie /context detail für eine Aufschlüsselung nach Elementen aus.',
+    'Fï¿½hren Sie /context detail fï¿½r eine Aufschlï¿½sselung nach Elementen aus.',
   active: 'aktiv',
   'body loaded': 'Inhalt geladen',
   memory: 'Speicher',
   '{{region}} configuration updated successfully.':
     '{{region}}-Konfiguration erfolgreich aktualisiert.',
   'Authenticated successfully with {{region}}. API key and model configs saved to settings.json.':
-    'Erfolgreich mit {{region}} authentifiziert. API-Schlüssel und Modellkonfigurationen wurden in settings.json gespeichert.',
+    'Erfolgreich mit {{region}} authentifiziert. API-Schlï¿½ssel und Modellkonfigurationen wurden in settings.json gespeichert.',
   'Tip: Use /model to switch between available Coding Plan models.':
-    'Tipp: Verwenden Sie /model, um zwischen verfügbaren Coding Plan-Modellen zu wechseln.',
+    'Tipp: Verwenden Sie /model, um zwischen verfï¿½gbaren Coding Plan-Modellen zu wechseln.',
 
   // ============================================================================
   // Ask User Question Tool
@@ -1944,7 +1944,7 @@ export default {
   'Please answer the following question(s):':
     'Bitte beantworten Sie die folgende(n) Frage(n):',
   'Cannot ask user questions in non-interactive mode. Please run in interactive mode to use this tool.':
-    'Benutzerfragen können im nicht-interaktiven Modus nicht gestellt werden. Bitte führen Sie das Tool im interaktiven Modus aus.',
+    'Benutzerfragen kï¿½nnen im nicht-interaktiven Modus nicht gestellt werden. Bitte fï¿½hren Sie das Tool im interaktiven Modus aus.',
   'User declined to answer the questions.':
     'Benutzer hat die Beantwortung der Fragen abgelehnt.',
   'User has provided the following answers:':
@@ -1959,35 +1959,35 @@ export default {
   '(not answered)': '(nicht beantwortet)',
   'Ready to submit your answers?': 'Bereit, Ihre Antworten zu senden?',
   '?/?: Navigate | ?/?: Switch tabs | Enter: Select':
-    '?/?: Navigieren | ?/?: Tabs wechseln | Enter: Auswählen',
+    '?/?: Navigieren | ?/?: Tabs wechseln | Enter: Auswï¿½hlen',
   '?/?: Navigate | ?/?: Switch tabs | Space/Enter: Toggle | Esc: Cancel':
     '?/?: Navigieren | ?/?: Tabs wechseln | Space/Enter: Umschalten | Esc: Abbrechen',
   '?/?: Navigate | Space/Enter: Toggle | Esc: Cancel':
     '?/?: Navigieren | Space/Enter: Umschalten | Esc: Abbrechen',
   '?/?: Navigate | Enter: Select | Esc: Cancel':
-    '?/?: Navigieren | Enter: Auswählen | Esc: Abbrechen',
+    '?/?: Navigieren | Enter: Auswï¿½hlen | Esc: Abbrechen',
 
   // ============================================================================
   // Commands - Auth
   // ============================================================================
   'Configure authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
     'Qwen-Authentifizierung mit Qwen-OAuth oder Alibaba Cloud Coding Plan konfigurieren',
-  'Authenticate using Qwen OAuth': 'Mit Qwen OAuth authentifizieren',
+  'Authenticate using Qwen OAuth': 'Mit Legacy OAuth authentifizieren',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Mit Alibaba Cloud Coding Plan authentifizieren',
   'Region for Coding Plan (china/global)':
-    'Region für Coding Plan (china/global)',
-  'API key for Coding Plan': 'API-Schlüssel für Coding Plan',
+    'Region fï¿½r Coding Plan (china/global)',
+  'API key for Coding Plan': 'API-Schlï¿½ssel fï¿½r Coding Plan',
   'Show current authentication status':
     'Aktuellen Authentifizierungsstatus anzeigen',
   'Authentication completed successfully.':
     'Authentifizierung erfolgreich abgeschlossen.',
   'Starting Qwen OAuth authentication...':
-    'Qwen OAuth-Authentifizierung wird gestartet...',
+    'Legacy OAuth-Authentifizierung wird gestartet...',
   'Successfully authenticated with Qwen OAuth.':
-    'Erfolgreich mit Qwen OAuth authentifiziert.',
+    'Erfolgreich mit Legacy OAuth authentifiziert.',
   'Failed to authenticate with Qwen OAuth: {{error}}':
-    'Authentifizierung mit Qwen OAuth fehlgeschlagen: {{error}}',
+    'Authentifizierung mit Legacy OAuth fehlgeschlagen: {{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
     'Alibaba Cloud Coding Plan-Authentifizierung wird verarbeitet...',
   'Successfully authenticated with Alibaba Cloud Coding Plan.':
@@ -1998,29 +1998,29 @@ export default {
   '????? (aliyun.com)': '????? (aliyun.com)',
   Global: 'Global',
   'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
-  'Select region for Coding Plan:': 'Region für Coding Plan auswählen:',
+  'Select region for Coding Plan:': 'Region fï¿½r Coding Plan auswï¿½hlen:',
   'Enter your Coding Plan API key: ':
-    'Geben Sie Ihren Coding Plan API-Schlüssel ein: ',
-  'Select authentication method:': 'Authentifizierungsmethode auswählen:',
+    'Geben Sie Ihren Coding Plan API-Schlï¿½ssel ein: ',
+  'Select authentication method:': 'Authentifizierungsmethode auswï¿½hlen:',
   '\n=== Authentication Status ===\n': '\n=== Authentifizierungsstatus ===\n',
   '??  No authentication method configured.\n':
     '??  Keine Authentifizierungsmethode konfiguriert.\n',
   'Run one of the following commands to get started:\n':
-    'Führen Sie einen der folgenden Befehle aus, um zu beginnen:\n',
+    'Fï¿½hren Sie einen der folgenden Befehle aus, um zu beginnen:\n',
   '  hopcode auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  hopcode auth qwen-oauth     - Mit Qwen OAuth authentifizieren (eingestellt)',
+    '  hopcode auth qwen-oauth     - Mit Legacy OAuth authentifizieren (eingestellt)',
   '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
     '  hopcode auth coding-plan      - Mit Alibaba Cloud Coding Plan authentifizieren\n',
-  'Or simply run:': 'Oder einfach ausführen:',
+  'Or simply run:': 'Oder einfach ausfï¿½hren:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Interaktive Authentifizierungseinrichtung\n',
   '? Authentication Method: Qwen OAuth':
-    '? Authentifizierungsmethode: Qwen OAuth',
+    '? Authentifizierungsmethode: Legacy OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Typ: Kostenloses Kontingent (eingestellt 2026-04-15)',
-  '  Limit: No longer available': '  Limit: Nicht mehr verfügbar',
+  '  Limit: No longer available': '  Limit: Nicht mehr verfï¿½gbar',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Das kostenlose Qwen OAuth-Kontingent wurde am 2026-04-15 eingestellt. Führen Sie /auth aus, um zu Coding Plan, OpenRouter, Fireworks AI oder einem anderen Anbieter zu wechseln.',
+    'Das kostenlose Legacy OAuth-Kontingent wurde am 2026-04-15 eingestellt. Fï¿½hren Sie /auth aus, um zu Coding Plan, OpenRouter, Fireworks AI oder einem anderen Anbieter zu wechseln.',
   '  Models: Qwen latest models\n': '  Modelle: Qwen neueste Modelle\n',
   '? Authentication Method: Alibaba Cloud Coding Plan':
     '? Authentifizierungsmethode: Alibaba Cloud Coding Plan',
@@ -2029,29 +2029,29 @@ export default {
   '  Region: {{region}}': '  Region: {{region}}',
   '  Current Model: {{model}}': '  Aktuelles Modell: {{model}}',
   '  Config Version: {{version}}': '  Konfigurationsversion: {{version}}',
-  '  Status: API key configured\n': '  Status: API-Schlüssel konfiguriert\n',
+  '  Status: API key configured\n': '  Status: API-Schlï¿½ssel konfiguriert\n',
   '??  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
-    '??  Authentifizierungsmethode: Alibaba Cloud Coding Plan (Unvollständig)',
+    '??  Authentifizierungsmethode: Alibaba Cloud Coding Plan (Unvollstï¿½ndig)',
   '  Issue: API key not found in environment or settings\n':
-    '  Problem: API-Schlüssel nicht in Umgebung oder Einstellungen gefunden\n',
+    '  Problem: API-Schlï¿½ssel nicht in Umgebung oder Einstellungen gefunden\n',
   '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  Führen Sie `hopcode auth coding-plan` aus, um neu zu konfigurieren.\n',
+    '  Fï¿½hren Sie `hopcode auth coding-plan` aus, um neu zu konfigurieren.\n',
   '? Authentication Method: {{type}}': '? Authentifizierungsmethode: {{type}}',
   '  Status: Configured\n': '  Status: Konfiguriert\n',
   'Failed to check authentication status: {{error}}':
-    'Authentifizierungsstatus konnte nicht überprüft werden: {{error}}',
-  'Select an option:': 'Option auswählen:',
+    'Authentifizierungsstatus konnte nicht ï¿½berprï¿½ft werden: {{error}}',
+  'Select an option:': 'Option auswï¿½hlen:',
   'Raw mode not available. Please run in an interactive terminal.':
-    'Raw-Modus nicht verfügbar. Bitte in einem interaktiven Terminal ausführen.',
+    'Raw-Modus nicht verfï¿½gbar. Bitte in einem interaktiven Terminal ausfï¿½hren.',
   '(Use ? ? arrows to navigate, Enter to select, Ctrl+C to exit)\n':
-    '(? ? Pfeiltasten zum Navigieren, Enter zum Auswählen, Strg+C zum Beenden)\n',
+    '(? ? Pfeiltasten zum Navigieren, Enter zum Auswï¿½hlen, Strg+C zum Beenden)\n',
   compact: 'kompakt',
   'compact mode: on (Ctrl+O off)': 'Kompaktmodus: ein (Strg+O aus)',
   'to toggle compact mode': 'Kompaktmodus umschalten',
   'Hide tool output and thinking for a cleaner view (toggle with Ctrl+O).':
-    'Tool-Ausgabe und Denkprozess ausblenden für eine übersichtlichere Ansicht (mit Strg+O umschalten).',
+    'Tool-Ausgabe und Denkprozess ausblenden fï¿½r eine ï¿½bersichtlichere Ansicht (mit Strg+O umschalten).',
   'Press Ctrl+O to show full tool output':
-    'Strg+O für vollständige Tool-Ausgabe drücken',
+    'Strg+O fï¿½r vollstï¿½ndige Tool-Ausgabe drï¿½cken',
 
   'Switch to plan mode or exit plan mode':
     'Switch to plan mode or exit plan mode',

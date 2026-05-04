@@ -40,7 +40,7 @@ You'll be prompted to log in on first use. That's it! [Continue with Quickstart 
 
 > [!note]
 >
-> **New VS Code Extension (Beta)**: Prefer a graphical interface? Our new **VS Code extension** provides an easy-to-use native IDE experience without requiring terminal familiarity. Simply install from the marketplace and start coding with HopCode directly in your sidebar. Download and install the [HopCode Companion](https://marketplace.visualstudio.com/items?itemName=qwenlm.hopcode-vscode-ide-companion) now.
+> **New VS Code Extension (Beta)**: Prefer a graphical interface? Our new **VS Code extension** provides an easy-to-use native IDE experience without requiring terminal familiarity. Simply install from the marketplace and start coding with HopCode directly in your sidebar. Download and install the [HopCode Companion](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion) now.
 
 ## What HopCode does for you
 

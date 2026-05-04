@@ -22,7 +22,7 @@
 
 ### Installation
 
-Download and install the extension from the [Visual Studio Code Extension Marketplace](https://marketplace.visualstudio.com/items?itemName=qwenlm.hopcode-vscode-ide-companion).
+Download and install the extension from the [Visual Studio Code Extension Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion).
 
 ## Troubleshooting
 

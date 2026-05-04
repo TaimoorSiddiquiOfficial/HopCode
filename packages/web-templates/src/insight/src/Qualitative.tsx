@@ -485,11 +485,11 @@ export function FrictionPoints({
 }
 
 // HopCode.md Additions Section Component
-function QwenMdAdditionsSection({
+function HopcodeMdAdditionsSection({
   additions,
 }: {
   additions: NonNullable<
-    NonNullable<QualitativeData['improvements']>['Qwen_md_additions']
+    NonNullable<QualitativeData['improvements']>['Hopcode_md_additions']
   >;
 }) {
   const [checkedState, setCheckedState] = useState(
@@ -576,9 +576,11 @@ export function Improvements({
       </h2>
 
       {/* HOPCODE.md Additions */}
-      {Array.isArray(improvements.Qwen_md_additions) &&
-        improvements.Qwen_md_additions.length > 0 && (
-          <QwenMdAdditionsSection additions={improvements.Qwen_md_additions} />
+      {Array.isArray(improvements.Hopcode_md_additions) &&
+        improvements.Hopcode_md_additions.length > 0 && (
+          <HopcodeMdAdditionsSection
+            additions={improvements.Hopcode_md_additions}
+          />
         )}
 
       <p className="text-xs text-slate-500 mb-3">

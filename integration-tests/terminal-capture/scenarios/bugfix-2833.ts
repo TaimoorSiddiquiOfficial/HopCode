@@ -11,7 +11,7 @@ export default {
   terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
     {
-      type: '/qc:bugfix https://github.com/QwenLM/hopcode/issues/2833',
+      type: '/qc:bugfix https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/2833',
       // Bugfix workflow is long-running (20+ minutes), capture throughout
       streaming: {
         delayMs: 10000, // Wait 10s for initial prompt processing
