@@ -3,8 +3,9 @@ from __future__ import annotations
 import threading
 import time
 
-import hopcode_sdk.sync_query as sync_query_module
 import pytest
+
+import hopcode_sdk.sync_query as sync_query_module
 from hopcode_sdk import is_sdk_result_message, query_sync
 from hopcode_sdk.sync_query import SyncQuery
 

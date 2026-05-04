@@ -5,6 +5,7 @@ from collections.abc import Callable
 from typing import Any, cast
 
 import pytest
+
 from hopcode_sdk.errors import AbortError, ControlRequestTimeoutError
 from hopcode_sdk.json_lines import parse_json_line
 from hopcode_sdk.query import Query

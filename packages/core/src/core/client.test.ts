@@ -419,6 +419,7 @@ describe('Gemini Client (client.ts)', () => {
     it('should call chat.addHistory with the provided content', async () => {
       const mockChat = {
         addHistory: vi.fn(),
+        peekHistory: vi.fn().mockReturnValue([]),
       } as unknown as GeminiChat;
       client['chat'] = mockChat;
 
@@ -475,6 +476,7 @@ describe('Gemini Client (client.ts)', () => {
       mockChat = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
     });
@@ -515,6 +517,7 @@ describe('Gemini Client (client.ts)', () => {
         getHistory: mockGetHistory,
         addHistory: vi.fn(),
         setHistory: vi.fn(),
+        peekHistory: vi.fn().mockReturnValue([]),
       } as unknown as GeminiChat;
     });
 
@@ -535,6 +538,7 @@ describe('Gemini Client (client.ts)', () => {
       const mockOriginalChat: Partial<GeminiChat> = {
         getHistory: vi.fn((_curated?: boolean) => chatHistory),
         setHistory: vi.fn(),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockOriginalChat as GeminiChat;
 
@@ -590,6 +594,7 @@ describe('Gemini Client (client.ts)', () => {
       const mockNewChat: Partial<GeminiChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
         setHistory: vi.fn(),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
 
       client['startChat'] = vi.fn().mockImplementation(async () => {
@@ -834,6 +839,7 @@ describe('Gemini Client (client.ts)', () => {
       ];
       const mockNewChat: Partial<GeminiChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['startChat'] = vi
         .fn()
@@ -896,6 +902,7 @@ describe('Gemini Client (client.ts)', () => {
       ];
       const mockNewChat: Partial<GeminiChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['startChat'] = vi.fn().mockImplementation(async () => {
         client['chat'] = mockNewChat as GeminiChat;
@@ -991,6 +998,7 @@ describe('Gemini Client (client.ts)', () => {
       ];
       const mockNewChat: Partial<GeminiChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['startChat'] = vi.fn().mockImplementation(async () => {
         client['chat'] = mockNewChat as GeminiChat;
@@ -1068,6 +1076,7 @@ describe('Gemini Client (client.ts)', () => {
       ];
       const mockNewChat: Partial<GeminiChat> = {
         getHistory: vi.fn().mockReturnValue(newCompressedHistory),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['startChat'] = vi.fn().mockImplementation(async () => {
         client['chat'] = mockNewChat as GeminiChat;
@@ -1226,6 +1235,7 @@ describe('Gemini Client (client.ts)', () => {
       const mockChat = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       } as unknown as GeminiChat;
       client['chat'] = mockChat;
 
@@ -1280,6 +1290,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1335,6 +1346,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1393,6 +1405,7 @@ hello
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1455,6 +1468,7 @@ hello
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1510,6 +1524,7 @@ hello
           { role: 'user', parts: [{ text: 'I prefer terse responses.' }] },
           { role: 'model', parts: [{ text: 'Done' }] },
         ]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1573,6 +1588,7 @@ hello
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1611,6 +1627,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1655,6 +1672,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1742,6 +1760,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1798,6 +1817,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -1873,6 +1893,11 @@ Other open files:
           addHistory: vi.fn(),
           setHistory: vi.fn(),
           // Assume history is not empty for delta checks
+          peekHistory: vi
+            .fn()
+            .mockReturnValue([
+              { role: 'user', parts: [{ text: 'previous message' }] },
+            ]),
           getHistory: vi
             .fn()
             .mockReturnValue([
@@ -2077,9 +2102,11 @@ Other open files:
         // Make history empty
         const mockChat = client['chat'] as unknown as {
           getHistory: ReturnType<(typeof vi)['fn']>;
+          peekHistory: ReturnType<(typeof vi)['fn']>;
           addHistory: ReturnType<(typeof vi)['fn']>;
         };
         mockChat.getHistory.mockReturnValue([]);
+        mockChat.peekHistory.mockReturnValue([]);
 
         const stream = client.sendMessageStream(
           [{ text: 'Hi' }],
@@ -2126,10 +2153,12 @@ Other open files:
         })();
         mockTurnRunFn.mockReturnValue(mockStream);
 
+        const getHistoryMock = vi.fn().mockReturnValue([] as Content[]);
         mockChat = {
           addHistory: vi.fn(),
-          getHistory: vi.fn().mockReturnValue([]), // Default empty history
+          getHistory: getHistoryMock,
           setHistory: vi.fn(),
+          peekHistory: vi.fn().mockImplementation(() => getHistoryMock()),
         };
         client['chat'] = mockChat as GeminiChat;
 
@@ -2468,6 +2497,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -2504,6 +2534,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -2543,6 +2574,7 @@ Other open files:
       const mockChat: Partial<GeminiChat> = {
         addHistory: vi.fn(),
         getHistory: vi.fn().mockReturnValue([]),
+        peekHistory: vi.fn().mockReturnValue([]),
       };
       client['chat'] = mockChat as GeminiChat;
 
@@ -2567,6 +2599,7 @@ Other open files:
           getHistory: vi.fn().mockReturnValue([]),
           setHistory: vi.fn(),
           stripOrphanedUserEntriesFromHistory: vi.fn(),
+          peekHistory: vi.fn().mockReturnValue([]),
         };
         client['chat'] = mockChat as GeminiChat;
 
@@ -2598,6 +2631,7 @@ Other open files:
           getHistory: vi.fn().mockReturnValue([]),
           setHistory: vi.fn(),
           stripOrphanedUserEntriesFromHistory: vi.fn(),
+          peekHistory: vi.fn().mockReturnValue([]),
         };
         client['chat'] = mockChat as GeminiChat;
 
@@ -2640,6 +2674,7 @@ Other open files:
         mockChat = {
           addHistory: vi.fn(),
           getHistory: vi.fn().mockReturnValue([]),
+          peekHistory: vi.fn().mockReturnValue([]),
         };
         client['chat'] = mockChat as GeminiChat;
       });
