@@ -383,7 +383,7 @@ describe('AuthDialog', () => {
 
   describe('QWEN_DEFAULT_AUTH_TYPE environment variable', () => {
     it('should select the auth type specified by QWEN_DEFAULT_AUTH_TYPE', () => {
-      // QWEN_OAUTH is the only valid AuthType that can be selected via env var
+      // HOPCODE_OAUTH is the only valid AuthType that can be selected via env var
       // API-KEY is not an AuthType enum value, so it cannot be selected this way
       process.env['QWEN_DEFAULT_AUTH_TYPE'] = AuthType.HOPCODE_OAUTH;
 
@@ -422,7 +422,7 @@ describe('AuthDialog', () => {
 
       const { lastFrame } = renderAuthDialog(settings);
 
-      // QWEN_OAUTH maps to 'OAUTH' in the new three-option main menu
+      // HOPCODE_OAUTH maps to 'OAUTH' in the new three-option main menu
       expect(lastFrame()).toContain('OAuth');
     });
 

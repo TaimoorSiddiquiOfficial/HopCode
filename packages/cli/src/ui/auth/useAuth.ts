@@ -179,8 +179,8 @@ export const useAuthCommand = (
           );
         }
 
-        // Only update credentials if not switching to QWEN_OAUTH,
-        // so that OpenAI credentials are preserved when switching to QWEN_OAUTH.
+        // Only update credentials if not switching to HOPCODE_OAUTH,
+        // so that OpenAI credentials are preserved when switching to HOPCODE_OAUTH.
         if (authType !== AuthType.HOPCODE_OAUTH && credentials) {
           if (credentials?.apiKey != null) {
             settings.setValue(

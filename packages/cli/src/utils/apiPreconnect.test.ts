@@ -129,7 +129,7 @@ describe('apiPreconnect', () => {
 
     it('should fall back to authType default when resolvedBaseUrl is a non-URL sentinel', () => {
       preconnectApi('qwen-oauth', {
-        resolvedBaseUrl: 'DYNAMIC_QWEN_OAUTH_BASE_URL',
+        resolvedBaseUrl: 'DYNAMIC_HOPCODE_OAUTH_BASE_URL',
       });
       expect(mockFetch).toHaveBeenCalledWith(
         'https://coding.dashscope.aliyuncs.com',

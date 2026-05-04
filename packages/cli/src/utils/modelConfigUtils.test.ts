@@ -62,8 +62,8 @@ describe('modelConfigUtils', () => {
       expect(getAuthTypeFromEnv()).toBeUndefined();
     });
 
-    it('should return HOPCODE_OAUTH when QWEN_OAUTH is set', () => {
-      process.env['QWEN_OAUTH'] = 'true';
+    it('should return HOPCODE_OAUTH when HOPCODE_OAUTH is set', () => {
+      process.env['HOPCODE_OAUTH'] = 'true';
 
       expect(getAuthTypeFromEnv()).toBe(AuthType.HOPCODE_OAUTH);
     });
@@ -112,13 +112,13 @@ describe('modelConfigUtils', () => {
       expect(getAuthTypeFromEnv()).toBeUndefined();
     });
 
-    it('should prioritize QWEN_OAUTH over other auth types when explicitly set', () => {
-      process.env['QWEN_OAUTH'] = 'true';
+    it('should prioritize HOPCODE_OAUTH over other auth types when explicitly set', () => {
+      process.env['HOPCODE_OAUTH'] = 'true';
       process.env['OPENAI_API_KEY'] = 'test-key';
       process.env['OPENAI_MODEL'] = 'gpt-4';
       process.env['OPENAI_BASE_URL'] = 'https://api.openai.com';
 
-      // QWEN_OAUTH is checked first, so it should be returned even when other auth vars are set
+      // HOPCODE_OAUTH is checked first, so it should be returned even when other auth vars are set
       expect(getAuthTypeFromEnv()).toBe(AuthType.HOPCODE_OAUTH);
     });
 

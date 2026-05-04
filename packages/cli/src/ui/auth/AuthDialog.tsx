@@ -58,7 +58,7 @@ type ApiKeyOption =
 type OAuthOption =
   | 'OPENROUTER_OAUTH'
   | 'MODELSCOPE_OAUTH'
-  | 'QWEN_OAUTH_DISCONTINUED';
+  | 'HOPCODE_OAUTH_DISCONTINUED';
 
 // View level for navigation
 type ViewLevel =
@@ -330,11 +330,11 @@ export function AuthDialog(): React.JSX.Element {
       value: 'MODELSCOPE_OAUTH' as OAuthOption,
     },
     {
-      key: 'QWEN_OAUTH_DISCONTINUED',
+      key: 'HOPCODE_OAUTH_DISCONTINUED',
       title: t('Qwen'),
       label: t('Qwen'),
       description: t('Discontinued — switch to Coding Plan or API Key'),
-      value: 'QWEN_OAUTH_DISCONTINUED' as OAuthOption,
+      value: 'HOPCODE_OAUTH_DISCONTINUED' as OAuthOption,
     },
   ];
 
@@ -443,7 +443,7 @@ export function AuthDialog(): React.JSX.Element {
     }
 
     // Qwen OAuth free tier discontinued — show warning instead of proceeding
-    if (value === 'QWEN_OAUTH_DISCONTINUED') {
+    if (value === 'HOPCODE_OAUTH_DISCONTINUED') {
       setErrorMessage(
         t(
           'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
