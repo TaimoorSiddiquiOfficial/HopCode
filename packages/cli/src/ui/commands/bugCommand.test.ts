@@ -36,7 +36,7 @@ describe('bugCommand', () => {
           ? GIT_COMMIT_INFO
           : undefined,
     });
-    vi.stubEnv('SANDBOX', 'qwen-test');
+    vi.stubEnv('SANDBOX', 'hopcode-test');
   });
 
   afterEach(() => {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run real end-to-end smoke tests against qwen CLI using hopcode_sdk.
+"""Run real end-to-end smoke tests against hopcode CLI using hopcode_sdk.
 
 This script is intentionally lightweight and avoids any test doubles.
 It is useful for manual verification after changing SDK runtime behavior.
@@ -79,12 +79,17 @@ class SyncResult:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run real hopcode_sdk smoke tests using qwen CLI",
+        description="Run real hopcode_sdk smoke tests using hopcode CLI",
+    )
+    parser.add_argument(
+        "--hopcode",
+        default="hopcode",
+        help="Path or command for hopcode executable (default: hopcode)",
     )
     parser.add_argument(
         "--qwen",
-        default="qwen",
-        help="Path or command for qwen executable (default: qwen)",
+        default=None,
+        help="Deprecated alias for --hopcode",
     )
     parser.add_argument(
         "--cwd",
@@ -110,8 +115,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def check_qwen_cli_available(qwen_cmd: str, timeout_seconds: float) -> str:
-    spawn_info = prepare_spawn_info(qwen_cmd)
+def check_hopcode_cli_available(hopcode_cmd: str, timeout_seconds: float) -> str:
+    spawn_info = prepare_spawn_info(hopcode_cmd)
     completed = subprocess.run(
         [spawn_info.command, *spawn_info.args, "--version"],
         check=True,
@@ -125,7 +130,7 @@ def check_qwen_cli_available(qwen_cmd: str, timeout_seconds: float) -> str:
 def build_options(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "cwd": args.cwd,
-        "path_to_qwen_executable": args.qwen,
+        "path_to_hopcode_executable": args.hopcode or args.qwen,
         "permission_mode": "izn",
         "max_session_turns": 1,
         "timeout": {
@@ -283,7 +288,7 @@ def run_sync_with_timeout(args: argparse.Namespace) -> SyncResult:
 
     thread = threading.Thread(
         target=worker,
-        name="qwen-sdk-real-smoke-sync",
+        name="hopcode-sdk-real-smoke-sync",
         daemon=True,
     )
     thread.start()
@@ -308,7 +313,7 @@ def build_failure_payload(
     *,
     stage: str,
     exc: BaseException,
-    qwen_version: str | None = None,
+    hopcode_version: str | None = None,
     completed: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {
@@ -317,8 +322,8 @@ def build_failure_payload(
         "error": str(exc),
         "error_type": type(exc).__name__,
     }
-    if qwen_version is not None:
-        payload["qwen_version"] = qwen_version
+    if hopcode_version is not None:
+        payload["hopcode_version"] = hopcode_version
     if completed:
         payload["completed"] = completed
     return payload
@@ -328,7 +333,9 @@ async def main() -> int:
     args = parse_args()
 
     try:
-        qwen_version = check_qwen_cli_available(args.qwen, args.timeout_seconds)
+        hopcode_version = check_hopcode_cli_available(
+            args.hopcode or args.qwen, args.timeout_seconds
+        )
     except (subprocess.CalledProcessError, OSError, subprocess.TimeoutExpired) as exc:
         payload = build_failure_payload(stage="preflight", exc=exc)
         print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -338,7 +345,7 @@ async def main() -> int:
     completed: dict[str, Any] = {}
     try:
         if not args.json_only:
-            print(f"[smoke] qwen version: {qwen_version}")
+            print(f"[smoke] hopcode version: {hopcode_version}")
             print(f"[smoke] running {stage}...")
         async_single = await run_stage(
             stage,
@@ -366,7 +373,7 @@ async def main() -> int:
         payload = build_failure_payload(
             stage=stage,
             exc=exc,
-            qwen_version=qwen_version,
+            hopcode_version=hopcode_version,
             completed=completed,
         )
         print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -375,7 +382,7 @@ async def main() -> int:
     all_ok = async_single.ok and async_controls.ok and sync_result.ok
     payload = {
         "ok": all_ok,
-        "qwen_version": qwen_version,
+        "hopcode_version": hopcode_version,
         "async_single": asdict(async_single),
         "async_controls": asdict(async_controls),
         "sync": asdict(sync_result),

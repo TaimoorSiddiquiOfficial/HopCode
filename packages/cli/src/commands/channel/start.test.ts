@@ -86,11 +86,11 @@ const invokeStartHandler = async (
   if (!handler) {
     throw new Error('startCommand handler is missing');
   }
-  await handler({ _: [], $0: 'qwen', ...args } as StartCommandArgs);
+  await handler({ _: [], $0: 'hopcode', ...args } as StartCommandArgs);
 };
 
 const mockParsedChannelConfig = {
-  cwd: '/tmp/qwen-channel-test',
+  cwd: '/tmp/hopcode-channel-test',
   model: 'qwen-test-model',
   sessionScope: 'user',
   type: 'telegram',

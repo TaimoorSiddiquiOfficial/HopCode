@@ -2,7 +2,7 @@
 
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const PACKAGE_NAME = 'qwen-code-sdk';
+const PACKAGE_NAME = 'hopcode-sdk';
 const TAG_PREFIX = 'sdk-python-';
 
 function readPyprojectVersion() {

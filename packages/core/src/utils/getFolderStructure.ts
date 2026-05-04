@@ -136,7 +136,7 @@ async function readFullStructure(
             (options.fileFilteringOptions.respectGitIgnore &&
               options.fileService.shouldGitIgnoreFile(filePath)) ||
             (options.fileFilteringOptions.respectHopCodeIgnore &&
-              options.fileService.shouldQwenIgnoreFile(filePath));
+              options.fileService.shouldHopCodeIgnoreFile(filePath));
           if (shouldIgnore) {
             continue;
           }

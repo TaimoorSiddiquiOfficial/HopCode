@@ -307,7 +307,7 @@ export default {
   'Show Welcome Back Dialog': 'Willkommen-zurück-Dialog anzeigen',
   'Enable User Feedback': 'Benutzerfeedback aktivieren',
   'How is HopCode doing this session? (optional)':
-    'Wie macht sich Qwen in dieser Sitzung? (optional)',
+    'Wie macht sich HopCode in dieser Sitzung? (optional)',
   Bad: 'Schlecht',
   Fine: 'In Ordnung',
   Good: 'Gut',
@@ -619,7 +619,7 @@ export default {
   'No hooks configured for this event.':
     'Für dieses Ereignis sind keine Hooks konfiguriert.',
   'To add hooks, edit settings.json directly or ask HopCode.':
-    'Um Hooks hinzuzufügen, bearbeiten Sie settings.json direkt oder fragen Sie Qwen.',
+    'Um Hooks hinzuzufügen, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
   'Enter to select · Esc to go back': 'Enter zum Auswählen · Esc zum Zurück',
   // Hooks - Config Detail Step
   'Hook details': 'Hook-Details',
@@ -628,7 +628,7 @@ export default {
   'Desc:': 'Beschreibung:',
   'No hook config selected': 'Keine Hook-Konfiguration ausgewählt',
   'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'Um diesen Hook zu ändern oder zu entfernen, bearbeiten Sie settings.json direkt oder fragen Sie Qwen.',
+    'Um diesen Hook zu ändern oder zu entfernen, bearbeiten Sie settings.json direkt oder fragen Sie HopCode.',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'Hook-Konfiguration - Deaktiviert',
   'All hooks are currently disabled. You have {{count}} that are not running.':
@@ -707,7 +707,7 @@ export default {
     'stderr nur dem Benutzer anzeigen, aber mit Tool-Aufruf fortfahren',
   'block processing, erase original prompt, and show stderr to user only':
     'Verarbeitung blockieren, ursprünglichen Prompt löschen und stderr nur dem Benutzer anzeigen',
-  'stdout shown to HopCode': 'stdout dem Qwen anzeigen',
+  'stdout shown to HopCode': 'stdout dem HopCode anzeigen',
   'show stderr to user only (blocking errors ignored)':
     'stderr nur dem Benutzer anzeigen (Blockierungsfehler ignoriert)',
   'command completes successfully': 'Befehl erfolgreich abgeschlossen',

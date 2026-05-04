@@ -49,7 +49,10 @@ export class FileDiscoveryService {
       if (options.respectGitIgnore && this.shouldGitIgnoreFile(filePath)) {
         return false;
       }
-      if (options.respectHopCodeIgnore && this.shouldQwenIgnoreFile(filePath)) {
+      if (
+        options.respectHopCodeIgnore &&
+        this.shouldHopCodeIgnoreFile(filePath)
+      ) {
         return false;
       }
       return true;
@@ -105,11 +108,18 @@ export class FileDiscoveryService {
   /**
    * Checks if a single file should be hopcode-ignored
    */
-  shouldQwenIgnoreFile(filePath: string): boolean {
+  shouldHopCodeIgnoreFile(filePath: string): boolean {
     if (this.HopCodeIgnoreFilter) {
       return this.HopCodeIgnoreFilter.isIgnored(filePath);
     }
     return false;
+  }
+
+  /**
+   * @deprecated Use shouldHopCodeIgnoreFile instead
+   */
+  shouldQwenIgnoreFile(filePath: string): boolean {
+    return this.shouldHopCodeIgnoreFile(filePath);
   }
 
   /**
@@ -127,7 +137,7 @@ export class FileDiscoveryService {
     if (respectGitIgnore && this.shouldGitIgnoreFile(filePath)) {
       return true;
     }
-    if (respectHopCodeIgnore && this.shouldQwenIgnoreFile(filePath)) {
+    if (respectHopCodeIgnore && this.shouldHopCodeIgnoreFile(filePath)) {
       return true;
     }
     return false;
@@ -136,7 +146,14 @@ export class FileDiscoveryService {
   /**
    * Returns loaded patterns from .hopcodeignore
    */
-  getQwenIgnorePatterns(): string[] {
+  getHopCodeIgnorePatterns(): string[] {
     return this.HopCodeIgnoreFilter?.getPatterns() ?? [];
+  }
+
+  /**
+   * @deprecated Use getHopCodeIgnorePatterns instead
+   */
+  getQwenIgnorePatterns(): string[] {
+    return this.getHopCodeIgnorePatterns();
   }
 }

@@ -12,10 +12,10 @@ pip install hopcode-sdk
 ## Requirements
 
 - Python `>=3.10`
-- External `qwen` CLI installed and available in `PATH`
+- External `hopcode` CLI installed and available in `PATH`
 
 You can also point the SDK at an explicit CLI binary or script with
-`path_to_qwen_executable`.
+`path_to_hopcode_executable` (or the legacy `path_to_qwen_executable`).
 
 ## Quick Start
 
@@ -30,7 +30,7 @@ async def main() -> None:
         "List the top-level packages in this repository.",
         {
             "cwd": "/path/to/project",
-            "path_to_qwen_executable": "qwen",
+            "path_to_hopcode_executable": "hopcode",
         },
     )
 
@@ -101,14 +101,14 @@ The `context` argument includes `cancel_event`, `suggestions`, and
 
 - `ValidationError`: invalid query options or malformed session identifiers
 - `ControlRequestTimeoutError`: CLI control operation exceeded timeout
-- `ProcessExitError`: `qwen` exited with a non-zero code
+- `ProcessExitError`: `hopcode` exited with a non-zero code
 - `AbortError`: query or control request was cancelled
 
 ## Current Scope
 
 `0.1.x` is intentionally narrow:
 
-- Uses external `qwen` CLI via process transport
+- Uses external `hopcode` CLI via process transport
 - Targets `stream-json` parity with the TypeScript SDK core flow
 - Does not yet implement ACP transport
 - Does not yet embed MCP servers inside the SDK process

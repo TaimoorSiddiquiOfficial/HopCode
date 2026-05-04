@@ -1,4 +1,4 @@
-"""Protocol message types and helpers for qwen stream-json."""
+"""Protocol message types and helpers for hopcode stream-json."""
 
 from __future__ import annotations
 
@@ -116,6 +116,7 @@ class SDKSystemMessage(TypedDict):
     permission_mode: NotRequired[str]
     slash_commands: NotRequired[list[str]]
     qwen_code_version: NotRequired[str]
+    hopcode_version: NotRequired[str]
     output_style: NotRequired[str]
     agents: NotRequired[list[str]]
     skills: NotRequired[list[str]]

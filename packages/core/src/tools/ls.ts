@@ -268,7 +268,7 @@ class LSToolInvocation extends BaseToolInvocation<LSToolParams, ToolResult> {
         ignoredMessages.push(`${gitIgnoredCount} git-ignored`);
       }
       if (hopCodeIgnoredCount > 0) {
-        ignoredMessages.push(`${hopCodeIgnoredCount} qwen-ignored`);
+        ignoredMessages.push(`${hopCodeIgnoredCount} hopcode-ignored`);
       }
       if (ignoredMessages.length > 0) {
         resultMessage += `\n\n(${ignoredMessages.join(', ')})`;

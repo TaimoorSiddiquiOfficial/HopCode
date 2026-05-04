@@ -395,7 +395,7 @@ export default {
   'Show Welcome Back Dialog': 'Mostrar el diàleg de benvinguda',
   'Enable User Feedback': 'Activar les valoracions dels usuaris',
   'How is HopCode doing this session? (optional)':
-    'Com va Qwen en aquesta sessió? (opcional)',
+    'Com va HopCode en aquesta sessió? (opcional)',
   Bad: 'Malament',
   Fine: 'Bé',
   Good: 'Molt bé',
@@ -701,7 +701,7 @@ export default {
   'No hooks configured for this event.':
     'No hi ha hooks configurats per a aquest esdeveniment.',
   'To add hooks, edit settings.json directly or ask HopCode.':
-    'Per afegir hooks, editeu settings.json directament o demaneu-ho a Qwen.',
+    'Per afegir hooks, editeu settings.json directament o demaneu-ho a HopCode.',
   'Enter to select · Esc to go back':
     'Retorn per seleccionar · Esc per tornar enrere',
   'Hook details': 'Detalls del hook',
@@ -710,7 +710,7 @@ export default {
   'Desc:': 'Desc:',
   'No hook config selected': 'Cap configuració de hook seleccionada',
   'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'Per modificar o eliminar aquest hook, editeu settings.json directament o demaneu ajuda a Qwen.',
+    'Per modificar o eliminar aquest hook, editeu settings.json directament o demaneu ajuda a HopCode.',
   'Hook Configuration - Disabled': 'Configuració de hooks - Desactivats',
   'All hooks are currently disabled. You have {{count}} that are not running.':
     'Tots els hooks estan desactivats. En teniu {{count}} que no estan en execució.',
@@ -783,7 +783,7 @@ export default {
     "mostrar stderr només a l'usuari però continuar amb la crida a l'eina",
   'block processing, erase original prompt, and show stderr to user only':
     "blocar el processament, esborrar el missatge original i mostrar stderr només a l'usuari",
-  'stdout shown to HopCode': 'stdout mostrat a Qwen',
+  'stdout shown to HopCode': 'stdout mostrat a HopCode',
   'show stderr to user only (blocking errors ignored)':
     "mostrar stderr només a l'usuari (errors de bloqueig ignorats)",
   'command completes successfully': "l'ordre es completa correctament",

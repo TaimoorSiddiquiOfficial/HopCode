@@ -414,7 +414,7 @@ export class ReadFileTool extends BaseDeclarativeTool<
     }
 
     const fileService = this.config.getFileService();
-    if (fileService.shouldQwenIgnoreFile(params.file_path)) {
+    if (fileService.shouldHopCodeIgnoreFile(params.file_path)) {
       return `File path '${filePath}' is ignored by .hopcodeignore pattern(s).`;
     }
 

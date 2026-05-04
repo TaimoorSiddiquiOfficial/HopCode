@@ -8,6 +8,7 @@ from typing import Any
 from .errors import (
     AbortError,
     ControlRequestTimeoutError,
+    HopCodeSDKError,
     ProcessExitError,
     QwenSDKError,
     ValidationError,
@@ -79,6 +80,7 @@ __all__ = [
     "Query",
     "QueryOptions",
     "QueryOptionsDict",
+    "HopCodeSDKError",
     "QwenSDKError",
     "SDKAssistantMessage",
     "SDKMessage",

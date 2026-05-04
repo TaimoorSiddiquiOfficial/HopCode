@@ -396,6 +396,7 @@ export interface ConfigParameters {
   fileFiltering?: {
     respectGitIgnore?: boolean;
     respectQwenIgnore?: boolean;
+    respectHopCodeIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
   };
@@ -655,6 +656,7 @@ export class Config {
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
     respectQwenIgnore: boolean;
+    respectHopCodeIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
@@ -824,6 +826,10 @@ export class Config {
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
       respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
+      respectHopCodeIgnore:
+        params.fileFiltering?.respectHopCodeIgnore ??
+        params.fileFiltering?.respectQwenIgnore ??
+        true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -2158,6 +2164,10 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
+  getFileFilteringRespectHopCodeIgnore(): boolean {
+    return this.fileFiltering.respectHopCodeIgnore;
+  }
+  /** @deprecated Use getFileFilteringRespectHopCodeIgnore instead */
   getFileFilteringRespectQwenIgnore(): boolean {
     return this.fileFiltering.respectQwenIgnore;
   }
@@ -2165,7 +2175,7 @@ export class Config {
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectHopCodeIgnore: true,
+      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
       respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
     };
   }

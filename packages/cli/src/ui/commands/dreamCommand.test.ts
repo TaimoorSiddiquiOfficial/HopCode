@@ -44,7 +44,7 @@ describe('dreamCommand', () => {
       expectedTranscriptDir,
     );
     expect(expectedTranscriptDir).not.toContain(
-      `${path.sep}.qwen${path.sep}tmp${path.sep}`,
+      `${path.sep}.hopcode${path.sep}tmp${path.sep}`,
     );
   });
 });

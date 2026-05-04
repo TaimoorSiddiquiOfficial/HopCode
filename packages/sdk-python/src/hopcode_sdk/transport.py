@@ -1,4 +1,4 @@
-"""Process transport for qwen CLI stream-json protocol."""
+"""Process transport for hopcode CLI stream-json protocol."""
 
 from __future__ import annotations
 
@@ -23,11 +23,11 @@ class SpawnInfo:
     args: list[str]
 
 
-def prepare_spawn_info(path_to_qwen_executable: str | None) -> SpawnInfo:
-    if path_to_qwen_executable is None:
-        return SpawnInfo(command="qwen", args=[])
+def prepare_spawn_info(path_to_hopcode_executable: str | None) -> SpawnInfo:
+    if path_to_hopcode_executable is None:
+        return SpawnInfo(command="hopcode", args=[])
 
-    spec = path_to_qwen_executable
+    spec = path_to_hopcode_executable
     if os.path.sep not in spec and (
         os.path.altsep is None or os.path.altsep not in spec
     ):
@@ -67,7 +67,10 @@ class ProcessTransport:
         if self._process is not None:
             return
 
-        spawn_info = prepare_spawn_info(self._options.path_to_qwen_executable)
+        spawn_info = prepare_spawn_info(
+            self._options.path_to_hopcode_executable
+            or self._options.path_to_qwen_executable
+        )
         args = [*spawn_info.args, *build_cli_arguments(self._options)]
         stderr_target = (
             asyncio.subprocess.PIPE

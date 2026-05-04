@@ -59,6 +59,11 @@ def validate_query_options(options: QueryOptions) -> None:
         raise ValidationError("max_session_turns must be -1 or a non-negative integer")
 
     if (
+        options.path_to_hopcode_executable is not None
+        and not options.path_to_hopcode_executable.strip()
+    ):
+        raise ValidationError("path_to_hopcode_executable cannot be empty")
+    if (
         options.path_to_qwen_executable is not None
         and not options.path_to_qwen_executable.strip()
     ):

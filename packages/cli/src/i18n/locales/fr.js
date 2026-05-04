@@ -401,7 +401,7 @@ export default {
   'Show Welcome Back Dialog': 'Afficher le dialogue de bienvenue',
   'Enable User Feedback': 'Activer les retours utilisateur',
   'How is HopCode doing this session? (optional)':
-    'Comment se passe cette session avec Qwen ? (facultatif)',
+    'Comment se passe cette session avec HopCode ? (facultatif)',
   Bad: 'Mauvais',
   Fine: 'Correct',
   Good: 'Bien',
@@ -709,7 +709,7 @@ export default {
   'No hooks configured for this event.':
     'Aucun hook configur� pour cet �v�nement.',
   'To add hooks, edit settings.json directly or ask HopCode.':
-    'Pour ajouter des hooks, �ditez settings.json directement ou demandez � Qwen.',
+    'Pour ajouter des hooks, �ditez settings.json directement ou demandez � HopCode.',
   'Enter to select � Esc to go back':
     'Entr�e pour s�lectionner � �chap pour revenir',
   'Hook details': 'D�tails du hook',
@@ -718,7 +718,7 @@ export default {
   'Desc:': 'Description :',
   'No hook config selected': 'Aucune configuration de hook s�lectionn�e',
   'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'Pour modifier ou supprimer ce hook, �ditez settings.json directement ou demandez � Qwen.',
+    'Pour modifier ou supprimer ce hook, �ditez settings.json directement ou demandez � HopCode.',
   'Hook Configuration - Disabled': 'Configuration du hook - D�sactiv�',
   'All hooks are currently disabled. You have {{count}} that are not running.':
     "Tous les hooks sont actuellement d�sactiv�s. Vous en avez {{count}} qui ne s'ex�cutent pas.",
@@ -790,7 +790,7 @@ export default {
     "afficher stderr � l'utilisateur uniquement mais continuer l'appel d'outil",
   'block processing, erase original prompt, and show stderr to user only':
     "bloquer le traitement, effacer l'invite originale et afficher stderr � l'utilisateur uniquement",
-  'stdout shown to HopCode': 'stdout affich� � Qwen',
+  'stdout shown to HopCode': 'stdout affich� � HopCode',
   'show stderr to user only (blocking errors ignored)':
     "afficher stderr � l'utilisateur uniquement (erreurs bloquantes ignor�es)",
   'command completes successfully': 'la commande se termine avec succ�s',

@@ -332,7 +332,7 @@ export default {
   'Show Welcome Back Dialog': 'Mostrar Diálogo de Bem-vindo de Volta',
   'Enable User Feedback': 'Ativar Feedback do Usuário',
   'How is HopCode doing this session? (optional)':
-    'Como o Qwen está se saindo nesta sessão? (opcional)',
+    'Como o HopCode está se saindo nesta sessão? (opcional)',
   Bad: 'Ruim',
   Fine: 'Bom',
   Good: 'Ótimo',
@@ -627,7 +627,7 @@ export default {
   'No hooks configured for this event.':
     'Nenhum hook configurado para este evento.',
   'To add hooks, edit settings.json directly or ask HopCode.':
-    'Para adicionar hooks, edite settings.json diretamente ou pergunte ao Qwen.',
+    'Para adicionar hooks, edite settings.json diretamente ou pergunte ao HopCode.',
   'Enter to select · Esc to go back': 'Enter para selecionar · Esc para voltar',
   // Hooks - Config Detail Step
   'Hook details': 'Detalhes do Hook',
@@ -636,7 +636,7 @@ export default {
   'Desc:': 'Descrição:',
   'No hook config selected': 'Nenhuma configuração de hook selecionada',
   'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'Para modificar ou remover este hook, edite settings.json diretamente ou pergunte ao Qwen.',
+    'Para modificar ou remover este hook, edite settings.json diretamente ou pergunte ao HopCode.',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'Configuração de Hook - Desativado',
   'All hooks are currently disabled. You have {{count}} that are not running.':
@@ -715,7 +715,7 @@ export default {
     'mostrar stderr apenas ao usuário mas continuar com chamada de ferramenta',
   'block processing, erase original prompt, and show stderr to user only':
     'bloquear processamento, apagar prompt original e mostrar stderr apenas ao usuário',
-  'stdout shown to HopCode': 'stdout mostrado ao Qwen',
+  'stdout shown to HopCode': 'stdout mostrado ao HopCode',
   'show stderr to user only (blocking errors ignored)':
     'mostrar stderr apenas ao usuário (erros de bloqueio ignorados)',
   'command completes successfully': 'comando concluído com sucesso',
