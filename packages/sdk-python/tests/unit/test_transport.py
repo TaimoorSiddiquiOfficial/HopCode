@@ -139,10 +139,10 @@ async def test_transport_discards_stderr_when_debug_is_disabled(
     assert captured["kwargs"]["stderr"] is subprocess.DEVNULL
 
 
-def test_prepare_spawn_info_defaults_to_qwen_when_none() -> None:
+def test_prepare_spawn_info_defaults_to_hopcode_when_none() -> None:
     spawn_info = prepare_spawn_info(None)
 
-    assert spawn_info.command == "qwen"
+    assert spawn_info.command == "hopcode"
     assert spawn_info.args == []
 
 
