@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, cast
 
 import pytest
-
 from hopcode_sdk.errors import ValidationError
 from hopcode_sdk.types import QueryOptions, TimeoutOptions
 from hopcode_sdk.validation import validate_query_options
