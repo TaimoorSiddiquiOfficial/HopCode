@@ -73,16 +73,15 @@ export function parseAndFormatApiError(
       return error.message;
     }
 
-    const errorMessage = getErrorMessage(error);
     // If a previous pass through this function already wrapped this message
     // and stuffed it into Error.message, return it unchanged. Avoids the
     // "[API Error: [API Error: ...]]" double-wrap reported in non-interactive
     // mode when a 4xx flows through both the stream handler and handleError.
-    if (isAlreadyFormatted(errorMessage)) {
-      return errorMessage;
+    if (isAlreadyFormatted(error.message)) {
+      return error.message;
     }
 
-    let text = `[API Error: ${errorMessage}]`;
+    let text = `[API Error: ${error.message}]`;
     if (error.status === 429) {
       text += getRateLimitMessage(authType);
     }

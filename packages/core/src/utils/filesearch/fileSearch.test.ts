@@ -655,7 +655,7 @@ describe('FileSearch', () => {
       const fileSearch = FileSearchFactory.create({
         projectRoot: tmpDir,
         useGitignore: false,
-        useHopcodeignore: false,
+        useQwenignore: false,
         ignoreDirs: [],
         cache: false,
         cacheTtl: 0,

@@ -1173,8 +1173,8 @@ export default {
   // ============================================================================
   // Commandes - Mod�le
   // ============================================================================
-  'Switch the model for this session (--fast for suggestion model)':
-    'Changer le mod�le pour cette session (--fast pour le mod�le de suggestion)',
+  'Switch the model for this session (--fast for suggestion model, [model-id] to switch immediately).':
+    'Changer le modèle pour cette session (--fast pour le modèle de suggestion)',
   'Set a lighter model for prompt suggestions and speculative execution':
     "D�finir un mod�le plus l�ger pour les suggestions d'invite et l'ex�cution sp�culative",
   'Content generator configuration not available.':
@@ -1182,7 +1182,9 @@ export default {
   'Authentication type not available.':
     "Type d'authentification non disponible.",
   'No models available for the current authentication type ({{authType}}).':
-    "Aucun mod�le disponible pour le type d'authentification actuel ({{authType}}).",
+    "Aucun modèle disponible pour le type d'authentification actuel ({{authType}}).",
+  // Needs translation
+  ' (not in model registry)': ' (not in model registry)',
 
   // ============================================================================
   // Commandes - Effacer

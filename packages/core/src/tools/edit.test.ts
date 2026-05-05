@@ -959,27 +959,6 @@ describe('EditTool', () => {
     });
   });
 
-  describe('workspace boundary validation', () => {
-    it('should validate paths are within workspace root', () => {
-      const validPath = {
-        file_path: path.join(rootDir, 'file.txt'),
-        old_string: 'old',
-        new_string: 'new',
-      };
-      expect(tool.validateToolParams(validPath)).toBeNull();
-    });
-
-    it('should allow paths outside workspace root (external path support)', () => {
-      const externalPath = {
-        file_path: '/etc/passwd',
-        old_string: 'root',
-        new_string: 'hacked',
-      };
-      const error = tool.validateToolParams(externalPath);
-      expect(error).toBeNull();
-    });
-  });
-
   describe.skipIf(process.platform === 'win32')(
     'escaped paths with spaces (end-to-end)',
     () => {
@@ -1025,4 +1004,25 @@ describe('EditTool', () => {
       });
     },
   );
+
+  describe('workspace boundary validation', () => {
+    it('should validate paths are within workspace root', () => {
+      const validPath = {
+        file_path: path.join(rootDir, 'file.txt'),
+        old_string: 'old',
+        new_string: 'new',
+      };
+      expect(tool.validateToolParams(validPath)).toBeNull();
+    });
+
+    it('should allow paths outside workspace root (external path support)', () => {
+      const externalPath = {
+        file_path: '/etc/passwd',
+        old_string: 'root',
+        new_string: 'hacked',
+      };
+      const error = tool.validateToolParams(externalPath);
+      expect(error).toBeNull();
+    });
+  });
 });

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Shared tool-call routing — maps ToolCallData to the appropriate

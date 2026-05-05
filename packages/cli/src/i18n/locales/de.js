@@ -1030,8 +1030,8 @@ export default {
   // ============================================================================
   // Commands - Model
   // ============================================================================
-  'Switch the model for this session (--fast for suggestion model)':
-    'Modell f�r diese Sitzung wechseln (--fast f�r Vorschlagsmodell)',
+  'Switch the model for this session (--fast for suggestion model, [model-id] to switch immediately).':
+    'Modell für diese Sitzung wechseln (--fast für Vorschlagsmodell)',
   'Set a lighter model for prompt suggestions and speculative execution':
     'Leichteres Modell f�r Eingabevorschl�ge und spekulative Ausf�hrung festlegen',
   'Content generator configuration not available.':
@@ -1039,7 +1039,9 @@ export default {
   'Authentication type not available.':
     'Authentifizierungstyp nicht verf�gbar.',
   'No models available for the current authentication type ({{authType}}).':
-    'Keine Modelle f�r den aktuellen Authentifizierungstyp ({{authType}}) verf�gbar.',
+    'Keine Modelle für den aktuellen Authentifizierungstyp ({{authType}}) verfügbar.',
+  // Needs translation
+  ' (not in model registry)': ' (not in model registry)',
 
   // ============================================================================
   // Commands - Clear

@@ -29,7 +29,7 @@ function makeConfig(targetDir: string, cache: FileReadCache, disabled = false) {
     },
     getFileReadCache: () => cache,
     getFileReadCacheDisabled: () => disabled,
-    getFileService: () => ({ shouldHopCodeIgnoreFile: () => false }),
+    getFileService: () => ({ shouldQwenIgnoreFile: () => false }),
     getFileFilteringOptions: () => ({}),
     getDebugMode: () => false,
     getFileSystemService: () => new StandardFileSystemService(),

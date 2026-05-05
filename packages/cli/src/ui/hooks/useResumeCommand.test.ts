@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Code
+ * Copyright 2025 Qwen Code
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -163,6 +163,7 @@ describe('useResumeCommand', () => {
       }),
       getBackgroundShellRegistry: () => ({
         getAll: vi.fn().mockReturnValue([]),
+        hasRunningEntries: vi.fn().mockReturnValue(false),
         reset: vi.fn(),
       }),
       getMonitorRegistry: () => ({
@@ -197,7 +198,7 @@ describe('useResumeCommand', () => {
 
     let resumePromise: Promise<void> | undefined;
     act(() => {
-      // Start resume but do not await it yet — we want to assert the dialog
+      // Start resume but do not await it yet ΓÇö we want to assert the dialog
       // closes immediately before the async session load completes.
       resumePromise = result.current.handleResume('session-2');
     });
@@ -248,6 +249,7 @@ describe('useResumeCommand', () => {
       }),
       getBackgroundShellRegistry: () => ({
         getAll: vi.fn().mockReturnValue([]),
+        hasRunningEntries: vi.fn().mockReturnValue(false),
         reset: vi.fn(),
       }),
       getMonitorRegistry: () => ({
@@ -306,6 +308,7 @@ describe('useResumeCommand', () => {
       }),
       getBackgroundShellRegistry: () => ({
         getAll: vi.fn().mockReturnValue([]),
+        hasRunningEntries: vi.fn().mockReturnValue(false),
         reset: vi.fn(),
       }),
       getMonitorRegistry: () => ({
@@ -364,6 +367,7 @@ describe('useResumeCommand', () => {
       }),
       getBackgroundShellRegistry: () => ({
         getAll: vi.fn().mockReturnValue([]),
+        hasRunningEntries: vi.fn().mockReturnValue(false),
         reset: vi.fn(),
       }),
       getMonitorRegistry: () => ({

@@ -169,85 +169,45 @@ describe('telemetry/config helpers', () => {
       );
     });
 
-    it('resolves per-signal endpoints from HOPCODE_ env vars', async () => {
+    it('resolves per-signal endpoints from OTEL_ env vars', async () => {
       const env = {
-        HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT: 'http://traces:4317/v1/traces',
-        HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT: 'http://logs:4317/v1/logs',
-        HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT:
-          'http://metrics:4317/v1/metrics',
+        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://traces:4318/v1/traces',
+        OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://logs:4318/v1/logs',
       } as Record<string, string>;
+
       const resolved = await resolveTelemetrySettings({ env });
-      expect(resolved.otlpTracesEndpoint).toBe('http://traces:4317/v1/traces');
-      expect(resolved.otlpLogsEndpoint).toBe('http://logs:4317/v1/logs');
-      expect(resolved.otlpMetricsEndpoint).toBe(
-        'http://metrics:4317/v1/metrics',
-      );
+      expect(resolved.otlpTracesEndpoint).toBe('http://traces:4318/v1/traces');
+      expect(resolved.otlpLogsEndpoint).toBe('http://logs:4318/v1/logs');
+      expect(resolved.otlpMetricsEndpoint).toBeUndefined();
     });
 
-    it('falls back to QWEN_ env vars for per-signal endpoints', async () => {
+    it('QWEN_ env vars take precedence over OTEL_ vars for per-signal endpoints', async () => {
       const env = {
         QWEN_TELEMETRY_OTLP_TRACES_ENDPOINT:
-          'http://qwen-traces:4317/v1/traces',
-        QWEN_TELEMETRY_OTLP_LOGS_ENDPOINT: 'http://qwen-logs:4317/v1/logs',
-        QWEN_TELEMETRY_OTLP_METRICS_ENDPOINT:
-          'http://qwen-metrics:4317/v1/metrics',
+          'http://qwen-traces:4318/v1/traces',
+        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://otel-traces:4318/v1/traces',
       } as Record<string, string>;
+
       const resolved = await resolveTelemetrySettings({ env });
       expect(resolved.otlpTracesEndpoint).toBe(
-        'http://qwen-traces:4317/v1/traces',
-      );
-      expect(resolved.otlpLogsEndpoint).toBe('http://qwen-logs:4317/v1/logs');
-      expect(resolved.otlpMetricsEndpoint).toBe(
-        'http://qwen-metrics:4317/v1/metrics',
+        'http://qwen-traces:4318/v1/traces',
       );
     });
 
-    it('HOPCODE_ env vars take precedence over QWEN_', async () => {
-      const env = {
-        HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT: 'http://hopcode-traces:4317',
-        QWEN_TELEMETRY_OTLP_TRACES_ENDPOINT: 'http://qwen-traces:4317',
-      } as Record<string, string>;
-      const resolved = await resolveTelemetrySettings({ env });
-      expect(resolved.otlpTracesEndpoint).toBe('http://hopcode-traces:4317');
-    });
-
-    it('falls back to OTEL_ env vars for per-signal endpoints', async () => {
-      const env = {
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://otel-traces:4317',
-        OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://otel-logs:4317',
-        OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: 'http://otel-metrics:4317',
-      } as Record<string, string>;
-      const resolved = await resolveTelemetrySettings({ env });
-      expect(resolved.otlpTracesEndpoint).toBe('http://otel-traces:4317');
-      expect(resolved.otlpLogsEndpoint).toBe('http://otel-logs:4317');
-      expect(resolved.otlpMetricsEndpoint).toBe('http://otel-metrics:4317');
-    });
-
-    it('per-signal endpoints come from settings fallback', async () => {
+    it('resolves per-signal endpoints from settings', async () => {
       const settings = {
-        otlpTracesEndpoint: 'http://settings-traces:4317',
-        otlpLogsEndpoint: 'http://settings-logs:4317',
-        otlpMetricsEndpoint: 'http://settings-metrics:4317',
+        otlpTracesEndpoint: 'http://traces-settings:4318/v1/traces',
+        otlpMetricsEndpoint: 'http://metrics-settings:4318/v1/metrics',
       };
-      const resolved = await resolveTelemetrySettings({ settings });
-      expect(resolved.otlpTracesEndpoint).toBe('http://settings-traces:4317');
-      expect(resolved.otlpLogsEndpoint).toBe('http://settings-logs:4317');
-      expect(resolved.otlpMetricsEndpoint).toBe('http://settings-metrics:4317');
-    });
 
-    it('argv per-signal endpoints take highest precedence', async () => {
-      const argv = {
-        telemetryOtlpTracesEndpoint: 'http://argv-traces:4317',
-        telemetryOtlpLogsEndpoint: 'http://argv-logs:4317',
-        telemetryOtlpMetricsEndpoint: 'http://argv-metrics:4317',
-      };
-      const env = {
-        HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT: 'http://env-traces:4317',
-      } as Record<string, string>;
-      const resolved = await resolveTelemetrySettings({ argv, env });
-      expect(resolved.otlpTracesEndpoint).toBe('http://argv-traces:4317');
-      expect(resolved.otlpLogsEndpoint).toBe('http://argv-logs:4317');
-      expect(resolved.otlpMetricsEndpoint).toBe('http://argv-metrics:4317');
+      const resolved = await resolveTelemetrySettings({ settings });
+      expect(resolved.otlpTracesEndpoint).toBe(
+        'http://traces-settings:4318/v1/traces',
+      );
+      expect(resolved.otlpLogsEndpoint).toBeUndefined();
+      expect(resolved.otlpMetricsEndpoint).toBe(
+        'http://metrics-settings:4318/v1/metrics',
+      );
     });
   });
 });

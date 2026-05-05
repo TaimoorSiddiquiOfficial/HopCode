@@ -122,30 +122,6 @@ Forcing the user to confirm-or-decline every time the PR has any HopCode history
 
 **Trade-off:**
 
-- ✅ Common case (re-running /review on a PR after a few new commits) no longer prompts unnecessarily.
-- ✅ The terminal log keeps the user informed about what was skipped, so transparency is preserved.
-- ❌ Conceptual overlap that doesn't share a line is missed — e.g. a prior comment on line 559 about cache lifecycle and a new comment on line 1352 about cache lifecycle would be classified `No conflict`. Line-based heuristics cannot detect "same root cause, different anchor." If the user wants semantic-overlap detection, they must read the terminal log and the PR comments themselves.
-
-Line-based classification was chosen because it's deterministic, cheap, and catches the precise UX failure (visual duplicate at the same line). Semantic overlap detection would require an extra LLM call for what is, in practice, a rare edge case.
-
-## Why downgrade APPROVE when CI is non-green
-
-**Original behavior:** if Step 7 resolved verdict to `APPROVE`, the API event was submitted as `APPROVE` without any check on CI status.
-
-**Problem:** the LLM review pipeline reads the diff and surrounding code statically. It does not run tests, does not exercise integration boundaries, and does not see runtime failures. CI does. A PR with red CI but no static red flags is **the worst case** for an LLM `APPROVE` — the human reader sees an Approve badge from a tool that didn't actually verify the change runs.
-
-**Current behavior:** before submitting `APPROVE`, query `check-runs` and legacy commit `statuses` for the PR HEAD. Classify:
-
-- All success → `APPROVE` continues.
-- Any failure → downgrade `APPROVE` to `COMMENT`, body explains.
-- All pending → downgrade to `COMMENT` (don't approve before CI decides), body explains.
-
-**Why downgrade rather than block:** the reviewer LLM has done substantive work; throwing the review away because CI is red wastes that. Downgrading to `COMMENT` keeps all inline findings, preserves the static review value, and lets GitHub's check status carry the "do not merge" signal naturally.
-
-**Why this stacks with self-PR downgrade:** a self-authored PR with red CI hits **both** downgrade rules. The event is `COMMENT` either way, so stacking is operationally a no-op — but the body should mention both reasons so a future maintainer reading the review knows why an LLM that found no Critical issues did not approve.
-
-**Trade-off:**
-
 - ✅ No more "LLM approved while CI is red" embarrassments.
 - ✅ Reviewer's substantive work (inline comments) is preserved.
 - ❌ Adds two extra API calls (`check-runs` + `statuses`) per APPROVE-bound submit; only relevant for the `APPROVE` path so the cost is negligible.

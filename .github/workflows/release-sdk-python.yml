@@ -44,7 +44,7 @@ jobs:
       name: 'production-release'
       url: '${{ github.server_url }}/${{ github.repository }}/releases'
     if: |-
-      ${{ github.repository == 'HopTrendy/HopCode' }}
+      ${{ github.repository == 'QwenLM/qwen-code' }}
     permissions:
       contents: 'write'
       id-token: 'write'
@@ -214,7 +214,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e 'packages/sdk-python[dev]' build
 
-      - name: 'Build hopcode CLI bundle'
+      - name: 'Build qwen CLI bundle'
         if: |-
           ${{ github.event.inputs.force_skip_tests != 'true' }}
         run: |
@@ -343,7 +343,7 @@ jobs:
           rm -rf dist
           python -m build
 
-      - name: 'Publish hopcode-sdk to PyPI'
+      - name: 'Publish qwen-code-sdk to PyPI'
         if: |-
           ${{ steps.vars.outputs.is_dry_run == 'false' }}
         uses: 'pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b' # ratchet:pypa/gh-action-pypi-publish@release/v1
@@ -396,7 +396,7 @@ jobs:
           {
             echo "## Published Package"
             echo ""
-            echo "- PyPI package: \`hopcode-sdk\`"
+            echo "- PyPI package: \`qwen-code-sdk\`"
             echo "- Package version: \`${PACKAGE_VERSION}\`"
             echo ""
             echo "---"

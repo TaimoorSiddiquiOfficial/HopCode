@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -94,7 +94,7 @@ interface RestorePausedEntryOptions {
 
 function approvalModeToPermissionMode(mode?: string): PermissionMode {
   switch (mode) {
-    case 'izn':
+    case 'yolo':
       return PermissionMode.Izn;
     case 'auto-edit':
       return PermissionMode.AutoEdit;

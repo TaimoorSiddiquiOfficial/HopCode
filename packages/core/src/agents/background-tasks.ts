@@ -5,7 +5,7 @@
  */
 
 /**
- * @fileoverview BackgroundTaskRegistry — tracks background (async) sub-agents.
+ * @fileoverview BackgroundTaskRegistry ΓÇö tracks background (async) sub-agents.
  *
  * When the Agent tool is called with `run_in_background: true`, the sub-agent
  * runs asynchronously. This registry tracks the lifecycle of each background
@@ -13,6 +13,7 @@
  */
 
 import { createDebugLogger } from '../utils/debugLogger.js';
+import { escapeXml } from '../utils/xml.js';
 import { patchAgentMeta } from './agent-transcript.js';
 
 const debugLogger = createDebugLogger('BACKGROUND_TASKS');
@@ -35,7 +36,7 @@ const CANCEL_GRACE_MS = 5000;
  * dialog (user-facing) so the two surfaces never drift.
  *
  * When `includePrefix` is true (default), returns `subagentType: desc`;
- * when false, returns the bare truncated description — used where the
+ * when false, returns the bare truncated description ΓÇö used where the
  * subagent type is already rendered separately (e.g. the dialog header).
  */
 export function buildBackgroundEntryLabel(
@@ -59,18 +60,11 @@ export function buildBackgroundEntryLabel(
     : truncated;
 }
 
-// Escape text so it is safe to interpolate into an XML element body.
 // Subagent-produced strings (description, result, error) can contain `<`,
-// `>`, or literal `</task-notification>` — without escaping, a subagent
+// `>`, or literal `</task-notification>` ΓÇö without escaping, a subagent
 // summarizing HTML or another agent's notification could close the
 // envelope early and forge sibling tags (e.g. a faked <status>) that the
-// parent model would treat as trusted metadata.
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
+// parent model would treat as trusted metadata. Use the shared helper.
 
 export type BackgroundTaskStatus =
   | 'running'
@@ -86,7 +80,7 @@ export interface AgentCompletionStats {
 }
 
 /**
- * A compact record of a recent tool invocation — drives the Progress
+ * A compact record of a recent tool invocation ΓÇö drives the Progress
  * section of the detail dialog. The Agent tool maintains a rolling
  * buffer of these on each background entry by subscribing to the
  * subagent's event emitter.
@@ -94,7 +88,7 @@ export interface AgentCompletionStats {
 export interface BackgroundActivity {
   /** Tool name (e.g. `Bash`, `Read`). */
   name: string;
-  /** Short one-line description — the tool's own render-friendly summary. */
+  /** Short one-line description ΓÇö the tool's own render-friendly summary. */
   description: string;
   /** Emission timestamp (ms). */
   at: number;
@@ -156,11 +150,6 @@ export interface BackgroundTaskEntry {
   >;
 }
 
-interface CancelOptions {
-  notify?: boolean;
-  persistedStatus?: Extract<BackgroundTaskStatus, 'running' | 'cancelled'>;
-}
-
 export interface NotificationMeta {
   agentId: string;
   status: BackgroundTaskStatus;
@@ -182,7 +171,7 @@ interface BackgroundTaskCancelOptions {
 }
 
 /**
- * Fires on entry status transitions — register, complete, fail, cancel.
+ * Fires on entry status transitions ΓÇö register, complete, fail, cancel.
  * Intentionally does NOT fire on `appendActivity` so consumers that only
  * care about the pill / roster (Footer, AppContainer) don't re-render
  * on every tool call a background agent makes.
@@ -191,7 +180,7 @@ export type BackgroundStatusChangeCallback = (
   entry?: BackgroundTaskEntry,
 ) => void;
 
-/** Fires on `appendActivity` — scoped to detail-view consumers. */
+/** Fires on `appendActivity` ΓÇö scoped to detail-view consumers. */
 export type BackgroundActivityChangeCallback = (
   entry: BackgroundTaskEntry,
 ) => void;
@@ -220,7 +209,7 @@ export class BackgroundTaskRegistry {
 
   // Transition a still-running entry to 'completed' and emit the terminal
   // notification. No-op if the entry is already terminal *and* has been
-  // notified — protects against duplicate emission when cancel aborts the
+  // notified ΓÇö protects against duplicate emission when cancel aborts the
   // signal and the natural handler also races to completion.
   complete(
     agentId: string,
@@ -229,7 +218,7 @@ export class BackgroundTaskRegistry {
   ): void {
     const entry = this.agents.get(agentId);
     if (!entry) return;
-    // Allow running → completed (normal path) and cancelled → completed
+    // Allow running ΓåÆ completed (normal path) and cancelled ΓåÆ completed
     // (cancel raced the natural handler: the reasoning loop finished with
     // a real result before the abort landed, and we prefer to surface that
     // real result over the bare cancel).
@@ -246,7 +235,7 @@ export class BackgroundTaskRegistry {
     this.emitStatusChange(entry);
   }
 
-  // See complete() for the cancelled → terminal path rationale.
+  // See complete() for the cancelled ΓåÆ terminal path rationale.
   fail(agentId: string, error: string, stats?: AgentCompletionStats): void {
     const entry = this.agents.get(agentId);
     if (!entry) return;
@@ -268,10 +257,10 @@ export class BackgroundTaskRegistry {
   // completion path (bgBody) fires complete()/fail()/finalizeCancelled()
   // with the real partial/final result, which carries far more information
   // than a bare "cancelled" message. A deferred fallback handles the rare
-  // case where a tool ignores AbortSignal and bgBody never settles — the
+  // case where a tool ignores AbortSignal and bgBody never settles ΓÇö the
   // timeout lands on finalizeCancellationIfPending(), which is a no-op
   // once the natural handler has already emitted.
-  cancel(agentId: string, options: CancelOptions = {}): void {
+  cancel(agentId: string, options: BackgroundTaskCancelOptions = {}): void {
     const entry = this.agents.get(agentId);
     if (!entry || entry.status !== 'running') return;
     const persistedStatus = options.persistedStatus ?? 'cancelled';
@@ -356,7 +345,7 @@ export class BackgroundTaskRegistry {
 
   /**
    * Append a recent tool activity to a running entry's rolling buffer.
-   * No-op if the entry is not running — late events after a cancellation
+   * No-op if the entry is not running ΓÇö late events after a cancellation
    * shouldn't leak into the Progress section.
    */
   appendActivity(agentId: string, activity: BackgroundActivity): void {
@@ -477,7 +466,15 @@ export class BackgroundTaskRegistry {
       ...options,
     };
     for (const entry of Array.from(this.agents.values())) {
-      this.cancel(entry.agentId, cancelOptions);
+      if (entry.status === 'running') {
+        this.cancel(entry.agentId, cancelOptions);
+      }
+
+      if (cancelOptions.notify === false) {
+        entry.notified = true;
+        continue;
+      }
+
       // Shutdown path: no natural handler will run, so emit the cancelled
       // notification here to honour the one-notification-per-agent contract.
       this.finalizeCancellationIfPending(entry.agentId);
@@ -491,7 +488,7 @@ export class BackgroundTaskRegistry {
 
   private emitNotification(entry: BackgroundTaskEntry): void {
     // Mark notified *before* invoking the callback so that a re-entrant
-    // terminal call inside the callback chain (cancel → complete race)
+    // terminal call inside the callback chain (cancel ΓåÆ complete race)
     // sees the flag and short-circuits, rather than firing twice.
     if (entry.notified) return;
     entry.notified = true;

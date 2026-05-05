@@ -14,15 +14,29 @@ import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 
+// Get an array of the available model IDs as strings
+function getAvailableModelIds(context: CommandContext) {
+  const { services } = context;
+  const { config } = services;
+  if (!config) {
+    return [];
+  }
+  const availableModels = config.getAvailableModels();
+  // Convert AvailableModel[] to string[] on AvailableModel.id
+  return availableModels.map((model) => model.id);
+}
+
 export const modelCommand: SlashCommand = {
   name: 'model',
   completionPriority: 100,
   get description() {
-    return t('Switch the model for this session (--fast for suggestion model)');
+    return t(
+      'Switch the model for this session (--fast for suggestion model, [model-id] to switch immediately).',
+    );
   },
   kind: CommandKind.BUILT_IN,
   supportedModes: ['interactive', 'non_interactive', 'acp'] as const,
-  completion: async (_context, partialArg) => {
+  completion: async (context, partialArg) => {
     if (partialArg && '--fast'.startsWith(partialArg)) {
       return [
         {
@@ -32,8 +46,14 @@ export const modelCommand: SlashCommand = {
           ),
         },
       ];
+    } else if (partialArg.trim()) {
+      // Include model IDs matching the partial argument
+      return getAvailableModelIds(context).filter((id) =>
+        id.startsWith(partialArg.trim()),
+      );
+    } else {
+      return null;
     }
-    return null;
   },
   action: async (
     context: CommandContext,
@@ -110,11 +130,12 @@ export const modelCommand: SlashCommand = {
       };
     }
 
-    // Non-interactive/ACP: set model if an arg was provided, otherwise show current model
-    if (context.executionMode !== 'interactive') {
-      const modelName = args.trim();
+    // Handle modelName argument: immediately switch to the provided model
+    if (args !== '' && context.executionMode === 'interactive') {
+      const modelName = args.trim().split(' ')[0];
       if (modelName) {
-        // /model <model-id> — set the main model
+        // Use first argument only, avoids later syntax confusion and/or use of model names with spaces
+        // Ignore argument if it is empty, e.g. to avoid confusion with trailing whitespace
         if (!settings) {
           return {
             type: 'message',
@@ -122,19 +143,55 @@ export const modelCommand: SlashCommand = {
             content: t('Settings service not available.'),
           };
         }
+        await config.setModel(modelName);
         settings.setValue(
           getPersistScopeForModelSelection(settings),
           'model.name',
           modelName,
         );
+
+        if (config.getModelsConfig().hasModel(authType, modelName)) {
+          return {
+            type: 'message',
+            messageType: 'info',
+            content: t('Model') + ': ' + modelName,
+          };
+        } else {
+          return {
+            type: 'message',
+            messageType: 'info',
+            content:
+              t('Model') + ': ' + modelName + t(' (not in model registry)'),
+          };
+        }
+      }
+    }
+
+    // Non-interactive/ACP: set model if an arg was provided, otherwise show current model
+    if (context.executionMode !== 'interactive') {
+      const modelName = args.trim().split(' ')[0];
+      if (modelName.trim()) {
+        // /model <model-id> â€” set the main model
+        if (!settings) {
+          return {
+            type: 'message',
+            messageType: 'error',
+            content: t('Settings service not available.'),
+          };
+        }
         await config.setModel(modelName);
+        settings.setValue(
+          getPersistScopeForModelSelection(settings),
+          'model.name',
+          modelName,
+        );
         return {
           type: 'message',
           messageType: 'info',
           content: t('Model') + ': ' + modelName,
         };
       }
-      // /model with no args — show current model
+      // /model with no args ï¿½ show current model
       const currentModel = config.getModel() ?? 'unknown';
       return {
         type: 'message',

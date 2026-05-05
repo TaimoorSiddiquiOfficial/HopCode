@@ -771,17 +771,12 @@ export class GeminiChat {
   }
 
   /**
-   * Returns the history array directly without cloning.
-   *
-   * This is a read-only view for internal callers that only need to
-   * inspect history (read length, filter, slice, etc.) and will NOT
-   * mutate the returned array or its Content objects.
-   *
-   * Use {@link getHistory} when the caller (or downstream code) might
-   * mutate the returned array.
+   * Returns the number of entries in the raw chat history. O(1) and
+   * does not clone — use this when you only need the count and would
+   * otherwise pay the {@link getHistory} `structuredClone` cost.
    */
-  peekHistory(curated: boolean = false): Content[] {
-    return curated ? extractCuratedHistory(this.history) : this.history;
+  getHistoryLength(): number {
+    return this.history.length;
   }
 
   /**
@@ -789,15 +784,6 @@ export class GeminiChat {
    */
   clearHistory(): void {
     this.history = [];
-  }
-
-  /**
-   * Returns the number of entries in the raw chat history. O(1) and
-   * does not clone — use this when you only need the count and would
-   * otherwise pay the {@link getHistory} `structuredClone` cost.
-   */
-  getHistoryLength(): number {
-    return this.history.length;
   }
 
   /**

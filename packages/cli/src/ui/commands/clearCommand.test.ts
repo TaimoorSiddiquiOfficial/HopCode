@@ -61,13 +61,14 @@ describe('clearCommand', () => {
             }) as unknown as GeminiClient,
           getBackgroundTaskRegistry: vi.fn().mockReturnValue({
             hasUnfinalizedTasks: vi.fn().mockReturnValue(false),
-            abortAll: mockAbortBackgroundTasks,
             reset: mockResetBackgroundTasks,
+            abortAll: mockAbortBackgroundTasks,
           }),
           getBackgroundShellRegistry: vi.fn().mockReturnValue({
             getAll: vi.fn().mockReturnValue([]),
-            abortAll: mockAbortBackgroundShells,
+            hasRunningEntries: vi.fn().mockReturnValue(false),
             reset: mockResetBackgroundShells,
+            abortAll: mockAbortBackgroundShells,
           }),
           startNewSession: mockStartNewSession,
           getHookSystem: mockGetHookSystem,
@@ -297,13 +298,14 @@ describe('clearCommand', () => {
             getHookSystem: mockGetHookSystem,
             getBackgroundTaskRegistry: vi.fn().mockReturnValue({
               hasUnfinalizedTasks: vi.fn().mockReturnValue(false),
-              abortAll: mockAbortBackgroundTasks,
               reset: mockResetBackgroundTasks,
+              abortAll: mockAbortBackgroundTasks,
             }),
             getBackgroundShellRegistry: vi.fn().mockReturnValue({
               getAll: vi.fn().mockReturnValue([]),
-              abortAll: mockAbortBackgroundShells,
+              hasRunningEntries: vi.fn().mockReturnValue(false),
               reset: mockResetBackgroundShells,
+              abortAll: mockAbortBackgroundShells,
             }),
             startNewSession: mockStartNewSession,
             getGeminiClient: vi.fn().mockReturnValue({
@@ -375,6 +377,123 @@ describe('clearCommand', () => {
             }),
             getBackgroundShellRegistry: vi.fn().mockReturnValue({
               getAll: vi.fn().mockReturnValue([]),
+              hasRunningEntries: vi.fn().mockReturnValue(false),
+              reset: vi.fn(),
+            }),
+            getMonitorRegistry: vi.fn().mockReturnValue({
+              getRunning: vi.fn().mockReturnValue([]),
+              reset: vi.fn(),
+            }),
+            getHookSystem: mockGetHookSystem,
+            startNewSession: mockStartNewSession,
+            getGeminiClient: vi.fn().mockReturnValue({
+              resetChat: mockResetChat,
+            } as unknown as GeminiClient),
+            getModel: vi.fn().mockReturnValue('test-model'),
+            getApprovalMode: vi.fn().mockReturnValue('default'),
+            getToolRegistry: vi.fn().mockReturnValue({
+              getAllTools: vi.fn().mockReturnValue([]),
+            }),
+            getDebugLogger: vi.fn().mockReturnValue({ warn: vi.fn() }),
+          },
+        },
+        session: {
+          startNewSession: vi.fn(),
+        },
+      });
+
+      const result = await clearCommand.action(blockedContext, '');
+
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content:
+          "Stop the current session's running background tasks before starting a new session.",
+      });
+      expect(mockStartNewSession).not.toHaveBeenCalled();
+      expect(mockResetChat).not.toHaveBeenCalled();
+    });
+
+    it('blocks session clearing while a monitor is still running', async () => {
+      if (!clearCommand.action)
+        throw new Error('clearCommand must have an action.');
+
+      const blockedContext = createMockCommandContext({
+        executionMode: 'non_interactive',
+        services: {
+          config: {
+            getBackgroundTaskRegistry: vi.fn().mockReturnValue({
+              hasUnfinalizedTasks: vi.fn().mockReturnValue(false),
+              reset: vi.fn(),
+            }),
+            getBackgroundShellRegistry: vi.fn().mockReturnValue({
+              getAll: vi.fn().mockReturnValue([]),
+              hasRunningEntries: vi.fn().mockReturnValue(false),
+              reset: vi.fn(),
+            }),
+            getMonitorRegistry: vi.fn().mockReturnValue({
+              getRunning: vi.fn().mockReturnValue([
+                {
+                  monitorId: 'mon_123',
+                  status: 'running',
+                },
+              ]),
+              reset: vi.fn(),
+            }),
+            getHookSystem: mockGetHookSystem,
+            startNewSession: mockStartNewSession,
+            getGeminiClient: vi.fn().mockReturnValue({
+              resetChat: mockResetChat,
+            } as unknown as GeminiClient),
+            getModel: vi.fn().mockReturnValue('test-model'),
+            getApprovalMode: vi.fn().mockReturnValue('default'),
+            getToolRegistry: vi.fn().mockReturnValue({
+              getAllTools: vi.fn().mockReturnValue([]),
+            }),
+            getDebugLogger: vi.fn().mockReturnValue({ warn: vi.fn() }),
+          },
+        },
+        session: {
+          startNewSession: vi.fn(),
+        },
+      });
+
+      const result = await clearCommand.action(blockedContext, '');
+
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content:
+          "Stop the current session's running background tasks before starting a new session.",
+      });
+      expect(mockStartNewSession).not.toHaveBeenCalled();
+      expect(mockResetChat).not.toHaveBeenCalled();
+    });
+
+    it('blocks session clearing while a background shell is still running', async () => {
+      if (!clearCommand.action)
+        throw new Error('clearCommand must have an action.');
+
+      const blockedContext = createMockCommandContext({
+        executionMode: 'non_interactive',
+        services: {
+          config: {
+            getBackgroundTaskRegistry: vi.fn().mockReturnValue({
+              hasUnfinalizedTasks: vi.fn().mockReturnValue(false),
+              reset: vi.fn(),
+            }),
+            getBackgroundShellRegistry: vi.fn().mockReturnValue({
+              getAll: vi.fn().mockReturnValue([
+                {
+                  shellId: 'shell_123',
+                  status: 'running',
+                },
+              ]),
+              hasRunningEntries: vi.fn().mockReturnValue(true),
+              reset: vi.fn(),
+            }),
+            getMonitorRegistry: vi.fn().mockReturnValue({
+              getRunning: vi.fn().mockReturnValue([]),
               reset: vi.fn(),
             }),
             getHookSystem: mockGetHookSystem,

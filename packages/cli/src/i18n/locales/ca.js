@@ -1207,15 +1207,17 @@ export default {
   // ============================================================================
   // Ordres - Model
   // ============================================================================
-  'Switch the model for this session (--fast for suggestion model)':
-    'Canviar el model per a aquesta sessi� (--fast per al model de suggeriments)',
+  'Switch the model for this session (--fast for suggestion model, [model-id] to switch immediately).':
+    'Canviar el model per a aquesta sessió (--fast per al model de suggeriments)',
   'Set a lighter model for prompt suggestions and speculative execution':
     'Establir un model m�s lleuger per a suggeriments de missatges i execuci� especulativa',
   'Content generator configuration not available.':
     'Configuraci� del generador de contingut no disponible.',
   'Authentication type not available.': "Tipus d'autenticaci� no disponible.",
   'No models available for the current authentication type ({{authType}}).':
-    "No hi ha models disponibles per al tipus d'autenticaci� actual ({{authType}}).",
+    "No hi ha models disponibles per al tipus d'autenticació actual ({{authType}}).",
+  // Needs translation
+  ' (not in model registry)': ' (not in model registry)',
 
   // ============================================================================
   // Ordres - Netejar

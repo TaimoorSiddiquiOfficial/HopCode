@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,16 +22,16 @@ const debugLogger = createDebugLogger('CLIENT');
 
 // Core modules
 import type { ContentGenerator } from './contentGenerator.js';
+import type { ResolvedModelConfig } from '../models/types.js';
+import { AuthType, createContentGenerator } from './contentGenerator.js';
 import { GeminiChat } from './geminiChat.js';
 import {
   getArenaSystemReminder,
   getCoreSystemPrompt,
   getCustomSystemPrompt,
   getPlanModeSystemReminder,
-  getQuranGuidancePerTurnReminder,
   getSubagentSystemReminder,
 } from './prompts.js';
-import type { ClassifierTelemetry } from '@hoptrendy/quran-guidance';
 import {
   CompressionStatus,
   GeminiEventType,
@@ -48,6 +48,9 @@ import {
 } from '../services/chatCompressionService.js';
 import { LoopDetectionService } from '../services/loopDetectionService.js';
 
+// Models
+import { buildAgentContentGeneratorConfig } from '../models/content-generator-config.js';
+
 // Tools
 import type { RelevantAutoMemoryPromptResult } from '../memory/manager.js';
 import { ToolNames } from '../tools/tool-names.js';
@@ -56,7 +59,6 @@ import { ToolNames } from '../tools/tool-names.js';
 import {
   NextSpeakerCheckEvent,
   logNextSpeakerCheck,
-  recordClassifierSituation,
 } from '../telemetry/index.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 
@@ -95,9 +97,6 @@ import { createHookOutput } from '../hooks/types.js';
 import { ideContextStore } from '../ide/ideContext.js';
 import { type File, type IdeContext } from '../ide/types.js';
 import type { StopHookOutput } from '../hooks/types.js';
-
-// Skill evolution
-import { runEvolvePass } from '../services/evolveService.js';
 
 const MAX_TURNS = 100;
 
@@ -142,6 +141,14 @@ export class GeminiClient {
   private forceFullIdeContext = true;
 
   /**
+   * Cache of per-model ContentGenerators keyed by model ID.
+   * Avoids rebuilding the generator (SDK instantiation, config resolution)
+   * on every side query (recap, title, tool summary).
+   * Cleared on session reset (resetChat) to pick up config changes.
+   */
+  private perModelGeneratorCache = new Map<string, Promise<ContentGenerator>>();
+
+  /**
    * At any point in this conversation, was compression triggered without
    * being forced and did it fail?
    */
@@ -157,7 +164,7 @@ export class GeminiClient {
   /**
    * Timestamp (epoch ms) of the last completed API call.
    * Used to detect idle periods for thinking block cleanup.
-   * Starts as null — on the first query there is no prior thinking to clean,
+   * Starts as null ΓÇö on the first query there is no prior thinking to clean,
    * so the idle check is skipped until the first API call completes.
    */
   private lastApiCompletionTimestamp: number | null = null;
@@ -210,17 +217,6 @@ export class GeminiClient {
     return this.getChat().getHistory(curated);
   }
 
-  /**
-   * Returns the chat history without deep-cloning.
-   *
-   * For internal read-only callers only — the returned array and its
-   * Content objects MUST NOT be mutated. Use {@link getHistory} when
-   * the caller or downstream code may need to modify the returned array.
-   */
-  peekHistory(curated: boolean = false): Content[] {
-    return this.getChat().peekHistory(curated);
-  }
-
   private stripOrphanedUserEntriesFromHistory() {
     this.getChat().stripOrphanedUserEntriesFromHistory();
     // Stripped trailing user entries can include read_file
@@ -228,6 +224,9 @@ export class GeminiClient {
     // FileReadCache would still record those reads, so the retry's
     // re-issued Read could hit the file_unchanged placeholder while
     // the model has nothing to fall back on. Clear to be safe.
+    debugLogger.debug(
+      '[FILE_READ_CACHE] clear after stripOrphanedUserEntriesFromHistory',
+    );
     this.config.getFileReadCache().clear();
   }
 
@@ -238,12 +237,13 @@ export class GeminiClient {
     // Without clearing, a follow-up Read of an unchanged file would
     // return the file_unchanged placeholder for bytes that no longer
     // exist in the new history.
+    debugLogger.debug('[FILE_READ_CACHE] clear after setHistory');
     this.config.getFileReadCache().clear();
     this.forceFullIdeContext = true;
   }
 
   truncateHistory(keepCount: number) {
-    // Use the O(1) length getter rather than getHistory() — the latter
+    // Use the O(1) length getter rather than getHistory() ΓÇö the latter
     // structuredClone's the entire history just to read .length, which
     // gets expensive in long-running sessions.
     const prevLen = this.getChat().getHistoryLength();
@@ -255,6 +255,9 @@ export class GeminiClient {
     // the clear, reintroducing the file_unchanged placeholder bug).
     const newLen = this.getChat().getHistoryLength();
     if (newLen < prevLen) {
+      debugLogger.debug(
+        `[FILE_READ_CACHE] clear after truncateHistory(keep=${keepCount}, prev=${prevLen}, new=${newLen})`,
+      );
       this.config.getFileReadCache().clear();
     }
     this.forceFullIdeContext = true;
@@ -279,7 +282,9 @@ export class GeminiClient {
     // read_file tool results the FileReadCache still tracks are no
     // longer in history, so a follow-up Read would serve a placeholder
     // pointing at content the model can no longer retrieve.
+    debugLogger.debug('[FILE_READ_CACHE] clear after resetChat');
     this.config.getFileReadCache().clear();
+    this.perModelGeneratorCache.clear();
     await this.startChat();
   }
 
@@ -303,59 +308,19 @@ export class GeminiClient {
     const overrideSystemPrompt = this.config.getSystemPrompt();
     const appendSystemPrompt = this.config.getAppendSystemPrompt();
 
-    // Build extra injections: capability manifest + permission blocker note
-    const extraSections = this.buildSystemPromptExtras();
-    const fullAppend = appendSystemPrompt
-      ? extraSections
-        ? `${appendSystemPrompt}\n\n${extraSections}`
-        : appendSystemPrompt
-      : extraSections || undefined;
-
     if (overrideSystemPrompt) {
       return getCustomSystemPrompt(
         overrideSystemPrompt,
         userMemory,
-        fullAppend,
+        appendSystemPrompt,
       );
     }
 
-    return getCoreSystemPrompt(userMemory, this.config.getModel(), fullAppend);
-  }
-
-  /**
-   * Builds supplementary system-prompt sections injected each session start:
-   *  1. Capability manifest — lists active MCP tool names so the model knows
-   *     what external tools are available beyond the built-in set.
-   *  2. Permission blocker note — reminds the model if certain tools have been
-   *     repeatedly denied, so it can avoid re-requesting them.
-   */
-  private buildSystemPromptExtras(): string {
-    const parts: string[] = [];
-
-    // 1. Capability manifest for MCP tools
-    try {
-      const registry = this.config.getToolRegistry();
-      const allNames = registry.getAllToolNames();
-      // MCP tool names follow the pattern `serverName__toolName` (two underscores)
-      const mcpTools = allNames.filter((n) => n.includes('__'));
-      if (mcpTools.length > 0) {
-        parts.push(
-          `# Active MCP Tools\nThe following tools are available via MCP servers:\n${mcpTools.map((t) => `- \`${t}\``).join('\n')}`,
-        );
-      }
-    } catch {
-      // Registry not yet initialised — skip silently
-    }
-
-    // 2. PermissionBlocker note
-    try {
-      const note = this.config.getPermissionBlockerService().buildPromptNote();
-      if (note) parts.push(note);
-    } catch {
-      // Service not available — skip silently
-    }
-
-    return parts.join('\n\n');
+    return getCoreSystemPrompt(
+      userMemory,
+      this.config.getModel(),
+      appendSystemPrompt,
+    );
   }
 
   async startChat(extraHistory?: Content[]): Promise<GeminiChat> {
@@ -730,7 +695,7 @@ export class GeminiClient {
     }
 
     // Notifications start a fresh Turn with a new prompt_id, so the loop
-    // detector must reset — otherwise a prior turn's count can trip
+    // detector must reset ΓÇö otherwise a prior turn's count can trip
     // LoopDetected early on the notification turn.
     if (
       messageType === SendMessageType.UserQuery ||
@@ -775,12 +740,22 @@ export class GeminiClient {
       // retries/hooks) so that model latency during a tool-call loop
       // doesn't count as user idle time.
       const mcResult = microcompactHistory(
-        this.getChat().peekHistory(),
+        this.getChat().getHistory(),
         this.lastApiCompletionTimestamp,
         this.config.getClearContextOnIdle(),
       );
       if (mcResult.meta) {
-        this.setHistory(mcResult.history);
+        this.getChat().setHistory(mcResult.history);
+        // Microcompaction replaces old compactable tool outputs
+        // (including read_file) with a placeholder, but the
+        // FileReadCache still records the prior full Reads as "seen in
+        // this conversation". A follow-up Read of an unchanged file
+        // would then return the file_unchanged placeholder pointing at
+        // bytes the model can no longer retrieve from history. Drop the
+        // cache so post-microcompaction Reads re-emit the bytes,
+        // mirroring the post-compaction clear in tryCompressChat.
+        debugLogger.debug('[FILE_READ_CACHE] clear after microcompaction');
+        this.config.getFileReadCache().clear();
         const m = mcResult.meta;
         debugLogger.debug(
           `[TIME-BASED MC] gap ${m.gapMinutes}min > ${m.thresholdMinutes}min, ` +
@@ -834,11 +809,11 @@ export class GeminiClient {
     }
 
     // Prevent context updates from being sent while a tool call is
-    // waiting for a response. The HopCode API requires that a functionResponse
+    // waiting for a response. The Qwen API requires that a functionResponse
     // part from the user immediately follows a functionCall part from the model
     // in the conversation history . The IDE context is not discarded; it will
     // be included in the next regular message sent to the model.
-    const history = this.peekHistory();
+    const history = this.getHistory();
     const lastMessage =
       history.length > 0 ? history[history.length - 1] : undefined;
     const hasPendingToolCall =
@@ -924,28 +899,8 @@ export class GeminiClient {
           const configPath = `${sessionDir}/config.json`;
           systemReminders.push(getArenaSystemReminder(configPath));
         } catch {
-          // Arena config not yet initialized — skip
+          // Arena config not yet initialized ΓÇö skip
         }
-      }
-
-      // add per-turn quran guidance reminder for context-aware behavior
-      const messageText = partToString(request);
-      const iznActive = this.config.getApprovalMode() === ApprovalMode.IZN;
-
-      const config = this.config;
-      const classifierTelemetry: ClassifierTelemetry = {
-        recordClassification(situation, confidence) {
-          recordClassifierSituation(config, situation, confidence);
-        },
-      };
-
-      const quranGuidanceReminder = getQuranGuidancePerTurnReminder(
-        messageText,
-        iznActive,
-        classifierTelemetry,
-      );
-      if (quranGuidanceReminder) {
-        systemReminders.push(quranGuidanceReminder);
       }
 
       requestToSent = [...systemReminders, ...requestToSent];
@@ -967,7 +922,7 @@ export class GeminiClient {
           return turn;
         }
       }
-      // Update arena status on Finished events — stats are derived
+      // Update arena status on Finished events ΓÇö stats are derived
       // automatically from uiTelemetryService by the reporter.
       if (arenaAgentClient && event.type === GeminiEventType.Finished) {
         await arenaAgentClient.updateStatus();
@@ -1001,7 +956,7 @@ export class GeminiClient {
       this.config.hasHooksForEvent('Stop')
     ) {
       // Get response text from the chat history
-      const history = this.peekHistory();
+      const history = this.getHistory();
       const lastModelMessage = history
         .filter((msg) => msg.role === 'model')
         .pop();
@@ -1100,12 +1055,12 @@ export class GeminiClient {
     }
 
     if (!turn.pendingToolCalls.length && signal && !signal.aborted) {
-      // Save cache-safe params here — before any early return — so that
+      // Save cache-safe params here ΓÇö before any early return ΓÇö so that
       // background extract/dream agents calling getCacheSafeParams() always
       // see the current turn's history regardless of which path exits below.
       try {
         const chat = this.getChat();
-        const fullHistory = chat.peekHistory(true);
+        const fullHistory = chat.getHistory(true);
         const maxHistoryForCache = 40;
         const cachedHistory =
           fullHistory.length > maxHistoryForCache
@@ -1117,12 +1072,12 @@ export class GeminiClient {
           this.config.getModel(),
         );
       } catch {
-        // Best-effort — don't block the main flow
+        // Best-effort ΓÇö don't block the main flow
       }
 
       if (this.config.getSkipNextSpeakerCheck()) {
         this.runManagedAutoMemoryBackgroundTasks(messageType);
-        // Report completed before returning — agent has no more work to do
+        // Report completed before returning ΓÇö agent has no more work to do
         if (arenaAgentClient) {
           await arenaAgentClient.reportCompleted();
         }
@@ -1158,24 +1113,8 @@ export class GeminiClient {
 
       this.runManagedAutoMemoryBackgroundTasks(messageType);
 
-      // Fire-and-forget skill evolution pass every N turns
-      void (async () => {
-        try {
-          const recentHistory = this.peekHistory().slice(-20);
-          const recentMessages = recentHistory
-            .filter((c) => c.role === 'user' || c.role === 'model')
-            .map((c) => ({
-              role: c.role as string,
-              text: partToString(c.parts ?? []),
-            }));
-          await runEvolvePass(this.config, recentMessages);
-        } catch {
-          // Never surface evolve errors to the user
-        }
-      })();
-
       if (arenaAgentClient) {
-        // No continuation needed — agent completed its task
+        // No continuation needed ΓÇö agent completed its task
         await arenaAgentClient.reportCompleted();
       }
     }
@@ -1211,10 +1150,31 @@ export class GeminiClient {
         systemInstruction: finalSystemInstruction,
       };
 
+      // When the requested model differs from the main model (e.g. fast model
+      // side queries for session recap / title / summary), resolve the target
+      // model's own ContentGeneratorConfig so that per-model settings like
+      // extra_body, samplingParams, and reasoning are not inherited from the
+      // main model's config.
+      const mainModel = this.config.getModel() ?? model;
+      const isPerModel = model !== mainModel;
+
+      // Resolve the authType for retry logic. When using a per-model content
+      // generator (e.g. fast model side queries), the retry authType must match
+      // the target model's provider, not the main session's provider. This
+      // ensures QWEN_OAUTH quota detection checks against the right provider.
+      const retryAuthType = isPerModel
+        ? (this.createRetryAuthTypeForModel(model) ??
+          this.config.getContentGeneratorConfig()?.authType ??
+          AuthType.USE_OPENAI)
+        : this.config.getContentGeneratorConfig()?.authType;
+
+      const contentGenerator = isPerModel
+        ? await this.createContentGeneratorForModel(model)
+        : this.getContentGeneratorOrFail();
       const apiCall = () => {
         currentAttemptModel = model;
 
-        return this.getContentGeneratorOrFail().generateContent(
+        return contentGenerator.generateContent(
           {
             model,
             config: requestConfig,
@@ -1224,12 +1184,12 @@ export class GeminiClient {
         );
       };
       const result = await retryWithBackoff(apiCall, {
-        authType: this.config.getContentGeneratorConfig()?.authType,
+        authType: retryAuthType,
         persistentMode: isUnattendedMode(),
         signal: abortSignal,
         heartbeatFn: (info) => {
           process.stderr.write(
-            `[hopcode] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
+            `[qwen-code] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
           );
         },
       });
@@ -1252,6 +1212,111 @@ export class GeminiClient {
         `Failed to generate content with model ${currentAttemptModel}: ${getErrorMessage(error)}`,
       );
     }
+  }
+
+  /**
+   * Resolve a model across all authTypes. Handles the case where the target
+   * model is registered under a different authType than the main model
+   * (e.g. main=QWEN_OAUTH, fast=USE_ANTHROPIC).
+   *
+   * TODO: Move cross-authType resolution to ModelRegistry for a cleaner
+   * data-layer solution. Follow-up PR.
+   */
+
+  private resolveModelAcrossAuthTypes(
+    model: string,
+  ): ResolvedModelConfig | undefined {
+    const modelsConfig = this.config.getModelsConfig();
+    const allAuthTypes: AuthType[] = [
+      AuthType.HOPCODE_OAUTH,
+      AuthType.USE_OPENAI,
+      AuthType.USE_VERTEX_AI,
+      AuthType.USE_ANTHROPIC,
+      AuthType.USE_GEMINI,
+    ];
+
+    // Try the main authType first for early exit
+    const mainAuthType = this.config.getContentGeneratorConfig()?.authType;
+    if (mainAuthType) {
+      const resolved = modelsConfig.getResolvedModel(mainAuthType, model);
+      if (resolved) return resolved;
+    }
+
+    for (const authType of allAuthTypes) {
+      if (authType === mainAuthType) continue;
+      const resolved = modelsConfig.getResolvedModel(authType, model);
+      if (resolved) return resolved;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Resolve the authType for a given model without creating a full generator.
+   * Used by retry logic to ensure provider-specific checks (e.g. QWEN_OAUTH
+   * quota detection) reference the correct provider.
+   */
+  private createRetryAuthTypeForModel(model: string): string | undefined {
+    return this.resolveModelAcrossAuthTypes(model)?.authType;
+  }
+
+  /**
+   * Return a ContentGenerator for a specific model (e.g. the fast model) with
+   * its own per-model settings from modelProviders.  This prevents the main
+   * model's extra_body / samplingParams / reasoning from leaking into side
+   * queries that target a different model.
+   *
+   * Falls back to the main content generator when the target model is not in
+   * the registry or when creating a dedicated generator fails (e.g. in test
+   * environments without full auth setup).
+   *
+   * Results are cached by model ID to avoid rebuilding the generator
+   * (SDK instantiation, config resolution) on every side query.
+   */
+  private async createContentGeneratorForModel(
+    model: string,
+  ): Promise<ContentGenerator> {
+    // Check cache first (Promise coalescing to prevent redundant SDK instantiations)
+    const cached = this.perModelGeneratorCache.get(model);
+    if (cached) return cached;
+
+    const generatorPromise = (async () => {
+      try {
+        const resolvedModel = this.resolveModelAcrossAuthTypes(model);
+
+        if (!resolvedModel) {
+          debugLogger.warn(
+            `Model "${model}" not found in registry across all authTypes, falling back to main generator.`,
+          );
+          return this.getContentGeneratorOrFail();
+        }
+
+        const targetConfig = buildAgentContentGeneratorConfig(
+          this.config,
+          model,
+          {
+            authType: resolvedModel.authType,
+            apiKey: resolvedModel.envKey
+              ? (process.env[resolvedModel.envKey] ?? undefined)
+              : undefined,
+            baseUrl: resolvedModel.baseUrl,
+          },
+        );
+
+        return await createContentGenerator(targetConfig, this.config);
+      } catch (err: unknown) {
+        debugLogger.warn(
+          `Failed to create content generator for model "${model}", falling back to main generator.`,
+          err instanceof Error ? err.message : String(err),
+        );
+        // On failure, delete from cache so subsequent attempts can retry.
+        this.perModelGeneratorCache.delete(model);
+        return this.getContentGeneratorOrFail();
+      }
+    })();
+
+    this.perModelGeneratorCache.set(model, generatorPromise);
+    return generatorPromise;
   }
 
   async tryCompressChat(
@@ -1289,6 +1354,7 @@ export class GeminiClient {
         // placeholder pointing at content the model can no longer
         // retrieve from its own context. Clear the cache so post-
         // compaction Reads re-emit the bytes.
+        debugLogger.debug('[FILE_READ_CACHE] clear after tryCompressChat');
         this.config.getFileReadCache().clear();
         uiTelemetryService.setLastPromptTokenCount(info.newTokenCount);
         this.forceFullIdeContext = true;
