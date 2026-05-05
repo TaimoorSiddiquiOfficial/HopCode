@@ -1232,16 +1232,23 @@ Body.
       // otherwise the user copy's globs activate the visible (project)
       // skill, even when the touched file is outside the project skill's
       // declared paths.
-      const projectQwenSkillsDir = path.join(
+      const projectHopCodeSkillsDir = path.join(
         '/test/project',
-        '.qwen',
+        '.hopcode',
         'skills',
       );
-      const userQwenSkillsDir = path.join('/home/user', '.qwen', 'skills');
+      const userHopCodeSkillsDir = path.join(
+        '/home/user',
+        '.hopcode',
+        'skills',
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(fs.readdir).mockImplementation((dirPath: any) => {
         const pathStr = String(dirPath);
-        if (pathStr === projectQwenSkillsDir || pathStr === userQwenSkillsDir) {
+        if (
+          pathStr === projectHopCodeSkillsDir ||
+          pathStr === userHopCodeSkillsDir
+        ) {
           return Promise.resolve([
             {
               name: 'foo',
@@ -1258,7 +1265,7 @@ Body.
       vi.mocked(fs.access).mockResolvedValue(undefined);
       vi.mocked(fs.readFile).mockImplementation((filePath) => {
         const pathStr = String(filePath);
-        if (pathStr.startsWith(projectQwenSkillsDir)) {
+        if (pathStr.startsWith(projectHopCodeSkillsDir)) {
           return Promise.resolve(`---
 name: foo
 description: A test skill
@@ -1269,7 +1276,7 @@ paths:
 Project body.
 `);
         }
-        if (pathStr.startsWith(userQwenSkillsDir)) {
+        if (pathStr.startsWith(userHopCodeSkillsDir)) {
           return Promise.resolve(`---
 name: foo
 description: A test skill

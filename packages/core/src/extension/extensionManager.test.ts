@@ -100,7 +100,7 @@ function createExtension({
   );
 
   if (addContextFile) {
-    fs.writeFileSync(path.join(extDir, 'QWEN.md'), 'context');
+    fs.writeFileSync(path.join(extDir, 'HOPCODE.md'), 'context');
   }
 
   if (contextFileName) {
@@ -169,7 +169,7 @@ describe('extension tests', () => {
       expect(extensions[0].config.name).toBe('test-extension');
     });
 
-    it('should load context file path when QWEN.md is present', async () => {
+    it('should load context file path when HOPCODE.md is present', async () => {
       createExtension({
         extensionsDir: userExtensionsDir,
         name: 'ext1',
@@ -190,7 +190,7 @@ describe('extension tests', () => {
       const ext1 = extensions.find((e) => e.config.name === 'ext1');
       const ext2 = extensions.find((e) => e.config.name === 'ext2');
       expect(ext1?.contextFiles).toEqual([
-        path.join(userExtensionsDir, 'ext1', 'QWEN.md'),
+        path.join(userExtensionsDir, 'ext1', 'HOPCODE.md'),
       ]);
       expect(ext2?.contextFiles).toEqual([]);
     });
@@ -215,7 +215,7 @@ describe('extension tests', () => {
       ]);
     });
 
-    it('should use default QWEN.md when contextFileName is empty array', async () => {
+    it('should use default HOPCODE.md when contextFileName is empty array', async () => {
       const extDir = path.join(userExtensionsDir, 'ext-empty-context');
       fs.mkdirSync(extDir, { recursive: true });
       fs.writeFileSync(
@@ -226,7 +226,7 @@ describe('extension tests', () => {
           contextFileName: [],
         }),
       );
-      fs.writeFileSync(path.join(extDir, 'QWEN.md'), 'context content');
+      fs.writeFileSync(path.join(extDir, 'HOPCODE.md'), 'context content');
 
       const manager = createExtensionManager();
       await manager.refreshCache();
@@ -235,7 +235,7 @@ describe('extension tests', () => {
       expect(extensions).toHaveLength(1);
       const ext = extensions.find((e) => e.config.name === 'ext-empty-context');
       expect(ext?.contextFiles).toEqual([
-        path.join(userExtensionsDir, 'ext-empty-context', 'QWEN.md'),
+        path.join(userExtensionsDir, 'ext-empty-context', 'HOPCODE.md'),
       ]);
     });
 
