@@ -112,6 +112,7 @@ describe('gemini.tsx main function', () => {
   let originalEnvGeminiSandbox: string | undefined;
   let originalEnvSandbox: string | undefined;
   let originalEnvQwenCodeSimple: string | undefined;
+  let originalEnvHopcodeSimple: string | undefined;
   let initialUnhandledRejectionListeners: NodeJS.UnhandledRejectionListener[] =
     [];
 
@@ -120,9 +121,11 @@ describe('gemini.tsx main function', () => {
     originalEnvGeminiSandbox = process.env['QWEN_SANDBOX'];
     originalEnvSandbox = process.env['SANDBOX'];
     originalEnvQwenCodeSimple = process.env['QWEN_CODE_SIMPLE'];
+    originalEnvHopcodeSimple = process.env['HOPCODE_SIMPLE'];
     delete process.env['QWEN_SANDBOX'];
     delete process.env['SANDBOX'];
     delete process.env['QWEN_CODE_SIMPLE'];
+    delete process.env['HOPCODE_SIMPLE'];
 
     initialUnhandledRejectionListeners =
       process.listeners('unhandledRejection');
@@ -144,6 +147,11 @@ describe('gemini.tsx main function', () => {
       process.env['QWEN_CODE_SIMPLE'] = originalEnvQwenCodeSimple;
     } else {
       delete process.env['QWEN_CODE_SIMPLE'];
+    }
+    if (originalEnvHopcodeSimple !== undefined) {
+      process.env['HOPCODE_SIMPLE'] = originalEnvHopcodeSimple;
+    } else {
+      delete process.env['HOPCODE_SIMPLE'];
     }
 
     const currentListeners = process.listeners('unhandledRejection');
