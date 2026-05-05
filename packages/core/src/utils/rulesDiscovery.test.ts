@@ -13,7 +13,7 @@ import {
   loadRules,
   ConditionalRulesRegistry,
 } from './rulesDiscovery.js';
-import { HOPCODE_DIR } from './paths.js';
+import { HOPCODE_DIR, unescapePath } from './paths.js';
 
 vi.mock('os', async (importOriginal) => {
   const actualOs = await importOriginal<typeof os>();
@@ -423,5 +423,24 @@ Use hooks.`,
       const result = reg.matchAndConsume('src/foo.ts');
       expect(result).toContain('Strict.');
     });
+
+    it.skipIf(process.platform === 'win32')(
+      'should match shell-escaped file paths after unescaping',
+      () => {
+        // On Windows, unescapePath is a no-op (backslash is a path
+        // separator, not a shell escape character).
+        const reg = new ConditionalRulesRegistry(
+          [rule('/r/ts.md', ['src/**/*.tsx'], 'Use hooks.')],
+          '/project',
+        );
+        const escapedPath = 'src/App\\ file.tsx';
+        const normalizedPath = unescapePath(escapedPath.trim());
+        expect(normalizedPath).toBe('src/App file.tsx');
+        const result = reg.matchAndConsume(
+          path.resolve('/project', normalizedPath),
+        );
+        expect(result).toContain('Use hooks.');
+      },
+    );
   });
 });

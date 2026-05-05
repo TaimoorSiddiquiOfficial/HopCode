@@ -46,6 +46,22 @@ export function _resetValidatePathCacheForTest(): void {
  */
 export const SHELL_SPECIAL_CHARS = /[ \t()[\]{};|*?$`'"#&<>!~]/;
 
+// Single shared list of path-argument keys used across file tools.
+// file_path (Edit, ReadFile, WriteFile), path (Glob, Grep, Ls, RipGrep),
+// filePath (Lsp), notebook_path.
+export const PATH_ARG_KEYS = [
+  'file_path',
+  'path',
+  'filePath',
+  'notebook_path',
+] as const;
+
+/** Compiled regex for unescapePath — hoisted to avoid re-compilation per call. */
+const UNESCAPE_REGEX = (() => {
+  const inner = SHELL_SPECIAL_CHARS.source.slice(1, -1);
+  return new RegExp(`\\\\([${inner}])`, 'g');
+})();
+
 /**
  * Replaces the home directory with a tilde.
  * @param path - The path to tildeify.
@@ -207,10 +223,11 @@ export function escapePath(filePath: string): string {
  * Removes backslash escaping from shell metacharacters.
  */
 export function unescapePath(filePath: string): string {
-  return filePath.replace(
-    new RegExp(`\\\\([${SHELL_SPECIAL_CHARS.source.slice(1, -1)}])`, 'g'),
-    '$1',
-  );
+  if (os.platform() === 'win32') {
+    return filePath;
+  }
+  const unescaped = filePath.replace(UNESCAPE_REGEX, '$1');
+  return unescaped;
 }
 
 /**
