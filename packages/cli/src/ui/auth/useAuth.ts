@@ -48,8 +48,7 @@ import {
 
 /**
  * Generate an env key from protocol and base URL for custom API keys.
- * Format: HOPCODE_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
- * (QWEN_CUSTOM_API_KEY_ prefix kept for backward compatibility.)
+ * Format: QWEN_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
  */
 export function generateCustomApiKeyEnvKey(
   protocol: string,
