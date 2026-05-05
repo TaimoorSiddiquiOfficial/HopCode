@@ -11,7 +11,7 @@ import { t } from '../../../../i18n/index.js';
 
 interface GenerationOption {
   label: string;
-  value: 'qwen' | 'manual';
+  value: 'auto' | 'manual';
 }
 
 const generationOptions: GenerationOption[] = [
@@ -19,7 +19,7 @@ const generationOptions: GenerationOption[] = [
     get label() {
       return t('Generate with HopCode (Recommended)');
     },
-    value: 'qwen',
+    value: 'auto',
   },
   {
     get label() {
@@ -39,7 +39,7 @@ export function GenerationMethodSelector({
   onPrevious: _onPrevious,
 }: WizardStepProps) {
   const handleSelect = (selectedValue: string) => {
-    const method = selectedValue as 'qwen' | 'manual';
+    const method = selectedValue as 'auto' | 'manual';
     dispatch({ type: 'SET_GENERATION_METHOD', method });
     onNext();
   };

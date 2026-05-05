@@ -583,7 +583,7 @@ export async function parseArguments(): Promise<CliArgs> {
           description:
             'Slash command names to hide/disable (comma-separated or ' +
             'repeated). Merged with the `slashCommands.disabled` setting ' +
-            'and HOPCODE_DISABLED_SLASH_COMMANDS (or QWEN_DISABLED_SLASH_COMMANDS). Matched case-insensitively ' +
+            'and HOPCODE_DISABLED_SLASH_COMMANDS. Matched case-insensitively ' +
             'against the final command name.',
           coerce: (names: string[]) =>
             names.flatMap((n) => n.split(',').map((t) => t.trim())),

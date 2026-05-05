@@ -47,8 +47,9 @@ import {
 } from '../../commands/auth/openrouterOAuth.js';
 
 /**
- * Generate a Qwen-managed env key from protocol and base URL.
- * Format: QWEN_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
+ * Generate an env key from protocol and base URL for custom API keys.
+ * Format: HOPCODE_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
+ * (QWEN_CUSTOM_API_KEY_ prefix kept for backward compatibility.)
  */
 export function generateCustomApiKeyEnvKey(
   protocol: string,
