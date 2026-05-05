@@ -3501,7 +3501,7 @@ Other open files:
       };
 
       // resolveModelAcrossAuthTypes calls getResolvedModel multiple times:
-      // 1. main authType (QWEN_OAUTH) → undefined (miss)
+      // 1. main authType (HOPCODE_OAUTH) → undefined (miss)
       // 2. secondary authType (USE_OPENAI) → mockResolvedModel (hit)
       // 3. buildAgentContentGeneratorConfig calls getResolvedModel again
       //    with the resolved authType → mockResolvedModel (hit)
