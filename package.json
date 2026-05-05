@@ -80,7 +80,7 @@
     },
     "baseline-browser-mapping": "^2.9.19",
     "normalize-package-data": "^7.0.1",
-    "brace-expansion": "^1.1.13",
+    "brace-expansion@<1.1.13": "^1.1.13",
     "esbuild": "^0.25.5"
   },
   "bin": {
