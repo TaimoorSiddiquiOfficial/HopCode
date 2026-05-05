@@ -51,7 +51,7 @@
     "ansi-regex": "^6.2.2",
     "command-exists": "^1.2.9",
     "comment-json": "^4.2.5",
-    "diff": "^7.0.0",
+    "diff": "^9.0.0",
     "dotenv": "^17.4.2",
     "fzf": "^0.5.2",
     "glob": "^11.1.0",

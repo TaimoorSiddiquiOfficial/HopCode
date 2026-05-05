@@ -67,7 +67,7 @@
     "chardet": "^2.1.0",
     "iconv-lite": "^0.6.3",
     "chokidar": "^4.0.3",
-    "diff": "^7.0.0",
+    "diff": "^9.0.0",
     "dotenv": "^17.4.2",
     "extract-zip": "^2.0.1",
     "fast-levenshtein": "^2.0.6",
