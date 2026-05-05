@@ -3424,7 +3424,7 @@ Other open files:
 
       // Main config uses a different authType
       vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         apiKey: 'test-key',
         apiModel: 'test-model',
       } as unknown as ContentGeneratorConfig);
@@ -3440,7 +3440,7 @@ Other open files:
       );
 
       // VERIFY: retryWithBackoff was called with the fast model's authType ('openai'),
-      // not the main model's authType ('QWEN_OAUTH').
+      // not the main model's authType ('HOPCODE_OAUTH').
       expect(retryWithBackoff).toHaveBeenCalledWith(
         expect.any(Function),
         expect.objectContaining({
@@ -3514,9 +3514,9 @@ Other open files:
         getResolvedModel,
       } as unknown as ModelsConfig);
 
-      // Main config uses QWEN_OAUTH — fast model registered under USE_OPENAI
+      // Main config uses HOPCODE_OAUTH — fast model registered under USE_OPENAI
       vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         apiKey: 'test-key',
         apiModel: 'test-model',
       } as unknown as ContentGeneratorConfig);
@@ -3532,10 +3532,10 @@ Other open files:
         'fast-model',
       );
 
-      // First call uses main authType (QWEN_OAUTH) — misses
+      // First call uses main authType (HOPCODE_OAUTH) — misses
       expect(getResolvedModel).toHaveBeenNthCalledWith(
         1,
-        AuthType.QWEN_OAUTH,
+        AuthType.HOPCODE_OAUTH,
         'fast-model',
       );
       // Second call falls through to secondary authType — hits
