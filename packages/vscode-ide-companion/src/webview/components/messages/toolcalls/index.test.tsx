@@ -45,8 +45,8 @@ vi.mock('@hoptrendy/webui', async () => {
     getToolCallComponent: realGetToolCallComponent,
     isAgentExecutionToolCall,
   } =
-    await vi.importActual<typeof import('@qwen-code/webui')>(
-      '@qwen-code/webui',
+    await vi.importActual<typeof import('@hoptrendy/webui')>(
+      '@hoptrendy/webui',
     );
 
   // Map each real component to its label-based mock.
