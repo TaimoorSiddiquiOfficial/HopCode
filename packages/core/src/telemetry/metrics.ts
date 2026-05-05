@@ -52,6 +52,9 @@ const MEMORY_DREAM_DURATION = `${SERVICE_NAME}.memory.dream.duration`;
 const MEMORY_RECALL_COUNT = `${SERVICE_NAME}.memory.recall.count`;
 const MEMORY_RECALL_DURATION = `${SERVICE_NAME}.memory.recall.duration`;
 
+// Classifier Metrics
+const CLASSIFIER_SITUATION_COUNT = `${SERVICE_NAME}.classifier.situation.count`;
+
 const baseMetricDefinition = {
   getCommonAttributes: (config: Config): Attributes => ({
     'session.id': config.getSessionId(),
@@ -377,6 +380,9 @@ let memoryDreamDurationHistogram: Histogram | undefined;
 let memoryRecallCounter: Counter | undefined;
 let memoryRecallDurationHistogram: Histogram | undefined;
 
+// Classifier Metrics
+let classifierSituationCounter: Counter | undefined;
+
 let isMetricsInitialized = false;
 let isPerformanceMonitoringEnabled = false;
 
@@ -483,6 +489,13 @@ export function initializeMetrics(config: Config): void {
   );
   // Initialize performance monitoring metrics if enabled
   initializePerformanceMonitoring(config);
+
+  // Classifier metrics
+  classifierSituationCounter = meter.createCounter(CLASSIFIER_SITUATION_COUNT, {
+    description:
+      'Counts classifier situation detections, tagged by situation and confidence band.',
+    valueType: ValueType.INT,
+  });
 
   isMetricsInitialized = true;
 }
@@ -614,6 +627,32 @@ export function recordContentRetryFailure(config: Config): void {
     1,
     baseMetricDefinition.getCommonAttributes(config),
   );
+}
+
+/** Confidence band for classifier telemetry. */
+export type ConfidenceBand = 'low' | 'medium' | 'high';
+
+/**
+ * Records a classifier situation detection event.
+ * @param config — Config for common attributes
+ * @param situation — the detected situation type
+ * @param confidence — confidence score (0.0–1.0)
+ */
+export function recordClassifierSituation(
+  config: Config,
+  situation: string,
+  confidence: number,
+): void {
+  if (!classifierSituationCounter || !isMetricsInitialized) return;
+
+  const band: ConfidenceBand =
+    confidence >= 0.7 ? 'high' : confidence >= 0.5 ? 'medium' : 'low';
+
+  classifierSituationCounter.add(1, {
+    ...baseMetricDefinition.getCommonAttributes(config),
+    situation,
+    confidence_band: band,
+  });
 }
 
 export function recordModelSlashCommand(

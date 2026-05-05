@@ -56,3 +56,6 @@ export const EVENT_PERFORMANCE_REGRESSION = 'hopcode.performance.regression';
 export const EVENT_MEMORY_EXTRACT = 'hopcode.memory.extract';
 export const EVENT_MEMORY_DREAM = 'hopcode.memory.dream';
 export const EVENT_MEMORY_RECALL = 'hopcode.memory.recall';
+
+// Classifier Telemetry
+export const EVENT_CLASSIFIER_SITUATION = 'hopcode.classifier.situation';

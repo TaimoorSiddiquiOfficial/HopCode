@@ -87,6 +87,16 @@ export type SituationAnalysis = {
   requiredAngles: QuranicAngle[];
 };
 
+/** Callback interface for recording classifier events for telemetry. */
+export interface ClassifierTelemetry {
+  /**
+   * Called whenever a situation is classified.
+   * @param situation — the detected agent situation
+   * @param confidence — confidence score (0.0–1.0)
+   */
+  recordClassification(situation: AgentSituation, confidence: number): void;
+}
+
 export type GuidanceDecision = {
   situation: AgentSituation;
   appliedAngles: QuranicAngle[];

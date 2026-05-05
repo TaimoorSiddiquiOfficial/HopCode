@@ -4,6 +4,54 @@ import type {
   IznGateResult,
 } from '../types/izn-types.js';
 
+// ── Escalation thresholds ──────────────────────────────────────────
+export const IZN_ESCALATION_LEVELS = {
+  /** Standard self-verification — first-time or isolated destructive call. */
+  CAUTION: 'caution',
+  /** Repeated same-category block — stronger warning with regression risk. */
+  WARNING: 'warning',
+  /** Persistent same-category block — refusal with explicit justification. */
+  REFUSAL: 'refusal',
+} as const;
+
+export type IznEscalationLevel =
+  (typeof IZN_ESCALATION_LEVELS)[keyof typeof IZN_ESCALATION_LEVELS];
+
+/** Consecutive blocks needed to escalate to warning level. */
+const WARNING_THRESHOLD = 3;
+/** Consecutive blocks needed to escalate to refusal level. */
+const REFUSAL_THRESHOLD = 5;
+
+export interface IznBlockHistoryEntry {
+  category: DestructiveActionCategory;
+}
+
+function computeEscalationLevel(
+  matchedCategories: DestructiveActionCategory[],
+  blockHistory?: IznBlockHistoryEntry[],
+): IznEscalationLevel | null {
+  if (!blockHistory || blockHistory.length === 0) return null;
+
+  // Count consecutive blocks where at least one category matches
+  let consecutive = 0;
+  for (let i = blockHistory.length - 1; i >= 0; i--) {
+    const entry = blockHistory[i];
+    const hasOverlap = entry.category
+      ? matchedCategories.includes(entry.category)
+      : false;
+    if (hasOverlap) {
+      consecutive++;
+    } else {
+      break;
+    }
+  }
+
+  if (consecutive >= REFUSAL_THRESHOLD) return IZN_ESCALATION_LEVELS.REFUSAL;
+  if (consecutive >= WARNING_THRESHOLD) return IZN_ESCALATION_LEVELS.WARNING;
+  if (consecutive >= 1) return IZN_ESCALATION_LEVELS.CAUTION;
+  return null;
+}
+
 /**
  * Izn pre-execution gate.
  *
@@ -15,18 +63,29 @@ import type {
  *
  * Non-destructive actions (reads, normal writes, searches) pass through.
  * Destructive categories trigger the clarification workflow.
+ *
+ * When `blockHistory` is provided, the gate escalates after repeated
+ * same-category blocks: caution → warning (3+) → refusal (5+).
  */
-export function checkIznGate(input: {
-  toolName: string;
-  toolArgs?: Record<string, unknown>;
-  command?: string;
-}): IznGateResult {
+export function checkIznGate(
+  input: {
+    toolName: string;
+    toolArgs?: Record<string, unknown>;
+    command?: string;
+  },
+  blockHistory?: IznBlockHistoryEntry[],
+): IznGateResult {
   const textToCheck = buildTextToCheck(input);
   const matchedCategories = matchCategories(textToCheck, input.toolName);
 
   if (matchedCategories.length === 0) {
     return { allowed: true };
   }
+
+  const escalationLevel = computeEscalationLevel(
+    matchedCategories,
+    blockHistory,
+  );
 
   // Build the intent-clarification plan from the matched rules.
   const allAnalysisPlan = matchedCategories.flatMap((cat) => {
@@ -51,20 +110,20 @@ export function checkIznGate(input: {
   const uniqueIntentQuestions = [...new Set(allIntentQuestions)];
   const uniqueImpactScope = [...new Set(allImpactScope)];
 
+  const reason = buildEscalatedReason(matchedCategories, escalationLevel);
+
   return {
     allowed: false,
-    reason: `Destructive action detected: ${matchedCategories.join(', ')}. Izn requires self-verification before proceeding.`,
-    requiredConfirmation: [
-      'Izn Mode — Self-Verification Required:',
-      '',
-      ...uniqueAnalysisPlan.map((step, i) => `${i + 1}. ${step}`),
-      '',
-      'Confirm scope before proceeding.',
-    ].join('\n'),
+    reason,
+    requiredConfirmation: buildConfirmationText(
+      uniqueAnalysisPlan,
+      escalationLevel,
+    ),
     category: matchedCategories,
     analysisPlan: uniqueAnalysisPlan,
     intentQuestions: uniqueIntentQuestions,
     impactScope: uniqueImpactScope,
+    escalationLevel: escalationLevel ?? undefined,
   };
 }
 
@@ -76,15 +135,24 @@ export function checkIznGate(input: {
  * the category-specific post-report checklist. For normal tools, a
  * generic reminder to verify the result matches intent.
  *
- * Returns `null` if the tool should have no additional scope context.
+ * When `blockHistory` is provided and escalation applies, the report
+ * includes stronger regression-risk warnings.
  */
-export function reportIznScope(input: {
-  toolName: string;
-  toolArgs?: Record<string, unknown>;
-  command?: string;
-}): { context: string } | null {
+export function reportIznScope(
+  input: {
+    toolName: string;
+    toolArgs?: Record<string, unknown>;
+    command?: string;
+  },
+  blockHistory?: IznBlockHistoryEntry[],
+): { context: string } {
   const textToCheck = buildTextToCheck(input);
   const matchedCategories = matchCategories(textToCheck, input.toolName);
+  const escalationLevel = computeEscalationLevel(
+    matchedCategories,
+    blockHistory,
+  );
+
   if (matchedCategories.length === 0) {
     return {
       context: [
@@ -108,8 +176,15 @@ export function reportIznScope(input: {
   });
   const uniqueRevertConditions = [...new Set(allRevertConditions)];
 
+  const escalationHeader =
+    escalationLevel === IZN_ESCALATION_LEVELS.REFUSAL
+      ? '⚠️ IZN REFUSAL '
+      : escalationLevel === IZN_ESCALATION_LEVELS.WARNING
+        ? '⚠️ IZN WARNING '
+        : '';
+
   const lines = [
-    `Izn scope — ${matchedCategories.join(', ')} completed:`,
+    `${escalationHeader}Izn scope — ${matchedCategories.join(', ')} completed:`,
     '',
     ...uniquePostReport.map((step, i) => `${i + 1}. ${step}`),
     '',
@@ -127,10 +202,30 @@ export function reportIznScope(input: {
     );
   }
 
+  if (escalationLevel === IZN_ESCALATION_LEVELS.WARNING) {
+    lines.push(
+      '',
+      '⚠️ Repeated same-category action — regression risk elevated.',
+      '    Confirm this specific action is still within the agreed scope.',
+    );
+  }
+
+  if (escalationLevel === IZN_ESCALATION_LEVELS.REFUSAL) {
+    lines.push(
+      '',
+      '⛔ This action type has been blocked repeatedly.',
+      '    The risk of unintended damage now outweighs the stated intent.',
+      '    If this action is genuinely necessary, re-explain the full intent',
+      '    and break the work into smaller, verified steps.',
+    );
+  }
+
   lines.push('', 'Verify scope and report any deviations.');
 
   return { context: lines.join('\n') };
 }
+
+// ── Helpers ─────────────────────────────────────────────────────────
 
 /** Build a single string from all text-bearing inputs for pattern matching. */
 function buildTextToCheck(input: {
@@ -179,4 +274,40 @@ function matchCategories(
     }
   }
   return matched;
+}
+
+function buildEscalatedReason(
+  matchedCategories: DestructiveActionCategory[],
+  escalationLevel: IznEscalationLevel | null,
+): string {
+  const base = `Destructive action detected: ${matchedCategories.join(', ')}.`;
+
+  switch (escalationLevel) {
+    case IZN_ESCALATION_LEVELS.REFUSAL:
+      return `${base} BLOCKED — this action type has been attempted ${REFUSAL_THRESHOLD}+ times. Re-explain intent and break into smaller verified steps.`;
+    case IZN_ESCALATION_LEVELS.WARNING:
+      return `${base} WARNING — repeated same-category action. Confirm this is still within agreed scope.`;
+    default:
+      return `${base} Izn requires self-verification before proceeding.`;
+  }
+}
+
+function buildConfirmationText(
+  analysisPlan: string[],
+  escalationLevel: IznEscalationLevel | null,
+): string {
+  const prefix =
+    escalationLevel === IZN_ESCALATION_LEVELS.REFUSAL
+      ? '⛔ REPEATED BLOCK — Self-Verification Required:'
+      : escalationLevel === IZN_ESCALATION_LEVELS.WARNING
+        ? '⚠️ Repeated Action — Self-Verification Required:'
+        : 'Izn Mode — Self-Verification Required:';
+
+  return [
+    prefix,
+    '',
+    ...analysisPlan.map((step, i) => `${i + 1}. ${step}`),
+    '',
+    'Confirm scope before proceeding.',
+  ].join('\n');
 }

@@ -74,6 +74,7 @@ import {
   checkIznGate,
   reportIznScope,
   type IznGateResult,
+  type IznBlockHistoryEntry,
 } from '@hoptrendy/quran-guidance';
 import { ShellToolInvocation } from '../tools/shell.js';
 import { IdeClient } from '../ide/ide-client.js';
@@ -483,6 +484,8 @@ export class CoreToolScheduler {
    * cannot leak across turns.
    */
   private iznVerifiedHashes = new Set<string>();
+  /** Accumulated destructive-action block history for the current turn. */
+  private iznBlockHistory: IznBlockHistoryEntry[] = [];
   private requestQueue: Array<{
     request: ToolCallRequestInfo | ToolCallRequestInfo[];
     signal: AbortSignal;
@@ -865,6 +868,8 @@ export class CoreToolScheduler {
   ): Promise<void> {
     this.isScheduling = true;
     try {
+      // Fresh block history each turn so escalation resets between user turns.
+      this.iznBlockHistory = [];
       if (this.isRunning()) {
         throw new Error(
           'Cannot schedule new tool calls while other tool calls are actively running (executing or awaiting approval).',
@@ -1122,10 +1127,13 @@ export class CoreToolScheduler {
               if (this.iznVerifiedHashes.has(iznHash)) {
                 this.iznVerifiedHashes.delete(iznHash);
               } else {
-                const gateResult = checkIznGate({
-                  toolName: reqInfo.name,
-                  toolArgs: toolParams,
-                });
+                const gateResult = checkIznGate(
+                  {
+                    toolName: reqInfo.name,
+                    toolArgs: toolParams,
+                  },
+                  this.iznBlockHistory,
+                );
                 if (!gateResult.allowed) {
                   // ── Izn intent-clarification gate ──────────────────
                   // Instead of hard-blocking, return a system-reminder
@@ -1135,6 +1143,13 @@ export class CoreToolScheduler {
                   // retrying. Store the hash so the retry passes the
                   // gate after verification completes.
                   this.iznVerifiedHashes.add(iznHash);
+                  // Record in block history for progressive escalation.
+                  // Use the first (primary) matched category.
+                  if (gateResult.category.length > 0) {
+                    this.iznBlockHistory.push({
+                      category: gateResult.category[0],
+                    });
+                  }
                   const clarificationMsg =
                     buildIznClarificationMessage(gateResult);
                   this.setToolCallOutcome(
@@ -1823,10 +1838,13 @@ export class CoreToolScheduler {
         // Izn mode: inject post-execution scope-report context
         // so the model self-verifies after each tool call.
         if (this.config.getApprovalMode() === ApprovalMode.IZN) {
-          const scopeReport = reportIznScope({
-            toolName,
-            toolArgs: toolInput,
-          });
+          const scopeReport = reportIznScope(
+            {
+              toolName,
+              toolArgs: toolInput,
+            },
+            this.iznBlockHistory,
+          );
           if (scopeReport) {
             content = appendAdditionalContext(
               content,

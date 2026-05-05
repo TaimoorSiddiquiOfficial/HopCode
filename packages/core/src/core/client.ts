@@ -31,6 +31,7 @@ import {
   getQuranGuidancePerTurnReminder,
   getSubagentSystemReminder,
 } from './prompts.js';
+import type { ClassifierTelemetry } from '@hoptrendy/quran-guidance';
 import {
   CompressionStatus,
   GeminiEventType,
@@ -55,6 +56,7 @@ import { ToolNames } from '../tools/tool-names.js';
 import {
   NextSpeakerCheckEvent,
   logNextSpeakerCheck,
+  recordClassifierSituation,
 } from '../telemetry/index.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 
@@ -929,9 +931,18 @@ export class GeminiClient {
       // add per-turn quran guidance reminder for context-aware behavior
       const messageText = partToString(request);
       const iznActive = this.config.getApprovalMode() === ApprovalMode.IZN;
+
+      const config = this.config;
+      const classifierTelemetry: ClassifierTelemetry = {
+        recordClassification(situation, confidence) {
+          recordClassifierSituation(config, situation, confidence);
+        },
+      };
+
       const quranGuidanceReminder = getQuranGuidancePerTurnReminder(
         messageText,
         iznActive,
+        classifierTelemetry,
       );
       if (quranGuidanceReminder) {
         systemReminders.push(quranGuidanceReminder);

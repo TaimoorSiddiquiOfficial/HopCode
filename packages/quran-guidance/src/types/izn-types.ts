@@ -31,6 +31,8 @@ export type IznGateResult =
       intentQuestions: string[];
       /** What the model should investigate (files to read, deps to trace). */
       impactScope: string[];
+      /** Escalation level when the same category has been blocked repeatedly. */
+      escalationLevel?: 'caution' | 'warning' | 'refusal';
     };
 
 /** Izn mode behavior rules that layer onto the base guidance. */

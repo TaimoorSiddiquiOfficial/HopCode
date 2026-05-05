@@ -107,6 +107,7 @@ export {
   recordInvalidChunk,
   recordContentRetry,
   recordContentRetryFailure,
+  recordClassifierSituation,
   // Performance monitoring functions
   recordStartupPerformance,
   recordMemoryUsage,
@@ -133,6 +134,7 @@ export {
   ToolExecutionPhase,
   ApiRequestPhase,
   FileOperation,
+  type ConfidenceBand,
 } from './metrics.js';
 export { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 export { sanitizeHookName } from './sanitize.js';

@@ -15,6 +15,7 @@ import type { GenerateContentConfig } from '@google/genai';
 import {
   getQuranGuidedBehavior,
   QURAN_GUIDED_AGENT_PROMPT,
+  type ClassifierTelemetry,
 } from '@hoptrendy/quran-guidance';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
@@ -1142,6 +1143,7 @@ export function getQuranGuidanceSection(): string {
 export function getQuranGuidancePerTurnReminder(
   userMessage: string,
   iznModeActive: boolean,
+  telemetry?: ClassifierTelemetry,
 ): string {
   const systemMdEnv = process.env['HOPCODE_SYSTEM_MD'];
   if (systemMdEnv && systemMdEnv !== '0' && systemMdEnv !== 'false') {
@@ -1152,6 +1154,7 @@ export function getQuranGuidancePerTurnReminder(
     const { behaviorPrompt } = getQuranGuidedBehavior({
       userMessage,
       iznModeActive,
+      telemetry,
     });
 
     if (!behaviorPrompt) return '';

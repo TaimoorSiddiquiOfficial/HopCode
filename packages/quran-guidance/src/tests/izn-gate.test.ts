@@ -128,9 +128,8 @@ describe('reportIznScope', () => {
       toolName: 'write_file',
       toolArgs: { file_path: '/tmp/test.txt', content: 'hello' },
     });
-    expect(result).not.toBeNull();
-    expect(result!.context).toContain('Izn scope');
-    expect(result!.context).toContain('Verify this change matches your intent');
+    expect(result.context).toContain('Izn scope');
+    expect(result.context).toContain('Verify this change matches your intent');
   });
 
   it('returns category-specific report for destructive tools', () => {
@@ -138,9 +137,8 @@ describe('reportIznScope', () => {
       toolName: 'run_shell_command',
       command: 'rm -rf /some/dir',
     });
-    expect(result).not.toBeNull();
-    expect(result!.context).toContain('file_deletion completed');
-    expect(result!.context).toContain('List what was deleted');
+    expect(result.context).toContain('file_deletion completed');
+    expect(result.context).toContain('List what was deleted');
   });
 
   it('includes intent verification guidance in destructive report', () => {
@@ -148,12 +146,11 @@ describe('reportIznScope', () => {
       toolName: 'run_shell_command',
       command: 'DROP TABLE users;',
     });
-    expect(result).not.toBeNull();
-    expect(result!.context).toContain('Intent verification:');
-    expect(result!.context).toContain(
+    expect(result.context).toContain('Intent verification:');
+    expect(result.context).toContain(
       'If intent was clarified before this action',
     );
-    expect(result!.context).toContain(
+    expect(result.context).toContain(
       'confirm the result matches what was agreed',
     );
   });
@@ -163,15 +160,131 @@ describe('reportIznScope', () => {
       toolName: 'run_shell_command',
       command: 'rm -rf critical-project/',
     });
-    expect(result).not.toBeNull();
-    expect(result!.context).toContain('Revert conditions');
-    expect(result!.context).toContain('critical project files');
+    expect(result.context).toContain('Revert conditions');
+    expect(result.context).toContain('critical project files');
   });
 
-  it('returns null for tools without a command or args', () => {
+  it('returns generic reminder for tools without a command or args', () => {
     const result = reportIznScope({ toolName: 'read_file' });
-    // No destructive match → generic reminder, not null
-    expect(result).not.toBeNull();
-    expect(result!.context).toContain('Izn scope');
+    expect(result.context).toContain('Izn scope');
+  });
+});
+
+describe('Izn progressive escalation', () => {
+  const blockHistory = (cat: string, count: number) =>
+    Array.from({ length: count }, () => ({
+      category: cat as 'file_deletion',
+    }));
+
+  it('caution level (1–2 same-category blocks) — standard message', () => {
+    const result = checkIznGate(
+      {
+        toolName: 'run_shell_command',
+        command: 'rm -rf /tmp/cache',
+      },
+      blockHistory('file_deletion', 2),
+    );
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.escalationLevel).toBe('caution');
+      expect(result.reason).toContain('Izn requires self-verification');
+      expect(result.reason).not.toContain('WARNING');
+      expect(result.reason).not.toContain('BLOCKED');
+    }
+  });
+
+  it('warning level (3 same-category blocks) — stronger message', () => {
+    const result = checkIznGate(
+      {
+        toolName: 'run_shell_command',
+        command: 'rm -rf /tmp/cache',
+      },
+      blockHistory('file_deletion', 3),
+    );
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.escalationLevel).toBe('warning');
+      expect(result.reason).toContain('WARNING');
+      expect(result.reason).toContain('repeated same-category action');
+      expect(result.requiredConfirmation).toContain('⚠️ Repeated Action');
+    }
+  });
+
+  it('refusal level (5+ same-category blocks) — blocked message', () => {
+    const result = checkIznGate(
+      {
+        toolName: 'run_shell_command',
+        command: 'rm -rf /tmp/cache',
+      },
+      blockHistory('file_deletion', 5),
+    );
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.escalationLevel).toBe('refusal');
+      expect(result.reason).toContain('BLOCKED');
+      expect(result.reason).toContain('break into smaller verified steps');
+      expect(result.requiredConfirmation).toContain('⛔ REPEATED BLOCK');
+    }
+  });
+
+  it('no escalation when blockHistory is empty', () => {
+    const result = checkIznGate({
+      toolName: 'run_shell_command',
+      command: 'rm -rf /tmp/cache',
+    });
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.escalationLevel).toBeUndefined();
+      expect(result.reason).not.toContain('WARNING');
+      expect(result.reason).not.toContain('BLOCKED');
+    }
+  });
+
+  it('no escalation when blockHistory is for different category', () => {
+    const result = checkIznGate(
+      {
+        toolName: 'run_shell_command',
+        command: 'rm -rf /tmp/cache',
+      },
+      [{ category: 'force_push' }, { category: 'force_push' }],
+    );
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.escalationLevel).toBeUndefined();
+    }
+  });
+
+  it('reportIznScope includes warning message on escalation', () => {
+    const result = reportIznScope(
+      {
+        toolName: 'run_shell_command',
+        command: 'rm -rf /tmp/cache',
+      },
+      blockHistory('file_deletion', 3),
+    );
+    expect(result.context).toContain('⚠️ IZN WARNING');
+    expect(result.context).toContain('regression risk');
+  });
+
+  it('reportIznScope includes refusal message on high escalation', () => {
+    const result = reportIznScope(
+      {
+        toolName: 'run_shell_command',
+        command: 'rm -rf /tmp/cache',
+      },
+      blockHistory('file_deletion', 5),
+    );
+    expect(result.context).toContain('⚠️ IZN REFUSAL');
+    expect(result.context).toContain('blocked repeatedly');
+  });
+
+  it('reportIznScope for generic tool does not escalate', () => {
+    const result = reportIznScope(
+      { toolName: 'read_file' },
+      blockHistory('file_deletion', 10),
+    );
+    expect(result.context).toContain('Izn scope');
+    expect(result.context).not.toContain('WARNING');
+    expect(result.context).not.toContain('REFUSAL');
   });
 });
