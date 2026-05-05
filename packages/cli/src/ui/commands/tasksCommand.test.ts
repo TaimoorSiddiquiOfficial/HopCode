@@ -302,7 +302,7 @@ describe('tasksCommand', () => {
     // Pin the actual key path so a regression that goes back to the
     // wrong `Ctrl+T` text (which is bound to the MCP descriptions
     // toggle, not the Background tasks dialog) fails loudly.
-    expect(withHint.content).toContain('Γåô');
+    expect(withHint.content).toContain('↓');
     expect(withHint.content).toContain('Enter');
     expect(withHint.content).not.toContain('Ctrl+T');
     expect(withHint.content).toContain('Background tasks (1 total)');

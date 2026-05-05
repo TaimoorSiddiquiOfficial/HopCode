@@ -1211,8 +1211,13 @@ describe('InputPrompt', () => {
     const { stdin, lastFrame, unmount } = renderWithProviders(<TestHarness />);
     await wait();
 
-    stdin.write('/export md');
-    await wait();
+    // Type characters individually: multi-char stdin.write is treated as
+    // paste, which skips markNextTextChangeAsUserInput and prevents
+    // export cycling from arming.
+    for (const ch of '/export md') {
+      stdin.write(ch);
+      await wait();
+    }
     expect(stripAnsi(lastFrame() ?? '')).toContain('/export md');
 
     // Pressing Down must cycle to the NEXT format (json).
