@@ -153,7 +153,9 @@ const replayTerminalOutput = async (
     replayTerminal.write(output, () => resolve());
   });
 
-  return serializeTerminalToText(replayTerminal);
+  const text = serializeTerminalToText(replayTerminal);
+  replayTerminal.dispose();
+  return text;
 };
 
 const getLastNonEmptyAnsiLineIndex = (output: AnsiOutput): number => {
@@ -877,6 +879,11 @@ export class ShellExecutionService {
                   (ptyInfo?.name as 'node-pty' | 'lydell-node-pty') ??
                   'node-pty',
               });
+              // Release the xterm Terminal's scrollback buffers and internal
+              // state so they can be GC'd. Without this every PTY command
+              // permanently retains its terminal's memory for the session
+              // lifetime, which is the primary driver of the OOM crashes.
+              headlessTerminal.dispose();
             };
 
             // Give any last onData callbacks a chance to run before finalizing.

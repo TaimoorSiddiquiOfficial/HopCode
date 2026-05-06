@@ -67,12 +67,13 @@ export type BackgroundShellStatusChangeCallback = (
 ) => void;
 
 export class BackgroundShellRegistry {
-  // Entries persist for the session lifetime — no automatic eviction of
-  // terminal entries. For typical interactive sessions (tens of background
-  // shells over an hour) this is fine, but long-running sessions that spawn
-  // many short-lived background commands will see the map and the on-disk
-  // output files grow without bound. Eviction policy (LRU? age-based? cap?)
-  // is left as a follow-up alongside output-file rotation.
+  // Cap the number of retained terminal (non-running) entries to prevent
+  // unbounded memory growth in long-running sessions that spawn many
+  // short-lived background commands. When the cap is reached, the oldest
+  // settled entries are evicted (FIFO insertion order). Running entries are
+  // never evicted — they still hold resources that the process manager needs.
+  private static readonly MAX_TERMINAL_ENTRIES = 50;
+
   private readonly entries = new Map<string, BackgroundShellEntry>();
 
   private registerCallback: BackgroundShellRegisterCallback | undefined;
@@ -98,6 +99,29 @@ export class BackgroundShellRegistry {
     cb: BackgroundShellStatusChangeCallback | undefined,
   ): void {
     this.statusChangeCallback = cb;
+  }
+
+  /**
+   * Evict the oldest settled (non-running) entries once the cap is reached.
+   * Called after every status transition so the registry stays bounded.
+   */
+  private evictTerminalEntries(): void {
+    let terminalCount = 0;
+    for (const entry of this.entries.values()) {
+      if (entry.status !== 'running') terminalCount++;
+    }
+    if (terminalCount <= BackgroundShellRegistry.MAX_TERMINAL_ENTRIES) return;
+
+    const toEvict =
+      terminalCount - BackgroundShellRegistry.MAX_TERMINAL_ENTRIES;
+    let evicted = 0;
+    for (const [shellId, entry] of this.entries) {
+      if (evicted >= toEvict) break;
+      if (entry.status !== 'running') {
+        this.entries.delete(shellId);
+        evicted++;
+      }
+    }
   }
 
   register(entry: BackgroundShellEntry): void {
@@ -132,6 +156,7 @@ export class BackgroundShellRegistry {
     entry.exitCode = exitCode;
     entry.endTime = endTime;
     this.fireStatusChange(entry);
+    this.evictTerminalEntries();
   }
 
   fail(shellId: string, error: string, endTime: number): void {
@@ -141,6 +166,7 @@ export class BackgroundShellRegistry {
     entry.error = error;
     entry.endTime = endTime;
     this.fireStatusChange(entry);
+    this.evictTerminalEntries();
   }
 
   cancel(shellId: string, endTime: number): void {
@@ -150,6 +176,7 @@ export class BackgroundShellRegistry {
     entry.endTime = endTime;
     entry.abortController.abort();
     this.fireStatusChange(entry);
+    this.evictTerminalEntries();
   }
 
   private fireRegister(entry: BackgroundShellEntry): void {
