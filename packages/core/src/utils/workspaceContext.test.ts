@@ -10,6 +10,25 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { WorkspaceContext } from './workspaceContext.js';
 
+// fs.symlinkSync requires Administrator privileges or Developer Mode
+// on Windows. Skip symlink-dependent tests when the environment doesn't
+// support it rather than failing with EPERM.
+const symlinkSupported = (() => {
+  try {
+    const tmpDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'workspace-symlink-test-'),
+    );
+    const target = path.join(tmpDir, 'target');
+    const link = path.join(tmpDir, 'link');
+    fs.writeFileSync(target, 'test');
+    fs.symlinkSync(target, link, 'file');
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 describe('WorkspaceContext with real filesystem', () => {
   let tempDir: string;
   let cwd: string;
@@ -83,18 +102,21 @@ describe('WorkspaceContext with real filesystem', () => {
       expect(directories).toHaveLength(2);
     });
 
-    it('should handle symbolic links correctly', () => {
-      const realDir = path.join(tempDir, 'real');
-      fs.mkdirSync(realDir, { recursive: true });
-      const symlinkDir = path.join(tempDir, 'symlink-to-real');
-      fs.symlinkSync(realDir, symlinkDir, 'dir');
-      const workspaceContext = new WorkspaceContext(cwd);
-      workspaceContext.addDirectory(symlinkDir);
+    it.skipIf(!symlinkSupported)(
+      'should handle symbolic links correctly',
+      () => {
+        const realDir = path.join(tempDir, 'real');
+        fs.mkdirSync(realDir, { recursive: true });
+        const symlinkDir = path.join(tempDir, 'symlink-to-real');
+        fs.symlinkSync(realDir, symlinkDir, 'dir');
+        const workspaceContext = new WorkspaceContext(cwd);
+        workspaceContext.addDirectory(symlinkDir);
 
-      const directories = workspaceContext.getDirectories();
+        const directories = workspaceContext.getDirectories();
 
-      expect(directories).toEqual([cwd, realDir]);
-    });
+        expect(directories).toEqual([cwd, realDir]);
+      },
+    );
   });
 
   describe('path validation', () => {
@@ -158,7 +180,7 @@ describe('WorkspaceContext with real filesystem', () => {
       );
     });
 
-    describe('with symbolic link', () => {
+    describe.skipIf(!symlinkSupported)('with symbolic link', () => {
       describe('in the workspace', () => {
         let realDir: string;
         let symlinkDir: string;
