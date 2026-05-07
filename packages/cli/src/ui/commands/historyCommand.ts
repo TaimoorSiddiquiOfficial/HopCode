@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SlashCommand , CommandKind, type MessageActionReturn } from './types.js';
+import {
+  type SlashCommand,
+  CommandKind,
+  type MessageActionReturn,
+} from './types.js';
 
 /** Maximum search results shown per query. */
 const MAX_DISPLAY_RESULTS = 20;

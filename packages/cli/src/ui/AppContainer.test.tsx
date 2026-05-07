@@ -520,6 +520,13 @@ describe('AppContainer State Management', () => {
           _addItem,
           _clearItems,
           _loadHistory,
+          _searchHistory,
+          _jumpToSearchResult,
+          _canLoadOlderHistory,
+          _canLoadNewerHistory,
+          _loadOlderHistory,
+          _loadNewerHistory,
+          _windowInfo,
           refreshStatic,
         ) => {
           slashRefreshStatic = refreshStatic;

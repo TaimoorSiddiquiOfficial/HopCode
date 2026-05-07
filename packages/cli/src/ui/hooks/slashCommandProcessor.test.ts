@@ -178,6 +178,19 @@ describe('useSlashCommandProcessor', () => {
         mockAddItem,
         mockClearItems,
         mockLoadHistory,
+        vi.fn(), // searchHistory
+        vi.fn(), // jumpToSearchResult
+        false, // canLoadOlderHistory
+        false, // canLoadNewerHistory
+        vi.fn(), // loadOlderHistory
+        vi.fn(), // loadNewerHistory
+        {
+          windowStart: 0,
+          windowEnd: 0,
+          total: 0,
+          hasOlder: false,
+          hasNewer: false,
+        }, // windowInfo
         vi.fn(), // refreshStatic
         vi.fn(), // toggleVimEnabled
         false, // isProcessing
@@ -990,6 +1003,19 @@ describe('useSlashCommandProcessor', () => {
           mockAddItem,
           mockClearItems,
           mockLoadHistory,
+          vi.fn(), // searchHistory
+          vi.fn(), // jumpToSearchResult
+          false, // canLoadOlderHistory
+          false, // canLoadNewerHistory
+          vi.fn(), // loadOlderHistory
+          vi.fn(), // loadNewerHistory
+          {
+            windowStart: 0,
+            windowEnd: 0,
+            total: 0,
+            hasOlder: false,
+            hasNewer: false,
+          }, // windowInfo
           vi.fn(), // refreshStatic
           vi.fn(), // toggleVimEnabled
           false, // isProcessing
