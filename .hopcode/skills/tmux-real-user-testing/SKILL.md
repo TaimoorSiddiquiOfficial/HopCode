@@ -1,11 +1,16 @@
 ---
 name: tmux-real-user-testing
-description: This skill should be used when the user asks to "用 tmux 做真实测试", "保存 tmux 日志", "像真实用户一样测试 Qwen", "生成可复查的 TUI 测试报告", "测试 slash command 交互", or requests a tmux-based real user E2E run with complete readable logs. It guides real TUI usage with step-by-step capture-pane snapshots rather than ANSI raw pipe logs.
+description: >
+  Run HopCode in a real tmux TUI session for end-to-end manual testing with
+  readable step-by-step screen captures. Use when asked to "test with tmux",
+  "real user test", "save tmux log", "test slash command interaction",
+  "generate TUI test report", or "tmux-based E2E test". Guides full TUI
+  interaction with labeled capture-pane snapshots instead of raw ANSI pipe logs.
 ---
 
 # tmux Real User Testing
 
-Run Qwen Code in a real tmux TUI session as a user would: navigate dialogs,
+Run HopCode in a real tmux TUI session as a user would: navigate dialogs,
 trigger slash commands, exercise workflows, and save a readable log that
 maintainers can review. Prefer this workflow when the goal is not just a pass/fail
 assertion, but a narrative artifact showing what happened on screen.
@@ -60,7 +65,7 @@ The `start` command outputs `export` statements — use `eval` to set the variab
 directly in your shell:
 
 ```bash
-eval "$(bash .qwen/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh \
+eval "$(bash .hopcode/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh \
   start <scenario> . npm run dev -- --approval-mode yolo)"
 # → $SESSION, $OUTDIR, $LOG are now available
 ```
@@ -68,7 +73,7 @@ eval "$(bash .qwen/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh \
 Show the full usage before running a new scenario:
 
 ```bash
-bash .qwen/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh help
+bash .hopcode/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh help
 ```
 
 ## Manual workflow
@@ -98,7 +103,7 @@ done
 ```
 
 Use `node dist/cli.js` instead of `npm run dev` only when verifying a built
-bundle. Use the globally installed `qwen` only when reproducing a user-reported
+bundle. Use the globally installed `hopcode` only when reproducing a user-reported
 installed-version bug.
 
 ### 2. Append labeled readable snapshots
@@ -214,7 +219,7 @@ For each step, define:
 ### Short example: testing /auth → OAuth
 
 ```bash
-HELPER=.qwen/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh
+HELPER=.hopcode/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh
 
 # Start
 eval "$(bash "$HELPER" start auth-test . npm run dev -- --approval-mode yolo)"
@@ -244,7 +249,7 @@ Ask before deleting logs or reverting settings. Do not sanitize by default if th
 user explicitly requests complete logs. If logs may be shared externally, offer a
 separate sanitized copy rather than modifying the original.
 
-Mention likely side effects before starting: OAuth may open a browser, write Qwen
+Mention likely side effects before starting: OAuth may open a browser, write HopCode
 settings, set API key config, and update model provider entries.
 
 ## Common pitfalls

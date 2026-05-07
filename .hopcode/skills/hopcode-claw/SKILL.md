@@ -32,25 +32,33 @@ Check if authentication is already configured:
 hopcode auth status
 ```
 
-If authentication exists, skip this section. If not authenticated, check if the `BAILIAN_CODING_PLAN_API_KEY` environment variable exists:
+If authentication exists, skip this section. If not authenticated, use one of HopCode's supported providers:
+
+**Ollama Local** (free, runs locally — requires Ollama installed):
 
 ```bash
-echo $BAILIAN_CODING_PLAN_API_KEY
+hopcode auth ollama-local
 ```
 
-**If `BAILIAN_CODING_PLAN_API_KEY` exists**, authenticate directly:
+**Ollama Cloud** (requires an API key from https://ollama.com):
 
 ```bash
-hopcode auth coding-plan --region china --key $BAILIAN_CODING_PLAN_API_KEY
+hopcode auth ollama-cloud --key <your-key>
 ```
 
-**If the environment variable does not exist**, interrupt and prompt the user to authenticate via `coding-plan` or API key:
+**OpenAI-compatible** (any OpenAI-compatible API):
+
+```bash
+hopcode auth openai --key <your-api-key>
+```
+
+**If the user has no configured provider**, interrupt and prompt:
 
 ```bash
 hopcode auth
 ```
 
-Or configure custom API after launching HopCode via `/auth`.
+Or configure a provider interactively after launching HopCode via `/auth`.
 
 ## ACPX Integration
 
@@ -171,18 +179,18 @@ Config files (highest priority first): CLI args > env vars > system > project (`
 
 Key settings:
 
-| Setting                      | Description                               |
-| ---------------------------- | ----------------------------------------- |
-| `model.name`                 | Model to use (e.g. `qwen-max`)            |
-| `tools.approvalMode`         | `plan` / `default` / `auto_edit` / `yolo` |
-| `permissions.allow/ask/deny` | Tool permission rules                     |
-| `mcpServers.*`               | MCP server configurations                 |
+| Setting                      | Description                                         |
+| ---------------------------- | --------------------------------------------------- |
+| `model.name`                 | Model to use (e.g. `llama3.2`, `qwen2.5-coder:32b`) |
+| `tools.approvalMode`         | `plan` / `default` / `auto_edit` / `yolo`           |
+| `permissions.allow/ask/deny` | Tool permission rules                               |
+| `mcpServers.*`               | MCP server configurations                           |
 
 Full reference: https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/configuration/settings.md
 
 ### Authentication
 
-Supports Alibaba Cloud Coding Plan, OpenAI-compatible API keys, and Qwen OAuth (free tier discontinued 2026-04-15).
+Supports Ollama Local, Ollama Cloud, and OpenAI-compatible API keys.
 
 Full reference: https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/docs/users/configuration/auth.md
 
