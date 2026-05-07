@@ -19,7 +19,7 @@ import type {
   ToolKind,
 } from '@agentclientprotocol/sdk';
 import type { Part } from '@google/genai';
-import { ToolNames, Kind } from '@qwen-code/qwen-code-core';
+import { ToolNames, Kind } from '@hoptrendy/hopcode-core';
 import { buildTruncatedDiffPreviewText } from '../../../utils/truncatedDiffPreview.js';
 
 /**
