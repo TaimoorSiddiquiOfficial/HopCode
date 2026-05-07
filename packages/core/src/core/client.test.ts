@@ -3247,7 +3247,7 @@ Other open files:
       // First call uses main authType (QWEN_OAUTH) — misses
       expect(getResolvedModel).toHaveBeenNthCalledWith(
         1,
-        AuthType.QWEN_OAUTH,
+        'qwen-oauth',
         'fast-model',
       );
       // Second call falls through to secondary authType — hits
