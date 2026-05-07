@@ -332,6 +332,22 @@ const HistoryItemDisplayComponent: React.FC<HistoryItemDisplayProps> = ({
       {itemForDisplay.type === 'away_recap' && (
         <AwayRecapMessage text={itemForDisplay.text} />
       )}
+      {itemForDisplay.type === 'history_context_note' && (
+        <Box
+          borderStyle="single"
+          borderColor={theme.text.secondary}
+          paddingX={1}
+          flexDirection="column"
+        >
+          <Text color={theme.text.secondary} bold>
+            ↑ Older history (items 0–{itemForDisplay.windowTo - 1} not shown)
+          </Text>
+          <Text color={theme.text.secondary}>{itemForDisplay.text}</Text>
+          <Text color={theme.text.secondary} dimColor>
+            Use /history older to navigate up · /history newer to go back
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 };

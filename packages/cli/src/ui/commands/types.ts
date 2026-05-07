@@ -97,6 +97,14 @@ export interface CommandContext {
     extensionsUpdateState: Map<string, ExtensionUpdateStatus>;
     dispatchExtensionStateUpdate: (action: ExtensionUpdateAction) => void;
     addConfirmUpdateExtensionRequest: (value: ConfirmationRequest) => void;
+    // ── History window navigation and search (optional — only present in interactive) ──
+    canLoadOlderHistory?: boolean;
+    canLoadNewerHistory?: boolean;
+    loadOlderHistory?: () => void;
+    loadNewerHistory?: () => void;
+    windowInfo?: UseHistoryManagerReturn['windowInfo'];
+    searchHistory?: UseHistoryManagerReturn['searchHistory'];
+    jumpToSearchResult?: UseHistoryManagerReturn['jumpToSearchResult'];
   };
   // Session-specific data
   session: {

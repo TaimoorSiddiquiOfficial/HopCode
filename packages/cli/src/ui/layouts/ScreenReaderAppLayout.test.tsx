@@ -56,6 +56,19 @@ const baseUIState: Partial<UIState> = {
     clearItems: vi.fn(),
     loadHistory: vi.fn(),
     truncateToItem: vi.fn(),
+    canLoadOlderHistory: false,
+    canLoadNewerHistory: false,
+    loadOlderHistory: vi.fn(),
+    loadNewerHistory: vi.fn(),
+    windowInfo: {
+      total: 0,
+      windowStart: 0,
+      windowEnd: 0,
+      hasOlder: false,
+      hasNewer: false,
+    },
+    searchHistory: vi.fn().mockReturnValue([]),
+    jumpToSearchResult: vi.fn(),
   },
   stickyTodos: [
     {

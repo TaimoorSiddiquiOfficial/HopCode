@@ -464,6 +464,23 @@ export type HistoryItemDoctor = HistoryItemBase & {
   summary: { pass: number; warn: number; fail: number };
 };
 
+/**
+ * Synthetic item prepended to the visible window when older items have been
+ * scrolled out of view.  Summarises the hidden portion so the AI and the user
+ * are aware that context exists above the current window.
+ *
+ * IDs for context-note items are always negative to avoid collision with real
+ * message IDs (which are always positive).
+ */
+export type HistoryItemContextNote = HistoryItemBase & {
+  type: 'history_context_note';
+  /** Always 0 — the context note covers the oldest hidden items. */
+  windowFrom: number;
+  /** Exclusive end index: equals the current window start. */
+  windowTo: number;
+  text: string;
+};
+
 // Using Omit<HistoryItem, 'id'> seems to have some issues with typescript's
 // type inference e.g. historyItem.type === 'tool_group' isn't auto-inferring that
 // 'tools' in historyItem.
@@ -506,7 +523,8 @@ export type HistoryItemWithoutId =
   | HistoryItemUserPromptSubmitBlocked
   | HistoryItemStopHookLoop
   | HistoryItemStopHookSystemMessage
-  | HistoryItemDoctor;
+  | HistoryItemDoctor
+  | HistoryItemContextNote;
 
 export type HistoryItem = HistoryItemWithoutId & { id: number };
 
