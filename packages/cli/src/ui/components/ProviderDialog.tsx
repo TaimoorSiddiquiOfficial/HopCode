@@ -123,6 +123,9 @@ export function ProviderDialog({
   const [step, setStep] = useState<Step>('provider');
   const [selectedProvider, setSelectedProvider] =
     useState<ProviderConfig | null>(null);
+  const [highlightedProviderId, setHighlightedProviderId] = useState<
+    string | null
+  >(null);
   const [apiKey, setApiKey] = useState('');
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -407,7 +410,7 @@ export function ProviderDialog({
             <DescriptiveRadioButtonSelect
               items={providerItems}
               onSelect={handleProviderSelect}
-              onHighlight={() => {}}
+              onHighlight={(value: string) => setHighlightedProviderId(value)}
               showNumbers={true}
             />
           </Box>
@@ -416,6 +419,48 @@ export function ProviderDialog({
               {t('Enter to configure, Esc to close')}
             </Text>
           </Box>
+          {(highlightedProviderId === 'ollama-local' ||
+            highlightedProviderId === 'ollama-cloud') && (
+            <Box
+              marginTop={1}
+              borderStyle="single"
+              borderColor={theme.border.default}
+              paddingX={1}
+              flexDirection="column"
+            >
+              {highlightedProviderId === 'ollama-local' ? (
+                <>
+                  <Text bold color={theme.text.accent}>
+                    Ollama Local — Quick Start
+                  </Text>
+                  <Text color={theme.text.secondary}>
+                    1. Install: https://ollama.com/download
+                  </Text>
+                  <Text color={theme.text.secondary}>
+                    2. Start: ollama serve
+                  </Text>
+                  <Text color={theme.text.secondary}>
+                    3. Pull: ollama pull llama3.2
+                  </Text>
+                  <Text color={theme.text.secondary}>
+                    CLI: hopcode auth ollama-local [--host http://...]
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text bold color={theme.text.accent}>
+                    Ollama Cloud — Quick Start
+                  </Text>
+                  <Text color={theme.text.secondary}>
+                    Get API key: https://ollama.com → Account → API Keys
+                  </Text>
+                  <Text color={theme.text.secondary}>
+                    CLI: hopcode auth ollama-cloud --key {'<'}your-key{'>'}
+                  </Text>
+                </>
+              )}
+            </Box>
+          )}
         </>
       )}
 
@@ -425,6 +470,22 @@ export function ProviderDialog({
             {t('Configure {{provider}}', { provider: selectedProvider.label })}
           </Text>
           <Box marginTop={1} flexDirection="column">
+            {selectedProvider.id === 'ollama-cloud' && (
+              <Box
+                marginBottom={1}
+                borderStyle="single"
+                borderColor={theme.border.default}
+                paddingX={1}
+                flexDirection="column"
+              >
+                <Text bold color={theme.text.accent}>
+                  Ollama Cloud API Key
+                </Text>
+                <Text color={theme.text.secondary}>
+                  Get yours at: https://ollama.com → Account → API Keys
+                </Text>
+              </Box>
+            )}
             {getStoredApiKey(settings, selectedProvider.envKey) ? (
               <Text color={theme.text.secondary}>
                 {t('Key already set')} (
@@ -478,7 +539,11 @@ export function ProviderDialog({
           <Box marginTop={1}>
             {isLoadingModels ? (
               <Text color={theme.text.secondary}>
-                {t('⟳ Fetching available models…')}
+                {selectedProvider.id.startsWith('ollama')
+                  ? t('⟳ Connecting to {{provider}}…', {
+                      provider: selectedProvider.label,
+                    })
+                  : t('⟳ Fetching available models…')}
               </Text>
             ) : (
               <DescriptiveRadioButtonSelect
@@ -494,6 +559,18 @@ export function ProviderDialog({
               <Text color={theme.status.error}>✕ {errorMessage}</Text>
             </Box>
           )}
+          {!isLoadingModels &&
+            selectedProvider.id === 'ollama-local' &&
+            !errorMessage && (
+              <Box marginTop={1} flexDirection="column">
+                <Text color={theme.text.secondary}>
+                  Tip: pull more models with{' '}
+                  <Text bold>
+                    ollama pull {'<'}model{'>'}
+                  </Text>
+                </Text>
+              </Box>
+            )}
           {!isLoadingModels && (
             <Box marginTop={1}>
               <Text color={theme.text.secondary}>

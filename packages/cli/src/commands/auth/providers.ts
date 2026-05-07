@@ -54,6 +54,44 @@ export async function promptForApiKey(providerLabel: string): Promise<string> {
 }
 
 /**
+ * Run a quick connectivity check against an Ollama endpoint.
+ * Returns a human-readable status line, never throws.
+ */
+async function checkOllamaConnectivity(
+  baseUrl: string,
+  apiKey?: string,
+): Promise<string> {
+  const rootUrl = baseUrl.replace(/\/v1\/?$/, '');
+  const headers: Record<string, string> = {};
+  if (apiKey && apiKey !== 'ollama') {
+    headers['Authorization'] = `Bearer ${apiKey}`;
+  }
+  try {
+    const res = await fetch(`${rootUrl}/api/tags`, {
+      headers,
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { models?: unknown[] };
+      const count = data.models?.length ?? 0;
+      return count > 0
+        ? `✓ Connected · ${count} model${count === 1 ? '' : 's'} available`
+        : '✓ Connected · No models installed yet (run: ollama pull llama3.2)';
+    }
+    if (res.status === 401 || res.status === 403) {
+      return `✕ Auth error (${res.status}) — check OLLAMA_CLOUD_API_KEY`;
+    }
+    return `✕ HTTP ${res.status} from Ollama endpoint`;
+  } catch {
+    const isLocal = /localhost|127\.0\.0\.1/.test(rootUrl);
+    if (isLocal) {
+      return '✕ Cannot connect — start Ollama with: ollama serve';
+    }
+    return `✕ Cannot reach Ollama Cloud at ${rootUrl} (check your network or API key)`;
+  }
+}
+
+/**
  * Handles authentication for a third-party API key provider.
  *
  * Follows the same pattern as handleCodePlanAuth:
@@ -64,10 +102,12 @@ export async function promptForApiKey(providerLabel: string): Promise<string> {
  *
  * @param providerId - Provider ID from PROVIDER_REGISTRY
  * @param options - Optional pre-supplied API key (e.g. from --key CLI flag)
+ * @param overrideBaseUrl - Override the provider's default baseUrl (used by ollama-local --host)
  */
 export async function handleApiKeyAuth(
   providerId: string,
   options: { apiKey?: string } = {},
+  overrideBaseUrl?: string,
 ): Promise<void> {
   const provider = getProvider(providerId);
   if (!provider) {
@@ -147,6 +187,11 @@ export async function handleApiKeyAuth(
     let apiKey = options.apiKey;
     if (!apiKey) {
       if (provider.requiresApiKey) {
+        if (providerId === 'ollama-cloud') {
+          writeStdoutLine(
+            t('  Get your API key at: https://ollama.com → Account → API Keys'),
+          );
+        }
         apiKey = await promptForApiKey(provider.label);
       } else {
         // Ollama local uses a dummy key so the OpenAI SDK doesn't complain
@@ -173,11 +218,12 @@ export async function handleApiKeyAuth(
     }
 
     // 2. Build the model provider config entry
+    const effectiveBaseUrl = overrideBaseUrl ?? provider.baseUrl;
     const newModelConfig: ModelConfig = {
       id: provider.defaultModel,
       name: `[${provider.label}] ${provider.defaultModel}`,
       envKey: provider.envKey || undefined,
-      ...(provider.baseUrl ? { baseUrl: provider.baseUrl } : {}),
+      ...(effectiveBaseUrl ? { baseUrl: effectiveBaseUrl } : {}),
     };
 
     // 3. Persist to the correct modelProviders bucket
@@ -197,7 +243,7 @@ export async function handleApiKeyAuth(
       // Remove any existing entry with the same envKey+baseUrl to keep settings clean
       const filteredConfigs = existingConfigs.filter(
         (c) =>
-          !(c.envKey === provider.envKey && c.baseUrl === provider.baseUrl),
+          !(c.envKey === provider.envKey && c.baseUrl === effectiveBaseUrl),
       );
 
       const updatedConfigs = [newModelConfig, ...filteredConfigs];
@@ -226,7 +272,14 @@ export async function handleApiKeyAuth(
         provider: provider.label,
       }),
     );
-    if (!provider.requiresApiKey) {
+
+    // Run a quick connectivity check for Ollama providers
+    if (providerId.startsWith('ollama')) {
+      const testUrl = effectiveBaseUrl ?? 'http://localhost:11434/v1';
+      const cloudApiKey = providerId === 'ollama-cloud' ? apiKey : undefined;
+      const status = await checkOllamaConnectivity(testUrl, cloudApiKey);
+      writeStdoutLine(`  ${status}`);
+    } else if (!provider.requiresApiKey) {
       writeStdoutLine(
         t(
           '  Ollama running at {{url}} — start Ollama first with `ollama serve`',
@@ -248,4 +301,31 @@ export async function handleApiKeyAuth(
     );
     process.exit(1);
   }
+}
+
+/**
+ * Dedicated auth handler for Ollama Local.
+ *
+ * Differs from the generic `handleApiKeyAuth` path by:
+ * - Accepting an optional `--host` flag to override the default localhost endpoint
+ * - Persisting the host as `OLLAMA_HOST` so `ollamaService.ts` picks it up
+ * - Running a connectivity check after configuration
+ *
+ * @param options.host - Custom host (e.g. http://192.168.1.50:11434)
+ */
+export async function handleOllamaLocalAuth(
+  options: { host?: string } = {},
+): Promise<void> {
+  const { host } = options;
+
+  // Normalise the host: ensure it has a scheme and no trailing slash
+  let overrideBaseUrl: string | undefined;
+  if (host) {
+    const normalised = host.startsWith('http') ? host : `http://${host}`;
+    overrideBaseUrl = `${normalised.replace(/\/$/, '')}/v1`;
+    // Persist the host override to OLLAMA_HOST so the service layer uses it
+    process.env['OLLAMA_HOST'] = normalised.replace(/\/$/, '');
+  }
+
+  return handleApiKeyAuth('ollama-local', {}, overrideBaseUrl);
 }

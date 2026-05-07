@@ -12,8 +12,10 @@
  * health checks, embedding generation, and direct chat access.
  */
 
-/** Environment variable key for Ollama API authentication. */
+/** Environment variable key for local Ollama authentication (dummy value used by OpenAI SDK). */
 const OLLAMA_API_KEY = 'OLLAMA_API_KEY';
+/** Environment variable key for Ollama Cloud API authentication. */
+const OLLAMA_CLOUD_API_KEY = 'OLLAMA_CLOUD_API_KEY';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -99,10 +101,11 @@ export function detectOllamaEndpoint(): string {
 }
 
 /**
- * Detect an API key for Ollama Cloud from environment variables.
+ * Detect an API key for Ollama from environment variables.
+ * Checks OLLAMA_CLOUD_API_KEY first (cloud), then OLLAMA_API_KEY (local dummy).
  */
 export function detectOllamaApiKey(): string | undefined {
-  return process.env[OLLAMA_API_KEY] || process.env.OLLAMA_API_KEY;
+  return process.env[OLLAMA_CLOUD_API_KEY] || process.env[OLLAMA_API_KEY];
 }
 
 /**

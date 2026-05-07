@@ -755,7 +755,11 @@ export function ModelDialog({
       {isLoadingLiveModels && !hasModels ? (
         <Box marginTop={1}>
           <Text color={theme.text.secondary}>
-            {t('⟳ Fetching available models…')}
+            {activeProviderEntry?.id.startsWith('ollama')
+              ? t('⟳ Connecting to {{provider}}…', {
+                  provider: activeProviderEntry.label,
+                })
+              : t('⟳ Fetching available models…')}
           </Text>
         </Box>
       ) : !hasModels ? (
@@ -788,10 +792,25 @@ export function ModelDialog({
           {isLoadingLiveModels && (
             <Box marginTop={1}>
               <Text color={theme.text.secondary}>
-                {t('⟳ Fetching available models…')}
+                {activeProviderEntry?.id.startsWith('ollama')
+                  ? t('⟳ Connecting to {{provider}}…', {
+                      provider: activeProviderEntry.label,
+                    })
+                  : t('⟳ Fetching available models…')}
               </Text>
             </Box>
           )}
+          {!isLoadingLiveModels &&
+            activeProviderEntry?.id === 'ollama-local' && (
+              <Box marginTop={1}>
+                <Text color={theme.text.secondary}>
+                  Tip: pull more models with{' '}
+                  <Text bold>
+                    ollama pull {'<'}model{'>'}
+                  </Text>
+                </Text>
+              </Box>
+            )}
         </Box>
       )}
 

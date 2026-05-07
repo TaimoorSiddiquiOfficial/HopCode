@@ -11,7 +11,7 @@ import {
   showAuthStatus,
 } from './auth/handler.js';
 import { PROVIDER_REGISTRY } from './auth/registry.js';
-import { handleApiKeyAuth } from './auth/providers.js';
+import { handleApiKeyAuth, handleOllamaLocalAuth } from './auth/providers.js';
 import { t } from '../i18n/index.js';
 
 /**
@@ -19,7 +19,27 @@ import { t } from '../i18n/index.js';
  * subcommands below. All other PROVIDER_REGISTRY providers get a generic
  * `hopcode auth <id> [--key <apikey>]` subcommand generated automatically.
  */
-const SPECIAL_AUTH_PROVIDERS = new Set(['coding-plan', 'openrouter']);
+const SPECIAL_AUTH_PROVIDERS = new Set([
+  'coding-plan',
+  'openrouter',
+  'ollama-local',
+]);
+
+const ollamaLocalCommand = {
+  command: 'ollama-local',
+  describe: t('Configure local Ollama (runs at localhost:11434 by default)'),
+  builder: (yargs: Argv) =>
+    yargs.option('host', {
+      alias: 'H',
+      describe: t(
+        'Custom Ollama host (e.g. http://192.168.1.50:11434). Defaults to http://localhost:11434',
+      ),
+      type: 'string',
+    }),
+  handler: async (argv: { host?: string }) => {
+    await handleOllamaLocalAuth({ host: argv['host'] });
+  },
+};
 
 const codePlanCommand = {
   command: 'coding-plan',
@@ -79,6 +99,7 @@ export const authCommand: CommandModule = {
   ),
   builder: (yargs: Argv) => {
     let y = yargs
+      .command(ollamaLocalCommand)
       .command(codePlanCommand)
       .command(openRouterCommand)
       .command(statusCommand);

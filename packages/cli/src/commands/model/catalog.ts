@@ -810,18 +810,24 @@ const catalogs: ProviderCatalog[] = [
   },
 
   // ── Ollama Local ──────────────────────────────────────────────────────────
-  // Note: ollama-local fetches a live list via catalog/ollama.ts.
+  // Note: ollama-local fetches a live list via commands/model/ollama.ts.
   // This static fallback is shown if the Ollama daemon is unreachable.
   {
     providerId: 'ollama-local',
     categories: [
       {
-        name: 'Common Models (install with: ollama pull <name>)',
+        name: 'General (install with: ollama pull <name>)',
         models: [
           {
             id: 'llama3.2',
-            label: 'Llama 3.2',
-            description: '3B, fast',
+            label: 'Llama 3.2 3B',
+            description: 'Fast, everyday tasks',
+            context: '8k',
+          },
+          {
+            id: 'llama3.2:1b',
+            label: 'Llama 3.2 1B',
+            description: 'Tiny, ultra-fast',
             context: '8k',
           },
           {
@@ -837,16 +843,10 @@ const catalogs: ProviderCatalog[] = [
             context: '128k',
           },
           {
-            id: 'deepseek-r1:7b',
-            label: 'DeepSeek R1 7B',
-            description: 'Local reasoning',
-            context: '32k',
-          },
-          {
-            id: 'qwen2.5-coder:7b',
-            label: 'Qwen 2.5 Coder 7B',
-            description: 'Code specialist',
-            context: '32k',
+            id: 'llama3.3:70b',
+            label: 'Llama 3.3 70B',
+            description: 'Meta latest flagship',
+            context: '128k',
           },
           {
             id: 'mistral:7b',
@@ -855,22 +855,98 @@ const catalogs: ProviderCatalog[] = [
             context: '8k',
           },
           {
-            id: 'phi4',
-            label: 'Phi-4',
-            description: 'Microsoft, small',
-            context: '16k',
-          },
-          {
             id: 'gemma3:12b',
             label: 'Gemma 3 12B',
             description: 'Google, capable',
             context: '128k',
           },
           {
+            id: 'gemma3:27b',
+            label: 'Gemma 3 27B',
+            description: 'Google, large',
+            context: '128k',
+          },
+          {
+            id: 'phi4',
+            label: 'Phi-4',
+            description: 'Microsoft, small+smart',
+            context: '16k',
+          },
+          {
+            id: 'phi4-mini',
+            label: 'Phi-4 Mini',
+            description: 'Microsoft, tiny',
+            context: '16k',
+          },
+        ],
+      },
+      {
+        name: 'Code',
+        models: [
+          {
+            id: 'qwen2.5-coder:7b',
+            label: 'Qwen 2.5 Coder 7B',
+            description: 'Code specialist',
+            context: '32k',
+          },
+          {
+            id: 'qwen2.5-coder:14b',
+            label: 'Qwen 2.5 Coder 14B',
+            description: 'Code, larger',
+            context: '32k',
+          },
+          {
+            id: 'qwen2.5-coder:32b',
+            label: 'Qwen 2.5 Coder 32B',
+            description: 'Code, best local',
+            context: '32k',
+          },
+          {
             id: 'codellama:7b',
             label: 'CodeLlama 7B',
-            description: 'Code',
+            description: 'Meta code model',
             context: '16k',
+          },
+          {
+            id: 'codellama:34b',
+            label: 'CodeLlama 34B',
+            description: 'Meta code, large',
+            context: '16k',
+          },
+          {
+            id: 'devstral',
+            label: 'Devstral',
+            description: 'Mistral agentic coding',
+            context: '128k',
+          },
+        ],
+      },
+      {
+        name: 'Reasoning',
+        models: [
+          {
+            id: 'deepseek-r1:7b',
+            label: 'DeepSeek R1 7B',
+            description: 'Local reasoning',
+            context: '32k',
+          },
+          {
+            id: 'deepseek-r1:14b',
+            label: 'DeepSeek R1 14B',
+            description: 'Reasoning, medium',
+            context: '32k',
+          },
+          {
+            id: 'deepseek-r1:70b',
+            label: 'DeepSeek R1 70B',
+            description: 'Reasoning, large',
+            context: '64k',
+          },
+          {
+            id: 'qwq',
+            label: 'QwQ 32B',
+            description: 'Qwen reasoning',
+            context: '32k',
           },
         ],
       },
@@ -878,47 +954,101 @@ const catalogs: ProviderCatalog[] = [
   },
 
   // ── Ollama Cloud ──────────────────────────────────────────────────────────
+  // Live model list fetched from https://openai.ollama.com/v1/models.
+  // Static fallback shown when cloud is unreachable or key is invalid.
   {
     providerId: 'ollama-cloud',
     categories: [
       {
-        name: 'Cloud Models',
+        name: 'General',
         models: [
           {
-            id: 'gpt-oss:120b-cloud',
-            label: 'GPT-OSS 120B',
-            description: 'OpenAI open-source, Ollama cloud',
-            context: '128k',
-          },
-          {
-            id: 'deepseek-v3:685b-cloud',
-            label: 'DeepSeek V3 685B',
-            description: 'Flagship cloud',
-            context: '64k',
-          },
-          {
-            id: 'llama3.3:70b-cloud',
+            id: 'llama3.3:70b',
             label: 'Llama 3.3 70B',
             description: 'Meta flagship',
             context: '128k',
           },
           {
-            id: 'qwen2.5:72b-cloud',
-            label: 'Qwen 2.5 72B',
-            description: 'Alibaba cloud',
+            id: 'llama3.1:405b',
+            label: 'Llama 3.1 405B',
+            description: 'Meta largest',
             context: '128k',
           },
           {
-            id: 'mistral:7b-cloud',
+            id: 'mistral:7b',
             label: 'Mistral 7B',
-            description: 'Cloud inference',
+            description: 'Fast, general',
             context: '32k',
           },
           {
-            id: 'phi4:cloud',
+            id: 'gemma3:27b',
+            label: 'Gemma 3 27B',
+            description: 'Google, capable',
+            context: '128k',
+          },
+          {
+            id: 'phi4',
             label: 'Phi-4',
-            description: 'Microsoft cloud',
+            description: 'Microsoft',
             context: '16k',
+          },
+        ],
+      },
+      {
+        name: 'Code',
+        models: [
+          {
+            id: 'qwen2.5-coder:32b',
+            label: 'Qwen 2.5 Coder 32B',
+            description: 'Best-in-class code',
+            context: '32k',
+          },
+          {
+            id: 'qwen2.5-coder:72b',
+            label: 'Qwen 2.5 Coder 72B',
+            description: 'Code, largest',
+            context: '32k',
+          },
+          {
+            id: 'codellama:70b',
+            label: 'CodeLlama 70B',
+            description: 'Meta code, large',
+            context: '16k',
+          },
+          {
+            id: 'devstral',
+            label: 'Devstral',
+            description: 'Mistral agentic coding',
+            context: '128k',
+          },
+        ],
+      },
+      {
+        name: 'Reasoning',
+        models: [
+          {
+            id: 'deepseek-r1:70b',
+            label: 'DeepSeek R1 70B',
+            description: 'Reasoning, large',
+            context: '64k',
+          },
+          {
+            id: 'deepseek-r1:671b',
+            label: 'DeepSeek R1 671B',
+            description: 'Full DeepSeek R1',
+            context: '64k',
+          },
+          {
+            id: 'deepseek-v3',
+            label: 'DeepSeek V3',
+            description: 'Chat + reasoning',
+            context: '64k',
+          },
+          {
+            id: 'qwq:32b',
+            label: 'QwQ 32B',
+            description: 'Qwen reasoning',
+            context: '32k',
           },
         ],
       },

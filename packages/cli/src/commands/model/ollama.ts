@@ -7,11 +7,14 @@
 /**
  * Live model fetching for Ollama (local and cloud).
  *
- * Uses the native Ollama `/api/tags` endpoint for local deployments
- * (with richer metadata) and the OpenAI-compatible `/v1/models` endpoint
- * for Ollama Cloud (which doesn't always expose `/api/tags`).
+ * Local deployments: uses the native `/api/tags` endpoint for rich metadata
+ * (model size, quantization, parameter count).
  *
- * Falls back to the static catalog if the endpoint is unreachable.
+ * Cloud deployments (non-localhost): uses the OpenAI-compatible `/v1/models`
+ * endpoint because cloud providers may not expose `/api/tags`.
+ *
+ * Falls back to the static catalog if the endpoint is unreachable or returns
+ * an auth error.
  */
 import type { ModelCategory } from './catalog.js';
 import { fetchOpenAICompatibleModels } from './discovery.js';
@@ -82,59 +85,126 @@ function buildModelDescription(tag: OllamaTag, isCloud: boolean): string {
 }
 
 /**
+ * Build the /api/tags URL from a baseUrl that may end with /v1.
+ * e.g. "http://localhost:11434/v1" → "http://localhost:11434/api/tags"
+ */
+function buildTagsUrl(baseUrl: string): string {
+  return `${baseUrl.replace(/\/v1\/?$/, '')}/api/tags`;
+}
+
+/**
+ * Produce a human-readable error for common Ollama HTTP status codes.
+ */
+function ollamaHttpError(status: number, isCloud: boolean): string {
+  if (status === 401 || status === 403) {
+    return isCloud
+      ? `Authentication failed (${status}). Check your OLLAMA_CLOUD_API_KEY at https://ollama.com → Account → API Keys.`
+      : `Authentication failed (${status}). Local Ollama should not require a key — check OLLAMA_API_KEY is unset or set to "ollama".`;
+  }
+  if (status === 404) {
+    return isCloud
+      ? `Ollama Cloud endpoint not found (404). Verify the API URL is correct.`
+      : `Ollama local endpoint not found (404). Ensure Ollama is running: ollama serve`;
+  }
+  return `Ollama returned HTTP ${status}.`;
+}
+
+/**
  * Fetches models from an Ollama deployment.
  *
- * For local Ollama, uses the native `/api/tags` endpoint which provides
- * model size, parameter count, quantization level, and other metadata.
+ * - Local: attempts native `/api/tags` (rich metadata: size, quant level)
+ * - Cloud: goes directly to `/v1/models` (OpenAI-compatible, always available)
  *
- * For Ollama Cloud, tries `/api/tags` first, then falls back to the
- * OpenAI-compatible `/v1/models` endpoint (which is always available on
- * Ollama Cloud but provides less metadata).
+ * Returns null on any error so callers can fall back to the static catalog.
  *
- * @param baseUrl   - e.g. http://localhost:11434/v1 or https://ollama.com/v1
- * @param apiKey    - Bearer token for Ollama Cloud (OLLAMA_API_KEY); omit for local
- * @param timeoutMs - max wait time per attempt before falling back
+ * @param baseUrl   - e.g. "http://localhost:11434/v1" or "https://openai.ollama.com/v1"
+ * @param apiKey    - Bearer token for Ollama Cloud (OLLAMA_CLOUD_API_KEY); omit for local
+ * @param timeoutMs - max wait time before treating the server as unreachable
  */
 export async function fetchOllamaModels(
   baseUrl: string,
   apiKey?: string,
-  timeoutMs = 3000,
+  timeoutMs = 4000,
 ): Promise<ModelCategory[] | null> {
   const isCloud = !isLocalEndpoint(baseUrl);
-  const tagsUrl = `${baseUrl.replace(/\/v1\/?$/, '')}/api/tags`;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   const headers: Record<string, string> = {};
-  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+  if (apiKey && apiKey !== 'ollama') {
+    headers['Authorization'] = `Bearer ${apiKey}`;
+  }
 
-  // Try native `/api/tags` first (more metadata)
+  // ── Local: try native /api/tags first for richer metadata ───────────────
+  if (!isCloud) {
+    const tagsUrl = buildTagsUrl(baseUrl);
+    try {
+      const resp = await fetch(tagsUrl, {
+        headers,
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      if (!resp.ok) {
+        // Surface auth/config errors, but still fall through to /v1/models
+        if (resp.status === 401 || resp.status === 403) {
+          throw new Error(ollamaHttpError(resp.status, false));
+        }
+      } else {
+        const data = (await resp.json()) as OllamaTagsResponse;
+        if (data.models?.length) {
+          const models = data.models.map((m) => ({
+            id: m.name,
+            label: m.name,
+            description: buildModelDescription(m, false),
+          }));
+          return [{ name: 'Installed Models', models }];
+        }
+        // Server responded but has no models — show friendly message
+        return [
+          {
+            name: 'No models installed',
+            models: [
+              {
+                id: 'llama3.2',
+                label: 'llama3.2 (suggested)',
+                description: 'Run: ollama pull llama3.2',
+              },
+            ],
+          },
+        ];
+      }
+    } catch (err) {
+      // Re-throw auth errors so the UI can surface them
+      if (
+        err instanceof Error &&
+        err.message.includes('Authentication failed')
+      ) {
+        throw err;
+      }
+      // Timeout or ECONNREFUSED — fall through to /v1/models attempt
+    }
+  }
+
+  // ── Cloud or local fallback: use OpenAI-compatible /v1/models ────────────
   try {
-    const resp = await fetch(tagsUrl, { signal: controller.signal, headers });
-    clearTimeout(timer);
-
-    if (resp.ok) {
-      const data = (await resp.json()) as OllamaTagsResponse;
-
-      if (data.models?.length) {
-        const categoryName = isCloud
-          ? 'Ollama Cloud Models'
-          : 'Installed Models';
-        const models = data.models.map((m) => ({
-          id: m.name,
-          label: m.name,
-          description: buildModelDescription(m, isCloud),
-        }));
-
-        return [{ name: categoryName, models }];
+    const categories = await fetchOpenAICompatibleModels(
+      baseUrl,
+      apiKey,
+      timeoutMs,
+    );
+    if (categories) return categories;
+  } catch (err) {
+    // Surface specific auth/HTTP errors
+    if (err instanceof Error) {
+      const msg = err.message;
+      if (
+        msg.includes('401') ||
+        msg.includes('403') ||
+        msg.includes('Authentication')
+      ) {
+        throw new Error(ollamaHttpError(401, isCloud));
       }
     }
-  } catch {
-    // `/api/tags` failed — fall through to fallback
   }
-  clearTimeout(timer);
 
-  // For any deployment (local or cloud), fall back to the
-  // OpenAI-compatible `/v1/models` endpoint
-  return fetchOpenAICompatibleModels(baseUrl, apiKey, timeoutMs);
+  // Return null to signal "use static catalog"
+  return null;
 }
