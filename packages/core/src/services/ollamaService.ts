@@ -297,6 +297,9 @@ export class OllamaService {
 
     const decoder = new TextDecoder();
     let buffer = '';
+    // Guard against pathologically long lines from a misbehaving server.
+    // A single NDJSON line should never exceed 16 MiB in practice.
+    const MAX_BUFFER_BYTES = 16 * 1024 * 1024;
 
     try {
       while (true) {
@@ -304,6 +307,14 @@ export class OllamaService {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
+
+        if (buffer.length > MAX_BUFFER_BYTES) {
+          reader.cancel();
+          throw new Error(
+            'Ollama stream line exceeded 16 MiB — aborting to prevent out-of-memory.',
+          );
+        }
+
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
 

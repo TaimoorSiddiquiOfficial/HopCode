@@ -24,6 +24,10 @@ export interface UseHistoryManagerReturn {
   truncateToItem: (itemId: number) => void;
 }
 
+// Maximum number of UI history items kept in memory per session.
+// Older items are evicted (from the front) to prevent unbounded growth.
+const MAX_HISTORY_ITEMS = 2_000;
+
 /**
  * Custom hook to manage the chat history state.
  *
@@ -62,7 +66,7 @@ export function useHistory(): UseHistoryManagerReturn {
             return prevHistory; // Don't add the duplicate
           }
         }
-        return [...prevHistory, newItem];
+        return [...prevHistory, newItem].slice(-MAX_HISTORY_ITEMS);
       });
       return id; // Return the generated ID (even if not added, to keep signature)
     },
