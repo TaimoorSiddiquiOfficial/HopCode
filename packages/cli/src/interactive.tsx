@@ -113,8 +113,8 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     heapStats.heap_size_limit / 1024 / 1024,
   );
 
-  // Set target to 50% of total memory
-  const targetMaxOldSpaceSizeInMB = Math.floor(totalMemoryMB * 0.5);
+  // Set target to 75% of total memory
+  const targetMaxOldSpaceSizeInMB = Math.floor(totalMemoryMB * 0.75);
   if (isDebugMode) {
     writeStderrLine(
       `Current heap size ${currentMaxOldSpaceSizeMb.toFixed(2)} MB`,

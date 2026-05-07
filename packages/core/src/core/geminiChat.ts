@@ -17,6 +17,7 @@ import type {
   GenerateContentResponseUsageMetadata,
 } from '@google/genai';
 import { createUserContent, FinishReason } from '@google/genai';
+import v8 from 'node:v8';
 import { retryWithBackoff, isUnattendedMode } from '../utils/retry.js';
 import { getErrorStatus } from '../utils/errors.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
@@ -368,6 +369,22 @@ export class GeminiChat {
   }
 
   /**
+   * Returns true when the V8 heap is under memory pressure.
+   *
+   * Compression is normally token-count gated. However, raw tool outputs
+   * (large file reads, long shell results) can balloon the in-process
+   * `this.history` array far beyond what token counts alone suggest. This
+   * check provides a memory-based safety valve: when used heap exceeds 70%
+   * of the V8 heap limit we force a compression pass so old turns are
+   * summarised and their objects can be GC'd before the heap fills completely.
+   */
+  private static isUnderMemoryPressure(): boolean {
+    const { used_heap_size, heap_size_limit } = v8.getHeapStatistics();
+    if (heap_size_limit <= 0) return false;
+    return used_heap_size / heap_size_limit > 0.7;
+  }
+
+  /**
    * Attempt to compress this chat's history.
    *
    * Returns the compression info regardless of outcome. On a successful
@@ -480,10 +497,23 @@ export class GeminiChat {
     // `await this.sendPromise`.
     let compressionInfo: ChatCompressionInfo;
     try {
+      // Force compression when heap is under memory pressure, regardless of
+      // the token-count threshold. Raw tool outputs (file reads, shell results)
+      // can grow the in-memory history array to several GB while still being
+      // under the model's context-window token limit, causing heap OOM crashes
+      // in long sessions. Skip if a previous compression attempt already failed
+      // (to avoid burning API calls in a loop).
+      const forceCompress =
+        !this.hasFailedCompressionAttempt && GeminiChat.isUnderMemoryPressure();
+      if (forceCompress) {
+        debugLogger.debug(
+          `[MEMORY] Heap pressure detected, forcing compression before API call`,
+        );
+      }
       compressionInfo = await this.tryCompress(
         prompt_id,
         model,
-        false,
+        forceCompress,
         params.config?.abortSignal,
       );
     } catch (error) {
