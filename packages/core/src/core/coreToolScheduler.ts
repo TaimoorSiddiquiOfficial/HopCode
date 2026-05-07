@@ -51,9 +51,6 @@ import { fileURLToPath } from 'node:url';
 import { ToolNames, ToolNamesMigration } from '../tools/tool-names.js';
 import { escapeXml } from '../utils/xml.js';
 import { unescapePath, PATH_ARG_KEYS } from '../utils/paths.js';
-import { CONCURRENCY_SAFE_KINDS } from '../tools/tools.js';
-import { isShellCommandReadOnly } from '../utils/shellReadOnlyChecker.js';
-import { stripShellWrapper } from '../utils/shell-utils.js';
 import {
   injectPermissionRulesIfMissing,
   persistPermissionOutcome,
@@ -65,22 +62,13 @@ import {
   isAutoEditApproved,
 } from './permissionFlow.js';
 import { getResponseTextFromParts } from '../utils/generateContentResponseUtilities.js';
-import type { ModifyContext } from '../tools/modifiable-tool.js';
-import {
-  isModifiableDeclarativeTool,
-  modifyWithEditor,
-} from '../tools/modifiable-tool.js';
-import * as Diff from 'diff';
 import levenshtein from 'fast-levenshtein';
 import { getPlanModeSystemReminder } from './prompts.js';
-import {
-  checkIznGate,
-  reportIznScope,
-  type IznGateResult,
-  type IznBlockHistoryEntry,
-} from '@hoptrendy/quran-guidance';
+import { IznGateHandler } from '../confirmation-bus/iznGateHandler.js';
+import { BatchExecutionPlanner } from './batchExecutionPlanner.js';
 import { ShellToolInvocation } from '../tools/shell.js';
 import { IdeClient } from '../ide/ide-client.js';
+import { InlineModificationHandler } from './inlineModificationHandler.js';
 
 const TRUNCATION_PARAM_GUIDANCE =
   'Note: Your previous response was truncated due to max_tokens limit, ' +
@@ -546,47 +534,6 @@ function toParts(input: PartListUnion): Part[] {
  * questions via ask_user_question, and only retries once intent is
  * confirmed.
  */
-export function buildIznClarificationMessage(
-  gateResult: IznGateResult & { allowed: false },
-): string {
-  const lines: string[] = [
-    '<system-reminder>',
-    `Izn gate — ${gateResult.category.join(', ')} detected. Pause and verify before retrying.`,
-    '',
-    '## Self-Verification Steps',
-    '',
-    ...gateResult.analysisPlan.map((step, i) => `${i + 1}. ${step}`),
-  ];
-
-  if (gateResult.impactScope.length > 0) {
-    lines.push(
-      '',
-      '## Impact Analysis (investigate before acting)',
-      '',
-      ...gateResult.impactScope.map((item, i) => `${i + 1}. ${item}`),
-    );
-  }
-
-  if (gateResult.intentQuestions.length > 0) {
-    lines.push(
-      '',
-      '## Clarify Intent (ask the user)',
-      '',
-      ...gateResult.intentQuestions.map((q, i) => `${i + 1}. ${q}`),
-    );
-  }
-
-  lines.push(
-    '',
-    'After completing verification and receiving confirmed intent, retry the tool call.',
-    '',
-    'If you cannot verify safety: do NOT retry. Use ask_user_question to revert to consultation.',
-    '</system-reminder>',
-  );
-
-  return lines.join('\n');
-}
-
 const VALIDATION_RETRY_LOOP_THRESHOLD = 3;
 
 /** Directive injected when a tool call repeatedly fails validation. */
@@ -630,58 +577,6 @@ interface CoreToolSchedulerOptions {
   chatRecordingService?: ChatRecordingService;
 }
 
-// ─── Tool Concurrency Helpers ────────────────────────────────
-
-interface ToolBatch {
-  concurrent: boolean;
-  calls: ScheduledToolCall[];
-}
-
-/**
- * Returns true if a scheduled tool call can safely execute concurrently
- * with other safe tools (no side effects, no shared mutable state).
- */
-function isConcurrencySafe(call: ScheduledToolCall): boolean {
-  // Agent tools spawn independent sub-agents with no shared state.
-  if (call.request.name === ToolNames.AGENT) return true;
-  // Shell commands: check if the command is read-only (e.g., git log, cat).
-  // Uses the synchronous regex+shell-quote checker (not the async AST-based
-  // one) because partitioning runs synchronously. The sync checker covers
-  // the same command whitelist and is fail-closed — unknown commands remain
-  // sequential. The AST version is used separately for permission decisions.
-  if (call.tool.kind === Kind.Execute) {
-    const command = (call.request.args as { command?: string }).command;
-    if (typeof command !== 'string') return false;
-    try {
-      return isShellCommandReadOnly(stripShellWrapper(command));
-    } catch {
-      return false; // fail-closed
-    }
-  }
-  return CONCURRENCY_SAFE_KINDS.has(call.tool.kind);
-}
-
-/**
- * Partition tool calls into consecutive batches by concurrency safety.
- *
- * Consecutive safe tools are merged into a single parallel batch.
- * Each unsafe tool forms its own sequential batch.
- *
- * Example: [Read, Read, Edit, Read] → [[Read,Read](parallel), [Edit](seq), [Read](seq)]
- */
-function partitionToolCalls(calls: ScheduledToolCall[]): ToolBatch[] {
-  return calls.reduce<ToolBatch[]>((batches, call) => {
-    const safe = isConcurrencySafe(call);
-    const lastBatch = batches[batches.length - 1];
-    if (safe && lastBatch?.concurrent) {
-      lastBatch.calls.push(call);
-    } else {
-      batches.push({ concurrent: safe, calls: [call] });
-    }
-    return batches;
-  }, []);
-}
-
 export class CoreToolScheduler {
   private toolRegistry: ToolRegistry;
   private toolCalls: ToolCall[] = [];
@@ -695,16 +590,11 @@ export class CoreToolScheduler {
   private isFinalizingToolCalls = false;
   private isScheduling = false;
   private validationRetryCounts = new Map<string, number>();
-  /**
-   * Tracks shell commands that have passed the Izn verification gate
-   * and are pending retry. When the model re-issues the same command
-   * after self-verification, the hash match allows it to skip the
-   * gate and execute. Hashes are removed on pass-through so they
-   * cannot leak across turns.
-   */
-  private iznVerifiedHashes = new Set<string>();
-  /** Accumulated destructive-action block history for the current turn. */
-  private iznBlockHistory: IznBlockHistoryEntry[] = [];
+  private iznGateHandler = new IznGateHandler();
+  private inlineModHandler: InlineModificationHandler;
+  private batchExecutionPlanner = new BatchExecutionPlanner(
+    parseInt(process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] || '', 10) || 10,
+  );
   private requestQueue: Array<{
     request: ToolCallRequestInfo | ToolCallRequestInfo[];
     signal: AbortSignal;
@@ -720,6 +610,10 @@ export class CoreToolScheduler {
     this.onToolCallsUpdate = options.onToolCallsUpdate;
     this.getPreferredEditor = options.getPreferredEditor;
     this.onEditorClose = options.onEditorClose;
+    this.inlineModHandler = new InlineModificationHandler(
+      this.getPreferredEditor,
+      this.onEditorClose,
+    );
     this.chatRecordingService = options.chatRecordingService;
   }
 
@@ -1088,7 +982,7 @@ export class CoreToolScheduler {
     this.isScheduling = true;
     try {
       // Fresh block history each turn so escalation resets between user turns.
-      this.iznBlockHistory = [];
+      this.iznGateHandler.clearBlockHistory();
       if (this.isRunning()) {
         throw new Error(
           'Cannot schedule new tool calls while other tool calls are actively running (executing or awaiting approval).',
@@ -1333,61 +1227,28 @@ export class CoreToolScheduler {
             // but the agent must self-verify before destructive actions
             // (file deletion, force-push, DROP/TRUNCATE, permission changes).
             if (approvalMode === ApprovalMode.IZN) {
-              // ── Retry-after-verification bypass ──────────────────
-              // Hash the command text so the model can retry the same
-              // shell command after completing self-verification. If
-              // the hash matches a previously-blocked command, skip
-              // the gate and allow execution.
-              const commandStr =
-                typeof toolParams.command === 'string'
-                  ? toolParams.command
-                  : '';
-              const iznHash = `${reqInfo.name}|${commandStr}`;
-              if (this.iznVerifiedHashes.has(iznHash)) {
-                this.iznVerifiedHashes.delete(iznHash);
-              } else {
-                const gateResult = checkIznGate(
-                  {
-                    toolName: reqInfo.name,
-                    toolArgs: toolParams,
-                  },
-                  this.iznBlockHistory,
+              const gateDecision = this.iznGateHandler.check({
+                toolName: reqInfo.name,
+                toolArgs: toolParams,
+              });
+
+              if (!gateDecision.allowed) {
+                this.setToolCallOutcome(
+                  reqInfo.callId,
+                  ToolConfirmationOutcome.ProceedAlways,
                 );
-                if (!gateResult.allowed) {
-                  // ── Izn intent-clarification gate ──────────────────
-                  // Instead of hard-blocking, return a system-reminder
-                  // with the clarification plan so the model can
-                  // investigate, trace dependencies, predict cascade
-                  // effects, and ask the user to confirm intent before
-                  // retrying. Store the hash so the retry passes the
-                  // gate after verification completes.
-                  this.iznVerifiedHashes.add(iznHash);
-                  // Record in block history for progressive escalation.
-                  // Use the first (primary) matched category.
-                  if (gateResult.category.length > 0) {
-                    this.iznBlockHistory.push({
-                      category: gateResult.category[0],
-                    });
-                  }
-                  const clarificationMsg =
-                    buildIznClarificationMessage(gateResult);
-                  this.setToolCallOutcome(
+                this.setStatusInternal(reqInfo.callId, 'success', {
+                  callId: reqInfo.callId,
+                  responseParts: convertToFunctionResponse(
+                    reqInfo.name,
                     reqInfo.callId,
-                    ToolConfirmationOutcome.ProceedAlways,
-                  );
-                  this.setStatusInternal(reqInfo.callId, 'success', {
-                    callId: reqInfo.callId,
-                    responseParts: convertToFunctionResponse(
-                      reqInfo.name,
-                      reqInfo.callId,
-                      clarificationMsg,
-                    ),
-                    resultDisplay: undefined,
-                    error: undefined,
-                    errorType: undefined,
-                  });
-                  continue;
-                }
+                    gateDecision.clarificationMessage,
+                  ),
+                  resultDisplay: undefined,
+                  error: undefined,
+                  errorType: undefined,
+                });
+                continue;
               }
             }
 
@@ -1669,55 +1530,39 @@ export class CoreToolScheduler {
       this.setStatusInternal(callId, 'cancelled', cancelMessage);
     } else if (outcome === ToolConfirmationOutcome.ModifyWithEditor) {
       const waitingToolCall = toolCall as WaitingToolCall;
-      if (isModifiableDeclarativeTool(waitingToolCall.tool)) {
-        const modifyContext = waitingToolCall.tool.getModifyContext(signal);
-        const editorType = this.getPreferredEditor();
-        if (!editorType) {
-          return;
-        }
+      this.setStatusInternal(callId, 'awaiting_approval', {
+        ...waitingToolCall.confirmationDetails,
+        isModifying: true,
+      } as ToolCallConfirmationDetails);
 
+      const result = await this.inlineModHandler.launchEditorForModify(
+        waitingToolCall,
+        signal,
+      );
+
+      if (result) {
+        this.setArgsInternal(callId, result.updatedParams);
         this.setStatusInternal(callId, 'awaiting_approval', {
           ...waitingToolCall.confirmationDetails,
-          isModifying: true,
-        } as ToolCallConfirmationDetails);
-
-        // Normalize shell-escaped paths so the editor receives actual
-        // filesystem paths (request.args may still hold escaped values
-        // since buildInvocation normalizes a structuredClone).
-        const normalizedArgs = {
-          ...waitingToolCall.request.args,
-        } as typeof waitingToolCall.request.args;
-        for (const key of PATH_ARG_KEYS) {
-          if (typeof normalizedArgs[key] === 'string') {
-            (normalizedArgs as Record<string, unknown>)[key] = unescapePath(
-              String(normalizedArgs[key]).trim(),
-            );
-          }
-        }
-        const { updatedParams, updatedDiff } = await modifyWithEditor<
-          typeof waitingToolCall.request.args
-        >(
-          normalizedArgs,
-          modifyContext as ModifyContext<typeof waitingToolCall.request.args>,
-          editorType,
-          signal,
-          this.onEditorClose,
-        );
-        this.setArgsInternal(callId, updatedParams);
-        this.setStatusInternal(callId, 'awaiting_approval', {
-          ...waitingToolCall.confirmationDetails,
-          fileDiff: updatedDiff,
+          fileDiff: result.updatedDiff,
           isModifying: false,
         } as ToolCallConfirmationDetails);
       }
     } else {
       // If the client provided new content, apply it before scheduling.
       if (payload?.newContent && toolCall) {
-        await this._applyInlineModify(
+        const result = this.inlineModHandler.applyInlineModify(
           toolCall as WaitingToolCall,
           payload,
           signal,
         );
+        if (result) {
+          this.setArgsInternal(callId, result.updatedParams);
+          this.setStatusInternal(callId, 'awaiting_approval', {
+            ...(toolCall as WaitingToolCall).confirmationDetails,
+            fileDiff: result.updatedDiff,
+          } as ToolCallConfirmationDetails);
+        }
       }
       this.setStatusInternal(callId, 'scheduled');
     }
@@ -1794,49 +1639,6 @@ export class CoreToolScheduler {
     }
   }
 
-  /**
-   * Applies user-provided content changes to a tool call that is awaiting confirmation.
-   * This method updates the tool's arguments and refreshes the confirmation prompt with a new diff
-   * before the tool is scheduled for execution.
-   * @private
-   */
-  private async _applyInlineModify(
-    toolCall: WaitingToolCall,
-    payload: ToolConfirmationPayload,
-    signal: AbortSignal,
-  ): Promise<void> {
-    const confirmDetails = toolCall.confirmationDetails;
-    if (
-      confirmDetails.type !== 'edit' ||
-      !isModifiableDeclarativeTool(toolCall.tool) ||
-      !payload.newContent
-    ) {
-      return;
-    }
-
-    const currentContent = confirmDetails.originalContent ?? '';
-    const modifyContext = toolCall.tool.getModifyContext(signal);
-
-    const updatedParams = modifyContext.createUpdatedParams(
-      currentContent,
-      payload.newContent,
-      toolCall.request.args,
-    );
-    const updatedDiff = Diff.createPatch(
-      confirmDetails.filePath,
-      currentContent,
-      payload.newContent,
-      'Current',
-      'Proposed',
-    );
-
-    this.setArgsInternal(toolCall.request.callId, updatedParams);
-    this.setStatusInternal(toolCall.request.callId, 'awaiting_approval', {
-      ...confirmDetails,
-      fileDiff: updatedDiff,
-    });
-  }
-
   private async attemptExecutionOfScheduledCalls(
     signal: AbortSignal,
   ): Promise<void> {
@@ -1853,48 +1655,12 @@ export class CoreToolScheduler {
         (call): call is ScheduledToolCall => call.status === 'scheduled',
       );
 
-      // Partition tool calls into consecutive batches by concurrency safety.
-      // Consecutive safe tools are grouped into parallel batches; unsafe
-      // tools each form their own sequential batch. Execute (shell) is safe
-      // only when isShellCommandReadOnly() returns true; otherwise sequential.
-      const batches = partitionToolCalls(callsToExecute);
-
-      for (const batch of batches) {
-        if (batch.concurrent && batch.calls.length > 1) {
-          await this.runConcurrently(batch.calls, signal);
-        } else {
-          for (const call of batch.calls) {
-            await this.executeSingleToolCall(call, signal);
-          }
-        }
-      }
+      await this.batchExecutionPlanner.execute(
+        callsToExecute,
+        (call, sig) => this.executeSingleToolCall(call, sig),
+        signal,
+      );
     }
-  }
-
-  /**
-   * Execute multiple tool calls concurrently with a concurrency cap.
-   */
-  private async runConcurrently(
-    calls: ScheduledToolCall[],
-    signal: AbortSignal,
-  ): Promise<void> {
-    const parsed = parseInt(
-      process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] || '',
-      10,
-    );
-    const maxConcurrency = Number.isFinite(parsed) && parsed >= 1 ? parsed : 10;
-    const executing = new Set<Promise<void>>();
-
-    for (const call of calls) {
-      const p = this.executeSingleToolCall(call, signal).finally(() => {
-        executing.delete(p);
-      });
-      executing.add(p);
-      if (executing.size >= maxConcurrency) {
-        await Promise.race(executing);
-      }
-    }
-    await Promise.all(executing);
   }
 
   private async executeSingleToolCall(
@@ -2162,17 +1928,14 @@ export class CoreToolScheduler {
         // Izn mode: inject post-execution scope-report context
         // so the model self-verifies after each tool call.
         if (this.config.getApprovalMode() === ApprovalMode.IZN) {
-          const scopeReport = reportIznScope(
-            {
-              toolName,
-              toolArgs: toolInput,
-            },
-            this.iznBlockHistory,
-          );
-          if (scopeReport) {
+          const scopeContext = this.iznGateHandler.buildScopeReport({
+            toolName,
+            toolArgs: toolInput,
+          });
+          if (scopeContext) {
             content = appendAdditionalContext(
               content,
-              `<system-reminder>\n${scopeReport.context}\n</system-reminder>`,
+              `<system-reminder>\n${scopeContext}\n</system-reminder>`,
             );
           }
         }
