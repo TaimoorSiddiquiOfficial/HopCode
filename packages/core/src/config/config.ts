@@ -55,11 +55,13 @@ import { setGeminiMdFilename } from '../memory/const.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
 import { ToolRegistry, type ToolFactory } from '../tools/tool-registry.js';
 import { ToolNames } from '../tools/tool-names.js';
+import { PermissionsConfig } from './permissionsConfig.js';
+import { ApprovalConfig, type ApprovalMode } from './approvalConfig.js';
 import type { LspClient } from '../lsp/types.js';
 
 // Other modules
 import { ideContextStore } from '../ide/ideContext.js';
-import { InputFormat, OutputFormat } from '../output/types.js';
+import { type InputFormat, OutputFormat } from '../output/types.js';
 import { PromptRegistry } from '../prompts/prompt-registry.js';
 import { SkillManager } from '../skills/skill-manager.js';
 import { PermissionManager } from '../permissions/permission-manager.js';
@@ -70,9 +72,11 @@ import { BackgroundAgentResumeService } from '../agents/background-agent-resume.
 import { BackgroundShellRegistry } from '../services/backgroundShellRegistry.js';
 import { MonitorRegistry } from '../services/monitorRegistry.js';
 import { FileReadCache } from '../services/fileReadCache.js';
+import { TelemetryConfig, type TelemetrySettings } from './telemetryConfig.js';
+export type { TelemetrySettings } from './telemetryConfig.js';
+import { UiConfig } from './uiConfig.js';
+import { ChatConfig } from './chatConfig.js';
 import {
-  DEFAULT_OTLP_ENDPOINT,
-  DEFAULT_TELEMETRY_TARGET,
   isTelemetrySdkInitialized,
   initializeTelemetry,
   shutdownTelemetry,
@@ -117,7 +121,6 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
-import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
@@ -151,50 +154,12 @@ export {
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 };
 
-export enum ApprovalMode {
-  PLAN = 'plan',
-  DEFAULT = 'default',
-  AUTO_EDIT = 'auto-edit',
-  IZN = 'izn',
-}
-
-export const APPROVAL_MODES = Object.values(ApprovalMode);
-
-/**
- * Information about an approval mode including display name and description.
- */
-export interface ApprovalModeInfo {
-  id: ApprovalMode;
-  name: string;
-  description: string;
-}
-
-/**
- * Detailed information about each approval mode.
- * Used for UI display and protocol responses.
- */
-export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
-  [ApprovalMode.PLAN]: {
-    id: ApprovalMode.PLAN,
-    name: 'Plan',
-    description: 'Analyze only, do not modify files or execute commands',
-  },
-  [ApprovalMode.DEFAULT]: {
-    id: ApprovalMode.DEFAULT,
-    name: 'Default',
-    description: 'Require approval for file edits or shell commands',
-  },
-  [ApprovalMode.AUTO_EDIT]: {
-    id: ApprovalMode.AUTO_EDIT,
-    name: 'Auto Edit',
-    description: 'Automatically approve file edits',
-  },
-  [ApprovalMode.IZN]: {
-    id: ApprovalMode.IZN,
-    name: 'Izn',
-    description: 'Automatically approve all tools',
-  },
-};
+export {
+  ApprovalMode,
+  APPROVAL_MODES,
+  APPROVAL_MODE_INFO,
+} from './approvalConfig.js';
+export type { ApprovalModeInfo } from './approvalConfig.js';
 
 export interface AccessibilitySettings {
   enableLoadingPhrases?: boolean;
@@ -218,22 +183,6 @@ export interface ClearContextOnIdleSettings {
   toolResultsThresholdMinutes?: number;
   /** Number of most-recent tool results to preserve. Default 5. */
   toolResultsNumToKeep?: number;
-}
-
-export interface TelemetrySettings {
-  enabled?: boolean;
-  target?: TelemetryTarget;
-  otlpEndpoint?: string;
-  otlpProtocol?: 'grpc' | 'http';
-  /** Per-signal endpoint override for traces (HTTP only). Used as-is without path appending. */
-  otlpTracesEndpoint?: string;
-  /** Per-signal endpoint override for logs (HTTP only). Used as-is without path appending. */
-  otlpLogsEndpoint?: string;
-  /** Per-signal endpoint override for metrics (HTTP only). Used as-is without path appending. */
-  otlpMetricsEndpoint?: string;
-  logPrompts?: boolean;
-  outfile?: string;
-  useCollector?: boolean;
 }
 
 export interface OutputSettings {
@@ -265,8 +214,10 @@ export interface ExtensionInstallMetadata {
   pluginName?: string;
 }
 
-export const DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD = 25_000;
-export const DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES = 1000;
+export {
+  DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
+  DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES,
+} from './constants.js';
 
 export class MCPServerConfig {
   constructor(
@@ -571,12 +522,6 @@ export interface ConfigInitializeOptions {
   sendSdkMcpMessage?: SendSdkMcpMessage;
 }
 
-const DEFAULT_BARE_CORE_TOOLS = [
-  ToolNames.READ_FILE,
-  ToolNames.EDIT,
-  ToolNames.SHELL,
-];
-
 export class Config {
   private sessionId: string;
   private sessionData?: ResumedSessionData;
@@ -606,7 +551,6 @@ export class Config {
   private contentGeneratorConfig!: ContentGeneratorConfig;
   private contentGeneratorConfigSources: ContentGeneratorConfigSources = {};
   private contentGenerator!: ContentGenerator;
-  private readonly embeddingModel: string;
 
   private modelsConfig!: ModelsConfig;
   private readonly modelProvidersConfig?: ModelProvidersConfig;
@@ -615,22 +559,10 @@ export class Config {
   private readonly sandbox: SandboxConfig | undefined;
   private readonly targetDir: string;
   private workspaceContext: WorkspaceContext;
-  private readonly debugMode: boolean;
-  private readonly inputFormat: InputFormat;
-  private readonly outputFormat: OutputFormat;
-  private readonly includePartialMessages: boolean;
   private readonly question: string | undefined;
   private readonly systemPrompt: string | undefined;
   private readonly appendSystemPrompt: string | undefined;
-  private readonly coreTools: string[] | undefined;
-  private readonly allowedTools: string[] | undefined;
-  private readonly excludeTools: string[] | undefined;
-  private readonly disabledSlashCommands: readonly string[];
-  private readonly permissionsAllow: string[];
-  private readonly permissionsAsk: string[];
-  private readonly permissionsDeny: string[];
-  private readonly toolDiscoveryCommand: string | undefined;
-  private readonly toolCallCommand: string | undefined;
+  private readonly permissionsConfig: PermissionsConfig;
   private readonly mcpServerCommand: string | undefined;
   private mcpServers: Record<string, MCPServerConfig> | undefined;
   private readonly lspEnabled: boolean;
@@ -643,10 +575,10 @@ export class Config {
   private geminiMdFileCount: number;
   private conditionalRulesRegistry: ConditionalRulesRegistry | undefined;
   private readonly contextRuleExcludes: string[];
-  private approvalMode: ApprovalMode;
-  private prePlanMode?: ApprovalMode;
-  private readonly accessibility: AccessibilitySettings;
-  private readonly telemetrySettings: TelemetrySettings;
+  private readonly approvalConfig: ApprovalConfig;
+  private readonly telemetryConfig: TelemetryConfig;
+  private readonly uiConfig: UiConfig;
+  private readonly chatConfig: ChatConfig;
   private readonly gitCoAuthor: GitCoAuthorSettings;
   private readonly usageStatisticsEnabled: boolean;
   private readonly fileReadCacheDisabled: boolean;
@@ -684,9 +616,6 @@ export class Config {
   private readonly folderTrust: boolean;
   private ideMode: boolean;
 
-  private readonly maxSessionTurns: number;
-  private readonly clearContextOnIdle: ClearContextOnIdleSettings;
-  private readonly sessionTokenLimit: number;
   private readonly listExtensions: boolean;
   private readonly overrideExtensions?: string[];
 
@@ -697,8 +626,6 @@ export class Config {
   private readonly chatRecordingEnabled: boolean;
   private readonly loadMemoryFromIncludeDirectories: boolean = false;
   private readonly importFormat: 'tree' | 'flat';
-  private readonly chatCompression: ChatCompressionSettings | undefined;
-  private readonly interactive: boolean;
   private readonly trustedFolder: boolean | undefined;
   private readonly useRipgrep: boolean;
   private readonly useBuiltinRipgrep: boolean;
@@ -711,9 +638,6 @@ export class Config {
     | null = null;
   private readonly arenaAgentClient: ArenaAgentClient | null;
   private readonly agentsSettings: AgentsCollabSettings;
-  private readonly skipLoopDetection: boolean;
-  private readonly skipStartupContext: boolean;
-  private readonly bareMode: boolean;
   private readonly warnings: string[];
   private readonly allowedHttpHookUrls: string[];
   private readonly powershellConfig:
@@ -727,13 +651,10 @@ export class Config {
   private initialized: boolean = false;
   readonly storage: Storage;
   private readonly fileExclusions: FileExclusions;
-  private readonly truncateToolOutputThreshold: number;
-  private readonly truncateToolOutputLines: number;
   private readonly eventEmitter?: EventEmitter;
   private readonly channel: string | undefined;
   private readonly jsonFd: number | undefined;
   private readonly jsonFile: string | undefined;
-  private readonly inputFile: string | undefined;
   private readonly defaultFileEncoding: FileEncodingType | undefined;
   private readonly enableManagedAutoMemory: boolean;
   private readonly enableManagedAutoDream: boolean;
@@ -755,7 +676,6 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel = params.embeddingModel ?? DEFAULT_QWEN_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.webSearch = params.webSearch;
@@ -768,27 +688,24 @@ export class Config {
       this.targetDir,
       this.explicitIncludeDirectories,
     );
-    this.debugMode = params.debugMode;
-    this.inputFormat = params.inputFormat ?? InputFormat.TEXT;
     const normalizedOutputFormat = normalizeConfigOutputFormat(
       params.outputFormat ?? params.output?.format,
     );
-    this.outputFormat = normalizedOutputFormat ?? OutputFormat.TEXT;
-    this.includePartialMessages = params.includePartialMessages ?? false;
     this.question = params.question;
     this.systemPrompt = params.systemPrompt;
     this.appendSystemPrompt = params.appendSystemPrompt;
-    this.coreTools = params.coreTools;
-    this.allowedTools = params.allowedTools;
-    this.excludeTools = params.excludeTools;
-    this.disabledSlashCommands = Object.freeze([
-      ...(params.disabledSlashCommands ?? []),
-    ]);
-    this.permissionsAllow = params.permissions?.allow || [];
-    this.permissionsAsk = params.permissions?.ask || [];
-    this.permissionsDeny = params.permissions?.deny || [];
-    this.toolDiscoveryCommand = params.toolDiscoveryCommand;
-    this.toolCallCommand = params.toolCallCommand;
+    this.permissionsConfig = new PermissionsConfig({
+      bareMode: params.bareMode ?? false,
+      coreTools: params.coreTools,
+      allowedTools: params.allowedTools,
+      excludeTools: params.excludeTools,
+      disabledSlashCommands: params.disabledSlashCommands,
+      permissionsAllow: params.permissions?.allow || [],
+      permissionsAsk: params.permissions?.ask || [],
+      permissionsDeny: params.permissions?.deny || [],
+      toolDiscoveryCommand: params.toolDiscoveryCommand,
+      toolCallCommand: params.toolCallCommand,
+    });
     this.mcpServerCommand = params.mcpServerCommand;
     this.mcpServers = params.mcpServers;
     this.lspEnabled = params.lsp?.enabled ?? false;
@@ -800,20 +717,43 @@ export class Config {
     this.userMemory = params.userMemory ?? '';
     this.geminiMdFileCount = params.geminiMdFileCount ?? 0;
     this.contextRuleExcludes = params.contextRuleExcludes ?? [];
-    this.approvalMode = params.approvalMode ?? ApprovalMode.DEFAULT;
-    this.accessibility = params.accessibility ?? {};
-    this.telemetrySettings = {
-      enabled: params.telemetry?.enabled ?? false,
-      target: params.telemetry?.target ?? DEFAULT_TELEMETRY_TARGET,
+    this.approvalConfig = new ApprovalConfig({
+      approvalMode: params.approvalMode,
+      prePlanMode: undefined,
+    });
+    this.telemetryConfig = new TelemetryConfig({
+      enabled: params.telemetry?.enabled,
+      target: params.telemetry?.target,
       otlpEndpoint: params.telemetry?.otlpEndpoint,
       otlpProtocol: params.telemetry?.otlpProtocol,
       otlpTracesEndpoint: params.telemetry?.otlpTracesEndpoint,
       otlpLogsEndpoint: params.telemetry?.otlpLogsEndpoint,
       otlpMetricsEndpoint: params.telemetry?.otlpMetricsEndpoint,
-      logPrompts: params.telemetry?.logPrompts ?? true,
+      logPrompts: params.telemetry?.logPrompts,
       outfile: params.telemetry?.outfile,
       useCollector: params.telemetry?.useCollector,
-    };
+    });
+    this.uiConfig = new UiConfig({
+      inputFormat: params.inputFormat,
+      outputFormat: normalizedOutputFormat ?? OutputFormat.TEXT,
+      includePartialMessages: params.includePartialMessages,
+      debugMode: params.debugMode,
+      bareMode: params.bareMode,
+      accessibility: params.accessibility,
+      truncateToolOutputThreshold: params.truncateToolOutputThreshold,
+      truncateToolOutputLines: params.truncateToolOutputLines,
+      skipLoopDetection: params.skipLoopDetection,
+      skipStartupContext: params.skipStartupContext,
+      inputFile: params.inputFile,
+    });
+    this.chatConfig = new ChatConfig({
+      maxSessionTurns: params.maxSessionTurns,
+      clearContextOnIdle: params.clearContextOnIdle,
+      sessionTokenLimit: params.sessionTokenLimit,
+      embeddingModel: params.embeddingModel,
+      chatCompression: params.chatCompression,
+      interactive: params.interactive,
+    });
     this.gitCoAuthor = {
       enabled: params.gitCoAuthor ?? true,
       name: 'HopCode',
@@ -839,14 +779,6 @@ export class Config {
     this.cwd = params.cwd ?? process.cwd();
     this.fileDiscoveryService = params.fileDiscoveryService ?? null;
     this.bugCommand = params.bugCommand;
-    this.maxSessionTurns = params.maxSessionTurns ?? -1;
-    this.clearContextOnIdle = {
-      toolResultsThresholdMinutes:
-        params.clearContextOnIdle?.toolResultsThresholdMinutes ?? 60,
-      toolResultsNumToKeep:
-        params.clearContextOnIdle?.toolResultsNumToKeep ?? 5,
-    };
-    this.sessionTokenLimit = params.sessionTokenLimit ?? -1;
     this.experimentalZedIntegration =
       params.experimentalZedIntegration ?? false;
     this.cronEnabled = params.cronEnabled ?? false;
@@ -865,12 +797,7 @@ export class Config {
     this.loadMemoryFromIncludeDirectories =
       params.loadMemoryFromIncludeDirectories ?? false;
     this.importFormat = params.importFormat ?? 'tree';
-    this.chatCompression = params.chatCompression;
-    this.interactive = params.interactive ?? false;
     this.trustedFolder = params.trustedFolder;
-    this.skipLoopDetection = params.skipLoopDetection ?? false;
-    this.skipStartupContext = params.skipStartupContext ?? false;
-    this.bareMode = params.bareMode ?? false;
     this.warnings = params.warnings ?? [];
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
     this.powershellConfig = params.powershellConfig;
@@ -888,18 +815,11 @@ export class Config {
       showColor: params.shellExecutionConfig?.showColor ?? false,
       pager: params.shellExecutionConfig?.pager ?? 'cat',
     };
-    this.truncateToolOutputThreshold =
-      params.truncateToolOutputThreshold ??
-      DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD;
-    this.truncateToolOutputLines =
-      params.truncateToolOutputLines ?? DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES;
     this.channel = params.channel;
     this.jsonFd = params.jsonFd;
     this.jsonFile = params.jsonFile;
-    this.inputFile = params.inputFile;
     this.defaultFileEncoding = params.defaultFileEncoding;
     this.storage = new Storage(this.targetDir);
-    this.inputFormat = params.inputFormat ?? InputFormat.TEXT;
     this.fileExclusions = new FileExclusions(this);
     this.eventEmitter = params.eventEmitter;
     this.arenaAgentClient = ArenaAgentClient.create();
@@ -924,7 +844,7 @@ export class Config {
       onModelChange: this.handleModelChange.bind(this),
     });
 
-    if (this.telemetrySettings.enabled) {
+    if (this.telemetryConfig.getEnabled()) {
       initializeTelemetry(this);
     }
 
@@ -1637,19 +1557,19 @@ export class Config {
   }
 
   getMaxSessionTurns(): number {
-    return this.maxSessionTurns;
+    return this.chatConfig.getMaxSessionTurns();
   }
 
   getClearContextOnIdle(): ClearContextOnIdleSettings {
-    return this.clearContextOnIdle;
+    return this.chatConfig.getClearContextOnIdle();
   }
 
   getSessionTokenLimit(): number {
-    return this.sessionTokenLimit;
+    return this.chatConfig.getSessionTokenLimit();
   }
 
   getEmbeddingModel(): string {
-    return this.embeddingModel;
+    return this.chatConfig.getEmbeddingModel();
   }
 
   getSandbox(): SandboxConfig | undefined {
@@ -1734,7 +1654,7 @@ export class Config {
   }
 
   getDebugMode(): boolean {
-    return this.debugMode;
+    return this.uiConfig.getDebugMode();
   }
 
   getQuestion(): string | undefined {
@@ -1751,78 +1671,31 @@ export class Config {
 
   /** @deprecated Use getPermissionsAllow() instead. */
   getCoreTools(): string[] | undefined {
-    if (this.getBareMode()) {
-      return DEFAULT_BARE_CORE_TOOLS;
-    }
-    return this.coreTools;
+    return this.permissionsConfig.getCoreTools();
   }
 
-  /**
-   * Returns the merged allow-rules for PermissionManager.
-   *
-   * This merges all sources so that PermissionManager receives a single,
-   * authoritative list:
-   *   - settings.permissions.allow  (persistent rules from all scopes)
-   *   - allowedTools param  (SDK / argv auto-approve list)
-   *
-   * Note: coreTools is intentionally excluded here — it has whitelist semantics
-   * (only listed tools are registered), not auto-approve semantics. It is
-   * handled separately via PermissionManager.coreToolsAllowList.
-   *
-   * CLI callers (loadCliConfig) already pre-merge argv into permissionsAllow
-   * before constructing Config, so those fields will be empty for CLI usage.
-   * SDK callers construct Config directly and rely on allowedTools.
-   */
   getPermissionsAllow(): string[] {
-    const base = this.permissionsAllow ?? [];
-    const sdkAllow = [...(this.allowedTools ?? [])];
-    if (sdkAllow.length === 0) return base.length > 0 ? base : [];
-    const merged = [...base];
-    for (const t of sdkAllow) {
-      if (t && !merged.includes(t)) merged.push(t);
-    }
-    return merged;
+    return this.permissionsConfig.getPermissionsAllow();
   }
 
   getPermissionsAsk(): string[] {
-    return this.permissionsAsk;
+    return this.permissionsConfig.getPermissionsAsk();
   }
 
-  /**
-   * Returns the merged deny-rules for PermissionManager.
-   *
-   * Merges:
-   *   - settings.permissions.deny  (persistent rules from all scopes)
-   *   - excludeTools param  (SDK / argv blocklist)
-   *
-   * CLI callers pre-merge argv.excludeTools into permissionsDeny.
-   */
   getPermissionsDeny(): string[] {
-    const base = this.permissionsDeny ?? [];
-    const sdkDeny = this.excludeTools ?? [];
-    if (sdkDeny.length === 0) return base.length > 0 ? base : [];
-    const merged = [...base];
-    for (const t of sdkDeny) {
-      if (t && !merged.includes(t)) merged.push(t);
-    }
-    return merged;
+    return this.permissionsConfig.getPermissionsDeny();
   }
 
   getToolDiscoveryCommand(): string | undefined {
-    return this.toolDiscoveryCommand;
+    return this.permissionsConfig.getToolDiscoveryCommand();
   }
 
-  /**
-   * Returns the pre-merged list of slash command names that should be hidden
-   * from the CLI surface. Callers should treat this as a case-insensitive
-   * denylist; `CommandService.create` handles the normalization.
-   */
   getDisabledSlashCommands(): readonly string[] {
-    return this.disabledSlashCommands;
+    return this.permissionsConfig.getDisabledSlashCommands();
   }
 
   getToolCallCommand(): string | undefined {
-    return this.toolCallCommand;
+    return this.permissionsConfig.getToolCallCommand();
   }
 
   getMcpServerCommand(): string | undefined {
@@ -1990,37 +1863,15 @@ export class Config {
   }
 
   getApprovalMode(): ApprovalMode {
-    return this.approvalMode;
+    return this.approvalConfig.getApprovalMode();
   }
 
-  /**
-   * Returns the approval mode that was active before entering plan mode.
-   * Falls back to DEFAULT if no pre-plan mode was recorded.
-   */
   getPrePlanMode(): ApprovalMode {
-    return this.prePlanMode ?? ApprovalMode.DEFAULT;
+    return this.approvalConfig.getPrePlanMode();
   }
 
   setApprovalMode(mode: ApprovalMode): void {
-    if (
-      !this.isTrustedFolder() &&
-      mode !== ApprovalMode.DEFAULT &&
-      mode !== ApprovalMode.PLAN
-    ) {
-      throw new Error(
-        'Cannot enable privileged approval modes in an untrusted folder.',
-      );
-    }
-    // Track the mode before entering plan mode so it can be restored later
-    if (mode === ApprovalMode.PLAN && this.approvalMode !== ApprovalMode.PLAN) {
-      this.prePlanMode = this.approvalMode;
-    } else if (
-      mode !== ApprovalMode.PLAN &&
-      this.approvalMode === ApprovalMode.PLAN
-    ) {
-      this.prePlanMode = undefined;
-    }
-    this.approvalMode = mode;
+    this.approvalConfig.setApprovalMode(mode, this.isTrustedFolder());
   }
 
   /**
@@ -2061,51 +1912,51 @@ export class Config {
   }
 
   getInputFormat(): 'text' | 'stream-json' {
-    return this.inputFormat;
+    return this.uiConfig.getInputFormat();
   }
 
   getIncludePartialMessages(): boolean {
-    return this.includePartialMessages;
+    return this.uiConfig.getIncludePartialMessages();
   }
 
   getAccessibility(): AccessibilitySettings {
-    return this.accessibility;
+    return this.uiConfig.getAccessibility();
   }
 
   getTelemetryEnabled(): boolean {
-    return this.telemetrySettings.enabled ?? false;
+    return this.telemetryConfig.getEnabled();
   }
 
   getTelemetryLogPromptsEnabled(): boolean {
-    return this.telemetrySettings.logPrompts ?? true;
+    return this.telemetryConfig.getLogPromptsEnabled();
   }
 
   getTelemetryOtlpEndpoint(): string | undefined {
-    return this.telemetrySettings.otlpEndpoint ?? DEFAULT_OTLP_ENDPOINT;
+    return this.telemetryConfig.getOtlpEndpoint();
   }
 
   getTelemetryOtlpProtocol(): 'grpc' | 'http' {
-    return this.telemetrySettings.otlpProtocol ?? 'grpc';
+    return this.telemetryConfig.getOtlpProtocol();
   }
 
   getTelemetryOtlpTracesEndpoint(): string | undefined {
-    return this.telemetrySettings.otlpTracesEndpoint;
+    return this.telemetryConfig.getOtlpTracesEndpoint();
   }
 
   getTelemetryOtlpLogsEndpoint(): string | undefined {
-    return this.telemetrySettings.otlpLogsEndpoint;
+    return this.telemetryConfig.getOtlpLogsEndpoint();
   }
 
   getTelemetryOtlpMetricsEndpoint(): string | undefined {
-    return this.telemetrySettings.otlpMetricsEndpoint;
+    return this.telemetryConfig.getOtlpMetricsEndpoint();
   }
 
   getTelemetryTarget(): TelemetryTarget {
-    return this.telemetrySettings.target ?? DEFAULT_TELEMETRY_TARGET;
+    return this.telemetryConfig.getTarget();
   }
 
   getTelemetryOutfile(): string | undefined {
-    return this.telemetrySettings.outfile;
+    return this.telemetryConfig.getOutfile();
   }
 
   getGitCoAuthor(): GitCoAuthorSettings {
@@ -2113,7 +1964,7 @@ export class Config {
   }
 
   getTelemetryUseCollector(): boolean {
-    return this.telemetrySettings.useCollector ?? false;
+    return this.telemetryConfig.getUseCollector();
   }
 
   getGeminiClient(): GeminiClient {
@@ -2488,7 +2339,7 @@ export class Config {
    * by an external process and submit them as user messages.
    */
   getInputFile(): string | undefined {
-    return this.inputFile;
+    return this.uiConfig.getInputFile();
   }
 
   /**
@@ -2514,11 +2365,11 @@ export class Config {
   }
 
   getChatCompression(): ChatCompressionSettings | undefined {
-    return this.chatCompression;
+    return this.chatConfig.getChatCompression();
   }
 
   isInteractive(): boolean {
-    return this.interactive;
+    return this.chatConfig.isInteractive();
   }
 
   getUseRipgrep(): boolean {
@@ -2552,39 +2403,31 @@ export class Config {
     };
   }
   getScreenReader(): boolean {
-    return this.accessibility.screenReader ?? false;
+    return this.uiConfig.getScreenReader();
   }
 
   getSkipLoopDetection(): boolean {
-    return this.skipLoopDetection;
+    return this.uiConfig.getSkipLoopDetection();
   }
 
   getSkipStartupContext(): boolean {
-    return this.skipStartupContext;
+    return this.uiConfig.getSkipStartupContext();
   }
 
   getBareMode(): boolean {
-    return this.bareMode;
+    return this.uiConfig.getBareMode();
   }
 
   getTruncateToolOutputThreshold(): number {
-    if (this.truncateToolOutputThreshold <= 0) {
-      return Number.POSITIVE_INFINITY;
-    }
-
-    return this.truncateToolOutputThreshold;
+    return this.uiConfig.getTruncateToolOutputThreshold();
   }
 
   getTruncateToolOutputLines(): number {
-    if (this.truncateToolOutputLines <= 0) {
-      return Number.POSITIVE_INFINITY;
-    }
-
-    return this.truncateToolOutputLines;
+    return this.uiConfig.getTruncateToolOutputLines();
   }
 
   getOutputFormat(): OutputFormat {
-    return this.outputFormat;
+    return this.uiConfig.getOutputFormat();
   }
 
   async getGitService(): Promise<GitService> {

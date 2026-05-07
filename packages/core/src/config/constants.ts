@@ -24,3 +24,6 @@ export const DEFAULT_FILE_FILTERING_OPTIONS: FileFilteringOptions = {
   respectHopCodeIgnore: true,
   respectQwenIgnore: true,
 };
+
+export const DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD = 25_000;
+export const DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES = 1000;
