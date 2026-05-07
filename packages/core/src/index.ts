@@ -40,6 +40,7 @@ export {
   type ModelsConfigOptions,
   type ModelProvidersConfig,
   type ModelSwitchMetadata,
+  MODEL_GENERATION_CONFIG_FIELDS,
   type OnModelChangeCallback,
   HOPCODE_OAUTH_MODELS,
   resolveModelConfig,
