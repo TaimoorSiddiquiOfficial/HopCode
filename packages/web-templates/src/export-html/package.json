@@ -6,7 +6,7 @@
     "build": "node build.mjs"
   },
   "dependencies": {
-    "@hoptrendy/webui": "^0.26.1"
+    "@hoptrendy/webui": "^0.27.0"
   },
   "devDependencies": {
     "esbuild": "0.25.0"
