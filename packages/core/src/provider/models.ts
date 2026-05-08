@@ -98,18 +98,8 @@ export namespace ModelsDev {
       .catch(() => undefined);
     if (snapshot) return snapshot;
     if (Flag.OPENCODE_DISABLE_MODELS_FETCH) return {};
-    // 10-second timeout; 5 MiB response size guard to prevent OOM.
-    const MAX_RESPONSE_BYTES = 5 * 1024 * 1024;
-    const response = await fetch(`${url()}/api.json`, {
-      signal: AbortSignal.timeout(10_000),
-    });
-    const text = await response.text();
-    if (text.length > MAX_RESPONSE_BYTES) {
-      throw new Error(
-        `models.dev response too large (${text.length} bytes) — refusing to parse.`,
-      );
-    }
-    return JSON.parse(text);
+    const json = await fetch(`${url()}/api.json`).then((x) => x.text());
+    return JSON.parse(json);
   });
 
   export async function get() {

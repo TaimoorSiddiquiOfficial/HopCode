@@ -70,27 +70,16 @@ async function handleDashboard(port: number, open: boolean): Promise<void> {
     // Give server a moment to start, then open browser
     setTimeout(async () => {
       const url = `http://localhost:${port}`;
-      const { execFile } = await import('node:child_process');
-      let file: string;
-      let args: string[];
+      let cmd: string;
       if (process.platform === 'win32') {
-        // `start` is a shell built-in; invoke via cmd.exe with empty title arg
-        file = 'cmd.exe';
-        args = ['/c', 'start', '', url];
+        cmd = `start ${url}`;
       } else if (process.platform === 'darwin') {
-        file = '/usr/bin/open';
-        args = [url];
+        cmd = `open ${url}`;
       } else {
-        file = 'xdg-open';
-        args = [url];
+        cmd = `xdg-open ${url}`;
       }
-      execFile(file, args, { timeout: 5_000, maxBuffer: 4_096 }, (err) => {
-        if (err) {
-          process.stderr.write(
-            `Could not open browser automatically: ${err.message}\n`,
-          );
-        }
-      });
+      const { exec } = await import('node:child_process');
+      exec(cmd);
     }, 1500);
   }
 
