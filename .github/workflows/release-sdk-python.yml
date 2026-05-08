@@ -44,7 +44,7 @@ jobs:
       name: 'production-release'
       url: '${{ github.server_url }}/${{ github.repository }}/releases'
     if: |-
-      ${{ github.repository == 'QwenLM/qwen-code' }}
+      ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}
     permissions:
       contents: 'write'
       id-token: 'write'
@@ -214,7 +214,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e 'packages/sdk-python[dev]' build
 
-      - name: 'Build qwen CLI bundle'
+      - name: 'Build HopCode CLI bundle'
         if: |-
           ${{ github.event.inputs.force_skip_tests != 'true' }}
         run: |
@@ -262,7 +262,7 @@ jobs:
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
           OPENAI_MODEL: '${{ secrets.OPENAI_MODEL }}'
         run: |
-          python packages/sdk-python/scripts/smoke_real.py --qwen "${GITHUB_WORKSPACE}/dist/cli.js" --cwd "${GITHUB_WORKSPACE}" --json-only
+          python packages/sdk-python/scripts/smoke_real.py --hopcode "${GITHUB_WORKSPACE}/dist/cli.js" --cwd "${GITHUB_WORKSPACE}" --json-only
 
       - name: 'Configure Git User'
         run: |
@@ -343,7 +343,7 @@ jobs:
           rm -rf dist
           python -m build
 
-      - name: 'Publish qwen-code-sdk to PyPI'
+      - name: 'Publish hopcode-sdk to PyPI'
         if: |-
           ${{ steps.vars.outputs.is_dry_run == 'false' }}
         uses: 'pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b' # ratchet:pypa/gh-action-pypi-publish@release/v1
@@ -373,12 +373,6 @@ jobs:
           set -euo pipefail
           TAG_NAME="sdk-python-${RELEASE_TAG}"
 
-          if [[ "${IS_NIGHTLY}" == "true" || "${IS_PREVIEW}" == "true" ]]; then
-            PRERELEASE_FLAG="--prerelease"
-          else
-            PRERELEASE_FLAG=""
-          fi
-
           if gh release view "${TAG_NAME}" --json tagName >/dev/null 2>&1; then
             echo "::warning::GitHub release ${TAG_NAME} already exists; skipping create."
             exit 0
@@ -396,36 +390,42 @@ jobs:
           {
             echo "## Published Package"
             echo ""
-            echo "- PyPI package: \`qwen-code-sdk\`"
+            echo "- PyPI package: \`hopcode-sdk\`"
             echo "- Package version: \`${PACKAGE_VERSION}\`"
             echo ""
             echo "---"
             echo ""
           } > "${NOTES_FILE}"
 
+          GH_RELEASE_ARGS=()
           if [[ -n "${PREVIOUS_RELEASE_TAG}" ]]; then
-            PREVIOUS_NOTES=$(gh release view "sdk-python-${PREVIOUS_RELEASE_TAG}" --json body -q '.body' 2>&1) || {
-              ERR_MSG="${PREVIOUS_NOTES}"
-              case "${ERR_MSG}" in
-                *"release not found"*|*"Not Found"*|*"HTTP 404"*)
-                  PREVIOUS_NOTES='See commit history for changes.'
-                  ;;
-                *)
-                  echo "::warning::Failed to fetch previous release notes: ${ERR_MSG}"
-                  PREVIOUS_NOTES='See commit history for changes.'
-                  ;;
-              esac
-            }
-            printf '%s\n' "${PREVIOUS_NOTES}" >> "${NOTES_FILE}"
+            PREVIOUS_TAG_NAME="sdk-python-${PREVIOUS_RELEASE_TAG}"
+            # Verify the previous tag exists in Git before using --notes-start-tag.
+            # If a prior release published to PyPI but failed to create a GitHub
+            # release/tag, the tag won't exist — fall back to static notes to
+            # avoid failing gh release create after PyPI publish.
+            if git rev-parse "${PREVIOUS_TAG_NAME}" >/dev/null 2>&1; then
+              GH_RELEASE_ARGS+=(--generate-notes --notes-start-tag "${PREVIOUS_TAG_NAME}")
+            else
+              echo "::warning::Previous tag ${PREVIOUS_TAG_NAME} not found; skipping --generate-notes."
+              echo "See commit history for changes." >> "${NOTES_FILE}"
+            fi
           else
+            # PREVIOUS_RELEASE_TAG is empty for preview/nightly (not computed)
+            # and for the very first stable release (no prior stable on PyPI).
+            # Skip --generate-notes to avoid including non-SDK commits.
             echo "See commit history for changes." >> "${NOTES_FILE}"
+          fi
+
+          if [[ "${IS_NIGHTLY}" == "true" || "${IS_PREVIEW}" == "true" ]]; then
+            GH_RELEASE_ARGS+=(--prerelease)
           fi
 
           gh release create "${TAG_NAME}" \
             --target "${RELEASE_TARGET_SHA}" \
             --title "SDK Python Release ${RELEASE_TAG}" \
             --notes-file "${NOTES_FILE}" \
-            ${PRERELEASE_FLAG}
+            "${GH_RELEASE_ARGS[@]}"
 
           rm -f "${NOTES_FILE}"
 
