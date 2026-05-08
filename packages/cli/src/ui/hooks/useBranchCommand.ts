@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Code
  * SPDX-License-Identifier: Apache-2.0
@@ -13,7 +13,7 @@ import {
   type ResumedSessionData,
   SessionStartSource,
   type PermissionMode,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { buildResumedHistoryItems } from '../utils/resumeHistoryUtils.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { t } from '../../i18n/index.js';
@@ -33,12 +33,12 @@ const MAX_BRANCH_COLLISION_SCAN = 99;
  * to 100 chars, fall back to "Branched conversation" when the transcript
  * has no user text.
  *
- * Reads ChatRecord[] — the JSONL-level transcript — NOT the Gemini API
+ * Reads ChatRecord[] â€” the JSONL-level transcript â€” NOT the Gemini API
  * `Content[]` history. The latter is prepended with environment / CLAUDE.md /
  * context injections by the runtime; its first role=user entry is a
  * synthetic bootstrap message, not anything the user typed.
  *
- * Records with a `subtype` are skipped — those are cron-fired prompts,
+ * Records with a `subtype` are skipped â€” those are cron-fired prompts,
  * notifications, slash-command echoes, etc., not genuine user input.
  */
 function deriveFirstPrompt(messages: ChatRecord[]): string {
@@ -75,7 +75,7 @@ async function computeUniqueBranchTitle(
   const trimmed = baseName.trim();
   const taken = new Set(
     (await sessionService.findSessionTitlesByPrefix(`${trimmed} (Branch`)).map(
-      (t) => t.toLowerCase().trim(),
+      (t: string) => t.toLowerCase().trim(),
     ),
   );
   const first = `${trimmed} (Branch)`;
@@ -84,7 +84,7 @@ async function computeUniqueBranchTitle(
     const candidate = `${trimmed} (Branch ${n})`;
     if (!taken.has(candidate.toLowerCase())) return candidate;
   }
-  // Pathological density — timestamp fallback keeps the fork unique.
+  // Pathological density â€” timestamp fallback keeps the fork unique.
   return `${trimmed} (Branch ${Date.now()})`;
 }
 
@@ -109,7 +109,7 @@ export interface UseBranchCommandResult {
  *   2. Finalize the outgoing ChatRecordingService so the last metadata is on disk.
  *   3. Call `SessionService.forkSession` to write a new JSONL under a new id.
  *   4. Load the fork back via `loadSession` and switch the UI + core config.
- *   5. Compute the customTitle — user-provided name OR `deriveFirstPrompt` —
+ *   5. Compute the customTitle â€” user-provided name OR `deriveFirstPrompt` â€”
  *      always suffixed with ` (Branch)` (bumping to `(Branch N)` on collision).
  *   6. Fire the SessionStart hook.
  *   7. Announce the fork with Claude-style two-line info item:
@@ -139,7 +139,7 @@ export function useBranchCommand(
       try {
         // 1. Flush outgoing recorder. Must happen BEFORE the parent snapshot
         //    so the snapshot captures `finalize()`'s trailing custom_title
-        //    record — without that, a rollback restores the recorder with
+        //    record â€” without that, a rollback restores the recorder with
         //    a stale `lastCompletedUuid` and the next user message attaches
         //    its parentUuid to a record that's no longer the JSONL tail.
         try {
@@ -173,14 +173,14 @@ export function useBranchCommand(
         //    session, so a throw leaves the user safely on the parent
         //    instead of stranded with a cleared history and a half-live
         //    client. `coreSwapped` gates the rollback path in the catch
-        //    block below — without it, a failure between swap and UI
+        //    block below â€” without it, a failure between swap and UI
         //    update would leave core on the fork while UI still shows
         //    the parent, silently recording user input into an orphan.
         config.startNewSession(newSessionId, resumed);
         coreSwapped = true;
         await config.getGeminiClient()?.initialize?.();
 
-        // 6. Swap UI. Once this commits, rolling core back is unsafe —
+        // 6. Swap UI. Once this commits, rolling core back is unsafe â€”
         //    it would leave UI on the branch but recorder writing into
         //    the parent JSONL (the inverse split-brain). `uiSwapped` is
         //    set immediately after the UI commits so any subsequent
@@ -206,8 +206,8 @@ export function useBranchCommand(
         setSessionName?.(effectiveTitle);
 
         // 8. Fire SessionStart for the new session. A fork is semantically
-        //    distinct from a resume — the sessionId is new and the transcript
-        //    is a derivative — so we use the dedicated `Branch` source value
+        //    distinct from a resume â€” the sessionId is new and the transcript
+        //    is a derivative â€” so we use the dedicated `Branch` source value
         //    to let hook consumers distinguish the two.
         try {
           await config
@@ -226,7 +226,7 @@ export function useBranchCommand(
 
         // 10. Announce. Two history items mirror Claude's success message
         //    (branched line + resume hint). The quoted name is the raw
-        //    user-provided `name`; no `(Branch)` suffix — that decoration
+        //    user-provided `name`; no `(Branch)` suffix â€” that decoration
         //    belongs in the picker/prompt bar, not in the user-facing
         //    announcement.
         const titleInfo = name ? ` "${name}"` : '';
@@ -251,7 +251,7 @@ export function useBranchCommand(
         );
       } catch (err) {
         if (coreSwapped && !uiSwapped) {
-          // Core switched to the fork but UI hasn't swapped yet — put core
+          // Core switched to the fork but UI hasn't swapped yet â€” put core
           // back on the parent, otherwise the recorder would keep writing
           // new user messages into the orphan fork JSONL while UI still
           // shows the parent.

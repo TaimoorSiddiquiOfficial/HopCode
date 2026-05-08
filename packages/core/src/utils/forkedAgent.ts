@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -9,11 +9,11 @@
  *
  * The two execution paths are selected by whether cacheSafeParams is supplied:
  *
- *   WITH cacheSafeParams  → GeminiChat single-turn, NO tools, shares parent
+ *   WITH cacheSafeParams  â†’ GeminiChat single-turn, NO tools, shares parent
  *                            prompt cache (systemInstruction + history).
  *                            Use for: /btw, suggestions, pipelined suggestions.
  *
- *   WITHOUT cacheSafeParams → AgentHeadless multi-turn, full tool access,
+ *   WITHOUT cacheSafeParams â†’ AgentHeadless multi-turn, full tool access,
  *                              isolated session (no shared history).
  *                              Use for: memory extract, dream consolidation.
  *
@@ -45,7 +45,7 @@ import {
 } from '../agents/index.js';
 
 // ---------------------------------------------------------------------------
-// CacheSafeParams — shared prompt-cache slot
+// CacheSafeParams â€” shared prompt-cache slot
 // ---------------------------------------------------------------------------
 
 /**
@@ -60,7 +60,7 @@ export interface CacheSafeParams {
   history: Content[];
   /** Model identifier */
   model: string;
-  /** Version number — increments when systemInstruction or tools change */
+  /** Version number â€” increments when systemInstruction or tools change */
   version: number;
 }
 
@@ -115,7 +115,7 @@ export function clearCacheSafeParams(): void {
 }
 
 // ---------------------------------------------------------------------------
-// Forked chat — shared by runForkedAgent (cache path) and speculation
+// Forked chat â€” shared by runForkedAgent (cache path) and speculation
 // ---------------------------------------------------------------------------
 
 /** Per-request config that strips tools so the model never produces function calls. */
@@ -145,7 +145,7 @@ export function createForkedChat(
     config,
     {
       ...params.generationConfig,
-      // Disable thinking for forked queries — no reasoning tokens needed,
+      // Disable thinking for forked queries â€” no reasoning tokens needed,
       // and it doesn't affect the cache prefix.
       thinkingConfig: { includeThoughts: false },
     },
@@ -156,12 +156,12 @@ export function createForkedChat(
 }
 
 // ---------------------------------------------------------------------------
-// ForkedQueryResult — returned by cache-path runForkedAgent
+// ForkedQueryResult â€” returned by cache-path runForkedAgent
 // ---------------------------------------------------------------------------
 
 /**
  * Result from a cache-path runForkedAgent (with cacheSafeParams).
- * Single-turn, text-only — tools are denied.
+ * Single-turn, text-only â€” tools are denied.
  */
 export interface ForkedQueryResult {
   /** Extracted text response, or null if no text */
@@ -187,7 +187,7 @@ function extractQueryUsage(
 }
 
 // ---------------------------------------------------------------------------
-// ForkedAgentParams / ForkedAgentResult — AgentHeadless path
+// ForkedAgentParams / ForkedAgentResult â€” AgentHeadless path
 // ---------------------------------------------------------------------------
 
 /**
@@ -296,11 +296,11 @@ function extractFilePathsFromArgs(args: Record<string, unknown>): string[] {
  *
  * Two overloads selected by the shape of `params`:
  *
- *   params.cacheSafeParams present  → cache path (ForkedQueryResult)
+ *   params.cacheSafeParams present  â†’ cache path (ForkedQueryResult)
  *     Single-turn, NO tools, shares parent prompt cache.
  *     Use for: /btw, suggestions, pipelined suggestions.
  *
- *   params.taskPrompt present        → agent path (ForkedAgentResult)
+ *   params.taskPrompt present        â†’ agent path (ForkedAgentResult)
  *     Multi-turn AgentHeadless, full tool access, isolated session.
  *     Use for: memory extract, dream consolidation.
  */
@@ -313,7 +313,7 @@ export async function runForkedAgent(
 export async function runForkedAgent(
   params: ForkedAgentParams,
 ): Promise<ForkedQueryResult | ForkedAgentResult> {
-  // ── Cache path ────────────────────────────────────────────────────────────
+  // â”€â”€ Cache path â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if ('cacheSafeParams' in params) {
     const { config, userMessage, cacheSafeParams, jsonSchema, abortSignal } =
       params;
@@ -358,14 +358,14 @@ export async function runForkedAgent(
       try {
         jsonResult = JSON.parse(trimmed) as Record<string, unknown>;
       } catch {
-        // non-JSON response despite schema constraint — treat as text
+        // non-JSON response despite schema constraint â€” treat as text
       }
     }
 
     return { text: trimmed, jsonResult, usage };
   }
 
-  // ── AgentHeadless path ────────────────────────────────────────────────────
+  // â”€â”€ AgentHeadless path â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // `createApprovalModeOverride` rebuilds the tool registry on the YOLO
   // wrapper Config so core file tools (`EditTool` / `WriteFileTool` /
   // `ReadFileTool`) resolve `this.config` to the wrapper, not to the
@@ -381,7 +381,7 @@ export async function runForkedAgent(
   // while `this.config.getApprovalMode()` lands on YOLO.
   const yoloConfig = await createApprovalModeOverride(
     params.config,
-    ApprovalMode.YOLO,
+    ApprovalMode.IZN,
   );
   const filesTouched = new Set<string>();
 

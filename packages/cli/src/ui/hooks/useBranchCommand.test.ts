@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Code
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { SessionStartSource } from '@qwen-code/qwen-code-core';
+import { SessionStartSource } from '@hoptrendy/hopcode-core';
 import { useBranchCommand } from './useBranchCommand.js';
 
 describe('useBranchCommand', () => {
@@ -89,7 +89,7 @@ describe('useBranchCommand', () => {
     };
   });
 
-  it('runs finalize → snapshot → forkSession → loadSession → config.startNewSession in order', async () => {
+  it('runs finalize â†’ snapshot â†’ forkSession â†’ loadSession â†’ config.startNewSession in order', async () => {
     // The parent snapshot must come AFTER finalize(): finalize() appends a
     // trailing custom_title record to the parent JSONL, advancing the
     // recorder's lastCompletedUuid. A snapshot taken before that captures
@@ -138,7 +138,7 @@ describe('useBranchCommand', () => {
   it('bumps to (Branch N) when the default suffix is already taken', async () => {
     // `findSessionTitlesByPrefix` returns every existing title under the
     // `${name} (Branch` prefix in one shot, so the bump logic picks the
-    // first free slot in memory — no per-candidate disk probe.
+    // first free slot in memory â€” no per-candidate disk probe.
     findSessionTitlesByPrefix.mockResolvedValue(['my-branch (Branch)']);
 
     const { result } = renderHook(() => useBranchCommand(makeOptions()));
@@ -292,7 +292,7 @@ describe('useBranchCommand', () => {
     // on the fork), but then getGeminiClient().initialize() rejects. Without
     // rollback, core stays on the fork while UI is still on the parent, so
     // the recorder silently writes subsequent user input into an orphan
-    // JSONL. This test pins the rollback invariant — after the failure core
+    // JSONL. This test pins the rollback invariant â€” after the failure core
     // must be back on the parent sessionId with the parent's ResumedSessionData.
     const oldSessionId = '12345678-aaaa-bbbb-cccc-dddddddddddd';
     const parentResumed = {
@@ -336,7 +336,7 @@ describe('useBranchCommand', () => {
     // Client was re-initialized after rollback so chat history re-hydrates
     // against the parent session.
     expect(initialize).toHaveBeenCalledTimes(2);
-    // UI never switched — no cleared history, no UI sessionId swap.
+    // UI never switched â€” no cleared history, no UI sessionId swap.
     expect(clearItems).not.toHaveBeenCalled();
     expect(loadHistory).not.toHaveBeenCalled();
     expect(startNewSessionUI).not.toHaveBeenCalled();
@@ -353,7 +353,7 @@ describe('useBranchCommand', () => {
 
   it('still surfaces the error and leaves core on the parent when rollback re-init also throws', async () => {
     // If the rollback initialize() itself rejects, the swap of sessionId +
-    // recorder has still happened — that is the load-bearing invariant —
+    // recorder has still happened â€” that is the load-bearing invariant â€”
     // so we just log and surface the original failure without crashing.
     const oldSessionId = '12345678-aaaa-bbbb-cccc-dddddddddddd';
     loadSession.mockResolvedValue({
@@ -401,7 +401,7 @@ describe('useBranchCommand', () => {
     // If it did, the user would see the branch UI but every new prompt
     // would be recorded into the parent's JSONL.
     //
-    // Pin the invariant by making remount() — which runs after the UI swap —
+    // Pin the invariant by making remount() â€” which runs after the UI swap â€”
     // throw, then assert: only ONE config.startNewSession call (to the
     // branch), no second call resetting it back to the parent.
     const oldSessionId = '12345678-aaaa-bbbb-cccc-dddddddddddd';
@@ -418,7 +418,7 @@ describe('useBranchCommand', () => {
     expect(startNewSessionUI).toHaveBeenCalledTimes(1);
     expect(clearItems).toHaveBeenCalled();
     expect(loadHistory).toHaveBeenCalled();
-    // Core did NOT roll back to the parent — only the initial swap to
+    // Core did NOT roll back to the parent â€” only the initial swap to
     // the branch. A second call with `oldSessionId` would mean the catch
     // block reverted core while UI stayed on the branch.
     expect(startNewSessionConfig).toHaveBeenCalledTimes(1);
@@ -440,8 +440,8 @@ describe('useBranchCommand', () => {
 
   it('does not clear or swap the UI when core startNewSession throws post-fork', async () => {
     // Guards the "swap core first" invariant: if core swap fails after the
-    // disk fork succeeds, the UI must stay on the parent — no cleared
-    // history, no new UI sessionId — so the user is not stranded.
+    // disk fork succeeds, the UI must stay on the parent â€” no cleared
+    // history, no new UI sessionId â€” so the user is not stranded.
     startNewSessionConfig.mockImplementation(() => {
       throw new Error('core boom');
     });

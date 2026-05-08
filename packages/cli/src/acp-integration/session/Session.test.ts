@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,9 +9,9 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Session } from './Session.js';
-import type { Config, GeminiChat } from '@qwen-code/qwen-code-core';
-import { ApprovalMode, AuthType } from '@qwen-code/qwen-code-core';
-import * as core from '@qwen-code/qwen-code-core';
+import type { Config, GeminiChat } from '@hoptrendy/hopcode-core';
+import { ApprovalMode, AuthType } from '@hoptrendy/hopcode-core';
+import * as core from '@hoptrendy/hopcode-core';
 import { SettingScope } from '../../config/settings.js';
 import type {
   AgentSideConnection,
@@ -105,7 +105,7 @@ describe('Session', () => {
 
     mockToolRegistry = {
       getTool: vi.fn(),
-      // #executePrompt → #buildInitialSystemReminders calls
+      // #executePrompt â†’ #buildInitialSystemReminders calls
       // getToolRegistry().ensureTool(ToolNames.AGENT) on every session.prompt(),
       // so the default mock must provide it (#1151 / #3479).
       ensureTool: vi.fn().mockResolvedValue(true),
@@ -197,7 +197,7 @@ describe('Session', () => {
       ['plan', ApprovalMode.PLAN],
       ['default', ApprovalMode.DEFAULT],
       ['auto-edit', ApprovalMode.AUTO_EDIT],
-      ['yolo', ApprovalMode.YOLO],
+      ['yolo', ApprovalMode.IZN],
     ] as const)('maps %s mode', async (modeId, expected) => {
       await session.setMode({
         sessionId: 'test-session-id',
@@ -898,7 +898,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockChat.sendMessageStream = vi
           .fn()
           .mockResolvedValueOnce(
@@ -961,7 +961,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockConfig.getSessionTokenLimit = vi.fn().mockReturnValue(100);
         mockGeminiClient.tryCompressChat
           .mockResolvedValueOnce({
@@ -1860,7 +1860,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'result',
@@ -1922,7 +1922,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn();
           const tool = {
@@ -1974,7 +1974,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'file contents',
@@ -2039,7 +2039,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'file contents',
@@ -2104,7 +2104,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
 
           const executeSpy = vi
             .fn()
@@ -2221,12 +2221,12 @@ describe('Session', () => {
     describe('tool call concurrency', () => {
       it('runs multiple Agent tool calls concurrently (issue #2516)', async () => {
         // Each Agent call has two controllable async boundaries:
-        //   - `called`  — resolves *when* the test code reaches `execute()`
-        //   - `result`  — the promise `execute()` returns, resolved by the
+        //   - `called`  â€” resolves *when* the test code reaches `execute()`
+        //   - `result`  â€” the promise `execute()` returns, resolved by the
         //                 test after observing both `called` signals.
         //
         // Under the old sequential for-loop, call-b's `execute()` would
-        // only run after call-a's `execute()` promise resolved — so the
+        // only run after call-a's `execute()` promise resolved â€” so the
         // `await Promise.all([called-a, called-b])` below deadlocks and
         // the test hits vitest's default per-test timeout. Under the
         // concurrent implementation both `called` signals fire before
@@ -2313,7 +2313,7 @@ describe('Session', () => {
         });
 
         // Wait until both `execute()` bodies have been entered. Sequential
-        // behaviour deadlocks here → vitest times out the test → failure.
+        // behaviour deadlocks here â†’ vitest times out the test â†’ failure.
         await Promise.all([called['call-a'].promise, called['call-b'].promise]);
 
         // Resolve out of order to also verify that final part ordering
@@ -2324,7 +2324,7 @@ describe('Session', () => {
         await promptPromise;
 
         // The second sendMessageStream invocation carries the tool responses
-        // that will be fed back to the model — assert their order matches
+        // that will be fed back to the model â€” assert their order matches
         // the original function-call order (A before B).
         expect(sendMessageStream).toHaveBeenCalledTimes(2);
         const followUp = sendMessageStream.mock.calls[1][1] as {

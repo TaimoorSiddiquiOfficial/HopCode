@@ -1,11 +1,11 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect } from 'vitest';
-import type { SessionListItem } from '@qwen-code/qwen-code-core';
+import type { SessionListItem } from '@hoptrendy/hopcode-core';
 import { filterSessions, truncateText } from './sessionPickerUtils.js';
 
 function s(overrides: Partial<SessionListItem>): SessionListItem {
