@@ -2240,7 +2240,7 @@ describe('ShellTool', () => {
         // the first; a simple way to assert this is that `Body line 1`
         // and the trailer share the same closing quote.
         expect(observed).toMatch(
-          /-m\s+"Body line 1\s+Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud\.com>"/s,
+          /-m\s+"Body line 1\s+Co-authored-by: HopCode <hopcode@hoptrendy\.com>"/s,
         );
         // And the first -m's title is unchanged.
         expect(observed).toMatch(/-m\s+"Title"\s/);
@@ -2550,7 +2550,7 @@ describe('ShellTool', () => {
 
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: Qwen-Coder <qwen-coder@alibabacloud.com>',
+            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -2943,8 +2943,8 @@ describe('ShellTool', () => {
         (mockConfig.getGitCoAuthor as Mock).mockReturnValue({
           commit: true,
           pr: false,
-          name: 'Qwen-Coder',
-          email: 'qwen-coder@alibabacloud.com',
+          name: 'HopCode',
+          email: 'hopcode@hoptrendy.com',
         });
 
         const command = 'gh pr create --title "x" --body "Summary"';
