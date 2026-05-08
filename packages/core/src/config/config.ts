@@ -730,6 +730,8 @@ export class Config {
       otlpLogsEndpoint: params.telemetry?.otlpLogsEndpoint,
       otlpMetricsEndpoint: params.telemetry?.otlpMetricsEndpoint,
       logPrompts: params.telemetry?.logPrompts,
+      includeSensitiveSpanAttributes:
+        params.telemetry?.includeSensitiveSpanAttributes ?? false,
       outfile: params.telemetry?.outfile,
       useCollector: params.telemetry?.useCollector,
     });
@@ -1929,6 +1931,10 @@ export class Config {
 
   getTelemetryLogPromptsEnabled(): boolean {
     return this.telemetryConfig.getLogPromptsEnabled();
+  }
+
+  getTelemetryIncludeSensitiveSpanAttributes(): boolean {
+    return this.telemetrySettings.includeSensitiveSpanAttributes ?? false;
   }
 
   getTelemetryOtlpEndpoint(): string | undefined {

@@ -109,6 +109,14 @@ export async function resolveTelemetrySettings(options: {
     ) ??
     settings.logPrompts;
 
+  const includeSensitiveSpanAttributes =
+    parseBooleanEnvFlag(
+      env['HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES'] ??
+        env['QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES'],
+    ) ??
+    settings.includeSensitiveSpanAttributes ??
+    false;
+
   const outfile =
     argv.telemetryOutfile ??
     env['HOPCODE_TELEMETRY_OUTFILE'] ??
@@ -152,6 +160,7 @@ export async function resolveTelemetrySettings(options: {
     otlpLogsEndpoint,
     otlpMetricsEndpoint,
     logPrompts,
+    includeSensitiveSpanAttributes,
     outfile,
     useCollector,
   };
