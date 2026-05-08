@@ -22,6 +22,7 @@ export interface TelemetrySettings {
   /** Per-signal endpoint override for metrics (HTTP only). Used as-is without path appending. */
   otlpMetricsEndpoint?: string;
   logPrompts?: boolean;
+  includeSensitiveSpanAttributes?: boolean;
   outfile?: string;
   useCollector?: boolean;
 }
@@ -35,6 +36,7 @@ export interface TelemetryConfigParams {
   otlpLogsEndpoint?: string;
   otlpMetricsEndpoint?: string;
   logPrompts?: boolean;
+  includeSensitiveSpanAttributes?: boolean;
   outfile?: string;
   useCollector?: boolean;
 }
@@ -58,6 +60,8 @@ export class TelemetryConfig {
       otlpLogsEndpoint: params.otlpLogsEndpoint,
       otlpMetricsEndpoint: params.otlpMetricsEndpoint,
       logPrompts: params.logPrompts ?? true,
+      includeSensitiveSpanAttributes:
+        params.includeSensitiveSpanAttributes ?? false,
       outfile: params.outfile,
       useCollector: params.useCollector,
     };

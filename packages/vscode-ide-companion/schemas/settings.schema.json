@@ -838,6 +838,12 @@
                 "type": "string"
               }
             }
+          },
+          "default": {
+            "enabled": false,
+            "mode": "ask",
+            "allowlist": [],
+            "blocklist": []
           }
         }
       }
