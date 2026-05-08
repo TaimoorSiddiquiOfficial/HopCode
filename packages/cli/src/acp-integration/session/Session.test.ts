@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,9 +9,10 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Session } from './Session.js';
-import type { Config, GeminiChat } from '@hoptrendy/hopcode-core';
-import { ApprovalMode, AuthType } from '@hoptrendy/hopcode-core';
-import * as core from '@hoptrendy/hopcode-core';
+import type { Config, GeminiChat } from '@qwen-code/qwen-code-core';
+import { ApprovalMode, AuthType } from '@qwen-code/qwen-code-core';
+import * as core from '@qwen-code/qwen-code-core';
+import { SettingScope } from '../../config/settings.js';
 import type {
   AgentSideConnection,
   PromptRequest,
@@ -158,7 +159,11 @@ describe('Session', () => {
 
     mockSettings = {
       merged: {},
-    } as LoadedSettings;
+      isTrusted: false,
+      user: { settings: {} },
+      workspace: { settings: {} },
+      setValue: vi.fn(),
+    } as unknown as LoadedSettings;
 
     getAvailableCommandsSpy = vi.mocked(nonInteractiveCliCommands)
       .getAvailableCommands as unknown as ReturnType<typeof vi.fn>;
@@ -192,7 +197,7 @@ describe('Session', () => {
       ['plan', ApprovalMode.PLAN],
       ['default', ApprovalMode.DEFAULT],
       ['auto-edit', ApprovalMode.AUTO_EDIT],
-      ['izn', ApprovalMode.IZN],
+      ['yolo', ApprovalMode.YOLO],
     ] as const)('maps %s mode', async (modeId, expected) => {
       await session.setMode({
         sessionId: 'test-session-id',
@@ -216,6 +221,16 @@ describe('Session', () => {
         'qwen3-coder-plus',
         undefined,
       );
+      expect(mockSettings.setValue).toHaveBeenCalledWith(
+        SettingScope.User,
+        'model.name',
+        'qwen3-coder-plus',
+      );
+      expect(mockSettings.setValue).toHaveBeenCalledWith(
+        SettingScope.User,
+        'security.auth.selectedType',
+        AuthType.USE_OPENAI,
+      );
     });
 
     it('rejects empty/whitespace model IDs', async () => {
@@ -227,6 +242,24 @@ describe('Session', () => {
       ).rejects.toThrow('Invalid params');
 
       expect(mockConfig.switchModel).not.toHaveBeenCalled();
+      expect(mockSettings.setValue).not.toHaveBeenCalled();
+    });
+
+    it('can switch the session model without persisting a new default', async () => {
+      await session.setModel(
+        {
+          sessionId: 'test-session-id',
+          modelId: `qwen3-coder-flash(${AuthType.USE_OPENAI})`,
+        },
+        { persistDefault: false },
+      );
+
+      expect(mockConfig.switchModel).toHaveBeenCalledWith(
+        AuthType.USE_OPENAI,
+        'qwen3-coder-flash',
+        undefined,
+      );
+      expect(mockSettings.setValue).not.toHaveBeenCalled();
     });
 
     it('propagates errors from config.switchModel', async () => {
@@ -239,6 +272,7 @@ describe('Session', () => {
           modelId: `invalid-model(${AuthType.USE_OPENAI})`,
         }),
       ).rejects.toThrow('Invalid model');
+      expect(mockSettings.setValue).not.toHaveBeenCalled();
     });
   });
 
@@ -864,7 +898,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
         mockChat.sendMessageStream = vi
           .fn()
           .mockResolvedValueOnce(
@@ -927,7 +961,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
         mockConfig.getSessionTokenLimit = vi.fn().mockReturnValue(100);
         mockGeminiClient.tryCompressChat
           .mockResolvedValueOnce({
@@ -1826,7 +1860,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.IZN);
+            .mockReturnValue(ApprovalMode.YOLO);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'result',
@@ -1888,7 +1922,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.IZN);
+            .mockReturnValue(ApprovalMode.YOLO);
 
           const executeSpy = vi.fn();
           const tool = {
@@ -1940,7 +1974,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.IZN);
+            .mockReturnValue(ApprovalMode.YOLO);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'file contents',
@@ -2005,7 +2039,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.IZN);
+            .mockReturnValue(ApprovalMode.YOLO);
 
           const executeSpy = vi.fn().mockResolvedValue({
             llmContent: 'file contents',
@@ -2070,7 +2104,7 @@ describe('Session', () => {
           mockConfig.getDisableAllHooks = vi.fn().mockReturnValue(false);
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.IZN);
+            .mockReturnValue(ApprovalMode.YOLO);
 
           const executeSpy = vi
             .fn()
@@ -2181,6 +2215,125 @@ describe('Session', () => {
 
           expect(mockFireStopFailureEvent).not.toHaveBeenCalled();
         });
+      });
+    });
+
+    describe('tool call concurrency', () => {
+      it('runs multiple Agent tool calls concurrently (issue #2516)', async () => {
+        // Each Agent call has two controllable async boundaries:
+        //   - `called`  — resolves *when* the test code reaches `execute()`
+        //   - `result`  — the promise `execute()` returns, resolved by the
+        //                 test after observing both `called` signals.
+        //
+        // Under the old sequential for-loop, call-b's `execute()` would
+        // only run after call-a's `execute()` promise resolved — so the
+        // `await Promise.all([called-a, called-b])` below deadlocks and
+        // the test hits vitest's default per-test timeout. Under the
+        // concurrent implementation both `called` signals fire before
+        // either `result` is resolved.
+        type Deferred<T> = {
+          promise: Promise<T>;
+          resolve: (v: T) => void;
+        };
+        const makeDeferred = <T>(): Deferred<T> => {
+          let resolve!: (v: T) => void;
+          const promise = new Promise<T>((r) => {
+            resolve = r;
+          });
+          return { promise, resolve };
+        };
+
+        const called: Record<string, Deferred<void>> = {
+          'call-a': makeDeferred<void>(),
+          'call-b': makeDeferred<void>(),
+        };
+        const result: Record<string, Deferred<core.ToolResult>> = {
+          'call-a': makeDeferred<core.ToolResult>(),
+          'call-b': makeDeferred<core.ToolResult>(),
+        };
+
+        const agentTool = {
+          name: core.ToolNames.AGENT,
+          kind: core.Kind.Think,
+          build: vi.fn().mockImplementation((args: Record<string, unknown>) => {
+            const id = args['_test_id'] as string;
+            return {
+              params: args,
+              eventEmitter: undefined,
+              getDefaultPermission: vi.fn().mockResolvedValue('allow'),
+              getDescription: vi.fn().mockReturnValue(`agent ${id}`),
+              toolLocations: vi.fn().mockReturnValue([]),
+              execute: vi.fn().mockImplementation(() => {
+                called[id].resolve();
+                return result[id].promise;
+              }),
+            };
+          }),
+        };
+
+        mockToolRegistry.getTool.mockImplementation((name: string) =>
+          name === core.ToolNames.AGENT ? agentTool : undefined,
+        );
+        mockConfig.getApprovalMode = vi
+          .fn()
+          .mockReturnValue(ApprovalMode.DEFAULT);
+        mockConfig.getPermissionManager = vi.fn().mockReturnValue(null);
+
+        // Model returns two Agent calls, then an empty stream once results
+        // are fed back (to terminate the prompt loop).
+        const sendMessageStream = vi
+          .fn()
+          .mockResolvedValueOnce(
+            createStreamWithChunks([
+              {
+                type: core.StreamEventType.CHUNK,
+                value: {
+                  functionCalls: [
+                    {
+                      id: 'call-a',
+                      name: core.ToolNames.AGENT,
+                      args: { _test_id: 'call-a', subagent_type: 'explore' },
+                    },
+                    {
+                      id: 'call-b',
+                      name: core.ToolNames.AGENT,
+                      args: { _test_id: 'call-b', subagent_type: 'explore' },
+                    },
+                  ],
+                },
+              },
+            ]),
+          )
+          .mockResolvedValueOnce(createEmptyStream());
+        mockChat.sendMessageStream = sendMessageStream;
+
+        const promptPromise = session.prompt({
+          sessionId: 'test-session-id',
+          prompt: [{ type: 'text', text: 'spawn two agents' }],
+        });
+
+        // Wait until both `execute()` bodies have been entered. Sequential
+        // behaviour deadlocks here → vitest times out the test → failure.
+        await Promise.all([called['call-a'].promise, called['call-b'].promise]);
+
+        // Resolve out of order to also verify that final part ordering
+        // follows the original functionCalls order, not resolution order.
+        result['call-b'].resolve({ llmContent: 'B-done', returnDisplay: 'B' });
+        result['call-a'].resolve({ llmContent: 'A-done', returnDisplay: 'A' });
+
+        await promptPromise;
+
+        // The second sendMessageStream invocation carries the tool responses
+        // that will be fed back to the model — assert their order matches
+        // the original function-call order (A before B).
+        expect(sendMessageStream).toHaveBeenCalledTimes(2);
+        const followUp = sendMessageStream.mock.calls[1][1] as {
+          message: Array<{ functionResponse?: { id?: string } }>;
+        };
+        const ids = followUp.message
+          .filter((p) => p.functionResponse)
+          .map((p) => p.functionResponse?.id);
+        expect(ids).toEqual(['call-a', 'call-b']);
       });
     });
 
