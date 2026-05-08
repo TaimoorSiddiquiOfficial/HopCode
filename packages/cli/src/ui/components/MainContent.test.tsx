@@ -273,7 +273,7 @@ describe('<MainContent />', () => {
             ].join('\n'),
           },
         ],
-        pendingHistoryItems: [
+        pendingGeminiHistoryItems: [
           {
             type: 'gemini_content',
             text: [

@@ -2612,6 +2612,13 @@ describe('parseArguments with positional prompt', () => {
 });
 
 describe('Telemetry configuration via environment variables', () => {
+  const originalArgv = process.argv;
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    vi.unstubAllEnvs();
+  });
+
   it('should prioritize HOPCODE_TELEMETRY_ENABLED over settings', async () => {
     vi.stubEnv('HOPCODE_TELEMETRY_ENABLED', 'true');
     process.argv = ['node', 'script.js'];
