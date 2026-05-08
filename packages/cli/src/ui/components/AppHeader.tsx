@@ -6,7 +6,9 @@
 
 import { useMemo } from 'react';
 import { Box } from 'ink';
-import { AuthType, isCodingPlanConfig } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@hoptrendy/hopcode-core';
+import { findProviderByCredentials } from '../../auth/allProviders.js';
+import { resolveMetadataKey } from '../../auth/providerConfig.js';
 import { Header, AuthDisplayType } from './Header.js';
 import { Tips } from './Tips.js';
 import { useSettings } from '../contexts/SettingsContext.js';
@@ -25,14 +27,14 @@ function getAuthDisplayType(
   authType?: AuthType,
   baseUrl?: string,
   apiKeyEnvKey?: string,
-): AuthDisplayType {
+): AuthDisplayType | string {
   if (!authType) {
     return AuthDisplayType.UNKNOWN;
   }
 
-  // Check if it's a Coding Plan config
-  if (isCodingPlanConfig(baseUrl, apiKeyEnvKey)) {
-    return AuthDisplayType.CODING_PLAN;
+  const matched = findProviderByCredentials(baseUrl, apiKeyEnvKey);
+  if (matched && resolveMetadataKey(matched)) {
+    return matched.label;
   }
 
   switch (authType) {

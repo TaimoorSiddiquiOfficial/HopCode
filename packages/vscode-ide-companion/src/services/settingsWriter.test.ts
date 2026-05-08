@@ -25,7 +25,8 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   };
 });
 
-import { CODING_PLAN_ENV_KEY, AuthType } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@hoptrendy/hopcode-core';
+import { CODING_PLAN_ENV_KEY } from './subscriptionPlanDefinitions.js';
 import {
   readHopcodeSettingsForVSCode,
   writeCodingPlanConfig,

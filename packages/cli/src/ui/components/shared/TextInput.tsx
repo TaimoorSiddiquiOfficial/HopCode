@@ -35,6 +35,21 @@ export interface TextInputProps {
   initialCursorOffset?: number;
   /** When true, renders each character as ? to hide sensitive input like API keys. */
   mask?: boolean;
+  ellipsizeOverflow?: boolean;
+}
+
+function ellipsizeMiddle(text: string, width: number): string {
+  if (width <= 0) return '';
+  if (stringWidth(text) <= width) return text;
+  if (width <= 3) return cpSlice(text, 0, width);
+
+  const available = width - 3;
+  const headLength = Math.ceil(available / 2);
+  const tailLength = Math.floor(available / 2);
+  return `${cpSlice(text, 0, headLength)}...${cpSlice(
+    text,
+    cpLen(text) - tailLength,
+  )}`;
 }
 
 export function TextInput({
@@ -51,6 +66,7 @@ export function TextInput({
   inputWidth = 80,
   initialCursorOffset,
   mask = false,
+  ellipsizeOverflow = false,
 }: TextInputProps) {
   const allowMultiline = height > 1;
 
@@ -97,7 +113,7 @@ export function TextInput({
         return;
       }
 
-      // Multiline newline insertion (Shift+Enter etc.) — check before SUBMIT
+      // Multiline newline insertion (Shift+Enter etc.) ï¿½ check before SUBMIT
       // so that modified-Return keys aren't swallowed by the submit branch.
       if (allowMultiline && keyMatchers[Command.NEWLINE](key)) {
         buffer.newline();
@@ -165,6 +181,8 @@ export function TextInput({
               {chalk.inverse(placeholder.slice(0, 1))}
               <Text color={Colors.Gray}>{placeholder.slice(1)}</Text>
             </Text>
+          ) : ellipsizeOverflow && stringWidth(buffer.text) > inputWidth ? (
+            <Text>{ellipsizeMiddle(buffer.text, inputWidth)}</Text>
           ) : (
             linesToRender.map((lineText, visualIdxInRenderedSet) => {
               const cursorVisualRow = cursorVisualRowAbsolute - scrollVisualRow;

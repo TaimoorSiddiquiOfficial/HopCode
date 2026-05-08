@@ -17,7 +17,7 @@ import {
   fetchOpenRouterModels,
   isOpenRouterConfig,
   mergeOpenRouterConfigs,
-} from '../../commands/auth/openrouterOAuth.js';
+} from '../../auth/providers/oauth/openrouterOAuth.js';
 import {
   PROVIDER_REGISTRY,
   getProvider,

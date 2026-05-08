@@ -9,6 +9,7 @@ import {
   handleQwenAuth,
   runInteractiveAuth,
   showAuthStatus,
+  handleApiKeyAuthSetup,
 } from './auth/handler.js';
 import { PROVIDER_REGISTRY } from './auth/registry.js';
 import { handleApiKeyAuth, handleOllamaLocalAuth } from './auth/providers.js';
@@ -23,6 +24,7 @@ const SPECIAL_AUTH_PROVIDERS = new Set([
   'coding-plan',
   'openrouter',
   'ollama-local',
+  'api-key',
 ]);
 
 const ollamaLocalCommand = {
@@ -46,9 +48,9 @@ const codePlanCommand = {
   describe: t('Authenticate using Alibaba Cloud Coding Plan'),
   builder: (yargs: Argv) =>
     yargs
-      .option('region', {
-        alias: 'r',
-        describe: t('Region for Coding Plan (china/global)'),
+      .option('base-url', {
+        alias: 'u',
+        describe: t('Base URL for Coding Plan'),
         type: 'string',
       })
       .option('key', {
@@ -56,10 +58,23 @@ const codePlanCommand = {
         describe: t('API key for Coding Plan'),
         type: 'string',
       }),
-  handler: async (argv: { region?: string; key?: string }) => {
-    const region = argv['region'] as string | undefined;
+  handler: async (argv: { 'base-url'?: string; key?: string }) => {
+    const baseUrl = argv['base-url'];
     const key = argv['key'] as string | undefined;
-    await handleQwenAuth('coding-plan', { region, key });
+
+    if (baseUrl && key) {
+      await handleQwenAuth('coding-plan', { baseUrl, key });
+    } else {
+      await handleQwenAuth('coding-plan', {});
+    }
+  },
+};
+
+const apiKeyCommand = {
+  command: 'api-key',
+  describe: t('Authenticate using an API key'),
+  handler: async () => {
+    await handleApiKeyAuthSetup();
   },
 };
 
@@ -101,6 +116,7 @@ export const authCommand: CommandModule = {
     let y = yargs
       .command(ollamaLocalCommand)
       .command(codePlanCommand)
+      .command(apiKeyCommand)
       .command(openRouterCommand)
       .command(statusCommand);
 

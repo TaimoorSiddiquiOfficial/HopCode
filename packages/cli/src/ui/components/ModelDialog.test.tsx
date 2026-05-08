@@ -70,6 +70,10 @@ const renderComponent = (
         authType: AuthType.HOPCODE_OAUTH,
       })),
     ),
+    getModelsConfig: vi.fn(() => ({
+      getGenerationConfig: vi.fn(() => ({ baseUrl: undefined })),
+    })),
+    getActiveRuntimeModelSnapshot: vi.fn(() => undefined),
 
     // --- Functions used by ClearcutLogger ---
     getUsageStatisticsEnabled: vi.fn(() => true),
@@ -267,11 +271,9 @@ describe('<ModelDialog />', () => {
     // Select a non-OAuth model (USE_OPENAI)
     await childOnSelect(`${AuthType.USE_OPENAI}::gpt-4`);
 
-    expect(switchModel).toHaveBeenCalledWith(
-      AuthType.USE_OPENAI,
-      'gpt-4',
-      undefined,
-    );
+    expect(switchModel).toHaveBeenCalledWith(AuthType.USE_OPENAI, 'gpt-4', {
+      baseUrl: undefined,
+    });
     expect(mockSettings.setValue).toHaveBeenCalledWith(
       SettingScope.User,
       'model.name',
@@ -369,6 +371,10 @@ describe('<ModelDialog />', () => {
   it('updates initialIndex when config context changes', () => {
     const mockGetModel = vi.fn(() => DEFAULT_HOPCODE_MODEL);
     const mockGetAuthType = vi.fn(() => 'qwen-oauth');
+    const mockGetModelsConfig = vi.fn(() => ({
+      getGenerationConfig: vi.fn(() => ({ baseUrl: undefined })),
+    }));
+    const mockGetActiveRuntimeModelSnapshot = vi.fn(() => undefined);
     const mockSettings = {
       isTrusted: true,
       user: { settings: {} },
@@ -392,6 +398,8 @@ describe('<ModelDialog />', () => {
                   authType: AuthType.HOPCODE_OAUTH,
                 })),
               ),
+              getModelsConfig: mockGetModelsConfig,
+              getActiveRuntimeModelSnapshot: mockGetActiveRuntimeModelSnapshot,
             } as unknown as Config
           }
         >
@@ -418,6 +426,8 @@ describe('<ModelDialog />', () => {
           authType: AuthType.HOPCODE_OAUTH,
         })),
       ),
+      getModelsConfig: mockGetModelsConfig,
+      getActiveRuntimeModelSnapshot: mockGetActiveRuntimeModelSnapshot,
     } as unknown as Config;
 
     rerender(

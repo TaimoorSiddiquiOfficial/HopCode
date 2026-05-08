@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -1061,13 +1061,30 @@ export default {
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
     'Legacy OAuth ?????? 2026-04-15 ?????? Coding Plan ? API Key?',
   'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Legacy OAuth?????2026-04-15??????????????????? /auth ???',
-  '\n? Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n? Legacy OAuth ?????? 2026-04-15 ???????????\n',
-  'Paid � Up to 6,000 requests/5 hrs � All Alibaba Cloud Coding Plan Models':
-    '?? � ? 5 ???? 6,000 ??? � ??????? Coding Plan ????',
-  'Alibaba Cloud Coding Plan': '????? Coding Plan',
-  'Bring your own API key': '????? API ??',
+    'Qwen OAuth免費層已於2026-04-15停止服務。請選擇其他提供商的模型或運行 /auth 切換。',
+  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ Qwen OAuth 免費額度已於 2026-04-15 停用。請選擇其他選項。\n',
+  'Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
+    '付費 · 每 5 小時最多 6,000 次請求 · 支持阿里雲百鍊 Coding Plan 全部模型',
+  'For teams · Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
+    '適合團隊 · 付費 · 每 5 小時最多 6,000 次請求 · 支援阿里雲百鍊 Coding Plan 全部模型',
+  'For individual developers · Pay per model call · 5-hour/weekly quotas':
+    '適合個人開發場景 · 按模型調用次數計費 · 每 5 小時/每週限額',
+  Subscribe: '訂閱計劃',
+  'Paid subscription plans from Alibaba Cloud ModelStudio':
+    '阿里雲百鍊付費訂閱計劃',
+  'Select Subscription Plan': '選擇訂閱計劃',
+  'Alibaba Cloud Coding Plan': '阿里雲百鍊 Coding Plan',
+  'Alibaba Cloud Token Plan': '阿里雲百鍊 Token Plan',
+  'Pay-as-you-go tokens · Configure ModelStudio standard API key':
+    '按 Token 付費 · 配置百鍊標準 API Key',
+  'For individuals · Pay-as-you-go tokens · Dedicated Token Plan endpoint':
+    '適合個人 · 按 Token 付費 · 使用獨立 Token Plan Endpoint',
+  'For teams/companies · Credits deducted by token usage · Dedicated API key and base URL':
+    '適合一人公司/團隊/企業 · 按 Token 消耗抵扣 Credits · 專屬 API Key 和 Base URL',
+  'Token Plan documentation': 'Token Plan 參考文檔',
+  'Bring your own API key': '使用自己的 API 密鑰',
+
   'API-KEY': 'API-KEY',
   'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)':
     '??????????????(?? OpenRouter?ModelScope)',
@@ -1417,8 +1434,11 @@ export default {
   'to retry last request': '???????',
   'API key cannot be empty.': 'API Key ?????',
   'Invalid API key. Coding Plan API keys start with "sk-sp-". Please check.':
-    '??? API Key,Coding Plan API Key ?? "sk-sp-" ??,???',
-  'You can get your Coding Plan API key here': '???????? Coding Plan API Key',
+    '無效的 API Key，Coding Plan API Key 均以 "sk-sp-" 開頭，請檢查',
+  'You can get your Coding Plan API key here':
+    '您可以在這裏獲取 Coding Plan API Key',
+  'You can get your Token Plan API key here':
+    '您可以在這裏獲取 Token Plan API Key',
   'API key is stored in settings.env. You can migrate it to a .env file for better security.':
     'API Key ???? settings.env ?????????? .env ????????????',
   'New model configurations are available for Alibaba Cloud Coding Plan. Update now?':
@@ -1437,13 +1457,15 @@ export default {
     '?????? Coding Plan API Key,??????!',
   Custom: '???',
   'More instructions about configuring `modelProviders` manually.':
-    '?????? `modelProviders` ??????',
-  'Select API-KEY configuration mode:': '?? API-KEY ????:',
-  '(Press Escape to go back)': '(? Escape ???)',
-  '(Press Enter to submit, Escape to cancel)': '(? Enter ??,Escape ??)',
-  'Select Region for Coding Plan': '?? Coding Plan ??',
-  'Choose based on where your account is registered': '?????????????',
-  'Enter Coding Plan API Key': '?? Coding Plan API Key',
+    '關於手動配置 `modelProviders` 的更多說明。',
+  'Select API-KEY configuration mode:': '選擇 API-KEY 配置模式：',
+  '(Press Escape to go back)': '(按 Escape 鍵返回)',
+  '(Press Enter to submit, Escape to cancel)': '(按 Enter 提交，Escape 取消)',
+  'Select Region for Coding Plan': '選擇 Coding Plan 區域',
+  'Choose based on where your account is registered':
+    '請根據您的賬號註冊地區選擇',
+  'Enter Coding Plan API Key': '輸入 Coding Plan API Key',
+  'Enter Token Plan API Key': '輸入 Token Plan API Key',
   'New model configurations are available for {{region}}. Update now?':
     '{{region}} ?????????????????',
   '{{region}} configuration updated successfully. Model switched to "{{model}}".':
