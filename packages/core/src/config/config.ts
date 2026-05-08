@@ -138,6 +138,9 @@ import {
 import { getAutoMemoryRoot } from '../memory/paths.js';
 import { readAutoMemoryIndex } from '../memory/store.js';
 import { MemoryManager } from '../memory/manager.js';
+import { CommitAttributionService } from '../services/commitAttribution.js';
+
+const gitCoAuthorLogger = createDebugLogger('GIT_CO_AUTHOR');
 
 import {
   ModelsConfig,
@@ -190,9 +193,57 @@ export interface OutputSettings {
 }
 
 export interface GitCoAuthorSettings {
-  enabled?: boolean;
+  commit: boolean;
+  pr: boolean;
   name?: string;
   email?: string;
+}
+
+/**
+ * Shape accepted by the Config constructor for the `gitCoAuthor` param.
+ *
+ * A plain `boolean` is accepted for backward compatibility: older settings
+ * (shipped before commit and PR attribution were split) stored this field as
+ * a single boolean, and we treat that as applying to both sub-toggles so
+ * nobody's stored preference silently flips.
+ */
+export type GitCoAuthorParam = boolean | { commit?: boolean; pr?: boolean };
+
+function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
+  commit: boolean;
+  pr: boolean;
+} {
+  if (typeof value === 'boolean') {
+    return { commit: value, pr: value };
+  }
+  const pickBool = (v: unknown, fieldName: string): boolean => {
+    if (v === undefined) return true;
+    if (typeof v === 'boolean') return v;
+    if (typeof v === 'string') {
+      const lowered = v.trim().toLowerCase();
+      if (
+        lowered === 'true' ||
+        lowered === 'yes' ||
+        lowered === 'on' ||
+        lowered === '1'
+      ) {
+        return true;
+      }
+      const knownDisable = ['false', 'no', 'off', '0', 'disabled', ''];
+      if (!knownDisable.includes(lowered)) {
+        gitCoAuthorLogger.warn(
+          `Unrecognized string value for general.gitCoAuthor.${fieldName}: ${JSON.stringify(v)}; treating as false. Accepted forms: true/yes/on/1, false/no/off/0/empty.`,
+        );
+      }
+      return false;
+    }
+    if (typeof v === 'number') return v === 1;
+    return false;
+  };
+  return {
+    commit: pickBool(value?.commit, 'commit'),
+    pr: pickBool(value?.pr, 'pr'),
+  };
 }
 
 export type ExtensionOriginSource = 'Claude' | 'Gemini' | 'HopCode';
@@ -334,7 +385,7 @@ export interface ConfigParameters {
   contextFileName?: string | string[];
   accessibility?: AccessibilitySettings;
   telemetry?: TelemetrySettings;
-  gitCoAuthor?: boolean;
+  gitCoAuthor?: GitCoAuthorParam;
   usageStatisticsEnabled?: boolean;
   /**
    * If true, disables the per-session FileReadCache short-circuit
@@ -757,7 +808,7 @@ export class Config {
       interactive: params.interactive,
     });
     this.gitCoAuthor = {
-      enabled: params.gitCoAuthor ?? true,
+      ...normalizeGitCoAuthor(params.gitCoAuthor),
       name: 'HopCode',
       email: 'hopcode@hoptrendy.com',
     };
@@ -1342,6 +1393,12 @@ export class Config {
     // constructed via Object.create — those should clear their own
     // cache, not the parent's.
     this.getFileReadCache().clear();
+    // The commit-attribution singleton accumulates per-file AI edits
+    // and a session-scoped prompt counter — both stop being meaningful
+    // when the session resets. Without this, pending attributions
+    // from the previous session could attach to a commit in the new
+    // one, and the "N-shotted" PR label would span sessions.
+    CommitAttributionService.resetInstance();
     if (this.initialized) {
       logStartSession(this, new StartSessionEvent(this));
     }
