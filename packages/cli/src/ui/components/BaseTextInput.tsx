@@ -5,7 +5,7 @@
  */
 
 /**
- * @fileoverview BaseTextInput — shared text input component with rendering
+ * @fileoverview BaseTextInput ï¿½ shared text input component with rendering
  * and common readline keyboard handling.
  *
  * Provides:
@@ -99,7 +99,7 @@ export function defaultRenderLine({
 
   const len = cpLen(lineText);
 
-  // Cursor past end of line — append inverse space
+  // Cursor past end of line ï¿½ append inverse space
   if (cursorCol >= len) {
     return (
       <Text>
@@ -145,7 +145,11 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
         return;
       }
 
-      // -- Standard readline shortcuts --
+      if (keyMatchers[Command.TOGGLE_RENDER_MODE](key)) {
+        return;
+      }
+
+      // â”€â”€ Standard readline shortcuts â”€â”€
 
       // Submit (Enter, no modifiers)
       if (keyMatchers[Command.SUBMIT](key)) {
@@ -215,7 +219,7 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
         return;
       }
 
-      // Tab — never insert literal tab characters into the buffer;
+      // Tab ï¿½ never insert literal tab characters into the buffer;
       // consumers that need Tab behaviour should intercept it via onKeypress.
       if ((key.name === 'tab' || key.sequence === '\t') && !key.paste) {
         return;
@@ -231,7 +235,7 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
         return;
       }
 
-      // Fallthrough — delegate to buffer's built-in input handler
+      // Fallthrough ï¿½ delegate to buffer's built-in input handler
       buffer.handleInput(key);
     },
     [buffer, onSubmit, onKeypress],
