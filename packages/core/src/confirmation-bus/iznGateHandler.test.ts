@@ -213,6 +213,49 @@ describe('IznGateHandler', () => {
     });
   });
 
+  describe('clearVerifiedHashes', () => {
+    it('clears stale verified hashes so they cannot auto-approve across turns', () => {
+      mockCheckIznGate.mockReturnValue({
+        allowed: false,
+        category: ['destructive-write'],
+        analysisPlan: ['Verify'],
+        impactScope: [],
+        intentQuestions: [],
+      });
+
+      // Block a command — hash stored for retry
+      handler.check(makeParams({ toolArgs: { command: 'rm a' } }));
+      expect(mockCheckIznGate).toHaveBeenCalledTimes(1);
+
+      // Clear verified hashes (simulating new turn)
+      handler.clearVerifiedHashes();
+
+      // Same command should now be blocked again (hash was cleared)
+      const result = handler.check(
+        makeParams({ toolArgs: { command: 'rm a' } }),
+      );
+      expect(result.allowed).toBe(false);
+      expect(mockCheckIznGate).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not affect block history', () => {
+      mockCheckIznGate.mockReturnValue({
+        allowed: false,
+        category: ['destructive-write'],
+        analysisPlan: ['Verify'],
+        impactScope: [],
+        intentQuestions: [],
+      });
+
+      handler.check(makeParams());
+      expect(handler.getBlockHistory()).toHaveLength(1);
+
+      handler.clearVerifiedHashes();
+      // Block history should be unchanged
+      expect(handler.getBlockHistory()).toHaveLength(1);
+    });
+  });
+
   describe('buildScopeReport', () => {
     it('returns context when reportIznScope returns data', () => {
       mockReportIznScope.mockReturnValue({

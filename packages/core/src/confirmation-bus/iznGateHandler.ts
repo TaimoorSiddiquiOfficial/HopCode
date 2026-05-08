@@ -153,6 +153,15 @@ export class IznGateHandler {
     this.blockHistory = [];
   }
 
+  /**
+   * Discard verified hashes at the start of each user turn so that
+   * stale hashes from a previous turn cannot auto-approve commands
+   * without the model going through verification again.
+   */
+  clearVerifiedHashes(): void {
+    this.verifiedHashes.clear();
+  }
+
   getBlockHistory(): readonly IznBlockHistoryEntry[] {
     return this.blockHistory;
   }

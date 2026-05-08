@@ -30,6 +30,7 @@ import {
   getCoreSystemPrompt,
   getCustomSystemPrompt,
   getPlanModeSystemReminder,
+  getQuranGuidancePerTurnReminder,
   getSubagentSystemReminder,
 } from './prompts.js';
 import {
@@ -1009,6 +1010,25 @@ export class GeminiClient {
         systemReminders.push(
           getPlanModeSystemReminder(this.config.getSdkMode()),
         );
+      }
+
+      // add Quran-guided per-turn behavioral reminder
+      const userTextParts: string[] = [];
+      for (const p of requestToSent) {
+        if (typeof p === 'string') {
+          userTextParts.push(p);
+        } else if ('text' in p && p.text) {
+          userTextParts.push(p.text);
+        }
+      }
+      const userText = userTextParts.join(' ');
+      if (userText) {
+        const iznActive = this.config.getApprovalMode() === ApprovalMode.IZN;
+        const quranReminder = getQuranGuidancePerTurnReminder(
+          userText,
+          iznActive,
+        );
+        if (quranReminder) systemReminders.push(quranReminder);
       }
 
       // add arena system reminder if an arena session is active

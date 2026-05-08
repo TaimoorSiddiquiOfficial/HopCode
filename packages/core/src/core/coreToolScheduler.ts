@@ -1020,6 +1020,9 @@ export class CoreToolScheduler {
     try {
       // Fresh block history each turn so escalation resets between user turns.
       this.iznGateHandler.clearBlockHistory();
+      // Fresh verified hashes each turn so stale hashes from a previous
+      // turn cannot auto-approve commands without verification.
+      this.iznGateHandler.clearVerifiedHashes();
       if (this.isRunning()) {
         throw new Error(
           'Cannot schedule new tool calls while other tool calls are actively running (executing or awaiting approval).',

@@ -49,7 +49,7 @@ export const iznBehaviorRules: IznBehaviorRule[] = [
   },
   {
     category: 'force_push',
-    detectPattern: /\b(force.push|git push.*--force|git push.*-f)\b/i,
+    detectPattern: /\b(force[ -]push|git push.*--force|git push.*-f)\b/i,
     preVerify: [
       'Show the current branch and remote state.',
       'List commits that will be pushed.',
