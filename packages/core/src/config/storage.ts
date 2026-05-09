@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -125,7 +125,8 @@ export class Storage {
   }
 
   static getGlobalHopCodeDir(): string {
-    const envDir = process.env['HOPCODE_HOME'];
+    // Check HOPCODE_HOME first, then fall back to QWEN_HOME for backward compat.
+    const envDir = process.env['HOPCODE_HOME'] ?? process.env['QWEN_HOME'];
     if (envDir) {
       return Storage.resolvePath(envDir);
     }

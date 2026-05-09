@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -56,6 +56,7 @@ import {
   resetHomeEnvBootstrapForTesting,
   SETTINGS_VERSION,
   SETTINGS_VERSION_KEY,
+  resetHomeEnvBootstrapForTesting,
 } from './settings.js';
 import { needsMigration } from './migration/index.js';
 import { HOPCODE_DIR } from '@hoptrendy/hopcode-core';
@@ -178,6 +179,7 @@ describe('Settings Loading and Merging', () => {
       isTrusted: true,
       source: 'file',
     });
+    resetHomeEnvBootstrapForTesting();
     // Ensure the mock delegates to the real implementation by default
     // (set up in vi.mock factory above).
   });

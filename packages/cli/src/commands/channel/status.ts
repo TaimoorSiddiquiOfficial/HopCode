@@ -1,4 +1,4 @@
-﻿import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { Storage } from '@hoptrendy/hopcode-core';
 import type { CommandModule } from 'yargs';
