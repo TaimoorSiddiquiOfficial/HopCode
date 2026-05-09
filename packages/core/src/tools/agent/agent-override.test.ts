@@ -140,13 +140,13 @@ describe('createApprovalModeOverride bound-tool isolation', () => {
 
     expect(parent.getApprovalMode()).toBe(ApprovalMode.DEFAULT);
 
-    const child = await createApprovalModeOverride(parent, ApprovalMode.YOLO);
-    expect(child.getApprovalMode()).toBe(ApprovalMode.YOLO);
+    const child = await createApprovalModeOverride(parent, ApprovalMode.IZN);
+    expect(child.getApprovalMode()).toBe(ApprovalMode.IZN);
 
     const childEdit = await child.getToolRegistry().ensureTool(ToolNames.EDIT);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundConfig = (childEdit as any).config as Config;
-    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.YOLO);
+    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.IZN);
   });
 
   it('copies discovered tools from the parent registry without re-discovering', async () => {
@@ -270,7 +270,7 @@ describe('createApprovalModeOverride bound-tool isolation', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const override = Object.create(parent) as any;
-      override.getApprovalMode = () => ApprovalMode.YOLO;
+      override.getApprovalMode = () => ApprovalMode.IZN;
       await rebuildToolRegistryOnOverride(override as Config, parent);
 
       expect(

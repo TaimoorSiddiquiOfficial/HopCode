@@ -99,7 +99,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((captured.config as any)[TOOL_REGISTRY_REBUILT]).toBe(true);
     // 2. Resolve approval mode to YOLO (the override)
-    expect(captured.config!.getApprovalMode()).toBe(ApprovalMode.YOLO);
+    expect(captured.config!.getApprovalMode()).toBe(ApprovalMode.IZN);
     // 3. Hand out a different ToolRegistry instance from the parent
     expect(captured.config!.getToolRegistry()).not.toBe(parentRegistry);
   });
@@ -132,7 +132,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect((editTool as any).config).toBe(captured.config);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundConfig = (editTool as any).config as Config;
-    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.YOLO);
+    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.IZN);
     expect(boundConfig.getFileReadCache()).toBe(
       captured.config!.getFileReadCache(),
     );
@@ -179,7 +179,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundConfig = (editTool as any).config as Config;
     // YOLO from yoloConfig's own override
-    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.YOLO);
+    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.IZN);
     // Scoped PM from scopedConfig (one prototype level up)
     expect(boundConfig.getPermissionManager?.()).toBe(scopedPm);
   });

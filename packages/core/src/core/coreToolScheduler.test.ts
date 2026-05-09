@@ -3321,7 +3321,7 @@ describe('Fire hook functions integration', () => {
         execute: async (params) => {
           const id = (params as { id: string }).id;
           executionLog.push(`start:${id}`);
-          // Simulate async work — concurrent agents will interleave here
+          // Simulate async work ï¿½ concurrent agents will interleave here
           await new Promise((r) => setTimeout(r, 50));
           executionLog.push(`end:${id}`);
           return {
@@ -4253,7 +4253,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
     msg = getLastErrorMessage(onToolCallsUpdate);
     expect(msg).not.toContain(RETRY_LOOP_STOP_DIRECTIVE);
 
-    // Turn 3: same bad params — should trigger directive
+    // Turn 3: same bad params ï¿½ should trigger directive
     await scheduler.schedule(
       [makeRequest('c3', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -4283,7 +4283,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       new AbortController().signal,
     );
 
-    // Turn 4: back to tool — should be count 1 again (no directive)
+    // Turn 4: back to tool ï¿½ should be count 1 again (no directive)
     await scheduler.schedule(
       [makeRequest('c4', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -4313,7 +4313,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       new AbortController().signal,
     );
 
-    // Two more failures — count should restart at 1, not jump to 3+.
+    // Two more failures ï¿½ count should restart at 1, not jump to 3+.
     await scheduler.schedule(
       [makeRequest('c4', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -4787,7 +4787,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -4982,7 +4982,7 @@ describe('CoreToolScheduler activation wiring', () => {
         getSessionId: () => 'test-session-id',
         getUsageStatisticsEnabled: () => true,
         getDebugMode: () => false,
-        getApprovalMode: () => ApprovalMode.YOLO,
+        getApprovalMode: () => ApprovalMode.IZN,
         getPermissionsAllow: () => [],
         getContentGeneratorConfig: () => ({
           model: 'test-model',
@@ -5099,7 +5099,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5197,7 +5197,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5292,7 +5292,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5449,7 +5449,7 @@ describe('CoreToolScheduler shell-tool promote integration (#3831 PR-2)', () => 
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getContentGeneratorConfig: () => ({
         model: 'test-model',
         authType: 'gemini',
