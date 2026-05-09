@@ -55,7 +55,6 @@ import {
   loadEnvironment,
   SETTINGS_VERSION,
   SETTINGS_VERSION_KEY,
-  resetHomeEnvBootstrapForTesting,
 } from './settings.js';
 import { needsMigration } from './migration/index.js';
 import { HOPCODE_DIR } from '@hoptrendy/hopcode-core';
@@ -81,6 +80,22 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 // must keep going through `getUserSettingsPath()` to pick up `HOPCODE_HOME`
 // resolved from `~/.env` after module load.
 const USER_SETTINGS_PATH = getUserSettingsPath();
+
+const mockDebugLogger = vi.hoisted(() => ({
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+}));
+
+vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@qwen-code/qwen-code-core')>();
+  return {
+    ...actual,
+    createDebugLogger: () => mockDebugLogger,
+  };
+});
 
 const MOCK_WORKSPACE_DIR = '/mock/workspace';
 // Use the (mocked) SETTINGS_DIRECTORY_NAME for consistency
@@ -178,7 +193,6 @@ describe('Settings Loading and Merging', () => {
       isTrusted: true,
       source: 'file',
     });
-    resetHomeEnvBootstrapForTesting();
     // Ensure the mock delegates to the real implementation by default
     // (set up in vi.mock factory above).
   });
