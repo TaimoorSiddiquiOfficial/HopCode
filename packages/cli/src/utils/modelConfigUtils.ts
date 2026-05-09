@@ -6,9 +6,9 @@
 
 import {
   AuthType,
+  MODEL_GENERATION_CONFIG_FIELDS,
   type ContentGeneratorConfig,
   type ContentGeneratorConfigSources,
-  MODEL_GENERATION_CONFIG_FIELDS,
   resolveModelConfig,
   type ModelConfigSourcesInput,
   type ProviderModelConfig,

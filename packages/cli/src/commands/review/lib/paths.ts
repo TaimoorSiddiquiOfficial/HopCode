@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Centralised path constants and helpers for the `qwen review` subcommands.
+// Centralised path constants and helpers for the `hopcode review` subcommands.
 // All paths are relative to the project root (the current working directory
 // when the command is invoked). Use `path.join` rather than string
 // concatenation so Windows backslashes are produced when needed.

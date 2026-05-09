@@ -34,8 +34,6 @@ import {
   OPENROUTER_ENV_KEY,
   runOpenRouterOAuthLogin,
 } from '../../auth/providers/oauth/openrouterOAuth.js';
-import { PROVIDER_REGISTRY } from './registry.js';
-import { handleApiKeyAuth } from './providers.js';
 
 function formatElapsedTime(startMs: number): string {
   return `${((Date.now() - startMs) / 1000).toFixed(2)}s`;
@@ -206,7 +204,7 @@ async function handleCodePlanAuth(
     selectedKey = key;
   } else {
     selectedBaseUrl = await promptForCodingPlanBaseUrl();
-    selectedKey = await promptForAuthKey(t('Enter your Coding Plan API key: '));
+    selectedKey = await promptForKey(t('Enter your Coding Plan API key: '));
   }
 
   writeStdoutLine(t('Processing Alibaba Cloud Coding Plan authentication...'));
@@ -338,7 +336,7 @@ async function promptForCodingPlanBaseUrl(): Promise<string> {
 /**
  * Prompts the user to enter an API key
  */
-async function promptForAuthKey(prompt: string): Promise<string> {
+async function promptForKey(prompt: string): Promise<string> {
   // Create a simple password-style input (without echoing characters)
   const stdin = process.stdin;
   const stdout = process.stdout;
@@ -464,9 +462,10 @@ export async function runInteractiveAuth() {
  * Intentionally simplified: the full interactive provider setup is now
  * available through the `/auth` slash command in the UI. The CLI sub-command
  * (`hopcode auth api-key`) serves as a lightweight fallback that points users
- * to the docs.
+ * to the docs. A future improvement could wire this into the provider
+ * registry for a fully interactive CLI flow.
  */
-export async function handleApiKeyAuthSetup() {
+export async function handleApiKeyAuth() {
   handleCustomApiKeyAuth();
 }
 
@@ -558,9 +557,7 @@ export async function showAuthStatus(): Promise<void> {
           writeStdoutLine(
             t('  Issue: API key not found in environment or settings\n'),
           );
-          writeStdoutLine(
-            t('  Run `hopcode auth openrouter` to re-configure.\n'),
-          );
+          writeStdoutLine(t('  Run `qwen auth openrouter` to re-configure.\n'));
         }
       } else if (managedProvider) {
         const envKey =
@@ -613,7 +610,7 @@ export async function showAuthStatus(): Promise<void> {
             t('  Issue: API key not found in environment or settings\n'),
           );
           writeStdoutLine(
-            t('  Run `hopcode auth` to re-configure authentication.\n'),
+            t('  Run `qwen auth` to re-configure authentication.\n'),
           );
         }
       } else if (activeConfig) {

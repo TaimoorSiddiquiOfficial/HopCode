@@ -95,7 +95,7 @@ export async function runAcpAgent(
 
   const stream = ndJsonStream(stdout, stdin);
   const connection = new AgentSideConnection(
-    (conn) => new QwenAgent(config, settings, argv, conn),
+    (conn) => new HopCodeAgent(config, settings, argv, conn),
     stream,
   );
 
@@ -189,7 +189,7 @@ export function toHttpServer(
   return undefined;
 }
 
-class QwenAgent implements Agent {
+class HopCodeAgent implements Agent {
   private sessions: Map<string, Session> = new Map();
   private clientCapabilities: ClientCapabilities | undefined;
 

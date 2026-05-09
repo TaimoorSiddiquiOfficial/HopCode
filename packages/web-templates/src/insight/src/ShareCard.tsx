@@ -150,7 +150,7 @@ export function ShareCard({
             paddingTop: '8px',
           }}
         >
-          qwen.ai
+          hopcode.ai
         </div>
       </div>
 

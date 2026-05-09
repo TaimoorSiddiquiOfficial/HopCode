@@ -254,7 +254,7 @@ const INTERNAL_MODEL_PATTERNS = [
   /qwen[-_]?turbo/i,
 ];
 
-const SANITIZED_GENERATOR_NAME = 'Qwen-Coder';
+const SANITIZED_GENERATOR_NAME = 'HopCode';
 
 function sanitizeModelName(name: string): string {
   for (const pattern of INTERNAL_MODEL_PATTERNS) {

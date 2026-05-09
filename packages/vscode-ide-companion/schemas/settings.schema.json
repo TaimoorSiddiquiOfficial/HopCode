@@ -287,7 +287,7 @@
           "default": false
         },
         "customBannerTitle": {
-          "description": "Replace the default \">_ Qwen Code\" title shown in the banner info panel. The version suffix is always appended.",
+          "description": "Replace the default \">_ HopCode\" title shown in the banner info panel. The version suffix is always appended.",
           "type": "string",
           "default": ""
         },
@@ -358,7 +358,7 @@
               "additionalProperties": false
             }
           ],
-          "description": "Replace the default QWEN ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
+          "description": "Replace the default HOPCODE ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
         }
       }
     },

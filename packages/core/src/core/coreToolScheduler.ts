@@ -1454,7 +1454,7 @@ export class CoreToolScheduler {
             if (hooksEnabled && messageBus) {
               fireNotificationHook(
                 messageBus,
-                `Qwen Code needs your permission to use ${reqInfo.name}`,
+                `HopCode needs your permission to use ${reqInfo.name}`,
                 NotificationType.PermissionPrompt,
                 'Permission needed',
               ).catch((error) => {

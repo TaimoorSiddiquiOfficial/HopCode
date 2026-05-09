@@ -163,28 +163,28 @@ export function convertClaudeAgentConfig(
   claudeAgent: ClaudeAgentConfig,
 ): Record<string, unknown> {
   // Base config with required fields
-  const qwenAgent: Record<string, unknown> = {
+  const hopcodeAgent: Record<string, unknown> = {
     name: claudeAgent.name,
     description: claudeAgent.description,
   };
 
   if (claudeAgent.color) {
-    qwenAgent['color'] = claudeAgent.color;
+    hopcodeAgent['color'] = claudeAgent.color;
   }
 
   // Convert system prompt if present
   if (claudeAgent.systemPrompt) {
-    qwenAgent['systemPrompt'] = claudeAgent.systemPrompt;
+    hopcodeAgent['systemPrompt'] = claudeAgent.systemPrompt;
   }
 
   // Convert tools using claudeBuildInToolsTransform
   if (claudeAgent.tools && claudeAgent.tools.length > 0) {
-    qwenAgent['tools'] = claudeBuildInToolsTransform(claudeAgent.tools);
+    hopcodeAgent['tools'] = claudeBuildInToolsTransform(claudeAgent.tools);
   }
 
   // Preserve Claude's top-level model selector.
   if (claudeAgent.model) {
-    qwenAgent['model'] = claudeAgent.model;
+    hopcodeAgent['model'] = claudeAgent.model;
   }
 
   // Map Claude permission mode aliases to HopCode ApprovalMode values.
@@ -204,19 +204,19 @@ export function convertClaudeAgentConfig(
     const mapped =
       claudeToQwenMode[claudeAgent.permissionMode] ??
       claudeAgent.permissionMode;
-    qwenAgent['approvalMode'] = mapped;
+    hopcodeAgent['approvalMode'] = mapped;
   }
   if (claudeAgent.hooks) {
-    qwenAgent['hooks'] = claudeAgent.hooks;
+    hopcodeAgent['hooks'] = claudeAgent.hooks;
   }
   if (claudeAgent.skills && claudeAgent.skills.length > 0) {
-    qwenAgent['skills'] = claudeAgent.skills;
+    hopcodeAgent['skills'] = claudeAgent.skills;
   }
   if (claudeAgent.disallowedTools && claudeAgent.disallowedTools.length > 0) {
-    qwenAgent['disallowedTools'] = claudeAgent.disallowedTools;
+    hopcodeAgent['disallowedTools'] = claudeAgent.disallowedTools;
   }
 
-  return qwenAgent;
+  return hopcodeAgent;
 }
 
 /**
@@ -268,11 +268,11 @@ async function convertAgentFiles(agentsDir: string): Promise<void> {
       };
 
       // Convert to HopCode format
-      const qwenAgent = convertClaudeAgentConfig(claudeAgent);
+      const hopcodeAgent = convertClaudeAgentConfig(claudeAgent);
 
       // Build new frontmatter (excluding systemPrompt as it goes in body)
       const newFrontmatter: Record<string, unknown> = {};
-      for (const [key, value] of Object.entries(qwenAgent)) {
+      for (const [key, value] of Object.entries(hopcodeAgent)) {
         if (key !== 'systemPrompt' && value !== undefined) {
           newFrontmatter[key] = value;
         }
@@ -280,7 +280,7 @@ async function convertAgentFiles(agentsDir: string): Promise<void> {
 
       // Write converted content back
       const newYaml = stringifyYaml(newFrontmatter);
-      const systemPrompt = (qwenAgent['systemPrompt'] as string) || body.trim();
+      const systemPrompt = (hopcodeAgent['systemPrompt'] as string) || body.trim();
       const newContent = `---
 ${newYaml}
 ---

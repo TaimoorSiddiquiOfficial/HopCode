@@ -810,7 +810,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: '' as string,
         description:
-          'Replace the default ">_ Qwen Code" title shown in the banner info panel. The version suffix is always appended.',
+          'Replace the default ">_ HopCode" title shown in the banner info panel. The version suffix is always appended.',
         showInDialog: false,
       },
       customBannerSubtitle: {
@@ -830,7 +830,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: undefined as CustomAsciiArtSetting | undefined,
         description:
-          'Replace the default QWEN ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
+          'Replace the default HOPCODE ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
         showInDialog: false,
         // The runtime accepts three shapes (inline string, {path}, or
         // {small,large} where each tier is itself string-or-{path}). The

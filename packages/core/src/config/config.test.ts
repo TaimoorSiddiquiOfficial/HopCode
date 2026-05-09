@@ -1125,6 +1125,7 @@ describe('Server Config (config.ts)', () => {
     });
   });
 
+
   describe('Telemetry Settings', () => {
     it('should return default telemetry target if not provided', () => {
       const params: ConfigParameters = {

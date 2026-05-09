@@ -189,6 +189,7 @@ export interface ClearContextOnIdleSettings {
   toolResultsNumToKeep?: number;
 }
 
+
 export interface OutputSettings {
   format?: OutputFormat;
 }
@@ -217,6 +218,15 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
   if (typeof value === 'boolean') {
     return { commit: value, pr: value };
   }
+  // Default to `true` (the schema default) ONLY when the sub-field
+  // is genuinely absent. For PRESENT-but-non-boolean values, honor
+  // common string forms (`"true"`/`"yes"`/`"on"`/`"1"` → true,
+  // `"false"`/`"no"`/`"off"`/`"0"`/`""` → false) and treat anything
+  // else as opt-out. settings.json is user-editable, and the previous
+  // "default-to-true on mismatch" policy meant a hand-edited
+  // `{ "commit": "false" }` silently activated attribution against
+  // the user's clear intent. Safer-by-default: ambiguous values
+  // disable rather than enable.
   const pickBool = (v: unknown, fieldName: string): boolean => {
     if (v === undefined) return true;
     if (typeof v === 'boolean') return v;
@@ -230,8 +240,12 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
       ) {
         return true;
       }
+      // Known disable-intent forms — silent (matches user intent).
       const knownDisable = ['false', 'no', 'off', '0', 'disabled', ''];
       if (!knownDisable.includes(lowered)) {
+        // Unrecognised string — disable (safer-by-default) but log
+        // so a user wondering "why is my setting being ignored?"
+        // can see the actual coercion in QWEN_DEBUG_LOG_FILE.
         gitCoAuthorLogger.warn(
           `Unrecognized string value for general.gitCoAuthor.${fieldName}: ${JSON.stringify(v)}; treating as false. Accepted forms: true/yes/on/1, false/no/off/0/empty.`,
         );
@@ -781,7 +795,7 @@ export class Config {
       otlpTracesEndpoint: params.telemetry?.otlpTracesEndpoint,
       otlpLogsEndpoint: params.telemetry?.otlpLogsEndpoint,
       otlpMetricsEndpoint: params.telemetry?.otlpMetricsEndpoint,
-      logPrompts: params.telemetry?.logPrompts,
+      logPrompts: params.telemetry?.logPrompts ?? true,
       includeSensitiveSpanAttributes:
         params.telemetry?.includeSensitiveSpanAttributes ?? false,
       outfile: params.telemetry?.outfile,
@@ -2002,6 +2016,10 @@ export class Config {
     return (
       this.telemetryConfig.getSettings().includeSensitiveSpanAttributes ?? false
     );
+  }
+
+  getTelemetryIncludeSensitiveSpanAttributes(): boolean {
+    return this.telemetrySettings.includeSensitiveSpanAttributes ?? false;
   }
 
   getTelemetryOtlpEndpoint(): string | undefined {

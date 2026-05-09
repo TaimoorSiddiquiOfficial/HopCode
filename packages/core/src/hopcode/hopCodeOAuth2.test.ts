@@ -1004,37 +1004,37 @@ describe('CredentialsClearRequiredError', () => {
   });
 });
 
-describe('clearQwenCredentials', () => {
+describe('clearHopcodeCredentials', () => {
   it('should successfully clear credentials file', async () => {
     const { promises: fs } = await import('node:fs');
-    const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
+    const { clearHopcodeCredentials } = await import('./hopCodeOAuth2.js');
 
     vi.mocked(fs.unlink).mockResolvedValue(undefined);
 
-    await expect(clearQwenCredentials()).resolves.not.toThrow();
+    await expect(clearHopcodeCredentials()).resolves.not.toThrow();
     expect(fs.unlink).toHaveBeenCalled();
   });
 
   it('should handle file not found error gracefully', async () => {
     const { promises: fs } = await import('node:fs');
-    const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
+    const { clearHopcodeCredentials } = await import('./hopCodeOAuth2.js');
 
     const notFoundError = new Error('File not found');
     (notFoundError as Error & { code: string }).code = 'ENOENT';
     vi.mocked(fs.unlink).mockRejectedValue(notFoundError);
 
-    await expect(clearQwenCredentials()).resolves.not.toThrow();
+    await expect(clearHopcodeCredentials()).resolves.not.toThrow();
   });
 
   it('should handle other file system errors gracefully', async () => {
     const { promises: fs } = await import('node:fs');
-    const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
+    const { clearHopcodeCredentials } = await import('./hopCodeOAuth2.js');
 
     const permissionError = new Error('Permission denied');
     vi.mocked(fs.unlink).mockRejectedValue(permissionError);
 
     // Should not throw but may log warning
-    await expect(clearQwenCredentials()).resolves.not.toThrow();
+    await expect(clearHopcodeCredentials()).resolves.not.toThrow();
   });
 });
 
@@ -1679,7 +1679,7 @@ describe('Utility Functions', () => {
     });
   });
 
-  describe('getQwenCachedCredentialPath', () => {
+  describe('getHopcodeCachedCredentialPath', () => {
     it('should return correct path to cached credentials', async () => {
       const os = await import('os');
       const path = await import('path');
@@ -1690,13 +1690,13 @@ describe('Utility Functions', () => {
         'oauth_creds.json',
       );
 
-      // Since this is a private function, we test it indirectly through clearQwenCredentials
+      // Since this is a private function, we test it indirectly through clearHopcodeCredentials
       const { promises: fs } = await import('node:fs');
-      const { clearQwenCredentials } = await import('./hopCodeOAuth2.js');
+      const { clearHopcodeCredentials } = await import('./hopCodeOAuth2.js');
 
       vi.mocked(fs.unlink).mockResolvedValue(undefined);
 
-      await clearQwenCredentials();
+      await clearHopcodeCredentials();
 
       expect(fs.unlink).toHaveBeenCalledWith(expectedPath);
     });
@@ -1704,9 +1704,9 @@ describe('Utility Functions', () => {
 });
 
 describe('Credential Caching Functions', () => {
-  describe('cacheQwenCredentials', () => {
+  describe('cacheHopcodeCredentials', () => {
     it('should create directory and write credentials to file', async () => {
-      // Mock the internal cacheQwenCredentials function by creating client and calling refresh
+      // Mock the internal cacheHopcodeCredentials function by creating client and calling refresh
       const client = new HopCodeOAuth2Client();
       client.setCredentials({
         refresh_token: 'test-refresh',
@@ -2000,7 +2000,7 @@ describe('Enhanced Error Handling and Edge Cases', () => {
   });
 
   describe('Enhanced refreshAccessToken scenarios', () => {
-    it('should call clearQwenCredentials on 400 error', async () => {
+    it('should call clearHopcodeCredentials on 400 error', async () => {
       client.setCredentials({
         refresh_token: 'expired-refresh',
       });

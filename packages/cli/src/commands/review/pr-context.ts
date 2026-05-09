@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review pr-context`: fetch a PR's metadata + existing comments and
+// `hopcode review pr-context`: fetch a PR's metadata + existing comments and
 // emit a single Markdown file that agents can consume as context.
 //
 // The Markdown is shaped so the calling LLM can pass it to review agents

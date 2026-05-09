@@ -37,7 +37,7 @@ const HOPCODE_OAUTH_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';
 
 // File System Configuration
 const HOPCODE_DIR = '.hopcode';
-const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
+const HOPCODE_CREDENTIAL_FILENAME = 'oauth_creds.json';
 
 /**
  * PKCE (Proof Key for Code Exchange) utilities
@@ -422,7 +422,7 @@ export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
       const errorData = await response.text();
       // Handle 400/401 errors which indicate refresh token expiry or invalidity
       if (response.status === 400 || response.status === 401) {
-        await clearQwenCredentials();
+        await clearHopcodeCredentials();
         throw new CredentialsClearRequiredError(
           "Refresh token expired or invalid. Please use '/auth' to re-authenticate.",
           { status: response.status, response: errorData },
@@ -809,7 +809,7 @@ async function authWithQwenDeviceFlow(
           client.setCredentials(credentials);
 
           // Cache the new tokens
-          await cacheQwenCredentials(credentials);
+          await cacheHopcodeCredentials(credentials);
 
           // IMPORTANT:
           // SharedTokenManager maintains an in-memory cache and throttles file checks.
@@ -965,8 +965,8 @@ async function authWithQwenDeviceFlow(
   }
 }
 
-async function cacheQwenCredentials(credentials: HopCodeCredentials) {
-  const filePath = getQwenCachedCredentialPath();
+async function cacheHopcodeCredentials(credentials: HopCodeCredentials) {
+  const filePath = getHopcodeCachedCredentialPath();
   try {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
 
@@ -997,11 +997,11 @@ async function cacheQwenCredentials(credentials: HopCodeCredentials) {
  * Clear cached HopCode credentials from disk
  * This is useful when credentials have expired or need to be reset
  */
-export async function clearQwenCredentials(): Promise<void> {
+export async function clearHopcodeCredentials(): Promise<void> {
   try {
-    const filePath = getQwenCachedCredentialPath();
+    const filePath = getHopcodeCachedCredentialPath();
     await fs.unlink(filePath);
-    debugLogger.debug('Cached Qwen credentials cleared successfully.');
+    debugLogger.debug('Cached HopCode credentials cleared successfully.');
   } catch (error: unknown) {
     // If file doesn't exist or can't be deleted, we consider it cleared
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
@@ -1010,7 +1010,7 @@ export async function clearQwenCredentials(): Promise<void> {
     }
     // Log other errors but don't throw - clearing credentials should be non-critical
     debugLogger.warn(
-      'Warning: Failed to clear cached Qwen credentials:',
+      'Warning: Failed to clear Cached HopCode credentials:',
       error,
     );
   } finally {
@@ -1024,8 +1024,8 @@ export async function clearQwenCredentials(): Promise<void> {
   }
 }
 
-function getQwenCachedCredentialPath(): string {
-  return path.join(os.homedir(), HOPCODE_DIR, QWEN_CREDENTIAL_FILENAME);
+function getHopcodeCachedCredentialPath(): string {
+  return path.join(os.homedir(), HOPCODE_DIR, HOPCODE_CREDENTIAL_FILENAME);
 }
 
-export const clearCachedCredentialFile = clearQwenCredentials;
+export const clearCachedCredentialFile = clearHopcodeCredentials;

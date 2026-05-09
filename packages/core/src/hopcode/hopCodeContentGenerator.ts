@@ -25,7 +25,7 @@ import { createDebugLogger } from '../utils/debugLogger.js';
  * HopCode Content Generator that uses HopCode OAuth tokens with automatic refresh
  */
 export class HopCodeContentGenerator extends OpenAIContentGenerator {
-  private readonly debugLogger = createDebugLogger('QWEN');
+  private readonly debugLogger = createDebugLogger('HOPCODE');
   private qwenClient: IHopCodeOAuth2Client;
   private sharedManager: SharedTokenManager;
   private currentToken?: string;

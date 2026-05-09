@@ -506,8 +506,8 @@ export class WebViewProvider {
               (request.toolCall as { kind?: string } | undefined)?.kind ===
               'switch_mode';
 
-            // Always close open qwen-diff editors after any permission decision
-            void vscode.commands.executeCommand('qwen.diff.closeAll');
+            // Always close open diff editors after any permission decision
+            void vscode.commands.executeCommand('hopcode.diff.closeAll');
 
             if (isCancel) {
               // Fire and forget — for normal tool calls, cancel generation and
@@ -583,7 +583,7 @@ export class WebViewProvider {
               })();
             } else {
               // Allowed/proceeded — suppress diff re-open briefly
-              void vscode.commands.executeCommand('qwen.diff.suppressBriefly');
+              void vscode.commands.executeCommand('hopcode.diff.suppressBriefly');
             }
           };
           // Store handler in message handler
@@ -1438,7 +1438,7 @@ export class WebViewProvider {
       type: 'agentConnectionError',
       data: {
         message:
-          'Lost connection to Qwen agent and auto-reconnect failed. Please use the refresh button to try again.',
+          'Lost connection to HopCode agent and auto-reconnect failed. Please use the refresh button to try again.',
       },
     });
   }

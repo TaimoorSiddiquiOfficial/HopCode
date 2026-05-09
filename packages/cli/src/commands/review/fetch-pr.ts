@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review fetch-pr`: prepare a PR review's working state in a single
+// `hopcode review fetch-pr`: prepare a PR review's working state in a single
 // deterministic pass.
 //
 //   1. Clean any stale worktree / branch from a previously interrupted run

@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review load-rules`: read project-specific code-review rules from
+// `hopcode review load-rules`: read project-specific code-review rules from
 // the **base branch** of a PR and emit a combined Markdown file.
 //
 // Rules are loaded from the base branch (not the PR branch) so a malicious

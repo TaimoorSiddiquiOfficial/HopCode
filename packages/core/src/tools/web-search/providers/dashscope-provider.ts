@@ -60,21 +60,21 @@ interface DashScopeSearchResponse {
 
 // File System Configuration
 const HOPCODE_DIR = '.hopcode';
-const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
+const HOPCODE_CREDENTIAL_FILENAME = 'oauth_creds.json';
 
 /**
  * Get the path to the cached OAuth credentials file.
  */
-function getQwenCachedCredentialPath(): string {
-  return path.join(os.homedir(), HOPCODE_DIR, QWEN_CREDENTIAL_FILENAME);
+function getHopcodeCachedCredentialPath(): string {
+  return path.join(os.homedir(), HOPCODE_DIR, HOPCODE_CREDENTIAL_FILENAME);
 }
 
 /**
  * Load cached HopCode OAuth credentials from disk.
  */
-async function loadQwenCredentials(): Promise<HopCodeCredentials | null> {
+async function loadHopcodeCredentials(): Promise<HopCodeCredentials | null> {
   try {
-    const keyFile = getQwenCachedCredentialPath();
+    const keyFile = getHopcodeCachedCredentialPath();
     const creds = await fs.readFile(keyFile, 'utf-8');
     return JSON.parse(creds) as HopCodeCredentials;
   } catch {
@@ -108,7 +108,7 @@ export class DashScopeProvider extends BaseWebSearchProvider {
     apiEndpoint: string;
   }> {
     // Load credentials once
-    const credentials = await loadQwenCredentials();
+    const credentials = await loadHopcodeCredentials();
 
     // Get access token: try OAuth credentials first, fallback to apiKey
     let accessToken: string | null = null;
