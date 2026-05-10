@@ -15,6 +15,7 @@ import {
   SessionService,
   type Config,
   createDebugLogger,
+  writeRuntimeStatus,
 } from '@hoptrendy/hopcode-core';
 import { render } from 'ink';
 import dns from 'node:dns';
@@ -216,6 +217,28 @@ export async function startInteractiveUI(
 ) {
   const version = await getCliVersion();
   setWindowTitle(basename(workspaceRoot), settings);
+
+  // Write a small runtime.json sidecar next to the chat log so external
+  // tools (terminal multiplexers, IDE integrations, status daemons) can
+  // map the running PID back to its session id and work directory.
+  // Best-effort: a read-only filesystem must not prevent the UI from
+  // starting up.
+  try {
+    const sessionId = config.getSessionId();
+    const runtimeStatusPath = config.storage.getRuntimeStatusPath(sessionId);
+    await writeRuntimeStatus(runtimeStatusPath, {
+      sessionId,
+      workDir: config.getTargetDir(),
+      hopcodeVersion: version,
+    });
+    // Mark this process as the runtime.json owner so subsequent
+    // session swaps (/clear, /resume, etc.) refresh the sidecar.
+    // Non-interactive entry points never reach here, so they won't
+    // trample a sibling shell's sidecar on the same session id.
+    config.markRuntimeStatusEnabled();
+  } catch {
+    // ignored: best-effort, never block UI startup.
+  }
   const restoreTerminalRedrawOptimizer =
     process.stdout.isTTY && !config.getScreenReader()
       ? installTerminalRedrawOptimizer(process.stdout)
@@ -677,7 +700,7 @@ export async function main() {
         ...(config.getModelsConfig().getCurrentAuthType() ===
         AuthType.HOPCODE_OAUTH
           ? [
-              'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
+              'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
             ]
           : []),
       ]),
@@ -693,7 +716,7 @@ export async function main() {
       // runNonInteractive's main/drain loops. In TUI mode the same call
       // would just emit "Structured output accepted." and keep the chat
       // alive, which silently strands the user's run. Parse-time gating
-      // can't catch this case (`qwen --json-schema '...'` on a TTY with
+      // can't catch this case (`hopcode --json-schema '...'` on a TTY with
       // no prompt routes to interactive only after stdin TTY detection),
       // so reject here before the UI launches.
       if (config.getJsonSchema?.()) {
