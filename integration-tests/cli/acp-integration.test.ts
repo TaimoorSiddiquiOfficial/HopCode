@@ -17,6 +17,8 @@ const IS_SANDBOX =
   process.env['HOPCODE_SANDBOX'] &&
   process.env['HOPCODE_SANDBOX']!.toLowerCase() !== 'false';
 
+const HAS_API_KEY = !!process.env['OPENAI_API_KEY'];
+
 type PendingRequest = {
   resolve: (value: unknown) => void;
   reject: (reason: Error) => void;
@@ -273,382 +275,398 @@ function setupAcpTest(
   };
 }
 
-(IS_SANDBOX ? describe.skip : describe)('acp integration', () => {
-  it('basic smoke test', async () => {
-    const rig = new TestRig();
-    rig.setup('acp load session');
+(IS_SANDBOX || !HAS_API_KEY ? describe.skip : describe)(
+  'acp integration',
+  () => {
+    it('basic smoke test', async () => {
+      const rig = new TestRig();
+      rig.setup('acp load session');
 
-    const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
+      const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
 
-    try {
-      const initResult = await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: {
-          fs: { readTextFile: true, writeTextFile: true },
-        },
-      });
-      expect(initResult).toBeDefined();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((initResult as any).agentInfo.version).toBeDefined();
+      try {
+        const initResult = await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        });
+        expect(initResult).toBeDefined();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((initResult as any).agentInfo.version).toBeDefined();
 
-      await sendRequest('authenticate', { methodId: 'openai' });
+        await sendRequest('authenticate', { methodId: 'openai' });
 
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as { sessionId: string };
-      expect(newSession.sessionId).toBeTruthy();
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as { sessionId: string };
+        expect(newSession.sessionId).toBeTruthy();
 
-      const promptResult = await sendRequest('session/prompt', {
-        sessionId: newSession.sessionId,
-        prompt: [{ type: 'text', text: INITIAL_PROMPT }],
-      });
-      expect(promptResult).toBeDefined();
-    } catch (e) {
-      if (stderr.length) {
-        console.error('Agent stderr:', stderr.join(''));
+        const promptResult = await sendRequest('session/prompt', {
+          sessionId: newSession.sessionId,
+          prompt: [{ type: 'text', text: INITIAL_PROMPT }],
+        });
+        expect(promptResult).toBeDefined();
+      } catch (e) {
+        if (stderr.length) {
+          console.error('Agent stderr:', stderr.join(''));
+        }
+        throw e;
+      } finally {
+        await cleanup();
       }
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
+    });
 
-  it('initializes and allows setting mode', async () => {
-    const rig = new TestRig();
-    rig.setup('acp mode and model');
+    it('initializes and allows setting mode', async () => {
+      const rig = new TestRig();
+      rig.setup('acp mode and model');
 
-    const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
+      const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
 
-    try {
-      // Test 1: Initialize and verify modes are returned
-      const initResult = (await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: {
-          fs: { readTextFile: true, writeTextFile: true },
-        },
-      })) as { protocolVersion: number };
+      try {
+        // Test 1: Initialize and verify modes are returned
+        const initResult = (await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        })) as { protocolVersion: number };
 
-      expect(initResult).toBeDefined();
-      expect(initResult.protocolVersion).toBe(1);
+        expect(initResult).toBeDefined();
+        expect(initResult.protocolVersion).toBe(1);
 
-      // Test 2: Authenticate
-      await sendRequest('authenticate', { methodId: 'openai' });
+        // Test 2: Authenticate
+        await sendRequest('authenticate', { methodId: 'openai' });
 
-      // Test 3: Create a new session
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as {
-        sessionId: string;
-        models: {
-          availableModels: Array<{ modelId: string }>;
+        // Test 3: Create a new session
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as {
+          sessionId: string;
+          models: {
+            availableModels: Array<{ modelId: string }>;
+          };
         };
-      };
-      expect(newSession.sessionId).toBeTruthy();
-      expect(newSession.models.availableModels.length).toBeGreaterThan(0);
+        expect(newSession.sessionId).toBeTruthy();
+        expect(newSession.models.availableModels.length).toBeGreaterThan(0);
 
-      // Test 4: Set approval mode to 'izn'
-      const setModeResult = (await sendRequest('session/set_mode', {
-        sessionId: newSession.sessionId,
-        modeId: 'izn',
-      })) as unknown;
-      expect(setModeResult).toEqual({});
+        // Test 4: Set approval mode to 'izn'
+        const setModeResult = (await sendRequest('session/set_mode', {
+          sessionId: newSession.sessionId,
+          modeId: 'izn',
+        })) as unknown;
+        expect(setModeResult).toEqual({});
 
-      // Test 5: Set approval mode to 'auto-edit'
-      const setModeResult2 = (await sendRequest('session/set_mode', {
-        sessionId: newSession.sessionId,
-        modeId: 'auto-edit',
-      })) as unknown;
-      expect(setModeResult2).toEqual({});
+        // Test 5: Set approval mode to 'auto-edit'
+        const setModeResult2 = (await sendRequest('session/set_mode', {
+          sessionId: newSession.sessionId,
+          modeId: 'auto-edit',
+        })) as unknown;
+        expect(setModeResult2).toEqual({});
 
-      // Test 6: Set approval mode back to 'default'
-      const setModeResult3 = (await sendRequest('session/set_mode', {
-        sessionId: newSession.sessionId,
-        modeId: 'default',
-      })) as unknown;
-      expect(setModeResult3).toEqual({});
-    } catch (e) {
-      if (stderr.length) {
-        console.error('Agent stderr:', stderr.join(''));
+        // Test 6: Set approval mode back to 'default'
+        const setModeResult3 = (await sendRequest('session/set_mode', {
+          sessionId: newSession.sessionId,
+          modeId: 'default',
+        })) as unknown;
+        expect(setModeResult3).toEqual({});
+      } catch (e) {
+        if (stderr.length) {
+          console.error('Agent stderr:', stderr.join(''));
+        }
+        throw e;
+      } finally {
+        await cleanup();
       }
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
+    });
 
-  it('returns internal error details when model auth is required', async () => {
-    const rig = new TestRig();
-    rig.setup('acp auth methods in error data');
+    it('returns internal error details when model auth is required', async () => {
+      const rig = new TestRig();
+      rig.setup('acp auth methods in error data');
 
-    const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
+      const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
 
-    try {
-      await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: {
-          fs: { readTextFile: true, writeTextFile: true },
-        },
-      });
+      try {
+        await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        });
 
-      // Create a new session first
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as {
-        sessionId: string;
-        models: {
-          availableModels: Array<{ modelId: string }>;
+        // Create a new session first
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as {
+          sessionId: string;
+          models: {
+            availableModels: Array<{ modelId: string }>;
+          };
         };
-      };
 
-      // Choose a qwen-oauth model to trigger auth-required path deterministically.
-      const qwenOauthModel = newSession.models.availableModels.find((model) =>
-        model.modelId.includes('qwen-oauth'),
-      );
-      expect(qwenOauthModel).toBeDefined();
-      await expect(
-        sendRequest('session/set_config_option', {
+        // Choose a qwen-oauth model to trigger auth-required path deterministically.
+        const qwenOauthModel = newSession.models.availableModels.find((model) =>
+          model.modelId.includes('qwen-oauth'),
+        );
+        expect(qwenOauthModel).toBeDefined();
+        await expect(
+          sendRequest('session/set_config_option', {
+            sessionId: newSession.sessionId,
+            configId: 'model',
+            value: qwenOauthModel!.modelId,
+          }),
+        ).rejects.toMatchObject({
+          response: {
+            code: -32603,
+            message: 'Internal error',
+            data: {
+              details: expect.any(String),
+            },
+          },
+        });
+      } catch (e) {
+        if (stderr.length) {
+          console.error('Agent stderr:', stderr.join(''));
+        }
+        throw e;
+      } finally {
+        await cleanup();
+      }
+    });
+
+    it('supports session/set_config_option for mode and model', async () => {
+      const rig = new TestRig();
+      rig.setup('acp set config option');
+
+      const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
+
+      try {
+        // Initialize
+        await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        });
+
+        await sendRequest('authenticate', { methodId: 'openai' });
+
+        // Create a new session
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as {
+          sessionId: string;
+          models: {
+            availableModels: Array<{ modelId: string }>;
+          };
+        };
+        expect(newSession.sessionId).toBeTruthy();
+
+        // Test: Set mode using set_config_option
+        const setModeResult = (await sendRequest('session/set_config_option', {
+          sessionId: newSession.sessionId,
+          configId: 'mode',
+          value: 'izn',
+        })) as {
+          configOptions: Array<{
+            id: string;
+            currentValue: string;
+            options: Array<{
+              value: string;
+              name: string;
+              description: string;
+            }>;
+          }>;
+        };
+
+        expect(setModeResult).toBeDefined();
+        expect(Array.isArray(setModeResult.configOptions)).toBe(true);
+        expect(setModeResult.configOptions.length).toBeGreaterThanOrEqual(2);
+
+        // Find mode option
+        const modeOption = setModeResult.configOptions.find(
+          (opt) => opt.id === 'mode',
+        );
+        expect(modeOption).toBeDefined();
+        expect(modeOption!.currentValue).toBe('izn');
+        expect(Array.isArray(modeOption!.options)).toBe(true);
+        expect(modeOption!.options.some((o) => o.value === 'izn')).toBe(true);
+
+        // Find model option
+        const modelOption = setModeResult.configOptions.find(
+          (opt) => opt.id === 'model',
+        );
+        expect(modelOption).toBeDefined();
+        expect(modelOption!.currentValue).toBeTruthy();
+
+        // Test: Set model using set_config_option
+        // Use openai model to avoid auth issues
+        const openaiModel = newSession.models.availableModels.find((model) =>
+          model.modelId.includes('openai'),
+        );
+        expect(openaiModel).toBeDefined();
+
+        const setModelResult = (await sendRequest('session/set_config_option', {
           sessionId: newSession.sessionId,
           configId: 'model',
-          value: qwenOauthModel!.modelId,
-        }),
-      ).rejects.toMatchObject({
-        response: {
-          code: -32603,
-          message: 'Internal error',
-          data: {
-            details: expect.any(String),
-          },
-        },
-      });
-    } catch (e) {
-      if (stderr.length) {
-        console.error('Agent stderr:', stderr.join(''));
-      }
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
-
-  it('supports session/set_config_option for mode and model', async () => {
-    const rig = new TestRig();
-    rig.setup('acp set config option');
-
-    const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
-
-    try {
-      // Initialize
-      await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: {
-          fs: { readTextFile: true, writeTextFile: true },
-        },
-      });
-
-      await sendRequest('authenticate', { methodId: 'openai' });
-
-      // Create a new session
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as {
-        sessionId: string;
-        models: {
-          availableModels: Array<{ modelId: string }>;
+          value: openaiModel!.modelId,
+        })) as {
+          configOptions: Array<{
+            id: string;
+            currentValue: string;
+            options: Array<{
+              value: string;
+              name: string;
+              description: string;
+            }>;
+          }>;
         };
-      };
-      expect(newSession.sessionId).toBeTruthy();
 
-      // Test: Set mode using set_config_option
-      const setModeResult = (await sendRequest('session/set_config_option', {
-        sessionId: newSession.sessionId,
-        configId: 'mode',
-        value: 'izn',
-      })) as {
-        configOptions: Array<{
-          id: string;
-          currentValue: string;
-          options: Array<{ value: string; name: string; description: string }>;
-        }>;
-      };
+        expect(setModelResult).toBeDefined();
+        expect(Array.isArray(setModelResult.configOptions)).toBe(true);
 
-      expect(setModeResult).toBeDefined();
-      expect(Array.isArray(setModeResult.configOptions)).toBe(true);
-      expect(setModeResult.configOptions.length).toBeGreaterThanOrEqual(2);
-
-      // Find mode option
-      const modeOption = setModeResult.configOptions.find(
-        (opt) => opt.id === 'mode',
-      );
-      expect(modeOption).toBeDefined();
-      expect(modeOption!.currentValue).toBe('izn');
-      expect(Array.isArray(modeOption!.options)).toBe(true);
-      expect(modeOption!.options.some((o) => o.value === 'izn')).toBe(true);
-
-      // Find model option
-      const modelOption = setModeResult.configOptions.find(
-        (opt) => opt.id === 'model',
-      );
-      expect(modelOption).toBeDefined();
-      expect(modelOption!.currentValue).toBeTruthy();
-
-      // Test: Set model using set_config_option
-      // Use openai model to avoid auth issues
-      const openaiModel = newSession.models.availableModels.find((model) =>
-        model.modelId.includes('openai'),
-      );
-      expect(openaiModel).toBeDefined();
-
-      const setModelResult = (await sendRequest('session/set_config_option', {
-        sessionId: newSession.sessionId,
-        configId: 'model',
-        value: openaiModel!.modelId,
-      })) as {
-        configOptions: Array<{
-          id: string;
-          currentValue: string;
-          options: Array<{ value: string; name: string; description: string }>;
-        }>;
-      };
-
-      expect(setModelResult).toBeDefined();
-      expect(Array.isArray(setModelResult.configOptions)).toBe(true);
-
-      // Verify model was updated
-      const updatedModelOption = setModelResult.configOptions.find(
-        (opt) => opt.id === 'model',
-      );
-      expect(updatedModelOption).toBeDefined();
-      expect(updatedModelOption!.currentValue).toBe(openaiModel!.modelId);
-    } catch (e) {
-      if (stderr.length) {
-        console.error('Agent stderr:', stderr.join(''));
+        // Verify model was updated
+        const updatedModelOption = setModelResult.configOptions.find(
+          (opt) => opt.id === 'model',
+        );
+        expect(updatedModelOption).toBeDefined();
+        expect(updatedModelOption!.currentValue).toBe(openaiModel!.modelId);
+      } catch (e) {
+        if (stderr.length) {
+          console.error('Agent stderr:', stderr.join(''));
+        }
+        throw e;
+      } finally {
+        await cleanup();
       }
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
+    });
 
-  it('returns error for invalid configId in set_config_option', async () => {
-    const rig = new TestRig();
-    rig.setup('acp set config option error');
+    it('returns error for invalid configId in set_config_option', async () => {
+      const rig = new TestRig();
+      rig.setup('acp set config option error');
 
-    const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
+      const { sendRequest, cleanup, stderr } = setupAcpTest(rig);
 
-    try {
-      // Initialize
-      await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: {
-          fs: { readTextFile: true, writeTextFile: true },
-        },
-      });
+      try {
+        // Initialize
+        await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        });
 
-      await sendRequest('authenticate', { methodId: 'openai' });
+        await sendRequest('authenticate', { methodId: 'openai' });
 
-      // Create a new session
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as { sessionId: string };
-      expect(newSession.sessionId).toBeTruthy();
+        // Create a new session
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as { sessionId: string };
+        expect(newSession.sessionId).toBeTruthy();
 
-      // Test: Invalid configId should return error
-      await expect(
-        sendRequest('session/set_config_option', {
-          sessionId: newSession.sessionId,
-          configId: 'invalid_config',
-          value: 'some_value',
-        }),
-      ).rejects.toMatchObject({
-        response: {
-          code: -32602,
-          message: 'Invalid params: Unsupported configId: invalid_config',
-        },
-      });
-    } catch (e) {
-      if (stderr.length) {
-        console.error('Agent stderr:', stderr.join(''));
+        // Test: Invalid configId should return error
+        await expect(
+          sendRequest('session/set_config_option', {
+            sessionId: newSession.sessionId,
+            configId: 'invalid_config',
+            value: 'some_value',
+          }),
+        ).rejects.toMatchObject({
+          response: {
+            code: -32602,
+            message: 'Invalid params: Unsupported configId: invalid_config',
+          },
+        });
+      } catch (e) {
+        if (stderr.length) {
+          console.error('Agent stderr:', stderr.join(''));
+        }
+        throw e;
+      } finally {
+        await cleanup();
       }
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
+    });
 
-  it('receives available_commands_update with slash commands after session creation', async () => {
-    const rig = new TestRig();
-    rig.setup('acp slash commands');
+    it('receives available_commands_update with slash commands after session creation', async () => {
+      const rig = new TestRig();
+      rig.setup('acp slash commands');
 
-    const { sendRequest, cleanup, stderr, sessionUpdates } = setupAcpTest(rig);
+      const { sendRequest, cleanup, stderr, sessionUpdates } =
+        setupAcpTest(rig);
 
-    try {
-      // Initialize
-      await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: {
-          fs: { readTextFile: true, writeTextFile: true },
-        },
-      });
+      try {
+        // Initialize
+        await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        });
 
-      await sendRequest('authenticate', { methodId: 'openai' });
+        await sendRequest('authenticate', { methodId: 'openai' });
 
-      // Create a new session
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as { sessionId: string };
-      expect(newSession.sessionId).toBeTruthy();
+        // Create a new session
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as { sessionId: string };
+        expect(newSession.sessionId).toBeTruthy();
 
-      // Wait for available_commands_update to be received
-      await delay(1000);
+        // Wait for available_commands_update to be received
+        await delay(1000);
 
-      // Verify available_commands_update is received
-      const commandsUpdate = sessionUpdates.find(
-        (update) =>
-          update.update?.sessionUpdate === 'available_commands_update',
-      );
+        // Verify available_commands_update is received
+        const commandsUpdate = sessionUpdates.find(
+          (update) =>
+            update.update?.sessionUpdate === 'available_commands_update',
+        );
 
-      expect(commandsUpdate).toBeDefined();
-      expect(commandsUpdate?.update?.availableCommands).toBeDefined();
-      expect(Array.isArray(commandsUpdate?.update?.availableCommands)).toBe(
-        true,
-      );
+        expect(commandsUpdate).toBeDefined();
+        expect(commandsUpdate?.update?.availableCommands).toBeDefined();
+        expect(Array.isArray(commandsUpdate?.update?.availableCommands)).toBe(
+          true,
+        );
 
-      // Verify that the 'init' command is present (the only allowed built-in command for ACP)
-      const initCommand = commandsUpdate?.update?.availableCommands?.find(
-        (cmd) => cmd.name === 'init',
-      );
-      expect(initCommand).toBeDefined();
-      expect(initCommand?.description).toBeTruthy();
+        // Verify that the 'init' command is present (the only allowed built-in command for ACP)
+        const initCommand = commandsUpdate?.update?.availableCommands?.find(
+          (cmd) => cmd.name === 'init',
+        );
+        expect(initCommand).toBeDefined();
+        expect(initCommand?.description).toBeTruthy();
 
-      // Note: We don't test /init execution here because it triggers a complex
-      // multi-step process (listing files, reading up to 10 files, generating HOPCODE.md)
-      // that can take 30-60+ seconds, exceeding the request timeout.
-      // The slash command execution path is tested via simpler prompts in other tests.
-    } catch (e) {
-      if (stderr.length) {
-        console.error('Agent stderr:', stderr.join(''));
+        // Note: We don't test /init execution here because it triggers a complex
+        // multi-step process (listing files, reading up to 10 files, generating HOPCODE.md)
+        // that can take 30-60+ seconds, exceeding the request timeout.
+        // The slash command execution path is tested via simpler prompts in other tests.
+      } catch (e) {
+        if (stderr.length) {
+          console.error('Agent stderr:', stderr.join(''));
+        }
+        throw e;
+      } finally {
+        await cleanup();
       }
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
+    });
 
-  it('handles exit plan mode with permission request and mode update notification', async () => {
-    const rig = new TestRig();
-    rig.setup('acp exit plan mode');
+    it('handles exit plan mode with permission request and mode update notification', async () => {
+      const rig = new TestRig();
+      rig.setup('acp exit plan mode');
 
-    // Track which permission requests we've seen
-    const planModeRequests: PermissionRequest[] = [];
+      // Track which permission requests we've seen
+      const planModeRequests: PermissionRequest[] = [];
 
-    const { sendRequest, cleanup, stderr, sessionUpdates, permissionRequests } =
-      setupAcpTest(rig, {
+      const {
+        sendRequest,
+        cleanup,
+        stderr,
+        sessionUpdates,
+        permissionRequests,
+      } = setupAcpTest(rig, {
         permissionHandler: (request) => {
           // Track all permission requests for later verification
           // Auto-approve exit plan mode requests with "proceed_always" to trigger auto-edit mode
@@ -662,251 +680,260 @@ function setupAcpTest(
         },
       });
 
-    try {
-      // Initialize
-      await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: {
-          fs: { readTextFile: true, writeTextFile: true },
-        },
-      });
-
-      await sendRequest('authenticate', { methodId: 'openai' });
-
-      // Create a new session
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as { sessionId: string };
-      expect(newSession.sessionId).toBeTruthy();
-
-      // Set mode to 'plan' to enable plan mode
-      const setModeResult = (await sendRequest('session/set_mode', {
-        sessionId: newSession.sessionId,
-        modeId: 'plan',
-      })) as unknown;
-      expect(setModeResult).toEqual({});
-
-      // Send a prompt that should trigger the LLM to call exit_plan_mode
-      // The prompt is designed to trigger planning behavior
-      const promptResult = await sendRequest('session/prompt', {
-        sessionId: newSession.sessionId,
-        prompt: [
-          {
-            type: 'text',
-            text: 'Create a simple hello world function in Python. Make a brief plan and when ready, use the exit_plan_mode tool to present it for approval.',
+      try {
+        // Initialize
+        await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
           },
-        ],
-      });
-      expect(promptResult).toBeDefined();
+        });
 
-      // Give time for all notifications to be processed
-      await delay(1000);
+        await sendRequest('authenticate', { methodId: 'openai' });
 
-      // Verify: If exit_plan_mode was called, we should have received:
-      // 1. A permission request with kind: "switch_mode"
-      // 2. A current_mode_update notification after approval
+        // Create a new session
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as { sessionId: string };
+        expect(newSession.sessionId).toBeTruthy();
 
-      // Check for switch_mode permission requests
-      const switchModeRequests = permissionRequests.filter(
-        (req) => req.toolCall?.kind === 'switch_mode',
-      );
+        // Set mode to 'plan' to enable plan mode
+        const setModeResult = (await sendRequest('session/set_mode', {
+          sessionId: newSession.sessionId,
+          modeId: 'plan',
+        })) as unknown;
+        expect(setModeResult).toEqual({});
 
-      // Check for current_mode_update notifications
-      const modeUpdateNotifications = sessionUpdates.filter(
-        (update) => update.update?.sessionUpdate === 'current_mode_update',
-      );
+        // Send a prompt that should trigger the LLM to call exit_plan_mode
+        // The prompt is designed to trigger planning behavior
+        const promptResult = await sendRequest('session/prompt', {
+          sessionId: newSession.sessionId,
+          prompt: [
+            {
+              type: 'text',
+              text: 'Create a simple hello world function in Python. Make a brief plan and when ready, use the exit_plan_mode tool to present it for approval.',
+            },
+          ],
+        });
+        expect(promptResult).toBeDefined();
 
-      // If the LLM called exit_plan_mode, verify the flow
-      if (switchModeRequests.length > 0) {
-        // Verify permission request structure
-        const permReq = switchModeRequests[0];
-        expect(permReq.toolCall).toBeDefined();
-        expect(permReq.toolCall?.kind).toBe('switch_mode');
-        expect(permReq.toolCall?.status).toBe('pending');
-        expect(permReq.options).toBeDefined();
-        expect(Array.isArray(permReq.options)).toBe(true);
+        // Give time for all notifications to be processed
+        await delay(1000);
 
-        // Verify options include appropriate choices
-        const optionKinds = permReq.options?.map((opt) => opt.kind) ?? [];
-        expect(optionKinds).toContain('allow_once');
-        expect(optionKinds).toContain('allow_always');
+        // Verify: If exit_plan_mode was called, we should have received:
+        // 1. A permission request with kind: "switch_mode"
+        // 2. A current_mode_update notification after approval
 
-        // After approval, should have received current_mode_update
-        expect(modeUpdateNotifications.length).toBeGreaterThan(0);
+        // Check for switch_mode permission requests
+        const switchModeRequests = permissionRequests.filter(
+          (req) => req.toolCall?.kind === 'switch_mode',
+        );
 
-        // Verify mode update structure
-        const modeUpdate = modeUpdateNotifications[0];
-        expect(modeUpdate.sessionId).toBe(newSession.sessionId);
-        expect(modeUpdate.update?.currentModeId).toBeDefined();
-        // Mode should be auto-edit since we approved with proceed_always
-        expect(modeUpdate.update?.currentModeId).toBe('auto-edit');
-      }
+        // Check for current_mode_update notifications
+        const modeUpdateNotifications = sessionUpdates.filter(
+          (update) => update.update?.sessionUpdate === 'current_mode_update',
+        );
 
-      // Note: If the LLM didn't call exit_plan_mode, that's acceptable
-      // since LLM behavior is non-deterministic. The test setup and structure
-      // is verified regardless.
-    } catch (e) {
-      if (stderr.length) {
-        console.error('Agent stderr:', stderr.join(''));
-      }
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
+        // If the LLM called exit_plan_mode, verify the flow
+        if (switchModeRequests.length > 0) {
+          // Verify permission request structure
+          const permReq = switchModeRequests[0];
+          expect(permReq.toolCall).toBeDefined();
+          expect(permReq.toolCall?.kind).toBe('switch_mode');
+          expect(permReq.toolCall?.status).toBe('pending');
+          expect(permReq.options).toBeDefined();
+          expect(Array.isArray(permReq.options)).toBe(true);
 
-  it('blocks write tools in plan mode (issue #1806)', async () => {
-    const rig = new TestRig();
-    rig.setup('acp plan mode enforcement');
+          // Verify options include appropriate choices
+          const optionKinds = permReq.options?.map((opt) => opt.kind) ?? [];
+          expect(optionKinds).toContain('allow_once');
+          expect(optionKinds).toContain('allow_always');
 
-    const toolCallEvents: Array<{
-      toolName: string;
-      status: string;
-      error?: string;
-    }> = [];
+          // After approval, should have received current_mode_update
+          expect(modeUpdateNotifications.length).toBeGreaterThan(0);
 
-    const { sendRequest, cleanup, stderr, sessionUpdates } = setupAcpTest(rig, {
-      permissionHandler: (request) => {
-        // Cancel exit_plan_mode to keep plan mode active
-        if (request.toolCall?.kind === 'switch_mode') {
-          return { outcome: 'cancelled' };
+          // Verify mode update structure
+          const modeUpdate = modeUpdateNotifications[0];
+          expect(modeUpdate.sessionId).toBe(newSession.sessionId);
+          expect(modeUpdate.update?.currentModeId).toBeDefined();
+          // Mode should be auto-edit since we approved with proceed_always
+          expect(modeUpdate.update?.currentModeId).toBe('auto-edit');
         }
-        return { optionId: 'proceed_once' };
-      },
+
+        // Note: If the LLM didn't call exit_plan_mode, that's acceptable
+        // since LLM behavior is non-deterministic. The test setup and structure
+        // is verified regardless.
+      } catch (e) {
+        if (stderr.length) {
+          console.error('Agent stderr:', stderr.join(''));
+        }
+        throw e;
+      } finally {
+        await cleanup();
+      }
     });
 
-    try {
-      await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: { fs: { readTextFile: true, writeTextFile: true } },
-      });
-      await sendRequest('authenticate', { methodId: 'openai' });
+    it('blocks write tools in plan mode (issue #1806)', async () => {
+      const rig = new TestRig();
+      rig.setup('acp plan mode enforcement');
 
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as { sessionId: string };
+      const toolCallEvents: Array<{
+        toolName: string;
+        status: string;
+        error?: string;
+      }> = [];
 
-      // Set mode to 'plan'
-      const setModeResult = (await sendRequest('session/set_mode', {
-        sessionId: newSession.sessionId,
-        modeId: 'plan',
-      })) as unknown;
-      expect(setModeResult).toEqual({});
-
-      // Try to create a file - this should be blocked by plan mode
-      const promptResult = await sendRequest('session/prompt', {
-        sessionId: newSession.sessionId,
-        prompt: [
-          {
-            type: 'text',
-            text: 'Create a file called test.txt with content "Hello World"',
+      const { sendRequest, cleanup, stderr, sessionUpdates } = setupAcpTest(
+        rig,
+        {
+          permissionHandler: (request) => {
+            // Cancel exit_plan_mode to keep plan mode active
+            if (request.toolCall?.kind === 'switch_mode') {
+              return { outcome: 'cancelled' };
+            }
+            return { optionId: 'proceed_once' };
           },
-        ],
-      });
-      expect(promptResult).toBeDefined();
+        },
+      );
 
-      // Give time for tool calls to be processed
-      await delay(2000);
+      try {
+        await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        });
+        await sendRequest('authenticate', { methodId: 'openai' });
 
-      // Collect tool call events from session updates
-      sessionUpdates.forEach((update) => {
-        if (update.update?.sessionUpdate === 'tool_call_update') {
-          const toolUpdate = update.update as {
-            sessionUpdate: string;
-            toolName?: string;
-            status?: string;
-            error?: { message?: string };
-          };
-          if (toolUpdate.toolName) {
-            toolCallEvents.push({
-              toolName: toolUpdate.toolName,
-              status: toolUpdate.status ?? 'unknown',
-              error: toolUpdate.error?.message,
-            });
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as { sessionId: string };
+
+        // Set mode to 'plan'
+        const setModeResult = (await sendRequest('session/set_mode', {
+          sessionId: newSession.sessionId,
+          modeId: 'plan',
+        })) as unknown;
+        expect(setModeResult).toEqual({});
+
+        // Try to create a file - this should be blocked by plan mode
+        const promptResult = await sendRequest('session/prompt', {
+          sessionId: newSession.sessionId,
+          prompt: [
+            {
+              type: 'text',
+              text: 'Create a file called test.txt with content "Hello World"',
+            },
+          ],
+        });
+        expect(promptResult).toBeDefined();
+
+        // Give time for tool calls to be processed
+        await delay(2000);
+
+        // Collect tool call events from session updates
+        sessionUpdates.forEach((update) => {
+          if (update.update?.sessionUpdate === 'tool_call_update') {
+            const toolUpdate = update.update as {
+              sessionUpdate: string;
+              toolName?: string;
+              status?: string;
+              error?: { message?: string };
+            };
+            if (toolUpdate.toolName) {
+              toolCallEvents.push({
+                toolName: toolUpdate.toolName,
+                status: toolUpdate.status ?? 'unknown',
+                error: toolUpdate.error?.message,
+              });
+            }
           }
-        }
-      });
+        });
 
-      // Verify that if write_file was attempted, it was blocked
-      const writeFileEvents = toolCallEvents.filter(
-        (e) => e.toolName === 'write_file',
-      );
-
-      // If the LLM tried to call write_file in plan mode, it should have been blocked
-      if (writeFileEvents.length > 0) {
-        const blockedEvent = writeFileEvents.find(
-          (e) => e.status === 'error' && e.error?.includes('Plan mode'),
+        // Verify that if write_file was attempted, it was blocked
+        const writeFileEvents = toolCallEvents.filter(
+          (e) => e.toolName === 'write_file',
         );
-        expect(blockedEvent).toBeDefined();
-        expect(blockedEvent?.error).toContain('Plan mode is active');
+
+        // If the LLM tried to call write_file in plan mode, it should have been blocked
+        if (writeFileEvents.length > 0) {
+          const blockedEvent = writeFileEvents.find(
+            (e) => e.status === 'error' && e.error?.includes('Plan mode'),
+          );
+          expect(blockedEvent).toBeDefined();
+          expect(blockedEvent?.error).toContain('Plan mode is active');
+        }
+
+        // Verify the file was NOT created
+        const fs = await import('fs');
+        const path = await import('path');
+        const testFilePath = path.join(rig.testDir!, 'test.txt');
+        const fileExists = fs.existsSync(testFilePath);
+        expect(fileExists).toBe(false);
+      } catch (e) {
+        if (stderr.length) console.error('Agent stderr:', stderr.join(''));
+        throw e;
+      } finally {
+        await cleanup();
       }
+    });
 
-      // Verify the file was NOT created
-      const fs = await import('fs');
-      const path = await import('path');
-      const testFilePath = path.join(rig.testDir!, 'test.txt');
-      const fileExists = fs.existsSync(testFilePath);
-      expect(fileExists).toBe(false);
-    } catch (e) {
-      if (stderr.length) console.error('Agent stderr:', stderr.join(''));
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
+    it('receives usage metadata in agent_message_chunk updates', async () => {
+      const rig = new TestRig();
+      rig.setup('acp usage metadata');
 
-  it('receives usage metadata in agent_message_chunk updates', async () => {
-    const rig = new TestRig();
-    rig.setup('acp usage metadata');
+      const { sendRequest, cleanup, stderr, sessionUpdates } =
+        setupAcpTest(rig);
 
-    const { sendRequest, cleanup, stderr, sessionUpdates } = setupAcpTest(rig);
+      try {
+        await sendRequest('initialize', {
+          protocolVersion: 1,
+          clientCapabilities: {
+            fs: { readTextFile: true, writeTextFile: true },
+          },
+        });
+        await sendRequest('authenticate', { methodId: 'openai' });
 
-    try {
-      await sendRequest('initialize', {
-        protocolVersion: 1,
-        clientCapabilities: { fs: { readTextFile: true, writeTextFile: true } },
-      });
-      await sendRequest('authenticate', { methodId: 'openai' });
+        const newSession = (await sendRequest('session/new', {
+          cwd: rig.testDir!,
+          mcpServers: [],
+        })) as { sessionId: string };
 
-      const newSession = (await sendRequest('session/new', {
-        cwd: rig.testDir!,
-        mcpServers: [],
-      })) as { sessionId: string };
+        await sendRequest('session/prompt', {
+          sessionId: newSession.sessionId,
+          prompt: [{ type: 'text', text: 'Say "hello".' }],
+        });
 
-      await sendRequest('session/prompt', {
-        sessionId: newSession.sessionId,
-        prompt: [{ type: 'text', text: 'Say "hello".' }],
-      });
+        await delay(500);
 
-      await delay(500);
+        // Find updates with usage metadata
+        const updatesWithUsage = sessionUpdates.filter(
+          (u) =>
+            u.update?.sessionUpdate === 'agent_message_chunk' &&
+            u.update?._meta?.usage,
+        );
 
-      // Find updates with usage metadata
-      const updatesWithUsage = sessionUpdates.filter(
-        (u) =>
-          u.update?.sessionUpdate === 'agent_message_chunk' &&
-          u.update?._meta?.usage,
-      );
+        expect(updatesWithUsage.length).toBeGreaterThan(0);
 
-      expect(updatesWithUsage.length).toBeGreaterThan(0);
+        const usage = updatesWithUsage[0].update?._meta?.usage;
+        expect(usage).toBeDefined();
+        expect(
+          typeof usage?.promptTokens === 'number' ||
+            typeof usage?.totalTokens === 'number',
+        ).toBe(true);
+      } catch (e) {
+        if (stderr.length) console.error('Agent stderr:', stderr.join(''));
+        throw e;
+      } finally {
+        await cleanup();
+      }
+    });
+  },
+);
 
-      const usage = updatesWithUsage[0].update?._meta?.usage;
-      expect(usage).toBeDefined();
-      expect(
-        typeof usage?.promptTokens === 'number' ||
-          typeof usage?.totalTokens === 'number',
-      ).toBe(true);
-    } catch (e) {
-      if (stderr.length) console.error('Agent stderr:', stderr.join(''));
-      throw e;
-    } finally {
-      await cleanup();
-    }
-  });
-});
-
-(IS_SANDBOX ? describe.skip : describe)(
+(IS_SANDBOX || !HAS_API_KEY ? describe.skip : describe)(
   'acp flag backward compatibility',
   () => {
     it('should work with deprecated --experimental-acp flag and show warning', async () => {
