@@ -12,8 +12,31 @@ const stubCssPlugin: Plugin = {
   },
 };
 
+/**
+ * Stub @hoptrendy/web-templates — its src/generated/ files are gitignored
+ * and only produced by the build:templates step, which does not run in CI
+ * test jobs. Tests that pull in this package transitively (e.g. html.ts
+ * imported via @hoptrendy/hopcode-cli/export) only need a valid module shape.
+ */
+const stubWebTemplatesPlugin: Plugin = {
+  name: 'stub-web-templates',
+  enforce: 'pre',
+  resolveId(id) {
+    if (id === '@hoptrendy/web-templates') return '\0@hoptrendy/web-templates';
+  },
+  load(id) {
+    if (id === '\0@hoptrendy/web-templates') {
+      return `
+        export const EXPORT_HTML_TEMPLATE = '';
+        export const INSIGHT_JS = '';
+        export const INSIGHT_CSS = '';
+      `;
+    }
+  },
+};
+
 export default defineConfig({
-  plugins: [stubCssPlugin],
+  plugins: [stubCssPlugin, stubWebTemplatesPlugin],
   resolve: {
     alias: [
       {
