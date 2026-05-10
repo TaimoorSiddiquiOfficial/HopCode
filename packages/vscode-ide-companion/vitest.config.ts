@@ -8,6 +8,14 @@ export default defineConfig({
         __dirname,
         '../cli/src/export/index.ts',
       ),
+      '@hoptrendy/hopcode-core': path.resolve(
+        __dirname,
+        '../core/src/index.ts',
+      ),
+      '@hoptrendy/webui': path.resolve(
+        __dirname,
+        '../webui/src/index.ts',
+      ),
     },
   },
   test: {

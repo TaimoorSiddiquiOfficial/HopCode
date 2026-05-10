@@ -38,7 +38,7 @@ describe('imageSupport browser bundling', () => {
       platform: 'browser',
       write: false,
       logLevel: 'silent',
-      external: ['@hoptrendy/hopcode-core'],
+      external: ['@hoptrendy/hopcode-core', '@hoptrendy/webui'],
       loader: {
         '.png': 'dataurl',
       },
