@@ -17,6 +17,19 @@ interface ModelSelectorProps {
   onClose: () => void;
 }
 
+/**
+ * Returns true when the model is a non-runtime Qwen OAuth entry that has been
+ * discontinued.  Runtime snapshots (prefixed with `$runtime|`) remain
+ * selectable so users who already have a runtime model aren't blocked.
+ */
+function isDiscontinuedQwenOAuth(modelId: string): boolean {
+  return modelId.includes('(qwen-oauth)') && !modelId.startsWith('$runtime|');
+}
+
+const DISCONTINUED_DESCRIPTION = 'Discontinued — switch to Coding Plan or API Key';
+const DISCONTINUED_BLOCKED_MSG =
+  'Qwen OAuth free tier was discontinued on 2026-04-15';
+
 export const ModelSelector: FC<ModelSelectorProps> = ({
   visible,
   models,
@@ -27,6 +40,7 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [blockedMessage, setBlockedMessage] = useState<string | null>(null);
 
   // Reset selection when models change or when opened
   useEffect(() => {
@@ -62,10 +76,12 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
         case 'ArrowDown':
           event.preventDefault();
           setSelected((prev) => Math.min(prev + 1, models.length - 1));
+          setBlockedMessage(null);
           break;
         case 'ArrowUp':
           event.preventDefault();
           setSelected((prev) => Math.max(prev - 1, 0));
+          setBlockedMessage(null);
           break;
         case 'Enter':
           // Prevent form submission AND stop propagation so the input form
@@ -73,8 +89,12 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
           event.preventDefault();
           event.stopPropagation();
           if (models[selected]) {
-            onSelectModel(models[selected].modelId);
-            onClose();
+            if (isDiscontinuedQwenOAuth(models[selected].modelId)) {
+              setBlockedMessage(DISCONTINUED_BLOCKED_MSG);
+            } else {
+              onSelectModel(models[selected].modelId);
+              onClose();
+            }
           }
           break;
         case 'Escape':
@@ -110,11 +130,22 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
 
   const handleModelSelect = useCallback(
     (modelId: string) => {
+      if (isDiscontinuedQwenOAuth(modelId)) {
+        setBlockedMessage(DISCONTINUED_BLOCKED_MSG);
+        return;
+      }
       onSelectModel(modelId);
       onClose();
     },
     [onSelectModel, onClose],
   );
+
+  const handleModelHover = useCallback((index: number, modelId: string) => {
+    setSelected(index);
+    if (!isDiscontinuedQwenOAuth(modelId)) {
+      setBlockedMessage(null);
+    }
+  }, []);
 
   if (!visible) {
     return null;
@@ -149,18 +180,25 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
           models.map((model, index) => {
             const isActive = index === selected;
             const isCurrentModel = model.modelId === currentModelId;
+            const isDiscontinued = isDiscontinuedQwenOAuth(model.modelId);
+            const description = isDiscontinued
+              ? DISCONTINUED_DESCRIPTION
+              : model.description;
             return (
               <div
                 key={model.modelId}
                 data-index={index}
+                data-discontinued={isDiscontinued ? 'true' : undefined}
                 role="menuitem"
+                aria-disabled={isDiscontinued ? 'true' : undefined}
                 onClick={() => handleModelSelect(model.modelId)}
-                onMouseEnter={() => setSelected(index)}
+                onMouseOver={() => handleModelHover(index, model.modelId)}
                 className={[
                   'model-selector-item',
                   'mx-1 cursor-pointer rounded-[var(--app-list-border-radius)]',
                   'p-[var(--app-list-item-padding)]',
                   isActive ? 'bg-[var(--app-list-active-background)]' : '',
+                  isDiscontinued ? 'opacity-60' : '',
                 ].join(' ')}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -174,14 +212,22 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
                       ].join(' ')}
                     >
                       {model.name}
+                      {isDiscontinued && (
+                        <span
+                          data-testid="discontinued-badge"
+                          className="ml-1 text-[0.8em] text-[var(--app-secondary-foreground)]"
+                        >
+                          (Discontinued)
+                        </span>
+                      )}
                     </span>
-                    {model.description && (
+                    {description && (
                       <span className="block truncate text-[0.85em] text-[var(--app-secondary-foreground)] opacity-70">
-                        {model.description}
+                        {description}
                       </span>
                     )}
                   </div>
-                  {isCurrentModel && (
+                  {isCurrentModel && !isDiscontinued && (
                     <span className="flex-shrink-0 text-[var(--app-list-active-foreground)]">
                       <PlanCompletedIcon size={16} />
                     </span>
@@ -192,6 +238,16 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
           })
         )}
       </div>
+
+      {/* Blocked-selection banner */}
+      {blockedMessage && (
+        <div
+          data-testid="model-selector-blocked"
+          className="px-3 py-1.5 text-[0.85em] text-[var(--app-secondary-foreground)]"
+        >
+          {blockedMessage}
+        </div>
+      )}
     </div>
   );
 };

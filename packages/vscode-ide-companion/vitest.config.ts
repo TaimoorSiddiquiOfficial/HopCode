@@ -1,22 +1,39 @@
 import path from 'node:path';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, type Plugin } from 'vitest/config';
+
+const coreSrcPath = path.resolve(__dirname, '../core/src');
+
+/** Stub CSS imports so PostCSS/tailwind are never invoked during tests. */
+const stubCssPlugin: Plugin = {
+  name: 'stub-css',
+  enforce: 'pre',
+  transform(_, id) {
+    if (id.endsWith('.css')) return { code: 'export default {}', map: null };
+  },
+};
 
 export default defineConfig({
+  plugins: [stubCssPlugin],
   resolve: {
-    alias: {
-      '@hoptrendy/hopcode-cli/export': path.resolve(
-        __dirname,
-        '../cli/src/export/index.ts',
-      ),
-      '@hoptrendy/hopcode-core': path.resolve(
-        __dirname,
-        '../core/src/index.ts',
-      ),
-      '@hoptrendy/webui': path.resolve(
-        __dirname,
-        '../webui/src/index.ts',
-      ),
-    },
+    alias: [
+      {
+        // Sub-path imports: @hoptrendy/hopcode-core/src/foo/bar.js → packages/core/src/foo/bar.ts
+        find: /^@hoptrendy\/hopcode-core\/src\/(.+)\.js$/,
+        replacement: `${coreSrcPath}/$1.ts`,
+      },
+      {
+        find: '@hoptrendy/hopcode-core',
+        replacement: path.resolve(__dirname, '../core/src/index.ts'),
+      },
+      {
+        find: '@hoptrendy/hopcode-cli/export',
+        replacement: path.resolve(__dirname, '../cli/src/export/index.ts'),
+      },
+      {
+        find: '@hoptrendy/webui',
+        replacement: path.resolve(__dirname, '../webui/src/index.ts'),
+      },
+    ],
   },
   test: {
     globals: true,
