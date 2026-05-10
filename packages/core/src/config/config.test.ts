@@ -17,6 +17,7 @@ import {
   HopCodeLogger,
   isTelemetrySdkInitialized,
   shutdownTelemetry,
+  refreshSessionContext,
 } from '../telemetry/index.js';
 import type {
   ContentGenerator,
@@ -184,6 +185,7 @@ vi.mock('../telemetry/index.js', async (importOriginal) => {
     initializeTelemetry: vi.fn(),
     isTelemetrySdkInitialized: vi.fn(() => false),
     shutdownTelemetry: vi.fn().mockResolvedValue(undefined),
+    refreshSessionContext: vi.fn(),
     uiTelemetryService: {
       getLastPromptTokenCount: vi.fn(),
     },
@@ -399,6 +401,15 @@ describe('Server Config (config.ts)', () => {
 
       config.startNewSession();
       expect(cache.size()).toBe(0);
+    });
+
+    it('refreshes the telemetry session context with the new session ID', () => {
+      const config = new Config(baseParams);
+      vi.mocked(refreshSessionContext).mockClear();
+
+      const newSessionId = config.startNewSession();
+
+      expect(refreshSessionContext).toHaveBeenCalledWith(newSessionId);
     });
   });
 
