@@ -788,6 +788,7 @@ export async function main() {
       await runNonInteractiveStreamJson(
         nonInteractiveConfig,
         trimmedInput.length > 0 ? trimmedInput : '',
+        settings,
       );
       await runExitCleanup();
       // `runNonInteractiveStreamJson` doesn't return an explicit exit

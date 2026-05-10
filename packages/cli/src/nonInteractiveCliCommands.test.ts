@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleSlashCommand } from './nonInteractiveCliCommands.js';
+import { handleSlashCommand, getAvailableCommands } from './nonInteractiveCliCommands.js';
 import type { Config } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from './config/settings.js';
 import { CommandKind, type ExecutionMode } from './ui/commands/types.js';
@@ -15,9 +15,18 @@ import { filterCommandsForMode } from './services/commandUtils.js';
 const mockGetCommands = vi.hoisted(() => vi.fn());
 const mockGetCommandsForMode = vi.hoisted(() => vi.fn());
 const mockCommandServiceCreate = vi.hoisted(() => vi.fn());
+const mockCommandServiceFromCommands = vi.hoisted(() => vi.fn());
 vi.mock('./services/CommandService.js', () => ({
   CommandService: {
     create: mockCommandServiceCreate,
+    fromCommands: mockCommandServiceFromCommands,
+  },
+}));
+
+const mockLocalizeCommands = vi.hoisted(() => vi.fn());
+vi.mock('./services/DynamicCommandLocalizationService.js', () => ({
+  dynamicCommandLocalizationService: {
+    localizeCommands: mockLocalizeCommands,
   },
 }));
 
@@ -27,9 +36,26 @@ describe('handleSlashCommand', () => {
   let abortController: AbortController;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     // getCommandsForMode applies real mode filtering on top of getCommands()
     mockGetCommandsForMode.mockImplementation((mode: ExecutionMode) =>
       filterCommandsForMode(mockGetCommands(), mode),
+    );
+    mockCommandServiceFromCommands.mockImplementation((commands) => ({
+      getCommands: () => commands,
+      getCommandsForMode: (mode: ExecutionMode) =>
+        filterCommandsForMode(commands, mode),
+      getModelInvocableCommands: () =>
+        commands.filter(
+          (command: { modelInvocable?: boolean; hidden?: boolean }) =>
+            !command.hidden && command.modelInvocable === true,
+        ),
+    }));
+    mockLocalizeCommands.mockImplementation(
+      async (
+        _config: unknown,
+        commands: readonly unknown[],
+      ): Promise<readonly unknown[]> => commands,
     );
     mockCommandServiceCreate.mockResolvedValue({
       getCommands: mockGetCommands,
@@ -338,5 +364,114 @@ describe('handleSlashCommand', () => {
 
       expect(result.type).toBe('no_command');
     });
+  });
+});
+
+describe('getAvailableCommands', () => {
+  let mockConfig: Config;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockCommandServiceFromCommands.mockImplementation((commands) => ({
+      getCommands: () => commands,
+      getCommandsForMode: (mode: ExecutionMode) =>
+        filterCommandsForMode(commands, mode),
+      getModelInvocableCommands: () =>
+        commands.filter(
+          (command: { modelInvocable?: boolean; hidden?: boolean }) =>
+            !command.hidden && command.modelInvocable === true,
+        ),
+    }));
+    mockLocalizeCommands.mockImplementation(
+      async (
+        _config: unknown,
+        commands: readonly unknown[],
+      ): Promise<readonly unknown[]> => commands,
+    );
+    mockCommandServiceCreate.mockResolvedValue({
+      getCommands: mockGetCommands,
+      getCommandsForMode: mockGetCommandsForMode,
+    });
+
+    mockConfig = {
+      getExperimentalZedIntegration: vi.fn().mockReturnValue(false),
+      isInteractive: vi.fn().mockReturnValue(false),
+      getSessionId: vi.fn().mockReturnValue('test-session'),
+      getFolderTrustFeature: vi.fn().mockReturnValue(false),
+      getFolderTrust: vi.fn().mockReturnValue(false),
+      getProjectRoot: vi.fn().mockReturnValue('/test/project'),
+      getDisabledSlashCommands: vi.fn().mockReturnValue([]),
+      storage: {},
+    } as unknown as Config;
+  });
+
+  it('includes /export in the default non-interactive command list', async () => {
+    const exportCommand = {
+      name: 'export',
+      description: 'Export current session',
+      kind: CommandKind.BUILT_IN,
+      supportedModes: ['interactive', 'non_interactive', 'acp'] as const,
+      action: vi.fn(),
+    };
+    mockGetCommands.mockReturnValue([exportCommand]);
+
+    const commands = await getAvailableCommands(
+      mockConfig,
+      new AbortController().signal,
+    );
+
+    expect(commands.map((command) => command.name)).toContain('export');
+  });
+
+  it('does not enable dynamic localization without settings', async () => {
+    const command = {
+      name: 'review',
+      description: 'Review code',
+      kind: CommandKind.FILE,
+      supportedModes: ['acp'] as const,
+      action: vi.fn(),
+    };
+    mockGetCommands.mockReturnValue([command]);
+
+    await getAvailableCommands(mockConfig, new AbortController().signal, 'acp');
+
+    expect(mockLocalizeCommands).toHaveBeenCalledWith(
+      mockConfig,
+      [command],
+      expect.any(AbortSignal),
+      false,
+    );
+  });
+
+  it('enables dynamic localization when settings opt in', async () => {
+    const command = {
+      name: 'review',
+      description: 'Review code',
+      kind: CommandKind.FILE,
+      supportedModes: ['acp'] as const,
+      action: vi.fn(),
+    };
+    const settings = {
+      merged: {
+        general: {
+          dynamicCommandTranslation: true,
+        },
+      },
+    } as LoadedSettings;
+    mockGetCommands.mockReturnValue([command]);
+
+    await getAvailableCommands(
+      mockConfig,
+      new AbortController().signal,
+      'acp',
+      settings,
+    );
+
+    expect(mockLocalizeCommands).toHaveBeenCalledWith(
+      mockConfig,
+      [command],
+      expect.any(AbortSignal),
+      true,
+    );
   });
 });

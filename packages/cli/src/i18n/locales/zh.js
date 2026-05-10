@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -11,1849 +11,1732 @@ export default {
   // Help / UI Components
   // ============================================================================
   // Attachment hints
-  '? to manage attachments': '? ????',
-  '? ? select, Delete to remove, ? to exit': '? ? ??,Delete ??,? ??',
-  'Attachments: ': '??:',
-
-  'Basics:': '????:',
-  'Add context': '?????',
+  '↑ to manage attachments': '↑ 管理附件',
+  '← → select, Delete to remove, ↓ to exit': '← → 选择，Delete 删除，↓ 退出',
+  'Attachments: ': '附件：',
+  'Basics:': '基础功能：',
+  'Add context': '添加上下文',
   'Use {{symbol}} to specify files for context (e.g., {{example}}) to target specific files or folders.':
-    '?? {{symbol}} ?????????(??,{{example}}),????????????',
+    '使用 {{symbol}} 指定文件作为上下文（例如，{{example}}），用于定位特定文件或文件夹',
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
-  'Shell mode': 'Shell ??',
-  'IZN mode': 'IZN ??',
-  'plan mode': '????',
-  'auto-accept edits': '??????',
-  'Accepting edits': '????',
-  '(shift + tab to cycle)': '(shift + tab ??)',
-  '(tab to cycle)': '(? tab ??)',
+  'Shell mode': 'Shell 模式',
+  'YOLO mode': 'YOLO 模式',
+  'plan mode': '规划模式',
+  'auto-accept edits': '自动接受编辑',
+  'Accepting edits': '接受编辑',
+  '(shift + tab to cycle)': '(Shift + Tab 切换)',
+  '(tab to cycle)': '(按 Tab 切换)',
   'Execute shell commands via {{symbol}} (e.g., {{example1}}) or use natural language (e.g., {{example2}}).':
-    '?? {{symbol}} ?? shell ??(??,{{example1}})???????(??,{{example2}})',
+    '通过 {{symbol}} 执行 shell 命令（例如，{{example1}}）或使用自然语言（例如，{{example2}}）',
   '!': '!',
   '!npm run start': '!npm run start',
-  'start server': 'start server',
-  'Commands:': '??:',
-  'shell command': 'shell ??',
+  'Commands:': '命令：',
+  'shell command': 'shell 命令',
   'Model Context Protocol command (from external servers)':
-    '?????????(???????)',
-  'Keyboard Shortcuts:': '?????:',
-  'Toggle this help display': '???????',
-  'Toggle shell mode': '???????',
-  'Open command menu': '??????',
-  'Add file context': '???????',
-  'Accept suggestion / Autocomplete': '???? / ????',
-  'Reverse search history': '??????',
-  'Press ? again to close': '??? ? ??',
+    'Model Context Protocol 命令（来自外部服务器）',
+  'Keyboard Shortcuts:': '键盘快捷键：',
+  'Toggle this help display': '切换此帮助显示',
+  'Toggle shell mode': '切换命令行模式',
+  'Open command menu': '打开命令菜单',
+  'Add file context': '添加文件上下文',
+  'Accept suggestion / Autocomplete': '接受建议 / 自动补全',
+  'Reverse search history': '反向搜索历史',
+  'Press ? again to close': '再次按 ? 关闭',
   // Keyboard shortcuts panel descriptions
-  'for shell mode': '?????',
-  'for commands': '????',
-  'for file paths': '????',
-  'to clear input': '????',
-  'to cycle approvals': '??????',
-  'to quit': '??',
-  'for newline': '??',
-  'to clear screen': '??',
-  'to search history': '????',
-  'to paste images': '????',
-  'for external editor': '?????',
-  'to toggle compact mode': '??????',
-  'Jump through words in the input': '?????????',
-  'Close dialogs, cancel requests, or quit application': '?????????????????',
-  'New line': '??',
+  'for shell mode': '命令行模式',
+  'for commands': '命令菜单',
+  'for file paths': '文件路径',
+  'to clear input': '清空输入',
+  'to cycle approvals': '切换审批模式',
+  'to quit': '退出',
+  'for newline': '换行',
+  'to clear screen': '清屏',
+  'to search history': '搜索历史',
+  'to paste images': '粘贴图片',
+  'for external editor': '外部编辑器',
+  'to toggle compact mode': '切换紧凑模式',
+  'Jump through words in the input': '在输入中按单词跳转',
+  'Close dialogs, cancel requests, or quit application':
+    '关闭对话框、取消请求或退出应用程序',
+  'New line': '换行',
   'New line (Alt+Enter works for certain linux distros)':
-    '??(?? Linux ????? Alt+Enter)',
-  'Clear the screen': '??',
-  'Open input in external editor': '???????????',
-  'Send message': '????',
-  'Initializing...': '?????...',
+    '换行（某些 Linux 发行版支持 Alt+Enter）',
+  'Clear the screen': '清屏',
+  'Open input in external editor': '在外部编辑器中打开输入',
+  'Send message': '发送消息',
+  'Initializing...': '正在初始化...',
   'Connecting to MCP servers... ({{connected}}/{{total}})':
-    '????? MCP ???... ({{connected}}/{{total}})',
-  'Type your message or @path/to/file': '??????? @ ????',
-  '? for shortcuts': '? ? ?????',
+    '正在连接到 MCP servers... ({{connected}}/{{total}})',
+  'Type your message or @path/to/file': '输入您的消息或 @ 文件路径',
+  '? for shortcuts': '按 ? 查看快捷键',
   "Press 'i' for INSERT mode and 'Esc' for NORMAL mode.":
-    "? 'i' ??????,? 'Esc' ??????",
-  'Cancel operation / Clear input (double press)': '???? / ????(??)',
-  'Cycle approval modes': '????????',
-  'Cycle through your prompt history': '????????',
-  'For a full list of shortcuts, see {{docPath}}': '???????,??? {{docPath}}',
+    "按 'i' 进入插入模式，按 'Esc' 进入普通模式",
+  'Cancel operation / Clear input (double press)':
+    '取消操作 / 清空输入（双击）',
+  'Cycle approval modes': '循环切换审批模式',
+  'Cycle through your prompt history': '循环浏览提示历史',
+  'For a full list of shortcuts, see {{docPath}}':
+    '完整快捷键列表，请参阅 {{docPath}}',
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
-  'for help on HopCode': '?? HopCode ??',
-  'show version info': '??????',
-  'submit a bug report': '??????',
-  'About HopCode': '?? HopCode',
-  Status: '??',
+  'for help on HopCode': '获取 HopCode 帮助',
+  'show version info': '显示版本信息',
+  'submit a bug report': '提交错误报告',
+  Status: '状态',
 
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  HopCode: 'HopCode',
-  Runtime: '????',
-  OS: '????',
-  Auth: '??',
-  'CLI Version': 'CLI ??',
-  'Git Commit': 'Git ??',
-  Model: '??',
-  'Fast Model': '????',
-  Sandbox: '??',
-  'OS Platform': '??????',
-  'OS Arch': '??????',
-  'OS Release': '??????',
-  'Node.js Version': 'Node.js ??',
-  'NPM Version': 'NPM ??',
-  'Session ID': '?? ID',
-  'Auth Method': '????',
-  'Base URL': '?? URL',
-  Proxy: '??',
-  'Memory Usage': '????',
-  'IDE Client': 'IDE ???',
+  'HopCode': 'HopCode',
+  Runtime: '运行环境',
+  OS: '操作系统',
+  Auth: '认证',
+  Model: '模型',
+  'Fast Model': '快速模型',
+  Sandbox: '沙箱',
+  'Session ID': '会话 ID',
+  'Base URL': 'Base URL',
+  Proxy: '代理',
+  'Memory Usage': '内存使用',
+  'IDE Client': 'IDE 客户端',
 
   // ============================================================================
   // Commands - General
   // ============================================================================
   'Analyzes the project and creates a tailored HOPCODE.md file.':
-    '?????????? HOPCODE.md ??',
+    '分析项目并创建定制的 HOPCODE.md 文件',
   'List available HopCode tools. Usage: /tools [desc]':
-    '????? HopCode ?????:/tools [desc]',
-  'List available skills.': '???????',
-  'Available HopCode CLI tools:': '??? HopCode CLI ??:',
-  'No tools available': '??????',
-  'View or change the approval mode for tool usage': '??????????????',
+    '列出可用的 HopCode 工具。用法：/tools [desc]',
+  'List available skills.': '列出可用技能。',
+  'Available HopCode CLI tools:': '可用的 HopCode CLI 工具：',
+  'No tools available': '没有可用工具',
+  'View or change the approval mode for tool usage':
+    '查看或更改工具使用的审批模式',
   'Invalid approval mode "{{arg}}". Valid modes: {{modes}}':
-    '??????? "{{arg}}"?????:{{modes}}',
-  'Approval mode set to "{{mode}}"': '???????? "{{mode}}"',
-  'View or change the language setting': '?????????',
-  'change the theme': '????',
-  'Select Theme': '????',
-  Preview: '??',
-  '(Use Enter to select, Tab to configure scope)': '(?? Enter ??,Tab ?????)',
-  '(Use Enter to apply scope, Tab to go back)': '(?? Enter ?????,Tab ??)',
+    '无效的审批模式 "{{arg}}"。有效模式：{{modes}}',
+  'Approval mode set to "{{mode}}"': '审批模式已设置为 "{{mode}}"',
+  'View or change the language setting': '查看或更改语言设置',
+  'List background tasks (text dump — interactive dialog opens via the footer pill)':
+    '列出后台任务（文本列表；交互式对话框可通过页脚中的“后台任务”入口打开）',
+  'Delete a previous session': '删除先前的会话',
+  'Run installation and environment diagnostics': '运行安装和环境诊断',
+  'Browse dynamic model catalogs and choose which models stay enabled locally':
+    '浏览动态模型目录，并选择在本地保持启用的模型',
+  'Generate a one-line session recap now': '立即生成一条单行会话回顾',
+  'Rename the current conversation. --auto lets the fast model pick a title.':
+    '重命名当前对话。--auto 会让快速模型自动生成标题。',
+  'Rewind conversation to a previous turn': '将对话回退到之前的某一轮',
+  'change the theme': '更改主题',
+  'Select Theme': '选择主题',
+  Preview: '预览',
+  '(Use Enter to select, Tab to configure scope)':
+    '（使用 Enter 选择，Tab 配置作用域）',
+  '(Use Enter to apply scope, Tab to go back)':
+    '（使用 Enter 应用作用域，Tab 返回）',
   'Theme configuration unavailable due to NO_COLOR env variable.':
-    '?? NO_COLOR ????,????????',
-  'Theme "{{themeName}}" not found.': '????? "{{themeName}}"?',
+    '由于 NO_COLOR 环境变量，主题配置不可用。',
+  'Theme "{{themeName}}" not found.': '未找到主题 "{{themeName}}"。',
   'Theme "{{themeName}}" not found in selected scope.':
-    '???????????? "{{themeName}}"?',
-  'Clear conversation history and free up context': '????????????',
-  'Compresses the context by replacing it with a summary.': '????????????',
-  'open full HopCode documentation in your browser': '?????????? HopCode ??',
-  'Configuration not available.': '?????',
-  'change the auth method': '??????',
-  'Configure authentication information for login': '????????',
-  'Copy the last result or code snippet to clipboard': '?????????????????',
-  'Show working-tree change stats versus HEAD': '??????? HEAD ?????',
-  'Could not determine current working directory.': '???????????',
-  'Failed to compute git diff stats': '?? git diff ????',
+    '在所选作用域中未找到主题 "{{themeName}}"。',
+  'Clear conversation history and free up context': '清除对话历史并释放上下文',
+  'Compresses the context by replacing it with a summary.':
+    '通过摘要替换来压缩上下文',
+  'open full HopCode documentation in your browser':
+    '在浏览器中打开完整的 HopCode 文档',
+  'Configuration not available.': '配置不可用',
+  'Configure authentication information for login': '配置登录认证信息',
+  'Copy the last result or code snippet to clipboard':
+    '将最后的结果或代码片段复制到剪贴板',
+  'Show working-tree change stats versus HEAD':
+    '显示工作区相对 HEAD 的变更统计',
+  'Could not determine current working directory.': '无法确定当前工作目录。',
+  'Failed to compute git diff stats': '计算 git diff 统计失败',
   'No diff available. Either this is not a git repository, HEAD is missing, or a merge/rebase/cherry-pick/revert is in progress.':
-    '??? diff????? Git ???HEAD ??,????? merge/rebase/cherry-pick/revert?',
-  'Clean working tree � no changes against HEAD.': '????? �� ? HEAD ????',
+    '无可用 diff。可能不是 Git 仓库、HEAD 缺失，或正在执行 merge/rebase/cherry-pick/revert。',
+  'Clean working tree — no changes against HEAD.':
+    '工作区干净 —— 与 HEAD 无差异。',
   '{{count}} file changed, +{{added}} / -{{removed}}':
-    '{{count}} ?????,+{{added}} / -{{removed}}',
+    '{{count}} 个文件变更，+{{added}} / -{{removed}}',
   '{{count}} files changed, +{{added}} / -{{removed}}':
-    '{{count}} ?????,+{{added}} / -{{removed}}',
-  '{{count}} file changed': '{{count}} ?????',
-  '{{count}} files changed': '{{count}} ?????',
-  '�and {{hidden}} more (showing first {{shown}})':
-    '�?? {{hidden}} ?(???? {{shown}} ?)',
-  '(binary)': '(???)',
-  '(binary, new)': '(???,??)',
-  '(new)': '(??)',
-  '(new, partial)': '(??,????)',
-  '(deleted)': '(???)',
-  '(binary, deleted)': '(???,???)',
+    '{{count}} 个文件变更，+{{added}} / -{{removed}}',
+  '{{count}} file changed': '{{count}} 个文件变更',
+  '{{count}} files changed': '{{count}} 个文件变更',
+  '…and {{hidden}} more (showing first {{shown}})':
+    '…还有 {{hidden}} 个（仅显示前 {{shown}} 个）',
+  '(binary)': '（二进制）',
+  '(binary, new)': '（二进制，新增）',
+  '(new)': '（新增）',
+  '(new, partial)': '（新增，部分统计）',
+  '(deleted)': '（已删除）',
+  '(binary, deleted)': '（二进制，已删除）',
 
   // ============================================================================
   // Commands - Agents
   // ============================================================================
-  'Manage subagents for specialized task delegation.': '???????????????',
-  'Manage existing subagents (view, edit, delete).': '????????(????????)',
-  'Create a new subagent with guided setup.': '???????????????',
+  'Manage subagents for specialized task delegation.':
+    '管理用于专门任务委派的子智能体',
+  'Manage existing subagents (view, edit, delete).':
+    '管理现有子智能体（查看、编辑、删除）',
+  'Create a new subagent with guided setup.': '通过引导式设置创建新的子智能体',
 
   // ============================================================================
   // Agents - Management Dialog
   // ============================================================================
-  Agents: '???',
-  'Choose Action': '????',
-  'Edit {{name}}': '?? {{name}}',
-  'Edit Tools: {{name}}': '????: {{name}}',
-  'Edit Color: {{name}}': '????: {{name}}',
-  'Delete {{name}}': '?? {{name}}',
-  'Unknown Step': '????',
-  'Esc to close': '? Esc ??',
-  'Enter to select, ?? to navigate, Esc to close': 'Enter ??,?? ??,Esc ??',
-  'Esc to go back': '? Esc ??',
-  'Enter to confirm, Esc to cancel': 'Enter ??,Esc ??',
-  'Enter to select, ?? to navigate, Esc to go back': 'Enter ??,?? ??,Esc ??',
-  'Enter to submit, Esc to go back': 'Enter ??,Esc ??',
-  'Invalid step: {{step}}': '????: {{step}}',
-  'No subagents found.': '????????',
+  Agents: '智能体',
+  'Choose Action': '选择操作',
+  'Edit {{name}}': '编辑 {{name}}',
+  'Edit Tools: {{name}}': '编辑工具: {{name}}',
+  'Edit Color: {{name}}': '编辑颜色: {{name}}',
+  'Delete {{name}}': '删除 {{name}}',
+  'Unknown Step': '未知步骤',
+  'Esc to close': '按 Esc 关闭',
+  'Enter to select, ↑↓ to navigate, Esc to close':
+    'Enter 选择，↑↓ 导航，Esc 关闭',
+  'Esc to go back': '按 Esc 返回',
+  'Enter to confirm, Esc to cancel': 'Enter 确认，Esc 取消',
+  'Enter to select, ↑↓ to navigate, Esc to go back':
+    'Enter 选择，↑↓ 导航，Esc 返回',
+  'Enter to submit, Esc to go back': 'Enter 提交，Esc 返回',
+  'Invalid step: {{step}}': '无效步骤: {{step}}',
+  'No subagents found.': '未找到子智能体。',
   "Use '/agents create' to create your first subagent.":
-    "?? '/agents create' ????????????",
-  '(built-in)': '(??)',
-  '(overridden by project level agent)': '(??????????)',
-  'Project Level ({{path}})': '??? ({{path}})',
-  'User Level ({{path}})': '??? ({{path}})',
-  'Built-in Agents': '?????',
-  'Extension Agents': '?????',
-  'Using: {{count}} agents': '???: {{count}} ????',
-  'View Agent': '?????',
-  'Edit Agent': '?????',
-  'Delete Agent': '?????',
-  Back: '??',
-  'No agent selected': '??????',
-  'File Path: ': '????: ',
-  'Tools: ': '??: ',
-  'Color: ': '??: ',
-  'Description:': '??:',
-  'System Prompt:': '????:',
-  'Open in editor': '???????',
-  'Edit tools': '????',
-  'Edit color': '????',
-  '? Error:': '? ??:',
+    "使用 '/agents create' 创建您的第一个子智能体。",
+  '(built-in)': '（内置）',
+  '(overridden by project level agent)': '（已被项目级智能体覆盖）',
+  'Project Level ({{path}})': '项目级 ({{path}})',
+  'User Level ({{path}})': '用户级 ({{path}})',
+  'Built-in Agents': '内置智能体',
+  'Extension Agents': '扩展智能体',
+  'Using: {{count}} agents': '使用中: {{count}} 个智能体',
+  'View Agent': '查看智能体',
+  'Edit Agent': '编辑智能体',
+  'Delete Agent': '删除智能体',
+  Back: '返回',
+  'No agent selected': '未选择智能体',
+  'File Path: ': '文件路径: ',
+  'Tools: ': '工具: ',
+  'Color: ': '颜色: ',
+  'Description:': '描述:',
+  'System Prompt:': '系统提示:',
+  'Open in editor': '在编辑器中打开',
+  'Edit tools': '编辑工具',
+  'Edit color': '编辑颜色',
+  '❌ Error:': '❌ 错误:',
   'Are you sure you want to delete agent "{{name}}"?':
-    '????????? "{{name}}" ??',
+    '您确定要删除智能体 "{{name}}" 吗？',
   // ============================================================================
   // Agents - Creation Wizard
   // ============================================================================
-  'Project Level (.hopcode/agents/)': '??? (.hopcode/agents/)',
-  'User Level (~/.hopcode/agents/)': '??? (~/.hopcode/agents/)',
-  '? Subagent Created Successfully!': '? ????????!',
+  'Project Level (.hopcode/agents/)': '项目级 (.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)': '用户级 (~/.hopcode/agents/)',
+  '✅ Subagent Created Successfully!': '✅ 子智能体创建成功！',
   'Subagent "{{name}}" has been saved to {{level}} level.':
-    '???? "{{name}}" ???? {{level}} ???',
-  'Name: ': '??: ',
-  'Location: ': '??: ',
-  '? Error saving subagent:': '? ?????????:',
-  'Warnings:': '??:',
+    '子智能体 "{{name}}" 已保存到 {{level}} 级别。',
+  'Name: ': '名称: ',
+  'Location: ': '位置: ',
+  '❌ Error saving subagent:': '❌ 保存子智能体时出错:',
+  'Warnings:': '警告:',
   'Name "{{name}}" already exists at {{level}} level - will overwrite existing subagent':
-    '?? "{{name}}" ? {{level}} ????? - ?????????',
+    '名称 "{{name}}" 在 {{level}} 级别已存在 - 将覆盖现有子智能体',
   'Name "{{name}}" exists at user level - project level will take precedence':
-    '?? "{{name}}" ??????? - ???????',
+    '名称 "{{name}}" 在用户级别存在 - 项目级别将优先',
   'Name "{{name}}" exists at project level - existing subagent will take precedence':
-    '?? "{{name}}" ??????? - ?????????',
-  'Description is over {{length}} characters': '???? {{length}} ???',
-  'System prompt is over {{length}} characters': '?????? {{length}} ???',
+    '名称 "{{name}}" 在项目级别存在 - 现有子智能体将优先',
+  'Description is over {{length}} characters': '描述超过 {{length}} 个字符',
+  'System prompt is over {{length}} characters':
+    '系统提示超过 {{length}} 个字符',
   // Agents - Creation Wizard Steps
-  'Step {{n}}: Choose Location': '?? {{n}}: ????',
-  'Step {{n}}: Choose Generation Method': '?? {{n}}: ??????',
-  'Generate with HopCode (Recommended)': '?? HopCode ??(??)',
-  'Manual Creation': '????',
+  'Step {{n}}: Choose Location': '步骤 {{n}}: 选择位置',
+  'Step {{n}}: Choose Generation Method': '步骤 {{n}}: 选择生成方式',
+  'Generate with HopCode (Recommended)': '使用 HopCode 生成（推荐）',
+  'Manual Creation': '手动创建',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
-    '????????????????????(????????,?????)',
+    '描述此子智能体应该做什么以及何时使用它。（为了获得最佳效果，请全面描述）',
   'e.g., Expert code reviewer that reviews code based on best practices...':
-    '??:????????,??????????...',
-  'Generating subagent configuration...': '??????????...',
-  'Failed to generate subagent: {{error}}': '????????: {{error}}',
-  'Step {{n}}: Describe Your Subagent': '?? {{n}}: ????????',
-  'Step {{n}}: Enter Subagent Name': '?? {{n}}: ????????',
-  'Step {{n}}: Enter System Prompt': '?? {{n}}: ??????',
-  'Step {{n}}: Enter Description': '?? {{n}}: ????',
+    '例如：专业的代码审查员，根据最佳实践审查代码...',
+  'Generating subagent configuration...': '正在生成子智能体配置...',
+  'Failed to generate subagent: {{error}}': '生成子智能体失败: {{error}}',
+  'Step {{n}}: Describe Your Subagent': '步骤 {{n}}: 描述您的子智能体',
+  'Step {{n}}: Enter Subagent Name': '步骤 {{n}}: 输入子智能体名称',
+  'Step {{n}}: Enter System Prompt': '步骤 {{n}}: 输入系统提示',
+  'Step {{n}}: Enter Description': '步骤 {{n}}: 输入描述',
   // Agents - Tool Selection
-  'Step {{n}}: Select Tools': '?? {{n}}: ????',
-  'All Tools (Default)': '????(??)',
-  'All Tools': '????',
-  'Read-only Tools': '????',
-  'Read & Edit Tools': '???????',
-  'Read & Edit & Execution Tools': '??????????',
-  'All tools selected, including MCP tools': '???????,?? MCP ??',
-  'Selected tools:': '??????:',
-  'Read-only tools:': '????:',
-  'Edit tools:': '????:',
-  'Execution tools:': '????:',
-  'Step {{n}}: Choose Background Color': '?? {{n}}: ??????',
-  'Step {{n}}: Confirm and Save': '?? {{n}}: ?????',
+  'Step {{n}}: Select Tools': '步骤 {{n}}: 选择工具',
+  'All Tools (Default)': '所有工具（默认）',
+  'All Tools': '所有工具',
+  'Read-only Tools': '只读工具',
+  'Read & Edit Tools': '读取和编辑工具',
+  'Read & Edit & Execution Tools': '读取、编辑和执行工具',
+  'All tools selected, including MCP tools': '已选择所有工具，包括 MCP tools',
+  'Selected tools:': '已选择的工具:',
+  'Read-only tools:': '只读工具:',
+  'Edit tools:': '编辑工具:',
+  'Execution tools:': '执行工具:',
+  'Step {{n}}: Choose Background Color': '步骤 {{n}}: 选择背景颜色',
+  'Step {{n}}: Confirm and Save': '步骤 {{n}}: 确认并保存',
   // Agents - Navigation & Instructions
-  'Esc to cancel': '? Esc ??',
+  'Esc to cancel': '按 Esc 取消',
   'Press Enter to save, e to save and edit, Esc to go back':
-    '? Enter ??,e ?????,Esc ??',
+    '按 Enter 保存，e 保存并编辑，Esc 返回',
   'Press Enter to continue, {{navigation}}Esc to {{action}}':
-    '? Enter ??,{{navigation}}Esc {{action}}',
-  cancel: '??',
-  'go back': '??',
-  '?? to navigate, ': '?? ??,',
-  'Enter a clear, unique name for this subagent.': '???????????????????',
-  'e.g., Code Reviewer': '??:?????',
-  'Name cannot be empty.': '???????',
+    '按 Enter 继续，{{navigation}}Esc {{action}}',
+  cancel: '取消',
+  'go back': '返回',
+  '↑↓ to navigate, ': '↑↓ 导航，',
+  'Enter a clear, unique name for this subagent.':
+    '为此子智能体输入一个清晰、唯一的名称。',
+  'e.g., Code Reviewer': '例如：代码审查员',
+  'Name cannot be empty.': '名称不能为空。',
   "Write the system prompt that defines this subagent's behavior. Be comprehensive for best results.":
-    '?????????????????????????,??????',
-  'e.g., You are an expert code reviewer...': '??:????????????...',
-  'System prompt cannot be empty.': '?????????',
-  'Describe when and how this subagent should be used.': '????????????????',
+    '编写定义此子智能体行为的系统提示。为了获得最佳效果，请全面描述。',
+  'e.g., You are an expert code reviewer...':
+    '例如：您是一位专业的代码审查员...',
+  'System prompt cannot be empty.': '系统提示不能为空。',
+  'Describe when and how this subagent should be used.':
+    '描述何时以及如何使用此子智能体。',
   'e.g., Reviews code for best practices and potential bugs.':
-    '??:?????????????????',
-  'Description cannot be empty.': '???????',
-  'Failed to launch editor: {{error}}': '???????: {{error}}',
-  'Failed to save and edit subagent: {{error}}': '???????????: {{error}}',
+    '例如：审查代码以查找最佳实践和潜在错误。',
+  'Description cannot be empty.': '描述不能为空。',
+  'Failed to launch editor: {{error}}': '启动编辑器失败: {{error}}',
+  'Failed to save and edit subagent: {{error}}':
+    '保存并编辑子智能体失败: {{error}}',
 
   // ============================================================================
   // Extensions - Management Dialog
   // ============================================================================
-  'Manage Extensions': '????',
-  'Extension Details': '????',
-  'View Extension': '????',
-  'Update Extension': '????',
-  'Disable Extension': '????',
-  'Enable Extension': '????',
-  'Uninstall Extension': '????',
-  'Select Scope': '?????',
-  'User Scope': '?????',
-  'Workspace Scope': '??????',
-  'No extensions found.': '??????',
-  Active: '???',
-  Disabled: '???',
-  'Update available': '?????',
-  'Up to date': '????',
-  'Checking...': '???...',
-  'Updating...': '???...',
-  Unknown: '??',
-  Error: '??',
-  'Version:': '??:',
-  'Status:': '??:',
+  'Manage Extensions': '管理扩展',
+  'Extension Details': '扩展详情',
+  'View Extension': '查看扩展',
+  'Update Extension': '更新扩展',
+  'Disable Extension': '禁用扩展',
+  'Enable Extension': '启用扩展',
+  'Uninstall Extension': '卸载扩展',
+  'Select Scope': '选择作用域',
+  'User Scope': '用户作用域',
+  'Workspace Scope': '工作区作用域',
+  'No extensions found.': '未找到扩展。',
+  'Updating...': '更新中...',
+  Unknown: '未知',
+  Error: '错误',
+  'Stopped because': '停止原因',
+  'Version:': '版本：',
+  'Status:': '状态：',
   'Are you sure you want to uninstall extension "{{name}}"?':
-    '??????? "{{name}}" ??',
-  'This action cannot be undone.': '????????',
-  'Extension "{{name}}" disabled successfully.': '?? "{{name}}" ?????',
-  'Extension "{{name}}" enabled successfully.': '?? "{{name}}" ?????',
-  'Extension "{{name}}" updated successfully.': '?? "{{name}}" ?????',
-  'Failed to update extension "{{name}}": {{error}}':
-    '???? "{{name}}" ??:{{error}}',
-  'Select the scope for this action:': '?????????:',
-  'User - Applies to all projects': '?? - ???????',
-  'Workspace - Applies to current project only': '??? - ????????',
+    '确定要卸载扩展 "{{name}}" 吗？',
+  'This action cannot be undone.': '此操作无法撤销。',
+  'Extension "{{name}}" updated successfully.': '扩展 "{{name}}" 更新成功。',
   // Extension dialog - missing keys
-  'Name:': '??:',
-  'MCP Servers:': 'MCP ???:',
-  'Settings:': '??:',
-  active: '???',
-  'View Details': '????',
-  'Update failed:': '????:',
-  'Updating {{name}}...': '???? {{name}}...',
-  'Update complete!': '????!',
-  'User (global)': '??(??)',
-  'Workspace (project-specific)': '???(????)',
-  'Disable "{{name}}" - Select Scope': '?? "{{name}}" - ?????',
-  'Enable "{{name}}" - Select Scope': '?? "{{name}}" - ?????',
-  'No extension selected': '?????',
-  'Press Y/Enter to confirm, N/Esc to cancel': '? Y/Enter ??,N/Esc ??',
-  'Y/Enter to confirm, N/Esc to cancel': 'Y/Enter ??,N/Esc ??',
-  '{{count}} extensions installed': '??? {{count}} ???',
+  'Name:': '名称：',
+  'MCP Servers:': 'MCP Servers：',
+  'Settings:': '设置：',
+  active: '已启用',
+  'View Details': '查看详情',
+  'Update failed:': '更新失败：',
+  'Updating {{name}}...': '正在更新 {{name}}...',
+  'Update complete!': '更新完成！',
+  'User (global)': '用户（全局）',
+  'Workspace (project-specific)': '工作区（项目特定）',
+  'Disable "{{name}}" - Select Scope': '禁用 "{{name}}" - 选择作用域',
+  'Enable "{{name}}" - Select Scope': '启用 "{{name}}" - 选择作用域',
+  'No extension selected': '未选择扩展',
+  '{{count}} extensions installed': '已安装 {{count}} 个扩展',
   "Use '/extensions install' to install your first extension.":
-    "?? '/extensions install' ??????????",
+    "使用 '/extensions install' 安装您的第一个扩展。",
   // Update status values
-  'up to date': '????',
-  'update available': '?????',
-  'checking...': '???...',
-  'not updatable': '????',
-  error: '??',
+  'up to date': '已是最新',
+  'update available': '有可用更新',
+  'checking...': '检查中...',
+  'not updatable': '不可更新',
+  error: '错误',
 
   // ============================================================================
   // Commands - General (continued)
   // ============================================================================
-  'View and edit HopCode settings': '????? HopCode ??',
-  Settings: '??',
+  'View and edit HopCode settings': '查看和编辑 HopCode 设置',
+  Settings: '设置',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    '?????,???? HopCode?? r ??????????',
-  'The command "/{{command}}" is not supported in non-interactive mode.':
-    '?????????????? "/{{command}}"?',
+    '要查看更改，必须重启 HopCode。按 r 退出并立即应用更改。',
   // ============================================================================
   // Settings Labels
   // ============================================================================
-  'Vim Mode': 'Vim ??',
-  'Disable Auto Update': '??????',
-  'Attribution: commit': '??:??',
-  'Terminal Bell Notification': '??????',
-  'Enable Usage Statistics': '??????',
-  Theme: '??',
-  'Preferred Editor': '?????',
-  'Auto-connect to IDE': '????? IDE',
-  'Enable Prompt Completion': '??????',
-  'Debug Keystroke Logging': '??????',
-  'Language: UI': '??:??',
-  'Language: Model': '??:??',
-  'Output Format': '????',
-  'Hide Window Title': '??????',
-  'Show Status in Title': '????????',
-  'Hide Tips': '????',
-  'Show Line Numbers in Code': '????????',
-  'Show Citations': '????',
-  'Custom Witty Phrases': '???????',
-  'Show Welcome Back Dialog': '?????????',
-  'Enable User Feedback': '??????',
-  'How is HopCode doing this session? (optional)': 'HopCode ???????(??)',
-  Bad: '???',
-  Fine: '??',
-  Good: '??',
-  Dismiss: '??',
-  'Not Sure Yet': '????',
-  'Any other key': '?????',
-  'Disable Loading Phrases': '??????',
-  'Screen Reader Mode': '???????',
-  'IDE Mode': 'IDE ??',
-  'Max Session Turns': '??????',
-  'Skip Next Speaker Check': '??????????',
-  'Skip Loop Detection': '??????',
-  'Skip Startup Context': '???????',
-  'Enable OpenAI Logging': '?? OpenAI ??',
-  'OpenAI Logging Directory': 'OpenAI ????',
-  Timeout: '??',
-  'Max Retries': '??????',
-  'Disable Cache Control': '??????',
-  'Memory Discovery Max Dirs': '?????????',
-  'Load Memory From Include Directories': '?????????',
-  'Respect .gitignore': '?? .gitignore',
-  'Respect .hopcodeignore': '?? .hopcodeignore',
-  'Enable Recursive File Search': '????????',
-  'Disable Fuzzy Search': '??????',
-  'Interactive Shell (PTY)': '??? Shell (PTY)',
-  'Show Color': '????',
-  'Auto Accept': '????',
-  'Use Ripgrep': '?? Ripgrep',
-  'Use Builtin Ripgrep': '???? Ripgrep',
-  'Enable Tool Output Truncation': '????????',
-  'Tool Output Truncation Threshold': '????????',
-  'Tool Output Truncation Lines': '????????',
-  'Folder Trust': '?????',
-  'Vision Model Preview': '??????',
-  'Tool Schema Compliance': '?? Schema ???',
+  'Vim Mode': 'Vim 模式',
+  'Attribution: commit': '署名：提交',
+  'Terminal Bell Notification': '终端响铃通知',
+  'Enable Usage Statistics': '启用使用统计',
+  Theme: '主题',
+  'Preferred Editor': '首选编辑器',
+  'Auto-connect to IDE': '自动连接到 IDE',
+  'Debug Keystroke Logging': '调试按键记录',
+  'Language: UI': '语言：界面',
+  'Language: Model': '语言：模型',
+  'Output Format': '输出格式',
+  'Hide Window Title': '隐藏窗口标题',
+  'Show Status in Title': '在标题中显示状态',
+  'Hide Tips': '隐藏提示',
+  'Show Line Numbers in Code': '在代码中显示行号',
+  'Show Citations': '显示引用',
+  'Custom Witty Phrases': '自定义诙谐短语',
+  'Show Welcome Back Dialog': '显示欢迎回来对话框',
+  'Enable User Feedback': '启用用户反馈',
+  'How is HopCode doing this session? (optional)': 'HopCode 这次表现如何？（可选）',
+  Bad: '不满意',
+  Fine: '还行',
+  Good: '满意',
+  Dismiss: '忽略',
+  'Screen Reader Mode': '屏幕阅读器模式',
+  'Max Session Turns': '最大会话轮次',
+  'Skip Next Speaker Check': '跳过下一个说话者检查',
+  'Skip Loop Detection': '跳过循环检测',
+  'Skip Startup Context': '跳过启动上下文',
+  'Enable OpenAI Logging': '启用 OpenAI 日志',
+  'OpenAI Logging Directory': 'OpenAI 日志目录',
+  Timeout: '超时',
+  'Max Retries': '最大重试次数',
+  'Load Memory From Include Directories': '从包含目录加载内存',
+  'Respect .gitignore': '遵守 .gitignore',
+  'Respect .hopcodeignore': '遵守 .hopcodeignore',
+  'Enable Recursive File Search': '启用递归文件搜索',
+  'Interactive Shell (PTY)': '交互式 Shell (PTY)',
+  'Show Color': '显示颜色',
+  'Auto Accept': '自动接受',
+  'Use Ripgrep': '使用 Ripgrep',
+  'Use Builtin Ripgrep': '使用内置 Ripgrep',
+  'Tool Output Truncation Threshold': '工具输出截断阈值',
+  'Tool Output Truncation Lines': '工具输出截断行数',
+  'Folder Trust': '文件夹信任',
+  'Tool Schema Compliance': 'Tool Schema 兼容性',
   // Settings enum options
-  'Auto (detect from system)': '??(?????)',
-  'Auto (detect terminal theme)': '??(??????)',
-  Auto: '??',
-  Text: '??',
+  'Auto (detect from system)': '自动（从系统检测）',
+  'Auto (detect terminal theme)': '自动（检测终端主题）',
+  Auto: '自动',
+  Text: '文本',
   JSON: 'JSON',
-  Plan: '??',
-  Default: '??',
-  'Auto Edit': '????',
-  IZN: 'IZN',
-  'toggle vim mode on/off': '?? vim ????',
+  Plan: '规划',
+  Default: '默认',
+  'Auto Edit': '自动编辑',
+  YOLO: 'YOLO',
+  'toggle vim mode on/off': '切换 vim 模式开关',
   'check session stats. Usage: /stats [model|tools]':
-    '???????????:/stats [model|tools]',
-  'Show model-specific usage statistics.': '?????????????',
-  'Show tool-specific usage statistics.': '?????????????',
-  'exit the cli': '???????',
-  'Open MCP management dialog, or authenticate with OAuth-enabled servers':
-    '?? MCP ?????,???? OAuth ???????????',
-  'List configured MCP servers and tools, or authenticate with OAuth-enabled servers':
-    '?????? MCP ??????,????? OAuth ??????????',
-  'Manage workspace directories': '???????',
+    '检查会话统计信息。用法：/stats [model|tools]',
+  'Show model-specific usage statistics.': '显示模型相关的使用统计信息',
+  'Show tool-specific usage statistics.': '显示工具相关的使用统计信息',
+  'exit the cli': '退出命令行界面',
+  'Manage workspace directories': '管理工作区目录',
   'Add directories to the workspace. Use comma to separate multiple paths':
-    '????????????????????',
-  'Show all directories in the workspace': '???????????',
-  'set external editor preference': '??????????',
-  'Select Editor': '?????',
-  'Editor Preference': '??????',
+    '将目录添加到工作区。使用逗号分隔多个路径',
+  'Show all directories in the workspace': '显示工作区中的所有目录',
+  'set external editor preference': '设置外部编辑器首选项',
+  'Select Editor': '选择编辑器',
+  'Editor Preference': '编辑器首选项',
   'These editors are currently supported. Please note that some editors cannot be used in sandbox mode.':
-    '?????????????,????????????????',
-  'Your preferred editor is:': '????????:',
-  'Manage extensions': '????',
-  'Manage installed extensions': '????????',
-  'List active extensions': '??????',
-  'Update extensions. Usage: update <extension-names>|--all':
-    '???????:update <extension-names>|--all',
-  'Disable an extension': '????',
-  'Enable an extension': '????',
-  'Install an extension from a git repo or local path': '? Git ???????????',
-  'Uninstall an extension': '????',
-  'No extensions installed.': '??????',
-  'Usage: /extensions update <extension-names>|--all':
-    '??:/extensions update <???>|--all',
-  'Extension "{{name}}" not found.': '????? "{{name}}"?',
-  'No extensions to update.': '?????????',
-  'Usage: /extensions install <source>': '??:/extensions install <??>',
-  'Installing extension from "{{source}}"...': '??? "{{source}}" ????...',
-  'Extension "{{name}}" installed successfully.': '?? "{{name}}" ?????',
+    '当前支持以下编辑器。请注意，某些编辑器无法在沙箱模式下使用。',
+  'Your preferred editor is:': '您的首选编辑器是：',
+  'Manage extensions': '管理扩展',
+  'Manage installed extensions': '管理已安装的扩展',
+  'Disable an extension': '禁用扩展',
+  'Enable an extension': '启用扩展',
+  'Install an extension from a git repo or local path':
+    '从 Git 仓库或本地路径安装扩展',
+  'Uninstall an extension': '卸载扩展',
+  'No extensions installed.': '未安装扩展。',
+  'Extension "{{name}}" not found.': '未找到扩展 "{{name}}"。',
+  'No extensions to update.': '没有可更新的扩展。',
+  'Usage: /extensions install <source>': '用法：/extensions install <来源>',
+  'Installing extension from "{{source}}"...':
+    '正在从 "{{source}}" 安装扩展...',
+  'Extension "{{name}}" installed successfully.': '扩展 "{{name}}" 安装成功。',
   'Failed to install extension from "{{source}}": {{error}}':
-    '? "{{source}}" ??????:{{error}}',
-  'Usage: /extensions uninstall <extension-name>':
-    '??:/extensions uninstall <???>',
-  'Uninstalling extension "{{name}}"...': '?????? "{{name}}"...',
-  'Extension "{{name}}" uninstalled successfully.': '?? "{{name}}" ?????',
-  'Failed to uninstall extension "{{name}}": {{error}}':
-    '???? "{{name}}" ??:{{error}}',
-  'Usage: /extensions {{command}} <extension> [--scope=<user|workspace>]':
-    '??:/extensions {{command}} <??> [--scope=<user|workspace>]',
-  'Unsupported scope "{{scope}}", should be one of "user" or "workspace"':
-    '??????? "{{scope}}",?? "user" ? "workspace"',
-  'Extension "{{name}}" disabled for scope "{{scope}}"':
-    '?? "{{name}}" ????? "{{scope}}" ???',
-  'Extension "{{name}}" enabled for scope "{{scope}}"':
-    '?? "{{name}}" ????? "{{scope}}" ???',
-  'Do you want to continue? [Y/n]: ': '?????[Y/n]:',
-  'Do you want to continue?': '?????',
-  'Installing extension "{{name}}".': '?????? "{{name}}"?',
+    '从 "{{source}}" 安装扩展失败：{{error}}',
+  'Do you want to continue? [Y/n]: ': '是否继续？[Y/n]：',
+  'Do you want to continue?': '是否继续？',
+  'Installing extension "{{name}}".': '正在安装扩展 "{{name}}"。',
   '**Extensions may introduce unexpected behavior. Ensure you have investigated the extension source and trust the author.**':
-    '**?????????????????????????????**',
-  'This extension will run the following MCP servers:': '???????? MCP ???:',
-  local: '??',
-  remote: '??',
+    '**扩展可能会引入意外行为。请确保您已调查过扩展源并信任作者。**',
+  'This extension will run the following MCP servers:':
+    '此扩展将运行以下 MCP servers：',
+  local: '本地',
+  remote: '远程',
   'This extension will add the following commands: {{commands}}.':
-    '??????????:{{commands}}?',
+    '此扩展将添加以下命令：{{commands}}。',
   'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    '?????? {{fileName}} ??? HOPCODE.md ???????',
-  'This extension will exclude the following core tools: {{tools}}':
-    '????????????:{{tools}}',
-  'This extension will install the following skills:': '??????????:',
-  'This extension will install the following subagents:': '????????????:',
-  'Installation cancelled for "{{name}}".': '????? "{{name}}"?',
+    '此扩展将使用 {{fileName}} 向您的 HOPCODE.md 上下文追加信息',
+  'This extension will install the following skills:': '此扩展将安装以下技能：',
+  'This extension will install the following subagents:':
+    '此扩展将安装以下子智能体：',
+  'Installation cancelled for "{{name}}".': '已取消安装 "{{name}}"。',
   'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.':
-    '??????? {{originSource}} ???????????????? HopCode?',
+    '您正在安装来自 {{originSource}} 的扩展。某些功能可能无法完美兼容 HopCode。',
   '--ref and --auto-update are not applicable for marketplace extensions.':
-    '--ref ? --auto-update ?????????',
+    '--ref 和 --auto-update 不适用于市场扩展。',
   'Extension "{{name}}" installed successfully and enabled.':
-    '?? "{{name}}" ?????????',
-  'Installs an extension from a git repository URL, local path, or claude marketplace (marketplace-url:plugin-name).':
-    '? Git ?? URL?????? Claude ??(marketplace-url:plugin-name)?????',
+    '扩展 "{{name}}" 安装成功并已启用。',
   'The github URL, local path, or marketplace source (marketplace-url:plugin-name) of the extension to install.':
-    '??????? GitHub URL?????????(marketplace-url:plugin-name)?',
-  'The git ref to install from.': '???? Git ???',
-  'Enable auto-update for this extension.': '???????????',
-  'Enable pre-release versions for this extension.': '????????????',
+    '要安装的扩展的 GitHub URL、本地路径或市场源（marketplace-url:plugin-name）。',
+  'The git ref to install from.': '要安装的 Git 引用。',
+  'Enable auto-update for this extension.': '为此扩展启用自动更新。',
+  'Enable pre-release versions for this extension.': '为此扩展启用预发布版本。',
   'Acknowledge the security risks of installing an extension and skip the confirmation prompt.':
-    '???????????????????',
-  'The source argument must be provided.': '?????????',
-  'Extension "{{name}}" successfully uninstalled.': '?? "{{name}}" ?????',
-  'Uninstalls an extension.': '?????',
-  'The name or source path of the extension to uninstall.': '??????????????',
+    '确认安装扩展的安全风险并跳过确认提示。',
+  'The source argument must be provided.': '必须提供来源参数。',
+  'Extension "{{name}}" successfully uninstalled.':
+    '扩展 "{{name}}" 卸载成功。',
+  'Uninstalls an extension.': '卸载扩展。',
+  'The name or source path of the extension to uninstall.':
+    '要卸载的扩展的名称或源路径。',
   'Please include the name of the extension to uninstall as a positional argument.':
-    '?????????????????',
-  'Enables an extension.': '?????',
-  'The name of the extension to enable.': '?????????',
+    '请将要卸载的扩展名称作为位置参数。',
+  'Enables an extension.': '启用扩展。',
+  'The name of the extension to enable.': '要启用的扩展名称。',
   'The scope to enable the extenison in. If not set, will be enabled in all scopes.':
-    '??????????????,???????????',
+    '启用扩展的作用域。如果未设置，将在所有作用域中启用。',
   'Extension "{{name}}" successfully enabled for scope "{{scope}}".':
-    '?? "{{name}}" ????? "{{scope}}" ????',
+    '扩展 "{{name}}" 已在作用域 "{{scope}}" 中启用。',
   'Extension "{{name}}" successfully enabled in all scopes.':
-    '?? "{{name}}" ???????????',
+    '扩展 "{{name}}" 已在所有作用域中启用。',
   'Invalid scope: {{scope}}. Please use one of {{scopes}}.':
-    '??????:{{scope}}???? {{scopes}} ???',
-  'Disables an extension.': '?????',
-  'The name of the extension to disable.': '?????????',
-  'The scope to disable the extenison in.': '?????????',
+    '无效的作用域：{{scope}}。请使用 {{scopes}} 之一。',
+  'Disables an extension.': '禁用扩展。',
+  'The name of the extension to disable.': '要禁用的扩展名称。',
+  'The scope to disable the extenison in.': '禁用扩展的作用域。',
   'Extension "{{name}}" successfully disabled for scope "{{scope}}".':
-    '?? "{{name}}" ????? "{{scope}}" ????',
-  'Extension "{{name}}" successfully updated: {{oldVersion}} ? {{newVersion}}.':
-    '?? "{{name}}" ????:{{oldVersion}} ? {{newVersion}}?',
+    '扩展 "{{name}}" 已在作用域 "{{scope}}" 中禁用。',
+  'Extension "{{name}}" successfully updated: {{oldVersion}} → {{newVersion}}.':
+    '扩展 "{{name}}" 更新成功：{{oldVersion}} → {{newVersion}}。',
   'Unable to install extension "{{name}}" due to missing install metadata':
-    '?????????,?????? "{{name}}"',
-  'Extension "{{name}}" is already up to date.': '?? "{{name}}" ???????',
+    '由于缺少安装元数据，无法安装扩展 "{{name}}"',
+  'Extension "{{name}}" is already up to date.':
+    '扩展 "{{name}}" 已是最新版本。',
   'Updates all extensions or a named extension to the latest version.':
-    '??????????????????',
-  'The name of the extension to update.': '?????????',
-  'Update all extensions.': '???????',
-  'Either an extension name or --all must be provided': '????????? --all',
-  'Lists installed extensions.': '?????????',
-  'Path:': '??:',
-  'Source:': '??:',
-  'Type:': '??:',
-  'Ref:': '??:',
-  'Release tag:': '????:',
-  'Enabled (User):': '???(??):',
-  'Enabled (Workspace):': '???(???):',
-  'Context files:': '?????:',
-  'Skills:': '??:',
-  'Agents:': '???:',
-  'MCP servers:': 'MCP ???:',
-  'Link extension failed to install.': '?????????',
+    '将所有扩展或指定扩展更新到最新版本。',
+  'The name of the extension to update.': '要更新的扩展名称。',
+  'Update all extensions.': '更新所有扩展。',
+  'Either an extension name or --all must be provided':
+    '必须提供扩展名称或 --all',
+  'Lists installed extensions.': '列出已安装的扩展。',
+  'Path:': '路径：',
+  'Source:': '来源：',
+  'Type:': '类型：',
+  'Ref:': '引用：',
+  'Release tag:': '发布标签：',
+  'Enabled (User):': '已启用（用户）：',
+  'Enabled (Workspace):': '已启用（工作区）：',
+  'Context files:': '上下文文件：',
+  'Skills:': '技能：',
+  'Agents:': '智能体：',
+  'MCP servers:': 'MCP servers：',
+  'Link extension failed to install.': '链接扩展安装失败。',
   'Extension "{{name}}" linked successfully and enabled.':
-    '?? "{{name}}" ?????????',
+    '扩展 "{{name}}" 链接成功并已启用。',
   'Links an extension from a local path. Updates made to the local path will always be reflected.':
-    '????????????????????????',
-  'The name of the extension to link.': '?????????',
-  'Set a specific setting for an extension.': '??????????',
-  'Name of the extension to configure.': '?????????',
-  'The setting to configure (name or env var).': '??????(???????)?',
-  'The scope to set the setting in.': '?????????',
-  'List all settings for an extension.': '??????????',
-  'Name of the extension.': '?????',
+    '从本地路径链接扩展。对本地路径的更新将始终反映。',
+  'The name of the extension to link.': '要链接的扩展名称。',
+  'Set a specific setting for an extension.': '为扩展设置特定配置。',
+  'Name of the extension to configure.': '要配置的扩展名称。',
+  'The setting to configure (name or env var).':
+    '要配置的设置（名称或环境变量）。',
+  'The scope to set the setting in.': '设置配置的作用域。',
+  'List all settings for an extension.': '列出扩展的所有设置。',
+  'Name of the extension.': '扩展名称。',
   'Extension "{{name}}" has no settings to configure.':
-    '?? "{{name}}" ?????????',
-  'Settings for "{{name}}":': '"{{name}}" ???:',
-  '(workspace)': '(???)',
-  '(user)': '(??)',
-  '[not set]': '[???]',
-  '[value stored in keychain]': '[????????]',
-  'Value:': '?:',
-  'Manage extension settings.': '???????',
-  'You need to specify a command (set or list).': '???????(set ? list)?',
+    '扩展 "{{name}}" 没有可配置的设置。',
+  'Settings for "{{name}}":': '"{{name}}" 的设置：',
+  '(workspace)': '（工作区）',
+  '(user)': '（用户）',
+  '[not set]': '［未设置］',
+  '[value stored in keychain]': '［值存储在钥匙串中］',
+  'Value:': '值：',
+  'Manage extension settings.': '管理扩展设置。',
+  'You need to specify a command (set or list).':
+    '您需要指定命令（set 或 list）。',
   // ============================================================================
   // Plugin Choice / Marketplace
   // ============================================================================
-  'No plugins available in this marketplace.': '????????????',
+  'No plugins available in this marketplace.': '此市场中没有可用的插件。',
   'Select a plugin to install from marketplace "{{name}}":':
-    '??? "{{name}}" ?????????:',
-  'Plugin selection cancelled.': '????????',
-  'Select a plugin from "{{name}}"': '? "{{name}}" ?????',
-  'Use ?? or j/k to navigate, Enter to select, Escape to cancel':
-    '?? ?? ? j/k ??,????,Esc ??',
-  '{{count}} more above': '???? {{count}} ?',
-  '{{count}} more below': '???? {{count}} ?',
-  'manage IDE integration': '?? IDE ??',
-  'check status of IDE integration': '?? IDE ????',
+    '从市场 "{{name}}" 中选择要安装的插件：',
+  'Plugin selection cancelled.': '插件选择已取消。',
+  'Select a plugin from "{{name}}"': '从 "{{name}}" 中选择插件',
+  'Use ↑↓ or j/k to navigate, Enter to select, Escape to cancel':
+    '使用 ↑↓ 或 j/k 导航，Enter 选择，Escape 取消',
+  '{{count}} more above': '上方还有 {{count}} 项',
+  '{{count}} more below': '下方还有 {{count}} 项',
+  'manage IDE integration': '管理 IDE 集成',
+  'check status of IDE integration': '检查 IDE 集成状态',
   'install required IDE companion for {{ideName}}':
-    '?? {{ideName}} ??? IDE ????',
-  'enable IDE integration': '?? IDE ??',
-  'disable IDE integration': '?? IDE ??',
+    '安装 {{ideName}} 所需的 IDE 配套工具',
+  'enable IDE integration': '启用 IDE 集成',
+  'disable IDE integration': '禁用 IDE 集成',
   'IDE integration is not supported in your current environment. To use this feature, run HopCode in one of these supported IDEs: VS Code or VS Code forks.':
-    '???????? IDE ?????????,??????? IDE ????? HopCode:VS Code ? VS Code ?????',
-  'Set up GitHub Actions': '?? GitHub Actions',
+    '您当前环境不支持 IDE 集成。要使用此功能，请在以下支持的 IDE 之一中运行 HopCode：VS Code 或 VS Code 分支版本。',
+  'Set up GitHub Actions': '设置 GitHub Actions',
   'Configure terminal keybindings for multiline input (VS Code, Cursor, Windsurf, Trae)':
-    '???????????????(VS Code?Cursor?Windsurf?Trae)',
+    '配置终端按键绑定以支持多行输入（VS Code、Cursor、Windsurf、Trae）',
   'Please restart your terminal for the changes to take effect.':
-    '????????????',
-  'Failed to configure terminal: {{error}}': '??????:{{error}}',
+    '请重启终端以使更改生效。',
+  'Failed to configure terminal: {{error}}': '配置终端失败：{{error}}',
   'Could not determine {{terminalName}} config path on Windows: APPDATA environment variable is not set.':
-    '???? {{terminalName}} ? Windows ??????:??? APPDATA ?????',
+    '无法确定 {{terminalName}} 在 Windows 上的配置路径：未设置 APPDATA 环境变量。',
   '{{terminalName}} keybindings.json exists but is not a valid JSON array. Please fix the file manually or delete it to allow automatic configuration.':
-    '{{terminalName}} keybindings.json ???????? JSON ??????????????????????',
-  'File: {{file}}': '??:{{file}}',
+    '{{terminalName}} keybindings.json 存在但不是有效的 JSON 数组。请手动修复文件或删除它以允许自动配置。',
+  'File: {{file}}': '文件：{{file}}',
   'Failed to parse {{terminalName}} keybindings.json. The file contains invalid JSON. Please fix the file manually or delete it to allow automatic configuration.':
-    '?? {{terminalName}} keybindings.json ?????????? JSON????????????????????',
-  'Error: {{error}}': '??:{{error}}',
-  'Shift+Enter binding already exists': 'Shift+Enter ?????',
-  'Ctrl+Enter binding already exists': 'Ctrl+Enter ?????',
+    '解析 {{terminalName}} keybindings.json 失败。文件包含无效的 JSON。请手动修复文件或删除它以允许自动配置。',
+  'Error: {{error}}': '错误：{{error}}',
+  'Shift+Enter binding already exists': 'Shift+Enter 绑定已存在',
+  'Ctrl+Enter binding already exists': 'Ctrl+Enter 绑定已存在',
   'Existing keybindings detected. Will not modify to avoid conflicts.':
-    '???????????????,?????',
+    '检测到现有按键绑定。为避免冲突，不会修改。',
   'Please check and modify manually if needed: {{file}}':
-    '????,????????:{{file}}',
+    '如有需要，请手动检查并修改：{{file}}',
   'Added Shift+Enter and Ctrl+Enter keybindings to {{terminalName}}.':
-    '?? {{terminalName}} ?? Shift+Enter ? Ctrl+Enter ?????',
-  'Modified: {{file}}': '???:{{file}}',
+    '已为 {{terminalName}} 添加 Shift+Enter 和 Ctrl+Enter 按键绑定。',
+  'Modified: {{file}}': '已修改：{{file}}',
   '{{terminalName}} keybindings already configured.':
-    '{{terminalName}} ????????',
-  'Failed to configure {{terminalName}}.': '?? {{terminalName}} ???',
+    '{{terminalName}} 按键绑定已配置。',
+  'Failed to configure {{terminalName}}.': '配置 {{terminalName}} 失败。',
   'Your terminal is already configured for an optimal experience with multiline input (Shift+Enter and Ctrl+Enter).':
-    '??????????????(Shift+Enter ? Ctrl+Enter)??????',
+    '您的终端已配置为支持多行输入（Shift+Enter 和 Ctrl+Enter）的最佳体验。',
   // ============================================================================
   // Commands - Hooks
   // ============================================================================
-  'Manage HopCode hooks': '?? HopCode Hook',
-  'List all configured hooks': '???????? Hook',
-  'Enable a disabled hook': '?????? Hook',
-  'Disable an active hook': '?????? Hook',
+  'Manage HopCode hooks': '管理 HopCode Hook',
+  'List all configured hooks': '列出所有已配置的 Hook',
   // Hooks - Dialog
   Hooks: 'Hook',
-  'Loading hooks...': '???? Hook...',
-  'Error loading hooks:': '?? Hook ??:',
-  'Press Escape to close': '? Escape ??',
-  'Press Escape, Ctrl+C, or Ctrl+D to cancel': '? Escape?Ctrl+C ? Ctrl+D ??',
-  'Press Space, Enter, or Escape to dismiss': '??????? Escape ??',
-  'No hook selected': '??? Hook',
+  'Loading hooks...': '正在加载 Hook...',
+  'Error loading hooks:': '加载 Hook 出错：',
+  'Press Escape to close': '按 Escape 关闭',
+  'Press Escape, Ctrl+C, or Ctrl+D to cancel':
+    '按 Escape、Ctrl+C 或 Ctrl+D 取消',
+  'Press Space, Enter, or Escape to dismiss': '按 Space、Enter 或 Escape 关闭',
+  'No hook selected': '未选择 Hook',
   // Hooks - List Step
-  'No hook events found.': '??? Hook ???',
-  '{{count}} hook configured': '{{count}} ? Hook ???',
-  '{{count}} hooks configured': '{{count}} ? Hook ???',
+  'No hook events found.': '未找到 Hook 事件。',
+  '{{count}} hook configured': '{{count}} 个 Hook 已配置',
+  '{{count}} hooks configured': '{{count}} 个 Hook 已配置',
   'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
-    '????????????? Hook,????? settings.json ??? HopCode?',
-  'Enter to select � Esc to cancel': 'Enter ?? � Esc ??',
+    '此菜单为只读。要添加或修改 Hook，请直接编辑 settings.json 或询问 HopCode。',
+  'Enter to select · Esc to cancel': 'Enter 选择 · Esc 取消',
   // Hooks - Detail Step
-  'Exit codes:': '???:',
-  'Configured hooks:': '???? Hook:',
-  'No hooks configured for this event.': '?????? Hook?',
+  'Exit codes:': '退出码：',
+  'Configured hooks:': '已配置的 Hook：',
+  'No hooks configured for this event.': '此事件未配置 Hook。',
   'To add hooks, edit settings.json directly or ask HopCode.':
-    '??? Hook,????? settings.json ??? HopCode?',
-  'Enter to select � Esc to go back': 'Enter ?? � Esc ??',
+    '要添加 Hook，请直接编辑 settings.json 或询问 HopCode。',
+  'Enter to select · Esc to go back': 'Enter 选择 · Esc 返回',
   // Hooks - Config Detail Step
-  'Hook details': 'Hook ??',
-  'Event:': '??:',
-  'Extension:': '??:',
-  'Desc:': '??:',
-  'No hook config selected': '??? Hook ??',
+  'Hook details': 'Hook 详情',
+  'Event:': '事件：',
+  'Extension:': '扩展：',
+  'Desc:': '描述：',
+  'No hook config selected': '未选择 Hook 配置',
   'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    '??????? Hook,????? settings.json ??? HopCode?',
+    '要修改或删除此 Hook，请直接编辑 settings.json 或询问 HopCode。',
   // Hooks - Disabled Step
-  'Hook Configuration - Disabled': 'Hook ?? - ???',
+  'Hook Configuration - Disabled': 'Hook 配置 - 已禁用',
   'All hooks are currently disabled. You have {{count}} that are not running.':
-    '?? Hook ???????? {{count}} ????',
-  '{{count}} configured hook': '{{count}} ????? Hook',
-  '{{count}} configured hooks': '{{count}} ????? Hook',
-  'When hooks are disabled:': '? Hook ????:',
-  'No hook commands will execute': '?????? Hook ??',
-  'StatusLine will not be displayed': '???????',
+    '所有 Hook 当前已禁用。您有 {{count}} 未运行。',
+  '{{count}} configured hook': '{{count}} 个已配置的 Hook',
+  '{{count}} configured hooks': '{{count}} 个已配置的 Hook',
+  'When hooks are disabled:': '当 Hook 被禁用时：',
+  'No hook commands will execute': '不会执行任何 Hook 命令',
+  'StatusLine will not be displayed': '不会显示状态栏',
   'Tool operations will proceed without hook validation':
-    '???????? Hook ????????',
+    '工具操作将在没有 Hook 验证的情况下继续',
   'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.':
-    '????? Hook,?? settings.json ??? "disableAllHooks" ??? HopCode?',
+    '要重新启用 Hook，请从 settings.json 中删除 "disableAllHooks" 或询问 HopCode。',
   // Hooks - Source
-  Project: '??',
-  User: '??',
-  System: '??',
-  Extension: '??',
-  'Local Settings': '????',
-  'User Settings': '????',
-  'System Settings': '????',
-  Extensions: '??',
-  'Session (temporary)': '??(??)',
-  // Hooks - Status
-  '? Enabled': '? ???',
-  '? Disabled': '? ???',
+  Project: '项目',
+  User: '用户',
+  Skill: '技能',
+  System: '系统',
+  Extension: '扩展',
+  'Local Settings': '本地设置',
+  'User Settings': '用户设置',
+  'System Settings': '系统设置',
+  Extensions: '扩展',
+  'Session (temporary)': '会话（临时）',
   // Hooks - Event Descriptions (short)
-  'Before tool execution': '?????',
-  'After tool execution': '?????',
-  'After tool execution fails': '???????',
-  'When notifications are sent': '?????',
-  'When the user submits a prompt': '???????',
-  'When a new session is started': '??????',
-  'Right before HopCode concludes its response': 'HopCode ??????',
-  'When a subagent (Agent tool call) is started': '????(Agent ????)???',
-  'Right before a subagent concludes its response': '??????????',
-  'Before conversation compaction': '?????',
-  'When a session is ending': '?????',
-  'When a permission dialog is displayed': '????????',
+  'Before tool execution': '工具执行前',
+  'After tool execution': '工具执行后',
+  'After tool execution fails': '工具执行失败后',
+  'When notifications are sent': '发送通知时',
+  'When the user submits a prompt': '用户提交提示时',
+  'When a new session is started': '新会话开始时',
+  'Right before HopCode concludes its response': 'HopCode 结束响应之前',
+  'When a subagent (Agent tool call) is started':
+    '子智能体（Agent 工具调用）启动时',
+  'Right before a subagent concludes its response': '子智能体结束响应之前',
+  'Before conversation compaction': '对话压缩前',
+  'When a session is ending': '会话结束时',
+  'When a permission dialog is displayed': '显示权限对话框时',
   // Hooks - Event Descriptions (detailed)
-  'Input to command is JSON of tool call arguments.': '???????????? JSON?',
+  'Input to command is JSON of tool call arguments.':
+    '命令输入为工具调用参数的 JSON。',
   'Input to command is JSON with fields "inputs" (tool call arguments) and "response" (tool call response).':
-    '??????? "inputs"(??????)? "response"(??????)??? JSON?',
+    '命令输入为包含 "inputs"（工具调用参数）和 "response"（工具调用响应）字段的 JSON。',
   'Input to command is JSON with tool_name, tool_input, tool_use_id, error, error_type, is_interrupt, and is_timeout.':
-    '??????? tool_name?tool_input?tool_use_id?error?error_type?is_interrupt ? is_timeout ? JSON?',
+    '命令输入为包含 tool_name、tool_input、tool_use_id、error、error_type、is_interrupt 和 is_timeout 的 JSON。',
   'Input to command is JSON with notification message and type.':
-    '??????????????? JSON?',
+    '命令输入为包含通知消息和类型的 JSON。',
   'Input to command is JSON with original user prompt text.':
-    '???????????????? JSON?',
-  'Input to command is JSON with session start source.': '?????????????? JSON?',
-  'Input to command is JSON with session end reason.': '?????????????? JSON?',
+    '命令输入为包含原始用户提示文本的 JSON。',
+  'Input to command is JSON with session start source.':
+    '命令输入为包含会话启动来源的 JSON。',
+  'Input to command is JSON with session end reason.':
+    '命令输入为包含会话结束原因的 JSON。',
   'Input to command is JSON with agent_id and agent_type.':
-    '??????? agent_id ? agent_type ? JSON?',
+    '命令输入为包含 agent_id 和 agent_type 的 JSON。',
   'Input to command is JSON with agent_id, agent_type, and agent_transcript_path.':
-    '??????? agent_id?agent_type ? agent_transcript_path ? JSON?',
-  'Input to command is JSON with compaction details.': '???????????? JSON?',
+    '命令输入为包含 agent_id、agent_type 和 agent_transcript_path 的 JSON。',
+  'Input to command is JSON with compaction details.':
+    '命令输入为包含压缩详情的 JSON。',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
-    '??????? tool_name?tool_input ? tool_use_id ? JSON????? hookSpecificOutput ? JSON,?????????????',
+    '命令输入为包含 tool_name、tool_input 和 tool_use_id 的 JSON。输出包含 hookSpecificOutput 的 JSON，其中包含允许或拒绝的决定。',
   // Hooks - Exit Code Descriptions
-  'stdout/stderr not shown': 'stdout/stderr ???',
-  'show stderr to model and continue conversation': '????? stderr ?????',
-  'show stderr to user only': '?????? stderr',
-  'stdout shown in transcript mode (ctrl+o)': 'stdout ??????? (ctrl+o)',
-  'show stderr to model immediately': '??????? stderr',
+  'stdout/stderr not shown': 'stdout/stderr 不显示',
+  'show stderr to model and continue conversation':
+    '向模型显示 stderr 并继续对话',
+  'show stderr to user only': '仅向用户显示 stderr',
+  'stdout shown in transcript mode (ctrl+o)': 'stdout 以转录模式显示 (ctrl+o)',
+  'show stderr to model immediately': '立即向模型显示 stderr',
   'show stderr to user only but continue with tool call':
-    '?????? stderr ???????',
+    '仅向用户显示 stderr 但继续工具调用',
   'block processing, erase original prompt, and show stderr to user only':
-    '????,??????,?????? stderr',
-  'stdout shown to HopCode': '? HopCode ?? stdout',
-  'show stderr to user only (blocking errors ignored)': '?????? stderr(??????)',
-  'command completes successfully': '??????',
-  'stdout shown to subagent': '??????? stdout',
-  'show stderr to subagent and continue having it run': '??????? stderr ?????',
-  'stdout appended as custom compact instructions': 'stdout ???????????',
-  'block compaction': '????',
+    '阻止处理，擦除原始提示，仅向用户显示 stderr',
+  'stdout shown to HopCode': '向 HopCode 显示 stdout',
+  'show stderr to user only (blocking errors ignored)':
+    '仅向用户显示 stderr（忽略阻塞错误）',
+  'command completes successfully': '命令成功完成',
+  'stdout shown to subagent': '向子智能体显示 stdout',
+  'show stderr to subagent and continue having it run':
+    '向子智能体显示 stderr 并继续运行',
+  'stdout appended as custom compact instructions':
+    'stdout 作为自定义压缩指令追加',
+  'block compaction': '阻止压缩',
   'show stderr to user only but continue with compaction':
-    '?????? stderr ?????',
-  'use hook decision if provided': '??????? Hook ??',
+    '仅向用户显示 stderr 但继续压缩',
+  'use hook decision if provided': '如果提供则使用 Hook 决定',
   // Hooks - Messages
-  'Config not loaded.': '??????',
+  'Config not loaded.': '配置未加载。',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
-    'Hook ??????????? Hook ???????',
-  'No hooks configured. Add hooks in your settings.json file.':
-    '??? Hook??? settings.json ????? Hook?',
-  'Configured Hooks ({{count}} total)': '???? Hook(? {{count}} ?)',
-
+    'Hook 未启用。请在设置中启用 Hook 以使用此功能。',
   // ============================================================================
   // Commands - Session Export
   // ============================================================================
-  'Export current session message history to a file': '???????????????',
-  'Export session to HTML format': '?????? HTML ??',
-  'Export session to JSON format': '?????? JSON ??',
+  'Export current session message history to a file':
+    '将当前会话的消息记录导出到文件',
+  'Export session to HTML format': '将会话导出为 HTML 文件',
+  'Export session to JSON format': '将会话导出为 JSON 文件',
   'Export session to JSONL format (one message per line)':
-    '?????? JSONL ??(??????)',
-  'Export session to markdown format': '?????? Markdown ??',
+    '将会话导出为 JSONL 文件（每行一条消息）',
+  'Export session to markdown format': '将会话导出为 Markdown 文件',
 
   // ============================================================================
   // Commands - Insights
   // ============================================================================
   'generate personalized programming insights from your chat history':
-    '?????????????????',
+    '根据你的聊天记录生成个性化编程洞察',
 
   // ============================================================================
   // Commands - Session History
   // ============================================================================
-  'Resume a previous session': '??????',
+  'Resume a previous session': '恢复先前会话',
+  'Fork the current conversation into a new session': '将当前对话分支到新会话',
+  'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
+    '响应或工具调用正在进行时无法分支。请等待其完成或处理待确认的工具调用。',
+  'No conversation to branch.': '没有可分支的对话。',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
-    '???????????????????????????????????',
+    '恢复某次工具调用。这将把对话与文件历史重置到提出该工具调用建议时的状态',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
-    '??????????????:VS Code?Cursor?Windsurf ? Trae?',
-  'Terminal "{{terminal}}" is not supported yet.': '?? "{{terminal}}" ?????',
+    '无法检测终端类型。支持的终端：VS Code、Cursor、Windsurf 和 Trae。',
+  'Terminal "{{terminal}}" is not supported yet.':
+    '终端 "{{terminal}}" 尚未支持。',
 
   // ============================================================================
   // Commands - Language
   // ============================================================================
-  'Invalid language. Available: {{options}}': '??????????:{{options}}',
-  'Language subcommands do not accept additional arguments.': '????????????',
-  'Current UI language: {{lang}}': '?? UI ??:{{lang}}',
-  'Current LLM output language: {{lang}}': '?? LLM ????:{{lang}}',
-  'LLM output language not set': '??? LLM ????',
-  'Set UI language': '?? UI ??',
-  'Set LLM output language': '?? LLM ????',
-  'Usage: /language ui [{{options}}]': '??:/language ui [{{options}}]',
-  'Usage: /language output <language>': '??:/language output <??>',
-  'Example: /language output ??': '??:/language output ??',
-  'Example: /language output English': '??:/language output English',
-  'Example: /language output ???': '??:/language output ???',
-  'Example: /language output Portugu�s': '??:/language output Portugu�s',
-  'UI language changed to {{lang}}': 'UI ?????? {{lang}}',
-  'LLM output language set to {{lang}}': 'LLM ???????? {{lang}}',
-  'LLM output language rule file generated at {{path}}':
-    'LLM ???????????? {{path}}',
+  'Invalid language. Available: {{options}}':
+    '无效的语言。可用选项：{{options}}',
+  'Language subcommands do not accept additional arguments.':
+    '语言子命令不接受额外参数',
+  'Current UI language: {{lang}}': '当前 UI 语言：{{lang}}',
+  'Current LLM output language: {{lang}}': '当前 LLM 输出语言：{{lang}}',
+  'Set UI language': '设置 UI 语言',
+  'Set LLM output language': '设置 LLM 输出语言',
+  'Usage: /language ui [{{options}}]': '用法：/language ui [{{options}}]',
+  'Usage: /language output <language>': '用法：/language output <语言>',
+  'Example: /language output 中文': '示例：/language output 中文',
+  'Example: /language output English': '示例：/language output English',
+  'Example: /language output 日本語': '示例：/language output 日本語',
+  'UI language changed to {{lang}}': 'UI 语言已更改为 {{lang}}',
+  'LLM output language set to {{lang}}': 'LLM 输出语言已设置为 {{lang}}',
   'Please restart the application for the changes to take effect.':
-    '??????????????',
+    '请重启应用程序以使更改生效。',
   'Failed to generate LLM output language rule file: {{error}}':
-    '?? LLM ??????????:{{error}}',
-  'Invalid command. Available subcommands:': '????????????:',
-  'Available subcommands:': '??????:',
+    '生成 LLM 输出语言规则文件失败：{{error}}',
+  'Invalid command. Available subcommands:': '无效的命令。可用的子命令：',
+  'Available subcommands:': '可用的子命令：',
   'To request additional UI language packs, please open an issue on GitHub.':
-    '?????? UI ???,?? GitHub ??? issue',
-  'Available options:': '????:',
-  'Set UI language to {{name}}': '? UI ????? {{name}}',
+    '如需请求其他 UI 语言包，请在 GitHub 上提交 issue',
+  'Available options:': '可用选项：',
+  'Set UI language to {{name}}': '将 UI 语言设置为 {{name}}',
 
   // ============================================================================
   // Commands - Approval Mode
   // ============================================================================
-  'Tool Approval Mode': '??????',
-  'Current approval mode: {{mode}}': '??????:{{mode}}',
-  'Available approval modes:': '???????:',
-  'Approval mode changed to: {{mode}}': '????????:{{mode}}',
-  'Approval mode changed to: {{mode}} (saved to {{scope}} settings{{location}})':
-    '????????:{{mode}}(????{{scope}}??{{location}})',
-  'Usage: /approval-mode <mode> [--session|--user|--project]':
-    '??:/approval-mode <mode> [--session|--user|--project]',
-
-  'Scope subcommands do not accept additional arguments.': '?????????????',
-  'Plan mode - Analyze only, do not modify files or execute commands':
-    '???? - ???,??????????',
-  'Default mode - Require approval for file edits or shell commands':
-    '???? - ????????? shell ??',
-  'Auto-edit mode - Automatically approve file edits': '?????? - ????????',
-  'IZN mode - Automatically approve all tools': 'IZN ?? - ????????',
-  '{{mode}} mode': '{{mode}} ??',
-  'Settings service is not available; unable to persist the approval mode.':
-    '???????;??????????',
-  'Failed to save approval mode: {{error}}': '????????:{{error}}',
-  'Failed to change approval mode: {{error}}': '????????:{{error}}',
-  'Apply to current session only (temporary)': '????????(??)',
-  'Persist for this project/workspace': '???????/???',
-  'Persist for this user on this machine': '????????????',
-  'Analyze only, do not modify files or execute commands': '???,??????????',
-  'Require approval for file edits or shell commands': '????????? shell ??',
-  'Automatically approve file edits': '????????',
-  'Automatically approve all tools': '????????',
+  'Tool Approval Mode': '工具审批模式',
+  '{{mode}} mode': '{{mode}} 模式',
+  'Analyze only, do not modify files or execute commands':
+    '仅分析，不修改文件或执行命令',
+  'Require approval for file edits or shell commands':
+    '需要批准文件编辑或 shell 命令',
+  'Automatically approve file edits': '自动批准文件编辑',
+  'Automatically approve all tools': '自动批准所有工具',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
-    '????????????????????????????',
-  'Apply To': '???',
-  'Workspace Settings': '?????',
-
-  // ============================================================================
-  // Commands - Memory
-  // ============================================================================
-  'Commands for interacting with memory.': '??????????',
-  'Show the current memory contents.': '????????',
-  'Show project-level memory contents.': '?????????',
-  'Show global memory contents.': '????????',
-  'Add content to project-level memory.': '??????????',
-  'Add content to global memory.': '?????????',
-  'Refresh the memory from the source.': '??????',
-  'Usage: /memory add --project <text to remember>':
-    '??:/memory add --project <??????>',
-  'Usage: /memory add --global <text to remember>':
-    '??:/memory add --global <??????>',
-  'Attempting to save to project memory: "{{text}}"': '???????????:"{{text}}"',
-  'Attempting to save to global memory: "{{text}}"': '???????????:"{{text}}"',
-  'Current memory content from {{count}} file(s):': '?? {{count}} ??????????:',
-  'Memory is currently empty.': '??????',
-  'Project memory file not found or is currently empty.': '??????????????',
-  'Global memory file not found or is currently empty.': '??????????????',
-  'Global memory is currently empty.': '????????',
-  'Global memory content:\n\n---\n{{content}}\n---':
-    '??????:\n\n---\n{{content}}\n---',
-  'Project memory content from {{path}}:\n\n---\n{{content}}\n---':
-    '???????? {{path}}:\n\n---\n{{content}}\n---',
-  'Project memory is currently empty.': '????????',
-  'Refreshing memory from source files...': '??????????...',
-  'Add content to the memory. Use --global for global memory or --project for project memory.':
-    '?????????? --global ??????,?? --project ??????',
-  'Usage: /memory add [--global|--project] <text to remember>':
-    '??:/memory add [--global|--project] <??????>',
-  'Attempting to save to memory {{scope}}: "{{fact}}"':
-    '????????? {{scope}}:"{{fact}}"',
-  'Open auto-memory folder': '?????????',
-  'Auto-memory: {{status}}': '????:{{status}}',
-  'Auto-dream: {{status}} � {{lastDream}} � /dream to run':
-    '????:{{status}} � {{lastDream}} � /dream ????',
-  never: '??',
-  on: '?',
-  off: '?',
-  '? dreaming': '? ???',
-  'Remove matching entries from managed auto-memory.': '????????????????',
-  'Usage: /forget <memory text to remove>': '??:/forget <????????>',
+    '工作区审批模式已存在并具有优先级。用户级别的更改将无效。',
+  'Apply To': '应用于',
+  'Workspace Settings': '工作区设置',
+  'Open auto-memory folder': '打开自动记忆文件夹',
+  'Auto-memory: {{status}}': '自动记忆：{{status}}',
+  'Auto-dream: {{status}} · {{lastDream}} · /dream to run':
+    '自动整理：{{status}} · {{lastDream}} · /dream 立即运行',
+  never: '从未',
+  on: '开',
+  off: '关',
+  'Remove matching entries from managed auto-memory.':
+    '从托管自动记忆中删除匹配的条目。',
+  'Usage: /forget <memory text to remove>': '用法：/forget <要删除的记忆文本>',
   'No managed auto-memory entries matched: {{query}}':
-    '?????????????:{{query}}',
-  'Show managed auto-memory status.': '??????????',
-  'Run managed auto-memory extraction for the current session.':
-    '???????????????',
-  'Managed auto-memory root: {{root}}': '?????????:{{root}}',
-  'Managed auto-memory topics:': '????????:',
-  'No extraction cursor found yet.': '?????????',
-  'Cursor: session={{sessionId}}, offset={{offset}}, updated={{updatedAt}}':
-    '??:session={{sessionId}},offset={{offset}},updated={{updatedAt}}',
-  'No chat client available to extract memory.': '????????????????',
-  'Managed auto-memory extraction is already running.': '??????????????',
-  'Managed auto-memory extraction found no new durable memories.':
-    '??????????????????',
-  'Consolidate managed auto-memory topic files.': '????????????',
-  'Managed auto-memory dream found nothing to improve.':
-    '?????? dream ?????????',
-  'Deduplicated entries: {{count}}': '?????:{{count}}',
-  'Save a durable memory using the save_memory tool.':
-    '?? save_memory ??????????',
-  'Usage: /remember [--global|--project] <text to remember>':
-    '??:/remember [--global|--project] <??????>',
-
-  // ============================================================================
-  // Commands - MCP
-  // ============================================================================
-  'Authenticate with an OAuth-enabled MCP server': '???? OAuth ? MCP ???????',
-  'List configured MCP servers and tools': '?????? MCP ??????',
-  'Restarts MCP servers.': '?? MCP ???',
-  'Open MCP management dialog': '?? MCP ?????',
-  'Could not retrieve tool registry.': '?????????',
-  'No MCP servers configured with OAuth authentication.':
-    '????? OAuth ??? MCP ???',
-  'MCP servers with OAuth authentication:': '?? OAuth ??? MCP ???:',
-  'Use /mcp auth <server-name> to authenticate.':
-    '?? /mcp auth <server-name> ????',
-  "MCP server '{{name}}' not found.": "??? MCP ??? '{{name}}'",
+    '没有匹配的托管自动记忆条目：{{query}}',
+  'Consolidate managed auto-memory topic files.': '整理托管自动记忆主题文件',
+  'Open MCP management dialog': '打开 MCP 管理对话框',
+  'Could not retrieve tool registry.': '无法检索工具注册表',
   "Successfully authenticated and refreshed tools for '{{name}}'.":
-    "???????? '{{name}}' ???",
-  "Failed to authenticate with MCP server '{{name}}': {{error}}":
-    "?? MCP ??? '{{name}}' ??:{{error}}",
-  "Re-discovering tools from '{{name}}'...": "?????? '{{name}}' ???...",
+    "成功认证并刷新了 '{{name}}' 的工具",
+  "Re-discovering tools from '{{name}}'...":
+    "正在重新发现 '{{name}}' 的工具...",
   "Discovered {{count}} tool(s) from '{{name}}'.":
-    "? '{{name}}' ??? {{count}} ????",
+    "从 '{{name}}' 发现了 {{count}} 个工具。",
   'Authentication complete. Returning to server details...':
-    '????,?????????...',
-  'Authentication successful.': '?????',
-  'If the browser does not open, copy and paste this URL into your browser:':
-    '??????????,????? URL ????????:',
-  'Make sure to copy the COMPLETE URL - it may wrap across multiple lines.':
-    '??  ???????? URL �� ????????',
-
+    '认证完成，正在返回服务器详情...',
+  'Authentication successful.': '认证成功。',
   // ============================================================================
   // MCP Management Dialog
   // ============================================================================
-  'Manage MCP servers': '?? MCP ???',
-  'Server Detail': '?????',
-  'Disable Server': '?????',
-  Tools: '??',
-  'Tool Detail': '????',
-  'MCP Management': 'MCP ??',
-  'Loading...': '???...',
-  'Unknown step': '????',
-  'Esc to back': 'Esc ??',
-  '?? to navigate � Enter to select � Esc to close':
-    '?? ?? � Enter ?? � Esc ??',
-  '?? to navigate � Enter to select � Esc to back': '?? ?? � Enter ?? � Esc ??',
-  '?? to navigate � Enter to confirm � Esc to back':
-    '?? ?? � Enter ?? � Esc ??',
-  'User Settings (global)': '????(??)',
-  'Workspace Settings (project-specific)': '?????(???)',
-  'Disable server:': '?????:',
-  'Select where to add the server to the exclude list:': '????????????????:',
-  'Press Enter to confirm, Esc to cancel': '? Enter ??,Esc ??',
-  'View tools': '????',
-  Reconnect: '????',
-  Enable: '??',
-  Disable: '??',
-  Authenticate: '??',
-  'Re-authenticate': '????',
-  'Clear Authentication': '????',
-  disabled: '???',
-  'Server:': '???:',
-  '(disabled)': '(???)',
-  'Error:': '??:',
-  tool: '??',
-  tools: '???',
-  connected: '???',
-  connecting: '???',
-  disconnected: '???',
+  'Manage MCP servers': '管理 MCP servers',
+  'Server Detail': '服务器详情',
+  Tools: '工具',
+  'Tool Detail': '工具详情',
+  'Loading...': '加载中...',
+  'Unknown step': '未知步骤',
+  'Esc to back': 'Esc 返回',
+  '↑↓ to navigate · Enter to select · Esc to close':
+    '↑↓ 导航 · Enter 选择 · Esc 关闭',
+  '↑↓ to navigate · Enter to select · Esc to back':
+    '↑↓ 导航 · Enter 选择 · Esc 返回',
+  '↑↓ to navigate · Enter to confirm · Esc to back':
+    '↑↓ 导航 · Enter 确认 · Esc 返回',
+  'User Settings (global)': '用户设置（全局）',
+  'Workspace Settings (project-specific)': '工作区设置（项目级）',
+  'Disable server:': '禁用服务器：',
+  'Select where to add the server to the exclude list:':
+    '选择将服务器添加到排除列表的位置：',
+  'Press Enter to confirm, Esc to cancel': '按 Enter 确认，Esc 取消',
+  'View tools': '查看工具',
+  Reconnect: '重新连接',
+  Enable: '启用',
+  Disable: '禁用',
+  Authenticate: '认证',
+  'Re-authenticate': '重新认证',
+  'Clear Authentication': '清空认证',
+  disabled: '已禁用',
+  enabled: '已启用',
+  'Server:': '服务器：',
+  'Error:': '错误：',
+  tool: '工具',
+  tools: '个工具',
+  connected: '已连接',
+  connecting: '连接中',
+  disconnected: '已断开',
 
   // MCP Server List
-  'User MCPs': '?? MCP',
-  'Project MCPs': '?? MCP',
-  'Extension MCPs': '?? MCP',
-  server: '????',
-  servers: '????',
-  'Add MCP servers to your settings to get started.': '??????? MCP ?????????',
-  'Run hopcode --debug to see error logs': '?? hopcode --debug ??????',
+  'User MCPs': '用户 MCP',
+  'Project MCPs': '项目 MCP',
+  'Extension MCPs': '扩展 MCP',
+  server: '个服务器',
+  servers: '个服务器',
+  'Add MCP servers to your settings to get started.':
+    '请在设置中添加 MCP servers 以开始使用。',
+  'Run hopcode --debug to see error logs': '运行 hopcode --debug 查看错误日志',
 
   // MCP OAuth Authentication
-  'OAuth Authentication': 'OAuth ??',
-  'Press Enter to start authentication, Esc to go back': '? Enter ????,Esc ??',
+  'OAuth Authentication': 'OAuth 认证',
   'Authenticating... Please complete the login in your browser.':
-    '???... ???????????',
+    '认证中... 请在浏览器中完成登录。',
   'Press c to copy the authorization URL to your clipboard.':
-    '? c ???? URL ?????',
+    '按 c 复制授权 URL 到剪贴板。',
   'Copy request sent to your terminal. If paste is empty, copy the URL above manually.':
-    '??????????;?????,??????? URL?',
-  'Cannot write to terminal � copy the URL above manually.':
-    '??????,??????? URL?',
-  'Press Enter or Esc to go back': '? Enter ? Esc ??',
-
+    '已向终端发送复制请求；若粘贴为空，请手动复制上方 URL。',
+  'Cannot write to terminal — copy the URL above manually.':
+    '无法写入终端，请手动复制上方 URL。',
   // MCP Server Detail
-  'Command:': '??:',
-  'Working Directory:': '????:',
-  'Capabilities:': '??:',
-  'No server selected': '??????',
-  prompts: '??',
+  'Command:': '命令：',
+  'Working Directory:': '工作目录：',
+  'No server selected': '未选择服务器',
+  prompts: '提示',
 
   // MCP Tool List
-  'No tools available for this server.': '???????????',
-  destructive: '???',
-  'read-only': '??',
-  'open-world': '????',
-  idempotent: '??',
-  'Tools for {{name}}': '{{name}} ???',
-  'Tools for {{serverName}}': '{{serverName}} ???',
+  'No tools available for this server.': '此服务器没有可用工具。',
+  destructive: '破坏性',
+  'read-only': '只读',
+  'open-world': '开放世界',
+  idempotent: '幂等',
+  'Tools for {{serverName}}': '{{serverName}} 的工具',
   '{{current}}/{{total}}': '{{current}}/{{total}}',
 
   // MCP Tool Detail
-  required: '??',
-  Type: '??',
-  Enum: '??',
-  Parameters: '??',
-  'No tool selected': '?????',
-  Annotations: '??',
-  Title: '??',
-  'Read Only': '??',
-  Destructive: '???',
-  Idempotent: '??',
-  'Open World': '????',
-  Server: '???',
+  required: '必需',
+  Parameters: '参数',
+  'No tool selected': '未选择工具',
+  Server: '服务器',
 
   // Invalid tool related translations
-  '{{count}} invalid tools': '{{count}} ?????',
-  invalid: '??',
-  'invalid: {{reason}}': '??:{{reason}}',
-  'missing name': '????',
-  'missing description': '????',
-  '(unnamed)': '(???)',
-  'Warning: This tool cannot be called by the LLM': '??:?????? LLM ??',
-  Reason: '??',
+  '{{count}} invalid tools': '{{count}} 个无效工具',
+  invalid: '无效',
+  'invalid: {{reason}}': '无效：{{reason}}',
+  'missing name': '缺少名称',
+  'missing description': '缺少描述',
+  '(unnamed)': '(未命名)',
+  'Warning: This tool cannot be called by the LLM':
+    '警告：此工具无法被 LLM 调用',
+  Reason: '原因',
   'Tools must have both name and description to be used by the LLM.':
-    '???????????????? LLM ???',
-
-  // ============================================================================
-  // Commands - Chat
-  // ============================================================================
-  'Manage conversation history.': '??????',
-  'List saved conversation checkpoints': '???????????',
-  'No saved conversation checkpoints found.': '????????????',
-  'List of saved conversations:': '????????:',
-  'Note: Newest last, oldest first': '??:??????,??????',
-  'Save the current conversation as a checkpoint. Usage: /chat save <tag>':
-    '??????????????:/chat save <tag>',
-  'Missing tag. Usage: /chat save <tag>': '???????:/chat save <tag>',
-  'Delete a conversation checkpoint. Usage: /chat delete <tag>':
-    '??????????:/chat delete <tag>',
-  'Missing tag. Usage: /chat delete <tag>': '???????:/chat delete <tag>',
-  "Conversation checkpoint '{{tag}}' has been deleted.": "????? '{{tag}}' ???",
-  "Error: No checkpoint found with tag '{{tag}}'.": "??:?????? '{{tag}}' ????",
-  'Resume a conversation from a checkpoint. Usage: /chat resume <tag>':
-    '???????????:/chat resume <tag>',
-  'Missing tag. Usage: /chat resume <tag>': '???????:/chat resume <tag>',
-  'No saved checkpoint found with tag: {{tag}}.': '?????? {{tag}} ???????',
-  'A checkpoint with the tag {{tag}} already exists. Do you want to overwrite it?':
-    '??? {{tag}} ???????????????',
-  'No chat client available to save conversation.': '???????????????',
-  'Conversation checkpoint saved with tag: {{tag}}.': '????????,??:{{tag}}',
-  'No conversation found to save.': '?????????',
-  'No chat client available to share conversation.': '???????????????',
-  'Invalid file format. Only .md and .json are supported.':
-    '??????????? .md ? .json ??',
-  'Error sharing conversation: {{error}}': '???????:{{error}}',
-  'Conversation shared to {{filePath}}': '?????? {{filePath}}',
-  'No conversation found to share.': '?????????',
-  'Share the current conversation to a markdown or json file. Usage: /chat share <file>':
-    '???????? markdown ? json ?????:/chat share <file>',
-
-  // ============================================================================
+    '工具必须同时具有名称和描述才能被 LLM 使用。',
+  // ===========================================================
   // Commands - Summary
   // ============================================================================
   'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
-    '?????????? .hopcode/PROJECT_SUMMARY.md',
-  'No chat client available to generate summary.': '???????????????',
+    '生成项目摘要并保存到 .hopcode/PROJECT_SUMMARY.md',
+  'No chat client available to generate summary.':
+    '没有可用的聊天客户端来生成摘要',
   'Already generating summary, wait for previous request to complete':
-    '??????,??????????',
-  'No conversation found to summarize.': '?????????',
+    '正在生成摘要，请等待上一个请求完成',
+  'No conversation found to summarize.': '未找到要总结的对话',
   'Failed to generate project context summary: {{error}}':
-    '???????????:{{error}}',
+    '生成项目上下文摘要失败：{{error}}',
   'Saved project summary to {{filePathForDisplay}}.':
-    '???????? {{filePathForDisplay}}',
-  'Saving project summary...': '????????...',
-  'Generating project summary...': '????????...',
+    '项目摘要已保存到 {{filePathForDisplay}}',
+  'Saving project summary...': '正在保存项目摘要...',
+  'Generating project summary...': '正在生成项目摘要...',
+  'Processing summary...': '正在处理摘要...',
+  'Project summary generated and saved successfully!':
+    '项目摘要已生成并成功保存！',
+  'Saved to: {{filePath}}': '保存至：{{filePath}}',
   'Failed to generate summary - no text content received from LLM response':
-    '?????? - ?? LLM ??????????',
+    '生成摘要失败 - 未从 LLM 响应中接收到文本内容',
 
   // ============================================================================
   // Commands - Model
   // ============================================================================
   'Switch the model for this session (--fast for suggestion model, [model-id] to switch immediately).':
-    '????????(--fast ???????)',
+    '切换此会话的模型（--fast 可设置建议模型）',
   'Set a lighter model for prompt suggestions and speculative execution':
-    '??????????????????',
-  'Content generator configuration not available.': '??????????',
-  'Authentication type not available.': '???????',
+    '设置用于输入建议和推测执行的轻量模型',
+  'Content generator configuration not available.': '内容生成器配置不可用',
+  'Authentication type not available.': '认证类型不可用',
   'No models available for the current authentication type ({{authType}}).':
-    '?????? ({{authType}}) ???????',
+    '当前认证类型 ({{authType}}) 没有可用的模型',
   // Needs translation
-  ' (not in model registry)': ' (not in model registry)',
 
   // ============================================================================
   // Commands - Clear
   // ============================================================================
   'Starting a new session, resetting chat, and clearing terminal.':
-    '???????,????????',
-  'Starting a new session and clearing.': '???????????',
+    '正在开始新会话，重置聊天并清屏。',
+  'Starting a new session and clearing.': '正在开始新会话并清屏。',
 
   // ============================================================================
   // Commands - Compress
   // ============================================================================
   'Already compressing, wait for previous request to complete':
-    '?????,??????????',
-  'Failed to compress chat history.': '????????',
-  'Failed to compress chat history: {{error}}': '????????:{{error}}',
-  'Compressing chat history': '????????',
+    '正在压缩中，请等待上一个请求完成',
+  'Failed to compress chat history.': '压缩聊天历史失败',
+  'Failed to compress chat history: {{error}}': '压缩聊天历史失败：{{error}}',
+  'Compressing chat history': '正在压缩聊天历史',
   'Chat history compressed from {{originalTokens}} to {{newTokens}} tokens.':
-    '?????? {{originalTokens}} ? token ??? {{newTokens}} ? token?',
-  'Compression was not beneficial for this history size.': '?????????,???????',
+    '聊天历史已从 {{originalTokens}} 个 token 压缩到 {{newTokens}} 个 token。',
+  'Compression was not beneficial for this history size.':
+    '对于此历史记录大小，压缩没有益处。',
   'Chat history compression did not reduce size. This may indicate issues with the compression prompt.':
-    '???????????????????????????',
+    '聊天历史压缩未能减小大小。这可能表明压缩提示存在问题。',
   'Could not compress chat history due to a token counting error.':
-    '?? token ????,?????????',
-  'Chat history is already compressed.': '?????????',
-
+    '由于 token 计数错误，无法压缩聊天历史。',
   // ============================================================================
   // Commands - Directory
   // ============================================================================
-  'Configuration is not available.': '??????',
-  'Please provide at least one path to add.': '??????????????',
+  'Configuration is not available.': '配置不可用。',
+  'Please provide at least one path to add.': '请提供至少一个要添加的路径。',
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
-    '/directory add ????????????????????????????? --include-directories?',
-  "Error adding '{{path}}': {{error}}": "?? '{{path}}' ???:{{error}}",
+    '/directory add 命令在限制性沙箱配置文件中不受支持。请改为在启动会话时使用 --include-directories。',
+  "Error adding '{{path}}': {{error}}": "添加 '{{path}}' 时出错：{{error}}",
   'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
-    '????,?????????? HOPCODE.md ??:\n- {{directories}}',
-  'Error refreshing memory: {{error}}': '???????:{{error}}',
+    '如果存在，已成功从以下目录添加 HOPCODE.md 文件：\n- {{directories}}',
+  'Error refreshing memory: {{error}}': '刷新内存时出错：{{error}}',
   'Successfully added directories:\n- {{directories}}':
-    '??????:\n- {{directories}}',
+    '成功添加目录：\n- {{directories}}',
   'Current workspace directories:\n{{directories}}':
-    '???????:\n{{directories}}',
+    '当前工作区目录：\n{{directories}}',
 
   // ============================================================================
   // Commands - Docs
   // ============================================================================
   'Please open the following URL in your browser to view the documentation:\n{{url}}':
-    '?????????? URL ?????:\n{{url}}',
-  'Opening documentation in your browser: {{url}}': '??????????:{{url}}',
+    '请在浏览器中打开以下 URL 以查看文档：\n{{url}}',
+  'Opening documentation in your browser: {{url}}':
+    '正在浏览器中打开文档：{{url}}',
 
   // ============================================================================
   // Dialogs - Tool Confirmation
   // ============================================================================
-  'Do you want to proceed?': '?????',
-  'Yes, allow once': '?,????',
-  'Allow always': '????',
-  Yes: '?',
-  No: '?',
-  'No (esc)': '? (esc)',
-  'Yes, allow always for this session': '?,????????',
-  'Modify in progress:': '????:',
-  'Save and close external editor to continue': '?????????????',
-  'Apply this change?': '????????',
-  'Yes, allow always': '?,????',
-  'Modify with external editor': '?????????',
-  'No, suggest changes (esc)': '?,???? (esc)',
-  "Allow execution of: '{{command}}'?": "????:'{{command}}'?",
-  'Yes, allow always ...': '?,???? ...',
-  'Always allow in this project': '?????????',
-  'Always allow {{action}} in this project': '?????????{{action}}',
-  'Always allow for this user': '????????',
-  'Always allow {{action}} for this user': '????????{{action}}',
-  'Yes, restore previous mode ({{mode}})': '?,??????? ({{mode}})',
-  'Yes, and auto-accept edits': '?,???????',
-  'Yes, and manually approve edits': '?,???????',
-  'No, keep planning (esc)': '?,???? (esc)',
-  'URLs to fetch:': '???? URL:',
-  'MCP Server: {{server}}': 'MCP ???:{{server}}',
-  'Tool: {{tool}}': '??:{{tool}}',
+  'Do you want to proceed?': '是否继续？',
+  'Yes, allow once': '是，允许一次',
+  'Allow always': '总是允许',
+  Yes: '是',
+  No: '否',
+  'No (esc)': '否 (esc)',
+  'Modify in progress:': '正在修改：',
+  'Save and close external editor to continue': '保存并关闭外部编辑器以继续',
+  'Apply this change?': '是否应用此更改？',
+  'Yes, allow always': '是，总是允许',
+  'Modify with external editor': '使用外部编辑器修改',
+  'No, suggest changes (esc)': '否，建议更改 (esc)',
+  "Allow execution of: '{{command}}'?": "允许执行：'{{command}}'？",
+  'Always allow in this project': '在本项目中总是允许',
+  'Always allow {{action}} in this project': '在本项目中总是允许{{action}}',
+  'Always allow for this user': '对该用户总是允许',
+  'Always allow {{action}} for this user': '对该用户总是允许{{action}}',
+  'Yes, restore previous mode ({{mode}})': '是，恢复之前的模式 ({{mode}})',
+  'Yes, and auto-accept edits': '是，并自动接受编辑',
+  'Yes, and manually approve edits': '是，并手动批准编辑',
+  'No, keep planning (esc)': '否，继续规划 (esc)',
+  'URLs to fetch:': '要获取的 URL：',
+  'MCP Server: {{server}}': 'MCP Server：{{server}}',
+  'Tool: {{tool}}': '工具：{{tool}}',
   'Allow execution of MCP tool "{{tool}}" from server "{{server}}"?':
-    '????????? "{{server}}" ? MCP ?? "{{tool}}"?',
-  'Yes, always allow tool "{{tool}}" from server "{{server}}"':
-    '?,????????? "{{server}}" ??? "{{tool}}"',
-  'Yes, always allow all tools from server "{{server}}"':
-    '?,????????? "{{server}}" ?????',
-
+    '允许执行来自 MCP server "{{server}}" 的 MCP tool "{{tool}}"？',
   // ============================================================================
   // Dialogs - Shell Confirmation
   // ============================================================================
-  'Shell Command Execution': 'Shell ????',
+  'Shell Command Execution': 'Shell 命令执行',
   'A custom command wants to run the following shell commands:':
-    '??????????? shell ??:',
-
-  // ============================================================================
-  // Dialogs - Pro Quota
-  // ============================================================================
-  'Pro quota limit reached for {{model}}.': '{{model}} ? Pro ???????',
-  'Change auth (executes the /auth command)': '????(?? /auth ??)',
-  'Continue with {{model}}': '?? {{model}} ??',
-
+    '自定义命令想要运行以下 shell 命令：',
   // ============================================================================
   // Dialogs - Welcome Back
   // ============================================================================
-  'Current Plan:': '????:',
+  'Current Plan:': '当前计划：',
   'Progress: {{done}}/{{total}} tasks completed':
-    '??:??? {{done}}/{{total}} ???',
-  ', {{inProgress}} in progress': ',{{inProgress}} ????',
-  'Pending Tasks:': '?????:',
-  'What would you like to do?': '???????',
-  'Choose how to proceed with your session:': '??????????:',
-  'Start new chat session': '????????',
-  'Continue previous conversation': '???????',
-  '?? Welcome back! (Last updated: {{timeAgo}})': '?? ????!(????:{{timeAgo}})',
-  '?? Overall Goal:': '?? ????:',
-
-  // ============================================================================
-  // Dialogs - Auth
-  // ============================================================================
-  'Get started': '????',
-  'Select Authentication Method': '??????',
-  'OpenAI API key is required to use OpenAI authentication.':
-    '?? OpenAI ???? OpenAI API ??',
+    '进度：已完成 {{done}}/{{total}} 个任务',
+  ', {{inProgress}} in progress': '，{{inProgress}} 个进行中',
+  'Pending Tasks:': '待处理任务：',
+  'What would you like to do?': '您想要做什么？',
+  'Choose how to proceed with your session:': '选择如何继续您的会话：',
+  'Start new chat session': '开始新的聊天会话',
+  'Continue previous conversation': '继续之前的对话',
+  '👋 Welcome back! (Last updated: {{timeAgo}})':
+    '👋 欢迎回来！（最后更新：{{timeAgo}}）',
+  '🎯 Overall Goal:': '🎯 总体目标：',
+  'Select Authentication Method': '选择认证方式',
   'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    '????????????????? Ctrl+C ??',
-  'Terms of Services and Privacy Notice': '?????????',
-  'HopCode OAuth': 'Legacy OAuth (??)',
-  'Discontinued � switch to Coding Plan or API Key':
-    '??? � ???? Coding Plan ? API Key',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.':
-    'Legacy OAuth ?????? 2026-04-15 ?????? /auth ??????',
+    '您必须选择认证方法才能继续。再次按 Ctrl+C 退出',
+  'Terms of Services and Privacy Notice': '服务条款和隐私声明',
+  'HopCode OAuth': 'HopCode OAuth (免费)',
+  'Discontinued — switch to Coding Plan or API Key':
+    '已停用 — 请切换到 Coding Plan 或 API Key',
   'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Legacy OAuth ?????? 2026-04-15 ?????? Coding Plan ? API Key?',
+    'HopCode OAuth 免费额度已于 2026-04-15 停用。请选择 Coding Plan 或 API Key。',
   'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Legacy OAuth?????2026-04-15??????????????????? /auth ???',
-  '\n? HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n? Legacy OAuth ?????? 2026-04-15 ???????????\n',
+    'HopCode OAuth免费层已于2026-04-15停止服务。请选择其他提供商的模型或运行 /auth 切换。',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ HopCode OAuth 免费额度已于 2026-04-15 停用。请选择其他选项。\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
-    '?? \u00B7 ? 5 ???? 6,000 ??? \u00B7 ??????? Coding Plan ????',
+    '付费 \u00B7 每 5 小时最多 6,000 次请求 \u00B7 支持阿里云百炼 Coding Plan 全部模型',
   'For teams \u00B7 Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
-    '???? \u00B7 ?? \u00B7 ? 5 ???? 6,000 ??? \u00B7 ??????? Coding Plan ????',
+    '适合团队 \u00B7 付费 \u00B7 每 5 小时最多 6,000 次请求 \u00B7 支持阿里云百炼 Coding Plan 全部模型',
   'For individual developers \u00B7 Pay per model call \u00B7 5-hour/weekly quotas':
-    '???????? \u00B7 ????????? \u00B7 ? 5 ??/????',
-  Subscribe: '????',
-  'Paid subscription plans from Alibaba Cloud ModelStudio': '???????????',
-  'Select Subscription Plan': '??????',
-  'Alibaba Cloud Coding Plan': '????? Coding Plan',
-  'Alibaba Cloud Token Plan': '????? Token Plan',
+    '适合个人开发场景 \u00B7 按模型调用次数计费 \u00B7 每 5 小时/每周限额',
+  Subscribe: '订阅计划',
+  'Paid subscription plans from Alibaba Cloud ModelStudio':
+    'Alibaba Cloud ModelStudio 付费订阅计划',
+  'Select Subscription Plan': '选择订阅计划',
+  'Alibaba Cloud Coding Plan': '阿里云百炼 Coding Plan',
+  'Alibaba Cloud Token Plan': '阿里云百炼 Token Plan',
   'Pay-as-you-go tokens \u00B7 Configure ModelStudio standard API key':
-    '? Token ?? \u00B7 ?????? API Key',
+    '按 Token 付费 \u00B7 配置 ModelStudio 标准 API Key',
   'For individuals \u00B7 Pay-as-you-go tokens \u00B7 Dedicated Token Plan endpoint':
-    '???? \u00B7 ? Token ?? \u00B7 ???? Token Plan Endpoint',
+    '适合个人 \u00B7 按 Token 付费 \u00B7 使用独立 Token Plan Endpoint',
   'For teams/companies \u00B7 Credits deducted by token usage \u00B7 Dedicated API key and base URL':
-    '??????/??/?? \u00B7 ? Token ???? Credits \u00B7 ?? API Key ? Base URL',
-  'Token Plan documentation': 'Token Plan ????',
-  'Bring your own API key': '????? API ??',
+    '适合一人公司/团队/企业 \u00B7 按 Token 消耗抵扣 Credits \u00B7 专属 API Key 和 Base URL',
+  'Token Plan documentation': 'Token Plan 参考文档',
+  'Bring your own API key': '使用自己的 API Key',
   'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)':
-    '??????????????(?? OpenRouter?ModelScope)',
-  'Use coding plan credentials or your own api-keys/providers.':
-    '?? Coding Plan ??????? API ??/????',
-  OpenAI: 'OpenAI',
-  'Failed to login. Message: {{message}}': '???????:{{message}}',
+    '基于浏览器的第三方提供商认证（例如 OpenRouter、ModelScope）',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
-    '?????????? {{enforcedType}},???????? {{currentType}}',
-  'HopCode OAuth authentication timed out. Please try again.':
-    'Legacy OAuth ????????',
-  'HopCode OAuth authentication cancelled.': 'Legacy OAuth ?????',
-  'HopCode OAuth Authentication': 'Legacy OAuth ??',
-  'Please visit this URL to authorize:': '???? URL ????:',
-  'Or scan the QR code below:': '?????????:',
-  'Waiting for authorization': '?????',
-  'Time remaining:': '????:',
-  '(Press ESC or CTRL+C to cancel)': '(? ESC ? CTRL+C ??)',
-  'HopCode OAuth Authentication Timeout': 'Legacy OAuth ????',
+    '认证方式被强制设置为 {{enforcedType}}，但您当前使用的是 {{currentType}}',
+  'HopCode OAuth Authentication': 'HopCode OAuth 认证',
+  'Please visit this URL to authorize:': '请访问此 URL 进行授权：',
+  'Waiting for authorization': '等待授权中',
+  'Time remaining:': '剩余时间：',
+  'HopCode OAuth Authentication Timeout': 'HopCode OAuth 认证超时',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
-    'OAuth ?????(?? {{seconds}} ?)??????????',
-  'Press any key to return to authentication type selection.': '????????????',
-  'Waiting for HopCode OAuth authentication...': '???? Legacy OAuth ??...',
-  'Note: Your existing API key in settings.json will not be cleared when using HopCode OAuth. You can switch back to OpenAI authentication later if needed.':
-    '??:?? Legacy OAuth ?,settings.json ???? API ????????????,???????? OpenAI ???',
-  'Note: Your existing API key will not be cleared when using HopCode OAuth.':
-    '??:?? Legacy OAuth ?,??? API ????????',
-  'Authentication timed out. Please try again.': '?????????',
+    'OAuth 令牌已过期（超过 {{seconds}} 秒）。请重新选择认证方法',
+  'Press any key to return to authentication type selection.':
+    '按任意键返回认证类型选择',
+  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 认证...',
+  'Authentication timed out. Please try again.': '认证超时。请重试。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
-    '??????...(? ESC ? CTRL+C ??)',
+    '正在等待认证...（按 ESC 或 CTRL+C 取消）',
   'Missing API key for OpenAI-compatible auth. Set settings.security.auth.apiKey, or set the {{envKeyHint}} environment variable.':
-    '?? OpenAI ????? API ?????? settings.security.auth.apiKey ??? {{envKeyHint}} ?????',
-  '{{envKeyHint}} environment variable not found.': '??? {{envKeyHint}} ?????',
+    '缺少 OpenAI 兼容认证的 API Key。请设置 settings.security.auth.apiKey 或设置 {{envKeyHint}} 环境变量。',
   '{{envKeyHint}} environment variable not found. Please set it in your .env file or environment variables.':
-    '??? {{envKeyHint}} ??????? .env ???????????????',
+    '未找到 {{envKeyHint}} 环境变量。请在 .env 文件或系统环境变量中进行设置。',
   '{{envKeyHint}} environment variable not found (or set settings.security.auth.apiKey). Please set it in your .env file or environment variables.':
-    '??? {{envKeyHint}} ????(??? settings.security.auth.apiKey)??? .env ???????????????',
+    '未找到 {{envKeyHint}} 环境变量（或设置 settings.security.auth.apiKey）。请在 .env 文件或系统环境变量中进行设置。',
   'Missing API key for OpenAI-compatible auth. Set the {{envKeyHint}} environment variable.':
-    '?? OpenAI ????? API ?????? {{envKeyHint}} ?????',
+    '缺少 OpenAI 兼容认证的 API Key。请设置 {{envKeyHint}} 环境变量。',
   'Anthropic provider missing required baseUrl in modelProviders[].baseUrl.':
-    'Anthropic ???????? baseUrl,?? modelProviders[].baseUrl ????',
+    'Anthropic 提供商缺少必需的 baseUrl，请在 modelProviders[].baseUrl 中配置。',
   'ANTHROPIC_BASE_URL environment variable not found.':
-    '??? ANTHROPIC_BASE_URL ?????',
-  'Invalid auth method selected.': '???????????',
-  'Failed to authenticate. Message: {{message}}': '???????:{{message}}',
+    '未找到 ANTHROPIC_BASE_URL 环境变量。',
+  'Invalid auth method selected.': '选择了无效的认证方式。',
+  'Failed to authenticate. Message: {{message}}': '认证失败。消息：{{message}}',
   'Authenticated successfully with {{authType}} credentials.':
-    '?? {{authType}} ???????',
+    '使用 {{authType}} 凭据成功认证。',
   'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    '??? HOPCODE_DEFAULT_AUTH_TYPE ?:"{{value}}"?????:{{validValues}}',
-  'OpenAI Configuration Required': '???? OpenAI',
-  'Please enter your OpenAI configuration. You can get an API key from':
-    '????? OpenAI ????????????? API ??:',
-  'API Key:': 'API ??:',
-  'Invalid credentials: {{errorMessage}}': '????:{{errorMessage}}',
-  'Failed to validate credentials': '??????',
-  'Press Enter to continue, Tab/?? to navigate, Esc to cancel':
-    '? Enter ??,Tab/?? ??,Esc ??',
-
+    '无效的 HOPCODE_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值为：{{validValues}}',
   // ============================================================================
   // Dialogs - Model
   // ============================================================================
-  'Select Model': '????',
-  '(Press Esc to close)': '(? Esc ??)',
-  'Current (effective) configuration': '??(????)??',
-  AuthType: '????',
-  'API Key': 'API ??',
-  unset: '???',
-  '(default)': '(??)',
-  '(set)': '(???)',
-  '(not set)': '(???)',
-  Modality: '??',
-  'Context Window': '?????',
-  text: '??',
-  'text-only': '???',
-  image: '??',
+  'Select Model': '选择模型',
+  'API Key': 'API Key',
+  '(default)': '(默认)',
+  '(not set)': '(未设置)',
+  Modality: '模态',
+  'Context Window': '上下文窗口',
+  text: '文本',
+  'text-only': '纯文本',
+  image: '图像',
   pdf: 'PDF',
-  audio: '??',
-  video: '??',
-  'not set': '???',
-  none: '?',
-  unknown: '??',
-  "Failed to switch model to '{{modelId}}'.\n\n{{error}}":
-    "??????? '{{modelId}}'.\n\n{{error}}",
-  'Qwen 3.6 Plus � efficient hybrid model with leading coding performance':
-    'Qwen 3.6 Plus � ??????,????????',
-  'The latest HopCode Vision model from Alibaba Cloud ModelStudio (version: qwen3-vl-plus-2025-09-23)':
-    '????? ModelStudio ??? HopCode Vision ??(??:qwen3-vl-plus-2025-09-23)',
-
+  audio: '音频',
+  video: '视频',
+  'not set': '未设置',
+  none: '无',
+  unknown: '未知',
   // ============================================================================
   // Dialogs - Permissions
   // ============================================================================
-  'Manage folder trust settings': '?????????',
-  'Manage permission rules': '??????',
-  Allow: '??',
-  Ask: '??',
-  Deny: '??',
-  Workspace: '???',
-  "HopCode won't ask before using allowed tools.": 'HopCode ??????????????',
-  'HopCode will ask before using these tools.': 'HopCode ????????????',
-  'HopCode is not allowed to use denied tools.': 'HopCode ????????????',
-  'Manage trusted directories for this workspace.': '?????????????',
-  'Any use of the {{tool}} tool': '{{tool}} ???????',
-  "{{tool}} commands matching '{{pattern}}'": "?? '{{pattern}}' ? {{tool}} ??",
-  'From user settings': '??????',
-  'From project settings': '??????',
-  'From session': '????',
-  'Project settings (local)': '????(??)',
-  'Saved in .hopcode/settings.local.json': '??? .hopcode/settings.local.json',
-  'Project settings': '????',
-  'Checked in at .hopcode/settings.json': '??? .hopcode/settings.json',
-  'User settings': '????',
-  'Saved in at ~/.hopcode/settings.json': '??? ~/.hopcode/settings.json',
-  'Add a new rule�': '?????�',
-  'Add {{type}} permission rule': '??{{type}}????',
+  'Manage folder trust settings': '管理文件夹信任设置',
+  'Manage permission rules': '管理 permission rules',
+  Allow: '允许',
+  Ask: '询问',
+  Deny: '拒绝',
+  Workspace: '工作区',
+  "HopCode won't ask before using allowed tools.":
+    'HopCode 使用已允许的工具前不会询问。',
+  'HopCode will ask before using these tools.':
+    'HopCode 使用这些工具前会先询问。',
+  'HopCode is not allowed to use denied tools.':
+    'HopCode 不允许使用被拒绝的工具。',
+  'Manage trusted directories for this workspace.':
+    '管理此工作区的受信任目录。',
+  'Any use of the {{tool}} tool': '{{tool}} 工具的任何使用',
+  "{{tool}} commands matching '{{pattern}}'":
+    "匹配 '{{pattern}}' 的 {{tool}} 命令",
+  'From user settings': '来自用户设置',
+  'From project settings': '来自项目设置',
+  'From session': '来自会话',
+  'Project settings': '项目设置',
+  'Checked in at .hopcode/settings.json': '保存在 .hopcode/settings.json',
+  'User settings': '用户设置',
+  'Saved in at ~/.hopcode/settings.json': '保存在 ~/.hopcode/settings.json',
+  'Add a new rule…': '添加新规则…',
+  'Add {{type}} permission rule': '添加 {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
-    '???????????,?????????????',
-  'e.g.,': '??',
-  or: '?',
-  'Enter permission rule�': '??????�',
-  'Enter to submit � Esc to cancel': '???? � Esc ??',
-  'Where should this rule be saved?': '??????????',
-  'Enter to confirm � Esc to cancel': '???? � Esc ??',
-  'Delete {{type}} rule?': '??{{type}}???',
-  'Are you sure you want to delete this permission rule?': '????????????',
-  'Permissions:': '??:',
-  '(?/? or tab to cycle)': '(?/? ? tab ??)',
-  'Press ?? to navigate � Enter to select � Type to search � Esc to cancel':
-    '? ?? ?? � ???? � ???? � Esc ??',
-  'Search�': '??�',
-  'Use /trust to manage folder trust settings for this workspace.':
-    '?? /trust ???????????????',
+    'permission rules 是工具名称，可选地后跟括号中的限定符。',
+  'e.g.,': '例如',
+  or: '或',
+  'Enter permission rule…': '输入 permission rule…',
+  'Enter to submit · Esc to cancel': 'Enter 提交 · Esc 取消',
+  'Where should this rule be saved?': '此规则应保存在哪里？',
+  'Enter to confirm · Esc to cancel': 'Enter 确认 · Esc 取消',
+  'Delete {{type}} rule?': '删除{{type}}规则？',
+  'Are you sure you want to delete this permission rule?':
+    '确定要删除此 permission rule 吗？',
+  'Permissions:': '权限：',
+  '(←/→ or tab to cycle)': '（←/→ 或 Tab 切换）',
+  'Press ↑↓ to navigate · Enter to select · Type to search · Esc to cancel':
+    '按 ↑↓ 导航 · Enter 选择 · 输入搜索 · Esc 取消',
+  'Search…': '搜索…',
   // Workspace directory management
-  'Add directory�': '????�',
-  'Add directory to workspace': '???????',
+  'Add directory…': '添加目录…',
+  'Add directory to workspace': '添加工作区目录',
   'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
-    'HopCode ???????????,??????????????????',
+    'HopCode 可以读取工作区中的文件，并在自动接受编辑模式开启时进行编辑。',
   'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'HopCode ????????????,??????????????????',
-  'Enter the path to the directory:': '??????:',
-  'Enter directory path�': '??????�',
-  'Tab to complete � Enter to add � Esc to cancel': 'Tab ?? � ???? � Esc ??',
-  'Remove directory?': '?????',
+    'HopCode 将能够读取此目录中的文件，并在自动接受编辑模式开启时进行编辑。',
+  'Enter the path to the directory:': '输入目录路径：',
+  'Enter directory path…': '输入目录路径…',
+  'Tab to complete · Enter to add · Esc to cancel':
+    'Tab 补全 · Enter 添加 · Esc 取消',
+  'Remove directory?': '删除目录？',
   'Are you sure you want to remove this directory from the workspace?':
-    '????????????????',
-  '  (Original working directory)': '  (??????)',
-  '  (from settings)': '  (????)',
-  'Directory does not exist.': '??????',
-  'Path is not a directory.': '???????',
-  'This directory is already in the workspace.': '??????????',
-  'Already covered by existing directory: {{dir}}': '????????:{{dir}}',
+    '确定要将此目录从工作区中移除吗？',
+  '  (Original working directory)': '  （原始工作目录）',
+  '  (from settings)': '  （来自设置）',
+  'Directory does not exist.': '目录不存在。',
+  'Path is not a directory.': '路径不是目录。',
+  'This directory is already in the workspace.': '此目录已在工作区中。',
+  'Already covered by existing directory: {{dir}}': '已被现有目录覆盖：{{dir}}',
 
   // ============================================================================
   // Status Bar
   // ============================================================================
-  'Using:': '???: ',
-  '{{count}} open file': '{{count}} ??????',
-  '{{count}} open files': '{{count}} ??????',
-  '(ctrl+g to view)': '(? ctrl+g ??)',
-  '{{count}} {{name}} file': '{{count}} ? {{name}} ??',
-  '{{count}} {{name}} files': '{{count}} ? {{name}} ??',
-  '{{count}} MCP server': '{{count}} ? MCP ???',
-  '{{count}} MCP servers': '{{count}} ? MCP ???',
-  '{{count}} Blocked': '{{count}} ????',
-  '(ctrl+t to view)': '(? ctrl+t ??)',
-  '(ctrl+t to toggle)': '(? ctrl+t ??)',
-  'Press Ctrl+C again to exit.': '??? Ctrl+C ??',
-  'Press Ctrl+D again to exit.': '??? Ctrl+D ??',
-  'Press Esc again to clear.': '??? Esc ??',
-  'Press ? to edit queued messages': '? ? ??????',
+  'Using:': '已加载: ',
+  '{{count}} open file': '{{count}} 个打开的文件',
+  '{{count}} open files': '{{count}} 个打开的文件',
+  '(ctrl+g to view)': '（按 ctrl+g 查看）',
+  '{{count}} {{name}} file': '{{count}} 个 {{name}} 文件',
+  '{{count}} {{name}} files': '{{count}} 个 {{name}} 文件',
+  '{{count}} MCP server': '{{count}} 个 MCP server',
+  '{{count}} MCP servers': '{{count}} 个 MCP servers',
+  '{{count}} Blocked': '{{count}} 个已阻止',
+  '(ctrl+t to view)': '（按 ctrl+t 查看）',
+  '(ctrl+t to toggle)': '（按 ctrl+t 切换）',
+  'Press Ctrl+C again to exit.': '再次按 Ctrl+C 退出',
+  'Press Ctrl+D again to exit.': '再次按 Ctrl+D 退出',
+  'Press Esc again to clear.': '再次按 Esc 清除',
+  'Press ↑ to edit queued messages': '按 ↑ 编辑排队消息',
 
   // ============================================================================
   // MCP Status
   // ============================================================================
-  'No MCP servers configured.': '??? MCP ???',
-  '? MCP servers are starting up ({{count}} initializing)...':
-    '? MCP ???????({{count}} ??????)...',
+  'No MCP servers configured.': '未配置 MCP servers',
+  '⏳ MCP servers are starting up ({{count}} initializing)...':
+    '⏳ MCP servers 正在启动（{{count}} 个正在初始化）...',
   'Note: First startup may take longer. Tool availability will update automatically.':
-    '??:???????????????????????',
-  'Configured MCP servers:': '???? MCP ???:',
-  Ready: '??',
-  'Starting... (first startup may take longer)': '????...(????????????)',
-  Disconnected: '?????',
-  '{{count}} tool': '{{count}} ???',
-  '{{count}} tools': '{{count}} ???',
-  '{{count}} prompt': '{{count}} ???',
-  '{{count}} prompts': '{{count}} ???',
-  '(from {{extensionName}})': '(?? {{extensionName}})',
+    '注意：首次启动可能需要更长时间。工具可用性将自动更新',
+  'Configured MCP servers:': '已配置的 MCP servers：',
+  Ready: '就绪',
+  'Starting... (first startup may take longer)':
+    '正在启动...（首次启动可能需要更长时间）',
+  Disconnected: '已断开连接',
+  '{{count}} tool': '{{count}} 个工具',
+  '{{count}} tools': '{{count}} 个工具',
+  '{{count}} prompt': '{{count}} 个提示',
+  '{{count}} prompts': '{{count}} 个提示',
+  '(from {{extensionName}})': '（来自 {{extensionName}}）',
   OAuth: 'OAuth',
-  'OAuth expired': 'OAuth ???',
-  'OAuth not authenticated': 'OAuth ???',
-  'tools and prompts will appear when ready': '????????????',
-  '{{count}} tools cached': '{{count}} ??????',
-  'Tools:': '??:',
-  'Parameters:': '??:',
-  'Prompts:': '??:',
-  Blocked: '???',
-  '?? Tips:': '?? ??:',
-  Use: '??',
-  'to show server and tool descriptions': '??????????',
-  'to show tool parameter schemas': '????????',
-  'to hide descriptions': '????',
-  'to authenticate with OAuth-enabled servers': '???? OAuth ????????',
-  Press: '?',
-  'to toggle tool descriptions on/off': '????????',
+  'OAuth expired': 'OAuth 已过期',
+  'OAuth not authenticated': 'OAuth 未认证',
+  'tools and prompts will appear when ready': '工具和提示将在就绪时显示',
+  '{{count}} tools cached': '{{count}} 个工具已缓存',
+  'Tools:': '工具：',
+  'Parameters:': '参数：',
+  'Prompts:': '提示：',
+  Blocked: '已阻止',
+  '💡 Tips:': '💡 提示：',
+  Use: '使用',
+  'to show server and tool descriptions': '显示服务器和工具描述',
+  'to show tool parameter schemas': '显示 tool parameter schemas',
+  'to hide descriptions': '隐藏描述',
+  'to authenticate with OAuth-enabled servers':
+    '使用支持 OAuth 的服务器进行认证',
+  Press: '按',
+  'to toggle tool descriptions on/off': '切换工具描述开关',
   "Starting OAuth authentication for MCP server '{{name}}'...":
-    "??? MCP ??? '{{name}}' ?? OAuth ??...",
-  'Restarting MCP servers...': '???? MCP ???...',
-
+    "正在为 MCP server '{{name}}' 启动 OAuth 认证...",
   // ============================================================================
   // Startup Tips
   // ============================================================================
-  'Tips:': '??:',
+  'Tips:': '提示：',
   'Use /compress when the conversation gets long to summarize history and free up context.':
-    '?????? /compress,???????????',
+    '对话变长时用 /compress，总结历史并释放上下文。',
   'Start a fresh idea with /clear or /new; the previous session stays available in history.':
-    '? /clear ? /new ?????;???????????????',
+    '用 /clear 或 /new 开启新思路；之前的会话会保留在历史记录中。',
   'Use /bug to submit issues to the maintainers when something goes off.':
-    '?????,? /bug ??????????',
-  'Switch auth type quickly with /auth.': '? /auth ?????????',
+    '遇到问题时，用 /bug 将问题提交给维护者。',
+  'Switch auth type quickly with /auth.': '用 /auth 快速切换认证方式。',
   'You can run any shell commands from HopCode using ! (e.g. !ls).':
-    '? HopCode ??? ! ????? shell ??(?? !ls)?',
+    '在 HopCode 中使用 ! 可运行任意 shell 命令（例如 !ls）。',
   'Type / to open the command popup; Tab autocompletes slash commands and saved prompts.':
-    '?? / ??????;? Tab ????????????????',
+    '输入 / 打开命令弹窗；按 Tab 自动补全斜杠命令和保存的提示词。',
   'You can resume a previous conversation by running hopcode --continue or hopcode --resume.':
-    '?? hopcode --continue ? hopcode --resume ?????????',
+    '运行 hopcode --continue 或 hopcode --resume 可继续之前的会话。',
   'You can switch permission mode quickly with Shift+Tab or /approval-mode.':
-    '? Shift+Tab ??? /approval-mode ??????????',
+    '按 Shift+Tab 或输入 /approval-mode 可快速切换权限模式。',
   'You can switch permission mode quickly with Tab or /approval-mode.':
-    '? Tab ??? /approval-mode ??????????',
+    '按 Tab 或输入 /approval-mode 可快速切换权限模式。',
   'Try /insight to generate personalized insights from your chat history.':
-    '?? /insight,??????????????',
-  'Press Ctrl+O to toggle compact mode � hide tool output and thinking for a cleaner view.':
-    '? Ctrl+O ?????? -- ???????????,??????',
+    '试试 /insight，从聊天记录中生成个性化洞察。',
+  'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
+    '按 Ctrl+O 切换紧凑模式 ── 隐藏工具输出和思考过程，界面更简洁。',
   'Add a HOPCODE.md file to give HopCode persistent project context.':
-    '?? HOPCODE.md ??,? HopCode ???????????',
+    '添加 HOPCODE.md 文件，为 HopCode 提供持久的项目上下文。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
-    '? /btw ????????,?????????',
+    '用 /btw 快速问一个小问题，不会打断当前对话。',
   'Context is almost full! Run /compress now or start /new to continue.':
-    '???????!????? /compress ??? /new ??????',
+    '上下文即将用满！请立即执行 /compress 或使用 /new 开启新会话。',
   'Context is getting full. Use /compress to free up space.':
-    '???????,? /compress ?????',
+    '上下文空间不足，用 /compress 释放空间。',
   'Long conversation? /compress summarizes history to free context.':
-    '?????? /compress ????,??????',
+    '对话太长？用 /compress 总结历史，释放上下文。',
 
   // ============================================================================
   // Exit Screen / Stats
   // ============================================================================
-  'Agent powering down. Goodbye!': 'HopCode ????,??!',
-  'To continue this session, run': '??????,???',
-  'Interaction Summary': '????',
-  'Session ID:': '?? ID:',
-  'Tool Calls:': '????:',
-  'Success Rate:': '???:',
-  'User Agreement:': '?????:',
-  reviewed: '???',
-  'Code Changes:': '????:',
-  Performance: '??',
-  'Wall Time:': '???:',
-  'Agent Active:': '???????:',
-  'API Time:': 'API ??:',
-  'Tool Time:': '????:',
-  'Session Stats': '????',
-  'Model Usage': '??????',
-  Reqs: '???',
-  'Input Tokens': '?? token ?',
-  'Output Tokens': '?? token ?',
-  'Savings Highlight:': '????:',
+  'Agent powering down. Goodbye!': 'HopCode 正在关闭，再见！',
+  'To continue this session, run': '要继续此会话，请运行',
+  'Interaction Summary': '交互摘要',
+  'Session ID:': '会话 ID：',
+  'Tool Calls:': '工具调用：',
+  'Success Rate:': '成功率：',
+  'User Agreement:': '用户同意率：',
+  reviewed: '已审核',
+  'Code Changes:': '代码变更：',
+  Performance: '性能',
+  'Wall Time:': '总耗时：',
+  'Agent Active:': '智能体活跃时间：',
+  'API Time:': 'API 时间：',
+  'Tool Time:': '工具时间：',
+  'Session Stats': '会话统计',
+  'Model Usage': '模型使用情况',
+  Reqs: '请求数',
+  'Input Tokens': '输入 token 数',
+  'Output Tokens': '输出 token 数',
+  'Savings Highlight:': '节省亮点：',
   'of input tokens were served from the cache, reducing costs.':
-    '????? token ,?????',
+    '从缓存载入 token ，降低了成本',
   'Tip: For a full token breakdown, run `/stats model`.':
-    '??:??????????,??? `/stats model`',
-  'Model Stats For Nerds': '????(????)',
-  'Tool Stats For Nerds': '????(????)',
-  Metric: '??',
+    '提示：要查看完整的令牌明细，请运行 `/stats model`',
+  'Model Stats For Nerds': '模型统计（技术细节）',
+  'Tool Stats For Nerds': '工具统计（技术细节）',
+  Metric: '指标',
   API: 'API',
-  Requests: '???',
-  Errors: '???',
-  'Avg Latency': '????',
-  Tokens: '??',
-  Total: '??',
-  Prompt: '??',
-  Cached: '??',
-  Thoughts: '??',
-  Tool: '??',
-  Output: '??',
-  'No API calls have been made in this session.': '?????????? API ??',
-  'Tool Name': '????',
-  Calls: '????',
-  'Success Rate': '???',
-  'Avg Duration': '????',
-  'User Decision Summary': '??????',
-  'Total Reviewed Suggestions:': '???????:',
-  ' � Accepted:': ' � ???:',
-  ' � Rejected:': ' � ???:',
-  ' � Modified:': ' � ???:',
-  ' Overall Agreement Rate:': ' ?????:',
-  'No tool calls have been made in this session.': '??????????????',
+  Requests: '请求数',
+  Errors: '错误数',
+  'Avg Latency': '平均延迟',
+  Tokens: '令牌',
+  Total: '总计',
+  Prompt: '提示',
+  Cached: '缓存',
+  Thoughts: '思考',
+  Output: '输出',
+  'No API calls have been made in this session.':
+    '本次会话中未进行任何 API 调用',
+  'Tool Name': '工具名称',
+  Calls: '调用次数',
+  'Success Rate': '成功率',
+  'Avg Duration': '平均耗时',
+  'User Decision Summary': '用户决策摘要',
+  'Total Reviewed Suggestions:': '已审核建议总数：',
+  ' » Accepted:': ' » 已接受：',
+  ' » Rejected:': ' » 已拒绝：',
+  ' » Modified:': ' » 已修改：',
+  ' Overall Agreement Rate:': ' 总体同意率：',
+  'No tool calls have been made in this session.':
+    '本次会话中未进行任何工具调用',
   'Session start time is unavailable, cannot calculate stats.':
-    '?????????,????????',
+    '会话开始时间不可用，无法计算统计信息',
 
   // ============================================================================
   // Command Format Migration
   // ============================================================================
-  'Command Format Migration': '??????',
-  'Found {{count}} TOML command file:': '?? {{count}} ? TOML ????:',
-  'Found {{count}} TOML command files:': '?? {{count}} ? TOML ????:',
-  'Current tasks': '????',
-  '... and {{count}} more': '... ???? {{count}} ?',
+  'Command Format Migration': '命令格式迁移',
+  'Found {{count}} TOML command file:': '发现 {{count}} 个 TOML 命令文件：',
+  'Found {{count}} TOML command files:': '发现 {{count}} 个 TOML 命令文件：',
+  'Current tasks': '当前任务',
+  '... and {{count}} more': '... 以及其他 {{count}} 个',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
-    'TOML ?????????????? Markdown ???',
+    'TOML 格式已弃用。是否将它们迁移到 Markdown 格式？',
   '(Backups will be created and original files will be preserved)':
-    '(?????,???????)',
+    '（将创建备份，原始文件将保留）',
 
   // ============================================================================
   // Loading Phrases
   // ============================================================================
-  'Waiting for user confirmation...': '??????...',
-  '(esc to cancel, {{time}})': '(? esc ??,{{time}})',
+  'Waiting for user confirmation...': '等待用户确认...',
   WITTY_LOADING_PHRASES: [
-    // --- ?????? ---
-    '??????,???...',
-    '?????,????!',
-    '?????,??????...',
-    '????????,?????...',
-    '??????????...',
+    // --- 职场搬砖系列 ---
+    '正在努力搬砖，请稍候...',
+    '老板在身后，快加载啊！',
+    '头发掉光前，一定能加载完...',
+    '服务器正在深呼吸，准备放大招...',
+    '正在向服务器投喂咖啡...',
 
-    // --- ?????? ---
-    '???????,??????...',
-    '??????,??????...',
-    '????????,?????...',
-    '??????,??????...',
-    '???????,??????...',
-    '?????,??????...',
+    // --- 大厂黑话系列 ---
+    '正在赋能全链路，寻找关键抓手...',
+    '正在降本增效，优化加载路径...',
+    '正在打破部门壁垒，沉淀方法论...',
+    '正在拥抱变化，迭代核心价值...',
+    '正在对齐颗粒度，打磨底层逻辑...',
+    '大力出奇迹，正在强行加载...',
 
-    // --- ??????? ---
-    '???????,????? Bug...',
-    '??? Bug ??? Feature...',
-    '??????,Bug ?????...',
-    '???????????????...',
-    '???????,?????...',
+    // --- 程序员自嘲系列 ---
+    '只要我不写代码，代码就没有 Bug...',
+    '正在把 Bug 转化为 Feature...',
+    '只要我不尴尬，Bug 就追不上我...',
+    '正在试图理解去年的自己写了什么...',
+    '正在猿力觉醒中，请耐心等待...',
 
-    // --- ?????? ---
-    '????????:????????',
-    '?????????,???...',
+    // --- 合作愉快系列 ---
+    '正在询问产品经理：这需求是真的吗？',
+    '正在给产品经理画饼，请稍等...',
 
-    // --- ?????? ---
-    '?????,??????????????...',
-    '????????,??????????...',
-    '??,????????????????...',
-    '??????? Bug,?????????...',
-    '???? 0.1% ???,????????...',
-    '??????,??????????...',
+    // --- 温暖治愈系列 ---
+    '每一行代码，都在努力让世界变得更好一点点...',
+    '每一个伟大的想法，都值得这份耐心的等待...',
+    '别急，美好的事物总是需要一点时间去酝酿...',
+    '愿你的代码永无 Bug，愿你的梦想终将成真...',
+    '哪怕只有 0.1% 的进度，也是在向目标靠近...',
+    '加载的是字节，承载的是对技术的热爱...',
   ],
 
   // ============================================================================
   // Extension Settings Input
   // ============================================================================
-  'Enter value...': '????...',
-  'Enter sensitive value...': '??????...',
-  'Press Enter to submit, Escape to cancel': '? Enter ??,Escape ??',
+  'Enter value...': '请输入值...',
+  'Enter sensitive value...': '请输入敏感值...',
+  'Press Enter to submit, Escape to cancel': '按 Enter 提交，Escape 取消',
 
   // ============================================================================
   // Command Migration Tool
   // ============================================================================
-  'Markdown file already exists: {{filename}}': 'Markdown ?????:{{filename}}',
-  'TOML Command Format Deprecation Notice': 'TOML ????????',
+  'Markdown file already exists: {{filename}}':
+    'Markdown 文件已存在：{{filename}}',
+  'TOML Command Format Deprecation Notice': 'TOML 命令格式弃用通知',
   'Found {{count}} command file(s) in TOML format:':
-    '?? {{count}} ? TOML ???????:',
+    '发现 {{count}} 个 TOML 格式的命令文件：',
   'The TOML format for commands is being deprecated in favor of Markdown format.':
-    '??? TOML ???????,???? Markdown ???',
+    '命令的 TOML 格式正在被弃用，推荐使用 Markdown 格式。',
   'Markdown format is more readable and easier to edit.':
-    'Markdown ???????????',
-  'You can migrate these files automatically using:': '?????????????????:',
-  'Or manually convert each file:': '?????????:',
+    'Markdown 格式更易读、更易编辑。',
+  'You can migrate these files automatically using:':
+    '您可以使用以下命令自动迁移这些文件：',
+  'Or manually convert each file:': '或手动转换每个文件：',
   'TOML: prompt = "..." / description = "..."':
-    'TOML:prompt = "..." / description = "..."',
-  'Markdown: YAML frontmatter + content': 'Markdown:YAML frontmatter + ??',
-  'The migration tool will:': '?????:',
-  'Convert TOML files to Markdown': '? TOML ????? Markdown',
-  'Create backups of original files': '?????????',
-  'Preserve all command functionality': '????????',
+    'TOML：prompt = "..." / description = "..."',
+  'Markdown: YAML frontmatter + content': 'Markdown：YAML frontmatter + 内容',
+  'The migration tool will:': '迁移工具将：',
+  'Convert TOML files to Markdown': '将 TOML 文件转换为 Markdown',
+  'Create backups of original files': '创建原始文件的备份',
+  'Preserve all command functionality': '保留所有命令功能',
   'TOML format will continue to work for now, but migration is recommended.':
-    'TOML ????????,??????',
+    'TOML 格式目前仍可使用，但建议迁移。',
 
   // ============================================================================
   // Extensions - Explore Command
   // ============================================================================
-  'Open extensions page in your browser': '?????????????',
-  'Unknown extensions source: {{source}}.': '???????:{{source}}?',
+  'Open extensions page in your browser': '在浏览器中打开扩展市场页面',
+  'Unknown extensions source: {{source}}.': '未知的扩展来源：{{source}}。',
   'Would open extensions page in your browser: {{url}} (skipped in test environment)':
-    '????????????:{{url}}(????????)',
-  'View available extensions at {{url}}': '? {{url}} ??????',
-  'Opening extensions page in your browser: {{url}}': '????????????:{{url}}',
+    '将在浏览器中打开扩展页面：{{url}}（测试环境中已跳过）',
+  'View available extensions at {{url}}': '在 {{url}} 查看可用扩展',
+  'Opening extensions page in your browser: {{url}}':
+    '正在浏览器中打开扩展页面：{{url}}',
   'Failed to open browser. Check out the extensions gallery at {{url}}':
-    '???????????????:{{url}}',
-
-  // ============================================================================
-  // Retry / Rate Limit
-  // ============================================================================
-  'Rate limit error: {{reason}}': '????:{{reason}}',
-  'Retrying in {{seconds}} seconds� (attempt {{attempt}}/{{maxRetries}})':
-    '?? {{seconds}} ????�(? {{attempt}}/{{maxRetries}} ?)',
-  'Press Ctrl+Y to retry': '? Ctrl+Y ???',
-  'No failed request to retry.': '???????????',
-  'to retry last request': '???????',
+    '打开浏览器失败。请访问扩展市场：{{url}}',
+  'Retrying in {{seconds}} seconds… (attempt {{attempt}}/{{maxRetries}})':
+    '将于 {{seconds}} 秒后重试…（第 {{attempt}}/{{maxRetries}} 次）',
+  'Press Ctrl+Y to retry': '按 Ctrl+Y 重试。',
+  'No failed request to retry.': '没有可重试的失败请求。',
+  'to retry last request': '重试上一次请求',
 
   // ============================================================================
   // Coding Plan Authentication
   // ============================================================================
-  'API key cannot be empty.': 'API Key ?????',
+  'API key cannot be empty.': 'API Key 不能为空。',
   'Invalid API key. Coding Plan API keys start with "sk-sp-". Please check.':
-    '??? API Key,Coding Plan API Key ?? "sk-sp-" ??,???',
-  'You can get your Coding Plan API key here': '???????? Coding Plan API Key',
-  'You can get your Token Plan API key here': '???????? Token Plan API Key',
+    '无效的 API Key，Coding Plan API Key 均以 "sk-sp-" 开头，请检查',
+  'You can get your Coding Plan API key here':
+    '您可以在这里获取 Coding Plan API Key',
+  'You can get your Token Plan API key here':
+    '您可以在这里获取 Token Plan API Key',
   'API key is stored in settings.env. You can migrate it to a .env file for better security.':
-    'API Key ???? settings.env ?????????? .env ????????????',
+    'API Key 已存储在 settings.env 中。您可以将其迁移到 .env 文件以获得更好的安全性。',
   'New model configurations are available for Alibaba Cloud Coding Plan. Update now?':
-    '????? Coding Plan ????????????????',
+    '阿里云百炼 Coding Plan 有新模型配置可用。是否立即更新？',
   'Coding Plan configuration updated successfully. New models are now available.':
-    'Coding Plan ???????????????',
+    'Coding Plan 配置更新成功。新模型现已可用。',
   'Coding Plan API key not found. Please re-authenticate with Coding Plan.':
-    '??? Coding Plan API Key?????? Coding Plan ???',
+    '未找到 Coding Plan API Key。请重新通过 Coding Plan 认证。',
   'Failed to update Coding Plan configuration: {{message}}':
-    '?? Coding Plan ????:{{message}}',
+    '更新 Coding Plan 配置失败：{{message}}',
 
   // ============================================================================
   // Custom API Key Configuration
   // ============================================================================
   'You can configure your API key and models in settings.json':
-    '???? settings.json ??? API Key ???',
-  'Refer to the documentation for setup instructions': '???????????',
+    '您可以在 settings.json 中配置 API Key 和模型',
+  'Refer to the documentation for setup instructions': '请参考文档了解配置说明',
 
   // ============================================================================
   // Auth Dialog - View Titles and Labels
   // ============================================================================
-  'API-KEY': 'API-KEY',
   'Coding Plan': 'Coding Plan',
-  "Paste your api key of ModelStudio Coding Plan and you're all set!":
-    '?????? Coding Plan API Key,??????!',
-  Custom: '???',
-  'More instructions about configuring `modelProviders` manually.':
-    '?????? `modelProviders` ??????',
-  'Select API-KEY configuration mode:': '?? API-KEY ????:',
-  '(Press Escape to go back)': '(? Escape ???)',
-  '(Press Enter to submit, Escape to cancel)': '(? Enter ??,Escape ??)',
-  'Select Region for Coding Plan': '?? Coding Plan ??',
-  'Choose based on where your account is registered': '?????????????',
-  'Enter Coding Plan API Key': '?? Coding Plan API Key',
-  'Enter Token Plan API Key': '?? Token Plan API Key',
+  Custom: '自定义',
+  'Select Region for Coding Plan': '选择 Coding Plan 区域',
+  'Choose based on where your account is registered':
+    '请根据您的账号注册地区选择',
+  'Enter Coding Plan API Key': '输入 Coding Plan API Key',
+  'Enter Token Plan API Key': '输入 Token Plan API Key',
 
   // ============================================================================
   // Coding Plan International Updates
   // ============================================================================
   'New model configurations are available for {{region}}. Update now?':
-    '{{region}} ?????????????????',
+    '{{region}} 有新的模型配置可用。是否立即更新？',
   '{{region}} configuration updated successfully. Model switched to "{{model}}".':
-    '{{region}} ????????????? "{{model}}"?',
-  'Authenticated successfully with {{region}}. API key and model configs saved to settings.json (backed up).':
-    '???? {{region}} ???API Key ????????? settings.json(???)?',
-
+    '{{region}} 配置更新成功。模型已切换至 "{{model}}"。',
   // ============================================================================
   // Context Usage
   // ============================================================================
-  'Context Usage': '???????',
-  '% used': '% ??',
-  '% context used': '% ?????',
+  'Context Usage': '上下文使用情况',
+  '% used': '% 已用',
+  '% context used': '% 上下文已用',
   'Context exceeds limit! Use /compress or /clear to reduce.':
-    '???????!??? /compress ? /clear ???????',
-  'Use /compress or /clear': '?? /compress ? /clear',
-  'Context window': '?????',
-  Used: '??',
-  Free: '??',
-  'Autocompact buffer': '???????',
-  'Usage by category': '????',
-  'System prompt': '????',
-  'Built-in tools': '????',
-  'MCP tools': 'MCP ??',
-  'Memory files': '????',
-  Skills: '??',
-  Messages: '??',
+    '上下文超出限制！请使用 /compress 或 /clear 来减少上下文。',
+  'Context window': '上下文窗口',
+  Used: '已用',
+  Free: '空闲',
+  'Autocompact buffer': '自动压缩缓冲区',
+  'Usage by category': '分类用量',
+  'System prompt': '系统提示',
+  'Built-in tools': '内置工具',
+  'MCP tools': 'MCP tools',
+  'Memory files': '记忆文件',
+  Skills: '技能',
+  Messages: '消息',
   tokens: 'tokens',
-  'Estimated pre-conversation overhead': '???????',
+  'Estimated pre-conversation overhead': '预估对话前开销',
   'No API response yet. Send a message to see actual usage.':
-    '?? API ?????????????????',
-  'Show context window usage breakdown.': '??????????????',
-  'Run /context detail for per-item breakdown.': '?? /context detail ???????',
+    '暂无 API 响应。发送消息以查看实际使用情况。',
+  'Run /context detail for per-item breakdown.':
+    '运行 /context detail 查看详细分解。',
   'Show context window usage breakdown. Use "/context detail" for per-item breakdown.':
-    '???????????????? "/context detail" ???????',
-  'body loaded': '?????',
-  memory: '??',
-  '{{region}} configuration updated successfully.': '{{region}} ???????',
+    '显示上下文窗口使用情况分解。输入 "/context detail" 查看详细分解。',
+  'body loaded': '内容已加载',
+  memory: '记忆',
+  '{{region}} configuration updated successfully.': '{{region}} 配置更新成功。',
   'Authenticated successfully with {{region}}. API key and model configs saved to settings.json.':
-    '???? {{region}} ???API Key ????????? settings.json?',
+    '成功通过 {{region}} 认证。API Key 和模型配置已保存至 settings.json。',
   'Tip: Use /model to switch between available Coding Plan models.':
-    '??:?? /model ????? Coding Plan ???',
-
-  // ============================================================================
-  // Ask User Question Tool
-  // ============================================================================
-  'Please answer the following question(s):': '???????:',
-  'Cannot ask user questions in non-interactive mode. Please run in interactive mode to use this tool.':
-    '????????????????????????????????',
-  'User declined to answer the questions.': '?????????',
-  'User has provided the following answers:': '?????????:',
-  'Failed to process user answers:': '????????:',
-  'Type something...': '????...',
-  Submit: '??',
-  'Submit answers': '????',
-  Cancel: '??',
-  'Your answers:': '????:',
-  '(not answered)': '(???)',
-  'Ready to submit your answers?': '????????????',
-  '?/?: Navigate | ?/?: Switch tabs | Enter: Select':
-    '?/?: ?? | ?/?: ????? | Enter: ??',
-  '?/?: Navigate | ?/?: Switch tabs | Space/Enter: Toggle | Esc: Cancel':
-    '?/?: ?? | ?/?: ????? | Space/Enter: ?? | Esc: ??',
-  '?/?: Navigate | Space/Enter: Toggle | Esc: Cancel':
-    '?/?: ?? | Space/Enter: ?? | Esc: ??',
-  '?/?: Navigate | Enter: Select | Esc: Cancel':
-    '?/?: ?? | Enter: ?? | Esc: ??',
-
-  // ============================================================================
-  // Commands - Auth
-  // ============================================================================
-  'Configure authentication information with hopcode-oauth or Alibaba Cloud Coding Plan':
-    '?? Legacy OAuth ?????? Coding Plan ??????',
-  'Authenticate using HopCode OAuth': '?? Legacy OAuth ????',
-  'Authenticate using Alibaba Cloud Coding Plan': '??????? Coding Plan ????',
-  'Region for Coding Plan (china/global)': 'Coding Plan ?? (china/global)',
-  'API key for Coding Plan': 'Coding Plan ? API ??',
-  'Show current authentication status': '????????',
-  'Authentication completed successfully.': '?????',
-  'Starting HopCode OAuth authentication...': '???? Legacy OAuth ??...',
-  'Successfully authenticated with HopCode OAuth.': '????? Legacy OAuth ???',
+    '提示：使用 /model 切换可用的 Coding Plan 模型。',
+  'Type something...': '输入内容...',
+  Submit: '提交',
+  'Submit answers': '提交答案',
+  Cancel: '取消',
+  'Your answers:': '您的答案：',
+  '(not answered)': '(未回答)',
+  'Ready to submit your answers?': '准备好提交您的答案了吗？',
+  '↑/↓: Navigate | ←/→: Switch tabs | Enter: Select':
+    '↑/↓: 导航 | ←/→: 切换标签页 | Enter: 选择',
+  '↑/↓: Navigate | Enter: Select | Esc: Cancel':
+    '↑/↓: 导航 | Enter: 选择 | Esc: 取消',
+  'Authenticate using HopCode OAuth': '使用 HopCode OAuth 进行认证',
+  'Authenticate using Alibaba Cloud Coding Plan':
+    '使用阿里云百炼 Coding Plan 进行认证',
+  'Region for Coding Plan (china/global)': 'Coding Plan 区域 (china/global)',
+  'API key for Coding Plan': 'Coding Plan 的 API Key',
+  'Show current authentication status': '显示当前认证状态',
+  'Authentication completed successfully.': '认证完成。',
+  'Starting HopCode OAuth authentication...': '正在启动 HopCode OAuth 认证...',
+  'Successfully authenticated with HopCode OAuth.': '已成功通过 HopCode OAuth 认证。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
-    'Legacy OAuth ????:{{error}}',
+    'HopCode OAuth 认证失败：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
-    '????????? Coding Plan ??...',
+    '正在处理阿里云百炼 Coding Plan 认证...',
   'Successfully authenticated with Alibaba Cloud Coding Plan.':
-    '?????????? Coding Plan ???',
+    '已成功通过阿里云百炼 Coding Plan 认证。',
   'Failed to authenticate with Coding Plan: {{error}}':
-    'Coding Plan ????:{{error}}',
-  '?? (China)': '?? (China)',
-  '????? (aliyun.com)': '????? (aliyun.com)',
-  Global: '??',
+    'Coding Plan 认证失败：{{error}}',
+  Global: '全球',
   'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
-  'Select region for Coding Plan:': '?? Coding Plan ??:',
-  'Enter your Coding Plan API key: ': '????? Coding Plan API ??:',
-  'Select authentication method:': '??????:',
-  '\n=== Authentication Status ===\n': '\n=== ???? ===\n',
-  '??  No authentication method configured.\n': '??  ????????\n',
-  'Run one of the following commands to get started:\n': '????????????:\n',
+  'Select region for Coding Plan:': '选择 Coding Plan 区域：',
+  'Enter your Coding Plan API key: ': '请输入您的 Coding Plan API Key：',
+  'Select authentication method:': '选择认证方式：',
+  '\n=== Authentication Status ===\n': '\n=== 认证状态 ===\n',
+  '⚠️  No authentication method configured.\n': '⚠️  未配置认证方式。\n',
+  'Run one of the following commands to get started:\n':
+    '运行以下命令之一开始配置：\n',
   '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - ?? Legacy OAuth ??(???)',
-  '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
-    '  hopcode auth coding-plan      - ??????? Coding Plan ??\n',
-  'Or simply run:': '??????:',
+    '  hopcode auth hopcode-oauth     - 使用 HopCode OAuth 登录（已停用）',
+  'Or simply run:': '或者直接运行：',
   '  hopcode auth                - Interactive authentication setup\n':
-    '  hopcode auth                - ???????\n',
-  '? Authentication Method: HopCode OAuth': '? ????:Legacy OAuth',
-  '  Type: Free tier (discontinued 2026-04-15)': '  ??:????(2026-04-15 ???)',
-  '  Limit: No longer available': '  ??:????',
+    '  hopcode auth                - 交互式认证配置\n',
+  '✓ Authentication Method: HopCode OAuth': '✓ 认证方式：HopCode OAuth',
+  '  Type: Free tier (discontinued 2026-04-15)':
+    '  类型：免费额度（2026-04-15 已停用）',
+  '  Limit: No longer available': '  限额：已不可用',
   'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Legacy OAuth ?????? 2026-04-15 ?????? /auth ??? Coding Plan?OpenRouter?Fireworks AI ???????',
-  '  Models: Qwen latest models\n': '  ??:Qwen ????\n',
-  '? Authentication Method: Alibaba Cloud Coding Plan':
-    '? ????:????? Coding Plan',
-  '?? (China) - ?????': '?? (China) - ?????',
-  'Global - Alibaba Cloud': '?? - Alibaba Cloud',
-  '  Region: {{region}}': '  ??:{{region}}',
-  '  Current Model: {{model}}': '  ????:{{model}}',
-  '  Config Version: {{version}}': '  ????:{{version}}',
-  '  Status: API key configured\n': '  ??:API ?????\n',
-  '??  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
-    '??  ????:????? Coding Plan(???)',
+    'HopCode OAuth 免费额度已于 2026-04-15 停用。请运行 /auth 切换到 Coding Plan、OpenRouter、Fireworks AI 或其他服务商。',
+  '✓ Authentication Method: Alibaba Cloud Coding Plan':
+    '✓ 认证方式：阿里云百炼 Coding Plan',
+  'Global - Alibaba Cloud': '全球 - Alibaba Cloud',
+  '  Region: {{region}}': '  区域：{{region}}',
+  '  Current Model: {{model}}': '  当前模型：{{model}}',
+  '  Config Version: {{version}}': '  配置版本：{{version}}',
+  '  Status: API key configured\n': '  状态：API Key 已配置\n',
+  '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
+    '⚠️  认证方式：阿里云百炼 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
-    '  ??:???????????? API ??\n',
+    '  问题：在环境变量或设置中未找到 API Key\n',
   '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  ?? `hopcode auth coding-plan` ?????\n',
-  '? Authentication Method: {{type}}': '? ????:{{type}}',
-  '  Status: Configured\n': '  ??:???\n',
-  'Failed to check authentication status: {{error}}': '????????:{{error}}',
-  'Select an option:': '???:',
+    '  运行 `hopcode auth coding-plan` 重新配置。\n',
+  '✓ Authentication Method: {{type}}': '✓ 认证方式：{{type}}',
+  '  Status: Configured\n': '  状态：已配置\n',
+  'Failed to check authentication status: {{error}}':
+    '检查认证状态失败：{{error}}',
+  'Select an option:': '请选择：',
   'Raw mode not available. Please run in an interactive terminal.':
-    '???????????????????',
-  '(Use ? ? arrows to navigate, Enter to select, Ctrl+C to exit)\n':
-    '(?? ? ? ????,Enter ??,Ctrl+C ??)\n',
-  compact: '??',
-  'compact mode: on (Ctrl+O off)': '????:?(Ctrl+O ??)',
+    '原始模式不可用。请在交互式终端中运行。',
+  '(Use ↑ ↓ arrows to navigate, Enter to select, Ctrl+C to exit)\n':
+    '(使用 ↑ ↓ 箭头导航，Enter 选择，Ctrl+C 退出)\n',
   'Hide tool output and thinking for a cleaner view (toggle with Ctrl+O).':
-    '????????????????,?????(Ctrl+O ??)?',
-  'Press Ctrl+O to show full tool output': '? Ctrl+O ??????????',
-
-  'Switch to plan mode or exit plan mode': '??????????????',
-  'Exited plan mode. Previous approval mode restored.': '???????,???????????',
+    '紧凑模式下隐藏工具输出和思考过程，界面更简洁（Ctrl+O 切换）。',
+  'Press Ctrl+O to show full tool output': '按 Ctrl+O 查看详细工具调用结果',
+  'Switch to plan mode or exit plan mode': '切换到计划模式或退出计划模式',
+  'Exited plan mode. Previous approval mode restored.':
+    '已退出计划模式，已恢复之前的审批模式。',
   'Enabled plan mode. The agent will analyze and plan without executing tools.':
-    '?????????????????,???????',
+    '启用计划模式。智能体将只分析和规划，而不执行工具。',
   'Already in plan mode. Use "/plan exit" to exit plan mode.':
-    '?????????? "/plan exit" ???????',
+    '已处于计划模式。使用 "/plan exit" 退出计划模式。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
-    '???????????? "/plan" ???????',
+    '未处于计划模式。请先使用 "/plan" 进入计划模式。',
+  "Set up HopCode's status line UI": '配置 HopCode 的状态栏',
 
-  "Set up HopCode's status line UI": '?? HopCode ????',
+  // === Core: added from PR #3328 ===
+  'Ask a quick side question without affecting the main conversation':
+    '在不影响主对话的情况下快速问一个旁支问题',
+  'Manage Arena sessions': '管理 Arena 会话',
+  'Start an Arena session with multiple models competing on the same task':
+    '启动一个 Arena 会话，让多个模型在同一任务上竞争',
+  'Stop the current Arena session': '停止当前 Arena 会话',
+  'Show the current Arena session status': '显示当前 Arena 会话状态',
+  'Select a model result and merge its diff into the current workspace':
+    '选择一个模型结果并将其差异合并到当前工作区',
+  'No running Arena session found.': '未找到正在运行的 Arena 会话。',
+  'No Arena session found. Start one with /arena start.':
+    '未找到 Arena 会话。请使用 /arena start 启动一个。',
+  'Arena session is still running. Wait for it to complete or use /arena stop first.':
+    'Arena 会话仍在运行中。请等待其完成，或先使用 /arena stop。',
+  'No successful agent results to select from. All agents failed or were cancelled.':
+    '没有可选择的成功智能体结果。所有智能体均失败或被取消。',
+  'Use /arena stop to end the session.': '使用 /arena stop 结束会话。',
+  'No idle agent found matching "{{name}}".':
+    '未找到匹配 "{{name}}" 的空闲智能体。',
+  'Failed to apply changes from {{label}}: {{error}}':
+    '从 {{label}} 应用更改失败：{{error}}',
+  'Applied changes from {{label}} to workspace. Arena session complete.':
+    '已将 {{label}} 的更改应用到工作区。Arena 会话完成。',
+  'Discard all Arena results and clean up worktrees?':
+    '丢弃所有 Arena 结果并清理工作树？',
+  'Arena results discarded. All worktrees cleaned up.':
+    'Arena 结果已丢弃。所有工作树已清理。',
+  'Arena is not supported in non-interactive mode. Use interactive mode to start an Arena session.':
+    'Arena 不支持非交互模式。请使用交互模式启动 Arena 会话。',
+  'Arena is not supported in non-interactive mode. Use interactive mode to stop an Arena session.':
+    'Arena 不支持非交互模式。请使用交互模式停止 Arena 会话。',
+  'Arena is not supported in non-interactive mode.': 'Arena 不支持非交互模式。',
+  'An Arena session exists. Use /arena stop or /arena select to end it before starting a new one.':
+    '已存在 Arena 会话。请使用 /arena stop 或 /arena select 结束后再启动新会话。',
+  'Usage: /arena start --models model1,model2 <task>':
+    '用法：/arena start --models model1,model2 <task>',
+  'Models to compete (required, at least 2)':
+    '参与竞争的模型（必须，至少 2 个）',
+  'Format: authType:modelId or just modelId':
+    '格式：authType:modelId 或仅 modelId',
+  'Arena requires at least 2 models. Use --models model1,model2 to specify.':
+    'Arena 至少需要 2 个模型。请使用 --models model1,model2 指定。',
+  'Arena started with {{count}} agents on task: "{{task}}"\nModels:\n{{modelList}}':
+    'Arena 已启动 {{count}} 个智能体处理任务："{{task}}"\n模型：\n{{modelList}}',
+  'Arena panes are running in tmux. Attach with: `{{command}}`':
+    'Arena 面板正在 tmux 中运行。使用以下命令附加：`{{command}}`',
+  '[{{label}}] failed: {{error}}': '[{{label}}] 失败：{{error}}',
+  'Loading suggestions...': '正在加载建议...',
+  'Open the memory manager.': '打开记忆管理器。',
+  'Save a durable memory to the memory system.':
+    '将一条持久记忆保存到记忆系统。',
+  'Show per-item context usage breakdown.': '显示按项目划分的上下文使用详情。',
+  'Manage extension settings': '管理扩展设置',
+
+  // === Core: added from PR #3328 ===
+  'Manage dynamic translation cache': '管理动态翻译缓存',
+  'Re-translate currently loaded dynamic slash descriptions for the current UI language':
+    '重新翻译当前 UI 语言的动态斜杠命令描述',
+  'Clear cached translations for the current UI language':
+    '清除当前 UI 语言的缓存翻译',
+  'Manage AI translation for dynamic slash command descriptions':
+    '管理动态斜杠命令描述的 AI 翻译',
+  'Enable AI translation for dynamic slash command descriptions':
+    '启用动态斜杠命令描述的 AI 翻译',
+  'Disable AI translation for dynamic slash command descriptions':
+    '禁用动态斜杠命令描述的 AI 翻译',
+  'Show AI translation status for dynamic slash command descriptions':
+    '显示动态斜杠命令描述的 AI 翻译状态',
+  'AI translation for dynamic slash command descriptions is {{status}}.':
+    '动态斜杠命令描述的 AI 翻译处于{{status}}状态。',
+  'AI translation for dynamic slash command descriptions is now enabled.':
+    '动态斜杠命令描述的 AI 翻译现已启用。',
+  'AI translation for dynamic slash command descriptions is now disabled.':
+    '动态斜杠命令描述的 AI 翻译现已禁用。',
+  'Background tasks': '后台任务',
+  'No tasks currently running': '当前没有正在运行的任务',
+  'No entry to show.': '没有可显示的条目。',
+  Running: '运行中',
+  Paused: '已暂停',
+  Completed: '已完成',
+  Failed: '失败',
+  Stopped: '已停止',
+  Shell: 'Shell',
+  Monitor: '监控',
+  Command: '命令',
+  Dream: '记忆整理',
+  '[dream] memory consolidation': '[记忆整理] 记忆整理',
+  '[dream] memory consolidation (reviewing {{count}} session)':
+    '[记忆整理] 记忆整理（正在审阅 {{count}} 个会话）',
+  '[dream] memory consolidation (reviewing {{count}} sessions)':
+    '[记忆整理] 记忆整理（正在审阅 {{count}} 个会话）',
+  '{{count}} session': '{{count}} 个会话',
+  '{{count}} sessions': '{{count}} 个会话',
+  '{{count}} topic': '{{count}} 个主题',
+  '{{count}} topics': '{{count}} 个主题',
+  '{{count}} tokens': '{{count}} tokens',
+  '{{count}} tool call': '{{count}} 个工具调用',
+  '{{count}} tool calls': '{{count}} 个工具调用',
+  '{{count}} event': '{{count}} 个事件',
+  '{{count}} events': '{{count}} 个事件',
+  '{{count}} dropped': '丢弃 {{count}} 行',
+  'pid {{pid}}': 'pid {{pid}}',
+  'exit {{exitCode}}': '退出码 {{exitCode}}',
+  'Sessions reviewing': '正在审阅的会话',
+  Progress: '进度',
+  'Resume blocked': '恢复受阻',
+  'Working dir': '工作目录',
+  'Output file': '输出文件',
+  'Topics touched ({{count}})': '触及的主题（{{count}}）',
+  '{{count}} more': '{{count}} 个',
+  'Lock release warning': '锁释放警告',
+  'Metadata write warning': '元数据写入警告',
+  "Subsequent dreams may be skipped as locked until the next session's staleness sweep cleans the file.":
+    '后续记忆整理可能会因锁定而跳过，直到下一次会话过期清理清除此文件。',
+  "The scheduler gate did not see this dream's timestamp; the next dream cycle may re-fire sooner than usual.":
+    '调度门控未看到本次记忆整理的时间戳；下一轮记忆整理可能会比平时更早重新触发。',
+
+  // === Same-as-English optimization ===
+  ' (not in model registry)': '（不在模型注册表中）',
+  'start server': '启动服务器',
+  '中国 (China)': '中国',
+  '中国 (China) - 阿里云百炼': '中国 - 阿里云百炼',
+  '阿里云百炼 (aliyun.com)': '阿里云百炼（aliyun.com）',
 };
