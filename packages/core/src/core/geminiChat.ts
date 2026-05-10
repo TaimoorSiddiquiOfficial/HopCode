@@ -40,7 +40,6 @@ import {
   logContentRetryFailure,
 } from '../telemetry/loggers.js';
 import { type ChatRecordingService } from '../services/chatRecordingService.js';
-import { ChatCompressionService } from '../services/chatCompressionService.js';
 import {
   ChatCompressionService,
   type CompactTrigger,

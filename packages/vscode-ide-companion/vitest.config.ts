@@ -33,6 +33,10 @@ export default defineConfig({
         find: '@hoptrendy/webui',
         replacement: path.resolve(__dirname, '../webui/src/index.ts'),
       },
+      {
+        find: '@hoptrendy/quran-guidance',
+        replacement: path.resolve(__dirname, '../quran-guidance/src/index.ts'),
+      },
     ],
   },
   test: {

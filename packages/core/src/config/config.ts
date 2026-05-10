@@ -2018,10 +2018,6 @@ export class Config {
     );
   }
 
-  getTelemetryIncludeSensitiveSpanAttributes(): boolean {
-    return this.telemetrySettings.includeSensitiveSpanAttributes ?? false;
-  }
-
   getTelemetryOtlpEndpoint(): string | undefined {
     return this.telemetryConfig.getOtlpEndpoint();
   }
