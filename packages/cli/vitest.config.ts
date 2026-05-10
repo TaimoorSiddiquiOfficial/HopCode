@@ -16,6 +16,18 @@ export default defineConfig({
         __dirname,
         '../server/dist/index.js',
       ),
+      '@hoptrendy/quran-guidance': path.resolve(
+        __dirname,
+        '../quran-guidance/src/index.ts',
+      ),
+      '@hoptrendy/channel-base': path.resolve(
+        __dirname,
+        '../channels/base/src/index.ts',
+      ),
+      '@hoptrendy/web-templates': path.resolve(
+        __dirname,
+        '../web-templates/src/index.ts',
+      ),
     },
   },
   test: {
