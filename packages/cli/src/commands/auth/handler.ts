@@ -28,6 +28,8 @@ import { loadSettings, type LoadedSettings } from '../../config/settings.js';
 import { loadCliConfig } from '../../config/config.js';
 import type { CliArgs } from '../../config/config.js';
 import { InteractiveSelector } from './interactiveSelector.js';
+import { handleApiKeyAuth } from './providers.js';
+import { PROVIDER_REGISTRY } from './registry.js';
 import {
   createOpenRouterOAuthSession,
   isOpenRouterConfig,
@@ -465,7 +467,7 @@ export async function runInteractiveAuth() {
  * to the docs. A future improvement could wire this into the provider
  * registry for a fully interactive CLI flow.
  */
-export async function handleApiKeyAuth() {
+export async function handleApiKeyAuthSetup() {
   handleCustomApiKeyAuth();
 }
 

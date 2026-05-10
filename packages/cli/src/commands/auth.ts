@@ -9,7 +9,7 @@ import {
   handleQwenAuth,
   runInteractiveAuth,
   showAuthStatus,
-  handleApiKeyAuth,
+  handleApiKeyAuthSetup,
 } from './auth/handler.js';
 import { PROVIDER_REGISTRY } from './auth/registry.js';
 import { handleApiKeyAuth, handleOllamaLocalAuth } from './auth/providers.js';

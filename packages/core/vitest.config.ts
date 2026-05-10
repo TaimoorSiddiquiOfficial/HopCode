@@ -5,8 +5,14 @@
  */
 
 import { defineConfig } from 'vitest/config';
+import path from 'node:path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@hoptrendy/quran-guidance': path.resolve(__dirname, '../quran-guidance/src/index.ts'),
+    },
+  },
   test: {
     reporters: ['default', 'junit'],
     silent: true,

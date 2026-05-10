@@ -42,7 +42,7 @@ async function switchMainModel(
       parsed.authType,
       parsed.modelId,
       parsed.authType !== currentAuthType &&
-        parsed.authType === AuthType.QWEN_OAUTH
+        parsed.authType === AuthType.HOPCODE_OAUTH
         ? { requireCachedCredentials: true }
         : undefined,
     );
