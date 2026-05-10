@@ -75,6 +75,7 @@ import levenshtein from 'fast-levenshtein';
 import { getPlanModeSystemReminder } from './prompts.js';
 import { ShellToolInvocation } from '../tools/shell.js';
 import { IdeClient } from '../ide/ide-client.js';
+import { IznGateHandler } from '../confirmation-bus/iznGateHandler.js';
 
 const TRUNCATION_PARAM_GUIDANCE =
   'Note: Your previous response was truncated due to max_tokens limit, ' +
@@ -648,6 +649,7 @@ export class CoreToolScheduler {
   private isFinalizingToolCalls = false;
   private isScheduling = false;
   private validationRetryCounts = new Map<string, number>();
+  private iznGateHandler: IznGateHandler;
   private requestQueue: Array<{
     request: ToolCallRequestInfo | ToolCallRequestInfo[];
     signal: AbortSignal;
@@ -664,6 +666,7 @@ export class CoreToolScheduler {
     this.getPreferredEditor = options.getPreferredEditor;
     this.onEditorClose = options.onEditorClose;
     this.chatRecordingService = options.chatRecordingService;
+    this.iznGateHandler = new IznGateHandler();
   }
 
   private setStatusInternal(
@@ -1029,6 +1032,8 @@ export class CoreToolScheduler {
     signal: AbortSignal,
   ): Promise<void> {
     this.isScheduling = true;
+    this.iznGateHandler.clearBlockHistory();
+    this.iznGateHandler.clearVerifiedHashes();
     try {
       if (this.isRunning()) {
         throw new Error(
@@ -1827,6 +1832,32 @@ export class CoreToolScheduler {
       }
     }
 
+    // Izn gate: pre-execution destructive-action check
+    if (this.config.getApprovalMode() === ApprovalMode.IZN) {
+      const iznDecision = this.iznGateHandler.check({
+        toolName,
+        toolArgs: toolInput,
+      });
+      if (!iznDecision.allowed) {
+        // Return the clarification message as a success response so the
+        // model sees the system-reminder with verification steps.
+        const response = convertToFunctionResponse(
+          toolName,
+          callId,
+          iznDecision.clarificationMessage,
+        );
+        this.setStatusInternal(callId, 'success', {
+          callId,
+          responseParts: response,
+          resultDisplay:
+            'Izn gate: destructive action blocked pending verification.',
+          error: undefined,
+          errorType: undefined,
+        } as ToolCallResponseInfo);
+        return;
+      }
+    }
+
     this.setStatusInternal(callId, 'executing');
 
     const liveOutputCallback = scheduledCall.tool.canUpdateOutput
@@ -2049,6 +2080,22 @@ export class CoreToolScheduler {
             content = appendAdditionalContext(
               content,
               `<system-reminder>\n${body}\n</system-reminder>`,
+            );
+          }
+        }
+
+        // Izn mode: inject post-execution scope-report context
+        if (this.config.getApprovalMode() === ApprovalMode.IZN) {
+          const scopeContext = this.iznGateHandler.buildScopeReport({
+            toolName,
+            toolArgs: toolInput,
+          });
+          if (scopeContext) {
+            content = appendAdditionalContext(
+              content,
+              `<system-reminder>
+${scopeContext}
+</system-reminder>`,
             );
           }
         }

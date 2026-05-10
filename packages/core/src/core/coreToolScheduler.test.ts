@@ -5154,10 +5154,11 @@ describe('CoreToolScheduler activation wiring', () => {
       (completed[0] as unknown as { response?: { responseParts?: unknown } })
         .response?.responseParts ?? null,
     );
-    // All three reminder blocks land but inside ONE envelope.
+    // All three reminder blocks land inside ONE envelope; the IZN scope
+    // report adds a second envelope when ApprovalMode.IZN is active.
     const envelopeCount = (responseText.match(/<system-reminder>/g) || [])
       .length;
-    expect(envelopeCount).toBe(1);
+    expect(envelopeCount).toBe(2);
     expect(responseText).toContain('Rule 1 body.');
     expect(responseText).toContain('Rule 2 body.');
     expect(responseText).toContain('tsx-helper');
@@ -5344,12 +5345,12 @@ describe('CoreToolScheduler activation wiring', () => {
       (completed[0] as unknown as { response?: { responseParts?: unknown } })
         .response?.responseParts ?? null,
     );
-    // Exactly one closing tag — the envelope's. The literal in the
-    // body is rewritten to <\/system-reminder> so it doesn't close
-    // the wrapper.
+    // One closing tag from rules activation, one from IZN scope report.
+    // The literal in the body is rewritten to <\/system-reminder> so it
+    // doesn't close the wrapper.
     const closeCount = (responseText.match(/<\/system-reminder>/g) || [])
       .length;
-    expect(closeCount).toBe(1);
+    expect(closeCount).toBe(2);
     // The rewritten form of the body literal still appears verbatim
     // (escaped form), so the rule content survives.
     expect(responseText).toContain('<\\\\/system-reminder>');

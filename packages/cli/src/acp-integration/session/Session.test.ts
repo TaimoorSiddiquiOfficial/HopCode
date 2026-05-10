@@ -197,7 +197,7 @@ describe('Session', () => {
       ['plan', ApprovalMode.PLAN],
       ['default', ApprovalMode.DEFAULT],
       ['auto-edit', ApprovalMode.AUTO_EDIT],
-      ['yolo', ApprovalMode.IZN],
+      ['izn', ApprovalMode.IZN],
     ] as const)('maps %s mode', async (modeId, expected) => {
       await session.setMode({
         sessionId: 'test-session-id',

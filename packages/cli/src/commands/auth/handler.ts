@@ -559,7 +559,9 @@ export async function showAuthStatus(): Promise<void> {
           writeStdoutLine(
             t('  Issue: API key not found in environment or settings\n'),
           );
-          writeStdoutLine(t('  Run `qwen auth openrouter` to re-configure.\n'));
+          writeStdoutLine(
+            t('  Run `hopcode auth openrouter` to re-configure.\n'),
+          );
         }
       } else if (managedProvider) {
         const envKey =
@@ -612,7 +614,7 @@ export async function showAuthStatus(): Promise<void> {
             t('  Issue: API key not found in environment or settings\n'),
           );
           writeStdoutLine(
-            t('  Run `qwen auth` to re-configure authentication.\n'),
+            t('  Run `hopcode auth` to re-configure authentication.\n'),
           );
         }
       } else if (activeConfig) {

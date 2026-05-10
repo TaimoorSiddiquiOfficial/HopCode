@@ -196,7 +196,7 @@ describe('SessionPicker', () => {
 
   describe('Branch Filtering', () => {
     it('should filter by branch when Ctrl+B is pressed', async () => {
-      // Bare letter keys ('B', 'b', 'j', 'k', â€¦) are reserved for the
+      // Bare letter keys ('B', 'b', 'j', 'k', …) are reserved for the
       // search query buffer. The branch toggle is Ctrl+B exclusively.
       const sessions = [
         createMockSession({
@@ -587,7 +587,7 @@ describe('SessionPicker', () => {
       expect(output).toContain('bug investigation');
       expect(output).not.toContain('unrelated');
 
-      // 'j' inside search appends to the query â†’ "bj" â€” only s1 still
+      // 'j' inside search appends to the query → "bj" — only s1 still
       // matches. If 'j' were still bound to nav we would see the same
       // 'b'-filtered list (two matches), and selectedIndex would drift
       // instead of the matches narrowing.
@@ -617,7 +617,7 @@ describe('SessionPicker', () => {
             sessionService={mockService as never}
             onSelect={vi.fn()}
             onCancel={vi.fn()}
-            // No `enablePreview` here â€” preview is disabled, so Space is
+            // No `enablePreview` here — preview is disabled, so Space is
             // simply ignored by list mode (the search seed-skip rule
             // also kicks in to keep leading whitespace out of the query).
           />
@@ -693,7 +693,7 @@ describe('SessionPicker', () => {
     it('Backspace in list mode does not spawn a search', async () => {
       // Regression: Backspace's raw byte (DEL, 0x7F) used to slip past
       // the printable-char filter and seed an implicit search with the
-      // literal DEL byte, producing a confusing 'No sessions match â€¦'
+      // literal DEL byte, producing a confusing 'No sessions match …'
       // frame in list mode. List-mode Backspace must be inert.
       const sessions = [
         createMockSession({
@@ -719,7 +719,7 @@ describe('SessionPicker', () => {
       await wait(50);
 
       const output = lastFrame() ?? '';
-      // Still in list mode â€” no search frame, no spurious empty match.
+      // Still in list mode — no search frame, no spurious empty match.
       expect(output).toContain('Press / to search');
       expect(output).not.toContain('Search:');
       expect(output).not.toContain('No sessions match');
@@ -728,10 +728,10 @@ describe('SessionPicker', () => {
     });
 
     it('search mode suppresses the row highlight', async () => {
-      // The "â€º" selected-prefix and accent color belong to the row
+      // The "›" selected-prefix and accent color belong to the row
       // the user is about to act on. While they're still typing the
-      // query, no row should claim that affordance â€” the search input
-      // owns focus exclusively until â†‘â†“/Enter commits to the list.
+      // query, no row should claim that affordance — the search input
+      // owns focus exclusively until ↑↓/Enter commits to the list.
       const sessions = [
         createMockSession({
           sessionId: 's1',
@@ -757,23 +757,23 @@ describe('SessionPicker', () => {
       );
 
       await wait(100);
-      // Sanity: in list mode the first row is highlighted with 'â€º '.
+      // Sanity: in list mode the first row is highlighted with '› '.
       let output = lastFrame() ?? '';
-      expect(output).toContain('â€º ');
+      expect(output).toContain('› ');
 
       // Enter search; the highlight should disappear.
       stdin.write('/login');
       await wait(50);
       output = lastFrame() ?? '';
       expect(output).toContain('Search:');
-      expect(output).not.toContain('â€º ');
+      expect(output).not.toContain('› ');
 
-      // Commit (â†“ or Enter) reinstates the highlight on the list.
+      // Commit (↓ or Enter) reinstates the highlight on the list.
       stdin.write(ARROW_DOWN);
       await wait(30);
       output = lastFrame() ?? '';
       expect(output).toContain('Filter:');
-      expect(output).toContain('â€º ');
+      expect(output).toContain('› ');
     });
 
     it('Enter in search commits the filter; second Enter selects', async () => {
@@ -811,7 +811,7 @@ describe('SessionPicker', () => {
       stdin.write('/special');
       await wait(30);
 
-      // First Enter: search â†’ list, query stays applied, no resume.
+      // First Enter: search → list, query stays applied, no resume.
       stdin.write('\r');
       await wait(30);
       expect(onSelect).not.toHaveBeenCalled();
@@ -827,7 +827,7 @@ describe('SessionPicker', () => {
 
     it('Enter in search with no matches stays in search', async () => {
       // Don't drop the user out of the search input on Enter when
-      // there's nothing to commit to â€” they're mid-typo and need
+      // there's nothing to commit to — they're mid-typo and need
       // to keep editing.
       const sessions = [
         createMockSession({
@@ -861,7 +861,7 @@ describe('SessionPicker', () => {
       expect(onSelect).not.toHaveBeenCalled();
     });
 
-    it('â†‘/â†“ from search drops to list mode while keeping the filter', async () => {
+    it('↑/↓ from search drops to list mode while keeping the filter', async () => {
       // The post-narrow state: user types to filter, then arrows to
       // pick a row. Once they navigate, the search frame goes away
       // (no more caret, switches to "Filter:" indicator) but the
@@ -918,9 +918,9 @@ describe('SessionPicker', () => {
       expect(output).not.toContain('unrelated');
     });
 
-    it('Space â†’ preview works on the highlighted row in filtered-list', async () => {
+    it('Space → preview works on the highlighted row in filtered-list', async () => {
       // Once narrowed and out of search, Space should trigger the
-      // preview shortcut just like in the unfiltered list â€” proves
+      // preview shortcut just like in the unfiltered list — proves
       // the action is mode-independent.
       const sessions = [
         createMockSession({
@@ -975,7 +975,7 @@ describe('SessionPicker', () => {
       await wait(30);
       stdin.write(ARROW_DOWN); // exits search, cursor on filtered first item
       await wait(30);
-      stdin.write(' '); // Space â†’ preview
+      stdin.write(' '); // Space → preview
       await wait(150);
 
       const frame = lastFrame() ?? '';
@@ -1070,7 +1070,7 @@ describe('SessionPicker', () => {
       await wait(100);
       stdin.write('/login');
       await wait(30);
-      stdin.write(ARROW_DOWN); // â†’ filtered-list with q='login'
+      stdin.write(ARROW_DOWN); // → filtered-list with q='login'
       await wait(30);
 
       let output = lastFrame() ?? '';
@@ -1093,7 +1093,7 @@ describe('SessionPicker', () => {
 
     it("'/' from filtered-list preserves the existing query", async () => {
       // Re-focusing search via '/' must not throw away what the user
-      // already typed â€” they typically hit '/' when they want to
+      // already typed — they typically hit '/' when they want to
       // tweak the filter, not start over. Esc is the explicit clear
       // gesture (covered by the Backspace/Esc test above).
       const sessions = [
@@ -1134,14 +1134,14 @@ describe('SessionPicker', () => {
       const output = lastFrame() ?? '';
       expect(output).toContain('Search:');
       expect(output).toContain('login');
-      // Filter is still applied â€” non-matches stay filtered out.
+      // Filter is still applied — non-matches stay filtered out.
       expect(output).not.toContain('unrelated');
     });
 
-    it('â†‘ at top of unfiltered list also wraps into search', async () => {
+    it('↑ at top of unfiltered list also wraps into search', async () => {
       // Same boundary-wrap pattern as the filtered case: a fresh
       // picker (no query yet) lets the user kick off a search just
-      // by hitting â†‘ from the first row, no '/' required.
+      // by hitting ↑ from the first row, no '/' required.
       const sessions = [
         createMockSession({
           sessionId: 's1',
@@ -1167,23 +1167,23 @@ describe('SessionPicker', () => {
       );
 
       await wait(100);
-      // Already at index 0 from the initial render; â†‘ wraps into search.
+      // Already at index 0 from the initial render; ↑ wraps into search.
       stdin.write(ARROW_UP);
       await wait(50);
 
       const output = lastFrame() ?? '';
       expect(output).toContain('Search:');
-      // No query yet, so the list is unfiltered â€” both rows visible.
+      // No query yet, so the list is unfiltered — both rows visible.
       expect(output).toContain('first');
       expect(output).toContain('second');
     });
 
-    it('â†‘ at top of filtered-list wraps focus back to search', async () => {
+    it('↑ at top of filtered-list wraps focus back to search', async () => {
       // fzf-style boundary wrap: the search row is treated as a row
-      // above the list, so pressing â†‘ when already on the first
+      // above the list, so pressing ↑ when already on the first
       // filtered match returns the user to search-mode editing
-      // without needing another '/' keystroke. â†“ at the bottom is
-      // intentionally NOT wrapped â€” that's the loadMore sentinel.
+      // without needing another '/' keystroke. ↓ at the bottom is
+      // intentionally NOT wrapped — that's the loadMore sentinel.
       const sessions = [
         createMockSession({
           sessionId: 'a',
@@ -1212,15 +1212,15 @@ describe('SessionPicker', () => {
       stdin.write('/login');
       await wait(30);
 
-      // â†“ from search exits to filtered-list at the first match
+      // ↓ from search exits to filtered-list at the first match
       // (selectedIndex was reset to 0 when the query changed, and
-      // â†“ no longer advances past it).
+      // ↓ no longer advances past it).
       stdin.write(ARROW_DOWN);
       await wait(30);
       let output = lastFrame() ?? '';
       expect(output).toContain('Filter:');
 
-      // â†‘ at index 0 wraps focus right back into search.
+      // ↑ at index 0 wraps focus right back into search.
       stdin.write(ARROW_UP);
       await wait(30);
       output = lastFrame() ?? '';
@@ -1230,17 +1230,17 @@ describe('SessionPicker', () => {
       expect(output).toContain('login');
     });
 
-    it('â†“ from search lands on the first match, not the second', async () => {
-      // Regression: previously â†“ from search did setViewMode('list')
-      // *and* advanced selectedIndex, so the user pressed â†“ once and
-      // jumped past the first (highest-relevance) match. Now â†“
+    it('↓ from search lands on the first match, not the second', async () => {
+      // Regression: previously ↓ from search did setViewMode('list')
+      // *and* advanced selectedIndex, so the user pressed ↓ once and
+      // jumped past the first (highest-relevance) match. Now ↓
       // simply commits the focus transition; selectedIndex stays at
       // 0 (already reset by the query-change effect).
       //
       // Inter-key waits are 50ms (not the 30ms used elsewhere): on
-      // Windows runners the keypress â†’ useEffect â†’ render chain
+      // Windows runners the keypress → useEffect → render chain
       // through `/login` + ARROW_DOWN + Enter consistently exceeded
-      // 30ms and dropped the Enter event â€” the spy never saw the
+      // 30ms and dropped the Enter event — the spy never saw the
       // selection. Tests in this file already use 50ms in similar
       // multi-step sequences; align with that.
       const sessions = [
@@ -1271,7 +1271,7 @@ describe('SessionPicker', () => {
       await wait(100);
       stdin.write('/login');
       await wait(50);
-      stdin.write(ARROW_DOWN); // exit search â†’ first match should be highlighted
+      stdin.write(ARROW_DOWN); // exit search → first match should be highlighted
       await wait(50);
       stdin.write('\r'); // Enter from list = select highlighted row
       await wait(50);
@@ -1279,10 +1279,10 @@ describe('SessionPicker', () => {
       expect(onSelect).toHaveBeenCalledWith('first-match');
     });
 
-    it('â†‘/â†“ are a no-op in search when the query matches nothing', async () => {
+    it('↑/↓ are a no-op in search when the query matches nothing', async () => {
       // Sentinel for the "phantom mode-switch" glitch: when the
       // current query has zero matches there is no row to land on,
-      // so â†‘/â†“ must not silently flip the picker out of search mode.
+      // so ↑/↓ must not silently flip the picker out of search mode.
       // The user keeps editing the query (or backs up) until the
       // filter actually finds something.
       const sessions = [
@@ -1312,7 +1312,7 @@ describe('SessionPicker', () => {
       expect(output).toContain('Search:');
       expect(output).toContain('No sessions match');
 
-      // â†‘â†“ should not exit search.
+      // ↑↓ should not exit search.
       stdin.write(ARROW_DOWN);
       await wait(30);
       output = lastFrame() ?? '';
@@ -1327,7 +1327,7 @@ describe('SessionPicker', () => {
     });
 
     it('typing in filtered-list re-enters search and appends', async () => {
-      // After narrowing â†’ arrow â†’ list, further typing should refine
+      // After narrowing → arrow → list, further typing should refine
       // (append to existing query) rather than start a fresh search.
       // Prompts use no spaces so the substring "loginbug" / "loginflow"
       // can match contiguously without colliding with Space-as-preview.
@@ -1360,7 +1360,7 @@ describe('SessionPicker', () => {
       await wait(30);
       stdin.write(ARROW_DOWN);
       await wait(30);
-      // Now list-mode + query='login'. Type 'bug' â€” implicit entry
+      // Now list-mode + query='login'. Type 'bug' — implicit entry
       // re-enters search and appends, yielding query='loginbug'.
       stdin.write('bug');
       await wait(50);
@@ -1424,7 +1424,7 @@ describe('SessionPicker', () => {
 
       const output = lastFrame();
       expect(output).toContain('Resume Session');
-      expect(output).toContain('â†‘â†“ to navigate');
+      expect(output).toContain('↑↓ to navigate');
       expect(output).toContain('Esc to cancel');
       // The default footer points the user at typing to start a search.
       expect(output).toContain('Type to search');
@@ -1635,7 +1635,7 @@ describe('SessionPicker', () => {
     it('renders tool_group items without crashing (stub Providers mounted)', async () => {
       // The previewed session contains a function call + tool_result, which
       // produces a `tool_group` HistoryItem that exercises ToolGroupMessage
-      // and ToolMessage â€” the places that throw without stub Providers.
+      // and ToolMessage — the places that throw without stub Providers.
       const toolSession = {
         conversation: {
           sessionId: 's1',
@@ -1714,7 +1714,7 @@ describe('SessionPicker', () => {
       );
 
       await wait(100);
-      stdin.write(' '); // Space â†’ preview in list mode
+      stdin.write(' '); // Space → preview in list mode
       await wait(150);
       const frame = lastFrame() ?? '';
       // Tool group renders with raw function name fallback (no registry).
@@ -1758,7 +1758,7 @@ describe('SessionPicker', () => {
     it('without enablePreview, Space is a no-op and footer omits the hint', async () => {
       // Regression: SessionPicker is also reused by the delete-session
       // dialog, where `onSelect = handleDelete`. If preview were on by
-      // default, Space â†’ preview â†’ Enter would silently delete the session
+      // default, Space → preview → Enter would silently delete the session
       // while the preview UI still says "Enter to resume". The default must
       // stay opt-in.
       const sessions = [
@@ -1777,7 +1777,7 @@ describe('SessionPicker', () => {
           sessionService={service as never}
           onSelect={onSelect}
           onCancel={vi.fn()}
-          // intentionally NO enablePreview â€” emulates the delete dialog
+          // intentionally NO enablePreview — emulates the delete dialog
         />,
       );
 
@@ -1788,7 +1788,7 @@ describe('SessionPicker', () => {
       // Space in destructive flows.
       expect(beforeFrame).not.toContain('Space to preview');
 
-      stdin.write(' '); // Space â€” no-op when preview is disabled
+      stdin.write(' '); // Space — no-op when preview is disabled
       await wait(150);
       const afterFrame = lastFrame() ?? '';
       // No preview body, still on the list.
