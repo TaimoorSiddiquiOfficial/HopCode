@@ -83,7 +83,9 @@ async def test_include_partial_messages(fake_hopcode_path: str) -> None:
 
 
 @pytest.mark.asyncio
-async def test_default_permission_callback_denies_tool_use(fake_hopcode_path: str) -> None:
+async def test_default_permission_callback_denies_tool_use(
+    fake_hopcode_path: str,
+) -> None:
     result = query(
         "use tool now",
         {

@@ -158,6 +158,19 @@ jobs:
         run: |-
           npm ci --prefer-offline --no-audit --progress=false
 
+      - name: 'Build test dependencies'
+        run: |
+          npm run build --workspace=packages/quran-guidance
+          npm run build --workspace=packages/core
+          npm run build --workspace=packages/web-templates
+          npm run build --workspace=packages/server
+          npm run build --workspace=packages/channels/base
+          npm run build --workspace=packages/channels/discord
+          npm run build --workspace=packages/channels/telegram
+          npm run build --workspace=packages/channels/weixin
+          npm run build --workspace=packages/channels/dingtalk
+          npm run generate
+
       - name: 'Run tests and generate reports'
         env:
           NO_COLOR: true

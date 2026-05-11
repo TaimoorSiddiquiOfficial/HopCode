@@ -608,7 +608,7 @@ describe('SessionMessageHandler', () => {
     );
 
     await handler.handle({
-      type: 'switchQwenSession',
+      type: 'switchHopCodeSession',
       data: { sessionId: archivedSessionId },
     });
 
@@ -646,7 +646,7 @@ describe('SessionMessageHandler', () => {
     );
 
     await handler.handle({
-      type: 'newQwenSession',
+      type: 'newHopCodeSession',
     });
 
     expect(handler.getCurrentConversationId()).toBeNull();

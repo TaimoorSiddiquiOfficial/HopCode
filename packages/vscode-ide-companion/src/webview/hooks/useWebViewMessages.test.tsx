@@ -49,7 +49,7 @@ function renderHookHarness(overrides?: {
   const handlers = {
     sessionManagement: {
       currentSessionId: 'conversation-1',
-      setQwenSessions: vi.fn(),
+      setHopCodeSessions: vi.fn(),
       setCurrentSessionId: vi.fn(),
       setCurrentSessionTitle: vi.fn(),
       setShowSessionSelector: vi.fn(),
@@ -311,7 +311,7 @@ describe('useWebViewMessages', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: {
-            type: 'qwenSessionSwitched',
+            type: 'hopcodeSessionSwitched',
             data: {
               sessionId: 'conversation-2',
               session: { title: 'Persisted Session' },
@@ -409,7 +409,7 @@ describe('useWebViewMessages', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: {
-            type: 'qwenSessionSwitched',
+            type: 'hopcodeSessionSwitched',
             data: {
               sessionId: 'conversation-2',
               session: { title: 'Persisted Session' },
@@ -465,7 +465,7 @@ describe('useWebViewMessages', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: {
-            type: 'qwenSessionSwitched',
+            type: 'hopcodeSessionSwitched',
             data: {
               sessionId: 'conversation-2',
               session: { title: 'Empty Session' },
