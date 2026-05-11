@@ -282,6 +282,8 @@ export class AskUserQuestionTool extends BaseDeclarativeTool<
       true, // isOutputMarkdown
       false, // canUpdateOutput
       false, // shouldDefer — kept always-visible so the model reaches for the structured clarification UX instead of asking in plain prose
+      false, // alwaysLoad
+      'ask question user input clarify choose',
     );
   }
 

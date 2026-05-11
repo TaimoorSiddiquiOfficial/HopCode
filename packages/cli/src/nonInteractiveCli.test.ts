@@ -23,6 +23,7 @@ import {
   SendMessageType,
   ToolNames,
 } from '@hoptrendy/hopcode-core';
+import type { JsonOutputAdapterInterface } from './nonInteractive/io/BaseJsonOutputAdapter.js';
 import type { Part } from '@google/genai';
 import { runNonInteractive } from './nonInteractiveCli.js';
 import { vi, type Mock, type MockInstance } from 'vitest';
@@ -337,7 +338,7 @@ describe('runNonInteractive', () => {
 
   it('on EPIPE, destroys stdout and returns normally instead of process.exit', async () => {
     // Regression: process.exit(0) on EPIPE bypassed runExitCleanup → flush()
-    // and dropped queued JSONL writes for `qwen -p ... | head -1` patterns.
+    // and dropped queued JSONL writes for `hopcode -p ... | head -1` patterns.
     // process.exit is mocked to throw in beforeEach, so reaching the
     // assertion also proves the bypass route is gone.
     setupMetricsMock();
@@ -3373,10 +3374,10 @@ describe('runNonInteractive', () => {
     it('emits structuredResult to stdout in OutputFormat.TEXT mode', async () => {
       // The other --json-schema tests pin OutputFormat.JSON /
       // OutputFormat.STREAM_JSON. TEXT is the default for headless runs
-      // (`qwen -p "..."` without --output-format), so it needs its own
+      // (`hopcode -p "..."` without --output-format), so it needs its own
       // pin: a regression that diverged the TEXT adapter's
       // structuredResult handling from the JSON / stream-json paths
-      // would only surface to users running plain `qwen -p`.
+      // would only surface to users running plain `hopcode -p`.
       (mockConfig.getJsonSchema as Mock).mockReturnValue({
         type: 'object',
         properties: { summary: { type: 'string' } },
@@ -3437,5 +3438,206 @@ describe('runNonInteractive', () => {
       const stdout = writes.join('');
       expect(stdout).toBe(`${JSON.stringify(structuredArgs)}\n`);
     });
+
+  // ---- --json-schema (structured_output) contract with adapter -----------------
+  // Upstream adapter-contract tests that verify structuredResult lands correctly
+  // on the JsonOutputAdapterInterface, complementing our processStdoutSpy-based tests.
+
+  function makeMockAdapter(): JsonOutputAdapterInterface {
+    return {
+      startAssistantMessage: vi.fn(),
+      processEvent: vi.fn(),
+      finalizeAssistantMessage: vi.fn().mockReturnValue({
+        type: 'assistant',
+        uuid: 'mock-uuid',
+        session_id: 'test-session-id',
+        parent_tool_use_id: null,
+        message: {
+          id: 'mock-uuid',
+          type: 'message',
+          role: 'assistant',
+          model: 'test-model',
+          content: [],
+          stop_reason: null,
+          usage: { input_tokens: 0, output_tokens: 0 },
+        },
+      }),
+      emitResult: vi.fn(),
+      emitMessage: vi.fn(),
+      emitUserMessage: vi.fn(),
+      emitToolResult: vi.fn(),
+      emitSystemMessage: vi.fn(),
+      emitToolProgress: vi.fn(),
+      getSessionId: vi.fn().mockReturnValue('test-session-id'),
+      getModel: vi.fn().mockReturnValue('test-model'),
+    } as unknown as JsonOutputAdapterInterface;
+  }
+
+  it('emits structuredResult and stops when structured_output is called under --json-schema (adapter contract)', async () => {
+    setupMetricsMock();
+    vi.mocked(mockConfig.getJsonSchema).mockReturnValue({
+      type: 'object',
+      required: ['answer'],
+      properties: { answer: { type: 'number' } },
+    });
+
+    // Single turn: model fires the synthetic structured_output tool with
+    // its final payload as args, then Finished. No follow-up turn should
+    // run — runNonInteractive's structured-output branch returns early.
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'so-1',
+        name: ToolNames.STRUCTURED_OUTPUT,
+        args: { answer: 42 },
+        isClientInitiated: false,
+        prompt_id: 'p-structured-success',
+      },
+    };
+    mockGeminiClient.sendMessageStream.mockReturnValueOnce(
+      createStreamFromEvents([
+        toolCallEvent,
+        {
+          type: GeminiEventType.Finished,
+          value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
+        },
+      ]),
+    );
+    // No error → runtime sets structuredSubmission and terminates.
+    mockCoreExecuteToolCall.mockResolvedValue({
+      responseParts: [{ text: 'Structured output accepted.' }],
+    });
+
+    const adapter = makeMockAdapter();
+    await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'compute 21*2',
+      'p-structured-success',
+      { adapter },
+    );
+
+    // Single-shot contract: no follow-up turn was issued.
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(1);
+    // Background tasks aborted so they don't race the terminal emitResult.
+    expect(mockBackgroundTaskRegistry.abortAll).toHaveBeenCalledTimes(1);
+    // structuredResult lands in the result message exactly as the model
+    // submitted it (no schema massaging at the runtime layer).
+    expect(adapter.emitResult).toHaveBeenCalledTimes(1);
+    expect(adapter.emitResult).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isError: false,
+        structuredResult: { answer: 42 },
+        numTurns: 1,
+      }),
+    );
+  });
+
+  it('terminates even when structured_output args are undefined under an empty schema', async () => {
+    // Pin the boolean-sentinel contract: the previous
+    // `structuredSubmission !== undefined` check broke if the model
+    // called structured_output with args missing/undefined (which can
+    // happen under a permissive `{}` schema, since validateToolParams
+    // would have already accepted the call). The run must still
+    // terminate on the first successful structured_output call.
+    setupMetricsMock();
+    vi.mocked(mockConfig.getJsonSchema).mockReturnValue({});
+
+    mockGeminiClient.sendMessageStream.mockReturnValueOnce(
+      createStreamFromEvents([
+        {
+          type: GeminiEventType.ToolCallRequest,
+          value: {
+            callId: 'so-undef',
+            name: ToolNames.STRUCTURED_OUTPUT,
+            args: undefined as unknown as Record<string, unknown>,
+            isClientInitiated: false,
+            prompt_id: 'p-structured-undef',
+          },
+        },
+        {
+          type: GeminiEventType.Finished,
+          value: { reason: undefined, usageMetadata: { totalTokenCount: 1 } },
+        },
+      ]),
+    );
+    mockCoreExecuteToolCall.mockResolvedValue({
+      responseParts: [{ text: 'Structured output accepted.' }],
+    });
+
+    const adapter = makeMockAdapter();
+    await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'go',
+      'p-structured-undef',
+      { adapter },
+    );
+
+    // Single turn — boolean sentinel kicked us out even though the args
+    // value itself is undefined.
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(1);
+    expect(adapter.emitResult).toHaveBeenCalledTimes(1);
+    expect(adapter.emitResult).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isError: false,
+        structuredResult: undefined,
+      }),
+    );
+  });
+
+  it('sets process.exitCode=1 via adapter when model emits text under --json-schema', async () => {
+    setupMetricsMock();
+    vi.mocked(mockConfig.getJsonSchema).mockReturnValue({
+      type: 'object',
+      required: ['answer'],
+      properties: { answer: { type: 'string' } },
+    });
+
+    // Snapshot/restore the global so a stray exitCode=1 doesn't bleed into
+    // sibling tests in the file.
+    const priorExitCode = process.exitCode;
+    process.exitCode = undefined;
+
+    try {
+      mockGeminiClient.sendMessageStream.mockReturnValueOnce(
+        createStreamFromEvents([
+          { type: GeminiEventType.Content, value: 'plain answer' },
+          {
+            type: GeminiEventType.Finished,
+            value: { reason: undefined, usageMetadata: { totalTokenCount: 1 } },
+          },
+        ]),
+      );
+
+      const adapter = makeMockAdapter();
+      await runNonInteractive(
+        mockConfig,
+        mockSettings,
+        'q',
+        'p-structured-text',
+        { adapter },
+      );
+
+      expect(process.exitCode).toBe(1);
+      // adapter sees the contract violation as an error result, with
+      // diagnostic context: turn count + truncated preview of model's
+      // plain-text output ("plain answer" from the mocked stream).
+      // The adapter is responsible for surfacing the message per output
+      // format (TEXT → stderr; JSON / STREAM_JSON → structured result);
+      // runNonInteractive no longer writes a duplicate stderr line.
+      expect(adapter.emitResult).toHaveBeenCalledTimes(1);
+      expect(adapter.emitResult).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isError: true,
+          errorMessage: expect.stringMatching(
+            /Model produced plain text.+after 1 turn\(s\).+Output preview.+plain answer/s,
+          ),
+        }),
+      );
+    } finally {
+      process.exitCode = priorExitCode;
+    }
+  });
   });
 });

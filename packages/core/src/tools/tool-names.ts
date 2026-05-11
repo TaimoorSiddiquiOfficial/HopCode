@@ -46,11 +46,11 @@ export const ToolNames = {
   TASK_OUTPUT: 'task_output',
   TASK_READY: 'task_ready',
   TASK_UPDATE: 'task_update',
+  TOOL_SEARCH: 'tool_search',
   WEB_SEARCH: 'web_search',
   REPO_MAP: 'repo_map',
   BROWSER: 'browser',
   BG_STOP: 'bg_stop',
-  TOOL_SEARCH: 'tool_search',
 } as const;
 
 /**
@@ -87,11 +87,11 @@ export const ToolDisplayNames = {
   TASK_OUTPUT: 'TaskOutput',
   TASK_READY: 'TaskReady',
   TASK_UPDATE: 'TaskUpdate',
+  TOOL_SEARCH: 'ToolSearch',
   WEB_SEARCH: 'WebSearch',
   REPO_MAP: 'RepoMap',
   BROWSER: 'Browser',
   BG_STOP: 'BgStop',
-  TOOL_SEARCH: 'ToolSearch',
 } as const;
 
 // Migration from old tool names to new tool names

@@ -185,7 +185,7 @@ export function getCoreSystemPrompt(
   userMemory?: string,
   model?: string,
   appendInstruction?: string,
-  _deferredTools?: Array<{ name: string; description: string }>,
+  deferredTools?: Array<{ name: string; description: string }>,
 ): string {
   // if HOPCODE_SYSTEM_MD is set (and not 0|false), override system prompt from file
   // default path is .hopcode/system.md but can be modified via custom path in HOPCODE_SYSTEM_MD
@@ -419,13 +419,16 @@ Your core function is efficient and safe assistance. Balance extreme conciseness
       ? buildSystemPromptSuffix(userMemory)
       : '';
   const appendSuffix = buildSystemPromptSuffix(appendInstruction);
+  const deferredSuffix = deferredTools
+    ? buildDeferredToolsSection(deferredTools)
+    : '';
   // Only append Quran guidance to the default HopCode prompt, not to
   // custom system prompts provided via HOPCODE_SYSTEM_MD.
   const quranGuidanceSuffix = systemMdEnabled
     ? ''
     : buildSystemPromptSuffix(getQuranGuidanceSection());
 
-  return `${basePrompt}${memorySuffix}${appendSuffix}${quranGuidanceSuffix}`;
+  return `${basePrompt}${deferredSuffix}${memorySuffix}${appendSuffix}${quranGuidanceSuffix}`;
 }
 
 /**

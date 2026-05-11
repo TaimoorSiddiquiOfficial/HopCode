@@ -80,6 +80,7 @@ function suppressedOutputBody(structuredCaptured: boolean): string {
     ? SUPPRESSED_OUTPUT_SUCCESS
     : SUPPRESSED_OUTPUT_RETRY;
 }
+
 import {
   normalizePartList,
   extractPartsFromUserMessage,
@@ -88,6 +89,8 @@ import {
   createAgentToolProgressHandler,
   computeUsageFromMetrics,
 } from './utils/nonInteractiveHelpers.js';
+
+const debugLogger = createDebugLogger('NON_INTERACTIVE_CLI');
 
 // Human-readable labels for the detectors that can fire mid-stream.
 // Surfaced to stderr in TEXT mode so a headless run that halts on a loop
@@ -774,7 +777,6 @@ export async function runNonInteractive(
             },
           );
 
-<<<<<<< HEAD
           if (structuredSubmission !== undefined) {
             // Single-shot terminal contract; aborts in-flight background
             // agents, holds back briefly for their terminal
@@ -782,79 +784,6 @@ export async function runNonInteractive(
             // structured success envelope. Same helper as the drain-turn
             // post-loop branch — see emitStructuredSuccess above.
             return emitStructuredSuccess();
-=======
-          for (const requestInfo of toolCallRequests) {
-            const finalRequestInfo = requestInfo;
-
-            const inputFormat =
-              typeof config.getInputFormat === 'function'
-                ? config.getInputFormat()
-                : InputFormat.TEXT;
-            const toolCallUpdateCallback =
-              inputFormat === InputFormat.STREAM_JSON && options.controlService
-                ? options.controlService.permission.getToolCallUpdateCallback()
-                : undefined;
-
-            // Build outputUpdateHandler for this tool call.
-            // Agent tool has its own complex handler (subagent messages).
-            // All other tools with canUpdateOutput=true (e.g., MCP tools)
-            // get a generic handler that emits progress via the adapter.
-            const isAgentTool = finalRequestInfo.name === 'agent';
-            const { handler: outputUpdateHandler } = isAgentTool
-              ? createAgentToolProgressHandler(
-                  config,
-                  finalRequestInfo.callId,
-                  adapter,
-                )
-              : createToolProgressHandler(finalRequestInfo, adapter);
-
-            const toolResponse = await executeToolCall(
-              config,
-              finalRequestInfo,
-              abortController.signal,
-              {
-                outputUpdateHandler,
-                ...(toolCallUpdateCallback && {
-                  onToolCallsUpdate: toolCallUpdateCallback,
-                }),
-              },
-            );
-
-            if (toolResponse.error) {
-              // In JSON/STREAM_JSON mode, tool errors are tolerated and formatted
-              // as tool_result blocks. handleToolError will detect JSON/STREAM_JSON mode
-              // from config and allow the session to continue so the LLM can decide what to do next.
-              // In text mode, we still log the error.
-              handleToolError(
-                finalRequestInfo.name,
-                toolResponse.error,
-                config,
-                toolResponse.errorType || 'TOOL_EXECUTION_ERROR',
-                typeof toolResponse.resultDisplay === 'string'
-                  ? toolResponse.resultDisplay
-                  : undefined,
-              );
-            }
-
-            adapter.emitToolResult(finalRequestInfo, toolResponse);
-            config
-              .getGeminiClient()
-              .recordCompletedToolCall(
-                finalRequestInfo.name,
-                finalRequestInfo.args as Record<string, unknown>,
-              );
-
-            if (toolResponse.responseParts) {
-              toolResponseParts.push(...toolResponse.responseParts);
-            }
-
-            // Capture model override from skill tool results.
-            // Use `in` so that undefined (from inherit/no-model skills) clears a prior override,
-            // while non-skill tools (field absent) leave the current override intact.
-            if ('modelOverride' in toolResponse) {
-              modelOverride = toolResponse.modelOverride;
-            }
->>>>>>> f5af7fbf9 (feat(memory): add autoSkill background project skill extraction (#3673))
           }
           currentMessages = [{ role: 'user', parts: toolResponseParts }];
         } else {
@@ -949,62 +878,10 @@ export async function runNonInteractive(
                   },
                 );
 
-<<<<<<< HEAD
                 if (structuredSubmission !== undefined) {
                   // Stop processing further turns for this drain item;
                   // the post-drain code will emit the terminal result.
                   return;
-=======
-                for (const requestInfo of itemToolCallRequests) {
-                  const isAgentTool = requestInfo.name === 'agent';
-                  const { handler: outputUpdateHandler } = isAgentTool
-                    ? createAgentToolProgressHandler(
-                        config,
-                        requestInfo.callId,
-                        adapter,
-                      )
-                    : createToolProgressHandler(requestInfo, adapter);
-
-                  const toolResponse = await executeToolCall(
-                    config,
-                    requestInfo,
-                    abortController.signal,
-                    {
-                      outputUpdateHandler,
-                      ...(toolCallUpdateCallback && {
-                        onToolCallsUpdate: toolCallUpdateCallback,
-                      }),
-                    },
-                  );
-
-                  if (toolResponse.error) {
-                    handleToolError(
-                      requestInfo.name,
-                      toolResponse.error,
-                      config,
-                      toolResponse.errorType || 'TOOL_EXECUTION_ERROR',
-                      typeof toolResponse.resultDisplay === 'string'
-                        ? toolResponse.resultDisplay
-                        : undefined,
-                    );
-                  }
-
-                  adapter.emitToolResult(requestInfo, toolResponse);
-                  config
-                    .getGeminiClient()
-                    .recordCompletedToolCall(
-                      requestInfo.name,
-                      requestInfo.args as Record<string, unknown>,
-                    );
-
-                  if (toolResponse.responseParts) {
-                    itemToolResponseParts.push(...toolResponse.responseParts);
-                  }
-
-                  if ('modelOverride' in toolResponse) {
-                    itemModelOverride = toolResponse.modelOverride;
-                  }
->>>>>>> f5af7fbf9 (feat(memory): add autoSkill background project skill extraction (#3673))
                 }
                 itemMessages = [{ role: 'user', parts: itemToolResponseParts }];
               } else {
@@ -1169,8 +1046,8 @@ export async function runNonInteractive(
           // structured_output tool. Reaching this branch means it emitted
           // plain text instead — surface as an error rather than silently
           // returning whatever free-form summary the adapter collected.
-          // Returning a non-zero exit code (rather than throwing) avoids
-          // the outer catch re-emitting the result a second time.
+          // Setting exitCode + returning (rather than throwing) avoids the
+          // outer catch re-emitting the result a second time.
           if (config.getJsonSchema()) {
             // Enrich the static contract message with diagnostic context:
             // turn count (how many tries the model got) + a preview of
@@ -1195,7 +1072,15 @@ export async function runNonInteractive(
               usage,
               stats,
             });
-            return 1;
+            // Adapter handles user-visible feedback per output format:
+            //   - TEXT: writes errorMessage to stderr (JsonOutputAdapter
+            //     emitResult, line ~70).
+            //   - JSON / STREAM_JSON: emits the structured result with
+            //     is_error=true.
+            // No extra stderr write here — duplicating in TEXT mode
+            // produced two copies of the same line in headless runs.
+            process.exitCode = 1;
+            return;
           }
 
           adapter.emitResult({

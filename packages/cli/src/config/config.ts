@@ -359,7 +359,6 @@ function schemaRootAcceptsObject(
   // No narrowing at the root — lenient default, treated as object-compatible.
   return true;
 }
-
 /** 4 MiB — well above any real schema, well below an accidental
  * gigabyte-sized file that would OOM `fs.readFileSync` + `JSON.parse`.
  */
@@ -397,10 +396,11 @@ function resolvePowerShellSettings(
 }
 
 /**
- * Resolve the --json-schema CLI argument into a validated JSON Schema
- * object, or undefined if the argument was not provided.
+ * Resolves the `--json-schema` argument into a parsed JSON Schema object.
  *
- * Accepts either an inline JSON literal or a `@path` reference.
+ * Accepts either a JSON literal or `@path/to/schema.json`. Fails fast with a
+ * FatalConfigError if the input can't be read/parsed/compiled — invalid
+ * schemas should not silently skip validation at runtime.
  */
 export function resolveJsonSchemaArg(
   raw: string | undefined,
@@ -410,7 +410,7 @@ export function resolveJsonSchemaArg(
   }
   const trimmed = raw.trim();
   if (!trimmed) {
-    throw new FatalConfigError('--json-schema argument cannot be empty.');
+    throw new FatalConfigError('--json-schema cannot be empty.');
   }
 
   let payload: string;
@@ -459,11 +459,9 @@ export function resolveJsonSchemaArg(
   try {
     parsed = JSON.parse(payload);
   } catch (err) {
-    // For inline JSON the user IS the source — echoing the SyntaxError
-    // (which on Node ≥18 embeds a 10-char input snippet) is fine. For
-    // @path, the error message would leak a prefix of the file's bytes
-    // through stderr to whatever wrapping process surfaces it; emit a
-    // generic message instead.
+    // For file-sourced schemas, emit a generic message to avoid leaking
+    // file content through stderr. For inline JSON the SyntaxError is
+    // fine (it includes a short snippet on Node >= 18).
     if (payloadSource === 'file') {
       throw new FatalConfigError(
         `--json-schema content of "${payloadSourcePath}" is not valid JSON.`,
@@ -509,7 +507,6 @@ export function resolveJsonSchemaArg(
       `--json-schema is not a valid JSON Schema: ${compileError}`,
     );
   }
-
   return parsed as Record<string, unknown>;
 }
 
@@ -981,15 +978,12 @@ export async function parseArguments(): Promise<CliArgs> {
             if (argv['promptInteractive']) {
               return '--json-schema cannot be used with --prompt-interactive (-i); structured output only terminates the non-interactive flow.';
             }
+            // Stream-json input runs through runNonInteractiveStreamJson,
+            // which doesn't honor the structured-output termination
+            // contract. Reject the combination explicitly so users see
+            // the mismatch at parse time instead of confusion at runtime.
             if (argv['inputFormat'] === 'stream-json') {
-              // The "first valid structured_output call ends the session"
-              // contract assumes a single one-shot prompt. Stream-json
-              // input keeps the process open waiting for more protocol
-              // messages, so terminating on the first call would silently
-              // drop subsequent prompts. Refuse the combination here
-              // rather than letting the run race to whichever message
-              // wins.
-              return '--json-schema cannot be used with --input-format stream-json; the "first structured_output call ends the session" contract is incompatible with the long-lived stream-json input protocol.';
+              return '--json-schema cannot be used with --input-format stream-json; structured output is a single-shot contract incompatible with stream-json input.';
             }
             if (argv['acp'] || argv['experimentalAcp']) {
               // ACP runs an external IDE/Zed protocol on its own turn loop

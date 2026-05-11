@@ -736,6 +736,7 @@ export class Config {
   private readonly jsonFd: number | undefined;
   private readonly jsonFile: string | undefined;
   private readonly jsonSchema: Record<string, unknown> | undefined;
+  private readonly inputFile: string | undefined;
   private readonly defaultFileEncoding: FileEncodingType | undefined;
   private readonly enableManagedAutoMemory: boolean;
   private readonly enableManagedAutoDream: boolean;
@@ -902,6 +903,7 @@ export class Config {
     this.jsonFd = params.jsonFd;
     this.jsonFile = params.jsonFile;
     this.jsonSchema = params.jsonSchema;
+    this.inputFile = params.inputFile;
     this.defaultFileEncoding = params.defaultFileEncoding;
     this.storage = new Storage(this.targetDir);
     this.fileExclusions = new FileExclusions(this);
@@ -2853,7 +2855,7 @@ export class Config {
     // --json-schema runs. It must be registered in BOTH the bare-mode
     // branch and the regular branch — without it the model can't finish
     // a structured run, so omitting either branch causes
-    // `qwen [--bare] --json-schema X -p "..."` to loop until
+    // `hopcode [--bare] --json-schema X -p "..."` to loop until
     // maxSessionTurns and exit via the "plain text" failure path. Hoisted
     // out of the two branches so the dynamic-import factory shape stays
     // in sync between them.
