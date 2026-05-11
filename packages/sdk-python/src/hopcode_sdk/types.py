@@ -96,7 +96,6 @@ class QueryOptionsDict(TypedDict, total=False):
     cwd: str
     model: str
     path_to_hopcode_executable: str
-    path_to_hopcode_executable: str
     permission_mode: PermissionMode
     can_use_tool: CanUseTool
     env: dict[str, str]
@@ -121,7 +120,6 @@ class QueryOptionsDict(TypedDict, total=False):
 class QueryOptions:
     cwd: str | None = None
     model: str | None = None
-    path_to_hopcode_executable: str | None = None
     path_to_hopcode_executable: str | None = None
     permission_mode: PermissionMode | None = None
     can_use_tool: CanUseTool | None = None
