@@ -124,13 +124,8 @@ export async function resolveTelemetrySettings(options: {
     env['HOPCODE_TELEMETRY_OUTFILE'] ??
     settings.outfile;
 
-  const useCollector =
-    parseBooleanEnvFlag(
-      env['HOPCODE_TELEMETRY_USE_COLLECTOR'] ??
-        env['HOPCODE_TELEMETRY_USE_COLLECTOR'],
-    ) ?? settings.useCollector;
-
-  // Per-signal endpoint resolution: arg > HOPCODE_* env > HOPCODE_* env > OTEL_* env > settings
+  // Per-signal endpoint overrides (HTTP only).
+  // Priority: HOPCODE_ env var > standard OTEL_ env var > settings.json
   const otlpTracesEndpoint =
     argv.telemetryOtlpTracesEndpoint ??
     env['HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
@@ -163,6 +158,5 @@ export async function resolveTelemetrySettings(options: {
     logPrompts,
     includeSensitiveSpanAttributes,
     outfile,
-    useCollector,
   };
 }

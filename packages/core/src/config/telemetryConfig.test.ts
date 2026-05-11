@@ -107,18 +107,6 @@ describe('TelemetryConfig', () => {
     });
   });
 
-  describe('getUseCollector', () => {
-    it('defaults to false', () => {
-      const config = new TelemetryConfig({});
-      expect(config.getUseCollector()).toBe(false);
-    });
-
-    it('returns true when collector is enabled', () => {
-      const config = new TelemetryConfig({ useCollector: true });
-      expect(config.getUseCollector()).toBe(true);
-    });
-  });
-
   describe('getSettings', () => {
     it('returns the full settings object', () => {
       const config = new TelemetryConfig({

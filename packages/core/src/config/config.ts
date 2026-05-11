@@ -815,7 +815,6 @@ export class Config {
       includeSensitiveSpanAttributes:
         params.telemetry?.includeSensitiveSpanAttributes ?? false,
       outfile: params.telemetry?.outfile,
-      useCollector: params.telemetry?.useCollector,
     });
     this.uiConfig = new UiConfig({
       inputFormat: params.inputFormat,
@@ -2114,10 +2113,6 @@ export class Config {
 
   getGitCoAuthor(): GitCoAuthorSettings {
     return this.gitCoAuthor;
-  }
-
-  getTelemetryUseCollector(): boolean {
-    return this.telemetryConfig.getUseCollector();
   }
 
   getGeminiClient(): GeminiClient {

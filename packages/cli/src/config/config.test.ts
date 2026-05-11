@@ -2952,15 +2952,6 @@ describe('Telemetry configuration via environment variables', () => {
     expect(config.getTelemetryOutfile()).toBe('/gemini/env/telemetry.log');
   });
 
-  it('should prioritize HOPCODE_TELEMETRY_USE_COLLECTOR over settings', async () => {
-    vi.stubEnv('HOPCODE_TELEMETRY_USE_COLLECTOR', 'true');
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments();
-    const settings: Settings = { telemetry: { useCollector: false } };
-    const config = await loadCliConfig(settings, argv, undefined, []);
-    expect(config.getTelemetryUseCollector()).toBe(true);
-  });
-
   it('should use settings value when HOPCODE_TELEMETRY_ENABLED is not set', async () => {
     vi.stubEnv('HOPCODE_TELEMETRY_ENABLED', undefined);
     process.argv = ['node', 'script.js'];

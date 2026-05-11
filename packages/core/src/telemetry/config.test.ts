@@ -63,7 +63,6 @@ describe('telemetry/config helpers', () => {
         logPrompts: false,
         includeSensitiveSpanAttributes: true,
         outfile: 'settings.log',
-        useCollector: false,
       };
       const resolved = await resolveTelemetrySettings({ settings });
       expect(resolved).toEqual({
@@ -83,7 +82,6 @@ describe('telemetry/config helpers', () => {
         logPrompts: false,
         includeSensitiveSpanAttributes: false,
         outfile: 'settings.log',
-        useCollector: false,
       };
       const env = {
         HOPCODE_TELEMETRY_ENABLED: '1',
@@ -93,7 +91,6 @@ describe('telemetry/config helpers', () => {
         HOPCODE_TELEMETRY_LOG_PROMPTS: 'true',
         HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES: 'true',
         HOPCODE_TELEMETRY_OUTFILE: 'env.log',
-        HOPCODE_TELEMETRY_USE_COLLECTOR: 'true',
       } as Record<string, string>;
       const argv = {
         telemetry: false,
@@ -116,7 +113,6 @@ describe('telemetry/config helpers', () => {
         logPrompts: true,
         includeSensitiveSpanAttributes: true,
         outfile: 'env.log',
-        useCollector: true,
       });
 
       const resolvedArgv = await resolveTelemetrySettings({
@@ -135,7 +131,6 @@ describe('telemetry/config helpers', () => {
         logPrompts: false,
         includeSensitiveSpanAttributes: true,
         outfile: 'argv.log',
-        useCollector: true, // from env as no argv option
       });
     });
 

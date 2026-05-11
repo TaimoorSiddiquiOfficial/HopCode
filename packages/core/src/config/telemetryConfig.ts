@@ -24,7 +24,6 @@ export interface TelemetrySettings {
   logPrompts?: boolean;
   includeSensitiveSpanAttributes?: boolean;
   outfile?: string;
-  useCollector?: boolean;
 }
 
 export interface TelemetryConfigParams {
@@ -38,7 +37,6 @@ export interface TelemetryConfigParams {
   logPrompts?: boolean;
   includeSensitiveSpanAttributes?: boolean;
   outfile?: string;
-  useCollector?: boolean;
 }
 
 /**
@@ -63,7 +61,6 @@ export class TelemetryConfig {
       includeSensitiveSpanAttributes:
         params.includeSensitiveSpanAttributes ?? false,
       outfile: params.outfile,
-      useCollector: params.useCollector,
     };
   }
 
@@ -105,9 +102,5 @@ export class TelemetryConfig {
 
   getOutfile(): string | undefined {
     return this.settings.outfile;
-  }
-
-  getUseCollector(): boolean {
-    return this.settings.useCollector ?? false;
   }
 }
