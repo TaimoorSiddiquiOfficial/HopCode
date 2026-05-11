@@ -42,6 +42,9 @@ describe('ExtensionStorage', () => {
             path.join(mockHomeDir, '.hopcode', 'extensions'),
         }) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     );
+    vi.mocked(Storage.getUserExtensionsDir).mockReturnValue(
+      path.join(mockHomeDir, '.hopcode', 'extensions'),
+    );
     storage = new ExtensionStorage(extensionName);
   });
 
@@ -87,14 +90,14 @@ describe('ExtensionStorage', () => {
   });
 
   it('should create a temporary directory', async () => {
-    const mockTmpDir = '/tmp/qwen-extension-123';
+    const mockTmpDir = '/tmp/hopcode-extension-123';
     vi.mocked(fs.promises.mkdtemp).mockResolvedValue(mockTmpDir);
     vi.mocked(os.tmpdir).mockReturnValue('/tmp');
 
     const result = await ExtensionStorage.createTmpDir();
 
     expect(fs.promises.mkdtemp).toHaveBeenCalledWith(
-      path.join('/tmp', 'qwen-extension'),
+      path.join('/tmp', 'hopcode-extension'),
     );
     expect(result).toBe(mockTmpDir);
   });

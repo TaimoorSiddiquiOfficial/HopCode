@@ -28,7 +28,7 @@ const CACHED_HOPCODE_OAUTH_MODELS: AvailableModel[] = HOPCODE_OAUTH_MODELS.map(
   }),
 );
 
-function getQwenOAuthModels(): readonly AvailableModel[] {
+function getHopCodeOAuthModels(): readonly AvailableModel[] {
   return CACHED_HOPCODE_OAUTH_MODELS;
 }
 
@@ -37,7 +37,7 @@ function getQwenOAuthModels(): readonly AvailableModel[] {
  * coder-model now has vision capabilities by default.
  */
 export function getFilteredQwenModels(): AvailableModel[] {
-  return [...getQwenOAuthModels()];
+  return [...getHopCodeOAuthModels()];
 }
 
 /**
@@ -113,7 +113,7 @@ export function getAvailableModelsForAuthType(
   // Fall back to environment variables for specific auth types (no config provided)
   switch (authType) {
     case AuthType.HOPCODE_OAUTH: {
-      return [...getQwenOAuthModels()];
+      return [...getHopCodeOAuthModels()];
     }
     case AuthType.USE_OPENAI: {
       const openAIModel = getOpenAIAvailableModelFromEnv();

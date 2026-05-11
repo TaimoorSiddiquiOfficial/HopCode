@@ -35,7 +35,7 @@ import {
 } from './skill-activation.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { normalizeContent } from '../utils/textUtils.js';
-import { SKILL_PROVIDER_CONFIG_DIRS } from '../config/storage.js';
+import { SKILL_PROVIDER_CONFIG_DIRS, Storage } from '../config/storage.js';
 import {
   HookEventName,
   HookType,
@@ -45,7 +45,6 @@ import {
 } from '../hooks/types.js';
 
 const debugLogger = createDebugLogger('SKILL_MANAGER');
-
 const HOPCODE_CONFIG_DIR = '.hopcode';
 const SKILLS_CONFIG_DIR = 'skills';
 const SKILL_MANIFEST_FILE = 'SKILL.md';
@@ -835,7 +834,9 @@ export class SkillManager {
         );
       case 'user':
         return SKILL_PROVIDER_CONFIG_DIRS.map((v) =>
-          path.join(os.homedir(), v, SKILLS_CONFIG_DIR),
+          v === HOPCODE_CONFIG_DIR
+            ? path.join(Storage.getGlobalHopCodeDir(), SKILLS_CONFIG_DIR)
+            : path.join(os.homedir(), v, SKILLS_CONFIG_DIR),
         );
       case 'bundled':
         return [this.bundledSkillsDir];
@@ -903,7 +904,7 @@ export class SkillManager {
 
     // Iterate provider directories in PROVIDER_CONFIG_DIRS order.
     // The first directory that contains a skill with a given name wins,
-    // so the order defines implicit precedence (.qwen > .agent > .cursor > ...).
+    // so the order defines implicit precedence (.hopcode > .agent > .cursor > ...).
     // Load in parallel but fold sequentially to preserve precedence.
     const baseDirs = this.getSkillsBaseDirs(level);
     const perDirSkills = await Promise.all(
@@ -1111,11 +1112,7 @@ export class SkillManager {
   }
 
   private async ensureUserSkillsDir(): Promise<void> {
-    const baseDir = path.join(
-      os.homedir(),
-      HOPCODE_CONFIG_DIR,
-      SKILLS_CONFIG_DIR,
-    );
+    const baseDir = path.join(Storage.getGlobalHopCodeDir(), SKILLS_CONFIG_DIR);
     try {
       await fs.mkdir(baseDir, { recursive: true });
     } catch (error) {

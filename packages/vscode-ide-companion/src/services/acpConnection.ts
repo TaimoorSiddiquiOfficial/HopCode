@@ -170,9 +170,9 @@ export class AcpConnection {
         message.toLowerCase().includes('error') &&
         !message.includes('Loaded cached')
       ) {
-        console.error(`[ACP qwen]:`, message);
+        console.error(`[ACP hopcode]:`, message);
       } else {
-        console.log(`[ACP qwen]:`, message);
+        console.log(`[ACP hopcode]:`, message);
       }
     });
 
@@ -182,7 +182,7 @@ export class AcpConnection {
 
     this.child!.on('exit', (code: number | null, signal: string | null) => {
       console.error(
-        `[ACP qwen] Process exited with code: ${code}, signal: ${signal}`,
+        `[ACP hopcode] Process exited with code: ${code}, signal: ${signal}`,
       );
       this.lastExitCode = code;
       this.lastExitSignal = signal;
@@ -508,6 +508,34 @@ export class AcpConnection {
       this.onEndTurn();
     }
     return response;
+  }
+
+  async rewindSession(
+    targetTurnIndex: number,
+  ): Promise<{ historyBeforeRewind?: unknown[] }> {
+    const conn = this.ensureConnection();
+    if (!this.sessionId) {
+      throw new Error('No active ACP session');
+    }
+
+    return (await conn.extMethod('rewindSession', {
+      sessionId: this.sessionId,
+      targetTurnIndex,
+      cwd: this.workingDir,
+    })) as { historyBeforeRewind?: unknown[] };
+  }
+
+  async restoreSessionHistory(history: unknown[]): Promise<void> {
+    const conn = this.ensureConnection();
+    if (!this.sessionId) {
+      throw new Error('No active ACP session');
+    }
+
+    await conn.extMethod('restoreSessionHistory', {
+      sessionId: this.sessionId,
+      history,
+      cwd: this.workingDir,
+    });
   }
 
   async loadSession(

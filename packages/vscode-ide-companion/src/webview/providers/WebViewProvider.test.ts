@@ -19,7 +19,7 @@ const {
   mockOnDidChangeActiveTextEditor,
   mockOnDidChangeTextEditorSelection,
   mockOpenExternal,
-  mockReadQwenSettingsForVSCode,
+  mockReadHopCodeSettingsForVSCode,
   mockWriteCodingPlanConfig,
   mockWriteModelProvidersConfig,
   mockClearPersistedAuth,
@@ -31,6 +31,7 @@ const {
   mockShowInformationMessage,
   mockWindowState,
   mockHopCodeAgentManagerInstances,
+  mockClipboardWriteText,
 } = vi.hoisted(() => ({
   mockConfigChangeHandlers: [] as Array<
     (event: { affectsConfiguration: (section: string) => boolean }) => unknown
@@ -66,7 +67,7 @@ const {
   mockOnDidChangeActiveTextEditor: vi.fn(() => ({ dispose: vi.fn() })),
   mockOnDidChangeTextEditorSelection: vi.fn(() => ({ dispose: vi.fn() })),
   mockOpenExternal: vi.fn(),
-  mockReadQwenSettingsForVSCode: vi.fn<
+  mockReadHopCodeSettingsForVSCode: vi.fn<
     () => {
       provider: 'coding-plan' | 'api-key';
       apiKey: string;
@@ -109,6 +110,7 @@ const {
     cancelCurrentPrompt: ReturnType<typeof vi.fn>;
     disconnect: ReturnType<typeof vi.fn>;
   }>,
+  mockClipboardWriteText: vi.fn(),
 }));
 
 vi.mock('@hoptrendy/hopcode-core', async () => {
@@ -135,6 +137,9 @@ vi.mock('vscode', () => ({
   },
   env: {
     openExternal: mockOpenExternal,
+    clipboard: {
+      writeText: mockClipboardWriteText,
+    },
   },
   window: {
     onDidChangeActiveTextEditor: mockOnDidChangeActiveTextEditor,
@@ -165,7 +170,7 @@ vi.mock('vscode', () => ({
 vi.mock('../../services/settingsWriter.js', () => ({
   writeCodingPlanConfig: mockWriteCodingPlanConfig,
   writeModelProvidersConfig: mockWriteModelProvidersConfig,
-  readHopcodeSettingsForVSCode: mockReadQwenSettingsForVSCode,
+  readHopcodeSettingsForVSCode: mockReadHopCodeSettingsForVSCode,
   clearPersistedAuth: mockClearPersistedAuth,
 }));
 
@@ -401,6 +406,8 @@ beforeEach(() => {
   mockWindowState.focused = true;
   mockShowInformationMessage.mockReset();
   mockShowInformationMessage.mockReturnValue(Promise.resolve(undefined));
+  mockClipboardWriteText.mockReset();
+  mockClipboardWriteText.mockResolvedValue(undefined);
 });
 
 describe('WebViewProvider.attachToView', () => {
@@ -502,6 +509,40 @@ describe('WebViewProvider.attachToView', () => {
         ],
         requestId: 7,
       },
+    });
+  });
+
+  it('reports clipboard copy success back to the requesting webview', async () => {
+    const { messageHandler, postMessage } = await setupAttachedProvider({
+      captureMessageHandler: true,
+    });
+
+    await messageHandler?.({
+      type: 'copyToClipboard',
+      data: { text: 'copy me', requestId: 'copy-1' },
+    });
+
+    expect(mockClipboardWriteText).toHaveBeenCalledWith('copy me');
+    expect(postMessage).toHaveBeenCalledWith({
+      type: 'copyToClipboardResult',
+      data: { requestId: 'copy-1', success: true },
+    });
+  });
+
+  it('reports clipboard copy failures back to the requesting webview', async () => {
+    mockClipboardWriteText.mockRejectedValueOnce(new Error('denied'));
+    const { messageHandler, postMessage } = await setupAttachedProvider({
+      captureMessageHandler: true,
+    });
+
+    await messageHandler?.({
+      type: 'copyToClipboard',
+      data: { text: 'copy me', requestId: 'copy-1' },
+    });
+
+    expect(postMessage).toHaveBeenCalledWith({
+      type: 'copyToClipboardResult',
+      data: { requestId: 'copy-1', success: false, error: 'denied' },
     });
   });
 
@@ -958,9 +999,9 @@ describe('WebViewProvider settings sync', () => {
 
     const synced = await (
       provider as unknown as {
-        syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+        syncVSCodeSettingsToHopCodeConfig: () => Promise<boolean>;
       }
-    ).syncVSCodeSettingsToQwenConfig();
+    ).syncVSCodeSettingsToHopCodeConfig();
 
     expect(synced).toBe(false);
     expect(mockWriteCodingPlanConfig).not.toHaveBeenCalled();
@@ -968,7 +1009,7 @@ describe('WebViewProvider settings sync', () => {
   });
 
   it('only syncs non-secret VS Code settings from ~/.hopcode/settings.json', async () => {
-    mockReadQwenSettingsForVSCode.mockReturnValue({
+    mockReadHopCodeSettingsForVSCode.mockReturnValue({
       provider: 'coding-plan',
       apiKey: 'sk-updated',
       codingPlanRegion: 'global',
@@ -993,9 +1034,9 @@ describe('WebViewProvider settings sync', () => {
 
     await (
       provider as unknown as {
-        syncQwenConfigToVSCodeSettings: () => Promise<void>;
+        syncHopCodeConfigToVSCodeSettings: () => Promise<void>;
       }
-    ).syncQwenConfigToVSCodeSettings();
+    ).syncHopCodeConfigToVSCodeSettings();
 
     expect(mockConfigUpdate).toHaveBeenCalledTimes(2);
     expect(mockConfigUpdate).toHaveBeenCalledWith(
@@ -1023,9 +1064,9 @@ describe('WebViewProvider settings sync', () => {
     const syncSpy = vi
       .spyOn(
         provider as unknown as {
-          syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+          syncVSCodeSettingsToHopCodeConfig: () => Promise<boolean>;
         },
-        'syncVSCodeSettingsToQwenConfig',
+        'syncVSCodeSettingsToHopCodeConfig',
       )
       .mockResolvedValue(true);
 
@@ -1045,9 +1086,9 @@ describe('WebViewProvider settings sync', () => {
     const syncSpy = vi
       .spyOn(
         provider as unknown as {
-          syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+          syncVSCodeSettingsToHopCodeConfig: () => Promise<boolean>;
         },
-        'syncVSCodeSettingsToQwenConfig',
+        'syncVSCodeSettingsToHopCodeConfig',
       )
       .mockResolvedValue(false);
 
@@ -1071,12 +1112,12 @@ describe('WebViewProvider settings sync', () => {
     (provider as unknown as { agentInitialized: boolean }).agentInitialized =
       true;
 
-    // syncVSCodeSettingsToQwenConfig returns false because apiKey is empty
+    // syncVSCodeSettingsToHopCodeConfig returns false because apiKey is empty
     vi.spyOn(
       provider as unknown as {
-        syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+        syncVSCodeSettingsToHopCodeConfig: () => Promise<boolean>;
       },
-      'syncVSCodeSettingsToQwenConfig',
+      'syncVSCodeSettingsToHopCodeConfig',
     ).mockResolvedValue(false);
 
     // apiKey is empty (user cleared it in Settings)
@@ -1117,12 +1158,12 @@ describe('WebViewProvider settings sync', () => {
     (provider as unknown as { agentInitialized: boolean }).agentInitialized =
       true;
 
-    // syncVSCodeSettingsToQwenConfig returns false — normal for api-key providers
+    // syncVSCodeSettingsToHopCodeConfig returns false — normal for api-key providers
     vi.spyOn(
       provider as unknown as {
-        syncVSCodeSettingsToQwenConfig: () => Promise<boolean>;
+        syncVSCodeSettingsToHopCodeConfig: () => Promise<boolean>;
       },
-      'syncVSCodeSettingsToQwenConfig',
+      'syncVSCodeSettingsToHopCodeConfig',
     ).mockResolvedValue(false);
 
     // apiKey is empty because api-key providers don't use this VS Code setting

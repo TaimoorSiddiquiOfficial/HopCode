@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team team
  * SPDX-License-Identifier: Apache-2.0
@@ -7,8 +7,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { homedir } from 'node:os';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
+import * as os from 'node:os';
 import {
   type SupportedLanguage,
   SUPPORTED_LANGUAGES,
@@ -34,7 +34,7 @@ const getBuiltinLocalesDir = (): string => {
 };
 
 const getUserLocalesDir = (): string =>
-  path.join(homedir(), '.hopcode', 'locales');
+  path.join(os.homedir(), '.hopcode', 'locales');
 
 /**
  * Get the path to the user's custom locales directory.

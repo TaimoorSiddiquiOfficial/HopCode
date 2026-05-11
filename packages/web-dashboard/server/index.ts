@@ -30,7 +30,7 @@ const PORT = parseInt(process.env['HOPCODE_DASHBOARD_PORT'] ?? '7899', 10);
 /** Root HopCode dir — ~/.hopcode unless overridden */
 function getHopcodeDir(): string {
   const env =
-    process.env['HOPCODE_RUNTIME_DIR'] ?? process.env['QWEN_RUNTIME_DIR'];
+    process.env['HOPCODE_RUNTIME_DIR'] ?? process.env['HOPCODE_RUNTIME_DIR'];
   if (env) return env;
   return path.join(os.homedir(), '.hopcode');
 }

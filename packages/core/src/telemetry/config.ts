@@ -61,14 +61,14 @@ export async function resolveTelemetrySettings(options: {
   const enabled =
     argv.telemetry ??
     parseBooleanEnvFlag(
-      env['HOPCODE_TELEMETRY_ENABLED'] ?? env['QWEN_TELEMETRY_ENABLED'],
+      env['HOPCODE_TELEMETRY_ENABLED'] ?? env['HOPCODE_TELEMETRY_ENABLED'],
     ) ??
     settings.enabled;
 
   const rawTarget =
     (argv.telemetryTarget as string | TelemetryTarget | undefined) ??
     env['HOPCODE_TELEMETRY_TARGET'] ??
-    env['QWEN_TELEMETRY_TARGET'] ??
+    env['HOPCODE_TELEMETRY_TARGET'] ??
     (settings.target as string | TelemetryTarget | undefined);
   const target = parseTelemetryTargetValue(rawTarget);
   if (rawTarget !== undefined && target === undefined) {
@@ -82,14 +82,14 @@ export async function resolveTelemetrySettings(options: {
   const otlpEndpoint =
     argv.telemetryOtlpEndpoint ??
     env['HOPCODE_TELEMETRY_OTLP_ENDPOINT'] ??
-    env['QWEN_TELEMETRY_OTLP_ENDPOINT'] ??
+    env['HOPCODE_TELEMETRY_OTLP_ENDPOINT'] ??
     env['OTEL_EXPORTER_OTLP_ENDPOINT'] ??
     settings.otlpEndpoint;
 
   const rawProtocol =
     (argv.telemetryOtlpProtocol as string | undefined) ??
     env['HOPCODE_TELEMETRY_OTLP_PROTOCOL'] ??
-    env['QWEN_TELEMETRY_OTLP_PROTOCOL'] ??
+    env['HOPCODE_TELEMETRY_OTLP_PROTOCOL'] ??
     settings.otlpProtocol;
   const otlpProtocol = (['grpc', 'http'] as const).find(
     (p) => p === rawProtocol,
@@ -105,14 +105,15 @@ export async function resolveTelemetrySettings(options: {
   const logPrompts =
     argv.telemetryLogPrompts ??
     parseBooleanEnvFlag(
-      env['HOPCODE_TELEMETRY_LOG_PROMPTS'] ?? env['QWEN_TELEMETRY_LOG_PROMPTS'],
+      env['HOPCODE_TELEMETRY_LOG_PROMPTS'] ??
+        env['HOPCODE_TELEMETRY_LOG_PROMPTS'],
     ) ??
     settings.logPrompts;
 
   const includeSensitiveSpanAttributes =
     parseBooleanEnvFlag(
       env['HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES'] ??
-        env['QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES'],
+        env['HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES'],
     ) ??
     settings.includeSensitiveSpanAttributes ??
     false;
@@ -120,34 +121,34 @@ export async function resolveTelemetrySettings(options: {
   const outfile =
     argv.telemetryOutfile ??
     env['HOPCODE_TELEMETRY_OUTFILE'] ??
-    env['QWEN_TELEMETRY_OUTFILE'] ??
+    env['HOPCODE_TELEMETRY_OUTFILE'] ??
     settings.outfile;
 
   const useCollector =
     parseBooleanEnvFlag(
       env['HOPCODE_TELEMETRY_USE_COLLECTOR'] ??
-        env['QWEN_TELEMETRY_USE_COLLECTOR'],
+        env['HOPCODE_TELEMETRY_USE_COLLECTOR'],
     ) ?? settings.useCollector;
 
-  // Per-signal endpoint resolution: arg > HOPCODE_* env > QWEN_* env > OTEL_* env > settings
+  // Per-signal endpoint resolution: arg > HOPCODE_* env > HOPCODE_* env > OTEL_* env > settings
   const otlpTracesEndpoint =
     argv.telemetryOtlpTracesEndpoint ??
     env['HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
-    env['QWEN_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
+    env['HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
     env['OTEL_EXPORTER_OTLP_TRACES_ENDPOINT'] ??
     settings.otlpTracesEndpoint;
 
   const otlpLogsEndpoint =
     argv.telemetryOtlpLogsEndpoint ??
     env['HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT'] ??
-    env['QWEN_TELEMETRY_OTLP_LOGS_ENDPOINT'] ??
+    env['HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT'] ??
     env['OTEL_EXPORTER_OTLP_LOGS_ENDPOINT'] ??
     settings.otlpLogsEndpoint;
 
   const otlpMetricsEndpoint =
     argv.telemetryOtlpMetricsEndpoint ??
     env['HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT'] ??
-    env['QWEN_TELEMETRY_OTLP_METRICS_ENDPOINT'] ??
+    env['HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT'] ??
     env['OTEL_EXPORTER_OTLP_METRICS_ENDPOINT'] ??
     settings.otlpMetricsEndpoint;
 

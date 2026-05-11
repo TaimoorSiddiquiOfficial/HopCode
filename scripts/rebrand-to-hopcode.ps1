@@ -136,16 +136,16 @@ function Invoke-Phase1 {
     Replace-InFiles -Pattern "package.json" -Old "ghcr.io/qwenlm/qwen-code" -New "ghcr.io/hopcode/hopcode" -Path (Join-Path $RootDir "packages")
     
     Write-Info "Updating environment variables..."
-    Replace-InFiles -Pattern "*.ts" -Old "QWEN_CODE_" -New "HOPCODE_" -Path (Join-Path $RootDir "packages")
-    Replace-InFiles -Pattern "*.js" -Old "QWEN_CODE_" -New "HOPCODE_" -Path (Join-Path $RootDir "packages")
-    Replace-InFiles -Pattern "*.ts" -Old "QWEN_SANDBOX" -New "HOPCODE_SANDBOX" -Path (Join-Path $RootDir "packages")
-    Replace-InFiles -Pattern "*.ts" -Old "QWEN_WORKING_DIR" -New "HOPCODE_WORKING_DIR" -Path (Join-Path $RootDir "packages")
+    Replace-InFiles -Pattern "*.ts" -Old "HOPCODE_" -New "HOPCODE_" -Path (Join-Path $RootDir "packages")
+    Replace-InFiles -Pattern "*.js" -Old "HOPCODE_" -New "HOPCODE_" -Path (Join-Path $RootDir "packages")
+    Replace-InFiles -Pattern "*.ts" -Old "HOPCODE_SANDBOX" -New "HOPCODE_SANDBOX" -Path (Join-Path $RootDir "packages")
+    Replace-InFiles -Pattern "*.ts" -Old "HOPCODE_WORKING_DIR" -New "HOPCODE_WORKING_DIR" -Path (Join-Path $RootDir "packages")
     
     Write-Info "Updating config directory references..."
-    Replace-InFiles -Pattern "*.sh" -Old ".qwen" -New ".hopcode" -Path (Join-Path $RootDir "scripts")
-    Replace-InFiles -Pattern "*.bat" -Old ".qwen" -New ".hopcode" -Path (Join-Path $RootDir "scripts")
-    Replace-InFiles -Pattern "*.ts" -Old ".qwen" -New ".hopcode" -Path (Join-Path $RootDir "packages")
-    Replace-InFiles -Pattern "*.js" -Old ".qwen" -New ".hopcode" -Path (Join-Path $RootDir "packages")
+    Replace-InFiles -Pattern "*.sh" -Old ".hopcode" -New ".hopcode" -Path (Join-Path $RootDir "scripts")
+    Replace-InFiles -Pattern "*.bat" -Old ".hopcode" -New ".hopcode" -Path (Join-Path $RootDir "scripts")
+    Replace-InFiles -Pattern "*.ts" -Old ".hopcode" -New ".hopcode" -Path (Join-Path $RootDir "packages")
+    Replace-InFiles -Pattern "*.js" -Old ".hopcode" -New ".hopcode" -Path (Join-Path $RootDir "packages")
     
     Write-Success "Phase 1 complete"
 }
@@ -172,8 +172,8 @@ function Invoke-Phase2 {
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "Qwen Code" -New "HopCode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "install_qwen_code" -New "install_hopcode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "@qwen-code/qwen-code" -New "@hopcode/hopcode"
-        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "QWEN_DIR" -New "HOPCODE_DIR"
-        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old ".qwen" -New ".hopcode"
+        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "HOPCODE_DIR" -New "HOPCODE_DIR"
+        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old ".hopcode" -New ".hopcode"
         
         if (-not $DryRun) {
             Rename-Item -Path (Join-Path $installDir "install-qwen-with-source.sh") -NewName "install-hopcode-with-source.sh"
@@ -184,7 +184,7 @@ function Invoke-Phase2 {
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "Qwen Code" -New "HopCode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old ":InstallQwenCode" -New ":InstallHopCode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "@qwen-code/qwen-code" -New "@hopcode/hopcode"
-        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "%USERPROFILE%\.qwen" -New "%USERPROFILE%\.hopcode"
+        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "%USERPROFILE%\.hopcode" -New "%USERPROFILE%\.hopcode"
         
         if (-not $DryRun) {
             Rename-Item -Path (Join-Path $installDir "install-qwen-with-source.bat") -NewName "install-hopcode-with-source.bat"
@@ -213,7 +213,7 @@ function Invoke-Phase2 {
         Replace-InFile -File $zedExt -Old 'authors = ["Qwen Team"]' -New 'authors = ["HopCode Team"]'
         Replace-InFile -File $zedExt -Old "Qwen Code Agent Server" -New "HopCode Agent Server"
         Replace-InFile -File $zedExt -Old "QwenLM/qwen-code" -New "TaimoorSiddiquiOfficial/HopCode"
-        Replace-InFile -File $zedExt -Old '[agent_servers.qwen-code]' -New '[agent_servers.hopcode]'
+        Replace-InFile -File $zedExt -Old '[agent_servers.hopcode-code]' -New '[agent_servers.hopcode]'
     }
     
     Write-Info "Updating WebUI package..."
@@ -221,7 +221,7 @@ function Invoke-Phase2 {
     Replace-InFile -File (Join-Path $RootDir "packages/webui/tailwind.preset.cjs") -Old "@qwen-code/webui" -New "@hopcode/webui"
     Replace-InFile -File (Join-Path $RootDir "packages/webui/src/styles/variables.css") -Old "--app-qwen-ivory" -New "--app-hopcode-ivory"
     Replace-InFile -File (Join-Path $RootDir "packages/webui/src/styles/variables.css") -Old "--qwen-corner-radius" -New "--hopcode-corner-radius"
-    Replace-InFile -File (Join-Path $RootDir "packages/webui/src/styles/timeline.css") -Old ".qwen-message" -New ".hopcode-message"
+    Replace-InFile -File (Join-Path $RootDir "packages/webui/src/styles/timeline.css") -Old ".hopcode-message" -New ".hopcode-message"
     
     Write-Success "Phase 2 complete"
 }
@@ -322,7 +322,7 @@ function Invoke-Phase5 {
     Replace-InFile -File (Join-Path $RootDir "Dockerfile") -Old "qwen-code" -New "hopcode"
     
     Write-Info "Updating git configuration..."
-    Replace-InFile -File (Join-Path $RootDir ".gitignore") -Old ".qwen" -New ".hopcode"
+    Replace-InFile -File (Join-Path $RootDir ".gitignore") -Old ".hopcode" -New ".hopcode"
     
     Write-Info "Updating integration tests..."
     $intTests = Join-Path $RootDir "integration-tests"

@@ -1,4 +1,4 @@
-import * as path from 'node:path';
+﻿import * as path from 'node:path';
 import * as os from 'node:os';
 import type { CommandModule } from 'yargs';
 import { normalizeProxyUrl } from '@hoptrendy/hopcode-core';

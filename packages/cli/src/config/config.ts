@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -30,6 +30,7 @@ import {
   NativeLspService,
   isBareMode,
   isToolEnabled,
+  type ConfigParameters,
   type MCPServerConfig,
 } from '@hoptrendy/hopcode-core';
 import { extensionsCommand } from '../commands/extensions.js';
@@ -179,6 +180,7 @@ export interface CliArgs {
   channel: string | undefined;
   jsonFd?: number | undefined;
   jsonFile?: string | undefined;
+  jsonSchema?: string | undefined;
   inputFile?: string | undefined;
 }
 
@@ -536,6 +538,14 @@ export async function parseArguments(): Promise<CliArgs> {
             'File path for structured JSON event output (dual output mode). ' +
             'Can be a regular file, FIFO (named pipe), or /dev/fd/N.',
         })
+        .option('json-schema', {
+          type: 'string',
+          description:
+            "JSON Schema that the model's final output must conform to " +
+            '(headless mode only). Accepts a JSON literal or "@path/to/schema.json". ' +
+            'Registers a synthetic `structured_output` tool; the session ends on ' +
+            'the first valid call.',
+        })
         .option('input-file', {
           type: 'string',
           description:
@@ -668,6 +678,31 @@ export async function parseArguments(): Promise<CliArgs> {
           // --resume accepts either a session UUID or a custom title
           if (argv['jsonFd'] != null && argv['jsonFile'] != null) {
             return '--json-fd and --json-file are mutually exclusive. Use one or the other.';
+          }
+          if (argv['jsonSchema']) {
+            if (argv['promptInteractive']) {
+              return '--json-schema cannot be used with --prompt-interactive (-i); structured output only terminates the non-interactive flow.';
+            }
+            // Stream-json input runs through runNonInteractiveStreamJson,
+            // which doesn't honor the structured-output termination
+            // contract. Reject the combination explicitly so users see
+            // the mismatch at parse time instead of confusion at runtime.
+            if (argv['inputFormat'] === 'stream-json') {
+              return '--json-schema cannot be used with --input-format stream-json; structured output is a single-shot contract incompatible with stream-json input.';
+            }
+            const hasPrompt = !!argv['prompt'];
+            const query = argv['query'] as string | string[] | undefined;
+            const hasPositionalQuery = Array.isArray(query)
+              ? query.length > 0
+              : !!query;
+            // Allow stdin piping (`echo "..." | hopcode --json-schema ...`):
+            // when stdin is not a TTY, the prompt is supplied via the pipe
+            // and headless mode runs normally. Only reject true interactive
+            // invocations with neither flag nor positional nor pipe.
+            const stdinIsPiped = !process.stdin.isTTY;
+            if (!hasPrompt && !hasPositionalQuery && !stdinIsPiped) {
+              return '--json-schema only applies to non-interactive mode; pass a prompt via -p, as a positional argument, or piped via stdin.';
+            }
           }
           return true;
         }),
@@ -1136,7 +1171,7 @@ export async function loadCliConfig(
   for (const name of argv.disabledSlashCommands ?? []) addDisabled(name);
   for (const name of (
     process.env['HOPCODE_DISABLED_SLASH_COMMANDS'] ??
-    process.env['QWEN_DISABLED_SLASH_COMMANDS'] ??
+    process.env['HOPCODE_DISABLED_SLASH_COMMANDS'] ??
     ''
   ).split(',')) {
     addDisabled(name);
@@ -1283,7 +1318,7 @@ export async function loadCliConfig(
 
   const modelProvidersConfig = settings.modelProviders;
 
-  const config = new Config({
+  const configParams: ConfigParameters = {
     sessionId,
     sessionData,
     embeddingModel: DEFAULT_HOPCODE_EMBEDDING_MODEL,
@@ -1420,6 +1455,9 @@ export async function loadCliConfig(
       ? false
       : (settings.memory?.enableManagedAutoMemory ?? true),
     enableManagedAutoDream: settings.memory?.enableManagedAutoDream ?? false,
+    enableAutoSkill: bareMode
+      ? false
+      : (settings.memory?.enableAutoSkill ?? false),
     fastModel: settings.fastModel || undefined,
     // Use separated hooks if provided, otherwise fall back to merged hooks
     userHooks: bareMode
@@ -1435,6 +1473,7 @@ export async function loadCliConfig(
     // absent.
     jsonFd: argv.jsonFd,
     jsonFile: argv.jsonFile ?? settings.dualOutput?.jsonFile,
+    jsonSchema: argv.jsonSchema ? JSON.parse(argv.jsonSchema) : undefined,
     inputFile: argv.inputFile ?? settings.dualOutput?.inputFile,
     // Precedence: explicit CLI flag > settings file > default(true).
     // NOTE: do NOT set a yargs default for `chat-recording`, otherwise argv will
@@ -1457,7 +1496,9 @@ export async function loadCliConfig(
             : undefined,
         }
       : undefined,
-  });
+  };
+
+  const config = new Config(configParams);
 
   if (lspEnabled) {
     try {

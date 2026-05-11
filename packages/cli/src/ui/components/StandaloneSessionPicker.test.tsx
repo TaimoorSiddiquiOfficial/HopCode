@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Code
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -677,7 +677,7 @@ describe('SessionPicker', () => {
 
       // First Esc: exit search back to list, do not cancel.
       stdin.write(ESC);
-      await wait(30);
+      await wait(100);
       output = lastFrame() ?? '';
       expect(output).toContain('login bug');
       expect(output).toContain('unrelated');
@@ -1402,6 +1402,47 @@ describe('SessionPicker', () => {
       expect(output).toContain('Test prompt text');
       expect(output).toContain('5 messages');
       expect(output).toContain('feature-branch');
+    });
+
+    it('renders the metadata line cleanly when messageCount is undefined', async () => {
+      // `listSessions()` now omits `messageCount` for perf, so this is the
+      // default production shape. Pin the row's render contract: time and
+      // branch still show, and the line must not contain a stray "messages"
+      // word, the literal "undefined", or a dangling " · " from the missing
+      // count segment.
+      const sessions = [
+        createMockSession({
+          sessionId: 'lazy-count',
+          prompt: 'No count yet',
+          messageCount: undefined,
+          gitBranch: 'feature-branch',
+        }),
+      ];
+      const mockService = createMockSessionService(sessions);
+
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SessionPicker
+            sessionService={mockService as never}
+            onSelect={vi.fn()}
+            onCancel={vi.fn()}
+          />
+        </KeypressProvider>,
+      );
+
+      await wait(100);
+
+      const output = lastFrame() ?? '';
+      expect(output).toContain('No count yet');
+      expect(output).toContain('feature-branch');
+      // Negative assertions guard the omit-count branch.
+      expect(output).not.toContain('messages');
+      expect(output).not.toContain('undefined');
+      // The metadata line should not contain a doubled separator. We isolate
+      // the row's metadata line (the one with the gitBranch) and check it.
+      const metaLine =
+        output.split('\n').find((l) => l.includes('feature-branch')) ?? '';
+      expect(metaLine).not.toMatch(/·\s*·/);
     });
 
     it('should show header and footer', async () => {

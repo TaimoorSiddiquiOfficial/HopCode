@@ -379,7 +379,7 @@ async function startFakeOpenAIServer(
 
   const verbose =
     process.env['HOPCODE_TUI_E2E_VERBOSE'] === '1' ||
-    process.env['QWEN_TUI_E2E_VERBOSE'] === '1';
+    process.env['HOPCODE_TUI_E2E_VERBOSE'] === '1';
   const log = (...args: unknown[]) => {
     if (verbose) {
       console.error('[fake-openai]', ...args);
@@ -485,7 +485,7 @@ async function main(): Promise<void> {
   const defaultRepoRoot = resolve(scriptDir, '../..');
   const repoRoot = resolve(
     process.env['HOPCODE_TUI_E2E_REPO'] ??
-      process.env['QWEN_TUI_E2E_REPO'] ??
+      process.env['HOPCODE_TUI_E2E_REPO'] ??
       defaultRepoRoot,
   );
   const defaultOut = join(
@@ -495,16 +495,16 @@ async function main(): Promise<void> {
   );
   const outputDir = resolve(
     process.env['HOPCODE_TUI_E2E_OUT'] ??
-      process.env['QWEN_TUI_E2E_OUT'] ??
+      process.env['HOPCODE_TUI_E2E_OUT'] ??
       defaultOut,
   );
   const maxClearPairs = envNumber(
     'HOPCODE_TUI_E2E_MAX_CLEAR_PAIRS',
-    envNumber('QWEN_TUI_E2E_MAX_CLEAR_PAIRS', 10),
+    envNumber('HOPCODE_TUI_E2E_MAX_CLEAR_PAIRS', 10),
   );
   const maxClearScreen = envNumber(
     'HOPCODE_TUI_E2E_MAX_CLEAR_SCREEN',
-    envNumber('QWEN_TUI_E2E_MAX_CLEAR_SCREEN', 20),
+    envNumber('HOPCODE_TUI_E2E_MAX_CLEAR_SCREEN', 20),
   );
   // The eraseLine ceiling is the metric that actually distinguishes the
   // visual-height fix from no-fix. With the fix in place we observe ~434;
@@ -512,11 +512,11 @@ async function main(): Promise<void> {
   // between so a full regression trips the ratchet.
   const maxEraseLine = envNumber(
     'HOPCODE_TUI_E2E_MAX_ERASE_LINE',
-    envNumber('QWEN_TUI_E2E_MAX_ERASE_LINE', 460),
+    envNumber('HOPCODE_TUI_E2E_MAX_ERASE_LINE', 460),
   );
   const subagentToolCalls = envNumber(
     'HOPCODE_TUI_E2E_SUBAGENT_TOOL_CALLS',
-    envNumber('QWEN_TUI_E2E_SUBAGENT_TOOL_CALLS', 5),
+    envNumber('HOPCODE_TUI_E2E_SUBAGENT_TOOL_CALLS', 5),
   );
   const packageJsonPath = join(repoRoot, 'package.json');
 

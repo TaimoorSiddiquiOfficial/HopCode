@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { renderWithProviders } from '../../test-utils/render.js';
+import { render } from 'ink-testing-library';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SessionPreview } from './SessionPreview.js';
+import { KeypressProvider } from '../contexts/KeypressContext.js';
 
 beforeEach(() => {
   Object.defineProperty(process.stdout, 'columns', {
@@ -125,6 +127,28 @@ describe('SessionPreview', () => {
     const frame = lastFrame() ?? '';
     expect(frame).toMatch(/42\s*messages/);
     expect(frame).toContain('feat/preview');
+  });
+
+  it('falls back to count from loaded conversation when messageCount prop is absent', async () => {
+    // listSessions() now omits messageCount, so the picker passes undefined
+    // through to SessionPreview. The footer must still show a count, derived
+    // from the loaded ResumedSessionData using unique user/assistant UUIDs.
+    const svc = mockService(fakeResumedData());
+    const { lastFrame } = render(
+      <KeypressProvider kittyProtocolEnabled={false}>
+        <SessionPreview
+          sessionService={svc}
+          sessionId="s1"
+          sessionTitle="My session"
+          onExit={vi.fn()}
+          onResume={vi.fn()}
+        />
+      </KeypressProvider>,
+    );
+    await wait(100);
+    const frame = lastFrame() ?? '';
+    expect(frame).toMatch(/2\s*messages/);
+    expect(frame).not.toContain('undefined');
   });
 
   it('calls onExit when Escape is pressed', async () => {

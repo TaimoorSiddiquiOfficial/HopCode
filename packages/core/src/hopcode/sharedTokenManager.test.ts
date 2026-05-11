@@ -39,12 +39,18 @@ vi.mock('node:os', () => ({
   homedir: vi.fn(),
 }));
 
-vi.mock('node:path', () => ({
-  default: {
-    join: vi.fn(),
-    dirname: vi.fn(),
-  },
-}));
+vi.mock('node:path', async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const actual: any = await importOriginal();
+  return {
+    ...actual,
+    default: {
+      ...actual.default,
+      join: vi.fn((...args: string[]) => actual.default.join(...args)),
+      dirname: vi.fn((p: string) => actual.default.dirname(p)),
+    },
+  };
+});
 
 /**
  * Helper to access private properties for testing
@@ -63,7 +69,7 @@ function setPrivateProperty<T>(obj: unknown, property: string, value: T): void {
 /**
  * Creates a mock HopCodeOAuth2Client for testing
  */
-function createMockQwenClient(
+function createMockHopCodeClient(
   initialCredentials: Partial<HopCodeCredentials> = {},
 ): IHopCodeOAuth2Client {
   let credentials: HopCodeCredentials = {
@@ -217,7 +223,7 @@ describe('SharedTokenManager', () => {
 
   describe('getValidCredentials', () => {
     it('should return valid cached credentials without refresh', async () => {
-      const mockClient = createMockQwenClient();
+      const mockClient = createMockHopCodeClient();
       const validCredentials = createValidCredentials();
 
       // Mock file operations to indicate no file changes
@@ -241,7 +247,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should refresh expired credentials', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const refreshResponse = createSuccessfulRefreshResponse();
 
       mockClient.refreshAccessToken = vi
@@ -262,7 +268,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should force refresh when forceRefresh is true', async () => {
-      const mockClient = createMockQwenClient(createValidCredentials());
+      const mockClient = createMockHopCodeClient(createValidCredentials());
       const refreshResponse = createSuccessfulRefreshResponse();
 
       mockClient.refreshAccessToken = vi
@@ -282,7 +288,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should throw TokenManagerError when refresh token is missing', async () => {
-      const mockClient = createMockQwenClient({
+      const mockClient = createMockHopCodeClient({
         access_token: 'expired_token',
         refresh_token: undefined, // No refresh token
         expiry_date: Date.now() - 3600000,
@@ -298,7 +304,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should throw TokenManagerError when refresh fails', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const errorResponse = createErrorResponse();
 
       mockClient.refreshAccessToken = vi.fn().mockResolvedValue(errorResponse);
@@ -312,7 +318,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should handle network errors during refresh', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const networkError = new Error('Network request failed');
 
       mockClient.refreshAccessToken = vi.fn().mockRejectedValue(networkError);
@@ -326,7 +332,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should wait for ongoing refresh and return same result', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const refreshResponse = createSuccessfulRefreshResponse();
 
       // Create a delayed refresh response
@@ -356,7 +362,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should reload credentials from file when file is modified', async () => {
-      const mockClient = createMockQwenClient();
+      const mockClient = createMockHopCodeClient();
       const fileCredentials = createValidCredentials({
         access_token: 'file_access_token',
       });
@@ -419,7 +425,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should return true when refresh is in progress', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
 
       // Clear cache to ensure refresh is triggered
       tokenManager.clearCache();
@@ -524,7 +530,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should handle file access errors gracefully', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
 
       // Mock file stat to throw access error
       const accessError = new Error(
@@ -539,7 +545,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should handle missing file gracefully', async () => {
-      const mockClient = createMockQwenClient();
+      const mockClient = createMockHopCodeClient();
       const validCredentials = createValidCredentials();
 
       // Mock file stat to throw file not found error
@@ -561,7 +567,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should handle lock timeout scenarios', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
 
       // Configure shorter timeouts for testing
       tokenManager.setLockConfig({
@@ -602,7 +608,7 @@ describe('SharedTokenManager', () => {
       setPrivateProperty(SharedTokenManager, 'instance', null);
       const freshTokenManager = SharedTokenManager.getInstance();
 
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const invalidResponse = {
         token_type: 'Bearer',
         expires_in: 3600,
@@ -654,7 +660,7 @@ describe('SharedTokenManager', () => {
 
   describe('File System Operations', () => {
     it('should handle file reload failures gracefully', async () => {
-      const mockClient = createMockQwenClient();
+      const mockClient = createMockHopCodeClient();
 
       // Mock successful refresh for when cache is cleared
       mockClient.refreshAccessToken = vi
@@ -686,7 +692,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should handle invalid JSON in credentials file', async () => {
-      const mockClient = createMockQwenClient();
+      const mockClient = createMockHopCodeClient();
 
       // Mock successful refresh for when cache is cleared
       mockClient.refreshAccessToken = vi
@@ -718,7 +724,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should handle directory creation during save', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const refreshResponse = createSuccessfulRefreshResponse();
 
       mockClient.refreshAccessToken = vi
@@ -756,7 +762,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should handle stale lock cleanup', async () => {
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const refreshResponse = createSuccessfulRefreshResponse();
 
       mockClient.refreshAccessToken = vi

@@ -23,7 +23,7 @@
 - NPM scope: `@qwen-code/*` → `@hoptrendy/*`
 - CLI command: `qwen` → `hopcode`
 - Config directory: `.qwen/` → `.hopcode/`
-- Environment variables: `QWEN_CODE_*` → `HOPCODE_*`
+- Environment variables: `HOPCODE_*` → `HOPCODE_*`
 
 ---
 

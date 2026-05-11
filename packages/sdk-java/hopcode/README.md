@@ -234,7 +234,7 @@ For proper operation, the following timeout relationships should be maintained:
 
 The `TransportOptions` class allows configuration of how the SDK communicates with the HopCode CLI:
 
-- `pathToQwenExecutable`: Path to the HopCode CLI executable
+- `pathToHopCodeExecutable`: Path to the HopCode CLI executable
 - `cwd`: Working directory for the CLI process
 - `model`: AI model to use for the session
 - `permissionMode`: Permission mode that controls tool execution

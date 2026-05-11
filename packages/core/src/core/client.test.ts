@@ -36,7 +36,7 @@ vi.mock('../utils/retry.js', () => ({
   isUnattendedMode: vi.fn(() => false),
 }));
 import { getCoreSystemPrompt, getCustomSystemPrompt } from './prompts.js';
-import { DEFAULT_QWEN_FLASH_MODEL } from '../config/models.js';
+import { DEFAULT_HOPCODE_FLASH_MODEL } from '../config/models.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { promptIdContext } from '../utils/promptIdContext.js';
 import { setSimulate429 } from '../utils/testUtils.js';
@@ -299,6 +299,7 @@ describe('Gemini Client (client.ts)', () => {
     scheduleExtract: ReturnType<typeof vi.fn>;
     scheduleDream: ReturnType<typeof vi.fn>;
     recall: ReturnType<typeof vi.fn>;
+    scheduleSkillReview: ReturnType<typeof vi.fn>;
   };
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -324,6 +325,10 @@ describe('Gemini Client (client.ts)', () => {
         selectedDocs: [],
         strategy: 'none',
       }),
+      scheduleSkillReview: vi.fn().mockReturnValue({
+        status: 'skipped',
+        skippedReason: 'below_threshold',
+      }),
     };
 
     mockGenerateContentFn = vi.fn().mockResolvedValue({
@@ -347,6 +352,10 @@ describe('Gemini Client (client.ts)', () => {
       warmAll: vi.fn().mockResolvedValue(undefined),
       ensureTool: vi.fn().mockResolvedValue(null),
       getFunctionDeclarations: vi.fn().mockReturnValue([]),
+      getDeferredToolSummary: vi.fn().mockReturnValue([]),
+      clearRevealedDeferredTools: vi.fn(),
+      revealDeferredTool: vi.fn(),
+      isDeferredToolRevealed: vi.fn().mockReturnValue(false),
       getTool: vi.fn().mockReturnValue(null),
     };
     const fileService = new FileDiscoveryService('/test/dir');
@@ -422,6 +431,7 @@ describe('Gemini Client (client.ts)', () => {
       getArenaAgentClient: vi.fn().mockReturnValue(null),
       getManagedAutoMemoryEnabled: vi.fn().mockReturnValue(true),
       getMemoryManager: vi.fn().mockReturnValue(mockMemoryManager),
+      getAutoSkillEnabled: vi.fn().mockReturnValue(false),
       getModelsConfig: vi.fn().mockReturnValue({
         getResolvedModel: vi.fn().mockReturnValue(undefined),
       }),
@@ -486,6 +496,91 @@ describe('Gemini Client (client.ts)', () => {
     });
   });
 
+  describe('startChat — deferred tools', () => {
+    // Pulls the registry mock used by the surrounding suite so each test
+    // can stub the deferred-summary + ToolSearch availability per case.
+    function getRegistryMock() {
+      return vi.mocked(mockConfig.getToolRegistry)() as unknown as {
+        getDeferredToolSummary: ReturnType<typeof vi.fn>;
+        getTool: ReturnType<typeof vi.fn>;
+        isDeferredToolRevealed: ReturnType<typeof vi.fn>;
+        revealDeferredTool: ReturnType<typeof vi.fn>;
+      };
+    }
+
+    it('re-reveals deferred tools that appear in resumed history', async () => {
+      // Resume contract: a transcript referencing `cron_create` (a
+      // deferred tool) must re-reveal it on startChat so the API
+      // declaration list includes its schema — otherwise a follow-up
+      // call to that tool would be rejected as unknown.
+      const reg = getRegistryMock();
+      reg.getDeferredToolSummary.mockReturnValue([
+        { name: 'cron_create', description: 'schedule' },
+        { name: 'cron_list', description: 'list' },
+      ]);
+      // ToolSearch is available so we DON'T enter the eager-reveal branch.
+      reg.getTool.mockImplementation((n: string) =>
+        n === 'tool_search' ? ({} as never) : null,
+      );
+      reg.revealDeferredTool.mockClear();
+
+      // Pass extraHistory containing a functionCall to cron_create.
+      await client.startChat([
+        {
+          role: 'model',
+          parts: [
+            {
+              functionCall: { name: 'cron_create', args: {} },
+            } as never,
+          ],
+        },
+      ]);
+
+      expect(reg.revealDeferredTool).toHaveBeenCalledWith('cron_create');
+      // cron_list NOT in history → must NOT be revealed by the resume scan.
+      expect(reg.revealDeferredTool).not.toHaveBeenCalledWith('cron_list');
+    });
+
+    it('eagerly reveals every deferred tool when ToolSearch is unavailable', async () => {
+      // When ToolSearch is filtered out (deny rule / --exclude-tools
+      // tool_search), the model has no way to reach deferred schemas.
+      // Silent disappearance is the worst failure mode — instead, reveal
+      // every deferred tool eagerly so they all land in the declaration
+      // list. The token-saving rationale of deferral was predicated on
+      // the discovery surface being available.
+      const reg = getRegistryMock();
+      reg.getDeferredToolSummary.mockReturnValue([
+        { name: 'cron_create', description: 'schedule' },
+        { name: 'cron_list', description: 'list' },
+      ]);
+      reg.getTool.mockReturnValue(null); // ToolSearch absent
+      reg.revealDeferredTool.mockClear();
+
+      await client.startChat();
+
+      expect(reg.revealDeferredTool).toHaveBeenCalledWith('cron_create');
+      expect(reg.revealDeferredTool).toHaveBeenCalledWith('cron_list');
+    });
+
+    it('does NOT eagerly reveal when ToolSearch is available', async () => {
+      // When ToolSearch IS registered, deferred tools stay hidden until
+      // the model discovers them — that's the whole point of deferral.
+      const reg = getRegistryMock();
+      reg.getDeferredToolSummary.mockReturnValue([
+        { name: 'cron_create', description: 'schedule' },
+      ]);
+      reg.getTool.mockImplementation((n: string) =>
+        n === 'tool_search' ? ({} as never) : null,
+      );
+      reg.revealDeferredTool.mockClear();
+
+      await client.startChat();
+
+      // No history scan match, ToolSearch available → no reveal at all.
+      expect(reg.revealDeferredTool).not.toHaveBeenCalled();
+    });
+  });
+
   describe('addHistory', () => {
     it('should call chat.addHistory with the provided content', async () => {
       const mockChat = {
@@ -536,6 +631,21 @@ describe('Gemini Client (client.ts)', () => {
       await client.resetChat();
 
       expect(cacheClear).toHaveBeenCalled();
+    });
+
+    it('clears revealedDeferred set so /clear gives a clean tool slate', async () => {
+      // resetChat() must call clearRevealedDeferredTools() — without
+      // this, deferred tools revealed via ToolSearch in the previous
+      // session would carry over as phantom declarations, defeating
+      // the "clean slate" expectation of `/clear`.
+      const reg = vi.mocked(mockConfig.getToolRegistry)() as unknown as {
+        clearRevealedDeferredTools: ReturnType<typeof vi.fn>;
+      };
+      reg.clearRevealedDeferredTools.mockClear();
+
+      await client.resetChat();
+
+      expect(reg.clearRevealedDeferredTools).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -1135,7 +1245,7 @@ hello
         selectedDocs: [
           {
             type: 'user',
-            filePath: '/test/project/root/.qwen/memory/user.md',
+            filePath: '/test/project/root/.hopcode/memory/user.md',
             relativePath: 'user.md',
             filename: 'user.md',
             title: 'User Memory',
@@ -1192,7 +1302,7 @@ hello
           selectedDocs: [
             {
               type: 'user',
-              filePath: '/test/project/root/.qwen/memory/user.md',
+              filePath: '/test/project/root/.hopcode/memory/user.md',
               relativePath: 'user.md',
               filename: 'user.md',
               title: 'User Memory',
@@ -1244,7 +1354,7 @@ hello
         'Keep it short again',
         expect.objectContaining({
           excludedFilePaths: new Set([
-            '/test/project/root/.qwen/memory/user.md',
+            '/test/project/root/.hopcode/memory/user.md',
           ]),
         }),
       );
@@ -1463,6 +1573,178 @@ hello
       expect(events).not.toContainEqual({
         type: GeminiEventType.HookSystemMessage,
         value: 'Managed auto-memory updated: user.md',
+      });
+    });
+
+    describe('autoSkill: scheduleSkillReview via runManagedAutoMemoryBackgroundTasks', () => {
+      let mockStreamFn: () => AsyncGenerator<{ type: string; value: string }>;
+      let mockChat: Partial<GeminiChat>;
+
+      beforeEach(() => {
+        vi.spyOn(client['config'], 'getAutoSkillEnabled').mockReturnValue(true);
+        mockStreamFn = async function* () {
+          yield { type: GeminiEventType.Content, value: 'Done' };
+        };
+        mockTurnRunFn.mockReturnValue(mockStreamFn());
+        mockChat = {
+          addHistory: vi.fn(),
+          getHistory: vi.fn().mockReturnValue([
+            { role: 'user', parts: [{ text: 'hello' }] },
+            { role: 'model', parts: [{ text: 'Done' }] },
+          ]),
+        };
+        client['chat'] = mockChat as GeminiChat;
+      });
+
+      it('should call scheduleSkillReview with correct params on UserQuery', async () => {
+        mockMemoryManager.scheduleSkillReview.mockReturnValue({
+          status: 'skipped',
+          skippedReason: 'below_threshold',
+        });
+
+        await fromAsync(
+          client.sendMessageStream(
+            [{ text: 'a query' }],
+            new AbortController().signal,
+            'prompt-id-autoskill-query',
+          ),
+        );
+
+        expect(mockMemoryManager.scheduleSkillReview).toHaveBeenCalledWith(
+          expect.objectContaining({
+            projectRoot: '/test/project/root',
+            sessionId: 'test-session-id',
+            config: mockConfig,
+          }),
+        );
+      });
+
+      it('should reset toolCallCount and push promise when review is scheduled', async () => {
+        let resolveFn!: (v: unknown) => void;
+        const promise = new Promise<{ metadata?: Record<string, unknown> }>(
+          (r) => {
+            resolveFn = r as (v: unknown) => void;
+          },
+        );
+        mockMemoryManager.scheduleSkillReview.mockReturnValue({
+          status: 'scheduled',
+          taskId: 'task-1',
+          promise,
+        });
+
+        // Artificially bump toolCallCount above 0 to verify it resets.
+        client['toolCallCount'] = 5;
+
+        await fromAsync(
+          client.sendMessageStream(
+            [{ text: 'trigger review' }],
+            new AbortController().signal,
+            'prompt-id-autoskill-scheduled',
+          ),
+        );
+
+        // Counter should have been reset.
+        expect(client['toolCallCount']).toBe(0);
+        // Promise should have been pushed to pendingMemoryTaskPromises.
+        expect(client['pendingMemoryTaskPromises'].length).toBeGreaterThan(0);
+
+        // Resolve promise so there are no dangling promises.
+        resolveFn({ metadata: { touchedSkillFiles: ['skill.md'] } });
+      });
+
+      it('should reset toolCallCount when review is already_running and count exceeds threshold', async () => {
+        mockMemoryManager.scheduleSkillReview.mockReturnValue({
+          status: 'skipped',
+          skippedReason: 'already_running',
+          taskId: 'task-inflight',
+        });
+
+        // Simulate counter above threshold.
+        const AUTO_SKILL_THRESHOLD = 20;
+        client['toolCallCount'] = AUTO_SKILL_THRESHOLD + 5;
+
+        await fromAsync(
+          client.sendMessageStream(
+            [{ text: 'trigger while in-flight' }],
+            new AbortController().signal,
+            'prompt-id-autoskill-inflight',
+          ),
+        );
+
+        // Counter should have been reset to prevent immediate cascade.
+        expect(client['toolCallCount']).toBe(0);
+      });
+
+      it('should always reset skillsModifiedInSession after scheduleSkillReview check', async () => {
+        mockMemoryManager.scheduleSkillReview.mockReturnValue({
+          status: 'skipped',
+          skippedReason: 'skills_modified_in_session',
+        });
+
+        client['skillsModifiedInSession'] = true;
+
+        await fromAsync(
+          client.sendMessageStream(
+            [{ text: 'wrote a skill file' }],
+            new AbortController().signal,
+            'prompt-id-autoskill-modified',
+          ),
+        );
+
+        expect(client['skillsModifiedInSession']).toBe(false);
+      });
+    });
+
+    describe('recordCompletedToolCall', () => {
+      it('should increment toolCallCount on each call', () => {
+        expect(client['toolCallCount']).toBe(0);
+        client.recordCompletedToolCall('read_file');
+        expect(client['toolCallCount']).toBe(1);
+        client.recordCompletedToolCall('write_file');
+        expect(client['toolCallCount']).toBe(2);
+      });
+
+      it('should set skillsModifiedInSession=true when write_file targets a skill path', () => {
+        vi.spyOn(client['config'], 'getProjectRoot').mockReturnValue(
+          '/project',
+        );
+        expect(client['skillsModifiedInSession']).toBe(false);
+
+        client.recordCompletedToolCall('write_file', {
+          file_path: '/project/.hopcode/skills/my-skill.md',
+        });
+
+        expect(client['skillsModifiedInSession']).toBe(true);
+      });
+
+      it('should not set skillsModifiedInSession=true for write_file outside skill path', () => {
+        vi.spyOn(client['config'], 'getProjectRoot').mockReturnValue(
+          '/project',
+        );
+        client.recordCompletedToolCall('write_file', {
+          file_path: '/project/src/index.ts',
+        });
+        expect(client['skillsModifiedInSession']).toBe(false);
+      });
+
+      it('should set skillsModifiedInSession=true when edit targets a skill path', () => {
+        vi.spyOn(client['config'], 'getProjectRoot').mockReturnValue(
+          '/project',
+        );
+        client.recordCompletedToolCall('edit', {
+          path: '/project/.hopcode/skills/my-skill.md',
+        });
+        expect(client['skillsModifiedInSession']).toBe(true);
+      });
+
+      it('should not set skillsModifiedInSession=true for non-write tools', () => {
+        vi.spyOn(client['config'], 'getProjectRoot').mockReturnValue(
+          '/project',
+        );
+        client.recordCompletedToolCall('read_file', {
+          file_path: '/project/.hopcode/skills/my-skill.md',
+        });
+        expect(client['skillsModifiedInSession']).toBe(false);
       });
     });
 
@@ -2798,12 +3080,12 @@ Other open files:
         contents,
         generationConfig,
         abortSignal,
-        DEFAULT_QWEN_FLASH_MODEL,
+        DEFAULT_HOPCODE_FLASH_MODEL,
       );
 
       expect(mockContentGenerator.generateContent).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: DEFAULT_QWEN_FLASH_MODEL,
+          model: DEFAULT_HOPCODE_FLASH_MODEL,
           config: expect.objectContaining({
             abortSignal,
             systemInstruction: getCoreSystemPrompt(''),
@@ -2826,7 +3108,7 @@ Other open files:
         contents,
         {},
         new AbortController().signal,
-        DEFAULT_QWEN_FLASH_MODEL,
+        DEFAULT_HOPCODE_FLASH_MODEL,
       );
 
       expect(mockContentGenerator.generateContent).not.toHaveBeenCalledWith({
@@ -2836,7 +3118,7 @@ Other open files:
       });
       expect(mockContentGenerator.generateContent).toHaveBeenCalledWith(
         {
-          model: DEFAULT_QWEN_FLASH_MODEL,
+          model: DEFAULT_HOPCODE_FLASH_MODEL,
           config: expect.any(Object),
           contents,
         },
@@ -2853,13 +3135,13 @@ Other open files:
           contents,
           {},
           abortSignal,
-          DEFAULT_QWEN_FLASH_MODEL,
+          DEFAULT_HOPCODE_FLASH_MODEL,
         );
       });
 
       expect(mockContentGenerator.generateContent).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: DEFAULT_QWEN_FLASH_MODEL,
+          model: DEFAULT_HOPCODE_FLASH_MODEL,
           contents,
         }),
         'btw-prompt-id',
@@ -2879,14 +3161,14 @@ Other open files:
           contents,
           {},
           abortSignal,
-          DEFAULT_QWEN_FLASH_MODEL,
+          DEFAULT_HOPCODE_FLASH_MODEL,
           'override-prompt-id',
         );
       });
 
       expect(mockContentGenerator.generateContent).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: DEFAULT_QWEN_FLASH_MODEL,
+          model: DEFAULT_HOPCODE_FLASH_MODEL,
           contents,
         }),
         'override-prompt-id',
@@ -2911,12 +3193,13 @@ Other open files:
         contents,
         {},
         abortSignal,
-        DEFAULT_QWEN_FLASH_MODEL,
+        DEFAULT_HOPCODE_FLASH_MODEL,
       );
 
       expect(getCustomSystemPrompt).toHaveBeenCalledWith(
         'Override prompt',
         'Saved memory',
+        undefined,
         undefined,
       );
       expect(mockContentGenerator.generateContent).toHaveBeenCalledWith(
@@ -2942,13 +3225,14 @@ Other open files:
         contents,
         {},
         abortSignal,
-        DEFAULT_QWEN_FLASH_MODEL,
+        DEFAULT_HOPCODE_FLASH_MODEL,
       );
 
       expect(getCoreSystemPrompt).toHaveBeenCalledWith(
         '',
         'test-model',
         'Be extra concise.',
+        undefined,
       );
     });
 
@@ -2973,13 +3257,14 @@ Other open files:
         contents,
         {},
         abortSignal,
-        DEFAULT_QWEN_FLASH_MODEL,
+        DEFAULT_HOPCODE_FLASH_MODEL,
       );
 
       expect(getCustomSystemPrompt).toHaveBeenCalledWith(
         'Override prompt',
         'Saved memory',
         'Focus on findings only.',
+        undefined,
       );
       expect(mockContentGenerator.generateContent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -3194,7 +3479,7 @@ Other open files:
 
       // Main config uses a different authType
       vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         apiKey: 'test-key',
         apiModel: 'test-model',
       } as unknown as ContentGeneratorConfig);
@@ -3210,7 +3495,7 @@ Other open files:
       );
 
       // VERIFY: retryWithBackoff was called with the fast model's authType ('openai'),
-      // not the main model's authType ('QWEN_OAUTH').
+      // not the main model's authType ('HOPCODE_OAUTH').
       expect(retryWithBackoff).toHaveBeenCalledWith(
         expect.any(Function),
         expect.objectContaining({
@@ -3271,7 +3556,7 @@ Other open files:
       };
 
       // resolveModelAcrossAuthTypes calls getResolvedModel multiple times:
-      // 1. main authType (QWEN_OAUTH) → undefined (miss)
+      // 1. main authType (HOPCODE_OAUTH) → undefined (miss)
       // 2. secondary authType (USE_OPENAI) → mockResolvedModel (hit)
       // 3. buildAgentContentGeneratorConfig calls getResolvedModel again
       //    with the resolved authType → mockResolvedModel (hit)
@@ -3284,9 +3569,9 @@ Other open files:
         getResolvedModel,
       } as unknown as ModelsConfig);
 
-      // Main config uses QWEN_OAUTH — fast model registered under USE_OPENAI
+      // Main config uses HOPCODE_OAUTH — fast model registered under USE_OPENAI
       vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         apiKey: 'test-key',
         apiModel: 'test-model',
       } as unknown as ContentGeneratorConfig);
@@ -3302,10 +3587,10 @@ Other open files:
         'fast-model',
       );
 
-      // First call uses main authType (QWEN_OAUTH) — misses
+      // First call uses main authType (HOPCODE_OAUTH) — misses
       expect(getResolvedModel).toHaveBeenNthCalledWith(
         1,
-        'qwen-oauth',
+        'hopcode-oauth',
         'fast-model',
       );
       // Second call falls through to secondary authType — hits

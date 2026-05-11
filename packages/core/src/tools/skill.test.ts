@@ -155,7 +155,7 @@ describe('SkillTool', () => {
           description: 'Skill <b>bold</b> & more',
           whenToUse: 'When <script> tags > nothing',
           level: 'project',
-          filePath: '/project/.qwen/skills/xss-skill/SKILL.md',
+          filePath: '/project/.hopcode/skills/xss-skill/SKILL.md',
           body: 'Body text.',
         },
       ]);
@@ -344,7 +344,7 @@ describe('SkillTool', () => {
         name: 'tsx-helper',
         description: 'React TSX helper',
         level: 'project',
-        filePath: '/test/project/.qwen/skills/tsx-helper/SKILL.md',
+        filePath: '/test/project/.hopcode/skills/tsx-helper/SKILL.md',
         body: 'Body.',
         paths: ['src/**/*.tsx'],
       };
@@ -374,7 +374,7 @@ describe('SkillTool', () => {
         name: 'tsx-helper',
         description: 'React TSX helper',
         level: 'project',
-        filePath: '/test/project/.qwen/skills/tsx-helper/SKILL.md',
+        filePath: '/test/project/.hopcode/skills/tsx-helper/SKILL.md',
         body: 'Body.',
         paths: ['src/**/*.tsx'],
       };
@@ -673,7 +673,7 @@ describe('SkillTool', () => {
         name: 'mcp-prompt-a',
         description: 'A hidden file-based skill',
         level: 'project',
-        filePath: '/test/project/.qwen/skills/mcp-prompt-a/SKILL.md',
+        filePath: '/test/project/.hopcode/skills/mcp-prompt-a/SKILL.md',
         body: 'Body.',
         disableModelInvocation: true,
       };

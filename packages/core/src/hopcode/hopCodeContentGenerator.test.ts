@@ -127,7 +127,7 @@ vi.mock('./sharedTokenManager.js', () => ({
     }
 
     async getValidCredentials(
-      qwenClient: IHopCodeOAuth2Client,
+      hopcodeClient: IHopCodeOAuth2Client,
     ): Promise<HopCodeCredentials> {
       // If we're configured to throw an error, do so
       if (this.shouldThrowError && this.errorToThrow) {
@@ -136,9 +136,9 @@ vi.mock('./sharedTokenManager.js', () => ({
 
       // Try to get credentials from the mock client first to trigger auth errors
       try {
-        const { token } = await qwenClient.getAccessToken();
+        const { token } = await hopcodeClient.getAccessToken();
         if (token) {
-          const credentials = qwenClient.getCredentials();
+          const credentials = hopcodeClient.getCredentials();
           return credentials;
         }
       } catch (error) {
@@ -161,20 +161,20 @@ vi.mock('./sharedTokenManager.js', () => ({
         if (isAuthError) {
           // Try to refresh the token through the client
           try {
-            const refreshResult = await qwenClient.refreshAccessToken();
+            const refreshResult = await hopcodeClient.refreshAccessToken();
             if (refreshResult && !('error' in refreshResult)) {
               // Refresh succeeded, update client credentials and return them
-              const updatedCredentials = qwenClient.getCredentials();
+              const updatedCredentials = hopcodeClient.getCredentials();
               return updatedCredentials;
             } else {
               // Refresh failed, throw appropriate error
               throw new Error(
-                'Failed to obtain valid Qwen access token. Please re-authenticate.',
+                'Failed to obtain valid HopCode access token. Please re-authenticate.',
               );
             }
           } catch {
             throw new Error(
-              'Failed to obtain valid Qwen access token. Please re-authenticate.',
+              'Failed to obtain valid HopCode access token. Please re-authenticate.',
             );
           }
         } else {
@@ -292,7 +292,7 @@ const createMockResponse = (text: string): GenerateContentResponse =>
   }) as GenerateContentResponse;
 
 describe('HopCodeContentGenerator', () => {
-  let mockQwenClient: IHopCodeOAuth2Client;
+  let mockHopCodeClient: IHopCodeOAuth2Client;
   let HopCodeContentGenerator: HopCodeContentGenerator;
   let mockConfig: Config;
 
@@ -327,7 +327,7 @@ describe('HopCodeContentGenerator', () => {
     } as unknown as Config;
 
     // Mock HopCodeOAuth2Client
-    mockQwenClient = {
+    mockHopCodeClient = {
       getAccessToken: vi.fn(),
       getCredentials: vi.fn(),
       setCredentials: vi.fn(),
@@ -346,7 +346,7 @@ describe('HopCodeContentGenerator', () => {
       maxRetries: 3,
     };
     HopCodeContentGenerator = new HopCodeGeneratorClass(
-      mockQwenClient,
+      mockHopCodeClient,
       contentGeneratorConfig,
       mockConfig,
     );
@@ -358,10 +358,12 @@ describe('HopCodeContentGenerator', () => {
 
   describe('Core Content Generation Methods', () => {
     it('should generate content with valid token', async () => {
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue(mockCredentials);
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue(
+        mockCredentials,
+      );
 
       const request: GenerateContentParameters = {
         model: 'qwen-turbo',
@@ -374,14 +376,16 @@ describe('HopCodeContentGenerator', () => {
       );
 
       expect(result.text).toBe('Generated content');
-      expect(mockQwenClient.getAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.getAccessToken).toHaveBeenCalled();
     });
 
     it('should generate content stream with valid token', async () => {
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue(mockCredentials);
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue(
+        mockCredentials,
+      );
 
       const request: GenerateContentParameters = {
         model: 'qwen-turbo',
@@ -399,7 +403,7 @@ describe('HopCodeContentGenerator', () => {
       }
 
       expect(chunks).toEqual(['Stream chunk 1', 'Stream chunk 2']);
-      expect(mockQwenClient.getAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.getAccessToken).toHaveBeenCalled();
     });
 
     it('should count tokens without requiring authentication', async () => {
@@ -415,14 +419,16 @@ describe('HopCodeContentGenerator', () => {
 
       expect(result.totalTokens).toBe(15);
       // countTokens is a local operation and should not require OAuth credentials
-      expect(mockQwenClient.getAccessToken).not.toHaveBeenCalled();
+      expect(mockHopCodeClient.getAccessToken).not.toHaveBeenCalled();
     });
 
     it('should embed content with valid token', async () => {
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue(mockCredentials);
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue(
+        mockCredentials,
+      );
 
       const request: EmbedContentParameters = {
         model: 'qwen-turbo',
@@ -433,7 +439,7 @@ describe('HopCodeContentGenerator', () => {
 
       expect(result.embeddings).toHaveLength(1);
       expect(result.embeddings?.[0]?.values).toEqual([0.1, 0.2, 0.3]);
-      expect(mockQwenClient.getAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.getAccessToken).toHaveBeenCalled();
     });
   });
 
@@ -442,12 +448,12 @@ describe('HopCodeContentGenerator', () => {
       const authError = { status: 401, message: 'Unauthorized' };
 
       // First call fails with auth error, second call succeeds
-      vi.mocked(mockQwenClient.getAccessToken)
+      vi.mocked(mockHopCodeClient.getAccessToken)
         .mockRejectedValueOnce(authError)
         .mockResolvedValueOnce({ token: 'refreshed-token' });
 
       // Refresh succeeds
-      vi.mocked(mockQwenClient.refreshAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.refreshAccessToken).mockResolvedValue({
         access_token: 'refreshed-token',
         token_type: 'Bearer',
         expires_in: 3600,
@@ -455,7 +461,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       // Set credentials for second call
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         access_token: 'refreshed-token',
         token_type: 'Bearer',
         refresh_token: 'refresh-token',
@@ -474,7 +480,7 @@ describe('HopCodeContentGenerator', () => {
       );
 
       expect(result.text).toBe('Generated content');
-      expect(mockQwenClient.refreshAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.refreshAccessToken).toHaveBeenCalled();
     });
 
     it('should refresh token on auth error and retry for content stream', async () => {
@@ -484,12 +490,12 @@ describe('HopCodeContentGenerator', () => {
       vi.clearAllMocks();
 
       // First call fails with auth error, second call succeeds
-      vi.mocked(mockQwenClient.getAccessToken)
+      vi.mocked(mockHopCodeClient.getAccessToken)
         .mockRejectedValueOnce(authError)
         .mockResolvedValueOnce({ token: 'refreshed-stream-token' });
 
       // Refresh succeeds
-      vi.mocked(mockQwenClient.refreshAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.refreshAccessToken).mockResolvedValue({
         access_token: 'refreshed-stream-token',
         token_type: 'Bearer',
         expires_in: 3600,
@@ -497,7 +503,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       // Set credentials for second call
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         access_token: 'refreshed-stream-token',
         token_type: 'Bearer',
         refresh_token: 'refresh-token',
@@ -521,7 +527,7 @@ describe('HopCodeContentGenerator', () => {
       }
 
       expect(chunks).toEqual(['Stream chunk 1', 'Stream chunk 2']);
-      expect(mockQwenClient.refreshAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.refreshAccessToken).toHaveBeenCalled();
     });
 
     it('should handle token refresh failure', async () => {
@@ -531,7 +537,7 @@ describe('HopCodeContentGenerator', () => {
       };
       mockTokenManager.setMockError(
         new Error(
-          'Failed to obtain valid Qwen access token. Please re-authenticate.',
+          'Failed to obtain valid HopCode access token. Please re-authenticate.',
         ),
       );
 
@@ -543,7 +549,7 @@ describe('HopCodeContentGenerator', () => {
       await expect(
         HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
       ).rejects.toThrow(
-        'Failed to obtain valid Qwen access token. Please re-authenticate.',
+        'Failed to obtain valid HopCode access token. Please re-authenticate.',
       );
 
       // Clean up
@@ -551,10 +557,10 @@ describe('HopCodeContentGenerator', () => {
     });
 
     it('should update endpoint when token is refreshed', async () => {
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         ...mockCredentials,
         resource_url: 'https://new-endpoint.com',
       });
@@ -566,7 +572,7 @@ describe('HopCodeContentGenerator', () => {
 
       await HopCodeContentGenerator.generateContent(request, 'test-prompt-id');
 
-      expect(mockQwenClient.getCredentials).toHaveBeenCalled();
+      expect(mockHopCodeClient.getCredentials).toHaveBeenCalled();
     });
   });
 
@@ -574,10 +580,10 @@ describe('HopCodeContentGenerator', () => {
     it('should use default endpoint when no custom endpoint provided', async () => {
       let capturedBaseURL = '';
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         access_token: 'test-token',
         refresh_token: 'test-refresh',
         // No resource_url provided
@@ -616,10 +622,10 @@ describe('HopCodeContentGenerator', () => {
     it('should normalize hostname-only endpoints by adding https protocol', async () => {
       let capturedBaseURL = '';
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         ...mockCredentials,
         resource_url: 'custom-endpoint.com',
       });
@@ -655,10 +661,10 @@ describe('HopCodeContentGenerator', () => {
     it('should preserve existing protocol in endpoint URLs', async () => {
       let capturedBaseURL = '';
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         ...mockCredentials,
         resource_url: 'https://custom-endpoint.com',
       });
@@ -694,10 +700,10 @@ describe('HopCodeContentGenerator', () => {
     it('should not duplicate /v1 suffix if already present', async () => {
       let capturedBaseURL = '';
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         ...mockCredentials,
         resource_url: 'https://custom-endpoint.com/v1',
       });
@@ -739,10 +745,10 @@ describe('HopCodeContentGenerator', () => {
         }
       ).pipeline.client;
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'temp-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         ...mockCredentials,
         access_token: 'temp-token',
         resource_url: 'https://temp-endpoint.com',
@@ -767,10 +773,10 @@ describe('HopCodeContentGenerator', () => {
         }
       ).pipeline.client;
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'temp-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         ...mockCredentials,
         access_token: 'temp-token',
       });
@@ -825,15 +831,17 @@ describe('HopCodeContentGenerator', () => {
 
       // Mock getAccessToken to fail initially, then succeed
       let getAccessTokenCallCount = 0;
-      vi.mocked(mockQwenClient.getAccessToken).mockImplementation(async () => {
-        getAccessTokenCallCount++;
-        if (getAccessTokenCallCount <= 2) {
-          throw authError; // Fail on first two calls (initial + retry)
-        }
-        return { token: 'refreshed-token' }; // Succeed after refresh
-      });
+      vi.mocked(mockHopCodeClient.getAccessToken).mockImplementation(
+        async () => {
+          getAccessTokenCallCount++;
+          if (getAccessTokenCallCount <= 2) {
+            throw authError; // Fail on first two calls (initial + retry)
+          }
+          return { token: 'refreshed-token' }; // Succeed after refresh
+        },
+      );
 
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         access_token: 'refreshed-token',
         token_type: 'Bearer',
         refresh_token: 'refresh-token',
@@ -841,7 +849,7 @@ describe('HopCodeContentGenerator', () => {
         expiry_date: Date.now() + 3600000,
       });
 
-      vi.mocked(mockQwenClient.refreshAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.refreshAccessToken).mockResolvedValue({
         access_token: 'refreshed-token',
         token_type: 'Bearer',
         expires_in: 3600,
@@ -859,7 +867,7 @@ describe('HopCodeContentGenerator', () => {
 
       expect(result.text).toBe('Success after retry');
       expect(mockGenerateContent).toHaveBeenCalledTimes(2);
-      expect(mockQwenClient.refreshAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.refreshAccessToken).toHaveBeenCalled();
 
       // Restore original method
       parentPrototype.generateContent = originalGenerateContent;
@@ -875,10 +883,12 @@ describe('HopCodeContentGenerator', () => {
       const originalGenerateContent = parentPrototype.generateContent;
       parentPrototype.generateContent = mockGenerateContent;
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'valid-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue(mockCredentials);
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue(
+        mockCredentials,
+      );
 
       const request: GenerateContentParameters = {
         model: 'qwen-turbo',
@@ -889,17 +899,17 @@ describe('HopCodeContentGenerator', () => {
         HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
       ).rejects.toThrow('Network timeout');
       expect(mockGenerateContent).toHaveBeenCalledTimes(1);
-      expect(mockQwenClient.refreshAccessToken).not.toHaveBeenCalled();
+      expect(mockHopCodeClient.refreshAccessToken).not.toHaveBeenCalled();
 
       // Restore original method
       parentPrototype.generateContent = originalGenerateContent;
     });
 
     it('should handle error response from token refresh', async () => {
-      vi.mocked(mockQwenClient.getAccessToken).mockRejectedValue(
+      vi.mocked(mockHopCodeClient.getAccessToken).mockRejectedValue(
         new Error('Token expired'),
       );
-      vi.mocked(mockQwenClient.refreshAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.refreshAccessToken).mockResolvedValue({
         error: 'invalid_grant',
         error_description: 'Refresh token expired',
       } as ErrorData);
@@ -911,7 +921,7 @@ describe('HopCodeContentGenerator', () => {
 
       await expect(
         HopCodeContentGenerator.generateContent(request, 'test-prompt-id'),
-      ).rejects.toThrow('Failed to obtain valid Qwen access token');
+      ).rejects.toThrow('Failed to obtain valid HopCode access token');
     });
   });
 
@@ -949,10 +959,12 @@ describe('HopCodeContentGenerator', () => {
       const authError = { status: 401, message: 'Unauthorized' };
       let parentCallCount = 0;
 
-      vi.mocked(mockQwenClient.getAccessToken).mockRejectedValue(authError);
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue(mockCredentials);
+      vi.mocked(mockHopCodeClient.getAccessToken).mockRejectedValue(authError);
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue(
+        mockCredentials,
+      );
 
-      vi.mocked(mockQwenClient.refreshAccessToken).mockImplementation(
+      vi.mocked(mockHopCodeClient.refreshAccessToken).mockImplementation(
         async () => {
           refreshCallCount++;
           await new Promise((resolve) => setTimeout(resolve, 50)); // Longer delay to ensure concurrency
@@ -1072,15 +1084,17 @@ describe('HopCodeContentGenerator', () => {
 
       // Mock getAccessToken to fail initially, then succeed
       let getAccessTokenCallCount = 0;
-      vi.mocked(mockQwenClient.getAccessToken).mockImplementation(async () => {
-        getAccessTokenCallCount++;
-        if (getAccessTokenCallCount <= 2) {
-          throw authError; // Fail on first two calls (initial + retry)
-        }
-        return { token: 'new-token' }; // Succeed after refresh
-      });
+      vi.mocked(mockHopCodeClient.getAccessToken).mockImplementation(
+        async () => {
+          getAccessTokenCallCount++;
+          if (getAccessTokenCallCount <= 2) {
+            throw authError; // Fail on first two calls (initial + retry)
+          }
+          return { token: 'new-token' }; // Succeed after refresh
+        },
+      );
 
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         access_token: 'new-token',
         token_type: 'Bearer',
         refresh_token: 'refresh-token',
@@ -1088,7 +1102,7 @@ describe('HopCodeContentGenerator', () => {
         expiry_date: Date.now() + 7200000,
       });
 
-      vi.mocked(mockQwenClient.refreshAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.refreshAccessToken).mockResolvedValue({
         access_token: 'new-token',
         token_type: 'Bearer',
         expires_in: 7200,
@@ -1106,8 +1120,8 @@ describe('HopCodeContentGenerator', () => {
       );
 
       expect(result.text).toBe('Success after refresh');
-      expect(mockQwenClient.getAccessToken).toHaveBeenCalled();
-      expect(mockQwenClient.refreshAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.getAccessToken).toHaveBeenCalled();
+      expect(mockHopCodeClient.refreshAccessToken).toHaveBeenCalled();
       expect(callCount).toBe(2); // Initial call + retry
     });
   });
@@ -1131,7 +1145,7 @@ describe('HopCodeContentGenerator', () => {
 
       // Create new instance to pick up the mock
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1144,7 +1158,7 @@ describe('HopCodeContentGenerator', () => {
       await newGenerator.generateContent(request, 'test-prompt-id');
 
       expect(mockTokenManager.getValidCredentials).toHaveBeenCalledWith(
-        mockQwenClient,
+        mockHopCodeClient,
       );
 
       // Restore original
@@ -1166,7 +1180,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1178,7 +1192,7 @@ describe('HopCodeContentGenerator', () => {
 
       await expect(
         newGenerator.generateContent(request, 'test-prompt-id'),
-      ).rejects.toThrow('Failed to obtain valid Qwen access token');
+      ).rejects.toThrow('Failed to obtain valid HopCode access token');
 
       SharedTokenManager.getInstance = originalGetInstance;
     });
@@ -1199,7 +1213,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1211,7 +1225,7 @@ describe('HopCodeContentGenerator', () => {
 
       await expect(
         newGenerator.generateContent(request, 'test-prompt-id'),
-      ).rejects.toThrow('Failed to obtain valid Qwen access token');
+      ).rejects.toThrow('Failed to obtain valid HopCode access token');
 
       SharedTokenManager.getInstance = originalGetInstance;
     });
@@ -1236,10 +1250,10 @@ describe('HopCodeContentGenerator', () => {
       ];
 
       endpoints.forEach(({ input, expected }) => {
-        vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+        vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
           token: 'test-token',
         });
-        vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+        vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
           ...mockCredentials,
           resource_url: input,
         });
@@ -1392,10 +1406,10 @@ describe('HopCodeContentGenerator', () => {
         }
       ).pipeline.client;
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'stream-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue({
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue({
         ...mockCredentials,
         access_token: 'stream-token',
         resource_url: 'https://stream-endpoint.com',
@@ -1448,10 +1462,10 @@ describe('HopCodeContentGenerator', () => {
         expiry_date: Date.now() + 3600000,
       };
 
-      vi.mocked(mockQwenClient.getAccessToken).mockResolvedValue({
+      vi.mocked(mockHopCodeClient.getAccessToken).mockResolvedValue({
         token: 'stream-token',
       });
-      vi.mocked(mockQwenClient.getCredentials).mockReturnValue(
+      vi.mocked(mockHopCodeClient.getCredentials).mockReturnValue(
         streamCredentials,
       );
 
@@ -1503,7 +1517,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1524,7 +1538,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1547,7 +1561,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1568,7 +1582,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1584,7 +1598,7 @@ describe('HopCodeContentGenerator', () => {
   describe('Constructor and Initialization', () => {
     it('should initialize with configured base URL when provided', () => {
       const generator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         {
           model: 'qwen-turbo',
           authType: AuthType.HOPCODE_OAUTH,
@@ -1604,7 +1618,7 @@ describe('HopCodeContentGenerator', () => {
 
     it('should get SharedTokenManager instance', () => {
       const generator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1630,7 +1644,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1642,7 +1656,7 @@ describe('HopCodeContentGenerator', () => {
 
       await expect(
         newGenerator.generateContent(request, 'test-prompt-id'),
-      ).rejects.toThrow('Failed to obtain valid Qwen access token');
+      ).rejects.toThrow('Failed to obtain valid HopCode access token');
       SharedTokenManager.getInstance = originalGetInstance;
     });
 
@@ -1659,7 +1673,7 @@ describe('HopCodeContentGenerator', () => {
         .mockReturnValue(mockTokenManager);
 
       const newGenerator = new HopCodeGeneratorClass(
-        mockQwenClient,
+        mockHopCodeClient,
         { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
@@ -1682,14 +1696,14 @@ describe('HopCodeContentGenerator', () => {
       // Methods requiring authentication should fail
       await expect(
         newGenerator.generateContent(generateRequest, 'test-id'),
-      ).rejects.toThrow('Failed to obtain valid Qwen access token');
+      ).rejects.toThrow('Failed to obtain valid HopCode access token');
 
       await expect(
         newGenerator.generateContentStream(generateRequest, 'test-id'),
-      ).rejects.toThrow('Failed to obtain valid Qwen access token');
+      ).rejects.toThrow('Failed to obtain valid HopCode access token');
 
       await expect(newGenerator.embedContent(embedRequest)).rejects.toThrow(
-        'Failed to obtain valid Qwen access token',
+        'Failed to obtain valid HopCode access token',
       );
 
       // countTokens should succeed as it's a local operation

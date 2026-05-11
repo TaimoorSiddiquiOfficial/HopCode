@@ -67,7 +67,7 @@ export class ModelRegistry {
   constructor(modelProvidersConfig?: ModelProvidersConfig) {
     this.modelsByAuthType = new Map();
 
-    // Always register qwen-oauth models (hard-coded, cannot be overridden)
+    // Always register hopcode-oauth models (hard-coded, cannot be overridden)
     this.registerAuthTypeModels(AuthType.HOPCODE_OAUTH, HOPCODE_OAUTH_MODELS);
 
     // Register user-configured models for other authTypes
@@ -82,7 +82,7 @@ export class ModelRegistry {
           continue;
         }
 
-        // Skip qwen-oauth as it uses hard-coded models
+        // Skip hopcode-oauth as it uses hard-coded models
         if (authType === AuthType.HOPCODE_OAUTH) {
           continue;
         }
@@ -184,7 +184,7 @@ export class ModelRegistry {
 
   /**
    * Get default model for an authType.
-   * For qwen-oauth, returns the coder model.
+   * For hopcode-oauth, returns the coder model.
    * For others, returns the first configured model.
    */
   getDefaultModelForAuthType(
@@ -240,10 +240,10 @@ export class ModelRegistry {
   /**
    * Reload models from updated configuration.
    * Clears existing user-configured models and re-registers from new config.
-   * Preserves hard-coded qwen-oauth models.
+   * Preserves hard-coded hopcode-oauth models.
    */
   reloadModels(modelProvidersConfig?: ModelProvidersConfig): void {
-    // Clear existing user-configured models (preserve qwen-oauth)
+    // Clear existing user-configured models (preserve hopcode-oauth)
     for (const authType of this.modelsByAuthType.keys()) {
       if (authType !== AuthType.HOPCODE_OAUTH) {
         this.modelsByAuthType.delete(authType);
@@ -262,7 +262,7 @@ export class ModelRegistry {
           continue;
         }
 
-        // Skip qwen-oauth as it uses hard-coded models
+        // Skip hopcode-oauth as it uses hard-coded models
         if (authType === AuthType.HOPCODE_OAUTH) {
           continue;
         }

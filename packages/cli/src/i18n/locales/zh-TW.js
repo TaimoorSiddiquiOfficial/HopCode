@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -119,17 +119,45 @@ export default {
     '?? NO_COLOR ????,????????',
   'Theme "{{themeName}}" not found.': '????? "{{themeName}}"?',
   'Theme "{{themeName}}" not found in selected scope.':
-    '???????????? "{{themeName}}"?',
+    '???????????{{themeName}}????',
   'Clear conversation history and free up context': '????????????',
-  'Compresses the context by replacing it with a summary.': '????????????',
-  'open full HopCode documentation in your browser': '?????????? HopCode ??',
-  'Configuration not available.': '?????',
+  'Compresses the context by replacing it with a summary.': '?????,??????',
+  'open full HopCode documentation in your browser': '????????? HopCode ??',
+  'Configuration not available.': '???????',
   'change the auth method': '??????',
-  'Configure authentication information for login': '????????',
+  'Configure authentication information for login': '?????????',
   'Copy the last result or code snippet to clipboard': '?????????????????',
+  'Show working-tree change stats versus HEAD': '?????????? HEAD ???',
+  'Could not determine current working directory.': '???????????',
+  'Failed to compute git diff stats': '???? git diff ??',
+  'No diff available. Either this is not a git repository, HEAD is missing, or a merge/rebase/cherry-pick/revert is in progress.':
+    '???? diff????? Git ????HEAD ??,????? merge/rebase/cherry-pick/revert?',
+  'Clean working tree - no changes against HEAD.': '????? � ? HEAD ?????',
+  '{{count}} file changed, +{{added}} / -{{removed}}':
+    '{{count}} ?????,+{{added}} / -{{removed}}',
+  '{{count}} files changed, +{{added}} / -{{removed}}':
+    '{{count}} ?????,+{{added}} / -{{removed}}',
+  '{{count}} file changed': '{{count}} ?????',
+  '{{count}} files changed': '{{count}} ?????',
+  '.and {{hidden}} more (showing first {{shown}})':
+    '.?? {{hidden}} ?(??? {{shown}} ?)',
+  '(binary)': '(????)',
+  '(binary, new)': '(????,??)',
+  '(new)': '(??)',
+  '(new, partial)': '(??,??)',
+  '(deleted)': '(???)',
+  '(binary, deleted)': '(????,???)',
+
+  // ============================================================================
+  // Commands - Agents
+  // ============================================================================
   'Manage subagents for specialized task delegation.': '???????????????',
   'Manage existing subagents (view, edit, delete).': '????????(????????)',
   'Create a new subagent with guided setup.': '???????????????',
+
+  // ============================================================================
+  // Agents - Management Dialog
+  // ============================================================================
   Agents: '???',
   'Choose Action': '????',
   'Edit {{name}}': '?? {{name}}',
@@ -138,10 +166,10 @@ export default {
   'Delete {{name}}': '?? {{name}}',
   'Unknown Step': '????',
   'Esc to close': '? Esc ??',
-  'Enter to select, ?? to navigate, Esc to close': 'Enter ??,?? ??,Esc ??',
+  'Enter to select,  to navigate, Esc to close': 'Enter ??, ??,Esc ??',
   'Esc to go back': '? Esc ??',
   'Enter to confirm, Esc to cancel': 'Enter ??,Esc ??',
-  'Enter to select, ?? to navigate, Esc to go back': 'Enter ??,?? ??,Esc ??',
+  'Enter to select,  to navigate, Esc to go back': 'Enter ??, ??,Esc ??',
   'Enter to submit, Esc to go back': 'Enter ??,Esc ??',
   'Invalid step: {{step}}': '????: {{step}}',
   'No subagents found.': '????????',
@@ -574,13 +602,13 @@ export default {
   '{{count}} hooks configured': '{{count}} ? Hook ???',
   'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
     '????????????? Hook,????? settings.json ??? HopCode?',
-  'Enter to select � Esc to cancel': 'Enter ?? � Esc ??',
+  'Enter to select ? Esc to cancel': 'Enter ?? ? Esc ??',
   'Exit codes:': '???:',
   'Configured hooks:': '???? Hook:',
   'No hooks configured for this event.': '?????? Hook?',
   'To add hooks, edit settings.json directly or ask HopCode.':
     '??? Hook,????? settings.json ??? HopCode?',
-  'Enter to select � Esc to go back': 'Enter ?? � Esc ??',
+  'Enter to select ? Esc to go back': 'Enter ?? ? Esc ??',
   'Hook details': 'Hook ??',
   'Event:': '??:',
   'Extension:': '??:',
@@ -692,7 +720,7 @@ export default {
   'Example: /language output ??': '??:/language output ??',
   'Example: /language output English': '??:/language output English',
   'Example: /language output ???': '??:/language output ???',
-  'Example: /language output Portugu�s': '??:/language output Portugu�s',
+  'Example: /language output Portugu?s': '??:/language output Portugu?s',
   'UI language changed to {{lang}}': 'UI ?????? {{lang}}',
   'LLM output language set to {{lang}}': 'LLM ???????? {{lang}}',
   'LLM output language rule file generated at {{path}}':
@@ -770,8 +798,8 @@ export default {
     '????????? {{scope}}:"{{fact}}"',
   'Open auto-memory folder': '?????????',
   'Auto-memory: {{status}}': '????:{{status}}',
-  'Auto-dream: {{status}} � {{lastDream}} � /dream to run':
-    '????:{{status}} � {{lastDream}} � /dream ????',
+  'Auto-dream: {{status}} ? {{lastDream}} ? /dream to run':
+    '????:{{status}} ? {{lastDream}} ? /dream ????',
   never: '??',
   on: '?',
   off: '?',
@@ -824,7 +852,7 @@ export default {
   'If the browser does not open, copy and paste this URL into your browser:':
     '??????????,????? URL ????????:',
   'Make sure to copy the COMPLETE URL - it may wrap across multiple lines.':
-    '??  ???????? URL �� ????????',
+    '??  ???????? URL ?? ????????',
   'Manage MCP servers': '?? MCP ???',
   'Server Detail': '?????',
   'Disable Server': '?????',
@@ -834,11 +862,11 @@ export default {
   'Loading...': '???...',
   'Unknown step': '????',
   'Esc to back': 'Esc ??',
-  '?? to navigate � Enter to select � Esc to close':
-    '?? ?? � Enter ?? � Esc ??',
-  '?? to navigate � Enter to select � Esc to back': '?? ?? � Enter ?? � Esc ??',
-  '?? to navigate � Enter to confirm � Esc to back':
-    '?? ?? � Enter ?? � Esc ??',
+  '?? to navigate ? Enter to select ? Esc to close':
+    '?? ?? ? Enter ?? ? Esc ??',
+  '?? to navigate ? Enter to select ? Esc to back': '?? ?? ? Enter ?? ? Esc ??',
+  '?? to navigate ? Enter to confirm ? Esc to back':
+    '?? ?? ? Enter ?? ? Esc ??',
   'User Settings (global)': '????(??)',
   'Workspace Settings (project-specific)': '?????(???)',
   'Disable server:': '?????:',
@@ -879,7 +907,7 @@ export default {
     '? c ???? URL ?????',
   'Copy request sent to your terminal. If paste is empty, copy the URL above manually.':
     '??????????;?????,??????? URL?',
-  'Cannot write to terminal � copy the URL above manually.':
+  'Cannot write to terminal ? copy the URL above manually.':
     '??????,??????? URL?',
   'Press Enter or Esc to go back': '? Enter ? Esc ??',
   'No tools available for this server.': '???????????',
@@ -955,15 +983,15 @@ export default {
   'Saving project summary...': '????????...',
   'Generating project summary...': '????????...',
   'Failed to generate summary - no text content received from LLM response':
-    '生成摘要失敗 - 未從 LLM 響應中接收到文本內容',
+    '?????? - ?? LLM ??????????',
   'Switch the model for this session (--fast for suggestion model, [model-id] to switch immediately).':
-    '切換此會話的模型（--fast 可設置建議模型）',
+    '????????(--fast ???????)',
   'Set a lighter model for prompt suggestions and speculative execution':
     '??????????????????',
   'Content generator configuration not available.': '??????????',
   'Authentication type not available.': '???????',
   'No models available for the current authentication type ({{authType}}).':
-    '當前認證類型 ({{authType}}) 沒有可用的模型',
+    '?????? ({{authType}}) ???????',
   // Needs translation
   ' (not in model registry)': ' (not in model registry)',
   'Starting a new session, resetting chat, and clearing terminal.':
@@ -1053,37 +1081,36 @@ export default {
   'You must select an auth method to proceed. Press Ctrl+C again to exit.':
     '????????????????? Ctrl+C ??',
   'Terms of Services and Privacy Notice': '?????????',
-  'Qwen OAuth': 'Legacy OAuth (??)',
-  'Discontinued � switch to Coding Plan or API Key':
-    '??? � ???? Coding Plan ? API Key',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.':
+  'HopCode OAuth': 'Legacy OAuth (??)',
+  'Discontinued ? switch to Coding Plan or API Key':
+    '??? ? ???? Coding Plan ? API Key',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.':
     'Legacy OAuth ?????? 2026-04-15 ?????? /auth ??????',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
     'Legacy OAuth ?????? 2026-04-15 ?????? Coding Plan ? API Key?',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Qwen OAuth免費層已於2026-04-15停止服務。請選擇其他提供商的模型或運行 /auth 切換。',
-  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ Qwen OAuth 免費額度已於 2026-04-15 停用。請選擇其他選項。\n',
-  'Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
-    '付費 · 每 5 小時最多 6,000 次請求 · 支持阿里雲百鍊 Coding Plan 全部模型',
-  'For teams · Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
-    '適合團隊 · 付費 · 每 5 小時最多 6,000 次請求 · 支援阿里雲百鍊 Coding Plan 全部模型',
-  'For individual developers · Pay per model call · 5-hour/weekly quotas':
-    '適合個人開發場景 · 按模型調用次數計費 · 每 5 小時/每週限額',
-  Subscribe: '訂閱計劃',
-  'Paid subscription plans from Alibaba Cloud ModelStudio':
-    '阿里雲百鍊付費訂閱計劃',
-  'Select Subscription Plan': '選擇訂閱計劃',
-  'Alibaba Cloud Coding Plan': '阿里雲百鍊 Coding Plan',
-  'Alibaba Cloud Token Plan': '阿里雲百鍊 Token Plan',
-  'Pay-as-you-go tokens · Configure ModelStudio standard API key':
-    '按 Token 付費 · 配置百鍊標準 API Key',
-  'For individuals · Pay-as-you-go tokens · Dedicated Token Plan endpoint':
-    '適合個人 · 按 Token 付費 · 使用獨立 Token Plan Endpoint',
-  'For teams/companies · Credits deducted by token usage · Dedicated API key and base URL':
-    '適合一人公司/團隊/企業 · 按 Token 消耗抵扣 Credits · 專屬 API Key 和 Base URL',
-  'Token Plan documentation': 'Token Plan 參考文檔',
-  'Bring your own API key': '使用自己的 API 密鑰',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'HopCode OAuth?????2026-04-15??????????????????? /auth ???',
+  '\n? HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n? HopCode OAuth ?????? 2026-04-15 ???????????\n',
+  'Paid � Up to 6,000 requests/5 hrs � All Alibaba Cloud Coding Plan Models':
+    '?? � ? 5 ???? 6,000 ??? � ??????? Coding Plan ????',
+  'For teams � Paid � Up to 6,000 requests/5 hrs � All Alibaba Cloud Coding Plan Models':
+    '???? � ?? � ? 5 ???? 6,000 ??? � ??????? Coding Plan ????',
+  'For individual developers � Pay per model call � 5-hour/weekly quotas':
+    '???????? � ????????? � ? 5 ??/????',
+  Subscribe: '????',
+  'Paid subscription plans from Alibaba Cloud ModelStudio': '???????????',
+  'Select Subscription Plan': '??????',
+  'Alibaba Cloud Coding Plan': '????? Coding Plan',
+  'Alibaba Cloud Token Plan': '????? Token Plan',
+  'Pay-as-you-go tokens � Configure ModelStudio standard API key':
+    '? Token ?? � ?????? API Key',
+  'For individuals � Pay-as-you-go tokens � Dedicated Token Plan endpoint':
+    '???? � ? Token ?? � ???? Token Plan Endpoint',
+  'For teams/companies � Credits deducted by token usage � Dedicated API key and base URL':
+    '??????/??/?? � ? Token ???? Credits � ?? API Key ? Base URL',
+  'Token Plan documentation': 'Token Plan ????',
+  'Bring your own API key': '????? API ??',
 
   'API-KEY': 'API-KEY',
   'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)':
@@ -1094,23 +1121,23 @@ export default {
   'Failed to login. Message: {{message}}': '???????:{{message}}',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     '?????????? {{enforcedType}},???????? {{currentType}}',
-  'Qwen OAuth authentication timed out. Please try again.':
+  'HopCode OAuth authentication timed out. Please try again.':
     'Legacy OAuth ????????',
-  'Qwen OAuth authentication cancelled.': 'Legacy OAuth ?????',
-  'Qwen OAuth Authentication': 'Legacy OAuth ??',
+  'HopCode OAuth authentication cancelled.': 'Legacy OAuth ?????',
+  'HopCode OAuth Authentication': 'Legacy OAuth ??',
   'Please visit this URL to authorize:': '???? URL ????:',
   'Or scan the QR code below:': '?????????:',
   'Waiting for authorization': '?????',
   'Time remaining:': '????:',
   '(Press ESC or CTRL+C to cancel)': '(? ESC ? CTRL+C ??)',
-  'Qwen OAuth Authentication Timeout': 'Legacy OAuth ????',
+  'HopCode OAuth Authentication Timeout': 'Legacy OAuth ????',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth ?????(?? {{seconds}} ?)??????????',
   'Press any key to return to authentication type selection.': '????????????',
-  'Waiting for Qwen OAuth authentication...': '???? Legacy OAuth ??...',
-  'Note: Your existing API key in settings.json will not be cleared when using Qwen OAuth. You can switch back to OpenAI authentication later if needed.':
+  'Waiting for HopCode OAuth authentication...': '???? Legacy OAuth ??...',
+  'Note: Your existing API key in settings.json will not be cleared when using HopCode OAuth. You can switch back to OpenAI authentication later if needed.':
     '??:?? Legacy OAuth ?,settings.json ???? API ????????????,???????? OpenAI ???',
-  'Note: Your existing API key will not be cleared when using Qwen OAuth.':
+  'Note: Your existing API key will not be cleared when using HopCode OAuth.':
     '??:?? Legacy OAuth ?,??? API ????????',
   'Authentication timed out. Please try again.': '?????????',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1164,10 +1191,10 @@ export default {
   unknown: '??',
   "Failed to switch model to '{{modelId}}'.\n\n{{error}}":
     "??????? '{{modelId}}'.\n\n{{error}}",
-  'Qwen 3.6 Plus � efficient hybrid model with leading coding performance':
-    'Qwen 3.6 Plus � ??????,????????',
-  'The latest Qwen Vision model from Alibaba Cloud ModelStudio (version: qwen3-vl-plus-2025-09-23)':
-    '????? ModelStudio ??? Qwen Vision ??(??:qwen3-vl-plus-2025-09-23)',
+  'Qwen 3.6 Plus ? efficient hybrid model with leading coding performance':
+    'Qwen 3.6 Plus ? ??????,????????',
+  'The latest HopCode Vision model from Alibaba Cloud ModelStudio (version: qwen3-vl-plus-2025-09-23)':
+    '????? ModelStudio ??? HopCode Vision ??(??:qwen3-vl-plus-2025-09-23)',
   'Manage folder trust settings': '?????????',
   'Manage permission rules': '??????',
   Allow: '??',
@@ -1189,34 +1216,34 @@ export default {
   'Checked in at .hopcode/settings.json': '??? .hopcode/settings.json',
   'User settings': '????',
   'Saved in at ~/.hopcode/settings.json': '??? ~/.hopcode/settings.json',
-  'Add a new rule�': '?????�',
+  'Add a new rule?': '??????',
   'Add {{type}} permission rule': '??{{type}}????',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
     '???????????,?????????????',
   'e.g.,': '??',
   or: '?',
-  'Enter permission rule�': '??????�',
-  'Enter to submit � Esc to cancel': '???? � Esc ??',
+  'Enter permission rule?': '???????',
+  'Enter to submit ? Esc to cancel': '???? ? Esc ??',
   'Where should this rule be saved?': '??????????',
-  'Enter to confirm � Esc to cancel': '???? � Esc ??',
+  'Enter to confirm ? Esc to cancel': '???? ? Esc ??',
   'Delete {{type}} rule?': '??{{type}}???',
   'Are you sure you want to delete this permission rule?': '????????????',
   'Permissions:': '??:',
   '(?/? or tab to cycle)': '(?/? ? tab ??)',
-  'Press ?? to navigate � Enter to select � Type to search � Esc to cancel':
-    '? ?? ?? � ???? � ???? � Esc ??',
-  'Search�': '??�',
+  'Press ?? to navigate ? Enter to select ? Type to search ? Esc to cancel':
+    '? ?? ?? ? ???? ? ???? ? Esc ??',
+  'Search?': '???',
   'Use /trust to manage folder trust settings for this workspace.':
     '?? /trust ???????????????',
-  'Add directory�': '????�',
+  'Add directory?': '?????',
   'Add directory to workspace': '???????',
   'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
     'HopCode ???????????,??????????????????',
   'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
     'HopCode ????????????,??????????????????',
   'Enter the path to the directory:': '??????:',
-  'Enter directory path�': '??????�',
-  'Tab to complete � Enter to add � Esc to cancel': 'Tab ?? � ???? � Esc ??',
+  'Enter directory path?': '???????',
+  'Tab to complete ? Enter to add ? Esc to cancel': 'Tab ?? ? ???? ? Esc ??',
   'Remove directory?': '?????',
   'Are you sure you want to remove this directory from the workspace?':
     '????????????????',
@@ -1295,7 +1322,7 @@ export default {
     '? Tab ??? /approval-mode ??????????',
   'Try /insight to generate personalized insights from your chat history.':
     '?? /insight,??????????????',
-  'Press Ctrl+O to toggle compact mode � hide tool output and thinking for a cleaner view.':
+  'Press Ctrl+O to toggle compact mode ? hide tool output and thinking for a cleaner view.':
     '? Ctrl+O ?????? -- ???????????,??????',
   'Add a HOPCODE.md file to give HopCode persistent project context.':
     '?? HOPCODE.md ??,? HopCode ???????????',
@@ -1352,9 +1379,9 @@ export default {
   'Avg Duration': '????',
   'User Decision Summary': '??????',
   'Total Reviewed Suggestions:': '???????:',
-  ' � Accepted:': ' � ???:',
-  ' � Rejected:': ' � ???:',
-  ' � Modified:': ' � ???:',
+  ' ? Accepted:': ' ? ???:',
+  ' ? Rejected:': ' ? ???:',
+  ' ? Modified:': ' ? ???:',
   ' Overall Agreement Rate:': ' ?????:',
   'No tool calls have been made in this session.': '??????????????',
   'Session start time is unavailable, cannot calculate stats.':
@@ -1427,18 +1454,16 @@ export default {
   'Failed to open browser. Check out the extensions gallery at {{url}}':
     '???????????????:{{url}}',
   'Rate limit error: {{reason}}': '????:{{reason}}',
-  'Retrying in {{seconds}} seconds� (attempt {{attempt}}/{{maxRetries}})':
-    '?? {{seconds}} ????�(? {{attempt}}/{{maxRetries}} ?)',
+  'Retrying in {{seconds}} seconds? (attempt {{attempt}}/{{maxRetries}})':
+    '?? {{seconds}} ?????(? {{attempt}}/{{maxRetries}} ?)',
   'Press Ctrl+Y to retry': '? Ctrl+Y ???',
   'No failed request to retry.': '???????????',
   'to retry last request': '???????',
   'API key cannot be empty.': 'API Key ?????',
   'Invalid API key. Coding Plan API keys start with "sk-sp-". Please check.':
-    '無效的 API Key，Coding Plan API Key 均以 "sk-sp-" 開頭，請檢查',
-  'You can get your Coding Plan API key here':
-    '您可以在這裏獲取 Coding Plan API Key',
-  'You can get your Token Plan API key here':
-    '您可以在這裏獲取 Token Plan API Key',
+    '??? API Key,Coding Plan API Key ?? "sk-sp-" ??,???',
+  'You can get your Coding Plan API key here': '???????? Coding Plan API Key',
+  'You can get your Token Plan API key here': '???????? Token Plan API Key',
   'API key is stored in settings.env. You can migrate it to a .env file for better security.':
     'API Key ???? settings.env ?????????? .env ????????????',
   'New model configurations are available for Alibaba Cloud Coding Plan. Update now?':
@@ -1457,15 +1482,14 @@ export default {
     '?????? Coding Plan API Key,??????!',
   Custom: '???',
   'More instructions about configuring `modelProviders` manually.':
-    '關於手動配置 `modelProviders` 的更多說明。',
-  'Select API-KEY configuration mode:': '選擇 API-KEY 配置模式：',
-  '(Press Escape to go back)': '(按 Escape 鍵返回)',
-  '(Press Enter to submit, Escape to cancel)': '(按 Enter 提交，Escape 取消)',
-  'Select Region for Coding Plan': '選擇 Coding Plan 區域',
-  'Choose based on where your account is registered':
-    '請根據您的賬號註冊地區選擇',
-  'Enter Coding Plan API Key': '輸入 Coding Plan API Key',
-  'Enter Token Plan API Key': '輸入 Token Plan API Key',
+    '?????? `modelProviders` ??????',
+  'Select API-KEY configuration mode:': '?? API-KEY ????:',
+  '(Press Escape to go back)': '(? Escape ???)',
+  '(Press Enter to submit, Escape to cancel)': '(? Enter ??,Escape ??)',
+  'Select Region for Coding Plan': '?? Coding Plan ??',
+  'Choose based on where your account is registered': '?????????????',
+  'Enter Coding Plan API Key': '?? Coding Plan API Key',
+  'Enter Token Plan API Key': '?? Token Plan API Key',
   'New model configurations are available for {{region}}. Update now?':
     '{{region}} ?????????????????',
   '{{region}} configuration updated successfully. Model switched to "{{model}}".':
@@ -1525,17 +1549,17 @@ export default {
     '?/?: ?? | Space/Enter: ?? | Esc: ??',
   '?/?: Navigate | Enter: Select | Esc: Cancel':
     '?/?: ?? | Enter: ?? | Esc: ??',
-  'Configure authentication information with Qwen-OAuth or Alibaba Cloud Coding Plan':
+  'Configure authentication information with hopcode-oauth or Alibaba Cloud Coding Plan':
     '?? Legacy OAuth ?????? Coding Plan ?? Qwen ????',
-  'Authenticate using Qwen OAuth': '?? Legacy OAuth ????',
+  'Authenticate using HopCode OAuth': '?? Legacy OAuth ????',
   'Authenticate using Alibaba Cloud Coding Plan': '??????? Coding Plan ????',
   'Region for Coding Plan (china/global)': 'Coding Plan ?? (china/global)',
   'API key for Coding Plan': 'Coding Plan ? API ??',
   'Show current authentication status': '????????',
   'Authentication completed successfully.': '?????',
-  'Starting Qwen OAuth authentication...': '???? Legacy OAuth ??...',
-  'Successfully authenticated with Qwen OAuth.': '????? Legacy OAuth ???',
-  'Failed to authenticate with Qwen OAuth: {{error}}':
+  'Starting HopCode OAuth authentication...': '???? Legacy OAuth ??...',
+  'Successfully authenticated with HopCode OAuth.': '????? Legacy OAuth ???',
+  'Failed to authenticate with HopCode OAuth: {{error}}':
     'Legacy OAuth ????:{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
     '????????? Coding Plan ??...',
@@ -1553,17 +1577,17 @@ export default {
   '\n=== Authentication Status ===\n': '\n=== ???? ===\n',
   '??  No authentication method configured.\n': '??  ????????\n',
   'Run one of the following commands to get started:\n': '????????????:\n',
-  '  hopcode auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  hopcode auth qwen-oauth     - ?? Legacy OAuth ??(???)',
+  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  hopcode auth hopcode-oauth     - ?? Legacy OAuth ??(???)',
   '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
     '  hopcode auth coding-plan      - ??????? Coding Plan ??\n',
   'Or simply run:': '??????:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - ???????\n',
-  '? Authentication Method: Qwen OAuth': '? ????:Legacy OAuth',
+  '? Authentication Method: HopCode OAuth': '? ????:Legacy OAuth',
   '  Type: Free tier (discontinued 2026-04-15)': '  ??:????(2026-04-15 ???)',
   '  Limit: No longer available': '  ??:????',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
     'Legacy OAuth ?????? 2026-04-15 ?????? /auth ??? Coding Plan?OpenRouter?Fireworks AI ???????',
   '  Models: Qwen latest models\n': '  ??:Qwen ????\n',
   '? Authentication Method: Alibaba Cloud Coding Plan':

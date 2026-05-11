@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+﻿import { existsSync, readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import type { CommandModule } from 'yargs';

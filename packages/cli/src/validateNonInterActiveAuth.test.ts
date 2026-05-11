@@ -285,7 +285,7 @@ describe('validateNonInterActiveAuth', () => {
       expect((e as Error).message).toContain('process.exit(1) called');
     }
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      'The configured auth type is qwen-oauth, but the current auth type is openai. Please re-authenticate with the correct type.',
+      'The configured auth type is hopcode-oauth, but the current auth type is openai. Please re-authenticate with the correct type.',
     );
     expect(processExitSpy).toHaveBeenCalledWith(1);
   });
@@ -372,7 +372,7 @@ describe('validateNonInterActiveAuth', () => {
       expect(emitResultMock).toHaveBeenCalledWith({
         isError: true,
         errorMessage: expect.stringContaining(
-          'The configured auth type is qwen-oauth, but the current auth type is openai.',
+          'The configured auth type is hopcode-oauth, but the current auth type is openai.',
         ),
         durationMs: 0,
         apiDurationMs: 0,
@@ -509,7 +509,7 @@ describe('validateNonInterActiveAuth', () => {
       expect(emitResultMock).toHaveBeenCalledWith({
         isError: true,
         errorMessage: expect.stringContaining(
-          'The configured auth type is qwen-oauth, but the current auth type is openai.',
+          'The configured auth type is hopcode-oauth, but the current auth type is openai.',
         ),
         durationMs: 0,
         apiDurationMs: 0,

@@ -23,16 +23,22 @@ export class FileTokenStorage extends BaseTokenStorage {
   }
 
   private deriveEncryptionKey(): Buffer {
+    // Legacy salt preserved for backward compatibility with tokens encrypted
+    // under the old "qwen-code" service name (changed to "hopcode" during rebranding).
     const salt = `${os.hostname()}-${os.userInfo().username}-hopcode`;
+    // New encryption key uses 'hopcode-oauth' instead of the legacy 'qwen-code-oauth'
     return crypto.scryptSync('hopcode-oauth', salt, 32);
   }
 
   /**
    * Derive the legacy encryption key for backward compatibility
    * with tokens encrypted under the old qwen-code-oauth service name.
+   * Kept for decrypting existing stored tokens during migration.
    */
   private deriveLegacyEncryptionKey(): Buffer {
+    // Legacy salt uses 'qwen-code' for backward compat with existing tokens
     const salt = `${os.hostname()}-${os.userInfo().username}-qwen-code`;
+    // Legacy key uses 'qwen-code-oauth' — DO NOT change this value
     return crypto.scryptSync('qwen-code-oauth', salt, 32);
   }
 

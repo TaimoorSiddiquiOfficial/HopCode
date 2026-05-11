@@ -30,7 +30,6 @@ function makeConfig(targetDir: string, cache: FileReadCache, disabled = false) {
     getFileReadCache: () => cache,
     getFileReadCacheDisabled: () => disabled,
     getFileService: () => ({
-      shouldQwenIgnoreFile: () => false,
       shouldHopCodeIgnoreFile: () => false,
     }),
     getFileFilteringOptions: () => ({}),

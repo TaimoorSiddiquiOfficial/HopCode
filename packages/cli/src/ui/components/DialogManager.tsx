@@ -16,7 +16,7 @@ import { SettingInputPrompt } from './SettingInputPrompt.js';
 import { PluginChoicePrompt } from './PluginChoicePrompt.js';
 import { ThemeDialog } from './ThemeDialog.js';
 import { SettingsDialog } from './SettingsDialog.js';
-import { QwenOAuthProgress } from './QwenOAuthProgress.js';
+import { HopCodeOAuthProgress } from './HopCodeOAuthProgress.js';
 import { ExternalAuthProgress } from './ExternalAuthProgress.js';
 import { AuthDialog } from '../auth/AuthDialog.js';
 import { EditorSettingsDialog } from './EditorSettingsDialog.js';
@@ -48,6 +48,7 @@ import { HooksManagementDialog } from './hooks/HooksManagementDialog.js';
 import { SessionPicker } from './SessionPicker.js';
 import { RewindSelector } from './RewindSelector.js';
 import { MemoryDialog } from './MemoryDialog.js';
+import { Help } from './Help.js';
 import { BackgroundTasksDialog } from './background-view/BackgroundTasksDialog.js';
 import { useBackgroundTaskViewState } from '../contexts/BackgroundTaskViewContext.js';
 import { t } from '../../i18n/index.js';
@@ -256,6 +257,18 @@ export const DialogManager = ({
   if (uiState.isMemoryDialogOpen) {
     return <MemoryDialog onClose={uiActions.closeMemoryDialog} />;
   }
+  if (uiState.isHelpDialogOpen) {
+    return (
+      <Help
+        commands={uiState.slashCommands}
+        width={mainAreaWidth}
+        activeTab={uiState.activeHelpTab}
+        onTabChange={uiActions.setHelpTab}
+        onClose={uiActions.closeHelpDialog}
+        isInteractive
+      />
+    );
+  }
   if (uiState.isApprovalModeDialogOpen) {
     const currentMode = config.getApprovalMode();
     return (
@@ -341,15 +354,17 @@ export const DialogManager = ({
     }
 
     // OpenAI authentication now handled through AuthDialog with coding-plan/custom sub-modes
-    // Qwen OAuth remains as a separate flow
+    // HopCode OAuth remains as a separate flow
     if (uiState.auth.pendingAuthType === AuthType.HOPCODE_OAUTH) {
       return (
-        <QwenOAuthProgress
-          deviceAuth={uiState.auth.qwenAuthState.deviceAuth || undefined}
-          authStatus={uiState.auth.qwenAuthState.authStatus}
-          authMessage={uiState.auth.qwenAuthState.authMessage}
+        <HopCodeOAuthProgress
+          deviceAuth={uiState.auth.hopCodeAuthState.deviceAuth || undefined}
+          authStatus={uiState.auth.hopCodeAuthState.authStatus}
+          authMessage={uiState.auth.hopCodeAuthState.authMessage}
           onTimeout={() => {
-            uiActions.auth.onAuthError('Qwen OAuth authentication timed out.');
+            uiActions.auth.onAuthError(
+              'HopCode OAuth authentication timed out.',
+            );
             uiActions.auth.cancelAuthentication();
             uiActions.auth.setAuthState(AuthState.Updating);
           }}

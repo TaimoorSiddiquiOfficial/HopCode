@@ -8,9 +8,9 @@
  * Discontinued-model detection for the ACP `availableModels` payload.
  *
  * The ACP server emits each model id wrapped as `${modelId}(${authType})`,
- * e.g. `qwen3-coder-plus(qwen-oauth)`. Runtime model snapshots are additionally
+ * e.g. `qwen3-coder-plus(hopcode-oauth)`. Runtime model snapshots are additionally
  * prefixed with `$runtime|${authType}|`, so the wrapped form becomes
- * `$runtime|qwen-oauth|qwen3-coder-plus(qwen-oauth)`.
+ * `$runtime|hopcode-oauth|qwen3-coder-plus(hopcode-oauth)`.
  *
  * This helper mirrors the encoding contract used by the CLI's
  * `acpModelUtils.ts` and the discontinued check in the CLI's `ModelDialog`.
@@ -19,15 +19,15 @@
 
 const RUNTIME_PREFIX = '$runtime|';
 
-/** Auth type marker for the (now-discontinued) Qwen OAuth free tier. */
-export const QWEN_OAUTH_AUTH_TYPE = 'qwen-oauth';
+/** Auth type marker for the (now-discontinued) HopCode OAuth free tier. */
+export const HOPCODE_OAUTH_AUTH_TYPE = 'hopcode-oauth';
 
 /** User-facing strings for the discontinued state (English-only — webview has no i18n runtime). */
 export const DISCONTINUED_MESSAGES = {
   badge: '(Discontinued)',
   description: 'Discontinued — switch to Coding Plan or API Key',
   blockedError:
-    'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
+    'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
 } as const;
 
 export interface ParsedAcpModelId {
@@ -64,7 +64,7 @@ export function parseAcpModelId(modelId: string): ParsedAcpModelId {
 }
 
 /**
- * Returns true when the model id refers to a non-runtime Qwen OAuth registry
+ * Returns true when the model id refers to a non-runtime HopCode OAuth registry
  * entry, matching the CLI's discontinued rule.
  *
  * Runtime snapshots from existing cached tokens are intentionally excluded so
@@ -75,5 +75,5 @@ export function isDiscontinuedModel(modelId: string): boolean {
     return false;
   }
   const parsed = parseAcpModelId(modelId);
-  return parsed.authType === QWEN_OAUTH_AUTH_TYPE && !parsed.isRuntime;
+  return parsed.authType === HOPCODE_OAUTH_AUTH_TYPE && !parsed.isRuntime;
 }

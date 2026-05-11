@@ -115,7 +115,7 @@ class SDKSystemMessage(TypedDict):
     model: NotRequired[str]
     permission_mode: NotRequired[str]
     slash_commands: NotRequired[list[str]]
-    qwen_code_version: NotRequired[str]
+    hopcode_code_version: NotRequired[str]
     hopcode_version: NotRequired[str]
     output_style: NotRequired[str]
     agents: NotRequired[list[str]]

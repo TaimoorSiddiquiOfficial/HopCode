@@ -552,7 +552,6 @@ export class HookRunner {
         GEMINI_PROJECT_DIR: input.cwd,
         CLAUDE_PROJECT_DIR: input.cwd, // For compatibility
         HOPCODE_PROJECT_DIR: input.cwd,
-        QWEN_PROJECT_DIR: input.cwd, // Backward compat alias
         ...hookConfig.env,
       };
 
@@ -705,7 +704,11 @@ export class HookRunner {
             // Not JSON, convert plain text to structured output
             output = this.convertPlainTextToHookOutput(
               textToParse,
-              isBlockingError ? exitCode : exitCode || EXIT_CODE_SUCCESS,
+              isBlockingError
+                ? exitCode
+                : exitCode === EXIT_CODE_SUCCESS
+                  ? EXIT_CODE_SUCCESS
+                  : EXIT_CODE_NON_BLOCKING_ERROR,
             );
           }
         }

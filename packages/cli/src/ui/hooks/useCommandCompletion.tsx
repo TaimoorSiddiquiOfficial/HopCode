@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -18,6 +18,7 @@ import { toCodePoints } from '../utils/textUtils.js';
 import { useAtCompletion } from './useAtCompletion.js';
 import { useSlashCompletion } from './useSlashCompletion.js';
 import type { Config } from '@hoptrendy/hopcode-core';
+import type { RecentSlashCommands } from './useSlashCompletion.js';
 import { useCompletion } from './useCompletion.js';
 import { parseSlashCommand } from '../../utils/commands.js';
 
@@ -58,6 +59,7 @@ export function useCommandCompletion(
   config?: Config,
   // When false, suppresses showing suggestions (e.g., after history navigation)
   active: boolean = true,
+  recentCommands?: RecentSlashCommands,
 ): UseCommandCompletionReturn {
   const {
     suggestions,
@@ -157,6 +159,7 @@ export function useCommandCompletion(
     query,
     slashCommands,
     commandContext,
+    recentCommands,
     setSuggestions,
     setIsLoadingSuggestions,
     setIsPerfectMatch,
@@ -259,12 +262,15 @@ export function useCommandCompletion(
       const match = getBestSlashCommandMatch(
         midCmd.partialCommand,
         slashCommands,
+        recentCommands,
       );
       if (!match) return null;
+      const isCompleteCommand = match.suffix.length === 0;
       return {
-        text: match.suffix,
+        text: isCompleteCommand ? (match.argumentHint ?? '') : match.suffix,
         insertPosition: cursorOffset,
-        acceptText: match.suffix,
+        acceptText: isCompleteCommand ? undefined : match.suffix,
+        showCursorBeforeText: isCompleteCommand,
       };
     }
 
@@ -297,6 +303,7 @@ export function useCommandCompletion(
     slashCommands,
     active,
     reverseSearchActive,
+    recentCommands,
   ]);
 
   return {

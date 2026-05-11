@@ -69,7 +69,7 @@ class ProcessTransport:
 
         spawn_info = prepare_spawn_info(
             self._options.path_to_hopcode_executable
-            or self._options.path_to_qwen_executable
+            or self._options.path_to_hopcode_executable
         )
         args = [*spawn_info.args, *build_cli_arguments(self._options)]
         stderr_target = (

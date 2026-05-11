@@ -325,6 +325,35 @@ Use hooks.`,
         `--- Rule from: ${HOPCODE_DIR}/rules/test.md ---`,
       );
     });
+
+    it('reads global rules from HOPCODE_HOME when set', async () => {
+      const customHopCodeHome = path.join(testRootDir, 'custom-hopcode-home');
+      const originalHopCodeHome = process.env['HOPCODE_HOME'];
+      process.env['HOPCODE_HOME'] = customHopCodeHome;
+      try {
+        await createTestFile(
+          path.join(customHopCodeHome, 'rules', 'fromCustomHome.md'),
+          'CustomHome rule.',
+        );
+        // A stale rule in the legacy ~/.hopcode/rules location should NOT be
+        // loaded once HOPCODE_HOME points elsewhere.
+        await createTestFile(
+          path.join(homedir, HOPCODE_DIR, 'rules', 'fromLegacyHome.md'),
+          'LegacyHome rule.',
+        );
+
+        const result = await loadRules(projectRoot, true);
+
+        expect(result.content).toContain('CustomHome rule.');
+        expect(result.content).not.toContain('LegacyHome rule.');
+      } finally {
+        if (originalHopCodeHome === undefined) {
+          delete process.env['HOPCODE_HOME'];
+        } else {
+          process.env['HOPCODE_HOME'] = originalHopCodeHome;
+        }
+      }
+    });
   });
 
   // -------------------------------------------------------------------------

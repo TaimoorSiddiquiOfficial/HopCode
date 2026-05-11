@@ -54,7 +54,7 @@ export interface ContentGenerator {
 
 export enum AuthType {
   USE_OPENAI = 'openai',
-  HOPCODE_OAUTH = 'qwen-oauth',
+  HOPCODE_OAUTH = 'hopcode-oauth',
   USE_GEMINI = 'gemini',
   USE_VERTEX_AI = 'vertex-ai',
   USE_ANTHROPIC = 'anthropic',
@@ -242,7 +242,7 @@ export function validateModelConfig(
 ): ModelConfigValidationResult {
   const errors: Error[] = [];
 
-  // Qwen OAuth doesn't need validation - it uses dynamic tokens
+  // HopCode OAuth doesn't need validation - it uses dynamic tokens
   if (config.authType === AuthType.HOPCODE_OAUTH) {
     return { valid: true, errors: [] };
   }
@@ -333,7 +333,7 @@ export async function createContentGenerator(
     );
     baseGenerator = createOpenAIContentGenerator(generatorConfig, config);
   } else if (authType === AuthType.HOPCODE_OAUTH) {
-    const { getQwenOAuthClient: getQwenOauthClient } = await import(
+    const { getHopCodeOAuthClient } = await import(
       '../hopcode/hopCodeOAuth2.js'
     );
     const { HopCodeContentGenerator } = await import(
@@ -341,12 +341,12 @@ export async function createContentGenerator(
     );
 
     try {
-      const qwenClient = await getQwenOauthClient(
+      const hopcodeClient = await getHopCodeOAuthClient(
         config,
         isInitialAuth ? { requireCachedCredentials: true } : undefined,
       );
       baseGenerator = new HopCodeContentGenerator(
-        qwenClient,
+        hopcodeClient,
         generatorConfig,
         config,
       );

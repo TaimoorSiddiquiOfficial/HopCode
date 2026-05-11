@@ -86,7 +86,7 @@
 **Issue:** Code references `AuthType.hopcode_OAUTH` which doesn't exist
 
 **Root Cause:**
-The authentication type `QWEN_OAUTH` refers to the actual Alibaba Cloud Qwen OAuth system and **should NOT be changed**. This is a real API service name.
+The authentication type `HOPCODE_OAUTH` refers to the actual Alibaba Cloud Qwen OAuth system and **should NOT be changed**. This is a real API service name.
 
 **Files Affected:**
 
@@ -107,13 +107,13 @@ The authentication type `QWEN_OAUTH` refers to the actual Alibaba Cloud Qwen OAu
 - `packages/core/src/utils/retry.ts` (1 error)
 
 **Solution:**
-These should remain as `AuthType.QWEN_OAUTH` because they refer to the actual Alibaba Qwen authentication service. The rebranding script incorrectly changed these.
+These should remain as `AuthType.HOPCODE_OAUTH` because they refer to the actual Alibaba Qwen authentication service. The rebranding script incorrectly changed these.
 
 **To Fix:**
 Run a find-and-replace in the core package:
 
 ```
-AuthType.hopcode_OAUTH → AuthType.QWEN_OAUTH
+AuthType.hopcode_OAUTH → AuthType.HOPCODE_OAUTH
 ```
 
 ---
@@ -155,7 +155,7 @@ These internal service names that refer to actual Qwen API clients should remain
 - **Model names** (qwen3.5-plus, qwen3.6-plus, etc.)
 - **Internal client library names** (qwenClient, etc.)
 - **File format names** (.qwenignore files)
-- **Authentication type constants** (QWEN_OAUTH)
+- **Authentication type constants** (HOPCODE_OAUTH)
 - **Third-party service references**
 
 ---
@@ -170,7 +170,7 @@ cd D:\HopCode\packages\core\src
 # Replace incorrect AuthType references
 findstr /S /I "AuthType.hopcode_OAUTH" *.ts */*.ts
 
-# Manually replace with: AuthType.QWEN_OAUTH
+# Manually replace with: AuthType.HOPCODE_OAUTH
 ```
 
 ### Step 2: Fix Service Property Names

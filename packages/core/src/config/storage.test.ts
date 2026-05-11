@@ -198,10 +198,15 @@ describe('Storage ? runtime path methods use getRuntimeBaseDir', () => {
     );
   });
 
-  it('getGlobalIdeDir uses custom runtime base dir', () => {
+  it('getGlobalIdeDir is anchored to the global Qwen dir, not runtime base dir', () => {
     const customDir = path.resolve('custom');
     Storage.setRuntimeBaseDir(customDir);
-    expect(Storage.getGlobalIdeDir()).toBe(path.join(customDir, 'ide'));
+    // IDE lock files are discovery anchors shared with the VS Code companion,
+    // which can only see env vars (not settings-based runtimeOutputDir), so
+    // getGlobalIdeDir must follow getGlobalHopCodeDir to keep both sides aligned.
+    expect(Storage.getGlobalIdeDir()).toBe(
+      path.join(Storage.getGlobalHopCodeDir(), 'ide'),
+    );
   });
 
   it('getProjectDir uses custom runtime base dir', () => {
@@ -317,7 +322,104 @@ describe('Storage ? config paths remain at ~/.hopcode regardless of runtime dir'
   });
 });
 
-describe('Storage ? runtime base dir async context isolation', () => {
+describe('Storage – HOPCODE_HOME env var', () => {
+  const originalEnv = process.env['HOPCODE_HOME'];
+
+  afterEach(() => {
+    if (originalEnv !== undefined) {
+      process.env['HOPCODE_HOME'] = originalEnv;
+    } else {
+      delete process.env['HOPCODE_HOME'];
+    }
+  });
+
+  it('defaults to ~/.hopcode when HOPCODE_HOME is not set', () => {
+    delete process.env['HOPCODE_HOME'];
+    const expected = path.join(os.homedir(), '.hopcode');
+    expect(Storage.getGlobalHopCodeDir()).toBe(expected);
+  });
+
+  it('uses HOPCODE_HOME when set to absolute path', () => {
+    const configDir = path.resolve('/tmp/custom-hopcode');
+    process.env['HOPCODE_HOME'] = configDir;
+    expect(Storage.getGlobalHopCodeDir()).toBe(configDir);
+  });
+
+  it('resolves relative HOPCODE_HOME to absolute path', () => {
+    process.env['HOPCODE_HOME'] = 'relative/config';
+    const expected = path.resolve('relative/config');
+    expect(Storage.getGlobalHopCodeDir()).toBe(expected);
+  });
+
+  it('config paths follow HOPCODE_HOME', () => {
+    const configDir = path.resolve('/tmp/custom-hopcode');
+    process.env['HOPCODE_HOME'] = configDir;
+    expect(Storage.getGlobalSettingsPath()).toBe(
+      path.join(configDir, 'settings.json'),
+    );
+    expect(Storage.getInstallationIdPath()).toBe(
+      path.join(configDir, 'installation_id'),
+    );
+    expect(Storage.getUserCommandsDir()).toBe(path.join(configDir, 'commands'));
+    expect(Storage.getMcpOAuthTokensPath()).toBe(
+      path.join(configDir, 'mcp-oauth-tokens.json'),
+    );
+    expect(Storage.getOAuthCredsPath()).toBe(
+      path.join(configDir, 'oauth_creds.json'),
+    );
+    expect(Storage.getGlobalBinDir()).toBe(path.join(configDir, 'bin'));
+    expect(Storage.getGlobalMemoryFilePath()).toBe(
+      path.join(configDir, 'memory.md'),
+    );
+  });
+
+  it('project-level paths are NOT affected by HOPCODE_HOME', () => {
+    const configDir = path.resolve('/tmp/custom-hopcode');
+    const projectDir = path.resolve('/tmp/project');
+    process.env['HOPCODE_HOME'] = configDir;
+    const storage = new Storage(projectDir);
+    expect(storage.getWorkspaceSettingsPath()).toBe(
+      path.join(projectDir, '.hopcode', 'settings.json'),
+    );
+    expect(storage.getProjectCommandsDir()).toBe(
+      path.join(projectDir, '.hopcode', 'commands'),
+    );
+  });
+
+  it('expands tilde (~) in HOPCODE_HOME', () => {
+    process.env['HOPCODE_HOME'] = '~/custom-hopcode';
+    const expected = path.join(os.homedir(), 'custom-hopcode');
+    expect(Storage.getGlobalHopCodeDir()).toBe(expected);
+  });
+
+  it('expands Windows-style tilde in HOPCODE_HOME', () => {
+    process.env['HOPCODE_HOME'] = '~\\custom-hopcode';
+    const expected = path.join(os.homedir(), 'custom-hopcode');
+    expect(Storage.getGlobalHopCodeDir()).toBe(expected);
+  });
+
+  it('handles bare tilde (~) as home directory in HOPCODE_HOME', () => {
+    process.env['HOPCODE_HOME'] = '~';
+    expect(Storage.getGlobalHopCodeDir()).toBe(os.homedir());
+  });
+
+  it('HOPCODE_HOME and HOPCODE_RUNTIME_DIR are independent', () => {
+    const configDir = path.resolve('/tmp/config');
+    const runtimeDir = path.resolve('/tmp/runtime');
+    process.env['HOPCODE_HOME'] = configDir;
+    process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
+    expect(Storage.getGlobalHopCodeDir()).toBe(configDir);
+    expect(Storage.getRuntimeBaseDir()).toBe(runtimeDir);
+    expect(Storage.getGlobalSettingsPath()).toBe(
+      path.join(configDir, 'settings.json'),
+    );
+    expect(Storage.getGlobalTempDir()).toBe(path.join(runtimeDir, 'tmp'));
+    expect(Storage.getGlobalDebugDir()).toBe(path.join(runtimeDir, 'debug'));
+    delete process.env['HOPCODE_RUNTIME_DIR'];
+  });
+});
+
+describe('Storage – runtime base dir async context isolation', () => {
   const originalEnv = process.env['HOPCODE_RUNTIME_DIR'];
 
   beforeEach(() => {

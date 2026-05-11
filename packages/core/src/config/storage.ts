@@ -38,14 +38,10 @@ export class Storage {
     this.targetDir = targetDir;
   }
 
-  private static resolveRuntimeBaseDir(
-    dir: string | null | undefined,
-    cwd?: string,
-  ): string | null {
-    if (!dir) {
-      return null;
-    }
-
+  /**
+   * Expands tilde and resolves relative paths to absolute.
+   */
+  private static resolvePath(dir: string, cwd?: string): string {
     let resolved = dir;
     if (
       resolved === '~' ||
@@ -65,6 +61,16 @@ export class Storage {
       resolved = cwd ? path.resolve(cwd, resolved) : path.resolve(resolved);
     }
     return resolved;
+  }
+
+  private static resolveRuntimeBaseDir(
+    dir: string | null | undefined,
+    cwd?: string,
+  ): string | null {
+    if (!dir) {
+      return null;
+    }
+    return Storage.resolvePath(dir, cwd);
   }
 
   /**
@@ -119,9 +125,13 @@ export class Storage {
   }
 
   static getGlobalHopCodeDir(): string {
+    const envDir = process.env['HOPCODE_HOME'];
+    if (envDir) {
+      return Storage.resolvePath(envDir);
+    }
     const homeDir = os.homedir();
     if (!homeDir) {
-      return path.join(os.tmpdir(), '.hopcode');
+      return path.join(os.tmpdir(), HOPCODE_DIR);
     }
     return path.join(homeDir, HOPCODE_DIR);
   }
@@ -163,7 +173,10 @@ export class Storage {
   }
 
   static getGlobalIdeDir(): string {
-    return path.join(Storage.getRuntimeBaseDir(), IDE_DIR_NAME);
+    // Pinned to the global Qwen dir so the VS Code companion (which only
+    // sees env vars, not settings-based runtimeOutputDir) finds the same
+    // lock-file location as the CLI.
+    return path.join(Storage.getGlobalHopCodeDir(), IDE_DIR_NAME);
   }
 
   static getPlansDir(): string {
@@ -244,7 +257,9 @@ export class Storage {
   getUserSkillsDirs(): string[] {
     const homeDir = os.homedir() || os.tmpdir();
     return SKILL_PROVIDER_CONFIG_DIRS.map((dir) =>
-      path.join(homeDir, dir, 'skills'),
+      dir === HOPCODE_DIR
+        ? path.join(Storage.getGlobalHopCodeDir(), 'skills')
+        : path.join(homeDir, dir, 'skills'),
     );
   }
 

@@ -15,7 +15,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { LoadedSettings } from '../../config/settings.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
-import { useQwenAuth } from '../hooks/useQwenAuth.js';
+import { useHopCodeAuth } from '../hooks/useHopCodeAuth.js';
 import { AuthState, MessageType } from '../types.js';
 import type { HistoryItem } from '../types.js';
 import { t } from '../../i18n/index.js';
@@ -73,7 +73,7 @@ export function maskApiKey(apiKey: string): string {
   return `${trimmed.slice(0, 3)}...${trimmed.slice(-4)}`;
 }
 
-export type { QwenAuthState } from '../hooks/useQwenAuth.js';
+export type { HopCodeAuthState } from '../hooks/useHopCodeAuth.js';
 
 export type AuthUiState = {
   authError: string | null;
@@ -85,7 +85,7 @@ export type AuthUiState = {
     message: string;
     detail?: string;
   } | null;
-  qwenAuthState: ReturnType<typeof useQwenAuth>['qwenAuthState'];
+  hopCodeAuthState: ReturnType<typeof useHopCodeAuth>['hopCodeAuthState'];
 };
 
 export type AuthController = {
@@ -132,7 +132,7 @@ export const useAuthCommand = (
   const [openRouterAbortCtrl, setOpenRouterAbortCtrl] =
     useState<AbortController | null>(null);
 
-  const { qwenAuthState, cancelQwenAuth } = useQwenAuth(
+  const { hopCodeAuthState, cancelHopCodeAuth } = useHopCodeAuth(
     pendingAuthType,
     isAuthenticating,
   );
@@ -391,7 +391,7 @@ export const useAuthCommand = (
 
   const cancelAuthentication = useCallback(() => {
     if (isAuthenticating && pendingAuthType === AuthType.HOPCODE_OAUTH) {
-      cancelQwenAuth();
+      cancelHopCodeAuth();
     }
     if (isAuthenticating && pendingAuthType === AuthType.USE_OPENAI) {
       openRouterAbortCtrl?.abort();
@@ -407,7 +407,7 @@ export const useAuthCommand = (
   }, [
     isAuthenticating,
     pendingAuthType,
-    cancelQwenAuth,
+    cancelHopCodeAuth,
     config,
     openRouterAbortCtrl,
   ]);
@@ -478,12 +478,12 @@ export const useAuthCommand = (
     [handleProviderSubmit],
   );
 
-  // -- Validate QWEN_DEFAULT_AUTH_TYPE env var on mount --------------------
+  // -- Validate HOPCODE_DEFAULT_AUTH_TYPE env var on mount --------------------
 
   useEffect(() => {
     const defaultAuthType =
       process.env['HOPCODE_DEFAULT_AUTH_TYPE'] ??
-      process.env['QWEN_DEFAULT_AUTH_TYPE'];
+      process.env['HOPCODE_DEFAULT_AUTH_TYPE'];
     if (
       defaultAuthType &&
       ![
@@ -521,7 +521,7 @@ export const useAuthCommand = (
       isAuthenticating,
       pendingAuthType,
       externalAuthState,
-      qwenAuthState,
+      hopCodeAuthState,
     }),
     [
       authError,
@@ -529,7 +529,7 @@ export const useAuthCommand = (
       isAuthenticating,
       pendingAuthType,
       externalAuthState,
-      qwenAuthState,
+      hopCodeAuthState,
     ],
   );
 
@@ -563,7 +563,7 @@ export const useAuthCommand = (
     isAuthenticating,
     pendingAuthType,
     externalAuthState,
-    qwenAuthState,
+    hopCodeAuthState,
     handleAuthSelect,
     handleProviderSubmit,
     handleOpenRouterSubmit,

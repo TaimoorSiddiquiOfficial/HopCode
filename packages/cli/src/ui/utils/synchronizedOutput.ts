@@ -36,12 +36,12 @@ export function terminalSupportsSynchronizedOutput(
 ): boolean {
   const disableSynced =
     env['HOPCODE_DISABLE_SYNCHRONIZED_OUTPUT'] ??
-    env['QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT'];
+    env['HOPCODE_DISABLE_SYNCHRONIZED_OUTPUT'];
   const synced =
-    env['HOPCODE_SYNCHRONIZED_OUTPUT'] ?? env['QWEN_CODE_SYNCHRONIZED_OUTPUT'];
+    env['HOPCODE_SYNCHRONIZED_OUTPUT'] ?? env['HOPCODE_SYNCHRONIZED_OUTPUT'];
   const forceSynced =
     env['HOPCODE_FORCE_SYNCHRONIZED_OUTPUT'] ??
-    env['QWEN_CODE_FORCE_SYNCHRONIZED_OUTPUT'];
+    env['HOPCODE_FORCE_SYNCHRONIZED_OUTPUT'];
 
   if (disableSynced === '1' || synced === '0') {
     return false;

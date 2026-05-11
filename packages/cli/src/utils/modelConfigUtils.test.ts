@@ -134,7 +134,7 @@ describe('modelConfigUtils', () => {
       vi.resetModules();
       process.env = { ...originalEnv };
       delete process.env['OPENAI_MODEL'];
-      delete process.env['QWEN_MODEL'];
+      delete process.env['HOPCODE_MODEL'];
       mockWriteStderrLine.mockClear();
     });
 
@@ -803,7 +803,7 @@ describe('modelConfigUtils', () => {
         expect.objectContaining({
           env: expect.not.objectContaining({
             OPENAI_MODEL: expect.anything(),
-            QWEN_MODEL: expect.anything(),
+            HOPCODE_MODEL: expect.anything(),
           }),
         }),
       );
@@ -1063,8 +1063,8 @@ describe('modelConfigUtils', () => {
       );
     });
 
-    // Edge Case 2: QWEN_MODEL is used as final fallback when OPENAI_MODEL is not set
-    it('Edge Case 2: QWEN_MODEL should be used as fallback when OPENAI_MODEL is not set', () => {
+    // Edge Case 2: HOPCODE_MODEL is used as final fallback when OPENAI_MODEL is not set
+    it('Edge Case 2: HOPCODE_MODEL should be used as fallback when OPENAI_MODEL is not set', () => {
       const argv = {};
       const qwenProvider: ProviderModelConfig = {
         id: 'qwen-env-model',
@@ -1091,7 +1091,7 @@ describe('modelConfigUtils', () => {
         argv,
         settings,
         selectedAuthType,
-        env: { QWEN_MODEL: 'qwen-env-model' },
+        env: { HOPCODE_MODEL: 'qwen-env-model' },
       });
 
       expect(vi.mocked(resolveModelConfig)).toHaveBeenCalledWith(
@@ -1101,8 +1101,8 @@ describe('modelConfigUtils', () => {
       );
     });
 
-    // Edge Case 3: OPENAI_MODEL over QWEN_MODEL when both are set and settings.model.name is not set
-    it('Edge Case 3: OPENAI_MODEL should win over QWEN_MODEL when both set', () => {
+    // Edge Case 3: OPENAI_MODEL over HOPCODE_MODEL when both are set and settings.model.name is not set
+    it('Edge Case 3: OPENAI_MODEL should win over HOPCODE_MODEL when both set', () => {
       const argv = {};
       const openAIProvider: ProviderModelConfig = {
         id: 'openai-env-model',
@@ -1136,7 +1136,7 @@ describe('modelConfigUtils', () => {
         selectedAuthType,
         env: {
           OPENAI_MODEL: 'openai-env-model',
-          QWEN_MODEL: 'qwen-env-model',
+          HOPCODE_MODEL: 'qwen-env-model',
         },
       });
 
@@ -1354,14 +1354,14 @@ describe('modelConfigUtils', () => {
         expect(callArgs.env?.['OPENAI_MODEL']).toBeUndefined();
       });
 
-      it('[Regression] QWEN_MODEL as fallback when OPENAI_MODEL not set', () => {
+      it('[Regression] HOPCODE_MODEL as fallback when OPENAI_MODEL not set', () => {
         const settings = makeMockSettings({ model: { name: undefined } });
         const selectedAuthType = AuthType.USE_OPENAI;
-        const env = { QWEN_MODEL: 'qwen-model', OPENAI_API_KEY: 'key' };
+        const env = { HOPCODE_MODEL: 'qwen-model', OPENAI_API_KEY: 'key' };
 
         vi.mocked(resolveModelConfig).mockImplementation(() => ({
           config: { model: 'qwen-model', apiKey: 'key', baseUrl: '' },
-          sources: { model: { kind: 'env' as const, envKey: 'QWEN_MODEL' } },
+          sources: { model: { kind: 'env' as const, envKey: 'HOPCODE_MODEL' } },
           warnings: [],
         }));
 
@@ -1372,9 +1372,9 @@ describe('modelConfigUtils', () => {
           env,
         });
 
-        // QWEN_MODEL should be passed to resolveModelConfig
+        // HOPCODE_MODEL should be passed to resolveModelConfig
         const callArgs = vi.mocked(resolveModelConfig).mock.calls[0][0];
-        expect(callArgs.env?.['QWEN_MODEL']).toBe('qwen-model');
+        expect(callArgs.env?.['HOPCODE_MODEL']).toBe('qwen-model');
       });
 
       it('[Regression] Non-OpenAI auth ignores OPENAI_MODEL', () => {

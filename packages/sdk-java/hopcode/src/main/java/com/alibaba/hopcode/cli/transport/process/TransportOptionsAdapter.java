@@ -65,7 +65,7 @@ class TransportOptionsAdapter {
      */
     String[] buildCommandArgs() {
         List<String> args = new ArrayList<>(
-                Arrays.asList(transportOptions.getPathToQwenExecutable(), "--input-format", "stream-json", "--output-format",
+                Arrays.asList(transportOptions.getPathToHopCodeExecutable(), "--input-format", "stream-json", "--output-format",
                         "stream-json", "--channel=SDK"));
 
         if (StringUtils.isNotBlank(transportOptions.getModel())) {
@@ -129,8 +129,8 @@ class TransportOptionsAdapter {
                 .map(TransportOptions::clone)
                 .orElse(new TransportOptions());
 
-        if (StringUtils.isBlank(transportOptions.getPathToQwenExecutable())) {
-            transportOptions.setPathToQwenExecutable("qwen");
+        if (StringUtils.isBlank(transportOptions.getPathToHopCodeExecutable())) {
+            transportOptions.setPathToHopCodeExecutable("hopcode");
         }
 
         if (StringUtils.isBlank(transportOptions.getCwd())) {

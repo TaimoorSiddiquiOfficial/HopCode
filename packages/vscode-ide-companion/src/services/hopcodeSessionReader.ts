@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -6,15 +6,15 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
 import * as readline from 'readline';
 import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
+import { getRuntimeBaseDir } from '../utils/paths.js';
 import { truncatePanelTitle } from '../webview/utils/panelTitleUtils.js';
 
 export interface HopCodeMessage {
   id: string;
   timestamp: string;
-  type: 'user' | 'qwen';
+  type: 'user' | 'hopcode';
   content: string;
   thoughts?: unknown[];
   tokens?: {
@@ -40,10 +40,8 @@ export interface HopCodeSession {
 }
 
 export class HopCodeSessionReader {
-  private hopcodeDir: string;
-
-  constructor() {
-    this.hopcodeDir = path.join(os.homedir(), '.hopcode');
+  private get runtimeDir(): string {
+    return getRuntimeBaseDir();
   }
 
   /**
@@ -60,7 +58,7 @@ export class HopCodeSessionReader {
         // Current project only
         const projectHash = getProjectHash(workingDir);
         const chatsDir = path.join(
-          this.hopcodeDir,
+          this.runtimeDir,
           'tmp',
           projectHash,
           'chats',
@@ -69,7 +67,7 @@ export class HopCodeSessionReader {
         sessions.push(...projectSessions);
       } else {
         // All projects
-        const tmpDir = path.join(this.hopcodeDir, 'tmp');
+        const tmpDir = path.join(this.runtimeDir, 'tmp');
         if (!fs.existsSync(tmpDir)) {
           console.log(
             '[HopCodeSessionReader] Tmp directory not found:',
@@ -265,7 +263,7 @@ export class HopCodeSessionReader {
             messages.push({
               id: uuid || `${messages.length}`,
               timestamp: typeof obj.timestamp === 'string' ? obj.timestamp : '',
-              type: type === 'user' ? 'user' : 'qwen',
+              type: type === 'user' ? 'user' : 'hopcode',
               content: text,
             });
           }

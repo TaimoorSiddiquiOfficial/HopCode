@@ -61,7 +61,7 @@ public class SDKSystemMessage extends MessageBase {
     /**
      * HopCode version.
      */
-    @JSONField(name = "qwen_code_version")
+    @JSONField(name = "hopcode_code_version")
     private String hopcodeVersion;
     /**
      * Output style.

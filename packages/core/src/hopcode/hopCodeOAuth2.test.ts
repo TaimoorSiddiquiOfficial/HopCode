@@ -32,7 +32,7 @@ import {
 
 interface MockSharedTokenManager {
   getValidCredentials(
-    qwenClient: HopCodeOAuth2Client,
+    hopcodeClient: HopCodeOAuth2Client,
   ): Promise<HopCodeCredentials>;
   getCurrentCredentials(): HopCodeCredentials | null;
   clearCache(): void;
@@ -51,10 +51,10 @@ vi.mock('./sharedTokenManager.js', () => ({
     }
 
     async getValidCredentials(
-      qwenClient: HopCodeOAuth2Client,
+      hopcodeClient: HopCodeOAuth2Client,
     ): Promise<HopCodeCredentials> {
       // Try to get credentials from the client first
-      const clientCredentials = qwenClient.getCredentials();
+      const clientCredentials = hopcodeClient.getCredentials();
       if (clientCredentials && clientCredentials.access_token) {
         return clientCredentials;
       }
@@ -768,7 +768,7 @@ describe('HopCodeOAuth2Client', () => {
         CredentialsClearRequiredError,
       );
       await expect(client.refreshAccessToken()).rejects.toThrow(
-        'Qwen OAuth refresh returned invalid JSON:',
+        'HopCode OAuth refresh returned invalid JSON:',
       );
     });
 
@@ -816,7 +816,7 @@ describe('HopCodeOAuth2Client', () => {
   });
 });
 
-describe('getQwenOAuthClient', () => {
+describe('getHopCodeOAuthClient', () => {
   let mockConfig: Config;
   let originalFetch: typeof global.fetch;
 
@@ -852,7 +852,7 @@ describe('getQwenOAuthClient', () => {
     SharedTokenManager.getInstance = vi.fn().mockReturnValue(mockTokenManager);
 
     const client = await import('./hopCodeOAuth2.js').then((module) =>
-      module.getQwenOAuthClient(mockConfig),
+      module.getHopCodeOAuthClient(mockConfig),
     );
 
     expect(client).toBeInstanceOf(Object);
@@ -885,7 +885,7 @@ describe('getQwenOAuthClient', () => {
     // The function should handle the invalid cached credentials and throw the expected error
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig),
+        module.getHopCodeOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
 
@@ -908,12 +908,12 @@ describe('getQwenOAuthClient', () => {
 
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig, {
+        module.getHopCodeOAuthClient(mockConfig, {
           requireCachedCredentials: true,
         }),
       ),
     ).rejects.toThrow(
-      'Qwen OAuth credentials expired. Please use /auth to re-authenticate with qwen-oauth.',
+      'HopCode OAuth credentials expired. Please use /auth to re-authenticate with hopcode-oauth.',
     );
 
     expect(global.fetch).not.toHaveBeenCalled();
@@ -947,8 +947,8 @@ describe('getQwenOAuthClient', () => {
 
     let thrownError: unknown;
     try {
-      const { getQwenOAuthClient } = await import('./hopCodeOAuth2.js');
-      await getQwenOAuthClient(mockConfig);
+      const { getHopCodeOAuthClient } = await import('./hopCodeOAuth2.js');
+      await getHopCodeOAuthClient(mockConfig);
     } catch (error: unknown) {
       thrownError = error;
     }
@@ -1077,7 +1077,7 @@ describe('HopCodeOAuth2Client - Additional Error Scenarios', () => {
   });
 });
 
-describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
+describe('getHopCodeOAuthClient - Enhanced Error Scenarios', () => {
   let mockConfig: Config;
   let originalFetch: typeof global.fetch;
 
@@ -1129,7 +1129,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
 
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig),
+        module.getHopCodeOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
 
@@ -1179,7 +1179,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
 
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig),
+        module.getHopCodeOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Authorization timeout, please restart the process.');
 
@@ -1229,7 +1229,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
 
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig),
+        module.getHopCodeOAuthClient(mockConfig),
       ),
     ).rejects.toThrow(
       'Too many requests. The server is rate limiting our requests. Please select a different authentication method or try again later.',
@@ -1267,7 +1267,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
 
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig),
+        module.getHopCodeOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
 
@@ -1275,7 +1275,7 @@ describe('getQwenOAuthClient - Enhanced Error Scenarios', () => {
   });
 });
 
-describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
+describe('authWithHopCodeDeviceFlow - Comprehensive Testing', () => {
   let mockConfig: Config;
   let originalFetch: typeof global.fetch;
 
@@ -1326,7 +1326,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
 
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig),
+        module.getHopCodeOAuthClient(mockConfig),
       ),
     ).rejects.toThrow('Device authorization flow failed');
 
@@ -1367,7 +1367,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
       .mockResolvedValue(mockTokenResponse as Response);
 
     const client = await import('./hopCodeOAuth2.js').then((module) =>
-      module.getQwenOAuthClient(mockConfig),
+      module.getHopCodeOAuthClient(mockConfig),
     );
 
     expect(client).toBeInstanceOf(Object);
@@ -1415,7 +1415,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
 
     await expect(
       import('./hopCodeOAuth2.js').then((module) =>
-        module.getQwenOAuthClient(mockConfig),
+        module.getHopCodeOAuthClient(mockConfig),
       ),
     ).rejects.toThrow(
       'Device code expired or invalid, please restart the authorization process.',
@@ -1472,7 +1472,7 @@ describe('authWithQwenDeviceFlow - Comprehensive Testing', () => {
       .mockResolvedValue(mockTokenResponse as Response);
 
     const client = await import('./hopCodeOAuth2.js').then((module) =>
-      module.getQwenOAuthClient(mockConfig),
+      module.getHopCodeOAuthClient(mockConfig),
     );
 
     expect(client).toBeInstanceOf(Object);
@@ -1541,7 +1541,7 @@ describe('Browser Launch and Error Handling', () => {
       .mockResolvedValue(mockTokenResponse as Response);
 
     const client = await import('./hopCodeOAuth2.js').then((module) =>
-      module.getQwenOAuthClient(mockConfig),
+      module.getHopCodeOAuthClient(mockConfig),
     );
 
     expect(client).toBeInstanceOf(Object);
@@ -1595,7 +1595,7 @@ describe('Browser Launch and Error Handling', () => {
       .mockResolvedValue(mockTokenResponse as Response);
 
     const client = await import('./hopCodeOAuth2.js').then((module) =>
-      module.getQwenOAuthClient(mockConfig),
+      module.getHopCodeOAuthClient(mockConfig),
     );
 
     expect(client).toBeInstanceOf(Object);
@@ -2139,7 +2139,7 @@ describe('SharedTokenManager Integration in HopCodeOAuth2Client', () => {
     expect(sharedManager).toBeDefined();
   });
 
-  it('should handle TokenManagerError types correctly in getQwenOAuthClient', async () => {
+  it('should handle TokenManagerError types correctly in getHopCodeOAuthClient', async () => {
     const mockConfig = {
       isBrowserLaunchSuppressed: vi.fn().mockReturnValue(true),
       isInteractive: vi.fn().mockReturnValue(true),
@@ -2201,7 +2201,7 @@ describe('SharedTokenManager Integration in HopCodeOAuth2Client', () => {
 
       try {
         await import('./hopCodeOAuth2.js').then((module) =>
-          module.getQwenOAuthClient(mockConfig),
+          module.getHopCodeOAuthClient(mockConfig),
         );
       } catch {
         // Expected to fail in test environment

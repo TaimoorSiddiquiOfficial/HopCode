@@ -146,8 +146,8 @@ qwen                      →  hopcode
 ~/.qwen/                  →  ~/.hopcode/
 
 # Environment Variables
-QWEN_CODE_*               →  HOPCODE_*
-QWEN_SANDBOX              →  HOPCODE_SANDBOX
+HOPCODE_*               →  HOPCODE_*
+HOPCODE_SANDBOX              →  HOPCODE_SANDBOX
 ```
 
 ### Phase 2: Visual Assets

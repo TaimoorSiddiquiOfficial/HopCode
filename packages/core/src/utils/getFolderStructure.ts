@@ -176,7 +176,7 @@ async function readFullStructure(
             (options.fileFilteringOptions.respectGitIgnore &&
               options.fileService.shouldGitIgnoreFile(subFolderPath)) ||
             (options.fileFilteringOptions.respectHopCodeIgnore &&
-              options.fileService.shouldQwenIgnoreFile(subFolderPath));
+              options.fileService.shouldHopCodeIgnoreFile(subFolderPath));
         }
 
         if (options.ignoredFolders.has(subFolderName) || isIgnored) {

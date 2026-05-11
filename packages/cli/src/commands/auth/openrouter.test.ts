@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { handleQwenAuth } from './handler.js';
+import { handleHopCodeAuth } from './handler.js';
 import { AuthType } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 
@@ -120,7 +120,7 @@ vi.mock('../../auth/providers/oauth/openrouterOAuth.js', () => ({
 import { loadSettings } from '../../config/settings.js';
 import { runOpenRouterOAuthLogin } from '../../auth/providers/oauth/openrouterOAuth.js';
 
-describe('handleQwenAuth openrouter', () => {
+describe('handleHopCodeAuth openrouter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
@@ -164,7 +164,7 @@ describe('handleQwenAuth openrouter', () => {
       }),
     );
 
-    await handleQwenAuth('openrouter', { key: 'or-key-123' });
+    await handleHopCodeAuth('openrouter', { key: 'or-key-123' });
 
     expect(mockBackupSettingsFile).toHaveBeenCalledWith('/user.json');
     expect(mockSetValue).toHaveBeenCalledWith(
@@ -244,7 +244,7 @@ describe('handleQwenAuth openrouter', () => {
       }),
     );
 
-    await handleQwenAuth('openrouter', { key: 'or-key-456' });
+    await handleHopCodeAuth('openrouter', { key: 'or-key-456' });
 
     const modelProvidersCall = mockSetValue.mock.calls.find(
       (call) => call[1] === `modelProviders.${AuthType.USE_OPENAI}`,
@@ -279,7 +279,7 @@ describe('handleQwenAuth openrouter', () => {
       authorizationUrl: 'https://openrouter.ai/auth?manual=1',
     });
 
-    await handleQwenAuth('openrouter', {});
+    await handleHopCodeAuth('openrouter', {});
 
     expect(runOpenRouterOAuthLogin).toHaveBeenCalledTimes(1);
     expect(mockSetValue).toHaveBeenCalledWith(
@@ -293,7 +293,7 @@ describe('handleQwenAuth openrouter', () => {
   it('applies OpenRouter provider updates through the shared installer', async () => {
     vi.mocked(loadSettings).mockReturnValue(createMockSettings({}));
 
-    await handleQwenAuth('openrouter', { key: 'or-key-dynamic' });
+    await handleHopCodeAuth('openrouter', { key: 'or-key-dynamic' });
 
     expect(mockSetValue).toHaveBeenCalledWith(
       'user',

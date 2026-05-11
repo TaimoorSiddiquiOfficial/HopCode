@@ -7,6 +7,7 @@
 import * as vscode from 'vscode';
 import { BaseMessageHandler } from './BaseMessageHandler.js';
 import type { ChatMessage } from '../../services/hopcodeAgentManager.js';
+import type { Conversation } from '../../services/conversationStore.js';
 import type { ImageAttachment } from '../../utils/imageSupport.js';
 import type { ApprovalModeValue } from '../../types/approvalModeValueTypes.js';
 import {
@@ -38,12 +39,14 @@ export class SessionMessageHandler extends BaseMessageHandler {
   canHandle(messageType: string): boolean {
     return [
       'sendMessage',
+
+      'editMessage',
       'newHopCodeSession',
       'switchHopCodeSession',
       'getHopCodeSessions',
       'resumeSession',
-      'deleteQwenSession',
-      'renameQwenSession',
+      'deleteHopCodeSession',
+      'renameHopCodeSession',
       'cancelStreaming',
       // UI action: open a new chat tab (new WebviewPanel)
       'openNewChatTab',
@@ -88,17 +91,44 @@ export class SessionMessageHandler extends BaseMessageHandler {
         );
         break;
 
-      case 'newQwenSession':
+      case 'editMessage':
+        await this.handleSendMessage(
+          (data?.text as string) || '',
+          data?.context as
+            | Array<{
+                type: string;
+                name: string;
+                value: string;
+                startLine?: number;
+                endLine?: number;
+              }>
+            | undefined,
+          data?.fileContext as
+            | {
+                fileName: string;
+                filePath: string;
+                startLine?: number;
+                endLine?: number;
+              }
+            | undefined,
+          data?.attachments as ImageAttachment[] | undefined,
+          typeof data?.targetTurnIndex === 'number'
+            ? data.targetTurnIndex
+            : undefined,
+        );
+        break;
+
+      case 'newHopCodeSession':
         await this.handleNewHopCodeSession();
         break;
 
-      case 'switchQwenSession':
+      case 'switchHopCodeSession':
         await this.handleSwitchHopCodeSession(
           (data?.sessionId as string) || '',
         );
         break;
 
-      case 'getQwenSessions':
+      case 'getHopCodeSessions':
         await this.handleGetHopCodeSessions(
           (data?.cursor as number | undefined) ?? undefined,
           (data?.size as number | undefined) ?? undefined,
@@ -109,12 +139,14 @@ export class SessionMessageHandler extends BaseMessageHandler {
         await this.handleResumeSession((data?.sessionId as string) || '');
         break;
 
-      case 'deleteQwenSession':
-        await this.handleDeleteQwenSession((data?.sessionId as string) || '');
+      case 'deleteHopCodeSession':
+        await this.handleDeleteHopCodeSession(
+          (data?.sessionId as string) || '',
+        );
         break;
 
-      case 'renameQwenSession':
-        await this.handleRenameQwenSession(
+      case 'renameHopCodeSession':
+        await this.handleRenameHopCodeSession(
           (data?.sessionId as string) || '',
           (data?.title as string) || '',
         );
@@ -194,6 +226,49 @@ export class SessionMessageHandler extends BaseMessageHandler {
    */
   resetStreamContent(): void {
     this.currentStreamContent = '';
+  }
+
+  private async captureConversationSnapshot(
+    conversationId: string | null,
+  ): Promise<Conversation | null> {
+    if (!conversationId) {
+      return null;
+    }
+
+    const conversation =
+      await this.conversationStore.getConversation(conversationId);
+    if (!conversation) {
+      return null;
+    }
+
+    return {
+      ...conversation,
+      messages: conversation.messages.map((message) => ({ ...message })),
+    };
+  }
+
+  private async restoreConversationSnapshot(
+    snapshot: Conversation | null,
+  ): Promise<void> {
+    if (!snapshot) {
+      return;
+    }
+
+    const restored = await this.conversationStore.replaceMessages(
+      snapshot.id,
+      snapshot.messages,
+    );
+    if (!restored) {
+      console.warn(
+        '[SessionMessageHandler] Failed to restore conversation snapshot; conversation not found:',
+        snapshot.id,
+      );
+    }
+    this.currentConversationId = snapshot.id;
+    this.sendToWebView({
+      type: 'conversationLoaded',
+      data: snapshot,
+    });
   }
 
   /**
@@ -382,6 +457,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       endLine?: number;
     },
     attachments?: ImageAttachment[],
+    editTargetTurnIndex?: number,
   ): Promise<void> {
     console.log('[SessionMessageHandler] handleSendMessage called with:', text);
     // Guard: do not process empty or whitespace-only messages.
@@ -480,6 +556,131 @@ export class SessionMessageHandler extends BaseMessageHandler {
       return;
     }
 
+    let editRestoreSnapshot: Conversation | null = null;
+    let editStoreMutationApplied = false;
+    let editAcpMutationApplied = false;
+    let editAcpHistorySnapshot: unknown[] | null = null;
+
+    if (editTargetTurnIndex !== undefined) {
+      if (!Number.isInteger(editTargetTurnIndex) || editTargetTurnIndex < 0) {
+        const errorMsg = 'Invalid message edit target.';
+        console.error('[SessionMessageHandler]', errorMsg, editTargetTurnIndex);
+        this.sendToWebView({
+          type: 'error',
+          data: { message: errorMsg },
+        });
+        return;
+      }
+
+      if (!this.agentManager.isConnected) {
+        await this.promptAuth(
+          'You need to configure your provider to use HopCode.',
+        );
+        return;
+      }
+
+      if (!this.agentManager.currentSessionId) {
+        try {
+          const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+          const workingDir = workspaceFolder?.uri.fsPath || process.cwd();
+          await this.agentManager.createNewSession(workingDir);
+        } catch (createErr) {
+          console.error(
+            '[SessionMessageHandler] Failed to create session before editing message:',
+            createErr,
+          );
+          const errorMsg = this.getErrorMessage(createErr);
+          if (this.shouldPromptAuth(createErr)) {
+            await this.promptAuth(
+              'Your session has expired or is invalid. Please configure your provider to continue using HopCode.',
+            );
+            return;
+          }
+          vscode.window.showErrorMessage(
+            `Failed to create session: ${errorMsg}`,
+          );
+          return;
+        }
+      }
+
+      try {
+        editRestoreSnapshot = await this.captureConversationSnapshot(
+          this.currentConversationId,
+        );
+      } catch (error) {
+        console.error(
+          '[SessionMessageHandler] Failed to capture edit restore snapshot:',
+          error,
+        );
+        const errorMsg = this.getErrorMessage(error);
+        vscode.window.showErrorMessage(`Failed to edit message: ${errorMsg}`);
+        this.sendToWebView({
+          type: 'error',
+          data: { message: errorMsg },
+        });
+        return;
+      }
+
+      if (!editRestoreSnapshot) {
+        const errorMsg = 'Failed to capture conversation state before editing.';
+        console.error('[SessionMessageHandler]', errorMsg);
+        vscode.window.showErrorMessage(`Failed to edit message: ${errorMsg}`);
+        this.sendToWebView({
+          type: 'error',
+          data: { message: errorMsg },
+        });
+        return;
+      }
+
+      try {
+        const truncated = await this.conversationStore.truncateFromUserTurn(
+          this.currentConversationId,
+          editTargetTurnIndex,
+        );
+        if (!truncated) {
+          throw new Error('Conversation not found for edit target.');
+        }
+        editStoreMutationApplied = true;
+
+        const rewindResult =
+          await this.agentManager.rewindSession(editTargetTurnIndex);
+        editAcpHistorySnapshot = rewindResult?.historyBeforeRewind ?? null;
+        editAcpMutationApplied = true;
+
+        this.sendToWebView({
+          type: 'conversationRewound',
+          data: { targetTurnIndex: editTargetTurnIndex },
+        });
+      } catch (error) {
+        if (editAcpMutationApplied && editAcpHistorySnapshot) {
+          try {
+            await this.agentManager.restoreSessionHistory(
+              editAcpHistorySnapshot,
+            );
+          } catch (restoreError) {
+            console.warn(
+              '[SessionMessageHandler] Failed to restore ACP history after rewind failure:',
+              restoreError,
+            );
+          }
+        }
+        if (editStoreMutationApplied) {
+          await this.restoreConversationSnapshot(editRestoreSnapshot);
+        }
+        const errorMsg = this.getErrorMessage(error);
+        console.error(
+          '[SessionMessageHandler] Failed to rewind session:',
+          error,
+        );
+        vscode.window.showErrorMessage(`Failed to edit message: ${errorMsg}`);
+        this.sendToWebView({
+          type: 'error',
+          data: { message: errorMsg },
+        });
+        return;
+      }
+    }
+
     // Check if this is the first message
     let isFirstMessage = false;
     try {
@@ -513,10 +714,40 @@ export class SessionMessageHandler extends BaseMessageHandler {
       timestamp: Date.now(),
     };
 
-    await this.conversationStore.addMessage(
-      this.currentConversationId,
-      userMessage,
-    );
+    try {
+      await this.conversationStore.addMessage(
+        this.currentConversationId,
+        userMessage,
+      );
+    } catch (error) {
+      console.error(
+        '[SessionMessageHandler] Failed to save user message:',
+        error,
+      );
+
+      if (editAcpMutationApplied && editAcpHistorySnapshot) {
+        try {
+          await this.agentManager.restoreSessionHistory(editAcpHistorySnapshot);
+        } catch (restoreError) {
+          console.warn(
+            '[SessionMessageHandler] Failed to restore ACP history after user message save failure:',
+            restoreError,
+          );
+        }
+      }
+
+      if (editStoreMutationApplied) {
+        await this.restoreConversationSnapshot(editRestoreSnapshot);
+      }
+
+      const errorMsg = this.getErrorMessage(error);
+      vscode.window.showErrorMessage(`Failed to edit message: ${errorMsg}`);
+      this.sendToWebView({
+        type: 'error',
+        data: { message: errorMsg },
+      });
+      return;
+    }
 
     this.sendToWebView({
       type: 'message',
@@ -617,6 +848,21 @@ export class SessionMessageHandler extends BaseMessageHandler {
       }
     } catch (error) {
       console.error('[SessionMessageHandler] Error sending message:', error);
+
+      if (editAcpMutationApplied && editAcpHistorySnapshot) {
+        try {
+          await this.agentManager.restoreSessionHistory(editAcpHistorySnapshot);
+        } catch (restoreError) {
+          console.warn(
+            '[SessionMessageHandler] Failed to restore ACP history after send failure:',
+            restoreError,
+          );
+        }
+      }
+
+      if (editStoreMutationApplied) {
+        await this.restoreConversationSnapshot(editRestoreSnapshot);
+      }
 
       const err = error as unknown as Error;
       // Safely convert error to string
@@ -769,7 +1015,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
             await this.agentManager.getSessionMessages(sessionId);
           this.currentConversationId = sessionId;
           this.sendToWebView({
-            type: 'qwenSessionSwitched',
+            type: 'hopcodeSessionSwitched',
             data: { sessionId, messages },
           });
           this.sendToWebView({
@@ -814,7 +1060,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         // Set current id and clear UI first so replayed updates append afterwards
         this.currentConversationId = sessionId;
         this.sendToWebView({
-          type: 'qwenSessionSwitched',
+          type: 'hopcodeSessionSwitched',
           data: { sessionId, messages: [], session: sessionDetails },
         });
 
@@ -880,7 +1126,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
             this.currentConversationId = sessionId;
 
             this.sendToWebView({
-              type: 'qwenSessionSwitched',
+              type: 'hopcodeSessionSwitched',
               data: { sessionId, messages, session: sessionDetails },
             });
             this.sendToWebView({
@@ -930,7 +1176,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
           // Offline view only
           this.currentConversationId = sessionId;
           this.sendToWebView({
-            type: 'qwenSessionSwitched',
+            type: 'hopcodeSessionSwitched',
             data: { sessionId, messages, session: sessionDetails },
           });
           this.sendToWebView({
@@ -983,7 +1229,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       });
       const append = typeof cursor === 'number';
       this.sendToWebView({
-        type: 'qwenSessionList',
+        type: 'hopcodeSessionList',
         data: {
           sessions: page.sessions,
           nextCursor: page.nextCursor,
@@ -1055,7 +1301,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
             await this.agentManager.getSessionMessages(sessionId);
           this.currentConversationId = sessionId;
           this.sendToWebView({
-            type: 'qwenSessionSwitched',
+            type: 'hopcodeSessionSwitched',
             data: { sessionId, messages },
           });
           vscode.window.showInformationMessage(
@@ -1072,7 +1318,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         // Pre-clear UI so replayed updates append afterwards
         this.currentConversationId = sessionId;
         this.sendToWebView({
-          type: 'qwenSessionSwitched',
+          type: 'hopcodeSessionSwitched',
           data: { sessionId, messages: [] },
         });
 
@@ -1131,7 +1377,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
   /**
    * Handle delete session request
    */
-  private async handleDeleteQwenSession(sessionId: string): Promise<void> {
+  private async handleDeleteHopCodeSession(sessionId: string): Promise<void> {
     try {
       if (
         sessionId === this.currentConversationId ||
@@ -1168,7 +1414,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
   /**
    * Handle rename session request
    */
-  private async handleRenameQwenSession(
+  private async handleRenameHopCodeSession(
     sessionId: string,
     title: string,
   ): Promise<void> {
@@ -1250,7 +1496,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
       if (!modelId) {
         throw new Error('Model ID is required');
       }
-      // Defensive guard: refuse non-runtime Qwen OAuth models in case the UI
+      // Defensive guard: refuse non-runtime HopCode OAuth models in case the UI
       // is bypassed (programmatic call, stale webview, restored session).
       if (isDiscontinuedModel(modelId)) {
         console.warn(

@@ -19,10 +19,10 @@ import {
   runOpenRouterOAuthLogin,
 } from '../../auth/providers/oauth/openrouterOAuth.js';
 
-vi.mock('../hooks/useQwenAuth.js', () => ({
-  useQwenAuth: vi.fn(() => ({
-    qwenAuthState: {},
-    cancelQwenAuth: vi.fn(),
+vi.mock('../hooks/useHopCodeAuth.js', () => ({
+  useHopCodeAuth: vi.fn(() => ({
+    hopCodeAuthState: {},
+    cancelHopCodeAuth: vi.fn(),
   })),
 }));
 
@@ -602,7 +602,7 @@ describe('generateCustomApiKeyEnvKey', () => {
       AuthType.USE_OPENAI,
       'https://api.openai.com/v1',
     );
-    expect(key).toMatch(/^QWEN_CUSTOM_API_KEY_[A-Z0-9_]+$/);
+    expect(key).toMatch(/^HOPCODE_CUSTOM_API_KEY_[A-Z0-9_]+$/);
     const key2 = generateCustomApiKeyEnvKey(
       AuthType.USE_OPENAI,
       'https://api.openai.com/v1',

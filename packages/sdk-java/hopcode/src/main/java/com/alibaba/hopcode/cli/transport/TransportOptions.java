@@ -14,9 +14,9 @@ import com.alibaba.hopcode.cli.utils.Timeout;
  */
 public class TransportOptions implements Cloneable {
     /**
-     * Path to the Qwen executable.
+     * Path to the HopCode executable.
      */
-    private String pathToQwenExecutable;
+    private String pathToHopCodeExecutable;
     /**
      * Current working directory for the CLI process.
      */
@@ -75,22 +75,22 @@ public class TransportOptions implements Cloneable {
     private List<String> otherOptions;
 
     /**
-     * Gets the path to the Qwen executable.
+     * Gets the path to the HopCode executable.
      *
-     * @return The path to the Qwen executable
+     * @return The path to the HopCode executable
      */
-    public String getPathToQwenExecutable() {
-        return pathToQwenExecutable;
+    public String getPathToHopCodeExecutable() {
+        return pathToHopCodeExecutable;
     }
 
     /**
-     * Sets the path to the Qwen executable.
+     * Sets the path to the HopCode executable.
      *
-     * @param pathToQwenExecutable The path to the Qwen executable
+     * @param pathToHopCodeExecutable The path to the HopCode executable
      * @return This instance for method chaining
      */
-    public TransportOptions setPathToQwenExecutable(String pathToQwenExecutable) {
-        this.pathToQwenExecutable = pathToQwenExecutable;
+    public TransportOptions setPathToHopCodeExecutable(String pathToHopCodeExecutable) {
+        this.pathToHopCodeExecutable = pathToHopCodeExecutable;
         return this;
     }
 

@@ -1,14 +1,14 @@
-name: 'Qwen Issue Follow-up Bot'
+name: 'HopCode Issue Follow-up Bot'
 
 # Required for automatic runs:
-# - Repository variable QWEN_ISSUE_FOLLOWUP_BOT_ENABLED=true.
-# - Optional repository variable QWEN_ISSUE_FOLLOWUP_BOT_ISSUES_DRY_RUN=false
+# - Repository variable HOPCODE_ISSUE_FOLLOWUP_BOT_ENABLED=true.
+# - Optional repository variable HOPCODE_ISSUE_FOLLOWUP_BOT_ISSUES_DRY_RUN=false
 #   enables real writes for newly opened issues.
-# - Optional repository variable QWEN_ISSUE_FOLLOWUP_BOT_SCHEDULE_DRY_RUN=false
+# - Optional repository variable HOPCODE_ISSUE_FOLLOWUP_BOT_SCHEDULE_DRY_RUN=false
 #   enables real writes for scheduled batch runs.
-# - Legacy repository variable QWEN_ISSUE_FOLLOWUP_BOT_DRY_RUN is still used as
+# - Legacy repository variable HOPCODE_ISSUE_FOLLOWUP_BOT_DRY_RUN is still used as
 #   a fallback for both automatic paths.
-# - Secret QWEN_CODE_BOT_TOKEN is preferred; CI_BOT_PAT is a fallback.
+# - Secret HOPCODE_BOT_TOKEN is preferred; CI_BOT_PAT is a fallback.
 
 on:
   issues:
@@ -46,7 +46,7 @@ permissions:
   issues: 'write'
 
 env:
-  BOT_GITHUB_TOKEN: '${{ secrets.QWEN_CODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
+  BOT_GITHUB_TOKEN: '${{ secrets.HOPCODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
 
 jobs:
   follow-up-issues:
@@ -54,7 +54,7 @@ jobs:
     if: |-
       ${{
         github.repository == 'QwenLM/qwen-code' &&
-        (github.event_name == 'workflow_dispatch' || vars.QWEN_ISSUE_FOLLOWUP_BOT_ENABLED == 'true') &&
+        (github.event_name == 'workflow_dispatch' || vars.HOPCODE_ISSUE_FOLLOWUP_BOT_ENABLED == 'true') &&
         (github.event_name != 'issues' || github.event.issue.pull_request == null)
       }}
     runs-on: 'ubuntu-latest'
@@ -65,15 +65,15 @@ jobs:
           EVENT_NAME: '${{ github.event_name }}'
           GH_TOKEN: '${{ env.BOT_GITHUB_TOKEN }}'
           DISPATCH_DRY_RUN: "${{ github.event.inputs.dry_run || 'true' }}"
-          ISSUE_OPENED_DRY_RUN: "${{ vars.QWEN_ISSUE_FOLLOWUP_BOT_ISSUES_DRY_RUN || vars.QWEN_ISSUE_FOLLOWUP_BOT_DRY_RUN || 'true' }}"
-          SCHEDULE_DRY_RUN: "${{ vars.QWEN_ISSUE_FOLLOWUP_BOT_SCHEDULE_DRY_RUN || vars.QWEN_ISSUE_FOLLOWUP_BOT_DRY_RUN || 'true' }}"
+          ISSUE_OPENED_DRY_RUN: "${{ vars.HOPCODE_ISSUE_FOLLOWUP_BOT_ISSUES_DRY_RUN || vars.HOPCODE_ISSUE_FOLLOWUP_BOT_DRY_RUN || 'true' }}"
+          SCHEDULE_DRY_RUN: "${{ vars.HOPCODE_ISSUE_FOLLOWUP_BOT_SCHEDULE_DRY_RUN || vars.HOPCODE_ISSUE_FOLLOWUP_BOT_DRY_RUN || 'true' }}"
           SCHEDULED_LIMIT_INPUT: "${{ github.event.inputs.scheduled_limit || '10' }}"
           SCHEDULED_LIMIT_MAX: '50'
         run: |-
           set -euo pipefail
 
           if [[ -z "${BOT_GITHUB_TOKEN}" ]]; then
-            echo '::error::QWEN_CODE_BOT_TOKEN or CI_BOT_PAT is required.'
+            echo '::error::HOPCODE_BOT_TOKEN or CI_BOT_PAT is required.'
             exit 1
           fi
 

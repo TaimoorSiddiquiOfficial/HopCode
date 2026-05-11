@@ -15,7 +15,7 @@ pip install hopcode-sdk
 - External `hopcode` CLI installed and available in `PATH`
 
 You can also point the SDK at an explicit CLI binary or script with
-`path_to_hopcode_executable` (or the legacy `path_to_qwen_executable`).
+`path_to_hopcode_executable` (or the legacy `path_to_hopcode_executable`).
 
 ## Quick Start
 
@@ -51,7 +51,7 @@ from hopcode_sdk import query_sync
 with query_sync(
     "Say hello",
     {
-        "path_to_qwen_executable": "qwen",
+        "path_to_hopcode_executable": "hopcode",
     },
 ) as result:
     for message in result:
@@ -83,7 +83,7 @@ async def can_use_tool(tool_name, tool_input, context):
 result = query(
     "Create hello.txt",
     {
-        "path_to_qwen_executable": "qwen",
+        "path_to_hopcode_executable": "hopcode",
         "can_use_tool": can_use_tool,
     },
 )

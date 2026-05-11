@@ -13,7 +13,7 @@ from .types import (
 )
 
 _VALID_PERMISSION_MODES = {"default", "plan", "auto-edit", "izn"}
-_VALID_AUTH_TYPES = {"openai", "anthropic", "qwen-oauth", "gemini", "vertex-ai"}
+_VALID_AUTH_TYPES = {"openai", "anthropic", "hopcode-oauth", "gemini", "vertex-ai"}
 
 
 def validate_query_options(options: QueryOptions) -> None:
@@ -29,7 +29,7 @@ def validate_query_options(options: QueryOptions) -> None:
     if options.auth_type and options.auth_type not in _VALID_AUTH_TYPES:
         raise ValidationError(
             f"Invalid auth_type: {options.auth_type!r}. "
-            "Expected one of: openai, anthropic, qwen-oauth, gemini, vertex-ai."
+            "Expected one of: openai, anthropic, hopcode-oauth, gemini, vertex-ai."
         )
 
     _validate_optional_callable(options.can_use_tool, _validate_can_use_tool_callable)
@@ -64,10 +64,10 @@ def validate_query_options(options: QueryOptions) -> None:
     ):
         raise ValidationError("path_to_hopcode_executable cannot be empty")
     if (
-        options.path_to_qwen_executable is not None
-        and not options.path_to_qwen_executable.strip()
+        options.path_to_hopcode_executable is not None
+        and not options.path_to_hopcode_executable.strip()
     ):
-        raise ValidationError("path_to_qwen_executable cannot be empty")
+        raise ValidationError("path_to_hopcode_executable cannot be empty")
 
     if options.mcp_servers:
         raise ValidationError(

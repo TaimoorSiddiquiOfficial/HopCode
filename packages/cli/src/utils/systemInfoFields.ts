@@ -101,7 +101,7 @@ function formatAuth(info: ExtendedSystemInfo): string {
 
   if (
     info.selectedAuthType.startsWith('oauth') ||
-    info.selectedAuthType === 'qwen-oauth'
+    info.selectedAuthType === 'hopcode-oauth'
   ) {
     return 'OAuth';
   }
@@ -116,7 +116,7 @@ function formatBaseUrl(info: ExtendedSystemInfo): string {
 
   if (
     info.selectedAuthType.startsWith('oauth') ||
-    info.selectedAuthType === 'qwen-oauth'
+    info.selectedAuthType === 'hopcode-oauth'
   ) {
     return '';
   }

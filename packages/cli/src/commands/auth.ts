@@ -6,7 +6,7 @@
 
 import type { CommandModule, Argv } from 'yargs';
 import {
-  handleQwenAuth,
+  handleHopCodeAuth,
   runInteractiveAuth,
   showAuthStatus,
   handleApiKeyAuthSetup,
@@ -63,9 +63,9 @@ const codePlanCommand = {
     const key = argv['key'] as string | undefined;
 
     if (baseUrl && key) {
-      await handleQwenAuth('coding-plan', { baseUrl, key });
+      await handleHopCodeAuth('coding-plan', { baseUrl, key });
     } else {
-      await handleQwenAuth('coding-plan', {});
+      await handleHopCodeAuth('coding-plan', {});
     }
   },
 };
@@ -94,7 +94,7 @@ const openRouterCommand = {
     if (key) {
       await handleApiKeyAuth('openrouter', { apiKey: key });
     } else {
-      await handleQwenAuth('openrouter', {});
+      await handleHopCodeAuth('openrouter', {});
     }
   },
 };

@@ -56,7 +56,7 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 #### Changes:
 
 - [ ] `scripts/installation/install-qwen-with-source.sh`
-  - `QWEN_DIR="${HOME}/.qwen"` → `HOPCODE_DIR="${HOME}/.hopcode"`
+  - `HOPCODE_DIR="${HOME}/.qwen"` → `HOPCODE_DIR="${HOME}/.hopcode"`
   - Update all path references
 
 - [ ] `scripts/installation/install-qwen-with-source.bat`
@@ -66,25 +66,25 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 - [ ] `packages/core/src/config/*`
 - [ ] `.gitignore` → `.hopcode/` entry
 
-### 1.4 Environment Variables (`QWEN_CODE_*` → `HOPCODE_*`)
+### 1.4 Environment Variables (`HOPCODE_*` → `HOPCODE_*`)
 
 **Impact:** Breaking change for users with custom env configs
 
-| Old Variable                     | New Variable                   |
-| -------------------------------- | ------------------------------ |
-| `QWEN_CODE_*`                    | `HOPCODE_*`                    |
-| `QWEN_SANDBOX`                   | `HOPCODE_SANDBOX`              |
-| `QWEN_WORKING_DIR`               | `HOPCODE_WORKING_DIR`          |
-| `QWEN_CODE_NO_RELAUNCH`          | `HOPCODE_NO_RELAUNCH`          |
-| `QWEN_CODE_TRUSTED_FOLDERS_PATH` | `HOPCODE_TRUSTED_FOLDERS_PATH` |
-| `QWEN_CODE_SYSTEM_SETTINGS_PATH` | `HOPCODE_SYSTEM_SETTINGS_PATH` |
-| `QWEN_CODE_IDE_SERVER_PORT`      | `HOPCODE_IDE_SERVER_PORT`      |
-| `QWEN_CODE_IDE_WORKSPACE_PATH`   | `HOPCODE_IDE_WORKSPACE_PATH`   |
-| `QWEN_CODE_LANG`                 | `HOPCODE_LANG`                 |
-| `QWEN_CODE_ENABLE_CRON`          | `HOPCODE_ENABLE_CRON`          |
-| `QWEN_CODE_MAX_OUTPUT_TOKENS`    | `HOPCODE_MAX_OUTPUT_TOKENS`    |
-| `QWEN_CODE_INTEGRATION_TEST`     | `HOPCODE_INTEGRATION_TEST`     |
-| `QWEN_CODE_PROFILE_STARTUP`      | `HOPCODE_PROFILE_STARTUP`      |
+| Old Variable                   | New Variable                   |
+| ------------------------------ | ------------------------------ |
+| `HOPCODE_*`                    | `HOPCODE_*`                    |
+| `HOPCODE_SANDBOX`              | `HOPCODE_SANDBOX`              |
+| `HOPCODE_WORKING_DIR`          | `HOPCODE_WORKING_DIR`          |
+| `HOPCODE_NO_RELAUNCH`          | `HOPCODE_NO_RELAUNCH`          |
+| `HOPCODE_TRUSTED_FOLDERS_PATH` | `HOPCODE_TRUSTED_FOLDERS_PATH` |
+| `HOPCODE_SYSTEM_SETTINGS_PATH` | `HOPCODE_SYSTEM_SETTINGS_PATH` |
+| `HOPCODE_IDE_SERVER_PORT`      | `HOPCODE_IDE_SERVER_PORT`      |
+| `HOPCODE_IDE_WORKSPACE_PATH`   | `HOPCODE_IDE_WORKSPACE_PATH`   |
+| `HOPCODE_LANG`                 | `HOPCODE_LANG`                 |
+| `HOPCODE_ENABLE_CRON`          | `HOPCODE_ENABLE_CRON`          |
+| `HOPCODE_MAX_OUTPUT_TOKENS`    | `HOPCODE_MAX_OUTPUT_TOKENS`    |
+| `HOPCODE_INTEGRATION_TEST`     | `HOPCODE_INTEGRATION_TEST`     |
+| `HOPCODE_PROFILE_STARTUP`      | `HOPCODE_PROFILE_STARTUP`      |
 
 ---
 
@@ -153,7 +153,7 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 #### Source Files:
 
 - [ ] `qwenCode.*` commands → `hopcodeCode.*`
-- [ ] `QWEN_CODE_*` env vars → `HOPCODE_*`
+- [ ] `HOPCODE_*` env vars → `HOPCODE_*`
 
 ### 2.4 Zed Extension
 
@@ -244,7 +244,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 | `QwenCode*` | `HopCode*`     | 332+  |
 | `qwenCode*` | `hopcodeCode*` | 100+  |
 | `qwen-*`    | `hopcode-*`    | 1854+ |
-| `QWEN_*`    | `HOPCODE_*`    | 500+  |
+| `HOPCODE_*` | `HOPCODE_*`    | 500+  |
 | `qwenlm`    | `hopcode`      | 123+  |
 | `QwenLM`    | `HopCode`      | 100+  |
 
@@ -537,7 +537,7 @@ alias qwen='hopcode'  # Optional: temporary alias
 | CLI Command  | `qwen`                           | `hopcode`                      |
 | Config Dir   | `.qwen/`                         | `.hopcode/`                    |
 | NPM Scope    | `@qwen-code/`                    | `@hoptrendy/`                  |
-| Env Vars     | `QWEN_CODE_*`                    | `HOPCODE_*`                    |
+| Env Vars     | `HOPCODE_*`                      | `HOPCODE_*`                    |
 | CSS Classes  | `.qwen-*`                        | `.hopcode-*`                   |
 | VS Code Ext  | `qwen-code-vscode-ide-companion` | `hopcode-vscode-ide-companion` |
 | Zed Ext      | `qwen-code`                      | `hopcode`                      |

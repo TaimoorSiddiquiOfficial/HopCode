@@ -46,6 +46,7 @@ import { parseSubagentModelSelection } from './model-selection.js';
 const debugLogger = createDebugLogger('SUBAGENT_MANAGER');
 import { BuiltinAgentRegistry } from './builtin-agents.js';
 import { ToolDisplayNamesMigration } from '../tools/tool-names.js';
+import { Storage } from '../config/storage.js';
 import {
   hasRebuiltToolRegistry,
   rebuildToolRegistryOnOverride,
@@ -919,7 +920,7 @@ export class SubagentManager {
             HOPCODE_CONFIG_DIR,
             AGENT_CONFIG_DIR,
           )
-        : path.join(os.homedir(), HOPCODE_CONFIG_DIR, AGENT_CONFIG_DIR);
+        : path.join(Storage.getGlobalHopCodeDir(), AGENT_CONFIG_DIR);
 
     return path.join(baseDir, `${name}.md`);
   }
@@ -954,8 +955,10 @@ export class SubagentManager {
       return [];
     }
 
-    let baseDir = level === 'project' ? projectRoot : homeDir;
-    baseDir = path.join(baseDir, HOPCODE_CONFIG_DIR, AGENT_CONFIG_DIR);
+    const baseDir =
+      level === 'project'
+        ? path.join(projectRoot, HOPCODE_CONFIG_DIR, AGENT_CONFIG_DIR)
+        : path.join(Storage.getGlobalHopCodeDir(), AGENT_CONFIG_DIR);
 
     try {
       const files = await fs.readdir(baseDir);

@@ -119,7 +119,7 @@ function applyTimeoutEnvOverride(
 ): void {
   if (modelProvider?.generationConfig?.timeout !== undefined) return;
 
-  const raw = env['HOPCODE_API_TIMEOUT_MS'] ?? env['QWEN_CODE_API_TIMEOUT_MS'];
+  const raw = env['HOPCODE_API_TIMEOUT_MS'] ?? env['HOPCODE_API_TIMEOUT_MS'];
   if (raw === undefined) return;
 
   const parsed = Number(raw);
@@ -152,7 +152,7 @@ export function resolveModelConfig(
 
   // Special handling for HopCode OAuth
   if (authType === AuthType.HOPCODE_OAUTH) {
-    return resolveQwenOAuthConfig(input, warnings);
+    return resolveHopCodeOAuthConfig(input, warnings);
   }
 
   // Get auth-specific env var mappings.
@@ -273,7 +273,7 @@ export function resolveModelConfig(
     sources,
   );
 
-  // ---- Env override: QWEN_CODE_API_TIMEOUT_MS ----
+  // ---- Env override: HOPCODE_API_TIMEOUT_MS ----
   applyTimeoutEnvOverride(env, generationConfig, sources, modelProvider);
 
   // Build final config
@@ -302,7 +302,7 @@ export function resolveModelConfig(
  * Special resolver for HopCode OAuth authentication.
  * HopCode OAuth has fixed model options and uses dynamic tokens.
  */
-function resolveQwenOAuthConfig(
+function resolveHopCodeOAuthConfig(
   input: ModelConfigSourcesInput,
   warnings: string[],
 ): ModelConfigResolutionResult {
@@ -354,7 +354,7 @@ function resolveQwenOAuthConfig(
     sources,
   );
 
-  // ---- Env override: QWEN_CODE_API_TIMEOUT_MS ----
+  // ---- Env override: HOPCODE_API_TIMEOUT_MS ----
   applyTimeoutEnvOverride(input.env, generationConfig, sources, modelProvider);
 
   const config: ContentGeneratorConfig = {

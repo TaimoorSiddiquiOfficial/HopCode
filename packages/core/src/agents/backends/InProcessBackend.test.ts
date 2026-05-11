@@ -21,7 +21,7 @@ vi.mock('../../core/contentGenerator.js', () => ({
   }),
   AuthType: {
     USE_OPENAI: 'openai',
-    HOPCODE_OAUTH: 'qwen-oauth',
+    HOPCODE_OAUTH: 'hopcode-oauth',
     USE_GEMINI: 'gemini',
     USE_VERTEX_AI: 'vertex-ai',
     USE_ANTHROPIC: 'anthropic',
@@ -527,7 +527,7 @@ describe('InProcessBackend', () => {
     const exitCallback = vi.fn();
     backend.setOnAgentExit(exitCallback);
 
-    // spawnAgent should NOT throw — it catches the error internally
+    // spawnAgent should NOT throw ï¿½ it catches the error internally
     await expect(
       backend.spawnAgent(createSpawnConfig('agent-fail')),
     ).resolves.toBeUndefined();
@@ -657,7 +657,7 @@ describe('InProcessBackend', () => {
         apiKey: 'bad-key',
       };
 
-      // Should not throw — falls back gracefully
+      // Should not throw ï¿½ falls back gracefully
       await expect(backend.spawnAgent(config)).resolves.toBeUndefined();
 
       const MockAgentCore = AgentCore as unknown as ReturnType<typeof vi.fn>;

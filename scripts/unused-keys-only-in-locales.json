@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-24T07:06:13.173Z",
+  "generatedAt": "2026-04-28T03:29:36.589Z",
   "keys": [
     "  Models: Qwen latest models\n",
     "  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)",
@@ -171,7 +171,7 @@
     "Run managed auto-memory extraction for the current session.",
     "Save a durable memory using the save_memory tool.",
     "Save the current conversation as a checkpoint. Usage: /chat save <tag>",
-    "Saved in .qwen/settings.local.json",
+    "Saved in .hopcode/settings.local.json",
     "Scope subcommands do not accept additional arguments.",
     "Select API-KEY configuration mode:",
     "Select the scope for this action:",

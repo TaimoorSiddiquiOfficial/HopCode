@@ -268,7 +268,7 @@ short-circuits the rest so the cheap ones run first:
 3. `autoTitleAttempts >= 3` → skip. Cap bounds total waste.
 4. `!config.isInteractive()` → skip. Headless `hopcode -p` / CI never spends
    fast-model tokens on a one-shot session.
-5. `autoTitleDisabledByEnv()` → skip. `QWEN_DISABLE_AUTO_TITLE=1`
+5. `autoTitleDisabledByEnv()` → skip. `HOPCODE_DISABLE_AUTO_TITLE=1`
    explicit opt-out.
 6. `!config.getFastModel()` → skip. No fast-model → no-op.
 
@@ -316,10 +316,10 @@ AND the cross-process re-read both run; manual wins at both layers.
 
 ### User-facing knobs
 
-| Setting / env var           | Default | Effect                                                                                              |
-| --------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
-| `fastModel`                 | unset   | Required for auto-titling. Unset → no-op (no main-model fallback).                                  |
-| `QWEN_DISABLE_AUTO_TITLE=1` | unset   | Opt out of the auto trigger without unsetting `fastModel`. `/rename --auto` still works on request. |
+| Setting / env var              | Default | Effect                                                                                              |
+| ------------------------------ | ------- | --------------------------------------------------------------------------------------------------- |
+| `fastModel`                    | unset   | Required for auto-titling. Unset → no-op (no main-model fallback).                                  |
+| `HOPCODE_DISABLE_AUTO_TITLE=1` | unset   | Opt out of the auto trigger without unsetting `fastModel`. `/rename --auto` still works on request. |
 
 No `settings.json` toggle — the env var is the only user-visible
 off-switch. Rationale: the feature is cosmetic and cheap; a settings

@@ -207,12 +207,12 @@ export class SharedTokenManager {
    * @throws TokenManagerError if unable to obtain valid credentials
    */
   async getValidCredentials(
-    qwenClient: IHopCodeOAuth2Client,
+    hopcodeClient: IHopCodeOAuth2Client,
     forceRefresh = false,
   ): Promise<HopCodeCredentials> {
     try {
       // Check if credentials file has been updated by other sessions
-      await this.checkAndReloadIfNeeded(qwenClient);
+      await this.checkAndReloadIfNeeded(hopcodeClient);
 
       // Return valid cached credentials if available (unless force refresh is requested)
       if (
@@ -229,7 +229,7 @@ export class SharedTokenManager {
       if (!currentRefreshPromise) {
         // Start new refresh operation with distributed locking
         currentRefreshPromise = this.performTokenRefresh(
-          qwenClient,
+          hopcodeClient,
           forceRefresh,
         );
         this.refreshPromise = currentRefreshPromise;
@@ -263,7 +263,7 @@ export class SharedTokenManager {
    * Uses promise-based locking to prevent concurrent file checks
    */
   private async checkAndReloadIfNeeded(
-    qwenClient?: IHopCodeOAuth2Client,
+    hopcodeClient?: IHopCodeOAuth2Client,
   ): Promise<void> {
     // If there's already an ongoing check, wait for it to complete
     if (this.checkPromise) {
@@ -284,7 +284,7 @@ export class SharedTokenManager {
     }
 
     // Start the check operation and store the promise
-    this.checkPromise = this.performFileCheck(qwenClient, now);
+    this.checkPromise = this.performFileCheck(hopcodeClient, now);
 
     try {
       await this.checkPromise;
@@ -328,7 +328,7 @@ export class SharedTokenManager {
    * This is separated to enable proper promise-based synchronization
    */
   private async performFileCheck(
-    qwenClient: IHopCodeOAuth2Client | undefined,
+    hopcodeClient: IHopCodeOAuth2Client | undefined,
     checkTime: number,
   ): Promise<void> {
     // Update lastCheck atomically at the start to prevent other calls from proceeding
@@ -346,7 +346,7 @@ export class SharedTokenManager {
 
       // Reload credentials if file has been modified since last cache
       if (fileModTime > this.memoryCache.fileModTime) {
-        await this.reloadCredentialsFromFile(qwenClient);
+        await this.reloadCredentialsFromFile(hopcodeClient);
         // Update fileModTime only after successful reload
         this.memoryCache.fileModTime = fileModTime;
       }
@@ -377,7 +377,7 @@ export class SharedTokenManager {
    * Force a file check without time-based throttling (used during refresh operations)
    */
   private async forceFileCheck(
-    qwenClient?: IHopCodeOAuth2Client,
+    hopcodeClient?: IHopCodeOAuth2Client,
   ): Promise<void> {
     try {
       const filePath = this.getCredentialFilePath();
@@ -386,7 +386,7 @@ export class SharedTokenManager {
 
       // Reload credentials if file has been modified since last cache
       if (fileModTime > this.memoryCache.fileModTime) {
-        await this.reloadCredentialsFromFile(qwenClient);
+        await this.reloadCredentialsFromFile(hopcodeClient);
         // Update cache state atomically
         this.memoryCache.fileModTime = fileModTime;
         this.memoryCache.lastCheck = Date.now();
@@ -417,7 +417,7 @@ export class SharedTokenManager {
    * Load credentials from the file system into memory cache and sync with hopcodeClient
    */
   private async reloadCredentialsFromFile(
-    qwenClient?: IHopCodeOAuth2Client,
+    hopcodeClient?: IHopCodeOAuth2Client,
   ): Promise<void> {
     try {
       const filePath = this.getCredentialFilePath();
@@ -433,8 +433,8 @@ export class SharedTokenManager {
 
       // Sync with hopcodeClient atomically - rollback on failure
       try {
-        if (qwenClient) {
-          qwenClient.setCredentials(credentials);
+        if (hopcodeClient) {
+          hopcodeClient.setCredentials(credentials);
         }
       } catch (clientError) {
         // Rollback memory cache on client sync failure
@@ -465,7 +465,7 @@ export class SharedTokenManager {
    * @throws TokenManagerError if refresh fails or lock cannot be acquired
    */
   private async performTokenRefresh(
-    qwenClient: IHopCodeOAuth2Client,
+    hopcodeClient: IHopCodeOAuth2Client,
     forceRefresh = false,
   ): Promise<HopCodeCredentials> {
     const startTime = Date.now();
@@ -474,7 +474,7 @@ export class SharedTokenManager {
 
     try {
       // Check if we have a refresh token before attempting refresh
-      const currentCredentials = qwenClient.getCredentials();
+      const currentCredentials = hopcodeClient.getCredentials();
       if (!currentCredentials.refresh_token) {
         // console.debug('create a NO_REFRESH_TOKEN error');
         throw new TokenManagerError(
@@ -498,7 +498,7 @@ export class SharedTokenManager {
 
       // Double-check if another process already refreshed the token (unless force refresh is requested)
       // Skip the time-based throttling since we're already in a locked refresh operation
-      await this.forceFileCheck(qwenClient);
+      await this.forceFileCheck(hopcodeClient);
 
       // Use refreshed credentials if they're now valid (unless force refresh is requested)
       if (
@@ -511,7 +511,7 @@ export class SharedTokenManager {
       }
 
       // Perform the actual token refresh
-      const response = await qwenClient.refreshAccessToken();
+      const response = await hopcodeClient.refreshAccessToken();
 
       // Check if the token refresh is taking too long
       const totalOperationTime = Date.now() - startTime;
@@ -551,7 +551,7 @@ export class SharedTokenManager {
 
       // Update memory cache and client credentials atomically
       this.memoryCache.credentials = credentials;
-      qwenClient.setCredentials(credentials);
+      hopcodeClient.setCredentials(credentials);
 
       // Persist to file and update modification time
       await this.saveCredentialsToFile(credentials);

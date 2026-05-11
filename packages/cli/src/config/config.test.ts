@@ -497,6 +497,80 @@ describe('parseArguments', () => {
     mockExit.mockRestore();
   });
 
+  it('should reject --json-schema with no prompt source when stdin is a TTY', async () => {
+    // True interactive invocation with no prompt anywhere → fail fast.
+    process.argv = ['node', 'script.js', '--json-schema', '{"type":"object"}'];
+
+    const originalIsTTY = process.stdin.isTTY;
+    process.stdin.isTTY = true;
+    const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit called');
+    });
+    mockWriteStderrLine.mockClear();
+
+    try {
+      await expect(parseArguments()).rejects.toThrow('process.exit called');
+      expect(mockWriteStderrLine).toHaveBeenCalledWith(
+        expect.stringContaining(
+          '--json-schema only applies to non-interactive mode',
+        ),
+      );
+    } finally {
+      mockExit.mockRestore();
+      process.stdin.isTTY = originalIsTTY;
+    }
+  });
+
+  it('should accept --json-schema with no -p / positional when stdin is piped', async () => {
+    // `echo "..." | qwen --json-schema ...` — input arrives via the
+    // pipe, so the prompt-presence check must not block the run.
+    process.argv = ['node', 'script.js', '--json-schema', '{"type":"object"}'];
+
+    const originalIsTTY = process.stdin.isTTY;
+    process.stdin.isTTY = false;
+    try {
+      const argv = await parseArguments();
+      expect(argv.jsonSchema).toBe('{"type":"object"}');
+      expect(argv.prompt).toBeUndefined();
+    } finally {
+      process.stdin.isTTY = originalIsTTY;
+    }
+  });
+
+  it('should throw when --json-schema is combined with --input-format stream-json', async () => {
+    // stream-json input runs through runNonInteractiveStreamJson which
+    // doesn't honor the structured-output single-shot termination
+    // contract — reject the combination at parse time so the user sees
+    // the mismatch immediately.
+    process.argv = [
+      'node',
+      'script.js',
+      '-p',
+      'hi',
+      '--output-format',
+      'stream-json',
+      '--input-format',
+      'stream-json',
+      '--json-schema',
+      '{"type":"object"}',
+    ];
+
+    const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit called');
+    });
+    mockWriteStderrLine.mockClear();
+
+    await expect(parseArguments()).rejects.toThrow('process.exit called');
+
+    expect(mockWriteStderrLine).toHaveBeenCalledWith(
+      expect.stringContaining(
+        '--json-schema cannot be used with --input-format stream-json',
+      ),
+    );
+
+    mockExit.mockRestore();
+  });
+
   it('should parse stream-json formats and include-partial-messages flag', async () => {
     process.argv = [
       'node',
@@ -600,7 +674,7 @@ describe('loadCliConfig', () => {
     vi.restoreAllMocks();
   });
 
-  it('should reset context file names to HOPCODE.md (plus legacy QWEN.md) and AGENTS.md by default', async () => {
+  it('should reset context file names to HOPCODE.md (plus legacy HOPCODE.md) and AGENTS.md by default', async () => {
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = {};
@@ -661,7 +735,7 @@ describe('loadCliConfig', () => {
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = {};
-    const defaultContextFiles = ['QWEN.md', 'AGENTS.md'];
+    const defaultContextFiles = ['HOPCODE.md', 'AGENTS.md'];
     const getAllSpy = vi
       .spyOn(ServerConfig, 'getAllGeminiMdFilenames')
       .mockReturnValue(defaultContextFiles);
@@ -2480,13 +2554,13 @@ describe('loadCliConfig fileFiltering', () => {
       value: false,
     },
     {
-      property: 'respectQwenIgnore',
-      getter: (c) => c.getFileFilteringRespectQwenIgnore(),
+      property: 'respectHopCodeIgnore',
+      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
       value: true,
     },
     {
-      property: 'respectQwenIgnore',
-      getter: (c) => c.getFileFilteringRespectQwenIgnore(),
+      property: 'respectHopCodeIgnore',
+      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
       value: false,
     },
     {
@@ -2775,16 +2849,16 @@ describe('Telemetry configuration via environment variables', () => {
     expect(config.getTelemetryLogPromptsEnabled()).toBe(false);
   });
 
-  it("should treat QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES='1' as true", async () => {
-    vi.stubEnv('QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES', '1');
+  it("should treat HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES='1' as true", async () => {
+    vi.stubEnv('HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES', '1');
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const config = await loadCliConfig({}, argv, undefined, []);
     expect(config.getTelemetryIncludeSensitiveSpanAttributes()).toBe(true);
   });
 
-  it("should treat QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES='false' as false", async () => {
-    vi.stubEnv('QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES', 'false');
+  it("should treat HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES='false' as false", async () => {
+    vi.stubEnv('HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES', 'false');
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const config = await loadCliConfig(

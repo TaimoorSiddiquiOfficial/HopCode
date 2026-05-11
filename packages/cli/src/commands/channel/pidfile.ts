@@ -1,4 +1,4 @@
-import {
+ï»¿import {
   existsSync,
   readFileSync,
   writeFileSync,
@@ -41,7 +41,7 @@ export function readServiceInfo(): ServiceInfo | null {
   try {
     info = JSON.parse(readFileSync(filePath, 'utf-8'));
   } catch {
-    // Corrupt file — clean up
+    // Corrupt file ï¿½ clean up
     try {
       unlinkSync(filePath);
     } catch {
@@ -51,7 +51,7 @@ export function readServiceInfo(): ServiceInfo | null {
   }
 
   if (!isProcessAlive(info.pid)) {
-    // Stale PID — process is dead, clean up
+    // Stale PID ï¿½ process is dead, clean up
     try {
       unlinkSync(filePath);
     } catch {

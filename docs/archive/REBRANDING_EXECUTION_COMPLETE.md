@@ -42,9 +42,9 @@
 
 **Environment Variables:**
 
-- ✅ `QWEN_CODE_*` → `HOPCODE_*` (100+ files)
-- ✅ `QWEN_SANDBOX` → `HOPCODE_SANDBOX`
-- ✅ `QWEN_WORKING_DIR` → `HOPCODE_WORKING_DIR`
+- ✅ `HOPCODE_*` → `HOPCODE_*` (100+ files)
+- ✅ `HOPCODE_SANDBOX` → `HOPCODE_SANDBOX`
+- ✅ `HOPCODE_WORKING_DIR` → `HOPCODE_WORKING_DIR`
 
 **Config Directory:**
 
@@ -266,7 +266,7 @@ These items need manual attention:
 | `@qwen-code/` → `@hoptrendy/` | 50+       |
 | `Qwen Code` → `HopCode`       | 500+      |
 | `qwen-code` → `hopcode`       | 300+      |
-| `QWEN_CODE_` → `HOPCODE_*`    | 100+      |
+| `HOPCODE_` → `HOPCODE_*`      | 100+      |
 | `.qwen/` → `.hopcode/`        | 50+       |
 | `QwenCode` → `HopCode`        | 200+      |
 | **TOTAL**                     | **1200+** |

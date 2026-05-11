@@ -50,7 +50,7 @@ const PROVIDER_PRIORITY = [
  *
  * @param argv - Command line arguments
  * @param settings - User settings from settings.json
- * @param authType - Authentication type (e.g., 'qwen-oauth')
+ * @param authType - Authentication type (e.g., 'hopcode-oauth')
  * @returns WebSearch configuration (always defined — DuckDuckGo is the fallback)
  */
 export function buildWebSearchConfig(

@@ -80,7 +80,7 @@ export class FileDiscoveryService {
         continue;
       }
 
-      if (opts.respectHopCodeIgnore && this.shouldQwenIgnoreFile(filePath)) {
+      if (opts.respectHopCodeIgnore && this.shouldHopCodeIgnoreFile(filePath)) {
         hopCodeIgnoredCount++;
         continue;
       }

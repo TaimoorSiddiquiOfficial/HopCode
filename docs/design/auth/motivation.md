@@ -3,7 +3,7 @@
 The auth module used to model each setup path as a separate flow: API key,
 OAuth, subscription plans, and custom providers. In practice, all of these paths
 produce the same kind of output: updates to the user's provider configuration in
-`~/.qwen/settings.json`.
+`~/.hopcode/settings.json`.
 
 This refactor makes provider setup the shared abstraction. A provider describes
 how it is shown, how credentials are collected, which models it installs, and

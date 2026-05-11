@@ -56,24 +56,24 @@ Mermaid image rendering is disabled by default because it requires external
 renderers and terminal image support. Enable it with:
 
 ```bash
-QWEN_CODE_MERMAID_IMAGE_RENDERING=1 qwen
+HOPCODE_MERMAID_IMAGE_RENDERING=1 qwen
 ```
 
 Optional environment variables:
 
-| Variable                                    | Description                                                                         |
-| ------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `QWEN_CODE_MERMAID_IMAGE_RENDERING=1`       | Enables external Mermaid image rendering.                                           |
-| `QWEN_CODE_DISABLE_MERMAID_IMAGES=1`        | Disables Mermaid image rendering even when enabled elsewhere.                       |
-| `QWEN_CODE_MERMAID_IMAGE_PROTOCOL=kitty`    | Forces Kitty protocol output. Useful for terminals such as Kitty and Ghostty.       |
-| `QWEN_CODE_MERMAID_IMAGE_PROTOCOL=iterm2`   | Requests iTerm2 inline images. Interactive TUI rendering falls back to text/ANSI.   |
-| `QWEN_CODE_MERMAID_IMAGE_PROTOCOL=off`      | Disables terminal image protocols and allows text or `chafa` fallback.              |
-| `QWEN_CODE_MERMAID_MMD_CLI=/path/to/mmdc`   | Uses a specific Mermaid CLI executable.                                             |
-| `QWEN_CODE_MERMAID_ALLOW_NPX=1`             | Allows Qwen Code to run `npx @mermaid-js/mermaid-cli` when `mmdc` is not installed. |
-| `QWEN_CODE_MERMAID_ALLOW_LOCAL_RENDERERS=1` | Allows project-local renderer binaries under `node_modules/.bin`.                   |
-| `QWEN_CODE_MERMAID_RENDER_WIDTH=1200`       | Overrides the PNG render width.                                                     |
-| `QWEN_CODE_MERMAID_RENDER_TIMEOUT_MS=10000` | Overrides the external render timeout, capped at 60000 ms.                          |
-| `QWEN_CODE_MERMAID_CELL_ASPECT_RATIO=0.5`   | Adjusts image row fitting for terminal font cell geometry.                          |
+| Variable                                  | Description                                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------------------------- |
+| `HOPCODE_MERMAID_IMAGE_RENDERING=1`       | Enables external Mermaid image rendering.                                           |
+| `HOPCODE_DISABLE_MERMAID_IMAGES=1`        | Disables Mermaid image rendering even when enabled elsewhere.                       |
+| `HOPCODE_MERMAID_IMAGE_PROTOCOL=kitty`    | Forces Kitty protocol output. Useful for terminals such as Kitty and Ghostty.       |
+| `HOPCODE_MERMAID_IMAGE_PROTOCOL=iterm2`   | Requests iTerm2 inline images. Interactive TUI rendering falls back to text/ANSI.   |
+| `HOPCODE_MERMAID_IMAGE_PROTOCOL=off`      | Disables terminal image protocols and allows text or `chafa` fallback.              |
+| `HOPCODE_MERMAID_MMD_CLI=/path/to/mmdc`   | Uses a specific Mermaid CLI executable.                                             |
+| `HOPCODE_MERMAID_ALLOW_NPX=1`             | Allows Qwen Code to run `npx @mermaid-js/mermaid-cli` when `mmdc` is not installed. |
+| `HOPCODE_MERMAID_ALLOW_LOCAL_RENDERERS=1` | Allows project-local renderer binaries under `node_modules/.bin`.                   |
+| `HOPCODE_MERMAID_RENDER_WIDTH=1200`       | Overrides the PNG render width.                                                     |
+| `HOPCODE_MERMAID_RENDER_TIMEOUT_MS=10000` | Overrides the external render timeout, capped at 60000 ms.                          |
+| `HOPCODE_MERMAID_CELL_ASPECT_RATIO=0.5`   | Adjusts image row fitting for terminal font cell geometry.                          |
 
 The first image render can be slow, especially when `npx` needs to resolve or
 download Mermaid CLI. During streaming, Qwen Code shows a bounded text preview

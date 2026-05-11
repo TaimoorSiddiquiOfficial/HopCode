@@ -438,9 +438,9 @@ describe('Configuration Options (E2E)', () => {
       }
     });
 
-    // Skip - qwen-oauth requires user interaction which is not possible in CI environments
-    it.skip('should accept authType: qwen-oauth', async () => {
-      // Note: qwen-oauth requires credentials in ~/.hopcode and user interaction
+    // Skip - hopcode-oauth requires user interaction which is not possible in CI environments
+    it.skip('should accept authType: hopcode-oauth', async () => {
+      // Note: hopcode-oauth requires credentials in ~/.hopcode and user interaction
       // Without credentials, the auth process will timeout waiting for user
       // This test verifies the option is accepted and passed correctly to CLI
 
@@ -451,7 +451,7 @@ describe('Configuration Options (E2E)', () => {
         options: {
           ...SHARED_TEST_OPTIONS,
           cwd: testDir,
-          authType: 'qwen-oauth',
+          authType: 'hopcode-oauth',
           debug: true,
           logLevel: 'debug',
           stderr: (msg: string) => {

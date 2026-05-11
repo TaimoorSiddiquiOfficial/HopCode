@@ -23,10 +23,13 @@ interface ModelSelectorProps {
  * selectable so users who already have a runtime model aren't blocked.
  */
 function isDiscontinuedQwenOAuth(modelId: string): boolean {
-  return modelId.includes('(qwen-oauth)') && !modelId.startsWith('$runtime|');
+  return (
+    modelId.includes('(hopcode-oauth)') && !modelId.startsWith('$runtime|')
+  );
 }
 
-const DISCONTINUED_DESCRIPTION = 'Discontinued — switch to Coding Plan or API Key';
+const DISCONTINUED_DESCRIPTION =
+  'Discontinued — switch to Coding Plan or API Key';
 const DISCONTINUED_BLOCKED_MSG =
   'Qwen OAuth free tier was discontinued on 2026-04-15';
 

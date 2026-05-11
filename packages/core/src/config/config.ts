@@ -189,7 +189,6 @@ export interface ClearContextOnIdleSettings {
   toolResultsNumToKeep?: number;
 }
 
-
 export interface OutputSettings {
   format?: OutputFormat;
 }
@@ -245,7 +244,7 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
       if (!knownDisable.includes(lowered)) {
         // Unrecognised string — disable (safer-by-default) but log
         // so a user wondering "why is my setting being ignored?"
-        // can see the actual coercion in QWEN_DEBUG_LOG_FILE.
+        // can see the actual coercion in HOPCODE_DEBUG_LOG_FILE.
         gitCoAuthorLogger.warn(
           `Unrecognized string value for general.gitCoAuthor.${fieldName}: ${JSON.stringify(v)}; treating as false. Accepted forms: true/yes/on/1, false/no/off/0/empty.`,
         );
@@ -377,7 +376,7 @@ export interface ConfigParameters {
    * CLI surface. Matched case-insensitively on the final (post-rename)
    * command name. Sourced from settings (`slashCommands.disabled`, UNION
    * merged across scopes), the `--disabled-slash-commands` CLI flag, and
-   * the `QWEN_DISABLED_SLASH_COMMANDS` environment variable.
+   * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
   /** Merged permission rules from all sources (settings + CLI args). */
@@ -412,6 +411,7 @@ export interface ConfigParameters {
   fileReadCacheDisabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
+    /** @deprecated Use respectHopCodeIgnore instead */
     respectQwenIgnore?: boolean;
     respectHopCodeIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
@@ -486,6 +486,13 @@ export interface ConfigParameters {
    */
   jsonFile?: string;
   /**
+   * JSON Schema that the model's final output must conform to. When set, a
+   * synthetic `structured_output` tool is registered and the non-interactive
+   * CLI ends the session the first time the model calls it with valid args.
+   * Only meaningful in headless mode (`hopcode -p`).
+   */
+  jsonSchema?: Record<string, unknown>;
+  /**
    * File path for receiving remote input commands (bidirectional sync mode).
    * An external process writes JSONL commands to this file, and the TUI
    * watches it to process messages as if the user typed them.
@@ -503,6 +510,8 @@ export interface ConfigParameters {
   enableManagedAutoMemory?: boolean;
   /** Enable managed auto-dream consolidation separately from extraction. Defaults to true. */
   enableManagedAutoDream?: boolean;
+  /** Enable automatic project skill review after tool-heavy sessions. Defaults to false. */
+  enableAutoSkill?: boolean;
   /**
    * Lightweight model for background tasks (memory extraction, dream, /btw side questions).
    * When set and valid for the current auth type, forked agents use this model instead of
@@ -653,7 +662,6 @@ export class Config {
   private cronScheduler: CronScheduler | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectQwenIgnore: boolean;
     respectHopCodeIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
@@ -721,9 +729,11 @@ export class Config {
   private readonly channel: string | undefined;
   private readonly jsonFd: number | undefined;
   private readonly jsonFile: string | undefined;
+  private readonly jsonSchema: Record<string, unknown> | undefined;
   private readonly defaultFileEncoding: FileEncodingType | undefined;
   private readonly enableManagedAutoMemory: boolean;
   private readonly enableManagedAutoDream: boolean;
+  private readonly enableAutoSkill: boolean;
   private fastModel?: string;
   private readonly disableAllHooks: boolean;
   /** User-level hooks (always loaded regardless of trust) */
@@ -833,7 +843,6 @@ export class Config {
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
       respectHopCodeIgnore:
         params.fileFiltering?.respectHopCodeIgnore ??
         params.fileFiltering?.respectQwenIgnore ??
@@ -886,6 +895,7 @@ export class Config {
     this.channel = params.channel;
     this.jsonFd = params.jsonFd;
     this.jsonFile = params.jsonFile;
+    this.jsonSchema = params.jsonSchema;
     this.defaultFileEncoding = params.defaultFileEncoding;
     this.storage = new Storage(this.targetDir);
     this.fileExclusions = new FileExclusions(this);
@@ -931,6 +941,7 @@ export class Config {
     });
     this.enableManagedAutoMemory = params.enableManagedAutoMemory ?? true;
     this.enableManagedAutoDream = params.enableManagedAutoDream ?? false;
+    this.enableAutoSkill = params.enableAutoSkill ?? false;
     this.fastModel = params.fastModel || undefined;
     this.disableAllHooks = params.disableAllHooks ?? false;
     // Store user and project hooks separately for proper source attribution
@@ -1531,11 +1542,11 @@ export class Config {
     // Some OpenAI-compatible reasoning models (e.g. DeepSeek) require
     // reasoning_content to be preserved across turns.
 
-    // Hot update path: only supported for qwen-oauth.
+    // Hot update path: only supported for hopcode-oauth.
     // For other auth types we always refresh to recreate the ContentGenerator.
     //
     // Rationale:
-    // - Non-qwen providers may need to re-validate credentials / baseUrl / envKey.
+    // - Non-hopcode providers may need to re-validate credentials / baseUrl / envKey.
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
     if (authType === AuthType.HOPCODE_OAUTH && !requiresRefresh) {
@@ -1550,7 +1561,7 @@ export class Config {
         },
       );
 
-      // Hot-update fields (qwen-oauth models share the same auth + client).
+      // Hot-update fields (hopcode-oauth models share the same auth + client).
       this.contentGeneratorConfig.model = config.model;
       this.contentGeneratorConfig.samplingParams = config.samplingParams;
       this.contentGeneratorConfig.contextWindowSize = config.contextWindowSize;
@@ -1622,7 +1633,7 @@ export class Config {
    *
    * For runtime models, the modelId should be in format `$runtime|${authType}|${modelId}`.
    * This triggers a refresh of the ContentGenerator when required (always on authType changes).
-   * For qwen-oauth model switches that are hot-update safe, this may update in place.
+   * For hopcode-oauth model switches that are hot-update safe, this may update in place.
    *
    * @param authType - Target authentication type
    * @param modelId - Target model ID (or `$runtime|${authType}|${modelId}` for runtime models)
@@ -2069,7 +2080,7 @@ export class Config {
     // Cron is experimental and opt-in: enabled via settings or env var
     if (
       process.env['HOPCODE_ENABLE_CRON'] === '1' ||
-      process.env['QWEN_CODE_ENABLE_CRON'] === '1'
+      process.env['HOPCODE_ENABLE_CRON'] === '1'
     )
       return true;
     return this.cronEnabled;
@@ -2107,14 +2118,13 @@ export class Config {
   }
   /** @deprecated Use getFileFilteringRespectHopCodeIgnore instead */
   getFileFilteringRespectQwenIgnore(): boolean {
-    return this.fileFiltering.respectQwenIgnore;
+    return this.fileFiltering.respectHopCodeIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
       respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
-      respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
     };
   }
 
@@ -2212,6 +2222,10 @@ export class Config {
 
   getManagedAutoDreamEnabled(): boolean {
     return this.enableManagedAutoDream && !this.getBareMode();
+  }
+
+  getAutoSkillEnabled(): boolean {
+    return this.enableAutoSkill && !this.getBareMode();
   }
 
   /**
@@ -2418,6 +2432,15 @@ export class Config {
    */
   getJsonFile(): string | undefined {
     return this.jsonFile;
+  }
+
+  /**
+   * Get the JSON Schema the model's final output must conform to.
+   * When set, the non-interactive CLI registers a synthetic
+   * `structured_output` tool and ends the session on a valid call.
+   */
+  getJsonSchema(): Record<string, unknown> | undefined {
+    return this.jsonSchema;
   }
 
   /**
@@ -2791,6 +2814,10 @@ export class Config {
     }
 
     // --- Core tools (always registered) ---
+    await registerLazy(ToolNames.TOOL_SEARCH, async () => {
+      const { ToolSearchTool } = await import('../tools/tool-search.js');
+      return new ToolSearchTool(this);
+    });
     await registerLazy(ToolNames.AGENT, async () => {
       const { AgentTool } = await import('../tools/agent/agent.js');
       return new AgentTool(this);
@@ -2903,6 +2930,19 @@ export class Config {
       await registerLazy(ToolNames.LSP, async () => {
         const { LspTool } = await import('../tools/lsp.js');
         return new LspTool(this);
+      });
+    }
+
+    // Register synthetic structured-output tool when --json-schema is set.
+    // The tool's parameter schema IS the user-supplied JSON Schema, so the
+    // model's arguments must match it (Ajv-validated in BaseDeclarativeTool).
+    if (this.jsonSchema) {
+      const schema = this.jsonSchema;
+      await registerLazy(ToolNames.STRUCTURED_OUTPUT, async () => {
+        const { SyntheticOutputTool } = await import(
+          '../tools/syntheticOutput.js'
+        );
+        return new SyntheticOutputTool(this, schema);
       });
     }
 

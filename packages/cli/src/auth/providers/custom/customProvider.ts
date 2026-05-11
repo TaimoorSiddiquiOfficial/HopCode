@@ -7,7 +7,7 @@
 import { AuthType } from '@hoptrendy/hopcode-core';
 import type { ProviderConfig } from '../../providerConfig.js';
 
-export const CUSTOM_API_KEY_ENV_PREFIX = 'QWEN_CUSTOM_API_KEY_';
+export const CUSTOM_API_KEY_ENV_PREFIX = 'HOPCODE_CUSTOM_API_KEY_';
 
 export function generateCustomEnvKey(
   protocol: AuthType,

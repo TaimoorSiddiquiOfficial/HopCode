@@ -41,7 +41,7 @@ function formatElapsedTime(startMs: number): string {
   return `${((Date.now() - startMs) / 1000).toFixed(2)}s`;
 }
 
-interface QwenAuthOptions {
+interface HopCodeAuthOptions {
   baseUrl?: string;
   key?: string;
 }
@@ -64,9 +64,9 @@ interface MergedSettingsWithCodingPlan {
 /**
  * Handles the authentication process based on the specified command and options
  */
-export async function handleQwenAuth(
-  command: 'qwen-oauth' | 'coding-plan' | 'openrouter',
-  options: QwenAuthOptions,
+export async function handleHopCodeAuth(
+  command: 'hopcode-oauth' | 'coding-plan' | 'openrouter',
+  options: HopCodeAuthOptions,
 ) {
   try {
     const settings = loadSettings();
@@ -139,8 +139,8 @@ export async function handleQwenAuth(
       },
     );
 
-    if (command === 'qwen-oauth') {
-      await handleQwenOAuth(config, settings);
+    if (command === 'hopcode-oauth') {
+      await handleHopCodeOAuth(config, settings);
     } else if (command === 'coding-plan') {
       await handleCodePlanAuth(config, settings, options);
     } else if (command === 'openrouter') {
@@ -157,13 +157,13 @@ export async function handleQwenAuth(
 }
 
 /**
- * Handles Qwen OAuth authentication
+ * Handles HopCode OAuth authentication
  */
-async function handleQwenOAuth(
+async function handleHopCodeOAuth(
   config: Config,
   settings: LoadedSettings,
 ): Promise<void> {
-  writeStdoutLine(t('Starting Qwen OAuth authentication...'));
+  writeStdoutLine(t('Starting HopCode OAuth authentication...'));
 
   try {
     await config.refreshAuth(AuthType.HOPCODE_OAUTH);
@@ -176,11 +176,11 @@ async function handleQwenOAuth(
       AuthType.HOPCODE_OAUTH,
     );
 
-    writeStdoutLine(t('Successfully authenticated with Qwen OAuth.'));
+    writeStdoutLine(t('Successfully authenticated with HopCode OAuth.'));
     process.exit(0);
   } catch (error) {
     writeStderrLine(
-      t('Failed to authenticate with Qwen OAuth: {{error}}', {
+      t('Failed to authenticate with HopCode OAuth: {{error}}', {
         error: getErrorMessage(error),
       }),
     );
@@ -194,7 +194,7 @@ async function handleQwenOAuth(
 async function handleCodePlanAuth(
   config: Config,
   settings: LoadedSettings,
-  options: QwenAuthOptions,
+  options: HopCodeAuthOptions,
 ): Promise<void> {
   const { baseUrl, key } = options;
 
@@ -239,10 +239,8 @@ async function handleCodePlanAuth(
 async function handleOpenRouterAuth(
   config: Config,
   settings: LoadedSettings,
-  options: QwenAuthOptions,
+  options: HopCodeAuthOptions,
 ): Promise<void> {
-  writeStdoutLine(t('Processing OpenRouter authentication...'));
-
   try {
     const authStartMs = Date.now();
     let selectedKey = options.key;
@@ -452,7 +450,7 @@ export async function runInteractiveAuth() {
   if (!choice) return;
 
   if (choice === 'coding-plan') {
-    await handleQwenAuth('coding-plan', {});
+    await handleHopCodeAuth('coding-plan', {});
   } else {
     await handleApiKeyAuth(choice, {});
   }
@@ -477,7 +475,7 @@ export async function handleApiKeyAuthSetup() {
 function handleCustomApiKeyAuth(): void {
   writeStdoutLine(
     t(
-      '\nYou can configure your API key and models in settings.json.\nRefer to the documentation for setup instructions:\n  https://qwenlm.github.io/qwen-code-docs/en/users/configuration/model-providers/\n',
+      '\nYou can configure your API key and models in settings.json.\nRefer to the documentation for setup instructions:\n  https://github.com/TaimoorSiddiquiOfficial/HopCode\n',
     ),
   );
   process.exit(0);

@@ -99,11 +99,11 @@ const OAUTH_ITEMS = [
     value: 'openrouter',
   },
   {
-    key: 'qwen-oauth-discontinued',
-    title: t('Qwen'),
-    label: t('Qwen'),
+    key: 'hopcode-oauth-discontinued',
+    title: t('HopCode'),
+    label: t('HopCode'),
     description: t('Discontinued — switch to Coding Plan or API Key'),
-    value: 'qwen-oauth-discontinued',
+    value: 'hopcode-oauth-discontinued',
   },
 ];
 

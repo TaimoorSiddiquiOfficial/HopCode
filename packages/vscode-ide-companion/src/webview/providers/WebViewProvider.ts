@@ -175,7 +175,7 @@ export class WebViewProvider {
           console.log(
             '[WebViewProvider] Auth-related hopcode settings changed by user, syncing...',
           );
-          const synced = await this.syncVSCodeSettingsToQwenConfig();
+          const synced = await this.syncVSCodeSettingsToHopCodeConfig();
           if (synced && this.agentInitialized) {
             // Settings changed and we have an active connection — reconnect
             try {
@@ -583,7 +583,9 @@ export class WebViewProvider {
               })();
             } else {
               // Allowed/proceeded — suppress diff re-open briefly
-              void vscode.commands.executeCommand('hopcode.diff.suppressBriefly');
+              void vscode.commands.executeCommand(
+                'hopcode.diff.suppressBriefly',
+              );
             }
           };
           // Store handler in message handler
@@ -1048,7 +1050,7 @@ export class WebViewProvider {
    *
    * @returns true if settings were synced (apiKey is configured), false otherwise
    */
-  private async syncVSCodeSettingsToQwenConfig(): Promise<boolean> {
+  private async syncVSCodeSettingsToHopCodeConfig(): Promise<boolean> {
     const config = vscode.workspace.getConfiguration('hopcode');
     const apiKey = config.get<string>('apiKey', '');
 
@@ -1087,10 +1089,10 @@ export class WebViewProvider {
    * This makes existing CLI-configured non-secret metadata visible in the
    * VSCode Settings page without mirroring credentials into settings.json.
    */
-  private async syncQwenConfigToVSCodeSettings(): Promise<void> {
+  private async syncHopCodeConfigToVSCodeSettings(): Promise<void> {
     try {
-      const qwenSettings = readHopcodeSettingsForVSCode();
-      if (!qwenSettings) {
+      const hopcodeSettings = readHopcodeSettingsForVSCode();
+      if (!hopcodeSettings) {
         return;
       }
 
@@ -1104,18 +1106,21 @@ export class WebViewProvider {
       const updates: Array<Thenable<void>> = [];
 
       if (
-        config.get<string>('provider', 'coding-plan') !== qwenSettings.provider
+        config.get<string>('provider', 'coding-plan') !==
+        hopcodeSettings.provider
       ) {
-        updates.push(config.update('provider', qwenSettings.provider, target));
+        updates.push(
+          config.update('provider', hopcodeSettings.provider, target),
+        );
       }
       if (
         config.get<'china' | 'global'>('codingPlanRegion', 'china') !==
-        qwenSettings.codingPlanRegion
+        hopcodeSettings.codingPlanRegion
       ) {
         updates.push(
           config.update(
             'codingPlanRegion',
-            qwenSettings.codingPlanRegion,
+            hopcodeSettings.codingPlanRegion,
             target,
           ),
         );
@@ -1137,7 +1142,7 @@ export class WebViewProvider {
       }
     } catch (error) {
       console.error(
-        '[WebViewProvider] Failed to sync qwen config to VSCode settings:',
+        '[WebViewProvider] Failed to sync hopcode config to VSCode settings:',
         error,
       );
     }
@@ -1158,7 +1163,7 @@ export class WebViewProvider {
 
     this.initializationPromise = (async () => {
       try {
-        await this.syncQwenConfigToVSCodeSettings();
+        await this.syncHopCodeConfigToVSCodeSettings();
 
         console.log('[WebViewProvider] Attempting connection...');
         // Attempt a connection to detect prior auth without forcing login
@@ -1263,7 +1268,7 @@ export class WebViewProvider {
           });
         }
 
-        // Load messages from the current Qwen session
+        // Load messages from the current HopCode session
         const sessionReady = await this.loadCurrentSessionMessages(options);
 
         if (sessionReady) {
@@ -1302,7 +1307,7 @@ export class WebViewProvider {
   /**
    * Handle auth interactive — interactive auth flow result.
    * Writes provider config to ~/.hopcode/settings.json and reconnects.
-   * Mirrors the CLI's `qwen auth coding-plan` / `qwen auth` flow.
+   * Mirrors the CLI's `hopcode auth coding-plan` / `hopcode auth` flow.
    */
   private async handleAuthInteractive(
     provider: string,
@@ -1493,7 +1498,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Load messages from current Qwen session
+   * Load messages from current HopCode session
    * Skips session restoration and creates a new session directly
    */
   private async loadCurrentSessionMessages(options?: {
@@ -1715,7 +1720,7 @@ export class WebViewProvider {
    * Context-aware handler for the "New Chat" action (openNewChatTab message).
    *
    * - View host (sidebar / secondary bar): resets the conversation in-place by
-   *   routing to the newQwenSession handler (includes auth checks and UI clearing).
+   *   routing to the newHopCodeSession handler (includes auth checks and UI clearing).
    * - Editor tab: returns false so the message falls through to
    *   SessionMessageHandler which opens a brand-new editor tab.
    *
@@ -1728,7 +1733,7 @@ export class WebViewProvider {
     if (message.type !== 'openNewChatTab' || !this.isViewHost) {
       return false;
     }
-    void this.messageHandler.route({ type: 'newQwenSession', data: {} });
+    void this.messageHandler.route({ type: 'newHopCodeSession', data: {} });
     return true;
   }
 
@@ -1773,8 +1778,33 @@ export class WebViewProvider {
       return true;
     }
     if (message.type === 'copyToClipboard') {
-      const { text } = message.data as { text: string };
-      await vscode.env.clipboard.writeText(text);
+      const { text, requestId } = message.data as {
+        text: string;
+        requestId?: string;
+      };
+      try {
+        await vscode.env.clipboard.writeText(text);
+        if (requestId) {
+          await webview.postMessage({
+            type: 'copyToClipboardResult',
+            data: { requestId, success: true },
+          });
+        }
+      } catch (error) {
+        if (requestId) {
+          await webview.postMessage({
+            type: 'copyToClipboardResult',
+            data: {
+              requestId,
+              success: false,
+              error: error instanceof Error ? error.message : String(error),
+            },
+          });
+        }
+        if (!requestId) {
+          throw error;
+        }
+      }
       return true;
     }
     if (message.type === 'resolveImagePaths') {
@@ -1786,7 +1816,7 @@ export class WebViewProvider {
     }
     // Reset task timer and notification guard when user sends a new message.
     // Falls through (returns false) so the message is still routed to handlers.
-    if (message.type === 'sendMessage') {
+    if (message.type === 'sendMessage' || message.type === 'editMessage') {
       this.agentStartTime = null;
       this.idleNotificationSent = false;
     }
@@ -2381,7 +2411,7 @@ export class WebViewProvider {
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       const workingDir = workspaceFolder?.uri.fsPath || process.cwd();
 
-      // Create new Qwen session via agent manager
+      // Create new HopCode session via agent manager
       await this.agentManager.createNewSession(workingDir, { forceNew: true });
       this.messageHandler.setCurrentConversationId(null);
 

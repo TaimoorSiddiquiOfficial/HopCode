@@ -49,6 +49,8 @@ export const ToolNames = {
   REPO_MAP: 'repo_map',
   BROWSER: 'browser',
   BG_STOP: 'bg_stop',
+  TOOL_SEARCH: 'tool_search',
+  STRUCTURED_OUTPUT: 'structured_output',
 } as const;
 
 /**
@@ -88,6 +90,8 @@ export const ToolDisplayNames = {
   REPO_MAP: 'RepoMap',
   BROWSER: 'Browser',
   BG_STOP: 'BgStop',
+  TOOL_SEARCH: 'ToolSearch',
+  STRUCTURED_OUTPUT: 'StructuredOutput',
 } as const;
 
 // Migration from old tool names to new tool names

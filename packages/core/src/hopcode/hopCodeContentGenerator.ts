@@ -26,12 +26,12 @@ import { createDebugLogger } from '../utils/debugLogger.js';
  */
 export class HopCodeContentGenerator extends OpenAIContentGenerator {
   private readonly debugLogger = createDebugLogger('HOPCODE');
-  private qwenClient: IHopCodeOAuth2Client;
+  private hopcodeClient: IHopCodeOAuth2Client;
   private sharedManager: SharedTokenManager;
   private currentToken?: string;
 
   constructor(
-    qwenClient: IHopCodeOAuth2Client,
+    hopcodeClient: IHopCodeOAuth2Client,
     contentGeneratorConfig: ContentGeneratorConfig,
     cliConfig: Config,
   ) {
@@ -43,7 +43,7 @@ export class HopCodeContentGenerator extends OpenAIContentGenerator {
 
     // Initialize with DashScope provider
     super(contentGeneratorConfig, cliConfig, dashscopeProvider);
-    this.qwenClient = qwenClient;
+    this.hopcodeClient = hopcodeClient;
     this.sharedManager = SharedTokenManager.getInstance();
 
     // Set default base URL, will be updated dynamically
@@ -88,7 +88,7 @@ export class HopCodeContentGenerator extends OpenAIContentGenerator {
     try {
       // Use SharedTokenManager for consistent token/endpoint pairing and automatic refresh
       const credentials = await this.sharedManager.getValidCredentials(
-        this.qwenClient,
+        this.hopcodeClient,
       );
 
       if (!credentials.access_token) {
@@ -106,7 +106,7 @@ export class HopCodeContentGenerator extends OpenAIContentGenerator {
       }
       this.debugLogger.warn('Failed to get token from shared manager:', error);
       throw new Error(
-        'Failed to obtain valid Qwen access token. Please re-authenticate.',
+        'Failed to obtain valid HopCode access token. Please re-authenticate.',
       );
     }
   }
@@ -142,7 +142,7 @@ export class HopCodeContentGenerator extends OpenAIContentGenerator {
       if (this.isAuthError(error)) {
         // Use SharedTokenManager to properly refresh and persist the token
         // This ensures the refreshed token is saved to oauth_creds.json
-        await this.sharedManager.getValidCredentials(this.qwenClient, true);
+        await this.sharedManager.getValidCredentials(this.hopcodeClient, true);
         return await attemptOperation();
       }
       throw error;

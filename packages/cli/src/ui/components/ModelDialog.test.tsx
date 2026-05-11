@@ -61,7 +61,7 @@ const renderComponent = (
     getModel: vi.fn(() => DEFAULT_HOPCODE_MODEL),
     setModel: vi.fn().mockResolvedValue(undefined),
     switchModel: vi.fn().mockResolvedValue(undefined),
-    getAuthType: vi.fn(() => 'qwen-oauth'),
+    getAuthType: vi.fn(() => 'hopcode-oauth'),
     getAllConfiguredModels: vi.fn(() =>
       getFilteredQwenModels().map((m) => ({
         id: m.id,
@@ -195,7 +195,7 @@ describe('<ModelDialog />', () => {
     );
   });
 
-  it('blocks qwen-oauth model selection with an error message (discontinued)', async () => {
+  it('blocks hopcode-oauth model selection with an error message (discontinued)', async () => {
     const { props, mockConfig } = renderComponent(
       {},
       {
@@ -217,7 +217,7 @@ describe('<ModelDialog />', () => {
 
     await childOnSelect(`${AuthType.HOPCODE_OAUTH}::${DEFAULT_HOPCODE_MODEL}`);
 
-    // qwen-oauth is discontinued — switchModel should NOT be called
+    // hopcode-oauth is discontinued — switchModel should NOT be called
     expect(mockConfig?.switchModel).not.toHaveBeenCalled();
     // Dialog should NOT close (user stays in the dialog to see the error)
     expect(props.onClose).not.toHaveBeenCalled();
@@ -287,7 +287,7 @@ describe('<ModelDialog />', () => {
     expect(props.onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('blocks switching to qwen-oauth from another authType (discontinued)', async () => {
+  it('blocks switching to hopcode-oauth from another authType (discontinued)', async () => {
     const switchModel = vi.fn().mockResolvedValue(undefined);
     const getAuthType = vi.fn(() => AuthType.USE_OPENAI);
     const getAvailableModelsForAuthType = vi.fn((t: AuthType) => {
@@ -323,7 +323,7 @@ describe('<ModelDialog />', () => {
     const childOnSelect = mockedSelect.mock.calls[0][0].onSelect;
     await childOnSelect(`${AuthType.HOPCODE_OAUTH}::${DEFAULT_HOPCODE_MODEL}`);
 
-    // qwen-oauth is discontinued — switchModel should NOT be called
+    // hopcode-oauth is discontinued — switchModel should NOT be called
     expect(switchModel).not.toHaveBeenCalled();
     // Dialog should NOT close
     expect(props.onClose).not.toHaveBeenCalled();
@@ -370,7 +370,7 @@ describe('<ModelDialog />', () => {
 
   it('updates initialIndex when config context changes', () => {
     const mockGetModel = vi.fn(() => DEFAULT_HOPCODE_MODEL);
-    const mockGetAuthType = vi.fn(() => 'qwen-oauth');
+    const mockGetAuthType = vi.fn(() => 'hopcode-oauth');
     const mockGetModelsConfig = vi.fn(() => ({
       getGenerationConfig: vi.fn(() => ({ baseUrl: undefined })),
     }));

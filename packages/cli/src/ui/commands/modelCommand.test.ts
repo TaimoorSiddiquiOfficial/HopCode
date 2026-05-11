@@ -220,8 +220,8 @@ describe('modelCommand', () => {
       type: 'message',
       messageType: 'error',
       content:
-        "Model 'missing-model' is not available for auth type 'qwen-oauth'.\n" +
-        "No models are configured for auth type 'qwen-oauth'.\n" +
+        "Model 'missing-model' is not available for auth type 'hopcode-oauth'.\n" +
+        "No models are configured for auth type 'hopcode-oauth'.\n" +
         'Configure models in settings.modelProviders or run /model to select an available model.',
     });
   });

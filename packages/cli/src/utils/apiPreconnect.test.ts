@@ -41,7 +41,7 @@ describe('apiPreconnect', () => {
     delete process.env['https_proxy'];
     delete process.env['HTTP_PROXY'];
     delete process.env['http_proxy'];
-    delete process.env['QWEN_CODE_DISABLE_PRECONNECT'];
+    delete process.env['HOPCODE_DISABLE_PRECONNECT'];
     delete process.env['NODE_EXTRA_CA_CERTS'];
     delete process.env['SANDBOX'];
   });
@@ -53,7 +53,7 @@ describe('apiPreconnect', () => {
   describe('shouldSkipPreconnect', () => {
     it('should skip when NODE_EXTRA_CA_CERTS is set', () => {
       process.env['NODE_EXTRA_CA_CERTS'] = '/path/to/ca.pem';
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });
@@ -133,7 +133,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should fall back to authType default when resolvedBaseUrl is a non-URL sentinel', () => {
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         resolvedBaseUrl: 'DYNAMIC_HOPCODE_OAUTH_BASE_URL',
       });
       expect(mockFetch).toHaveBeenCalledWith(
@@ -143,7 +143,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should fall back to default URL when resolvedBaseUrl is undefined', () => {
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).toHaveBeenCalledWith(
         'https://coding.dashscope.aliyuncs.com',
         expect.objectContaining({ method: 'HEAD' }),
@@ -152,8 +152,8 @@ describe('apiPreconnect', () => {
   });
 
   describe('preconnect behavior', () => {
-    it('should use default baseUrl for qwen-oauth', () => {
-      preconnectApi('qwen-oauth');
+    it('should use default baseUrl for hopcode-oauth', () => {
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).toHaveBeenCalledWith(
         'https://coding.dashscope.aliyuncs.com',
         expect.objectContaining({ method: 'HEAD' }),
@@ -177,7 +177,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should pass shared dispatcher on Node.js runtime', () => {
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
@@ -187,19 +187,21 @@ describe('apiPreconnect', () => {
     });
 
     it('should pass undefined proxy to shared dispatcher by default', () => {
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockGetOrCreateSharedDispatcher).toHaveBeenCalledWith(undefined);
     });
 
     it('should pass configured proxy to shared dispatcher', () => {
-      preconnectApi('qwen-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', {
+        proxy: 'http://proxy.example.com:8080',
+      });
       expect(mockGetOrCreateSharedDispatcher).toHaveBeenCalledWith(
         'http://proxy.example.com:8080',
       );
     });
 
     it('should not fire twice', () => {
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       preconnectApi('openai');
       expect(mockFetch).toHaveBeenCalledTimes(1);
     });
@@ -210,7 +212,7 @@ describe('apiPreconnect', () => {
       expect(mockFetch).not.toHaveBeenCalled();
 
       // Second call: valid authType → should fire
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(
         'https://coding.dashscope.aliyuncs.com',
@@ -221,25 +223,25 @@ describe('apiPreconnect', () => {
     it('should handle fetch errors gracefully', async () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
       // Should not throw
-      expect(() => preconnectApi('qwen-oauth')).not.toThrow();
+      expect(() => preconnectApi('hopcode-oauth')).not.toThrow();
     });
 
     it('should handle synchronous dispatcher errors gracefully', () => {
       mockGetOrCreateSharedDispatcher.mockImplementation(() => {
         throw new Error('Failed to create dispatcher');
       });
-      expect(() => preconnectApi('qwen-oauth')).not.toThrow();
+      expect(() => preconnectApi('hopcode-oauth')).not.toThrow();
     });
 
-    it('should skip when QWEN_CODE_DISABLE_PRECONNECT is set', () => {
-      process.env['QWEN_CODE_DISABLE_PRECONNECT'] = '1';
-      preconnectApi('qwen-oauth');
+    it('should skip when HOPCODE_DISABLE_PRECONNECT is set', () => {
+      process.env['HOPCODE_DISABLE_PRECONNECT'] = '1';
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it('should skip in sandbox mode', () => {
       process.env['SANDBOX'] = '1';
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });

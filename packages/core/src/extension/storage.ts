@@ -30,21 +30,12 @@ export class ExtensionStorage {
   }
 
   static getUserExtensionsDir(): string {
-    const homeDir = os.homedir();
-    // Fallback for test environments where os.homedir might be mocked to return undefined
-    if (!homeDir) {
-      const tmpDir = os.tmpdir();
-      if (!tmpDir) {
-        // Ultimate fallback when both os.homedir and os.tmpdir are mocked
-        return '/tmp/.hopcode/extensions';
-      }
-      return path.join(tmpDir, '.hopcode', 'extensions');
-    }
-    const storage = new Storage(homeDir);
-    return storage.getExtensionsDir();
+    return Storage.getUserExtensionsDir();
   }
 
   static async createTmpDir(): Promise<string> {
-    return await fs.promises.mkdtemp(path.join(os.tmpdir(), 'qwen-extension'));
+    return await fs.promises.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-extension'),
+    );
   }
 }

@@ -48,10 +48,10 @@ rename %USERPROFILE%\.qwen %USERPROFILE%\.hopcode
 
 ## Environment Variables
 
-| Qwen Code          | HopCode           | Status                          |
-| ------------------ | ----------------- | ------------------------------- |
-| `QWEN_CODE_SIMPLE` | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
-| `QWEN_SANDBOX`     | `HOPCODE_SANDBOX` | Update recommended              |
+| Qwen Code         | HopCode           | Status                          |
+| ----------------- | ----------------- | ------------------------------- |
+| `HOPCODE_SIMPLE`  | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
+| `HOPCODE_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended              |
 
 ## Package Name Changes
 

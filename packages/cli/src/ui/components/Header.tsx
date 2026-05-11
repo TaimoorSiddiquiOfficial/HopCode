@@ -35,7 +35,7 @@ interface HeaderProps {
    */
   customAsciiArt?: { small?: string; large?: string };
   /**
-   * Sanitized replacement for the bold ">_ Qwen Code" title in the info
+   * Sanitized replacement for the bold ">_ HopCode" title in the info
    * panel. The version suffix is always appended. When undefined or empty
    * the default title is used; the leading `>_` glyph is part of the
    * default brand and is dropped when a custom title is set.

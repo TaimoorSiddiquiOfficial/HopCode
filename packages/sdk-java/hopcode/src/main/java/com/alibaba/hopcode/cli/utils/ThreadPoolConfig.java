@@ -24,7 +24,7 @@ public class ThreadPoolConfig {
 
                 @Override
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(r, "qwen_code_cli-pool-" + threadNumber.getAndIncrement());
+                    Thread t = new Thread(r, "hopcode_code_cli-pool-" + threadNumber.getAndIncrement());
                     t.setDaemon(false);
                     return t;
                 }

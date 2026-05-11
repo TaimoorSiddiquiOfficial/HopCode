@@ -83,7 +83,7 @@ export class ModelsConfig {
   // Flag for strict model provider selection
   private strictModelProviderSelection: boolean = false;
 
-  // One-shot flag for qwen-oauth credential caching
+  // One-shot flag for hopcode-oauth credential caching
   private requireCachedQwenCredentialsOnce: boolean = false;
 
   // One-shot flag indicating credentials were manually set via updateCredentials()
@@ -252,7 +252,7 @@ export class ModelsConfig {
    *
    * Notes:
    * - By default, returns models across all authTypes.
-   * - qwen-oauth models are always ordered first.
+   * - hopcode-oauth models are always ordered first.
    * - Runtime model option (if active) is included before registry models of the same authType.
    */
   getAllConfiguredModels(authTypes?: AuthType[]): AvailableModel[] {
@@ -269,7 +269,7 @@ export class ModelsConfig {
       }
     }
 
-    // Force qwen-oauth to the front (if requested / defaulted in).
+    // Force hopcode-oauth to the front (if requested / defaulted in).
     const orderedAuthTypes: AuthType[] = [];
     if (uniqueAuthTypes.includes(AuthType.HOPCODE_OAUTH)) {
       orderedAuthTypes.push(AuthType.HOPCODE_OAUTH);
@@ -321,7 +321,7 @@ export class ModelsConfig {
     newModel: string,
     metadata?: ModelSwitchMetadata,
   ): Promise<void> {
-    // Special case: qwen-oauth model switch - hot update in place
+    // Special case: hopcode-oauth model switch - hot update in place
     // coder-model supports vision capabilities and can be hot-updated
     if (
       this.currentAuthType === AuthType.HOPCODE_OAUTH &&
@@ -1198,7 +1198,7 @@ export class ModelsConfig {
       label: snapshot.modelId,
       authType: snapshot.authType,
       /**
-       * `isVision` is for automatic switching of qwen-oauth vision model.
+       * `isVision` is for automatic switching of hopcode-oauth vision model.
        * Runtime models are basically specified via CLI arguments, env variables,
        * or settings for other auth types.
        */

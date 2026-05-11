@@ -26,7 +26,7 @@
 
 **AuthType References:**
 
-- ✅ Fixed 94 references: `AuthType.hopcode_OAUTH` → `AuthType.QWEN_OAUTH`
+- ✅ Fixed 94 references: `AuthType.hopcode_OAUTH` → `AuthType.HOPCODE_OAUTH`
 - These refer to actual Alibaba Cloud Qwen OAuth API
 
 **Service Property Names:**
@@ -110,11 +110,11 @@
 
 ### ❌ SHOULD NOT Be Changed (Technical/API-facing)
 
-- ✅ **API service names** - `QWEN_OAUTH` (kept correctly)
+- ✅ **API service names** - `HOPCODE_OAUTH` (kept correctly)
 - ✅ **Model names** - `qwen3.5-plus`, `qwen3.6-plus` (kept correctly)
 - ✅ **Internal client library names** - `qwenClient` (fixed back)
 - ✅ **File format names** - `.qwenignore` files (kept correctly)
-- ✅ **Authentication type constants** - `AuthType.QWEN_OAUTH` (fixed back)
+- ✅ **Authentication type constants** - `AuthType.HOPCODE_OAUTH` (fixed back)
 - ✅ **Directory properties** - `qwenDir` (fixed back)
 - ✅ **Service filters** - `qwenIgnoreFilter` (fixed back)
 

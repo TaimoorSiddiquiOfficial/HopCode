@@ -29,7 +29,7 @@ The benefits of sandboxing include:
 
 > [!note]
 >
-> **Naming note:** Some sandbox-related environment variables may have used the `GEMINI_*` prefix historically. All new environment variables use the `QWEN_*` prefix.
+> **Naming note:** Some sandbox-related environment variables may have used the `GEMINI_*` prefix historically. All new environment variables use the `HOPCODE_*` prefix.
 
 ## Sandboxing methods
 

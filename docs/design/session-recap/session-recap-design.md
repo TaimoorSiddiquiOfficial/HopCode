@@ -231,7 +231,7 @@ All failures are **fully transparent** to the user — recap is an
 auxiliary feature and never throws into the UI. Developers can grep for
 the `[SESSION_RECAP]` tag in the debug log file: written by default to
 `~/.hopcode/debug/<sessionId>.txt` (`latest.txt` symlinks to the current
-session); disable via `QWEN_DEBUG_LOG_FILE=0`.
+session); disable via `HOPCODE_DEBUG_LOG_FILE=0`.
 
 ## Out of Scope
 

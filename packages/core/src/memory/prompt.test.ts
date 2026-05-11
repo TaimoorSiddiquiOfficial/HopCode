@@ -24,7 +24,7 @@ describe('managed auto-memory prompt helpers', () => {
   it('embeds the current MEMORY.md index content', () => {
     const prompt = buildManagedAutoMemoryPrompt(
       '/tmp/project/.hopcode/memory',
-      '- [User Memory](user/terse.md) — User prefers terse responses.',
+      '- [User Memory](user/terse.md) ï¿½ User prefers terse responses.',
     );
 
     expect(prompt).toContain('## /tmp/project/.hopcode/memory/MEMORY.md');
@@ -34,9 +34,9 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('appends managed auto-memory after existing hierarchical memory', () => {
     const result = appendManagedAutoMemoryToUserMemory(
-      '--- Context from: QWEN.md ---\nProject rules',
+      '--- Context from: HOPCODE.md ---\nProject rules',
       '/tmp/project/.hopcode/memory',
-      '- [Project Memory](project/release-freeze.md) — Release freeze starts Friday.',
+      '- [Project Memory](project/release-freeze.md) ï¿½ Release freeze starts Friday.',
     );
 
     expect(result).toContain('Project rules');
@@ -48,7 +48,7 @@ describe('managed auto-memory prompt helpers', () => {
     const result = appendManagedAutoMemoryToUserMemory(
       '   ',
       '/tmp/project/.hopcode/memory',
-      '- [Reference](reference/grafana.md) — Grafana dashboard link.',
+      '- [Reference](reference/grafana.md) ï¿½ Grafana dashboard link.',
     );
 
     expect(result).toContain('# auto memory');
@@ -58,7 +58,7 @@ describe('managed auto-memory prompt helpers', () => {
   it('truncates oversized managed auto-memory index content', () => {
     const oversizedIndex = Array.from(
       { length: MAX_MANAGED_AUTO_MEMORY_INDEX_LINES + 50 },
-      (_, index) => `- [Memory ${index}](memory-${index}.md) — hook ${index}`,
+      (_, index) => `- [Memory ${index}](memory-${index}.md) ï¿½ hook ${index}`,
     ).join('\n');
     const result = buildManagedAutoMemoryPrompt(
       '/tmp/project/.hopcode/memory',

@@ -9,24 +9,24 @@ import {
   DISCONTINUED_MESSAGES,
   isDiscontinuedModel,
   parseAcpModelId,
-  QWEN_OAUTH_AUTH_TYPE,
+  HOPCODE_OAUTH_AUTH_TYPE,
 } from './discontinuedModel.js';
 
 describe('parseAcpModelId', () => {
   it('extracts authType and base model id from a registry entry', () => {
-    expect(parseAcpModelId('qwen3-coder-plus(qwen-oauth)')).toEqual({
+    expect(parseAcpModelId('qwen3-coder-plus(hopcode-oauth)')).toEqual({
       baseModelId: 'qwen3-coder-plus',
-      authType: 'qwen-oauth',
+      authType: 'hopcode-oauth',
       isRuntime: false,
     });
   });
 
   it('marks runtime snapshots and still strips the trailing wrapper', () => {
     expect(
-      parseAcpModelId('$runtime|qwen-oauth|qwen3-coder-plus(qwen-oauth)'),
+      parseAcpModelId('$runtime|hopcode-oauth|qwen3-coder-plus(hopcode-oauth)'),
     ).toEqual({
-      baseModelId: '$runtime|qwen-oauth|qwen3-coder-plus',
-      authType: 'qwen-oauth',
+      baseModelId: '$runtime|hopcode-oauth|qwen3-coder-plus',
+      authType: 'hopcode-oauth',
       isRuntime: true,
     });
   });
@@ -56,13 +56,15 @@ describe('parseAcpModelId', () => {
 });
 
 describe('isDiscontinuedModel', () => {
-  it('flags a non-runtime Qwen OAuth registry entry as discontinued', () => {
-    expect(isDiscontinuedModel('qwen3-coder-plus(qwen-oauth)')).toBe(true);
+  it('flags a non-runtime HopCode OAuth registry entry as discontinued', () => {
+    expect(isDiscontinuedModel('qwen3-coder-plus(hopcode-oauth)')).toBe(true);
   });
 
-  it('does NOT flag a runtime Qwen OAuth snapshot as discontinued', () => {
+  it('does NOT flag a runtime HopCode OAuth snapshot as discontinued', () => {
     expect(
-      isDiscontinuedModel('$runtime|qwen-oauth|qwen3-coder-plus(qwen-oauth)'),
+      isDiscontinuedModel(
+        '$runtime|hopcode-oauth|qwen3-coder-plus(hopcode-oauth)',
+      ),
     ).toBe(false);
   });
 
@@ -91,8 +93,8 @@ describe('DISCONTINUED_MESSAGES', () => {
   });
 });
 
-describe('QWEN_OAUTH_AUTH_TYPE', () => {
+describe('HOPCODE_OAUTH_AUTH_TYPE', () => {
   it('matches the encoded value used by the ACP server', () => {
-    expect(QWEN_OAUTH_AUTH_TYPE).toBe('qwen-oauth');
+    expect(HOPCODE_OAUTH_AUTH_TYPE).toBe('hopcode-oauth');
   });
 });

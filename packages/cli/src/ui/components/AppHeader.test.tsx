@@ -38,7 +38,7 @@ const createSettings = (options?: {
     user: {
       settings: { ui },
       originalSettings: { ui },
-      path: '/home/u/.qwen/settings.json',
+      path: '/home/u/.hopcode/settings.json',
     },
     workspace: { settings: {}, originalSettings: {}, path: '' },
   } as never;
@@ -115,7 +115,7 @@ describe('<AppHeader />', () => {
       createMockUIState(),
       createSettings({ hideTips: false, hideBanner: true }),
     );
-    expect(lastFrame()).not.toContain('>_ Qwen Code');
+    expect(lastFrame()).not.toContain('>_ HopCode');
     expect(lastFrame()).not.toContain('██╔═══██╗');
   });
 
@@ -145,7 +145,7 @@ describe('<AppHeader />', () => {
     );
     const frame = lastFrame() ?? '';
     expect(frame).toContain('Acme CLI');
-    expect(frame).not.toContain('>_ Qwen Code');
+    expect(frame).not.toContain('>_ HopCode');
     expect(frame).toContain('ACME');
     // Default Qwen logo must NOT bleed through when the user supplied art.
     expect(frame).not.toContain('██╔═══██╗');

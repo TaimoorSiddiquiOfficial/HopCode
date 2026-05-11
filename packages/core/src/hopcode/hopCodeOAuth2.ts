@@ -8,7 +8,6 @@ import crypto from 'crypto';
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
 import * as os from 'os';
-
 import open from 'open';
 import { EventEmitter } from 'events';
 import type { Config } from '../config/config.js';
@@ -445,7 +444,7 @@ export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
       responseData = JSON.parse(responseText) as TokenRefreshResponse;
     } catch {
       throw new Error(
-        `Qwen OAuth refresh returned invalid JSON: ${responseText || '(empty response body)'}`,
+        `HopCode OAuth refresh returned invalid JSON: ${responseText || '(empty response body)'}`,
       );
     }
 
@@ -499,7 +498,7 @@ export type AuthResult =
  */
 export const hopCodeOAuth2Events = new EventEmitter();
 
-export async function getQwenOAuthClient(
+export async function getHopCodeOAuthClient(
   config: Config,
   options?: { requireCachedCredentials?: boolean },
 ): Promise<HopCodeOAuth2Client> {
@@ -539,13 +538,13 @@ export async function getQwenOAuthClient(
 
     if (options?.requireCachedCredentials) {
       throw new Error(
-        'Qwen OAuth credentials expired. Please use /auth to re-authenticate with qwen-oauth.',
+        'HopCode OAuth credentials expired. Please use /auth to re-authenticate with hopcode-oauth.',
       );
     }
 
     // If we couldn't obtain valid credentials via SharedTokenManager, fall back to
     // interactive device authorization (unless explicitly forbidden above).
-    const result = await authWithQwenDeviceFlow(client, config);
+    const result = await authWithHopCodeDeviceFlow(client, config);
     if (result.success === false) {
       // Only emit timeout event if the failure reason is actually timeout
       // Other error types (401, 429, etc.) have already emitted their specific events
@@ -563,14 +562,14 @@ export async function getQwenOAuthClient(
         (() => {
           switch (result.reason) {
             case 'timeout':
-              return 'Qwen OAuth authentication timed out';
+              return 'HopCode OAuth authentication timed out';
             case 'cancelled':
-              return 'Qwen OAuth authentication was cancelled by user';
+              return 'HopCode OAuth authentication was cancelled by user';
             case 'rate_limit':
-              return 'Too many request for Qwen OAuth authentication, please try again later.';
+              return 'Too many request for HopCode OAuth authentication, please try again later.';
             case 'error':
             default:
-              return 'Qwen OAuth authentication failed';
+              return 'HopCode OAuth authentication failed';
           }
         })();
 
@@ -589,7 +588,7 @@ export async function getQwenOAuthClient(
  * convention of user-facing messages to stderr.
  */
 function showFallbackMessage(verificationUriComplete: string): void {
-  const title = 'Qwen OAuth Device Authorization';
+  const title = 'HopCode OAuth Device Authorization';
   const url = verificationUriComplete;
   const minWidth = 70;
   const maxWidth = 80;
@@ -684,7 +683,7 @@ function showFallbackMessage(verificationUriComplete: string): void {
   process.stderr.write(bottomBorder + '\n\n');
 }
 
-async function authWithQwenDeviceFlow(
+async function authWithHopCodeDeviceFlow(
   client: HopCodeOAuth2Client,
   config: Config,
 ): Promise<AuthResult> {
@@ -813,7 +812,7 @@ async function authWithQwenDeviceFlow(
 
           // IMPORTANT:
           // SharedTokenManager maintains an in-memory cache and throttles file checks.
-          // If we only write the creds file here, a subsequent `getQwenOAuthClient()`
+          // If we only write the creds file here, a subsequent `getHopCodeOAuthClient()`
           // call in the same process (within the throttle window) may not re-read the
           // updated file and could incorrectly re-trigger device auth.
           // Clearing the cache forces the next call to reload from disk.

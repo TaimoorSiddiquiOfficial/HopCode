@@ -58,26 +58,26 @@ observability framework — HopCode's observability system provides:
 All telemetry behavior is controlled through your `.hopcode/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
-| Setting                          | Environment Variable                               | CLI Flag                                                 | Description                                              | Values            | Default                 |
-| -------------------------------- | -------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- | ----------------- | ----------------------- |
-| `enabled`                        | `QWEN_TELEMETRY_ENABLED`                           | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                              | `true`/`false`    | `false`                 |
-| `target`                         | `QWEN_TELEMETRY_TARGET`                            | `--telemetry-target <local\|gcp>`                        | Where to send telemetry data                             | `"gcp"`/`"local"` | `"local"`               |
-| `otlpEndpoint`                   | `QWEN_TELEMETRY_OTLP_ENDPOINT`                     | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                  | URL string        | `http://localhost:4317` |
-| `otlpProtocol`                   | `QWEN_TELEMETRY_OTLP_PROTOCOL`                     | `--telemetry-otlp-protocol <grpc\|http>`                 | OTLP transport protocol                                  | `"grpc"`/`"http"` | `"grpc"`                |
-| `otlpTracesEndpoint`             | `QWEN_TELEMETRY_OTLP_TRACES_ENDPOINT`              | -                                                        | Per-signal endpoint override for traces (HTTP only)      | URL string        | -                       |
-| `otlpLogsEndpoint`               | `QWEN_TELEMETRY_OTLP_LOGS_ENDPOINT`                | -                                                        | Per-signal endpoint override for logs (HTTP only)        | URL string        | -                       |
-| `otlpMetricsEndpoint`            | `QWEN_TELEMETRY_OTLP_METRICS_ENDPOINT`             | -                                                        | Per-signal endpoint override for metrics (HTTP only)     | URL string        | -                       |
-| `outfile`                        | `QWEN_TELEMETRY_OUTFILE`                           | `--telemetry-outfile <path>`                             | Save telemetry to file (overrides `otlpEndpoint`)        | file path         | -                       |
-| `logPrompts`                     | `QWEN_TELEMETRY_LOG_PROMPTS`                       | `--telemetry-log-prompts` / `--no-telemetry-log-prompts` | Include prompts in telemetry logs                        | `true`/`false`    | `true`                  |
-| `includeSensitiveSpanAttributes` | `QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES` | -                                                        | Include sensitive attributes in log-to-span bridge spans | `true`/`false`    | `false`                 |
-| `useCollector`                   | `QWEN_TELEMETRY_USE_COLLECTOR`                     | -                                                        | Use external OTLP collector (advanced)                   | `true`/`false`    | `false`                 |
+| Setting                          | Environment Variable                                  | CLI Flag                                                 | Description                                              | Values            | Default                 |
+| -------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- | ----------------- | ----------------------- |
+| `enabled`                        | `HOPCODE_TELEMETRY_ENABLED`                           | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                              | `true`/`false`    | `false`                 |
+| `target`                         | `HOPCODE_TELEMETRY_TARGET`                            | `--telemetry-target <local\|gcp>`                        | Where to send telemetry data                             | `"gcp"`/`"local"` | `"local"`               |
+| `otlpEndpoint`                   | `HOPCODE_TELEMETRY_OTLP_ENDPOINT`                     | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                  | URL string        | `http://localhost:4317` |
+| `otlpProtocol`                   | `HOPCODE_TELEMETRY_OTLP_PROTOCOL`                     | `--telemetry-otlp-protocol <grpc\|http>`                 | OTLP transport protocol                                  | `"grpc"`/`"http"` | `"grpc"`                |
+| `otlpTracesEndpoint`             | `HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT`              | -                                                        | Per-signal endpoint override for traces (HTTP only)      | URL string        | -                       |
+| `otlpLogsEndpoint`               | `HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT`                | -                                                        | Per-signal endpoint override for logs (HTTP only)        | URL string        | -                       |
+| `otlpMetricsEndpoint`            | `HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT`             | -                                                        | Per-signal endpoint override for metrics (HTTP only)     | URL string        | -                       |
+| `outfile`                        | `HOPCODE_TELEMETRY_OUTFILE`                           | `--telemetry-outfile <path>`                             | Save telemetry to file (overrides `otlpEndpoint`)        | file path         | -                       |
+| `logPrompts`                     | `HOPCODE_TELEMETRY_LOG_PROMPTS`                       | `--telemetry-log-prompts` / `--no-telemetry-log-prompts` | Include prompts in telemetry logs                        | `true`/`false`    | `true`                  |
+| `includeSensitiveSpanAttributes` | `HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES` | -                                                        | Include sensitive attributes in log-to-span bridge spans | `true`/`false`    | `false`                 |
+| `useCollector`                   | `HOPCODE_TELEMETRY_USE_COLLECTOR`                     | -                                                        | Use external OTLP collector (advanced)                   | `true`/`false`    | `false`                 |
 
 **Note on boolean environment variables:** For the boolean settings (`enabled`,
 `logPrompts`, `includeSensitiveSpanAttributes`, `useCollector`), setting the
 corresponding environment variable to `true` or `1` will enable the feature. Any
 other value will disable it.
 
-**Sensitive log-to-span attributes:** When Qwen Code exports HTTP traces but has
+**Sensitive log-to-span attributes:** When HopCode exports HTTP traces but has
 no logs endpoint, log records are bridged into trace spans. By default, the
 bridge drops `prompt`, `function_args`, and `response_text` from span attributes.
 Set `includeSensitiveSpanAttributes` to `true` only when you explicitly want
@@ -98,7 +98,7 @@ verbatim. gRPC protocol uses service-based routing and does not append paths.
 The per-signal endpoint environment variables also accept the standard
 OpenTelemetry names: `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`,
 `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT`, `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT`.
-The `QWEN_TELEMETRY_OTLP_*` variants take precedence over the `OTEL_*` variants.
+The `HOPCODE_TELEMETRY_OTLP_*` variants take precedence over the `OTEL_*` variants.
 
 For detailed information about all configuration options, see the
 [Configuration Guide](./cli/configuration.md).
@@ -228,7 +228,7 @@ HopCode.
 
 Logs are timestamped records of specific events. The following events are logged for HopCode:
 
-- `qwen-code.config`: This event occurs once at startup with the CLI's configuration.
+- `hopcode.config`: This event occurs once at startup with the CLI's configuration.
   - **Attributes**:
     - `model` (string)
     - `sandbox_enabled` (boolean)
@@ -244,7 +244,7 @@ Logs are timestamped records of specific events. The following events are logged
     - `mcp_servers` (string)
     - `output_format` (string: "text" or "json")
 
-- `qwen-code.user_prompt`: This event occurs when a user submits a prompt.
+- `hopcode.user_prompt`: This event occurs when a user submits a prompt.
   - **Attributes**:
     - `prompt_length` (int)
     - `prompt_id` (string)
@@ -252,7 +252,7 @@ Logs are timestamped records of specific events. The following events are logged
       configured to be `false`)
     - `auth_type` (string)
 
-- `qwen-code.tool_call`: This event occurs for each function call.
+- `hopcode.tool_call`: This event occurs for each function call.
   - **Attributes**:
     - `function_name`
     - `function_args`
@@ -265,7 +265,7 @@ Logs are timestamped records of specific events. The following events are logged
     - `content_length` (int, if applicable)
     - `metadata` (if applicable, dictionary of string -> any)
 
-- `qwen-code.file_operation`: This event occurs for each file operation.
+- `hopcode.file_operation`: This event occurs for each file operation.
   - **Attributes**:
     - `tool_name` (string)
     - `operation` (string: "create", "read", "update")
@@ -279,12 +279,12 @@ Logs are timestamped records of specific events. The following events are logged
       - `user_added_lines` (int)
       - `user_removed_lines` (int)
 
-- `qwen-code.api_request`: This event occurs when making a request to the API.
+- `hopcode.api_request`: This event occurs when making a request to the API.
   - **Attributes**:
     - `model`
     - `request_text` (if applicable)
 
-- `qwen-code.api_error`: This event occurs if the API request fails.
+- `hopcode.api_error`: This event occurs if the API request fails.
   - **Attributes**:
     - `model`
     - `error`
@@ -293,7 +293,7 @@ Logs are timestamped records of specific events. The following events are logged
     - `duration_ms`
     - `auth_type`
 
-- `qwen-code.api_response`: This event occurs upon receiving a response from the API.
+- `hopcode.api_response`: This event occurs upon receiving a response from the API.
   - **Attributes**:
     - `model`
     - `status_code`
@@ -306,7 +306,7 @@ Logs are timestamped records of specific events. The following events are logged
     - `response_text` (if applicable)
     - `auth_type`
 
-- `qwen-code.tool_output_truncated`: This event occurs when the output of a tool call is too large and gets truncated.
+- `hopcode.tool_output_truncated`: This event occurs when the output of a tool call is too large and gets truncated.
   - **Attributes**:
     - `tool_name` (string)
     - `original_content_length` (int)
@@ -315,62 +315,62 @@ Logs are timestamped records of specific events. The following events are logged
     - `lines` (int)
     - `prompt_id` (string)
 
-- `qwen-code.malformed_json_response`: This event occurs when a `generateJson` response from the API cannot be parsed as a json.
+- `hopcode.malformed_json_response`: This event occurs when a `generateJson` response from the API cannot be parsed as a json.
   - **Attributes**:
     - `model`
 
-- `qwen-code.flash_fallback`: This event occurs when HopCode switches to flash as fallback.
+- `hopcode.flash_fallback`: This event occurs when HopCode switches to flash as fallback.
   - **Attributes**:
     - `auth_type`
 
-- `qwen-code.slash_command`: This event occurs when a user executes a slash command.
+- `hopcode.slash_command`: This event occurs when a user executes a slash command.
   - **Attributes**:
     - `command` (string)
     - `subcommand` (string, if applicable)
 
-- `qwen-code.extension_enable`: This event occurs when an extension is enabled
-- `qwen-code.extension_install`: This event occurs when an extension is installed
+- `hopcode.extension_enable`: This event occurs when an extension is enabled
+- `hopcode.extension_install`: This event occurs when an extension is installed
   - **Attributes**:
     - `extension_name` (string)
     - `extension_version` (string)
     - `extension_source` (string)
     - `status` (string)
-- `qwen-code.extension_uninstall`: This event occurs when an extension is uninstalled
+- `hopcode.extension_uninstall`: This event occurs when an extension is uninstalled
 
 ### Metrics
 
-Metrics are numerical measurements of behavior over time. The following metrics are collected for HopCode (metric names remain `qwen-code.*` for compatibility):
+Metrics are numerical measurements of behavior over time. The following metrics are collected for HopCode:
 
-- `qwen-code.session.count` (Counter, Int): Incremented once per CLI startup.
+- `hopcode.session.count` (Counter, Int): Incremented once per CLI startup.
 
-- `qwen-code.tool.call.count` (Counter, Int): Counts tool calls.
+- `hopcode.tool.call.count` (Counter, Int): Counts tool calls.
   - **Attributes**:
     - `function_name`
     - `success` (boolean)
     - `decision` (string: "accept", "reject", or "modify", if applicable)
     - `tool_type` (string: "mcp", or "native", if applicable)
 
-- `qwen-code.tool.call.latency` (Histogram, ms): Measures tool call latency.
+- `hopcode.tool.call.latency` (Histogram, ms): Measures tool call latency.
   - **Attributes**:
     - `function_name`
     - `decision` (string: "accept", "reject", or "modify", if applicable)
 
-- `qwen-code.api.request.count` (Counter, Int): Counts all API requests.
+- `hopcode.api.request.count` (Counter, Int): Counts all API requests.
   - **Attributes**:
     - `model`
     - `status_code`
     - `error_type` (if applicable)
 
-- `qwen-code.api.request.latency` (Histogram, ms): Measures API request latency.
+- `hopcode.api.request.latency` (Histogram, ms): Measures API request latency.
   - **Attributes**:
     - `model`
 
-- `qwen-code.token.usage` (Counter, Int): Counts the number of tokens used.
+- `hopcode.token.usage` (Counter, Int): Counts the number of tokens used.
   - **Attributes**:
     - `model`
     - `type` (string: "input", "output", "thought", or "cache")
 
-- `qwen-code.file.operation.count` (Counter, Int): Counts file operations.
+- `hopcode.file.operation.count` (Counter, Int): Counts file operations.
   - **Attributes**:
     - `operation` (string: "create", "read", "update"): The type of file operation.
     - `lines` (Int, if applicable): Number of lines in the file.
@@ -382,7 +382,7 @@ Metrics are numerical measurements of behavior over time. The following metrics 
     - `user_removed_lines` (Int, if applicable): Number of lines removed/changed by user in AI proposed changes.
     - `programming_language` (string, if applicable): The programming language of the file.
 
-- `qwen-code.chat_compression` (Counter, Int): Counts chat compression operations
+- `hopcode.chat_compression` (Counter, Int): Counts chat compression operations
   - **Attributes**:
     - `tokens_before`: (Int): Number of tokens in context prior to compression
     - `tokens_after`: (Int): Number of tokens in context after compression

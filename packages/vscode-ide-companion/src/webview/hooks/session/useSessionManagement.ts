@@ -12,7 +12,7 @@ import type { VSCodeAPI } from '../../hooks/useVSCode.js';
  * Manages session list, current session, session switching, and search
  */
 export const useSessionManagement = (vscode: VSCodeAPI) => {
-  const [qwenSessions, setQwenSessions] = useState<
+  const [hopcodeSessions, setHopCodeSessions] = useState<
     Array<Record<string, unknown>>
   >([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -62,10 +62,10 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
    */
   const filteredSessions = useMemo(() => {
     if (!sessionSearchQuery.trim()) {
-      return qwenSessions;
+      return hopcodeSessions;
     }
     const query = sessionSearchQuery.toLowerCase();
-    return qwenSessions.filter((session) => {
+    return hopcodeSessions.filter((session) => {
       const title = (
         (session.title as string) ||
         (session.name as string) ||
@@ -73,18 +73,21 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
       ).toLowerCase();
       return title.includes(query);
     });
-  }, [qwenSessions, sessionSearchQuery]);
+  }, [hopcodeSessions, sessionSearchQuery]);
 
   /**
    * Load session list
    */
-  const handleLoadQwenSessions = useCallback(() => {
+  const handleLoadHopCodeSessions = useCallback(() => {
     // Reset pagination state and load first page
-    setQwenSessions([]);
+    setHopCodeSessions([]);
     setNextCursor(undefined);
     setHasMore(true);
     setIsLoading(true);
-    vscode.postMessage({ type: 'getQwenSessions', data: { size: PAGE_SIZE } });
+    vscode.postMessage({
+      type: 'getHopCodeSessions',
+      data: { size: PAGE_SIZE },
+    });
     setShowSessionSelector(true);
   }, [vscode]);
 
@@ -94,7 +97,7 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
     }
     setIsLoading(true);
     vscode.postMessage({
-      type: 'getQwenSessions',
+      type: 'getHopCodeSessions',
       data: { cursor: nextCursor, size: PAGE_SIZE },
     });
   }, [hasMore, isLoading, nextCursor, vscode]);
@@ -102,7 +105,7 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
   /**
    * Create new session
    */
-  const handleNewQwenSession = useCallback(
+  const handleNewHopCodeSession = useCallback(
     (modelId?: string | null) => {
       const trimmedModelId =
         typeof modelId === 'string' && modelId.trim().length > 0
@@ -131,7 +134,7 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
       console.log('[useSessionManagement] Switching to session:', sessionId);
       setIsSwitchingSession(true);
       vscode.postMessage({
-        type: 'switchQwenSession',
+        type: 'switchHopCodeSession',
         data: { sessionId },
       });
     },
@@ -144,7 +147,7 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
   const handleDeleteSession = useCallback(
     (sessionId: string) => {
       vscode.postMessage({
-        type: 'deleteQwenSession',
+        type: 'deleteHopCodeSession',
         data: { sessionId },
       });
     },
@@ -157,7 +160,7 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
   const handleRenameSession = useCallback(
     (sessionId: string, title: string) => {
       vscode.postMessage({
-        type: 'renameQwenSession',
+        type: 'renameHopCodeSession',
         data: { sessionId, title },
       });
     },
@@ -166,7 +169,7 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
 
   return {
     // State
-    qwenSessions,
+    hopcodeSessions,
     currentSessionId,
     currentSessionTitle,
     showSessionSelector,
@@ -178,7 +181,7 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
     isSwitchingSession,
 
     // State setters
-    setQwenSessions,
+    setHopCodeSessions,
     setCurrentSessionId,
     setCurrentSessionTitle,
     setShowSessionSelector,
@@ -189,8 +192,8 @@ export const useSessionManagement = (vscode: VSCodeAPI) => {
     setIsSwitchingSession,
 
     // Operations
-    handleLoadQwenSessions,
-    handleNewQwenSession,
+    handleLoadHopCodeSessions,
+    handleNewHopCodeSession,
     handleSwitchSession,
     handleLoadMoreSessions,
     handleDeleteSession,

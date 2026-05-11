@@ -32,7 +32,7 @@ let preconnectFired = false;
  */
 const DEFAULT_BASE_URLS: Record<string, string> = {
   openai: 'https://api.openai.com',
-  'qwen-oauth': 'https://coding.dashscope.aliyuncs.com',
+  'hopcode-oauth': 'https://coding.dashscope.aliyuncs.com',
   anthropic: 'https://api.anthropic.com',
   dashscope: 'https://dashscope.aliyuncs.com',
 };
@@ -124,7 +124,7 @@ function getPreconnectTargetUrl(
  * Use HEAD request to establish TCP+TLS connection without sending actual request body.
  * Uses the shared undici dispatcher to ensure connection pool is shared with SDK clients.
  *
- * @param authType - Authentication type (openai, qwen-oauth, anthropic, etc.)
+ * @param authType - Authentication type (openai, hopcode-oauth, anthropic, etc.)
  * @param options - Configuration options
  */
 export function preconnectApi(
@@ -141,7 +141,7 @@ export function preconnectApi(
   // Check if disabled
   if (
     process.env['HOPCODE_DISABLE_PRECONNECT'] === '1' ||
-    process.env['QWEN_CODE_DISABLE_PRECONNECT'] === '1'
+    process.env['HOPCODE_DISABLE_PRECONNECT'] === '1'
   ) {
     debugLogger.debug('Preconnect disabled by environment variable');
     preconnectFired = true;

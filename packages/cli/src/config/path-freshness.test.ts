@@ -1,0 +1,65 @@
+/**
+ * @license
+ * Copyright 2025 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import * as path from 'node:path';
+import { homedir } from 'node:os';
+import { getUserSettingsDir, getUserSettingsPath } from './settings.js';
+import { getTrustedFoldersPath } from './trustedFolders.js';
+
+// Regression guard: `HOPCODE_HOME` is resolved by `preResolveHomeEnvOverrides()`
+// AFTER any module that imports a settings/trustedFolders path has loaded.
+// A top-level `const` would freeze the pre-bootstrap value and split state
+// across callers. Each test mutates `process.env.HOPCODE_HOME` post-load and
+// asserts the exported path getters reflect the new value.
+
+describe('settings/trustedFolders path getters are lazy', () => {
+  let originalHopCodeHome: string | undefined;
+  let originalTrustedPath: string | undefined;
+
+  beforeEach(() => {
+    originalHopCodeHome = process.env['HOPCODE_HOME'];
+    originalTrustedPath = process.env['HOPCODE_TRUSTED_FOLDERS_PATH'];
+    delete process.env['HOPCODE_HOME'];
+    delete process.env['HOPCODE_TRUSTED_FOLDERS_PATH'];
+  });
+
+  afterEach(() => {
+    if (originalHopCodeHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalHopCodeHome;
+    if (originalTrustedPath === undefined)
+      delete process.env['HOPCODE_TRUSTED_FOLDERS_PATH'];
+    else process.env['HOPCODE_TRUSTED_FOLDERS_PATH'] = originalTrustedPath;
+  });
+
+  it('getUserSettingsPath() reflects HOPCODE_HOME set after module load', () => {
+    const defaultPath = getUserSettingsPath();
+    expect(defaultPath).toBe(path.join(homedir(), '.hopcode', 'settings.json'));
+
+    process.env['HOPCODE_HOME'] = '/tmp/hopcode-lazy-test';
+    expect(getUserSettingsPath()).toBe(
+      path.join('/tmp/hopcode-lazy-test', 'settings.json'),
+    );
+  });
+
+  it('getUserSettingsDir() reflects HOPCODE_HOME set after module load', () => {
+    expect(getUserSettingsDir()).toBe(path.join(homedir(), '.hopcode'));
+
+    process.env['HOPCODE_HOME'] = '/tmp/hopcode-lazy-test';
+    expect(getUserSettingsDir()).toBe(path.normalize('/tmp/hopcode-lazy-test'));
+  });
+
+  it('getTrustedFoldersPath() reflects HOPCODE_HOME set after module load', () => {
+    expect(getTrustedFoldersPath()).toBe(
+      path.join(homedir(), '.hopcode', 'trustedFolders.json'),
+    );
+
+    process.env['HOPCODE_HOME'] = '/tmp/hopcode-lazy-test';
+    expect(getTrustedFoldersPath()).toBe(
+      path.join('/tmp/hopcode-lazy-test', 'trustedFolders.json'),
+    );
+  });
+});

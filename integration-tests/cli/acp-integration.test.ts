@@ -407,11 +407,11 @@ function setupAcpTest(
           };
         };
 
-        // Choose a qwen-oauth model to trigger auth-required path deterministically.
-        const qwenOauthModel = newSession.models.availableModels.find((model) =>
-          model.modelId.includes('qwen-oauth'),
+        // Choose a hopcode-oauth model to trigger auth-required path deterministically.
+        const hopcodeOauthModel = newSession.models.availableModels.find(
+          (model) => model.modelId.includes('hopcode-oauth'),
         );
-        expect(qwenOauthModel).toBeDefined();
+        expect(hopcodeOauthModel).toBeDefined();
         await expect(
           sendRequest('session/set_config_option', {
             sessionId: newSession.sessionId,

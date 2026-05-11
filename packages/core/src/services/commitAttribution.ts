@@ -291,12 +291,12 @@ function sanitiseAttribution(v: unknown): FileAttribution {
 
 /**
  * Surface label embedded in the git-notes payload. Defaults to `'cli'`
- * for the qwen-code CLI; embedders (IDE extensions, SDK consumers) can
- * override by setting `QWEN_CODE_ENTRYPOINT` before construction so the
+ * for the HopCode CLI; embedders (IDE extensions, SDK consumers) can
+ * override by setting `HOPCODE_ENTRYPOINT` before construction so the
  * note records where the contribution was authored.
  */
 export function getClientSurface(): string {
-  return process.env['QWEN_CODE_ENTRYPOINT'] ?? 'cli';
+  return process.env['HOPCODE_ENTRYPOINT'] ?? 'cli';
 }
 
 // ---------------------------------------------------------------------------

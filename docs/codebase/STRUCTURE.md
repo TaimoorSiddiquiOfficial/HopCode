@@ -464,7 +464,7 @@ integration-tests/
 docs/
 ├── ARCHITECTURE.md             # Architecture design (authoritative)
 ├── index.md                    # Documentation index
-├── MIGRATING_FROM_QWEN_CODE.md # Migration guide
+├── MIGRATING_FROM_HOPCODE.md # Migration guide
 ├── hopcodecli.png              # CLI screenshot
 ├── _meta.ts                    # Documentation metadata
 │

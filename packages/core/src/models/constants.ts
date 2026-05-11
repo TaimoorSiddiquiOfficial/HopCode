@@ -114,7 +114,7 @@ export const AUTH_ENV_MAPPINGS = {
     baseUrl: [],
     model: ['GOOGLE_MODEL'],
   },
-  'qwen-oauth': {
+  'hopcode-oauth': {
     apiKey: [],
     baseUrl: [],
     model: [],
@@ -123,7 +123,7 @@ export const AUTH_ENV_MAPPINGS = {
 
 export const DEFAULT_MODELS = {
   openai: MAINLINE_CODER_MODEL,
-  'qwen-oauth': DEFAULT_HOPCODE_MODEL,
+  'hopcode-oauth': DEFAULT_HOPCODE_MODEL,
 } as Partial<Record<AuthType, string>>;
 
 /**

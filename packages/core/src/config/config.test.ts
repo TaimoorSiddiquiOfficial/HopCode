@@ -149,16 +149,16 @@ vi.mock('../tools/read-many-files', () => ({
 }));
 vi.mock('../memory/const.js', () => ({
   setGeminiMdFilename: vi.fn(),
-  getCurrentGeminiMdFilename: vi.fn(() => 'QWEN.md'), // Mock the original filename
-  getAllGeminiMdFilenames: vi.fn(() => ['QWEN.md', 'AGENTS.md']),
-  DEFAULT_CONTEXT_FILENAME: 'QWEN.md',
+  getCurrentGeminiMdFilename: vi.fn(() => 'HOPCODE.md'), // Mock the original filename
+  getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
+  DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
   HOPCODE_CONFIG_DIR: '.hopcode',
 }));
 vi.mock('../tools/memory-config', () => ({
   setGeminiMdFilename: vi.fn(),
-  getCurrentGeminiMdFilename: vi.fn(() => 'QWEN.md'),
-  getAllGeminiMdFilenames: vi.fn(() => ['QWEN.md', 'AGENTS.md']),
-  DEFAULT_CONTEXT_FILENAME: 'QWEN.md',
+  getCurrentGeminiMdFilename: vi.fn(() => 'HOPCODE.md'),
+  getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
+  DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
   AGENT_CONTEXT_FILENAME: 'AGENTS.md',
   HOPCODE_CONFIG_DIR: '.hopcode',
   MEMORY_SECTION_HEADER: '## HopCode Added Memories',
@@ -569,7 +569,7 @@ describe('Server Config (config.ts)', () => {
   });
 
   describe('model switching optimization (HOPCODE_OAUTH)', () => {
-    it('should switch qwen-oauth model in-place without refreshing auth when safe', async () => {
+    it('should switch hopcode-oauth model in-place without refreshing auth when safe', async () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
@@ -598,7 +598,7 @@ describe('Server Config (config.ts)', () => {
         embedContent: vi.fn(),
       } as unknown as ContentGenerator);
 
-      // Establish initial qwen-oauth content generator config/content generator.
+      // Establish initial hopcode-oauth content generator config/content generator.
       await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
       // Spy after initial refresh to ensure model switch does not re-trigger refreshAuth.
@@ -786,7 +786,7 @@ describe('Server Config (config.ts)', () => {
     const config = new Config(baseParams);
 
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-      memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
       fileCount: 1,
       ruleCount: 0,
       conditionalRules: [],
@@ -807,7 +807,7 @@ describe('Server Config (config.ts)', () => {
     const config = new Config(baseParams);
 
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-      memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
       fileCount: 1,
       ruleCount: 0,
       conditionalRules: [],
@@ -829,7 +829,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-      memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
       fileCount: 1,
       ruleCount: 0,
       conditionalRules: [],
@@ -856,7 +856,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-      memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
       fileCount: 1,
       ruleCount: 0,
       conditionalRules: [],
@@ -1124,7 +1124,6 @@ describe('Server Config (config.ts)', () => {
       expect(settings.pr).toBe(true);
     });
   });
-
 
   describe('Telemetry Settings', () => {
     it('should return default telemetry target if not provided', () => {
@@ -2117,10 +2116,10 @@ describe('Model Switching and Config Updates', () => {
     expect(sources['enableCacheControl']?.kind).toBe('settings');
   });
 
-  it('should trigger full refresh when switching to non-qwen-oauth provider', async () => {
+  it('should trigger full refresh when switching to non-hopcode-oauth provider', async () => {
     const config = new Config(baseParams);
 
-    // Initialize with qwen-oauth
+    // Initialize with hopcode-oauth
     const initialConfig: ContentGeneratorConfig = {
       ['model']: 'qwen3-coder-plus',
       ['authType']: AuthType.HOPCODE_OAUTH,
@@ -2274,7 +2273,7 @@ describe('Model Switching and Config Updates', () => {
       } as unknown as ContentGenerator;
       const parentGeneratorConfig: ContentGeneratorConfig = {
         model: 'parent-model',
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         apiKey: 'parent-key',
       };
       setInstanceFields(config, parentGenerator, parentGeneratorConfig);
@@ -2292,7 +2291,7 @@ describe('Model Switching and Config Updates', () => {
       expect(config.getContentGenerator()).toBe(parentGenerator);
       expect(config.getContentGeneratorConfig()).toBe(parentGeneratorConfig);
       expect(config.getModel()).toBe('parent-model');
-      expect(config.getAuthType()).toBe(AuthType.QWEN_OAUTH);
+      expect(config.getAuthType()).toBe(AuthType.HOPCODE_OAUTH);
 
       // Inside the frame, every getter resolves to the agent's view.
       await runWithRuntimeContentGenerator(
@@ -2323,7 +2322,7 @@ describe('Model Switching and Config Updates', () => {
         { generateContentStream: vi.fn() } as unknown as ContentGenerator,
         {
           model: 'parent-model',
-          authType: AuthType.QWEN_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
         } as ContentGeneratorConfig,
       );
 

@@ -6,9 +6,9 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
 import * as crypto from 'crypto';
 import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
+import { getRuntimeBaseDir } from '../utils/paths.js';
 import type { HopCodeSession } from './hopcodeSessionReader.js';
 
 /**
@@ -21,18 +21,17 @@ import type { HopCodeSession } from './hopcodeSessionReader.js';
  * when ACP methods are unavailable or fail.
  */
 export class HopCodeSessionManager {
-  private hopcodeDir: string;
-
-  constructor() {
-    this.hopcodeDir = path.join(os.homedir(), '.hopcode');
-  }
-
   /**
    * Get the session directory for a project with backward compatibility
    */
   private getSessionDir(workingDir: string): string {
     const projectHash = getProjectHash(workingDir);
-    const sessionDir = path.join(this.hopcodeDir, 'tmp', projectHash, 'chats');
+    const sessionDir = path.join(
+      getRuntimeBaseDir(),
+      'tmp',
+      projectHash,
+      'chats',
+    );
     return sessionDir;
   }
 

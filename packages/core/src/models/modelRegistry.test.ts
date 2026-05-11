@@ -15,7 +15,7 @@ import type { ModelProvidersConfig } from './types.js';
 
 describe('ModelRegistry', () => {
   describe('initialization', () => {
-    it('should always include hard-coded qwen-oauth models', () => {
+    it('should always include hard-coded hopcode-oauth models', () => {
       const registry = new ModelRegistry();
 
       const qwenModels = registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH);
@@ -49,9 +49,9 @@ describe('ModelRegistry', () => {
       expect(openaiModels[0].id).toBe('gpt-4-turbo');
     });
 
-    it('should ignore qwen-oauth models in config (hard-coded)', () => {
+    it('should ignore hopcode-oauth models in config (hard-coded)', () => {
       const modelProvidersConfig: ModelProvidersConfig = {
-        'qwen-oauth': [
+        'hopcode-oauth': [
           {
             id: 'custom-qwen',
             name: 'Custom Qwen',
@@ -61,7 +61,7 @@ describe('ModelRegistry', () => {
 
       const registry = new ModelRegistry(modelProvidersConfig);
 
-      // Should still use hard-coded qwen-oauth models
+      // Should still use hard-coded hopcode-oauth models
       const qwenModels = registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH);
       expect(qwenModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
       expect(qwenModels.find((m) => m.id === 'custom-qwen')).toBeUndefined();
@@ -246,7 +246,7 @@ describe('ModelRegistry', () => {
   });
 
   describe('getDefaultModelForAuthType', () => {
-    it('should return coder-model for qwen-oauth', () => {
+    it('should return coder-model for hopcode-oauth', () => {
       const registry = new ModelRegistry();
       const defaultModel = registry.getDefaultModelForAuthType(
         AuthType.HOPCODE_OAUTH,
@@ -281,7 +281,7 @@ describe('ModelRegistry', () => {
   });
 
   describe('default base URLs', () => {
-    it('should apply default dashscope URL for qwen-oauth', () => {
+    it('should apply default dashscope URL for hopcode-oauth', () => {
       const registry = new ModelRegistry();
       const model = registry.getModel(AuthType.HOPCODE_OAUTH, 'coder-model');
       expect(model?.baseUrl).toBe('DYNAMIC_HOPCODE_OAUTH_BASE_URL');
@@ -598,7 +598,7 @@ describe('ModelRegistry', () => {
       expect(registry.getModel(AuthType.USE_OPENAI, 'gpt-3.5')).toBeDefined();
     });
 
-    it('should preserve hard-coded qwen-oauth models after reload', () => {
+    it('should preserve hard-coded hopcode-oauth models after reload', () => {
       const registry = new ModelRegistry({
         openai: [{ id: 'gpt-4', name: 'GPT-4' }],
       });
@@ -611,7 +611,7 @@ describe('ModelRegistry', () => {
         openai: [{ id: 'gpt-3.5', name: 'GPT-3.5' }],
       });
 
-      // qwen-oauth models should still exist
+      // hopcode-oauth models should still exist
       expect(registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH).length).toBe(
         HOPCODE_OAUTH_MODELS.length,
       );
@@ -635,23 +635,28 @@ describe('ModelRegistry', () => {
       expect(registry.getModelsForAuthType(AuthType.USE_OPENAI).length).toBe(0);
       expect(registry.getModelsForAuthType(AuthType.USE_GEMINI).length).toBe(0);
 
-      // qwen-oauth models should still exist
+      // hopcode-oauth models should still exist
       expect(registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH).length).toBe(
         HOPCODE_OAUTH_MODELS.length,
       );
     });
 
-    it('should ignore qwen-oauth models in reload config', () => {
-      const registry = new ModelRegistry();
-
-      registry.reloadModels({
-        'qwen-oauth': [{ id: 'custom-qwen', name: 'Custom Qwen' }],
+    it('should ignore hopcode-oauth models in reload config', () => {
+      const registry = new ModelRegistry({
+        openai: [{ id: 'gpt-4', name: 'GPT-4' }],
       });
+      const modelProvidersConfig: ModelProvidersConfig = {
+        'hopcode-oauth': [{ id: 'custom-qwen', name: 'Custom Qwen' }],
+      };
 
-      // qwen-oauth should still use hard-coded models
-      const qwenModels = registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH);
-      expect(qwenModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
-      expect(qwenModels.find((m) => m.id === 'custom-qwen')).toBeUndefined();
+      registry.reloadModels(modelProvidersConfig);
+
+      // hopcode-oauth should still use hard-coded models
+      const hopcodeModels = registry.getModelsForAuthType(
+        AuthType.HOPCODE_OAUTH,
+      );
+      expect(hopcodeModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
+      expect(hopcodeModels.find((m) => m.id === 'custom-qwen')).toBeUndefined();
     });
 
     it('should handle reload with multiple authTypes', () => {
@@ -745,7 +750,7 @@ describe('ModelRegistry', () => {
 
       // All user-configured models should be cleared
       expect(registry.getModelsForAuthType(AuthType.USE_OPENAI).length).toBe(0);
-      // qwen-oauth models should still exist
+      // hopcode-oauth models should still exist
       expect(registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH).length).toBe(
         HOPCODE_OAUTH_MODELS.length,
       );

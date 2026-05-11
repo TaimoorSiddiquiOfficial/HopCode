@@ -57,8 +57,8 @@ describe('FileDiscoveryService', () => {
       await createTestFile('.hopcodeignore', 'secrets.txt');
       const service = new FileDiscoveryService(projectRoot);
 
-      expect(service.shouldQwenIgnoreFile('secrets.txt')).toBe(true);
-      expect(service.shouldQwenIgnoreFile('src/index.js')).toBe(false);
+      expect(service.shouldHopCodeIgnoreFile('secrets.txt')).toBe(true);
+      expect(service.shouldHopCodeIgnoreFile('src/index.js')).toBe(false);
     });
   });
 
@@ -136,7 +136,7 @@ describe('FileDiscoveryService', () => {
     });
   });
 
-  describe('shouldGitIgnoreFile & shouldQwenIgnoreFile', () => {
+  describe('shouldGitIgnoreFile & shouldHopCodeIgnoreFile', () => {
     beforeEach(async () => {
       await fs.mkdir(path.join(projectRoot, '.git'));
       await createTestFile('.gitignore', 'node_modules/');
@@ -165,7 +165,7 @@ describe('FileDiscoveryService', () => {
       const service = new FileDiscoveryService(projectRoot);
 
       expect(
-        service.shouldQwenIgnoreFile(path.join(projectRoot, 'debug.log')),
+        service.shouldHopCodeIgnoreFile(path.join(projectRoot, 'debug.log')),
       ).toBe(true);
     });
 
@@ -173,7 +173,7 @@ describe('FileDiscoveryService', () => {
       const service = new FileDiscoveryService(projectRoot);
 
       expect(
-        service.shouldQwenIgnoreFile(path.join(projectRoot, 'src/index.ts')),
+        service.shouldHopCodeIgnoreFile(path.join(projectRoot, 'src/index.ts')),
       ).toBe(false);
     });
   });

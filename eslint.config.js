@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -305,6 +305,9 @@ export default tseslint.config(
     files: [
       'packages/web-templates/src/**/*.{js,jsx,ts,tsx}',
       'packages/web-templates/*.mjs',
+      'resolve-all-conflicts.mjs',
+      'temp_fix_all_mojibake.js',
+      'temp_mojibake_fix.js',
     ],
     languageOptions: {
       globals: {

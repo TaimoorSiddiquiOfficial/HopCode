@@ -27,7 +27,7 @@ const createMockUIState = (overrides: UIStateOverrides = {}): UIState => {
       isAuthenticating: false,
       pendingAuthType: undefined,
       externalAuthState: null,
-      qwenAuthState: {
+      hopCodeAuthState: {
         deviceAuth: null,
         authStatus: 'idle',
         authMessage: null,
@@ -254,7 +254,7 @@ describe('AuthDialog', { timeout: 15000 }, () => {
   beforeEach(() => {
     originalEnv = { ...process.env };
     process.env['GEMINI_API_KEY'] = '';
-    process.env['QWEN_DEFAULT_AUTH_TYPE'] = '';
+    process.env['HOPCODE_DEFAULT_AUTH_TYPE'] = '';
     vi.clearAllMocks();
   });
 
@@ -358,9 +358,9 @@ describe('AuthDialog', { timeout: 15000 }, () => {
       expect(lastFrame()).toContain('Third-party Providers');
     });
 
-    it('should not show the GEMINI_API_KEY message if QWEN_DEFAULT_AUTH_TYPE is set to something else', () => {
+    it('should not show the GEMINI_API_KEY message if HOPCODE_DEFAULT_AUTH_TYPE is set to something else', () => {
       process.env['GEMINI_API_KEY'] = 'foobar';
-      process.env['QWEN_DEFAULT_AUTH_TYPE'] = AuthType.USE_OPENAI;
+      process.env['HOPCODE_DEFAULT_AUTH_TYPE'] = AuthType.USE_OPENAI;
 
       const settings: LoadedSettings = new LoadedSettings(
         {
@@ -402,9 +402,9 @@ describe('AuthDialog', { timeout: 15000 }, () => {
       );
     });
 
-    it('should show the GEMINI_API_KEY message if QWEN_DEFAULT_AUTH_TYPE is set to use api key', () => {
+    it('should show the GEMINI_API_KEY message if HOPCODE_DEFAULT_AUTH_TYPE is set to use api key', () => {
       process.env['GEMINI_API_KEY'] = 'foobar';
-      process.env['QWEN_DEFAULT_AUTH_TYPE'] = AuthType.USE_OPENAI;
+      process.env['HOPCODE_DEFAULT_AUTH_TYPE'] = AuthType.USE_OPENAI;
 
       const settings: LoadedSettings = new LoadedSettings(
         {
@@ -447,11 +447,11 @@ describe('AuthDialog', { timeout: 15000 }, () => {
     });
   });
 
-  describe('QWEN_DEFAULT_AUTH_TYPE environment variable', () => {
-    it('should select the auth type specified by QWEN_DEFAULT_AUTH_TYPE', () => {
+  describe('HOPCODE_DEFAULT_AUTH_TYPE environment variable', () => {
+    it('should select the auth type specified by HOPCODE_DEFAULT_AUTH_TYPE', () => {
       // HOPCODE_OAUTH is the only valid AuthType that can be selected via env var
       // API-KEY is not an AuthType enum value, so it cannot be selected this way
-      process.env['QWEN_DEFAULT_AUTH_TYPE'] = AuthType.HOPCODE_OAUTH;
+      process.env['HOPCODE_DEFAULT_AUTH_TYPE'] = AuthType.HOPCODE_OAUTH;
 
       const settings: LoadedSettings = new LoadedSettings(
         {
@@ -492,7 +492,7 @@ describe('AuthDialog', { timeout: 15000 }, () => {
       expect(lastFrame()).toContain('OAuth');
     });
 
-    it('should fall back to default if QWEN_DEFAULT_AUTH_TYPE is not set', () => {
+    it('should fall back to default if HOPCODE_DEFAULT_AUTH_TYPE is not set', () => {
       const settings: LoadedSettings = new LoadedSettings(
         {
           settings: {
@@ -532,8 +532,8 @@ describe('AuthDialog', { timeout: 15000 }, () => {
       expect(lastFrame()).toContain('Alibaba ModelStudio');
     });
 
-    it('should show an error and fall back to default if QWEN_DEFAULT_AUTH_TYPE is invalid', () => {
-      process.env['QWEN_DEFAULT_AUTH_TYPE'] = 'invalid-auth-type';
+    it('should show an error and fall back to default if HOPCODE_DEFAULT_AUTH_TYPE is invalid', () => {
+      process.env['HOPCODE_DEFAULT_AUTH_TYPE'] = 'invalid-auth-type';
 
       const settings: LoadedSettings = new LoadedSettings(
         {
@@ -570,7 +570,7 @@ describe('AuthDialog', { timeout: 15000 }, () => {
 
       const { lastFrame } = renderAuthDialog(settings);
 
-      // Since the auth dialog doesn't show QWEN_DEFAULT_AUTH_TYPE errors anymore,
+      // Since the auth dialog doesn't show HOPCODE_DEFAULT_AUTH_TYPE errors anymore,
       // it will just show the default Alibaba ModelStudio option.
       expect(lastFrame()).toContain('Alibaba ModelStudio');
     });
@@ -1546,7 +1546,7 @@ describe('AuthDialog Custom API Key Wizard', { timeout: 15000 }, () => {
           const frame = lastFrame();
           expect(frame).toContain('Custom Provider · Step 6/6 · Review');
           expect(frame).toContain('The following JSON will be saved');
-          expect(frame).toContain('QWEN_CUSTOM_API_KEY_');
+          expect(frame).toContain('HOPCODE_CUSTOM_API_KEY_');
           expect(frame).toContain('qwen/qwen3-coder');
           expect(frame).toContain('gpt-4.1');
           expect(frame).toContain('Enter to save');

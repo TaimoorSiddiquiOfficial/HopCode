@@ -130,7 +130,7 @@ def check_hopcode_cli_available(hopcode_cmd: str, timeout_seconds: float) -> str
 def build_options(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "cwd": args.cwd,
-        "path_to_hopcode_executable": args.hopcode or args.qwen,
+        "path_to_hopcode_executable": args.hopcode or args.hopcode,
         "permission_mode": "izn",
         "max_session_turns": 1,
         "timeout": {
@@ -334,7 +334,7 @@ async def main() -> int:
 
     try:
         hopcode_version = check_hopcode_cli_available(
-            args.hopcode or args.qwen, args.timeout_seconds
+            args.hopcode or args.hopcode, args.timeout_seconds
         )
     except (subprocess.CalledProcessError, OSError, subprocess.TimeoutExpired) as exc:
         payload = build_failure_payload(stage="preflight", exc=exc)

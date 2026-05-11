@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ProcessTransportTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessTransportTest.class);
-    private static final String CUSTOM_ENV_NAME = "QWEN_SDK_TEST_ENV";
+    private static final String CUSTOM_ENV_NAME = "HOPCODE_SDK_TEST_ENV";
     private static final String CUSTOM_ENV_VALUE = "from-set-env";
 
     @TempDir
@@ -46,7 +46,7 @@ class ProcessTransportTest {
     void shouldPassCustomEnvToProcess() throws IOException {
         Path executable = createEnvPrinter();
         TransportOptions transportOptions = new TransportOptions()
-                .setPathToQwenExecutable(executable.toString())
+                .setPathToHopCodeExecutable(executable.toString())
                 .setEnv(Collections.singletonMap(CUSTOM_ENV_NAME, CUSTOM_ENV_VALUE));
 
         ProcessTransport transport = new ProcessTransport(transportOptions);

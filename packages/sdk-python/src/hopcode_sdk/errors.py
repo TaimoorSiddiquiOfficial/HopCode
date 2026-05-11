@@ -7,6 +7,10 @@ class HopCodeSDKError(Exception):
     """Base error for all SDK failures."""
 
 
+# Backward-compatibility alias — use HopCodeSDKError instead.
+QwenSDKError = HopCodeSDKError
+
+
 class ValidationError(HopCodeSDKError):
     """Raised when query options are invalid."""
 
@@ -25,7 +29,3 @@ class ProcessExitError(HopCodeSDKError):
 
 class ControlRequestTimeoutError(HopCodeSDKError):
     """Raised when a control request times out waiting for response."""
-
-
-# Backward-compatibility alias
-QwenSDKError = HopCodeSDKError

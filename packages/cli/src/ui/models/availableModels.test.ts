@@ -77,14 +77,14 @@ describe('availableModels', () => {
       process.env = originalEnv;
     });
 
-    it('should return hard-coded qwen models for qwen-oauth', () => {
+    it('should return hard-coded qwen models for hopcode-oauth', () => {
       const models = getAvailableModelsForAuthType(AuthType.HOPCODE_OAUTH);
       expect(models.length).toBe(1);
       expect(models[0].id).toBe('coder-model');
       expect(models[0].isVision).toBe(true);
     });
 
-    it('should use config models for qwen-oauth when config is provided', () => {
+    it('should use config models for hopcode-oauth when config is provided', () => {
       const mockConfig = {
         getAvailableModelsForAuthType: vi.fn().mockReturnValue([
           {

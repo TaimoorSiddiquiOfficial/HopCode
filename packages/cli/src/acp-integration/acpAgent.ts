@@ -29,6 +29,7 @@ import {
   ndJsonStream,
   PROTOCOL_VERSION,
 } from '@agentclientprotocol/sdk';
+import type { Content } from '@google/genai';
 import type {
   Agent,
   AuthenticateRequest,
@@ -486,6 +487,23 @@ class HopCodeAgent implements Agent {
             `Title too long (max ${SESSION_TITLE_MAX_LENGTH} chars)`,
           );
         }
+        // When the target session is currently live in this process, route
+        // through its ChatRecordingService so the in-memory `currentCustomTitle`
+        // stays in sync. Writing directly to disk via SessionService here
+        // would leave the live recording's cache stale; the next title
+        // re-anchor (every 32KB of writes) or finalize() would re-emit the
+        // old title and silently revert the rename. The disk-only path
+        // remains for the dead-session case (e.g., another client renaming
+        // a session that isn't active in this process).
+        const liveRecording = this.sessions
+          .get(sessionId)
+          ?.getConfig()
+          .getChatRecordingService();
+        if (liveRecording) {
+          const ok = liveRecording.recordCustomTitle(title, 'manual');
+          await liveRecording.flush();
+          return { success: ok };
+        }
         const success = await runWithAcpRuntimeOutputDir(
           this.settings,
           cwd,
@@ -495,6 +513,65 @@ class HopCodeAgent implements Agent {
           },
         );
         return { success };
+      }
+      case 'rewindSession': {
+        const sessionId = params['sessionId'] as string;
+        const targetTurnIndex = params['targetTurnIndex'];
+        if (!sessionId || !SESSION_ID_RE.test(sessionId)) {
+          throw RequestError.invalidParams(
+            undefined,
+            'Invalid or missing sessionId',
+          );
+        }
+        if (
+          !Number.isInteger(targetTurnIndex) ||
+          (targetTurnIndex as number) < 0
+        ) {
+          throw RequestError.invalidParams(
+            undefined,
+            'Invalid or missing targetTurnIndex',
+          );
+        }
+        const session = this.sessions.get(sessionId);
+        if (!session) {
+          throw RequestError.invalidParams(
+            undefined,
+            `Session not found for id: ${sessionId}`,
+          );
+        }
+
+        const historyBeforeRewind = session.captureHistorySnapshot();
+        return {
+          success: true,
+          historyBeforeRewind,
+          ...session.rewindToTurn(targetTurnIndex as number),
+        };
+      }
+      case 'restoreSessionHistory': {
+        const sessionId = params['sessionId'] as string;
+        const history = params['history'];
+        if (!sessionId || !SESSION_ID_RE.test(sessionId)) {
+          throw RequestError.invalidParams(
+            undefined,
+            'Invalid or missing sessionId',
+          );
+        }
+        if (!Array.isArray(history)) {
+          throw RequestError.invalidParams(
+            undefined,
+            'Invalid or missing history',
+          );
+        }
+        const session = this.sessions.get(sessionId);
+        if (!session) {
+          throw RequestError.invalidParams(
+            undefined,
+            `Session not found for id: ${sessionId}`,
+          );
+        }
+
+        session.restoreHistory(history as Content[]);
+        return { success: true };
       }
       case 'getAccountInfo': {
         const sessionId = params['sessionId'] as string | undefined;
@@ -628,13 +705,13 @@ class HopCodeAgent implements Agent {
     const authMethods = buildAuthMethods();
     const errorMessage = this.extractErrorMessage(error);
     if (
-      errorMessage?.includes('qwen-oauth') ||
-      errorMessage?.includes('Qwen OAuth')
+      errorMessage?.includes('hopcode-oauth') ||
+      errorMessage?.includes('HopCode OAuth')
     ) {
-      const qwenOAuthMethods = authMethods.filter(
+      const hopcodeOAuthMethods = authMethods.filter(
         (m) => m.id === AuthType.HOPCODE_OAUTH,
       );
-      return qwenOAuthMethods.length ? qwenOAuthMethods : authMethods;
+      return hopcodeOAuthMethods.length ? hopcodeOAuthMethods : authMethods;
     }
 
     if (selectedType) {

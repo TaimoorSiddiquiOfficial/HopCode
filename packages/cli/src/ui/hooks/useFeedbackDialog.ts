@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+﻿import { useState, useCallback, useEffect } from 'react';
 import * as fs from 'node:fs';
 import {
   type Config,
@@ -13,7 +13,7 @@ import { StreamingState, MessageType, type HistoryItem } from '../types.js';
 import {
   SettingScope,
   type LoadedSettings,
-  USER_SETTINGS_PATH,
+  getUserSettingsPath,
 } from '../../config/settings.js';
 import type { SessionStatsState } from '../contexts/SessionContext.js';
 import { FEEDBACK_OPTIONS } from '../FeedbackDialog.js';
@@ -38,8 +38,9 @@ const lastMessageIsAIResponse = (history: HistoryItem[]): boolean =>
  */
 const getFeedbackLastShownTimestampFromFile = (): number => {
   try {
-    if (fs.existsSync(USER_SETTINGS_PATH)) {
-      const content = fs.readFileSync(USER_SETTINGS_PATH, 'utf-8');
+    const userSettingsPath = getUserSettingsPath();
+    if (fs.existsSync(userSettingsPath)) {
+      const content = fs.readFileSync(userSettingsPath, 'utf-8');
       const settings = JSON.parse(stripJsonComments(content));
       return settings?.ui?.feedbackLastShownTimestamp ?? 0;
     }

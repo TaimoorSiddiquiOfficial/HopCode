@@ -168,12 +168,12 @@ phase_1_core_identity() {
     
     # 1.3 Environment variables in source files
     log_info "Updating environment variables..."
-    replace_in_files "*.ts" "QWEN_CODE_" "HOPCODE_"
-    replace_in_files "*.js" "QWEN_CODE_" "HOPCODE_"
-    replace_in_files "*.ts" "QWEN_SANDBOX" "HOPCODE_SANDBOX"
-    replace_in_files "*.js" "QWEN_SANDBOX" "HOPCODE_SANDBOX"
-    replace_in_files "*.ts" "QWEN_WORKING_DIR" "HOPCODE_WORKING_DIR"
-    replace_in_files "*.js" "QWEN_WORKING_DIR" "HOPCODE_WORKING_DIR"
+    replace_in_files "*.ts" "HOPCODE_" "HOPCODE_"
+    replace_in_files "*.js" "HOPCODE_" "HOPCODE_"
+    replace_in_files "*.ts" "HOPCODE_SANDBOX" "HOPCODE_SANDBOX"
+    replace_in_files "*.js" "HOPCODE_SANDBOX" "HOPCODE_SANDBOX"
+    replace_in_files "*.ts" "HOPCODE_WORKING_DIR" "HOPCODE_WORKING_DIR"
+    replace_in_files "*.js" "HOPCODE_WORKING_DIR" "HOPCODE_WORKING_DIR"
     
     # 1.4 Configuration directory references
     log_info "Updating config directory references..."
@@ -210,7 +210,7 @@ phase_2_high_visibility() {
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "Qwen Code" "HopCode"
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "install_qwen_code" "install_hopcode"
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "@qwen-code/qwen-code" "@hopcode/hopcode"
-        replace_in_file "scripts/installation/install-qwen-with-source.sh" "QWEN_DIR" "HOPCODE_DIR"
+        replace_in_file "scripts/installation/install-qwen-with-source.sh" "HOPCODE_DIR" "HOPCODE_DIR"
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "\.hopcode" ".hopcode"
         
         if [ "$DRY_RUN" = false ]; then
@@ -338,8 +338,8 @@ phase_4_documentation() {
     
     # 4.5 Java SDK
     log_info "Updating Java SDK..."
-    if [ -f "packages/sdk-java/QWEN.md" ] && [ "$DRY_RUN" = false ]; then
-        mv "packages/sdk-java/QWEN.md" "packages/sdk-java/HOPCODE.md"
+    if [ -f "packages/sdk-java/HOPCODE.md" ] && [ "$DRY_RUN" = false ]; then
+        mv "packages/sdk-java/HOPCODE.md" "packages/sdk-java/HOPCODE.md"
     fi
     
     log_success "Phase 4 complete"

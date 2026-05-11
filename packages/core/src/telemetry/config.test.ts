@@ -117,9 +117,6 @@ describe('telemetry/config helpers', () => {
         includeSensitiveSpanAttributes: true,
         outfile: 'env.log',
         useCollector: true,
-        otlpTracesEndpoint: undefined,
-        otlpLogsEndpoint: undefined,
-        otlpMetricsEndpoint: undefined,
       });
 
       const resolvedArgv = await resolveTelemetrySettings({
@@ -139,9 +136,6 @@ describe('telemetry/config helpers', () => {
         includeSensitiveSpanAttributes: true,
         outfile: 'argv.log',
         useCollector: true, // from env as no argv option
-        otlpTracesEndpoint: undefined,
-        otlpLogsEndpoint: undefined,
-        otlpMetricsEndpoint: undefined,
       });
     });
 
@@ -159,7 +153,7 @@ describe('telemetry/config helpers', () => {
 
       const resolvedEnvTrue = await resolveTelemetrySettings({
         env: {
-          QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES: '1',
+          HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES: '1',
         },
         settings: { includeSensitiveSpanAttributes: false },
       });
@@ -167,7 +161,7 @@ describe('telemetry/config helpers', () => {
 
       const resolvedEnvFalse = await resolveTelemetrySettings({
         env: {
-          QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES: 'false',
+          HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES: 'false',
         },
         settings: { includeSensitiveSpanAttributes: true },
       });
@@ -215,16 +209,16 @@ describe('telemetry/config helpers', () => {
       expect(resolved.otlpMetricsEndpoint).toBeUndefined();
     });
 
-    it('QWEN_ env vars take precedence over OTEL_ vars for per-signal endpoints', async () => {
+    it('HOPCODE_ env vars take precedence over OTEL_ vars for per-signal endpoints', async () => {
       const env = {
-        QWEN_TELEMETRY_OTLP_TRACES_ENDPOINT:
-          'http://qwen-traces:4318/v1/traces',
+        HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT:
+          'http://hopcode-traces:4318/v1/traces',
         OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://otel-traces:4318/v1/traces',
       } as Record<string, string>;
 
       const resolved = await resolveTelemetrySettings({ env });
       expect(resolved.otlpTracesEndpoint).toBe(
-        'http://qwen-traces:4318/v1/traces',
+        'http://hopcode-traces:4318/v1/traces',
       );
     });
 
