@@ -1,148 +1,183 @@
 ﻿# Installation Guide for HopCode with Source Tracking
 
-This guide describes how to install Node.js and HopCode with source information tracking.
+This guide describes the source-tracking installation scripts for HopCode.
+The scripts prefer standalone release archives and can fall back to npm when a
+standalone archive is not available.
 
 ## Overview
 
-The installation scripts automate the process of installing Node.js (if not present or below version 20) and HopCode, while capturing and storing the installation source information for analytics and tracking purposes.
+The installers are intentionally lightweight:
+
+- They try a standalone archive first by default.
+- They do not install Node.js, NVM, or any other Node version manager.
+- They do not edit npm config or shell profiles.
+- They do not start `hopcode` automatically after installation.
+- They store source information in `~/.hopcode/source.json` or
+  `%USERPROFILE%\.hopcode\source.json` when `--source` is provided.
+
+Standalone archives include a private Node.js runtime, so users do not need a
+local Node.js installation on the standalone path. Node.js 20 or newer and npm
+are only required when the installer falls back to npm or when
+`--method npm` is used.
 
 ## Installation Scripts
 
-We provide platform-specific installation scripts:
+- Linux/macOS: `install-hopcode-with-source.sh`
+- Windows: `install-hopcode-with-source.bat`
 
-- **Linux/macOS**: `install-hopcode-with-source.sh`
-- **Windows**: `install-hopcode-with-source.bat`
+## Release Artifacts
 
-## Linux/macOS Installation
+GitHub releases publish these standalone archives:
 
-### Script: install-hopcode-with-source.sh
+- `hopcode-darwin-arm64.tar.gz`
+- `hopcode-darwin-x64.tar.gz`
+- `hopcode-linux-arm64.tar.gz`
+- `hopcode-linux-x64.tar.gz`
+- `hopcode-win-x64.zip`
+- `SHA256SUMS`
 
-#### Features:
+Archive layout:
 
-- Checks for existing Node.js installation and version
-- Installs Node.js 20+ if needed using NVM
-- Installs HopCode globally with source information
-- Stores the source information in `~/.hopcode/source.json`
+```text
+hopcode/
+  bin/hopcode
+  bin/hopcode.cmd
+  lib/cli.js
+  node/
+  package.json
+  README.md
+  LICENSE
+  manifest.json
+```
 
-#### Usage:
+## Install Methods
+
+The default method is `detect`:
+
+1. Detect the current platform.
+2. Try to download and install the matching standalone archive.
+3. Verify the archive with `SHA256SUMS`.
+4. Fall back to npm if the standalone archive is not available.
+
+You can force a method:
 
 ```bash
-# Install with a specific source
-sh install-hopcode-with-source.sh --source github
-
-# Install with internal source
-sh install-hopcode-with-source.sh -s internal
-
-# Show help
-sh install-hopcode-with-source.sh --help
+bash install-hopcode-with-source.sh --method standalone
+bash install-hopcode-with-source.sh --method npm
 ```
 
-#### Supported Source Values:
+```bat
+install-hopcode-with-source.bat --method standalone
+install-hopcode-with-source.bat --method npm
+```
 
-- `github` - Installed from GitHub repository
-- `npm` - Installed from npm registry
-- `internal` - Internal installation
-- `local-build` - Local build installation
+## Optional Native Modules
 
-#### How it Works:
+The standalone archives bundle HopCode and a private Node.js runtime. They do
+not currently install npm optional native modules such as `node-pty` and
+`@teddyzhu/clipboard`. HopCode is designed to degrade when these optional
+modules are absent, but terminal pty behavior and clipboard image support may
+not be identical to an npm installation.
 
-1. The script accepts a `--source` parameter to specify where HopCode is being installed from
-2. It installs Node.js if needed
-3. It installs HopCode globally
-4. It creates `~/.hopcode/source.json` with the specified source information
+Use `--method npm` if you specifically need npm to resolve optional native
+modules for the current machine.
 
-#### Important Notes:
-
-⚠️ **After installation, you need to restart your terminal or run:**
+## Linux/macOS Usage
 
 ```bash
-source ~/.bashrc  # For bash users
-# or
-source ~/.zshrc   # For zsh users
+# Default: standalone archive with npm fallback
+bash install-hopcode-with-source.sh
+
+# Record a source value
+bash install-hopcode-with-source.sh --source github
+
+# Use npm explicitly
+bash install-hopcode-with-source.sh --method npm --registry https://registry.npmjs.org
+
+# Use a standalone mirror
+bash install-hopcode-with-source.sh --mirror github
+
+# Install an offline archive
+# SHA256SUMS must be in the same directory.
+bash install-hopcode-with-source.sh --archive ./hopcode-linux-x64.tar.gz
 ```
 
-This is required to load the newly installed Node.js and HopCode into your PATH.
+Standalone installs to:
 
-#### Prerequisites:
+- Runtime: `~/.local/lib/hopcode`
+- Shim: `~/.local/bin/hopcode`
 
-- curl (for NVM installation and script download)
-- bash-compatible shell
+Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_PARENT`,
+`HOPCODE_INSTALL_LIB_DIR`, or `HOPCODE_INSTALL_BIN_DIR` when needed.
 
-## Windows Installation
+## Windows Usage
 
-### Script: install-hopcode-with-source.bat
+```bat
+REM Default: standalone archive with npm fallback
+install-hopcode-with-source.bat
 
-#### Features:
+REM Record a source value
+install-hopcode-with-source.bat --source github
 
-- Checks for existing Node.js installation and version (requires version 20+)
-- Automatically downloads and installs Node.js 24 LTS if not present or version is too low
-- Installs HopCode globally with source information
-- Stores the source information in `%USERPROFILE%\.hopcode\source.json`
+REM Use npm explicitly
+install-hopcode-with-source.bat --method npm --registry https://registry.npmjs.org
 
-#### Prerequisites:
+REM Use a standalone mirror
+install-hopcode-with-source.bat --mirror github
 
-- **PowerShell (Administrator)**: The script must be run in PowerShell with Administrator privileges
-- Internet connection for downloading Node.js and HopCode
-
-#### Usage:
-
-> ⚠️ **Important**: You must run PowerShell as Administrator to install Node.js and global npm packages.
-
-**Step 1**: Open PowerShell as Administrator
-
-- Right-click on PowerShell and select "Run as Administrator"
-- Or press `Win + X` and select "Windows PowerShell (Admin)"
-
-**Step 2**: Navigate to the script directory and run:
-
-```powershell
-# Install with a specific source using --source parameter
-./install-hopcode-with-source.bat --source github
-
-# Install with short parameter
-./install-hopcode-with-source.bat -s internal
-
-# Use default source (unknown)
-./install-hopcode-with-source.bat
+REM Install an offline archive
+REM SHA256SUMS must be in the same directory.
+install-hopcode-with-source.bat --archive hopcode-win-x64.zip
 ```
 
-#### Supported Source Values:
+Standalone installs to:
 
-- `github` - Installed from GitHub repository
-- `npm` - Installed from npm registry
-- `internal` - Internal installation
-- `local-build` - Local build installation
+- Runtime: `%LOCALAPPDATA%\hopcode\hopcode`
+- Shim: `%LOCALAPPDATA%\hopcode\bin\hopcode.cmd`
 
-#### How it Works:
+Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_DIR`, or
+`HOPCODE_INSTALL_BIN_DIR` when needed.
 
-1. The script accepts a `--source` or `-s` parameter to specify where HopCode is being installed from
-2. It checks if Node.js is already installed and if the version is 20 or higher
-3. If Node.js is not installed or version is too low, it automatically downloads and installs Node.js 24 LTS
-4. It installs HopCode globally using npm
-5. It creates `%USERPROFILE%\.hopcode\source.json` with the specified source information
+Restart the terminal if `hopcode` is not immediately available on PATH.
 
-#### Why Administrator Privileges are Required:
+## Mirrors and Overrides
 
-- Installing Node.js requires writing to `C:\Program Files\nodejs`
-- Installing global npm packages requires elevated permissions
-- Modifying system PATH environment variables requires Administrator access
+Options:
 
-## Installation Source Feature
+- `--method detect|standalone|npm`
+- `--mirror github`
+- `--base-url URL`
+- `--archive PATH`
+- `--version VERSION`
+- `--registry REGISTRY`
+- `--source SOURCE`
 
-### Overview
+Environment variables:
 
-This feature implements the ability to capture and store the installation source of the HopCode package. The source information is used for analytics and tracking purposes.
+- `HOPCODE_INSTALL_METHOD`
+- `HOPCODE_INSTALL_MIRROR`
+- `HOPCODE_INSTALL_BASE_URL`
+- `HOPCODE_INSTALL_ARCHIVE`
+- `HOPCODE_INSTALL_VERSION`
+- `HOPCODE_NPM_REGISTRY`
 
-### Storage Location
+Use `--base-url` for private mirrors. The URL must contain
+`hopcode-<target>` archives and `SHA256SUMS` in the same directory. Custom
+base URLs must use `https://`.
 
-The installation source is stored in a separate file at:
+## Supported Source Values
 
-- **Unix/Linux/macOS**: `~/.hopcode/source.json`
-- **Windows**: `%USERPROFILE%\.hopcode\source.json` (equivalent to `C:\Users\{username}\.hopcode\source.json`)
+The source value may only contain letters, numbers, dot, underscore, and dash.
+Common values are:
 
-### File Format
+- `github`
+- `npm`
+- `internal`
+- `local-build`
 
-The `source.json` file contains:
+## Source Tracking
+
+When `--source` or `-s` is provided, the installer writes:
 
 ```json
 {
@@ -150,47 +185,17 @@ The `source.json` file contains:
 }
 ```
 
-### How the Source Information is Used
+Locations:
 
-1. **Telemetry Tracking**: The source information is included in RUM (Real User Monitoring) telemetry logs
-2. **Analytics**: Helps understand how users are discovering and installing HopCode
-3. **Distribution Analysis**: Tracks which distribution channels are most popular
+- Linux/macOS: `~/.hopcode/source.json`
+- Windows: `%USERPROFILE%\.hopcode\source.json`
 
-### Technical Implementation
+The telemetry logger reads this file when available. Missing, invalid, or
+unreadable source files are ignored.
 
-- The source information is stored as a separate JSON file
-- The telemetry logger reads this file during telemetry initialization
-- The source is included in the `app.channel` field of the RUM payload
-- The implementation gracefully handles missing files, unknown values, and parsing errors
+## Manual Installation
 
-### Verification
-
-After installation and restarting your terminal (or sourcing your shell configuration), you can verify the source information:
-
-**Linux/macOS:**
-
-```bash
-cat ~/.hopcode/source.json
-```
-
-**Windows:**
-
-```cmd
-type %USERPROFILE%\.hopcode\source.json
-```
-
-## Manual Installation (Without Source Tracking)
-
-If you prefer not to use the installation scripts or don't want source tracking:
-
-### Prerequisites
-
-```bash
-# Node.js 20+
-curl -qL https://www.npmjs.com/install.sh | sh
-```
-
-### NPM Installation
+If source tracking is not needed and Node.js 20 or newer is already available:
 
 ```bash
 npm install -g @hoptrendy/hopcode-cli@latest
@@ -200,47 +205,47 @@ Homebrew packages are not published by this repository yet. Use the npm package 
 
 ## Troubleshooting
 
-### Script Execution Issues
+### Standalone Archive Missing
 
-**Linux/macOS:**
+In `detect` mode, the installer falls back to npm. In `standalone` mode, install
+fails so that automation can detect the missing artifact.
+
+### Node.js Missing or Too Old
+
+This only blocks npm installation. Install or activate Node.js 20 or newer, then
+rerun the installer with `--method npm` or let `detect` fall back again.
+
+### npm Missing
+
+Install a Node.js distribution that includes npm, then rerun the installer.
+
+### Permission Errors During npm Install
+
+The installers do not rewrite npm prefix settings. If global npm installation
+fails with a permission error, fix the npm global install location or use a
+user-owned Node.js installation, then rerun:
 
 ```bash
-# Run with sh
-sh install-hopcode-with-source.sh --source github
+npm install -g @hoptrendy/hopcode-cli@latest
 ```
 
-**Windows (PowerShell as Administrator):**
+### hopcode Is Not on PATH After Installation
 
-```powershell
-# Run the script with --source parameter
-./install-hopcode-with-source.bat --source github
+Restart the terminal first. For standalone installs, add the shim directory:
 
-# Or with short parameter
-./install-hopcode-with-source.bat -s github
+```bash
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
-### Node.js Installation Issues
+For npm installs, add npm's global binary directory. On Linux/macOS this is
+usually:
 
-**Linux/macOS:**
+```bash
+export PATH="$(npm prefix -g)/bin:$PATH"
+```
 
-- Ensure NVM is installed: `curl -o- https://hopcode.dev/installation/install_nvm.sh | bash`
-- Restart your terminal or run: `source ~/.bashrc`
+On Windows standalone installs, add this directory to PATH:
 
-**Windows:**
-
-- Install NVM for Windows from: https://github.com/coreybutler/nvm-windows/releases
-- After installation, run the script again
-
-### Permission Issues
-
-You may need administrative privileges for global npm installation:
-
-- **Linux/macOS**: Use `sudo` with npm
-- **Windows**: Run PowerShell as Administrator (required for Node.js installation and global npm packages)
-
-## Notes
-
-- The scripts require internet access to download Node.js and HopCode
-- Administrative privileges may be required for global npm installation
-- The installation source is stored locally and used for tracking purposes only
-- If the source file is missing or invalid, the application continues to work normally
+```bat
+%LOCALAPPDATA%\hopcode\bin
+```

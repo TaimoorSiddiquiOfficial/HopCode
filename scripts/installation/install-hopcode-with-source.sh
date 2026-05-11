@@ -1,574 +1,681 @@
-﻿#!/bin/bash
-
+#!/usr/bin/env bash
 # HopCode Installation Script
-# This script installs Node.js (via NVM) and HopCode CLI
-# Supports Linux and macOS
-#
-# Usage: install-hopcode-with-source.sh --source [github|npm|internal|local-build]
-#        install-hopcode-with-source.sh -s [github|npm|internal|local-build]
+# Installs HopCode from a standalone archive when available, with npm fallback.
+# This script intentionally does not install Node.js, NVM, or change npm config.
 
-# Re-execute with bash if running with sh or other shells
-# This block must use POSIX-compliant syntax ([ not [[) since it runs before we know bash is available
-if [ -z "${BASH_VERSION}" ] && [ -z "${__HOPCODE_INSTALL_REEXEC:-}" ]; then
-    # Check if we're in a git hook environment
-    case "${0}" in
-        *.git/hooks/*) export __HOPCODE_IN_GIT_HOOK=1 ;;
-    esac
-    if [ -n "${GIT_DIR:-}" ]; then
-        export __HOPCODE_IN_GIT_HOOK=1
-    fi
+set -euo pipefail
 
-    # Try to find bash
-    if command -v bash >/dev/null 2>&1; then
-        export __HOPCODE_INSTALL_REEXEC=1
-        # Re-exec with bash, preserving all arguments
-        exec bash -- "${0}" "$@"
-    else
-        echo "Error: This script requires bash. Please install bash first."
-        exit 1
-    fi
-fi
-
-# Enable strict mode (bash-specific options)
-# pipefail requires bash 3+; check before setting
-if [ -n "${BASH_VERSION:-}" ]; then
-    # shellcheck disable=SC3040
-    set -eo pipefail
-else
-    set -e
-fi
-
-# ============================================
-# Color definitions
-# ============================================
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# ============================================
-# Log functions
-# ============================================
-log_info() {
-    echo -e "${BLUE}ℹ️  $1${NC}"
-}
-
-log_success() {
-    echo -e "${GREEN}✅ $1${NC}"
-}
-
-log_warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
-}
-
-log_error() {
-    echo -e "${RED}❌ $1${NC}"
-}
-
-# ============================================
-# Utility functions
-# ============================================
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-get_shell_profile() {
-    local current_shell
-    current_shell=$(basename "${SHELL}")
-    case "${current_shell}" in
-        bash)
-            echo "${HOME}/.bashrc"
-            ;;
-        zsh)
-            echo "${HOME}/.zshrc"
-            ;;
-        fish)
-            # Fish uses its own syntax; bash/zsh export statements are not compatible.
-            # Return empty string to signal callers to skip automatic profile writes.
-            echo ""
-            ;;
-        *)
-            echo "${HOME}/.profile"
-            ;;
-    esac
-}
-
-# ============================================
-# Parse command line arguments
-# ============================================
+# ── defaults ──────────────────────────────────────────────────────────
 SOURCE="unknown"
+METHOD="${HOPCODE_INSTALL_METHOD:-}"
+MIRROR="${HOPCODE_INSTALL_MIRROR:-github}"
+BASE_URL="${HOPCODE_INSTALL_BASE_URL:-}"
+ARCHIVE_PATH="${HOPCODE_INSTALL_ARCHIVE:-}"
+VERSION="${HOPCODE_INSTALL_VERSION:-latest}"
+NPM_REGISTRY="${HOPCODE_NPM_REGISTRY:-https://registry.npmmirror.com}"
+INSTALL_ROOT="${HOPCODE_INSTALL_ROOT:-}"
+INSTALL_LIB_PARENT="${HOPCODE_INSTALL_LIB_PARENT:-}"
+INSTALL_LIB_DIR="${HOPCODE_INSTALL_LIB_DIR:-}"
+INSTALL_BIN_DIR="${HOPCODE_INSTALL_BIN_DIR:-}"
+
+if [[ -z "${INSTALL_ROOT}" ]]; then
+    if [[ "$(uname)" == "Darwin" ]]; then
+        INSTALL_ROOT="/usr/local"
+    else
+        INSTALL_ROOT="${XDG_LOCAL_HOME:-${HOME}/.local}"
+    fi
+fi
+
+if [[ -z "${INSTALL_LIB_PARENT}" ]]; then
+    INSTALL_LIB_PARENT="${INSTALL_ROOT}/lib"
+fi
+
+if [[ -z "${INSTALL_LIB_DIR}" ]]; then
+    INSTALL_LIB_DIR="${INSTALL_LIB_PARENT}/hopcode"
+fi
+
+if [[ -z "${INSTALL_BIN_DIR}" ]]; then
+    INSTALL_BIN_DIR="${INSTALL_ROOT}/bin"
+fi
+
+# ── option parsing ────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
-    case $1 in
+    case "${1}" in
         -s|--source)
-            if [[ -z "$2" ]] || [[ "$2" == -* ]]; then
-                log_error "--source requires a value"
-                exit 1
-            fi
-            SOURCE="$2"
-            shift 2
-            ;;
+            if [[ -z "${2:-}" ]]; then echo "ERROR: --source requires a value" >&2; exit 1; fi
+            SOURCE="${2}"; shift 2 ;;
+        --method)
+            if [[ -z "${2:-}" ]]; then echo "ERROR: --method requires a value" >&2; exit 1; fi
+            METHOD="${2}"; shift 2 ;;
+        --mirror)
+            if [[ -z "${2:-}" ]]; then echo "ERROR: --mirror requires a value" >&2; exit 1; fi
+            MIRROR="${2}"; shift 2 ;;
+        --base-url)
+            if [[ -z "${2:-}" ]]; then echo "ERROR: --base-url requires a value" >&2; exit 1; fi
+            BASE_URL="${2}"; shift 2 ;;
+        --archive)
+            if [[ -z "${2:-}" ]]; then echo "ERROR: --archive requires a value" >&2; exit 1; fi
+            ARCHIVE_PATH="${2}"; shift 2 ;;
+        --version)
+            if [[ -z "${2:-}" ]]; then echo "ERROR: --version requires a value" >&2; exit 1; fi
+            VERSION="${2}"; shift 2 ;;
+        --registry)
+            if [[ -z "${2:-}" ]]; then echo "ERROR: --registry requires a value" >&2; exit 1; fi
+            NPM_REGISTRY="${2}"; shift 2 ;;
         -h|--help)
-            echo "Usage: $0 [OPTIONS]"
-            echo ""
-            echo "Options:"
-            echo "  -s, --source SOURCE    Specify the installation source (e.g., github, npm, internal)"
-            echo "  -h, --help             Show this help message"
-            echo ""
-            exit 0
-            ;;
+            print_usage; exit 0 ;;
         *)
-            log_error "Unknown option: $1"
-            exit 1
-            ;;
+            echo "ERROR: Unknown option: ${1}" >&2; echo; print_usage >&2; exit 1 ;;
     esac
 done
 
-# ============================================
-# Print header
-# ============================================
-echo "=========================================="
-echo "   HopCode Installation Script"
-echo "=========================================="
-echo ""
-log_info "System: $(uname -s) $(uname -r)" || true
-log_info "Shell: $(basename "${SHELL}")"
-echo ""
+# ── validation ────────────────────────────────────────────────────────
+METHOD="${METHOD:-detect}"
 
-# ============================================
-# Ensure download tool is available
-# ============================================
-ensure_download_tool() {
-    if command_exists curl; then
-        DOWNLOAD_CMD="curl"
-        DOWNLOAD_ARGS="-fsSL"
-        return 0
-    fi
-
-    if command_exists wget; then
-        DOWNLOAD_CMD="wget"
-        DOWNLOAD_ARGS="-qO -"
-        return 0
-    fi
-
-    log_error "Neither curl nor wget found"
-    log_info "Please install curl or wget manually:"
-    echo "  - macOS: brew install curl"
-    echo "  - Ubuntu/Debian: sudo apt-get install curl"
-    echo "  - CentOS/RHEL: sudo yum install curl"
-    exit 1
-}
-
-# ============================================
-# Clean npm configuration conflicts
-# ============================================
-clean_npmrc_conflict() {
-    local npmrc="${HOME}/.npmrc"
-    if [[ -f "${npmrc}" ]]; then
-        # Only clean if conflicting entries actually exist
-        if grep -Eq '^(prefix|globalconfig) *= *' "${npmrc}" 2>/dev/null; then
-            log_info "Cleaning npmrc conflicts..."
-            # Backup original npmrc before modifying
-            cp -f "${npmrc}" "${npmrc}.bak"
-            log_info "Backed up original .npmrc to ${npmrc}.bak"
-            grep -Ev '^(prefix|globalconfig) *= *' "${npmrc}.bak" > "${npmrc}.tmp" || true
-            mv -f "${npmrc}.tmp" "${npmrc}" || true
-            log_success "Removed conflicting prefix/globalconfig entries from .npmrc"
-        fi
-    fi
-}
-
-# ============================================
-# Install NVM
-# ============================================
-install_nvm() {
-    local NVM_DIR="${NVM_DIR:-${HOME}/.nvm}"
-    local NVM_VERSION="${NVM_VERSION:-v0.40.3}"
-
-    if [[ -s "${NVM_DIR}/nvm.sh" ]]; then
-        log_info "NVM is already installed at ${NVM_DIR}"
-        return 0
-    fi
-
-    log_info "Installing NVM ${NVM_VERSION}..."
-
-    # Download and install NVM from Aliyun OSS
-    # Use temporary file instead of pipe to avoid potential subshell issues
-    local NVM_INSTALL_TEMP
-    NVM_INSTALL_TEMP=$(mktemp)
-    if "${DOWNLOAD_CMD}" "${DOWNLOAD_ARGS}" "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" > "${NVM_INSTALL_TEMP}"; then
-        # Run the script in current shell environment
-        # shellcheck source=/dev/null
-        . "${NVM_INSTALL_TEMP}"
-        rm -f "${NVM_INSTALL_TEMP}"
-        log_success "NVM installed successfully"
-    else
-        rm -f "${NVM_INSTALL_TEMP}"
-        log_error "Failed to install NVM"
-        log_info "Please install NVM manually: https://github.com/nvm-sh/nvm#install--update-script"
-        exit 1
-    fi
-
-    # Configure shell profile
-    local PROFILE_FILE
-    PROFILE_FILE=$(get_shell_profile)
-
-    # Fish shell returns empty string from get_shell_profile because export/source
-    # syntax is incompatible with fish. Skip automatic profile writes for fish users.
-    if [[ -z "${PROFILE_FILE}" ]]; then
-        log_warning "Fish shell detected: automatic shell profile configuration is not supported."
-        log_info "Please add NVM configuration manually. See: https://github.com/nvm-sh/nvm#fish"
-    # Check if profile file is writable
-    elif [[ -f "${PROFILE_FILE}" ]] && [[ ! -w "${PROFILE_FILE}" ]]; then
-        log_warning "Cannot write to ${PROFILE_FILE} (permission denied)"
-        log_info "Skipping shell profile configuration"
-        log_info "You may need to manually add NVM configuration to your shell profile"
-    elif ! grep -q 'NVM_DIR' "${PROFILE_FILE}" 2>/dev/null; then
-        # shellcheck disable=SC2016
-        # The following echo statements intentionally use single quotes to write literal strings
-        {
-            echo ""
-            echo "# NVM configuration (added by HopCode installer)"
-            echo "export NVM_DIR=\"\$HOME/.nvm\""
-            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
-            echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
-        } >> "${PROFILE_FILE}" 2>/dev/null || {
-            log_warning "Failed to write to ${PROFILE_FILE}"
-            log_info "Skipping shell profile configuration"
-            return 0
-        }
-        log_info "Added NVM config to ${PROFILE_FILE}"
-    fi
-
-    # Load NVM for current session
-    export NVM_DIR="${NVM_DIR}"
-    # shellcheck source=/dev/null
-    [[ -s "${NVM_DIR}/nvm.sh" ]] && \. "${NVM_DIR}/nvm.sh"
-
-    log_success "NVM configured successfully"
+validate_value() {
+    local value="${1}"
+    # Reject unsafe characters that could enable command injection or path traversal.
+    local unsafe=$'\n'"$'\r'"!%&<>|^"
+    local i char
+    for (( i=0; i<${#value}; i++ )); do
+        char="${value:${i}:1}"
+        case "${unsafe}" in
+            *"${char}"*) return 1 ;;
+        esac
+    done
     return 0
 }
 
-# ============================================
-# Install Node.js via NVM
-# ============================================
-install_nodejs_with_nvm() {
-    local NODE_VERSION="${NODE_VERSION:-20}"
-    local NVM_DIR="${NVM_DIR:-${HOME}/.nvm}"
+validate_abs_path() {
+    local value="${1}"
+    case "${value}" in
+        /*) return 0 ;;
+        *)  return 1 ;;
+    esac
+}
 
-    # Ensure NVM is loaded
-    export NVM_DIR="${NVM_DIR}"
-    # shellcheck source=/dev/null
-    [[ -s "${NVM_DIR}/nvm.sh" ]] && \. "${NVM_DIR}/nvm.sh"
+validate_url() {
+    local value="${1}"
+    case "${value}" in
+        https://*) return 0 ;;
+        "")       return 0 ;;
+        *)        return 1 ;;
+    esac
+}
 
-    if ! command_exists nvm; then
-        log_error "NVM not loaded properly"
-        return 1
+validate_version() {
+    local value="${1}"
+    [[ "${value}" == "latest" ]] && return 0
+    [[ "${value}" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+[A-Za-z0-9.-]*$ ]] && return 0
+    return 1
+}
+
+validate_source() {
+    [[ "${SOURCE}" == "unknown" ]] && return 0
+    [[ "${SOURCE}" =~ ^[A-Za-z0-9._-]+$ ]] && return 0
+    return 1
+}
+
+for var_name in METHOD MIRROR BASE_URL ARCHIVE_PATH VERSION NPM_REGISTRY INSTALL_ROOT INSTALL_LIB_PARENT INSTALL_LIB_DIR INSTALL_BIN_DIR; do
+    value="${!var_name}"
+    if [[ -n "${value}" ]] && ! validate_value "${value}"; then
+        echo "ERROR: ${var_name} contains unsafe characters." >&2; exit 1
+    fi
+done
+
+validate_abs_path "${INSTALL_ROOT}"       || { echo "ERROR: HOPCODE_INSTALL_ROOT must be an absolute path." >&2; exit 1; }
+validate_abs_path "${INSTALL_LIB_PARENT}" || { echo "ERROR: HOPCODE_INSTALL_LIB_PARENT must be an absolute path." >&2; exit 1; }
+validate_abs_path "${INSTALL_LIB_DIR}"   || { echo "ERROR: HOPCODE_INSTALL_LIB_DIR must be an absolute path." >&2; exit 1; }
+validate_abs_path "${INSTALL_BIN_DIR}"    || { echo "ERROR: HOPCODE_INSTALL_BIN_DIR must be an absolute path." >&2; exit 1; }
+
+case "${METHOD}" in
+    detect|standalone|npm) ;;
+    *) echo "ERROR: --method must be detect, standalone, or npm." >&2; exit 1 ;;
+esac
+
+case "${MIRROR}" in
+    github) ;;
+    *) echo "ERROR: --mirror must be github." >&2; exit 1 ;;
+esac
+
+validate_url "${BASE_URL}"       || { echo "ERROR: --base-url must start with https://" >&2; exit 1; }
+validate_url "${NPM_REGISTRY}"   || { echo "ERROR: --registry must start with https://" >&2; exit 1; }
+validate_version "${VERSION}"    || { echo "ERROR: --version must be 'latest' or a semver string." >&2; exit 1; }
+validate_source                  || { echo "ERROR: --source may only contain letters, numbers, dot, underscore, or dash." >&2; exit 1; }
+
+# ── banner ─────────────────────────────────────────────────────────────
+echo "==========================================="
+echo "HopCode Installation Script"
+echo "==========================================="
+echo
+echo "INFO: Install method: ${METHOD}"
+if [[ "${METHOD}" != "npm" ]]; then
+    echo "INFO: Standalone mirror: ${MIRROR}"
+    [[ -n "${BASE_URL}" ]] && echo "INFO: Standalone base URL: ${BASE_URL}"
+    if [[ -n "${ARCHIVE_PATH}" ]]; then
+        echo "INFO: Standalone archive: ${ARCHIVE_PATH}"
+    else
+        echo "INFO: Standalone version: ${VERSION}"
+    fi
+fi
+if [[ "${METHOD}" != "standalone" ]]; then
+    echo "INFO: npm registry: ${NPM_REGISTRY}"
+fi
+[[ "${SOURCE}" != "unknown" ]] && echo "INFO: Installation source: ${SOURCE}"
+echo
+
+# ── helper functions ───────────────────────────────────────────────────
+detect_target() {
+    local arch os
+    arch="$(uname -m)"
+    os="$(uname -s)"
+
+    case "${os}:${arch}" in
+        Linux:aarch64)  echo "linux-arm64" ;;
+        Linux:x86_64)   echo "linux-x64" ;;
+        Linux:arm64)    echo "linux-arm64" ;;
+        Linux:amd64)    echo "linux-x64" ;;
+        Darwin:arm64)   echo "darwin-arm64" ;;
+        Darwin:x86_64)  echo "darwin-x64" ;;
+        Darwin:aarch64) echo "darwin-arm64" ;;
+        *) echo "ERROR:unsupported" ;;
+    esac
+}
+
+release_version_path() {
+    if [[ "${VERSION}" == "latest" ]]; then
+        echo "latest"
+        return
+    fi
+    local v="${VERSION}"
+    [[ "${v}" == v* ]] || v="v${v}"
+    echo "${v}"
+}
+
+standalone_base_url() {
+    if [[ -n "${BASE_URL}" ]]; then
+        echo "${BASE_URL}"
+        return
     fi
 
-    # Set Node.js mirror source for faster downloads in China
-    export NVM_NODEJS_ORG_MIRROR="https://npmmirror.com/mirrors/node"
-
-    # Install Node.js
-    log_info "Installing Node.js v${NODE_VERSION}..."
-    if nvm install "${NODE_VERSION}"; then
-        nvm alias default "${NODE_VERSION}" || true
-        nvm use default || true
-        log_success "Node.js v${NODE_VERSION} installed successfully"
-
-        # Verify installation
-        log_info "Node.js version: $(node -v)" || true
-        log_info "npm version: $(npm -v)" || true
-
-        return 0
+    local version_path
+    version_path="$(release_version_path)"
+    if [[ "${version_path}" == "latest" ]]; then
+        echo "https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download"
     else
-        log_error "Failed to install Node.js"
+        echo "https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/download/${version_path}"
+    fi
+}
+
+url_exists() {
+    local url="${1}"
+    if command -v curl >/dev/null 2>&1; then
+        curl -fsSL -o /dev/null --head "${url}" 2>/dev/null
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q --spider "${url}" 2>/dev/null
+    else
+        echo "ERROR: curl or wget is required for URL checks." >&2
         return 1
     fi
 }
 
-# ============================================
-# Check Node.js version
-# ============================================
-check_node_version() {
-    if ! command_exists node; then
-        return 1
-    fi
+download_file() {
+    local url="${1}"
+    local dest="${2}"
 
-    local current_version
-    current_version=$(node -v | sed 's/v//')
-    local major_version
-    major_version=$(echo "${current_version}" | cut -d. -f1 | sed 's/[^0-9]//g')
-
-    # Handle cases where major_version is empty or non-numeric
-    if [[ -z "${major_version}" ]]; then
-        log_warning "Unable to determine Node.js version from: $(node -v)"
-        return 1
-    fi
-
-    if [[ "${major_version}" -ge 20 ]]; then
-        log_success "Node.js v${current_version} is already installed (>= 20)"
-        return 0
+    if command -v curl >/dev/null 2>&1; then
+        curl -fsSL -o "${dest}" "${url}"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q -O "${dest}" "${url}"
     else
-        log_warning "Node.js v${current_version} is installed but version < 20"
+        echo "ERROR: curl or wget is required for downloads." >&2
         return 1
     fi
 }
 
-# ============================================
-# Install Node.js
-# ============================================
-install_nodejs() {
-    local platform
-    platform=$(uname -s)
+sha256_of() {
+    local file="${1}"
+    if command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 "${file}" | cut -d' ' -f1
+    elif command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "${file}" | cut -d' ' -f1
+    else
+        echo "ERROR: sha256sum or shasum is required for checksum verification." >&2
+        return 1
+    fi
+}
 
-    case "${platform}" in
-        Linux|Darwin)
-            log_info "Installing Node.js on ${platform}..."
+verify_checksum() {
+    local archive_file="${1}"
+    local checksum_source="${2:-}"
+    local archive_name="${3:-}"
+    local checksum_file
+    local temp_checksum=""
+    local require_checksum="1"
 
-            # Install NVM
-            if ! install_nvm; then
-                log_error "Failed to install NVM"
+    if [[ -z "${archive_name}" ]]; then
+        archive_name="$(basename "${archive_file}")"
+    fi
+
+    if [[ -n "${checksum_source}" ]]; then
+        if [[ "${checksum_source}" == https://* ]]; then
+            require_checksum="1"
+            temp_checksum="$(mktemp)"
+            download_file "${checksum_source}" "${temp_checksum}" || {
+                rm -f "${temp_checksum}"
+                echo "ERROR: Could not download SHA256SUMS for checksum verification." >&2
                 return 1
-            fi
+            }
+            checksum_file="${temp_checksum}"
+        else
+            checksum_file="${checksum_source}"
+        fi
+    else
+        checksum_file="$(dirname "${archive_file}")/SHA256SUMS"
+    fi
 
-            # Load NVM
-            export NVM_DIR="${HOME}/.nvm"
-            # shellcheck source=/dev/null
-            [[ -s "${NVM_DIR}/nvm.sh" ]] && \. "${NVM_DIR}/nvm.sh"
+    if [[ ! -f "${checksum_file}" ]]; then
+        if [[ "${require_checksum}" == "1" ]]; then
+            echo "ERROR: SHA256SUMS not found; cannot verify archive." >&2
+            return 1
+        fi
+        echo "WARNING: SHA256SUMS not found; skipping checksum verification."
+        return 0
+    fi
 
-            # Install Node.js
-            if ! install_nodejs_with_nvm; then
-                log_error "Failed to install Node.js"
-                return 1
+    local expected_hash=""
+    local line hash_in_file name_in_file
+    while IFS= read -r line; do
+        hash_in_file="${line%% *}"
+        name_in_file="${line#* }"
+        # Strip leading * or space from the filename column
+        name_in_file="${name_in_file#\*}"
+        name_in_file="${name_in_file# }"
+        if [[ "${name_in_file}" == "${archive_name}" ]]; then
+            expected_hash="${hash_in_file}"
+            break
+        fi
+    done < "${checksum_file}"
+
+    [[ -n "${temp_checksum}" ]] && rm -f "${temp_checksum}"
+
+    if [[ -z "${expected_hash}" ]]; then
+        if [[ "${require_checksum}" == "1" ]]; then
+            echo "ERROR: Checksum entry for ${archive_name} not found." >&2
+            return 1
+        fi
+        echo "WARNING: Checksum entry for ${archive_name} not found; skipping checksum verification."
+        return 0
+    fi
+
+    local actual_hash
+    actual_hash="$(sha256_of "${archive_file}")" || return 1
+
+    if [[ "${expected_hash}" != "${actual_hash}" ]]; then
+        echo "ERROR: Checksum verification failed for ${archive_name}." >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Checksum verified for ${archive_name}."
+    return 0
+}
+
+reject_archive_links() {
+    local extract_dir="${1}"
+    # Find any symlinks in the extracted directory.
+    if find "${extract_dir}" -type l -print -quit 2>/dev/null | grep -q .; then
+        echo "ERROR: Archive contains symlinks; refusing to install." >&2
+        return 1
+    fi
+    return 0
+}
+
+ensure_managed_install_dir() {
+    local target_dir="${1}"
+    if [[ ! -d "${target_dir}" ]]; then
+        return 0
+    fi
+    if [[ -f "${target_dir}/manifest.json" ]]; then
+        return 0
+    fi
+    echo "ERROR: ${target_dir} exists but is not a HopCode standalone install." >&2
+    echo "ERROR: Refusing to overwrite it. Move or remove it manually, then rerun the installer." >&2
+    return 1
+}
+
+# ── standalone installation ────────────────────────────────────────────
+install_standalone() {
+    local temp_dir=""
+    local checksum_source=""
+
+    # Resolve the archive from a local file or from the configured release mirror.
+    if [[ -n "${ARCHIVE_PATH}" ]]; then
+        ARCHIVE_FILE="${ARCHIVE_PATH}"
+        ARCHIVE_NAME="$(basename "${ARCHIVE_FILE}")"
+        if [[ ! -f "${ARCHIVE_FILE}" ]]; then
+            echo "ERROR: Standalone archive not found: ${ARCHIVE_FILE}" >&2
+            return 1
+        fi
+    else
+        local target
+        target="$(detect_target)"
+        if [[ "${target}" == "ERROR:unsupported" ]]; then
+            echo "WARNING: Standalone archive is not available for this platform." >&2
+            return 2
+        fi
+
+        ARCHIVE_NAME="hopcode-${target}.tar.gz"
+        local base_url
+        base_url="$(standalone_base_url)"
+        ARCHIVE_URL="${base_url}/${ARCHIVE_NAME}"
+        checksum_source="${base_url}/SHA256SUMS"
+
+        if [[ "${METHOD}" == "detect" ]]; then
+            if ! url_exists "${ARCHIVE_URL}"; then
+                echo "WARNING: Standalone archive not found: ${ARCHIVE_NAME}" >&2
+                return 2
             fi
+        fi
+
+        temp_dir="$(mktemp -d)"
+        ARCHIVE_FILE="${temp_dir}/${ARCHIVE_NAME}"
+
+        echo "INFO: Downloading ${ARCHIVE_URL}"
+        download_file "${ARCHIVE_URL}" "${ARCHIVE_FILE}" || {
+            rm -rf "${temp_dir}"
+            echo "WARNING: Failed to download standalone archive." >&2
+            return 2
+        }
+    fi
+
+    [[ -z "${temp_dir}" ]] && temp_dir="$(mktemp -d)"
+
+    # Verify integrity before extraction or changing the install directory.
+    verify_checksum "${ARCHIVE_FILE}" "${checksum_source}" "${ARCHIVE_NAME}" || {
+        rm -rf "${temp_dir}"
+        return 1
+    }
+
+    # Extract into a temporary directory, then validate required entry points.
+    local extract_dir="${temp_dir}/extract"
+    mkdir -p "${extract_dir}"
+    tar -xzf "${ARCHIVE_FILE}" -C "${extract_dir}" || {
+        rm -rf "${temp_dir}"
+        echo "ERROR: Failed to extract standalone archive." >&2
+        return 1
+    }
+
+    reject_archive_links "${extract_dir}" || {
+        rm -rf "${temp_dir}"
+        return 1
+    }
+
+    if [[ ! -f "${extract_dir}/hopcode/bin/hopcode" ]]; then
+        rm -rf "${temp_dir}"
+        echo "ERROR: Archive does not contain hopcode/bin/hopcode." >&2
+        return 1
+    fi
+
+    if [[ ! -f "${extract_dir}/hopcode/node/bin/node" ]]; then
+        rm -rf "${temp_dir}"
+        echo "ERROR: Archive does not contain hopcode/node/bin/node." >&2
+        return 1
+    fi
+
+    mkdir -p "${INSTALL_LIB_PARENT}"
+    mkdir -p "${INSTALL_BIN_DIR}"
+
+    # Stage into .new and keep .old so failed upgrades can roll back.
+    local new_install_dir="${INSTALL_LIB_DIR}.new"
+    local old_install_dir="${INSTALL_LIB_DIR}.old"
+
+    ensure_managed_install_dir "${INSTALL_LIB_DIR}" || { rm -rf "${temp_dir}"; return 1; }
+    ensure_managed_install_dir "${new_install_dir}" || { rm -rf "${temp_dir}"; return 1; }
+    ensure_managed_install_dir "${old_install_dir}" || { rm -rf "${temp_dir}"; return 1; }
+
+    rm -rf "${new_install_dir}"
+    rm -rf "${old_install_dir}"
+    mv "${extract_dir}/hopcode" "${new_install_dir}" || {
+        rm -rf "${temp_dir}"
+        echo "ERROR: Failed to stage standalone archive." >&2
+        return 1
+    }
+
+    if [[ -d "${INSTALL_LIB_DIR}" ]]; then
+        mv "${INSTALL_LIB_DIR}" "${old_install_dir}" || {
+            rm -rf "${temp_dir}"
+            echo "ERROR: Failed to back up existing install at ${INSTALL_LIB_DIR}." >&2
+            return 1
+        }
+    fi
+    mv "${new_install_dir}" "${INSTALL_LIB_DIR}" || {
+        # Roll back.
+        mv "${old_install_dir}" "${INSTALL_LIB_DIR}" 2>/dev/null || true
+        rm -rf "${temp_dir}"
+        echo "ERROR: Failed to install standalone archive to ${INSTALL_LIB_DIR}." >&2
+        return 1
+    }
+
+    # Write a portable shim that delegates to the real binary.
+    local shim_path="${INSTALL_BIN_DIR}/hopcode"
+    cat > "${shim_path}.new" <<SHIM
+#!/usr/bin/env bash
+exec "${INSTALL_LIB_DIR}/bin/hopcode" "\$@"
+SHIM
+    chmod +x "${shim_path}.new"
+    mv "${shim_path}.new" "${shim_path}" || {
+        rm -f "${shim_path}.new"
+        # Roll back the install.
+        rm -rf "${INSTALL_LIB_DIR}"
+        mv "${old_install_dir}" "${INSTALL_LIB_DIR}" 2>/dev/null || true
+        rm -rf "${temp_dir}"
+        echo "ERROR: Failed to create hopcode wrapper in ${INSTALL_BIN_DIR}." >&2
+        return 1
+    }
+
+    rm -rf "${old_install_dir}"
+    rm -rf "${temp_dir}"
+
+    echo "SUCCESS: HopCode standalone archive installed successfully."
+    echo "INFO: Installed to ${INSTALL_LIB_DIR}"
+    return 0
+}
+
+# ── npm installation ───────────────────────────────────────────────────
+install_npm() {
+    require_node
+    require_npm
+
+    if command -v hopcode >/dev/null 2>&1; then
+        local existing_version
+        existing_version="$(hopcode --version 2>/dev/null || echo unknown)"
+        echo "INFO: Existing HopCode detected: ${existing_version}"
+        echo "INFO: Upgrading to the latest version."
+    fi
+
+    echo "INFO: Running: npm install -g @hoptrendy/hopcode-cli@latest --registry ${NPM_REGISTRY}"
+    npm install -g "@hoptrendy/hopcode-cli@latest" --registry "${NPM_REGISTRY}" || {
+        echo "ERROR: Failed to install HopCode." >&2
+        echo >&2
+        echo "This installer does not change your npm prefix or PATH." >&2
+        echo "If the failure is a permission error, fix your npm global package directory, then run:" >&2
+        echo "  npm install -g @hoptrendy/hopcode-cli@latest --registry ${NPM_REGISTRY}" >&2
+        return 1
+    }
+
+    echo "SUCCESS: HopCode installed successfully."
+    create_source_json
+    return 0
+}
+
+require_node() {
+    if ! command -v node >/dev/null 2>&1; then
+        echo "ERROR: Node.js was not found." >&2
+        echo >&2
+        echo "Node.js 20 or newer is required before installing HopCode with npm." >&2
+        echo "Please install Node.js from https://nodejs.org/ and rerun this installer." >&2
+        return 1
+    fi
+
+    local node_version
+    node_version="$(node -p 'process.versions.node' 2>/dev/null || echo unknown)"
+    if [[ "${node_version}" == "unknown" ]]; then
+        echo "ERROR: Unable to determine Node.js version." >&2
+        echo "Node.js 20 or newer is required before installing HopCode with npm." >&2
+        return 1
+    fi
+
+    local major_version="${node_version%%.*}"
+    if [[ "${major_version}" -lt 20 ]]; then
+        echo "ERROR: Node.js ${node_version} is installed, but Node.js 20 or newer is required." >&2
+        echo "Please install Node.js from https://nodejs.org/ and rerun this installer." >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Node.js ${node_version} detected."
+    return 0
+}
+
+require_npm() {
+    if ! command -v npm >/dev/null 2>&1; then
+        echo "ERROR: npm was not found." >&2
+        echo "Please install Node.js with npm included, then rerun this installer." >&2
+        return 1
+    fi
+
+    local npm_version
+    npm_version="$(npm -v 2>/dev/null || echo unknown)"
+    echo "SUCCESS: npm ${npm_version} detected."
+    return 0
+}
+
+# ── source tracking ─────────────────────────────────────────────────────
+create_source_json() {
+    [[ "${SOURCE}" == "unknown" ]] && return 0
+
+    local hopcode_dir="${HOME}/.hopcode"
+    mkdir -p "${hopcode_dir}"
+
+    printf '{\n  "source": "%s"\n}\n' "${SOURCE}" > "${hopcode_dir}/source.json"
+    echo "SUCCESS: Installation source saved to ${hopcode_dir}/source.json"
+}
+
+# ── final instructions ──────────────────────────────────────────────────
+print_final_instructions() {
+    local extra_bin="${1:-}"
+    local path_prefix=""
+    [[ -n "${extra_bin}" ]] && path_prefix="PATH=\"${extra_bin}:${PATH}\" "
+
+    echo
+    echo "==========================================="
+    echo "Installation completed!"
+    echo "==========================================="
+    echo
+
+    if eval "${path_prefix} command -v hopcode" >/dev/null 2>&1; then
+        local hopcode_version
+        hopcode_version="$(eval "${path_prefix} hopcode --version" 2>/dev/null || echo unknown)"
+        echo "SUCCESS: HopCode is ready to use: ${hopcode_version}"
+        echo
+        echo "You can now run: hopcode"
+        echo
+        echo "INFO: Run hopcode in your project directory to start an interactive session."
+        return 0
+    fi
+
+    echo "WARNING: HopCode was installed, but hopcode is not on PATH in this prompt."
+    echo
+    echo "Restart your terminal, then run: hopcode"
+    if [[ -n "${extra_bin}" ]]; then
+        echo
+        echo "Or add this directory to PATH:"
+        echo "  export PATH=\"${extra_bin}:\$PATH\""
+        echo "Then run:"
+        echo "  hopcode"
+        return 0
+    fi
+
+    local npm_prefix
+    npm_prefix="$(npm prefix -g 2>/dev/null || true)"
+    if [[ -n "${npm_prefix}" ]]; then
+        echo
+        echo "Or add this npm global directory to PATH:"
+        echo "  ${npm_prefix}/bin"
+        echo "Then run:"
+        echo "  hopcode"
+    fi
+}
+
+# ── main dispatch ──────────────────────────────────────────────────────
+main() {
+    case "${METHOD}" in
+        standalone)
+            install_standalone
+            local status=$?
+            if [[ ${status} -eq 0 ]]; then
+                print_final_instructions "${INSTALL_BIN_DIR}"
+            fi
+            return ${status}
             ;;
-        MINGW*|CYGWIN*|MSYS*)
-            log_error "Windows platform detected. Please use Windows installer or WSL."
-            log_info "Visit: https://nodejs.org/en/download/"
-            exit 1
+        npm)
+            install_npm
+            local status=$?
+            if [[ ${status} -eq 0 ]]; then
+                print_final_instructions ""
+            fi
+            return ${status}
+            ;;
+        detect)
+            install_standalone
+            local standalone_status=$?
+            if [[ ${standalone_status} -eq 0 ]]; then
+                print_final_instructions "${INSTALL_BIN_DIR}"
+                return 0
+            fi
+
+            if [[ ${standalone_status} -eq 2 ]]; then
+                echo "WARNING: Falling back to npm installation."
+                install_npm
+                local npm_status=$?
+                if [[ ${npm_status} -ne 0 ]]; then
+                    echo "WARNING: Standalone archive was unavailable before npm fallback; npm fallback also failed." >&2
+                    echo "WARNING: Retry with --method standalone to debug the standalone failure, or install Node.js 20+ and rerun --method npm." >&2
+                fi
+                if [[ ${npm_status} -eq 0 ]]; then
+                    print_final_instructions ""
+                fi
+                return ${npm_status}
+            fi
+
+            echo "WARNING: Standalone install failed. Retry with --method npm to use npm, or --method standalone to debug the standalone failure." >&2
+            return ${standalone_status}
             ;;
         *)
-            log_error "Unsupported platform: ${platform}"
-            exit 1
+            echo "ERROR: Unknown method: ${METHOD}" >&2
+            return 1
             ;;
     esac
 }
 
-# ============================================
-# Check and install Node.js
-# ============================================
-check_and_install_nodejs() {
-    if check_node_version; then
-        log_info "Using existing Node.js installation"
-        clean_npmrc_conflict
-    else
-        log_warning "Installing or upgrading Node.js..."
-        install_nodejs
-    fi
-}
+# ── usage ──────────────────────────────────────────────────────────────
+print_usage() {
+    cat <<'EOF'
+HopCode Installer
 
-# ============================================
-# Fix npm permissions (without using sudo)
-# ============================================
-fix_npm_permissions() {
-    log_info "Checking npm permissions..."
+Usage: install-hopcode-with-source.sh [OPTIONS]
 
-    local NPM_GLOBAL_DIR
-    NPM_GLOBAL_DIR=$(npm config get prefix 2>/dev/null) || true
-
-    # Determine whether we need to fall back to ~/.npm-global:
-    # 1. prefix is empty or contains an error string
-    # 2. prefix is a system directory (would break sudo setuid binaries)
-    # 3. prefix directory is not writable
-    local use_user_dir=false
-
-    if [[ -z "${NPM_GLOBAL_DIR}" ]] || [[ "${NPM_GLOBAL_DIR}" == *"error"* ]]; then
-        log_info "npm prefix is unset or invalid, switching to user directory"
-        use_user_dir=true
-    else
-        # SAFETY CHECK: Never use system directories
-        case "${NPM_GLOBAL_DIR}" in
-            /|/usr|/usr/local|/bin|/sbin|/lib|/lib64|/opt|/snap|/var|/etc)
-                log_warning "npm prefix is a system directory (${NPM_GLOBAL_DIR}), switching to user directory to avoid breaking system binaries."
-                use_user_dir=true
-                ;;
-        esac
-    fi
-
-    if [[ "${use_user_dir}" == false ]] && [[ ! -w "${NPM_GLOBAL_DIR}" ]]; then
-        log_warning "npm global directory is not writable: ${NPM_GLOBAL_DIR}, switching to user directory."
-        use_user_dir=true
-    fi
-
-    if [[ "${use_user_dir}" == true ]]; then
-        NPM_GLOBAL_DIR="${HOME}/.npm-global"
-        # Create the directory before setting prefix so npm config set succeeds
-        mkdir -p "${NPM_GLOBAL_DIR}"
-        npm config set prefix "${NPM_GLOBAL_DIR}"
-        log_success "npm prefix set to: ${NPM_GLOBAL_DIR}"
-
-        # Only add ~/.npm-global/bin to PATH when we actually use it
-        local PROFILE_FILE
-        PROFILE_FILE=$(get_shell_profile)
-        if [[ -n "${PROFILE_FILE}" ]] && ! grep -q '.npm-global/bin' "${PROFILE_FILE}" 2>/dev/null; then
-            {
-                echo ""
-                echo "# NPM global bin (added by HopCode installer)"
-                echo "export PATH=\"\$HOME/.npm-global/bin:\$PATH\""
-            } >> "${PROFILE_FILE}" 2>/dev/null || log_warning "Failed to write PATH update to ${PROFILE_FILE}"
-            log_info "Added npm global bin to PATH in ${PROFILE_FILE}"
-        fi
-    else
-        log_info "npm global directory is writable: ${NPM_GLOBAL_DIR}"
-    fi
-
-    return 0
-}
-
-# ============================================
-# Install HopCode
-# ============================================
-install_hopcode() {
-    # Ensure NVM node is in PATH
-    export NVM_DIR="${HOME}/.nvm"
-    # shellcheck source=/dev/null
-    [[ -s "${NVM_DIR}/nvm.sh" ]] && \. "${NVM_DIR}/nvm.sh" 2>/dev/null || true
-
-    # Add npm global bin to PATH
-    local NPM_GLOBAL_BIN
-    NPM_GLOBAL_BIN=$(npm config get prefix 2>/dev/null)/bin
-    if [[ -n "${NPM_GLOBAL_BIN}" ]]; then
-        export PATH="${NPM_GLOBAL_BIN}:${PATH}"
-    fi
-
-    if command_exists hopcode; then
-        local HOPCODE_VERSION
-        HOPCODE_VERSION=$(hopcode --version 2>/dev/null || echo "unknown")
-        log_success "HopCode is already installed: ${HOPCODE_VERSION}"
-        log_info "Upgrading to the latest version..."
-    fi
-
-    # Clean npmrc conflicts
-    clean_npmrc_conflict
-
-    # Fix npm permissions if needed
-    fix_npm_permissions
-
-    # Install HopCode
-    log_info "Installing HopCode..."
-    if npm install -g @hoptrendy/hopcode-cli@latest --registry https://registry.npmjs.org; then
-        log_success "HopCode installed successfully!"
-
-        # Verify installation
-        if command_exists hopcode; then
-            local hopcode_version
-            hopcode_version=$(hopcode --version 2>/dev/null) || hopcode_version="unknown"
-            log_info "HopCode version: ${hopcode_version}"
-        fi
-    else
-        log_error "Failed to install HopCode!"
-        log_info "Please check your internet connection and try again"
-        exit 1
-    fi
-
-    # Create source.json if source parameter was provided
-    if [[ "${SOURCE}" != "unknown" ]]; then
-        create_source_json
-    fi
-}
-
-# ============================================
-# Create source.json
-# ============================================
-create_source_json() {
-    local HOPCODE_DIR="${HOME}/.hopcode"
-
-    mkdir -p "${HOPCODE_DIR}"
-
-    # Escape special characters in SOURCE for JSON
-    local ESCAPED_SOURCE
-    ESCAPED_SOURCE=$(printf '%s' "${SOURCE}" | sed 's/\\/\\\\/g; s/"/\\"/g')
-
-    cat > "${HOPCODE_DIR}/source.json" <<EOF
-{
-  "source": "${ESCAPED_SOURCE}"
-}
+Options:
+  -s, --source SOURCE      Record the installation source.
+                            Only letters, numbers, dot, underscore, and dash are allowed.
+  --method METHOD          Install method: detect, standalone, or npm.
+  --mirror MIRROR          Standalone archive mirror: github.
+  --base-url URL            Override standalone archive base URL.
+  --archive PATH            Install from a local standalone archive.
+  --version VERSION        Standalone release version. Defaults to latest.
+  --registry REGISTRY      npm registry to use.
+                            Defaults to HOPCODE_NPM_REGISTRY or https://registry.npmmirror.com
+  -h, --help               Show this help message.
 EOF
-
-    log_success "Installation source saved to ~/.hopcode/source.json"
 }
 
-# ============================================
-# Main function
-# ============================================
-main() {
-    # Validate HOME variable
-    if [[ -z "${HOME}" ]]; then
-        log_warning "HOME environment variable is not set"
-        local MAIN_UID
-        MAIN_UID=$(id -u) || true
-        if [[ "${MAIN_UID}" -eq 0 ]]; then
-            export HOME="/root"
-        else
-            local CURRENT_USER
-            CURRENT_USER=$(whoami) || true
-            local user_home
-            user_home=$(eval echo "~${CURRENT_USER}") || true
-            export HOME="${user_home}"
-        fi
-        log_info "Using HOME=${HOME}"
-    fi
-
-    # Ensure download tool is available
-    ensure_download_tool
-
-    # Check and install Node.js
-    check_and_install_nodejs
-    echo ""
-
-    # Install HopCode
-    install_hopcode
-    echo ""
-
-    # ============================================
-    # Final instructions
-    # ============================================
-    echo "=========================================="
-    echo "✅ Installation completed!"
-    echo "=========================================="
-    echo ""
-
-    # Ensure NVM and npm global bin are in PATH
-    export NVM_DIR="${HOME}/.nvm"
-    # shellcheck source=/dev/null
-    [[ -s "${NVM_DIR}/nvm.sh" ]] && \. "${NVM_DIR}/nvm.sh" 2>/dev/null || true
-    local NPM_GLOBAL_BIN
-    NPM_GLOBAL_BIN=$(npm config get prefix 2>/dev/null)/bin
-    if [[ -n "${NPM_GLOBAL_BIN}" ]]; then
-        export PATH="${NPM_GLOBAL_BIN}:${PATH}"
-    fi
-
-    # Check if hopcode is immediately available
-    if command_exists hopcode; then
-        log_success "HopCode is ready to use!"
-        echo ""
-        echo "You can now run: hopcode"
-        echo ""
-        # Auto-start HopCode
-        log_info "Starting HopCode..."
-        echo ""
-        exec hopcode
-    else
-        log_warning "HopCode command not found in current session"
-        echo ""
-        echo "To use HopCode immediately without restarting your terminal,"
-        echo "run the following command in your current shell:"
-        echo "  eval \$(${0} --print-env)"
-        echo ""
-        log_info "Or simply restart your terminal, then run: hopcode"
-    fi
-}
-
-# Run main function
-main "$@"
+main

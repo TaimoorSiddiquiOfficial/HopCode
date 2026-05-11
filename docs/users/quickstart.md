@@ -14,29 +14,39 @@ Make sure you have:
 
 ## Step 1: Install HopCode
 
+The recommended installer uses a standalone archive when one is available for
+your platform. If it falls back to npm, you will need Node.js 20 or later with
+npm available on PATH.
+
 To install HopCode, use one of the following methods:
 
 ### Quick Install (Recommended)
 
-**Prerequisites**
+**Linux / macOS**
 
-Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
+```sh
+curl -fsSL https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.sh | bash
+```
 
-**NPM**
+**Windows**
 
-```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+```cmd
+powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
 ```
 
 > [!note]
 >
-> It's recommended to restart your terminal after installation to ensure environment variables take effect.
+> It's recommended to restart your terminal after installation if `hopcode` is not
+> immediately available on PATH. For offline installation, download a release
+> archive such as `hopcode-linux-x64.tar.gz` or `hopcode-win-x64.zip` plus
+> `SHA256SUMS`, then run the installer with `--archive PATH`.
 
 ### Manual Installation
 
 **Prerequisites**
 
-Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
+Manual npm installation requires Node.js 20 or later. Download it from
+[nodejs.org](https://nodejs.org/en/download).
 
 **NPM**
 

@@ -71,9 +71,37 @@ Or install via the [VS Code Marketplace](https://marketplace.visualstudio.com/it
 
 ### CLI Installation (Recommended)
 
+The installer uses a standalone HopCode archive when one is available for
+your platform, so the default path does not require a preinstalled Node.js
+runtime. If a standalone archive is not available, it falls back to npm and then
+requires Node.js 20 or later with npm on PATH.
+
+#### Linux / macOS
+
+```sh
+curl -fsSL https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.sh | bash
+```
+
+#### Windows
+
+Works in both Command Prompt and PowerShell:
+
+```cmd
+powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
+```
+
+> **Note**: It's recommended to restart your terminal after installation if
+> `hopcode` is not immediately available on PATH. For offline installation, download
+> a release archive such as `hopcode-linux-x64.tar.gz` or
+> `hopcode-win-x64.zip` plus `SHA256SUMS`, then run the installer with
+> `--archive PATH`.
+
+### Manual Installation
+
 #### Prerequisites
 
-Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
+Manual npm installation requires Node.js 20 or later. Download it from
+[nodejs.org](https://nodejs.org/en/download).
 
 #### NPM
 
