@@ -52,7 +52,7 @@ def test_sync_query_bootstrap_failure_cleans_up_loop_thread(
         active_threads = {
             thread.ident
             for thread in threading.enumerate()
-        if thread.name == "hopcode-sdk-sync-loop"
+            if thread.name == "hopcode-sdk-sync-loop"
         }
         if active_threads == baseline_threads:
             break
