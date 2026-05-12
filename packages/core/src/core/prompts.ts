@@ -859,7 +859,7 @@ function getToolCallExamples(model?: string): string {
   if (toolCallStyle) {
     switch (toolCallStyle.toLowerCase()) {
       case 'hopcoder':
-      case 'hopcoder':
+      case 'qwen-coder':
         return hopCoderToolCallExamples;
       case 'hopvl':
       case 'qwen-vl':
