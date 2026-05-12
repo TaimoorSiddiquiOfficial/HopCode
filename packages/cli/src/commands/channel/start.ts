@@ -4,12 +4,12 @@ import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { normalizeProxyUrl, Storage } from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
-import { AcpBridge, SessionRouter } from '@hopcode/channel-base';
+import { AcpBridge, SessionRouter } from '@hoptrendy/channel-base';
 import type {
   ChannelBase,
   ChannelPlugin,
   ToolCallEvent,
-} from '@hopcode/channel-base';
+} from '@hoptrendy/channel-base';
 import { getPlugin, registerPlugin } from './channel-registry.js';
 import { findCliEntryPath, parseChannelConfig } from './config-utils.js';
 import {

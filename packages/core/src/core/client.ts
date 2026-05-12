@@ -1174,7 +1174,7 @@ export class GeminiClient {
         const iznActive = this.config.getApprovalMode() === ApprovalMode.IZN;
         const quranReminder = getQuranGuidancePerTurnReminder(
           userText,
-          iznActive,
+          iznActive ? 'izn' : undefined,
         );
         if (quranReminder) systemReminders.push(quranReminder);
       }
@@ -1458,7 +1458,7 @@ export class GeminiClient {
           // model's own ContentGeneratorConfig so that per-model settings like
           // extra_body, samplingParams, and reasoning are not inherited from the
           // main model's config. The retry authType is resolved alongside so that
-          // provider-specific checks (e.g. QWEN_OAUTH quota detection) reference
+          // provider-specific checks (e.g. HOPCODE_OAUTH quota detection) reference
           // the target model's provider.
           const { contentGenerator, retryAuthType } = await this.config
             .getBaseLlmClient()

@@ -68,3 +68,13 @@ class SyntheticOutputInvocation extends BaseToolInvocation<
     };
   }
 }
+
+/**
+ * Placeholder args object used in telemetry to indicate that a structured-output
+ * tool call occurred without leaking the actual payload values.
+ * Shared between `telemetry/types.ts` (OTLP/event-stream) and
+ * `core/geminiChat.ts` (on-disk JSONL) so neither side can silently drift.
+ */
+export const STRUCTURED_OUTPUT_REDACTED_ARGS: Record<string, string> = {
+  _redacted: 'structured-output-args-redacted-for-privacy',
+};

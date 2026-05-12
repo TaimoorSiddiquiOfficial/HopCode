@@ -5,7 +5,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleSlashCommand, getAvailableCommands } from './nonInteractiveCliCommands.js';
+import {
+  handleSlashCommand,
+  getAvailableCommands,
+} from './nonInteractiveCliCommands.js';
 import type { Config } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from './config/settings.js';
 import { CommandKind, type ExecutionMode } from './ui/commands/types.js';
@@ -457,7 +460,7 @@ describe('getAvailableCommands', () => {
           dynamicCommandTranslation: true,
         },
       },
-    } as LoadedSettings;
+    } as unknown as LoadedSettings;
     mockGetCommands.mockReturnValue([command]);
 
     await getAvailableCommands(

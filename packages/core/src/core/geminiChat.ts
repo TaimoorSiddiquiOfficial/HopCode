@@ -1062,6 +1062,24 @@ export class GeminiChat {
   }
 
   /**
+   * Strip thought parts from every entry in the chat history.
+   * Used before API history reconstruction when resuming sessions
+   * where the model should not see its own chain-of-thought.
+   */
+  stripThoughtsFromHistory(): void {
+    this.history = this.history
+      .map((content: Content) => {
+        if (!content.parts) return content;
+        const filtered = content.parts.filter(
+          (part: Part) => !(part as Part).thought,
+        );
+        if (filtered.length === 0) return null;
+        return { ...content, parts: filtered };
+      })
+      .filter((c: Content | null): c is Content => c !== null);
+  }
+
+  /**
    * Pop all orphaned trailing user entries from chat history.
    * In a valid conversation the last entry is always a model response;
    * any trailing user entries are leftovers from a request that failed.

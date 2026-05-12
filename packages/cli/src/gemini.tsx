@@ -674,7 +674,8 @@ export async function main() {
         })),
         ...getSettingsWarnings(settings),
         ...config.getWarnings(),
-        ...(config.getModelsConfig().getCurrentAuthType() === AuthType.HOP_OAUTH
+        ...(config.getModelsConfig().getCurrentAuthType() ===
+        AuthType.HOPCODE_OAUTH
           ? [
               'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
             ]

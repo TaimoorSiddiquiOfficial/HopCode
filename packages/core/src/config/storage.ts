@@ -275,4 +275,13 @@ export class Storage {
   getHistoryFilePath(): string {
     return path.join(this.getProjectTempDir(), 'shell_history');
   }
+
+  /**
+   * Returns the runtime-status JSON path for a given session id.
+   * The file lives alongside the session's history data so that external
+   * tools can discover which session a PID is serving.
+   */
+  getRuntimeStatusPath(sessionId: string): string {
+    return path.join(this.getProjectDir(), 'runtime', `${sessionId}.json`);
+  }
 }

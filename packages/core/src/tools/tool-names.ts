@@ -41,6 +41,16 @@ export const ToolNames = {
   MONITOR: 'monitor',
   TOOL_SEARCH: 'tool_search',
   STRUCTURED_OUTPUT: 'structured_output',
+  REPO_MAP: 'repo_map',
+  BROWSER: 'browser',
+  BG_STOP: 'bg_stop',
+  TASK_CREATE: 'task_create',
+  TASK_GET: 'task_get',
+  TASK_LIST: 'task_list',
+  TASK_OUTPUT: 'task_output',
+  TASK_READY: 'task_ready',
+  TASK_UPDATE: 'task_update',
+  WEB_SEARCH: 'web_search',
 } as const;
 
 /**
@@ -72,6 +82,16 @@ export const ToolDisplayNames = {
   MONITOR: 'Monitor',
   TOOL_SEARCH: 'ToolSearch',
   STRUCTURED_OUTPUT: 'StructuredOutput',
+  REPO_MAP: 'RepoMap',
+  BROWSER: 'Browser',
+  BG_STOP: 'BgStop',
+  TASK_CREATE: 'TaskCreate',
+  TASK_GET: 'TaskGet',
+  TASK_LIST: 'TaskList',
+  TASK_OUTPUT: 'TaskOutput',
+  TASK_READY: 'TaskReady',
+  TASK_UPDATE: 'TaskUpdate',
+  WEB_SEARCH: 'WebSearch',
 } as const;
 
 // Migration from old tool names to new tool names
