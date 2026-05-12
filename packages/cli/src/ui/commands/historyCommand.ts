@@ -9,6 +9,7 @@ import {
   CommandKind,
   type MessageActionReturn,
 } from './types.js';
+import { t } from '../../i18n/index.js';
 
 /** Maximum search results shown per query. */
 const MAX_DISPLAY_RESULTS = 20;
@@ -26,7 +27,9 @@ export const historyCommand: SlashCommand = {
   altNames: ['hist'],
   kind: CommandKind.BUILT_IN,
   supportedModes: ['interactive'] as const,
-  description: 'Navigate and search session history',
+  get description() {
+    return t('Navigate and search session history');
+  },
   argumentHint: 'search <query> | older | newer | info | jump <n>',
   examples: [
     '/history search fix the bug',
@@ -41,7 +44,9 @@ export const historyCommand: SlashCommand = {
       altNames: ['find', 'grep'],
       kind: CommandKind.BUILT_IN,
       supportedModes: ['interactive'] as const,
-      description: 'Full-text search across all history items (entire session)',
+      get description() {
+        return t('Full-text search across all history items (entire session)');
+      },
       argumentHint: '<query>',
       action(context, args) {
         const query = args.trim();
@@ -84,7 +89,9 @@ export const historyCommand: SlashCommand = {
       altNames: ['up', 'prev'],
       kind: CommandKind.BUILT_IN,
       supportedModes: ['interactive'] as const,
-      description: 'Load the previous 2 000 history items',
+      get description() {
+        return t('Load the previous 2 000 history items');
+      },
       action(context) {
         if (!context.ui.canLoadOlderHistory) {
           return makeInfo('You are already at the beginning of the history.');
@@ -105,7 +112,9 @@ export const historyCommand: SlashCommand = {
       altNames: ['down', 'next'],
       kind: CommandKind.BUILT_IN,
       supportedModes: ['interactive'] as const,
-      description: 'Load the next 2 000 history items',
+      get description() {
+        return t('Load the next 2 000 history items');
+      },
       action(context) {
         if (!context.ui.canLoadNewerHistory) {
           return makeInfo('You are already at the most recent history.');
@@ -128,7 +137,9 @@ export const historyCommand: SlashCommand = {
       altNames: ['status'],
       kind: CommandKind.BUILT_IN,
       supportedModes: ['interactive'] as const,
-      description: 'Show current history window statistics',
+      get description() {
+        return t('Show current history window statistics');
+      },
       action(context) {
         const info = context.ui.windowInfo;
         if (!info) return makeInfo('History info is not available.');
@@ -147,7 +158,9 @@ export const historyCommand: SlashCommand = {
       altNames: ['goto', 'go'],
       kind: CommandKind.BUILT_IN,
       supportedModes: ['interactive'] as const,
-      description: 'Jump to a specific item index in history',
+      get description() {
+        return t('Jump to a specific item index in history');
+      },
       argumentHint: '<index>',
       action(context, args) {
         const n = parseInt(args.trim(), 10);
@@ -195,7 +208,9 @@ export const searchCommand: SlashCommand = {
   altNames: ['find'],
   kind: CommandKind.BUILT_IN,
   supportedModes: ['interactive'] as const,
-  description: 'Full-text search across all history items',
+  get description() {
+    return t('Full-text search across all history items');
+  },
   argumentHint: '<query>',
   examples: ['/search fix the bug', '/search OOM', '/search ollama'],
   action(context, args) {

@@ -770,6 +770,14 @@ export default {
     'Aucune conversation à dupliquer dans une branche.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     "Restaurer un appel d'outil. Cela réinitialisera la conversation et l'historique des fichiers à l'état où il se trouvait lors de la suggestion de l'appel d'outil",
+  'Navigate and search session history': 'Naviguer et rechercher dans l\'historique de session',
+  'Full-text search across all history items (entire session)':
+    'Recherche en texte intégral dans tous les éléments de l\'historique (session entière)',
+  'Load the previous 2 000 history items': 'Charger les 2 000 éléments précédents de l\'historique',
+  'Load the next 2 000 history items': 'Charger les 2 000 éléments suivants de l\'historique',
+  'Show current history window statistics': 'Afficher les statistiques de la fenêtre d\'historique actuelle',
+  'Jump to a specific item index in history': 'Aller à un indice d\'élément spécifique dans l\'historique',
+  'Full-text search across all history items': 'Recherche en texte intégral dans tous les éléments de l\'historique',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Impossible de détecter le type de terminal. Terminaux pris en charge : VS Code, Cursor, Windsurf et Trae.',
   'Terminal "{{terminal}}" is not supported yet.':

@@ -713,6 +713,14 @@ export default {
   'No conversation to branch.': 'Não há conversa para ramificar.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'Restaurar uma chamada de ferramenta. Isso redefinirá o histórico da conversa e dos arquivos para o estado em que a chamada da ferramenta foi sugerida',
+  'Navigate and search session history': 'Navegar e pesquisar histórico de sessão',
+  'Full-text search across all history items (entire session)':
+    'Pesquisa de texto completo em todos os itens do histórico (sessão inteira)',
+  'Load the previous 2 000 history items': 'Carregar os 2 000 itens anteriores do histórico',
+  'Load the next 2 000 history items': 'Carregar os próximos 2 000 itens do histórico',
+  'Show current history window statistics': 'Mostrar estatísticas da janela de histórico atual',
+  'Jump to a specific item index in history': 'Ir para um índice de item específico no histórico',
+  'Full-text search across all history items': 'Pesquisa de texto completo em todos os itens do histórico',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Não foi possível detectar o tipo de terminal. Terminais suportados: VS Code, Cursor, Windsurf e Trae.',
   'Terminal "{{terminal}}" is not supported yet.':

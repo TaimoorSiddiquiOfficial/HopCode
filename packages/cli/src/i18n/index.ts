@@ -14,6 +14,7 @@ import {
   SUPPORTED_LANGUAGES,
   getLanguageNameFromLocale,
   getLanguageNameForTranslationTarget,
+  resolveSupportedLanguage,
 } from './languages.js';
 import { MUST_TRANSLATE_KEYS } from './mustTranslateKeys.js';
 
@@ -23,6 +24,7 @@ export {
   MUST_TRANSLATE_KEYS,
   getLanguageNameFromLocale,
   getLanguageNameForTranslationTarget,
+  resolveSupportedLanguage,
 };
 
 // State
@@ -168,6 +170,24 @@ async function loadTranslationsAsync(
       }
     }
 
+    // Final fallback: try the bundled relative import. This works even when
+    // the filesystem check fails (e.g., inside a bundled/compiled context
+    // where locale files are inlined rather than on disk).
+    try {
+      const module = await import(`./locales/${lang}.js`);
+      const result = module.default || module;
+      if (
+        result &&
+        typeof result === 'object' &&
+        Object.keys(result).length > 0
+      ) {
+        translationCache[lang] = result;
+        return result;
+      }
+    } catch {
+      // Bundled import not available either.
+    }
+
     // Return empty object if both directories fail
     // Cache it to avoid repeated failed attempts
     translationCache[lang] = {};
@@ -203,7 +223,9 @@ function interpolate(
 
 // Language setting helpers
 function resolveLanguage(lang: SupportedLanguage | 'auto'): SupportedLanguage {
-  return lang === 'auto' ? detectSystemLanguage() : lang;
+  if (lang === 'auto') return detectSystemLanguage();
+  const resolved = resolveSupportedLanguage(lang);
+  return resolved ?? lang;
 }
 
 // Public API

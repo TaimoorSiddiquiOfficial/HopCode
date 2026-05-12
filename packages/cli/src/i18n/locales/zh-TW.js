@@ -682,6 +682,14 @@ export default {
   'No conversation to branch.': '沒有可分支的對話。',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     '恢復某次工具調用。這將把對話與文件歷史重置到提出該工具調用建議時的狀態',
+  'Navigate and search session history': '瀏覽和搜索會話歷史',
+  'Full-text search across all history items (entire session)':
+    '全文搜索所有歷史條目（整個會話）',
+  'Load the previous 2 000 history items': '加載前2,000條歷史條目',
+  'Load the next 2 000 history items': '加載後2,000條歷史條目',
+  'Show current history window statistics': '顯示當前歷史窗口統計信息',
+  'Jump to a specific item index in history': '跳轉到歷史中特定條目索引',
+  'Full-text search across all history items': '全文搜索所有歷史條目',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     '無法檢測終端類型。支持的終端：VS Code、Cursor、Windsurf 和 Trae。',
   'Terminal "{{terminal}}" is not supported yet.':

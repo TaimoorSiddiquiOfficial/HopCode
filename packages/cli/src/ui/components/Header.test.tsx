@@ -54,7 +54,7 @@ describe('<Header />', () => {
 
   it('displays auth type and model', () => {
     const { lastFrame } = render(<Header {...defaultProps} />);
-    expect(lastFrame()).toContain('Legacy OAuth');
+    expect(lastFrame()).toContain('HopCode OAuth');
     expect(lastFrame()).toContain('hopcoder-plus');
   });
 
@@ -121,7 +121,7 @@ describe('<Header />', () => {
     // Subtitle sits between the title and the auth line.
     const titleIdx = frame.indexOf('>_ HopCode');
     const subtitleIdx = frame.indexOf('Built-in DataWorks Official Skills');
-    const authIdx = frame.indexOf('Legacy OAuth');
+    const authIdx = frame.indexOf('HopCode OAuth');
     expect(titleIdx).toBeLessThan(subtitleIdx);
     expect(subtitleIdx).toBeLessThan(authIdx);
   });
@@ -133,7 +133,7 @@ describe('<Header />', () => {
     // spacer between them is just whitespace-padding, so we assert the
     // visible chrome the user sees.
     expect(frame).toContain('>_ HopCode');
-    expect(frame).toContain('Legacy OAuth');
+    expect(frame).toContain('HopCode OAuth');
   });
 
   it('renders the custom banner title in place of the default brand', () => {
@@ -183,7 +183,7 @@ describe('<Header />', () => {
     expect(lastFrame()).not.toContain('X'.repeat(150));
     expect(lastFrame()).not.toContain('Y'.repeat(150));
     // Info panel still renders.
-    expect(lastFrame()).toContain('Legacy OAuth');
+    expect(lastFrame()).toContain('HopCode OAuth');
   });
 
   it('falls back to the default HopCode logo when no custom art was provided at all', () => {

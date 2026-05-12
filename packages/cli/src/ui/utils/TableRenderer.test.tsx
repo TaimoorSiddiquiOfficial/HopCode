@@ -487,7 +487,7 @@ describe('<TableRenderer />', () => {
       [['Doc', '[HopCode](https://example.com/path)']],
       60,
     );
-    expect(output).toContain('Qwen');
+    expect(output).toContain('HopCode');
     expect(output).not.toContain('[HopCode](');
   });
 

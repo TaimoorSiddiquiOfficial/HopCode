@@ -722,6 +722,14 @@ export default {
   'No conversation to branch.': 'Нет разговора для создания ветки.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'Восстановить вызов инструмента. Это вернет историю разговора и файлов к состоянию на момент, когда был предложен этот вызов инструмента',
+  'Navigate and search session history': 'Навигация и поиск по истории сеанса',
+  'Full-text search across all history items (entire session)':
+    'Полнотекстовый поиск по всем элементам истории (весь сеанс)',
+  'Load the previous 2 000 history items': 'Загрузить предыдущие 2 000 элементов истории',
+  'Load the next 2 000 history items': 'Загрузить следующие 2 000 элементов истории',
+  'Show current history window statistics': 'Показать статистику текущего окна истории',
+  'Jump to a specific item index in history': 'Перейти к определенному индексу элемента в истории',
+  'Full-text search across all history items': 'Полнотекстовый поиск по всем элементам истории',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Не удалось определить тип терминала. Поддерживаемые терминалы: VS Code, Cursor, Windsurf и Trae.',
   'Terminal "{{terminal}}" is not supported yet.':

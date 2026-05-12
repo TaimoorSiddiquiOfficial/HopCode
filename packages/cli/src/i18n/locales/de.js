@@ -707,6 +707,14 @@ export default {
   'No conversation to branch.': 'Keine Unterhaltung zum Verzweigen vorhanden.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'Einen Tool-Aufruf wiederherstellen. Dadurch werden Konversations- und Dateiverlauf auf den Zustand zurückgesetzt, in dem der Tool-Aufruf vorgeschlagen wurde',
+  'Navigate and search session history': 'Sitzungsverlauf navigieren und durchsuchen',
+  'Full-text search across all history items (entire session)':
+    'Volltextsuche über alle Verlaufseinträge (gesamte Sitzung)',
+  'Load the previous 2 000 history items': 'Vorherige 2 000 Verlaufseinträge laden',
+  'Load the next 2 000 history items': 'Nächste 2 000 Verlaufseinträge laden',
+  'Show current history window statistics': 'Statistiken des aktuellen Verlaufsfensters anzeigen',
+  'Jump to a specific item index in history': 'Zu einem bestimmten Elementindex im Verlauf springen',
+  'Full-text search across all history items': 'Volltextsuche über alle Verlaufseinträge',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Terminal-Typ konnte nicht erkannt werden. Unterstützte Terminals: VS Code, Cursor, Windsurf und Trae.',
   'Terminal "{{terminal}}" is not supported yet.':

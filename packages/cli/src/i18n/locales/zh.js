@@ -748,6 +748,14 @@ export default {
   'No conversation to branch.': '没有可分支的对话。',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     '恢复某次工具调用。这将把对话与文件历史重置到提出该工具调用建议时的状态',
+  'Navigate and search session history': '浏览和搜索会话历史',
+  'Full-text search across all history items (entire session)':
+    '全文搜索所有历史条目（整个会话）',
+  'Load the previous 2 000 history items': '加载前2,000条历史条目',
+  'Load the next 2 000 history items': '加载后2,000条历史条目',
+  'Show current history window statistics': '显示当前历史窗口统计信息',
+  'Jump to a specific item index in history': '跳转到历史中特定条目索引',
+  'Full-text search across all history items': '全文搜索所有历史条目',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     '无法检测终端类型。支持的终端：VS Code、Cursor、Windsurf 和 Trae。',
   'Terminal "{{terminal}}" is not supported yet.':

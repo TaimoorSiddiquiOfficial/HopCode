@@ -499,6 +499,14 @@ export default {
   'No conversation to branch.': '分岐できる会話がありません。',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'ツール呼び出しを復元します。これにより、会話とファイルの履歴はそのツール呼び出しが提案された時点の状態に戻ります',
+  'Navigate and search session history': 'セッション履歴のナビゲートと検索',
+  'Full-text search across all history items (entire session)':
+    'すべての履歴項目の全文検索（セッション全体）',
+  'Load the previous 2 000 history items': '前の2 000件の履歴項目を読み込む',
+  'Load the next 2 000 history items': '次の2 000件の履歴項目を読み込む',
+  'Show current history window statistics': '現在の履歴ウィンドウの統計を表示',
+  'Jump to a specific item index in history': '履歴内の特定の項目インデックスにジャンプ',
+  'Full-text search across all history items': 'すべての履歴項目の全文検索',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'ターミナルの種類を検出できませんでした。サポートされているターミナル: VS Code、Cursor、Windsurf、Trae',
   'Terminal "{{terminal}}" is not supported yet.':

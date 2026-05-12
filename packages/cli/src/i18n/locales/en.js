@@ -793,6 +793,14 @@ export default {
   'No conversation to branch.': 'No conversation to branch.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested',
+  'Navigate and search session history': 'Navigate and search session history',
+  'Full-text search across all history items (entire session)':
+    'Full-text search across all history items (entire session)',
+  'Load the previous 2 000 history items': 'Load the previous 2 000 history items',
+  'Load the next 2 000 history items': 'Load the next 2 000 history items',
+  'Show current history window statistics': 'Show current history window statistics',
+  'Jump to a specific item index in history': 'Jump to a specific item index in history',
+  'Full-text search across all history items': 'Full-text search across all history items',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.',
   'Terminal "{{terminal}}" is not supported yet.':

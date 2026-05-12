@@ -365,7 +365,7 @@ describe('parseArguments', () => {
     await expect(parseArguments()).rejects.toThrow('process.exit called');
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      expect.stringContaining('first structured_output call ends the session'),
+      expect.stringContaining('--json-schema cannot be used with --input-format stream-json'),
     );
 
     mockExit.mockRestore();
@@ -805,7 +805,6 @@ describe('loadCliConfig', () => {
     expect(setGeminiMdFilenameSpy).toHaveBeenCalledTimes(1);
     expect(setGeminiMdFilenameSpy).toHaveBeenCalledWith([
       ServerConfig.DEFAULT_CONTEXT_FILENAME,
-      ServerConfig.LEGACY_CONTEXT_FILENAME,
       ServerConfig.AGENT_CONTEXT_FILENAME,
     ]);
   });
