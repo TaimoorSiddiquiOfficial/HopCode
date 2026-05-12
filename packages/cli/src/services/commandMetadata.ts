@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,21 +14,19 @@ export type CommandSourceGroup = {
 };
 
 export function getCommandSourceBadge(
-  command: Pick<SlashCommand, 'source' | 'sourceDetail'>,
+  command: Pick<SlashCommand, 'source' | 'sourceLabel'>,
 ): string | null {
   switch (command.source) {
     case 'bundled-skill':
       return '[Skill]';
     case 'skill-dir-command':
-      if (command.sourceDetail === 'user') {
-        return '[User]';
-      }
-      if (command.sourceDetail === 'project') {
-        return '[Project]';
-      }
+      if (command.sourceLabel === 'User') return '[User]';
+      if (command.sourceLabel === 'Project') return '[Project]';
       return '[Custom]';
     case 'plugin-command':
-      return command.sourceDetail === 'extension' ? '[Extension]' : '[Plugin]';
+      return command.sourceLabel?.startsWith('Extension:')
+        ? '[Extension]'
+        : '[Plugin]';
     case 'mcp-prompt':
       return '[MCP]';
     case 'builtin-command':

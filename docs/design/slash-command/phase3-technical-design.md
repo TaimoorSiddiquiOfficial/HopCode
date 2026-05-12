@@ -1,4 +1,4 @@
-﻿# Phase 3 技术设计文档：体验对齐
+# Phase 3 技术设计文档：体验对齐
 
 ## 1. 设计目标与约束
 
@@ -642,7 +642,7 @@ npm run build && npm run bundle
 Interactive 场景建议使用独立临时目录，避免污染当前仓库：
 
 ```bash
-tmux new-session -d -s qwen-slash-phase3 -x 200 -y 50 \
+tmux new-session -d -s hopcode-slash-phase3 -x 200 -y 50 \
   "cd /tmp/hopcode-slash-phase3 && /Users/mochi/code/hopcode-test/dist/cli.js --approval-mode yolo"
 sleep 3
 ```
@@ -650,21 +650,21 @@ sleep 3
 发送输入时拆分文本和回车，避免 TUI 吞掉提交：
 
 ```bash
-tmux send-keys -t qwen-slash-phase3 "/help"
+tmux send-keys -t hopcode-slash-phase3 "/help"
 sleep 0.5
-tmux send-keys -t qwen-slash-phase3 Enter
+tmux send-keys -t hopcode-slash-phase3 Enter
 ```
 
 捕获输出：
 
 ```bash
-tmux capture-pane -t qwen-slash-phase3 -p -S -100
+tmux capture-pane -t hopcode-slash-phase3 -p -S -100
 ```
 
 清理：
 
 ```bash
-tmux kill-session -t qwen-slash-phase3
+tmux kill-session -t hopcode-slash-phase3
 ```
 
 #### 10.5.2 E2E 测试清单
