@@ -538,7 +538,6 @@ export type HistoryItemWithoutId =
   | HistoryItemToolGroup
   | HistoryItemToolUseSummary
   | HistoryItemStats
-  | HistoryItemDiffStats
   | HistoryItemModelStats
   | HistoryItemToolStats
   | HistoryItemQuit
