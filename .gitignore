@@ -1,4 +1,11 @@
-﻿# API keys and secrets
+﻿# Temp rebrand/fix scripts (one-time use, already served their purpose)
+_rebrand_*.mjs
+fix_*.mjs
+inspect_*.mjs
+rebrand_*.mjs
+resolve_*.mjs
+
+# API keys and secrets
 .env
 .env~
 
