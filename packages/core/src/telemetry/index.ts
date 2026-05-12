@@ -145,3 +145,20 @@ export {
   formatCostUsd,
 } from './modelPricing.js';
 export type { ModelPricing } from './modelPricing.js';
+export {
+  startInteractionSpan,
+  endInteractionSpan,
+  startLLMRequestSpan,
+  endLLMRequestSpan,
+  startToolSpan,
+  endToolSpan,
+  startToolExecutionSpan,
+  endToolExecutionSpan,
+  clearSessionTracingForTesting,
+} from './session-tracing.js';
+export type {
+  StartInteractionOptions,
+  EndInteractionOptions,
+  LLMRequestMetadata,
+  ToolSpanMetadata,
+} from './session-tracing.js';

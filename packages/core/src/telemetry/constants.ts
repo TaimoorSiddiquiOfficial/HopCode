@@ -59,3 +59,9 @@ export const EVENT_MEMORY_RECALL = 'hopcode.memory.recall';
 
 // Classifier Telemetry
 export const EVENT_CLASSIFIER_SITUATION = 'hopcode.classifier.situation';
+
+// Session Tracing Span Names
+export const SPAN_INTERACTION = 'hopcode.interaction';
+export const SPAN_LLM_REQUEST = 'hopcode.llm_request';
+export const SPAN_TOOL = 'hopcode.tool';
+export const SPAN_TOOL_EXECUTION = 'hopcode.tool.execution';
