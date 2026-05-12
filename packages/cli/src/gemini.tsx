@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,6 @@ import {
   SessionService,
   type Config,
   createDebugLogger,
-  writeRuntimeStatus,
 } from '@hoptrendy/hopcode-core';
 import { render } from 'ink';
 import dns from 'node:dns';
@@ -117,8 +116,8 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     heapStats.heap_size_limit / 1024 / 1024,
   );
 
-  // Set target to 75% of total memory
-  const targetMaxOldSpaceSizeInMB = Math.floor(totalMemoryMB * 0.75);
+  // Set target to 50% of total memory
+  const targetMaxOldSpaceSizeInMB = Math.floor(totalMemoryMB * 0.5);
   if (isDebugMode) {
     writeStderrLine(
       `Current heap size ${currentMaxOldSpaceSizeMb.toFixed(2)} MB`,
@@ -217,28 +216,6 @@ export async function startInteractiveUI(
 ) {
   const version = await getCliVersion();
   setWindowTitle(basename(workspaceRoot), settings);
-
-  // Write a small runtime.json sidecar next to the chat log so external
-  // tools (terminal multiplexers, IDE integrations, status daemons) can
-  // map the running PID back to its session id and work directory.
-  // Best-effort: a read-only filesystem must not prevent the UI from
-  // starting up.
-  try {
-    const sessionId = config.getSessionId();
-    const runtimeStatusPath = config.storage.getRuntimeStatusPath(sessionId);
-    await writeRuntimeStatus(runtimeStatusPath, {
-      sessionId,
-      workDir: config.getTargetDir(),
-      hopcodeVersion: version,
-    });
-    // Mark this process as the runtime.json owner so subsequent
-    // session swaps (/clear, /resume, etc.) refresh the sidecar.
-    // Non-interactive entry points never reach here, so they won't
-    // trample a sibling shell's sidecar on the same session id.
-    config.markRuntimeStatusEnabled();
-  } catch {
-    // ignored: best-effort, never block UI startup.
-  }
   const restoreTerminalRedrawOptimizer =
     process.stdout.isTTY && !config.getScreenReader()
       ? installTerminalRedrawOptimizer(process.stdout)
@@ -697,8 +674,7 @@ export async function main() {
         })),
         ...getSettingsWarnings(settings),
         ...config.getWarnings(),
-        ...(config.getModelsConfig().getCurrentAuthType() ===
-        AuthType.HOPCODE_OAUTH
+        ...(config.getModelsConfig().getCurrentAuthType() === AuthType.HOP_OAUTH
           ? [
               'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
             ]
@@ -711,24 +687,6 @@ export async function main() {
     finalizeStartupProfile(config.getSessionId());
 
     if (config.isInteractive()) {
-      // --json-schema is a headless-only contract: the synthetic
-      // structured_output tool only terminates the run inside
-      // runNonInteractive's main/drain loops. In TUI mode the same call
-      // would just emit "Structured output accepted." and keep the chat
-      // alive, which silently strands the user's run. Parse-time gating
-      // can't catch this case (`hopcode --json-schema '...'` on a TTY with
-      // no prompt routes to interactive only after stdin TTY detection),
-      // so reject here before the UI launches.
-      if (config.getJsonSchema?.()) {
-        writeStderrLine(
-          'Error: --json-schema is a headless-only flag. Provide a one-shot prompt via -p / --prompt or pipe one in via stdin.',
-        );
-        // Run cleanup so MCP subprocesses + telemetry exporters that the
-        // earlier initializeApp() / loadCliConfig() registered get shut
-        // down — process.exit() doesn't drain them on its own.
-        await runExitCleanup();
-        process.exit(1);
-      }
       // Need kitty detection to be complete before we can start the interactive UI.
       await kittyProtocolDetectionComplete;
       // Drain the auto-theme probe before render so the OSC 11 response is
@@ -788,19 +746,11 @@ export async function main() {
       await runNonInteractiveStreamJson(
         nonInteractiveConfig,
         trimmedInput.length > 0 ? trimmedInput : '',
-        settings,
       );
       await runExitCleanup();
       // Honor any exitCode set by the run (e.g. --json-schema plain-text
       // path sets it to 1). Hardcoding 0 here would silently mask non-zero
       // shell exits so the caller can't detect failures.
-      // Note: `runNonInteractiveStreamJson` doesn't return an explicit exit
-      // code yet, so a cleanup task that mutates `process.exitCode` could
-      // clobber a failure signal here. This is currently safe because
-      // `--json-schema` is rejected at parse time when combined with
-      // `--input-format stream-json`. If a future stream-json equivalent
-      // of structured output is added, plumb the exit code through the
-      // function's return value the way `runNonInteractive` below does.
       process.exit(process.exitCode ?? 0);
     }
 
@@ -822,17 +772,8 @@ export async function main() {
 
     debugLogger.debug(`Session ID: ${config.getSessionId()}`);
 
-    const exitCode = await runNonInteractive(
-      nonInteractiveConfig,
-      settings,
-      input,
-      prompt_id,
-    );
-    // Call cleanup before process.exit, which causes cleanup to not run.
-    // Capture the exit code BEFORE cleanup so any cleanup task that
-    // mutates process.exitCode can't silently turn a structured-output
-    // failure (or other explicit non-zero return from runNonInteractive)
-    // into a zero exit.
+    await runNonInteractive(nonInteractiveConfig, settings, input, prompt_id);
+    // Call cleanup before process.exit, which causes cleanup to not run
     await runExitCleanup();
     // Honor any exitCode set by the run (e.g. --json-schema plain-text
     // path sets it to 1). Hardcoding 0 here would silently mask non-zero
