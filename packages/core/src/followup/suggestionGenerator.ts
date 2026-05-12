@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Prompt Suggestion Generator
@@ -12,6 +12,7 @@
 import type { Content } from '@google/genai';
 import type { Config } from '../config/config.js';
 import { getCacheSafeParams, runForkedAgent } from '../utils/forkedAgent.js';
+import { runSideQuery } from '../utils/sideQuery.js';
 import {
   uiTelemetryService,
   EVENT_API_RESPONSE,
@@ -39,14 +40,14 @@ PRIORITY: If the assistant's last message contains a tip or hint like "Tip: type
 or "type X to ...", extract X as the suggestion. These are explicit next-step hints.
 
 EXAMPLES:
-Assistant says "Tip: type post comments to publish findings" ? "post comments"
-Assistant says "type /review to start" ? "/review"
-User asked "fix the bug and run tests", bug is fixed ? "run the tests"
-After code written ? "try it out"
-Model offers options ? suggest the one the user would likely pick, based on conversation
-Model asks to continue ? "yes" or "go ahead"
-Task complete, obvious follow-up ? "commit this" or "push it"
-After error or misunderstanding ? silence (let them assess/correct)
+Assistant says "Tip: type post comments to publish findings" → "post comments"
+Assistant says "type /review to start" → "/review"
+User asked "fix the bug and run tests", bug is fixed → "run the tests"
+After code written → "try it out"
+Model offers options → suggest the one the user would likely pick, based on conversation
+Model asks to continue → "yes" or "go ahead"
+Task complete, obvious follow-up → "commit this" or "push it"
+After error or misunderstanding → silence (let them assess/correct)
 
 Be specific: "run the tests" beats "continue".
 
@@ -190,7 +191,7 @@ async function generateViaForkedQuery(
       const raw = parsed['suggestion'];
       return typeof raw === 'string' ? raw : null;
     } catch {
-      // Model returned plain text � use it directly
+      // Model returned plain text — use it directly
       return result.text;
     }
   }
@@ -198,7 +199,7 @@ async function generateViaForkedQuery(
   return null;
 }
 
-/** Generate via direct ContentGenerator.generateContent (always reports usage) */
+/** Generate via runSideQuery (always reports usage) */
 async function generateViaBaseLlm(
   config: Config,
   conversationHistory: Content[],
@@ -211,33 +212,24 @@ async function generateViaBaseLlm(
     { role: 'user', parts: [{ text: SUGGESTION_PROMPT }] },
   ];
 
-  const generator = config.getContentGenerator();
   const startTime = Date.now();
-  const response = await generator.generateContent(
-    {
-      model,
-      contents,
-      config: {
-        abortSignal,
-        // Disable thinking for suggestion generation � not needed and wastes tokens
-        thinkingConfig: { includeThoughts: false },
-      },
-    },
-    'prompt_suggestion',
-  );
+  const result = await runSideQuery(config, {
+    purpose: 'prompt-suggestion',
+    contents,
+    abortSignal,
+    model,
+    // Suggestions are best-effort UI hints; if the model is unavailable,
+    // the user shouldn't pay 7× the latency for a hint they may ignore.
+    maxAttempts: 1,
+  });
   const durationMs = Date.now() - startTime;
 
   // Report usage to session stats so /stats tracks suggestion model tokens
-  const usage = response.usageMetadata;
-  if (usage) {
-    reportSuggestionUsage(model, usage, durationMs);
+  if (result.usage) {
+    reportSuggestionUsage(model, result.usage, durationMs);
   }
 
-  const text = response.candidates?.[0]?.content?.parts
-    ?.filter((p) => !(p as Record<string, unknown>)['thought'])
-    .map((p) => p.text ?? '')
-    .join('')
-    .trim();
+  const text = result.text;
   if (text) {
     // Try to parse as JSON first (model might return {"suggestion": "..."})
     try {
@@ -245,7 +237,7 @@ async function generateViaBaseLlm(
       const s = parsed['suggestion'];
       if (typeof s === 'string') return s;
     } catch {
-      // Not JSON � use raw text as the suggestion
+      // Not JSON — use raw text as the suggestion
     }
     return text;
   }
@@ -308,7 +300,7 @@ export function getFilterReason(suggestion: string): string | null {
 
   if (/^\w+:\s/.test(suggestion)) return 'prefixed_label';
 
-  // CJK text has no spaces � skip whitespace-based word count checks
+  // CJK text has no spaces — skip whitespace-based word count checks
   // and use character count instead
   const hasCJK = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(
     suggestion,
