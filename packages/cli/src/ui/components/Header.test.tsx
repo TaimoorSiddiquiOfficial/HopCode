@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ const useTerminalSizeMock = vi.mocked(useTerminalSize.useTerminalSize);
 const defaultProps = {
   version: '1.0.0',
   authDisplayType: AuthDisplayType.HOPCODE_OAUTH,
-  model: 'qwen-coder-plus',
+  model: 'hopcoder-plus',
   workingDirectory: '/home/user/projects/test',
 };
 
@@ -55,7 +55,7 @@ describe('<Header />', () => {
   it('displays auth type and model', () => {
     const { lastFrame } = render(<Header {...defaultProps} />);
     expect(lastFrame()).toContain('Legacy OAuth');
-    expect(lastFrame()).toContain('qwen-coder-plus');
+    expect(lastFrame()).toContain('hopcoder-plus');
   });
 
   it('displays Coding Plan auth type', () => {

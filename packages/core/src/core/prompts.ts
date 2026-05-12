@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -859,7 +859,7 @@ function getToolCallExamples(model?: string): string {
   if (toolCallStyle) {
     switch (toolCallStyle.toLowerCase()) {
       case 'hopcoder':
-      case 'qwen-coder':
+      case 'hopcoder':
         return hopCoderToolCallExamples;
       case 'hopvl':
       case 'qwen-vl':

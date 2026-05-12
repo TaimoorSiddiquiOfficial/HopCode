@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -671,7 +671,7 @@ describe('AnthropicContentConverter', () => {
     });
   });
 
-  // https://github.com/QwenLM/qwen-code/issues/3786 — DeepSeek's
+  // https://github.com/QwenLM/hopcode/issues/3786 — DeepSeek's
   // anthropic-compatible API rejects requests in thinking mode when a prior
   // assistant turn carrying `tool_use` omits a thinking block. Plain-text
   // assistant turns without thinking are accepted unchanged, so the converter

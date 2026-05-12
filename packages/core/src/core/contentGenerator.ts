@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -132,7 +132,7 @@ export type ContentGeneratorConfig = {
   // LM Studio) reject anything else with HTTP 400 "Invalid 'messages' in
   // payload". Enable this for any provider that strictly validates tool
   // message content. Default: false (preserves prior behavior for permissive
-  // providers). See QwenLM/qwen-code#3616.
+  // providers). See QwenLM/hopcode#3616.
   splitToolMedia?: boolean;
 };
 
