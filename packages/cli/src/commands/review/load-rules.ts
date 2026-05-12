@@ -74,7 +74,9 @@ function loadCombined(baseRef: string): {
   } else {
     const hopcodeRules = showFile(baseRef, '.hopcode/review-rules.md');
     if (hopcodeRules) {
-      sections.push(`### From .hopcode/review-rules.md\n\n${hopcodeRules.trim()}`);
+      sections.push(
+        `### From .hopcode/review-rules.md\n\n${hopcodeRules.trim()}`,
+      );
       loaded.push('.hopcode/review-rules.md');
     }
   }

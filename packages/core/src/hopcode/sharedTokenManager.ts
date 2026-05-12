@@ -375,7 +375,9 @@ export class SharedTokenManager {
   /**
    * Force a file check without time-based throttling (used during refresh operations)
    */
-  private async forceFileCheck(hopcodeClient?: IHopCodeOAuth2Client): Promise<void> {
+  private async forceFileCheck(
+    hopcodeClient?: IHopCodeOAuth2Client,
+  ): Promise<void> {
     try {
       const filePath = this.getCredentialFilePath();
       const stats = await fs.stat(filePath);
@@ -690,7 +692,10 @@ export class SharedTokenManager {
    * @returns The absolute path to the credentials file
    */
   private getCredentialFilePath(): string {
-    return path.join(Storage.getGlobalHopCodeDir(), HOPCODE_CREDENTIAL_FILENAME);
+    return path.join(
+      Storage.getGlobalHopCodeDir(),
+      HOPCODE_CREDENTIAL_FILENAME,
+    );
   }
 
   /**

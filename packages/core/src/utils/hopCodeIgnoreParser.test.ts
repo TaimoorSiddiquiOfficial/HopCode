@@ -20,7 +20,9 @@ describe('HopCodeIgnoreParser', () => {
   }
 
   beforeEach(async () => {
-    projectRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcodeignore-test-'));
+    projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcodeignore-test-'),
+    );
   });
 
   afterEach(async () => {

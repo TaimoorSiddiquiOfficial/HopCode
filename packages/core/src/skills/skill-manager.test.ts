@@ -580,7 +580,11 @@ You are a helpful assistant.
         '.hopcode',
         'skills',
       );
-      const userHopcodeSkillsDir = path.join('/home/user', '.hopcode', 'skills');
+      const userHopcodeSkillsDir = path.join(
+        '/home/user',
+        '.hopcode',
+        'skills',
+      );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(fs.readdir).mockImplementation((dirPath: any) => {
@@ -687,7 +691,11 @@ Skill 3 content`);
     it('should deduplicate same-name skills across provider dirs within a level', async () => {
       // Override readdir to return the same skill name from both .hopcode and .agents dirs
       vi.mocked(fs.readdir).mockReset();
-      const projectHopcodeDir = path.join('/test/project', '.hopcode', 'skills');
+      const projectHopcodeDir = path.join(
+        '/test/project',
+        '.hopcode',
+        'skills',
+      );
       const projectAgentDir = path.join('/test/project', '.agents', 'skills');
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -770,7 +778,9 @@ Skill 3 content`);
       const baseDirs = manager.getSkillsBaseDirs('project');
 
       expect(baseDirs).toHaveLength(2);
-      expect(baseDirs).toContain(path.join('/test/project', '.hopcode', 'skills'));
+      expect(baseDirs).toContain(
+        path.join('/test/project', '.hopcode', 'skills'),
+      );
       expect(baseDirs).toContain(
         path.join('/test/project', '.agents', 'skills'),
       );
@@ -1233,11 +1243,18 @@ Body.
         '.hopcode',
         'skills',
       );
-      const userHopcodeSkillsDir = path.join('/home/user', '.hopcode', 'skills');
+      const userHopcodeSkillsDir = path.join(
+        '/home/user',
+        '.hopcode',
+        'skills',
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(fs.readdir).mockImplementation((dirPath: any) => {
         const pathStr = String(dirPath);
-        if (pathStr === projectHopcodeSkillsDir || pathStr === userHopcodeSkillsDir) {
+        if (
+          pathStr === projectHopcodeSkillsDir ||
+          pathStr === userHopcodeSkillsDir
+        ) {
           return Promise.resolve([
             {
               name: 'foo',

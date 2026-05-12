@@ -36,7 +36,11 @@ describe('Storage – additional helpers', () => {
   });
 
   it('getMcpOAuthTokensPath returns ~/.hopcode/mcp-oauth-tokens.json', () => {
-    const expected = path.join(os.homedir(), '.hopcode', 'mcp-oauth-tokens.json');
+    const expected = path.join(
+      os.homedir(),
+      '.hopcode',
+      'mcp-oauth-tokens.json',
+    );
     expect(Storage.getMcpOAuthTokensPath()).toBe(expected);
   });
 });

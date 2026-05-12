@@ -184,7 +184,8 @@ export class ModelsConfig {
         this.generationConfigSources,
       ),
       strictModelProviderSelection: this.strictModelProviderSelection,
-      requireCachedHopCodeCredentialsOnce: this.requireCachedHopCodeCredentialsOnce,
+      requireCachedHopCodeCredentialsOnce:
+        this.requireCachedHopCodeCredentialsOnce,
       hasManualCredentials: this.hasManualCredentials,
       activeRuntimeModelSnapshotId: this.activeRuntimeModelSnapshotId,
     };

@@ -280,7 +280,8 @@ async function convertAgentFiles(agentsDir: string): Promise<void> {
 
       // Write converted content back
       const newYaml = stringifyYaml(newFrontmatter);
-      const systemPrompt = (hopcodeAgent['systemPrompt'] as string) || body.trim();
+      const systemPrompt =
+        (hopcodeAgent['systemPrompt'] as string) || body.trim();
       const newContent = `---
 ${newYaml}
 ---

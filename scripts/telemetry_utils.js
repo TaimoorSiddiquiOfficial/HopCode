@@ -70,10 +70,7 @@ export const WORKSPACE_SETTINGS_FILE = path.join(
 );
 
 export function getJson(url) {
-  const tmpFile = path.join(
-    os.tmpdir(),
-    `hopcode-releases-${Date.now()}.json`,
-  );
+  const tmpFile = path.join(os.tmpdir(), `hopcode-releases-${Date.now()}.json`);
   try {
     const result = spawnSync(
       'curl',

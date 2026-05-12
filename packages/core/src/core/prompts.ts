@@ -126,7 +126,9 @@ export function getCoreSystemPrompt(
   let systemMdEnabled = false;
   let systemMdPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
   // Resolve the environment variable to get either a path or a switch value.
-  const systemMdResolution = resolvePathFromEnv(process.env['HOPCODE_SYSTEM_MD']);
+  const systemMdResolution = resolvePathFromEnv(
+    process.env['HOPCODE_SYSTEM_MD'],
+  );
 
   // Proceed only if the environment variable is set and is not disabled.
   if (systemMdResolution.value && !systemMdResolution.isDisabled) {

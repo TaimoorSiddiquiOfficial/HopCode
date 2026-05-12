@@ -78,7 +78,10 @@ export const DEFAULT_EXCLUDED_ENV_VARS = ['DEBUG', 'DEBUG_MODE'];
 // redirect these — that would split global state between the real home and a
 // project-controlled directory. Always excluded from project .env files,
 // regardless of user-configurable `advanced.excludedEnvVars`.
-const PROJECT_ENV_HARDCODED_EXCLUSIONS = ['HOPCODE_HOME', 'HOPCODE_RUNTIME_DIR'];
+const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
+  'HOPCODE_HOME',
+  'HOPCODE_RUNTIME_DIR',
+];
 
 // Settings version to track migration state
 export const SETTINGS_VERSION = 4;
@@ -517,7 +520,9 @@ function getUserLevelEnvPaths(): Set<string> {
     path.normalize(path.join(homeDir, '.env')),
     path.normalize(path.join(globalHopcodeDir, '.env')),
   ]);
-  const legacyhopcodeEnv = path.normalize(path.join(homeDir, HOPCODE_DIR, '.env'));
+  const legacyhopcodeEnv = path.normalize(
+    path.join(homeDir, HOPCODE_DIR, '.env'),
+  );
   paths.add(legacyhopcodeEnv);
   return paths;
 }
@@ -656,7 +661,8 @@ function findEnvFile(
 
   const globalHopcodeDir = Storage.getGlobalHopCodeDir();
   const legacyHopcodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
-  const hasCustomConfigDir = path.normalize(globalHopcodeDir) !== legacyHopcodeDir;
+  const hasCustomConfigDir =
+    path.normalize(globalHopcodeDir) !== legacyHopcodeDir;
 
   const canUseEnvFile = (filePath: string): boolean =>
     isTrusted !== false || userLevelPaths.has(path.normalize(filePath));

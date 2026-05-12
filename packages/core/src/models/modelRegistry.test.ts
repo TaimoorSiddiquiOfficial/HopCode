@@ -18,7 +18,9 @@ describe('ModelRegistry', () => {
     it('should always include hard-coded hopcode-oauth models', () => {
       const registry = new ModelRegistry();
 
-      const hopcodeModels = registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH);
+      const hopcodeModels = registry.getModelsForAuthType(
+        AuthType.HOPCODE_OAUTH,
+      );
       expect(hopcodeModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
       expect(hopcodeModels[0].id).toBe('coder-model');
     });
@@ -62,9 +64,13 @@ describe('ModelRegistry', () => {
       const registry = new ModelRegistry(modelProvidersConfig);
 
       // Should still use hard-coded hopcode-oauth models
-      const hopcodeModels = registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH);
+      const hopcodeModels = registry.getModelsForAuthType(
+        AuthType.HOPCODE_OAUTH,
+      );
       expect(hopcodeModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
-      expect(hopcodeModels.find((m) => m.id === 'custom-hopcode')).toBeUndefined();
+      expect(
+        hopcodeModels.find((m) => m.id === 'custom-hopcode'),
+      ).toBeUndefined();
     });
   });
 
@@ -656,7 +662,9 @@ describe('ModelRegistry', () => {
         AuthType.HOPCODE_OAUTH,
       );
       expect(hopcodeModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
-      expect(hopcodeModels.find((m) => m.id === 'custom-hopcode')).toBeUndefined();
+      expect(
+        hopcodeModels.find((m) => m.id === 'custom-hopcode'),
+      ).toBeUndefined();
     });
 
     it('should handle reload with multiple authTypes', () => {

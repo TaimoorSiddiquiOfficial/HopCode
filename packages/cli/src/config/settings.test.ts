@@ -3183,7 +3183,11 @@ describe('Settings Loading and Merging', () => {
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue('/mock/home/user');
-        const userHopcodeEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+        const userHopcodeEnvPath = path.join(
+          '/mock/home/user',
+          HOPCODE_DIR,
+          '.env',
+        );
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({
           isTrusted: true,
@@ -3195,7 +3199,8 @@ describe('Settings Loading and Merging', () => {
         (fs.readFileSync as Mock).mockImplementation(
           (p: fs.PathOrFileDescriptor) => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
-            if (p === userHopcodeEnvPath) return 'HOPCODE_HOME=/tmp/from-user-env';
+            if (p === userHopcodeEnvPath)
+              return 'HOPCODE_HOME=/tmp/from-user-env';
             return '{}';
           },
         );
@@ -3293,7 +3298,11 @@ describe('Settings Loading and Merging', () => {
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue(MOCK_WORKSPACE_DIR);
-        const userHopcodeEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+        const userHopcodeEnvPath = path.join(
+          '/mock/home/user',
+          HOPCODE_DIR,
+          '.env',
+        );
         const customSettingsPath = path.join(
           '/tmp/from-user-env',
           'settings.json',
@@ -3308,7 +3317,8 @@ describe('Settings Loading and Merging', () => {
         );
         (fs.readFileSync as Mock).mockImplementation(
           (p: fs.PathOrFileDescriptor) => {
-            if (p === userHopcodeEnvPath) return 'HOPCODE_HOME=/tmp/from-user-env';
+            if (p === userHopcodeEnvPath)
+              return 'HOPCODE_HOME=/tmp/from-user-env';
             if (p === customSettingsPath) return JSON.stringify({});
             return '{}';
           },
@@ -3355,7 +3365,9 @@ describe('Settings Loading and Merging', () => {
         );
         expect(warningMatch).toBeDefined();
         expect(warningMatch).toContain(customHome);
-        expect(warningMatch).toContain(path.join('/mock/home/user', HOPCODE_DIR));
+        expect(warningMatch).toContain(
+          path.join('/mock/home/user', HOPCODE_DIR),
+        );
       });
 
       it('does not warn when HOPCODE_HOME points to a directory with settings.json', () => {
@@ -3449,7 +3461,11 @@ describe('Settings Loading and Merging', () => {
           .spyOn(process, 'cwd')
           .mockReturnValue('/mock/home/user');
         const customHome = '/tmp/hopcode-home-fresh-fallback';
-        const userHopcodeEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+        const userHopcodeEnvPath = path.join(
+          '/mock/home/user',
+          HOPCODE_DIR,
+          '.env',
+        );
         const customSettingsPath = path.join(customHome, 'settings.json');
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({

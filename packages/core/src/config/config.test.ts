@@ -288,9 +288,10 @@ describe('Server Config (config.ts)', () => {
     // Reset mocks if necessary
     vi.clearAllMocks();
     vi.mocked(isTelemetrySdkInitialized).mockReturnValue(false);
-    vi.spyOn(HopCodeLogger.prototype, 'logStartSessionEvent').mockImplementation(
-      async () => undefined,
-    );
+    vi.spyOn(
+      HopCodeLogger.prototype,
+      'logStartSessionEvent',
+    ).mockImplementation(async () => undefined);
 
     // Setup default mock for resolveContentGeneratorConfigWithSources
     vi.mocked(resolveContentGeneratorConfigWithSources).mockImplementation(
@@ -1024,7 +1025,9 @@ describe('Server Config (config.ts)', () => {
       });
       await config.initialize();
 
-      expect(HopCodeLogger.prototype.logStartSessionEvent).toHaveBeenCalledOnce();
+      expect(
+        HopCodeLogger.prototype.logStartSessionEvent,
+      ).toHaveBeenCalledOnce();
     });
   });
 

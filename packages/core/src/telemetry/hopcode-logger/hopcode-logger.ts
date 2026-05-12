@@ -193,7 +193,10 @@ export class HopCodeLogger {
         );
       }
     } catch (error) {
-      this.debugLogger.error('HopCodeLogger: Failed to enqueue log event.', error);
+      this.debugLogger.error(
+        'HopCodeLogger: Failed to enqueue log event.',
+        error,
+      );
     }
   }
 

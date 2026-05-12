@@ -16,11 +16,7 @@ import {
 } from '../config/settings.js';
 import { promisify } from 'node:util';
 import type { Config, SandboxConfig } from '@hoptrendy/hopcode-core';
-import {
-  FatalSandboxError,
-  Storage,
-  isSubpath,
-} from '@hoptrendy/hopcode-core';
+import { FatalSandboxError, Storage, isSubpath } from '@hoptrendy/hopcode-core';
 import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
 
@@ -607,8 +603,7 @@ export async function start_sandbox(
 
   // name container after image, plus random suffix to avoid conflicts
   const imageName = parseImageName(image);
-  const isIntegrationTest =
-    process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
+  const isIntegrationTest = process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
   let containerName;
   if (isIntegrationTest) {
     containerName = `hopcode-integration-test-${randomBytes(4).toString(
@@ -632,10 +627,7 @@ export async function start_sandbox(
 
   // copy HOPCODE_TEST_VAR for integration tests
   if (process.env['HOPCODE_TEST_VAR']) {
-    args.push(
-      '--env',
-      `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`,
-    );
+    args.push('--env', `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`);
   }
 
   // copy GEMINI_API_KEY(s)

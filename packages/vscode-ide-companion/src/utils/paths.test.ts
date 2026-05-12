@@ -81,12 +81,16 @@ describe('vscode-ide-companion paths – getGlobalHopCodeDir', () => {
 
   it('expands tilde (~/x) in HOPCODE_HOME', () => {
     process.env['HOPCODE_HOME'] = '~/custom-hopcode';
-    expect(getGlobalHopCodeDir()).toBe(path.join(home.tempHome, 'custom-hopcode'));
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(home.tempHome, 'custom-hopcode'),
+    );
   });
 
   it('expands Windows-style tilde (~\\x) in HOPCODE_HOME', () => {
     process.env['HOPCODE_HOME'] = '~\\custom-hopcode';
-    expect(getGlobalHopCodeDir()).toBe(path.join(home.tempHome, 'custom-hopcode'));
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(home.tempHome, 'custom-hopcode'),
+    );
   });
 
   it('treats bare tilde (~) as home directory', () => {
