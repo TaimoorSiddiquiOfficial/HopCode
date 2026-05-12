@@ -100,7 +100,10 @@ export function buildRuntimeFetchOptions(
         // This allows Anthropic SDK timeout to control the request
         // Note: Bun's fetch automatically uses proxy settings from environment variables
         // (HTTP_PROXY, HTTPS_PROXY, NO_PROXY), so proxy behavior is preserved
-        const bunFetch: typeof fetch = async (
+        const bunFetch: (
+          input: RequestInfo | URL,
+          init?: RequestInit,
+        ) => Promise<Response> = async (
           input: RequestInfo | URL,
           init?: RequestInit,
         ) => {

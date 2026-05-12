@@ -10,7 +10,10 @@ import path from 'node:path';
 export default defineConfig({
   resolve: {
     alias: {
-      '@hoptrendy/quran-guidance': path.resolve(__dirname, '../quran-guidance/src/index.ts'),
+      '@hoptrendy/quran-guidance': path.resolve(
+        __dirname,
+        '../quran-guidance/src/index.ts',
+      ),
     },
   },
   test: {

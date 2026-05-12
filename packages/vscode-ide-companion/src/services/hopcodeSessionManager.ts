@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
 import { getRuntimeBaseDir } from '../utils/paths.js';
-import type { HopCodeSession } from './HopCodeSessionReader.js';
+import type { HopCodeSession } from './hopcodeSessionReader.js';
 
 /**
  * HopCode Session Manager

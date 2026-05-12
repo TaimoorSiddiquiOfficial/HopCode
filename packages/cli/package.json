@@ -1,6 +1,7 @@
 {
   "name": "@hoptrendy/hopcode-cli",
   "version": "0.15.10",
+  "private": true,
   "description": "HopCode",
   "repository": {
     "type": "git",

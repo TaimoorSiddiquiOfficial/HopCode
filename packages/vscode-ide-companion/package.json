@@ -1,8 +1,7 @@
 {
   "name": "hopcode-vscode-ide-companion",
-  "displayName": "HopCode Companion",
-  "description": "Enable HopCode with direct access to your VS Code workspace.",
   "version": "0.15.9",
+  "private": true,
   "publisher": "hoptrendy",
   "icon": "assets/icon.png",
   "repository": {

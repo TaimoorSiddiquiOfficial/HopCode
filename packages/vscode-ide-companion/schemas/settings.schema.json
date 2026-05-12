@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "description": "HopCode settings configuration",
@@ -118,6 +118,11 @@
           "description": "The language for LLM output. Use \"auto\" to detect from system settings, or set a specific language.",
           "type": "string",
           "default": "auto"
+        },
+        "dynamicCommandTranslation": {
+          "description": "Automatically translate slash command names and descriptions to the current UI language.",
+          "type": "boolean",
+          "default": false
         },
         "terminalBell": {
           "description": "Play terminal bell sound when response completes or needs approval.",
@@ -692,12 +697,12 @@
           }
         },
         "approvalMode": {
-          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, yolo",
+          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, izn",
           "enum": [
             "plan",
             "default",
             "auto-edit",
-            "yolo"
+            "izn"
           ],
           "default": "default"
         },
@@ -808,6 +813,35 @@
             "description": "URL pattern (supports * wildcard)",
             "type": "string"
           }
+        },
+        "powershell": {
+          "description": "Configuration for PowerShell command security policies.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enable PowerShell security policies.",
+              "type": "boolean",
+              "default": false
+            },
+            "mode": {
+              "description": "PowerShell security mode: allow, ask, or deny.",
+              "type": "string"
+            },
+            "allowlist": {
+              "description": "Commands allowed when mode is \"ask\".",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "blocklist": {
+              "description": "Commands always blocked regardless of mode.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
@@ -819,6 +853,10 @@
           "description": "Automatically configure Node.js memory limits",
           "type": "boolean",
           "default": false
+        },
+        "tavilyApiKey": {
+          "description": "API key for Tavily web search provider. Falls back to TAVILY_API_KEY environment variable.",
+          "type": "string"
         },
         "dnsResolutionOrder": {
           "description": "The DNS resolution order.",
@@ -2153,6 +2191,32 @@
           "default": true
         }
       }
+    },
+    "webSearch": {
+      "description": "Web search provider configuration.",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "List of web search provider names.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "default": {
+          "description": "Default web search provider name.",
+          "type": "string"
+        },
+        "mode": {
+          "description": "Web search mode: auto or manual.",
+          "type": "string"
+        }
+      }
+    },
+    "agentModels": {
+      "description": "Per-agent model overrides mapping subagent names to model configuration.",
+      "type": "object",
+      "additionalProperties": true
     },
     "$version": {
       "type": "number",

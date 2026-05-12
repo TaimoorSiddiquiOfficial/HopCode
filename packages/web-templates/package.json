@@ -1,6 +1,7 @@
 {
   "name": "@hoptrendy/web-templates",
   "version": "0.27.5",
+  "private": true,
   "description": "Web templates bundled as embeddable JS/CSS strings",
   "repository": {
     "type": "git",
