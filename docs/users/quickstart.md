@@ -1,4 +1,4 @@
-﻿# Quickstart
+# Quickstart
 
 > 👏 Welcome to HopCode!
 
@@ -14,10 +14,6 @@ Make sure you have:
 
 ## Step 1: Install HopCode
 
-The recommended installer uses a standalone archive when one is available for
-your platform. If it falls back to npm, you will need Node.js 20 or later with
-npm available on PATH.
-
 To install HopCode, use one of the following methods:
 
 ### Quick Install (Recommended)
@@ -25,33 +21,29 @@ To install HopCode, use one of the following methods:
 **Linux / macOS**
 
 ```sh
-curl -fsSL https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.sh | bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.sh | bash
 ```
 
-**Windows**
+**Windows (Run as Administrator)**
 
 ```cmd
-powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
+powershell -Command "Invoke-WebRequest 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
 ```
 
 > [!note]
 >
-> It's recommended to restart your terminal after installation if `hopcode` is not
-> immediately available on PATH. For offline installation, download a release
-> archive such as `hopcode-linux-x64.tar.gz` or `hopcode-win-x64.zip` plus
-> `SHA256SUMS`, then run the installer with `--archive PATH`.
+> It's recommended to restart your terminal after installation to ensure environment variables take effect.
 
 ### Manual Installation
 
 **Prerequisites**
 
-Manual npm installation requires Node.js 20 or later. Download it from
-[nodejs.org](https://nodejs.org/en/download).
+Make sure you have Node.js 22 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
 
 **NPM**
 
 ```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
 **Homebrew (macOS, Linux)**
@@ -79,11 +71,11 @@ Choose your preferred authentication method:
 - **Alibaba Cloud Coding Plan**: Select `Alibaba Cloud Coding Plan` for a fixed monthly fee with diverse model options. See the [Coding Plan guide](https://bailian.console.aliyun.com/cn-beijing/?tab=coding-plan#/efm/coding-plan-index) ([intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) for setup instructions.
 - **API Key**: Select `API Key`, then enter your API key from Alibaba Cloud Model Studio ([Beijing](https://bailian.console.aliyun.com/) / [intl](https://modelstudio.console.alibabacloud.com/)). See the API setup guide ([Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=doc#/doc/?type=model&url=3023091) / [intl](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model&url=2974721)) for details.
 
-> ⚠️ **Note**: HopCode OAuth was discontinued on April 15, 2026. If you were previously using HopCode OAuth, please switch to one of the methods above.
+> ⚠️ **Note**: Qwen OAuth was discontinued on April 15, 2026. If you were previously using Qwen OAuth, please switch to one of the methods above.
 
 > [!note]
 >
-> When you first authenticate HopCode with your account, a workspace called ".hopcode" is automatically created for you. This workspace provides centralized cost tracking and management for all HopCode usage in your organization.
+> When you first authenticate HopCode with your Qwen account, a workspace called ".hopcode" is automatically created for you. This workspace provides centralized cost tracking and management for all HopCode usage in your organization.
 
 > [!tip]
 >
@@ -282,4 +274,4 @@ build a dashboard showing products that are most frequently returned by our UK c
 
 - **In HopCode**: Type `/help` or ask "how do I..."
 - **Documentation**: You're here! Browse other guides
-- **Community**: Join our [GitHub Discussion](https://github.com/TaimoorSiddiquiOfficial/HopCode/discussions) for tips and support
+- **Community**: Join our [GitHub Discussion](https://github.com/QwenLM/hopcode/discussions) for tips and support

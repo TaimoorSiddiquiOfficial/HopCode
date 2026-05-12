@@ -73,7 +73,7 @@ Or combined in one command:
 
 ```bash
 cd integration-tests && \
-  cross-env HOPCODE_SANDBOX=false npx vitest run cli interactive
+  cross-env QWEN_SANDBOX=false npx vitest run cli interactive
 ```
 
 **Gotcha:** In interactive tests, always call `session.idle()` between sends —
@@ -101,9 +101,8 @@ npm run preflight  # Full check: clean → install → format → lint → build
   between packages
 - **Tests**: Collocated with source (`file.test.ts` next to `file.ts`),
   vitest framework
-- **Commits**: Conventional Commits (e.g., `feat(cli): Add --json flag`).
-  Never use the word "quran" in commit messages or changelog entries.
-- **Node.js**: Development requires `~20.19.0`; production requires `>=20`
+- **Commits**: Conventional Commits (e.g., `feat(cli): Add --json flag`)
+- **Node.js**: Development and production both require `>=22` (Ink 7 + React 19.2 requirement)
 
 ## Development Guidelines
 
@@ -114,7 +113,7 @@ npm run preflight  # Full check: clean → install → format → lint → build
    bugfixes.
 2. **Test plan for behavioral changes** — write an E2E test plan in
    `.hopcode/e2e-tests/` when the change affects user-observable behavior. Dry-run
-   against the global `hopcode` CLI first to confirm the baseline.
+   against the global `qwen` CLI first to confirm the baseline.
 3. **Build + typecheck before declaring done**:
    `npm run build && npm run typecheck`.
 4. **Code review** — run `/review` when available. Triage each comment:

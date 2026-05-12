@@ -1,115 +1,81 @@
-﻿<div align="center">
+<div align="center">
 
 [![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
-[![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/HopCode.svg)](./LICENSE)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
-[![VS Code](https://img.shields.io/visual-studio-marketplace/v/hopcode.hopcode-vscode-ide-companion?label=VS%20Code)](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion)
+[![License](https://img.shields.io/github/license/QwenLM/hopcode.svg)](./LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 
-**An open-source AI agent that lives in your terminal — works with any model provider.**
+<a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="QwenLM%2Fhopcode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
-<a href="https://hopcode.dev/docs/zh/users/overview">中文</a> |
-<a href="https://hopcode.dev/docs/de/users/overview">Deutsch</a> |
-<a href="https://hopcode.dev/docs/fr/users/overview">français</a> |
-<a href="https://hopcode.dev/docs/ja/users/overview">日本語</a> |
-<a href="https://hopcode.dev/docs/ru/users/overview">Русский</a> |
-<a href="https://hopcode.dev/docs/pt-BR/users/overview">Português (Brasil)</a>
+**An open-source AI agent that lives in your terminal.**
+
+<a href="https://hopcode.dev/hopcode-docs/zh/users/overview">中文</a> |
+<a href="https://hopcode.dev/hopcode-docs/de/users/overview">Deutsch</a> |
+<a href="https://hopcode.dev/hopcode-docs/fr/users/overview">français</a> |
+<a href="https://hopcode.dev/hopcode-docs/ja/users/overview">日本語</a> |
+<a href="https://hopcode.dev/hopcode-docs/ru/users/overview">Русский</a> |
+<a href="https://hopcode.dev/hopcode-docs/pt-BR/users/overview">Português (Brasil)</a>
 
 </div>
 
 ## 🎉 News
 
-- **2026-04-19**: 🎸 **VS Code Extension v0.14.8** published to the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion). Install directly from VS Code!
+- **2026-04-15**: Qwen OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `hopcode auth` to configure.
 
-- **2026-04-19**: ✨ **Skills System** launched — 5 built-in skills (`spec-driven`, `git-workflow`, `codebase-map`, `changelog`, `mcp-builder`). Run `hopcode skills list` to see them.
+- **2026-04-13**: Qwen OAuth free tier policy update: daily quota adjusted to 100 requests/day (from 1,000).
 
-- **2026-04-15**: Qwen OAuth provider has been discontinued. Switch to [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), any compatible API provider, or run models locally via Ollama. Run `hopcode auth` to configure.
+- **2026-04-02**: Qwen3.6-Plus is now live! Get an API key from [Alibaba Cloud ModelStudio](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model&url=2840914_2&modelId=qwen3.6-plus) to access it through the OpenAI-compatible API.
+
+- **2026-02-16**: Qwen3.5-Plus is now live!
 
 ## Why HopCode?
 
-HopCode is an open-source AI agent for the terminal that works with **any LLM provider** — cloud or local. It helps you understand large codebases, automate tedious work, and ship faster.
+HopCode is an open-source AI agent for the terminal, optimized for Qwen series models. It helps you understand large codebases, automate tedious work, and ship faster.
 
-- **Any provider, any model**: OpenAI, Anthropic, Google Gemini, Mistral, DeepSeek, Groq, Together AI, Fireworks AI, Cohere, xAI Grok, [OpenRouter](https://openrouter.ai) (100+ models), [Ollama](https://ollama.com) / [vLLM](https://vllm.ai) (local), and any OpenAI-compatible endpoint. **15+ native provider SDKs** — more deep integrations than any competitor.
-- **Skills system**: modular, auto-loaded skills extend HopCode's capabilities — run `hopcode skills list` to see bundled skills or add your own.
-- **Agentic workflow, feature-rich**: built-in tools for file editing, shell execution, web search, sub-agents, and full agentic loops — a Claude Code-like experience.
-- **VS Code extension**: **the only terminal AI agent with a native VS Code Marketplace extension** — install directly from VS Code for in-editor AI assistance. No JSON-RPC setup required.
-- **Terminal-first, IDE-friendly**: built for developers who live in the command line, with optional integration for VS Code, Zed, and JetBrains IDEs. Plus a **web dashboard** for browser-based workflows.
-- **🏟️ Arena mode** _(unique)_: run multiple AI models in parallel on the same task and compare outputs side-by-side. No other terminal agent has this.
-- **📊 Per-subagent `/stats`**: track token usage, latency, and cost broken down by subagent — see exactly what each agent spent.
-- **🔍 LSP integration**: native Language Server Protocol support for deep code intelligence — symbol navigation, hover info, and diagnostics powered by your language server.
-- **💬 Enterprise channels**: WeChat and DingTalk integration for teams using Chinese enterprise platforms.
-- **🌐 Multi-language docs**: documentation in 7 languages (EN, ZH, DE, FR, JA, RU, PT-BR).
+- **Multi-protocol, flexible providers**: use OpenAI / Anthropic / Gemini-compatible APIs, [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key.
+- **Open-source, co-evolving**: both the framework and the Qwen3-Coder model are open-source—and they ship and evolve together.
+- **Agentic workflow, feature-rich**: rich built-in tools (Skills, SubAgents) for a full agentic workflow and a Claude Code-like experience.
+- **Terminal-first, IDE-friendly**: built for developers who live in the command line, with optional integration for VS Code, Zed, and JetBrains IDEs.
 
-![HopCode CLI Screenshot](./docs/hopcodecli.png)
-
-## 🏟️ Arena Mode — Unique to HopCode
-
-Run **multiple AI models simultaneously** on the same prompt and compare their responses side-by-side. Use Arena mode to find the best model for any task without switching context.
-
-```bash
-# Start Arena mode with 3 models competing
-hopcode --arena gpt-4o,claude-sonnet-4-5,deepseek-r1 "Refactor this function for readability"
-```
-
-Arena mode spawns parallel subagents — each using a different model — and streams their responses in synchronized columns. Use `/stats` to see per-subagent token usage and latency breakdown.
-
-> No competitor — not **Hermes Agent**, **OpenClaude**, **Claude Code**, or **Cursor** — offers multi-model parallel competition. Arena Mode is HopCode's exclusive superpower.
->
-> **HopCode is also the only terminal agent with:** a native VS Code Marketplace extension, LSP integration, a browser-based web dashboard, and 15+ native AI SDK provider integrations.
+![](https://gw.alicdn.com/imgextra/i1/O1CN01D2DviS1wwtEtMwIzJ_!!6000000006373-2-tps-1600-900.png)
 
 ## Installation
 
-### VS Code Extension
-
-Install the HopCode companion directly from VS Code:
-
-1. Open VS Code → Extensions (`Ctrl+Shift+X`)
-2. Search for **HopCode**
-3. Click **Install**
-
-Or install via the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion).
-
-### CLI Installation (Recommended)
-
-The installer uses a standalone HopCode archive when one is available for
-your platform, so the default path does not require a preinstalled Node.js
-runtime. If a standalone archive is not available, it falls back to npm and then
-requires Node.js 20 or later with npm on PATH.
+### Quick Install (Recommended)
 
 #### Linux / macOS
 
-```sh
-curl -fsSL https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.sh | bash
+```bash
+bash -c "$(curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.sh)"
 ```
 
-#### Windows
+#### Windows (Run as Administrator)
 
 Works in both Command Prompt and PowerShell:
 
 ```cmd
-powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
+powershell -Command "Invoke-WebRequest 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
 ```
 
-> **Note**: It's recommended to restart your terminal after installation if
-> `hopcode` is not immediately available on PATH. For offline installation, download
-> a release archive such as `hopcode-linux-x64.tar.gz` or
-> `hopcode-win-x64.zip` plus `SHA256SUMS`, then run the installer with
-> `--archive PATH`.
+> **Note**: It's recommended to restart your terminal after installation to ensure environment variables take effect.
 
 ### Manual Installation
 
 #### Prerequisites
 
-Manual npm installation requires Node.js 20 or later. Download it from
-[nodejs.org](https://nodejs.org/en/download).
+Make sure you have Node.js 22 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
 
 #### NPM
 
 ```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
-Native installers and Homebrew packages are not published by this repository yet. Use the npm package above for the current supported CLI install path.
+#### Homebrew (macOS, Linux)
+
+```bash
+brew install hopcode
+```
 
 ## Quick Start
 
@@ -148,50 +114,26 @@ Copy the prompt below and paste it into your agent:
 
 ```
 Use HopCode as a coding agent. First, fetch and read this skill reference:
-https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
+https://raw.githubusercontent.com/QwenLM/hopcode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
 Then follow the instructions inside to install, authenticate, and use HopCode via acpx for all coding tasks.
 ```
 
 ## Authentication
 
-HopCode works with **any model provider** that exposes an OpenAI-compatible API, plus native Anthropic and Google Gemini protocols.
-
-### Supported Providers
-
-| Provider                                               | Protocol    | Notes                               |
-| ------------------------------------------------------ | ----------- | ----------------------------------- |
-| [OpenAI](https://platform.openai.com)                  | `openai`    | GPT-4o, GPT-4.1, o3, etc.           |
-| [Anthropic](https://anthropic.com)                     | `anthropic` | Claude Opus/Sonnet/Haiku            |
-| [Google Gemini](https://ai.google.dev)                 | `gemini`    | Gemini 2.5 Pro/Flash                |
-| [Google Vertex AI](https://cloud.google.com/vertex-ai) | `vertex-ai` | Enterprise Gemini                   |
-| [DeepSeek](https://platform.deepseek.com)              | `openai`    | deepseek-chat, deepseek-reasoner    |
-| [Mistral](https://mistral.ai)                          | `openai`    | mistral-large, codestral, etc.      |
-| [Groq](https://groq.com)                               | `openai`    | Llama 4, Mixtral, Qwen (ultra-fast) |
-| [Together AI](https://together.ai)                     | `openai`    | 200+ open-source models             |
-| [Fireworks AI](https://fireworks.ai)                   | `openai`    | DeepSeek R1/V3, Llama 4             |
-| [OpenRouter](https://openrouter.ai)                    | `openai`    | 300+ models, single API key         |
-| [xAI Grok](https://x.ai)                               | `openai`    | grok-4, grok-3                      |
-| [Cohere](https://cohere.com)                           | `openai`    | Command-A, Command-R                |
-| [Alibaba Qwen](https://dashscope.aliyuncs.com)         | `openai`    | qwen3.6-plus, qwen-max              |
-| [Ollama](https://ollama.com)                           | `openai`    | Local models (llama3, qwen3, etc.)  |
-| [vLLM](https://vllm.ai)                                | `openai`    | Self-hosted models                  |
-| [LM Studio](https://lmstudio.ai)                       | `openai`    | Local GUI + API                     |
-| Any OpenAI-compatible                                  | `openai`    | Set `baseUrl` to your endpoint      |
-
 HopCode supports the following authentication methods:
 
-- **API Key (recommended)**: use an API key from any supported provider (OpenAI, Anthropic, Google GenAI, Mistral, Groq, DeepSeek, OpenRouter, and any OpenAI-compatible endpoint).
+- **API Key (recommended)**: use an API key from Alibaba Cloud Model Studio ([Beijing](https://bailian.console.aliyun.com/) / [intl](https://modelstudio.console.alibabacloud.com/)) or any supported provider (OpenAI, Anthropic, Google GenAI, and other compatible endpoints).
 - **Coding Plan**: subscribe to the Alibaba Cloud Coding Plan ([Beijing](https://bailian.console.aliyun.com/cn-beijing?tab=coding-plan#/efm/coding-plan-index) / [intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) for a fixed monthly fee with higher quotas.
 
 > ⚠️ **Qwen OAuth was discontinued on April 15, 2026.** If you were previously using Qwen OAuth, please switch to one of the methods above. Run `hopcode` and then `/auth` to reconfigure.
 
 #### API Key (recommended)
 
-Use an API key to connect to any supported provider. Supports multiple protocols:
+Use an API key to connect to Alibaba Cloud Model Studio or any supported provider. Supports multiple protocols:
 
-- **OpenAI-compatible**: OpenAI, OpenRouter, Groq, Fireworks AI, Together AI, DeepSeek, Mistral, Alibaba Qwen, Ollama, vLLM, and any `/v1`-compatible endpoint
-- **Anthropic**: Claude models directly
-- **Google GenAI / Vertex AI**: Gemini models
+- **OpenAI-compatible**: Alibaba Cloud ModelStudio, ModelScope, OpenAI, OpenRouter, and other OpenAI-compatible providers
+- **Anthropic**: Claude models
+- **Google GenAI**: Gemini models
 
 The **recommended** way to configure models and providers is by editing `~/.hopcode/settings.json` (create it if it doesn't exist). This file lets you define all available models, API keys, and default settings in one place.
 
@@ -199,37 +141,23 @@ The **recommended** way to configure models and providers is by editing `~/.hopc
 
 **Step 1:** Create or edit `~/.hopcode/settings.json`
 
-Here is a complete example using [OpenRouter](https://openrouter.ai) (gives you access to 300+ models with a single API key):
+Here is a complete example:
 
 ```json
 {
   "modelProviders": {
     "openai": [
       {
-        "id": "anthropic/claude-sonnet-4-5",
-        "name": "Claude Sonnet 4.5 (OpenRouter)",
-        "baseUrl": "https://openrouter.ai/api/v1",
-        "description": "Claude via OpenRouter",
-        "envKey": "OPENROUTER_API_KEY"
-      },
-      {
-        "id": "deepseek/deepseek-r1",
-        "name": "DeepSeek R1 (OpenRouter)",
-        "baseUrl": "https://openrouter.ai/api/v1",
-        "description": "DeepSeek R1 reasoning model",
-        "envKey": "OPENROUTER_API_KEY"
-      },
-      {
-        "id": "qwen/qwen3-coder",
-        "name": "Qwen3 Coder (OpenRouter)",
-        "baseUrl": "https://openrouter.ai/api/v1",
-        "description": "Qwen3 Coder via OpenRouter",
-        "envKey": "OPENROUTER_API_KEY"
+        "id": "qwen3.6-plus",
+        "name": "qwen3.6-plus",
+        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "description": "Qwen3-Coder via Dashscope",
+        "envKey": "DASHSCOPE_API_KEY"
       }
     ]
   },
   "env": {
-    "OPENROUTER_API_KEY": "sk-or-xxxxxxxxxxxxx"
+    "DASHSCOPE_API_KEY": "sk-xxxxxxxxxxxxx"
   },
   "security": {
     "auth": {
@@ -237,7 +165,7 @@ Here is a complete example using [OpenRouter](https://openrouter.ai) (gives you 
     }
   },
   "model": {
-    "name": "anthropic/claude-sonnet-4-5"
+    "name": "qwen3.6-plus"
   }
 }
 ```
@@ -417,20 +345,23 @@ Use the `/model` command at any time to switch between all configured models.
 
 </details>
 
-> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://hopcode.dev/docs/en/users/configuration/auth/) for full details.
+> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://hopcode.dev/hopcode-docs/en/users/configuration/auth/) for full details.
 
 > **Security note:** Never commit API keys to version control. The `~/.hopcode/settings.json` file is in your home directory and should stay private.
 
-#### Local Model Setup (Ollama / vLLM / LM Studio)
+#### Local Model Setup (Ollama / vLLM)
 
-You can also run models locally — no API key or cloud account needed. Configure your local model endpoint in `~/.hopcode/settings.json` using the `modelProviders` field.
+You can also run models locally — no API key or cloud account needed. This is not an authentication method; instead, configure your local model endpoint in `~/.hopcode/settings.json` using the `modelProviders` field.
+
+Set `generationConfig.contextWindowSize` inside the matching provider entry
+and adjust it to the context length configured on your local server.
 
 <details>
-<summary>Ollama setup (multiple models)</summary>
+<summary>Ollama setup</summary>
 
 1. Install Ollama from [ollama.com](https://ollama.com/)
-2. Pull models: `ollama pull qwen3:32b && ollama pull llama3.3:70b && ollama pull deepseek-r1:14b`
-3. Configure `~/.hopcode/settings.json` — list all your pulled models so you can switch with `/model`:
+2. Pull a model: `ollama pull qwen3:32b`
+3. Configure `~/.hopcode/settings.json`:
 
 ```json
 {
@@ -440,19 +371,10 @@ You can also run models locally — no API key or cloud account needed. Configur
         "id": "qwen3:32b",
         "name": "Qwen3 32B (Ollama)",
         "baseUrl": "http://localhost:11434/v1",
-        "description": "Qwen3 32B running locally"
-      },
-      {
-        "id": "llama3.3:70b",
-        "name": "Llama 3.3 70B (Ollama)",
-        "baseUrl": "http://localhost:11434/v1",
-        "description": "Meta Llama 3.3 70B"
-      },
-      {
-        "id": "deepseek-r1:14b",
-        "name": "DeepSeek R1 14B (Ollama)",
-        "baseUrl": "http://localhost:11434/v1",
-        "description": "DeepSeek R1 reasoning model"
+        "description": "Qwen3 32B running locally via Ollama",
+        "generationConfig": {
+          "contextWindowSize": 131072
+        }
       }
     ]
   },
@@ -466,8 +388,6 @@ You can also run models locally — no API key or cloud account needed. Configur
   }
 }
 ```
-
-Use `/model` inside HopCode to switch between models from the same Ollama instance.
 
 </details>
 
@@ -486,7 +406,10 @@ Use `/model` inside HopCode to switch between models from the same Ollama instan
         "id": "Qwen/Qwen3-32B",
         "name": "Qwen3 32B (vLLM)",
         "baseUrl": "http://localhost:8000/v1",
-        "description": "Qwen3 32B running locally via vLLM"
+        "description": "Qwen3 32B running locally via vLLM",
+        "generationConfig": {
+          "contextWindowSize": 131072
+        }
       }
     ]
   },
@@ -510,7 +433,7 @@ As an open-source terminal agent, you can use HopCode in four primary ways:
 1. Interactive mode (terminal UI)
 2. Headless mode (scripts, CI)
 3. IDE integration (VS Code, Zed)
-4. TypeScript SDK
+4. SDKs (TypeScript, Python, Java)
 
 #### Interactive mode
 
@@ -528,65 +451,50 @@ cd your-project/
 hopcode -p "your question"
 ```
 
-Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://hopcode.dev/docs/en/users/features/headless).
+Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://hopcode.dev/hopcode-docs/en/users/features/headless).
 
 #### IDE integration
 
 Use HopCode inside your editor (VS Code, Zed, and JetBrains IDEs):
 
-- [Use in VS Code](https://hopcode.dev/docs/en/users/integration-vscode/)
-- [Use in Zed](https://hopcode.dev/docs/en/users/integration-zed/)
-- [Use in JetBrains IDEs](https://hopcode.dev/docs/en/users/integration-jetbrains/)
+- [Use in VS Code](https://hopcode.dev/hopcode-docs/en/users/integration-vscode/)
+- [Use in Zed](https://hopcode.dev/hopcode-docs/en/users/integration-zed/)
+- [Use in JetBrains IDEs](https://hopcode.dev/hopcode-docs/en/users/integration-jetbrains/)
 
-#### TypeScript SDK
+#### SDKs
 
-Build on top of HopCode with the TypeScript SDK:
+Build on top of HopCode with the available SDKs:
 
-- [Use the HopCode SDK](./packages/sdk-typescript/README.md)
+- TypeScript: [Use the HopCode SDK](./packages/sdk-typescript/README.md)
+- Python: [Use the Python SDK](./packages/sdk-python/README.md)
+- Java: [Use the Java SDK](./packages/sdk-java/qwencode/README.md)
 
-#### Skills
+Python SDK example:
 
-Skills are modular instruction sets that extend HopCode's capabilities for specific workflows.
+```python
+import asyncio
 
-```bash
-# List available skills
-hopcode skills list
+from qwen_code_sdk import is_sdk_result_message, query
 
-# Show a skill's instructions
-hopcode skills show spec-driven
 
-# Add a custom skill from a URL
-hopcode skills add https://example.com/my-skill/SKILL.md
+async def main() -> None:
+    result = query(
+        "Summarize the repository layout.",
+        {
+            "cwd": "/path/to/project",
+            "path_to_qwen_executable": "hopcode",
+        },
+    )
 
-# Remove a skill
-hopcode skills remove my-skill
+    async for message in result:
+        if is_sdk_result_message(message):
+            print(message["result"])
+
+
+asyncio.run(main())
 ```
-
-**Built-in skills:**
-
-| Skill          | Description                                |
-| -------------- | ------------------------------------------ |
-| `spec-driven`  | TDD / spec-first development workflow      |
-| `git-workflow` | Conventional commits, PR descriptions      |
-| `codebase-map` | Document your codebase architecture        |
-| `changelog`    | Generate structured CHANGELOG entries      |
-| `mcp-builder`  | Build MCP (Model Context Protocol) servers |
 
 ## Commands & Shortcuts
-
-### CLI Profile Commands
-
-Save and switch provider/model configurations as named profiles:
-
-```bash
-hopcode profile init "fast-local"   # interactive wizard — sets provider, model, base URL, API key
-hopcode profile list                 # list all saved profiles
-hopcode profile use "fast-local"     # activate a profile for next startup
-hopcode profile show                 # show currently active profile
-hopcode profile delete "fast-local"  # remove a profile
-```
-
-Profiles are stored in `~/.hopcode-profiles.json` and persist across sessions.
 
 ### Session Commands
 
@@ -603,9 +511,9 @@ Profiles are stored in `~/.hopcode-profiles.json` and persist across sessions.
 - `Ctrl+D` - Exit (on empty line)
 - `Up/Down` - Navigate command history
 
-> Learn more about [Commands](https://hopcode.dev/docs/en/users/features/commands/)
+> Learn more about [Commands](https://hopcode.dev/hopcode-docs/en/users/features/commands/)
 >
-> **Tip**: In IZN mode (`--izn`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/docs/en/users/features/approval-mode/)
+> **Tip**: In YOLO mode (`--yolo`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/hopcode-docs/en/users/features/approval-mode/)
 
 ## Configuration
 
@@ -624,25 +532,8 @@ The most commonly used top-level fields in `settings.json`:
 | `env`                        | Fallback environment variables (e.g. API keys). Lower priority than shell `export` and `.env` files. |
 | `security.auth.selectedType` | The protocol to use on startup (e.g. `openai`).                                                      |
 | `model.name`                 | The default model to use when HopCode starts.                                                        |
-| `agentModels`                | Per-subagent model overrides — route specific subagents to different models.                         |
 
-#### Per-Agent Model Routing
-
-Use `agentModels` in `settings.json` to route specific subagents to different models. This lets you use a fast/cheap model for simple subagents and a powerful model for complex ones:
-
-```json
-{
-  "agentModels": {
-    "test-engineer": "gpt-4o-mini",
-    "code-review": "claude-opus-4",
-    "main": "claude-sonnet-4-5"
-  }
-}
-```
-
-The key is the subagent name (as defined in its config), and the value is any model ID configured in `modelProviders`. The `"main"` key sets the model for the primary conversation agent.
-
-> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://hopcode.dev/docs/en/users/configuration/settings/) for all available options.
+> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://hopcode.dev/hopcode-docs/en/users/configuration/settings/) for all available options.
 
 ## Benchmark Results
 
@@ -662,7 +553,7 @@ Looking for a graphical interface?
 
 ## Troubleshooting
 
-If you encounter issues, check the [troubleshooting guide](https://hopcode.dev/docs/en/users/support/troubleshooting/).
+If you encounter issues, check the [troubleshooting guide](https://hopcode.dev/hopcode-docs/en/users/support/troubleshooting/).
 
 **Common issues:**
 
@@ -677,11 +568,4 @@ To report a bug from within the CLI, run `/bug` and include a short title and re
 
 ## Acknowledgments
 
-HopCode is a fork of [HopCode](https://github.com/QwenLM/hopcode), which itself is based on [Google Gemini CLI](https://github.com/google-gemini/gemini-cli). We acknowledge and appreciate the excellent work of both the HopCode team and the Gemini CLI team.
-
-HopCode extends the original with:
-
-- Multi-provider model support (OpenAI, Anthropic, Gemini, Groq, OpenRouter, Ollama, vLLM, and more)
-- Skills system for modular AI workflows
-- VS Code Marketplace extension
-- OpenRouter integration for 300+ models via a single API key
+This project is based on [Google Gemini CLI](https://github.com/google-gemini/gemini-cli). We acknowledge and appreciate the excellent work of the Gemini CLI team. Our main contribution focuses on parser-level adaptations to better support Qwen-Coder models.

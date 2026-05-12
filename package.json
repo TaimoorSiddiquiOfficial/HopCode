@@ -2,7 +2,7 @@
   "name": "@hoptrendy/hopcode",
   "version": "0.27.5",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "type": "module",
   "workspaces": [
@@ -74,8 +74,10 @@
     "clean": "node scripts/clean.js",
     "pre-commit": "node scripts/pre-commit.js"
   },
+  "//overrides": {
+    "@types/node": "Pinned to 20.x even though engines require Node >=22. Upgrading to @types/node@22.x re-introduces a Dirent<NonSharedBuffer> type regression in @hoptrendy/hopcode-core/sessionService tests. Revisit once the upstream type for Dirent stabilises (see PR #3860 discussion)."
+  },
   "overrides": {
-    "wrap-ansi": "9.0.2",
     "ansi-regex": "6.2.2",
     "cliui": {
       "wrap-ansi": "7.0.0"
@@ -84,7 +86,10 @@
     "normalize-package-data": "^7.0.1",
     "brace-expansion@<1.1.13": "^1.1.13",
     "esbuild": "^0.25.5",
-    "ink": "^6.8.0"
+    "ink": "^7.0.2",
+    "@types/node": "20.19.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "bin": {
     "hopcode": "dist/cli.js"
@@ -138,6 +143,7 @@
     "@hoptrendy/hopcode-cli": "^0.21.0",
     "@testing-library/dom": "^10.4.1",
     "fuzzysort": "^3.1.0",
+    "ink": "^7.0.2",
     "remeda": "^2.33.7",
     "simple-git": "^3.29.0"
   },

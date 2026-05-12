@@ -21,7 +21,7 @@ import {
 import { t } from '../i18n/index.js';
 import { loadGitHubToken } from './githubTokenStore.js';
 
-const MIN_NODE_MAJOR = 20;
+const MIN_NODE_MAJOR = 22;
 
 function checkNodeVersion(): DoctorCheckResult {
   const version = process.version;
