@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -86,9 +86,9 @@ export async function convertGeminiExtensionPackage(
     }
 
     // Step 3: Create hopcode-extension.json with converted config
-    const qwenConfigPath = path.join(tmpDir, 'hopcode-extension.json');
+    const hopcodeConfigPath = path.join(tmpDir, 'hopcode-extension.json');
     fs.writeFileSync(
-      qwenConfigPath,
+      hopcodeConfigPath,
       JSON.stringify(geminiConfig, null, 2),
       'utf-8',
     );

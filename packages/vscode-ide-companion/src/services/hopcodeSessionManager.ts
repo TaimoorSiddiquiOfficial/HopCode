@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
 import { getRuntimeBaseDir } from '../utils/paths.js';
-import type { HopCodeSession } from './hopcodeSessionReader.js';
+import type { HopCodeSession } from './HopCodeSessionReader.js';
 
 /**
  * HopCode Session Manager
@@ -59,9 +59,7 @@ export class HopCodeSessionManager {
       const filePath = path.join(sessionDir, filename);
 
       if (!fs.existsSync(filePath)) {
-        console.log(
-          `[HopCodeSessionManager] Session file not found: ${filePath}`,
-        );
+        console.log(`[HopCodeSessionManager] Session file not found: ${filePath}`);
         return null;
       }
 

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,8 +8,8 @@ import * as fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Config } from '@qwen-code/qwen-code-core';
-import { Storage } from '@qwen-code/qwen-code-core';
+import type { Config } from '@hoptrendy/hopcode-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 import { setLanguageAsync } from '../i18n/index.js';
 import { CommandKind, type SlashCommand } from '../ui/commands/types.js';
 import { DynamicCommandLocalizationService } from './DynamicCommandLocalizationService.js';
@@ -36,9 +36,9 @@ describe('DynamicCommandLocalizationService', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-dynamic-command-i18n-'),
+      path.join(os.tmpdir(), 'hopcode-dynamic-command-i18n-'),
     );
-    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(tempDir);
+    vi.spyOn(Storage, 'getGlobalHopCodeDir').mockReturnValue(tempDir);
 
     generateJson = vi.fn().mockResolvedValue({
       translations: [{ id: 'review', text: '审查代码变更' }],
@@ -306,7 +306,7 @@ describe('DynamicCommandLocalizationService', () => {
     const cachePath = path.join(tempDir, 'dynamic-command-translations.json');
     const fileInsteadOfDir = path.join(tempDir, 'not-a-directory');
     await fs.writeFile(fileInsteadOfDir, 'not a directory', 'utf-8');
-    vi.mocked(Storage.getGlobalQwenDir).mockReturnValue(fileInsteadOfDir);
+    vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(fileInsteadOfDir);
 
     const service = new DynamicCommandLocalizationService();
     const firstLocalized = await service.localizeCommands(
@@ -318,7 +318,7 @@ describe('DynamicCommandLocalizationService', () => {
 
     expect(firstLocalized[0]?.description).toBe('审查代码变更');
 
-    vi.mocked(Storage.getGlobalQwenDir).mockReturnValue(tempDir);
+    vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempDir);
     generateJson.mockResolvedValueOnce({
       translations: [{ id: 'review', text: '恢复审查代码变更' }],
     });

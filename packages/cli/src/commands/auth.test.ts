@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -72,7 +72,7 @@ describe('auth command', () => {
     ['auth'],
     ['auth status'],
     ['auth api-key'],
-    ['auth qwen-oauth'],
+    ['auth hopcode-oauth'],
     ['auth openrouter --key test-key'],
     ['auth coding-plan --region china --key sk-sp-test'],
     ['auth --key test-key'],

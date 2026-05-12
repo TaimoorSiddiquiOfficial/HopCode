@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -1432,15 +1432,15 @@ describe('loggers', () => {
       getTelemetryLogPromptsEnabled: () => true,
     } as unknown as Config;
 
-    const mockQwenLogger = {
+    const mockHopCodeLogger = {
       logHookCallEvent: vi.fn(),
     };
 
     beforeEach(() => {
       vi.spyOn(HopCodeLogger, 'getInstance').mockReturnValue(
-        mockQwenLogger as unknown as HopCodeLogger,
+        mockHopCodeLogger as unknown as HopCodeLogger,
       );
-      mockQwenLogger.logHookCallEvent.mockClear();
+      mockHopCodeLogger.logHookCallEvent.mockClear();
     });
 
     it('should log a successful hook call to HopCodeLogger', () => {
@@ -1461,7 +1461,7 @@ describe('loggers', () => {
       logHookCall(mockConfig, event);
 
       // Should call HopCodeLogger
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
     it('should log a failed hook call with error', () => {
@@ -1482,7 +1482,7 @@ describe('loggers', () => {
       logHookCall(mockConfig, event);
 
       // Should call HopCodeLogger
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
     it('should handle when HopCodeLogger is not available', () => {
@@ -1518,7 +1518,7 @@ describe('loggers', () => {
 
       logHookCall(mockConfig, event);
 
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
     it('should log hook call with minimal fields', () => {
@@ -1533,7 +1533,7 @@ describe('loggers', () => {
 
       logHookCall(mockConfig, event);
 
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
     it('should log hook call with exit code', () => {
@@ -1553,7 +1553,7 @@ describe('loggers', () => {
 
       logHookCall(mockConfig, event);
 
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
     it('should log hook call with zero exit code on success', () => {
@@ -1573,7 +1573,7 @@ describe('loggers', () => {
 
       logHookCall(mockConfig, event);
 
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
     it('should log hook call with non-zero exit code on failure', () => {
@@ -1593,7 +1593,7 @@ describe('loggers', () => {
 
       logHookCall(mockConfig, event);
 
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
     });
 
     it('should log all hook event types', () => {
@@ -1613,7 +1613,7 @@ describe('loggers', () => {
       ];
 
       for (const eventType of eventTypes) {
-        mockQwenLogger.logHookCallEvent.mockClear();
+        mockHopCodeLogger.logHookCallEvent.mockClear();
 
         const event = new HookCallEvent(
           eventType,
@@ -1626,7 +1626,7 @@ describe('loggers', () => {
 
         logHookCall(mockConfig, event);
 
-        expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledWith(event);
+        expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledWith(event);
       }
     });
 
@@ -1643,8 +1643,8 @@ describe('loggers', () => {
       logHookCall(mockConfig, event);
 
       // Verify the exact event object is passed
-      expect(mockQwenLogger.logHookCallEvent).toHaveBeenCalledTimes(1);
-      const passedEvent = mockQwenLogger.logHookCallEvent.mock.calls[0][0];
+      expect(mockHopCodeLogger.logHookCallEvent).toHaveBeenCalledTimes(1);
+      const passedEvent = mockHopCodeLogger.logHookCallEvent.mock.calls[0][0];
       expect(passedEvent).toBe(event);
     });
   });

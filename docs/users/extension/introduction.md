@@ -1,4 +1,4 @@
-# HopCode Extensions
+﻿# HopCode Extensions
 
 HopCode extensions package prompts, MCP servers, subagents, skills and custom commands into a familiar and user-friendly format. With extensions, you can expand the capabilities of HopCode and share those capabilities with others. They are designed to be easily installable and shareable.
 
@@ -54,9 +54,9 @@ hopcode extensions install https://github.com/f/awesome-chatgpt-prompts:prompts.
 
 Claude plugins are automatically converted to HopCode format during installation:
 
-- `claude-plugin.json` is converted to `qwen-extension.json`
-- Agent configurations are converted to Qwen subagent format
-- Skill configurations are converted to Qwen skill format
+- `claude-plugin.json` is converted to `hopcode-extension.json`
+- Agent configurations are converted to HopCode subagent format
+- Skill configurations are converted to HopCode skill format
 - Tool mappings are automatically handled
 
 You can quickly browse available extensions from different marketplaces using the `/extensions explore` command:
@@ -85,7 +85,7 @@ hopcode extensions install <owner>/<repo>
 
 Gemini extensions are automatically converted to HopCode format during installation:
 
-- `gemini-extension.json` is converted to `qwen-extension.json`
+- `gemini-extension.json` is converted to `hopcode-extension.json`
 - TOML command files are automatically migrated to Markdown format
 - MCP servers, context files, and settings are preserved
 
@@ -115,7 +115,7 @@ Only scoped packages (`@scope/package-name`) are supported to avoid ambiguity wi
 
 **Authentication** is handled automatically via the `NPM_TOKEN` environment variable or registry-specific `_authToken` entries in your `.npmrc` file.
 
-> **Note:** npm extensions must include a `qwen-extension.json` file at the package root, following the same format as any other HopCode extension. See [Extension Releasing](./extension-releasing.md#releasing-through-npm-registry) for packaging details.
+> **Note:** npm extensions must include a `hopcode-extension.json` file at the package root, following the same format as any other HopCode extension. See [Extension Releasing](./extension-releasing.md#releasing-through-npm-registry) for packaging details.
 
 #### From Git Repository
 
@@ -131,11 +131,11 @@ This will install the github mcp server extension.
 hopcode extensions install /path/to/your/extension
 ```
 
-Note that we create a copy of the installed extension, so you will need to run `qwen extensions update` to pull in changes from both locally-defined extensions and those on GitHub.
+Note that we create a copy of the installed extension, so you will need to run `hopcode extensions update` to pull in changes from both locally-defined extensions and those on GitHub.
 
 ### Uninstalling an extension
 
-To uninstall, run `qwen extensions uninstall extension-name`, so, in the case of the install example:
+To uninstall, run `hopcode extensions uninstall extension-name`, so, in the case of the install example:
 
 ```
 hopcode extensions uninstall qwen-cli-security
@@ -145,17 +145,17 @@ hopcode extensions uninstall qwen-cli-security
 
 Extensions are, by default, enabled across all workspaces. You can disable an extension entirely or for specific workspace.
 
-For example, `qwen extensions disable extension-name` will disable the extension at the user level, so it will be disabled everywhere. `qwen extensions disable extension-name --scope=workspace` will only disable the extension in the current workspace.
+For example, `hopcode extensions disable extension-name` will disable the extension at the user level, so it will be disabled everywhere. `hopcode extensions disable extension-name --scope=workspace` will only disable the extension in the current workspace.
 
 ### Enabling an extension
 
-You can enable extensions using `qwen extensions enable extension-name`. You can also enable an extension for a specific workspace using `qwen extensions enable extension-name --scope=workspace` from within that workspace.
+You can enable extensions using `hopcode extensions enable extension-name`. You can also enable an extension for a specific workspace using `hopcode extensions enable extension-name --scope=workspace` from within that workspace.
 
 This is useful if you have an extension disabled at the top-level and only enabled in specific places.
 
 ### Updating an extension
 
-For extensions installed from a local path, a git repository, or an npm registry, you can explicitly update to the latest version with `qwen extensions update extension-name`. For npm extensions installed without a version pin (e.g. `@scope/pkg`), updates check the `latest` dist-tag. For those installed with a specific dist-tag (e.g. `@scope/pkg@beta`), updates track that tag. Extensions pinned to an exact version (e.g. `@scope/pkg@1.2.0`) are always considered up-to-date.
+For extensions installed from a local path, a git repository, or an npm registry, you can explicitly update to the latest version with `hopcode extensions update extension-name`. For npm extensions installed without a version pin (e.g. `@scope/pkg`), updates check the `latest` dist-tag. For those installed with a specific dist-tag (e.g. `@scope/pkg@beta`), updates track that tag. Extensions pinned to an exact version (e.g. `@scope/pkg@1.2.0`) are always considered up-to-date.
 
 You can update all extensions with:
 
@@ -167,13 +167,13 @@ hopcode extensions update --all
 
 On startup, HopCode looks for extensions in `<home>/.hopcode/extensions`
 
-Extensions exist as a directory that contains a `qwen-extension.json` file. For example:
+Extensions exist as a directory that contains a `hopcode-extension.json` file. For example:
 
-`<home>/.hopcode/extensions/my-extension/qwen-extension.json`
+`<home>/.hopcode/extensions/my-extension/hopcode-extension.json`
 
-### `qwen-extension.json`
+### `hopcode-extension.json`
 
-The `qwen-extension.json` file contains the configuration for the extension. The file has the following structure:
+The `hopcode-extension.json` file contains the configuration for the extension. The file has the following structure:
 
 ```json
 {
@@ -223,7 +223,7 @@ The `qwen-extension.json` file contains the configuration for the extension. The
 
 ### Managing Extension Settings
 
-Extensions can require configuration through settings (such as API keys or credentials). These settings can be managed using the `qwen extensions settings` CLI command:
+Extensions can require configuration through settings (such as API keys or credentials). These settings can be managed using the `hopcode extensions settings` CLI command:
 
 **Set a setting value:**
 
@@ -270,7 +270,7 @@ An extension named `gcp` with the following structure:
 
 ```
 .hopcode/extensions/gcp/
-├── qwen-extension.json
+├── hopcode-extension.json
 └── commands/
     ├── deploy.md
     └── gcs/
@@ -290,7 +290,7 @@ Extensions can provide custom skills by placing skill files in a `skills/` subdi
 
 ```
 .hopcode/extensions/my-extension/
-├── qwen-extension.json
+├── hopcode-extension.json
 └── skills/
     └── pdf-processor/
         └── SKILL.md
@@ -306,7 +306,7 @@ Extensions can provide custom subagents by placing agent configuration files in 
 
 ```
 .hopcode/extensions/my-extension/
-├── qwen-extension.json
+├── hopcode-extension.json
 └── agents/
     └── testing-expert.yaml
 ```
@@ -327,7 +327,7 @@ For example, if both a user and the `gcp` extension define a `deploy` command:
 
 ## Variables
 
-HopCode extensions allow variable substitution in `qwen-extension.json`. This can be useful if e.g., you need the current directory to run an MCP server using `"cwd": "${extensionPath}${/}run.ts"`.
+HopCode extensions allow variable substitution in `hopcode-extension.json`. This can be useful if e.g., you need the current directory to run an MCP server using `"cwd": "${extensionPath}${/}run.ts"`.
 
 **Supported variables:**
 

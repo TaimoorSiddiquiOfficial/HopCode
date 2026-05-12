@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -44,7 +44,7 @@ const legacySubcommands = [
   'coding-plan',
   'openrouter',
   'api-key',
-  'qwen-oauth',
+  'hopcode-oauth',
 ];
 
 export const authCommand: CommandModule = {

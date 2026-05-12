@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,9 +60,9 @@ describe('rulesDiscovery', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
+  // ─────────────────────────────────────────────────────────────────────────
   // parseRuleFile
-  // -------------------------------------------------------------------------
+  // ─────────────────────────────────────────────────────────────────────────
 
   describe('parseRuleFile', () => {
     it('parses a rule with paths frontmatter', () => {
@@ -171,9 +171,9 @@ Body.
     });
   });
 
-  // -------------------------------------------------------------------------
-  // loadRules � baseline vs conditional split
-  // -------------------------------------------------------------------------
+  // ─────────────────────────────────────────────────────────────────────────
+  // loadRules — baseline vs conditional split
+  // ─────────────────────────────────────────────────────────────────────────
 
   describe('loadRules', () => {
     it('returns empty when no rules directory exists', async () => {
@@ -327,12 +327,12 @@ Use hooks.`,
     });
 
     it('reads global rules from HOPCODE_HOME when set', async () => {
-      const customHopCodeHome = path.join(testRootDir, 'custom-hopcode-home');
-      const originalHopCodeHome = process.env['HOPCODE_HOME'];
-      process.env['HOPCODE_HOME'] = customHopCodeHome;
+      const customHopcodeHome = path.join(testRootDir, 'custom-hopcode-home');
+      const originalHopcodeHome = process.env['HOPCODE_HOME'];
+      process.env['HOPCODE_HOME'] = customHopcodeHome;
       try {
         await createTestFile(
-          path.join(customHopCodeHome, 'rules', 'fromCustomHome.md'),
+          path.join(customHopcodeHome, 'rules', 'fromCustomHome.md'),
           'CustomHome rule.',
         );
         // A stale rule in the legacy ~/.hopcode/rules location should NOT be
@@ -347,18 +347,18 @@ Use hooks.`,
         expect(result.content).toContain('CustomHome rule.');
         expect(result.content).not.toContain('LegacyHome rule.');
       } finally {
-        if (originalHopCodeHome === undefined) {
+        if (originalHopcodeHome === undefined) {
           delete process.env['HOPCODE_HOME'];
         } else {
-          process.env['HOPCODE_HOME'] = originalHopCodeHome;
+          process.env['HOPCODE_HOME'] = originalHopcodeHome;
         }
       }
     });
   });
 
-  // -------------------------------------------------------------------------
+  // ─────────────────────────────────────────────────────────────────────────
   // ConditionalRulesRegistry
-  // -------------------------------------------------------------------------
+  // ─────────────────────────────────────────────────────────────────────────
 
   describe('ConditionalRulesRegistry', () => {
     const rule = (fp: string, pats: string[], body: string) => ({
@@ -433,7 +433,7 @@ Use hooks.`,
     });
 
     it('rejects the exact `..` relative path (parent of projectRoot)', () => {
-      // Pattern matches literal '..' � pathological but defensive
+      // Pattern matches literal '..' — pathological but defensive
       const reg = new ConditionalRulesRegistry(
         [rule('/r/dot.md', ['..'], 'Parent rule.')],
         '/project',

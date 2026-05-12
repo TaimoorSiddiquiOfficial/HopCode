@@ -677,7 +677,7 @@ To report a bug from within the CLI, run `/bug` and include a short title and re
 
 ## Acknowledgments
 
-HopCode is a fork of [Qwen Code](https://github.com/QwenLM/qwen-code), which itself is based on [Google Gemini CLI](https://github.com/google-gemini/gemini-cli). We acknowledge and appreciate the excellent work of both the Qwen Code team and the Gemini CLI team.
+HopCode is a fork of [HopCode](https://github.com/QwenLM/hopcode), which itself is based on [Google Gemini CLI](https://github.com/google-gemini/gemini-cli). We acknowledge and appreciate the excellent work of both the HopCode team and the Gemini CLI team.
 
 HopCode extends the original with:
 

@@ -2,12 +2,12 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.27.5",
-  "publisher": "hopcode",
+  "version": "0.15.9",
+  "publisher": "hoptrendy",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "url": "https://github.com/hoptrendy/hopcode.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {
@@ -20,14 +20,21 @@
   ],
   "keywords": [
     "hopcode",
-    "ai coding",
+    "HopCode",
+    "HopCode",
+    "HopCode",
     "cli",
     "ide integration",
-    "ide companion",
-    "AI assistant"
+    "ide companion"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onView:hopcode.chatView.sidebar",
+    "onView:hopcode.chatView.secondary",
+    "onCommand:hopcode.openChat",
+    "onCommand:hopcode.focusChat",
+    "onCommand:hopcode.newConversation",
+    "onCommand:hopcode.showLogs"
   ],
   "contributes": {
     "jsonValidation": [
@@ -81,12 +88,12 @@
     ],
     "commands": [
       {
-        "command": "hopcode.diff.accept",
+        "command": "HopCode.diff.accept",
         "title": "HopCode: Accept Current Diff",
         "icon": "$(check)"
       },
       {
-        "command": "hopcode.diff.cancel",
+        "command": "HopCode.diff.cancel",
         "title": "HopCode: Close Diff Editor",
         "icon": "$(close)"
       },
@@ -104,8 +111,8 @@
         "icon": "./assets/icon.png"
       },
       {
-        "command": "hopcode.login",
-        "title": "HopCode: Login"
+        "command": "hopcode.auth",
+        "title": "HopCode: Auth"
       },
       {
         "command": "hopcode.focusChat",
@@ -135,16 +142,15 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "hopcode.diff.accept",
-          "when": "hopcode.diff.isVisible"
+          "command": "HopCode.diff.accept",
+          "when": "HopCode.diff.isVisible"
         },
         {
-          "command": "hopcode.diff.cancel",
-          "when": "hopcode.diff.isVisible"
+          "command": "HopCode.diff.cancel",
+          "when": "HopCode.diff.isVisible"
         },
         {
-          "command": "hopcode.login",
-          "when": "false"
+          "command": "hopcode.auth"
         },
         {
           "command": "hopcode.copyMessage",
@@ -178,13 +184,13 @@
       ],
       "editor/title": [
         {
-          "command": "hopcode.diff.accept",
-          "when": "hopcode.diff.isVisible",
+          "command": "HopCode.diff.accept",
+          "when": "HopCode.diff.isVisible",
           "group": "navigation"
         },
         {
-          "command": "hopcode.diff.cancel",
-          "when": "hopcode.diff.isVisible",
+          "command": "HopCode.diff.cancel",
+          "when": "HopCode.diff.isVisible",
           "group": "navigation"
         },
         {
@@ -204,7 +210,7 @@
             "api-key"
           ],
           "enumDescriptions": [
-            "Alibaba Cloud Coding Plan â€” configurable from VS Code Settings",
+            "Alibaba Cloud Coding Plan — configurable from VS Code Settings",
             "Configured via HopCode: Auth or the onboarding button"
           ],
           "default": "coding-plan",
@@ -224,8 +230,8 @@
             "global"
           ],
           "enumDescriptions": [
-            "China â€” é˜¿é‡Œäº‘ç™¾ç‚¼ (aliyun.com)",
-            "Global â€” Alibaba Cloud (alibabacloud.com)"
+            "China — 阿里云百炼 (aliyun.com)",
+            "Global — Alibaba Cloud (alibabacloud.com)"
           ],
           "default": "china",
           "markdownDescription": "Region for Coding Plan. _(Only used when Provider is `coding-plan`)_"
@@ -246,14 +252,14 @@
     },
     "keybindings": [
       {
-        "command": "hopcode.diff.accept",
+        "command": "HopCode.diff.accept",
         "key": "ctrl+s",
-        "when": "hopcode.diff.isVisible"
+        "when": "HopCode.diff.isVisible"
       },
       {
-        "command": "hopcode.diff.accept",
+        "command": "HopCode.diff.accept",
         "key": "cmd+s",
-        "when": "hopcode.diff.isVisible"
+        "when": "HopCode.diff.isVisible"
       },
       {
         "command": "hopcode.focusChat",
@@ -266,52 +272,53 @@
   "type": "module",
   "scripts": {
     "prepackage": "node ./scripts/prepackage.js",
-    "prebuild": "npm --prefix ../webui run build",
-    "build": "node esbuild.js --production",
+    "build": "npm run build:dev",
     "build:dev": "npm run check-types && npm run lint && node esbuild.js",
     "build:prod": "node esbuild.js --production",
     "generate:notices": "node ./scripts/generate-notices.js",
+    "prepare": "npm run generate:notices",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "watch": "npm-run-all2 -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npx --yes @vscode/vsce package --no-dependencies",
+    "package": "vsce package --no-dependencies",
     "test": "vitest run",
     "test:ci": "vitest run --coverage",
     "validate:notices": "node ./scripts/validate-notices.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.25",
+    "@types/express": "^5.0.3",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^20.19.1",
-    "@types/react": "^19.2.14",
+    "@types/node": "20.x",
+    "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
     "@types/semver": "^7.7.1",
     "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^8.35.0",
-    "@typescript-eslint/parser": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
     "autoprefixer": "^10.4.22",
-    "esbuild": "^0.25.12",
-    "eslint": "^9.39.4",
+    "esbuild": "^0.25.3",
+    "eslint": "^9.25.1",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "npm-run-all2": "^8.0.4",
+    "npm-run-all2": "^8.0.2",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^0.14.1",
-    "@hoptrendy/webui": "file:../webui",
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@hopcode/webui": "*",
+    "@modelcontextprotocol/sdk": "^1.25.1",
     "cors": "^2.8.5",
-    "express": "^4.22.1",
+    "dotenv": "^17.1.0",
+    "express": "^5.1.0",
     "markdown-it": "^14.1.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "semver": "^7.7.4",
+    "semver": "^7.7.2",
     "zod": "^3.25.76"
   }
 }

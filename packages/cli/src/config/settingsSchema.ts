@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -397,6 +397,12 @@ const SETTINGS_SCHEMA = {
         description:
           'Attribution added to git commits and pull requests created through HopCode.',
         showInDialog: false,
+        // Pre-V4 settings stored this as a single boolean. The V3→V4
+        // migration rewrites those on first launch, but the IDE schema
+        // validator runs before that — accept the boolean shape so users
+        // editing settings.json in VS Code don't see a spurious warning
+        // until they run HopCode once. Config.normalizeGitCoAuthor handles
+        // the boolean at runtime.
         legacyTypes: ['boolean'],
         properties: {
           commit: {
@@ -472,17 +478,6 @@ const SETTINGS_SCHEMA = {
         description:
           'The language for LLM output. Use "auto" to detect from system settings, ' +
           'or set a specific language.',
-        showInDialog: true,
-      },
-      dynamicCommandTranslation: {
-        type: 'boolean',
-        label: 'Language: Dynamic Command Translation',
-        category: 'General',
-        requiresRestart: false,
-        default: false,
-        description:
-          'Enable AI translation for dynamic slash command descriptions. ' +
-          'When disabled, dynamic commands use their original descriptions and do not trigger translation model calls.',
         showInDialog: true,
       },
       terminalBell: {
@@ -841,7 +836,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: undefined as CustomAsciiArtSetting | undefined,
         description:
-          'Replace the default HOPCODE ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
+          'Replace the default HopCode ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
         showInDialog: false,
         // The runtime accepts three shapes (inline string, {path}, or
         // {small,large} where each tier is itself string-or-{path}). The
@@ -1122,7 +1117,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: false,
             description:
-              'When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: "tool"` messages with HTTP 400 "Invalid \'messages\' in payload". Default false preserves the prior behavior for permissive providers.',
+              'When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: "tool"` messages with HTTP 400 "Invalid \'messages\' in payload". Default false preserves the prior behavior for permissive providers. See hoptrendy/hopcode#3616.',
             parentKey: 'generationConfig',
             showInDialog: false,
           },
@@ -1233,16 +1228,6 @@ const SETTINGS_SCHEMA = {
           'Settings for clearing stale context after idle periods. Use -1 to disable a threshold.',
         showInDialog: false,
         properties: {
-          thinkingThresholdMinutes: {
-            type: 'number',
-            label: 'Thinking Idle Threshold (minutes)',
-            category: 'Context',
-            requiresRestart: false,
-            default: 5 as number,
-            description:
-              'Minutes of inactivity before clearing old thinking blocks. Use -1 to disable.',
-            showInDialog: false,
-          },
           toolResultsThresholdMinutes: {
             type: 'number',
             label: 'Tool Results Idle Threshold (minutes)',
@@ -1283,7 +1268,7 @@ const SETTINGS_SCHEMA = {
             description: 'Respect .gitignore files when searching',
             showInDialog: true,
           },
-          respectHopCodeIgnore: {
+          respectHopcodeIgnore: {
             type: 'boolean',
             label: 'Respect .hopcodeignore',
             category: 'Context',
@@ -1548,7 +1533,7 @@ const SETTINGS_SCHEMA = {
           { value: ApprovalMode.PLAN, label: 'Plan' },
           { value: ApprovalMode.DEFAULT, label: 'Default' },
           { value: ApprovalMode.AUTO_EDIT, label: 'Auto Edit' },
-          { value: ApprovalMode.IZN, label: 'Izn' },
+          { value: ApprovalMode.YOLO, label: 'YOLO' },
         ],
       },
       autoAccept: {
@@ -1761,83 +1746,6 @@ const SETTINGS_SCHEMA = {
           description: 'URL pattern (supports * wildcard)',
         },
       },
-      powershell: {
-        type: 'object',
-        label: 'PowerShell Security',
-        category: 'Security',
-        requiresRestart: false,
-        default: {
-          enabled: false,
-          mode: 'ask',
-          allowlist: [],
-          blocklist: [],
-        },
-        description:
-          'Controls whether and how the AI agent can execute PowerShell commands. ' +
-          'When disabled, all PowerShell commands are blocked. Use allowlist/blocklist ' +
-          'for fine-grained command control.',
-        showInDialog: false,
-        properties: {
-          enabled: {
-            type: 'boolean',
-            label: 'Enable PowerShell',
-            category: 'Security',
-            requiresRestart: false,
-            default: false,
-            description:
-              'Master switch. When disabled, ALL PowerShell commands are blocked.',
-            showInDialog: false,
-          },
-          mode: {
-            type: 'string',
-            label: 'PowerShell Mode',
-            category: 'Security',
-            requiresRestart: false,
-            default: 'ask',
-            options: [
-              { value: 'allow', label: 'Allow — Execute without confirmation' },
-              { value: 'ask', label: 'Ask — Prompt for confirmation' },
-              {
-                value: 'deny',
-                label: 'Deny — Block all command unmatched by allowlist',
-              },
-            ],
-            description:
-              'Default behavior for PowerShell commands not matched by allowlist/blocklist.',
-            showInDialog: false,
-          },
-          allowlist: {
-            type: 'array',
-            label: 'PowerShell Allowlist',
-            category: 'Security',
-            requiresRestart: false,
-            default: [] as string[],
-            description:
-              'Command patterns automatically allowed (bypass mode). Supports * wildcard. ' +
-              'Example: "get-*" allows all Get-* cmdlets.',
-            showInDialog: false,
-            items: {
-              type: 'string',
-              description: 'Command pattern (supports * wildcard)',
-            },
-          },
-          blocklist: {
-            type: 'array',
-            label: 'PowerShell Blocklist',
-            category: 'Security',
-            requiresRestart: false,
-            default: [] as string[],
-            description:
-              'Command patterns always blocked regardless of mode. Supports * wildcard. ' +
-              'Example: "rm -rf *" blocks recursive force remove.',
-            showInDialog: false,
-            items: {
-              type: 'string',
-              description: 'Command pattern (supports * wildcard)',
-            },
-          },
-        },
-      },
     },
   },
 
@@ -1895,67 +1803,12 @@ const SETTINGS_SCHEMA = {
         default: undefined as string | undefined,
         description:
           'Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). ' +
-          'Config files remain at ~/.hopcode. Env var HOPCODE_RUNTIME_DIR takes priority.',
-        showInDialog: false,
-      },
-      tavilyApiKey: {
-        type: 'string',
-        label: 'Tavily API Key (Deprecated)',
-        category: 'Advanced',
-        requiresRestart: false,
-        default: undefined as string | undefined,
-        description:
-          '⚠️ DEPRECATED: Please use webSearch.provider configuration instead. Legacy API key for the Tavily API.',
+          'Config files remain at ~/.hopcode (or HOPCODE_HOME if set). Env var HOPCODE_RUNTIME_DIR takes priority.',
         showInDialog: false,
       },
     },
   },
 
-  webSearch: {
-    type: 'object',
-    label: 'Web Search',
-    category: 'Advanced',
-    requiresRestart: true,
-    default: undefined as
-      | {
-          provider: Array<{
-            type:
-              | 'tavily'
-              | 'google'
-              | 'dashscope'
-              | 'duckduckgo'
-              | 'exa'
-              | 'bing'
-              | 'jina'
-              | 'firecrawl'
-              | 'custom';
-            apiKey?: string;
-            searchEngineId?: string;
-            [key: string]: unknown;
-          }>;
-          default: string;
-          mode?: 'auto' | 'manual';
-        }
-      | undefined,
-    description:
-      'Configuration for web search providers. Supports: tavily, google, dashscope, duckduckgo, exa, bing, jina, firecrawl, custom. Set mode="auto" for failover chain.',
-    showInDialog: false,
-  },
-  agentModels: {
-    type: 'object',
-    label: 'Agent Model Overrides',
-    category: 'Advanced',
-    requiresRestart: false,
-    default: undefined as
-      | Record<
-          string,
-          string | { model: string; baseUrl?: string; apiKey?: string }
-        >
-      | undefined,
-    description:
-      'Per-agent model overrides. String form: "modelId" or "authType::modelId". Object form: {"model": "...", "baseUrl": "...", "apiKey": "..."}. Use "inherit" to use the parent model.',
-    showInDialog: false,
-  },
   agents: {
     type: 'object',
     label: 'Agents',
@@ -2256,7 +2109,7 @@ export function getSettingsSchema(): SettingsSchemaType {
   const schema = SETTINGS_SCHEMA as unknown as SettingsSchema;
   if (schema['general']?.properties?.['language']) {
     (
-      schema['general'].properties['language'] as unknown as {
+      schema['general'].properties['language'] as {
         options?: SettingEnumOption[];
       }
     ).options = getLanguageSettingsOptions();

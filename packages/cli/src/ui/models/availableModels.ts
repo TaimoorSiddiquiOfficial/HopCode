@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -36,7 +36,7 @@ function getHopCodeOAuthModels(): readonly AvailableModel[] {
  * Get available HopCode models
  * coder-model now has vision capabilities by default.
  */
-export function getFilteredQwenModels(): AvailableModel[] {
+export function getFilteredHopCodeModels(): AvailableModel[] {
   return [...getHopCodeOAuthModels()];
 }
 

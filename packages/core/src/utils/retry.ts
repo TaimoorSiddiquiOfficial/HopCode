@@ -6,7 +6,7 @@
 
 import type { GenerateContentResponse } from '@google/genai';
 import { AuthType } from '../core/contentGenerator.js';
-import { isQwenQuotaExceededError } from './quotaErrorDetection.js';
+import { isHopCodeQuotaExceededError } from './quotaErrorDetection.js';
 import { createDebugLogger } from './debugLogger.js';
 import { getErrorStatus } from './errors.js';
 
@@ -199,7 +199,7 @@ export async function retryWithBackoff<T>(
       // Check for HopCode OAuth quota exceeded error - throw immediately without retry
       if (
         authType === AuthType.HOPCODE_OAUTH &&
-        isQwenQuotaExceededError(error)
+        isHopCodeQuotaExceededError(error)
       ) {
         throw new Error(
           `Qwen OAuth free tier has been discontinued as of 2026-04-15.\n\n` +

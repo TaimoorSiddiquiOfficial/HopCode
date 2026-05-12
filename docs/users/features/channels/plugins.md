@@ -1,4 +1,4 @@
-# Custom Channel Plugins
+﻿# Custom Channel Plugins
 
 You can extend the channel system with custom platform adapters packaged as [extensions](../../extension/introduction). This lets you connect HopCode to any messaging platform, webhook, or custom transport.
 
@@ -6,7 +6,7 @@ You can extend the channel system with custom platform adapters packaged as [ext
 
 Channel plugins are loaded at startup from active extensions. When `hopcode channel start` runs, it:
 
-1. Scans all enabled extensions for `channels` entries in their `qwen-extension.json`
+1. Scans all enabled extensions for `channels` entries in their `hopcode-extension.json`
 2. Dynamically imports each channel's entry point
 3. Registers the channel type so it can be referenced in `settings.json`
 4. Creates channel instances using the plugin's factory function

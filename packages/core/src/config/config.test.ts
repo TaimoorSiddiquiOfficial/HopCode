@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -17,7 +17,6 @@ import {
   HopCodeLogger,
   isTelemetrySdkInitialized,
   shutdownTelemetry,
-  refreshSessionContext,
 } from '../telemetry/index.js';
 import type {
   ContentGenerator,
@@ -153,7 +152,6 @@ vi.mock('../memory/const.js', () => ({
   getCurrentGeminiMdFilename: vi.fn(() => 'HOPCODE.md'), // Mock the original filename
   getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
-  HOPCODE_CONFIG_DIR: '.hopcode',
 }));
 vi.mock('../tools/memory-config', () => ({
   setGeminiMdFilename: vi.fn(),
@@ -161,22 +159,18 @@ vi.mock('../tools/memory-config', () => ({
   getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
   AGENT_CONTEXT_FILENAME: 'AGENTS.md',
-  HOPCODE_CONFIG_DIR: '.hopcode',
   MEMORY_SECTION_HEADER: '## HopCode Added Memories',
 }));
 
 vi.mock('../core/contentGenerator.js');
 
-vi.mock('../core/client.js', () => {
-  const mockClient = vi.fn().mockImplementation(() => ({
+vi.mock('../core/client.js', () => ({
+  GeminiClient: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     isInitialized: vi.fn().mockReturnValue(true),
     setTools: vi.fn(),
-  }));
-  return {
-    GeminiClient: mockClient,
-  };
-});
+  })),
+}));
 
 vi.mock('../telemetry/index.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../telemetry/index.js')>();
@@ -185,7 +179,6 @@ vi.mock('../telemetry/index.js', async (importOriginal) => {
     initializeTelemetry: vi.fn(),
     isTelemetrySdkInitialized: vi.fn(() => false),
     shutdownTelemetry: vi.fn().mockResolvedValue(undefined),
-    refreshSessionContext: vi.fn(),
     uiTelemetryService: {
       getLastPromptTokenCount: vi.fn(),
     },
@@ -295,10 +288,9 @@ describe('Server Config (config.ts)', () => {
     // Reset mocks if necessary
     vi.clearAllMocks();
     vi.mocked(isTelemetrySdkInitialized).mockReturnValue(false);
-    vi.spyOn(
-      HopCodeLogger.prototype,
-      'logStartSessionEvent',
-    ).mockImplementation(async () => undefined);
+    vi.spyOn(HopCodeLogger.prototype, 'logStartSessionEvent').mockImplementation(
+      async () => undefined,
+    );
 
     // Setup default mock for resolveContentGeneratorConfigWithSources
     vi.mocked(resolveContentGeneratorConfigWithSources).mockImplementation(
@@ -401,15 +393,6 @@ describe('Server Config (config.ts)', () => {
 
       config.startNewSession();
       expect(cache.size()).toBe(0);
-    });
-
-    it('refreshes the telemetry session context with the new session ID', () => {
-      const config = new Config(baseParams);
-      vi.mocked(refreshSessionContext).mockClear();
-
-      const newSessionId = config.startNewSession();
-
-      expect(refreshSessionContext).toHaveBeenCalledWith(newSessionId);
     });
   });
 
@@ -584,7 +567,7 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
-        authType: AuthType.HOPCODE_OAUTH,
+        authType: AuthType.hopcode_OAUTH,
         model: 'coder-model',
         apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
         baseUrl: DEFAULT_DASHSCOPE_BASE_URL,
@@ -610,12 +593,12 @@ describe('Server Config (config.ts)', () => {
       } as unknown as ContentGenerator);
 
       // Establish initial hopcode-oauth content generator config/content generator.
-      await config.refreshAuth(AuthType.HOPCODE_OAUTH);
+      await config.refreshAuth(AuthType.hopcode_OAUTH);
 
       // Spy after initial refresh to ensure model switch does not re-trigger refreshAuth.
       const refreshSpy = vi.spyOn(config, 'refreshAuth');
 
-      await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
+      await config.switchModel(AuthType.hopcode_OAUTH, 'coder-model');
 
       expect(config.getModel()).toBe('coder-model');
       expect(refreshSpy).not.toHaveBeenCalled();
@@ -630,7 +613,7 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
-        authType: AuthType.HOPCODE_OAUTH,
+        authType: AuthType.hopcode_OAUTH,
         model: 'coder-model',
         apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
         baseUrl: DEFAULT_DASHSCOPE_BASE_URL,
@@ -655,16 +638,16 @@ describe('Server Config (config.ts)', () => {
         embedContent: vi.fn(),
       } as unknown as ContentGenerator);
 
-      await config.refreshAuth(AuthType.HOPCODE_OAUTH);
+      await config.refreshAuth(AuthType.hopcode_OAUTH);
 
-      await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
+      await config.switchModel(AuthType.hopcode_OAUTH, 'coder-model');
     });
 
     it('should notify model change listeners after switchModel', async () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
-        authType: AuthType.HOPCODE_OAUTH,
+        authType: AuthType.hopcode_OAUTH,
         model: 'coder-model',
         apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
         baseUrl: DEFAULT_DASHSCOPE_BASE_URL,
@@ -689,12 +672,12 @@ describe('Server Config (config.ts)', () => {
         embedContent: vi.fn(),
       } as unknown as ContentGenerator);
 
-      await config.refreshAuth(AuthType.HOPCODE_OAUTH);
+      await config.refreshAuth(AuthType.hopcode_OAUTH);
 
       const listener = vi.fn();
       const unsubscribe = config.onModelChange(listener);
 
-      await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
+      await config.switchModel(AuthType.hopcode_OAUTH, 'coder-model');
 
       expect(listener).toHaveBeenCalledWith('coder-model');
 
@@ -1041,9 +1024,7 @@ describe('Server Config (config.ts)', () => {
       });
       await config.initialize();
 
-      expect(
-        HopCodeLogger.prototype.logStartSessionEvent,
-      ).toHaveBeenCalledOnce();
+      expect(HopCodeLogger.prototype.logStartSessionEvent).toHaveBeenCalledOnce();
     });
   });
 
@@ -1254,48 +1235,6 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(paramsWithoutTelemetry);
       expect(config.getTelemetryOtlpProtocol()).toBe('grpc');
     });
-
-    it('should return per-signal endpoints when provided', () => {
-      const params: ConfigParameters = {
-        ...baseParams,
-        telemetry: {
-          enabled: true,
-          otlpTracesEndpoint: 'http://traces:4317/v1/traces',
-          otlpLogsEndpoint: 'http://logs:4317/v1/logs',
-          otlpMetricsEndpoint: 'http://metrics:4317/v1/metrics',
-        },
-      };
-      const config = new Config(params);
-      expect(config.getTelemetryOtlpTracesEndpoint()).toBe(
-        'http://traces:4317/v1/traces',
-      );
-      expect(config.getTelemetryOtlpLogsEndpoint()).toBe(
-        'http://logs:4317/v1/logs',
-      );
-      expect(config.getTelemetryOtlpMetricsEndpoint()).toBe(
-        'http://metrics:4317/v1/metrics',
-      );
-    });
-
-    it('should return undefined for per-signal endpoints when not provided', () => {
-      const params: ConfigParameters = {
-        ...baseParams,
-        telemetry: { enabled: true },
-      };
-      const config = new Config(params);
-      expect(config.getTelemetryOtlpTracesEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpLogsEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpMetricsEndpoint()).toBeUndefined();
-    });
-
-    it('should return undefined for per-signal endpoints when telemetry not provided', () => {
-      const paramsWithoutTelemetry: ConfigParameters = { ...baseParams };
-      delete paramsWithoutTelemetry.telemetry;
-      const config = new Config(paramsWithoutTelemetry);
-      expect(config.getTelemetryOtlpTracesEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpLogsEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpMetricsEndpoint()).toBeUndefined();
-    });
   });
 
   describe('Per-Signal OTLP Endpoint Configuration', () => {
@@ -1424,82 +1363,6 @@ describe('Server Config (config.ts)', () => {
       expect(
         (registerToolMock as Mock).mock.calls.map((call) => call[0]),
       ).toEqual([ToolNames.READ_FILE, ToolNames.EDIT, ToolNames.SHELL]);
-    });
-
-    it('registers structured_output in bare mode when jsonSchema is set', async () => {
-      // Bare mode strips the toolset to READ_FILE/EDIT/SHELL, but the
-      // synthetic structured_output tool is the terminal contract for
-      // --json-schema runs. Without it the model loops until
-      // maxSessionTurns and exits via the "plain text" failure path —
-      // expensive in tokens for what's almost always a CI use case. The
-      // synthetic tool must be registered alongside the bare three.
-      const config = new Config({
-        ...baseParams,
-        bareMode: true,
-        jsonSchema: { type: 'object', properties: { ok: { type: 'boolean' } } },
-      });
-      await config.initialize();
-
-      const registerToolMock = (
-        (await vi.importMock('../tools/tool-registry')) as {
-          ToolRegistry: { prototype: { registerFactory: Mock } };
-        }
-      ).ToolRegistry.prototype.registerFactory;
-
-      expect(
-        (registerToolMock as Mock).mock.calls.map((call) => call[0]),
-      ).toEqual([
-        ToolNames.READ_FILE,
-        ToolNames.EDIT,
-        ToolNames.SHELL,
-        ToolNames.STRUCTURED_OUTPUT,
-      ]);
-    });
-
-    it('does NOT register structured_output when createToolRegistry is called with forSubAgent=true', async () => {
-      // Subagent overrides reuse the parent Config via prototype
-      // delegation (createApprovalModeOverride / buildSubagentContextOverride
-      // → Object.create(base)) and rebuild the tool registry with
-      // `forSubAgent: true`. Even though `this.jsonSchema` propagates
-      // through the prototype chain, the synthetic tool MUST NOT register
-      // in the subagent registry: only runNonInteractive's main / drain
-      // loops detect a successful structured_output call as terminal, so
-      // a subagent calling the tool would receive "Session will end now"
-      // and then keep running because its own loop has no terminator —
-      // wasted tokens and no structured payload on stdout.
-      const config = new Config({
-        ...baseParams,
-        bareMode: true,
-        jsonSchema: { type: 'object', properties: { ok: { type: 'boolean' } } },
-      });
-      await config.initialize();
-
-      const registerToolMock = (
-        (await vi.importMock('../tools/tool-registry')) as {
-          ToolRegistry: { prototype: { registerFactory: Mock } };
-        }
-      ).ToolRegistry.prototype.registerFactory;
-      // Initial bare init registers READ_FILE / EDIT / SHELL /
-      // STRUCTURED_OUTPUT (asserted by the test above). Reset so we can
-      // observe ONLY the forSubAgent rebuild's calls.
-      (registerToolMock as Mock).mockClear();
-
-      // Rebuild registry as if for a subagent override.
-      await config.createToolRegistry(undefined, {
-        skipDiscovery: true,
-        forSubAgent: true,
-      });
-
-      const registeredNames = (registerToolMock as Mock).mock.calls.map(
-        (call) => call[0],
-      );
-      expect(registeredNames).not.toContain(ToolNames.STRUCTURED_OUTPUT);
-      // The bare three still register so the subagent has its toolset.
-      expect(registeredNames).toEqual([
-        ToolNames.READ_FILE,
-        ToolNames.EDIT,
-        ToolNames.SHELL,
-      ]);
     });
 
     it('should register a tool if coreTools contains an argument-specific pattern', async () => {
@@ -1795,10 +1658,10 @@ describe('setApprovalMode with folder trust', () => {
     cwd: '.',
   };
 
-  it('should throw an error when setting IZN mode in an untrusted folder', () => {
+  it('should throw an error when setting YOLO mode in an untrusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
-    expect(() => config.setApprovalMode(ApprovalMode.IZN)).toThrow(
+    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).toThrow(
       'Cannot enable privileged approval modes in an untrusted folder.',
     );
   });
@@ -1831,7 +1694,7 @@ describe('setApprovalMode with folder trust', () => {
   it('should NOT throw an error when setting any mode in a trusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    expect(() => config.setApprovalMode(ApprovalMode.IZN)).not.toThrow();
+    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.DEFAULT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.PLAN)).not.toThrow();
@@ -1840,7 +1703,7 @@ describe('setApprovalMode with folder trust', () => {
   it('should NOT throw an error when setting any mode if trustedFolder is undefined', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true); // isTrustedFolder defaults to true
-    expect(() => config.setApprovalMode(ApprovalMode.IZN)).not.toThrow();
+    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.DEFAULT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.PLAN)).not.toThrow();
@@ -1875,11 +1738,11 @@ describe('setApprovalMode with folder trust', () => {
       const config = new Config(baseParams);
       vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
 
-      config.setApprovalMode(ApprovalMode.IZN);
+      config.setApprovalMode(ApprovalMode.YOLO);
       config.setApprovalMode(ApprovalMode.PLAN);
       // Setting PLAN again should not overwrite prePlanMode
       config.setApprovalMode(ApprovalMode.PLAN);
-      expect(config.getPrePlanMode()).toBe(ApprovalMode.IZN);
+      expect(config.getPrePlanMode()).toBe(ApprovalMode.YOLO);
     });
   });
 
@@ -2134,7 +1997,7 @@ describe('Model Switching and Config Updates', () => {
     // Initialize with first model
     const initialConfig: ContentGeneratorConfig = {
       ['model']: 'qwen3-coder-plus',
-      ['authType']: AuthType.HOPCODE_OAUTH,
+      ['authType']: AuthType.hopcode_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 1_000_000,
       ['samplingParams']: { temperature: 0.7 },
@@ -2149,7 +2012,7 @@ describe('Model Switching and Config Updates', () => {
       },
     });
 
-    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
+    await config.refreshAuth(AuthType.hopcode_OAUTH);
 
     // Verify initial config
     const contentGenConfig = config.getContentGeneratorConfig();
@@ -2159,7 +2022,7 @@ describe('Model Switching and Config Updates', () => {
     // Switch to a different model with different token limits
     const newConfig: ContentGeneratorConfig = {
       ['model']: 'qwen-max',
-      ['authType']: AuthType.HOPCODE_OAUTH,
+      ['authType']: AuthType.hopcode_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,
       ['samplingParams']: { temperature: 0.8 },
@@ -2184,7 +2047,7 @@ describe('Model Switching and Config Updates', () => {
           requiresRefresh: boolean,
         ) => Promise<void>;
       }
-    ).handleModelChange(AuthType.HOPCODE_OAUTH, false);
+    ).handleModelChange(AuthType.hopcode_OAUTH, false);
 
     // Verify all fields are updated
     const updatedConfig = config.getContentGeneratorConfig();
@@ -2209,7 +2072,7 @@ describe('Model Switching and Config Updates', () => {
     // Initialize with hopcode-oauth
     const initialConfig: ContentGeneratorConfig = {
       ['model']: 'qwen3-coder-plus',
-      ['authType']: AuthType.HOPCODE_OAUTH,
+      ['authType']: AuthType.hopcode_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 1_000_000,
     };
@@ -2219,7 +2082,7 @@ describe('Model Switching and Config Updates', () => {
       sources: {},
     });
 
-    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
+    await config.refreshAuth(AuthType.hopcode_OAUTH);
 
     // Switch to different auth type (should trigger full refresh)
     const newConfig: ContentGeneratorConfig = {
@@ -2261,7 +2124,7 @@ describe('Model Switching and Config Updates', () => {
     // Initialize with config that has undefined token limits
     const initialConfig: ContentGeneratorConfig = {
       ['model']: 'qwen3-coder-plus',
-      ['authType']: AuthType.HOPCODE_OAUTH,
+      ['authType']: AuthType.hopcode_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: undefined,
     };
@@ -2271,12 +2134,12 @@ describe('Model Switching and Config Updates', () => {
       sources: {},
     });
 
-    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
+    await config.refreshAuth(AuthType.hopcode_OAUTH);
 
     // Switch to model with defined limits
     const newConfig: ContentGeneratorConfig = {
       ['model']: 'qwen-max',
-      ['authType']: AuthType.HOPCODE_OAUTH,
+      ['authType']: AuthType.hopcode_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,
     };
@@ -2293,7 +2156,7 @@ describe('Model Switching and Config Updates', () => {
           requiresRefresh: boolean,
         ) => Promise<void>;
       }
-    ).handleModelChange(AuthType.HOPCODE_OAUTH, false);
+    ).handleModelChange(AuthType.hopcode_OAUTH, false);
 
     // Verify limits are now defined
     const updatedConfig = config.getContentGeneratorConfig();
@@ -2360,7 +2223,7 @@ describe('Model Switching and Config Updates', () => {
       } as unknown as ContentGenerator;
       const parentGeneratorConfig: ContentGeneratorConfig = {
         model: 'parent-model',
-        authType: AuthType.HOPCODE_OAUTH,
+        authType: AuthType.hopcode_OAUTH,
         apiKey: 'parent-key',
       };
       setInstanceFields(config, parentGenerator, parentGeneratorConfig);
@@ -2378,7 +2241,7 @@ describe('Model Switching and Config Updates', () => {
       expect(config.getContentGenerator()).toBe(parentGenerator);
       expect(config.getContentGeneratorConfig()).toBe(parentGeneratorConfig);
       expect(config.getModel()).toBe('parent-model');
-      expect(config.getAuthType()).toBe(AuthType.HOPCODE_OAUTH);
+      expect(config.getAuthType()).toBe(AuthType.hopcode_OAUTH);
 
       // Inside the frame, every getter resolves to the agent's view.
       await runWithRuntimeContentGenerator(
@@ -2409,7 +2272,7 @@ describe('Model Switching and Config Updates', () => {
         { generateContentStream: vi.fn() } as unknown as ContentGenerator,
         {
           model: 'parent-model',
-          authType: AuthType.HOPCODE_OAUTH,
+          authType: AuthType.hopcode_OAUTH,
         } as ContentGeneratorConfig,
       );
 

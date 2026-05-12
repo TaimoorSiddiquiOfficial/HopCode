@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -172,7 +172,7 @@ describe('LSTool', () => {
       expect(result.returnDisplay).toBe('Listed 2 item(s) (2 git-ignored)');
     });
 
-    it('should respect qwenignore patterns', async () => {
+    it('should respect hopcodeignore patterns', async () => {
       await fs.writeFile(path.join(tempRootDir, 'file1.txt'), 'content1');
       await fs.writeFile(path.join(tempRootDir, 'file2.log'), 'content1');
       await fs.writeFile(path.join(tempRootDir, '.hopcodeignore'), '*.log');

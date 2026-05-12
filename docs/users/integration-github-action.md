@@ -1,4 +1,4 @@
-# Github Actions：hopcode-action
+﻿# Github Actions：hopcode-action
 
 ## Overview
 
@@ -125,7 +125,7 @@ This type of action can be used to invoke a general-purpose, conversational HopC
 - <a name="__input_settings"></a><a href="#user-content-__input_settings"><code>settings</code></a>: _(Optional)_ A JSON string written to `.hopcode/settings.json` to configure the CLI's _project_ settings.
   For more details, see the documentation on [settings files](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/configuration.md#settings-files).
 
-- <a name="__input_use_hopcode_assist"></a><a href="#user-content-__input_use_hopcode_assist"><code>use*qwen_code_assist</code></a>: *(Optional, default: `false`)\* Whether to use Code Assist for HopCode model access instead of the default HopCode API key.
+- <a name="__input_use_hopcode_assist"></a><a href="#user-content-__input_use_hopcode_assist"><code>use*HOPCODE_assist</code></a>: *(Optional, default: `false`)\* Whether to use Code Assist for HopCode model access instead of the default HopCode API key.
   For more information, see the [HopCode CLI documentation](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/authentication.md).
 
 - <a name="__input_use_vertex_ai"></a><a href="#user-content-__input_use_vertex_ai"><code>use*vertex_ai</code></a>: *(Optional, default: `false`)\* Whether to use Vertex AI for HopCode model access instead of the default HopCode API key.

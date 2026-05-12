@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -7,29 +7,29 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   getAvailableModelsForAuthType,
-  getFilteredQwenModels,
+  getFilteredHopCodeModels,
   getOpenAIAvailableModelFromEnv,
 } from './availableModels.js';
 import { AuthType, type Config } from '@hoptrendy/hopcode-core';
 
 describe('availableModels', () => {
   describe('Qwen models', () => {
-    const qwenModels = getFilteredQwenModels();
+    const hopcodeModels = getFilteredHopCodeModels();
 
     it('should include only coder-model', () => {
-      expect(qwenModels.length).toBe(1);
-      expect(qwenModels[0].id).toBe('coder-model');
+      expect(hopcodeModels.length).toBe(1);
+      expect(hopcodeModels[0].id).toBe('coder-model');
     });
 
     it('should have coder-model with vision capability', () => {
-      const coderModel = qwenModels[0];
+      const coderModel = hopcodeModels[0];
       expect(coderModel.isVision).toBe(true);
     });
   });
 
-  describe('getFilteredQwenModels', () => {
+  describe('getFilteredHopCodeModels', () => {
     it('should return coder-model with vision capability', () => {
-      const models = getFilteredQwenModels();
+      const models = getFilteredHopCodeModels();
       expect(models.length).toBe(1);
       expect(models[0].id).toBe('coder-model');
       expect(models[0].isVision).toBe(true);

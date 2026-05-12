@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -417,7 +417,7 @@ export interface ConfigParameters {
   fileFiltering?: {
     respectGitIgnore?: boolean;
     /** @deprecated Use respectHopCodeIgnore instead */
-    respectQwenIgnore?: boolean;
+    respecthopcodeignore?: boolean;
     respectHopCodeIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
@@ -852,7 +852,7 @@ export class Config {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
       respectHopCodeIgnore:
         params.fileFiltering?.respectHopCodeIgnore ??
-        params.fileFiltering?.respectQwenIgnore ??
+        params.fileFiltering?.respecthopcodeignore ??
         true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
@@ -2174,7 +2174,7 @@ export class Config {
     return this.fileFiltering.respectHopCodeIgnore;
   }
   /** @deprecated Use getFileFilteringRespectHopCodeIgnore instead */
-  getFileFilteringRespectQwenIgnore(): boolean {
+  getFileFilteringRespecthopcodeignore(): boolean {
     return this.fileFiltering.respectHopCodeIgnore;
   }
 

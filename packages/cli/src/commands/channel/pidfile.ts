@@ -6,7 +6,7 @@
   unlinkSync,
 } from 'node:fs';
 import * as path from 'node:path';
-import * as os from 'node:os';
+import { Storage } from '@hoptrendy/hopcode-core';
 
 export interface ServiceInfo {
   pid: number;
@@ -15,7 +15,7 @@ export interface ServiceInfo {
 }
 
 function pidFilePath(): string {
-  return path.join(os.homedir(), '.hopcode', 'channels', 'service.pid');
+  return path.join(Storage.getGlobalHopCodeDir(), 'channels', 'service.pid');
 }
 
 /** Check if a process is alive. */
@@ -41,7 +41,7 @@ export function readServiceInfo(): ServiceInfo | null {
   try {
     info = JSON.parse(readFileSync(filePath, 'utf-8'));
   } catch {
-    // Corrupt file � clean up
+    // Corrupt file — clean up
     try {
       unlinkSync(filePath);
     } catch {
@@ -51,7 +51,7 @@ export function readServiceInfo(): ServiceInfo | null {
   }
 
   if (!isProcessAlive(info.pid)) {
-    // Stale PID � process is dead, clean up
+    // Stale PID — process is dead, clean up
     try {
       unlinkSync(filePath);
     } catch {

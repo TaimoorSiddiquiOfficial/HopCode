@@ -1,4 +1,4 @@
-# 🔧 HopCode Build Fixes Applied
+﻿# 🔧 HopCode Build Fixes Applied
 
 **Date:** 2026-04-18  
 **Status:** ✅ **FIXES APPLIED**
@@ -22,7 +22,7 @@
 ```json
 // Before
 "repository": {
-  "url": "https://github.com/QwenLM/qwen-code.git"
+  "url": "https://github.com/QwenLM/hopcode.git"
 }
 
 // After
@@ -37,14 +37,14 @@
 
 **Updated Package Names:**
 
-- ✅ `@hoptrendy/hopcode-cli` (was `@hoptrendy/qwen-code`)
-- ✅ `@hoptrendy/hopcode-core` (was `@hoptrendy/qwen-code-core`)
+- ✅ `@hoptrendy/hopcode-cli` (was `@hoptrendy/hopcode`)
+- ✅ `@hoptrendy/hopcode-core` (was `@hoptrendy/hopcode-core`)
 - ✅ `hopcode-vscode-ide-companion` (publisher: `hopcode`)
 - ✅ `@hoptrendy/sdk` (description updated)
 
 **Bin Commands:**
 
-- ✅ `hopcode` (was `qwen`)
+- ✅ `hopcode` (was `hopcode`)
 
 ---
 
@@ -52,11 +52,11 @@
 
 **`packages/sdk-typescript/package.json`:**
 
-- ✅ Description: "HopCode CLI" (was "qwen-code CLI")
-- ✅ Keywords: `hopcode`, `hopcode-code` (was `qwen`, `qwen-code`)
-- ✅ Author: "HopCode Team" (was "Qwen Team")
+- ✅ Description: "HopCode CLI" (was "hopcode CLI")
+- ✅ Keywords: `hopcode`, `hopcode-code` (was `hopcode`, `hopcode`)
+- ✅ Author: "HopCode Team" (was "HopCode Team")
 - ✅ Bugs URL: Updated to new repository
-- ✅ Homepage: `hopcode.dev/docs` (was `qwenlm.github.io/qwen-code-docs`)
+- ✅ Homepage: `hopcode.dev/docs` (was `qwenlm.github.io/hopcode-docs`)
 
 ---
 
@@ -74,7 +74,7 @@
 
 **`package.json`:**
 
-- ✅ Bin command: `hopcode` (was `qwen`)
+- ✅ Bin command: `hopcode` (was `hopcode`)
 - ✅ Prepare script simplified to just `husky`
 
 ---
@@ -86,7 +86,7 @@
 **Issue:** Code references `AuthType.hopcode_OAUTH` which doesn't exist
 
 **Root Cause:**
-The authentication type `HOPCODE_OAUTH` refers to the actual Alibaba Cloud Qwen OAuth system and **should NOT be changed**. This is a real API service name.
+The authentication type `HOPCODE_OAUTH` refers to the actual Alibaba Cloud HopCode OAuth system and **should NOT be changed**. This is a real API service name.
 
 **Files Affected:**
 
@@ -131,7 +131,7 @@ AuthType.hopcode_OAUTH → AuthType.HOPCODE_OAUTH
 These internal service names that refer to actual Qwen API clients should remain unchanged:
 
 - `qwenClient` → Keep as is (refers to Qwen API client)
-- `qwenIgnoreFilter` → Keep as is (refers to Qwen ignore file format)
+- `hopcodeignoreFilter` → Keep as is (refers to Qwen ignore file format)
 
 ---
 
@@ -139,9 +139,9 @@ These internal service names that refer to actual Qwen API clients should remain
 
 ### ✅ SHOULD Be Changed (Brand-facing)
 
-- Package names (`@qwen-code/*` → `@hoptrendy/*`)
-- CLI command name (`qwen` → `hopcode`)
-- Project name in descriptions ("Qwen Code" → "HopCode")
+- Package names (`@hopcode/*` → `@hoptrendy/*`)
+- CLI command name (`hopcode` → `hopcode`)
+- Project name in descriptions ("HopCode" → "HopCode")
 - Repository URLs
 - Documentation URLs
 - Author/Team names
@@ -151,10 +151,10 @@ These internal service names that refer to actual Qwen API clients should remain
 
 ### ❌ SHOULD NOT Be Changed (Technical/API-facing)
 
-- **API service names** (Qwen OAuth, Qwen API, etc.)
+- **API service names** (HopCode OAuth, Qwen API, etc.)
 - **Model names** (qwen3.5-plus, qwen3.6-plus, etc.)
 - **Internal client library names** (qwenClient, etc.)
-- **File format names** (.qwenignore files)
+- **File format names** (.hopcodeignore files)
 - **Authentication type constants** (HOPCODE_OAUTH)
 - **Third-party service references**
 
@@ -182,7 +182,7 @@ In `packages/core/src/qwen/qwenContentGenerator.ts`:
 
 In `packages/core/src/services/fileDiscoveryService.ts`:
 
-- Change `hopcodeIgnoreFilter` back to `qwenIgnoreFilter`
+- Change `hopcodeIgnoreFilter` back to `hopcodeignoreFilter`
 
 ### Step 3: Re-enable Build Scripts
 

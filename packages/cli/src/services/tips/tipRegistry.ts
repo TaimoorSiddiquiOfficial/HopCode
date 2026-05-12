@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -79,7 +79,7 @@ export const tipRegistry: ContextualTip[] = [
     priority: 70,
   },
   {
-    id: 'new-user-qwenmd',
+    id: 'new-user-hopcodeMd',
     content:
       'Add a HOPCODE.md file to give HopCode persistent project context.',
     trigger: 'startup',

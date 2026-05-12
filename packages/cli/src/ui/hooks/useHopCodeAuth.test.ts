@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -10,11 +10,11 @@ import type { DeviceAuthorizationData } from '@hoptrendy/hopcode-core';
 import { useHopCodeAuth } from './useHopCodeAuth.js';
 import {
   AuthType,
-  hopCodeOAuth2Events,
+  HopCodeOAuth2Events,
   HopCodeOAuth2Event,
 } from '@hoptrendy/hopcode-core';
 
-// Mock the hopCodeOAuth2Events
+// Mock the HopCodeOAuth2Events
 vi.mock('@hoptrendy/hopcode-core', async () => {
   const actual = await vi.importActual('@hoptrendy/hopcode-core');
   const mockEmitter = {
@@ -24,7 +24,7 @@ vi.mock('@hoptrendy/hopcode-core', async () => {
   };
   return {
     ...actual,
-    hopCodeOAuth2Events: mockEmitter,
+    HopCodeOAuth2Events: mockEmitter,
     HopCodeOAuth2Event: {
       AuthUri: 'authUri',
       AuthProgress: 'authProgress',
@@ -32,7 +32,7 @@ vi.mock('@hoptrendy/hopcode-core', async () => {
   };
 });
 
-const mockHopCodeOAuth2Events = vi.mocked(hopCodeOAuth2Events);
+const mockHopCodeOAuth2Events = vi.mocked(HopCodeOAuth2Events);
 
 describe('useHopCodeAuth', () => {
   const mockDeviceAuth: DeviceAuthorizationData = {
@@ -413,10 +413,10 @@ describe('useHopCodeAuth', () => {
 
   it('should handle different auth types correctly', () => {
     // Test with HopCode OAuth - should set up event listeners when authenticating
-    const { result: qwenResult } = renderHook(() =>
+    const { result: hopcodeResult } = renderHook(() =>
       useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );
-    expect(qwenResult.current.hopCodeAuthState.authStatus).toBe('idle');
+    expect(hopcodeResult.current.hopCodeAuthState.authStatus).toBe('idle');
     expect(mockHopCodeOAuth2Events.on).toHaveBeenCalled();
 
     // Test with other auth types - should not set up event listeners

@@ -1,6 +1,6 @@
-# 🦋 HopCode Rebranding - Final Checklist
+﻿# 🦋 HopCode Rebranding - Final Checklist
 
-**Project:** Qwen Code → HopCode Transformation  
+**Project:** HopCode → HopCode Transformation  
 **Created:** 2026-04-18  
 **Status:** Ready for Execution
 
@@ -87,7 +87,7 @@
 #### Zed Extension
 
 - [ ] Copy `hopcode-logo-concept1.svg` → `packages/zed-extension/hopcode.svg`
-- [ ] Delete old `qwen-code.svg`
+- [ ] Delete old `hopcode.svg`
 - [ ] Update `extension.toml` id
 - [ ] Update `extension.toml` name
 - [ ] Update `extension.toml` authors
@@ -461,7 +461,7 @@ start D:\HopCode\assets\ASSET_INVENTORY.md
 
 ---
 
-**Ready to transform Qwen Code into HopCode! 🦋**
+**Ready to transform HopCode into HopCode! 🦋**
 
 _Last Updated: 2026-04-18_  
 _Project Status: Preparation Complete, Ready for Execution_

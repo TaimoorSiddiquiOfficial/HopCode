@@ -1,15 +1,15 @@
-# Migrating from Qwen Code to HopCode
+﻿# Migrating from HopCode to HopCode
 
-This guide helps existing Qwen Code users transition to HopCode.
+This guide helps existing HopCode users transition to HopCode.
 
 ## What Changed
 
-HopCode is a fork of Qwen Code with expanded multi-provider support, new features, and a rebranded identity. The core functionality remains the same, but there are some changes to configuration, commands, and environment variables.
+HopCode is a fork of HopCode with expanded multi-provider support, new features, and a rebranded identity. The core functionality remains the same, but there are some changes to configuration, commands, and environment variables.
 
 ## Quick Migration Checklist
 
 - [ ] Update global installation: `npm install -g @hoptrendy/hopcode`
-- [ ] Rename config directory: `mv ~/.qwen ~/.hopcode`
+- [ ] Rename config directory: `mv ~/.hopcode ~/.hopcode`
 - [ ] Update shell aliases: `alias hopcode='hopcode'` (replace `qwen`)
 - [ ] Update IDE extensions: Install HopCode VS Code / Zed extensions
 - [ ] Update CI scripts: Replace `qwen` command with `hopcode`
@@ -17,7 +17,7 @@ HopCode is a fork of Qwen Code with expanded multi-provider support, new feature
 
 ## Command Changes
 
-| Qwen Code        | HopCode             | Notes                            |
+| HopCode          | HopCode             | Notes                            |
 | ---------------- | ------------------- | -------------------------------- |
 | `qwen`           | `hopcode`           | Main CLI entry point             |
 | `qwen --json`    | `hopcode --json`    | Headless JSON output             |
@@ -29,26 +29,26 @@ HopCode is a fork of Qwen Code with expanded multi-provider support, new feature
 
 ## Configuration Directory
 
-| Qwen Code         | HopCode              |
-| ----------------- | -------------------- |
-| `~/.qwen/`        | `~/.hopcode/`        |
-| `.qwen/agents/`   | `.hopcode/agents/`   |
-| `.qwen/skills/`   | `.hopcode/skills/`   |
-| `.qwen/commands/` | `.hopcode/commands/` |
+| HopCode              | HopCode              |
+| -------------------- | -------------------- |
+| `~/.hopcode/`        | `~/.hopcode/`        |
+| `.hopcode/agents/`   | `.hopcode/agents/`   |
+| `.hopcode/skills/`   | `.hopcode/skills/`   |
+| `.hopcode/commands/` | `.hopcode/commands/` |
 
 **Migration:**
 
 ```bash
 # Linux/macOS
-mv ~/.qwen ~/.hopcode
+mv ~/.hopcode ~/.hopcode
 
 # Windows
-rename %USERPROFILE%\.qwen %USERPROFILE%\.hopcode
+rename %USERPROFILE%\.hopcode %USERPROFILE%\.hopcode
 ```
 
 ## Environment Variables
 
-| Qwen Code         | HopCode           | Status                          |
+| HopCode           | HopCode           | Status                          |
 | ----------------- | ----------------- | ------------------------------- |
 | `HOPCODE_SIMPLE`  | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
 | `HOPCODE_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended              |
@@ -57,7 +57,7 @@ rename %USERPROFILE%\.qwen %USERPROFILE%\.hopcode
 
 | Old         | New                  |
 | ----------- | -------------------- |
-| `qwen-code` | `@hoptrendy/hopcode` |
+| `hopcode`   | `@hoptrendy/hopcode` |
 | `@qwen/sdk` | `@hoptrendy/sdk`     |
 
 **Update imports:**
@@ -74,7 +74,7 @@ import { Query } from '@hoptrendy/sdk';
 
 ### VS Code
 
-1. Uninstall the Qwen Code extension
+1. Uninstall the HopCode extension
 2. Install `hopcode-vscode-ide-companion` from the marketplace
 3. Your settings will be migrated automatically on first launch
 
@@ -85,7 +85,7 @@ import { Query } from '@hoptrendy/sdk';
 
 ## New Features in HopCode
 
-Features not available in Qwen Code:
+Features not available in HopCode:
 
 - **Multi-provider support** — Claude, GPT, Gemini, DeepSeek, Groq, Ollama, and 15+ others
 - **Per-agent model routing** — Different models for different agents/tasks
@@ -98,10 +98,10 @@ Features not available in Qwen Code:
 
 ## Breaking Changes
 
-1. **Config directory rename** — `~/.qwen` → `~/.hopcode`
+1. **Config directory rename** — `~/.hopcode` → `~/.hopcode`
 2. **Binary name** — `qwen` → `hopcode`
 3. **NPM scope** — `@qwen/*` → `@hoptrendy/*`
-4. **Docker image** — `ghcr.io/qwenlm/qwen-code` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
+4. **Docker image** — `ghcr.io/qwenlm/hopcode` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
 
 ## Troubleshooting
 

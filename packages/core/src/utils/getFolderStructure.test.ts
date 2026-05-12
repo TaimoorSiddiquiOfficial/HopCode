@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -292,8 +292,8 @@ ${testRootDir}${path.sep}
     });
   });
 
-  describe('with qwenignore', () => {
-    it('should ignore qwenignore files by default', async () => {
+  describe('with hopcodeignore', () => {
+    it('should ignore hopcodeignore files by default', async () => {
       await fsPromises.writeFile(
         nodePath.join(testRootDir, '.hopcodeignore'),
         'ignored.txt\nnode_modules/\n.gemini/\n!/.gemini/config.yaml',

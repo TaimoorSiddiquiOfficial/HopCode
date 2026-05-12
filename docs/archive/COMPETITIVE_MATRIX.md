@@ -1,4 +1,4 @@
-# Competitive Feature Matrix: HopCode vs Hermes-Agent vs OpenClaude
+﻿# Competitive Feature Matrix: HopCode vs Hermes-Agent vs OpenClaude
 
 > Last updated: 2026-04-23
 > Purpose: Track feature parity and competitive positioning across terminal-first AI coding agents.
@@ -7,14 +7,14 @@
 
 ## Project Metadata
 
-| Attribute    | HopCode                     | Hermes-Agent          | OpenClaude            |
-| ------------ | --------------------------- | --------------------- | --------------------- |
-| **Language** | TypeScript (strict, ESM)    | Python + TypeScript   | TypeScript (Bun/Node) |
-| **Version**  | 0.15.1                      | 0.10.0 (Apr 16, 2026) | 0.6.0 (Apr 22, 2026)  |
-| **Stars**    | —                           | **111k**              | 23.8k                 |
-| **Forks**    | —                           | 16.2k                 | 7.9k                  |
-| **License**  | Apache-2.0                  | Apache-2.0            | Apache-2.0            |
-| **Origin**   | Qwen Code / Gemini CLI fork | Nous Research         | Claude Code offshoot  |
+| Attribute    | HopCode                   | Hermes-Agent          | OpenClaude            |
+| ------------ | ------------------------- | --------------------- | --------------------- |
+| **Language** | TypeScript (strict, ESM)  | Python + TypeScript   | TypeScript (Bun/Node) |
+| **Version**  | 0.15.1                    | 0.10.0 (Apr 16, 2026) | 0.6.0 (Apr 22, 2026)  |
+| **Stars**    | —                         | **111k**              | 23.8k                 |
+| **Forks**    | —                         | 16.2k                 | 7.9k                  |
+| **License**  | Apache-2.0                | Apache-2.0            | Apache-2.0            |
+| **Origin**   | HopCode / Gemini CLI fork | Nous Research         | Claude Code offshoot  |
 
 ---
 

@@ -416,7 +416,7 @@ function setupAcpTest(
           sendRequest('session/set_config_option', {
             sessionId: newSession.sessionId,
             configId: 'model',
-            value: qwenOauthModel!.modelId,
+            value: hopcodeOauthModel!.modelId,
           }),
         ).rejects.toMatchObject({
           response: {

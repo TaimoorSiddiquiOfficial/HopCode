@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -58,9 +58,16 @@ function getMergeStrategyForPath(path: string[]): MergeStrategy | undefined {
 
 export type { Settings, MemoryImportFormat };
 
-export const SETTINGS_DIRECTORY_NAME = '.hopcode';
-export const USER_SETTINGS_PATH = Storage.getGlobalSettingsPath();
-export const USER_SETTINGS_DIR = path.dirname(USER_SETTINGS_PATH);
+export const SETTINGS_DIRECTORY_NAME = HOPCODE_DIR;
+
+// Lazy getters: must NOT be top-level consts. `HOPCODE_HOME` may be resolved
+// from `~/.env` or `~/.hopcode/.env` by `preResolveHomeEnvOverrides()` in
+// `loadSettings()`, which runs after this module is imported. A const
+// captured here would freeze the pre-bootstrap value and split state across
+// callers.
+export function getUserSettingsPath(): string {
+  return Storage.getGlobalSettingsPath();
+}
 export function getUserSettingsDir(): string {
   return path.dirname(getUserSettingsPath());
 }
@@ -71,10 +78,7 @@ export const DEFAULT_EXCLUDED_ENV_VARS = ['DEBUG', 'DEBUG_MODE'];
 // redirect these — that would split global state between the real home and a
 // project-controlled directory. Always excluded from project .env files,
 // regardless of user-configurable `advanced.excludedEnvVars`.
-const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
-  'HOPCODE_HOME',
-  'HOPCODE_RUNTIME_DIR',
-];
+const PROJECT_ENV_HARDCODED_EXCLUSIONS = ['HOPCODE_HOME', 'HOPCODE_RUNTIME_DIR'];
 
 // Settings version to track migration state
 export const SETTINGS_VERSION = 4;
@@ -500,7 +504,7 @@ export function createMinimalSettings(): LoadedSettings {
 /**
  * Returns the set of normalized .env file paths that count as user-level.
  *
- * User-level paths cover the home `.env` and the global Qwen config dir
+ * User-level paths cover the home `.env` and the global HopCode config dir
  * `.env` (which respects `HOPCODE_HOME`). When `HOPCODE_HOME` redirects elsewhere,
  * the legacy `<homedir>/.hopcode/.env` is also included so credentials users
  * left there continue to load (and the trust check in untrusted workspaces
@@ -508,13 +512,13 @@ export function createMinimalSettings(): LoadedSettings {
  */
 function getUserLevelEnvPaths(): Set<string> {
   const homeDir = homedir();
-  const hopcodeHome = Storage.getGlobalHopCodeDir();
+  const globalHopcodeDir = Storage.getGlobalHopCodeDir();
   const paths = new Set([
     path.normalize(path.join(homeDir, '.env')),
-    path.normalize(path.join(hopcodeHome, '.env')),
+    path.normalize(path.join(globalHopcodeDir, '.env')),
   ]);
-  const legacyQwenEnv = path.normalize(path.join(homeDir, HOPCODE_DIR, '.env'));
-  paths.add(legacyQwenEnv);
+  const legacyhopcodeEnv = path.normalize(path.join(homeDir, HOPCODE_DIR, '.env'));
+  paths.add(legacyhopcodeEnv);
   return paths;
 }
 
@@ -650,20 +654,22 @@ function findEnvFile(
   const homeDir = homedir();
   const isTrusted = isWorkspaceTrusted(settings).isTrusted;
 
-  const globalHopCodeDir = Storage.getGlobalHopCodeDir();
-  const legacyHopCodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
-  const hasCustomConfigDir =
-    path.normalize(globalHopCodeDir) !== legacyHopCodeDir;
+  const globalHopcodeDir = Storage.getGlobalHopCodeDir();
+  const legacyHopcodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
+  const hasCustomConfigDir = path.normalize(globalHopcodeDir) !== legacyHopcodeDir;
 
   const canUseEnvFile = (filePath: string): boolean =>
     isTrusted !== false || userLevelPaths.has(path.normalize(filePath));
 
-  // Home-dir candidates in priority order: globalHopCodeDir/.env, then legacy
+  // Home-dir candidates in priority order: globalHopcodeDir/.env, then legacy
   // ~/.hopcode/.env (only when HOPCODE_HOME redirects), then ~/.env.
+  // Users who add `HOPCODE_HOME=` to an existing global env file shouldn't lose
+  // credentials still in the legacy file; routing vars inside it are already
+  // pinned by `preResolveHomeEnvOverrides` (no-override).
   const findHomeCandidate = (): string | null => {
-    const candidates = [path.join(globalHopCodeDir, '.env')];
+    const candidates = [path.join(globalHopcodeDir, '.env')];
     if (hasCustomConfigDir) {
-      candidates.push(path.join(legacyHopCodeDir, '.env'));
+      candidates.push(path.join(legacyHopcodeDir, '.env'));
     }
     candidates.push(path.join(homeDir, '.env'));
     for (const candidate of candidates) {
@@ -675,15 +681,17 @@ function findEnvFile(
   };
 
   let currentDir = path.resolve(startDir);
+  let visitedHomeDir = false;
   while (true) {
     if (currentDir === homeDir) {
+      visitedHomeDir = true;
       const found = findHomeCandidate();
       if (found) return found;
     } else {
       // Workspace step: prefer .hopcode/.env, then plain .env.
-      const hopcodeEnvPath = path.join(currentDir, HOPCODE_DIR, '.env');
-      if (fs.existsSync(hopcodeEnvPath) && canUseEnvFile(hopcodeEnvPath)) {
-        return hopcodeEnvPath;
+      const geminiEnvPath = path.join(currentDir, HOPCODE_DIR, '.env');
+      if (fs.existsSync(geminiEnvPath) && canUseEnvFile(geminiEnvPath)) {
+        return geminiEnvPath;
       }
       const envPath = path.join(currentDir, '.env');
       if (fs.existsSync(envPath) && canUseEnvFile(envPath)) {
@@ -693,11 +701,7 @@ function findEnvFile(
 
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir || !parentDir) {
-      const homeCandidate = findHomeCandidate();
-      if (homeCandidate) {
-        return homeCandidate;
-      }
-      return null;
+      return visitedHomeDir ? null : findHomeCandidate();
     }
     currentDir = parentDir;
   }
@@ -752,13 +756,15 @@ export function loadEnvironment(settings: Settings): void {
 
       const excludedVars =
         settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
-      const isHomeScopedEnvFile = userLevelPaths.has(
-        path.normalize(envFilePath),
-      );
-      const globalHopCodeDir = Storage.getGlobalHopCodeDir();
-      const isHopCodeScopedEnvFile =
-        path.normalize(path.dirname(envFilePath)) ===
-          path.normalize(globalHopCodeDir) || envFilePath.includes(HOPCODE_DIR);
+      const normalizedEnvFilePath = path.normalize(envFilePath);
+      // homeScoped: `.env` lives under the user's home hopcode dir or `~/.env` —
+      //   only these may set HOPCODE_HOME / HOPCODE_RUNTIME_DIR.
+      // hopcodeScoped: any `.env` whose immediate parent is `.hopcode` (including
+      //   `<repo>/.hopcode/.env`) — exempt from the user `excludedEnvVars` list.
+      const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
+      const isHopcodeScopedEnvFile =
+        isHomeScopedEnvFile ||
+        path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
 
       for (const key in parsedEnv) {
         if (Object.hasOwn(parsedEnv, key)) {
@@ -768,7 +774,7 @@ export function loadEnvironment(settings: Settings): void {
           ) {
             continue;
           }
-          if (!isHopCodeScopedEnvFile && excludedVars.includes(key)) {
+          if (!isHopcodeScopedEnvFile && excludedVars.includes(key)) {
             continue;
           }
 
@@ -801,16 +807,12 @@ export function loadEnvironment(settings: Settings): void {
  * Loads settings from user and workspace directories.
  * Project settings override user settings.
  */
-export function getUserSettingsPath(): string {
-  return Storage.getGlobalSettingsPath();
-}
-
 export function loadSettings(
   workspaceDir: string = process.cwd(),
 ): LoadedSettings {
   // Apply any HOPCODE_HOME / HOPCODE_RUNTIME_DIR set in user-level `.env` files
   // BEFORE any code reads a path derived from them. After this call, the
-  // lazy `userSettingsPath` / `Storage.getGlobalHopCodeDir()` getters
+  // lazy `getUserSettingsPath()` / `Storage.getGlobalHopCodeDir()` getters
   // return the post-bootstrap value.
   preResolveHomeEnvOverrides();
   const userSettingsPath = getUserSettingsPath();

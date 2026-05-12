@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -1389,26 +1389,26 @@ describe('ModelsConfig', () => {
       const allModels = modelsConfig.getAllConfiguredModels();
 
       // hopcode-oauth models should be ordered first
-      const firstNonQwenIndex = allModels.findIndex(
+      const firstNonHopCodeIndex = allModels.findIndex(
         (m) => m.authType !== AuthType.HOPCODE_OAUTH,
       );
-      expect(firstNonQwenIndex).toBeGreaterThan(0);
+      expect(firstNonHopCodeIndex).toBeGreaterThan(0);
       expect(
         allModels
-          .slice(0, firstNonQwenIndex)
+          .slice(0, firstNonHopCodeIndex)
           .every((m) => m.authType === AuthType.HOPCODE_OAUTH),
       ).toBe(true);
       expect(
         allModels
-          .slice(firstNonQwenIndex)
+          .slice(firstNonHopCodeIndex)
           .every((m) => m.authType !== AuthType.HOPCODE_OAUTH),
       ).toBe(true);
 
       // Should include hopcode-oauth models (hard-coded)
-      const qwenModels = allModels.filter(
+      const hopcodeModels = allModels.filter(
         (m) => m.authType === AuthType.HOPCODE_OAUTH,
       );
-      expect(qwenModels.length).toBeGreaterThan(0);
+      expect(hopcodeModels.length).toBeGreaterThan(0);
 
       // Should include openai models
       const openaiModels = allModels.filter(
@@ -1440,10 +1440,10 @@ describe('ModelsConfig', () => {
 
       // Should still include hopcode-oauth models (hard-coded)
       expect(allModels.length).toBeGreaterThan(0);
-      const qwenModels = allModels.filter(
+      const hopcodeModels = allModels.filter(
         (m) => m.authType === AuthType.HOPCODE_OAUTH,
       );
-      expect(qwenModels.length).toBeGreaterThan(0);
+      expect(hopcodeModels.length).toBeGreaterThan(0);
     });
 
     it('should return models with correct structure', () => {
@@ -1512,19 +1512,19 @@ describe('ModelsConfig', () => {
       expect(openaiOnly.map((m) => m.id)).toContain('openai-model-1');
 
       // Filter: include hopcode-oauth but request it later -> still ordered first
-      const withQwen = modelsConfig.getAllConfiguredModels([
+      const withHopCode = modelsConfig.getAllConfiguredModels([
         AuthType.USE_OPENAI,
         AuthType.HOPCODE_OAUTH,
         AuthType.USE_ANTHROPIC,
       ]);
-      expect(withQwen.length).toBeGreaterThan(0);
-      const firstNonQwenIndex = withQwen.findIndex(
+      expect(withHopCode.length).toBeGreaterThan(0);
+      const firstNonHopCodeIndex = withHopCode.findIndex(
         (m) => m.authType !== AuthType.HOPCODE_OAUTH,
       );
-      expect(firstNonQwenIndex).toBeGreaterThan(0);
+      expect(firstNonHopCodeIndex).toBeGreaterThan(0);
       expect(
-        withQwen
-          .slice(0, firstNonQwenIndex)
+        withHopCode
+          .slice(0, firstNonHopCodeIndex)
           .every((m) => m.authType === AuthType.HOPCODE_OAUTH),
       ).toBe(true);
     });
@@ -2040,7 +2040,7 @@ describe('ModelsConfig', () => {
         },
       });
 
-      const initialQwenModels = modelsConfig
+      const initialhopcodeModels = modelsConfig
         .getAllConfiguredModels()
         .filter((m) => m.authType === 'hopcode-oauth');
 
@@ -2049,10 +2049,10 @@ describe('ModelsConfig', () => {
       });
 
       // hopcode-oauth models should still exist
-      const qwenModelsAfterReload = modelsConfig
+      const hopcodeModelsAfterReload = modelsConfig
         .getAllConfiguredModels()
         .filter((m) => m.authType === 'hopcode-oauth');
-      expect(qwenModelsAfterReload.length).toBe(initialQwenModels.length);
+      expect(hopcodeModelsAfterReload.length).toBe(initialhopcodeModels.length);
     });
 
     it('should handle reload with undefined config', () => {

@@ -4,11 +4,11 @@ HopCode allows you to configure multiple model providers through the `modelProvi
 
 ## Overview
 
-Use `modelProviders` to declare curated model lists per auth type that the `/model` picker can switch between. Keys must be valid auth types (`openai`, `anthropic`, `gemini`, etc.). Each entry requires an `id` and **must include `envKey`**, with optional `name`, `description`, `baseUrl`, and `generationConfig`. Credentials are never persisted in settings; the runtime reads them from `process.env[envKey]`. Qwen OAuth models remain hard-coded and cannot be overridden.
+Use `modelProviders` to declare curated model lists per auth type that the `/model` picker can switch between. Keys must be valid auth types (`openai`, `anthropic`, `gemini`, etc.). Each entry requires an `id` and **must include `envKey`**, with optional `name`, `description`, `baseUrl`, and `generationConfig`. Credentials are never persisted in settings; the runtime reads them from `process.env[envKey]`. HopCode OAuth models remain hard-coded and cannot be overridden.
 
 > [!note]
 >
-> Only the `/model` command exposes non-default auth types. Anthropic, Gemini, etc., must be defined via `modelProviders`. The `/auth` command lists Qwen OAuth, Alibaba Cloud Coding Plan, and API Key as the built-in authentication options.
+> Only the `/model` command exposes non-default auth types. Anthropic, Gemini, etc., must be defined via `modelProviders`. The `/auth` command lists HopCode OAuth, Alibaba Cloud Coding Plan, and API Key as the built-in authentication options.
 
 > [!note]
 >
@@ -22,12 +22,12 @@ Below are comprehensive configuration examples for different authentication type
 
 The `modelProviders` object keys must be valid `authType` values. Currently supported auth types are:
 
-| Auth Type    | Description                                                                             |
-| ------------ | --------------------------------------------------------------------------------------- |
-| `openai`     | OpenAI-compatible APIs (OpenAI, Azure OpenAI, local inference servers like vLLM/Ollama) |
-| `anthropic`  | Anthropic Claude API                                                                    |
-| `gemini`     | Google Gemini API                                                                       |
-| `qwen-oauth` | Qwen OAuth (hard-coded, cannot be overridden in `modelProviders`)                       |
+| Auth Type       | Description                                                                             |
+| --------------- | --------------------------------------------------------------------------------------- |
+| `openai`        | OpenAI-compatible APIs (OpenAI, Azure OpenAI, local inference servers like vLLM/Ollama) |
+| `anthropic`     | Anthropic Claude API                                                                    |
+| `gemini`        | Google Gemini API                                                                       |
+| `hopcode-oauth` | HopCode OAuth (hard-coded, cannot be overridden in `modelProviders`)                    |
 
 > [!warning]
 > If an invalid auth type key is used (e.g., a typo like `"openai-custom"`), the configuration will be **silently skipped** and the models will not appear in the `/model` picker. Always use one of the supported auth type values listed above.
@@ -36,12 +36,12 @@ The `modelProviders` object keys must be valid `authType` values. Currently supp
 
 HopCode uses the following official SDKs to send requests to each provider:
 
-| Auth Type    | SDK Package                                                                                     |
-| ------------ | ----------------------------------------------------------------------------------------------- |
-| `openai`     | [`openai`](https://www.npmjs.com/package/openai) - Official OpenAI Node.js SDK                  |
-| `anthropic`  | [`@anthropic-ai/sdk`](https://www.npmjs.com/package/@anthropic-ai/sdk) - Official Anthropic SDK |
-| `gemini`     | [`@google/genai`](https://www.npmjs.com/package/@google/genai) - Official Google GenAI SDK      |
-| `qwen-oauth` | [`openai`](https://www.npmjs.com/package/openai) with custom provider (DashScope-compatible)    |
+| Auth Type       | SDK Package                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| `openai`        | [`openai`](https://www.npmjs.com/package/openai) - Official OpenAI Node.js SDK                  |
+| `anthropic`     | [`@anthropic-ai/sdk`](https://www.npmjs.com/package/@anthropic-ai/sdk) - Official Anthropic SDK |
+| `gemini`        | [`@google/genai`](https://www.npmjs.com/package/@google/genai) - Official Google GenAI SDK      |
+| `hopcode-oauth` | [`openai`](https://www.npmjs.com/package/openai) with custom provider (DashScope-compatible)    |
 
 This means the `baseUrl` you configure should be compatible with the corresponding SDK's expected API format. For example, when using `openai` auth type, the endpoint must accept OpenAI API format requests.
 
@@ -268,7 +268,7 @@ export VLLM_API_KEY="not-needed"
 
 > [!note]
 >
-> The `extra_body` parameter is **only supported for OpenAI-compatible providers** (`openai`, `qwen-oauth`). It is ignored for Anthropic, and Gemini providers.
+> The `extra_body` parameter is **only supported for OpenAI-compatible providers** (`openai`, `hopcode-oauth`). It is ignored for Anthropic, and Gemini providers.
 
 > [!note]
 >
@@ -398,7 +398,7 @@ The effective auth/model/credential values are chosen per field using the follow
 | Settings (`settings.json`) | `security.auth.selectedType`           | `model.name`                                    | `security.auth.apiKey`                              | `security.auth.baseUrl`                              | —                      | —                                 |
 | Default / computed         | Falls back to `AuthType.HOPCODE_OAUTH` | Built-in default (OpenAI ⇒ `qwen3-coder-plus`)  | —                                                   | —                                                    | —                      | `Config.getProxy()` if configured |
 
-\*When present, CLI auth flags override settings. Otherwise, `security.auth.selectedType` or the implicit default determine the auth type. Qwen OAuth and OpenAI are the only auth types surfaced without extra configuration.
+\*When present, CLI auth flags override settings. Otherwise, `security.auth.selectedType` or the implicit default determine the auth type. HopCode OAuth and OpenAI are the only auth types surfaced without extra configuration.
 
 > [!warning]
 >
@@ -577,7 +577,7 @@ When you configure a model without using `modelProviders`, HopCode automatically
 
 ```bash
 # This creates a RuntimeModelSnapshot with ID: $runtime|openai|my-custom-model
-qwen --auth-type openai --model my-custom-model --openaiApiKey $KEY --openaiBaseUrl https://api.example.com/v1
+hopcode --auth-type openai --model my-custom-model --openaiApiKey $KEY --openaiBaseUrl https://api.example.com/v1
 ```
 
 The snapshot:

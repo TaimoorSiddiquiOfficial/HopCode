@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -30,7 +30,7 @@ export const authCommand: SlashCommand = {
         type: 'message',
         messageType: 'info',
         content: t(
-          'Authentication configuration is only available in interactive mode. To configure authentication, run Qwen Code interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
+          'Authentication configuration is only available in interactive mode. To configure authentication, run HopCode interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
         ),
       };
     }

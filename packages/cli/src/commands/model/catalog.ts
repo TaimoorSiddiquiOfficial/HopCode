@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -1255,7 +1255,7 @@ const catalogs: ProviderCatalog[] = [
         ],
       },
       {
-        name: 'Qwen Coder',
+        name: 'HopCoder',
         models: [
           {
             id: 'qwen2.5-coder-32b-instruct',

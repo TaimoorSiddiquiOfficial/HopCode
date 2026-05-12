@@ -28,7 +28,7 @@ function resolvePath(dir: string): string {
 }
 
 /**
- * Returns the global Qwen home directory (config, credentials, etc.).
+ * Returns the global HopCode home directory (config, credentials, etc.).
  *
  * Priority: HOPCODE_HOME env var > ~/.hopcode
  *

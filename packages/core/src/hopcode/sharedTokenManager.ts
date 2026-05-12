@@ -1,12 +1,11 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import path from 'node:path';
 import { promises as fs, unlinkSync } from 'node:fs';
-import * as os from 'os';
 import { randomUUID } from 'node:crypto';
 
 import type { IHopCodeOAuth2Client } from './hopCodeOAuth2.js';
@@ -18,11 +17,11 @@ import {
   CredentialsClearRequiredError,
 } from './hopCodeOAuth2.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
+import { Storage } from '../config/storage.js';
 
 const debugLogger = createDebugLogger('HOPCODE_OAUTH');
 
 // File System Configuration
-const HOPCODE_DIR = '.hopcode';
 const HOPCODE_CREDENTIAL_FILENAME = 'oauth_creds.json';
 const HOPCODE_LOCK_FILENAME = 'oauth_creds.lock';
 
@@ -376,9 +375,7 @@ export class SharedTokenManager {
   /**
    * Force a file check without time-based throttling (used during refresh operations)
    */
-  private async forceFileCheck(
-    hopcodeClient?: IHopCodeOAuth2Client,
-  ): Promise<void> {
+  private async forceFileCheck(hopcodeClient?: IHopCodeOAuth2Client): Promise<void> {
     try {
       const filePath = this.getCredentialFilePath();
       const stats = await fs.stat(filePath);
@@ -693,7 +690,7 @@ export class SharedTokenManager {
    * @returns The absolute path to the credentials file
    */
   private getCredentialFilePath(): string {
-    return path.join(os.homedir(), HOPCODE_DIR, HOPCODE_CREDENTIAL_FILENAME);
+    return path.join(Storage.getGlobalHopCodeDir(), HOPCODE_CREDENTIAL_FILENAME);
   }
 
   /**
@@ -702,7 +699,7 @@ export class SharedTokenManager {
    * @returns The absolute path to the lock file
    */
   private getLockFilePath(): string {
-    return path.join(os.homedir(), HOPCODE_DIR, HOPCODE_LOCK_FILENAME);
+    return path.join(Storage.getGlobalHopCodeDir(), HOPCODE_LOCK_FILENAME);
   }
 
   /**

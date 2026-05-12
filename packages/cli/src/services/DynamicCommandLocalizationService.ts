@@ -1,18 +1,18 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-import type { Config } from '@qwen-code/qwen-code-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   Storage,
   createDebugLogger,
   getErrorMessage,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   getCurrentLanguage,
   getLanguageNameForTranslationTarget,
@@ -43,7 +43,7 @@ type TranslationItem = {
 };
 
 function getCachePath(): string {
-  return path.join(Storage.getGlobalQwenDir(), CACHE_FILE_NAME);
+  return path.join(Storage.getGlobalHopCodeDir(), CACHE_FILE_NAME);
 }
 
 function getCommandPath(command: SlashCommand, prefix = ''): string {

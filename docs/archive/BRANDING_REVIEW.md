@@ -1,4 +1,4 @@
-# HopCode Visual Branding Review & Strategy
+﻿# HopCode Visual Branding Review & Strategy
 
 **Document Version:** 1.0  
 **Created:** 2026-04-18  
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive review of all visual branding assets in the HopCode repository (formerly Qwen Code) and presents a complete rebranding strategy with logo concepts, color palettes, and design guidelines.
+This document provides a comprehensive review of all visual branding assets in the HopCode repository (formerly HopCode) and presents a complete rebranding strategy with logo concepts, color palettes, and design guidelines.
 
 ---
 
@@ -23,7 +23,7 @@ This document provides a comprehensive review of all visual branding assets in t
 | ----------------- | -------------------------------------------------------- | ---------------- | ------------------------------ |
 | **VS Code Icon**  | `packages/vscode-ide-companion/assets/icon.png`          | PNG (256x256)    | Purple hexagonal geometric "Q" |
 | **Sidebar Icon**  | `packages/vscode-ide-companion/assets/sidebar-icon.svg`  | SVG (141.38x140) | Geometric "Q" letterform       |
-| **Zed Extension** | `packages/zed-extension/qwen-code.svg`                   | SVG (141.38x140) | Same geometric "Q"             |
+| **Zed Extension** | `packages/zed-extension/hopcode.svg`                     | SVG (141.38x140) | Same geometric "Q"             |
 | **Favicon**       | `packages/web-templates/src/export-html/src/favicon.svg` | SVG              | Black "Q" letterform           |
 
 #### Current Logo Analysis
@@ -122,8 +122,8 @@ GradientColors: ['#FFD700', '#da7959']; // Gold → Coral
 **Current branded CSS classes:**
 
 ```css
-.qwen-message              /* 37+ occurrences */
-.qwen-webui-container
+.hopcode-message              /* 37+ occurrences */
+.hopcode-webui-container
 --app-qwen-ivory           /* Brand color variable */
 --qwen-corner-radius-small
 --qwen-corner-radius-medium
@@ -363,14 +363,14 @@ GradientColors: ['#7C3AED', '#0891B2']; // Violet → Teal
 
 ### 2.5 CSS Class Migration
 
-**All `.qwen-*` classes → `.hopcode-*`**
+**All `.hopcode-*` classes → `.hopcode-*`**
 
 ```css
 /* Old → New */
-.qwen-message              → .hopcode-message
-.qwen-webui-container      → .hopcode-webui-container
-.qwen-timeline             → .hopcode-timeline
-.qwen-tool-call            → .hopcode-tool-call
+.hopcode-message              → .hopcode-message
+.hopcode-webui-container      → .hopcode-webui-container
+.hopcode-timeline             → .hopcode-timeline
+.hopcode-tool-call            → .hopcode-tool-call
 
 /* Variables */
 --app-qwen-ivory           → --app-hopcode-ivory
@@ -466,7 +466,7 @@ sed -i 's/--app-qwen-ivory/--app-hopcode-ivory/g' packages/webui/src/styles/vari
 sed -i 's/--qwen-corner-radius/--hopcode-corner-radius/g' packages/webui/src/styles/variables.css
 
 # Update all CSS files
-find packages/webui/src -name "*.css" -exec sed -i 's/\.qwen-/\.hopcode-/g' {} \;
+find packages/webui/src -name "*.css" -exec sed -i 's/\.hopcode-/\.hopcode-/g' {} \;
 ```
 
 **Day 3-4: Component Updates**
@@ -623,7 +623,7 @@ Code (14px, Mono)
 ❌ "You must configure the settings before proceeding"  
 ✅ "Configure your settings to get started"
 
-❌ "The Qwen Code agent executes commands"  
+❌ "The HopCode agent executes commands"  
 ✅ "HopCode helps you code faster with AI assistance"
 
 ---
@@ -791,15 +791,15 @@ sed -i 's/--app-qwen-ivory/--app-hopcode-ivory/g' packages/webui/src/styles/vari
 sed -i 's/--qwen-corner-radius/--hopcode-corner-radius/g' packages/webui/src/styles/variables.css
 
 # Replace all CSS classes
-find packages/webui/src -name "*.css" -exec sed -i 's/\.qwen-/\.hopcode-/g' {} \;
+find packages/webui/src -name "*.css" -exec sed -i 's/\.hopcode-/\.hopcode-/g' {} \;
 ```
 
 ### TypeScript/JavaScript Updates
 
 ```bash
 # Update component references
-find packages/webui/src -name "*.tsx" -exec sed -i 's/QwenCode/HopCode/g' {} \;
-find packages/webui/src -name "*.ts" -exec sed -i 's/QwenCode/HopCode/g' {} \;
+find packages/webui/src -name "*.tsx" -exec sed -i 's/HopCode/HopCode/g' {} \;
+find packages/webui/src -name "*.ts" -exec sed -i 's/HopCode/HopCode/g' {} \;
 
 # Update logo imports
 find packages -name "*.ts" -o -name "*.tsx" | xargs sed -i 's/qwen-logo/hopcode-logo/g'

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -43,7 +43,7 @@ const IDE_WORKSPACE_PATH_ENV_VAR = 'HOPCODE_IDE_WORKSPACE_PATH';
 const IDE_DIR = 'ide';
 
 async function getGlobalIdeDir(): Promise<string> {
-  // Anchored to the global Qwen dir (not the runtime base dir) so the CLI's
+  // Anchored to the global hopcode dir (not the runtime base dir) so the CLI's
   // discovery path matches: the CLI can resolve runtime dirs from settings,
   // but this extension only sees env vars, so settings-based overrides would
   // silently desync the lock-file location.

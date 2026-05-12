@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -118,7 +118,7 @@ export class FileDiscoveryService {
   /**
    * @deprecated Use shouldHopCodeIgnoreFile instead
    */
-  shouldQwenIgnoreFile(filePath: string): boolean {
+  shouldhopcodeignoreFile(filePath: string): boolean {
     return this.shouldHopCodeIgnoreFile(filePath);
   }
 
@@ -153,7 +153,7 @@ export class FileDiscoveryService {
   /**
    * @deprecated Use getHopCodeIgnorePatterns instead
    */
-  getQwenIgnorePatterns(): string[] {
+  gethopcodeignorePatterns(): string[] {
     return this.getHopCodeIgnorePatterns();
   }
 }

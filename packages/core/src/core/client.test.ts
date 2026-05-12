@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -191,7 +191,7 @@ vi.mock('../telemetry/index.js', async (importOriginal) => {
     ...actual,
     uiTelemetryService: mockUiTelemetryService,
     // We keep the real implementations of logChatCompression, etc.
-    // but we can spy on QwenLogger if needed
+    // but we can spy on HopCodeLogger if needed
   };
 });
 vi.mock('../ide/ideContext.js');
@@ -3201,7 +3201,7 @@ Other open files:
         expect.objectContaining({
           name: 'client.generateContent',
           attributes: {
-            model: DEFAULT_QWEN_FLASH_MODEL,
+            model: DEFAULT_HOPCODE_FLASH_MODEL,
             prompt_id: 'btw-prompt-id',
           },
         }),
@@ -3237,7 +3237,7 @@ Other open files:
         expect.objectContaining({
           name: 'client.generateContent',
           attributes: {
-            model: DEFAULT_QWEN_FLASH_MODEL,
+            model: DEFAULT_HOPCODE_FLASH_MODEL,
             prompt_id: 'override-prompt-id',
           },
         }),
@@ -3357,7 +3357,7 @@ Other open files:
           contents,
           {},
           abortSignal,
-          DEFAULT_QWEN_FLASH_MODEL,
+          DEFAULT_HOPCODE_FLASH_MODEL,
         ),
       ).rejects.toThrow('raw upstream 500 with sensitive details');
 
@@ -3381,7 +3381,7 @@ Other open files:
           contents,
           {},
           abortController.signal,
-          DEFAULT_QWEN_FLASH_MODEL,
+          DEFAULT_HOPCODE_FLASH_MODEL,
         ),
       ).rejects.toThrow('raw abort reason with sensitive details');
 

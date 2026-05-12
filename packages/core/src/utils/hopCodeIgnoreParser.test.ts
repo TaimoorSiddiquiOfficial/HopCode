@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -20,7 +20,7 @@ describe('HopCodeIgnoreParser', () => {
   }
 
   beforeEach(async () => {
-    projectRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'qwenignore-test-'));
+    projectRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcodeignore-test-'));
   });
 
   afterEach(async () => {

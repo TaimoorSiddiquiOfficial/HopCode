@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import {
   getAllGeminiMdFilenames,
-  HOPCODE_DIR,
+  Storage,
   getAutoMemoryRoot,
   getAutoMemoryProjectStateDir,
 } from '@hoptrendy/hopcode-core';
@@ -124,8 +124,7 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
   const globalMemoryPath = useMemo(
     () =>
       path.join(
-        os.homedir(),
-        HOPCODE_DIR,
+        Storage.getGlobalHopCodeDir(),
         getAllGeminiMdFilenames()[0] ?? 'HOPCODE.md',
       ),
     [],
@@ -215,7 +214,7 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
           );
         case 'global':
           return resolvePreferredMemoryFile(
-            path.join(os.homedir(), HOPCODE_DIR),
+            Storage.getGlobalHopCodeDir(),
             getAllGeminiMdFilenames()[0] ?? 'HOPCODE.md',
           );
         case 'managed':

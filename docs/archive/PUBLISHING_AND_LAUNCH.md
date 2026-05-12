@@ -1,4 +1,4 @@
-# 🚀 HopCode - Publishing & Launch Checklist
+﻿# 🚀 HopCode - Publishing & Launch Checklist
 
 **Status:** 📋 Ready for Launch Preparation  
 **Updated:** 2026-04-18
@@ -251,7 +251,7 @@ cd docs-site
 
 # Update site title
 # File: src/app/layout.jsx
-# Change: <title>Qwen Code</title> → <title>HopCode</title>
+# Change: <title>HopCode</title> → <title>HopCode</title>
 
 # Update logo
 # Replace logo component with HopCode logo
@@ -290,7 +290,7 @@ HopCode: The Butterfly Effect of Intelligent Code
 open-source AI coding assistant that's transforming how developers
 work with large codebases.
 
-Formerly known as "Qwen Code," HopCode represents a new chapter in
+Formerly known as "HopCode," HopCode represents a new chapter in
 AI-assisted development, featuring:
 
 - Enhanced terminal interface
@@ -334,7 +334,7 @@ automate tedious work, and ship faster.
 🦋 Introducing HopCode!
 
 The butterfly effect of intelligent code is here. We've rebranded from
-Qwen Code to HopCode, marking a new era of AI-assisted development.
+HopCode to HopCode, marking a new era of AI-assisted development.
 
 Try it now:
 npm install -g @hoptrendy/hopcode
@@ -347,7 +347,7 @@ npm install -g @hoptrendy/hopcode
 ```
 🚀 Exciting News! We're launching HopCode!
 
-After successful development as "Qwen Code," we're rebranding to
+After successful development as "HopCode," we're rebranding to
 HopCode - an AI-powered coding assistant optimized for Qwen series
 models.
 
@@ -368,7 +368,7 @@ Learn more: [documentation link]
 ```
 @everyone 🦋 HopCode has landed!
 
-We've rebranded from Qwen Code to HopCode! Here's what you need to know:
+We've rebranded from HopCode to HopCode! Here's what you need to know:
 
 ✅ Same great AI coding assistant
 ✅ Fresh new name and logo
@@ -444,17 +444,17 @@ Questions? Drop them below! 👇
 
 ### Migration Guide
 
-Create a migration guide for users of "Qwen Code":
+Create a migration guide for users of "HopCode":
 
 ````markdown
-# Migrating from Qwen Code to HopCode
+# Migrating from HopCode to HopCode
 
-Good news! Qwen Code is now HopCode. Here's how to upgrade:
+Good news! HopCode is now HopCode. Here's how to upgrade:
 
 ## 1. Uninstall Old Version
 
 ```bash
-npm uninstall -g @qwen-code/qwen-code
+npm uninstall -g @hoptrendy/hopcode
 ```
 ````
 
@@ -467,15 +467,15 @@ npm install -g @hoptrendy/hopcode
 ## 3. Migrate Configuration
 
 Your settings are safe! HopCode will automatically migrate your
-configuration from `~/.qwen/` to `~/.hopcode/` on first run.
+configuration from `~/.hopcode/` to `~/.hopcode/` on first run.
 
 ## 4. Update Your Workflow
 
 Update any scripts or documentation that reference:
 
-- `qwen` command → `hopcode`
-- `@qwen-code/*` packages → `@hoptrendy/*`
-- `.qwen/` directory → `.hopcode/`
+- `hopcode` command → `hopcode`
+- `@hopcode/*` packages → `@hoptrendy/*`
+- `.hopcode/` directory → `.hopcode/`
 
 ## Questions?
 

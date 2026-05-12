@@ -198,8 +198,8 @@ This file contains third-party software notices and license terms.
 
 
 ============================================================
-@hoptrendy/webui@undefined
-(No repository found)
+@hopcode/webui@undefined
+(git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git)
 
 License text not found.
 

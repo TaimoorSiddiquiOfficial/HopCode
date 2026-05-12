@@ -343,25 +343,25 @@ describe('checkI18n', () => {
 
   it('detects the unused-keys JSON flag from argv or env', () => {
     const originalArgv = process.argv;
-    const originalEnv = process.env['QWEN_CHECK_I18N_WRITE_UNUSED_KEYS'];
+    const originalEnv = process.env['HOPCODE_CHECK_I18N_WRITE_UNUSED_KEYS'];
 
     try {
       process.argv = ['node', 'check-i18n.ts'];
-      delete process.env['QWEN_CHECK_I18N_WRITE_UNUSED_KEYS'];
+      delete process.env['HOPCODE_CHECK_I18N_WRITE_UNUSED_KEYS'];
       expect(shouldWriteUnusedKeysJson()).toBe(false);
 
       process.argv = ['node', 'check-i18n.ts', '--write-unused-locale-keys'];
       expect(shouldWriteUnusedKeysJson()).toBe(true);
 
       process.argv = ['node', 'check-i18n.ts'];
-      process.env['QWEN_CHECK_I18N_WRITE_UNUSED_KEYS'] = '1';
+      process.env['HOPCODE_CHECK_I18N_WRITE_UNUSED_KEYS'] = '1';
       expect(shouldWriteUnusedKeysJson()).toBe(true);
     } finally {
       process.argv = originalArgv;
       if (originalEnv === undefined) {
-        delete process.env['QWEN_CHECK_I18N_WRITE_UNUSED_KEYS'];
+        delete process.env['HOPCODE_CHECK_I18N_WRITE_UNUSED_KEYS'];
       } else {
-        process.env['QWEN_CHECK_I18N_WRITE_UNUSED_KEYS'] = originalEnv;
+        process.env['HOPCODE_CHECK_I18N_WRITE_UNUSED_KEYS'] = originalEnv;
       }
     }
   });

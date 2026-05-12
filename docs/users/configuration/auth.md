@@ -1,16 +1,16 @@
-# Authentication
+﻿# Authentication
 
 HopCode supports three authentication methods. Pick the one that matches how you want to run the CLI:
 
-- **Qwen OAuth**: sign in with your `qwen.ai` account in a browser. **Free tier discontinued on 2026-04-15** — switch to another method.
+- **HopCode OAuth**: sign in with your `qwen.ai` account in a browser. **Free tier discontinued on 2026-04-15** — switch to another method.
 - **Alibaba Cloud Coding Plan**: use an API key from Alibaba Cloud. Paid subscription with diverse model options and higher quotas.
 - **API Key**: bring your own API key. Flexible to your own needs — supports OpenAI, Anthropic, Gemini, and other compatible endpoints.
 
-## Option 1: Qwen OAuth (Discontinued)
+## Option 1: HopCode OAuth (Discontinued)
 
 > [!warning]
 >
-> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `hopcode` and use `/auth` to configure.
+> The HopCode OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `hopcode` and use `/auth` to configure.
 
 - **How it works**: on first start, HopCode opens a browser login page. After you finish, credentials are cached locally so you usually won't need to log in again.
 - **Requirements**: a `qwen.ai` account + internet access (at least for the first login).
@@ -310,14 +310,14 @@ hopcode --model "qwen3.5-plus"
 
 The standalone `hopcode auth` CLI command has been removed. Use these replacements instead:
 
-| Previous use case                | Replacement                                                                                      |
-| -------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Interactive authentication setup | Run `hopcode`, then use `/auth`                                                                   |
-| Coding Plan setup                | Use `/auth`, or set `BAILIAN_CODING_PLAN_API_KEY` with the Coding Plan base URL                   |
-| OpenRouter setup                 | Use `/auth`, or set `OPENROUTER_API_KEY` and `OPENAI_BASE_URL=https://openrouter.ai/api/v1`      |
-| API-key or custom provider setup | Configure `~/.hopcode/settings.json`, `.env`, or provider-specific environment variables          |
-| Check current authentication     | Run `/doctor` inside HopCode                                                                     |
-| OAuth browser flow               | Run `hopcode` interactively and use `/auth`; OAuth cannot be configured with env vars alone      |
+| Previous use case                | Replacement                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------- |
+| Interactive authentication setup | Run `hopcode`, then use `/auth`                                                             |
+| Coding Plan setup                | Use `/auth`, or set `BAILIAN_CODING_PLAN_API_KEY` with the Coding Plan base URL             |
+| OpenRouter setup                 | Use `/auth`, or set `OPENROUTER_API_KEY` and `OPENAI_BASE_URL=https://openrouter.ai/api/v1` |
+| API-key or custom provider setup | Configure `~/.hopcode/settings.json`, `.env`, or provider-specific environment variables    |
+| Check current authentication     | Run `/doctor` inside HopCode                                                                |
+| OAuth browser flow               | Run `hopcode` interactively and use `/auth`; OAuth cannot be configured with env vars alone |
 
 Legacy invocations such as `hopcode auth status` now print a removal notice with migration paths.
 

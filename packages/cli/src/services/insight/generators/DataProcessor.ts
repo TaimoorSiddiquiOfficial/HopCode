@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
@@ -133,7 +133,7 @@ export class DataProcessor {
           type: 'object',
           additionalProperties: { type: 'number' },
         },
-        Qwen_helpfulness: {
+        HOPCODE_helpfulness: {
           type: 'string',
           enum: [
             'unhelpful',
@@ -183,7 +183,7 @@ export class DataProcessor {
         'goal_categories',
         'outcome',
         'user_satisfaction_counts',
-        'Qwen_helpfulness',
+        'HOPCODE_helpfulness',
         'session_type',
         'friction_counts',
         'friction_detail',

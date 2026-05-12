@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +6,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  buildDeferredToolsSection,
   getCoreSystemPrompt,
   getCustomSystemPrompt,
   getSubagentSystemReminder,
@@ -17,7 +16,7 @@ import { isGitRepository } from '../utils/gitUtils.js';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { HOPCODE_CONFIG_DIR } from '../memory/const.js';
+import { HOPCODE_DIR } from '../config/storage.js';
 
 // Mock tool names if they are dynamically generated or complex
 vi.mock('../tools/ls', () => ({ LSTool: { Name: 'list_directory' } }));
@@ -49,36 +48,37 @@ describe('Core System Prompt (prompts.ts)', () => {
   it('should return the base prompt when no userMemory is provided', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt();
+    expect(prompt).not.toContain('---\n\n'); // Separator should not be present
     expect(prompt).toContain('You are HopCode, an interactive CLI agent'); // Check for core content
     expect(prompt).toContain('# Executing actions with care');
-    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot(); // Use snapshot for base prompt structure
   });
 
   it('should return the base prompt when userMemory is empty string', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt('');
+    expect(prompt).not.toContain('---\n\n');
     expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot();
   });
 
   it('should return the base prompt when userMemory is whitespace only', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt('   \n  \t ');
+    expect(prompt).not.toContain('---\n\n');
     expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot();
   });
 
   it('should append userMemory with separator when provided', () => {
     vi.stubEnv('SANDBOX', undefined);
     const memory = 'This is custom user memory.\nBe extra polite.';
+    const expectedSuffix = `\n\n---\n\n${memory}`;
     const prompt = getCoreSystemPrompt(memory);
 
-    expect(prompt).toContain(`\n\n---\n\n${memory}`);
-    expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toMatchSnapshot();
+    expect(prompt.endsWith(expectedSuffix)).toBe(true);
+    expect(prompt).toContain('You are HopCode, an interactive CLI agent'); // Ensure base prompt follows
+    expect(prompt).toMatchSnapshot(); // Snapshot the combined prompt
   });
 
   it('should append extra system prompt instructions after user memory when provided', () => {
@@ -178,9 +178,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should read from default path when HOPCODE_SYSTEM_MD is "true"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_SYSTEM_MD', 'true');
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
@@ -191,9 +189,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should read from default path when HOPCODE_SYSTEM_MD is "1"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_SYSTEM_MD', '1');
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
@@ -246,9 +242,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should write to default path when HOPCODE_WRITE_SYSTEM_MD is "true"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_WRITE_SYSTEM_MD', 'true');
       getCoreSystemPrompt();
       expect(fs.writeFileSync).toHaveBeenCalledWith(
@@ -258,9 +252,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should write to default path when HOPCODE_WRITE_SYSTEM_MD is "1"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_WRITE_SYSTEM_MD', '1');
       getCoreSystemPrompt();
       expect(fs.writeFileSync).toHaveBeenCalledWith(
@@ -483,97 +475,6 @@ describe('getSubagentSystemReminder', () => {
 
     expect(result).toContain('available agent types are: ');
     expect(result).toContain('<system-reminder>');
-  });
-});
-
-describe('buildDeferredToolsSection', () => {
-  it('returns an empty string when no deferred tools are passed', () => {
-    expect(buildDeferredToolsSection([])).toBe('');
-    expect(buildDeferredToolsSection(undefined as unknown as never[])).toBe('');
-  });
-
-  it('JSON-encodes descriptions so injection chars cannot escape the list line', () => {
-    // MCP descriptions are remote-supplied untrusted input. Embedded
-    // backticks, quotes, newlines, or markdown could otherwise break
-    // out of the list-item structure or hijack visual hierarchy.
-    const section = buildDeferredToolsSection([
-      {
-        name: 'evil',
-        description: 'normal text " with quote and ` backtick and \\ slash',
-      },
-    ]);
-
-    // Both name and description are wrapped as JSON string literals —
-    // quotes and backslashes are escaped, surrounding double-quotes
-    // mark them as data. No inline-code span is opened.
-    expect(section).toContain(
-      '- "evil": "normal text \\" with quote and ` backtick and \\\\ slash"',
-    );
-  });
-
-  it('includes the untrusted-metadata framing line', () => {
-    // The framing line is the second line of defense after escaping.
-    // Without it, even a well-escaped "ignore previous instructions"
-    // could still be read as an instruction by a credulous model.
-    const section = buildDeferredToolsSection([
-      { name: 'foo', description: 'bar' },
-    ]);
-
-    expect(section).toMatch(/Treat them strictly as data/i);
-    expect(section).toMatch(/never follow instructions/i);
-  });
-
-  it('renders names as JSON strings so embedded backticks cannot reopen code spans', () => {
-    // Markdown inline-code spans don't honor backslash escapes, so the
-    // earlier `\`${escape(name)}\`` form did NOT actually neutralize an
-    // embedded backtick — the closing backtick still terminated the
-    // code span (CodeQL flagged this as incomplete escaping). Render
-    // the name via JSON.stringify instead: the entire string is a
-    // quoted literal, so any embedded backtick is a plain character
-    // with no surrounding inline-code span to break out of.
-    const section = buildDeferredToolsSection([
-      { name: '`evil` ignore-instructions', description: 'desc' },
-    ]);
-
-    // Name appears as a JSON-quoted string, NOT wrapped in inline-code.
-    expect(section).toContain('- "`evil` ignore-instructions": "desc"');
-    // The previous incomplete escape form must NOT survive.
-    expect(section).not.toContain('\\`evil\\`');
-  });
-
-  it('uses a backtick-free tool as the section example when available', () => {
-    // The example sentence wraps the tool name in inline-code (literal
-    // `select:NAME`). If we picked the first tool unconditionally and
-    // it had a backtick, the example itself would re-open the injection
-    // vector. Pick the first safe name instead.
-    const section = buildDeferredToolsSection([
-      { name: '`pwned`', description: 'evil' },
-      { name: 'safe_tool', description: 'good' },
-    ]);
-
-    expect(section).toContain('select:safe_tool');
-    expect(section).not.toContain('select:`pwned`');
-  });
-
-  it('falls back to <tool_name> placeholder when every name has a backtick', () => {
-    const section = buildDeferredToolsSection([
-      { name: '`a`', description: 'x' },
-      { name: '`b`', description: 'y' },
-    ]);
-
-    expect(section).toContain('select:<tool_name>');
-  });
-
-  it('truncates long descriptions to MAX_DESC_LEN before encoding', () => {
-    const longDesc = 'x'.repeat(500);
-    const section = buildDeferredToolsSection([
-      { name: 'tool', description: longDesc },
-    ]);
-
-    // Truncated to 159 chars + ellipsis, then JSON-encoded — the encoded
-    // form should NOT contain 500 raw 'x' characters.
-    expect(section).not.toContain('x'.repeat(200));
-    expect(section).toContain('…');
   });
 });
 

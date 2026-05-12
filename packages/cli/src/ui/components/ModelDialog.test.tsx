@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -15,7 +15,7 @@ import type { Config } from '@hoptrendy/hopcode-core';
 import { AuthType, DEFAULT_HOPCODE_MODEL } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
-import { getFilteredQwenModels } from '../models/availableModels.js';
+import { getFilteredHopCodeModels } from '../models/availableModels.js';
 
 vi.mock('../hooks/useKeypress.js', () => ({
   useKeypress: vi.fn(),
@@ -30,7 +30,7 @@ vi.mock('./shared/DescriptiveRadioButtonSelect.js', () => ({
 const createMockGetAvailableModelsForAuthType = () =>
   vi.fn((t: AuthType) => {
     if (t === AuthType.HOPCODE_OAUTH) {
-      return getFilteredQwenModels().map((m) => ({
+      return getFilteredHopCodeModels().map((m) => ({
         id: m.id,
         label: m.label,
         authType: AuthType.HOPCODE_OAUTH,
@@ -63,7 +63,7 @@ const renderComponent = (
     switchModel: vi.fn().mockResolvedValue(undefined),
     getAuthType: vi.fn(() => 'hopcode-oauth'),
     getAllConfiguredModels: vi.fn(() =>
-      getFilteredQwenModels().map((m) => ({
+      getFilteredHopCodeModels().map((m) => ({
         id: m.id,
         label: m.label,
         description: m.description || '',
@@ -147,8 +147,8 @@ describe('<ModelDialog />', () => {
 
     expect(mockGetModel).toHaveBeenCalled();
     // Calculate expected index dynamically based on model list
-    const qwenModels = getFilteredQwenModels();
-    const expectedIndex = qwenModels.findIndex(
+    const hopcodeModels = getFilteredHopCodeModels();
+    const expectedIndex = hopcodeModels.findIndex(
       (m) => m.id === DEFAULT_HOPCODE_MODEL,
     );
     expect(mockedSelect).toHaveBeenCalledWith(
@@ -201,7 +201,7 @@ describe('<ModelDialog />', () => {
       {
         getAvailableModelsForAuthType: vi.fn((t: AuthType) => {
           if (t === AuthType.HOPCODE_OAUTH) {
-            return getFilteredQwenModels().map((m) => ({
+            return getFilteredHopCodeModels().map((m) => ({
               id: m.id,
               label: m.label,
               authType: AuthType.HOPCODE_OAUTH,
@@ -231,7 +231,7 @@ describe('<ModelDialog />', () => {
         return [{ id: 'gpt-4', label: 'GPT-4', authType: t }];
       }
       if (t === AuthType.HOPCODE_OAUTH) {
-        return getFilteredQwenModels().map((m) => ({
+        return getFilteredHopCodeModels().map((m) => ({
           id: m.id,
           label: m.label,
           authType: AuthType.HOPCODE_OAUTH,
@@ -246,7 +246,7 @@ describe('<ModelDialog />', () => {
       switchModel,
       getAvailableModelsForAuthType,
       getAllConfiguredModels: vi.fn(() => [
-        ...getFilteredQwenModels().map((m) => ({
+        ...getFilteredHopCodeModels().map((m) => ({
           id: m.id,
           label: m.label,
           description: m.description || '',
@@ -295,7 +295,7 @@ describe('<ModelDialog />', () => {
         return [{ id: 'gpt-4', label: 'GPT-4', authType: t }];
       }
       if (t === AuthType.HOPCODE_OAUTH) {
-        return getFilteredQwenModels().map((m) => ({
+        return getFilteredHopCodeModels().map((m) => ({
           id: m.id,
           label: m.label,
           authType: AuthType.HOPCODE_OAUTH,
@@ -391,7 +391,7 @@ describe('<ModelDialog />', () => {
               getAvailableModelsForAuthType:
                 createMockGetAvailableModelsForAuthType(),
               getAllConfiguredModels: vi.fn(() =>
-                getFilteredQwenModels().map((m) => ({
+                getFilteredHopCodeModels().map((m) => ({
                   id: m.id,
                   label: m.label,
                   description: m.description || '',
@@ -419,7 +419,7 @@ describe('<ModelDialog />', () => {
       getAuthType: mockGetAuthType,
       getAvailableModelsForAuthType: createMockGetAvailableModelsForAuthType(),
       getAllConfiguredModels: vi.fn(() =>
-        getFilteredQwenModels().map((m) => ({
+        getFilteredHopCodeModels().map((m) => ({
           id: m.id,
           label: m.label,
           description: m.description || '',
@@ -444,8 +444,8 @@ describe('<ModelDialog />', () => {
     expect(callCount).toBeGreaterThanOrEqual(2);
     const afterChangeCall = mockedSelect.mock.calls[callCount - 1][0];
     // Calculate expected index for DEFAULT_HOPCODE_MODEL dynamically
-    const qwenModels = getFilteredQwenModels();
-    const expectedCoderIndex = qwenModels.findIndex(
+    const hopcodeModels = getFilteredHopCodeModels();
+    const expectedCoderIndex = hopcodeModels.findIndex(
       (m) => m.id === DEFAULT_HOPCODE_MODEL,
     );
     expect(afterChangeCall.initialIndex).toBe(expectedCoderIndex);

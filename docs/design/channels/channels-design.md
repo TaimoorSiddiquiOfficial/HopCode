@@ -1,4 +1,4 @@
-# Channels Design
+﻿# Channels Design
 
 > External messaging integrations for HopCode — interact with an agent from Telegram, WeChat, and more.
 >
@@ -96,7 +96,7 @@ On inbound messages, plugins build an `Envelope` and call `this.handleInbound(en
 
 ### Discovery & Loading
 
-External plugins are **extensions** managed by `ExtensionManager`, declared in `qwen-extension.json`:
+External plugins are **extensions** managed by `ExtensionManager`, declared in `hopcode-extension.json`:
 
 ```json
 {

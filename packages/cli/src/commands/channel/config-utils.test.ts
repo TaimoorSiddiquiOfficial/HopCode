@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+﻿import { describe, it, expect, vi, afterEach } from 'vitest';
 import { resolveEnvVars, parseChannelConfig } from './config-utils.js';
 
 // Mock the channel-registry so we don't pull in real plugins

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,23 +36,19 @@ import type {
 import type { Config } from '../config/config.js';
 import { APPROVAL_MODES } from '../config/config.js';
 import type { RuntimeContentGeneratorView } from '../agents/runtime/agent-context.js';
-import {
-  createRuntimeContentGeneratorView,
-  type AuthOverrides,
-} from '../models/content-generator-config.js';
+import { createRuntimeContentGeneratorView } from '../models/content-generator-config.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { normalizeContent } from '../utils/textUtils.js';
 import { parseSubagentModelSelection } from './model-selection.js';
 const debugLogger = createDebugLogger('SUBAGENT_MANAGER');
 import { BuiltinAgentRegistry } from './builtin-agents.js';
 import { ToolDisplayNamesMigration } from '../tools/tool-names.js';
-import { Storage } from '../config/storage.js';
+import { HOPCODE_DIR, Storage } from '../config/storage.js';
 import {
   hasRebuiltToolRegistry,
   rebuildToolRegistryOnOverride,
 } from '../tools/agent/agent.js';
 
-const HOPCODE_CONFIG_DIR = '.hopcode';
 const AGENT_CONFIG_DIR = 'agents';
 
 /**
@@ -740,22 +736,15 @@ export class SubagentManager {
     config: SubagentConfig,
     base: Config,
   ): Promise<RuntimeContentGeneratorView | undefined> {
-    // Check if the user has configured a per-agent model override in settings.json
-    const settingsOverride = base.getAgentModelForType(config.name);
-    const fullModelConfig = base.getAgentModelFullConfig(config.name);
-    const modelStr = settingsOverride ?? config.model;
-
-    const selection = parseSubagentModelSelection(modelStr);
+    const selection = parseSubagentModelSelection(config.model);
     if (selection.inherits) {
       return undefined;
     }
 
     const authType =
       selection.authType ?? base.getContentGeneratorConfig().authType;
-    const authOverrides: AuthOverrides = {
+    const authOverrides = {
       authType: authType as string,
-      apiKey: fullModelConfig?.apiKey,
-      baseUrl: fullModelConfig?.baseUrl,
     };
 
     const view = await createRuntimeContentGeneratorView(
@@ -915,11 +904,7 @@ export class SubagentManager {
 
     const baseDir =
       level === 'project'
-        ? path.join(
-            this.config.getProjectRoot(),
-            HOPCODE_CONFIG_DIR,
-            AGENT_CONFIG_DIR,
-          )
+        ? path.join(this.config.getProjectRoot(), HOPCODE_DIR, AGENT_CONFIG_DIR)
         : path.join(Storage.getGlobalHopCodeDir(), AGENT_CONFIG_DIR);
 
     return path.join(baseDir, `${name}.md`);
@@ -957,7 +942,7 @@ export class SubagentManager {
 
     const baseDir =
       level === 'project'
-        ? path.join(projectRoot, HOPCODE_CONFIG_DIR, AGENT_CONFIG_DIR)
+        ? path.join(projectRoot, HOPCODE_DIR, AGENT_CONFIG_DIR)
         : path.join(Storage.getGlobalHopCodeDir(), AGENT_CONFIG_DIR);
 
     try {

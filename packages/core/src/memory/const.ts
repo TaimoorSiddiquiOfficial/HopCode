@@ -1,21 +1,18 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const HOPCODE_CONFIG_DIR = '.hopcode';
 export const DEFAULT_CONTEXT_FILENAME = 'HOPCODE.md';
-export const LEGACY_CONTEXT_FILENAME = 'HOPCODE.md';
 export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
 export const MEMORY_SECTION_HEADER = '## HopCode Added Memories';
 
 // This variable will hold the currently configured filename for context files.
-// It defaults to include HOPCODE.md, HOPCODE.md (legacy), and AGENTS.md.
-// HOPCODE.md is kept for backward compatibility with existing projects.
+// It defaults to include both HOPCODE.md and AGENTS.md but can be overridden by setGeminiMdFilename.
+// HOPCODE.md is first to maintain backward compatibility (used by /init command tool).
 let currentGeminiMdFilename: string | string[] = [
   DEFAULT_CONTEXT_FILENAME,
-  LEGACY_CONTEXT_FILENAME,
   AGENT_CONTEXT_FILENAME,
 ];
 

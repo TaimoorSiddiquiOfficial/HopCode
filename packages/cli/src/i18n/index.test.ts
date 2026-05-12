@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -21,15 +21,15 @@ describe('bundled locale fallback', () => {
   });
 
   it('loads bundled builtin translations when locale files are absent on disk', async () => {
-    const qwenLocalePathPattern =
-      /([\\/]\.qwen|[\\/]i18n)[\\/]locales([\\/]|$)/;
+    const hopcodeLocalePathPattern =
+      /([\\/]\.hopcode|[\\/]i18n)[\\/]locales([\\/]|$)/;
 
     vi.doMock('node:fs', async (importOriginal) => {
       const actualFs = await importOriginal<typeof import('node:fs')>();
       return {
         ...actualFs,
         existsSync: (target: Parameters<typeof actualFs.existsSync>[0]) => {
-          if (qwenLocalePathPattern.test(String(target))) {
+          if (hopcodeLocalePathPattern.test(String(target))) {
             return false;
           }
           return actualFs.existsSync(target);
@@ -62,7 +62,7 @@ describe('bundled locale fallback', () => {
       'utf-8',
     );
 
-    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(tempDir);
+    vi.spyOn(Storage, 'getGlobalHopCodeDir').mockReturnValue(tempDir);
 
     const { setLanguageAsync, t } = await import('./index.js');
     await setLanguageAsync('zh');
@@ -84,7 +84,7 @@ describe('bundled locale fallback', () => {
       'utf-8',
     );
 
-    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(tempDir);
+    vi.spyOn(Storage, 'getGlobalHopCodeDir').mockReturnValue(tempDir);
 
     const { setLanguageAsync, t } = await import('./index.js');
     await setLanguageAsync('zh');

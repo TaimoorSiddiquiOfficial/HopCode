@@ -1,4 +1,4 @@
-# 🚀 HopCode Launch Plan
+﻿# 🚀 HopCode Launch Plan
 
 **Status:** ✅ **READY TO LAUNCH**  
 **Date:** 2026-04-18
@@ -30,7 +30,7 @@
 
 ### Option 1: Soft Launch (TODAY) ⭐ RECOMMENDED
 
-**What:** Launch HopCode with Qwen OAuth + announce multi-AI coming soon
+**What:** Launch HopCode with HopCode OAuth + announce multi-AI coming soon
 
 **Timeline:** 1-2 days
 
@@ -45,7 +45,7 @@
 **Features:**
 
 - ✅ HopCode branding
-- ✅ Qwen OAuth integration
+- ✅ HopCode OAuth integration
 - ✅ VS Code extension
 - ✅ Zed extension
 - 📢 Multi-AI "Coming Soon"
@@ -369,7 +369,7 @@ Try it: npm install -g @hoptrendy/hopcode
 
 ### A) Soft Launch (Recommended) ⭐
 - Launch today/tomorrow
-- Qwen OAuth + "Multi-AI Coming Soon"
+- HopCode OAuth + "Multi-AI Coming Soon"
 - Gather feedback, iterate quickly
 
 ### B) Multi-AI Launch

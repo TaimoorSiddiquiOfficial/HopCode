@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -38,8 +38,7 @@ describe('ExtensionStorage', () => {
     vi.mocked(Storage).mockImplementation(
       () =>
         ({
-          getExtensionsDir: () =>
-            path.join(mockHomeDir, '.hopcode', 'extensions'),
+          getExtensionsDir: () => path.join(mockHomeDir, '.hopcode', 'extensions'),
         }) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     );
     vi.mocked(Storage.getUserExtensionsDir).mockReturnValue(

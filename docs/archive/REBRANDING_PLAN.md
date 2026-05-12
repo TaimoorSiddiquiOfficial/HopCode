@@ -1,6 +1,6 @@
-# HopCode Rebranding Plan
+﻿# HopCode Rebranding Plan
 
-## From "Qwen Code" → "HopCode"
+## From "HopCode" → "HopCode"
 
 **Created:** 2026-04-18  
 **Repository:** D:\HopCode  
@@ -10,13 +10,13 @@
 
 ## Executive Summary
 
-This document outlines the complete rebranding strategy to transform "Qwen Code" into "HopCode" with a butterfly effect approach—where every change cascades systematically through the codebase, documentation, and ecosystem.
+This document outlines the complete rebranding strategy to transform "HopCode" into "HopCode" with a butterfly effect approach—where every change cascades systematically through the codebase, documentation, and ecosystem.
 
 ---
 
 ## Phase 1: Core Identity Changes (Breaking)
 
-### 1.1 Package Naming (`@qwen-code/*` → `@hoptrendy/*`)
+### 1.1 Package Naming (`@hopcode/*` → `@hoptrendy/*`)
 
 **Impact:** Critical - Affects all dependencies and imports
 
@@ -32,12 +32,12 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
   - `name`: `@hoptrendy/hopcode`
   - `description`: `HopCode`
   - `bin`: `{ "hopcode": "dist/index.js" }`
-  - All `@qwen-code/*` dependencies → `@hoptrendy/*`
+  - All `@hopcode/*` dependencies → `@hoptrendy/*`
 
 - [ ] All `packages/*/package.json` files
   - `@hoptrendy/sdk`, `@hoptrendy/webui`, `@hoptrendy/core`, etc.
 
-### 1.2 CLI Command (`qwen` → `hopcode`)
+### 1.2 CLI Command (`hopcode` → `hopcode`)
 
 **Impact:** User-facing breaking change
 
@@ -45,22 +45,22 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 
 - [ ] `packages/cli/package.json` → `bin.hopcode`
 - [ ] `packages/cli/src/*` → Update command registration
-- [ ] `README.md` → All `qwen` command examples → `hopcode`
+- [ ] `README.md` → All `hopcode` command examples → `hopcode`
 - [ ] Installation scripts → Update command references
 - [ ] Documentation → All command examples
 
-### 1.3 Configuration Directory (`.qwen/` → `.hopcode/`)
+### 1.3 Configuration Directory (`.hopcode/` → `.hopcode/`)
 
 **Impact:** User data migration required
 
 #### Changes:
 
 - [ ] `scripts/installation/install-qwen-with-source.sh`
-  - `HOPCODE_DIR="${HOME}/.qwen"` → `HOPCODE_DIR="${HOME}/.hopcode"`
+  - `HOPCODE_DIR="${HOME}/.hopcode"` → `HOPCODE_DIR="${HOME}/.hopcode"`
   - Update all path references
 
 - [ ] `scripts/installation/install-qwen-with-source.bat`
-  - `%USERPROFILE%\.qwen` → `%USERPROFILE%\.hopcode`
+  - `%USERPROFILE%\.hopcode` → `%USERPROFILE%\.hopcode`
 
 - [ ] `packages/core/src/utils/installationManager.ts`
 - [ ] `packages/core/src/config/*`
@@ -99,10 +99,10 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 - [ ] Badges: Update npm, license, trendshift URLs
 - [ ] Documentation links: Migrate to new docs site
 - [ ] Title & Introduction: "HopCode" branding
-- [ ] Installation commands: `hopcode` instead of `qwen`
+- [ ] Installation commands: `hopcode` instead of `hopcode`
 - [ ] Configuration examples: `~/.hopcode/settings.json`
 - [ ] Model examples: Keep `qwen3.5-plus` (actual model names)
-- [ ] "Why Qwen Code?" → "Why HopCode?"
+- [ ] "Why HopCode?" → "Why HopCode?"
 
 ### 2.2 Installation Scripts
 
@@ -110,20 +110,20 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 
 - [ ] Rename file → `install-hopcode-with-source.sh`
 - [ ] Update all comments and echo messages
-- [ ] `install_qwen_code()` → `install_hopcode()`
-- [ ] Directory paths: `.qwen` → `.hopcode`
+- [ ] `install_HOPCODE_code()` → `install_hopcode()`
+- [ ] Directory paths: `.hopcode` → `.hopcode`
 - [ ] npm package: `@hoptrendy/hopcode`
 
 #### Batch Script (`scripts/installation/install-qwen-with-source.bat`)
 
 - [ ] Rename file → `install-hopcode-with-source.bat`
 - [ ] Update all REM comments and echo messages
-- [ ] `:InstallQwenCode` label → `:InstallHopCode`
+- [ ] `:InstallHopCode` label → `:InstallHopCode`
 - [ ] Windows paths: `%USERPROFILE%\.hopcode`
 
 #### Installation Guide (`scripts/installation/INSTALLATION_GUIDE.md`)
 
-- [ ] Update all "Qwen Code" references → "HopCode"
+- [ ] Update all "HopCode" references → "HopCode"
 
 ### 2.3 VS Code Extension
 
@@ -152,7 +152,7 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 
 #### Source Files:
 
-- [ ] `qwenCode.*` commands → `hopcodeCode.*`
+- [ ] `HopCode.*` commands → `hopcodeCode.*`
 - [ ] `HOPCODE_*` env vars → `HOPCODE_*`
 
 ### 2.4 Zed Extension
@@ -163,11 +163,11 @@ This document outlines the complete rebranding strategy to transform "Qwen Code"
 
 ```toml
 # Old
-id = "qwen-code"
-name = "Qwen Code"
-authors = ["Qwen Team"]
-description = "Qwen Code Agent Server..."
-repository = "https://github.com/QwenLM/qwen-code"
+id = "hopcode"
+name = "HopCode"
+authors = ["HopCode Team"]
+description = "HopCode Agent Server..."
+repository = "https://github.com/QwenLM/hopcode"
 
 # New
 id = "hopcode"
@@ -179,7 +179,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 #### Assets:
 
-- [ ] `qwen-code.svg` → `hopcode.svg` (redesign logo)
+- [ ] `hopcode.svg` → `hopcode.svg` (redesign logo)
 
 #### `README.md`:
 
@@ -187,7 +187,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 #### `LICENSE`:
 
-- [ ] Copyright holder: `Qwen Team` → `HopCode Team`
+- [ ] Copyright holder: `HopCode Team` → `HopCode Team`
 
 ### 2.5 WebUI Package
 
@@ -201,18 +201,18 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 #### Source Files (100+ files):
 
-- [ ] Copyright headers: `Qwen Team` → `HopCode Team`
+- [ ] Copyright headers: `HopCode Team` → `HopCode Team`
 - [ ] `src/styles/variables.css`:
   - `--app-qwen-ivory` → `--app-hopcode-ivory`
   - `--qwen-corner-radius-*` → `--hopcode-corner-radius-*`
 
 #### CSS Files:
 
-- [ ] `src/styles/timeline.css`: `.qwen-message` → `.hopcode-message` (37+ occurrences)
+- [ ] `src/styles/timeline.css`: `.hopcode-message` → `.hopcode-message` (37+ occurrences)
 
 #### `README.md`:
 
-- [ ] `QwenCodeWebUI` global object → `HopCodeWebUI`
+- [ ] `HopCodeWebUI` global object → `HopCodeWebUI`
 
 #### Examples:
 
@@ -224,7 +224,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 ### 3.1 Copyright Headers (782+ files)
 
-**Pattern:** `Copyright 2025 Qwen` → `Copyright 2026 HopCode Team`
+**Pattern:** `Copyright 2025 HopCode` → `Copyright 2026 HopCode Team`
 
 #### Affected Directories:
 
@@ -241,8 +241,8 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 | Pattern     | Replacement    | Count |
 | ----------- | -------------- | ----- |
-| `QwenCode*` | `HopCode*`     | 332+  |
-| `qwenCode*` | `hopcodeCode*` | 100+  |
+| `HopCode*`  | `HopCode*`     | 332+  |
+| `HopCode*`  | `hopcodeCode*` | 100+  |
 | `qwen-*`    | `hopcode-*`    | 1854+ |
 | `HOPCODE_*` | `HOPCODE_*`    | 500+  |
 | `qwenlm`    | `hopcode`      | 123+  |
@@ -250,16 +250,16 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 #### Java Package Names:
 
-**Decision Required:** Keep `com.alibaba.qwen.code` for Maven compatibility or migrate to new namespace
+**Decision Required:** Keep `com.alibaba.hopcode.code` for Maven compatibility or migrate to new namespace
 
 ### 3.3 CSS Classes & Styling
 
-| Old Class                | New Class                   |
-| ------------------------ | --------------------------- |
-| `.qwen-message`          | `.hopcode-message`          |
-| `.qwen-webui-container`  | `.hopcode-webui-container`  |
-| `--app-qwen-ivory`       | `--app-hopcode-ivory`       |
-| `--qwen-corner-radius-*` | `--hopcode-corner-radius-*` |
+| Old Class                  | New Class                   |
+| -------------------------- | --------------------------- |
+| `.hopcode-message`         | `.hopcode-message`          |
+| `.hopcode-webui-container` | `.hopcode-webui-container`  |
+| `--app-qwen-ivory`         | `--app-hopcode-ivory`       |
+| `--qwen-corner-radius-*`   | `--hopcode-corner-radius-*` |
 
 ---
 
@@ -298,7 +298,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 #### Java SDK (`packages/sdk-java/`):
 
-- [ ] `qwencode/` → Package names (decision required)
+- [ ] `HopCode/` → Package names (decision required)
 - [ ] `QWEN.md` → `HOPCODE.md`
 - [ ] `pom.xml` → Maven configuration
 - [ ] `client/` → Client library
@@ -309,16 +309,16 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 ### 5.1 Container Images
 
-| Old                                | New                       |
-| ---------------------------------- | ------------------------- |
-| `ghcr.io/qwenlm/qwen-code`         | `ghcr.io/hopcode/hopcode` |
-| `qwenlm.github.io/qwen-code-docs/` | New docs URL              |
+| Old                              | New                       |
+| -------------------------------- | ------------------------- |
+| `ghcr.io/qwenlm/hopcode`         | `ghcr.io/hopcode/hopcode` |
+| `qwenlm.github.io/hopcode-docs/` | New docs URL              |
 
 ### 5.2 Asset Hosting
 
-| Old                                              | New            |
-| ------------------------------------------------ | -------------- |
-| `qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/` | New CDN/bucket |
+| Old                                            | New            |
+| ---------------------------------------------- | -------------- |
+| `hopcode-assets.oss-cn-hangzhou.aliyuncs.com/` | New CDN/bucket |
 
 ### 5.3 GitHub Repository
 
@@ -331,7 +331,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 - [ ] Reserve `@hopcode` scope on npm
 - [ ] Publish all packages under new scope
-- [ ] Deprecate old `@qwen-code/*` packages with migration notice
+- [ ] Deprecate old `@hopcode/*` packages with migration notice
 
 ---
 
@@ -355,7 +355,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 ### Migration Strategy for Users
 
 1. **Backward Compatibility Layer** (Optional):
-   - Support both `.qwen/` and `.hopcode/` directories temporarily
+   - Support both `.hopcode/` and `.hopcode/` directories temporarily
    - Auto-migrate settings on first run
    - Deprecation warnings for old env vars
 
@@ -364,7 +364,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
    ```bash
    # Example migration script
    hopcode migrate
-   # Moves ~/.qwen → ~/.hopcode
+   # Moves ~/.hopcode → ~/.hopcode
    # Updates settings.json with new paths
    # Creates backup
    ```
@@ -385,14 +385,14 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 ### Assets
 
-- [ ] `packages/zed-extension/qwen-code.svg` → `hopcode.svg`
+- [ ] `packages/zed-extension/hopcode.svg` → `hopcode.svg`
 - [ ] `packages/vscode-ide-companion/assets/icon.png` → redesign
 - [ ] `packages/vscode-ide-companion/assets/sidebar-icon.svg` → redesign
 - [ ] `packages/web-templates/src/export-html/src/favicon.svg` → redesign
 
 ### Configuration
 
-- [ ] `packages/*/qwen-extension.json` → `hopcode-extension.json`
+- [ ] `packages/*/hopcode-extension.json` → `hopcode-extension.json`
 - [ ] `packages/sdk-java/QWEN.md` → `HOPCODE.md`
 
 ---
@@ -411,12 +411,12 @@ hopcode
 
 ### Subcommands
 
-| Old                | New                   |
-| ------------------ | --------------------- |
-| `qwen mcp`         | `hopcode mcp`         |
-| `qwen extensions`  | `hopcode extensions`  |
-| `qwen auth`        | `hopcode auth`        |
-| `qwen diff.accept` | `hopcode diff.accept` |
+| Old                  | New                   |
+| -------------------- | --------------------- |
+| `hopcode mcp`        | `hopcode mcp`         |
+| `hopcode extensions` | `hopcode extensions`  |
+| `qwen auth`          | `hopcode auth`        |
+| `qwen diff.accept`   | `hopcode diff.accept` |
 
 ### Slash Commands (in-chat)
 
@@ -437,7 +437,7 @@ alias qwen='hopcode'  # Optional: temporary alias
 
 ### 1. Unit Tests
 
-- [ ] Update all test fixtures referencing `.qwen/`
+- [ ] Update all test fixtures referencing `.hopcode/`
 - [ ] Update environment variable mocks
 - [ ] Update package name assertions
 
@@ -531,18 +531,18 @@ alias qwen='hopcode'  # Optional: temporary alias
 
 ### Naming Convention Summary
 
-| Context      | Old                              | New                            |
-| ------------ | -------------------------------- | ------------------------------ |
-| Project Name | Qwen Code                        | HopCode                        |
-| CLI Command  | `qwen`                           | `hopcode`                      |
-| Config Dir   | `.qwen/`                         | `.hopcode/`                    |
-| NPM Scope    | `@qwen-code/`                    | `@hoptrendy/`                  |
-| Env Vars     | `HOPCODE_*`                      | `HOPCODE_*`                    |
-| CSS Classes  | `.qwen-*`                        | `.hopcode-*`                   |
-| VS Code Ext  | `qwen-code-vscode-ide-companion` | `hopcode-vscode-ide-companion` |
-| Zed Ext      | `qwen-code`                      | `hopcode`                      |
-| WebUI Global | `QwenCodeWebUI`                  | `HopCodeWebUI`                 |
-| Java Package | `com.alibaba.qwen.code`          | _(TBD)_                        |
+| Context      | Old                            | New                            |
+| ------------ | ------------------------------ | ------------------------------ |
+| Project Name | HopCode                        | HopCode                        |
+| CLI Command  | `hopcode`                      | `hopcode`                      |
+| Config Dir   | `.hopcode/`                    | `.hopcode/`                    |
+| NPM Scope    | `@hopcode/`                    | `@hoptrendy/`                  |
+| Env Vars     | `HOPCODE_*`                    | `HOPCODE_*`                    |
+| CSS Classes  | `.hopcode-*`                   | `.hopcode-*`                   |
+| VS Code Ext  | `hopcode-vscode-ide-companion` | `hopcode-vscode-ide-companion` |
+| Zed Ext      | `hopcode`                      | `hopcode`                      |
+| WebUI Global | `HopCodeWebUI`                 | `HopCodeWebUI`                 |
+| Java Package | `com.alibaba.hopcode.code`     | _(TBD)_                        |
 
 ---
 

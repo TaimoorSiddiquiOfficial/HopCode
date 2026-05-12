@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+﻿import { describe, it, expect, afterEach } from 'vitest';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import { getGlobalHopCodeDir } from './paths.js';
@@ -20,7 +20,7 @@ describe('channels/base paths – getGlobalHopCodeDir', () => {
   });
 
   it('uses HOPCODE_HOME when set to absolute path', () => {
-    const configDir = path.resolve('/tmp/custom-qwen');
+    const configDir = path.resolve('/tmp/custom-hopcode');
     process.env['HOPCODE_HOME'] = configDir;
     expect(getGlobalHopCodeDir()).toBe(configDir);
   });
@@ -31,13 +31,17 @@ describe('channels/base paths – getGlobalHopCodeDir', () => {
   });
 
   it('expands tilde (~/x) in HOPCODE_HOME', () => {
-    process.env['HOPCODE_HOME'] = '~/custom-qwen';
-    expect(getGlobalHopCodeDir()).toBe(path.join(os.homedir(), 'custom-qwen'));
+    process.env['HOPCODE_HOME'] = '~/custom-hopcode';
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(os.homedir(), 'custom-hopcode'),
+    );
   });
 
   it('expands Windows-style tilde (~\\x) in HOPCODE_HOME', () => {
-    process.env['HOPCODE_HOME'] = '~\\custom-qwen';
-    expect(getGlobalHopCodeDir()).toBe(path.join(os.homedir(), 'custom-qwen'));
+    process.env['HOPCODE_HOME'] = '~\\custom-hopcode';
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(os.homedir(), 'custom-hopcode'),
+    );
   });
 
   it('treats bare tilde (~) as home directory', () => {

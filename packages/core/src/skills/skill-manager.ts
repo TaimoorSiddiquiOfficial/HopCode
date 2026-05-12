@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,7 +35,11 @@ import {
 } from './skill-activation.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { normalizeContent } from '../utils/textUtils.js';
-import { SKILL_PROVIDER_CONFIG_DIRS, Storage } from '../config/storage.js';
+import {
+  HOPCODE_DIR,
+  SKILL_PROVIDER_CONFIG_DIRS,
+  Storage,
+} from '../config/storage.js';
 import {
   HookEventName,
   HookType,
@@ -45,7 +49,6 @@ import {
 } from '../hooks/types.js';
 
 const debugLogger = createDebugLogger('SKILL_MANAGER');
-const HOPCODE_CONFIG_DIR = '.hopcode';
 const SKILLS_CONFIG_DIR = 'skills';
 const SKILL_MANIFEST_FILE = 'SKILL.md';
 
@@ -834,7 +837,7 @@ export class SkillManager {
         );
       case 'user':
         return SKILL_PROVIDER_CONFIG_DIRS.map((v) =>
-          v === HOPCODE_CONFIG_DIR
+          v === HOPCODE_DIR
             ? path.join(Storage.getGlobalHopCodeDir(), SKILLS_CONFIG_DIR)
             : path.join(os.homedir(), v, SKILLS_CONFIG_DIR),
         );

@@ -1,10 +1,10 @@
 ﻿import { existsSync, readFileSync } from 'node:fs';
 import * as path from 'node:path';
-import * as os from 'node:os';
+import { Storage } from '@hoptrendy/hopcode-core';
 import type { CommandModule } from 'yargs';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { readServiceInfo } from './pidfile.js';
-import type { SessionTarget } from '@hoptrendy/channel-base';
+import type { SessionTarget } from '@hopcode/channel-base';
 
 interface PersistedEntry {
   sessionId: string;
@@ -42,8 +42,7 @@ export const statusCommand: CommandModule = {
 
     // Read session data for per-channel counts
     const sessionsPath = path.join(
-      os.homedir(),
-      '.hopcode',
+      Storage.getGlobalHopCodeDir(),
       'channels',
       'sessions.json',
     );

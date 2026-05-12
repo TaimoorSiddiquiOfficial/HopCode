@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -72,9 +72,9 @@ function loadCombined(baseRef: string): {
     );
     loaded.push('.hopcode/review-rules.md');
   } else {
-    const qwenRules = showFile(baseRef, '.hopcode/review-rules.md');
-    if (qwenRules) {
-      sections.push(`### From .hopcode/review-rules.md\n\n${qwenRules.trim()}`);
+    const hopcodeRules = showFile(baseRef, '.hopcode/review-rules.md');
+    if (hopcodeRules) {
+      sections.push(`### From .hopcode/review-rules.md\n\n${hopcodeRules.trim()}`);
       loaded.push('.hopcode/review-rules.md');
     }
   }
@@ -109,9 +109,9 @@ function loadCombined(baseRef: string): {
   }
 
   // 4. HOPCODE.md — extract Code Review section only.
-  const qwenMd = showFile(baseRef, 'HOPCODE.md');
-  if (qwenMd) {
-    const section = extractCodeReviewSection(qwenMd);
+  const hopcodeMd = showFile(baseRef, 'HOPCODE.md');
+  if (hopcodeMd) {
+    const section = extractCodeReviewSection(hopcodeMd);
     if (section) {
       sections.push(`### From HOPCODE.md\n\n${section}`);
       loaded.push('HOPCODE.md');

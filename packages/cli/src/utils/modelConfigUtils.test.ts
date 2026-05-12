@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -1066,7 +1066,7 @@ describe('modelConfigUtils', () => {
     // Edge Case 2: HOPCODE_MODEL is used as final fallback when OPENAI_MODEL is not set
     it('Edge Case 2: HOPCODE_MODEL should be used as fallback when OPENAI_MODEL is not set', () => {
       const argv = {};
-      const qwenProvider: ProviderModelConfig = {
+      const hopcodeProvider: ProviderModelConfig = {
         id: 'qwen-env-model',
         name: 'Qwen Env Model',
       };
@@ -1075,7 +1075,7 @@ describe('modelConfigUtils', () => {
         modelProviders: {
           [AuthType.USE_OPENAI]: [
             { id: 'other-model', name: 'Other Model' },
-            qwenProvider,
+            hopcodeProvider,
           ],
         },
       });
@@ -1096,7 +1096,7 @@ describe('modelConfigUtils', () => {
 
       expect(vi.mocked(resolveModelConfig)).toHaveBeenCalledWith(
         expect.objectContaining({
-          modelProvider: qwenProvider,
+          modelProvider: hopcodeProvider,
         }),
       );
     });
@@ -1108,7 +1108,7 @@ describe('modelConfigUtils', () => {
         id: 'openai-env-model',
         name: 'OpenAI Env Model',
       };
-      const qwenProvider: ProviderModelConfig = {
+      const hopcodeProvider: ProviderModelConfig = {
         id: 'qwen-env-model',
         name: 'Qwen Env Model',
       };
@@ -1118,7 +1118,7 @@ describe('modelConfigUtils', () => {
           [AuthType.USE_OPENAI]: [
             { id: 'other-model', name: 'Other Model' },
             openAIProvider,
-            qwenProvider,
+            hopcodeProvider,
           ],
         },
       });
