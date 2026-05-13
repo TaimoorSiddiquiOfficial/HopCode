@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-base",
-  "version": "0.27.6",
+  "version": "0.27.7",
   "private": true,
   "description": "Base channel infrastructure for HopCode",
   "type": "module",
