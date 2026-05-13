@@ -231,7 +231,11 @@ function schemaRootAcceptsObject(
     rawType !== undefined &&
     (Array.isArray(rawType) ? rawType : [rawType]).includes('object');
 
-  if (rawType !== undefined && !typeIncludesObject) {
+  if (
+    rawType !== undefined &&
+    (typeof rawType === 'string' || Array.isArray(rawType)) &&
+    !typeIncludesObject
+  ) {
     return false;
   }
 
@@ -490,7 +494,7 @@ export function resolveJsonSchemaArg(
   // "schema can be parsed" and "schema can be satisfied by an object value".
   if (!schemaRootAcceptsObject(parsed as Record<string, unknown>)) {
     throw new FatalConfigError(
-      '--json-schema root must accept object-typed values (tool parameters ' +
+      '--json-schema: the top-level type must include "object" (tool parameters ' +
         'are always JSON objects). At least one branch of a root anyOf/oneOf ' +
         'must be satisfiable by an object, and a root `type` (when present) ' +
         'must include "object".',

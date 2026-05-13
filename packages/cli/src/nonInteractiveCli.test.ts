@@ -64,9 +64,11 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 const mockGetCommands = vi.hoisted(() => vi.fn());
 const mockGetCommandsForMode = vi.hoisted(() => vi.fn());
 const mockCommandServiceCreate = vi.hoisted(() => vi.fn());
+const mockCommandServiceFromCommands = vi.hoisted(() => vi.fn());
 vi.mock('./services/CommandService.js', () => ({
   CommandService: {
     create: mockCommandServiceCreate,
+    fromCommands: mockCommandServiceFromCommands,
   },
 }));
 
@@ -115,6 +117,11 @@ describe('runNonInteractive', () => {
     mockCommandServiceCreate.mockResolvedValue({
       getCommands: mockGetCommands,
       getCommandsForMode: mockGetCommandsForMode,
+    });
+    mockCommandServiceFromCommands.mockReturnValue({
+      getCommands: mockGetCommands,
+      getCommandsForMode: mockGetCommandsForMode,
+      getModelInvocableCommands: vi.fn().mockReturnValue([]),
     });
 
     processStdoutSpy = vi
@@ -1076,7 +1083,7 @@ describe('runNonInteractive', () => {
 
     // Should write error message through adapter to stdout (TEXT mode goes through JsonOutputAdapter)
     expect(processStderrSpy).toHaveBeenCalledWith(
-      'Shell command confirmation is not supported in non-interactive mode. Use YOLO mode or pre-approve commands.\n',
+      'Shell command confirmation is not supported in non-interactive mode. Use Izn mode or pre-approve commands.\n',
     );
   });
 

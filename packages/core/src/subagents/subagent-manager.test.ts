@@ -1177,7 +1177,7 @@ System prompt 3`);
     it('should list subagents from both levels', async () => {
       const subagents = await manager.listSubagents();
 
-      expect(subagents).toHaveLength(6); // agent1 (project takes precedence), agent2, agent3, general-purpose, Explore, statusline-setup (built-in)
+      expect(subagents).toHaveLength(10); // agent1 (project takes precedence), agent2, agent3, general-purpose, Explore, statusline-setup, security-specialist, performance-engineer, devops-engineer, tech-writer (built-in)
       expect(subagents.map((s) => s.name)).toEqual([
         'agent1',
         'agent2',
@@ -1185,6 +1185,10 @@ System prompt 3`);
         'general-purpose',
         'Explore',
         'statusline-setup',
+        'security-specialist',
+        'performance-engineer',
+        'devops-engineer',
+        'tech-writer',
       ]);
     });
 
@@ -1215,9 +1219,13 @@ System prompt 3`);
         'agent1',
         'agent2',
         'agent3',
+        'devops-engineer',
         'Explore',
         'general-purpose',
+        'performance-engineer',
+        'security-specialist',
         'statusline-setup',
+        'tech-writer',
       ]);
     });
 
@@ -1229,11 +1237,15 @@ System prompt 3`);
 
       const subagents = await manager.listSubagents();
 
-      expect(subagents).toHaveLength(3); // Only built-in agents remain
+      expect(subagents).toHaveLength(7); // Only built-in agents remain
       expect(subagents.map((s) => s.name)).toEqual([
         'general-purpose',
         'Explore',
         'statusline-setup',
+        'security-specialist',
+        'performance-engineer',
+        'devops-engineer',
+        'tech-writer',
       ]);
       expect(subagents.every((s) => s.level === 'builtin')).toBe(true);
     });
@@ -1245,11 +1257,15 @@ System prompt 3`);
 
       const subagents = await manager.listSubagents();
 
-      expect(subagents).toHaveLength(3); // Only built-in agents remain
+      expect(subagents).toHaveLength(7); // Only built-in agents remain
       expect(subagents.map((s) => s.name)).toEqual([
         'general-purpose',
         'Explore',
         'statusline-setup',
+        'security-specialist',
+        'performance-engineer',
+        'devops-engineer',
+        'tech-writer',
       ]);
       expect(subagents.every((s) => s.level === 'builtin')).toBe(true);
     });

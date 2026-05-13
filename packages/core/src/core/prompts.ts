@@ -392,17 +392,20 @@ Your core function is efficient and safe assistance. Balance extreme conciseness
       : '';
   const appendSuffix = buildSystemPromptSuffix(appendInstruction);
 
-  // Only append Quran guidance to the default HopCode prompt, not to
-  // custom instruction prompts, since those are user-authored.
-  const quranGuidanceSuffix = systemMdEnabled
-    ? ''
-    : buildSystemPromptSuffix(getQuranGuidanceSection());
-
   const deferredSuffix = deferredTools
     ? buildDeferredToolsSection(deferredTools)
     : '';
 
-  return `${basePrompt}${deferredSuffix}${memorySuffix}${appendSuffix}${quranGuidanceSuffix}`;
+  // Only append Quran guidance to the default HopCode prompt, not to
+  // custom instruction prompts, since those are user-authored.
+  // Use a plain newline prefix (no --- separator) so user memory section
+  // remains the last --- block when present.
+  const quranGuidanceText = systemMdEnabled ? '' : getQuranGuidanceSection();
+  const quranGuidanceSuffix = quranGuidanceText
+    ? `\n\n${quranGuidanceText}`
+    : '';
+
+  return `${basePrompt}${deferredSuffix}${quranGuidanceSuffix}${memorySuffix}${appendSuffix}`;
 }
 
 /**

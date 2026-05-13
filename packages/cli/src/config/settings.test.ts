@@ -53,6 +53,7 @@ import {
   SETTINGS_DIRECTORY_NAME, // This is from the original module, but used by the mock.
   type Settings,
   loadEnvironment,
+  resetHomeEnvBootstrapForTesting,
   SETTINGS_VERSION,
   SETTINGS_VERSION_KEY,
 } from './settings.js';
@@ -80,22 +81,6 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 // must keep going through `getUserSettingsPath()` to pick up `HOPCODE_HOME`
 // resolved from `~/.env` after module load.
 const USER_SETTINGS_PATH = getUserSettingsPath();
-
-const mockDebugLogger = vi.hoisted(() => ({
-  debug: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-  info: vi.fn(),
-}));
-
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
-  return {
-    ...actual,
-    createDebugLogger: () => mockDebugLogger,
-  };
-});
 
 const MOCK_WORKSPACE_DIR = '/mock/workspace';
 // Use the (mocked) SETTINGS_DIRECTORY_NAME for consistency
@@ -3308,6 +3293,7 @@ describe('Settings Loading and Merging', () => {
 
       it('redirects user settings path when HOPCODE_HOME is set in ~/.hopcode/.env', () => {
         delete process.env['HOPCODE_HOME'];
+        resetHomeEnvBootstrapForTesting();
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')

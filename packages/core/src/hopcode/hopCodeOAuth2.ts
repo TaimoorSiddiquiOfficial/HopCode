@@ -1037,3 +1037,5 @@ function getHopCodeCachedCredentialPath(): string {
 }
 
 export const clearCachedCredentialFile = clearHopCodeCredentials;
+export const hopCodeOAuth2Events = HopCodeOAuth2Events;
+export const clearHopcodeCredentials = clearHopCodeCredentials;
