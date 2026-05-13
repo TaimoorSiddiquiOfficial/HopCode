@@ -61,7 +61,11 @@ async function initGitRepo(dir: string): Promise<void> {
   );
 }
 
-function mockGitListing(gitRoot: string, trackedFiles: string[]): void {
+function mockGitListing(
+  gitRoot: string,
+  trackedFiles: string[],
+  deletedFiles: string[] = [],
+): void {
   __setCommandRunnerForTests(async (command, args) => {
     if (command !== 'git') {
       return { success: false, lines: [] };
@@ -76,7 +80,7 @@ function mockGitListing(gitRoot: string, trackedFiles: string[]): void {
     }
 
     if (args.includes('ls-files') && args.includes('--deleted')) {
-      return { success: true, lines: [] };
+      return { success: true, lines: deletedFiles };
     }
 
     if (args.includes('ls-files') && args.includes('--cached')) {
@@ -908,8 +912,7 @@ describe('crawler', () => {
         'alive.txt': '',
         'deleted.txt': '',
       });
-      await initGitRepo(tmpDir);
-      await fs.unlink(path.join(tmpDir, 'deleted.txt'));
+      mockGitListing(tmpDir, ['alive.txt', 'deleted.txt'], ['deleted.txt']);
 
       const ignore = loadIgnoreRules({
         projectRoot: tmpDir,

@@ -7,6 +7,8 @@
 import { defineConfig } from 'vitest/config';
 import path from 'node:path';
 
+const TEST_TIMEOUT_MS = process.platform === 'win32' ? 15_000 : 5_000;
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -23,6 +25,7 @@ export default defineConfig({
     outputFile: {
       junit: 'junit.xml',
     },
+    testTimeout: TEST_TIMEOUT_MS,
     coverage: {
       enabled: true,
       provider: 'v8',
