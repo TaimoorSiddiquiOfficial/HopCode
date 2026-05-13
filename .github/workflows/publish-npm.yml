@@ -266,7 +266,14 @@ jobs:
             echo "✅ VS Code Marketplace: published successfully"
           else
             echo "$output"
-            if echo "$output" | grep -qiE "(already published|already exists|version already|EEXIST|already.*0\.[0-9])"; then
+            if echo "$output" | grep -q "Please use a different"; then
+              # "already exists in the Marketplace. Please use a different 'name'" is a
+              # publisher permission error, NOT a "version already published" skip condition.
+              echo "❌ VS Code Marketplace: Publisher permission denied." >&2
+              echo "   The VSCE_PAT token is likely expired or does not belong to the 'hopcode' publisher." >&2
+              echo "   Regenerate it at: https://marketplace.visualstudio.com/manage/publishers/hopcode" >&2
+              exit 1
+            elif echo "$output" | grep -qiE "(already published|version already|EEXIST|already.*0\.[0-9])"; then
               version=$(node -p "require('./package.json').version")
               echo "⏭️ VS Code Marketplace: v${version} already published, skipping"
             else
