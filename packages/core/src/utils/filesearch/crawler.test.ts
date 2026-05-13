@@ -61,6 +61,35 @@ async function initGitRepo(dir: string): Promise<void> {
   );
 }
 
+function mockGitListing(gitRoot: string, trackedFiles: string[]): void {
+  __setCommandRunnerForTests(async (command, args) => {
+    if (command !== 'git') {
+      return { success: false, lines: [] };
+    }
+
+    if (args.includes('rev-parse') && args.includes('--show-toplevel')) {
+      return { success: true, lines: [gitRoot] };
+    }
+
+    if (args.includes('ls-files') && args.includes('--others')) {
+      return { success: true, lines: [] };
+    }
+
+    if (args.includes('ls-files') && args.includes('--deleted')) {
+      return { success: true, lines: [] };
+    }
+
+    if (args.includes('ls-files') && args.includes('--cached')) {
+      return {
+        success: true,
+        lines: trackedFiles.map((file) => `H ${file}`),
+      };
+    }
+
+    return { success: false, lines: [] };
+  });
+}
+
 describe('crawler', () => {
   let tmpDir: string;
   afterEach(async () => {
@@ -826,7 +855,7 @@ describe('crawler', () => {
         'file1.js': '',
         src: ['file2.js'],
       });
-      await initGitRepo(tmpDir);
+      mockGitListing(tmpDir, ['file1.js', 'src/file2.js']);
 
       const ignore = loadIgnoreRules({
         projectRoot: tmpDir,
@@ -852,8 +881,8 @@ describe('crawler', () => {
       tmpDir = await createTmpDir({
         src: ['file2.js'],
       });
-      await initGitRepo(tmpDir);
       tmpDir = await fs.realpath(tmpDir);
+      mockGitListing(tmpDir, ['src/file2.js']);
 
       const ignore = loadIgnoreRules({
         projectRoot: tmpDir,

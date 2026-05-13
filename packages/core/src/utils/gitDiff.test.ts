@@ -682,33 +682,15 @@ describe('resolveGitDir', () => {
   it('follows the gitdir pointer for linked worktrees', async () => {
     const main = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitmain-'));
     try {
-      await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: main });
-      await execFileAsync('git', ['config', 'user.email', 'test@example.com'], {
-        cwd: main,
-      });
-      await execFileAsync('git', ['config', 'user.name', 'Test'], {
-        cwd: main,
-      });
-      await execFileAsync('git', ['config', 'commit.gpgsign', 'false'], {
-        cwd: main,
-      });
-      await fs.writeFile(path.join(main, 'a.txt'), 'hi\n');
-      await execFileAsync('git', ['add', '.'], { cwd: main });
-      await execFileAsync('git', ['commit', '-q', '-m', 'init'], { cwd: main });
-
       const wtPath = path.join(main, 'wt');
-      await execFileAsync(
-        'git',
-        ['worktree', 'add', '-q', wtPath, '-b', 'side'],
-        { cwd: main },
-      );
+      const gitDir = path.join(main, '.git', 'worktrees', 'wt');
+      await fs.mkdir(gitDir, { recursive: true });
+      await fs.mkdir(wtPath, { recursive: true });
+      await fs.writeFile(path.join(wtPath, '.git'), `gitdir: ${gitDir}\n`);
+      await fs.writeFile(path.join(gitDir, 'HEAD'), 'ref: refs/heads/side\n');
 
       const resolved = await resolveGitDir(wtPath);
       expect(resolved).not.toBeNull();
-      // Git writes the linked-worktree pointer with forward slashes even on
-      // Windows (`gitdir: C:/.../main/.git/worktrees/wt`), and we surface
-      // that string verbatim. Match either separator so the assertion is
-      // platform-independent.
       expect(resolved).toMatch(/[/\\]\.git[/\\]worktrees[/\\]/);
 
       // Fake a merge-in-progress inside the linked worktree's gitdir and
