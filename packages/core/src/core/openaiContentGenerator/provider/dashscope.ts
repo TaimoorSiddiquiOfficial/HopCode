@@ -41,19 +41,24 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
       ? baseUrl.slice(0, -1)
       : baseUrl;
 
-    // Matches: dashscope.aliyuncs.com, *.dashscope.aliyuncs.com, or *.dashscope-intl.aliyuncs.com
-    let isDashscopeOrigin: boolean;
+    // Parse the URL and check hostname instead of regex to avoid ReDoS on
+    // attacker-controlled baseUrl and to reject path-only matches like
+    // https://evil.example/dashscope.aliyuncs.com/...
+    let hostname: string | null = null;
     try {
-      const hostname = new URL(baseUrl).hostname;
-      isDashscopeOrigin = /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(
-        hostname,
-      );
+      hostname = new URL(normalizedBaseUrl).hostname.toLowerCase();
     } catch {
-      // If baseUrl is not a valid URL (e.g., just a hostname), test directly
-      isDashscopeOrigin = /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(
-        baseUrl,
-      );
+      hostname = null;
     }
+
+    // Matches: dashscope.aliyuncs.com, *.dashscope.aliyuncs.com,
+    // dashscope-intl.aliyuncs.com, or *.dashscope-intl.aliyuncs.com
+    const isDashscopeOrigin =
+      hostname !== null &&
+      (hostname === 'dashscope.aliyuncs.com' ||
+        hostname === 'dashscope-intl.aliyuncs.com' ||
+        hostname.endsWith('.dashscope.aliyuncs.com') ||
+        hostname.endsWith('.dashscope-intl.aliyuncs.com'));
 
     // Check if proxy is configured and matches
     const normalizedProxyUrl = DASHSCOPE_PROXY_BASE_URL?.endsWith('/')
