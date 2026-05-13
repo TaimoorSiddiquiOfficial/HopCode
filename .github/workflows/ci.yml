@@ -170,7 +170,6 @@ jobs:
       pull-requests: 'write'
     env:
       NODE_OPTIONS: '--max-old-space-size=8192'
-      NPM_CONFIG_CACHE: '${{ runner.temp }}/npm-cache'
     strategy:
       fail-fast: false # So we can see all test failures
       matrix:
@@ -204,6 +203,8 @@ jobs:
           npm config set fetch-timeout 300000
 
       - name: 'Install dependencies'
+        env:
+          NPM_CONFIG_CACHE: '${{ runner.temp }}/npm-cache'
         run: |-
           npm ci --prefer-offline --no-audit --progress=false
 
