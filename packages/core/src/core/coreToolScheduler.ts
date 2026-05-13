@@ -650,6 +650,15 @@ interface CoreToolSchedulerOptions {
    * Optional recording service. If provided, tool results will be recorded.
    */
   chatRecordingService?: ChatRecordingService;
+  /**
+   * Optional shared IznGateHandler. When provided, it persists across
+   * {@link CoreToolScheduler} instances within the same turn so that the
+   * retry-after-verification path (hash-based bypass) works when the model
+   * re-issues a destructive command after self-verification and user
+   * confirmation. When omitted, a new handler is created (suitable for
+   * one-shot tool execution outside the agent reasoning loop).
+   */
+  iznGateHandler?: IznGateHandler;
 }
 
 // ─── Tool Concurrency Helpers ────────────────────────────────
@@ -734,7 +743,7 @@ export class CoreToolScheduler {
     this.getPreferredEditor = options.getPreferredEditor;
     this.onEditorClose = options.onEditorClose;
     this.chatRecordingService = options.chatRecordingService;
-    this.iznGateHandler = new IznGateHandler();
+    this.iznGateHandler = options.iznGateHandler ?? new IznGateHandler();
   }
 
   private setStatusInternal(
@@ -1100,8 +1109,6 @@ export class CoreToolScheduler {
     signal: AbortSignal,
   ): Promise<void> {
     this.isScheduling = true;
-    this.iznGateHandler.clearBlockHistory();
-    this.iznGateHandler.clearVerifiedHashes();
     try {
       if (this.isRunning()) {
         throw new Error(
