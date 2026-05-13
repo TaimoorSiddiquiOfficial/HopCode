@@ -9,7 +9,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test } from 'vitest';
 import {
   fetchGitDiff,
   fetchGitDiffHunks,
@@ -1163,52 +1163,59 @@ describe('fetchGitDiff deletion detection', () => {
 });
 
 describe('fetchGitDiff special filetypes among untracked files', () => {
-  it('marks untracked symlinks as binary and never follows them', async () => {
-    // Reproduces wenshao Critical (PR #3491 line 455): without an lstat
-    // gate, `open()` would dereference an untracked symlink and read its
-    // target — which can live outside the worktree.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-lnk-'));
-    try {
-      await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
-      await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
-        cwd: repo,
-      });
-      await execFileAsync('git', ['config', 'user.name', 'T'], { cwd: repo });
-      await execFileAsync('git', ['config', 'commit.gpgsign', 'false'], {
-        cwd: repo,
-      });
-      await fs.writeFile(path.join(repo, 'seed.txt'), 'x\n');
-      await execFileAsync('git', ['add', '.'], { cwd: repo });
-      await execFileAsync('git', ['commit', '-q', '-m', 'init'], { cwd: repo });
-
-      // Create an outside-worktree target with content that, if followed,
-      // would push linesAdded up. The lstat gate means we never read it.
-      const outside = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-outside-'));
+  test.skipIf(process.platform === 'win32')(
+    'marks untracked symlinks as binary and never follows them',
+    async () => {
+      // Reproduces wenshao Critical (PR #3491 line 455): without an lstat
+      // gate, `open()` would dereference an untracked symlink and read its
+      // target — which can live outside the worktree.
+      const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-lnk-'));
       try {
-        await fs.writeFile(
-          path.join(outside, 'secret.txt'),
-          'one\ntwo\nthree\n',
-        );
-        await fs.symlink(
-          path.join(outside, 'secret.txt'),
-          path.join(repo, 'link.txt'),
-        );
+        await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
+        await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
+          cwd: repo,
+        });
+        await execFileAsync('git', ['config', 'user.name', 'T'], { cwd: repo });
+        await execFileAsync('git', ['config', 'commit.gpgsign', 'false'], {
+          cwd: repo,
+        });
+        await fs.writeFile(path.join(repo, 'seed.txt'), 'x\n');
+        await execFileAsync('git', ['add', '.'], { cwd: repo });
+        await execFileAsync('git', ['commit', '-q', '-m', 'init'], {
+          cwd: repo,
+        });
 
-        const result = await fetchGitDiff(repo);
-        expect(result).not.toBeNull();
-        const entry = result!.perFileStats.get('link.txt');
-        expect(entry).toBeDefined();
-        expect(entry?.isBinary).toBe(true);
-        expect(entry?.isUntracked).toBe(true);
-        // No content from the symlink target leaked into the totals.
-        expect(result!.stats.linesAdded).toBe(0);
+        // Create an outside-worktree target with content that, if followed,
+        // would push linesAdded up. The lstat gate means we never read it.
+        const outside = await fs.mkdtemp(
+          path.join(os.tmpdir(), 'hop-outside-'),
+        );
+        try {
+          await fs.writeFile(
+            path.join(outside, 'secret.txt'),
+            'one\ntwo\nthree\n',
+          );
+          await fs.symlink(
+            path.join(outside, 'secret.txt'),
+            path.join(repo, 'link.txt'),
+          );
+
+          const result = await fetchGitDiff(repo);
+          expect(result).not.toBeNull();
+          const entry = result!.perFileStats.get('link.txt');
+          expect(entry).toBeDefined();
+          expect(entry?.isBinary).toBe(true);
+          expect(entry?.isUntracked).toBe(true);
+          // No content from the symlink target leaked into the totals.
+          expect(result!.stats.linesAdded).toBe(0);
+        } finally {
+          await fs.rm(outside, { recursive: true, force: true });
+        }
       } finally {
-        await fs.rm(outside, { recursive: true, force: true });
+        await fs.rm(repo, { recursive: true, force: true });
       }
-    } finally {
-      await fs.rm(repo, { recursive: true, force: true });
-    }
-  });
+    },
+  );
 });
 
 describe('fetchGitDiff untracked counting', () => {

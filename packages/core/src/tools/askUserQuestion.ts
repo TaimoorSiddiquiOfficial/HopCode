@@ -281,7 +281,7 @@ export class AskUserQuestionTool extends BaseDeclarativeTool<
       >,
       true, // isOutputMarkdown
       false, // canUpdateOutput
-      true, // shouldDefer — rarely needed; loaded on demand via ToolSearch
+      false, // shouldDefer
       false, // alwaysLoad
       'ask question user input clarify choose',
     );

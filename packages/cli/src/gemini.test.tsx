@@ -571,6 +571,7 @@ describe('gemini.tsx main function kitty protocol', () => {
       getModelsConfig: () => ({ getCurrentAuthType: () => null }),
       getUsageStatisticsEnabled: () => true,
       getSessionId: () => 'test-session-id',
+      getJsonSchema: () => undefined,
     } as unknown as Config);
     vi.mocked(loadSettings).mockReturnValue({
       errors: [],
@@ -687,6 +688,7 @@ describe('gemini.tsx main function kitty protocol', () => {
       getProxy: () => undefined,
       getUsageStatisticsEnabled: () => true,
       getSessionId: () => 'test-session-id',
+      getJsonSchema: () => undefined,
     } as unknown as Config);
     vi.mocked(loadSettings).mockReturnValue({
       errors: [],

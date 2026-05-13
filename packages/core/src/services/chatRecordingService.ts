@@ -40,6 +40,13 @@ const AUTO_TITLE_ATTEMPT_CAP = 3;
 const SESSION_FILE_DIFF_AGGREGATE_CHAR_LIMIT = 100_000;
 const SESSION_FILE_DIFF_CHAR_LIMIT = 50_000;
 const SESSION_FILE_CONTENT_CHAR_LIMIT = 16_000;
+/**
+ * Re-append the custom_title record to EOF once this many UTF-8 bytes of
+ * non-title content have accumulated since the last title write. Keeps the
+ * title within the 64 KB tail window that SessionPicker scans for session
+ * metadata, even in long-running sessions with large tool outputs.
+ */
+const TITLE_REANCHOR_THRESHOLD_BYTES = 32 * 1024;
 
 function isFileDiffDisplay(resultDisplay: unknown): resultDisplay is FileDiff {
   if (
@@ -507,6 +514,16 @@ export class ChatRecordingService {
    */
   private lastAttributionSnapshotJson: string | undefined;
 
+  /**
+   * UTF-8 bytes written to the JSONL since the last `custom_title` record.
+   * Resets to zero whenever a title record is appended (whether by
+   * `recordCustomTitle`, `finalize`, or the re-anchor path). When this
+   * exceeds {@link TITLE_REANCHOR_THRESHOLD_BYTES} and a title is set,
+   * `afterWrite` inserts a sidecar re-anchor record without touching the
+   * active parent chain.
+   */
+  private bytesSinceLastTitle = 0;
+
   constructor(config: Config) {
     this.config = config;
     this.lastRecordUuid =
@@ -704,6 +721,57 @@ export class ChatRecordingService {
   }
 
   /**
+   * Accumulates bytes written and, when the re-anchor threshold is crossed,
+   * inserts a sidecar `custom_title` record at EOF without disturbing the
+   * active parent UUID chain.
+   *
+   * The re-anchor keeps the title within the 64 KB tail window that
+   * SessionPicker scans, preventing it from being scrolled off during a
+   * long session. The byte counter is always reset (even on failure) to
+   * prevent a retry storm if the append fails.
+   *
+   * @param record The record that was just appended — used for byte counting.
+   */
+  private afterWrite(record: ChatRecord): void {
+    this.bytesSinceLastTitle += Buffer.byteLength(
+      JSON.stringify(record),
+      'utf8',
+    );
+    if (
+      !this.currentCustomTitle ||
+      this.bytesSinceLastTitle < TITLE_REANCHOR_THRESHOLD_BYTES
+    ) {
+      return;
+    }
+    // Reset BEFORE attempting the write to bound retry attempts when the
+    // underlying append fails (disk full, permissions, etc.).
+    this.bytesSinceLastTitle = 0;
+    // Save the current parent pointer — the re-anchor is a sidecar write
+    // that must NOT become the parent of subsequent records.
+    const savedUuid = this.lastRecordUuid;
+    try {
+      const reanchorRecord: ChatRecord = {
+        ...this.createBaseRecord('system'),
+        type: 'system',
+        subtype: 'custom_title',
+        systemPayload: {
+          customTitle: this.currentCustomTitle,
+          ...(this.currentTitleSource !== undefined
+            ? { titleSource: this.currentTitleSource }
+            : {}),
+        },
+      };
+      this.appendRecord(reanchorRecord);
+    } catch (error) {
+      debugLogger.error('Error re-anchoring title:', error);
+    } finally {
+      // Restore the active parent so the next real record chains from
+      // the triggering record, not from the re-anchor.
+      this.lastRecordUuid = savedUuid;
+    }
+  }
+
+  /**
    * Records a user message.
    * Writes immediately to disk.
    *
@@ -717,6 +785,7 @@ export class ChatRecordingService {
         message: createUserContent(message),
       };
       this.appendRecord(record);
+      this.afterWrite(record);
     } catch (error) {
       debugLogger.error('Error saving user message:', error);
     }
@@ -795,6 +864,7 @@ export class ChatRecordingService {
       }
 
       this.appendRecord(record);
+      this.afterWrite(record);
       this.maybeTriggerAutoTitle();
     } catch (error) {
       debugLogger.error('Error saving assistant turn:', error);
@@ -929,6 +999,7 @@ export class ChatRecordingService {
       }
 
       this.appendRecord(record);
+      this.afterWrite(record);
     } catch (error) {
       debugLogger.error('Error saving tool result:', error);
     }
@@ -1087,6 +1158,7 @@ export class ChatRecordingService {
       this.appendRecord(record);
       this.currentCustomTitle = customTitle;
       this.currentTitleSource = titleSource;
+      this.bytesSinceLastTitle = 0;
       return true;
     } catch (error) {
       debugLogger.error('Error saving custom title record:', error);
@@ -1133,6 +1205,7 @@ export class ChatRecordingService {
         },
       };
       this.appendRecord(record);
+      this.bytesSinceLastTitle = 0;
     } catch (error) {
       debugLogger.error('Error finalizing session metadata:', error);
     }

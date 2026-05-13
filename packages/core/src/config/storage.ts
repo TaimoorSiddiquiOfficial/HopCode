@@ -282,6 +282,10 @@ export class Storage {
    * tools can discover which session a PID is serving.
    */
   getRuntimeStatusPath(sessionId: string): string {
-    return path.join(this.getProjectDir(), 'runtime', `${sessionId}.json`);
+    return path.join(
+      this.getProjectDir(),
+      'chats',
+      `${sessionId}.runtime.json`,
+    );
   }
 }

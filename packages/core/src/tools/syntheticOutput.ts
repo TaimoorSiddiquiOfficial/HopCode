@@ -76,5 +76,5 @@ class SyntheticOutputInvocation extends BaseToolInvocation<
  * `core/geminiChat.ts` (on-disk JSONL) so neither side can silently drift.
  */
 export const STRUCTURED_OUTPUT_REDACTED_ARGS: Record<string, string> = {
-  _redacted: 'structured-output-args-redacted-for-privacy',
+  __redacted: 'structured_output payload (see stdout result)',
 };

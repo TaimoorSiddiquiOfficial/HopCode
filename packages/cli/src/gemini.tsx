@@ -575,6 +575,18 @@ export async function main() {
     );
     profileCheckpoint('after_load_cli_config');
 
+    // --json-schema is headless-only: the synthetic structured_output tool only
+    // terminates the run inside runNonInteractive. In TUI mode it's an inert
+    // tool that prints "accepted" and leaves the chat alive — silently stranding
+    // the run. Reject early so users get a clear error instead of a hung TUI.
+    if (config.isInteractive() && config.getJsonSchema()) {
+      writeStderrLine(
+        '--json-schema is a headless-only flag; pass a prompt via -p to use structured output.',
+      );
+      await runExitCleanup();
+      process.exit(1);
+    }
+
     // Register cleanup for MCP clients as early as possible
     // This ensures MCP server subprocesses are properly terminated on exit
     registerCleanup(() => config.shutdown());

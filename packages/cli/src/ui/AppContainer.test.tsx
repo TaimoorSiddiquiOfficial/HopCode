@@ -1955,11 +1955,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         pendingToolCalls: [executingShell],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       render(
@@ -2009,11 +2014,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         pendingToolCalls: [],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       render(
@@ -2068,11 +2078,16 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         pendingToolCalls: [executingNonShell],
         thought: null,
         cancelOngoingRequest: vi.fn(),
         retryLastPrompt: vi.fn(),
+        handleApprovalModeChange: vi.fn(),
+        activePtyId: undefined,
+        loopDetectionConfirmationRequest: null,
+        streamingResponseLengthRef: { current: 0 },
+        isReceivingContent: false,
       });
 
       render(
