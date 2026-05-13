@@ -428,12 +428,13 @@ and adjust it to the context length configured on your local server.
 
 ## Usage
 
-As an open-source terminal agent, you can use HopCode in four primary ways:
+As an open-source terminal agent, you can use HopCode in five primary ways:
 
 1. Interactive mode (terminal UI)
 2. Headless mode (scripts, CI)
 3. IDE integration (VS Code, Zed)
 4. SDKs (TypeScript, Python, Java)
+5. Daemon mode — `hopcode serve` exposes ACP over HTTP+SSE so multiple clients share one agent (experimental)
 
 #### Interactive mode
 
@@ -460,6 +461,20 @@ Use HopCode inside your editor (VS Code, Zed, and JetBrains IDEs):
 - [Use in VS Code](https://hopcode.dev/hopcode-docs/en/users/integration-vscode/)
 - [Use in Zed](https://hopcode.dev/hopcode-docs/en/users/integration-zed/)
 - [Use in JetBrains IDEs](https://hopcode.dev/hopcode-docs/en/users/integration-jetbrains/)
+
+#### Daemon mode (`hopcode serve`, experimental)
+
+```bash
+cd your-project/
+hopcode serve
+# → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge)
+```
+
+Run HopCode as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custom CLIs all share **one** agent session over HTTP+SSE — instead of each spawning their own subprocess. Loopback bind has no auth by default (set `HOPCODE_SERVER_TOKEN` to enable bearer auth even on loopback); remote binds (`--hostname 0.0.0.0`) **require** a token — boot refuses without one. See:
+
+- [Daemon mode user guide](https://hopcode.dev/hopcode-docs/en/users/hopcode-serve)
+- [HTTP protocol reference](https://hopcode.dev/hopcode-docs/en/developers/hopcode-serve-protocol)
+- [DaemonClient TypeScript quickstart](https://hopcode.dev/hopcode-docs/en/developers/examples/daemon-client-quickstart)
 
 #### SDKs
 

@@ -13,7 +13,8 @@
   'integration-vscode': 'Visual Studio Code',
   'integration-zed': 'Zed IDE',
   'integration-jetbrains': 'JetBrains IDEs',
-  'integration-github-action': 'Github Actions',
+  'integration-github-action': 'GitHub Actions',
+  'hopcode-serve': 'Daemon mode (hopcode serve)',
   'Code with HopCode': {
     type: 'separator',
     title: 'Code with HopCode', // Title is optional

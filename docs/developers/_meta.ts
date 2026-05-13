@@ -20,6 +20,7 @@ export default {
 
   'channel-plugins': 'Channel Plugin Guide',
   tools: 'Tools',
+  'hopcode-serve-protocol': 'hopcode serve HTTP protocol',
 
   examples: {
     display: 'hidden',
