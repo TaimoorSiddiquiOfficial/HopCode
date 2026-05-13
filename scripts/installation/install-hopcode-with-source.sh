@@ -546,13 +546,14 @@ SHIM
 
     echo "SUCCESS: HopCode standalone archive installed successfully."
     echo "INFO: Installed to ${INSTALL_LIB_DIR}"
+    create_source_json
     return 0
 }
 
 # ── npm installation ───────────────────────────────────────────────────
 install_npm() {
-    require_node
-    require_npm
+    require_node || return 1
+    require_npm || return 1
 
     if command -v hopcode >/dev/null 2>&1; then
         local existing_version
@@ -703,8 +704,8 @@ main() {
 
             if [[ ${standalone_status} -eq 2 ]]; then
                 echo "WARNING: Falling back to npm installation."
-                install_npm
-                local npm_status=$?
+                local npm_status=0
+                install_npm || npm_status=$?
                 if [[ ${npm_status} -ne 0 ]]; then
                     echo "WARNING: Standalone archive was unavailable before npm fallback; npm fallback also failed." >&2
                     echo "WARNING: Retry with --method standalone to debug the standalone failure, or install Node.js 20+ and rerun --method npm." >&2
