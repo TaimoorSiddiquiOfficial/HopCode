@@ -52,8 +52,12 @@ jobs:
           ROOT=$(pwd)
           ROOT_PACKAGE='@hoptrendy/hopcode'
           PACKAGES_INPUT='${{ github.event.inputs.packages }}'
-          ALL_PACKAGES=$(npm query '.workspace' | jq -c --arg root "${ROOT}/" \
-            '[.[] | {name: .name, path: (.path | ltrimstr($root))}]')
+          # Fetch all workspace packages, excluding private ones (they cannot be published to npm)
+          ALL_PACKAGES_RAW=$(npm query '.workspace' | jq -c --arg root "${ROOT}/" \
+            '[.[] | {name: .name, path: (.path | ltrimstr($root)), private: (.private // false)}]')
+          # Log any private packages that are being excluded
+          echo "$ALL_PACKAGES_RAW" | jq -r '.[] | select(.private == true) | "⏭️ Skipping private package: \(.name)"'
+          ALL_PACKAGES=$(echo "$ALL_PACKAGES_RAW" | jq -c '[.[] | select(.private != true) | {name: .name, path: .path}]')
           if [[ "$PACKAGES_INPUT" == "all" ]]; then
             PACKAGES_JSON="${ALL_PACKAGES}"
             PUBLISH_ROOT='true'

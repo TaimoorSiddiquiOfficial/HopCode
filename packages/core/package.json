@@ -1,7 +1,6 @@
 {
   "name": "@hoptrendy/hopcode-core",
   "version": "0.27.7",
-  "private": true,
   "description": "HopCode Core",
   "repository": {
     "type": "git",
