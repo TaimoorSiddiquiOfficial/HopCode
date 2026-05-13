@@ -433,6 +433,7 @@ export const DialogManager = ({
   }
 
   if (uiState.isDeleteDialogOpen) {
+    const currentSessionId = config.getSessionId();
     return (
       <SessionPicker
         sessionService={config.getSessionService()}
@@ -440,6 +441,9 @@ export const DialogManager = ({
         onSelect={uiActions.handleDelete}
         onCancel={uiActions.closeDeleteDialog}
         title={t('Delete Session')}
+        enableMultiSelect
+        onConfirmMulti={uiActions.handleDeleteMany}
+        disabledIds={currentSessionId ? [currentSessionId] : undefined}
       />
     );
   }
