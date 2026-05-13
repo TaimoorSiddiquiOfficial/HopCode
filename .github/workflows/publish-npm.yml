@@ -247,6 +247,10 @@ jobs:
         shell: 'bash'
         run: 'npm run build'
 
+      - name: 'Install VSCE'
+        shell: 'bash'
+        run: 'npm install -g @vscode/vsce'
+
       - name: 'Package VS Code Extension (VSIX)'
         working-directory: 'packages/vscode-ide-companion'
         shell: 'bash'
