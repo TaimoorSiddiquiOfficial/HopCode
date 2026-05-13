@@ -16,10 +16,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hoptrendy/hopcode.git"
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
   "config": {
-    "sandboxImageUri": "ghcr.io/hoptrendy/hopcode:0.15.10"
+    "sandboxImageUri": "ghcr.io/taimoorSiddiquiofficial/hopcode:0.15.10"
   },
   "scripts": {
     "start": "cross-env node scripts/start.js",
