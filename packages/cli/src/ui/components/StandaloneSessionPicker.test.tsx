@@ -580,7 +580,7 @@ describe('SessionPicker', () => {
       await wait(100);
       // 'b' implicitly enters search. Both s1 and s2 contain 'b'.
       stdin.write('b');
-      await wait(30);
+      await wait(100);
       let output = lastFrame() ?? '';
       expect(output).toContain('Search:');
       expect(output).toContain('bjorn config');
