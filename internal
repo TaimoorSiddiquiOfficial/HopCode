@@ -1,9 +1,0 @@
-@hoptrendy/hopcode-cli = deps: 
-@hoptrendy/hopcode-core = deps: 
-@hoptrendy/quran-guidance = deps: 
-@hoptrendy/sdk = deps: 
-@hoptrendy/hopcode-server = deps: 
-hopcode-vscode-ide-companion = deps: 
-@hoptrendy/web-dashboard = deps: 
-@hoptrendy/web-templates = deps: 
-@hoptrendy/webui = deps: 

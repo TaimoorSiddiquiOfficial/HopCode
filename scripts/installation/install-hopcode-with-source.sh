@@ -75,7 +75,7 @@ METHOD="${METHOD:-detect}"
 validate_value() {
     local value="${1}"
     # Reject unsafe characters that could enable command injection or path traversal.
-    local unsafe=$'\n'"$'\r'"!%&<>|^"
+    local unsafe=$'\n\r!%&<>|^"`'
     local i char
     for (( i=0; i<${#value}; i++ )); do
         char="${value:${i}:1}"
@@ -221,16 +221,78 @@ url_exists() {
 
 download_file() {
     local url="${1}"
-    local dest="${2}"
+    local destination="${2}"
 
     if command -v curl >/dev/null 2>&1; then
-        curl -fsSL -o "${dest}" "${url}"
+        curl -fsSL -o "${destination}" "${url}"
     elif command -v wget >/dev/null 2>&1; then
-        wget -q -O "${dest}" "${url}"
+        wget -q --tries=3 "${url}" -O "${destination}"
     else
         echo "ERROR: curl or wget is required for downloads." >&2
         return 1
     fi
+}
+
+shell_quote() {
+    printf '%q' "${1}"
+}
+
+validate_archive_entry() {
+    local entry="${1}"
+    case "${entry}" in
+        ''|/*|..|../*|*/..|*/../*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+validate_archive_contents() {
+    local archive_path="${1}"
+    local entries
+
+    case "${archive_path}" in
+        *.tar.gz|*.tgz)
+            entries="$(tar -tzf "${archive_path}")" || return 1
+            ;;
+        *.tar.xz|*.txz)
+            entries="$(tar -tJf "${archive_path}")" || return 1
+            ;;
+        *.zip)
+            entries="$(unzip -Z1 "${archive_path}")" || return 1
+            ;;
+        *)
+            echo "ERROR: Unsupported standalone archive format." >&2
+            return 1
+            ;;
+    esac
+
+    local entry
+    while IFS= read -r entry; do
+        if ! validate_archive_entry "${entry}"; then
+            echo "ERROR: Archive contains unsafe path: ${entry}" >&2
+            return 1
+        fi
+    done <<< "${entries}"
+}
+
+extract_archive() {
+    local archive_path="${1}"
+    local destination="${2}"
+
+    case "${archive_path}" in
+        *.tar.gz|*.tgz)
+            tar -xzf "${archive_path}" -C "${destination}" || return 1
+            ;;
+        *.tar.xz|*.txz)
+            tar -xJf "${archive_path}" -C "${destination}" || return 1
+            ;;
+        *.zip)
+            unzip -q "${archive_path}" -d "${destination}" || return 1
+            ;;
+        *)
+            echo "ERROR: Unsupported standalone archive format." >&2
+            return 1
+            ;;
+    esac
 }
 
 sha256_of() {
@@ -399,7 +461,11 @@ install_standalone() {
     # Extract into a temporary directory, then validate required entry points.
     local extract_dir="${temp_dir}/extract"
     mkdir -p "${extract_dir}"
-    tar -xzf "${ARCHIVE_FILE}" -C "${extract_dir}" || {
+    validate_archive_contents "${ARCHIVE_FILE}" || {
+        rm -rf "${temp_dir}"
+        return 1
+    }
+    extract_archive "${ARCHIVE_FILE}" "${extract_dir}" || {
         rm -rf "${temp_dir}"
         echo "ERROR: Failed to extract standalone archive." >&2
         return 1
@@ -458,9 +524,11 @@ install_standalone() {
 
     # Write a portable shim that delegates to the real binary.
     local shim_path="${INSTALL_BIN_DIR}/hopcode"
+    local quoted_hopcode_bin
+    quoted_hopcode_bin="$(shell_quote "${INSTALL_LIB_DIR}/bin/hopcode")"
     cat > "${shim_path}.new" <<SHIM
 #!/usr/bin/env bash
-exec "${INSTALL_LIB_DIR}/bin/hopcode" "\$@"
+exec ${quoted_hopcode_bin} "\$@"
 SHIM
     chmod +x "${shim_path}.new"
     mv "${shim_path}.new" "${shim_path}" || {
@@ -610,24 +678,24 @@ print_final_instructions() {
 main() {
     case "${METHOD}" in
         standalone)
-            install_standalone
-            local status=$?
+            local status=0
+            install_standalone || status=$?
             if [[ ${status} -eq 0 ]]; then
                 print_final_instructions "${INSTALL_BIN_DIR}"
             fi
             return ${status}
             ;;
         npm)
-            install_npm
-            local status=$?
+            local status=0
+            install_npm || status=$?
             if [[ ${status} -eq 0 ]]; then
                 print_final_instructions ""
             fi
             return ${status}
             ;;
         detect)
-            install_standalone
-            local standalone_status=$?
+            local standalone_status=0
+            install_standalone || standalone_status=$?
             if [[ ${standalone_status} -eq 0 ]]; then
                 print_final_instructions "${INSTALL_BIN_DIR}"
                 return 0

@@ -568,7 +568,7 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
-        authType: AuthType.hopcode_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         model: 'coder-model',
         apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
         baseUrl: DEFAULT_DASHSCOPE_BASE_URL,
@@ -594,12 +594,12 @@ describe('Server Config (config.ts)', () => {
       } as unknown as ContentGenerator);
 
       // Establish initial hopcode-oauth content generator config/content generator.
-      await config.refreshAuth(AuthType.hopcode_OAUTH);
+      await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
       // Spy after initial refresh to ensure model switch does not re-trigger refreshAuth.
       const refreshSpy = vi.spyOn(config, 'refreshAuth');
 
-      await config.switchModel(AuthType.hopcode_OAUTH, 'coder-model');
+      await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
 
       expect(config.getModel()).toBe('coder-model');
       expect(refreshSpy).not.toHaveBeenCalled();
@@ -614,7 +614,7 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
-        authType: AuthType.hopcode_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         model: 'coder-model',
         apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
         baseUrl: DEFAULT_DASHSCOPE_BASE_URL,
@@ -639,16 +639,16 @@ describe('Server Config (config.ts)', () => {
         embedContent: vi.fn(),
       } as unknown as ContentGenerator);
 
-      await config.refreshAuth(AuthType.hopcode_OAUTH);
+      await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
-      await config.switchModel(AuthType.hopcode_OAUTH, 'coder-model');
+      await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
     });
 
     it('should notify model change listeners after switchModel', async () => {
       const config = new Config(baseParams);
 
       const mockContentConfig: ContentGeneratorConfig = {
-        authType: AuthType.hopcode_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         model: 'coder-model',
         apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN',
         baseUrl: DEFAULT_DASHSCOPE_BASE_URL,
@@ -673,12 +673,12 @@ describe('Server Config (config.ts)', () => {
         embedContent: vi.fn(),
       } as unknown as ContentGenerator);
 
-      await config.refreshAuth(AuthType.hopcode_OAUTH);
+      await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
       const listener = vi.fn();
       const unsubscribe = config.onModelChange(listener);
 
-      await config.switchModel(AuthType.hopcode_OAUTH, 'coder-model');
+      await config.switchModel(AuthType.HOPCODE_OAUTH, 'coder-model');
 
       expect(listener).toHaveBeenCalledWith('coder-model');
 
@@ -1637,7 +1637,7 @@ describe('setApprovalMode with folder trust', () => {
   it('should throw an error when setting YOLO mode in an untrusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
-    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).toThrow(
+    expect(() => config.setApprovalMode(ApprovalMode.IZN)).toThrow(
       'Cannot enable privileged approval modes in an untrusted folder.',
     );
   });
@@ -1670,7 +1670,7 @@ describe('setApprovalMode with folder trust', () => {
   it('should NOT throw an error when setting any mode in a trusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).not.toThrow();
+    expect(() => config.setApprovalMode(ApprovalMode.IZN)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.DEFAULT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.PLAN)).not.toThrow();
@@ -1679,7 +1679,7 @@ describe('setApprovalMode with folder trust', () => {
   it('should NOT throw an error when setting any mode if trustedFolder is undefined', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true); // isTrustedFolder defaults to true
-    expect(() => config.setApprovalMode(ApprovalMode.YOLO)).not.toThrow();
+    expect(() => config.setApprovalMode(ApprovalMode.IZN)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.DEFAULT)).not.toThrow();
     expect(() => config.setApprovalMode(ApprovalMode.PLAN)).not.toThrow();
@@ -1714,11 +1714,11 @@ describe('setApprovalMode with folder trust', () => {
       const config = new Config(baseParams);
       vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
 
-      config.setApprovalMode(ApprovalMode.YOLO);
+      config.setApprovalMode(ApprovalMode.IZN);
       config.setApprovalMode(ApprovalMode.PLAN);
       // Setting PLAN again should not overwrite prePlanMode
       config.setApprovalMode(ApprovalMode.PLAN);
-      expect(config.getPrePlanMode()).toBe(ApprovalMode.YOLO);
+      expect(config.getPrePlanMode()).toBe(ApprovalMode.IZN);
     });
   });
 
@@ -1973,7 +1973,7 @@ describe('Model Switching and Config Updates', () => {
     // Initialize with first model
     const initialConfig: ContentGeneratorConfig = {
       ['model']: 'qwen3-coder-plus',
-      ['authType']: AuthType.hopcode_OAUTH,
+      ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 1_000_000,
       ['samplingParams']: { temperature: 0.7 },
@@ -1988,7 +1988,7 @@ describe('Model Switching and Config Updates', () => {
       },
     });
 
-    await config.refreshAuth(AuthType.hopcode_OAUTH);
+    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
     // Verify initial config
     const contentGenConfig = config.getContentGeneratorConfig();
@@ -1998,7 +1998,7 @@ describe('Model Switching and Config Updates', () => {
     // Switch to a different model with different token limits
     const newConfig: ContentGeneratorConfig = {
       ['model']: 'qwen-max',
-      ['authType']: AuthType.hopcode_OAUTH,
+      ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,
       ['samplingParams']: { temperature: 0.8 },
@@ -2023,7 +2023,7 @@ describe('Model Switching and Config Updates', () => {
           requiresRefresh: boolean,
         ) => Promise<void>;
       }
-    ).handleModelChange(AuthType.hopcode_OAUTH, false);
+    ).handleModelChange(AuthType.HOPCODE_OAUTH, false);
 
     // Verify all fields are updated
     const updatedConfig = config.getContentGeneratorConfig();
@@ -2048,7 +2048,7 @@ describe('Model Switching and Config Updates', () => {
     // Initialize with hopcode-oauth
     const initialConfig: ContentGeneratorConfig = {
       ['model']: 'qwen3-coder-plus',
-      ['authType']: AuthType.hopcode_OAUTH,
+      ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 1_000_000,
     };
@@ -2058,7 +2058,7 @@ describe('Model Switching and Config Updates', () => {
       sources: {},
     });
 
-    await config.refreshAuth(AuthType.hopcode_OAUTH);
+    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
     // Switch to different auth type (should trigger full refresh)
     const newConfig: ContentGeneratorConfig = {
@@ -2100,7 +2100,7 @@ describe('Model Switching and Config Updates', () => {
     // Initialize with config that has undefined token limits
     const initialConfig: ContentGeneratorConfig = {
       ['model']: 'qwen3-coder-plus',
-      ['authType']: AuthType.hopcode_OAUTH,
+      ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: undefined,
     };
@@ -2110,12 +2110,12 @@ describe('Model Switching and Config Updates', () => {
       sources: {},
     });
 
-    await config.refreshAuth(AuthType.hopcode_OAUTH);
+    await config.refreshAuth(AuthType.HOPCODE_OAUTH);
 
     // Switch to model with defined limits
     const newConfig: ContentGeneratorConfig = {
       ['model']: 'qwen-max',
-      ['authType']: AuthType.hopcode_OAUTH,
+      ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,
     };
@@ -2132,7 +2132,7 @@ describe('Model Switching and Config Updates', () => {
           requiresRefresh: boolean,
         ) => Promise<void>;
       }
-    ).handleModelChange(AuthType.hopcode_OAUTH, false);
+    ).handleModelChange(AuthType.HOPCODE_OAUTH, false);
 
     // Verify limits are now defined
     const updatedConfig = config.getContentGeneratorConfig();
@@ -2199,7 +2199,7 @@ describe('Model Switching and Config Updates', () => {
       } as unknown as ContentGenerator;
       const parentGeneratorConfig: ContentGeneratorConfig = {
         model: 'parent-model',
-        authType: AuthType.hopcode_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         apiKey: 'parent-key',
       };
       setInstanceFields(config, parentGenerator, parentGeneratorConfig);
@@ -2217,7 +2217,7 @@ describe('Model Switching and Config Updates', () => {
       expect(config.getContentGenerator()).toBe(parentGenerator);
       expect(config.getContentGeneratorConfig()).toBe(parentGeneratorConfig);
       expect(config.getModel()).toBe('parent-model');
-      expect(config.getAuthType()).toBe(AuthType.hopcode_OAUTH);
+      expect(config.getAuthType()).toBe(AuthType.HOPCODE_OAUTH);
 
       // Inside the frame, every getter resolves to the agent's view.
       await runWithRuntimeContentGenerator(
@@ -2248,7 +2248,7 @@ describe('Model Switching and Config Updates', () => {
         { generateContentStream: vi.fn() } as unknown as ContentGenerator,
         {
           model: 'parent-model',
-          authType: AuthType.hopcode_OAUTH,
+          authType: AuthType.HOPCODE_OAUTH,
         } as ContentGeneratorConfig,
       );
 

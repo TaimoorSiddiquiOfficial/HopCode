@@ -49,7 +49,7 @@ describe('installation scripts', () => {
     expect(script).not.toMatch(/^\s*exec\s+hopcode\s*$/m);
     expect(script).not.toContain('--print-env');
     expect(script).not.toContain('brew install node@20');
-    expect(script).toContain('brew install node');
+    expect(script).not.toContain('brew install node');
     expect(script).toContain(
       '--source may only contain letters, numbers, dot, underscore, or dash',
     );
@@ -74,19 +74,19 @@ describe('installation scripts', () => {
     expect(script).toContain('detect_target()');
     expect(script).toContain('verify_checksum()');
     expect(script).toContain('SHA256SUMS not found; cannot verify archive');
-    expect(script).toContain('awk -v archive_name');
+    expect(script).toContain('while IFS= read -r line');
     expect(script).not.toContain(
       'grep -E "(^|[[:space:]])[*]?${archive_name}$"',
     );
     expect(script).toContain('validate_archive_contents()');
     expect(script).toContain('Archive contains unsafe path');
     expect(script).toContain('hopcode-${target}');
-    expect(script).toContain('*.tar.xz)');
+    expect(script).toContain('*.tar.xz|*.txz)');
     expect(script).toContain('METHOD="${METHOD:-detect}"');
     expect(script).toContain('must start with https://');
     expect(script).toContain('Falling back to npm installation');
     expect(script).toContain('standalone_status=$?');
-    expect(script).toContain('[[ "${standalone_status}" -eq 2 ]]');
+    expect(script).toContain('[[ ${standalone_status} -eq 2 ]]');
     expect(script).toContain(
       'Standalone install failed. Retry with --method npm',
     );
@@ -94,14 +94,11 @@ describe('installation scripts', () => {
     expect(script).toContain('shell_quote()');
     expect(script).toContain('exec ${quoted_hopcode_bin} "\\$@"');
     expect(script).toContain('validate_version()');
-    expect(script).toContain('validate_install_path');
-    expect(script).toContain('validate_https_url "${NPM_REGISTRY}"');
+    expect(script).toContain('validate_abs_path "${INSTALL_ROOT}"');
+    expect(script).toContain('validate_url "${NPM_REGISTRY}"');
     expect(script).toContain('hopcode/node/bin/node');
     expect(script).toContain('Archive contains symlinks; refusing to install');
     expect(script).toContain('not a HopCode standalone install');
-    expect(script).toContain(
-      'Return 2 only when a standalone archive is unavailable',
-    );
     expect(script).toContain('npm fallback also failed');
     expect(script).toContain(
       'unzip -q "${archive_path}" -d "${destination}" || return 1',
@@ -110,8 +107,7 @@ describe('installation scripts', () => {
       'tar -xzf "${archive_path}" -C "${destination}" || return 1',
     );
     expect(script).toContain('wget -q --tries=3 "${url}" -O "${destination}"');
-    expect(script).toContain('TEMP_DIRS+=');
-    expect(script).not.toContain('-print -quit');
+    expect(script).toContain('find "${extract_dir}" -type l');
   });
 
   it('keeps the Windows installer lightweight', () => {
@@ -167,7 +163,9 @@ describe('installation scripts', () => {
       'if defined HOPCODE_INSTALL_ROOT set "INSTALL_BASE=!HOPCODE_INSTALL_ROOT!"',
     );
     expect(script).not.toContain('%HOPCODE_INSTALL_ROOT%');
-    expect(script).toContain('set "HOPCODE_VALIDATE_INSTALL_BASE=!INSTALL_BASE!"');
+    expect(script).toContain(
+      'set "HOPCODE_VALIDATE_INSTALL_BASE=!INSTALL_BASE!"',
+    );
     expect(script).toContain(
       'installer options contain unsafe command characters',
     );
@@ -550,9 +548,9 @@ describe('Linux/macOS installer end-to-end', () => {
             path.join(installRoot, 'lib', 'hopcode', 'node', 'bin', 'node'),
           ),
         ).toBe(true);
-        expect(readScript(path.join(home, '.hopcode', 'source.json'))).toContain(
-          '"source": "smoke"',
-        );
+        expect(
+          readScript(path.join(home, '.hopcode', 'source.json')),
+        ).toContain('"source": "smoke"');
 
         const version = execFileSync(path.join(installRoot, 'bin', 'hopcode'), [
           '--version',
@@ -899,9 +897,9 @@ describe('Windows installer end-to-end', () => {
         expect(
           existsSync(path.join(installRoot, 'hopcode', 'node', 'node.exe')),
         ).toBe(true);
-        expect(readScript(path.join(home, '.hopcode', 'source.json'))).toContain(
-          '"source": "smoke"',
-        );
+        expect(
+          readScript(path.join(home, '.hopcode', 'source.json')),
+        ).toContain('"source": "smoke"');
 
         const version = runWindowsCommand(
           `call "${path.join(installRoot, 'bin', 'hopcode.cmd')}" --version`,

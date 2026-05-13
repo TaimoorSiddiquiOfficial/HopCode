@@ -2981,7 +2981,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',

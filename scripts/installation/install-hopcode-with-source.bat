@@ -422,7 +422,7 @@ if "!EXPECTED_HASH!"=="" (
 
 set "ACTUAL_HASH="
 set "HOPCODE_HASH_FILE=!ARCHIVE_FILE!"
-for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; (Get-FileHash -Algorithm SHA256 -LiteralPath $env:HOPCODE_HASH_FILE).Hash" 2^>nul') do (
+for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module $env:SystemRoot\system32\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Utility\Microsoft.PowerShell.Utility.psd1 -Force; $ErrorActionPreference = 'Stop'; $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $env:HOPCODE_HASH_FILE; Write-Output $hash.Hash" 2^>nul') do (
     if "!ACTUAL_HASH!"=="" set "ACTUAL_HASH=%%H"
 )
 set "HOPCODE_HASH_FILE="
