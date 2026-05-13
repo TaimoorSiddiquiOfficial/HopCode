@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -410,12 +410,12 @@ export function AuthDialog(): React.JSX.Element {
           <Box>
             <Link
               // TODO: Replace with HopCode docs when available
-              // Original: https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/
+              // Original: https://hopcode.dev/hopcode-docs/en/users/support/tos-privacy/
               url="https://github.com/TaimoorSiddiquiOfficial/HopCode"
               fallback={false}
             >
               <Text color={theme.text.secondary} underline>
-                {/* Original: https://qwenlm.github.io/qwen-code-docs/en/users/support/tos-privacy/ */}
+                {/* Original: https://hopcode.dev/hopcode-docs/en/users/support/tos-privacy/ */}
                 https://github.com/TaimoorSiddiquiOfficial/HopCode
               </Text>
             </Link>

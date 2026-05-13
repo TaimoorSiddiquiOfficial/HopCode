@@ -49,7 +49,7 @@ npm install -g @hoptrendy/hopcode-cli
 ```json
 "HopCode": {
   "type": "custom",
-  "command": "qwen",
+  "command": "hopcode",
   "args": ["--acp"],
   "env": {}
 }
@@ -61,7 +61,7 @@ npm install -g @hoptrendy/hopcode-cli
 
 ### Agent not appearing
 
-- Run `qwen --version` in terminal to verify installation
+- Run `hopcode --version` in terminal to verify installation
 - Check that the JSON configuration is valid
 - Restart Zed Editor
 

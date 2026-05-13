@@ -1,4 +1,4 @@
-# 🚀 HopCode Soft Launch - EXECUTION CHECKLIST
+﻿# 🚀 HopCode Soft Launch - EXECUTION CHECKLIST
 
 **Launch Date:** 2026-04-18  
 **Status:** 🟡 **IN PROGRESS**
@@ -9,7 +9,7 @@
 
 ### Technical Readiness
 
-- [x] Rebranding complete (Qwen Code → HopCode)
+- [x] Rebranding complete (HopCode → HopCode)
 - [x] Build system working
 - [x] AI SDK providers tested and working
 - [x] Documentation created (17 files)

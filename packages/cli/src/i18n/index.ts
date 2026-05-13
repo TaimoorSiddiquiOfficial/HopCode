@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2026 HopCode Team team
+ * Copyright 2025 HopCode team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,15 +8,24 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
-import * as os from 'node:os';
+import { Storage } from '@hoptrendy/hopcode-core';
 import {
   type SupportedLanguage,
   SUPPORTED_LANGUAGES,
   getLanguageNameFromLocale,
+  getLanguageNameForTranslationTarget,
+  resolveSupportedLanguage,
 } from './languages.js';
+import { MUST_TRANSLATE_KEYS } from './mustTranslateKeys.js';
 
 export type { SupportedLanguage };
-export { getLanguageNameFromLocale };
+export {
+  SUPPORTED_LANGUAGES,
+  MUST_TRANSLATE_KEYS,
+  getLanguageNameFromLocale,
+  getLanguageNameForTranslationTarget,
+  resolveSupportedLanguage,
+};
 
 // State
 let currentLanguage: SupportedLanguage = 'en';
@@ -34,7 +43,7 @@ const getBuiltinLocalesDir = (): string => {
 };
 
 const getUserLocalesDir = (): string =>
-  path.join(os.homedir(), '.hopcode', 'locales');
+  path.join(Storage.getGlobalHopCodeDir(), 'locales');
 
 /**
  * Get the path to the user's custom locales directory.
@@ -57,7 +66,7 @@ const getLocalePath = (
 export function detectSystemLanguage(): SupportedLanguage {
   const envLang = process.env['HOPCODE_LANG'] || process.env['LANG'];
   if (envLang) {
-    // Normalize POSIX locales (e.g. zh_TW.UTF-8 ? zh-tw) before matching
+    // Normalize POSIX locales (e.g. zh_TW.UTF-8 → zh-tw) before matching
     const normalized = envLang.replace(/_/g, '-').toLowerCase();
     for (const lang of SUPPORTED_LANGUAGES) {
       if (normalized.startsWith(lang.code.toLowerCase())) return lang.code;
@@ -161,6 +170,24 @@ async function loadTranslationsAsync(
       }
     }
 
+    // Final fallback: try the bundled relative import. This works even when
+    // the filesystem check fails (e.g., inside a bundled/compiled context
+    // where locale files are inlined rather than on disk).
+    try {
+      const module = await import(`./locales/${lang}.js`);
+      const result = module.default || module;
+      if (
+        result &&
+        typeof result === 'object' &&
+        Object.keys(result).length > 0
+      ) {
+        translationCache[lang] = result;
+        return result;
+      }
+    } catch {
+      // Bundled import not available either.
+    }
+
     // Return empty object if both directories fail
     // Cache it to avoid repeated failed attempts
     translationCache[lang] = {};
@@ -196,7 +223,9 @@ function interpolate(
 
 // Language setting helpers
 function resolveLanguage(lang: SupportedLanguage | 'auto'): SupportedLanguage {
-  return lang === 'auto' ? detectSystemLanguage() : lang;
+  if (lang === 'auto') return detectSystemLanguage();
+  const resolved = resolveSupportedLanguage(lang);
+  return resolved ?? lang;
 }
 
 // Public API

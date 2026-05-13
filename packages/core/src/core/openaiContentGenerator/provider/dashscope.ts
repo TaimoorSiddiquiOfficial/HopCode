@@ -7,6 +7,7 @@ import {
   DEFAULT_TIMEOUT,
   DEFAULT_MAX_RETRIES,
   DEFAULT_DASHSCOPE_BASE_URL,
+  DASHSCOPE_PROXY_BASE_URL,
 } from '../constants.js';
 import type {
   DashScopeRequestMetadata,
@@ -15,7 +16,10 @@ import type {
   ChatCompletionToolWithCache,
 } from './types.js';
 import { buildRuntimeFetchOptions } from '../../../utils/runtimeFetchOptions.js';
+import { createDebugLogger } from '../../../utils/debugLogger.js';
 import { DefaultOpenAICompatibleProvider } from './default.js';
+
+const debugLogger = createDebugLogger('DashScopeOpenAICompatibleProvider');
 
 export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatibleProvider {
   constructor(
@@ -33,14 +37,41 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
     if (authType === AuthType.HOPCODE_OAUTH) return true;
     if (!baseUrl) return true;
 
+    const normalizedBaseUrl = baseUrl.endsWith('/')
+      ? baseUrl.slice(0, -1)
+      : baseUrl;
+
     // Matches: dashscope.aliyuncs.com, *.dashscope.aliyuncs.com, or *.dashscope-intl.aliyuncs.com
+    let isDashscopeOrigin: boolean;
     try {
       const hostname = new URL(baseUrl).hostname;
-      return /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(hostname);
+      isDashscopeOrigin = /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(
+        hostname,
+      );
     } catch {
       // If baseUrl is not a valid URL (e.g., just a hostname), test directly
-      return /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(baseUrl);
+      isDashscopeOrigin = /^([\w-]+\.)?dashscope(-intl)?\.aliyuncs\.com$/i.test(
+        baseUrl,
+      );
     }
+
+    // Check if proxy is configured and matches
+    const normalizedProxyUrl = DASHSCOPE_PROXY_BASE_URL?.endsWith('/')
+      ? DASHSCOPE_PROXY_BASE_URL.slice(0, -1)
+      : DASHSCOPE_PROXY_BASE_URL;
+
+    const isProxyMatch = Boolean(
+      normalizedProxyUrl &&
+        normalizedBaseUrl.toLowerCase() === normalizedProxyUrl.toLowerCase(),
+    );
+
+    if (normalizedProxyUrl && !isDashscopeOrigin && !isProxyMatch) {
+      debugLogger.debug(
+        `DASHSCOPE_PROXY_BASE_URL is configured but the request baseUrl does not match. DashScope headers/cache control will be skipped.`,
+      );
+    }
+
+    return isDashscopeOrigin || isProxyMatch;
   }
 
   override buildHeaders(): Record<string, string | undefined> {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
@@ -31,6 +31,7 @@ import type {
 } from '../types/QualitativeInsightTypes.js';
 import {
   getInsightPrompt,
+  runSideQuery,
   type Config,
   type ChatRecord,
 } from '@hoptrendy/hopcode-core';
@@ -133,7 +134,7 @@ export class DataProcessor {
           type: 'object',
           additionalProperties: { type: 'number' },
         },
-        Qwen_helpfulness: {
+        HOPCODE_helpfulness: {
           type: 'string',
           enum: [
             'unhelpful',
@@ -183,7 +184,7 @@ export class DataProcessor {
         'goal_categories',
         'outcome',
         'user_satisfaction_counts',
-        'Qwen_helpfulness',
+        'HOPCODE_helpfulness',
         'session_type',
         'friction_counts',
         'friction_detail',
@@ -196,11 +197,15 @@ export class DataProcessor {
     const prompt = `${getInsightPrompt('analysis')}\n\nSESSION:\n${sessionText}`;
 
     try {
-      const result = await this.config.getBaseLlmClient().generateJson({
-        // Use the configured model
+      const result = await runSideQuery<Record<string, unknown>>(this.config, {
+        purpose: 'insight-session-analysis',
+        // Quality is the entire point — keep main model + reasoning on.
         model: this.config.getModel(),
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         schema: INSIGHT_SCHEMA,
+        config: {
+          thinkingConfig: { includeThoughts: true },
+        },
         abortSignal: AbortSignal.timeout(600000), // 10 minute timeout per session
       });
 
@@ -391,12 +396,19 @@ export class DataProcessor {
     ): Promise<T | undefined> => {
       const prompt = `${promptTemplate}\n\n${commonData}`;
       try {
-        const result = await this.config.getBaseLlmClient().generateJson({
-          model: this.config.getModel(),
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          schema,
-          abortSignal: AbortSignal.timeout(600000),
-        });
+        const result = await runSideQuery<Record<string, unknown>>(
+          this.config,
+          {
+            purpose: 'insight-qualitative-generate',
+            model: this.config.getModel(),
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            schema,
+            config: {
+              thinkingConfig: { includeThoughts: true },
+            },
+            abortSignal: AbortSignal.timeout(600000),
+          },
+        );
         return result as T;
       } catch (error) {
         logger.error('Failed to generate insight:', error);

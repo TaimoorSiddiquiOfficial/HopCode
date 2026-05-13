@@ -6,7 +6,7 @@ HopCode is an open-source AI coding assistant tool maintained by the HopCode tea
 
 HopCode supports three authentication methods to access AI models. Your authentication method determines which terms of service and privacy policies apply to your usage:
 
-1. **Qwen OAuth** — Log in with your qwen.ai account (free tier discontinued 2026-04-15)
+1. **HopCode OAuth** — Log in with your qwen.ai account (free tier discontinued 2026-04-15)
 2. **Alibaba Cloud Coding Plan** — Use an API key from Alibaba Cloud
 3. **API Key** — Bring your own API key
 
@@ -14,11 +14,11 @@ For each authentication method, different Terms of Service and Privacy Notices m
 
 | Authentication Method     | Provider          | Terms of Service                                                   | Privacy Notice                                                     |
 | :------------------------ | :---------------- | :----------------------------------------------------------------- | :----------------------------------------------------------------- |
-| Qwen OAuth                | Qwen AI           | [Qwen Terms of Service](https://qwen.ai/termsservice)              | [Qwen Privacy Policy](https://qwen.ai/privacypolicy)               |
+| HopCode OAuth             | HopCode           | [Qwen Terms of Service](https://qwen.ai/termsservice)              | [Qwen Privacy Policy](https://qwen.ai/privacypolicy)               |
 | Alibaba Cloud Coding Plan | Alibaba Cloud     | See [details below](#2-if-you-are-using-alibaba-cloud-coding-plan) | See [details below](#2-if-you-are-using-alibaba-cloud-coding-plan) |
 | API Key                   | Various Providers | Depends on your chosen API provider (OpenAI, Anthropic, etc.)      | Depends on your chosen API provider                                |
 
-## 1. If you are using Qwen OAuth Authentication
+## 1. If you are using HopCode OAuth Authentication
 
 When you authenticate using your qwen.ai account, these Terms of Service and Privacy Notice documents apply:
 
@@ -64,7 +64,7 @@ When enabled, HopCode may collect:
 
 ### Data Collection by Authentication Method
 
-- **Qwen OAuth:** Usage statistics are governed by Qwen's privacy policy. You can opt-out through HopCode's configuration settings.
+- **HopCode OAuth:** Usage statistics are governed by Qwen's privacy policy. You can opt-out through HopCode's configuration settings.
 - **Alibaba Cloud Coding Plan:** Usage statistics are governed by Alibaba Cloud's privacy policy. You can opt-out through HopCode's configuration settings.
 - **API Key:** No additional data is collected by HopCode beyond what your chosen API provider collects.
 
@@ -74,7 +74,7 @@ When enabled, HopCode may collect:
 
 Whether your code, including prompts and answers, is used to train AI models depends on your authentication method and the specific AI service provider you use:
 
-- **Qwen OAuth**: Data usage is governed by [Qwen's Privacy Policy](https://qwen.ai/privacy). Please refer to their policy for specific details about data collection and model training practices.
+- **HopCode OAuth**: Data usage is governed by [Qwen's Privacy Policy](https://qwen.ai/privacy). Please refer to their policy for specific details about data collection and model training practices.
 
 - **Alibaba Cloud Coding Plan**: Data usage is governed by Alibaba Cloud's privacy policy. Please refer to their policy for specific details about data collection and model training practices.
 
@@ -103,7 +103,7 @@ The Usage Statistics setting only controls data collection by HopCode itself. It
 
 ### 3. How do I switch between authentication methods?
 
-You can switch between Qwen OAuth, Alibaba Cloud Coding Plan, and your own API key at any time:
+You can switch between HopCode OAuth, Alibaba Cloud Coding Plan, and your own API key at any time:
 
 1. **During startup**: Choose your preferred authentication method when prompted
 2. **Within the CLI**: Use the `/auth` command to reconfigure your authentication method

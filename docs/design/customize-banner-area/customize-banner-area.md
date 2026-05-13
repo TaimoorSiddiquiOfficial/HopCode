@@ -1,4 +1,4 @@
-# Customize Banner Area Design
+﻿# Customize Banner Area Design
 
 > Allow users to replace the HOPCODE ASCII art, replace the brand title, and
 > hide the banner entirely — without letting them suppress the operational
@@ -26,7 +26,7 @@ top, not let them silence the information that makes a session
 debuggable. That stance drives every "what can change vs. what is locked"
 decision in the rest of this document.
 
-This is tracked by [issue #3005](https://github.com/QwenLM/qwen-code/issues/3005).
+This is tracked by [issue #3005](https://github.com/QwenLM/hopcode/issues/3005).
 
 ## Banner region taxonomy
 
@@ -194,7 +194,7 @@ auth/model line:
 ┌─────────────────────────────────────────────────────────┐
 │ DataWorks DataAgent (vX.Y.Z)                            │  ← B① title
 │ Built-in DataWorks Official Skills                      │  ← B② subtitle
-│ HopCode OAuth | qwen-coder ( /model to change)             │  ← B③ status
+│ HopCode OAuth | hopcoder ( /model to change)             │  ← B③ status
 │ ~/projects/example                                      │  ← B④ path
 └─────────────────────────────────────────────────────────┘
 ```
@@ -346,7 +346,7 @@ Where `banner-large.txt` contains the stacked-words ANSI Shadow output
 
 ### How to verify your change
 
-1. Save `settings.json` and start a fresh `qwen` session — banner
+1. Save `settings.json` and start a fresh `hopcode` session — banner
    resolution runs once at startup.
 2. Resize the terminal to confirm `small` / `large` tiers swap as
    expected, and that the logo column disappears at very narrow widths.
@@ -747,13 +747,13 @@ For the eventual implementation PR, the following end-to-end checks
 should pass.
 
 1. `~/.hopcode/settings.json` with `customBannerTitle: "Acme CLI"` and an
-   inline `customAsciiArt` string → `qwen` shows the new title and art;
+   inline `customAsciiArt` string → `hopcode` shows the new title and art;
    version suffix still present.
 2. `customBannerSubtitle: "Built-in Acme Skills"` → the subtitle row
    renders between the title and the auth/model line in the secondary
    text color; auth, model, and path still visible. Unsetting it
    restores the blank spacer row (back-compat).
-3. `hideBanner: true` → `qwen` starts with no banner; tips and chat
+3. `hideBanner: true` → `hopcode` starts with no banner; tips and chat
    render normally.
 4. `customAsciiArt: { "path": "./brand.txt" }` in a workspace
    `settings.json`, with `brand.txt` next to it in `.hopcode/` → loads

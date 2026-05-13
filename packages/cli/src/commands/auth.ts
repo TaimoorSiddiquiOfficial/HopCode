@@ -1,148 +1,66 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CommandModule, Argv } from 'yargs';
-import {
-  handleHopCodeAuth,
-  runInteractiveAuth,
-  showAuthStatus,
-  handleApiKeyAuthSetup,
-} from './auth/handler.js';
-import { PROVIDER_REGISTRY } from './auth/registry.js';
-import { handleApiKeyAuth, handleOllamaLocalAuth } from './auth/providers.js';
+import type { Argv, CommandModule } from 'yargs';
 import { t } from '../i18n/index.js';
 
-/**
- * Providers that have bespoke auth flows and their own explicitly defined
- * subcommands below. All other PROVIDER_REGISTRY providers get a generic
- * `hopcode auth <id> [--key <apikey>]` subcommand generated automatically.
- */
-const SPECIAL_AUTH_PROVIDERS = new Set([
+const shouldUseColor = () =>
+  Boolean(process.stdout.isTTY && !process.env['NO_COLOR']);
+
+const color = (value: string, code: string) =>
+  shouldUseColor() ? `\x1b[${code}m${value}\x1b[0m` : value;
+
+const cyan = (value: string) => color(value, '36');
+const yellow = (value: string) => color(value, '33');
+
+export const buildRemovalNotice = (): string =>
+  [
+    '',
+    yellow(t('⚠  hopcode auth has been removed.')),
+    '',
+    `  ${cyan(t('Interactive'))}   →  ${t('run hopcode and use /auth to configure providers')}`,
+    `  ${cyan(t('CI / Headless'))} →  ${t('set provider environment variables, for example OPENAI_API_KEY + OPENAI_BASE_URL + OPENAI_MODEL')}`,
+    `                     ${t('or pass --openai-api-key, --openai-base-url, --model')}`,
+    `  ${cyan(t('Coding Plan'))}   →  ${t('set BAILIAN_CODING_PLAN_API_KEY and use the Coding Plan base URL for your region')}`,
+    `                     ${t('China: https://coding.dashscope.aliyuncs.com/v1')}`,
+    `                     ${t('International: https://coding-intl.dashscope.aliyuncs.com/v1')}`,
+    `  ${cyan(t('OpenRouter'))}    →  ${t('set OPENROUTER_API_KEY and OPENAI_BASE_URL=https://openrouter.ai/api/v1')}`,
+    `  ${cyan(t('Qwen OAuth'))}    →  ${t('run hopcode interactively and use /auth; OAuth cannot be configured with env vars alone')}`,
+    `  ${cyan(t('Scripted'))}      →  ${t('edit ~/.hopcode/settings.json, or run hopcode interactively once')}`,
+    '',
+    `  ${t('Check auth status')} → ${cyan('/doctor')}`,
+    '',
+  ].join('\n');
+
+export const printRemovalNotice = () => {
+  process.stdout.write(buildRemovalNotice(), () => process.exit(0));
+};
+
+const legacySubcommands = [
+  'status',
   'coding-plan',
   'openrouter',
-  'ollama-local',
   'api-key',
-]);
-
-const ollamaLocalCommand = {
-  command: 'ollama-local',
-  describe: t('Configure local Ollama (runs at localhost:11434 by default)'),
-  builder: (yargs: Argv) =>
-    yargs.option('host', {
-      alias: 'H',
-      describe: t(
-        'Custom Ollama host (e.g. http://192.168.1.50:11434). Defaults to http://localhost:11434',
-      ),
-      type: 'string',
-    }),
-  handler: async (argv: { host?: string }) => {
-    await handleOllamaLocalAuth({ host: argv['host'] });
-  },
-};
-
-const codePlanCommand = {
-  command: 'coding-plan',
-  describe: t('Authenticate using Alibaba Cloud Coding Plan'),
-  builder: (yargs: Argv) =>
-    yargs
-      .option('base-url', {
-        alias: 'u',
-        describe: t('Base URL for Coding Plan'),
-        type: 'string',
-      })
-      .option('key', {
-        alias: 'k',
-        describe: t('API key for Coding Plan'),
-        type: 'string',
-      }),
-  handler: async (argv: { 'base-url'?: string; key?: string }) => {
-    const baseUrl = argv['base-url'];
-    const key = argv['key'] as string | undefined;
-
-    if (baseUrl && key) {
-      await handleHopCodeAuth('coding-plan', { baseUrl, key });
-    } else {
-      await handleHopCodeAuth('coding-plan', {});
-    }
-  },
-};
-
-const apiKeyCommand = {
-  command: 'api-key',
-  describe: t('Authenticate using an API key'),
-  handler: async () => {
-    await handleApiKeyAuthSetup();
-  },
-};
-
-const openRouterCommand = {
-  command: 'openrouter',
-  describe: t(
-    'Authenticate using OpenRouter (OAuth browser flow or --key for API key)',
-  ),
-  builder: (yargs: Argv) =>
-    yargs.option('key', {
-      alias: 'k',
-      describe: t('OpenRouter API key (skips browser OAuth flow)'),
-      type: 'string',
-    }),
-  handler: async (argv: { key?: string }) => {
-    const key = argv['key'] as string | undefined;
-    if (key) {
-      await handleApiKeyAuth('openrouter', { apiKey: key });
-    } else {
-      await handleHopCodeAuth('openrouter', {});
-    }
-  },
-};
-
-const statusCommand = {
-  command: 'status',
-  describe: t('Show current authentication status'),
-  handler: async () => {
-    await showAuthStatus();
-  },
-};
+  'hopcode-oauth',
+];
 
 export const authCommand: CommandModule = {
   command: 'auth',
-  describe: t(
-    'Configure authentication — supports all AI providers (OpenRouter, Groq, Mistral, OpenAI, Anthropic, Gemini, and more)',
-  ),
+  describe: t('Configure authentication (removed)'),
   builder: (yargs: Argv) => {
-    let y = yargs
-      .command(ollamaLocalCommand)
-      .command(codePlanCommand)
-      .command(apiKeyCommand)
-      .command(openRouterCommand)
-      .command(statusCommand);
-
-    // Auto-generate a subcommand for every provider in the registry that
-    // doesn't have a bespoke handler above.
-    for (const provider of PROVIDER_REGISTRY) {
-      if (SPECIAL_AUTH_PROVIDERS.has(provider.id)) continue;
-      const p = provider; // capture for closure
+    let y = yargs.version(false).strict(false);
+    for (const name of legacySubcommands) {
       y = y.command({
-        command: p.id,
-        describe: p.description,
-        builder: (y2: Argv) =>
-          y2.option('key', {
-            alias: 'k',
-            describe: t('API key for {{label}}', { label: p.label }),
-            type: 'string',
-          }),
-        handler: async (argv: { key?: string }) => {
-          await handleApiKeyAuth(p.id, { apiKey: argv['key'] });
-        },
+        command: `${name} [legacyArgs..]`,
+        describe: false,
+        builder: (subYargs: Argv) => subYargs.strict(false),
+        handler: printRemovalNotice,
       });
     }
-
-    return y.demandCommand(0).version(false);
+    return y;
   },
-  handler: async () => {
-    await runInteractiveAuth();
-  },
+  handler: printRemovalNotice,
 };

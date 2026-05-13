@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,6 +27,47 @@ describe('authCommand', () => {
       type: 'dialog',
       dialog: 'auth',
     });
+  });
+
+  it('should return a dialog action when execution mode is undefined', () => {
+    if (!authCommand.action) {
+      throw new Error('The auth command must have an action.');
+    }
+
+    mockContext.executionMode = undefined;
+    const result = authCommand.action(mockContext, '');
+
+    expect(result).toEqual({
+      type: 'dialog',
+      dialog: 'auth',
+    });
+  });
+
+  it.each(['non_interactive', 'acp'] as const)(
+    'should return an info message in %s mode',
+    (executionMode) => {
+      if (!authCommand.action) {
+        throw new Error('The auth command must have an action.');
+      }
+
+      mockContext.executionMode = executionMode;
+      const result = authCommand.action(mockContext, '');
+
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'info',
+        content:
+          'Authentication configuration is only available in interactive mode. To configure authentication, run HopCode interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
+      });
+    },
+  );
+
+  it('should support interactive, non-interactive, and ACP modes', () => {
+    expect(authCommand.supportedModes).toEqual([
+      'interactive',
+      'non_interactive',
+      'acp',
+    ]);
   });
 
   it('should have the correct name and description', () => {

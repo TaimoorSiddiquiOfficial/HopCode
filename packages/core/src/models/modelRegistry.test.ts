@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -18,9 +18,11 @@ describe('ModelRegistry', () => {
     it('should always include hard-coded hopcode-oauth models', () => {
       const registry = new ModelRegistry();
 
-      const qwenModels = registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH);
-      expect(qwenModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
-      expect(qwenModels[0].id).toBe('coder-model');
+      const hopcodeModels = registry.getModelsForAuthType(
+        AuthType.HOPCODE_OAUTH,
+      );
+      expect(hopcodeModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
+      expect(hopcodeModels[0].id).toBe('coder-model');
     });
 
     it('should initialize with empty config', () => {
@@ -53,7 +55,7 @@ describe('ModelRegistry', () => {
       const modelProvidersConfig: ModelProvidersConfig = {
         'hopcode-oauth': [
           {
-            id: 'custom-qwen',
+            id: 'custom-hopcode',
             name: 'Custom Qwen',
           },
         ],
@@ -62,9 +64,13 @@ describe('ModelRegistry', () => {
       const registry = new ModelRegistry(modelProvidersConfig);
 
       // Should still use hard-coded hopcode-oauth models
-      const qwenModels = registry.getModelsForAuthType(AuthType.HOPCODE_OAUTH);
-      expect(qwenModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
-      expect(qwenModels.find((m) => m.id === 'custom-qwen')).toBeUndefined();
+      const hopcodeModels = registry.getModelsForAuthType(
+        AuthType.HOPCODE_OAUTH,
+      );
+      expect(hopcodeModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
+      expect(
+        hopcodeModels.find((m) => m.id === 'custom-hopcode'),
+      ).toBeUndefined();
     });
   });
 
@@ -646,7 +652,7 @@ describe('ModelRegistry', () => {
         openai: [{ id: 'gpt-4', name: 'GPT-4' }],
       });
       const modelProvidersConfig: ModelProvidersConfig = {
-        'hopcode-oauth': [{ id: 'custom-qwen', name: 'Custom Qwen' }],
+        'hopcode-oauth': [{ id: 'custom-hopcode', name: 'Custom Qwen' }],
       };
 
       registry.reloadModels(modelProvidersConfig);
@@ -656,7 +662,9 @@ describe('ModelRegistry', () => {
         AuthType.HOPCODE_OAUTH,
       );
       expect(hopcodeModels.length).toBe(HOPCODE_OAUTH_MODELS.length);
-      expect(hopcodeModels.find((m) => m.id === 'custom-qwen')).toBeUndefined();
+      expect(
+        hopcodeModels.find((m) => m.id === 'custom-hopcode'),
+      ).toBeUndefined();
     });
 
     it('should handle reload with multiple authTypes', () => {

@@ -23,11 +23,12 @@ const assetBuilds = [
 
 const runCommand = ({ command, args, cwd, label }) =>
   new Promise((resolve, reject) => {
-    const useShell = process.platform === 'win32';
-    // On Windows, quote the command path to handle spaces (e.g., "C:\Program Files\nodejs\node.exe")
-    const quotedCommand = useShell ? `"${command}"` : command;
+    // Don't use shell on Windows when paths contain spaces — cmd.exe splits
+    // unquoted arguments at spaces, breaking module resolution.  Use shell
+    // only on non-Windows platforms where it's needed for PATH lookups.
+    const useShell = process.platform !== 'win32';
 
-    const child = spawn(quotedCommand, args, {
+    const child = spawn(command, args, {
       cwd,
       stdio: 'inherit',
       shell: useShell,

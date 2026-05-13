@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,6 +12,7 @@ import { getAllGeminiMdFilenames } from '../memory/const.js';
 import type { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { processImports } from './memoryImportProcessor.js';
 import { HOPCODE_DIR } from './paths.js';
+import { Storage } from '../config/storage.js';
 import { createDebugLogger } from './debugLogger.js';
 import { loadRules, type RuleFile } from './rulesDiscovery.js';
 
@@ -130,11 +131,8 @@ async function getGeminiMdFilePathsInternalForEachDir(
 
   for (const geminiMdFilename of geminiMdFilenames) {
     const resolvedHome = path.resolve(userHomePath);
-    const globalMemoryPath = path.join(
-      resolvedHome,
-      HOPCODE_DIR,
-      geminiMdFilename,
-    );
+    const globalHopcodeDir = Storage.getGlobalHopCodeDir();
+    const globalMemoryPath = path.join(globalHopcodeDir, geminiMdFilename);
 
     // Handle the case where we're in the home directory (dir is empty string or home path)
     const resolvedDir = dir ? path.resolve(dir) : resolvedHome;
@@ -200,7 +198,10 @@ async function getGeminiMdFilePathsInternalForEachDir(
         : path.dirname(resolvedHome);
 
       while (currentDir && currentDir !== path.dirname(currentDir)) {
-        if (currentDir === path.join(resolvedHome, HOPCODE_DIR)) {
+        if (
+          currentDir === globalHopcodeDir ||
+          currentDir === path.join(resolvedHome, HOPCODE_DIR)
+        ) {
           break;
         }
 

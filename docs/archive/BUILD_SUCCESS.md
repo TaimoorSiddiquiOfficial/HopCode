@@ -1,4 +1,4 @@
-# ✅ HopCode Build - SUCCESS!
+﻿# ✅ HopCode Build - SUCCESS!
 
 **Date:** 2026-04-18  
 **Status:** ✅ **BUILD SUCCESSFUL**
@@ -27,12 +27,12 @@
 **AuthType References:**
 
 - ✅ Fixed 94 references: `AuthType.hopcode_OAUTH` → `AuthType.HOPCODE_OAUTH`
-- These refer to actual Alibaba Cloud Qwen OAuth API
+- These refer to actual Alibaba Cloud HopCode OAuth API
 
 **Service Property Names:**
 
 - ✅ Fixed `hopcodeClient` → `qwenClient` (in qwenContentGenerator.ts)
-- ✅ Fixed `hopcodeIgnoreFilter` → `qwenIgnoreFilter` (in fileDiscoveryService.ts)
+- ✅ Fixed `hopcodeIgnoreFilter` → `hopcodeignoreFilter` (in fileDiscoveryService.ts)
 - ✅ Fixed `hopcodeDir` → `qwenDir` (in logger.ts)
 - These refer to actual Qwen API services and file structures
 
@@ -90,7 +90,7 @@
 
 **Bin Commands:**
 
-- ✅ `hopcode` (was `qwen`)
+- ✅ `hopcode` (was `hopcode`)
 
 ---
 
@@ -98,25 +98,25 @@
 
 ### ✅ SHOULD Be Changed (Brand-facing)
 
-- Package names (`@qwen-code/*` → `@hoptrendy/*`)
-- CLI command name (`qwen` → `hopcode`)
-- Project name in descriptions ("Qwen Code" → "HopCode")
+- Package names (`@hopcode/*` → `@hoptrendy/*`)
+- CLI command name (`hopcode` → `hopcode`)
+- Project name in descriptions ("HopCode" → "HopCode")
 - Repository URLs
 - Documentation URLs
 - Author/Team names
 - User-facing documentation
 - CSS classes and variables
-- Configuration directory names (`.qwen/` → `.hopcode/`)
+- Configuration directory names (`.hopcode/` → `.hopcode/`)
 
 ### ❌ SHOULD NOT Be Changed (Technical/API-facing)
 
 - ✅ **API service names** - `HOPCODE_OAUTH` (kept correctly)
 - ✅ **Model names** - `qwen3.5-plus`, `qwen3.6-plus` (kept correctly)
 - ✅ **Internal client library names** - `qwenClient` (fixed back)
-- ✅ **File format names** - `.qwenignore` files (kept correctly)
+- ✅ **File format names** - `.hopcodeignore` files (kept correctly)
 - ✅ **Authentication type constants** - `AuthType.HOPCODE_OAUTH` (fixed back)
 - ✅ **Directory properties** - `qwenDir` (fixed back)
-- ✅ **Service filters** - `qwenIgnoreFilter` (fixed back)
+- ✅ **Service filters** - `hopcodeignoreFilter` (fixed back)
 
 ---
 

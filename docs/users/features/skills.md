@@ -1,4 +1,4 @@
-# Agent Skills
+﻿# Agent Skills
 
 > Create, manage, and share Skills to extend HopCode's capabilities.
 
@@ -159,7 +159,7 @@ Extensions can provide custom skills that become available when the extension is
 
 Extension skills are automatically discovered and loaded when the extension is installed and enabled.
 
-To see which extensions provide skills, check the extension's `qwen-extension.json` file for a `skills` field.
+To see which extensions provide skills, check the extension's `hopcode-extension.json` file for a `skills` field.
 
 To view available Skills, ask HopCode directly:
 

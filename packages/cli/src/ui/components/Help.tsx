@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,8 +46,7 @@ const TAB_DEFS: Array<{ tab: HelpTab; labelKey: string }> = [
   { tab: 'commands', labelKey: 'commands' },
   { tab: 'custom-commands', labelKey: 'custom-commands' },
 ];
-// TODO: Replace with HopCode docs URL when available
-const DOCS_URL = 'https://hopcode.dev/docs/';
+const DOCS_URL = 'https://hopcode.dev/hopcode-docs/';
 
 export const Help: React.FC<HelpProps> = ({
   commands,

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,7 @@ import type { GeminiChat } from '../core/geminiChat.js';
 import { type ChatCompressionInfo, CompressionStatus } from '../core/turn.js';
 import { DEFAULT_TOKEN_LIMIT } from '../core/tokenLimits.js';
 import { getCompressionPrompt } from '../core/prompts.js';
-import { getResponseText } from '../utils/partUtils.js';
+import { runSideQuery } from '../utils/sideQuery.js';
 import { logChatCompression } from '../telemetry/loggers.js';
 import { makeChatCompressionEvent } from '../telemetry/types.js';
 import type { PermissionMode } from '../hooks/types.js';
@@ -316,30 +316,34 @@ export class ChatCompressionService {
       };
     }
 
-    const summaryResponse = await config.getContentGenerator().generateContent(
-      {
-        model,
-        contents: [
-          ...historyToCompress,
-          {
-            role: 'user',
-            parts: [
-              {
-                text: 'First, reason in your scratchpad. Then, generate the <state_snapshot>.',
-              },
-            ],
-          },
-        ],
-        config: {
-          systemInstruction: getCompressionPrompt(),
-          ...(signal ? { abortSignal: signal } : {}),
+    const summaryResult = await runSideQuery(config, {
+      purpose: 'chat-compression',
+      model,
+      // Best-effort: failures fall back to NOOP and the next turn re-triggers
+      // compression anyway, so don't burn 7 retries blocking the user mid-turn.
+      maxAttempts: 1,
+      systemInstruction: getCompressionPrompt(),
+      contents: [
+        ...historyToCompress,
+        {
+          role: 'user',
+          parts: [
+            {
+              text: 'First, reason in your scratchpad. Then, generate the <state_snapshot>.',
+            },
+          ],
         },
+      ],
+      // Compression quality drives every subsequent main turn — keep reasoning on.
+      config: {
+        thinkingConfig: { includeThoughts: true },
       },
+      abortSignal: signal ?? new AbortController().signal,
       promptId,
-    );
-    const summary = getResponseText(summaryResponse) ?? '';
+    });
+    const summary = summaryResult.text;
     const isSummaryEmpty = !summary || summary.trim().length === 0;
-    const compressionUsageMetadata = summaryResponse.usageMetadata;
+    const compressionUsageMetadata = summaryResult.usage;
     const compressionInputTokenCount =
       compressionUsageMetadata?.promptTokenCount;
     let compressionOutputTokenCount =

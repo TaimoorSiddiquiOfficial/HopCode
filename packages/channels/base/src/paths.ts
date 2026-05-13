@@ -5,7 +5,7 @@ import * as os from 'node:os';
  * Expands tilde and resolves relative paths to absolute.
  * Mirrors Storage.resolvePath() in packages/core.
  */
-function resolvePath(dir: string): string {
+export function resolvePath(dir: string): string {
   let resolved = dir;
   if (
     resolved === '~' ||
@@ -28,7 +28,7 @@ function resolvePath(dir: string): string {
 }
 
 /**
- * Returns the global Qwen home directory (config, credentials, etc.).
+ * Returns the global HopCode home directory (config, credentials, etc.).
  *
  * Priority: HOPCODE_HOME env var > ~/.hopcode
  *

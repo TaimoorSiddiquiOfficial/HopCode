@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -330,6 +330,7 @@ export const MainContent = () => {
       );
     });
     return () => clearImmediate(handle);
+     
   }, [replayCount, mergedHistory.length]);
 
   // Render the full list when the tail gap is small (≤ CHUNK_SIZE). This

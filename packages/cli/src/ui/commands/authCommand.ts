@@ -1,10 +1,14 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { OpenDialogActionReturn, SlashCommand } from './types.js';
+import type {
+  OpenDialogActionReturn,
+  SlashCommand,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';
 
@@ -15,9 +19,24 @@ export const authCommand: SlashCommand = {
     return t('Configure authentication information for login');
   },
   kind: CommandKind.BUILT_IN,
-  supportedModes: ['interactive'] as const,
-  action: (_context, _args): OpenDialogActionReturn => ({
-    type: 'dialog',
-    dialog: 'auth',
-  }),
+  supportedModes: ['interactive', 'non_interactive', 'acp'],
+  action: (
+    context,
+    _args,
+  ): OpenDialogActionReturn | SlashCommandActionReturn => {
+    const executionMode = context.executionMode ?? 'interactive';
+    if (executionMode !== 'interactive') {
+      return {
+        type: 'message',
+        messageType: 'info',
+        content: t(
+          'Authentication configuration is only available in interactive mode. To configure authentication, run HopCode interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
+        ),
+      };
+    }
+    return {
+      type: 'dialog',
+      dialog: 'auth',
+    };
+  },
 };

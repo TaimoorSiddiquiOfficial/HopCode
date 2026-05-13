@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,9 +8,9 @@ import * as path from 'node:path';
 import * as os from 'node:os';
 import * as fs from 'node:fs';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { getProjectHash, sanitizeCwd } from '../utils/paths.js';
+import { getProjectHash, HOPCODE_DIR, sanitizeCwd } from '../utils/paths.js';
 
-export const HOPCODE_DIR = '.hopcode';
+export { HOPCODE_DIR } from '../utils/paths.js';
 export const GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json';
 export const OAUTH_FILE = 'oauth_creds.json';
 export const SKILL_PROVIDER_CONFIG_DIRS = ['.hopcode', '.agents'];
@@ -131,7 +131,7 @@ export class Storage {
     }
     const homeDir = os.homedir();
     if (!homeDir) {
-      return path.join(os.tmpdir(), HOPCODE_DIR);
+      return path.join(os.tmpdir(), '.hopcode');
     }
     return path.join(homeDir, HOPCODE_DIR);
   }
@@ -173,7 +173,7 @@ export class Storage {
   }
 
   static getGlobalIdeDir(): string {
-    // Pinned to the global Qwen dir so the VS Code companion (which only
+    // Pinned to the global hopcode dir so the VS Code companion (which only
     // sees env vars, not settings-based runtimeOutputDir) finds the same
     // lock-file location as the CLI.
     return path.join(Storage.getGlobalHopCodeDir(), IDE_DIR_NAME);
@@ -274,5 +274,18 @@ export class Storage {
 
   getHistoryFilePath(): string {
     return path.join(this.getProjectTempDir(), 'shell_history');
+  }
+
+  /**
+   * Returns the runtime-status JSON path for a given session id.
+   * The file lives alongside the session's history data so that external
+   * tools can discover which session a PID is serving.
+   */
+  getRuntimeStatusPath(sessionId: string): string {
+    return path.join(
+      this.getProjectDir(),
+      'chats',
+      `${sessionId}.runtime.json`,
+    );
   }
 }

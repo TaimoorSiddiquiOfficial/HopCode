@@ -69,7 +69,7 @@ describe('vscode-ide-companion paths – getGlobalHopCodeDir', () => {
   });
 
   it('uses HOPCODE_HOME when set to absolute path', () => {
-    const configDir = path.resolve('/tmp/custom-qwen');
+    const configDir = path.resolve('/tmp/custom-hopcode');
     process.env['HOPCODE_HOME'] = configDir;
     expect(getGlobalHopCodeDir()).toBe(configDir);
   });
@@ -80,13 +80,17 @@ describe('vscode-ide-companion paths – getGlobalHopCodeDir', () => {
   });
 
   it('expands tilde (~/x) in HOPCODE_HOME', () => {
-    process.env['HOPCODE_HOME'] = '~/custom-qwen';
-    expect(getGlobalHopCodeDir()).toBe(path.join(home.tempHome, 'custom-qwen'));
+    process.env['HOPCODE_HOME'] = '~/custom-hopcode';
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(home.tempHome, 'custom-hopcode'),
+    );
   });
 
   it('expands Windows-style tilde (~\\x) in HOPCODE_HOME', () => {
-    process.env['HOPCODE_HOME'] = '~\\custom-qwen';
-    expect(getGlobalHopCodeDir()).toBe(path.join(home.tempHome, 'custom-qwen'));
+    process.env['HOPCODE_HOME'] = '~\\custom-hopcode';
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(home.tempHome, 'custom-hopcode'),
+    );
   });
 
   it('treats bare tilde (~) as home directory', () => {
@@ -148,13 +152,13 @@ describe('vscode-ide-companion paths – getRuntimeBaseDir', () => {
 
   it('falls back to HOPCODE_HOME when HOPCODE_RUNTIME_DIR is unset', () => {
     delete process.env['HOPCODE_RUNTIME_DIR'];
-    const configDir = path.resolve('/tmp/custom-qwen');
+    const configDir = path.resolve('/tmp/custom-hopcode');
     process.env['HOPCODE_HOME'] = configDir;
     expect(getRuntimeBaseDir()).toBe(configDir);
   });
 
   it('HOPCODE_RUNTIME_DIR takes priority over HOPCODE_HOME', () => {
-    const configDir = path.resolve('/tmp/custom-qwen');
+    const configDir = path.resolve('/tmp/custom-hopcode');
     const runtimeDir = path.resolve('/tmp/custom-runtime');
     process.env['HOPCODE_HOME'] = configDir;
     process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
@@ -222,7 +226,7 @@ describe('vscode-ide-companion paths – .env bootstrap', () => {
   });
 
   it('reads HOPCODE_RUNTIME_DIR from <HOPCODE_HOME>/.env when HOPCODE_HOME is preset', () => {
-    const configDir = path.join(home.tempHome, 'custom-qwen');
+    const configDir = path.join(home.tempHome, 'custom-hopcode');
     const runtimeDir = path.resolve('/tmp/from-runtime-dotenv');
     fs.mkdirSync(configDir, { recursive: true });
     fs.writeFileSync(

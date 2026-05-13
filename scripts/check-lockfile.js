@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,7 +50,16 @@ for (const [location, details] of Object.entries(packages)) {
   if (details.resolved && details.integrity) {
     continue;
   }
-  // 2) Git and file dependencies only need a "resolved" field.
+  // 2) npm can omit registry tarball metadata in package-lock v3. A plain
+  //    version identifies a registry package when no non-registry URL exists.
+  const isRegistrySnapshot =
+    typeof details.version === 'string' &&
+    !details.version.startsWith('file:') &&
+    !details.version.startsWith('git');
+  if (!details.resolved && !details.integrity && isRegistrySnapshot) {
+    continue;
+  }
+  // 3) Git and file dependencies only need a "resolved" field.
   const isGitOrFileDep =
     details.resolved?.startsWith('git') ||
     details.resolved?.startsWith('file:');

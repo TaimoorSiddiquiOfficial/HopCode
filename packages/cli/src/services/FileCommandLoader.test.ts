@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -119,6 +119,8 @@ describe('FileCommandLoader', () => {
     const command = commands[0];
     expect(command).toBeDefined();
     expect(command.name).toBe('test');
+    expect(command.sourceLabel).toBe('Custom');
+    expect(command.sourceDetail).toBe('custom');
 
     const result = await command.action?.(
       createMockCommandContext({

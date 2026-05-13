@@ -1,12 +1,12 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as os from 'node:os';
+import { Storage } from '../config/storage.js';
 import { HOPCODE_DIR, sanitizeCwd } from '../utils/paths.js';
 import type { AutoMemoryType } from './types.js';
 
@@ -81,16 +81,17 @@ function findCanonicalGitRoot(startPath: string): string | null {
 
 /**
  * Returns the base directory for all auto-memory storage.
- * Defaults to `~/.hopcode`; overridable via HOPCODE_MEMORY_BASE_DIR for tests.
+ * Defaults to the global hopcode dir (`~/.hopcode` or `$HOPCODE_HOME`);
+ * overridable via HOPCODE_MEMORY_BASE_DIR for tests.
  */
 export function getMemoryBaseDir(): string {
   if (process.env['HOPCODE_MEMORY_BASE_DIR']) {
     return process.env['HOPCODE_MEMORY_BASE_DIR'];
   }
-  return path.join(os.homedir(), HOPCODE_DIR);
+  return Storage.getGlobalHopCodeDir();
 }
 
-// Memoize by projectRoot � findCanonicalGitRoot() walks the file system (existsSync
+// Memoize by projectRoot — findCanonicalGitRoot() walks the file system (existsSync
 // per directory) and is called from hot-path code such as schedulers and scanners.
 const _autoMemoryRootCache = new Map<string, string>();
 

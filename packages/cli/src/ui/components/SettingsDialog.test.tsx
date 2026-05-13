@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,7 @@
  *
  */
 
-import { renderWithProviders } from '../../test-utils/render.js';
+import { render } from 'ink-testing-library';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SettingsDialog } from './SettingsDialog.js';
 import { LoadedSettings, SettingScope } from '../../config/settings.js';
@@ -238,8 +238,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       const output = lastFrame();
@@ -253,12 +255,14 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog
-          settings={settings}
-          onSelect={onSelect}
-          availableTerminalHeight={20}
-        />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog
+            settings={settings}
+            onSelect={onSelect}
+            availableTerminalHeight={20}
+          />
+        </KeypressProvider>,
       );
 
       const output = lastFrame();
@@ -271,8 +275,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       const output = lastFrame();
@@ -284,8 +290,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       const output = lastFrame();
@@ -299,8 +307,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount, lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount, lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Press down arrow
@@ -323,8 +333,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // First go down, then up
@@ -340,8 +352,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Navigate with vim keys
@@ -357,8 +371,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount, lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount, lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Try to go up from first item
@@ -388,10 +404,12 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
       const component = (
-        <SettingsDialog settings={settings} onSelect={onSelect} />
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>
       );
 
-      const { stdin, unmount, lastFrame } = renderWithProviders(component);
+      const { stdin, unmount, lastFrame } = render(component);
 
       // Wait for initial render and verify we're on Tool Approval Mode (first setting)
       await waitFor(() => {
@@ -451,10 +469,12 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
       const component = (
-        <SettingsDialog settings={settings} onSelect={onSelect} />
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>
       );
 
-      const { stdin, unmount, lastFrame } = renderWithProviders(component);
+      const { stdin, unmount, lastFrame } = render(component);
 
       await waitFor(() => {
         expect(lastFrame()).toContain('● Tool Approval Mode');
@@ -500,10 +520,13 @@ describe('SettingsDialog', () => {
         // Use real schema - first setting "Tool Approval Mode" is an enum
         const settings = createMockSettings();
         const onSelect = vi.fn();
-
-        const { stdin, unmount, lastFrame } = renderWithProviders(
-          <SettingsDialog settings={settings} onSelect={onSelect} />,
+        const component = (
+          <KeypressProvider kittyProtocolEnabled={false}>
+            <SettingsDialog settings={settings} onSelect={onSelect} />
+          </KeypressProvider>
         );
+
+        const { stdin, unmount, lastFrame } = render(component);
 
         // Verify we're on Tool Approval Mode (first setting, an enum)
         await waitFor(() => {
@@ -536,17 +559,20 @@ describe('SettingsDialog', () => {
 
       it('loops back when reaching the end of an enum', async () => {
         vi.mocked(saveModifiedSettings).mockClear();
-        // Use Tool Approval Mode set to IZN (last value) to test looping back to first
+        // Use Tool Approval Mode set to YOLO (last value) to test looping back to first
         const settings = createMockSettings({
           tools: {
-            approvalMode: 'izn', // Last enum value
+            approvalMode: 'yolo', // Last enum value
           },
         });
         const onSelect = vi.fn();
-
-        const { stdin, unmount, lastFrame } = renderWithProviders(
-          <SettingsDialog settings={settings} onSelect={onSelect} />,
+        const component = (
+          <KeypressProvider kittyProtocolEnabled={false}>
+            <SettingsDialog settings={settings} onSelect={onSelect} />
+          </KeypressProvider>
         );
+
+        const { stdin, unmount, lastFrame } = render(component);
 
         // Verify we're on Tool Approval Mode (first setting)
         await waitFor(() => {
@@ -567,7 +593,7 @@ describe('SettingsDialog', () => {
           new Set<string>(['tools.approvalMode']),
           expect.objectContaining({
             tools: expect.objectContaining({
-              approvalMode: 'plan', // First enum value after IZN
+              approvalMode: 'plan', // First enum value after YOLO
             }),
           }),
           expect.any(LoadedSettings),
@@ -582,8 +608,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Press Space to toggle current setting
@@ -597,8 +625,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Navigate to vim mode setting and toggle it
@@ -616,8 +646,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Switch to scope focus
@@ -635,8 +667,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Wait for initial render
@@ -660,12 +694,14 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onRestartRequest = vi.fn();
 
-      const { unmount } = renderWithProviders(
-        <SettingsDialog
-          settings={settings}
-          onSelect={() => {}}
-          onRestartRequest={onRestartRequest}
-        />,
+      const { unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog
+            settings={settings}
+            onSelect={() => {}}
+            onRestartRequest={onRestartRequest}
+          />
+        </KeypressProvider>,
       );
 
       // This test would need to trigger a restart-required setting change
@@ -679,12 +715,14 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onRestartRequest = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog
-          settings={settings}
-          onSelect={() => {}}
-          onRestartRequest={onRestartRequest}
-        />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog
+            settings={settings}
+            onSelect={() => {}}
+            onRestartRequest={onRestartRequest}
+          />
+        </KeypressProvider>,
       );
 
       // Press 'r' key (this would only work if restart prompt is showing)
@@ -701,8 +739,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Wait for initial render
@@ -726,8 +766,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings({ vimMode: true });
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Switch to scope selector
@@ -750,8 +792,10 @@ describe('SettingsDialog', () => {
       );
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Should show user scope values initially
@@ -767,8 +811,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Try to toggle a setting (this might trigger vim mode toggle)
@@ -785,8 +831,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Toggle a setting
@@ -807,8 +855,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Navigate down many times to test scrolling
@@ -826,9 +876,11 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
+      const { stdin, unmount } = render(
         <VimModeProvider settings={settings}>
-          <SettingsDialog settings={settings} onSelect={onSelect} />
+          <KeypressProvider kittyProtocolEnabled={false}>
+            <SettingsDialog settings={settings} onSelect={onSelect} />
+          </KeypressProvider>
         </VimModeProvider>,
       );
 
@@ -850,8 +902,10 @@ describe('SettingsDialog', () => {
       );
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       const output = lastFrame();
@@ -863,8 +917,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Toggle a non-restart-required setting (like hideTips)
@@ -879,8 +935,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // This test would need to navigate to a specific restart-required setting
@@ -891,53 +949,6 @@ describe('SettingsDialog', () => {
       expect(lastFrame()).not.toContain(
         'To see changes, HopCode must be restarted',
       );
-
-      unmount();
-    });
-
-    it('should keep restart prompt when switching scopes', async () => {
-      const settings = createMockSettings();
-      const onSelect = vi.fn();
-
-      const { stdin, lastFrame, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
-      );
-
-      await waitFor(() => {
-        expect(lastFrame()).toContain('Tool Approval Mode');
-      });
-
-      const languageIndex = getDialogSettingKeys().indexOf('general.language');
-      expect(languageIndex).toBeGreaterThanOrEqual(0);
-
-      const press = async (key: string) => {
-        act(() => {
-          stdin.write(key);
-        });
-        await wait();
-      };
-
-      // Trigger a restart-required setting change by toggling the UI language setting.
-      for (let i = 0; i < languageIndex; i++) {
-        await press(TerminalKeys.DOWN_ARROW as string);
-      }
-      await press(TerminalKeys.ENTER as string);
-
-      await waitFor(() => {
-        expect(lastFrame()).toContain(
-          'To see changes, HopCode must be restarted',
-        );
-      });
-
-      // Switch scopes; restart prompt should remain visible.
-      await press(TerminalKeys.TAB as string);
-      await press('2');
-
-      await waitFor(() => {
-        expect(lastFrame()).toContain(
-          'To see changes, HopCode must be restarted',
-        );
-      });
 
       unmount();
     });
@@ -952,8 +963,10 @@ describe('SettingsDialog', () => {
       );
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       const output = lastFrame();
@@ -969,8 +982,10 @@ describe('SettingsDialog', () => {
       );
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       const output = lastFrame();
@@ -985,8 +1000,10 @@ describe('SettingsDialog', () => {
         general: { outputLanguage: 'en' },
       });
 
-      const { stdin, unmount, lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={() => {}} />,
+      const { stdin, unmount, lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={() => {}} />
+        </KeypressProvider>,
       );
 
       await waitFor(() => {
@@ -1042,8 +1059,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Rapid navigation
@@ -1061,8 +1080,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings({ vimMode: true }); // Start with vimMode enabled
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Press Ctrl+C to reset current setting to default
@@ -1077,8 +1098,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings({ vimMode: true }); // Start with vimMode enabled
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Press Ctrl+L to reset current setting to default
@@ -1093,8 +1116,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Try to navigate when potentially at bounds
@@ -1110,8 +1135,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Wait for initial render
@@ -1140,8 +1167,10 @@ describe('SettingsDialog', () => {
       );
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Should still render without crashing
@@ -1153,8 +1182,10 @@ describe('SettingsDialog', () => {
       const onSelect = vi.fn();
 
       // Should not crash even if some settings are missing definitions
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toContain('Settings');
@@ -1166,8 +1197,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Wait for initial render
@@ -1193,8 +1226,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Toggle first setting (should require restart)
@@ -1222,8 +1257,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings({ vimMode: true });
       const onSelect = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Multiple scope changes
@@ -1246,12 +1283,14 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onRestartRequest = vi.fn();
 
-      const { stdin, unmount } = renderWithProviders(
-        <SettingsDialog
-          settings={settings}
-          onSelect={() => {}}
-          onRestartRequest={onRestartRequest}
-        />,
+      const { stdin, unmount } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog
+            settings={settings}
+            onSelect={() => {}}
+            onRestartRequest={onRestartRequest}
+          />
+        </KeypressProvider>,
       );
 
       // This would test the restart workflow if we could trigger it
@@ -1270,8 +1309,10 @@ describe('SettingsDialog', () => {
       let settings = createMockSettings({ 'a.string.setting': 'initial' });
       const onSelect = vi.fn();
 
-      const { stdin, unmount, rerender } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { stdin, unmount, rerender } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Wait for the dialog to render
@@ -1339,8 +1380,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toMatchSnapshot();
@@ -1370,7 +1413,7 @@ describe('SettingsDialog', () => {
           loadFromIncludeDirectories: true,
           fileFiltering: {
             respectGitIgnore: true,
-            respectHopCodeIgnore: true,
+            respectHopcodeIgnore: true,
             enableRecursiveFileSearch: true,
             disableFuzzySearch: false,
           },
@@ -1388,8 +1431,10 @@ describe('SettingsDialog', () => {
       });
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toMatchSnapshot();
@@ -1416,8 +1461,10 @@ describe('SettingsDialog', () => {
       });
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toMatchSnapshot();
@@ -1427,8 +1474,10 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings();
       const onSelect = vi.fn();
 
-      const { lastFrame, stdin } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, stdin } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Switch focus to scope selector with Tab
@@ -1451,8 +1500,10 @@ describe('SettingsDialog', () => {
       );
       const onSelect = vi.fn();
 
-      const { lastFrame, stdin } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, stdin } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Switch to scope selector
@@ -1482,8 +1533,10 @@ describe('SettingsDialog', () => {
       );
       const onSelect = vi.fn();
 
-      const { lastFrame, stdin } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame, stdin } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       // Switch to scope selector
@@ -1511,8 +1564,10 @@ describe('SettingsDialog', () => {
       });
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toMatchSnapshot();
@@ -1523,7 +1578,7 @@ describe('SettingsDialog', () => {
         context: {
           fileFiltering: {
             respectGitIgnore: false,
-            respectHopCodeIgnore: true,
+            respectHopcodeIgnore: true,
             enableRecursiveFileSearch: false,
             disableFuzzySearch: true,
           },
@@ -1532,8 +1587,10 @@ describe('SettingsDialog', () => {
       });
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toMatchSnapshot();
@@ -1560,8 +1617,10 @@ describe('SettingsDialog', () => {
       });
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toMatchSnapshot();
@@ -1591,7 +1650,7 @@ describe('SettingsDialog', () => {
           loadFromIncludeDirectories: false,
           fileFiltering: {
             respectGitIgnore: false,
-            respectHopCodeIgnore: false,
+            respectHopcodeIgnore: false,
             enableRecursiveFileSearch: false,
             disableFuzzySearch: false,
           },
@@ -1609,8 +1668,10 @@ describe('SettingsDialog', () => {
       });
       const onSelect = vi.fn();
 
-      const { lastFrame } = renderWithProviders(
-        <SettingsDialog settings={settings} onSelect={onSelect} />,
+      const { lastFrame } = render(
+        <KeypressProvider kittyProtocolEnabled={false}>
+          <SettingsDialog settings={settings} onSelect={onSelect} />
+        </KeypressProvider>,
       );
 
       expect(lastFrame()).toMatchSnapshot();

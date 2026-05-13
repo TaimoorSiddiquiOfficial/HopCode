@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +17,7 @@ import { isGitRepository } from '../utils/gitUtils.js';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { HOPCODE_CONFIG_DIR } from '../memory/const.js';
+import { HOPCODE_DIR } from '../config/storage.js';
 
 // Mock tool names if they are dynamically generated or complex
 vi.mock('../tools/ls', () => ({ LSTool: { Name: 'list_directory' } }));
@@ -49,36 +49,37 @@ describe('Core System Prompt (prompts.ts)', () => {
   it('should return the base prompt when no userMemory is provided', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt();
+    expect(prompt).not.toContain('---\n\n'); // Separator should not be present
     expect(prompt).toContain('You are HopCode, an interactive CLI agent'); // Check for core content
     expect(prompt).toContain('# Executing actions with care');
-    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot(); // Use snapshot for base prompt structure
   });
 
   it('should return the base prompt when userMemory is empty string', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt('');
+    expect(prompt).not.toContain('---\n\n');
     expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot();
   });
 
   it('should return the base prompt when userMemory is whitespace only', () => {
     vi.stubEnv('SANDBOX', undefined);
     const prompt = getCoreSystemPrompt('   \n  \t ');
+    expect(prompt).not.toContain('---\n\n');
     expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toContain('# Quran-Guided Coding Agent');
     expect(prompt).toMatchSnapshot();
   });
 
   it('should append userMemory with separator when provided', () => {
     vi.stubEnv('SANDBOX', undefined);
     const memory = 'This is custom user memory.\nBe extra polite.';
+    const expectedSuffix = `\n\n---\n\n${memory}`;
     const prompt = getCoreSystemPrompt(memory);
 
-    expect(prompt).toContain(`\n\n---\n\n${memory}`);
-    expect(prompt).toContain('You are HopCode, an interactive CLI agent');
-    expect(prompt).toMatchSnapshot();
+    expect(prompt.endsWith(expectedSuffix)).toBe(true);
+    expect(prompt).toContain('You are HopCode, an interactive CLI agent'); // Ensure base prompt follows
+    expect(prompt).toMatchSnapshot(); // Snapshot the combined prompt
   });
 
   it('should append extra system prompt instructions after user memory when provided', () => {
@@ -178,9 +179,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should read from default path when HOPCODE_SYSTEM_MD is "true"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_SYSTEM_MD', 'true');
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
@@ -191,9 +190,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should read from default path when HOPCODE_SYSTEM_MD is "1"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_SYSTEM_MD', '1');
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
@@ -246,9 +243,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should write to default path when HOPCODE_WRITE_SYSTEM_MD is "true"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_WRITE_SYSTEM_MD', 'true');
       getCoreSystemPrompt();
       expect(fs.writeFileSync).toHaveBeenCalledWith(
@@ -258,9 +253,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it('should write to default path when HOPCODE_WRITE_SYSTEM_MD is "1"', () => {
-      const defaultPath = path.resolve(
-        path.join(HOPCODE_CONFIG_DIR, 'system.md'),
-      );
+      const defaultPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
       vi.stubEnv('HOPCODE_WRITE_SYSTEM_MD', '1');
       getCoreSystemPrompt();
       expect(fs.writeFileSync).toHaveBeenCalledWith(

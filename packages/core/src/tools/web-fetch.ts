@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { convert } from 'html-to-text';
 import type { Config } from '../config/config.js';
 import { fetchWithTimeout, isPrivateIp } from '../utils/fetch.js';
-import { getResponseText } from '../utils/partUtils.js';
+import { runSideQuery } from '../utils/sideQuery.js';
 import { ToolErrorType } from './tool-error.js';
 import type {
   ToolCallConfirmationDetails,
@@ -18,7 +18,6 @@ import type {
 } from './tools.js';
 import type { PermissionDecision } from '../permissions/types.js';
 import { BaseDeclarativeTool, BaseToolInvocation, Kind } from './tools.js';
-import { DEFAULT_HOPCODE_MODEL } from '../config/models.js';
 import { ToolNames, ToolDisplayNames } from './tool-names.js';
 import { createDebugLogger, type DebugLogger } from '../utils/debugLogger.js';
 
@@ -84,8 +83,10 @@ class WebFetchToolInvocation extends BaseToolInvocation<
     let url = this.params.url;
 
     // Convert GitHub blob URL to raw URL
-    if (isGitHubBlobUrl(url)) {
-      url = convertGitHubBlobToRaw(url);
+    if (url.includes('github.com') && url.includes('/blob/')) {
+      url = url
+        .replace('github.com', 'raw.githubusercontent.com')
+        .replace('/blob/', '/');
       this.debugLogger.debug(
         `[WebFetchTool] Converted GitHub blob URL to raw URL: ${url}`,
       );
@@ -138,7 +139,6 @@ class WebFetchToolInvocation extends BaseToolInvocation<
         `[WebFetchTool] Content length: ${textContent.length} characters`,
       );
 
-      const geminiClient = this.config.getGeminiClient();
       const fallbackPrompt = `The user requested the following: "${this.params.prompt}".
 
 I have fetched the content from ${this.params.url}. Please use the following content to answer the user's request.
@@ -151,17 +151,21 @@ ${textContent}
         `[WebFetchTool] Processing content with prompt: "${this.params.prompt}"`,
       );
 
-      const result = await geminiClient.generateContent(
-        [{ role: 'user', parts: [{ text: fallbackPrompt }] }],
-        {
-          systemInstruction:
-            'Extract and summarize the requested information from the provided web content. ' +
-            'Be concise and accurate. Respond only with the requested information.',
-        },
-        signal,
-        this.config.getModel() || DEFAULT_HOPCODE_MODEL,
-      );
-      const resultText = getResponseText(result) || '';
+      const result = await runSideQuery(this.config, {
+        purpose: 'web-fetch',
+        // Pin to the main model — fast model loses too much fidelity on
+        // long, rich source material.
+        model: this.config.getModel(),
+        // Best-effort: the outer catch already converts processing failures
+        // into a tool error; retrying 7× just delays that fallback.
+        maxAttempts: 1,
+        contents: [{ role: 'user', parts: [{ text: fallbackPrompt }] }],
+        systemInstruction:
+          'Extract and summarize the requested information from the provided web content. ' +
+          'Be concise and accurate. Respond only with the requested information.',
+        abortSignal: signal,
+      });
+      const resultText = result.text || '';
 
       this.debugLogger.debug(
         `[WebFetchTool] Successfully processed content from ${this.params.url}`,
@@ -287,6 +291,11 @@ export class WebFetchTool extends BaseDeclarativeTool<
         required: ['url', 'prompt'],
         type: 'object',
       },
+      true, // isOutputMarkdown
+      false, // canUpdateOutput
+      true, // shouldDefer — web fetching is infrequent
+      false, // alwaysLoad
+      'web fetch url http download content',
     );
   }
 
@@ -313,24 +322,4 @@ export class WebFetchTool extends BaseDeclarativeTool<
   ): ToolInvocation<WebFetchToolParams, ToolResult> {
     return new WebFetchToolInvocation(this.config, params);
   }
-}
-
-// ── URL helpers ────────────────────────────────────────────────────────────────
-
-function isGitHubBlobUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return (
-      parsed.hostname === 'github.com' && parsed.pathname.includes('/blob/')
-    );
-  } catch {
-    return false;
-  }
-}
-
-function convertGitHubBlobToRaw(url: string): string {
-  const parsed = new URL(url);
-  parsed.hostname = 'raw.githubusercontent.com';
-  parsed.pathname = parsed.pathname.replace('/blob/', '/');
-  return parsed.toString();
 }

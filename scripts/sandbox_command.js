@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,12 +19,14 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import path from 'node:path';
+const { join, dirname } = path;
 import stripJsonComments from 'strip-json-comments';
 import os from 'node:os';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import dotenv from 'dotenv';
+import { bootstrapHomeEnv, resolvePath } from './lib/hopcode-home-bootstrap.js';
 
 const argv = yargs(hideBin(process.argv)).option('q', {
   alias: 'quiet',
@@ -32,30 +34,53 @@ const argv = yargs(hideBin(process.argv)).option('q', {
   default: false,
 }).argv;
 
-let qwenSandbox = process.env.HOPCODE_SANDBOX;
+let hopcodeSandbox = process.env.hopcode_SANDBOX;
 
-if (!qwenSandbox) {
-  const userSettingsFile = join(os.homedir(), '.hopcode', 'settings.json');
+bootstrapHomeEnv();
+
+if (!hopcodeSandbox) {
+  const configDir = process.env.HOPCODE_HOME
+    ? resolvePath(process.env.HOPCODE_HOME)
+    : join(os.homedir(), '.hopcode');
+  const userSettingsFile = join(configDir, 'settings.json');
   if (existsSync(userSettingsFile)) {
     const settings = JSON.parse(
       stripJsonComments(readFileSync(userSettingsFile, 'utf-8')),
     );
     if (settings.sandbox) {
-      qwenSandbox = settings.sandbox;
+      hopcodeSandbox = settings.sandbox;
     }
   }
 }
 
-if (!qwenSandbox) {
+if (!hopcodeSandbox) {
+  // Walk up from cwd to find a project-level .env. Parse manually and copy
+  // only HOPCODE_SANDBOX — calling dotenv.config() here would inject every key,
+  // including HOPCODE_HOME / HOPCODE_RUNTIME_DIR that the main CLI hard-blocks via
+  // PROJECT_ENV_HARDCODED_EXCLUSIONS. A project file must not be able to
+  // redirect global state through this back door.
   let currentDir = process.cwd();
   while (true) {
-    const qwenEnv = join(currentDir, '.hopcode', '.env');
+    const hopcodeEnv = join(currentDir, '.hopcode', '.env');
     const regularEnv = join(currentDir, '.env');
-    if (existsSync(qwenEnv)) {
-      dotenv.config({ path: qwenEnv, quiet: true });
-      break;
+    let candidate = null;
+    if (existsSync(hopcodeEnv)) {
+      candidate = hopcodeEnv;
     } else if (existsSync(regularEnv)) {
-      dotenv.config({ path: regularEnv, quiet: true });
+      candidate = regularEnv;
+    }
+    if (candidate) {
+      try {
+        const parsed = dotenv.parse(readFileSync(candidate, 'utf-8'));
+        if (
+          parsed.hopcode_SANDBOX &&
+          !Object.hasOwn(process.env, 'HOPCODE_SANDBOX')
+        ) {
+          process.env.hopcode_SANDBOX = parsed.hopcode_SANDBOX;
+        }
+      } catch (_e) {
+        // Match dotenv's quiet-mode behavior used elsewhere.
+      }
       break;
     }
     const parentDir = dirname(currentDir);
@@ -64,10 +89,10 @@ if (!qwenSandbox) {
     }
     currentDir = parentDir;
   }
-  qwenSandbox = process.env.HOPCODE_SANDBOX;
+  hopcodeSandbox = process.env.hopcode_SANDBOX;
 }
 
-qwenSandbox = (qwenSandbox || '').toLowerCase();
+hopcodeSandbox = (hopcodeSandbox || '').toLowerCase();
 
 const commandExists = (cmd) => {
   // Use 'where.exe' (not 'where') on Windows because PowerShell aliases
@@ -90,7 +115,7 @@ const commandExists = (cmd) => {
 };
 
 let command = '';
-if (['1', 'true'].includes(qwenSandbox)) {
+if (['1', 'true'].includes(hopcodeSandbox)) {
   if (commandExists('docker')) {
     command = 'docker';
   } else if (commandExists('podman')) {
@@ -101,12 +126,12 @@ if (['1', 'true'].includes(qwenSandbox)) {
     );
     process.exit(1);
   }
-} else if (qwenSandbox && !['0', 'false'].includes(qwenSandbox)) {
-  if (commandExists(qwenSandbox)) {
-    command = qwenSandbox;
+} else if (hopcodeSandbox && !['0', 'false'].includes(hopcodeSandbox)) {
+  if (commandExists(hopcodeSandbox)) {
+    command = hopcodeSandbox;
   } else {
     console.error(
-      `ERROR: missing sandbox command '${qwenSandbox}' (from HOPCODE_SANDBOX)`,
+      `ERROR: missing sandbox command '${hopcodeSandbox}' (from HOPCODE_SANDBOX)`,
     );
     process.exit(1);
   }

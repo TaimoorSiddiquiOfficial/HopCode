@@ -1,4 +1,4 @@
-# Troubleshooting
+﻿# Troubleshooting
 
 This guide provides solutions to common issues and debugging tips, including topics on:
 
@@ -9,8 +9,8 @@ This guide provides solutions to common issues and debugging tips, including top
 
 ## Authentication or login errors
 
-- **Error: `Qwen OAuth free tier was discontinued on 2026-04-15`**
-  - **Cause:** Qwen OAuth is no longer available as of April 15, 2026.
+- **Error: `HopCode OAuth free tier was discontinued on 2026-04-15`**
+  - **Cause:** HopCode OAuth is no longer available as of April 15, 2026.
   - **Solution:** Switch to a different authentication method. Run `hopcode` → `/auth` and choose one of:
     - **API Key**: Use an API key from Alibaba Cloud Model Studio ([Beijing](https://bailian.console.aliyun.com/) / [intl](https://modelstudio.console.alibabacloud.com/)). See the API setup guide ([Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=doc#/doc/?type=model&url=3023091) / [intl](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model&url=2974721)).
     - **Alibaba Cloud Coding Plan**: Subscribe for a fixed monthly fee with higher quotas. See the Coding Plan guide ([Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=coding-plan#/efm/coding-plan-index) / [intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)).
@@ -21,9 +21,9 @@ This guide provides solutions to common issues and debugging tips, including top
     - Example: `export NODE_EXTRA_CA_CERTS=/path/to/your/corporate-ca.crt`
 
 - **Error: `Device authorization flow failed: fetch failed`**
-  - **Cause:** Node.js could not reach Qwen OAuth endpoints (often a proxy or SSL/TLS trust issue). When available, HopCode will also print the underlying error cause (for example: `UNABLE_TO_VERIFY_LEAF_SIGNATURE`). Note: this error is specific to the legacy Qwen OAuth flow.
+  - **Cause:** Node.js could not reach HopCode OAuth endpoints (often a proxy or SSL/TLS trust issue). When available, HopCode will also print the underlying error cause (for example: `UNABLE_TO_VERIFY_LEAF_SIGNATURE`). Note: this error is specific to the legacy HopCode OAuth flow.
   - **Solution:**
-    - If you are still using Qwen OAuth, switch to API Key or Coding Plan via `/auth`.
+    - If you are still using HopCode OAuth, switch to API Key or Coding Plan via `/auth`.
     - If you are behind a proxy, set it via `hopcode --proxy <url>` (or the `proxy` setting in `settings.json`).
     - If your network uses a corporate TLS inspection CA, set `NODE_EXTRA_CA_CERTS` as described above.
 

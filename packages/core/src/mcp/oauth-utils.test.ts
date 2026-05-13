@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -331,7 +331,7 @@ describe('OAuthUtils', () => {
       );
     });
 
-    // Regression test for https://github.com/QwenLM/qwen-code/issues/1749
+    // Regression test for https://github.com/QwenLM/hopcode/issues/1749
     // Per MCP spec, resource should be the canonical URI including the path,
     // so multi-tenant servers can distinguish between different MCP servers.
     it('should preserve full path for multi-tenant MCP servers (issue #1749)', () => {

@@ -58,22 +58,21 @@ observability framework — HopCode's observability system provides:
 All telemetry behavior is controlled through your `.hopcode/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
-| Setting                          | Environment Variable                                  | CLI Flag                                                 | Description                                              | Values            | Default                 |
-| -------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- | ----------------- | ----------------------- |
-| `enabled`                        | `HOPCODE_TELEMETRY_ENABLED`                           | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                              | `true`/`false`    | `false`                 |
-| `target`                         | `HOPCODE_TELEMETRY_TARGET`                            | `--telemetry-target <local\|gcp>`                        | Where to send telemetry data                             | `"gcp"`/`"local"` | `"local"`               |
-| `otlpEndpoint`                   | `HOPCODE_TELEMETRY_OTLP_ENDPOINT`                     | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                  | URL string        | `http://localhost:4317` |
-| `otlpProtocol`                   | `HOPCODE_TELEMETRY_OTLP_PROTOCOL`                     | `--telemetry-otlp-protocol <grpc\|http>`                 | OTLP transport protocol                                  | `"grpc"`/`"http"` | `"grpc"`                |
-| `otlpTracesEndpoint`             | `HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT`              | -                                                        | Per-signal endpoint override for traces (HTTP only)      | URL string        | -                       |
-| `otlpLogsEndpoint`               | `HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT`                | -                                                        | Per-signal endpoint override for logs (HTTP only)        | URL string        | -                       |
-| `otlpMetricsEndpoint`            | `HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT`             | -                                                        | Per-signal endpoint override for metrics (HTTP only)     | URL string        | -                       |
-| `outfile`                        | `HOPCODE_TELEMETRY_OUTFILE`                           | `--telemetry-outfile <path>`                             | Save telemetry to file (overrides `otlpEndpoint`)        | file path         | -                       |
-| `logPrompts`                     | `HOPCODE_TELEMETRY_LOG_PROMPTS`                       | `--telemetry-log-prompts` / `--no-telemetry-log-prompts` | Include prompts in telemetry logs                        | `true`/`false`    | `true`                  |
-| `includeSensitiveSpanAttributes` | `HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES` | -                                                        | Include sensitive attributes in log-to-span bridge spans | `true`/`false`    | `false`                 |
-| `useCollector`                   | `HOPCODE_TELEMETRY_USE_COLLECTOR`                     | -                                                        | Use external OTLP collector (advanced)                   | `true`/`false`    | `false`                 |
+| Setting                          | Environment Variable                                  | CLI Flag                                                 | Description                                                                                                                          | Values            | Default                 |
+| -------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ----------------------- |
+| `enabled`                        | `HOPCODE_TELEMETRY_ENABLED`                           | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                                                                                                          | `true`/`false`    | `false`                 |
+| `target`                         | `HOPCODE_TELEMETRY_TARGET`                            | `--telemetry-target <local\|gcp>` _(deprecated)_         | Informational destination label; does not control exporter routing — set `otlpEndpoint` or `outfile` to configure where data is sent | `"gcp"`/`"local"` | `"local"`               |
+| `otlpEndpoint`                   | `HOPCODE_TELEMETRY_OTLP_ENDPOINT`                     | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                                                                                              | URL string        | `http://localhost:4317` |
+| `otlpProtocol`                   | `HOPCODE_TELEMETRY_OTLP_PROTOCOL`                     | `--telemetry-otlp-protocol <grpc\|http>`                 | OTLP transport protocol                                                                                                              | `"grpc"`/`"http"` | `"grpc"`                |
+| `otlpTracesEndpoint`             | `HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT`              | -                                                        | Per-signal endpoint override for traces (HTTP only)                                                                                  | URL string        | -                       |
+| `otlpLogsEndpoint`               | `HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT`                | -                                                        | Per-signal endpoint override for logs (HTTP only)                                                                                    | URL string        | -                       |
+| `otlpMetricsEndpoint`            | `HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT`             | -                                                        | Per-signal endpoint override for metrics (HTTP only)                                                                                 | URL string        | -                       |
+| `outfile`                        | `HOPCODE_TELEMETRY_OUTFILE`                           | `--telemetry-outfile <path>`                             | Save telemetry to file (overrides OTLP export)                                                                                       | file path         | -                       |
+| `logPrompts`                     | `HOPCODE_TELEMETRY_LOG_PROMPTS`                       | `--telemetry-log-prompts` / `--no-telemetry-log-prompts` | Include prompts in telemetry logs                                                                                                    | `true`/`false`    | `true`                  |
+| `includeSensitiveSpanAttributes` | `HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES` | -                                                        | Include sensitive attributes in log-to-span bridge spans                                                                             | `true`/`false`    | `false`                 |
 
 **Note on boolean environment variables:** For the boolean settings (`enabled`,
-`logPrompts`, `includeSensitiveSpanAttributes`, `useCollector`), setting the
+`logPrompts`, `includeSensitiveSpanAttributes`), setting the
 corresponding environment variable to `true` or `1` will enable the feature. Any
 other value will disable it.
 
@@ -188,16 +187,20 @@ For local development and debugging, you can capture telemetry data locally:
 ### File-based Output (Recommended)
 
 1. Enable telemetry in your `.hopcode/settings.json`:
+
    ```json
    {
      "telemetry": {
        "enabled": true,
-       "target": "local",
-       "otlpEndpoint": "",
        "outfile": ".hopcode/telemetry.log"
      }
    }
    ```
+
+   > **Note:** When `outfile` is set, OTLP export is automatically disabled.
+   > The `target` and `otlpEndpoint` settings are not needed for file-only
+   > output and can be safely omitted from your config.
+
 2. Run HopCode and send prompts.
 3. View logs and metrics in the specified file (e.g., `.hopcode/telemetry.log`).
 

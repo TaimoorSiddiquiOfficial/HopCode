@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -311,7 +311,7 @@ export async function downloadFromGitHubRelease(
     if (entries.length === 2) {
       const lonelyDir = entries.find((entry) => entry.isDirectory());
       if (lonelyDir) {
-        const hasQwenConfig = fs.existsSync(
+        const hashopcodeConfig = fs.existsSync(
           path.join(destination, lonelyDir.name, EXTENSIONS_CONFIG_FILENAME),
         );
         const hasGeminiConfig = fs.existsSync(
@@ -328,7 +328,7 @@ export async function downloadFromGitHubRelease(
           path.join(destination, lonelyDir.name, '.claude-plugin/plugin.json'),
         );
         if (
-          hasQwenConfig ||
+          hashopcodeConfig ||
           hasGeminiConfig ||
           hasMarketplaceConfig ||
           hasClaudePluginConfig

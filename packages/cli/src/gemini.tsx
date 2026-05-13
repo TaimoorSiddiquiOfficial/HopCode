@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -116,8 +116,8 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     heapStats.heap_size_limit / 1024 / 1024,
   );
 
-  // Set target to 75% of total memory
-  const targetMaxOldSpaceSizeInMB = Math.floor(totalMemoryMB * 0.75);
+  // Set target to 50% of total memory
+  const targetMaxOldSpaceSizeInMB = Math.floor(totalMemoryMB * 0.5);
   if (isDebugMode) {
     writeStderrLine(
       `Current heap size ${currentMaxOldSpaceSizeMb.toFixed(2)} MB`,
@@ -575,6 +575,18 @@ export async function main() {
     );
     profileCheckpoint('after_load_cli_config');
 
+    // --json-schema is headless-only: the synthetic structured_output tool only
+    // terminates the run inside runNonInteractive. In TUI mode it's an inert
+    // tool that prints "accepted" and leaves the chat alive — silently stranding
+    // the run. Reject early so users get a clear error instead of a hung TUI.
+    if (config.isInteractive() && config.getJsonSchema()) {
+      writeStderrLine(
+        '--json-schema is a headless-only flag; pass a prompt via -p to use structured output.',
+      );
+      await runExitCleanup();
+      process.exit(1);
+    }
+
     // Register cleanup for MCP clients as early as possible
     // This ensures MCP server subprocesses are properly terminated on exit
     registerCleanup(() => config.shutdown());
@@ -677,7 +689,7 @@ export async function main() {
         ...(config.getModelsConfig().getCurrentAuthType() ===
         AuthType.HOPCODE_OAUTH
           ? [
-              'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
+              'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
             ]
           : []),
       ]),

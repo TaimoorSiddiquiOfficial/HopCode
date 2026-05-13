@@ -18,14 +18,16 @@ To install HopCode, use one of the following methods:
 
 ### Quick Install (Recommended)
 
-**Prerequisites**
+**Linux / macOS**
 
-Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
+```sh
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.sh | bash
+```
 
-**NPM**
+**Windows (Run as Administrator)**
 
-```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+```cmd
+powershell -Command "Invoke-WebRequest 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
 ```
 
 > [!note]
@@ -36,12 +38,12 @@ npm install -g @hoptrendy/hopcode-cli@latest
 
 **Prerequisites**
 
-Make sure you have Node.js 20 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
+Make sure you have Node.js 22 or later installed. Download it from [nodejs.org](https://nodejs.org/en/download).
 
 **NPM**
 
 ```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
 **Homebrew (macOS, Linux)**
@@ -73,11 +75,11 @@ Choose your preferred authentication method:
 
 > [!note]
 >
-> When you first authenticate HopCode with your account, a workspace called ".hopcode" is automatically created for you. This workspace provides centralized cost tracking and management for all HopCode usage in your organization.
+> When you first authenticate HopCode with your Qwen account, a workspace called ".hopcode" is automatically created for you. This workspace provides centralized cost tracking and management for all HopCode usage in your organization.
 
 > [!tip]
 >
-> You can also configure authentication directly from the terminal without starting a session by running `hopcode auth`. Use `hopcode auth status` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
+> To configure authentication, start HopCode and run `/auth`. Use `/doctor` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
 
 ## Step 3: Start your first session
 
@@ -216,21 +218,19 @@ review my changes and suggest improvements
 
 Here are the most important commands for daily use:
 
-| Command                | What it does                                     | Example                       |
-| ---------------------- | ------------------------------------------------ | ----------------------------- |
-| `hopcode`              | start HopCode                                    | `hopcode`                     |
-| `/auth`                | Change authentication method (in session)        | `/auth`                       |
-| `hopcode auth`         | Configure authentication from the terminal       | `hopcode auth`                |
-| `hopcode auth api-key` | Configure API key authentication                 | `hopcode auth api-key`        |
-| `hopcode auth status`  | Check current authentication status              | `hopcode auth status`         |
-| `/help`                | Display help information for available commands  | `/help` or `/?`               |
-| `/compress`            | Replace chat history with summary to save Tokens | `/compress`                   |
-| `/clear`               | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |
-| `/theme`               | Change HopCode visual theme                      | `/theme`                      |
-| `/language`            | View or change language settings                 | `/language`                   |
-| → `ui [language]`      | Set UI interface language                        | `/language ui zh-CN`          |
-| → `output [language]`  | Set LLM output language                          | `/language output Chinese`    |
-| `/quit`                | Exit HopCode immediately                         | `/quit` or `/exit`            |
+| Command               | What it does                                     | Example                       |
+| --------------------- | ------------------------------------------------ | ----------------------------- |
+| `hopcode`             | start HopCode                                    | `hopcode`                     |
+| `/auth`               | Change authentication method (in session)        | `/auth`                       |
+| `/doctor`             | Check current authentication and environment     | `/doctor`                     |
+| `/help`               | Display help information for available commands  | `/help` or `/?`               |
+| `/compress`           | Replace chat history with summary to save Tokens | `/compress`                   |
+| `/clear`              | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |
+| `/theme`              | Change HopCode visual theme                      | `/theme`                      |
+| `/language`           | View or change language settings                 | `/language`                   |
+| → `ui [language]`     | Set UI interface language                        | `/language ui zh-CN`          |
+| → `output [language]` | Set LLM output language                          | `/language output Chinese`    |
+| `/quit`               | Exit HopCode immediately                         | `/quit` or `/exit`            |
 
 See the [CLI reference](./features/commands) for a complete list of commands.
 
@@ -274,4 +274,4 @@ build a dashboard showing products that are most frequently returned by our UK c
 
 - **In HopCode**: Type `/help` or ask "how do I..."
 - **Documentation**: You're here! Browse other guides
-- **Community**: Join our [GitHub Discussion](https://github.com/TaimoorSiddiquiOfficial/HopCode/discussions) for tips and support
+- **Community**: Join our [GitHub Discussion](https://github.com/QwenLM/hopcode/discussions) for tips and support

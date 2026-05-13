@@ -1,12 +1,11 @@
 ﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as os from 'node:os';
 import {
   FatalConfigError,
   getErrorMessage,
@@ -19,11 +18,6 @@ import stripJsonComments from 'strip-json-comments';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 
 export const TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json';
-export const SETTINGS_DIRECTORY_NAME = '.hopcode';
-export const USER_SETTINGS_DIR = path.join(
-  os.homedir(),
-  SETTINGS_DIRECTORY_NAME,
-);
 
 export function getTrustedFoldersPath(): string {
   if (process.env['HOPCODE_TRUSTED_FOLDERS_PATH']) {

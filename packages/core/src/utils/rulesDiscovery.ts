@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,15 +20,15 @@ import picomatch from 'picomatch';
 import { parse as parseYaml } from './yaml-parser.js';
 import { normalizeContent } from './textUtils.js';
 import { HOPCODE_DIR } from './paths.js';
+import { Storage } from '../config/storage.js';
 import { createDebugLogger } from './debugLogger.js';
 import { resolveProjectRelativePath } from './projectPath.js';
-import { Storage } from '../config/storage.js';
 
 const logger = createDebugLogger('RULES_DISCOVERY');
 
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Types
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface RuleFile {
   filePath: string;
@@ -46,9 +46,9 @@ export interface LoadRulesResponse {
   conditionalRules: RuleFile[];
 }
 
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Parsing
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---(?:\n|$)([\s\S]*)$/;
 
@@ -113,9 +113,9 @@ export function parseRuleFile(
   return { filePath, description, paths, content };
 }
 
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Directory scanning (recursive)
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Recursively collect all .md file paths under a directory.
@@ -155,7 +155,7 @@ async function loadRulesFromDir(
   if (allPaths.length === 0) return [];
 
   // Sort for deterministic ordering. Use Array.sort() default (UTF-16 code
-  // point comparison) rather than localeCompare � locale-dependent sorting
+  // point comparison) rather than localeCompare — locale-dependent sorting
   // can produce different orders on machines with different locales.
   allPaths.sort();
 
@@ -186,9 +186,9 @@ async function loadRulesFromDir(
   return ruleFiles;
 }
 
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Formatting
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Format loaded rules into a single string with source markers,
@@ -202,7 +202,7 @@ export function formatRules(rules: RuleFile[], projectRoot: string): string {
         : rule.filePath;
       // Normalize to forward slashes for cross-platform consistency in the
       // system prompt. Glob patterns in `paths:` use forward slashes, so
-      // display paths should match � otherwise Windows shows `.hopcode\rules\foo.md`
+      // display paths should match — otherwise Windows shows `.hopcode\rules\foo.md`
       // and Linux shows `.hopcode/rules/foo.md`, which is confusing in diffs/tests.
       const displayPath = rawDisplayPath.replace(/\\/g, '/');
       return (
@@ -214,9 +214,9 @@ export function formatRules(rules: RuleFile[], projectRoot: string): string {
     .join('\n\n');
 }
 
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // ConditionalRulesRegistry (Gap 3: turn-level lazy loading)
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface CompiledRule {
   rule: RuleFile;
@@ -295,9 +295,9 @@ export class ConditionalRulesRegistry {
   }
 }
 
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Main entry point
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Load rules from both global (`~/.hopcode/rules/`) and project-level
@@ -320,7 +320,7 @@ export async function loadRules(
 
   const allRules: RuleFile[] = [];
 
-  // 1. Global rules: ~/.hopcode/rules/
+  // 1. Global rules: <HOPCODE_HOME or ~/.hopcode>/rules/
   const globalRulesDir = path.join(Storage.getGlobalHopCodeDir(), 'rules');
   const globalRules = await loadRulesFromDir(globalRulesDir, excludes);
   allRules.push(...globalRules);
@@ -336,7 +336,7 @@ export async function loadRules(
       logger.debug(`Loaded ${projectRules.length} project rule(s)`);
     } else {
       logger.debug(
-        'Project rules dir same as global � skipping to avoid duplicates',
+        'Project rules dir same as global — skipping to avoid duplicates',
       );
     }
   }

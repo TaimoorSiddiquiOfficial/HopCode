@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Credential storage for WeChat account.
  * Stores account data in ~/.hopcode/channels/weixin/
  */
@@ -12,7 +12,7 @@ import {
   chmodSync,
 } from 'node:fs';
 import { join } from 'node:path';
-import { homedir } from 'node:os';
+import { getGlobalHopCodeDir } from '@hoptrendy/channel-base';
 
 export const DEFAULT_BASE_URL = 'https://ilinkai.weixin.qq.com';
 
@@ -26,7 +26,7 @@ export interface AccountData {
 export function getStateDir(): string {
   const dir =
     process.env['WEIXIN_STATE_DIR'] ||
-    join(homedir(), '.hopcode', 'channels', 'weixin');
+    join(getGlobalHopCodeDir(), 'channels', 'weixin');
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }

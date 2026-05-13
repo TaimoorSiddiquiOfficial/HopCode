@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +99,7 @@ export function isGenericQuotaExceededError(error: unknown): boolean {
   return false;
 }
 
-export function isQwenQuotaExceededError(error: unknown): boolean {
+export function isHopCodeQuotaExceededError(error: unknown): boolean {
   // Match the specific HopCode free-tier quota error to distinguish it from
   // temporary throttling (429 due to concurrency) or paid account quota limits.
   if (typeof error !== 'object' || error === null) {

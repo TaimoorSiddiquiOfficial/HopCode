@@ -22,7 +22,7 @@ interface ModelSelectorProps {
  * discontinued.  Runtime snapshots (prefixed with `$runtime|`) remain
  * selectable so users who already have a runtime model aren't blocked.
  */
-function isDiscontinuedQwenOAuth(modelId: string): boolean {
+function isDiscontinuedHopCodeOAuth(modelId: string): boolean {
   return (
     modelId.includes('(hopcode-oauth)') && !modelId.startsWith('$runtime|')
   );
@@ -92,7 +92,7 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
           event.preventDefault();
           event.stopPropagation();
           if (models[selected]) {
-            if (isDiscontinuedQwenOAuth(models[selected].modelId)) {
+            if (isDiscontinuedHopCodeOAuth(models[selected].modelId)) {
               setBlockedMessage(DISCONTINUED_BLOCKED_MSG);
             } else {
               onSelectModel(models[selected].modelId);
@@ -133,7 +133,7 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
 
   const handleModelSelect = useCallback(
     (modelId: string) => {
-      if (isDiscontinuedQwenOAuth(modelId)) {
+      if (isDiscontinuedHopCodeOAuth(modelId)) {
         setBlockedMessage(DISCONTINUED_BLOCKED_MSG);
         return;
       }
@@ -145,7 +145,7 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
 
   const handleModelHover = useCallback((index: number, modelId: string) => {
     setSelected(index);
-    if (!isDiscontinuedQwenOAuth(modelId)) {
+    if (!isDiscontinuedHopCodeOAuth(modelId)) {
       setBlockedMessage(null);
     }
   }, []);
@@ -183,7 +183,7 @@ export const ModelSelector: FC<ModelSelectorProps> = ({
           models.map((model, index) => {
             const isActive = index === selected;
             const isCurrentModel = model.modelId === currentModelId;
-            const isDiscontinued = isDiscontinuedQwenOAuth(model.modelId);
+            const isDiscontinued = isDiscontinuedHopCodeOAuth(model.modelId);
             const description = isDiscontinued
               ? DISCONTINUED_DESCRIPTION
               : model.description;

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -12,11 +12,10 @@ export default {
   // Help / UI Components
   // ============================================================================
   // Attachment hints
-  '? to manage attachments': '? to manage attachments',
-  '? ? select, Delete to remove, ? to exit':
-    '? ? select, Delete to remove, ? to exit',
+  '↑ to manage attachments': '↑ to manage attachments',
+  '← → select, Delete to remove, ↓ to exit':
+    '← → select, Delete to remove, ↓ to exit',
   'Attachments: ': 'Attachments: ',
-
   'Basics:': 'Basics:',
   'Add context': 'Add context',
   'Use {{symbol}} to specify files for context (e.g., {{example}}) to target specific files or folders.':
@@ -24,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell mode',
-  'IZN mode': 'IZN mode',
+  'YOLO mode': 'YOLO mode',
   'plan mode': 'plan mode',
   'auto-accept edits': 'auto-accept edits',
   'Accepting edits': 'Accepting edits',
@@ -86,28 +85,19 @@ export default {
   'for help on HopCode': 'for help on HopCode',
   'show version info': 'show version info',
   'submit a bug report': 'submit a bug report',
-  'About HopCode': 'About HopCode',
   Status: 'Status',
 
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  HopCode: 'HopCode',
+  'HopCode': 'HopCode',
   Runtime: 'Runtime',
   OS: 'OS',
   Auth: 'Auth',
-  'CLI Version': 'CLI Version',
-  'Git Commit': 'Git Commit',
   Model: 'Model',
   'Fast Model': 'Fast Model',
   Sandbox: 'Sandbox',
-  'OS Platform': 'OS Platform',
-  'OS Arch': 'OS Arch',
-  'OS Release': 'OS Release',
-  'Node.js Version': 'Node.js Version',
-  'NPM Version': 'NPM Version',
   'Session ID': 'Session ID',
-  'Auth Method': 'Auth Method',
   'Base URL': 'Base URL',
   Proxy: 'Proxy',
   'Memory Usage': 'Memory Usage',
@@ -129,6 +119,19 @@ export default {
     'Invalid approval mode "{{arg}}". Valid modes: {{modes}}',
   'Approval mode set to "{{mode}}"': 'Approval mode set to "{{mode}}"',
   'View or change the language setting': 'View or change the language setting',
+  'List background tasks (text dump — interactive dialog opens via the footer pill)':
+    'List background tasks (text dump — interactive dialog opens via the footer pill)',
+  'Delete a previous session': 'Delete a previous session',
+  'Run installation and environment diagnostics':
+    'Run installation and environment diagnostics',
+  'Browse dynamic model catalogs and choose which models stay enabled locally':
+    'Browse dynamic model catalogs and choose which models stay enabled locally',
+  'Generate a one-line session recap now':
+    'Generate a one-line session recap now',
+  'Rename the current conversation. --auto lets the fast model pick a title.':
+    'Rename the current conversation. --auto lets the fast model pick a title.',
+  'Rewind conversation to a previous turn':
+    'Rewind conversation to a previous turn',
   'change the theme': 'change the theme',
   'Select Theme': 'Select Theme',
   Preview: 'Preview',
@@ -148,7 +151,6 @@ export default {
   'open full HopCode documentation in your browser':
     'open full HopCode documentation in your browser',
   'Configuration not available.': 'Configuration not available.',
-  'change the auth method': 'change the auth method',
   'Configure authentication information for login':
     'Configure authentication information for login',
   'Copy the last result or code snippet to clipboard':
@@ -160,16 +162,16 @@ export default {
   'Failed to compute git diff stats': 'Failed to compute git diff stats',
   'No diff available. Either this is not a git repository, HEAD is missing, or a merge/rebase/cherry-pick/revert is in progress.':
     'No diff available. Either this is not a git repository, HEAD is missing, or a merge/rebase/cherry-pick/revert is in progress.',
-  'Clean working tree � no changes against HEAD.':
-    'Clean working tree � no changes against HEAD.',
+  'Clean working tree — no changes against HEAD.':
+    'Clean working tree — no changes against HEAD.',
   '{{count}} file changed, +{{added}} / -{{removed}}':
     '{{count}} file changed, +{{added}} / -{{removed}}',
   '{{count}} files changed, +{{added}} / -{{removed}}':
     '{{count}} files changed, +{{added}} / -{{removed}}',
   '{{count}} file changed': '{{count}} file changed',
   '{{count}} files changed': '{{count}} files changed',
-  '�and {{hidden}} more (showing first {{shown}})':
-    '�and {{hidden}} more (showing first {{shown}})',
+  '…and {{hidden}} more (showing first {{shown}})':
+    '…and {{hidden}} more (showing first {{shown}})',
   '(binary)': '(binary)',
   '(binary, new)': '(binary, new)',
   '(new)': '(new)',
@@ -198,12 +200,12 @@ export default {
   'Delete {{name}}': 'Delete {{name}}',
   'Unknown Step': 'Unknown Step',
   'Esc to close': 'Esc to close',
-  'Enter to select, ?? to navigate, Esc to close':
-    'Enter to select, ?? to navigate, Esc to close',
+  'Enter to select, ↑↓ to navigate, Esc to close':
+    'Enter to select, ↑↓ to navigate, Esc to close',
   'Esc to go back': 'Esc to go back',
   'Enter to confirm, Esc to cancel': 'Enter to confirm, Esc to cancel',
-  'Enter to select, ?? to navigate, Esc to go back':
-    'Enter to select, ?? to navigate, Esc to go back',
+  'Enter to select, ↑↓ to navigate, Esc to go back':
+    'Enter to select, ↑↓ to navigate, Esc to go back',
   'Enter to submit, Esc to go back': 'Enter to submit, Esc to go back',
   'Invalid step: {{step}}': 'Invalid step: {{step}}',
   'No subagents found.': 'No subagents found.',
@@ -229,7 +231,7 @@ export default {
   'Open in editor': 'Open in editor',
   'Edit tools': 'Edit tools',
   'Edit color': 'Edit color',
-  '? Error:': '? Error:',
+  '❌ Error:': '❌ Error:',
   'Are you sure you want to delete agent "{{name}}"?':
     'Are you sure you want to delete agent "{{name}}"?',
   // ============================================================================
@@ -237,12 +239,12 @@ export default {
   // ============================================================================
   'Project Level (.hopcode/agents/)': 'Project Level (.hopcode/agents/)',
   'User Level (~/.hopcode/agents/)': 'User Level (~/.hopcode/agents/)',
-  '? Subagent Created Successfully!': '? Subagent Created Successfully!',
+  '✅ Subagent Created Successfully!': '✅ Subagent Created Successfully!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Subagent "{{name}}" has been saved to {{level}} level.',
   'Name: ': 'Name: ',
   'Location: ': 'Location: ',
-  '? Error saving subagent:': '? Error saving subagent:',
+  '❌ Error saving subagent:': '❌ Error saving subagent:',
   'Warnings:': 'Warnings:',
   'Name "{{name}}" already exists at {{level}} level - will overwrite existing subagent':
     'Name "{{name}}" already exists at {{level}} level - will overwrite existing subagent',
@@ -258,7 +260,8 @@ export default {
   'Step {{n}}: Choose Location': 'Step {{n}}: Choose Location',
   'Step {{n}}: Choose Generation Method':
     'Step {{n}}: Choose Generation Method',
-  'Generate with HopCode (Recommended)': 'Generate with HopCode (Recommended)',
+  'Generate with HopCode (Recommended)':
+    'Generate with HopCode (Recommended)',
   'Manual Creation': 'Manual Creation',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)',
@@ -295,7 +298,7 @@ export default {
     'Press Enter to continue, {{navigation}}Esc to {{action}}',
   cancel: 'cancel',
   'go back': 'go back',
-  '?? to navigate, ': '?? to navigate, ',
+  '↑↓ to navigate, ': '↑↓ to navigate, ',
   'Enter a clear, unique name for this subagent.':
     'Enter a clear, unique name for this subagent.',
   'e.g., Code Reviewer': 'e.g., Code Reviewer',
@@ -328,37 +331,24 @@ export default {
   'User Scope': 'User Scope',
   'Workspace Scope': 'Workspace Scope',
   'No extensions found.': 'No extensions found.',
-  Active: 'Active',
-  Disabled: 'Disabled',
-  'Update available': 'Update available',
-  'Up to date': 'Up to date',
-  'Checking...': 'Checking...',
   'Updating...': 'Updating...',
   Unknown: 'Unknown',
   Error: 'Error',
+  'Stopped because': 'Stopped because',
   'Version:': 'Version:',
   'Status:': 'Status:',
   'Are you sure you want to uninstall extension "{{name}}"?':
     'Are you sure you want to uninstall extension "{{name}}"?',
   'This action cannot be undone.': 'This action cannot be undone.',
-  'Extension "{{name}}" disabled successfully.':
-    'Extension "{{name}}" disabled successfully.',
-  'Extension "{{name}}" enabled successfully.':
-    'Extension "{{name}}" enabled successfully.',
   'Extension "{{name}}" updated successfully.':
     'Extension "{{name}}" updated successfully.',
-  'Failed to update extension "{{name}}": {{error}}':
-    'Failed to update extension "{{name}}": {{error}}',
-  'Select the scope for this action:': 'Select the scope for this action:',
-  'User - Applies to all projects': 'User - Applies to all projects',
-  'Workspace - Applies to current project only':
-    'Workspace - Applies to current project only',
   // Extension dialog - missing keys
   'Name:': 'Name:',
   'MCP Servers:': 'MCP Servers:',
   'Settings:': 'Settings:',
   active: 'active',
   disabled: 'disabled',
+  enabled: 'enabled',
   'View Details': 'View Details',
   'Update failed:': 'Update failed:',
   'Updating {{name}}...': 'Updating {{name}}...',
@@ -368,9 +358,6 @@ export default {
   'Disable "{{name}}" - Select Scope': 'Disable "{{name}}" - Select Scope',
   'Enable "{{name}}" - Select Scope': 'Enable "{{name}}" - Select Scope',
   'No extension selected': 'No extension selected',
-  'Press Y/Enter to confirm, N/Esc to cancel':
-    'Press Y/Enter to confirm, N/Esc to cancel',
-  'Y/Enter to confirm, N/Esc to cancel': 'Y/Enter to confirm, N/Esc to cancel',
   '{{count}} extensions installed': '{{count}} extensions installed',
   "Use '/extensions install' to install your first extension.":
     "Use '/extensions install' to install your first extension.",
@@ -388,20 +375,16 @@ export default {
   Settings: 'Settings',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
     'To see changes, HopCode must be restarted. Press r to exit and apply changes now.',
-  'The command "/{{command}}" is not supported in non-interactive mode.':
-    'The command "/{{command}}" is not supported in non-interactive mode.',
   // ============================================================================
   // Settings Labels
   // ============================================================================
   'Vim Mode': 'Vim Mode',
-  'Disable Auto Update': 'Disable Auto Update',
   'Attribution: commit': 'Attribution: commit',
   'Terminal Bell Notification': 'Terminal Bell Notification',
   'Enable Usage Statistics': 'Enable Usage Statistics',
   Theme: 'Theme',
   'Preferred Editor': 'Preferred Editor',
   'Auto-connect to IDE': 'Auto-connect to IDE',
-  'Enable Prompt Completion': 'Enable Prompt Completion',
   'Debug Keystroke Logging': 'Debug Keystroke Logging',
   'Language: UI': 'Language: UI',
   'Language: Model': 'Language: Model',
@@ -420,11 +403,7 @@ export default {
   Fine: 'Fine',
   Good: 'Good',
   Dismiss: 'Dismiss',
-  'Not Sure Yet': 'Not Sure Yet',
-  'Any other key': 'Any other key',
-  'Disable Loading Phrases': 'Disable Loading Phrases',
   'Screen Reader Mode': 'Screen Reader Mode',
-  'IDE Mode': 'IDE Mode',
   'Max Session Turns': 'Max Session Turns',
   'Skip Next Speaker Check': 'Skip Next Speaker Check',
   'Skip Loop Detection': 'Skip Loop Detection',
@@ -433,24 +412,19 @@ export default {
   'OpenAI Logging Directory': 'OpenAI Logging Directory',
   Timeout: 'Timeout',
   'Max Retries': 'Max Retries',
-  'Disable Cache Control': 'Disable Cache Control',
-  'Memory Discovery Max Dirs': 'Memory Discovery Max Dirs',
   'Load Memory From Include Directories':
     'Load Memory From Include Directories',
   'Respect .gitignore': 'Respect .gitignore',
   'Respect .hopcodeignore': 'Respect .hopcodeignore',
   'Enable Recursive File Search': 'Enable Recursive File Search',
-  'Disable Fuzzy Search': 'Disable Fuzzy Search',
   'Interactive Shell (PTY)': 'Interactive Shell (PTY)',
   'Show Color': 'Show Color',
   'Auto Accept': 'Auto Accept',
   'Use Ripgrep': 'Use Ripgrep',
   'Use Builtin Ripgrep': 'Use Builtin Ripgrep',
-  'Enable Tool Output Truncation': 'Enable Tool Output Truncation',
   'Tool Output Truncation Threshold': 'Tool Output Truncation Threshold',
   'Tool Output Truncation Lines': 'Tool Output Truncation Lines',
   'Folder Trust': 'Folder Trust',
-  'Vision Model Preview': 'Vision Model Preview',
   'Tool Schema Compliance': 'Tool Schema Compliance',
   // Settings enum options
   'Auto (detect from system)': 'Auto (detect from system)',
@@ -461,7 +435,7 @@ export default {
   Plan: 'Plan',
   Default: 'Default',
   'Auto Edit': 'Auto Edit',
-  IZN: 'IZN',
+  YOLO: 'YOLO',
   'toggle vim mode on/off': 'toggle vim mode on/off',
   'check session stats. Usage: /stats [model|tools]':
     'check session stats. Usage: /stats [model|tools]',
@@ -470,10 +444,6 @@ export default {
   'Show tool-specific usage statistics.':
     'Show tool-specific usage statistics.',
   'exit the cli': 'exit the cli',
-  'Open MCP management dialog, or authenticate with OAuth-enabled servers':
-    'Open MCP management dialog, or authenticate with OAuth-enabled servers',
-  'List configured MCP servers and tools, or authenticate with OAuth-enabled servers':
-    'List configured MCP servers and tools, or authenticate with OAuth-enabled servers',
   'Manage workspace directories': 'Manage workspace directories',
   'Add directories to the workspace. Use comma to separate multiple paths':
     'Add directories to the workspace. Use comma to separate multiple paths',
@@ -487,17 +457,12 @@ export default {
   'Your preferred editor is:': 'Your preferred editor is:',
   'Manage extensions': 'Manage extensions',
   'Manage installed extensions': 'Manage installed extensions',
-  'List active extensions': 'List active extensions',
-  'Update extensions. Usage: update <extension-names>|--all':
-    'Update extensions. Usage: update <extension-names>|--all',
   'Disable an extension': 'Disable an extension',
   'Enable an extension': 'Enable an extension',
   'Install an extension from a git repo or local path':
     'Install an extension from a git repo or local path',
   'Uninstall an extension': 'Uninstall an extension',
   'No extensions installed.': 'No extensions installed.',
-  'Usage: /extensions update <extension-names>|--all':
-    'Usage: /extensions update <extension-names>|--all',
   'Extension "{{name}}" not found.': 'Extension "{{name}}" not found.',
   'No extensions to update.': 'No extensions to update.',
   'Usage: /extensions install <source>': 'Usage: /extensions install <source>',
@@ -507,22 +472,6 @@ export default {
     'Extension "{{name}}" installed successfully.',
   'Failed to install extension from "{{source}}": {{error}}':
     'Failed to install extension from "{{source}}": {{error}}',
-  'Usage: /extensions uninstall <extension-name>':
-    'Usage: /extensions uninstall <extension-name>',
-  'Uninstalling extension "{{name}}"...':
-    'Uninstalling extension "{{name}}"...',
-  'Extension "{{name}}" uninstalled successfully.':
-    'Extension "{{name}}" uninstalled successfully.',
-  'Failed to uninstall extension "{{name}}": {{error}}':
-    'Failed to uninstall extension "{{name}}": {{error}}',
-  'Usage: /extensions {{command}} <extension> [--scope=<user|workspace>]':
-    'Usage: /extensions {{command}} <extension> [--scope=<user|workspace>]',
-  'Unsupported scope "{{scope}}", should be one of "user" or "workspace"':
-    'Unsupported scope "{{scope}}", should be one of "user" or "workspace"',
-  'Extension "{{name}}" disabled for scope "{{scope}}"':
-    'Extension "{{name}}" disabled for scope "{{scope}}"',
-  'Extension "{{name}}" enabled for scope "{{scope}}"':
-    'Extension "{{name}}" enabled for scope "{{scope}}"',
   'Do you want to continue? [Y/n]: ': 'Do you want to continue? [Y/n]: ',
   'Do you want to continue?': 'Do you want to continue?',
   'Installing extension "{{name}}".': 'Installing extension "{{name}}".',
@@ -536,8 +485,6 @@ export default {
     'This extension will add the following commands: {{commands}}.',
   'This extension will append info to your HOPCODE.md context using {{fileName}}':
     'This extension will append info to your HOPCODE.md context using {{fileName}}',
-  'This extension will exclude the following core tools: {{tools}}':
-    'This extension will exclude the following core tools: {{tools}}',
   'This extension will install the following skills:':
     'This extension will install the following skills:',
   'This extension will install the following subagents:':
@@ -550,8 +497,6 @@ export default {
     '--ref and --auto-update are not applicable for marketplace extensions.',
   'Extension "{{name}}" installed successfully and enabled.':
     'Extension "{{name}}" installed successfully and enabled.',
-  'Installs an extension from a git repository URL, local path, or claude marketplace (marketplace-url:plugin-name).':
-    'Installs an extension from a git repository URL, local path, or claude marketplace (marketplace-url:plugin-name).',
   'The github URL, local path, or marketplace source (marketplace-url:plugin-name) of the extension to install.':
     'The github URL, local path, or marketplace source (marketplace-url:plugin-name) of the extension to install.',
   'The git ref to install from.': 'The git ref to install from.',
@@ -588,8 +533,8 @@ export default {
     'The scope to disable the extenison in.',
   'Extension "{{name}}" successfully disabled for scope "{{scope}}".':
     'Extension "{{name}}" successfully disabled for scope "{{scope}}".',
-  'Extension "{{name}}" successfully updated: {{oldVersion}} ? {{newVersion}}.':
-    'Extension "{{name}}" successfully updated: {{oldVersion}} ? {{newVersion}}.',
+  'Extension "{{name}}" successfully updated: {{oldVersion}} → {{newVersion}}.':
+    'Extension "{{name}}" successfully updated: {{oldVersion}} → {{newVersion}}.',
   'Unable to install extension "{{name}}" due to missing install metadata':
     'Unable to install extension "{{name}}" due to missing install metadata',
   'Extension "{{name}}" is already up to date.':
@@ -635,6 +580,7 @@ export default {
   '[not set]': '[not set]',
   '[value stored in keychain]': '[value stored in keychain]',
   'Value:': 'Value:',
+  'Manage extension settings': 'Manage extension settings',
   'Manage extension settings.': 'Manage extension settings.',
   'You need to specify a command (set or list).':
     'You need to specify a command (set or list).',
@@ -647,8 +593,8 @@ export default {
     'Select a plugin to install from marketplace "{{name}}":',
   'Plugin selection cancelled.': 'Plugin selection cancelled.',
   'Select a plugin from "{{name}}"': 'Select a plugin from "{{name}}"',
-  'Use ?? or j/k to navigate, Enter to select, Escape to cancel':
-    'Use ?? or j/k to navigate, Enter to select, Escape to cancel',
+  'Use ↑↓ or j/k to navigate, Enter to select, Escape to cancel':
+    'Use ↑↓ or j/k to navigate, Enter to select, Escape to cancel',
   '{{count}} more above': '{{count}} more above',
   '{{count}} more below': '{{count}} more below',
   'manage IDE integration': 'manage IDE integration',
@@ -694,8 +640,6 @@ export default {
   // ============================================================================
   'Manage HopCode hooks': 'Manage HopCode hooks',
   'List all configured hooks': 'List all configured hooks',
-  'Enable a disabled hook': 'Enable a disabled hook',
-  'Disable an active hook': 'Disable an active hook',
   // Hooks - Dialog
   Hooks: 'Hooks',
   'Loading hooks...': 'Loading hooks...',
@@ -712,14 +656,14 @@ export default {
   '{{count}} hooks configured': '{{count}} hooks configured',
   'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
     'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.',
-  'Enter to select � Esc to cancel': 'Enter to select � Esc to cancel',
+  'Enter to select · Esc to cancel': 'Enter to select · Esc to cancel',
   // Hooks - Detail Step
   'Exit codes:': 'Exit codes:',
   'Configured hooks:': 'Configured hooks:',
   'No hooks configured for this event.': 'No hooks configured for this event.',
   'To add hooks, edit settings.json directly or ask HopCode.':
     'To add hooks, edit settings.json directly or ask HopCode.',
-  'Enter to select � Esc to go back': 'Enter to select � Esc to go back',
+  'Enter to select · Esc to go back': 'Enter to select · Esc to go back',
   // Hooks - Config Detail Step
   'Hook details': 'Hook details',
   'Event:': 'Event:',
@@ -744,6 +688,7 @@ export default {
   // Hooks - Source
   Project: 'Project',
   User: 'User',
+  Skill: 'Skill',
   System: 'System',
   Extension: 'Extension',
   'Local Settings': 'Local Settings',
@@ -751,9 +696,6 @@ export default {
   'System Settings': 'System Settings',
   Extensions: 'Extensions',
   'Session (temporary)': 'Session (temporary)',
-  // Hooks - Status
-  '? Enabled': '? Enabled',
-  '? Disabled': '? Disabled',
   // Hooks - Event Descriptions (short)
   'Before tool execution': 'Before tool execution',
   'After tool execution': 'After tool execution',
@@ -823,10 +765,6 @@ export default {
   'Config not loaded.': 'Config not loaded.',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
     'Hooks are not enabled. Enable hooks in settings to use this feature.',
-  'No hooks configured. Add hooks in your settings.json file.':
-    'No hooks configured. Add hooks in your settings.json file.',
-  'Configured Hooks ({{count}} total)': 'Configured Hooks ({{count}} total)',
-
   // ============================================================================
   // Commands - Session Export
   // ============================================================================
@@ -848,8 +786,21 @@ export default {
   // Commands - Session History
   // ============================================================================
   'Resume a previous session': 'Resume a previous session',
+  'Fork the current conversation into a new session':
+    'Fork the current conversation into a new session',
+  'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
+    'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.',
+  'No conversation to branch.': 'No conversation to branch.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested',
+  'Navigate and search session history': 'Navigate and search session history',
+  'Full-text search across all history items (entire session)':
+    'Full-text search across all history items (entire session)',
+  'Load the previous 2 000 history items': 'Load the previous 2 000 history items',
+  'Load the next 2 000 history items': 'Load the next 2 000 history items',
+  'Show current history window statistics': 'Show current history window statistics',
+  'Jump to a specific item index in history': 'Jump to a specific item index in history',
+  'Full-text search across all history items': 'Full-text search across all history items',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -865,19 +816,34 @@ export default {
   'Current UI language: {{lang}}': 'Current UI language: {{lang}}',
   'Current LLM output language: {{lang}}':
     'Current LLM output language: {{lang}}',
-  'LLM output language not set': 'LLM output language not set',
   'Set UI language': 'Set UI language',
   'Set LLM output language': 'Set LLM output language',
   'Usage: /language ui [{{options}}]': 'Usage: /language ui [{{options}}]',
   'Usage: /language output <language>': 'Usage: /language output <language>',
-  'Example: /language output ??': 'Example: /language output ??',
+  'Manage dynamic translation cache': 'Manage dynamic translation cache',
+  'Re-translate currently loaded dynamic slash descriptions for the current UI language':
+    'Re-translate currently loaded dynamic slash descriptions for the current UI language',
+  'Clear cached translations for the current UI language':
+    'Clear cached translations for the current UI language',
+  'Manage AI translation for dynamic slash command descriptions':
+    'Manage AI translation for dynamic slash command descriptions',
+  'Enable AI translation for dynamic slash command descriptions':
+    'Enable AI translation for dynamic slash command descriptions',
+  'Disable AI translation for dynamic slash command descriptions':
+    'Disable AI translation for dynamic slash command descriptions',
+  'Show AI translation status for dynamic slash command descriptions':
+    'Show AI translation status for dynamic slash command descriptions',
+  'AI translation for dynamic slash command descriptions is {{status}}.':
+    'AI translation for dynamic slash command descriptions is {{status}}.',
+  'AI translation for dynamic slash command descriptions is now enabled.':
+    'AI translation for dynamic slash command descriptions is now enabled.',
+  'AI translation for dynamic slash command descriptions is now disabled.':
+    'AI translation for dynamic slash command descriptions is now disabled.',
+  'Example: /language output 中文': 'Example: /language output 中文',
   'Example: /language output English': 'Example: /language output English',
-  'Example: /language output ???': 'Example: /language output ???',
-  'Example: /language output Portugu�s': 'Example: /language output Portugu�s',
+  'Example: /language output 日本語': 'Example: /language output 日本語',
   'UI language changed to {{lang}}': 'UI language changed to {{lang}}',
   'LLM output language set to {{lang}}': 'LLM output language set to {{lang}}',
-  'LLM output language rule file generated at {{path}}':
-    'LLM output language rule file generated at {{path}}',
   'Please restart the application for the changes to take effect.':
     'Please restart the application for the changes to take effect.',
   'Failed to generate LLM output language rule file: {{error}}':
@@ -894,36 +860,7 @@ export default {
   // Commands - Approval Mode
   // ============================================================================
   'Tool Approval Mode': 'Tool Approval Mode',
-  'Current approval mode: {{mode}}': 'Current approval mode: {{mode}}',
-  'Available approval modes:': 'Available approval modes:',
-  'Approval mode changed to: {{mode}}': 'Approval mode changed to: {{mode}}',
-  'Approval mode changed to: {{mode}} (saved to {{scope}} settings{{location}})':
-    'Approval mode changed to: {{mode}} (saved to {{scope}} settings{{location}})',
-  'Usage: /approval-mode <mode> [--session|--user|--project]':
-    'Usage: /approval-mode <mode> [--session|--user|--project]',
-
-  'Scope subcommands do not accept additional arguments.':
-    'Scope subcommands do not accept additional arguments.',
-  'Plan mode - Analyze only, do not modify files or execute commands':
-    'Plan mode - Analyze only, do not modify files or execute commands',
-  'Default mode - Require approval for file edits or shell commands':
-    'Default mode - Require approval for file edits or shell commands',
-  'Auto-edit mode - Automatically approve file edits':
-    'Auto-edit mode - Automatically approve file edits',
-  'IZN mode - Automatically approve all tools':
-    'IZN mode - Automatically approve all tools',
   '{{mode}} mode': '{{mode}} mode',
-  'Settings service is not available; unable to persist the approval mode.':
-    'Settings service is not available; unable to persist the approval mode.',
-  'Failed to save approval mode: {{error}}':
-    'Failed to save approval mode: {{error}}',
-  'Failed to change approval mode: {{error}}':
-    'Failed to change approval mode: {{error}}',
-  'Apply to current session only (temporary)':
-    'Apply to current session only (temporary)',
-  'Persist for this project/workspace': 'Persist for this project/workspace',
-  'Persist for this user on this machine':
-    'Persist for this user on this machine',
   'Analyze only, do not modify files or execute commands':
     'Analyze only, do not modify files or execute commands',
   'Require approval for file edits or shell commands':
@@ -934,107 +871,25 @@ export default {
     'Workspace approval mode exists and takes priority. User-level change will have no effect.',
   'Apply To': 'Apply To',
   'Workspace Settings': 'Workspace Settings',
-
-  // ============================================================================
-  // Commands - Memory
-  // ============================================================================
-  'Commands for interacting with memory.':
-    'Commands for interacting with memory.',
-  'Show the current memory contents.': 'Show the current memory contents.',
-  'Show project-level memory contents.': 'Show project-level memory contents.',
-  'Show global memory contents.': 'Show global memory contents.',
-  'Add content to project-level memory.':
-    'Add content to project-level memory.',
-  'Add content to global memory.': 'Add content to global memory.',
-  'Refresh the memory from the source.': 'Refresh the memory from the source.',
-  'Usage: /memory add --project <text to remember>':
-    'Usage: /memory add --project <text to remember>',
-  'Usage: /memory add --global <text to remember>':
-    'Usage: /memory add --global <text to remember>',
-  'Attempting to save to project memory: "{{text}}"':
-    'Attempting to save to project memory: "{{text}}"',
-  'Attempting to save to global memory: "{{text}}"':
-    'Attempting to save to global memory: "{{text}}"',
-  'Current memory content from {{count}} file(s):':
-    'Current memory content from {{count}} file(s):',
-  'Memory is currently empty.': 'Memory is currently empty.',
-  'Project memory file not found or is currently empty.':
-    'Project memory file not found or is currently empty.',
-  'Global memory file not found or is currently empty.':
-    'Global memory file not found or is currently empty.',
-  'Global memory is currently empty.': 'Global memory is currently empty.',
-  'Global memory content:\n\n---\n{{content}}\n---':
-    'Global memory content:\n\n---\n{{content}}\n---',
-  'Project memory content from {{path}}:\n\n---\n{{content}}\n---':
-    'Project memory content from {{path}}:\n\n---\n{{content}}\n---',
-  'Project memory is currently empty.': 'Project memory is currently empty.',
-  'Refreshing memory from source files...':
-    'Refreshing memory from source files...',
-  'Add content to the memory. Use --global for global memory or --project for project memory.':
-    'Add content to the memory. Use --global for global memory or --project for project memory.',
-  'Usage: /memory add [--global|--project] <text to remember>':
-    'Usage: /memory add [--global|--project] <text to remember>',
-  'Attempting to save to memory {{scope}}: "{{fact}}"':
-    'Attempting to save to memory {{scope}}: "{{fact}}"',
   'Open auto-memory folder': 'Open auto-memory folder',
   'Auto-memory: {{status}}': 'Auto-memory: {{status}}',
-  'Auto-dream: {{status}} � {{lastDream}} � /dream to run':
-    'Auto-dream: {{status}} � {{lastDream}} � /dream to run',
+  'Auto-dream: {{status}} · {{lastDream}} · /dream to run':
+    'Auto-dream: {{status}} · {{lastDream}} · /dream to run',
   never: 'never',
   on: 'on',
   off: 'off',
-  '? dreaming': '? dreaming',
   'Remove matching entries from managed auto-memory.':
     'Remove matching entries from managed auto-memory.',
   'Usage: /forget <memory text to remove>':
     'Usage: /forget <memory text to remove>',
   'No managed auto-memory entries matched: {{query}}':
     'No managed auto-memory entries matched: {{query}}',
-  'Show managed auto-memory status.': 'Show managed auto-memory status.',
-  'Run managed auto-memory extraction for the current session.':
-    'Run managed auto-memory extraction for the current session.',
-  'Managed auto-memory root: {{root}}': 'Managed auto-memory root: {{root}}',
-  'Managed auto-memory topics:': 'Managed auto-memory topics:',
-  'No extraction cursor found yet.': 'No extraction cursor found yet.',
-  'Cursor: session={{sessionId}}, offset={{offset}}, updated={{updatedAt}}':
-    'Cursor: session={{sessionId}}, offset={{offset}}, updated={{updatedAt}}',
-  'No chat client available to extract memory.':
-    'No chat client available to extract memory.',
-  'Managed auto-memory extraction is already running.':
-    'Managed auto-memory extraction is already running.',
-  'Managed auto-memory extraction found no new durable memories.':
-    'Managed auto-memory extraction found no new durable memories.',
   'Consolidate managed auto-memory topic files.':
     'Consolidate managed auto-memory topic files.',
-  'Managed auto-memory dream found nothing to improve.':
-    'Managed auto-memory dream found nothing to improve.',
-  'Deduplicated entries: {{count}}': 'Deduplicated entries: {{count}}',
-  'Save a durable memory using the save_memory tool.':
-    'Save a durable memory using the save_memory tool.',
-  'Usage: /remember [--global|--project] <text to remember>':
-    'Usage: /remember [--global|--project] <text to remember>',
-
-  // ============================================================================
-  // Commands - MCP
-  // ============================================================================
-  'Authenticate with an OAuth-enabled MCP server':
-    'Authenticate with an OAuth-enabled MCP server',
-  'List configured MCP servers and tools':
-    'List configured MCP servers and tools',
-  'Restarts MCP servers.': 'Restarts MCP servers.',
   'Open MCP management dialog': 'Open MCP management dialog',
   'Could not retrieve tool registry.': 'Could not retrieve tool registry.',
-  'No MCP servers configured with OAuth authentication.':
-    'No MCP servers configured with OAuth authentication.',
-  'MCP servers with OAuth authentication:':
-    'MCP servers with OAuth authentication:',
-  'Use /mcp auth <server-name> to authenticate.':
-    'Use /mcp auth <server-name> to authenticate.',
-  "MCP server '{{name}}' not found.": "MCP server '{{name}}' not found.",
   "Successfully authenticated and refreshed tools for '{{name}}'.":
     "Successfully authenticated and refreshed tools for '{{name}}'.",
-  "Failed to authenticate with MCP server '{{name}}': {{error}}":
-    "Failed to authenticate with MCP server '{{name}}': {{error}}",
   "Re-discovering tools from '{{name}}'...":
     "Re-discovering tools from '{{name}}'...",
   "Discovered {{count}} tool(s) from '{{name}}'.":
@@ -1042,29 +897,22 @@ export default {
   'Authentication complete. Returning to server details...':
     'Authentication complete. Returning to server details...',
   'Authentication successful.': 'Authentication successful.',
-  'If the browser does not open, copy and paste this URL into your browser:':
-    'If the browser does not open, copy and paste this URL into your browser:',
-  'Make sure to copy the COMPLETE URL - it may wrap across multiple lines.':
-    'Make sure to copy the COMPLETE URL - it may wrap across multiple lines.',
-
   // ============================================================================
   // MCP Management Dialog
   // ============================================================================
   'Manage MCP servers': 'Manage MCP servers',
   'Server Detail': 'Server Detail',
-  'Disable Server': 'Disable Server',
   Tools: 'Tools',
   'Tool Detail': 'Tool Detail',
-  'MCP Management': 'MCP Management',
   'Loading...': 'Loading...',
   'Unknown step': 'Unknown step',
   'Esc to back': 'Esc to back',
-  '?? to navigate � Enter to select � Esc to close':
-    '?? to navigate � Enter to select � Esc to close',
-  '?? to navigate � Enter to select � Esc to back':
-    '?? to navigate � Enter to select � Esc to back',
-  '?? to navigate � Enter to confirm � Esc to back':
-    '?? to navigate � Enter to confirm � Esc to back',
+  '↑↓ to navigate · Enter to select · Esc to close':
+    '↑↓ to navigate · Enter to select · Esc to close',
+  '↑↓ to navigate · Enter to select · Esc to back':
+    '↑↓ to navigate · Enter to select · Esc to back',
+  '↑↓ to navigate · Enter to confirm · Esc to back':
+    '↑↓ to navigate · Enter to confirm · Esc to back',
   'User Settings (global)': 'User Settings (global)',
   'Workspace Settings (project-specific)':
     'Workspace Settings (project-specific)',
@@ -1083,10 +931,8 @@ export default {
   'Server:': 'Server:',
   'Command:': 'Command:',
   'Working Directory:': 'Working Directory:',
-  'Capabilities:': 'Capabilities:',
   'No server selected': 'No server selected',
   prompts: 'prompts',
-  '(disabled)': '(disabled)',
   'Error:': 'Error:',
   tool: 'tool',
   tools: 'tools',
@@ -1102,45 +948,31 @@ export default {
   servers: 'servers',
   'Add MCP servers to your settings to get started.':
     'Add MCP servers to your settings to get started.',
-  'Run hopcode --debug to see error logs':
-    'Run hopcode --debug to see error logs',
+  'Run hopcode --debug to see error logs': 'Run hopcode --debug to see error logs',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth Authentication',
-  'Press Enter to start authentication, Esc to go back':
-    'Press Enter to start authentication, Esc to go back',
   'Authenticating... Please complete the login in your browser.':
     'Authenticating... Please complete the login in your browser.',
   'Press c to copy the authorization URL to your clipboard.':
     'Press c to copy the authorization URL to your clipboard.',
   'Copy request sent to your terminal. If paste is empty, copy the URL above manually.':
     'Copy request sent to your terminal. If paste is empty, copy the URL above manually.',
-  'Cannot write to terminal � copy the URL above manually.':
-    'Cannot write to terminal � copy the URL above manually.',
-  'Press Enter or Esc to go back': 'Press Enter or Esc to go back',
-
+  'Cannot write to terminal — copy the URL above manually.':
+    'Cannot write to terminal — copy the URL above manually.',
   // MCP Tool List
   'No tools available for this server.': 'No tools available for this server.',
   destructive: 'destructive',
   'read-only': 'read-only',
   'open-world': 'open-world',
   idempotent: 'idempotent',
-  'Tools for {{name}}': 'Tools for {{name}}',
   'Tools for {{serverName}}': 'Tools for {{serverName}}',
   '{{current}}/{{total}}': '{{current}}/{{total}}',
 
   // MCP Tool Detail
   required: 'required',
-  Type: 'Type',
-  Enum: 'Enum',
   Parameters: 'Parameters',
   'No tool selected': 'No tool selected',
-  Annotations: 'Annotations',
-  Title: 'Title',
-  'Read Only': 'Read Only',
-  Destructive: 'Destructive',
-  Idempotent: 'Idempotent',
-  'Open World': 'Open World',
   Server: 'Server',
 
   // Invalid tool related translations
@@ -1155,53 +987,7 @@ export default {
   Reason: 'Reason',
   'Tools must have both name and description to be used by the LLM.':
     'Tools must have both name and description to be used by the LLM.',
-
-  // ============================================================================
-  // Commands - Chat
-  // ============================================================================
-  'Manage conversation history.': 'Manage conversation history.',
-  'List saved conversation checkpoints': 'List saved conversation checkpoints',
-  'No saved conversation checkpoints found.':
-    'No saved conversation checkpoints found.',
-  'List of saved conversations:': 'List of saved conversations:',
-  'Note: Newest last, oldest first': 'Note: Newest last, oldest first',
-  'Save the current conversation as a checkpoint. Usage: /chat save <tag>':
-    'Save the current conversation as a checkpoint. Usage: /chat save <tag>',
-  'Missing tag. Usage: /chat save <tag>':
-    'Missing tag. Usage: /chat save <tag>',
-  'Delete a conversation checkpoint. Usage: /chat delete <tag>':
-    'Delete a conversation checkpoint. Usage: /chat delete <tag>',
-  'Missing tag. Usage: /chat delete <tag>':
-    'Missing tag. Usage: /chat delete <tag>',
-  "Conversation checkpoint '{{tag}}' has been deleted.":
-    "Conversation checkpoint '{{tag}}' has been deleted.",
-  "Error: No checkpoint found with tag '{{tag}}'.":
-    "Error: No checkpoint found with tag '{{tag}}'.",
-  'Resume a conversation from a checkpoint. Usage: /chat resume <tag>':
-    'Resume a conversation from a checkpoint. Usage: /chat resume <tag>',
-  'Missing tag. Usage: /chat resume <tag>':
-    'Missing tag. Usage: /chat resume <tag>',
-  'No saved checkpoint found with tag: {{tag}}.':
-    'No saved checkpoint found with tag: {{tag}}.',
-  'A checkpoint with the tag {{tag}} already exists. Do you want to overwrite it?':
-    'A checkpoint with the tag {{tag}} already exists. Do you want to overwrite it?',
-  'No chat client available to save conversation.':
-    'No chat client available to save conversation.',
-  'Conversation checkpoint saved with tag: {{tag}}.':
-    'Conversation checkpoint saved with tag: {{tag}}.',
-  'No conversation found to save.': 'No conversation found to save.',
-  'No chat client available to share conversation.':
-    'No chat client available to share conversation.',
-  'Invalid file format. Only .md and .json are supported.':
-    'Invalid file format. Only .md and .json are supported.',
-  'Error sharing conversation: {{error}}':
-    'Error sharing conversation: {{error}}',
-  'Conversation shared to {{filePath}}': 'Conversation shared to {{filePath}}',
-  'No conversation found to share.': 'No conversation found to share.',
-  'Share the current conversation to a markdown or json file. Usage: /chat share <file>':
-    'Share the current conversation to a markdown or json file. Usage: /chat share <file>',
-
-  // ============================================================================
+  // ===========================================================
   // Commands - Summary
   // ============================================================================
   'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
@@ -1217,6 +1003,10 @@ export default {
     'Saved project summary to {{filePathForDisplay}}.',
   'Saving project summary...': 'Saving project summary...',
   'Generating project summary...': 'Generating project summary...',
+  'Processing summary...': 'Processing summary...',
+  'Project summary generated and saved successfully!':
+    'Project summary generated and saved successfully!',
+  'Saved to: {{filePath}}': 'Saved to: {{filePath}}',
   'Failed to generate summary - no text content received from LLM response':
     'Failed to generate summary - no text content received from LLM response',
 
@@ -1260,8 +1050,6 @@ export default {
     'Chat history compression did not reduce size. This may indicate issues with the compression prompt.',
   'Could not compress chat history due to a token counting error.':
     'Could not compress chat history due to a token counting error.',
-  'Chat history is already compressed.': 'Chat history is already compressed.',
-
   // ============================================================================
   // Commands - Directory
   // ============================================================================
@@ -1296,7 +1084,6 @@ export default {
   Yes: 'Yes',
   No: 'No',
   'No (esc)': 'No (esc)',
-  'Yes, allow always for this session': 'Yes, allow always for this session',
   'Modify in progress:': 'Modify in progress:',
   'Save and close external editor to continue':
     'Save and close external editor to continue',
@@ -1305,7 +1092,6 @@ export default {
   'Modify with external editor': 'Modify with external editor',
   'No, suggest changes (esc)': 'No, suggest changes (esc)',
   "Allow execution of: '{{command}}'?": "Allow execution of: '{{command}}'?",
-  'Yes, allow always ...': 'Yes, allow always ...',
   'Always allow in this project': 'Always allow in this project',
   'Always allow {{action}} in this project':
     'Always allow {{action}} in this project',
@@ -1322,27 +1108,12 @@ export default {
   'Tool: {{tool}}': 'Tool: {{tool}}',
   'Allow execution of MCP tool "{{tool}}" from server "{{server}}"?':
     'Allow execution of MCP tool "{{tool}}" from server "{{server}}"?',
-  'Yes, always allow tool "{{tool}}" from server "{{server}}"':
-    'Yes, always allow tool "{{tool}}" from server "{{server}}"',
-  'Yes, always allow all tools from server "{{server}}"':
-    'Yes, always allow all tools from server "{{server}}"',
-
   // ============================================================================
   // Dialogs - Shell Confirmation
   // ============================================================================
   'Shell Command Execution': 'Shell Command Execution',
   'A custom command wants to run the following shell commands:':
     'A custom command wants to run the following shell commands:',
-
-  // ============================================================================
-  // Dialogs - Pro Quota
-  // ============================================================================
-  'Pro quota limit reached for {{model}}.':
-    'Pro quota limit reached for {{model}}.',
-  'Change auth (executes the /auth command)':
-    'Change auth (executes the /auth command)',
-  'Continue with {{model}}': 'Continue with {{model}}',
-
   // ============================================================================
   // Dialogs - Welcome Back
   // ============================================================================
@@ -1356,32 +1127,23 @@ export default {
     'Choose how to proceed with your session:',
   'Start new chat session': 'Start new chat session',
   'Continue previous conversation': 'Continue previous conversation',
-  '?? Welcome back! (Last updated: {{timeAgo}})':
-    '?? Welcome back! (Last updated: {{timeAgo}})',
-  '?? Overall Goal:': '?? Overall Goal:',
-
-  // ============================================================================
-  // Dialogs - Auth
-  // ============================================================================
-  'Get started': 'Get started',
+  '👋 Welcome back! (Last updated: {{timeAgo}})':
+    '👋 Welcome back! (Last updated: {{timeAgo}})',
+  '🎯 Overall Goal:': '🎯 Overall Goal:',
   'Select Authentication Method': 'Select Authentication Method',
-  'OpenAI API key is required to use OpenAI authentication.':
-    'OpenAI API key is required to use OpenAI authentication.',
   'You must select an auth method to proceed. Press Ctrl+C again to exit.':
     'You must select an auth method to proceed. Press Ctrl+C again to exit.',
   'Terms of Services and Privacy Notice':
     'Terms of Services and Privacy Notice',
-  'HopCode OAuth': 'Legacy OAuth',
-  'Discontinued � switch to Coding Plan or API Key':
-    'Discontinued � switch to Coding Plan or API Key',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.':
-    'Legacy OAuth free tier was discontinued on 2026-04-15. Run /auth to switch provider.',
+  'HopCode OAuth': 'HopCode OAuth',
+  'Discontinued — switch to Coding Plan or API Key':
+    'Discontinued — switch to Coding Plan or API Key',
   'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Legacy OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
+    'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
   'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Legacy OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
-  '\n? HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n? Legacy OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
+    'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models',
   'For teams \u00B7 Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
@@ -1404,43 +1166,25 @@ export default {
   'Bring your own API key': 'Bring your own API key',
   'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)':
     'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)',
-  'API-KEY': 'API-KEY',
-  'Use coding plan credentials or your own api-keys/providers.':
-    'Use coding plan credentials or your own api-keys/providers.',
-  OpenAI: 'OpenAI',
-  'Failed to login. Message: {{message}}':
-    'Failed to login. Message: {{message}}',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.',
-  'HopCode OAuth authentication timed out. Please try again.':
-    'Legacy OAuth authentication timed out. Please try again.',
-  'HopCode OAuth authentication cancelled.':
-    'Legacy OAuth authentication cancelled.',
-  'HopCode OAuth Authentication': 'Legacy OAuth Authentication',
+  'HopCode OAuth Authentication': 'HopCode OAuth Authentication',
   'Please visit this URL to authorize:': 'Please visit this URL to authorize:',
-  'Or scan the QR code below:': 'Or scan the QR code below:',
   'Waiting for authorization': 'Waiting for authorization',
   'Time remaining:': 'Time remaining:',
-  '(Press ESC or CTRL+C to cancel)': '(Press ESC or CTRL+C to cancel)',
-  'HopCode OAuth Authentication Timeout': 'Legacy OAuth Authentication Timeout',
+  'HopCode OAuth Authentication Timeout': 'HopCode OAuth Authentication Timeout',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.',
   'Press any key to return to authentication type selection.':
     'Press any key to return to authentication type selection.',
   'Waiting for HopCode OAuth authentication...':
-    'Waiting for Legacy OAuth authentication...',
-  'Note: Your existing API key in settings.json will not be cleared when using HopCode OAuth. You can switch back to OpenAI authentication later if needed.':
-    'Note: Your existing API key in settings.json will not be cleared when using Legacy OAuth. You can switch back to OpenAI authentication later if needed.',
-  'Note: Your existing API key will not be cleared when using HopCode OAuth.':
-    'Note: Your existing API key will not be cleared when using Legacy OAuth.',
+    'Waiting for HopCode OAuth authentication...',
   'Authentication timed out. Please try again.':
     'Authentication timed out. Please try again.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     'Waiting for auth... (Press ESC or CTRL+C to cancel)',
   'Missing API key for OpenAI-compatible auth. Set settings.security.auth.apiKey, or set the {{envKeyHint}} environment variable.':
     'Missing API key for OpenAI-compatible auth. Set settings.security.auth.apiKey, or set the {{envKeyHint}} environment variable.',
-  '{{envKeyHint}} environment variable not found.':
-    '{{envKeyHint}} environment variable not found.',
   '{{envKeyHint}} environment variable not found. Please set it in your .env file or environment variables.':
     '{{envKeyHint}} environment variable not found. Please set it in your .env file or environment variables.',
   '{{envKeyHint}} environment variable not found (or set settings.security.auth.apiKey). Please set it in your .env file or environment variables.':
@@ -1458,27 +1202,12 @@ export default {
     'Authenticated successfully with {{authType}} credentials.',
   'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
     'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}',
-  'OpenAI Configuration Required': 'OpenAI Configuration Required',
-  'Please enter your OpenAI configuration. You can get an API key from':
-    'Please enter your OpenAI configuration. You can get an API key from',
-  'API Key:': 'API Key:',
-  'Invalid credentials: {{errorMessage}}':
-    'Invalid credentials: {{errorMessage}}',
-  'Failed to validate credentials': 'Failed to validate credentials',
-  'Press Enter to continue, Tab/?? to navigate, Esc to cancel':
-    'Press Enter to continue, Tab/?? to navigate, Esc to cancel',
-
   // ============================================================================
   // Dialogs - Model
   // ============================================================================
   'Select Model': 'Select Model',
-  '(Press Esc to close)': '(Press Esc to close)',
-  'Current (effective) configuration': 'Current (effective) configuration',
-  AuthType: 'AuthType',
   'API Key': 'API Key',
-  unset: 'unset',
   '(default)': '(default)',
-  '(set)': '(set)',
   '(not set)': '(not set)',
   Modality: 'Modality',
   'Context Window': 'Context Window',
@@ -1491,13 +1220,6 @@ export default {
   'not set': 'not set',
   none: 'none',
   unknown: 'unknown',
-  "Failed to switch model to '{{modelId}}'.\n\n{{error}}":
-    "Failed to switch model to '{{modelId}}'.\n\n{{error}}",
-  'Qwen 3.6 Plus � efficient hybrid model with leading coding performance':
-    'Qwen 3.6 Plus � efficient hybrid model with leading coding performance',
-  'The latest HopCode Vision model from Alibaba Cloud ModelStudio (version: qwen3-vl-plus-2025-09-23)':
-    'The latest HopCode Vision model from Alibaba Cloud ModelStudio (version: qwen3-vl-plus-2025-09-23)',
-
   // ============================================================================
   // Dialogs - Permissions
   // ============================================================================
@@ -1521,46 +1243,39 @@ export default {
   'From user settings': 'From user settings',
   'From project settings': 'From project settings',
   'From session': 'From session',
-  'Project settings (local)': 'Project settings (local)',
-  'Saved in .hopcode/settings.local.json':
-    'Saved in .hopcode/settings.local.json',
   'Project settings': 'Project settings',
-  'Checked in at .hopcode/settings.json':
-    'Checked in at .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json': 'Checked in at .hopcode/settings.json',
   'User settings': 'User settings',
-  'Saved in at ~/.hopcode/settings.json':
-    'Saved in at ~/.hopcode/settings.json',
-  'Add a new rule�': 'Add a new rule�',
+  'Saved in at ~/.hopcode/settings.json': 'Saved in at ~/.hopcode/settings.json',
+  'Add a new rule…': 'Add a new rule…',
   'Add {{type}} permission rule': 'Add {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
     'Permission rules are a tool name, optionally followed by a specifier in parentheses.',
   'e.g.,': 'e.g.,',
   or: 'or',
-  'Enter permission rule�': 'Enter permission rule�',
-  'Enter to submit � Esc to cancel': 'Enter to submit � Esc to cancel',
+  'Enter permission rule…': 'Enter permission rule…',
+  'Enter to submit · Esc to cancel': 'Enter to submit · Esc to cancel',
   'Where should this rule be saved?': 'Where should this rule be saved?',
-  'Enter to confirm � Esc to cancel': 'Enter to confirm � Esc to cancel',
+  'Enter to confirm · Esc to cancel': 'Enter to confirm · Esc to cancel',
   'Delete {{type}} rule?': 'Delete {{type}} rule?',
   'Are you sure you want to delete this permission rule?':
     'Are you sure you want to delete this permission rule?',
   'Permissions:': 'Permissions:',
-  '(?/? or tab to cycle)': '(?/? or tab to cycle)',
-  'Press ?? to navigate � Enter to select � Type to search � Esc to cancel':
-    'Press ?? to navigate � Enter to select � Type to search � Esc to cancel',
-  'Search�': 'Search�',
-  'Use /trust to manage folder trust settings for this workspace.':
-    'Use /trust to manage folder trust settings for this workspace.',
+  '(←/→ or tab to cycle)': '(←/→ or tab to cycle)',
+  'Press ↑↓ to navigate · Enter to select · Type to search · Esc to cancel':
+    'Press ↑↓ to navigate · Enter to select · Type to search · Esc to cancel',
+  'Search…': 'Search…',
   // Workspace directory management
-  'Add directory�': 'Add directory�',
+  'Add directory…': 'Add directory…',
   'Add directory to workspace': 'Add directory to workspace',
   'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
     'HopCode can read files in the workspace, and make edits when auto-accept edits is on.',
   'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
     'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.',
   'Enter the path to the directory:': 'Enter the path to the directory:',
-  'Enter directory path�': 'Enter directory path�',
-  'Tab to complete � Enter to add � Esc to cancel':
-    'Tab to complete � Enter to add � Esc to cancel',
+  'Enter directory path…': 'Enter directory path…',
+  'Tab to complete · Enter to add · Esc to cancel':
+    'Tab to complete · Enter to add · Esc to cancel',
   'Remove directory?': 'Remove directory?',
   'Are you sure you want to remove this directory from the workspace?':
     'Are you sure you want to remove this directory from the workspace?',
@@ -1590,14 +1305,14 @@ export default {
   'Press Ctrl+C again to exit.': 'Press Ctrl+C again to exit.',
   'Press Ctrl+D again to exit.': 'Press Ctrl+D again to exit.',
   'Press Esc again to clear.': 'Press Esc again to clear.',
-  'Press ? to edit queued messages': 'Press ? to edit queued messages',
+  'Press ↑ to edit queued messages': 'Press ↑ to edit queued messages',
 
   // ============================================================================
   // MCP Status
   // ============================================================================
   'No MCP servers configured.': 'No MCP servers configured.',
-  '? MCP servers are starting up ({{count}} initializing)...':
-    '? MCP servers are starting up ({{count}} initializing)...',
+  '⏳ MCP servers are starting up ({{count}} initializing)...':
+    '⏳ MCP servers are starting up ({{count}} initializing)...',
   'Note: First startup may take longer. Tool availability will update automatically.':
     'Note: First startup may take longer. Tool availability will update automatically.',
   'Configured MCP servers:': 'Configured MCP servers:',
@@ -1620,7 +1335,7 @@ export default {
   'Parameters:': 'Parameters:',
   'Prompts:': 'Prompts:',
   Blocked: 'Blocked',
-  '?? Tips:': '?? Tips:',
+  '💡 Tips:': '💡 Tips:',
   Use: 'Use',
   'to show server and tool descriptions':
     'to show server and tool descriptions',
@@ -1632,8 +1347,6 @@ export default {
   'to toggle tool descriptions on/off': 'to toggle tool descriptions on/off',
   "Starting OAuth authentication for MCP server '{{name}}'...":
     "Starting OAuth authentication for MCP server '{{name}}'...",
-  'Restarting MCP servers...': 'Restarting MCP servers...',
-
   // ============================================================================
   // Startup Tips
   // ============================================================================
@@ -1658,8 +1371,8 @@ export default {
     'You can switch permission mode quickly with Tab or /approval-mode.',
   'Try /insight to generate personalized insights from your chat history.':
     'Try /insight to generate personalized insights from your chat history.',
-  'Press Ctrl+O to toggle compact mode � hide tool output and thinking for a cleaner view.':
-    'Press Ctrl+O to toggle compact mode � hide tool output and thinking for a cleaner view.',
+  'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
+    'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.',
   'Add a HOPCODE.md file to give HopCode persistent project context.':
     'Add a HOPCODE.md file to give HopCode persistent project context.',
   'Use /btw to ask a quick side question without disrupting the conversation.':
@@ -1710,7 +1423,6 @@ export default {
   Prompt: 'Prompt',
   Cached: 'Cached',
   Thoughts: 'Thoughts',
-  Tool: 'Tool',
   Output: 'Output',
   'No API calls have been made in this session.':
     'No API calls have been made in this session.',
@@ -1720,9 +1432,9 @@ export default {
   'Avg Duration': 'Avg Duration',
   'User Decision Summary': 'User Decision Summary',
   'Total Reviewed Suggestions:': 'Total Reviewed Suggestions:',
-  ' � Accepted:': ' � Accepted:',
-  ' � Rejected:': ' � Rejected:',
-  ' � Modified:': ' � Modified:',
+  ' » Accepted:': ' » Accepted:',
+  ' » Rejected:': ' » Rejected:',
+  ' » Modified:': ' » Modified:',
   ' Overall Agreement Rate:': ' Overall Agreement Rate:',
   'No tool calls have been made in this session.':
     'No tool calls have been made in this session.',
@@ -1736,6 +1448,48 @@ export default {
   'Found {{count}} TOML command file:': 'Found {{count}} TOML command file:',
   'Found {{count}} TOML command files:': 'Found {{count}} TOML command files:',
   'Current tasks': 'Current tasks',
+  'Background tasks': 'Background tasks',
+  'No tasks currently running': 'No tasks currently running',
+  'No entry to show.': 'No entry to show.',
+  Running: 'Running',
+  Paused: 'Paused',
+  Completed: 'Completed',
+  Failed: 'Failed',
+  Stopped: 'Stopped',
+  Shell: 'Shell',
+  Monitor: 'Monitor',
+  Command: 'Command',
+  Dream: 'Dream',
+  '[dream] memory consolidation': '[dream] memory consolidation',
+  '[dream] memory consolidation (reviewing {{count}} session)':
+    '[dream] memory consolidation (reviewing {{count}} session)',
+  '[dream] memory consolidation (reviewing {{count}} sessions)':
+    '[dream] memory consolidation (reviewing {{count}} sessions)',
+  '{{count}} session': '{{count}} session',
+  '{{count}} sessions': '{{count}} sessions',
+  '{{count}} topic': '{{count}} topic',
+  '{{count}} topics': '{{count}} topics',
+  '{{count}} tokens': '{{count}} tokens',
+  '{{count}} tool call': '{{count}} tool call',
+  '{{count}} tool calls': '{{count}} tool calls',
+  '{{count}} event': '{{count}} event',
+  '{{count}} events': '{{count}} events',
+  '{{count}} dropped': '{{count}} dropped',
+  'pid {{pid}}': 'pid {{pid}}',
+  'exit {{exitCode}}': 'exit {{exitCode}}',
+  'Sessions reviewing': 'Sessions reviewing',
+  Progress: 'Progress',
+  'Resume blocked': 'Resume blocked',
+  'Working dir': 'Working dir',
+  'Output file': 'Output file',
+  'Topics touched ({{count}})': 'Topics touched ({{count}})',
+  '{{count}} more': '{{count}} more',
+  'Lock release warning': 'Lock release warning',
+  'Metadata write warning': 'Metadata write warning',
+  "Subsequent dreams may be skipped as locked until the next session's staleness sweep cleans the file.":
+    "Subsequent dreams may be skipped as locked until the next session's staleness sweep cleans the file.",
+  "The scheduler gate did not see this dream's timestamp; the next dream cycle may re-fire sooner than usual.":
+    "The scheduler gate did not see this dream's timestamp; the next dream cycle may re-fire sooner than usual.",
   '... and {{count}} more': '... and {{count}} more',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
     'The TOML format is deprecated. Would you like to migrate them to Markdown format?',
@@ -1746,8 +1500,6 @@ export default {
   // Loading Phrases
   // ============================================================================
   'Waiting for user confirmation...': 'Waiting for user confirmation...',
-  '(esc to cancel, {{time}})': '(esc to cancel, {{time}})',
-
   // ============================================================================
   // Loading Phrases
   // ============================================================================
@@ -1931,13 +1683,8 @@ export default {
     'Opening extensions page in your browser: {{url}}',
   'Failed to open browser. Check out the extensions gallery at {{url}}':
     'Failed to open browser. Check out the extensions gallery at {{url}}',
-
-  // ============================================================================
-  // Retry / Rate Limit
-  // ============================================================================
-  'Rate limit error: {{reason}}': 'Rate limit error: {{reason}}',
-  'Retrying in {{seconds}} seconds� (attempt {{attempt}}/{{maxRetries}})':
-    'Retrying in {{seconds}} seconds� (attempt {{attempt}}/{{maxRetries}})',
+  'Retrying in {{seconds}} seconds… (attempt {{attempt}}/{{maxRetries}})':
+    'Retrying in {{seconds}} seconds… (attempt {{attempt}}/{{maxRetries}})',
   'Press Ctrl+Y to retry': 'Press Ctrl+Y to retry',
   'No failed request to retry.': 'No failed request to retry.',
   'to retry last request': 'to retry last request',
@@ -1975,15 +1722,7 @@ export default {
   // Auth Dialog - View Titles and Labels
   // ============================================================================
   'Coding Plan': 'Coding Plan',
-  "Paste your api key of ModelStudio Coding Plan and you're all set!":
-    "Paste your api key of ModelStudio Coding Plan and you're all set!",
   Custom: 'Custom',
-  'More instructions about configuring `modelProviders` manually.':
-    'More instructions about configuring `modelProviders` manually.',
-  'Select API-KEY configuration mode:': 'Select API-KEY configuration mode:',
-  '(Press Escape to go back)': '(Press Escape to go back)',
-  '(Press Enter to submit, Escape to cancel)':
-    '(Press Enter to submit, Escape to cancel)',
   'Select Region for Coding Plan': 'Select Region for Coding Plan',
   'Choose based on where your account is registered':
     'Choose based on where your account is registered',
@@ -1997,9 +1736,6 @@ export default {
     'New model configurations are available for {{region}}. Update now?',
   '{{region}} configuration updated successfully. Model switched to "{{model}}".':
     '{{region}} configuration updated successfully. Model switched to "{{model}}".',
-  'Authenticated successfully with {{region}}. API key and model configs saved to settings.json (backed up).':
-    'Authenticated successfully with {{region}}. API key and model configs saved to settings.json (backed up).',
-
   // ============================================================================
   // Context Usage Component
   // ============================================================================
@@ -2008,7 +1744,6 @@ export default {
   '% context used': '% context used',
   'Context exceeds limit! Use /compress or /clear to reduce.':
     'Context exceeds limit! Use /compress or /clear to reduce.',
-  'Use /compress or /clear': 'Use /compress or /clear',
   'No API response yet. Send a message to see actual usage.':
     'No API response yet. Send a message to see actual usage.',
   'Estimated pre-conversation overhead': 'Estimated pre-conversation overhead',
@@ -2024,8 +1759,6 @@ export default {
   'Memory files': 'Memory files',
   Skills: 'Skills',
   Messages: 'Messages',
-  'Show context window usage breakdown.':
-    'Show context window usage breakdown.',
   'Run /context detail for per-item breakdown.':
     'Run /context detail for per-item breakdown.',
   'Show context window usage breakdown. Use "/context detail" for per-item breakdown.':
@@ -2038,19 +1771,6 @@ export default {
     'Authenticated successfully with {{region}}. API key and model configs saved to settings.json.',
   'Tip: Use /model to switch between available Coding Plan models.':
     'Tip: Use /model to switch between available Coding Plan models.',
-
-  // ============================================================================
-  // Ask User Question Tool
-  // ============================================================================
-  'Please answer the following question(s):':
-    'Please answer the following question(s):',
-  'Cannot ask user questions in non-interactive mode. Please run in interactive mode to use this tool.':
-    'Cannot ask user questions in non-interactive mode. Please run in interactive mode to use this tool.',
-  'User declined to answer the questions.':
-    'User declined to answer the questions.',
-  'User has provided the following answers:':
-    'User has provided the following answers:',
-  'Failed to process user answers:': 'Failed to process user answers:',
   'Type something...': 'Type something...',
   Submit: 'Submit',
   'Submit answers': 'Submit answers',
@@ -2058,21 +1778,11 @@ export default {
   'Your answers:': 'Your answers:',
   '(not answered)': '(not answered)',
   'Ready to submit your answers?': 'Ready to submit your answers?',
-  '?/?: Navigate | ?/?: Switch tabs | Enter: Select':
-    '?/?: Navigate | ?/?: Switch tabs | Enter: Select',
-  '?/?: Navigate | ?/?: Switch tabs | Space/Enter: Toggle | Esc: Cancel':
-    '?/?: Navigate | ?/?: Switch tabs | Space/Enter: Toggle | Esc: Cancel',
-  '?/?: Navigate | Space/Enter: Toggle | Esc: Cancel':
-    '?/?: Navigate | Space/Enter: Toggle | Esc: Cancel',
-  '?/?: Navigate | Enter: Select | Esc: Cancel':
-    '?/?: Navigate | Enter: Select | Esc: Cancel',
-
-  // ============================================================================
-  // Commands - Auth
-  // ============================================================================
-  'Configure authentication information with hopcode-oauth or Alibaba Cloud Coding Plan':
-    'Configure HopCode authentication information with Legacy OAuth or Alibaba Cloud Coding Plan',
-  'Authenticate using HopCode OAuth': 'Authenticate using Legacy OAuth',
+  '↑/↓: Navigate | ←/→: Switch tabs | Enter: Select':
+    '↑/↓: Navigate | ←/→: Switch tabs | Enter: Select',
+  '↑/↓: Navigate | Enter: Select | Esc: Cancel':
+    '↑/↓: Navigate | Enter: Select | Esc: Cancel',
+  'Authenticate using HopCode OAuth': 'Authenticate using HopCode OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Authenticate using Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
@@ -2082,74 +1792,67 @@ export default {
   'Authentication completed successfully.':
     'Authentication completed successfully.',
   'Starting HopCode OAuth authentication...':
-    'Starting Legacy OAuth authentication...',
+    'Starting HopCode OAuth authentication...',
   'Successfully authenticated with HopCode OAuth.':
-    'Successfully authenticated with Legacy OAuth.',
+    'Successfully authenticated with HopCode OAuth.',
   'Failed to authenticate with HopCode OAuth: {{error}}':
-    'Failed to authenticate with Legacy OAuth: {{error}}',
+    'Failed to authenticate with HopCode OAuth: {{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
     'Processing Alibaba Cloud Coding Plan authentication...',
   'Successfully authenticated with Alibaba Cloud Coding Plan.':
     'Successfully authenticated with Alibaba Cloud Coding Plan.',
   'Failed to authenticate with Coding Plan: {{error}}':
     'Failed to authenticate with Coding Plan: {{error}}',
-  '?? (China)': '?? (China)',
-  '????? (aliyun.com)': '????? (aliyun.com)',
+  '中国 (China)': '中国 (China)',
+  '阿里云百炼 (aliyun.com)': '阿里云百炼 (aliyun.com)',
   Global: 'Global',
   'Alibaba Cloud (alibabacloud.com)': 'Alibaba Cloud (alibabacloud.com)',
   'Select region for Coding Plan:': 'Select region for Coding Plan:',
   'Enter your Coding Plan API key: ': 'Enter your Coding Plan API key: ',
   'Select authentication method:': 'Select authentication method:',
   '\n=== Authentication Status ===\n': '\n=== Authentication Status ===\n',
-  '??  No authentication method configured.\n':
-    '??  No authentication method configured.\n',
+  '⚠️  No authentication method configured.\n':
+    '⚠️  No authentication method configured.\n',
   'Run one of the following commands to get started:\n':
     'Run one of the following commands to get started:\n',
   '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth Legacy OAuth     - Authenticate with Legacy OAuth (discontinued)',
-  '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n':
-    '  hopcode auth coding-plan      - Authenticate with Alibaba Cloud Coding Plan\n',
+    '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)',
   'Or simply run:': 'Or simply run:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Interactive authentication setup\n',
-  '? Authentication Method: HopCode OAuth':
-    '? Authentication Method: Legacy OAuth',
+  '✓ Authentication Method: HopCode OAuth': '✓ Authentication Method: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type: Free tier (discontinued 2026-04-15)',
   '  Limit: No longer available': '  Limit: No longer available',
   'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Legacy OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
-  '  Models: Qwen latest models\n': '  Models: HopCode models\n',
-  '? Authentication Method: Alibaba Cloud Coding Plan':
-    '? Authentication Method: Alibaba Cloud Coding Plan',
-  '?? (China) - ?????': '?? (China) - ?????',
+    'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
+  '✓ Authentication Method: Alibaba Cloud Coding Plan':
+    '✓ Authentication Method: Alibaba Cloud Coding Plan',
+  '中国 (China) - 阿里云百炼': '中国 (China) - 阿里云百炼',
   'Global - Alibaba Cloud': 'Global - Alibaba Cloud',
   '  Region: {{region}}': '  Region: {{region}}',
   '  Current Model: {{model}}': '  Current Model: {{model}}',
   '  Config Version: {{version}}': '  Config Version: {{version}}',
   '  Status: API key configured\n': '  Status: API key configured\n',
-  '??  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
-    '??  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)',
+  '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
+    '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)',
   '  Issue: API key not found in environment or settings\n':
     '  Issue: API key not found in environment or settings\n',
   '  Run `hopcode auth coding-plan` to re-configure.\n':
     '  Run `hopcode auth coding-plan` to re-configure.\n',
-  '? Authentication Method: {{type}}': '? Authentication Method: {{type}}',
+  '✓ Authentication Method: {{type}}': '✓ Authentication Method: {{type}}',
   '  Status: Configured\n': '  Status: Configured\n',
   'Failed to check authentication status: {{error}}':
     'Failed to check authentication status: {{error}}',
   'Select an option:': 'Select an option:',
   'Raw mode not available. Please run in an interactive terminal.':
     'Raw mode not available. Please run in an interactive terminal.',
-  '(Use ? ? arrows to navigate, Enter to select, Ctrl+C to exit)\n':
-    '(Use ? ? arrows to navigate, Enter to select, Ctrl+C to exit)\n',
-  compact: 'compact',
-  'compact mode: on (Ctrl+O off)': 'compact mode: on (Ctrl+O off)',
+  '(Use ↑ ↓ arrows to navigate, Enter to select, Ctrl+C to exit)\n':
+    '(Use ↑ ↓ arrows to navigate, Enter to select, Ctrl+C to exit)\n',
   'Hide tool output and thinking for a cleaner view (toggle with Ctrl+O).':
     'Hide tool output and thinking for a cleaner view (toggle with Ctrl+O).',
   'Press Ctrl+O to show full tool output':
     'Press Ctrl+O to show full tool output',
-
   'Switch to plan mode or exit plan mode':
     'Switch to plan mode or exit plan mode',
   'Exited plan mode. Previous approval mode restored.':
@@ -2160,6 +1863,62 @@ export default {
     'Already in plan mode. Use "/plan exit" to exit plan mode.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Not in plan mode. Use "/plan" to enter plan mode first.',
-
   "Set up HopCode's status line UI": "Set up HopCode's status line UI",
+
+  // === Core: added from PR #3328 ===
+  'Open the memory manager.': 'Open the memory manager.',
+  'Save a durable memory to the memory system.':
+    'Save a durable memory to the memory system.',
+  'Ask a quick side question without affecting the main conversation':
+    'Ask a quick side question without affecting the main conversation',
+  'Manage Arena sessions': 'Manage Arena sessions',
+  'Start an Arena session with multiple models competing on the same task':
+    'Start an Arena session with multiple models competing on the same task',
+  'Stop the current Arena session': 'Stop the current Arena session',
+  'Show the current Arena session status':
+    'Show the current Arena session status',
+  'Select a model result and merge its diff into the current workspace':
+    'Select a model result and merge its diff into the current workspace',
+  'No running Arena session found.': 'No running Arena session found.',
+  'No Arena session found. Start one with /arena start.':
+    'No Arena session found. Start one with /arena start.',
+  'Arena session is still running. Wait for it to complete or use /arena stop first.':
+    'Arena session is still running. Wait for it to complete or use /arena stop first.',
+  'No successful agent results to select from. All agents failed or were cancelled.':
+    'No successful agent results to select from. All agents failed or were cancelled.',
+  'Use /arena stop to end the session.': 'Use /arena stop to end the session.',
+  'No idle agent found matching "{{name}}".':
+    'No idle agent found matching "{{name}}".',
+  'Failed to apply changes from {{label}}: {{error}}':
+    'Failed to apply changes from {{label}}: {{error}}',
+  'Applied changes from {{label}} to workspace. Arena session complete.':
+    'Applied changes from {{label}} to workspace. Arena session complete.',
+  'Discard all Arena results and clean up worktrees?':
+    'Discard all Arena results and clean up worktrees?',
+  'Arena results discarded. All worktrees cleaned up.':
+    'Arena results discarded. All worktrees cleaned up.',
+  'Arena is not supported in non-interactive mode. Use interactive mode to start an Arena session.':
+    'Arena is not supported in non-interactive mode. Use interactive mode to start an Arena session.',
+  'Arena is not supported in non-interactive mode. Use interactive mode to stop an Arena session.':
+    'Arena is not supported in non-interactive mode. Use interactive mode to stop an Arena session.',
+  'Arena is not supported in non-interactive mode.':
+    'Arena is not supported in non-interactive mode.',
+  'An Arena session exists. Use /arena stop or /arena select to end it before starting a new one.':
+    'An Arena session exists. Use /arena stop or /arena select to end it before starting a new one.',
+  'Usage: /arena start --models model1,model2 <task>':
+    'Usage: /arena start --models model1,model2 <task>',
+  'Models to compete (required, at least 2)':
+    'Models to compete (required, at least 2)',
+  'Format: authType:modelId or just modelId':
+    'Format: authType:modelId or just modelId',
+  'Arena requires at least 2 models. Use --models model1,model2 to specify.':
+    'Arena requires at least 2 models. Use --models model1,model2 to specify.',
+  'Arena started with {{count}} agents on task: "{{task}}"\nModels:\n{{modelList}}':
+    'Arena started with {{count}} agents on task: "{{task}}"\nModels:\n{{modelList}}',
+  'Arena panes are running in tmux. Attach with: `{{command}}`':
+    'Arena panes are running in tmux. Attach with: `{{command}}`',
+  '[{{label}}] failed: {{error}}': '[{{label}}] failed: {{error}}',
+  'Loading suggestions...': 'Loading suggestions...',
+  'Show per-item context usage breakdown.':
+    'Show per-item context usage breakdown.',
 };

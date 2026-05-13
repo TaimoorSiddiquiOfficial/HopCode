@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,17 +46,20 @@ vi.mock('@agentclientprotocol/sdk', () => ({
   })),
   ndJsonStream: vi.fn().mockReturnValue({}),
   RequestError: class RequestError extends Error {
-    static invalidParams(_data: unknown, message: string) {
-      return new RequestError(message);
-    }
-
-    static methodNotFound(method: string) {
-      return new RequestError(`Method not found: ${method}`);
-    }
-
-    static authRequired(message: string) {
-      return new RequestError(message);
-    }
+    static authRequired = vi
+      .fn()
+      .mockImplementation((data: unknown, msg: string) => {
+        const err = new Error(msg);
+        Object.assign(err, data);
+        return err;
+      });
+    static invalidParams = vi
+      .fn()
+      .mockImplementation((data: unknown, msg: string) => {
+        const err = new Error(msg);
+        Object.assign(err, data);
+        return err;
+      });
   },
   PROTOCOL_VERSION: '1.0.0',
 }));
@@ -84,19 +87,10 @@ vi.mock('@hoptrendy/hopcode-core', () => ({
   AuthType: {},
   clearCachedCredentialFile: vi.fn(),
   HopCodeOAuth2Event: {},
-  hopCodeOAuth2Events: { on: vi.fn(), off: vi.fn() },
-  MCPServerConfig: vi.fn().mockImplementation(function (
-    this: Record<string, unknown>,
-    command: unknown,
-    args: unknown,
-    env: unknown,
-    cwd: unknown,
-    url: unknown,
-    httpUrl: unknown,
-    headers: unknown,
-  ) {
-    Object.assign(this, { command, args, env, cwd, url, httpUrl, headers });
-  }),
+  HopCodeOAuth2Events: { on: vi.fn(), off: vi.fn() },
+  MCPServerConfig: vi.fn().mockImplementation((...args: unknown[]) => ({
+    _args: args,
+  })),
   SessionService: vi.fn(),
   SESSION_TITLE_MAX_LENGTH: 200,
   tokenLimit: vi.fn(),
@@ -533,7 +527,7 @@ describe('runAcpAgent SessionEnd hooks', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Unit tests for stdioServer / sseServer / httpServer helpers
+// Unit tests for toStdioServer / toSseServer / toHttpServer helpers
 // ---------------------------------------------------------------------------
 
 describe('toStdioServer', () => {

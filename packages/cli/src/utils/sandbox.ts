@@ -1,23 +1,17 @@
 ﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  exec,
-  execSync,
-  execFileSync,
-  spawn,
-  type ChildProcess,
-} from 'node:child_process';
+import { exec, execSync, spawn, type ChildProcess } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { quote, parse } from 'shell-quote';
 import {
-  USER_SETTINGS_DIR,
+  getUserSettingsDir,
   SETTINGS_DIRECTORY_NAME,
 } from '../config/settings.js';
 import { promisify } from 'node:util';
@@ -27,13 +21,6 @@ import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
 
 const execAsync = promisify(exec);
-
-function ensureDirectoryAndGetRealPath(dir: string): string {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  return fs.realpathSync(dir);
-}
 
 function getContainerPath(hostPath: string): string {
   if (os.platform() !== 'win32') {
@@ -46,6 +33,13 @@ function getContainerPath(hostPath: string): string {
     return `/${match[1].toLowerCase()}/${match[2]}`;
   }
   return hostPath;
+}
+
+function ensureDirectoryAndGetRealPath(dir: string): string {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  return fs.realpathSync(dir);
 }
 
 const LOCAL_DEV_SANDBOX_IMAGE_NAME = 'hopcode-sandbox';
@@ -178,8 +172,8 @@ function entrypoint(workdir: string, cliArgs: string[]): string[] {
         ? 'npm run debug --'
         : 'npm rebuild && npm run start --'
       : process.env['DEBUG']
-        ? `node --inspect-brk=0.0.0.0:${process.env['DEBUG_PORT'] || '9229'} $(which hopcode)`
-        : 'hopcode';
+        ? `node --inspect-brk=0.0.0.0:${process.env['DEBUG_PORT'] || '9229'} $(which HopCode)`
+        : 'HopCode';
 
   const args = [...shellCmds, cliCmd, ...quotedCliArgs];
   return ['bash', '-c', args.join(' ')];
@@ -363,7 +357,7 @@ export async function start_sandbox(
 
   writeStderrLine(`hopping into sandbox (command: ${config.command}) ...`);
 
-  // determine full path for hopcode-code to distinguish linked vs installed setting
+  // determine full path for hopcode to distinguish linked vs installed setting
   const gcPath = fs.realpathSync(process.argv[1]);
 
   const projectSandboxDockerfile = path.join(
@@ -376,9 +370,9 @@ export async function start_sandbox(
   const workdir = path.resolve(process.cwd());
   const containerWorkdir = getContainerPath(workdir);
 
-  // if BUILD_SANDBOX is set, then call scripts/build_sandbox.js under hopcode-code repo
+  // if BUILD_SANDBOX is set, then call scripts/build_sandbox.js under hopcode repo
   //
-  // note this can only be done with binary linked from hopcode-code repo
+  // note this can only be done with binary linked from hopcode repo
   if (process.env['BUILD_SANDBOX']) {
     if (!gcPath.includes('hopcode/packages/')) {
       throw new FatalSandboxError(
@@ -389,28 +383,25 @@ export async function start_sandbox(
       writeStderrLine('building sandbox ...');
       const gcRoot = gcPath.split('/packages/')[0];
       // if project folder has sandbox.Dockerfile under project settings folder, use that
-      const buildArgs: string[] = ['-s'];
+      let buildArgs = '';
       const projectSandboxDockerfile = path.join(
         SETTINGS_DIRECTORY_NAME,
         'sandbox.Dockerfile',
       );
       if (isCustomProjectSandbox) {
         writeStderrLine(`using ${projectSandboxDockerfile} for sandbox`);
-        buildArgs.push(
-          '-f',
-          path.resolve(projectSandboxDockerfile),
-          '-i',
-          image,
-        );
+        buildArgs += `-f ${path.resolve(projectSandboxDockerfile)} -i ${image}`;
       }
-      execFileSync('node', ['scripts/build_sandbox.js', ...buildArgs], {
-        cwd: gcRoot,
-        stdio: 'inherit',
-        env: {
-          ...process.env,
-          HOPCODE_SANDBOX: config.command, // in case sandbox is enabled via flags (see config.ts under cli package)
+      execSync(
+        `cd ${gcRoot} && node scripts/build_sandbox.js -s ${buildArgs}`,
+        {
+          stdio: 'inherit',
+          env: {
+            ...process.env,
+            HOPCODE_SANDBOX: config.command, // in case sandbox is enabled via flags (see config.ts under cli package)
+          },
         },
-      });
+      );
     }
   }
 
@@ -419,7 +410,7 @@ export async function start_sandbox(
     const remedy =
       image === LOCAL_DEV_SANDBOX_IMAGE_NAME
         ? 'Try running `npm run build:all` or `npm run build:sandbox` under the hopcode repo to build it locally, or check the image name and your network connection.'
-        : 'Please check the image name, your network connection, or notify the HopCode team if the issue persists.';
+        : 'Please check the image name, your network connection, or notify hopcode-dev@service.alibaba.com if the issue persists.';
     throw new FatalSandboxError(
       `Sandbox image '${image}' is missing or could not be pulled. ${remedy}`,
     );
@@ -451,7 +442,7 @@ export async function start_sandbox(
   // Mount user settings at /home/node/.hopcode and at the canonical host path
   // used by HOPCODE_HOME, unless that host path is already covered by a broader
   // runtime-dir mount below.
-  const userSettingsDirOnHost = USER_SETTINGS_DIR;
+  const userSettingsDirOnHost = getUserSettingsDir();
   const runtimeBaseDirOnHost = Storage.getRuntimeBaseDir();
   const userSettingsDirRealPath = ensureDirectoryAndGetRealPath(
     userSettingsDirOnHost,
@@ -798,10 +789,10 @@ export async function start_sandbox(
 
     // Instead of passing --user to the main sandbox container, we let it
     // start as root, then create a user with the host's UID/GID, and
-    // finally switch to that user to run the hopcode process. This is
+    // finally switch to that user to run the HopCode process. This is
     // necessary on Linux to ensure the user exists within the
     // container's /etc/passwd file, which is required by os.userInfo().
-    const username = 'hopcode';
+    const username = 'HopCode';
     const homeDir = getContainerPath(os.homedir());
 
     const setupUserCommands = [

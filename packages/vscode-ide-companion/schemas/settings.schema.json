@@ -119,6 +119,11 @@
           "type": "string",
           "default": "auto"
         },
+        "dynamicCommandTranslation": {
+          "description": "Automatically translate slash command names and descriptions to the current UI language.",
+          "type": "boolean",
+          "default": false
+        },
         "terminalBell": {
           "description": "Play terminal bell sound when response completes or needs approval.",
           "type": "boolean",
@@ -358,7 +363,7 @@
               "additionalProperties": false
             }
           ],
-          "description": "Replace the default HOPCODE ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
+          "description": "Replace the default HopCode ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
         }
       }
     },
@@ -470,7 +475,7 @@
               "default": true
             },
             "splitToolMedia": {
-              "description": "When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: \"tool\"` messages with HTTP 400 \"Invalid 'messages' in payload\". Default false preserves the prior behavior for permissive providers.",
+              "description": "When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: \"tool\"` messages with HTTP 400 \"Invalid 'messages' in payload\". Default false preserves the prior behavior for permissive providers. See hoptrendy/hopcode#3616.",
               "type": "boolean",
               "default": false
             },
@@ -524,11 +529,6 @@
           "description": "Settings for clearing stale context after idle periods. Use -1 to disable a threshold.",
           "type": "object",
           "properties": {
-            "thinkingThresholdMinutes": {
-              "description": "Minutes of inactivity before clearing old thinking blocks. Use -1 to disable.",
-              "type": "number",
-              "default": 5
-            },
             "toolResultsThresholdMinutes": {
               "description": "Minutes of inactivity before clearing old tool result content. Use -1 to disable.",
               "type": "number",
@@ -550,7 +550,7 @@
               "type": "boolean",
               "default": true
             },
-            "respectHopCodeIgnore": {
+            "respectHopcodeIgnore": {
               "description": "Respect .hopcodeignore files when searching",
               "type": "boolean",
               "default": true
@@ -642,6 +642,17 @@
         "sandboxImage": {
           "description": "Sandbox image URI used by Docker/Podman when --sandbox-image and HOPCODE_SANDBOX_IMAGE are not set.",
           "type": "string"
+        },
+        "toolSearch": {
+          "description": "Settings for the ToolSearch discovery mechanism.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "When enabled, MCP tools are loaded on-demand via ToolSearch to reduce prompt size. Disable this for models that rely on prefix-based KV caching (e.g. DeepSeek) to keep the prompt prefix stable and maximize cache hit rates.",
+              "type": "boolean",
+              "default": true
+            }
+          }
         },
         "shell": {
           "description": "Settings for shell execution.",
@@ -804,41 +815,32 @@
           }
         },
         "powershell": {
-          "description": "Controls whether and how the AI agent can execute PowerShell commands. When disabled, all PowerShell commands are blocked. Use allowlist/blocklist for fine-grained command control.",
+          "description": "Configuration for PowerShell command security policies.",
           "type": "object",
           "properties": {
             "enabled": {
-              "description": "Master switch. When disabled, ALL PowerShell commands are blocked.",
+              "description": "Enable PowerShell security policies.",
               "type": "boolean",
               "default": false
             },
             "mode": {
-              "description": "Default behavior for PowerShell commands not matched by allowlist/blocklist.",
-              "type": "string",
-              "default": "ask"
+              "description": "PowerShell security mode: allow, ask, or deny.",
+              "type": "string"
             },
             "allowlist": {
-              "description": "Command patterns automatically allowed (bypass mode). Supports * wildcard. Example: \"get-*\" allows all Get-* cmdlets.",
+              "description": "Commands allowed when mode is \"ask\".",
               "type": "array",
               "items": {
-                "description": "Command pattern (supports * wildcard)",
                 "type": "string"
               }
             },
             "blocklist": {
-              "description": "Command patterns always blocked regardless of mode. Supports * wildcard. Example: \"rm -rf *\" blocks recursive force remove.",
+              "description": "Commands always blocked regardless of mode.",
               "type": "array",
               "items": {
-                "description": "Command pattern (supports * wildcard)",
                 "type": "string"
               }
             }
-          },
-          "default": {
-            "enabled": false,
-            "mode": "ask",
-            "allowlist": [],
-            "blocklist": []
           }
         }
       }
@@ -851,6 +853,10 @@
           "description": "Automatically configure Node.js memory limits",
           "type": "boolean",
           "default": false
+        },
+        "tavilyApiKey": {
+          "description": "API key for Tavily web search provider. Falls back to TAVILY_API_KEY environment variable.",
+          "type": "string"
         },
         "dnsResolutionOrder": {
           "description": "The DNS resolution order.",
@@ -873,24 +879,10 @@
           "additionalProperties": true
         },
         "runtimeOutputDir": {
-          "description": "Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). Config files remain at ~/.hopcode. Env var HOPCODE_RUNTIME_DIR takes priority.",
-          "type": "string"
-        },
-        "tavilyApiKey": {
-          "description": "⚠️ DEPRECATED: Please use webSearch.provider configuration instead. Legacy API key for the Tavily API.",
+          "description": "Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). Config files remain at ~/.hopcode (or HOPCODE_HOME if set). Env var HOPCODE_RUNTIME_DIR takes priority.",
           "type": "string"
         }
       }
-    },
-    "webSearch": {
-      "description": "Configuration for web search providers. Supports: tavily, google, dashscope, duckduckgo, exa, bing, jina, firecrawl, custom. Set mode=\"auto\" for failover chain.",
-      "type": "object",
-      "additionalProperties": true
-    },
-    "agentModels": {
-      "description": "Per-agent model overrides. String form: \"modelId\" or \"authType::modelId\". Object form: {\"model\": \"...\", \"baseUrl\": \"...\", \"apiKey\": \"...\"}. Use \"inherit\" to use the parent model.",
-      "type": "object",
-      "additionalProperties": true
     },
     "agents": {
       "description": "Settings for multi-agent collaboration features (Arena, Team, Swarm).",
@@ -2199,6 +2191,32 @@
           "default": true
         }
       }
+    },
+    "webSearch": {
+      "description": "Web search provider configuration.",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "List of web search provider names.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "default": {
+          "description": "Default web search provider name.",
+          "type": "string"
+        },
+        "mode": {
+          "description": "Web search mode: auto or manual.",
+          "type": "string"
+        }
+      }
+    },
+    "agentModels": {
+      "description": "Per-agent model overrides mapping subagent names to model configuration.",
+      "type": "object",
+      "additionalProperties": true
     },
     "$version": {
       "type": "number",

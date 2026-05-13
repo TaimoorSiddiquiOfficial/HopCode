@@ -1,13 +1,13 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import crypto from 'crypto';
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
-import * as os from 'os';
+import type { ChildProcess } from 'node:child_process';
 import open from 'open';
 import { EventEmitter } from 'events';
 import type { Config } from '../config/config.js';
@@ -19,6 +19,7 @@ import {
   TokenManagerError,
   TokenError,
 } from './sharedTokenManager.js';
+import { Storage } from '../config/storage.js';
 
 const debugLogger = createDebugLogger('HOPCODE_OAUTH');
 
@@ -35,7 +36,6 @@ const HOPCODE_OAUTH_SCOPE = 'openid profile email model.completion';
 const HOPCODE_OAUTH_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';
 
 // File System Configuration
-const HOPCODE_DIR = '.hopcode';
 const HOPCODE_CREDENTIAL_FILENAME = 'oauth_creds.json';
 
 /**
@@ -421,7 +421,7 @@ export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
       const errorData = await response.text();
       // Handle 400/401 errors which indicate refresh token expiry or invalidity
       if (response.status === 400 || response.status === 401) {
-        await clearHopcodeCredentials();
+        await clearHopCodeCredentials();
         throw new CredentialsClearRequiredError(
           "Refresh token expired or invalid. Please use '/auth' to re-authenticate.",
           { status: response.status, response: errorData },
@@ -496,7 +496,7 @@ export type AuthResult =
 /**
  * Global event emitter instance for HopCodeOAuth2 authentication events
  */
-export const hopCodeOAuth2Events = new EventEmitter();
+export const HopCodeOAuth2Events = new EventEmitter();
 
 export async function getHopCodeOAuthClient(
   config: Config,
@@ -545,11 +545,11 @@ export async function getHopCodeOAuthClient(
     // If we couldn't obtain valid credentials via SharedTokenManager, fall back to
     // interactive device authorization (unless explicitly forbidden above).
     const result = await authWithHopCodeDeviceFlow(client, config);
-    if (result.success === false) {
+    if (!result.success) {
       // Only emit timeout event if the failure reason is actually timeout
       // Other error types (401, 429, etc.) have already emitted their specific events
       if (result.reason === 'timeout') {
-        hopCodeOAuth2Events.emit(
+        HopCodeOAuth2Events.emit(
           HopCodeOAuth2Event.AuthProgress,
           'timeout',
           'Authentication timed out. Please try again or select a different authentication method.',
@@ -693,7 +693,7 @@ async function authWithHopCodeDeviceFlow(
   const cancelHandler = () => {
     isCancelled = true;
   };
-  hopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthCancel, cancelHandler);
+  HopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthCancel, cancelHandler);
 
   // Helper to check cancellation and return appropriate result
   const checkCancellation = (): AuthResult | null => {
@@ -702,7 +702,7 @@ async function authWithHopCodeDeviceFlow(
     }
     const message = 'Authentication cancelled by user.';
     debugLogger.debug('\n' + message);
-    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthProgress, 'error', message);
+    HopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthProgress, 'error', message);
     return { success: false, reason: 'cancelled', message };
   };
 
@@ -711,31 +711,40 @@ async function authWithHopCodeDeviceFlow(
     status: 'polling' | 'success' | 'error' | 'timeout' | 'rate_limit',
     message: string,
   ): void => {
-    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthProgress, status, message);
+    HopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthProgress, status, message);
   };
 
   // Helper to handle browser launch with error handling
   const launchBrowser = async (url: string): Promise<void> => {
-    try {
-      const childProcess = await open(url);
+    let childProcess: ChildProcess | undefined;
 
-      // IMPORTANT: Attach an error handler to the returned child process.
-      // Without this, if `open` fails to spawn a process (e.g., `xdg-open` is not found
-      // in a minimal Docker container), it will emit an unhandled 'error' event,
-      // causing the entire Node.js process to crash.
-      if (childProcess) {
-        childProcess.on('error', (err) => {
-          debugLogger.debug('Browser launch failed:', err.message || err);
+    try {
+      // Call open and get the process
+      childProcess = await open(url);
+
+      // CRITICAL FIX: Attach error listener IMMEDIATELY if a process object exists.
+      // We do this outside the 'if' check scope to ensure it's bound as soon as possible.
+      if (childProcess && typeof childProcess.on === 'function') {
+        childProcess.on('error', (err: Error) => {
+          debugLogger.warn(`Browser launch process error: ${err.message}`);
+          debugLogger.info(`Please open this URL manually: ${url}`);
         });
+
+        // Optional: Also listen for 'close' or 'exit' if needed for cleanup,
+        // but 'error' is the main crasher.
+      } else {
+        // Fallback: If open() didn't return a valid process object, log a warning
+        debugLogger.debug(
+          'open() did not return a valid child process object.',
+        );
       }
     } catch (err) {
-      debugLogger.debug(
-        'Failed to open browser:',
-        err instanceof Error ? err.message : 'Unknown error',
-      );
+      // Handle synchronous errors or promise rejections from open()
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      debugLogger.warn(`Failed to open browser automatically: ${errorMessage}`);
+      debugLogger.info(`Please open this URL manually: ${url}`);
     }
   };
-
   try {
     // Generate PKCE code verifier and challenge
     const { code_verifier, code_challenge } = generatePKCEPair();
@@ -756,7 +765,7 @@ async function authWithHopCodeDeviceFlow(
     }
 
     // Emit device authorization event for UI integration immediately
-    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthUri, deviceAuth);
+    HopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthUri, deviceAuth);
 
     if (config.isBrowserLaunchSuppressed() || !config.isInteractive()) {
       showFallbackMessage(deviceAuth.verification_uri_complete);
@@ -808,7 +817,7 @@ async function authWithHopCodeDeviceFlow(
           client.setCredentials(credentials);
 
           // Cache the new tokens
-          await cacheHopcodeCredentials(credentials);
+          await cacheHopCodeCredentials(credentials);
 
           // IMPORTANT:
           // SharedTokenManager maintains an in-memory cache and throttles file checks.
@@ -960,12 +969,12 @@ async function authWithHopCodeDeviceFlow(
     return { success: false, reason: 'error', message };
   } finally {
     // Clean up event listener
-    hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthCancel, cancelHandler);
+    HopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthCancel, cancelHandler);
   }
 }
 
-async function cacheHopcodeCredentials(credentials: HopCodeCredentials) {
-  const filePath = getHopcodeCachedCredentialPath();
+async function cacheHopCodeCredentials(credentials: HopCodeCredentials) {
+  const filePath = getHopCodeCachedCredentialPath();
   try {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
 
@@ -996,9 +1005,9 @@ async function cacheHopcodeCredentials(credentials: HopCodeCredentials) {
  * Clear cached HopCode credentials from disk
  * This is useful when credentials have expired or need to be reset
  */
-export async function clearHopcodeCredentials(): Promise<void> {
+export async function clearHopCodeCredentials(): Promise<void> {
   try {
-    const filePath = getHopcodeCachedCredentialPath();
+    const filePath = getHopCodeCachedCredentialPath();
     await fs.unlink(filePath);
     debugLogger.debug('Cached HopCode credentials cleared successfully.');
   } catch (error: unknown) {
@@ -1009,7 +1018,7 @@ export async function clearHopcodeCredentials(): Promise<void> {
     }
     // Log other errors but don't throw - clearing credentials should be non-critical
     debugLogger.warn(
-      'Warning: Failed to clear Cached HopCode credentials:',
+      'Warning: Failed to clear cached HopCode credentials:',
       error,
     );
   } finally {
@@ -1023,8 +1032,10 @@ export async function clearHopcodeCredentials(): Promise<void> {
   }
 }
 
-function getHopcodeCachedCredentialPath(): string {
-  return path.join(os.homedir(), HOPCODE_DIR, HOPCODE_CREDENTIAL_FILENAME);
+function getHopCodeCachedCredentialPath(): string {
+  return path.join(Storage.getGlobalHopCodeDir(), HOPCODE_CREDENTIAL_FILENAME);
 }
 
-export const clearCachedCredentialFile = clearHopcodeCredentials;
+export const clearCachedCredentialFile = clearHopCodeCredentials;
+export const hopCodeOAuth2Events = HopCodeOAuth2Events;
+export const clearHopcodeCredentials = clearHopCodeCredentials;

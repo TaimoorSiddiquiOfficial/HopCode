@@ -1,4 +1,4 @@
-# Getting Started with HopCode Extensions
+﻿# Getting Started with HopCode Extensions
 
 This guide will walk you through creating your first HopCode extension. You'll learn how to set up a new extension, add a custom tool via an MCP server, create a custom command, and provide context to the model with a `HOPCODE.md` file.
 
@@ -21,7 +21,7 @@ This will create a new directory with the following structure:
 ```
 my-first-extension/
 ├── example.ts
-├── qwen-extension.json
+├── hopcode-extension.json
 ├── package.json
 └── tsconfig.json
 ```
@@ -30,7 +30,7 @@ my-first-extension/
 
 Let's look at the key files in your new extension.
 
-### `qwen-extension.json`
+### `hopcode-extension.json`
 
 This is the manifest file for your extension. It tells HopCode how to load and use your extension.
 
@@ -126,7 +126,7 @@ Before you can use the extension, you need to compile the TypeScript code and li
     npm run build
     ```
 
-    This will compile `example.ts` into `dist/example.js`, which is the file referenced in your `qwen-extension.json`.
+    This will compile `example.ts` into `dist/example.js`, which is the file referenced in your `hopcode-extension.json`.
 
 3.  **Link the extension:**
 
@@ -260,7 +260,7 @@ You can provide persistent context to the model by adding a `HOPCODE.md` file to
     You are an expert developer assistant. When the user asks you to fetch posts, use the `fetch_posts` tool. Be concise in your responses.
     ```
 
-2.  Update your `qwen-extension.json` to tell the CLI to load this file:
+2.  Update your `hopcode-extension.json` to tell the CLI to load this file:
 
     ```json
     {

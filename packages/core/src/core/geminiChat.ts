@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -307,22 +307,6 @@ function extractCuratedHistory(comprehensiveHistory: Content[]): Content[] {
     }
   }
   return curatedHistory;
-}
-
-function stripThoughtPartsFromContent(content: Content): Content | null {
-  if (!content.parts) {
-    return content;
-  }
-
-  const parts = content.parts.filter((part) => !(part as Part).thought);
-  if (parts.length === 0) {
-    return null;
-  }
-
-  return {
-    ...content,
-    parts,
-  };
 }
 
 /**
@@ -1089,10 +1073,22 @@ export class GeminiChat {
     this.history = this.history.slice(0, keepCount);
   }
 
+  /**
+   * Strip thought parts from every entry in the chat history.
+   * Used before API history reconstruction when resuming sessions
+   * where the model should not see its own chain-of-thought.
+   */
   stripThoughtsFromHistory(): void {
     this.history = this.history
-      .map(stripThoughtPartsFromContent)
-      .filter((content): content is Content => content !== null);
+      .map((content: Content) => {
+        if (!content.parts) return content;
+        const filtered = content.parts.filter(
+          (part: Part) => !(part as Part).thought,
+        );
+        if (filtered.length === 0) return null;
+        return { ...content, parts: filtered };
+      })
+      .filter((c: Content | null): c is Content => c !== null);
   }
 
   /**

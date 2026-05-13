@@ -1,4 +1,4 @@
-# WeChat (Weixin)
+﻿# WeChat (Weixin)
 
 This guide covers setting up a HopCode channel on WeChat via the official iLink Bot API.
 
@@ -81,18 +81,18 @@ WeChat channels support all the standard channel options (see [Channel Overview]
 
 - **Use plain text instructions** — Since WeChat strips all markdown, add instructions like "Use plain text only" to avoid the agent producing formatted responses that look messy.
 - **Keep responses short** — WeChat message bubbles work best with concise text. Adding a character limit to your instructions helps (e.g., "Keep responses under 500 characters").
-- **Session expiry** — If you see "Session expired (errcode -14)" in the logs, your WeChat login has expired. Stop the channel and re-run `qwen channel configure-weixin` to log in again.
+- **Session expiry** — If you see "Session expired (errcode -14)" in the logs, your WeChat login has expired. Stop the channel and re-run `hopcode channel configure-weixin` to log in again.
 - **Restrict access** — Use `senderPolicy: "pairing"` or `"allowlist"` to control who can talk to the bot. See [DM Pairing](./overview#dm-pairing) for details.
 
 ## Troubleshooting
 
 ### "WeChat account not configured"
 
-Run `qwen channel configure-weixin` to log in via QR code first.
+run `hopcode channel configure-weixin` to log in via QR code first.
 
 ### "Session expired (errcode -14)"
 
-Your WeChat login session has expired. Stop the channel and run `qwen channel configure-weixin` again.
+Your WeChat login session has expired. Stop the channel and run `hopcode channel configure-weixin` again.
 
 ### Bot doesn't respond
 

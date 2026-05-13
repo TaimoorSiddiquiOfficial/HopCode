@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,9 +16,11 @@ import {
 } from '../utils/commandUtils.js';
 import { toCodePoints } from '../utils/textUtils.js';
 import { useAtCompletion } from './useAtCompletion.js';
-import { useSlashCompletion } from './useSlashCompletion.js';
+import {
+  type RecentSlashCommands,
+  useSlashCompletion,
+} from './useSlashCompletion.js';
 import type { Config } from '@hoptrendy/hopcode-core';
-import type { RecentSlashCommands } from './useSlashCompletion.js';
 import { useCompletion } from './useCompletion.js';
 import { parseSlashCommand } from '../../utils/commands.js';
 

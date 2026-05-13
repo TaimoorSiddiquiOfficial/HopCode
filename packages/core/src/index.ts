@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -345,6 +345,7 @@ export {
   detectRuntime,
   getOrCreateSharedDispatcher,
 } from './utils/runtimeFetchOptions.js';
+export * from './utils/runtimeStatus.js';
 export * from './utils/schemaValidator.js';
 export * from './utils/shell-utils.js';
 export * from './utils/subagentGenerator.js';

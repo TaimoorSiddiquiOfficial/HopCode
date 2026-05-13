@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -152,7 +152,6 @@ vi.mock('../memory/const.js', () => ({
   getCurrentGeminiMdFilename: vi.fn(() => 'HOPCODE.md'), // Mock the original filename
   getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
-  HOPCODE_CONFIG_DIR: '.hopcode',
 }));
 vi.mock('../tools/memory-config', () => ({
   setGeminiMdFilename: vi.fn(),
@@ -160,22 +159,18 @@ vi.mock('../tools/memory-config', () => ({
   getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
   AGENT_CONTEXT_FILENAME: 'AGENTS.md',
-  HOPCODE_CONFIG_DIR: '.hopcode',
   MEMORY_SECTION_HEADER: '## HopCode Added Memories',
 }));
 
 vi.mock('../core/contentGenerator.js');
 
-vi.mock('../core/client.js', () => {
-  const mockClient = vi.fn().mockImplementation(() => ({
+vi.mock('../core/client.js', () => ({
+  GeminiClient: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     isInitialized: vi.fn().mockReturnValue(true),
     setTools: vi.fn(),
-  }));
-  return {
-    GeminiClient: mockClient,
-  };
-});
+  })),
+}));
 
 vi.mock('../telemetry/index.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../telemetry/index.js')>();
@@ -969,33 +964,6 @@ describe('Server Config (config.ts)', () => {
     expect(config.getTelemetryEnabled()).toBe(TELEMETRY_SETTINGS.enabled);
   });
 
-  it('Config constructor should set telemetry useCollector to true when provided', () => {
-    const paramsWithTelemetry: ConfigParameters = {
-      ...baseParams,
-      telemetry: { enabled: true, useCollector: true },
-    };
-    const config = new Config(paramsWithTelemetry);
-    expect(config.getTelemetryUseCollector()).toBe(true);
-  });
-
-  it('Config constructor should set telemetry useCollector to false when provided', () => {
-    const paramsWithTelemetry: ConfigParameters = {
-      ...baseParams,
-      telemetry: { enabled: true, useCollector: false },
-    };
-    const config = new Config(paramsWithTelemetry);
-    expect(config.getTelemetryUseCollector()).toBe(false);
-  });
-
-  it('Config constructor should default telemetry useCollector to false if not provided', () => {
-    const paramsWithTelemetry: ConfigParameters = {
-      ...baseParams,
-      telemetry: { enabled: true },
-    };
-    const config = new Config(paramsWithTelemetry);
-    expect(config.getTelemetryUseCollector()).toBe(false);
-  });
-
   it('should have a getFileService method that returns FileDiscoveryService', () => {
     const config = new Config(baseParams);
     const fileService = config.getFileService();
@@ -1242,48 +1210,6 @@ describe('Server Config (config.ts)', () => {
       delete paramsWithoutTelemetry.telemetry;
       const config = new Config(paramsWithoutTelemetry);
       expect(config.getTelemetryOtlpProtocol()).toBe('grpc');
-    });
-
-    it('should return per-signal endpoints when provided', () => {
-      const params: ConfigParameters = {
-        ...baseParams,
-        telemetry: {
-          enabled: true,
-          otlpTracesEndpoint: 'http://traces:4317/v1/traces',
-          otlpLogsEndpoint: 'http://logs:4317/v1/logs',
-          otlpMetricsEndpoint: 'http://metrics:4317/v1/metrics',
-        },
-      };
-      const config = new Config(params);
-      expect(config.getTelemetryOtlpTracesEndpoint()).toBe(
-        'http://traces:4317/v1/traces',
-      );
-      expect(config.getTelemetryOtlpLogsEndpoint()).toBe(
-        'http://logs:4317/v1/logs',
-      );
-      expect(config.getTelemetryOtlpMetricsEndpoint()).toBe(
-        'http://metrics:4317/v1/metrics',
-      );
-    });
-
-    it('should return undefined for per-signal endpoints when not provided', () => {
-      const params: ConfigParameters = {
-        ...baseParams,
-        telemetry: { enabled: true },
-      };
-      const config = new Config(params);
-      expect(config.getTelemetryOtlpTracesEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpLogsEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpMetricsEndpoint()).toBeUndefined();
-    });
-
-    it('should return undefined for per-signal endpoints when telemetry not provided', () => {
-      const paramsWithoutTelemetry: ConfigParameters = { ...baseParams };
-      delete paramsWithoutTelemetry.telemetry;
-      const config = new Config(paramsWithoutTelemetry);
-      expect(config.getTelemetryOtlpTracesEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpLogsEndpoint()).toBeUndefined();
-      expect(config.getTelemetryOtlpMetricsEndpoint()).toBeUndefined();
     });
   });
 
@@ -1708,7 +1634,7 @@ describe('setApprovalMode with folder trust', () => {
     cwd: '.',
   };
 
-  it('should throw an error when setting IZN mode in an untrusted folder', () => {
+  it('should throw an error when setting YOLO mode in an untrusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
     expect(() => config.setApprovalMode(ApprovalMode.IZN)).toThrow(

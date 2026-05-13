@@ -1,4 +1,4 @@
-# Checkpointing
+﻿# Checkpointing
 
 HopCode includes a Checkpointing feature that automatically saves a snapshot of your project's state before any file modifications are made by AI-powered tools. This allows you to safely experiment with and apply code changes, knowing you can instantly revert back to the state before the tool was run.
 
@@ -27,7 +27,7 @@ The Checkpointing feature is disabled by default. To enable it, you can either u
 You can enable checkpointing for the current session by using the `--checkpointing` flag when starting HopCode:
 
 ```bash
-qwen --checkpointing
+hopcode --checkpointing
 ```
 
 ### Using the `settings.json` File

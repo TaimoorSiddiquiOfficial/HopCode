@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -538,7 +538,6 @@ export type HistoryItemWithoutId =
   | HistoryItemToolGroup
   | HistoryItemToolUseSummary
   | HistoryItemStats
-  | HistoryItemDiffStats
   | HistoryItemModelStats
   | HistoryItemToolStats
   | HistoryItemQuit
@@ -560,7 +559,8 @@ export type HistoryItemWithoutId =
   | HistoryItemStopHookLoop
   | HistoryItemStopHookSystemMessage
   | HistoryItemDoctor
-  | HistoryItemContextNote;
+  | HistoryItemContextNote
+  | HistoryItemDiffStats;
 
 export type HistoryItem = HistoryItemWithoutId & { id: number };
 

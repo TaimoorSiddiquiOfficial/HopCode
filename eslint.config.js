@@ -30,6 +30,12 @@ export default tseslint.config(
       'docs-site/out/**',
       '.hopcode/**',
       '.hopcode-backup-*/**',
+      // Root-level one-off migration/rebrand scripts (not part of the package)
+      '_rebrand_*.mjs',
+      'rebrand_cherry*.mjs',
+      'resolve_*.mjs',
+      'fix_*.mjs',
+      'inspect_qwen*.mjs',
     ],
   },
   eslint.configs.recommended,

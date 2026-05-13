@@ -1,4 +1,4 @@
-# Connect HopCode to tools via MCP
+﻿# Connect HopCode to tools via MCP
 
 HopCode can connect to external tools and data sources through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). MCP servers give HopCode access to your tools, databases, and APIs.
 
@@ -20,7 +20,7 @@ With MCP servers connected, you can ask HopCode to:
 HopCode loads MCP servers from `mcpServers` in your `settings.json`. You can configure servers either:
 
 - By editing `settings.json` directly
-- By using `hopcode mcp` commands (see [CLI reference](#qwen-mcp-cli))
+- By using `hopcode mcp` commands (see [CLI reference](#hopcode-mcp-cli))
 
 ### Add your first server
 
@@ -270,7 +270,7 @@ Example:
 
 ## Troubleshooting
 
-- **Server shows “Disconnected” in `qwen mcp list`**: verify the URL/command is correct, then increase `timeout`.
+- **Server shows “Disconnected” in `hopcode mcp list`**: verify the URL/command is correct, then increase `timeout`.
 - **Stdio server fails to start**: use an absolute `command` path, and double-check `cwd`/`env`.
 - **Environment variables in JSON don’t resolve**: ensure they exist in the environment where HopCode runs (shell vs GUI app environments can differ).
 
@@ -325,7 +325,7 @@ Optional:
 | `targetAudience`       | string                       | The OAuth Client ID allowlisted on the IAP-protected application you are trying to access. Used with `authProviderType: 'service_account_impersonation'`.                                                                                                         |
 | `targetServiceAccount` | string                       | The email address of the Google Cloud Service Account to impersonate. Used with `authProviderType: 'service_account_impersonation'`.                                                                                                                              |
 
-<a id="qwen-mcp-cli"></a>
+<a id="hopcode-mcp-cli"></a>
 
 ### Manage MCP servers with `hopcode mcp`
 

@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,6 +23,7 @@ import {
   SendMessageType,
   ToolNames,
 } from '@hoptrendy/hopcode-core';
+import type { JsonOutputAdapterInterface } from './nonInteractive/io/BaseJsonOutputAdapter.js';
 import type { Part } from '@google/genai';
 import { runNonInteractive } from './nonInteractiveCli.js';
 import { vi, type Mock, type MockInstance } from 'vitest';
@@ -63,9 +64,11 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 const mockGetCommands = vi.hoisted(() => vi.fn());
 const mockGetCommandsForMode = vi.hoisted(() => vi.fn());
 const mockCommandServiceCreate = vi.hoisted(() => vi.fn());
+const mockCommandServiceFromCommands = vi.hoisted(() => vi.fn());
 vi.mock('./services/CommandService.js', () => ({
   CommandService: {
     create: mockCommandServiceCreate,
+    fromCommands: mockCommandServiceFromCommands,
   },
 }));
 
@@ -114,6 +117,11 @@ describe('runNonInteractive', () => {
     mockCommandServiceCreate.mockResolvedValue({
       getCommands: mockGetCommands,
       getCommandsForMode: mockGetCommandsForMode,
+    });
+    mockCommandServiceFromCommands.mockReturnValue({
+      getCommands: mockGetCommands,
+      getCommandsForMode: mockGetCommandsForMode,
+      getModelInvocableCommands: vi.fn().mockReturnValue([]),
     });
 
     processStdoutSpy = vi
@@ -320,7 +328,7 @@ describe('runNonInteractive', () => {
 
   it('on EPIPE, destroys stdout and returns normally instead of process.exit', async () => {
     // Regression: process.exit(0) on EPIPE bypassed runExitCleanup → flush()
-    // and dropped queued JSONL writes for `qwen -p ... | head -1` patterns.
+    // and dropped queued JSONL writes for `hopcode -p ... | head -1` patterns.
     // process.exit is mocked to throw in beforeEach, so reaching the
     // assertion also proves the bypass route is gone.
     setupMetricsMock();

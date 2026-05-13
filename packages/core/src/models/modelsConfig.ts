@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -84,7 +84,7 @@ export class ModelsConfig {
   private strictModelProviderSelection: boolean = false;
 
   // One-shot flag for hopcode-oauth credential caching
-  private requireCachedQwenCredentialsOnce: boolean = false;
+  private requireCachedHopCodeCredentialsOnce: boolean = false;
 
   // One-shot flag indicating credentials were manually set via updateCredentials()
   // When true, syncAfterAuthRefresh should NOT override these credentials with
@@ -173,7 +173,7 @@ export class ModelsConfig {
     generationConfig: Partial<ContentGeneratorConfig>;
     generationConfigSources: ContentGeneratorConfigSources;
     strictModelProviderSelection: boolean;
-    requireCachedQwenCredentialsOnce: boolean;
+    requireCachedHopCodeCredentialsOnce: boolean;
     hasManualCredentials: boolean;
     activeRuntimeModelSnapshotId: string | undefined;
   } {
@@ -184,7 +184,8 @@ export class ModelsConfig {
         this.generationConfigSources,
       ),
       strictModelProviderSelection: this.strictModelProviderSelection,
-      requireCachedQwenCredentialsOnce: this.requireCachedQwenCredentialsOnce,
+      requireCachedHopCodeCredentialsOnce:
+        this.requireCachedHopCodeCredentialsOnce,
       hasManualCredentials: this.hasManualCredentials,
       activeRuntimeModelSnapshotId: this.activeRuntimeModelSnapshotId,
     };
@@ -203,8 +204,8 @@ export class ModelsConfig {
     this._generationConfig = snapshot.generationConfig;
     this.generationConfigSources = snapshot.generationConfigSources;
     this.strictModelProviderSelection = snapshot.strictModelProviderSelection;
-    this.requireCachedQwenCredentialsOnce =
-      snapshot.requireCachedQwenCredentialsOnce;
+    this.requireCachedHopCodeCredentialsOnce =
+      snapshot.requireCachedHopCodeCredentialsOnce;
     this.hasManualCredentials = snapshot.hasManualCredentials;
     this.activeRuntimeModelSnapshotId = snapshot.activeRuntimeModelSnapshotId;
   }
@@ -387,7 +388,7 @@ export class ModelsConfig {
       authType === AuthType.HOPCODE_OAUTH &&
       options?.requireCachedCredentials
     ) {
-      this.requireCachedQwenCredentialsOnce = true;
+      this.requireCachedHopCodeCredentialsOnce = true;
     }
 
     try {
@@ -694,8 +695,8 @@ export class ModelsConfig {
    * Check and consume the one-shot cached credentials flag
    */
   consumeRequireCachedCredentialsFlag(): boolean {
-    const value = this.requireCachedQwenCredentialsOnce;
-    this.requireCachedQwenCredentialsOnce = false;
+    const value = this.requireCachedHopCodeCredentialsOnce;
+    this.requireCachedHopCodeCredentialsOnce = false;
     return value;
   }
 

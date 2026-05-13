@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -104,18 +104,6 @@ describe('TelemetryConfig', () => {
         outfile: '/tmp/telemetry.json',
       });
       expect(config.getOutfile()).toBe('/tmp/telemetry.json');
-    });
-  });
-
-  describe('getUseCollector', () => {
-    it('defaults to false', () => {
-      const config = new TelemetryConfig({});
-      expect(config.getUseCollector()).toBe(false);
-    });
-
-    it('returns true when collector is enabled', () => {
-      const config = new TelemetryConfig({ useCollector: true });
-      expect(config.getUseCollector()).toBe(true);
     });
   });
 

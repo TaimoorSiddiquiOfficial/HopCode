@@ -1,7 +1,7 @@
 ﻿import * as path from 'node:path';
-import * as os from 'node:os';
 import type { CommandModule } from 'yargs';
-import { normalizeProxyUrl } from '@hoptrendy/hopcode-core';
+import { ProxyAgent, setGlobalDispatcher } from 'undici';
+import { normalizeProxyUrl, Storage } from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { AcpBridge, SessionRouter } from '@hoptrendy/channel-base';
@@ -24,7 +24,7 @@ const CRASH_WINDOW_MS = 5 * 60 * 1000; // 5-minute window for counting crashes
 const RESTART_DELAY_MS = 3000;
 
 /**
- * Resolve proxy settings for the channel service process.
+ * Resolve and apply proxy settings for the channel service process.
  *
  * The normal CLI path applies proxy via loadCliConfig → Config constructor →
  * setGlobalDispatcher, but `channel start` never calls loadCliConfig. This
@@ -46,11 +46,14 @@ export function resolveProxy(
       process.env['HTTP_PROXY'] ||
       process.env['http_proxy'],
   );
+  if (proxyUrl) {
+    setGlobalDispatcher(new ProxyAgent(proxyUrl));
+  }
   return proxyUrl;
 }
 
 function sessionsPath(): string {
-  return path.join(os.homedir(), '.hopcode', 'channels', 'sessions.json');
+  return path.join(Storage.getGlobalHopCodeDir(), 'channels', 'sessions.json');
 }
 
 function loadChannelsConfig(): Record<string, unknown> {
@@ -159,7 +162,7 @@ function checkDuplicateInstance(): void {
     writeStderrLine(
       `Error: Channel service is already running (PID ${existing.pid}, started ${existing.startedAt}).`,
     );
-    writeStderrLine('Use "hopcode channel stop" to stop it first.');
+    writeStderrLine('Use "HopCode channel stop" to stop it first.');
     process.exit(1);
   }
 }

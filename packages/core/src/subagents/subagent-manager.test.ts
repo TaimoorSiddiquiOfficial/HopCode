@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1177,7 +1177,7 @@ System prompt 3`);
     it('should list subagents from both levels', async () => {
       const subagents = await manager.listSubagents();
 
-      expect(subagents).toHaveLength(10); // agent1 (project takes precedence), agent2, agent3 + 7 built-in
+      expect(subagents).toHaveLength(10); // agent1 (project takes precedence), agent2, agent3, general-purpose, Explore, statusline-setup, security-specialist, performance-engineer, devops-engineer, tech-writer (built-in)
       expect(subagents.map((s) => s.name)).toEqual([
         'agent1',
         'agent2',

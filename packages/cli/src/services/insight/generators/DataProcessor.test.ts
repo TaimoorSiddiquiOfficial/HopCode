@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
@@ -340,7 +340,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'fully_achieved',
           user_satisfaction_counts: { satisfied: 2, neutral: 1 },
-          Qwen_helpfulness: 'very_helpful',
+          HOPCODE_helpfulness: 'very_helpful',
           session_type: 'single_task',
           friction_counts: {},
           friction_detail: '',
@@ -353,7 +353,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'mostly_achieved',
           user_satisfaction_counts: { satisfied: 1, frustrated: 2 },
-          Qwen_helpfulness: 'moderately_helpful',
+          HOPCODE_helpfulness: 'moderately_helpful',
           session_type: 'multi_task',
           friction_counts: {},
           friction_detail: '',
@@ -383,7 +383,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'fully_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'very_helpful',
+          HOPCODE_helpfulness: 'very_helpful',
           session_type: 'single_task',
           friction_counts: { slow_response: 1, unclear_answer: 2 },
           friction_detail: 'Some friction',
@@ -396,7 +396,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'mostly_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'moderately_helpful',
+          HOPCODE_helpfulness: 'moderately_helpful',
           session_type: 'multi_task',
           friction_counts: { slow_response: 2 },
           friction_detail: 'More friction',
@@ -425,7 +425,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'fully_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'very_helpful',
+          HOPCODE_helpfulness: 'very_helpful',
           session_type: 'single_task',
           friction_counts: {},
           friction_detail: '',
@@ -438,7 +438,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'mostly_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'moderately_helpful',
+          HOPCODE_helpfulness: 'moderately_helpful',
           session_type: 'multi_task',
           friction_counts: {},
           friction_detail: '',
@@ -451,7 +451,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'partially_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'slightly_helpful',
+          HOPCODE_helpfulness: 'slightly_helpful',
           session_type: 'exploration',
           friction_counts: {},
           friction_detail: '',
@@ -481,7 +481,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'fully_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'very_helpful',
+          HOPCODE_helpfulness: 'very_helpful',
           session_type: 'single_task',
           friction_counts: {},
           friction_detail: '',
@@ -494,7 +494,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'fully_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'moderately_helpful',
+          HOPCODE_helpfulness: 'moderately_helpful',
           session_type: 'multi_task',
           friction_counts: {},
           friction_detail: '',
@@ -507,7 +507,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'partially_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'slightly_helpful',
+          HOPCODE_helpfulness: 'slightly_helpful',
           session_type: 'exploration',
           friction_counts: {},
           friction_detail: '',
@@ -536,7 +536,7 @@ describe('DataProcessor', () => {
           goal_categories: { coding: 2, debugging: 1 },
           outcome: 'fully_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'very_helpful',
+          HOPCODE_helpfulness: 'very_helpful',
           session_type: 'single_task',
           friction_counts: {},
           friction_detail: '',
@@ -549,7 +549,7 @@ describe('DataProcessor', () => {
           goal_categories: { coding: 1, refactoring: 3 },
           outcome: 'mostly_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'moderately_helpful',
+          HOPCODE_helpfulness: 'moderately_helpful',
           session_type: 'multi_task',
           friction_counts: {},
           friction_detail: '',
@@ -588,7 +588,7 @@ describe('DataProcessor', () => {
         goal_categories: { coding: 1 },
         outcome: 'fully_achieved',
         user_satisfaction_counts: { satisfied: 1 },
-        Qwen_helpfulness: 'very_helpful',
+        HOPCODE_helpfulness: 'very_helpful',
         session_type: 'single_task',
         friction_counts: {},
         friction_detail: '',
@@ -1056,7 +1056,7 @@ describe('DataProcessor', () => {
           goal_categories: { coding: 2, debugging: 1 },
           outcome: 'fully_achieved',
           user_satisfaction_counts: { satisfied: 2 },
-          Qwen_helpfulness: 'very_helpful',
+          HOPCODE_helpfulness: 'very_helpful',
           session_type: 'single_task',
           friction_counts: { slow: 1 },
           friction_detail: 'Some friction detail',
@@ -1097,7 +1097,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'fully_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'very_helpful',
+          HOPCODE_helpfulness: 'very_helpful',
           session_type: 'single_task',
           friction_counts: {},
           friction_detail: '',
@@ -1110,7 +1110,7 @@ describe('DataProcessor', () => {
           goal_categories: {},
           outcome: 'mostly_achieved',
           user_satisfaction_counts: {},
-          Qwen_helpfulness: 'moderately_helpful',
+          HOPCODE_helpfulness: 'moderately_helpful',
           session_type: 'multi_task',
           friction_counts: {},
           friction_detail: '   ',
@@ -1160,7 +1160,7 @@ describe('DataProcessor', () => {
         goal_categories: { debugging: 1 },
         outcome: 'fully_achieved',
         user_satisfaction_counts: { satisfied: 1 },
-        Qwen_helpfulness: 'very_helpful',
+        HOPCODE_helpfulness: 'very_helpful',
         session_type: 'single_task',
         friction_counts: {},
         friction_detail: '',
@@ -1170,13 +1170,32 @@ describe('DataProcessor', () => {
     ];
 
     it('should return partial qualitative data when some LLM calls fail', async () => {
+      // Schema validation rejects partial objects, so build a fully-populated
+      // response — only the explicitly-rejected calls should land as undefined.
       let callIndex = 0;
       mockGenerateJson.mockImplementation(() => {
         callIndex++;
         if (callIndex % 2 === 0) {
           return Promise.reject(new Error('LLM timeout'));
         }
-        return Promise.resolve({ intro: 'test', areas: [], opportunities: [] });
+        return Promise.resolve({
+          intro: 'test',
+          impressive_workflows: [],
+          areas: [],
+          opportunities: [],
+          friction_points: [],
+          memorable_moments: [],
+          improvements: [],
+          interaction_style: {
+            archetype: 'collaborative',
+            description: 'test',
+            traits: [],
+          },
+          at_a_glance: {
+            top_strengths: [],
+            common_pitfalls: [],
+          },
+        });
       });
 
       const result = await (
@@ -1282,7 +1301,7 @@ describe('DataProcessor', () => {
         goal_categories: {},
         outcome: 'fully_achieved',
         user_satisfaction_counts: {},
-        Qwen_helpfulness: 'very_helpful',
+        HOPCODE_helpfulness: 'very_helpful',
         session_type: 'single_task',
         friction_counts: {},
         friction_detail: '',

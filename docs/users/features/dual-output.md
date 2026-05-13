@@ -112,7 +112,7 @@ this feature also exposes a path-based alternative.
 Pure `child_process.spawn` with a `stdio` array:
 
 ```ts
-const child = spawn('qwen', ['--json-fd', '3'], {
+const child = spawn('hopcode', ['--json-fd', '3'], {
   stdio: ['inherit', 'inherit', 'inherit', eventsFd],
 });
 ```
@@ -159,12 +159,12 @@ spawn model:
 import { spawn } from 'node-pty';
 
 const pty = spawn(
-  'qwen',
+  'hopcode',
   [
     '--json-file',
-    '/tmp/qwen-events.jsonl',
+    '/tmp/hopcode-events.jsonl',
     '--input-file',
-    '/tmp/qwen-input.jsonl',
+    '/tmp/hopcode-input.jsonl',
   ],
   { cols: 120, rows: 40 },
 );
@@ -202,26 +202,26 @@ wrappers that throw away stdout anyway.
 Run HopCode with all three channels enabled:
 
 ```bash
-mkfifo /tmp/qwen-events.jsonl /tmp/qwen-input.jsonl
-qwen \
-  --json-file /tmp/qwen-events.jsonl \
-  --input-file /tmp/qwen-input.jsonl
+mkfifo /tmp/hopcode-events.jsonl /tmp/hopcode-input.jsonl
+hopcode \
+  --json-file /tmp/hopcode-events.jsonl \
+  --input-file /tmp/hopcode-input.jsonl
 ```
 
 In a second terminal, tail the event stream:
 
 ```bash
-cat /tmp/qwen-events.jsonl
+cat /tmp/hopcode-events.jsonl
 ```
 
 In a third terminal, push a prompt into the running TUI:
 
 ```bash
-echo '{"type":"submit","text":"Explain this repo"}' >> /tmp/qwen-input.jsonl
+echo '{"type":"submit","text":"Explain this repo"}' >> /tmp/hopcode-input.jsonl
 ```
 
 The prompt appears in the TUI exactly as if the user typed it, and the
-streaming response is mirrored on `/tmp/qwen-events.jsonl`.
+streaming response is mirrored on `/tmp/hopcode-events.jsonl`.
 
 ## Output event schema
 
@@ -337,17 +337,17 @@ A typical embedding parent process spawns HopCode with both channels:
 import { spawn } from 'node:child_process';
 import { openSync } from 'node:fs';
 
-const eventsFd = openSync('/tmp/qwen-events.jsonl', 'w');
+const eventsFd = openSync('/tmp/hopcode-events.jsonl', 'w');
 const child = spawn(
-  'qwen',
-  ['--json-fd', '3', '--input-file', '/tmp/qwen-input.jsonl'],
+  'hopcode',
+  ['--json-fd', '3', '--input-file', '/tmp/hopcode-input.jsonl'],
   { stdio: ['inherit', 'inherit', 'inherit', eventsFd] },
 );
 ```
 
 The TUI still owns the user's terminal on stdio 0/1/2, while the embedder
 reads structured events on the file backing fd 3 and pushes commands by
-appending JSONL lines to `/tmp/qwen-input.jsonl`.
+appending JSONL lines to `/tmp/hopcode-input.jsonl`.
 
 ## Settings-based configuration
 
@@ -360,8 +360,8 @@ through every launch. The same channels can be configured in
 // or <workspace>/.hopcode/settings.json  (workspace-level)
 {
   "dualOutput": {
-    "jsonFile": "/tmp/qwen-events.jsonl",
-    "inputFile": "/tmp/qwen-input.jsonl",
+    "jsonFile": "/tmp/hopcode-events.jsonl",
+    "inputFile": "/tmp/hopcode-input.jsonl",
   },
 }
 ```
@@ -392,11 +392,11 @@ normally:
 
 ```bash
 # Terminal A
-mkfifo /tmp/qwen-events.jsonl
-cat /tmp/qwen-events.jsonl | jq -c 'select(.type != "stream_event") | {type, subtype}'
+mkfifo /tmp/hopcode-events.jsonl
+cat /tmp/hopcode-events.jsonl | jq -c 'select(.type != "stream_event") | {type, subtype}'
 
 # Terminal B
-qwen --json-file /tmp/qwen-events.jsonl
+hopcode --json-file /tmp/hopcode-events.jsonl
 # ...then chat normally; terminal A shows session_start,
 # user/assistant/result/control_request lifecycle in real time.
 ```
@@ -414,12 +414,12 @@ the first:
 
 ```bash
 # Terminal A
-touch /tmp/qwen-in.jsonl
-qwen --input-file /tmp/qwen-in.jsonl
+touch /tmp/hopcode-in.jsonl
+hopcode --input-file /tmp/hopcode-in.jsonl
 
 # Terminal B — the TUI responds as if you typed it
 echo '{"type":"submit","text":"list files in the current directory"}' \
-  >> /tmp/qwen-in.jsonl
+  >> /tmp/hopcode-in.jsonl
 ```
 
 ### POC 3 — remote tool-permission bridge
@@ -428,18 +428,18 @@ Approve or deny tool calls from a separate process:
 
 ```bash
 # Terminal A — observe control_requests
-mkfifo /tmp/qwen-out.jsonl
-touch /tmp/qwen-in.jsonl
-(cat /tmp/qwen-out.jsonl \
+mkfifo /tmp/hopcode-out.jsonl
+touch /tmp/hopcode-in.jsonl
+(cat /tmp/hopcode-out.jsonl \
   | jq -c 'select(.type == "control_request")') &
 
 # Terminal B
-qwen --json-file /tmp/qwen-out.jsonl --input-file /tmp/qwen-in.jsonl
-# Ask Qwen to do something that needs approval, e.g.
+hopcode --json-file /tmp/hopcode-out.jsonl --input-file /tmp/hopcode-in.jsonl
+# Ask HopCode to do something that needs approval, e.g.
 # "run `ls -la /tmp`". A control_request will appear in terminal A.
 # Copy the request_id, then in a third terminal:
 echo '{"type":"confirmation_response","request_id":"<paste-id>","allowed":true}' \
-  >> /tmp/qwen-in.jsonl
+  >> /tmp/hopcode-in.jsonl
 # The TUI confirmation prompt dismisses and the tool executes.
 ```
 
@@ -471,12 +471,12 @@ import { createInterface } from 'node:readline';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const events = join(tmpdir(), `qwen-events-${process.pid}.jsonl`);
-const input = join(tmpdir(), `qwen-input-${process.pid}.jsonl`);
+const events = join(tmpdir(), `hopcode-events-${process.pid}.jsonl`);
+const input = join(tmpdir(), `hopcode-input-${process.pid}.jsonl`);
 writeFileSync(events, '');
 writeFileSync(input, '');
 
-const child = spawn('qwen', ['--json-file', events, '--input-file', input], {
+const child = spawn('hopcode', ['--json-file', events, '--input-file', input], {
   stdio: 'inherit',
 });
 
@@ -569,19 +569,19 @@ If the TUI crashes before `session_end`, the output stream closes
 ### POC 7 — failure drills (prove the flags never break the TUI)
 
 ```bash
-qwen --json-fd 1
+hopcode --json-fd 1
 # stderr: "Warning: dual output disabled — ..."
 # TUI still launches normally.
 
-qwen --json-fd 9999
+hopcode --json-fd 9999
 # stderr: "Warning: dual output disabled — fd 9999 not open"
 # TUI still launches normally.
 
-qwen --json-fd 3 --json-file /tmp/x.jsonl
+hopcode --json-fd 3 --json-file /tmp/x.jsonl
 # yargs rejects: "--json-fd and --json-file are mutually exclusive."
 # Process exits before TUI starts.
 
-qwen --json-file /nonexistent/dir/x.jsonl
+hopcode --json-file /nonexistent/dir/x.jsonl
 # stderr warning; TUI still launches.
 ```
 

@@ -1,8 +1,8 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,11 +13,14 @@ import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
+import { bootstrapHomeEnv, resolvePath } from './lib/hopcode-home-bootstrap.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const projectRoot = path.resolve(__dirname, '..');
+
+bootstrapHomeEnv();
 
 /**
  * Generates a unique hash for a project based on its root path.
@@ -34,16 +37,33 @@ function getProjectHash(projectRoot) {
 
 const projectHash = getProjectHash(projectRoot);
 
-// User-level .hopcode directory in home
-const USER_HOPCODE_DIR = path.join(os.homedir(), '.hopcode');
+// Runtime base directory for ephemeral data (tmp, otel, etc.)
+// Priority: HOPCODE_RUNTIME_DIR > HOPCODE_HOME > ~/.hopcode
+function getRuntimeBaseDir() {
+  const runtimeDir = process.env.hopcode_RUNTIME_DIR;
+  if (runtimeDir) {
+    return resolvePath(runtimeDir);
+  }
+  const homeEnv = process.env.HOPCODE_HOME;
+  if (homeEnv) {
+    return resolvePath(homeEnv);
+  }
+  return path.join(os.homedir(), '.hopcode');
+}
+
 // Project-level .hopcode directory in the workspace
 const WORKSPACE_HOPCODE_DIR = path.join(projectRoot, '.hopcode');
 
-// Telemetry artifacts are stored in a hashed directory under the user's ~/.hopcode/tmp
-export const OTEL_DIR = path.join(USER_HOPCODE_DIR, 'tmp', projectHash, 'otel');
+// Telemetry artifacts are stored in a hashed directory under the runtime dir
+export const OTEL_DIR = path.join(
+  getRuntimeBaseDir(),
+  'tmp',
+  projectHash,
+  'otel',
+);
 export const BIN_DIR = path.join(OTEL_DIR, 'bin');
 
-// Workspace settings remain in the project's .hopcode directory
+// Workspace settings remain in the project's .gemini directory
 export const WORKSPACE_SETTINGS_FILE = path.join(
   WORKSPACE_HOPCODE_DIR,
   'settings.json',

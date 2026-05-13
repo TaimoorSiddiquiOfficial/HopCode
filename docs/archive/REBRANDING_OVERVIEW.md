@@ -1,6 +1,6 @@
-# 🦋 HopCode Rebranding - Complete Overview
+﻿# 🦋 HopCode Rebranding - Complete Overview
 
-**Project:** Qwen Code → HopCode Transformation  
+**Project:** HopCode → HopCode Transformation  
 **Date:** 2026-04-18  
 **Status:** Ready for Review  
 **Repository:** D:\HopCode
@@ -41,7 +41,7 @@
 
 ### The Rebranding Strategy
 
-This rebranding transforms "Qwen Code" into "HopCode" using a **butterfly effect** approach - where every change cascades systematically through:
+This rebranding transforms "HopCode" into "HopCode" using a **butterfly effect** approach - where every change cascades systematically through:
 
 1. **Core Identity** - Package names, CLI command, configuration
 2. **Visual Branding** - Logo, colors, typography, design system
@@ -65,7 +65,7 @@ This rebranding transforms "Qwen Code" into "HopCode" using a **butterfly effect
 
 ## 🎨 Visual Branding Summary
 
-### Current State (Qwen Code)
+### Current State (HopCode)
 
 **Logo:** Geometric "Q" letterform (hexagonal, angular)  
 **Colors:** Blue primary (#3b82f6), Ivory accent (#f5f5dc)  
@@ -133,17 +133,17 @@ Display:     'Inter', SemiBold (600)
 
 ```bash
 # Package Names
-@qwen-code/qwen-code      →  @hoptrendy/hopcode
-@qwen-code/sdk            →  @hoptrendy/sdk
-@qwen-code/webui          →  @hoptrendy/webui
-@qwen-code/core           →  @hoptrendy/core
-@qwen-code/cli-insight    →  @hoptrendy/cli-insight
+@hoptrendy/hopcode      →  @hoptrendy/hopcode
+@hopcode/sdk            →  @hoptrendy/sdk
+@hopcode/webui          →  @hoptrendy/webui
+@hopcode/core           →  @hoptrendy/core
+@hopcode/cli-insight    →  @hoptrendy/cli-insight
 
 # CLI Command
 qwen                      →  hopcode
 
 # Configuration Directory
-~/.qwen/                  →  ~/.hopcode/
+~/.hopcode/                  →  ~/.hopcode/
 
 # Environment Variables
 HOPCODE_*               →  HOPCODE_*
@@ -156,7 +156,7 @@ HOPCODE_SANDBOX              →  HOPCODE_SANDBOX
 # Logo Files to Replace
 packages/vscode-ide-companion/assets/icon.png
 packages/vscode-ide-companion/assets/sidebar-icon.svg
-packages/zed-extension/qwen-code.svg
+packages/zed-extension/hopcode.svg
 packages/web-templates/src/export-html/src/favicon.svg
 
 # CSS Variables
@@ -164,8 +164,8 @@ packages/web-templates/src/export-html/src/favicon.svg
 --qwen-corner-radius-*    →  --hopcode-corner-radius-*
 
 # CSS Classes
-.qwen-message             →  .hopcode-message
-.qwen-webui-container     →  .hopcode-webui-container
+.hopcode-message             →  .hopcode-message
+.hopcode-webui-container     →  .hopcode-webui-container
 ```
 
 ### Phase 3: Documentation
@@ -294,7 +294,7 @@ Before executing the rebranding:
 
 ## 🔄 Migration for Users
 
-### Existing Users (Qwen Code)
+### Existing Users (HopCode)
 
 Provide a migration path:
 
@@ -303,8 +303,8 @@ Provide a migration path:
 hopcode migrate
 
 # What it will do:
-# 1. Backup ~/.qwen/ → ~/.qwen.backup/
-# 2. Copy ~/.qwen/ → ~/.hopcode/
+# 1. Backup ~/.hopcode/ → ~/.hopcode.backup/
+# 2. Copy ~/.hopcode/ → ~/.hopcode/
 # 3. Update settings.json with new paths
 # 4. Create alias: qwen → hopcode (optional)
 # 5. Provide rollback instructions
@@ -314,7 +314,7 @@ hopcode migrate
 
 Consider supporting both during transition:
 
-- Support `.qwen/` and `.hopcode/` directories
+- Support `.hopcode/` and `.hopcode/` directories
 - Deprecation warnings for old config
 - 6-month transition period
 
@@ -340,7 +340,7 @@ Consider supporting both during transition:
 
 - [ ] Reserve `@hopcode` scope
 - [ ] Publish all 14 packages
-- [ ] Deprecate `@qwen-code/*` packages with migration notice
+- [ ] Deprecate `@hopcode/*` packages with migration notice
 
 ---
 
@@ -551,7 +551,7 @@ cp -r .hopcode-backup-*/packages/* packages/
 
 ## 🏁 Conclusion
 
-This rebranding package provides everything needed to transform "Qwen Code" into "HopCode":
+This rebranding package provides everything needed to transform "HopCode" into "HopCode":
 
 ✅ **Comprehensive Strategy** - 9000+ changes mapped out  
 ✅ **Automation** - Scripts to execute changes safely  

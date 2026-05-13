@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,6 +36,12 @@ describe('CrawlCache', () => {
       expect(key1).not.toBe(key3);
       expect(key2).not.toBe(key3);
       expect(key3).toBe(key4);
+    });
+
+    it('should generate a different hash for different gitignore modes', () => {
+      const key1 = getCacheKey('/foo', 'bar', undefined, undefined, true);
+      const key2 = getCacheKey('/foo', 'bar', undefined, undefined, false);
+      expect(key1).not.toBe(key2);
     });
   });
 

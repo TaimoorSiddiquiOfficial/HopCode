@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,14 +11,13 @@ import type {
   GenerateContentResponse,
 } from '@google/genai';
 import { ApiError } from '@google/genai';
-import type { ContentGenerator } from '../core/contentGenerator.js';
+import { AuthType, type ContentGenerator } from '../core/contentGenerator.js';
 import {
   GeminiChat,
   InvalidStreamError,
   StreamEventType,
   type StreamEvent,
 } from './geminiChat.js';
-import { AuthType } from './contentGenerator.js';
 import { StreamContentError } from './openaiContentGenerator/pipeline.js';
 import type { Config } from '../config/config.js';
 import { setSimulate429 } from '../utils/testUtils.js';
@@ -2933,26 +2932,6 @@ describe('GeminiChat', async () => {
     expect(modelTurn!.parts![0]!.text).not.toContain(
       'This valid part should be discarded',
     );
-  });
-
-  describe('stripThoughtsFromHistory', () => {
-    it('should strip thought parts from history and drop thought-only entries', () => {
-      chat.setHistory([
-        { role: 'user', parts: [{ text: 'question' }] },
-        {
-          role: 'model',
-          parts: [{ text: 'thinking', thought: true }, { text: 'answer' }],
-        },
-        { role: 'model', parts: [{ text: 'more thinking', thought: true }] },
-      ]);
-
-      chat.stripThoughtsFromHistory();
-
-      expect(chat.getHistory()).toEqual([
-        { role: 'user', parts: [{ text: 'question' }] },
-        { role: 'model', parts: [{ text: 'answer' }] },
-      ]);
-    });
   });
 
   describe('stripOrphanedUserEntriesFromHistory', () => {

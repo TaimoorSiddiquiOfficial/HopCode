@@ -1,8 +1,8 @@
-# HopCode Rebranding Quick-Start Guide
+﻿# HopCode Rebranding Quick-Start Guide
 
 ## Overview
 
-This guide walks you through executing the complete rebranding from "Qwen Code" to "HopCode" using the automated scripts.
+This guide walks you through executing the complete rebranding from "HopCode" to "HopCode" using the automated scripts.
 
 ---
 
@@ -147,19 +147,19 @@ Replace logo and icon files:
 Replace these URLs with actual HopCode URLs:
 
 ```
-Old: https://qwenlm.github.io/qwen-code-docs/
+Old: https://qwenlm.github.io/hopcode-docs/
 New: [Your new docs URL]
 
-Old: https://github.com/QwenLM/qwen-code
+Old: https://github.com/QwenLM/hopcode
 New: https://github.com/TaimoorSiddiquiOfficial/HopCode
 
-Old: qwen-code-assets.oss-cn-hangzhou.aliyuncs.com
+Old: hopcode-assets.oss-cn-hangzhou.aliyuncs.com
 New: [Your new CDN/bucket]
 ```
 
 ### 5.4 Java Package Names
 
-**Decision Required:** Update or keep `com.alibaba.qwen.code` package names for Maven compatibility.
+**Decision Required:** Update or keep `com.alibaba.hopcode.code` package names for Maven compatibility.
 
 ---
 
@@ -238,7 +238,7 @@ hopcode migrate
 
 This should:
 
-- Move `~/.qwen/` → `~/.hopcode/`
+- Move `~/.hopcode/` → `~/.hopcode/`
 - Update settings files
 - Create backup
 - Provide rollback option
@@ -270,8 +270,8 @@ chmod +x scripts/installation/*.sh
 
 ```bash
 # Search for remaining Qwen references
-grep -r "qwen-code" packages/ --include="*.json"
-grep -r "@qwen-code" packages/ --include="*.ts"
+grep -r "hopcode" packages/ --include="*.json"
+grep -r "@hopcode" packages/ --include="*.ts"
 ```
 
 ### Issue: Import errors in TypeScript
@@ -314,8 +314,8 @@ git clean -fd
 
 ## Post-Rebranding Checklist
 
-- [ ] All `@qwen-code/*` packages renamed to `@hoptrendy/*`
-- [ ] CLI command changed from `qwen` to `hopcode`
+- [ ] All `@hopcode/*` packages renamed to `@hoptrendy/*`
+- [ ] CLI command changed from `hopcode` to `hopcode`
 - [ ] Config directory updated to `.hopcode/`
 - [ ] Environment variables updated to `HOPCODE_*`
 - [ ] README.md fully updated

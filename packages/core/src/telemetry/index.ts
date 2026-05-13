@@ -1,13 +1,12 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 export enum TelemetryTarget {
   GCP = 'gcp',
   LOCAL = 'local',
-  HOPCODE = 'hopcode',
 }
 
 const DEFAULT_TELEMETRY_TARGET = TelemetryTarget.LOCAL;
@@ -17,6 +16,7 @@ export { DEFAULT_TELEMETRY_TARGET, DEFAULT_OTLP_ENDPOINT };
 export {
   initializeTelemetry,
   shutdownTelemetry,
+  refreshSessionContext,
   isTelemetrySdkInitialized,
 } from './sdk.js';
 export {
@@ -144,3 +144,20 @@ export {
   formatCostUsd,
 } from './modelPricing.js';
 export type { ModelPricing } from './modelPricing.js';
+export {
+  startInteractionSpan,
+  endInteractionSpan,
+  startLLMRequestSpan,
+  endLLMRequestSpan,
+  startToolSpan,
+  endToolSpan,
+  startToolExecutionSpan,
+  endToolExecutionSpan,
+  clearSessionTracingForTesting,
+} from './session-tracing.js';
+export type {
+  StartInteractionOptions,
+  EndInteractionOptions,
+  LLMRequestMetadata,
+  ToolSpanMetadata,
+} from './session-tracing.js';

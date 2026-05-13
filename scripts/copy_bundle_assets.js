@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,6 +82,18 @@ if (existsSync(userDocsDir)) {
   console.log('Copied docs/users/ to dist/bundled/qc-helper/docs/');
 } else {
   console.warn(`Warning: User docs directory not found at ${userDocsDir}`);
+}
+
+// Copy builtin locales so bundled dist/cli.js can load UI translations at runtime.
+// Published packages already include these via prepare-package.js; bundle output
+// should mirror that behavior for local `node dist/cli.js` runs.
+const localesDir = join(root, 'packages', 'cli', 'src', 'i18n', 'locales');
+if (existsSync(localesDir)) {
+  const destLocalesDir = join(distDir, 'locales');
+  copyRecursiveSync(localesDir, destLocalesDir);
+  console.log('Copied builtin locales to dist/locales/');
+} else {
+  console.warn(`Warning: Locales directory not found at ${localesDir}`);
 }
 
 console.log('\n✅ All bundle assets copied to dist/');

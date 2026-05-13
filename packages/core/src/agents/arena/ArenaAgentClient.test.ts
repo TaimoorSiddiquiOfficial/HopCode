@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -550,7 +550,7 @@ describe('ArenaAgentClient', () => {
 
   describe('safeAgentId()', () => {
     it('should pass through typical model IDs unchanged', () => {
-      expect(safeAgentId('qwen-coder-plus')).toBe('qwen-coder-plus');
+      expect(safeAgentId('hopcoder-plus')).toBe('hopcoder-plus');
     });
 
     it('should handle IDs without unsafe characters', () => {

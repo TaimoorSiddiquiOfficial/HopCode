@@ -8,7 +8,18 @@
     "types": ["node", "vitest/globals"],
     "paths": {
       "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
-      "@hoptrendy/hopcode-core/*": ["../core/src/*"]
+      "@hoptrendy/hopcode-core/*": ["../core/src/*"],
+      "@hoptrendy/hopcode-server": ["../server/src/index.ts"],
+      "@hoptrendy/hopcode-server/*": ["../server/src/*"],
+      "@hoptrendy/channel-base": ["../channels/base/src/index.ts"],
+      "@hoptrendy/channel-base/*": ["../channels/base/src/*"],
+      "@hoptrendy/channel-telegram": ["../channels/telegram/src/index.ts"],
+      "@hoptrendy/channel-weixin": ["../channels/weixin/src/index.ts"],
+      "@hoptrendy/channel-weixin/*": ["../channels/weixin/src/*"],
+      "@hoptrendy/channel-dingtalk": ["../channels/dingtalk/src/index.ts"],
+      "@hoptrendy/channel-discord": ["../channels/discord/src/index.ts"],
+      "@hoptrendy/web-templates": ["../web-templates/src/index.ts"],
+      "@hoptrendy/web-templates/*": ["../web-templates/src/*"]
     }
   },
   "include": [
@@ -92,6 +103,8 @@
     { "path": "../channels/base" },
     { "path": "../channels/telegram" },
     { "path": "../channels/weixin" },
-    { "path": "../channels/dingtalk" }
+    { "path": "../channels/dingtalk" },
+    { "path": "../channels/discord" },
+    { "path": "../web-templates" }
   ]
 }

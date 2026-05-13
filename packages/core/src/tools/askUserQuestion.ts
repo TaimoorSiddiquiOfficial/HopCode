@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -281,7 +281,7 @@ export class AskUserQuestionTool extends BaseDeclarativeTool<
       >,
       true, // isOutputMarkdown
       false, // canUpdateOutput
-      true, // shouldDefer — rarely needed; loaded on demand via ToolSearch
+      false, // shouldDefer
       false, // alwaysLoad
       'ask question user input clarify choose',
     );

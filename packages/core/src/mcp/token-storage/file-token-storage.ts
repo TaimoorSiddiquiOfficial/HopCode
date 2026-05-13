@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,6 +10,7 @@ import * as os from 'node:os';
 import * as crypto from 'node:crypto';
 import { BaseTokenStorage } from './base-token-storage.js';
 import type { OAuthCredentials } from './types.js';
+import { Storage } from '../../config/storage.js';
 
 export class FileTokenStorage extends BaseTokenStorage {
   private readonly tokenFilePath: string;
@@ -17,29 +18,14 @@ export class FileTokenStorage extends BaseTokenStorage {
 
   constructor(serviceName: string) {
     super(serviceName);
-    const configDir = path.join(os.homedir(), '.hopcode');
+    const configDir = Storage.getGlobalHopCodeDir();
     this.tokenFilePath = path.join(configDir, 'mcp-oauth-tokens-v2.json');
     this.encryptionKey = this.deriveEncryptionKey();
   }
 
   private deriveEncryptionKey(): Buffer {
-    // Legacy salt preserved for backward compatibility with tokens encrypted
-    // under the old "qwen-code" service name (changed to "hopcode" during rebranding).
     const salt = `${os.hostname()}-${os.userInfo().username}-hopcode`;
-    // New encryption key uses 'hopcode-oauth' instead of the legacy 'qwen-code-oauth'
     return crypto.scryptSync('hopcode-oauth', salt, 32);
-  }
-
-  /**
-   * Derive the legacy encryption key for backward compatibility
-   * with tokens encrypted under the old qwen-code-oauth service name.
-   * Kept for decrypting existing stored tokens during migration.
-   */
-  private deriveLegacyEncryptionKey(): Buffer {
-    // Legacy salt uses 'qwen-code' for backward compat with existing tokens
-    const salt = `${os.hostname()}-${os.userInfo().username}-qwen-code`;
-    // Legacy key uses 'qwen-code-oauth' — DO NOT change this value
-    return crypto.scryptSync('qwen-code-oauth', salt, 32);
   }
 
   private encrypt(text: string): string {
@@ -64,23 +50,17 @@ export class FileTokenStorage extends BaseTokenStorage {
     const authTag = Buffer.from(parts[1], 'hex');
     const encrypted = parts[2];
 
-    // Try the current key first, then fall back to the legacy key
-    // for backward compatibility with tokens encrypted under the old name.
-    for (const key of [this.encryptionKey, this.deriveLegacyEncryptionKey()]) {
-      try {
-        const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-        decipher.setAuthTag(authTag);
+    const decipher = crypto.createDecipheriv(
+      'aes-256-gcm',
+      this.encryptionKey,
+      iv,
+    );
+    decipher.setAuthTag(authTag);
 
-        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
 
-        return decrypted;
-      } catch {
-        // Decryption failed with this key, try the next one
-      }
-    }
-
-    throw new Error('Failed to decrypt data with both current and legacy keys');
+    return decrypted;
   }
 
   private async ensureDirectoryExists(): Promise<void> {

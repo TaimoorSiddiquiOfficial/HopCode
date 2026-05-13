@@ -39,7 +39,6 @@ export class SessionMessageHandler extends BaseMessageHandler {
   canHandle(messageType: string): boolean {
     return [
       'sendMessage',
-
       'editMessage',
       'newHopCodeSession',
       'switchHopCodeSession',

@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,12 +10,11 @@ import os from 'node:os';
 import { ToolNames } from '../tools/tool-names.js';
 import process from 'node:process';
 import { isGitRepository } from '../utils/gitUtils.js';
-import { HOPCODE_CONFIG_DIR } from '../memory/const.js';
+import { HOPCODE_DIR } from '../config/storage.js';
 import type { GenerateContentConfig } from '@google/genai';
 import {
   getQuranGuidedBehavior,
   QURAN_GUIDED_AGENT_PROMPT,
-  type ClassifierTelemetry,
 } from '@hoptrendy/quran-guidance';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
@@ -133,29 +132,7 @@ export function buildDeferredToolsSection(
   deferredTools: Array<{ name: string; description: string }>,
 ): string {
   if (!deferredTools || deferredTools.length === 0) return '';
-  // One line per tool, truncated to keep the prompt lean. The model only needs
-  // enough info to decide whether to call ToolSearch; the full schema is
-  // fetched on demand.
-  //
-  // MCP tool descriptions originate from the remote server and are untrusted
-  // input. Render each description as a JSON-encoded string literal so
-  // embedded backticks, quotes, newlines, and control characters can't break
-  // out of the list-line into surrounding system-prompt structure. This
-  // doesn't sanitize the *meaning* (a description that says "ignore previous
-  // instructions" still says that) — the framing line below tells the model
-  // to treat the whole list as data, not instructions.
   const MAX_DESC_LEN = 160;
-  // Render BOTH name and description via JSON.stringify so any quotes,
-  // backslashes, newlines, tabs, control chars, OR backticks they
-  // contain are wrapped inside `"..."` quoted strings instead of being
-  // interpolated raw into surrounding markdown. This is structurally
-  // safer than trying to escape backticks for a markdown inline-code
-  // span — markdown inline code doesn't process backslash escapes, so
-  // `\`` doesn't actually neutralize an embedded backtick (CodeQL
-  // flagged the previous escape attempt as incomplete). MCP names with
-  // embedded backticks are adversarial; this representation keeps them
-  // visible (so the model can `select:` them) without giving them a
-  // path to open a stray code span elsewhere in the prompt.
   const lines = deferredTools.map(({ name, description }) => {
     const firstLine = (description || '').split('\n')[0].trim();
     const truncated =
@@ -164,10 +141,6 @@ export function buildDeferredToolsSection(
         : firstLine;
     return `- ${JSON.stringify(name)}: ${JSON.stringify(truncated)}`;
   });
-  // Pick the first backtick-free tool name as the example; backticks
-  // in the example would re-open the inline-code injection vector
-  // exactly the lines above are guarding against. Falls back to a
-  // generic placeholder when every tool name has a backtick.
   const exampleName =
     deferredTools.find((t) => !t.name.includes('`'))?.name ?? '<tool_name>';
   return `
@@ -185,13 +158,12 @@ export function getCoreSystemPrompt(
   userMemory?: string,
   model?: string,
   appendInstruction?: string,
-  _deferredTools?: Array<{ name: string; description: string }>,
+  deferredTools?: Array<{ name: string; description: string }>,
 ): string {
   // if HOPCODE_SYSTEM_MD is set (and not 0|false), override system prompt from file
-  // default path is .hopcode/system.md but can be modified via custom path in HOPCODE_SYSTEM_MD
+  // default path is .hopcode/system.md (project-level), can be overridden via HOPCODE_SYSTEM_MD
   let systemMdEnabled = false;
-  // The default path for the system prompt file. This can be overridden.
-  let systemMdPath = path.resolve(path.join(HOPCODE_CONFIG_DIR, 'system.md'));
+  let systemMdPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
   // Resolve the environment variable to get either a path or a switch value.
   const systemMdResolution = resolvePathFromEnv(
     process.env['HOPCODE_SYSTEM_MD'],
@@ -419,13 +391,21 @@ Your core function is efficient and safe assistance. Balance extreme conciseness
       ? buildSystemPromptSuffix(userMemory)
       : '';
   const appendSuffix = buildSystemPromptSuffix(appendInstruction);
-  // Only append Quran guidance to the default HopCode prompt, not to
-  // custom system prompts provided via HOPCODE_SYSTEM_MD.
-  const quranGuidanceSuffix = systemMdEnabled
-    ? ''
-    : buildSystemPromptSuffix(getQuranGuidanceSection());
 
-  return `${basePrompt}${memorySuffix}${appendSuffix}${quranGuidanceSuffix}`;
+  const deferredSuffix = deferredTools
+    ? buildDeferredToolsSection(deferredTools)
+    : '';
+
+  // Only append Quran guidance to the default HopCode prompt, not to
+  // custom instruction prompts, since those are user-authored.
+  // Use a plain newline prefix (no --- separator) so user memory section
+  // remains the last --- block when present.
+  const quranGuidanceText = systemMdEnabled ? '' : getQuranGuidanceSection();
+  const quranGuidanceSuffix = quranGuidanceText
+    ? `\n\n${quranGuidanceText}`
+    : '';
+
+  return `${basePrompt}${deferredSuffix}${quranGuidanceSuffix}${memorySuffix}${appendSuffix}`;
 }
 
 /**
@@ -620,7 +600,7 @@ To help you check their settings, I can read their contents. Which one would you
 </example>
 `.trim();
 
-const HopCoderToolCallExamples = `
+const hopCoderToolCallExamples = `
 # Examples (Illustrating Tone and Workflow)
 <example>
 user: 1 + 2
@@ -777,7 +757,7 @@ I found the following 'app.config' files:
 To help you check their settings, I can read their contents. Which one would you like to start with, or should I read all of them?
 </example>
 `.trim();
-const hopcodeVlToolCallExamples = `
+const hopVlToolCallExamples = `
 # Examples (Illustrating Tone and Workflow)
 <example>
 user: 1 + 2
@@ -878,18 +858,20 @@ To help you check their settings, I can read their contents. Which one would you
 
 function getToolCallExamples(model?: string): string {
   // Check for environment variable override first
-  const toolCallStyle = process.env['HOPCODE_TOOL_CALL_STYLE'];
+  const toolCallStyle = process.env['HOPCODE_CODE_TOOL_CALL_STYLE'];
   if (toolCallStyle) {
     switch (toolCallStyle.toLowerCase()) {
+      case 'hopcoder':
       case 'qwen-coder':
-        return HopCoderToolCallExamples;
+        return hopCoderToolCallExamples;
+      case 'hopvl':
       case 'qwen-vl':
-        return hopcodeVlToolCallExamples;
+        return hopVlToolCallExamples;
       case 'general':
         return generalToolCallExamples;
       default:
         debugLogger.warn(
-          `Unknown HOPCODE_TOOL_CALL_STYLE value: ${toolCallStyle}. Using model-based detection.`,
+          `Unknown HOPCODE_CODE_TOOL_CALL_STYLE value: ${toolCallStyle}. Using model-based detection.`,
         );
         break;
     }
@@ -897,17 +879,17 @@ function getToolCallExamples(model?: string): string {
 
   // Enhanced regex-based model detection
   if (model && model.length < 100) {
-    // Match hopcode*-coder patterns (e.g., qwen3-coder, qwen2.5-coder, qwen-coder)
-    if (/qwen[^-]*-coder/i.test(model)) {
-      return HopCoderToolCallExamples;
+    // Match qwen*-coder and hopcode*-coder patterns (e.g., qwen3-coder, qwen2.5-coder, hopcoder)
+    if (/qwen[^-]*-coder/i.test(model) || /hopcode[^-]*-coder/i.test(model)) {
+      return hopCoderToolCallExamples;
     }
-    // Match hopcode*-vl patterns (e.g., hopcode-vl, qwen2-vl, qwen3-vl)
-    if (/qwen[^-]*-vl/i.test(model)) {
-      return hopcodeVlToolCallExamples;
+    // Match qwen*-vl and hopcode*-vl patterns (e.g., qwen-vl, qwen2-vl, qwen3-vl)
+    if (/qwen[^-]*-vl/i.test(model) || /hopcode[^-]*-vl/i.test(model)) {
+      return hopVlToolCallExamples;
     }
     // Match coder-model pattern (same as qwen3-coder)
     if (/coder-model/i.test(model)) {
-      return HopCoderToolCallExamples;
+      return hopCoderToolCallExamples;
     }
   }
 
@@ -1008,11 +990,11 @@ CRITICAL GUIDELINES:
    "
 
 2. **user_satisfaction_counts**: Base ONLY on explicit user signals.
-   - "Yay!", "great!", "perfect!" ? happy
-   - "thanks", "looks good", "that works" ? satisfied
-   - "ok, now let's..." (continuing without complaint) ? likely_satisfied
-   - "that's not right", "try again" ? dissatisfied
-   - "this is broken", "I give up" ? frustrated
+   - "Yay!", "great!", "perfect!" → happy
+   - "thanks", "looks good", "that works" → satisfied
+   - "ok, now let's..." (continuing without complaint) → likely_satisfied
+   - "that's not right", "try again" → dissatisfied
+   - "this is broken", "I give up" → frustrated
 
 3. **friction_counts**: Be specific about what went wrong.
    - misunderstood_request: HopCode interpreted incorrectly
@@ -1104,25 +1086,25 @@ Find something genuinely interesting or amusing from the session summaries.`,
     3. Finally, verify Z.
 
     # Examples
-    - Input: "fix lint errors in src/" ? Output: runs eslint --fix, commits changes
-    - Input: "review this PR" ? Output: reads diff, posts inline comments
+    - Input: "fix lint errors in src/" → Output: runs eslint --fix, commits changes
+    - Input: "review this PR" → Output: reads diff, posts inline comments
 
     # Edge Cases
     - If no files match, report "nothing to do" instead of failing.
     - If the user didn't specify a branch, default to the current branch.
     \`\`\`
 
-3. **Headless Mode: Run HopCode non-interactively from scripts and CI/CD.
+3. **Headless Mode**: Run HopCode non-interactively from scripts and CI/CD.
    - How to use: \`hopcode -p "fix lint errors"\`
    - Good for: CI/CD integration, batch code fixes, automated reviews
 
-4. **Task Agents: HopCode spawns focused sub-agents for complex exploration or parallel work.
-   - How to use: HopCode auto-invokes when helpful, or ask "use an agent to explore X""
+4. **Task Agents**: HopCode spawns focused sub-agents for complex exploration or parallel work.
+   - How to use: HopCode auto-invokes when helpful, or ask "use an agent to explore X"
    - Good for: codebase exploration, understanding complex systems
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
-  "HopCode_md_additions": [
+  "HOPCODE_md_additions": [
     {"addition": "A specific line or block to add to HOPCODE.md based on workflow patterns. E.g., 'Always run tests after modifying auth-related files'", "why": "1 sentence explaining why this would help based on actual sessions", "prompt_scaffold": "Instructions for where to add this in HOPCODE.md. E.g., 'Add under ## Testing section'"}
   ],
   "features_to_try": [
@@ -1133,7 +1115,7 @@ Call respond_in_schema function with A VALID JSON OBJECT as argument:
   ]
 }
 
-IMPORTANT for HopCode_md_additions: PRIORITIZE instructions that appear MULTIPLE TIMES in the user data. If user told HopCode the same thing in 2+ sessions (e.g., 'always run tests', 'use TypeScript'), that's a PRIME candidate - they shouldn't have to repeat themselves.
+IMPORTANT for HOPCODE_md_additions: PRIORITIZE instructions that appear MULTIPLE TIMES in the user data. If user told HopCode the same thing in 2+ sessions (e.g., 'always run tests', 'use TypeScript'), that's a PRIME candidate - they shouldn't have to repeat themselves.
 
 IMPORTANT for features_to_try: Pick 2-3 from the QC FEATURES REFERENCE above. Include 2-3 items for each category.`,
 
@@ -1141,7 +1123,7 @@ IMPORTANT for features_to_try: Pick 2-3 from the QC FEATURES REFERENCE above. In
 
 Call respond_in_schema function with A VALID JSON OBJECT as argument:
 {
-  "narrative": "2-3 paragraphs analyzing HOW the user interacts with HopCode. Use second person 'you'. Describe patterns: iterate quickly vs detailed upfront specs? Interrupt often or Let HopCode run? Include specific examples. Use **bold** for key insights.",
+  "narrative": "2-3 paragraphs analyzing HOW the user interacts with HopCode. Use second person 'you'. Describe patterns: iterate quickly vs detailed upfront specs? Interrupt often or let HopCode run? Include specific examples. Use **bold** for key insights.",
   "key_pattern": "One sentence summary of most distinctive interaction style"
 }
 `,
@@ -1154,7 +1136,7 @@ Use this 4-part structure:
 
 2. **What's hindering you** - Split into (a) HopCode's fault (misunderstandings, wrong approaches, bugs) and (b) user-side friction (not providing enough context, environment issues -- ideally more general than just one project). Be honest but constructive.
 
-3. **Quick wins to try** - Specific HopCode features they could try from the examples below, or a workflow technique if you think it's really compelling. (Avoid stuff like 'Ask HopCode to confirm before taking actions" or "Type out more context up front" which are less compelling.)
+3. **Quick wins to try** - Specific HopCode features they could try from the examples below, or a workflow technique if you think it's really compelling. (Avoid stuff like "Ask HopCode to confirm before taking actions" or "Type out more context up front" which are less compelling.)
 
 4. **Ambitious workflows for better models** - As we move to much more capable models over the next 3-6 months, what should they prepare for? What workflows that seem impossible now will become possible? Draw from the appropriate section below.
 
@@ -1180,12 +1162,10 @@ export function getInsightPrompt(type: InsightPromptType): string {
 
 /**
  * Returns the Quran-guided coding behavior section for the system prompt.
- *
  * Sources from the @hoptrendy/quran-guidance package's curated
- * prompt template, which defines the agent's behavioral framework
+ * agent prompt, which encodes behavioral guidance
  * based on Quranic principles of verification, fairness, good speech,
- * and trust. No dynamic situation classification — this is the static
- * foundational guidance injected at startup.
+ * patience, and constructive work.
  */
 export function getQuranGuidanceSection(): string {
   return QURAN_GUIDED_AGENT_PROMPT;
@@ -1193,44 +1173,22 @@ export function getQuranGuidanceSection(): string {
 
 /**
  * Generates a per-turn Quran-guided behavioral reminder based on the
- * user's current message. Classifies the situation, resolves relevant
- * guidance, and returns a &lt;system-reminder&gt; to inject before the
- * model processes the turn.
- *
- * Suppressed when HOPCODE_SYSTEM_MD is active (static guidance is
- * already suppressed in that mode).
- *
- * @param userMessage - The user's current message text
- * @param iznModeActive - Whether Izn approval mode is active
- * @returns A &lt;system-reminder&gt; string, or '' if suppressed/empty
+ * current situation (e.g., debugging, code review, planning).
  */
 export function getQuranGuidancePerTurnReminder(
   userMessage: string,
-  iznModeActive: boolean,
-  telemetry?: ClassifierTelemetry,
+  agentContext?: string,
+  taskType?: string,
 ): string {
-  const systemMdEnv = process.env['HOPCODE_SYSTEM_MD'];
-  if (systemMdEnv && systemMdEnv !== '0' && systemMdEnv !== 'false') {
-    return '';
-  }
-
   try {
     const { behaviorPrompt } = getQuranGuidedBehavior({
       userMessage,
-      iznModeActive,
-      telemetry,
+      agentContext,
+      taskType,
     });
-
-    if (!behaviorPrompt) return '';
-
-    return `<system-reminder>
-${behaviorPrompt}
-</system-reminder>`;
-  } catch (err) {
-    debugLogger.warn(
-      'Failed to generate Quran guidance per-turn reminder:',
-      err,
-    );
+    return behaviorPrompt;
+  } catch {
+    // 'Failed to generate Quran guidance per-turn reminder:'
     return '';
   }
 }

@@ -9,13 +9,29 @@
 
 ### Install HopCode
 
-```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+The recommended installer uses a standalone archive when one is available for
+your platform. If it falls back to npm, Node.js 20 or later with npm must be
+available on PATH.
+
+**Linux / macOS**
+
+```sh
+curl -fsSL https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.sh | bash
+```
+
+**Windows**
+
+```cmd
+powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
 ```
 
 > [!note]
 >
-> It's recommended to restart your terminal after installation to ensure environment variables take effect. If the installation fails, please refer to the [Quickstart](./quickstart) guide.
+> It's recommended to restart your terminal after installation if `hopcode` is not
+> immediately available on PATH. If the installation fails, please refer to
+> [Manual Installation](./quickstart#manual-installation) in the Quickstart
+> guide. For offline installation, download a release archive and run the
+> installer with `--archive PATH`; keep `SHA256SUMS` next to the archive.
 
 ### Start using HopCode:
 

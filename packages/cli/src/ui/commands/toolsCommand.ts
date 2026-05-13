@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,10 +15,9 @@ import { t } from '../../i18n/index.js';
 export const toolsCommand: SlashCommand = {
   name: 'tools',
   get description() {
-    return t('list available HopCode tools. Usage: /tools [desc]');
+    return t('List available HopCode tools. Usage: /tools [desc]');
   },
   kind: CommandKind.BUILT_IN,
-  supportedModes: ['interactive'] as const,
   action: async (context: CommandContext, args?: string): Promise<void> => {
     const subCommand = args?.trim();
 

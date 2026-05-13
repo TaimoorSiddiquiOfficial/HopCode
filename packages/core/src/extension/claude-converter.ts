@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -193,7 +193,7 @@ export function convertClaudeAgentConfig(
   // rather than `auto-edit` (which auto-approves), preserving the restrictive
   // intent. `bypassPermissions` is the Claude mode that auto-approves everything.
   if (claudeAgent.permissionMode) {
-    const claudeToQwenMode: Record<string, string> = {
+    const claudeToHopCodeMode: Record<string, string> = {
       default: 'default',
       plan: 'plan',
       acceptEdits: 'auto-edit',
@@ -202,7 +202,7 @@ export function convertClaudeAgentConfig(
       auto: 'auto-edit',
     };
     const mapped =
-      claudeToQwenMode[claudeAgent.permissionMode] ??
+      claudeToHopCodeMode[claudeAgent.permissionMode] ??
       claudeAgent.permissionMode;
     hopcodeAgent['approvalMode'] = mapped;
   }
@@ -280,7 +280,8 @@ async function convertAgentFiles(agentsDir: string): Promise<void> {
 
       // Write converted content back
       const newYaml = stringifyYaml(newFrontmatter);
-      const systemPrompt = (hopcodeAgent['systemPrompt'] as string) || body.trim();
+      const systemPrompt =
+        (hopcodeAgent['systemPrompt'] as string) || body.trim();
       const newContent = `---
 ${newYaml}
 ---
@@ -302,7 +303,7 @@ ${systemPrompt}
  * @param claudeConfig Claude plugin configuration
  * @returns HopCode ExtensionConfig
  */
-export function convertClaudeToQwenConfig(
+export function convertClaudeToHopCodeConfig(
   claudeConfig: ClaudePluginConfig,
 ): ExtensionConfig {
   // Validate required fields
@@ -521,18 +522,18 @@ export async function convertClaudePluginPackage(
     await convertAgentFiles(agentsDestDir);
 
     // Step 10: Convert to HopCode format config
-    const qwenConfig = convertClaudeToQwenConfig(mergedConfig);
+    const hopcodeConfig = convertClaudeToHopCodeConfig(mergedConfig);
 
     // Step 11: Write hopcode-extension.json
-    const qwenConfigPath = path.join(tmpDir, 'hopcode-extension.json');
+    const hopcodeConfigPath = path.join(tmpDir, 'hopcode-extension.json');
     fs.writeFileSync(
-      qwenConfigPath,
-      JSON.stringify(qwenConfig, null, 2),
+      hopcodeConfigPath,
+      JSON.stringify(hopcodeConfig, null, 2),
       'utf-8',
     );
 
     return {
-      config: qwenConfig,
+      config: hopcodeConfig,
       convertedDir: tmpDir,
     };
   } catch (error) {

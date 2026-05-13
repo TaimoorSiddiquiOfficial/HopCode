@@ -11,7 +11,7 @@ import {
   clearCachedCredentialFile,
   createDebugLogger,
   HopCodeOAuth2Event,
-  hopCodeOAuth2Events,
+  HopCodeOAuth2Events,
   MCPServerConfig,
   SessionService,
   SESSION_TITLE_MAX_LENGTH,
@@ -245,7 +245,7 @@ class HopCodeAgent implements Agent {
     };
 
     if (method === AuthType.HOPCODE_OAUTH) {
-      hopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthUri, authUriHandler);
+      HopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthUri, authUriHandler);
     }
 
     await clearCachedCredentialFile();
@@ -258,7 +258,7 @@ class HopCodeAgent implements Agent {
       );
     } finally {
       if (method === AuthType.HOPCODE_OAUTH) {
-        hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, authUriHandler);
+        HopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, authUriHandler);
       }
     }
   }

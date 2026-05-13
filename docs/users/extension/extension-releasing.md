@@ -1,4 +1,4 @@
-# Extension Releasing
+﻿# Extension Releasing
 
 There are three primary ways of releasing extensions to users:
 
@@ -12,7 +12,7 @@ Git repository releases tend to be the simplest and most flexible approach, whil
 
 This is the most flexible and simple option. All you need to do us create a publicly accessible git repo (such as a public github repository) and then users can install your extension using `hopcode extensions install <your-repo-uri>`, or for a GitHub repository they can use the simplified `hopcode extensions install <org>/<repo>` format. They can optionally depend on a specific ref (branch/tag/commit) using the `--ref=<some-ref>` argument, this defaults to the default branch.
 
-Whenever commits are pushed to the ref that a user depends on, they will be prompted to update the extension. Note that this also allows for easy rollbacks, the HEAD commit is always treated as the latest version regardless of the actual version in the `qwen-extension.json` file.
+Whenever commits are pushed to the ref that a user depends on, they will be prompted to update the extension. Note that this also allows for easy rollbacks, the HEAD commit is always treated as the latest version regardless of the actual version in the `hopcode-extension.json` file.
 
 ### Managing release channels using a git repository
 
@@ -73,7 +73,7 @@ To ensure HopCode can automatically find the correct release asset for each plat
 
 #### Archive structure
 
-Archives must be fully contained extensions and have all the standard requirements - specifically the `qwen-extension.json` file must be at the root of the archive.
+Archives must be fully contained extensions and have all the standard requirements - specifically the `hopcode-extension.json` file must be at the root of the archive.
 
 The rest of the layout should look exactly the same as a typical extension, see [extensions.md](extension.md).
 
@@ -98,7 +98,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies
         run: npm ci
@@ -131,21 +131,21 @@ You can publish HopCode extensions as scoped npm packages (e.g. `@your-org/my-ex
 
 ### Package requirements
 
-Your npm package must include a `qwen-extension.json` file at the package root. This is the same config file used by all HopCode extensions — the npm tarball is simply another delivery mechanism.
+Your npm package must include a `hopcode-extension.json` file at the package root. This is the same config file used by all HopCode extensions — the npm tarball is simply another delivery mechanism.
 
 A minimal package structure looks like:
 
 ```
 my-extension/
 ├── package.json
-├── qwen-extension.json
+├── hopcode-extension.json
 ├── HOPCODE.md              # optional context file
 ├── commands/             # optional custom commands
 ├── skills/               # optional custom skills
 └── agents/               # optional custom subagents
 ```
 
-Make sure `qwen-extension.json` is included in your published package (i.e. not excluded by `.npmignore` or the `files` field in `package.json`).
+Make sure `hopcode-extension.json` is included in your published package (i.e. not excluded by `.npmignore` or the `files` field in `package.json`).
 
 ### Publishing
 

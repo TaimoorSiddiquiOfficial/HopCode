@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ const useTerminalSizeMock = vi.mocked(useTerminalSize.useTerminalSize);
 const defaultProps = {
   version: '1.0.0',
   authDisplayType: AuthDisplayType.HOPCODE_OAUTH,
-  model: 'qwen-coder-plus',
+  model: 'hopcoder-plus',
   workingDirectory: '/home/user/projects/test',
 };
 
@@ -54,8 +54,8 @@ describe('<Header />', () => {
 
   it('displays auth type and model', () => {
     const { lastFrame } = render(<Header {...defaultProps} />);
-    expect(lastFrame()).toContain('Legacy OAuth');
-    expect(lastFrame()).toContain('qwen-coder-plus');
+    expect(lastFrame()).toContain('HopCode OAuth');
+    expect(lastFrame()).toContain('hopcoder-plus');
   });
 
   it('displays Coding Plan auth type', () => {
@@ -73,6 +73,14 @@ describe('<Header />', () => {
       <Header {...defaultProps} authDisplayType={AuthDisplayType.API_KEY} />,
     );
     expect(lastFrame()).toContain('API Key');
+  });
+
+  it('displays custom provider auth labels as-is', () => {
+    const { lastFrame } = render(
+      <Header {...defaultProps} authDisplayType="OpenRouter" />,
+    );
+    expect(lastFrame()).toContain('OpenRouter');
+    expect(lastFrame()).not.toContain('Unknown');
   });
 
   it('displays Unknown when auth type is not set', () => {
@@ -113,7 +121,7 @@ describe('<Header />', () => {
     // Subtitle sits between the title and the auth line.
     const titleIdx = frame.indexOf('>_ HopCode');
     const subtitleIdx = frame.indexOf('Built-in DataWorks Official Skills');
-    const authIdx = frame.indexOf('Legacy OAuth');
+    const authIdx = frame.indexOf('HopCode OAuth');
     expect(titleIdx).toBeLessThan(subtitleIdx);
     expect(subtitleIdx).toBeLessThan(authIdx);
   });
@@ -125,7 +133,7 @@ describe('<Header />', () => {
     // spacer between them is just whitespace-padding, so we assert the
     // visible chrome the user sees.
     expect(frame).toContain('>_ HopCode');
-    expect(frame).toContain('Legacy OAuth');
+    expect(frame).toContain('HopCode OAuth');
   });
 
   it('renders the custom banner title in place of the default brand', () => {
@@ -175,7 +183,7 @@ describe('<Header />', () => {
     expect(lastFrame()).not.toContain('X'.repeat(150));
     expect(lastFrame()).not.toContain('Y'.repeat(150));
     // Info panel still renders.
-    expect(lastFrame()).toContain('Legacy OAuth');
+    expect(lastFrame()).toContain('HopCode OAuth');
   });
 
   it('falls back to the default HopCode logo when no custom art was provided at all', () => {

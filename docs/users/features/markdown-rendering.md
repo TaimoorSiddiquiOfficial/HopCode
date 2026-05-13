@@ -1,6 +1,6 @@
-# Markdown Rendering
+﻿# Markdown Rendering
 
-Qwen Code renders common Markdown structures directly in the TUI so model
+HopCode renders common Markdown structures directly in the TUI so model
 answers are easier to scan without leaving the terminal. The renderer is
 designed to keep the original source reachable, especially for visual blocks
 such as Mermaid diagrams and LaTeX math.
@@ -25,7 +25,7 @@ treated as normal text input.
 - `raw`: show source-oriented Markdown for visual blocks such as Mermaid,
   tables, and LaTeX.
 
-To start Qwen Code in raw mode by default, set `ui.renderMode`:
+To start HopCode in raw mode by default, set `ui.renderMode`:
 
 ```json
 {
@@ -43,40 +43,40 @@ current session view; it does not rewrite your settings file.
 Fenced `mermaid` code blocks render visually in `render` mode. The TUI uses a
 layered strategy:
 
-1. If enabled and supported, Qwen Code asks Mermaid CLI (`mmdc`) to render the
+1. If enabled and supported, HopCode asks Mermaid CLI (`mmdc`) to render the
    diagram to a PNG and sends it to the terminal image protocol.
 2. If terminal images are unavailable but `chafa` is installed, the same PNG can
    be converted to ANSI block graphics.
-3. Otherwise, Qwen Code falls back to a terminal wireframe or compact text
+3. Otherwise, HopCode falls back to a terminal wireframe or compact text
    preview.
-4. If a Mermaid diagram type cannot be previewed, Qwen Code shows the original
+4. If a Mermaid diagram type cannot be previewed, HopCode shows the original
    fenced source instead of hiding it behind a placeholder.
 
 Mermaid image rendering is disabled by default because it requires external
 renderers and terminal image support. Enable it with:
 
 ```bash
-HOPCODE_MERMAID_IMAGE_RENDERING=1 qwen
+HOPCODE_MERMAID_IMAGE_RENDERING=1 hopcode
 ```
 
 Optional environment variables:
 
-| Variable                                  | Description                                                                         |
-| ----------------------------------------- | ----------------------------------------------------------------------------------- |
-| `HOPCODE_MERMAID_IMAGE_RENDERING=1`       | Enables external Mermaid image rendering.                                           |
-| `HOPCODE_DISABLE_MERMAID_IMAGES=1`        | Disables Mermaid image rendering even when enabled elsewhere.                       |
-| `HOPCODE_MERMAID_IMAGE_PROTOCOL=kitty`    | Forces Kitty protocol output. Useful for terminals such as Kitty and Ghostty.       |
-| `HOPCODE_MERMAID_IMAGE_PROTOCOL=iterm2`   | Requests iTerm2 inline images. Interactive TUI rendering falls back to text/ANSI.   |
-| `HOPCODE_MERMAID_IMAGE_PROTOCOL=off`      | Disables terminal image protocols and allows text or `chafa` fallback.              |
-| `HOPCODE_MERMAID_MMD_CLI=/path/to/mmdc`   | Uses a specific Mermaid CLI executable.                                             |
-| `HOPCODE_MERMAID_ALLOW_NPX=1`             | Allows Qwen Code to run `npx @mermaid-js/mermaid-cli` when `mmdc` is not installed. |
-| `HOPCODE_MERMAID_ALLOW_LOCAL_RENDERERS=1` | Allows project-local renderer binaries under `node_modules/.bin`.                   |
-| `HOPCODE_MERMAID_RENDER_WIDTH=1200`       | Overrides the PNG render width.                                                     |
-| `HOPCODE_MERMAID_RENDER_TIMEOUT_MS=10000` | Overrides the external render timeout, capped at 60000 ms.                          |
-| `HOPCODE_MERMAID_CELL_ASPECT_RATIO=0.5`   | Adjusts image row fitting for terminal font cell geometry.                          |
+| Variable                                  | Description                                                                       |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| `HOPCODE_MERMAID_IMAGE_RENDERING=1`       | Enables external Mermaid image rendering.                                         |
+| `HOPCODE_DISABLE_MERMAID_IMAGES=1`        | Disables Mermaid image rendering even when enabled elsewhere.                     |
+| `HOPCODE_MERMAID_IMAGE_PROTOCOL=kitty`    | Forces Kitty protocol output. Useful for terminals such as Kitty and Ghostty.     |
+| `HOPCODE_MERMAID_IMAGE_PROTOCOL=iterm2`   | Requests iTerm2 inline images. Interactive TUI rendering falls back to text/ANSI. |
+| `HOPCODE_MERMAID_IMAGE_PROTOCOL=off`      | Disables terminal image protocols and allows text or `chafa` fallback.            |
+| `HOPCODE_MERMAID_MMD_CLI=/path/to/mmdc`   | Uses a specific Mermaid CLI executable.                                           |
+| `HOPCODE_MERMAID_ALLOW_NPX=1`             | Allows HopCode to run `npx @mermaid-js/mermaid-cli` when `mmdc` is not installed. |
+| `HOPCODE_MERMAID_ALLOW_LOCAL_RENDERERS=1` | Allows project-local renderer binaries under `node_modules/.bin`.                 |
+| `HOPCODE_MERMAID_RENDER_WIDTH=1200`       | Overrides the PNG render width.                                                   |
+| `HOPCODE_MERMAID_RENDER_TIMEOUT_MS=10000` | Overrides the external render timeout, capped at 60000 ms.                        |
+| `HOPCODE_MERMAID_CELL_ASPECT_RATIO=0.5`   | Adjusts image row fitting for terminal font cell geometry.                        |
 
 The first image render can be slow, especially when `npx` needs to resolve or
-download Mermaid CLI. During streaming, Qwen Code shows a bounded text preview
+download Mermaid CLI. During streaming, HopCode shows a bounded text preview
 and attempts image rendering only after the model response is complete.
 
 ### Mermaid Source Copy
@@ -102,7 +102,7 @@ rendered title.
 
 ## LaTeX Math
 
-Qwen Code supports basic inline and block LaTeX rendering in the terminal:
+HopCode supports basic inline and block LaTeX rendering in the terminal:
 
 ```markdown
 Inline math: $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$

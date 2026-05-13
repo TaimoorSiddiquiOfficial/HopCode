@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -939,10 +939,10 @@ describe('HopCodeContentGenerator', () => {
 
     it('should clear token on clearToken()', () => {
       // Simulate having cached token value
-      const qwenInstance = HopCodeContentGenerator as unknown as {
+      const hopcodeInstance = HopCodeContentGenerator as unknown as {
         currentToken: string;
       };
-      qwenInstance.currentToken = 'cached-token';
+      hopcodeInstance.currentToken = 'cached-token';
 
       HopCodeContentGenerator.clearToken();
 

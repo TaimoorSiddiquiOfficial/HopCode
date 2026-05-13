@@ -130,13 +130,13 @@ describe('HOPCODE_HOME environment variable', () => {
      * 1c. Relative path is resolved correctly.
      *
      * TestRig sets cwd to testDir when spawning the child process, so a
-     * relative path like "./custom-qwen" resolves to
-     * <testDir>/custom-qwen inside the subprocess.
+     * relative path like "./custom-HopCode" resolves to
+     * <testDir>/custom-HopCode inside the subprocess.
      */
     it('1c: relative HOPCODE_HOME path is resolved against subprocess cwd', async () => {
       rig.setup('hopcode-home-1c-relative-path');
 
-      const relativePath = './custom-qwen';
+      const relativePath = './custom-HopCode';
       process.env['HOPCODE_HOME'] = relativePath;
 
       try {
@@ -146,7 +146,7 @@ describe('HOPCODE_HOME environment variable', () => {
       }
 
       // Resolve the expected absolute path the same way the subprocess does
-      const expectedAbsPath = resolve(rig.testDir!, 'custom-qwen');
+      const expectedAbsPath = resolve(rig.testDir!, 'custom-HopCode');
       const installationIdPath = join(expectedAbsPath, 'installation_id');
       expect(
         existsSync(installationIdPath),

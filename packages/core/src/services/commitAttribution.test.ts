@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -413,11 +413,7 @@ describe('CommitAttributionService', () => {
         'src/human.ts': 200,
       });
 
-      const note = service.generateNotePayload(
-        staged,
-        '/project',
-        'HopCode',
-      );
+      const note = service.generateNotePayload(staged, '/project', 'HopCode');
 
       expect(note.files['src/main.ts']!.percent).toBe(50);
       expect(note.files['src/human.ts']!.percent).toBe(0);

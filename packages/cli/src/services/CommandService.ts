@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,6 +28,10 @@ export class CommandService {
    * @param commands A readonly array of the fully loaded and de-duplicated commands.
    */
   private constructor(private readonly commands: readonly SlashCommand[]) {}
+
+  static fromCommands(commands: readonly SlashCommand[]): CommandService {
+    return new CommandService(Object.freeze([...commands]));
+  }
 
   /**
    * Asynchronously creates and initializes a new CommandService instance.

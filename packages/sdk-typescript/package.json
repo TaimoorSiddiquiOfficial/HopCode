@@ -1,6 +1,7 @@
 {
   "name": "@hoptrendy/sdk",
-  "version": "0.27.5",
+  "version": "0.27.6",
+  "private": true,
   "description": "TypeScript SDK for programmatic access to HopCode CLI",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -43,7 +44,7 @@
   "author": "HopCode Team",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.1",

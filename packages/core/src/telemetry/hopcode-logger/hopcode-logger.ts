@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,6 +10,7 @@ import * as os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { Storage } from '../../config/storage.js';
 
 import type {
   StartSessionEvent,
@@ -305,17 +306,29 @@ export class HopCodeLogger {
 
   readSourceInfo(): string {
     try {
-      const sourceJsonPath = path.join(os.homedir(), '.hopcode', 'source.json');
-      if (fs.existsSync(sourceJsonPath)) {
-        const sourceJsonContent = fs.readFileSync(sourceJsonPath, 'utf8');
-        const sourceData = JSON.parse(sourceJsonContent);
-        if (
-          sourceData &&
-          typeof sourceData === 'object' &&
-          sourceData.source &&
-          sourceData.source !== 'unknown'
-        ) {
-          return sourceData.source;
+      const globalDir = Storage.getGlobalHopCodeDir();
+      const sourceJsonPath = path.join(globalDir, 'source.json');
+
+      // Also check legacy ~/.hopcode/source.json when HOPCODE_HOME is set,
+      // since the installer writes to ~/.hopcode/ regardless of the env var.
+      const legacyPath = path.join(os.homedir(), '.hopcode', 'source.json');
+      const candidates =
+        path.normalize(sourceJsonPath) !== path.normalize(legacyPath)
+          ? [sourceJsonPath, legacyPath]
+          : [sourceJsonPath];
+
+      for (const candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+          const sourceJsonContent = fs.readFileSync(candidate, 'utf8');
+          const sourceData = JSON.parse(sourceJsonContent);
+          if (
+            sourceData &&
+            typeof sourceData === 'object' &&
+            sourceData.source &&
+            sourceData.source !== 'unknown'
+          ) {
+            return sourceData.source;
+          }
         }
       }
     } catch (_error) {
@@ -601,6 +614,7 @@ export class HopCodeLogger {
       properties: {
         model: event.model,
         prompt_id: event.prompt_id,
+        subagent_name: event.subagent_name,
       },
     });
 
@@ -618,6 +632,7 @@ export class HopCodeLogger {
         auth_type: event.auth_type,
         model: event.model,
         prompt_id: event.prompt_id,
+        subagent_name: event.subagent_name,
       },
       snapshots: JSON.stringify({
         input_token_count: event.input_token_count,
@@ -655,6 +670,7 @@ export class HopCodeLogger {
         auth_type: event.auth_type,
         model: event.model,
         prompt_id: event.prompt_id,
+        subagent_name: event.subagent_name,
         error_message: event.error_message,
         error_type: event.error_type,
       },

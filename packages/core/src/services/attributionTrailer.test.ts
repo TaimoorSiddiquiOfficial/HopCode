@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,7 @@ import type { CommitAttributionNote } from './commitAttribution.js';
 
 const sampleNote: CommitAttributionNote = {
   version: 1,
-  generator: 'Qwen-Coder',
+  generator: 'hopcoder',
   files: {
     'src/main.ts': { aiChars: 150, humanChars: 50, percent: 75 },
     'src/utils.ts': { aiChars: 0, humanChars: 200, percent: 0 },

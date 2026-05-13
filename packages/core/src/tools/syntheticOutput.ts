@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -68,3 +68,13 @@ class SyntheticOutputInvocation extends BaseToolInvocation<
     };
   }
 }
+
+/**
+ * Placeholder args object used in telemetry to indicate that a structured-output
+ * tool call occurred without leaking the actual payload values.
+ * Shared between `telemetry/types.ts` (OTLP/event-stream) and
+ * `core/geminiChat.ts` (on-disk JSONL) so neither side can silently drift.
+ */
+export const STRUCTURED_OUTPUT_REDACTED_ARGS: Record<string, string> = {
+  __redacted: 'structured_output payload (see stdout result)',
+};

@@ -53,8 +53,8 @@
 ```json
 {
   "agent_servers": {
-    "qwen": {
-      "command": "/path/to/qwen",
+    "hopcode": {
+      "command": "/path/to/hopcode",
       "args": ["--acp"],
       "env": {}
     }
@@ -70,7 +70,7 @@
 
 ### Agent not appearing
 
-- Run `qwen --version` in terminal to verify installation
+- Run `hopcode --version` in terminal to verify installation
 - Ensure your JetBrains IDE version supports ACP
 - Restart your JetBrains IDE
 

@@ -415,7 +415,7 @@ async function createPerAgentConfig(
   // Create tool registry - needs to be done after override creation
   const agentRegistry: ToolRegistry = await override.createToolRegistry(
     undefined,
-    { skipDiscovery: true },
+    { skipDiscovery: true, forSubAgent: true },
   );
   agentRegistry.copyDiscoveredToolsFrom(base.getToolRegistry());
 

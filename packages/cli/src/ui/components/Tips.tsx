@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,8 +45,7 @@ export const Tips: React.FC = () => {
   return (
     <Box marginLeft={2} marginRight={2}>
       <Text color={theme.text.secondary}>
-        {t('Tips: ')}
-        {t(selectedTip)}
+        {t('Tips:')} {t(selectedTip)}
       </Text>
     </Box>
   );

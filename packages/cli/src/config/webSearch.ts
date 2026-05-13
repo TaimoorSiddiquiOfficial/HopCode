@@ -65,9 +65,11 @@ export function buildWebSearchConfig(
 
   if (settings.webSearch) {
     // Use providers from settings.json
-    providers = [...settings.webSearch.provider] as WebSearchProviderConfig[];
+    providers = [
+      ...(settings.webSearch.provider as unknown as WebSearchProviderConfig[]),
+    ];
     userDefault = settings.webSearch.default;
-    userMode = (settings.webSearch as WebSearchConfig).mode;
+    userMode = (settings.webSearch as unknown as WebSearchConfig).mode;
   } else {
     // Build providers from command line args and environment variables
 

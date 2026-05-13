@@ -7,7 +7,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   AuthType,
-  hopCodeOAuth2Events,
+  HopCodeOAuth2Events,
   HopCodeOAuth2Event,
   type DeviceAuthorizationData,
 } from '@hoptrendy/hopcode-core';
@@ -80,13 +80,13 @@ export const useHopCodeAuth = (
     };
 
     // Add event listeners
-    hopCodeOAuth2Events.on(HopCodeOAuth2Event.AuthUri, handleDeviceAuth);
-    hopCodeOAuth2Events.on(HopCodeOAuth2Event.AuthProgress, handleAuthProgress);
+    HopCodeOAuth2Events.on(HopCodeOAuth2Event.AuthUri, handleDeviceAuth);
+    HopCodeOAuth2Events.on(HopCodeOAuth2Event.AuthProgress, handleAuthProgress);
 
     // Cleanup event listeners when component unmounts or auth finishes
     return () => {
-      hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, handleDeviceAuth);
-      hopCodeOAuth2Events.off(
+      HopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, handleDeviceAuth);
+      HopCodeOAuth2Events.off(
         HopCodeOAuth2Event.AuthProgress,
         handleAuthProgress,
       );
@@ -95,7 +95,7 @@ export const useHopCodeAuth = (
 
   const cancelHopCodeAuth = useCallback(() => {
     // Emit cancel event to stop polling
-    hopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthCancel);
+    HopCodeOAuth2Events.emit(HopCodeOAuth2Event.AuthCancel);
 
     setHopCodeAuthState({
       deviceAuth: null,

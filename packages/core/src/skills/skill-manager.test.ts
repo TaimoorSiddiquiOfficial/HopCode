@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -159,8 +159,8 @@ describe('SkillManager', () => {
         return { name: 'regular-skill', description: 'A regular skill' };
       }
       if (yamlString.includes('name: shared-skill')) {
-        const desc = yamlString.includes('From qwen dir')
-          ? 'From qwen dir'
+        const desc = yamlString.includes('From hopcode dir')
+          ? 'From hopcode dir'
           : yamlString.includes('From agent dir')
             ? 'From agent dir'
             : 'A shared skill';
@@ -575,17 +575,21 @@ You are a helpful assistant.
     beforeEach(() => {
       // Mock directory listing based on path to handle multiple base dirs per level.
       // Use path.join to construct expected paths so separators match on all platforms.
-      const projectQwenSkillsDir = path.join(
+      const projectHopcodeSkillsDir = path.join(
         '/test/project',
         '.hopcode',
         'skills',
       );
-      const userQwenSkillsDir = path.join('/home/user', '.hopcode', 'skills');
+      const userHopcodeSkillsDir = path.join(
+        '/home/user',
+        '.hopcode',
+        'skills',
+      );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(fs.readdir).mockImplementation((dirPath: any) => {
         const pathStr = String(dirPath);
-        if (pathStr === projectQwenSkillsDir) {
+        if (pathStr === projectHopcodeSkillsDir) {
           return Promise.resolve([
             {
               name: 'skill1',
@@ -607,7 +611,7 @@ You are a helpful assistant.
             },
           ] as unknown as Awaited<ReturnType<typeof fs.readdir>>);
         }
-        if (pathStr === userQwenSkillsDir) {
+        if (pathStr === userHopcodeSkillsDir) {
           return Promise.resolve([
             {
               name: 'skill3',
@@ -726,7 +730,7 @@ Skill 3 content`);
         const pathStr = String(filePath);
         if (pathStr.includes('.hopcode') && pathStr.includes('shared-skill')) {
           return Promise.resolve(
-            `---\nname: shared-skill\ndescription: From qwen dir\n---\nQwen content`,
+            `---\nname: shared-skill\ndescription: From hopcode dir\n---\nHopCode content`,
           );
         }
         if (pathStr.includes('.agents') && pathStr.includes('shared-skill')) {
@@ -745,7 +749,7 @@ Skill 3 content`);
       // Only one instance should remain, from .hopcode (first in PROVIDER_CONFIG_DIRS)
       expect(skills).toHaveLength(1);
       expect(skills[0].name).toBe('shared-skill');
-      expect(skills[0].description).toBe('From qwen dir');
+      expect(skills[0].description).toBe('From hopcode dir');
     });
 
     it('should handle empty directories', async () => {
@@ -1234,12 +1238,12 @@ Body.
       // otherwise the user copy's globs activate the visible (project)
       // skill, even when the touched file is outside the project skill's
       // declared paths.
-      const projectHopCodeSkillsDir = path.join(
+      const projectHopcodeSkillsDir = path.join(
         '/test/project',
         '.hopcode',
         'skills',
       );
-      const userHopCodeSkillsDir = path.join(
+      const userHopcodeSkillsDir = path.join(
         '/home/user',
         '.hopcode',
         'skills',
@@ -1248,8 +1252,8 @@ Body.
       vi.mocked(fs.readdir).mockImplementation((dirPath: any) => {
         const pathStr = String(dirPath);
         if (
-          pathStr === projectHopCodeSkillsDir ||
-          pathStr === userHopCodeSkillsDir
+          pathStr === projectHopcodeSkillsDir ||
+          pathStr === userHopcodeSkillsDir
         ) {
           return Promise.resolve([
             {
@@ -1267,7 +1271,7 @@ Body.
       vi.mocked(fs.access).mockResolvedValue(undefined);
       vi.mocked(fs.readFile).mockImplementation((filePath) => {
         const pathStr = String(filePath);
-        if (pathStr.startsWith(projectHopCodeSkillsDir)) {
+        if (pathStr.startsWith(projectHopcodeSkillsDir)) {
           return Promise.resolve(`---
 name: foo
 description: A test skill
@@ -1278,7 +1282,7 @@ paths:
 Project body.
 `);
         }
-        if (pathStr.startsWith(userHopCodeSkillsDir)) {
+        if (pathStr.startsWith(userHopcodeSkillsDir)) {
           return Promise.resolve(`---
 name: foo
 description: A test skill

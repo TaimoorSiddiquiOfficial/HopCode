@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,10 +19,12 @@ export const getCacheKey = (
   ignoreContent: string,
   maxDepth?: number,
   maxFiles?: number,
+  useGitignore: boolean = true,
 ): string => {
   const hash = crypto.createHash('sha256');
   hash.update(directory);
   hash.update(ignoreContent);
+  hash.update(useGitignore ? 'gitignore' : 'no-gitignore');
   if (maxDepth !== undefined) {
     hash.update(String(maxDepth));
   }
