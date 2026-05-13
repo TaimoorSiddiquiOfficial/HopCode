@@ -33,6 +33,7 @@ import {
   type ExecutingToolCall,
   type WaitingToolCall,
 } from '../../core/coreToolScheduler.js';
+import { IznGateHandler } from '../../confirmation-bus/iznGateHandler.js';
 import type {
   ToolConfirmationOutcome,
   ToolCallConfirmationDetails,
@@ -566,6 +567,12 @@ export class AgentCore {
     let finalText = '';
     let terminateMode: AgentTerminateMode | null = null;
 
+    // Shared IznGateHandler persists across all tool-execution rounds
+    // within the same turn so the retry-after-verification path
+    // (hash-based bypass) works when the model re-issues a destructive
+    // command after self-verification and user confirmation.
+    const iznGateHandler = new IznGateHandler();
+
     while (true) {
       // Check abort before starting a new round — prevents unnecessary API
       // calls after processFunctionCalls was unblocked by an abort signal.
@@ -726,6 +733,7 @@ export class AgentCore {
           promptId,
           turnCounter,
           toolsList,
+          iznGateHandler,
           currentResponseId,
           wasOutputTruncated,
         );
@@ -1001,6 +1009,7 @@ export class AgentCore {
     promptId: string,
     currentRound: number,
     toolsList: FunctionDeclaration[],
+    iznGateHandler: IznGateHandler,
     responseId?: string,
     wasOutputTruncated = false,
   ): Promise<Content[]> {
@@ -1077,6 +1086,7 @@ export class AgentCore {
     const executionStartedEmitted = new Set<string>();
     const scheduler = new CoreToolScheduler({
       config: this.runtimeContext,
+      iznGateHandler,
       outputUpdateHandler: (callId, outputChunk) => {
         this.eventEmitter?.emit(AgentEventType.TOOL_OUTPUT_UPDATE, {
           subagentId: this.subagentId,
