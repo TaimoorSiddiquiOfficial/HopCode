@@ -255,9 +255,7 @@ describe('injectPermissionRulesIfMissing', () => {
 
     // The injected rules should contain a pattern matching the command
     expect(details.permissionRules).toBeDefined();
-    expect(
-      details.permissionRules!.some((r) => r.includes('run_shell_command')),
-    ).toBe(true);
+    expect(details.permissionRules!.some((r) => r.includes('Bash'))).toBe(true);
   });
 
   it('injects rules with path context for file tools', () => {
@@ -276,9 +274,9 @@ describe('injectPermissionRulesIfMissing', () => {
 
     expect(details.permissionRules).toBeDefined();
     // Should include the file path context
-    expect(details.permissionRules!.some((r) => r.includes('app.ts'))).toBe(
-      true,
-    );
+    expect(
+      details.permissionRules!.some((r) => r.includes('/project/src')),
+    ).toBe(true);
   });
 
   it('injects rules with domain context for web_fetch', () => {

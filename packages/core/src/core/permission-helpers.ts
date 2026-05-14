@@ -114,13 +114,11 @@ export async function evaluatePermissionRules(
   if (pm && defaultPermission !== 'deny') {
     if (pm.hasRelevantRules(pmCtx)) {
       const pmDecision = await pm.evaluate(pmCtx);
-      if (pmDecision !== 'default') {
-        finalPermission = pmDecision;
-        // If PM explicitly forces 'ask', adding allow rules won't help
-        // because ask has higher priority. Hide "Always allow" options.
-        if (pmDecision === 'ask' && pm.hasMatchingAskRule(pmCtx)) {
-          pmForcedAsk = true;
-        }
+      finalPermission = pmDecision;
+      // If PM explicitly forces 'ask', adding allow rules won't help
+      // because ask has higher priority. Hide "Always allow" options.
+      if (pmDecision === 'ask' && pm.hasMatchingAskRule(pmCtx)) {
+        pmForcedAsk = true;
       }
     }
   }
@@ -199,7 +197,7 @@ export async function persistPermissionOutcome(
     confirmationDetails as unknown as Record<string, unknown>
   )?.['permissionRules'] as string[] | undefined;
   const payloadRules = payload?.permissionRules;
-  const rules = payloadRules ?? detailsRules ?? [];
+  const rules = detailsRules ?? payloadRules ?? [];
 
   if (rules.length > 0) {
     for (const rule of rules) {
