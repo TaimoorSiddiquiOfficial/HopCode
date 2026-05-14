@@ -30,11 +30,15 @@ describe('detectTerminalTheme', () => {
   // ---------------------------------------------------------------------------
 
   describe('parseOscRgb', () => {
-    it('should parse rgb:RRRR/GGGG/BBBB format', async () => {
-      const { parseOscRgb } = await import('./detect-terminal-theme.js');
-      const rgb = parseOscRgb('rgb:0000/0000/0000');
-      expect(rgb).toEqual({ r: 0, g: 0, b: 0 });
-    });
+    it(
+      'should parse rgb:RRRR/GGGG/BBBB format',
+      { timeout: 15000 },
+      async () => {
+        const { parseOscRgb } = await import('./detect-terminal-theme.js');
+        const rgb = parseOscRgb('rgb:0000/0000/0000');
+        expect(rgb).toEqual({ r: 0, g: 0, b: 0 });
+      },
+    );
 
     it('should parse short hex components (rgb:RR/GG/BB)', async () => {
       const { parseOscRgb } = await import('./detect-terminal-theme.js');

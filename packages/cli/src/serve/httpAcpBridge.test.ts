@@ -1794,6 +1794,7 @@ describe('createHttpAcpBridge', () => {
       // Pre-fix: rename replaced the symlink with a regular file,
       // leaving the original target unchanged. Verify the target's
       // content is what was written and the symlink is preserved.
+      if (process.platform === 'win32') return; // symlinks need admin on Windows
       const { bridge, conn } = await setupForFs();
       const dir = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-bridge-symlink-'),
