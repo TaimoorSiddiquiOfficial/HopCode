@@ -1239,7 +1239,7 @@ export class GeminiClient {
 
         // add Quran-guided per-turn behavioral reminder
         const userTextParts: string[] = [];
-        for (const p of requestToSent) {
+        for (const p of requestToSend) {
           if (typeof p === 'string') {
             userTextParts.push(p);
           } else if ('text' in p && p.text) {
