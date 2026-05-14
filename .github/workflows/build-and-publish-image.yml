@@ -113,14 +113,14 @@ jobs:
           echo "GitHub ref: ${{ github.ref }}"
 
       - name: 'Set up QEMU'
-        uses: 'docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130' # ratchet:docker/setup-qemu-action@v3
+        uses: 'docker/setup-qemu-action@v4' # ratchet:exclude
 
       - name: 'Set up Docker Buildx'
-        uses: 'docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f' # ratchet:docker/setup-buildx-action@v3
+        uses: 'docker/setup-buildx-action@v4' # ratchet:exclude
 
       - name: 'Extract metadata (tags, labels) for Docker'
         id: 'meta'
-        uses: 'docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051' # ratchet:docker/metadata-action@v5
+        uses: 'docker/metadata-action@v6' # ratchet:exclude
         with:
           images: '${{ steps.image.outputs.repository }}'
           tags: |
@@ -131,7 +131,7 @@ jobs:
       - name: 'Log in to the Container registry'
         if: |-
           ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true') }}
-        uses: 'docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9' # ratchet:docker/login-action@v3
+        uses: 'docker/login-action@v4' # ratchet:exclude
         with:
           registry: '${{ env.REGISTRY }}'
           username: '${{ github.actor }}'
@@ -139,7 +139,7 @@ jobs:
 
       - name: 'Build and push Docker image'
         id: 'build-and-push'
-        uses: 'docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8' # ratchet:docker/build-push-action@v6
+        uses: 'docker/build-push-action@v7' # ratchet:exclude
         with:
           context: '.'
           platforms: 'linux/amd64,linux/arm64'
