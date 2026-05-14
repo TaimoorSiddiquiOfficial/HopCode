@@ -37,9 +37,8 @@ function mockStats(overrides: Partial<fs.Stats> = {}): fs.Stats {
   } as fs.Stats;
 }
 
-// Since we can't easily seed the real cache, we mock `cache.check()`
-// directly in tests that need specific cache states. For the
-// filesystem-side tests we mock `fs.promises.stat`.
+// ---------------------------------------------------------------------------
+// checkPriorRead
 // ---------------------------------------------------------------------------
 
 describe('checkPriorRead', () => {
@@ -183,24 +182,21 @@ describe('checkPriorRead', () => {
   });
 
   // ── Cache: fresh + read + cacheable → ok ────────────────────────────
+  // Uses seed() instead of mocking cache.check()
 
   it('returns ok when cache is fresh and file was read as text', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
 
-    // Stub check to return a fresh entry with lastReadAt and cacheable
-    vi.spyOn(cache, 'check').mockReturnValue({
-      state: 'fresh',
-      entry: {
-        inodeKey: '1:100',
-        realPath: '/tmp/test.txt',
-        mtimeMs: stats.mtimeMs,
-        sizeBytes: stats.size,
-        lastReadAt: 1_700_000_001_000,
-        lastReadCacheable: true,
-        lastWriteAt: undefined,
-        lastReadWasFull: false,
-      },
+    // Seed the cache directly — no mock needed
+    cache.seed({
+      absPath: '/tmp/test.txt',
+      dev: stats.dev as number,
+      ino: stats.ino as number,
+      mtimeMs: stats.mtimeMs,
+      sizeBytes: stats.size,
+      lastReadAt: 1_700_000_001_000,
+      lastReadCacheable: true,
     });
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'editing');
@@ -212,18 +208,14 @@ describe('checkPriorRead', () => {
   it('rejects when cache is fresh but lastReadAt is undefined', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({
-      state: 'fresh',
-      entry: {
-        inodeKey: '1:100',
-        realPath: '/tmp/test.txt',
-        mtimeMs: stats.mtimeMs,
-        sizeBytes: stats.size,
-        lastReadAt: undefined,
-        lastReadCacheable: false,
-        lastWriteAt: 1_700_000_000_500,
-        lastReadWasFull: false,
-      },
+
+    // Seed entry without lastReadAt — simulates "present but never read"
+    cache.seed({
+      absPath: '/tmp/test.txt',
+      dev: stats.dev as number,
+      ino: stats.ino as number,
+      mtimeMs: stats.mtimeMs,
+      sizeBytes: stats.size,
     });
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'editing');
@@ -240,18 +232,16 @@ describe('checkPriorRead', () => {
   it('rejects when cache is stale (file changed since read)', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({
-      state: 'stale',
-      entry: {
-        inodeKey: '1:100',
-        realPath: '/tmp/test.txt',
-        mtimeMs: stats.mtimeMs,
-        sizeBytes: stats.size,
-        lastReadAt: undefined,
-        lastReadCacheable: false,
-        lastWriteAt: undefined,
-        lastReadWasFull: false,
-      },
+
+    // Seed with a different mtime to simulate drift
+    cache.seed({
+      absPath: '/tmp/test.txt',
+      dev: stats.dev as number,
+      ino: stats.ino as number,
+      mtimeMs: stats.mtimeMs - 1000, // stale
+      sizeBytes: stats.size,
+      lastReadAt: 1_700_000_001_000,
+      lastReadCacheable: true,
     });
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'editing');
@@ -269,7 +259,7 @@ describe('checkPriorRead', () => {
   it('rejects when cache state is unknown (never read)', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({ state: 'unknown' });
+    // Don't seed anything — cache is empty
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'editing');
     expect(result.ok).toBe(false);
@@ -287,18 +277,16 @@ describe('checkPriorRead', () => {
   it('rejects non-text payloads with EDIT_REQUIRES_PRIOR_READ', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({
-      state: 'fresh',
-      entry: {
-        inodeKey: '1:100',
-        realPath: '/tmp/photo.png',
-        mtimeMs: stats.mtimeMs,
-        sizeBytes: stats.size,
-        lastReadAt: 1_700_000_001_000,
-        lastReadCacheable: false,
-        lastWriteAt: undefined,
-        lastReadWasFull: false,
-      },
+
+    // Seed a non-cacheable (binary) entry
+    cache.seed({
+      absPath: '/tmp/photo.png',
+      dev: stats.dev as number,
+      ino: stats.ino as number,
+      mtimeMs: stats.mtimeMs,
+      sizeBytes: stats.size,
+      lastReadAt: 1_700_000_001_000,
+      lastReadCacheable: false,
     });
 
     const result = await checkPriorRead(cache, '/tmp/photo.png', 'editing');
@@ -316,7 +304,6 @@ describe('checkPriorRead', () => {
   it('uses "overwriting" verb-specific wording in unknown state', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({ state: 'unknown' });
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'overwriting');
     expect(result.ok).toBe(false);
@@ -330,7 +317,6 @@ describe('checkPriorRead', () => {
   it('uses "edit" verb-specific wording in unknown state', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({ state: 'unknown' });
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'editing');
     expect(result.ok).toBe(false);
@@ -346,7 +332,6 @@ describe('checkPriorRead', () => {
   it('uses "overwriting" in displayMessage for overwriting verb', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({ state: 'unknown' });
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'overwriting');
     expect(result.ok).toBe(false);
@@ -358,7 +343,6 @@ describe('checkPriorRead', () => {
   it('uses "editing" in displayMessage for editing verb', async () => {
     const stats = mockStats();
     vi.spyOn(fs.promises, 'stat').mockResolvedValue(stats);
-    vi.spyOn(cache, 'check').mockReturnValue({ state: 'unknown' });
 
     const result = await checkPriorRead(cache, '/tmp/test.txt', 'editing');
     expect(result.ok).toBe(false);
@@ -395,6 +379,80 @@ describe('checkPriorRead', () => {
     if (!result.ok) {
       expect(result.displayMessage).toContain('editing');
     }
+  });
+
+  // ── Seed updating: overwrite existing entry ──────────────────────────
+
+  it('seed updates an existing entry when the same inode is seeded again', () => {
+    cache.seed({
+      absPath: '/tmp/a.txt',
+      dev: 1,
+      ino: 100,
+      mtimeMs: 1000,
+      sizeBytes: 512,
+      lastReadAt: 100,
+      lastReadCacheable: true,
+    });
+
+    // Re-seed the same inode with different values
+    const updated = cache.seed({
+      absPath: '/tmp/b.txt',
+      dev: 1,
+      ino: 100,
+      mtimeMs: 2000,
+      sizeBytes: 1024,
+      lastReadAt: 200,
+      lastReadCacheable: false,
+    });
+
+    expect(updated.realPath).toBe('/tmp/b.txt');
+    expect(updated.mtimeMs).toBe(2000);
+    expect(updated.sizeBytes).toBe(1024);
+    expect(updated.lastReadAt).toBe(200);
+    expect(updated.lastReadCacheable).toBe(false);
+    expect(cache.size()).toBe(1);
+  });
+
+  // ── Seed defaults: flags default to false when omitted ──────────────
+
+  it('seed defaults lastReadWasFull and lastReadCacheable to false', () => {
+    const entry = cache.seed({
+      absPath: '/tmp/x.txt',
+      dev: 1,
+      ino: 200,
+      mtimeMs: 1000,
+      sizeBytes: 256,
+    });
+
+    expect(entry.lastReadWasFull).toBe(false);
+    expect(entry.lastReadCacheable).toBe(false);
+    expect(entry.lastReadAt).toBeUndefined();
+    expect(entry.lastWriteAt).toBeUndefined();
+  });
+
+  // ── Seed independence: different inodes are separate entries ─────────
+
+  it('seed creates independent entries for different inodes', () => {
+    cache.seed({
+      absPath: '/tmp/a.txt',
+      dev: 1,
+      ino: 100,
+      mtimeMs: 1000,
+      sizeBytes: 512,
+      lastReadAt: 100,
+      lastReadCacheable: true,
+    });
+    cache.seed({
+      absPath: '/tmp/b.txt',
+      dev: 1,
+      ino: 200,
+      mtimeMs: 1000,
+      sizeBytes: 512,
+      lastReadAt: 100,
+      lastReadCacheable: true,
+    });
+
+    expect(cache.size()).toBe(2);
   });
 });
 

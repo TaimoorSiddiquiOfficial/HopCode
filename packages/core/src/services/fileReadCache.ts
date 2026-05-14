@@ -257,6 +257,54 @@ export class FileReadCache {
     return this.byInode.size;
   }
 
+  /**
+   * Directly inject an entry into the cache for testing.
+   *
+   * This bypasses the normal `recordRead` / `recordWrite` flow and
+   * allows seeding the cache with arbitrary state without touching
+   * the filesystem.  All fields are required except the optional
+   * timestamps — omitting `lastReadAt` produces the same "fresh but
+   * never read" state that triggers `EDIT_REQUIRES_PRIOR_READ`.
+   *
+   * Returns the inserted (or updated) entry so callers can assert on it.
+   */
+  seed(opts: {
+    absPath: string;
+    dev: number;
+    ino: number;
+    mtimeMs: number;
+    sizeBytes: number;
+    lastReadAt?: number;
+    lastWriteAt?: number;
+    lastReadWasFull?: boolean;
+    lastReadCacheable?: boolean;
+  }): FileReadEntry {
+    const inodeKey = `${opts.dev}:${opts.ino}`;
+    const existing = this.byInode.get(inodeKey);
+    if (existing) {
+      existing.realPath = opts.absPath;
+      existing.mtimeMs = opts.mtimeMs;
+      existing.sizeBytes = opts.sizeBytes;
+      existing.lastReadAt = opts.lastReadAt;
+      existing.lastWriteAt = opts.lastWriteAt;
+      existing.lastReadWasFull = opts.lastReadWasFull ?? false;
+      existing.lastReadCacheable = opts.lastReadCacheable ?? false;
+      return existing;
+    }
+    const entry: FileReadEntry = {
+      inodeKey,
+      realPath: opts.absPath,
+      mtimeMs: opts.mtimeMs,
+      sizeBytes: opts.sizeBytes,
+      lastReadAt: opts.lastReadAt,
+      lastWriteAt: opts.lastWriteAt,
+      lastReadWasFull: opts.lastReadWasFull ?? false,
+      lastReadCacheable: opts.lastReadCacheable ?? false,
+    };
+    this.byInode.set(inodeKey, entry);
+    return entry;
+  }
+
   private upsert(absPath: string, stats: Stats): FileReadEntry {
     const key = FileReadCache.inodeKey(stats);
     const existing = this.byInode.get(key);
