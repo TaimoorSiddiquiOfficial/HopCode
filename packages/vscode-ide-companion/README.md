@@ -1,9 +1,9 @@
 # HopCode Companion
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/hopcode.hopcode-vscode-ide-companion)](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion)
-[![VS Code Installs](https://img.shields.io/visual-studio-marketplace/i/hopcode.hopcode-vscode-ide-companion)](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion)
-[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/hopcode/hopcode-vscode-ide-companion)](https://open-vsx.org/extension/hopcode/hopcode-vscode-ide-companion)
-[![Rating](https://img.shields.io/visual-studio-marketplace/r/hopcode.hopcode-vscode-ide-companion)](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion)
+[![Version](https://img.shields.io/visual-studio-marketplace/v/hoptrendy.hoptrendy-vscode-ide-companion)](https://marketplace.visualstudio.com/items?itemName=hoptrendy.hoptrendy-vscode-ide-companion)
+[![VS Code Installs](https://img.shields.io/visual-studio-marketplace/i/hoptrendy.hoptrendy-vscode-ide-companion)](https://marketplace.visualstudio.com/items?itemName=hoptrendy.hoptrendy-vscode-ide-companion)
+[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/hoptrendy/hoptrendy-vscode-ide-companion)](https://open-vsx.org/extension/hoptrendy/hoptrendy-vscode-ide-companion)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/hoptrendy.hoptrendy-vscode-ide-companion)](https://marketplace.visualstudio.com/items?itemName=hoptrendy.hoptrendy-vscode-ide-companion)
 
 Seamlessly integrate [HopCode](https://github.com/TaimoorSiddiquiOfficial/HopCode) into Visual Studio Code with native IDE features and an intuitive chat interface. This extension bundles everything you need — no additional installation required.
 
@@ -22,7 +22,7 @@ Seamlessly integrate [HopCode](https://github.com/TaimoorSiddiquiOfficial/HopCod
 
 ## Quick Start
 
-1. **Install** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion) or [Open VSX Registry](https://open-vsx.org/extension/hopcode/hopcode-vscode-ide-companion)
+1. **Install** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hoptrendy.hoptrendy-vscode-ide-companion) or [Open VSX Registry](https://open-vsx.org/extension/hoptrendy/hoptrendy-vscode-ide-companion)
 
 2. **Open the Chat panel** using one of these methods:
    - Click the **HopCode icon** in the activity bar

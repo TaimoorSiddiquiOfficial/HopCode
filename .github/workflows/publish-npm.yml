@@ -270,8 +270,8 @@ jobs:
               # "already exists in the Marketplace. Please use a different 'name'" is a
               # publisher permission error, NOT a "version already published" skip condition.
               echo "❌ VS Code Marketplace: Publisher permission denied." >&2
-              echo "   The VSCE_PAT token is likely expired or does not belong to the 'hopcode' publisher." >&2
-              echo "   Regenerate it at: https://marketplace.visualstudio.com/manage/publishers/hopcode" >&2
+              echo "   The VSCE_PAT token is likely expired or does not belong to the 'hoptrendy' publisher." >&2
+              echo "   Regenerate it at: https://marketplace.visualstudio.com/manage/publishers/hoptrendy" >&2
               exit 1
             elif echo "$output" | grep -qiE "(already published|version already|EEXIST|already.*0\.[0-9])"; then
               version=$(node -p "require('./package.json').version")
@@ -297,7 +297,7 @@ jobs:
               version=$(node -p "require('./package.json').version")
               echo "⏭️ Open VSX: v${version} already published, skipping"
             elif echo "$output" | grep -qiE "(unknown publisher|create-namespace|namespace)"; then
-              echo "⚠️ Open VSX: publisher namespace not registered. Visit https://open-vsx.org to create the 'hopcode' namespace, then re-run."
+              echo "⚠️ Open VSX: publisher namespace not registered. Visit https://open-vsx.org to create the 'hoptrendy' namespace, then re-run."
             elif echo "$output" | grep -qiE "(publisher agreement|eclipse foundation|sign.*agreement)"; then
               echo "⚠️ Open VSX: Publisher Agreement not signed. Visit https://open-vsx.org to sign the Eclipse Foundation Publisher Agreement."
             else

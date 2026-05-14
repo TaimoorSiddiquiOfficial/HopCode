@@ -296,7 +296,7 @@ describe('activate', () => {
 
       expect(executeCommandMock).toHaveBeenCalledWith(
         'workbench.extensions.installExtension',
-        'hopcode.hopcode-vscode-ide-companion',
+        'hoptrendy.hoptrendy-vscode-ide-companion',
       );
     });
 

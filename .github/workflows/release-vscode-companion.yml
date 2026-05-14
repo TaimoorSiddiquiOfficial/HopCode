@@ -226,7 +226,7 @@ jobs:
           VSCODE_TARGET: '${{ matrix.target }}'
         run: |
           # Build and stage the extension + bundled CLI
-          npm --workspace=hopcode-vscode-ide-companion run prepackage
+          npm --workspace=hoptrendy-vscode-ide-companion run prepackage
 
       - name: 'Package VSIX (platform-specific)'
         if: "${{ matrix.target != '' }}"

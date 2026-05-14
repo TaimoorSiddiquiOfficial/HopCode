@@ -21,7 +21,7 @@ import { registerNewCommands } from './commands/index.js';
 import { ReadonlyFileSystemProvider } from './services/readonlyFileSystemProvider.js';
 import { isWindows } from './utils/platform.js';
 
-const CLI_IDE_COMPANION_IDENTIFIER = 'hopcode.hopcode-vscode-ide-companion';
+const CLI_IDE_COMPANION_IDENTIFIER = 'hoptrendy.hoptrendy-vscode-ide-companion';
 const INFO_MESSAGE_SHOWN_KEY = 'hopCodeInfoMessageShown';
 export const DIFF_SCHEME = 'hopcode-diff';
 
