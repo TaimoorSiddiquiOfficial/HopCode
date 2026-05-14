@@ -51,6 +51,8 @@ export const ToolNames = {
   TASK_READY: 'task_ready',
   TASK_UPDATE: 'task_update',
   WEB_SEARCH: 'web_search',
+  ENTER_WORKTREE: 'enter_worktree',
+  EXIT_WORKTREE: 'exit_worktree',
 } as const;
 
 /**
@@ -92,6 +94,8 @@ export const ToolDisplayNames = {
   TASK_READY: 'TaskReady',
   TASK_UPDATE: 'TaskUpdate',
   WEB_SEARCH: 'WebSearch',
+  ENTER_WORKTREE: 'EnterWorktree',
+  EXIT_WORKTREE: 'ExitWorktree',
 } as const;
 
 // Migration from old tool names to new tool names
