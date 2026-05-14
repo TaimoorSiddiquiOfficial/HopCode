@@ -7,6 +7,7 @@
 import type { GenerateContentParameters } from '@google/genai';
 import { hasErrorCode, hasErrorType } from '../../utils/errors.js';
 import { createDebugLogger } from '../../utils/debugLogger.js';
+import { redactProxyError } from '../../utils/runtimeFetchOptions.js';
 import type { ErrorHandler, RequestContext } from './types.js';
 
 const debugLogger = createDebugLogger('OPENAI_ERROR');
@@ -25,11 +26,16 @@ export class EnhancedErrorHandler implements ErrorHandler {
     context: RequestContext,
     request: GenerateContentParameters,
   ): never {
-    const isTimeoutError = this.isTimeoutError(error);
-    const errorMessage = this.buildErrorMessage(error, context, isTimeoutError);
+    const redactedError = redactProxyError(error);
+    const isTimeoutError = this.isTimeoutError(redactedError);
+    const errorMessage = this.buildErrorMessage(
+      redactedError,
+      context,
+      isTimeoutError,
+    );
 
     // Allow subclasses to suppress error logging for specific scenarios
-    if (!this.shouldSuppressErrorLogging(error, request)) {
+    if (!this.shouldSuppressErrorLogging(redactedError, request)) {
       debugLogger.error('OpenAI API Error:', errorMessage);
     }
 
@@ -40,7 +46,7 @@ export class EnhancedErrorHandler implements ErrorHandler {
       );
     }
 
-    throw error;
+    throw redactedError;
   }
 
   shouldSuppressErrorLogging(
