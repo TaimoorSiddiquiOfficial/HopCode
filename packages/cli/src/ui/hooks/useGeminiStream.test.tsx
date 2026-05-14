@@ -1907,7 +1907,7 @@ describe('useGeminiStream', () => {
       });
 
       // Sanity: the throttle has not fired yet.
-      expect(result.current.pendingHistoryItems).toEqual([]);
+      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
 
       act(() => {
         result.current.cancelOngoingRequest();
