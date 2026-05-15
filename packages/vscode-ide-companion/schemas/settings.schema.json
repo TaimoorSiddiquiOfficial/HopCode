@@ -119,7 +119,6 @@
           "type": "string",
           "default": "auto"
         },
-
         "terminalBell": {
           "description": "Play terminal bell sound when response completes or needs approval.",
           "type": "boolean",

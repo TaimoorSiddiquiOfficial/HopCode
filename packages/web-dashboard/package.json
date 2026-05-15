@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/web-dashboard",
-  "version": "0.27.8",
+  "version": "0.27.9",
   "description": "Standalone web dashboard for HopCode â€” session browser, chat viewer, cost tracking",
   "type": "module",
   "bin": {
