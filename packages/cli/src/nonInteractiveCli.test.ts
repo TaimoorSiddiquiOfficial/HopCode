@@ -64,11 +64,9 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 const mockGetCommands = vi.hoisted(() => vi.fn());
 const mockGetCommandsForMode = vi.hoisted(() => vi.fn());
 const mockCommandServiceCreate = vi.hoisted(() => vi.fn());
-const mockCommandServiceFromCommands = vi.hoisted(() => vi.fn());
 vi.mock('./services/CommandService.js', () => ({
   CommandService: {
     create: mockCommandServiceCreate,
-    fromCommands: mockCommandServiceFromCommands,
   },
 }));
 

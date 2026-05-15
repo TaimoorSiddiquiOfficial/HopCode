@@ -119,11 +119,7 @@
           "type": "string",
           "default": "auto"
         },
-        "dynamicCommandTranslation": {
-          "description": "Automatically translate slash command names and descriptions to the current UI language.",
-          "type": "boolean",
-          "default": false
-        },
+
         "terminalBell": {
           "description": "Play terminal bell sound when response completes or needs approval.",
           "type": "boolean",

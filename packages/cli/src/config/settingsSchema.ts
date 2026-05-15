@@ -480,16 +480,7 @@ const SETTINGS_SCHEMA = {
           'or set a specific language.',
         showInDialog: true,
       },
-      dynamicCommandTranslation: {
-        type: 'boolean',
-        label: 'Dynamic Command Translation',
-        category: 'General',
-        requiresRestart: false,
-        default: false,
-        description:
-          'Automatically translate slash command names and descriptions to the current UI language.',
-        showInDialog: true,
-      },
+
       terminalBell: {
         type: 'boolean',
         label: 'Terminal Bell Notification',
