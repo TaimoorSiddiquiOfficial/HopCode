@@ -4007,14 +4007,14 @@ describe('ShellTool', () => {
         });
       }).toThrow('Timeout must be a positive number.');
 
-      // Timeout too large
+      // Large timeout (no longer capped)
       expect(() => {
         shellTool.build({
           command: 'echo test',
           is_background: false,
           timeout: 700000,
         });
-      }).toThrow('Timeout cannot exceed 600000ms (10 minutes).');
+      }).not.toThrow();
 
       // Non-integer timeout
       expect(() => {
