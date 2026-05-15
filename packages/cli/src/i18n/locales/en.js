@@ -90,7 +90,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Runtime',
   OS: 'OS',
   Auth: 'Auth',
@@ -260,8 +260,7 @@ export default {
   'Step {{n}}: Choose Location': 'Step {{n}}: Choose Location',
   'Step {{n}}: Choose Generation Method':
     'Step {{n}}: Choose Generation Method',
-  'Generate with HopCode (Recommended)':
-    'Generate with HopCode (Recommended)',
+  'Generate with HopCode (Recommended)': 'Generate with HopCode (Recommended)',
   'Manual Creation': 'Manual Creation',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)',
@@ -713,6 +712,9 @@ export default {
   'When a session is ending': 'When a session is ending',
   'When a permission dialog is displayed':
     'When a permission dialog is displayed',
+  'When a new todo item is created': 'When a new todo item is created',
+  'When a todo item is marked as completed':
+    'When a todo item is marked as completed',
   // Hooks - Event Descriptions (detailed)
   'Input to command is JSON of tool call arguments.':
     'Input to command is JSON of tool call arguments.',
@@ -736,6 +738,10 @@ export default {
     'Input to command is JSON with compaction details.',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
     'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.',
+  'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.',
+  'Input to command is JSON with todo_id, todo_content, previous_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'Input to command is JSON with todo_id, todo_content, previous_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.',
   // Hooks - Exit Code Descriptions
   'stdout/stderr not shown': 'stdout/stderr not shown',
   'show stderr to model and continue conversation':
@@ -761,6 +767,12 @@ export default {
   'show stderr to user only but continue with compaction':
     'show stderr to user only but continue with compaction',
   'use hook decision if provided': 'use hook decision if provided',
+  'allow todo creation': 'allow todo creation',
+  'block todo creation and show reason to model':
+    'block todo creation and show reason to model',
+  'allow todo completion': 'allow todo completion',
+  'block todo completion and show reason to model':
+    'block todo completion and show reason to model',
   // Hooks - Messages
   'Config not loaded.': 'Config not loaded.',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
@@ -796,11 +808,15 @@ export default {
   'Navigate and search session history': 'Navigate and search session history',
   'Full-text search across all history items (entire session)':
     'Full-text search across all history items (entire session)',
-  'Load the previous 2 000 history items': 'Load the previous 2 000 history items',
+  'Load the previous 2 000 history items':
+    'Load the previous 2 000 history items',
   'Load the next 2 000 history items': 'Load the next 2 000 history items',
-  'Show current history window statistics': 'Show current history window statistics',
-  'Jump to a specific item index in history': 'Jump to a specific item index in history',
-  'Full-text search across all history items': 'Full-text search across all history items',
+  'Show current history window statistics':
+    'Show current history window statistics',
+  'Jump to a specific item index in history':
+    'Jump to a specific item index in history',
+  'Full-text search across all history items':
+    'Full-text search across all history items',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -948,7 +964,8 @@ export default {
   servers: 'servers',
   'Add MCP servers to your settings to get started.':
     'Add MCP servers to your settings to get started.',
-  'Run hopcode --debug to see error logs': 'Run hopcode --debug to see error logs',
+  'Run hopcode --debug to see error logs':
+    'Run hopcode --debug to see error logs',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth Authentication',
@@ -1172,7 +1189,8 @@ export default {
   'Please visit this URL to authorize:': 'Please visit this URL to authorize:',
   'Waiting for authorization': 'Waiting for authorization',
   'Time remaining:': 'Time remaining:',
-  'HopCode OAuth Authentication Timeout': 'HopCode OAuth Authentication Timeout',
+  'HopCode OAuth Authentication Timeout':
+    'HopCode OAuth Authentication Timeout',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.',
   'Press any key to return to authentication type selection.':
@@ -1244,9 +1262,11 @@ export default {
   'From project settings': 'From project settings',
   'From session': 'From session',
   'Project settings': 'Project settings',
-  'Checked in at .hopcode/settings.json': 'Checked in at .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Checked in at .hopcode/settings.json',
   'User settings': 'User settings',
-  'Saved in at ~/.hopcode/settings.json': 'Saved in at ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Saved in at ~/.hopcode/settings.json',
   'Add a new rule…': 'Add a new rule…',
   'Add {{type}} permission rule': 'Add {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1820,7 +1840,8 @@ export default {
   'Or simply run:': 'Or simply run:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Interactive authentication setup\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Authentication Method: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Authentication Method: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type: Free tier (discontinued 2026-04-15)',
   '  Limit: No longer available': '  Limit: No longer available',

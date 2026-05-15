@@ -70,7 +70,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Laufzeit',
   OS: 'Betriebssystem',
   Auth: 'Authentifizierung',
@@ -215,8 +215,7 @@ export default {
   'Step {{n}}: Choose Location': 'Schritt {{n}}: Speicherort wählen',
   'Step {{n}}: Choose Generation Method':
     'Schritt {{n}}: Generierungsmethode wählen',
-  'Generate with HopCode (Recommended)':
-    'Mit HopCode generieren (Empfohlen)',
+  'Generate with HopCode (Recommended)': 'Mit HopCode generieren (Empfohlen)',
   'Manual Creation': 'Manuelle Erstellung',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Beschreiben Sie, was dieser Unteragent tun soll und wann er verwendet werden soll. (Ausführliche Beschreibung für beste Ergebnisse)',
@@ -625,6 +624,10 @@ export default {
   'When a session is ending': 'Wenn eine Sitzung endet',
   'When a permission dialog is displayed':
     'Wenn ein Berechtigungsdialog angezeigt wird',
+  'When a new todo item is created':
+    'Wenn ein neues Todo-Element erstellt wird',
+  'When a todo item is marked as completed':
+    'Wenn ein Todo-Element als erledigt markiert wird',
   // Hooks - Event Descriptions (detailed)
   'Input to command is JSON of tool call arguments.':
     'Die Eingabe an den Befehl ist JSON der Tool-Aufruf-Argumente.',
@@ -648,6 +651,10 @@ export default {
     'Die Eingabe an den Befehl ist JSON mit Komprimierungsdetails.',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
     'Die Eingabe an den Befehl ist JSON mit tool_name, tool_input und tool_use_id. Ausgabe ist JSON mit hookSpecificOutput, das die Entscheidung zum Zulassen oder Ablehnen enthält.',
+  'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'Die Eingabe an den Befehl ist JSON mit todo_id, todo_content, todo_status, all_todos und phase. In validation ist die Ausgabe JSON mit decision (allow/block/deny) und reason. In postWrite wird block/deny ignoriert.',
+  'Input to command is JSON with todo_id, todo_content, previous_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'Die Eingabe an den Befehl ist JSON mit todo_id, todo_content, previous_status, all_todos und phase. In validation ist die Ausgabe JSON mit decision (allow/block/deny) und reason. In postWrite wird block/deny ignoriert.',
   // Hooks - Exit Code Descriptions
   'stdout/stderr not shown': 'stdout/stderr nicht angezeigt',
   'show stderr to model and continue conversation':
@@ -674,6 +681,12 @@ export default {
     'stderr nur dem Benutzer anzeigen, aber mit Komprimierung fortfahren',
   'use hook decision if provided':
     'Hook-Entscheidung verwenden, falls bereitgestellt',
+  'allow todo creation': 'Todo-Erstellung zulassen',
+  'block todo creation and show reason to model':
+    'Todo-Erstellung blockieren und Grund dem Modell anzeigen',
+  'allow todo completion': 'Todo-Abschluss zulassen',
+  'block todo completion and show reason to model':
+    'Todo-Abschluss blockieren und Grund dem Modell anzeigen',
   // Hooks - Messages
   'Config not loaded.': 'Konfiguration nicht geladen.',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
@@ -707,14 +720,19 @@ export default {
   'No conversation to branch.': 'Keine Unterhaltung zum Verzweigen vorhanden.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'Einen Tool-Aufruf wiederherstellen. Dadurch werden Konversations- und Dateiverlauf auf den Zustand zurückgesetzt, in dem der Tool-Aufruf vorgeschlagen wurde',
-  'Navigate and search session history': 'Sitzungsverlauf navigieren und durchsuchen',
+  'Navigate and search session history':
+    'Sitzungsverlauf navigieren und durchsuchen',
   'Full-text search across all history items (entire session)':
     'Volltextsuche über alle Verlaufseinträge (gesamte Sitzung)',
-  'Load the previous 2 000 history items': 'Vorherige 2 000 Verlaufseinträge laden',
+  'Load the previous 2 000 history items':
+    'Vorherige 2 000 Verlaufseinträge laden',
   'Load the next 2 000 history items': 'Nächste 2 000 Verlaufseinträge laden',
-  'Show current history window statistics': 'Statistiken des aktuellen Verlaufsfensters anzeigen',
-  'Jump to a specific item index in history': 'Zu einem bestimmten Elementindex im Verlauf springen',
-  'Full-text search across all history items': 'Volltextsuche über alle Verlaufseinträge',
+  'Show current history window statistics':
+    'Statistiken des aktuellen Verlaufsfensters anzeigen',
+  'Jump to a specific item index in history':
+    'Zu einem bestimmten Elementindex im Verlauf springen',
+  'Full-text search across all history items':
+    'Volltextsuche über alle Verlaufseinträge',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Terminal-Typ konnte nicht erkannt werden. Unterstützte Terminals: VS Code, Cursor, Windsurf und Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -1133,9 +1151,11 @@ export default {
   'From project settings': 'Aus Projekteinstellungen',
   'From session': 'Aus Sitzung',
   'Project settings': 'Projekteinstellungen',
-  'Checked in at .hopcode/settings.json': 'Eingecheckt in .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Eingecheckt in .hopcode/settings.json',
   'User settings': 'Benutzereinstellungen',
-  'Saved in at ~/.hopcode/settings.json': 'Gespeichert in ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Gespeichert in ~/.hopcode/settings.json',
   'Add a new rule…': 'Neue Regel hinzufügen…',
   'Add {{type}} permission rule': '{{type}} permission rule hinzufügen',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

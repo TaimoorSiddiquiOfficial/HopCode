@@ -90,7 +90,7 @@ export default {
   // ============================================================================
   // Поля системной информации
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Среда выполнения',
   OS: 'ОС',
   Auth: 'Аутентификация',
@@ -218,7 +218,8 @@ export default {
   // Агенты - Мастер создания
   // ============================================================================
   'Project Level (.hopcode/agents/)': 'Уровень проекта (.hopcode/agents/)',
-  'User Level (~/.hopcode/agents/)': 'Уровень пользователя (~/.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)':
+    'Уровень пользователя (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ Подагент успешно создан!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Подагент "{{name}}" сохранен на уровне {{level}}.',
@@ -640,6 +641,9 @@ export default {
   'Before conversation compaction': 'Перед сжатием разговора',
   'When a session is ending': 'При завершении сессии',
   'When a permission dialog is displayed': 'При отображении диалога разрешений',
+  'When a new todo item is created': 'При создании новой задачи',
+  'When a todo item is marked as completed':
+    'При отметке задачи как выполненной',
   // Hooks - Event Descriptions (detailed)
   'Input to command is JSON of tool call arguments.':
     'Ввод в команду — это JSON аргументов вызова инструмента.',
@@ -663,6 +667,10 @@ export default {
     'Ввод в команду — это JSON с деталями сжатия.',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
     'Ввод в команду — это JSON с tool_name, tool_input и tool_use_id. Вывод — JSON с hookSpecificOutput, содержащим решение о разрешении или отказе.',
+  'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'Ввод в команду — это JSON с todo_id, todo_content, todo_status, all_todos и phase. В validation вывод — JSON с decision (allow/block/deny) и reason. В postWrite block/deny игнорируется.',
+  'Input to command is JSON with todo_id, todo_content, previous_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'Ввод в команду — это JSON с todo_id, todo_content, previous_status, all_todos и phase. В validation вывод — JSON с decision (allow/block/deny) и reason. В postWrite block/deny игнорируется.',
   // Hooks - Exit Code Descriptions
   'stdout/stderr not shown': 'stdout/stderr не отображаются',
   'show stderr to model and continue conversation':
@@ -689,6 +697,12 @@ export default {
     'показать stderr только пользователю, но продолжить сжатие',
   'use hook decision if provided':
     'использовать решение хука, если предоставлено',
+  'allow todo creation': 'разрешить создание задачи',
+  'block todo creation and show reason to model':
+    'заблокировать создание задачи и показать причину модели',
+  'allow todo completion': 'разрешить выполнение задачи',
+  'block todo completion and show reason to model':
+    'заблокировать выполнение задачи и показать причину модели',
   // Hooks - Messages
   'Config not loaded.': 'Конфигурация не загружена.',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
@@ -725,11 +739,16 @@ export default {
   'Navigate and search session history': 'Навигация и поиск по истории сеанса',
   'Full-text search across all history items (entire session)':
     'Полнотекстовый поиск по всем элементам истории (весь сеанс)',
-  'Load the previous 2 000 history items': 'Загрузить предыдущие 2 000 элементов истории',
-  'Load the next 2 000 history items': 'Загрузить следующие 2 000 элементов истории',
-  'Show current history window statistics': 'Показать статистику текущего окна истории',
-  'Jump to a specific item index in history': 'Перейти к определенному индексу элемента в истории',
-  'Full-text search across all history items': 'Полнотекстовый поиск по всем элементам истории',
+  'Load the previous 2 000 history items':
+    'Загрузить предыдущие 2 000 элементов истории',
+  'Load the next 2 000 history items':
+    'Загрузить следующие 2 000 элементов истории',
+  'Show current history window statistics':
+    'Показать статистику текущего окна истории',
+  'Jump to a specific item index in history':
+    'Перейти к определенному индексу элемента в истории',
+  'Full-text search across all history items':
+    'Полнотекстовый поиск по всем элементам истории',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Не удалось определить тип терминала. Поддерживаемые терминалы: VS Code, Cursor, Windsurf и Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -1084,9 +1103,11 @@ export default {
   'From project settings': 'Из настроек проекта',
   'From session': 'Из сессии',
   'Project settings': 'Настройки проекта',
-  'Checked in at .hopcode/settings.json': 'Зафиксировано в .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Зафиксировано в .hopcode/settings.json',
   'User settings': 'Пользовательские настройки',
-  'Saved in at ~/.hopcode/settings.json': 'Сохранено в ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Сохранено в ~/.hopcode/settings.json',
   'Add a new rule…': 'Добавить новое правило…',
   'Add {{type}} permission rule': 'Добавить {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1659,7 +1680,8 @@ export default {
   'Or simply run:': 'Или просто выполните:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Интерактивная настройка аутентификации\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Метод аутентификации: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Метод аутентификации: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Тип: Бесплатный уровень (прекращено 2026-04-15)',
   '  Limit: No longer available': '  Лимит: Больше не доступен',

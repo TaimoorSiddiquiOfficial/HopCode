@@ -82,7 +82,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   OS: 'SO',
   Auth: 'Autenticação',
   Model: 'Modelo',
@@ -632,6 +632,9 @@ export default {
   'When a session is ending': 'Quando uma sessão está terminando',
   'When a permission dialog is displayed':
     'Quando um diálogo de permissão é exibido',
+  'When a new todo item is created': 'Quando um novo item todo é criado',
+  'When a todo item is marked as completed':
+    'Quando um item todo é marcado como concluído',
   // Hooks - Event Descriptions (detailed)
   'Input to command is JSON of tool call arguments.':
     'A entrada para o comando é JSON dos argumentos da chamada da ferramenta.',
@@ -655,6 +658,10 @@ export default {
     'A entrada para o comando é JSON com detalhes da compactação.',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
     'A entrada para o comando é JSON com tool_name, tool_input e tool_use_id. Saída é JSON com hookSpecificOutput contendo decisão de permitir ou negar.',
+  'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'A entrada para o comando é JSON com todo_id, todo_content, todo_status, all_todos e phase. Em validation, saída é JSON com decision (allow/block/deny) e reason. Em postWrite, block/deny é ignorado.',
+  'Input to command is JSON with todo_id, todo_content, previous_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'A entrada para o comando é JSON com todo_id, todo_content, previous_status, all_todos e phase. Em validation, saída é JSON com decision (allow/block/deny) e reason. Em postWrite, block/deny é ignorado.',
   // Hooks - Exit Code Descriptions
   'stdout/stderr not shown': 'stdout/stderr não exibido',
   'show stderr to model and continue conversation':
@@ -680,6 +687,12 @@ export default {
   'show stderr to user only but continue with compaction':
     'mostrar stderr apenas ao usuário mas continuar com compactação',
   'use hook decision if provided': 'usar decisão do hook se fornecida',
+  'allow todo creation': 'permitir criação de todo',
+  'block todo creation and show reason to model':
+    'bloquear criação de todo e mostrar motivo ao modelo',
+  'allow todo completion': 'permitir conclusão de todo',
+  'block todo completion and show reason to model':
+    'bloquear conclusão de todo e mostrar motivo ao modelo',
   // Hooks - Messages
   'Config not loaded.': 'Configuração não carregada.',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
@@ -713,14 +726,20 @@ export default {
   'No conversation to branch.': 'Não há conversa para ramificar.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'Restaurar uma chamada de ferramenta. Isso redefinirá o histórico da conversa e dos arquivos para o estado em que a chamada da ferramenta foi sugerida',
-  'Navigate and search session history': 'Navegar e pesquisar histórico de sessão',
+  'Navigate and search session history':
+    'Navegar e pesquisar histórico de sessão',
   'Full-text search across all history items (entire session)':
     'Pesquisa de texto completo em todos os itens do histórico (sessão inteira)',
-  'Load the previous 2 000 history items': 'Carregar os 2 000 itens anteriores do histórico',
-  'Load the next 2 000 history items': 'Carregar os próximos 2 000 itens do histórico',
-  'Show current history window statistics': 'Mostrar estatísticas da janela de histórico atual',
-  'Jump to a specific item index in history': 'Ir para um índice de item específico no histórico',
-  'Full-text search across all history items': 'Pesquisa de texto completo em todos os itens do histórico',
+  'Load the previous 2 000 history items':
+    'Carregar os 2 000 itens anteriores do histórico',
+  'Load the next 2 000 history items':
+    'Carregar os próximos 2 000 itens do histórico',
+  'Show current history window statistics':
+    'Mostrar estatísticas da janela de histórico atual',
+  'Jump to a specific item index in history':
+    'Ir para um índice de item específico no histórico',
+  'Full-text search across all history items':
+    'Pesquisa de texto completo em todos os itens do histórico',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Não foi possível detectar o tipo de terminal. Terminais suportados: VS Code, Cursor, Windsurf e Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -1137,7 +1156,8 @@ export default {
   'From project settings': 'Das configurações do projeto',
   'From session': 'Da sessão',
   'Project settings': 'Configurações do projeto',
-  'Checked in at .hopcode/settings.json': 'Registrado em .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Registrado em .hopcode/settings.json',
   'User settings': 'Configurações do usuário',
   'Saved in at ~/.hopcode/settings.json': 'Salvo em ~/.hopcode/settings.json',
   'Add a new rule…': 'Adicionar nova regra…',
@@ -1651,7 +1671,8 @@ export default {
   'Or simply run:': 'Ou simplesmente execute:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Configuração interativa de autenticação\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Método de autenticação: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Método de autenticação: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipo: Nível gratuito (descontinuado 2026-04-15)',
   '  Limit: No longer available': '  Limite: Não mais disponível',

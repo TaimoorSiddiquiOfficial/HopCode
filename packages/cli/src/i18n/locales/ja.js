@@ -409,8 +409,7 @@ export default {
   'When notifications are sent': '通知送信時',
   'When the user submits a prompt': 'ユーザーがプロンプトを送信した時',
   'When a new session is started': '新しいセッションが開始された時',
-  'Right before HopCode concludes its response':
-    'HopCode が応答を終了する直前',
+  'Right before HopCode concludes its response': 'HopCode が応答を終了する直前',
   'When a subagent (Agent tool call) is started':
     'サブエージェント（Agent ツール呼び出し）が開始された時',
   'Right before a subagent concludes its response':
@@ -418,6 +417,8 @@ export default {
   'Before conversation compaction': '会話圧縮前',
   'When a session is ending': 'セッション終了時',
   'When a permission dialog is displayed': '権限ダイアログ表示時',
+  'When a new todo item is created': '新Todo項目作成時',
+  'When a todo item is marked as completed': 'Todo項目完了時',
   // Hooks - Event Descriptions (detailed)
   'Input to command is JSON of tool call arguments.':
     'コマンドへの入力はツール呼び出し引数の JSON です。',
@@ -441,6 +442,10 @@ export default {
     'コマンドへの入力は圧縮詳細を持つ JSON です。',
   'Input to command is JSON with tool_name, tool_input, and tool_use_id. Output JSON with hookSpecificOutput containing decision to allow or deny.':
     'コマンドへの入力は tool_name、tool_input、tool_use_id を持つ JSON です。許可または拒否の決定を含む hookSpecificOutput を持つ JSON を出力します。',
+  'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'コマンドへの入力は todo_id、todo_content、todo_status、all_todos、phase を持つ JSON です。validation では decision（allow/block/deny）と reason を持つ JSON を出力します。postWrite では block/deny は無視されます。',
+  'Input to command is JSON with todo_id, todo_content, previous_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
+    'コマンドへの入力は todo_id、todo_content、previous_status、all_todos、phase を持つ JSON です。validation では decision（allow/block/deny）と reason を持つ JSON を出力します。postWrite では block/deny は無視されます。',
   // Hooks - Exit Code Descriptions
   'stdout/stderr not shown': 'stdout/stderr は表示されません',
   'show stderr to model and continue conversation':
@@ -466,6 +471,12 @@ export default {
   'show stderr to user only but continue with compaction':
     'stderr をユーザーのみに表示し、圧縮を続ける',
   'use hook decision if provided': '提供されている場合はフックの決定を使用',
+  'allow todo creation': 'Todo作成を許可',
+  'block todo creation and show reason to model':
+    'Todo作成をブロックし、理由をモデルに表示',
+  'allow todo completion': 'Todo完了を許可',
+  'block todo completion and show reason to model':
+    'Todo完了をブロックし、理由をモデルに表示',
   // Hooks - Messages
   'Config not loaded.': '設定が読み込まれていません。',
   'Hooks are not enabled. Enable hooks in settings to use this feature.':
@@ -505,7 +516,8 @@ export default {
   'Load the previous 2 000 history items': '前の2 000件の履歴項目を読み込む',
   'Load the next 2 000 history items': '次の2 000件の履歴項目を読み込む',
   'Show current history window statistics': '現在の履歴ウィンドウの統計を表示',
-  'Jump to a specific item index in history': '履歴内の特定の項目インデックスにジャンプ',
+  'Jump to a specific item index in history':
+    '履歴内の特定の項目インデックスにジャンプ',
   'Full-text search across all history items': 'すべての履歴項目の全文検索',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'ターミナルの種類を検出できませんでした。サポートされているターミナル: VS Code、Cursor、Windsurf、Trae',
@@ -818,7 +830,8 @@ export default {
     'OAuthトークンが期限切れです({{seconds}}秒以上)。認証方法を再度選択してください',
   'Press any key to return to authentication type selection.':
     '認証タイプ選択に戻るには任意のキーを押してください',
-  'Waiting for HopCode OAuth authentication...': 'HopCode OAuth認証を待っています...',
+  'Waiting for HopCode OAuth authentication...':
+    'HopCode OAuth認証を待っています...',
   'Authentication timed out. Please try again.':
     '認証がタイムアウトしました。再度お試しください',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -864,7 +877,8 @@ export default {
   'From project settings': 'プロジェクト設定から',
   'From session': 'セッションから',
   'Project settings': 'プロジェクト設定',
-  'Checked in at .hopcode/settings.json': '.hopcode/settings.json にチェックイン',
+  'Checked in at .hopcode/settings.json':
+    '.hopcode/settings.json にチェックイン',
   'User settings': 'ユーザー設定',
   'Saved in at ~/.hopcode/settings.json': '~/.hopcode/settings.json に保存',
   'Add a new rule…': '新しいルールを追加…',
@@ -1171,7 +1185,8 @@ export default {
   'API key for Coding Plan': 'Coding Plan の API Key',
   'Show current authentication status': '現在の認証ステータスを表示',
   'Authentication completed successfully.': '認証が正常に完了しました。',
-  'Starting HopCode OAuth authentication...': 'HopCode OAuth 認証を開始しています...',
+  'Starting HopCode OAuth authentication...':
+    'HopCode OAuth 認証を開始しています...',
   'Successfully authenticated with HopCode OAuth.':
     'HopCode OAuth での認証に成功しました。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
@@ -1420,7 +1435,7 @@ export default {
 
   // === Missing key backfill ===
   Status: 'ステータス',
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'ランタイム',
   OS: 'OS',
   Auth: '認証',
