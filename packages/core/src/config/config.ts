@@ -624,6 +624,11 @@ export interface ConfigInitializeOptions {
    * Required for SDK MCP server support in SDK mode.
    */
   sendSdkMcpMessage?: SendSdkMcpMessage;
+  /**
+   * Skip Gemini client chat initialization. Useful for bootstrap paths that
+   * need config services (hooks, tools, MCP) before a real session exists.
+   */
+  skipGeminiInitialization?: boolean;
 }
 
 export class Config {
@@ -1226,8 +1231,12 @@ export class Config {
       `Tool registry initialized with ${this.toolRegistry.getAllToolNames().length} tools`,
     );
 
-    await this.geminiClient.initialize();
-    this.debugLogger.info('Gemini client initialized');
+    if (!options?.skipGeminiInitialization) {
+      await this.geminiClient.initialize();
+      this.debugLogger.info('Gemini client initialized');
+    } else {
+      this.debugLogger.info('Gemini client initialization skipped');
+    }
 
     // Detect and capture runtime model snapshot (from CLI/ENV/credentials)
     this.modelsConfig.detectAndCaptureRuntimeModel();
