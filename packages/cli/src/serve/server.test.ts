@@ -1302,7 +1302,7 @@ describe('runHopCodeServe', () => {
     // making this a true E2E that doesn't require a real `qwen --acp`
     // child.
     const bridge = fakeBridge();
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       {
         hostname: '127.0.0.1',
         port: 0,
@@ -1330,7 +1330,7 @@ describe('runHopCodeServe', () => {
     // would then spawn a `qwen --acp` child with that cwd and the
     // agent would fail with an opaque ENOENT.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -1350,7 +1350,7 @@ describe('runHopCodeServe', () => {
     // test would then see ENOENT instead of the expected
     // "not a directory" branch.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -1361,7 +1361,7 @@ describe('runHopCodeServe', () => {
 
   it('rejects relative --workspace at boot', async () => {
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
