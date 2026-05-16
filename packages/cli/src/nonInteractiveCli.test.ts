@@ -63,6 +63,7 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 
 const mockGetCommands = vi.hoisted(() => vi.fn());
 const mockGetCommandsForMode = vi.hoisted(() => vi.fn());
+const mockGetModelInvocableCommands = vi.hoisted(() => vi.fn());
 const mockCommandServiceCreate = vi.hoisted(() => vi.fn());
 vi.mock('./services/CommandService.js', () => ({
   CommandService: {
@@ -115,12 +116,9 @@ describe('runNonInteractive', () => {
     mockCommandServiceCreate.mockResolvedValue({
       getCommands: mockGetCommands,
       getCommandsForMode: mockGetCommandsForMode,
+      getModelInvocableCommands: mockGetModelInvocableCommands,
     });
-    mockCommandServiceFromCommands.mockReturnValue({
-      getCommands: mockGetCommands,
-      getCommandsForMode: mockGetCommandsForMode,
-      getModelInvocableCommands: vi.fn().mockReturnValue([]),
-    });
+    mockGetModelInvocableCommands.mockReturnValue([]);
 
     processStdoutSpy = vi
       .spyOn(process.stdout, 'write')
