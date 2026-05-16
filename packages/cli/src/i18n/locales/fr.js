@@ -21,7 +21,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'YOLO mode': 'Mode YOLO',
+  'Izn mode': 'Mode Izn',
   'plan mode': 'mode plan',
   'auto-accept edits': 'acceptation automatique des modifications',
   'Accepting edits': 'Acceptation des modifications',
@@ -414,7 +414,7 @@ export default {
   Plan: 'Plan',
   Default: 'Par défaut',
   'Auto Edit': 'Édition automatique',
-  YOLO: 'YOLO',
+  Izn: 'Izn',
   'toggle vim mode on/off': 'activer/désactiver le mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'vérifier les stats de session. Utilisation : /stats [modèle|outils]',

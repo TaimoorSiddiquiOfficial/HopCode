@@ -21,7 +21,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'YOLO mode': 'Mode YOLO',
+  'Izn mode': 'Mode Izn',
   'plan mode': 'mode de planificació',
   'auto-accept edits': 'acceptació automàtica de canvis',
   'Accepting edits': 'Acceptant canvis',
@@ -88,7 +88,7 @@ export default {
   // ============================================================================
   // Informació del sistema
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: "Entorn d'execució",
   OS: 'SO',
   Auth: 'Autenticació',
@@ -347,8 +347,7 @@ export default {
   // ============================================================================
   // Ordres - General (continuació)
   // ============================================================================
-  'View and edit HopCode settings':
-    'Veure i editar la configuració de HopCode',
+  'View and edit HopCode settings': 'Veure i editar la configuració de HopCode',
   Settings: 'Configuració',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
     'Per veure els canvis, cal reiniciar HopCode. Premeu r per sortir i aplicar els canvis ara.',
@@ -412,7 +411,7 @@ export default {
   Plan: 'Planificació',
   Default: 'Per defecte',
   'Auto Edit': 'Edició automàtica',
-  YOLO: 'YOLO',
+  Izn: 'Izn',
   'toggle vim mode on/off': 'activar/desactivar el mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'comprovar les estadístiques de la sessió. Ús: /stats [model|tools]',
@@ -763,14 +762,20 @@ export default {
   'No conversation to branch.': 'No hi ha cap conversa per bifurcar.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     "Restaurar una crida a una eina. Això restablirà la conversa i l'historial de fitxers a l'estat en què es trobaven quan es va suggerir la crida a l'eina",
-  'Navigate and search session history': 'Navegar i cercar a l\'historial de sessió',
+  'Navigate and search session history':
+    "Navegar i cercar a l'historial de sessió",
   'Full-text search across all history items (entire session)':
-    'Cerca de text complet a tots els elements de l\'historial (tota la sessió)',
-  'Load the previous 2 000 history items': 'Carregar els 2 000 elements anteriors de l\'historial',
-  'Load the next 2 000 history items': 'Carregar els propers 2 000 elements de l\'historial',
-  'Show current history window statistics': 'Mostrar estadístiques de la finestra d\'historial actual',
-  'Jump to a specific item index in history': 'Anar a un índex d\'element específic a l\'historial',
-  'Full-text search across all history items': 'Cerca de text complet a tots els elements de l\'historial',
+    "Cerca de text complet a tots els elements de l'historial (tota la sessió)",
+  'Load the previous 2 000 history items':
+    "Carregar els 2 000 elements anteriors de l'historial",
+  'Load the next 2 000 history items':
+    "Carregar els propers 2 000 elements de l'historial",
+  'Show current history window statistics':
+    "Mostrar estadístiques de la finestra d'historial actual",
+  'Jump to a specific item index in history':
+    "Anar a un índex d'element específic a l'historial",
+  'Full-text search across all history items':
+    "Cerca de text complet a tots els elements de l'historial",
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     "No s'ha pogut detectar el tipus de terminal. Terminals compatibles: VS Code, Cursor, Windsurf i Trae.",
   'Terminal "{{terminal}}" is not supported yet.':
@@ -1712,7 +1717,8 @@ export default {
   'Or simply run:': 'O simplement executeu:',
   '  hopcode auth                - Interactive authentication setup\n':
     "  hopcode auth                - Configuració interactiva de l'autenticació\n",
-  '✓ Authentication Method: HopCode OAuth': "✓ Mètode d'autenticació: HopCode OAuth",
+  '✓ Authentication Method: HopCode OAuth':
+    "✓ Mètode d'autenticació: HopCode OAuth",
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipus: Nivell gratuït (descontinuat el 15-04-2026)',
   '  Limit: No longer available': '  Límit: Ja no disponible',

@@ -17,7 +17,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'YOLO mode': 'YOLO 模式',
+  'Izn mode': 'Izn 模式',
   'plan mode': '規劃模式',
   'auto-accept edits': '自動接受編輯',
   'Accepting edits': '接受編輯',
@@ -376,7 +376,7 @@ export default {
   Plan: '規劃',
   Default: '默認',
   'Auto Edit': '自動編輯',
-  YOLO: 'YOLO',
+  Izn: 'Izn',
   'toggle vim mode on/off': '切換 vim 模式開關',
   'check session stats. Usage: /stats [model|tools]':
     '檢查會話統計信息。用法：/stats [model|tools]',

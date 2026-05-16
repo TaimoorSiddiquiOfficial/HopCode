@@ -13,7 +13,7 @@ Do not explain the sample.`;
 
 export default {
   name: 'markdown-rendering',
-  spawn: ['node', 'dist/cli.js', '--yolo'],
+  spawn: ['node', 'dist/cli.js', '--izn'],
   terminal: {
     title: 'hopcode-code markdown rendering',
     cwd: '../../..',

@@ -545,7 +545,7 @@ describe('BackgroundAgentResumeService', () => {
       createdAt: '2026-04-20T00:00:00.000Z',
       status: 'running',
       subagentName: 'researcher',
-      resolvedApprovalMode: 'yolo',
+      resolvedApprovalMode: 'izn',
     });
     fs.writeFileSync(
       outputFile,

@@ -23,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Режим терминала',
-  'YOLO mode': 'Режим YOLO',
+  'Izn mode': 'Режим Izn',
   'plan mode': 'Режим планирования',
   'auto-accept edits': 'Режим принятия правок',
   'Accepting edits': 'Принятие правок',
@@ -365,7 +365,7 @@ export default {
   Plan: 'План',
   Default: 'По умолчанию',
   'Auto Edit': 'Авторедактирование',
-  YOLO: 'YOLO',
+  Izn: 'Izn',
   'toggle vim mode on/off': 'Включение/выключение режима vim',
   'check session stats. Usage: /stats [model|tools]':
     'Просмотр статистики сессии. Использование: /stats [model|tools]',

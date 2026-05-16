@@ -366,20 +366,20 @@ export async function runForkedAgent(
   }
 
   // â”€â”€ AgentHeadless path â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // `createApprovalModeOverride` rebuilds the tool registry on the YOLO
+  // `createApprovalModeOverride` rebuilds the tool registry on the IZN
   // wrapper Config so core file tools (`EditTool` / `WriteFileTool` /
   // `ReadFileTool`) resolve `this.config` to the wrapper, not to the
-  // parent. Without that rebuild the YOLO override is silently ignored
+  // parent. Without that rebuild the IZN override is silently ignored
   // on the bound-tool path (parent's pre-bound tool instances keep
   // reading the parent's approval mode), and the wrapper's own
   // `FileReadCache` lazy-init is bypassed too.
   //
   // Consumers that pre-wrap with `createMemoryScopedAgentConfig`
-  // (memory extraction / dream agent) compose correctly: the YOLO
+  // (memory extraction / dream agent) compose correctly: the IZN
   // wrapper's bound tools resolve `this.config.getPermissionManager()`
   // through the prototype chain to the scoped wrapper's own override,
-  // while `this.config.getApprovalMode()` lands on YOLO.
-  const yoloConfig = await createApprovalModeOverride(
+  // while `this.config.getApprovalMode()` lands on IZN.
+  const iznConfig = await createApprovalModeOverride(
     params.config,
     ApprovalMode.IZN,
   );
@@ -410,7 +410,7 @@ export async function runForkedAgent(
   try {
     const headless = await AgentHeadless.create(
       params.name,
-      yoloConfig,
+      iznConfig,
       promptConfig,
       modelConfig,
       runConfig,
@@ -456,7 +456,7 @@ export async function runForkedAgent(
     // instances dispose their change-listeners on shared
     // SubagentManager / SkillManager. Same shape as the spawn-path
     // finallys in `agent.ts` and `background-agent-resume.ts`.
-    void yoloConfig
+    void iznConfig
       .getToolRegistry()
       .stop()
       .catch(() => {});

@@ -19,11 +19,11 @@ import {
 
 /**
  * Regression: `runForkedAgent` (AgentHeadless path) used to produce its
- * YOLO wrapper via `Object.create(parent) + getApprovalMode = YOLO`,
+ * IZN wrapper via `Object.create(parent) + getApprovalMode = IZN`,
  * which left the parent's already-bound `EditTool` / `WriteFileTool` /
  * `ReadFileTool` reachable through the wrapper's prototype chain. Bound
  * tools then read `this.config.getApprovalMode()` from the parent
- * (silently ignoring the YOLO override) and `this.config.getFileReadCache()`
+ * (silently ignoring the IZN override) and `this.config.getFileReadCache()`
  * from the parent's cache.
  *
  * The fix: route through `createApprovalModeOverride`, which rebuilds
@@ -71,7 +71,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     return { captured, restore: () => spy.mockRestore() };
   }
 
-  it('passes a Config with the rebuilt-registry marker and YOLO approval mode to AgentHeadless.create', async () => {
+  it('passes a Config with the rebuilt-registry marker and IZN approval mode to AgentHeadless.create', async () => {
     const parent = new ConfigImpl(baseParams);
     const parentRegistry = await parent.createToolRegistry(undefined, {
       skipDiscovery: true,
@@ -98,7 +98,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect(hasRebuiltToolRegistry(captured.config!)).toBe(true);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((captured.config as any)[TOOL_REGISTRY_REBUILT]).toBe(true);
-    // 2. Resolve approval mode to YOLO (the override)
+    // Resolve approval mode to IZN (the override)
     expect(captured.config!.getApprovalMode()).toBe(ApprovalMode.IZN);
     // 3. Hand out a different ToolRegistry instance from the parent
     expect(captured.config!.getToolRegistry()).not.toBe(parentRegistry);
@@ -143,10 +143,10 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     // The memory extraction / dream agent path stacks two wrappers:
     //   parent
     //     └── scopedConfig (Object.create + getPermissionManager override)
-    //           └── yoloConfig (createApprovalModeOverride, sets registry + marker)
+    //           └── iznConfig (createApprovalModeOverride, sets registry + marker)
     // Bound tools must see:
-    //   - approval mode = YOLO (from yoloConfig's own override)
-    //   - permission manager = scopedPm (walks proto past yoloConfig to scopedConfig)
+    //   - approval mode = IZN (from iznConfig's own override)
+    //   - permission manager = scopedPm (walks proto past iznConfig to scopedConfig)
     const parent = new ConfigImpl(baseParams);
     const parentRegistry = await parent.createToolRegistry(undefined, {
       skipDiscovery: true,
@@ -178,7 +178,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect(editTool).toBeInstanceOf(EditTool);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundConfig = (editTool as any).config as Config;
-    // YOLO from yoloConfig's own override
+    // IZN from iznConfig's own override
     expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.IZN);
     // Scoped PM from scopedConfig (one prototype level up)
     expect(boundConfig.getPermissionManager?.()).toBe(scopedPm);

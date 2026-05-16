@@ -1343,7 +1343,7 @@ export class CoreToolScheduler {
           // finalPermission === 'ask' (or 'default' from PM → treat as ask)
           // apply ApprovalMode overrides.
           // ask_user_question always needs confirmation so the user can answer;
-          // it must bypass both YOLO auto-approve and plan-mode blocking.
+          // it must bypass both IZN auto-approve and plan-mode blocking.
           const isAskUserQuestionTool =
             reqInfo.name === ToolNames.ASK_USER_QUESTION;
           let confirmationDetails: ToolCallConfirmationDetails | undefined;

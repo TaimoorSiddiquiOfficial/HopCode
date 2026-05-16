@@ -2388,7 +2388,7 @@ describe('useGeminiStream', () => {
   });
 
   describe('handleApprovalModeChange', () => {
-    it('should auto-approve all pending tool calls when switching to YOLO mode', async () => {
+    it('should auto-approve all pending tool calls when switching to IZN mode', async () => {
       const mockOnConfirm = vi.fn().mockResolvedValue(undefined);
       const awaitingApprovalToolCalls: TrackedToolCall[] = [
         {
