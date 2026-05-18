@@ -61,12 +61,39 @@ const debugLogger = createDebugLogger('HOPCODE_CHAT');
 const HEAP_PRESSURE_COMPRESSION_RATIO = 0.7;
 const HEAP_PRESSURE_COMPRESSION_COOLDOWN_MS = 30_000;
 
-function isCompressionFailureStatus(status: CompressionStatus): boolean {
-  return (
-    status === CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT ||
-    status === CompressionStatus.COMPRESSION_FAILED_EMPTY_SUMMARY ||
-    status === CompressionStatus.COMPRESSION_FAILED_TOKEN_COUNT_ERROR
-  );
+/**
+ * Replaces the args on a `structured_output` `functionCall` with the
+ * same `__redacted` placeholder used by `ToolCallEvent` telemetry
+ * (`packages/core/src/telemetry/types.ts`).
+ *
+ * The chat-recording JSONL (`<projectDir>/chats/<sessionId>.jsonl`)
+ * persists assistant turns to disk and re-feeds them on
+ * `--continue` / `--resume`. For `--json-schema` runs the tool args
+ * ARE the user's structured payload — already emitted on stdout via
+ * `result` / `structured_result`. Recording them verbatim here would
+ * mean the same payload (and every validation-failure retry along the
+ * way) sits on disk indefinitely, contradicting the privacy contract
+ * documented next to the telemetry redaction. Mirror the placeholder
+ * here so the chat-recording surface matches.
+ *
+ * Non-`structured_output` `functionCall`s pass through untouched.
+ *
+ * Exported for tests; callers should prefer the inline use inside
+ * `recordAssistantTurn` invocation below.
+ */
+export function redactStructuredOutputArgsForRecording(
+  part: Part,
+): { functionCall: NonNullable<Part['functionCall']> } | null {
+  if (!part.functionCall) return null;
+  if (part.functionCall.name !== ToolNames.STRUCTURED_OUTPUT) {
+    return { functionCall: part.functionCall };
+  }
+  return {
+    functionCall: {
+      ...part.functionCall,
+      args: { ...STRUCTURED_OUTPUT_REDACTED_ARGS },
+    },
+  };
 }
 
 function isCompressionFailureStatus(status: CompressionStatus): boolean {
@@ -472,6 +499,10 @@ export class GeminiChat {
       heapPressureRatio >= HEAP_PRESSURE_COMPRESSION_RATIO &&
       !heapPressureCooldownActive;
     if (bypassTokenThreshold) {
+      // Temporary safety net: token-based compaction can be too late for
+      // large-context sessions because JS heap pressure may hit first.
+      // Do not use force=true here because that carries manual /compress
+      // semantics in ChatCompressionService.
       debugLogger.warn(
         `Heap pressure at ${(heapPressureRatio * 100).toFixed(1)}%; ` +
           'attempting auto-compaction before token threshold.',
@@ -1174,6 +1205,27 @@ export class GeminiChat {
     // Deep copy the history to avoid mutating the history outside of the
     // chat session.
     return structuredClone(history);
+  }
+
+  /**
+   * Returns a deep-copied tail of the chat history. This avoids cloning the
+   * entire session when callers only need recent context.
+   */
+  getHistoryTail(count: number, curated: boolean = false): Content[] {
+    if (count <= 0) return [];
+    const history = curated
+      ? extractCuratedHistory(this.history)
+      : this.history;
+    return structuredClone(history.slice(-count));
+  }
+
+  /**
+   * Returns a defensive copy of the last raw history entry without cloning the
+   * full conversation. This avoids O(history) cloning, though cloning the last
+   * entry is still proportional to that entry's own size.
+   */
+  getLastHistoryEntry(): Content | undefined {
+    return this.getHistoryTail(1)[0];
   }
 
   /**
