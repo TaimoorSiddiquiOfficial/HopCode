@@ -67,6 +67,26 @@ describe('useSelectionList', () => {
     });
   };
 
+  const pressCtrlKey = (name: string) => {
+    act(() => {
+      if (activeKeypressHandler) {
+        const key: Key = {
+          name,
+          sequence: name === 'p' ? '\x10' : name === 'n' ? '\x0e' : name,
+          ctrl: true,
+          meta: false,
+          shift: false,
+          paste: false,
+        };
+        activeKeypressHandler(key);
+      } else {
+        throw new Error(
+          `Test attempted to press Ctrl+${name} but the keypress handler is not active.`,
+        );
+      }
+    });
+  };
+
   describe('Initialization', () => {
     it('should initialize with the default index (0) if enabled', () => {
       const { result } = renderHook(() =>
@@ -177,6 +197,44 @@ describe('useSelectionList', () => {
       expect(result.current.activeIndex).toBe(2);
       pressKey('up');
       expect(result.current.activeIndex).toBe(0);
+    });
+
+    it('should move down with Ctrl+N in selection list', () => {
+      const { result } = renderHook(() =>
+        useSelectionList({ items, onSelect: mockOnSelect }),
+      );
+      expect(result.current.activeIndex).toBe(0);
+      pressCtrlKey('n');
+      expect(result.current.activeIndex).toBe(2);
+      pressCtrlKey('n');
+      expect(result.current.activeIndex).toBe(3);
+    });
+
+    it('should move up with Ctrl+P in selection list', () => {
+      const { result } = renderHook(() =>
+        useSelectionList({ items, initialIndex: 3, onSelect: mockOnSelect }),
+      );
+      expect(result.current.activeIndex).toBe(3);
+      pressCtrlKey('p');
+      expect(result.current.activeIndex).toBe(2);
+      pressCtrlKey('p');
+      expect(result.current.activeIndex).toBe(0);
+    });
+
+    it('should wrap navigation with Ctrl+N/Ctrl+P correctly', () => {
+      const { result } = renderHook(() =>
+        useSelectionList({
+          items,
+          initialIndex: items.length - 1,
+          onSelect: mockOnSelect,
+        }),
+      );
+      expect(result.current.activeIndex).toBe(3);
+      pressCtrlKey('n');
+      expect(result.current.activeIndex).toBe(0);
+
+      pressCtrlKey('p');
+      expect(result.current.activeIndex).toBe(3);
     });
 
     it('should wrap navigation correctly', () => {

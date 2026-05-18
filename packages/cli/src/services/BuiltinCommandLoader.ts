@@ -65,6 +65,7 @@ import {
   historyCommand,
   searchCommand,
 } from '../ui/commands/historyCommand.js';
+import { lspCommand } from '../ui/commands/lspCommand.js';
 
 const builtinDebugLogger = createDebugLogger('BUILTIN_COMMAND_LOADER');
 
@@ -153,6 +154,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       statuslineCommand,
       historyCommand,
       searchCommand,
+      ...(this.config?.isLspEnabled() ? [lspCommand] : []),
     ];
 
     return allDefinitions

@@ -7,7 +7,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SkillCommandLoader } from './SkillCommandLoader.js';
 import { CommandKind } from '../ui/commands/types.js';
-import type { Config, SkillConfig } from '@hoptrendy/hopcode-core';
+import {
+  buildSkillLlmContent,
+  type Config,
+  type SkillConfig,
+} from '@hoptrendy/hopcode-core';
 
 function makeSkill(overrides: Partial<SkillConfig> = {}): SkillConfig {
   return {
@@ -18,6 +22,10 @@ function makeSkill(overrides: Partial<SkillConfig> = {}): SkillConfig {
     body: 'Skill body content.',
     ...overrides,
   };
+}
+
+function makeSkillPrompt(body: string): string {
+  return buildSkillLlmContent('/home/user/.hopcode/skills/my-skill', body);
 }
 
 describe('SkillCommandLoader', () => {
@@ -136,7 +144,7 @@ describe('SkillCommandLoader', () => {
 
     expect(result).toEqual({
       type: 'submit_prompt',
-      content: [{ text: 'Skill body content.' }],
+      content: [{ text: makeSkillPrompt('Skill body content.') }],
     });
   });
 
@@ -154,9 +162,12 @@ describe('SkillCommandLoader', () => {
       'foo',
     );
 
+    // buildSkillLlmContent adds trailing \n; appendToLastTextPart adds \n\n separator
+    const expectedWithInvocation =
+      makeSkillPrompt('Skill body content.') + '\n\n/my-skill foo';
     expect(result).toEqual({
       type: 'submit_prompt',
-      content: [{ text: 'Skill body content.\n\n/my-skill foo' }],
+      content: [{ text: expectedWithInvocation }],
     });
   });
 
