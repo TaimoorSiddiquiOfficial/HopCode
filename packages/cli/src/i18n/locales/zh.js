@@ -1743,4 +1743,7 @@ export default {
   '中国 (China)': '中国',
   '中国 (China) - 阿里云百炼': '中国 - 阿里云百炼',
   '阿里云百炼 (aliyun.com)': '阿里云百炼（aliyun.com）',
+  'Show LSP server status. Usage: /lsp [status]':
+    '显示 LSP 服务器状态。用法：/lsp [status]',
+  'Show current process memory diagnostics': '显示当前进程内存诊断信息',
 };

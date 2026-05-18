@@ -1549,4 +1549,7 @@ export default {
   // === Same-as-English optimization ===
   ' (not in model registry)': '（不在模型註冊表中）',
   'start server': '啟動伺服器',
+  'Show LSP server status. Usage: /lsp [status]':
+    '顯示 LSP 伺服器狀態。用法：/lsp [status]',
+  'Show current process memory diagnostics': '顯示目前進程記憶體診斷資訊',
 };

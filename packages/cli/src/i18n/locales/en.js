@@ -1923,4 +1923,6 @@ export default {
   'Loading suggestions...': 'Loading suggestions...',
   'Show per-item context usage breakdown.':
     'Show per-item context usage breakdown.',
+  'Show LSP server status. Usage: /lsp [status]':
+    'Show LSP server status. Usage: /lsp [status]',
 };
