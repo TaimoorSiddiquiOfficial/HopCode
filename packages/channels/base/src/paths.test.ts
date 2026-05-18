@@ -72,3 +72,26 @@ describe('channels/base paths – resolvePath', () => {
     expect(resolvePath('relative/dir')).toBe(path.resolve('relative/dir'));
   });
 });
+
+describe('channels/base paths – resolvePath', () => {
+  it('returns absolute paths unchanged', () => {
+    const abs = path.resolve('/tmp/x');
+    expect(resolvePath(abs)).toBe(abs);
+  });
+
+  it('expands bare tilde (~) to home directory', () => {
+    expect(resolvePath('~')).toBe(os.homedir());
+  });
+
+  it('expands POSIX-style tilde (~/x)', () => {
+    expect(resolvePath('~/xomo')).toBe(path.join(os.homedir(), 'xomo'));
+  });
+
+  it('expands Windows-style tilde (~\\x)', () => {
+    expect(resolvePath('~\\xomo')).toBe(path.join(os.homedir(), 'xomo'));
+  });
+
+  it('resolves relative paths against process.cwd', () => {
+    expect(resolvePath('relative/dir')).toBe(path.resolve('relative/dir'));
+  });
+});
