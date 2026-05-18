@@ -5,7 +5,6 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import fs from 'node:fs/promises';
 import {
   StandardFileSystemService,
   needsUtf8Bom,
@@ -20,6 +19,7 @@ const mockGetSystemEncoding = vi.hoisted(() =>
 );
 
 vi.mock('fs/promises');
+vi.mock('../utils/atomicFileWrite.js');
 vi.mock('os', () => ({
   default: {
     platform: mockPlatform,
@@ -39,6 +39,7 @@ vi.mock('../utils/fileUtils.js', async (importOriginal) => {
 });
 
 import { readFileWithLineAndLimit } from '../utils/fileUtils.js';
+import { atomicWriteFile } from '../utils/atomicFileWrite.js';
 
 describe('StandardFileSystemService', () => {
   let fileSystem: StandardFileSystemService;
@@ -46,6 +47,7 @@ describe('StandardFileSystemService', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     resetUtf8BomCache();
+    vi.mocked(atomicWriteFile).mockResolvedValue();
     mockPlatform.mockReturnValue('linux');
     mockGetSystemEncoding.mockReturnValue('utf-8');
     fileSystem = new StandardFileSystemService();
@@ -125,31 +127,27 @@ describe('StandardFileSystemService', () => {
 
   describe('writeTextFile', () => {
     it('should write file content using fs', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'Hello, World!',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/file.txt',
         'Hello, World!',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should write file with BOM when bom option is true', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'Hello, World!',
         _meta: { bom: true },
       });
 
-      // Verify that fs.writeFile was called with a Buffer that starts with BOM
-      const writeCall = vi.mocked(fs.writeFile).mock.calls[0];
+      // Verify that atomicWriteFile was called with a Buffer that starts with BOM
+      const writeCall = vi.mocked(atomicWriteFile).mock.calls[0];
       expect(writeCall[0]).toBe('/test/file.txt');
       expect(writeCall[1]).toBeInstanceOf(Buffer);
       const buffer = writeCall[1] as Buffer;
@@ -159,24 +157,20 @@ describe('StandardFileSystemService', () => {
     });
 
     it('should write file without BOM when bom option is false', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'Hello, World!',
         _meta: { bom: false },
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/file.txt',
         'Hello, World!',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should not duplicate BOM when content already has BOM character', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       // Content that includes the BOM character (as readTextFile would return)
       const contentWithBOM = '\uFEFF' + 'Hello';
       await fileSystem.writeTextFile({
@@ -185,8 +179,8 @@ describe('StandardFileSystemService', () => {
         _meta: { bom: true },
       });
 
-      // Verify that fs.writeFile was called with a Buffer that has only one BOM
-      const writeCall = vi.mocked(fs.writeFile).mock.calls[0];
+      // Verify that atomicWriteFile was called with a Buffer that has only one BOM
+      const writeCall = vi.mocked(atomicWriteFile).mock.calls[0];
       expect(writeCall[0]).toBe('/test/file.txt');
       expect(writeCall[1]).toBeInstanceOf(Buffer);
       const buffer = writeCall[1] as Buffer;
@@ -211,39 +205,31 @@ describe('StandardFileSystemService', () => {
     });
 
     it('should write file with non-UTF-8 encoding using iconv-lite', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: '你好世界',
         _meta: { encoding: 'gbk' },
       });
 
-      // Verify that fs.writeFile was called with a Buffer (iconv-encoded)
-      const writeCall = vi.mocked(fs.writeFile).mock.calls[0];
+      // Verify that atomicWriteFile was called with a Buffer (iconv-encoded)
+      const writeCall = vi.mocked(atomicWriteFile).mock.calls[0];
       expect(writeCall[0]).toBe('/test/file.txt');
       expect(writeCall[1]).toBeInstanceOf(Buffer);
     });
 
     it('should write file as UTF-8 when encoding is utf-8', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'Hello',
         _meta: { encoding: 'utf-8' },
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
-        '/test/file.txt',
-        'Hello',
-        'utf-8',
-      );
+      expect(atomicWriteFile).toHaveBeenCalledWith('/test/file.txt', 'Hello', {
+        encoding: 'utf-8',
+      });
     });
 
     it('should preserve UTF-16LE BOM when writing back a UTF-16LE file', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'Hello',
@@ -251,7 +237,7 @@ describe('StandardFileSystemService', () => {
       });
 
       // iconv-lite encodes as UTF-16LE; with bom:true the FF FE BOM is prepended
-      const writeCall = vi.mocked(fs.writeFile).mock.calls[0];
+      const writeCall = vi.mocked(atomicWriteFile).mock.calls[0];
       expect(writeCall[0]).toBe('/test/file.txt');
       expect(writeCall[1]).toBeInstanceOf(Buffer);
       const buf = writeCall[1] as Buffer;
@@ -261,8 +247,6 @@ describe('StandardFileSystemService', () => {
     });
 
     it('should not add BOM when writing UTF-16LE file without bom flag', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'Hello',
@@ -270,7 +254,7 @@ describe('StandardFileSystemService', () => {
       });
 
       // No BOM prepended — raw iconv-encoded buffer written directly
-      const writeCall = vi.mocked(fs.writeFile).mock.calls[0];
+      const writeCall = vi.mocked(atomicWriteFile).mock.calls[0];
       expect(writeCall[0]).toBe('/test/file.txt');
       expect(writeCall[1]).toBeInstanceOf(Buffer);
       const buf = writeCall[1] as Buffer;
@@ -280,113 +264,106 @@ describe('StandardFileSystemService', () => {
 
     it('should convert LF to CRLF when writing .bat files on Windows', async () => {
       mockPlatform.mockReturnValue('win32');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/script.bat',
         content: '@echo off\necho hello\nexit /b 0\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/script.bat',
         '@echo off\r\necho hello\r\nexit /b 0\r\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should convert LF to CRLF when writing .cmd files on Windows', async () => {
       mockPlatform.mockReturnValue('win32');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/script.cmd',
         content: '@echo off\necho hello\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/script.cmd',
         '@echo off\r\necho hello\r\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should not double-convert existing CRLF in .bat files on Windows', async () => {
       mockPlatform.mockReturnValue('win32');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/script.bat',
         content: '@echo off\r\necho hello\r\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/script.bat',
         '@echo off\r\necho hello\r\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should handle mixed line endings in .bat files on Windows', async () => {
       mockPlatform.mockReturnValue('win32');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/script.bat',
         content: 'line1\r\nline2\nline3\r\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/script.bat',
         'line1\r\nline2\r\nline3\r\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should be case-insensitive for .BAT extension on Windows', async () => {
       mockPlatform.mockReturnValue('win32');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/SCRIPT.BAT',
         content: 'echo hello\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/SCRIPT.BAT',
         'echo hello\r\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should not convert line endings for non-.bat/.cmd files on Windows', async () => {
       mockPlatform.mockReturnValue('win32');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/script.sh',
         content: '#!/bin/bash\necho hello\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/script.sh',
         '#!/bin/bash\necho hello\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should not convert line endings for .bat files on non-Windows', async () => {
       mockPlatform.mockReturnValue('darwin');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/script.bat',
         content: '@echo off\necho hello\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/script.bat',
         '@echo off\necho hello\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
   });
@@ -499,55 +476,48 @@ describe('StandardFileSystemService', () => {
 
   describe('writeTextFile with lineEnding preservation', () => {
     it('should convert LF to CRLF when lineEnding is crlf', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'line1\nline2\n',
         _meta: { lineEnding: 'crlf' },
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/file.txt',
         'line1\r\nline2\r\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should not convert line endings when lineEnding is lf', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'line1\nline2\n',
         _meta: { lineEnding: 'lf' },
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/file.txt',
         'line1\nline2\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should not convert line endings when lineEnding is not specified', async () => {
-      vi.mocked(fs.writeFile).mockResolvedValue();
-
       await fileSystem.writeTextFile({
         path: '/test/file.txt',
         content: 'line1\nline2\n',
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/file.txt',
         'line1\nline2\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
 
     it('should preserve CRLF for non-bat files on non-Windows when lineEnding is crlf', async () => {
       mockPlatform.mockReturnValue('linux');
-      vi.mocked(fs.writeFile).mockResolvedValue();
 
       await fileSystem.writeTextFile({
         path: '/test/file.cs',
@@ -555,10 +525,10 @@ describe('StandardFileSystemService', () => {
         _meta: { lineEnding: 'crlf' },
       });
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
+      expect(atomicWriteFile).toHaveBeenCalledWith(
         '/test/file.cs',
         'using System;\r\nclass Foo {}\r\n',
-        'utf-8',
+        { encoding: 'utf-8' },
       );
     });
   });
