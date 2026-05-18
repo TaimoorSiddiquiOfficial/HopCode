@@ -406,6 +406,7 @@ export const AppContainer = (props: AppContainerProps) => {
 
   // Terminal and layout hooks
   const { columns: terminalWidth, rows: terminalHeight } = useTerminalSize();
+  const previousTerminalWidthRef = useRef(terminalWidth);
   const { stdin, setRawMode } = useStdin();
   const { stdout } = useStdout();
 
@@ -2094,6 +2095,14 @@ export const AppContainer = (props: AppContainerProps) => {
   // old width — header content visibly tears until the next refreshStatic
   // (e.g. /model). Cheap repaint (cursor-to + erase-down) rather than a
   // full clearTerminal to avoid the full-screen flash.
+  useEffect(() => {
+    if (previousTerminalWidthRef.current === terminalWidth) {
+      return;
+    }
+    previousTerminalWidthRef.current = terminalWidth;
+    repaintStaticViewport();
+  }, [terminalWidth, repaintStaticViewport]);
+
   useEffect(() => {
     if (previousTerminalWidthRef.current === terminalWidth) {
       return;
