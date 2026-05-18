@@ -56,7 +56,6 @@ import {
   resetHomeEnvBootstrapForTesting,
   SETTINGS_VERSION,
   SETTINGS_VERSION_KEY,
-  resetHomeEnvBootstrapForTesting,
 } from './settings.js';
 import { needsMigration } from './migration/index.js';
 import { HOPCODE_DIR } from '@hoptrendy/hopcode-core';
