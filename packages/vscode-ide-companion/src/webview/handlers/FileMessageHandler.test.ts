@@ -197,7 +197,7 @@ describe('FileMessageHandler', () => {
   });
 
   describe('createAndOpenTempFile viewColumn selection', () => {
-    const chatViewType = 'mainThreadWebview-qwenCode.chat';
+    const chatViewType = 'mainThreadWebview-HopCode.chat';
 
     beforeEach(() => {
       vi.clearAllMocks();

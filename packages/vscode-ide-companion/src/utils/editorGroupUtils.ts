@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as vscode from 'vscode';
 
-const CHAT_WEBVIEW_TYPE = 'mainThreadWebview-qwenCode.chat';
+const CHAT_WEBVIEW_TYPE = 'mainThreadWebview-HopCode.chat';
 
 function isChatWebview(tab: vscode.Tab): boolean {
   const input: unknown = (tab as { input?: unknown }).input;
@@ -40,7 +40,7 @@ function findNeighborGroup(
 }
 
 /**
- * Find the editor group immediately to the left of the Qwen chat webview.
+ * Find the editor group immediately to the left of the HopCode chat webview.
  * - If the chat webview group is the leftmost group, returns undefined.
  * - If no chat webview is found in any editor group, returns undefined.
  */
@@ -62,7 +62,7 @@ export function findLeftGroupOfChatWebview(): vscode.ViewColumn | undefined {
 }
 
 /**
- * Find the editor group immediately to the right of the Qwen chat webview.
+ * Find the editor group immediately to the right of the HopCode chat webview.
  * - If the chat webview group is the rightmost group, returns undefined.
  * - If no chat webview is found in any editor group, returns undefined.
  */

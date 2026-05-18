@@ -6,7 +6,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const chatViewType = 'mainThreadWebview-qwenCode.chat';
+const chatViewType = 'mainThreadWebview-HopCode.chat';
 
 const vscodeMock = vi.hoisted(() => ({
   ViewColumn: { One: 1, Two: 2, Three: 3, Four: 4 },
