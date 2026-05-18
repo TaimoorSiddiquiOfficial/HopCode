@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode",
-  "version": "0.27.9",
+  "version": "0.27.10",
   "engines": {
     "node": ">=22.0.0"
   },
