@@ -44,6 +44,22 @@ const createNativeLspServiceInstance = () => ({
   workspaceDiagnostics: vi.fn().mockResolvedValue([]),
   codeActions: vi.fn().mockResolvedValue([]),
   applyWorkspaceEdit: vi.fn().mockResolvedValue(false),
+  getStatusSnapshot: vi.fn().mockReturnValue({
+    enabled: true,
+    configuredServers: 1,
+    readyServers: 1,
+    failedServers: 0,
+    inProgressServers: 0,
+    notStartedServers: 0,
+    servers: [
+      {
+        name: 'typescript',
+        status: 'READY',
+        languages: ['typescript'],
+        transport: 'stdio',
+      },
+    ],
+  }),
 });
 
 vi.mock('./trustedFolders.js', () => ({
@@ -365,7 +381,9 @@ describe('parseArguments', () => {
     await expect(parseArguments()).rejects.toThrow('process.exit called');
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      expect.stringContaining('--json-schema cannot be used with --input-format stream-json'),
+      expect.stringContaining(
+        '--json-schema cannot be used with --input-format stream-json',
+      ),
     );
 
     mockExit.mockRestore();
@@ -905,6 +923,28 @@ describe('loadCliConfig', () => {
     expect(lspInstance).toBeDefined();
     expect(lspInstance?.discoverAndPrepare).toHaveBeenCalledTimes(1);
     expect(lspInstance?.start).toHaveBeenCalledTimes(1);
+  });
+
+  it('should collect LSP status snapshots during debug-mode startup', async () => {
+    process.argv = ['node', 'script.js', '--experimental-lsp', '--debug'];
+    const argv = await parseArguments();
+    const settings: Settings = {};
+
+    await loadCliConfig(settings, argv);
+
+    const lspInstance = getLastLspInstance();
+    expect(lspInstance?.getStatusSnapshot).toHaveBeenCalledTimes(2);
+  });
+
+  it('should not collect LSP status snapshots during normal startup', async () => {
+    process.argv = ['node', 'script.js', '--experimental-lsp'];
+    const argv = await parseArguments();
+    const settings: Settings = {};
+
+    await loadCliConfig(settings, argv);
+
+    const lspInstance = getLastLspInstance();
+    expect(lspInstance?.getStatusSnapshot).not.toHaveBeenCalled();
   });
 
   describe('Proxy configuration', () => {
