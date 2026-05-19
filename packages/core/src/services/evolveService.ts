@@ -29,6 +29,11 @@ import { ToolNames } from '../tools/tool-names.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { getProposalsDir } from '../memory/proposalStore.js';
 import { HOPCODE_DIR } from '../config/storage.js';
+import {
+  errorLogger,
+  withinServiceBoundary,
+  withinAgentBoundary,
+} from '../errors/index.js';
 
 const logger = createDebugLogger('EVOLVE_SERVICE');
 
@@ -63,8 +68,32 @@ export async function runEvolvePass(
   );
   const proposalsDir = getProposalsDir(projectRoot);
 
-  await fs.mkdir(evolveSkillsDir, { recursive: true }).catch(() => {});
-  await fs.mkdir(proposalsDir, { recursive: true }).catch(() => {});
+  // Create directories with proper error handling
+  await withinServiceBoundary(
+    { serviceName: 'filesystem-evolve-skills' },
+    async () => await fs.mkdir(evolveSkillsDir, { recursive: true }),
+  ).catch((error) => {
+    errorLogger.warn('Failed to create evolve skills directory', {
+      error:
+        error instanceof Error
+          ? { message: error.message, stack: error.stack }
+          : String(error),
+      path: evolveSkillsDir,
+    });
+  });
+
+  await withinServiceBoundary(
+    { serviceName: 'filesystem-proposals' },
+    async () => await fs.mkdir(proposalsDir, { recursive: true }),
+  ).catch((error) => {
+    errorLogger.warn('Failed to create proposals directory', {
+      error:
+        error instanceof Error
+          ? { message: error.message, stack: error.stack }
+          : String(error),
+      path: proposalsDir,
+    });
+  });
 
   const recentText = recentMessages
     .slice(-10)
@@ -103,7 +132,10 @@ export async function runEvolvePass(
     context.set('evolveSkillsDir', evolveSkillsDir);
     context.set('proposalsDir', proposalsDir);
 
-    await agent.execute(context);
+    await withinAgentBoundary(
+      { agentId: 'evolve-skill-detector' },
+      async () => await agent.execute(context),
+    );
     logger.debug('Evolve pass complete');
   } catch (err) {
     logger.debug('Evolve pass skipped:', err);
