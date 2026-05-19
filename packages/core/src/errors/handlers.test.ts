@@ -74,9 +74,9 @@ describe('withRetry', () => {
   });
 
   it('fails after max retries', async () => {
-    const operation = vi
-      .fn()
-      .mockRejectedValue(NetworkErrors.connectionRefused('api.example.com'));
+    const operation = vi.fn().mockImplementation(async () => {
+      throw NetworkErrors.connectionRefused('api.example.com');
+    });
 
     const promise = withRetry(operation, {
       maxRetries: 2,
@@ -86,6 +86,7 @@ describe('withRetry', () => {
     await vi.runAllTimersAsync();
 
     await expect(promise).rejects.toThrow('Connection refused');
+
     expect(operation).toHaveBeenCalledTimes(3); // 1 initial + 2 retries
   });
 
@@ -149,9 +150,9 @@ describe('withRetry', () => {
   });
 
   it('uses exponential backoff', async () => {
-    const operation = vi
-      .fn()
-      .mockRejectedValue(NetworkErrors.connectionRefused('api.example.com'));
+    const operation = vi.fn().mockImplementation(async () => {
+      throw NetworkErrors.connectionRefused('api.example.com');
+    });
 
     const promise = withRetry(operation, {
       maxRetries: 3,
