@@ -269,7 +269,10 @@ function getErrorMessage(error: unknown): string {
 
 /**
  * Sleep for specified milliseconds.
+ * Uses Promise-based delay that works with Vitest fake timers.
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
