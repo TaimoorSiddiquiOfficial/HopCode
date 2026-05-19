@@ -22,6 +22,22 @@ import { createDebugLogger } from '../utils/debugLogger.js';
 
 const debugLogger = createDebugLogger('BACKGROUND_SHELLS');
 
+/**
+ * Cap on how many terminal (completed/failed/cancelled) entries the
+ * registry retains. Without this cap, every short-lived background
+ * shell leaves a row in the Background tasks dialog and pill forever,
+ * crowding out the running entries the user actually opened the dialog
+ * to find. Mirrors the rationale + retention pattern in
+ * `MonitorRegistry.MAX_RETAINED_TERMINAL_MONITORS`.
+ *
+ * Sized lower than the monitor cap because shells are user-initiated
+ * (a session typically has tens, not hundreds) and the dialog-side
+ * cost of a stale shell row is higher — each one has a long `command`
+ * label, so they push newer entries out of the visible window faster
+ * than monitor rows would.
+ */
+export const MAX_RETAINED_TERMINAL_SHELLS = 32;
+
 export type BackgroundShellStatus =
   | 'running'
   | 'completed'
@@ -67,13 +83,6 @@ export type BackgroundShellStatusChangeCallback = (
 ) => void;
 
 export class BackgroundShellRegistry {
-  // Cap the number of retained terminal (non-running) entries to prevent
-  // unbounded memory growth in long-running sessions that spawn many
-  // short-lived background commands. When the cap is reached, the oldest
-  // settled entries are evicted (FIFO insertion order). Running entries are
-  // never evicted — they still hold resources that the process manager needs.
-  private static readonly MAX_TERMINAL_ENTRIES = 50;
-
   private readonly entries = new Map<string, BackgroundShellEntry>();
 
   private registerCallback: BackgroundShellRegisterCallback | undefined;
@@ -99,29 +108,6 @@ export class BackgroundShellRegistry {
     cb: BackgroundShellStatusChangeCallback | undefined,
   ): void {
     this.statusChangeCallback = cb;
-  }
-
-  /**
-   * Evict the oldest settled (non-running) entries once the cap is reached.
-   * Called after every status transition so the registry stays bounded.
-   */
-  private evictTerminalEntries(): void {
-    let terminalCount = 0;
-    for (const entry of this.entries.values()) {
-      if (entry.status !== 'running') terminalCount++;
-    }
-    if (terminalCount <= BackgroundShellRegistry.MAX_TERMINAL_ENTRIES) return;
-
-    const toEvict =
-      terminalCount - BackgroundShellRegistry.MAX_TERMINAL_ENTRIES;
-    let evicted = 0;
-    for (const [shellId, entry] of this.entries) {
-      if (evicted >= toEvict) break;
-      if (entry.status !== 'running') {
-        this.entries.delete(shellId);
-        evicted++;
-      }
-    }
   }
 
   register(entry: BackgroundShellEntry): void {
@@ -155,8 +141,8 @@ export class BackgroundShellRegistry {
     entry.status = 'completed';
     entry.exitCode = exitCode;
     entry.endTime = endTime;
+    this.pruneTerminalEntries();
     this.fireStatusChange(entry);
-    this.evictTerminalEntries();
   }
 
   fail(shellId: string, error: string, endTime: number): void {
@@ -165,18 +151,61 @@ export class BackgroundShellRegistry {
     entry.status = 'failed';
     entry.error = error;
     entry.endTime = endTime;
+    this.pruneTerminalEntries();
     this.fireStatusChange(entry);
-    this.evictTerminalEntries();
   }
 
   cancel(shellId: string, endTime: number): void {
     const entry = this.entries.get(shellId);
     if (!entry || entry.status !== 'running') return;
+    this.settleAsCancelled(entry, endTime);
+    this.pruneTerminalEntries();
+    this.fireStatusChange(entry);
+  }
+
+  /**
+   * Mutates a running entry to its `cancelled` terminal state without
+   * touching the prune or status-change side channels. Internal helper
+   * shared by `cancel()` (single-shot, fires both side channels) and
+   * `abortAll()` (batch, fires both exactly once after the loop).
+   *
+   * Caller is responsible for verifying the entry is `running` before
+   * invoking this. The split keeps the running-status guard at the
+   * public-API boundary so a future caller can't accidentally settle
+   * an already-terminal entry without that check.
+   */
+  private settleAsCancelled(
+    entry: BackgroundShellEntry,
+    endTime: number,
+  ): void {
     entry.status = 'cancelled';
     entry.endTime = endTime;
     entry.abortController.abort();
-    this.fireStatusChange(entry);
-    this.evictTerminalEntries();
+  }
+
+  /**
+   * Evict the oldest terminal entries (by `endTime`, then `startTime`)
+   * once the count exceeds `MAX_RETAINED_TERMINAL_SHELLS`. Running
+   * entries are never evicted. Called after every running → terminal
+   * transition; settle order ensures the newly-terminal entry has its
+   * `endTime` stamped before the prune runs, so a fresh terminal
+   * never out-ages the entries already retained.
+   */
+  private pruneTerminalEntries(): void {
+    const terminalEntries = Array.from(this.entries.values())
+      .filter((entry) => entry.status !== 'running')
+      .sort(
+        (a, b) =>
+          (a.endTime ?? a.startTime) - (b.endTime ?? b.startTime) ||
+          a.startTime - b.startTime,
+      );
+
+    while (terminalEntries.length > MAX_RETAINED_TERMINAL_SHELLS) {
+      const oldest = terminalEntries.shift();
+      if (oldest) {
+        this.entries.delete(oldest.shellId);
+      }
+    }
   }
 
   private fireRegister(entry: BackgroundShellEntry): void {
@@ -243,13 +272,28 @@ export class BackgroundShellRegistry {
    * background shells don't outlive the CLI process and leak orphaned
    * children. Symmetric with `BackgroundTaskRegistry.abortAll()` for the
    * subagent path.
+   *
+   * Settles each entry inline, then fires `pruneTerminalEntries` and the
+   * statusChange callback exactly once after the loop. The per-entry
+   * `cancel()` path would have triggered both side channels for every
+   * running shell — wasteful on shutdown / `/clear` where the only
+   * subscriber (`useBackgroundTaskView`) just re-pulls `getAll()`
+   * regardless of the entry argument.
    */
   abortAll(): void {
     const endTime = Date.now();
+    let lastCancelled: BackgroundShellEntry | undefined;
     for (const entry of Array.from(this.entries.values())) {
-      if (entry.status === 'running') {
-        this.cancel(entry.shellId, endTime);
-      }
+      if (entry.status !== 'running') continue;
+      this.settleAsCancelled(entry, endTime);
+      lastCancelled = entry;
     }
+    if (!lastCancelled) return;
+    this.pruneTerminalEntries();
+    // The single subscriber (`useBackgroundTaskView`) ignores the entry
+    // arg and re-pulls `getAll()`, so passing the last cancelled entry
+    // here is informational only — any of the just-cancelled entries
+    // would be equally valid as the "what changed" signal.
+    this.fireStatusChange(lastCancelled);
   }
 }
