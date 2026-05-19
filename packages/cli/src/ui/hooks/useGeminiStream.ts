@@ -1427,8 +1427,7 @@ export const useGeminiStream = (
             case ServerGeminiEventType.ToolCallRequest:
               flushBufferedStreamEvents();
               toolCallRequests.push(event.value);
-              // Count tool call args JSON toward token estimation (matches
-              // Claude Code's input_json_delta handling).
+              // Count tool call args JSON toward token estimation.
               try {
                 const argsJson = JSON.stringify(event.value.args);
                 streamingResponseLengthRef.current += argsJson.length;
@@ -2092,9 +2091,8 @@ export const useGeminiStream = (
       markToolsAsSubmitted(callIdsToMarkAsSubmitted);
 
       // Fire tool-use summary generation in parallel with the next API call.
-      // The fast-model Haiku-equivalent latency (~1s) is hidden behind the
-      // main-model streaming (5-30s). Mirrors Claude Code's query.ts:1411-1482
-      // behavior. Fire-and-forget: failures are silent and never block the turn.
+      // The fast-model latency is hidden behind the main-model streaming.
+      // Fire-and-forget: failures are silent and never block the turn.
       // Subagent exclusion is implicit — useGeminiStream only drives the
       // main session; subagents run through agents/runtime/ with their own loop.
       if (config.getEmitToolUseSummaries()) {

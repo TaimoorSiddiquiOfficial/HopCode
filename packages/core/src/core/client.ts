@@ -19,6 +19,7 @@ import { ApprovalMode, type Config } from '../config/config.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { recordStartupEvent } from '../utils/startupEventSink.js';
 import { microcompactHistory } from '../services/microcompaction/microcompact.js';
+import { formatStopHookBlockingCapWarning } from '../hooks/stopHookCap.js';
 
 const debugLogger = createDebugLogger('CLIENT');
 
@@ -1539,20 +1540,33 @@ export class GeminiClient {
             continueReason,
           ];
 
-          // Emit StopHookLoop event for iterations after the first one.
-          // The first iteration (currentIterationCount === 1) is the initial request,
-          // so there's no prior stop hook execution to report. We only emit this event
-          // when stop hooks have been executed multiple times (loop detected).
-          if (currentIterationCount > 1) {
+          // Emit StopHookLoop starting with the first blocking decision so
+          // configured Stop hooks surface their reason before the follow-up
+          // turn is generated. The cap check stays before the yield because
+          // a cap of 1 means no follow-up turn should run.
+          const stopHookBlockingCap = this.config.getStopHookBlockingCap();
+          if (currentIterationCount >= stopHookBlockingCap) {
+            const warning = formatStopHookBlockingCapWarning(
+              'Stop',
+              stopHookBlockingCap,
+            );
             yield {
-              type: GeminiEventType.StopHookLoop,
-              value: {
-                iterationCount: currentIterationCount,
-                reasons: currentReasons,
-                stopHookCount: response.stopHookCount ?? 1,
-              },
+              type: GeminiEventType.HookSystemMessage,
+              value: warning,
             };
+            debugLogger.warn(warning);
+            if (isTopLevelInteraction) endInteractionSpan('ok');
+            return turn;
           }
+
+          yield {
+            type: GeminiEventType.StopHookLoop,
+            value: {
+              iterationCount: currentIterationCount,
+              reasons: currentReasons,
+              stopHookCount: response.stopHookCount ?? 1,
+            },
+          };
 
           const continueRequest = [{ text: continueReason }];
           const hookTurn = yield* this.sendMessageStream(

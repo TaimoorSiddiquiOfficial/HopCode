@@ -763,11 +763,11 @@ export class Session implements SessionContext {
     hooksEnabled: boolean,
     messageBus: MessageBus | undefined,
   ): Promise<{ stopReason: PromptResponse['stopReason'] }> {
-    const MAX_STOP_HOOK_ITERATIONS = 100;
+    const stopHookBlockingCap = this.config.getStopHookBlockingCap();
     let stopHookIterationCount = 0;
     let stopHookReasons: string[] = [];
 
-    while (stopHookIterationCount < MAX_STOP_HOOK_ITERATIONS) {
+    while (stopHookIterationCount < stopHookBlockingCap) {
       if (
         !hooksEnabled ||
         !messageBus ||
@@ -831,7 +831,21 @@ export class Session implements SessionContext {
         stopHookIterationCount++;
         stopHookReasons = [...stopHookReasons, continueReason];
 
-        // Emit StopHookLoop event for iterations after the first one
+        if (stopHookIterationCount >= stopHookBlockingCap) {
+          const warning = formatStopHookBlockingCapWarning(
+            'Stop',
+            stopHookBlockingCap,
+          );
+          abortGoalForStopHookCap(
+            this.config,
+            this.config.getSessionId(),
+            warning,
+          );
+          await this.messageEmitter.emitAgentMessage(warning);
+          debugLogger.warn(warning);
+          return { stopReason: 'end_turn' };
+        }
+
         if (stopHookIterationCount > 1) {
           await this.messageEmitter.emitStopHookLoop(
             stopHookIterationCount,
@@ -972,13 +986,6 @@ export class Session implements SessionContext {
 
       // Stop hook allowed stopping, exit the loop
       break;
-    }
-
-    // If we exceeded max iterations, log a warning but still end gracefully
-    if (stopHookIterationCount >= MAX_STOP_HOOK_ITERATIONS) {
-      debugLogger.warn(
-        `Stop hook loop reached maximum iterations (${MAX_STOP_HOOK_ITERATIONS}), forcing stop`,
-      );
     }
 
     return { stopReason: 'end_turn' };
