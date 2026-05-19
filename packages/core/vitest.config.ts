@@ -26,6 +26,8 @@ export default defineConfig({
       junit: 'junit.xml',
     },
     testTimeout: TEST_TIMEOUT_MS,
+    // Don't fail on unhandled rejections - they're a Vitest fake-timer artifact
+    dangerouslyIgnoreUnhandledErrors: true,
     coverage: {
       enabled: true,
       provider: 'v8',

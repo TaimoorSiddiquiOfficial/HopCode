@@ -74,19 +74,24 @@ describe('withRetry', () => {
   });
 
   it('fails after max retries', async () => {
-    const operation = vi.fn().mockImplementation(async () => {
-      throw NetworkErrors.connectionRefused('api.example.com');
-    });
+    const operation = vi
+      .fn()
+      .mockRejectedValue(NetworkErrors.connectionRefused('api.example.com'));
 
+    // Run timers first, then await the promise
+    // This pattern avoids Vitest unhandled rejection warnings with fake timers
     const promise = withRetry(operation, {
       maxRetries: 2,
       initialDelayMs: 100,
     });
 
+    // Wait for all timers to complete
     await vi.runAllTimersAsync();
+    // Let microtasks flush
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
+    // Now check the result
     await expect(promise).rejects.toThrow('Connection refused');
-
     expect(operation).toHaveBeenCalledTimes(3); // 1 initial + 2 retries
   });
 
