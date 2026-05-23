@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Code
  * SPDX-License-Identifier: Apache-2.0
@@ -70,7 +70,7 @@ describe('resolveCustomBanner', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-banner-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-banner-'));
   });
 
   afterEach(() => {

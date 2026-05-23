@@ -73,7 +73,7 @@ Or combined in one command:
 
 ```bash
 cd integration-tests && \
-  cross-env QWEN_SANDBOX=false npx vitest run cli interactive
+  cross-env HOPCODE_SANDBOX=false npx vitest run cli interactive
 ```
 
 **Gotcha:** In interactive tests, always call `session.idle()` between sends —
@@ -113,7 +113,7 @@ npm run preflight  # Full check: clean → install → format → lint → build
    bugfixes.
 2. **Test plan for behavioral changes** — write an E2E test plan in
    `.hopcode/e2e-tests/` when the change affects user-observable behavior. Dry-run
-   against the global `qwen` CLI first to confirm the baseline.
+   against the global `hopcode` CLI first to confirm the baseline.
 3. **Build + typecheck before declaring done**:
    `npm run build && npm run typecheck`.
 4. **Code review** — run `/review` when available. Triage each comment:

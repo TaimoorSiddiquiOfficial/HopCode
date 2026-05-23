@@ -24,7 +24,7 @@ let runtimeDir: string;
 let prevRuntimeEnv: string | undefined;
 
 beforeEach(async () => {
-  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'qwen-rt-cfg-'));
+  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'hopcode-rt-cfg-'));
   runtimeDir = path.join(tmpDir, 'runtime');
   prevRuntimeEnv = process.env['HOPCODE_RUNTIME_DIR'];
   process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;

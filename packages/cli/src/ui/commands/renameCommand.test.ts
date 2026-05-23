@@ -211,7 +211,7 @@ describe('renameCommand', () => {
 
     it('uses fastModel when configured', async () => {
       const { config, generateText } = mockConfigForKebab({
-        fastModel: 'qwen-turbo',
+        fastModel: 'hopcode-turbo',
         model: 'main-model',
       });
       mockContext = createMockCommandContext({
@@ -221,7 +221,7 @@ describe('renameCommand', () => {
       await renameCommand.action!(mockContext, '');
 
       expect(generateText).toHaveBeenCalledOnce();
-      expect(generateText.mock.calls[0][0].model).toBe('qwen-turbo');
+      expect(generateText.mock.calls[0][0].model).toBe('hopcode-turbo');
     });
 
     it('falls back to main model when fastModel is unset', async () => {
@@ -268,7 +268,7 @@ describe('renameCommand', () => {
         getChatRecordingService: vi.fn().mockReturnValue({
           recordCustomTitle: vi.fn(),
         }),
-        getFastModel: vi.fn().mockReturnValue('qwen-turbo'),
+        getFastModel: vi.fn().mockReturnValue('hopcode-turbo'),
       };
       mockContext = createMockCommandContext({
         services: { config: mockConfig as never },
@@ -289,14 +289,14 @@ describe('renameCommand', () => {
       tryGenerateSessionTitleMock.mockResolvedValue({
         ok: true,
         title: 'Fix login button on mobile',
-        modelUsed: 'qwen-turbo',
+        modelUsed: 'hopcode-turbo',
       });
       const mockRecordCustomTitle = vi.fn().mockReturnValue(true);
       const mockConfig = {
         getChatRecordingService: vi.fn().mockReturnValue({
           recordCustomTitle: mockRecordCustomTitle,
         }),
-        getFastModel: vi.fn().mockReturnValue('qwen-turbo'),
+        getFastModel: vi.fn().mockReturnValue('hopcode-turbo'),
       };
       mockContext = createMockCommandContext({
         services: { config: mockConfig as never },
@@ -325,7 +325,7 @@ describe('renameCommand', () => {
         getChatRecordingService: vi.fn().mockReturnValue({
           recordCustomTitle: vi.fn(),
         }),
-        getFastModel: vi.fn().mockReturnValue('qwen-turbo'),
+        getFastModel: vi.fn().mockReturnValue('hopcode-turbo'),
       };
       mockContext = createMockCommandContext({
         services: { config: mockConfig as never },
@@ -350,7 +350,7 @@ describe('renameCommand', () => {
         getChatRecordingService: vi.fn().mockReturnValue({
           recordCustomTitle: vi.fn(),
         }),
-        getFastModel: vi.fn().mockReturnValue('qwen-turbo'),
+        getFastModel: vi.fn().mockReturnValue('hopcode-turbo'),
       };
       mockContext = createMockCommandContext({
         services: { config: mockConfig as never },
@@ -371,7 +371,7 @@ describe('renameCommand', () => {
         getChatRecordingService: vi.fn().mockReturnValue({
           recordCustomTitle: vi.fn(),
         }),
-        getFastModel: vi.fn().mockReturnValue('qwen-turbo'),
+        getFastModel: vi.fn().mockReturnValue('hopcode-turbo'),
       };
       mockContext = createMockCommandContext({
         services: { config: mockConfig as never },
@@ -398,7 +398,7 @@ describe('renameCommand', () => {
         getChatRecordingService: vi.fn().mockReturnValue({
           recordCustomTitle: vi.fn(),
         }),
-        getFastModel: vi.fn().mockReturnValue('qwen-turbo'),
+        getFastModel: vi.fn().mockReturnValue('hopcode-turbo'),
       };
       mockContext = createMockCommandContext({
         services: { config: mockConfig as never },
@@ -417,7 +417,7 @@ describe('renameCommand', () => {
       tryGenerateSessionTitleMock.mockResolvedValue({
         ok: true,
         title: 'Audit auth middleware',
-        modelUsed: 'qwen-turbo',
+        modelUsed: 'hopcode-turbo',
       });
       const mockRenameSession = vi.fn().mockResolvedValue(true);
       const mockConfig = {
@@ -426,7 +426,7 @@ describe('renameCommand', () => {
         getSessionService: vi.fn().mockReturnValue({
           renameSession: mockRenameSession,
         }),
-        getFastModel: vi.fn().mockReturnValue('qwen-turbo'),
+        getFastModel: vi.fn().mockReturnValue('hopcode-turbo'),
       };
       mockContext = createMockCommandContext({
         services: { config: mockConfig as never },

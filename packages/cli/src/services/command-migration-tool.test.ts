@@ -18,7 +18,9 @@ describe('command-migration-tool', () => {
   let tempDir: string;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-migration-test-'));
+    tempDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-migration-test-'),
+    );
   });
 
   afterEach(async () => {

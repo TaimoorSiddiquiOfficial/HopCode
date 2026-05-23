@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -12,7 +12,7 @@
  * custom directory instead of ~/.hopcode/.
  *
  * Based on the test plan at:
- *   .hopcode/docs/PLAN-hopcode-config-dir-e2e-tests.md
+ *   .claude/docs/PLAN-hopcode-config-dir-e2e-tests.md
  *
  * NOTE: Most tests require a full prompt run (config.initialize() must run to
  * write installation_id). Only scenario 2b can use --help because settings
@@ -130,13 +130,13 @@ describe('HOPCODE_HOME environment variable', () => {
      * 1c. Relative path is resolved correctly.
      *
      * TestRig sets cwd to testDir when spawning the child process, so a
-     * relative path like "./custom-HopCode" resolves to
-     * <testDir>/custom-HopCode inside the subprocess.
+     * relative path like "./custom-hopcode" resolves to
+     * <testDir>/custom-hopcode inside the subprocess.
      */
     it('1c: relative HOPCODE_HOME path is resolved against subprocess cwd', async () => {
       rig.setup('hopcode-home-1c-relative-path');
 
-      const relativePath = './custom-HopCode';
+      const relativePath = './custom-hopcode';
       process.env['HOPCODE_HOME'] = relativePath;
 
       try {
@@ -146,7 +146,7 @@ describe('HOPCODE_HOME environment variable', () => {
       }
 
       // Resolve the expected absolute path the same way the subprocess does
-      const expectedAbsPath = resolve(rig.testDir!, 'custom-HopCode');
+      const expectedAbsPath = resolve(rig.testDir!, 'custom-hopcode');
       const installationIdPath = join(expectedAbsPath, 'installation_id');
       expect(
         existsSync(installationIdPath),

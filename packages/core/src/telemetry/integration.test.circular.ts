@@ -25,7 +25,7 @@ describe('Circular Reference Integration Test', () => {
     (HopCodeLogger as any).instance = undefined;
   });
 
-  it('should handle HttpsProxyAgent-like circular references in qwen logging', () => {
+  it('should handle HttpsProxyAgent-like circular references in hopcode logging', () => {
     // Create a mock config with proxy
     const mockConfig = {
       getTelemetryEnabled: () => true,

@@ -463,7 +463,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .send({ cwd: '/work/a', modelServiceId: 'qwen-prod' });
+        .send({ cwd: '/work/a', modelServiceId: 'hopcode-prod' });
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
         sessionId: 'fake-0',
@@ -471,7 +471,7 @@ describe('createServeApp', () => {
         attached: false,
       });
       expect(bridge.calls).toEqual([
-        { workspaceCwd: '/work/a', modelServiceId: 'qwen-prod' },
+        { workspaceCwd: '/work/a', modelServiceId: 'hopcode-prod' },
       ]);
     });
 
@@ -1299,7 +1299,7 @@ describe('runHopCodeServe', () => {
     // once at boot; `/capabilities.workspaceCwd` returns the canonical
     // form, NOT the raw input. Tests inject a fake bridge here so we
     // verify the route layer's canonicalization (not the bridge's),
-    // making this a true E2E that doesn't require a real `qwen --acp`
+    // making this a true E2E that doesn't require a real `hopcode --acp`
     // child.
     const bridge = fakeBridge();
     handle = await runHopCodeServe(
@@ -1327,14 +1327,14 @@ describe('runHopCodeServe', () => {
     // Without the boot-time stat check, `canonicalizeWorkspace`'s
     // ENOENT fallback to `path.resolve` would let the daemon boot
     // pointed at a non-existent directory; every `POST /session`
-    // would then spawn a `qwen --acp` child with that cwd and the
+    // would then spawn a `hopcode --acp` child with that cwd and the
     // agent would fail with an opaque ENOENT.
     await expect(
       runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
-        workspace: `/tmp/qwen-serve-no-such-path-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        workspace: `/tmp/hopcode-serve-no-such-path-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       }),
     ).rejects.toThrow(/directory does not exist/);
   });

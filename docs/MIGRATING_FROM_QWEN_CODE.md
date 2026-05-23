@@ -1,4 +1,4 @@
-﻿# Migrating from HopCode to HopCode
+# Migrating from HopCode to HopCode
 
 This guide helps existing HopCode users transition to HopCode.
 
@@ -21,7 +21,7 @@ HopCode is a fork of HopCode with expanded multi-provider support, new features,
 | ---------------- | ------------------- | -------------------------------- |
 | `qwen`           | `hopcode`           | Main CLI entry point             |
 | `qwen --json`    | `hopcode --json`    | Headless JSON output             |
-| `qwen serve`     | `hopcode serve`     | HTTP API server                  |
+| `hopcode serve`  | `hopcode serve`     | HTTP API server                  |
 | `qwen dashboard` | `hopcode dashboard` | Web dashboard                    |
 | `qwen profile`   | `hopcode profile`   | Profile management               |
 | —                | `hopcode grpc`      | **New** — gRPC headless server   |

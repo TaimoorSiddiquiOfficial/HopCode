@@ -1160,7 +1160,7 @@ describe('useGeminiStream', () => {
       const config = {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => false),
-        getFastModel: vi.fn(() => 'qwen-fast'),
+        getFastModel: vi.fn(() => 'hopcode-fast'),
         getGeminiClient: vi.fn(() => ({
           generateContent: vi.fn(),
         })),
@@ -1204,8 +1204,8 @@ describe('useGeminiStream', () => {
       const config = {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
-        getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'qwen-main'),
+        getFastModel: vi.fn(() => 'hopcode-fast'),
+        getModel: vi.fn(() => 'hopcode-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -1231,7 +1231,7 @@ describe('useGeminiStream', () => {
       // Model was called with the fast model and includes tool names in the prompt.
       expect(generateText).toHaveBeenCalledTimes(1);
       const options = generateText.mock.calls[0][0];
-      expect(options.model).toBe('qwen-fast');
+      expect(options.model).toBe('hopcode-fast');
       const userText = options.contents[0].parts[0].text as string;
       expect(userText).toContain('Tool: Grep');
       expect(userText).toContain('Tool: Read');
@@ -1253,8 +1253,8 @@ describe('useGeminiStream', () => {
       const config = {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
-        getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'qwen-main'),
+        getFastModel: vi.fn(() => 'hopcode-fast'),
+        getModel: vi.fn(() => 'hopcode-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -1356,8 +1356,8 @@ describe('useGeminiStream', () => {
       const config = {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
-        getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'qwen-main'),
+        getFastModel: vi.fn(() => 'hopcode-fast'),
+        getModel: vi.fn(() => 'hopcode-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -3528,7 +3528,7 @@ describe('useGeminiStream', () => {
             type: ServerGeminiEventType.Thought,
             value: {
               subject: '',
-              description: ' user mentioned globally installed qwen,',
+              description: ' user mentioned globally installed hopcode,',
             },
           };
           yield {
@@ -3548,14 +3548,14 @@ describe('useGeminiStream', () => {
         expect(mockAddItem).toHaveBeenCalledWith(
           expect.objectContaining({
             type: 'gemini_thought',
-            text: 'The user mentioned globally installed qwen,',
+            text: 'The user mentioned globally installed hopcode,',
           }),
           expect.any(Number),
         );
       });
       expect(result.current.thought).toEqual({
         subject: 'Evaluating installation approach',
-        description: 'The user mentioned globally installed qwen,',
+        description: 'The user mentioned globally installed hopcode,',
       });
     });
 

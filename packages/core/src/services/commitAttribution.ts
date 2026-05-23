@@ -247,6 +247,11 @@ export interface AttributionSnapshot {
 // ---------------------------------------------------------------------------
 
 const INTERNAL_MODEL_PATTERNS = [
+  /hopcode[-_]?\d+(\.\d+)?[-_]?b?/i,
+  /hopcode[-_]?coder[-_]?\d*/i,
+  /hopcode[-_]?max/i,
+  /hopcode[-_]?plus/i,
+  /hopcode[-_]?turbo/i,
   /qwen[-_]?\d+(\.\d+)?[-_]?b?/i,
   /qwen[-_]?coder[-_]?\d*/i,
   /qwen[-_]?max/i,

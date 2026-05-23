@@ -424,7 +424,7 @@ Symlinked skill body.
 
   describe('parseModelField', () => {
     it('should return the model string for a valid model', () => {
-      expect(parseModelField({ model: 'qwen-max' })).toBe('qwen-max');
+      expect(parseModelField({ model: 'hopcode-max' })).toBe('hopcode-max');
     });
 
     it('should return undefined when model is omitted', () => {
@@ -444,7 +444,7 @@ Symlinked skill body.
     });
 
     it('should trim whitespace from model string', () => {
-      expect(parseModelField({ model: '  qwen-max  ' })).toBe('qwen-max');
+      expect(parseModelField({ model: '  qwen-max  ' })).toBe('hopcode-max');
     });
 
     it('should throw for non-string types', () => {
@@ -664,7 +664,7 @@ Symlinked skill body.
       mockParseYaml.mockReturnValue({
         name: 'model-test',
         description: 'Test skill with model',
-        model: 'qwen-max',
+        model: 'hopcode-max',
       });
 
       const config = parseSkillContent(
@@ -672,7 +672,7 @@ Symlinked skill body.
         testFilePath,
       );
 
-      expect(config.model).toBe('qwen-max');
+      expect(config.model).toBe('hopcode-max');
     });
 
     it('should set model to undefined when omitted', () => {

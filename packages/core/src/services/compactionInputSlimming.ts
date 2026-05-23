@@ -62,7 +62,8 @@ export function resolveSlimmingConfig(
 ): ResolvedSlimmingConfig {
   return {
     imageTokenEstimate: resolveNumber(
-      process.env['QWEN_IMAGE_TOKEN_ESTIMATE'],
+      process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'] ??
+        process.env['QWEN_IMAGE_TOKEN_ESTIMATE'],
       settings?.imageTokenEstimate,
       DEFAULT_IMAGE_TOKEN_ESTIMATE,
       { minInclusive: 1 },

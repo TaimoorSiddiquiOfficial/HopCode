@@ -17,10 +17,12 @@ import {
 
 describe('compactionInputSlimming', () => {
   beforeEach(() => {
+    delete process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'];
     delete process.env['QWEN_IMAGE_TOKEN_ESTIMATE'];
   });
 
   afterEach(() => {
+    delete process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'];
     delete process.env['QWEN_IMAGE_TOKEN_ESTIMATE'];
   });
 
@@ -36,13 +38,13 @@ describe('compactionInputSlimming', () => {
     });
 
     it('env overrides settings', () => {
-      process.env['QWEN_IMAGE_TOKEN_ESTIMATE'] = '3000';
+      process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'] = '3000';
       const cfg = resolveSlimmingConfig({ imageTokenEstimate: 999 });
       expect(cfg.imageTokenEstimate).toBe(3000);
     });
 
     it('falls through invalid env to settings, then defaults', () => {
-      process.env['QWEN_IMAGE_TOKEN_ESTIMATE'] = 'not-a-number';
+      process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'] = 'not-a-number';
       const cfg = resolveSlimmingConfig({ imageTokenEstimate: 1234 });
       expect(cfg.imageTokenEstimate).toBe(1234);
 
@@ -51,7 +53,7 @@ describe('compactionInputSlimming', () => {
     });
 
     it('rejects below-minimum values', () => {
-      process.env['QWEN_IMAGE_TOKEN_ESTIMATE'] = '0';
+      process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'] = '0';
       const cfg = resolveSlimmingConfig(undefined);
       // Falls through to default.
       expect(cfg.imageTokenEstimate).toBe(DEFAULT_IMAGE_TOKEN_ESTIMATE);

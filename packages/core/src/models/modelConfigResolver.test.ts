@@ -136,12 +136,12 @@ describe('modelConfigResolver', () => {
           cli: {},
           settings: {},
           env: {
-            HOPCODE_MODEL: 'qwen-model',
+            HOPCODE_MODEL: 'hopcode-model',
             OPENAI_API_KEY: 'key',
           },
         });
 
-        expect(result.config.model).toBe('qwen-model');
+        expect(result.config.model).toBe('hopcode-model');
         expect(result.sources['model'].envKey).toBe('HOPCODE_MODEL');
       });
     });

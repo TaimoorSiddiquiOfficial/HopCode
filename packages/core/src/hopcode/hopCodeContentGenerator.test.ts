@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -308,7 +308,7 @@ describe('HopCodeContentGenerator', () => {
     // Mock Config
     mockConfig = {
       getContentGeneratorConfig: vi.fn().mockReturnValue({
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         apiKey: 'test-api-key',
         authType: 'qwen',
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
@@ -338,7 +338,7 @@ describe('HopCodeContentGenerator', () => {
 
     // Create HopCodeContentGenerator instance
     const contentGeneratorConfig = {
-      model: 'qwen-turbo',
+      model: 'hopcode-turbo',
       apiKey: 'test-api-key',
       authType: AuthType.HOPCODE_OAUTH,
       baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
@@ -366,7 +366,7 @@ describe('HopCodeContentGenerator', () => {
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -388,7 +388,7 @@ describe('HopCodeContentGenerator', () => {
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello stream' }] }],
       };
 
@@ -411,7 +411,7 @@ describe('HopCodeContentGenerator', () => {
       vi.clearAllMocks();
 
       const request: CountTokensParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Count me' }] }],
       };
 
@@ -431,7 +431,7 @@ describe('HopCodeContentGenerator', () => {
       );
 
       const request: EmbedContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ parts: [{ text: 'Embed me' }] }],
       };
 
@@ -470,7 +470,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -512,7 +512,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello stream' }] }],
       };
 
@@ -542,7 +542,7 @@ describe('HopCodeContentGenerator', () => {
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -566,7 +566,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -604,7 +604,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -645,7 +645,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -684,7 +684,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -723,7 +723,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -755,7 +755,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -790,7 +790,7 @@ describe('HopCodeContentGenerator', () => {
       parentPrototype.generateContent = vi.fn().mockRejectedValue(mockError);
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -856,7 +856,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -891,7 +891,7 @@ describe('HopCodeContentGenerator', () => {
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -915,7 +915,7 @@ describe('HopCodeContentGenerator', () => {
       } as ErrorData);
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -990,7 +990,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -1110,7 +1110,7 @@ describe('HopCodeContentGenerator', () => {
       });
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Test message' }] }],
       };
 
@@ -1146,12 +1146,12 @@ describe('HopCodeContentGenerator', () => {
       // Create new instance to pick up the mock
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -1181,12 +1181,12 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -1214,12 +1214,12 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -1426,7 +1426,7 @@ describe('HopCodeContentGenerator', () => {
         .mockRejectedValue(new Error('Stream error'));
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Stream test' }] }],
       };
 
@@ -1476,7 +1476,7 @@ describe('HopCodeContentGenerator', () => {
       mockTokenManager.setMockCredentials(streamCredentials);
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Stream test' }] }],
       };
 
@@ -1518,7 +1518,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1539,7 +1539,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1562,7 +1562,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1583,7 +1583,7 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1600,7 +1600,7 @@ describe('HopCodeContentGenerator', () => {
       const generator = new HopCodeGeneratorClass(
         mockHopCodeClient,
         {
-          model: 'qwen-turbo',
+          model: 'hopcode-turbo',
           authType: AuthType.HOPCODE_OAUTH,
           baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
           apiKey: 'test-key',
@@ -1619,7 +1619,7 @@ describe('HopCodeContentGenerator', () => {
     it('should get SharedTokenManager instance', () => {
       const generator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
@@ -1645,12 +1645,12 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
       const request: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
@@ -1674,22 +1674,22 @@ describe('HopCodeContentGenerator', () => {
 
       const newGenerator = new HopCodeGeneratorClass(
         mockHopCodeClient,
-        { model: 'qwen-turbo', authType: AuthType.HOPCODE_OAUTH },
+        { model: 'hopcode-turbo', authType: AuthType.HOPCODE_OAUTH },
         mockConfig,
       );
 
       const generateRequest: GenerateContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
       };
 
       const countRequest: CountTokensParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ role: 'user', parts: [{ text: 'Count' }] }],
       };
 
       const embedRequest: EmbedContentParameters = {
-        model: 'qwen-turbo',
+        model: 'hopcode-turbo',
         contents: [{ parts: [{ text: 'Embed' }] }],
       };
 

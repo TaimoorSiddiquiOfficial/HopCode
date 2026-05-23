@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -1067,7 +1067,7 @@ describe('modelConfigUtils', () => {
     it('Edge Case 2: HOPCODE_MODEL should be used as fallback when OPENAI_MODEL is not set', () => {
       const argv = {};
       const hopcodeProvider: ProviderModelConfig = {
-        id: 'qwen-env-model',
+        id: 'hopcode-env-model',
         name: 'Qwen Env Model',
       };
       const settings = makeMockSettings({
@@ -1082,7 +1082,7 @@ describe('modelConfigUtils', () => {
       const selectedAuthType = AuthType.USE_OPENAI;
 
       vi.mocked(resolveModelConfig).mockReturnValue({
-        config: { model: 'qwen-env-model', apiKey: '', baseUrl: '' },
+        config: { model: 'hopcode-env-model', apiKey: '', baseUrl: '' },
         sources: {},
         warnings: [],
       });
@@ -1091,7 +1091,7 @@ describe('modelConfigUtils', () => {
         argv,
         settings,
         selectedAuthType,
-        env: { HOPCODE_MODEL: 'qwen-env-model' },
+        env: { HOPCODE_MODEL: 'hopcode-env-model' },
       });
 
       expect(vi.mocked(resolveModelConfig)).toHaveBeenCalledWith(
@@ -1109,7 +1109,7 @@ describe('modelConfigUtils', () => {
         name: 'OpenAI Env Model',
       };
       const hopcodeProvider: ProviderModelConfig = {
-        id: 'qwen-env-model',
+        id: 'hopcode-env-model',
         name: 'Qwen Env Model',
       };
       const settings = makeMockSettings({
@@ -1136,7 +1136,7 @@ describe('modelConfigUtils', () => {
         selectedAuthType,
         env: {
           OPENAI_MODEL: 'openai-env-model',
-          HOPCODE_MODEL: 'qwen-env-model',
+          HOPCODE_MODEL: 'hopcode-env-model',
         },
       });
 
@@ -1357,10 +1357,10 @@ describe('modelConfigUtils', () => {
       it('[Regression] HOPCODE_MODEL as fallback when OPENAI_MODEL not set', () => {
         const settings = makeMockSettings({ model: { name: undefined } });
         const selectedAuthType = AuthType.USE_OPENAI;
-        const env = { HOPCODE_MODEL: 'qwen-model', OPENAI_API_KEY: 'key' };
+        const env = { HOPCODE_MODEL: 'hopcode-model', OPENAI_API_KEY: 'key' };
 
         vi.mocked(resolveModelConfig).mockImplementation(() => ({
-          config: { model: 'qwen-model', apiKey: 'key', baseUrl: '' },
+          config: { model: 'hopcode-model', apiKey: 'key', baseUrl: '' },
           sources: { model: { kind: 'env' as const, envKey: 'HOPCODE_MODEL' } },
           warnings: [],
         }));
@@ -1374,7 +1374,7 @@ describe('modelConfigUtils', () => {
 
         // HOPCODE_MODEL should be passed to resolveModelConfig
         const callArgs = vi.mocked(resolveModelConfig).mock.calls[0][0];
-        expect(callArgs.env?.['HOPCODE_MODEL']).toBe('qwen-model');
+        expect(callArgs.env?.['HOPCODE_MODEL']).toBe('hopcode-model');
       });
 
       it('[Regression] Non-OpenAI auth ignores OPENAI_MODEL', () => {

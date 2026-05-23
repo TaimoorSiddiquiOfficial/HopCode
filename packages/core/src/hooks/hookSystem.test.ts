@@ -1568,7 +1568,7 @@ describe('HookSystem', () => {
 
       await hookSystem.fireSubagentStopEvent(
         'agent-456',
-        'qwen-tester',
+        'hopcode-tester',
         '/transcript/path.jsonl',
         'last message from agent',
         true,
@@ -1577,7 +1577,7 @@ describe('HookSystem', () => {
 
       expect(mockHookEventHandler.fireSubagentStopEvent).toHaveBeenCalledWith(
         'agent-456',
-        'qwen-tester',
+        'hopcode-tester',
         '/transcript/path.jsonl',
         'last message from agent',
         true,

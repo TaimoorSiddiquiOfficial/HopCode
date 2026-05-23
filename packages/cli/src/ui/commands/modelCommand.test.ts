@@ -155,33 +155,37 @@ describe('modelCommand', () => {
     const setValue = vi.fn();
     const switchModel = vi.fn().mockResolvedValue(undefined);
     mockContext = createMockCommandContext({
-      invocation: { raw: '/model qwen-max', name: 'model', args: 'qwen-max' },
+      invocation: {
+        raw: '/model qwen-max',
+        name: 'model',
+        args: 'hopcode-max',
+      },
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.HOPCODE_OAUTH,
           }),
           getAvailableModelsForAuthType: vi
             .fn()
-            .mockReturnValue([{ id: 'qwen-max', label: 'Qwen Max' }]),
+            .mockReturnValue([{ id: 'hopcode-max', label: 'Qwen Max' }]),
           switchModel,
         },
         settings: createMockSettings(setValue),
       },
     });
 
-    const result = await modelCommand.action!(mockContext, 'qwen-max');
+    const result = await modelCommand.action!(mockContext, 'hopcode-max');
 
     expect(switchModel).toHaveBeenCalledWith(
       AuthType.HOPCODE_OAUTH,
-      'qwen-max',
+      'hopcode-max',
       undefined,
     );
     expect(setValue).toHaveBeenCalledWith(
       expect.any(String),
       'model.name',
-      'qwen-max',
+      'hopcode-max',
     );
     expect(result).toEqual({
       type: 'message',
@@ -202,7 +206,7 @@ describe('modelCommand', () => {
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.HOPCODE_OAUTH,
           }),
           switchModel,
@@ -234,30 +238,30 @@ describe('modelCommand', () => {
       invocation: {
         raw: '/model qwen-max',
         name: 'model',
-        args: 'qwen-max',
+        args: 'hopcode-max',
       },
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.HOPCODE_OAUTH,
           }),
           switchModel,
           getAvailableModelsForAuthType: vi
             .fn()
-            .mockReturnValue([{ id: 'qwen-max', label: 'Qwen Max' }]),
+            .mockReturnValue([{ id: 'hopcode-max', label: 'Qwen Max' }]),
         },
         settings: createMockSettings(setValue),
       },
     });
 
-    await expect(modelCommand.action!(mockContext, 'qwen-max')).rejects.toThrow(
-      'Refresh failed',
-    );
+    await expect(
+      modelCommand.action!(mockContext, 'hopcode-max'),
+    ).rejects.toThrow('Refresh failed');
 
     expect(switchModel).toHaveBeenCalledWith(
       AuthType.HOPCODE_OAUTH,
-      'qwen-max',
+      'hopcode-max',
       undefined,
     );
     expect(setValue).not.toHaveBeenCalled();
@@ -275,7 +279,7 @@ describe('modelCommand', () => {
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.USE_OPENAI,
           }),
           getAvailableModelsForAuthType: vi
@@ -320,7 +324,7 @@ describe('modelCommand', () => {
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.USE_OPENAI,
           }),
           getAvailableModelsForAuthType: vi.fn().mockReturnValue([]),
@@ -355,7 +359,7 @@ describe('modelCommand', () => {
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.HOPCODE_OAUTH,
           }),
           getAuthType: vi.fn().mockReturnValue(AuthType.HOPCODE_OAUTH),
@@ -508,12 +512,12 @@ describe('modelCommand', () => {
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.USE_OPENAI,
           }),
           getAllConfiguredModels: vi.fn().mockReturnValue([
             {
-              id: 'qwen-turbo',
+              id: 'hopcode-turbo',
               label: 'Qwen Turbo',
               authType: AuthType.USE_OPENAI,
             },
@@ -553,7 +557,7 @@ describe('modelCommand', () => {
       services: {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
-            model: 'qwen-plus',
+            model: 'hopcode-plus',
             authType: AuthType.USE_OPENAI,
           }),
           getAvailableModelsForAuthType: vi
@@ -591,10 +595,10 @@ describe('modelCommand', () => {
         services: {
           config: {
             getContentGeneratorConfig: vi.fn().mockReturnValue({
-              model: 'qwen-max',
+              model: 'hopcode-max',
               authType: AuthType.HOPCODE_OAUTH,
             }),
-            getModel: vi.fn().mockReturnValue('qwen-max'),
+            getModel: vi.fn().mockReturnValue('hopcode-max'),
           },
         },
       });
@@ -604,7 +608,7 @@ describe('modelCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: expect.stringContaining('qwen-max'),
+        content: expect.stringContaining('hopcode-max'),
       });
       expect((result as { type: string }).type).toBe('message');
     });
@@ -616,13 +620,13 @@ describe('modelCommand', () => {
         services: {
           config: {
             getContentGeneratorConfig: vi.fn().mockReturnValue({
-              model: 'qwen-max',
+              model: 'hopcode-max',
               authType: AuthType.HOPCODE_OAUTH,
             }),
-            getModel: vi.fn().mockReturnValue('qwen-max'),
+            getModel: vi.fn().mockReturnValue('hopcode-max'),
           },
           settings: {
-            merged: { fastModel: 'qwen-turbo' } as Record<string, unknown>,
+            merged: { fastModel: 'hopcode-turbo' } as Record<string, unknown>,
           },
         },
       });
@@ -632,7 +636,7 @@ describe('modelCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: expect.stringContaining('qwen-turbo'),
+        content: expect.stringContaining('hopcode-turbo'),
       });
     });
   });

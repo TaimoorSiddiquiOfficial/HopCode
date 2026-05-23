@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -179,7 +179,7 @@ describe('systemInfo', () => {
     });
 
     it('should handle legacy qwen- prefix removal', () => {
-      process.env['SANDBOX'] = 'qwen-custom-sandbox';
+      process.env['SANDBOX'] = 'hopcode-custom-sandbox';
       expect(getSandboxEnv(true)).toBe('custom-sandbox');
     });
   });

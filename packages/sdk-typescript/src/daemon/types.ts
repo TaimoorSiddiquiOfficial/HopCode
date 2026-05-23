@@ -39,7 +39,7 @@ export interface DaemonCapabilities {
    * extension to v=1 envelopes (added by #3803 §02). Daemons
    * predating §02 still announce `v: 1` but omit this field; the
    * protocol's "bump v only on incompatible frame changes" stance
-   * (see `qwen-serve-protocol.md`) makes additive optionality the
+   * (see `hopcode-serve-protocol.md`) makes additive optionality the
    * correct shape. All post-§02 daemons populate it.
    *
    * **SDK consumers**: if you need the value as a non-undefined

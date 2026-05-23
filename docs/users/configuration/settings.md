@@ -599,7 +599,7 @@ file wins: `<HOPCODE_HOME>/.env` (or `~/.hopcode/.env` when `HOPCODE_HOME` is un
 loaded before `~/.env`, and existing environment values are not overwritten.
 
 When both user-level `.env` files define the same variable, the Qwen-specific
-file wins: `<QWEN_HOME>/.env` (or `~/.qwen/.env` when `QWEN_HOME` is unset) is
+file wins: `<HOPCODE_HOME>/.env` (or `~/.hopcode/.env` when `HOPCODE_HOME` is unset) is
 loaded before `~/.env`, and existing environment values are not overwritten.
 
 ## Command-Line Arguments

@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-dingtalk",
-  "version": "0.27.10",
+  "version": "0.27.11",
   "description": "DingTalk channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",

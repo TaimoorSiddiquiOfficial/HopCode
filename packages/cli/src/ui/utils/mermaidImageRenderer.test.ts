@@ -121,7 +121,9 @@ describe('mermaid image renderer', () => {
   });
 
   it('does not auto-discover repo-local renderers from the current working directory', () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-local-mmdc-'));
+    const tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'hopcode-local-mmdc-'),
+    );
     tempDirs.push(tempDir);
     const binDir = path.join(tempDir, 'node_modules', '.bin');
     fs.mkdirSync(binDir, { recursive: true });
@@ -153,7 +155,9 @@ describe('mermaid image renderer', () => {
   });
 
   it('does not auto-discover node_modules renderers from PATH without opt-in', () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-path-mmdc-'));
+    const tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'hopcode-path-mmdc-'),
+    );
     tempDirs.push(tempDir);
     const binDir = path.join(
       tempDir,
@@ -255,7 +259,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('renders Mermaid through mmdc when terminal images are available', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
 
@@ -278,7 +282,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('renders Mermaid through Kitty asynchronously for interactive UI callers', async () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
 
@@ -298,7 +302,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('does not render iTerm2 images asynchronously because placement is cursor-bound', async () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
 
@@ -318,7 +322,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('honors the configured terminal cell aspect ratio when fitting images', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
 
@@ -338,7 +342,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('falls back to the default render timeout when configured timeout is invalid', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
 
@@ -359,7 +363,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('renders Mermaid through chafa when terminal images are unavailable', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-chafa-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-chafa-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
     createFakeChafa(binDir);
@@ -383,7 +387,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('honors the Mermaid image disable flag over chafa fallback rendering', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-chafa-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-chafa-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
     createFakeChafa(binDir);
@@ -407,7 +411,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('honors the Mermaid image disable flag in async rendering', async () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-chafa-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-chafa-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
     createFakeChafa(binDir);
@@ -431,7 +435,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('does not forward API credentials to external renderers', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-env-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-env-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir, [
       'const fs = require("node:fs");',
@@ -462,7 +466,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('renders Mermaid through chafa asynchronously for interactive UI callers', async () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-chafa-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-chafa-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
     createFakeChafa(binDir);
@@ -486,7 +490,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('bounds retained renderer output from async command failures', async () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-chafa-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-chafa-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
     createFakeChafa(binDir, [
@@ -514,7 +518,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('bounds retained renderer output across many async stderr chunks', async () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-chafa-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-chafa-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
     createFakeChafa(binDir, [
@@ -550,7 +554,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('cancels async Mermaid CLI rendering when the caller aborts', async () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir, ['setTimeout(() => {}, 60_000);']);
 
@@ -591,7 +595,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('renders Kitty terminal images as virtual placements', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir);
 
@@ -618,7 +622,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('rejects oversized Mermaid PNG output before reading it', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     createFakeMmdc(binDir, [
       'const fs = require("node:fs");',
@@ -645,7 +649,7 @@ describe('mermaid image renderer', () => {
   });
 
   it('evicts Mermaid image caches by retained byte size', () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-mmdc-'));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-mmdc-'));
     tempDirs.push(binDir);
     const countPath = path.join(binDir, 'count.txt');
     createFakeMmdc(binDir, [

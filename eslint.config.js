@@ -35,7 +35,7 @@ export default tseslint.config(
       'rebrand_cherry*.mjs',
       'resolve_*.mjs',
       'fix_*.mjs',
-      'inspect_qwen*.mjs',
+      'inspect_hopcode*.mjs',
     ],
   },
   eslint.configs.recommended,

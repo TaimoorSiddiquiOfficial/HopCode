@@ -2351,7 +2351,7 @@ describe('Model Switching and Config Updates', () => {
 
     // Switch to a different model with different token limits
     const newConfig: ContentGeneratorConfig = {
-      ['model']: 'qwen-max',
+      ['model']: 'hopcode-max',
       ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,
@@ -2381,7 +2381,7 @@ describe('Model Switching and Config Updates', () => {
 
     // Verify all fields are updated
     const updatedConfig = config.getContentGeneratorConfig();
-    expect(updatedConfig['model']).toBe('qwen-max');
+    expect(updatedConfig['model']).toBe('hopcode-max');
     expect(updatedConfig['contextWindowSize']).toBe(128_000);
     expect(updatedConfig['samplingParams']?.temperature).toBe(0.8);
     expect(updatedConfig['enableCacheControl']).toBe(false);
@@ -2468,7 +2468,7 @@ describe('Model Switching and Config Updates', () => {
 
     // Switch to model with defined limits
     const newConfig: ContentGeneratorConfig = {
-      ['model']: 'qwen-max',
+      ['model']: 'hopcode-max',
       ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,

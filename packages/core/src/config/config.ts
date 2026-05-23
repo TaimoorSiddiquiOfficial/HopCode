@@ -131,7 +131,7 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
-import { Storage } from './storage.js';
+import { Storage, HOPCODE_DIR } from './storage.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
   clearRuntimeStatus,
@@ -195,7 +195,7 @@ export interface ChatCompressionSettings {
    * apportioning chars across history in `findCompressSplitPoint`.
    * Also used as the placeholder budget when stripping inline media
    * out of the side-query compaction prompt. Default 1600.
-   * Env override: `QWEN_IMAGE_TOKEN_ESTIMATE`.
+   * Env override: `HOPCODE_IMAGE_TOKEN_ESTIMATE` (falls back to `QWEN_IMAGE_TOKEN_ESTIMATE` for backward compat).
    */
   imageTokenEstimate?: number;
 }
@@ -1274,20 +1274,20 @@ export class Config {
     // directory the worktree creators (`enter_worktree` and
     // `agent isolation:'worktree'`) write to. Using `this.targetDir`
     // directly would cause launches from a monorepo subdirectory to
-    // scan `<subdir>/.qwen/worktrees/` — which never exists — and the
+    // scan `<subdir>/.hopcode/worktrees/` — which never exists — and the
     // sweep would silently be a no-op forever.
     if (!this.getBareMode()) {
       void (async () => {
         try {
           // Resolve the repo top-level FIRST. The previous code bailed
-          // on `fs.access(<targetDir>/.qwen/worktrees)` before resolving,
+          // on `fs.access(<targetDir>/.hopcode/worktrees)` before resolving,
           // so a monorepo subdir launch (where `targetDir` is the
           // subdir, not the repo root) always early-returned and the
           // sweep was permanently a no-op. Fast-bail still happens, just
           // against the *correct* directory.
           const probe = new GitWorktreeService(this.targetDir);
           const root = (await probe.getRepoTopLevel()) ?? this.targetDir;
-          const worktreesDir = path.join(root, '.qwen', 'worktrees');
+          const worktreesDir = path.join(root, HOPCODE_DIR, 'worktrees');
           try {
             await fsPromises.access(worktreesDir);
           } catch {

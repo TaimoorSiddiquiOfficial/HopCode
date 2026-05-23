@@ -27,7 +27,7 @@ export class OverlayFs {
     const id = randomUUID().slice(0, 8);
     this.overlayDir = join(
       tmpdir(),
-      'qwen-speculation',
+      'hopcode-speculation',
       String(process.pid),
       id,
     );
@@ -74,10 +74,10 @@ export class OverlayFs {
       try {
         await copyFile(originalPath, overlayPath);
       } catch {
-        // Original may be a directory or unreadable — proceed without copy
+        // Original may be a directory or unreadable ï¿½ proceed without copy
       }
     }
-    // For new files: the overlay path is created but empty — the tool will write to it
+    // For new files: the overlay path is created but empty ï¿½ the tool will write to it
 
     this.writtenFiles.set(rel, overlayPath);
     return overlayPath;
@@ -104,7 +104,7 @@ export class OverlayFs {
         await copyFile(overlayPath, realPath);
         applied.push(realPath);
       } catch {
-        // Best-effort — ignore errors and continue
+        // Best-effort ï¿½ ignore errors and continue
       }
     }
 

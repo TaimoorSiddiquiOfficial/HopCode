@@ -77,7 +77,7 @@ describe('ShellTool', () => {
         getUserSkillsDirs: vi
           .fn()
           .mockReturnValue(['/test/dir/.hopcode/skills']),
-        getProjectTempDir: vi.fn().mockReturnValue('/tmp/qwen-temp'),
+        getProjectTempDir: vi.fn().mockReturnValue('/tmp/hopcode-temp'),
         getProjectDir: vi.fn().mockReturnValue('/test/proj'),
       },
       getTruncateToolOutputThreshold: vi.fn().mockReturnValue(0),
@@ -1408,7 +1408,7 @@ describe('ShellTool', () => {
           .mockResolvedValue({
             content:
               'Tool output was too large and has been truncated.\n[mocked truncated body]',
-            outputFile: '/tmp/qwen-temp/shell_mocked.output',
+            outputFile: '/tmp/hopcode-temp/shell_mocked.output',
           });
 
         try {

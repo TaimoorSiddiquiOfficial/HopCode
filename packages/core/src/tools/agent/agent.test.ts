@@ -360,7 +360,7 @@ describe('AgentTool', () => {
       const os = await import('node:os');
       const { execFileSync } = await import('node:child_process');
       const repo = await fs.mkdtemp(
-        pathMod.join(os.tmpdir(), 'qwen-iso-dirty-'),
+        pathMod.join(os.tmpdir(), 'hopcode-iso-dirty-'),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -401,7 +401,7 @@ describe('AgentTool', () => {
       const os = await import('node:os');
       const { execFileSync } = await import('node:child_process');
       const repo = await fs.mkdtemp(
-        pathMod.join(os.tmpdir(), 'qwen-iso-clean-'),
+        pathMod.join(os.tmpdir(), 'hopcode-iso-clean-'),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1779,7 +1779,7 @@ describe('AgentTool', () => {
         'getBackgroundTaskRegistry'
       ] = vi.fn().mockReturnValue(mockRegistry);
       (config as unknown as Record<string, unknown>)['storage'] = {
-        getProjectDir: () => '/tmp/qwen-test',
+        getProjectDir: () => '/tmp/hopcode-test',
       };
       (mockAgent as unknown as Record<string, unknown>)[
         'setExternalMessageProvider'
@@ -1966,7 +1966,7 @@ describe('AgentTool', () => {
       ).createInvocation(params);
       await invocation.execute();
       const expectedTranscriptPrefix = path.join(
-        '/tmp/qwen-test',
+        '/tmp/hopcode-test',
         'subagents',
         'test-session-id',
         'agent-monitor-',

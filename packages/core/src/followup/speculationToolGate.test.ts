@@ -164,7 +164,7 @@ describe('speculationToolGate', () => {
       await rewritePathArgs(args, overlayFs);
 
       expect(args['file_path']).not.toBe(filePath);
-      expect(String(args['file_path'])).toContain('qwen-speculation');
+      expect(String(args['file_path'])).toContain('hopcode-speculation');
     });
 
     it('rewrites filePath argument (camelCase)', async () => {
@@ -192,7 +192,7 @@ describe('speculationToolGate', () => {
       const args: Record<string, unknown> = { path: filePath };
       await rewritePathArgs(args, overlayFs);
 
-      expect(String(args['path'])).toContain('qwen-speculation');
+      expect(String(args['path'])).toContain('hopcode-speculation');
     });
   });
 
@@ -205,7 +205,7 @@ describe('speculationToolGate', () => {
       // First: redirect a write (puts file in overlay)
       await overlayFs.redirectWrite(filePath);
 
-      // Then: evaluate a read tool — path should be resolved to overlay
+      // Then: evaluate a read tool ï¿½ path should be resolved to overlay
       const args: Record<string, unknown> = { file_path: filePath };
       const result = await evaluateToolCall(
         ToolNames.READ_FILE,
@@ -216,7 +216,7 @@ describe('speculationToolGate', () => {
 
       expect(result.action).toBe('allow');
       // The file_path arg should now point to the overlay
-      expect(String(args['file_path'])).toContain('qwen-speculation');
+      expect(String(args['file_path'])).toContain('hopcode-speculation');
       expect(String(args['file_path'])).not.toBe(filePath);
     });
 

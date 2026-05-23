@@ -427,7 +427,7 @@ describe('GitWorktreeService', () => {
       return {
         id: `${sessionId}/${name}`,
         name,
-        path: `/mock-qwen/worktrees/${sessionId}/worktrees/${name}`,
+        path: `/mock-hopcode/worktrees/${sessionId}/worktrees/${name}`,
         branch: `worktrees/${sessionId}/${name}`,
         isActive: true,
         createdAt: 1,

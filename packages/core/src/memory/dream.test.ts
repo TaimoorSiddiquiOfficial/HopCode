@@ -31,7 +31,7 @@ describe('managed auto-memory dream', () => {
     vi.mocked(planManagedAutoMemoryDreamByAgent).mockReset();
     mockConfig = {
       getSessionId: vi.fn().mockReturnValue('session-1'),
-      getModel: vi.fn().mockReturnValue('qwen-test'),
+      getModel: vi.fn().mockReturnValue('hopcode-test'),
       getApprovalMode: vi.fn(),
     } as unknown as Config;
   });

@@ -53,12 +53,12 @@ export function bootstrapHomeEnv() {
   if (process.env.HOPCODE_HOME && process.env.HOPCODE_RUNTIME_DIR) {
     return;
   }
-  const initialHopCodeHome = process.env.HOPCODE_HOME;
-  const initialHopCodeDir = initialHopCodeHome
-    ? resolvePath(initialHopCodeHome)
+  const initialHopcodeHome = process.env.HOPCODE_HOME ?? process.env.QWEN_HOME;
+  const initialHopcodeDir = initialHopcodeHome
+    ? resolvePath(initialHopcodeHome)
     : path.join(os.homedir(), '.hopcode');
-  const candidates = [path.join(initialHopCodeDir, '.env')];
-  if (!initialHopCodeHome) {
+  const candidates = [path.join(initialHopcodeDir, '.env')];
+  if (!initialHopcodeHome) {
     candidates.push(path.join(os.homedir(), '.env'));
   }
   for (const candidate of candidates) {
@@ -68,10 +68,10 @@ export function bootstrapHomeEnv() {
   // If HOPCODE_HOME was just discovered, also read <new HOPCODE_HOME>/.env so
   // HOPCODE_RUNTIME_DIR can be sourced from there (mirrors the VS Code
   // companion's bootstrapHomeEnvOverrides).
-  const discoveredHopCodeHome = process.env.HOPCODE_HOME;
-  if (discoveredHopCodeHome && discoveredHopCodeHome !== initialHopCodeHome) {
-    const discoveredDir = resolvePath(discoveredHopCodeHome);
-    if (discoveredDir !== initialHopCodeDir) {
+  const discoveredHopcodeHome = process.env.HOPCODE_HOME;
+  if (discoveredHopcodeHome && discoveredHopcodeHome !== initialHopcodeHome) {
+    const discoveredDir = resolvePath(discoveredHopcodeHome);
+    if (discoveredDir !== initialHopcodeDir) {
       readEnvInto(path.join(discoveredDir, '.env'));
     }
   }
@@ -83,7 +83,12 @@ function readEnvInto(file) {
   }
   try {
     const parsed = dotenv.parse(readFileSync(file, 'utf-8'));
-    for (const key of ['HOPCODE_HOME', 'HOPCODE_RUNTIME_DIR']) {
+    for (const key of [
+      'HOPCODE_HOME',
+      'HOPCODE_RUNTIME_DIR',
+      'QWEN_HOME',
+      'QWEN_RUNTIME_DIR',
+    ]) {
       if (parsed[key] && !Object.hasOwn(process.env, key)) {
         process.env[key] = parsed[key];
       }

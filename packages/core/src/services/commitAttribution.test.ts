@@ -458,7 +458,8 @@ describe('CommitAttributionService', () => {
       const staged = makeStagedInfo(['f.ts'], { 'f.ts': 10 });
 
       expect(
-        service.generateNotePayload(staged, '/project', 'qwen-72b').generator,
+        service.generateNotePayload(staged, '/project', 'hopcode-72b')
+          .generator,
       ).toBe('HopCode');
       expect(
         service.generateNotePayload(staged, '/project', 'CustomAgent')

@@ -91,7 +91,7 @@ const invokeStartHandler = async (
 
 const mockParsedChannelConfig = {
   cwd: '/tmp/hopcode-channel-test',
-  model: 'qwen-test-model',
+  model: 'hopcode-test-model',
   sessionScope: 'user',
   type: 'telegram',
 };

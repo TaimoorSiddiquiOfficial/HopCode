@@ -107,7 +107,7 @@ describe('defaultModalities', () => {
 
   describe('Qwen', () => {
     it('returns image + video for qwen-vl-max', () => {
-      const m = defaultModalities('qwen-vl-max');
+      const m = defaultModalities('hopcode-vl-max');
       expect(m.image).toBe(true);
       expect(m.video).toBe(true);
       expect(m.pdf).toBeUndefined();
@@ -148,7 +148,7 @@ describe('defaultModalities', () => {
     });
 
     it('returns text-only for qwen-turbo', () => {
-      expect(defaultModalities('qwen-turbo')).toEqual({});
+      expect(defaultModalities('hopcode-turbo')).toEqual({});
     });
   });
 

@@ -138,7 +138,7 @@ Note that we create a copy of the installed extension, so you will need to run `
 To uninstall, run `hopcode extensions uninstall extension-name`, so, in the case of the install example:
 
 ```
-hopcode extensions uninstall qwen-cli-security
+hopcode extensions uninstall hopcode-cli-security
 ```
 
 ### Disabling an extension

@@ -35,11 +35,11 @@ describe('CacheSafeParams', () => {
         tools: [{ functionDeclarations: [] }],
       };
 
-      saveCacheSafeParams(config, [], 'qwen-max');
+      saveCacheSafeParams(config, [], 'hopcode-max');
 
       const params = getCacheSafeParams();
       expect(params).not.toBeNull();
-      expect(params!.model).toBe('qwen-max');
+      expect(params!.model).toBe('hopcode-max');
       expect(params!.history).toEqual([]);
       expect(params!.version).toBeGreaterThan(0);
     });

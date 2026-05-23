@@ -1400,7 +1400,7 @@ describe('mergeExcludeTools', () => {
   });
 
   it('should not auto-disable tool_search for non-deepseek models', async () => {
-    process.argv = ['node', 'script.js', '--model', 'qwen-max'];
+    process.argv = ['node', 'script.js', '--model', 'hopcode-max'];
     const argv = await parseArguments();
     const settings: Settings = {};
     const config = await loadCliConfig(settings, argv, undefined, []);

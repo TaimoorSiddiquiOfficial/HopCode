@@ -67,7 +67,7 @@ Command hooks execute commands via child processes. Input JSON is passed through
         "hooks": [
           {
             "type": "command",
-            "command": "$QWEN_PROJECT_DIR/.qwen/hooks/security-check.sh",
+            "command": "$HOPCODE_PROJECT_DIR/.hopcode/hooks/security-check.sh",
             "name": "security-check",
             "timeout": 10000
           }
@@ -811,7 +811,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.qwen/hooks/todo-validator.sh
+# ~/.hopcode/hooks/todo-validator.sh
 # Validates todo content before creation
 
 INPUT=$(cat)
@@ -843,7 +843,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.qwen/hooks/todo-validator.sh",
+            "command": "$HOME/.hopcode/hooks/todo-validator.sh",
             "name": "todo-validator",
             "timeout": 5000
           }
@@ -908,7 +908,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.qwen/hooks/todo-completion-validator.sh
+# ~/.hopcode/hooks/todo-completion-validator.sh
 # Validates todo completion conditions
 
 INPUT=$(cat)
@@ -937,7 +937,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.qwen/hooks/todo-completion-validator.sh",
+            "command": "$HOME/.hopcode/hooks/todo-completion-validator.sh",
             "name": "completion-validator",
             "timeout": 5000
           }
@@ -957,7 +957,7 @@ exit 0
 
 ## Hook Configuration
 
-Hooks are configured in HopCode settings, typically in `.qwen/settings.json` or user configuration files:
+Hooks are configured in HopCode settings, typically in `.hopcode/settings.json` or user configuration files:
 
 ```json
 {
@@ -1021,7 +1021,7 @@ Only `command` type supports asynchronous execution. Setting `"async": true` run
         "hooks": [
           {
             "type": "command",
-            "command": "$QWEN_PROJECT_DIR/.qwen/hooks/run-tests-async.sh",
+            "command": "$HOPCODE_PROJECT_DIR/.hopcode/hooks/run-tests-async.sh",
             "async": true,
             "timeout": 300000
           }
@@ -1096,7 +1096,7 @@ echo '{
 exit 0
 ```
 
-Configure in `.qwen/settings.json`:
+Configure in `.hopcode/settings.json`:
 
 ```json
 {

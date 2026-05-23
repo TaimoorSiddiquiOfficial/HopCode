@@ -957,7 +957,7 @@ function sendBridgeError(
     // (`req.workspaceCwd` → `canonicalizeWorkspace` → here). `path.resolve`
     // + `realpathSync.native` both preserve control characters inside
     // path segments — they only normalize separators / `..` / `.` and
-    // walk symlinks. A body like `{"cwd": "/legit/path\nqwen serve:
+    // walk symlinks. A body like `{"cwd": "/legit/path\nhopcode serve:
     // FAKE LOG LINE"}` would otherwise emit two valid-looking daemon
     // log lines, weaponizing line-based log shippers (Splunk / Loki /
     // journald → SIEM). `JSON.stringify` escapes control chars and
@@ -967,7 +967,7 @@ function sendBridgeError(
     // `--workspace` / `process.cwd()`) but quoted symmetrically for
     // readability.
     writeStderrLine(
-      `qwen serve: workspace_mismatch (POST /session): ` +
+      `hopcode serve: workspace_mismatch (POST /session): ` +
         `daemon bound to ${JSON.stringify(err.bound)}, ` +
         `rejected ${JSON.stringify(err.requested)}`,
     );

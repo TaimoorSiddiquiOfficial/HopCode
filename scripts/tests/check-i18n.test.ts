@@ -40,7 +40,7 @@ function makeFixture(): {
   localesDir: string;
   sourceDir: string;
 } {
-  const root = mkdtempSync(path.join(tmpdir(), 'qwen-check-i18n-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'hopcode-check-i18n-'));
   tempDirs.push(root);
 
   const localesDir = path.join(root, 'locales');

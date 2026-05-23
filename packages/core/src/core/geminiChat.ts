@@ -338,8 +338,8 @@ export class InvalidStreamError extends Error {
  * The session maintains all the turns between user and model.
  */
 const SESSION_START_CONTEXT_SENTINEL_START =
-  '<qwen:session-start-context hidden="true">';
-const SESSION_START_CONTEXT_SENTINEL_END = '</qwen:session-start-context>';
+  '<hopcode:session-start-context hidden="true">';
+const SESSION_START_CONTEXT_SENTINEL_END = '</hopcode:session-start-context>';
 const SESSION_START_CONTEXT_HEADER = 'SessionStart additional context';
 
 function buildSessionStartContextBlock(extraInstruction: string): string {

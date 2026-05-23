@@ -157,7 +157,7 @@ const distPackageJson = {
   bin: {
     hopcode: 'cli.js',
     // Optional temporary compatibility alias:
-    // qwen: 'cli.js',
+    // hopcode: 'cli.js',
   },
   files: [
     'cli.js',

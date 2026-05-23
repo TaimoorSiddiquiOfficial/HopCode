@@ -458,7 +458,7 @@ describe('<StatsDisplay />', () => {
       const metrics: SessionMetrics = {
         models: {
           'glm-5': mainOnly(coreMetrics(2, 200)),
-          'qwen-plus': {
+          'hopcode-plus': {
             api: { totalRequests: 1, totalErrors: 0, totalLatencyMs: 100 },
             tokens: {
               prompt: 40,
@@ -480,7 +480,7 @@ describe('<StatsDisplay />', () => {
       const output = lastFrame();
 
       expect(output).toContain('glm-5 (main)');
-      expect(output).toContain('qwen-plus (researcher)');
+      expect(output).toContain('hopcode-plus (researcher)');
       // The bare `glm-5` label (not followed by a space + `(`) must not appear
       // as a row label in this session.
       expect(output).not.toMatch(/glm-5\s{2,}/);

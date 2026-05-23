@@ -811,14 +811,17 @@ describe('Logger', () => {
     it('only undoes USER entries (model_switch is left intact)', async () => {
       await logger.logMessage(MessageSenderType.USER, 'real prompt');
       vi.advanceTimersByTime(1000);
-      await logger.logMessage(MessageSenderType.MODEL_SWITCH, 'qwen→qwen-max');
+      await logger.logMessage(
+        MessageSenderType.MODEL_SWITCH,
+        'hopcode→hopcode-max',
+      );
 
       // The model-switch write does NOT update lastLoggedUserEntry, so undo
       // still targets the earlier USER row.
       const removed = await logger.removeLastUserMessage();
       expect(removed).toBe(true);
       const onDisk = await readLogFile();
-      expect(onDisk.map((e) => e.message)).toEqual(['qwen→qwen-max']);
+      expect(onDisk.map((e) => e.message)).toEqual(['hopcode→hopcode-max']);
     });
 
     it('returns false when the tracked entry is no longer on disk', async () => {
@@ -962,7 +965,10 @@ describe('Logger', () => {
       expect(trackedAfterUser).not.toBeNull();
 
       vi.spyOn(fs, 'writeFile').mockRejectedValueOnce(new Error('Disk full'));
-      await logger.logMessage(MessageSenderType.MODEL_SWITCH, 'qwen→qwen-max');
+      await logger.logMessage(
+        MessageSenderType.MODEL_SWITCH,
+        'hopcode→hopcode-max',
+      );
 
       // Tracker is unchanged — the non-USER failure didn't shift which
       // row was the most recent user prompt.
