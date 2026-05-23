@@ -21,9 +21,7 @@ import {
   FatalInputError,
   ApprovalMode,
   SendMessageType,
-  ToolNames,
 } from '@hoptrendy/hopcode-core';
-import type { JsonOutputAdapterInterface } from './nonInteractive/io/BaseJsonOutputAdapter.js';
 import type { Part } from '@google/genai';
 import { runNonInteractive } from './nonInteractiveCli.js';
 import { vi, type Mock, type MockInstance } from 'vitest';

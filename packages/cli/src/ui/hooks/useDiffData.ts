@@ -5,11 +5,11 @@
  */
 
 import { useEffect, useState } from 'react';
-import type { GitDiffHunk } from '@hoptrendy/hopcode-core';
 import {
   createDebugLogger,
   fetchGitDiff,
   fetchGitDiffHunks,
+  type GitDiffHunk,
   type GitDiffResult,
 } from '@hoptrendy/hopcode-core';
 

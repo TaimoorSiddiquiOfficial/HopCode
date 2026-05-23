@@ -51,8 +51,8 @@ function getRuntimeBaseDir() {
   return path.join(os.homedir(), '.qwen');
 }
 
-// Project-level .qwen directory in the workspace
-const WORKSPACE_QWEN_DIR = path.join(projectRoot, '.qwen');
+// Project-level .hopcode directory in the workspace
+const WORKSPACE_HOPCODE_DIR = path.join(projectRoot, '.hopcode');
 
 // Telemetry artifacts are stored in a hashed directory under the runtime dir
 export const OTEL_DIR = path.join(

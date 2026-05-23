@@ -18,7 +18,6 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Content, GenerateContentResponse, Part } from '@google/genai';
-import { SpanStatusCode } from '@opentelemetry/api';
 import { GeminiClient, SendMessageType } from './client.js';
 import { findCompressSplitPoint } from '../services/chatCompressionService.js';
 import { getRecentGitStatus } from '../utils/gitUtils.js';

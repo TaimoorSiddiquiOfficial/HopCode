@@ -6,9 +6,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Text } from 'ink';
-import type { GitDiffHunk } from '@hoptrendy/hopcode-core';
 import type {
   FileHistoryService,
+  GitDiffHunk,
   GitDiffResult,
   PerFileStats,
   TurnDiff,

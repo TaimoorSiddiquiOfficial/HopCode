@@ -112,6 +112,10 @@ if (cliPackageJson.config?.sandboxImageUri) {
 run(
   'npm install --workspace packages/cli --workspace packages/core --workspace packages/channels/base --workspace packages/channels/plugin-example --package-lock-only --ignore-scripts',
 );
+const exportHtmlPackageJsonPath = resolve(
+  process.cwd(),
+  'packages/web-templates/src/export-html/package.json',
+);
 const exportHtmlPackageJson = readJson(exportHtmlPackageJsonPath);
 if (exportHtmlPackageJson.dependencies?.['@hoptrendy/webui']) {
   exportHtmlPackageJson.dependencies['@hoptrendy/webui'] = `^${newVersion}`;
