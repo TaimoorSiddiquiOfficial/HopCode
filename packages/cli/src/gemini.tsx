@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -16,6 +16,7 @@ import {
   setStartupEventSink,
   type Config,
   createDebugLogger,
+  writeRuntimeStatus,
 } from '@hoptrendy/hopcode-core';
 import { render } from 'ink';
 import dns from 'node:dns';
@@ -220,6 +221,27 @@ export async function startInteractiveUI(
 ) {
   const version = await getCliVersion();
   setWindowTitle(basename(workspaceRoot), settings);
+
+  // Write a small runtime.json sidecar next to the chat log so external
+  // tools (terminal multiplexers, IDE integrations, status daemons) can
+  // map the running PID back to its session id and work directory.
+  // Best-effort: a read-only filesystem must not prevent the UI from
+  // starting up. Marking the runtime status as enabled is what arms the
+  // session-swap refresh in `Config.refreshSessionId()` — without this
+  // call, the sidecar would never update on `/clear` or `/resume`.
+  try {
+    const sessionId = config.getSessionId();
+    const runtimeStatusPath = config.storage.getRuntimeStatusPath(sessionId);
+    await writeRuntimeStatus(runtimeStatusPath, {
+      sessionId,
+      workDir: config.getTargetDir(),
+      qwenVersion: version,
+    });
+    config.markRuntimeStatusEnabled();
+  } catch {
+    // ignored: best-effort, never block UI startup.
+  }
+
   const restoreTerminalRedrawOptimizer =
     process.stdout.isTTY && !config.getScreenReader()
       ? installTerminalRedrawOptimizer(process.stdout)
@@ -371,7 +393,7 @@ export async function main() {
   profileCheckpoint('main_entry');
   // Bridge core-package startup events (Config.initialize, MCP discovery,
   // GeminiClient.setTools) into the cli's startup profiler. Gated on
-  // `isStartupProfilerEnabled()` so that when HOPCODE_PROFILE_STARTUP is
+  // `isStartupProfilerEnabled()` so that when QWEN_CODE_PROFILE_STARTUP is
   // unset (the common case) every core-side `recordStartupEvent()` call
   // sees a null sink and short-circuits at the first comparison, instead
   // of going through this arrow wrapper and the profiler's own enabled
@@ -760,7 +782,7 @@ export async function main() {
       // runNonInteractive's main/drain loops. In TUI mode the same call
       // would just emit "Structured output accepted." and keep the chat
       // alive, which silently strands the user's run. Parse-time gating
-      // can't catch this case (`hopcode --json-schema '...'` on a TTY with
+      // can't catch this case (`qwen --json-schema '...'` on a TTY with
       // no prompt routes to interactive only after stdin TTY detection),
       // so reject here before the UI launches.
       if (config.getJsonSchema?.()) {
@@ -848,7 +870,7 @@ export async function main() {
         writeStderrLine(
           `Warning: MCP server(s) failed to start: ${failedMcpServers.join(', ')}. ` +
             `Continuing with built-in tools and any servers that did connect. ` +
-            `Re-run with HOPCODE_DEBUG=1 to see per-server reasons.`,
+            `Re-run with QWEN_CODE_DEBUG=1 to see per-server reasons.`,
         );
       }
       // Finalize the non-interactive startup profile here so MCP events
@@ -881,7 +903,7 @@ export async function main() {
       settings,
     );
 
-    const prompt_id = Math.random().toString(16).slice(2);
+    const prompt_id = createNonInteractivePromptId(config.getSessionId());
 
     if (inputFormat === InputFormat.STREAM_JSON) {
       const trimmedInput = (input ?? '').trim();
@@ -892,9 +914,15 @@ export async function main() {
         settings,
       );
       await runExitCleanup();
-      // Honor any exitCode set by the run (e.g. --json-schema plain-text
-      // path sets it to 1). Hardcoding 0 here would silently mask non-zero
-      // shell exits so the caller can't detect failures.
+      // `runNonInteractiveStreamJson` doesn't return an explicit exit
+      // code yet, so a cleanup task that mutates `process.exitCode`
+      // could clobber a non-zero failure signal. This is currently safe
+      // because `--json-schema` is rejected at parse time when combined
+      // with `--input-format stream-json` (see the yargs `.check` in
+      // resolveCliGenerationConfig), so structured-output failures
+      // never reach this branch. If a future stream-json equivalent of
+      // structured output is added, plumb the exit code through the
+      // function's return value the way `runNonInteractive` below does.
       process.exit(process.exitCode ?? 0);
     }
 
@@ -916,14 +944,24 @@ export async function main() {
 
     debugLogger.debug(`Session ID: ${config.getSessionId()}`);
 
-    await runNonInteractive(nonInteractiveConfig, settings, input, prompt_id);
-    // Call cleanup before process.exit, which causes cleanup to not run
+    const exitCode = await runNonInteractive(
+      nonInteractiveConfig,
+      settings,
+      input,
+      prompt_id,
+    );
+    // Call cleanup before process.exit, which causes cleanup to not run.
+    // Capture the exit code BEFORE cleanup so any cleanup task that
+    // mutates process.exitCode can't silently turn a structured-output
+    // failure (or other explicit non-zero return from runNonInteractive)
+    // into a zero exit.
     await runExitCleanup();
-    // Honor any exitCode set by the run (e.g. --json-schema plain-text
-    // path sets it to 1). Hardcoding 0 here would silently mask non-zero
-    // shell exits so the caller can't detect failures.
-    process.exit(process.exitCode ?? 0);
+    process.exit(exitCode);
   }
+}
+
+export function createNonInteractivePromptId(sessionId: string): string {
+  return `${sessionId}########0`;
 }
 
 function setWindowTitle(title: string, settings: LoadedSettings) {

@@ -13,12 +13,12 @@ import {
   findRightGroupOfChatWebview,
 } from '../../utils/editorGroupUtils.js';
 import { ReadonlyFileSystemProvider } from '../../services/readonlyFileSystemProvider.js';
-import { FileDiscoveryService } from '@hoptrendy/hopcode-core/src/services/fileDiscoveryService.js';
 import {
+  crawlCache,
+  FileDiscoveryService,
   FileSearchFactory,
   type FileSearch,
-} from '@hoptrendy/hopcode-core/src/utils/filesearch/fileSearch.js';
-import * as crawlCache from '@hoptrendy/hopcode-core/src/utils/filesearch/crawlCache.js';
+} from '@hoptrendy/hopcode-core';
 import { getErrorMessage } from '../../utils/errorMessage.js';
 
 /**

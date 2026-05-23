@@ -83,6 +83,28 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 // resolved from `~/.env` after module load.
 const USER_SETTINGS_PATH = getUserSettingsPath();
 
+const mockDebugLogger = vi.hoisted(() => ({
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+}));
+
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+  return {
+    ...actual,
+    createDebugLogger: () => mockDebugLogger,
+  };
+});
+
+// Resolve the (mocked) user-settings path once at module load. Tests mock
+// `os.homedir`, so the value is stable across the suite. Production callers
+// must keep going through `getUserSettingsPath()` to pick up `QWEN_HOME`
+// resolved from `~/.env` after module load.
+const USER_SETTINGS_PATH = getUserSettingsPath();
+
 const MOCK_WORKSPACE_DIR = '/mock/workspace';
 // Use the (mocked) SETTINGS_DIRECTORY_NAME for consistency
 const MOCK_WORKSPACE_SETTINGS_PATH = pathActual.join(
@@ -2967,17 +2989,17 @@ describe('Settings Loading and Merging', () => {
         expect(process.env['MULTI_VAR_C']).toEqual('value_c');
       });
 
-      it('should never set HOPCODE_HOME or HOPCODE_RUNTIME_DIR from settings.env', () => {
+      it('should never set QWEN_HOME or QWEN_RUNTIME_DIR from settings.env', () => {
         // Storage-routing vars must not come from settings.json — even at
         // user scope — because a workspace settings.json could otherwise
         // redirect global state after the path bootstrap has run.
-        delete process.env['HOPCODE_HOME'];
-        delete process.env['HOPCODE_RUNTIME_DIR'];
+        delete process.env['QWEN_HOME'];
+        delete process.env['QWEN_RUNTIME_DIR'];
 
         const userSettingsContent: Settings = {
           env: {
-            HOPCODE_HOME: '/redirected/by/settings',
-            HOPCODE_RUNTIME_DIR: '/redirected/runtime',
+            QWEN_HOME: '/redirected/by/settings',
+            QWEN_RUNTIME_DIR: '/redirected/runtime',
             HARMLESS_VAR: 'ok',
           },
         };
@@ -3000,8 +3022,8 @@ describe('Settings Loading and Merging', () => {
 
         loadSettings(MOCK_WORKSPACE_DIR);
 
-        expect(process.env['HOPCODE_HOME']).toBeUndefined();
-        expect(process.env['HOPCODE_RUNTIME_DIR']).toBeUndefined();
+        expect(process.env['QWEN_HOME']).toBeUndefined();
+        expect(process.env['QWEN_RUNTIME_DIR']).toBeUndefined();
         expect(process.env['HARMLESS_VAR']).toEqual('ok');
       });
 
@@ -3087,29 +3109,29 @@ describe('Settings Loading and Merging', () => {
       });
     });
 
-    describe('HOPCODE_HOME custom directory', () => {
-      const originalHopcodeHome = process.env['HOPCODE_HOME'];
+    describe('QWEN_HOME custom directory', () => {
+      const originalQwenHome = process.env['QWEN_HOME'];
 
       beforeEach(() => {
         delete process.env['DEBUG'];
         delete process.env['DEBUG_MODE'];
-        delete process.env['HOPCODE_HOME_TEST_VAR'];
+        delete process.env['QWEN_HOME_TEST_VAR'];
       });
 
       afterEach(() => {
-        if (originalHopcodeHome === undefined) {
-          delete process.env['HOPCODE_HOME'];
+        if (originalQwenHome === undefined) {
+          delete process.env['QWEN_HOME'];
         } else {
-          process.env['HOPCODE_HOME'] = originalHopcodeHome;
+          process.env['QWEN_HOME'] = originalQwenHome;
         }
         delete process.env['DEBUG'];
         delete process.env['DEBUG_MODE'];
-        delete process.env['HOPCODE_HOME_TEST_VAR'];
+        delete process.env['QWEN_HOME_TEST_VAR'];
       });
 
-      it('does not exclude DEBUG/DEBUG_MODE from .env in a HOPCODE_HOME dir not named .hopcode', () => {
-        const customHome = '/tmp/hopcode-home-custom';
-        process.env['HOPCODE_HOME'] = customHome;
+      it('does not exclude DEBUG/DEBUG_MODE from .env in a QWEN_HOME dir not named .qwen', () => {
+        const customHome = '/tmp/qwen-home-custom';
+        process.env['QWEN_HOME'] = customHome;
         const customGlobalEnvPath = path.join(customHome, '.env');
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({
@@ -3123,7 +3145,7 @@ describe('Settings Loading and Merging', () => {
           (p: fs.PathOrFileDescriptor) => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
             if (p === customGlobalEnvPath)
-              return 'DEBUG=true\nDEBUG_MODE=1\nHOPCODE_HOME_TEST_VAR=hello';
+              return 'DEBUG=true\nDEBUG_MODE=1\nQWEN_HOME_TEST_VAR=hello';
             return '{}';
           },
         );
@@ -3131,15 +3153,15 @@ describe('Settings Loading and Merging', () => {
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
         // All three should be set — DEBUG and DEBUG_MODE must NOT be excluded
-        // because the .env lives inside the user-level HOPCODE_HOME directory.
+        // because the .env lives inside the user-level QWEN_HOME directory.
         expect(process.env['DEBUG']).toEqual('true');
         expect(process.env['DEBUG_MODE']).toEqual('1');
-        expect(process.env['HOPCODE_HOME_TEST_VAR']).toEqual('hello');
+        expect(process.env['QWEN_HOME_TEST_VAR']).toEqual('hello');
       });
 
-      it('ignores HOPCODE_HOME and HOPCODE_RUNTIME_DIR set in a project .env', () => {
-        delete process.env['HOPCODE_HOME'];
-        delete process.env['HOPCODE_RUNTIME_DIR'];
+      it('ignores QWEN_HOME and QWEN_RUNTIME_DIR set in a project .env', () => {
+        delete process.env['QWEN_HOME'];
+        delete process.env['QWEN_RUNTIME_DIR'];
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')
@@ -3158,8 +3180,8 @@ describe('Settings Loading and Merging', () => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
             if (p === projectEnvPath)
               return [
-                'HOPCODE_HOME=/tmp/hijack',
-                'HOPCODE_RUNTIME_DIR=/tmp/hijack-runtime',
+                'QWEN_HOME=/tmp/hijack',
+                'QWEN_RUNTIME_DIR=/tmp/hijack-runtime',
                 'OTHER_VAR=ok',
               ].join('\n');
             return '{}';
@@ -3169,8 +3191,8 @@ describe('Settings Loading and Merging', () => {
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
         // A project .env must never redirect global state.
-        expect(process.env['HOPCODE_HOME']).toBeUndefined();
-        expect(process.env['HOPCODE_RUNTIME_DIR']).toBeUndefined();
+        expect(process.env['QWEN_HOME']).toBeUndefined();
+        expect(process.env['QWEN_RUNTIME_DIR']).toBeUndefined();
         // Other vars from the same project .env still load.
         expect(process.env['OTHER_VAR']).toEqual('ok');
 
@@ -3178,47 +3200,42 @@ describe('Settings Loading and Merging', () => {
         cwdSpy.mockRestore();
       });
 
-      it('still honors HOPCODE_HOME from a user-level .env (~/.hopcode/.env)', () => {
-        delete process.env['HOPCODE_HOME'];
+      it('still honors QWEN_HOME from a user-level .env (~/.qwen/.env)', () => {
+        delete process.env['QWEN_HOME'];
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue('/mock/home/user');
-        const userHopcodeEnvPath = path.join(
-          '/mock/home/user',
-          HOPCODE_DIR,
-          '.env',
-        );
+        const userQwenEnvPath = path.join('/mock/home/user', QWEN_DIR, '.env');
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({
           isTrusted: true,
           source: 'file',
         });
         (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-          [USER_SETTINGS_PATH, userHopcodeEnvPath].includes(p.toString()),
+          [USER_SETTINGS_PATH, userQwenEnvPath].includes(p.toString()),
         );
         (fs.readFileSync as Mock).mockImplementation(
           (p: fs.PathOrFileDescriptor) => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
-            if (p === userHopcodeEnvPath)
-              return 'HOPCODE_HOME=/tmp/from-user-env';
+            if (p === userQwenEnvPath) return 'QWEN_HOME=/tmp/from-user-env';
             return '{}';
           },
         );
 
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
-        expect(process.env['HOPCODE_HOME']).toEqual('/tmp/from-user-env');
+        expect(process.env['QWEN_HOME']).toEqual('/tmp/from-user-env');
         cwdSpy.mockRestore();
       });
 
-      it('does not exclude DEBUG/DEBUG_MODE from a workspace .hopcode/.env', () => {
+      it('does not exclude DEBUG/DEBUG_MODE from a workspace .qwen/.env', () => {
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue(MOCK_WORKSPACE_DIR);
-        const workspaceHopcodeEnvPath = path.join(
+        const workspaceQwenEnvPath = path.join(
           MOCK_WORKSPACE_DIR,
-          HOPCODE_DIR,
+          QWEN_DIR,
           '.env',
         );
 
@@ -3227,37 +3244,37 @@ describe('Settings Loading and Merging', () => {
           source: 'file',
         });
         (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-          [USER_SETTINGS_PATH, workspaceHopcodeEnvPath].includes(p.toString()),
+          [USER_SETTINGS_PATH, workspaceQwenEnvPath].includes(p.toString()),
         );
         (fs.readFileSync as Mock).mockImplementation(
           (p: fs.PathOrFileDescriptor) => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
-            if (p === workspaceHopcodeEnvPath)
-              return 'DEBUG=true\nDEBUG_MODE=1\nHOPCODE_HOME_TEST_VAR=hello';
+            if (p === workspaceQwenEnvPath)
+              return 'DEBUG=true\nDEBUG_MODE=1\nQWEN_HOME_TEST_VAR=hello';
             return '{}';
           },
         );
 
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
-        // Per docs, `.hopcode/.env` files are never filtered by excludedEnvVars,
+        // Per docs, `.qwen/.env` files are never filtered by excludedEnvVars,
         // even when nested inside a workspace.
         expect(process.env['DEBUG']).toEqual('true');
         expect(process.env['DEBUG_MODE']).toEqual('1');
-        expect(process.env['HOPCODE_HOME_TEST_VAR']).toEqual('hello');
+        expect(process.env['QWEN_HOME_TEST_VAR']).toEqual('hello');
         cwdSpy.mockRestore();
       });
 
-      it('still blocks HOPCODE_HOME from a workspace .hopcode/.env', () => {
-        delete process.env['HOPCODE_HOME'];
-        delete process.env['HOPCODE_RUNTIME_DIR'];
+      it('still blocks QWEN_HOME from a workspace .qwen/.env', () => {
+        delete process.env['QWEN_HOME'];
+        delete process.env['QWEN_RUNTIME_DIR'];
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue(MOCK_WORKSPACE_DIR);
-        const workspaceHopcodeEnvPath = path.join(
+        const workspaceQwenEnvPath = path.join(
           MOCK_WORKSPACE_DIR,
-          HOPCODE_DIR,
+          QWEN_DIR,
           '.env',
         );
 
@@ -3266,15 +3283,15 @@ describe('Settings Loading and Merging', () => {
           source: 'file',
         });
         (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-          [USER_SETTINGS_PATH, workspaceHopcodeEnvPath].includes(p.toString()),
+          [USER_SETTINGS_PATH, workspaceQwenEnvPath].includes(p.toString()),
         );
         (fs.readFileSync as Mock).mockImplementation(
           (p: fs.PathOrFileDescriptor) => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
-            if (p === workspaceHopcodeEnvPath)
+            if (p === workspaceQwenEnvPath)
               return [
-                'HOPCODE_HOME=/tmp/hijack',
-                'HOPCODE_RUNTIME_DIR=/tmp/hijack-runtime',
+                'QWEN_HOME=/tmp/hijack',
+                'QWEN_RUNTIME_DIR=/tmp/hijack-runtime',
                 'OTHER_VAR=ok',
               ].join('\n');
             return '{}';
@@ -3283,28 +3300,23 @@ describe('Settings Loading and Merging', () => {
 
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
-        // A workspace `.hopcode/.env` is exempt from `excludedEnvVars` but must
+        // A workspace `.qwen/.env` is exempt from `excludedEnvVars` but must
         // still be blocked from redirecting global state.
-        expect(process.env['HOPCODE_HOME']).toBeUndefined();
-        expect(process.env['HOPCODE_RUNTIME_DIR']).toBeUndefined();
+        expect(process.env['QWEN_HOME']).toBeUndefined();
+        expect(process.env['QWEN_RUNTIME_DIR']).toBeUndefined();
         expect(process.env['OTHER_VAR']).toEqual('ok');
 
         delete process.env['OTHER_VAR'];
         cwdSpy.mockRestore();
       });
 
-      it('redirects user settings path when HOPCODE_HOME is set in ~/.hopcode/.env', () => {
-        delete process.env['HOPCODE_HOME'];
-        resetHomeEnvBootstrapForTesting();
+      it('redirects user settings path when QWEN_HOME is set in ~/.qwen/.env', () => {
+        delete process.env['QWEN_HOME'];
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue(MOCK_WORKSPACE_DIR);
-        const userHopcodeEnvPath = path.join(
-          '/mock/home/user',
-          HOPCODE_DIR,
-          '.env',
-        );
+        const userQwenEnvPath = path.join('/mock/home/user', QWEN_DIR, '.env');
         const customSettingsPath = path.join(
           '/tmp/from-user-env',
           'settings.json',
@@ -3315,12 +3327,11 @@ describe('Settings Loading and Merging', () => {
           source: 'file',
         });
         (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-          [userHopcodeEnvPath, customSettingsPath].includes(p.toString()),
+          [userQwenEnvPath, customSettingsPath].includes(p.toString()),
         );
         (fs.readFileSync as Mock).mockImplementation(
           (p: fs.PathOrFileDescriptor) => {
-            if (p === userHopcodeEnvPath)
-              return 'HOPCODE_HOME=/tmp/from-user-env';
+            if (p === userQwenEnvPath) return 'QWEN_HOME=/tmp/from-user-env';
             if (p === customSettingsPath) return JSON.stringify({});
             return '{}';
           },
@@ -3328,23 +3339,23 @@ describe('Settings Loading and Merging', () => {
 
         const loaded = loadSettings(MOCK_WORKSPACE_DIR);
 
-        // The pre-pass propagates HOPCODE_HOME from ~/.hopcode/.env into
+        // The pre-pass propagates QWEN_HOME from ~/.qwen/.env into
         // process.env so subsequent path getters (which now read it lazily)
         // route to /tmp/from-user-env consistently.
-        expect(process.env['HOPCODE_HOME']).toEqual('/tmp/from-user-env');
+        expect(process.env['QWEN_HOME']).toEqual('/tmp/from-user-env');
         expect(loaded.user.path).toEqual(customSettingsPath);
         cwdSpy.mockRestore();
       });
 
-      it('warns when HOPCODE_HOME redirects but the legacy ~/.hopcode still has settings', () => {
-        const customHome = '/tmp/hopcode-home-fresh';
-        process.env['HOPCODE_HOME'] = customHome;
+      it('warns when QWEN_HOME redirects but the legacy ~/.qwen still has settings', () => {
+        const customHome = '/tmp/qwen-home-fresh';
+        process.env['QWEN_HOME'] = customHome;
         const legacySettings = path.join(
           '/mock/home/user',
-          HOPCODE_DIR,
+          QWEN_DIR,
           'settings.json',
         );
-        // Active HOPCODE_HOME has nothing yet; legacy ~/.hopcode has settings.json.
+        // Active QWEN_HOME has nothing yet; legacy ~/.qwen has settings.json.
         const customSettingsPath = path.join(customHome, 'settings.json');
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({
@@ -3353,7 +3364,7 @@ describe('Settings Loading and Merging', () => {
         });
         (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) => {
           const s = p.toString();
-          // Legacy settings exist, active HOPCODE_HOME settings do not.
+          // Legacy settings exist, active QWEN_HOME settings do not.
           if (s === legacySettings) return true;
           if (s === customSettingsPath) return false;
           return false;
@@ -3363,18 +3374,16 @@ describe('Settings Loading and Merging', () => {
         const loaded = loadSettings(MOCK_WORKSPACE_DIR);
 
         const warningMatch = loaded.migrationWarnings.find((w) =>
-          w.includes('HOPCODE_HOME points to'),
+          w.includes('QWEN_HOME points to'),
         );
         expect(warningMatch).toBeDefined();
         expect(warningMatch).toContain(customHome);
-        expect(warningMatch).toContain(
-          path.join('/mock/home/user', HOPCODE_DIR),
-        );
+        expect(warningMatch).toContain(path.join('/mock/home/user', QWEN_DIR));
       });
 
-      it('does not warn when HOPCODE_HOME points to a directory with settings.json', () => {
-        const customHome = '/tmp/hopcode-home-migrated';
-        process.env['HOPCODE_HOME'] = customHome;
+      it('does not warn when QWEN_HOME points to a directory with settings.json', () => {
+        const customHome = '/tmp/qwen-home-migrated';
+        process.env['QWEN_HOME'] = customHome;
         const customSettingsPath = path.join(customHome, 'settings.json');
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({
@@ -3389,16 +3398,16 @@ describe('Settings Loading and Merging', () => {
         const loaded = loadSettings(MOCK_WORKSPACE_DIR);
 
         const warningMatch = loaded.migrationWarnings.find((w) =>
-          w.includes('HOPCODE_HOME points to'),
+          w.includes('QWEN_HOME points to'),
         );
         expect(warningMatch).toBeUndefined();
       });
 
-      it('does not warn when HOPCODE_HOME is unset (default ~/.hopcode)', () => {
-        delete process.env['HOPCODE_HOME'];
+      it('does not warn when QWEN_HOME is unset (default ~/.qwen)', () => {
+        delete process.env['QWEN_HOME'];
         const legacySettings = path.join(
           '/mock/home/user',
-          HOPCODE_DIR,
+          QWEN_DIR,
           'settings.json',
         );
 
@@ -3414,14 +3423,14 @@ describe('Settings Loading and Merging', () => {
         const loaded = loadSettings(MOCK_WORKSPACE_DIR);
 
         const warningMatch = loaded.migrationWarnings.find((w) =>
-          w.includes('HOPCODE_HOME points to'),
+          w.includes('QWEN_HOME points to'),
         );
         expect(warningMatch).toBeUndefined();
       });
 
-      it('prefers HOPCODE_HOME/.env over ~/.env at the home-dir step', () => {
-        const customHome = '/tmp/hopcode-home-custom';
-        process.env['HOPCODE_HOME'] = customHome;
+      it('prefers QWEN_HOME/.env over ~/.env at the home-dir step', () => {
+        const customHome = '/tmp/qwen-home-custom';
+        process.env['QWEN_HOME'] = customHome;
         const customGlobalEnvPath = path.join(customHome, '.env');
         const homeEnvPath = path.join('/mock/home/user', '.env');
 
@@ -3438,46 +3447,42 @@ describe('Settings Loading and Merging', () => {
           (p: fs.PathOrFileDescriptor) => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
             if (p === customGlobalEnvPath)
-              return 'HOPCODE_HOME_TEST_VAR=fromHopcodeHome';
-            if (p === homeEnvPath) return 'HOPCODE_HOME_TEST_VAR=fromHomeDir';
+              return 'QWEN_HOME_TEST_VAR=fromQwenHome';
+            if (p === homeEnvPath) return 'QWEN_HOME_TEST_VAR=fromHomeDir';
             return '{}';
           },
         );
 
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
-        // HOPCODE_HOME/.env must win — without the precedence fix, ~/.env would
-        // be returned by the walk-up before the HOPCODE_HOME fallback was ever
+        // QWEN_HOME/.env must win — without the precedence fix, ~/.env would
+        // be returned by the walk-up before the QWEN_HOME fallback was ever
         // consulted.
-        expect(process.env['HOPCODE_HOME_TEST_VAR']).toEqual('fromHopcodeHome');
+        expect(process.env['QWEN_HOME_TEST_VAR']).toEqual('fromQwenHome');
       });
 
-      it('falls back to legacy ~/.hopcode/.env for non-routing keys when <HOPCODE_HOME>/.env is absent', () => {
-        // User keeps OPENAI_API_KEY in ~/.hopcode/.env and adds HOPCODE_HOME to the
+      it('falls back to legacy ~/.qwen/.env for non-routing keys when <QWEN_HOME>/.env is absent', () => {
+        // User keeps OPENAI_API_KEY in ~/.qwen/.env and adds QWEN_HOME to the
         // same file. Adding the redirect must not silently drop credentials
         // sitting in that file when the new dir hasn't been populated yet.
-        delete process.env['HOPCODE_HOME'];
+        delete process.env['QWEN_HOME'];
         delete process.env['OPENAI_API_KEY'];
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')
           .mockReturnValue('/mock/home/user');
-        const customHome = '/tmp/hopcode-home-fresh-fallback';
-        const userHopcodeEnvPath = path.join(
-          '/mock/home/user',
-          HOPCODE_DIR,
-          '.env',
-        );
+        const customHome = '/tmp/qwen-home-fresh-fallback';
+        const userQwenEnvPath = path.join('/mock/home/user', QWEN_DIR, '.env');
         const customSettingsPath = path.join(customHome, 'settings.json');
 
         vi.mocked(isWorkspaceTrusted).mockReturnValue({
           isTrusted: true,
           source: 'file',
         });
-        // Only the legacy ~/.hopcode/.env exists; <HOPCODE_HOME>/.env, the active
-        // settings.json under <HOPCODE_HOME>, and ~/.env all do not.
+        // Only the legacy ~/.qwen/.env exists; <QWEN_HOME>/.env, the active
+        // settings.json under <QWEN_HOME>, and ~/.env all do not.
         (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-          [USER_SETTINGS_PATH, customSettingsPath, userHopcodeEnvPath].includes(
+          [USER_SETTINGS_PATH, customSettingsPath, userQwenEnvPath].includes(
             p.toString(),
           ),
         );
@@ -3485,9 +3490,9 @@ describe('Settings Loading and Merging', () => {
           (p: fs.PathOrFileDescriptor) => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
             if (p === customSettingsPath) return JSON.stringify({});
-            if (p === userHopcodeEnvPath)
+            if (p === userQwenEnvPath)
               return [
-                `HOPCODE_HOME=${customHome}`,
+                `QWEN_HOME=${customHome}`,
                 'OPENAI_API_KEY=secret-from-legacy',
               ].join('\n');
             return '{}';
@@ -3496,7 +3501,7 @@ describe('Settings Loading and Merging', () => {
 
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
-        expect(process.env['HOPCODE_HOME']).toEqual(customHome);
+        expect(process.env['QWEN_HOME']).toEqual(customHome);
         expect(process.env['OPENAI_API_KEY']).toEqual('secret-from-legacy');
 
         delete process.env['OPENAI_API_KEY'];

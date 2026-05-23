@@ -57,7 +57,7 @@ describe('authCommand', () => {
         type: 'message',
         messageType: 'info',
         content:
-          'Authentication configuration is only available in interactive mode. To configure authentication, run HopCode interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
+          'Authentication configuration is only available in interactive mode. To configure authentication, run Qwen Code interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
       });
     },
   );
@@ -72,8 +72,7 @@ describe('authCommand', () => {
 
   it('should have the correct name and description', () => {
     expect(authCommand.name).toBe('auth');
-    expect(authCommand.description).toBe(
-      'Configure authentication information for login',
-    );
+    expect(authCommand.altNames).toEqual(['connect', 'login']);
+    expect(authCommand.description).toBe('Connect an LLM provider');
   });
 });

@@ -2,7 +2,7 @@
 
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,9 +36,15 @@ const TARGETS = new Map([
   ['win-x64', { outputExtension: 'zip', nodeExecutable: ['node.exe'] }],
 ]);
 
-const DIST_REQUIRED_PATHS = ['cli.js', 'vendor', 'bundled/qc-helper/docs'];
+const DIST_REQUIRED_PATHS = [
+  'cli.js',
+  'chunks',
+  'vendor',
+  'bundled/qc-helper/docs',
+];
 const DIST_ALLOWED_ENTRIES = new Set([
   'cli.js',
+  'chunks',
   'vendor',
   'bundled',
   'package.json',
@@ -90,12 +96,12 @@ async function main() {
   fs.mkdirSync(outDir, { recursive: true });
 
   const targetConfig = TARGETS.get(target);
-  const outputName = `hopcode-${target}.${targetConfig.outputExtension}`;
+  const outputName = `qwen-code-${target}.${targetConfig.outputExtension}`;
   const outputPath = path.join(outDir, outputName);
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-standalone-'));
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-standalone-'));
 
   try {
-    const packageRoot = path.join(tempRoot, 'hopcode');
+    const packageRoot = path.join(tempRoot, 'qwen-code');
     const runtimeExtractDir = path.join(tempRoot, 'runtime');
     fs.mkdirSync(packageRoot, { recursive: true });
     fs.mkdirSync(runtimeExtractDir, { recursive: true });
@@ -188,7 +194,7 @@ function readOptionValue(argv, index, optionName) {
 }
 
 function printUsage() {
-  console.log(`HopCode standalone package builder
+  console.log(`Qwen Code standalone package builder
 
 Usage:
   npm run package:standalone -- --target TARGET --node-archive PATH [OPTIONS]
@@ -197,7 +203,7 @@ Options:
   --target TARGET         One of: ${Array.from(TARGETS.keys()).join(', ')}
   --node-archive PATH    Downloaded Node.js runtime archive.
   --out-dir DIR          Output directory. Defaults to dist/standalone.
-  --version VERSION      HopCode version. Defaults to package.json version.
+  --version VERSION      Qwen Code version. Defaults to package.json version.
   --skip-checksums       Do not update SHA256SUMS. Used by release packaging.
   -h, --help             Show this help message.`);
 }
@@ -310,13 +316,13 @@ function extractZipArchive(nodeArchive, extractDir) {
         '-ExecutionPolicy',
         'Bypass',
         '-Command',
-        'Expand-Archive -LiteralPath $env:HOPCODE_NODE_ARCHIVE -DestinationPath $env:HOPCODE_EXTRACT_DIR -Force',
+        'Expand-Archive -LiteralPath $env:QWEN_NODE_ARCHIVE -DestinationPath $env:QWEN_EXTRACT_DIR -Force',
       ],
       {
         env: {
           ...process.env,
-          HOPCODE_NODE_ARCHIVE: nodeArchive,
-          HOPCODE_EXTRACT_DIR: extractDir,
+          QWEN_NODE_ARCHIVE: nodeArchive,
+          QWEN_EXTRACT_DIR: extractDir,
         },
       },
     );
@@ -487,7 +493,7 @@ set -e
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 exec "$ROOT/node/bin/node" "$ROOT/lib/cli.js" "$@"
 `;
-  const unixShimPath = path.join(binDir, 'hopcode');
+  const unixShimPath = path.join(binDir, 'qwen');
   fs.writeFileSync(unixShimPath, unixShim);
   fs.chmodSync(unixShimPath, 0o755);
 
@@ -496,7 +502,7 @@ setlocal
 set "ROOT=%~dp0.."
 "%ROOT%\\node\\node.exe" "%ROOT%\\lib\\cli.js" %*
 `;
-  fs.writeFileSync(path.join(binDir, 'hopcode.cmd'), windowsShim);
+  fs.writeFileSync(path.join(binDir, 'qwen.cmd'), windowsShim);
 }
 
 function writeManifest(packageRoot, manifest) {
@@ -505,7 +511,7 @@ function writeManifest(packageRoot, manifest) {
     manifestPath,
     JSON.stringify(
       {
-        name: '@hoptrendy/hopcode',
+        name: '@hoptrendy/hopcode-cli',
         version: manifest.version,
         target: manifest.target,
         nodeArchive: manifest.nodeArchive,
@@ -523,7 +529,7 @@ function createArchive(outputExtension, outputPath, cwd) {
     return;
   }
 
-  run('tar', ['-czf', outputPath, '-C', cwd, 'hopcode']);
+  run('tar', ['-czf', outputPath, '-C', cwd, 'qwen-code']);
 }
 
 function createZipArchive(outputPath, cwd) {
@@ -535,20 +541,20 @@ function createZipArchive(outputPath, cwd) {
         '-ExecutionPolicy',
         'Bypass',
         '-Command',
-        'Compress-Archive -LiteralPath $env:HOPCODE_PACKAGE_ROOT -DestinationPath $env:HOPCODE_OUTPUT_PATH -Force',
+        'Compress-Archive -LiteralPath $env:QWEN_PACKAGE_ROOT -DestinationPath $env:QWEN_OUTPUT_PATH -Force',
       ],
       {
         env: {
           ...process.env,
-          HOPCODE_PACKAGE_ROOT: path.join(cwd, 'hopcode'),
-          HOPCODE_OUTPUT_PATH: outputPath,
+          QWEN_PACKAGE_ROOT: path.join(cwd, 'qwen-code'),
+          QWEN_OUTPUT_PATH: outputPath,
         },
       },
     );
     return;
   }
 
-  run('zip', ['-qr', outputPath, 'hopcode'], { cwd });
+  run('zip', ['-qr', outputPath, 'qwen-code'], { cwd });
 }
 
 async function writeSha256Sums(outDir) {
@@ -556,14 +562,14 @@ async function writeSha256Sums(outDir) {
     .readdirSync(outDir)
     .filter(
       (entry) =>
-        entry.startsWith('hopcode-') &&
+        entry.startsWith('qwen-code-') &&
         (entry.endsWith('.tar.gz') || entry.endsWith('.zip')),
     )
     .sort();
 
   if (entries.length === 0) {
     fail(
-      `No hopcode archives found in ${outDir}; refusing to write empty SHA256SUMS.`,
+      `No qwen-code archives found in ${outDir}; refusing to write empty SHA256SUMS.`,
     );
   }
 

@@ -172,7 +172,7 @@ describe('simple-mcp-server', () => {
     // MCP availability the spawned CLI's first non-interactive `--prompt`
     // request fires without the MCP `add` tool wired into the model's tool
     // surface, so the model answers `15` directly and `foundToolCall` stays
-    // false. Remove once TaimoorSiddiquiOfficial/HopCode#4163 is fixed.
+    // false. Remove once QwenLM/qwen-code#4163 is fixed.
     process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'] = '1';
 
     // Setup test directory with MCP server configuration

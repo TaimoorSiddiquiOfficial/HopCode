@@ -38,9 +38,17 @@ vi.mock('node:os', async (importOriginal) => {
   };
 });
 
-vi.mock('@hoptrendy/hopcode-core/src/ide/detect-ide.js', () => ({
-  detectIdeFromEnv: vi.fn(() => ({ name: 'vscode', displayName: 'VS Code' })),
-}));
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+  return {
+    ...actual,
+    detectIdeFromEnv: vi.fn(() => ({
+      name: 'vscode',
+      displayName: 'VS Code',
+    })),
+  };
+});
 
 const vscodeMock = vi.hoisted(() => ({
   workspace: {
@@ -61,13 +69,6 @@ const vscodeMock = vi.hoisted(() => ({
 }));
 
 vi.mock('vscode', () => vscodeMock);
-
-vi.mock('@hoptrendy/hopcode-core/src/ide/detect-ide.js', () => ({
-  detectIdeFromEnv: vi.fn(() => ({
-    name: 'vscode',
-    displayName: 'VS Code',
-  })),
-}));
 
 vi.mock('./open-files-manager', () => {
   const OpenFilesManager = vi.fn();

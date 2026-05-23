@@ -389,6 +389,9 @@ describe('ChatCompressionService', () => {
     service = new ChatCompressionService();
     mockChat = {
       getHistory: vi.fn(),
+      getHistoryShallow: vi.fn((curated?: boolean) =>
+        mockChat.getHistory(curated),
+      ),
       appendSystemInstruction: vi.fn(),
     } as unknown as GeminiChat;
     mockGetHookSystem = vi.fn().mockReturnValue({});
@@ -596,6 +599,72 @@ describe('ChatCompressionService', () => {
     expect(result.newHistory![0].parts![0].text).toBe('Summary');
     expect(mockGenerateContent).toHaveBeenCalled();
     expect(mockGetHookSystem).toHaveBeenCalled();
+  });
+
+  it('does not deep-clone full history while compressing', async () => {
+    const largeToolOutput = 'x'.repeat(1024 * 1024);
+    const history: Content[] = [
+      { role: 'user', parts: [{ text: 'review this PR' }] },
+      {
+        role: 'model',
+        parts: [
+          {
+            functionCall: {
+              id: 'read-1',
+              name: 'read_file',
+              args: { path: 'large.ts' },
+            },
+          },
+        ],
+      },
+      {
+        role: 'user',
+        parts: [
+          {
+            functionResponse: {
+              id: 'read-1',
+              name: 'read_file',
+              response: { output: largeToolOutput },
+            },
+          },
+        ],
+      },
+      { role: 'model', parts: [{ text: 'analysis' }] },
+    ];
+    vi.mocked(mockChat.getHistory).mockImplementation(() => {
+      throw new Error('getHistory should not be called by compression');
+    });
+    vi.mocked(mockChat.getHistoryShallow).mockReturnValue(history);
+    vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
+      model: 'gemini-pro',
+      contextWindowSize: 1000,
+    } as unknown as ReturnType<typeof mockConfig.getContentGeneratorConfig>);
+    vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(800);
+
+    const mockGenerateContent = vi.fn().mockResolvedValue({
+      text: 'Summary',
+      usage: {
+        promptTokenCount: 1600,
+        candidatesTokenCount: 50,
+        totalTokenCount: 1650,
+      },
+    });
+    vi.mocked(mockConfig.getBaseLlmClient).mockReturnValue({
+      generateText: mockGenerateContent,
+    } as unknown as BaseLlmClient);
+
+    const result = await service.compress(mockChat, {
+      promptId: mockPromptId,
+      force: false,
+      model: mockModel,
+      config: mockConfig,
+      hasFailedCompressionAttempt: false,
+      originalTokenCount: uiTelemetryService.getLastPromptTokenCount(),
+    });
+
+    expect(result.info.compressionStatus).toBe(CompressionStatus.COMPRESSED);
+    expect(mockChat.getHistory).not.toHaveBeenCalled();
+    expect(mockChat.getHistoryShallow).toHaveBeenCalledWith(true);
   });
 
   it('should force compress even if under threshold', async () => {

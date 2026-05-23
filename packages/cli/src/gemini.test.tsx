@@ -14,6 +14,7 @@ import {
   type MockInstance,
 } from 'vitest';
 import {
+  createNonInteractivePromptId,
   main,
   setupUnhandledRejectionHandler,
   validateDnsResolutionOrder,
@@ -282,9 +283,7 @@ describe('gemini.tsx main function', () => {
     vi.mocked(loadSandboxConfig).mockResolvedValue(undefined);
     vi.mocked(relaunchAppInChildProcess).mockResolvedValue(undefined);
     vi.mocked(loadCliConfig).mockResolvedValue(configStub);
-    vi.spyOn(nonInteractiveModule, 'runNonInteractive').mockResolvedValue(
-      undefined,
-    );
+    vi.spyOn(nonInteractiveModule, 'runNonInteractive').mockResolvedValue(0);
 
     try {
       await main();
@@ -308,6 +307,12 @@ describe('gemini.tsx main function', () => {
         userHooks: undefined,
         projectHooks: undefined,
       },
+    );
+  });
+
+  it('creates non-interactive prompt ids that preserve session correlation', () => {
+    expect(createNonInteractivePromptId('test-session-id')).toBe(
+      'test-session-id########0',
     );
   });
 

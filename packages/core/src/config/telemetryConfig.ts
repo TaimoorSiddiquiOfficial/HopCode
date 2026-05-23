@@ -24,6 +24,9 @@ export interface TelemetrySettings {
   logPrompts?: boolean;
   includeSensitiveSpanAttributes?: boolean;
   outfile?: string;
+  resourceAttributes?: Record<string, string>;
+  metrics?: { includeSessionId?: boolean };
+  resourceAttributeWarnings?: string[];
 }
 
 export interface TelemetryConfigParams {
@@ -37,6 +40,9 @@ export interface TelemetryConfigParams {
   logPrompts?: boolean;
   includeSensitiveSpanAttributes?: boolean;
   outfile?: string;
+  resourceAttributes?: Record<string, string>;
+  metrics?: { includeSessionId?: boolean };
+  resourceAttributeWarnings?: string[];
 }
 
 /**
@@ -61,6 +67,9 @@ export class TelemetryConfig {
       includeSensitiveSpanAttributes:
         params.includeSensitiveSpanAttributes ?? false,
       outfile: params.outfile,
+      resourceAttributes: params.resourceAttributes,
+      metrics: params.metrics,
+      resourceAttributeWarnings: params.resourceAttributeWarnings,
     };
   }
 

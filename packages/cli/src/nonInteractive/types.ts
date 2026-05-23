@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
+  ActiveGoal,
   SubagentConfig,
   McpToolProgressData,
 } from '@hoptrendy/hopcode-core';
@@ -246,13 +247,19 @@ export interface ToolProgressStreamEvent {
   content: McpToolProgressData;
 }
 
+export interface ActiveGoalStreamEvent {
+  type: 'active_goal';
+  active_goal: ActiveGoal | null;
+}
+
 export type StreamEvent =
   | MessageStartStreamEvent
   | ContentBlockStartEvent
   | ContentBlockDeltaEvent
   | ContentBlockStopEvent
   | MessageStopStreamEvent
-  | ToolProgressStreamEvent;
+  | ToolProgressStreamEvent
+  | ActiveGoalStreamEvent;
 
 export interface CLIPartialAssistantMessage {
   type: 'stream_event';
@@ -262,7 +269,7 @@ export interface CLIPartialAssistantMessage {
   parent_tool_use_id: string | null;
 }
 
-export type PermissionMode = 'default' | 'plan' | 'auto-edit' | 'izn';
+export type PermissionMode = 'default' | 'plan' | 'auto-edit' | 'auto' | 'yolo' | 'izn';
 
 /**
  * Permission suggestion for tool use requests

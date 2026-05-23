@@ -517,7 +517,7 @@ describe('modelCommand', () => {
           }),
           getAllConfiguredModels: vi.fn().mockReturnValue([
             {
-              id: 'hopcode-turbo',
+              id: 'qwen-turbo',
               label: 'Qwen Turbo',
               authType: AuthType.USE_OPENAI,
             },

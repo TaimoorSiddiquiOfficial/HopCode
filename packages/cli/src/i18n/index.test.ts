@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,15 +21,15 @@ describe('bundled locale fallback', () => {
   });
 
   it('loads bundled builtin translations when locale files are absent on disk', async () => {
-    const hopcodeLocalePathPattern =
-      /([\\/]\.hopcode|[\\/]i18n)[\\/]locales([\\/]|$)/;
+    const qwenLocalePathPattern =
+      /([\\/]\.qwen|[\\/]i18n)[\\/]locales([\\/]|$)/;
 
     vi.doMock('node:fs', async (importOriginal) => {
       const actualFs = await importOriginal<typeof import('node:fs')>();
       return {
         ...actualFs,
         existsSync: (target: Parameters<typeof actualFs.existsSync>[0]) => {
-          if (hopcodeLocalePathPattern.test(String(target))) {
+          if (qwenLocalePathPattern.test(String(target))) {
             return false;
           }
           return actualFs.existsSync(target);
@@ -52,7 +52,7 @@ describe('bundled locale fallback', () => {
 
   it('falls back to bundled translations when a user locale default export is null', async () => {
     const tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'hopcode-i18n-null-locale-'),
+      path.join(os.tmpdir(), 'qwen-i18n-null-locale-'),
     );
     const localesDir = path.join(tempDir, 'locales');
     await fs.mkdir(localesDir, { recursive: true });
@@ -62,7 +62,7 @@ describe('bundled locale fallback', () => {
       'utf-8',
     );
 
-    vi.spyOn(Storage, 'getGlobalHopCodeDir').mockReturnValue(tempDir);
+    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(tempDir);
 
     const { setLanguageAsync, t } = await import('./index.js');
     await setLanguageAsync('zh');
@@ -74,7 +74,7 @@ describe('bundled locale fallback', () => {
 
   it('falls back to bundled translations when a user locale default export is an array', async () => {
     const tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'hopcode-i18n-array-locale-'),
+      path.join(os.tmpdir(), 'qwen-i18n-array-locale-'),
     );
     const localesDir = path.join(tempDir, 'locales');
     await fs.mkdir(localesDir, { recursive: true });
@@ -84,7 +84,7 @@ describe('bundled locale fallback', () => {
       'utf-8',
     );
 
-    vi.spyOn(Storage, 'getGlobalHopCodeDir').mockReturnValue(tempDir);
+    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(tempDir);
 
     const { setLanguageAsync, t } = await import('./index.js');
     await setLanguageAsync('zh');
@@ -98,10 +98,9 @@ describe('bundled locale fallback', () => {
 describe('public i18n exports', () => {
   it('re-exports supported languages and required translation keys', async () => {
     const i18n = await import('./index.js');
-    const { MUST_TRANSLATE_KEYS } = await import('./mustTranslateKeys.js');
 
     expect(i18n.SUPPORTED_LANGUAGES.length).toBeGreaterThan(0);
-    expect(MUST_TRANSLATE_KEYS.length).toBeGreaterThan(0);
+    expect(i18n.MUST_TRANSLATE_KEYS.length).toBeGreaterThan(0);
   });
 });
 

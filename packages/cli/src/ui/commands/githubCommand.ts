@@ -108,7 +108,7 @@ Device Flow guide: \`docs/users/GITHUB_DEVICE_FLOW_GUIDE.md\``,
       // User configured - show status and quick actions
       return {
         type: 'message',
-        messageType: 'success',
+        messageType: 'info',
         content: `# ✅ GitHub Integration - Ready
 
 **App ID**: ${GITHUB_APP_ID}  

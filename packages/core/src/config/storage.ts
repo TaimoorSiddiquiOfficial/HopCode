@@ -9,8 +9,9 @@ import * as os from 'node:os';
 import * as fs from 'node:fs';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { getProjectHash, HOPCODE_DIR, sanitizeCwd } from '../utils/paths.js';
+import { FatalConfigError } from '../utils/errors.js';
 
-export { HOPCODE_DIR } from '../utils/paths.js';
+export { HOPCODE_DIR, QWEN_DIR } from '../utils/paths.js';
 export const GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json';
 export const OAUTH_FILE = 'oauth_creds.json';
 export const SKILL_PROVIDER_CONFIG_DIRS = ['.hopcode', '.agents'];
@@ -74,6 +75,22 @@ export class Storage {
   }
 
   /**
+   * Sanitizes a session id for use as a plan filename.
+   *
+   * Plan files are keyed by session id, but the raw id is public SDK input.
+   * Strip directory separators and Windows-invalid filename characters so a
+   * hostile value cannot escape the plans directory.
+   */
+  static sanitizePlanSessionId(sessionId: string): string {
+    const safeName = path
+      .basename(sessionId.replace(/\\/g, '/'))
+      .replace(/^\.+/g, '_')
+      // eslint-disable-next-line no-control-regex
+      .replace(/[<>:"|?*\x00-\x1F]/g, '_');
+    return safeName || '_';
+  }
+
+  /**
    * Sets the custom runtime output base directory.
    * Handles tilde (~) expansion and resolves relative paths to absolute.
    * Pass null/undefined/empty string to reset to default (getGlobalHopCodeDir()).
@@ -124,9 +141,8 @@ export class Storage {
     return Storage.getGlobalHopCodeDir();
   }
 
-  static getGlobalHopCodeDir(): string {
-    // Check HOPCODE_HOME first, then fall back to QWEN_HOME for backward compat.
-    const envDir = process.env['HOPCODE_HOME'] ?? process.env['QWEN_HOME'];
+  static getGlobalQwenDir(): string {
+    const envDir = process.env['QWEN_HOME'];
     if (envDir) {
       return Storage.resolvePath(envDir);
     }
@@ -135,6 +151,10 @@ export class Storage {
       return path.join(os.tmpdir(), '.hopcode');
     }
     return path.join(homeDir, HOPCODE_DIR);
+  }
+
+  static getGlobalHopCodeDir(): string {
+    return Storage.getGlobalQwenDir();
   }
 
   static getMcpOAuthTokensPath(): string {
@@ -174,18 +194,106 @@ export class Storage {
   }
 
   static getGlobalIdeDir(): string {
-    // Pinned to the global hopcode dir so the VS Code companion (which only
+    // Pinned to the global Qwen dir so the VS Code companion (which only
     // sees env vars, not settings-based runtimeOutputDir) finds the same
     // lock-file location as the CLI.
-    return path.join(Storage.getGlobalHopCodeDir(), IDE_DIR_NAME);
+    return path.join(Storage.getGlobalQwenDir(), IDE_DIR_NAME);
   }
 
-  static getPlansDir(): string {
-    return path.join(Storage.getGlobalHopCodeDir(), PLANS_DIR_NAME);
+  /**
+   * Resolves pathToResolve by realpathing its deepest existing ancestor and
+   * appending the not-yet-created remainder.
+   */
+  private static resolvePathThroughExistingAncestor(
+    pathToResolve: string,
+  ): string {
+    let candidate = pathToResolve;
+    while (true) {
+      try {
+        const realCandidate = fs.realpathSync(candidate);
+        const remainder = path.relative(candidate, pathToResolve);
+        return path.join(realCandidate, remainder);
+      } catch (err: unknown) {
+        if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+          throw err;
+        }
+        const parent = path.dirname(candidate);
+        if (parent === candidate) {
+          return pathToResolve;
+        }
+        candidate = parent;
+      }
+    }
   }
 
-  static getPlanFilePath(sessionId: string): string {
-    return path.join(Storage.getPlansDir(), `${sessionId}.md`);
+  /**
+   * Checks whether {@link childPath} resides within {@link parentPath},
+   * resolving symbolic links to prevent traversal bypass attacks.
+   */
+  private static isPathWithinDirectory(
+    childPath: string,
+    parentPath: string,
+  ): boolean {
+    const realParent = Storage.resolvePathThroughExistingAncestor(parentPath);
+    const realChild = Storage.resolvePathThroughExistingAncestor(childPath);
+
+    const relativePath = path.relative(realParent, realChild);
+    return (
+      relativePath === '' ||
+      (!relativePath.startsWith('..') && !path.isAbsolute(relativePath))
+    );
+  }
+
+  static assertPathWithinDirectory(
+    childPath: string,
+    parentPath: string,
+    errorMessage: string,
+  ): void {
+    if (!Storage.isPathWithinDirectory(childPath, parentPath)) {
+      throw new FatalConfigError(errorMessage);
+    }
+  }
+
+  static getPlansDir(
+    projectRoot?: string | null,
+    plansDirectory?: string | null,
+  ): string {
+    const configuredPlansDirectory = plansDirectory?.trim();
+    if (configuredPlansDirectory) {
+      if (!projectRoot) {
+        throw new FatalConfigError(
+          'projectRoot is required when plansDirectory is configured.',
+        );
+      }
+
+      const resolvedProjectRoot = path.resolve(projectRoot);
+      const resolvedPlansDirectory = Storage.resolvePath(
+        configuredPlansDirectory,
+        resolvedProjectRoot,
+      );
+
+      Storage.assertPathWithinDirectory(
+        resolvedPlansDirectory,
+        resolvedProjectRoot,
+        `plansDirectory must resolve within the project root.`,
+      );
+
+      return resolvedPlansDirectory;
+    }
+
+    return path.join(Storage.getGlobalQwenDir(), PLANS_DIR_NAME);
+  }
+
+  static getPlanFilePath(
+    sessionId: string,
+    projectRoot?: string | null,
+    plansDirectory?: string | null,
+  ): string {
+    // Kept for tests and SDK callers that still use Storage helpers directly.
+    return path.join(
+      Storage.getPlansDir(projectRoot, plansDirectory),
+      `${Storage.sanitizePlanSessionId(sessionId)}.md`,
+    );
   }
 
   static getGlobalBinDir(): string {
@@ -243,6 +351,22 @@ export class Storage {
     return path.join(this.getHopCodeDir(), 'commands');
   }
 
+  /**
+   * Path to the runtime-status sidecar JSON for this session.
+   *
+   * Co-located with the per-session chat log under
+   * `<projectDir>/chats/<sessionId>.runtime.json` so external observers
+   * (terminal multiplexers, IDE integrations, status daemons) can scan
+   * the same directory used for chat history to find live sessions.
+   */
+  getRuntimeStatusPath(sessionId: string): string {
+    return path.join(
+      this.getProjectDir(),
+      'chats',
+      `${sessionId}.runtime.json`,
+    );
+  }
+
   getProjectTempCheckpointsDir(): string {
     return path.join(this.getProjectTempDir(), 'checkpoints');
   }
@@ -259,7 +383,7 @@ export class Storage {
     const homeDir = os.homedir() || os.tmpdir();
     return SKILL_PROVIDER_CONFIG_DIRS.map((dir) =>
       dir === HOPCODE_DIR
-        ? path.join(Storage.getGlobalHopCodeDir(), 'skills')
+        ? path.join(Storage.getGlobalQwenDir(), 'skills')
         : path.join(homeDir, dir, 'skills'),
     );
   }
@@ -275,18 +399,5 @@ export class Storage {
 
   getHistoryFilePath(): string {
     return path.join(this.getProjectTempDir(), 'shell_history');
-  }
-
-  /**
-   * Returns the runtime-status JSON path for a given session id.
-   * The file lives alongside the session's history data so that external
-   * tools can discover which session a PID is serving.
-   */
-  getRuntimeStatusPath(sessionId: string): string {
-    return path.join(
-      this.getProjectDir(),
-      'chats',
-      `${sessionId}.runtime.json`,
-    );
   }
 }

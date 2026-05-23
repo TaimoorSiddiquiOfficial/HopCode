@@ -19,13 +19,12 @@ import {
 import { t } from '../../i18n/index.js';
 import {
   collectMemoryDiagnostics,
-  formatMemoryUsage,
   type MemoryDiagnostics,
 } from '@hoptrendy/hopcode-core';
+import { formatMemoryUsage } from '../utils/formatters.js';
 
 const MEMORY_SUBCOMMAND = 'memory';
 const DOCTOR_SUBCOMMANDS = [MEMORY_SUBCOMMAND] as const;
-
 function getHeapSnapshotSensitiveDataWarning(): string {
   return t(
     'Heap snapshot may contain prompts, file contents, tool results, and other sensitive data. Do not share it publicly without reviewing it first.',
@@ -138,7 +137,7 @@ export const doctorCommand: SlashCommand = {
           if (isHighHeapPressure(latestDiagnostics)) {
             throw new Error(
               t(
-                'Heap snapshot skipped: V8 heap pressure is already high, and writing a synchronous heap snapshot could make the process unresponsive or trigger OOM. Restart HopCode first if it is unstable, or retry before memory pressure reaches the warning threshold.',
+                'Heap snapshot skipped: V8 heap pressure is already high, and writing a synchronous heap snapshot could make the process unresponsive or trigger OOM. Restart Qwen Code first if it is unstable, or retry before memory pressure reaches the warning threshold.',
               ),
             );
           }
@@ -271,7 +270,7 @@ async function memoryDoctorAction(context: CommandContext, args = '') {
   try {
     const diagnostics = await collectMemoryDiagnostics({
       sessionId: context.services.config?.getSessionId(),
-      hopcodeVersion: context.services.config?.getCliVersion(),
+      qwenVersion: context.services.config?.getCliVersion(),
     });
 
     if (context.abortSignal?.aborted) {

@@ -62,8 +62,7 @@ export function resolveSlimmingConfig(
 ): ResolvedSlimmingConfig {
   return {
     imageTokenEstimate: resolveNumber(
-      process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'] ??
-        process.env['QWEN_IMAGE_TOKEN_ESTIMATE'],
+      process.env['QWEN_IMAGE_TOKEN_ESTIMATE'],
       settings?.imageTokenEstimate,
       DEFAULT_IMAGE_TOKEN_ESTIMATE,
       { minInclusive: 1 },
@@ -110,7 +109,7 @@ export function estimatePartChars(
   if (typeof part.text === 'string') {
     return part.text.length;
   }
-  // Tool results in hopcode carry media on `functionResponse.parts`
+  // Tool results in qwen-code carry media on `functionResponse.parts`
   // (an extension to the @google/genai schema; see
   // `coreToolScheduler.createFunctionResponsePart`). Walk into those
   // nested parts so a base64 image attached to a `read_file` result
@@ -136,7 +135,7 @@ export function estimatePartChars(
 
 /**
  * Returns the nested-parts array from a `functionResponse`, if present.
- * hopcode attaches media here (see
+ * qwen-code attaches media here (see
  * `coreToolScheduler.createFunctionResponsePart`); the standard
  * `@google/genai` FunctionResponse type does not declare it.
  */
@@ -210,7 +209,7 @@ function transformPart(part: Part, stats: SlimStats): Part {
   if (part.fileData) {
     return mediaPlaceholderPart(part.fileData.mimeType, stats);
   }
-  // Walk into functionResponse.parts (hopcode's nested-media carrier
+  // Walk into functionResponse.parts (qwen-code's nested-media carrier
   // for tool results — see `coreToolScheduler.createFunctionResponsePart`).
   // Without this, base64 images returned by read_file et al. leak into
   // the side-query payload.
@@ -252,7 +251,7 @@ function mediaPlaceholderPart(
 
 function isNonImageMime(mime: string): boolean {
   // Anything outside image/* is rendered with the `[document: ...]`
-  // placeholder. audio/video are rare on hopcode's tool surface and
+  // placeholder. audio/video are rare on qwen-code's tool surface and
   // the placeholder is purely informational, so the conservative
   // grouping is acceptable.
   return !mime.startsWith('image/');

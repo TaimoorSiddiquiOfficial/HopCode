@@ -40,7 +40,8 @@ const mockCommands: readonly SlashCommand[] = [
     description: 'A custom command',
     kind: CommandKind.FILE,
     source: 'skill-dir-command',
-    sourceLabel: 'Project',
+    sourceLabel: 'Custom',
+    sourceDetail: 'custom',
   },
   {
     name: 'plugin-cmd',
@@ -137,7 +138,7 @@ describe('Help Component', () => {
     const { lastFrame } = render(<Help commands={mockCommands} width={100} />);
     const output = lastFrame();
 
-    expect(output).toContain('HopCode');
+    expect(output).toContain('Qwen Code');
     expect(output).toContain('general');
     expect(output).toContain('commands');
     expect(output).toContain('custom-commands');
@@ -177,12 +178,50 @@ describe('Help Component', () => {
     expect(output).toContain('[all]');
     expect(output).toContain('[model]');
     expect(output).toContain('/custom');
-    expect(output).toContain('[Project]');
+    expect(output).toContain('[Custom]');
     expect(output).toContain('/plugin-cmd');
     expect(output).toContain('[Plugin]');
     expect(output).toContain('/mcp-prompt');
     expect(output).toContain('[MCP]');
     expect(output).not.toContain('/test');
+  });
+
+  it('orders help commands alphabetically regardless of completionPriority', () => {
+    // Skill priority is scoped to the /skills listing; /help intentionally
+    // stays alphabetical so a high-priority skill can't push a built-in
+    // command around in the help view.
+    const commands: SlashCommand[] = [
+      {
+        name: 'alpha',
+        description: 'Default priority skill',
+        kind: CommandKind.SKILL,
+        source: 'bundled-skill',
+        sourceLabel: 'Skill',
+      },
+      {
+        name: 'zeta',
+        description: 'High priority skill',
+        kind: CommandKind.SKILL,
+        source: 'bundled-skill',
+        sourceLabel: 'Skill',
+        completionPriority: 100,
+      },
+      {
+        name: 'beta',
+        description: 'Default priority skill',
+        kind: CommandKind.SKILL,
+        source: 'bundled-skill',
+        sourceLabel: 'Skill',
+      },
+    ];
+
+    const { lastFrame } = render(
+      <Help commands={commands} width={130} activeTab="custom-commands" />,
+    );
+    const output = lastFrame() ?? '';
+
+    expect(output.indexOf('/alpha')).toBeLessThan(output.indexOf('/beta'));
+    expect(output.indexOf('/beta')).toBeLessThan(output.indexOf('/zeta'));
   });
 
   it('switches tabs with Tab and Shift+Tab when interactive', () => {

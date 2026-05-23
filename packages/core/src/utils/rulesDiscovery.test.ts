@@ -326,19 +326,19 @@ Use hooks.`,
       );
     });
 
-    it('reads global rules from HOPCODE_HOME when set', async () => {
-      const customHopcodeHome = path.join(testRootDir, 'custom-hopcode-home');
-      const originalHopcodeHome = process.env['HOPCODE_HOME'];
-      process.env['HOPCODE_HOME'] = customHopcodeHome;
+    it('reads global rules from QWEN_HOME when set', async () => {
+      const customQwenHome = path.join(testRootDir, 'custom-qwen-home');
+      const originalQwenHome = process.env['QWEN_HOME'];
+      process.env['QWEN_HOME'] = customQwenHome;
       try {
         await createTestFile(
-          path.join(customHopcodeHome, 'rules', 'fromCustomHome.md'),
+          path.join(customQwenHome, 'rules', 'fromCustomHome.md'),
           'CustomHome rule.',
         );
-        // A stale rule in the legacy ~/.hopcode/rules location should NOT be
-        // loaded once HOPCODE_HOME points elsewhere.
+        // A stale rule in the legacy ~/.qwen/rules location should NOT be
+        // loaded once QWEN_HOME points elsewhere.
         await createTestFile(
-          path.join(homedir, HOPCODE_DIR, 'rules', 'fromLegacyHome.md'),
+          path.join(homedir, QWEN_DIR, 'rules', 'fromLegacyHome.md'),
           'LegacyHome rule.',
         );
 
@@ -347,10 +347,10 @@ Use hooks.`,
         expect(result.content).toContain('CustomHome rule.');
         expect(result.content).not.toContain('LegacyHome rule.');
       } finally {
-        if (originalHopcodeHome === undefined) {
-          delete process.env['HOPCODE_HOME'];
+        if (originalQwenHome === undefined) {
+          delete process.env['QWEN_HOME'];
         } else {
-          process.env['HOPCODE_HOME'] = originalHopcodeHome;
+          process.env['QWEN_HOME'] = originalQwenHome;
         }
       }
     });

@@ -84,6 +84,8 @@ export default {
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
   'for help on HopCode': 'for help on HopCode',
   'show version info': 'show version info',
+  'show paths for current session files and logs':
+    'show paths for current session files and logs',
   'submit a bug report': 'submit a bug report',
   Status: 'Status',
 
@@ -132,6 +134,45 @@ export default {
     'Rename the current conversation. --auto lets the fast model pick a title.',
   'Rewind conversation to a previous turn':
     'Rewind conversation to a previous turn',
+  'Rewind Conversation': 'Rewind Conversation',
+  'No user turns to rewind to.': 'No user turns to rewind to.',
+  'Rewind to: ': 'Rewind to: ',
+  'Restore code and conversation': 'Restore code and conversation',
+  'Restore conversation only': 'Restore conversation only',
+  'Restore code only': 'Restore code only',
+  'Never mind': 'Never mind',
+  'Computing file changes...': 'Computing file changes...',
+  'Restoring...': 'Restoring...',
+  'Restored {{count}} file(s).': 'Restored {{count}} file(s).',
+  'Failed to restore files: {{error}}': 'Failed to restore files: {{error}}',
+  'Rewind failed: {{error}}': 'Rewind failed: {{error}}',
+  'Cannot rewind conversation: no active model client.':
+    'Cannot rewind conversation: no active model client.',
+  'Code restored, but conversation could not be rewound (no active client).':
+    'Code restored, but conversation could not be rewound (no active client).',
+  'Conversation rewound. Edit your prompt and press Enter to continue.':
+    'Conversation rewound. Edit your prompt and press Enter to continue.',
+  'Rewinding does not affect files edited manually or via shell commands.':
+    'Rewinding does not affect files edited manually or via shell commands.',
+  'Cannot rewind to a turn that was compressed. Try a more recent turn.':
+    'Cannot rewind to a turn that was compressed. Try a more recent turn.',
+  'File restore is unavailable for this turn (no captured file changes, or this turn predates the current session).':
+    'File restore is unavailable for this turn (no captured file changes, or this turn predates the current session).',
+  '(+{{insertions}} -{{deletions}} in {{count}} file)':
+    '(+{{insertions}} -{{deletions}} in {{count}} file)',
+  '(+{{insertions}} -{{deletions}} in {{count}} files)':
+    '(+{{insertions}} -{{deletions}} in {{count}} files)',
+  'Failed to restore {{count}} file(s): {{files}}':
+    'Failed to restore {{count}} file(s): {{files}}',
+  'Cannot restore files: this turn was created before file checkpointing was enabled.':
+    'Cannot restore files: this turn was created before file checkpointing was enabled.',
+  'No files needed to be restored.': 'No files needed to be restored.',
+  '↑↓ to navigate · Enter to select · Esc to go back':
+    '↑↓ to navigate · Enter to select · Esc to go back',
+  '↑↓ to navigate · Enter to select · Esc to cancel':
+    '↑↓ to navigate · Enter to select · Esc to cancel',
+  'Enter/Y to confirm · Esc/N to go back':
+    'Enter/Y to confirm · Esc/N to go back',
   'change the theme': 'change the theme',
   'Select Theme': 'Select Theme',
   Preview: 'Preview',
@@ -151,8 +192,7 @@ export default {
   'open full HopCode documentation in your browser':
     'open full HopCode documentation in your browser',
   'Configuration not available.': 'Configuration not available.',
-  'Configure authentication information for login':
-    'Configure authentication information for login',
+  'Connect an LLM provider': 'Connect an LLM provider',
   'Copy the last result or code snippet to clipboard':
     'Copy the last result or code snippet to clipboard',
   'Show working-tree change stats versus HEAD':
@@ -372,8 +412,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': 'View and edit HopCode settings',
   Settings: 'Settings',
-  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    'To see changes, HopCode must be restarted. Press r to exit and apply changes now.',
+  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
+    'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.',
   // ============================================================================
   // Settings Labels
   // ============================================================================
@@ -482,8 +522,8 @@ export default {
   remote: 'remote',
   'This extension will add the following commands: {{commands}}.':
     'This extension will add the following commands: {{commands}}.',
-  'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    'This extension will append info to your HOPCODE.md context using {{fileName}}',
+  'This extension will append info to your QWEN.md context using {{fileName}}':
+    'This extension will append info to your QWEN.md context using {{fileName}}',
   'This extension will install the following skills:':
     'This extension will install the following skills:',
   'This extension will install the following subagents:':
@@ -1128,20 +1168,20 @@ export default {
   '👋 Welcome back! (Last updated: {{timeAgo}})':
     '👋 Welcome back! (Last updated: {{timeAgo}})',
   '🎯 Overall Goal:': '🎯 Overall Goal:',
-  'Select Authentication Method': 'Select Authentication Method',
-  'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    'You must select an auth method to proceed. Press Ctrl+C again to exit.',
+  'Connect a Provider': 'Connect a Provider',
+  'You must connect a provider to proceed. Press Ctrl+C again to exit.':
+    'You must connect a provider to proceed. Press Ctrl+C again to exit.',
   'Terms of Services and Privacy Notice':
     'Terms of Services and Privacy Notice',
   'HopCode OAuth': 'HopCode OAuth',
   'Discontinued — switch to Coding Plan or API Key':
     'Discontinued — switch to Coding Plan or API Key',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
-  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
+  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models',
   'For teams \u00B7 Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
@@ -1166,18 +1206,17 @@ export default {
     'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.',
-  'HopCode OAuth Authentication': 'HopCode OAuth Authentication',
+  'Qwen OAuth Authentication': 'Qwen OAuth Authentication',
   'Please visit this URL to authorize:': 'Please visit this URL to authorize:',
   'Waiting for authorization': 'Waiting for authorization',
   'Time remaining:': 'Time remaining:',
-  'HopCode OAuth Authentication Timeout':
-    'HopCode OAuth Authentication Timeout',
+  'Qwen OAuth Authentication Timeout': 'Qwen OAuth Authentication Timeout',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.',
   'Press any key to return to authentication type selection.':
     'Press any key to return to authentication type selection.',
-  'Waiting for HopCode OAuth authentication...':
-    'Waiting for HopCode OAuth authentication...',
+  'Waiting for Qwen OAuth authentication...':
+    'Waiting for Qwen OAuth authentication...',
   'Authentication timed out. Please try again.':
     'Authentication timed out. Please try again.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1199,8 +1238,8 @@ export default {
     'Failed to authenticate. Message: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     'Authenticated successfully with {{authType}} credentials.',
-  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}',
+  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}',
   // ============================================================================
   // Dialogs - Model
   // ============================================================================
@@ -1783,7 +1822,7 @@ export default {
     '↑/↓: Navigate | ←/→: Switch tabs | Enter: Select',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: Navigate | Enter: Select | Esc: Cancel',
-  'Authenticate using HopCode OAuth': 'Authenticate using HopCode OAuth',
+  'Authenticate using Qwen OAuth': 'Authenticate using Qwen OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Authenticate using Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
@@ -1816,8 +1855,8 @@ export default {
     '⚠️  No authentication method configured.\n',
   'Run one of the following commands to get started:\n':
     'Run one of the following commands to get started:\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)',
+  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)',
   'Or simply run:': 'Or simply run:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Interactive authentication setup\n',
@@ -1826,8 +1865,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type: Free tier (discontinued 2026-04-15)',
   '  Limit: No longer available': '  Limit: No longer available',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ Authentication Method: Alibaba Cloud Coding Plan',
   '中国 (China) - 阿里云百炼': '中国 (China) - 阿里云百炼',
@@ -1857,6 +1896,8 @@ export default {
     'Press Ctrl+O to show full tool output',
   'Switch to plan mode or exit plan mode':
     'Switch to plan mode or exit plan mode',
+  'Set a goal — keep working until the condition is met':
+    'Set a goal — keep working until the condition is met',
   'Exited plan mode. Previous approval mode restored.':
     'Exited plan mode. Previous approval mode restored.',
   'Enabled plan mode. The agent will analyze and plan without executing tools.':
@@ -1865,10 +1906,12 @@ export default {
     'Already in plan mode. Use "/plan exit" to exit plan mode.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Not in plan mode. Use "/plan" to enter plan mode first.',
-  "Set up HopCode's status line UI": "Set up HopCode's status line UI",
+  "Set up Qwen Code's status line UI": "Set up Qwen Code's status line UI",
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Open the memory manager.',
+  'Show current process memory diagnostics':
+    'Show current process memory diagnostics',
   'Save a durable memory to the memory system.':
     'Save a durable memory to the memory system.',
   'Ask a quick side question without affecting the main conversation':
@@ -1923,6 +1966,4 @@ export default {
   'Loading suggestions...': 'Loading suggestions...',
   'Show per-item context usage breakdown.':
     'Show per-item context usage breakdown.',
-  'Show LSP server status. Usage: /lsp [status]':
-    'Show LSP server status. Usage: /lsp [status]',
 };

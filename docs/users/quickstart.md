@@ -79,7 +79,7 @@ Choose your preferred authentication method:
 
 > [!tip]
 >
-> To configure authentication, start HopCode and run `/auth`. Use `/doctor` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
+> To configure authentication, start Qwen Code and run `/auth`. Use `/doctor` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
 
 ## Step 3: Start your first session
 

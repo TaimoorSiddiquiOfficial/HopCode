@@ -104,9 +104,9 @@ describe('AnthropicContentGenerator', () => {
     vi.restoreAllMocks();
   });
 
-  it('uses hopcode-proxy identity (User-Agent + x-app + Bearer auth) for non-Anthropic baseURLs', async () => {
+  it('uses claude-cli identity (User-Agent + x-app + Bearer auth) for non-Anthropic baseURLs', async () => {
     // Non-Anthropic-native baseURL → IdeaLab-style proxy path:
-    //  - User-Agent presents as `hopcode-proxy/<version> (external, cli)`
+    //  - User-Agent presents as `claude-cli/<version> (external, cli)`
     //  - `x-app: cli` is sent
     //  - SDK is constructed with `authToken` (sends `Authorization: Bearer`)
     //    rather than `apiKey` (`x-api-key`), avoiding dual-header conflicts.
@@ -126,16 +126,16 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('hopcode-proxy/1.2.3');
+    expect(headers['User-Agent']).toContain('claude-cli/1.2.3');
     expect(headers['User-Agent']).toContain('(external, cli)');
     expect(headers['x-app']).toBe('cli');
     expect(anthropicState.constructorOptions?.['authToken']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['apiKey']).toBeNull();
   });
 
-  it('uses HopCode identity + apiKey auth when baseURL is api.anthropic.com', async () => {
+  it('uses QwenCode identity + apiKey auth when baseURL is api.anthropic.com', async () => {
     // Anthropic-native baseURL: keep the SDK-default `x-api-key` auth and
-    // a truthful `HopCode` User-Agent (no `x-app` header) so usage isn't
+    // a truthful `QwenCode` User-Agent (no `x-app` header) so usage isn't
     // misattributed to Claude CLI in Anthropic's logs/quotas.
     const { AnthropicContentGenerator } = await importGenerator();
     void new AnthropicContentGenerator(
@@ -153,8 +153,8 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
-    expect(headers['User-Agent']).not.toContain('hopcode-proxy');
+    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+    expect(headers['User-Agent']).not.toContain('claude-cli');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -176,7 +176,7 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
+    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -185,7 +185,7 @@ describe('AnthropicContentGenerator', () => {
   it('treats *.anthropic.com subdomains as Anthropic-native', async () => {
     // Anthropic's own subdomains (regional endpoints, internal routes) all
     // share the native auth/identity contract — none of them want the
-    // proxy-flavored Bearer auth or hopcode-proxy UA.
+    // proxy-flavored Bearer auth or claude-cli UA.
     const { AnthropicContentGenerator } = await importGenerator();
     void new AnthropicContentGenerator(
       {
@@ -202,13 +202,13 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
+    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
   });
 
-  it('treats malformed baseURL as proxy (URL parse failure falls through to hopcode-proxy identity)', async () => {
+  it('treats malformed baseURL as proxy (URL parse failure falls through to claude-cli identity)', async () => {
     // A bogus baseUrl string trips `new URL()`. The detector's catch
     // branch must fall through to the proxy path rather than throw or
     // silently treat the broken value as Anthropic-native.
@@ -228,7 +228,7 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('hopcode-proxy/1.2.3');
+    expect(headers['User-Agent']).toContain('claude-cli/1.2.3');
     expect(headers['x-app']).toBe('cli');
     expect(anthropicState.constructorOptions?.['authToken']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['apiKey']).toBeNull();
@@ -237,7 +237,7 @@ describe('AnthropicContentGenerator', () => {
   it('pins DeepSeek anthropic-compatible baseURL onto the proxy auth/identity path', async () => {
     // The auth/identity gate uses an Anthropic-native allow-list rather
     // than an IdeaLab-only allow-list, so `api.deepseek.com/anthropic`
-    // gets the same Bearer + hopcode-proxy + x-app bundle that proxies get.
+    // gets the same Bearer + claude-cli + x-app bundle that proxies get.
     // This documents the assumption — if DeepSeek's anthropic-compatible
     // endpoint ever rejects `Authorization: Bearer`, this test pins the
     // shape we'd need to flip back, and any future change here surfaces
@@ -258,7 +258,7 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('hopcode-proxy/1.2.3');
+    expect(headers['User-Agent']).toContain('claude-cli/1.2.3');
     expect(headers['x-app']).toBe('cli');
     expect(anthropicState.constructorOptions?.['authToken']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['apiKey']).toBeNull();
@@ -268,7 +268,7 @@ describe('AnthropicContentGenerator', () => {
     // A copy-pasted baseURL with leading/trailing whitespace would
     // otherwise trip `new URL(...)` in `isAnthropicNativeBaseUrl` and
     // fall through to proxy identity — meaning real api.anthropic.com
-    // gets Bearer auth + hopcode-proxy UA and 401s. Trim the config side
+    // gets Bearer auth + claude-cli UA and 401s. Trim the config side
     // before classification, mirroring how the env-side already
     // handles whitespace.
     const { AnthropicContentGenerator } = await importGenerator();
@@ -286,7 +286,7 @@ describe('AnthropicContentGenerator', () => {
     );
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
+    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -313,7 +313,7 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('hopcode-proxy/1.2.3');
+    expect(headers['User-Agent']).toContain('claude-cli/1.2.3');
     expect(headers['x-app']).toBe('cli');
     expect(anthropicState.constructorOptions?.['authToken']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['apiKey']).toBeNull();
@@ -348,7 +348,7 @@ describe('AnthropicContentGenerator', () => {
     it('suppresses ANTHROPIC_API_KEY back-fill on the proxy branch (prevents credential leak)', async () => {
       // Scenario: user runs Claude Code in the same shell so
       // ANTHROPIC_API_KEY is exported with their real Anthropic key, and
-      // separately configures hopcode with an IdeaLab proxy + IdeaLab
+      // separately configures qwen-code with an IdeaLab proxy + IdeaLab
       // token. Pre-fix, the SDK's destructuring default would back-fill
       // `apiKey` from the env, then the auth resolver would prefer it
       // over our `authToken` and ship `X-Api-Key: <real Anthropic key>`
@@ -404,7 +404,7 @@ describe('AnthropicContentGenerator', () => {
     it('applies proxy identity when ANTHROPIC_BASE_URL env points to a proxy and config.baseUrl is unset', async () => {
       // Symmetric concern: pre-fix, `isAnthropicNativeBaseUrl` only read
       // `config.baseUrl`, so a user who set ANTHROPIC_BASE_URL only via
-      // env (leaving hopcode's baseUrl unset) had the SDK route to the
+      // env (leaving qwen-code's baseUrl unset) had the SDK route to the
       // proxy while our predicate thought it was Anthropic-native — wrong
       // UA, wrong auth shape, and the cache-scope beta + scope:'global'
       // shipped to a proxy that likely doesn't recognize them.
@@ -424,7 +424,7 @@ describe('AnthropicContentGenerator', () => {
       );
       const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
         {}) as Record<string, string>;
-      expect(headers['User-Agent']).toContain('hopcode-proxy/1.2.3');
+      expect(headers['User-Agent']).toContain('claude-cli/1.2.3');
       expect(headers['x-app']).toBe('cli');
       expect(anthropicState.constructorOptions?.['authToken']).toBe(
         'idealab-token',
@@ -452,7 +452,7 @@ describe('AnthropicContentGenerator', () => {
       );
       const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
         {}) as Record<string, string>;
-      expect(headers['User-Agent']).toContain('HopCode/1.2.3');
+      expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
       expect(headers['x-app']).toBeUndefined();
       expect(anthropicState.constructorOptions?.['apiKey']).toBe('config-key');
       expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -460,7 +460,7 @@ describe('AnthropicContentGenerator', () => {
 
     it('config.baseUrl wins over ANTHROPIC_BASE_URL when both are set', async () => {
       // Mirror the SDK's own resolution: explicit config beats env. A
-      // user who deliberately points hopcode at api.anthropic.com
+      // user who deliberately points qwen-code at api.anthropic.com
       // shouldn't have a stray ANTHROPIC_BASE_URL silently flip them
       // onto the proxy path.
       process.env['ANTHROPIC_BASE_URL'] = 'https://idealab.example/anthropic';
@@ -479,7 +479,7 @@ describe('AnthropicContentGenerator', () => {
       );
       const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
         {}) as Record<string, string>;
-      expect(headers['User-Agent']).toContain('HopCode/1.2.3');
+      expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
       expect(headers['x-app']).toBeUndefined();
       expect(anthropicState.constructorOptions?.['apiKey']).toBe('config-key');
       expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -509,7 +509,7 @@ describe('AnthropicContentGenerator', () => {
       {}) as Record<string, string>;
     // Beta headers moved out of defaultHeaders — see PR #3788 review feedback.
     // Only User-Agent and customHeaders remain at construction time.
-    expect(headers['User-Agent']).toContain('hopcode-proxy/1.2.3');
+    expect(headers['User-Agent']).toContain('claude-cli/1.2.3');
     expect(headers['X-Custom']).toBe('1');
     expect(headers['anthropic-beta']).toBeUndefined();
   });
@@ -983,7 +983,7 @@ describe('AnthropicContentGenerator', () => {
 
       // defaultHeaders carries User-Agent and customHeaders (not beta).
       // baseConfig now targets api.anthropic.com, so this asserts the
-      // Anthropic-native UA (HopCode) — the hopcode-proxy identity bundle
+      // Anthropic-native UA (QwenCode) — the claude-cli identity bundle
       // is covered by the proxy-baseURL tests at the top of the suite.
       const defaultHeaders = (anthropicState.constructorOptions?.[
         'defaultHeaders'

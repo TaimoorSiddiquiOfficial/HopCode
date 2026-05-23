@@ -135,22 +135,6 @@ export async function atomicWriteFile(
     }
   }
 
-  // Respect file-level write permissions: on POSIX, a temp-file rename
-  // replaces the target even when the target is read-only (chmod 444),
-  // because rename only requires directory write permission. Pre-check
-  // write access on the target to preserve the expected permission semantics.
-  if (existingMode !== undefined) {
-    try {
-      await fs.access(targetPath, fs.constants.W_OK);
-    } catch (_err) {
-      const accessErr = new Error(
-        `EACCES: permission denied, open '${targetPath}'`,
-      ) as NodeJS.ErrnoException;
-      accessErr.code = 'EACCES';
-      throw accessErr;
-    }
-  }
-
   const desiredMode = existingMode ?? options?.mode;
 
   const writeOptions: {

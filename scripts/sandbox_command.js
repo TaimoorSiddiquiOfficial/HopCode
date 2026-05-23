@@ -34,7 +34,7 @@ const argv = yargs(hideBin(process.argv)).option('q', {
   default: false,
 }).argv;
 
-let hopcodeSandbox = process.env.hopcode_SANDBOX;
+let hopcodeSandbox = process.env.HOPCODE_SANDBOX;
 
 bootstrapHomeEnv();
 
@@ -73,10 +73,10 @@ if (!hopcodeSandbox) {
       try {
         const parsed = dotenv.parse(readFileSync(candidate, 'utf-8'));
         if (
-          parsed.hopcode_SANDBOX &&
+          parsed.HOPCODE_SANDBOX &&
           !Object.hasOwn(process.env, 'HOPCODE_SANDBOX')
         ) {
-          process.env.hopcode_SANDBOX = parsed.hopcode_SANDBOX;
+          process.env.HOPCODE_SANDBOX = parsed.HOPCODE_SANDBOX;
         }
       } catch (_e) {
         // Match dotenv's quiet-mode behavior used elsewhere.

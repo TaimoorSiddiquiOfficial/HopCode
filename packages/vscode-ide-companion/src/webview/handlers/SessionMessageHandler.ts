@@ -40,9 +40,9 @@ export class SessionMessageHandler extends BaseMessageHandler {
     return [
       'sendMessage',
       'editMessage',
-      'newHopCodeSession',
-      'switchHopCodeSession',
-      'getHopCodeSessions',
+      'newQwenSession',
+      'switchQwenSession',
+      'getQwenSessions',
       'resumeSession',
       'deleteHopCodeSession',
       'renameHopCodeSession',
@@ -115,6 +115,10 @@ export class SessionMessageHandler extends BaseMessageHandler {
             ? data.targetTurnIndex
             : undefined,
         );
+        break;
+
+      case 'newQwenSession':
+        await this.handleNewHopCodeSession();
         break;
 
       case 'newHopCodeSession':
@@ -600,7 +604,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
 
       if (!this.agentManager.isConnected) {
         await this.promptAuth(
-          'You need to configure your provider to use HopCode.',
+          'You need to configure your provider to use Qwen Code.',
         );
         return;
       }
@@ -618,7 +622,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
           const errorMsg = this.getErrorMessage(createErr);
           if (this.shouldPromptAuth(createErr)) {
             await this.promptAuth(
-              'Your session has expired or is invalid. Please configure your provider to continue using HopCode.',
+              'Your session has expired or is invalid. Please configure your provider to continue using Qwen Code.',
             );
             return;
           }

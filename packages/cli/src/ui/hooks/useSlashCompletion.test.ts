@@ -256,7 +256,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'help',
           altNames: ['?'],
-          description: 'for help on HopCode',
+          description: 'for help on Qwen Code',
         }),
       ];
       const { result } = renderHook(() =>
@@ -443,7 +443,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'help',
           altNames: ['?'],
-          description: 'for help on HopCode',
+          description: 'for help on Qwen Code',
         }),
       ];
       const recentCommands = new Map([
@@ -1121,5 +1121,40 @@ describe('useSlashCompletion', () => {
     expect(mockSetSuggestions).not.toHaveBeenCalled();
     expect(mockSetIsLoadingSuggestions).not.toHaveBeenCalled();
     expect(mockSetIsPerfectMatch).not.toHaveBeenCalled();
+  });
+
+  describe('isDirectory propagation', () => {
+    it('should propagate isDirectory from CommandCompletionItem to Suggestion', async () => {
+      const mockCompletionFn = vi.fn().mockResolvedValue([
+        { value: '/tmp/workspace/', isDirectory: true },
+        { value: '/tmp/file.txt' },
+      ]);
+
+      const slashCommands = [
+        createTestCommand({
+          name: 'dir',
+          description: 'test',
+          completion: mockCompletionFn,
+        }),
+      ];
+
+      const { result } = renderHook(() =>
+        useTestHarnessForSlashCompletion(
+          true,
+          '/dir ',
+          slashCommands,
+          mockCommandContext,
+        ),
+      );
+
+      await waitFor(() => {
+        expect(result.current.suggestions.length).toBe(2);
+      });
+
+      // First suggestion (directory) should have isDirectory: true
+      expect(result.current.suggestions[0].isDirectory).toBe(true);
+      // Second suggestion (file) should NOT have isDirectory flag
+      expect(result.current.suggestions[1].isDirectory).toBeFalsy();
+    });
   });
 });

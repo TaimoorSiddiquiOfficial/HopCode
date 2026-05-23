@@ -1,7 +1,7 @@
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { getGlobalHopCodeDir } from './paths.js';
+import { getGlobalQwenDir } from './paths.js';
 
 // Alphabet without ambiguous chars: 0/O, 1/I
 const SAFE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -22,7 +22,7 @@ export class PairingStore {
   private allowlistPath: string;
 
   constructor(channelName: string) {
-    this.dir = path.join(getGlobalHopCodeDir(), 'channels');
+    this.dir = path.join(getGlobalQwenDir(), 'channels');
     this.pendingPath = path.join(this.dir, `${channelName}-pairing.json`);
     this.allowlistPath = path.join(this.dir, `${channelName}-allowlist.json`);
   }

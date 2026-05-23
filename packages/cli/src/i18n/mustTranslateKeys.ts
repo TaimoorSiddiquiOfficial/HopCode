@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode team
+ * Copyright 2025 Qwen team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,5 +82,5 @@ export const MUST_TRANSLATE_KEYS = [
   '? for shortcuts',
   'Invalid approval mode "{{arg}}". Valid modes: {{modes}}',
   'Approval mode set to "{{mode}}"',
-  "Set up HopCode's status line UI",
+  "Set up Qwen Code's status line UI",
 ] as const;

@@ -63,7 +63,7 @@ export const makeSkillTemplateCommand: SlashCommand = {
 
       return {
         type: 'message',
-        messageType: 'success',
+        messageType: 'info',
         content: generateSuccessReport(skillName, generatedFiles),
       };
     } catch (error) {

@@ -498,4 +498,19 @@ describe('persistPermissionOutcome', () => {
 
     expect(mockPersistFn).not.toHaveBeenCalled();
   });
+
+  it('uses notebook_path as the file path for notebook_edit', () => {
+    expect(
+      buildPermissionCheckContext(
+        'notebook_edit',
+        {
+          notebook_path: '/project/analysis.ipynb',
+        },
+        '/project',
+      ),
+    ).toMatchObject({
+      toolName: 'notebook_edit',
+      filePath: '/project/analysis.ipynb',
+    });
+  });
 });

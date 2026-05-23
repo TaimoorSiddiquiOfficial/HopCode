@@ -18,14 +18,14 @@ function makeSkill(overrides: Partial<SkillConfig> = {}): SkillConfig {
     name: 'my-skill',
     description: 'My skill description',
     level: 'user',
-    filePath: '/home/user/.hopcode/skills/my-skill/SKILL.md',
+    filePath: '/tmp/qwen-test/skills/my-skill/SKILL.md',
     body: 'Skill body content.',
     ...overrides,
   };
 }
 
 function makeSkillPrompt(body: string): string {
-  return buildSkillLlmContent('/home/user/.hopcode/skills/my-skill', body);
+  return buildSkillLlmContent('/tmp/qwen-test/skills/my-skill', body);
 }
 
 describe('SkillCommandLoader', () => {
@@ -112,6 +112,21 @@ describe('SkillCommandLoader', () => {
     expect(cmd.modelInvocable).toBe(true);
   });
 
+  it('does not propagate skill.priority to completionPriority', async () => {
+    // Priority is scoped to the `/skills` listing only; slash-completion /
+    // `/help` ordering should be independent of any skill's priority value.
+    const skill = makeSkill({ level: 'user', priority: 42 });
+    mockSkillManager.listSkills.mockImplementation(
+      ({ level }: { level: string }) =>
+        Promise.resolve(level === 'user' ? [skill] : []),
+    );
+
+    const loader = new SkillCommandLoader(mockConfig);
+    const commands = await loader.loadCommands(signal);
+
+    expect(commands[0].completionPriority).toBeUndefined();
+  });
+
   it('should load project skill with sourceLabel "Project"', async () => {
     const skill = makeSkill({ level: 'project' });
     mockSkillManager.listSkills.mockImplementation(
@@ -163,11 +178,13 @@ describe('SkillCommandLoader', () => {
     );
 
     // buildSkillLlmContent adds trailing \n; appendToLastTextPart adds \n\n separator
-    const expectedWithInvocation =
-      makeSkillPrompt('Skill body content.') + '\n\n/my-skill foo';
     expect(result).toEqual({
       type: 'submit_prompt',
-      content: [{ text: expectedWithInvocation }],
+      content: [
+        {
+          text: `${makeSkillPrompt('Skill body content.')}\n\n/my-skill foo`,
+        },
+      ],
     });
   });
 

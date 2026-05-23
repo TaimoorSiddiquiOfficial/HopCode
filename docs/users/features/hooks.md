@@ -30,13 +30,14 @@ Hooks are user-defined scripts or programs that are automatically executed by Ho
 
 ## Hook Types
 
-HopCode supports three hook executor types:
+Qwen Code supports four hook executor types:
 
 | Type       | Description                                                                                    |
 | :--------- | :--------------------------------------------------------------------------------------------- |
 | `command`  | Execute a shell command. Receives JSON via `stdin`, returns results via `stdout`.              |
 | `http`     | Send JSON as a `POST` request body to a specified URL. Returns results via HTTP response body. |
 | `function` | Directly call a registered JavaScript function (session-level hooks only).                     |
+| `prompt`   | Use an LLM to evaluate hook input and return a decision.                                       |
 
 ### Command Hooks
 
@@ -134,6 +135,102 @@ Function hooks directly call registered JavaScript/TypeScript functions. They ar
 
 **Note**: For most use cases, use **command hooks** or **HTTP hooks** instead, which can be configured in settings files.
 
+### Prompt Hooks
+
+Prompt hooks use an LLM to evaluate hook input and return a decision. This is useful for making intelligent decisions based on context, such as determining whether to allow or block an operation.
+
+**How it works:**
+
+1. The hook input JSON is injected into your prompt using the `$ARGUMENTS` placeholder
+2. The prompt is sent to an LLM (default: your current model)
+3. The LLM returns a JSON response with the decision
+4. Qwen Code processes the decision and continues or blocks execution accordingly
+
+**Configuration:**
+
+| Field           | Type       | Required | Description                                         |
+| :-------------- | :--------- | :------- | :-------------------------------------------------- |
+| `type`          | `"prompt"` | Yes      | Hook type                                           |
+| `prompt`        | `string`   | Yes      | Prompt sent to LLM. Use `$ARGUMENTS` for hook input |
+| `model`         | `string`   | No       | Model to use (defaults to your current model)       |
+| `timeout`       | `number`   | No       | Timeout in seconds, default 30                      |
+| `name`          | `string`   | No       | Hook name (for logging)                             |
+| `description`   | `string`   | No       | Hook description                                    |
+| `statusMessage` | `string`   | No       | Status message displayed during execution           |
+
+**Response Format:**
+
+The LLM must return JSON with the following structure:
+
+```json
+{
+  "ok": true,
+  "reason": "Explanation of the decision",
+  "additionalContext": "Optional context to inject into the conversation"
+}
+```
+
+| Field               | Description                                                                |
+| :------------------ | :------------------------------------------------------------------------- |
+| `ok`                | `true` to allow/continue, `false` to block/stop                            |
+| `reason`            | Required when `ok` is `false`. Shown to the model to explain the block     |
+| `additionalContext` | Optional. Additional context to inject into the conversation when allowing |
+
+**Supported Events:**
+
+Prompt hooks can be used with most hook events, including:
+
+- `PreToolUse` - Evaluate whether to allow a tool call
+- `PostToolUse` - Evaluate tool results and potentially inject context
+- `Stop` - Determine whether to continue or stop
+- `SubagentStop` - Evaluate subagent results
+- `UserPromptSubmit` - Evaluate or enrich user prompts
+
+**Example: Stop Hook**
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are evaluating whether Qwen Code should stop working. Context: $ARGUMENTS\n\nAnalyze the conversation and determine if:\n1. All user-requested tasks are complete\n2. Any errors need to be addressed\n3. Follow-up work is needed\n\nRespond with JSON: {\"ok\": true} to allow stopping, or {\"ok\": false, \"reason\": \"your explanation\"} to continue working.",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+When `ok` is `false`, Qwen Code will continue working and use the `reason` as context for the next response.
+
+**Example: PreToolUse Hook**
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Evaluate this tool call for security concerns. Tool input: $ARGUMENTS\n\nCheck for:\n- Dangerous commands (rm -rf, curl | sh, etc.)\n- Unauthorized access attempts\n- Data exfiltration patterns\n\nRespond with {\"ok\": true} if safe, or {\"ok\": false, \"reason\": \"concern\"} if blocked.",
+            "model": "sonnet",
+            "timeout": 30,
+            "name": "security-evaluator"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## Hook Events
 
 Hooks fire at specific points during a HopCode session. Different events support different matchers to filter trigger conditions.
@@ -161,15 +258,15 @@ Hooks fire at specific points during a HopCode session. Different events support
 
 | Event Type          | Events                                                                 | Matcher Support | Matcher Target                                           |
 | :------------------ | :--------------------------------------------------------------------- | :-------------- | :------------------------------------------------------- |
-| Tool Events         | `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | Γ£à Regex       | Tool name: `WriteFile`, `ReadFile`, `Bash`, etc.         |
-| Subagent Events     | `SubagentStart`, `SubagentStop`                                        | Γ£à Regex       | Agent type: `Bash`, `Explorer`, etc.                     |
-| Session Events      | `SessionStart`                                                         | Γ£à Regex       | Source: `startup`, `resume`, `clear`, `compact`          |
-| Session Events      | `SessionEnd`                                                           | Γ£à Regex       | Reason: `clear`, `logout`, `prompt_input_exit`, etc.     |
-| Notification Events | `Notification`                                                         | Γ£à Exact match | Type: `permission_prompt`, `idle_prompt`, `auth_success` |
-| Compact Events      | `PreCompact`                                                           | Γ£à Exact match | Trigger: `manual`, `auto`                                |
-| Todo Events         | `TodoCreated`, `TodoCompleted`                                         | Γ¥î No          | N/A                                                      |
-| Prompt Events       | `UserPromptSubmit`                                                     | Γ¥î No          | N/A                                                      |
-| Stop Events         | `Stop`                                                                 | Γ¥î No          | N/A                                                      |
+| Tool Events         | `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | ✅ Regex        | Tool name: `WriteFile`, `ReadFile`, `Bash`, etc.         |
+| Subagent Events     | `SubagentStart`, `SubagentStop`                                        | ✅ Regex        | Agent type: `Bash`, `Explorer`, etc.                     |
+| Session Events      | `SessionStart`                                                         | ✅ Regex        | Source: `startup`, `resume`, `clear`, `compact`          |
+| Session Events      | `SessionEnd`                                                           | ✅ Regex        | Reason: `clear`, `logout`, `prompt_input_exit`, etc.     |
+| Notification Events | `Notification`                                                         | ✅ Exact match  | Type: `permission_prompt`, `idle_prompt`, `auth_success` |
+| Compact Events      | `PreCompact`                                                           | ✅ Exact match  | Trigger: `manual`, `auto`                                |
+| Todo Events         | `TodoCreated`, `TodoCompleted`                                         | ❌ No           | N/A                                                      |
+| Prompt Events       | `UserPromptSubmit`                                                     | ❌ No           | N/A                                                      |
+| Stop Events         | `Stop`                                                                 | ❌ No           | N/A                                                      |
 
 **Matcher Syntax:**
 
@@ -811,7 +908,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.hopcode/hooks/todo-validator.sh
+# ~/.qwen/hooks/todo-validator.sh
 # Validates todo content before creation
 
 INPUT=$(cat)
@@ -843,7 +940,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.hopcode/hooks/todo-validator.sh",
+            "command": "$HOME/.qwen/hooks/todo-validator.sh",
             "name": "todo-validator",
             "timeout": 5000
           }
@@ -908,7 +1005,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.hopcode/hooks/todo-completion-validator.sh
+# ~/.qwen/hooks/todo-completion-validator.sh
 # Validates todo completion conditions
 
 INPUT=$(cat)
@@ -937,7 +1034,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.hopcode/hooks/todo-completion-validator.sh",
+            "command": "$HOME/.qwen/hooks/todo-completion-validator.sh",
             "name": "completion-validator",
             "timeout": 5000
           }

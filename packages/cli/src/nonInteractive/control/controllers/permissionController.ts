@@ -141,8 +141,8 @@ export class PermissionController extends BaseController {
 
     // Map permission modes to approval logic (aligned with VALID_APPROVAL_MODE_VALUES)
     switch (mode) {
-      case 'izn': // Allow all tools
       case 'auto-edit': // Auto-approve edit operations
+      case 'auto': // Auto-approve via LLM classifier — coreToolScheduler enforces the gate
       case 'plan': // Auto-approve planning operations
         return { allowed: true };
 
@@ -213,7 +213,8 @@ export class PermissionController extends BaseController {
       'default',
       'plan',
       'auto-edit',
-      'izn',
+      'auto',
+      'yolo',
     ];
 
     if (!validModes.includes(mode)) {

@@ -10,14 +10,14 @@ import { promisify } from 'node:util';
 import os from 'node:os';
 import { getNpmVersion, getGitVersion } from './systemInfo.js';
 import { validateAuthMethod } from '../config/auth.js';
-import { findProviderByCredentials } from '../auth/allProviders.js';
-import type { CommandContext } from '../ui/commands/types.js';
-import type { DoctorCheckResult } from '../ui/types.js';
 import {
+  findProviderByCredentials,
   canUseRipgrep,
   getMCPServerStatus,
   MCPServerStatus,
 } from '@hoptrendy/hopcode-core';
+import type { CommandContext } from '../ui/commands/types.js';
+import type { DoctorCheckResult } from '../ui/types.js';
 import { t } from '../i18n/index.js';
 import { loadGitHubToken } from './githubTokenStore.js';
 

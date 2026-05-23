@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 
-const CHAT_WEBVIEW_TYPE = 'mainThreadWebview-HopCode.chat';
+const CHAT_WEBVIEW_TYPE = 'mainThreadWebview-qwenCode.chat';
 
 function isChatWebview(tab: vscode.Tab): boolean {
   const input: unknown = (tab as { input?: unknown }).input;
@@ -62,7 +62,7 @@ export function findLeftGroupOfChatWebview(): vscode.ViewColumn | undefined {
 }
 
 /**
- * Find the editor group immediately to the right of the HopCode chat webview.
+ * Find the editor group immediately to the right of the Qwen chat webview.
  * - If the chat webview group is the rightmost group, returns undefined.
  * - If no chat webview is found in any editor group, returns undefined.
  */

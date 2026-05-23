@@ -74,7 +74,7 @@ export const githubDeviceAuthCommand: SlashCommand = {
 
       return {
         type: 'message',
-        messageType: 'success',
+        messageType: 'info',
         content: `# ✅ GitHub Authentication Successful!
 
 **Authentication Method**: Device Flow (OAuth 2.0)  

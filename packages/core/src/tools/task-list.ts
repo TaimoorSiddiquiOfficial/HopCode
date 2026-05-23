@@ -38,6 +38,13 @@ class TaskListToolInvocation extends BaseToolInvocation<
 
   async execute(_signal: AbortSignal): Promise<ToolResult> {
     const store = this.config.getTaskStore();
+    if (!store) {
+      return {
+        llmContent: 'Task store is not available.',
+        returnDisplay: 'Task store is not available.',
+        error: { message: 'Task store is not available.' },
+      };
+    }
     const tasks = store.list({
       status: this.params.status as TaskStatus | undefined,
       parentTaskId: this.params.parentTaskId,

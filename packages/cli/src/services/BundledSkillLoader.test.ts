@@ -103,6 +103,20 @@ describe('BundledSkillLoader', () => {
     });
   });
 
+  it('does not propagate skill.priority to completionPriority', async () => {
+    // Priority is intentionally scoped to the `/skills` listing (sorted in
+    // SkillManager.listSkills) and must NOT leak into the slash-completion
+    // menu / `/help` ordering — typing `/` should keep its prior behavior
+    // regardless of any skill's priority value.
+    const skill = makeSkill({ priority: 42 });
+    mockSkillManager.listSkills.mockResolvedValue([skill]);
+
+    const loader = new BundledSkillLoader(mockConfig);
+    const commands = await loader.loadCommands(signal);
+
+    expect(commands[0].completionPriority).toBeUndefined();
+  });
+
   it('should submit skill body as prompt without args', async () => {
     const skill = makeSkill();
     mockSkillManager.listSkills.mockResolvedValue([skill]);
@@ -132,11 +146,13 @@ describe('BundledSkillLoader', () => {
     );
 
     // buildSkillLlmContent adds trailing \n to body; appendToLastTextPart adds \n\n separator
-    const expectedWithInvocation =
-      makeSkillPrompt('You are an expert code reviewer.') + '\n\n/review 123';
     expect(result).toEqual({
       type: 'submit_prompt',
-      content: [{ text: expectedWithInvocation }],
+      content: [
+        {
+          text: `${makeSkillPrompt('You are an expert code reviewer.')}\n\n/review 123`,
+        },
+      ],
     });
   });
 
@@ -179,13 +195,13 @@ describe('BundledSkillLoader', () => {
       '',
     );
 
-    const resolvedBody =
-      'YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder via HopCode';
     expect(result).toEqual({
       type: 'submit_prompt',
       content: [
         {
-          text: makeSkillPrompt(resolvedBody),
+          text: makeSkillPrompt(
+            'YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder via Qwen Code',
+          ),
         },
       ],
     });
@@ -227,13 +243,14 @@ describe('BundledSkillLoader', () => {
       '123',
     );
 
-    const resolvedBody = 'YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder';
     // buildSkillLlmContent adds trailing \n; appendToLastTextPart adds \n\n separator
-    const expectedWithInvocation =
-      makeSkillPrompt(resolvedBody) + '\n\n/review 123';
     expect(result).toEqual({
       type: 'submit_prompt',
-      content: [{ text: expectedWithInvocation }],
+      content: [
+        {
+          text: `${makeSkillPrompt('YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder')}\n\n/review 123`,
+        },
+      ],
     });
   });
 

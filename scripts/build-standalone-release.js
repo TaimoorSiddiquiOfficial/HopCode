@@ -2,7 +2,7 @@
 
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,26 +22,26 @@ const rootDir = path.resolve(__dirname, '..');
 
 const RELEASE_TARGETS = [
   {
-    hopcodeTarget: 'darwin-arm64',
+    qwenTarget: 'darwin-arm64',
     nodeTarget: 'darwin-arm64',
     nodeArchiveExtension: 'tar.gz',
   },
   {
-    hopcodeTarget: 'darwin-x64',
+    qwenTarget: 'darwin-x64',
     nodeTarget: 'darwin-x64',
     nodeArchiveExtension: 'tar.gz',
   },
   {
-    hopcodeTarget: 'linux-arm64',
+    qwenTarget: 'linux-arm64',
     nodeTarget: 'linux-arm64',
     nodeArchiveExtension: 'tar.xz',
   },
   {
-    hopcodeTarget: 'linux-x64',
+    qwenTarget: 'linux-x64',
     nodeTarget: 'linux-x64',
     nodeArchiveExtension: 'tar.xz',
   },
-  { hopcodeTarget: 'win-x64', nodeTarget: 'win-x64', nodeArchiveExtension: 'zip' },
+  { qwenTarget: 'win-x64', nodeTarget: 'win-x64', nodeArchiveExtension: 'zip' },
 ];
 const EXPECTED_ARCHIVE_COUNT = RELEASE_TARGETS.length;
 
@@ -70,7 +70,7 @@ async function main() {
   );
   fs.mkdirSync(runtimeParent, { recursive: true });
   const runtimeDir = fs.mkdtempSync(
-    path.join(runtimeParent, 'hopcode-node-runtime-'),
+    path.join(runtimeParent, 'qwen-node-runtime-'),
   );
   const nodeDistUrl = `https://nodejs.org/dist/v${nodeVersion}`;
 
@@ -104,7 +104,7 @@ function isMainModule() {
 }
 
 async function packageTarget({
-  hopcodeTarget,
+  qwenTarget,
   nodeTarget,
   nodeArchiveExtension,
   nodeDistUrl,
@@ -123,7 +123,7 @@ async function packageTarget({
   const args = [
     'scripts/create-standalone-package.js',
     '--target',
-    hopcodeTarget,
+    qwenTarget,
     '--node-archive',
     archivePath,
     '--out-dir',
@@ -202,8 +202,8 @@ function assertStandaloneOutput(outDir) {
     .filter(Boolean)
     .sort();
   const expectedArchiveNames = RELEASE_TARGETS.map(
-    ({ hopcodeTarget }) =>
-      `hopcode-${hopcodeTarget}.${hopcodeTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
+    ({ qwenTarget }) =>
+      `qwen-code-${qwenTarget}.${qwenTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
   ).sort();
   const missing = expectedArchiveNames.filter(
     (archiveName) => !archiveNames.includes(archiveName),

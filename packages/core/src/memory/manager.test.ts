@@ -233,7 +233,7 @@ describe('MemoryManager', () => {
     beforeEach(() => {
       vi.resetAllMocks();
       vi.mocked(runSkillReviewByAgent).mockResolvedValue({
-        touchedSkillFiles: ['/project/.hopcode/skills/test/SKILL.md'],
+        touchedSkillFiles: ['/project/.qwen/skills/test/SKILL.md'],
       });
     });
 

@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -236,7 +236,7 @@ function buildTaskPrompt(skillsRoot: string): string {
     '',
     'Use `ls` and `read_file` to inspect existing skills before writing.',
     'Use `write_file` to create a new skill, `edit` to update an existing auto-skill.',
-    "Each skill lives at .hopcode/skills/<name>/SKILL.md. Skills you create MUST include 'source: auto-skill' in the frontmatter:",
+    "Each skill lives at .qwen/skills/<name>/SKILL.md. Skills you create MUST include 'source: auto-skill' in the frontmatter:",
     '',
     '---',
     'name: <skill-name>',

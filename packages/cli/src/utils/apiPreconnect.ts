@@ -18,11 +18,11 @@
 import {
   createDebugLogger,
   detectRuntime,
+  getAllProviderBaseUrls,
   getOrCreateSharedDispatcher,
   redactProxyCredentials,
 } from '@hoptrendy/hopcode-core';
-
-import { getAllProviderBaseUrls } from '../auth/allProviders.js';
+import { fetch as undiciFetch } from 'undici';
 
 const debugLogger = createDebugLogger('PRECONNECT');
 
@@ -197,15 +197,19 @@ export function preconnectApi(
     // so the warmed TCP+TLS connection is reused by subsequent API calls.
     const dispatcher = getOrCreateSharedDispatcher(proxy);
 
-    // Fire HEAD request to warm connection (fire-and-forget)
-    fetch(targetUrl, {
+    // Fire HEAD request to warm connection (fire-and-forget).
+    // Use undici's own fetch (not Node's built-in fetch) so the dispatcher
+    // and fetch come from the same undici version — Node's bundled undici
+    // may differ in major version from the bundled one (e.g. v8 vs v6),
+    // causing handler-interface mismatches like `invalid onError method`.
+    undiciFetch(targetUrl, {
       method: 'HEAD',
       signal: AbortSignal.timeout(5_000),
       headers: {
         'User-Agent': 'HopCode-Preconnect/1.0',
       },
       dispatcher,
-    } as RequestInit)
+    })
       .then(() => {
         debugLogger.debug('Preconnect completed');
       })

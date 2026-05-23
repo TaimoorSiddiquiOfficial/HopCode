@@ -42,7 +42,7 @@ export const statusCommand: CommandModule = {
 
     // Read session data for per-channel counts
     const sessionsPath = path.join(
-      Storage.getGlobalHopCodeDir(),
+      Storage.getGlobalQwenDir(),
       'channels',
       'sessions.json',
     );

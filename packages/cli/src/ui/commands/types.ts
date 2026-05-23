@@ -141,7 +141,7 @@ export interface QuitActionReturn {
  */
 export interface MessageActionReturn {
   type: 'message';
-  messageType: 'info' | 'error' | 'warning' | 'success';
+  messageType: 'info' | 'warning' | 'error';
   content: string;
 }
 
@@ -152,7 +152,7 @@ export interface MessageActionReturn {
 export interface StreamMessagesActionReturn {
   type: 'stream_messages';
   messages: AsyncGenerator<
-    { messageType: 'info' | 'error'; content: string },
+    { messageType: 'info' | 'warning' | 'error'; content: string },
     void,
     unknown
   >;
@@ -183,10 +183,10 @@ export interface OpenDialogActionReturn {
     | 'theme'
     | 'editor'
     | 'settings'
+    | 'statusline'
     | 'memory'
     | 'model'
     | 'fast-model'
-    | 'manage-models'
     | 'subagent_create'
     | 'subagent_list'
     | 'trust'
@@ -198,7 +198,8 @@ export interface OpenDialogActionReturn {
     | 'extensions_manage'
     | 'hooks'
     | 'mcp'
-    | 'rewind';
+    | 'rewind'
+    | 'diff';
 }
 
 export interface StartImmediateSubagentActionReturn {
@@ -308,6 +309,8 @@ export interface CommandCompletionItem {
   value: string;
   label?: string;
   description?: string;
+  /** Whether the completion represents a directory path. When true, handleAutocomplete should NOT append a trailing space so the user can continue tab-completing deeper into the directory tree. */
+  isDirectory?: boolean;
 }
 
 // The standardized contract for any command in the system.
@@ -377,6 +380,12 @@ export interface SlashCommand {
    * Example: "<model-id>" / "show|list|set <id>"
    */
   argumentHint?: string;
+
+  /**
+   * Whether command-picker clients should wait for additional user input before
+   * submitting this command. Defaults are inferred from command metadata.
+   */
+  acceptsInput?: boolean;
 
   /**
    * Describes when to use this command — injected into the model-visible

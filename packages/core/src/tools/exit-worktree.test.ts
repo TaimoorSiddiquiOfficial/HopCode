@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,6 +31,11 @@ function makeMockConfig(targetDir = process.cwd()): Config {
 }
 
 describe('ExitWorktreeTool', () => {
+  // Real git invocations + user-global hooks can spike to 10-20s when
+  // the suite runs alongside other integ tests. Bump timeouts so the
+  // suite isn't flaky on CI / busy local runs. (Phase C #4174.)
+  vi.setConfig({ testTimeout: 30000, hookTimeout: 30000 });
+
   describe('metadata', () => {
     it('exposes the correct tool name', () => {
       const tool = new ExitWorktreeTool(makeMockConfig());
@@ -150,7 +155,7 @@ describe('ExitWorktreeTool', () => {
     let repoRoot: string;
 
     beforeEach(async () => {
-      repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-exit-wt-'));
+      repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-exit-wt-'));
       execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
       execFileSync('git', ['config', 'user.email', 't@e.com'], {
         cwd: repoRoot,

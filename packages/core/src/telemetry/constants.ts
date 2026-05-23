@@ -53,15 +53,16 @@ export const EVENT_PERFORMANCE_BASELINE = 'hopcode.performance.baseline';
 export const EVENT_PERFORMANCE_REGRESSION = 'hopcode.performance.regression';
 
 // Managed Auto-Memory Events
-export const EVENT_MEMORY_EXTRACT = 'hopcode.memory.extract';
-export const EVENT_MEMORY_DREAM = 'hopcode.memory.dream';
-export const EVENT_MEMORY_RECALL = 'hopcode.memory.recall';
-
-// Classifier Telemetry
-export const EVENT_CLASSIFIER_SITUATION = 'hopcode.classifier.situation';
+export const EVENT_MEMORY_EXTRACT = 'qwen-code.memory.extract';
+export const EVENT_MEMORY_DREAM = 'qwen-code.memory.dream';
+export const EVENT_MEMORY_RECALL = 'qwen-code.memory.recall';
 
 // Session Tracing Span Names
-export const SPAN_INTERACTION = 'hopcode.interaction';
-export const SPAN_LLM_REQUEST = 'hopcode.llm_request';
-export const SPAN_TOOL = 'hopcode.tool';
-export const SPAN_TOOL_EXECUTION = 'hopcode.tool.execution';
+export const SPAN_INTERACTION = 'qwen-code.interaction';
+export const SPAN_LLM_REQUEST = 'qwen-code.llm_request';
+export const SPAN_TOOL = 'qwen-code.tool';
+export const SPAN_TOOL_EXECUTION = 'qwen-code.tool.execution';
+/** Brackets the time a tool spends in `awaiting_approval` waiting on the user. */
+export const SPAN_TOOL_BLOCKED_ON_USER = 'qwen-code.tool.blocked_on_user';
+/** Wraps each pre/post-tool-use hook fire site for per-hook latency / decision tracking. */
+export const SPAN_HOOK = 'qwen-code.hook';

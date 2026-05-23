@@ -1,4 +1,4 @@
-﻿import * as path from 'node:path';
+import * as path from 'node:path';
 import type { CommandModule } from 'yargs';
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { normalizeProxyUrl, Storage } from '@hoptrendy/hopcode-core';
@@ -53,7 +53,7 @@ export function resolveProxy(
 }
 
 function sessionsPath(): string {
-  return path.join(Storage.getGlobalHopCodeDir(), 'channels', 'sessions.json');
+  return path.join(Storage.getGlobalQwenDir(), 'channels', 'sessions.json');
 }
 
 function loadChannelsConfig(): Record<string, unknown> {

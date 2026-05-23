@@ -1,11 +1,13 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { readdir, readFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
 import process from 'node:process';
+import { promisify } from 'node:util';
 import v8 from 'node:v8';
 import { createDebugLogger } from './debugLogger.js';
 import { formatMemoryUsage } from './formatters.js';
@@ -20,16 +22,18 @@ const ACTIVE_HANDLES_THRESHOLD = 256;
 const ACTIVE_REQUESTS_THRESHOLD = 100;
 const OPEN_FD_THRESHOLD = 500;
 const debugLogger = createDebugLogger('MEMORY_DIAGNOSTICS');
+const execFileAsync = promisify(execFile);
 
 export interface MemoryDiagnostics {
   timestamp: string;
   sessionId?: string;
-  hopcodeVersion?: string;
+  qwenVersion?: string;
   uptimeSeconds: number;
   memoryUsage: NodeJS.MemoryUsage;
   v8HeapStats: V8HeapStats;
   v8HeapSpaces: V8HeapSpaceStats[] | null;
   resourceUsage: MemoryResourceUsage;
+  processTree: ProcessTreeMemoryUsage | null;
   activeHandles: number;
   activeRequests: number;
   openFileDescriptors: number | null;
@@ -57,9 +61,19 @@ export interface V8HeapSpaceStats {
 }
 
 export interface MemoryResourceUsage {
+  /** Normalized bytes. Node/resourceUsage reports maxRSS in KiB. */
   maxRSS: number;
+  maxRSSRaw: number;
+  maxRSSUnit: 'KiB';
   userCPUTime: number;
   systemCPUTime: number;
+}
+
+export interface ProcessTreeMemoryUsage {
+  rootPid: number;
+  processCount: number;
+  rootRSS: number;
+  treeRSS: number;
 }
 
 export interface MemoryDiagnosticsAnalysis {
@@ -82,7 +96,7 @@ export interface MemoryRisk {
 export interface MemoryDiagnosticsOptions {
   now?: () => Date;
   sessionId?: string;
-  hopcodeVersion?: string;
+  qwenVersion?: string;
   memoryUsage?: () => NodeJS.MemoryUsage;
   heapStatistics?: () => v8.HeapInfo;
   heapSpaceStatistics?: () => v8.HeapSpaceInfo[];
@@ -92,6 +106,7 @@ export interface MemoryDiagnosticsOptions {
   activeRequests?: () => number;
   openFileDescriptors?: () => Promise<number>;
   smapsRollup?: () => Promise<string>;
+  processTree?: () => Promise<ProcessTreeMemoryUsage>;
   platform?: NodeJS.Platform;
   nodeVersion?: string;
 }
@@ -114,7 +129,7 @@ export async function collectMemoryDiagnostics(
   const heapStatistics = options.heapStatistics?.() ?? v8.getHeapStatistics();
   const resourceUsage = options.resourceUsage?.() ?? process.resourceUsage();
   const uptimeSeconds = options.uptimeSeconds?.() ?? process.uptime();
-  const [openFileDescriptors, smapsRollup, heapSpaceStatistics] =
+  const [openFileDescriptors, smapsRollup, heapSpaceStatistics, processTree] =
     await Promise.all([
       optionalProbe(
         'openFileDescriptors',
@@ -125,26 +140,32 @@ export async function collectMemoryDiagnostics(
         'heapSpaceStatistics',
         options.heapSpaceStatistics ?? (() => v8.getHeapSpaceStatistics()),
       ),
+      optionalProbe(
+        'processTree',
+        options.processTree ?? (() => collectProcessTreeMemoryUsage(platform)),
+      ),
     ]);
   const v8HeapSpaces = mapHeapSpaces(heapSpaceStatistics);
 
-  // Node.js >=14.10.0 returns maxRSS in bytes on all platforms.
-  // This project requires Node >=22.
-  const maxRSSBytes = resourceUsage.maxRSS;
+  const maxRSSRaw = resourceUsage.maxRSS;
+  const maxRSSBytes = normalizeMaxRSSBytes(maxRSSRaw);
 
   const diagnostics = {
     timestamp: now().toISOString(),
     sessionId: options.sessionId,
-    hopcodeVersion: options.hopcodeVersion,
+    qwenVersion: options.qwenVersion,
     uptimeSeconds,
     memoryUsage,
     v8HeapStats: mapHeapStats(heapStatistics),
     v8HeapSpaces,
     resourceUsage: {
       maxRSS: maxRSSBytes,
+      maxRSSRaw,
+      maxRSSUnit: 'KiB' as const,
       userCPUTime: resourceUsage.userCPUTime,
       systemCPUTime: resourceUsage.systemCPUTime,
     },
+    processTree,
     activeHandles: getProcessInternalCount(
       'activeHandles',
       '_getActiveHandles',
@@ -165,6 +186,10 @@ export async function collectMemoryDiagnostics(
     ...diagnostics,
     analysis: analyzeMemoryDiagnostics(diagnostics),
   };
+}
+
+function normalizeMaxRSSBytes(maxRSSKiB: number): number {
+  return maxRSSKiB * 1024;
 }
 
 function mapHeapStats(heapInfo: v8.HeapInfo): V8HeapStats {
@@ -231,6 +256,85 @@ async function countOpenFileDescriptors(): Promise<number> {
 
 async function readProcSmapsRollup(): Promise<string> {
   return readFile('/proc/self/smaps_rollup', 'utf8');
+}
+
+async function collectProcessTreeMemoryUsage(
+  platform: NodeJS.Platform,
+): Promise<ProcessTreeMemoryUsage> {
+  if (platform === 'win32') {
+    throw new Error('process tree RSS probe is unavailable on win32');
+  }
+
+  const { stdout } = await execFileAsync('ps', ['-axo', 'pid=,ppid=,rss='], {
+    maxBuffer: 1024 * 1024,
+    timeout: 5000,
+  });
+  const rows = parsePsRows(stdout);
+  const rootPid = process.pid;
+  const rowsByPid = new Map(rows.map((row) => [row.pid, row]));
+  const childrenByParent = new Map<number, PsRow[]>();
+  for (const row of rows) {
+    const children = childrenByParent.get(row.ppid);
+    if (children) {
+      children.push(row);
+    } else {
+      childrenByParent.set(row.ppid, [row]);
+    }
+  }
+
+  const queue = [rootPid];
+  const seen = new Set<number>();
+  let rootRSS = 0;
+  let treeRSS = 0;
+  let processCount = 0;
+  while (queue.length > 0) {
+    const pid = queue.shift()!;
+    if (seen.has(pid)) {
+      continue;
+    }
+    seen.add(pid);
+    const row = rowsByPid.get(pid);
+    if (row) {
+      const rssBytes = row.rssKiB * 1024;
+      if (pid === rootPid) {
+        rootRSS = rssBytes;
+      }
+      treeRSS += rssBytes;
+      processCount += 1;
+    }
+    for (const child of childrenByParent.get(pid) ?? []) {
+      queue.push(child.pid);
+    }
+  }
+
+  return {
+    rootPid,
+    processCount,
+    rootRSS,
+    treeRSS,
+  };
+}
+
+interface PsRow {
+  pid: number;
+  ppid: number;
+  rssKiB: number;
+}
+
+function parsePsRows(output: string): PsRow[] {
+  return output
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => {
+      const [pid, ppid, rssKiB] = line.trim().split(/\s+/).map(Number);
+      return { pid, ppid, rssKiB };
+    })
+    .filter(
+      (row) =>
+        Number.isFinite(row.pid) &&
+        Number.isFinite(row.ppid) &&
+        Number.isFinite(row.rssKiB),
+    );
 }
 
 async function optionalProbe<T>(

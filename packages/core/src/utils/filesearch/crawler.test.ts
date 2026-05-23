@@ -51,7 +51,7 @@ async function initGitRepo(dir: string): Promise<void> {
       '-c',
       'user.name=Qwen Test',
       '-c',
-      'user.email=hopcode-test@example.com',
+      'user.email=qwen-test@example.com',
       'commit',
       '--no-gpg-sign',
       '-m',
@@ -59,39 +59,6 @@ async function initGitRepo(dir: string): Promise<void> {
     ],
     dir,
   );
-}
-
-function mockGitListing(
-  gitRoot: string,
-  trackedFiles: string[],
-  deletedFiles: string[] = [],
-): void {
-  __setCommandRunnerForTests(async (command, args) => {
-    if (command !== 'git') {
-      return { success: false, lines: [] };
-    }
-
-    if (args.includes('rev-parse') && args.includes('--show-toplevel')) {
-      return { success: true, lines: [gitRoot] };
-    }
-
-    if (args.includes('ls-files') && args.includes('--others')) {
-      return { success: true, lines: [] };
-    }
-
-    if (args.includes('ls-files') && args.includes('--deleted')) {
-      return { success: true, lines: deletedFiles };
-    }
-
-    if (args.includes('ls-files') && args.includes('--cached')) {
-      return {
-        success: true,
-        lines: trackedFiles.map((file) => `H ${file}`),
-      };
-    }
-
-    return { success: false, lines: [] };
-  });
 }
 
 describe('crawler', () => {
@@ -859,7 +826,7 @@ describe('crawler', () => {
         'file1.js': '',
         src: ['file2.js'],
       });
-      mockGitListing(tmpDir, ['file1.js', 'src/file2.js']);
+      await initGitRepo(tmpDir);
 
       const ignore = loadIgnoreRules({
         projectRoot: tmpDir,
@@ -885,8 +852,8 @@ describe('crawler', () => {
       tmpDir = await createTmpDir({
         src: ['file2.js'],
       });
+      await initGitRepo(tmpDir);
       tmpDir = await fs.realpath(tmpDir);
-      mockGitListing(tmpDir, ['src/file2.js']);
 
       const ignore = loadIgnoreRules({
         projectRoot: tmpDir,
@@ -912,7 +879,8 @@ describe('crawler', () => {
         'alive.txt': '',
         'deleted.txt': '',
       });
-      mockGitListing(tmpDir, ['alive.txt', 'deleted.txt'], ['deleted.txt']);
+      await initGitRepo(tmpDir);
+      await fs.unlink(path.join(tmpDir, 'deleted.txt'));
 
       const ignore = loadIgnoreRules({
         projectRoot: tmpDir,

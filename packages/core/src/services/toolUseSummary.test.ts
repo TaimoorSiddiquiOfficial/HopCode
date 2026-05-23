@@ -254,7 +254,7 @@ describe('generateToolUseSummary', () => {
 
     const options = generateContentFn.mock.calls[0][0];
 
-    expect(options.model).toBe('hopcode-fast');
+    expect(options.model).toBe('qwen-fast');
     expect(options.promptId).toBe('side-query:tool-use-summary');
     expect(options.systemInstruction).toBe(TOOL_USE_SUMMARY_SYSTEM_PROMPT);
 
@@ -308,25 +308,6 @@ describe('generateToolUseSummary', () => {
     // 200 As + some wrapper text, but no 500 As
     expect(userText).toContain('A'.repeat(200));
     expect(userText).not.toContain('A'.repeat(201));
-  });
-
-  it('uses explicit model parameter over config fast model', async () => {
-    const generateContentFn = vi.fn().mockResolvedValue({
-      text: 'Done',
-      usage: undefined,
-    });
-    const config = makeMockConfig('hopcode-fast', generateContentFn);
-
-    await generateToolUseSummary({
-      config,
-      tools: [{ name: 'Edit', input: {}, output: '' }],
-      signal: abortController().signal,
-      model: 'hopcode-turbo-explicit',
-    });
-
-    expect(generateContentFn.mock.calls[0][0].model).toBe(
-      'hopcode-turbo-explicit',
-    );
   });
 
   it('returns null when model returns empty text', async () => {

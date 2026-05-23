@@ -132,7 +132,29 @@ export function buildDeferredToolsSection(
   deferredTools: Array<{ name: string; description: string }>,
 ): string {
   if (!deferredTools || deferredTools.length === 0) return '';
+  // One line per tool, truncated to keep the prompt lean. The model only needs
+  // enough info to decide whether to call ToolSearch; the full schema is
+  // fetched on demand.
+  //
+  // MCP tool descriptions originate from the remote server and are untrusted
+  // input. Render each description as a JSON-encoded string literal so
+  // embedded backticks, quotes, newlines, and control characters can't break
+  // out of the list-line into surrounding system-prompt structure. This
+  // doesn't sanitize the *meaning* (a description that says "ignore previous
+  // instructions" still says that) — the framing line below tells the model
+  // to treat the whole list as data, not instructions.
   const MAX_DESC_LEN = 160;
+  // Render BOTH name and description via JSON.stringify so any quotes,
+  // backslashes, newlines, tabs, control chars, OR backticks they
+  // contain are wrapped inside `"..."` quoted strings instead of being
+  // interpolated raw into surrounding markdown. This is structurally
+  // safer than trying to escape backticks for a markdown inline-code
+  // span — markdown inline code doesn't process backslash escapes, so
+  // `\`` doesn't actually neutralize an embedded backtick (CodeQL
+  // flagged the previous escape attempt as incomplete). MCP names with
+  // embedded backticks are adversarial; this representation keeps them
+  // visible (so the model can `select:` them) without giving them a
+  // path to open a stray code span elsewhere in the prompt.
   const lines = deferredTools.map(({ name, description }) => {
     const firstLine = (description || '').split('\n')[0].trim();
     const truncated =
@@ -141,6 +163,10 @@ export function buildDeferredToolsSection(
         : firstLine;
     return `- ${JSON.stringify(name)}: ${JSON.stringify(truncated)}`;
   });
+  // Pick the first backtick-free tool name as the example; backticks
+  // in the example would re-open the inline-code injection vector
+  // exactly the lines above are guarding against. Falls back to a
+  // generic placeholder when every tool name has a backtick.
   const exampleName =
     deferredTools.find((t) => !t.name.includes('`'))?.name ?? '<tool_name>';
   return `
@@ -160,8 +186,8 @@ export function getCoreSystemPrompt(
   appendInstruction?: string,
   deferredTools?: Array<{ name: string; description: string }>,
 ): string {
-  // if HOPCODE_SYSTEM_MD is set (and not 0|false), override system prompt from file
-  // default path is .hopcode/system.md (project-level), can be overridden via HOPCODE_SYSTEM_MD
+  // if QWEN_SYSTEM_MD is set (and not 0|false), override system prompt from file
+  // default path is .qwen/system.md (project-level), can be overridden via QWEN_SYSTEM_MD
   let systemMdEnabled = false;
   let systemMdPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
   // Resolve the environment variable to get either a path or a switch value.
@@ -310,7 +336,9 @@ IMPORTANT: Always use the ${ToolNames.TODO_WRITE} tool to plan and track tasks t
 - **Background Processes:** Use background execution with \`is_background: true\` for commands that are unlikely to stop on their own, e.g. \`node server.js\`. Do not append a trailing \`&\` when using the shell tool's managed background mode. If unsure, ask the user.
 - **Interactive Commands:** Try to avoid shell commands that are likely to require user interaction (e.g. \`git rebase -i\`). Use non-interactive versions of commands (e.g. \`npm init -y\` instead of \`npm init\`) when available, and otherwise remind the user that interactive shell commands are not supported and may cause hangs until canceled by the user.
 - **Task Management:** Use the '${ToolNames.TODO_WRITE}' tool proactively for complex, multi-step tasks to track progress and provide visibility to users. This tool helps organize work systematically and ensures no requirements are missed.
-- **Subagent Delegation:** When doing file search, prefer to use the '${ToolNames.AGENT}' tool in order to reduce context usage. You should proactively use the '${ToolNames.AGENT}' tool with specialized agents when the task at hand matches the agent's description.
+- **Subagent Delegation:** Use the '${ToolNames.AGENT}' tool with specialized agents when the task at hand matches the agent's description. Subagents are valuable for parallelizing independent queries or for protecting the main context window from excessive results, but they should not be used excessively when not needed. Importantly, avoid duplicating work that subagents are already doing - if you delegate research to a subagent, do not also perform the same searches yourself.
+- For simple, directed codebase searches (e.g. for a specific file/class/function) use the '${ToolNames.GREP}' or '${ToolNames.GLOB}' tools directly.
+- For broader codebase exploration and deep research, use the '${ToolNames.AGENT}' tool with subagent_type=Explore. This is slower than using '${ToolNames.GREP}' or '${ToolNames.GLOB}' directly, so use this only when a simple, directed search proves to be insufficient or when your task will clearly require more than 3 queries.
 - **Respect User Confirmations:** Most tool calls (also denoted as 'function calls') will first require confirmation from the user, where they will either approve or cancel the function call. If a user cancels a function call, respect their choice and do _not_ try to make the function call again. It is okay to request the tool call again _only_ if the user requests that same tool call on a subsequent prompt. When a user cancels a function call, assume best intentions from the user and consider inquiring if they prefer any alternative paths forward.
 
 ## Interaction Details
@@ -359,6 +387,11 @@ ${(function () {
 - After each commit, confirm that it was successful by running \`git status\`.
 - If a commit fails, never attempt to work around the issues without being asked to do so.
 - Never push changes to a remote repository without being asked explicitly by the user.
+
+## Git as Source of Truth
+- Git history, recent changes, or who-changed-what — \`git log\` / \`git blame\` are authoritative. Do NOT rely on memory or assumption when you need to know what changed. Always run the command.
+- If asked about *recent* or *current* state of the codebase, prefer \`git log\` or reading the code over any cached assumption. A memory or snapshot is frozen in time.
+- Debugging solutions or fix recipes — the fix is in the code; the commit message has the context.
 `;
   }
   return '';
@@ -391,21 +424,11 @@ Your core function is efficient and safe assistance. Balance extreme conciseness
       ? buildSystemPromptSuffix(userMemory)
       : '';
   const appendSuffix = buildSystemPromptSuffix(appendInstruction);
-
   const deferredSuffix = deferredTools
     ? buildDeferredToolsSection(deferredTools)
     : '';
 
-  // Only append Quran guidance to the default HopCode prompt, not to
-  // custom instruction prompts, since those are user-authored.
-  // Use a plain newline prefix (no --- separator) so user memory section
-  // remains the last --- block when present.
-  const quranGuidanceText = systemMdEnabled ? '' : getQuranGuidanceSection();
-  const quranGuidanceSuffix = quranGuidanceText
-    ? `\n\n${quranGuidanceText}`
-    : '';
-
-  return `${basePrompt}${deferredSuffix}${quranGuidanceSuffix}${memorySuffix}${appendSuffix}`;
+  return `${basePrompt}${deferredSuffix}${memorySuffix}${appendSuffix}`;
 }
 
 /**

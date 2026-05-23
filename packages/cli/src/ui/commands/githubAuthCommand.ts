@@ -44,7 +44,7 @@ export const githubAuthCommand: SlashCommand = {
     // User is authenticated - show status and app installation link
     return {
       type: 'message',
-      messageType: 'success',
+      messageType: 'info',
       content: generateAuthenticatedMessage(),
     };
   },

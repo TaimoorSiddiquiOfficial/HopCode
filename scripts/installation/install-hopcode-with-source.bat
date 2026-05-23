@@ -7,27 +7,27 @@ setlocal enabledelayedexpansion
 
 set "SOURCE=unknown"
 set "METHOD="
-if defined HOPCODE_INSTALL_METHOD set "METHOD=!HOPCODE_INSTALL_METHOD!"
+if defined HopCode_INSTALL_METHOD set "METHOD=!HopCode_INSTALL_METHOD!"
 set "MIRROR=github"
-if defined HOPCODE_INSTALL_MIRROR set "MIRROR=!HOPCODE_INSTALL_MIRROR!"
+if defined HopCode_INSTALL_MIRROR set "MIRROR=!HopCode_INSTALL_MIRROR!"
 set "BASE_URL="
-if defined HOPCODE_INSTALL_BASE_URL set "BASE_URL=!HOPCODE_INSTALL_BASE_URL!"
+if defined HopCode_INSTALL_BASE_URL set "BASE_URL=!HopCode_INSTALL_BASE_URL!"
 set "ARCHIVE_PATH="
-if defined HOPCODE_INSTALL_ARCHIVE set "ARCHIVE_PATH=!HOPCODE_INSTALL_ARCHIVE!"
+if defined HopCode_INSTALL_ARCHIVE set "ARCHIVE_PATH=!HopCode_INSTALL_ARCHIVE!"
 set "VERSION=latest"
-if defined HOPCODE_INSTALL_VERSION set "VERSION=!HOPCODE_INSTALL_VERSION!"
+if defined HopCode_INSTALL_VERSION set "VERSION=!HopCode_INSTALL_VERSION!"
 set "NPM_REGISTRY=https://registry.npmmirror.com"
-if defined HOPCODE_NPM_REGISTRY set "NPM_REGISTRY=!HOPCODE_NPM_REGISTRY!"
+if defined HopCode_NPM_REGISTRY set "NPM_REGISTRY=!HopCode_NPM_REGISTRY!"
 if defined LOCALAPPDATA (
-    set "INSTALL_BASE=!LOCALAPPDATA!\hopcode"
+    set "INSTALL_BASE=!LOCALAPPDATA!\HopCode-code"
 ) else (
-    set "INSTALL_BASE=!USERPROFILE!\AppData\Local\hopcode"
+    set "INSTALL_BASE=!USERPROFILE!\AppData\Local\HopCode-code"
 )
-if defined HOPCODE_INSTALL_ROOT set "INSTALL_BASE=!HOPCODE_INSTALL_ROOT!"
-set "INSTALL_DIR=!INSTALL_BASE!\hopcode"
-if defined HOPCODE_INSTALL_LIB_DIR set "INSTALL_DIR=!HOPCODE_INSTALL_LIB_DIR!"
+if defined HopCode_INSTALL_ROOT set "INSTALL_BASE=!HopCode_INSTALL_ROOT!"
+set "INSTALL_DIR=!INSTALL_BASE!\HopCode-code"
+if defined HopCode_INSTALL_LIB_DIR set "INSTALL_DIR=!HopCode_INSTALL_LIB_DIR!"
 set "INSTALL_BIN_DIR=!INSTALL_BASE!\bin"
-if defined HOPCODE_INSTALL_BIN_DIR set "INSTALL_BIN_DIR=!HOPCODE_INSTALL_BIN_DIR!"
+if defined HopCode_INSTALL_BIN_DIR set "INSTALL_BIN_DIR=!HopCode_INSTALL_BIN_DIR!"
 
 REM Parse flags before any network or filesystem work.
 :parse_args
@@ -194,77 +194,79 @@ exit /b 1
 :PrintUsage
 echo HopCode Installer
 echo.
-echo Usage: install-hopcode-with-source.bat [OPTIONS]
+echo Usage: install-HopCode-with-source.bat [OPTIONS]
 echo.
 echo Options:
 echo   -s, --source SOURCE      Record the installation source.
 echo                            Only letters, numbers, dot, underscore, and dash are allowed.
 echo   --method METHOD          Install method: detect, standalone, or npm.
-echo   --mirror MIRROR          Standalone archive mirror: github.
+echo   --mirror MIRROR          Standalone archive mirror: github or aliyun.
 echo   --base-url URL           Override standalone archive base URL.
 echo   --archive PATH           Install from a local standalone archive.
 echo   --version VERSION        Standalone release version. Defaults to latest.
 echo   --registry REGISTRY      npm registry to use.
-echo                            Defaults to HOPCODE_NPM_REGISTRY or https://registry.npmmirror.com
+echo                            Defaults to HopCode_NPM_REGISTRY or https://registry.npmmirror.com
 echo   -h, --help               Show this help message.
 exit /b 0
 
 :ValidateOptions
 if "!METHOD!"=="" set "METHOD=detect"
 
-set "HOPCODE_VALIDATE_METHOD=!METHOD!"
-set "HOPCODE_VALIDATE_MIRROR=!MIRROR!"
-set "HOPCODE_VALIDATE_BASE_URL=!BASE_URL!"
-set "HOPCODE_VALIDATE_ARCHIVE_PATH=!ARCHIVE_PATH!"
-set "HOPCODE_VALIDATE_VERSION=!VERSION!"
-set "HOPCODE_VALIDATE_NPM_REGISTRY=!NPM_REGISTRY!"
-set "HOPCODE_VALIDATE_INSTALL_BASE=!INSTALL_BASE!"
-set "HOPCODE_VALIDATE_INSTALL_DIR=!INSTALL_DIR!"
-set "HOPCODE_VALIDATE_INSTALL_BIN_DIR=!INSTALL_BIN_DIR!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124); foreach ($name in 'METHOD','MIRROR','BASE_URL','ARCHIVE_PATH','VERSION','NPM_REGISTRY','INSTALL_BASE','INSTALL_DIR','INSTALL_BIN_DIR') { $value = [Environment]::GetEnvironmentVariable('HOPCODE_VALIDATE_' + $name); if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 } }"
+set "HopCode_VALIDATE_METHOD=!METHOD!"
+set "HopCode_VALIDATE_MIRROR=!MIRROR!"
+set "HopCode_VALIDATE_BASE_URL=!BASE_URL!"
+set "HopCode_VALIDATE_ARCHIVE_PATH=!ARCHIVE_PATH!"
+set "HopCode_VALIDATE_VERSION=!VERSION!"
+set "HopCode_VALIDATE_NPM_REGISTRY=!NPM_REGISTRY!"
+set "HopCode_VALIDATE_INSTALL_BASE=!INSTALL_BASE!"
+set "HopCode_VALIDATE_INSTALL_DIR=!INSTALL_DIR!"
+set "HopCode_VALIDATE_INSTALL_BIN_DIR=!INSTALL_BIN_DIR!"
+set "HopCode_VALIDATE_SOURCE=!SOURCE!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124); foreach ($name in 'METHOD','MIRROR','BASE_URL','ARCHIVE_PATH','VERSION','NPM_REGISTRY','INSTALL_BASE','INSTALL_DIR','INSTALL_BIN_DIR','SOURCE') { $value = [Environment]::GetEnvironmentVariable('HopCode_VALIDATE_' + $name); if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 } }"
 set "PS_STATUS=%ERRORLEVEL%"
-set "HOPCODE_VALIDATE_METHOD="
-set "HOPCODE_VALIDATE_MIRROR="
-set "HOPCODE_VALIDATE_BASE_URL="
-set "HOPCODE_VALIDATE_ARCHIVE_PATH="
-set "HOPCODE_VALIDATE_VERSION="
-set "HOPCODE_VALIDATE_NPM_REGISTRY="
-set "HOPCODE_VALIDATE_INSTALL_BASE="
-set "HOPCODE_VALIDATE_INSTALL_DIR="
-set "HOPCODE_VALIDATE_INSTALL_BIN_DIR="
+set "HopCode_VALIDATE_METHOD="
+set "HopCode_VALIDATE_MIRROR="
+set "HopCode_VALIDATE_BASE_URL="
+set "HopCode_VALIDATE_ARCHIVE_PATH="
+set "HopCode_VALIDATE_VERSION="
+set "HopCode_VALIDATE_NPM_REGISTRY="
+set "HopCode_VALIDATE_INSTALL_BASE="
+set "HopCode_VALIDATE_INSTALL_DIR="
+set "HopCode_VALIDATE_INSTALL_BIN_DIR="
+set "HopCode_VALIDATE_SOURCE="
 if %PS_STATUS% NEQ 0 (
     echo ERROR: installer options contain unsafe command characters.
     exit /b 1
 )
 
 if "!INSTALL_BASE!"=="" (
-    echo ERROR: HOPCODE_INSTALL_ROOT must not be empty.
+    echo ERROR: HopCode_INSTALL_ROOT must not be empty.
     exit /b 1
 )
 if "!INSTALL_DIR!"=="" (
-    echo ERROR: HOPCODE_INSTALL_LIB_DIR must not be empty.
+    echo ERROR: HopCode_INSTALL_LIB_DIR must not be empty.
     exit /b 1
 )
 if "!INSTALL_BIN_DIR!"=="" (
-    echo ERROR: HOPCODE_INSTALL_BIN_DIR must not be empty.
+    echo ERROR: HopCode_INSTALL_BIN_DIR must not be empty.
     exit /b 1
 )
 if "!INSTALL_BASE:~1,2!"==":\" goto validate_install_base_ok
 if "!INSTALL_BASE:~1,2!"==":/" goto validate_install_base_ok
 if "!INSTALL_BASE:~0,2!"=="\\" goto validate_install_base_ok
-echo ERROR: HOPCODE_INSTALL_ROOT must be an absolute path.
+echo ERROR: HopCode_INSTALL_ROOT must be an absolute path.
 exit /b 1
 :validate_install_base_ok
 if "!INSTALL_DIR:~1,2!"==":\" goto validate_install_dir_ok
 if "!INSTALL_DIR:~1,2!"==":/" goto validate_install_dir_ok
 if "!INSTALL_DIR:~0,2!"=="\\" goto validate_install_dir_ok
-echo ERROR: HOPCODE_INSTALL_LIB_DIR must be an absolute path.
+echo ERROR: HopCode_INSTALL_LIB_DIR must be an absolute path.
 exit /b 1
 :validate_install_dir_ok
 if "!INSTALL_BIN_DIR:~1,2!"==":\" goto validate_install_bin_dir_ok
 if "!INSTALL_BIN_DIR:~1,2!"==":/" goto validate_install_bin_dir_ok
 if "!INSTALL_BIN_DIR:~0,2!"=="\\" goto validate_install_bin_dir_ok
-echo ERROR: HOPCODE_INSTALL_BIN_DIR must be an absolute path.
+echo ERROR: HopCode_INSTALL_BIN_DIR must be an absolute path.
 exit /b 1
 :validate_install_bin_dir_ok
 
@@ -276,7 +278,8 @@ exit /b 1
 
 :validate_method_ok
 if /i "!MIRROR!"=="github" goto validate_mirror_ok
-echo ERROR: --mirror must be github.
+if /i "!MIRROR!"=="aliyun" goto validate_mirror_ok
+echo ERROR: --mirror must be github or aliyun.
 exit /b 1
 
 :validate_mirror_ok
@@ -343,28 +346,33 @@ if not "!BASE_URL!"=="" (
 )
 
 call :ReleaseVersionPath
-if /i "!VERSION_PATH!"=="latest" (
-    set "STANDALONE_BASE_URL=https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download"
+if /i "!MIRROR!"=="aliyun" (
+    set "STANDALONE_BASE_URL=https://HopCode-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/HopCode-code/!VERSION_PATH!"
     exit /b 0
 )
 
-set "STANDALONE_BASE_URL=https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/download/!VERSION_PATH!"
+if /i "!VERSION_PATH!"=="latest" (
+    set "STANDALONE_BASE_URL=https://github.com/HopCodeLM/HopCode-code/releases/latest/download"
+    exit /b 0
+)
+
+set "STANDALONE_BASE_URL=https://github.com/HopCodeLM/HopCode-code/releases/download/!VERSION_PATH!"
 exit /b 0
 
 :UrlExists
-set "HOPCODE_CHECK_URL=%~1"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $request = [Net.WebRequest]::Create($env:HOPCODE_CHECK_URL); $request.Method = 'HEAD'; try { $response = $request.GetResponse(); $response.Close(); exit 0 } catch { exit 1 }" >nul 2>&1
+set "HopCode_CHECK_URL=%~1"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $request = [Net.WebRequest]::Create($env:HopCode_CHECK_URL); $request.Method = 'HEAD'; try { $response = $request.GetResponse(); $response.Close(); exit 0 } catch { exit 1 }" >nul 2>&1
 set "PS_STATUS=%ERRORLEVEL%"
-set "HOPCODE_CHECK_URL="
+set "HopCode_CHECK_URL="
 exit /b %PS_STATUS%
 
 :DownloadFile
-set "HOPCODE_DOWNLOAD_URL=%~1"
-set "HOPCODE_DOWNLOAD_DEST=%~2"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $client = New-Object Net.WebClient; $client.DownloadFile($env:HOPCODE_DOWNLOAD_URL, $env:HOPCODE_DOWNLOAD_DEST); exit 0 } catch { exit 1 }"
+set "HopCode_DOWNLOAD_URL=%~1"
+set "HopCode_DOWNLOAD_DEST=%~2"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $client = New-Object Net.WebClient; $client.DownloadFile($env:HopCode_DOWNLOAD_URL, $env:HopCode_DOWNLOAD_DEST); exit 0 } catch { exit 1 }"
 set "PS_STATUS=%ERRORLEVEL%"
-set "HOPCODE_DOWNLOAD_URL="
-set "HOPCODE_DOWNLOAD_DEST="
+set "HopCode_DOWNLOAD_URL="
+set "HopCode_DOWNLOAD_DEST="
 exit /b %PS_STATUS%
 
 :VerifyChecksum
@@ -380,7 +388,7 @@ if "!CHECKSUM_FILE!"=="" (
 ) else (
     if /i "!CHECKSUM_FILE:~0,8!"=="https://" (
         set "REQUIRE_CHECKSUM=1"
-        set "TEMP_CHECKSUM=%TEMP%\hopcode-checksums-%RANDOM%%RANDOM%.txt"
+        set "TEMP_CHECKSUM=%TEMP%\HopCode-code-checksums-%RANDOM%%RANDOM%.txt"
         call :DownloadFile "!CHECKSUM_FILE!" "!TEMP_CHECKSUM!"
         if !ERRORLEVEL! NEQ 0 (
             if exist "!TEMP_CHECKSUM!" del /F /Q "!TEMP_CHECKSUM!" >nul 2>&1
@@ -421,11 +429,11 @@ if "!EXPECTED_HASH!"=="" (
 )
 
 set "ACTUAL_HASH="
-set "HOPCODE_HASH_FILE=!ARCHIVE_FILE!"
-for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module $env:SystemRoot\system32\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Utility\Microsoft.PowerShell.Utility.psd1 -Force; $ErrorActionPreference = 'Stop'; $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $env:HOPCODE_HASH_FILE; Write-Output $hash.Hash" 2^>nul') do (
+set "HopCode_HASH_FILE=!ARCHIVE_FILE!"
+for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; (Get-FileHash -Algorithm SHA256 -LiteralPath $env:HopCode_HASH_FILE).Hash" 2^>nul') do (
     if "!ACTUAL_HASH!"=="" set "ACTUAL_HASH=%%H"
 )
-set "HOPCODE_HASH_FILE="
+set "HopCode_HASH_FILE="
 
 if not "!TEMP_CHECKSUM!"=="" del /F /Q "!TEMP_CHECKSUM!" >nul 2>&1
 
@@ -462,7 +470,7 @@ if not "!ARCHIVE_PATH!"=="" (
     call :DetectTarget
     if !ERRORLEVEL! NEQ 0 exit /b 2
 
-    set "ARCHIVE_NAME=hopcode-win-x64.zip"
+    set "ARCHIVE_NAME=HopCode-code-win-x64.zip"
     call :StandaloneBaseUrl
     set "ARCHIVE_URL=!STANDALONE_BASE_URL!/!ARCHIVE_NAME!"
     set "CHECKSUM_SOURCE=!STANDALONE_BASE_URL!/SHA256SUMS"
@@ -475,7 +483,7 @@ if not "!ARCHIVE_PATH!"=="" (
         )
     )
 
-    set "TEMP_DIR=%TEMP%\hopcode-install-%RANDOM%%RANDOM%"
+    set "TEMP_DIR=%TEMP%\HopCode-code-install-%RANDOM%%RANDOM%"
     mkdir "!TEMP_DIR!" >nul 2>&1
     set "ARCHIVE_FILE=!TEMP_DIR!\!ARCHIVE_NAME!"
 
@@ -489,7 +497,7 @@ if not "!ARCHIVE_PATH!"=="" (
 )
 
 if "!TEMP_DIR!"=="" (
-    set "TEMP_DIR=%TEMP%\hopcode-install-%RANDOM%%RANDOM%"
+    set "TEMP_DIR=%TEMP%\HopCode-code-install-%RANDOM%%RANDOM%"
     mkdir "!TEMP_DIR!" >nul 2>&1
 )
 
@@ -503,12 +511,17 @@ if !ERRORLEVEL! NEQ 0 (
 REM Extract into a temporary directory, then validate required entry points.
 set "EXTRACT_DIR=!TEMP_DIR!\extract"
 mkdir "!EXTRACT_DIR!" >nul 2>&1
-set "HOPCODE_ARCHIVE_FILE=!ARCHIVE_FILE!"
-set "HOPCODE_EXTRACT_DIR=!EXTRACT_DIR!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath $env:HOPCODE_ARCHIVE_FILE -DestinationPath $env:HOPCODE_EXTRACT_DIR -Force"
+call :ValidateArchiveContents "!ARCHIVE_FILE!"
+if !ERRORLEVEL! NEQ 0 (
+    if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
+    exit /b 1
+)
+set "HopCode_ARCHIVE_FILE=!ARCHIVE_FILE!"
+set "HopCode_EXTRACT_DIR=!EXTRACT_DIR!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath $env:HopCode_ARCHIVE_FILE -DestinationPath $env:HopCode_EXTRACT_DIR -Force"
 set "PS_STATUS=!ERRORLEVEL!"
-set "HOPCODE_ARCHIVE_FILE="
-set "HOPCODE_EXTRACT_DIR="
+set "HopCode_ARCHIVE_FILE="
+set "HopCode_EXTRACT_DIR="
 if !PS_STATUS! NEQ 0 (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
     echo ERROR: Failed to extract standalone archive.
@@ -521,15 +534,15 @@ if !ERRORLEVEL! NEQ 0 (
     exit /b 1
 )
 
-if not exist "!EXTRACT_DIR!\hopcode\bin\hopcode.cmd" (
+if not exist "!EXTRACT_DIR!\HopCode-code\bin\HopCode.cmd" (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Archive does not contain hopcode\bin\hopcode.cmd.
+    echo ERROR: Archive does not contain HopCode-code\bin\HopCode.cmd.
     exit /b 1
 )
 
-if not exist "!EXTRACT_DIR!\hopcode\node\node.exe" (
+if not exist "!EXTRACT_DIR!\HopCode-code\node\node.exe" (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Archive does not contain hopcode\node\node.exe.
+    echo ERROR: Archive does not contain HopCode-code\node\node.exe.
     exit /b 1
 )
 
@@ -560,7 +573,7 @@ if !ERRORLEVEL! NEQ 0 (
 
 if exist "!NEW_INSTALL_DIR!" rmdir /S /Q "!NEW_INSTALL_DIR!" >nul 2>&1
 if exist "!OLD_INSTALL_DIR!" rmdir /S /Q "!OLD_INSTALL_DIR!" >nul 2>&1
-move /Y "!EXTRACT_DIR!\hopcode" "!NEW_INSTALL_DIR!" >nul
+move /Y "!EXTRACT_DIR!\HopCode-code" "!NEW_INSTALL_DIR!" >nul
 if !ERRORLEVEL! NEQ 0 (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
     echo ERROR: Failed to stage standalone archive.
@@ -585,22 +598,22 @@ if !ERRORLEVEL! NEQ 0 (
 
 (
 echo @echo off
-echo call "!INSTALL_DIR!\bin\hopcode.cmd" %%*
-) > "!INSTALL_BIN_DIR!\hopcode.cmd.new"
+echo call "!INSTALL_DIR!\bin\HopCode.cmd" %%*
+) > "!INSTALL_BIN_DIR!\HopCode.cmd.new"
 if !ERRORLEVEL! NEQ 0 (
     if exist "!INSTALL_DIR!" rmdir /S /Q "!INSTALL_DIR!" >nul 2>&1
     if exist "!OLD_INSTALL_DIR!" move /Y "!OLD_INSTALL_DIR!" "!INSTALL_DIR!" >nul
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create HopCode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
-move /Y "!INSTALL_BIN_DIR!\hopcode.cmd.new" "!INSTALL_BIN_DIR!\hopcode.cmd" >nul
+move /Y "!INSTALL_BIN_DIR!\HopCode.cmd.new" "!INSTALL_BIN_DIR!\HopCode.cmd" >nul
 if !ERRORLEVEL! NEQ 0 (
-    if exist "!INSTALL_BIN_DIR!\hopcode.cmd.new" del /F /Q "!INSTALL_BIN_DIR!\hopcode.cmd.new" >nul 2>&1
+    if exist "!INSTALL_BIN_DIR!\HopCode.cmd.new" del /F /Q "!INSTALL_BIN_DIR!\HopCode.cmd.new" >nul 2>&1
     if exist "!INSTALL_DIR!" rmdir /S /Q "!INSTALL_DIR!" >nul 2>&1
     if exist "!OLD_INSTALL_DIR!" move /Y "!OLD_INSTALL_DIR!" "!INSTALL_DIR!" >nul
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create HopCode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 
@@ -614,11 +627,31 @@ echo SUCCESS: HopCode standalone archive installed successfully.
 echo INFO: Installed to !INSTALL_DIR!
 exit /b 0
 
-:RejectArchiveLinks
-set "HOPCODE_EXTRACT_DIR=%~1"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$item = Get-ChildItem -LiteralPath $env:HOPCODE_EXTRACT_DIR -Recurse -Force | Where-Object { $_.Attributes -match 'ReparsePoint' }; if ($item) { exit 1 } else { exit 0 }"
+:ValidateArchiveContents
+set "HopCode_ARCHIVE_FILE=%~1"
+REM Enumerate archive entries and reject any with path traversal indicators:
+REM empty names, leading '/', drive-rooted paths, '..' segments, or control chars.
+REM This prevents Zip Slip attacks before extraction.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $archive = $null; try { Add-Type -AssemblyName System.IO.Compression.FileSystem; $archive = [IO.Compression.ZipFile]::OpenRead($env:HopCode_ARCHIVE_FILE); foreach ($entry in $archive.Entries) { $raw = $entry.FullName; if ($raw.IndexOfAny([char[]](10,13)) -ge 0) { [Console]::Error.WriteLine('Archive contains unsafe path with control character: ' + $raw); exit 1 }; $name = $raw -replace '\\', '/'; while ($name.StartsWith('./')) { $name = $name.Substring(2) }; if ($name -eq '' -or $name.StartsWith('/') -or $name -match '^[A-Za-z]:' -or $name -match '(^|/)\.\.(/|$)') { [Console]::Error.WriteLine('Archive contains unsafe path: ' + $entry.FullName); exit 1 } } } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 } finally { if ($null -ne $archive) { $archive.Dispose() } }"
 set "PS_STATUS=%ERRORLEVEL%"
-set "HOPCODE_EXTRACT_DIR="
+set "HopCode_ARCHIVE_FILE="
+if %PS_STATUS% EQU 0 exit /b 0
+if %PS_STATUS% EQU 1 (
+    echo ERROR: Archive contains unsafe path entries.
+    exit /b 1
+)
+if %PS_STATUS% EQU 2 (
+    echo ERROR: Archive could not be inspected before extraction.
+    exit /b 1
+)
+echo ERROR: Archive validation failed before extraction.
+exit /b %PS_STATUS%
+
+:RejectArchiveLinks
+set "HopCode_EXTRACT_DIR=%~1"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$item = Get-ChildItem -LiteralPath $env:HopCode_EXTRACT_DIR -Recurse -Force | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 } | Select-Object -First 1; if ($item) { exit 1 }"
+set "PS_STATUS=%ERRORLEVEL%"
+set "HopCode_EXTRACT_DIR="
 if %PS_STATUS% NEQ 0 echo ERROR: Archive contains symlinks or reparse points; refusing to install.
 exit /b %PS_STATUS%
 
@@ -684,21 +717,21 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 call :RequireNpm
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
-where hopcode >nul 2>&1
+where HopCode >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "HOPCODE_VERSION=%%i"
-    echo INFO: Existing HopCode detected: !HOPCODE_VERSION!
+    for /f "delims=" %%i in ('HopCode --version 2^>nul') do set "HopCode_VERSION=%%i"
+    echo INFO: Existing HopCode detected: !HopCode_VERSION!
     echo INFO: Upgrading to the latest version.
 )
 
-echo INFO: Running: npm install -g @hoptrendy/hopcode-cli@latest --registry !NPM_REGISTRY!
-call npm install -g @hoptrendy/hopcode-cli@latest --registry "!NPM_REGISTRY!"
+echo INFO: Running: npm install -g @HopCode-code/HopCode-code@latest --registry !NPM_REGISTRY!
+call npm install -g @HopCode-code/HopCode-code@latest --registry "!NPM_REGISTRY!"
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Failed to install HopCode.
     echo.
     echo This installer does not change your npm prefix or PATH.
     echo If the failure is a permission error, fix your npm global package directory, then run:
-    echo   npm install -g @hoptrendy/hopcode-cli@latest --registry !NPM_REGISTRY!
+    echo   npm install -g @HopCode-code/HopCode-code@latest --registry !NPM_REGISTRY!
     exit /b 1
 )
 
@@ -709,16 +742,16 @@ exit /b 0
 :CreateSourceJson
 if "!SOURCE!"=="unknown" exit /b 0
 
-set "HOPCODE_DIR=!USERPROFILE!\.hopcode"
-if not exist "!HOPCODE_DIR!" mkdir "!HOPCODE_DIR!"
+set "HopCode_DIR=!USERPROFILE!\.HopCode"
+if not exist "!HopCode_DIR!" mkdir "!HopCode_DIR!"
 
 (
 echo {
 echo   "source": "!SOURCE!"
 echo }
-) > "!HOPCODE_DIR!\source.json"
+) > "!HopCode_DIR!\source.json"
 
-echo SUCCESS: Installation source saved to !USERPROFILE!\.hopcode\source.json
+echo SUCCESS: Installation source saved to !USERPROFILE!\.HopCode\source.json
 exit /b 0
 
 :PrintFinalInstructions
@@ -731,26 +764,26 @@ echo Installation completed!
 echo ===========================================
 echo.
 
-where hopcode >nul 2>&1
+where HopCode >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "HOPCODE_VERSION=%%i"
-    echo SUCCESS: HopCode is ready to use: !HOPCODE_VERSION!
+    for /f "delims=" %%i in ('HopCode --version 2^>nul') do set "HopCode_VERSION=%%i"
+    echo SUCCESS: HopCode is ready to use: !HopCode_VERSION!
     echo.
-    echo You can now run: hopcode
+    echo You can now run: HopCode
     echo.
-    echo INFO: Run hopcode in your project directory to start an interactive session.
+    echo INFO: Run HopCode in your project directory to start an interactive session.
     exit /b 0
 )
 
-echo WARNING: HopCode was installed, but hopcode is not on PATH in this prompt.
+echo WARNING: HopCode was installed, but HopCode is not on PATH in this prompt.
 echo.
-echo Restart your command prompt, then run: hopcode
+echo Restart your command prompt, then run: HopCode
 if not "!EXTRA_BIN!"=="" (
     echo.
     echo Or add this directory to PATH:
     echo   !EXTRA_BIN!
     echo Then run:
-    echo   hopcode
+    echo   HopCode
     exit /b 0
 )
 
@@ -760,6 +793,7 @@ if not "!NPM_PREFIX!"=="" (
     echo Or add this npm global directory to PATH:
     echo   !NPM_PREFIX!
     echo Then run:
-    echo   hopcode
+    echo   HopCode
 )
 exit /b 0
+

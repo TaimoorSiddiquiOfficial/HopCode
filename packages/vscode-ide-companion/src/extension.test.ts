@@ -7,18 +7,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as vscode from 'vscode';
 import { activate } from './extension.js';
-import {
-  IDE_DEFINITIONS,
-  detectIdeFromEnv,
-} from '@hoptrendy/hopcode-core/src/ide/detect-ide.js';
+import { IDE_DEFINITIONS, detectIdeFromEnv } from '@hoptrendy/hopcode-core';
 
-vi.mock('@hoptrendy/hopcode-core/src/ide/detect-ide.js', async () => {
-  const actual = await vi.importActual(
-    '@hoptrendy/hopcode-core/src/ide/detect-ide.js',
-  );
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
-    detectIdeFromEnv: vi.fn(() => IDE_DEFINITIONS.vscode),
+    detectIdeFromEnv: vi.fn(() => actual.IDE_DEFINITIONS.vscode),
   };
 });
 

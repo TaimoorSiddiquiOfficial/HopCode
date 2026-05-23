@@ -5,7 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import type { File } from '@hoptrendy/hopcode-core/src/ide/types.js';
+import type { File } from '@hoptrendy/hopcode-core';
 
 export function isFileUri(uri: vscode.Uri): boolean {
   return uri.scheme === 'file';

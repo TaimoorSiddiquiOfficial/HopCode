@@ -31,6 +31,13 @@ class TaskOutputToolInvocation extends BaseToolInvocation<
 
   async execute(_signal: AbortSignal): Promise<ToolResult> {
     const store = this.config.getTaskStore();
+    if (!store) {
+      return {
+        llmContent: 'Task store is not available.',
+        returnDisplay: 'Task store is not available.',
+        error: { message: 'Task store is not available.' },
+      };
+    }
     const task = store.setOutput(this.params.taskId, this.params.output);
 
     if (!task) {

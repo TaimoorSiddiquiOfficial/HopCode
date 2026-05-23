@@ -134,6 +134,45 @@ export default {
     'Переименовать текущий разговор. --auto позволит быстрой модели выбрать заголовок.',
   'Rewind conversation to a previous turn':
     'Откатить разговор к предыдущему ходу',
+  'Rewind Conversation': 'Перемотка разговора',
+  'No user turns to rewind to.': 'Нет пользовательских ходов для перемотки.',
+  'Rewind to: ': 'Перемотать к: ',
+  'Restore code and conversation': 'Восстановить код и беседу',
+  'Restore conversation only': 'Восстановить только беседу',
+  'Restore code only': 'Восстановить только код',
+  'Never mind': 'Неважно',
+  'Computing file changes...': 'Вычисление изменений файлов...',
+  'Restoring...': 'Восстановление...',
+  'Restored {{count}} file(s).': 'Восстановлено файлов: {{count}}.',
+  'Failed to restore files: {{error}}':
+    'Не удалось восстановить файлы: {{error}}',
+  'Rewind failed: {{error}}': 'Сбой отката: {{error}}',
+  'Cannot rewind conversation: no active model client.':
+    'Невозможно откатить разговор: нет активного клиента модели.',
+  'Code restored, but conversation could not be rewound (no active client).':
+    'Код восстановлен, но разговор не удалось откатить (нет активного клиента).',
+  'Conversation rewound. Edit your prompt and press Enter to continue.':
+    'Разговор откатили. Отредактируйте подсказку и нажмите Enter, чтобы продолжить.',
+  'Rewinding does not affect files edited manually or via shell commands.':
+    'Откат не затрагивает файлы, отредактированные вручную или с помощью shell-команд.',
+  'Cannot rewind to a turn that was compressed. Try a more recent turn.':
+    'Не удаётся откатиться к сжатому ходу. Попробуйте более недавний ход.',
+  'File restore is unavailable for this turn (no captured file changes, or this turn predates the current session).':
+    'Восстановление файлов недоступно для этого хода (нет записанных изменений или ход был до текущей сессии).',
+  '(+{{insertions}} -{{deletions}} in {{count}} file)':
+    '(+{{insertions}} -{{deletions}} в {{count}} файле)',
+  '(+{{insertions}} -{{deletions}} in {{count}} files)':
+    '(+{{insertions}} -{{deletions}} в {{count}} файлах)',
+  'Failed to restore {{count}} file(s): {{files}}':
+    'Не удалось восстановить {{count}} файл(ов): {{files}}',
+  'Cannot restore files: this turn was created before file checkpointing was enabled.':
+    'Невозможно восстановить файлы: этот ход был создан до включения контрольных точек файлов.',
+  'No files needed to be restored.': 'Файлы не нуждались в восстановлении.',
+  '↑↓ to navigate · Enter to select · Esc to go back':
+    '↑↓ навигация · Enter выбор · Esc назад',
+  '↑↓ to navigate · Enter to select · Esc to cancel':
+    '↑↓ навигация · Enter выбор · Esc отмена',
+  'Enter/Y to confirm · Esc/N to go back': 'Enter/Y подтвердить · Esc/N назад',
   'change the theme': 'Изменение темы',
   'Select Theme': 'Выбор темы',
   Preview: 'Предпросмотр',
@@ -153,8 +192,7 @@ export default {
   'open full HopCode documentation in your browser':
     'Открытие полной документации HopCode в браузере',
   'Configuration not available.': 'Конфигурация недоступна.',
-  'Configure authentication information for login':
-    'Настройка аутентификационной информации для входа',
+  'Connect an LLM provider': 'Подключить провайдера LLM',
   'Copy the last result or code snippet to clipboard':
     'Копирование последнего результата или фрагмента кода в буфер обмена',
 
@@ -303,8 +341,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': 'Просмотр и изменение настроек HopCode',
   Settings: 'Настройки',
-  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    'Для применения изменений необходимо перезапустить HopCode. Нажмите r для выхода и применения изменений.',
+  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
+    'Для применения изменений необходимо перезапустить Qwen Code. Нажмите r для выхода и применения изменений.',
   // ============================================================================
   // Метки настроек
   // ============================================================================
@@ -416,8 +454,8 @@ export default {
   remote: 'удалённый',
   'This extension will add the following commands: {{commands}}.':
     'Это расширение добавит следующие команды: {{commands}}.',
-  'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    'Это расширение добавит информацию в ваш контекст HOPCODE.md с помощью {{fileName}}',
+  'This extension will append info to your QWEN.md context using {{fileName}}':
+    'Это расширение добавит информацию в ваш контекст QWEN.md с помощью {{fileName}}',
   'This extension will install the following skills:':
     'Это расширение установит следующие навыки:',
   'This extension will install the following subagents:':
@@ -1004,20 +1042,20 @@ export default {
   '👋 Welcome back! (Last updated: {{timeAgo}})':
     '👋 С возвращением! (Последнее обновление: {{timeAgo}})',
   '🎯 Overall Goal:': '🎯 Общая цель:',
-  'Select Authentication Method': 'Выберите метод авторизации',
-  'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    'Вы должны выбрать метод авторизации для продолжения. Нажмите Ctrl+C снова для выхода.',
+  'Connect a Provider': 'Подключить провайдера',
+  'You must connect a provider to proceed. Press Ctrl+C again to exit.':
+    'Необходимо подключить провайдера для продолжения. Нажмите Ctrl+C снова для выхода.',
   'Terms of Services and Privacy Notice':
     'Условия обслуживания и уведомление о конфиденциальности',
   'HopCode OAuth': 'HopCode OAuth',
   'Discontinued — switch to Coding Plan or API Key':
     'Прекращено — переключитесь на Coding Plan или API Key',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Бесплатный уровень HopCode OAuth прекращён 2026-04-15. Выберите Coding Plan или API Key.',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Бесплатный уровень HopCode OAuth был прекращен 2026-04-15. Пожалуйста, выберите модель от другого провайдера или выполните /auth для переключения.',
-  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ Бесплатный уровень HopCode OAuth прекращён 2026-04-15. Выберите другую опцию.\n',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'Бесплатный уровень Qwen OAuth прекращён 2026-04-15. Выберите Coding Plan или API Key.',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'Бесплатный уровень Qwen OAuth был прекращен 2026-04-15. Пожалуйста, выберите модель от другого провайдера или выполните /auth для переключения.',
+  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ Бесплатный уровень Qwen OAuth прекращён 2026-04-15. Выберите другую опцию.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     'Платно \u00B7 До 6 000 запросов/5 часов \u00B7 Все модели Alibaba Cloud Coding Plan',
   'Alibaba Cloud Coding Plan': 'Alibaba Cloud Coding Plan',
@@ -1026,18 +1064,18 @@ export default {
     'Браузерная аутентификация с использованием сторонних провайдеров (например, OpenRouter, ModelScope)',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     'Авторизация должна быть {{enforcedType}}, но вы сейчас используете {{currentType}}.',
-  'HopCode OAuth Authentication': 'Авторизация HopCode OAuth',
+  'Qwen OAuth Authentication': 'Авторизация Qwen OAuth',
   'Please visit this URL to authorize:':
     'Пожалуйста, посетите этот URL для авторизации:',
   'Waiting for authorization': 'Ожидание авторизации',
   'Time remaining:': 'Осталось времени:',
-  'HopCode OAuth Authentication Timeout': 'Таймаут авторизации HopCode OAuth',
+  'Qwen OAuth Authentication Timeout': 'Таймаут авторизации Qwen OAuth',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'Токен OAuth истек (более {{seconds}} секунд). Пожалуйста, выберите метод авторизации снова.',
   'Press any key to return to authentication type selection.':
     'Нажмите любую клавишу для возврата к выбору типа авторизации.',
-  'Waiting for HopCode OAuth authentication...':
-    'Ожидание авторизации HopCode OAuth...',
+  'Waiting for Qwen OAuth authentication...':
+    'Ожидание авторизации Qwen OAuth...',
   'Authentication timed out. Please try again.':
     'Время ожидания авторизации истекло. Пожалуйста, попробуйте снова.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1059,8 +1097,8 @@ export default {
     'Не удалось авторизоваться. Сообщение: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     'Успешно авторизовано с учетными данными {{authType}}.',
-  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    'Неверное значение HOPCODE_DEFAULT_AUTH_TYPE: "{{value}}". Допустимые значения: {{validValues}}',
+  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    'Неверное значение QWEN_DEFAULT_AUTH_TYPE: "{{value}}". Допустимые значения: {{validValues}}',
   // ============================================================================
   // Диалоги - Модель
   // ============================================================================
@@ -1604,8 +1642,8 @@ export default {
   servers: 'серверов',
   'Add MCP servers to your settings to get started.':
     'Добавьте MCP servers в настройки, чтобы начать.',
-  'Run hopcode --debug to see error logs':
-    'Запустите hopcode --debug для просмотра журналов ошибок',
+  'Run qwen --debug to see error logs':
+    'Запустите qwen --debug для просмотра журналов ошибок',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth-аутентификация',
@@ -1643,7 +1681,7 @@ export default {
     '↑/↓: Навигация | ←/→: Переключение вкладок | Enter: Выбор',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: Навигация | Enter: Выбор | Esc: Отмена',
-  'Authenticate using HopCode OAuth': 'Аутентификация через HopCode OAuth',
+  'Authenticate using Qwen OAuth': 'Аутентификация через Qwen OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Аутентификация через Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
@@ -1675,8 +1713,8 @@ export default {
     '⚠️  Метод аутентификации не настроен.\n',
   'Run one of the following commands to get started:\n':
     'Выполните одну из следующих команд для начала:\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - Аутентификация через HopCode OAuth (прекращено)',
+  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  qwen auth qwen-oauth     - Аутентификация через Qwen OAuth (прекращено)',
   'Or simply run:': 'Или просто выполните:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Интерактивная настройка аутентификации\n',
@@ -1685,8 +1723,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Тип: Бесплатный уровень (прекращено 2026-04-15)',
   '  Limit: No longer available': '  Лимит: Больше не доступен',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Бесплатный уровень HopCode OAuth прекращён 2026-04-15. Выполните /auth для переключения на Coding Plan, OpenRouter, Fireworks AI или другого провайдера.',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'Бесплатный уровень Qwen OAuth прекращён 2026-04-15. Выполните /auth для переключения на Coding Plan, OpenRouter, Fireworks AI или другого провайдера.',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ Метод аутентификации: Alibaba Cloud Coding Plan',
   'Global - Alibaba Cloud': 'Глобальный - Alibaba Cloud',
@@ -1698,8 +1736,8 @@ export default {
     '⚠️  Метод аутентификации: Alibaba Cloud Coding Plan (Не завершён)',
   '  Issue: API key not found in environment or settings\n':
     '  Проблема: API Key не найден в окружении или настройках\n',
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  Выполните `hopcode auth coding-plan` для повторной настройки.\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  Выполните `qwen auth coding-plan` для повторной настройки.\n',
   '✓ Authentication Method: {{type}}': '✓ Метод аутентификации: {{type}}',
   '  Status: Configured\n': '  Статус: Настроено\n',
   'Failed to check authentication status: {{error}}':
@@ -1723,8 +1761,8 @@ export default {
     'Уже в режиме плана. Используйте "/plan exit" для выхода из режима плана.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Не в режиме плана. Сначала используйте "/plan" для входа в режим плана.',
-  "Set up HopCode's status line UI":
-    'Настроить интерфейс строки состояния HopCode',
+  "Set up Qwen Code's status line UI":
+    'Настроить интерфейс строки состояния Qwen Code',
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Открыть менеджер памяти.',

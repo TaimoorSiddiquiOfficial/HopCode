@@ -31,7 +31,7 @@ export enum Command {
   NAVIGATION_UP = 'navigationUp',
   NAVIGATION_DOWN = 'navigationDown',
 
-  // Selection-list nav: arrows + k/j + Ctrl+P/Ctrl+N
+  // Selection list navigation (dialogs, menus)
   SELECTION_UP = 'selectionUp',
   SELECTION_DOWN = 'selectionDown',
 
@@ -128,7 +128,7 @@ export const defaultKeyBindings: KeyBindingConfig = {
     // Separator, rendered as "^_" by `cat -v`) for Ctrl+Backspace under
     // its standard Ctrl-modifies-meta-keys convention. The same byte is
     // the historical Ctrl-mapping of the Unit Separator on traditional
-    // ANSI/VT terminals (Ctrl+_ and Ctrl+/ also emit it), but hopcode
+    // ANSI/VT terminals (Ctrl+_ and Ctrl+/ also emit it), but qwen-code
     // doesn't bind those keystrokes elsewhere so this entry is additive
     // and non-conflicting on every platform.
     { sequence: '\x1f' },
@@ -144,7 +144,7 @@ export const defaultKeyBindings: KeyBindingConfig = {
   [Command.NAVIGATION_DOWN]: [{ key: 'down' }],
 
   // Selection-list nav: arrows + k/j + Ctrl+P/Ctrl+N
-  // ctrl: false on bare k/j skips Ctrl+K (kill-line) and Ctrl+J (newline)
+  // ctrl: false on bare k/j skips Ctrl+K and Ctrl+J
   [Command.SELECTION_UP]: [
     { key: 'up' },
     { key: 'k', ctrl: false },

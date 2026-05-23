@@ -38,16 +38,6 @@ import { extensionsCommand } from '../commands/extensions.js';
 import { hooksCommand } from '../commands/hooks.js';
 import type { Settings } from './settings.js';
 import { loadSettings, SettingScope } from './settings.js';
-import { githubCommand } from '../commands/github/index.js';
-import { modelCommand } from '../commands/model/index.js';
-import { skillsCommand } from '../commands/skills.js';
-import { profileCommand } from '../commands/profile/index.js';
-import { dashboardCommand } from '../commands/dashboard.js';
-import { serveCommand } from '../commands/serve.js';
-import { grpcCommand } from '../commands/grpc.js';
-import { learnCommand } from '../commands/learn.js';
-import { cronCommand } from '../commands/cron.js';
-import { searchCommand } from '../commands/search.js';
 import {
   resolveCliGenerationConfig,
   getAuthTypeFromEnv,
@@ -57,6 +47,7 @@ import { hideBin } from 'yargs/helpers';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { homedir } from 'node:os';
+import { randomUUID } from 'node:crypto';
 import stripJsonComments from 'strip-json-comments';
 
 import { resolvePath } from '../utils/resolvePath.js';
@@ -67,6 +58,16 @@ import { mcpCommand } from '../commands/mcp.js';
 import { channelCommand } from '../commands/channel.js';
 import { authCommand } from '../commands/auth.js';
 import { reviewCommand } from '../commands/review.js';
+import { serveCommand } from '../commands/serve.js';
+import { githubCommand } from '../commands/github/index.js';
+import { modelCommand } from '../commands/model/index.js';
+import { skillsCommand } from '../commands/skills.js';
+import { profileCommand } from '../commands/profile/index.js';
+import { dashboardCommand } from '../commands/dashboard.js';
+import { grpcCommand } from '../commands/grpc.js';
+import { learnCommand } from '../commands/learn.js';
+import { cronCommand } from '../commands/cron.js';
+import { searchCommand } from '../commands/search.js';
 
 // UUID v4 regex pattern for validation
 const SESSION_ID_REGEX =
@@ -91,7 +92,8 @@ const VALID_APPROVAL_MODE_VALUES = [
   'plan',
   'default',
   'auto-edit',
-  'izn',
+  'auto',
+  'yolo',
 ] as const;
 
 function formatApprovalModeError(value: string): Error {
@@ -115,6 +117,8 @@ function parseApprovalModeValue(value: string): ApprovalMode {
     case 'autoedit':
     case 'auto-edit':
       return ApprovalMode.AUTO_EDIT;
+    case 'auto':
+      return ApprovalMode.AUTO;
     default:
       throw formatApprovalModeError(value);
   }
@@ -173,6 +177,11 @@ export interface CliArgs {
   resume: string | undefined;
   /** Specify a session ID without session resumption */
   sessionId: string | undefined;
+  /**
+   * Create a new forked session from the resumed session. Must be used with
+   * --resume or --continue.
+   */
+  forkSession?: boolean | undefined;
   /** Internal: preserve the outer session ID when relaunching in a sandbox */
   sandboxSessionId?: string | undefined;
   maxSessionTurns: number | undefined;
@@ -233,11 +242,7 @@ function schemaRootAcceptsObject(
     rawType !== undefined &&
     (Array.isArray(rawType) ? rawType : [rawType]).includes('object');
 
-  if (
-    rawType !== undefined &&
-    (typeof rawType === 'string' || Array.isArray(rawType)) &&
-    !typeIncludesObject
-  ) {
+  if (rawType !== undefined && !typeIncludesObject) {
     return false;
   }
 
@@ -365,41 +370,11 @@ function schemaRootAcceptsObject(
   // No narrowing at the root — lenient default, treated as object-compatible.
   return true;
 }
+
 /** 4 MiB — well above any real schema, well below an accidental
  * gigabyte-sized file that would OOM `fs.readFileSync` + `JSON.parse`.
  */
 const MAX_JSON_SCHEMA_FILE_BYTES = 4 * 1024 * 1024;
-
-/**
- * Resolve PowerShell security settings from settings.json to the
- * PowerShellSecurityConfig format expected by the core Config class.
- *
- * Settings values may be `undefined` (when not configured) — this
- * function strips those so the core `resolvePowerShellConfig`
- * utility can fill in defaults.
- */
-function resolvePowerShellSettings(
-  settings: Record<string, unknown> | undefined,
-):
-  | Partial<import('@hoptrendy/hopcode-core').PowerShellSecurityConfig>
-  | undefined {
-  if (!settings) return undefined;
-
-  const enabled =
-    typeof settings['enabled'] === 'boolean' ? settings['enabled'] : undefined;
-  const mode =
-    typeof settings['mode'] === 'string'
-      ? (settings['mode'] as 'allow' | 'ask' | 'deny')
-      : undefined;
-  const allowlist = Array.isArray(settings['allowlist'])
-    ? (settings['allowlist'] as string[])
-    : undefined;
-  const blocklist = Array.isArray(settings['blocklist'])
-    ? (settings['blocklist'] as string[])
-    : undefined;
-
-  return { enabled, mode, allowlist, blocklist };
-}
 
 /**
  * Resolves the `--json-schema` argument into a parsed JSON Schema object.
@@ -415,7 +390,7 @@ export function resolveJsonSchemaArg(
     return undefined;
   }
   const trimmed = raw.trim();
-  if (!trimmed) {
+  if (trimmed.length === 0) {
     throw new FatalConfigError('--json-schema cannot be empty.');
   }
 
@@ -465,9 +440,11 @@ export function resolveJsonSchemaArg(
   try {
     parsed = JSON.parse(payload);
   } catch (err) {
-    // For file-sourced schemas, emit a generic message to avoid leaking
-    // file content through stderr. For inline JSON the SyntaxError is
-    // fine (it includes a short snippet on Node >= 18).
+    // For inline JSON the user IS the source — echoing the SyntaxError
+    // (which on Node ≥18 embeds a 10-char input snippet) is fine. For
+    // @path, the error message would leak a prefix of the file's bytes
+    // through stderr to whatever wrapping process surfaces it; emit a
+    // generic message instead.
     if (payloadSource === 'file') {
       throw new FatalConfigError(
         `--json-schema content of "${payloadSourcePath}" is not valid JSON.`,
@@ -496,7 +473,7 @@ export function resolveJsonSchemaArg(
   // "schema can be parsed" and "schema can be satisfied by an object value".
   if (!schemaRootAcceptsObject(parsed as Record<string, unknown>)) {
     throw new FatalConfigError(
-      '--json-schema: the top-level type must include "object" (tool parameters ' +
+      '--json-schema root must accept object-typed values (tool parameters ' +
         'are always JSON objects). At least one branch of a root anyOf/oneOf ' +
         'must be satisfiable by an object, and a root `type` (when present) ' +
         'must include "object".',
@@ -513,6 +490,7 @@ export function resolveJsonSchemaArg(
       `--json-schema is not a valid JSON Schema: ${compileError}`,
     );
   }
+
   return parsed as Record<string, unknown>;
 }
 
@@ -683,9 +661,9 @@ export async function parseArguments(): Promise<CliArgs> {
         })
         .option('approval-mode', {
           type: 'string',
-          choices: ['plan', 'default', 'auto-edit', 'izn'],
+          choices: ['plan', 'default', 'auto-edit', 'auto', 'yolo'],
           description:
-            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), izn (auto-approve all tools)',
+            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), yolo (auto-approve all tools)',
         })
         .option('checkpointing', {
           type: 'boolean',
@@ -870,6 +848,12 @@ export async function parseArguments(): Promise<CliArgs> {
           type: 'string',
           description: 'Specify a session ID for this run.',
         })
+        .option('fork-session', {
+          type: 'boolean',
+          description:
+            'Create a new forked session from the resumed session. Must be used with --resume or --continue.',
+          default: false,
+        })
         .option('sandbox-session-id', {
           type: 'string',
           hidden: true,
@@ -971,8 +955,18 @@ export async function parseArguments(): Promise<CliArgs> {
           if (argv['continue'] && argv['resume']) {
             return 'Cannot use both --continue and --resume together. Use --continue to resume the latest session, or --resume <sessionId> to resume a specific session.';
           }
-          if (argv['sessionId'] && (argv['continue'] || argv['resume'])) {
+          const hasResume = argv['resume'] !== undefined;
+          if (argv['sessionId'] && (argv['continue'] || hasResume)) {
             return 'Cannot use --session-id with --continue or --resume. Use --session-id to start a new session with a specific ID, or use --continue/--resume to resume an existing session.';
+          }
+          if (argv['forkSession'] && !(argv['continue'] || hasResume)) {
+            return '--fork-session must be used with --resume or --continue.';
+          }
+          if (
+            argv['sandboxSessionId'] &&
+            (argv['sessionId'] || argv['continue'] || argv['resume'])
+          ) {
+            return 'Cannot use internal --sandbox-session-id with --session-id, --continue, or --resume.';
           }
           if (
             argv['sandboxSessionId'] &&
@@ -1000,12 +994,15 @@ export async function parseArguments(): Promise<CliArgs> {
             if (argv['promptInteractive']) {
               return '--json-schema cannot be used with --prompt-interactive (-i); structured output only terminates the non-interactive flow.';
             }
-            // Stream-json input runs through runNonInteractiveStreamJson,
-            // which doesn't honor the structured-output termination
-            // contract. Reject the combination explicitly so users see
-            // the mismatch at parse time instead of confusion at runtime.
             if (argv['inputFormat'] === 'stream-json') {
-              return '--json-schema cannot be used with --input-format stream-json; structured output is a single-shot contract incompatible with stream-json input.';
+              // The "first valid structured_output call ends the session"
+              // contract assumes a single one-shot prompt. Stream-json
+              // input keeps the process open waiting for more protocol
+              // messages, so terminating on the first call would silently
+              // drop subsequent prompts. Refuse the combination here
+              // rather than letting the run race to whichever message
+              // wins.
+              return '--json-schema cannot be used with --input-format stream-json; the "first structured_output call ends the session" contract is incompatible with the long-lived stream-json input protocol.';
             }
             if (argv['acp'] || argv['experimentalAcp']) {
               // ACP runs an external IDE/Zed protocol on its own turn loop
@@ -1021,7 +1018,7 @@ export async function parseArguments(): Promise<CliArgs> {
             const hasPositionalQuery = Array.isArray(query)
               ? query.length > 0
               : !!query;
-            // Allow stdin piping (`echo "..." | hopcode --json-schema ...`):
+            // Allow stdin piping (`echo "..." | qwen --json-schema ...`):
             // when stdin is not a TTY, the prompt is supplied via the pipe
             // and headless mode runs normally. Only reject true interactive
             // invocations with neither flag nor positional nor pipe — the
@@ -1066,7 +1063,7 @@ export async function parseArguments(): Promise<CliArgs> {
     .command(searchCommand)
     // Register /review skill helpers (presubmit checks, cleanup)
     .command(reviewCommand)
-    // Register `hopcode serve` (Stage 1 daemon — see issue #3803)
+    // Register `qwen serve` (Stage 1 daemon — see issue #3803)
     .command(serveCommand);
 
   yargsInstance
@@ -1511,6 +1508,20 @@ export async function loadCliConfig(
     addDisabled(name);
   }
 
+  // Resolve the per-workspace tool denylist (#4175 Wave 4 PR 17). De-duplicate
+  // while preserving original casing; downstream lookups go through
+  // `Config.getDisabledTools()` which materializes a Set, so the order here
+  // is only meaningful for diagnostic output.
+  const disabledTools: string[] = [];
+  const seenDisabledTools = new Set<string>();
+  for (const raw of settings.tools?.disabled ?? []) {
+    if (typeof raw !== 'string') continue;
+    const trimmed = raw.trim();
+    if (!trimmed || seenDisabledTools.has(trimmed)) continue;
+    seenDisabledTools.add(trimmed);
+    disabledTools.push(trimmed);
+  }
+
   // Helper: check if a tool is explicitly covered by an allow rule OR by the
   // coreTools whitelist. Uses alias matching for coreTools (via isToolEnabled)
   // to preserve the original behaviour where "ShellTool", "Shell", and
@@ -1550,6 +1561,17 @@ export async function loadCliConfig(
       case ApprovalMode.PLAN:
       case ApprovalMode.DEFAULT:
         // Deny all write/execute tools unless explicitly allowed.
+        denyUnlessAllowed(ToolNames.SHELL as ToolName);
+        denyUnlessAllowed(ToolNames.MONITOR as ToolName);
+        denyUnlessAllowed(ToolNames.EDIT as ToolName);
+        denyUnlessAllowed(ToolNames.WRITE_FILE as ToolName);
+        break;
+      case ApprovalMode.AUTO:
+        // AUTO uses an LLM classifier to gate Shell/Monitor/Edit/WriteFile at
+        // call time; but non-interactive mode has no UI for the classifier's
+        // fallback path, so apply the same denylist as DEFAULT to keep parity
+        // with the interactive AUTO safety guarantees (no zero-denial drift
+        // toward YOLO behavior).
         denyUnlessAllowed(ToolNames.SHELL as ToolName);
         denyUnlessAllowed(ToolNames.MONITOR as ToolName);
         denyUnlessAllowed(ToolNames.EDIT as ToolName);
@@ -1643,6 +1665,11 @@ export async function loadCliConfig(
       sessionData = await sessionService.loadLastSession();
       if (sessionData) {
         sessionId = sessionData.conversation.sessionId;
+      } else if (argv.forkSession) {
+        writeStderrLine(
+          'Cannot use --fork-session with --continue: no saved session found to fork.',
+        );
+        process.exit(1);
       }
     }
 
@@ -1658,7 +1685,30 @@ export async function loadCliConfig(
         process.exit(1);
       }
     }
+
+    if (argv.forkSession && sessionId) {
+      const sourceSessionId = sessionId;
+      const forkedSessionId = randomUUID();
+      try {
+        await sessionService.forkSession(sourceSessionId, forkedSessionId);
+      } catch (err) {
+        writeStderrLine(
+          `Failed to fork session ${sourceSessionId}: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        process.exit(1);
+      }
+      sessionId = forkedSessionId;
+      sessionData = await sessionService.loadSession(forkedSessionId);
+      if (!sessionData) {
+        writeStderrLine(`Failed to load forked session ${forkedSessionId}.`);
+        process.exit(1);
+      }
+    }
   } else if (argv.sandboxSessionId) {
+    if (!process.env['SANDBOX']) {
+      writeStderrLine('--sandbox-session-id is for internal sandbox use only.');
+      process.exit(1);
+    }
     sessionId = argv.sandboxSessionId;
   } else if (argv['sessionId']) {
     // Use provided session ID without session resumption
@@ -1700,11 +1750,13 @@ export async function loadCliConfig(
     excludeTools: mergedDeny,
     disabledSlashCommands:
       disabledSlashCommands.length > 0 ? disabledSlashCommands : undefined,
+    disabledTools: disabledTools.length > 0 ? disabledTools : undefined,
     // New unified permissions (PermissionManager source of truth).
     permissions: {
       allow: mergedAllow.length > 0 ? mergedAllow : undefined,
       ask: mergedAsk.length > 0 ? mergedAsk : undefined,
       deny: mergedDeny.length > 0 ? mergedDeny : undefined,
+      autoMode: settings.permissions?.autoMode,
     },
     // Permission rule persistence callback (writes to settings files).
     onPersistPermissionRule: async (scope, ruleType, rule) => {
@@ -1749,6 +1801,7 @@ export async function loadCliConfig(
     fileFiltering: settings.context?.fileFiltering,
     checkpointing:
       argv.checkpointing || settings.general?.checkpointing?.enabled,
+    plansDirectory: settings.plansDirectory,
     proxy:
       argv.proxy ||
       settings.proxy ||
@@ -1782,9 +1835,6 @@ export async function loadCliConfig(
     allowedHttpHookUrls: bareMode
       ? []
       : (settings.security?.allowedHttpHookUrls ?? []),
-    powershellConfig: bareMode
-      ? undefined
-      : resolvePowerShellSettings(settings.security?.powershell),
     cliVersion: await getCliVersion(),
     webSearch: bareMode
       ? undefined
@@ -1823,6 +1873,7 @@ export async function loadCliConfig(
     projectHooks: bareMode ? undefined : hooksConfig?.projectHooks,
     hooks: bareMode ? undefined : settings.hooks, // Keep for backward compatibility
     disableAllHooks: bareMode ? true : (settings.disableAllHooks ?? false),
+    stopHookBlockingCap: bareMode ? undefined : settings.stopHookBlockingCap,
     channel: argv.channel,
     // CLI flag wins over settings.json. `--json-fd` is fd-only (no settings
     // equivalent � fd passing is a spawn-time concern). `--json-file` and

@@ -1,12 +1,16 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { EventEmitter } from 'node:events';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { AgentStatus, ArenaEventType, AuthType } from '@hoptrendy/hopcode-core';
+import {
+  AgentStatus,
+  ArenaEventType,
+  AuthType,
+} from '@hoptrendy/hopcode-core';
 import { arenaCommand } from './arenaCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 

@@ -10,7 +10,7 @@ import { randomBytes, randomInt } from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { simpleGit, CheckRepoActions } from 'simple-git';
 import type { SimpleGit } from 'simple-git';
-import { Storage, HOPCODE_DIR } from '../config/storage.js';
+import { Storage } from '../config/storage.js';
 import { isCommandAvailable } from '../utils/shell-utils.js';
 import { isNodeError } from '../utils/errors.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
@@ -32,9 +32,9 @@ export function worktreeBranchForSlug(slug: string): string {
  * provisioning time and consulted by `exit_worktree` to decide
  * whether the current session is allowed to drop the worktree. The
  * file lives outside the working tree (it is .gitignored as part of
- * `.hopcode/worktrees/.gitignore`) so it cannot leak into commits.
+ * `.qwen/worktrees/.gitignore`) so it cannot leak into commits.
  */
-export const WORKTREE_SESSION_FILE = '.hopcode-session';
+export const WORKTREE_SESSION_FILE = '.qwen-session';
 
 /** Writes the owning session id into the worktree's session marker. */
 export async function writeWorktreeSessionMarker(
@@ -281,8 +281,8 @@ export class GitWorktreeService {
    * Resolves the absolute path of the enclosing git repository's top
    * directory. Used by callers that need to anchor general-purpose
    * worktrees at the *repo* root rather than the cwd they were invoked
-   * from — otherwise running `hopcode` from a monorepo subdirectory would
-   * scatter `.hopcode/worktrees/` under each subdirectory instead of
+   * from — otherwise running `qwen` from a monorepo subdirectory would
+   * scatter `.qwen/worktrees/` under each subdirectory instead of
    * gathering them under the repo root.
    *
    * Returns the canonical top-level path on success, or `null` when the
@@ -981,16 +981,16 @@ export class GitWorktreeService {
   // ──────────────────────────────────────────────────────────────────────
   // User-facing worktree APIs (used by EnterWorktree / ExitWorktree tools
   // and AgentTool `isolation: 'worktree'`). These create worktrees under
-  // `<projectRoot>/.hopcode/worktrees/<slug>` rather than under the
+  // `<projectRoot>/.qwen/worktrees/<slug>` rather than under the
   // session-scoped Arena baseDir.
   // ──────────────────────────────────────────────────────────────────────
 
   /**
    * Returns the directory holding all general-purpose worktrees for this
-   * repo: `<projectRoot>/.hopcode/worktrees`.
+   * repo: `<projectRoot>/.qwen/worktrees`.
    */
   getUserWorktreesDir(): string {
-    return path.join(this.sourceRepoPath, HOPCODE_DIR, WORKTREES_DIR);
+    return path.join(this.sourceRepoPath, '.qwen', WORKTREES_DIR);
   }
 
   /**
@@ -1076,7 +1076,7 @@ export class GitWorktreeService {
   }
 
   /**
-   * Creates a general-purpose worktree at `<projectRoot>/.hopcode/worktrees/<slug>`
+   * Creates a general-purpose worktree at `<projectRoot>/.qwen/worktrees/<slug>`
    * with branch `worktree-<slug>`. Used by `EnterWorktreeTool` and
    * `AgentTool isolation:'worktree'`.
    *
@@ -1112,7 +1112,7 @@ export class GitWorktreeService {
       // Keep the worktrees directory and its contents out of the parent
       // repo's `git status` and any subsequent glob/grep that walks from
       // the parent root. Only writes when the file is missing — never
-      // touches an existing user-managed `.hopcode/.gitignore`.
+      // touches an existing user-managed `.qwen/.gitignore`.
       await this.ensureWorktreesGitignored();
 
       const base = baseBranch || (await this.getCurrentBranch());
@@ -1141,6 +1141,17 @@ export class GitWorktreeService {
         base,
       ]);
 
+      // Configure core.hooksPath so commits inside the worktree run the
+      // main repo's hooks (the new worktree's .git directory has no hooks
+      // of its own). Priority: .husky/ first (common for JS projects),
+      // .git/hooks fallback. Mirrors claude-code's performPostCreationSetup.
+      // Best-effort: hook failures must not abort worktree creation.
+      await this.configureHooksPath(worktreePath).catch((error) => {
+        debugLogger.warn(
+          `createUserWorktree: failed to configure core.hooksPath for ${slug}: ${error}`,
+        );
+      });
+
       const worktree: WorktreeInfo = {
         id: slug,
         name: slug,
@@ -1154,6 +1165,90 @@ export class GitWorktreeService {
       const message = `Failed to create worktree "${slug}": ${error instanceof Error ? error.message : 'Unknown error'}`;
       debugLogger.warn(`createUserWorktree: ${message}`);
       return { success: false, error: message };
+    }
+  }
+
+  /**
+   * Configures `core.hooksPath` inside `worktreePath` to point at the main
+   * repository's hooks directory. Prefers `.husky/` over `.git/hooks/` to
+   * match the convention most JS projects use (husky's prepare script
+   * configures `core.hooksPath=.husky` in the main repo).
+   *
+   * Skips the `git config` write subprocess when the value already
+   * matches the desired one — common when this method runs against a
+   * worktree that already inherits the same `core.hooksPath` from a
+   * prior creation cycle. The probe read itself is still a subprocess
+   * (claude-code's `parseGitConfigValue` reads the config file
+   * directly to avoid even that, but the read runs once per worktree
+   * creation so the extra ~14ms isn't worth the file-parsing complexity).
+   */
+  private async configureHooksPath(worktreePath: string): Promise<void> {
+    // .husky/ is the convention for JS projects; check it first.
+    const huskyPath = path.join(this.sourceRepoPath, '.husky');
+    let hooksPath: string | null = null;
+    try {
+      await fs.stat(huskyPath);
+      hooksPath = huskyPath;
+    } catch (error) {
+      if (!(isNodeError(error) && error.code === 'ENOENT')) {
+        debugLogger.warn(
+          `configureHooksPath: cannot stat ${huskyPath}: ${error}`,
+        );
+      }
+    }
+
+    // Fall back to the canonical hooks dir. Construct `<sourceRepoPath>/.git/hooks`
+    // assumes `.git` is a directory — but when Qwen itself is launched
+    // from a linked worktree, `.git` is a FILE pointing at the real
+    // gitdir, and the constructed path ENOTDIRs. Use `git rev-parse
+    // --git-common-dir` to get the canonical hooks parent regardless
+    // of worktree/non-worktree shape. (PR #4174 review #3259975237.)
+    if (!hooksPath) {
+      try {
+        const commonDir = (
+          await this.git.raw(['rev-parse', '--git-common-dir'])
+        ).trim();
+        const resolvedCommonDir = path.isAbsolute(commonDir)
+          ? commonDir
+          : path.resolve(this.sourceRepoPath, commonDir);
+        const candidate = path.join(resolvedCommonDir, 'hooks');
+        await fs.stat(candidate);
+        hooksPath = candidate;
+      } catch (error) {
+        if (!(isNodeError(error) && error.code === 'ENOENT')) {
+          debugLogger.warn(
+            `configureHooksPath: cannot resolve git common hooks dir: ${error}`,
+          );
+        }
+      }
+    }
+    if (!hooksPath) return;
+
+    const worktreeGit = simpleGit(worktreePath);
+    let existing = '';
+    try {
+      // Saves the write subprocess when value already matches. The probe
+      // read is also a subprocess — claude-code skips even that via
+      // parseGitConfigValue, but the read runs once per worktree
+      // creation so the extra ~14ms isn't worth the file-parser tax.
+      existing = (
+        await worktreeGit.raw(['config', '--local', 'core.hooksPath'])
+      ).trim();
+    } catch {
+      // Key not set — empty string means "proceed with the write".
+    }
+    // Only write when the key is unset. A non-empty existing value is
+    // either inherited (system / global / local config from the user
+    // or from a previous Qwen run) or an explicit user policy override
+    // — in both cases overwriting silently replaces the user's choice.
+    // (PR #4174 review #3259975242.)
+    if (existing === '') {
+      await worktreeGit.raw(['config', 'core.hooksPath', hooksPath]);
+    } else if (existing !== hooksPath) {
+      debugLogger.debug(
+        `configureHooksPath: preserving existing core.hooksPath=${existing} ` +
+          `(Qwen would have set it to ${hooksPath})`,
+      );
     }
   }
 
@@ -1192,16 +1287,16 @@ export class GitWorktreeService {
   }
 
   /**
-   * Ensures `<projectRoot>/.hopcode/.gitignore` ignores the worktrees
+   * Ensures `<projectRoot>/.qwen/.gitignore` ignores the worktrees
    * directory. Idempotent: writes only when the file is missing. If the
    * file exists (user may have curated it), this method is a no-op so
    * we never disturb intentional configuration.
    */
   private async ensureWorktreesGitignored(): Promise<void> {
     try {
-      const hopcodeDir = path.join(this.sourceRepoPath, HOPCODE_DIR);
-      await fs.mkdir(hopcodeDir, { recursive: true });
-      const gitignorePath = path.join(hopcodeDir, '.gitignore');
+      const qwenDir = path.join(this.sourceRepoPath, '.qwen');
+      await fs.mkdir(qwenDir, { recursive: true });
+      const gitignorePath = path.join(qwenDir, '.gitignore');
       // `flag: 'wx'` is "open for write, fail if exists" — one atomic
       // syscall that handles the "preserve user-curated file" case
       // without the `fs.access` + `fs.writeFile` TOCTOU race two
@@ -1209,7 +1304,7 @@ export class GitWorktreeService {
       try {
         await fs.writeFile(
           gitignorePath,
-          `# Auto-generated by hopcode.\n${WORKTREES_DIR}/\n`,
+          `# Auto-generated by qwen-code.\n${WORKTREES_DIR}/\n`,
           { encoding: 'utf8', flag: 'wx' },
         );
       } catch (error) {

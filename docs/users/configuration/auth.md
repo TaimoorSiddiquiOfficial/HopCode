@@ -10,7 +10,7 @@ HopCode supports three authentication methods. Pick the one that matches how you
 
 > [!warning]
 >
-> The HopCode OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `hopcode` and use `/auth` to configure.
+> The Qwen OAuth free tier was discontinued on 2026-04-15. Existing cached tokens may continue working briefly, but new requests will be rejected. Please switch to Alibaba Cloud Coding Plan, [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or another provider. Run `qwen` and use `/auth` to configure.
 
 - **How it works**: on first start, HopCode opens a browser login page. After you finish, credentials are cached locally so you usually won't need to log in again.
 - **Requirements**: a `qwen.ai` account + internet access (at least for the first login).
@@ -48,13 +48,13 @@ Alibaba Cloud Coding Plan is available in two regions:
 
 ### Interactive setup
 
-Enter `hopcode` in the terminal to launch HopCode, then run the `/auth` command and select **Alibaba Cloud Coding Plan**. Choose your region, then enter your `sk-sp-xxxxxxxxx` key.
+Enter `qwen` in the terminal to launch Qwen Code, then run the `/auth` command and select **Alibaba Cloud Coding Plan**. Choose your region, then enter your `sk-sp-xxxxxxxxx` key.
 
 After authentication, use the `/model` command to switch between all Alibaba Cloud Coding Plan supported models (including qwen3.5-plus, qwen3-coder-plus, qwen3-coder-next, qwen3-max, glm-4.7, and kimi-k2.5).
 
 ### Headless or scripted setup
 
-For CI, containers, or scripts, configure Coding Plan with environment variables or `settings.json` instead of the removed `hopcode auth coding-plan` command.
+For CI, containers, or scripts, configure Coding Plan with environment variables or `settings.json` instead of the removed `qwen auth coding-plan` command.
 
 ```bash
 export BAILIAN_CODING_PLAN_API_KEY="sk-sp-xxxxxxxxx"
@@ -306,20 +306,20 @@ hopcode --model "qwen3-coder-plus"
 hopcode --model "qwen3.5-plus"
 ```
 
-## Removed `hopcode auth` CLI command
+## Removed `qwen auth` CLI command
 
-The standalone `hopcode auth` CLI command has been removed. Use these replacements instead:
+The standalone `qwen auth` CLI command has been removed. Use these replacements instead:
 
 | Previous use case                | Replacement                                                                                 |
 | -------------------------------- | ------------------------------------------------------------------------------------------- |
-| Interactive authentication setup | Run `hopcode`, then use `/auth`                                                             |
+| Interactive authentication setup | Run `qwen`, then use `/auth`                                                                |
 | Coding Plan setup                | Use `/auth`, or set `BAILIAN_CODING_PLAN_API_KEY` with the Coding Plan base URL             |
 | OpenRouter setup                 | Use `/auth`, or set `OPENROUTER_API_KEY` and `OPENAI_BASE_URL=https://openrouter.ai/api/v1` |
-| API-key or custom provider setup | Configure `~/.hopcode/settings.json`, `.env`, or provider-specific environment variables    |
-| Check current authentication     | Run `/doctor` inside HopCode                                                                |
-| OAuth browser flow               | Run `hopcode` interactively and use `/auth`; OAuth cannot be configured with env vars alone |
+| API-key or custom provider setup | Configure `~/.qwen/settings.json`, `.env`, or provider-specific environment variables       |
+| Check current authentication     | Run `/doctor` inside Qwen Code                                                              |
+| OAuth browser flow               | Run `qwen` interactively and use `/auth`; OAuth cannot be configured with env vars alone    |
 
-Legacy invocations such as `hopcode auth status` now print a removal notice with migration paths.
+Legacy invocations such as `qwen auth status` now print a removal notice with these migration paths.
 
 ## Security notes
 

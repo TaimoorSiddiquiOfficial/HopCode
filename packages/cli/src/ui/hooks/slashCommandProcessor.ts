@@ -90,8 +90,8 @@ export interface SlashCommandProcessorActions {
   openEditorDialog: () => void;
   openMemoryDialog: () => void;
   openSettingsDialog: () => void;
+  openStatusLineDialog: () => void;
   openModelDialog: (options?: { fastModelMode?: boolean }) => void;
-  openManageModelsDialog: () => void;
   openTrustDialog: () => void;
   openPermissionsDialog: () => void;
   openApprovalModeDialog: () => void;
@@ -109,6 +109,7 @@ export interface SlashCommandProcessorActions {
   openMcpDialog: () => void;
   openHooksDialog: () => void;
   openRewindSelector: () => void;
+  openDiffDialog: () => void;
   openHelpDialog: () => void;
 }
 
@@ -667,12 +668,6 @@ export const useSlashCommandProcessor = (
                       content: result.content,
                       timestamp: new Date(),
                     });
-                  } else if (result.messageType === 'success') {
-                    addMessage({
-                      type: MessageType.SUCCESS,
-                      content: result.content,
-                      timestamp: new Date(),
-                    });
                   } else {
                     addMessage({
                       type: MessageType.INFO,
@@ -707,6 +702,9 @@ export const useSlashCommandProcessor = (
                     case 'settings':
                       actions.openSettingsDialog();
                       return { type: 'handled' };
+                    case 'statusline':
+                      actions.openStatusLineDialog();
+                      return { type: 'handled' };
                     case 'memory':
                       actions.openMemoryDialog();
                       return { type: 'handled' };
@@ -715,9 +713,6 @@ export const useSlashCommandProcessor = (
                       return { type: 'handled' };
                     case 'fast-model':
                       actions.openModelDialog({ fastModelMode: true });
-                      return { type: 'handled' };
-                    case 'manage-models':
-                      actions.openManageModelsDialog();
                       return { type: 'handled' };
                     case 'trust':
                       actions.openTrustDialog();
@@ -764,6 +759,9 @@ export const useSlashCommandProcessor = (
                       return { type: 'handled' };
                     case 'rewind':
                       actions.openRewindSelector();
+                      return { type: 'handled' };
+                    case 'diff':
+                      actions.openDiffDialog();
                       return { type: 'handled' };
                     case 'help':
                       actions.openHelpDialog();

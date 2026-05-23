@@ -188,6 +188,28 @@ describe('SessionService', () => {
       expect(result.items[0].gitBranch).toBe('main');
     });
 
+    it('should NOT populate messageCount during listing', async () => {
+      // Listing must avoid the full-file readline that counting requires
+      // — message counts are now lazy and provided by
+      // `countSessionMessages(sessionId)` only when a UI surface (e.g.
+      // a session preview) is about to display them. Pinning this
+      // contract here so future refactors can't quietly re-introduce
+      // the per-file scan that used to dominate /resume open time.
+      readdirSyncSpy.mockReturnValue([
+        `${sessionIdA}.jsonl`,
+      ] as unknown as Array<fs.Dirent<Buffer>>);
+      statSyncSpy.mockReturnValue({
+        mtimeMs: Date.now(),
+        isFile: () => true,
+      } as fs.Stats);
+      vi.mocked(jsonl.readLines).mockResolvedValue([recordA1]);
+
+      const result = await sessionService.listSessions();
+
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].messageCount).toBeUndefined();
+    });
+
     it('should truncate long prompts', async () => {
       const longPrompt = 'A'.repeat(300);
       const recordWithLongPrompt: ChatRecord = {
@@ -919,6 +941,57 @@ describe('SessionService', () => {
       const history = buildApiHistoryFromConversation(conversation);
 
       expect(history).toEqual([recordA1.message, assistantA1.message]);
+    });
+
+    it('does not deep-clone stored messages when rebuilding resume API history', () => {
+      const largePayload = {
+        output: 'x'.repeat(128 * 1024),
+        nested: { keep: true },
+      };
+      const toolResult: ChatRecord = {
+        uuid: 'large-tool-result',
+        parentUuid: recordA1.uuid,
+        sessionId: sessionIdA,
+        timestamp: '2024-01-01T00:02:00Z',
+        type: 'tool_result',
+        message: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                id: 'call-1',
+                name: 'read_file',
+                response: largePayload,
+              },
+            },
+          ],
+        },
+        cwd: '/test/project/root',
+        version: '1.0.0',
+      };
+      const conversation: ConversationRecord = {
+        sessionId: sessionIdA,
+        projectHash: 'test-project-hash',
+        startTime: '2024-01-01T00:00:00Z',
+        lastUpdated: '2024-01-01T00:02:00Z',
+        messages: [recordA1, toolResult],
+      };
+      const structuredCloneSpy = vi
+        .spyOn(globalThis, 'structuredClone')
+        .mockImplementation(() => {
+          throw new Error('unexpected deep clone');
+        });
+
+      const history = buildApiHistoryFromConversation(conversation);
+
+      expect(structuredCloneSpy).not.toHaveBeenCalled();
+      expect(history).toEqual([recordA1.message, toolResult.message]);
+      expect(history[1]).not.toBe(toolResult.message);
+      expect(history[1].parts).not.toBe(toolResult.message!.parts);
+      const response = history[1].parts![0] as {
+        functionResponse: { response: typeof largePayload };
+      };
+      expect(response.functionResponse.response).toBe(largePayload);
     });
 
     it('merges mid-turn user messages into the preceding tool result on resume', () => {

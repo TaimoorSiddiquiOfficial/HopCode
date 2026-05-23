@@ -55,6 +55,7 @@ import { InsightProgressMessage } from './messages/InsightProgressMessage.js';
 import { BtwMessage } from './messages/BtwMessage.js';
 import { MemorySavedMessage } from './messages/MemorySavedMessage.js';
 import { DiffStatsDisplay } from './messages/DiffStatsDisplay.js';
+import { GoalStatusMessage } from './messages/GoalStatusMessage.js';
 import { useCompactMode } from '../contexts/CompactModeContext.js';
 
 interface HistoryItemDisplayProps {
@@ -343,21 +344,14 @@ const HistoryItemDisplayComponent: React.FC<HistoryItemDisplayProps> = ({
       {itemForDisplay.type === 'away_recap' && (
         <AwayRecapMessage text={itemForDisplay.text} />
       )}
-      {itemForDisplay.type === 'history_context_note' && (
-        <Box
-          borderStyle="single"
-          borderColor={theme.text.secondary}
-          paddingX={1}
-          flexDirection="column"
-        >
-          <Text color={theme.text.secondary} bold>
-            ↑ Older history (items 0–{itemForDisplay.windowTo - 1} not shown)
-          </Text>
-          <Text color={theme.text.secondary}>{itemForDisplay.text}</Text>
-          <Text color={theme.text.secondary} dimColor>
-            Use /history older to navigate up · /history newer to go back
-          </Text>
-        </Box>
+      {itemForDisplay.type === 'goal_status' && (
+        <GoalStatusMessage
+          kind={itemForDisplay.kind}
+          condition={itemForDisplay.condition}
+          iterations={itemForDisplay.iterations}
+          durationMs={itemForDisplay.durationMs}
+          lastReason={itemForDisplay.lastReason}
+        />
       )}
     </Box>
   );

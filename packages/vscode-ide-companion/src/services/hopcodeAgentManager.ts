@@ -20,6 +20,7 @@ import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
 import {
   HopCodeSessionReader,
   type HopCodeSession,
+  type HopCodeMessage,
 } from './hopcodeSessionReader.js';
 import { HopCodeSessionManager } from './hopcodeSessionManager.js';
 import { SessionService } from '@hoptrendy/hopcode-core';
@@ -288,9 +289,14 @@ export class HopCodeAgentManager {
         const obj = (init || {}) as Record<string, unknown>;
         const modes = obj['modes'] as
           | {
-              currentModeId?: 'plan' | 'default' | 'auto-edit' | 'izn';
+              currentModeId?:
+                | 'plan'
+                | 'default'
+                | 'auto-edit'
+                | 'auto'
+                | 'yolo';
               availableModes?: Array<{
-                id: 'plan' | 'default' | 'auto-edit' | 'izn';
+                id: 'plan' | 'default' | 'auto-edit' | 'auto' | 'yolo';
                 name: string;
                 description: string;
               }>;
@@ -648,16 +654,16 @@ export class HopCodeAgentManager {
         false,
       );
       // Sorted by lastUpdated desc already per reader
-      const allWithMtime = all.map((s) => ({
+      const allWithMtime = all.map((s: HopCodeSession) => ({
         raw: s,
         mtime: new Date(s.lastUpdated).getTime(),
       }));
       const filtered =
         cursor !== undefined
-          ? allWithMtime.filter((x) => x.mtime < cursor)
+          ? allWithMtime.filter((x: { raw: HopCodeSession; mtime: number }) => x.mtime < cursor)
           : allWithMtime;
       const page = filtered.slice(0, size);
-      const sessions = page.map((x) => ({
+      const sessions = page.map((x: { raw: HopCodeSession; mtime: number }) => ({
         id: x.raw.sessionId,
         sessionId: x.raw.sessionId,
         title: this.sessionReader.getSessionTitle(x.raw),
@@ -1209,7 +1215,7 @@ export class HopCodeAgentManager {
       }
 
       // Convert message format
-      const messages: ChatMessage[] = session.messages.map((msg) => ({
+      const messages: ChatMessage[] = session.messages.map((msg: HopCodeMessage) => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
         content: msg.content,
         timestamp: new Date(msg.timestamp).getTime(),
@@ -1429,9 +1435,9 @@ export class HopCodeAgentManager {
    */
   onModeInfo(
     callback: (info: {
-      currentModeId?: 'plan' | 'default' | 'auto-edit' | 'izn';
+      currentModeId?: ApprovalModeValue;
       availableModes?: Array<{
-        id: 'plan' | 'default' | 'auto-edit' | 'izn';
+        id: ApprovalModeValue;
         name: string;
         description: string;
       }>;
@@ -1445,7 +1451,9 @@ export class HopCodeAgentManager {
    * Register mode changed callback
    */
   onModeChanged(
-    callback: (modeId: 'plan' | 'default' | 'auto-edit' | 'izn') => void,
+    callback: (
+      modeId: ApprovalModeValue,
+    ) => void,
   ): void {
     this.callbacks.onModeChanged = callback;
     this.sessionUpdateHandler.updateCallbacks(this.callbacks);

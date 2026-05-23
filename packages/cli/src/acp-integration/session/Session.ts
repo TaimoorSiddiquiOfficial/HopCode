@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -58,6 +58,16 @@ import {
   evaluatePermissionFlow,
   needsConfirmation,
   isPlanModeBlocked,
+  abortGoalForStopHookCap,
+  formatStopHookBlockingCapWarning,
+  applyAutoModeDecision,
+  evaluateAutoMode,
+  isApproveOutcome,
+  MAX_TRANSCRIPT_MESSAGES,
+  recordAllow,
+  recordFallbackApprove,
+  shouldFallback,
+  shouldRunAutoModeForCall,
 } from '@hoptrendy/hopcode-core';
 import { getCommandSubcommandNames } from '../../services/commandMetadata.js';
 import { getEffectiveSupportedModes } from '../../services/commandUtils.js';
@@ -185,6 +195,56 @@ function isUserPromptRecord(record: ChatRecord): boolean {
   );
 }
 
+export interface AvailableCommandsSnapshot {
+  availableCommands: AvailableCommand[];
+  availableSkills?: string[];
+}
+
+export async function buildAvailableCommandsSnapshot(
+  config: Config,
+  abortSignal: AbortSignal = AbortSignal.timeout(10_000),
+): Promise<AvailableCommandsSnapshot> {
+  const slashCommands = await getAvailableCommands(config, abortSignal, 'acp');
+
+  const availableCommands: AvailableCommand[] = slashCommands.map((cmd) => {
+    const acceptsInput =
+      cmd.acceptsInput ??
+      (cmd.kind !== CommandKind.BUILT_IN ||
+        cmd.completion != null ||
+        cmd.argumentHint != null ||
+        (cmd.subCommands != null && cmd.subCommands.length > 0));
+    return {
+      name: cmd.name,
+      description: cmd.description,
+      input: acceptsInput ? { hint: cmd.argumentHint ?? '' } : null,
+      _meta: {
+        argumentHint: cmd.argumentHint,
+        source: cmd.source,
+        sourceLabel: cmd.sourceLabel,
+        supportedModes: getEffectiveSupportedModes(cmd),
+        subcommands: getCommandSubcommandNames(cmd),
+        modelInvocable: cmd.modelInvocable === true,
+      },
+    };
+  });
+
+  let availableSkills: string[] | undefined;
+  try {
+    const skillManager = config.getSkillManager();
+    if (skillManager) {
+      const skills = await skillManager.listSkills();
+      availableSkills = skills.map((skill) => skill.name);
+    }
+  } catch (error) {
+    debugLogger.error('Error loading available skills:', error);
+  }
+
+  return {
+    availableCommands,
+    ...(availableSkills !== undefined ? { availableSkills } : {}),
+  };
+}
+
 /**
  * Session represents an active conversation session with the AI model.
  * It uses modular components for consistent event emission:
@@ -223,6 +283,21 @@ export class Session implements SessionContext {
 
   // Message rewrite middleware (optional, installed after history replay)
   messageRewriter?: MessageRewriteMiddleware;
+
+  /**
+   * Phase C worktree restore notice. Set by acpAgent.loadSession when a
+   * resumed session has a live worktree sidecar; prepended to the next
+   * #executePrompt call as a <system-reminder>, then cleared.
+   *
+   * One-shot by design — after the first prompt the worktree path is
+   * already in the conversation context (the reminder we just sent + any
+   * subsequent tool calls), so re-injecting on every turn would clutter
+   * the history without adding signal. TUI uses historyManager.addItem(INFO)
+   * for the equivalent UX hint and headless prepends to the single shot
+   * prompt; all three modes share the `restoreWorktreeContext` helper
+   * that produces this string.
+   */
+  pendingWorktreeNotice: string | null = null;
 
   // Implement SessionContext interface
   readonly sessionId: string;
@@ -600,6 +675,20 @@ export class Session implements SessionContext {
           parts = [...systemReminders, ...parts];
         }
 
+        // Phase C: one-shot worktree restore notice, set by acpAgent on
+        // --resume / loadSession when the session's worktree is still alive.
+        // Prepended exactly once, then cleared so it doesn't repeat on
+        // subsequent turns.
+        if (this.pendingWorktreeNotice) {
+          parts = [
+            {
+              text: `<system-reminder>\n${this.pendingWorktreeNotice}\n</system-reminder>\n\n`,
+            },
+            ...parts,
+          ];
+          this.pendingWorktreeNotice = null;
+        }
+
         let nextMessage: Content | null = { role: 'user', parts };
 
         while (nextMessage !== null) {
@@ -763,11 +852,11 @@ export class Session implements SessionContext {
     hooksEnabled: boolean,
     messageBus: MessageBus | undefined,
   ): Promise<{ stopReason: PromptResponse['stopReason'] }> {
-    const MAX_STOP_HOOK_ITERATIONS = 100;
+    const stopHookBlockingCap = this.config.getStopHookBlockingCap();
     let stopHookIterationCount = 0;
     let stopHookReasons: string[] = [];
 
-    while (stopHookIterationCount < MAX_STOP_HOOK_ITERATIONS) {
+    while (stopHookIterationCount < stopHookBlockingCap) {
       if (
         !hooksEnabled ||
         !messageBus ||
@@ -831,7 +920,21 @@ export class Session implements SessionContext {
         stopHookIterationCount++;
         stopHookReasons = [...stopHookReasons, continueReason];
 
-        // Emit StopHookLoop event for iterations after the first one
+        if (stopHookIterationCount >= stopHookBlockingCap) {
+          const warning = formatStopHookBlockingCapWarning(
+            'Stop',
+            stopHookBlockingCap,
+          );
+          abortGoalForStopHookCap(
+            this.config,
+            this.config.getSessionId(),
+            warning,
+          );
+          await this.messageEmitter.emitAgentMessage(warning);
+          debugLogger.warn(warning);
+          return { stopReason: 'end_turn' };
+        }
+
         if (stopHookIterationCount > 1) {
           await this.messageEmitter.emitStopHookLoop(
             stopHookIterationCount,
@@ -972,13 +1075,6 @@ export class Session implements SessionContext {
 
       // Stop hook allowed stopping, exit the loop
       break;
-    }
-
-    // If we exceeded max iterations, log a warning but still end gracefully
-    if (stopHookIterationCount >= MAX_STOP_HOOK_ITERATIONS) {
-      debugLogger.warn(
-        `Stop hook loop reached maximum iterations (${MAX_STOP_HOOK_ITERATIONS}), forcing stop`,
-      );
     }
 
     return { stopReason: 'end_turn' };
@@ -1425,61 +1521,14 @@ export class Session implements SessionContext {
   }
 
   async sendAvailableCommandsUpdate(): Promise<void> {
-    const abortController = new AbortController();
     try {
-      // Load commands available in ACP mode
-      const slashCommands = await getAvailableCommands(
-        this.config,
-        abortController.signal,
-        'acp',
-      );
-
-      // Convert SlashCommand[] to AvailableCommand[] format for ACP protocol.
-      // Commands that accept arguments get input: { hint } so the client can
-      // let users type arguments before submitting.  Commands with no argument
-      // support get input: null so the client auto-submits them on selection.
-      //
-      // A command is considered to accept arguments when any of:
-      //   - it is not a BUILT_IN command (skills, file commands, etc.)
-      //   - it has a completion function
-      //   - it declares an argumentHint
-      //   - it has subCommands
-      const availableCommands: AvailableCommand[] = slashCommands.map((cmd) => {
-        const acceptsInput =
-          cmd.kind !== CommandKind.BUILT_IN ||
-          cmd.completion != null ||
-          cmd.argumentHint != null ||
-          (cmd.subCommands != null && cmd.subCommands.length > 0);
-        return {
-          name: cmd.name,
-          description: cmd.description,
-          input: acceptsInput ? { hint: cmd.argumentHint ?? '' } : null,
-          _meta: {
-            argumentHint: cmd.argumentHint,
-            source: cmd.source,
-            sourceLabel: cmd.sourceLabel,
-            supportedModes: getEffectiveSupportedModes(cmd),
-            subcommands: getCommandSubcommandNames(cmd),
-            modelInvocable: cmd.modelInvocable === true,
-          },
-        };
-      });
-
-      let availableSkills: string[] | undefined;
-      try {
-        const skillManager = this.config.getSkillManager();
-        if (skillManager) {
-          const skills = await skillManager.listSkills();
-          availableSkills = skills.map((skill) => skill.name);
-        }
-      } catch (error) {
-        debugLogger.error('Error loading available skills:', error);
-      }
+      const { availableCommands, availableSkills } =
+        await buildAvailableCommandsSnapshot(this.config);
 
       const update: SessionUpdate = {
         sessionUpdate: 'available_commands_update',
         availableCommands,
-        ...(availableSkills
+        ...(availableSkills !== undefined
           ? {
               _meta: {
                 availableSkills,
@@ -1516,7 +1565,8 @@ export class Session implements SessionContext {
       plan: ApprovalMode.PLAN,
       default: ApprovalMode.DEFAULT,
       'auto-edit': ApprovalMode.AUTO_EDIT,
-      izn: ApprovalMode.IZN,
+      auto: ApprovalMode.AUTO,
+      yolo: ApprovalMode.YOLO,
     };
 
     const approvalMode = modeMap[params.modeId as ApprovalModeValue];
@@ -1879,10 +1929,80 @@ export class Session implements SessionContext {
         );
       }
 
+      // Explicit allow (user rule matched, or tool's L3 default is 'allow')
+      // is authoritative — AUTO classifier must not be allowed to override
+      // it. Parallels coreToolScheduler.ts:1337-1366; without this, an ACP
+      // session in AUTO mode could see a user-written `Bash(git push *)`
+      // allow rule reach the classifier and get blocked by a conservative
+      // Stage-1 verdict. Also resets the denialTracking streak so a
+      // following classifier-eligible call doesn't surprise the user with
+      // a manual prompt right after an allow-rule call just worked.
+      let autoModeAllowed = finalPermission === 'allow';
+      if (autoModeAllowed && approvalMode === ApprovalMode.AUTO) {
+        this.config.setAutoModeDenialState(
+          recordAllow(this.config.getAutoModeDenialState()),
+        );
+      }
+
+      // ── L5: AUTO mode three-layer filter (duplicated from
+      // coreToolScheduler.ts; ACP routes through this Session path).
+      // Returns 'allowed' / 'blocked' / 'fallback'. Blocked early-returns;
+      // allowed skips requestPermission; fallback drops through to the
+      // existing manual-approval flow below.
+      if (!autoModeAllowed && shouldRunAutoModeForCall(approvalMode, fc.name)) {
+        const denialState = this.config.getAutoModeDenialState();
+        // `buildClassifierContents` retains only the most recent
+        // MAX_TRANSCRIPT_MESSAGES messages; ask the chat client for
+        // exactly that tail rather than triggering a `structuredClone`
+        // of the whole session on every non-fast-path AUTO call.
+        // Parallels coreToolScheduler.ts.
+        const messages =
+          this.config
+            .getGeminiClient?.()
+            ?.getHistoryTail(MAX_TRANSCRIPT_MESSAGES, false) ?? [];
+        const decision = await evaluateAutoMode({
+          ctx: pmCtx,
+          pmForcedAsk,
+          toolParams,
+          messages,
+          config: this.config,
+          signal: abortSignal,
+          skipClassifier: shouldFallback(denialState).fallback,
+        });
+
+        // Apply decision via shared helper — eliminates ~40 lines of
+        // line-for-line duplication with coreToolScheduler.ts and makes
+        // the CLI / ACP paths share one source of truth for the
+        // switch + denial-tracking state updates + exhaustiveness
+        // guard.
+        const outcome = applyAutoModeDecision(
+          decision,
+          this.config,
+          denialState,
+        );
+        switch (outcome.kind) {
+          case 'approved':
+            autoModeAllowed = true;
+            break;
+          case 'blocked':
+            return earlyErrorResponse(new Error(outcome.errorMessage), fc.name);
+          case 'fallback':
+            // Drop through to the manual-approval flow below.
+            break;
+          default: {
+            const _exhaustive: never = outcome;
+            void _exhaustive;
+          }
+        }
+      }
+
       let didRequestPermission = false;
       let confirmationDetails: ToolCallConfirmationDetails | undefined;
 
-      if (needsConfirmation(finalPermission, approvalMode, fc.name)) {
+      if (
+        !autoModeAllowed &&
+        needsConfirmation(finalPermission, approvalMode, fc.name)
+      ) {
         confirmationDetails =
           await invocation.getConfirmationDetails(abortSignal);
 
@@ -1996,6 +2116,19 @@ export class Session implements SessionContext {
               : z
                   .nativeEnum(ToolConfirmationOutcome)
                   .parse(output.outcome.optionId);
+
+          // Reset the AUTO-mode fallback streak when the user manually
+          // approves a prompt that was raised because denialTracking forced
+          // fallback. Without this, a single block-streak permanently
+          // downgrades the rest of the session to manual approval until the
+          // mode is toggled. Parallels coreToolScheduler.ts:1705-1717.
+          // Cancel / abort do NOT reset — treating rejection as a signal
+          // the classifier was right to block.
+          if (approvalMode === ApprovalMode.AUTO && isApproveOutcome(outcome)) {
+            this.config.setAutoModeDenialState(
+              recordFallbackApprove(this.config.getAutoModeDenialState()),
+            );
+          }
 
           await confirmationDetails.onConfirm(outcome, {
             answers: output.answers,

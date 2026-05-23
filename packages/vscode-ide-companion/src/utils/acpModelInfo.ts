@@ -5,7 +5,7 @@
  */
 
 import type { ModelInfo } from '@agentclientprotocol/sdk';
-import { knownTokenLimit } from '@hoptrendy/hopcode-core/src/core/tokenLimits.js';
+import { knownTokenLimit } from '@hoptrendy/hopcode-core';
 import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
 
 type AcpMeta = Record<string, unknown>;
@@ -118,7 +118,8 @@ const APPROVAL_MODE_VALUES: ApprovalModeValue[] = [
   'plan',
   'default',
   'auto-edit',
-  'izn',
+  'auto',
+  'yolo',
 ];
 
 const isApprovalModeValue = (value: unknown): value is ApprovalModeValue =>

@@ -81,14 +81,14 @@ function findCanonicalGitRoot(startPath: string): string | null {
 
 /**
  * Returns the base directory for all auto-memory storage.
- * Defaults to the global hopcode dir (`~/.hopcode` or `$HOPCODE_HOME`);
- * overridable via HOPCODE_MEMORY_BASE_DIR for tests.
+ * Defaults to the global qwen dir (`~/.qwen` or `$QWEN_HOME`);
+ * overridable via QWEN_CODE_MEMORY_BASE_DIR for tests.
  */
 export function getMemoryBaseDir(): string {
   if (process.env['HOPCODE_MEMORY_BASE_DIR']) {
     return process.env['HOPCODE_MEMORY_BASE_DIR'];
   }
-  return Storage.getGlobalHopCodeDir();
+  return Storage.getGlobalQwenDir();
 }
 
 // Memoize by projectRoot — findCanonicalGitRoot() walks the file system (existsSync

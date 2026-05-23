@@ -1,7 +1,7 @@
 #!/usr/bin/env npx tsx
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -165,12 +165,12 @@ async function startFakeOpenAIServer(): Promise<FakeServer> {
   };
 }
 
-function hopArgs(baseUrl: string): string[] {
+function qwenArgs(baseUrl: string): string[] {
   return [
     'dist/cli.js',
     '--no-chat-recording',
     '--approval-mode',
-    'izn',
+    'yolo',
     '--auth-type',
     'openai',
     '--openai-api-key',
@@ -256,12 +256,12 @@ function foregroundsAtOccurrences(raw: string, needle: string): string[] {
 async function main(): Promise<void> {
   const scriptDir = dirname(fileURLToPath(import.meta.url));
   const defaultRepoRoot = resolve(scriptDir, '../..');
-  const repoRoot = resolve(process.env['HOP_TUI_E2E_REPO'] ?? defaultRepoRoot);
+  const repoRoot = resolve(process.env['QWEN_TUI_E2E_REPO'] ?? defaultRepoRoot);
   const outputDir = resolve(
-    process.env['HOP_TUI_E2E_OUT'] ??
-      join(tmpdir(), 'hop-table-wrap-ansi', basename(repoRoot)),
+    process.env['QWEN_TUI_E2E_OUT'] ??
+      join(tmpdir(), 'qwen-table-wrap-ansi', basename(repoRoot)),
   );
-  const expectedPass = process.env['HOP_TUI_E2E_EXPECT_PASS'] !== 'false';
+  const expectedPass = process.env['QWEN_TUI_E2E_EXPECT_PASS'] !== 'false';
 
   if (existsSync(outputDir)) {
     rmSync(outputDir, { recursive: true });
@@ -277,14 +277,14 @@ async function main(): Promise<void> {
     FORCE_COLOR: '1',
     HOME: homeDir,
     NODE_NO_WARNINGS: '1',
-    HOPCODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
-    HOPCODE_NO_RELAUNCH: '1',
-    HOPCODE_SANDBOX: 'false',
+    QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
+    QWEN_CODE_NO_RELAUNCH: '1',
+    QWEN_SANDBOX: 'false',
     TERM: 'xterm-256color',
     USERPROFILE: homeDir,
   };
   delete env['NO_COLOR'];
-  delete env['HOPCODE_SIMPLE'];
+  delete env['QWEN_CODE_SIMPLE'];
   for (const key of [
     'HTTP_PROXY',
     'http_proxy',
@@ -310,7 +310,7 @@ async function main(): Promise<void> {
 
   const screenshots: string[] = [];
   try {
-    await terminal.spawn('node', hopArgs(fakeServer.baseUrl));
+    await terminal.spawn('node', qwenArgs(fakeServer.baseUrl));
     await terminal.waitFor('Type your message', { timeout: 30000 });
     await terminal.type(PROMPT_TEXT, { delay: 12, slow: true });
     await terminal.idle(400, 4000);

@@ -1,9 +1,9 @@
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
-[![License](https://img.shields.io/github/license/QwenLM/hopcode.svg)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
+[![License](https://img.shields.io/github/license/QwenLM/qwen-code.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
-[![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
+[![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
 
 <a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="QwenLM%2Fhopcode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
@@ -428,13 +428,13 @@ and adjust it to the context length configured on your local server.
 
 ## Usage
 
-As an open-source terminal agent, you can use HopCode in five primary ways:
+As an open-source terminal agent, you can use Qwen Code in five primary ways:
 
 1. Interactive mode (terminal UI)
 2. Headless mode (scripts, CI)
 3. IDE integration (VS Code, Zed)
 4. SDKs (TypeScript, Python, Java)
-5. Daemon mode — `hopcode serve` exposes ACP over HTTP+SSE so multiple clients share one agent (experimental)
+5. Daemon mode — `qwen serve` exposes ACP over HTTP+SSE so multiple clients share one agent (experimental)
 
 #### Interactive mode
 
@@ -475,6 +475,20 @@ Run HopCode as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custo
 - [Daemon mode user guide](https://hopcode.dev/hopcode-docs/en/users/hopcode-serve)
 - [HTTP protocol reference](https://hopcode.dev/hopcode-docs/en/developers/hopcode-serve-protocol)
 - [DaemonClient TypeScript quickstart](https://hopcode.dev/hopcode-docs/en/developers/examples/daemon-client-quickstart)
+
+#### Daemon mode (`qwen serve`, experimental)
+
+```bash
+cd your-project/
+qwen serve
+# → qwen serve listening on http://127.0.0.1:4170 (mode=http-bridge)
+```
+
+Run Qwen Code as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custom CLIs all share **one** agent session over HTTP+SSE — instead of each spawning their own subprocess. Loopback bind has no auth by default (set `QWEN_SERVER_TOKEN` to enable bearer auth even on loopback); remote binds (`--hostname 0.0.0.0`) **require** a token — boot refuses without one. See:
+
+- [Daemon mode user guide](https://qwenlm.github.io/qwen-code-docs/en/users/qwen-serve)
+- [HTTP protocol reference](https://qwenlm.github.io/qwen-code-docs/en/developers/qwen-serve-protocol)
+- [DaemonClient TypeScript quickstart](https://qwenlm.github.io/qwen-code-docs/en/developers/examples/daemon-client-quickstart)
 
 #### SDKs
 

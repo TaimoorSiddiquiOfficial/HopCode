@@ -5,7 +5,7 @@
  */
 
 import type * as vscode from 'vscode';
-import type { File } from '@hoptrendy/hopcode-core/src/ide/types.js';
+import type { File } from '@hoptrendy/hopcode-core';
 import { MAX_FILES, MAX_SELECTED_TEXT_LENGTH } from './constants.js';
 import {
   deactivateCurrentActiveFile,

@@ -51,7 +51,7 @@ const UserMessageBase: FC<UserMessageProps> = ({
 
   return (
     <div
-      className="hopcode-message user-message-container group flex gap-0 my-1 items-start text-left flex-col relative"
+      className="qwen-message user-message-container group flex gap-0 my-1 items-start text-left flex-col relative"
       style={{ position: 'relative' }}
     >
       <div

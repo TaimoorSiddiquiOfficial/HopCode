@@ -344,7 +344,7 @@ You can override trust requirements for specific servers in their configuration:
 2. **Check if the server is installed**: Run the command manually (e.g. `clangd --version`) to verify
 3. **Check the command**: The server binary must be in your system `PATH`, or specified as an absolute path (e.g. `/opt/llvm/bin/clangd`). Relative paths that escape the workspace are blocked
 4. **Check workspace trust**: The workspace must be trusted for LSP (use `/trust`)
-5. **Check logs**: Start HopCode with `--debug`, then search for LSP-related entries in the debug log (see Debugging section below)
+5. **Check logs**: Start Qwen Code with `--debug`, then search for LSP-related entries in the debug log (see Debugging section below)
 6. **Check the process**: Run `ps aux | grep <server-name>` to verify the server process is running
 
 ### Slow Performance
@@ -361,22 +361,22 @@ You can override trust requirements for specific servers in their configuration:
 
 ### Debugging
 
-LSP does not have a separate debug flag. Use HopCode's normal debug mode together with the LSP feature flag:
+LSP does not have a separate debug flag. Use Qwen Code's normal debug mode together with the LSP feature flag:
 
 ```bash
-hopcode --experimental-lsp --debug
+qwen --experimental-lsp --debug
 ```
 
 Debug logs are written to the session debug log directory. To check LSP-related entries:
 
 ```bash
 # Default runtime directory
-rg "LSP|Native LSP|clangd|connection closed" ~/.hopcode/debug/latest
+rg "LSP|Native LSP|clangd|connection closed" ~/.qwen/debug/latest
 # Or, without ripgrep:
-grep -E "LSP|Native LSP|clangd|connection closed" ~/.hopcode/debug/latest
+grep -E "LSP|Native LSP|clangd|connection closed" ~/.qwen/debug/latest
 
-# If HOPCODE_RUNTIME_DIR is configured
-rg "LSP|Native LSP|clangd|connection closed" "$HOPCODE_RUNTIME_DIR/debug/latest"
+# If QWEN_RUNTIME_DIR is configured
+rg "LSP|Native LSP|clangd|connection closed" "$QWEN_RUNTIME_DIR/debug/latest"
 ```
 
 Useful entries include:
@@ -461,25 +461,25 @@ hopcode --experimental-lsp
 
 ### Q: How do I know which language servers are running?
 
-Start HopCode with LSP and debug mode enabled:
+Start Qwen Code with LSP and debug mode enabled:
 
 ```bash
-hopcode --experimental-lsp --debug
+qwen --experimental-lsp --debug
 ```
 
 Then run `/status` for a short summary, `/lsp` for per-server status, or inspect the debug log:
 
 ```bash
 # Default runtime directory
-rg "LSP|Native LSP|<server-name>" ~/.hopcode/debug/latest
+rg "LSP|Native LSP|<server-name>" ~/.qwen/debug/latest
 # Or:
-grep -E "LSP|Native LSP|<server-name>" ~/.hopcode/debug/latest
+grep -E "LSP|Native LSP|<server-name>" ~/.qwen/debug/latest
 
-# If HOPCODE_RUNTIME_DIR is configured
-rg "LSP|Native LSP|<server-name>" "$HOPCODE_RUNTIME_DIR/debug/latest"
+# If QWEN_RUNTIME_DIR is configured
+rg "LSP|Native LSP|<server-name>" "$QWEN_RUNTIME_DIR/debug/latest"
 ```
 
-LSP uses HopCode's normal `--debug` mode; there is no separate LSP debug flag.
+LSP uses Qwen Code's normal `--debug` mode; there is no separate LSP debug flag.
 
 ### Q: Can I use multiple language servers for the same file type?
 

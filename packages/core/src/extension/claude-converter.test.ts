@@ -9,7 +9,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import {
-  convertClaudeToHopCodeConfig,
+  convertClaudeToQwenConfig,
+  convertClaudeAgentConfig,
   mergeClaudeConfigs,
   isClaudePluginConfig,
   convertClaudePluginPackage,
@@ -76,6 +77,18 @@ describe('convertClaudeToHopCodeConfig', () => {
     } as ClaudePluginConfig;
 
     expect(() => convertClaudeToHopCodeConfig(invalidConfig)).toThrow();
+  });
+});
+
+describe('convertClaudeAgentConfig', () => {
+  it('should map Claude NotebookEdit to Qwen NotebookEdit', () => {
+    const result = convertClaudeAgentConfig({
+      name: 'notebook-agent',
+      description: 'Works on notebooks',
+      tools: ['Read', 'NotebookEdit', 'Edit'],
+    });
+
+    expect(result['tools']).toEqual(['ReadFile', 'NotebookEdit', 'Edit']);
   });
 });
 

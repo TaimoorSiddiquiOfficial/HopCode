@@ -1,4 +1,10 @@
-﻿/**
+/**
+ * @license
+ * Copyright 2025 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -12,13 +18,13 @@
  * report to ~/.hopcode/startup-perf/ on finalization.
  *
  * Usage (already wired in index.ts / gemini.tsx):
- *   initStartupProfiler()        u{2014} call once at process start to record T0
- *   profileCheckpoint('name')    u{2014} call at each phase boundary (sequential)
- *   recordStartupEvent('name', attrs?) u{2014} record a discrete event (multi-fire allowed)
- *   finalizeStartupProfile(id)   u{2014} call after last checkpoint to write report
+ *   initStartupProfiler()        — call once at process start to record T0
+ *   profileCheckpoint('name')    — call at each phase boundary (sequential)
+ *   recordStartupEvent('name', attrs?) — record a discrete event (multi-fire allowed)
+ *   finalizeStartupProfile(id)   — call after last checkpoint to write report
  *
  * By default profiles only inside the sandbox child process to avoid duplicate
- * reports. Set HOPCODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
+ * reports. Set QWEN_CODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
  * (pre-sandbox) process; outer reports are written with an `outer-` filename
  * prefix to keep them separate from sandbox-child reports.
  *
@@ -138,8 +144,9 @@ export function initStartupProfiler(): void {
   if (process.env['HOPCODE_PROFILE_STARTUP'] !== '1') {
     return;
   }
+
   const inSandboxChild = !!process.env['SANDBOX'];
-  const outerOptIn = process.env['HOPCODE_PROFILE_STARTUP_OUTER'] === '1';
+  const outerOptIn = process.env['QWEN_CODE_PROFILE_STARTUP_OUTER'] === '1';
 
   // Default behavior is unchanged: only the sandbox child collects.
   // Outer (pre-sandbox) collection requires an explicit opt-in to avoid
@@ -151,9 +158,9 @@ export function initStartupProfiler(): void {
   enabled = true;
   outerProcess = !inSandboxChild;
   // Default to capturing heap snapshots at every checkpoint.
-  // Disable with HOPCODE_PROFILE_STARTUP_NO_HEAP=1 when measuring the
+  // Disable with QWEN_CODE_PROFILE_STARTUP_NO_HEAP=1 when measuring the
   // Heisenberg overhead of the heap call itself.
-  captureHeap = process.env['HOPCODE_PROFILE_STARTUP_NO_HEAP'] !== '1';
+  captureHeap = process.env['QWEN_CODE_PROFILE_STARTUP_NO_HEAP'] !== '1';
   finalized = false;
   processUptimeAtT0Ms = Math.round(process.uptime() * 1000 * 100) / 100;
   t0 = performance.now();

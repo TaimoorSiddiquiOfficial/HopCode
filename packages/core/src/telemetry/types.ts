@@ -194,7 +194,7 @@ export class ToolCallEvent implements BaseTelemetryEvent {
     // command's actual answer, already emitted in stdout `result` /
     // `structured_result`). Recording them again as ordinary tool-call
     // function_args duplicates that data into telemetry surfaces (OTLP
-    // exports, HopCodeLogger, ui-telemetry stream, the chat-recording UI
+    // exports, QwenLogger, ui-telemetry stream, the chat-recording UI
     // event mirror) where it can leak off-device. Replace with a shared
     // placeholder constant so consumers still see the call happened —
     // duration, success, decision metrics are preserved — but the
@@ -844,7 +844,7 @@ export class AuthEvent implements BaseTelemetryEvent {
 }
 
 /** Hook type for telemetry */
-export type HookTelemetryType = 'command' | 'http' | 'function';
+export type HookTelemetryType = 'command' | 'http' | 'function' | 'prompt';
 
 /**
  * Hook call telemetry event

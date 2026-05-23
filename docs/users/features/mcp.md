@@ -200,7 +200,7 @@ pathology.
 ### Rolling back progressive MCP
 
 If you need the old synchronous behavior (cli waits for every MCP server
-before showing any UI), set `HOPCODE_LEGACY_MCP_BLOCKING=1` in your
+before showing any UI), set `QWEN_CODE_LEGACY_MCP_BLOCKING=1` in your
 environment. This is kept as an escape hatch for at least one release.
 
 ## Safety and control

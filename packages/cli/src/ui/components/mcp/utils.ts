@@ -38,7 +38,7 @@ export function groupServersBySource(
     }
   }
 
-  // Sort by priority: user > project > extension
+  // 按优先级排序: user > project > extension
   const result: GroupedServers[] = [];
 
   for (const source of SOURCE_ORDER) {

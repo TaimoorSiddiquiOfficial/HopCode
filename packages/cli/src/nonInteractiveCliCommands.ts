@@ -48,13 +48,13 @@ export type NonInteractiveSlashCommandResult =
     }
   | {
       type: 'message';
-      messageType: 'info' | 'error';
+      messageType: 'info' | 'warning' | 'error';
       content: string;
     }
   | {
       type: 'stream_messages';
       messages: AsyncGenerator<
-        { messageType: 'info' | 'error'; content: string },
+        { messageType: 'info' | 'warning' | 'error'; content: string },
         void,
         unknown
       >;
@@ -95,7 +95,7 @@ function handleCommandResult(
       return {
         type: 'message',
         messageType:
-          result.messageType === 'warning' || result.messageType === 'success'
+          result.messageType === 'warning'
             ? ('info' as const)
             : result.messageType,
         content: result.content,

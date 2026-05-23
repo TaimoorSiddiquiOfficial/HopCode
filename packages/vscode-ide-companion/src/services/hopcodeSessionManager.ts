@@ -7,7 +7,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { getProjectHash } from '@hoptrendy/hopcode-core/src/utils/paths.js';
+import { getProjectHash } from '@hoptrendy/hopcode-core';
 import { getRuntimeBaseDir } from '../utils/paths.js';
 import type { HopCodeSession } from './hopcodeSessionReader.js';
 

@@ -139,25 +139,39 @@ export {
 export { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 export { sanitizeHookName } from './sanitize.js';
 export {
-  getModelPricing,
-  estimateModelCost,
-  formatCostUsd,
-} from './modelPricing.js';
-export type { ModelPricing } from './modelPricing.js';
-export {
   startInteractionSpan,
   endInteractionSpan,
   startLLMRequestSpan,
   endLLMRequestSpan,
   startToolSpan,
   endToolSpan,
+  runInToolSpanContext,
   startToolExecutionSpan,
   endToolExecutionSpan,
-  clearSessionTracingForTesting,
+  startToolBlockedOnUserSpan,
+  endToolBlockedOnUserSpan,
+  startHookSpan,
+  endHookSpan,
+  getActiveInteractionSpan,
+  truncateSpanError,
 } from './session-tracing.js';
 export type {
   StartInteractionOptions,
   EndInteractionOptions,
   LLMRequestMetadata,
   ToolSpanMetadata,
+  ToolBlockedDecision,
+  ToolBlockedSource,
+  HookEvent,
+  StartHookSpanOptions,
+  HookSpanMetadata,
 } from './session-tracing.js';
+export {
+  addUserPromptAttributes,
+  addSystemPromptAttributes,
+  addToolSchemaAttributes,
+  addModelOutputAttributes,
+  addToolInputAttributes,
+  addToolResultAttributes,
+  truncateContent,
+} from './detailed-span-attributes.js';

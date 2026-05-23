@@ -61,21 +61,25 @@ const vscodeMock = vi.hoisted(() => {
 });
 
 vi.mock('vscode', () => vscodeMock);
-vi.mock('@hoptrendy/hopcode-core/src/services/fileDiscoveryService.js', () => ({
-  FileDiscoveryService: class {
-    shouldIgnoreFile(filePath: string, options?: unknown) {
-      return shouldIgnoreFileMock(filePath, options);
-    }
-  },
-}));
-vi.mock('@hoptrendy/hopcode-core/src/utils/filesearch/fileSearch.js', () => ({
-  FileSearchFactory: {
-    create: () => fileSearchMock,
-  },
-}));
-vi.mock('@hoptrendy/hopcode-core/src/utils/filesearch/crawlCache.js', () => ({
-  clear: vi.fn(),
-}));
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+  return {
+    ...actual,
+    FileDiscoveryService: class {
+      shouldIgnoreFile(filePath: string, options?: unknown) {
+        return shouldIgnoreFileMock(filePath, options);
+      }
+    },
+    FileSearchFactory: {
+      create: () => fileSearchMock,
+    },
+    crawlCache: {
+      ...actual.crawlCache,
+      clear: vi.fn(),
+    },
+  };
+});
 
 const readonlyProviderMock = vi.hoisted(() => ({
   createUri: vi.fn(),
@@ -197,7 +201,7 @@ describe('FileMessageHandler', () => {
   });
 
   describe('createAndOpenTempFile viewColumn selection', () => {
-    const chatViewType = 'mainThreadWebview-HopCode.chat';
+    const chatViewType = 'mainThreadWebview-qwenCode.chat';
 
     beforeEach(() => {
       vi.clearAllMocks();
@@ -226,32 +230,6 @@ describe('FileMessageHandler', () => {
       vscodeMock.window.tabGroups.all = [
         { tabs: [regularTab()], viewColumn: 1 },
         { tabs: [chatTab()], viewColumn: 2 },
-      ];
-
-      const sendToWebView = vi.fn();
-      const handler = new FileMessageHandler(
-        {} as HopCodeAgentManager,
-        {} as ConversationStore,
-        null,
-        sendToWebView,
-      );
-
-      await handler.handle({
-        type: 'createAndOpenTempFile' as never,
-        data: { content: 'hello', fileName: 'test.txt' },
-      });
-
-      expect(vscodeMock.window.showTextDocument).toHaveBeenCalledTimes(1);
-      const options = vscodeMock.window.showTextDocument.mock.calls[0]?.[1] as {
-        viewColumn: number;
-      };
-      expect(options.viewColumn).toBe(1);
-    });
-
-    it('opens in right group when no left neighbor but right exists', async () => {
-      vscodeMock.window.tabGroups.all = [
-        { tabs: [chatTab()], viewColumn: 1 },
-        { tabs: [regularTab()], viewColumn: 2 },
       ];
 
       const sendToWebView = vi.fn();

@@ -1,6 +1,6 @@
 # DaemonClient quickstart (TypeScript)
 
-A minimal end-to-end example: start a `hopcode serve` daemon in another terminal, then drive it from a Node script with the SDK's `DaemonClient`. See also: [Daemon mode user guide](../../users/hopcode-serve.md) and [HTTP protocol reference](../hopcode-serve-protocol.md).
+A minimal end-to-end example: start a `qwen serve` daemon in another terminal, then drive it from a Node script with the SDK's `DaemonClient`. See also: [Daemon mode user guide](../../users/qwen-serve.md) and [HTTP protocol reference](../qwen-serve-protocol.md).
 
 ## Setup
 
@@ -8,8 +8,8 @@ In one terminal:
 
 ```bash
 cd your-project/
-hopcode serve --port 4170
-# → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/your-project)
+qwen serve --port 4170
+# → qwen serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/your-project)
 ```
 
 Per [#3803](https://github.com/QwenLM/qwen-code/issues/3803) §02 each daemon binds to one workspace at boot (the current `cwd`, or override with `--workspace /path/to/dir`). The daemon's bound path is advertised on `/capabilities.workspaceCwd` so clients can pre-flight check + omit `cwd` from `POST /session`.
@@ -17,17 +17,17 @@ Per [#3803](https://github.com/QwenLM/qwen-code/issues/3803) §02 each daemon bi
 In another:
 
 ```bash
-npm install @hoptrendy/hopcode-sdk
+npm install @hoptrendy/sdk
 ```
 
 ## Hello daemon
 
 ```ts
-import { DaemonClient, type DaemonEvent } from '@hoptrendy/hopcode-sdk';
+import { DaemonClient, type DaemonEvent } from '@hoptrendy/sdk';
 
 const client = new DaemonClient({
   baseUrl: 'http://127.0.0.1:4170',
-  // token: process.env.HOPCODE_SERVER_TOKEN, // required for non-loopback binds
+  // token: process.env.QWEN_SERVER_TOKEN, // required for non-loopback binds
 });
 
 // 1. Confirm we can reach the daemon, gate UI on its features, and
@@ -109,6 +109,30 @@ function handleEvent(event: DaemonEvent): void {
 }
 ```
 
+## Workspace file helpers
+
+File routes are workspace-scoped, not session-scoped, so they live on
+`DaemonClient` directly:
+
+```ts
+const file = await client.readWorkspaceFile('src/main.ts');
+
+const updated = await client.editWorkspaceFile({
+  path: 'src/main.ts',
+  oldText: 'timeout: 30000',
+  newText: 'timeout: 60000',
+  expectedHash: file.hash!,
+});
+
+console.log(updated.hash);
+```
+
+`expectedHash` is SHA-256 over the raw on-disk bytes. `mode: "replace"` and
+`editWorkspaceFile()` require it so stale clients do not overwrite a file they
+did not just read. Write/edit require bearer-token configuration even on
+loopback; start the daemon with `--token` or `QWEN_SERVER_TOKEN` before using
+them.
+
 ## Reconnect with `Last-Event-ID`
 
 If your client process restarts mid-session, replay events you missed:
@@ -151,10 +175,10 @@ case 'permission_request': {
 
 ## Shared-session collaboration
 
-Two clients pointed at the **same daemon** end up on the same session. Per #3803 §02 each daemon is bound to ONE workspace at boot, so the daemon launched as `hopcode serve --workspace /work/repo` (or `cd /work/repo && hopcode serve`) is what both clients connect to:
+Two clients pointed at the **same daemon** end up on the same session. Per #3803 §02 each daemon is bound to ONE workspace at boot, so the daemon launched as `qwen serve --workspace /work/repo` (or `cd /work/repo && qwen serve`) is what both clients connect to:
 
 ```ts
-// Daemon was launched as `hopcode serve --workspace /work/repo` so
+// Daemon was launched as `qwen serve --workspace /work/repo` so
 // `caps.workspaceCwd === '/work/repo'` for both clients.
 
 // Client A (e.g. an IDE plugin)
@@ -174,7 +198,7 @@ Both clients see the same `session_update` / `permission_request` stream. Either
 If `workspaceCwd` doesn't match the daemon's bound workspace, `createOrAttachSession` rejects with `DaemonHttpError` carrying status `400` and a structured body:
 
 ```ts
-import { DaemonHttpError } from '@qwen-code/sdk';
+import { DaemonHttpError } from '@hoptrendy/sdk';
 
 try {
   await client.createOrAttachSession({ workspaceCwd: '/some/other/project' });
@@ -205,14 +229,14 @@ When the daemon was started with a token (any non-loopback bind requires one):
 ```ts
 const client = new DaemonClient({
   baseUrl: 'https://your-host:4170',
-  token: process.env.HOPCODE_SERVER_TOKEN,
+  token: process.env.QWEN_SERVER_TOKEN,
 });
 ```
 
 Wrong / missing tokens return `401` with a uniform body — the SDK throws `DaemonHttpError` on any 4xx/5xx from a route handler.
 
 ```ts
-import { DaemonHttpError } from '@hoptrendy/hopcode-sdk';
+import { DaemonHttpError } from '@hoptrendy/sdk';
 
 try {
   await client.health();
@@ -238,6 +262,6 @@ Cancel only winds down the **active** prompt — anything you'd already POSTed a
 
 ## What's next
 
-- [HTTP protocol reference](../hopcode-serve-protocol.md) — full route spec with status codes
-- [Daemon mode user guide](../../users/hopcode-serve.md) — operator-side docs
+- [HTTP protocol reference](../qwen-serve-protocol.md) — full route spec with status codes
+- [Daemon mode user guide](../../users/qwen-serve.md) — operator-side docs
 - Source: `packages/sdk-typescript/src/daemon/`

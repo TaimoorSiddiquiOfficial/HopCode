@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -502,9 +502,36 @@ describe('osc8 helpers', () => {
       expect(supportsHyperlinks()).toBe(true);
     });
 
-    it('mintty is enabled via TERM_PROGRAM=mintty', () => {
+    it('mintty ≥ 3.3 is enabled, < 3.3 is not, missing version refuses', () => {
+      // Older mintty builds (still shipping in some Git-for-Windows distros
+      // and dev environments like Laragon) print raw OSC 8 escape bytes as
+      // visible garbage instead of ignoring them — see issue #4420. mintty
+      // has set TERM_PROGRAM_VERSION since 2.7 (2017), so a missing version
+      // implies an ancient build and we refuse.
       setTTY(true);
       process.env['TERM_PROGRAM'] = 'mintty';
+      process.env['TERM_PROGRAM_VERSION'] = '4.0.0';
+      expect(supportsHyperlinks()).toBe(true);
+      process.env['TERM_PROGRAM_VERSION'] = '3.7.1';
+      expect(supportsHyperlinks()).toBe(true);
+      process.env['TERM_PROGRAM_VERSION'] = '3.3.0';
+      expect(supportsHyperlinks()).toBe(true);
+      process.env['TERM_PROGRAM_VERSION'] = '3.2.9';
+      expect(supportsHyperlinks()).toBe(false);
+      process.env['TERM_PROGRAM_VERSION'] = '3.1.0';
+      expect(supportsHyperlinks()).toBe(false);
+      process.env['TERM_PROGRAM_VERSION'] = '2.9.8';
+      expect(supportsHyperlinks()).toBe(false);
+      process.env['TERM_PROGRAM_VERSION'] = '';
+      expect(supportsHyperlinks()).toBe(false);
+      delete process.env['TERM_PROGRAM_VERSION'];
+      expect(supportsHyperlinks()).toBe(false);
+      // Users on mintty 3.1–3.2 who know their build's OSC 8 implementation
+      // works can opt back in via FORCE_HYPERLINK=1 — same escape hatch the
+      // Warp and Hyper tests above assert. Pin the contract so a future
+      // refactor that reorders early-exit checks can't silently break it.
+      process.env['TERM_PROGRAM_VERSION'] = '3.2.9';
+      process.env['FORCE_HYPERLINK'] = '1';
       expect(supportsHyperlinks()).toBe(true);
     });
 
@@ -533,7 +560,7 @@ describe('osc8 helpers', () => {
     it('FORCE_HYPERLINK=1 does NOT override non-TTY suppression', () => {
       // A user with `FORCE_HYPERLINK=1` in their shell profile (to enable
       // OSC 8 inside tmux interactively) must still get a clean pipe when
-      // running `hopcode | cat` — escape bytes never go into a file/pipe.
+      // running `qwen | cat` — escape bytes never go into a file/pipe.
       setTTY(false);
       process.env['FORCE_HYPERLINK'] = '1';
       expect(supportsHyperlinks()).toBe(false);
@@ -547,13 +574,13 @@ describe('osc8 helpers', () => {
       expect(supportsHyperlinks()).toBe(false);
     });
 
-    it('hard opt-outs (NO_COLOR/HOPCODE_DISABLE_HYPERLINKS) win over FORCE_HYPERLINK', () => {
+    it('hard opt-outs (NO_COLOR/QWEN_DISABLE_HYPERLINKS) win over FORCE_HYPERLINK', () => {
       setTTY(true);
       process.env['FORCE_HYPERLINK'] = '1';
       process.env['NO_COLOR'] = '1';
       expect(supportsHyperlinks()).toBe(false);
       delete process.env['NO_COLOR'];
-      process.env['HOPCODE_DISABLE_HYPERLINKS'] = '1';
+      process.env['QWEN_DISABLE_HYPERLINKS'] = '1';
       expect(supportsHyperlinks()).toBe(false);
     });
 

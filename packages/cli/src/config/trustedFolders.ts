@@ -25,7 +25,7 @@ export function getTrustedFoldersPath(): string {
   }
   // Resolve lazily on every call: see settings.ts:getUserSettingsPath for why
   // a top-level const would be stale after `preResolveHomeEnvOverrides()`.
-  return path.join(Storage.getGlobalHopCodeDir(), TRUSTED_FOLDERS_FILENAME);
+  return path.join(Storage.getGlobalQwenDir(), TRUSTED_FOLDERS_FILENAME);
 }
 
 export enum TrustLevel {

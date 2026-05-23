@@ -16,7 +16,11 @@ import {
 } from '../config/settings.js';
 import { promisify } from 'node:util';
 import type { Config, SandboxConfig } from '@hoptrendy/hopcode-core';
-import { FatalSandboxError, Storage, isSubpath } from '@hoptrendy/hopcode-core';
+import {
+  FatalSandboxError,
+  Storage,
+  isSubpath,
+} from '@hoptrendy/hopcode-core';
 import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
 
@@ -42,9 +46,9 @@ function ensureDirectoryAndGetRealPath(dir: string): string {
   return fs.realpathSync(dir);
 }
 
-const LOCAL_DEV_SANDBOX_IMAGE_NAME = 'hopcode-sandbox';
-const SANDBOX_NETWORK_NAME = 'hopcode-sandbox';
-const SANDBOX_PROXY_NAME = 'hopcode-sandbox-proxy';
+const LOCAL_DEV_SANDBOX_IMAGE_NAME = 'qwen-code-sandbox';
+const SANDBOX_NETWORK_NAME = 'qwen-code-sandbox';
+const SANDBOX_PROXY_NAME = 'qwen-code-sandbox-proxy';
 const BUILTIN_SEATBELT_PROFILES = [
   'permissive-open',
   'permissive-closed',
@@ -219,11 +223,11 @@ export async function start_sandbox(
 
     // Canonicalize via realpathSync so seatbelt's `subpath` matcher sees the
     // same path the kernel will. mkdirSync first because realpathSync throws
-    // on missing dirs and a custom HOPCODE_HOME / HOPCODE_RUNTIME_DIR may not exist
+    // on missing dirs and a custom QWEN_HOME / QWEN_RUNTIME_DIR may not exist
     // yet on first run.
-    const hopcodeDir = Storage.getGlobalHopCodeDir();
+    const qwenDir = Storage.getGlobalQwenDir();
     const runtimeDir = Storage.getRuntimeBaseDir();
-    fs.mkdirSync(hopcodeDir, { recursive: true });
+    fs.mkdirSync(qwenDir, { recursive: true });
     fs.mkdirSync(runtimeDir, { recursive: true });
 
     const args = [
@@ -236,7 +240,7 @@ export async function start_sandbox(
       '-D',
       `CACHE_DIR=${fs.realpathSync(execSync(`getconf DARWIN_USER_CACHE_DIR`).toString().trim())}`,
       '-D',
-      `HOPCODE_DIR=${fs.realpathSync(hopcodeDir)}`,
+      `QWEN_DIR=${fs.realpathSync(qwenDir)}`,
       '-D',
       `RUNTIME_DIR=${fs.realpathSync(runtimeDir)}`,
     ];
@@ -439,8 +443,8 @@ export async function start_sandbox(
   // mount current directory as working directory in sandbox (set via --workdir)
   args.push('--volume', `${workdir}:${containerWorkdir}`);
 
-  // Mount user settings at /home/node/.hopcode and at the canonical host path
-  // used by HOPCODE_HOME, unless that host path is already covered by a broader
+  // Mount user settings at /home/node/.qwen and at the canonical host path
+  // used by QWEN_HOME, unless that host path is already covered by a broader
   // runtime-dir mount below.
   const userSettingsDirOnHost = getUserSettingsDir();
   const runtimeBaseDirOnHost = Storage.getRuntimeBaseDir();
@@ -481,13 +485,13 @@ export async function start_sandbox(
     );
   }
 
-  // Pass HOPCODE_HOME so the sandboxed CLI resolves the global hopcode dir to the
-  // same path the host did, instead of relying on the /home/node/.hopcode mount
+  // Pass QWEN_HOME so the sandboxed CLI resolves the global qwen dir to the
+  // same path the host did, instead of relying on the /home/node/.qwen mount
   // being the default fallback.
-  args.push('--env', `HOPCODE_HOME=${userSettingsDirContainerPath}`);
+  args.push('--env', `QWEN_HOME=${userSettingsDirContainerPath}`);
 
-  // Mount the runtime base dir and pass HOPCODE_RUNTIME_DIR when it diverges
-  // from the global hopcode dir; otherwise the existing user-settings mount
+  // Mount the runtime base dir and pass QWEN_RUNTIME_DIR when it diverges
+  // from the global qwen dir; otherwise the existing user-settings mount
   // already covers it.
   if (!runtimeCoveredByUserSettings) {
     args.push(
@@ -496,7 +500,7 @@ export async function start_sandbox(
     );
   }
   if (!runtimeSameAsUserSettings) {
-    args.push('--env', `HOPCODE_RUNTIME_DIR=${runtimeBaseDirContainerPath}`);
+    args.push('--env', `QWEN_RUNTIME_DIR=${runtimeBaseDirContainerPath}`);
   }
 
   // mount os.tmpdir() as os.tmpdir() inside container

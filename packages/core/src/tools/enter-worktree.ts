@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,6 +12,7 @@ import {
   GitWorktreeService,
   writeWorktreeSessionMarker,
 } from '../services/gitWorktreeService.js';
+import { writeWorktreeSession } from '../services/worktreeSessionService.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
 const debugLogger = createDebugLogger('ENTER_WORKTREE');
@@ -25,7 +26,7 @@ export interface EnterWorktreeParams {
   name?: string;
 }
 
-const enterWorktreeDescription = `Creates an isolated git worktree at \`<projectRoot>/.hopcode/worktrees/<slug>\` and returns its absolute path so subsequent file edits, shell commands, and other tools can operate inside it.
+const enterWorktreeDescription = `Creates an isolated git worktree at \`<projectRoot>/.qwen/worktrees/<slug>\` and returns its absolute path so subsequent file edits, shell commands, and other tools can operate inside it.
 
 ## When to Use
 
@@ -70,17 +71,17 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
     const cwd = this.config.getTargetDir();
 
     // Refuse nested worktree creation. If the caller's cwd is itself
-    // already inside `.hopcode/worktrees/<slug>/`, a fresh worktree would
-    // be provisioned at `<repo>/.hopcode/worktrees/<new>/` — but the
+    // already inside `.qwen/worktrees/<slug>/`, a fresh worktree would
+    // be provisioned at `<repo>/.qwen/worktrees/<new>/` — but the
     // model's mental model and inherited file paths would still
     // reference the outer worktree. The resulting handle confusion
     // typically leaves the inner worktree orphaned on exit.
     //
     // The check is conservative: any path component named
-    // `.hopcode/worktrees` somewhere in cwd qualifies. We also forbid
+    // `.qwen/worktrees` somewhere in cwd qualifies. We also forbid
     // sentinel "inside a worktree" markers that an `enter_worktree`
     // session leaves behind (writeSessionMarker, below).
-    if (/\.hopcode[\\/]worktrees[\\/]/.test(cwd)) {
+    if (/\.qwen[\\/]worktrees[\\/]/.test(cwd)) {
       const reason =
         'Already inside a git worktree. Call exit_worktree first, ' +
         'or return to the main repository checkout before creating a ' +
@@ -91,7 +92,7 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
 
     // First-pass service rooted at cwd, only to find the repo top-level.
     // We can't use cwd as the worktree anchor because launching from a
-    // monorepo subdirectory would scatter `.hopcode/worktrees/` under each
+    // monorepo subdirectory would scatter `.qwen/worktrees/` under each
     // package's directory, and the startup sweep at `Config.initialize`
     // would never find them.
     const probe = new GitWorktreeService(cwd);
@@ -111,7 +112,7 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
     }
 
     // Resolve to the repo's top-level so worktrees always live under
-    // `<repoRoot>/.hopcode/worktrees/`, regardless of which subdirectory
+    // `<repoRoot>/.qwen/worktrees/`, regardless of which subdirectory
     // the user invoked the tool from.
     const projectRoot = (await probe.getRepoTopLevel()) ?? cwd;
     const service =
@@ -136,7 +137,7 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
     // Without an explicit base, `createUserWorktree` falls back to
     // whichever branch the main working tree has checked out, which is
     // not necessarily where the user is working (e.g. they invoked
-    // hopcode from a feature branch but the main working tree still has
+    // qwen from a feature branch but the main working tree still has
     // `main` checked out).
     let baseBranch: string | undefined;
     try {
@@ -146,6 +147,20 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
         `enter_worktree: getCurrentBranch failed at ${projectRoot}: ${error}`,
       );
     }
+
+    // Capture HEAD before creating the branch so WorktreeExitDialog can
+    // count new commits created inside the worktree. Empty string when
+    // rev-parse fails (e.g. unborn HEAD) — the dialog treats empty as
+    // "unknown" and skips the commit-count display.
+    let originalHeadCommit = '';
+    try {
+      originalHeadCommit = await service.getCurrentCommitHash();
+    } catch (error) {
+      debugLogger.warn(
+        `enter_worktree: getCurrentCommitHash failed at ${projectRoot}: ${error}`,
+      );
+    }
+
     const result = await service.createUserWorktree(slug, baseBranch);
     if (!result.success || !result.worktree) {
       const reason = result.error ?? 'Failed to create worktree.';
@@ -166,6 +181,31 @@ class EnterWorktreeInvocation extends BaseToolInvocation<
     } catch (error) {
       debugLogger.warn(
         `enter_worktree: failed to write session marker at ${result.worktree.path}: ${error}`,
+      );
+    }
+
+    // Persist worktree session state so --resume can restore context,
+    // the Footer can display the active worktree, and WorktreeExitDialog
+    // knows what to operate on. Best-effort: a write failure does not
+    // abort the creation (the worktree is still usable; the CLI just
+    // loses visibility into it across resume).
+    try {
+      await writeWorktreeSession(
+        this.config
+          .getSessionService()
+          .getWorktreeSessionPath(this.config.getSessionId()),
+        {
+          slug,
+          worktreePath: result.worktree.path,
+          worktreeBranch: result.worktree.branch,
+          originalCwd: projectRoot,
+          originalBranch: baseBranch ?? 'HEAD',
+          originalHeadCommit,
+        },
+      );
+    } catch (error) {
+      debugLogger.warn(
+        `enter_worktree: failed to write WorktreeSession sidecar: ${error}`,
       );
     }
 

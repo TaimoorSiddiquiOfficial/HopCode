@@ -1,21 +1,18 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const chatViewType = 'mainThreadWebview-HopCode.chat';
+const chatViewType = 'mainThreadWebview-qwenCode.chat';
 
 const vscodeMock = vi.hoisted(() => ({
   ViewColumn: { One: 1, Two: 2, Three: 3, Four: 4 },
   window: {
     tabGroups: {
-      all: [] as Array<{
-        tabs: Array<{ input: unknown }>;
-        viewColumn: number;
-      }>,
+      all: [] as Array<{ tabs: Array<{ input: unknown }>; viewColumn: number }>,
     },
   },
 }));

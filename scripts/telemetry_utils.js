@@ -38,21 +38,21 @@ function getProjectHash(projectRoot) {
 const projectHash = getProjectHash(projectRoot);
 
 // Runtime base directory for ephemeral data (tmp, otel, etc.)
-// Priority: HOPCODE_RUNTIME_DIR > HOPCODE_HOME > ~/.hopcode
+// Priority: QWEN_RUNTIME_DIR > QWEN_HOME > ~/.qwen
 function getRuntimeBaseDir() {
-  const runtimeDir = process.env.hopcode_RUNTIME_DIR;
+  const runtimeDir = process.env.QWEN_RUNTIME_DIR;
   if (runtimeDir) {
     return resolvePath(runtimeDir);
   }
-  const homeEnv = process.env.HOPCODE_HOME;
+  const homeEnv = process.env.QWEN_HOME;
   if (homeEnv) {
     return resolvePath(homeEnv);
   }
-  return path.join(os.homedir(), '.hopcode');
+  return path.join(os.homedir(), '.qwen');
 }
 
-// Project-level .hopcode directory in the workspace
-const WORKSPACE_HOPCODE_DIR = path.join(projectRoot, '.hopcode');
+// Project-level .qwen directory in the workspace
+const WORKSPACE_QWEN_DIR = path.join(projectRoot, '.qwen');
 
 // Telemetry artifacts are stored in a hashed directory under the runtime dir
 export const OTEL_DIR = path.join(

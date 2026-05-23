@@ -12,6 +12,7 @@ import process from 'node:process';
 import {
   FatalConfigError,
   HOPCODE_DIR,
+  QWEN_DIR,
   getErrorMessage,
   Storage,
   createDebugLogger,
@@ -60,8 +61,8 @@ export type { Settings, MemoryImportFormat };
 
 export const SETTINGS_DIRECTORY_NAME = HOPCODE_DIR;
 
-// Lazy getters: must NOT be top-level consts. `HOPCODE_HOME` may be resolved
-// from `~/.env` or `~/.hopcode/.env` by `preResolveHomeEnvOverrides()` in
+// Lazy getters: must NOT be top-level consts. `QWEN_HOME` may be resolved
+// from `~/.env` or `~/.qwen/.env` by `preResolveHomeEnvOverrides()` in
 // `loadSettings()`, which runs after this module is imported. A const
 // captured here would freeze the pre-bootstrap value and split state across
 // callers.
@@ -73,15 +74,12 @@ export function getUserSettingsDir(): string {
 }
 export const DEFAULT_EXCLUDED_ENV_VARS = ['DEBUG', 'DEBUG_MODE'];
 
-// HOPCODE_HOME and HOPCODE_RUNTIME_DIR control where global state (settings, OAuth
+// QWEN_HOME and QWEN_RUNTIME_DIR control where global state (settings, OAuth
 // credentials, installation IDs, etc.) is written. A project `.env` must never
 // redirect these — that would split global state between the real home and a
 // project-controlled directory. Always excluded from project .env files,
 // regardless of user-configurable `advanced.excludedEnvVars`.
-const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
-  'HOPCODE_HOME',
-  'HOPCODE_RUNTIME_DIR',
-];
+const PROJECT_ENV_HARDCODED_EXCLUSIONS = ['QWEN_HOME', 'QWEN_RUNTIME_DIR'];
 
 // Settings version to track migration state
 export const SETTINGS_VERSION = 4;
@@ -507,33 +505,31 @@ export function createMinimalSettings(): LoadedSettings {
 /**
  * Returns the set of normalized .env file paths that count as user-level.
  *
- * User-level paths cover the home `.env` and the global HopCode config dir
- * `.env` (which respects `HOPCODE_HOME`). When `HOPCODE_HOME` redirects elsewhere,
- * the legacy `<homedir>/.hopcode/.env` is also included so credentials users
+ * User-level paths cover the home `.env` and the global Qwen config dir
+ * `.env` (which respects `QWEN_HOME`). When `QWEN_HOME` redirects elsewhere,
+ * the legacy `<homedir>/.qwen/.env` is also included so credentials users
  * left there continue to load (and the trust check in untrusted workspaces
  * still allows reading it).
  */
 function getUserLevelEnvPaths(): Set<string> {
   const homeDir = homedir();
-  const globalHopcodeDir = Storage.getGlobalHopCodeDir();
+  const globalQwenDir = Storage.getGlobalQwenDir();
   const paths = new Set([
     path.normalize(path.join(homeDir, '.env')),
-    path.normalize(path.join(globalHopcodeDir, '.env')),
+    path.normalize(path.join(globalQwenDir, '.env')),
   ]);
-  const legacyhopcodeEnv = path.normalize(
-    path.join(homeDir, HOPCODE_DIR, '.env'),
-  );
-  paths.add(legacyhopcodeEnv);
+  const legacyQwenEnv = path.normalize(path.join(homeDir, QWEN_DIR, '.env'));
+  paths.add(legacyQwenEnv);
   return paths;
 }
 
 /**
- * Pre-resolves HOPCODE_HOME and HOPCODE_RUNTIME_DIR from user-level `.env` files
+ * Pre-resolves QWEN_HOME and QWEN_RUNTIME_DIR from user-level `.env` files
  * before any settings or storage paths are read. Required because
- * module-load `Storage.getGlobalHopCodeDir()` would otherwise snapshot legacy
+ * module-load `Storage.getGlobalQwenDir()` would otherwise snapshot legacy
  * paths for settings.json, OAuth tokens, installation_id, etc., while the
  * regular `.env` load (inside `loadSettings`) only runs later — splitting
- * global state between `~/.hopcode/...` and `<HOPCODE_HOME>/...`.
+ * global state between `~/.qwen/...` and `<QWEN_HOME>/...`.
  *
  * Only home-scoped paths are consulted; project `.env` files are barred from
  * changing these vars by `PROJECT_ENV_HARDCODED_EXCLUSIONS`.
@@ -549,32 +545,32 @@ export function preResolveHomeEnvOverrides(): void {
   }
   homeEnvBootstrapped = true;
 
-  if (process.env['HOPCODE_HOME'] && process.env['HOPCODE_RUNTIME_DIR']) {
+  if (process.env['QWEN_HOME'] && process.env['QWEN_RUNTIME_DIR']) {
     return;
   }
 
-  // Storage.getGlobalHopCodeDir() shares the same homedir resolution as the
-  // rest of the storage layer; when HOPCODE_HOME is unset it equals
-  // `<homedir>/.hopcode`, so path.dirname() recovers `<homedir>`.
-  const initialHopcodeHome = process.env['HOPCODE_HOME'];
-  const initialHopcodeDir = Storage.getGlobalHopCodeDir();
-  const candidates: string[] = [path.join(initialHopcodeDir, '.env')];
-  if (!initialHopcodeHome) {
-    candidates.push(path.join(path.dirname(initialHopcodeDir), '.env'));
+  // Storage.getGlobalQwenDir() shares the same homedir resolution as the
+  // rest of the storage layer; when QWEN_HOME is unset it equals
+  // `<homedir>/.qwen`, so path.dirname() recovers `<homedir>`.
+  const initialQwenHome = process.env['QWEN_HOME'];
+  const initialQwenDir = Storage.getGlobalQwenDir();
+  const candidates: string[] = [path.join(initialQwenDir, '.env')];
+  if (!initialQwenHome) {
+    candidates.push(path.join(path.dirname(initialQwenDir), '.env'));
   }
 
   for (const candidate of candidates) {
     readHomeEnvInto(candidate);
   }
 
-  // If HOPCODE_HOME was just discovered, also read <new HOPCODE_HOME>/.env so
-  // HOPCODE_RUNTIME_DIR can be sourced from there (mirrors the VS Code
+  // If QWEN_HOME was just discovered, also read <new QWEN_HOME>/.env so
+  // QWEN_RUNTIME_DIR can be sourced from there (mirrors the VS Code
   // companion's bootstrapHomeEnvOverrides — without this third pass the
   // CLI and companion would diverge on the runtime dir).
-  const discoveredHopcodeHome = process.env['HOPCODE_HOME'];
-  if (discoveredHopcodeHome && discoveredHopcodeHome !== initialHopcodeHome) {
-    const discoveredDir = Storage.getGlobalHopCodeDir();
-    if (discoveredDir !== initialHopcodeDir) {
+  const discoveredQwenHome = process.env['QWEN_HOME'];
+  if (discoveredQwenHome && discoveredQwenHome !== initialQwenHome) {
+    const discoveredDir = Storage.getGlobalQwenDir();
+    if (discoveredDir !== initialQwenDir) {
       readHomeEnvInto(path.join(discoveredDir, '.env'));
     }
   }
@@ -602,42 +598,42 @@ export function resetHomeEnvBootstrapForTesting(): void {
 }
 
 /**
- * Surfaces a one-shot warning when HOPCODE_HOME has been redirected but the
+ * Surfaces a one-shot warning when QWEN_HOME has been redirected but the
  * user hasn't migrated their existing global state. Auto-copying OAuth
  * tokens / settings / memory is intentionally skipped, but silently starting
  * fresh is a footgun. Returns null when there's nothing to warn about.
  */
-function detectHopCodeHomeRedirectWithoutMigration(
+function detectQwenHomeRedirectWithoutMigration(
   activeUserSettingsPath: string,
 ): string | null {
-  if (!process.env['HOPCODE_HOME']) {
+  if (!process.env['QWEN_HOME']) {
     return null;
   }
-  // Compute the legacy path by briefly unsetting HOPCODE_HOME so Storage uses
+  // Compute the legacy path by briefly unsetting QWEN_HOME so Storage uses
   // its homedir-based default — same homedir resolution as the rest of the
   // storage layer. try/finally restores the env on any throw.
-  const activeHopcodeDir = Storage.getGlobalHopCodeDir();
-  const savedHopcodeHome = process.env['HOPCODE_HOME'];
-  delete process.env['HOPCODE_HOME'];
-  let legacyHopcodeDir: string;
+  const activeQwenDir = Storage.getGlobalQwenDir();
+  const savedQwenHome = process.env['QWEN_HOME'];
+  delete process.env['QWEN_HOME'];
+  let legacyQwenDir: string;
   try {
-    legacyHopcodeDir = Storage.getGlobalHopCodeDir();
+    legacyQwenDir = Storage.getGlobalQwenDir();
   } finally {
-    process.env['HOPCODE_HOME'] = savedHopcodeHome;
+    process.env['QWEN_HOME'] = savedQwenHome;
   }
-  if (path.resolve(activeHopcodeDir) === path.resolve(legacyHopcodeDir)) {
+  if (path.resolve(activeQwenDir) === path.resolve(legacyQwenDir)) {
     return null;
   }
   if (fs.existsSync(activeUserSettingsPath)) {
     return null;
   }
-  const legacyUserSettings = path.join(legacyHopcodeDir, 'settings.json');
+  const legacyUserSettings = path.join(legacyQwenDir, 'settings.json');
   if (!fs.existsSync(legacyUserSettings)) {
     return null;
   }
   return (
-    `HOPCODE_HOME points to "${activeHopcodeDir}" but no settings.json was found there. ` +
-    `Existing config remains at "${legacyHopcodeDir}" — OAuth tokens, settings, memory, ` +
+    `QWEN_HOME points to "${activeQwenDir}" but no settings.json was found there. ` +
+    `Existing config remains at "${legacyQwenDir}" — OAuth tokens, settings, memory, ` +
     `extensions, and skills are not auto-migrated. Copy them manually if you want them ` +
     `to apply at the new location.`
   );
@@ -649,7 +645,7 @@ function detectHopCodeHomeRedirectWithoutMigration(
  * When workspace is untrusted, only allow user-level .env files at:
  * - ~/.hopcode/.env
  * - ~/.env
- * - <HOPCODE_HOME>/.env (when set)
+ * - <QWEN_HOME>/.env (when set)
  */
 function findEnvFile(
   settings: Settings,
@@ -659,23 +655,22 @@ function findEnvFile(
   const homeDir = homedir();
   const isTrusted = isWorkspaceTrusted(settings).isTrusted;
 
-  const globalHopcodeDir = Storage.getGlobalHopCodeDir();
-  const legacyHopcodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
-  const hasCustomConfigDir =
-    path.normalize(globalHopcodeDir) !== legacyHopcodeDir;
+  const globalQwenDir = Storage.getGlobalQwenDir();
+  const legacyQwenDir = path.normalize(path.join(homeDir, QWEN_DIR));
+  const hasCustomConfigDir = path.normalize(globalQwenDir) !== legacyQwenDir;
 
   const canUseEnvFile = (filePath: string): boolean =>
     isTrusted !== false || userLevelPaths.has(path.normalize(filePath));
 
-  // Home-dir candidates in priority order: globalHopcodeDir/.env, then legacy
-  // ~/.hopcode/.env (only when HOPCODE_HOME redirects), then ~/.env.
-  // Users who add `HOPCODE_HOME=` to an existing global env file shouldn't lose
+  // Home-dir candidates in priority order: globalQwenDir/.env, then legacy
+  // ~/.qwen/.env (only when QWEN_HOME redirects), then ~/.env.
+  // Users who add `QWEN_HOME=` to an existing global env file shouldn't lose
   // credentials still in the legacy file; routing vars inside it are already
   // pinned by `preResolveHomeEnvOverrides` (no-override).
   const findHomeCandidate = (): string | null => {
-    const candidates = [path.join(globalHopcodeDir, '.env')];
+    const candidates = [path.join(globalQwenDir, '.env')];
     if (hasCustomConfigDir) {
-      candidates.push(path.join(legacyHopcodeDir, '.env'));
+      candidates.push(path.join(legacyQwenDir, '.env'));
     }
     candidates.push(path.join(homeDir, '.env'));
     for (const candidate of candidates) {
@@ -694,8 +689,8 @@ function findEnvFile(
       const found = findHomeCandidate();
       if (found) return found;
     } else {
-      // Workspace step: prefer .hopcode/.env, then plain .env.
-      const geminiEnvPath = path.join(currentDir, HOPCODE_DIR, '.env');
+      // Workspace step: prefer .qwen/.env, then plain .env.
+      const geminiEnvPath = path.join(currentDir, QWEN_DIR, '.env');
       if (fs.existsSync(geminiEnvPath) && canUseEnvFile(geminiEnvPath)) {
         return geminiEnvPath;
       }
@@ -763,14 +758,14 @@ export function loadEnvironment(settings: Settings): void {
       const excludedVars =
         settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
       const normalizedEnvFilePath = path.normalize(envFilePath);
-      // homeScoped: `.env` lives under the user's home hopcode dir or `~/.env` —
-      //   only these may set HOPCODE_HOME / HOPCODE_RUNTIME_DIR.
-      // hopcodeScoped: any `.env` whose immediate parent is `.hopcode` (including
-      //   `<repo>/.hopcode/.env`) — exempt from the user `excludedEnvVars` list.
+      // homeScoped: `.env` lives under the user's home Qwen dir or `~/.env` —
+      //   only these may set QWEN_HOME / QWEN_RUNTIME_DIR.
+      // qwenScoped: any `.env` whose immediate parent is `.qwen` (including
+      //   `<repo>/.qwen/.env`) — exempt from the user `excludedEnvVars` list.
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
-      const isHopcodeScopedEnvFile =
+      const isQwenScopedEnvFile =
         isHomeScopedEnvFile ||
-        path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
+        path.basename(path.dirname(normalizedEnvFilePath)) === QWEN_DIR;
 
       for (const key in parsedEnv) {
         if (Object.hasOwn(parsedEnv, key)) {
@@ -780,7 +775,7 @@ export function loadEnvironment(settings: Settings): void {
           ) {
             continue;
           }
-          if (!isHopcodeScopedEnvFile && excludedVars.includes(key)) {
+          if (!isQwenScopedEnvFile && excludedVars.includes(key)) {
             continue;
           }
 
@@ -816,14 +811,14 @@ export function loadEnvironment(settings: Settings): void {
 export function loadSettings(
   workspaceDir: string = process.cwd(),
 ): LoadedSettings {
-  // Apply any HOPCODE_HOME / HOPCODE_RUNTIME_DIR set in user-level `.env` files
+  // Apply any QWEN_HOME / QWEN_RUNTIME_DIR set in user-level `.env` files
   // BEFORE any code reads a path derived from them. After this call, the
-  // lazy `getUserSettingsPath()` / `Storage.getGlobalHopCodeDir()` getters
+  // lazy `getUserSettingsPath()` / `Storage.getGlobalQwenDir()` getters
   // return the post-bootstrap value.
   preResolveHomeEnvOverrides();
   const userSettingsPath = getUserSettingsPath();
-  const hopcodeHomeRedirectWarning =
-    detectHopCodeHomeRedirectWithoutMigration(userSettingsPath);
+  const qwenHomeRedirectWarning =
+    detectQwenHomeRedirectWithoutMigration(userSettingsPath);
 
   let systemSettings: Settings = {};
   let systemDefaultSettings: Settings = {};
@@ -1092,7 +1087,7 @@ export function loadSettings(
 
   // Collect all migration warnings from all scopes
   const allMigrationWarnings: string[] = [
-    ...(hopcodeHomeRedirectWarning ? [hopcodeHomeRedirectWarning] : []),
+    ...(qwenHomeRedirectWarning ? [qwenHomeRedirectWarning] : []),
     ...(systemResult.migrationWarnings ?? []),
     ...(systemDefaultsResult.migrationWarnings ?? []),
     ...(userResult.migrationWarnings ?? []),

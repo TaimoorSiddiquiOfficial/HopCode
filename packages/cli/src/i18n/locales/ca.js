@@ -131,6 +131,46 @@ export default {
     'Canviar el nom de la conversa actual. --auto permet que el model ràpid triï un títol.',
   'Rewind conversation to a previous turn':
     'Rebobinar la conversa fins a un torn anterior',
+  'Rewind Conversation': 'Rebobinar la conversa',
+  'No user turns to rewind to.': "No hi ha torns d'usuari per rebobinar.",
+  'Rewind to: ': 'Rebobinar a: ',
+  'Restore code and conversation': 'Restaura el codi i la conversa',
+  'Restore conversation only': 'Restaura només la conversa',
+  'Restore code only': 'Restaura només el codi',
+  'Never mind': 'Tant és',
+  'Computing file changes...': "S'estan calculant els canvis als fitxers...",
+  'Restoring...': "S'està restaurant...",
+  'Restored {{count}} file(s).': "S'han restaurat {{count}} fitxer(s).",
+  'Failed to restore files: {{error}}':
+    'Error en restaurar els fitxers: {{error}}',
+  'Rewind failed: {{error}}': 'Error en retrocedir: {{error}}',
+  'Cannot rewind conversation: no active model client.':
+    'No es pot retrocedir la conversa: cap client de model actiu.',
+  'Code restored, but conversation could not be rewound (no active client).':
+    'Codi restaurat, però la conversa no s’ha pogut retrocedir (cap client actiu).',
+  'Conversation rewound. Edit your prompt and press Enter to continue.':
+    'Conversa retrocedida. Edita la teva indicació i prem Retorn per continuar.',
+  'Rewinding does not affect files edited manually or via shell commands.':
+    'El retrocés no afecta els fitxers editats manualment o mitjançant comandes de shell.',
+  'Cannot rewind to a turn that was compressed. Try a more recent turn.':
+    'No es pot retrocedir a un torn que ha estat comprimit. Prova amb un torn més recent.',
+  'File restore is unavailable for this turn (no captured file changes, or this turn predates the current session).':
+    'La restauració de fitxers no està disponible per a aquest torn (no s’han capturat canvis, o aquest torn és anterior a la sessió actual).',
+  '(+{{insertions}} -{{deletions}} in {{count}} file)':
+    '(+{{insertions}} -{{deletions}} en {{count}} fitxer)',
+  '(+{{insertions}} -{{deletions}} in {{count}} files)':
+    '(+{{insertions}} -{{deletions}} en {{count}} fitxers)',
+  'Failed to restore {{count}} file(s): {{files}}':
+    'Error en restaurar {{count}} fitxer(s): {{files}}',
+  'Cannot restore files: this turn was created before file checkpointing was enabled.':
+    'No es poden restaurar els fitxers: aquest torn es va crear abans que el punt de control de fitxers estigués habilitat.',
+  'No files needed to be restored.': 'Cap fitxer necessitava restauració.',
+  '↑↓ to navigate · Enter to select · Esc to go back':
+    '↑↓ per navegar · Enter per seleccionar · Esc per tornar',
+  '↑↓ to navigate · Enter to select · Esc to cancel':
+    '↑↓ per navegar · Enter per seleccionar · Esc per cancel·lar',
+  'Enter/Y to confirm · Esc/N to go back':
+    'Enter/Y per confirmar · Esc/N per tornar',
   'change the theme': 'canviar el tema',
   'Select Theme': 'Seleccionar tema',
   Preview: 'Previsualització',
@@ -150,8 +190,7 @@ export default {
   'open full HopCode documentation in your browser':
     'obrir la documentació completa de HopCode al navegador',
   'Configuration not available.': 'Configuració no disponible.',
-  'Configure authentication information for login':
-    "Configurar la informació d'autenticació per a iniciar sessió",
+  'Connect an LLM provider': 'Connectar un proveïdor LLM',
   'Copy the last result or code snippet to clipboard':
     "Copiar l'últim resultat o fragment de codi al porta-retalls",
 
@@ -349,8 +388,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': 'Veure i editar la configuració de HopCode',
   Settings: 'Configuració',
-  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    'Per veure els canvis, cal reiniciar HopCode. Premeu r per sortir i aplicar els canvis ara.',
+  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
+    'Per veure els canvis, cal reiniciar Qwen Code. Premeu r per sortir i aplicar els canvis ara.',
   // ============================================================================
   // Etiquetes de configuració
   // ============================================================================
@@ -460,8 +499,8 @@ export default {
   remote: 'remot',
   'This extension will add the following commands: {{commands}}.':
     'Aquesta extensió afegirà les ordres següents: {{commands}}.',
-  'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    'Aquesta extensió afegirà informació al vostre context HOPCODE.md usant {{fileName}}',
+  'This extension will append info to your QWEN.md context using {{fileName}}':
+    'Aquesta extensió afegirà informació al vostre context QWEN.md usant {{fileName}}',
   'This extension will install the following skills:':
     'Aquesta extensió instal·larà les habilitats següents:',
   'This extension will install the following subagents:':
@@ -907,8 +946,8 @@ export default {
   servers: 'servidors',
   'Add MCP servers to your settings to get started.':
     'Afegiu MCP servers a la configuració per començar.',
-  'Run hopcode --debug to see error logs':
-    "Executeu hopcode --debug per veure els registres d'errors",
+  'Run qwen --debug to see error logs':
+    "Executeu qwen --debug per veure els registres d'errors",
   'OAuth Authentication': 'Autenticació OAuth',
   'Authenticating... Please complete the login in your browser.':
     "Autenticant... Completeu l'inici de sessió al vostre navegador.",
@@ -1087,38 +1126,38 @@ export default {
   '👋 Welcome back! (Last updated: {{timeAgo}})':
     '👋 Benvingut de nou! (Darrera actualització: {{timeAgo}})',
   '🎯 Overall Goal:': '🎯 Objectiu general:',
-  'Select Authentication Method': "Seleccioneu el mètode d'autenticació",
-  'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    "Cal seleccionar un mètode d'autenticació per continuar. Premeu Ctrl+C de nou per sortir.",
+  'Connect a Provider': 'Connectar un proveïdor',
+  'You must connect a provider to proceed. Press Ctrl+C again to exit.':
+    'Cal connectar un proveïdor per continuar. Premeu Ctrl+C de nou per sortir.',
   'Terms of Services and Privacy Notice':
     'Termes de servei i avís de privacitat',
   'HopCode OAuth': 'HopCode OAuth',
   'Discontinued — switch to Coding Plan or API Key':
     'Descontinuat — canvieu a Coding Plan o API Key',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'El nivell gratuït de HopCode OAuth es va descontinuar el 15-04-2026. Seleccioneu Coding Plan o API Key en el seu lloc.',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    "El nivell gratuït de HopCode OAuth es va descontinuar el 15-04-2026. Seleccioneu un model d'un altre proveïdor o executeu /auth per canviar.",
-  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ El nivell gratuït de HopCode OAuth es va descontinuar el 15-04-2026. Seleccioneu una altra opció.\n',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'El nivell gratuït de Qwen OAuth es va descontinuar el 15-04-2026. Seleccioneu Coding Plan o API Key en el seu lloc.',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    "El nivell gratuït de Qwen OAuth es va descontinuar el 15-04-2026. Seleccioneu un model d'un altre proveïdor o executeu /auth per canviar.",
+  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ El nivell gratuït de Qwen OAuth es va descontinuar el 15-04-2026. Seleccioneu una altra opció.\n',
   'Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
     "De pagament · Fins a 6.000 sol·licituds/5 h · Tots els models de Coding Plan d'Alibaba Cloud",
   'Alibaba Cloud Coding Plan': "Coding Plan d'Alibaba Cloud",
   'Bring your own API key': 'Porteu la vostra pròpia API Key',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     "L'autenticació ha de ser {{enforcedType}}, però actualment esteu usant {{currentType}}.",
-  'HopCode OAuth Authentication': 'Autenticació HopCode OAuth',
+  'Qwen OAuth Authentication': 'Autenticació Qwen OAuth',
   'Please visit this URL to authorize:': 'Visiteu aquesta URL per autoritzar:',
   'Waiting for authorization': "Esperant l'autorització",
   'Time remaining:': 'Temps restant:',
-  'HopCode OAuth Authentication Timeout':
-    "Temps d'espera de l'autenticació HopCode OAuth esgotat",
+  'Qwen OAuth Authentication Timeout':
+    "Temps d'espera de l'autenticació Qwen OAuth esgotat",
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     "El token OAuth ha expirat (més de {{seconds}} segons). Seleccioneu el mètode d'autenticació de nou.",
   'Press any key to return to authentication type selection.':
     "Premeu qualsevol tecla per tornar a la selecció del tipus d'autenticació.",
-  'Waiting for HopCode OAuth authentication...':
-    "Esperant l'autenticació HopCode OAuth...",
+  'Waiting for Qwen OAuth authentication...':
+    "Esperant l'autenticació Qwen OAuth...",
   'Authentication timed out. Please try again.':
     "L'autenticació ha expirat. Torneu-ho a intentar.",
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1141,8 +1180,8 @@ export default {
     'Error en autenticar-se. Missatge: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     "S'ha autenticat correctament amb les credencials {{authType}}.",
-  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    'Valor de HOPCODE_DEFAULT_AUTH_TYPE no vàlid: "{{value}}". Els valors vàlids són: {{validValues}}',
+  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    'Valor de QWEN_DEFAULT_AUTH_TYPE no vàlid: "{{value}}". Els valors vàlids són: {{validValues}}',
   // ============================================================================
   // Diàlegs - Model
   // ============================================================================
@@ -1679,7 +1718,7 @@ export default {
     '↑/↓: Navegar | ←/→: Canviar pestanyes | Enter: Seleccionar',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: Navegar | Enter: Seleccionar | Esc: Cancel·lar',
-  'Authenticate using HopCode OAuth': 'Autenticar-se usant HopCode OAuth',
+  'Authenticate using Qwen OAuth': 'Autenticar-se usant Qwen OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     "Autenticar-se usant el Coding Plan d'Alibaba Cloud",
   'Region for Coding Plan (china/global)':
@@ -1712,8 +1751,8 @@ export default {
     "⚠️  Cap mètode d'autenticació configurat.\n",
   'Run one of the following commands to get started:\n':
     'Executeu una de les ordres següents per començar:\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - Autenticar-se amb HopCode OAuth (descontinuat)',
+  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  qwen auth qwen-oauth     - Autenticar-se amb Qwen OAuth (descontinuat)',
   'Or simply run:': 'O simplement executeu:',
   '  hopcode auth                - Interactive authentication setup\n':
     "  hopcode auth                - Configuració interactiva de l'autenticació\n",
@@ -1722,8 +1761,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipus: Nivell gratuït (descontinuat el 15-04-2026)',
   '  Limit: No longer available': '  Límit: Ja no disponible',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'El nivell gratuït de HopCode OAuth es va descontinuar el 15-04-2026. Executeu /auth per canviar a Coding Plan, OpenRouter, Fireworks AI o un altre proveïdor.',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'El nivell gratuït de Qwen OAuth es va descontinuar el 15-04-2026. Executeu /auth per canviar a Coding Plan, OpenRouter, Fireworks AI o un altre proveïdor.',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     "✓ Mètode d'autenticació: Coding Plan d'Alibaba Cloud",
   'Global - Alibaba Cloud': 'Global - Alibaba Cloud',
@@ -1735,8 +1774,8 @@ export default {
     "⚠️  Mètode d'autenticació: Coding Plan d'Alibaba Cloud (Incomplet)",
   '  Issue: API key not found in environment or settings\n':
     "  Problema: API Key no trobada a l'entorn o la configuració\n",
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  Executeu `hopcode auth coding-plan` per tornar a configurar.\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  Executeu `qwen auth coding-plan` per tornar a configurar.\n',
   '✓ Authentication Method: {{type}}': "✓ Mètode d'autenticació: {{type}}",
   '  Status: Configured\n': '  Estat: Configurat\n',
   'Failed to check authentication status: {{error}}':
@@ -1760,8 +1799,8 @@ export default {
     'Ja esteu en mode de planificació. Useu "/plan exit" per sortir del mode de planificació.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'No esteu en mode de planificació. Useu "/plan" per entrar al mode de planificació primer.',
-  "Set up HopCode's status line UI":
-    "Configurar la interfície de la barra d'estat de HopCode",
+  "Set up Qwen Code's status line UI":
+    "Configurar la interfície de la barra d'estat de Qwen Code",
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Obrir el gestor de memòria.',

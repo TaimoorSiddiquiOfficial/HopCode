@@ -14,8 +14,8 @@
   'integration-zed': 'Zed IDE',
   'integration-jetbrains': 'JetBrains IDEs',
   'integration-github-action': 'GitHub Actions',
-  'hopcode-serve': 'Daemon mode (hopcode serve)',
-  'Code with HopCode': {
+  'qwen-serve': 'Daemon mode (qwen serve)',
+  'Code with Qwen Code': {
     type: 'separator',
     title: 'Code with HopCode', // Title is optional
   },

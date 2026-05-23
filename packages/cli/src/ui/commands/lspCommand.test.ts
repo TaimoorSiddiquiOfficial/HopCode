@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -78,7 +78,7 @@ describe('lspCommand', () => {
     expect(result).toMatchObject({
       type: 'message',
       messageType: 'info',
-      content: expect.stringContaining('HOPCODE_RUNTIME_DIR'),
+      content: expect.stringContaining('QWEN_RUNTIME_DIR'),
     });
     expect(context.ui.addItem).not.toHaveBeenCalled();
   });

@@ -28,15 +28,6 @@ export const VISIBLE_LOGS_COUNT = 15;
  */
 export const VISIBLE_TOOLS_COUNT = 10;
 
-/**
- * Display names for MCP sources
- */
-export const SOURCE_DISPLAY_NAMES: Record<string, string> = {
-  user: 'User MCPs',
-  project: 'Project MCPs',
-  extension: 'Extension MCPs',
-};
-
 export const SOURCE_ORDER = ['user', 'project', 'extension'] as const;
 
 /**

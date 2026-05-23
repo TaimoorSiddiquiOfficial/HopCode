@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -141,7 +141,7 @@ function parseVersion(versionString: string | undefined): ParsedVersion {
  *      host supports OSC 8 and have `allow-passthrough on` (tmux 3.3+) can
  *      opt in with `FORCE_HYPERLINK=1`.
  *
- *   2. `HOPCODE_DISABLE_HYPERLINKS=1` is a hard opt-out (e.g. for users whose
+ *   2. `QWEN_DISABLE_HYPERLINKS=1` is a hard opt-out (e.g. for users whose
  *      terminal advertises support but breaks on long URLs).
  *
  * The detector deliberately allocates nothing and reads env vars on every
@@ -154,7 +154,7 @@ export function supportsHyperlinks(
   const env = process.env;
 
   // Hard opt-outs win unconditionally.
-  if (env['HOPCODE_DISABLE_HYPERLINKS'] === '1') return false;
+  if (env['QWEN_DISABLE_HYPERLINKS'] === '1') return false;
   if (env['NO_COLOR'] !== undefined && env['NO_COLOR'] !== '') return false;
   if (env['FORCE_COLOR'] === '0' || env['FORCE_COLOR'] === 'false') {
     return false;
@@ -164,7 +164,7 @@ export function supportsHyperlinks(
   // guard sits above `FORCE_HYPERLINK` on purpose: a user who has
   // `FORCE_HYPERLINK=1` in their shell profile (to enable OSC 8 inside
   // tmux/Hyper interactively) still shouldn't see escape bytes when they
-  // run `hopcode | cat` or `hopcode > out.txt`.
+  // run `qwen | cat` or `qwen > out.txt`.
   if (!stream || !stream.isTTY) return false;
 
   // Explicit force overrides every heuristic below — but not the opt-outs
@@ -237,9 +237,15 @@ export function supportsHyperlinks(
       case 'ghostty':
         return true;
       case 'mintty':
-        // mintty ≥ 3.3 supports OSC 8; older installs are extremely rare
-        // and still degrade safely (terminal just prints the visible bytes).
-        return true;
+        // mintty added OSC 8 in 3.1, hardened in 3.3. Older builds (still
+        // bundled with some Git-for-Windows distros and developer
+        // environments like Laragon) print the raw `\x1b]8;;url\x07`
+        // bytes as visible garbage instead of silently ignoring them,
+        // so gate on TERM_PROGRAM_VERSION. mintty has set
+        // TERM_PROGRAM_VERSION since 2.7 (2017), so a missing version
+        // means a very old build — refuse rather than guess.
+        if (!env['TERM_PROGRAM_VERSION']) return false;
+        return version.major > 3 || (version.major === 3 && version.minor >= 3);
       // Warp (TERM_PROGRAM=WarpTerminal) does NOT yet support OSC 8 — its
       // rendering engine ignores the envelope and prints visible garbage,
       // so we deliberately fall through to the legacy `label (url)` path.
@@ -477,5 +483,5 @@ export const HYPERLINK_ENV_KEYS = [
   'TERM',
   'TEAMCITY_VERSION',
   'FORCE_HYPERLINK',
-  'HOPCODE_DISABLE_HYPERLINKS',
+  'QWEN_DISABLE_HYPERLINKS',
 ] as const;

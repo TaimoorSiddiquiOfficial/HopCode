@@ -166,18 +166,14 @@ export class MessageRouter {
   }
 
   /**
-   * Set auth interactive handler — interactive auth flow.
+   * Set auth interactive handler ï¿½ interactive auth flow.
    * Also registers the handler on the session handler so
    * "Configure" prompts in session flows trigger the interactive flow.
    */
   setAuthInteractiveHandler(
     handler: (
-      provider: string,
-      region?: string,
-      apiKey?: string,
-      baseUrl?: string,
-      model?: string,
-      modelIds?: string,
+      config: import('@hoptrendy/hopcode-core').ProviderConfig,
+      inputs: import('@hoptrendy/hopcode-core').ProviderSetupInputs,
     ) => Promise<void>,
   ): void {
     this.authHandler.setAuthInteractiveHandler(handler);

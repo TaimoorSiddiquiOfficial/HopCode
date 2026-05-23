@@ -13,7 +13,8 @@ export enum ApprovalMode {
   PLAN = 'plan',
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
-  IZN = 'izn',
+  AUTO = 'auto',
+  YOLO = 'yolo',
 }
 
 /**
@@ -23,7 +24,8 @@ export const APPROVAL_MODE_MAP: Record<string, ApprovalMode> = {
   plan: ApprovalMode.PLAN,
   default: ApprovalMode.DEFAULT,
   'auto-edit': ApprovalMode.AUTO_EDIT,
-  izn: ApprovalMode.IZN,
+  auto: ApprovalMode.AUTO,
+  yolo: ApprovalMode.YOLO,
 };
 
 /**
@@ -52,8 +54,14 @@ export const APPROVAL_MODE_INFO: Record<
     title: 'HopCode will edit files automatically. Click to switch modes.',
     iconType: 'auto',
   },
-  [ApprovalMode.IZN]: {
-    label: 'Izn',
+  [ApprovalMode.AUTO]: {
+    label: 'Auto',
+    title:
+      'Qwen will use a classifier to auto-approve safe tools and block risky ones. Click to switch modes.',
+    iconType: 'auto',
+  },
+  [ApprovalMode.YOLO]: {
+    label: 'YOLO',
     title: 'Automatically approve all tools. Click to switch modes.',
     iconType: 'izn',
   },

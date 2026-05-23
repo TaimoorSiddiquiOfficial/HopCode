@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
-import { afterEach, beforeEach, describe, expect, it, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   fetchGitDiff,
   fetchGitDiffHunks,
@@ -30,7 +30,7 @@ async function git(cwd: string, ...args: string[]): Promise<void> {
 }
 
 async function makeRepo(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-test-'));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-test-'));
   await git(dir, 'init', '-q', '-b', 'main');
   await git(dir, 'config', 'user.email', 'test@example.com');
   await git(dir, 'config', 'user.name', 'Test');
@@ -244,7 +244,7 @@ describe('fetchGitDiff', () => {
   });
 
   it('returns null when not in a git repo', async () => {
-    const plain = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-plain-'));
+    const plain = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-plain-'));
     try {
       expect(await fetchGitDiff(plain)).toBeNull();
     } finally {
@@ -669,7 +669,7 @@ describe('parseGitDiff size/line caps', () => {
 
 describe('resolveGitDir', () => {
   it('returns the .git directory for a regular repo', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdir-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdir-'));
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
       const resolved = await resolveGitDir(dir);
@@ -680,17 +680,35 @@ describe('resolveGitDir', () => {
   });
 
   it('follows the gitdir pointer for linked worktrees', async () => {
-    const main = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitmain-'));
+    const main = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitmain-'));
     try {
+      await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: main });
+      await execFileAsync('git', ['config', 'user.email', 'test@example.com'], {
+        cwd: main,
+      });
+      await execFileAsync('git', ['config', 'user.name', 'Test'], {
+        cwd: main,
+      });
+      await execFileAsync('git', ['config', 'commit.gpgsign', 'false'], {
+        cwd: main,
+      });
+      await fs.writeFile(path.join(main, 'a.txt'), 'hi\n');
+      await execFileAsync('git', ['add', '.'], { cwd: main });
+      await execFileAsync('git', ['commit', '-q', '-m', 'init'], { cwd: main });
+
       const wtPath = path.join(main, 'wt');
-      const gitDir = path.join(main, '.git', 'worktrees', 'wt');
-      await fs.mkdir(gitDir, { recursive: true });
-      await fs.mkdir(wtPath, { recursive: true });
-      await fs.writeFile(path.join(wtPath, '.git'), `gitdir: ${gitDir}\n`);
-      await fs.writeFile(path.join(gitDir, 'HEAD'), 'ref: refs/heads/side\n');
+      await execFileAsync(
+        'git',
+        ['worktree', 'add', '-q', wtPath, '-b', 'side'],
+        { cwd: main },
+      );
 
       const resolved = await resolveGitDir(wtPath);
       expect(resolved).not.toBeNull();
+      // Git writes the linked-worktree pointer with forward slashes even on
+      // Windows (`gitdir: C:/.../main/.git/worktrees/wt`), and we surface
+      // that string verbatim. Match either separator so the assertion is
+      // platform-independent.
       expect(resolved).toMatch(/[/\\]\.git[/\\]worktrees[/\\]/);
 
       // Fake a merge-in-progress inside the linked worktree's gitdir and
@@ -738,7 +756,7 @@ describe('fetchGitDiff transient-state detection', () => {
 
 describe('fetchGitDiff tracked-file filename robustness', () => {
   it('keeps the real filename for tracked files that contain a tab', async () => {
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-tab-'));
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-tab-'));
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -771,7 +789,7 @@ describe('fetchGitDiff tracked-file filename robustness', () => {
   });
 
   it('combines a rename into a single "old => new" per-file entry', async () => {
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-mv-'));
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-mv-'));
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -842,7 +860,7 @@ describe('fetchGitDiff untracked with special filenames', () => {
   it('counts an untracked file whose name contains a newline as one entry', async () => {
     // Skip on platforms where the filesystem rejects `\n` in names (e.g. some
     // Windows filesystems). POSIX filesystems accept it; we rely on that here.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-nl-'));
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-nl-'));
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@example.com'], {
@@ -883,7 +901,7 @@ describe('fetchGitDiff invocation from a subdirectory', () => {
     // from a subdir, `git diff --numstat` emitted repo-root-relative keys but
     // `ls-files --others` was scoped to cwd, so untracked files outside the
     // subdir were silently dropped and the path basis was inconsistent.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-sub-'));
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-sub-'));
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -933,7 +951,7 @@ describe('fetchGitDiff fast path with untracked-only workspaces', () => {
     // because it line-counted only the first MAX_FILES untracked files.
     // The fix makes the threshold fire on tracked + untracked even when
     // shortstat returns nothing.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-fp-'));
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-fp-'));
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -977,8 +995,8 @@ describe('fetchGitDiffHunks ignores external diff drivers', () => {
     // `fetchGitDiffHunks` only wants to inspect hunks. The fix is
     // `--no-ext-diff`; this test plants an env-var driver that touches a
     // sentinel file and asserts it never fires.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-ext-'));
-    const sentinel = path.join(os.tmpdir(), `hop-ext-fired-${Date.now()}`);
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-ext-'));
+    const sentinel = path.join(os.tmpdir(), `qwen-ext-fired-${Date.now()}`);
     const driverScript = path.join(repo, 'evil-diff.sh');
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1035,8 +1053,8 @@ describe('fetchGitDiffHunks ignores external diff drivers', () => {
     // of textconv filters configured via .gitattributes +
     // `diff.<name>.textconv`. Without `--no-textconv`, a malicious
     // worktree can still execute commands when this utility runs.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-tc-'));
-    const sentinel = path.join(os.tmpdir(), `hop-tc-fired-${Date.now()}`);
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-tc-'));
+    const sentinel = path.join(os.tmpdir(), `qwen-tc-fired-${Date.now()}`);
     const driverScript = path.join(repo, 'evil-textconv.sh');
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1145,59 +1163,52 @@ describe('fetchGitDiff deletion detection', () => {
 });
 
 describe('fetchGitDiff special filetypes among untracked files', () => {
-  test.skipIf(process.platform === 'win32')(
-    'marks untracked symlinks as binary and never follows them',
-    async () => {
-      // Reproduces wenshao Critical (PR #3491 line 455): without an lstat
-      // gate, `open()` would dereference an untracked symlink and read its
-      // target — which can live outside the worktree.
-      const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hop-gitdiff-lnk-'));
+  it('marks untracked symlinks as binary and never follows them', async () => {
+    // Reproduces wenshao Critical (PR #3491 line 455): without an lstat
+    // gate, `open()` would dereference an untracked symlink and read its
+    // target — which can live outside the worktree.
+    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-gitdiff-lnk-'));
+    try {
+      await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
+      await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
+        cwd: repo,
+      });
+      await execFileAsync('git', ['config', 'user.name', 'T'], { cwd: repo });
+      await execFileAsync('git', ['config', 'commit.gpgsign', 'false'], {
+        cwd: repo,
+      });
+      await fs.writeFile(path.join(repo, 'seed.txt'), 'x\n');
+      await execFileAsync('git', ['add', '.'], { cwd: repo });
+      await execFileAsync('git', ['commit', '-q', '-m', 'init'], { cwd: repo });
+
+      // Create an outside-worktree target with content that, if followed,
+      // would push linesAdded up. The lstat gate means we never read it.
+      const outside = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-outside-'));
       try {
-        await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
-        await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
-          cwd: repo,
-        });
-        await execFileAsync('git', ['config', 'user.name', 'T'], { cwd: repo });
-        await execFileAsync('git', ['config', 'commit.gpgsign', 'false'], {
-          cwd: repo,
-        });
-        await fs.writeFile(path.join(repo, 'seed.txt'), 'x\n');
-        await execFileAsync('git', ['add', '.'], { cwd: repo });
-        await execFileAsync('git', ['commit', '-q', '-m', 'init'], {
-          cwd: repo,
-        });
-
-        // Create an outside-worktree target with content that, if followed,
-        // would push linesAdded up. The lstat gate means we never read it.
-        const outside = await fs.mkdtemp(
-          path.join(os.tmpdir(), 'hop-outside-'),
+        await fs.writeFile(
+          path.join(outside, 'secret.txt'),
+          'one\ntwo\nthree\n',
         );
-        try {
-          await fs.writeFile(
-            path.join(outside, 'secret.txt'),
-            'one\ntwo\nthree\n',
-          );
-          await fs.symlink(
-            path.join(outside, 'secret.txt'),
-            path.join(repo, 'link.txt'),
-          );
+        await fs.symlink(
+          path.join(outside, 'secret.txt'),
+          path.join(repo, 'link.txt'),
+        );
 
-          const result = await fetchGitDiff(repo);
-          expect(result).not.toBeNull();
-          const entry = result!.perFileStats.get('link.txt');
-          expect(entry).toBeDefined();
-          expect(entry?.isBinary).toBe(true);
-          expect(entry?.isUntracked).toBe(true);
-          // No content from the symlink target leaked into the totals.
-          expect(result!.stats.linesAdded).toBe(0);
-        } finally {
-          await fs.rm(outside, { recursive: true, force: true });
-        }
+        const result = await fetchGitDiff(repo);
+        expect(result).not.toBeNull();
+        const entry = result!.perFileStats.get('link.txt');
+        expect(entry).toBeDefined();
+        expect(entry?.isBinary).toBe(true);
+        expect(entry?.isUntracked).toBe(true);
+        // No content from the symlink target leaked into the totals.
+        expect(result!.stats.linesAdded).toBe(0);
       } finally {
-        await fs.rm(repo, { recursive: true, force: true });
+        await fs.rm(outside, { recursive: true, force: true });
       }
-    },
-  );
+    } finally {
+      await fs.rm(repo, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('fetchGitDiff untracked counting', () => {

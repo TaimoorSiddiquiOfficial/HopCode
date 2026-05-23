@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,6 +20,10 @@ import {
   readWorktreeSessionMarker,
   worktreeBranchForSlug,
 } from '../services/gitWorktreeService.js';
+import {
+  readWorktreeSession,
+  clearWorktreeSession,
+} from '../services/worktreeSessionService.js';
 import * as fs from 'node:fs/promises';
 import { isNodeError } from '../utils/errors.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
@@ -137,8 +141,8 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
   async execute(_signal: AbortSignal): Promise<ToolResult> {
     // Mirror `enter_worktree`: anchor at the repo top-level so we look
     // for the worktree under the same directory it was created in.
-    // Otherwise launching `hopcode` from a subdirectory of a monorepo would
-    // make exit_worktree look at `<subdir>/.hopcode/worktrees/<slug>`,
+    // Otherwise launching `qwen` from a subdirectory of a monorepo would
+    // make exit_worktree look at `<subdir>/.qwen/worktrees/<slug>`,
     // which never exists, and every call would return "Worktree not
     // found" even when the worktree is alive.
     const cwd = this.config.getTargetDir();
@@ -178,6 +182,14 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
     }
 
     if (this.params.action === 'keep') {
+      // Phase C update: preserve the sidecar on `keep`. `keep` means
+      // "the worktree directory and branch remain on disk so it can be
+      // revisited later" — clearing the persisted binding would force
+      // a subsequent `--resume` (or interactive Footer / WorktreeExitDialog)
+      // to forget the worktree the user just chose to retain. The model
+      // can still reference the absolute path from the tool result;
+      // dropping the sidecar served no purpose beyond invalidating the
+      // restore mechanism. (PR #4174 review #3259975245.)
       const output: ExitWorktreeOutput = {
         action: 'keep',
         worktreePath,
@@ -197,7 +209,7 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
     // 0. Session ownership: refuse to drop a worktree that was created
     //    by a different session. Without this, a prompt injection (or
     //    just a confused model) in session A could enumerate
-    //    `.hopcode/worktrees/` and call `exit_worktree` with a name
+    //    `.qwen/worktrees/` and call `exit_worktree` with a name
     //    belonging to session B, destroying its work. Worktrees
     //    created before this guard existed lack the marker; we treat
     //    those as "owner unknown" and allow removal (matches prior
@@ -283,6 +295,7 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
       // Status check passed and unmerged check passed, but the safe
       // delete still refused — most likely a race where new commits
       // landed between the checks. Be loud rather than force-deleting.
+      await this.maybeClearWorktreeSession();
       const output: ExitWorktreeOutput = {
         action: 'remove',
         worktreePath,
@@ -302,6 +315,7 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
       `Removed user worktree: ${worktreePath} (branch=${branch})`,
     );
 
+    await this.maybeClearWorktreeSession();
     const output: ExitWorktreeOutput = {
       action: 'remove',
       worktreePath,
@@ -312,6 +326,31 @@ class ExitWorktreeInvocation extends BaseToolInvocation<
       llmContent: JSON.stringify(output),
       returnDisplay: `Removed worktree **${this.params.name}** (branch \`${branch}\`)`,
     };
+  }
+
+  /**
+   * Clears the WorktreeSession sidecar file iff its `slug` matches the
+   * worktree being exited. We skip the clear when the sidecar names a
+   * different slug because the user might have multiple worktrees on
+   * disk while the sidecar tracks only one — wiping it on every exit
+   * would orphan the currently-tracked worktree from the CLI's view.
+   *
+   * Best-effort: failures are logged, never raised.
+   */
+  private async maybeClearWorktreeSession(): Promise<void> {
+    try {
+      const sessionPath = this.config
+        .getSessionService()
+        .getWorktreeSessionPath(this.config.getSessionId());
+      const existing = await readWorktreeSession(sessionPath);
+      if (existing && existing.slug === this.params.name) {
+        await clearWorktreeSession(sessionPath);
+      }
+    } catch (error) {
+      debugLogger.warn(
+        `exit_worktree: failed to clear WorktreeSession sidecar: ${error}`,
+      );
+    }
   }
 }
 

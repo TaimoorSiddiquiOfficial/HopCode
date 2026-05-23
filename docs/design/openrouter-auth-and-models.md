@@ -32,7 +32,7 @@ The user-facing flows are:
 - `/auth` → OpenRouter for the interactive TUI flow.
 - Environment variables for automation or direct API-key setup:
   `OPENROUTER_API_KEY` plus `OPENAI_BASE_URL=https://openrouter.ai/api/v1`.
-- `~/.hopcode/settings.json` for scripted setup that needs explicit model provider
+- `~/.qwen/settings.json` for scripted setup that needs explicit model provider
   entries.
 
 Browser OAuth uses OpenRouter's PKCE flow and writes the exchanged API key into

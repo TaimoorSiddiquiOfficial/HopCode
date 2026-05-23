@@ -8,4 +8,10 @@
  * Type for approval mode values
  * Used in ACP protocol for controlling agent behavior
  */
-export type ApprovalModeValue = 'plan' | 'default' | 'auto-edit' | 'izn';
+export type ApprovalModeValue =
+  | 'plan'
+  | 'default'
+  | 'auto-edit'
+  | 'auto'
+  | 'yolo'
+  | 'izn';

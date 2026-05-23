@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -41,6 +41,7 @@ import { getRuntimeContentGenerator } from '../agents/runtime/agent-context.js';
 
 // Services
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
+import { FileHistoryService } from '../services/fileHistoryService.js';
 import {
   type FileSystemService,
   StandardFileSystemService,
@@ -63,9 +64,8 @@ import { setGeminiMdFilename } from '../memory/const.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
 import { recordStartupEvent } from '../utils/startupEventSink.js';
 import { ToolRegistry, type ToolFactory } from '../tools/tool-registry.js';
+import type { McpBudgetEvent } from '../tools/mcp-client-manager.js';
 import { ToolNames } from '../tools/tool-names.js';
-import { PermissionsConfig } from './permissionsConfig.js';
-import { ApprovalConfig, type ApprovalMode } from './approvalConfig.js';
 import type { LspClient, LspStatusSnapshot } from '../lsp/types.js';
 
 // Other modules
@@ -74,6 +74,11 @@ import { type InputFormat, OutputFormat } from '../output/types.js';
 import { PromptRegistry } from '../prompts/prompt-registry.js';
 import { SkillManager } from '../skills/skill-manager.js';
 import { PermissionManager } from '../permissions/permission-manager.js';
+import {
+  type AutoModeDenialState,
+  createDenialState,
+  resetDenialState,
+} from '../permissions/denialTracking.js';
 import { SubagentManager } from '../subagents/subagent-manager.js';
 import type { SubagentConfig } from '../subagents/types.js';
 import { BackgroundTaskRegistry } from '../agents/background-tasks.js';
@@ -81,10 +86,7 @@ import { BackgroundAgentResumeService } from '../agents/background-agent-resume.
 import { BackgroundShellRegistry } from '../services/backgroundShellRegistry.js';
 import { MonitorRegistry } from '../services/monitorRegistry.js';
 import { FileReadCache } from '../services/fileReadCache.js';
-import { TelemetryConfig, type TelemetrySettings } from './telemetryConfig.js';
-export type { TelemetrySettings } from './telemetryConfig.js';
-import { UiConfig } from './uiConfig.js';
-import { ChatConfig } from './chatConfig.js';
+import { resolveStopHookBlockingCap } from '../hooks/stopHookCap.js';
 import {
   isTelemetrySdkInitialized,
   initializeTelemetry,
@@ -131,7 +133,15 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
-import { Storage, HOPCODE_DIR } from './storage.js';
+import { Storage } from './storage.js';
+import {
+  ApprovalConfig,
+  ApprovalMode,
+} from './approvalConfig.js';
+import { TelemetryConfig } from './telemetryConfig.js';
+import { UiConfig } from './uiConfig.js';
+import { ChatConfig } from './chatConfig.js';
+import { PermissionsConfig } from './permissionsConfig.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
   clearRuntimeStatus,
@@ -175,9 +185,44 @@ export {
 export {
   ApprovalMode,
   APPROVAL_MODES,
+  type ApprovalModeInfo,
   APPROVAL_MODE_INFO,
 } from './approvalConfig.js';
-export type { ApprovalModeInfo } from './approvalConfig.js';
+
+/**
+ * Thrown by `Config.setApprovalMode` when the requested mode would grant
+ * privileged tool autonomy in a folder the user has not marked as trusted.
+ *
+ * Why: the daemon mutation route at `POST /session/:id/approval-mode` needs
+ * to recognize this specific class of rejection and translate it into a
+ * structured `errorKind: 'auth_env_error'` rather than a generic 500.
+ * Using a named subclass lets the bridge match by `err.name` without
+ * depending on the message text (which would drift across i18n).
+ */
+export class TrustGateError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'TrustGateError';
+  }
+}
+
+/**
+ * Settings for the AUTO approval mode classifier.
+ *
+ * `hints` and `environment` are natural-language strings injected additively
+ * into the classifier's system prompt; they do NOT use rule-matching syntax.
+ * Use `permissions.allow / ask / deny` for hard rules.
+ */
+export interface AutoModeSettings {
+  hints?: {
+    /** Natural-language descriptions of actions the user wants AUTO mode to allow. */
+    allow?: string[];
+    /** Natural-language descriptions of actions the user wants AUTO mode to block. */
+    deny?: string[];
+  };
+  /** Environment / context lines injected into the classifier's system prompt. */
+  environment?: string[];
+}
 
 export interface AccessibilitySettings {
   enableLoadingPhrases?: boolean;
@@ -195,7 +240,7 @@ export interface ChatCompressionSettings {
    * apportioning chars across history in `findCompressSplitPoint`.
    * Also used as the placeholder budget when stripping inline media
    * out of the side-query compaction prompt. Default 1600.
-   * Env override: `HOPCODE_IMAGE_TOKEN_ESTIMATE` (falls back to `QWEN_IMAGE_TOKEN_ESTIMATE` for backward compat).
+   * Env override: `QWEN_IMAGE_TOKEN_ESTIMATE`.
    */
   imageTokenEstimate?: number;
 }
@@ -209,6 +254,53 @@ export interface ClearContextOnIdleSettings {
   toolResultsThresholdMinutes?: number;
   /** Number of most-recent tool results to preserve. Default 5. */
   toolResultsNumToKeep?: number;
+}
+
+export interface TelemetrySettings {
+  enabled?: boolean;
+  target?: TelemetryTarget;
+  otlpEndpoint?: string;
+  otlpProtocol?: 'grpc' | 'http';
+  /** Per-signal endpoint override for traces (HTTP only). Used as-is without path appending. */
+  otlpTracesEndpoint?: string;
+  /** Per-signal endpoint override for logs (HTTP only). Used as-is without path appending. */
+  otlpLogsEndpoint?: string;
+  /** Per-signal endpoint override for metrics (HTTP only). Used as-is without path appending. */
+  otlpMetricsEndpoint?: string;
+  logPrompts?: boolean;
+  includeSensitiveSpanAttributes?: boolean;
+  outfile?: string;
+  /**
+   * Static resource attributes attached to every span/log/metric the SDK
+   * exports (OTLP or file outfile — they share the same Resource).
+   * Merged with `OTEL_RESOURCE_ATTRIBUTES`; settings win on key conflict.
+   * Reserved keys (`service.version`, `session.id`) are dropped with a
+   * `diag.warn`.
+   */
+  resourceAttributes?: Record<string, string>;
+  /** Per-signal cardinality controls. */
+  metrics?: TelemetryMetricsSettings;
+  /**
+   * Human-readable diagnostics produced while resolving
+   * `resourceAttributes` (drops, coercions, reserved-key strips).
+   * Populated by `resolveTelemetrySettings()`; the SDK emits a one-time
+   * console summary at startup when this is non-empty so users notice
+   * silent drops without scanning the OTel debug log.
+   *
+   * Not a user-settable field — operators should leave it unset.
+   */
+  resourceAttributeWarnings?: string[];
+}
+
+export interface TelemetryMetricsSettings {
+  /**
+   * Include `session.id` on every metric data point. Default: false.
+   *
+   * WARNING: each CLI session creates a new value, causing unbounded
+   * metric time-series fan-out at the backend. Only enable for
+   * short-term debugging — spans and logs still carry session.id.
+   */
+  includeSessionId?: boolean;
 }
 
 export interface OutputSettings {
@@ -411,11 +503,25 @@ export interface ConfigParameters {
    * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
+  /**
+   * Tool names hidden from the registry at construction time. Unlike
+   * `permissions.deny` (which keeps the tool registered and rejects
+   * invocation), tools listed here are not registered at all and never
+   * appear in `/tools`, `getAllTools()`, or function-call discovery.
+   * Sourced from `settings.tools.disabled` and the daemon mutation route
+   * `POST /workspace/tools/:name/enable {enabled:false}` (#4175 Wave 4 PR
+   * 17). Active sessions retain already-registered tools — the disabled
+   * set is consulted at register time, so toggling takes effect on the
+   * next ACP child spawn or `ToolRegistry.refresh()`.
+   */
+  disabledTools?: string[];
   /** Merged permission rules from all sources (settings + CLI args). */
   permissions?: {
     allow?: string[];
     ask?: string[];
     deny?: string[];
+    /** Settings consumed by the AUTO approval mode classifier. */
+    autoMode?: AutoModeSettings;
   };
   toolDiscoveryCommand?: string;
   toolCallCommand?: string;
@@ -450,6 +556,9 @@ export interface ConfigParameters {
     enableFuzzySearch?: boolean;
   };
   checkpointing?: boolean;
+  fileCheckpointingEnabled?: boolean;
+  /** Directory where approved plan files are stored. Must resolve inside targetDir. */
+  plansDirectory?: string;
   proxy?: string;
   cwd: string;
   fileDiscoveryService?: FileDiscoveryService;
@@ -521,7 +630,7 @@ export interface ConfigParameters {
    * JSON Schema that the model's final output must conform to. When set, a
    * synthetic `structured_output` tool is registered and the non-interactive
    * CLI ends the session the first time the model calls it with valid args.
-   * Only meaningful in headless mode (`hopcode -p`).
+   * Only meaningful in headless mode (`qwen -p`).
    */
   jsonSchema?: Record<string, unknown>;
   /**
@@ -558,6 +667,11 @@ export interface ConfigParameters {
    * to use disableAllHooks instead (note: inverted logic - enabled:true → disableAllHooks:false).
    */
   disableAllHooks?: boolean;
+  /**
+   * Maximum consecutive blocking Stop/SubagentStop hook decisions before the
+   * runtime overrides the hook loop and allows the turn to end.
+   */
+  stopHookBlockingCap?: number;
   /**
    * User-level hooks configuration (from user settings).
    * These hooks are always loaded regardless of folder trust status.
@@ -639,6 +753,17 @@ export class Config {
   private sessionData?: ResumedSessionData;
   private debugLogger: DebugLogger;
   private toolRegistry!: ToolRegistry;
+  /**
+   * PR 14b fix #2 (codex review round 1): callback stashed BEFORE
+   * `initialize()` runs and applied as soon as `toolRegistry` is up,
+   * so the manager's `setOnBudgetEvent` is wired before
+   * `startMcpDiscoveryInBackground` (or legacy blocking discovery)
+   * fires the first pass. Pre-fix the acpAgent registered after
+   * `initialize()` returned, missing the first pass entirely under
+   * `QWEN_CODE_LEGACY_MCP_BLOCKING=1` and racing against background
+   * discovery completion under the default mode.
+   */
+  private pendingMcpBudgetCallback?: (event: McpBudgetEvent) => void;
   private promptRegistry!: PromptRegistry;
   private subagentManager!: SubagentManager;
   private readonly backgroundTaskRegistry = new BackgroundTaskRegistry();
@@ -667,14 +792,14 @@ export class Config {
   private modelsConfig!: ModelsConfig;
   private readonly modelProvidersConfig?: ModelProvidersConfig;
   private readonly webSearch?: WebSearchConfig | null;
-  private readonly agentModels?: Record<string, AgentModelOverride>;
   private readonly sandbox: SandboxConfig | undefined;
   private readonly targetDir: string;
   private workspaceContext: WorkspaceContext;
   private readonly question: string | undefined;
   private readonly systemPrompt: string | undefined;
   private readonly appendSystemPrompt: string | undefined;
-  private readonly permissionsConfig: PermissionsConfig;
+  private readonly disabledTools: ReadonlySet<string>;
+  private readonly permissionsAutoMode: AutoModeSettings;
   private readonly mcpServerCommand: string | undefined;
   private mcpServers: Record<string, MCPServerConfig> | undefined;
   private readonly lspEnabled: boolean;
@@ -688,10 +813,12 @@ export class Config {
   private geminiMdFileCount: number;
   private conditionalRulesRegistry: ConditionalRulesRegistry | undefined;
   private readonly contextRuleExcludes: string[];
-  private readonly approvalConfig: ApprovalConfig;
-  private readonly telemetryConfig: TelemetryConfig;
-  private readonly uiConfig: UiConfig;
-  private readonly chatConfig: ChatConfig;
+  private approvalConfig: ApprovalConfig;
+  private autoModeDenialState: AutoModeDenialState = createDenialState();
+  private telemetryConfig: TelemetryConfig;
+  private uiConfig: UiConfig;
+  private chatConfig: ChatConfig;
+  private permissionsConfig: PermissionsConfig;
   private readonly gitCoAuthor: GitCoAuthorSettings;
   private readonly usageStatisticsEnabled: boolean;
   private readonly fileReadCacheDisabled: boolean;
@@ -718,6 +845,8 @@ export class Config {
     undefined;
   private taskStore: TaskStore | undefined = undefined;
   private readonly checkpointing: boolean;
+  private readonly fileCheckpointingEnabled: boolean;
+  private fileHistoryService: FileHistoryService | undefined;
   private readonly proxy: string | undefined;
   private readonly cwd: string;
   private readonly explicitIncludeDirectories: string[];
@@ -769,12 +898,15 @@ export class Config {
   private readonly jsonFd: number | undefined;
   private readonly jsonFile: string | undefined;
   private readonly jsonSchema: Record<string, unknown> | undefined;
+  private readonly plansDir: string;
+  private readonly plansDirectoryConfigured: boolean;
   private readonly defaultFileEncoding: FileEncodingType | undefined;
   private readonly enableManagedAutoMemory: boolean;
   private readonly enableManagedAutoDream: boolean;
   private readonly enableAutoSkill: boolean;
   private fastModel?: string;
   private readonly disableAllHooks: boolean;
+  private readonly stopHookBlockingCap: number;
   /** User-level hooks (always loaded regardless of trust) */
   private readonly userHooks?: Record<string, unknown>;
   /** Project-level hooks (only loaded in trusted folders) */
@@ -794,8 +926,9 @@ export class Config {
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.webSearch = params.webSearch;
-    this.agentModels = params.agentModels;
     this.targetDir = path.resolve(params.targetDir);
+    this.plansDirectoryConfigured = Boolean(params.plansDirectory?.trim());
+    this.plansDir = Storage.getPlansDir(this.targetDir, params.plansDirectory);
     this.explicitIncludeDirectories = Array.from(
       new Set(params.includeDirectories ?? []),
     );
@@ -809,18 +942,8 @@ export class Config {
     this.question = params.question;
     this.systemPrompt = params.systemPrompt;
     this.appendSystemPrompt = params.appendSystemPrompt;
-    this.permissionsConfig = new PermissionsConfig({
-      bareMode: params.bareMode ?? false,
-      coreTools: params.coreTools,
-      allowedTools: params.allowedTools,
-      excludeTools: params.excludeTools,
-      disabledSlashCommands: params.disabledSlashCommands,
-      permissionsAllow: params.permissions?.allow || [],
-      permissionsAsk: params.permissions?.ask || [],
-      permissionsDeny: params.permissions?.deny || [],
-      toolDiscoveryCommand: params.toolDiscoveryCommand,
-      toolCallCommand: params.toolCallCommand,
-    });
+    this.disabledTools = new Set(params.disabledTools ?? []);
+    this.permissionsAutoMode = params.permissions?.autoMode ?? {};
     this.mcpServerCommand = params.mcpServerCommand;
     this.mcpServers = params.mcpServers;
     this.lspEnabled = params.lsp?.enabled ?? false;
@@ -848,10 +971,13 @@ export class Config {
       includeSensitiveSpanAttributes:
         params.telemetry?.includeSensitiveSpanAttributes ?? false,
       outfile: params.telemetry?.outfile,
+      resourceAttributes: params.telemetry?.resourceAttributes,
+      metrics: params.telemetry?.metrics,
+      resourceAttributeWarnings: params.telemetry?.resourceAttributeWarnings,
     });
     this.uiConfig = new UiConfig({
       inputFormat: params.inputFormat,
-      outputFormat: normalizedOutputFormat ?? OutputFormat.TEXT,
+      outputFormat: params.outputFormat ?? normalizedOutputFormat,
       includePartialMessages: params.includePartialMessages,
       debugMode: params.debugMode,
       bareMode: params.bareMode,
@@ -869,6 +995,18 @@ export class Config {
       embeddingModel: params.embeddingModel,
       chatCompression: params.chatCompression,
       interactive: params.interactive,
+    });
+    this.permissionsConfig = new PermissionsConfig({
+      bareMode: params.bareMode ?? false,
+      coreTools: params.coreTools,
+      allowedTools: params.allowedTools,
+      excludeTools: params.excludeTools,
+      disabledSlashCommands: params.disabledSlashCommands,
+      permissionsAllow: params.permissions?.allow || [],
+      permissionsAsk: params.permissions?.ask || [],
+      permissionsDeny: params.permissions?.deny || [],
+      toolDiscoveryCommand: params.toolDiscoveryCommand,
+      toolCallCommand: params.toolCallCommand,
     });
     this.gitCoAuthor = {
       ...normalizeGitCoAuthor(params.gitCoAuthor),
@@ -890,6 +1028,9 @@ export class Config {
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
     };
     this.checkpointing = params.checkpointing ?? false;
+    this.fileCheckpointingEnabled =
+      params.fileCheckpointingEnabled ??
+      (!params.sdkMode && (params.interactive ?? false));
     this.proxy = params.proxy;
     this.cwd = params.cwd ?? process.cwd();
     this.fileDiscoveryService = params.fileDiscoveryService ?? null;
@@ -914,6 +1055,7 @@ export class Config {
     this.importFormat = params.importFormat ?? 'tree';
     this.trustedFolder = params.trustedFolder;
     this.warnings = params.warnings ?? [];
+    this.addLegacyPlanLocationWarning();
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
     this.powershellConfig = params.powershellConfig;
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
@@ -982,12 +1124,19 @@ export class Config {
     this.enableAutoSkill = params.enableAutoSkill ?? false;
     this.fastModel = params.fastModel || undefined;
     this.disableAllHooks = params.disableAllHooks ?? false;
+    this.stopHookBlockingCap = resolveStopHookBlockingCap(
+      params.stopHookBlockingCap,
+    );
     // Store user and project hooks separately for proper source attribution
     this.userHooks = params.userHooks;
     this.projectHooks = params.projectHooks;
     // Legacy: fall back to merged hooks if new fields are not provided
     this.hooks = params.hooks;
     this.memoryManager = new MemoryManager();
+    this.taskStore = new TaskStore(this.targetDir, this.sessionId);
+    this.permissionBlockerService = new PermissionBlockerService(
+      path.join(this.targetDir, '.hopcode', 'permission-blocker.json'),
+    );
   }
 
   /**
@@ -1217,10 +1366,10 @@ export class Config {
     // after the registry exists. This lets `Config.initialize()` (and the
     // cli's `input_enabled` checkpoint) resolve without waiting on MCP
     // server response time. Users can opt back into the legacy synchronous
-    // behavior with `HOPCODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
+    // behavior with `QWEN_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
     // an escape hatch.
     const legacyBlockingMcp =
-      process.env['HOPCODE_LEGACY_MCP_BLOCKING'] === '1';
+      process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'] === '1';
     const skipInlineMcpDiscovery = this.getBareMode() || !legacyBlockingMcp;
 
     this.toolRegistry = await this.createToolRegistry(
@@ -1274,20 +1423,20 @@ export class Config {
     // directory the worktree creators (`enter_worktree` and
     // `agent isolation:'worktree'`) write to. Using `this.targetDir`
     // directly would cause launches from a monorepo subdirectory to
-    // scan `<subdir>/.hopcode/worktrees/` — which never exists — and the
+    // scan `<subdir>/.qwen/worktrees/` — which never exists — and the
     // sweep would silently be a no-op forever.
     if (!this.getBareMode()) {
       void (async () => {
         try {
           // Resolve the repo top-level FIRST. The previous code bailed
-          // on `fs.access(<targetDir>/.hopcode/worktrees)` before resolving,
+          // on `fs.access(<targetDir>/.qwen/worktrees)` before resolving,
           // so a monorepo subdir launch (where `targetDir` is the
           // subdir, not the repo root) always early-returned and the
           // sweep was permanently a no-op. Fast-bail still happens, just
           // against the *correct* directory.
           const probe = new GitWorktreeService(this.targetDir);
           const root = (await probe.getRepoTopLevel()) ?? this.targetDir;
-          const worktreesDir = path.join(root, HOPCODE_DIR, 'worktrees');
+          const worktreesDir = path.join(root, '.qwen', 'worktrees');
           try {
             await fsPromises.access(worktreesDir);
           } catch {
@@ -1417,7 +1566,7 @@ export class Config {
    *
    * Resolves immediately when:
    * - bare mode is on (no MCP discovery is started),
-   * - `HOPCODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
+   * - `QWEN_CODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
    *   synchronously inside {@link initialize}), or
    * - no MCP servers are configured.
    */
@@ -1691,6 +1840,7 @@ export class Config {
     // constructed via Object.create — those should clear their own
     // cache, not the parent's.
     this.getFileReadCache().clear();
+    this.fileHistoryService = undefined;
     refreshSessionContext(this.sessionId);
     // The commit-attribution singleton accumulates per-file AI edits
     // and a session-scoped prompt counter — both stop being meaningful
@@ -1711,7 +1861,7 @@ export class Config {
     //
     // Only refresh when THIS process established its own sidecar at
     // startup (interactive UI). A non-interactive `/clear` (e.g.
-    // hopcode --prompt-interactive) must not delete a sibling shell's
+    // qwen --prompt-interactive) must not delete a sibling shell's
     // sidecar that happens to share the outgoing session id —
     // mirrors kimi-cli PR #2082's "write only when a session is
     // established for this process" rule.
@@ -1727,7 +1877,7 @@ export class Config {
           await writeRuntimeStatus(newPath, {
             sessionId: newSessionId,
             workDir,
-            hopcodeVersion: cliVersion,
+            qwenVersion: cliVersion,
           });
         } catch {
           // ignored: best-effort cleanup
@@ -1785,6 +1935,14 @@ export class Config {
     return this.contentGeneratorConfigSources;
   }
 
+  getTaskStore(): TaskStore | undefined {
+    return this.taskStore;
+  }
+
+  getPermissionBlockerService(): PermissionBlockerService | undefined {
+    return this.permissionBlockerService;
+  }
+
   getModel(): string {
     return (
       this.getContentGeneratorConfig()?.model || this.modelsConfig.getModel()
@@ -1806,24 +1964,38 @@ export class Config {
   }
 
   /**
-   * Returns the fast model if one is configured and valid for the current auth
-   * type, otherwise returns undefined. Direct runtime paths use this as a
-   * cheaper alternative to the main session model, so it intentionally stays
-   * current-auth-only.
+   * Returns the configured fast model selector when it resolves to an available
+   * model. Bare selectors stay bare and authType-qualified selectors keep their
+   * authType prefix so selector-aware runtime paths can route cross-auth calls.
    */
   getFastModel(): string | undefined {
-    const authType =
-      this.contentGeneratorConfig?.authType ??
-      this.modelsConfig.getCurrentAuthType();
-    if (!authType) return undefined;
     const selector = this.resolveFastModelSelector();
     if (!selector) return undefined;
-    if (selector.authType && selector.authType !== authType) return undefined;
 
-    const available = this.getAllConfiguredModels([authType]);
-    return available.some((m) => m.id === selector.modelId)
-      ? selector.modelId
-      : undefined;
+    const available = selector.authType
+      ? this.getAllConfiguredModels([selector.authType])
+      : this.getAllConfiguredModels();
+    if (!available.some((m) => m.id === selector.modelId)) {
+      return undefined;
+    }
+
+    const rawSelector = resolveModelId(this.fastModel);
+    return rawSelector?.authType
+      ? `${rawSelector.authType}:${selector.modelId}`
+      : selector.modelId;
+  }
+
+  private resolveFastModelSelector() {
+    if (!this.fastModel) return undefined;
+    try {
+      return resolveModelId(this.fastModel, {
+        currentAuthType: this.getContentGeneratorConfig()?.authType,
+        getAvailableModels: (authTypes) =>
+          this.getAllConfiguredModels(authTypes),
+      });
+    } catch {
+      return undefined;
+    }
   }
 
   /**
@@ -1846,15 +2018,6 @@ export class Config {
     return available.some((m) => m.id === selector.modelId)
       ? selector.modelId
       : undefined;
-  }
-
-  private resolveFastModelSelector() {
-    if (!this.fastModel) return undefined;
-    try {
-      return resolveModelId(this.fastModel);
-    } catch {
-      return undefined;
-    }
   }
 
   /**
@@ -2141,6 +2304,17 @@ export class Config {
     return this.permissionsConfig.getDisabledSlashCommands();
   }
 
+  /**
+   * Returns the read-only set of tool names hidden from this Config's
+   * ToolRegistry. Consulted by `ToolRegistry.registerTool` and
+   * `ToolRegistry.registerFactory` to skip registration. Toggling at
+   * runtime requires re-spawning the ACP child (the set is frozen at
+   * construction time). See `disabledTools` in ConfigParameters.
+   */
+  getDisabledTools(): ReadonlySet<string> {
+    return this.disabledTools;
+  }
+
   getToolCallCommand(): string | undefined {
     return this.permissionsConfig.getToolCallCommand();
   }
@@ -2365,36 +2539,200 @@ export class Config {
     return this.approvalConfig.getApprovalMode();
   }
 
+  /**
+   * Returns the AUTO approval mode classifier settings (hints + environment).
+   * Returns an empty object when no settings are configured.
+   */
+  getAutoModeSettings(): AutoModeSettings {
+    return this.permissionsAutoMode;
+  }
+
+  /**
+   * Returns the AUTO mode denialTracking state for the current session.
+   * Used by the scheduler to decide whether to fall back from classifier
+   * evaluation to manual approval. Session-scoped, never persisted.
+   */
+  getAutoModeDenialState(): AutoModeDenialState {
+    return this.autoModeDenialState;
+  }
+
+  /**
+   * Replace the AUTO mode denialTracking state. Caller produces the new
+   * state via one of the pure transitions in `permissions/denialTracking.ts`
+   * (recordAllow / recordBlock / recordUnavailable / recordFallback*).
+   */
+  setAutoModeDenialState(state: AutoModeDenialState): void {
+    this.autoModeDenialState = state;
+  }
+
+  /**
+   * Returns the approval mode that was active before entering plan mode.
+   * Falls back to DEFAULT if no pre-plan mode was recorded.
+   */
   getPrePlanMode(): ApprovalMode {
     return this.approvalConfig.getPrePlanMode();
   }
 
   setApprovalMode(mode: ApprovalMode): void {
+    const fromMode = this.approvalConfig.getApprovalMode();
     this.approvalConfig.setApprovalMode(mode, this.isTrustedFolder());
+    // Strip over-broad allow rules (Bash interpreter wildcards, any Agent /
+    // Skill allow) on AUTO entry; restore them on AUTO exit. Settings on
+    // disk are NEVER touched — this is a runtime-only adjustment of the
+    // active PermissionManager rule set. The PermissionManager is `null`
+    // until initialize() is called, so skip the hook on early-startup
+    // mode changes (the strip will happen via initialize for AUTO-default
+    // sessions).
+    if (this.permissionManager) {
+      if (mode === ApprovalMode.AUTO && fromMode !== ApprovalMode.AUTO) {
+        this.permissionManager.stripDangerousRulesForAutoMode();
+      } else if (fromMode === ApprovalMode.AUTO && mode !== ApprovalMode.AUTO) {
+        this.permissionManager.restoreDangerousRules();
+      }
+    }
+    // Any deliberate mode change invalidates the AUTO denialTracking signal.
+    if (fromMode !== mode) {
+      this.autoModeDenialState = resetDenialState();
+    }
+  }
+
+  /**
+   * Returns the directory where this session's plan file is stored.
+   */
+  getPlansDir(): string {
+    return this.plansDir;
+  }
+
+  private assertPlansDirWithinTargetDir(): void {
+    if (!this.plansDirectoryConfigured) {
+      return;
+    }
+
+    Storage.assertPathWithinDirectory(
+      this.plansDir,
+      this.targetDir,
+      `plansDirectory must resolve within the project root.`,
+    );
+  }
+
+  private assertPlanFilePathWithinTargetDir(filePath: string): void {
+    if (!this.plansDirectoryConfigured) {
+      return;
+    }
+
+    Storage.assertPathWithinDirectory(
+      filePath,
+      this.targetDir,
+      `plansDirectory must resolve within the project root.`,
+    );
+  }
+
+  private addLegacyPlanLocationWarning(): void {
+    try {
+      if (!this.plansDirectoryConfigured) {
+        return;
+      }
+
+      const legacyPlansDir = Storage.getPlansDir();
+      const legacyPlanFiles = this.getPlanFileNames(legacyPlansDir);
+      if (legacyPlanFiles.length === 0) {
+        return;
+      }
+
+      const configuredPlanFiles = new Set(this.getPlanFileNames(this.plansDir));
+      const hiddenLegacyPlanFiles = legacyPlanFiles.filter(
+        (fileName) => !configuredPlanFiles.has(fileName),
+      );
+      if (hiddenLegacyPlanFiles.length === 0) {
+        return;
+      }
+
+      this.warnings.push(
+        `Warning: Saved plan files exist at ${legacyPlansDir}, but ` +
+          `plansDirectory is configured to use ${this.plansDir}. Move ` +
+          `existing plan files to ${this.plansDir} if you want to keep ` +
+          `using them.`,
+      );
+    } catch (err: unknown) {
+      const message = `Failed to check legacy plan directory migration warning: ${
+        err instanceof Error ? err.message : String(err)
+      }`;
+      this.warnings.push(message);
+      this.debugLogger.warn(message, err);
+    }
+  }
+
+  private getPlanFileNames(plansDir: string): string[] {
+    try {
+      return fs.readdirSync(plansDir).filter((entry) => entry.endsWith('.md'));
+    } catch (err: unknown) {
+      const code = (err as NodeJS.ErrnoException).code;
+      if (code === 'ENOENT') {
+        return [];
+      }
+      if (code === 'EACCES' || code === 'EPERM') {
+        const message = `Failed to read plan directory ${plansDir}: ${
+          err instanceof Error ? err.message : String(err)
+        }`;
+        this.warnings.push(message);
+        this.debugLogger.warn(message, err);
+        return [];
+      }
+      throw err;
+    }
   }
 
   /**
    * Returns the file path for this session's plan file.
    */
   getPlanFilePath(): string {
-    return Storage.getPlanFilePath(this.sessionId);
+    return path.join(
+      this.plansDir,
+      `${Storage.sanitizePlanSessionId(this.sessionId)}.md`,
+    );
   }
 
   /**
    * Saves a plan to disk for the current session.
    */
   savePlan(plan: string): void {
+    this.assertPlansDirWithinTargetDir();
     const filePath = this.getPlanFilePath();
     const dir = path.dirname(filePath);
     fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(filePath, plan, 'utf-8');
+    // Write to a temp file first, then atomically rename to avoid
+    // leaving a corrupted file if the process crashes mid-write.
+    const tmpPath = filePath + '.tmp';
+    fs.writeFileSync(tmpPath, plan, 'utf-8');
+    try {
+      fs.renameSync(tmpPath, filePath);
+    } catch (err: unknown) {
+      if ((err as NodeJS.ErrnoException).code !== 'EXDEV') {
+        throw err;
+      }
+
+      fs.copyFileSync(tmpPath, filePath);
+      fs.unlinkSync(tmpPath);
+    }
+    try {
+      this.assertPlanFilePathWithinTargetDir(filePath);
+    } catch (err) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch {
+        // Ignore rollback errors; the containment check already failed.
+      }
+      throw err;
+    }
   }
 
   /**
    * Loads the plan for the current session, or returns undefined if none exists.
    */
   loadPlan(): string | undefined {
+    this.assertPlansDirWithinTargetDir();
     const filePath = this.getPlanFilePath();
+    this.assertPlanFilePathWithinTargetDir(filePath);
     try {
       return fs.readFileSync(filePath, 'utf-8');
     } catch (error: unknown) {
@@ -2458,6 +2796,18 @@ export class Config {
 
   getTelemetryTarget(): TelemetryTarget {
     return this.telemetryConfig.getTarget();
+  }
+
+  getTelemetryResourceAttributes(): Record<string, string> {
+    return this.telemetryConfig.getSettings().resourceAttributes ?? {};
+  }
+
+  getTelemetryMetricsIncludeSessionId(): boolean {
+    return this.telemetryConfig.getSettings().metrics?.includeSessionId ?? false;
+  }
+
+  getTelemetryResourceAttributeWarnings(): readonly string[] {
+    return this.telemetryConfig.getSettings().resourceAttributeWarnings ?? [];
   }
 
   getTelemetryOutfile(): string | undefined {
@@ -2550,6 +2900,21 @@ export class Config {
     return this.checkpointing;
   }
 
+  getFileCheckpointingEnabled(): boolean {
+    return this.fileCheckpointingEnabled;
+  }
+
+  getFileHistoryService(): FileHistoryService {
+    if (!this.fileHistoryService) {
+      this.fileHistoryService = new FileHistoryService(
+        this.sessionId,
+        this.fileCheckpointingEnabled,
+        this.cwd,
+      );
+    }
+    return this.fileHistoryService;
+  }
+
   getProxy(): string | undefined {
     return normalizeProxyUrl(this.proxy);
   }
@@ -2608,8 +2973,13 @@ export class Config {
    * registered hooks for the given event name.  Callers can use this to skip
    * expensive MessageBus round-trips when no hooks are configured.
    */
-  hasHooksForEvent(eventName: string): boolean {
-    return this.hookSystem?.hasHooksForEvent(eventName) ?? false;
+  hasHooksForEvent(eventName: string, sessionId?: string): boolean {
+    return (
+      this.hookSystem?.hasHooksForEvent(
+        eventName,
+        sessionId ?? this.getSessionId(),
+      ) ?? false
+    );
   }
 
   /**
@@ -2617,6 +2987,10 @@ export class Config {
    */
   getDisableAllHooks(): boolean {
     return this.disableAllHooks || this.getBareMode();
+  }
+
+  getStopHookBlockingCap(): number {
+    return this.stopHookBlockingCap;
   }
 
   getManagedAutoMemoryEnabled(): boolean {
@@ -3012,9 +3386,7 @@ export class Config {
 
   async loadPausedBackgroundAgents(
     sessionId: string = this.getSessionId(),
-  ): Promise<
-    ReadonlyArray<import('../agents/background-tasks.js').BackgroundTaskEntry>
-  > {
+  ): Promise<ReadonlyArray<import('../agents/background-tasks.js').AgentTask>> {
     return this.getBackgroundAgentResumeService().loadPausedBackgroundAgents(
       sessionId,
     );
@@ -3023,9 +3395,7 @@ export class Config {
   async resumeBackgroundAgent(
     agentId: string,
     initialMessage?: string,
-  ): Promise<
-    import('../agents/background-tasks.js').BackgroundTaskEntry | undefined
-  > {
+  ): Promise<import('../agents/background-tasks.js').AgentTask | undefined> {
     return this.getBackgroundAgentResumeService().resumeBackgroundAgent(
       agentId,
       initialMessage,
@@ -3201,7 +3571,7 @@ export class Config {
     // --json-schema runs. It must be registered in BOTH the bare-mode
     // branch and the regular branch — without it the model can't finish
     // a structured run, so omitting either branch causes
-    // `hopcode [--bare] --json-schema X -p "..."` to loop until
+    // `qwen [--bare] --json-schema X -p "..."` to loop until
     // maxSessionTurns and exit via the "plain text" failure path. Hoisted
     // out of the two branches so the dynamic-import factory shape stays
     // in sync between them.
@@ -3224,7 +3594,7 @@ export class Config {
         const { SyntheticOutputTool } = await import(
           '../tools/syntheticOutput.js'
         );
-        return new SyntheticOutputTool(this, schema);
+        return new SyntheticOutputTool(schema);
       });
     };
 
@@ -3236,6 +3606,10 @@ export class Config {
       await registerLazy(ToolNames.EDIT, async () => {
         const { EditTool } = await import('../tools/edit.js');
         return new EditTool(this);
+      });
+      await registerLazy(ToolNames.NOTEBOOK_EDIT, async () => {
+        const { NotebookEditTool } = await import('../tools/notebook-edit.js');
+        return new NotebookEditTool(this);
       });
       await registerLazy(ToolNames.SHELL, async () => {
         const { ShellTool } = await import('../tools/shell.js');
@@ -3321,6 +3695,10 @@ export class Config {
       const { EditTool } = await import('../tools/edit.js');
       return new EditTool(this);
     });
+    await registerLazy(ToolNames.NOTEBOOK_EDIT, async () => {
+      const { NotebookEditTool } = await import('../tools/notebook-edit.js');
+      return new NotebookEditTool(this);
+    });
     await registerLazy(ToolNames.WRITE_FILE, async () => {
       const { WriteFileTool } = await import('../tools/write-file.js');
       return new WriteFileTool(this);
@@ -3405,6 +3783,34 @@ export class Config {
       return new MonitorTool(this);
     });
 
+    // PR 14b fix #2 (codex review round 1): apply any pending MCP
+    // budget-event callback BEFORE `discoverAllTools` (legacy blocking
+    // mode runs MCP discovery synchronously in there) and BEFORE the
+    // post-`createToolRegistry` `startMcpDiscoveryInBackground` (default
+    // mode). Either way the manager has its callback wired at the
+    // moment the first discovery pass fires, so end-of-pass events
+    // for that pass are routed through the SDK push channel.
+    if (this.pendingMcpBudgetCallback) {
+      const mgr = registry.getMcpClientManager();
+      if (mgr && typeof mgr.setOnBudgetEvent === 'function') {
+        mgr.setOnBudgetEvent(this.pendingMcpBudgetCallback);
+      }
+      // PR 14b fix (codex round 6): clear after consumption so a
+      // subsequent `createToolRegistry` call (e.g. subagent override
+      // via `createApprovalModeOverride` /
+      // `buildSubagentContextOverride`) doesn't re-apply the parent
+      // session's callback to a fresh manager. Subagent contexts run
+      // their own MCP clients but should NOT push budget events
+      // through the parent's ACP session — that would route subagent
+      // telemetry to the wrong subscriber.
+      //
+      // Late-call setter (`setMcpBudgetEventCallback` after
+      // `initialize()`) is unaffected: it dispatches directly to the
+      // existing manager via the `if (this.toolRegistry)` branch,
+      // not through `pendingMcpBudgetCallback`.
+      this.pendingMcpBudgetCallback = undefined;
+    }
+
     if (!options?.skipDiscovery) {
       await registry.discoverAllTools();
     }
@@ -3414,85 +3820,60 @@ export class Config {
     return registry;
   }
 
-  // -------------------------------------------------------------------------
-  // Upstream compatibility stubs (HopCode fork)
-  // -------------------------------------------------------------------------
-
-  /** Lazy singleton PermissionBlockerService. */
-  getPermissionBlockerService(): PermissionBlockerService {
-    if (!this.permissionBlockerService) {
-      const homeDir = process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.';
-      const persistPath = path.join(
-        homeDir,
-        '.hopcode',
-        'permission-blocker.json',
-      );
-      this.permissionBlockerService = new PermissionBlockerService(persistPath);
-    }
-    return this.permissionBlockerService;
-  }
-
-  /** Lazy singleton TaskStore. */
-  getTaskStore(): TaskStore {
-    if (!this.taskStore) {
-      const runtimeDir = this.storage.getProjectDir?.() ?? this.cwd;
-      this.taskStore = new TaskStore(runtimeDir, this.getSessionId());
-    }
-    return this.taskStore;
-  }
-
-  /** Returns an overridden model string for a named agent type (e.g. "orchestrator"). */
-  getAgentModelForType(name: string): string | undefined {
-    const override = this.agentModels?.[name];
-    if (typeof override === 'string') {
-      return override === 'inherit' ? undefined : override;
-    }
-    return override?.model === 'inherit' ? undefined : override?.model;
-  }
-
-  /** Returns full model config (apiKey, baseUrl) for a named agent type. */
-  getAgentModelFullConfig(
-    name: string,
-  ): { apiKey?: string; baseUrl?: string } | undefined {
-    const override = this.agentModels?.[name];
-    if (!override || typeof override === 'string') {
-      return undefined;
-    }
-    return { apiKey: override.apiKey, baseUrl: override.baseUrl };
-  }
-
   /**
-   * Static factory — returns the shared singleton Config. Not supported in
-   * the HopCode fork; Config is always constructed directly by the CLI layer.
+   * PR 14b fix #2 (codex review round 1): register the MCP guardrail
+   * push-event callback. Acceptable to call at any point in the
+   * Config lifecycle — before, during, or after `initialize()`.
+   *
+   * Two paths:
+   * - **Pre-init** (no `toolRegistry` yet): stash on
+   *   `pendingMcpBudgetCallback`. `createToolRegistry` will apply it
+   *   to the freshly-constructed manager and clear the stash (round
+   *   6 fix). The stash is the ONLY way to reach a manager that
+   *   doesn't exist yet.
+   * - **Late** (`toolRegistry` already exists): dispatch directly to
+   *   the existing manager. **DO NOT** also stash — that's the
+   *   round-7 fix. Pre-fix, both paths assigned to
+   *   `pendingMcpBudgetCallback` regardless, so a subsequent
+   *   `createToolRegistry` (subagent override via
+   *   `createApprovalModeOverride` /
+   *   `buildSubagentContextOverride`) would re-apply the parent
+   *   session's callback to the subagent's fresh manager — routing
+   *   subagent telemetry through the wrong ACP session.
+   *
+   * `cb: undefined` clears the registration. `off`-mode managers
+   * silently drop the callback (their state machine never runs).
    */
-  static async get(): Promise<Config> {
-    throw new Error(
-      'Config.get() is not supported in the HopCode fork. ' +
-        'Construct Config directly via `new Config(...)` in the CLI layer.',
-    );
+  setMcpBudgetEventCallback(
+    cb: ((event: McpBudgetEvent) => void) | undefined,
+  ): void {
+    if (this.toolRegistry) {
+      // Late-call path: apply directly. Do NOT stash — see comment
+      // above for the subagent isolation rationale.
+      const mgr = this.toolRegistry.getMcpClientManager?.();
+      if (mgr && typeof mgr.setOnBudgetEvent === 'function') {
+        mgr.setOnBudgetEvent(cb);
+      }
+      this.pendingMcpBudgetCallback = undefined;
+      return;
+    }
+    // Pre-init path: stash for `createToolRegistry` to consume.
+    this.pendingMcpBudgetCallback = cb;
   }
 }
 
 /**
- * Creates a lightweight Proxy over `base` that overrides selected methods.
- * This lets callers fork Config state (e.g. different approval mode, model)
- * without mutating or copying the parent Config instance.
+ * Creates a shallow override of a Config by prototype delegation.
+ * The returned object delegates to `base` for all properties not
+ * explicitly overridden in `overrides`.
  */
-export function createConfigOverride(
-  base: Config,
-  overrides: Partial<Record<keyof Config, unknown>>,
-): Config {
-  return new Proxy(base, {
-    get(target, prop, receiver) {
-      if (prop in overrides) {
-        const val = overrides[prop as keyof Config];
-        return val;
-      }
-      const value = Reflect.get(target, prop, receiver);
-      if (typeof value === 'function') {
-        return value.bind(target);
-      }
-      return value;
-    },
-  });
+export function createConfigOverride<T extends Config>(
+  base: T,
+  overrides: Partial<Record<keyof T, () => unknown>>,
+): T {
+  const override = Object.create(base) as T;
+  for (const [key, getter] of Object.entries(overrides)) {
+    (override as Record<string, unknown>)[key] = getter();
+  }
+  return override;
 }

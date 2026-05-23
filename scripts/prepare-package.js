@@ -161,6 +161,7 @@ const distPackageJson = {
   },
   files: [
     'cli.js',
+    'chunks',
     'vendor',
     '*.sb',
     'README.md',

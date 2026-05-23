@@ -311,7 +311,7 @@ describe('useWebViewMessages', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: {
-            type: 'hopcodeSessionSwitched',
+            type: 'qwenSessionSwitched',
             data: {
               sessionId: 'conversation-2',
               session: { title: 'Persisted Session' },
@@ -409,7 +409,7 @@ describe('useWebViewMessages', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: {
-            type: 'hopcodeSessionSwitched',
+            type: 'qwenSessionSwitched',
             data: {
               sessionId: 'conversation-2',
               session: { title: 'Persisted Session' },
@@ -465,7 +465,7 @@ describe('useWebViewMessages', () => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: {
-            type: 'hopcodeSessionSwitched',
+            type: 'qwenSessionSwitched',
             data: {
               sessionId: 'conversation-2',
               session: { title: 'Empty Session' },

@@ -5,10 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import type {
-  File,
-  IdeContext,
-} from '@hoptrendy/hopcode-core/src/ide/types.js';
+import type { File, IdeContext } from '@hoptrendy/hopcode-core';
 import {
   isFileUri,
   isNotebookFileUri,

@@ -105,10 +105,12 @@ if (cliPackageJson.config?.sandboxImageUri) {
   writeJson(cliPackageJsonPath, cliPackageJson);
 }
 
-// 7. Keep the export-html template dependency aligned with the bundled webui version.
-const exportHtmlPackageJsonPath = resolve(
-  process.cwd(),
-  'packages/web-templates/src/export-html/package.json',
+// 7. Run `npm install` to update package-lock.json.
+// --ignore-scripts prevents the root `prepare` lifecycle from triggering a
+// redundant full build that fails with TS5055 when dist/ already exists from
+// the initial `npm ci` install.
+run(
+  'npm install --workspace packages/cli --workspace packages/core --workspace packages/channels/base --workspace packages/channels/plugin-example --package-lock-only --ignore-scripts',
 );
 const exportHtmlPackageJson = readJson(exportHtmlPackageJsonPath);
 if (exportHtmlPackageJson.dependencies?.['@hoptrendy/webui']) {

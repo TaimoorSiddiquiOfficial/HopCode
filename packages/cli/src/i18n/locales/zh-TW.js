@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Traditional Chinese (zh-TW) translations for HopCode CLI
-// Auto-generated: structure from en.js, values from zh-TW (manual) or opencc(zh.js s2t)
+// Traditional Chinese (zh-TW) translations for Qwen Code CLI
+// Bootstrapped from en.js structure with opencc(zh.js s2t),
+// then extensively hand-corrected for Taiwan vocabulary conventions.
+// This file is the authoritative source — do not overwrite with auto-generated output.
 export default {
   '↑ to manage attachments': '↑ 管理附件',
   '← → select, Delete to remove, ↓ to exit': '← → 選擇，Delete 刪除，↓ 退出',
@@ -76,6 +78,7 @@ export default {
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
   'for help on HopCode': '獲取 HopCode 幫助',
   'show version info': '顯示版本信息',
+  'show paths for current session files and logs': '顯示目前會話檔案和日誌路徑',
   'submit a bug report': '提交錯誤報告',
   Status: '狀態',
   HopCode: 'HopCode',
@@ -90,10 +93,10 @@ export default {
   Proxy: '代理',
   'Memory Usage': '內存使用',
   'IDE Client': 'IDE 客戶端',
-  'Analyzes the project and creates a tailored HOPCODE.md file.':
-    '分析項目並創建定製的 HOPCODE.md 檔案',
-  'List available HopCode tools. Usage: /tools [desc]':
-    '列出可用的 HopCode 工具。用法：/tools [desc]',
+  'Analyzes the project and creates a tailored QWEN.md file.':
+    '分析項目並創建定製的 QWEN.md 檔案',
+  'List available Qwen Code tools. Usage: /tools [desc]':
+    '列出可用的 Qwen Code 工具。用法：/tools [desc]',
   'List available skills.': '列出可用技能。',
   'Available HopCode CLI tools:': '可用的 HopCode CLI 工具：',
   'No tools available': '沒有可用工具',
@@ -113,6 +116,44 @@ export default {
   'Rename the current conversation. --auto lets the fast model pick a title.':
     '重新命名目前的對話。--auto 會讓快速模型自動產生標題。',
   'Rewind conversation to a previous turn': '將對話回退到先前的某一輪',
+  'Rewind Conversation': '回退對話',
+  'No user turns to rewind to.': '沒有可回退的使用者對話輪次。',
+  'Rewind to: ': '回退到：',
+  'Restore code and conversation': '恢復程式碼和對話',
+  'Restore conversation only': '僅恢復對話',
+  'Restore code only': '僅恢復程式碼',
+  'Never mind': '算了',
+  'Computing file changes...': '正在計算檔案變更...',
+  'Restoring...': '正在恢復...',
+  'Restored {{count}} file(s).': '已恢復 {{count}} 個檔案。',
+  'Failed to restore files: {{error}}': '恢復檔案失敗：{{error}}',
+  'Rewind failed: {{error}}': '回退失敗：{{error}}',
+  'Cannot rewind conversation: no active model client.':
+    '無法回退對話：模型客戶端未啟用。',
+  'Code restored, but conversation could not be rewound (no active client).':
+    '程式碼已恢復，但對話無法回退（模型客戶端未啟用）。',
+  'Conversation rewound. Edit your prompt and press Enter to continue.':
+    '對話已回退。修改提示後按 Enter 繼續。',
+  'Rewinding does not affect files edited manually or via shell commands.':
+    '回退不會影響手動編輯或透過 shell 命令修改的檔案。',
+  'Cannot rewind to a turn that was compressed. Try a more recent turn.':
+    '無法回退到已被壓縮的輪次，請嘗試更近一些的輪次。',
+  'File restore is unavailable for this turn (no captured file changes, or this turn predates the current session).':
+    '該輪次無法還原檔案（沒有擷取到檔案變更，或該輪次屬於本次會話之前）。',
+  '(+{{insertions}} -{{deletions}} in {{count}} file)':
+    '(+{{insertions}} -{{deletions}}，{{count}} 個檔案)',
+  '(+{{insertions}} -{{deletions}} in {{count}} files)':
+    '(+{{insertions}} -{{deletions}}，{{count}} 個檔案)',
+  'Failed to restore {{count}} file(s): {{files}}':
+    '恢復 {{count}} 個檔案失敗：{{files}}',
+  'Cannot restore files: this turn was created before file checkpointing was enabled.':
+    '無法恢復檔案：該輪對話建立時尚未啟用檔案檢查點功能。',
+  'No files needed to be restored.': '沒有檔案需要恢復。',
+  '↑↓ to navigate · Enter to select · Esc to go back':
+    '↑↓ 導覽 · Enter 選取 · Esc 返回',
+  '↑↓ to navigate · Enter to select · Esc to cancel':
+    '↑↓ 導覽 · Enter 選取 · Esc 取消',
+  'Enter/Y to confirm · Esc/N to go back': 'Enter/Y 確認 · Esc/N 返回',
   'change the theme': '更改主題',
   'Select Theme': '選擇主題',
   Preview: '預覽',
@@ -131,7 +172,7 @@ export default {
   'open full HopCode documentation in your browser':
     '在瀏覽器中打開完整的 HopCode 文檔',
   'Configuration not available.': '配置不可用',
-  'Configure authentication information for login': '配置登錄認證信息',
+  'Connect an LLM provider': '連接 LLM 提供商',
   'Copy the last result or code snippet to clipboard':
     '將最後的結果或代碼片段複製到剪貼板',
   'Show working-tree change stats versus HEAD':
@@ -319,8 +360,8 @@ export default {
   error: '錯誤',
   'View and edit HopCode settings': '查看和編輯 HopCode 設置',
   Settings: '設置',
-  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    '要查看更改，必須重啟 HopCode。按 r 退出並立即應用更改。',
+  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
+    '要查看更改，必須重啟 Qwen Code。按 r 退出並立即應用更改。',
   'Vim Mode': 'Vim 模式',
   'Attribution: commit': '署名：提交',
   'Terminal Bell Notification': '終端響鈴通知',
@@ -340,8 +381,7 @@ export default {
   'Custom Witty Phrases': '自定義詼諧短語',
   'Show Welcome Back Dialog': '顯示歡迎回來對話框',
   'Enable User Feedback': '啟用用戶反饋',
-  'How is HopCode doing this session? (optional)':
-    'HopCode 這次表現如何？（可選）',
+  'How is Qwen doing this session? (optional)': 'Qwen 這次表現如何？（可選）',
   Bad: '不滿意',
   Fine: '還行',
   Good: '滿意',
@@ -357,7 +397,7 @@ export default {
   'Max Retries': '最大重試次數',
   'Load Memory From Include Directories': '從包含目錄加載內存',
   'Respect .gitignore': '遵守 .gitignore',
-  'Respect .hopcodeignore': '遵守 .hopcodeignore',
+  'Respect .qwenignore': '遵守 .qwenignore',
   'Enable Recursive File Search': '啟用遞歸檔案搜索',
   'Interactive Shell (PTY)': '交互式 Shell (PTY)',
   'Show Color': '顯示顏色',
@@ -420,8 +460,8 @@ export default {
   remote: '遠程',
   'This extension will add the following commands: {{commands}}.':
     '此擴展將添加以下命令：{{commands}}。',
-  'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    '此擴展將使用 {{fileName}} 向您的 HOPCODE.md 上下文追加信息',
+  'This extension will append info to your QWEN.md context using {{fileName}}':
+    '此擴展將使用 {{fileName}} 向您的 QWEN.md 上下文追加信息',
   'This extension will install the following skills:': '此擴展將安裝以下技能：',
   'This extension will install the following subagents:':
     '此擴展將安裝以下子智能體：',
@@ -555,7 +595,7 @@ export default {
   'Failed to configure {{terminalName}}.': '配置 {{terminalName}} 失敗。',
   'Your terminal is already configured for an optimal experience with multiline input (Shift+Enter and Ctrl+Enter).':
     '您的終端已配置為支持多行輸入（Shift+Enter 和 Ctrl+Enter）的最佳體驗。',
-  'Manage HopCode hooks': '管理 HopCode Hook',
+  'Manage Qwen Code hooks': '管理 Qwen Code Hook',
   'List all configured hooks': '列出所有已配置的 Hook',
   Hooks: 'Hook',
   'Loading hooks...': '正在加載 Hook...',
@@ -568,8 +608,8 @@ export default {
   'No hook events found.': '未找到 Hook 事件。',
   '{{count}} hook configured': '{{count}} 個 Hook 已配置',
   '{{count}} hooks configured': '{{count}} 個 Hook 已配置',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
-    '此選單為只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 HopCode。',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
+    '此選單為只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 Qwen Code。',
   'Enter to select · Esc to cancel': 'Enter 選擇 · Esc 取消',
   'Exit codes:': '退出碼：',
   'Configured hooks:': '已配置的 Hook：',
@@ -594,8 +634,8 @@ export default {
   'StatusLine will not be displayed': '不會顯示狀態欄',
   'Tool operations will proceed without hook validation':
     '工具操作將在沒有 Hook 驗證的情況下繼續',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.':
-    '要重新啟用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 HopCode。',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
+    '要重新啟用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 Qwen Code。',
   Project: '項目',
   User: '用戶',
   Skill: '技能',
@@ -683,14 +723,6 @@ export default {
   'No conversation to branch.': '沒有可分支的對話。',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     '恢復某次工具調用。這將把對話與檔案歷史重置到提出該工具調用建議時的狀態',
-  'Navigate and search session history': '瀏覽和搜索會話歷史',
-  'Full-text search across all history items (entire session)':
-    '全文搜索所有歷史條目（整個會話）',
-  'Load the previous 2 000 history items': '加載前2,000條歷史條目',
-  'Load the next 2 000 history items': '加載後2,000條歷史條目',
-  'Show current history window statistics': '顯示當前歷史窗口統計信息',
-  'Jump to a specific item index in history': '跳轉到歷史中特定條目索引',
-  'Full-text search across all history items': '全文搜索所有歷史條目',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     '無法檢測終端類型。支持的終端：VS Code、Cursor、Windsurf 和 Trae。',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -800,7 +832,7 @@ export default {
   servers: '個伺服器',
   'Add MCP servers to your settings to get started.':
     '請在設置中添加 MCP servers 以開始使用。',
-  'Run hopcode --debug to see error logs': '運行 hopcode --debug 查看錯誤日誌',
+  'Run qwen --debug to see error logs': '運行 qwen --debug 查看錯誤日誌',
   'OAuth Authentication': 'OAuth 認證',
   'Authenticating... Please complete the login in your browser.':
     '認證中... 請在瀏覽器中完成登錄。',
@@ -832,8 +864,8 @@ export default {
   Reason: '原因',
   'Tools must have both name and description to be used by the LLM.':
     '工具必須同時具有名稱和描述才能被 LLM 使用。',
-  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
-    '生成項目摘要並保存到 .hopcode/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
+    '生成項目摘要並保存到 .qwen/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     '沒有可用的聊天客戶端來生成摘要',
   'Already generating summary, wait for previous request to complete':
@@ -881,8 +913,8 @@ export default {
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
     '/directory add 命令在限制性沙箱配置檔案中不受支持。請改為在啟動會話時使用 --include-directories。',
   "Error adding '{{path}}': {{error}}": "添加 '{{path}}' 時出錯：{{error}}",
-  'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
-    '如果存在，已成功從以下目錄添加 HOPCODE.md 檔案：\n- {{directories}}',
+  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
+    '如果存在，已成功從以下目錄添加 QWEN.md 檔案：\n- {{directories}}',
   'Error refreshing memory: {{error}}': '刷新內存時出錯：{{error}}',
   'Successfully added directories:\n- {{directories}}':
     '成功添加目錄：\n- {{directories}}',
@@ -933,19 +965,19 @@ export default {
   '👋 Welcome back! (Last updated: {{timeAgo}})':
     '👋 歡迎回來！（最後更新：{{timeAgo}}）',
   '🎯 Overall Goal:': '🎯 總體目標：',
-  'Select Authentication Method': '選擇認證方式',
-  'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    '您必須選擇認證方法才能繼續。再次按 Ctrl+C 退出',
+  'Connect a Provider': '連接服務商',
+  'You must connect a provider to proceed. Press Ctrl+C again to exit.':
+    '必須連接一個服務商才能繼續。再次按 Ctrl+C 退出',
   'Terms of Services and Privacy Notice': '服務條款和隱私聲明',
   'HopCode OAuth': 'HopCode OAuth (免費)',
   'Discontinued — switch to Coding Plan or API Key':
     '已停用 — 請切換到 Coding Plan 或 API Key',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'HopCode OAuth 免費額度已於 2026-04-15 停用。請選擇 Coding Plan 或 API Key。',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'HopCode OAuth免費層已於2026-04-15停止服務。請選擇其他提供商的模型或運行 /auth 切換。',
-  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ HopCode OAuth 免費額度已於 2026-04-15 停用。請選擇其他選項。\n',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'Qwen OAuth 免費額度已於 2026-04-15 停用。請選擇 Coding Plan 或 API Key。',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'Qwen OAuth免費層已於2026-04-15停止服務。請選擇其他提供商的模型或運行 /auth 切換。',
+  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ Qwen OAuth 免費額度已於 2026-04-15 停用。請選擇其他選項。\n',
   'Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
     '付費 · 每 5 小時最多 6,000 次請求 · 支持阿里雲百鍊 Coding Plan 全部模型',
   'For teams · Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
@@ -970,17 +1002,16 @@ export default {
     '基於瀏覽器的第三方提供商認證（例如 OpenRouter、ModelScope）',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     '認證方式被強制設置為 {{enforcedType}}，但您當前使用的是 {{currentType}}',
-  'HopCode OAuth Authentication': 'HopCode OAuth 認證',
+  'Qwen OAuth Authentication': 'Qwen OAuth 認證',
   'Please visit this URL to authorize:': '請訪問此 URL 進行授權：',
   'Waiting for authorization': '等待授權中',
   'Time remaining:': '剩餘時間：',
-  'HopCode OAuth Authentication Timeout': 'HopCode OAuth 認證超時',
+  'Qwen OAuth Authentication Timeout': 'Qwen OAuth 認證超時',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth 令牌已過期（超過 {{seconds}} 秒）。請重新選擇認證方法',
   'Press any key to return to authentication type selection.':
     '按任意鍵返回認證類型選擇',
-  'Waiting for HopCode OAuth authentication...':
-    '正在等待 HopCode OAuth 認證...',
+  'Waiting for Qwen OAuth authentication...': '正在等待 Qwen OAuth 認證...',
   'Authentication timed out. Please try again.': '認證超時。請重試。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待認證...（按 ESC 或 CTRL+C 取消）',
@@ -1000,8 +1031,8 @@ export default {
   'Failed to authenticate. Message: {{message}}': '認證失敗。消息：{{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     '使用 {{authType}} 憑據成功認證。',
-  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    '無效的 HOPCODE_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值為：{{validValues}}',
+  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    '無效的 QWEN_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值為：{{validValues}}',
   'Select Model': '選擇模型',
   'API Key': 'API Key',
   '(default)': '(默認)',
@@ -1061,10 +1092,10 @@ export default {
   'Search…': '搜索…',
   'Add directory…': '添加目錄…',
   'Add directory to workspace': '添加工作區目錄',
-  'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
-    'HopCode 可以讀取工作區中的檔案，並在自動接受編輯模式開啟時進行編輯。',
-  'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'HopCode 將能夠讀取此目錄中的檔案，並在自動接受編輯模式開啟時進行編輯。',
+  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
+    'Qwen Code 可以讀取工作區中的檔案，並在自動接受編輯模式開啟時進行編輯。',
+  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'Qwen Code 將能夠讀取此目錄中的檔案，並在自動接受編輯模式開啟時進行編輯。',
   'Enter the path to the directory:': '輸入目錄路徑：',
   'Enter directory path…': '輸入目錄路徑…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -1150,8 +1181,8 @@ export default {
     '試試 /insight，從聊天記錄中生成個性化洞察。',
   'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
     '按 Ctrl+O 切換緊湊模式 ── 隱藏工具輸出和思考過程，界面更簡潔。',
-  'Add a HOPCODE.md file to give HopCode persistent project context.':
-    '添加 HOPCODE.md 檔案，為 HopCode 提供持久的項目上下文。',
+  'Add a QWEN.md file to give Qwen Code persistent project context.':
+    '添加 QWEN.md 檔案，為 Qwen Code 提供持久的項目上下文。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     '用 /btw 快速問一個小問題，不會打斷當前對話。',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1360,18 +1391,17 @@ export default {
     '↑/↓: 導航 | ←/→: 切換標籤頁 | Enter: 選擇',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: 導航 | Enter: 選擇 | Esc: 取消',
-  'Authenticate using HopCode OAuth': '使用 HopCode OAuth 進行認證',
+  'Authenticate using Qwen OAuth': '使用 Qwen OAuth 進行認證',
   'Authenticate using Alibaba Cloud Coding Plan':
     '使用阿里雲百鍊 Coding Plan 進行認證',
   'Region for Coding Plan (china/global)': 'Coding Plan 區域 (china/global)',
   'API key for Coding Plan': 'Coding Plan 的 API Key',
   'Show current authentication status': '顯示當前認證狀態',
   'Authentication completed successfully.': '認證完成。',
-  'Starting HopCode OAuth authentication...': '正在啟動 HopCode OAuth 認證...',
-  'Successfully authenticated with HopCode OAuth.':
-    '已成功通過 HopCode OAuth 認證。',
-  'Failed to authenticate with HopCode OAuth: {{error}}':
-    'HopCode OAuth 認證失敗：{{error}}',
+  'Starting Qwen OAuth authentication...': '正在啟動 Qwen OAuth 認證...',
+  'Successfully authenticated with Qwen OAuth.': '已成功通過 Qwen OAuth 認證。',
+  'Failed to authenticate with Qwen OAuth: {{error}}':
+    'Qwen OAuth 認證失敗：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
     '正在處理阿里雲百鍊 Coding Plan 認證...',
   'Successfully authenticated with Alibaba Cloud Coding Plan.':
@@ -1389,8 +1419,8 @@ export default {
   '⚠️  No authentication method configured.\n': '⚠️  未配置認證方式。\n',
   'Run one of the following commands to get started:\n':
     '運行以下命令之一開始配置：\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - 使用 HopCode OAuth 登錄（已停用）',
+  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  qwen auth qwen-oauth     - 使用 Qwen OAuth 登錄（已停用）',
   'Or simply run:': '或者直接運行：',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - 交互式認證配置\n',
@@ -1398,8 +1428,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  類型：免費額度（2026-04-15 已停用）',
   '  Limit: No longer available': '  限額：已不可用',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'HopCode OAuth 免費額度已於 2026-04-15 停用。請運行 /auth 切換到 Coding Plan、OpenRouter、Fireworks AI 或其他服務商。',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'Qwen OAuth 免費額度已於 2026-04-15 停用。請運行 /auth 切換到 Coding Plan、OpenRouter、Fireworks AI 或其他服務商。',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ 認證方式：阿里雲百鍊 Coding Plan',
   '中国 (China) - 阿里云百炼': '中國 (China) - 阿里雲百鍊',
@@ -1412,8 +1442,8 @@ export default {
     '⚠️  認證方式：阿里雲百鍊 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  問題：在環境變量或設置中未找到 API Key\n',
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  運行 `hopcode auth coding-plan` 重新配置。\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  運行 `qwen auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 認證方式：{{type}}',
   '  Status: Configured\n': '  狀態：已配置\n',
   'Failed to check authentication status: {{error}}':
@@ -1427,6 +1457,8 @@ export default {
     '緊湊模式下隱藏工具輸出和思考過程，界面更簡潔（Ctrl+O 切換）。',
   'Press Ctrl+O to show full tool output': '按 Ctrl+O 查看詳細工具調用結果',
   'Switch to plan mode or exit plan mode': '切換到計劃模式或退出計劃模式',
+  'Set a goal — keep working until the condition is met':
+    '設定目標 — 持續工作直到條件滿足',
   'Exited plan mode. Previous approval mode restored.':
     '已退出計劃模式，已恢復之前的審批模式。',
   'Enabled plan mode. The agent will analyze and plan without executing tools.':
@@ -1435,7 +1467,7 @@ export default {
     '已處於計劃模式。使用 "/plan exit" 退出計劃模式。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     '未處於計劃模式。請先使用 "/plan" 進入計劃模式。',
-  "Set up HopCode's status line UI": '配置 HopCode 的狀態欄',
+  "Set up Qwen Code's status line UI": '配置 Qwen Code 的狀態欄',
   'When a new todo item is created': '建立新待辦事項時',
   'When a todo item is marked as completed': '待辦事項標記為完成時',
   'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':
@@ -1451,6 +1483,7 @@ export default {
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': '打開記憶管理器。',
+  'Show current process memory diagnostics': '顯示目前程序的內存診斷。',
   'Save a durable memory to the memory system.': '將持久記憶保存到記憶系統。',
   'Ask a quick side question without affecting the main conversation':
     '在不影響主對話的情況下快速提問旁支問題',
@@ -1549,7 +1582,4 @@ export default {
   // === Same-as-English optimization ===
   ' (not in model registry)': '（不在模型註冊表中）',
   'start server': '啟動伺服器',
-  'Show LSP server status. Usage: /lsp [status]':
-    '顯示 LSP 伺服器狀態。用法：/lsp [status]',
-  'Show current process memory diagnostics': '顯示目前進程記憶體診斷資訊',
 };

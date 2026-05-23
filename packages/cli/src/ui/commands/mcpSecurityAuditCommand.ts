@@ -44,7 +44,7 @@ export const mcpSecurityAuditCommand: SlashCommand = {
 
       return {
         type: 'message',
-        messageType: 'success',
+        messageType: 'info',
         content: generateSecurityReport(auditResults),
       };
     } catch (error) {

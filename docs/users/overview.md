@@ -13,6 +13,10 @@ The recommended installer uses a standalone archive when one is available for
 your platform. If it falls back to npm, Node.js 20 or later with npm must be
 available on PATH.
 
+The recommended installer uses a standalone archive when one is available for
+your platform. If it falls back to npm, Node.js 20 or later with npm must be
+available on PATH.
+
 **Linux / macOS**
 
 ```sh
@@ -27,7 +31,7 @@ powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOffici
 
 > [!note]
 >
-> It's recommended to restart your terminal after installation if `hopcode` is not
+> It's recommended to restart your terminal after installation if `qwen` is not
 > immediately available on PATH. If the installation fails, please refer to
 > [Manual Installation](./quickstart#manual-installation) in the Quickstart
 > guide. For offline installation, download a release archive and run the

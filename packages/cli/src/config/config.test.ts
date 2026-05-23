@@ -21,6 +21,15 @@ import { isWorkspaceTrusted } from './trustedFolders.js';
 
 const mockWriteStderrLine = vi.hoisted(() => vi.fn());
 const mockWriteStdoutLine = vi.hoisted(() => vi.fn());
+const mockSessionServiceInstance = vi.hoisted(() => ({
+  loadLastSession: vi.fn(),
+  loadSession: vi.fn(),
+  forkSession: vi.fn(),
+  sessionExists: vi.fn(),
+}));
+const mockSessionServiceCtor = vi.hoisted(() =>
+  vi.fn(() => mockSessionServiceInstance),
+);
 
 vi.mock('../utils/stdioHelpers.js', () => ({
   writeStderrLine: mockWriteStderrLine,
@@ -155,6 +164,7 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
     NativeLspService: vi
       .fn()
       .mockImplementation(() => createNativeLspServiceInstance()),
+    SessionService: mockSessionServiceCtor,
     SkillManager: SkillManagerMock,
     IdeClient: {
       getInstance: vi.fn().mockResolvedValue({
@@ -381,9 +391,7 @@ describe('parseArguments', () => {
     await expect(parseArguments()).rejects.toThrow('process.exit called');
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      expect.stringContaining(
-        '--json-schema cannot be used with --input-format stream-json',
-      ),
+      expect.stringContaining('first structured_output call ends the session'),
     );
 
     mockExit.mockRestore();
@@ -428,6 +436,46 @@ describe('parseArguments', () => {
     process.argv = ['node', 'script.js', '-c'];
     const argv = await parseArguments();
     expect(argv.continue).toBe(true);
+  });
+
+  it('should parse --fork-session with --resume', async () => {
+    process.argv = [
+      'node',
+      'script.js',
+      '--resume',
+      '123e4567-e89b-12d3-a456-426614174000',
+      '--fork-session',
+    ];
+    const argv = await parseArguments();
+    expect(argv.resume).toBe('123e4567-e89b-12d3-a456-426614174000');
+    expect(argv.forkSession).toBe(true);
+  });
+
+  it('should parse --fork-session with the --resume picker form', async () => {
+    process.argv = ['node', 'script.js', '--resume', '--fork-session'];
+    const argv = await parseArguments();
+    // Empty string is the existing yargs shape for picker form: --resume
+    // without an explicit session ID.
+    expect(argv.resume).toBe('');
+    expect(argv.forkSession).toBe(true);
+  });
+
+  it('should reject --fork-session without --resume or --continue', async () => {
+    process.argv = ['node', 'script.js', '--fork-session'];
+    const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit called');
+    });
+    mockWriteStderrLine.mockClear();
+
+    await expect(parseArguments()).rejects.toThrow('process.exit called');
+
+    expect(mockWriteStderrLine).toHaveBeenCalledWith(
+      expect.stringContaining(
+        '--fork-session must be used with --resume or --continue',
+      ),
+    );
+
+    mockExit.mockRestore();
   });
 
   it('should convert positional query argument to prompt by default', async () => {
@@ -799,6 +847,14 @@ describe('loadCliConfig', () => {
     nativeLspServiceMock.mockImplementation(
       () => createNativeLspServiceInstance() as unknown as NativeLspService,
     );
+    mockSessionServiceCtor.mockImplementation(() => mockSessionServiceInstance);
+    mockSessionServiceInstance.loadLastSession.mockResolvedValue(undefined);
+    mockSessionServiceInstance.loadSession.mockResolvedValue(undefined);
+    mockSessionServiceInstance.forkSession.mockResolvedValue({
+      filePath: '/mock/fork.jsonl',
+      copiedCount: 1,
+    });
+    mockSessionServiceInstance.sessionExists.mockResolvedValue(false);
     vi.mocked(os.homedir).mockReturnValue('/mock/home/user');
     vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
   });
@@ -865,19 +921,115 @@ describe('loadCliConfig', () => {
     expect(config.getIncludePartialMessages()).toBe(true);
   });
 
+  it('should fork and load a new session when --resume is combined with --fork-session', async () => {
+    const sourceSessionId = '123e4567-e89b-42d3-a456-426614174000';
+    const sourceData = {
+      conversation: { sessionId: sourceSessionId, messages: [] },
+      uiHistory: [],
+    };
+    const forkedData = {
+      conversation: { sessionId: 'forked-session-id', messages: [] },
+      uiHistory: [],
+    };
+    mockSessionServiceInstance.loadSession.mockImplementation(
+      async (sessionId: string) => {
+        if (sessionId === sourceSessionId) return sourceData;
+        return forkedData;
+      },
+    );
+
+    const config = await loadCliConfig({}, {
+      resume: sourceSessionId,
+      forkSession: true,
+    } as CliArgs);
+
+    expect(mockSessionServiceInstance.forkSession).toHaveBeenCalledWith(
+      sourceSessionId,
+      config.getSessionId(),
+    );
+    expect(config.getSessionId()).toBe(
+      mockSessionServiceInstance.forkSession.mock.calls[0]?.[1],
+    );
+    expect(mockSessionServiceInstance.loadSession).toHaveBeenCalledWith(
+      config.getSessionId(),
+    );
+  });
+
+  it('should explain when --fork-session fails to copy the source session', async () => {
+    const sourceSessionId = '123e4567-e89b-42d3-a456-426614174000';
+    const sourceData = {
+      conversation: { sessionId: sourceSessionId, messages: [] },
+      uiHistory: [],
+    };
+    mockSessionServiceInstance.loadSession.mockResolvedValue(sourceData);
+    mockSessionServiceInstance.forkSession.mockRejectedValue(
+      new Error('source session belongs to another project'),
+    );
+    const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit called');
+    });
+
+    await expect(
+      loadCliConfig({}, {
+        resume: sourceSessionId,
+        forkSession: true,
+      } as CliArgs),
+    ).rejects.toThrow('process.exit called');
+
+    expect(mockWriteStderrLine).toHaveBeenCalledWith(
+      `Failed to fork session ${sourceSessionId}: source session belongs to another project`,
+    );
+    expect(mockExit).toHaveBeenCalledWith(1);
+  });
+
+  it('should explain when --continue --fork-session has no saved session to fork', async () => {
+    const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit called');
+    });
+
+    await expect(
+      loadCliConfig({}, {
+        continue: true,
+        forkSession: true,
+      } as CliArgs),
+    ).rejects.toThrow('process.exit called');
+
+    expect(mockWriteStderrLine).toHaveBeenCalledWith(
+      'Cannot use --fork-session with --continue: no saved session found to fork.',
+    );
+    expect(mockExit).toHaveBeenCalledWith(1);
+  });
+
   it('should use internal sandbox session ID without treating it as a new session', async () => {
     const sessionId = '123e4567-e89b-12d3-a456-426614174000';
+    vi.stubEnv('SANDBOX', 'sandbox-exec');
     process.argv = ['node', 'script.js', '--sandbox-session-id', sessionId];
-    const sessionExistsSpy = vi.spyOn(
-      ServerConfig.SessionService.prototype,
-      'sessionExists',
-    );
     const argv = await parseArguments();
     const settings: Settings = {};
     const config = await loadCliConfig(settings, argv);
 
     expect(config.getSessionId()).toBe(sessionId);
-    expect(sessionExistsSpy).not.toHaveBeenCalled();
+    expect(mockSessionServiceInstance.sessionExists).not.toHaveBeenCalled();
+  });
+
+  it('should reject direct use of the internal sandbox session ID flag', async () => {
+    const sessionId = '123e4567-e89b-12d3-a456-426614174000';
+    const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit called');
+    });
+
+    process.argv = ['node', 'script.js', '--sandbox-session-id', sessionId];
+    const argv = await parseArguments();
+
+    await expect(loadCliConfig({}, argv)).rejects.toThrow(
+      'process.exit called',
+    );
+
+    expect(mockWriteStderrLine).toHaveBeenCalledWith(
+      '--sandbox-session-id is for internal sandbox use only.',
+    );
+    expect(mockExit).toHaveBeenCalledWith(1);
+    expect(mockSessionServiceInstance.sessionExists).not.toHaveBeenCalled();
   });
 
   it('should reset context filenames to defaults when context.fileName is not configured', async () => {
@@ -1400,7 +1552,7 @@ describe('mergeExcludeTools', () => {
   });
 
   it('should not auto-disable tool_search for non-deepseek models', async () => {
-    process.argv = ['node', 'script.js', '--model', 'hopcode-max'];
+    process.argv = ['node', 'script.js', '--model', 'qwen-max'];
     const argv = await parseArguments();
     const settings: Settings = {};
     const config = await loadCliConfig(settings, argv, undefined, []);
@@ -1706,7 +1858,7 @@ describe('Approval mode tool exclusion logic', () => {
     await expect(
       loadCliConfig(settings, invalidArgv as CliArgs, undefined, []),
     ).rejects.toThrow(
-      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, izn',
+      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, auto, yolo',
     );
   });
 });
@@ -2230,6 +2382,7 @@ describe('loadCliConfig with includeDirectories', () => {
     expect(config.getCoreTools()).toEqual([
       ToolNames.READ_FILE,
       ToolNames.EDIT,
+      ToolNames.NOTEBOOK_EDIT,
       ToolNames.SHELL,
     ]);
     expect(config.getDisableAllHooks()).toBe(true);
@@ -2248,8 +2401,20 @@ describe('loadCliConfig with includeDirectories', () => {
     expect(config.getCoreTools()).toEqual([
       ToolNames.READ_FILE,
       ToolNames.EDIT,
+      ToolNames.NOTEBOOK_EDIT,
       ToolNames.SHELL,
     ]);
+  });
+
+  it('should preserve plansDirectory in bare mode', async () => {
+    process.argv = ['node', 'script.js', '--bare'];
+    const argv = await parseArguments();
+    const settings: Settings = {
+      plansDirectory: './project-plans',
+    };
+    const config = await loadCliConfig(settings, argv, undefined, []);
+
+    expect(config.getPlansDir()).toContain('project-plans');
   });
 });
 
@@ -2670,7 +2835,7 @@ describe('loadCliConfig approval mode', () => {
       tools: { approvalMode: 'invalid_mode' },
     } as unknown as Settings;
     await expect(loadCliConfig(settings, argv, undefined, [])).rejects.toThrow(
-      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, izn',
+      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, auto, yolo',
     );
   });
 
@@ -3006,8 +3171,8 @@ describe('Telemetry configuration via environment variables', () => {
     expect(config.getTelemetryOutfile()).toBe('/gemini/env/telemetry.log');
   });
 
-  it('should use settings value when HOPCODE_TELEMETRY_ENABLED is not set', async () => {
-    vi.stubEnv('HOPCODE_TELEMETRY_ENABLED', undefined);
+  it('should use settings value when QWEN_TELEMETRY_ENABLED is not set', async () => {
+    vi.stubEnv('QWEN_TELEMETRY_ENABLED', undefined);
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = { telemetry: { enabled: true } };
@@ -3240,5 +3405,43 @@ describe('loadCliConfig runtimeOutputDir', () => {
 
     await loadCliConfig({}, argv);
     expect(Storage.getRuntimeBaseDir()).toBe(Storage.getGlobalHopCodeDir());
+  });
+});
+
+describe('loadCliConfig plansDirectory', () => {
+  const originalArgv = process.argv;
+
+  beforeEach(() => {
+    process.argv = ['node', 'script.js'];
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    vi.restoreAllMocks();
+  });
+
+  it('should resolve relative plansDirectory against cwd', async () => {
+    const argv = await parseArguments();
+    const cwd = path.resolve('workspace', 'my-project');
+    const settings: Settings = {
+      plansDirectory: './project-plans',
+    };
+
+    const config = await loadCliConfig(settings, argv, cwd);
+
+    expect(config.getPlansDir()).toBe(path.join(cwd, 'project-plans'));
+    expect(config.getPlanFilePath()).toContain(path.join(cwd, 'project-plans'));
+  });
+
+  it('should reject plansDirectory values outside cwd', async () => {
+    const argv = await parseArguments();
+    const cwd = path.resolve('workspace', 'my-project');
+    const settings: Settings = {
+      plansDirectory: '../plans',
+    };
+
+    await expect(loadCliConfig(settings, argv, cwd)).rejects.toThrow(
+      'plansDirectory must resolve within the project root',
+    );
   });
 });

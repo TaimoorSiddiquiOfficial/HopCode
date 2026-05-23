@@ -95,6 +95,7 @@ export interface HistoryItemBase {
 export type HistoryItemUser = HistoryItemBase & {
   type: 'user';
   text: string;
+  promptId?: string;
 };
 
 export type HistoryItemGemini = HistoryItemBase & {
@@ -500,21 +501,36 @@ export type HistoryItemDoctor = HistoryItemBase & {
   summary: { pass: number; warn: number; fail: number };
 };
 
-/**
- * Synthetic item prepended to the visible window when older items have been
- * scrolled out of view.  Summarises the hidden portion so the AI and the user
- * are aware that context exists above the current window.
- *
- * IDs for context-note items are always negative to avoid collision with real
- * message IDs (which are always positive).
- */
-export type HistoryItemContextNote = HistoryItemBase & {
-  type: 'history_context_note';
-  /** Always 0 — the context note covers the oldest hidden items. */
-  windowFrom: number;
-  /** Exclusive end index: equals the current window start. */
-  windowTo: number;
-  text: string;
+export type GoalStatusKind =
+  | 'set'
+  | 'achieved'
+  | 'cleared'
+  | 'failed'
+  | 'aborted'
+  | 'checking';
+
+export const TERMINAL_GOAL_STATUS_KINDS = [
+  'achieved',
+  'aborted',
+  'failed',
+] as const satisfies readonly GoalStatusKind[];
+
+export function isTerminalGoalStatusKind(
+  kind: GoalStatusKind,
+): kind is (typeof TERMINAL_GOAL_STATUS_KINDS)[number] {
+  return TERMINAL_GOAL_STATUS_KINDS.includes(
+    kind as (typeof TERMINAL_GOAL_STATUS_KINDS)[number],
+  );
+}
+
+export type HistoryItemGoalStatus = HistoryItemBase & {
+  type: 'goal_status';
+  kind: GoalStatusKind;
+  condition: string;
+  /** Set for progress and terminal goal states. */
+  iterations?: number;
+  durationMs?: number;
+  lastReason?: string;
 };
 
 // Using Omit<HistoryItem, 'id'> seems to have some issues with typescript's
@@ -560,8 +576,8 @@ export type HistoryItemWithoutId =
   | HistoryItemStopHookLoop
   | HistoryItemStopHookSystemMessage
   | HistoryItemDoctor
-  | HistoryItemContextNote
-  | HistoryItemDiffStats;
+  | HistoryItemDiffStats
+  | HistoryItemGoalStatus;
 
 export type HistoryItem = HistoryItemWithoutId & { id: number };
 
@@ -591,6 +607,7 @@ export enum MessageType {
   ARENA_SESSION_COMPLETE = 'arena_session_complete',
   INSIGHT_PROGRESS = 'insight_progress',
   BTW = 'btw',
+  GOAL_STATUS = 'goal_status',
 }
 
 export interface InsightProgressProps {
@@ -606,9 +623,8 @@ export type Message =
   | {
       type:
         | MessageType.INFO
-        | MessageType.ERROR
         | MessageType.WARNING
-        | MessageType.SUCCESS
+        | MessageType.ERROR
         | MessageType.USER;
       content: string; // Renamed from text for clarity in this context
       timestamp: Date;

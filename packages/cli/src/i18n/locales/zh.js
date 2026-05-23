@@ -81,6 +81,7 @@ export default {
   'docs/keyboard-shortcuts.md': 'docs/keyboard-shortcuts.md',
   'for help on HopCode': '获取 HopCode 帮助',
   'show version info': '显示版本信息',
+  'show paths for current session files and logs': '显示当前会话文件和日志路径',
   'submit a bug report': '提交错误报告',
   Status: '状态',
 
@@ -126,6 +127,44 @@ export default {
   'Rename the current conversation. --auto lets the fast model pick a title.':
     '重命名当前对话。--auto 会让快速模型自动生成标题。',
   'Rewind conversation to a previous turn': '将对话回退到之前的某一轮',
+  'Rewind Conversation': '回退对话',
+  'No user turns to rewind to.': '没有可回退的用户对话轮次。',
+  'Rewind to: ': '回退到：',
+  'Restore code and conversation': '恢复代码和对话',
+  'Restore conversation only': '仅恢复对话',
+  'Restore code only': '仅恢复代码',
+  'Never mind': '算了',
+  'Computing file changes...': '正在计算文件变更...',
+  'Restoring...': '正在恢复...',
+  'Restored {{count}} file(s).': '已恢复 {{count}} 个文件。',
+  'Failed to restore files: {{error}}': '恢复文件失败：{{error}}',
+  'Rewind failed: {{error}}': '回退失败：{{error}}',
+  'Cannot rewind conversation: no active model client.':
+    '无法回退对话：模型客户端未激活。',
+  'Code restored, but conversation could not be rewound (no active client).':
+    '代码已恢复，但对话无法回退（模型客户端未激活）。',
+  'Conversation rewound. Edit your prompt and press Enter to continue.':
+    '对话已回退。修改你的提示后按回车继续。',
+  'Rewinding does not affect files edited manually or via shell commands.':
+    '回退不会影响手工编辑或通过 shell 命令修改的文件。',
+  'Cannot rewind to a turn that was compressed. Try a more recent turn.':
+    '无法回退到已被压缩的轮次，请尝试更近一些的轮次。',
+  'File restore is unavailable for this turn (no captured file changes, or this turn predates the current session).':
+    '该轮次无法恢复文件（没有捕获到文件变更，或该轮次属于本次会话之前）。',
+  '(+{{insertions}} -{{deletions}} in {{count}} file)':
+    '(+{{insertions}} -{{deletions}}，{{count}} 个文件)',
+  '(+{{insertions}} -{{deletions}} in {{count}} files)':
+    '(+{{insertions}} -{{deletions}}，{{count}} 个文件)',
+  'Failed to restore {{count}} file(s): {{files}}':
+    '恢复 {{count}} 个文件失败：{{files}}',
+  'Cannot restore files: this turn was created before file checkpointing was enabled.':
+    '无法恢复文件：该轮对话创建时尚未启用文件检查点功能。',
+  'No files needed to be restored.': '没有文件需要恢复。',
+  '↑↓ to navigate · Enter to select · Esc to go back':
+    '↑↓ 导航 · Enter 选择 · Esc 返回',
+  '↑↓ to navigate · Enter to select · Esc to cancel':
+    '↑↓ 导航 · Enter 选择 · Esc 取消',
+  'Enter/Y to confirm · Esc/N to go back': 'Enter/Y 确认 · Esc/N 返回',
   'change the theme': '更改主题',
   'Select Theme': '选择主题',
   Preview: '预览',
@@ -144,7 +183,7 @@ export default {
   'open full HopCode documentation in your browser':
     '在浏览器中打开完整的 HopCode 文档',
   'Configuration not available.': '配置不可用',
-  'Configure authentication information for login': '配置登录认证信息',
+  'Connect an LLM provider': '连接 LLM 提供商',
   'Copy the last result or code snippet to clipboard':
     '将最后的结果或代码片段复制到剪贴板',
   'Show working-tree change stats versus HEAD':
@@ -354,8 +393,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': '查看和编辑 HopCode 设置',
   Settings: '设置',
-  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
-    '要查看更改，必须重启 HopCode。按 r 退出并立即应用更改。',
+  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
+    '要查看更改，必须重启 Qwen Code。按 r 退出并立即应用更改。',
   // ============================================================================
   // Settings Labels
   // ============================================================================
@@ -459,8 +498,8 @@ export default {
   remote: '远程',
   'This extension will add the following commands: {{commands}}.':
     '此扩展将添加以下命令：{{commands}}。',
-  'This extension will append info to your HOPCODE.md context using {{fileName}}':
-    '此扩展将使用 {{fileName}} 向您的 HOPCODE.md 上下文追加信息',
+  'This extension will append info to your QWEN.md context using {{fileName}}':
+    '此扩展将使用 {{fileName}} 向您的 QWEN.md 上下文追加信息',
   'This extension will install the following skills:': '此扩展将安装以下技能：',
   'This extension will install the following subagents:':
     '此扩展将安装以下子智能体：',
@@ -889,7 +928,7 @@ export default {
   servers: '个服务器',
   'Add MCP servers to your settings to get started.':
     '请在设置中添加 MCP servers 以开始使用。',
-  'Run hopcode --debug to see error logs': '运行 hopcode --debug 查看错误日志',
+  'Run qwen --debug to see error logs': '运行 qwen --debug 查看错误日志',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth 认证',
@@ -1067,19 +1106,19 @@ export default {
   '👋 Welcome back! (Last updated: {{timeAgo}})':
     '👋 欢迎回来！（最后更新：{{timeAgo}}）',
   '🎯 Overall Goal:': '🎯 总体目标：',
-  'Select Authentication Method': '选择认证方式',
-  'You must select an auth method to proceed. Press Ctrl+C again to exit.':
-    '您必须选择认证方法才能继续。再次按 Ctrl+C 退出',
+  'Connect a Provider': '连接服务商',
+  'You must connect a provider to proceed. Press Ctrl+C again to exit.':
+    '必须连接一个服务商才能继续。再次按 Ctrl+C 退出',
   'Terms of Services and Privacy Notice': '服务条款和隐私声明',
   'HopCode OAuth': 'HopCode OAuth (免费)',
   'Discontinued — switch to Coding Plan or API Key':
     '已停用 — 请切换到 Coding Plan 或 API Key',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'HopCode OAuth 免费额度已于 2026-04-15 停用。请选择 Coding Plan 或 API Key。',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'HopCode OAuth免费层已于2026-04-15停止服务。请选择其他提供商的模型或运行 /auth 切换。',
-  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ HopCode OAuth 免费额度已于 2026-04-15 停用。请选择其他选项。\n',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'Qwen OAuth 免费额度已于 2026-04-15 停用。请选择 Coding Plan 或 API Key。',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'Qwen OAuth免费层已于2026-04-15停止服务。请选择其他提供商的模型或运行 /auth 切换。',
+  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ Qwen OAuth 免费额度已于 2026-04-15 停用。请选择其他选项。\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     '付费 \u00B7 每 5 小时最多 6,000 次请求 \u00B7 支持阿里云百炼 Coding Plan 全部模型',
   'For teams \u00B7 Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
@@ -1104,17 +1143,16 @@ export default {
     '基于浏览器的第三方提供商认证（例如 OpenRouter、ModelScope）',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     '认证方式被强制设置为 {{enforcedType}}，但您当前使用的是 {{currentType}}',
-  'HopCode OAuth Authentication': 'HopCode OAuth 认证',
+  'Qwen OAuth Authentication': 'Qwen OAuth 认证',
   'Please visit this URL to authorize:': '请访问此 URL 进行授权：',
   'Waiting for authorization': '等待授权中',
   'Time remaining:': '剩余时间：',
-  'HopCode OAuth Authentication Timeout': 'HopCode OAuth 认证超时',
+  'Qwen OAuth Authentication Timeout': 'Qwen OAuth 认证超时',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth 令牌已过期（超过 {{seconds}} 秒）。请重新选择认证方法',
   'Press any key to return to authentication type selection.':
     '按任意键返回认证类型选择',
-  'Waiting for HopCode OAuth authentication...':
-    '正在等待 HopCode OAuth 认证...',
+  'Waiting for Qwen OAuth authentication...': '正在等待 Qwen OAuth 认证...',
   'Authentication timed out. Please try again.': '认证超时。请重试。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待认证...（按 ESC 或 CTRL+C 取消）',
@@ -1134,8 +1172,8 @@ export default {
   'Failed to authenticate. Message: {{message}}': '认证失败。消息：{{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     '使用 {{authType}} 凭据成功认证。',
-  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    '无效的 HOPCODE_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值为：{{validValues}}',
+  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    '无效的 QWEN_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值为：{{validValues}}',
   // ============================================================================
   // Dialogs - Model
   // ============================================================================
@@ -1564,7 +1602,7 @@ export default {
     '↑/↓: 导航 | ←/→: 切换标签页 | Enter: 选择',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: 导航 | Enter: 选择 | Esc: 取消',
-  'Authenticate using HopCode OAuth': '使用 HopCode OAuth 进行认证',
+  'Authenticate using Qwen OAuth': '使用 Qwen OAuth 进行认证',
   'Authenticate using Alibaba Cloud Coding Plan':
     '使用阿里云百炼 Coding Plan 进行认证',
   'Region for Coding Plan (china/global)': 'Coding Plan 区域 (china/global)',
@@ -1591,8 +1629,8 @@ export default {
   '⚠️  No authentication method configured.\n': '⚠️  未配置认证方式。\n',
   'Run one of the following commands to get started:\n':
     '运行以下命令之一开始配置：\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - 使用 HopCode OAuth 登录（已停用）',
+  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
+    '  qwen auth qwen-oauth     - 使用 Qwen OAuth 登录（已停用）',
   'Or simply run:': '或者直接运行：',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - 交互式认证配置\n',
@@ -1600,8 +1638,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  类型：免费额度（2026-04-15 已停用）',
   '  Limit: No longer available': '  限额：已不可用',
-  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'HopCode OAuth 免费额度已于 2026-04-15 停用。请运行 /auth 切换到 Coding Plan、OpenRouter、Fireworks AI 或其他服务商。',
+  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'Qwen OAuth 免费额度已于 2026-04-15 停用。请运行 /auth 切换到 Coding Plan、OpenRouter、Fireworks AI 或其他服务商。',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ 认证方式：阿里云百炼 Coding Plan',
   'Global - Alibaba Cloud': '全球 - Alibaba Cloud',
@@ -1613,8 +1651,8 @@ export default {
     '⚠️  认证方式：阿里云百炼 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  问题：在环境变量或设置中未找到 API Key\n',
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  运行 `hopcode auth coding-plan` 重新配置。\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  运行 `qwen auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 认证方式：{{type}}',
   '  Status: Configured\n': '  状态：已配置\n',
   'Failed to check authentication status: {{error}}':
@@ -1628,6 +1666,8 @@ export default {
     '紧凑模式下隐藏工具输出和思考过程，界面更简洁（Ctrl+O 切换）。',
   'Press Ctrl+O to show full tool output': '按 Ctrl+O 查看详细工具调用结果',
   'Switch to plan mode or exit plan mode': '切换到计划模式或退出计划模式',
+  'Set a goal — keep working until the condition is met':
+    '设定目标 — 持续工作直到条件满足',
   'Exited plan mode. Previous approval mode restored.':
     '已退出计划模式，已恢复之前的审批模式。',
   'Enabled plan mode. The agent will analyze and plan without executing tools.':
@@ -1636,7 +1676,7 @@ export default {
     '已处于计划模式。使用 "/plan exit" 退出计划模式。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     '未处于计划模式。请先使用 "/plan" 进入计划模式。',
-  "Set up HopCode's status line UI": '配置 HopCode 的状态栏',
+  "Set up Qwen Code's status line UI": '配置 Qwen Code 的状态栏',
 
   // === Core: added from PR #3328 ===
   'Ask a quick side question without affecting the main conversation':
@@ -1688,6 +1728,7 @@ export default {
   '[{{label}}] failed: {{error}}': '[{{label}}] 失败：{{error}}',
   'Loading suggestions...': '正在加载建议...',
   'Open the memory manager.': '打开记忆管理器。',
+  'Show current process memory diagnostics': '显示当前进程的内存诊断。',
   'Save a durable memory to the memory system.':
     '将一条持久记忆保存到记忆系统。',
   'Show per-item context usage breakdown.': '显示按项目划分的上下文使用详情。',
@@ -1743,7 +1784,4 @@ export default {
   '中国 (China)': '中国',
   '中国 (China) - 阿里云百炼': '中国 - 阿里云百炼',
   '阿里云百炼 (aliyun.com)': '阿里云百炼（aliyun.com）',
-  'Show LSP server status. Usage: /lsp [status]':
-    '显示 LSP 服务器状态。用法：/lsp [status]',
-  'Show current process memory diagnostics': '显示当前进程内存诊断信息',
 };

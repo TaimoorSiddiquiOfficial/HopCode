@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Integration coverage for the runtime.json sidecar wiring through
@@ -24,17 +24,17 @@ let runtimeDir: string;
 let prevRuntimeEnv: string | undefined;
 
 beforeEach(async () => {
-  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'hopcode-rt-cfg-'));
+  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'qwen-rt-cfg-'));
   runtimeDir = path.join(tmpDir, 'runtime');
-  prevRuntimeEnv = process.env['HOPCODE_RUNTIME_DIR'];
-  process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
+  prevRuntimeEnv = process.env['QWEN_RUNTIME_DIR'];
+  process.env['QWEN_RUNTIME_DIR'] = runtimeDir;
 });
 
 afterEach(async () => {
   if (prevRuntimeEnv === undefined) {
-    delete process.env['HOPCODE_RUNTIME_DIR'];
+    delete process.env['QWEN_RUNTIME_DIR'];
   } else {
-    process.env['HOPCODE_RUNTIME_DIR'] = prevRuntimeEnv;
+    process.env['QWEN_RUNTIME_DIR'] = prevRuntimeEnv;
   }
   await rm(tmpDir, { recursive: true, force: true });
 });

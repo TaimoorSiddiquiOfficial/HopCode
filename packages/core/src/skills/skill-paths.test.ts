@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,14 +21,14 @@ describe('skill project paths', () => {
 
   it('resolves the project skills root', () => {
     expect(getProjectSkillsRoot(projectRoot)).toBe(
-      path.join(projectRoot, '.hopcode', 'skills'),
+      path.join(projectRoot, '.qwen', 'skills'),
     );
   });
 
-  it('allows paths inside project .hopcode/skills', () => {
+  it('allows paths inside project .qwen/skills', () => {
     const skillPath = path.join(
       projectRoot,
-      '.hopcode',
+      '.qwen',
       'skills',
       'my-skill',
       'SKILL.md',
@@ -38,12 +38,7 @@ describe('skill project paths', () => {
   });
 
   it('rejects sibling paths that merely share the prefix', () => {
-    const sibling = path.join(
-      projectRoot,
-      '.hopcode',
-      'skills-evil',
-      'SKILL.md',
-    );
+    const sibling = path.join(projectRoot, '.qwen', 'skills-evil', 'SKILL.md');
     expect(isProjectSkillPath(sibling, projectRoot)).toBe(false);
     expect(() => assertProjectSkillPath(sibling, projectRoot)).toThrow(
       'Skills writes are restricted to',
@@ -64,7 +59,7 @@ describe('assertRealProjectSkillPath – symlink traversal', () => {
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skill-symlink-'));
     projectRoot = path.join(tmpDir, 'project');
-    skillsDir = path.join(projectRoot, '.hopcode', 'skills');
+    skillsDir = path.join(projectRoot, '.qwen', 'skills');
     outsideDir = path.join(tmpDir, 'outside');
     await fs.mkdir(skillsDir, { recursive: true });
     await fs.mkdir(outsideDir, { recursive: true });
@@ -81,33 +76,27 @@ describe('assertRealProjectSkillPath – symlink traversal', () => {
     ).resolves.toBeUndefined();
   });
 
-  const itSkipWin32 = process.platform === 'win32' ? it.skip : it;
+  it('rejects a path whose parent is a symlink pointing outside skills dir', async () => {
+    // Create a symlink: .qwen/skills/escape -> ../../outside
+    const symlinkPath = path.join(skillsDir, 'escape');
+    await fs.symlink(outsideDir, symlinkPath);
 
-  itSkipWin32(
-    'rejects a path whose parent is a symlink pointing outside skills dir',
-    async () => {
-      const symlinkPath = path.join(skillsDir, 'escape');
-      await fs.symlink(outsideDir, symlinkPath);
+    const target = path.join(symlinkPath, 'evil.md');
+    await expect(
+      assertRealProjectSkillPath(target, projectRoot),
+    ).rejects.toThrow('symlink traversal detected');
+  });
 
-      const target = path.join(symlinkPath, 'evil.md');
-      await expect(
-        assertRealProjectSkillPath(target, projectRoot),
-      ).rejects.toThrow('symlink traversal detected');
-    },
-  );
+  it('accepts a path where skills root itself is a symlink to a safe dir', async () => {
+    // skills dir → realSkills (still inside project)
+    const realSkills = path.join(projectRoot, '.qwen', 'real-skills');
+    await fs.mkdir(realSkills, { recursive: true });
+    await fs.rm(skillsDir, { recursive: true });
+    await fs.symlink(realSkills, skillsDir);
 
-  itSkipWin32(
-    'accepts a path where skills root itself is a symlink to a safe dir',
-    async () => {
-      const realSkills = path.join(projectRoot, '.hopcode', 'real-skills');
-      await fs.mkdir(realSkills, { recursive: true });
-      await fs.rm(skillsDir, { recursive: true });
-      await fs.symlink(realSkills, skillsDir);
-
-      const target = path.join(skillsDir, 'my-skill', 'SKILL.md');
-      await expect(
-        assertRealProjectSkillPath(target, projectRoot),
-      ).resolves.toBeUndefined();
-    },
-  );
+    const target = path.join(skillsDir, 'my-skill', 'SKILL.md');
+    await expect(
+      assertRealProjectSkillPath(target, projectRoot),
+    ).resolves.toBeUndefined();
+  });
 });

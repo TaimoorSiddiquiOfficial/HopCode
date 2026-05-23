@@ -244,7 +244,7 @@ export class HistoryVault {
       windowTo: this._windowStart,
       text: summaryText,
       id: nextContextNoteId(),
-    } as HistoryItem;
+    } as unknown as HistoryItem;
   }
 }
 

@@ -9,17 +9,8 @@
     "paths": {
       "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
       "@hoptrendy/hopcode-core/*": ["../core/src/*"],
-      "@hoptrendy/hopcode-server": ["../server/src/index.ts"],
-      "@hoptrendy/hopcode-server/*": ["../server/src/*"],
-      "@hoptrendy/channel-base": ["../channels/base/src/index.ts"],
-      "@hoptrendy/channel-base/*": ["../channels/base/src/*"],
-      "@hoptrendy/channel-telegram": ["../channels/telegram/src/index.ts"],
-      "@hoptrendy/channel-weixin": ["../channels/weixin/src/index.ts"],
-      "@hoptrendy/channel-weixin/*": ["../channels/weixin/src/*"],
-      "@hoptrendy/channel-dingtalk": ["../channels/dingtalk/src/index.ts"],
-      "@hoptrendy/channel-discord": ["../channels/discord/src/index.ts"],
-      "@hoptrendy/web-templates": ["../web-templates/src/index.ts"],
-      "@hoptrendy/web-templates/*": ["../web-templates/src/*"]
+      "@hoptrendy/hopcode-acp-bridge": ["../acp-bridge/src/index.ts"],
+      "@hoptrendy/hopcode-acp-bridge/*": ["../acp-bridge/src/*"]
     }
   },
   "include": [
@@ -44,6 +35,7 @@
     "src/nonInteractiveCli.test.ts",
     "src/services/FileCommandLoader.test.ts",
     "src/services/prompt-processors/argumentProcessor.test.ts",
+    "src/serve/auth.test.ts",
     "src/serve/server.test.ts",
     "src/utils/cleanup.test.ts",
     "src/utils/handleAutoUpdate.test.ts",
@@ -100,7 +92,7 @@
   ],
   "references": [
     { "path": "../core" },
-    { "path": "../server" },
+    { "path": "../acp-bridge" },
     { "path": "../channels/base" },
     { "path": "../channels/telegram" },
     { "path": "../channels/weixin" },

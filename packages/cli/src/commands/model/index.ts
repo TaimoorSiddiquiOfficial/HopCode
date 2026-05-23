@@ -31,7 +31,7 @@ import {
   fetchOpenAICompatibleModels,
   fetchOpenRouterModels,
 } from './discovery.js';
-import { InteractiveSelector } from '../auth/interactiveSelector.js';
+import { InteractiveSelector } from '../../auth/interactiveSelector.js';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { t } from '../../i18n/index.js';
 import type { ModelCategory } from './catalog.js';

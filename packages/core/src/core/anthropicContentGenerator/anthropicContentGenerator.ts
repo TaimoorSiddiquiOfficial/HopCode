@@ -35,6 +35,7 @@ import {
 } from '../../utils/runtimeFetchOptions.js';
 import { DEFAULT_TIMEOUT } from '../openaiContentGenerator/constants.js';
 import { createDebugLogger } from '../../utils/debugLogger.js';
+import { runtimeDiagnostics } from '../../utils/runtimeDiagnostics.js';
 import {
   tokenLimit,
   CAPPED_DEFAULT_MAX_TOKENS,
@@ -113,9 +114,9 @@ function resolveEffectiveBaseUrl(
 /**
  * Whether the resolved baseURL is Anthropic's native API (or the SDK default
  * when no baseURL is set). Used to gate IdeaLab-style proxy workarounds —
- * `Authorization: Bearer` auth and the `hopcode-proxy` User-Agent — so that
+ * `Authorization: Bearer` auth and the `claude-cli` User-Agent — so that
  * users hitting `api.anthropic.com` directly keep the SDK-default
- * `x-api-key` auth and a truthful `HopCode` User-Agent (avoids identity
+ * `x-api-key` auth and a truthful `QwenCode` User-Agent (avoids identity
  * misattribution in Anthropic-side logs/quotas).
  */
 function isAnthropicNativeBaseUrl(
@@ -169,7 +170,7 @@ export class AnthropicContentGenerator implements ContentGenerator {
     private readonly cliConfig: Config,
   ) {
     // One predicate drives the whole IdeaLab-style proxy compatibility
-    // bundle: `Authorization: Bearer` auth, `hopcode-proxy` User-Agent, and
+    // bundle: `Authorization: Bearer` auth, `claude-cli` User-Agent, and
     // `x-app: cli`. Two locally-named booleans for the same thing would
     // obscure that coupling and tempt a future contributor to split one
     // half of the bundle without the other.
@@ -226,6 +227,7 @@ export class AnthropicContentGenerator implements ContentGenerator {
     let response: Message;
     try {
       const anthropicRequest = await this.buildRequest(request);
+      runtimeDiagnostics.recordAnthropicWireRequest(anthropicRequest);
       const headers = this.buildPerRequestHeaders(anthropicRequest);
       response = (await this.client.messages.create(anthropicRequest, {
         signal: request.config?.abortSignal,
@@ -249,6 +251,7 @@ export class AnthropicContentGenerator implements ContentGenerator {
       ...anthropicRequest,
       stream: true,
     };
+    runtimeDiagnostics.recordAnthropicWireRequest(streamingRequest);
 
     let stream: AsyncIterable<RawMessageStreamEvent>;
     try {
@@ -312,15 +315,15 @@ export class AnthropicContentGenerator implements ContentGenerator {
     // mixed-case, one lowercase) when the per-request override fires.
     const version = this.cliConfig.getCliVersion() || 'unknown';
     // For non-Anthropic-native baseURLs (IdeaLab-style proxies), present as
-    // `hopcode-proxy` + `x-app: cli` to satisfy proxy Team rules that restrict
+    // `claude-cli` + `x-app: cli` to satisfy proxy Team rules that restrict
     // usage by client identity. For api.anthropic.com itself we keep the
-    // truthful HopCode User-Agent so usage isn't misattributed to Claude
+    // truthful QwenCode User-Agent so usage isn't misattributed to Claude
     // CLI in Anthropic's logs/quotas, and we don't ship the proxy-specific
     // `x-app` header. Predicate is computed once at construction and shared
     // with the auth-mode decision so the bundle stays internally consistent.
     const userAgent = useProxyIdentity
-      ? `hopcode-proxy/${version} (external, cli)`
-      : `HopCode/${version} (${process.platform}; ${process.arch})`;
+      ? `claude-cli/${version} (external, cli)`
+      : `QwenCode/${version} (${process.platform}; ${process.arch})`;
     const { customHeaders } = this.contentGeneratorConfig;
 
     const headers: Record<string, string> = {
@@ -395,8 +398,8 @@ export class AnthropicContentGenerator implements ContentGenerator {
    * `cache_control` entries this request. Requires both
    * `enableCacheControl !== false` AND an Anthropic-native baseURL.
    * Computed per request: `Config.handleModelChange()` hot-updates
-   * `enableCacheControl` in-place on the hopcode-oauth path (without
-   * recreating the ContentGenerator); non-hopcode-oauth providers refresh
+   * `enableCacheControl` in-place on the qwen-oauth path (without
+   * recreating the ContentGenerator); non-qwen-oauth providers refresh
    * via generator recreation, which captures `baseUrl` fresh at
    * construct time (not mutated). Reading both fields each request is
    * the right defense — cheap and avoids stale-cache surprises if the
@@ -504,9 +507,9 @@ export class AnthropicContentGenerator implements ContentGenerator {
     // Sample the live cache-control flags once per request and forward
     // them to the converter (body-side `cache_control`). The converter's
     // constructor-time value would otherwise diverge from the live value
-    // on the hopcode-oauth path, where `Config.handleModelChange()`
+    // on the qwen-oauth path, where `Config.handleModelChange()`
     // hot-updates `enableCacheControl` in place without recreating the
-    // ContentGenerator. (Non-hopcode-oauth providers refresh via generator
+    // ContentGenerator. (Non-qwen-oauth providers refresh via generator
     // recreation, so `baseUrl` is captured fresh at construct time, not
     // mutated mid-session — defensive per-request reads on both fields
     // cover both paths.) `useGlobalCacheScope` is a strict subset of

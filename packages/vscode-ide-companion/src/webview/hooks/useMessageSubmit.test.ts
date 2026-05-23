@@ -9,7 +9,7 @@
 import { act, createElement, type FormEvent, type RefObject } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ZERO_WIDTH_SPACE, stripZeroWidthSpaces } from '@hopcode/webui';
+import { ZERO_WIDTH_SPACE, stripZeroWidthSpaces } from '@hoptrendy/webui';
 import { shouldSendMessage, useMessageSubmit } from './useMessageSubmit.js';
 
 type UseMessageSubmitProps = Parameters<typeof useMessageSubmit>[0];

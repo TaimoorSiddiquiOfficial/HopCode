@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,8 +15,8 @@ describe('createSlashCommandFromDefinition', () => {
 
   it('marks custom file commands with stable source detail', () => {
     const command = createSlashCommandFromDefinition(
-      '/workspace/.hopcode/commands/review.toml',
-      '/workspace/.hopcode/commands',
+      '/workspace/.qwen/commands/review.toml',
+      '/workspace/.qwen/commands',
       {
         prompt: 'Review the current changes',
       },
@@ -31,8 +31,8 @@ describe('createSlashCommandFromDefinition', () => {
 
   it('marks extension commands with stable source detail', () => {
     const command = createSlashCommandFromDefinition(
-      '/workspace/.hopcode/extensions/demo/commands/review.md',
-      '/workspace/.hopcode/extensions/demo/commands',
+      '/workspace/.qwen/extensions/demo/commands/review.md',
+      '/workspace/.qwen/extensions/demo/commands',
       {
         prompt: 'Review the current changes',
       },

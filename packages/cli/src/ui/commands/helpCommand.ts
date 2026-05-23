@@ -14,7 +14,7 @@ export const helpCommand: SlashCommand = {
   kind: CommandKind.BUILT_IN,
   supportedModes: ['interactive'] as const,
   get description() {
-    return t('for help on HopCode');
+    return t('for help on Qwen Code');
   },
   action: async () => ({
     type: 'dialog',

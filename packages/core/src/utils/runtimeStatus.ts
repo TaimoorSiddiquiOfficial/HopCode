@@ -1,16 +1,16 @@
 /**
  * @license
- * Copyright 2025 HopCode Contributors
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  *
- * Runtime status sidecar for an active interactive HopCode session.
+ * Runtime status sidecar for an active interactive Qwen Code session.
  *
  * This module writes a small JSON file alongside the session's chat log
  * while an interactive session is alive. It exists so that **external**
  * tools (terminal multiplexers, tab managers, IDE integrations,
  * observability daemons) can answer the question:
  *
- *     "Which HopCode session is the running PID X serving?"
+ *     "Which Qwen Code session is the running PID X serving?"
  *
  * The CLI does not embed the session id in `argv` for fresh
  * (non-resumed) sessions, and the OS process title can be truncated, so
@@ -41,7 +41,7 @@ import { atomicWriteJSON } from './atomicFileWrite.js';
 
 export const RUNTIME_STATUS_SCHEMA_VERSION = 1;
 
-/** Snapshot of a live HopCode session process for external observers. */
+/** Snapshot of a live Qwen Code session process for external observers. */
 export interface RuntimeStatus {
   schemaVersion: number;
   pid: number;
@@ -50,7 +50,7 @@ export interface RuntimeStatus {
   hostname: string;
   /** Epoch seconds (with sub-second precision). Matches kimi-cli's format. */
   startedAt: number;
-  hopcodeVersion: string | null;
+  qwenVersion: string | null;
 }
 
 /**
@@ -65,7 +65,7 @@ interface RuntimeStatusOnDisk {
   work_dir: string;
   hostname: string;
   started_at: number;
-  hopcode_version: string | null;
+  qwen_version: string | null;
 }
 
 export interface WriteRuntimeStatusFields {
@@ -74,7 +74,7 @@ export interface WriteRuntimeStatusFields {
   /** Defaults to `process.pid`. */
   pid?: number;
   /** Defaults to `null`. Pass the value of `getCliVersion()`. */
-  hopcodeVersion?: string | null;
+  qwenVersion?: string | null;
 }
 
 /**
@@ -101,7 +101,7 @@ export async function writeRuntimeStatus(
     work_dir: fields.workDir,
     hostname: os.hostname(),
     started_at: Date.now() / 1000,
-    hopcode_version: fields.hopcodeVersion ?? null,
+    qwen_version: fields.qwenVersion ?? null,
   };
 
   await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -118,7 +118,7 @@ export async function writeRuntimeStatus(
  * coerces null/array/object into a string just to satisfy the
  * dataclass.
  *
- * Note: a returned record only proves that *some* HopCode process
+ * Note: a returned record only proves that *some* Qwen Code process
  * once claimed this session. The PID may already be dead (clean quit
  * or crash). Consumers must verify liveness themselves before treating
  * the record as a currently-running session.
@@ -156,7 +156,7 @@ export async function readRuntimeStatus(
   const workDir = obj['work_dir'];
   const hostname = obj['hostname'];
   const startedAt = obj['started_at'];
-  const hopcodeVersion = obj['hopcode_version'];
+  const qwenVersion = obj['qwen_version'];
 
   if (!isFiniteInteger(schemaVersion)) return null;
   if (!isFiniteInteger(pid)) return null;
@@ -166,8 +166,7 @@ export async function readRuntimeStatus(
   if (typeof startedAt !== 'number' || !Number.isFinite(startedAt)) {
     return null;
   }
-  if (hopcodeVersion !== null && typeof hopcodeVersion !== 'string')
-    return null;
+  if (qwenVersion !== null && typeof qwenVersion !== 'string') return null;
 
   return {
     schemaVersion,
@@ -176,14 +175,14 @@ export async function readRuntimeStatus(
     workDir,
     hostname,
     startedAt,
-    hopcodeVersion,
+    qwenVersion,
   };
 }
 
 /**
  * Remove the runtime status file at `filePath`, if present.
  *
- * Intentionally **not** called on `/quit` — when the HopCode process
+ * Intentionally **not** called on `/quit` — when the qwen-code process
  * exits, an external observer's PID-liveness check already detects the
  * missing process, so a stale record is harmless. This helper exists
  * for the narrow case where the **same PID continues running** but

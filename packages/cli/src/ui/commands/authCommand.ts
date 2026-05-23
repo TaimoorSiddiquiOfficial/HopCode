@@ -14,9 +14,9 @@ import { t } from '../../i18n/index.js';
 
 export const authCommand: SlashCommand = {
   name: 'auth',
-  altNames: ['login'],
+  altNames: ['connect', 'login'],
   get description() {
-    return t('Configure authentication information for login');
+    return t('Connect an LLM provider');
   },
   kind: CommandKind.BUILT_IN,
   supportedModes: ['interactive', 'non_interactive', 'acp'],
@@ -30,7 +30,7 @@ export const authCommand: SlashCommand = {
         type: 'message',
         messageType: 'info',
         content: t(
-          'Authentication configuration is only available in interactive mode. To configure authentication, run HopCode interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
+          'Authentication configuration is only available in interactive mode. To configure authentication, run Qwen Code interactively and use /auth, or set environment variables: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL.',
         ),
       };
     }
