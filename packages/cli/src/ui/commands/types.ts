@@ -198,6 +198,7 @@ export interface OpenDialogActionReturn {
     | 'extensions_manage'
     | 'hooks'
     | 'mcp'
+    | 'manage-models'
     | 'rewind'
     | 'diff';
 }
