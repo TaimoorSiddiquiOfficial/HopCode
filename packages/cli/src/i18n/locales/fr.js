@@ -1790,8 +1790,8 @@ export default {
     'Déjà en mode plan. Utilisez "/plan exit" pour quitter le mode plan.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Pas en mode plan. Utilisez "/plan" pour entrer en mode plan d\'abord.',
-  "Set up Qwen Code's status line UI":
-    "Configurer l'interface de la barre de statut de Qwen Code",
+  "Set up HopCode's status line UI":
+    "Configurer l'interface de la barre de statut de HopCode",
   'Press ↑ to edit queued messages':
     'Appuyez sur ↑ pour modifier les messages en file d’attente',
   'Add a QWEN.md file to give Qwen Code persistent project context.':

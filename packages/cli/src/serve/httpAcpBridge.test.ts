@@ -4714,11 +4714,11 @@ describe('createHttpAcpBridge', () => {
       await fsp.rm(tmpWs, { recursive: true, force: true });
     });
 
-    it('creates an empty QWEN.md on a fresh workspace', async () => {
+    it('creates an empty HOPCODE.md on a fresh workspace', async () => {
       const bridge = createHttpAcpBridge({ boundWorkspace: tmpWs });
       const res = await bridge.initWorkspace({}, undefined);
       expect(res.action).toBe('created');
-      expect(res.path).toBe(path.join(tmpWs, 'QWEN.md'));
+      expect(res.path).toBe(path.join(tmpWs, 'HOPCODE.md'));
       const written = await fsp.readFile(res.path, 'utf8');
       expect(written).toBe('');
     });
@@ -4728,7 +4728,7 @@ describe('createHttpAcpBridge', () => {
       // a no-op rather than a silent overwrite. Original whitespace
       // content is preserved; the response surface signals `'noop'`
       // so the SSE event accurately reflects "no on-disk change."
-      const target = path.join(tmpWs, 'QWEN.md');
+      const target = path.join(tmpWs, 'HOPCODE.md');
       const original = '   \n\t\n';
       await fsp.writeFile(target, original, 'utf8');
       const bridge = createHttpAcpBridge({ boundWorkspace: tmpWs });
@@ -4739,7 +4739,7 @@ describe('createHttpAcpBridge', () => {
     });
 
     it('throws WorkspaceInitConflictError when content exists and force is omitted', async () => {
-      const target = path.join(tmpWs, 'QWEN.md');
+      const target = path.join(tmpWs, 'HOPCODE.md');
       const original = '# Project notes\n\nimportant stuff';
       await fsp.writeFile(target, original, 'utf8');
       const bridge = createHttpAcpBridge({ boundWorkspace: tmpWs });
@@ -4754,7 +4754,7 @@ describe('createHttpAcpBridge', () => {
     });
 
     it('overwrites with action:overwrote when force is true', async () => {
-      const target = path.join(tmpWs, 'QWEN.md');
+      const target = path.join(tmpWs, 'HOPCODE.md');
       await fsp.writeFile(target, '# Old', 'utf8');
       const bridge = createHttpAcpBridge({ boundWorkspace: tmpWs });
       const res = await bridge.initWorkspace({ force: true }, undefined);
@@ -6044,7 +6044,7 @@ describe('createHttpAcpBridge', () => {
         type: 'memory_changed',
         data: {
           scope: 'workspace',
-          filePath: '/work/QWEN.md',
+          filePath: '/work/HOPCODE.md',
           mode: 'append',
           bytesWritten: 5,
         },

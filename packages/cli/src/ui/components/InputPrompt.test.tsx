@@ -175,16 +175,6 @@ describe('InputPrompt', () => {
   const mockedUseReverseSearchCompletion = vi.mocked(
     useReverseSearchCompletion,
   );
-  const mockedUseUIState = vi.mocked(useUIState);
-  const mockedUseUIActions = vi.mocked(useUIActions);
-  const mockedUseAgentViewState = vi.mocked(useAgentViewState);
-  const mockedUseAgentViewActions = vi.mocked(useAgentViewActions);
-  const mockedUseBackgroundTaskViewState = vi.mocked(
-    useBackgroundTaskViewState,
-  );
-  const mockedUseBackgroundTaskViewActions = vi.mocked(
-    useBackgroundTaskViewActions,
-  );
 
   beforeEach(() => {
     vi.resetAllMocks();

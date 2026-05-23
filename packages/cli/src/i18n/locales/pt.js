@@ -1752,8 +1752,8 @@ export default {
     'Já está no modo de planejamento. Use "/plan exit" para sair do modo de planejamento.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Não está no modo de planejamento. Use "/plan" para entrar primeiro no modo de planejamento.',
-  "Set up Qwen Code's status line UI":
-    'Configurar a interface da barra de status do Qwen Code',
+  "Set up HopCode's status line UI":
+    'Configurar a interface da barra de status do HopCode',
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Abrir o gerenciador de memória.',

@@ -689,10 +689,14 @@ function findEnvFile(
       const found = findHomeCandidate();
       if (found) return found;
     } else {
-      // Workspace step: prefer .qwen/.env, then plain .env.
-      const geminiEnvPath = path.join(currentDir, QWEN_DIR, '.env');
-      if (fs.existsSync(geminiEnvPath) && canUseEnvFile(geminiEnvPath)) {
-        return geminiEnvPath;
+      // Workspace step: prefer .hopcode/.env, then legacy .qwen/.env, then plain .env.
+      const hopcodeEnvPath = path.join(currentDir, HOPCODE_DIR, '.env');
+      if (fs.existsSync(hopcodeEnvPath) && canUseEnvFile(hopcodeEnvPath)) {
+        return hopcodeEnvPath;
+      }
+      const legacyEnvPath = path.join(currentDir, QWEN_DIR, '.env');
+      if (fs.existsSync(legacyEnvPath) && canUseEnvFile(legacyEnvPath)) {
+        return legacyEnvPath;
       }
       const envPath = path.join(currentDir, '.env');
       if (fs.existsSync(envPath) && canUseEnvFile(envPath)) {
@@ -765,7 +769,9 @@ export function loadEnvironment(settings: Settings): void {
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
       const isQwenScopedEnvFile =
         isHomeScopedEnvFile ||
-        path.basename(path.dirname(normalizedEnvFilePath)) === QWEN_DIR;
+        [QWEN_DIR, HOPCODE_DIR].includes(
+          path.basename(path.dirname(normalizedEnvFilePath)),
+        );
 
       for (const key in parsedEnv) {
         if (Object.hasOwn(parsedEnv, key)) {

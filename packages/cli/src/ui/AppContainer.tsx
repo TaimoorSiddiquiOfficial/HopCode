@@ -630,7 +630,7 @@ export const AppContainer = (props: AppContainerProps) => {
    *    (all servers ready or failed) or `STARTUP_PROFILE_FINALIZE_CAP_MS`
    *    elapses (so a hung server doesn't keep the profile open forever).
    *
-   * In legacy blocking mode (`QWEN_CODE_LEGACY_MCP_BLOCKING=1`) MCP
+   * In legacy blocking mode (`HOPCODE_LEGACY_MCP_BLOCKING=1`) MCP
    * discovery already completed inside `config.initialize()`, so this
    * effect observes `MCPDiscoveryState.COMPLETED` immediately and finalizes
    * without waiting.
@@ -1095,6 +1095,7 @@ export const AppContainer = (props: AppContainerProps) => {
       handleBranch,
       openDeleteDialog,
       openHelpDialog,
+      openManageModelsDialog: () => {},
     }),
     [
       openAuthDialog,

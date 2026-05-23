@@ -93,10 +93,10 @@ export default {
   Proxy: '代理',
   'Memory Usage': '內存使用',
   'IDE Client': 'IDE 客戶端',
-  'Analyzes the project and creates a tailored QWEN.md file.':
-    '分析項目並創建定製的 QWEN.md 檔案',
-  'List available Qwen Code tools. Usage: /tools [desc]':
-    '列出可用的 Qwen Code 工具。用法：/tools [desc]',
+  'Analyzes the project and creates a tailored HOPCODE.md file.':
+    '分析項目並創建定製的 HOPCODE.md 檔案',
+  'List available HopCode tools. Usage: /tools [desc]':
+    '列出可用的 HopCode 工具。用法：/tools [desc]',
   'List available skills.': '列出可用技能。',
   'Available HopCode CLI tools:': '可用的 HopCode CLI 工具：',
   'No tools available': '沒有可用工具',
@@ -595,7 +595,7 @@ export default {
   'Failed to configure {{terminalName}}.': '配置 {{terminalName}} 失敗。',
   'Your terminal is already configured for an optimal experience with multiline input (Shift+Enter and Ctrl+Enter).':
     '您的終端已配置為支持多行輸入（Shift+Enter 和 Ctrl+Enter）的最佳體驗。',
-  'Manage Qwen Code hooks': '管理 Qwen Code Hook',
+  'Manage HopCode hooks': '管理 HopCode Hook',
   'List all configured hooks': '列出所有已配置的 Hook',
   Hooks: 'Hook',
   'Loading hooks...': '正在加載 Hook...',
@@ -864,8 +864,8 @@ export default {
   Reason: '原因',
   'Tools must have both name and description to be used by the LLM.':
     '工具必須同時具有名稱和描述才能被 LLM 使用。',
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    '生成項目摘要並保存到 .qwen/PROJECT_SUMMARY.md',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    '生成項目摘要並保存到 .hopcode/PROJECT_SUMMARY.md',
   'No chat client available to generate summary.':
     '沒有可用的聊天客戶端來生成摘要',
   'Already generating summary, wait for previous request to complete':
@@ -1467,7 +1467,7 @@ export default {
     '已處於計劃模式。使用 "/plan exit" 退出計劃模式。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     '未處於計劃模式。請先使用 "/plan" 進入計劃模式。',
-  "Set up Qwen Code's status line UI": '配置 Qwen Code 的狀態欄',
+  "Set up HopCode's status line UI": '配置 HopCode 的狀態欄',
   'When a new todo item is created': '建立新待辦事項時',
   'When a todo item is marked as completed': '待辦事項標記為完成時',
   'Input to command is JSON with todo_id, todo_content, todo_status, all_todos, and phase. In validation, output JSON with decision (allow/block/deny) and reason. In postWrite, block/deny is ignored.':

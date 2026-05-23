@@ -103,8 +103,8 @@ describe('EventBus', () => {
     const iter = bus.subscribe({ maxQueued: 2, signal: abort.signal });
 
     // Publish 3 events without draining the iterator. Queue cap is 2; the
-    // 3rd should trip the eviction path and append a `client_evicted`
-    // terminal frame.
+    // 3rd should trip the eviction path, emit a `slow_client_warning`, and
+    // append a `client_evicted` terminal frame.
     bus.publish({ type: 'foo', data: 1 });
     bus.publish({ type: 'foo', data: 2 });
     bus.publish({ type: 'foo', data: 3 });
@@ -113,10 +113,20 @@ describe('EventBus', () => {
     for await (const e of iter) {
       collected.push(e);
     }
-    expect(collected).toHaveLength(3);
+    expect(collected).toHaveLength(4);
     expect(collected[0]?.data).toBe(1);
     expect(collected[1]?.data).toBe(2);
-    expect(collected[2]?.type).toBe('client_evicted');
+    expect(collected[2]?.type).toBe('slow_client_warning');
+    expect(collected[2]?.data).toEqual({
+      lastEventId: 2,
+      maxQueued: 2,
+      queueSize: 2,
+    });
+    expect(collected[3]?.type).toBe('client_evicted');
+    expect(collected[3]?.data).toEqual({
+      droppedAfter: 3,
+      reason: 'queue_overflow',
+    });
     expect(bus.subscriberCount).toBe(0);
     abort.abort();
   });

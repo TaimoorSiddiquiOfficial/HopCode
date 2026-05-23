@@ -72,7 +72,7 @@ describe('apiPreconnect', () => {
   describe('shouldSkipPreconnect', () => {
     it('should skip when NODE_EXTRA_CA_CERTS is set', () => {
       process.env['NODE_EXTRA_CA_CERTS'] = '/path/to/ca.pem';
-      preconnectApi('qwen-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });
@@ -160,7 +160,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should fall back to authType default when resolvedBaseUrl is a non-URL sentinel', () => {
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         resolvedBaseUrl: 'DYNAMIC_QWEN_OAUTH_BASE_URL',
         proxy: 'http://proxy.example.com:8080',
       });
@@ -171,7 +171,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should fall back to default URL when resolvedBaseUrl is undefined', () => {
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://proxy.example.com:8080',
       });
       expect(mockFetch).toHaveBeenCalledWith(
@@ -182,8 +182,8 @@ describe('apiPreconnect', () => {
   });
 
   describe('preconnect behavior', () => {
-    it('should use default baseUrl for qwen-oauth', () => {
-      preconnectApi('qwen-oauth', {
+    it('should use default baseUrl for hopcode-oauth', () => {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://proxy.example.com:8080',
       });
       expect(mockFetch).toHaveBeenCalledWith(
@@ -213,7 +213,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should pass shared dispatcher on Node.js runtime', () => {
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://proxy.example.com:8080',
       });
       expect(mockFetch).toHaveBeenCalledWith(
@@ -225,7 +225,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should pass configured proxy to shared dispatcher', () => {
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://proxy.example.com:8080',
       });
       expect(mockGetOrCreateSharedDispatcher).toHaveBeenCalledWith(
@@ -234,7 +234,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should not fire twice', () => {
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://proxy.example.com:8080',
       });
       preconnectApi('openai', { proxy: 'http://proxy.example.com:8080' });
@@ -249,7 +249,7 @@ describe('apiPreconnect', () => {
       expect(mockFetch).not.toHaveBeenCalled();
 
       // Second call: valid authType → should fire
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://proxy.example.com:8080',
       });
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -260,7 +260,7 @@ describe('apiPreconnect', () => {
     });
 
     it('should skip dispatcher creation when no proxy configured', () => {
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).not.toHaveBeenCalled();
       expect(mockGetOrCreateSharedDispatcher).not.toHaveBeenCalled();
       expect(mockDebugLogger.debug).toHaveBeenCalledWith(
@@ -270,11 +270,11 @@ describe('apiPreconnect', () => {
 
     it('should allow a later proxy preconnect after a no-proxy skip', () => {
       // First call: no proxy, no useful undici pool to warm.
-      preconnectApi('qwen-oauth');
+      preconnectApi('hopcode-oauth');
       expect(mockFetch).not.toHaveBeenCalled();
 
       // Second call: proxy is now available, so preconnect should still fire.
-      preconnectApi('qwen-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockGetOrCreateSharedDispatcher).toHaveBeenCalledWith(
         'http://proxy.example.com:8080',
@@ -285,7 +285,7 @@ describe('apiPreconnect', () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
       // Should not throw
       expect(() =>
-        preconnectApi('qwen-oauth', { proxy: 'http://proxy.example.com:8080' }),
+        preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' }),
       ).not.toThrow();
     });
 
@@ -293,7 +293,7 @@ describe('apiPreconnect', () => {
       mockFetch.mockRejectedValue(
         new Error('connect ECONNREFUSED token@proxy.local:8080'),
       );
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://token@proxy.local:8080',
       });
 
@@ -313,7 +313,7 @@ describe('apiPreconnect', () => {
         throw new Error('Failed to create dispatcher');
       });
       expect(() =>
-        preconnectApi('qwen-oauth', { proxy: 'http://proxy.example.com:8080' }),
+        preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' }),
       ).not.toThrow();
     });
 
@@ -322,7 +322,7 @@ describe('apiPreconnect', () => {
         throw new Error('connect ECONNREFUSED user:pass@proxy.local:8080');
       });
 
-      preconnectApi('qwen-oauth', {
+      preconnectApi('hopcode-oauth', {
         proxy: 'http://user:pass@proxy.local:8080',
       });
 
@@ -334,15 +334,15 @@ describe('apiPreconnect', () => {
       );
     });
 
-    it('should skip when QWEN_CODE_DISABLE_PRECONNECT is set', () => {
-      process.env['QWEN_CODE_DISABLE_PRECONNECT'] = '1';
-      preconnectApi('qwen-oauth', { proxy: 'http://proxy.example.com:8080' });
+    it('should skip when HOPCODE_DISABLE_PRECONNECT is set', () => {
+      process.env['HOPCODE_DISABLE_PRECONNECT'] = '1';
+      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it('should skip in sandbox mode', () => {
       process.env['SANDBOX'] = '1';
-      preconnectApi('qwen-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });

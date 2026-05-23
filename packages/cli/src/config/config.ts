@@ -661,7 +661,7 @@ export async function parseArguments(): Promise<CliArgs> {
         })
         .option('approval-mode', {
           type: 'string',
-          choices: ['plan', 'default', 'auto-edit', 'auto', 'yolo'],
+          choices: ['plan', 'default', 'auto-edit', 'auto', 'yolo', 'izn'],
           description:
             'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), yolo (auto-approve all tools)',
         })

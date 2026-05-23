@@ -174,7 +174,7 @@ describe('workspace memory routes', () => {
   });
 
   describe('GET /workspace/memory', () => {
-    it('returns idle status when no QWEN.md or AGENTS.md exists anywhere', async () => {
+    it('returns idle status when no HOPCODE.md or AGENTS.md exists anywhere', async () => {
       const bridge = buildBridgeStub();
       const app = buildApp({ bridge, boundWorkspace: workspace });
       const res = await request(app).get('/workspace/memory');
@@ -190,13 +190,13 @@ describe('workspace memory routes', () => {
       });
     });
 
-    it('reports workspace and global QWEN.md files with byte counts', async () => {
-      const wsFile = path.join(workspace, 'QWEN.md');
+    it('reports workspace and global HOPCODE.md files with byte counts', async () => {
+      const wsFile = path.join(workspace, 'HOPCODE.md');
       const wsContent = 'workspace memory\n';
       await fs.writeFile(wsFile, wsContent, 'utf8');
 
       await fs.mkdir(globalDir, { recursive: true });
-      const globalFile = path.join(globalDir, 'QWEN.md');
+      const globalFile = path.join(globalDir, 'HOPCODE.md');
       const globalContent = 'global memory\n';
       await fs.writeFile(globalFile, globalContent, 'utf8');
 
@@ -219,7 +219,7 @@ describe('workspace memory routes', () => {
   });
 
   describe('POST /workspace/memory', () => {
-    it('appends to workspace QWEN.md and emits memory_changed', async () => {
+    it('appends to workspace HOPCODE.md and emits memory_changed', async () => {
       const bridge = buildBridgeStub();
       const app = buildApp({ bridge, boundWorkspace: workspace });
       const res = await request(app)
@@ -229,10 +229,10 @@ describe('workspace memory routes', () => {
       expect(res.status).toBe(200);
       expect(res.body.ok).toBe(true);
       expect(res.body.mode).toBe('append');
-      expect(res.body.filePath).toBe(path.join(workspace, 'QWEN.md'));
+      expect(res.body.filePath).toBe(path.join(workspace, 'HOPCODE.md'));
 
       const written = await fs.readFile(
-        path.join(workspace, 'QWEN.md'),
+        path.join(workspace, 'HOPCODE.md'),
         'utf8',
       );
       expect(written).toContain('- entry one');
@@ -243,13 +243,13 @@ describe('workspace memory routes', () => {
       const data = events[0]?.data as Record<string, unknown>;
       expect(data['scope']).toBe('workspace');
       expect(data['mode']).toBe('append');
-      expect(data['filePath']).toBe(path.join(workspace, 'QWEN.md'));
+      expect(data['filePath']).toBe(path.join(workspace, 'HOPCODE.md'));
     });
 
-    it('replaces workspace QWEN.md when mode=replace', async () => {
+    it('replaces workspace HOPCODE.md when mode=replace', async () => {
       const bridge = buildBridgeStub();
       const app = buildApp({ bridge, boundWorkspace: workspace });
-      const filePath = path.join(workspace, 'QWEN.md');
+      const filePath = path.join(workspace, 'HOPCODE.md');
       await fs.writeFile(filePath, 'old\n', 'utf8');
 
       const res = await request(app)
@@ -269,9 +269,9 @@ describe('workspace memory routes', () => {
         .send({ scope: 'global', mode: 'append', content: '- global note' });
 
       expect(res.status).toBe(200);
-      expect(res.body.filePath).toBe(path.join(globalDir, 'QWEN.md'));
+      expect(res.body.filePath).toBe(path.join(globalDir, 'HOPCODE.md'));
       const written = await fs.readFile(
-        path.join(globalDir, 'QWEN.md'),
+        path.join(globalDir, 'HOPCODE.md'),
         'utf8',
       );
       expect(written).toContain('- global note');
@@ -355,11 +355,11 @@ describe('workspace memory routes', () => {
       expect(events).toHaveLength(0);
     });
 
-    it('returns 413 memory_file_too_large when existing QWEN.md exceeds the 16 MB cap', async () => {
-      // Write a 17 MB existing QWEN.md, then attempt append. The
+    it('returns 413 memory_file_too_large when existing HOPCODE.md exceeds the 16 MB cap', async () => {
+      // Write a 17 MB existing HOPCODE.md, then attempt append. The
       // helper's pre-read `fs.stat` must refuse with the typed
       // error → the route maps it to 413.
-      const filePath = path.join(workspace, 'QWEN.md');
+      const filePath = path.join(workspace, 'HOPCODE.md');
       // 17 MB of `x` characters. Bypass the helper's mutex / cap by
       // writing directly via fs (simulating an externally-grown file
       // outside the daemon's control).
@@ -399,7 +399,7 @@ describe('workspace memory routes', () => {
       const bridge = buildBridgeStub();
       const app = buildApp({ bridge, boundWorkspace: workspace });
 
-      // Force a 500 by making the workspace QWEN.md unwritable. We
+      // Force a 500 by making the workspace HOPCODE.md unwritable. We
       // chmod the WORKSPACE directory (not the file) so `mkdir` and
       // `writeFile` will fail with EACCES.
       const before = await fs.stat(workspace);

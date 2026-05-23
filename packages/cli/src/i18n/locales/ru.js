@@ -1761,8 +1761,8 @@ export default {
     'Уже в режиме плана. Используйте "/plan exit" для выхода из режима плана.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Не в режиме плана. Сначала используйте "/plan" для входа в режим плана.',
-  "Set up Qwen Code's status line UI":
-    'Настроить интерфейс строки состояния Qwen Code',
+  "Set up HopCode's status line UI":
+    'Настроить интерфейс строки состояния HopCode',
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Открыть менеджер памяти.',

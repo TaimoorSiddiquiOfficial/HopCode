@@ -629,8 +629,8 @@ export default {
   Disconnected: '切断',
   '{{count}} tool': '{{count}} ツール',
   '{{count}} tools': '{{count}} ツール',
-  'Generate a project summary and save it to .qwen/PROJECT_SUMMARY.md':
-    'プロジェクトサマリーを生成し、.qwen/PROJECT_SUMMARY.md に保存',
+  'Generate a project summary and save it to .hopcode/PROJECT_SUMMARY.md':
+    'プロジェクトサマリーを生成し、.hopcode/PROJECT_SUMMARY.md に保存',
   'No chat client available to generate summary.':
     'サマリーを生成するためのチャットクライアントがありません',
   'Already generating summary, wait for previous request to complete':
@@ -1293,7 +1293,7 @@ export default {
     'すでにプランモードです。"/plan exit" でプランモードを終了します。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'プランモードではありません。"/plan" で先にプランモードに入ってください。',
-  "Set up Qwen Code's status line UI": 'Qwen Code のステータスライン UI を設定',
+  "Set up HopCode's status line UI": 'HopCode のステータスライン UI を設定',
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'メモリマネージャーを開く。',

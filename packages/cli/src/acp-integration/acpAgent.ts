@@ -145,7 +145,8 @@ export const AUTH_PREFLIGHT_ENV_KEYS: Readonly<
  * waived rather than a missing entry.
  */
 export const AUTH_PREFLIGHT_WAIVED_AUTH_TYPES: ReadonlySet<string> = new Set([
-  'qwen-oauth',
+  'hopcode-oauth',
+  'qwen_oauth',
 ]);
 
 export async function runAcpAgent(
@@ -1851,7 +1852,7 @@ class HopCodeAgent implements Agent {
     // PR 14b fix #2 (codex review round 1): register the MCP guardrail
     // budget-event callback BEFORE `config.initialize()`. Pre-fix the
     // registration ran AFTER initialize, which (a) missed end-of-pass
-    // events under `QWEN_CODE_LEGACY_MCP_BLOCKING=1` (synchronous
+    // events under `HOPCODE_LEGACY_MCP_BLOCKING=1` (synchronous
     // discovery completes inside initialize, before our setter runs)
     // and (b) raced against background-discovery completion under the
     // default progressive mode. `Config.setMcpBudgetEventCallback`

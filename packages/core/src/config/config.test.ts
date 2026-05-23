@@ -189,9 +189,9 @@ vi.mock('../tools/read-many-files', () => ({
 }));
 vi.mock('../memory/const.js', () => ({
   setGeminiMdFilename: vi.fn(),
-  getCurrentGeminiMdFilename: vi.fn(() => 'QWEN.md'), // Mock the original filename
-  getAllGeminiMdFilenames: vi.fn(() => ['QWEN.md', 'AGENTS.md']),
-  DEFAULT_CONTEXT_FILENAME: 'QWEN.md',
+  getCurrentGeminiMdFilename: vi.fn(() => 'HOPCODE.md'), // Mock the original filename
+  getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
+  DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
 }));
 vi.mock('../tools/memory-config', () => ({
   setGeminiMdFilename: vi.fn(),

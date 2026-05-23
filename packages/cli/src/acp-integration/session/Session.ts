@@ -1567,6 +1567,7 @@ export class Session implements SessionContext {
       'auto-edit': ApprovalMode.AUTO_EDIT,
       auto: ApprovalMode.AUTO,
       yolo: ApprovalMode.YOLO,
+      izn: ApprovalMode.IZN,
     };
 
     const approvalMode = modeMap[params.modeId as ApprovalModeValue];

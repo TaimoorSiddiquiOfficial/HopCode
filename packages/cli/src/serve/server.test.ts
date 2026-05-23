@@ -479,7 +479,7 @@ function fakeBridge(opts: FakeBridgeOpts = {}): FakeBridge {
   const initWorkspaceImpl =
     opts.initWorkspaceImpl ??
     (async () => ({
-      path: path.resolve(WS_BOUND, 'QWEN.md'),
+      path: path.resolve(WS_BOUND, 'HOPCODE.md'),
       action: 'created' as const,
     }));
   const restartMcpServerCalls: FakeBridge['restartMcpServerCalls'] = [];
@@ -2290,6 +2290,7 @@ describe('createServeApp', () => {
         'auto-edit',
         'auto',
         'yolo',
+        'izn',
       ]);
       const unknown = await auth(
         request(app).post('/session/session-A/approval-mode'),
@@ -2368,7 +2369,7 @@ describe('createServeApp', () => {
       const res = await auth(request(app).post('/workspace/init')).send({});
       expect(res.status).toBe(200);
       expect(res.body.action).toBe('created');
-      expect(res.body.path).toContain('QWEN.md');
+      expect(res.body.path).toContain('HOPCODE.md');
       expect(bridge.initWorkspaceCalls[0]).toMatchObject({
         initOpts: { force: false },
       });
@@ -2377,7 +2378,7 @@ describe('createServeApp', () => {
     it('forwards force:true to the bridge', async () => {
       const bridge = fakeBridge({
         initWorkspaceImpl: async () => ({
-          path: path.resolve(WS_BOUND, 'QWEN.md'),
+          path: path.resolve(WS_BOUND, 'HOPCODE.md'),
           action: 'overwrote' as const,
         }),
       });
@@ -2434,7 +2435,7 @@ describe('createServeApp', () => {
     it('409 with structured payload when bridge throws WorkspaceInitConflictError', async () => {
       const bridge = fakeBridge({
         initWorkspaceImpl: async () => {
-          throw new WorkspaceInitConflictError('/work/bound/QWEN.md', 1234);
+          throw new WorkspaceInitConflictError('/work/bound/HOPCODE.md', 1234);
         },
       });
       const app = createServeApp(tokenOpts, undefined, { bridge });
@@ -2442,7 +2443,7 @@ describe('createServeApp', () => {
       expect(res.status).toBe(409);
       expect(res.body).toMatchObject({
         code: 'workspace_init_conflict',
-        path: '/work/bound/QWEN.md',
+        path: '/work/bound/HOPCODE.md',
         existingSize: 1234,
       });
     });

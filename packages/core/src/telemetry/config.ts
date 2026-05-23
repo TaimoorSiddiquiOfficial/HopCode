@@ -125,7 +125,10 @@ export async function resolveTelemetrySettings(options: {
     false;
 
   const outfile =
-    argv.telemetryOutfile ?? env['QWEN_TELEMETRY_OUTFILE'] ?? settings.outfile;
+    argv.telemetryOutfile ??
+    env['HOPCODE_TELEMETRY_OUTFILE'] ??
+    env['QWEN_TELEMETRY_OUTFILE'] ??
+    settings.outfile;
 
   // Per-signal endpoint overrides (HTTP only).
   // Priority: HOPCODE_ env var > standard OTEL_ env var > settings.json

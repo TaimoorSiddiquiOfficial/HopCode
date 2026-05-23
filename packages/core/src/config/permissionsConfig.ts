@@ -9,6 +9,7 @@ import { ToolNames } from '../tools/tool-names.js';
 const DEFAULT_BARE_CORE_TOOLS = [
   ToolNames.READ_FILE,
   ToolNames.EDIT,
+  ToolNames.NOTEBOOK_EDIT,
   ToolNames.SHELL,
 ];
 

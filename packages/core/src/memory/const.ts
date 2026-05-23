@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const DEFAULT_CONTEXT_FILENAME = 'QWEN.md';
+export const DEFAULT_CONTEXT_FILENAME = 'HOPCODE.md';
 export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
 export const MEMORY_SECTION_HEADER = '## HopCode Added Memories';
 

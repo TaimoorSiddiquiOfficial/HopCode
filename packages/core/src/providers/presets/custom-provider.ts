@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { AuthType } from '../../core/contentGenerator.js';
 import type { ProviderConfig } from '../types.js';
 
-export const CUSTOM_API_KEY_ENV_PREFIX = 'QWEN_CUSTOM_API_KEY_';
+export const CUSTOM_API_KEY_ENV_PREFIX = 'HOPCODE_CUSTOM_API_KEY_';
 
 /**
  * Derive the env-var key that holds the API token for a custom provider.

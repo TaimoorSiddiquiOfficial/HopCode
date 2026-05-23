@@ -101,7 +101,7 @@ export const ToolListStep: React.FC<ToolListStepProps> = ({
                 <Text
                   color={isSelected ? theme.text.accent : theme.text.primary}
                 >
-                  {isSelected ? '?' : ' '}
+                  {isSelected ? '❯' : ' '}
                 </Text>
               </Box>
               {/* ???? - ???? */}
@@ -133,12 +133,12 @@ export const ToolListStep: React.FC<ToolListStepProps> = ({
       {tools.length > VISIBLE_TOOLS_COUNT && (
         <Box marginTop={1}>
           <Text color={theme.text.secondary}>
-            {scrollOffset > 0 ? '? ' : '  '}
+            {scrollOffset > 0 ? '↑ ' : '  '}
             {t('{{current}}/{{total}}', {
               current: (selectedIndex + 1).toString(),
               total: tools.length.toString(),
             })}
-            {scrollOffset + VISIBLE_TOOLS_COUNT < tools.length ? ' ?' : ''}
+            {scrollOffset + VISIBLE_TOOLS_COUNT < tools.length ? ' ↓' : ''}
           </Text>
         </Box>
       )}

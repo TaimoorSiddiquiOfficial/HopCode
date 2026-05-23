@@ -59,7 +59,7 @@ import {
   resetHomeEnvBootstrapForTesting,
 } from './settings.js';
 import { needsMigration } from './migration/index.js';
-import { HOPCODE_DIR } from '@hoptrendy/hopcode-core';
+import { HOPCODE_DIR, QWEN_DIR } from '@hoptrendy/hopcode-core';
 
 const mockDebugLogger = vi.hoisted(() => ({
   debug: vi.fn(),
@@ -80,28 +80,6 @@ vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
 // Resolve the (mocked) user-settings path once at module load. Tests mock
 // `os.homedir`, so the value is stable across the suite. Production callers
 // must keep going through `getUserSettingsPath()` to pick up `HOPCODE_HOME`
-// resolved from `~/.env` after module load.
-const USER_SETTINGS_PATH = getUserSettingsPath();
-
-const mockDebugLogger = vi.hoisted(() => ({
-  debug: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-  info: vi.fn(),
-}));
-
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
-  return {
-    ...actual,
-    createDebugLogger: () => mockDebugLogger,
-  };
-});
-
-// Resolve the (mocked) user-settings path once at module load. Tests mock
-// `os.homedir`, so the value is stable across the suite. Production callers
-// must keep going through `getUserSettingsPath()` to pick up `QWEN_HOME`
 // resolved from `~/.env` after module load.
 const USER_SETTINGS_PATH = getUserSettingsPath();
 

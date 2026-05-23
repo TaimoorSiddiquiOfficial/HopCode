@@ -1755,7 +1755,7 @@ export default {
     'Bereits im Plan-Modus. Verwenden Sie "/plan exit", um den Plan-Modus zu verlassen.',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     'Nicht im Plan-Modus. Verwenden Sie "/plan", um zuerst in den Plan-Modus zu gelangen.',
-  "Set up Qwen Code's status line UI": 'Qwen Codes Statusleisten-UI einrichten',
+  "Set up HopCode's status line UI": 'HopCodes Statusleisten-UI einrichten',
 
   // === Core: added from PR #3328 ===
   'Open the memory manager.': 'Den Speicher-Manager öffnen.',

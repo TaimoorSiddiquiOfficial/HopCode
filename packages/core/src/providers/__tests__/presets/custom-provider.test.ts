@@ -110,7 +110,7 @@ describe('customProvider', () => {
     ]);
   });
 
-  it('owns any model whose envKey starts with the QWEN_CUSTOM_API_KEY_ prefix', () => {
+  it('owns any model whose envKey starts with the HOPCODE_CUSTOM_API_KEY_ prefix', () => {
     // Without ownsModel, applyModelProvidersPatch falls back to id+baseUrl
     // identity matching, so reinstalling a custom provider under a different
     // baseUrl would leave the old entries behind. Prefix-match cleanly

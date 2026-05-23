@@ -156,7 +156,7 @@ describe('modelCommand', () => {
     const switchModel = vi.fn().mockResolvedValue(undefined);
     mockContext = createMockCommandContext({
       invocation: {
-        raw: '/model qwen-max',
+        raw: '/model hopcode-max',
         name: 'model',
         args: 'hopcode-max',
       },
@@ -190,7 +190,7 @@ describe('modelCommand', () => {
     expect(result).toEqual({
       type: 'message',
       messageType: 'info',
-      content: 'Model: qwen-max',
+      content: 'Model: hopcode-max',
     });
   });
 

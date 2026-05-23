@@ -120,7 +120,7 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
                         isSelected ? theme.text.accent : theme.text.primary
                       }
                     >
-                      {isSelected ? '?' : ' '}
+                      {isSelected ? '❯' : ' '}
                     </Text>
                   </Box>
                   {/* ????? - ???? */}
@@ -134,7 +134,7 @@ export const ServerListStep: React.FC<ServerListStepProps> = ({
                       {server.name}
                     </Text>
                   </Box>
-                  <Text color={theme.text.secondary}> � </Text>
+                  <Text color={theme.text.secondary}> · </Text>
                   {/* ??????? */}
                   <Text
                     color={

@@ -111,6 +111,7 @@ export interface SlashCommandProcessorActions {
   openRewindSelector: () => void;
   openDiffDialog: () => void;
   openHelpDialog: () => void;
+  openManageModelsDialog: () => void;
 }
 
 /**
@@ -765,6 +766,9 @@ export const useSlashCommandProcessor = (
                       return { type: 'handled' };
                     case 'help':
                       actions.openHelpDialog();
+                      return { type: 'handled' };
+                    case 'manage-models':
+                      actions.openManageModelsDialog();
                       return { type: 'handled' };
                     default: {
                       const unhandled: never = result.dialog;

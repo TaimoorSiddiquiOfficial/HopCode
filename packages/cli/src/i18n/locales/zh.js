@@ -1676,7 +1676,7 @@ export default {
     '已处于计划模式。使用 "/plan exit" 退出计划模式。',
   'Not in plan mode. Use "/plan" to enter plan mode first.':
     '未处于计划模式。请先使用 "/plan" 进入计划模式。',
-  "Set up Qwen Code's status line UI": '配置 Qwen Code 的状态栏',
+  "Set up HopCode's status line UI": '配置 HopCode 的状态栏',
 
   // === Core: added from PR #3328 ===
   'Ask a quick side question without affecting the main conversation':

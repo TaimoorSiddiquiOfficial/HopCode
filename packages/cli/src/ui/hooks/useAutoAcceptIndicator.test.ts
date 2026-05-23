@@ -211,6 +211,17 @@ describe('useAutoAcceptIndicator', () => {
     expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
       ApprovalMode.YOLO,
     );
+    expect(result.current).toBe(ApprovalMode.YOLO);
+
+    act(() => {
+      capturedUseKeypressHandler({
+        name: 'tab',
+        shift: true,
+      } as Key);
+    });
+    expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
+      ApprovalMode.IZN,
+    );
     expect(result.current).toBe(ApprovalMode.IZN);
 
     act(() => {

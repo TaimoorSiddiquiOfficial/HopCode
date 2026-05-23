@@ -200,7 +200,7 @@ describe('BundledSkillLoader', () => {
       content: [
         {
           text: makeSkillPrompt(
-            'YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder via Qwen Code',
+            'YOUR_MODEL_ID="qwen3-coder"\n\nReview by qwen3-coder via HopCode',
           ),
         },
       ],

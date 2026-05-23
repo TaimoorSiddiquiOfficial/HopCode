@@ -760,7 +760,7 @@ export class Config {
    * `startMcpDiscoveryInBackground` (or legacy blocking discovery)
    * fires the first pass. Pre-fix the acpAgent registered after
    * `initialize()` returned, missing the first pass entirely under
-   * `QWEN_CODE_LEGACY_MCP_BLOCKING=1` and racing against background
+   * `HOPCODE_LEGACY_MCP_BLOCKING=1` and racing against background
    * discovery completion under the default mode.
    */
   private pendingMcpBudgetCallback?: (event: McpBudgetEvent) => void;
@@ -1366,10 +1366,10 @@ export class Config {
     // after the registry exists. This lets `Config.initialize()` (and the
     // cli's `input_enabled` checkpoint) resolve without waiting on MCP
     // server response time. Users can opt back into the legacy synchronous
-    // behavior with `QWEN_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
+    // behavior with `HOPCODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
     // an escape hatch.
     const legacyBlockingMcp =
-      process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'] === '1';
+      process.env['HOPCODE_LEGACY_MCP_BLOCKING'] === '1';
     const skipInlineMcpDiscovery = this.getBareMode() || !legacyBlockingMcp;
 
     this.toolRegistry = await this.createToolRegistry(
@@ -1566,7 +1566,7 @@ export class Config {
    *
    * Resolves immediately when:
    * - bare mode is on (no MCP discovery is started),
-   * - `QWEN_CODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
+   * - `HOPCODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
    *   synchronously inside {@link initialize}), or
    * - no MCP servers are configured.
    */
@@ -3873,7 +3873,7 @@ export function createConfigOverride<T extends Config>(
 ): T {
   const override = Object.create(base) as T;
   for (const [key, getter] of Object.entries(overrides)) {
-    (override as Record<string, unknown>)[key] = getter();
+    (override as Record<string, unknown>)[key] = getter;
   }
   return override;
 }
