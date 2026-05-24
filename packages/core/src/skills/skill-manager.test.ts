@@ -746,7 +746,7 @@ Skill 3 content`);
       );
       const projectQwenSkillsDir = path.join(
         '/test/project',
-        '.qwen',
+        '.hopcode',
         'skills',
       );
       vi.mocked(fs.readdir).mockImplementation((dirPath) => {

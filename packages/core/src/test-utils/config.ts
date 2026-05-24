@@ -15,8 +15,8 @@ export const DEFAULT_CONFIG_PARAMETERS: ConfigParameters = {
   debugMode: false,
   proxy: undefined,
   model: 'hopcode-9001-super-duper',
-  targetDir: '/',
-  cwd: '/',
+  targetDir: process.cwd(),
+  cwd: process.cwd(),
 };
 
 /**
