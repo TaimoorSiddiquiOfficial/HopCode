@@ -6,7 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { homedir, platform } from 'node:os';
+import * as os from 'node:os';
 import * as dotenv from 'dotenv';
 import process from 'node:process';
 import {
@@ -157,9 +157,9 @@ export function getSystemSettingsPath(): string {
   if (process.env['HOPCODE_SYSTEM_SETTINGS_PATH']) {
     return process.env['HOPCODE_SYSTEM_SETTINGS_PATH'];
   }
-  if (platform() === 'darwin') {
+  if (os.platform() === 'darwin') {
     return '/Library/Application Support/HopCode/settings.json';
-  } else if (platform() === 'win32') {
+  } else if (os.platform() === 'win32') {
     return 'C:\\ProgramData\\hopcode\\settings.json';
   } else {
     return '/etc/hopcode/settings.json';
@@ -512,7 +512,7 @@ export function createMinimalSettings(): LoadedSettings {
  * still allows reading it).
  */
 function getUserLevelEnvPaths(): Set<string> {
-  const homeDir = homedir();
+  const homeDir = os.homedir();
   const globalQwenDir = Storage.getGlobalQwenDir();
   const paths = new Set([
     path.normalize(path.join(homeDir, '.env')),
@@ -551,11 +551,13 @@ export function preResolveHomeEnvOverrides(): void {
 
   // Storage.getGlobalQwenDir() shares the same homedir resolution as the
   // rest of the storage layer; when QWEN_HOME is unset it equals
-  // `<homedir>/.qwen`, so path.dirname() recovers `<homedir>`.
+  // `<homedir>/.hopcode`, so path.dirname() recovers `<homedir>`.
   const initialQwenHome = process.env['QWEN_HOME'];
   const initialQwenDir = Storage.getGlobalQwenDir();
   const candidates: string[] = [path.join(initialQwenDir, '.env')];
   if (!initialQwenHome) {
+    // Also check legacy ~/.qwen/.env for users migrating from the old directory name
+    candidates.push(path.join(path.dirname(initialQwenDir), QWEN_DIR, '.env'));
     candidates.push(path.join(path.dirname(initialQwenDir), '.env'));
   }
 
@@ -627,13 +629,27 @@ function detectQwenHomeRedirectWithoutMigration(
   if (fs.existsSync(activeUserSettingsPath)) {
     return null;
   }
+
+  // After rebranding the default directory changed from ~/.qwen to ~/.hopcode.
+  // For migration warnings we also need to check the pre-rebrand legacy path.
+  const trueLegacyQwenDir = path.join(os.homedir(), QWEN_DIR);
   const legacyUserSettings = path.join(legacyQwenDir, 'settings.json');
-  if (!fs.existsSync(legacyUserSettings)) {
+  const trueLegacyUserSettings = path.join(trueLegacyQwenDir, 'settings.json');
+  if (
+    !fs.existsSync(legacyUserSettings) &&
+    !fs.existsSync(trueLegacyUserSettings)
+  ) {
     return null;
   }
+
+  // Prefer the pre-rebrand legacy path in the warning message when it still
+  // has settings, otherwise fall back to the current default path.
+  const warningLegacyDir = fs.existsSync(trueLegacyUserSettings)
+    ? trueLegacyQwenDir
+    : legacyQwenDir;
   return (
     `QWEN_HOME points to "${activeQwenDir}" but no settings.json was found there. ` +
-    `Existing config remains at "${legacyQwenDir}" — OAuth tokens, settings, memory, ` +
+    `Existing config remains at "${warningLegacyDir}" — OAuth tokens, settings, memory, ` +
     `extensions, and skills are not auto-migrated. Copy them manually if you want them ` +
     `to apply at the new location.`
   );
@@ -652,7 +668,7 @@ function findEnvFile(
   startDir: string,
   userLevelPaths: Set<string> = getUserLevelEnvPaths(),
 ): string | null {
-  const homeDir = homedir();
+  const homeDir = os.homedir();
   const isTrusted = isWorkspaceTrusted(settings).isTrusted;
 
   const globalQwenDir = Storage.getGlobalQwenDir();
@@ -837,7 +853,7 @@ export function loadSettings(
 
   // Resolve paths to their canonical representation to handle symlinks
   const resolvedWorkspaceDir = path.resolve(workspaceDir);
-  const resolvedHomeDir = path.resolve(homedir());
+  const resolvedHomeDir = path.resolve(os.homedir());
 
   let realWorkspaceDir = resolvedWorkspaceDir;
   try {

@@ -6,10 +6,10 @@
 
 /// <reference types="vitest/globals" />
 
-// Mock 'os' first.
+// Mock 'node:os' first.
 import * as osActual from 'node:os'; // Import for type info for the mock factory
 
-vi.mock('os', async (importOriginal) => {
+vi.mock('node:os', async (importOriginal) => {
   const actualOs = await importOriginal<typeof osActual>();
   return {
     ...actualOs,

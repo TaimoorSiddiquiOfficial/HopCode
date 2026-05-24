@@ -25,9 +25,9 @@ import { isWindows } from './utils/platform.js';
 // into the active extension flow yet.
 export { createSdkDaemonSessionFactory as __daemonIdeSessionFactoryForBundle } from './services/daemonIdeConnection.js';
 
-const CLI_IDE_COMPANION_IDENTIFIER = 'qwenlm.qwen-code-vscode-ide-companion';
-const INFO_MESSAGE_SHOWN_KEY = 'qwenCodeInfoMessageShown';
-export const DIFF_SCHEME = 'qwen-diff';
+const CLI_IDE_COMPANION_IDENTIFIER = 'hoptrendy.hoptrendy-vscode-ide-companion';
+const INFO_MESSAGE_SHOWN_KEY = 'hopcodeInfoMessageShown';
+export const DIFF_SCHEME = 'hopcode-diff';
 
 /**
  * IDE environments where the installation greeting is hidden.  In these

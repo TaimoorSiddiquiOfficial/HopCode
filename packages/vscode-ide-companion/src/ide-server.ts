@@ -28,7 +28,7 @@ import type { z } from 'zod';
 import type { DiffManager } from './diff-manager.js';
 import { OpenFilesManager } from './open-files-manager.js';
 import { ACP_ERROR_CODES } from './constants/acpSchema.js';
-import { getGlobalQwenDir } from './utils/paths.js';
+import { getGlobalHopcodeDir } from './utils/paths.js';
 
 class CORSError extends Error {
   constructor(message: string) {
@@ -38,16 +38,16 @@ class CORSError extends Error {
 }
 
 const MCP_SESSION_ID_HEADER = 'mcp-session-id';
-const IDE_SERVER_PORT_ENV_VAR = 'QWEN_CODE_IDE_SERVER_PORT';
-const IDE_WORKSPACE_PATH_ENV_VAR = 'QWEN_CODE_IDE_WORKSPACE_PATH';
+const IDE_SERVER_PORT_ENV_VAR = 'HOPCODE_IDE_SERVER_PORT';
+const IDE_WORKSPACE_PATH_ENV_VAR = 'HOPCODE_IDE_WORKSPACE_PATH';
 const IDE_DIR = 'ide';
 
 async function getGlobalIdeDir(): Promise<string> {
-  // Anchored to the global Qwen dir (not the runtime base dir) so the CLI's
+  // Anchored to the global HopCode dir (not the runtime base dir) so the CLI's
   // discovery path matches: the CLI can resolve runtime dirs from settings,
   // but this extension only sees env vars, so settings-based overrides would
   // silently desync the lock-file location.
-  const ideDir = path.join(getGlobalQwenDir(), IDE_DIR);
+  const ideDir = path.join(getGlobalHopcodeDir(), IDE_DIR);
   await fs.mkdir(ideDir, { recursive: true });
   return ideDir;
 }

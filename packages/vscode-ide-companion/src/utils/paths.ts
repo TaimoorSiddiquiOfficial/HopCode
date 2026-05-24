@@ -38,7 +38,7 @@ function resolvePath(dir: string): string {
 let envBootstrapped = false;
 
 /**
- * Pre-resolves QWEN_HOME / QWEN_RUNTIME_DIR from `<homedir>/.qwen/.env` and
+ * Pre-resolves HOPCODE_HOME / HOPCODE_RUNTIME_DIR from `<homedir>/.hopcode/.env` and
  * `<homedir>/.env`. Mirrors the CLI's `preResolveHomeEnvOverrides` so the
  * companion's lock-file location agrees with the CLI even when these vars
  * are only configured via `.env`. Idempotent.
@@ -49,7 +49,7 @@ function bootstrapHomeEnvOverrides(): void {
   }
   envBootstrapped = true;
 
-  if (process.env['QWEN_HOME'] && process.env['QWEN_RUNTIME_DIR']) {
+  if (process.env['HOPCODE_HOME'] && process.env['HOPCODE_RUNTIME_DIR']) {
     return;
   }
 
@@ -58,12 +58,12 @@ function bootstrapHomeEnvOverrides(): void {
     return;
   }
 
-  const initialQwenHome = process.env['QWEN_HOME'];
-  const currentQwenDir = initialQwenHome
-    ? resolvePath(initialQwenHome)
-    : path.join(homeDir, '.qwen');
+  const initialHopcodeHome = process.env['HOPCODE_HOME'];
+  const currentHopcodeDir = initialHopcodeHome
+    ? resolvePath(initialHopcodeHome)
+    : path.join(homeDir, '.hopcode');
 
-  const KEYS = ['QWEN_HOME', 'QWEN_RUNTIME_DIR'] as const;
+  const KEYS = ['HOPCODE_HOME', 'HOPCODE_RUNTIME_DIR'] as const;
   const readInto = (file: string) => {
     try {
       const parsed = dotenv.parse(fs.readFileSync(file, 'utf-8'));
@@ -77,18 +77,18 @@ function bootstrapHomeEnvOverrides(): void {
     }
   };
 
-  readInto(path.join(currentQwenDir, '.env'));
-  if (!initialQwenHome) {
+  readInto(path.join(currentHopcodeDir, '.env'));
+  if (!initialHopcodeHome) {
     readInto(path.join(homeDir, '.env'));
   }
 
-  // If QWEN_HOME was just discovered, also read <new QWEN_HOME>/.env so
-  // QWEN_RUNTIME_DIR can be sourced from there — otherwise the companion
+  // If HOPCODE_HOME was just discovered, also read <new HOPCODE_HOME>/.env so
+  // HOPCODE_RUNTIME_DIR can be sourced from there — otherwise the companion
   // would write lock files into a different runtime dir than the CLI reads.
-  const discoveredQwenHome = process.env['QWEN_HOME'];
-  if (discoveredQwenHome && discoveredQwenHome !== initialQwenHome) {
-    const discoveredDir = resolvePath(discoveredQwenHome);
-    if (discoveredDir !== currentQwenDir) {
+  const discoveredHopcodeHome = process.env['HOPCODE_HOME'];
+  if (discoveredHopcodeHome && discoveredHopcodeHome !== initialHopcodeHome) {
+    const discoveredDir = resolvePath(discoveredHopcodeHome);
+    if (discoveredDir !== currentHopcodeDir) {
       readInto(path.join(discoveredDir, '.env'));
     }
   }
@@ -100,36 +100,36 @@ export function resetEnvBootstrapForTesting(): void {
 }
 
 /**
- * Returns the global Qwen home directory (config, credentials, etc.).
+ * Returns the global HopCode home directory (config, credentials, etc.).
  *
- * Priority: QWEN_HOME env var > ~/.qwen
+ * Priority: HOPCODE_HOME env var > ~/.hopcode
  */
-export function getGlobalQwenDir(): string {
+export function getGlobalHopcodeDir(): string {
   bootstrapHomeEnvOverrides();
-  const envDir = process.env['QWEN_HOME'];
+  const envDir = process.env['HOPCODE_HOME'];
   if (envDir) {
     return resolvePath(envDir);
   }
   const homeDir = os.homedir();
   return homeDir
-    ? path.join(homeDir, '.qwen')
-    : path.join(os.tmpdir(), '.qwen');
+    ? path.join(homeDir, '.hopcode')
+    : path.join(os.tmpdir(), '.hopcode');
 }
 
 /**
  * Returns the runtime base directory for ephemeral data (tmp, debug, IDE
  * lock files, sessions, etc.).
  *
- * Priority: QWEN_RUNTIME_DIR env var > QWEN_HOME env var > ~/.qwen
+ * Priority: HOPCODE_RUNTIME_DIR env var > HOPCODE_HOME env var > ~/.hopcode
  *
  * This mirrors the fallback chain in packages/core Storage.getRuntimeBaseDir()
  * without importing from core to avoid cross-package dependencies.
  */
 export function getRuntimeBaseDir(): string {
   bootstrapHomeEnvOverrides();
-  const runtimeDir = process.env['QWEN_RUNTIME_DIR'];
+  const runtimeDir = process.env['HOPCODE_RUNTIME_DIR'];
   if (runtimeDir) {
     return resolvePath(runtimeDir);
   }
-  return getGlobalQwenDir();
+  return getGlobalHopcodeDir();
 }

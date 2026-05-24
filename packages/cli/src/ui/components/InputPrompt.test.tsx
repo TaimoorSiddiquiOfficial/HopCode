@@ -1574,7 +1574,12 @@ describe('InputPrompt', () => {
     await wait();
 
     act(() => {
-      stdin.write('/export md');
+      // Write each character individually to avoid triggering the test
+      // harness's multi-char paste path, which would skip
+      // markNextTextChangeAsUserInput() and leave cyclingActiveRef false.
+      for (const char of '/export md') {
+        stdin.write(char);
+      }
     });
     await wait(350);
     expect(stripAnsi(lastFrame() ?? '')).toContain('/export md');
@@ -1583,6 +1588,7 @@ describe('InputPrompt', () => {
     act(() => {
       stdin.write('\u001B[B');
     });
+    await wait(100);
     expect(stripAnsi(lastFrame() ?? '')).toContain('/export json');
     unmount();
   });
