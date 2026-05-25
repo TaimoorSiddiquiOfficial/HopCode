@@ -999,7 +999,7 @@ is_qwen_standalone_install_dir() {
     [[ -f "${manifest_path}" ]] || return 1
     # Manifest format is produced by writeManifest in create-standalone-package.js.
     # Keep these grep checks in sync if that JSON layout changes.
-    grep -Eq '"name"[[:space:]]*:[[:space:]]*"@qwen-code/qwen-code"' "${manifest_path}" 2>/dev/null || return 1
+    grep -Eq '"name"[[:space:]]*:[[:space:]]*"@hoptrendy/hopcode-cli"' "${manifest_path}" 2>/dev/null || return 1
     grep -Eq '"target"[[:space:]]*:[[:space:]]*"(darwin|linux)-(arm64|x64)"' "${manifest_path}" 2>/dev/null || return 1
     [[ -f "${install_dir}/bin/qwen" && ! -L "${install_dir}/bin/qwen" && -x "${install_dir}/bin/qwen" ]] || return 1
     [[ -f "${install_dir}/node/bin/node" && ! -L "${install_dir}/node/bin/node" && -x "${install_dir}/node/bin/node" ]] || return 1
@@ -1355,7 +1355,7 @@ print_final_instructions() {
     echo ""
     echo "Uninstall:"
     if [[ "${install_method}" == "npm" ]]; then
-        echo "  npm uninstall -g @qwen-code/qwen-code"
+        echo "  npm uninstall -g @hoptrendy/hopcode-cli"
     elif [[ -n "${install_dir}" && -n "${install_bin_dir}" ]]; then
         echo "  curl -fsSL ${standalone_uninstall_url} | QWEN_INSTALL_LIB_DIR=$(shell_quote "${install_dir}") QWEN_INSTALL_BIN_DIR=$(shell_quote "${install_bin_dir}") bash"
     else
