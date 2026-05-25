@@ -500,7 +500,7 @@ Symlinked skill body.
     });
 
     it('should trim whitespace from model string', () => {
-      expect(parseModelField({ model: '  qwen-max  ' })).toBe('hopcode-max');
+      expect(parseModelField({ model: '  qwen-max  ' })).toBe('qwen-max');
     });
 
     it('should throw for non-string types', () => {

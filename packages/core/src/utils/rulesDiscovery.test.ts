@@ -338,7 +338,7 @@ Use hooks.`,
         // A stale rule in the legacy ~/.qwen/rules location should NOT be
         // loaded once QWEN_HOME points elsewhere.
         await createTestFile(
-          path.join(homedir, QWEN_DIR, 'rules', 'fromLegacyHome.md'),
+          path.join(homedir, HOPCODE_DIR, 'rules', 'fromLegacyHome.md'),
           'LegacyHome rule.',
         );
 

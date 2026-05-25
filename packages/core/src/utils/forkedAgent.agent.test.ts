@@ -100,7 +100,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     return { captured, restore: () => spy.mockRestore() };
   }
 
-  it('passes a Config with the rebuilt-registry marker and IZN approval mode to AgentHeadless.create', async () => {
+  it('passes a Config with the rebuilt-registry marker and YOLO approval mode to AgentHeadless.create', async () => {
     const parent = new ConfigImpl(baseParams);
     const parentRegistry = await parent.createToolRegistry(undefined, {
       skipDiscovery: true,
@@ -127,8 +127,8 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect(hasRebuiltToolRegistry(captured.config!)).toBe(true);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((captured.config as any)[TOOL_REGISTRY_REBUILT]).toBe(true);
-    // Resolve approval mode to IZN (the override)
-    expect(captured.config!.getApprovalMode()).toBe(ApprovalMode.IZN);
+    // Resolve approval mode to YOLO (the override)
+    expect(captured.config!.getApprovalMode()).toBe(ApprovalMode.YOLO);
     // 3. Hand out a different ToolRegistry instance from the parent
     expect(captured.config!.getToolRegistry()).not.toBe(parentRegistry);
   });
@@ -161,7 +161,7 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect((editTool as any).config).toBe(captured.config);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundConfig = (editTool as any).config as Config;
-    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.IZN);
+    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.YOLO);
     expect(boundConfig.getFileReadCache()).toBe(
       captured.config!.getFileReadCache(),
     );
@@ -207,8 +207,8 @@ describe('runForkedAgent (AgentHeadless path) bound-tool isolation', () => {
     expect(editTool).toBeInstanceOf(EditTool);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundConfig = (editTool as any).config as Config;
-    // IZN from iznConfig's own override
-    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.IZN);
+    // YOLO from iznConfig's own override
+    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.YOLO);
     // Scoped PM from scopedConfig (one prototype level up)
     expect(boundConfig.getPermissionManager?.()).toBe(scopedPm);
   });

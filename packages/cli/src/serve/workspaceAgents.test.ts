@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +18,7 @@ import {
   vi,
   type MockInstance,
 } from 'vitest';
-import { Storage, QWEN_DIR } from '@hoptrendy/hopcode-core';
+import { Storage, HOPCODE_DIR } from '@hoptrendy/hopcode-core';
 import { createMutationGate } from './auth.js';
 import type { HttpAcpBridge } from './httpAcpBridge.js';
 import type { BridgeEvent } from './eventBus.js';
@@ -157,7 +157,7 @@ describe('workspace agents routes', () => {
   let getGlobalQwenDirSpy: MockInstance<() => string>;
 
   beforeEach(async () => {
-    tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-serve-agents-'));
+    tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-serve-agents-'));
     workspace = path.join(tmp, 'workspace');
     globalDir = path.join(tmp, 'global');
     await fs.mkdir(workspace, { recursive: true });
@@ -173,7 +173,7 @@ describe('workspace agents routes', () => {
   });
 
   it('lists built-in agents alongside on-disk project agents', async () => {
-    const projectAgentsDir = path.join(workspace, QWEN_DIR, 'agents');
+    const projectAgentsDir = path.join(workspace, HOPCODE_DIR, 'agents');
     await fs.mkdir(projectAgentsDir, { recursive: true });
     await fs.writeFile(
       path.join(projectAgentsDir, 'reviewer.md'),
@@ -221,7 +221,7 @@ describe('workspace agents routes', () => {
     // serve the stale cache from the first call and silently miss
     // the new entry — diverging from the detail route, which always
     // re-reads disk.
-    const projectAgentsDir = path.join(workspace, QWEN_DIR, 'agents');
+    const projectAgentsDir = path.join(workspace, HOPCODE_DIR, 'agents');
     await fs.mkdir(projectAgentsDir, { recursive: true });
     await fs.writeFile(
       path.join(projectAgentsDir, 'fresh-out-of-band.md'),
@@ -257,7 +257,7 @@ describe('workspace agents routes', () => {
   });
 
   it('matches frontmatter name case-insensitively', async () => {
-    const projectAgentsDir = path.join(workspace, QWEN_DIR, 'agents');
+    const projectAgentsDir = path.join(workspace, HOPCODE_DIR, 'agents');
     await fs.mkdir(projectAgentsDir, { recursive: true });
     await fs.writeFile(
       path.join(projectAgentsDir, 'casey.md'),
@@ -299,7 +299,7 @@ describe('workspace agents routes', () => {
 
     // File was actually written.
     const onDisk = await fs.readFile(
-      path.join(workspace, QWEN_DIR, 'agents', 'tester.md'),
+      path.join(workspace, HOPCODE_DIR, 'agents', 'tester.md'),
       'utf8',
     );
     expect(onDisk).toContain('name: tester');
@@ -516,7 +516,7 @@ describe('workspace agents routes', () => {
     // version must NOT exist (would otherwise be unfindable via
     // case-insensitive lookup).
     const onDisk = await fs.readFile(
-      path.join(workspace, QWEN_DIR, 'agents', 'trimmed-name.md'),
+      path.join(workspace, HOPCODE_DIR, 'agents', 'trimmed-name.md'),
       'utf8',
     );
     expect(onDisk).toContain('name: trimmed-name');
@@ -769,7 +769,9 @@ describe('workspace agents routes', () => {
 
     // Project file gone; user file still exists.
     await expect(
-      fs.access(path.join(workspace, QWEN_DIR, 'agents', 'scoped-delete.md')),
+      fs.access(
+        path.join(workspace, HOPCODE_DIR, 'agents', 'scoped-delete.md'),
+      ),
     ).rejects.toMatchObject({ code: 'ENOENT' });
     await expect(
       fs.access(path.join(globalDir, 'agents', 'scoped-delete.md')),
@@ -814,7 +816,7 @@ describe('workspace agents routes', () => {
 
     // Project-level definition is untouched.
     const projectFile = await fs.readFile(
-      path.join(workspace, QWEN_DIR, 'agents', 'scoped-update.md'),
+      path.join(workspace, HOPCODE_DIR, 'agents', 'scoped-update.md'),
       'utf8',
     );
     expect(projectFile).toContain('a description longer than ten chars');

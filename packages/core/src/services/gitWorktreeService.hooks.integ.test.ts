@@ -27,7 +27,7 @@ describe('GitWorktreeService.createUserWorktree() — hooksPath setup', () => {
   let repoRoot: string;
 
   beforeEach(async () => {
-    repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-wt-hooks-'));
+    repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-wt-hooks-'));
     execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
     execFileSync('git', ['config', 'user.email', 't@e.com'], { cwd: repoRoot });
     execFileSync('git', ['config', 'user.name', 't'], { cwd: repoRoot });

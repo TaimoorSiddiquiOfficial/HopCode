@@ -13,6 +13,7 @@ import {
   mergeClaudeConfigs,
   isClaudePluginConfig,
   convertClaudePluginPackage,
+  convertClaudeToHopCodeConfig,
   type ClaudePluginConfig,
   type ClaudeMarketplacePluginConfig,
   type ClaudeMarketplaceConfig,

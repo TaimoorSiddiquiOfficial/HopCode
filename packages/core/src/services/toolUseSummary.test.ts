@@ -254,7 +254,7 @@ describe('generateToolUseSummary', () => {
 
     const options = generateContentFn.mock.calls[0][0];
 
-    expect(options.model).toBe('qwen-fast');
+    expect(options.model).toBe('hopcode-fast');
     expect(options.promptId).toBe('side-query:tool-use-summary');
     expect(options.systemInstruction).toBe(TOOL_USE_SUMMARY_SYSTEM_PROMPT);
 

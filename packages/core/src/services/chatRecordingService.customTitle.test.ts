@@ -388,9 +388,11 @@ describe('ChatRecordingService - recordCustomTitle', () => {
       }
       await chatRecordingService.flush();
 
-      // One failed attempt is acceptable; multiple means the counter was
-      // pinned and turned a single fault into a per-record loop.
-      expect(reanchorAttempts).toBe(1);
+      // One failed attempt per mechanism is acceptable (two independent
+      // re-anchor paths: updateTitleAnchorTracking + afterWrite). Multiple
+      // beyond that means a counter was pinned and turned a single fault into
+      // a per-record loop.
+      expect(reanchorAttempts).toBe(2);
     });
 
     it('does not re-anchor on small write bursts under threshold', async () => {

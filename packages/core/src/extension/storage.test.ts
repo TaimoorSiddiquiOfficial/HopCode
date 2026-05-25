@@ -43,7 +43,7 @@ describe('ExtensionStorage', () => {
         }) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     );
     vi.mocked(Storage.getUserExtensionsDir).mockReturnValue(
-      path.join(mockHomeDir, '.qwen', 'extensions'),
+      path.join(mockHomeDir, '.hopcode', 'extensions'),
     );
     storage = new ExtensionStorage(extensionName);
   });

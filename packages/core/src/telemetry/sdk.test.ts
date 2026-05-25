@@ -184,9 +184,9 @@ describe('Telemetry SDK', () => {
       .mockResolvedValue(undefined);
     const unlinkSpy = vi.spyOn(fs, 'unlink').mockResolvedValue(undefined);
     const symlinkSpy = vi.spyOn(fs, 'symlink').mockResolvedValue(undefined);
-    const previousDebugLogFileEnv = process.env['QWEN_DEBUG_LOG_FILE'];
+    const previousDebugLogFileEnv = process.env['HOPCODE_DEBUG_LOG_FILE'];
     try {
-      process.env['QWEN_DEBUG_LOG_FILE'] = '1';
+      process.env['HOPCODE_DEBUG_LOG_FILE'] = '1';
       setDebugLogSession({ getSessionId: () => 'otel-diag-test-session' });
 
       diag.error(
@@ -234,9 +234,9 @@ describe('Telemetry SDK', () => {
       setDebugLogSession(null);
       resetDebugLoggingState();
       if (previousDebugLogFileEnv === undefined) {
-        delete process.env['QWEN_DEBUG_LOG_FILE'];
+        delete process.env['HOPCODE_DEBUG_LOG_FILE'];
       } else {
-        process.env['QWEN_DEBUG_LOG_FILE'] = previousDebugLogFileEnv;
+        process.env['HOPCODE_DEBUG_LOG_FILE'] = previousDebugLogFileEnv;
       }
     }
   });
@@ -532,7 +532,7 @@ describe('Telemetry SDK', () => {
     it('always sets service.name and service.version from runtime', () => {
       initializeTelemetry(mockConfig);
       const attrs = getResourceAttributes();
-      expect(attrs['service.name']).toBe('qwen-code');
+      expect(attrs['service.name']).toBe('hopcode');
       expect(attrs['service.version']).toBe('1.0.0-test');
     });
 
@@ -570,7 +570,7 @@ describe('Telemetry SDK', () => {
         'service.name': '',
       });
       initializeTelemetry(mockConfig);
-      expect(getResourceAttributes()['service.name']).toBe('qwen-code');
+      expect(getResourceAttributes()['service.name']).toBe('hopcode');
     });
 
     it('whitespace-only service.name from settings falls back to default', () => {
@@ -581,7 +581,7 @@ describe('Telemetry SDK', () => {
         'service.name': '   ',
       });
       initializeTelemetry(mockConfig);
-      expect(getResourceAttributes()['service.name']).toBe('qwen-code');
+      expect(getResourceAttributes()['service.name']).toBe('hopcode');
     });
 
     it('emits a console summary when resource-attribute warnings are present', () => {
@@ -697,4 +697,3 @@ describe('refreshSessionContext', () => {
     expect(setSessionContext).not.toHaveBeenCalled();
   });
 });
-

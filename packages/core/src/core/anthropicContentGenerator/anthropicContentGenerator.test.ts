@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -133,9 +133,9 @@ describe('AnthropicContentGenerator', () => {
     expect(anthropicState.constructorOptions?.['apiKey']).toBeNull();
   });
 
-  it('uses QwenCode identity + apiKey auth when baseURL is api.anthropic.com', async () => {
+  it('uses HopCode identity + apiKey auth when baseURL is api.anthropic.com', async () => {
     // Anthropic-native baseURL: keep the SDK-default `x-api-key` auth and
-    // a truthful `QwenCode` User-Agent (no `x-app` header) so usage isn't
+    // a truthful `HopCode` User-Agent (no `x-app` header) so usage isn't
     // misattributed to Claude CLI in Anthropic's logs/quotas.
     const { AnthropicContentGenerator } = await importGenerator();
     void new AnthropicContentGenerator(
@@ -153,7 +153,7 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
     expect(headers['User-Agent']).not.toContain('claude-cli');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
@@ -176,7 +176,7 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -202,7 +202,7 @@ describe('AnthropicContentGenerator', () => {
 
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -286,7 +286,7 @@ describe('AnthropicContentGenerator', () => {
     );
     const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
       {}) as Record<string, string>;
-    expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+    expect(headers['User-Agent']).toContain('HopCode/1.2.3');
     expect(headers['x-app']).toBeUndefined();
     expect(anthropicState.constructorOptions?.['apiKey']).toBe('test-key');
     expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -452,7 +452,7 @@ describe('AnthropicContentGenerator', () => {
       );
       const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
         {}) as Record<string, string>;
-      expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+      expect(headers['User-Agent']).toContain('HopCode/1.2.3');
       expect(headers['x-app']).toBeUndefined();
       expect(anthropicState.constructorOptions?.['apiKey']).toBe('config-key');
       expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -479,7 +479,7 @@ describe('AnthropicContentGenerator', () => {
       );
       const headers = (anthropicState.constructorOptions?.['defaultHeaders'] ||
         {}) as Record<string, string>;
-      expect(headers['User-Agent']).toContain('QwenCode/1.2.3');
+      expect(headers['User-Agent']).toContain('HopCode/1.2.3');
       expect(headers['x-app']).toBeUndefined();
       expect(anthropicState.constructorOptions?.['apiKey']).toBe('config-key');
       expect(anthropicState.constructorOptions?.['authToken']).toBeNull();
@@ -983,7 +983,7 @@ describe('AnthropicContentGenerator', () => {
 
       // defaultHeaders carries User-Agent and customHeaders (not beta).
       // baseConfig now targets api.anthropic.com, so this asserts the
-      // Anthropic-native UA (QwenCode) — the claude-cli identity bundle
+      // Anthropic-native UA (HopCode) — the claude-cli identity bundle
       // is covered by the proxy-baseURL tests at the top of the suite.
       const defaultHeaders = (anthropicState.constructorOptions?.[
         'defaultHeaders'

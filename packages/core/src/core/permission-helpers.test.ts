@@ -13,6 +13,7 @@ import {
   evaluatePermissionRules,
   injectPermissionRulesIfMissing,
   persistPermissionOutcome,
+  buildPermissionCheckContext,
 } from './permission-helpers.js';
 import { ToolConfirmationOutcome } from '../tools/tools.js';
 import type { ToolCallConfirmationDetails } from '../tools/tools.js';

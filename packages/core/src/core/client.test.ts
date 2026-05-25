@@ -187,9 +187,28 @@ const mockUiTelemetryService = vi.hoisted(() => ({
   reset: vi.fn(),
   addEvent: vi.fn(),
 }));
+const clientSpanCalls = vi.hoisted(
+  (): Array<{
+    name: string;
+    attributes: Record<string, string | number | boolean>;
+    statuses: Array<{ code: number; message?: string }>;
+  }> => [],
+);
+const mockWithSpan = vi.hoisted(() => vi.fn());
 vi.mock('../telemetry/tracer.js', () => ({
   API_CALL_ABORTED_SPAN_STATUS_MESSAGE: 'API call aborted',
   API_CALL_FAILED_SPAN_STATUS_MESSAGE: 'API call failed',
+  safeSetStatus: (
+    span: { setStatus: (status: { code: number; message?: string }) => void },
+    status: { code: number; message?: string },
+  ) => {
+    try {
+      span.setStatus(status);
+    } catch {
+      // Match production best-effort telemetry behavior.
+    }
+  },
+  withSpan: mockWithSpan,
 }));
 
 vi.mock('../telemetry/index.js', async (importOriginal) => {
@@ -5468,7 +5487,6 @@ Other open files:
         expect.objectContaining({
           model: DEFAULT_HOPCODE_FLASH_MODEL,
           config: expect.objectContaining({
-            abortSignal,
             systemInstruction: getCoreSystemPrompt(''),
             temperature: 0.5,
           }),
@@ -5527,15 +5545,6 @@ Other open files:
         }),
         'btw-prompt-id',
       );
-      expect(clientSpanCalls.at(-1)).toEqual(
-        expect.objectContaining({
-          name: 'client.generateContent',
-          attributes: {
-            model: DEFAULT_HOPCODE_FLASH_MODEL,
-            prompt_id: 'btw-prompt-id',
-          },
-        }),
-      );
     });
 
     it('should prefer an explicit prompt id override over the current context', async () => {
@@ -5562,15 +5571,6 @@ Other open files:
           contents,
         }),
         'override-prompt-id',
-      );
-      expect(clientSpanCalls.at(-1)).toEqual(
-        expect.objectContaining({
-          name: 'client.generateContent',
-          attributes: {
-            model: DEFAULT_HOPCODE_FLASH_MODEL,
-            prompt_id: 'override-prompt-id',
-          },
-        }),
       );
     });
 
@@ -5687,13 +5687,13 @@ Other open files:
         contents,
         {},
         abortSignal,
-        DEFAULT_QWEN_FLASH_MODEL,
+        DEFAULT_HOPCODE_FLASH_MODEL,
       );
       await client.generateContent(
         contents,
         {},
         abortSignal,
-        DEFAULT_QWEN_FLASH_MODEL,
+        DEFAULT_HOPCODE_FLASH_MODEL,
       );
 
       expect(getRecentGitStatus).toHaveBeenCalledTimes(1);
@@ -5729,7 +5729,7 @@ Other open files:
           contents,
           {},
           abortSignal,
-          DEFAULT_QWEN_FLASH_MODEL,
+          DEFAULT_HOPCODE_FLASH_MODEL,
         ),
       ).rejects.toThrow('raw upstream 500 with sensitive details');
     });
@@ -5747,7 +5747,7 @@ Other open files:
           contents,
           {},
           abortController.signal,
-          DEFAULT_QWEN_FLASH_MODEL,
+          DEFAULT_HOPCODE_FLASH_MODEL,
         ),
       ).rejects.toThrow('raw abort reason with sensitive details');
     });

@@ -648,7 +648,7 @@ describe('CoreToolScheduler', () => {
         ToolErrorType.EXECUTION_DENIED,
       );
       expect(completedCall.response.error?.message).toBe(
-        'Qwen Code requires permission to use edit, but that permission was declined.',
+        'HopCode requires permission to use edit, but that permission was declined.',
       );
     }
     expect(execute).not.toHaveBeenCalled();
@@ -7874,7 +7874,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -7929,11 +7929,10 @@ describe('CoreToolScheduler activation wiring', () => {
       (completed[0] as unknown as { response?: { responseParts?: unknown } })
         .response?.responseParts ?? null,
     );
-    // All three reminder blocks land inside ONE envelope; the IZN scope
-    // report adds a second envelope when ApprovalMode.IZN is active.
+    // All three reminder blocks land but inside ONE envelope.
     const envelopeCount = (responseText.match(/<system-reminder>/g) || [])
       .length;
-    expect(envelopeCount).toBe(2);
+    expect(envelopeCount).toBe(1);
     expect(responseText).toContain('Rule 1 body.');
     expect(responseText).toContain('Rule 2 body.');
     expect(responseText).toContain('tsx-helper');
@@ -8064,7 +8063,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -8132,7 +8131,7 @@ describe('CoreToolScheduler activation wiring', () => {
     // the wrapper.
     const closeCount = (responseText.match(/<\/system-reminder>/g) || [])
       .length;
-    expect(closeCount).toBe(2);
+    expect(closeCount).toBe(1);
     // The rewritten form of the body literal still appears verbatim
     // (escaped form), so the rule content survives.
     expect(responseText).toContain('<\\\\/system-reminder>');

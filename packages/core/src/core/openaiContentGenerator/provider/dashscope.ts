@@ -351,6 +351,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
     'qwen-vl', // qwen-vl-max, qwen-vl-max-latest, etc.
     'qwen3-vl-plus', // qwen3-vl-plus variants
     'qwen3.5-plus', // qwen3.5-plus (has built-in vision capabilities)
+    'hopcode-vl', // hopcode-vl-max, etc.
   ];
 
   private isVisionModel(model: string | undefined): boolean {

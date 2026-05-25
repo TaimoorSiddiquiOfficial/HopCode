@@ -47,13 +47,18 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
 
   // HopCode VL (vision-language) models: image + video
   [/^qwen-vl-/, { image: true, video: true }],
+  [/^hopcode-vl-/, { image: true, video: true }],
   [/^qwen3-vl-/, { image: true, video: true }],
+  [/^hopcode3-vl-/, { image: true, video: true }],
 
   // HopCode coder / text models: text-only
   [/^qwen3-coder-/, {}],
+  [/^hopcode3-coder-/, {}],
   // Qwen3.6-35B-A3B (local quant variants) — image + video
   [/^qwen3\.6-35b/, { image: true, video: true }],
+  [/^hopcode3\.6-35b/, { image: true, video: true }],
   [/^qwen/, {}],
+  [/^hopcode/, {}],
 
   // -------------------
   // DeepSeek � text-only

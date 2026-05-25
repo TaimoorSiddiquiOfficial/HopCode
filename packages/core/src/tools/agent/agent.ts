@@ -224,7 +224,8 @@ export function resolveSubagentApprovalMode(
   if (
     parentApprovalMode === ApprovalMode.YOLO ||
     parentApprovalMode === ApprovalMode.AUTO_EDIT ||
-    parentApprovalMode === ApprovalMode.AUTO
+    parentApprovalMode === ApprovalMode.AUTO ||
+    parentApprovalMode === ApprovalMode.IZN
   ) {
     return approvalModeToPermissionMode(parentApprovalMode);
   }
@@ -243,7 +244,8 @@ export function resolveSubagentApprovalMode(
       !isTrustedFolder &&
       (resolved === PermissionMode.Yolo ||
         resolved === PermissionMode.AutoEdit ||
-        resolved === PermissionMode.Auto)
+        resolved === PermissionMode.Auto ||
+        resolved === PermissionMode.Izn)
     ) {
       return approvalModeToPermissionMode(parentApprovalMode);
     }

@@ -914,7 +914,7 @@ describe('modelConfigResolver', () => {
       // text at modelConfigResolver.ts ~L330). This test pins that down so a
       // future edit to MODALITY_PATTERNS doesn't silently regress OAuth.
       const result = resolveModelConfig({
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         cli: {},
         settings: {},
         env: {},

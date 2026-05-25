@@ -134,10 +134,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'I will now do something.' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     const mockApiResponse: NextSpeakerResponse = {
       reasoning: 'Model stated it will do something.',
       next_speaker: 'model',
@@ -157,10 +153,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'What would you like to do?' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     const mockApiResponse: NextSpeakerResponse = {
       reasoning: 'Model asked a question.',
       next_speaker: 'user',
@@ -179,10 +171,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'This is a statement.' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     const mockApiResponse: NextSpeakerResponse = {
       reasoning: 'Model made a statement, awaiting user input.',
       next_speaker: 'user',
@@ -204,10 +192,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'Some model output.' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     (mockBaseLlmClient.generateJson as Mock).mockRejectedValue(
       new Error('API Error'),
     );
@@ -225,10 +209,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'Some model output.' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     (mockBaseLlmClient.generateJson as Mock).mockResolvedValue({
       reasoning: 'This is incomplete.',
     } as unknown as NextSpeakerResponse); // Type assertion to simulate invalid response
@@ -245,10 +225,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'Some model output.' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     (mockBaseLlmClient.generateJson as Mock).mockResolvedValue({
       reasoning: 'Model made a statement, awaiting user input.',
       next_speaker: 123, // Invalid type
@@ -266,10 +242,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'Some model output.' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     (mockBaseLlmClient.generateJson as Mock).mockResolvedValue({
       reasoning: 'Model made a statement, awaiting user input.',
       next_speaker: 'neither', // Invalid enum value
@@ -287,10 +259,6 @@ describe('checkNextSpeaker', () => {
     mockChatHistory([
       { role: 'model', parts: [{ text: 'Some model output.' }] },
     ]);
-    (chatInstance.getHistory as Mock).mockReturnValue(history);
-    vi.mocked(chatInstance.getLastHistoryEntry).mockReturnValue(
-      history[history.length - 1],
-    );
     const mockApiResponse: NextSpeakerResponse = {
       reasoning: 'Model made a statement, awaiting user input.',
       next_speaker: 'user',

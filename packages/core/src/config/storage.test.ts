@@ -516,9 +516,9 @@ describe('Storage – QWEN_HOME env var', () => {
     }
   });
 
-  it('defaults to ~/.qwen when QWEN_HOME is not set', () => {
+  it('defaults to ~/.hopcode when QWEN_HOME is not set', () => {
     delete process.env['QWEN_HOME'];
-    const expected = path.join(os.homedir(), '.qwen');
+    const expected = path.join(os.homedir(), '.hopcode');
     expect(Storage.getGlobalQwenDir()).toBe(expected);
   });
 
@@ -562,10 +562,10 @@ describe('Storage – QWEN_HOME env var', () => {
     process.env['QWEN_HOME'] = configDir;
     const storage = new Storage(projectDir);
     expect(storage.getWorkspaceSettingsPath()).toBe(
-      path.join(projectDir, '.qwen', 'settings.json'),
+      path.join(projectDir, '.hopcode', 'settings.json'),
     );
     expect(storage.getProjectCommandsDir()).toBe(
-      path.join(projectDir, '.qwen', 'commands'),
+      path.join(projectDir, '.hopcode', 'commands'),
     );
   });
 
@@ -586,11 +586,11 @@ describe('Storage – QWEN_HOME env var', () => {
     expect(Storage.getGlobalQwenDir()).toBe(os.homedir());
   });
 
-  it('QWEN_HOME and QWEN_RUNTIME_DIR are independent', () => {
+  it('QWEN_HOME and HOPCODE_RUNTIME_DIR are independent', () => {
     const configDir = path.resolve('/tmp/config');
     const runtimeDir = path.resolve('/tmp/runtime');
     process.env['QWEN_HOME'] = configDir;
-    process.env['QWEN_RUNTIME_DIR'] = runtimeDir;
+    process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
     expect(Storage.getGlobalQwenDir()).toBe(configDir);
     expect(Storage.getRuntimeBaseDir()).toBe(runtimeDir);
     expect(Storage.getGlobalSettingsPath()).toBe(

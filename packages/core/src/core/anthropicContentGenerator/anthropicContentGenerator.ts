@@ -116,7 +116,7 @@ function resolveEffectiveBaseUrl(
  * when no baseURL is set). Used to gate IdeaLab-style proxy workarounds —
  * `Authorization: Bearer` auth and the `claude-cli` User-Agent — so that
  * users hitting `api.anthropic.com` directly keep the SDK-default
- * `x-api-key` auth and a truthful `QwenCode` User-Agent (avoids identity
+ * `x-api-key` auth and a truthful `HopCode` User-Agent (avoids identity
  * misattribution in Anthropic-side logs/quotas).
  */
 function isAnthropicNativeBaseUrl(
@@ -317,13 +317,13 @@ export class AnthropicContentGenerator implements ContentGenerator {
     // For non-Anthropic-native baseURLs (IdeaLab-style proxies), present as
     // `claude-cli` + `x-app: cli` to satisfy proxy Team rules that restrict
     // usage by client identity. For api.anthropic.com itself we keep the
-    // truthful QwenCode User-Agent so usage isn't misattributed to Claude
+    // truthful HopCode User-Agent so usage isn't misattributed to Claude
     // CLI in Anthropic's logs/quotas, and we don't ship the proxy-specific
     // `x-app` header. Predicate is computed once at construction and shared
     // with the auth-mode decision so the bundle stays internally consistent.
     const userAgent = useProxyIdentity
       ? `claude-cli/${version} (external, cli)`
-      : `QwenCode/${version} (${process.platform}; ${process.arch})`;
+      : `HopCode/${version} (${process.platform}; ${process.arch})`;
     const { customHeaders } = this.contentGeneratorConfig;
 
     const headers: Record<string, string> = {

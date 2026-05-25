@@ -61,7 +61,7 @@ export function normalize(model: string): string {
   // - HopCode models: qwen-plus-latest, hopcode-flash-latest, hopcode-vl-max-latest
   // - Kimi models: kimi-k2-0905, kimi-k2-0711, etc. (keep date for version distinction)
   if (
-    !s.match(/^qwen-(?:plus|flash|vl-max)-latest$/) &&
+    !s.match(/^(?:qwen|hopcode)-(?:plus|flash|vl-max)-latest$/) &&
     !s.match(/^kimi-k2-\d{4}$/)
   ) {
     // Regex breakdown:
@@ -113,6 +113,8 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^qwen3-coder-plus/, LIMITS['1m']],
   [/^qwen3-coder-flash/, LIMITS['1m']],
   [/^qwen3\.\d/, LIMITS['1m']],
+  [/^hopcode-plus-latest$/, LIMITS['1m']],
+  [/^hopcode-flash-latest$/, LIMITS['1m']],
   [/^qwen-plus-latest$/, LIMITS['1m']],
   [/^qwen-flash-latest$/, LIMITS['1m']],
   [/^coder-model$/, LIMITS['1m']],
@@ -121,6 +123,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   // Open-source Qwen3 variants: 256K native
   [/^qwen3-coder-/, LIMITS['256k']],
   // HopCode fallback (VL, turbo, plus, 2.5, etc.): 128K
+  [/^hopcode/, LIMITS['256k']],
   [/^qwen/, LIMITS['256k']],
 
   // -------------------

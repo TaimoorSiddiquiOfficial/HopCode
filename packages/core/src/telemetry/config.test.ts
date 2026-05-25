@@ -86,13 +86,13 @@ describe('telemetry/config helpers', () => {
         outfile: 'settings.log',
       };
       const env = {
-        QWEN_TELEMETRY_ENABLED: '1',
-        QWEN_TELEMETRY_TARGET: 'gcp',
-        QWEN_TELEMETRY_OTLP_ENDPOINT: 'http://env:4317',
-        QWEN_TELEMETRY_OTLP_PROTOCOL: 'http',
-        QWEN_TELEMETRY_LOG_PROMPTS: 'true',
-        QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES: 'true',
-        QWEN_TELEMETRY_OUTFILE: 'env.log',
+        HOPCODE_TELEMETRY_ENABLED: '1',
+        HOPCODE_TELEMETRY_TARGET: 'gcp',
+        HOPCODE_TELEMETRY_OTLP_ENDPOINT: 'http://env:4317',
+        HOPCODE_TELEMETRY_OTLP_PROTOCOL: 'http',
+        HOPCODE_TELEMETRY_LOG_PROMPTS: 'true',
+        HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES: 'true',
+        HOPCODE_TELEMETRY_OUTFILE: 'env.log',
       } as Record<string, string>;
       const argv = {
         telemetry: false,

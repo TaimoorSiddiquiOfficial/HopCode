@@ -34,6 +34,7 @@ describe('PermissionsConfig', () => {
       expect(config.getCoreTools()).toEqual([
         ToolNames.READ_FILE,
         ToolNames.EDIT,
+        ToolNames.NOTEBOOK_EDIT,
         ToolNames.SHELL,
       ]);
     });

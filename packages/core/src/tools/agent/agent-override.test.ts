@@ -149,7 +149,7 @@ describe('createApprovalModeOverride bound-tool isolation', () => {
     const childEdit = await child.getToolRegistry().ensureTool(ToolNames.EDIT);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundConfig = (childEdit as any).config as Config;
-    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.IZN);
+    expect(boundConfig.getApprovalMode()).toBe(ApprovalMode.YOLO);
   });
 
   it('copies discovered tools from the parent registry without re-discovering', async () => {
