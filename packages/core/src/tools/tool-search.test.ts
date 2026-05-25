@@ -13,6 +13,14 @@ import { DiscoveredMCPTool } from './mcp-tool.js';
 import { MockTool } from '../test-utils/mock-tool.js';
 import { ToolSearchTool, scoreTool, tokenize } from './tool-search.js';
 
+// Prevent Config constructor from creating TaskStore directories on disk.
+// Tests don't exercise task storage, so a no-op stub is sufficient.
+vi.mock('../services/task-store.js', () => ({
+  TaskStore: class {
+    constructor() {}
+  },
+}));
+
 const baseConfigParams: ConfigParameters = {
   cwd: '/tmp',
   model: 'test-model',

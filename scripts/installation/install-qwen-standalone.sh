@@ -1242,12 +1242,12 @@ install_standalone() {
 
 npm_package_spec() {
     if [[ "${VERSION}" == "latest" ]]; then
-        echo "@qwen-code/qwen-code@latest"
+        echo "@hoptrendy/hopcode-cli@latest"
         return 0
     fi
 
     local npm_version="${VERSION#v}"
-    echo "@qwen-code/qwen-code@${npm_version}"
+    echo "@hoptrendy/hopcode-cli@${npm_version}"
 }
 
 install_npm() {

@@ -1169,11 +1169,11 @@ echo SUCCESS: npm %NPM_VERSION% detected.
 exit /b 0
 
 :NpmPackageSpec
-set "NPM_PACKAGE_SPEC=@qwen-code/qwen-code@latest"
+set "NPM_PACKAGE_SPEC=@hoptrendy/hopcode-cli@latest"
 if /i "!VERSION!"=="latest" exit /b 0
 set "NPM_VERSION_SPEC=!VERSION!"
 if /i "!NPM_VERSION_SPEC:~0,1!"=="v" set "NPM_VERSION_SPEC=!NPM_VERSION_SPEC:~1!"
-set "NPM_PACKAGE_SPEC=@qwen-code/qwen-code@!NPM_VERSION_SPEC!"
+set "NPM_PACKAGE_SPEC=@hoptrendy/hopcode-cli@!NPM_VERSION_SPEC!"
 exit /b 0
 
 :InstallNpm
