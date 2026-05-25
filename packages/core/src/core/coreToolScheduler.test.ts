@@ -55,6 +55,7 @@ import { WriteFileTool } from '../tools/write-file.js';
 import { ShellTool, ShellToolInvocation } from '../tools/shell.js';
 import type { ShellToolParams } from '../tools/shell.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
+import { IznGateHandler } from '../confirmation-bus/iznGateHandler.js';
 
 type ToolSpanRecord = {
   name: string;
@@ -8359,5 +8360,167 @@ describe('CoreToolScheduler shell-tool promote integration (#3831 PR-2)', () => 
       );
     });
     expect(sawPromoteAcWhileExecuting).toBe(true);
+  });
+});
+
+describe('CoreToolScheduler IZN gate integration', () => {
+  // Build a minimal scheduler wired with the given iznGateHandler.
+  // The mock tool registry always returns a MockTool whose execute
+  // function is controlled by `executeFn`.
+  function buildIznScheduler(iznGateHandler: IznGateHandler, executeFn: Mock) {
+    const tool = new MockTool({
+      name: ToolNames.SHELL,
+      execute: executeFn,
+      getDefaultPermission: MOCK_TOOL_GET_DEFAULT_PERMISSION,
+      getConfirmationDetails: MOCK_TOOL_GET_CONFIRMATION_DETAILS,
+    });
+    const mockToolRegistry = {
+      getTool: () => tool,
+      ensureTool: async () => tool,
+      getFunctionDeclarations: () => [],
+      tools: new Map(),
+      discovery: {},
+      registerTool: () => {},
+      getToolByName: () => tool,
+      getToolByDisplayName: () => tool,
+      getTools: () => [],
+      discoverTools: async () => {},
+      getAllTools: () => [],
+      getToolsByServer: () => [],
+    } as unknown as ToolRegistry;
+
+    const onAllToolCallsComplete = vi.fn();
+    const onToolCallsUpdate = vi.fn();
+    const mockConfig = {
+      getSessionId: () => 'test-session-id',
+      getUsageStatisticsEnabled: () => true,
+      getDebugMode: () => false,
+      getApprovalMode: () => ApprovalMode.IZN,
+      getContentGeneratorConfig: () => ({
+        model: 'test-model',
+        authType: 'gemini',
+      }),
+      getToolRegistry: () => mockToolRegistry,
+      getShellExecutionConfig: () => ({
+        terminalWidth: 80,
+        terminalHeight: 24,
+      }),
+      getChatRecordingService: () => undefined,
+      getMessageBus: vi.fn().mockReturnValue(undefined),
+      getDisableAllHooks: vi.fn().mockReturnValue(true),
+    } as unknown as Config;
+
+    const scheduler = new CoreToolScheduler({
+      config: mockConfig,
+      iznGateHandler,
+      onAllToolCallsComplete,
+      onToolCallsUpdate,
+      getPreferredEditor: () => 'vscode',
+      onEditorClose: vi.fn(),
+    });
+
+    return { scheduler, onAllToolCallsComplete, onToolCallsUpdate };
+  }
+
+  it('blocks a destructive shell command and returns a clarification message', async () => {
+    const executeFn = vi
+      .fn()
+      .mockResolvedValue({ llmContent: 'deleted', returnDisplay: 'deleted' });
+    const iznGateHandler = new IznGateHandler();
+    const { scheduler, onAllToolCallsComplete } = buildIznScheduler(
+      iznGateHandler,
+      executeFn,
+    );
+
+    await scheduler.schedule(
+      [
+        {
+          callId: 'rm-gate-1',
+          name: ToolNames.SHELL,
+          args: { command: 'rm -rf /tmp/test-dir' },
+          isClientInitiated: false,
+          prompt_id: 'p-gate',
+        },
+      ],
+      new AbortController().signal,
+    );
+
+    await vi.waitFor(() => expect(onAllToolCallsComplete).toHaveBeenCalled());
+
+    const completedCalls = onAllToolCallsComplete.mock
+      .calls[0][0] as ToolCall[];
+    expect(completedCalls).toHaveLength(1);
+    const call = completedCalls[0];
+
+    // Gate should have blocked the command — tool must not have executed
+    expect(executeFn).not.toHaveBeenCalled();
+    expect(call.status).toBe('error');
+
+    // The resultDisplay confirms the gate blocked the call
+    if (call.status === 'error') {
+      expect(call.response.resultDisplay).toBe(
+        'Izn gate blocked a destructive tool call.',
+      );
+      // The response parts contain the clarification message
+      const partsText = call.response.responseParts
+        .map((p) => (typeof p === 'string' ? p : JSON.stringify(p)))
+        .join('');
+      expect(partsText).toContain('system-reminder');
+    }
+  });
+
+  it('allows a retry of the same blocked command (hash bypass across scheduler instances)', async () => {
+    // Simulates the production pattern: each processFunctionCalls() creates a
+    // new CoreToolScheduler but shares the same class-level IznGateHandler.
+    const executeFn = vi
+      .fn()
+      .mockResolvedValue({ llmContent: 'deleted', returnDisplay: 'deleted' });
+    const iznGateHandler = new IznGateHandler();
+
+    // First turn: gate blocks and stores a hash for the command
+    const { scheduler: scheduler1, onAllToolCallsComplete: complete1 } =
+      buildIznScheduler(iznGateHandler, executeFn);
+
+    await scheduler1.schedule(
+      [
+        {
+          callId: 'rm-gate-retry-1',
+          name: ToolNames.SHELL,
+          args: { command: 'rm -rf /tmp/retry-dir' },
+          isClientInitiated: false,
+          prompt_id: 'p-gate-retry',
+        },
+      ],
+      new AbortController().signal,
+    );
+
+    await vi.waitFor(() => expect(complete1).toHaveBeenCalled());
+    expect(executeFn).not.toHaveBeenCalled();
+
+    // Second turn (new scheduler, shared IznGateHandler): hash bypass allows
+    iznGateHandler.clearBlockHistory();
+    const { scheduler: scheduler2, onAllToolCallsComplete: complete2 } =
+      buildIznScheduler(iznGateHandler, executeFn);
+
+    await scheduler2.schedule(
+      [
+        {
+          callId: 'rm-gate-retry-2',
+          name: ToolNames.SHELL,
+          args: { command: 'rm -rf /tmp/retry-dir' },
+          isClientInitiated: false,
+          prompt_id: 'p-gate-retry-2',
+        },
+      ],
+      new AbortController().signal,
+    );
+
+    await vi.waitFor(() => expect(complete2).toHaveBeenCalled());
+
+    const completedCalls = complete2.mock.calls[0][0] as ToolCall[];
+    expect(completedCalls).toHaveLength(1);
+    // Command should have been allowed through on the second attempt
+    expect(executeFn).toHaveBeenCalledOnce();
+    expect(completedCalls[0].status).toBe('success');
   });
 });
