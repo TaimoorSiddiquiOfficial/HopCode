@@ -613,7 +613,7 @@ export const App: React.FC = () => {
       const message = event.data;
       if (
         message?.type === 'conversationLoaded' ||
-        message?.type === 'qwenSessionSwitched' ||
+        message?.type === 'hopcodeSessionSwitched' ||
         message?.type === 'conversationCleared'
       ) {
         setEditingMessage(null);

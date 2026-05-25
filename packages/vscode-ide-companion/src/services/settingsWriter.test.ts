@@ -283,9 +283,9 @@ describe('settingsWriter', () => {
           OPENROUTER_API_KEY: 'sk-openrouter',
           BAILIAN_CODING_PLAN_API_KEY: 'sk-coding',
           BAILIAN_TOKEN_PLAN_API_KEY: 'sk-token',
-          QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_API_FOO_COM_ABC123DEF456:
+          HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_API_FOO_COM_ABC123DEF456:
             'sk-custom-1',
-          QWEN_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_BAR_COM_DEAD0BEEF000:
+          HOPCODE_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_BAR_COM_DEAD0BEEF000:
             'sk-custom-2',
           NODE_OPTIONS: '--max-old-space-size=8192',
         },
@@ -301,7 +301,7 @@ describe('settingsWriter', () => {
       clearPersistedAuth();
 
       const after = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-      // Every preset + subscription + OPENAI + every QWEN_CUSTOM_API_KEY_*
+      // Every preset + subscription + OPENAI + every HOPCODE_CUSTOM_API_KEY_*
       // is gone; NODE_OPTIONS survives.
       expect(after.env).toEqual({ NODE_OPTIONS: '--max-old-space-size=8192' });
       // selectedType is wiped.

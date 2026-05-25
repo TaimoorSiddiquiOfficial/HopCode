@@ -201,7 +201,7 @@ describe('FileMessageHandler', () => {
   });
 
   describe('createAndOpenTempFile viewColumn selection', () => {
-    const chatViewType = 'mainThreadWebview-qwenCode.chat';
+    const chatViewType = 'mainThreadWebview-HopCode.chat';
 
     beforeEach(() => {
       vi.clearAllMocks();
@@ -249,7 +249,7 @@ describe('FileMessageHandler', () => {
       const options = vscodeMock.window.showTextDocument.mock.calls[0]?.[1] as {
         viewColumn: number;
       };
-      expect(options.viewColumn).toBe(2);
+      expect(options.viewColumn).toBe(1);
     });
 
     it('falls back to ViewColumn.Beside when neither left nor right neighbor exists', async () => {

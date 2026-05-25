@@ -656,7 +656,7 @@ export function clearPersistedAuth(): void {
     // Remove API keys: every preset's string envKey + any custom-provider
     // env var (prefix-matched). Without this, third-party (DeepSeek /
     // MiniMax / Z.AI / IdeaLab / ModelScope / OpenRouter) and custom
-    // (QWEN_CUSTOM_API_KEY_*) keys would linger on disk after the user
+    // (HOPCODE_CUSTOM_API_KEY_*) keys would linger on disk after the user
     // clears authentication.
     const env = settings.env as Record<string, unknown> | undefined;
     if (env) {

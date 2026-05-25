@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 
-const CHAT_WEBVIEW_TYPE = 'mainThreadWebview-qwenCode.chat';
+const CHAT_WEBVIEW_TYPE = 'mainThreadWebview-HopCode.chat';
 
 function isChatWebview(tab: vscode.Tab): boolean {
   const input: unknown = (tab as { input?: unknown }).input;
