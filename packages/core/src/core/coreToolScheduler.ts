@@ -124,6 +124,7 @@ const TOOL_FAILURE_KIND_PERMISSION_HOOK_DENIED = 'permission_hook_denied';
 const TOOL_FAILURE_KIND_PLAN_MODE_BLOCKED = 'plan_mode_blocked';
 const TOOL_FAILURE_KIND_NON_INTERACTIVE_DENIED = 'non_interactive_denied';
 const TOOL_FAILURE_KIND_BACKGROUND_AGENT_DENIED = 'background_agent_denied';
+const TOOL_FAILURE_KIND_IZN_GATE_BLOCKED = 'izn_gate_blocked';
 
 const TOOL_SPAN_STATUS_PRE_HOOK_BLOCKED = 'Tool execution blocked by hook';
 const TOOL_SPAN_STATUS_POST_HOOK_STOPPED = 'Tool execution stopped by hook';
@@ -136,6 +137,8 @@ const TOOL_SPAN_STATUS_NON_INTERACTIVE_DENIED =
   'Non-interactive mode declined permission';
 const TOOL_SPAN_STATUS_BACKGROUND_AGENT_DENIED =
   'Background agent cannot prompt for confirmation';
+const TOOL_SPAN_STATUS_IZN_GATE_BLOCKED =
+  'Izn gate blocked a destructive tool call';
 const TOOL_SPAN_STATUS_TOOL_ERROR = 'Tool execution failed';
 const TOOL_SPAN_STATUS_TOOL_EXCEPTION = 'Tool execution failed with exception';
 const TOOL_SPAN_STATUS_TOOL_CANCELLED = 'Tool execution cancelled by user';
@@ -805,6 +808,7 @@ export class CoreToolScheduler {
   private config: Config;
   private onEditorClose: () => void;
   private chatRecordingService?: ChatRecordingService;
+  private iznGateHandler?: IznGateHandler;
   private isFinalizingToolCalls = false;
   private isScheduling = false;
   private validationRetryCounts = new Map<string, number>();
@@ -846,6 +850,7 @@ export class CoreToolScheduler {
     this.getPreferredEditor = options.getPreferredEditor;
     this.onEditorClose = options.onEditorClose;
     this.chatRecordingService = options.chatRecordingService;
+    this.iznGateHandler = options.iznGateHandler;
   }
 
   private setStatusInternal(
@@ -1763,6 +1768,33 @@ export class CoreToolScheduler {
           if (
             !needsConfirmation(finalPermission, approvalMode, canonicalName)
           ) {
+            // IZN mode: run the destructive-action gate before auto-approving.
+            if (approvalMode === ApprovalMode.IZN && this.iznGateHandler) {
+              const gateDecision = this.iznGateHandler.check({
+                toolName: canonicalName,
+                toolArgs: toolParams,
+              });
+              if (!gateDecision.allowed) {
+                this.setStatusInternal(reqInfo.callId, 'error', {
+                  callId: reqInfo.callId,
+                  responseParts: convertToFunctionResponse(
+                    reqInfo.name,
+                    reqInfo.callId,
+                    gateDecision.clarificationMessage,
+                  ),
+                  resultDisplay: 'Izn gate blocked a destructive tool call.',
+                  error: undefined,
+                  errorType: undefined,
+                });
+                setToolSpanFailure(
+                  toolSpan,
+                  TOOL_FAILURE_KIND_IZN_GATE_BLOCKED,
+                  TOOL_SPAN_STATUS_IZN_GATE_BLOCKED,
+                );
+                this.finalizeToolSpan(reqInfo.callId);
+                continue;
+              }
+            }
             this.setToolCallOutcome(
               reqInfo.callId,
               ToolConfirmationOutcome.ProceedAlways,
@@ -2841,7 +2873,6 @@ export class CoreToolScheduler {
                     blockType: r.shouldStop ? 'stop' : undefined,
                   },
           );
-
 
           // Check if hook requested to stop execution
           if (postHookResult.shouldStop) {

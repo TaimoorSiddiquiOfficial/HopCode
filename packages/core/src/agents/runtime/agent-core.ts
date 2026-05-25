@@ -229,6 +229,14 @@ export class AgentCore {
   >();
   private readonly liveOutputs = new Map<string, ToolResultDisplay>();
   private readonly shellPids = new Map<string, number>();
+  /**
+   * Shared IznGateHandler persists across reasoning loops within this agent
+   * so retry-after-verification hashes survive across user turns. Block
+   * history is reset at the start of each user turn (clearBlockHistory),
+   * but hashes are kept — they are single-use (deleted on pass-through in
+   * check()) so a stale hash cannot auto-approve a different command.
+   */
+  private readonly iznGateHandler = new IznGateHandler();
 
   /**
    * Legacy execution stats maintained for aggregate tracking.
@@ -572,11 +580,12 @@ export class AgentCore {
     let finalText = '';
     let terminateMode: AgentTerminateMode | null = null;
 
-    // Shared IznGateHandler persists across all tool-execution rounds
-    // within the same turn so the retry-after-verification path
-    // (hash-based bypass) works when the model re-issues a destructive
-    // command after self-verification and user confirmation.
-    const iznGateHandler = new IznGateHandler();
+    // Reset escalation history for the new user turn. Verified hashes are NOT
+    // cleared here — they are single-use (deleted on pass-through in check())
+    // so they survive across turns to support the cross-turn retry flow where
+    // the model ends the loop to ask the user, the user confirms in a new
+    // message, and the model retries the blocked command in the next turn.
+    this.iznGateHandler.clearBlockHistory();
 
     while (true) {
       // Check abort before starting a new round — prevents unnecessary API
@@ -738,7 +747,7 @@ export class AgentCore {
           promptId,
           turnCounter,
           toolsList,
-          iznGateHandler,
+          this.iznGateHandler,
           currentResponseId,
           wasOutputTruncated,
         );
