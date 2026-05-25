@@ -24,6 +24,11 @@ import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
 import type { AnyToolInvocation } from '../tools/tools.js';
 import type { ArenaManager } from '../agents/arena/ArenaManager.js';
+import type { WebSearchConfig } from '../tools/web-search/types.js';
+import type { PowerShellSecurityConfig } from '../security/powershell-security.js';
+import { resolvePowerShellConfig } from '../security/powershell-security.js';
+import { PermissionBlockerService } from '../services/permissionBlockerService.js';
+import { TaskStore } from '../services/task-store.js';
 import { ArenaAgentClient } from '../agents/arena/ArenaAgentClient.js';
 
 // Core
@@ -130,7 +135,7 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
-import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
+import { DEFAULT_HOPCODE_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
@@ -178,6 +183,7 @@ export enum ApprovalMode {
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
   YOLO = 'yolo',
+  IZN = 'izn',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -236,6 +242,11 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
   [ApprovalMode.YOLO]: {
     id: ApprovalMode.YOLO,
     name: 'YOLO',
+    description: 'Automatically approve all tools',
+  },
+  [ApprovalMode.IZN]: {
+    id: ApprovalMode.IZN,
+    name: 'Izn',
     description: 'Automatically approve all tools',
   },
 };
@@ -443,7 +454,11 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
   };
 }
 
-export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
+export type ExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
+
+export type AgentModelOverride =
+  | string
+  | { model: string; baseUrl?: string; apiKey?: string };
 
 export interface ExtensionInstallMetadata {
   source: string;
@@ -613,7 +628,7 @@ export interface ConfigParameters {
   fileReadCacheDisabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    respectQwenIgnore?: boolean;
+    respectHopCodeIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
   };
@@ -629,19 +644,11 @@ export interface ConfigParameters {
   model?: string;
   outputLanguageFilePath?: string;
   maxSessionTurns?: number;
-  /**
-   * Wall-clock budget for an unattended run, in seconds. `-1` (default)
-   * means no limit. Enforced by the CLI's non-interactive run loop —
-   * see `RunBudgetEnforcer` in `packages/cli/src/utils/runBudget.ts`.
-   * Issue: QwenLM/qwen-code#4103.
-   */
   maxWallTimeSeconds?: number;
-  /**
-   * Cumulative tool-call budget across the entire run. `-1` means no
-   * limit. Counts every `executeToolCall` invocation (incl. failed
-   * tools, since the model is still consuming tokens reading the error).
-   */
   maxToolCalls?: number;
+  webSearch?: WebSearchConfig | null;
+  agentModels?: Record<string, AgentModelOverride>;
+  powershellConfig?: Partial<PowerShellSecurityConfig>;
   clearContextOnIdle?: ClearContextOnIdleSettings;
   sessionTokenLimit?: number;
   experimentalZedIntegration?: boolean;
@@ -912,7 +919,7 @@ export class Config {
   private cronScheduler: CronScheduler | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectQwenIgnore: boolean;
+    respectHopCodeIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
@@ -963,6 +970,15 @@ export class Config {
     | null = null;
   private readonly arenaAgentClient: ArenaAgentClient | null;
   private readonly agentsSettings: AgentsCollabSettings;
+  private readonly agentModels: Record<string, AgentModelOverride> | undefined;
+  private readonly webSearch: WebSearchConfig | null;
+  private readonly powershellConfig:
+    | Partial<PowerShellSecurityConfig>
+    | undefined;
+  private readonly permissionBlockerService:
+    | PermissionBlockerService
+    | undefined;
+  private readonly taskStore: TaskStore | undefined;
   private readonly skipLoopDetection: boolean;
   private readonly skipStartupContext: boolean;
   private readonly bareMode: boolean;
@@ -1009,7 +1025,8 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel = params.embeddingModel ?? DEFAULT_QWEN_EMBEDDING_MODEL;
+    this.embeddingModel =
+      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
@@ -1089,7 +1106,7 @@ export class Config {
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
+      respectHopCodeIgnore: params.fileFiltering?.respectHopCodeIgnore ?? true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -1158,8 +1175,9 @@ export class Config {
     this.addLegacyPlanLocationWarning();
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
-
-    // (web search removed)
+    this.webSearch = params.webSearch ?? null;
+    this.agentModels = params.agentModels;
+    this.powershellConfig = params.powershellConfig;
     this.useRipgrep = params.useRipgrep ?? true;
     this.useBuiltinRipgrep = params.useBuiltinRipgrep ?? true;
     this.shouldUseNodePtyShell =
@@ -1239,6 +1257,10 @@ export class Config {
     // Legacy: fall back to merged hooks if new fields are not provided
     this.hooks = params.hooks;
     this.memoryManager = new MemoryManager();
+    this.taskStore = new TaskStore(this.targetDir, this.sessionId);
+    this.permissionBlockerService = new PermissionBlockerService(
+      path.join(this.targetDir, '.hopcode', 'permission-blocker.json'),
+    );
   }
 
   /**
@@ -2606,6 +2628,40 @@ export class Config {
     return this.arenaManager;
   }
 
+  /**
+   * Returns the fast model for side-query paths. Unlike {@link getFastModel},
+   * this can return an authType-qualified selector because BaseLlmClient can
+   * route a single request through a provider different from the main session.
+   */
+  getFastModelForSideQuery(): string | undefined {
+    const selector = this.resolveFastModelSelector();
+    if (!selector) return undefined;
+
+    if (selector.authType) {
+      const available = this.getAllConfiguredModels([selector.authType]);
+      return available.some((m) => m.id === selector.modelId)
+        ? `${selector.authType}:${selector.modelId}`
+        : undefined;
+    }
+
+    const allModels = this.getAllConfiguredModels();
+    return allModels.some((m) => m.id === selector.modelId)
+      ? selector.modelId
+      : undefined;
+  }
+
+  setContextMdFileCount(count: number): void {
+    this.geminiMdFileCount = count;
+  }
+
+  getContextMdFileCount(): number {
+    return this.geminiMdFileCount;
+  }
+
+  getWebSearchConfig(): WebSearchConfig | null {
+    return this.webSearch ?? null;
+  }
+
   setArenaManager(manager: ArenaManager | null): void {
     this.arenaManager = manager;
     this.arenaManagerChangeCallback?.(manager);
@@ -2999,13 +3055,13 @@ export class Config {
     return this.fileFiltering.respectGitIgnore;
   }
   getFileFilteringRespectQwenIgnore(): boolean {
-    return this.fileFiltering.respectQwenIgnore;
+    return this.fileFiltering.respectHopCodeIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
+      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
     };
   }
 
@@ -3157,6 +3213,22 @@ export class Config {
    */
   setMessageBus(messageBus: MessageBus): void {
     this.messageBus = messageBus;
+  }
+
+  getTaskStore(): TaskStore | undefined {
+    return this.taskStore;
+  }
+
+  getPermissionBlockerService(): PermissionBlockerService | undefined {
+    return this.permissionBlockerService;
+  }
+
+  getPowerShellConfig(): PowerShellSecurityConfig {
+    return resolvePowerShellConfig(this.powershellConfig);
+  }
+
+  getAgentModels(): Record<string, AgentModelOverride> | undefined {
+    return this.agentModels;
   }
 
   /**
@@ -3974,4 +4046,20 @@ export class Config {
     // Pre-init path: stash for `createToolRegistry` to consume.
     this.pendingMcpBudgetCallback = cb;
   }
+}
+
+/**
+ * Creates a shallow override of a Config by prototype delegation.
+ * The returned object delegates to `base` for all properties not
+ * explicitly overridden in `overrides`.
+ */
+export function createConfigOverride<T extends Config>(
+  base: T,
+  overrides: Partial<Record<keyof T, () => unknown>>,
+): T {
+  const override = Object.create(base) as T;
+  for (const [key, getter] of Object.entries(overrides)) {
+    (override as Record<string, unknown>)[key] = getter;
+  }
+  return override;
 }

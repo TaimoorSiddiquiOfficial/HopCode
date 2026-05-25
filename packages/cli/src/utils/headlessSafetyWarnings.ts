@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ApprovalMode, type Config } from '@qwen-code/qwen-code-core';
+import { ApprovalMode, type Config } from '@hoptrendy/hopcode-core';
 
 export const HEADLESS_YOLO_NO_SANDBOX_WARNING =
   'Warning: running headless with --yolo / approval-mode=yolo and no sandbox. ' +

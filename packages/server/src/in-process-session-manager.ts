@@ -108,7 +108,7 @@ export class InProcessSessionManager {
     const model =
       (request.model as string) ||
       this.options.defaultModel ||
-      this.options.runtimeConfig.model ||
+      this.options.runtimeConfig.getModel() ||
       'claude-sonnet-4-6';
 
     const cwd = (request.cwd as string) || this.options['cwd'] || process.cwd();

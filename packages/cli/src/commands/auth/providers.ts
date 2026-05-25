@@ -162,6 +162,8 @@ export async function handleApiKeyAuth(
       resume: undefined,
       sessionId: undefined,
       maxSessionTurns: undefined,
+      maxWallTime: undefined,
+      maxToolCalls: undefined,
       coreTools: undefined,
       excludeTools: undefined,
       authType: undefined,

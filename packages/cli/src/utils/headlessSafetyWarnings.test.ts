@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { ApprovalMode, type Config } from '@qwen-code/qwen-code-core';
+import { ApprovalMode, type Config } from '@hoptrendy/hopcode-core';
 import {
   HEADLESS_YOLO_NO_SANDBOX_WARNING,
   getHeadlessYoloSafetyWarning,

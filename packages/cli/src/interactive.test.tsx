@@ -630,6 +630,8 @@ describe('interactive.tsx main function kitty protocol', () => {
       excludeTools: undefined,
       disabledSlashCommands: undefined,
       authType: undefined,
+      maxWallTime: undefined,
+      maxToolCalls: undefined,
       maxSessionTurns: undefined,
       experimentalLsp: undefined,
       channel: undefined,
