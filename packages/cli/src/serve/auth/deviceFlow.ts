@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
@@ -9,16 +9,16 @@
  * PR 21). The registry brokers an OAuth 2.0 Device Authorization Grant
  * (RFC 8628) initiated through `POST /workspace/auth/device-flow` so a
  * remote SDK client can ask the daemon to log in. Tokens land on the
- * **daemon** filesystem, not the client — the client only displays the
+ * **daemon** filesystem, not the client â€” the client only displays the
  * verification URL + user code.
  *
- * Key contracts (locked in `notes/pr21-design.md` §2):
+ * Key contracts (locked in `notes/pr21-design.md` Â§2):
  *   - per-`providerId` singleton (idempotent take-over for repeat POSTs)
  *   - workspace-wide cap of 4 active flows (abuse defense)
  *   - terminal entries kept for `TERMINAL_GRACE_MS` so SDK reconnects can
  *     still observe the result via GET
  *   - secrets (`device_code`, PKCE verifier) never appear in HTTP bodies,
- *     events, or logs — wrapped in a `BrandedSecret` whose `toJSON` returns
+ *     events, or logs â€” wrapped in a `BrandedSecret` whose `toJSON` returns
  *     `'[redacted]'`
  *   - polling state is owned by the daemon; SDK liveness is irrelevant
  */
@@ -33,7 +33,7 @@ export const DEVICE_FLOW_SLOW_DOWN_BUMP_MS = 5_000;
 /**
  * Hard ceiling on `provider.persist()`. A wedged disk I/O (NFS stall,
  * encrypted-volume contention) without this would leave a flow stuck
- * in `pending` until the sweeper catches the upstream `expires_in` —
+ * in `pending` until the sweeper catches the upstream `expires_in` â€”
  * potentially minutes. 30s is generous for a normal local FS write
  * but short enough that operators see disk problems quickly.
  * PR #4255 review C3.
@@ -67,12 +67,12 @@ export const DEVICE_FLOW_START_TIMEOUT_MS = 30_000;
 export const DEVICE_FLOW_POLL_TIMEOUT_MS = 30_000;
 /**
  * Operator-safe upper bound on the IdP-provided `expires_in`. RFC
- * 8628 §6.1 calls 5–30 minutes "reasonable"; 1 hour is the practical
+ * 8628 Â§6.1 calls 5â€“30 minutes "reasonable"; 1 hour is the practical
  * ceiling for any well-behaved IdP. PR #4255 fold-in 7 review thread
  * #3: `Number.isFinite + > 0` keeps NaN/Infinity out, but a malicious
  * or buggy IdP returning `1e12` still pins the per-provider singleton
  * for years and ties up an entry slot the entire time. Clamping
- * silently bounds the worst case to 1 hour — an IdP that genuinely
+ * silently bounds the worst case to 1 hour â€” an IdP that genuinely
  * needs longer is not RFC 8628 compliant.
  */
 export const DEVICE_FLOW_MAX_EXPIRES_IN_SEC = 60 * 60;
@@ -80,10 +80,10 @@ export const DEVICE_FLOW_MAX_EXPIRES_IN_SEC = 60 * 60;
  * Operator-safe lower bound on the IdP-provided `expires_in`.
  * Symmetric with `DEVICE_FLOW_MAX_EXPIRES_IN_SEC`. PR #4255 round-12
  * #5 (gpt-5.5 review Cy_ZF): a misbehaving / fuzzed IdP returning
- * `expires_in: 0.5` would produce `expiresAt = now() + 500 ms` —
+ * `expires_in: 0.5` would produce `expiresAt = now() + 500 ms` â€”
  * the very first poll (clamped at `>=1 s`) would fire AFTER
  * `expiresAt` and the entry would expire before any user could
- * authorize. RFC 8628 §3.2 calls 5–30 minutes "reasonable"; sub-30 s
+ * authorize. RFC 8628 Â§3.2 calls 5â€“30 minutes "reasonable"; sub-30 s
  * `expires_in` is effectively non-compliant. Floor lifts those
  * pathological values to 30 s so the user gets at least one
  * chance to complete the IdP page.
@@ -91,11 +91,11 @@ export const DEVICE_FLOW_MAX_EXPIRES_IN_SEC = 60 * 60;
 export const DEVICE_FLOW_MIN_EXPIRES_IN_SEC = 30;
 /**
  * Upper bound on the polling interval. RFC 8628's normal `interval`
- * + `slow_down` bumps live in the 5–30 s range; values past 60 s
+ * + `slow_down` bumps live in the 5â€“30 s range; values past 60 s
  * indicate an IdP misbehaving (or, more likely, `1e12` from a
  * fuzzed/buggy response). Capping keeps `setTimeout` from being
  * scheduled with a value that Node's scheduler clamps to
- * `TIMEOUT_MAX` (≈24.8 d) — at which point the poll never fires
+ * `TIMEOUT_MAX` (â‰ˆ24.8 d) â€” at which point the poll never fires
  * within the entry's `expiresAt` window. PR #4255 fold-in 7 review
  * thread #3.
  */
@@ -121,9 +121,9 @@ export type DeviceFlowStatus =
 /**
  * Terminal error classifications surfaced on `auth_device_flow_failed`.
  *
- * RFC 8628 §3.5 defines the upstream error codes for the polling
+ * RFC 8628 Â§3.5 defines the upstream error codes for the polling
  * endpoint; the daemon adds one daemon-internal kind (`persist_failed`)
- * for the disk-write phase. Keep these mutually exclusive — a
+ * for the disk-write phase. Keep these mutually exclusive â€” a
  * mis-classification (e.g. routing a network error into
  * `invalid_grant`) drives operators toward the wrong remediation.
  */
@@ -137,7 +137,7 @@ export type DeviceFlowErrorKind =
    *  IdP page. Recovery: re-issue with consent, or surface the
    *  refusal back to the human. */
   | 'access_denied'
-  /** RFC 8628: protocol-level violation — `device_code` /
+  /** RFC 8628: protocol-level violation â€” `device_code` /
    *  `client_id` / PKCE verifier didn't validate. Treat as a
    *  programmer error in the daemon's flow construction (the user
    *  can't fix this themselves). */
@@ -159,13 +159,13 @@ export type DeviceFlowErrorKind =
    *  **Lost-success / retry-after-persist-failed UX caveat.** When
    *  the failure originated from `provider.persist()` ignoring the
    *  registry's signal AND the underlying disk write later
-   *  succeeded (PR #4255 fold-in 9 #7 — only reachable for
+   *  succeeded (PR #4255 fold-in 9 #7 â€” only reachable for
    *  non-conforming future providers; the Qwen provider honors
    *  signal end-to-end), the daemon emits
    *  `auth_device_flow_failed`/`persist_failed` to SSE while the
    *  credentials are silently on disk. A naive SDK retry (\"disk
    *  transient, try again\") will hit the IdP a second time with
-   *  a fresh `device_code`, prompting the user a second time —
+   *  a fresh `device_code`, prompting the user a second time â€”
    *  but the FIRST credential set is already valid. If the second
    *  prompt times out without approval, the user is logged in
    *  (from the first lost-success persist) without realizing they
@@ -188,7 +188,7 @@ export type DeviceFlowErrorKind =
  * **Why a frozen plain object, not `new String(value)`:** an earlier draft
  * used a `String` wrapper with `toJSON` / `toString` overrides. Empirical
  * test (and code-review pass): `"x=" + new String("foo")` evaluates to
- * `"x=foo"` because `+` coerces via `Symbol.toPrimitive` → `valueOf` (which
+ * `"x=foo"` because `+` coerces via `Symbol.toPrimitive` â†’ `valueOf` (which
  * the `String` wrapper inherits and returns the raw primitive), NOT
  * `toString`. Template literals (`${secret}`) take the same path. So a
  * future commit that templated a `BrandedSecret<string>` into a log line
@@ -201,13 +201,13 @@ export type DeviceFlowErrorKind =
  * symbol` so other modules can't structurally satisfy it.
  *
  * Misuse paths and what they produce:
- *   `JSON.stringify({s: secret})` → `'{"s":"[redacted]"}'`
- *   `String(secret)`              → `'[redacted]'`
- *   `'x=' + secret`               → `'x=[redacted]'`
- *   `` `s=${secret}` ``           → `'s=[redacted]'`
- *   `secret.length`               → undefined (no String prototype)
- *   `+secret`                     → NaN
- *   `unsafeRevealSecret(secret)`        → the original primitive (only path)
+ *   `JSON.stringify({s: secret})` â†’ `'{"s":"[redacted]"}'`
+ *   `String(secret)`              â†’ `'[redacted]'`
+ *   `'x=' + secret`               â†’ `'x=[redacted]'`
+ *   `` `s=${secret}` ``           â†’ `'s=[redacted]'`
+ *   `secret.length`               â†’ undefined (no String prototype)
+ *   `+secret`                     â†’ NaN
+ *   `unsafeRevealSecret(secret)`        â†’ the original primitive (only path)
  */
 const SECRET_BRAND: unique symbol = Symbol('DeviceFlowSecret');
 
@@ -254,7 +254,7 @@ export function unsafeRevealSecret<T extends string>(
   if (value === undefined) {
     // The earlier message claimed "secret has been GC-evicted", but a
     // `WeakMap` only evicts entries when the KEY object becomes
-    // unreachable — and if that happened, the caller couldn't hold a
+    // unreachable â€” and if that happened, the caller couldn't hold a
     // reference to pass in here. So the only path to `undefined` is
     // an argument that was never registered (e.g. forged structural
     // shape, mistakenly serialized + reparsed object that retained
@@ -271,7 +271,7 @@ export interface DeviceFlowStartResult {
   userCode: string;
   verificationUri: string;
   verificationUriComplete?: string;
-  /** RFC 8628 §3.2 `expires_in` (seconds). */
+  /** RFC 8628 Â§3.2 `expires_in` (seconds). */
   expiresIn: number;
   /** Initial polling interval in seconds. RFC 8628 default = 5. */
   interval?: number;
@@ -298,7 +298,7 @@ export type DeviceFlowPollResult =
        *  audit trail records the race for incident response.
        *
        *  @remarks
-       *  **Provider-author contract — `signal` MUST be honored.** The
+       *  **Provider-author contract â€” `signal` MUST be honored.** The
        *  registry races this promise against `DEVICE_FLOW_PERSIST_TIMEOUT_MS`
        *  (currently 30 s). When the timeout fires, the registry
        *  publishes `persist_failed` to SSE subscribers AND aborts
@@ -312,7 +312,7 @@ export type DeviceFlowPollResult =
        *  view. The contract is therefore: every fs / network call
        *  inside `persist` MUST take `signal` as input AND propagate
        *  it down to abortable primitives (`fs.writeFile`, `fetch`,
-       *  etc.). `cacheQwenCredentials({signal})` in
+       *  etc.). `cacheHopCodeCredentials({signal})` in
        *  `qwenDeviceFlowProvider` is the canonical example. */
       persist(opts: { signal: AbortSignal }): Promise<{
         expiresAt?: number;
@@ -329,7 +329,7 @@ export interface DeviceFlowProvider {
   readonly providerId: DeviceFlowProviderId;
   /**
    * Begin a device-authorization grant against the IdP. Same SSE-leak
-   * sanitization rule as `poll()` applies to thrown error messages —
+   * sanitization rule as `poll()` applies to thrown error messages â€”
    * see `poll()` `@remarks` below.
    */
   start(opts: { signal: AbortSignal }): Promise<DeviceFlowStartResult>;
@@ -342,7 +342,7 @@ export interface DeviceFlowProvider {
    * still see the post-`await` guard suppress the resolved frame.
    *
    * @remarks
-   * **Provider-author contract — sanitize before throwing.** The
+   * **Provider-author contract â€” sanitize before throwing.** The
    * registry's `runPollTick` catch block forwards `err.message`
    * verbatim into the `auth_device_flow_failed` event's `hint`
    * field, which is workspace-broadcast over SSE to every subscriber
@@ -355,18 +355,18 @@ export interface DeviceFlowProvider {
    * accidentally echoed.
    *
    * Two equally-correct paths for new providers:
-   *   1. **Resolve to a typed `error` result** — return
+   *   1. **Resolve to a typed `error` result** â€” return
    *      `{ kind: 'error', errorKind, hint }` with a *bounded
    *      static-or-pattern hint*. This is the preferred path; it
    *      keeps full structured-error fidelity and drops nothing.
-   *   2. **Throw, but only with a sanitized `Error.message`** — if
+   *   2. **Throw, but only with a sanitized `Error.message`** â€” if
    *      the implementation finds it more natural to throw,
    *      construct the thrown `Error` with a *short bounded sentence
    *      that contains no IdP body / banner / secret*. Send the raw
    *      detail through `writeStderrLine` for operator audit; the
    *      thrown `message` is the SSE-visible surface.
    *
-   * `qwenDeviceFlowProvider` is the canonical example — see PR #4255
+   * `qwenDeviceFlowProvider` is the canonical example â€” see PR #4255
    * review S2 + fold-in 3 #9 + fold-in 5 #4 for the historical
    * regressions this contract prevents.
    */
@@ -437,7 +437,7 @@ export interface DeviceFlowEventSink {
 
 export interface DeviceFlowAuditSink {
   /** Structured stderr audit breadcrumb. `mutate({strict:true})` doesn't
-   *  carry an audit hook; PR 21 §8 #9 mandates a parallel log channel. */
+   *  carry an audit hook; PR 21 Â§8 #9 mandates a parallel log channel. */
   record(line: {
     deviceFlowId: string;
     providerId: DeviceFlowProviderId;
@@ -471,7 +471,7 @@ interface DeviceFlowEntry {
    * singleton). Initially `undefined`; populated only when a second
    * caller's `initiatorClientId` differs from `entry.initiatorClientId`.
    * Surfaced through the audit trail so incident response can see
-   * "client A started this flow, client B took it over at 12:34" —
+   * "client A started this flow, client B took it over at 12:34" â€”
    * useful when two SDK processes race on the same Qwen account
    * across hosts. Event-routing still uses the original
    * `initiatorClientId` (events are workspace-broadcast; the
@@ -487,13 +487,13 @@ interface DeviceFlowEntry {
   cancelController: AbortController;
   /**
    * `true` while `provider.persist()` is awaiting on disk I/O. While
-   * set, `cancel()` and the sweeper SKIP transitioning + emitting —
+   * set, `cancel()` and the sweeper SKIP transitioning + emitting â€”
    * only the persist resolution finalizes the terminal state. This
    * prevents the SDK-event-stream UX trap where direct subscribers
    * would see `auth_device_flow_cancelled` followed by
    * `auth_device_flow_authorized` for the same flow (reducer-state
    * converges correctly via last-write-wins, but imperative event
-   * handlers — close-dialog / release-resource / log-telemetry —
+   * handlers â€” close-dialog / release-resource / log-telemetry â€”
    * race onto an unmounted UI). PR #4255 fold-in 5 review thread #1.
    */
   persistInFlight?: boolean;
@@ -501,10 +501,10 @@ interface DeviceFlowEntry {
    * Set by `cancel()` if it ran while `persistInFlight === true`. The
    * persist resolution branch reads this to decide which terminal
    * event to emit:
-   *   - persist succeeded → `authorized` (IdP approval wins; the
+   *   - persist succeeded â†’ `authorized` (IdP approval wins; the
    *     cancel-during-persist race resolves toward the user's
    *     completed browser approval per fold-in 3's C4 reversal).
-   *   - persist failed (incl. abort fired by `cancel()`) → `cancelled`
+   *   - persist failed (incl. abort fired by `cancel()`) â†’ `cancelled`
    *     (the cancel got its way; no credentials on disk).
    */
   cancelRequestedDuringPersist?: boolean;
@@ -520,11 +520,11 @@ interface DeviceFlowEntry {
   cancellerClientId?: string;
   /**
    * First-writer-wins flag. Set the moment ANY `cancel()` call drives
-   * this entry into `cancelRequestedDuringPersist` — including the
+   * this entry into `cancelRequestedDuringPersist` â€” including the
    * anonymous case where `cancellerClientId` stays `undefined`. The
    * flag is decoupled from `cancellerClientId` because the latter
    * being `undefined` is BOTH "no canceller has driven the transition
-   * yet" AND "an anonymous canceller drove the transition" — using it
+   * yet" AND "an anonymous canceller drove the transition" â€” using it
    * as the gate would let a later identified canceller silently
    * overwrite an earlier anonymous one. PR #4255 follow-up review
    * (Copilot on #4291): closes the anonymous-first canceller bug.
@@ -564,7 +564,7 @@ export interface DeviceFlowStartParams {
  *
  * **Reachability:** the route layer (`server.ts`) already screens
  * unknown ids against `DEVICE_FLOW_SUPPORTED_PROVIDERS` and returns
- * `400 invalid_request` BEFORE reaching the registry — so this error
+ * `400 invalid_request` BEFORE reaching the registry â€” so this error
  * is reachable only on a daemon-internal invariant violation:
  * `DEVICE_FLOW_SUPPORTED_PROVIDERS` declares an id but the runtime
  * `resolveProvider` map doesn't carry an implementation for it
@@ -598,7 +598,7 @@ export class TooManyActiveDeviceFlowsError extends Error {
 }
 
 // PR #4255 review S3: `DeviceFlowNotFoundError` was exported but never
-// imported anywhere — the route handlers handle the not-found case
+// imported anywhere â€” the route handlers handle the not-found case
 // inline with `res.status(404).json(...)`. Removed to avoid dead-code
 // rot. Future routes that prefer typed-error flow can re-introduce it.
 
@@ -633,7 +633,7 @@ export class DeviceFlowPollTimeoutError extends Error {
 /**
  * Typed accessors for parking the `DeviceFlowRegistry` on
  * `express.Application['locals']`. The string key is shared between
- * `createServeApp` (writer) and `runQwenServe`'s shutdown drain
+ * `createServeApp` (writer) and `runHopCodeServe`'s shutdown drain
  * (reader); without typed setter/getter, a typo in either site
  * would compile cleanly and the dispose call would silently no-op,
  * leaving polling timers hanging until process `unref()`-driven
@@ -661,7 +661,7 @@ export function getDeviceFlowRegistry(app: {
 /**
  * In-memory device-flow state holder. Single instance per daemon.
  *
- * Lifecycle: `runQwenServe` constructs one, hands it to `createServeApp`,
+ * Lifecycle: `runHopCodeServe` constructs one, hands it to `createServeApp`,
  * and calls `dispose()` during shutdown drain so every pending poll timer
  * is cancelled before the process exits.
  */
@@ -676,7 +676,7 @@ export class DeviceFlowRegistry {
    * SDK clients posting `POST /workspace/auth/device-flow` in parallel
    * would otherwise both pass the "no existing pending entry" check,
    * each call `provider.start()` (a real IdP round-trip), and one's
-   * write to `byProvider` would clobber the other — leaving an orphan
+   * write to `byProvider` would clobber the other â€” leaving an orphan
    * `byId` entry with a still-running poll timer that consumes IdP
    * quota for nothing. Mirrors `SharedTokenManager`'s in-flight refresh
    * coalescing pattern.
@@ -725,7 +725,7 @@ export class DeviceFlowRegistry {
   }
 
   /**
-   * Start a new device flow OR — under per-provider singleton semantics —
+   * Start a new device flow OR â€” under per-provider singleton semantics â€”
    * return the existing pending entry (`attached: true`). The take-over
    * branch deliberately does NOT re-call `provider.start()`; making the
    * second POST a no-op (rather than a fresh IdP request) is the property
@@ -742,7 +742,7 @@ export class DeviceFlowRegistry {
     if (!provider) {
       throw new UnsupportedDeviceFlowProviderError(params.providerId);
     }
-    // Fast-path: an existing pending entry → idempotent take-over.
+    // Fast-path: an existing pending entry â†’ idempotent take-over.
     const existing = this.byProvider.get(params.providerId);
     if (existing && existing.status === 'pending') {
       this.recordTakeover(existing, params.initiatorClientId);
@@ -787,7 +787,7 @@ export class DeviceFlowRegistry {
     const cancelController = new AbortController();
     // PR #4255 fold-in 3 #2 + fold-in 7 #1: bound `provider.start()`
     // with an authoritative registry-side timeout via `Promise.race`.
-    // The earlier shape only ABORTED the signal on timeout — but a
+    // The earlier shape only ABORTED the signal on timeout â€” but a
     // provider that ignored the signal (non-abortable I/O, future
     // implementer who forgot to thread `signal` to `fetch`) would
     // leave the `await` hanging forever, pinning the `inFlightStarts`
@@ -833,7 +833,7 @@ export class DeviceFlowRegistry {
     // entry would land in `byId` / `byProvider` AFTER `dispose()`
     // already cleared them, leaving an orphan that has no poll
     // scheduled (because `schedulePoll` guards on `this.disposed`)
-    // and never transitions. Bail out — the secrets in `startResult`
+    // and never transitions. Bail out â€” the secrets in `startResult`
     // are inaccessible to the caller (we threw), and the IdP-issued
     // device_code is left to expire upstream on its own clock.
     if (this.disposed) {
@@ -843,13 +843,13 @@ export class DeviceFlowRegistry {
     // `expiresIn: number`, but a misbehaving / future provider could
     // hand us `undefined` / `NaN` / `Infinity`. `Math.max(0, NaN) *
     // 1000` is `NaN`; `now() + NaN` is `NaN`; `now >= NaN` is always
-    // `false`, so the sweeper would NEVER evict the entry — pinning
+    // `false`, so the sweeper would NEVER evict the entry â€” pinning
     // an upstream `device_code` slot until daemon restart. Reject
     // non-finite-positive values and fall back to RFC 8628's
     // suggested ceiling (10 min) so the entry still expires.
     //
     // PR #4255 fold-in 7 review thread #3: also clamp the upper end
-    // — an extreme finite value like `1e12` is finite-and-positive
+    // â€” an extreme finite value like `1e12` is finite-and-positive
     // but would pin the singleton for ~30,000 years. Cap at
     // `DEVICE_FLOW_MAX_EXPIRES_IN_SEC` so a malformed/malicious IdP
     // can't tie up a per-provider slot beyond an operator-safe
@@ -870,9 +870,9 @@ export class DeviceFlowRegistry {
     // schedule a `setTimeout(NaN)` (fires immediately) or
     // `setTimeout(Infinity)` (scheduler clamps to TIMEOUT_MAX). RFC
     // 8628 recommends a 5s default when the IdP omits `interval`.
-    // PR #4255 fold-in 7 review thread #3: also clamp upper bound —
+    // PR #4255 fold-in 7 review thread #3: also clamp upper bound â€”
     // `interval: 1e12` is finite-and-positive but Node's scheduler
-    // would either clamp to TIMEOUT_MAX (≈24.8 d, never fires within
+    // would either clamp to TIMEOUT_MAX (â‰ˆ24.8 d, never fires within
     // the entry's expiresAt) or drop. Cap at
     // `DEVICE_FLOW_MAX_INTERVAL_MS` so the poll fires within a
     // reasonable window regardless of upstream input.
@@ -932,8 +932,8 @@ export class DeviceFlowRegistry {
 
   /**
    * Cancel a pending flow. Idempotent on terminal entries (returns
-   * `{ alreadyTerminal: true }` and does NOT re-emit `cancelled` —
-   * RFC 7231 §4.3.5: DELETE may still be a 204 even when nothing was
+   * `{ alreadyTerminal: true }` and does NOT re-emit `cancelled` â€”
+   * RFC 7231 Â§4.3.5: DELETE may still be a 204 even when nothing was
    * removed). Returns `undefined` for unknown ids so the route layer
    * can map it to 404.
    */
@@ -949,8 +949,8 @@ export class DeviceFlowRegistry {
     // `fs.writeFile` a chance to short-circuit; the persist resolution
     // looks at `cancelRequestedDuringPersist` to decide whether to
     // emit `cancelled` (persist aborted in time) or `authorized`
-    // (persist committed before the abort fired — IdP wins per
-    // fold-in 3 C4). This eliminates the cancelled→authorized event
+    // (persist committed before the abort fired â€” IdP wins per
+    // fold-in 3 C4). This eliminates the cancelledâ†’authorized event
     // sequence that would have raced onto a listener that already
     // closed its dialog.
     if (entry.persistInFlight) {
@@ -965,7 +965,7 @@ export class DeviceFlowRegistry {
       // events to avoid double-handling.
       // PR #4255 follow-up review thread (deepseek-v4-pro): first-writer-
       // wins. Two SDK clients racing `cancel()` on the same persist-in-
-      // flight entry must NOT silently overwrite attribution — the second
+      // flight entry must NOT silently overwrite attribution â€” the second
       // caller's `cancel()` is functionally a no-op (the entry is already
       // marked `cancelRequestedDuringPersist`), so the persist-resolution
       // event should be attributed to whoever actually drove the
@@ -1034,7 +1034,7 @@ export class DeviceFlowRegistry {
    * passes (count = 0). All `MAX+1` then `await provider.start()`,
    * eventually installing more than the documented four pending
    * flows. Adding `inFlightStarts.size` makes the accounting
-   * include the not-yet-installed reservations — the second
+   * include the not-yet-installed reservations â€” the second
    * concurrent caller sees `count = 1`, the third `count = 2`, and
    * so on. `byProvider` and `inFlightStarts` are disjoint by
    * construction (the existing-pending-entry fast-path catches any
@@ -1095,7 +1095,7 @@ export class DeviceFlowRegistry {
     // success/error after our race timer already settled the wrapper.
     // Without this, a flaky IdP that responds 1s past the 30s timeout
     // would silently no-op (the second `.then(resolve, ...)` lands on
-    // an already-settled outer promise) — operator has no signal that
+    // an already-settled outer promise) â€” operator has no signal that
     // the IdP is in fact responsive (just slow). Symmetric with the
     // `lost_success_after_timeout` audit on the persist path (fold-in
     // 9 #7 of #4255).
@@ -1139,7 +1139,7 @@ export class DeviceFlowRegistry {
       // PR #4291 follow-up review (qwen-latest, #2): the previous
       // shape routed our own race-timer rejection through the same
       // `provider.poll() threw (raw): ...` audit path as a real
-      // provider throw — at 3 AM, on-call would mis-triage as
+      // provider throw â€” at 3 AM, on-call would mis-triage as
       // "provider bug" and waste time investigating provider code.
       // Branch on `DeviceFlowPollTimeoutError` to use a dedicated
       // hint + suppress the misleading "raw" audit path.
@@ -1149,7 +1149,7 @@ export class DeviceFlowRegistry {
           errorKind: 'upstream_error',
           hint: `provider.poll() timed out after ${err.timeoutMs}ms; check IdP connectivity`,
         };
-        // rawProviderError stays undefined — the audit branch reads
+        // rawProviderError stays undefined â€” the audit branch reads
         // that to decide whether to emit the misleading "threw (raw)"
         // line. Timeout is not a provider throw.
       } else {
@@ -1173,7 +1173,7 @@ export class DeviceFlowRegistry {
     if (pollTimedOut && providerPollPromise !== undefined) {
       const tracked = providerPollPromise;
       // Detached on purpose; the catch on the ORIGINAL promise has
-      // already happened (via the wrapper) — the observer below
+      // already happened (via the wrapper) â€” the observer below
       // sees the eventual settlement of the same promise. Both
       // success and error branches go through audit only.
       void tracked.then(
@@ -1190,15 +1190,15 @@ export class DeviceFlowRegistry {
             // cooperative provider whose abort path resolves to
             // `{kind: 'error', errorKind: 'upstream_error'}` (the Qwen
             // implementation does this in response to AbortError), the
-            // "response" is just the abort-cooperation path — the IdP
+            // "response" is just the abort-cooperation path â€” the IdP
             // could be completely down. Don't assert "responsive but
             // slow" on the error kind: route operators correctly by
             // distinguishing "real late response" (pending / slow_down /
             // success) from "provider's abort cooperation" (error).
             hint:
               latePollResult.kind === 'error'
-                ? `lost_late_poll_after_timeout: provider.poll() resolved kind=error after ${DEVICE_FLOW_POLL_TIMEOUT_MS}ms ceiling — likely abort-driven cooperation; IdP responsiveness unknown`
-                : `lost_late_poll_after_timeout: provider.poll() resolved kind=${latePollResult.kind} after ${DEVICE_FLOW_POLL_TIMEOUT_MS}ms ceiling — IdP is responsive but slow; consider raising the operator-side IdP latency alert threshold`,
+                ? `lost_late_poll_after_timeout: provider.poll() resolved kind=error after ${DEVICE_FLOW_POLL_TIMEOUT_MS}ms ceiling â€” likely abort-driven cooperation; IdP responsiveness unknown`
+                : `lost_late_poll_after_timeout: provider.poll() resolved kind=${latePollResult.kind} after ${DEVICE_FLOW_POLL_TIMEOUT_MS}ms ceiling â€” IdP is responsive but slow; consider raising the operator-side IdP latency alert threshold`,
           });
         },
         (lateErr: unknown) => {
@@ -1214,7 +1214,7 @@ export class DeviceFlowRegistry {
             clientId: entry.initiatorClientId,
             status: 'failed',
             errorKind: 'upstream_error',
-            hint: `lost_late_poll_after_timeout: provider.poll() rejected after ${DEVICE_FLOW_POLL_TIMEOUT_MS}ms ceiling: ${detail.length > 256 ? `${detail.slice(0, 256)}…[+${detail.length - 256} bytes]` : detail}`,
+            hint: `lost_late_poll_after_timeout: provider.poll() rejected after ${DEVICE_FLOW_POLL_TIMEOUT_MS}ms ceiling: ${detail.length > 256 ? `${detail.slice(0, 256)}â€¦[+${detail.length - 256} bytes]` : detail}`,
           });
         },
       );
@@ -1226,7 +1226,7 @@ export class DeviceFlowRegistry {
     // wipes secrets but leaves the status field untouched). A
     // provider that already resolved or doesn't honor abort can
     // therefore enter the `success` branch below and call
-    // `result.persist({...})` — committing credentials on a
+    // `result.persist({...})` â€” committing credentials on a
     // shutting-down daemon. Same shape as the disposal guard
     // already present at the top of the method (line 948); this
     // closes the post-await window.
@@ -1240,8 +1240,8 @@ export class DeviceFlowRegistry {
         // PR #4255 round-12 #4 (Cy_Y9): re-clamp against
         // `DEVICE_FLOW_MAX_INTERVAL_MS`. A misbehaving / malicious
         // IdP that keeps returning `slow_down` would otherwise
-        // push `intervalMs` past the documented bound — eventually
-        // past Node's `TIMEOUT_MAX` (≈24.8 d) at which point the
+        // push `intervalMs` past the documented bound â€” eventually
+        // past Node's `TIMEOUT_MAX` (â‰ˆ24.8 d) at which point the
         // poll never fires within `expiresAt`. Each bump is only
         // 5 s so reaching `TIMEOUT_MAX` is impractical, but the
         // invariant `intervalMs <= MAX_INTERVAL_MS` is documented
@@ -1268,7 +1268,7 @@ export class DeviceFlowRegistry {
         // persist() with both the entry's cancelController signal
         // AND an authoritative registry-side timeout via
         // `Promise.race`. The earlier shape only ABORTED the signal
-        // on timeout — but a provider whose `persist()` performs
+        // on timeout â€” but a provider whose `persist()` performs
         // non-abortable I/O (a future provider that does `mkdir` /
         // `chmod` / `mv` outside the abortable `fs.writeFile`
         // pathway) would leave this `await` hanging until process
@@ -1279,7 +1279,7 @@ export class DeviceFlowRegistry {
         // branch which maps to `persist_failed`.
         //
         // Set `entry.persistInFlight` for the duration so `cancel()`
-        // and the sweeper SKIP transition+emit during this window —
+        // and the sweeper SKIP transition+emit during this window â€”
         // they just register intent (or no-op) and let the persist
         // resolution decide the terminal state.
         let metadata: { expiresAt?: number; accountAlias?: string } = {};
@@ -1295,7 +1295,7 @@ export class DeviceFlowRegistry {
         // scenario: provider's persist runs `mkdir`/`chmod`/`mv`
         // outside the abortable `fs.writeFile` pathway and the
         // disk write succeeds 100 ms after the 30 s timeout fires
-        // — daemon now has credentials on disk while every SSE
+        // â€” daemon now has credentials on disk while every SSE
         // subscriber thinks the login failed.
         //
         // The Qwen provider is signal-honoring (see fold-in 3 #10)
@@ -1310,8 +1310,8 @@ export class DeviceFlowRegistry {
         // The persist invocation happens BEFORE the surrounding
         // `new Promise` constructor (the tracker is captured by
         // reference inside the constructor), so a synchronous throw
-        // from a non-conforming provider — e.g. a top-of-function
-        // validation `if (!signal) throw …` — would NOT be caught
+        // from a non-conforming provider â€” e.g. a top-of-function
+        // validation `if (!signal) throw â€¦` â€” would NOT be caught
         // by the outer try/catch around `await new Promise(...)`.
         // `runPollTick` is invoked via `void this.runPollTick(...)`
         // so the escaped throw becomes an `unhandledRejection`. The
@@ -1329,7 +1329,7 @@ export class DeviceFlowRegistry {
           persistError = syncErr;
           persistTracker = Promise.reject(syncErr);
           // Suppress the unhandled-rejection warning on the
-          // synthetic rejected promise — we own the recovery via
+          // synthetic rejected promise â€” we own the recovery via
           // `persistError` and the lost_success branch below
           // explicitly catches its rejection too.
           persistTracker.catch(() => {});
@@ -1337,7 +1337,7 @@ export class DeviceFlowRegistry {
         persistTracker.then(
           (lateMeta) => {
             // Only fire when the race was timed out AND the underlying
-            // persist later succeeded — that's the inconsistency
+            // persist later succeeded â€” that's the inconsistency
             // window. Happy-path resolution (race accepted the value)
             // leaves `persistTimedOut === false`.
             if (!persistTimedOut) return;
@@ -1351,7 +1351,7 @@ export class DeviceFlowRegistry {
           },
           () => {
             // Late rejection after the race already drove the
-            // terminal — no-op (persistError carries the original
+            // terminal â€” no-op (persistError carries the original
             // failure, the registry already published it).
           },
         );
@@ -1392,12 +1392,12 @@ export class DeviceFlowRegistry {
         if (persistError) {
           // Persist failed (abort triggered by cancel/timeout, or a
           // genuine fs error). Two terminal mappings:
-          //   1. cancelDuringPersist → `cancelled` (user cancel won)
-          //   2. otherwise → `error`/`persist_failed` (genuine disk
-          //                  fault — even if now >= expiresAt)
+          //   1. cancelDuringPersist â†’ `cancelled` (user cancel won)
+          //   2. otherwise â†’ `error`/`persist_failed` (genuine disk
+          //                  fault â€” even if now >= expiresAt)
           //
           // PR #4255 fold-in 9 review thread #13: previously a
-          // persist-fail × past-`expiresAt` path classified as
+          // persist-fail Ã— past-`expiresAt` path classified as
           // `expired`/`expired_token`, which routed operator
           // remediation toward "user re-authenticates" (RFC 8628
           // expiry semantic) when the actual root cause was a disk
@@ -1427,7 +1427,7 @@ export class DeviceFlowRegistry {
             this.transitionTerminal(entry, 'error', 'persist_failed')
           ) {
             // S1 sanitize: full err detail goes through stderr audit
-            // (debugLogger inside cacheQwenCredentials); only a
+            // (debugLogger inside cacheHopCodeCredentials); only a
             // bounded sentence flows to SSE subscribers.
             const pastExpiry = this.now() >= entry.expiresAt;
             this.deps.events.publish(
@@ -1436,7 +1436,7 @@ export class DeviceFlowRegistry {
                 data: {
                   deviceFlowId: entry.deviceFlowId,
                   errorKind: 'persist_failed',
-                  hint: 'credentials could not be written to the daemon filesystem — check disk space and permissions',
+                  hint: 'credentials could not be written to the daemon filesystem â€” check disk space and permissions',
                 },
               },
               entry.initiatorClientId,
@@ -1458,7 +1458,7 @@ export class DeviceFlowRegistry {
         }
         // Persist succeeded. Per fold-in 3 C4 (and fold-in 5 #1
         // refinement): IdP approval wins. Whether or not cancel was
-        // requested during persist, the disk write committed —
+        // requested during persist, the disk write committed â€”
         // honor it.
         if (this.transitionTerminal(entry, 'authorized')) {
           this.deps.events.publish(
@@ -1533,7 +1533,7 @@ export class DeviceFlowRegistry {
    * a pending entry (or one being created in `inFlightStarts`). When
    * the second caller's `initiatorClientId` differs from the entry's,
    * stamp it on `entry.lastOriginatorClientId` and emit an audit
-   * breadcrumb. No event publish — the per-provider singleton's
+   * breadcrumb. No event publish â€” the per-provider singleton's
    * `started` event was already broadcast workspace-wide, and emitting
    * a second `started` would confuse SDK reducers (the `attached:
    * true` HTTP response is the second caller's signal). PR #4255
@@ -1563,7 +1563,7 @@ export class DeviceFlowRegistry {
    * the two identical sites (poll-tick top-of-loop + sweeper) so
    * the event shape lives in one place. No-op if the entry has
    * already transitioned (the transitionTerminal idempotence guard
-   * handles the sweeper × poll-tick race).
+   * handles the sweeper Ã— poll-tick race).
    */
   private expireEntry(entry: DeviceFlowEntry): void {
     if (!this.transitionTerminal(entry, 'expired', 'expired_token')) return;
@@ -1589,8 +1589,8 @@ export class DeviceFlowRegistry {
 
   /**
    * Move a pending entry to terminal state. Returns **`true` exactly once**
-   * — the call site that successfully drove the transition. Subsequent
-   * calls (sweeper × poll-tick race, double cancel, etc.) return `false`
+   * â€” the call site that successfully drove the transition. Subsequent
+   * calls (sweeper Ã— poll-tick race, double cancel, etc.) return `false`
    * so the caller can suppress duplicate event publish + audit log.
    *
    * On a successful transition:
@@ -1598,7 +1598,7 @@ export class DeviceFlowRegistry {
    *   2. wipes the secret material from `entry.deviceCode` /
    *      `entry.pkceVerifier`. The PRIMARY guard against secret leaks
    *      is the `entry.status !== 'pending'` check at the top of
-   *      `runPollTick` — a stale timer that managed to fire post-clear
+   *      `runPollTick` â€” a stale timer that managed to fire post-clear
    *      bails out before touching the entry. Secret-clearing here is
    *      DEFENSE IN DEPTH: even if a future refactor weakens the
    *      status guard, the registry's in-memory state can no longer
@@ -1646,10 +1646,10 @@ export class DeviceFlowRegistry {
     const now = this.now();
     for (const entry of [...this.byId.values()]) {
       // PR #4255 fold-in 5 review thread #1: skip entries with persist
-      // in flight — the persist resolution branch will handle the
+      // in flight â€” the persist resolution branch will handle the
       // terminal transition + audit (and emit `expired` if the entry
       // was past `expiresAt` when persist failed). Sweeping here would
-      // create the same `expired` → `authorized` event-stream UX trap
+      // create the same `expired` â†’ `authorized` event-stream UX trap
       // that the cancel-during-persist case avoids.
       if (entry.persistInFlight) continue;
       if (entry.status === 'pending' && now >= entry.expiresAt) {

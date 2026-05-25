@@ -148,14 +148,14 @@ export interface BridgeOptions {
    * `WorkspaceMismatchError` (route → 400 with code `workspace_mismatch`).
    *
    * **Caller contract**: pass the result of
-   * `canonicalizeWorkspace(path)`. `runQwenServe` does this at boot
+   * `canonicalizeWorkspace(path)`. `runHopCodeServe` does this at boot
    * and threads the same canonical value into the bridge AND
    * `createServeApp` (via `deps.boundWorkspace`) so all three —
    * `/capabilities.workspaceCwd`, the `POST /session` cwd fallback,
    * and this bridge's mismatch check — share one canonical form. The
    * constructor only checks `path.isAbsolute`; it does NOT
    * re-canonicalize (a redundant `realpathSync.native` could
-   * theoretically diverge from the runQwenServe canonicalize on
+   * theoretically diverge from the runHopCodeServe canonicalize on
    * NFS-transient / mid-rename filesystems, landing the bridge with
    * one canonical form while `/capabilities` advertises another).
    * Direct embeds / tests calling `createHttpAcpBridge` themselves
@@ -167,8 +167,8 @@ export interface BridgeOptions {
    * at spawn time. Concurrent embedded daemons in the same process
    * use this to avoid cross-contaminating each other's MCP budget /
    * mode env (the `defaultSpawnChannelFactory` snapshots
-   * `process.env` AT SPAWN TIME, not at `runQwenServe()` call
-   * time — so the last `runQwenServe()` to set the global env
+   * `process.env` AT SPAWN TIME, not at `runHopCodeServe()` call
+   * time — so the last `runHopCodeServe()` to set the global env
    * would win for all subsequent spawns across all daemon
    * handles, breaking the documented per-daemon policy).
    *
@@ -188,7 +188,7 @@ export interface BridgeOptions {
    * #4175 Wave 4 PR 17 — optional callback for persisting `tools.
    * approvalMode` to the workspace settings file. Invoked by
    * `setSessionApprovalMode` ONLY when the route caller passes
-   * `{persist: true}`. The default `runQwenServe` wires this to
+   * `{persist: true}`. The default `runHopCodeServe` wires this to
    * `loadSettings(boundWorkspace).setValue(SettingScope.Workspace,
    * 'tools.approvalMode', mode)`. Bridge tests and embedded callers
    * may omit it; when omitted, `setSessionApprovalMode` still applies
@@ -204,7 +204,7 @@ export interface BridgeOptions {
    * `tools.disabled` in workspace settings. Invoked by
    * `setWorkspaceToolEnabled` to add (`enabled: false`) or remove
    * (`enabled: true`) `toolName` from the persisted disabled set.
-   * The default `runQwenServe` wires this to a fresh
+   * The default `runHopCodeServe` wires this to a fresh
    * `loadSettings(boundWorkspace)` per call so concurrent edits from
    * other writers (CLI, another daemon, an editor) are picked up.
    * Bridge tests / embedded callers may omit it; without the hook

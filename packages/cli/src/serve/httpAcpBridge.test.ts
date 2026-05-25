@@ -334,13 +334,13 @@ describe('createHttpAcpBridge', () => {
   });
 
   it('forwards childEnvOverrides to the channelFactory at spawn time (#4247 R6 line 216)', async () => {
-    // Round 6 (wenshao R5 line 216): pre-fix `runQwenServe` set
+    // Round 6 (wenshao R5 line 216): pre-fix `runHopCodeServe` set
     // `process.env` globally to pass the MCP budget config to the
     // ACP child. With concurrent embedded daemons, the last
-    // `runQwenServe` to set the var would silently win for all
+    // `runHopCodeServe` to set the var would silently win for all
     // other daemons' subsequent spawns (because
     // `defaultSpawnChannelFactory` snapshots `process.env` AT
-    // SPAWN TIME, not at runQwenServe time). The fix routes the
+    // SPAWN TIME, not at runHopCodeServe time). The fix routes the
     // env through `BridgeOptions.childEnvOverrides` closed over
     // inside each bridge — so each bridge's spawn factory sees
     // ITS own overrides, regardless of what other daemons did.
@@ -556,7 +556,7 @@ describe('createHttpAcpBridge', () => {
 
   it('returns idle env envelope when statusProvider is omitted (Mode A fallback)', async () => {
     // PR 22b/2 fold-in: covers the no-provider branch in
-    // `getWorkspaceEnvStatus`. Production `runQwenServe` and
+    // `getWorkspaceEnvStatus`. Production `runHopCodeServe` and
     // `createServeApp` both wire `createDaemonStatusProvider()`, but
     // direct embeds (Mode A in-process consumers, future) may omit it.
     // The bridge must still answer the route — falling back to the

@@ -1,17 +1,17 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import {
-  cacheQwenCredentials,
+  cacheHopCodeCredentials,
   generatePKCEPair,
   isDeviceAuthorizationSuccess,
   isDeviceTokenPending,
   isDeviceTokenSuccess,
   HopCodeOAuth2Client,
-  QwenOAuthPollError,
+  HopCodeOAuthPollError,
   type DeviceTokenPendingData,
   type IHopCodeOAuth2Client,
   type HopCodeCredentials,
@@ -36,8 +36,8 @@ const QWEN_OAUTH_SCOPE = 'openid profile email model.completion';
  * audit. PR #4255 fold-in 6 review thread #5: the raw `err.message`
  * from `QwenOAuth2Client` embeds the full upstream response body,
  * which on a misbehaving reverse proxy / WAF can be megabytes of
- * HTML — and container log-aggregation pipelines (Loki, Fluent Bit,
- * Stackdriver) typically truncate or reject lines past 4–32 KiB,
+ * HTML â€” and container log-aggregation pipelines (Loki, Fluent Bit,
+ * Stackdriver) typically truncate or reject lines past 4â€“32 KiB,
  * meaning the *useful* prefix is lost downstream. Truncate here so
  * the kept prefix is the part with the actual IdP error code /
  * description, with a `[+N more]` tail so the reader knows how much
@@ -49,20 +49,20 @@ const STDERR_DETAIL_MAX = 2_048;
 function truncateForStderr(detail: string): string {
   if (detail.length <= STDERR_DETAIL_MAX) return detail;
   const dropped = detail.length - STDERR_DETAIL_MAX;
-  return `${detail.slice(0, STDERR_DETAIL_MAX)}…[+${dropped} bytes truncated]`;
+  return `${detail.slice(0, STDERR_DETAIL_MAX)}â€¦[+${dropped} bytes truncated]`;
 }
 
 /**
  * Strip / replace bytes that could forge log lines or inject terminal
  * control sequences when interpolated into a stderr breadcrumb. PR #4291
- * follow-up review (gpt-5.5, #2): `QwenOAuthPollError.oauthError` comes
- * directly from the upstream JSON `error` field — attacker-controlled
+ * follow-up review (gpt-5.5, #2): `HopCodeOAuthPollError.oauthError` comes
+ * directly from the upstream JSON `error` field â€” attacker-controlled
  * if the IdP, a reverse proxy, or a WAF is hostile / compromised. A
  * value like `slow_down\n[serve] FAKE LOG LINE 2026-...` would otherwise
- * forge an extra log line; a value containing `\x1b[…m` could inject
+ * forge an extra log line; a value containing `\x1b[â€¦m` could inject
  * ANSI color or cursor-movement sequences into operator terminals.
  *
- * Strips C0 controls (0x00–0x1f), DEL (0x7f), and C1 controls (0x80–0x9f).
+ * Strips C0 controls (0x00â€“0x1f), DEL (0x7f), and C1 controls (0x80â€“0x9f).
  * Replaces each with `?` so the operator can still see SOMETHING was
  * present at that index (length-preserving) instead of silently dropping.
  */
@@ -77,10 +77,10 @@ function sanitizeForStderr(value: string): string {
  * Uses the lower-level `QwenOAuth2Client` primitives (`requestDeviceAuthorization`
  * / `pollDeviceToken`) directly rather than the high-level
  * `authWithQwenDeviceFlow` because that helper invokes `open(url)` to launch
- * a browser on the daemon host. PR 21 design §8 #1 forbids browser-spawning
- * from the daemon — only the SDK/user side may decide to open a URL.
+ * a browser on the daemon host. PR 21 design Â§8 #1 forbids browser-spawning
+ * from the daemon â€” only the SDK/user side may decide to open a URL.
  */
-export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
+export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
   readonly providerId: DeviceFlowProviderId = 'qwen-oauth';
   private readonly client: IHopCodeOAuth2Client;
 
@@ -112,7 +112,7 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
       //
       // PR #4255 fold-in 3 (#9): the raw `err.message` from the
       // QwenOAuth2Client embeds the full IdP response body (which can
-      // be HTML from a reverse proxy / WAF — hundreds of bytes,
+      // be HTML from a reverse proxy / WAF â€” hundreds of bytes,
       // potentially leaking infrastructure detail). Use a stable
       // bounded message for the route response; the original err
       // detail goes through stderr audit only via the registry's
@@ -131,7 +131,7 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
     }
     if (!isDeviceAuthorizationSuccess(auth)) {
       // PR #4255 fold-in 3 (#9): same sanitization as the catch above
-      // — well-formed but unsuccessful IdP responses can carry
+      // â€” well-formed but unsuccessful IdP responses can carry
       // arbitrary `error_description` text that we don't want in the
       // SDK-visible 502 hint. Static message; raw envelope to stderr.
       const errorData = auth as { error?: string; error_description?: string };
@@ -175,7 +175,7 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
     }
     if (opts.signal.aborted) {
       // Caller already gave up. Returning `pending` is the correct
-      // semantic — the registry's post-await guard will see entry.status
+      // semantic â€” the registry's post-await guard will see entry.status
       // !== 'pending' and skip emit/audit.
       return { kind: 'pending' };
     }
@@ -200,7 +200,7 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // `authorization_pending` or `slow_down`. Map RFC 8628 errors to
       // structured terminal results; everything else is `upstream_error`.
       // PR #4255 review S2: do NOT echo the raw thrown message into
-      // `hint` — `qwenOAuth2.ts` embeds the entire IdP responseText
+      // `hint` â€” `qwenOAuth2.ts` embeds the entire IdP responseText
       // (which can be an HTML error page from a reverse proxy / WAF
       // running into hundreds of bytes) into the message, and that
       // would flow through `publishWorkspaceEvent` to every SSE
@@ -208,14 +208,14 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // through the registry's stderr audit only.
       //
       // PR #4255 fold-in 5 (#4): branch on `instanceof
-      // QwenOAuthPollError` and read the structured `oauthError`
+      // HopCodeOAuthPollError` and read the structured `oauthError`
       // field instead of substring-matching the message text. The
       // earlier regex was a fragile cross-file string contract that
       // would silently degrade to `upstream_error` if `qwenOAuth2.ts`
       // ever changed its message format. The typed class makes the
       // contract explicit + tsc-checkable.
       const errorKind: DeviceFlowErrorKind =
-        err instanceof QwenOAuthPollError
+        err instanceof HopCodeOAuthPollError
           ? mapRfc8628OAuthCode(err.oauthError)
           : 'upstream_error';
       // PR #4255 follow-up review thread (deepseek-v4-pro): mirror the
@@ -227,24 +227,24 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // 1. **Skip ONLY when the registry-owned signal aborted (#4291,
       //    follow-up gpt-5.5 review).** Earlier shape also skipped
       //    when `err.name === 'AbortError'`, but `AbortError` can
-      //    come from sources WE didn't initiate — upstream IdP TCP
+      //    come from sources WE didn't initiate â€” upstream IdP TCP
       //    RST, proxy timeout, undici/node-fetch wrapping unrelated
       //    transport failures as AbortError. Those are real failures
       //    that the operator needs visibility into; silently dropping
       //    them was a signal-loss bug. Now we skip iff `opts.signal`
-      //    was driven aborted by `cancel()` / `dispose()` — anything
+      //    was driven aborted by `cancel()` / `dispose()` â€” anything
       //    else, including unexpected `AbortError`, falls through to
       //    the sanitized breadcrumb path with `signalAborted=false`.
       //
       // 2. **Don't echo raw `err.message`** (Copilot review on
       //    #4291). `pollDeviceToken` POSTs `device_code` +
-      //    `code_verifier` (PKCE) per RFC 8628 §3.4. A WAF / reverse
+      //    `code_verifier` (PKCE) per RFC 8628 Â§3.4. A WAF / reverse
       //    proxy that echoes the request body in its error response
       //    would put those bearer-equivalent values into daemon
-      //    stderr — violating the BrandedSecret-style "secrets never
+      //    stderr â€” violating the BrandedSecret-style "secrets never
       //    appear in logs" contract the registry depends on. Log
-      //    STRUCTURED diagnostics only: `QwenOAuthPollError.oauthError`
-      //    (RFC 8628 §3.5 enum), or for non-OAuth errors, just the
+      //    STRUCTURED diagnostics only: `HopCodeOAuthPollError.oauthError`
+      //    (RFC 8628 Â§3.5 enum), or for non-OAuth errors, just the
       //    constructor name + a bounded message length so the
       //    on-call still gets a breadcrumb without the request-body
       //    echo path.
@@ -259,8 +259,8 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
       const aborted = opts.signal.aborted;
       if (!aborted) {
         let safeDetail: string;
-        if (err instanceof QwenOAuthPollError) {
-          // Structured upstream OAuth error envelope — no raw body,
+        if (err instanceof HopCodeOAuthPollError) {
+          // Structured upstream OAuth error envelope â€” no raw body,
           // but the `oauthError` field IS attacker-controlled, so
           // sanitize C0/C1 controls before interpolating.
           const rawOauthError = err.oauthError ?? '(missing)';
@@ -305,30 +305,30 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
         // PR #4255 review C3 + fold-in 3 (#10): `persist({signal})`
         // is now threaded end-to-end. The registry passes its
         // per-entry `cancelController.signal`; we forward it to
-        // `cacheQwenCredentials({signal})` which forwards to
+        // `cacheHopCodeCredentials({signal})` which forwards to
         // `fs.writeFile(..., {signal})`. A wedged disk write aborts
         // immediately when `cancel()` / `dispose()` / the
         // 30s `DEVICE_FLOW_PERSIST_TIMEOUT_MS` fires, instead of
         // hanging until the OS-level timeout.
         async persist(persistOpts: { signal: AbortSignal }) {
-          // Order matters: write to disk FIRST. If `cacheQwenCredentials`
+          // Order matters: write to disk FIRST. If `cacheHopCodeCredentials`
           // throws (EACCES, EROFS, ENOSPC) we MUST NOT update the
-          // in-process client — otherwise the daemon enters a zombie
+          // in-process client â€” otherwise the daemon enters a zombie
           // state where this session "remembers" the token but a
           // restart loses it.
-          await cacheQwenCredentials(credentials, {
+          await cacheHopCodeCredentials(credentials, {
             signal: persistOpts.signal,
           });
           try {
             client.setCredentials(credentials);
           } catch {
-            // ignore — disk file is the durable record; in-process
+            // ignore â€” disk file is the durable record; in-process
             // refresh happens on next SharedTokenManager mtime poll
           }
           // PR #4255 review W3: `accountAlias` USED to be wired
           // through events / reducer / audit but the Qwen IdP token
           // response doesn't carry one (see DeviceTokenData shape in
-          // `qwenOAuth2.ts:152-160` — no `name` / `email` / `sub`
+          // `qwenOAuth2.ts:152-160` â€” no `name` / `email` / `sub`
           // field). Returning only `{expiresAt}` makes the field
           // type-honestly absent rather than always-undefined. A
           // future provider whose token response carries an alias
@@ -350,7 +350,7 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
     // response (it never returns a structured error envelope from the
     // success path). So this fall-through is reached only if a future
     // refactor changes that contract. Map defensively to
-    // `upstream_error` with a bounded hint (PR #4255 review S2 — never
+    // `upstream_error` with a bounded hint (PR #4255 review S2 â€” never
     // forward the raw IdP response body to SDK clients).
     return {
       kind: 'error',
@@ -362,7 +362,7 @@ export class QwenOAuthDeviceFlowProvider implements DeviceFlowProvider {
 
 /**
  * Map a structured RFC 8628 OAuth error code (from
- * `QwenOAuthPollError.oauthError`) to the registry's
+ * `HopCodeOAuthPollError.oauthError`) to the registry's
  * `DeviceFlowErrorKind` taxonomy. Unknown / missing codes fall
  * through to `upstream_error`. PR #4255 fold-in 5 (#4) replaced the
  * earlier substring-regex match against the message text, which was

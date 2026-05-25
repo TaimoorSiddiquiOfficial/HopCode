@@ -6,10 +6,10 @@
 
 export { createServeApp, type ServeAppDeps } from './server.js';
 export {
-  runQwenServe,
+  runHopCodeServe,
   type RunHandle,
-  type RunQwenServeDeps,
-} from './runQwenServe.js';
+  type RunHopCodeServeDeps,
+} from './runHopCodeServe.js';
 export {
   CAPABILITIES_SCHEMA_VERSION,
   STAGE1_FEATURES,

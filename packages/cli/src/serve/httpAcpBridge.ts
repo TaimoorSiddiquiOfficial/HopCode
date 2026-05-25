@@ -189,7 +189,7 @@ export type { AcpChannel, AcpChannelExitInfo, ChannelFactory };
 // `BridgeOptions` + `DaemonStatusProvider` lifted to
 // `@hoptrendy/hopcode-acp-bridge/bridgeOptions` in #4175 PR 22b/2 — the
 // daemon-host injection seam (`statusProvider`) is now part of the
-// bridge package's public construction contract. `runQwenServe` wires
+// bridge package's public construction contract. `runHopCodeServe` wires
 // `createDaemonStatusProvider()` (production impl in
 // `cli/src/serve/daemonStatusProvider.ts`) when the bridge is built;
 // embedded callers that don't need daemon-host cells may omit it,
@@ -1240,11 +1240,11 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
     );
   }
   const channelFactory = opts.channelFactory ?? defaultSpawnChannelFactory;
-  // PR 14 fix (review #4247 wenshao R5 runQwenServe.ts:216): close over
+  // PR 14 fix (review #4247 wenshao R5 runHopCodeServe.ts:216): close over
   // a per-handle env-override snapshot. Calls to `channelFactory` at
   // spawn time receive this as the 2nd arg, so the default factory
   // can merge into the child env without consulting any global state
-  // that another concurrent `runQwenServe()` handle might have
+  // that another concurrent `runHopCodeServe()` handle might have
   // mutated. Frozen to make accidental mutation throw rather than
   // silently corrupt later spawns.
   const childEnvOverrides: Readonly<Record<string, string | undefined>> =
@@ -1274,7 +1274,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
       : Infinity;
   // #3803 §02: the bound path is the canonical form `spawnOrAttach`
   // compares incoming `workspaceCwd` against. The caller MUST pass an
-  // already-canonical value (via `canonicalizeWorkspace`). `runQwenServe`
+  // already-canonical value (via `canonicalizeWorkspace`). `runHopCodeServe`
   // does this at boot and threads the same value into both
   // `createHttpAcpBridge` and `createServeApp` (via
   // `deps.boundWorkspace`); direct embeds / tests that construct the
@@ -1285,7 +1285,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
   // (a) on case-insensitive / symlinked filesystems two independent
   // `realpathSync.native` calls could theoretically disagree if the FS
   // mutates between them (NFS transient, operator rename), landing
-  // the bridge with one canonical form while `runQwenServe` advertises
+  // the bridge with one canonical form while `runHopCodeServe` advertises
   // another and `/capabilities` clients see `workspace_mismatch` on
   // every POST; (b) it's a syscall removed from the boot path. The
   // `path.isAbsolute` guard stays — it's a structural input check, not
@@ -1351,7 +1351,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
   // dispatched on an existing connection AFTER the shutdown snapshot
   // taken in `shutdown()` fails fast instead of creating a child the
   // shutdown path has no more visibility into. Without this, the
-  // server.listen → bridge.shutdown ordering in `runQwenServe` leaves
+  // server.listen → bridge.shutdown ordering in `runHopCodeServe` leaves
   // a window between (a) shutdown snapshotting `byId` for kills and
   // (b) `server.close` rejecting new connections, during which a
   // late-arriving `POST /session` slips a fresh child past cleanup.
@@ -1663,7 +1663,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         //
         // Suppressed during `shuttingDown` because the operator
         // already saw "received SIGINT, draining..." from
-        // `runQwenServe`'s signal handler. The standalone
+        // `runHopCodeServe`'s signal handler. The standalone
         // killSession case (last session leaves, channel torn down
         // but daemon stays up) still logs — there's no upstream
         // context line in that flow, and the message confirms the
@@ -2465,7 +2465,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
 
     async spawnOrAttach(req) {
       if (shuttingDown) {
-        // `runQwenServe.close()` calls `bridge.shutdown()` BEFORE
+        // `runHopCodeServe.close()` calls `bridge.shutdown()` BEFORE
         // `server.close()`. During that window, established HTTP
         // connections can still hit `POST /session`. Refuse here so
         // late-arrivers don't spawn children the shutdown path won't
@@ -3381,7 +3381,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         throw new Error(
           'setSessionApprovalMode called with `persist: true` but no ' +
             '`persistApprovalMode` callback wired in BridgeOptions. ' +
-            'runQwenServe wires the production callback; direct embeds ' +
+            'runHopCodeServe wires the production callback; direct embeds ' +
             'and tests must opt in or omit `persist`.',
         );
       }
@@ -3488,7 +3488,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
       if (!persistDisabledTools) {
         throw new Error(
           'setWorkspaceToolEnabled requires `persistDisabledTools` in ' +
-            'BridgeOptions; runQwenServe wires the production callback. ' +
+            'BridgeOptions; runHopCodeServe wires the production callback. ' +
             'Direct embeds and tests must opt in.',
         );
       }
@@ -3842,7 +3842,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
 
     async shutdown() {
       // Set BEFORE the snapshot so any racing `spawnOrAttach` triggered
-      // by an in-flight HTTP connection after `runQwenServe.close()`
+      // by an in-flight HTTP connection after `runHopCodeServe.close()`
       // entered the bridge.shutdown() phase fails fast instead of
       // spawning a child this teardown won't see.
       shuttingDown = true;
@@ -4106,7 +4106,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   for (const key of SCRUBBED_CHILD_ENV_KEYS) {
     delete childEnv[key];
   }
-  // PR 14 fix (review #4247 wenshao R5 runQwenServe.ts:216): apply
+  // PR 14 fix (review #4247 wenshao R5 runHopCodeServe.ts:216): apply
   // per-handle env overrides on top of the process.env snapshot.
   // `undefined` value means "delete this var from the child env" so
   // an embedded caller can scrub a stale inherited var without
@@ -4307,7 +4307,7 @@ function killChild(child: ChildProcess): Promise<void> {
     // sleep (D-state, e.g. NFS read blocked on a dead server). Without
     // this hard deadline, `bridge.shutdown()`'s `Promise.all` waits
     // forever on that one wedged child and SHUTDOWN_FORCE_CLOSE_MS in
-    // `runQwenServe` only covers `server.close()`, not the bridge.
+    // `runHopCodeServe` only covers `server.close()`, not the bridge.
     // After the deadline give up: the child is probably stuck in a
     // kernel call we can't cancel, and `process.exit(0)` will reap it
     // when the daemon returns to its caller.

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
@@ -27,7 +27,7 @@ import {
   type DeviceFlowProviderId,
   type DeviceFlowPublicView,
 } from './auth/deviceFlow.js';
-import { QwenOAuthDeviceFlowProvider } from './auth/qwenDeviceFlowProvider.js';
+import { HopCodeOAuthDeviceFlowProvider } from './auth/hopCodeDeviceFlowProvider.js';
 import { createDaemonStatusProvider } from './daemonStatusProvider.js';
 import { isLoopbackBind } from './loopbackBinds.js';
 import {
@@ -72,15 +72,15 @@ import { registerWorkspaceFileWriteRoutes } from './routes/workspaceFileWrite.js
  * `WARN_EVERY` dropped events with as much context as the audit
  * payload exposes. The default factory uses this so a regression
  * that silently strips audit events shows up in operator logs
- * instead of disappearing — the earlier one-shot warn was a
+ * instead of disappearing â€” the earlier one-shot warn was a
  * permanent silent no-op after the first event, which made a PR
- * 19/20 regression where `runQwenServe` forgets to inject the real
+ * 19/20 regression where `runHopCodeServe` forgets to inject the real
  * factory completely invisible (every write 403s; nothing in
  * audit; one stale stderr line easy to miss for background
  * daemons). Periodic warning + dropped-event count + first-event
  * `errorKind` + `pathHash` make the regression actionable.
  *
- * PR 19/20's `runQwenServe` injection replaces this with a real
+ * PR 19/20's `runHopCodeServe` injection replaces this with a real
  * per-session emit, so legitimate production traffic never hits
  * the warning.
  */
@@ -99,7 +99,7 @@ export function createDefaultFsAuditEmit(): (event: BridgeEvent) => void {
       if (data?.pathHash) ctx.push(`pathHash=${data.pathHash}`);
       const ctxStr = ctx.length > 0 ? ` (${ctx.join(' ')})` : '';
       writeStderrLine(
-        `qwen serve: fs audit emit is the default no-op — ${droppedCount} event(s) dropped so far. ` +
+        `qwen serve: fs audit emit is the default no-op â€” ${droppedCount} event(s) dropped so far. ` +
           `Latest type=${event.type}${ctxStr}. ` +
           `Inject deps.fsFactory in createServeApp to wire audit into the EventBus.`,
       );
@@ -113,8 +113,8 @@ export interface ServeAppDeps {
   /**
    * Pre-canonicalized workspace path. When supplied, `createServeApp`
    * skips its own `canonicalizeWorkspace` call (which would issue a
-   * redundant `realpathSync.native` syscall — idempotent, but a hot
-   * boot-time stat we can avoid). `runQwenServe` passes this after
+   * redundant `realpathSync.native` syscall â€” idempotent, but a hot
+   * boot-time stat we can avoid). `runHopCodeServe` passes this after
    * its own boot-time canonicalize so the value used by
    * `/capabilities`, the `POST /session` cwd fallback, and the
    * bridge are all the SAME canonical form. Callers that haven't
@@ -130,16 +130,16 @@ export interface ServeAppDeps {
    * builds a strict default (`trusted: false`, warn-once no-op
    * `emit`) so an upstream refactor that forgets to inject
    * `fsFactory` never silently allows writes against an untrusted
-   * workspace. No PR 18 routes consume the factory yet — the slot
+   * workspace. No PR 18 routes consume the factory yet â€” the slot
    * is wired so PR 19 read-only file routes can drop in without
-   * re-shaping `ServeAppDeps`. Once PR 19 lands, `runQwenServe`
+   * re-shaping `ServeAppDeps`. Once PR 19 lands, `runHopCodeServe`
    * will inject a factory whose `trusted` flag mirrors
    * `Config.isTrustedFolder()` and whose `emit` plumbs into the
    * per-session EventBus.
    */
   fsFactory?: WorkspaceFileSystemFactory;
   /**
-   * Issue #4175 PR 21 — device-flow auth registry. Tests inject a fake
+   * Issue #4175 PR 21 â€” device-flow auth registry. Tests inject a fake
    * (`now` / `schedule` overrides for deterministic timer control,
    * stubbed providers, captured event sink). Production callers omit
    * this and `createServeApp` constructs a default wired to the
@@ -148,8 +148,8 @@ export interface ServeAppDeps {
    */
   deviceFlowRegistry?: DeviceFlowRegistry;
   /**
-   * Issue #4175 PR 21 — extra device-flow providers for tests / future
-   * extensions. Production builds register only `QwenOAuthDeviceFlowProvider`;
+   * Issue #4175 PR 21 â€” extra device-flow providers for tests / future
+   * extensions. Production builds register only `HopCodeOAuthDeviceFlowProvider`;
    * passing extra entries here registers them in addition to the default
    * Qwen provider. Used by tests that stub the OAuth flow.
    */
@@ -157,15 +157,15 @@ export interface ServeAppDeps {
 }
 
 /**
- * Build the Express app for `qwen serve`. Pure function — no side effects on
- * the network or process; `runQwenServe` does the listen/signal handling.
+ * Build the Express app for `qwen serve`. Pure function â€” no side effects on
+ * the network or process; `runHopCodeServe` does the listen/signal handling.
  *
  * `getPort` is invoked lazily by the host-allowlist middleware so callers
  * binding to port 0 (ephemeral) can supply the actual port after `listen()`
  * resolves. Defaults to `opts.port` for callers (e.g. tests) that pin a port
  * up front.
  *
- * Stage 1 routes shipped (matches §04 of issue #3803):
+ * Stage 1 routes shipped (matches Â§04 of issue #3803):
  *   - `GET  /health`
  *   - `GET  /capabilities`
  *   - `GET  /workspace/mcp`
@@ -188,18 +188,18 @@ export interface ServeAppDeps {
  *   - `POST /permission/:requestId`
  *
  * **Workspace validation contract.** `createServeApp` itself does NOT
- * verify that `opts.workspace` exists or is a directory — it
+ * verify that `opts.workspace` exists or is a directory â€” it
  * canonicalizes via `canonicalizeWorkspace`, which falls back to
  * `path.resolve` on ENOENT so the app boots even against a missing
- * path. `runQwenServe` is the production entry point and DOES
+ * path. `runHopCodeServe` is the production entry point and DOES
  * perform the `fs.statSync` + `isDirectory()` boot-loud check before
  * calling this function. Tests inject synthetic paths (`/work/bound`
  * etc.) on purpose: they want to exercise the route layer's
  * canonicalization and `workspace_mismatch` translation without
  * needing a real directory on disk. If a future entry point binds
  * `createServeApp` directly to user input, it MUST replicate the
- * `runQwenServe` validation (or call into a shared helper if one is
- * extracted) — otherwise a non-existent `--workspace` would boot
+ * `runHopCodeServe` validation (or call into a shared helper if one is
+ * extracted) â€” otherwise a non-existent `--workspace` would boot
  * a "healthy"-looking daemon whose every spawn fails with cryptic
  * child-process ENOENT.
  */
@@ -213,23 +213,23 @@ export function createServeApp(
   // direct callers of `createServeApp` (tests, embeds) get the same
   // cap they configured via `ServeOptions`. Previously the default
   // bridge silently fell back to `DEFAULT_MAX_SESSIONS` (20) and
-  // only the `runQwenServe` path piped the option through.
+  // only the `runHopCodeServe` path piped the option through.
   //
-  // Workspace binding mirrors `runQwenServe`: per #3803 §02 the
+  // Workspace binding mirrors `runHopCodeServe`: per #3803 Â§02 the
   // daemon is bound to exactly one workspace (`opts.workspace` or
   // `process.cwd()`). `POST /session` with a mismatched cwd is
   // rejected with 400 `workspace_mismatch`.
   //
   // The value advertised on `/capabilities`, used for the `POST
   // /session` cwd fallback, AND passed into the bridge must be the
-  // SAME canonical form — otherwise the bridge's
+  // SAME canonical form â€” otherwise the bridge's
   // `realpathSync.native` would diverge from what `/capabilities`
   // shows on symlinks / case-insensitive filesystems, and clients
   // echoing the advertised path back would see a response whose
   // `workspaceCwd` differs from what they sent.
   //
-  // `deps.boundWorkspace` is the pre-canonicalized fast-path —
-  // `runQwenServe` passes it after its own boot-time
+  // `deps.boundWorkspace` is the pre-canonicalized fast-path â€”
+  // `runHopCodeServe` passes it after its own boot-time
   // `canonicalizeWorkspace`, so we skip the redundant
   // `realpathSync.native` here. When omitted (tests, direct embeds)
   // we canonicalize ourselves.
@@ -240,7 +240,7 @@ export function createServeApp(
     deps.bridge ??
     createHttpAcpBridge({
       maxSessions: opts.maxSessions,
-      // Symmetric with `runQwenServe.ts` — direct embeds / tests that
+      // Symmetric with `runHopCodeServe.ts` â€” direct embeds / tests that
       // call `createServeApp` without supplying their own bridge and
       // pass `ServeOptions.eventRingSize` would otherwise silently
       // get the default 8000 ring instead of their configured value.
@@ -249,7 +249,7 @@ export function createServeApp(
         : {}),
       boundWorkspace,
       // PR 22b/2 (wenshao/gpt-5.5 review fold-in #4304): symmetric
-      // with `runQwenServe.ts` — direct embeds / tests that don't
+      // with `runHopCodeServe.ts` â€” direct embeds / tests that don't
       // inject `deps.bridge` would otherwise silently lose the
       // daemon env + preflight cells the default server app
       // reported pre-injection. Wiring the production status provider
@@ -262,7 +262,7 @@ export function createServeApp(
   // `Origin` header on same-origin POST/fetch calls; `denyBrowserOriginCors`
   // below would reject them. This middleware strips `Origin` when it
   // matches the daemon's own address so the demo page's API calls pass
-  // through. Only loopback origins are matched — non-loopback deployments
+  // through. Only loopback origins are matched â€” non-loopback deployments
   // require the operator to front the daemon with a reverse proxy for
   // browser access anyway (per the threat-model docs).
   let cachedStripPort = -1;
@@ -296,7 +296,7 @@ export function createServeApp(
   // once on first call so a future regression that silently swallows
   // audit events surfaces in operator logs the first time it bites.
   // Callers passing `deps.fsFactory` get full control of trust +
-  // audit destination — `runQwenServe` will inject one whose
+  // audit destination â€” `runHopCodeServe` will inject one whose
   // `trusted` mirrors `Config.isTrustedFolder()` and whose `emit`
   // plumbs into the per-session EventBus once PR 19/20 lands.
   const fsFactory: WorkspaceFileSystemFactory =
@@ -316,10 +316,10 @@ export function createServeApp(
   // Surface the bound workspace on `app.locals` so the PR 19 read
   // routes can compute workspace-relative response paths without
   // re-resolving. Same canonical form `/capabilities` advertises
-  // and the bridge enforces — keeping every layer in agreement.
+  // and the bridge enforces â€” keeping every layer in agreement.
   (app.locals as { boundWorkspace?: string }).boundWorkspace = boundWorkspace;
 
-  // Issue #4175 PR 21 — wire the device-flow registry. Default builds
+  // Issue #4175 PR 21 â€” wire the device-flow registry. Default builds
   // a single Qwen provider; tests inject `deps.deviceFlowRegistry`
   // wholesale (with controlled clock/scheduler) or
   // `deps.deviceFlowProviders` to stub the OAuth client only.
@@ -331,7 +331,10 @@ export function createServeApp(
     deviceFlowProviderMap.set(provider.providerId, provider);
   }
   if (!deviceFlowProviderMap.has('qwen-oauth')) {
-    deviceFlowProviderMap.set('qwen-oauth', new QwenOAuthDeviceFlowProvider());
+    deviceFlowProviderMap.set(
+      'qwen-oauth',
+      new HopCodeOAuthDeviceFlowProvider(),
+    );
   }
   const deviceFlowEventSink: DeviceFlowEventSink = {
     publish(emission, originatorClientId) {
@@ -386,7 +389,7 @@ export function createServeApp(
             const STDERR_HINT_MAX = 1_024;
             const hint =
               line.hint.length > STDERR_HINT_MAX
-                ? `${line.hint.slice(0, STDERR_HINT_MAX)}…[+${line.hint.length - STDERR_HINT_MAX} bytes truncated]`
+                ? `${line.hint.slice(0, STDERR_HINT_MAX)}â€¦[+${line.hint.length - STDERR_HINT_MAX} bytes truncated]`
                 : line.hint;
             // Quote the hint so multi-word values stay parseable.
             parts.push(`hint=${JSON.stringify(hint)}`);
@@ -400,12 +403,12 @@ export function createServeApp(
   // without closure capture (and so future helper extracts can find it
   // without threading it through their args). Typed accessor (fold-in 4
   // review thread D) prevents a string-key typo from silently
-  // detaching `runQwenServe`'s shutdown dispose call.
+  // detaching `runHopCodeServe`'s shutdown dispose call.
   setDeviceFlowRegistry(app, deviceFlowRegistry);
 
   // Order matters: rejection guards (CORS / Host allowlist / bearer auth)
   // run BEFORE the JSON body parser. Otherwise an unauthenticated POST
-  // gets a full 10MB `JSON.parse` before the 401 fires — a trivially
+  // gets a full 10MB `JSON.parse` before the 401 fires â€” a trivially
   // amplified CPU/memory cost from any wrong-token client.
   app.use(denyBrowserOriginCors);
   app.use(hostAllowlist(opts.hostname, getPort));
@@ -414,11 +417,11 @@ export function createServeApp(
   // On loopback binds, registered BEFORE bearerAuth so browsers can
   // reach the page via address-bar navigation (which cannot attach
   // Authorization headers). On non-loopback binds, registered AFTER
-  // bearerAuth — an unauthenticated `/demo` on a public interface
+  // bearerAuth â€” an unauthenticated `/demo` on a public interface
   // would leak the full API surface (route enumeration + interactive
   // console), far more than `/health`'s `{"status":"ok"}`.
   // X-Frame-Options: DENY + CSP frame-ancestors 'none' prevent
-  // clickjacking — a malicious site embedding the demo in an iframe
+  // clickjacking â€” a malicious site embedding the demo in an iframe
   // could trick a user into performing daemon actions via transparent
   // overlay (the iframe's same-origin fetches bypass CORS).
   const demoHandler = (
@@ -442,7 +445,7 @@ export function createServeApp(
     }
   };
 
-  // `/health` is exempted from `bearerAuth` ONLY on loopback binds —
+  // `/health` is exempted from `bearerAuth` ONLY on loopback binds â€”
   // the canonical liveness-probe case (k8s/Compose probes don't
   // carry the daemon's bearer; round-tripping a 401 just to know
   // the listener is up is waste). On non-loopback binds the
@@ -456,13 +459,13 @@ export function createServeApp(
   // cases.
   // Shared handler so loopback (pre-auth) and non-loopback (post-auth)
   // routes return the same shape. `?deep=1` exposes bridge counters
-  // (`sessions`, `pendingPermissions`) for observability — it is
+  // (`sessions`, `pendingPermissions`) for observability â€” it is
   // INFORMATIONAL only, not a true liveness probe. Counter getters
   // are size accessors that don't perform per-session/channel pings,
   // so a wedged child (stuck on a request, leaked FD, etc.) won't
   // change the response. We retain the try/catch + 503 as a
   // defense-in-depth net for custom bridge impls whose getters MAY
-  // throw — but the real bridge's getters never do, so under normal
+  // throw â€” but the real bridge's getters never do, so under normal
   // operation the 503 path is unreachable. Per BQ-6F: the docs
   // (`docs/users/qwen-serve.md` + `qwen-serve-protocol.md`) clarify
   // that deep is for counters, not health verification. Default (no
@@ -497,8 +500,8 @@ export function createServeApp(
   // /health behind bearer too" rule to loopback. Without this, an
   // operator who set the flag specifically to harden the loopback
   // default would still see `/health` answering 200 to unauthenticated
-  // probes — defeating the flag's purpose. The boot check in
-  // `runQwenServe` guarantees `token` is set whenever `requireAuth`
+  // probes â€” defeating the flag's purpose. The boot check in
+  // `runHopCodeServe` guarantees `token` is set whenever `requireAuth`
   // is true, so the post-`bearerAuth` registration always has a token
   // to compare against.
   const exposeHealthPreAuth = loopback && !opts.requireAuth;
@@ -523,7 +526,7 @@ export function createServeApp(
 
   // Issue #4175 PR 15. Mutation-route gate factory. Today's existing
   // mutation routes (`POST /session*`, `/permission/:requestId`) opt
-  // into the default non-strict mode, which is a passthrough — so
+  // into the default non-strict mode, which is a passthrough â€” so
   // backward compatibility is bit-for-bit. Wave 4 PRs will pass
   // `{ strict: true }` for routes (memory CRUD / file edit / tool
   // enable / MCP restart / device-flow auth) that should require a
@@ -546,7 +549,7 @@ export function createServeApp(
         requireAuth: opts.requireAuth === true,
       }),
       modelServices: [],
-      // #3803 §02: surface the bound workspace so clients can detect
+      // #3803 Â§02: surface the bound workspace so clients can detect
       // mismatch pre-flight and omit `cwd` on `POST /session`.
       workspaceCwd: boundWorkspace,
     };
@@ -599,13 +602,13 @@ export function createServeApp(
     safeBody,
   });
 
-  // TODO(#4175 PR 24 — PermissionMediator audit log): emit an
+  // TODO(#4175 PR 24 â€” PermissionMediator audit log): emit an
   // `audit.diagnostic_read` event from these two routes so a security
   // operator can correlate "who read what when". Read-only diagnostic
   // surfaces are reconnaissance vectors (env: secret-var presence;
   // preflight: workspace path + CLI entry + Node version) and the absence
   // of audit emission here is a deliberate scope deferral, not an
-  // oversight — the audit topic does not yet exist; PR 24 lands the
+  // oversight â€” the audit topic does not yet exist; PR 24 lands the
   // shared `bridge.emitAudit` infrastructure that this and PR 18's
   // `fs.access` events will both use.
   app.get('/workspace/env', async (_req, res) => {
@@ -624,7 +627,7 @@ export function createServeApp(
     }
   });
 
-  // Issue #4175 PR 19 — read-only workspace file routes
+  // Issue #4175 PR 19 â€” read-only workspace file routes
   // (`GET /file|/list|/glob|/stat`). Registered after the workspace
   // diagnostics routes so the file surface sits next to its sibling
   // workspace-scoped reads and shares the same auth posture (no
@@ -641,7 +644,7 @@ export function createServeApp(
     safeBody,
   });
 
-  // -- Issue #4175 PR 21 — auth device-flow routes ------------------------
+  // -- Issue #4175 PR 21 â€” auth device-flow routes ------------------------
 
   app.post(
     '/workspace/auth/device-flow',
@@ -650,7 +653,7 @@ export function createServeApp(
       const body = safeBody(req);
       const providerIdRaw = body['providerId'];
       // PR #4255 review W2: split `invalid_request` (request shape is
-      // wrong — missing/non-string field) from `unsupported_provider`
+      // wrong â€” missing/non-string field) from `unsupported_provider`
       // (the field is well-formed but its value isn't in the
       // daemon's known set). Conflating the two surfaced misleading
       // remediation hints to SDK consumers branching on `code`
@@ -670,7 +673,7 @@ export function createServeApp(
       // the documented extension hook for tests / future
       // providers. Hardcoding the static tuple here meant
       // injected providers were rejected at the route while still
-      // being registered in `deviceFlowProviderMap` — easy to
+      // being registered in `deviceFlowProviderMap` â€” easy to
       // break when adding a second provider.
       if (!deviceFlowProviderMap.has(providerIdRaw as DeviceFlowProviderId)) {
         res.status(400).json({
@@ -688,7 +691,7 @@ export function createServeApp(
           providerId,
           ...(clientId !== undefined ? { initiatorClientId: clientId } : {}),
         });
-        // Idempotent take-over → 200 with `attached: true`. Fresh start →
+        // Idempotent take-over â†’ 200 with `attached: true`. Fresh start â†’
         // 201 + `attached: false`. The registry is the source of truth on
         // which branch fired (it's the one that decided not to call
         // `provider.start()` again).
@@ -724,7 +727,7 @@ export function createServeApp(
 
   // PR #4255 fold-in 3: this GET surfaces `userCode` /
   // `verificationUri` / `verificationUriComplete` for pending entries
-  // — material an attacker on the same loopback host could use to
+  // â€” material an attacker on the same loopback host could use to
   // shoulder-surf the IdP approval flow. POST + DELETE are already
   // strict; aligning GET to `mutate({ strict: true })` closes the
   // information-disclosure asymmetry (the sibling
@@ -738,7 +741,7 @@ export function createServeApp(
   // `400 invalid_client_id` instead of the previous 200, matching the
   // POST/DELETE behavior. SDK clients that send the header on POST
   // should send a valid value on GET too. Anonymous callers (header
-  // absent) are unaffected and continue to work as pre-PR-4291 — the
+  // absent) are unaffected and continue to work as pre-PR-4291 â€” the
   // both-undefined branch in `callerIsInitiator` covers them.
   app.get(
     '/workspace/auth/device-flow/:id',
@@ -769,7 +772,7 @@ export function createServeApp(
       // INSIDE the body shaper which doesn't have an audit sink, so
       // the route handler is the right layer to record it. Use
       // QWEN_SERVE_DEBUG-gated stderr (rather than unconditional
-      // audit) — multi-SDK setups sharing a bearer token will cause
+      // audit) â€” multi-SDK setups sharing a bearer token will cause
       // legitimate "different caller GETs same flow" traffic that
       // would otherwise flood production logs. Operators who hit
       // the symptom can flip QWEN_SERVE_DEBUG=1 and get the
@@ -787,7 +790,7 @@ export function createServeApp(
         )
       ) {
         writeStderrLine(
-          `qwen serve debug: GET /workspace/auth/device-flow/${id} redacted verification fields — caller-clientId mismatch (initiator=${view.initiatorClientId ?? 'anonymous'}, caller=${clientId ?? 'anonymous'})`,
+          `qwen serve debug: GET /workspace/auth/device-flow/${id} redacted verification fields â€” caller-clientId mismatch (initiator=${view.initiatorClientId ?? 'anonymous'}, caller=${clientId ?? 'anonymous'})`,
         );
       }
       res.status(200).json(toDeviceFlowStateBody(view, clientId));
@@ -847,15 +850,15 @@ export function createServeApp(
 
   app.post('/session', mutate(), async (req, res) => {
     const body = safeBody(req);
-    // #3803 §02: 1 daemon = 1 workspace. Three input shapes:
-    //   - `cwd` ABSENT from body → fall back to the daemon's bound
-    //     workspace (the §02 documented shape — clients pre-flight
+    // #3803 Â§02: 1 daemon = 1 workspace. Three input shapes:
+    //   - `cwd` ABSENT from body â†’ fall back to the daemon's bound
+    //     workspace (the Â§02 documented shape â€” clients pre-flight
     //     `caps.workspaceCwd` and may then omit `cwd`).
-    //   - `cwd` PRESENT but not a string → 400 malformed. A
+    //   - `cwd` PRESENT but not a string â†’ 400 malformed. A
     //     client/orchestrator serialization bug (`cwd: null`,
     //     `cwd: 123`, `cwd: {}`) must not silently bind a session
     //     to the daemon's workspace; surface the bug instead.
-    //   - `cwd` PRESENT as a string → fall through to the
+    //   - `cwd` PRESENT as a string â†’ fall through to the
     //     `path.isAbsolute` check (empty string and relative both
     //     fail there with "must be an absolute path when provided").
     //
@@ -863,7 +866,7 @@ export function createServeApp(
     // `'cwd' in body` reflects exactly "did the client send the
     // key?" without prototype-chain confusion. The presence-check
     // is safe as long as `PROTOTYPE_POLLUTION_KEYS` doesn't grow to
-    // include `cwd` — see the cross-reference in the const's JSDoc
+    // include `cwd` â€” see the cross-reference in the const's JSDoc
     // for what to do if that invariant ever has to break.
     const hasCwd = 'cwd' in body;
     if (hasCwd && typeof body['cwd'] !== 'string') {
@@ -877,9 +880,9 @@ export function createServeApp(
     // (`WorkspaceMismatchError`'s `.message` echoes `requested` twice;
     // `sendBridgeError` writes it to stderr; `res.json` echoes it
     // again). On the loopback-default-no-token deployment shape this
-    // is pre-auth, so a 10 MB cwd body — right under
-    // `express.json({limit: '10mb'})` — would otherwise cost
-    // ~60 MB per request × `maxConnections` (default 256). The
+    // is pre-auth, so a 10 MB cwd body â€” right under
+    // `express.json({limit: '10mb'})` â€” would otherwise cost
+    // ~60 MB per request Ã— `maxConnections` (default 256). The
     // `MAX_WORKSPACE_PATH_LENGTH` constant matches Linux's PATH_MAX
     // (4096); legitimate filesystem paths fit well under it. The
     // `WorkspaceMismatchError` constructor also truncates as a
@@ -904,12 +907,12 @@ export function createServeApp(
         : undefined;
     // Per-request `sessionScope` override (#4175 PR 5). Validate at the
     // route boundary so a 400 surfaces a clear `code: invalid_session_scope`
-    // before we touch the bridge — the bridge revalidates as a defense
+    // before we touch the bridge â€” the bridge revalidates as a defense
     // against direct callers, but a typed 4xx is the right shape for HTTP
     // clients. The field is OPTIONAL: omitting it preserves pre-PR
     // behavior bit-for-bit (the daemon-wide `BridgeOptions.sessionScope`
     // takes effect). New clients can pre-flight `caps.features` for
-    // `session_scope_override` before sending — see
+    // `session_scope_override` before sending â€” see
     // `packages/cli/src/serve/capabilities.ts`.
     const rawSessionScope = body['sessionScope'];
     let sessionScope: 'single' | 'thread' | undefined;
@@ -932,7 +935,7 @@ export function createServeApp(
         ...(clientId !== undefined ? { clientId } : {}),
         ...(sessionScope !== undefined ? { sessionScope } : {}),
       });
-      // Client may have disconnected during the 1–3s spawn window. If
+      // Client may have disconnected during the 1â€“3s spawn window. If
       // so, the response can't be delivered. The session is otherwise
       // orphaned (in `byId` / `defaultEntry` with no client knowing the
       // id), and under churn this leaks one child per aborted request.
@@ -943,16 +946,16 @@ export function createServeApp(
       // only flips while the request body is still being received,
       // so a client that completed the POST and then closed during
       // the spawn would slip past it. `req.destroyed` is too eager
-      // — clients (incl. supertest) close their writable end after
+      // â€” clients (incl. supertest) close their writable end after
       // sending the body even though they're still listening for the
       // response. `res.writable` is the documented signal for
       // "ServerResponse can still send to client".
       //
       // Combined with `!session.attached` we only reap when WE spawned
-      // a fresh child for this request — if another client legitimately
+      // a fresh child for this request â€” if another client legitimately
       // attached, killing it would tear out their work mid-flight.
       // The disconnect-without-reap branch also needs to skip
-      // `res.json` — writing to a closed socket would throw EPIPE
+      // `res.json` â€” writing to a closed socket would throw EPIPE
       // through Express's default error handler.
       if (!res.writable) {
         if (!session.attached) {
@@ -971,7 +974,7 @@ export function createServeApp(
           // tanzhenxin issue 2: when an attaching client disconnects
           // before its 200 response can be written, the
           // `attachCount` bump we did inside `spawnOrAttach` is
-          // fictitious — there's no live attaching client. Roll the
+          // fictitious â€” there's no live attaching client. Roll the
           // counter back and let the bridge decide whether to reap
           // (it does if attachCount returns to 0 AND no live SSE
           // subscribers). Without this, both-coalesced-callers-
@@ -1123,7 +1126,7 @@ export function createServeApp(
     // the agent winds down promptly and the per-session FIFO doesn't
     // stay blocked on a dead client. Detached after the prompt settles.
     //
-    // Use `res.on('close')` (NOT `req.on('close')`) — `IncomingMessage`'s
+    // Use `res.on('close')` (NOT `req.on('close')`) â€” `IncomingMessage`'s
     // close event fires once the request body has been fully consumed
     // even when the client is still listening for the response, which
     // would cancel every ordinary prompt the moment its upload
@@ -1143,13 +1146,13 @@ export function createServeApp(
     }
     try {
       // SECURITY NOTE: this `...(body as object)` passthrough is
-      // intentional — the bridge / ACP SDK ignores fields it
+      // intentional â€” the bridge / ACP SDK ignores fields it
       // doesn't recognize (ACP-spec `_meta` etc are forwarded
       // wholesale to the agent, which is the documented behavior).
       // `sessionId` and `prompt` are forced to the route's view to
       // prevent body-spoofing of the routing key. If a future
       // bridge version starts trusting an additional field by name,
-      // that field becomes a client-controlled input surface — at
+      // that field becomes a client-controlled input surface â€” at
       // that point switch this to an explicit pick. The same
       // pattern repeats on cancel / model below; review them all
       // together when adding new bridge-trusted fields.
@@ -1168,7 +1171,7 @@ export function createServeApp(
       // The HTTP client disconnecting fires the abort path above and
       // the bridge re-throws as `AbortError`. That's a normal
       // wind-down, not an error worth a 500 + stderr stack trace.
-      // Drop it silently — the socket is already closed so we can't
+      // Drop it silently â€” the socket is already closed so we can't
       // send a response anyway, and active clients (e.g. an IDE
       // plugin scrubbing a stuck prompt) would otherwise spam the
       // daemon log.
@@ -1176,10 +1179,10 @@ export function createServeApp(
       // BX9_k: narrow the swallow to ONLY the case where WE armed
       // the abort. The earlier blanket `err.name === 'AbortError'`
       // could also swallow an internal bridge abort (e.g. the child
-      // process aborting a prompt mid-flight) — leaving the client
+      // process aborting a prompt mid-flight) â€” leaving the client
       // with no response and no log trace. If `abort.signal.aborted`
       // is false, the AbortError came from somewhere we didn't
-      // expect → route it through `sendBridgeError` as a real
+      // expect â†’ route it through `sendBridgeError` as a real
       // failure.
       if (
         err instanceof DOMException &&
@@ -1201,7 +1204,7 @@ export function createServeApp(
     // #4175 PR 9: clients ping the daemon to update last-seen
     // bookkeeping. Bridge throws `SessionNotFoundError` for unknown
     // ids and `InvalidClientIdError` when an `X-Qwen-Client-Id`
-    // header is supplied but not registered for this session — both
+    // header is supplied but not registered for this session â€” both
     // are routed through `sendBridgeError` so they share the same
     // typed shape (`404` and `400 invalid_client_id`) the rest of
     // the routes use.
@@ -1309,7 +1312,7 @@ export function createServeApp(
         .json({ error: '`:id` must decode to an absolute workspace path' });
       return;
     }
-    // #3803 §02: reject cross-workspace queries so orchestrators
+    // #3803 Â§02: reject cross-workspace queries so orchestrators
     // don't mistake "no sessions here" for "workspace is idle".
     const key = canonicalizeWorkspace(workspaceCwd);
     if (key !== boundWorkspace) {
@@ -1360,13 +1363,13 @@ export function createServeApp(
     '/session/:id/approval-mode',
     mutate({ strict: true }),
     async (req, res) => {
-      // #4175 Wave 4 PR 17 — first strict-gated session mutation
+      // #4175 Wave 4 PR 17 â€” first strict-gated session mutation
       // surface after PR 14 v1. Validates `mode` against the closed
       // `APPROVAL_MODES` enum and an optional `persist: boolean` flag.
       // The bridge applies the change inside the ACP child's per-session
       // `Config` and (when `persist: true`) writes `tools.approvalMode`
       // to workspace settings via the `persistApprovalMode` hook wired
-      // in `runQwenServe.ts`.
+      // in `runHopCodeServe.ts`.
       const sessionId = req.params['id'];
       const body = safeBody(req);
       const mode = body['mode'];
@@ -1491,7 +1494,7 @@ export function createServeApp(
       // Wave 4 mutation routes; bridge writes the file directly (no
       // ACP roundtrip) and fan-outs `tool_toggled` to every live
       // session SSE bus. Already-registered tools in live sessions
-      // are NOT retroactively unregistered — toggling takes effect on
+      // are NOT retroactively unregistered â€” toggling takes effect on
       // the next ACP child spawn or session refresh.
       const rawToolName = req.params['name'];
       if (!rawToolName || typeof rawToolName !== 'string') {
@@ -1612,7 +1615,7 @@ export function createServeApp(
     }
     if (!accepted) {
       // Either the requestId never existed or another client already won
-      // the race. Stage 1 doesn't distinguish — both surface as 404.
+      // the race. Stage 1 doesn't distinguish â€” both surface as 404.
       res
         .status(404)
         .json({ error: 'No pending permission request', requestId });
@@ -1628,7 +1631,7 @@ export function createServeApp(
     // `parseMaxQueuedQuery` sends its own 400 + JSON body on rejection
     // (returns `null`) so the SSE handshake doesn't get half-written.
     // `undefined` means "client didn't ask for an override; use bus
-    // default 256" — proceed as before.
+    // default 256" â€” proceed as before.
     if (maxQueued === null) return;
 
     let iter: AsyncIterator<BridgeEvent> | undefined;
@@ -1652,7 +1655,7 @@ export function createServeApp(
       // the same cap, looped, amplifying the exact load the limit
       // exists to prevent.
       //
-      // `429` is the standard "back off" signal — browsers'
+      // `429` is the standard "back off" signal â€” browsers'
       // `EventSource` treats `4xx` as terminal and does NOT
       // auto-reconnect on it, unlike `200 + close` which DOES
       // reconnect. Body shape mirrors the SSE frame's data field so
@@ -1688,7 +1691,7 @@ export function createServeApp(
 
     // Backpressure helper: `res.write` returns false when the kernel send
     // buffer is full. Without awaiting `drain` Node accumulates the
-    // payload in user-space memory unboundedly — a slow consumer on a
+    // payload in user-space memory unboundedly â€” a slow consumer on a
     // chatty session can balloon daemon RSS. Wait for `drain` (or
     // close/error) before scheduling the next write.
     //
@@ -1697,7 +1700,7 @@ export function createServeApp(
     // interleave with the main event-write loop. Without serialization,
     // the heartbeat firing while the main loop is mid-`drain` await
     // would issue a second `res.write()` that bypasses the
-    // backpressure guard — and could even interleave bytes between two
+    // backpressure guard â€” and could even interleave bytes between two
     // SSE frames on the wire. The chain is single-flight: each call
     // waits for the previous write to settle before scheduling its own.
     let writeChain: Promise<void> = Promise.resolve();
@@ -1712,7 +1715,7 @@ export function createServeApp(
         // so that surfaces as a rejection on this promise instead of
         // escaping the executor and turning into an unhandled
         // exception. Async failures still arrive via the `'error'`
-        // event handler below — Node's Writable.write callback isn't
+        // event handler below â€” Node's Writable.write callback isn't
         // documented to receive an error argument (errors come on
         // the event), so we don't rely on it.
         let ok: boolean;
@@ -1749,14 +1752,14 @@ export function createServeApp(
       const next = writeChain.then(() => doWrite(chunk));
       // Tail-swallow rejections on the chain itself so a single failed
       // write doesn't poison every subsequent call. The CALLER's
-      // returned promise still rejects — chain-internal failures are
+      // returned promise still rejects â€” chain-internal failures are
       // someone else's problem, not blockers for queueing.
       writeChain = next.catch(() => undefined);
       return next;
     };
 
     // Tell EventSource to retry after 3s on disconnect. Awaiting drain on
-    // the very first write is overkill but cheap — `ok` is true the
+    // the very first write is overkill but cheap â€” `ok` is true the
     // overwhelming majority of the time. Always swallow rejection: a
     // socket that errors before the very first write would otherwise
     // surface as an unhandled promise rejection (the `res.on('error')`
@@ -1770,7 +1773,7 @@ export function createServeApp(
     // KNOWN GAP: this only catches dead connections via write
     // back-pressure on heartbeat itself. A network partition without TCP
     // RST can leave the connection looking alive (no FIN received) for
-    // however long Node's keepalive probes take to time out — usually
+    // however long Node's keepalive probes take to time out â€” usually
     // ~2 hours by default, configurable via `server.keepAliveTimeout`.
     // Stage 2 may add an explicit application-level idle timeout
     // (last-byte-written tracking + per-connection deadline).
@@ -1797,9 +1800,9 @@ export function createServeApp(
     // the close event doesn't fire first.
     res.on('error', (err) => {
       // Without this log the daemon side is blind to SSE disconnects
-      // (RST, mid-flight kill -9, network blip). Cleanup still runs —
+      // (RST, mid-flight kill -9, network blip). Cleanup still runs â€”
       // the listener exists primarily so Node doesn't crash on EPIPE
-      // — but operators get a breadcrumb when chasing flaky clients.
+      // â€” but operators get a breadcrumb when chasing flaky clients.
       writeStderrLine(
         `qwen serve: SSE socket error (session ${sessionId}): ${err.message}`,
       );
@@ -1816,7 +1819,7 @@ export function createServeApp(
         }
       } catch (err) {
         if (!res.writableEnded) {
-          // Don't burn an `id:` slot — `stream_error` is a terminal frame
+          // Don't burn an `id:` slot â€” `stream_error` is a terminal frame
           // emitted on the daemon side when the bridge iterator throws, so
           // it has no place in the per-session monotonic sequence and a
           // hard-coded `id: 0` would regress the client's `Last-Event-ID`
@@ -1838,7 +1841,7 @@ export function createServeApp(
   });
 
   // Final error handler. `express.json()` throws `SyntaxError` (with
-  // `status: 400`) on malformed body — without this 4-arg middleware
+  // `status: 400`) on malformed body â€” without this 4-arg middleware
   // Express renders an HTML error page, which trips SDK clients that
   // expect a JSON body on every response. Anything else bubbling out
   // is a programmer error; log it and return a JSON 500 (matches the
@@ -1863,7 +1866,7 @@ export function createServeApp(
       // request body exceeds the `express.json({ limit: '10mb' })`
       // ceiling. Without this branch it falls through to the 500 path
       // and clients see a misleading "Internal server error" instead
-      // of a clear "payload too large" — which is the kind of error
+      // of a clear "payload too large" â€” which is the kind of error
       // they can actually act on (chunk the request, raise the limit).
       if (
         err &&
@@ -1888,7 +1891,7 @@ export function createServeApp(
 
 /**
  * Keys stripped by `safeBody` to defend against prototype-pollution
- * — see BZ9uv/va/vs/wD/Bd1zz. Routes downstream of `safeBody` spread
+ * â€” see BZ9uv/va/vs/wD/Bd1zz. Routes downstream of `safeBody` spread
  * the filtered result into objects passed to the bridge / ACP SDK;
  * without this scrub a client could set
  * `{"__proto__": {"polluted": true}}` and pollute
@@ -1898,7 +1901,7 @@ export function createServeApp(
  * route distinguishes "absent" from "present" via `'cwd' in body`
  * against `safeBody`'s output. The semantics rely on this set NOT
  * overlapping with user-payload keys. If you ever add a key here
- * that a route's presence-check cares about (highly unlikely — this
+ * that a route's presence-check cares about (highly unlikely â€” this
  * set is the JS prototype-attack triple, plus a route would have
  * to deliberately name a property after one of these), the
  * presence-check needs to move to the pre-`safeBody` `req.body`
@@ -1913,9 +1916,9 @@ const PROTOTYPE_POLLUTION_KEYS: ReadonlySet<string> = new Set([
 
 const CLIENT_ID_HEADER = 'x-qwen-client-id';
 const MAX_CLIENT_ID_LENGTH = 128;
-/** #4282 fold-in 2 (deepseek SV1) — see /workspace/tools/:name/enable. */
+/** #4282 fold-in 2 (deepseek SV1) â€” see /workspace/tools/:name/enable. */
 const MAX_TOOL_NAME_LENGTH = 256;
-/** #4282 fold-in 4 (qwen-latest S1) — see /workspace/mcp/:server/restart. */
+/** #4282 fold-in 4 (qwen-latest S1) â€” see /workspace/mcp/:server/restart. */
 const MAX_SERVER_NAME_LENGTH = 256;
 const CLIENT_ID_RE = /^[A-Za-z0-9._:-]+$/;
 const INVALID_PERMISSION_OUTCOME_ERROR =
@@ -1978,7 +1981,7 @@ function parseOptionalWorkspaceCwd(
 }
 
 /**
- * PR 21 — translate the registry's redacted `DeviceFlowPublicView` into
+ * PR 21 â€” translate the registry's redacted `DeviceFlowPublicView` into
  * the wire shape declared by `DaemonDeviceFlowStartResult`. Splitting
  * "start response" from "state body" preserves the `attached` field
  * the start route needs without polluting the GET shape.
@@ -1997,7 +2000,7 @@ function toDeviceFlowStartResponseBody(
     attached,
   };
   // PR #4291 follow-up review (gpt-5.5, #3): policy consistency with
-  // `toDeviceFlowStateBody` — only the original starter sees the
+  // `toDeviceFlowStateBody` â€” only the original starter sees the
   // verification material. Earlier shape unconditionally returned
   // `userCode` / `verificationUri` / `verificationUriComplete` on
   // every POST, including the `attached: true` take-over case, so any
@@ -2008,7 +2011,7 @@ function toDeviceFlowStartResponseBody(
   // was set from the same `callerClientId` on this very request.
   // Take-over callers that don't match the initiator now see the
   // public envelope only. The both-undefined branch preserves the
-  // anonymous-start → anonymous-reattach use case.
+  // anonymous-start â†’ anonymous-reattach use case.
   const callerIsInitiator =
     (view.initiatorClientId === undefined && callerClientId === undefined) ||
     (view.initiatorClientId !== undefined &&
@@ -2022,7 +2025,7 @@ function toDeviceFlowStartResponseBody(
     }
   }
   // PR #4255 round-12 #6 (gpt-5.5 review CzHOK): minor info-leak
-  // close-out — only echo `initiatorClientId` back to a take-over
+  // close-out â€” only echo `initiatorClientId` back to a take-over
   // POST when the caller is the same client that started the flow
   // (or when the take-over caller explicitly identified
   // themselves and matches the original starter). An anonymous
@@ -2057,7 +2060,7 @@ function toDeviceFlowStateBody(
   if (view.intervalMs !== undefined) body['intervalMs'] = view.intervalMs;
   if (view.lastPolledAt !== undefined) body['lastPolledAt'] = view.lastPolledAt;
   // PR #4255 follow-up review thread (deepseek-v4-pro): symmetrize with
-  // the POST take-over response shape — only echo `userCode` /
+  // the POST take-over response shape â€” only echo `userCode` /
   // `verificationUri` / `verificationUriComplete` / `initiatorClientId`
   // back to the original starter (matched by `X-Qwen-Client-Id`). An
   // anonymous GET caller, or a caller identifying as a different client,
@@ -2069,7 +2072,7 @@ function toDeviceFlowStateBody(
   //
   // **Threat model (PR #4291 follow-up review by Copilot):** this gate
   // is BEST-EFFORT ATTRIBUTION, not authentication. `X-Qwen-Client-Id`
-  // is a syntactic header, not bound to a server-validated identity —
+  // is a syntactic header, not bound to a server-validated identity â€”
   // anyone holding the bearer token can spoof it. The bearer token IS
   // the auth boundary; this gate exists to prevent ACCIDENTAL
   // cross-client reads in well-behaved multi-SDK setups (and to keep
@@ -2080,9 +2083,9 @@ function toDeviceFlowStateBody(
   // is a separate architectural change.
   // PR #4291 follow-up review (qwen-latest, #3): the gate must accept
   // the both-undefined case too, otherwise an anonymously-started flow
-  // (POST without `X-Qwen-Client-Id` → `initiatorClientId === undefined`)
+  // (POST without `X-Qwen-Client-Id` â†’ `initiatorClientId === undefined`)
   // becomes silently unreadable: even the same anonymous caller GETting
-  // the same id can no longer retrieve `userCode`/`verificationUri` —
+  // the same id can no longer retrieve `userCode`/`verificationUri` â€”
   // the body switches from "what they got from POST" to a redacted
   // public envelope, with HTTP 200, no error. Pre-PR-4291 GET returned
   // these fields to anyone with the bearer; this gate's purpose is to
@@ -2177,7 +2180,7 @@ function isValidOutcome(
   const obj = raw as Record<string, unknown>;
   if (obj['outcome'] === 'cancelled') return true;
   // `optionId` must be a non-empty string. An empty string is technically a
-  // string but isn't a meaningful selection — letting it through would
+  // string but isn't a meaningful selection â€” letting it through would
   // forward malformed votes to the bridge and the agent would reject the
   // unknown option opaquely.
   return (
@@ -2194,12 +2197,12 @@ const MAX_QUERY_MAX_QUEUED = 2048;
 /**
  * Parse the optional `?maxQueued=N` query param on
  * `GET /session/:id/events`. Returns:
- *   - `undefined` — param absent, EventBus uses its default cap (256).
- *   - a positive integer in `[16, 2048]` — caller wants a custom cap.
- *   - `null` — malformed value; the function ALREADY sent a 400 JSON
+ *   - `undefined` â€” param absent, EventBus uses its default cap (256).
+ *   - a positive integer in `[16, 2048]` â€” caller wants a custom cap.
+ *   - `null` â€” malformed value; the function ALREADY sent a 400 JSON
  *     response and the route must short-circuit. (Pre-handshake 400
  *     is safer than half-opening an SSE stream and emitting a
- *     `stream_error` frame the client has to parse — `EventSource`
+ *     `stream_error` frame the client has to parse â€” `EventSource`
  *     auto-reconnects on the latter.)
  *
  * Cap range rationale: lower bound 16 (smaller is useless for any
@@ -2210,8 +2213,8 @@ function parseMaxQueuedQuery(
   raw: unknown,
   res: import('express').Response,
 ): number | undefined | null {
-  // Absent param → undefined (use bus default). Present-but-empty
-  // (`?maxQueued=` typed explicitly) → fail-CLOSED 400 — the API
+  // Absent param â†’ undefined (use bus default). Present-but-empty
+  // (`?maxQueued=` typed explicitly) â†’ fail-CLOSED 400 â€” the API
   // documents fail-closed for any malformed value before opening
   // SSE, and an empty string is unambiguously malformed (real values
   // are positive integers in [16, 2048]).
@@ -2255,7 +2258,7 @@ function parseMaxQueuedQuery(
 /**
  * Wrap an attacker-controllable string for safe interpolation into a
  * stderr log line. `JSON.stringify` escapes control characters
- * (`\n`, `\r`, etc.) and wraps the result in quotes — any injection
+ * (`\n`, `\r`, etc.) and wraps the result in quotes â€” any injection
  * attempt surfaces as visible-as-quoted-noise rather than a
  * forged log line. Truncated AFTER stringify to keep the budget
  * predictable even for control-heavy inputs.
@@ -2270,7 +2273,7 @@ function parseLastEventId(raw: unknown): number | undefined {
   if (typeof raw !== 'string' || !/^\d+$/.test(raw)) {
     // BX9_I: log a breadcrumb for the operator when a non-empty
     // header is rejected. The client resumed from event 0 instead
-    // of where they meant to — without this line, the loss of
+    // of where they meant to â€” without this line, the loss of
     // every event buffered during their disconnect was invisible.
     // Skip the log for missing / empty headers (the common case of
     // "first connect, no resume").
@@ -2304,7 +2307,7 @@ function sendPermissionVoteError(
   // BkwQI: voter's `optionId` wasn't in the option set the agent
   // originally offered (e.g. forging `ProceedAlways*` when the
   // prompt's `hideAlwaysAllow` policy suppressed it). 400, not
-  // 404 — the requestId IS known, but the chosen option isn't.
+  // 404 â€” the requestId IS known, but the chosen option isn't.
   if (err instanceof InvalidPermissionOptionError) {
     res.status(400).json({
       error: err.message,
@@ -2319,7 +2322,7 @@ function sendPermissionVoteError(
 
 function formatSseFrame(event: BridgeEvent | OmitId<BridgeEvent>): string {
   // SSE format: id (optional), event (optional), data, blank line.
-  // The `id:` line is intentionally omitted when `event.id` is absent —
+  // The `id:` line is intentionally omitted when `event.id` is absent â€”
   // terminal/synthetic frames (e.g. daemon-side `stream_error`) must not
   // burn a slot in the per-session monotonic sequence the client uses for
   // `Last-Event-ID` reconnect tracking.
@@ -2329,7 +2332,7 @@ function formatSseFrame(event: BridgeEvent | OmitId<BridgeEvent>): string {
   // conformant parser joins with `\n`); we don't emit that form because
   // our payload is JSON without embedded newlines after `JSON.stringify`.
   // The SDK parser at `sdk-typescript/src/daemon/sse.ts` handles the
-  // multi-line variant on the receive side — input/output asymmetry is
+  // multi-line variant on the receive side â€” input/output asymmetry is
   // intentional.
   const dataJson = JSON.stringify(event);
   const idLine =
@@ -2346,7 +2349,7 @@ type OmitId<T> = Omit<T, 'id'>;
  * log line so a bare `ECONNRESET` / `ENOMEM` stack trace is
  * attributable to a specific session and request without having to
  * timestamp-correlate against client logs. Pass via the route handlers
- * — see how they call `sendBridgeError(res, err, { route: 'POST
+ * â€” see how they call `sendBridgeError(res, err, { route: 'POST
  * /session/:id/prompt', sessionId })`. Optional so test/dev call
  * sites that don't care about the log can omit it.
  */
@@ -2422,9 +2425,9 @@ function sendBridgeError(
     return;
   }
   if (err instanceof WorkspaceMismatchError) {
-    // #3803 §02 single-workspace mode: the daemon binds to one
+    // #3803 Â§02 single-workspace mode: the daemon binds to one
     // workspace at boot; cross-workspace POSTs are rejected here.
-    // 400 (not 404 — the daemon is "fine", the client just picked
+    // 400 (not 404 â€” the daemon is "fine", the client just picked
     // the wrong daemon for their workspace). Body includes both
     // paths so orchestrator-aware clients can route to the right
     // daemon / spawn a new one.
@@ -2438,13 +2441,13 @@ function sendBridgeError(
     // requests by the upstream bearer-token gate, so probing-DoS
     // log noise stays bounded.
     // SECURITY: `err.requested` is derived from the request body
-    // (`req.workspaceCwd` → `canonicalizeWorkspace` → here). `path.resolve`
+    // (`req.workspaceCwd` â†’ `canonicalizeWorkspace` â†’ here). `path.resolve`
     // + `realpathSync.native` both preserve control characters inside
-    // path segments — they only normalize separators / `..` / `.` and
+    // path segments â€” they only normalize separators / `..` / `.` and
     // walk symlinks. A body like `{"cwd": "/legit/path\nqwen serve:
     // FAKE LOG LINE"}` would otherwise emit two valid-looking daemon
     // log lines, weaponizing line-based log shippers (Splunk / Loki /
-    // journald → SIEM). `JSON.stringify` escapes control chars and
+    // journald â†’ SIEM). `JSON.stringify` escapes control chars and
     // wraps in quotes so any injection attempt surfaces as
     // visible-as-quoted-noise rather than forged-line. `err.bound` is
     // safe (canonicalized at boot from operator-controlled
@@ -2467,7 +2470,7 @@ function sendBridgeError(
     // Same wire shape as the route-layer 400 (`server.ts` validates
     // body['sessionScope'] before calling the bridge). A direct embed
     // / test caller bypassing the route would otherwise see a generic
-    // 500 — the typed translation keeps both layers in agreement so
+    // 500 â€” the typed translation keeps both layers in agreement so
     // SDK clients can branch on `code` regardless of which layer
     // surfaced the rejection.
     res.status(400).json({
@@ -2499,7 +2502,7 @@ function sendBridgeError(
     return;
   }
   if (err instanceof RestoreInProgressError) {
-    // Match `SessionLimitExceededError`'s 5s hint (above) — the
+    // Match `SessionLimitExceededError`'s 5s hint (above) â€” the
     // underlying restore can take up to `initTimeoutMs` (default
     // 10s) on the agent side, so a 1s retry hint pushed clients
     // into tight loops that kept hitting the same 409.
@@ -2514,10 +2517,10 @@ function sendBridgeError(
     return;
   }
   // 5xx is the kind of error operators need to see in their daemon log
-  // — bridge ENOMEM, agent stack trace, unexpected throw, etc. Without
+  // â€” bridge ENOMEM, agent stack trace, unexpected throw, etc. Without
   // logging here every 500 disappears once the caller consumes the
   // response body. This is a stop-gap until structured access/error
-  // logging lands (tracked under §10 follow-ups). Use the stdio helper
+  // logging lands (tracked under Â§10 follow-ups). Use the stdio helper
   // (not `console.error`) to keep the no-console lint rule happy and
   // route through the same writer the rest of the daemon uses.
   const ctxParts = [
@@ -2554,7 +2557,7 @@ function errorMessage(err: unknown): string {
 /**
  * Build the JSON body for a 5xx response. The ACP SDK forwards
  * JSON-RPC-shaped errors like `{code: -32000, message: "Internal error",
- * data: {reason: "model quota exceeded"}}` — discarding `code`/`data`
+ * data: {reason: "model quota exceeded"}}` â€” discarding `code`/`data`
  * collapses every distinct failure (quota / rate-limit / auth /
  * crash) to the same opaque `"Internal error"` string at the client.
  * Forward both fields so callers can triage from response body alone.
@@ -2566,7 +2569,7 @@ function errorMessage(err: unknown): string {
  * snippets, etc.) to every authenticated SSE subscriber that
  * observes 5xx responses. In Stage 1's single-user / small-team
  * trust model (every authenticated client is the same human or
- * collaborators they trust) this is acceptable — and the triage
+ * collaborators they trust) this is acceptable â€” and the triage
  * value of the rich error is high. Stage 2 multi-tenant deployments
  * will need an opt-in `--redact-errors` flag (or per-deployment
  * policy hook) that strips `data` and replaces it with an

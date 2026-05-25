@@ -1965,7 +1965,7 @@ describe('McpClientManager — PR 14 guardrails', () => {
 
   it('constructor downgrades enforce-without-budget when budgetConfig passed directly (wenshao R8 #5)', async () => {
     // Direct-budgetConfig path is test-/embedded-only — production
-    // callers (CLI, runQwenServe, env-var fallback) all validate
+    // callers (CLI, runHopCodeServe, env-var fallback) all validate
     // upfront. Defense-in-depth: constructor mirrors the env-var
     // path's downgrade so a future caller that bypasses validation
     // can't silently fail-open.

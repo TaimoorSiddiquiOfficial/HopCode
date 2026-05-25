@@ -23,7 +23,7 @@ import { HEADLESS_YOLO_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarning
  * Pause the current async function indefinitely. Used after the daemon
  * listener is up so yargs `parse()` never resolves — if it did, the
  * top-level CLI would fall through to the interactive (TUI) entry point
- * in `gemini.tsx`. SIGINT / SIGTERM in `runQwenServe` is the sole exit
+ * in `gemini.tsx`. SIGINT / SIGTERM in `runHopCodeServe` is the sole exit
  * route. Named so a future maintainer doesn't read the bare
  * `new Promise<never>(() => {})` as a bug (BRQQZ).
  */
@@ -241,9 +241,9 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
 
     // Lazy-load the serve module so non-serve invocations don't pay for
     // express + body-parser + qs in their startup path.
-    const { runQwenServe } = await import('../serve/index.js');
+    const { runHopCodeServe } = await import('../serve/index.js');
     try {
-      await runQwenServe({
+      await runHopCodeServe({
         port: argv.port,
         hostname: argv.hostname,
         token: argv.token,

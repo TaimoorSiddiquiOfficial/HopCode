@@ -93,7 +93,7 @@ export function hostAllowlist(
 
 /**
  * Bearer token middleware. When `token` is undefined the gate is open — used
- * for the loopback-only developer default. `runQwenServe` enforces that any
+ * for the loopback-only developer default. `runHopCodeServe` enforces that any
  * non-loopback bind has a token, and that `--require-auth` boots only with a
  * token configured, so this no-token branch is reachable only on loopback
  * developer setups that opted out of `--require-auth`.
@@ -275,7 +275,7 @@ export function createMutationGate(
   // cache is visible.
   const strictDenier: RequestHandler = (_req: Request, res: Response) => {
     // Only list remediations that work standalone. `--require-auth` is
-    // paired-required-with-a-token at boot (`runQwenServe.ts` refuses
+    // paired-required-with-a-token at boot (`runHopCodeServe.ts` refuses
     // to start with the flag set but no token), so naming it as a
     // third standalone option here would loop the operator into a
     // different boot error. Configuring a token via `QWEN_SERVER_TOKEN`

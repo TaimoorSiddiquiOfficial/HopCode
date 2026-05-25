@@ -269,7 +269,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       // PR 14 fix (review #4247 wenshao R7 line 191): operator typos
       // like `QWEN_SERVE_MCP_CLIENT_BUDGET=abc` previously fell
       // through silently to "no budget" with zero indication. The
-      // CLI parent (`commands/serve.ts` + `runQwenServe.ts`)
+      // CLI parent (`commands/serve.ts` + `runHopCodeServe.ts`)
       // validates and throws, but the ACP child process — where
       // this function runs — has no such validation. Surface a
       // boot breadcrumb so operators see the misconfiguration in
@@ -313,7 +313,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
   // `QWEN_SERVE_MCP_BUDGET_MODE=enforce` in a Docker Compose / k8s
   // env without the matching budget, daemon boots happy, snapshot
   // shows `budgetMode: 'off'`, and enforcement is silently
-  // disabled. The CLI handler + `runQwenServe` path both throw on
+  // disabled. The CLI handler + `runHopCodeServe` path both throw on
   // this combination; the env-var fallback path (used by the ACP
   // child) was the laggard. Now mirrors the R7 #6 invalid-value
   // breadcrumb pattern.
@@ -482,7 +482,7 @@ export class McpClientManager {
     // PR 14 fix (review #4247 wenshao R8 #5 + R10 line 357): mirror
     // `readBudgetFromEnv`'s `(enforce|warn)`-without-budget
     // downgrade for the direct-`budgetConfig` path too. All
-    // production callers (CLI handler, `runQwenServe`, env-var
+    // production callers (CLI handler, `runHopCodeServe`, env-var
     // fallback) validate upfront, but a future code path that
     // injects `budgetConfig` without running the validation
     // would re-introduce the silent fail-open. Defense in depth.

@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import { createServeApp } from './server.js';
-import { runQwenServe, type RunHandle } from './runQwenServe.js';
+import { runHopCodeServe, type RunHandle } from './runHopCodeServe.js';
 import {
   CONDITIONAL_SERVE_FEATURES,
   getAdvertisedServeFeatures,
@@ -1999,7 +1999,7 @@ describe('createServeApp', () => {
             else signal?.addEventListener('abort', onAbort, { once: true });
           }),
       });
-      const localHandle = await runQwenServe(
+      const localHandle = await runHopCodeServe(
         { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
         { bridge },
       );
@@ -3318,7 +3318,7 @@ describe('createServeApp', () => {
       // The whole point of `--require-auth` is to harden the
       // loopback default; the unauthenticated `/health` carve-out
       // would defeat that on shared dev hosts. Boot-time check in
-      // `runQwenServe` guarantees a token whenever the flag is on,
+      // `runHopCodeServe` guarantees a token whenever the flag is on,
       // so this 401 is reachable only under operator opt-in.
       const app = createServeApp({
         ...baseOpts,
@@ -3424,7 +3424,7 @@ describe('createServeApp', () => {
   });
 });
 
-describe('runQwenServe', () => {
+describe('runHopCodeServe', () => {
   let handle: RunHandle | undefined;
 
   afterEach(async () => {
@@ -3437,7 +3437,7 @@ describe('runQwenServe', () => {
 
   it('refuses to bind 0.0.0.0 without a token', async () => {
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '0.0.0.0',
         port: 0,
         mode: 'http-bridge',
@@ -3449,7 +3449,7 @@ describe('runQwenServe', () => {
     // Boot-loud check: silently dropping the flag would leave the
     // operator believing loopback is hardened when it isn't.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3458,14 +3458,14 @@ describe('runQwenServe', () => {
     ).rejects.toThrow(/--require-auth/);
   });
 
-  // PR 14 fix (review #4247): runQwenServe is the documented embedded
+  // PR 14 fix (review #4247): runHopCodeServe is the documented embedded
   // entry point, so budget validation must live here, not just in the
   // yargs CLI handler. Embedded callers (other tools wrapping the
   // daemon, deps.bridge test injection) silently produced an uncapped
   // child pre-fix despite requesting enforce.
   it('rejects non-positive mcpClientBudget (#4175 PR 14)', async () => {
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3473,7 +3473,7 @@ describe('runQwenServe', () => {
       }),
     ).rejects.toThrow(/mcpClientBudget/);
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3484,7 +3484,7 @@ describe('runQwenServe', () => {
 
   it('rejects mcpBudgetMode=enforce without a budget (#4175 PR 14)', async () => {
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3494,19 +3494,19 @@ describe('runQwenServe', () => {
   });
 
   // Round 6 (wenshao R5 line 216): replaced the R3 `process.env`
-  // mutation tests. `runQwenServe` now passes per-handle env
+  // mutation tests. `runHopCodeServe` now passes per-handle env
   // overrides via `BridgeOptions.childEnvOverrides`, NOT by mutating
   // global `process.env` — so concurrent embedded daemons don't
   // cross-contaminate each other's MCP budget env. The two tests
-  // below assert (a) runQwenServe doesn't touch process.env and
-  // (b) a pre-existing process.env value survives runQwenServe
-  // calls unrelated to MCP overrides (proving runQwenServe is no
+  // below assert (a) runHopCodeServe doesn't touch process.env and
+  // (b) a pre-existing process.env value survives runHopCodeServe
+  // calls unrelated to MCP overrides (proving runHopCodeServe is no
   // longer the source of env mutation).
   it('does not mutate process.env when caller provides mcp budget options (#4247 R6 line 216)', async () => {
     // Sanity-check: no MCP env vars set before.
     delete process.env['QWEN_SERVE_MCP_CLIENT_BUDGET'];
     delete process.env['QWEN_SERVE_MCP_BUDGET_MODE'];
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
       mode: 'http-bridge',
@@ -3522,7 +3522,7 @@ describe('runQwenServe', () => {
 
   it('preserves pre-existing process.env values (no longer wipes globals on omit) (#4247 R6 line 216)', async () => {
     // Pre-R6 the "scrub on omit" code path delete'd these from
-    // process.env. Post-R6 runQwenServe doesn't touch process.env
+    // process.env. Post-R6 runHopCodeServe doesn't touch process.env
     // at all; the override mechanism handles "scrub" at the
     // per-handle level inside the bridge's spawn factory. So if an
     // operator had QWEN_SERVE_MCP_CLIENT_BUDGET exported in their
@@ -3531,7 +3531,7 @@ describe('runQwenServe', () => {
     // `undefined` via overrides to scrub it on spawn).
     process.env['QWEN_SERVE_MCP_CLIENT_BUDGET'] = '99';
     try {
-      handle = await runQwenServe({
+      handle = await runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3544,7 +3544,7 @@ describe('runQwenServe', () => {
   });
 
   it('starts with --require-auth + token on loopback', async () => {
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
       mode: 'http-bridge',
@@ -3563,7 +3563,7 @@ describe('runQwenServe', () => {
 
   it('accepts QWEN_SERVER_TOKEN from the env when binding non-loopback', async () => {
     process.env['QWEN_SERVER_TOKEN'] = 'env-secret';
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '0.0.0.0',
       port: 0,
       mode: 'http-bridge',
@@ -3572,7 +3572,7 @@ describe('runQwenServe', () => {
   });
 
   it('starts on a loopback ephemeral port without a token', async () => {
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
       mode: 'http-bridge',
@@ -3594,7 +3594,7 @@ describe('runQwenServe', () => {
     // bricked every request. Fix treats 0 / Infinity / non-finite as
     // "leave the property unset" so Node's default (no cap) actually
     // applies.
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
       mode: 'http-bridge',
@@ -3610,7 +3610,7 @@ describe('runQwenServe', () => {
   });
 
   it('--max-connections Infinity treated as unlimited (tanzhenxin issue 1)', async () => {
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
       mode: 'http-bridge',
@@ -3624,7 +3624,7 @@ describe('runQwenServe', () => {
   });
 
   it('--max-connections 100 sets the cap as supplied', async () => {
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
       mode: 'http-bridge',
@@ -3637,7 +3637,7 @@ describe('runQwenServe', () => {
     // Silent fail-OPEN on a CLI typo would weaken the DoS guard.
     // Boot-loud is the right behavior for an unparseable cap.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3645,7 +3645,7 @@ describe('runQwenServe', () => {
       }),
     ).rejects.toThrow(/maxConnections: NaN/);
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3658,7 +3658,7 @@ describe('runQwenServe', () => {
     // The previous Set lookup was case-sensitive, so `Localhost` was
     // treated as non-loopback and refused to boot without a token.
     // Fix lowercases the operator-supplied hostname before lookup.
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: 'Localhost',
       port: 0,
       mode: 'http-bridge',
@@ -3668,9 +3668,9 @@ describe('runQwenServe', () => {
 
   it('strips brackets from `[::1]` before passing to app.listen()', async () => {
     // Node's app.listen wants the unbracketed IPv6 literal — `[::1]`
-    // would fail with ENOTFOUND. The fixup is in runQwenServe's
+    // would fail with ENOTFOUND. The fixup is in runHopCodeServe's
     // bind-time normalization.
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '[::1]',
       port: 0,
       mode: 'http-bridge',
@@ -3692,7 +3692,7 @@ describe('runQwenServe', () => {
     // mangled to `2001:db8::1]:8080` and let Node ENOTFOUND. Catch it
     // upstream with a clear error pointing at the right separation.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '[2001:db8::1]:8080',
         port: 0,
         mode: 'http-bridge',
@@ -3707,7 +3707,7 @@ describe('runQwenServe', () => {
     // produce a misleading `[localhost:4170]:port` URL, then fail
     // at `app.listen()` with ENOTFOUND. Catch upstream.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: 'localhost:4170',
         port: 0,
         mode: 'http-bridge',
@@ -3716,14 +3716,14 @@ describe('runQwenServe', () => {
       /Invalid --hostname "localhost:4170".*looks like a "host:port" combination/,
     );
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1:4170',
         port: 0,
         mode: 'http-bridge',
       }),
     ).rejects.toThrow(/Invalid --hostname "127\.0\.0\.1:4170"/);
     // But raw IPv6 (multiple colons) still works.
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '::1',
       port: 0,
       mode: 'http-bridge',
@@ -3736,7 +3736,7 @@ describe('runQwenServe', () => {
     // typing `[]` clearly meant something specific, not wildcard — fail
     // loudly instead of silently exposing the daemon on every interface.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '[]',
         port: 0,
         mode: 'http-bridge',
@@ -3754,7 +3754,7 @@ describe('runQwenServe', () => {
     // making this a true E2E that doesn't require a real `qwen --acp`
     // child.
     const bridge = fakeBridge();
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       {
         hostname: '127.0.0.1',
         port: 0,
@@ -3782,7 +3782,7 @@ describe('runQwenServe', () => {
     // would then spawn a `qwen --acp` child with that cwd and the
     // agent would fail with an opaque ENOENT.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3802,7 +3802,7 @@ describe('runQwenServe', () => {
     // test would then see ENOENT instead of the expected
     // "not a directory" branch.
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3813,7 +3813,7 @@ describe('runQwenServe', () => {
 
   it('rejects relative --workspace at boot', async () => {
     await expect(
-      runQwenServe({
+      runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -3824,7 +3824,7 @@ describe('runQwenServe', () => {
 
   it('drains the bridge before closing the listener', async () => {
     const bridge = fakeBridge();
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -3835,7 +3835,7 @@ describe('runQwenServe', () => {
   });
 
   it('wires fsFactory + emit through to the read routes (#4175 PR 19 follow-up #2)', async () => {
-    // Pin the contract that `runQwenServe` constructs the workspace
+    // Pin the contract that `runHopCodeServe` constructs the workspace
     // filesystem boundary, threads its emit hook through to
     // `createServeApp`, and that boundary actually drives the new
     // PR 19 read routes. A regression that drops the `fsFactory`
@@ -3848,7 +3848,7 @@ describe('runQwenServe', () => {
     );
     await fsp.writeFile(path.join(wsRoot, 'a.txt'), 'hello');
     try {
-      handle = await runQwenServe(
+      handle = await runHopCodeServe(
         {
           hostname: '127.0.0.1',
           port: 0,
@@ -3886,7 +3886,7 @@ describe('runQwenServe', () => {
     // The injection point exists so embedded callers (other tools
     // wrapping the daemon, future runtime locality contracts) can
     // swap in a remote-fronting factory. This test asserts
-    // `runQwenServe` does NOT silently shadow a caller-supplied
+    // `runHopCodeServe` does NOT silently shadow a caller-supplied
     // factory with its built-in default. A regression that ignored
     // `deps.fsFactory` and fell back to the built-in factory would
     // resolve `a.txt` against `process.cwd()`, find no such file,
@@ -3932,7 +3932,7 @@ describe('runQwenServe', () => {
       }),
     };
     const bridge = fakeBridge();
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       {
         hostname: '127.0.0.1',
         port: 0,
@@ -3961,7 +3961,7 @@ describe('runQwenServe', () => {
     );
     try {
       const captured: BridgeEvent[] = [];
-      handle = await runQwenServe(
+      handle = await runHopCodeServe(
         {
           hostname: '127.0.0.1',
           port: 0,
@@ -3993,8 +3993,8 @@ describe('runQwenServe', () => {
   it('trust snapshot=false flows through deps.trustedWorkspace into the boundary (#4175 PR 19 follow-up #2)', async () => {
     // PR 19 has no write routes, so the trust gate's effect on
     // mutating intents can't be observed via HTTP. Instead, we
-    // construct the same factory that runQwenServe would build,
-    // with the same `trusted` value runQwenServe would pass, and
+    // construct the same factory that runHopCodeServe would build,
+    // with the same `trusted` value runHopCodeServe would pass, and
     // assert the gate trips. The contract is: when
     // `deps.trustedWorkspace = false`, the factory's
     // `assertTrustedForIntent` rejects writes with
@@ -4003,7 +4003,7 @@ describe('runQwenServe', () => {
       path.join(os.tmpdir(), 'qwen-runqwen-untrust-'),
     );
     try {
-      // Mirror runQwenServe's construction. If `runQwenServe`
+      // Mirror runHopCodeServe's construction. If `runHopCodeServe`
       // changes the call shape (different deps order, different
       // fields), this test will start failing to type-check —
       // which is the point: the failure is the audit trail.
@@ -4033,7 +4033,7 @@ describe('runQwenServe', () => {
 
   it('handle.close() is idempotent — concurrent + repeat calls share one drain cycle', async () => {
     const bridge = fakeBridge();
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4052,7 +4052,7 @@ describe('runQwenServe', () => {
 
   it('force-closes connections after the shutdown timeout', async () => {
     const bridge = fakeBridge();
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4089,19 +4089,19 @@ describe('runQwenServe', () => {
     const sigintBefore = process.listenerCount('SIGINT');
     const sigtermBefore = process.listenerCount('SIGTERM');
 
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
 
-    // runQwenServe attaches one of each.
+    // runHopCodeServe attaches one of each.
     expect(process.listenerCount('SIGINT')).toBe(sigintBefore + 1);
     expect(process.listenerCount('SIGTERM')).toBe(sigtermBefore + 1);
 
     await handle.close();
     handle = undefined;
 
-    // After drain completes, the listener that runQwenServe added is gone.
+    // After drain completes, the listener that runHopCodeServe added is gone.
     // (Detaching during drain would leave a second-signal-during-shutdown
     // hitting Node's default termination behavior; this design detaches at
     // the end of `finish` so the `if (shuttingDown) return` guard is the
@@ -4165,7 +4165,7 @@ describe('GET /session/:id/events (SSE)', () => {
         await new Promise(() => {});
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4198,7 +4198,7 @@ describe('GET /session/:id/events (SSE)', () => {
         await new Promise(() => {});
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4222,7 +4222,7 @@ describe('GET /session/:id/events (SSE)', () => {
         await new Promise(() => {});
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4244,7 +4244,7 @@ describe('GET /session/:id/events (SSE)', () => {
         await new Promise(() => {});
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4266,7 +4266,7 @@ describe('GET /session/:id/events (SSE)', () => {
         throw new Error('bridge must not be touched');
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4285,7 +4285,7 @@ describe('GET /session/:id/events (SSE)', () => {
         throw new Error('bridge must not be touched');
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4304,7 +4304,7 @@ describe('GET /session/:id/events (SSE)', () => {
         throw new Error('bridge must not be touched');
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4325,7 +4325,7 @@ describe('GET /session/:id/events (SSE)', () => {
         throw new SessionNotFoundError(sessionId);
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4356,7 +4356,7 @@ describe('GET /session/:id/events (SSE)', () => {
         });
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4381,7 +4381,7 @@ describe('GET /session/:id/events (SSE)', () => {
         throw new Error('agent died');
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4410,7 +4410,7 @@ describe('GET /session/:id/events (SSE)', () => {
         })();
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4433,7 +4433,7 @@ describe('GET /session/:id/events (SSE)', () => {
         })();
       },
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       { hostname: '127.0.0.1', port: 0, mode: 'http-bridge' },
       { bridge },
     );
@@ -4599,12 +4599,12 @@ describe('same-origin Origin-stripping middleware', () => {
   });
 });
 
-describe('runQwenServe SIGINT handler', () => {
+describe('runHopCodeServe SIGINT handler', () => {
   it('does not register signal handlers until the listener is up', () => {
     // Sanity: we register `once` so we don't leak across test runs.
     // No assertion beyond "module loads without throwing"; full lifecycle
     // is covered indirectly by the loopback boot test above.
-    expect(typeof runQwenServe).toBe('function');
+    expect(typeof runHopCodeServe).toBe('function');
     void vi.fn(); // silence unused-import lint if vitest tree-shakes
   });
 });

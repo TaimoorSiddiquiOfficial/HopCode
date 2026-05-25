@@ -33,7 +33,7 @@ export interface ServeOptions {
   /**
    * Bearer token required on every request. Optional when bound to loopback
    * (developer convenience); required when bound beyond loopback (boot fails
-   * without one — see runQwenServe).
+   * without one — see runHopCodeServe).
    */
   token?: string;
   mode: ServeMode;
