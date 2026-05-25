@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,11 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { type Config, DEFAULT_TOKEN_LIMIT } from '@hoptrendy/hopcode-core';
+import {
+  type Config,
+  DEFAULT_TOKEN_LIMIT,
+  computeThresholds,
+} from '@hoptrendy/hopcode-core';
 import {
   StreamingState,
   MessageType,
@@ -81,6 +85,7 @@ export function useContextualTips({
       sessionPromptCount,
       sessionCount: tipHistory.sessionCount,
       platform: process.platform,
+      thresholds: computeThresholds(contextWindowSize),
     };
 
     const tip = selectTip('post-response', tipContext, tipRegistry, tipHistory);

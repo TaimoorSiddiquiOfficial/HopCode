@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -174,7 +174,7 @@ export interface AgentParams {
   run_in_background?: boolean;
   /**
    * When set to `'worktree'`, spins up a temporary git worktree under
-   * `<projectRoot>/.qwen/worktrees/agent-<7hex>` and instructs the agent to
+   * `<projectRoot>/.hopcode/worktrees/agent-<7hex>` and instructs the agent to
    * confine all file operations to that path. After the agent completes:
    * - if no changes were made, the worktree is auto-removed;
    * - if changes were made, the worktree is preserved and its path/branch
@@ -190,8 +190,8 @@ const debugLogger = createDebugLogger('AGENT');
  */
 function approvalModeToPermissionMode(mode: ApprovalMode): PermissionMode {
   switch (mode) {
-    case ApprovalMode.IZN:
-      return PermissionMode.Izn;
+    case ApprovalMode.YOLO:
+      return PermissionMode.Yolo;
     case ApprovalMode.AUTO_EDIT:
       return PermissionMode.AutoEdit;
     case ApprovalMode.AUTO:
@@ -208,7 +208,7 @@ function approvalModeToPermissionMode(mode: ApprovalMode): PermissionMode {
  * Resolves the effective permission mode for a sub-agent.
  *
  * Rules (matching claw-code):
- * - Permissive parent modes (izn, auto-edit) always win
+ * - Permissive parent modes (yolo, auto-edit) always win
  * - Otherwise, the agent definition's mode applies if set
  * - Default fallback is auto-edit (sub-agents need autonomy)
  */
@@ -224,8 +224,7 @@ export function resolveSubagentApprovalMode(
   if (
     parentApprovalMode === ApprovalMode.YOLO ||
     parentApprovalMode === ApprovalMode.AUTO_EDIT ||
-    parentApprovalMode === ApprovalMode.AUTO ||
-    parentApprovalMode === ApprovalMode.IZN
+    parentApprovalMode === ApprovalMode.AUTO
   ) {
     return approvalModeToPermissionMode(parentApprovalMode);
   }
@@ -244,8 +243,7 @@ export function resolveSubagentApprovalMode(
       !isTrustedFolder &&
       (resolved === PermissionMode.Yolo ||
         resolved === PermissionMode.AutoEdit ||
-        resolved === PermissionMode.Auto ||
-        resolved === PermissionMode.Izn)
+        resolved === PermissionMode.Auto)
     ) {
       return approvalModeToPermissionMode(parentApprovalMode);
     }
@@ -268,8 +266,8 @@ export function resolveSubagentApprovalMode(
  */
 function permissionModeToApprovalMode(mode: PermissionMode): ApprovalMode {
   switch (mode) {
-    case PermissionMode.Izn:
-      return ApprovalMode.IZN;
+    case PermissionMode.Yolo:
+      return ApprovalMode.YOLO;
     case PermissionMode.AutoEdit:
       return ApprovalMode.AUTO_EDIT;
     case PermissionMode.Auto:
@@ -294,7 +292,7 @@ function permissionModeToApprovalMode(mode: PermissionMode): ApprovalMode {
  * independent imports of this module observe the same Symbol identity.
  */
 export const TOOL_REGISTRY_REBUILT: unique symbol = Symbol.for(
-  'hopcode:tool-registry-rebuilt',
+  'qwen-code:tool-registry-rebuilt',
 );
 
 /**
@@ -457,7 +455,7 @@ export class AgentTool extends BaseDeclarativeTool<AgentParams, ToolResult> {
           type: 'string',
           enum: ['worktree'],
           description:
-            "Isolation mode. 'worktree' creates a temporary git worktree under <projectRoot>/.qwen/worktrees/agent-<7hex> so the agent works on an isolated copy of the repo. The worktree is auto-removed if the agent makes no changes; otherwise the worktree path and branch are returned in the result.",
+            "Isolation mode. 'worktree' creates a temporary git worktree under <projectRoot>/.hopcode/worktrees/agent-<7hex> so the agent works on an isolated copy of the repo. The worktree is auto-removed if the agent makes no changes; otherwise the worktree path and branch are returned in the result.",
         },
       },
       required: ['description', 'prompt'],
@@ -998,7 +996,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           initialMessages = [...rawHistory];
         }
       } else {
-        // History ends with user (unusual) � drop the trailing user
+        // History ends with user (unusual) — drop the trailing user
         // message to avoid consecutive user messages when agent-headless
         // sends the task_prompt.
         initialMessages = rawHistory.slice(0, -1);
@@ -1020,7 +1018,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
 
     const generationConfig = geminiClient?.getChat().getGenerationConfig();
     if (generationConfig?.systemInstruction) {
-      // Inline FunctionDeclaration[] from the parent � passed verbatim
+      // Inline FunctionDeclaration[] from the parent — passed verbatim
       // (including `agent` and cron tools) so the fork's system prompt,
       // tools, and history exactly match the parent's and share its
       // DashScope cache prefix. A fork is a context-sharing extension of
@@ -1445,6 +1443,37 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         updateOutput(this.currentDisplay);
       }
 
+      // OR the tool parameter with the agent definition's background flag.
+      const shouldRunInBackground =
+        this.params.run_in_background === true ||
+        subagentConfig.background === true;
+
+      // Preflight: fast-fail before expensive worktree/subagent setup.
+      // This is not redundant with registry.register() below — that call
+      // remains the authoritative race guard, but by then the launch path
+      // has already run hooks and created a child agent.
+      if (shouldRunInBackground) {
+        try {
+          this.config
+            .getBackgroundTaskRegistry()
+            .assertCanStartBackgroundAgent();
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          this.updateDisplay(
+            {
+              status: 'failed',
+              terminateReason: errorMessage,
+            },
+            updateOutput,
+          );
+          return {
+            llmContent: errorMessage,
+            returnDisplay: this.currentDisplay!,
+          };
+        }
+      }
+
       // ── Optional worktree isolation (Phase 1: provision) ──────────
       // Provision the worktree BEFORE creating the agent Config so the
       // override below can rebind `getTargetDir()` to the worktree path
@@ -1470,7 +1499,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
       if (this.params.isolation === 'worktree') {
         const cwd = this.config.getTargetDir();
         // Refuse nested isolation. If the parent itself is already
-        // running inside a worktree (cwd contains `.qwen/worktrees/`),
+        // running inside a worktree (cwd contains `.hopcode/worktrees/`),
         // creating a sibling isolation worktree at the repo root
         // would leave the model's mental map pointing at the outer
         // worktree while the override aimed it at the inner one.
@@ -1496,7 +1525,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           );
         }
         // Anchor the worktree at the repo top-level so monorepo subdir
-        // launches still gather worktrees under `<repoRoot>/.qwen/...`,
+        // launches still gather worktrees under `<repoRoot>/.hopcode/...`,
         // which is also the path the startup sweep scans.
         const projectRoot = (await probe.getRepoTopLevel()) ?? cwd;
         const wtService =
@@ -1642,36 +1671,16 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         ov.getWorkspaceContext = () => wtWorkspace;
       }
 
-      // ── Optional worktree isolation (Phase 2: rebind cwd) ─────────
-      // Rebind every "where am I?" surface on the agent's Config
-      // override to the worktree path so the subagent's tools cannot
-      // leak into the parent project tree.
-      //
-      // We override at two layers because Config getters mix direct
-      // field reads and getter calls. Shadowing only the methods would
-      // leave call sites like `this.targetDir` (e.g. inside
-      // `getProjectRoot`, `getFileService`) resolving via the
-      // prototype chain to the parent's `targetDir` — JS does not
-      // promote a getter assignment to a field shadow. Setting both
-      // `ov.targetDir` (own-property field) AND `ov.getTargetDir`
-      // (own-property method) covers both lookup paths.
-      if (worktreeIsolation) {
-        const wtPath = worktreeIsolation.path;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const ov = agentConfig as any;
-        ov.targetDir = wtPath;
-        ov.cwd = wtPath;
-        ov.getTargetDir = () => wtPath;
-        ov.getCwd = () => wtPath;
-        ov.getWorkingDir = () => wtPath;
-        ov.getProjectRoot = () => wtPath;
-        const wtFileService = new FileDiscoveryService(wtPath);
-        ov.fileDiscoveryService = wtFileService;
-        ov.getFileService = () => wtFileService;
-        const wtWorkspace = new WorkspaceContext(wtPath);
-        ov.workspaceContext = wtWorkspace;
-        ov.getWorkspaceContext = () => wtWorkspace;
-      }
+      // Date.now() alone collides when two parallel background agents of the
+      // same type land in the same ms; the registry is keyed by agentId.
+      const agentIdSuffix = this.callId ?? randomUUID().slice(0, 8);
+      const hookOpts = {
+        agentId: `${subagentConfig.name}-${agentIdSuffix}`,
+        agentType: this.params.subagent_type || subagentConfig.name,
+        resolvedMode,
+        signal,
+        updateOutput,
+      };
 
       // Create the subagent. Fork bypasses SubagentManager because its
       // runtime configs are synthesized from the parent's cache-safe params.
@@ -1714,26 +1723,11 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
       const contextState = new ContextState();
       contextState.set('task_prompt', taskPrompt);
 
-      // Date.now() alone collides when two parallel background agents of the
-      // same type land in the same ms; the registry is keyed by agentId.
-      const agentIdSuffix = this.callId ?? randomUUID().slice(0, 8);
-      const hookOpts = {
-        agentId: `${subagentConfig.name}-${agentIdSuffix}`,
-        agentType: this.params.subagent_type || subagentConfig.name,
-        resolvedMode,
-        signal,
-        updateOutput,
-      };
-
-      // -- Background (async) execution path ----------------------
-      // OR the tool parameter with the agent definition's background flag.
-      const shouldRunInBackground =
-        this.params.run_in_background === true ||
-        subagentConfig.background === true;
-
+      // ── Background (async) execution path ──────────────────────
       if (shouldRunInBackground) {
         // Fire SubagentStart hook before background launch
         const hookSystem = this.config.getHookSystem();
+        let subagentStartHookCompleted = false;
         if (hookSystem) {
           try {
             const startHookOutput = await hookSystem.fireSubagentStartEvent(
@@ -1746,6 +1740,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
             if (additionalContext) {
               contextState.set('hook_context', additionalContext);
             }
+            subagentStartHookCompleted = true;
           } catch (hookError) {
             debugLogger.warn(
               `[Agent] SubagentStart hook failed, continuing execution: ${hookError}`,
@@ -1753,20 +1748,19 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           }
         }
 
-        // Create an independent AbortController � background agents
+        // Create an independent AbortController — background agents
         // survive ESC cancellation of the parent's current turn.
         const bgAbortController = new AbortController();
 
         // Background agents have no UI, so interactive permission prompts must be
-        // auto-denied rather than auto-approved (IZN). PermissionRequest hooks
+        // auto-denied rather than auto-approved (YOLO). PermissionRequest hooks
         // still run and can override. Use Object.create so the resolved approval
         // mode override (e.g. subagent-level `approvalMode: auto-edit`) is preserved.
-        const bgConfig = Object.create(agentConfig) as Config;
-        (
-          bgConfig as unknown as Record<string, unknown>
-        ).getShouldAvoidPermissionPrompts = () => true;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const bgConfig = Object.create(agentConfig) as any;
+        bgConfig.getShouldAvoidPermissionPrompts = () => true;
 
-        // Register in the background task registry only AFTER init succeeds � if
+        // Register in the background task registry only AFTER init succeeds — if
         // construction throws, a pre-registered phantom 'running' entry would hang
         // the non-interactive hold-back loop forever.
         // Dedicated emitter for this background agent so the transcript
@@ -1813,6 +1807,76 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
           hookOpts.agentId,
         );
         const projectRoot = this.config.getProjectRoot();
+        try {
+          // Register before writing the meta sidecar — see the matching
+          // foreground call below for the full rationale. Keeping the
+          // order symmetric here guards the background path against the
+          // same orphaned-meta hazard if register() throws.
+          registry.register({
+            agentId: hookOpts.agentId,
+            description: this.params.description,
+            subagentType: subagentConfig.name,
+            isBackgrounded: true,
+            status: 'running',
+            startTime: Date.now(),
+            abortController: bgAbortController,
+            toolUseId: this.callId,
+            prompt: this.params.prompt,
+            outputFile: jsonlPath,
+            metaPath,
+          });
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          bgAbortController.abort();
+
+          if (hookSystem && subagentStartHookCompleted) {
+            try {
+              await hookSystem.fireSubagentStopEvent(
+                hookOpts.agentId,
+                hookOpts.agentType,
+                jsonlPath,
+                bgSubagent.getFinalText(),
+                false,
+                resolvedMode,
+                signal,
+              );
+            } catch (hookError) {
+              debugLogger.warn(
+                `[Agent] SubagentStop hook after background registration failure failed: ${hookError}`,
+              );
+            }
+          }
+
+          let wtSuffix = '';
+          try {
+            wtSuffix = formatWorktreeSuffix(await cleanupWorktreeIsolation());
+          } catch (cleanupError) {
+            debugLogger.warn(
+              `[Agent] Worktree cleanup after background registration failure failed: ${cleanupError}`,
+            );
+          }
+
+          this.updateDisplay(
+            {
+              status: 'failed',
+              terminateReason: errorMessage,
+            },
+            updateOutput,
+          );
+          void agentConfig
+            .getToolRegistry()
+            .stop()
+            .catch((stopError) => {
+              debugLogger.warn(
+                `[Agent] ToolRegistry stop after background registration failure failed: ${stopError}`,
+              );
+            });
+          return {
+            llmContent: `${errorMessage}${wtSuffix}`,
+            returnDisplay: this.currentDisplay!,
+          };
+        }
         const { cleanup: cleanupJsonl } = attachJsonlTranscriptWriter(
           bgEventEmitter,
           jsonlPath,
@@ -1837,23 +1901,6 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
             launchTaskPrompt: isFork ? bgTaskPrompt : undefined,
           },
         );
-        // Register before writing the meta sidecar — see the matching
-        // foreground call below for the full rationale. Keeping the
-        // order symmetric here guards the background path against the
-        // same orphaned-meta hazard if register() ever grows a throw.
-        registry.register({
-          agentId: hookOpts.agentId,
-          description: this.params.description,
-          subagentType: subagentConfig.name,
-          isBackgrounded: true,
-          status: 'running',
-          startTime: Date.now(),
-          abortController: bgAbortController,
-          toolUseId: this.callId,
-          prompt: this.params.prompt,
-          outputFile: jsonlPath,
-          metaPath,
-        });
         writeAgentMeta(metaPath, {
           agentId: hookOpts.agentId,
           agentType: hookOpts.agentType,
@@ -1941,7 +1988,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         // Fire-and-forget: start the subagent without blocking the parent.
         // For forks, wrap the body in runInForkContext so the recursive-fork
         // guard in execute() fires if the fork child's model calls `agent`
-        // again � otherwise background forks bypass the ALS marker and can
+        // again — otherwise background forks bypass the ALS marker and can
         // spawn nested implicit forks.
         const bgBody = async () => {
           try {
@@ -2192,6 +2239,8 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
       // listeners + fd even if the attach itself throws partway through.
       // The attach happens inside the `try` below — keeping it outside
       // would leak listeners on any synchronous setup failure.
+      let cleanupFgJsonl: (() => void) | undefined;
+
       const cleanupOwnedMonitorNotifications =
         this.registerOwnedMonitorNotifications(
           hookOpts.agentId,
@@ -2207,8 +2256,6 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
       subagent.setExternalMessageWaitPredicate?.(() =>
         this.config.getMonitorRegistry().hasRunningForOwner(hookOpts.agentId),
       );
-
-      let cleanupFgJsonl: (() => void) | undefined;
 
       // Mirror the background path's progress wiring so the dialog detail
       // body has live tool-call activity AND a current `entry.stats`

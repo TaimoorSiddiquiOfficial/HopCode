@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,9 +24,6 @@ import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
 import type { AnyToolInvocation } from '../tools/tools.js';
 import type { ArenaManager } from '../agents/arena/ArenaManager.js';
-import type { WebSearchConfig } from '../tools/web-search/types.js';
-import type { PowerShellSecurityConfig } from '../security/powershell-security.js';
-import { resolvePowerShellConfig } from '../security/powershell-security.js';
 import { ArenaAgentClient } from '../agents/arena/ArenaAgentClient.js';
 
 // Core
@@ -51,8 +48,6 @@ import { GitService } from '../services/gitService.js';
 import { GitWorktreeService } from '../services/gitWorktreeService.js';
 import { cleanupStaleAgentWorktrees } from '../services/worktreeCleanup.js';
 import { CronScheduler } from '../services/cronScheduler.js';
-import { PermissionBlockerService } from '../services/permissionBlockerService.js';
-import { TaskStore } from '../services/task-store.js';
 
 // Tools — only lightweight imports; tool classes are lazy-loaded via dynamic import
 import {
@@ -70,7 +65,7 @@ import type { LspClient, LspStatusSnapshot } from '../lsp/types.js';
 
 // Other modules
 import { ideContextStore } from '../ide/ideContext.js';
-import { type InputFormat, OutputFormat } from '../output/types.js';
+import { InputFormat, OutputFormat } from '../output/types.js';
 import { PromptRegistry } from '../prompts/prompt-registry.js';
 import { SkillManager } from '../skills/skill-manager.js';
 import { PermissionManager } from '../permissions/permission-manager.js';
@@ -82,12 +77,14 @@ import {
 import { SubagentManager } from '../subagents/subagent-manager.js';
 import type { SubagentConfig } from '../subagents/types.js';
 import { BackgroundTaskRegistry } from '../agents/background-tasks.js';
+import { MonitorRegistry } from '../services/monitorRegistry.js';
 import { BackgroundAgentResumeService } from '../agents/background-agent-resume.js';
 import { BackgroundShellRegistry } from '../services/backgroundShellRegistry.js';
-import { MonitorRegistry } from '../services/monitorRegistry.js';
 import { FileReadCache } from '../services/fileReadCache.js';
 import { resolveStopHookBlockingCap } from '../hooks/stopHookCap.js';
 import {
+  DEFAULT_OTLP_ENDPOINT,
+  DEFAULT_TELEMETRY_TARGET,
   isTelemetrySdkInitialized,
   initializeTelemetry,
   shutdownTelemetry,
@@ -133,15 +130,8 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
+import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
-import {
-  ApprovalConfig,
-  ApprovalMode,
-} from './approvalConfig.js';
-import { TelemetryConfig } from './telemetryConfig.js';
-import { UiConfig } from './uiConfig.js';
-import { ChatConfig } from './chatConfig.js';
-import { PermissionsConfig } from './permissionsConfig.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
   clearRuntimeStatus,
@@ -182,12 +172,15 @@ export {
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 };
 
-export {
-  ApprovalMode,
-  APPROVAL_MODES,
-  type ApprovalModeInfo,
-  APPROVAL_MODE_INFO,
-} from './approvalConfig.js';
+export enum ApprovalMode {
+  PLAN = 'plan',
+  DEFAULT = 'default',
+  AUTO_EDIT = 'auto-edit',
+  AUTO = 'auto',
+  YOLO = 'yolo',
+}
+
+export const APPROVAL_MODES = Object.values(ApprovalMode);
 
 /**
  * Thrown by `Config.setApprovalMode` when the requested mode would grant
@@ -205,6 +198,47 @@ export class TrustGateError extends Error {
     this.name = 'TrustGateError';
   }
 }
+
+/**
+ * Information about an approval mode including display name and description.
+ */
+export interface ApprovalModeInfo {
+  id: ApprovalMode;
+  name: string;
+  description: string;
+}
+
+/**
+ * Detailed information about each approval mode.
+ * Used for UI display and protocol responses.
+ */
+export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
+  [ApprovalMode.PLAN]: {
+    id: ApprovalMode.PLAN,
+    name: 'Plan',
+    description: 'Analyze only, do not modify files or execute commands',
+  },
+  [ApprovalMode.DEFAULT]: {
+    id: ApprovalMode.DEFAULT,
+    name: 'Default',
+    description: 'Require approval for file edits or shell commands',
+  },
+  [ApprovalMode.AUTO_EDIT]: {
+    id: ApprovalMode.AUTO_EDIT,
+    name: 'Auto Edit',
+    description: 'Automatically approve file edits',
+  },
+  [ApprovalMode.AUTO]: {
+    id: ApprovalMode.AUTO,
+    name: 'Auto',
+    description: 'LLM classifier auto-approves safe actions, blocks risky ones',
+  },
+  [ApprovalMode.YOLO]: {
+    id: ApprovalMode.YOLO,
+    name: 'YOLO',
+    description: 'Automatically approve all tools',
+  },
+};
 
 /**
  * Settings for the AUTO approval mode classifier.
@@ -234,7 +268,6 @@ export interface BugCommandSettings {
 }
 
 export interface ChatCompressionSettings {
-  contextPercentageThreshold?: number;
   /**
    * Estimated tokens for a single inline image / document part when
    * apportioning chars across history in `findCompressSplitPoint`.
@@ -303,6 +336,42 @@ export interface TelemetryMetricsSettings {
   includeSessionId?: boolean;
 }
 
+/**
+ * Security-relevant settings controlling what client-side correlation
+ * data qwen-code writes into outbound LLM API requests.
+ *
+ * **Why this is a separate namespace from `telemetry.*`:** telemetry
+ * controls data flow into the user's OWN observability backend (OTLP
+ * collector / file outfile). The settings here control data flow OUT of
+ * the qwen-code process and INTO third-party LLM provider request
+ * streams (DashScope, OpenAI, Anthropic, etc.). Different recipients =
+ * different consent decision, so a different settings tree. See PR
+ * #4390 review (LaZzyMan) for the framing rationale.
+ *
+ * All values default to off / no propagation. Operators who want to
+ * propagate trace context for server-side trace stitching (e.g. ARMS
+ * Tracing + DashScope) opt in explicitly.
+ */
+export interface OutboundCorrelationSettings {
+  /**
+   * Inject W3C `traceparent` header on outbound HTTP requests
+   * originated by undici / global `fetch` (LLM SDK calls, MCP
+   * StreamableHTTP clients, WebFetch tool, etc.). Default: `false`.
+   *
+   * When `false`, the SDK is configured with a no-op
+   * `TextMapPropagator` so trace context stays internal to the user's
+   * OTLP collector (operator still gets client HTTP spans, but the
+   * trace id is not written onto third-party request streams).
+   *
+   * When `true`, the OTel default W3C composite propagator
+   * (`tracecontext` + `baggage`) is installed and `traceparent` is
+   * written on every outbound `fetch`. Useful when the LLM provider
+   * also reports into the operator's OTel collector — e.g. ARMS
+   * Tracing + DashScope — for cross-process trace stitching.
+   */
+  propagateTraceContext?: boolean;
+}
+
 export interface OutputSettings {
   format?: OutputFormat;
 }
@@ -358,7 +427,7 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
       if (!knownDisable.includes(lowered)) {
         // Unrecognised string — disable (safer-by-default) but log
         // so a user wondering "why is my setting being ignored?"
-        // can see the actual coercion in HOPCODE_DEBUG_LOG_FILE.
+        // can see the actual coercion in QWEN_DEBUG_LOG_FILE.
         gitCoAuthorLogger.warn(
           `Unrecognized string value for general.gitCoAuthor.${fieldName}: ${JSON.stringify(v)}; treating as false. Accepted forms: true/yes/on/1, false/no/off/0/empty.`,
         );
@@ -374,11 +443,7 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
   };
 }
 
-export type ExtensionOriginSource = 'Claude' | 'Gemini' | 'HopCode';
-
-export type AgentModelOverride =
-  | string
-  | { model: string; baseUrl?: string; apiKey?: string };
+export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
 
 export interface ExtensionInstallMetadata {
   source: string;
@@ -393,10 +458,8 @@ export interface ExtensionInstallMetadata {
   pluginName?: string;
 }
 
-export {
-  DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
-  DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES,
-} from './constants.js';
+export const DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD = 25_000;
+export const DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES = 1000;
 
 export class MCPServerConfig {
   constructor(
@@ -500,7 +563,7 @@ export interface ConfigParameters {
    * CLI surface. Matched case-insensitively on the final (post-rename)
    * command name. Sourced from settings (`slashCommands.disabled`, UNION
    * merged across scopes), the `--disabled-slash-commands` CLI flag, and
-   * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
+   * the `QWEN_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
   /**
@@ -537,6 +600,7 @@ export interface ConfigParameters {
   contextFileName?: string | string[];
   accessibility?: AccessibilitySettings;
   telemetry?: TelemetrySettings;
+  outboundCorrelation?: OutboundCorrelationSettings;
   gitCoAuthor?: GitCoAuthorParam;
   usageStatisticsEnabled?: boolean;
   /**
@@ -549,9 +613,7 @@ export interface ConfigParameters {
   fileReadCacheDisabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    /** @deprecated Use respectHopCodeIgnore instead */
-    respecthopcodeignore?: boolean;
-    respectHopCodeIgnore?: boolean;
+    respectQwenIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
   };
@@ -567,6 +629,19 @@ export interface ConfigParameters {
   model?: string;
   outputLanguageFilePath?: string;
   maxSessionTurns?: number;
+  /**
+   * Wall-clock budget for an unattended run, in seconds. `-1` (default)
+   * means no limit. Enforced by the CLI's non-interactive run loop —
+   * see `RunBudgetEnforcer` in `packages/cli/src/utils/runBudget.ts`.
+   * Issue: QwenLM/qwen-code#4103.
+   */
+  maxWallTimeSeconds?: number;
+  /**
+   * Cumulative tool-call budget across the entire run. `-1` means no
+   * limit. Counts every `executeToolCall` invocation (incl. failed
+   * tools, since the model is still consuming tokens reading the error).
+   */
+  maxToolCalls?: number;
   clearContextOnIdle?: ClearContextOnIdleSettings;
   sessionTokenLimit?: number;
   experimentalZedIntegration?: boolean;
@@ -641,10 +716,6 @@ export interface ConfigParameters {
   inputFile?: string;
   /** Model providers configuration grouped by authType */
   modelProvidersConfig?: ModelProvidersConfig;
-  /** Web search provider configuration. */
-  webSearch?: WebSearchConfig | null;
-  /** Per-agent model overrides. */
-  agentModels?: Record<string, AgentModelOverride>;
   /** Multi-agent collaboration settings (Arena, Team, Swarm) */
   agents?: AgentsCollabSettings;
   /** Enable managed auto-memory background extraction and dream. Defaults to true. */
@@ -691,12 +762,6 @@ export interface ConfigParameters {
   warnings?: string[];
   /** Allowed HTTP hook URLs whitelist (from security.allowedHttpHookUrls) */
   allowedHttpHookUrls?: string[];
-  /**
-   * PowerShell security policy configuration (from security.powershell).
-   * Controls whether and how the AI agent can execute PowerShell commands.
-   * May be partial — missing fields are filled in by resolvePowerShellConfig.
-   */
-  powershellConfig?: Partial<PowerShellSecurityConfig>;
   /**
    * Callback for persisting a permission rule to settings.
    * Injected by the CLI layer; core uses this to write allow/ask/deny rules
@@ -748,6 +813,13 @@ export interface ConfigInitializeOptions {
   skipGeminiInitialization?: boolean;
 }
 
+const DEFAULT_BARE_CORE_TOOLS = [
+  ToolNames.READ_FILE,
+  ToolNames.EDIT,
+  ToolNames.NOTEBOOK_EDIT,
+  ToolNames.SHELL,
+];
+
 export class Config {
   private sessionId: string;
   private sessionData?: ResumedSessionData;
@@ -767,9 +839,9 @@ export class Config {
   private promptRegistry!: PromptRegistry;
   private subagentManager!: SubagentManager;
   private readonly backgroundTaskRegistry = new BackgroundTaskRegistry();
+  private readonly monitorRegistry = new MonitorRegistry();
   private backgroundAgentResumeService?: BackgroundAgentResumeService;
   private readonly backgroundShellRegistry = new BackgroundShellRegistry();
-  private readonly monitorRegistry = new MonitorRegistry();
   // Field initializer runs once on the parent Config; child Configs
   // built via Object.create(parent) intentionally do NOT pick this up
   // — see getFileReadCache() for the per-instance lazy initialization
@@ -788,18 +860,31 @@ export class Config {
   private contentGeneratorConfig!: ContentGeneratorConfig;
   private contentGeneratorConfigSources: ContentGeneratorConfigSources = {};
   private contentGenerator!: ContentGenerator;
+  private readonly embeddingModel: string;
 
   private modelsConfig!: ModelsConfig;
   private readonly modelProvidersConfig?: ModelProvidersConfig;
-  private readonly webSearch?: WebSearchConfig | null;
   private readonly sandbox: SandboxConfig | undefined;
   private readonly targetDir: string;
   private workspaceContext: WorkspaceContext;
+  private readonly debugMode: boolean;
+  private readonly inputFormat: InputFormat;
+  private readonly outputFormat: OutputFormat;
+  private readonly includePartialMessages: boolean;
   private readonly question: string | undefined;
   private readonly systemPrompt: string | undefined;
   private readonly appendSystemPrompt: string | undefined;
+  private readonly coreTools: string[] | undefined;
+  private readonly allowedTools: string[] | undefined;
+  private readonly excludeTools: string[] | undefined;
+  private readonly disabledSlashCommands: readonly string[];
   private readonly disabledTools: ReadonlySet<string>;
+  private readonly permissionsAllow: string[];
+  private readonly permissionsAsk: string[];
+  private readonly permissionsDeny: string[];
   private readonly permissionsAutoMode: AutoModeSettings;
+  private readonly toolDiscoveryCommand: string | undefined;
+  private readonly toolCallCommand: string | undefined;
   private readonly mcpServerCommand: string | undefined;
   private mcpServers: Record<string, MCPServerConfig> | undefined;
   private readonly lspEnabled: boolean;
@@ -813,12 +898,12 @@ export class Config {
   private geminiMdFileCount: number;
   private conditionalRulesRegistry: ConditionalRulesRegistry | undefined;
   private readonly contextRuleExcludes: string[];
-  private approvalConfig: ApprovalConfig;
+  private approvalMode: ApprovalMode;
+  private prePlanMode?: ApprovalMode;
   private autoModeDenialState: AutoModeDenialState = createDenialState();
-  private telemetryConfig: TelemetryConfig;
-  private uiConfig: UiConfig;
-  private chatConfig: ChatConfig;
-  private permissionsConfig: PermissionsConfig;
+  private readonly accessibility: AccessibilitySettings;
+  private readonly telemetrySettings: TelemetrySettings;
+  private readonly outboundCorrelationSettings: OutboundCorrelationSettings;
   private readonly gitCoAuthor: GitCoAuthorSettings;
   private readonly usageStatisticsEnabled: boolean;
   private readonly fileReadCacheDisabled: boolean;
@@ -827,23 +912,14 @@ export class Config {
   private cronScheduler: CronScheduler | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectHopCodeIgnore: boolean;
+    respectQwenIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
-  // Provider-registry compat properties (populated from user settings file by provider.ts)
-  provider?: Record<string, unknown>;
-  model?: string;
-  small_model?: string;
-  disabled_providers?: string[];
-  enabled_providers?: string[];
   private fileDiscoveryService: FileDiscoveryService | null = null;
   private gitService: GitService | undefined = undefined;
   private sessionService: SessionService | undefined = undefined;
   private chatRecordingService: ChatRecordingService | undefined = undefined;
-  private permissionBlockerService: PermissionBlockerService | undefined =
-    undefined;
-  private taskStore: TaskStore | undefined = undefined;
   private readonly checkpointing: boolean;
   private readonly fileCheckpointingEnabled: boolean;
   private fileHistoryService: FileHistoryService | undefined;
@@ -857,6 +933,11 @@ export class Config {
   private readonly folderTrust: boolean;
   private ideMode: boolean;
 
+  private readonly maxSessionTurns: number;
+  private readonly maxWallTimeSeconds: number;
+  private readonly maxToolCalls: number;
+  private readonly clearContextOnIdle: ClearContextOnIdleSettings;
+  private readonly sessionTokenLimit: number;
   private readonly listExtensions: boolean;
   private readonly overrideExtensions?: string[];
 
@@ -868,6 +949,8 @@ export class Config {
   private readonly chatRecordingEnabled: boolean;
   private readonly loadMemoryFromIncludeDirectories: boolean = false;
   private readonly importFormat: 'tree' | 'flat';
+  private readonly chatCompression: ChatCompressionSettings | undefined;
+  private readonly interactive: boolean;
   private readonly trustedFolder: boolean | undefined;
   private readonly useRipgrep: boolean;
   private readonly useBuiltinRipgrep: boolean;
@@ -880,11 +963,11 @@ export class Config {
     | null = null;
   private readonly arenaAgentClient: ArenaAgentClient | null;
   private readonly agentsSettings: AgentsCollabSettings;
+  private readonly skipLoopDetection: boolean;
+  private readonly skipStartupContext: boolean;
+  private readonly bareMode: boolean;
   private readonly warnings: string[];
   private readonly allowedHttpHookUrls: string[];
-  private readonly powershellConfig:
-    | Partial<PowerShellSecurityConfig>
-    | undefined;
   private readonly onPersistPermissionRuleCallback?: (
     scope: 'project' | 'user',
     ruleType: 'allow' | 'ask' | 'deny',
@@ -893,11 +976,14 @@ export class Config {
   private initialized: boolean = false;
   readonly storage: Storage;
   private readonly fileExclusions: FileExclusions;
+  private readonly truncateToolOutputThreshold: number;
+  private readonly truncateToolOutputLines: number;
   private readonly eventEmitter?: EventEmitter;
   private readonly channel: string | undefined;
   private readonly jsonFd: number | undefined;
   private readonly jsonFile: string | undefined;
   private readonly jsonSchema: Record<string, unknown> | undefined;
+  private readonly inputFile: string | undefined;
   private readonly plansDir: string;
   private readonly plansDirectoryConfigured: boolean;
   private readonly defaultFileEncoding: FileEncodingType | undefined;
@@ -923,9 +1009,9 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
+    this.embeddingModel = params.embeddingModel ?? DEFAULT_QWEN_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
-    this.webSearch = params.webSearch;
     this.targetDir = path.resolve(params.targetDir);
     this.plansDirectoryConfigured = Boolean(params.plansDirectory?.trim());
     this.plansDir = Storage.getPlansDir(this.targetDir, params.plansDirectory);
@@ -936,14 +1022,29 @@ export class Config {
       this.targetDir,
       this.explicitIncludeDirectories,
     );
+    this.debugMode = params.debugMode;
+    this.inputFormat = params.inputFormat ?? InputFormat.TEXT;
     const normalizedOutputFormat = normalizeConfigOutputFormat(
       params.outputFormat ?? params.output?.format,
     );
+    this.outputFormat = normalizedOutputFormat ?? OutputFormat.TEXT;
+    this.includePartialMessages = params.includePartialMessages ?? false;
     this.question = params.question;
     this.systemPrompt = params.systemPrompt;
     this.appendSystemPrompt = params.appendSystemPrompt;
+    this.coreTools = params.coreTools;
+    this.allowedTools = params.allowedTools;
+    this.excludeTools = params.excludeTools;
+    this.disabledSlashCommands = Object.freeze([
+      ...(params.disabledSlashCommands ?? []),
+    ]);
     this.disabledTools = new Set(params.disabledTools ?? []);
+    this.permissionsAllow = params.permissions?.allow || [];
+    this.permissionsAsk = params.permissions?.ask || [];
+    this.permissionsDeny = params.permissions?.deny || [];
     this.permissionsAutoMode = params.permissions?.autoMode ?? {};
+    this.toolDiscoveryCommand = params.toolDiscoveryCommand;
+    this.toolCallCommand = params.toolCallCommand;
     this.mcpServerCommand = params.mcpServerCommand;
     this.mcpServers = params.mcpServers;
     this.lspEnabled = params.lsp?.enabled ?? false;
@@ -955,13 +1056,11 @@ export class Config {
     this.userMemory = params.userMemory ?? '';
     this.geminiMdFileCount = params.geminiMdFileCount ?? 0;
     this.contextRuleExcludes = params.contextRuleExcludes ?? [];
-    this.approvalConfig = new ApprovalConfig({
-      approvalMode: params.approvalMode,
-      prePlanMode: undefined,
-    });
-    this.telemetryConfig = new TelemetryConfig({
-      enabled: params.telemetry?.enabled,
-      target: params.telemetry?.target,
+    this.approvalMode = params.approvalMode ?? ApprovalMode.DEFAULT;
+    this.accessibility = params.accessibility ?? {};
+    this.telemetrySettings = {
+      enabled: params.telemetry?.enabled ?? false,
+      target: params.telemetry?.target ?? DEFAULT_TELEMETRY_TARGET,
       otlpEndpoint: params.telemetry?.otlpEndpoint,
       otlpProtocol: params.telemetry?.otlpProtocol,
       otlpTracesEndpoint: params.telemetry?.otlpTracesEndpoint,
@@ -974,44 +1073,15 @@ export class Config {
       resourceAttributes: params.telemetry?.resourceAttributes,
       metrics: params.telemetry?.metrics,
       resourceAttributeWarnings: params.telemetry?.resourceAttributeWarnings,
-    });
-    this.uiConfig = new UiConfig({
-      inputFormat: params.inputFormat,
-      outputFormat: params.outputFormat ?? normalizedOutputFormat,
-      includePartialMessages: params.includePartialMessages,
-      debugMode: params.debugMode,
-      bareMode: params.bareMode,
-      accessibility: params.accessibility,
-      truncateToolOutputThreshold: params.truncateToolOutputThreshold,
-      truncateToolOutputLines: params.truncateToolOutputLines,
-      skipLoopDetection: params.skipLoopDetection,
-      skipStartupContext: params.skipStartupContext,
-      inputFile: params.inputFile,
-    });
-    this.chatConfig = new ChatConfig({
-      maxSessionTurns: params.maxSessionTurns,
-      clearContextOnIdle: params.clearContextOnIdle,
-      sessionTokenLimit: params.sessionTokenLimit,
-      embeddingModel: params.embeddingModel,
-      chatCompression: params.chatCompression,
-      interactive: params.interactive,
-    });
-    this.permissionsConfig = new PermissionsConfig({
-      bareMode: params.bareMode ?? false,
-      coreTools: params.coreTools,
-      allowedTools: params.allowedTools,
-      excludeTools: params.excludeTools,
-      disabledSlashCommands: params.disabledSlashCommands,
-      permissionsAllow: params.permissions?.allow || [],
-      permissionsAsk: params.permissions?.ask || [],
-      permissionsDeny: params.permissions?.deny || [],
-      toolDiscoveryCommand: params.toolDiscoveryCommand,
-      toolCallCommand: params.toolCallCommand,
-    });
+    };
+    this.outboundCorrelationSettings = {
+      propagateTraceContext:
+        params.outboundCorrelation?.propagateTraceContext ?? false,
+    };
     this.gitCoAuthor = {
       ...normalizeGitCoAuthor(params.gitCoAuthor),
-      name: 'HopCode',
-      email: 'hopcode@hoptrendy.com',
+      name: 'Qwen-Coder',
+      email: 'qwen-coder@alibabacloud.com',
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
     this.fileReadCacheDisabled = params.fileReadCacheDisabled ?? false;
@@ -1019,10 +1089,7 @@ export class Config {
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectHopCodeIgnore:
-        params.fileFiltering?.respectHopCodeIgnore ??
-        params.fileFiltering?.respecthopcodeignore ??
-        true,
+      respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -1035,6 +1102,16 @@ export class Config {
     this.cwd = params.cwd ?? process.cwd();
     this.fileDiscoveryService = params.fileDiscoveryService ?? null;
     this.bugCommand = params.bugCommand;
+    this.maxSessionTurns = params.maxSessionTurns ?? -1;
+    this.maxWallTimeSeconds = params.maxWallTimeSeconds ?? -1;
+    this.maxToolCalls = params.maxToolCalls ?? -1;
+    this.clearContextOnIdle = {
+      toolResultsThresholdMinutes:
+        params.clearContextOnIdle?.toolResultsThresholdMinutes ?? 60,
+      toolResultsNumToKeep:
+        params.clearContextOnIdle?.toolResultsNumToKeep ?? 5,
+    };
+    this.sessionTokenLimit = params.sessionTokenLimit ?? -1;
     this.experimentalZedIntegration =
       params.experimentalZedIntegration ?? false;
     this.cronEnabled = params.cronEnabled ?? false;
@@ -1053,11 +1130,33 @@ export class Config {
     this.loadMemoryFromIncludeDirectories =
       params.loadMemoryFromIncludeDirectories ?? false;
     this.importFormat = params.importFormat ?? 'tree';
+    // Auto-compaction threshold moved to built-in constants (computeThresholds
+    // in chatCompressionService.ts). The old `contextPercentageThreshold`
+    // field is deprecated; if present in user settings, emit a one-time
+    // warning and ignore the value.
+    if (
+      params.chatCompression &&
+      typeof (params.chatCompression as Record<string, unknown>)[
+        'contextPercentageThreshold'
+      ] !== 'undefined'
+    ) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[qwen-code] chatCompression.contextPercentageThreshold has been removed ' +
+          'and is now controlled by built-in thresholds. Setting will be ignored. ' +
+          'Remove this key from your settings.json to silence this warning; ' +
+          'see docs/users/configuration/settings.md for current compaction behavior.',
+      );
+    }
+    this.chatCompression = params.chatCompression;
+    this.interactive = params.interactive ?? false;
     this.trustedFolder = params.trustedFolder;
+    this.skipLoopDetection = params.skipLoopDetection ?? false;
+    this.skipStartupContext = params.skipStartupContext ?? false;
+    this.bareMode = params.bareMode ?? false;
     this.warnings = params.warnings ?? [];
     this.addLegacyPlanLocationWarning();
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
-    this.powershellConfig = params.powershellConfig;
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
 
     // (web search removed)
@@ -1072,12 +1171,19 @@ export class Config {
       showColor: params.shellExecutionConfig?.showColor ?? false,
       pager: params.shellExecutionConfig?.pager ?? 'cat',
     };
+    this.truncateToolOutputThreshold =
+      params.truncateToolOutputThreshold ??
+      DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD;
+    this.truncateToolOutputLines =
+      params.truncateToolOutputLines ?? DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES;
     this.channel = params.channel;
     this.jsonFd = params.jsonFd;
     this.jsonFile = params.jsonFile;
     this.jsonSchema = params.jsonSchema;
+    this.inputFile = params.inputFile;
     this.defaultFileEncoding = params.defaultFileEncoding;
     this.storage = new Storage(this.targetDir);
+    this.inputFormat = params.inputFormat ?? InputFormat.TEXT;
     this.fileExclusions = new FileExclusions(this);
     this.eventEmitter = params.eventEmitter;
     this.arenaAgentClient = ArenaAgentClient.create();
@@ -1102,7 +1208,7 @@ export class Config {
       onModelChange: this.handleModelChange.bind(this),
     });
 
-    if (this.telemetryConfig.getEnabled()) {
+    if (this.telemetrySettings.enabled) {
       initializeTelemetry(this);
     }
 
@@ -1133,10 +1239,6 @@ export class Config {
     // Legacy: fall back to merged hooks if new fields are not provided
     this.hooks = params.hooks;
     this.memoryManager = new MemoryManager();
-    this.taskStore = new TaskStore(this.targetDir, this.sessionId);
-    this.permissionBlockerService = new PermissionBlockerService(
-      path.join(this.targetDir, '.hopcode', 'permission-blocker.json'),
-    );
   }
 
   /**
@@ -1244,8 +1346,7 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['tool_response'] as Record<string, unknown>) || {},
                   (input['tool_use_id'] as string) || '',
-                  (input['permission_mode'] as PermissionMode) ||
-                    PermissionMode.Default,
+                  (input['permission_mode'] as PermissionMode) || 'default',
                   signal,
                 );
                 break;
@@ -1256,8 +1357,7 @@ export class Config {
                   (input['tool_input'] as Record<string, unknown>) || {},
                   (input['error'] as string) || '',
                   input['is_interrupt'] as boolean | undefined,
-                  (input['permission_mode'] as PermissionMode) ||
-                    PermissionMode.Default,
+                  (input['permission_mode'] as PermissionMode) || 'default',
                   signal,
                 );
                 break;
@@ -1265,7 +1365,7 @@ export class Config {
                 result = await hookSystem.fireNotificationEvent(
                   (input['message'] as string) || '',
                   (input['notification_type'] as NotificationType) ||
-                    NotificationType.PermissionPrompt,
+                    'permission_prompt',
                   (input['title'] as string) || undefined,
                   signal,
                 );
@@ -1423,13 +1523,13 @@ export class Config {
     // directory the worktree creators (`enter_worktree` and
     // `agent isolation:'worktree'`) write to. Using `this.targetDir`
     // directly would cause launches from a monorepo subdirectory to
-    // scan `<subdir>/.qwen/worktrees/` — which never exists — and the
+    // scan `<subdir>/.hopcode/worktrees/` — which never exists — and the
     // sweep would silently be a no-op forever.
     if (!this.getBareMode()) {
       void (async () => {
         try {
           // Resolve the repo top-level FIRST. The previous code bailed
-          // on `fs.access(<targetDir>/.qwen/worktrees)` before resolving,
+          // on `fs.access(<targetDir>/.hopcode/worktrees)` before resolving,
           // so a monorepo subdir launch (where `targetDir` is the
           // subdir, not the repo root) always early-returned and the
           // sweep was permanently a no-op. Fast-bail still happens, just
@@ -1935,14 +2035,6 @@ export class Config {
     return this.contentGeneratorConfigSources;
   }
 
-  getTaskStore(): TaskStore | undefined {
-    return this.taskStore;
-  }
-
-  getPermissionBlockerService(): PermissionBlockerService | undefined {
-    return this.permissionBlockerService;
-  }
-
   getModel(): string {
     return (
       this.getContentGeneratorConfig()?.model || this.modelsConfig.getModel()
@@ -1999,28 +2091,6 @@ export class Config {
   }
 
   /**
-   * Returns the fast model for side-query paths. Unlike {@link getFastModel},
-   * this can return an authType-qualified selector because BaseLlmClient can
-   * route a single request through a provider different from the main session.
-   */
-  getFastModelForSideQuery(): string | undefined {
-    const selector = this.resolveFastModelSelector();
-    if (!selector) return undefined;
-
-    if (selector.authType) {
-      const available = this.getAllConfiguredModels([selector.authType]);
-      return available.some((m) => m.id === selector.modelId)
-        ? `${selector.authType}:${selector.modelId}`
-        : undefined;
-    }
-
-    const available = this.getAllConfiguredModels();
-    return available.some((m) => m.id === selector.modelId)
-      ? selector.modelId
-      : undefined;
-  }
-
-  /**
    * Update the fast model at runtime (e.g., when the user runs `/model --fast <model>`).
    * Pass undefined or an empty string to clear the fast model override.
    */
@@ -2060,14 +2130,14 @@ export class Config {
     // Some OpenAI-compatible reasoning models (e.g. DeepSeek) require
     // reasoning_content to be preserved across turns.
 
-    // Hot update path: only supported for hopcode-oauth.
+    // Hot update path: only supported for qwen-oauth.
     // For other auth types we always refresh to recreate the ContentGenerator.
     //
     // Rationale:
-    // - Non-hopcode providers may need to re-validate credentials / baseUrl / envKey.
+    // - Non-qwen providers may need to re-validate credentials / baseUrl / envKey.
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
-    if (authType === AuthType.HOPCODE_OAUTH && !requiresRefresh) {
+    if (authType === AuthType.QWEN_OAUTH && !requiresRefresh) {
       const { config, sources } = resolveContentGeneratorConfigWithSources(
         this,
         authType,
@@ -2079,7 +2149,7 @@ export class Config {
         },
       );
 
-      // Hot-update fields (hopcode-oauth models share the same auth + client).
+      // Hot-update fields (qwen-oauth models share the same auth + client).
       this.contentGeneratorConfig.model = config.model;
       this.contentGeneratorConfig.samplingParams = config.samplingParams;
       this.contentGeneratorConfig.contextWindowSize = config.contextWindowSize;
@@ -2151,7 +2221,7 @@ export class Config {
    *
    * For runtime models, the modelId should be in format `$runtime|${authType}|${modelId}`.
    * This triggers a refresh of the ContentGenerator when required (always on authType changes).
-   * For hopcode-oauth model switches that are hot-update safe, this may update in place.
+   * For qwen-oauth model switches that are hot-update safe, this may update in place.
    *
    * @param authType - Target authentication type
    * @param modelId - Target model ID (or `$runtime|${authType}|${modelId}` for runtime models)
@@ -2167,19 +2237,27 @@ export class Config {
   }
 
   getMaxSessionTurns(): number {
-    return this.chatConfig.getMaxSessionTurns();
+    return this.maxSessionTurns;
+  }
+
+  getMaxWallTimeSeconds(): number {
+    return this.maxWallTimeSeconds;
+  }
+
+  getMaxToolCalls(): number {
+    return this.maxToolCalls;
   }
 
   getClearContextOnIdle(): ClearContextOnIdleSettings {
-    return this.chatConfig.getClearContextOnIdle();
+    return this.clearContextOnIdle;
   }
 
   getSessionTokenLimit(): number {
-    return this.chatConfig.getSessionTokenLimit();
+    return this.sessionTokenLimit;
   }
 
   getEmbeddingModel(): string {
-    return this.chatConfig.getEmbeddingModel();
+    return this.embeddingModel;
   }
 
   getSandbox(): SandboxConfig | undefined {
@@ -2264,7 +2342,7 @@ export class Config {
   }
 
   getDebugMode(): boolean {
-    return this.uiConfig.getDebugMode();
+    return this.debugMode;
   }
 
   getQuestion(): string | undefined {
@@ -2281,27 +2359,74 @@ export class Config {
 
   /** @deprecated Use getPermissionsAllow() instead. */
   getCoreTools(): string[] | undefined {
-    return this.permissionsConfig.getCoreTools();
+    if (this.getBareMode()) {
+      return DEFAULT_BARE_CORE_TOOLS;
+    }
+    return this.coreTools;
   }
 
+  /**
+   * Returns the merged allow-rules for PermissionManager.
+   *
+   * This merges all sources so that PermissionManager receives a single,
+   * authoritative list:
+   *   - settings.permissions.allow  (persistent rules from all scopes)
+   *   - allowedTools param  (SDK / argv auto-approve list)
+   *
+   * Note: coreTools is intentionally excluded here — it has whitelist semantics
+   * (only listed tools are registered), not auto-approve semantics. It is
+   * handled separately via PermissionManager.coreToolsAllowList.
+   *
+   * CLI callers (loadCliConfig) already pre-merge argv into permissionsAllow
+   * before constructing Config, so those fields will be empty for CLI usage.
+   * SDK callers construct Config directly and rely on allowedTools.
+   */
   getPermissionsAllow(): string[] {
-    return this.permissionsConfig.getPermissionsAllow();
+    const base = this.permissionsAllow ?? [];
+    const sdkAllow = [...(this.allowedTools ?? [])];
+    if (sdkAllow.length === 0) return base.length > 0 ? base : [];
+    const merged = [...base];
+    for (const t of sdkAllow) {
+      if (t && !merged.includes(t)) merged.push(t);
+    }
+    return merged;
   }
 
   getPermissionsAsk(): string[] {
-    return this.permissionsConfig.getPermissionsAsk();
+    return this.permissionsAsk;
   }
 
+  /**
+   * Returns the merged deny-rules for PermissionManager.
+   *
+   * Merges:
+   *   - settings.permissions.deny  (persistent rules from all scopes)
+   *   - excludeTools param  (SDK / argv blocklist)
+   *
+   * CLI callers pre-merge argv.excludeTools into permissionsDeny.
+   */
   getPermissionsDeny(): string[] {
-    return this.permissionsConfig.getPermissionsDeny();
+    const base = this.permissionsDeny ?? [];
+    const sdkDeny = this.excludeTools ?? [];
+    if (sdkDeny.length === 0) return base.length > 0 ? base : [];
+    const merged = [...base];
+    for (const t of sdkDeny) {
+      if (t && !merged.includes(t)) merged.push(t);
+    }
+    return merged;
   }
 
   getToolDiscoveryCommand(): string | undefined {
-    return this.permissionsConfig.getToolDiscoveryCommand();
+    return this.toolDiscoveryCommand;
   }
 
+  /**
+   * Returns the pre-merged list of slash command names that should be hidden
+   * from the CLI surface. Callers should treat this as a case-insensitive
+   * denylist; `CommandService.create` handles the normalization.
+   */
   getDisabledSlashCommands(): readonly string[] {
-    return this.permissionsConfig.getDisabledSlashCommands();
+    return this.disabledSlashCommands;
   }
 
   /**
@@ -2316,7 +2441,7 @@ export class Config {
   }
 
   getToolCallCommand(): string | undefined {
-    return this.permissionsConfig.getToolCallCommand();
+    return this.toolCallCommand;
   }
 
   getMcpServerCommand(): string | undefined {
@@ -2477,20 +2602,6 @@ export class Config {
     this.geminiMdFileCount = count;
   }
 
-  /** Alias for setGeminiMdFileCount — used by upstream-merged files. */
-  setContextMdFileCount(count: number): void {
-    this.geminiMdFileCount = count;
-  }
-
-  /** Alias for getGeminiMdFileCount — used by upstream-merged files. */
-  getContextMdFileCount(): number {
-    return this.geminiMdFileCount;
-  }
-
-  getWebSearchConfig(): WebSearchConfig | null {
-    return this.webSearch ?? null;
-  }
-
   getArenaManager(): ArenaManager | null {
     return this.arenaManager;
   }
@@ -2536,7 +2647,7 @@ export class Config {
   }
 
   getApprovalMode(): ApprovalMode {
-    return this.approvalConfig.getApprovalMode();
+    return this.approvalMode;
   }
 
   /**
@@ -2570,12 +2681,28 @@ export class Config {
    * Falls back to DEFAULT if no pre-plan mode was recorded.
    */
   getPrePlanMode(): ApprovalMode {
-    return this.approvalConfig.getPrePlanMode();
+    return this.prePlanMode ?? ApprovalMode.DEFAULT;
   }
 
   setApprovalMode(mode: ApprovalMode): void {
-    const fromMode = this.approvalConfig.getApprovalMode();
-    this.approvalConfig.setApprovalMode(mode, this.isTrustedFolder());
+    if (
+      !this.isTrustedFolder() &&
+      mode !== ApprovalMode.DEFAULT &&
+      mode !== ApprovalMode.PLAN
+    ) {
+      throw new TrustGateError(
+        'Cannot enable privileged approval modes in an untrusted folder.',
+      );
+    }
+    // Track the mode before entering plan mode so it can be restored later
+    if (mode === ApprovalMode.PLAN && this.approvalMode !== ApprovalMode.PLAN) {
+      this.prePlanMode = this.approvalMode;
+    } else if (
+      mode !== ApprovalMode.PLAN &&
+      this.approvalMode === ApprovalMode.PLAN
+    ) {
+      this.prePlanMode = undefined;
+    }
     // Strip over-broad allow rules (Bash interpreter wildcards, any Agent /
     // Skill allow) on AUTO entry; restore them on AUTO exit. Settings on
     // disk are NEVER touched — this is a runtime-only adjustment of the
@@ -2583,6 +2710,7 @@ export class Config {
     // until initialize() is called, so skip the hook on early-startup
     // mode changes (the strip will happen via initialize for AUTO-default
     // sessions).
+    const fromMode = this.approvalMode;
     if (this.permissionManager) {
       if (mode === ApprovalMode.AUTO && fromMode !== ApprovalMode.AUTO) {
         this.permissionManager.stripDangerousRulesForAutoMode();
@@ -2594,6 +2722,7 @@ export class Config {
     if (fromMode !== mode) {
       this.autoModeDenialState = resetDenialState();
     }
+    this.approvalMode = mode;
   }
 
   /**
@@ -2749,69 +2878,76 @@ export class Config {
   }
 
   getInputFormat(): 'text' | 'stream-json' {
-    return this.uiConfig.getInputFormat();
+    return this.inputFormat;
   }
 
   getIncludePartialMessages(): boolean {
-    return this.uiConfig.getIncludePartialMessages();
+    return this.includePartialMessages;
   }
 
   getAccessibility(): AccessibilitySettings {
-    return this.uiConfig.getAccessibility();
+    return this.accessibility;
   }
 
   getTelemetryEnabled(): boolean {
-    return this.telemetryConfig.getEnabled();
+    return this.telemetrySettings.enabled ?? false;
   }
 
   getTelemetryLogPromptsEnabled(): boolean {
-    return this.telemetryConfig.getLogPromptsEnabled();
+    return this.telemetrySettings.logPrompts ?? true;
   }
 
   getTelemetryIncludeSensitiveSpanAttributes(): boolean {
-    return (
-      this.telemetryConfig.getSettings().includeSensitiveSpanAttributes ?? false
-    );
+    return this.telemetrySettings.includeSensitiveSpanAttributes ?? false;
   }
 
   getTelemetryOtlpEndpoint(): string | undefined {
-    return this.telemetryConfig.getOtlpEndpoint();
+    return this.telemetrySettings.otlpEndpoint ?? DEFAULT_OTLP_ENDPOINT;
   }
 
   getTelemetryOtlpProtocol(): 'grpc' | 'http' {
-    return this.telemetryConfig.getOtlpProtocol();
+    return this.telemetrySettings.otlpProtocol ?? 'grpc';
   }
 
   getTelemetryOtlpTracesEndpoint(): string | undefined {
-    return this.telemetryConfig.getOtlpTracesEndpoint();
+    return this.telemetrySettings.otlpTracesEndpoint;
   }
 
   getTelemetryOtlpLogsEndpoint(): string | undefined {
-    return this.telemetryConfig.getOtlpLogsEndpoint();
+    return this.telemetrySettings.otlpLogsEndpoint;
   }
 
   getTelemetryOtlpMetricsEndpoint(): string | undefined {
-    return this.telemetryConfig.getOtlpMetricsEndpoint();
+    return this.telemetrySettings.otlpMetricsEndpoint;
   }
 
   getTelemetryTarget(): TelemetryTarget {
-    return this.telemetryConfig.getTarget();
+    return this.telemetrySettings.target ?? DEFAULT_TELEMETRY_TARGET;
   }
 
   getTelemetryResourceAttributes(): Record<string, string> {
-    return this.telemetryConfig.getSettings().resourceAttributes ?? {};
+    return this.telemetrySettings.resourceAttributes ?? {};
   }
 
   getTelemetryMetricsIncludeSessionId(): boolean {
-    return this.telemetryConfig.getSettings().metrics?.includeSessionId ?? false;
+    return this.telemetrySettings.metrics?.includeSessionId ?? false;
   }
 
   getTelemetryResourceAttributeWarnings(): readonly string[] {
-    return this.telemetryConfig.getSettings().resourceAttributeWarnings ?? [];
+    return this.telemetrySettings.resourceAttributeWarnings ?? [];
+  }
+
+  /**
+   * Whether to inject W3C `traceparent` on outbound `fetch` requests
+   * (LLM SDKs, MCP, WebFetch, etc.). Default false — see
+   * `OutboundCorrelationSettings` for rationale.
+   */
+  getOutboundCorrelationPropagateTraceContext(): boolean {
+    return this.outboundCorrelationSettings.propagateTraceContext ?? false;
   }
 
   getTelemetryOutfile(): string | undefined {
-    return this.telemetryConfig.getOutfile();
+    return this.telemetrySettings.outfile;
   }
 
   getGitCoAuthor(): GitCoAuthorSettings {
@@ -2831,11 +2967,7 @@ export class Config {
 
   isCronEnabled(): boolean {
     // Cron is experimental and opt-in: enabled via settings or env var
-    if (
-      process.env['HOPCODE_ENABLE_CRON'] === '1' ||
-      process.env['HOPCODE_ENABLE_CRON'] === '1'
-    )
-      return true;
+    if (process.env['HOPCODE_ENABLE_CRON'] === '1') return true;
     return this.cronEnabled;
   }
 
@@ -2866,18 +2998,14 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
-  getFileFilteringRespectHopCodeIgnore(): boolean {
-    return this.fileFiltering.respectHopCodeIgnore;
-  }
-  /** @deprecated Use getFileFilteringRespectHopCodeIgnore instead */
-  getFileFilteringRespecthopcodeignore(): boolean {
-    return this.fileFiltering.respectHopCodeIgnore;
+  getFileFilteringRespectQwenIgnore(): boolean {
+    return this.fileFiltering.respectQwenIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
+      respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
     };
   }
 
@@ -3150,16 +3278,6 @@ export class Config {
     return this.getBareMode() ? [] : this.allowedHttpHookUrls;
   }
 
-  /**
-   * Returns the PowerShell security policy configuration.
-   *
-   * Uses the `resolvePowerShellConfig` utility to fill in defaults
-   * when no user configuration is present.
-   */
-  getPowerShellConfig(): PowerShellSecurityConfig {
-    return resolvePowerShellConfig(this.powershellConfig);
-  }
-
   isTrustedFolder(): boolean {
     // isWorkspaceTrusted in cli/src/config/trustedFolder.js returns undefined
     // when the file based trust value is unavailable, since it is mainly used
@@ -3226,7 +3344,7 @@ export class Config {
    * by an external process and submit them as user messages.
    */
   getInputFile(): string | undefined {
-    return this.uiConfig.getInputFile();
+    return this.inputFile;
   }
 
   /**
@@ -3252,11 +3370,11 @@ export class Config {
   }
 
   getChatCompression(): ChatCompressionSettings | undefined {
-    return this.chatConfig.getChatCompression();
+    return this.chatCompression;
   }
 
   isInteractive(): boolean {
-    return this.chatConfig.isInteractive();
+    return this.interactive;
   }
 
   getUseRipgrep(): boolean {
@@ -3290,31 +3408,39 @@ export class Config {
     };
   }
   getScreenReader(): boolean {
-    return this.uiConfig.getScreenReader();
+    return this.accessibility.screenReader ?? false;
   }
 
   getSkipLoopDetection(): boolean {
-    return this.uiConfig.getSkipLoopDetection();
+    return this.skipLoopDetection;
   }
 
   getSkipStartupContext(): boolean {
-    return this.uiConfig.getSkipStartupContext();
+    return this.skipStartupContext;
   }
 
   getBareMode(): boolean {
-    return this.uiConfig.getBareMode();
+    return this.bareMode;
   }
 
   getTruncateToolOutputThreshold(): number {
-    return this.uiConfig.getTruncateToolOutputThreshold();
+    if (this.truncateToolOutputThreshold <= 0) {
+      return Number.POSITIVE_INFINITY;
+    }
+
+    return this.truncateToolOutputThreshold;
   }
 
   getTruncateToolOutputLines(): number {
-    return this.uiConfig.getTruncateToolOutputLines();
+    if (this.truncateToolOutputLines <= 0) {
+      return Number.POSITIVE_INFINITY;
+    }
+
+    return this.truncateToolOutputLines;
   }
 
   getOutputFormat(): OutputFormat {
-    return this.uiConfig.getOutputFormat();
+    return this.outputFormat;
   }
 
   async getGitService(): Promise<GitService> {
@@ -3375,6 +3501,10 @@ export class Config {
     return this.backgroundTaskRegistry;
   }
 
+  getMonitorRegistry(): MonitorRegistry {
+    return this.monitorRegistry;
+  }
+
   getBackgroundAgentResumeService(): BackgroundAgentResumeService {
     if (!this.backgroundAgentResumeService) {
       this.backgroundAgentResumeService = new BackgroundAgentResumeService(
@@ -3410,10 +3540,6 @@ export class Config {
 
   getBackgroundShellRegistry(): BackgroundShellRegistry {
     return this.backgroundShellRegistry;
-  }
-
-  getMonitorRegistry(): MonitorRegistry {
-    return this.monitorRegistry;
   }
 
   /**
@@ -3735,18 +3861,6 @@ export class Config {
       const { WebFetchTool } = await import('../tools/web-fetch.js');
       return new WebFetchTool(this);
     });
-    await registerLazy(ToolNames.REPO_MAP, async () => {
-      const { RepoMapTool } = await import('../tools/repoMap.js');
-      return new RepoMapTool(this);
-    });
-    await registerLazy(ToolNames.BROWSER, async () => {
-      const { BrowserTool } = await import('../tools/browser.js');
-      return new BrowserTool(this);
-    });
-    await registerLazy(ToolNames.BG_STOP, async () => {
-      const { BgStopTool } = await import('../tools/bg-stop.js');
-      return new BgStopTool(this);
-    });
     if (this.isLspEnabled() && this.getLspClient()) {
       await registerLazy(ToolNames.LSP, async () => {
         const { LspTool } = await import('../tools/lsp.js');
@@ -3860,20 +3974,4 @@ export class Config {
     // Pre-init path: stash for `createToolRegistry` to consume.
     this.pendingMcpBudgetCallback = cb;
   }
-}
-
-/**
- * Creates a shallow override of a Config by prototype delegation.
- * The returned object delegates to `base` for all properties not
- * explicitly overridden in `overrides`.
- */
-export function createConfigOverride<T extends Config>(
-  base: T,
-  overrides: Partial<Record<keyof T, () => unknown>>,
-): T {
-  const override = Object.create(base) as T;
-  for (const [key, getter] of Object.entries(overrides)) {
-    (override as Record<string, unknown>)[key] = getter;
-  }
-  return override;
 }
