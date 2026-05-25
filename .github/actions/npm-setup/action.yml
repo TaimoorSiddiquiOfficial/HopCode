@@ -24,6 +24,10 @@ runs:
         registry-url: '${{ inputs.registry-url }}'
         scope: '${{ inputs.scope }}'
 
+    - name: 'Remove deprecated always-auth config'
+      shell: 'bash'
+      run: 'npm config delete always-auth 2>/dev/null || true'
+
     - name: 'Install Dependencies'
       shell: 'bash'
       run: 'npm ci --no-audit --progress=false'
