@@ -40,10 +40,11 @@ execSync('npm run generate', { stdio: 'inherit', cwd: root });
 // 3. channel-base (base channel infrastructure - used by channel adapters and cli)
 // 4. channel adapters (depend on channel-base)
 // 5. acp-bridge (depends on core - used by cli)
-// 6. cli (depends on core, acp-bridge, web-templates, channel packages)
-// 7. webui (shared UI components - used by vscode companion)
-// 8. sdk (no internal dependencies)
-// 9. vscode-ide-companion (depends on webui)
+// 6. server (gRPC server — depends on core, used by cli via dynamic import)
+// 7. cli (depends on core, acp-bridge, web-templates, channel packages, server)
+// 8. webui (shared UI components - used by vscode companion)
+// 9. sdk (no internal dependencies)
+// 10. vscode-ide-companion (depends on webui)
 const buildOrder = [
   'packages/quran-guidance',
   'packages/core',
@@ -55,6 +56,7 @@ const buildOrder = [
   'packages/channels/dingtalk',
   'packages/channels/plugin-example',
   'packages/acp-bridge',
+  'packages/server',
   'packages/cli',
   'packages/webui',
   'packages/sdk-typescript',
