@@ -3054,7 +3054,7 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
-  getFileFilteringRespectQwenIgnore(): boolean {
+  getFileFilteringRespectHopCodeIgnore(): boolean {
     return this.fileFiltering.respectHopCodeIgnore;
   }
 

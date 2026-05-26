@@ -216,8 +216,8 @@ export function handleToolError(
   if (isExecutionDenied && isNonInteractive && isTextMode) {
     const warningMessage =
       `Warning: Tool "${toolName}" requires user approval but cannot execute in non-interactive mode.\n` +
-      `To enable automatic tool execution, use the -y flag (YOLO mode):\n` +
-      `Example: qwen -p 'your prompt' -y\n\n`;
+      `To enable automatic tool execution, use the -z flag (Izn mode):\n` +
+      `Example: hopcode -p 'your prompt' -z\n\n`;
     process.stderr.write(warningMessage);
   }
 

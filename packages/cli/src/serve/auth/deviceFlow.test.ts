@@ -631,7 +631,7 @@ describe('DeviceFlowRegistry — polling state machine', () => {
     const dir = path.dirname(fileURLToPath(import.meta.url));
     const sources = [
       fs.readFileSync(path.join(dir, 'deviceFlow.ts'), 'utf8'),
-      fs.readFileSync(path.join(dir, 'qwenDeviceFlowProvider.ts'), 'utf8'),
+      fs.readFileSync(path.join(dir, 'hopCodeDeviceFlowProvider.ts'), 'utf8'),
     ];
     const forbiddenPatterns = [
       // Static imports
