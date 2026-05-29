@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -205,7 +205,7 @@ export interface HttpAcpBridge {
 
   /**
    * Bd1y6: synchronous force-kill of every live channel. Called by
-   * the runQwenServe SIGINT/SIGTERM handler when the operator
+   * the runHopCodeServe SIGINT/SIGTERM handler when the operator
    * double-taps — the second signal can't afford the async
    * `shutdown()` Promise that the first signal is still in the
    * middle of. Without this, `process.exit(1)` would leave agent
@@ -410,14 +410,14 @@ export interface BridgeOptions {
    * `WorkspaceMismatchError` (route → 400 with code `workspace_mismatch`).
    *
    * **Caller contract**: pass the result of
-   * `canonicalizeWorkspace(path)`. `runQwenServe` does this at boot
+   * `canonicalizeWorkspace(path)`. `runHopCodeServe` does this at boot
    * and threads the same canonical value into the bridge AND
    * `createServeApp` (via `deps.boundWorkspace`) so all three —
    * `/capabilities.workspaceCwd`, the `POST /session` cwd fallback,
    * and this bridge's mismatch check — share one canonical form. The
    * constructor only checks `path.isAbsolute`; it does NOT
    * re-canonicalize (a redundant `realpathSync.native` could
-   * theoretically diverge from the runQwenServe canonicalize on
+   * theoretically diverge from the runHopCodeServe canonicalize on
    * NFS-transient / mid-rename filesystems, landing the bridge with
    * one canonical form while `/capabilities` advertises another).
    * Direct embeds / tests calling `createHttpAcpBridge` themselves
@@ -1046,7 +1046,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
       : Infinity;
   // #3803 §02: the bound path is the canonical form `spawnOrAttach`
   // compares incoming `workspaceCwd` against. The caller MUST pass an
-  // already-canonical value (via `canonicalizeWorkspace`). `runQwenServe`
+  // already-canonical value (via `canonicalizeWorkspace`). `runHopCodeServe`
   // does this at boot and threads the same value into both
   // `createHttpAcpBridge` and `createServeApp` (via
   // `deps.boundWorkspace`); direct embeds / tests that construct the
@@ -1057,7 +1057,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
   // (a) on case-insensitive / symlinked filesystems two independent
   // `realpathSync.native` calls could theoretically disagree if the FS
   // mutates between them (NFS transient, operator rename), landing
-  // the bridge with one canonical form while `runQwenServe` advertises
+  // the bridge with one canonical form while `runHopCodeServe` advertises
   // another and `/capabilities` clients see `workspace_mismatch` on
   // every POST; (b) it's a syscall removed from the boot path. The
   // `path.isAbsolute` guard stays — it's a structural input check, not
@@ -1119,7 +1119,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
   // dispatched on an existing connection AFTER the shutdown snapshot
   // taken in `shutdown()` fails fast instead of creating a child the
   // shutdown path has no more visibility into. Without this, the
-  // server.listen → bridge.shutdown ordering in `runQwenServe` leaves
+  // server.listen → bridge.shutdown ordering in `runHopCodeServe` leaves
   // a window between (a) shutdown snapshotting `byId` for kills and
   // (b) `server.close` rejecting new connections, during which a
   // late-arriving `POST /session` slips a fresh child past cleanup.
@@ -1649,7 +1649,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
 
     async spawnOrAttach(req) {
       if (shuttingDown) {
-        // `runQwenServe.close()` calls `bridge.shutdown()` BEFORE
+        // `runHopCodeServe.close()` calls `bridge.shutdown()` BEFORE
         // `server.close()`. During that window, established HTTP
         // connections can still hit `POST /session`. Refuse here so
         // late-arrivers don't spawn children the shutdown path won't
@@ -2225,7 +2225,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
 
     async shutdown() {
       // Set BEFORE the snapshot so any racing `spawnOrAttach` triggered
-      // by an in-flight HTTP connection after `runQwenServe.close()`
+      // by an in-flight HTTP connection after `runHopCodeServe.close()`
       // entered the bridge.shutdown() phase fails fast instead of
       // spawning a child this teardown won't see.
       shuttingDown = true;
@@ -2731,7 +2731,7 @@ function killChild(child: ChildProcess): Promise<void> {
     // sleep (D-state, e.g. NFS read blocked on a dead server). Without
     // this hard deadline, `bridge.shutdown()`'s `Promise.all` waits
     // forever on that one wedged child and SHUTDOWN_FORCE_CLOSE_MS in
-    // `runQwenServe` only covers `server.close()`, not the bridge.
+    // `runHopCodeServe` only covers `server.close()`, not the bridge.
     // After the deadline give up: the child is probably stuck in a
     // kernel call we can't cancel, and `process.exit(0)` will reap it
     // when the daemon returns to its caller.

@@ -35,7 +35,7 @@ export interface ServeAppDeps {
    * Pre-canonicalized workspace path. When supplied, `createServeApp`
    * skips its own `canonicalizeWorkspace` call (which would issue a
    * redundant `realpathSync.native` syscall — idempotent, but a hot
-   * boot-time stat we can avoid). `runQwenServe` passes this after
+   * boot-time stat we can avoid). `runHopCodeServe` passes this after
    * its own boot-time canonicalize so the value used by
    * `/capabilities`, the `POST /session` cwd fallback, and the
    * bridge are all the SAME canonical form. Callers that haven't
@@ -70,14 +70,14 @@ export interface ServeAppDeps {
  * verify that `opts.workspace` exists or is a directory — it
  * canonicalizes via `canonicalizeWorkspace`, which falls back to
  * `path.resolve` on ENOENT so the app boots even against a missing
- * path. `runQwenServe` is the production entry point and DOES
+ * path. `runHopCodeServe` is the production entry point and DOES
  * perform the `fs.statSync` + `isDirectory()` boot-loud check before
  * calling this function. Tests inject synthetic paths (`/work/bound`
  * etc.) on purpose: they want to exercise the route layer's
  * canonicalization and `workspace_mismatch` translation without
  * needing a real directory on disk. If a future entry point binds
  * `createServeApp` directly to user input, it MUST replicate the
- * `runQwenServe` validation (or call into a shared helper if one is
+ * `runHopCodeServe` validation (or call into a shared helper if one is
  * extracted) — otherwise a non-existent `--workspace` would boot
  * a "healthy"-looking daemon whose every spawn fails with cryptic
  * child-process ENOENT.
@@ -957,7 +957,7 @@ function sendBridgeError(
     // (`req.workspaceCwd` → `canonicalizeWorkspace` → here). `path.resolve`
     // + `realpathSync.native` both preserve control characters inside
     // path segments — they only normalize separators / `..` / `.` and
-    // walk symlinks. A body like `{"cwd": "/legit/path\nqwen serve:
+    // walk symlinks. A body like `{"cwd": "/legit/path\nhopcode serve:
     // FAKE LOG LINE"}` would otherwise emit two valid-looking daemon
     // log lines, weaponizing line-based log shippers (Splunk / Loki /
     // journald → SIEM). `JSON.stringify` escapes control chars and
@@ -967,7 +967,7 @@ function sendBridgeError(
     // `--workspace` / `process.cwd()`) but quoted symmetrically for
     // readability.
     writeStderrLine(
-      `qwen serve: workspace_mismatch (POST /session): ` +
+      `hopcode serve: workspace_mismatch (POST /session): ` +
         `daemon bound to ${JSON.stringify(err.bound)}, ` +
         `rejected ${JSON.stringify(err.requested)}`,
     );

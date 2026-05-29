@@ -1094,7 +1094,7 @@ export async function parseArguments(): Promise<CliArgs> {
       result._[0] === 'review')
   ) {
     // Note: `serve` is intentionally NOT in this list. Its handler blocks
-    // forever (after the listener is up); SIGINT/SIGTERM in runQwenServe
+    // forever (after the listener is up); SIGINT/SIGTERM in runHopCodeServe
     // drives shutdown. Hitting `process.exit(0)` here would kill the daemon.
     // MCP/Extensions/Auth/Hooks/Channel/Review commands handle their own
     // execution and exit. Returning here would let the main interactive

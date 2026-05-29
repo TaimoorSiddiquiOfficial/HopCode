@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -2025,7 +2025,7 @@ describe('createHttpAcpBridge', () => {
       const { bridge, conn } = await setupForFs();
       const tmp = path.join(
         os.tmpdir(),
-        `qwen-bridge-write-${randomBytes(8).toString('hex')}.txt`,
+        `hopcode-bridge-write-${randomBytes(8).toString('hex')}.txt`,
       );
       try {
         await (
@@ -2055,7 +2055,7 @@ describe('createHttpAcpBridge', () => {
       // target should exist in the directory.
       const { bridge, conn } = await setupForFs();
       const dir = await fsp.mkdtemp(
-        path.join(os.tmpdir(), 'qwen-bridge-atomic-'),
+        path.join(os.tmpdir(), 'hopcode-bridge-atomic-'),
       );
       const tmp = path.join(dir, 'target.txt');
       try {
@@ -2096,7 +2096,7 @@ describe('createHttpAcpBridge', () => {
       const { bridge, conn } = await setupForFs();
       const sparse = path.join(
         os.tmpdir(),
-        `qwen-bridge-sparse-${randomBytes(8).toString('hex')}.bin`,
+        `hopcode-bridge-sparse-${randomBytes(8).toString('hex')}.bin`,
       );
       const fh = await fsp.open(sparse, 'w');
       try {
@@ -2141,7 +2141,7 @@ describe('createHttpAcpBridge', () => {
       const { bridge, conn } = await setupForFs();
       const fifoPath = path.join(
         os.tmpdir(),
-        `qwen-bridge-fifo-${randomBytes(8).toString('hex')}`,
+        `hopcode-bridge-fifo-${randomBytes(8).toString('hex')}`,
       );
       const { execFileSync } = await import('node:child_process');
       try {
@@ -2177,7 +2177,7 @@ describe('createHttpAcpBridge', () => {
       if (process.platform === 'win32') return; // symlinks need admin on Windows
       const { bridge, conn } = await setupForFs();
       const dir = await fsp.mkdtemp(
-        path.join(os.tmpdir(), 'qwen-bridge-symlink-'),
+        path.join(os.tmpdir(), 'hopcode-bridge-symlink-'),
       );
       const target = path.join(dir, 'target.txt');
       const link = path.join(dir, 'link.txt');
@@ -2223,7 +2223,7 @@ describe('createHttpAcpBridge', () => {
       if (process.platform === 'win32') return; // symlinks need admin on Windows
       const { bridge, conn } = await setupForFs();
       const dir = await fsp.mkdtemp(
-        path.join(os.tmpdir(), 'qwen-bridge-dangling-'),
+        path.join(os.tmpdir(), 'hopcode-bridge-dangling-'),
       );
       const target = path.join(dir, 'target.txt'); // not created yet
       const link = path.join(dir, 'link.txt');
@@ -2259,7 +2259,7 @@ describe('createHttpAcpBridge', () => {
       const { bridge, conn } = await setupForFs();
       const tmp = path.join(
         os.tmpdir(),
-        `qwen-bridge-read-${randomBytes(8).toString('hex')}.txt`,
+        `hopcode-bridge-read-${randomBytes(8).toString('hex')}.txt`,
       );
       await fsp.writeFile(
         tmp,
@@ -2289,7 +2289,7 @@ describe('createHttpAcpBridge', () => {
       const { bridge, conn } = await setupForFs();
       const tmp = path.join(
         os.tmpdir(),
-        `qwen-bridge-slice-${randomBytes(8).toString('hex')}.txt`,
+        `hopcode-bridge-slice-${randomBytes(8).toString('hex')}.txt`,
       );
       await fsp.writeFile(tmp, 'a\nb\nc\nd\ne', 'utf8');
       try {

@@ -78,7 +78,7 @@ packages/web-templates/src/generated/
 .integration-tests/
 packages/vscode-ide-companion/*.vsix
 
-# Qwen Code Configs
+# HopCode Configs
 
 .hopcode/*
 !.hopcode/commands/

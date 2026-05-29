@@ -1,6 +1,6 @@
 # `hopcode serve` HTTP protocol reference
 
-Stage 1 of the [qwen-code daemon design](https://github.com/QwenLM/qwen-code/issues/3803). All routes live under the daemon's base URL (default `http://127.0.0.1:4170`).
+Stage 1 of the HopCode daemon design. All routes live under the daemon's base URL (default `http://127.0.0.1:4170`).
 
 ## Authentication
 
@@ -126,7 +126,7 @@ Request:
 ```json
 {
   "cwd": "/absolute/path/to/workspace",
-  "modelServiceId": "qwen-prod"
+  "modelServiceId": "hopcode-prod"
 }
 ```
 
@@ -236,13 +236,13 @@ Switch the active model **within** the session's currently bound model service. 
 Request:
 
 ```json
-{ "modelId": "qwen-staging" }
+{ "modelId": "hopcode-staging" }
 ```
 
 Response:
 
 ```json
-{ "modelId": "qwen-staging" }
+{ "modelId": "hopcode-staging" }
 ```
 
 On success, publishes `model_switched` to the SSE stream. On failure, publishes `model_switch_failed` (so passive subscribers see the failure, not just the caller). Races against the agent channel exit so a wedged child can't block the HTTP handler.

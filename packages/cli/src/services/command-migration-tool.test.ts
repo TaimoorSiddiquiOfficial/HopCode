@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -18,7 +18,9 @@ describe('command-migration-tool', () => {
   let tempDir: string;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-migration-test-'));
+    tempDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-migration-test-'),
+    );
   });
 
   afterEach(async () => {

@@ -86,7 +86,7 @@ function findRootId(startId: number, byId: Map<number, RawComment>): number {
  *
  * Filters out empty bodies (`COMMENTED` reviews submitted alongside inline
  * comments often have body=""), and the canonical "no issues found, LGTM"
- * template the qwen-review pipeline auto-emits — those carry no review
+ * template the hopcode-review pipeline auto-emits — those carry no review
  * content beyond their state, which the agent doesn't need re-told.
  */
 function isReviewWorthShowing(body: string | undefined): boolean {

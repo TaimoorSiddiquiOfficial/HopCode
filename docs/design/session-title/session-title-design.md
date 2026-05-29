@@ -144,7 +144,7 @@ const TITLE_SCHEMA = {
 Why function calling rather than free text + tag extraction:
 
 1. Cross-provider reliability — OpenAI-compatible endpoints, Gemini, and
-   Qwen's native tool-calling all implement function calling; tag parsing
+   The model's native tool-calling all implement function calling; tag parsing
    would rely on every model respecting a text convention.
 2. No reasoning-preamble leakage — the function call arguments come back
    structured, so a "thinking" paragraph before the answer can't bleed

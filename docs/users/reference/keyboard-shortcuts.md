@@ -15,7 +15,7 @@ This document lists the available keyboard shortcuts in HopCode.
 | `Ctrl+T`                       | Toggle the display of tool descriptions.                                                                                                                                                                                                                                                                  |
 | `Ctrl+B`                       | While a foreground shell command is running: promote it to a background task. The child keeps running, the agent's turn unblocks, and the shell appears in `/tasks` + the Background tasks dialog. No-op when no shell is executing — Ctrl+B then falls through to its prompt-area binding (cursor-left). |
 | `Alt/Option+M`                 | Toggle Markdown output between rich rendered previews and raw/source mode. On macOS, the terminal must send Option as Meta.                                                                                                                                                                               |
-| `Shift+Tab` (`Tab` on Windows) | Cycle approval modes (`plan` → `default` → `auto-edit` → `yolo`)                                                                                                                                                                                                                                          |
+| `Shift+Tab` (`Tab` on Windows) | Cycle approval modes (`plan` → `default` → `auto-edit` → `izn`)                                                                                                                                                                                                                                           |
 
 ## Input Prompt
 

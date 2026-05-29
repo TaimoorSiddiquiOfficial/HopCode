@@ -274,4 +274,4 @@ build a dashboard showing products that are most frequently returned by our UK c
 
 - **In HopCode**: Type `/help` or ask "how do I..."
 - **Documentation**: You're here! Browse other guides
-- **Community**: Join our [GitHub Discussion](https://github.com/QwenLM/hopcode/discussions) for tips and support
+- **Community**: Join our [GitHub Discussion](https://github.com/TaimoorSiddiquiOfficial/HopCode/discussions) for tips and support

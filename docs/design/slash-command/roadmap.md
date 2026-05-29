@@ -2,7 +2,7 @@
 
 ## 总体目标
 
-用 Qwen 内部架构风格，交付一个在外部体验上 95% 对齐 Claude Code 的 command 平台，同时修复三模式分裂、命令来源单一、prompt command 无法被模型调用三个核心问题。
+用 HopCode 内部架构风格，交付一个在外部体验上 95% 对齐 Claude Code 的 command 平台，同时修复三模式分裂、命令来源单一、prompt command 无法被模型调用三个核心问题。
 
 ---
 

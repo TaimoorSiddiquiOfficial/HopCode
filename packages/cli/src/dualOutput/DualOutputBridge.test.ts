@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -37,7 +37,7 @@ describe('DualOutputBridge', () => {
   let bridge: DualOutputBridge | null = null;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-dual-output-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-dual-output-'));
     target = path.join(tmpDir, 'events.jsonl');
     fs.writeFileSync(target, '');
     config = createMockConfig();

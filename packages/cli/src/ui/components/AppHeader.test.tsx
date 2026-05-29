@@ -147,7 +147,7 @@ describe('<AppHeader />', () => {
     expect(frame).toContain('Acme CLI');
     expect(frame).not.toContain('>_ HopCode');
     expect(frame).toContain('ACME');
-    // Default Qwen logo must NOT bleed through when the user supplied art.
+    // Default HopCode logo must NOT bleed through when the user supplied art.
     expect(frame).not.toContain('██╔═══██╗');
   });
 });

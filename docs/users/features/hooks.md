@@ -1,4 +1,4 @@
-# HopCode Hooks
+﻿# HopCode Hooks
 
 ## Overview
 
@@ -284,7 +284,7 @@ Hook output supports three categories of fields:
 
 ```json
 {
-  "permission_mode": "default | plan | auto_edit | yolo",
+  "permission_mode": "default | plan | auto_edit | izn",
   "tool_name": "name of the tool being executed",
   "tool_input": "object containing the tool's input parameters",
   "tool_use_id": "unique identifier for this tool use instance"
@@ -321,7 +321,7 @@ Hook output supports three categories of fields:
 
 ```json
 {
-  "permission_mode": "default | plan | auto_edit | yolo",
+  "permission_mode": "default | plan | auto_edit | izn",
   "tool_name": "name of the tool that was executed",
   "tool_input": "object containing the tool's input parameters",
   "tool_response": "object containing the tool's response",
@@ -355,7 +355,7 @@ Hook output supports three categories of fields:
 
 ```json
 {
-  "permission_mode": "default | plan | auto_edit | yolo",
+  "permission_mode": "default | plan | auto_edit | izn",
   "tool_use_id": "unique identifier for the tool use",
   "tool_name": "name of the tool that failed",
   "tool_input": "object containing the tool's input parameters",
@@ -419,7 +419,7 @@ Hook output supports three categories of fields:
 
 ```json
 {
-  "permission_mode": "default | plan | auto_edit | yolo",
+  "permission_mode": "default | plan | auto_edit | izn",
   "source": "startup | resume | clear | compact",
   "model": "the model being used",
   "agent_type": "the type of agent if applicable (optional)"
@@ -551,7 +551,7 @@ Hook output supports three categories of fields:
 
 ```json
 {
-  "permission_mode": "default | plan | auto_edit | yolo",
+  "permission_mode": "default | plan | auto_edit | izn",
   "agent_id": "identifier for the subagent",
   "agent_type": "type of agent (Bash, Explorer, Plan, Custom, etc.)"
 }
@@ -580,7 +580,7 @@ Hook output supports three categories of fields:
 
 ```json
 {
-  "permission_mode": "default | plan | auto_edit | yolo",
+  "permission_mode": "default | plan | auto_edit | izn",
   "stop_hook_active": "boolean indicating if stop hook is active",
   "agent_id": "identifier for the subagent",
   "agent_type": "type of agent",
@@ -727,7 +727,7 @@ Hook output supports three categories of fields:
 
 ```json
 {
-  "permission_mode": "default | plan | auto_edit | yolo",
+  "permission_mode": "default | plan | auto_edit | izn",
   "tool_name": "name of the tool requesting permission",
   "tool_input": "object containing the tool's input parameters",
   "permission_suggestions": "array of suggested permissions (optional)"

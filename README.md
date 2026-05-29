@@ -1,11 +1,11 @@
 <div align="center">
 
 [![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
-[![License](https://img.shields.io/github/license/QwenLM/hopcode.svg)](./LICENSE)
+[![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/HopCode.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 
-<a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="QwenLM%2Fhopcode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="TaimoorSiddiquiOfficial%2FHopCode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
 **An open-source AI agent that lives in your terminal.**
 
@@ -114,7 +114,7 @@ Copy the prompt below and paste it into your agent:
 
 ```
 Use HopCode as a coding agent. First, fetch and read this skill reference:
-https://raw.githubusercontent.com/QwenLM/hopcode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
+https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
 Then follow the instructions inside to install, authenticate, and use HopCode via acpx for all coding tasks.
 ```
 
@@ -489,7 +489,7 @@ Python SDK example:
 ```python
 import asyncio
 
-from qwen_code_sdk import is_sdk_result_message, query
+from hopcode_sdk import is_sdk_result_message, query
 
 
 async def main() -> None:
@@ -528,7 +528,7 @@ asyncio.run(main())
 
 > Learn more about [Commands](https://hopcode.dev/hopcode-docs/en/users/features/commands/)
 >
-> **Tip**: In YOLO mode (`--yolo`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/hopcode-docs/en/users/features/approval-mode/)
+> **Tip**: In IZN mode (`--izn`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/hopcode-docs/en/users/features/approval-mode/)
 
 ## Configuration
 

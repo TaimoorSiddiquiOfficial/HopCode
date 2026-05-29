@@ -1,4 +1,4 @@
-# Commands
+﻿# Commands
 
 This document details all commands supported by HopCode, helping you efficiently manage sessions, customize the interface, and control its behavior.
 
@@ -68,7 +68,7 @@ Commands for managing AI tools and models.
 | →`plan`          | Analysis only, no execution                   | Secure review                                 |
 | →`default`       | Require approval for edits                    | Daily use                                     |
 | →`auto-edit`     | Automatically approve edits                   | Trusted environment                           |
-| →`yolo`          | Automatically approve all                     | Quick prototyping                             |
+| →`izn`           | Automatically approve all                     | Quick prototyping                             |
 | `/model`         | Switch model used in current session          | `/model`                                      |
 | `/model --fast`  | Set a lighter model for prompt suggestions    | `/model --fast qwen3-coder-flash`             |
 | `/extensions`    | List all active extensions in current session | `/extensions`                                 |
@@ -279,10 +279,10 @@ Save frequently used prompts as shortcut commands to improve work efficiency and
 
 ### Quick Overview
 
-| Function         | Description                                | Advantages                             | Priority | Applicable Scenarios                                 |
-| ---------------- | ------------------------------------------ | -------------------------------------- | -------- | ---------------------------------------------------- |
-| Namespace        | Subdirectory creates colon-named commands  | Better command organization            |          |                                                      |
-| Global Commands  | `~/.hopcode/commands/`                    | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
+| Function         | Description                                   | Advantages                             | Priority | Applicable Scenarios                                 |
+| ---------------- | --------------------------------------------- | -------------------------------------- | -------- | ---------------------------------------------------- |
+| Namespace        | Subdirectory creates colon-named commands     | Better command organization            |          |                                                      |
+| Global Commands  | `~/.hopcode/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
 | Project Commands | `<project root directory>/.hopcode/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
 
 Priority Rules: Project commands > User commands (project command used when names are same)
@@ -292,8 +292,8 @@ Priority Rules: Project commands > User commands (project command used when name
 #### File Path to Command Name Mapping Table
 
 | File Location                               | Generated Command | Example Call          |
-| ------------------------------------------ | ----------------- | --------------------- |
-| `~/.hopcode/commands/test.md`              | `/test`           | `/test Parameter`     |
+| ------------------------------------------- | ----------------- | --------------------- |
+| `~/.hopcode/commands/test.md`               | `/test`           | `/test Parameter`     |
 | `<project>/.hopcode/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
 
 Naming Rules: Path separator (`/` or `\`) converted to colon (`:`)
@@ -407,10 +407,10 @@ Review {{args}}, reference standards:
 #### "Pure Function Refactoring" Command Creation Steps Table
 
 | Operation                     | Command/Code                                 |
-| ----------------------------- | ------------------------------------------- |
+| ----------------------------- | -------------------------------------------- |
 | 1. Create directory structure | `mkdir -p ~/.hopcode/commands/refactor`      |
 | 2. Create command file        | `touch ~/.hopcode/commands/refactor/pure.md` |
-| 3. Edit command content       | Refer to the complete code below.             |
+| 3. Edit command content       | Refer to the complete code below.            |
 | 4. Test command               | `@file.js` → `/refactor:pure`                |
 
 ```markdown

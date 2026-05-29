@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -79,7 +79,7 @@ const DEFAULT_RING_SIZE = 4000;
  * session from being opened thousands of times by an attacker to amplify
  * each `publish()` (which is O(N) over subscribers) into a CPU/memory
  * DoS. Daemon's HTTP listener also wants `server.maxConnections`
- * configured at the listener level — see `runQwenServe.ts`.
+ * configured at the listener level — see `runHopCodeServe.ts`.
  */
 const DEFAULT_MAX_SUBSCRIBERS = 64;
 

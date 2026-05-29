@@ -167,7 +167,7 @@ id = "hopcode"
 name = "HopCode"
 authors = ["HopCode Team"]
 description = "HopCode Agent Server..."
-repository = "https://github.com/QwenLM/hopcode"
+repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 # New
 id = "hopcode"

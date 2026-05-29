@@ -292,7 +292,7 @@ export const useAuthCommand = (
     }
   }, [settings, config, completeAuthentication, addItem, handleAuthFailure]);
 
-  // -- Legacy auth select (Qwen OAuth / direct) ----------------------------
+  // -- Legacy auth select (HopCode OAuth / direct) ----------------------------
 
   const isProviderManagedModel = useCallback(
     (authType: AuthType, modelId: string | undefined) => {
@@ -349,7 +349,7 @@ export const useAuthCommand = (
         return;
       }
 
-      // Qwen OAuth or other direct auth
+      // HopCode OAuth or other direct auth
       try {
         await config.refreshAuth(authType);
 

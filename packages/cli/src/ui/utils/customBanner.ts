@@ -449,7 +449,7 @@ function sanitizeSingleLine(
  * Shared with `<Header />` so the renderer doesn't reinvent the same width
  * arithmetic. Tries `large` first, then `small`; returns the first tier
  * that fits in the available width, or `undefined` to signal "hide the
- * logo column entirely (fall back to the default Qwen logo or no logo)".
+ * logo column entirely (fall back to the default HopCode logo or no logo)".
  */
 export function pickAsciiArtTier(
   small: string | undefined,

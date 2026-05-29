@@ -226,7 +226,7 @@ export function AuthDialog(): React.JSX.Element {
     }
     setErrorMessage(
       t(
-        'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
+        'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
       ),
     );
   };

@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -16,7 +16,7 @@ describe('RemoteInputWatcher', () => {
   let watcher: RemoteInputWatcher | null = null;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-remote-input-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-remote-input-'));
     inputFile = path.join(tmpDir, 'input.jsonl');
     fs.writeFileSync(inputFile, '');
   });
@@ -83,7 +83,7 @@ describe('RemoteInputWatcher', () => {
       JSON.stringify({ type: 'submit', text: 'queued' }) + '\n',
     );
 
-    // Trigger read — command will be queued then submitted, but TUI rejects (busy)
+    // Trigger read ï¿½ command will be queued then submitted, but TUI rejects (busy)
     await watcher.checkForNewInput();
     // processQueue runs async; give it a tick
     await new Promise((r) => setTimeout(r, 50));

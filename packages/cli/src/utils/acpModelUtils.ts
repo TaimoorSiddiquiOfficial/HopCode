@@ -12,7 +12,7 @@ import { z } from 'zod';
  *
  * NOTE: The VSCode webview side mirrors this encoding contract in
  * `packages/vscode-ide-companion/src/webview/utils/discontinuedModel.ts` to
- * detect discontinued Qwen OAuth registry models without changing the wire
+ * detect discontinued HopCode OAuth registry models without changing the wire
  * format. If the encoding here evolves (new authTypes, runtime prefix changes,
  * etc.), update that file too.
  */

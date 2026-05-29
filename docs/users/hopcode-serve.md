@@ -1,4 +1,4 @@
-# Daemon mode (`hopcode serve`)
+﻿# Daemon mode (`hopcode serve`)
 
 Run HopCode as a local HTTP daemon so multiple clients (IDE plugins, web UIs, CI scripts, custom CLIs) share one agent session over HTTP + Server-Sent Events instead of each spawning their own subprocess.
 
@@ -233,7 +233,7 @@ No TUI shell runs inside the daemon. The slash commands listed above **don't exi
 
 #### Mode 2 — Stage 1.5 `hopcode --serve` co-hosted TUI (not in this PR)
 
-When Stage 1.5 lands `hopcode --serve` (TUI process co-hosts the same HTTP server), the TUI **does** exist alongside remote clients. A local operator typing `/approval-mode yolo` or `/mcp add-server` mutates session state, and remote clients on HTTP have no event to observe the change.
+When Stage 1.5 lands `hopcode --serve` (TUI process co-hosts the same HTTP server), the TUI **does** exist alongside remote clients. A local operator typing `/approval-mode izn` or `/mcp add-server` mutates session state, and remote clients on HTTP have no event to observe the change.
 
 In this mode, TUI is a **"super-client"** — it observes the same agent conversation remote clients see, AND can mutate session state remote clients can't. The asymmetry is:
 

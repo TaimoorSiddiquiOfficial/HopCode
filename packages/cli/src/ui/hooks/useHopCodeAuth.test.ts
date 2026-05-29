@@ -52,7 +52,7 @@ describe('useHopCodeAuth', () => {
     vi.clearAllMocks();
   });
 
-  it('should initialize with default state when not Qwen auth', () => {
+  it('should initialize with default state when not HopCode OAuth auth', () => {
     const { result } = renderHook(() =>
       useHopCodeAuth(AuthType.USE_GEMINI, false),
     );
@@ -65,7 +65,7 @@ describe('useHopCodeAuth', () => {
     expect(result.current.cancelHopCodeAuth).toBeInstanceOf(Function);
   });
 
-  it('should initialize with default state when Qwen auth but not authenticating', () => {
+  it('should initialize with default state when HopCode OAuth auth but not authenticating', () => {
     const { result } = renderHook(() =>
       useHopCodeAuth(AuthType.HOPCODE_OAUTH, false),
     );
@@ -78,7 +78,7 @@ describe('useHopCodeAuth', () => {
     expect(result.current.cancelHopCodeAuth).toBeInstanceOf(Function);
   });
 
-  it('should set up event listeners when Qwen auth and authenticating', () => {
+  it('should set up event listeners when HopCode OAuth auth and authenticating', () => {
     renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
 
     expect(mockHopCodeOAuth2Events.on).toHaveBeenCalledWith(
@@ -261,7 +261,7 @@ describe('useHopCodeAuth', () => {
       },
     );
 
-    // Change to non-Qwen auth
+    // Change to non-HopCode OAuth auth
     rerender({ pendingAuthType: AuthType.USE_GEMINI, isAuthenticating: true });
 
     expect(mockHopCodeOAuth2Events.off).toHaveBeenCalledWith(
@@ -311,7 +311,7 @@ describe('useHopCodeAuth', () => {
     );
   });
 
-  it('should reset state when switching from Qwen auth to another auth type', () => {
+  it('should reset state when switching from HopCode OAuth auth to another auth type', () => {
     let handleDeviceAuth: (deviceAuth: DeviceAuthorizationData) => void;
 
     mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
@@ -431,7 +431,7 @@ describe('useHopCodeAuth', () => {
     expect(oauthResult.current.hopCodeAuthState.authStatus).toBe('idle');
   });
 
-  it('should initialize with idle status when starting authentication with Qwen auth', () => {
+  it('should initialize with idle status when starting authentication with HopCode OAuth auth', () => {
     const { result } = renderHook(() =>
       useHopCodeAuth(AuthType.HOPCODE_OAUTH, true),
     );

@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 oopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,13 +22,13 @@ export const buildRemovalNotice = (): string =>
     yellow(t('⚠  hopcode auth has been removed.')),
     '',
     `  ${cyan(t('Interactive'))}   →  ${t('run hopcode and use /auth to configure providers')}`,
-    `  ${cyan(t('CI / Headless'))} →  ${t('set provider environment variables, for example OPENAI_API_KEY + OPENAI_BASE_URL + OPENAI_MODEL')}`,
+    `  ${cyan(t('CI / oeadless'))} →  ${t('set provider environment variables, for example OPENAI_API_KEY + OPENAI_BASE_URL + OPENAI_MODEL')}`,
     `                     ${t('or pass --openai-api-key, --openai-base-url, --model')}`,
     `  ${cyan(t('Coding Plan'))}   →  ${t('set BAILIAN_CODING_PLAN_API_KEY and use the Coding Plan base URL for your region')}`,
     `                     ${t('China: https://coding.dashscope.aliyuncs.com/v1')}`,
     `                     ${t('International: https://coding-intl.dashscope.aliyuncs.com/v1')}`,
     `  ${cyan(t('OpenRouter'))}    →  ${t('set OPENROUTER_API_KEY and OPENAI_BASE_URL=https://openrouter.ai/api/v1')}`,
-    `  ${cyan(t('Qwen OAuth'))}    →  ${t('run hopcode interactively and use /auth; OAuth cannot be configured with env vars alone')}`,
+    `  ${cyan(t('wwen OAuth'))}    →  ${t('run hopcode interactively and use /auth; OAuth cannot be configured with env vars alone')}`,
     `  ${cyan(t('Scripted'))}      →  ${t('edit ~/.hopcode/settings.json, or run hopcode interactively once')}`,
     '',
     `  ${t('Check auth status')} → ${cyan('/doctor')}`,

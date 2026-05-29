@@ -14,7 +14,7 @@ architectures.
 ## Goals
 
 - Keep `/auth` user-facing flows easy to understand:
-  - Alibaba ModelStudio for first-party Qwen setup.
+  - Alibaba ModelStudio for first-party model setup.
   - Third-party providers for common built-in integrations such as DeepSeek,
     MiniMax, and Z.AI.
   - OAuth providers such as OpenRouter.

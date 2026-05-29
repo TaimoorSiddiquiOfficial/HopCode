@@ -82,7 +82,7 @@ To complete a full production build, these items need fixing:
 Search and replace in all package.json files:
 
 ```
-QwenLM/hopcode → TaimoorSiddiquiOfficial/HopCode
+TaimoorSiddiquiOfficial/HopCode → TaimoorSiddiquiOfficial/HopCode
 ```
 
 ### 3. Clean Install

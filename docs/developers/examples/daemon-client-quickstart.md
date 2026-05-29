@@ -151,10 +151,10 @@ case 'permission_request': {
 
 ## Shared-session collaboration
 
-Two clients pointed at the **same daemon** end up on the same session. Per #3803 §02 each daemon is bound to ONE workspace at boot, so the daemon launched as `qwen serve --workspace /work/repo` (or `cd /work/repo && qwen serve`) is what both clients connect to:
+Two clients pointed at the **same daemon** end up on the same session. Per #3803 §02 each daemon is bound to ONE workspace at boot, so the daemon launched as `hopcode serve --workspace /work/repo` (or `cd /work/repo && hopcode serve`) is what both clients connect to:
 
 ```ts
-// Daemon was launched as `qwen serve --workspace /work/repo` so
+// Daemon was launched as `hopcode serve --workspace /work/repo` so
 // `caps.workspaceCwd === '/work/repo'` for both clients.
 
 // Client A (e.g. an IDE plugin)
@@ -174,7 +174,7 @@ Both clients see the same `session_update` / `permission_request` stream. Either
 If `workspaceCwd` doesn't match the daemon's bound workspace, `createOrAttachSession` rejects with `DaemonHttpError` carrying status `400` and a structured body:
 
 ```ts
-import { DaemonHttpError } from '@qwen-code/sdk';
+import { DaemonHttpError } from '@hoptrendy/hopcode-sdk';
 
 try {
   await client.createOrAttachSession({ workspaceCwd: '/some/other/project' });
