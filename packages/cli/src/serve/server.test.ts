@@ -3431,7 +3431,7 @@ describe('runHopCodeServe', () => {
       await handle.close();
       handle = undefined;
     }
-    delete process.env['QWEN_SERVER_TOKEN'];
+    delete process.env['HOPCODE_SERVER_TOKEN'];
   });
 
   it('refuses to bind 0.0.0.0 without a token', async () => {
@@ -3503,8 +3503,8 @@ describe('runHopCodeServe', () => {
   // longer the source of env mutation).
   it('does not mutate process.env when caller provides mcp budget options (#4247 R6 line 216)', async () => {
     // Sanity-check: no MCP env vars set before.
-    delete process.env['QWEN_SERVE_MCP_CLIENT_BUDGET'];
-    delete process.env['QWEN_SERVE_MCP_BUDGET_MODE'];
+    delete process.env['HOPCODE_SERVE_MCP_CLIENT_BUDGET'];
+    delete process.env['HOPCODE_SERVE_MCP_BUDGET_MODE'];
     handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
@@ -3515,8 +3515,8 @@ describe('runHopCodeServe', () => {
     // Pre-R6 this leaked into global process.env. Post-R6 the values
     // travel via `BridgeOptions.childEnvOverrides` closure → only
     // the spawned ACP child sees them.
-    expect(process.env['QWEN_SERVE_MCP_CLIENT_BUDGET']).toBeUndefined();
-    expect(process.env['QWEN_SERVE_MCP_BUDGET_MODE']).toBeUndefined();
+    expect(process.env['HOPCODE_SERVE_MCP_CLIENT_BUDGET']).toBeUndefined();
+    expect(process.env['HOPCODE_SERVE_MCP_BUDGET_MODE']).toBeUndefined();
   });
 
   it('preserves pre-existing process.env values (no longer wipes globals on omit) (#4247 R6 line 216)', async () => {
@@ -3524,11 +3524,11 @@ describe('runHopCodeServe', () => {
     // process.env. Post-R6 runHopCodeServe doesn't touch process.env
     // at all; the override mechanism handles "scrub" at the
     // per-handle level inside the bridge's spawn factory. So if an
-    // operator had QWEN_SERVE_MCP_CLIENT_BUDGET exported in their
+    // operator had HOPCODE_SERVE_MCP_CLIENT_BUDGET exported in their
     // shell BEFORE starting the daemon, it stays in their process
     // env (and gets ignored by this daemon's child, which receives
     // `undefined` via overrides to scrub it on spawn).
-    process.env['QWEN_SERVE_MCP_CLIENT_BUDGET'] = '99';
+    process.env['HOPCODE_SERVE_MCP_CLIENT_BUDGET'] = '99';
     try {
       handle = await runHopCodeServe({
         hostname: '127.0.0.1',
@@ -3536,9 +3536,9 @@ describe('runHopCodeServe', () => {
         mode: 'http-bridge',
         // No mcpClientBudget — override will scrub the var on spawn.
       });
-      expect(process.env['QWEN_SERVE_MCP_CLIENT_BUDGET']).toBe('99');
+      expect(process.env['HOPCODE_SERVE_MCP_CLIENT_BUDGET']).toBe('99');
     } finally {
-      delete process.env['QWEN_SERVE_MCP_CLIENT_BUDGET'];
+      delete process.env['HOPCODE_SERVE_MCP_CLIENT_BUDGET'];
     }
   });
 
@@ -3560,8 +3560,8 @@ describe('runHopCodeServe', () => {
     expect(withAuth.status).toBe(200);
   });
 
-  it('accepts QWEN_SERVER_TOKEN from the env when binding non-loopback', async () => {
-    process.env['QWEN_SERVER_TOKEN'] = 'env-secret';
+  it('accepts HOPCODE_SERVER_TOKEN from the env when binding non-loopback', async () => {
+    process.env['HOPCODE_SERVER_TOKEN'] = 'env-secret';
     handle = await runHopCodeServe({
       hostname: '0.0.0.0',
       port: 0,

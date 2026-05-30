@@ -3171,8 +3171,8 @@ describe('Telemetry configuration via environment variables', () => {
     expect(config.getTelemetryOutfile()).toBe('/gemini/env/telemetry.log');
   });
 
-  it('should use settings value when QWEN_TELEMETRY_ENABLED is not set', async () => {
-    vi.stubEnv('QWEN_TELEMETRY_ENABLED', undefined);
+  it('should use settings value when HOPCODE_TELEMETRY_ENABLED is not set', async () => {
+    vi.stubEnv('HOPCODE_TELEMETRY_ENABLED', undefined);
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = { telemetry: { enabled: true } };

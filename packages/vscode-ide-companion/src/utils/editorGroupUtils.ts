@@ -62,7 +62,7 @@ export function findLeftGroupOfChatWebview(): vscode.ViewColumn | undefined {
 }
 
 /**
- * Find the editor group immediately to the right of the Qwen chat webview.
+ * Find the editor group immediately to the right of the HopCode chat webview.
  * - If the chat webview group is the rightmost group, returns undefined.
  * - If no chat webview is found in any editor group, returns undefined.
  */

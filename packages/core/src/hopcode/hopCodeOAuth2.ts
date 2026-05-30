@@ -36,7 +36,7 @@ const HOPCODE_OAUTH_SCOPE = 'openid profile email model.completion';
 const HOPCODE_OAUTH_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';
 
 // File System Configuration
-const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
+const HOPCODE_CREDENTIAL_FILENAME = 'oauth_creds.json';
 
 /**
  * PKCE (Proof Key for Code Exchange) utilities
@@ -1055,7 +1055,7 @@ async function authWithHopCodeDeviceFlow(
 // matches opencode's `auth.json` to keep tokens unreadable by other users on
 // shared hosts. The constant is exported so tests/auditors can assert intent
 // rather than re-deriving it from a raw octal literal.
-export const QWEN_CREDENTIAL_FILE_MODE = 0o600;
+export const HOPCODE_CREDENTIAL_FILE_MODE = 0o600;
 
 export async function cacheHopCodeCredentials(
   credentials: HopCodeCredentials,
@@ -1093,7 +1093,7 @@ export async function cacheHopCodeCredentials(
     const tempPath = `${filePath}.tmp.${process.pid}.${randomUUID()}`;
     try {
       await fs.writeFile(tempPath, credString, {
-        mode: QWEN_CREDENTIAL_FILE_MODE,
+        mode: HOPCODE_CREDENTIAL_FILE_MODE,
         ...(opts?.signal ? { signal: opts.signal } : {}),
       });
       // Defensive: if the platform ignored `mode` on creation
@@ -1103,11 +1103,11 @@ export async function cacheHopCodeCredentials(
       // path. A non-cooperative FS that can't tighten a 0o600 file
       // shouldn't be serving credentials anyway.
       try {
-        await fs.chmod(tempPath, QWEN_CREDENTIAL_FILE_MODE);
+        await fs.chmod(tempPath, HOPCODE_CREDENTIAL_FILE_MODE);
       } catch (chmodErr) {
         if (process.platform !== 'win32') {
           throw new Error(
-            `cacheHopCodeCredentials: refusing to publish credentials â€” chmod 0o${QWEN_CREDENTIAL_FILE_MODE.toString(8)} on temp file failed: ${
+            `cacheHopCodeCredentials: refusing to publish credentials â€” chmod 0o${HOPCODE_CREDENTIAL_FILE_MODE.toString(8)} on temp file failed: ${
               chmodErr instanceof Error ? chmodErr.message : String(chmodErr)
             }`,
           );
@@ -1117,7 +1117,7 @@ export async function cacheHopCodeCredentials(
         // Surface a debug breadcrumb for operators on exotic Windows
         // filesystems but allow the rename to proceed.
         debugLogger.warn(
-          `cacheHopCodeCredentials: chmod 0o${QWEN_CREDENTIAL_FILE_MODE.toString(8)} on Windows temp file ${tempPath} failed; relying on NTFS ACL: ${
+          `cacheHopCodeCredentials: chmod 0o${HOPCODE_CREDENTIAL_FILE_MODE.toString(8)} on Windows temp file ${tempPath} failed; relying on NTFS ACL: ${
             chmodErr instanceof Error ? chmodErr.message : String(chmodErr)
           }`,
         );
@@ -1217,7 +1217,7 @@ export async function clearHopCodeCredentials(): Promise<void> {
 }
 
 function getQwenCachedCredentialPath(): string {
-  return path.join(Storage.getGlobalHopCodeDir(), QWEN_CREDENTIAL_FILENAME);
+  return path.join(Storage.getGlobalHopCodeDir(), HOPCODE_CREDENTIAL_FILENAME);
 }
 
 export const clearCachedCredentialFile = clearHopCodeCredentials;

@@ -14,7 +14,7 @@ import {
   DEFAULT_CONTEXT_FILENAME,
 } from '../memory/const.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
-import { HOPCODE_DIR, QWEN_DIR } from './paths.js';
+import { HOPCODE_DIR, HOPCODE_DIR_ALIAS } from './paths.js';
 
 vi.mock('os', async (importOriginal) => {
   const actualOs = await importOriginal<typeof os>();
@@ -541,7 +541,7 @@ describe('loadServerHierarchicalMemory', () => {
     expect(childOccurrences).toBe(1);
   });
 
-  describe('QWEN.local.md (project-local context file)', () => {
+  describe('HOPCODE.local.md (project-local context file)', () => {
     // The local-context-file slot is anchored at `<projectRoot>/.hopcode/`, where
     // projectRoot is the nearest ancestor containing a `.git` directory OR a
     // `.git` file (the latter is how git worktrees and submodules are marked).
@@ -551,9 +551,9 @@ describe('loadServerHierarchicalMemory', () => {
       await createEmptyDir(path.join(projectRoot, '.git'));
     });
 
-    it('loads .hopcode/QWEN.local.md from project root when present', async () => {
+    it('loads .hopcode/HOPCODE.local.md from project root when present', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'local context content',
       );
 
@@ -571,13 +571,13 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('orders QWEN.local.md after the project-root HOPCODE.md', async () => {
+    it('orders HOPCODE.local.md after the project-root HOPCODE.md', async () => {
       const projectFile = await createTestFile(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
         'shared project context',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'local override',
       );
 
@@ -600,7 +600,7 @@ describe('loadServerHierarchicalMemory', () => {
       expect(localIdx).toBeGreaterThan(projectIdx);
     });
 
-    it('orders QWEN.local.md after upward-traversed CWD HOPCODE.md', async () => {
+    it('orders HOPCODE.local.md after upward-traversed CWD HOPCODE.md', async () => {
       const projectFile = await createTestFile(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
         'project root memory',
@@ -610,7 +610,7 @@ describe('loadServerHierarchicalMemory', () => {
         'cwd memory',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'local memory',
       );
 
@@ -635,7 +635,7 @@ describe('loadServerHierarchicalMemory', () => {
       expect(localIdx).toBeGreaterThan(cwdIdx);
     });
 
-    it('silently ignores absent .hopcode/QWEN.local.md', async () => {
+    it('silently ignores absent .hopcode/HOPCODE.local.md', async () => {
       await createTestFile(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
         'project content',
@@ -654,9 +654,9 @@ describe('loadServerHierarchicalMemory', () => {
       expect(result.memoryContent).not.toContain('HOPCODE.local.md');
     });
 
-    it('does not load QWEN.local.md from untrusted workspaces', async () => {
+    it('does not load HOPCODE.local.md from untrusted workspaces', async () => {
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'local content',
       );
 
@@ -672,9 +672,9 @@ describe('loadServerHierarchicalMemory', () => {
       expect(memoryContent).not.toContain('local content');
     });
 
-    it('does not load QWEN.local.md in explicit-only mode', async () => {
+    it('does not load HOPCODE.local.md in explicit-only mode', async () => {
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'local content',
       );
 
@@ -693,12 +693,12 @@ describe('loadServerHierarchicalMemory', () => {
       expect(result.memoryContent).not.toContain('local content');
     });
 
-    it('does not search .hopcode/QWEN.local.md in CWD subdirectories', async () => {
-      // A `.hopcode/QWEN.local.md` placed inside a nested directory (not the
+    it('does not search .hopcode/HOPCODE.local.md in CWD subdirectories', async () => {
+      // A `.hopcode/HOPCODE.local.md` placed inside a nested directory (not the
       // project root) must NOT be picked up — the slot is single, fixed,
-      // and lives at <projectRoot>/.hopcode/QWEN.local.md.
+      // and lives at <projectRoot>/.hopcode/HOPCODE.local.md.
       await createTestFile(
-        path.join(cwd, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(cwd, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'misplaced local content',
       );
 
@@ -714,9 +714,9 @@ describe('loadServerHierarchicalMemory', () => {
       expect(result.memoryContent).not.toContain('misplaced local content');
     });
 
-    it('loads QWEN.local.md even when no project HOPCODE.md exists', async () => {
+    it('loads HOPCODE.local.md even when no project HOPCODE.md exists', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'standalone local',
       );
 
@@ -734,7 +734,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('loads QWEN.local.md when project root is marked by a .git FILE (worktree / submodule layout)', async () => {
+    it('loads HOPCODE.local.md when project root is marked by a .git FILE (worktree / submodule layout)', async () => {
       // Git worktrees and submodules mark the repo root with a `.git` file
       // (containing `gitdir: <path>`), not a `.git` directory. The loader
       // must treat that as a valid project root, otherwise `<cwd>` is used
@@ -750,7 +750,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
 
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'worktree local',
       );
 
@@ -768,7 +768,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('skips QWEN.local.md when no project root can be found (no .git ancestor)', async () => {
+    it('skips HOPCODE.local.md when no project root can be found (no .git ancestor)', async () => {
       // Without a project root, falling back to cwd would silently turn the
       // single fixed slot into a per-cwd file — opposite of the design.
       // Pin the "skip" behavior so a future regression doesn't reintroduce
@@ -779,11 +779,11 @@ describe('loadServerHierarchicalMemory', () => {
       });
 
       await createTestFile(
-        path.join(cwd, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(cwd, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'cwd-anchored local that must not load',
       );
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'projectRoot-anchored local that must not load either',
       );
 
@@ -804,17 +804,17 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
-    it('skips QWEN.local.md when cwd === homedir without .git (avoids global-dir collision)', async () => {
+    it('skips HOPCODE.local.md when cwd === homedir without .git (avoids global-dir collision)', async () => {
       // When cwd is the home directory and there is no `.git` there, the
-      // would-be slot path resolves to `<homedir>/.hopcode/QWEN.local.md` —
-      // i.e. inside the GLOBAL Qwen dir. Loading that as a project-local
+      // would-be slot path resolves to `<homedir>/.hopcode/HOPCODE.local.md` —
+      // i.e. inside the GLOBAL HopCode dir. Loading that as a project-local
       // override is wrong: there is no project. Pin the "skip" behavior.
       await fsPromises.rm(path.join(projectRoot, '.git'), {
         recursive: true,
         force: true,
       });
       await createTestFile(
-        path.join(homedir, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(homedir, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'do not promote this to project-local',
       );
 
@@ -836,7 +836,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('dedupes when an extension registers the local slot path explicitly', async () => {
       // The hierarchical scan iterates `getAllGeminiMdFilenames()`
-      // (HOPCODE.md / AGENTS.md) and never produces a `QWEN.local.md` path,
+      // (HOPCODE.md / AGENTS.md) and never produces a `HOPCODE.local.md` path,
       // so the dedup guard in the slot loader looks unreachable in
       // production paths. It IS reachable, though, via
       // `extensionContextFilePaths`: an extension may register the slot
@@ -845,7 +845,7 @@ describe('loadServerHierarchicalMemory', () => {
       // slot loader from then appending the same file a second time
       // (double content + inflated fileCount). Pin that behavior.
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
         'slot content only once',
       );
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# Qwen Code standalone uninstaller.
+# HopCode standalone uninstaller.
 # Removes files owned by install-qwen-standalone.sh and preserves user config.
 
-if [ -z "${BASH_VERSION}" ] && [ -z "${__QWEN_UNINSTALL_REEXEC:-}" ]; then
+if [ -z "${BASH_VERSION}" ] && [ -z "${__HOPCODE_UNINSTALL_REEXEC:-}" ]; then
     if command -v bash >/dev/null 2>&1; then
         if [ -f "${0}" ]; then
-            export __QWEN_UNINSTALL_REEXEC=1
+            export __HOPCODE_UNINSTALL_REEXEC=1
             exec bash -- "${0}" "$@"
         fi
 
@@ -44,39 +44,39 @@ log_error() {
 
 print_usage() {
     cat <<EOF
-Qwen Code Standalone Uninstaller
+HopCode Standalone Uninstaller
 
 Usage: $0 [OPTIONS]
 
 Options:
-  --purge       Also remove the installer source marker at ~/.qwen/source.json.
-                Other Qwen Code config and auth files are preserved.
+  --purge       Also remove the installer source marker at ~/.hopcode/source.json.
+                Other HopCode config and auth files are preserved.
   -h, --help    Show this help message.
 
 Environment:
-  QWEN_INSTALL_ROOT       Install root. Defaults to ~/.local.
-  QWEN_INSTALL_LIB_DIR    Standalone runtime directory.
-  QWEN_INSTALL_BIN_DIR    Wrapper directory.
-  QWEN_UNINSTALL_PURGE=1  Same as --purge.
+  HOPCODE_INSTALL_ROOT       Install root. Defaults to ~/.local.
+  HOPCODE_INSTALL_LIB_DIR    Standalone runtime directory.
+  HOPCODE_INSTALL_BIN_DIR    Wrapper directory.
+  HOPCODE_UNINSTALL_PURGE=1  Same as --purge.
 EOF
 }
 
-PURGE="${QWEN_UNINSTALL_PURGE:-0}"
+PURGE="${HOPCODE_UNINSTALL_PURGE:-0}"
 
-if [[ -z "${HOME:-}" && -z "${QWEN_INSTALL_ROOT:-}" ]]; then
-    log_error "HOME is not set. Set QWEN_INSTALL_ROOT to the standalone install root."
+if [[ -z "${HOME:-}" && -z "${HOPCODE_INSTALL_ROOT:-}" ]]; then
+    log_error "HOME is not set. Set HOPCODE_INSTALL_ROOT to the standalone install root."
     exit 1
 fi
 
-INSTALL_ROOT="${QWEN_INSTALL_ROOT:-${HOME}/.local}"
-if [[ -n "${QWEN_INSTALL_LIB_DIR:-}" ]]; then
-    INSTALL_LIB_DIR="${QWEN_INSTALL_LIB_DIR}"
+INSTALL_ROOT="${HOPCODE_INSTALL_ROOT:-${HOME}/.local}"
+if [[ -n "${HOPCODE_INSTALL_LIB_DIR:-}" ]]; then
+    INSTALL_LIB_DIR="${HOPCODE_INSTALL_LIB_DIR}"
     INSTALL_LIB_PARENT="$(dirname "${INSTALL_LIB_DIR}")"
 else
-    INSTALL_LIB_PARENT="${QWEN_INSTALL_LIB_PARENT:-${INSTALL_ROOT}/lib}"
-    INSTALL_LIB_DIR="${INSTALL_LIB_PARENT}/qwen-code"
+    INSTALL_LIB_PARENT="${HOPCODE_INSTALL_LIB_PARENT:-${INSTALL_ROOT}/lib}"
+    INSTALL_LIB_DIR="${INSTALL_LIB_PARENT}/hopcode"
 fi
-INSTALL_BIN_DIR="${QWEN_INSTALL_BIN_DIR:-${INSTALL_ROOT}/bin}"
+INSTALL_BIN_DIR="${HOPCODE_INSTALL_BIN_DIR:-${INSTALL_ROOT}/bin}"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -120,13 +120,13 @@ validate_install_path() {
 }
 
 validate_options() {
-    validate_install_path "${INSTALL_ROOT}" "QWEN_INSTALL_ROOT"
-    validate_install_path "${INSTALL_LIB_PARENT}" "QWEN_INSTALL_LIB_PARENT"
-    validate_install_path "${INSTALL_LIB_DIR}" "QWEN_INSTALL_LIB_DIR"
-    validate_install_path "${INSTALL_BIN_DIR}" "QWEN_INSTALL_BIN_DIR"
+    validate_install_path "${INSTALL_ROOT}" "HOPCODE_INSTALL_ROOT"
+    validate_install_path "${INSTALL_LIB_PARENT}" "HOPCODE_INSTALL_LIB_PARENT"
+    validate_install_path "${INSTALL_LIB_DIR}" "HOPCODE_INSTALL_LIB_DIR"
+    validate_install_path "${INSTALL_BIN_DIR}" "HOPCODE_INSTALL_BIN_DIR"
 }
 
-is_qwen_standalone_install_dir() {
+is_hopcode_standalone_install_dir() {
     local install_dir="$1"
     local manifest_path="${install_dir}/manifest.json"
 
@@ -144,7 +144,7 @@ shell_quote() {
 
 remove_install_wrapper() {
     local wrapper_path="${INSTALL_BIN_DIR}/qwen"
-    local qwen_bin="${INSTALL_LIB_DIR}/bin/qwen"
+    local hopcode_bin="${INSTALL_LIB_DIR}/bin/qwen"
 
     if [[ ! -e "${wrapper_path}" ]]; then
         return 0
@@ -158,10 +158,10 @@ remove_install_wrapper() {
     # The installer writes the path through shell_quote, so the wrapper may
     # contain the raw path (no special chars) or the single-quoted form
     # (paths with spaces, quotes, or other shell metacharacters).
-    local quoted_qwen_bin
-    quoted_qwen_bin=$(shell_quote "${qwen_bin}")
-    if ! grep -qF "${qwen_bin}" "${wrapper_path}" 2>/dev/null &&
-        ! grep -qF "${quoted_qwen_bin}" "${wrapper_path}" 2>/dev/null; then
+    local quoted_hopcode_bin
+    quoted_hopcode_bin=$(shell_quote "${hopcode_bin}")
+    if ! grep -qF "${hopcode_bin}" "${wrapper_path}" 2>/dev/null &&
+        ! grep -qF "${quoted_hopcode_bin}" "${wrapper_path}" 2>/dev/null; then
         log_warning "${wrapper_path} does not point at this standalone install; skipping."
         return 0
     fi
@@ -179,9 +179,9 @@ remove_install_wrapper() {
 }
 
 remove_shell_path_entry() {
-    local begin_marker="# Qwen Code PATH block begin"
-    local end_marker="# Qwen Code PATH block end"
-    local legacy_marker="# Added by qwen-code installer (multi-qwen shadow fix)"
+    local begin_marker="# HopCode PATH block begin"
+    local end_marker="# HopCode PATH block end"
+    local legacy_marker="# Added by hopcode installer (multi-qwen shadow fix)"
     local rc_files=()
     local rc_file
 
@@ -199,7 +199,7 @@ remove_shell_path_entry() {
             continue
 
         local temp_file
-        temp_file=$(mktemp "${rc_file}.qwen-uninstall.XXXXXX") || {
+        temp_file=$(mktemp "${rc_file}.hopcode-uninstall.XXXXXX") || {
             log_warning "Could not create temp file for ${rc_file}; leaving PATH entry unchanged."
             continue
         }
@@ -253,11 +253,11 @@ remove_shell_path_entry() {
             }
         ' "${rc_file}" > "${temp_file}" && mv "${temp_file}" "${rc_file}" || {
             rm -f "${temp_file}"
-            log_warning "Could not remove Qwen Code PATH entry from ${rc_file}."
+            log_warning "Could not remove HopCode PATH entry from ${rc_file}."
             continue
         }
 
-        log_success "Removed Qwen Code PATH entry from ${rc_file}"
+        log_success "Removed HopCode PATH entry from ${rc_file}"
     done
 }
 
@@ -269,10 +269,10 @@ remove_empty_dir() {
 }
 
 remove_source_marker() {
-    local source_json="${HOME:-}/.qwen/source.json"
+    local source_json="${HOME:-}/.hopcode/source.json"
 
     if [[ "${PURGE}" != "1" ]]; then
-        log_info "Preserving ${HOME:-~}/.qwen (set QWEN_UNINSTALL_PURGE=1 to remove source.json)."
+        log_info "Preserving ${HOME:-~}/.hopcode (set HOPCODE_UNINSTALL_PURGE=1 to remove source.json)."
         return 0
     fi
 
@@ -281,21 +281,21 @@ remove_source_marker() {
         rm -f "${source_json}"
         log_success "Removed ${source_json}"
     fi
-    remove_empty_dir "${HOME}/.qwen"
+    remove_empty_dir "${HOME}/.hopcode"
 }
 
 validate_options
 
-echo "Qwen Code Standalone Uninstaller"
+echo "HopCode Standalone Uninstaller"
 echo ""
 
 install_was_managed=0
-if is_qwen_standalone_install_dir "${INSTALL_LIB_DIR}"; then
+if is_hopcode_standalone_install_dir "${INSTALL_LIB_DIR}"; then
     install_was_managed=1
     rm -rf "${INSTALL_LIB_DIR}"
     log_success "Removed ${INSTALL_LIB_DIR}"
 elif [[ -e "${INSTALL_LIB_DIR}" ]]; then
-    log_warning "${INSTALL_LIB_DIR} exists but is not a Qwen Code standalone install; skipping."
+    log_warning "${INSTALL_LIB_DIR} exists but is not a HopCode standalone install; skipping."
 else
     log_info "No standalone runtime found at ${INSTALL_LIB_DIR}."
 fi
@@ -309,4 +309,4 @@ fi
 remove_shell_path_entry
 remove_source_marker
 
-log_success "Qwen Code standalone install removed."
+log_success "HopCode standalone install removed."

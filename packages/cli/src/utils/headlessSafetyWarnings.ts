@@ -10,7 +10,7 @@ export const HEADLESS_IZN_NO_SANDBOX_WARNING =
   'Warning: running headless with --izn / approval-mode=izn and no sandbox. ' +
   "All tool calls (shell, write, edit) auto-execute at this process's privilege level. " +
   'Enable a sandbox via --sandbox / HOPCODE_SANDBOX, or set ' +
-  'QWEN_CODE_SUPPRESS_IZN_WARNING=1 to silence this notice.';
+  'HOPCODE_CODE_SUPPRESS_IZN_WARNING=1 to silence this notice.';
 
 /**
  * Returns a warning line to emit when running in IZN without a sandbox in a
@@ -39,7 +39,7 @@ export function getHeadlessIznSafetyWarning(
   // check here misfires inside real sandboxes, where the helper would
   // wrongly emit a "no sandbox" warning despite the run being contained.
   if (env['SANDBOX']) return null;
-  if (isTruthyEnv(env['QWEN_CODE_SUPPRESS_IZN_WARNING'])) return null;
+  if (isTruthyEnv(env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'])) return null;
   return HEADLESS_IZN_NO_SANDBOX_WARNING;
 }
 

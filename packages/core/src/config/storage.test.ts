@@ -381,7 +381,7 @@ describe('Storage – runtime path methods use getRuntimeBaseDir', () => {
     );
   });
 
-  it('getGlobalIdeDir is anchored to the global Qwen dir, not runtime base dir', () => {
+  it('getGlobalIdeDir is anchored to the global HopCode dir, not runtime base dir', () => {
     const customDir = path.resolve('custom');
     Storage.setRuntimeBaseDir(customDir);
     // IDE lock files are discovery anchors shared with the VS Code companion,
@@ -505,7 +505,7 @@ describe('Storage – config paths remain at ~/.hopcode regardless of runtime di
   });
 });
 
-describe('Storage – QWEN_HOME env var', () => {
+describe('Storage – HOPCODE_HOME env var', () => {
   const originalEnv = process.env['HOPCODE_HOME'];
 
   afterEach(() => {
@@ -522,19 +522,19 @@ describe('Storage – QWEN_HOME env var', () => {
     expect(Storage.getGlobalHopCodeDir()).toBe(expected);
   });
 
-  it('uses QWEN_HOME when set to absolute path', () => {
+  it('uses HOPCODE_HOME when set to absolute path', () => {
     const configDir = path.resolve('/tmp/custom-hopcode');
     process.env['HOPCODE_HOME'] = configDir;
     expect(Storage.getGlobalHopCodeDir()).toBe(configDir);
   });
 
-  it('resolves relative QWEN_HOME to absolute path', () => {
+  it('resolves relative HOPCODE_HOME to absolute path', () => {
     process.env['HOPCODE_HOME'] = 'relative/config';
     const expected = path.resolve('relative/config');
     expect(Storage.getGlobalHopCodeDir()).toBe(expected);
   });
 
-  it('config paths follow QWEN_HOME', () => {
+  it('config paths follow HOPCODE_HOME', () => {
     const configDir = path.resolve('/tmp/custom-hopcode');
     process.env['HOPCODE_HOME'] = configDir;
     expect(Storage.getGlobalSettingsPath()).toBe(
@@ -556,7 +556,7 @@ describe('Storage – QWEN_HOME env var', () => {
     );
   });
 
-  it('project-level paths are NOT affected by QWEN_HOME', () => {
+  it('project-level paths are NOT affected by HOPCODE_HOME', () => {
     const configDir = path.resolve('/tmp/custom-hopcode');
     const projectDir = path.resolve('/tmp/project');
     process.env['HOPCODE_HOME'] = configDir;
@@ -569,24 +569,24 @@ describe('Storage – QWEN_HOME env var', () => {
     );
   });
 
-  it('expands tilde (~) in QWEN_HOME', () => {
+  it('expands tilde (~) in HOPCODE_HOME', () => {
     process.env['HOPCODE_HOME'] = '~/custom-hopcode';
     const expected = path.join(os.homedir(), 'custom-hopcode');
     expect(Storage.getGlobalHopCodeDir()).toBe(expected);
   });
 
-  it('expands Windows-style tilde in QWEN_HOME', () => {
+  it('expands Windows-style tilde in HOPCODE_HOME', () => {
     process.env['HOPCODE_HOME'] = '~\\custom-hopcode';
     const expected = path.join(os.homedir(), 'custom-hopcode');
     expect(Storage.getGlobalHopCodeDir()).toBe(expected);
   });
 
-  it('handles bare tilde (~) as home directory in QWEN_HOME', () => {
+  it('handles bare tilde (~) as home directory in HOPCODE_HOME', () => {
     process.env['HOPCODE_HOME'] = '~';
     expect(Storage.getGlobalHopCodeDir()).toBe(os.homedir());
   });
 
-  it('QWEN_HOME and HOPCODE_RUNTIME_DIR are independent', () => {
+  it('HOPCODE_HOME and HOPCODE_RUNTIME_DIR are independent', () => {
     const configDir = path.resolve('/tmp/config');
     const runtimeDir = path.resolve('/tmp/runtime');
     process.env['HOPCODE_HOME'] = configDir;
@@ -598,7 +598,7 @@ describe('Storage – QWEN_HOME env var', () => {
     );
     expect(Storage.getGlobalTempDir()).toBe(path.join(runtimeDir, 'tmp'));
     expect(Storage.getGlobalDebugDir()).toBe(path.join(runtimeDir, 'debug'));
-    delete process.env['QWEN_RUNTIME_DIR'];
+    delete process.env['HOPCODE_RUNTIME_DIR'];
   });
 });
 

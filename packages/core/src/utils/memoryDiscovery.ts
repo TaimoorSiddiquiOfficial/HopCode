@@ -14,7 +14,7 @@ import {
 } from '../memory/const.js';
 import type { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { processImports } from './memoryImportProcessor.js';
-import { QWEN_DIR } from './paths.js';
+import { HOPCODE_DIR_ALIAS } from './paths.js';
 import { Storage } from '../config/storage.js';
 import { createDebugLogger } from './debugLogger.js';
 import { findProjectRoot } from './projectRoot.js';
@@ -91,8 +91,8 @@ async function getGeminiMdFilePathsInternalForEachDir(
 
   for (const geminiMdFilename of geminiMdFilenames) {
     const resolvedHome = path.resolve(userHomePath);
-    const globalQwenDir = Storage.getGlobalHopCodeDir();
-    const globalMemoryPath = path.join(globalQwenDir, geminiMdFilename);
+    const globalHopcodeDir = Storage.getGlobalHopCodeDir();
+    const globalMemoryPath = path.join(globalHopcodeDir, geminiMdFilename);
 
     // Handle the case where we're in the home directory (dir is empty string or home path)
     const resolvedDir = dir ? path.resolve(dir) : resolvedHome;
@@ -159,8 +159,8 @@ async function getGeminiMdFilePathsInternalForEachDir(
 
       while (currentDir && currentDir !== path.dirname(currentDir)) {
         if (
-          currentDir === globalQwenDir ||
-          currentDir === path.join(resolvedHome, QWEN_DIR)
+          currentDir === globalHopcodeDir ||
+          currentDir === path.join(resolvedHome, HOPCODE_DIR_ALIAS)
         ) {
           break;
         }
@@ -350,11 +350,11 @@ export async function loadServerHierarchicalMemory(
   //   * Deep cwd in a non-git workspace turns the slot into a per-cwd
   //     file, breaking the "single fixed slot" invariant.
   //   * `cwd === homedir` resolves the slot path to `~/.hopcode/HOPCODE.local.md`,
-  //     colliding with the global Qwen directory.
+  //     colliding with the global HopCode directory.
   if (implicitDiscoveryEnabled && folderTrust && foundRoot) {
     const localContextPath = path.join(
       foundRoot,
-      QWEN_DIR,
+      HOPCODE_DIR_ALIAS,
       LOCAL_CONTEXT_FILENAME,
     );
     try {

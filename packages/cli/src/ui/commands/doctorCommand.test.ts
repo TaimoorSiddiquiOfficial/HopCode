@@ -760,7 +760,7 @@ describe('doctorCommand', () => {
 
     expect(collectMemoryDiagnostics).toHaveBeenCalledWith({
       sessionId: 'session-123',
-      qwenVersion: '0.15.11',
+      hopcodeVersion: '0.15.11',
     });
   });
 

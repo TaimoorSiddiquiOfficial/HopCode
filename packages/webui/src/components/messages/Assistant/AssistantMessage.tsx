@@ -66,7 +66,7 @@ const AssistantMessageBase: FC<AssistantMessageProps> = ({
 
   return (
     <div
-      className={`qwen-message message-item assistant-message-container group ${getStatusClass()}`}
+      className={`hopcode-message message-item assistant-message-container group ${getStatusClass()}`}
       data-first={isFirst}
       data-last={isLast}
       style={{

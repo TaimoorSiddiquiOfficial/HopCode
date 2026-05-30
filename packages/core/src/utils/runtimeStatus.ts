@@ -50,7 +50,7 @@ export interface RuntimeStatus {
   hostname: string;
   /** Epoch seconds (with sub-second precision). Matches kimi-cli's format. */
   startedAt: number;
-  qwenVersion: string | null;
+  hopcodeVersion: string | null;
 }
 
 /**
@@ -65,7 +65,7 @@ interface RuntimeStatusOnDisk {
   work_dir: string;
   hostname: string;
   started_at: number;
-  qwen_version: string | null;
+  hopcode_version: string | null;
 }
 
 export interface WriteRuntimeStatusFields {
@@ -74,7 +74,7 @@ export interface WriteRuntimeStatusFields {
   /** Defaults to `process.pid`. */
   pid?: number;
   /** Defaults to `null`. Pass the value of `getCliVersion()`. */
-  qwenVersion?: string | null;
+  hopcodeVersion?: string | null;
 }
 
 /**
@@ -101,7 +101,7 @@ export async function writeRuntimeStatus(
     work_dir: fields.workDir,
     hostname: os.hostname(),
     started_at: Date.now() / 1000,
-    qwen_version: fields.qwenVersion ?? null,
+    hopcode_version: fields.hopcodeVersion ?? null,
   };
 
   await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -156,7 +156,7 @@ export async function readRuntimeStatus(
   const workDir = obj['work_dir'];
   const hostname = obj['hostname'];
   const startedAt = obj['started_at'];
-  const qwenVersion = obj['qwen_version'];
+  const hopcodeVersion = obj['hopcode_version'];
 
   if (!isFiniteInteger(schemaVersion)) return null;
   if (!isFiniteInteger(pid)) return null;
@@ -166,7 +166,8 @@ export async function readRuntimeStatus(
   if (typeof startedAt !== 'number' || !Number.isFinite(startedAt)) {
     return null;
   }
-  if (qwenVersion !== null && typeof qwenVersion !== 'string') return null;
+  if (hopcodeVersion !== null && typeof hopcodeVersion !== 'string')
+    return null;
 
   return {
     schemaVersion,
@@ -175,7 +176,7 @@ export async function readRuntimeStatus(
     workDir,
     hostname,
     startedAt,
-    qwenVersion,
+    hopcodeVersion,
   };
 }
 

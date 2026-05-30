@@ -69,7 +69,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       .option('token', {
         type: 'string',
         description:
-          'Bearer token required on every request. Falls back to the QWEN_SERVER_TOKEN env var.',
+          'Bearer token required on every request. Falls back to the HOPCODE_SERVER_TOKEN env var.',
       })
       .option('max-sessions', {
         type: 'number',
@@ -102,7 +102,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
           'Refuse to start without a bearer token, even on loopback. ' +
           'Hardens the loopback developer default for shared dev hosts / CI ' +
           'runners / multi-tenant workstations where any local user can hit ' +
-          '127.0.0.1. Requires --token or QWEN_SERVER_TOKEN. /health also ' +
+          '127.0.0.1. Requires --token or HOPCODE_SERVER_TOKEN. /health also ' +
           'requires Authorization when enabled (no loopback exemption — ' +
           'k8s/Compose probes must pass the bearer too).',
       })
@@ -164,7 +164,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       // `/proc/<pid>/environ` (owner-only).
       writeStderrLine(
         'hopcode serve: --token is visible in the process command line; ' +
-          'prefer the QWEN_SERVER_TOKEN env var for any non-trivial ' +
+          'prefer the HOPCODE_SERVER_TOKEN env var for any non-trivial ' +
           'deployment.',
       );
     }
@@ -216,14 +216,14 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
     // sessions will load. Per-session override (the ACP client flipping
     // approval mode mid-session) is out of scope here; this warns about
     // a deployment that's wide-open at boot. Suppress with
-    // QWEN_CODE_SUPPRESS_IZN_WARNING=1.
+    // HOPCODE_CODE_SUPPRESS_IZN_WARNING=1.
     try {
       const loaded = loadSettings(argv.workspace ?? process.cwd());
       const merged = loaded.merged;
       const approvalMode = merged.tools?.approvalMode;
       const sandbox = merged.tools?.sandbox;
       const sandboxEnv = process.env['SANDBOX'];
-      const suppress = process.env['QWEN_CODE_SUPPRESS_IZN_WARNING'];
+      const suppress = process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'];
       const suppressed = suppress === '1' || suppress === 'true';
       if (
         approvalMode === ApprovalMode.IZN &&

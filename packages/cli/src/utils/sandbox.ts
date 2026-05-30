@@ -219,11 +219,11 @@ export async function start_sandbox(
 
     // Canonicalize via realpathSync so seatbelt's `subpath` matcher sees the
     // same path the kernel will. mkdirSync first because realpathSync throws
-    // on missing dirs and a custom QWEN_HOME / QWEN_RUNTIME_DIR may not exist
+    // on missing dirs and a custom HOPCODE_HOME / HOPCODE_RUNTIME_DIR may not exist
     // yet on first run.
-    const qwenDir = Storage.getGlobalHopCodeDir();
+    const hopcodeDir = Storage.getGlobalHopCodeDir();
     const runtimeDir = Storage.getRuntimeBaseDir();
-    fs.mkdirSync(qwenDir, { recursive: true });
+    fs.mkdirSync(hopcodeDir, { recursive: true });
     fs.mkdirSync(runtimeDir, { recursive: true });
 
     const args = [
@@ -236,7 +236,7 @@ export async function start_sandbox(
       '-D',
       `CACHE_DIR=${fs.realpathSync(execSync(`getconf DARWIN_USER_CACHE_DIR`).toString().trim())}`,
       '-D',
-      `QWEN_DIR=${fs.realpathSync(qwenDir)}`,
+      `HOPCODE_DIR=${fs.realpathSync(hopcodeDir)}`,
       '-D',
       `RUNTIME_DIR=${fs.realpathSync(runtimeDir)}`,
     ];
@@ -440,7 +440,7 @@ export async function start_sandbox(
   args.push('--volume', `${workdir}:${containerWorkdir}`);
 
   // Mount user settings at /home/node/.hopcode and at the canonical host path
-  // used by QWEN_HOME, unless that host path is already covered by a broader
+  // used by HOPCODE_HOME, unless that host path is already covered by a broader
   // runtime-dir mount below.
   const userSettingsDirOnHost = getUserSettingsDir();
   const runtimeBaseDirOnHost = Storage.getRuntimeBaseDir();
@@ -486,7 +486,7 @@ export async function start_sandbox(
   // being the default fallback.
   args.push('--env', `HOPCODE_HOME=${userSettingsDirContainerPath}`);
 
-  // Mount the runtime base dir and pass QWEN_RUNTIME_DIR when it diverges
+  // Mount the runtime base dir and pass HOPCODE_RUNTIME_DIR when it diverges
   // from the global hopcode dir; otherwise the existing user-settings mount
   // already covers it.
   if (!runtimeCoveredByUserSettings) {
@@ -496,7 +496,7 @@ export async function start_sandbox(
     );
   }
   if (!runtimeSameAsUserSettings) {
-    args.push('--env', `QWEN_RUNTIME_DIR=${runtimeBaseDirContainerPath}`);
+    args.push('--env', `HOPCODE_RUNTIME_DIR=${runtimeBaseDirContainerPath}`);
   }
 
   // mount os.tmpdir() as os.tmpdir() inside container

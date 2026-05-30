@@ -150,7 +150,7 @@ describe('HopCodeConnectionHandler', () => {
       });
       // Note: this suite only exercises the connect()-level backoff timer.
       // newSessionWithRetry schedules its own 300ms auth-delay setTimeout
-      // (see qwenConnectionHandler.ts), which is currently unreachable
+      // (see hopcodeConnectionHandler.ts), which is currently unreachable
       // because newSession is mocked to succeed on first attempt. If a future
       // test exercises that path, advance its timer with the same helper.
       vi.useFakeTimers();

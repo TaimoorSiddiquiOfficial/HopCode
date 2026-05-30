@@ -1032,7 +1032,7 @@
       "default": false
     },
     "stopHookBlockingCap": {
-      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.",
+      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_CODE_STOP_HOOK_BLOCK_CAP.",
       "type": "number",
       "default": 8
     },

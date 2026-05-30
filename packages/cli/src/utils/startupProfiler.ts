@@ -24,7 +24,7 @@
  *   finalizeStartupProfile(id)   — call after last checkpoint to write report
  *
  * By default profiles only inside the sandbox child process to avoid duplicate
- * reports. Set QWEN_CODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
+ * reports. Set HOPCODE_CODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
  * (pre-sandbox) process; outer reports are written with an `outer-` filename
  * prefix to keep them separate from sandbox-child reports.
  *
@@ -146,7 +146,7 @@ export function initStartupProfiler(): void {
   }
 
   const inSandboxChild = !!process.env['SANDBOX'];
-  const outerOptIn = process.env['QWEN_CODE_PROFILE_STARTUP_OUTER'] === '1';
+  const outerOptIn = process.env['HOPCODE_CODE_PROFILE_STARTUP_OUTER'] === '1';
 
   // Default behavior is unchanged: only the sandbox child collects.
   // Outer (pre-sandbox) collection requires an explicit opt-in to avoid
@@ -158,9 +158,9 @@ export function initStartupProfiler(): void {
   enabled = true;
   outerProcess = !inSandboxChild;
   // Default to capturing heap snapshots at every checkpoint.
-  // Disable with QWEN_CODE_PROFILE_STARTUP_NO_HEAP=1 when measuring the
+  // Disable with HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP=1 when measuring the
   // Heisenberg overhead of the heap call itself.
-  captureHeap = process.env['QWEN_CODE_PROFILE_STARTUP_NO_HEAP'] !== '1';
+  captureHeap = process.env['HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP'] !== '1';
   finalized = false;
   processUptimeAtT0Ms = Math.round(process.uptime() * 1000 * 100) / 100;
   t0 = performance.now();

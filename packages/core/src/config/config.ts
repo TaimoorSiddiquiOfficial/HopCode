@@ -278,7 +278,7 @@ export interface ChatCompressionSettings {
    * apportioning chars across history in `findCompressSplitPoint`.
    * Also used as the placeholder budget when stripping inline media
    * out of the side-query compaction prompt. Default 1600.
-   * Env override: `QWEN_IMAGE_TOKEN_ESTIMATE`.
+   * Env override: `HOPCODE_IMAGE_TOKEN_ESTIMATE`.
    */
   imageTokenEstimate?: number;
 }
@@ -1993,7 +1993,7 @@ export class Config {
           await writeRuntimeStatus(newPath, {
             sessionId: newSessionId,
             workDir,
-            qwenVersion: cliVersion,
+            hopcodeVersion: cliVersion,
           });
         } catch {
           // ignored: best-effort cleanup

@@ -33,7 +33,7 @@ const MAX_DESCRIPTION_LENGTH = 40;
 const MAX_RECENT_ACTIVITIES = 5;
 export const DEFAULT_MAX_CONCURRENT_BACKGROUND_AGENTS = 10;
 export const BACKGROUND_AGENT_CONCURRENCY_ENV =
-  'QWEN_CODE_MAX_BACKGROUND_AGENTS';
+  'HOPCODE_CODE_MAX_BACKGROUND_AGENTS';
 
 export function resolveMaxConcurrentBackgroundAgents(
   env: Record<string, string | undefined> = process.env,

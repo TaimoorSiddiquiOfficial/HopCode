@@ -270,7 +270,7 @@ async function memoryDoctorAction(context: CommandContext, args = '') {
   try {
     const diagnostics = await collectMemoryDiagnostics({
       sessionId: context.services.config?.getSessionId(),
-      qwenVersion: context.services.config?.getCliVersion(),
+      hopcodeVersion: context.services.config?.getCliVersion(),
     });
 
     if (context.abortSignal?.aborted) {

@@ -78,7 +78,7 @@ describe('lspCommand', () => {
     expect(result).toMatchObject({
       type: 'message',
       messageType: 'info',
-      content: expect.stringContaining('QWEN_RUNTIME_DIR'),
+      content: expect.stringContaining('HOPCODE_RUNTIME_DIR'),
     });
     expect(context.ui.addItem).not.toHaveBeenCalled();
   });

@@ -236,7 +236,7 @@ export async function startInteractiveUI(
     await writeRuntimeStatus(runtimeStatusPath, {
       sessionId,
       workDir: config.getTargetDir(),
-      qwenVersion: version,
+      hopcodeVersion: version,
     });
     config.markRuntimeStatusEnabled();
   } catch {
@@ -394,7 +394,7 @@ export async function main() {
   profileCheckpoint('main_entry');
   // Bridge core-package startup events (Config.initialize, MCP discovery,
   // GeminiClient.setTools) into the cli's startup profiler. Gated on
-  // `isStartupProfilerEnabled()` so that when QWEN_CODE_PROFILE_STARTUP is
+  // `isStartupProfilerEnabled()` so that when HOPCODE_CODE_PROFILE_STARTUP is
   // unset (the common case) every core-side `recordStartupEvent()` call
   // sees a null sink and short-circuits at the first comparison, instead
   // of going through this arrow wrapper and the profiler's own enabled
@@ -882,7 +882,7 @@ export async function main() {
         writeStderrLine(
           `Warning: MCP server(s) failed to start: ${failedMcpServers.join(', ')}. ` +
             `Continuing with built-in tools and any servers that did connect. ` +
-            `Re-run with QWEN_CODE_DEBUG=1 to see per-server reasons.`,
+            `Re-run with HOPCODE_CODE_DEBUG=1 to see per-server reasons.`,
         );
       }
       // Finalize the non-interactive startup profile here so MCP events

@@ -27,7 +27,7 @@ const execFileAsync = promisify(execFile);
 export interface MemoryDiagnostics {
   timestamp: string;
   sessionId?: string;
-  qwenVersion?: string;
+  hopcodeVersion?: string;
   uptimeSeconds: number;
   memoryUsage: NodeJS.MemoryUsage;
   v8HeapStats: V8HeapStats;
@@ -96,7 +96,7 @@ export interface MemoryRisk {
 export interface MemoryDiagnosticsOptions {
   now?: () => Date;
   sessionId?: string;
-  qwenVersion?: string;
+  hopcodeVersion?: string;
   memoryUsage?: () => NodeJS.MemoryUsage;
   heapStatistics?: () => v8.HeapInfo;
   heapSpaceStatistics?: () => v8.HeapSpaceInfo[];
@@ -153,7 +153,7 @@ export async function collectMemoryDiagnostics(
   const diagnostics = {
     timestamp: now().toISOString(),
     sessionId: options.sessionId,
-    qwenVersion: options.qwenVersion,
+    hopcodeVersion: options.hopcodeVersion,
     uptimeSeconds,
     memoryUsage,
     v8HeapStats: mapHeapStats(heapStatistics),

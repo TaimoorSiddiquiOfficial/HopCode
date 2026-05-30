@@ -1,7 +1,7 @@
 {
   "name": "@hoptrendy/hopcode-core",
   "version": "0.29.0",
-  "description": "Qwen Code Core",
+  "description": "HopCode Core",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"

@@ -23,7 +23,7 @@ export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
  * project root can be found, the slot is skipped — the loader does NOT
  * fall back to cwd, because that would turn a "single fixed slot" into a
  * per-cwd file and (when cwd is the home directory) would collide with
- * the global Qwen dir at `~/.hopcode/`.
+ * the global HopCode dir at `~/.hopcode/`.
  */
 export const LOCAL_CONTEXT_FILENAME = 'HOPCODE.local.md';
 export const MEMORY_SECTION_HEADER = '## HopCode Added Memories';

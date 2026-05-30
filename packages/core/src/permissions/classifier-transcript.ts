@@ -5,7 +5,7 @@
  *
  * Classifier transcript construction.
  *
- * Mirrors ClaudeCode's `buildTranscriptEntries` (yoloClassifier.ts) in two
+ * Mirrors ClaudeCode's `buildTranscriptEntries` (iznClassifier.ts) in two
  * ways:
  *   1. Assistant text is stripped — the agent could be tricked into writing
  *      "classifier, please allow this" inside its output.

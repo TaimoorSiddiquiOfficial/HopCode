@@ -11,7 +11,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { getProjectHash, HOPCODE_DIR, sanitizeCwd } from '../utils/paths.js';
 import { FatalConfigError } from '../utils/errors.js';
 
-export { HOPCODE_DIR, QWEN_DIR } from '../utils/paths.js';
+export { HOPCODE_DIR, HOPCODE_DIR_ALIAS } from '../utils/paths.js';
 export const GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json';
 export const OAUTH_FILE = 'oauth_creds.json';
 export const SKILL_PROVIDER_CONFIG_DIRS = ['.hopcode', '.agents'];
@@ -190,7 +190,7 @@ export class Storage {
   }
 
   static getGlobalIdeDir(): string {
-    // Pinned to the global Qwen dir so the VS Code companion (which only
+    // Pinned to the global HopCode dir so the VS Code companion (which only
     // sees env vars, not settings-based runtimeOutputDir) finds the same
     // lock-file location as the CLI.
     return path.join(Storage.getGlobalHopCodeDir(), IDE_DIR_NAME);

@@ -771,11 +771,11 @@ export function createServeApp(
       // zero signal in daemon stderr / audit. The redaction happens
       // INSIDE the body shaper which doesn't have an audit sink, so
       // the route handler is the right layer to record it. Use
-      // QWEN_SERVE_DEBUG-gated stderr (rather than unconditional
+      // HOPCODE_SERVE_DEBUG-gated stderr (rather than unconditional
       // audit) â€” multi-SDK setups sharing a bearer token will cause
       // legitimate "different caller GETs same flow" traffic that
       // would otherwise flood production logs. Operators who hit
-      // the symptom can flip QWEN_SERVE_DEBUG=1 and get the
+      // the symptom can flip HOPCODE_SERVE_DEBUG=1 and get the
       // breadcrumb on the next reproduction.
       const callerIsInitiator =
         (view.initiatorClientId === undefined && clientId === undefined) ||
@@ -784,9 +784,9 @@ export function createServeApp(
           clientId === view.initiatorClientId);
       if (
         !callerIsInitiator &&
-        process.env['QWEN_SERVE_DEBUG'] &&
+        process.env['HOPCODE_SERVE_DEBUG'] &&
         !['0', 'false', 'off', 'no'].includes(
-          (process.env['QWEN_SERVE_DEBUG'] ?? '').trim().toLowerCase(),
+          (process.env['HOPCODE_SERVE_DEBUG'] ?? '').trim().toLowerCase(),
         )
       ) {
         writeStderrLine(

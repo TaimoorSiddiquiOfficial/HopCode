@@ -40,7 +40,7 @@ import {
  * local user. Keep this in sync with `loadedSettingsAdapter`'s expectations.
  */
 const SETTINGS_FILE_MODE = 0o600;
-/** Directory mode for ~/.qwen — owner-only. */
+/** Directory mode for ~/.hopcode — owner-only. */
 const SETTINGS_DIR_MODE = 0o700;
 
 // ---------------------------------------------------------------------------

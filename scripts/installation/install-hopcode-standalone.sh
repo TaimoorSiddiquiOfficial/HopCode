@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-# Qwen Code Installation Script
-# Installs Qwen Code from a standalone archive when available, with npm fallback.
+# HopCode Installation Script
+# Installs HopCode from a standalone archive when available, with npm fallback.
 # This script intentionally does not install Node.js or change npm config.
 #
 # Usage:
 #   install-qwen-standalone.sh --source [github|npm|internal|local-build]
 #   install-qwen-standalone.sh --method [detect|standalone|npm]
 
-if [ -z "${BASH_VERSION}" ] && [ -z "${__QWEN_INSTALL_REEXEC:-}" ]; then
+if [ -z "${BASH_VERSION}" ] && [ -z "${__HOPCODE_INSTALL_REEXEC:-}" ]; then
     if command -v bash >/dev/null 2>&1; then
         if [ -f "${0}" ]; then
-            export __QWEN_INSTALL_REEXEC=1
+            export __HOPCODE_INSTALL_REEXEC=1
             exec bash -- "${0}" "$@"
         fi
 
@@ -86,51 +86,51 @@ trap 'cleanup_temp_dirs; exit 143' TERM
 
 print_usage() {
     cat <<EOF
-Qwen Code Installer
+HopCode Installer
 
 Usage: $0 [OPTIONS]
 
 Options:
   -s, --source SOURCE      Record the installation source.
   --method METHOD          Install method: detect, standalone, or npm.
-                           Defaults to QWEN_INSTALL_METHOD or detect.
+                           Defaults to HOPCODE_INSTALL_METHOD or detect.
   --mirror MIRROR          Standalone archive mirror: auto, github, or aliyun.
-                           Defaults to QWEN_INSTALL_MIRROR or auto, which picks
+                           Defaults to HOPCODE_INSTALL_MIRROR or auto, which picks
                            whichever responds first via a HEAD probe.
   --base-url URL           Override standalone archive base URL.
   --archive PATH           Install from a local standalone archive.
   --version VERSION        Standalone release version. Defaults to latest.
   --registry REGISTRY      npm registry to use for npm fallback.
-                           Defaults to QWEN_NPM_REGISTRY or https://registry.npmmirror.com
+                           Defaults to HOPCODE_NPM_REGISTRY or https://registry.npmmirror.com
   --no-modify-path         Do not append PATH to the user's shell rc file even
-                           when a shadowing 'qwen' is detected.
+                           when a shadowing 'hopcode' is detected.
   -h, --help               Show this help message.
 
 Examples:
   curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
   curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash -s -- --source github
   curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash -s -- --method standalone
-  ./install-qwen-standalone.sh --archive ./qwen-code-linux-x64.tar.gz
+  ./install-qwen-standalone.sh --archive ./hopcode-linux-x64.tar.gz
 EOF
 }
 
 SOURCE="unknown"
-METHOD="${QWEN_INSTALL_METHOD:-}"
-MIRROR="${QWEN_INSTALL_MIRROR:-auto}"
-BASE_URL="${QWEN_INSTALL_BASE_URL:-}"
-ARCHIVE_PATH="${QWEN_INSTALL_ARCHIVE:-}"
-VERSION="${QWEN_INSTALL_VERSION:-latest}"
-NO_MODIFY_PATH="${QWEN_NO_MODIFY_PATH:-0}"
-NPM_REGISTRY="${QWEN_NPM_REGISTRY:-https://registry.npmmirror.com}"
-INSTALL_ROOT="${QWEN_INSTALL_ROOT:-${HOME:-}/.local}"
-if [[ -n "${QWEN_INSTALL_LIB_DIR:-}" ]]; then
-    INSTALL_LIB_DIR="${QWEN_INSTALL_LIB_DIR}"
+METHOD="${HOPCODE_INSTALL_METHOD:-}"
+MIRROR="${HOPCODE_INSTALL_MIRROR:-auto}"
+BASE_URL="${HOPCODE_INSTALL_BASE_URL:-}"
+ARCHIVE_PATH="${HOPCODE_INSTALL_ARCHIVE:-}"
+VERSION="${HOPCODE_INSTALL_VERSION:-latest}"
+NO_MODIFY_PATH="${HOPCODE_NO_MODIFY_PATH:-0}"
+NPM_REGISTRY="${HOPCODE_NPM_REGISTRY:-https://registry.npmmirror.com}"
+INSTALL_ROOT="${HOPCODE_INSTALL_ROOT:-${HOME:-}/.local}"
+if [[ -n "${HOPCODE_INSTALL_LIB_DIR:-}" ]]; then
+    INSTALL_LIB_DIR="${HOPCODE_INSTALL_LIB_DIR}"
     INSTALL_LIB_PARENT="$(dirname "${INSTALL_LIB_DIR}")"
 else
-    INSTALL_LIB_PARENT="${QWEN_INSTALL_LIB_PARENT:-${INSTALL_ROOT}/lib}"
-    INSTALL_LIB_DIR="${INSTALL_LIB_PARENT}/qwen-code"
+    INSTALL_LIB_PARENT="${HOPCODE_INSTALL_LIB_PARENT:-${INSTALL_ROOT}/lib}"
+    INSTALL_LIB_DIR="${INSTALL_LIB_PARENT}/hopcode"
 fi
-INSTALL_BIN_DIR="${QWEN_INSTALL_BIN_DIR:-${INSTALL_ROOT}/bin}"
+INSTALL_BIN_DIR="${HOPCODE_INSTALL_BIN_DIR:-${INSTALL_ROOT}/bin}"
 
 validate_source() {
     if [[ "${SOURCE}" == "unknown" ]]; then
@@ -175,12 +175,12 @@ validate_version() {
 }
 
 validate_github_repo() {
-    local github_repo="${QWEN_INSTALL_GITHUB_REPO:-QwenLM/qwen-code}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/qwen-code}"
     if [[ "${github_repo}" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
         return 0
     fi
 
-    log_error "QWEN_INSTALL_GITHUB_REPO must be in owner/repo format."
+    log_error "HOPCODE_INSTALL_GITHUB_REPO must be in owner/repo format."
     exit 1
 }
 
@@ -231,10 +231,10 @@ validate_options() {
     validate_https_url "${NPM_REGISTRY}" "--registry"
     validate_version
     validate_github_repo
-    validate_install_path "${INSTALL_ROOT}" "QWEN_INSTALL_ROOT"
-    validate_install_path "${INSTALL_LIB_PARENT}" "QWEN_INSTALL_LIB_PARENT"
-    validate_install_path "${INSTALL_LIB_DIR}" "QWEN_INSTALL_LIB_DIR"
-    validate_install_path "${INSTALL_BIN_DIR}" "QWEN_INSTALL_BIN_DIR"
+    validate_install_path "${INSTALL_ROOT}" "HOPCODE_INSTALL_ROOT"
+    validate_install_path "${INSTALL_LIB_PARENT}" "HOPCODE_INSTALL_LIB_PARENT"
+    validate_install_path "${INSTALL_LIB_DIR}" "HOPCODE_INSTALL_LIB_DIR"
+    validate_install_path "${INSTALL_BIN_DIR}" "HOPCODE_INSTALL_BIN_DIR"
     validate_source
 }
 
@@ -318,12 +318,12 @@ done
 validate_options
 
 print_header() {
-    echo "Installing Qwen Code version: $(display_install_version)"
+    echo "Installing HopCode version: $(display_install_version)"
 }
 
 print_node_help() {
     echo ""
-    echo "Node.js 22 or newer is required before installing Qwen Code with npm."
+    echo "Node.js 22 or newer is required before installing HopCode with npm."
     echo ""
     echo "Install Node.js, then rerun this installer:"
     case "$(uname -s 2>/dev/null || echo unknown)" in
@@ -412,19 +412,19 @@ create_source_json() {
         return 0
     fi
 
-    local qwen_dir="${HOME}/.qwen"
-    mkdir -p "${qwen_dir}"
+    local hopcode_dir="${HOME}/.hopcode"
+    mkdir -p "${hopcode_dir}"
 
     local escaped_source
     escaped_source=$(printf '%s' "${SOURCE}" | sed 's/\\/\\\\/g; s/"/\\"/g')
 
-    cat > "${qwen_dir}/source.json" <<EOF
+    cat > "${hopcode_dir}/source.json" <<EOF
 {
   "source": "${escaped_source}"
 }
 EOF
 
-    log_success "Installation source saved to ~/.qwen/source.json"
+    log_success "Installation source saved to ~/.hopcode/source.json"
 }
 
 detect_target() {
@@ -487,7 +487,7 @@ release_version_path() {
     esac
 }
 
-# When a shadowing 'qwen' is detected, append a PATH prepend to the user's
+# When a shadowing 'hopcode' is detected, append a PATH prepend to the user's
 # shell rc file at the very end. Putting it at the END means our prepend runs
 # AFTER any earlier PATH munging in the rc file (e.g., other tools' shell
 # init), so our installed_bin wins. Idempotent via a marker comment.
@@ -519,8 +519,8 @@ maybe_update_shell_path() {
 
     [[ -z "${rc_file}" ]] && return 0
 
-    local begin_marker="# Qwen Code PATH block begin"
-    local end_marker="# Qwen Code PATH block end"
+    local begin_marker="# HopCode PATH block begin"
+    local end_marker="# HopCode PATH block end"
     local quoted_install_bin_dir
     quoted_install_bin_dir=$(shell_quote "${install_bin_dir}")
     local export_line
@@ -552,7 +552,7 @@ maybe_update_shell_path() {
 
 github_base_url_for_version() {
     local version_path="$1"
-    local github_repo="${QWEN_INSTALL_GITHUB_REPO:-QwenLM/qwen-code}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/qwen-code}"
     if [[ "${version_path}" == "latest" ]]; then
         echo "https://github.com/${github_repo}/releases/latest/download"
     else
@@ -682,7 +682,7 @@ race_mirror_head() {
     local gh_url="$2"
     local oss_url="$3"
     local tmpdir
-    if ! tmpdir=$(mktemp -d -t qwen-mirror.XXXXXX 2>/dev/null); then
+    if ! tmpdir=$(mktemp -d -t hopcode-mirror.XXXXXX 2>/dev/null); then
         # Refuse to fall back to a predictable PID-based path; a local attacker
         # could pre-create it to influence mirror selection.
         echo "mirror probe: mktemp failed" >&2
@@ -959,12 +959,12 @@ ensure_managed_install_dir() {
         return 0
     fi
 
-    if is_qwen_standalone_install_dir "${install_dir}"; then
+    if is_hopcode_standalone_install_dir "${install_dir}"; then
         return 0
     fi
 
     local backup="${install_dir}.backup.$(date +%Y%m%dT%H%M%S 2>/dev/null || date +%Y%m%d%H%M%S)"
-    log_warning "${install_dir} exists but is not a Qwen Code standalone install."
+    log_warning "${install_dir} exists but is not a HopCode standalone install."
     log_warning "Backing up to: ${backup}"
     if mv "${install_dir}" "${backup}"; then
         return 0
@@ -992,7 +992,7 @@ restore_stale_install_backup() {
     return 1
 }
 
-is_qwen_standalone_install_dir() {
+is_hopcode_standalone_install_dir() {
     local install_dir="$1"
     local manifest_path="${install_dir}/manifest.json"
 
@@ -1001,19 +1001,19 @@ is_qwen_standalone_install_dir() {
     # Keep these grep checks in sync if that JSON layout changes.
     grep -Eq '"name"[[:space:]]*:[[:space:]]*"@hoptrendy/hopcode-cli"' "${manifest_path}" 2>/dev/null || return 1
     grep -Eq '"target"[[:space:]]*:[[:space:]]*"(darwin|linux)-(arm64|x64)"' "${manifest_path}" 2>/dev/null || return 1
-    [[ -f "${install_dir}/bin/qwen" && ! -L "${install_dir}/bin/qwen" && -x "${install_dir}/bin/qwen" ]] || return 1
+    [[ -f "${install_dir}/bin/hopcode" && ! -L "${install_dir}/bin/hopcode" && -x "${install_dir}/bin/hopcode" ]] || return 1
     [[ -f "${install_dir}/node/bin/node" && ! -L "${install_dir}/node/bin/node" && -x "${install_dir}/node/bin/node" ]] || return 1
 }
 
 write_unix_wrapper() {
     local wrapper_path="$1"
-    local qwen_bin="$2"
-    local quoted_qwen_bin
-    quoted_qwen_bin=$(shell_quote "${qwen_bin}")
+    local hopcode_bin="$2"
+    local quoted_hopcode_bin
+    quoted_hopcode_bin=$(shell_quote "${hopcode_bin}")
 
     if ! cat > "${wrapper_path}" <<EOF
 #!/usr/bin/env sh
-exec ${quoted_qwen_bin} "\$@"
+exec ${quoted_hopcode_bin} "\$@"
 EOF
     then
         return 1
@@ -1047,7 +1047,7 @@ install_standalone() {
 
         local archive_extension
         archive_extension=$(archive_extension_for_target "${target}")
-        archive_name="qwen-code-${target}.${archive_extension}"
+        archive_name="hopcode-${target}.${archive_extension}"
 
         local requested_mirror="${MIRROR}"
         local requested_version_path=""
@@ -1160,14 +1160,14 @@ install_standalone() {
         return 1
     fi
 
-    if [[ ! -f "${extract_dir}/qwen-code/bin/qwen" || -L "${extract_dir}/qwen-code/bin/qwen" || ! -x "${extract_dir}/qwen-code/bin/qwen" ]]; then
-        log_error "Archive does not contain qwen-code/bin/qwen."
+    if [[ ! -f "${extract_dir}/hopcode/bin/hopcode" || -L "${extract_dir}/hopcode/bin/hopcode" || ! -x "${extract_dir}/hopcode/bin/hopcode" ]]; then
+        log_error "Archive does not contain hopcode/bin/hopcode."
         rm -rf "${temp_dir}"
         return 1
     fi
 
-    if [[ ! -f "${extract_dir}/qwen-code/node/bin/node" || -L "${extract_dir}/qwen-code/node/bin/node" || ! -x "${extract_dir}/qwen-code/node/bin/node" ]]; then
-        log_error "Archive does not contain executable qwen-code/node/bin/node."
+    if [[ ! -f "${extract_dir}/hopcode/node/bin/node" || -L "${extract_dir}/hopcode/node/bin/node" || ! -x "${extract_dir}/hopcode/node/bin/node" ]]; then
+        log_error "Archive does not contain executable hopcode/node/bin/node."
         rm -rf "${temp_dir}"
         return 1
     fi
@@ -1180,7 +1180,7 @@ install_standalone() {
     # Stage into .new and keep .old so failed upgrades can roll back.
     local new_install_dir="${INSTALL_LIB_DIR}.new"
     local old_install_dir="${INSTALL_LIB_DIR}.old"
-    local wrapper_tmp="${INSTALL_BIN_DIR}/qwen.new"
+    local wrapper_tmp="${INSTALL_BIN_DIR}/hopcode.new"
     if ! ensure_managed_install_dir "${INSTALL_LIB_DIR}" ||
         ! ensure_managed_install_dir "${new_install_dir}" ||
         ! ensure_managed_install_dir "${old_install_dir}"; then
@@ -1199,9 +1199,9 @@ install_standalone() {
         }
     fi
     rm -rf "${new_install_dir}" "${wrapper_tmp}"
-    mv "${extract_dir}/qwen-code" "${new_install_dir}"
+    mv "${extract_dir}/hopcode" "${new_install_dir}"
 
-    if ! write_unix_wrapper "${wrapper_tmp}" "${INSTALL_LIB_DIR}/bin/qwen"; then
+    if ! write_unix_wrapper "${wrapper_tmp}" "${INSTALL_LIB_DIR}/bin/hopcode"; then
         rm -rf "${temp_dir}" "${new_install_dir}" "${wrapper_tmp}"
         log_error "Failed to create qwen wrapper in ${INSTALL_BIN_DIR}."
         return 1
@@ -1220,13 +1220,13 @@ install_standalone() {
         return 1
     fi
 
-    if ! mv -f "${wrapper_tmp}" "${INSTALL_BIN_DIR}/qwen"; then
+    if ! mv -f "${wrapper_tmp}" "${INSTALL_BIN_DIR}/hopcode"; then
         rm -rf "${INSTALL_LIB_DIR}" "${wrapper_tmp}"
         if [[ -e "${old_install_dir}" ]]; then
             mv "${old_install_dir}" "${INSTALL_LIB_DIR}"
         fi
         rm -rf "${temp_dir}"
-        log_error "Failed to create qwen wrapper in ${INSTALL_BIN_DIR}."
+        log_error "Failed to create hopcode wrapper in ${INSTALL_BIN_DIR}."
         return 1
     fi
 
@@ -1236,7 +1236,7 @@ install_standalone() {
     create_source_json
     rm -rf "${temp_dir}"
 
-    log_success "Qwen Code standalone archive installed successfully."
+    log_success "HopCode standalone archive installed successfully."
     log_info "Installed to ${INSTALL_LIB_DIR}"
 }
 
@@ -1257,10 +1257,10 @@ install_npm() {
     local package_spec
     package_spec=$(npm_package_spec)
 
-    if command_exists qwen; then
-        local qwen_version
-        qwen_version=$(qwen --version 2>/dev/null || echo "unknown")
-        log_info "Existing Qwen Code detected: ${qwen_version}"
+    if command_exists hopcode; then
+        local hopcode_version
+        hopcode_version=$(hopcode --version 2>/dev/null || echo "unknown")
+        log_info "Existing HopCode detected: ${hopcode_version}"
         if [[ "${VERSION}" == "latest" ]]; then
             log_info "Upgrading to the latest version."
         else
@@ -1279,12 +1279,12 @@ install_npm() {
 
     log_info "Running: npm install -g ${package_spec} --registry ${NPM_REGISTRY}"
     if "${install_cmd[@]}"; then
-        log_success "Qwen Code installed successfully."
+        log_success "HopCode installed successfully."
         create_source_json
         return 0
     fi
 
-    log_error "Failed to install Qwen Code."
+    log_error "Failed to install HopCode."
     echo ""
     echo "This installer does not change your npm prefix or shell profile."
     echo "If the failure is a permission error, install Node.js with a user-owned"
@@ -1301,25 +1301,25 @@ print_final_instructions() {
     local quoted_install_bin_dir=""
     local standalone_uninstall_url="https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh"
     if [[ -n "${install_bin_dir}" ]]; then
-        installed_bin="${install_bin_dir}/qwen"
+        installed_bin="${install_bin_dir}/hopcode"
         quoted_install_bin_dir=$(shell_quote "${install_bin_dir}")
     fi
 
-    # PRE_INSTALL_QWENS was captured by main() BEFORE the install ran
-    # (newline-separated list of every qwen binary found on disk). Filter out
+    # PRE_INSTALL_HOPCODES was captured by main() BEFORE the install ran
+    # (newline-separated list of every hopcode binary found on disk). Filter out
     # the one we just installed; whatever remains may shadow this install.
-    local other_qwens=""
-    if [[ -n "${PRE_INSTALL_QWENS:-}" ]]; then
+    local other_hopcodes=""
+    if [[ -n "${PRE_INSTALL_HOPCODES:-}" ]]; then
         local saved_ifs="${IFS}"
         IFS=$'\n'
         local path
-        for path in ${PRE_INSTALL_QWENS}; do
+        for path in ${PRE_INSTALL_HOPCODES}; do
             [[ -z "${path}" ]] && continue
             [[ -n "${installed_bin}" && "${path}" == "${installed_bin}" ]] && continue
-            if [[ -z "${other_qwens}" ]]; then
-                other_qwens="${path}"
+            if [[ -z "${other_hopcodes}" ]]; then
+                other_hopcodes="${path}"
             else
-                other_qwens="${other_qwens}"$'\n'"${path}"
+                other_hopcodes="${other_hopcodes}"$'\n'"${path}"
             fi
         done
         IFS="${saved_ifs}"
@@ -1334,17 +1334,17 @@ print_final_instructions() {
     local installed_version="unknown"
     if [[ -n "${installed_bin}" && -x "${installed_bin}" ]]; then
         installed_version=$("${installed_bin}" --version 2>/dev/null || echo "unknown")
-    elif command_exists qwen; then
-        installed_version=$(qwen --version 2>/dev/null || echo "unknown")
+    elif command_exists hopcode; then
+        installed_version=$(hopcode --version 2>/dev/null || echo "unknown")
     fi
 
-    echo "QWEN CODE"
+    echo "HOPCODE"
     echo ""
-    echo "Qwen Code ${installed_version} installed successfully."
+    echo "HopCode ${installed_version} installed successfully."
     echo ""
     echo "To start:"
     echo "  cd <project>"
-    echo "  qwen"
+    echo "  hopcode"
 
     if [[ -n "${install_dir}" ]]; then
         echo ""
@@ -1357,7 +1357,7 @@ print_final_instructions() {
     if [[ "${install_method}" == "npm" ]]; then
         echo "  npm uninstall -g @hoptrendy/hopcode-cli"
     elif [[ -n "${install_dir}" && -n "${install_bin_dir}" ]]; then
-        echo "  curl -fsSL ${standalone_uninstall_url} | QWEN_INSTALL_LIB_DIR=$(shell_quote "${install_dir}") QWEN_INSTALL_BIN_DIR=$(shell_quote "${install_bin_dir}") bash"
+        echo "  curl -fsSL ${standalone_uninstall_url} | HOPCODE_INSTALL_LIB_DIR=$(shell_quote "${install_dir}") HOPCODE_INSTALL_BIN_DIR=$(shell_quote "${install_bin_dir}") bash"
     else
         echo "  curl -fsSL ${standalone_uninstall_url} | bash"
     fi
@@ -1366,14 +1366,14 @@ print_final_instructions() {
         maybe_update_shell_path "${install_bin_dir}"
     fi
 
-    if [[ -n "${other_qwens}" ]]; then
+    if [[ -n "${other_hopcodes}" ]]; then
         echo ""
-        log_warning "Other 'qwen' executables exist on this system. Depending on your"
+        log_warning "Other 'hopcode' executables exist on this system. Depending on your"
         log_warning "shell PATH order, one of these may run instead of the install above:"
         local saved_ifs="${IFS}"
         IFS=$'\n'
         local path
-        for path in ${other_qwens}; do
+        for path in ${other_hopcodes}; do
             [[ -z "${path}" ]] && continue
             log_warning "  ${path}"
         done
@@ -1389,45 +1389,45 @@ print_final_instructions() {
 
 main() {
     if [[ -z "${HOME:-}" ]]; then
-        log_error "HOME is not set; cannot determine where to install Qwen Code."
+        log_error "HOME is not set; cannot determine where to install HopCode."
         exit 1
     fi
 
-    # Discover all qwen executables on disk BEFORE we install, so the
+    # Discover all hopcode executables on disk BEFORE we install, so the
     # just-installed binary doesn't pollute the search. We can't reliably
     # simulate the user's interactive shell PATH (some tools inject their
     # bin only under a tty), so we enumerate well-known per-tool bin
     # directories plus whatever bash inherited on PATH.
-    PRE_INSTALL_QWENS=$(
+    PRE_INSTALL_HOPCODES=$(
         {
             IFS=:
             for dir in $PATH; do
                 [[ -z "${dir}" ]] && continue
-                [[ -x "${dir}/qwen" ]] && echo "${dir}/qwen"
+                [[ -x "${dir}/hopcode" ]] && echo "${dir}/hopcode"
             done
             for candidate in \
-                "${HOME}/.opencode/bin/qwen" \
-                "${HOME}/.bun/bin/qwen" \
-                "${HOME}/.cargo/bin/qwen" \
-                "${HOME}/.deno/bin/qwen" \
-                "${HOME}/.volta/bin/qwen" \
-                "${HOME}/.fnm/bin/qwen" \
-                "${HOME}/.local/bin/qwen" \
-                "${HOME}/Library/pnpm/qwen" \
-                "/usr/local/bin/qwen" \
-                "/opt/homebrew/bin/qwen"; do
+                "${HOME}/.opencode/bin/hopcode" \
+                "${HOME}/.bun/bin/hopcode" \
+                "${HOME}/.cargo/bin/hopcode" \
+                "${HOME}/.deno/bin/hopcode" \
+                "${HOME}/.volta/bin/hopcode" \
+                "${HOME}/.fnm/bin/hopcode" \
+                "${HOME}/.local/bin/hopcode" \
+                "${HOME}/Library/pnpm/hopcode" \
+                "/usr/local/bin/hopcode" \
+                "/opt/homebrew/bin/hopcode"; do
                 [[ -x "${candidate}" ]] && echo "${candidate}"
             done
             if command_exists npm; then
                 local npm_prefix
                 npm_prefix=$(npm prefix -g 2>/dev/null || true)
-                if [[ -n "${npm_prefix}" && -x "${npm_prefix}/bin/qwen" ]]; then
-                    echo "${npm_prefix}/bin/qwen"
+                if [[ -n "${npm_prefix}" && -x "${npm_prefix}/bin/hopcode" ]]; then
+                    echo "${npm_prefix}/bin/hopcode"
                 fi
             fi
         } 2>/dev/null | sort -u
     )
-    export PRE_INSTALL_QWENS
+    export PRE_INSTALL_HOPCODES
 
     print_header
 

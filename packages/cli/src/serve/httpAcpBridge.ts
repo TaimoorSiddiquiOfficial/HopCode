@@ -409,7 +409,7 @@ interface PermissionResolutionRecord {
 const MAX_RESOLVED_PERMISSION_RECORDS = 512;
 
 function isServeDebugLoggingEnabled(): boolean {
-  const value = process.env['QWEN_SERVE_DEBUG'];
+  const value = process.env['HOPCODE_SERVE_DEBUG'];
   if (!value) return false;
   return !['0', 'false', 'off', 'no'].includes(value.trim().toLowerCase());
 }
@@ -3053,7 +3053,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
       // true. `EventBus.publish` is documented never to throw (BX9_p
       // contract at eventBus.ts:186), so anything landing here in
       // normal ops is by definition unexpected — silencing it via
-      // QWEN_SERVE_DEBUG would let a true regression succeed at the
+      // HOPCODE_SERVE_DEBUG would let a true regression succeed at the
       // route layer (200 OK) while SSE subscribers stop seeing
       // events. The shutdown gate keeps the common race noise out of
       // the production log without hiding actual bugs.
@@ -4087,7 +4087,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   // ONLY daemon-internal secrets (see SCRUBBED_CHILD_ENV_KEYS at module
   // scope). An earlier version used an allowlist, but that broke the
   // common deployment shape: users export `OPENAI_API_KEY` /
-  // `ANTHROPIC_API_KEY` / `QWEN_*` / `DASHSCOPE_API_KEY` / a custom
+  // `ANTHROPIC_API_KEY` / `HOPCODE_*` / `DASHSCOPE_API_KEY` / a custom
   // `modelProviders[].envKey` to authenticate the agent's LLM calls,
   // and core's model config resolves those from `process.env`. An
   // exhaustive allowlist can't enumerate user-defined provider keys,
@@ -4098,7 +4098,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   // `~/.aws/credentials`, etc. is reachable by prompt injection
   // regardless of what we put in `env`. The env passthrough is not
   // the security boundary; the user-as-trust-root is. The only thing
-  // we MUST scrub is `QWEN_SERVER_TOKEN` (daemon-only auth that
+  // we MUST scrub is `HOPCODE_SERVER_TOKEN` (daemon-only auth that
   // would let a prompt-injected shell turn the agent into an
   // authenticated client of its own daemon — escalation the agent
   // doesn't otherwise have).
@@ -4113,7 +4113,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   // having to mutate the daemon's global process.env. Applied AFTER
   // `SCRUBBED_CHILD_ENV_KEYS` so the daemon-only secret list still
   // wins (operators can't override the scrub by passing
-  // `QWEN_SERVER_TOKEN` in overrides — defense in depth).
+  // `HOPCODE_SERVER_TOKEN` in overrides — defense in depth).
   if (childEnvOverrides) {
     for (const [key, value] of Object.entries(childEnvOverrides)) {
       if (SCRUBBED_CHILD_ENV_KEYS.has(key)) continue;
@@ -4252,7 +4252,7 @@ const KILL_HARD_DEADLINE_MS = 10_000;
  * environment. Everything else is passed through — see the
  * threat-model rationale at the call site in `defaultSpawnChannelFactory`.
  *
- * Currently just `QWEN_SERVER_TOKEN`: the daemon's own bearer token,
+ * Currently just `HOPCODE_SERVER_TOKEN`: the daemon's own bearer token,
  * which the agent doesn't need (it speaks to the daemon over stdio,
  * not HTTP). Leaving it in the child's env would let prompt injection
  * turn the agent into an authenticated client of its own daemon — an
@@ -4271,7 +4271,7 @@ const KILL_HARD_DEADLINE_MS = 10_000;
  * Defined at module scope so the Set is allocated once at load.
  */
 const SCRUBBED_CHILD_ENV_KEYS: ReadonlySet<string> = new Set([
-  'QWEN_SERVER_TOKEN',
+  'HOPCODE_SERVER_TOKEN',
 ]);
 
 function killChild(child: ChildProcess): Promise<void> {

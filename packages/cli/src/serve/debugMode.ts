@@ -22,11 +22,11 @@
  * `"0" / "false" / "off" / "no"` (case-insensitive, with surrounding
  * whitespace trimmed) disable. Matches the bridge's existing
  * `isServeDebugLoggingEnabled` semantics so the two toggles move in
- * lockstep — operators set `QWEN_SERVE_DEBUG=1` and get both stderr
+ * lockstep — operators set `HOPCODE_SERVE_DEBUG=1` and get both stderr
  * verbosity and response-body detail.
  */
 export function isServeDebugMode(): boolean {
-  const value = process.env['QWEN_SERVE_DEBUG'];
+  const value = process.env['HOPCODE_SERVE_DEBUG'];
   if (!value) return false;
   return !['0', 'false', 'off', 'no'].includes(value.trim().toLowerCase());
 }

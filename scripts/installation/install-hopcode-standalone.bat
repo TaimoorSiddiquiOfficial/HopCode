@@ -10,29 +10,29 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 
 set "SOURCE=unknown"
 set "METHOD="
-if defined QWEN_INSTALL_METHOD set "METHOD=!QWEN_INSTALL_METHOD!"
+if defined HOPCODE_INSTALL_METHOD set "METHOD=!HOPCODE_INSTALL_METHOD!"
 set "MIRROR=auto"
-if defined QWEN_INSTALL_MIRROR set "MIRROR=!QWEN_INSTALL_MIRROR!"
+if defined HOPCODE_INSTALL_MIRROR set "MIRROR=!HOPCODE_INSTALL_MIRROR!"
 set "NO_MODIFY_PATH=0"
-if defined QWEN_NO_MODIFY_PATH set "NO_MODIFY_PATH=!QWEN_NO_MODIFY_PATH!"
+if defined HOPCODE_NO_MODIFY_PATH set "NO_MODIFY_PATH=!HOPCODE_NO_MODIFY_PATH!"
 set "BASE_URL="
-if defined QWEN_INSTALL_BASE_URL set "BASE_URL=!QWEN_INSTALL_BASE_URL!"
+if defined HOPCODE_INSTALL_BASE_URL set "BASE_URL=!HOPCODE_INSTALL_BASE_URL!"
 set "ARCHIVE_PATH="
-if defined QWEN_INSTALL_ARCHIVE set "ARCHIVE_PATH=!QWEN_INSTALL_ARCHIVE!"
+if defined HOPCODE_INSTALL_ARCHIVE set "ARCHIVE_PATH=!HOPCODE_INSTALL_ARCHIVE!"
 set "VERSION=latest"
-if defined QWEN_INSTALL_VERSION set "VERSION=!QWEN_INSTALL_VERSION!"
+if defined HOPCODE_INSTALL_VERSION set "VERSION=!HOPCODE_INSTALL_VERSION!"
 set "NPM_REGISTRY=https://registry.npmmirror.com"
-if defined QWEN_NPM_REGISTRY set "NPM_REGISTRY=!QWEN_NPM_REGISTRY!"
+if defined HOPCODE_NPM_REGISTRY set "NPM_REGISTRY=!HOPCODE_NPM_REGISTRY!"
 if defined LOCALAPPDATA (
     set "INSTALL_BASE=!LOCALAPPDATA!\qwen-code"
 ) else (
     set "INSTALL_BASE=!USERPROFILE!\AppData\Local\qwen-code"
 )
-if defined QWEN_INSTALL_ROOT set "INSTALL_BASE=!QWEN_INSTALL_ROOT!"
+if defined HOPCODE_INSTALL_ROOT set "INSTALL_BASE=!HOPCODE_INSTALL_ROOT!"
 set "INSTALL_DIR=!INSTALL_BASE!\qwen-code"
-if defined QWEN_INSTALL_LIB_DIR set "INSTALL_DIR=!QWEN_INSTALL_LIB_DIR!"
+if defined HOPCODE_INSTALL_LIB_DIR set "INSTALL_DIR=!HOPCODE_INSTALL_LIB_DIR!"
 set "INSTALL_BIN_DIR=!INSTALL_BASE!\bin"
-if defined QWEN_INSTALL_BIN_DIR set "INSTALL_BIN_DIR=!QWEN_INSTALL_BIN_DIR!"
+if defined HOPCODE_INSTALL_BIN_DIR set "INSTALL_BIN_DIR=!HOPCODE_INSTALL_BIN_DIR!"
 
 REM Parse flags before any network or filesystem work.
 :parse_args
@@ -210,35 +210,35 @@ call :PrintHeader
 
 REM Discover all qwen executables on disk BEFORE we install. We can't
 REM reliably simulate the user's PATH ordering, so enumerate well-known
-REM per-tool bin directories plus everything `where qwen` returns.
-call :CreateTempFile "qwen-pre-install"
+REM per-tool bin directories plus everything `where hopcode` returns.
+call :CreateTempFile "hopcode-pre-install"
 if !ERRORLEVEL! NEQ 0 exit /b 1
-set "PRE_INSTALL_QWENS_FILE=!TEMP_FILE!"
+set "PRE_INSTALL_HOPCODES_FILE=!TEMP_FILE!"
 rem Avoid `call echo` here: `call` triggers an extra parse pass on the
 rem expanded path, so a directory containing &/|/<,>/etc. would be re-evaluated
 rem as command separators. Plain `echo` writes the literal value.
-for /f "delims=" %%i in ('where qwen 2^>nul') do echo %%i>>"!PRE_INSTALL_QWENS_FILE!"
+for /f "delims=" %%i in ('where hopcode 2^>nul') do echo %%i>>"!PRE_INSTALL_HOPCODES_FILE!"
 for %%c in (
-    "!USERPROFILE!\.opencode\bin\qwen.cmd"
-    "!APPDATA!\npm\qwen.cmd"
-    "!USERPROFILE!\.bun\bin\qwen.cmd"
-    "!LOCALAPPDATA!\bun\bin\qwen.cmd"
-    "!LOCALAPPDATA!\qwen-code\bin\qwen.cmd"
-) do if exist %%c echo %%~c>>"!PRE_INSTALL_QWENS_FILE!"
+    "!USERPROFILE!\.opencode\bin\hopcode.cmd"
+    "!APPDATA!\npm\hopcode.cmd"
+    "!USERPROFILE!\.bun\bin\hopcode.cmd"
+    "!LOCALAPPDATA!\bun\bin\hopcode.cmd"
+    "!LOCALAPPDATA!\qwen-code\bin\hopcode.cmd"
+) do if exist %%c echo %%~c>>"!PRE_INSTALL_HOPCODES_FILE!"
 for /f "delims=" %%i in ('npm prefix -g 2^>nul') do (
-    if exist "%%i\qwen.cmd" echo %%i\qwen.cmd>>"!PRE_INSTALL_QWENS_FILE!"
+    if exist "%%i\hopcode.cmd" echo %%i\qwen.cmd>>"!PRE_INSTALL_HOPCODES_FILE!"
 )
-set "PRE_INSTALL_QWENS_LIST="
-if exist "!PRE_INSTALL_QWENS_FILE!" (
-    for /f "delims=" %%i in ('sort "!PRE_INSTALL_QWENS_FILE!" 2^>nul ^| findstr /v "^$"') do (
-        if "!PRE_INSTALL_QWENS_LIST!"=="" (
-            set "PRE_INSTALL_QWENS_LIST=%%i"
+set "PRE_INSTALL_HOPCODES_LIST="
+if exist "!PRE_INSTALL_HOPCODES_FILE!" (
+    for /f "delims=" %%i in ('sort "!PRE_INSTALL_HOPCODES_FILE!" 2^>nul ^| findstr /v "^$"') do (
+        if "!PRE_INSTALL_HOPCODES_LIST!"=="" (
+            set "PRE_INSTALL_HOPCODES_LIST=%%i"
         ) else (
-            echo !PRE_INSTALL_QWENS_LIST! | findstr /i /c:"%%i" >nul 2>&1
-            if errorlevel 1 set "PRE_INSTALL_QWENS_LIST=!PRE_INSTALL_QWENS_LIST!|%%i"
+            echo !PRE_INSTALL_HOPCODES_LIST! | findstr /i /c:"%%i" >nul 2>&1
+            if errorlevel 1 set "PRE_INSTALL_HOPCODES_LIST=!PRE_INSTALL_HOPCODES_LIST!|%%i"
         )
     )
-    del /f /q "!PRE_INSTALL_QWENS_FILE!" >nul 2>&1
+    del /f /q "!PRE_INSTALL_HOPCODES_FILE!" >nul 2>&1
 )
 
 REM Dispatch after validation; detect falls back to npm only when unavailable.
@@ -300,15 +300,15 @@ echo   -s, --source SOURCE      Record the installation source.
 echo                            Only letters, numbers, dot, underscore, and dash are allowed.
 echo   --method METHOD          Install method: detect, standalone, or npm.
 echo   --mirror MIRROR          Standalone archive mirror: auto, github, or aliyun.
-echo                            Defaults to QWEN_INSTALL_MIRROR or auto, which picks
+echo                            Defaults to HOPCODE_INSTALL_MIRROR or auto, which picks
 echo                            whichever responds first via a HEAD probe.
 echo   --base-url URL           Override standalone archive base URL.
 echo   --archive PATH           Install from a local standalone archive.
 echo   --version VERSION        Standalone release version. Defaults to latest.
 echo   --registry REGISTRY      npm registry to use.
-echo                            Defaults to QWEN_NPM_REGISTRY or https://registry.npmmirror.com
+echo                            Defaults to HOPCODE_NPM_REGISTRY or https://registry.npmmirror.com
 echo   --no-modify-path         Do not prepend INSTALL_BIN_DIR to user PATH even
-echo                            when a shadowing 'qwen' is detected.
+echo                            when a shadowing 'hopcode' is detected.
 echo   -h, --help               Show this help message.
 exit /b 0
 
@@ -321,7 +321,7 @@ echo Installing Qwen Code version: !DISPLAY_VERSION!
 exit /b 0
 
 :ValidateRawEnvironmentOptions
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124); $rawNames = @('QWEN_INSTALL_METHOD','QWEN_INSTALL_MIRROR','QWEN_NO_MODIFY_PATH','QWEN_INSTALL_BASE_URL','QWEN_INSTALL_ARCHIVE','QWEN_INSTALL_VERSION','QWEN_NPM_REGISTRY','QWEN_INSTALL_ROOT','QWEN_INSTALL_LIB_DIR','QWEN_INSTALL_BIN_DIR','QWEN_INSTALL_GITHUB_REPO','QWEN_INSTALL_CURL_EXE'); foreach ($name in $rawNames) { $value = [Environment]::GetEnvironmentVariable($name); if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 } }; exit 0"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124); $rawNames = @('HOPCODE_INSTALL_METHOD','HOPCODE_INSTALL_MIRROR','HOPCODE_NO_MODIFY_PATH','HOPCODE_INSTALL_BASE_URL','HOPCODE_INSTALL_ARCHIVE','HOPCODE_INSTALL_VERSION','HOPCODE_NPM_REGISTRY','HOPCODE_INSTALL_ROOT','HOPCODE_INSTALL_LIB_DIR','HOPCODE_INSTALL_BIN_DIR','HOPCODE_INSTALL_GITHUB_REPO','HOPCODE_INSTALL_CURL_EXE'); foreach ($name in $rawNames) { $value = [Environment]::GetEnvironmentVariable($name); if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 } }; exit 0"
 if %ERRORLEVEL% EQU 0 exit /b 0
 echo ERROR: installer options contain unsafe command characters.
 exit /b 1
@@ -329,73 +329,73 @@ exit /b 1
 :ValidateOptions
 if "!METHOD!"=="" set "METHOD=detect"
 
-set "QWEN_VALIDATE_METHOD=!METHOD!"
-set "QWEN_VALIDATE_MIRROR=!MIRROR!"
-set "QWEN_VALIDATE_BASE_URL=!BASE_URL!"
-set "QWEN_VALIDATE_ARCHIVE_PATH=!ARCHIVE_PATH!"
-set "QWEN_VALIDATE_VERSION=!VERSION!"
-set "QWEN_VALIDATE_NPM_REGISTRY=!NPM_REGISTRY!"
-set "QWEN_VALIDATE_INSTALL_BASE=!INSTALL_BASE!"
-set "QWEN_VALIDATE_INSTALL_DIR=!INSTALL_DIR!"
-set "QWEN_VALIDATE_INSTALL_BIN_DIR=!INSTALL_BIN_DIR!"
-set "QWEN_VALIDATE_SOURCE=!SOURCE!"
-call :CreateTempFile "qwen-validate-options" ".ps1"
+set "HOPCODE_VALIDATE_METHOD=!METHOD!"
+set "HOPCODE_VALIDATE_MIRROR=!MIRROR!"
+set "HOPCODE_VALIDATE_BASE_URL=!BASE_URL!"
+set "HOPCODE_VALIDATE_ARCHIVE_PATH=!ARCHIVE_PATH!"
+set "HOPCODE_VALIDATE_VERSION=!VERSION!"
+set "HOPCODE_VALIDATE_NPM_REGISTRY=!NPM_REGISTRY!"
+set "HOPCODE_VALIDATE_INSTALL_BASE=!INSTALL_BASE!"
+set "HOPCODE_VALIDATE_INSTALL_DIR=!INSTALL_DIR!"
+set "HOPCODE_VALIDATE_INSTALL_BIN_DIR=!INSTALL_BIN_DIR!"
+set "HOPCODE_VALIDATE_SOURCE=!SOURCE!"
+call :CreateTempFile "hopcode-validate-options" ".ps1"
 if !ERRORLEVEL! NEQ 0 exit /b 1
-set "QWEN_VALIDATE_OPTIONS_SCRIPT=!TEMP_FILE!"
-> "!QWEN_VALIDATE_OPTIONS_SCRIPT!" echo $unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124)
->> "!QWEN_VALIDATE_OPTIONS_SCRIPT!" echo $names = @('METHOD','MIRROR','BASE_URL','ARCHIVE_PATH','VERSION','NPM_REGISTRY','INSTALL_BASE','INSTALL_DIR','INSTALL_BIN_DIR','SOURCE')
->> "!QWEN_VALIDATE_OPTIONS_SCRIPT!" echo foreach ($name in $names) {
->> "!QWEN_VALIDATE_OPTIONS_SCRIPT!" echo   $value = [Environment]::GetEnvironmentVariable('QWEN_VALIDATE_' + $name)
->> "!QWEN_VALIDATE_OPTIONS_SCRIPT!" echo   if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 }
->> "!QWEN_VALIDATE_OPTIONS_SCRIPT!" echo }
->> "!QWEN_VALIDATE_OPTIONS_SCRIPT!" echo exit 0
-powershell -NoProfile -ExecutionPolicy Bypass -File "!QWEN_VALIDATE_OPTIONS_SCRIPT!"
+set "HOPCODE_VALIDATE_OPTIONS_SCRIPT=!TEMP_FILE!"
+> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo $unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124)
+>> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo $names = @('METHOD','MIRROR','BASE_URL','ARCHIVE_PATH','VERSION','NPM_REGISTRY','INSTALL_BASE','INSTALL_DIR','INSTALL_BIN_DIR','SOURCE')
+>> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo foreach ($name in $names) {
+>> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo   $value = [Environment]::GetEnvironmentVariable('HOPCODE_VALIDATE_' + $name)
+>> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo   if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 }
+>> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo }
+>> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo exit 0
+powershell -NoProfile -ExecutionPolicy Bypass -File "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!"
 set "PS_STATUS=%ERRORLEVEL%"
-del /F /Q "!QWEN_VALIDATE_OPTIONS_SCRIPT!" >nul 2>&1
-set "QWEN_VALIDATE_OPTIONS_SCRIPT="
-set "QWEN_VALIDATE_METHOD="
-set "QWEN_VALIDATE_MIRROR="
-set "QWEN_VALIDATE_BASE_URL="
-set "QWEN_VALIDATE_ARCHIVE_PATH="
-set "QWEN_VALIDATE_VERSION="
-set "QWEN_VALIDATE_NPM_REGISTRY="
-set "QWEN_VALIDATE_INSTALL_BASE="
-set "QWEN_VALIDATE_INSTALL_DIR="
-set "QWEN_VALIDATE_INSTALL_BIN_DIR="
-set "QWEN_VALIDATE_SOURCE="
+del /F /Q "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" >nul 2>&1
+set "HOPCODE_VALIDATE_OPTIONS_SCRIPT="
+set "HOPCODE_VALIDATE_METHOD="
+set "HOPCODE_VALIDATE_MIRROR="
+set "HOPCODE_VALIDATE_BASE_URL="
+set "HOPCODE_VALIDATE_ARCHIVE_PATH="
+set "HOPCODE_VALIDATE_VERSION="
+set "HOPCODE_VALIDATE_NPM_REGISTRY="
+set "HOPCODE_VALIDATE_INSTALL_BASE="
+set "HOPCODE_VALIDATE_INSTALL_DIR="
+set "HOPCODE_VALIDATE_INSTALL_BIN_DIR="
+set "HOPCODE_VALIDATE_SOURCE="
 if %PS_STATUS% NEQ 0 (
     echo ERROR: installer options contain unsafe command characters.
     exit /b 1
 )
 
 if "!INSTALL_BASE!"=="" (
-    echo ERROR: QWEN_INSTALL_ROOT must not be empty.
+    echo ERROR: HOPCODE_INSTALL_ROOT must not be empty.
     exit /b 1
 )
 if "!INSTALL_DIR!"=="" (
-    echo ERROR: QWEN_INSTALL_LIB_DIR must not be empty.
+    echo ERROR: HOPCODE_INSTALL_LIB_DIR must not be empty.
     exit /b 1
 )
 if "!INSTALL_BIN_DIR!"=="" (
-    echo ERROR: QWEN_INSTALL_BIN_DIR must not be empty.
+    echo ERROR: HOPCODE_INSTALL_BIN_DIR must not be empty.
     exit /b 1
 )
 if "!INSTALL_BASE:~1,2!"==":\" goto validate_install_base_ok
 if "!INSTALL_BASE:~1,2!"==":/" goto validate_install_base_ok
 if "!INSTALL_BASE:~0,2!"=="\\" goto validate_install_base_ok
-echo ERROR: QWEN_INSTALL_ROOT must be an absolute path.
+echo ERROR: HOPCODE_INSTALL_ROOT must be an absolute path.
 exit /b 1
 :validate_install_base_ok
 if "!INSTALL_DIR:~1,2!"==":\" goto validate_install_dir_ok
 if "!INSTALL_DIR:~1,2!"==":/" goto validate_install_dir_ok
 if "!INSTALL_DIR:~0,2!"=="\\" goto validate_install_dir_ok
-echo ERROR: QWEN_INSTALL_LIB_DIR must be an absolute path.
+echo ERROR: HOPCODE_INSTALL_LIB_DIR must be an absolute path.
 exit /b 1
 :validate_install_dir_ok
 if "!INSTALL_BIN_DIR:~1,2!"==":\" goto validate_install_bin_dir_ok
 if "!INSTALL_BIN_DIR:~1,2!"==":/" goto validate_install_bin_dir_ok
 if "!INSTALL_BIN_DIR:~0,2!"=="\\" goto validate_install_bin_dir_ok
-echo ERROR: QWEN_INSTALL_BIN_DIR must be an absolute path.
+echo ERROR: HOPCODE_INSTALL_BIN_DIR must be an absolute path.
 exit /b 1
 :validate_install_bin_dir_ok
 
@@ -439,20 +439,20 @@ exit /b 1
 
 :ValidateVersion
 if /i "!VERSION!"=="latest" exit /b 0
-set "QWEN_VERSION_VALUE=!VERSION!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$value = $env:QWEN_VERSION_VALUE; if ($value -match '^v?[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9]+)*$') { exit 0 }; exit 1"
+set "HOPCODE_VERSION_VALUE=!VERSION!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$value = $env:HOPCODE_VERSION_VALUE; if ($value -match '^v?[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9]+)*$') { exit 0 }; exit 1"
 set "PS_STATUS=%ERRORLEVEL%"
-set "QWEN_VERSION_VALUE="
+set "HOPCODE_VERSION_VALUE="
 if %PS_STATUS% EQU 0 exit /b 0
 echo ERROR: --version must be 'latest' or a semver string.
 exit /b 1
 
 :ValidateGithubRepo
-if not defined QWEN_INSTALL_GITHUB_REPO exit /b 0
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$value = $env:QWEN_INSTALL_GITHUB_REPO; if ($value -match '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$') { exit 0 }; exit 1"
+if not defined HOPCODE_INSTALL_GITHUB_REPO exit /b 0
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$value = $env:HOPCODE_INSTALL_GITHUB_REPO; if ($value -match '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$') { exit 0 }; exit 1"
 if %ERRORLEVEL% EQU 0 exit /b 0
 
-echo ERROR: QWEN_INSTALL_GITHUB_REPO must be in owner/repo format.
+echo ERROR: HOPCODE_INSTALL_GITHUB_REPO must be in owner/repo format.
 exit /b 1
 
 :ValidateSource
@@ -489,41 +489,41 @@ set "VERSION_PATH=v!VERSION_PATH!"
 exit /b 0
 
 :GithubBaseUrlForVersion
-rem args: %~1=version_path  → sets QWEN_GH_BASE_URL
-set "QWEN_GH_REPO=QwenLM/qwen-code"
-if defined QWEN_INSTALL_GITHUB_REPO set "QWEN_GH_REPO=!QWEN_INSTALL_GITHUB_REPO!"
+rem args: %~1=version_path  → sets HOPCODE_GH_BASE_URL
+set "HOPCODE_GH_REPO=QwenLM/qwen-code"
+if defined HOPCODE_INSTALL_GITHUB_REPO set "HOPCODE_GH_REPO=!HOPCODE_INSTALL_GITHUB_REPO!"
 if /i "%~1"=="latest" (
-    set "QWEN_GH_BASE_URL=https://github.com/!QWEN_GH_REPO!/releases/latest/download"
+    set "HOPCODE_GH_BASE_URL=https://github.com/!HOPCODE_GH_REPO!/releases/latest/download"
 ) else (
-    set "QWEN_GH_BASE_URL=https://github.com/!QWEN_GH_REPO!/releases/download/%~1"
+    set "HOPCODE_GH_BASE_URL=https://github.com/!HOPCODE_GH_REPO!/releases/download/%~1"
 )
-set "QWEN_GH_REPO="
+set "HOPCODE_GH_REPO="
 exit /b 0
 
 :AliyunBaseUrlForVersion
-rem args: %~1=version_path  → sets QWEN_OSS_BASE_URL
-set "QWEN_OSS_BASE_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/%~1"
+rem args: %~1=version_path  → sets HOPCODE_OSS_BASE_URL
+set "HOPCODE_OSS_BASE_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/%~1"
 exit /b 0
 
 :AliyunLatestVersionUrl
-set "QWEN_OSS_LATEST_VERSION_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/latest/VERSION"
+set "HOPCODE_OSS_LATEST_VERSION_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/latest/VERSION"
 exit /b 0
 
 :RaceMirrorHead
 rem args: %~1=timeout_seconds %~2=gh_url %~3=oss_url
-rem Sets QWEN_RACE_RESULT to "aliyun", "github", or "timeout". Sequential
+rem Sets HOPCODE_RACE_RESULT to "aliyun", "github", or "timeout". Sequential
 rem (OSS first, GH fallback) keeps the PowerShell snippet small; a true
 rem parallel race adds a lot of escaping for marginal speedup since OSS HEAD
 rem is sub-second when reachable. Caller decides what to do with "timeout"
 rem (currently: log it and fall back to github).
-set "QWEN_RACE_TIMEOUT=%~1"
-set "QWEN_RACE_GH_URL=%~2"
-set "QWEN_RACE_OSS_URL=%~3"
-set "QWEN_RACE_RESULT=timeout"
-for /f "delims=" %%r in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='SilentlyContinue'; $t=[int]$env:QWEN_RACE_TIMEOUT; try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Probe($url) { try { $r = [Net.WebRequest]::Create($url); $r.Method = 'HEAD'; $r.Timeout = $t * 1000; if ($r -is [Net.HttpWebRequest]) { $r.AllowAutoRedirect = $true }; $resp = $r.GetResponse(); $resp.Close(); return $true } catch { return $false } }; if (Probe $env:QWEN_RACE_OSS_URL) { Write-Output 'aliyun'; exit 0 } elseif (Probe $env:QWEN_RACE_GH_URL) { Write-Output 'github'; exit 0 } else { Write-Output 'timeout'; exit 0 }"') do set "QWEN_RACE_RESULT=%%r"
-set "QWEN_RACE_TIMEOUT="
-set "QWEN_RACE_GH_URL="
-set "QWEN_RACE_OSS_URL="
+set "HOPCODE_RACE_TIMEOUT=%~1"
+set "HOPCODE_RACE_GH_URL=%~2"
+set "HOPCODE_RACE_OSS_URL=%~3"
+set "HOPCODE_RACE_RESULT=timeout"
+for /f "delims=" %%r in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='SilentlyContinue'; $t=[int]$env:HOPCODE_RACE_TIMEOUT; try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Probe($url) { try { $r = [Net.WebRequest]::Create($url); $r.Method = 'HEAD'; $r.Timeout = $t * 1000; if ($r -is [Net.HttpWebRequest]) { $r.AllowAutoRedirect = $true }; $resp = $r.GetResponse(); $resp.Close(); return $true } catch { return $false } }; if (Probe $env:HOPCODE_RACE_OSS_URL) { Write-Output 'aliyun'; exit 0 } elseif (Probe $env:HOPCODE_RACE_GH_URL) { Write-Output 'github'; exit 0 } else { Write-Output 'timeout'; exit 0 }"') do set "HOPCODE_RACE_RESULT=%%r"
+set "HOPCODE_RACE_TIMEOUT="
+set "HOPCODE_RACE_GH_URL="
+set "HOPCODE_RACE_OSS_URL="
 exit /b 0
 
 :StandaloneBaseUrl
@@ -540,24 +540,24 @@ if /i "!MIRROR!"=="auto" (
     call :GithubBaseUrlForVersion "!VERSION_PATH!"
     if /i "!VERSION_PATH!"=="latest" (
         call :AliyunLatestVersionUrl
-        set "QWEN_OSS_PROBE_URL=!QWEN_OSS_LATEST_VERSION_URL!"
+        set "HOPCODE_OSS_PROBE_URL=!HOPCODE_OSS_LATEST_VERSION_URL!"
     ) else (
         call :AliyunBaseUrlForVersion "!VERSION_PATH!"
-        set "QWEN_OSS_PROBE_URL=!QWEN_OSS_BASE_URL!/SHA256SUMS"
+        set "HOPCODE_OSS_PROBE_URL=!HOPCODE_OSS_BASE_URL!/SHA256SUMS"
     )
-    call :RaceMirrorHead 2 "!QWEN_GH_BASE_URL!/SHA256SUMS" "!QWEN_OSS_PROBE_URL!"
-    if /i "!QWEN_RACE_RESULT!"=="timeout" (
+    call :RaceMirrorHead 2 "!HOPCODE_GH_BASE_URL!/SHA256SUMS" "!HOPCODE_OSS_PROBE_URL!"
+    if /i "!HOPCODE_RACE_RESULT!"=="timeout" (
         echo INFO: Mirror auto-selection timed out; defaulting to github.
         set "MIRROR=github"
     ) else (
-        set "MIRROR=!QWEN_RACE_RESULT!"
-        echo INFO: Mirror auto-selected via HEAD probe: !QWEN_RACE_RESULT!
+        set "MIRROR=!HOPCODE_RACE_RESULT!"
+        echo INFO: Mirror auto-selected via HEAD probe: !HOPCODE_RACE_RESULT!
     )
-    set "QWEN_GH_BASE_URL="
-    set "QWEN_OSS_BASE_URL="
-    set "QWEN_OSS_LATEST_VERSION_URL="
-    set "QWEN_OSS_PROBE_URL="
-    set "QWEN_RACE_RESULT="
+    set "HOPCODE_GH_BASE_URL="
+    set "HOPCODE_OSS_BASE_URL="
+    set "HOPCODE_OSS_LATEST_VERSION_URL="
+    set "HOPCODE_OSS_PROBE_URL="
+    set "HOPCODE_RACE_RESULT="
 )
 
 if /i "!MIRROR!"=="aliyun" (
@@ -565,15 +565,15 @@ if /i "!MIRROR!"=="aliyun" (
     if !ERRORLEVEL! NEQ 0 exit /b 1
     set "STANDALONE_VERSION_PATH=!RESOLVED_VERSION_PATH!"
     call :AliyunBaseUrlForVersion "!RESOLVED_VERSION_PATH!"
-    set "STANDALONE_BASE_URL=!QWEN_OSS_BASE_URL!"
-    set "QWEN_OSS_BASE_URL="
+    set "STANDALONE_BASE_URL=!HOPCODE_OSS_BASE_URL!"
+    set "HOPCODE_OSS_BASE_URL="
     set "RESOLVED_VERSION_PATH="
     exit /b 0
 )
 
 call :GithubBaseUrlForVersion "!VERSION_PATH!"
-set "STANDALONE_BASE_URL=!QWEN_GH_BASE_URL!"
-set "QWEN_GH_BASE_URL="
+set "STANDALONE_BASE_URL=!HOPCODE_GH_BASE_URL!"
+set "HOPCODE_GH_BASE_URL="
 exit /b 0
 
 :UseGithubFallbackBaseUrl
@@ -590,40 +590,40 @@ rem Prepend the install dir to the user-level PATH (HKCU\Environment) via
 rem [Environment]::SetEnvironmentVariable. Idempotent: skips if the dir is
 rem already on the user PATH. Uses PowerShell rather than `setx` because setx
 rem truncates PATH at 1024 chars, which can silently mangle long PATHs.
-set "QWEN_NEW_BIN=%~1"
-if "!QWEN_NEW_BIN!"=="" exit /b 0
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$bin = $env:QWEN_NEW_BIN; $userPath = [Environment]::GetEnvironmentVariable('Path', 'User'); if ([string]::IsNullOrEmpty($userPath)) { $userPath = '' }; $entries = $userPath -split ';' | Where-Object { $_ -ne '' }; if ($entries -contains $bin) { Write-Output ('INFO: User PATH already contains ' + $bin + ' (skipping).'); exit 0 }; $newPath = (@($bin) + $entries) -join ';'; [Environment]::SetEnvironmentVariable('Path', $newPath, 'User'); Write-Output ('SUCCESS: Prepended ' + $bin + ' to your user PATH.'); Write-Output 'INFO: Open a NEW command prompt for the change to take effect.'"
+set "HOPCODE_NEW_BIN=%~1"
+if "!HOPCODE_NEW_BIN!"=="" exit /b 0
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$bin = $env:HOPCODE_NEW_BIN; $userPath = [Environment]::GetEnvironmentVariable('Path', 'User'); if ([string]::IsNullOrEmpty($userPath)) { $userPath = '' }; $entries = $userPath -split ';' | Where-Object { $_ -ne '' }; if ($entries -contains $bin) { Write-Output ('INFO: User PATH already contains ' + $bin + ' (skipping).'); exit 0 }; $newPath = (@($bin) + $entries) -join ';'; [Environment]::SetEnvironmentVariable('Path', $newPath, 'User'); Write-Output ('SUCCESS: Prepended ' + $bin + ' to your user PATH.'); Write-Output 'INFO: Open a NEW command prompt for the change to take effect.'"
 set "PS_STATUS=%ERRORLEVEL%"
-set "QWEN_NEW_BIN="
+set "HOPCODE_NEW_BIN="
 exit /b %PS_STATUS%
 
 :UrlExists
-set "QWEN_CHECK_URL=%~1"
+set "HOPCODE_CHECK_URL=%~1"
 rem Prefer Tls12+Tls13; fall back to Tls12 alone on older .NET Framework where the Tls13 enum is missing.
 rem AllowAutoRedirect=true is required for GitHub release asset URLs which return HTTP 302.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Test-QwenUrl($method, $range) { try { $request = [Net.WebRequest]::Create($env:QWEN_CHECK_URL); $request.Timeout = 10000; $request.Method = $method; if ($range) { $request.Headers.Add('Range', 'bytes=0-0') }; if ($request -is [Net.HttpWebRequest]) { $request.ReadWriteTimeout = 30000; $request.AllowAutoRedirect = $true }; $response = $request.GetResponse(); $response.Close(); return $true } catch { return $false } }; if (Test-QwenUrl 'HEAD' $false) { exit 0 }; if (Test-QwenUrl 'GET' $true) { exit 0 }; exit 1" >nul 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Test-HopcodeUrl($method, $range) { try { $request = [Net.WebRequest]::Create($env:HOPCODE_CHECK_URL); $request.Timeout = 10000; $request.Method = $method; if ($range) { $request.Headers.Add('Range', 'bytes=0-0') }; if ($request -is [Net.HttpWebRequest]) { $request.ReadWriteTimeout = 30000; $request.AllowAutoRedirect = $true }; $response = $request.GetResponse(); $response.Close(); return $true } catch { return $false } }; if (Test-HopcodeUrl 'HEAD' $false) { exit 0 }; if (Test-HopcodeUrl 'GET' $true) { exit 0 }; exit 1" >nul 2>&1
 set "PS_STATUS=%ERRORLEVEL%"
-set "QWEN_CHECK_URL="
+set "HOPCODE_CHECK_URL="
 exit /b %PS_STATUS%
 
 :DownloadFile
-set "QWEN_DOWNLOAD_URL=%~1"
-set "QWEN_DOWNLOAD_DEST=%~2"
+set "HOPCODE_DOWNLOAD_URL=%~1"
+set "HOPCODE_DOWNLOAD_DEST=%~2"
 rem Prefer curl.exe -# for a hash-mark progress bar (Windows 10+ includes it);
 rem fall back to Invoke-WebRequest (which shows its own progress bar).
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $curl = $env:QWEN_INSTALL_CURL_EXE; if ([string]::IsNullOrEmpty($curl)) { $cmd = Get-Command curl.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -ne $cmd) { $curl = $cmd.Source } }; if (-not [string]::IsNullOrEmpty($curl)) { & $curl --connect-timeout 15 --max-time 300 --retry 2 -#fSLo $env:QWEN_DOWNLOAD_DEST $env:QWEN_DOWNLOAD_URL; if ($LASTEXITCODE -ne 0) { throw ('curl.exe download failed (exit code ' + $LASTEXITCODE + ')') }; exit 0 }; try { try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; Invoke-WebRequest -Uri $env:QWEN_DOWNLOAD_URL -OutFile $env:QWEN_DOWNLOAD_DEST -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 300; exit 0 } catch { [Console]::Error.WriteLine('Download error: ' + $_.Exception.Message); exit 1 }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $curl = $env:HOPCODE_INSTALL_CURL_EXE; if ([string]::IsNullOrEmpty($curl)) { $cmd = Get-Command curl.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -ne $cmd) { $curl = $cmd.Source } }; if (-not [string]::IsNullOrEmpty($curl)) { & $curl --connect-timeout 15 --max-time 300 --retry 2 -#fSLo $env:HOPCODE_DOWNLOAD_DEST $env:HOPCODE_DOWNLOAD_URL; if ($LASTEXITCODE -ne 0) { throw ('curl.exe download failed (exit code ' + $LASTEXITCODE + ')') }; exit 0 }; try { try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; Invoke-WebRequest -Uri $env:HOPCODE_DOWNLOAD_URL -OutFile $env:HOPCODE_DOWNLOAD_DEST -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 300; exit 0 } catch { [Console]::Error.WriteLine('Download error: ' + $_.Exception.Message); exit 1 }"
 set "PS_STATUS=%ERRORLEVEL%"
-set "QWEN_DOWNLOAD_URL="
-set "QWEN_DOWNLOAD_DEST="
+set "HOPCODE_DOWNLOAD_URL="
+set "HOPCODE_DOWNLOAD_DEST="
 exit /b %PS_STATUS%
 
 :DownloadFileQuiet
-set "QWEN_DOWNLOAD_URL=%~1"
-set "QWEN_DOWNLOAD_DEST=%~2"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $curl = $env:QWEN_INSTALL_CURL_EXE; if ([string]::IsNullOrEmpty($curl)) { $cmd = Get-Command curl.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -ne $cmd) { $curl = $cmd.Source } }; if (-not [string]::IsNullOrEmpty($curl)) { & $curl --connect-timeout 15 --max-time 300 --retry 2 -fsSLo $env:QWEN_DOWNLOAD_DEST $env:QWEN_DOWNLOAD_URL; if ($LASTEXITCODE -ne 0) { throw ('curl.exe download failed (exit code ' + $LASTEXITCODE + ')') }; exit 0 }; try { $ProgressPreference = 'SilentlyContinue'; try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; Invoke-WebRequest -Uri $env:QWEN_DOWNLOAD_URL -OutFile $env:QWEN_DOWNLOAD_DEST -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 300; exit 0 } catch { [Console]::Error.WriteLine('Download error: ' + $_.Exception.Message); exit 1 }"
+set "HOPCODE_DOWNLOAD_URL=%~1"
+set "HOPCODE_DOWNLOAD_DEST=%~2"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $curl = $env:HOPCODE_INSTALL_CURL_EXE; if ([string]::IsNullOrEmpty($curl)) { $cmd = Get-Command curl.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -ne $cmd) { $curl = $cmd.Source } }; if (-not [string]::IsNullOrEmpty($curl)) { & $curl --connect-timeout 15 --max-time 300 --retry 2 -fsSLo $env:HOPCODE_DOWNLOAD_DEST $env:HOPCODE_DOWNLOAD_URL; if ($LASTEXITCODE -ne 0) { throw ('curl.exe download failed (exit code ' + $LASTEXITCODE + ')') }; exit 0 }; try { $ProgressPreference = 'SilentlyContinue'; try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; Invoke-WebRequest -Uri $env:HOPCODE_DOWNLOAD_URL -OutFile $env:HOPCODE_DOWNLOAD_DEST -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 300; exit 0 } catch { [Console]::Error.WriteLine('Download error: ' + $_.Exception.Message); exit 1 }"
 set "PS_STATUS=%ERRORLEVEL%"
-set "QWEN_DOWNLOAD_URL="
-set "QWEN_DOWNLOAD_DEST="
+set "HOPCODE_DOWNLOAD_URL="
+set "HOPCODE_DOWNLOAD_DEST="
 exit /b %PS_STATUS%
 
 :ResolveAliyunVersionPath
@@ -634,33 +634,33 @@ if /i not "%~1"=="latest" (
 )
 
 call :AliyunLatestVersionUrl
-call :CreateTempFile "qwen-code-latest-version"
+call :CreateTempFile "hopcode-code-latest-version"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 set "TEMP_VERSION_FILE=!TEMP_FILE!"
 
-call :DownloadFileQuiet "!QWEN_OSS_LATEST_VERSION_URL!" "!TEMP_VERSION_FILE!"
+call :DownloadFileQuiet "!HOPCODE_OSS_LATEST_VERSION_URL!" "!TEMP_VERSION_FILE!"
 if !ERRORLEVEL! NEQ 0 (
     if exist "!TEMP_VERSION_FILE!" del /F /Q "!TEMP_VERSION_FILE!" >nul 2>&1
     set "TEMP_VERSION_FILE="
-    set "QWEN_OSS_LATEST_VERSION_URL="
+    set "HOPCODE_OSS_LATEST_VERSION_URL="
     echo WARNING: Failed to resolve Aliyun latest VERSION pointer.
     exit /b 1
 )
 
 set "NORMALIZED_VERSION_FILE=!TEMP_VERSION_FILE!.normalized"
-set "QWEN_VERSION_POINTER_FILE=!TEMP_VERSION_FILE!"
-set "QWEN_NORMALIZED_VERSION_FILE=!NORMALIZED_VERSION_FILE!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$value = [IO.File]::ReadAllText($env:QWEN_VERSION_POINTER_FILE).Trim(); $value = $value.Trim([char]0xfeff); if ($value -match '^v?[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9]+)*$') { if (-not $value.StartsWith('v')) { $value = 'v' + $value }; [IO.File]::WriteAllText($env:QWEN_NORMALIZED_VERSION_FILE, $value, [Text.UTF8Encoding]::new($false)); exit 0 }; exit 1"
+set "HOPCODE_VERSION_POINTER_FILE=!TEMP_VERSION_FILE!"
+set "HOPCODE_NORMALIZED_VERSION_FILE=!NORMALIZED_VERSION_FILE!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$value = [IO.File]::ReadAllText($env:HOPCODE_VERSION_POINTER_FILE).Trim(); $value = $value.Trim([char]0xfeff); if ($value -match '^v?[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9]+)*$') { if (-not $value.StartsWith('v')) { $value = 'v' + $value }; [IO.File]::WriteAllText($env:HOPCODE_NORMALIZED_VERSION_FILE, $value, [Text.UTF8Encoding]::new($false)); exit 0 }; exit 1"
 if !ERRORLEVEL! EQU 0 (
     for /f "usebackq delims=" %%V in ("!NORMALIZED_VERSION_FILE!") do if not defined RESOLVED_VERSION_PATH set "RESOLVED_VERSION_PATH=%%V"
 )
-set "QWEN_VERSION_POINTER_FILE="
-set "QWEN_NORMALIZED_VERSION_FILE="
+set "HOPCODE_VERSION_POINTER_FILE="
+set "HOPCODE_NORMALIZED_VERSION_FILE="
 if exist "!NORMALIZED_VERSION_FILE!" del /F /Q "!NORMALIZED_VERSION_FILE!" >nul 2>&1
 set "NORMALIZED_VERSION_FILE="
 if exist "!TEMP_VERSION_FILE!" del /F /Q "!TEMP_VERSION_FILE!" >nul 2>&1
 set "TEMP_VERSION_FILE="
-set "QWEN_OSS_LATEST_VERSION_URL="
+set "HOPCODE_OSS_LATEST_VERSION_URL="
 
 if "!RESOLVED_VERSION_PATH!"=="" (
     echo ERROR: Aliyun latest VERSION pointer is not a valid semver value.
@@ -680,7 +680,7 @@ if "!CHECKSUM_FILE!"=="" (
     for %%I in ("!ARCHIVE_FILE!") do set "CHECKSUM_FILE=%%~dpISHA256SUMS"
 ) else (
     if /i "!CHECKSUM_FILE:~0,8!"=="https://" (
-        call :CreateTempFile "qwen-code-checksums"
+        call :CreateTempFile "hopcode-code-checksums"
         if !ERRORLEVEL! NEQ 0 exit /b 1
         set "TEMP_CHECKSUM=!TEMP_FILE!"
         call :DownloadFile "!CHECKSUM_FILE!" "!TEMP_CHECKSUM!"
@@ -715,11 +715,11 @@ if "!EXPECTED_HASH!"=="" (
 )
 
 set "ACTUAL_HASH="
-set "QWEN_HASH_FILE=!ARCHIVE_FILE!"
-for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; (Get-FileHash -Algorithm SHA256 -LiteralPath $env:QWEN_HASH_FILE).Hash" 2^>nul') do (
+set "HOPCODE_HASH_FILE=!ARCHIVE_FILE!"
+for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; (Get-FileHash -Algorithm SHA256 -LiteralPath $env:HOPCODE_HASH_FILE).Hash" 2^>nul') do (
     if "!ACTUAL_HASH!"=="" set "ACTUAL_HASH=%%H"
 )
-set "QWEN_HASH_FILE="
+set "HOPCODE_HASH_FILE="
 
 if not "!TEMP_CHECKSUM!"=="" del /F /Q "!TEMP_CHECKSUM!" >nul 2>&1
 
@@ -760,8 +760,8 @@ if not "!ARCHIVE_PATH!"=="" (
         call :ReleaseVersionPath
         set "REQUESTED_VERSION_PATH=!VERSION_PATH!"
         call :GithubBaseUrlForVersion "!VERSION_PATH!"
-        set "GITHUB_FALLBACK_BASE_URL=!QWEN_GH_BASE_URL!"
-        set "QWEN_GH_BASE_URL="
+        set "GITHUB_FALLBACK_BASE_URL=!HOPCODE_GH_BASE_URL!"
+        set "HOPCODE_GH_BASE_URL="
     )
 
     call :StandaloneBaseUrl
@@ -778,8 +778,8 @@ if not "!ARCHIVE_PATH!"=="" (
     )
     if not "!GITHUB_FALLBACK_BASE_URL!"=="" if /i "!REQUESTED_VERSION_PATH!"=="latest" if /i "!MIRROR!"=="aliyun" if not "!STANDALONE_VERSION_PATH!"=="" (
         call :GithubBaseUrlForVersion "!STANDALONE_VERSION_PATH!"
-        set "GITHUB_FALLBACK_BASE_URL=!QWEN_GH_BASE_URL!"
-        set "QWEN_GH_BASE_URL="
+        set "GITHUB_FALLBACK_BASE_URL=!HOPCODE_GH_BASE_URL!"
+        set "HOPCODE_GH_BASE_URL="
     )
     if /i "!STANDALONE_BASE_URL!"=="!GITHUB_FALLBACK_BASE_URL!" set "GITHUB_FALLBACK_BASE_URL="
     set "ARCHIVE_URL=!STANDALONE_BASE_URL!/!ARCHIVE_NAME!"
@@ -856,12 +856,12 @@ if !ERRORLEVEL! NEQ 0 (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
     exit /b 1
 )
-set "QWEN_ARCHIVE_FILE=!ARCHIVE_FILE!"
-set "QWEN_EXTRACT_DIR=!EXTRACT_DIR!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference = 'SilentlyContinue'; Expand-Archive -LiteralPath $env:QWEN_ARCHIVE_FILE -DestinationPath $env:QWEN_EXTRACT_DIR -Force"
+set "HOPCODE_ARCHIVE_FILE=!ARCHIVE_FILE!"
+set "HOPCODE_EXTRACT_DIR=!EXTRACT_DIR!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference = 'SilentlyContinue'; Expand-Archive -LiteralPath $env:HOPCODE_ARCHIVE_FILE -DestinationPath $env:HOPCODE_EXTRACT_DIR -Force"
 set "PS_STATUS=!ERRORLEVEL!"
-set "QWEN_ARCHIVE_FILE="
-set "QWEN_EXTRACT_DIR="
+set "HOPCODE_ARCHIVE_FILE="
+set "HOPCODE_EXTRACT_DIR="
 if !PS_STATUS! NEQ 0 (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
     echo ERROR: Failed to extract standalone archive.
@@ -874,7 +874,7 @@ if !ERRORLEVEL! NEQ 0 (
     exit /b 1
 )
 
-if not exist "!EXTRACT_DIR!\qwen-code\bin\qwen.cmd" (
+if not exist "!EXTRACT_DIR!\qwen-code\bin\hopcode.cmd" (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
     echo ERROR: Archive does not contain qwen-code\bin\qwen.cmd.
     exit /b 1
@@ -974,7 +974,7 @@ rem (`!`) and other shell-metacharacters in those values; if that validator is e
 rem loosened, the wrapper write below becomes a command injection sink.
 (
 echo @echo off
-echo call "!INSTALL_DIR!\bin\qwen.cmd" %%*
+echo call "!INSTALL_DIR!\bin\hopcode.cmd" %%*
 ) > "!INSTALL_BIN_DIR!\qwen.cmd.new"
 if !ERRORLEVEL! NEQ 0 (
     call :RemoveInstalledDirWithWarning
@@ -983,7 +983,7 @@ if !ERRORLEVEL! NEQ 0 (
     echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
-move /Y "!INSTALL_BIN_DIR!\qwen.cmd.new" "!INSTALL_BIN_DIR!\qwen.cmd" >nul
+move /Y "!INSTALL_BIN_DIR!\qwen.cmd.new" "!INSTALL_BIN_DIR!\hopcode.cmd" >nul
 if !ERRORLEVEL! NEQ 0 (
     if exist "!INSTALL_BIN_DIR!\qwen.cmd.new" del /F /Q "!INSTALL_BIN_DIR!\qwen.cmd.new" >nul 2>&1
     call :RemoveInstalledDirWithWarning
@@ -1017,11 +1017,11 @@ exit /b 0
 
 :CreateTempFile
 set "TEMP_FILE="
-set "QWEN_TEMP_FILE_PREFIX=%~1"
-set "QWEN_TEMP_FILE_EXTENSION=%~2"
-for /f "usebackq delims=" %%I in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $file = Join-Path $env:TEMP ($env:QWEN_TEMP_FILE_PREFIX + '-' + [IO.Path]::GetRandomFileName() + $env:QWEN_TEMP_FILE_EXTENSION); New-Item -ItemType File -Path $file -ErrorAction Stop | Out-Null; [Console]::Write($file)"`) do set "TEMP_FILE=%%I"
-set "QWEN_TEMP_FILE_PREFIX="
-set "QWEN_TEMP_FILE_EXTENSION="
+set "HOPCODE_TEMP_FILE_PREFIX=%~1"
+set "HOPCODE_TEMP_FILE_EXTENSION=%~2"
+for /f "usebackq delims=" %%I in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $file = Join-Path $env:TEMP ($env:HOPCODE_TEMP_FILE_PREFIX + '-' + [IO.Path]::GetRandomFileName() + $env:HOPCODE_TEMP_FILE_EXTENSION); New-Item -ItemType File -Path $file -ErrorAction Stop | Out-Null; [Console]::Write($file)"`) do set "TEMP_FILE=%%I"
+set "HOPCODE_TEMP_FILE_PREFIX="
+set "HOPCODE_TEMP_FILE_EXTENSION="
 if "!TEMP_FILE!"=="" (
     echo ERROR: Failed to create a temporary file.
     exit /b 1
@@ -1030,10 +1030,10 @@ exit /b 0
 
 :EnsureDir
 set "REQUIRED_DIR=%~1"
-set "QWEN_REQUIRED_DIR=!REQUIRED_DIR!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $path = $env:QWEN_REQUIRED_DIR; if (Test-Path -LiteralPath $path -PathType Container) { exit 0 }; if (Test-Path -LiteralPath $path) { exit 2 }; New-Item -ItemType Directory -Path $path -Force | Out-Null; exit 0"
+set "HOPCODE_REQUIRED_DIR=!REQUIRED_DIR!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $path = $env:HOPCODE_REQUIRED_DIR; if (Test-Path -LiteralPath $path -PathType Container) { exit 0 }; if (Test-Path -LiteralPath $path) { exit 2 }; New-Item -ItemType Directory -Path $path -Force | Out-Null; exit 0"
 set "PS_STATUS=!ERRORLEVEL!"
-set "QWEN_REQUIRED_DIR="
+set "HOPCODE_REQUIRED_DIR="
 if !PS_STATUS! EQU 0 exit /b 0
 if !PS_STATUS! EQU 2 (
     echo ERROR: Path exists but is not a directory: !REQUIRED_DIR!
@@ -1043,16 +1043,16 @@ echo ERROR: Failed to create directory: !REQUIRED_DIR!
 exit /b 1
 
 :ValidateArchiveContents
-set "QWEN_ARCHIVE_FILE=%~1"
+set "HOPCODE_ARCHIVE_FILE=%~1"
 REM Normalize backslashes to forward slashes before checking. Some Windows
 REM zip producers (including PowerShell's Compress-Archive) emit entries
 REM with backslash separators even though the ZIP spec requires '/'. We
 REM accept either separator and reject only entries that, after
 REM normalization, are empty, absolute, drive-rooted, or contain a '..'
 REM segment.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $archive = $null; try { Add-Type -AssemblyName System.IO.Compression.FileSystem; $archive = [IO.Compression.ZipFile]::OpenRead($env:QWEN_ARCHIVE_FILE); foreach ($entry in $archive.Entries) { $raw = $entry.FullName; if ($raw.IndexOfAny([char[]](10,13)) -ge 0) { [Console]::Error.WriteLine('Archive contains unsafe path with control character: ' + $raw); exit 1 }; $name = $raw -replace '\\', '/'; while ($name.StartsWith('./')) { $name = $name.Substring(2) }; if ($name -eq '' -or $name.StartsWith('/') -or $name -match '^[A-Za-z]:' -or $name -match '(^|/)\.\.(/|$)') { [Console]::Error.WriteLine('Archive contains unsafe path: ' + $entry.FullName); exit 1 } } } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 } finally { if ($null -ne $archive) { $archive.Dispose() } }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $archive = $null; try { Add-Type -AssemblyName System.IO.Compression.FileSystem; $archive = [IO.Compression.ZipFile]::OpenRead($env:HOPCODE_ARCHIVE_FILE); foreach ($entry in $archive.Entries) { $raw = $entry.FullName; if ($raw.IndexOfAny([char[]](10,13)) -ge 0) { [Console]::Error.WriteLine('Archive contains unsafe path with control character: ' + $raw); exit 1 }; $name = $raw -replace '\\', '/'; while ($name.StartsWith('./')) { $name = $name.Substring(2) }; if ($name -eq '' -or $name.StartsWith('/') -or $name -match '^[A-Za-z]:' -or $name -match '(^|/)\.\.(/|$)') { [Console]::Error.WriteLine('Archive contains unsafe path: ' + $entry.FullName); exit 1 } } } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 } finally { if ($null -ne $archive) { $archive.Dispose() } }"
 set "PS_STATUS=%ERRORLEVEL%"
-set "QWEN_ARCHIVE_FILE="
+set "HOPCODE_ARCHIVE_FILE="
 if %PS_STATUS% EQU 0 exit /b 0
 if %PS_STATUS% EQU 1 (
     echo ERROR: Archive contains unsafe path entries.
@@ -1093,19 +1093,19 @@ if !ERRORLEVEL! NEQ 0 (
 exit /b 0
 
 :RejectArchiveLinks
-set "QWEN_EXTRACT_DIR=%~1"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$item = Get-ChildItem -LiteralPath $env:QWEN_EXTRACT_DIR -Recurse -Force | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 } | Select-Object -First 1; if ($item) { exit 1 }"
+set "HOPCODE_EXTRACT_DIR=%~1"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$item = Get-ChildItem -LiteralPath $env:HOPCODE_EXTRACT_DIR -Recurse -Force | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 } | Select-Object -First 1; if ($item) { exit 1 }"
 set "PS_STATUS=%ERRORLEVEL%"
-set "QWEN_EXTRACT_DIR="
+set "HOPCODE_EXTRACT_DIR="
 if %PS_STATUS% NEQ 0 echo ERROR: Archive contains symlinks or reparse points; refusing to install.
 exit /b %PS_STATUS%
 
 :EnsureManagedInstallDir
 set "MANAGED_DIR=%~1"
-set "QWEN_MANAGED_DIR=!MANAGED_DIR!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = $env:QWEN_MANAGED_DIR; if (!(Test-Path -LiteralPath $dir)) { exit 0 }; if (!(Test-Path -LiteralPath $dir -PathType Container)) { exit 1 }; $manifest = Join-Path $dir 'manifest.json'; if (!(Test-Path -LiteralPath $manifest -PathType Leaf)) { exit 1 }; try { $data = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json } catch { exit 1 }; if ($data.name -ne '@hoptrendy/hopcode-cli') { exit 1 }; if ([string]$data.target -notmatch '^win-(x64|arm64)$') { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'bin\qwen.cmd') -PathType Leaf)) { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'node\node.exe') -PathType Leaf)) { exit 1 }; exit 0"
+set "HOPCODE_MANAGED_DIR=!MANAGED_DIR!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = $env:HOPCODE_MANAGED_DIR; if (!(Test-Path -LiteralPath $dir)) { exit 0 }; if (!(Test-Path -LiteralPath $dir -PathType Container)) { exit 1 }; $manifest = Join-Path $dir 'manifest.json'; if (!(Test-Path -LiteralPath $manifest -PathType Leaf)) { exit 1 }; try { $data = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json } catch { exit 1 }; if ($data.name -ne '@hoptrendy/hopcode-cli') { exit 1 }; if ([string]$data.target -notmatch '^win-(x64|arm64)$') { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'bin\qwen.cmd') -PathType Leaf)) { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'node\node.exe') -PathType Leaf)) { exit 1 }; exit 0"
 set "PS_STATUS=!ERRORLEVEL!"
-set "QWEN_MANAGED_DIR="
+set "HOPCODE_MANAGED_DIR="
 if !PS_STATUS! EQU 0 exit /b 0
 
 rem Directory exists but is not a qwen-code standalone install.
@@ -1185,7 +1185,7 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 
 call :NpmPackageSpec
 
-where qwen >nul 2>&1
+where hopcode >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     for /f "delims=" %%i in ('qwen --version 2^>nul') do set "QWEN_VERSION=%%i"
     echo INFO: Existing Qwen Code detected: !QWEN_VERSION!
@@ -1214,15 +1214,15 @@ exit /b 0
 :CreateSourceJson
 if "!SOURCE!"=="unknown" exit /b 0
 
-set "QWEN_DIR=!USERPROFILE!\.qwen"
-call :EnsureDir "!QWEN_DIR!"
+set "HOPCODE_DIR=!USERPROFILE!\.qwen"
+call :EnsureDir "!HOPCODE_DIR!"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 
 (
 echo {
 echo   "source": "!SOURCE!"
 echo }
-) > "!QWEN_DIR!\source.json"
+) > "!HOPCODE_DIR!\source.json"
 
 echo SUCCESS: Installation source saved to !USERPROFILE!\.qwen\source.json
 exit /b 0
@@ -1236,7 +1236,7 @@ if "!SUMMARY_INSTALL_METHOD!"=="" set "SUMMARY_INSTALL_METHOD=standalone"
 
 set "INSTALLED_BIN="
 if not "!EXTRA_BIN!"=="" (
-    set "INSTALLED_BIN=!EXTRA_BIN!\qwen.cmd"
+    set "INSTALLED_BIN=!EXTRA_BIN!\hopcode.cmd"
     set "PATH=!EXTRA_BIN!;!PATH!"
 )
 
@@ -1268,7 +1268,7 @@ if /i "!SUMMARY_INSTALL_METHOD!"=="npm" (
 ) else (
     if not "!SUMMARY_INSTALL_DIR!"=="" (
         if not "!EXTRA_BIN!"=="" (
-            echo   set "QWEN_INSTALL_LIB_DIR=!SUMMARY_INSTALL_DIR!" ^&^& set "QWEN_INSTALL_BIN_DIR=!EXTRA_BIN!" ^&^& powershell -ExecutionPolicy Bypass -c "irm !STANDALONE_UNINSTALL_URL! ^| iex"
+            echo   set "HOPCODE_INSTALL_LIB_DIR=!SUMMARY_INSTALL_DIR!" ^&^& set "HOPCODE_INSTALL_BIN_DIR=!EXTRA_BIN!" ^&^& powershell -ExecutionPolicy Bypass -c "irm !STANDALONE_UNINSTALL_URL! ^| iex"
         ) else (
             echo   powershell -ExecutionPolicy Bypass -c "irm !STANDALONE_UNINSTALL_URL! ^| iex"
         )
@@ -1277,10 +1277,10 @@ if /i "!SUMMARY_INSTALL_METHOD!"=="npm" (
     )
 )
 
-rem Build OTHER_QWENS = PRE_INSTALL_QWENS_LIST minus the install we just made.
+rem Build OTHER_QWENS = PRE_INSTALL_HOPCODES_LIST minus the install we just made.
 set "OTHER_QWENS="
-if defined PRE_INSTALL_QWENS_LIST (
-    for %%i in ("!PRE_INSTALL_QWENS_LIST:|=" "!") do (
+if defined PRE_INSTALL_HOPCODES_LIST (
+    for %%i in ("!PRE_INSTALL_HOPCODES_LIST:|=" "!") do (
         set "ENTRY=%%~i"
         if not "!ENTRY!"=="" if /i not "!ENTRY!"=="!INSTALLED_BIN!" (
             if "!OTHER_QWENS!"=="" (
@@ -1303,7 +1303,7 @@ if not "!EXTRA_BIN!"=="" if /i not "!NO_MODIFY_PATH!"=="1" (
 
 if defined OTHER_QWENS (
     echo.
-    echo WARNING: Other 'qwen' executables exist on this system. Depending on
+    echo WARNING: Other 'hopcode' executables exist on this system. Depending on
     echo WARNING: your PATH order, one of these may run instead of the install above:
     for %%i in ("!OTHER_QWENS:|=" "!") do (
         set "OQ=%%~i"

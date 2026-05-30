@@ -403,7 +403,7 @@ describe('telemetry/config helpers', () => {
 
     it('reads from env (override settings)', async () => {
       const resolved = await resolveTelemetrySettings({
-        env: { QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID: 'true' },
+        env: { HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID: 'true' },
         settings: { metrics: { includeSessionId: false } },
       });
       expect(resolved.metrics?.includeSessionId).toBe(true);
@@ -411,7 +411,7 @@ describe('telemetry/config helpers', () => {
 
     it('explicit env=false overrides settings=true', async () => {
       const resolved = await resolveTelemetrySettings({
-        env: { QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID: 'false' },
+        env: { HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID: 'false' },
         settings: { metrics: { includeSessionId: true } },
       });
       expect(resolved.metrics?.includeSessionId).toBe(false);

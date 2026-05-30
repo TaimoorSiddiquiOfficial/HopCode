@@ -43,8 +43,8 @@ const REMOTE_FETCH_TIMEOUT_MS = 30_000;
 // the verify and the build will disagree on expected filenames.
 function standaloneArchiveNamesFromReleaseTargets(releaseTargets) {
   return releaseTargets.map(
-    ({ qwenTarget }) =>
-      `hopcode-${qwenTarget}.${qwenTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
+    ({ hopcodeTarget }) =>
+      `hopcode-${hopcodeTarget}.${hopcodeTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
   );
 }
 

@@ -81,7 +81,7 @@ describe('convertClaudeToHopCodeConfig', () => {
 });
 
 describe('convertClaudeAgentConfig', () => {
-  it('should map Claude NotebookEdit to Qwen NotebookEdit', () => {
+  it('should map Claude NotebookEdit to HopCode NotebookEdit', () => {
     const result = convertClaudeAgentConfig({
       name: 'notebook-agent',
       description: 'Works on notebooks',
@@ -449,7 +449,7 @@ describe('convertClaudePluginPackage', () => {
     fs.rmSync(result.convertedDir, { recursive: true, force: true });
   });
 
-  it('should convert hooks from Claude plugin format to Qwen format with variable substitution', async () => {
+  it('should convert hooks from Claude plugin format to HopCode format with variable substitution', async () => {
     // Setup: Create a plugin with hooks in Claude format
     const pluginSourceDir = path.join(testDir, 'plugin-with-hooks');
     fs.mkdirSync(pluginSourceDir, { recursive: true });

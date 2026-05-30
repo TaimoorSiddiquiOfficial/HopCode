@@ -11,7 +11,7 @@ import { createDebugLogger } from './debugLogger.js';
 
 const debugLogger = createDebugLogger('GIT');
 const GIT_STATUS_TIMEOUT_MS = 5000;
-const GIT_STATUS_SEPARATOR = '\n__QWEN_GIT_STATUS_SEPARATOR__\n';
+const GIT_STATUS_SEPARATOR = '\n__HOPCODE_GIT_STATUS_SEPARATOR__\n';
 const DETACHED_HEAD_LABEL = '(detached HEAD)';
 
 /**

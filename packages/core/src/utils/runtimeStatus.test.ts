@@ -33,7 +33,7 @@ describe('writeRuntimeStatus', () => {
       sessionId: '11111111-2222-3333-4444-555555555555',
       workDir: '/work/dir',
       pid: 4242,
-      qwenVersion: '0.15.3',
+      hopcodeVersion: '0.15.3',
     });
     expect(written).toBe(targetPath());
 
@@ -45,17 +45,17 @@ describe('writeRuntimeStatus', () => {
     expect(typeof data.hostname).toBe('string');
     expect(data.hostname.length).toBeGreaterThan(0);
     expect(typeof data.started_at).toBe('number');
-    expect(data.qwen_version).toBe('0.15.3');
+    expect(data.hopcode_version).toBe('0.15.3');
   });
 
-  it('defaults pid to process.pid and qwen_version to null', async () => {
+  it('defaults pid to process.pid and hopcode_version to null', async () => {
     await writeRuntimeStatus(targetPath(), {
       sessionId: 'abc',
       workDir: '/w',
     });
     const data = JSON.parse(await readFile(targetPath(), 'utf-8'));
     expect(data.pid).toBe(process.pid);
-    expect(data.qwen_version).toBeNull();
+    expect(data.hopcode_version).toBeNull();
   });
 
   it('leaves no .tmp leftovers on success', async () => {
@@ -113,7 +113,7 @@ describe('readRuntimeStatus', () => {
       sessionId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
       workDir: '/some/where',
       pid: 99,
-      qwenVersion: '0.15.3',
+      hopcodeVersion: '0.15.3',
     });
     const status = await readRuntimeStatus(targetPath());
     expect(status).not.toBeNull();
@@ -121,7 +121,7 @@ describe('readRuntimeStatus', () => {
     expect(status!.sessionId).toBe('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
     expect(status!.workDir).toBe('/some/where');
     expect(status!.schemaVersion).toBe(RUNTIME_STATUS_SCHEMA_VERSION);
-    expect(status!.qwenVersion).toBe('0.15.3');
+    expect(status!.hopcodeVersion).toBe('0.15.3');
   });
 
   it('returns null when the file is missing', async () => {
@@ -143,7 +143,7 @@ describe('readRuntimeStatus', () => {
         work_dir: '/w',
         hostname: 'h',
         started_at: 0,
-        qwen_version: null,
+        hopcode_version: null,
       }),
       'utf-8',
     );
@@ -160,7 +160,7 @@ describe('readRuntimeStatus', () => {
         work_dir: '/w',
         hostname: 'h',
         started_at: 0,
-        qwen_version: null,
+        hopcode_version: null,
       }),
       'utf-8',
     );
@@ -177,7 +177,7 @@ describe('readRuntimeStatus', () => {
         work_dir: '/w',
         hostname: 'h',
         started_at: 0,
-        qwen_version: null,
+        hopcode_version: null,
       }),
       'utf-8',
     );
@@ -194,7 +194,7 @@ describe('readRuntimeStatus', () => {
         work_dir: ['/', 'w'],
         hostname: 'h',
         started_at: 0,
-        qwen_version: null,
+        hopcode_version: null,
       }),
       'utf-8',
     );
@@ -251,7 +251,7 @@ describe('same-PID session swap', () => {
       sessionId: 'session-a',
       workDir: '/w',
       pid: 4242,
-      qwenVersion: '0.0.0-test',
+      hopcodeVersion: '0.0.0-test',
     });
     expect(await readRuntimeStatus(oldPath)).not.toBeNull();
 
@@ -260,7 +260,7 @@ describe('same-PID session swap', () => {
       sessionId: 'session-b',
       workDir: '/w',
       pid: 4242,
-      qwenVersion: '0.0.0-test',
+      hopcodeVersion: '0.0.0-test',
     });
 
     expect(await readRuntimeStatus(oldPath)).toBeNull();

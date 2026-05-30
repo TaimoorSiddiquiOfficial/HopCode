@@ -22,7 +22,7 @@ import type { ToolCallData as BaseToolCallData } from '../toolcalls/index.js';
 import './ChatViewer.css';
 
 /**
- * Message part containing text content (Qwen format)
+ * Message part containing text content (HopCode format)
  */
 export interface MessagePart {
   text: string;

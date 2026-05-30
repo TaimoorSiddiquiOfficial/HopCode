@@ -104,7 +104,7 @@ describe('uploadAssets (integration)', () => {
   }
 
   it('spawns ossutil with the expected cp arguments per asset', async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-upload-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-upload-'));
     try {
       const { logPath, ossutilCommand, ossutilCommandArgs } =
         makeOssutilShim(tmp);
@@ -141,7 +141,7 @@ describe('uploadAssets (integration)', () => {
   });
 
   it('aggregates failures from ossutil non-zero exits', async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-upload-fail-'));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-upload-fail-'));
     try {
       const { logPath, ossutilCommand, ossutilCommandArgs } = makeOssutilShim(
         tmp,

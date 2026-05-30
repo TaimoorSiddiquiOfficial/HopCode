@@ -8,18 +8,18 @@
 # cmd.exe (runs in current session, qwen available immediately):
 #   curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.bat -o %TEMP%\install-qwen.bat && %TEMP%\install-qwen.bat
 #
-# To pin a specific release, set $env:QWEN_INSTALL_VERSION before invoking,
-# e.g. $env:QWEN_INSTALL_VERSION = 'vX.Y.Z'. This is equivalent to passing
+# To pin a specific release, set $env:HOPCODE_INSTALL_VERSION before invoking,
+# e.g. $env:HOPCODE_INSTALL_VERSION = 'vX.Y.Z'. This is equivalent to passing
 # --version vX.Y.Z to install-qwen-standalone.bat directly.
 #
 # To point this shim at a non-production hosted endpoint (staging buckets,
-# private mirrors), set $env:QWEN_INSTALLER_BAT_URL to the alternate .bat URL.
+# private mirrors), set $env:HOPCODE_INSTALLER_BAT_URL to the alternate .bat URL.
 # The override is required to be HTTPS so a misconfigured value can't silently
 # downgrade the download channel. The downstream .bat continues to honor
-# QWEN_INSTALL_BASE_URL for archive resolution.
+# HOPCODE_INSTALL_BASE_URL for archive resolution.
 #
 # By default the matching SHA256SUMS file is read from the same hosted
-# directory as the .bat. Set $env:QWEN_INSTALLER_CHECKSUMS_URL to override it
+# directory as the .bat. Set $env:HOPCODE_INSTALLER_CHECKSUMS_URL to override it
 # when testing a custom installer endpoint.
 
 $ErrorActionPreference = 'Stop'
@@ -43,8 +43,8 @@ function Download-File {
 }
 
 function Get-QwenInstallBase {
-    if (-not [string]::IsNullOrEmpty($env:QWEN_INSTALL_ROOT)) {
-        return $env:QWEN_INSTALL_ROOT
+    if (-not [string]::IsNullOrEmpty($env:HOPCODE_INSTALL_ROOT)) {
+        return $env:HOPCODE_INSTALL_ROOT
     }
 
     if (-not [string]::IsNullOrEmpty($env:LOCALAPPDATA)) {
@@ -55,8 +55,8 @@ function Get-QwenInstallBase {
 }
 
 function Get-QwenInstallBinDir {
-    if (-not [string]::IsNullOrEmpty($env:QWEN_INSTALL_BIN_DIR)) {
-        return $env:QWEN_INSTALL_BIN_DIR
+    if (-not [string]::IsNullOrEmpty($env:HOPCODE_INSTALL_BIN_DIR)) {
+        return $env:HOPCODE_INSTALL_BIN_DIR
     }
 
     return Join-Path (Get-QwenInstallBase) 'bin'
@@ -249,7 +249,7 @@ function Install-CurrentCmdPathShim {
             continue
         }
 
-        $shimPath = Join-Path $candidate 'qwen.cmd'
+        $shimPath = Join-Path $candidate 'hopcode.cmd'
         if (Test-Path -LiteralPath $shimPath -PathType Leaf) {
             $existingShim = Get-Content -LiteralPath $shimPath -Raw -ErrorAction SilentlyContinue
             if ($existingShim -notmatch 'Qwen Code current-session shim') {
@@ -273,14 +273,14 @@ function Install-CurrentCmdPathShim {
 
 function Update-CurrentShell {
     $qwenInstallBinDir = Get-QwenInstallBinDir
-    $qwenCommandPath = Join-Path $qwenInstallBinDir 'qwen.cmd'
+    $qwenCommandPath = Join-Path $qwenInstallBinDir 'hopcode.cmd'
     if (-not (Test-Path -LiteralPath $qwenCommandPath -PathType Leaf)) {
         return
     }
 
-    if ($env:QWEN_NO_MODIFY_PATH -eq '1') {
+    if ($env:HOPCODE_NO_MODIFY_PATH -eq '1') {
         Write-Output "Run: ${qwenCommandPath}"
-        Write-Output "INFO: QWEN_NO_MODIFY_PATH=1; skipping current-session PATH refresh."
+        Write-Output "INFO: HOPCODE_NO_MODIFY_PATH=1; skipping current-session PATH refresh."
         return
     }
 
@@ -297,7 +297,7 @@ function Update-CurrentShell {
 
         $shimPath = Install-CurrentCmdPathShim -QwenCommand $qwenCommandPath -PathValue $inheritedPath
         if (-not [string]::IsNullOrEmpty($shimPath)) {
-            Write-Output "INFO: Added qwen.cmd to a directory already on this cmd.exe PATH:"
+            Write-Output "INFO: Added hopcode.cmd to a directory already on this cmd.exe PATH:"
             Write-Output "INFO:   ${shimPath}"
             Write-Output "qwen is ready to use after this installer command returns."
             return
@@ -314,33 +314,33 @@ function Update-CurrentShell {
 
 $qwenDefaultInstallerUrl = 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.bat'
 $qwenDefaultChecksumsUrl = 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/SHA256SUMS'
-if ([string]::IsNullOrEmpty($env:QWEN_INSTALLER_BAT_URL)) {
-    $qwenInstallerUrl = $qwenDefaultInstallerUrl
+if ([string]::IsNullOrEmpty($env:HOPCODE_INSTALLER_BAT_URL)) {
+    $hopcodeInstallerUrl = $qwenDefaultInstallerUrl
 } else {
-    if ($env:QWEN_INSTALLER_BAT_URL -notmatch '^https://') {
-        Write-Error "QWEN_INSTALLER_BAT_URL must start with https://"
+    if ($env:HOPCODE_INSTALLER_BAT_URL -notmatch '^https://') {
+        Write-Error "HOPCODE_INSTALLER_BAT_URL must start with https://"
         exit 1
     }
-    $qwenInstallerUrl = $env:QWEN_INSTALLER_BAT_URL
+    $hopcodeInstallerUrl = $env:HOPCODE_INSTALLER_BAT_URL
 }
 
-if ([string]::IsNullOrEmpty($env:QWEN_INSTALLER_CHECKSUMS_URL)) {
-    if ($qwenInstallerUrl -eq $qwenDefaultInstallerUrl) {
-        $qwenChecksumsUrl = $qwenDefaultChecksumsUrl
+if ([string]::IsNullOrEmpty($env:HOPCODE_INSTALLER_CHECKSUMS_URL)) {
+    if ($hopcodeInstallerUrl -eq $qwenDefaultInstallerUrl) {
+        $hopcodeChecksumsUrl = $qwenDefaultChecksumsUrl
     } else {
-        $qwenChecksumsUrl = [Uri]::new([Uri]$qwenInstallerUrl, 'SHA256SUMS').AbsoluteUri
+        $hopcodeChecksumsUrl = [Uri]::new([Uri]$hopcodeInstallerUrl, 'SHA256SUMS').AbsoluteUri
     }
 } else {
-    if ($env:QWEN_INSTALLER_CHECKSUMS_URL -notmatch '^https://') {
-        Write-Error "QWEN_INSTALLER_CHECKSUMS_URL must start with https://"
+    if ($env:HOPCODE_INSTALLER_CHECKSUMS_URL -notmatch '^https://') {
+        Write-Error "HOPCODE_INSTALLER_CHECKSUMS_URL must start with https://"
         exit 1
     }
-    $qwenChecksumsUrl = $env:QWEN_INSTALLER_CHECKSUMS_URL
+    $hopcodeChecksumsUrl = $env:HOPCODE_INSTALLER_CHECKSUMS_URL
 }
 
-$qwenInstallerName = [IO.Path]::GetFileName(([Uri]$qwenInstallerUrl).AbsolutePath)
-if ([string]::IsNullOrEmpty($qwenInstallerName)) {
-    $qwenInstallerName = 'install-qwen-standalone.bat'
+$hopcodeInstallerName = [IO.Path]::GetFileName(([Uri]$hopcodeInstallerUrl).AbsolutePath)
+if ([string]::IsNullOrEmpty($hopcodeInstallerName)) {
+    $hopcodeInstallerName = 'install-qwen-standalone.bat'
 }
 if ([string]::IsNullOrEmpty($env:TEMP)) {
     Write-Error "TEMP environment variable is not set. Please set TEMP to a writable directory."
@@ -348,68 +348,68 @@ if ([string]::IsNullOrEmpty($env:TEMP)) {
 }
 # Use a cryptographically random staging filename so a same-user attacker cannot
 # pre-stage a malicious .bat at a predictable path and race the verify/execute
-# window between Get-FileHash and `& $qwenInstallerPath`.
-$qwenStagingSuffix = [IO.Path]::GetRandomFileName()
-$qwenInstallerPath = Join-Path $env:TEMP "qwen-installer-$qwenStagingSuffix.bat"
-$qwenChecksumsPath = Join-Path $env:TEMP "qwen-installation-SHA256SUMS-$qwenStagingSuffix"
+# window between Get-FileHash and `& $hopcodeInstallerPath`.
+$hopcodeStagingSuffix = [IO.Path]::GetRandomFileName()
+$hopcodeInstallerPath = Join-Path $env:TEMP "hopcode-installer-$hopcodeStagingSuffix.bat"
+$hopcodeChecksumsPath = Join-Path $env:TEMP "qwen-installation-SHA256SUMS-$hopcodeStagingSuffix"
 
 try {
-    Download-File -Url $qwenInstallerUrl -OutFile $qwenInstallerPath
+    Download-File -Url $hopcodeInstallerUrl -OutFile $hopcodeInstallerPath
 } catch {
     Write-Error "Failed to download Qwen Code installer from ${qwenInstallerUrl}: $($_.Exception.Message)"
     exit 1
 }
 
 try {
-    Download-File -Url $qwenChecksumsUrl -OutFile $qwenChecksumsPath
+    Download-File -Url $hopcodeChecksumsUrl -OutFile $hopcodeChecksumsPath
 } catch {
-    Remove-Item -LiteralPath $qwenInstallerPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $hopcodeInstallerPath -Force -ErrorAction SilentlyContinue
     Write-Error "Failed to download Qwen Code installer checksums from ${qwenChecksumsUrl}: $($_.Exception.Message)"
     exit 1
 }
 
-$qwenExpectedHash = $null
-foreach ($qwenChecksumLine in Get-Content -LiteralPath $qwenChecksumsPath) {
+$hopcodeExpectedHash = $null
+foreach ($qwenChecksumLine in Get-Content -LiteralPath $hopcodeChecksumsPath) {
     if ($qwenChecksumLine -match '^([0-9a-fA-F]{64})\s+\*?(.+)$') {
-        if ($Matches[2] -eq $qwenInstallerName) {
-            $qwenExpectedHash = $Matches[1].ToLowerInvariant()
+        if ($Matches[2] -eq $hopcodeInstallerName) {
+            $hopcodeExpectedHash = $Matches[1].ToLowerInvariant()
             break
         }
     }
 }
-if ([string]::IsNullOrEmpty($qwenExpectedHash)) {
-    Remove-Item -LiteralPath $qwenInstallerPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $qwenChecksumsPath -Force -ErrorAction SilentlyContinue
+if ([string]::IsNullOrEmpty($hopcodeExpectedHash)) {
+    Remove-Item -LiteralPath $hopcodeInstallerPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $hopcodeChecksumsPath -Force -ErrorAction SilentlyContinue
     Write-Error "Checksum entry for ${qwenInstallerName} not found in ${qwenChecksumsUrl}"
     exit 1
 }
 
-$qwenActualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $qwenInstallerPath).Hash.ToLowerInvariant()
-if ($qwenActualHash -ne $qwenExpectedHash) {
-    Remove-Item -LiteralPath $qwenInstallerPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $qwenChecksumsPath -Force -ErrorAction SilentlyContinue
+$hopcodeActualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $hopcodeInstallerPath).Hash.ToLowerInvariant()
+if ($hopcodeActualHash -ne $hopcodeExpectedHash) {
+    Remove-Item -LiteralPath $hopcodeInstallerPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $hopcodeChecksumsPath -Force -ErrorAction SilentlyContinue
     Write-Error "Checksum mismatch for ${qwenInstallerName}: expected ${qwenExpectedHash}, got ${qwenActualHash}."
     exit 1
 }
 
-$qwenInstallerExitCode = 0
-$qwenPreviousParentPowerShell = $env:QWEN_INSTALLER_PARENT_POWERSHELL
+$hopcodeInstallerExitCode = 0
+$hopcodePreviousParentPowerShell = $env:HOPCODE_INSTALLER_PARENT_POWERSHELL
 try {
-    $env:QWEN_INSTALLER_PARENT_POWERSHELL = '1'
-    & $qwenInstallerPath @args
-    $qwenInstallerExitCode = $LASTEXITCODE
+    $env:HOPCODE_INSTALLER_PARENT_POWERSHELL = '1'
+    & $hopcodeInstallerPath @args
+    $hopcodeInstallerExitCode = $LASTEXITCODE
 } finally {
-    if ($null -eq $qwenPreviousParentPowerShell) {
-        Remove-Item Env:\QWEN_INSTALLER_PARENT_POWERSHELL -ErrorAction SilentlyContinue
+    if ($null -eq $hopcodePreviousParentPowerShell) {
+        Remove-Item Env:\HOPCODE_INSTALLER_PARENT_POWERSHELL -ErrorAction SilentlyContinue
     } else {
-        $env:QWEN_INSTALLER_PARENT_POWERSHELL = $qwenPreviousParentPowerShell
+        $env:HOPCODE_INSTALLER_PARENT_POWERSHELL = $hopcodePreviousParentPowerShell
     }
-    Remove-Item -LiteralPath $qwenInstallerPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $qwenChecksumsPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $hopcodeInstallerPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $hopcodeChecksumsPath -Force -ErrorAction SilentlyContinue
 }
 
-if ($qwenInstallerExitCode -ne 0) {
-    exit $qwenInstallerExitCode
+if ($hopcodeInstallerExitCode -ne 0) {
+    exit $hopcodeInstallerExitCode
 }
 
 Update-CurrentShell

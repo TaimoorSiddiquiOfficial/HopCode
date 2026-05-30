@@ -222,7 +222,7 @@ export function mountWorkspaceAgentsRoutes(
             // '/Users/<x>/.hopcode/agents/foo.md'"` — leaking the
             // operator's absolute filesystem layout through an
             // authenticated route response. Gate the message behind
-            // `QWEN_SERVE_DEBUG` so default production responses
+            // `HOPCODE_SERVE_DEBUG` so default production responses
             // carry only the generic envelope; operators triaging
             // locally enable the toggle to get the path back.
             // Mirrors the workspaceMemory route's `file_error`
@@ -403,7 +403,7 @@ export function mountWorkspaceAgentsRoutes(
           if (err.code === SubagentErrorCode.FILE_ERROR) {
             // Same path-disclosure gating as the create-path
             // FILE_ERROR handler above. Default response is the
-            // generic envelope; `QWEN_SERVE_DEBUG` re-enables the
+            // generic envelope; `HOPCODE_SERVE_DEBUG` re-enables the
             // raw `err.message` for local triage.
             const debug = isServeDebugMode();
             res.status(500).json({

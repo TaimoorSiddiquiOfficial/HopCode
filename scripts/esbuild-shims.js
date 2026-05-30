@@ -27,7 +27,7 @@ if (typeof globalThis.require === 'undefined') {
 }
 
 export const require = _require;
-// IMPORTANT: __qwen_filename / __qwen_dirname always resolve to this shim's
+// IMPORTANT: __hopcode_filename / __hopcode_dirname always resolve to this shim's
 // chunk file — i.e. dist/chunks/ in a built bundle, NOT the directory of any
 // source file that uses bare __dirname / __filename. esbuild's `define`
 // rewrites all free references in source code to these symbols, so to get a
@@ -38,5 +38,5 @@ export const require = _require;
 // dist/chunks/ rather than the source dir — sibling-asset lookups (vendor/,
 // bundled/, locales/) must strip a trailing `chunks` segment. See
 // skill-manager.ts / ripgrepUtils.ts / i18n/index.ts for the pattern.
-export const __qwen_filename = fileURLToPath(import.meta.url);
-export const __qwen_dirname = dirname(__qwen_filename);
+export const __hopcode_filename = fileURLToPath(import.meta.url);
+export const __hopcode_dirname = dirname(__hopcode_filename);

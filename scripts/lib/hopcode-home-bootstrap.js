@@ -88,7 +88,7 @@ function readEnvInto(file) {
       'HOPCODE_HOME',
       'HOPCODE_RUNTIME_DIR',
       'HOPCODE_HOME',
-      'QWEN_RUNTIME_DIR',
+      'HOPCODE_RUNTIME_DIR',
     ]) {
       if (parsed[key] && !Object.hasOwn(process.env, key)) {
         process.env[key] = parsed[key];

@@ -127,7 +127,7 @@ export async function resolveTelemetrySettings(options: {
   const outfile =
     argv.telemetryOutfile ??
     env['HOPCODE_TELEMETRY_OUTFILE'] ??
-    env['QWEN_TELEMETRY_OUTFILE'] ??
+    env['HOPCODE_TELEMETRY_OUTFILE'] ??
     settings.outfile;
 
   // Per-signal endpoint overrides (HTTP only).
@@ -192,7 +192,7 @@ export async function resolveTelemetrySettings(options: {
     : undefined;
 
   const metricsIncludeSessionId =
-    parseBooleanEnvFlag(env['QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID']) ??
+    parseBooleanEnvFlag(env['HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID']) ??
     settings.metrics?.includeSessionId ??
     false;
 

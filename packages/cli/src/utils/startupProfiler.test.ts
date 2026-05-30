@@ -35,14 +35,14 @@ describe('startupProfiler', () => {
     resetStartupProfiler();
     vi.restoreAllMocks();
     saveEnv(
-      'QWEN_CODE_PROFILE_STARTUP',
-      'QWEN_CODE_PROFILE_STARTUP_OUTER',
-      'QWEN_CODE_PROFILE_STARTUP_NO_HEAP',
+      'HOPCODE_CODE_PROFILE_STARTUP',
+      'HOPCODE_CODE_PROFILE_STARTUP_OUTER',
+      'HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP',
       'SANDBOX',
     );
-    delete process.env['QWEN_CODE_PROFILE_STARTUP'];
-    delete process.env['QWEN_CODE_PROFILE_STARTUP_OUTER'];
-    delete process.env['QWEN_CODE_PROFILE_STARTUP_NO_HEAP'];
+    delete process.env['HOPCODE_CODE_PROFILE_STARTUP'];
+    delete process.env['HOPCODE_CODE_PROFILE_STARTUP_OUTER'];
+    delete process.env['HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP'];
     delete process.env['SANDBOX'];
   });
 
@@ -332,8 +332,8 @@ describe('startupProfiler', () => {
       expect(report.phases[0]!.heapUsedMb).toBeGreaterThan(0);
     });
 
-    it('omits heap snapshots when QWEN_CODE_PROFILE_STARTUP_NO_HEAP=1', () => {
-      process.env['QWEN_CODE_PROFILE_STARTUP_NO_HEAP'] = '1';
+    it('omits heap snapshots when HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP=1', () => {
+      process.env['HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP'] = '1';
       initStartupProfiler();
       profileCheckpoint('phase_a');
       const report = getStartupReport()!;
@@ -341,9 +341,9 @@ describe('startupProfiler', () => {
     });
   });
 
-  describe('outer-process opt-in (QWEN_CODE_PROFILE_STARTUP_OUTER=1)', () => {
+  describe('outer-process opt-in (HOPCODE_CODE_PROFILE_STARTUP_OUTER=1)', () => {
     it('does NOT collect outside sandbox without OUTER opt-in', () => {
-      process.env['QWEN_CODE_PROFILE_STARTUP'] = '1';
+      process.env['HOPCODE_CODE_PROFILE_STARTUP'] = '1';
       delete process.env['SANDBOX'];
 
       initStartupProfiler();
@@ -352,8 +352,8 @@ describe('startupProfiler', () => {
     });
 
     it('collects outside sandbox when OUTER=1 and writes outer-prefixed file', () => {
-      process.env['QWEN_CODE_PROFILE_STARTUP'] = '1';
-      process.env['QWEN_CODE_PROFILE_STARTUP_OUTER'] = '1';
+      process.env['HOPCODE_CODE_PROFILE_STARTUP'] = '1';
+      process.env['HOPCODE_CODE_PROFILE_STARTUP_OUTER'] = '1';
       delete process.env['SANDBOX'];
 
       vi.mocked(fs.mkdirSync).mockReturnValue(undefined);

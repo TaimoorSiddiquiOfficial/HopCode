@@ -252,14 +252,14 @@ export function mcpTransportOf(config: MCPServerConfig): McpTransportKind {
  * leave them unset and get `{ budgetMode: 'off' }` — the historical
  * behavior, no enforcement.
  *
- * `QWEN_SERVE_MCP_CLIENT_BUDGET` — positive integer; non-numeric /
+ * `HOPCODE_SERVE_MCP_CLIENT_BUDGET` — positive integer; non-numeric /
  *   zero / negative / NaN are silently ignored (treated as unset).
- * `QWEN_SERVE_MCP_BUDGET_MODE` — `enforce|warn|off`. Defaults to
+ * `HOPCODE_SERVE_MCP_BUDGET_MODE` — `enforce|warn|off`. Defaults to
  *   `warn` when a budget is set, `off` otherwise.
  */
 function readBudgetFromEnv(): McpBudgetConfig {
-  const rawBudget = process.env['QWEN_SERVE_MCP_CLIENT_BUDGET'];
-  const rawMode = process.env['QWEN_SERVE_MCP_BUDGET_MODE'];
+  const rawBudget = process.env['HOPCODE_SERVE_MCP_CLIENT_BUDGET'];
+  const rawMode = process.env['HOPCODE_SERVE_MCP_BUDGET_MODE'];
   let clientBudget: number | undefined;
   if (rawBudget !== undefined && rawBudget !== '') {
     const parsed = Number(rawBudget);
@@ -267,7 +267,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       clientBudget = parsed;
     } else {
       // PR 14 fix (review #4247 wenshao R7 line 191): operator typos
-      // like `QWEN_SERVE_MCP_CLIENT_BUDGET=abc` previously fell
+      // like `HOPCODE_SERVE_MCP_CLIENT_BUDGET=abc` previously fell
       // through silently to "no budget" with zero indication. The
       // CLI parent (`commands/serve.ts` + `runHopCodeServe.ts`)
       // validates and throws, but the ACP child process — where
@@ -275,7 +275,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       // boot breadcrumb so operators see the misconfiguration in
       // journald / docker logs.
       process.stderr.write(
-        `hopcode serve: ignoring invalid QWEN_SERVE_MCP_CLIENT_BUDGET=` +
+        `hopcode serve: ignoring invalid HOPCODE_SERVE_MCP_CLIENT_BUDGET=` +
           `'${rawBudget}' (expected positive integer); ` +
           `MCP budget enforcement disabled for this child.\n`,
       );
@@ -291,7 +291,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       // budget-driven default; now it gets a stderr line so the
       // typo is visible.
       process.stderr.write(
-        `hopcode serve: ignoring invalid QWEN_SERVE_MCP_BUDGET_MODE=` +
+        `hopcode serve: ignoring invalid HOPCODE_SERVE_MCP_BUDGET_MODE=` +
           `'${rawMode}' (expected enforce|warn|off); falling back to ` +
           `${clientBudget === undefined ? 'off' : 'warn'}.\n`,
       );
@@ -310,7 +310,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
   //
   // R9 #7: emit a stderr breadcrumb when the downgrade fires.
   // Pre-fix the downgrade was silent — operator sets
-  // `QWEN_SERVE_MCP_BUDGET_MODE=enforce` in a Docker Compose / k8s
+  // `HOPCODE_SERVE_MCP_BUDGET_MODE=enforce` in a Docker Compose / k8s
   // env without the matching budget, daemon boots happy, snapshot
   // shows `budgetMode: 'off'`, and enforcement is silently
   // disabled. The CLI handler + `runHopCodeServe` path both throw on
@@ -322,8 +322,8 @@ function readBudgetFromEnv(): McpBudgetConfig {
     clientBudget === undefined
   ) {
     process.stderr.write(
-      `hopcode serve: QWEN_SERVE_MCP_BUDGET_MODE=${budgetMode} requires ` +
-        `QWEN_SERVE_MCP_CLIENT_BUDGET=N; downgrading to off. ` +
+      `hopcode serve: HOPCODE_SERVE_MCP_BUDGET_MODE=${budgetMode} requires ` +
+        `HOPCODE_SERVE_MCP_CLIENT_BUDGET=N; downgrading to off. ` +
         `Set both env vars to enable MCP guardrail enforcement.\n`,
     );
     budgetMode = 'off';

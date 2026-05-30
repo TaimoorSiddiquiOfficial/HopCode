@@ -352,7 +352,10 @@ vi.mock('../../utils/errorMessage.js', () => ({
   getErrorMessage: vi.fn((error: unknown) => String(error)),
 }));
 
-import { WebViewProvider, resolveQwenCliEntryPath } from './WebViewProvider.js';
+import {
+  WebViewProvider,
+  resolveHopcodeCliEntryPath,
+} from './WebViewProvider.js';
 import {
   truncatePanelTitle,
   MAX_PANEL_TITLE_LENGTH,
@@ -370,9 +373,9 @@ type WebViewMessageHandler = (message: {
   data?: unknown;
 }) => Promise<void>;
 
-describe('resolveQwenCliEntryPath', () => {
+describe('resolveHopcodeCliEntryPath', () => {
   it('uses the source dev entry when the extension runs in development mode', () => {
-    const tempRoot = mkdtempSync(path.join(tmpdir(), 'qwen-vscode-dev-'));
+    const tempRoot = mkdtempSync(path.join(tmpdir(), 'hopcode-vscode-dev-'));
     try {
       const extensionRoot = path.join(
         tempRoot,
@@ -385,7 +388,7 @@ describe('resolveQwenCliEntryPath', () => {
       writeFileSync(devEntry, '');
 
       expect(
-        resolveQwenCliEntryPath({ fsPath: extensionRoot } as never, 2),
+        resolveHopcodeCliEntryPath({ fsPath: extensionRoot } as never, 2),
       ).toBe(devEntry);
     } finally {
       rmSync(tempRoot, { recursive: true, force: true });
@@ -394,11 +397,11 @@ describe('resolveQwenCliEntryPath', () => {
 
   it('uses the bundled CLI outside development mode', () => {
     expect(
-      resolveQwenCliEntryPath(
+      resolveHopcodeCliEntryPath(
         { fsPath: '/extension-root' } as never,
         undefined,
       ),
-    ).toBe('/extension-root/dist/qwen-cli/cli.js');
+    ).toBe('/extension-root/dist/hopcode-cli/cli.js');
   });
 });
 

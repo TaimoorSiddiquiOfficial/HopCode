@@ -38,9 +38,9 @@ function getProjectHash(projectRoot) {
 const projectHash = getProjectHash(projectRoot);
 
 // Runtime base directory for ephemeral data (tmp, otel, etc.)
-// Priority: QWEN_RUNTIME_DIR > QWEN_HOME > ~/.qwen
+// Priority: HOPCODE_RUNTIME_DIR > HOPCODE_HOME > ~/.hopcode
 function getRuntimeBaseDir() {
-  const runtimeDir = process.env.QWEN_RUNTIME_DIR;
+  const runtimeDir = process.env.HOPCODE_RUNTIME_DIR;
   if (runtimeDir) {
     return resolvePath(runtimeDir);
   }

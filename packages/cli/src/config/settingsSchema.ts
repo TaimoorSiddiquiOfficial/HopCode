@@ -2189,7 +2189,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: DEFAULT_STOP_HOOK_BLOCK_CAP,
     description:
-      'Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.',
+      'Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_CODE_STOP_HOOK_BLOCK_CAP.',
     // This is an advanced safety valve for runaway hook loops, not a common
     // interactive preference.
     showInDialog: false,

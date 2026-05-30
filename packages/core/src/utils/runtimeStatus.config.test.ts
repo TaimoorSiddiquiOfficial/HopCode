@@ -26,15 +26,15 @@ let prevRuntimeEnv: string | undefined;
 beforeEach(async () => {
   tmpDir = await mkdtemp(path.join(os.tmpdir(), 'hopcode-rt-cfg-'));
   runtimeDir = path.join(tmpDir, 'runtime');
-  prevRuntimeEnv = process.env['QWEN_RUNTIME_DIR'];
-  process.env['QWEN_RUNTIME_DIR'] = runtimeDir;
+  prevRuntimeEnv = process.env['HOPCODE_RUNTIME_DIR'];
+  process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
 });
 
 afterEach(async () => {
   if (prevRuntimeEnv === undefined) {
-    delete process.env['QWEN_RUNTIME_DIR'];
+    delete process.env['HOPCODE_RUNTIME_DIR'];
   } else {
-    process.env['QWEN_RUNTIME_DIR'] = prevRuntimeEnv;
+    process.env['HOPCODE_RUNTIME_DIR'] = prevRuntimeEnv;
   }
   await rm(tmpDir, { recursive: true, force: true });
 });
@@ -81,7 +81,7 @@ describe('Config.startNewSession runtime.json swap', () => {
     await writeRuntimeStatus(aPath, {
       sessionId: sessionA,
       workDir: tmpDir,
-      qwenVersion: '0.0.0-test',
+      hopcodeVersion: '0.0.0-test',
     });
 
     config.startNewSession(sessionB);
@@ -104,7 +104,7 @@ describe('Config.startNewSession runtime.json swap', () => {
     await writeRuntimeStatus(aPath, {
       sessionId: sessionA,
       workDir: tmpDir,
-      qwenVersion: '0.0.0-test',
+      hopcodeVersion: '0.0.0-test',
     });
     config.markRuntimeStatusEnabled();
 
@@ -127,7 +127,7 @@ describe('Config.startNewSession runtime.json swap', () => {
     await writeRuntimeStatus(aPath, {
       sessionId: sessionA,
       workDir: tmpDir,
-      qwenVersion: '0.0.0-test',
+      hopcodeVersion: '0.0.0-test',
     });
     config.markRuntimeStatusEnabled();
 

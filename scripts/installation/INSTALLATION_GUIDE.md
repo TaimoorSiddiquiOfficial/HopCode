@@ -85,7 +85,7 @@ roll back by repointing the global objects to a previous tag if a regression is
 caught after publish. The hosted
 installers intentionally default to `latest`; on Aliyun OSS this means reading
 `releases/hopcode/latest/VERSION` first, then downloading the matching
-versioned release directory. Use `--version` or `QWEN_INSTALL_VERSION` to pin a
+versioned release directory. Use `--version` or `HOPCODE_INSTALL_VERSION` to pin a
 standalone release directly.
 
 Configure the `production-release` GitHub environment with these required
@@ -174,8 +174,8 @@ Standalone installs to:
 - Runtime: `~/.local/lib/hopcode`
 - Shim: `~/.local/bin/qwen`
 
-Override with `QWEN_INSTALL_ROOT`, `QWEN_INSTALL_LIB_PARENT`,
-`QWEN_INSTALL_LIB_DIR`, or `QWEN_INSTALL_BIN_DIR` when needed.
+Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_PARENT`,
+`HOPCODE_INSTALL_LIB_DIR`, or `HOPCODE_INSTALL_BIN_DIR` when needed.
 
 Uninstall a standalone Linux/macOS install:
 
@@ -185,7 +185,7 @@ curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/unin
 
 The uninstaller removes only the standalone runtime, generated `qwen` wrapper,
 and installer-managed shell PATH block. It preserves `~/.qwen` by default. Set
-`QWEN_UNINSTALL_PURGE=1` to remove `~/.hopcode/source.json`; other config and auth
+`HOPCODE_UNINSTALL_PURGE=1` to remove `~/.hopcode/source.json`; other config and auth
 files are still preserved.
 
 ## Windows Usage
@@ -213,8 +213,8 @@ Standalone installs to:
 - Runtime: `%LOCALAPPDATA%\hopcode\hopcode`
 - Shim: `%LOCALAPPDATA%\hopcode\bin\qwen.cmd`
 
-Override with `QWEN_INSTALL_ROOT`, `QWEN_INSTALL_LIB_DIR`, or
-`QWEN_INSTALL_BIN_DIR` when needed.
+Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_DIR`, or
+`HOPCODE_INSTALL_BIN_DIR` when needed.
 
 Restart the terminal if `qwen` is not immediately available on PATH.
 
@@ -227,7 +227,7 @@ powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzho
 The uninstaller removes only the standalone runtime, generated `qwen.cmd`
 wrapper, user PATH entry, and the current-session `cmd.exe` shim created by the
 hosted PowerShell installer. It preserves `%USERPROFILE%\.qwen` by default. Set
-`QWEN_UNINSTALL_PURGE=1` to remove `%USERPROFILE%\.qwen\source.json`; other
+`HOPCODE_UNINSTALL_PURGE=1` to remove `%USERPROFILE%\.qwen\source.json`; other
 config and auth files are still preserved.
 
 ## Mirrors and Overrides
@@ -244,12 +244,12 @@ Options:
 
 Environment variables:
 
-- `QWEN_INSTALL_METHOD`
-- `QWEN_INSTALL_MIRROR`
-- `QWEN_INSTALL_BASE_URL`
-- `QWEN_INSTALL_ARCHIVE`
-- `QWEN_INSTALL_VERSION`
-- `QWEN_NPM_REGISTRY`
+- `HOPCODE_INSTALL_METHOD`
+- `HOPCODE_INSTALL_MIRROR`
+- `HOPCODE_INSTALL_BASE_URL`
+- `HOPCODE_INSTALL_ARCHIVE`
+- `HOPCODE_INSTALL_VERSION`
+- `HOPCODE_NPM_REGISTRY`
 
 Use `--base-url` for private mirrors. The URL must contain
 `hopcode-<target>` archives and `SHA256SUMS` in the same directory. Custom

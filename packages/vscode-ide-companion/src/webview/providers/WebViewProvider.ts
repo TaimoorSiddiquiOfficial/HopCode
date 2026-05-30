@@ -37,10 +37,7 @@ import {
   readHopCodeSettingsForVSCode,
   clearPersistedAuth,
 } from '../../services/settingsWriter.js';
-import {
-  buildInstallPlan,
-  parseInsightMessage,
-} from '@hoptrendy/hopcode-core';
+import { buildInstallPlan, parseInsightMessage } from '@hoptrendy/hopcode-core';
 
 /** Threshold (ms) before a completed task triggers a notification. */
 const LONG_TASK_THRESHOLD_MS = 20_000;
@@ -67,7 +64,7 @@ const AUTH_RELATED_HOPCODE_SETTINGS = [
   'hopcode.codingPlanRegion',
 ] as const;
 
-export function resolveQwenCliEntryPath(
+export function resolveHopcodeCliEntryPath(
   extensionUri: vscode.Uri,
   extensionMode: vscode.ExtensionMode | undefined,
 ): string {
@@ -84,7 +81,8 @@ export function resolveQwenCliEntryPath(
     }
   }
 
-  return vscode.Uri.joinPath(extensionUri, 'dist', 'qwen-cli', 'cli.js').fsPath;
+  return vscode.Uri.joinPath(extensionUri, 'dist', 'hopcode-cli', 'cli.js')
+    .fsPath;
 }
 
 function isInsightCommand(command: string): boolean {
@@ -283,49 +281,51 @@ export class WebViewProvider {
       });
     });
 
-    this.agentManager.onSlashCommandNotification((event: { command: string; messageType: string; message: string }) => {
-      if (isInsightCommand(event.command) && event.messageType === 'error') {
+    this.agentManager.onSlashCommandNotification(
+      (event: { command: string; messageType: string; message: string }) => {
+        if (isInsightCommand(event.command) && event.messageType === 'error') {
+          this.sendMessageToWebView({
+            type: 'insightProgressCleared',
+            data: {},
+          });
+        }
+
+        // Try to parse as structured insight message
+        if (isInsightCommand(event.command) && event.messageType === 'info') {
+          const parsed = parseInsightMessage(event.message);
+          if (parsed?.type === 'insight_progress') {
+            this.sendMessageToWebView({
+              type: 'insightProgress',
+              data: {
+                stage: parsed.stage,
+                progress: parsed.progress,
+                detail: parsed.detail,
+              },
+            });
+            return;
+          }
+
+          if (parsed?.type === 'insight_ready') {
+            this.sendMessageToWebView({
+              type: 'insightReportReady',
+              data: {
+                path: parsed.path,
+              },
+            });
+            return;
+          }
+        }
+
+        const chunk = event.message.endsWith('\n')
+          ? event.message
+          : `${event.message}\n`;
+        this.messageHandler.appendStreamContent(chunk);
         this.sendMessageToWebView({
-          type: 'insightProgressCleared',
-          data: {},
+          type: 'streamChunk',
+          data: { chunk },
         });
-      }
-
-      // Try to parse as structured insight message
-      if (isInsightCommand(event.command) && event.messageType === 'info') {
-        const parsed = parseInsightMessage(event.message);
-        if (parsed?.type === 'insight_progress') {
-          this.sendMessageToWebView({
-            type: 'insightProgress',
-            data: {
-              stage: parsed.stage,
-              progress: parsed.progress,
-              detail: parsed.detail,
-            },
-          });
-          return;
-        }
-
-        if (parsed?.type === 'insight_ready') {
-          this.sendMessageToWebView({
-            type: 'insightReportReady',
-            data: {
-              path: parsed.path,
-            },
-          });
-          return;
-        }
-      }
-
-      const chunk = event.message.endsWith('\n')
-        ? event.message
-        : `${event.message}\n`;
-      this.messageHandler.appendStreamContent(chunk);
-      this.sendMessageToWebView({
-        type: 'streamChunk',
-        data: { chunk },
-      });
-    });
+      },
+    );
 
     // Surface available modes and current mode (from ACP initialize)
     this.agentManager.onModeInfo((info: { currentModeId?: string } | null) => {
@@ -1231,7 +1231,7 @@ export class WebViewProvider {
         `[WebViewProvider] Using CLI-managed authentication (autoAuth=${autoAuthenticate})`,
       );
 
-      const cliEntry = resolveQwenCliEntryPath(
+      const cliEntry = resolveHopcodeCliEntryPath(
         this.extensionUri,
         this.context.extensionMode,
       );

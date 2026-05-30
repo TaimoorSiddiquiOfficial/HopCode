@@ -73,22 +73,22 @@ describe('getHeadlessIznSafetyWarning', () => {
     const cfg = makeConfig(ApprovalMode.IZN, undefined);
     expect(
       getHeadlessIznSafetyWarning(cfg, {
-        QWEN_CODE_SUPPRESS_IZN_WARNING: '1',
+        HOPCODE_CODE_SUPPRESS_IZN_WARNING: '1',
       }),
     ).toBeNull();
     expect(
       getHeadlessIznSafetyWarning(cfg, {
-        QWEN_CODE_SUPPRESS_IZN_WARNING: 'true',
+        HOPCODE_CODE_SUPPRESS_IZN_WARNING: 'true',
       }),
     ).toBeNull();
   });
 
-  it('does NOT suppress when QWEN_CODE_SUPPRESS_IZN_WARNING is 0 / false / empty', () => {
+  it('does NOT suppress when HOPCODE_CODE_SUPPRESS_IZN_WARNING is 0 / false / empty', () => {
     const cfg = makeConfig(ApprovalMode.IZN, undefined);
     for (const val of ['0', 'false', '', 'no']) {
       expect(
         getHeadlessIznSafetyWarning(cfg, {
-          QWEN_CODE_SUPPRESS_IZN_WARNING: val,
+          HOPCODE_CODE_SUPPRESS_IZN_WARNING: val,
         }),
       ).toBe(HEADLESS_IZN_NO_SANDBOX_WARNING);
     }

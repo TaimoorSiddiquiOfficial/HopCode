@@ -574,13 +574,13 @@ describe('osc8 helpers', () => {
       expect(supportsHyperlinks()).toBe(false);
     });
 
-    it('hard opt-outs (NO_COLOR/QWEN_DISABLE_HYPERLINKS) win over FORCE_HYPERLINK', () => {
+    it('hard opt-outs (NO_COLOR/HOPCODE_DISABLE_HYPERLINKS) win over FORCE_HYPERLINK', () => {
       setTTY(true);
       process.env['FORCE_HYPERLINK'] = '1';
       process.env['NO_COLOR'] = '1';
       expect(supportsHyperlinks()).toBe(false);
       delete process.env['NO_COLOR'];
-      process.env['QWEN_DISABLE_HYPERLINKS'] = '1';
+      process.env['HOPCODE_DISABLE_HYPERLINKS'] = '1';
       expect(supportsHyperlinks()).toBe(false);
     });
 

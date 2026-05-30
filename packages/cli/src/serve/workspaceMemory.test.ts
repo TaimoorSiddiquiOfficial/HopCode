@@ -383,7 +383,7 @@ describe('workspace memory routes', () => {
       expect(res.body.error).not.toContain(filePath);
     });
 
-    it('omits errorMessage + filePath in 500/413 responses unless QWEN_SERVE_DEBUG is on', async () => {
+    it('omits errorMessage + filePath in 500/413 responses unless HOPCODE_SERVE_DEBUG is on', async () => {
       // Windows ignores Unix-style permission bits passed to
       // `fs.chmod` — the directory stays writable, the POST succeeds
       // with 200, and the EACCES path this test exercises is
@@ -395,7 +395,7 @@ describe('workspace memory routes', () => {
 
       // Default: production response carries no `errorMessage` or
       // `filePath` fields — operators read the daemon stderr log
-      // for the path. Setting QWEN_SERVE_DEBUG=1 enables both.
+      // for the path. Setting HOPCODE_SERVE_DEBUG=1 enables both.
       const bridge = buildBridgeStub();
       const app = buildApp({ bridge, boundWorkspace: workspace });
 
@@ -404,9 +404,9 @@ describe('workspace memory routes', () => {
       // `writeFile` will fail with EACCES.
       const before = await fs.stat(workspace);
       await fs.chmod(workspace, 0o555);
-      const prevDebug = process.env['QWEN_SERVE_DEBUG'];
+      const prevDebug = process.env['HOPCODE_SERVE_DEBUG'];
       try {
-        delete process.env['QWEN_SERVE_DEBUG'];
+        delete process.env['HOPCODE_SERVE_DEBUG'];
         const res = await request(app).post('/workspace/memory').send({
           scope: 'workspace',
           mode: 'append',
@@ -422,7 +422,7 @@ describe('workspace memory routes', () => {
 
         // Toggle debug back on; the same payload now carries the
         // detail.
-        process.env['QWEN_SERVE_DEBUG'] = '1';
+        process.env['HOPCODE_SERVE_DEBUG'] = '1';
         const debugRes = await request(app).post('/workspace/memory').send({
           scope: 'workspace',
           mode: 'append',
@@ -431,8 +431,8 @@ describe('workspace memory routes', () => {
         expect(debugRes.status).toBe(500);
         expect(typeof debugRes.body.errorMessage).toBe('string');
       } finally {
-        if (prevDebug === undefined) delete process.env['QWEN_SERVE_DEBUG'];
-        else process.env['QWEN_SERVE_DEBUG'] = prevDebug;
+        if (prevDebug === undefined) delete process.env['HOPCODE_SERVE_DEBUG'];
+        else process.env['HOPCODE_SERVE_DEBUG'] = prevDebug;
         await fs.chmod(workspace, before.mode);
       }
     });

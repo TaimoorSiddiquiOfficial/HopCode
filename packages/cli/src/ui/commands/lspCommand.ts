@@ -68,7 +68,7 @@ export const lspCommand: SlashCommand = {
         context,
         'info',
         t(
-          'LSP is enabled but no client is connected. Check debug logs under `${QWEN_RUNTIME_DIR:-~/.hopcode}/debug/` or see the LSP troubleshooting docs.',
+          'LSP is enabled but no client is connected. Check debug logs under `${HOPCODE_RUNTIME_DIR:-~/.hopcode}/debug/` or see the LSP troubleshooting docs.',
         ),
       );
     }

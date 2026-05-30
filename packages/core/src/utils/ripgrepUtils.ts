@@ -67,7 +67,7 @@ function wslTimeout(): number {
 // it's running from source / transpiled / bundled output (each requires a
 // different `..`-traversal count). It is NOT just `path.join(__dirname,
 // basename)` because in bundled mode esbuild rewrites every bare `__filename`
-// reference to `__qwen_filename` (the shim chunk's path), which would make
+// reference to `__hopcode_filename` (the shim chunk's path), which would make
 // the heuristic always pick `levelsUp = 0` by accident; the explicit local
 // shadow keeps the lookup correct in source/transpiled/dev modes too, where
 // node ESM leaves `__filename` undefined.

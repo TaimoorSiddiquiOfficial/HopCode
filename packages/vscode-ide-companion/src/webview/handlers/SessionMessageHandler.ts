@@ -40,9 +40,9 @@ export class SessionMessageHandler extends BaseMessageHandler {
     return [
       'sendMessage',
       'editMessage',
-      'newQwenSession',
-      'switchQwenSession',
-      'getQwenSessions',
+      'newHopcodeSession',
+      'switchHopcodeSession',
+      'getHopcodeSessions',
       'resumeSession',
       'deleteHopCodeSession',
       'renameHopCodeSession',
@@ -117,7 +117,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         );
         break;
 
-      case 'newQwenSession':
+      case 'newHopcodeSession':
         await this.handleNewHopCodeSession();
         break;
 

@@ -19,7 +19,7 @@ import type { ApprovalModeValue } from './approvalModeValueTypes.js';
 export const authMethod = 'openai';
 
 /**
- * Authenticate update notification (Qwen extension, not ACP spec).
+ * Authenticate update notification (HopCode extension, not ACP spec).
  * Sent by agent during the OAuth flow.
  */
 export interface AuthenticateUpdateNotification {

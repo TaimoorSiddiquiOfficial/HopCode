@@ -57,7 +57,7 @@ export const APPROVAL_MODE_INFO: Record<
   [ApprovalMode.AUTO]: {
     label: 'Auto',
     title:
-      'Qwen will use a classifier to auto-approve safe tools and block risky ones. Click to switch modes.',
+      'HopCode will use a classifier to auto-approve safe tools and block risky ones. Click to switch modes.',
     iconType: 'auto',
   },
   [ApprovalMode.IZN]: {

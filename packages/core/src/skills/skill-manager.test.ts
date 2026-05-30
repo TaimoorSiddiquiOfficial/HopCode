@@ -744,13 +744,13 @@ Skill 3 content`);
       mockParseYaml.mockImplementation((yamlString: string) =>
         yaml.parse(yamlString),
       );
-      const projectQwenSkillsDir = path.join(
+      const projectHopcodeSkillsDir = path.join(
         '/test/project',
         '.hopcode',
         'skills',
       );
       vi.mocked(fs.readdir).mockImplementation((dirPath) => {
-        if (String(dirPath) === projectQwenSkillsDir) {
+        if (String(dirPath) === projectHopcodeSkillsDir) {
           return Promise.resolve(
             ['high', 'unset-beta', 'unset-alpha', 'negative'].map((name) => ({
               name,

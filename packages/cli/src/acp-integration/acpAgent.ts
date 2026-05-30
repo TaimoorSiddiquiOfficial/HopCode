@@ -931,7 +931,7 @@ class HopCodeAgent implements Agent {
       kind: 'mcp_budget',
       // PR 14 v1: per-session, not per-workspace. Each ACP session has
       // its own `Config`/`McpClientManager` (via `newSessionConfig`)
-      // and reads `QWEN_SERVE_MCP_CLIENT_BUDGET` independently.
+      // and reads `HOPCODE_SERVE_MCP_CLIENT_BUDGET` independently.
       // Snapshot shows the bootstrap session's view. Wave 5 PR 23
       // shared MCP pool will graduate this to `'workspace'`.
       scope: 'session',

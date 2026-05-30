@@ -22,8 +22,8 @@ import { Storage } from '../config/storage.js';
 const debugLogger = createDebugLogger('HOPCODE_OAUTH');
 
 // File System Configuration
-const QWEN_CREDENTIAL_FILENAME = 'oauth_creds.json';
-const QWEN_LOCK_FILENAME = 'oauth_creds.lock';
+const HOPCODE_CREDENTIAL_FILENAME = 'oauth_creds.json';
+const HOPCODE_LOCK_FILENAME = 'oauth_creds.lock';
 
 // Token and Cache Configuration
 const TOKEN_REFRESH_BUFFER_MS = 30 * 1000; // 30 seconds
@@ -692,7 +692,10 @@ export class SharedTokenManager {
    * @returns The absolute path to the credentials file
    */
   private getCredentialFilePath(): string {
-    return path.join(Storage.getGlobalHopCodeDir(), QWEN_CREDENTIAL_FILENAME);
+    return path.join(
+      Storage.getGlobalHopCodeDir(),
+      HOPCODE_CREDENTIAL_FILENAME,
+    );
   }
 
   /**
@@ -701,7 +704,7 @@ export class SharedTokenManager {
    * @returns The absolute path to the lock file
    */
   private getLockFilePath(): string {
-    return path.join(Storage.getGlobalHopCodeDir(), QWEN_LOCK_FILENAME);
+    return path.join(Storage.getGlobalHopCodeDir(), HOPCODE_LOCK_FILENAME);
   }
 
   /**

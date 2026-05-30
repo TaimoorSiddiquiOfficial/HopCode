@@ -246,7 +246,7 @@ export function mountWorkspaceMemoryRoutes(
           // Path disclosure: both `error` (which embeds the absolute
           // file path in the constructor message — see
           // `WorkspaceMemoryFileTooLargeError`) and `filePath` are
-          // gated behind QWEN_SERVE_DEBUG so production responses
+          // gated behind HOPCODE_SERVE_DEBUG so production responses
           // don't include `/Users/<x>/.hopcode/...` in the body.
           // Operators triaging an issue locally enable the debug
           // toggle to get the full text; in default mode SDK
@@ -277,7 +277,7 @@ export function mountWorkspaceMemoryRoutes(
         // `EROFS` / `EDQUOT` / `ENOSPC` / ...) stays unconditional so
         // SDK clients can branch on the failure class. The full
         // `errorMessage` (which often embeds the file path on Node's
-        // ENOENT/EACCES messages) is gated behind `QWEN_SERVE_DEBUG`.
+        // ENOENT/EACCES messages) is gated behind `HOPCODE_SERVE_DEBUG`.
         // Without the debug toggle, callers see only the generic
         // `error` + `code` + `osCode` envelope; the daemon's stderr
         // log has the full message for the operator.
