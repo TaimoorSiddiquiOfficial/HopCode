@@ -1,4 +1,4 @@
-# HopCode Configuration
+﻿# HopCode Configuration
 
 > [!tip]
 >
@@ -500,7 +500,7 @@ Here is an example of a `settings.json` file with the nested structure, new as o
     ]
   },
   "tools": {
-    "approvalMode": "yolo",
+    "approvalMode": "izn",
     "sandbox": "docker",
     "sandboxImage": "ghcr.io/qwenlm/qwen-code:0.14.1",
     "discoveryCommand": "bin/get_tools",

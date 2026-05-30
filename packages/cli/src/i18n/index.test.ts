@@ -52,7 +52,7 @@ describe('bundled locale fallback', () => {
 
   it('falls back to bundled translations when a user locale default export is null', async () => {
     const tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-i18n-null-locale-'),
+      path.join(os.tmpdir(), 'hopcode-i18n-null-locale-'),
     );
     const localesDir = path.join(tempDir, 'locales');
     await fs.mkdir(localesDir, { recursive: true });
@@ -74,7 +74,7 @@ describe('bundled locale fallback', () => {
 
   it('falls back to bundled translations when a user locale default export is an array', async () => {
     const tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-i18n-array-locale-'),
+      path.join(os.tmpdir(), 'hopcode-i18n-array-locale-'),
     );
     const localesDir = path.join(tempDir, 'locales');
     await fs.mkdir(localesDir, { recursive: true });

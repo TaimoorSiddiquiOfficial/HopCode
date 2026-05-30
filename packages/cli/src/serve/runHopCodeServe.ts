@@ -203,7 +203,7 @@ export async function runHopCodeServe(
   // Without the stat() check, `canonicalizeWorkspace`'s ENOENT fallback
   // to `path.resolve` would let the daemon boot pointed at a
   // non-existent directory; every `POST /session` would then spawn a
-  // `qwen --acp` child with that cwd and the agent would fail with an
+  // `hopcode --acp` child with that cwd and the agent would fail with an
   // opaque ENOENT — operator pain we can avoid by failing at boot.
   const rawWorkspace = opts.workspace ?? process.cwd();
   if (!path.isAbsolute(rawWorkspace)) {

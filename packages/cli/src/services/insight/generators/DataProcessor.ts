@@ -766,7 +766,7 @@ ${sessionSummaries}
 FRICTION DETAILS:
 ${frictionDetails}
 
-USER INSTRUCTIONS TO Qwen:
+USER INSTRUCTIONS TO HopCode:
 None captured`;
   }
 

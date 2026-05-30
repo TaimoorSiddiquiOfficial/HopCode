@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -84,7 +84,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
           'Absolute workspace path this daemon binds to. ' +
           'POST /session requests with a mismatched cwd return 400 workspace_mismatch. ' +
           'Defaults to process.cwd() when omitted. ' +
-          'For multi-workspace deployments, run one `qwen serve` per workspace ' +
+          'For multi-workspace deployments, run one `hopcode serve` per workspace ' +
           'on separate ports (or behind an external orchestrator).',
       })
       .option('max-connections', {

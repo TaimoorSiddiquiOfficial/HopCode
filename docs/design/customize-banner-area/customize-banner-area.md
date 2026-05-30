@@ -26,7 +26,7 @@ top, not let them silence the information that makes a session
 debuggable. That stance drives every "what can change vs. what is locked"
 decision in the rest of this document.
 
-This is tracked by [issue #3005](https://github.com/QwenLM/hopcode/issues/3005).
+This is tracked by [issue #3005](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3005).
 
 ## Banner region taxonomy
 
@@ -43,7 +43,7 @@ breaks into the following regions:
 │   │                      │         │                                     │  │
 │   │  ███ HOPCODE ASCII ███  │         │  ① Title:    >_ HopCode (vX.Y.Z)  │  │
 │   │  ███   ART ART  ███  │         │  ② Subtitle: «blank, or override»   │  │
-│   │  ███ HOPCODE ASCII ███  │         │  ③ Status:   HopCode OAuth | qwen-…    │  │
+│   │  ███ HOPCODE ASCII ███  │         │  ③ Status:   HopCode OAuth | model-…    │  │
 │   │                      │         │  ④ Path:     ~/projects/example     │  │
 │   └──────── A ───────────┘         └──────────────── B ──────────────────┘  │
 │                                                                             │

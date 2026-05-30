@@ -22,7 +22,7 @@
 ```json
 // Before
 "repository": {
-  "url": "https://github.com/QwenLM/hopcode.git"
+  "url": "https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
 }
 
 // After

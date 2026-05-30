@@ -89,7 +89,7 @@ describe('auth command', () => {
     }) as never);
 
     await yargs(command.split(' '))
-      .scriptName('qwen')
+      .scriptName('hopcode')
       .command(authCommand)
       .strict()
       .fail((message, error) => {

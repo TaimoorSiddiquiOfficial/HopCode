@@ -13,7 +13,7 @@ import {
 import { AuthType, type Config } from '@hoptrendy/hopcode-core';
 
 describe('availableModels', () => {
-  describe('Qwen models', () => {
+  describe('HopCode models', () => {
     const hopcodeModels = getFilteredHopCodeModels();
 
     it('should include only coder-model', () => {
@@ -77,7 +77,7 @@ describe('availableModels', () => {
       process.env = originalEnv;
     });
 
-    it('should return hard-coded qwen models for hopcode-oauth', () => {
+    it('should return hard-coded hopcode models for hopcode-oauth', () => {
       const models = getAvailableModelsForAuthType(AuthType.HOPCODE_OAUTH);
       expect(models.length).toBe(1);
       expect(models[0].id).toBe('coder-model');

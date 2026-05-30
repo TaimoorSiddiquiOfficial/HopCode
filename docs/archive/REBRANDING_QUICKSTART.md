@@ -150,7 +150,7 @@ Replace these URLs with actual HopCode URLs:
 Old: https://qwenlm.github.io/hopcode-docs/
 New: [Your new docs URL]
 
-Old: https://github.com/QwenLM/hopcode
+Old: https://github.com/TaimoorSiddiquiOfficial/HopCode
 New: https://github.com/TaimoorSiddiquiOfficial/HopCode
 
 Old: hopcode-assets.oss-cn-hangzhou.aliyuncs.com

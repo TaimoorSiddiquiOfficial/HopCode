@@ -1,4 +1,4 @@
-# Typescript SDK
+﻿# Typescript SDK
 
 ## @hopcode/sdk
 
@@ -138,7 +138,7 @@ const closed = q.isClosed();
 await q.interrupt();
 
 // Change permission mode mid-session
-await q.setPermissionMode('yolo');
+await q.setPermissionMode('izn');
 
 // Change model mid-session
 await q.setModel('qwen-max');
@@ -165,7 +165,7 @@ The SDK supports different permission modes for controlling tool execution:
 
 1. `excludeTools` - Blocks tools completely
 2. `permissionMode: 'plan'` - Blocks non-read-only tools
-3. `permissionMode: 'yolo'` - Auto-approves all tools
+3. `permissionMode: 'izn'` - Auto-approves all tools
 4. `allowedTools` - Auto-approves matching tools
 5. `canUseTool` callback - Custom approval logic
 6. Default behavior - Auto-deny in SDK mode
@@ -350,7 +350,7 @@ const server = createSdkMcpServer({
 const result = query({
   prompt: 'What is 42 + 17?',
   options: {
-    permissionMode: 'yolo',
+    permissionMode: 'izn',
     mcpServers: {
       calculator: server,
     },

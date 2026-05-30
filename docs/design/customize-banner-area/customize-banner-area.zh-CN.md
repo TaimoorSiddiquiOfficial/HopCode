@@ -19,7 +19,7 @@ Logo 和一个带边框的信息面板。多种真实场景需要对这一区域
 自定义只允许用户把自己的品牌叠在上面，**不允许**屏蔽用于排障的关键
 信息。本文档后续每一处「可改 / 不可改」的判定都来自这一立场。
 
-对应 issue：[#3005](https://github.com/QwenLM/hopcode/issues/3005)。
+对应 issue：[#3005](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3005)。
 
 ## Banner 区域划分
 
@@ -35,7 +35,7 @@ Logo 和一个带边框的信息面板。多种真实场景需要对这一区域
 │   │                      │         │                                     │  │
 │   │  ███ HOPCODE ASCII ███  │         │  ① 标题：    >_ HopCode (vX.Y.Z)  │  │
 │   │  ███   ART ART  ███  │         │  ② 副标题：  «空白行 / 自定义覆盖» │  │
-│   │  ███ HOPCODE ASCII ███  │         │  ③ 状态：    HopCode OAuth | qwen-…    │  │
+│   │  ███ HOPCODE ASCII ███  │         │  ③ 状态：    HopCode OAuth | model-…    │  │
 │   │                      │         │  ④ 路径：    ~/projects/example     │  │
 │   └──────── A ───────────┘         └──────────────── B ──────────────────┘  │
 │                                                                             │

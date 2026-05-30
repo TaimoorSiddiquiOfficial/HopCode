@@ -1,4 +1,4 @@
-# Phase 3 技术设计文档：体验对齐
+﻿# Phase 3 技术设计文档：体验对齐
 
 ## 1. 设计目标与约束
 
@@ -669,17 +669,17 @@ tmux kill-session -t qwen-slash-phase3
 
 #### 10.5.2 E2E 测试清单
 
-| 场景                    | 模式             | 步骤                                                                                    | 预期结果                                                                                                                                  |
-| ----------------------- | ---------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| 补全 source badge       | interactive/tmux | 输入 `/`，观察补全菜单                                                                  | skill/custom/plugin/MCP 命令展示对应 source badge；built-in 可不展示 badge                                                                |
-| 补全 argument hint      | interactive/tmux | 输入 `/model`、`/export`                                                                | 命令名后展示 `argumentHint`；无参数命令不展示噪声 hint                                                                                    |
-| recently used 排序      | interactive/tmux | 先执行 `/help`，再输入 `/`                                                              | `/help` 在同等匹配条件下优先出现；精确 query 仍优先匹配 query                                                                             |
-| alias 命中展示          | interactive/tmux | 输入 `/?`                                                                               | 补全项展示 `help (alias: ?)`；输入 `/he` 时不误显示 alias 命中                                                                            |
-| mid-input ghost text    | interactive/tmux | 在正文中输入 `please /rev`                                                              | 出现 `/review` 的 ghost text 后缀，Tab 可接受                                                                                             |
-| mid-input token 高亮    | interactive/tmux | 输入包含 `/review` 的正文                                                               | 有效 model-invocable slash token 使用命令高亮；路径如 `/usr/bin` 不被高亮为命令                                                           |
-| Help 分组目录           | interactive/tmux | 执行 `/help`                                                                            | 输出包含 Built-in Commands、Bundled Skills、Custom Commands、Plugin Commands、MCP Commands 分组；每条命令展示 source/mode/hint            |
-| `/doctor` headless 回归 | headless/json    | 执行 `node dist/cli.js "/doctor" --approval-mode yolo --output-format json 2>/dev/null` | 返回 `message`，不触发 TUI-only 组件错误                                                                                                  |
-| ACP metadata            | integration      | 运行 ACP session 并触发 `available_commands_update`                                     | 每个 command 保留 `name`、`description`、`input.hint`，并包含 `argumentHint`、`source`、`supportedModes`、`subcommands`、`modelInvocable` |
+| 场景                    | 模式             | 步骤                                                                                   | 预期结果                                                                                                                                  |
+| ----------------------- | ---------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 补全 source badge       | interactive/tmux | 输入 `/`，观察补全菜单                                                                 | skill/custom/plugin/MCP 命令展示对应 source badge；built-in 可不展示 badge                                                                |
+| 补全 argument hint      | interactive/tmux | 输入 `/model`、`/export`                                                               | 命令名后展示 `argumentHint`；无参数命令不展示噪声 hint                                                                                    |
+| recently used 排序      | interactive/tmux | 先执行 `/help`，再输入 `/`                                                             | `/help` 在同等匹配条件下优先出现；精确 query 仍优先匹配 query                                                                             |
+| alias 命中展示          | interactive/tmux | 输入 `/?`                                                                              | 补全项展示 `help (alias: ?)`；输入 `/he` 时不误显示 alias 命中                                                                            |
+| mid-input ghost text    | interactive/tmux | 在正文中输入 `please /rev`                                                             | 出现 `/review` 的 ghost text 后缀，Tab 可接受                                                                                             |
+| mid-input token 高亮    | interactive/tmux | 输入包含 `/review` 的正文                                                              | 有效 model-invocable slash token 使用命令高亮；路径如 `/usr/bin` 不被高亮为命令                                                           |
+| Help 分组目录           | interactive/tmux | 执行 `/help`                                                                           | 输出包含 Built-in Commands、Bundled Skills、Custom Commands、Plugin Commands、MCP Commands 分组；每条命令展示 source/mode/hint            |
+| `/doctor` headless 回归 | headless/json    | 执行 `node dist/cli.js "/doctor" --approval-mode izn --output-format json 2>/dev/null` | 返回 `message`，不触发 TUI-only 组件错误                                                                                                  |
+| ACP metadata            | integration      | 运行 ACP session 并触发 `available_commands_update`                                    | 每个 command 保留 `name`、`description`、`input.hint`，并包含 `argumentHint`、`source`、`supportedModes`、`subcommands`、`modelInvocable` |
 
 #### 10.5.3 Headless 命令示例
 

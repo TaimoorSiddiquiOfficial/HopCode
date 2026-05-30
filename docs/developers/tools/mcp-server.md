@@ -25,7 +25,7 @@ The discovery process is orchestrated by `discoverMcpTools()`, which:
 1. **Iterates through configured servers** from your `settings.json` `mcpServers` configuration
 2. **Establishes connections** using appropriate transport mechanisms (Stdio, SSE, or Streamable HTTP)
 3. **Fetches tool definitions** from each server using the MCP protocol
-4. **Sanitizes and validates** tool schemas for compatibility with the Qwen API
+4. **Sanitizes and validates** tool schemas for compatibility with the model API
 5. **Registers tools** in the global tool registry with conflict resolution
 
 ### Execution Layer (`mcp-tool.ts`)
@@ -406,7 +406,7 @@ Upon successful connection:
 1. **Tool listing:** The client calls the MCP server's tool listing endpoint
 2. **Schema validation:** Each tool's function declaration is validated
 3. **Tool filtering:** Tools are filtered based on `includeTools` and `excludeTools` configuration
-4. **Name sanitization:** Tool names are cleaned to meet Qwen API requirements:
+4. **Name sanitization:** Tool names are cleaned to meet model API requirements:
    - Invalid characters (non-alphanumeric, underscore, dot, hyphen) are replaced with underscores
    - Names longer than 63 characters are truncated with middle replacement (`___`)
 
@@ -541,7 +541,7 @@ Discovery State: COMPLETED
 
 ### Tool Usage
 
-Once discovered, MCP tools are available to the Qwen model like built-in tools. The model will automatically:
+Once discovered, MCP tools are available to the AI model like built-in tools. The model will automatically:
 
 1. **Select appropriate tools** based on your requests
 2. **Present confirmation dialogs** (unless the server is trusted)
@@ -698,7 +698,7 @@ When HopCode receives this response, it will:
 2.  Present the image data as a separate `inlineData` part.
 3.  Provide a clean, user-friendly summary in the CLI, indicating that both text and an image were received.
 
-This enables you to build sophisticated tools that can provide rich, multi-modal context to the Qwen model.
+This enables you to build sophisticated tools that can provide rich, multi-modal context to the AI model.
 
 ## MCP Prompts as Slash Commands
 

@@ -1,4 +1,4 @@
-# AutoSkill：自动技能提炼系统设计文档
+﻿# AutoSkill：自动技能提炼系统设计文档
 
 ## 概述
 
@@ -402,7 +402,7 @@ memory?: {
 ### 8. 本地构建产物验证
 
 - 按 e2e-testing skill 使用 headless JSON 输出：
-  `node dist/cli.js "<prompt>" --approval-mode yolo --output-format json 2>/dev/null`。
+  `node dist/cli.js "<prompt>" --approval-mode izn --output-format json 2>/dev/null`。
 - 必要时加 `--openai-logging --openai-logging-dir <tmp-dir>` 检查请求体中的工具 schema、prompt 和权限配置。
 - 对涉及 TUI 或 sessionEnd 可见状态的场景，使用 tmux interactive 流程捕获最终输出。
 

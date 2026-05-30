@@ -53,7 +53,7 @@ interface HeaderProps {
   /**
    * Width-aware override for the logo column. Each tier is a sanitized
    * ASCII string; the renderer picks `large` when it fits, then `small`,
-   * then falls through to the default Qwen logo. Either tier may be
+   * then falls through to the default HopCode logo. Either tier may be
    * omitted: a missing tier simply skips that step.
    */
   customAsciiArt?: { small?: string; large?: string };
@@ -107,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
   // Two distinct fallback paths:
   //   - User supplied a custom tier and at least one tier fits → render that.
   //   - User supplied custom art but neither tier fits → hide the logo column.
-  //     Falling back to the bundled QWEN logo here would silently undo a
+  //     Falling back to the bundled HOPCODE logo here would silently undo a
   //     white-label deployment on narrow terminals.
   //   - User supplied no custom art → fall through to `shortAsciiLogo` and let
   //     the existing width gate decide whether to show or hide it.
