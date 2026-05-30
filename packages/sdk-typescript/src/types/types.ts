@@ -258,7 +258,7 @@ export interface QueryOptions {
    *   safe ones / blocks risky ones. Fail-closed: classifier outages route
    *   the call to manual approval. Best for long autonomous sessions in
    *   trusted projects. See `docs/users/features/auto-mode.md`.
-   * - 'yolo': All tools execute automatically without confirmation.
+   * - 'izn': All tools execute automatically without confirmation.
    *
    * **Priority Chain (highest to lowest):**
    * 1. `excludeTools` - Blocks tools completely (returns permission error)
@@ -274,7 +274,7 @@ export interface QueryOptions {
    * @see allowedTools For auto-approving specific tools
    * @see excludeTools For blocking specific tools
    */
-  permissionMode?: 'default' | 'plan' | 'auto-edit' | 'auto' | 'yolo';
+  permissionMode?: 'default' | 'plan' | 'auto-edit' | 'auto' | 'izn';
 
   /**
    * Custom permission handler for tool execution approval.

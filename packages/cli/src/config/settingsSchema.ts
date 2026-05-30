@@ -1737,7 +1737,7 @@ const SETTINGS_SCHEMA = {
           { value: ApprovalMode.DEFAULT, label: 'Default' },
           { value: ApprovalMode.AUTO_EDIT, label: 'Auto Edit' },
           { value: ApprovalMode.AUTO, label: 'Auto' },
-          { value: ApprovalMode.YOLO, label: 'YOLO' },
+          { value: ApprovalMode.IZN, label: 'IZN' },
         ],
       },
       autoAccept: {

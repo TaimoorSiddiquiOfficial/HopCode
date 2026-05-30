@@ -121,7 +121,7 @@ describe('mapDomainErrorToErrorKind', () => {
   });
 
   it('classifies TrustGateError as auth_env_error (recognized via .name across package boundaries)', () => {
-    const err = new TrustGateError('untrusted folder rejects YOLO');
+    const err = new TrustGateError('untrusted folder rejects IZN');
     expect(mapDomainErrorToErrorKind(err)).toBe('auth_env_error');
     // Synthesize the same class by name alone — verifies the matcher works
     // even when a bundled-twice instance breaks `instanceof` symmetry.

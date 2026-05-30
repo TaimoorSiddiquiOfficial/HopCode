@@ -756,7 +756,9 @@ describe('fetchGitDiff transient-state detection', () => {
 
 describe('fetchGitDiff tracked-file filename robustness', () => {
   it('keeps the real filename for tracked files that contain a tab', async () => {
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-tab-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-tab-'),
+    );
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -789,7 +791,9 @@ describe('fetchGitDiff tracked-file filename robustness', () => {
   });
 
   it('combines a rename into a single "old => new" per-file entry', async () => {
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-mv-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-mv-'),
+    );
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -860,7 +864,9 @@ describe('fetchGitDiff untracked with special filenames', () => {
   it('counts an untracked file whose name contains a newline as one entry', async () => {
     // Skip on platforms where the filesystem rejects `\n` in names (e.g. some
     // Windows filesystems). POSIX filesystems accept it; we rely on that here.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-nl-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-nl-'),
+    );
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@example.com'], {
@@ -901,7 +907,9 @@ describe('fetchGitDiff invocation from a subdirectory', () => {
     // from a subdir, `git diff --numstat` emitted repo-root-relative keys but
     // `ls-files --others` was scoped to cwd, so untracked files outside the
     // subdir were silently dropped and the path basis was inconsistent.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-sub-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-sub-'),
+    );
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -951,7 +959,9 @@ describe('fetchGitDiff fast path with untracked-only workspaces', () => {
     // because it line-counted only the first MAX_FILES untracked files.
     // The fix makes the threshold fire on tracked + untracked even when
     // shortstat returns nothing.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-fp-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-fp-'),
+    );
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -995,7 +1005,9 @@ describe('fetchGitDiffHunks ignores external diff drivers', () => {
     // `fetchGitDiffHunks` only wants to inspect hunks. The fix is
     // `--no-ext-diff`; this test plants an env-var driver that touches a
     // sentinel file and asserts it never fires.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-ext-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-ext-'),
+    );
     const sentinel = path.join(os.tmpdir(), `hopcode-ext-fired-${Date.now()}`);
     const driverScript = path.join(repo, 'evil-diff.sh');
     try {
@@ -1053,7 +1065,9 @@ describe('fetchGitDiffHunks ignores external diff drivers', () => {
     // of textconv filters configured via .gitattributes +
     // `diff.<name>.textconv`. Without `--no-textconv`, a malicious
     // worktree can still execute commands when this utility runs.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-tc-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-tc-'),
+    );
     const sentinel = path.join(os.tmpdir(), `hopcode-tc-fired-${Date.now()}`);
     const driverScript = path.join(repo, 'evil-textconv.sh');
     try {
@@ -1167,7 +1181,9 @@ describe('fetchGitDiff special filetypes among untracked files', () => {
     // Reproduces wenshao Critical (PR #3491 line 455): without an lstat
     // gate, `open()` would dereference an untracked symlink and read its
     // target — which can live outside the worktree.
-    const repo = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-gitdiff-lnk-'));
+    const repo = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-gitdiff-lnk-'),
+    );
     try {
       await execFileAsync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
       await execFileAsync('git', ['config', 'user.email', 't@e.com'], {
@@ -1183,7 +1199,9 @@ describe('fetchGitDiff special filetypes among untracked files', () => {
 
       // Create an outside-worktree target with content that, if followed,
       // would push linesAdded up. The lstat gate means we never read it.
-      const outside = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-outside-'));
+      const outside = await fs.mkdtemp(
+        path.join(os.tmpdir(), 'hopcode-outside-'),
+      );
       try {
         await fs.writeFile(
           path.join(outside, 'secret.txt'),

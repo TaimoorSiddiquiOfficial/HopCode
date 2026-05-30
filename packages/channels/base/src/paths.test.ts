@@ -32,12 +32,16 @@ describe('channels/base paths – getGlobalHopCodeDir', () => {
 
   it('expands tilde (~/x) in QWEN_HOME', () => {
     process.env['HOPCODE_HOME'] = '~/custom-hopcode';
-    expect(getGlobalHopCodeDir()).toBe(path.join(os.homedir(), 'custom-hopcode'));
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(os.homedir(), 'custom-hopcode'),
+    );
   });
 
   it('expands Windows-style tilde (~\\x) in QWEN_HOME', () => {
     process.env['HOPCODE_HOME'] = '~\\custom-hopcode';
-    expect(getGlobalHopCodeDir()).toBe(path.join(os.homedir(), 'custom-hopcode'));
+    expect(getGlobalHopCodeDir()).toBe(
+      path.join(os.homedir(), 'custom-hopcode'),
+    );
   });
 
   it('treats bare tilde (~) as home directory', () => {

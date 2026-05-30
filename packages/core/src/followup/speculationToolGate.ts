@@ -78,7 +78,6 @@ export async function evaluateToolCall(
     if (
       approvalMode === ApprovalMode.AUTO_EDIT ||
       approvalMode === ApprovalMode.AUTO ||
-      approvalMode === ApprovalMode.YOLO ||
       approvalMode === ApprovalMode.IZN
     ) {
       return { action: 'redirect', reason: `write_tool:${toolName}` };

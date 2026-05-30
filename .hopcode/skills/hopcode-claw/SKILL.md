@@ -182,7 +182,7 @@ Key settings:
 | Setting                      | Description                                         |
 | ---------------------------- | --------------------------------------------------- |
 | `model.name`                 | Model to use (e.g. `llama3.2`, `qwen2.5-coder:32b`) |
-| `tools.approvalMode`         | `plan` / `default` / `auto_edit` / `yolo`           |
+| `tools.approvalMode`         | `plan` / `default` / `auto_edit` / `izn`           |
 | `permissions.allow/ask/deny` | Tool permission rules                               |
 | `mcpServers.*`               | MCP server configurations                           |
 

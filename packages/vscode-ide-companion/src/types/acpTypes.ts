@@ -55,8 +55,7 @@ export const NEXT_APPROVAL_MODE: {
   plan: 'default',
   default: 'auto-edit',
   'auto-edit': 'auto',
-  auto: 'yolo',
-  yolo: 'izn',
+  auto: 'izn',
   izn: 'plan',
 };
 

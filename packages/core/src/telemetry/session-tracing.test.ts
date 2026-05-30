@@ -719,9 +719,7 @@ describe('session-tracing', () => {
         cancelled: true,
       });
 
-      const record = mockSpans.find(
-        (s) => s.name === 'hopcode.tool.execution',
-      );
+      const record = mockSpans.find((s) => s.name === 'hopcode.tool.execution');
       expect(record?.ended).toBe(true);
       // No setStatus call — status stays UNSET, matching setToolSpanCancelled
       // on the parent tool span. Without this, success: false would set ERROR
@@ -742,9 +740,7 @@ describe('session-tracing', () => {
         error: 'Tool execution failed',
       });
 
-      const record = mockSpans.find(
-        (s) => s.name === 'hopcode.tool.execution',
-      );
+      const record = mockSpans.find((s) => s.name === 'hopcode.tool.execution');
       expect(record?.statuses).toHaveLength(1);
       expect(record?.statuses[0]!.code).toBe(SpanStatusCode.ERROR);
       expect(record?.statuses[0]!.message).toBe('Tool execution failed');

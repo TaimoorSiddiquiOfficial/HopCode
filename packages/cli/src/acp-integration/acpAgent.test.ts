@@ -1174,9 +1174,10 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
   });
 
   it('extMethod preflight surfaces SkillError as parse_error errorKind', async () => {
-    const skillError = new (
-      await import('@hoptrendy/hopcode-core')
-    ).SkillError('bad frontmatter', 'PARSE_ERROR');
+    const skillError = new (await import('@hoptrendy/hopcode-core')).SkillError(
+      'bad frontmatter',
+      'PARSE_ERROR',
+    );
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),

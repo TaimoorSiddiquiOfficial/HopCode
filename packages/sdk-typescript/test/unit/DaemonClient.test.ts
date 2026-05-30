@@ -1193,7 +1193,7 @@ describe('DaemonClient', () => {
         }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
-      const result = await client.setSessionApprovalMode('s-1', 'yolo');
+      const result = await client.setSessionApprovalMode('s-1', 'izn');
       expect(result).toEqual({
         sessionId: 's-1',
         mode: 'izn',
@@ -1235,7 +1235,7 @@ describe('DaemonClient', () => {
         }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
-      await client.setSessionApprovalMode('s-1', 'yolo', { persist: false });
+      await client.setSessionApprovalMode('s-1', 'izn', { persist: false });
       expect(JSON.parse(calls[0]!.body!)).toEqual({ mode: 'izn' });
     });
 
@@ -1265,7 +1265,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await expect(
-        client.setSessionApprovalMode('s-1', 'yolo'),
+        client.setSessionApprovalMode('s-1', 'izn'),
       ).rejects.toMatchObject({ status: 403 });
     });
   });

@@ -1566,7 +1566,6 @@ export class Session implements SessionContext {
       default: ApprovalMode.DEFAULT,
       'auto-edit': ApprovalMode.AUTO_EDIT,
       auto: ApprovalMode.AUTO,
-      yolo: ApprovalMode.YOLO,
       izn: ApprovalMode.IZN,
     };
 

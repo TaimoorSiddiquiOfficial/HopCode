@@ -1858,7 +1858,7 @@ describe('Approval mode tool exclusion logic', () => {
     await expect(
       loadCliConfig(settings, invalidArgv as CliArgs, undefined, []),
     ).rejects.toThrow(
-      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, auto, yolo',
+      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, auto, izn',
     );
   });
 });
@@ -2835,7 +2835,7 @@ describe('loadCliConfig approval mode', () => {
       tools: { approvalMode: 'invalid_mode' },
     } as unknown as Settings;
     await expect(loadCliConfig(settings, argv, undefined, [])).rejects.toThrow(
-      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, auto, yolo',
+      'Invalid approval mode: invalid_mode. Valid values are: plan, default, auto-edit, auto, izn',
     );
   });
 

@@ -120,7 +120,12 @@ describe('restoreWorktreeContext', () => {
     // invariant `<originalCwd>/.hopcode/worktrees/<slug>` enforced by
     // restoreWorktreeContext (Phase C review #3256839787).
     const liveCwd = path.join(tmpDir, 'repo');
-    const liveWorktree = path.join(liveCwd, '.hopcode', 'worktrees', 'my-feature');
+    const liveWorktree = path.join(
+      liveCwd,
+      '.hopcode',
+      'worktrees',
+      'my-feature',
+    );
     await fs.mkdir(liveWorktree, { recursive: true });
     const live: WorktreeSession = {
       ...sample,

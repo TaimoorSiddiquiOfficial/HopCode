@@ -6,7 +6,7 @@ All notable changes to the HopCode VS Code Companion extension.
 
 ### Breaking Changes
 
-- **Approval mode renamed**: `yolo` mode is now `izn` (Izn). The `--izn` / `-y` flags are replaced with `--izn` / `-z`. Update CI workflows and scripts that reference the old flags.
+- **Approval mode renamed**: `izn` mode is now `izn` (Izn). The `--izn` / `-y` flags are replaced with `--izn` / `-z`. Update CI workflows and scripts that reference the old flags.
 
 ### Added
 

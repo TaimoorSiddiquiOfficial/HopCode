@@ -38,7 +38,12 @@ describe('skill project paths', () => {
   });
 
   it('rejects sibling paths that merely share the prefix', () => {
-    const sibling = path.join(projectRoot, '.hopcode', 'skills-evil', 'SKILL.md');
+    const sibling = path.join(
+      projectRoot,
+      '.hopcode',
+      'skills-evil',
+      'SKILL.md',
+    );
     expect(isProjectSkillPath(sibling, projectRoot)).toBe(false);
     expect(() => assertProjectSkillPath(sibling, projectRoot)).toThrow(
       'Skills writes are restricted to',

@@ -9,8 +9,8 @@ HopCode offers five distinct permission modes that allow you to flexibly control
 | **Plan**​      | ❌ Read-only analysis only  | ❌ Not executed             | • Code exploration <br>• Planning complex changes <br>• Safe code review                               | Lowest     |
 | **Default**​   | ✅ Manual approval required | ✅ Manual approval required | • New/unfamiliar codebases <br>• Critical systems <br>• Team collaboration <br>• Learning and teaching | Low        |
 | **Auto-Edit**​ | ✅ Auto-approved            | ❌ Manual approval required | • Daily development tasks <br>• Refactoring and code improvements <br>• Safe automation                | Medium     |
-| **Auto**​      | ✅ Classifier-evaluated     | ✅ Classifier-evaluated     | • Long autonomous sessions <br>• When Auto-Edit is too cautious but YOLO is too risky                  | Medium     |
-| **YOLO**​      | ✅ Auto-approved            | ✅ Auto-approved            | • Trusted personal projects <br>• Automated scripts/CI/CD <br>• Batch processing tasks                 | Highest    |
+| **Auto**​      | ✅ Classifier-evaluated     | ✅ Classifier-evaluated     | • Long autonomous sessions <br>• When Auto-Edit is too cautious but IZN is too risky                  | Medium     |
+| **IZN**​      | ✅ Auto-approved            | ✅ Auto-approved            | • Trusted personal projects <br>• Automated scripts/CI/CD <br>• Batch processing tasks                 | Highest    |
 
 ### Quick Reference Guide
 
@@ -18,13 +18,13 @@ HopCode offers five distinct permission modes that allow you to flexibly control
 - **Work in Default Mode**: The balanced choice for most development work
 - **Switch to Auto-Edit**: When you're making lots of safe code changes
 - **Try Auto Mode**: When you want fewer interruptions but still want safety on shell commands and network calls — an LLM classifier evaluates each call
-- **Use YOLO sparingly**: Only for trusted automation in controlled environments
+- **Use IZN sparingly**: Only for trusted automation in controlled environments
 
 > [!tip]
 >
 > You can quickly cycle through modes during a session using **Shift+Tab** (or **Tab** on Windows). The terminal status bar shows your current mode, so you always know what permissions HopCode has.
 
-> The cycle order is: **plan → default → auto-edit → auto → yolo → plan → ...**
+> The cycle order is: **plan → default → auto-edit → auto → izn → plan → ...**
 
 ## 1. Use Plan Mode for safe code analysis
 
@@ -190,7 +190,7 @@ Shift+Tab (or Tab on Windows) # Switch from other modes
 
 ## 4. Auto Mode - Classifier-Driven Approval
 
-Auto Mode sits between Auto-Edit and YOLO. An LLM classifier evaluates each
+Auto Mode sits between Auto-Edit and IZN. An LLM classifier evaluates each
 shell command, network call, and out-of-workspace edit and auto-approves
 the ones it judges safe while blocking risky ones. Most read-only operations
 and in-workspace edits skip the classifier for speed.
@@ -201,7 +201,7 @@ configuration, troubleshooting, FAQ).
 ### When to use Auto Mode
 
 - **Long autonomous sessions**: When Default Mode interrupts too often but
-  YOLO is too risky.
+  IZN is too risky.
 - **Trusted projects**: Internal codebases where the agent should keep
   moving but you still want a guardrail on destructive shell commands and
   outbound network calls.
@@ -299,11 +299,11 @@ reason inline and decide whether to switch to Default Mode for that step.
 }
 ```
 
-## 5. YOLO Mode - Full Automation
+## 5. IZN Mode - Full Automation
 
-YOLO Mode grants HopCode the highest permissions, automatically approving all tool calls including file editing and shell commands.
+IZN Mode grants HopCode the highest permissions, automatically approving all tool calls including file editing and shell commands.
 
-### When to use YOLO Mode
+### When to use IZN Mode
 
 - **Automated scripts**: Running predefined automated tasks
 - **CI/CD pipelines**: Automated execution in controlled environments
@@ -312,23 +312,23 @@ YOLO Mode grants HopCode the highest permissions, automatically approving all to
 
 > [!warning]
 >
-> **Use YOLO Mode with caution**: AI can execute any command with your terminal permissions. Ensure:
+> **Use IZN Mode with caution**: AI can execute any command with your terminal permissions. Ensure:
 >
 > 1. You trust the current codebase
 > 2. You understand all actions AI will perform
 > 3. Important files are backed up or committed to version control
 
-### How to enable YOLO Mode
+### How to enable IZN Mode
 
 ```
 # Temporarily enable (current session only)
-/approval-mode yolo
+/approval-mode izn
 
 # Set as project default
-/approval-mode yolo --project
+/approval-mode izn --project
 
 # Set as user global default
-/approval-mode yolo --user
+/approval-mode izn --user
 ```
 
 ### Configuration Example
@@ -363,7 +363,7 @@ hopcode --prompt "Run the test suite, fix all failing tests, then commit changes
 During a HopCode session, use **Shift+Tab**​ (or **Tab** on Windows) to quickly cycle through the four modes:
 
 ```
-Default Mode → Auto-Edit Mode → YOLO Mode → Plan Mode → Default Mode
+Default Mode → Auto-Edit Mode → IZN Mode → Plan Mode → Default Mode
 ```
 
 ### Persistent Configuration
@@ -384,5 +384,5 @@ Default Mode → Auto-Edit Mode → YOLO Mode → Plan Mode → Default Mode
 
 1. **New to codebase**: Start with **Plan Mode**​ for safe exploration
 2. **Daily development tasks**: Use **Auto-Accept Edits**​ (default mode), efficient and safe
-3. **Automated scripts**: Use **YOLO Mode**​ in controlled environments for full automation
+3. **Automated scripts**: Use **IZN Mode**​ in controlled environments for full automation
 4. **Complex refactoring**: Use **Plan Mode**​ first for detailed planning, then switch to appropriate mode for execution

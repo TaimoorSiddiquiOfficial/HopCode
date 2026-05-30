@@ -214,7 +214,7 @@ export class PermissionController extends BaseController {
       'plan',
       'auto-edit',
       'auto',
-      'yolo',
+      'izn',
     ];
 
     if (!validModes.includes(mode)) {

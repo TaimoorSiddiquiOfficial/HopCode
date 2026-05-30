@@ -381,7 +381,8 @@ export default {
   'Custom Witty Phrases': '自定義詼諧短語',
   'Show Welcome Back Dialog': '顯示歡迎回來對話框',
   'Enable User Feedback': '啟用用戶反饋',
-  'How is HopCode doing this session? (optional)': 'Qwen 這次表現如何？（可選）',
+  'How is HopCode doing this session? (optional)':
+    'Qwen 這次表現如何？（可選）',
   Bad: '不滿意',
   Fine: '還行',
   Good: '滿意',
@@ -1011,7 +1012,8 @@ export default {
     'OAuth 令牌已過期（超過 {{seconds}} 秒）。請重新選擇認證方法',
   'Press any key to return to authentication type selection.':
     '按任意鍵返回認證類型選擇',
-  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 認證...',
+  'Waiting for HopCode OAuth authentication...':
+    '正在等待 HopCode OAuth 認證...',
   'Authentication timed out. Please try again.': '認證超時。請重試。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待認證...（按 ESC 或 CTRL+C 取消）',
@@ -1399,7 +1401,8 @@ export default {
   'Show current authentication status': '顯示當前認證狀態',
   'Authentication completed successfully.': '認證完成。',
   'Starting HopCode OAuth authentication...': '正在啟動 HopCode OAuth 認證...',
-  'Successfully authenticated with HopCode OAuth.': '已成功通過 HopCode OAuth 認證。',
+  'Successfully authenticated with HopCode OAuth.':
+    '已成功通過 HopCode OAuth 認證。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
     'HopCode OAuth 認證失敗：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':

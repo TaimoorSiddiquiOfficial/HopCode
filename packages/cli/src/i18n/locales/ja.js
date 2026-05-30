@@ -868,7 +868,8 @@ export default {
     'OAuthトークンが期限切れです({{seconds}}秒以上)。認証方法を再度選択してください',
   'Press any key to return to authentication type selection.':
     '認証タイプ選択に戻るには任意のキーを押してください',
-  'Waiting for HopCode OAuth authentication...': 'HopCode OAuth認証を待っています...',
+  'Waiting for HopCode OAuth authentication...':
+    'HopCode OAuth認証を待っています...',
   'Authentication timed out. Please try again.':
     '認証がタイムアウトしました。再度お試しください',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1453,7 +1454,7 @@ export default {
 
   // === Missing key backfill ===
   Status: 'ステータス',
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'ランタイム',
   OS: 'OS',
   Auth: '認証',

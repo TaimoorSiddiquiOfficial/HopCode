@@ -14,7 +14,7 @@ export enum ApprovalMode {
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
-  YOLO = 'yolo',
+  IZN = 'izn',
 }
 
 /**
@@ -25,7 +25,7 @@ export const APPROVAL_MODE_MAP: Record<string, ApprovalMode> = {
   default: ApprovalMode.DEFAULT,
   'auto-edit': ApprovalMode.AUTO_EDIT,
   auto: ApprovalMode.AUTO,
-  yolo: ApprovalMode.YOLO,
+  izn: ApprovalMode.IZN,
 };
 
 /**
@@ -60,8 +60,8 @@ export const APPROVAL_MODE_INFO: Record<
       'Qwen will use a classifier to auto-approve safe tools and block risky ones. Click to switch modes.',
     iconType: 'auto',
   },
-  [ApprovalMode.YOLO]: {
-    label: 'YOLO',
+  [ApprovalMode.IZN]: {
+    label: 'IZN',
     title: 'Automatically approve all tools. Click to switch modes.',
     iconType: 'izn',
   },

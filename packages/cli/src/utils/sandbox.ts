@@ -16,11 +16,7 @@ import {
 } from '../config/settings.js';
 import { promisify } from 'node:util';
 import type { Config, SandboxConfig } from '@hoptrendy/hopcode-core';
-import {
-  FatalSandboxError,
-  Storage,
-  isSubpath,
-} from '@hoptrendy/hopcode-core';
+import { FatalSandboxError, Storage, isSubpath } from '@hoptrendy/hopcode-core';
 import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
 

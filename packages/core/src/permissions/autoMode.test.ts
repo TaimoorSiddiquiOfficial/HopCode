@@ -366,7 +366,7 @@ describe('shouldRunAutoModeForCall', () => {
       ApprovalMode.DEFAULT,
       ApprovalMode.PLAN,
       ApprovalMode.AUTO_EDIT,
-      ApprovalMode.YOLO,
+      ApprovalMode.IZN,
     ]) {
       expect(shouldRunAutoModeForCall(mode, ToolNames.SHELL)).toBe(false);
     }

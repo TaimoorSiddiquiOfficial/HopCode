@@ -34,7 +34,11 @@ import {
 } from '@hoptrendy/hopcode-core';
 import type { Part, PartListUnion } from '@google/genai';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
-import type { HistoryItem, HistoryItemWithoutId, SlashCommandProcessorResult } from '../types.js';
+import type {
+  HistoryItem,
+  HistoryItemWithoutId,
+  SlashCommandProcessorResult,
+} from '../types.js';
 import { MessageType, StreamingState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { findLastSafeSplitPoint } from '../utils/markdownUtilities.js';

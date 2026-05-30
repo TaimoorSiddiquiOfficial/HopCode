@@ -15,7 +15,7 @@ Usage:
   tmux-real-user-log.sh help
 
 Examples:
-  eval "$(tmux-real-user-log.sh start mytest . npm run dev -- --approval-mode yolo)"
+  eval "$(tmux-real-user-log.sh start mytest . npm run dev -- --approval-mode izn)"
   tmux-real-user-log.sh snapshot mytest-... /tmp/run "01 initial screen"
   tmux-real-user-log.sh type-submit mytest-... /auth
   tmux-real-user-log.sh send mytest-... Down Enter

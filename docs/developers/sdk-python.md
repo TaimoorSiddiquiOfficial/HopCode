@@ -144,7 +144,7 @@ with query_sync(
 | `cwd`                      | `str`                                                      | Working directory for the CLI process.                                                                          |
 | `model`                    | `str`                                                      | Model override for this SDK session.                                                                            |
 | `path_to_qwen_executable`  | `str`                                                      | `qwen`, an explicit binary path, or a `.js` CLI bundle.                                                         |
-| `permission_mode`          | `default`, `plan`, `auto-edit`, `yolo`                     | Tool execution approval mode. `yolo` auto-approves all tools; use it only in trusted or sandboxed environments. |
+| `permission_mode`          | `default`, `plan`, `auto-edit`, `izn`                     | Tool execution approval mode. `izn` auto-approves all tools; use it only in trusted or sandboxed environments. |
 | `can_use_tool`             | async callback                                             | Custom permission callback for tool requests.                                                                   |
 | `env`                      | `dict[str, str]`                                           | Extra environment variables passed to the CLI process.                                                          |
 | `system_prompt`            | `str`                                                      | Override the system prompt.                                                                                     |

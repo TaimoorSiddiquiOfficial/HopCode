@@ -49,7 +49,7 @@ history 足够大时会产生峰值放大，需要再用默认 heap 长任务验
 | Model                    | `qwen3.6-plus` (128K context window)                         |
 | Heap limit               | `--max-old-space-size=512`                                   |
 | Heap-pressure safety net | **禁用** (HEAP_PRESSURE_COMPRESSION_RATIO 设为 99.0)         |
-| 操作模式                 | YOLO + 自动化多轮 Read 文件任务                              |
+| 操作模式                 | IZN + 自动化多轮 Read 文件任务                              |
 | 工作目录                 | hopcode monorepo (3538 .ts files, 1.26M lines)               |
 
 ### 关键配置修改

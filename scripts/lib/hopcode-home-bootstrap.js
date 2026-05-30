@@ -53,7 +53,8 @@ export function bootstrapHomeEnv() {
   if (process.env.HOPCODE_HOME && process.env.HOPCODE_RUNTIME_DIR) {
     return;
   }
-  const initialHopcodeHome = process.env.HOPCODE_HOME ?? process.env.HOPCODE_HOME;
+  const initialHopcodeHome =
+    process.env.HOPCODE_HOME ?? process.env.HOPCODE_HOME;
   const initialHopcodeDir = initialHopcodeHome
     ? resolvePath(initialHopcodeHome)
     : path.join(os.homedir(), '.hopcode');

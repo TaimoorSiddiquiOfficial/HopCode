@@ -6,16 +6,16 @@
 
 import { ApprovalMode, type Config } from '@hoptrendy/hopcode-core';
 
-export const HEADLESS_YOLO_NO_SANDBOX_WARNING =
-  'Warning: running headless with --yolo / approval-mode=izn and no sandbox. ' +
+export const HEADLESS_IZN_NO_SANDBOX_WARNING =
+  'Warning: running headless with --izn / approval-mode=izn and no sandbox. ' +
   "All tool calls (shell, write, edit) auto-execute at this process's privilege level. " +
   'Enable a sandbox via --sandbox / HOPCODE_SANDBOX, or set ' +
-  'QWEN_CODE_SUPPRESS_YOLO_WARNING=1 to silence this notice.';
+  'QWEN_CODE_SUPPRESS_IZN_WARNING=1 to silence this notice.';
 
 /**
- * Returns a warning line to emit when running in YOLO without a sandbox in a
+ * Returns a warning line to emit when running in IZN without a sandbox in a
  * non-interactive run, or `null` when no warning is warranted: sandbox is
- * configured, we're already inside a sandbox, approval mode is not YOLO, or
+ * configured, we're already inside a sandbox, approval mode is not IZN, or
  * the user explicitly suppressed the notice.
  *
  * The call site (gemini.tsx) is responsible for gating on
@@ -25,11 +25,11 @@ export const HEADLESS_YOLO_NO_SANDBOX_WARNING =
  * The `env` argument is injectable for tests; production callers omit it and
  * fall through to `process.env`.
  */
-export function getHeadlessYoloSafetyWarning(
+export function getHeadlessIznSafetyWarning(
   config: Pick<Config, 'getApprovalMode' | 'getSandbox'>,
   env: NodeJS.ProcessEnv = process.env,
 ): string | null {
-  if (config.getApprovalMode() !== ApprovalMode.YOLO) return null;
+  if (config.getApprovalMode() !== ApprovalMode.IZN) return null;
   if (config.getSandbox()) return null;
   // `SANDBOX` is set by the sandbox transport itself: macOS seatbelt sets
   // it to `sandbox-exec`, Docker/Podman to the container name (e.g.
@@ -39,8 +39,8 @@ export function getHeadlessYoloSafetyWarning(
   // check here misfires inside real sandboxes, where the helper would
   // wrongly emit a "no sandbox" warning despite the run being contained.
   if (env['SANDBOX']) return null;
-  if (isTruthyEnv(env['QWEN_CODE_SUPPRESS_YOLO_WARNING'])) return null;
-  return HEADLESS_YOLO_NO_SANDBOX_WARNING;
+  if (isTruthyEnv(env['QWEN_CODE_SUPPRESS_IZN_WARNING'])) return null;
+  return HEADLESS_IZN_NO_SANDBOX_WARNING;
 }
 
 function isTruthyEnv(val: string | undefined): boolean {

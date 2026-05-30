@@ -222,7 +222,9 @@ describe('session marker round-trip', () => {
     const { readWorktreeSessionMarker, WORKTREE_SESSION_FILE } = await import(
       '../services/gitWorktreeService.js'
     );
-    const tmp = await fs.mkdtemp(pathMod.join(os.tmpdir(), 'hopcode-wt-session-'));
+    const tmp = await fs.mkdtemp(
+      pathMod.join(os.tmpdir(), 'hopcode-wt-session-'),
+    );
     try {
       await fs.writeFile(
         pathMod.join(tmp, WORKTREE_SESSION_FILE),

@@ -141,7 +141,7 @@ export const QueryOptionsSchema = z
       ])
       .optional(),
     permissionMode: z
-      .enum(['default', 'plan', 'auto-edit', 'auto', 'yolo'])
+      .enum(['default', 'plan', 'auto-edit', 'auto', 'izn'])
       .optional(),
     canUseTool: z
       .custom<CanUseTool>((val) => typeof val === 'function', {

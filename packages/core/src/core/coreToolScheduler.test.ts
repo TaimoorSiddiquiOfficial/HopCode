@@ -516,7 +516,7 @@ describe('CoreToolScheduler', () => {
         getSessionId: () => 'test-session-id',
         getUsageStatisticsEnabled: () => true,
         getDebugMode: () => false,
-        getApprovalMode: () => options.approvalMode ?? ApprovalMode.YOLO,
+        getApprovalMode: () => options.approvalMode ?? ApprovalMode.IZN,
         getPermissionsAllow: () => [],
         getPermissionsDeny: options.getPermissionsDeny ?? (() => undefined),
         getContentGeneratorConfig: () => ({
@@ -3388,7 +3388,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5070,14 +5070,14 @@ describe('CoreToolScheduler telemetry spans', () => {
       getAllTools: () => [],
       getToolsByServer: () => [],
     } as unknown as ToolRegistry;
-    // The auto-approve YOLO path doesn't call _schedule's getMessageBus
+    // The auto-approve IZN path doesn't call _schedule's getMessageBus
     // branch, so the only getMessageBus call is the prelude one at
     // _executeToolCallBody. Make that call throw.
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({}),
       getShellExecutionConfig: () => ({
@@ -7875,7 +7875,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -8064,7 +8064,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',

@@ -82,7 +82,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   OS: 'SO',
   Auth: 'Autenticação',
   Model: 'Modelo',

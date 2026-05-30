@@ -37,7 +37,7 @@ Run from that directory:
 
 ```bash
 cd /tmp/test-dir && <hopcode> "prompt" \
-  --approval-mode yolo --output-format json
+  --approval-mode izn --output-format json
 ```
 
 ## Writing Test Servers

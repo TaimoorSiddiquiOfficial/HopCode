@@ -1848,9 +1848,7 @@ describe('standalone release packaging', () => {
       'Remove-RecordedCurrentCmdPathShim',
     );
     expect(uninstallPowerShellSource).toContain('current-cmd-shim.txt');
-    expect(uninstallPowerShellSource).toContain(
-      'HopCode current-session shim',
-    );
+    expect(uninstallPowerShellSource).toContain('HopCode current-session shim');
     expect(uninstallPowerShellSource).toContain('QWEN_UNINSTALL_PURGE');
     expect(uninstallPowerShellSource).toContain('Preserving');
     expect(uninstallPowerShellSource).toMatch(
@@ -1884,9 +1882,9 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
             path.join(installRoot, 'lib', 'hopcode', 'node', 'bin', 'node'),
           ),
         ).toBe(true);
-        expect(readScript(path.join(home, '.hopcode', 'source.json'))).toContain(
-          '"source": "smoke"',
-        );
+        expect(
+          readScript(path.join(home, '.hopcode', 'source.json')),
+        ).toContain('"source": "smoke"');
 
         const version = execFileSync(path.join(installRoot, 'bin', 'qwen'), [
           '--version',
@@ -1896,9 +1894,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         expect(version).toBe('0.0.0-smoke');
         expect(output).toContain('Installing HopCode version: latest');
         expect(output).toContain('QWEN CODE');
-        expect(output).toContain(
-          'HopCode 0.0.0-smoke installed successfully.',
-        );
+        expect(output).toContain('HopCode 0.0.0-smoke installed successfully.');
         expect(output).toContain('To start:\n  cd <project>\n  qwen');
         expect(output).toContain(
           `Installed to:\n  ${path.join(installRoot, 'lib', 'hopcode')}`,
@@ -2013,9 +2009,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         expect(curlUrls).toContain(
           '/releases/hopcode/v0.0.0-smoke/hopcode-linux-x64.tar.gz',
         );
-        expect(curlUrls).toContain(
-          '/releases/hopcode/v0.0.0-smoke/SHA256SUMS',
-        );
+        expect(curlUrls).toContain('/releases/hopcode/v0.0.0-smoke/SHA256SUMS');
         expect(curlUrls).not.toContain(
           '/releases/hopcode/latest/hopcode-linux-x64.tar.gz',
         );
@@ -2180,9 +2174,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
       runUnixUninstaller(installRoot, home);
 
-      expect(existsSync(path.join(installRoot, 'lib', 'hopcode'))).toBe(
-        false,
-      );
+      expect(existsSync(path.join(installRoot, 'lib', 'hopcode'))).toBe(false);
       expect(existsSync(path.join(installRoot, 'bin', 'qwen'))).toBe(false);
       expect(readScript(rcFile)).toBe('before\nafter\n');
       expect(existsSync(sourceJson)).toBe(true);
@@ -2952,9 +2944,9 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
         expect(
           existsSync(path.join(installRoot, 'hopcode', 'node', 'node.exe')),
         ).toBe(true);
-        expect(readScript(path.join(home, '.hopcode', 'source.json'))).toContain(
-          '"source": "smoke"',
-        );
+        expect(
+          readScript(path.join(home, '.hopcode', 'source.json')),
+        ).toContain('"source": "smoke"');
 
         const version = runWindowsCommand(
           `call "${path.join(installRoot, 'bin', 'qwen.cmd')}" --version`,

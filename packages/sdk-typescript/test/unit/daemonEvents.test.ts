@@ -1414,7 +1414,9 @@ describe('PR 21 — auth device-flow events', () => {
       },
     );
     expect(persistFailed.flows['hopcode-oauth']?.status).toBe('error');
-    expect(persistFailed.flows['hopcode-oauth']?.errorKind).toBe('persist_failed');
+    expect(persistFailed.flows['hopcode-oauth']?.errorKind).toBe(
+      'persist_failed',
+    );
   });
 
   it('reduceDaemonAuthEvent ignores stale events that do not match the current flow', () => {
@@ -1499,7 +1501,9 @@ describe('PR 21 — auth device-flow events', () => {
     expect(replayedStartedStale.flows['hopcode-oauth']?.deviceFlowId).toBe(
       'flow-A',
     );
-    expect(replayedStartedStale.flows['hopcode-oauth']?.status).toBe('authorized');
+    expect(replayedStartedStale.flows['hopcode-oauth']?.status).toBe(
+      'authorized',
+    );
   });
 
   it('reduceDaemonAuthEvent passes synthetic frames (no envelope id) through the gate', () => {
@@ -1560,13 +1564,13 @@ describe('PR 21 — auth device-flow events', () => {
         data: {
           sessionId: 'sess-1',
           previous: 'default',
-          next: 'yolo',
+          next: 'izn',
           persisted: true,
         },
       });
       expect(next.approvalModeChangedCount).toBe(1);
-      expect(next.approvalMode).toBe('yolo');
-      expect(next.lastApprovalModeChange?.next).toBe('yolo');
+      expect(next.approvalMode).toBe('izn');
+      expect(next.lastApprovalModeChange?.next).toBe('izn');
       expect(next.lastApprovalModeChange?.persisted).toBe(true);
       // Envelope `originatorClientId` was merged onto the snapshot.
       expect(next.lastApprovalModeChange?.originatorClientId).toBe('client-A');

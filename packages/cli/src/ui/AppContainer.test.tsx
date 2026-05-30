@@ -2800,7 +2800,7 @@ describe('AppContainer State Management', () => {
           (handler): handler is (key: Key) => void =>
             typeof handler === 'function' &&
             (handler.toString().includes('promoteShellToBackground') ||
-             handler.toString().includes('PROMOTE_SHELL_TO_BACKGROUND')),
+              handler.toString().includes('PROMOTE_SHELL_TO_BACKGROUND')),
         ) as ((key: Key) => void) | undefined;
       expect(handleKeypress).toBeDefined();
 
@@ -2856,7 +2856,7 @@ describe('AppContainer State Management', () => {
           (handler): handler is (key: Key) => void =>
             typeof handler === 'function' &&
             (handler.toString().includes('promoteShellToBackground') ||
-             handler.toString().includes('PROMOTE_SHELL_TO_BACKGROUND')),
+              handler.toString().includes('PROMOTE_SHELL_TO_BACKGROUND')),
         ) as ((key: Key) => void) | undefined;
       expect(handleKeypress).toBeDefined();
 
@@ -2921,7 +2921,7 @@ describe('AppContainer State Management', () => {
           (handler): handler is (key: Key) => void =>
             typeof handler === 'function' &&
             (handler.toString().includes('promoteShellToBackground') ||
-             handler.toString().includes('PROMOTE_SHELL_TO_BACKGROUND')),
+              handler.toString().includes('PROMOTE_SHELL_TO_BACKGROUND')),
         ) as ((key: Key) => void) | undefined;
       expect(handleKeypress).toBeDefined();
 

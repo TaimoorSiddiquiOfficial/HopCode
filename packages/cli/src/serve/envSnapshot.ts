@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  detectRuntime,
-  redactProxyCredentials,
-} from '@hoptrendy/hopcode-core';
+import { detectRuntime, redactProxyCredentials } from '@hoptrendy/hopcode-core';
 import {
   STATUS_SCHEMA_VERSION,
   type ServeEnvCell,

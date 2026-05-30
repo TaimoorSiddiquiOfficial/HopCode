@@ -24,7 +24,9 @@ describe('writeWorkspaceContextFile', () => {
   let getGlobalHopCodeDirSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
-    tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-write-context-'));
+    tmpRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-write-context-'),
+    );
     workspace = path.join(tmpRoot, 'workspace');
     globalDir = path.join(tmpRoot, 'global');
     await fs.mkdir(workspace, { recursive: true });

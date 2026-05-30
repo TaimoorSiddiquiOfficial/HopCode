@@ -1210,7 +1210,8 @@ export default {
   'Please visit this URL to authorize:': 'Please visit this URL to authorize:',
   'Waiting for authorization': 'Waiting for authorization',
   'Time remaining:': 'Time remaining:',
-  'HopCode OAuth Authentication Timeout': 'HopCode OAuth Authentication Timeout',
+  'HopCode OAuth Authentication Timeout':
+    'HopCode OAuth Authentication Timeout',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.',
   'Press any key to return to authentication type selection.':

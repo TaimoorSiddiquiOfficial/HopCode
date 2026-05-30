@@ -731,8 +731,8 @@ export class GeminiClient {
         return PermissionMode.AutoEdit;
       case ApprovalMode.AUTO:
         return PermissionMode.Auto;
-      case ApprovalMode.YOLO:
-        return PermissionMode.Yolo;
+      case ApprovalMode.IZN:
+        return PermissionMode.Izn;
       default:
         return PermissionMode.Default;
     }

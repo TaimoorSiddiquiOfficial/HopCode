@@ -170,7 +170,7 @@ function qwenArgs(baseUrl: string): string[] {
     'dist/cli.js',
     '--no-chat-recording',
     '--approval-mode',
-    'yolo',
+    'izn',
     '--auth-type',
     'openai',
     '--openai-api-key',

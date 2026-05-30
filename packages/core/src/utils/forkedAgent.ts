@@ -475,12 +475,12 @@ export async function runForkedAgent(
   // (memory extraction / dream agent) compose correctly: the IZN
   // wrapper's bound tools resolve `this.config.getPermissionManager()`
   // through the prototype chain to the scoped wrapper's own override,
-  // while `this.config.getApprovalMode()` lands on YOLO.
-  const { config: yoloConfig, cleanup: restoreParentPM } =
-    await createApprovalModeOverride(params.config, ApprovalMode.YOLO);
-  // YOLO never triggers strip → restoreParentPM is a no-op. Kept for
+  // while `this.config.getApprovalMode()` lands on IZN.
+  const { config: iznConfig, cleanup: restoreParentPM } =
+    await createApprovalModeOverride(params.config, ApprovalMode.IZN);
+  // IZN never triggers strip → restoreParentPM is a no-op. Kept for
   // API symmetry with the other createApprovalModeOverride callers; if
-  // this function ever switches away from YOLO the lifecycle stays
+  // this function ever switches away from IZN the lifecycle stays
   // correct without further refactor.
   const filesTouched = new Set<string>();
 
@@ -499,7 +499,7 @@ export async function runForkedAgent(
     params.model ?? params.config.getFastModel?.() ?? params.config.getModel();
   const modelRuntime = await buildForkedModelRuntime(
     params.config,
-    yoloConfig,
+    iznConfig,
     modelSelector,
   );
   const modelConfig: ModelConfig = {
@@ -515,7 +515,7 @@ export async function runForkedAgent(
   try {
     const headless = await AgentHeadless.create(
       params.name,
-      yoloConfig,
+      iznConfig,
       promptConfig,
       modelConfig,
       runConfig,
@@ -565,7 +565,7 @@ export async function runForkedAgent(
     // instances dispose their change-listeners on shared
     // SubagentManager / SkillManager. Same shape as the spawn-path
     // finallys in `agent.ts` and `background-agent-resume.ts`.
-    void yoloConfig
+    void iznConfig
       .getToolRegistry()
       .stop()
       .catch(() => {});

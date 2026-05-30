@@ -2449,12 +2449,12 @@ describe('setApprovalMode with folder trust', () => {
       expect(config.getPrePlanMode()).toBe(ApprovalMode.AUTO);
     });
 
-    it('AUTO appears in APPROVAL_MODES between AUTO_EDIT and YOLO', () => {
+    it('AUTO appears in APPROVAL_MODES between AUTO_EDIT and IZN', () => {
       const autoEditIdx = APPROVAL_MODES.indexOf(ApprovalMode.AUTO_EDIT);
       const autoIdx = APPROVAL_MODES.indexOf(ApprovalMode.AUTO);
-      const yoloIdx = APPROVAL_MODES.indexOf(ApprovalMode.YOLO);
+      const iznIdx = APPROVAL_MODES.indexOf(ApprovalMode.IZN);
       expect(autoIdx).toBeGreaterThan(autoEditIdx);
-      expect(autoIdx).toBeLessThan(yoloIdx);
+      expect(autoIdx).toBeLessThan(iznIdx);
     });
 
     it('APPROVAL_MODE_INFO has an entry for AUTO', () => {

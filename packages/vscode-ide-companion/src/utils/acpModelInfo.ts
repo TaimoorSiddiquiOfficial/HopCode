@@ -119,7 +119,7 @@ const APPROVAL_MODE_VALUES: ApprovalModeValue[] = [
   'default',
   'auto-edit',
   'auto',
-  'yolo',
+  'izn',
 ];
 
 const isApprovalModeValue = (value: unknown): value is ApprovalModeValue =>

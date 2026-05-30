@@ -66,7 +66,7 @@ directly in your shell:
 
 ```bash
 eval "$(bash .hopcode/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh \
-  start <scenario> . npm run dev -- --approval-mode yolo)"
+  start <scenario> . npm run dev -- --approval-mode izn)"
 # → $SESSION, $OUTDIR, $LOG are now available
 ```
 
@@ -91,7 +91,7 @@ SESSION="<scenario>-$TS"
 mkdir -p "$OUT"
 tmux new-session -d -s "$SESSION" -x 200 -y 50 \
   -c "$PROJECT_ROOT" \
-  "npm run dev -- --approval-mode yolo"
+  "npm run dev -- --approval-mode izn"
 
 # Poll until TUI is ready (adjust regex to match your app's startup line)
 for i in $(seq 1 30); do
@@ -222,7 +222,7 @@ For each step, define:
 HELPER=.hopcode/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh
 
 # Start
-eval "$(bash "$HELPER" start auth-test . npm run dev -- --approval-mode yolo)"
+eval "$(bash "$HELPER" start auth-test . npm run dev -- --approval-mode izn)"
 # → prints SESSION=... OUTDIR=...
 
 # Trigger /auth, navigate to OAuth provider

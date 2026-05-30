@@ -7,8 +7,8 @@
 import { describe, it, expect } from 'vitest';
 import { ApprovalMode, type Config } from '@hoptrendy/hopcode-core';
 import {
-  HEADLESS_YOLO_NO_SANDBOX_WARNING,
-  getHeadlessYoloSafetyWarning,
+  HEADLESS_IZN_NO_SANDBOX_WARNING,
+  getHeadlessIznSafetyWarning,
 } from './headlessSafetyWarnings.js';
 
 function makeConfig(
@@ -23,74 +23,74 @@ function makeConfig(
   };
 }
 
-describe('getHeadlessYoloSafetyWarning', () => {
-  it('warns when approval mode is YOLO and no sandbox is configured', () => {
-    const cfg = makeConfig(ApprovalMode.YOLO, undefined);
-    expect(getHeadlessYoloSafetyWarning(cfg, {})).toBe(
-      HEADLESS_YOLO_NO_SANDBOX_WARNING,
+describe('getHeadlessIznSafetyWarning', () => {
+  it('warns when approval mode is IZN and no sandbox is configured', () => {
+    const cfg = makeConfig(ApprovalMode.IZN, undefined);
+    expect(getHeadlessIznSafetyWarning(cfg, {})).toBe(
+      HEADLESS_IZN_NO_SANDBOX_WARNING,
     );
   });
 
-  it('does not warn when approval mode is not YOLO', () => {
+  it('does not warn when approval mode is not IZN', () => {
     const cfg = makeConfig(ApprovalMode.DEFAULT, undefined);
-    expect(getHeadlessYoloSafetyWarning(cfg, {})).toBeNull();
+    expect(getHeadlessIznSafetyWarning(cfg, {})).toBeNull();
   });
 
   it('does not warn when a sandbox is configured', () => {
-    const cfg = makeConfig(ApprovalMode.YOLO, {
+    const cfg = makeConfig(ApprovalMode.IZN, {
       command: 'docker',
       image: 'hopcode-sandbox',
     });
-    expect(getHeadlessYoloSafetyWarning(cfg, {})).toBeNull();
+    expect(getHeadlessIznSafetyWarning(cfg, {})).toBeNull();
   });
 
   it('does not warn when SANDBOX env is set to the value the sandbox transport actually writes', () => {
-    const cfg = makeConfig(ApprovalMode.YOLO, undefined);
+    const cfg = makeConfig(ApprovalMode.IZN, undefined);
     // macOS seatbelt
     expect(
-      getHeadlessYoloSafetyWarning(cfg, { SANDBOX: 'sandbox-exec' }),
+      getHeadlessIznSafetyWarning(cfg, { SANDBOX: 'sandbox-exec' }),
     ).toBeNull();
     // Docker / Podman container name
     expect(
-      getHeadlessYoloSafetyWarning(cfg, { SANDBOX: 'hopcode-sandbox' }),
+      getHeadlessIznSafetyWarning(cfg, { SANDBOX: 'hopcode-sandbox' }),
     ).toBeNull();
     // Generic truthy values
-    expect(getHeadlessYoloSafetyWarning(cfg, { SANDBOX: '1' })).toBeNull();
-    expect(getHeadlessYoloSafetyWarning(cfg, { SANDBOX: 'true' })).toBeNull();
+    expect(getHeadlessIznSafetyWarning(cfg, { SANDBOX: '1' })).toBeNull();
+    expect(getHeadlessIznSafetyWarning(cfg, { SANDBOX: 'true' })).toBeNull();
   });
 
   it('warns when SANDBOX env is unset or empty string', () => {
-    const cfg = makeConfig(ApprovalMode.YOLO, undefined);
-    expect(getHeadlessYoloSafetyWarning(cfg, {})).toBe(
-      HEADLESS_YOLO_NO_SANDBOX_WARNING,
+    const cfg = makeConfig(ApprovalMode.IZN, undefined);
+    expect(getHeadlessIznSafetyWarning(cfg, {})).toBe(
+      HEADLESS_IZN_NO_SANDBOX_WARNING,
     );
-    expect(getHeadlessYoloSafetyWarning(cfg, { SANDBOX: '' })).toBe(
-      HEADLESS_YOLO_NO_SANDBOX_WARNING,
+    expect(getHeadlessIznSafetyWarning(cfg, { SANDBOX: '' })).toBe(
+      HEADLESS_IZN_NO_SANDBOX_WARNING,
     );
   });
 
   it('respects the explicit suppression env var when set to 1 or true', () => {
-    const cfg = makeConfig(ApprovalMode.YOLO, undefined);
+    const cfg = makeConfig(ApprovalMode.IZN, undefined);
     expect(
-      getHeadlessYoloSafetyWarning(cfg, {
-        QWEN_CODE_SUPPRESS_YOLO_WARNING: '1',
+      getHeadlessIznSafetyWarning(cfg, {
+        QWEN_CODE_SUPPRESS_IZN_WARNING: '1',
       }),
     ).toBeNull();
     expect(
-      getHeadlessYoloSafetyWarning(cfg, {
-        QWEN_CODE_SUPPRESS_YOLO_WARNING: 'true',
+      getHeadlessIznSafetyWarning(cfg, {
+        QWEN_CODE_SUPPRESS_IZN_WARNING: 'true',
       }),
     ).toBeNull();
   });
 
-  it('does NOT suppress when QWEN_CODE_SUPPRESS_YOLO_WARNING is 0 / false / empty', () => {
-    const cfg = makeConfig(ApprovalMode.YOLO, undefined);
+  it('does NOT suppress when QWEN_CODE_SUPPRESS_IZN_WARNING is 0 / false / empty', () => {
+    const cfg = makeConfig(ApprovalMode.IZN, undefined);
     for (const val of ['0', 'false', '', 'no']) {
       expect(
-        getHeadlessYoloSafetyWarning(cfg, {
-          QWEN_CODE_SUPPRESS_YOLO_WARNING: val,
+        getHeadlessIznSafetyWarning(cfg, {
+          QWEN_CODE_SUPPRESS_IZN_WARNING: val,
         }),
-      ).toBe(HEADLESS_YOLO_NO_SANDBOX_WARNING);
+      ).toBe(HEADLESS_IZN_NO_SANDBOX_WARNING);
     }
   });
 });

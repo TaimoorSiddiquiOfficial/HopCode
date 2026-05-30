@@ -246,7 +246,7 @@ For complete details on all available configuration options, settings files, and
 
 ## Safety in unattended runs
 
-Headless / CI runs combined with `--izn` (or `--approval-mode=izn`) auto-approve every tool call, including `shell`, `write`, and `edit`. **`--izn` does not enable a sandbox** — those tools run at the host process's privilege level. When HopCode detects this combination with no sandbox configured, it prints a one-line warning to stderr at startup. Suppress the warning with `HOPCODE_SUPPRESS_YOLO_WARNING=1` once you've reviewed the trade-off.
+Headless / CI runs combined with `--izn` (or `--approval-mode=izn`) auto-approve every tool call, including `shell`, `write`, and `edit`. **`--izn` does not enable a sandbox** — those tools run at the host process's privilege level. When HopCode detects this combination with no sandbox configured, it prints a one-line warning to stderr at startup. Suppress the warning with `HOPCODE_SUPPRESS_IZN_WARNING=1` once you've reviewed the trade-off.
 
 ### Run-level budgets
 
@@ -264,7 +264,7 @@ HopCode can abort an unattended run when it crosses one of the following thresho
 - **`structured_output` is exempt from `--max-tool-calls`.** Under `--json-schema`, the model's terminal `structured_output` call is the "I'm done" contract, not real work — it doesn't count against `--max-tool-calls` so a budget-edge completion isn't aborted as a false positive. The exemption is unconditional (including failed Ajv validations), so a model stuck in a malformed-output retry loop is NOT bounded by `--max-tool-calls`; combine with `--max-session-turns` or `--max-wall-time` to cap retries.
 - **`structured_output` is NOT exempt from `--max-session-turns`.** That counter is pre-existing and bumps for every turn including the terminal contract. Size `--max-session-turns` to `N+1` if you want to allow `N` real-work turns under `--json-schema`.
 - **Single-shot vs `--input-format stream-json`:** in stream-json input mode the daemon resets the budget counters at the start of every user message; the budget is per-message, not per-process.
-- **`hopcode serve` / ACP sessions:** the daemon ACP session path does NOT currently consult `--max-wall-time` / `--max-tool-calls` from settings.json. These budgets only apply to single-shot `hopcode -p` runs and to `--input-format stream-json` sessions. (`hopcode serve` does emit the YOLO-no-sandbox warning at boot if `tools.approvalMode: 'izn'` is set in settings.)
+- **`hopcode serve` / ACP sessions:** the daemon ACP session path does NOT currently consult `--max-wall-time` / `--max-tool-calls` from settings.json. These budgets only apply to single-shot `hopcode -p` runs and to `--input-format stream-json` sessions. (`hopcode serve` does emit the IZN-no-sandbox warning at boot if `tools.approvalMode: 'izn'` is set in settings.)
 
 ### Recommended combinations
 

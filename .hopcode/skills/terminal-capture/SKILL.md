@@ -51,7 +51,7 @@ import type { ScenarioConfig } from '../scenario-runner.js';
 
 export default {
   name: '/about',
-  spawn: ['node', 'dist/cli.js', '--yolo'],
+  spawn: ['node', 'dist/cli.js', '--izn'],
   // cwd is relative to this config file's location.
   terminal: { title: 'hopcode', cwd: '../../..' },
   flow: [
@@ -256,7 +256,7 @@ interface FlowStep {
 
 interface ScenarioConfig {
   name: string; // Scenario name (also used as screenshot subdirectory name)
-  spawn: string[]; // Launch command ["node", "dist/cli.js", "--yolo"]
+  spawn: string[]; // Launch command ["node", "dist/cli.js", "--izn"]
   flow: FlowStep[]; // Interaction steps
   terminal?: {
     cols?: number; // Number of columns, default 100

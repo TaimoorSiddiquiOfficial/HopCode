@@ -294,9 +294,9 @@ export class HopCodeAgentManager {
                 | 'default'
                 | 'auto-edit'
                 | 'auto'
-                | 'yolo';
+                | 'izn';
               availableModes?: Array<{
-                id: 'plan' | 'default' | 'auto-edit' | 'auto' | 'yolo';
+                id: 'plan' | 'default' | 'auto-edit' | 'auto' | 'izn';
                 name: string;
                 description: string;
               }>;

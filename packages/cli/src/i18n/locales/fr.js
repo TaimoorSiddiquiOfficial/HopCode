@@ -1161,7 +1161,8 @@ export default {
     'Veuillez visiter cette URL pour autoriser :',
   'Waiting for authorization': "En attente d'autorisation",
   'Time remaining:': 'Temps restant :',
-  'HopCode OAuth Authentication Timeout': "Délai d'authentification HopCode OAuth",
+  'HopCode OAuth Authentication Timeout':
+    "Délai d'authentification HopCode OAuth",
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     "Token OAuth expiré (plus de {{seconds}} secondes). Veuillez sélectionner à nouveau la méthode d'authentification.",
   'Press any key to return to authentication type selection.':

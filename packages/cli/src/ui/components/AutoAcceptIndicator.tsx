@@ -42,7 +42,7 @@ export const AutoAcceptIndicator: React.FC<AutoAcceptIndicatorProps> = ({
       textContent = t('auto mode (classifier-evaluated)');
       subText = cycleText;
       break;
-    case ApprovalMode.YOLO:
+    case ApprovalMode.IZN:
       textColor = theme.status.error;
       textContent = t('Izn mode');
       subText = cycleText;

@@ -209,9 +209,9 @@ describe('useAutoAcceptIndicator', () => {
       } as Key);
     });
     expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
-      ApprovalMode.YOLO,
+      ApprovalMode.IZN,
     );
-    expect(result.current).toBe(ApprovalMode.YOLO);
+    expect(result.current).toBe(ApprovalMode.IZN);
 
     act(() => {
       capturedUseKeypressHandler({

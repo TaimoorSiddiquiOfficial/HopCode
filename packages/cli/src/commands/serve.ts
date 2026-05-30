@@ -17,7 +17,7 @@ import {
   MCP_BUDGET_WARN_FRACTION,
 } from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../config/settings.js';
-import { HEADLESS_YOLO_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarnings.js';
+import { HEADLESS_IZN_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarnings.js';
 
 /**
  * Pause the current async function indefinitely. Used after the daemon
@@ -208,30 +208,30 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       );
     }
 
-    // Emit the headless-YOLO safety warning at daemon startup if
-    // settings.json statically configures yolo + no sandbox. We can't
-    // use `getHeadlessYoloSafetyWarning(config)` here because the daemon
+    // Emit the headless-IZN safety warning at daemon startup if
+    // settings.json statically configures izn + no sandbox. We can't
+    // use `getHeadlessIznSafetyWarning(config)` here because the daemon
     // hasn't constructed a `Config` yet — sessions get their own — so
     // we re-derive the predicate from the same settings.json the
     // sessions will load. Per-session override (the ACP client flipping
     // approval mode mid-session) is out of scope here; this warns about
     // a deployment that's wide-open at boot. Suppress with
-    // QWEN_CODE_SUPPRESS_YOLO_WARNING=1.
+    // QWEN_CODE_SUPPRESS_IZN_WARNING=1.
     try {
       const loaded = loadSettings(argv.workspace ?? process.cwd());
       const merged = loaded.merged;
       const approvalMode = merged.tools?.approvalMode;
       const sandbox = merged.tools?.sandbox;
       const sandboxEnv = process.env['SANDBOX'];
-      const suppress = process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
+      const suppress = process.env['QWEN_CODE_SUPPRESS_IZN_WARNING'];
       const suppressed = suppress === '1' || suppress === 'true';
       if (
-        approvalMode === ApprovalMode.YOLO &&
+        approvalMode === ApprovalMode.IZN &&
         !sandbox &&
         !sandboxEnv &&
         !suppressed
       ) {
-        writeStderrLine(HEADLESS_YOLO_NO_SANDBOX_WARNING);
+        writeStderrLine(HEADLESS_IZN_NO_SANDBOX_WARNING);
       }
     } catch {
       // Settings load can fail (corrupt JSON, etc.); don't block

@@ -22,7 +22,9 @@ describe('canonicalizeWorkspace', () => {
 
   beforeEach(async () => {
     const id = randomBytes(6).toString('hex');
-    scratch = await fsp.mkdtemp(path.join(os.tmpdir(), `hopcode-fs-paths-${id}-`));
+    scratch = await fsp.mkdtemp(
+      path.join(os.tmpdir(), `hopcode-fs-paths-${id}-`),
+    );
   });
 
   afterEach(async () => {

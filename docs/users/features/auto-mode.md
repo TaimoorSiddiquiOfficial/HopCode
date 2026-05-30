@@ -2,7 +2,7 @@
 
 Auto Mode uses an LLM classifier to evaluate each tool call and decide
 whether to auto-approve it. It sits between Auto-Edit (which only
-auto-approves file edits) and YOLO (which auto-approves everything).
+auto-approves file edits) and IZN (which auto-approves everything).
 
 This page is the reference for configuring and troubleshooting Auto Mode.
 For an introduction, see the
@@ -257,7 +257,7 @@ Auto-Edit auto-approves file edits and nothing else — shell commands
 still ask. Auto Mode uses a classifier to also auto-approve safe shell
 commands and other tool calls while still blocking risky ones.
 
-**How is this different from YOLO?**
+**How is this different from IZN?**
 
-YOLO auto-approves everything without any review. Auto Mode has the
+IZN auto-approves everything without any review. Auto Mode has the
 classifier in the loop and blocks risky actions.

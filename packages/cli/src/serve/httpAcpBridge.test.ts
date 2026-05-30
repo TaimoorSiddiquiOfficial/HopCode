@@ -4449,7 +4449,7 @@ describe('createHttpAcpBridge', () => {
       await expect(
         bridge.setSessionApprovalMode(
           session.sessionId,
-          ApprovalMode.YOLO,
+          ApprovalMode.IZN,
           { persist: true },
           undefined,
         ),
@@ -4472,12 +4472,12 @@ describe('createHttpAcpBridge', () => {
       const session = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
       const res = await bridge.setSessionApprovalMode(
         session.sessionId,
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
         { persist: false },
         undefined,
       );
       expect(res.persisted).toBe(false);
-      expect(res.mode).toBe('yolo');
+      expect(res.mode).toBe('izn');
       await bridge.shutdown();
     });
 
@@ -4509,7 +4509,7 @@ describe('createHttpAcpBridge', () => {
         [Symbol.asyncIterator]();
       await bridge.setSessionApprovalMode(
         a.sessionId,
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
         { persist: true },
         undefined,
       );
@@ -4527,7 +4527,7 @@ describe('createHttpAcpBridge', () => {
       expect(bFirst.value?.data).toMatchObject({
         sessionId: a.sessionId,
         previous: 'default',
-        next: 'yolo',
+        next: 'izn',
         persisted: true,
       });
       aborts.forEach((a) => a.abort());
@@ -4558,7 +4558,7 @@ describe('createHttpAcpBridge', () => {
         [Symbol.asyncIterator]();
       await bridge.setSessionApprovalMode(
         a.sessionId,
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
         { persist: false },
         undefined,
       );
@@ -4707,7 +4707,9 @@ describe('createHttpAcpBridge', () => {
     let tmpWs: string;
 
     beforeEach(async () => {
-      tmpWs = await fsp.mkdtemp(path.join(os.tmpdir(), 'hopcode-init-workspace-'));
+      tmpWs = await fsp.mkdtemp(
+        path.join(os.tmpdir(), 'hopcode-init-workspace-'),
+      );
     });
 
     afterEach(async () => {

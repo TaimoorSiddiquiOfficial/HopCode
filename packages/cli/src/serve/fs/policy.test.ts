@@ -29,7 +29,10 @@ describe('shouldIgnore', () => {
 
   beforeEach(async () => {
     scratch = await fsp.mkdtemp(
-      path.join(os.tmpdir(), `hopcode-policy-${randomBytes(4).toString('hex')}-`),
+      path.join(
+        os.tmpdir(),
+        `hopcode-policy-${randomBytes(4).toString('hex')}-`,
+      ),
     );
     const wsDir = path.join(scratch, 'ws');
     await fsp.mkdir(wsDir, { recursive: true });
@@ -208,7 +211,10 @@ describe('detectBinary', () => {
 
   beforeEach(async () => {
     scratch = await fsp.mkdtemp(
-      path.join(os.tmpdir(), `hopcode-binary-${randomBytes(4).toString('hex')}-`),
+      path.join(
+        os.tmpdir(),
+        `hopcode-binary-${randomBytes(4).toString('hex')}-`,
+      ),
     );
     const wsDir = path.join(scratch, 'ws');
     await fsp.mkdir(wsDir, { recursive: true });

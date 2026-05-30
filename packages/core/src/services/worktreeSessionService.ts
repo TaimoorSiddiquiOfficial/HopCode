@@ -204,7 +204,11 @@ export async function restoreWorktreeContext(
   // there. Restrict to the Qwen-managed worktrees subtree so a
   // tampered sidecar can't redirect file operations to /etc, ~/, etc.
   // (PR #4174 review #3256839787.)
-  const expectedParent = path.join(session.originalCwd, '.hopcode', 'worktrees');
+  const expectedParent = path.join(
+    session.originalCwd,
+    '.hopcode',
+    'worktrees',
+  );
   const resolvedWorktree = path.resolve(session.worktreePath);
   if (
     !resolvedWorktree.startsWith(expectedParent + path.sep) &&

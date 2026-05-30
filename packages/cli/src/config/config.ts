@@ -98,7 +98,7 @@ const VALID_APPROVAL_MODE_VALUES = [
   'default',
   'auto-edit',
   'auto',
-  'yolo',
+  'izn',
 ] as const;
 
 function formatApprovalModeError(value: string): Error {
@@ -668,9 +668,9 @@ export async function parseArguments(): Promise<CliArgs> {
         })
         .option('approval-mode', {
           type: 'string',
-          choices: ['plan', 'default', 'auto-edit', 'auto', 'yolo', 'izn'],
+          choices: ['plan', 'default', 'auto-edit', 'auto', 'izn', 'izn'],
           description:
-            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), yolo (auto-approve all tools)',
+            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), izn (auto-approve all tools)',
         })
         .option('checkpointing', {
           type: 'boolean',
@@ -1647,7 +1647,7 @@ export async function loadCliConfig(
         // call time; but non-interactive mode has no UI for the classifier's
         // fallback path, so apply the same denylist as DEFAULT to keep parity
         // with the interactive AUTO safety guarantees (no zero-denial drift
-        // toward YOLO behavior).
+        // toward IZN behavior).
         denyUnlessAllowed(ToolNames.SHELL as ToolName);
         denyUnlessAllowed(ToolNames.MONITOR as ToolName);
         denyUnlessAllowed(ToolNames.EDIT as ToolName);
