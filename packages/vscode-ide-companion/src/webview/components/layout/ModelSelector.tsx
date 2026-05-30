@@ -18,7 +18,7 @@ interface ModelSelectorProps {
 }
 
 /**
- * Returns true when the model is a non-runtime Qwen OAuth entry that has been
+ * Returns true when the model is a non-runtime HopCode OAuth entry that has been
  * discontinued.  Runtime snapshots (prefixed with `$runtime|`) remain
  * selectable so users who already have a runtime model aren't blocked.
  */
@@ -31,7 +31,7 @@ function isDiscontinuedHopCodeOAuth(modelId: string): boolean {
 const DISCONTINUED_DESCRIPTION =
   'Discontinued — switch to Coding Plan or API Key';
 const DISCONTINUED_BLOCKED_MSG =
-  'Qwen OAuth free tier was discontinued on 2026-04-15';
+  'HopCode OAuth free tier was discontinued on 2026-04-15';
 
 export const ModelSelector: FC<ModelSelectorProps> = ({
   visible,

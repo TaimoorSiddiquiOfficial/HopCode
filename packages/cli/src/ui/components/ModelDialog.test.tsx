@@ -389,7 +389,7 @@ describe('<ModelDialog />', () => {
     expect(mockedSelect.mock.calls[0][0].initialIndex).toBe(deepseekIndex);
   });
 
-  it('blocks switching to qwen-oauth from another authType (discontinued)', async () => {
+  it('blocks switching to hopcode-oauth from another authType (discontinued)', async () => {
     const switchModel = vi.fn().mockResolvedValue(undefined);
     const getAuthType = vi.fn(() => AuthType.USE_OPENAI);
     const getAvailableModelsForAuthType = vi.fn((t: AuthType) => {

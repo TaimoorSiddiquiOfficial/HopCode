@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 
-export const PROJECT_SKILLS_RELATIVE_DIR = path.join('.qwen', 'skills');
+export const PROJECT_SKILLS_RELATIVE_DIR = path.join('.hopcode', 'skills');
 export const SKILL_FILE_NAME = 'SKILL.md';
 
 export function getProjectSkillsRoot(projectRoot: string): string {

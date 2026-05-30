@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Traditional Chinese (zh-TW) translations for Qwen Code CLI
+// Traditional Chinese (zh-TW) translations for HopCode CLI
 // Bootstrapped from en.js structure with opencc(zh.js s2t),
 // then extensively hand-corrected for Taiwan vocabulary conventions.
 // This file is the authoritative source — do not overwrite with auto-generated output.
@@ -360,8 +360,8 @@ export default {
   error: '錯誤',
   'View and edit HopCode settings': '查看和編輯 HopCode 設置',
   Settings: '設置',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    '要查看更改，必須重啟 Qwen Code。按 r 退出並立即應用更改。',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    '要查看更改，必須重啟 HopCode。按 r 退出並立即應用更改。',
   'Vim Mode': 'Vim 模式',
   'Attribution: commit': '署名：提交',
   'Terminal Bell Notification': '終端響鈴通知',
@@ -381,7 +381,7 @@ export default {
   'Custom Witty Phrases': '自定義詼諧短語',
   'Show Welcome Back Dialog': '顯示歡迎回來對話框',
   'Enable User Feedback': '啟用用戶反饋',
-  'How is Qwen doing this session? (optional)': 'Qwen 這次表現如何？（可選）',
+  'How is HopCode doing this session? (optional)': 'Qwen 這次表現如何？（可選）',
   Bad: '不滿意',
   Fine: '還行',
   Good: '滿意',
@@ -460,8 +460,8 @@ export default {
   remote: '遠程',
   'This extension will add the following commands: {{commands}}.':
     '此擴展將添加以下命令：{{commands}}。',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    '此擴展將使用 {{fileName}} 向您的 QWEN.md 上下文追加信息',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    '此擴展將使用 {{fileName}} 向您的 HOPCODE.md 上下文追加信息',
   'This extension will install the following skills:': '此擴展將安裝以下技能：',
   'This extension will install the following subagents:':
     '此擴展將安裝以下子智能體：',
@@ -608,8 +608,8 @@ export default {
   'No hook events found.': '未找到 Hook 事件。',
   '{{count}} hook configured': '{{count}} 個 Hook 已配置',
   '{{count}} hooks configured': '{{count}} 個 Hook 已配置',
-  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask Qwen Code.':
-    '此選單為只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 Qwen Code。',
+  'This menu is read-only. To add or modify hooks, edit settings.json directly or ask HopCode.':
+    '此選單為只讀。要添加或修改 Hook，請直接編輯 settings.json 或詢問 HopCode。',
   'Enter to select · Esc to cancel': 'Enter 選擇 · Esc 取消',
   'Exit codes:': '退出碼：',
   'Configured hooks:': '已配置的 Hook：',
@@ -634,8 +634,8 @@ export default {
   'StatusLine will not be displayed': '不會顯示狀態欄',
   'Tool operations will proceed without hook validation':
     '工具操作將在沒有 Hook 驗證的情況下繼續',
-  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask Qwen Code.':
-    '要重新啟用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 Qwen Code。',
+  'To re-enable hooks, remove "disableAllHooks" from settings.json or ask HopCode.':
+    '要重新啟用 Hook，請從 settings.json 中刪除 "disableAllHooks" 或詢問 HopCode。',
   Project: '項目',
   User: '用戶',
   Skill: '技能',
@@ -832,7 +832,7 @@ export default {
   servers: '個伺服器',
   'Add MCP servers to your settings to get started.':
     '請在設置中添加 MCP servers 以開始使用。',
-  'Run qwen --debug to see error logs': '運行 qwen --debug 查看錯誤日誌',
+  'Run hopcode --debug to see error logs': '運行 hopcode --debug 查看錯誤日誌',
   'OAuth Authentication': 'OAuth 認證',
   'Authenticating... Please complete the login in your browser.':
     '認證中... 請在瀏覽器中完成登錄。',
@@ -913,8 +913,8 @@ export default {
   'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.':
     '/directory add 命令在限制性沙箱配置檔案中不受支持。請改為在啟動會話時使用 --include-directories。',
   "Error adding '{{path}}': {{error}}": "添加 '{{path}}' 時出錯：{{error}}",
-  'Successfully added QWEN.md files from the following directories if there are:\n- {{directories}}':
-    '如果存在，已成功從以下目錄添加 QWEN.md 檔案：\n- {{directories}}',
+  'Successfully added HOPCODE.md files from the following directories if there are:\n- {{directories}}':
+    '如果存在，已成功從以下目錄添加 HOPCODE.md 檔案：\n- {{directories}}',
   'Error refreshing memory: {{error}}': '刷新內存時出錯：{{error}}',
   'Successfully added directories:\n- {{directories}}':
     '成功添加目錄：\n- {{directories}}',
@@ -972,12 +972,12 @@ export default {
   'HopCode OAuth': 'HopCode OAuth (免費)',
   'Discontinued — switch to Coding Plan or API Key':
     '已停用 — 請切換到 Coding Plan 或 API Key',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Qwen OAuth 免費額度已於 2026-04-15 停用。請選擇 Coding Plan 或 API Key。',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Qwen OAuth免費層已於2026-04-15停止服務。請選擇其他提供商的模型或運行 /auth 切換。',
-  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ Qwen OAuth 免費額度已於 2026-04-15 停用。請選擇其他選項。\n',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'HopCode OAuth 免費額度已於 2026-04-15 停用。請選擇 Coding Plan 或 API Key。',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'HopCode OAuth免費層已於2026-04-15停止服務。請選擇其他提供商的模型或運行 /auth 切換。',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ HopCode OAuth 免費額度已於 2026-04-15 停用。請選擇其他選項。\n',
   'Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
     '付費 · 每 5 小時最多 6,000 次請求 · 支持阿里雲百鍊 Coding Plan 全部模型',
   'For teams · Paid · Up to 6,000 requests/5 hrs · All Alibaba Cloud Coding Plan Models':
@@ -1002,16 +1002,16 @@ export default {
     '基於瀏覽器的第三方提供商認證（例如 OpenRouter、ModelScope）',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     '認證方式被強制設置為 {{enforcedType}}，但您當前使用的是 {{currentType}}',
-  'Qwen OAuth Authentication': 'Qwen OAuth 認證',
+  'HopCode OAuth Authentication': 'HopCode OAuth 認證',
   'Please visit this URL to authorize:': '請訪問此 URL 進行授權：',
   'Waiting for authorization': '等待授權中',
   'Time remaining:': '剩餘時間：',
-  'Qwen OAuth Authentication Timeout': 'Qwen OAuth 認證超時',
+  'HopCode OAuth Authentication Timeout': 'HopCode OAuth 認證超時',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth 令牌已過期（超過 {{seconds}} 秒）。請重新選擇認證方法',
   'Press any key to return to authentication type selection.':
     '按任意鍵返回認證類型選擇',
-  'Waiting for Qwen OAuth authentication...': '正在等待 Qwen OAuth 認證...',
+  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 認證...',
   'Authentication timed out. Please try again.': '認證超時。請重試。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待認證...（按 ESC 或 CTRL+C 取消）',
@@ -1092,10 +1092,10 @@ export default {
   'Search…': '搜索…',
   'Add directory…': '添加目錄…',
   'Add directory to workspace': '添加工作區目錄',
-  'Qwen Code can read files in the workspace, and make edits when auto-accept edits is on.':
-    'Qwen Code 可以讀取工作區中的檔案，並在自動接受編輯模式開啟時進行編輯。',
-  'Qwen Code will be able to read files in this directory and make edits when auto-accept edits is on.':
-    'Qwen Code 將能夠讀取此目錄中的檔案，並在自動接受編輯模式開啟時進行編輯。',
+  'HopCode can read files in the workspace, and make edits when auto-accept edits is on.':
+    'HopCode 可以讀取工作區中的檔案，並在自動接受編輯模式開啟時進行編輯。',
+  'HopCode will be able to read files in this directory and make edits when auto-accept edits is on.':
+    'HopCode 將能夠讀取此目錄中的檔案，並在自動接受編輯模式開啟時進行編輯。',
   'Enter the path to the directory:': '輸入目錄路徑：',
   'Enter directory path…': '輸入目錄路徑…',
   'Tab to complete · Enter to add · Esc to cancel':
@@ -1181,8 +1181,8 @@ export default {
     '試試 /insight，從聊天記錄中生成個性化洞察。',
   'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
     '按 Ctrl+O 切換緊湊模式 ── 隱藏工具輸出和思考過程，界面更簡潔。',
-  'Add a QWEN.md file to give Qwen Code persistent project context.':
-    '添加 QWEN.md 檔案，為 Qwen Code 提供持久的項目上下文。',
+  'Add a HOPCODE.md file to give HopCode persistent project context.':
+    '添加 HOPCODE.md 檔案，為 HopCode 提供持久的項目上下文。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     '用 /btw 快速問一個小問題，不會打斷當前對話。',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1391,17 +1391,17 @@ export default {
     '↑/↓: 導航 | ←/→: 切換標籤頁 | Enter: 選擇',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: 導航 | Enter: 選擇 | Esc: 取消',
-  'Authenticate using Qwen OAuth': '使用 Qwen OAuth 進行認證',
+  'Authenticate using HopCode OAuth': '使用 HopCode OAuth 進行認證',
   'Authenticate using Alibaba Cloud Coding Plan':
     '使用阿里雲百鍊 Coding Plan 進行認證',
   'Region for Coding Plan (china/global)': 'Coding Plan 區域 (china/global)',
   'API key for Coding Plan': 'Coding Plan 的 API Key',
   'Show current authentication status': '顯示當前認證狀態',
   'Authentication completed successfully.': '認證完成。',
-  'Starting Qwen OAuth authentication...': '正在啟動 Qwen OAuth 認證...',
-  'Successfully authenticated with Qwen OAuth.': '已成功通過 Qwen OAuth 認證。',
-  'Failed to authenticate with Qwen OAuth: {{error}}':
-    'Qwen OAuth 認證失敗：{{error}}',
+  'Starting HopCode OAuth authentication...': '正在啟動 HopCode OAuth 認證...',
+  'Successfully authenticated with HopCode OAuth.': '已成功通過 HopCode OAuth 認證。',
+  'Failed to authenticate with HopCode OAuth: {{error}}':
+    'HopCode OAuth 認證失敗：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
     '正在處理阿里雲百鍊 Coding Plan 認證...',
   'Successfully authenticated with Alibaba Cloud Coding Plan.':
@@ -1419,8 +1419,8 @@ export default {
   '⚠️  No authentication method configured.\n': '⚠️  未配置認證方式。\n',
   'Run one of the following commands to get started:\n':
     '運行以下命令之一開始配置：\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - 使用 Qwen OAuth 登錄（已停用）',
+  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  hopcode auth hopcode-oauth     - 使用 HopCode OAuth 登錄（已停用）',
   'Or simply run:': '或者直接運行：',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - 交互式認證配置\n',
@@ -1428,8 +1428,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  類型：免費額度（2026-04-15 已停用）',
   '  Limit: No longer available': '  限額：已不可用',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Qwen OAuth 免費額度已於 2026-04-15 停用。請運行 /auth 切換到 Coding Plan、OpenRouter、Fireworks AI 或其他服務商。',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'HopCode OAuth 免費額度已於 2026-04-15 停用。請運行 /auth 切換到 Coding Plan、OpenRouter、Fireworks AI 或其他服務商。',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ 認證方式：阿里雲百鍊 Coding Plan',
   '中国 (China) - 阿里云百炼': '中國 (China) - 阿里雲百鍊',
@@ -1442,8 +1442,8 @@ export default {
     '⚠️  認證方式：阿里雲百鍊 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  問題：在環境變量或設置中未找到 API Key\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  運行 `qwen auth coding-plan` 重新配置。\n',
+  '  Run `hopcode auth coding-plan` to re-configure.\n':
+    '  運行 `hopcode auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 認證方式：{{type}}',
   '  Status: Configured\n': '  狀態：已配置\n',
   'Failed to check authentication status: {{error}}':

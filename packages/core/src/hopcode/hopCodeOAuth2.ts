@@ -148,7 +148,7 @@ export class HopCodeOAuthPollError extends Error {
 }
 
 /**
- * Qwen OAuth2 credentials interface
+ * HopCode OAuth2 credentials interface
  */
 export interface HopCodeCredentials {
   access_token?: string;
@@ -1050,7 +1050,7 @@ async function authWithHopCodeDeviceFlow(
   }
 }
 
-// PR 21 (#4175 Wave 4): exported so the `qwen serve` device-flow registry can
+// PR 21 (#4175 Wave 4): exported so the `hopcode serve` device-flow registry can
 // persist credentials acquired through the daemon's HTTP route. Mode 0o600
 // matches opencode's `auth.json` to keep tokens unreadable by other users on
 // shared hosts. The constant is exported so tests/auditors can assert intent
@@ -1217,7 +1217,7 @@ export async function clearHopCodeCredentials(): Promise<void> {
 }
 
 function getQwenCachedCredentialPath(): string {
-  return path.join(Storage.getGlobalQwenDir(), QWEN_CREDENTIAL_FILENAME);
+  return path.join(Storage.getGlobalHopCodeDir(), QWEN_CREDENTIAL_FILENAME);
 }
 
 export const clearCachedCredentialFile = clearHopCodeCredentials;

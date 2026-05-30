@@ -310,7 +310,7 @@ describe('HopCodeContentGenerator', () => {
       getContentGeneratorConfig: vi.fn().mockReturnValue({
         model: 'hopcode-turbo',
         apiKey: 'test-api-key',
-        authType: 'qwen',
+        authType: 'hopcode',
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         enableOpenAILogging: false,
         timeout: 120000,

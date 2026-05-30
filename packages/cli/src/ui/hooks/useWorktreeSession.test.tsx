@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +30,7 @@ function makeMockConfig(sidecarPath: string): Config {
 
 const sample: WorktreeSession = {
   slug: 'my-feature',
-  worktreePath: '/repo/.qwen/worktrees/my-feature',
+  worktreePath: '/repo/.hopcode/worktrees/my-feature',
   worktreeBranch: 'worktree-my-feature',
   originalCwd: '/repo',
   originalBranch: 'main',

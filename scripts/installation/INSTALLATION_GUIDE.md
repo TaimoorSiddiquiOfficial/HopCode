@@ -1,6 +1,6 @@
 # Installation Guide for HopCode with Source Tracking
 
-This guide describes the source-tracking installation scripts for Qwen Code.
+This guide describes the source-tracking installation scripts for HopCode.
 The scripts prefer standalone release archives and can fall back to npm when a
 standalone archive is not available.
 
@@ -13,7 +13,7 @@ The installers are intentionally lightweight:
 - They do not edit npm config. Standalone installs may update the shell profile
   or user PATH so the generated `qwen` shim is discoverable.
 - They do not start `qwen` automatically after installation.
-- They store source information in `~/.qwen/source.json` or
+- They store source information in `~/.hopcode/source.json` or
   `%USERPROFILE%\.qwen\source.json` when `--source` is provided.
 
 Standalone archives include a private Node.js runtime, so users do not need a
@@ -32,11 +32,11 @@ are only required when the installer falls back to npm or when
 
 GitHub releases publish these standalone archives:
 
-- `qwen-code-darwin-arm64.tar.gz`
-- `qwen-code-darwin-x64.tar.gz`
-- `qwen-code-linux-arm64.tar.gz`
-- `qwen-code-linux-x64.tar.gz`
-- `qwen-code-win-x64.zip`
+- `hopcode-darwin-arm64.tar.gz`
+- `hopcode-darwin-x64.tar.gz`
+- `hopcode-linux-arm64.tar.gz`
+- `hopcode-linux-x64.tar.gz`
+- `hopcode-win-x64.zip`
 - `SHA256SUMS`
 
 The new standalone-first installer scripts (`install-qwen-standalone.sh`,
@@ -84,7 +84,7 @@ links keep resolving without a version segment. The versioned snapshot lets you
 roll back by repointing the global objects to a previous tag if a regression is
 caught after publish. The hosted
 installers intentionally default to `latest`; on Aliyun OSS this means reading
-`releases/qwen-code/latest/VERSION` first, then downloading the matching
+`releases/hopcode/latest/VERSION` first, then downloading the matching
 versioned release directory. Use `--version` or `QWEN_INSTALL_VERSION` to pin a
 standalone release directly.
 
@@ -98,15 +98,15 @@ The workflow defaults to the production OSS bucket and Hangzhou endpoint. Set
 these GitHub Actions variables only when the bucket, endpoint, or public base
 URL changes:
 
-- `ALIYUN_OSS_BUCKET` (default: `qwen-code-assets`)
+- `ALIYUN_OSS_BUCKET` (default: `hopcode-assets`)
 - `ALIYUN_OSS_ENDPOINT` (default: `https://oss-cn-hangzhou.aliyuncs.com`)
 - `ALIYUN_OSS_PUBLIC_BASE_URL` (default:
-  `https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com`)
+  `https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com`)
 
 Archive layout:
 
 ```text
-qwen-code/
+hopcode/
   bin/qwen
   bin/qwen.cmd
   lib/cli.js
@@ -140,9 +140,9 @@ install-qwen-standalone.bat --method npm
 
 ## Optional Native Modules
 
-The standalone archives bundle Qwen Code and a private Node.js runtime. They do
+The standalone archives bundle HopCode and a private Node.js runtime. They do
 not currently install npm optional native modules such as `node-pty` and
-`@teddyzhu/clipboard`. Qwen Code is designed to degrade when these optional
+`@teddyzhu/clipboard`. HopCode is designed to degrade when these optional
 modules are absent, but terminal pty behavior and clipboard image support may
 not be identical to an npm installation.
 
@@ -166,12 +166,12 @@ bash install-qwen-standalone.sh --mirror aliyun
 
 # Install an offline archive
 # SHA256SUMS must be in the same directory.
-bash install-qwen-standalone.sh --archive ./qwen-code-linux-x64.tar.gz
+bash install-qwen-standalone.sh --archive ./hopcode-linux-x64.tar.gz
 ```
 
 Standalone installs to:
 
-- Runtime: `~/.local/lib/qwen-code`
+- Runtime: `~/.local/lib/hopcode`
 - Shim: `~/.local/bin/qwen`
 
 Override with `QWEN_INSTALL_ROOT`, `QWEN_INSTALL_LIB_PARENT`,
@@ -180,12 +180,12 @@ Override with `QWEN_INSTALL_ROOT`, `QWEN_INSTALL_LIB_PARENT`,
 Uninstall a standalone Linux/macOS install:
 
 ```bash
-curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
 ```
 
 The uninstaller removes only the standalone runtime, generated `qwen` wrapper,
 and installer-managed shell PATH block. It preserves `~/.qwen` by default. Set
-`QWEN_UNINSTALL_PURGE=1` to remove `~/.qwen/source.json`; other config and auth
+`QWEN_UNINSTALL_PURGE=1` to remove `~/.hopcode/source.json`; other config and auth
 files are still preserved.
 
 ## Windows Usage
@@ -205,13 +205,13 @@ install-qwen-standalone.bat --mirror aliyun
 
 REM Install an offline archive
 REM SHA256SUMS must be in the same directory.
-install-qwen-standalone.bat --archive qwen-code-win-x64.zip
+install-qwen-standalone.bat --archive hopcode-win-x64.zip
 ```
 
 Standalone installs to:
 
-- Runtime: `%LOCALAPPDATA%\qwen-code\qwen-code`
-- Shim: `%LOCALAPPDATA%\qwen-code\bin\qwen.cmd`
+- Runtime: `%LOCALAPPDATA%\hopcode\hopcode`
+- Shim: `%LOCALAPPDATA%\hopcode\bin\qwen.cmd`
 
 Override with `QWEN_INSTALL_ROOT`, `QWEN_INSTALL_LIB_DIR`, or
 `QWEN_INSTALL_BIN_DIR` when needed.
@@ -221,7 +221,7 @@ Restart the terminal if `qwen` is not immediately available on PATH.
 Uninstall a standalone Windows install:
 
 ```bat
-powershell -ExecutionPolicy Bypass -c "irm https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex"
 ```
 
 The uninstaller removes only the standalone runtime, generated `qwen.cmd`
@@ -252,12 +252,12 @@ Environment variables:
 - `QWEN_NPM_REGISTRY`
 
 Use `--base-url` for private mirrors. The URL must contain
-`qwen-code-<target>` archives and `SHA256SUMS` in the same directory. Custom
+`hopcode-<target>` archives and `SHA256SUMS` in the same directory. Custom
 base URLs must use `https://`.
 
 For Aliyun OSS/CDN, release publishing uploads byte-identical artifacts to the
-versioned directory, for example `releases/qwen-code/vX.Y.Z/`. Stable releases
-also update the small `releases/qwen-code/latest/VERSION` pointer used by the
+versioned directory, for example `releases/hopcode/vX.Y.Z/`. Stable releases
+also update the small `releases/hopcode/latest/VERSION` pointer used by the
 default installer path. The installer reads that pointer and then downloads the
 versioned archive plus the versioned `SHA256SUMS`; nightly and preview releases
 do not update the pointer.
@@ -284,7 +284,7 @@ When `--source` or `-s` is provided, the installer writes:
 
 Locations:
 
-- Linux/macOS: `~/.qwen/source.json`
+- Linux/macOS: `~/.hopcode/source.json`
 - Windows: `%USERPROFILE%\.qwen\source.json`
 
 The telemetry logger reads this file when available. Missing, invalid, or
@@ -298,10 +298,10 @@ If source tracking is not needed and Node.js 22 or newer is already available:
 npm install -g @hoptrendy/hopcode-cli@latest
 ```
 
-Homebrew users can also install Qwen Code with:
+Homebrew users can also install HopCode with:
 
 ```bash
-brew install qwen-code
+brew install hopcode
 ```
 
 ## Troubleshooting
@@ -348,5 +348,5 @@ export PATH="$(npm prefix -g)/bin:$PATH"
 On Windows standalone installs, add this directory to PATH:
 
 ```bat
-%LOCALAPPDATA%\qwen-code\bin
+%LOCALAPPDATA%\hopcode\bin
 ```

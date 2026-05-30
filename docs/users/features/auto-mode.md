@@ -10,7 +10,7 @@ For an introduction, see the
 
 ## How it works
 
-When you're in Auto Mode and the agent tries to run a tool, Qwen Code
+When you're in Auto Mode and the agent tries to run a tool, HopCode
 walks three layers in order:
 
 1. **acceptEdits fast-path** — Edit / Write whose target path is inside
@@ -55,12 +55,12 @@ without classifier review:
 - `Agent` / `Agent(coder)` — any allow on the Agent tool
 - `Skill` / `Skill(pdf)` — any allow on the Skill tool
 
-When you enter Auto Mode, Qwen Code temporarily removes these rules from
+When you enter Auto Mode, HopCode temporarily removes these rules from
 the active permission set and prints a notice listing them. The rules
 come back the moment you leave Auto Mode. `settings.json` is never
 modified.
 
-If you genuinely need these broad rules, use YOLO mode instead.
+If you genuinely need these broad rules, use IZN mode instead.
 
 ## Configuring hints
 
@@ -214,7 +214,7 @@ tightened over time.
 **Does Auto Mode send my code to a third party?**
 
 Auto Mode reuses your existing model configuration — same endpoint as
-the main agent. If you've configured Qwen Code to use a self-hosted
+the main agent. If you've configured HopCode to use a self-hosted
 model, the classifier runs against that endpoint too.
 
 **Will my secrets / `.env` contents reach the classifier?**

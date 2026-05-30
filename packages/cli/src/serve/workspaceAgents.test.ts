@@ -121,11 +121,11 @@ function buildApp(opts: {
     boundWorkspace: opts.boundWorkspace,
     mutate,
     parseClientId: (req, res) => {
-      const raw = req.get('x-qwen-client-id');
+      const raw = req.get('x-hopcode-client-id');
       if (raw === undefined || raw === '') return undefined;
       if (raw.length > 128 || !/^[A-Za-z0-9._:-]+$/.test(raw)) {
         res.status(400).json({
-          error: '`X-Qwen-Client-Id` must be a non-empty token',
+          error: '`X-HopCode-Client-Id` must be a non-empty token',
           code: 'invalid_client_id',
         });
         return null;
@@ -154,7 +154,7 @@ describe('workspace agents routes', () => {
   let tmp: string;
   let workspace: string;
   let globalDir: string;
-  let getGlobalQwenDirSpy: MockInstance<() => string>;
+  let getGlobalHopCodeDirSpy: MockInstance<() => string>;
 
   beforeEach(async () => {
     tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-serve-agents-'));
@@ -162,13 +162,13 @@ describe('workspace agents routes', () => {
     globalDir = path.join(tmp, 'global');
     await fs.mkdir(workspace, { recursive: true });
     await fs.mkdir(globalDir, { recursive: true });
-    getGlobalQwenDirSpy = vi
-      .spyOn(Storage, 'getGlobalQwenDir')
+    getGlobalHopCodeDirSpy = vi
+      .spyOn(Storage, 'getGlobalHopCodeDir')
       .mockReturnValue(globalDir);
   });
 
   afterEach(async () => {
-    getGlobalQwenDirSpy.mockRestore();
+    getGlobalHopCodeDirSpy.mockRestore();
     await fs.rm(tmp, { recursive: true, force: true });
   });
 
@@ -485,12 +485,12 @@ describe('workspace agents routes', () => {
     expect(res.body.code).toBe('token_required');
   });
 
-  it('rejects 400 invalid_client_id for unknown X-Qwen-Client-Id', async () => {
+  it('rejects 400 invalid_client_id for unknown X-HopCode-Client-Id', async () => {
     const bridge = buildBridgeStub({ knownIds: ['client_known'] });
     const app = buildApp({ bridge, boundWorkspace: workspace });
     const res = await request(app)
       .post('/workspace/agents')
-      .set('X-Qwen-Client-Id', 'client_stranger')
+      .set('X-HopCode-Client-Id', 'client_stranger')
       .send({
         name: 'a-name',
         description: 'a description longer than ten chars',
@@ -617,7 +617,7 @@ describe('workspace agents routes', () => {
     // Create with a stamped client id.
     const createRes = await request(app)
       .post('/workspace/agents')
-      .set('X-Qwen-Client-Id', 'client_audit')
+      .set('X-HopCode-Client-Id', 'client_audit')
       .send({
         name: 'audited',
         description: 'a description longer than ten chars',
@@ -629,7 +629,7 @@ describe('workspace agents routes', () => {
     // Update with the same client id.
     const updateRes = await request(app)
       .post('/workspace/agents/audited')
-      .set('X-Qwen-Client-Id', 'client_audit')
+      .set('X-HopCode-Client-Id', 'client_audit')
       .send({ description: 'a NEW description longer than ten chars' });
     expect(updateRes.status).toBe(200);
     expect(updateRes.body.changed).toBe(true);
@@ -637,7 +637,7 @@ describe('workspace agents routes', () => {
     // Delete with the same client id.
     const deleteRes = await request(app)
       .delete('/workspace/agents/audited')
-      .set('X-Qwen-Client-Id', 'client_audit');
+      .set('X-HopCode-Client-Id', 'client_audit');
     expect(deleteRes.status).toBe(204);
 
     const events = (bridge as unknown as { events: RecordedEvent[] }).events;

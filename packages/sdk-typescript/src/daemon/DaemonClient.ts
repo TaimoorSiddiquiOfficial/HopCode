@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -51,9 +51,9 @@ import type {
 } from './types.js';
 
 /**
- * SDK-side HTTP client for the `qwen serve` daemon. Sibling to
+ * SDK-side HTTP client for the `hopcode serve` daemon. Sibling to
  * `ProcessTransport`: ProcessTransport drives a stdio child running
- * `qwen --input-format stream-json`; DaemonClient hits the daemon's HTTP
+ * `hopcode --input-format stream-json`; DaemonClient hits the daemon's HTTP
  * routes (POST /session, POST /session/:id/prompt, GET /session/:id/events,
  * etc.) and yields ACP-flavored events.
  *
@@ -91,7 +91,7 @@ export interface DaemonClientOptions {
 }
 
 const DEFAULT_FETCH_TIMEOUT_MS = 30_000;
-const CLIENT_ID_HEADER = 'X-Qwen-Client-Id';
+const CLIENT_ID_HEADER = 'X-HopCode-Client-Id';
 
 /**
  * Strip any trailing slashes from a base URL via plain string ops. The
@@ -471,14 +471,14 @@ export class DaemonClient {
   // -- Workspace memory (issue #4175 PR 16) ------------------------------
 
   /**
-   * Fetch the daemon's `QWEN.md` / `AGENTS.md` snapshot. Read-only;
+   * Fetch the daemon's `HOPCODE.md` / `AGENTS.md` snapshot. Read-only;
    * pre-flight `caps.features.workspace_memory` before calling
    * against an unknown daemon. Returns `initialized: false` and an
    * empty `files` array when no memory files exist at the bound
-   * workspace root or `~/.qwen`.
+   * workspace root or `~/.hopcode`.
    *
    * v1 discovers files at the bound workspace ROOT only, plus the
-   * user's global `~/.qwen` directory — it does NOT walk parent
+   * user's global `~/.hopcode` directory — it does NOT walk parent
    * directories or recurse into the workspace tree. The route's
    * companion helper `walkWorkspaceForMemory` keeps a guarded
    * upward-walk loop body for a future hierarchical mode but breaks
@@ -499,7 +499,7 @@ export class DaemonClient {
   }
 
   /**
-   * Append to or replace `QWEN.md` at workspace or global scope.
+   * Append to or replace `HOPCODE.md` at workspace or global scope.
    * Strict mutation gate (`token_required` on no-token loopback
    * defaults). When the daemon advertises `workspace_memory`, expect
    * 200 with `{ ok, filePath, bytesWritten, mode }`; older daemons
@@ -965,7 +965,7 @@ export class DaemonClient {
   }
 
   /**
-   * #4175 Wave 4 PR 17. Scaffold a `QWEN.md` at the daemon's bound
+   * #4175 Wave 4 PR 17. Scaffold a `HOPCODE.md` at the daemon's bound
    * workspace root. Mechanical only — does NOT invoke the LLM. The
    * daemon writes an empty file; clients that want AI-driven content
    * fill should follow up with `POST /session/:id/prompt`.

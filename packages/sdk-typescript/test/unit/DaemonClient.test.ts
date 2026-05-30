@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -173,7 +173,7 @@ describe('DaemonClient', () => {
       expect(calls[0]?.url).toBe(
         'http://daemon/file?path=src%2Fa.ts&line=2&limit=3',
       );
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('reads raw bytes as base64 payloads', async () => {
@@ -266,7 +266,7 @@ describe('DaemonClient', () => {
         }),
       });
       expect(calls[0]?.headers['content-type']).toBe('application/json');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
       expect(calls[1]).toMatchObject({
         method: 'POST',
         url: 'http://daemon/file/edit',
@@ -332,12 +332,12 @@ describe('DaemonClient', () => {
         v: 1,
         workspaceCwd: '/work/a',
         initialized: true,
-        current: { authType: 'qwen', modelId: 'qwen3(qwen)' },
+        current: { authType: 'hopcode', modelId: 'qwen3(qwen)' },
         providers: [
           {
             kind: 'model_provider',
             status: 'ok',
-            authType: 'qwen',
+            authType: 'hopcode',
             current: true,
             models: [
               {
@@ -472,7 +472,7 @@ describe('DaemonClient', () => {
         ['GET', 'http://daemon/session/with%2Fslash/context'],
         ['GET', 'http://daemon/session/with%2Fslash/supported-commands'],
       ]);
-      expect(calls.map((c) => c.headers['x-qwen-client-id'])).toEqual([
+      expect(calls.map((c) => c.headers['x-hopcode-client-id'])).toEqual([
         'client-1',
         'client-1',
       ]);
@@ -567,11 +567,11 @@ describe('DaemonClient', () => {
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.createOrAttachSession({
         workspaceCwd: '/work/a',
-        modelServiceId: 'qwen-prod',
+        modelServiceId: 'hopcode-prod',
       });
       expect(JSON.parse(calls[0]!.body!)).toEqual({
         cwd: '/work/a',
-        modelServiceId: 'qwen-prod',
+        modelServiceId: 'hopcode-prod',
       });
     });
 
@@ -590,7 +590,7 @@ describe('DaemonClient', () => {
         'client-1',
       );
       expect(session.clientId).toBe('client-1');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
       expect(JSON.parse(calls[0]!.body!)).toEqual({ cwd: '/work/a' });
     });
 
@@ -687,7 +687,7 @@ describe('DaemonClient', () => {
         undefined,
         'client-1',
       );
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('forwards a caller AbortSignal through to fetch (A-UsQ)', async () => {
@@ -751,8 +751,8 @@ describe('DaemonClient', () => {
       await client.loadSession('s-1', {}, 'client-1');
       await client.resumeSession('s-1', {}, 'client-1');
 
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
-      expect(calls[1]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
+      expect(calls[1]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('POSTs /session/:id/resume and omits cwd when absent', async () => {
@@ -799,7 +799,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.cancel('s-1', 'client-1');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('throws on 404', async () => {
@@ -842,7 +842,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       const result = await client.heartbeat('s-1', 'client-1');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
       expect(result.clientId).toBe('client-1');
     });
 
@@ -889,7 +889,7 @@ describe('DaemonClient', () => {
         { outcome: { outcome: 'cancelled' } },
         'client-1',
       );
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('returns false on 404 (lost the race)', async () => {
@@ -928,7 +928,7 @@ describe('DaemonClient', () => {
       expect(calls[0]?.url).toBe(
         'http://daemon/session/s-1/permission/req%2F1',
       );
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('returns false on session-scoped permission 404', async () => {
@@ -987,7 +987,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.closeSession('s-1', 'client-1');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('throws on 500', async () => {
@@ -1029,7 +1029,7 @@ describe('DaemonClient', () => {
         { displayName: 'test' },
         'client-1',
       );
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('throws on 404', async () => {
@@ -1168,7 +1168,7 @@ describe('DaemonClient', () => {
       const { fetch, calls } = recordingFetch(() => jsonResponse(200, {}));
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.setSessionModel('s-1', 'qwen3-coder', 'client-1');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('throws on 404 (unknown session)', async () => {
@@ -1187,7 +1187,7 @@ describe('DaemonClient', () => {
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, {
           sessionId: 's-1',
-          mode: 'yolo',
+          mode: 'izn',
           previous: 'default',
           persisted: false,
         }),
@@ -1196,13 +1196,13 @@ describe('DaemonClient', () => {
       const result = await client.setSessionApprovalMode('s-1', 'yolo');
       expect(result).toEqual({
         sessionId: 's-1',
-        mode: 'yolo',
+        mode: 'izn',
         previous: 'default',
         persisted: false,
       });
       expect(calls[0]?.url).toBe('http://daemon/session/s-1/approval-mode');
       expect(calls[0]?.method).toBe('POST');
-      expect(JSON.parse(calls[0]!.body!)).toEqual({ mode: 'yolo' });
+      expect(JSON.parse(calls[0]!.body!)).toEqual({ mode: 'izn' });
     });
 
     it('forwards persist:true in the body when requested', async () => {
@@ -1229,17 +1229,17 @@ describe('DaemonClient', () => {
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, {
           sessionId: 's-1',
-          mode: 'yolo',
+          mode: 'izn',
           previous: 'default',
           persisted: false,
         }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.setSessionApprovalMode('s-1', 'yolo', { persist: false });
-      expect(JSON.parse(calls[0]!.body!)).toEqual({ mode: 'yolo' });
+      expect(JSON.parse(calls[0]!.body!)).toEqual({ mode: 'izn' });
     });
 
-    it('sends X-Qwen-Client-Id when supplied', async () => {
+    it('sends X-HopCode-Client-Id when supplied', async () => {
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, {
           sessionId: 's-1',
@@ -1252,7 +1252,7 @@ describe('DaemonClient', () => {
       await client.setSessionApprovalMode('s-1', 'plan', {
         clientId: 'client-1',
       });
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('throws on 403 trust-gate rejection', async () => {
@@ -1300,7 +1300,7 @@ describe('DaemonClient', () => {
       );
     });
 
-    it('forwards X-Qwen-Client-Id when supplied', async () => {
+    it('forwards X-HopCode-Client-Id when supplied', async () => {
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, { toolName: 'Bash', enabled: false }),
       );
@@ -1308,7 +1308,7 @@ describe('DaemonClient', () => {
       await client.setWorkspaceToolEnabled('Bash', false, {
         clientId: 'client-1',
       });
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('throws on 401 when daemon strict-gates the route', async () => {
@@ -1325,11 +1325,11 @@ describe('DaemonClient', () => {
   describe('initWorkspace (#4175 Wave 4 PR 17)', () => {
     it('POSTs an empty body when force is omitted', async () => {
       const { fetch, calls } = recordingFetch(() =>
-        jsonResponse(200, { path: '/work/QWEN.md', action: 'created' }),
+        jsonResponse(200, { path: '/work/HOPCODE.md', action: 'created' }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       const result = await client.initWorkspace();
-      expect(result).toEqual({ path: '/work/QWEN.md', action: 'created' });
+      expect(result).toEqual({ path: '/work/HOPCODE.md', action: 'created' });
       expect(calls[0]?.url).toBe('http://daemon/workspace/init');
       expect(calls[0]?.method).toBe('POST');
       expect(JSON.parse(calls[0]!.body!)).toEqual({});
@@ -1337,7 +1337,7 @@ describe('DaemonClient', () => {
 
     it('forwards force:true in the body', async () => {
       const { fetch, calls } = recordingFetch(() =>
-        jsonResponse(200, { path: '/work/QWEN.md', action: 'overwrote' }),
+        jsonResponse(200, { path: '/work/HOPCODE.md', action: 'overwrote' }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       const result = await client.initWorkspace({ force: true });
@@ -1347,7 +1347,7 @@ describe('DaemonClient', () => {
 
     it('omits force when explicitly false (default-empty body)', async () => {
       const { fetch, calls } = recordingFetch(() =>
-        jsonResponse(200, { path: '/work/QWEN.md', action: 'created' }),
+        jsonResponse(200, { path: '/work/HOPCODE.md', action: 'created' }),
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.initWorkspace({ force: false });
@@ -1359,7 +1359,7 @@ describe('DaemonClient', () => {
         jsonResponse(409, {
           error: 'file exists',
           code: 'workspace_init_conflict',
-          path: '/work/QWEN.md',
+          path: '/work/HOPCODE.md',
           existingSize: 1234,
         }),
       );
@@ -1425,7 +1425,7 @@ describe('DaemonClient', () => {
       );
     });
 
-    it('forwards X-Qwen-Client-Id when supplied', async () => {
+    it('forwards X-HopCode-Client-Id when supplied', async () => {
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, {
           serverName: 'docs',
@@ -1435,7 +1435,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.restartMcpServer('docs', { clientId: 'client-1' });
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('throws on 404 when the daemon reports an unknown server', async () => {
@@ -1769,7 +1769,7 @@ describe('DaemonClient', () => {
         files: [
           {
             kind: 'memory_file' as const,
-            path: '/work/a/QWEN.md',
+            path: '/work/a/HOPCODE.md',
             scope: 'workspace' as const,
             bytes: 42,
           },
@@ -1789,10 +1789,10 @@ describe('DaemonClient', () => {
       });
     });
 
-    it('POSTs /workspace/memory and forwards X-Qwen-Client-Id', async () => {
+    it('POSTs /workspace/memory and forwards X-HopCode-Client-Id', async () => {
       const reply = {
         ok: true,
-        filePath: '/work/QWEN.md',
+        filePath: '/work/HOPCODE.md',
         bytesWritten: 17,
         mode: 'append',
         changed: true,
@@ -1806,7 +1806,7 @@ describe('DaemonClient', () => {
       expect(result).toEqual(reply);
       expect(calls[0]?.method).toBe('POST');
       expect(calls[0]?.url).toBe('http://daemon/workspace/memory');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-7');
       const body = JSON.parse(calls[0]!.body!);
       expect(body).toEqual({
         scope: 'workspace',
@@ -1909,7 +1909,7 @@ describe('DaemonClient', () => {
       );
       expect(out).toEqual(reply);
       expect(calls[0]?.method).toBe('POST');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('updateWorkspaceAgent forwards the optional scope query', async () => {
@@ -2011,7 +2011,7 @@ describe('DaemonClient', () => {
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(201, {
           deviceFlowId: 'flow-A',
-          providerId: 'qwen-oauth',
+          providerId: 'hopcode-oauth',
           status: 'pending',
           userCode: 'USER-1',
           verificationUri: 'https://idp.example/verify',
@@ -2022,7 +2022,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       const res = await client.startDeviceFlow({
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         clientId: 'sdk-X',
       });
       expect(res.deviceFlowId).toBe('flow-A');
@@ -2030,16 +2030,16 @@ describe('DaemonClient', () => {
       const call = calls[0];
       expect(call?.url).toBe('http://daemon/workspace/auth/device-flow');
       expect(call?.method).toBe('POST');
-      expect(call?.headers['x-qwen-client-id']).toBe('sdk-X');
+      expect(call?.headers['x-hopcode-client-id']).toBe('sdk-X');
       expect(JSON.parse(call?.body ?? '{}')).toEqual({
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
       });
     });
 
     it('startDeviceFlow accepts 200 (take-over branch) and 201 (fresh) identically', async () => {
       const body = {
         deviceFlowId: 'flow-A',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         status: 'pending',
         userCode: 'USER-1',
         verificationUri: 'https://idp.example/verify',
@@ -2051,7 +2051,7 @@ describe('DaemonClient', () => {
         const { fetch } = recordingFetch(() => jsonResponse(status, body));
         const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
         await expect(
-          client.startDeviceFlow({ providerId: 'qwen-oauth' }),
+          client.startDeviceFlow({ providerId: 'hopcode-oauth' }),
         ).resolves.toMatchObject({ attached: true });
       }
     });
@@ -2062,7 +2062,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await expect(
-        client.startDeviceFlow({ providerId: 'qwen-oauth' }),
+        client.startDeviceFlow({ providerId: 'hopcode-oauth' }),
       ).rejects.toBeInstanceOf(DaemonHttpError);
     });
 
@@ -2070,7 +2070,7 @@ describe('DaemonClient', () => {
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, {
           deviceFlowId: 'flow with space',
-          providerId: 'qwen-oauth',
+          providerId: 'hopcode-oauth',
           status: 'authorized',
           createdAt: 1_700_000_000_000,
         }),
@@ -2093,7 +2093,7 @@ describe('DaemonClient', () => {
           observedSignal = init?.signal ?? undefined;
           return jsonResponse(200, {
             deviceFlowId: 'flow-A',
-            providerId: 'qwen-oauth',
+            providerId: 'hopcode-oauth',
             status: 'pending',
             createdAt: 1_700_000_000_000,
           });
@@ -2141,7 +2141,7 @@ describe('DaemonClient', () => {
         client.cancelDeviceFlow('flow-A', { clientId: 'sdk-Y' }),
       ).resolves.toBeUndefined();
       expect(calls[0]?.method).toBe('DELETE');
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('sdk-Y');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('sdk-Y');
     });
 
     it('cancelDeviceFlow swallows 404 idempotently (matches closeSession contract)', async () => {
@@ -2175,7 +2175,7 @@ describe('DaemonClient', () => {
         workspaceCwd: '/work/bound',
         providers: [],
         pendingDeviceFlows: [],
-        supportedDeviceFlowProviders: ['qwen-oauth' as const],
+        supportedDeviceFlowProviders: ['hopcode-oauth' as const],
       };
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, snapshot),

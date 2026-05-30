@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -349,12 +349,12 @@ export interface TelemetryMetricsSettings {
 
 /**
  * Security-relevant settings controlling what client-side correlation
- * data qwen-code writes into outbound LLM API requests.
+ * data hopcode writes into outbound LLM API requests.
  *
  * **Why this is a separate namespace from `telemetry.*`:** telemetry
  * controls data flow into the user's OWN observability backend (OTLP
  * collector / file outfile). The settings here control data flow OUT of
- * the qwen-code process and INTO third-party LLM provider request
+ * the hopcode process and INTO third-party LLM provider request
  * streams (DashScope, OpenAI, Anthropic, etc.). Different recipients =
  * different consent decision, so a different settings tree. See PR
  * #4390 review (LaZzyMan) for the framing rationale.
@@ -578,7 +578,7 @@ export interface ConfigParameters {
    * CLI surface. Matched case-insensitively on the final (post-rename)
    * command name. Sourced from settings (`slashCommands.disabled`, UNION
    * merged across scopes), the `--disabled-slash-commands` CLI flag, and
-   * the `QWEN_DISABLED_SLASH_COMMANDS` environment variable.
+   * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
   /**
@@ -712,7 +712,7 @@ export interface ConfigParameters {
    * JSON Schema that the model's final output must conform to. When set, a
    * synthetic `structured_output` tool is registered and the non-interactive
    * CLI ends the session the first time the model calls it with valid args.
-   * Only meaningful in headless mode (`qwen -p`).
+   * Only meaningful in headless mode (`hopcode -p`).
    */
   jsonSchema?: Record<string, unknown>;
   /**
@@ -1098,7 +1098,7 @@ export class Config {
     this.gitCoAuthor = {
       ...normalizeGitCoAuthor(params.gitCoAuthor),
       name: 'Qwen-Coder',
-      email: 'qwen-coder@alibabacloud.com',
+      email: 'hopcoder@alibabacloud.com',
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
     this.fileReadCacheDisabled = params.fileReadCacheDisabled ?? false;
@@ -1159,7 +1159,7 @@ export class Config {
     ) {
       // eslint-disable-next-line no-console
       console.warn(
-        '[qwen-code] chatCompression.contextPercentageThreshold has been removed ' +
+        '[hopcode] chatCompression.contextPercentageThreshold has been removed ' +
           'and is now controlled by built-in thresholds. Setting will be ignored. ' +
           'Remove this key from your settings.json to silence this warning; ' +
           'see docs/users/configuration/settings.md for current compaction behavior.',
@@ -1558,7 +1558,7 @@ export class Config {
           // against the *correct* directory.
           const probe = new GitWorktreeService(this.targetDir);
           const root = (await probe.getRepoTopLevel()) ?? this.targetDir;
-          const worktreesDir = path.join(root, '.qwen', 'worktrees');
+          const worktreesDir = path.join(root, '.hopcode', 'worktrees');
           try {
             await fsPromises.access(worktreesDir);
           } catch {
@@ -1983,7 +1983,7 @@ export class Config {
     //
     // Only refresh when THIS process established its own sidecar at
     // startup (interactive UI). A non-interactive `/clear` (e.g.
-    // qwen --prompt-interactive) must not delete a sibling shell's
+    // hopcode --prompt-interactive) must not delete a sibling shell's
     // sidecar that happens to share the outgoing session id —
     // mirrors kimi-cli PR #2082's "write only when a session is
     // established for this process" rule.
@@ -2152,11 +2152,11 @@ export class Config {
     // Some OpenAI-compatible reasoning models (e.g. DeepSeek) require
     // reasoning_content to be preserved across turns.
 
-    // Hot update path: only supported for qwen-oauth.
+    // Hot update path: only supported for hopcode-oauth.
     // For other auth types we always refresh to recreate the ContentGenerator.
     //
     // Rationale:
-    // - Non-qwen providers may need to re-validate credentials / baseUrl / envKey.
+    // - Non-hopcode providers may need to re-validate credentials / baseUrl / envKey.
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
     if (authType === AuthType.QWEN_OAUTH && !requiresRefresh) {
@@ -2171,7 +2171,7 @@ export class Config {
         },
       );
 
-      // Hot-update fields (qwen-oauth models share the same auth + client).
+      // Hot-update fields (hopcode-oauth models share the same auth + client).
       this.contentGeneratorConfig.model = config.model;
       this.contentGeneratorConfig.samplingParams = config.samplingParams;
       this.contentGeneratorConfig.contextWindowSize = config.contextWindowSize;
@@ -2243,7 +2243,7 @@ export class Config {
    *
    * For runtime models, the modelId should be in format `$runtime|${authType}|${modelId}`.
    * This triggers a refresh of the ContentGenerator when required (always on authType changes).
-   * For qwen-oauth model switches that are hot-update safe, this may update in place.
+   * For hopcode-oauth model switches that are hot-update safe, this may update in place.
    *
    * @param authType - Target authentication type
    * @param modelId - Target model ID (or `$runtime|${authType}|${modelId}` for runtime models)
@@ -3769,7 +3769,7 @@ export class Config {
     // --json-schema runs. It must be registered in BOTH the bare-mode
     // branch and the regular branch — without it the model can't finish
     // a structured run, so omitting either branch causes
-    // `qwen [--bare] --json-schema X -p "..."` to loop until
+    // `hopcode [--bare] --json-schema X -p "..."` to loop until
     // maxSessionTurns and exit via the "plain text" failure path. Hoisted
     // out of the two branches so the dynamic-import factory shape stays
     // in sync between them.

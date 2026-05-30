@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,7 +41,7 @@ export type TaskKind = 'agent' | 'shell' | 'monitor';
 
 /**
  * Lifecycle states a task can occupy. `paused` and `cancelled` are
- * qwen-code extensions used for resumable agents and explicit user
+ * hopcode extensions used for resumable agents and explicit user
  * cancellation; not every kind uses every state (shells and monitors
  * never `paused`, for example).
  */

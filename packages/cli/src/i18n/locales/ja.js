@@ -282,9 +282,9 @@ export default {
   'e.g., Reviews code for best practices and potential bugs.':
     '例: ベストプラクティスと潜在的なバグについてコードをレビューします。',
   // Commands - General (continued)
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    '変更を確認するには Qwen Code を再起動する必要があります。 r を押して終了し、変更を適用してください',
-  'View and edit Qwen Code settings': 'Qwen Code の設定を表示・編集',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    '変更を確認するには HopCode を再起動する必要があります。 r を押して終了し、変更を適用してください',
+  'View and edit HopCode settings': 'HopCode の設定を表示・編集',
   Settings: '設定',
   'Vim Mode': 'Vim モード',
   'Output Format': '出力形式',
@@ -339,8 +339,8 @@ export default {
   'set external editor preference': '外部エディタの設定',
   'Manage extensions': '拡張機能を管理',
   'Manage installed extensions': 'インストール済みの拡張機能を管理する',
-  'You are installing an extension from {{originSource}}. Some features may not work perfectly with Qwen Code.':
-    '{{originSource}} から拡張機能をインストールしています。一部の機能は Qwen Code で完全に動作しない可能性があります。',
+  'You are installing an extension from {{originSource}}. Some features may not work perfectly with HopCode.':
+    '{{originSource}} から拡張機能をインストールしています。一部の機能は HopCode で完全に動作しない可能性があります。',
   'manage IDE integration': 'IDE連携を管理',
   'check status of IDE integration': 'IDE連携の状態を確認',
   'install required IDE companion for {{ideName}}':
@@ -496,7 +496,7 @@ export default {
     'stderr をユーザーのみに表示し、ツール呼び出しを続ける',
   'block processing, erase original prompt, and show stderr to user only':
     '処理をブロックし、元のプロンプトを消去し、stderr をユーザーのみに表示',
-  'stdout shown to Qwen': 'stdout を Qwen に表示',
+  'stdout shown to HopCode': 'stdout を Qwen に表示',
   'show stderr to user only (blocking errors ignored)':
     'stderr をユーザーのみに表示（ブロッキングエラーは無視）',
   'command completes successfully': 'コマンドが正常に完了',
@@ -759,8 +759,8 @@ export default {
   servers: 'サーバー',
   'Add MCP servers to your settings to get started.':
     '設定に MCP servers を追加して開始してください。',
-  'Run qwen --debug to see error logs':
-    'qwen --debug を実行してエラーログを確認してください',
+  'Run hopcode --debug to see error logs':
+    'hopcode --debug を実行してエラーログを確認してください',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth 認証',
@@ -844,12 +844,12 @@ export default {
   'HopCode OAuth': 'HopCode OAuth',
   'Discontinued — switch to Coding Plan or API Key':
     '終了 — Coding Plan または API Key に切り替えてください',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Qwen OAuth 無料枠は 2026-04-15 に終了しました。Coding Plan または API Key を選択してください。',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Qwen OAuth無料プランは2026-04-15に終了しました。他のプロバイダーのモデルを選択するか、/authを実行して切り替えてください。',
-  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ Qwen OAuth 無料枠は 2026-04-15 に終了しました。他のオプションを選択してください。\n',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'HopCode OAuth 無料枠は 2026-04-15 に終了しました。Coding Plan または API Key を選択してください。',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'HopCode OAuth無料プランは2026-04-15に終了しました。他のプロバイダーのモデルを選択するか、/authを実行して切り替えてください。',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ HopCode OAuth 無料枠は 2026-04-15 に終了しました。他のオプションを選択してください。\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     '有料 \u00B7 5時間最大6,000リクエスト \u00B7 すべての Alibaba Cloud Coding Plan モデル',
   'Alibaba Cloud Coding Plan': 'Alibaba Cloud Coding Plan',
@@ -858,17 +858,17 @@ export default {
     'サードパーティプロバイダーによるブラウザベースの認証（例：OpenRouter、ModelScope）',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     '認証は {{enforcedType}} に強制されていますが、現在 {{currentType}} を使用しています',
-  'Qwen OAuth Authentication': 'Qwen OAuth認証',
+  'HopCode OAuth Authentication': 'HopCode OAuth認証',
   'Please visit this URL to authorize:':
     '認証するには以下のURLにアクセスしてください:',
   'Waiting for authorization': '認証を待っています',
   'Time remaining:': '残り時間:',
-  'Qwen OAuth Authentication Timeout': 'Qwen OAuth認証タイムアウト',
+  'HopCode OAuth Authentication Timeout': 'HopCode OAuth認証タイムアウト',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuthトークンが期限切れです({{seconds}}秒以上)。認証方法を再度選択してください',
   'Press any key to return to authentication type selection.':
     '認証タイプ選択に戻るには任意のキーを押してください',
-  'Waiting for Qwen OAuth authentication...': 'Qwen OAuth認証を待っています...',
+  'Waiting for HopCode OAuth authentication...': 'HopCode OAuth認証を待っています...',
   'Authentication timed out. Please try again.':
     '認証がタイムアウトしました。再度お試しください',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1214,7 +1214,7 @@ export default {
     '↑/↓: ナビゲート | ←/→: タブ切り替え | Enter: 選択',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: ナビゲート | Enter: 選択 | Esc: キャンセル',
-  'Authenticate using Qwen OAuth': 'Qwen OAuth で認証する',
+  'Authenticate using HopCode OAuth': 'HopCode OAuth で認証する',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Alibaba Cloud Coding Plan で認証する',
   'Region for Coding Plan (china/global)':
@@ -1246,8 +1246,8 @@ export default {
     '⚠️  認証方法が設定されていません。\n',
   'Run one of the following commands to get started:\n':
     '以下のコマンドのいずれかを実行して開始してください:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - Qwen OAuth で認証（終了）',
+  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  hopcode auth hopcode-oauth     - HopCode OAuth で認証（終了）',
   'Or simply run:': 'または以下を実行:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - インタラクティブ認証セットアップ\n',
@@ -1255,8 +1255,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  タイプ: 無料枠（2026-04-15 終了）',
   '  Limit: No longer available': '  制限: 利用不可',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Qwen OAuth 無料枠は 2026-04-15 に終了しました。/auth を実行して Coding Plan、OpenRouter、Fireworks AI、または他のプロバイダーに切り替えてください。',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'HopCode OAuth 無料枠は 2026-04-15 に終了しました。/auth を実行して Coding Plan、OpenRouter、Fireworks AI、または他のプロバイダーに切り替えてください。',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ 認証方法: Alibaba Cloud Coding Plan',
   'Global - Alibaba Cloud': 'グローバル - Alibaba Cloud',
@@ -1268,8 +1268,8 @@ export default {
     '⚠️  認証方法: Alibaba Cloud Coding Plan（不完全）',
   '  Issue: API key not found in environment or settings\n':
     '  問題: 環境変数または設定に API Key が見つかりません\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  `qwen auth coding-plan` を実行して再設定してください。\n',
+  '  Run `hopcode auth coding-plan` to re-configure.\n':
+    '  `hopcode auth coding-plan` を実行して再設定してください。\n',
   '✓ Authentication Method: {{type}}': '✓ 認証方法: {{type}}',
   '  Status: Configured\n': '  ステータス: 設定済み\n',
   'Failed to check authentication status: {{error}}':
@@ -1339,7 +1339,7 @@ export default {
   'Show Line Numbers in Code': 'コードの行番号を表示',
   'Show Welcome Back Dialog': 'おかえりダイアログを表示',
   'Enable User Feedback': 'ユーザーフィードバックを有効化',
-  'How is Qwen doing this session? (optional)':
+  'How is HopCode doing this session? (optional)':
     'このセッションでの Qwen の調子はどうですか？（任意）',
   'Interactive Shell (PTY)': '対話型シェル (PTY)',
   'Select Editor': 'エディタを選択',
@@ -1453,7 +1453,7 @@ export default {
 
   // === Missing key backfill ===
   Status: 'ステータス',
-  'Qwen Code': 'Qwen Code',
+  'HopCode': 'HopCode',
   Runtime: 'ランタイム',
   OS: 'OS',
   Auth: '認証',
@@ -1491,8 +1491,8 @@ export default {
   remote: 'リモート',
   'This extension will add the following commands: {{commands}}.':
     'この拡張機能は次のコマンドを追加します: {{commands}}。',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    'この拡張機能は {{fileName}} を使って QWEN.md コンテキストに情報を追記します',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    'この拡張機能は {{fileName}} を使って HOPCODE.md コンテキストに情報を追記します',
   'This extension will install the following skills:':
     'この拡張機能は次のスキルをインストールします:',
   'This extension will install the following subagents:':

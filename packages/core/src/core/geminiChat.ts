@@ -937,7 +937,7 @@ const ORPHAN_TOOL_USE_REPAIR_REASON =
  * pairs so the React scheduler's dedup can drop late real results for
  * those ids; hoisted ids are NOT returned (the real fr is still in
  * history, scheduler dedup handles them naturally). See the canonical
- * note above `ORPHAN_TOOL_USE_REPAIR_REASON`. qwen-code analogue of
+ * note above `ORPHAN_TOOL_USE_REPAIR_REASON`. hopcode analogue of
  * upstream Claude Code's `yieldMissingToolResultBlocks`.
  */
 /** Location of a `functionResponse` part within `history`. */
@@ -1170,8 +1170,8 @@ export function repairOrphanedToolUseTurns(
  * The session maintains all the turns between user and model.
  */
 const SESSION_START_CONTEXT_SENTINEL_START =
-  '<qwen:session-start-context hidden="true">';
-const SESSION_START_CONTEXT_SENTINEL_END = '</qwen:session-start-context>';
+  '<hopcode:session-start-context hidden="true">';
+const SESSION_START_CONTEXT_SENTINEL_END = '</hopcode:session-start-context>';
 const SESSION_START_CONTEXT_HEADER = 'SessionStart additional context';
 
 function buildSessionStartContextBlock(extraInstruction: string): string {
@@ -2191,7 +2191,7 @@ export class GeminiChat {
       signal: params.config?.abortSignal,
       heartbeatFn: (info) => {
         process.stderr.write(
-          `[qwen-code] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
+          `[hopcode] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
         );
       },
     });

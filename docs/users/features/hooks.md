@@ -30,7 +30,7 @@ Hooks are user-defined scripts or programs that are automatically executed by Ho
 
 ## Hook Types
 
-Qwen Code supports four hook executor types:
+HopCode supports four hook executor types:
 
 | Type       | Description                                                                                    |
 | :--------- | :--------------------------------------------------------------------------------------------- |
@@ -144,7 +144,7 @@ Prompt hooks use an LLM to evaluate hook input and return a decision. This is us
 1. The hook input JSON is injected into your prompt using the `$ARGUMENTS` placeholder
 2. The prompt is sent to an LLM (default: your current model)
 3. The LLM returns a JSON response with the decision
-4. Qwen Code processes the decision and continues or blocks execution accordingly
+4. HopCode processes the decision and continues or blocks execution accordingly
 
 **Configuration:**
 
@@ -196,7 +196,7 @@ Prompt hooks can be used with most hook events, including:
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "You are evaluating whether Qwen Code should stop working. Context: $ARGUMENTS\n\nAnalyze the conversation and determine if:\n1. All user-requested tasks are complete\n2. Any errors need to be addressed\n3. Follow-up work is needed\n\nRespond with JSON: {\"ok\": true} to allow stopping, or {\"ok\": false, \"reason\": \"your explanation\"} to continue working.",
+            "prompt": "You are evaluating whether HopCode should stop working. Context: $ARGUMENTS\n\nAnalyze the conversation and determine if:\n1. All user-requested tasks are complete\n2. Any errors need to be addressed\n3. Follow-up work is needed\n\nRespond with JSON: {\"ok\": true} to allow stopping, or {\"ok\": false, \"reason\": \"your explanation\"} to continue working.",
             "timeout": 30
           }
         ]
@@ -206,7 +206,7 @@ Prompt hooks can be used with most hook events, including:
 }
 ```
 
-When `ok` is `false`, Qwen Code will continue working and use the `reason` as context for the next response.
+When `ok` is `false`, HopCode will continue working and use the `reason` as context for the next response.
 
 **Example: PreToolUse Hook**
 
@@ -908,7 +908,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.qwen/hooks/todo-validator.sh
+# ~/.hopcode/hooks/todo-validator.sh
 # Validates todo content before creation
 
 INPUT=$(cat)
@@ -940,7 +940,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.qwen/hooks/todo-validator.sh",
+            "command": "$HOME/.hopcode/hooks/todo-validator.sh",
             "name": "todo-validator",
             "timeout": 5000
           }
@@ -1005,7 +1005,7 @@ During the `postWrite` phase, the todo has already been persisted. Hooks may sti
 
 ```bash
 #!/bin/bash
-# ~/.qwen/hooks/todo-completion-validator.sh
+# ~/.hopcode/hooks/todo-completion-validator.sh
 # Validates todo completion conditions
 
 INPUT=$(cat)
@@ -1034,7 +1034,7 @@ exit 0
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.qwen/hooks/todo-completion-validator.sh",
+            "command": "$HOME/.hopcode/hooks/todo-completion-validator.sh",
             "name": "completion-validator",
             "timeout": 5000
           }

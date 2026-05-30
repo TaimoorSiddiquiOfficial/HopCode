@@ -412,8 +412,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': 'View and edit HopCode settings',
   Settings: 'Settings',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    'To see changes, HopCode must be restarted. Press r to exit and apply changes now.',
   // ============================================================================
   // Settings Labels
   // ============================================================================
@@ -522,8 +522,8 @@ export default {
   remote: 'remote',
   'This extension will add the following commands: {{commands}}.':
     'This extension will add the following commands: {{commands}}.',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    'This extension will append info to your QWEN.md context using {{fileName}}',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    'This extension will append info to your HOPCODE.md context using {{fileName}}',
   'This extension will install the following skills:':
     'This extension will install the following skills:',
   'This extension will install the following subagents:':
@@ -1176,12 +1176,12 @@ export default {
   'HopCode OAuth': 'HopCode OAuth',
   'Discontinued — switch to Coding Plan or API Key':
     'Discontinued — switch to Coding Plan or API Key',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
-  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models',
   'For teams \u00B7 Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
@@ -1206,17 +1206,17 @@ export default {
     'Browser-based authentication with third-party providers (e.g. OpenRouter, ModelScope)',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.',
-  'Qwen OAuth Authentication': 'Qwen OAuth Authentication',
+  'HopCode OAuth Authentication': 'HopCode OAuth Authentication',
   'Please visit this URL to authorize:': 'Please visit this URL to authorize:',
   'Waiting for authorization': 'Waiting for authorization',
   'Time remaining:': 'Time remaining:',
-  'Qwen OAuth Authentication Timeout': 'Qwen OAuth Authentication Timeout',
+  'HopCode OAuth Authentication Timeout': 'HopCode OAuth Authentication Timeout',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.',
   'Press any key to return to authentication type selection.':
     'Press any key to return to authentication type selection.',
-  'Waiting for Qwen OAuth authentication...':
-    'Waiting for Qwen OAuth authentication...',
+  'Waiting for HopCode OAuth authentication...':
+    'Waiting for HopCode OAuth authentication...',
   'Authentication timed out. Please try again.':
     'Authentication timed out. Please try again.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1822,7 +1822,7 @@ export default {
     '↑/↓: Navigate | ←/→: Switch tabs | Enter: Select',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: Navigate | Enter: Select | Esc: Cancel',
-  'Authenticate using Qwen OAuth': 'Authenticate using Qwen OAuth',
+  'Authenticate using HopCode OAuth': 'Authenticate using HopCode OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Authenticate using Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
@@ -1855,8 +1855,8 @@ export default {
     '⚠️  No authentication method configured.\n',
   'Run one of the following commands to get started:\n':
     'Run one of the following commands to get started:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)',
+  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)',
   'Or simply run:': 'Or simply run:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Interactive authentication setup\n',
@@ -1865,8 +1865,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type: Free tier (discontinued 2026-04-15)',
   '  Limit: No longer available': '  Limit: No longer available',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ Authentication Method: Alibaba Cloud Coding Plan',
   '中国 (China) - 阿里云百炼': '中国 (China) - 阿里云百炼',

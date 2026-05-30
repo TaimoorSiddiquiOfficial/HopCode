@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -292,7 +292,7 @@ function permissionModeToApprovalMode(mode: PermissionMode): ApprovalMode {
  * independent imports of this module observe the same Symbol identity.
  */
 export const TOOL_REGISTRY_REBUILT: unique symbol = Symbol.for(
-  'qwen-code:tool-registry-rebuilt',
+  'hopcode:tool-registry-rebuilt',
 );
 
 /**
@@ -1504,7 +1504,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
         // would leave the model's mental map pointing at the outer
         // worktree while the override aimed it at the inner one.
         // Same guard `enter_worktree` uses.
-        if (/\.qwen[\\/]worktrees[\\/]/.test(cwd)) {
+        if (/\.hopcode[\\/]worktrees[\\/]/.test(cwd)) {
           return failWorktreeProvisioning(
             `Failed to set up worktree isolation: parent is already inside ` +
               `a worktree (${cwd}). Nested isolation worktrees are not ` +

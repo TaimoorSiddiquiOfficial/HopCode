@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -264,8 +264,8 @@ describe('NotebookEditTool', () => {
     expect(updated.cells).toHaveLength(3);
     expect(updated.cells[1].cell_type).toBe('markdown');
     expect(updated.cells[1].source).toEqual(['## Inserted']);
-    expect(updated.cells[1].id).toBe('qwen-cell-1');
-    expect(result.editedCellId).toBe('qwen-cell-1');
+    expect(updated.cells[1].id).toBe('hopcode-cell-1');
+    expect(result.editedCellId).toBe('hopcode-cell-1');
   });
 
   it('preserves adjacent source style for inserted cells in mixed-format notebooks', async () => {

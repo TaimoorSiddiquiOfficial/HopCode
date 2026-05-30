@@ -1,9 +1,9 @@
 # Telemetry: Outbound Trace Context & Session ID Header Propagation
 
-> 配套 issue: [#4384](https://github.com/QwenLM/qwen-code/issues/4384)
-> 父 issue: [#3731](https://github.com/QwenLM/qwen-code/issues/3731) (P3 deeper observability)
+> 配套 issue: [#4384](https://github.com/QwenLM/hopcode/issues/4384)
+> 父 issue: [#3731](https://github.com/QwenLM/hopcode/issues/3731) (P3 deeper observability)
 > 前置 PR: #4367 (resource attributes — merged 2026-05-21, commit `64401e1`)
-> 基于 2026-05-21 对 qwen-code main 分支 + 直接验证的 claude-code 源码
+> 基于 2026-05-21 对 hopcode main 分支 + 直接验证的 claude-code 源码
 
 ## 修订历史
 
@@ -18,12 +18,12 @@
 
 ## 1. 背景
 
-#4367 解决了**emitted telemetry 上的 attribute 与 cardinality**（操作员能给 span/log/metric 打 `user.id`/`tenant.id` 这类标签）。但有一类东西它没碰：**outbound LLM 请求的 HTTP header**。今天 qwen-code 发往 DashScope / OpenAI / Gemini / Anthropic 的请求**完全不带任何 cross-process correlation header**——既没有 W3C `traceparent`，也没有 session id。
+#4367 解决了**emitted telemetry 上的 attribute 与 cardinality**（操作员能给 span/log/metric 打 `user.id`/`tenant.id` 这类标签）。但有一类东西它没碰：**outbound LLM 请求的 HTTP header**。今天 hopcode 发往 DashScope / OpenAI / Gemini / Anthropic 的请求**完全不带任何 cross-process correlation header**——既没有 W3C `traceparent`，也没有 session id。
 
 后果：
 
-1. trace context 在 qwen-code 进程边界断开。若模型服务（如 ARMS Tracing 接入的 DashScope）本身有 OTel instrumentation，它产生的 span 与 qwen-code 的 trace 彼此独立，端到端 trace tree 不存在。
-2. 没有 session id 在 wire 上。后端要把 qwen-code 的 metric/log 与服务端日志关联，需要离线匹配 trace id 或时间戳，远不如直接读 header 简单。
+1. trace context 在 hopcode 进程边界断开。若模型服务（如 ARMS Tracing 接入的 DashScope）本身有 OTel instrumentation，它产生的 span 与 hopcode 的 trace 彼此独立，端到端 trace tree 不存在。
+2. 没有 session id 在 wire 上。后端要把 hopcode 的 metric/log 与服务端日志关联，需要离线匹配 trace id 或时间戳，远不如直接读 header 简单。
 3. 本地 trace 缺一层 client-side HTTP span。今天只能看 `api.generateContent` 的总耗时，看不到网络 TTFB / 响应体大小 / 重试次数。
 
 ## 2. 现状
@@ -113,19 +113,19 @@ const runtimeOptions = buildRuntimeFetchOptions(
 
 ### 3.2 非目标
 
-- **`baggage` header**：标准 SDK 已支持，但 qwen-code 没调 `propagation.setBaggage()`，默认不会发送。本设计不主动开启。
-- **subprocess `TRACEPARENT` env var 继承**：claude-code 给 Bash/PowerShell 子进程注入 `TRACEPARENT`。qwen-code 的 `BashTool` 没做。是独立 follow-up sub-issue。
-- **inbound `TRACEPARENT` / `TRACESTATE` 读取**：claude-code 的 `-p` 模式和 Agent SDK 从 env 读 traceparent 接续父进程 trace。qwen-code 没做。独立 follow-up。
+- **`baggage` header**：标准 SDK 已支持，但 hopcode 没调 `propagation.setBaggage()`，默认不会发送。本设计不主动开启。
+- **subprocess `TRACEPARENT` env var 继承**：claude-code 给 Bash/PowerShell 子进程注入 `TRACEPARENT`。hopcode 的 `BashTool` 没做。是独立 follow-up sub-issue。
+- **inbound `TRACEPARENT` / `TRACESTATE` 读取**：claude-code 的 `-p` 模式和 Agent SDK 从 env 读 traceparent 接续父进程 trace。hopcode 没做。独立 follow-up。
 - **`X-Qwen-Code-Request-Id`**：claude-code 有 `x-client-request-id`，对超时容错 correlation 有用。本期不做，可作为下一个 sub-issue。
 - **自定义 propagator（B3 / Jaeger / X-Ray）**：默认 W3C 已覆盖 99% 场景。可作为 future config option。
-- ~~**per-endpoint 选择性注入**：claude-code 对第三方 endpoint (Bedrock / Vertex) 不发 traceparent；qwen-code 没有第三方区分需要，统一发即可。~~ — **R3 修订**：此论断已被推翻。LaZzyMan review 指出 qwen-code 是开源 CLI 连接多个第三方 provider（OpenAI / Anthropic / OpenRouter / 等），claude-code 的 first-party→first-party 类比不适用；session id header 必须按 host 区分。详见 §11。`traceparent` 仍按 R1 设计全注入（OTel 标准 header，且 trace id 是 `sha256(sessionId)` 哈希值），可作为独立 follow-up 加 per-destination toggle（`telemetry.propagateTraceContext`）。
+- ~~**per-endpoint 选择性注入**：claude-code 对第三方 endpoint (Bedrock / Vertex) 不发 traceparent；hopcode 没有第三方区分需要，统一发即可。~~ — **R3 修订**：此论断已被推翻。LaZzyMan review 指出 hopcode 是开源 CLI 连接多个第三方 provider（OpenAI / Anthropic / OpenRouter / 等），claude-code 的 first-party→first-party 类比不适用；session id header 必须按 host 区分。详见 §11。`traceparent` 仍按 R1 设计全注入（OTel 标准 header，且 trace id 是 `sha256(sessionId)` 哈希值），可作为独立 follow-up 加 per-destination toggle（`telemetry.propagateTraceContext`）。
 
 ## 4. 设计
 
 ### 4.1 总体分层
 
 ```
-┌─ qwen-code process ────────────────────────────────────────────┐
+┌─ hopcode process ────────────────────────────────────────────┐
 │                                                                │
 │  ┌─ session-tracing.ts ─┐                                     │
 │  │ active span ctx      │                                     │
@@ -213,7 +213,7 @@ traceparent: 00-<32hex traceId>-<16hex spanId>-<01 sampled | 00 not sampled>
 #### `tracestate` 与 `baggage`
 
 - `tracestate`: 上游传过来才续传；自己 inject 不会主动加（OTel SDK 行为）。
-- `baggage`: 仅当 `propagation.setBaggage(ctx, ...)` 被调用过才有。qwen-code 不调，所以不会发送。
+- `baggage`: 仅当 `propagation.setBaggage(ctx, ...)` 被调用过才有。hopcode 不调，所以不会发送。
 
 ### 4.3 Part B — `X-Qwen-Code-Session-Id` via fetch wrapper（OpenAI / Anthropic）+ static headers（Gemini）
 
@@ -394,7 +394,7 @@ Anthropic SDK 同样接受 custom `fetch`（已经在用 `buildRuntimeFetchOptio
 
 **显式 audited 但无需改动**（避免 reviewer 怀疑漏路径）：
 
-- `packages/core/src/qwen/qwenContentGenerator.ts` — `extends OpenAIContentGenerator`，用 `DashScopeOpenAICompatibleProvider`，**自动继承 dashscope.ts 的 buildClient 改动**。所有 Qwen OAuth 流程同样受益。
+- `packages/core/src/qwen/qwenContentGenerator.ts` — `extends OpenAIContentGenerator`，用 `DashScopeOpenAICompatibleProvider`，**自动继承 dashscope.ts 的 buildClient 改动**。所有 HopCode OAuth 流程同样受益。
 - `packages/core/src/core/loggingContentGenerator/loggingContentGenerator.ts` — wrapper 模式，不构造 SDK client（它包装其他 contentGenerator 做 telemetry logging），无需改动。
 - `packages/core/src/core/contentGenerator.ts` — factory 入口，不持有 client。
   | `packages/core/src/telemetry/sdk.test.ts` | 修改 | 加 undici instrumentation 注册 + ignoreRequestHook 测试 |
@@ -578,7 +578,7 @@ return parsed.some(
 
 **实际影响范围**：
 
-- 用户启动 qwen-code → `/clear` → 用 Gemini 模型 → wire 上的 `X-Qwen-Code-Session-Id` 是旧 session id
+- 用户启动 hopcode → `/clear` → 用 Gemini 模型 → wire 上的 `X-Qwen-Code-Session-Id` 是旧 session id
 - 后端 correlation 错位（trace id 和 log 已正确切换到新 session，但 wire header 滞后）
 
 **为什么不修**（本期）：
@@ -601,17 +601,17 @@ return parsed.some(
 
 ## 9. 与 claude-code 对比
 
-| 维度                         | claude-code                                                                                                                                          | qwen-code 本设计                                                                                                                                                              | 决策依据                                                                                                                           |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Session id header 命名       | `X-Claude-Code-Session-Id`（产品前缀）                                                                                                               | `X-Qwen-Code-Session-Id`（产品前缀）                                                                                                                                          | ✅ 同样命名空间策略                                                                                                                |
-| Session id 注入机制          | SDK `defaultHeaders`（`client.ts:108`）+ 自定义 `buildFetch()` wrapper（`client.ts:370-390`，per-request `randomUUID()` 注入 `x-client-request-id`） | OpenAI/Anthropic 走 fetch wrapper（per-request 读 session id，避免 `/clear` staleness）；Gemini 走 static `httpOptions.headers`（SDK 限制）                                   | 与 claude-code 的 fetch wrapper 模式对齐。claude-code 也用 fetch wrapper 才能 per-request 加 `x-client-request-id`                 |
-| Session id 持久性            | claude-code 没有 `/clear`-式 session reset；session = process                                                                                        | 有 `/clear` reset → fetch wrapper 路径自动跟随；static headers 路径会 stale（§8.6）                                                                                           | qwen-code 独有的复杂度                                                                                                             |
-| Session id 编码              | HTTP header（不是 baggage）                                                                                                                          | HTTP header                                                                                                                                                                   | ✅ 同——backend 友好                                                                                                                |
-| `traceparent` 注入           | 闭源；公开 docs 描述存在；开源 repo 无 `propagation.inject` / `UndiciInstrumentation` 引用                                                           | `@opentelemetry/instrumentation-undici` 自动                                                                                                                                  | claude-code 怎么实现的不可见。我们选 OTel 官方推荐路径，更轻                                                                       |
-| `traceparent` 发送范围       | 仅第一方 Anthropic API；不发 Bedrock/Vertex/Foundry                                                                                                  | 发给所有出站 fetch (W3C 标准；trace id 是 `sha256(sessionId)` 哈希)。**R3 修订**：session id header 仅向 first-party (Alibaba/DashScope) 白名单注入，第三方默认不发。详见 §11 | R3 后 qwen-code 的 session header 与 claude-code 同样的 first-party-only 语义；`traceparent` 仍待 per-destination toggle follow-up |
-| `x-client-request-id` (随机) | 有，自动                                                                                                                                             | 暂不做（独立 follow-up sub-issue 价值更高）                                                                                                                                   | 范围控制                                                                                                                           |
-| 子进程 `TRACEPARENT` env     | 文档承认存在（实现闭源）                                                                                                                             | 不做（独立 follow-up）                                                                                                                                                        | 范围控制                                                                                                                           |
-| 入站 `TRACEPARENT` 读取      | 文档承认存在（`-p` / Agent SDK 模式）                                                                                                                | 不做（独立 follow-up）                                                                                                                                                        | 范围控制                                                                                                                           |
+| 维度                         | claude-code                                                                                                                                          | hopcode 本设计                                                                                                                                                                | 决策依据                                                                                                                         |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Session id header 命名       | `X-Claude-Code-Session-Id`（产品前缀）                                                                                                               | `X-Qwen-Code-Session-Id`（产品前缀）                                                                                                                                          | ✅ 同样命名空间策略                                                                                                              |
+| Session id 注入机制          | SDK `defaultHeaders`（`client.ts:108`）+ 自定义 `buildFetch()` wrapper（`client.ts:370-390`，per-request `randomUUID()` 注入 `x-client-request-id`） | OpenAI/Anthropic 走 fetch wrapper（per-request 读 session id，避免 `/clear` staleness）；Gemini 走 static `httpOptions.headers`（SDK 限制）                                   | 与 claude-code 的 fetch wrapper 模式对齐。claude-code 也用 fetch wrapper 才能 per-request 加 `x-client-request-id`               |
+| Session id 持久性            | claude-code 没有 `/clear`-式 session reset；session = process                                                                                        | 有 `/clear` reset → fetch wrapper 路径自动跟随；static headers 路径会 stale（§8.6）                                                                                           | hopcode 独有的复杂度                                                                                                             |
+| Session id 编码              | HTTP header（不是 baggage）                                                                                                                          | HTTP header                                                                                                                                                                   | ✅ 同——backend 友好                                                                                                              |
+| `traceparent` 注入           | 闭源；公开 docs 描述存在；开源 repo 无 `propagation.inject` / `UndiciInstrumentation` 引用                                                           | `@opentelemetry/instrumentation-undici` 自动                                                                                                                                  | claude-code 怎么实现的不可见。我们选 OTel 官方推荐路径，更轻                                                                     |
+| `traceparent` 发送范围       | 仅第一方 Anthropic API；不发 Bedrock/Vertex/Foundry                                                                                                  | 发给所有出站 fetch (W3C 标准；trace id 是 `sha256(sessionId)` 哈希)。**R3 修订**：session id header 仅向 first-party (Alibaba/DashScope) 白名单注入，第三方默认不发。详见 §11 | R3 后 hopcode 的 session header 与 claude-code 同样的 first-party-only 语义；`traceparent` 仍待 per-destination toggle follow-up |
+| `x-client-request-id` (随机) | 有，自动                                                                                                                                             | 暂不做（独立 follow-up sub-issue 价值更高）                                                                                                                                   | 范围控制                                                                                                                         |
+| 子进程 `TRACEPARENT` env     | 文档承认存在（实现闭源）                                                                                                                             | 不做（独立 follow-up）                                                                                                                                                        | 范围控制                                                                                                                         |
+| 入站 `TRACEPARENT` 读取      | 文档承认存在（`-p` / Agent SDK 模式）                                                                                                                | 不做（独立 follow-up）                                                                                                                                                        | 范围控制                                                                                                                         |
 
 **verified vs documented 注解**：
 
@@ -629,13 +629,13 @@ return parsed.some(
 - **`traceparent` 的 per-destination scope toggle** — R3 修订仅处理了 session id header 的作用域；`traceparent` 仍向所有出站 fetch 注入。可以加 `telemetry.propagateTraceContext: 'trusted-hosts' | 'all' | 'none'`，使用与 §11 同一份 allowlist 决定行为。
 - **Gemini 的 session id staleness lazy-invalidate fix**（§8.6 选项 A）：`/clear` 时 mark contentGenerator dirty，下次 LLM 调用 lazy recreate。让 Gemini 路径也享受 fetch wrapper 的实时性。
 - **子进程 `TRACEPARENT` env**：给 `BashTool` 执行子进程时注入 env，让外部工具能续传 trace。需要单独看 tool execution lifecycle。
-- **入站 `TRACEPARENT`**：`--prompt` 模式启动时读 env，让 CI / 外部 orchestrator 能把 qwen-code 接到更大的 trace。
+- **入站 `TRACEPARENT`**：`--prompt` 模式启动时读 env，让 CI / 外部 orchestrator 能把 hopcode 接到更大的 trace。
 - **可配置 `correlationHeader` name**：让企业 ops 自定义 header（默认 `X-Qwen-Code-Session-Id`）。
 - **`baggage` propagation 策略**：是否主动 set baggage 让 `user.id` / `tenant.id` 等也走 baggage 传到下游。本期不做，等需求明确。
 
 ## 11. R3 修订 — Host-Allowlist Scoping for `X-Qwen-Code-Session-Id`
 
-> 触发：[LaZzyMan 在 PR #4390 的 REQUEST_CHANGES review](https://github.com/QwenLM/qwen-code/pull/4390)
+> 触发：[LaZzyMan 在 PR #4390 的 REQUEST_CHANGES review](https://github.com/QwenLM/hopcode/pull/4390)
 > 落地 commit：`1c8528a56` (核心实现) + `cb162e716` (Vertex baseUrl fail-closed + `["*"]` trim 容错)
 
 ### 11.1 触发与论证
@@ -644,7 +644,7 @@ R1 设计把 `X-Qwen-Code-Session-Id` 向**所有**出站 LLM 请求注入，仅
 
 1. **标签错位**：`feat(telemetry):` + `telemetry/` 路径 + `getTelemetryEnabled()` gate 让用户合理理解为"自家可观测性数据流向自家 collector"。但 `X-Qwen-Code-Session-Id` 不会到达 OTLP 后端，它走在 LLM API 请求里发给 DashScope / OpenAI / Anthropic / Gemini / OpenRouter / MiniMax / ModelScope / Mistral。两种不同的数据出口决策绑在一个开关上。
 
-2. **claude-code 类比不成立**：R1 在 §9 把命名空间策略和 fetch wrapper 模式都"对齐"了 claude-code。但 claude-code 是 Anthropic 一方 → Anthropic 一方（single vendor, single direction），qwen-code 是开源 CLI → 多个第三方 provider。"一个稳定 cross-request UUID 广播到所有第三方"是 R1 没正面回答的问题。
+2. **claude-code 类比不成立**：R1 在 §9 把命名空间策略和 fetch wrapper 模式都"对齐"了 claude-code。但 claude-code 是 Anthropic 一方 → Anthropic 一方（single vendor, single direction），hopcode 是开源 CLI → 多个第三方 provider。"一个稳定 cross-request UUID 广播到所有第三方"是 R1 没正面回答的问题。
 
 3. **traceparent 是同一指纹的另一通道**：trace id = `sha256(sessionId).slice(0, 32)`，对接收方来说仍是稳定 per-session 标识符（哈希后不可逆，但同一 session 仍稳定）。
 
@@ -674,7 +674,7 @@ dashscope-intl.aliyuncs.com
 *.aliyun-inc.com
 ```
 
-这个集合的语义是"LLM provider、ARMS Tracing 后端、qwen-code distribution 同一法律实体"——也就是 claude-code 那个 single-vendor / single-direction 关系在 qwen-code 的对应集合。第三方 provider（OpenAI / Anthropic / OpenRouter / 等）默认**不**接收 header。
+这个集合的语义是"LLM provider、ARMS Tracing 后端、hopcode distribution 同一法律实体"——也就是 claude-code 那个 single-vendor / single-direction 关系在 hopcode 的对应集合。第三方 provider（OpenAI / Anthropic / OpenRouter / 等）默认**不**接收 header。
 
 ### 11.3 Pattern 语法（intentionally tiny）
 
@@ -768,7 +768,7 @@ Gemini SDK 有两个不可见 default endpoint（`generativelanguage.googleapis.
 
 ## 12. R4 修订 — Scope Conflation Split
 
-> 触发：[LaZzyMan round-8 follow-up review on PR #4390](https://github.com/QwenLM/qwen-code/pull/4390)
+> 触发：[LaZzyMan round-8 follow-up review on PR #4390](https://github.com/QwenLM/hopcode/pull/4390)
 > 落地：本 PR 收窄；R3 落地的 session-id 整套挪到独立 follow-up PR
 
 ### 12.1 触发与论证

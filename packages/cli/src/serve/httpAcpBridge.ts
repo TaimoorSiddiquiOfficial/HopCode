@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,7 +63,7 @@ import type {
  *     target that workspace; cross-workspace requests throw
  *     `WorkspaceMismatchError`. Multi-workspace deployments use multiple
  *     daemon processes (one per workspace, supervised externally).
- *   - One `qwen --acp` child total; multiple sessions multiplex onto it
+ *   - One `hopcode --acp` child total; multiple sessions multiplex onto it
  *     via `connection.newSession()` (the agent's native
  *     `sessions: Map<string, Session>` — see `acp-integration/acpAgent.ts:194`).
  *     Sessions share the child's process / OAuth state / `FileReadCache` /
@@ -184,7 +184,7 @@ export type { AcpChannel, AcpChannelExitInfo, ChannelFactory };
 // one constructor dep; benefit: Stage 1 clients see correct fs
 // semantics today instead of a wire-level break at Stage 2. Tracked
 // under #3803. Reference:
-// https://github.com/QwenLM/qwen-code/pull/3889#issuecomment-4427773706
+// https://github.com/QwenLM/hopcode/pull/3889#issuecomment-4427773706
 
 // `BridgeOptions` + `DaemonStatusProvider` lifted to
 // `@hoptrendy/hopcode-acp-bridge/bridgeOptions` in #4175 PR 22b/2 — the
@@ -201,7 +201,7 @@ import type {
 export type { BridgeOptions, DaemonStatusProvider };
 
 /**
- * The single `qwen --acp` child + the ACP connection on top of it,
+ * The single `hopcode --acp` child + the ACP connection on top of it,
  * shared by every SessionEntry in this daemon. Per #3803 §02 the
  * bridge is bound to one workspace at construction, so there is at
  * most one channel alive at any moment. Multiple sessions multiplex
@@ -320,7 +320,7 @@ interface SessionEntry {
   pendingPermissionIds: Set<string>;
   /**
    * Daemon-issued client ids currently known for this live session. HTTP
-   * clients may echo one through `X-Qwen-Client-Id`; the bridge only treats
+   * clients may echo one through `X-HopCode-Client-Id`; the bridge only treats
    * it as trusted originator metadata if it appears in this set.
    */
   clientIds: Map<string, number>;
@@ -375,7 +375,7 @@ interface SessionEntry {
   sessionLastSeenAt?: number;
   /**
    * Per-`clientId` last heartbeat (Date.now() epoch ms). Only populated
-   * when the heartbeat carried a trusted `X-Qwen-Client-Id`. Entries are
+   * when the heartbeat carried a trusted `X-HopCode-Client-Id`. Entries are
    * dropped together with the parent session — there's no per-client
    * eviction in this PR; revocation policy (PR 24) will own that.
    */
@@ -416,7 +416,7 @@ function isServeDebugLoggingEnabled(): boolean {
 
 function writeServeDebugLine(message: string): void {
   if (!isServeDebugLoggingEnabled()) return;
-  writeStderrLine(`qwen serve debug: ${message}`);
+  writeStderrLine(`hopcode serve debug: ${message}`);
 }
 
 // `InvalidPermissionOptionError` lifted to
@@ -476,7 +476,7 @@ function hasControlCharacter(value: string): boolean {
  *     subscribers (`GET /session/:id/events`) drain it.
  *   - File reads/writes proxy to local fs (daemon and agent share the host).
  *
- * Stage 1 trust model: the spawned `qwen --acp` child runs as the same user
+ * Stage 1 trust model: the spawned `hopcode --acp` child runs as the same user
  * as the daemon, so the file-proxy methods do NOT enforce a workspace-cwd
  * sandbox. The agent could already read or write the same files via its
  * built-in tools (e.g. shell). Restricting the bridge here would be
@@ -535,7 +535,7 @@ class BridgeClient implements Client {
   // agent-exposing surfaces share one lifecycle. This is also the
   // closure point for the prior chiga0 audit Risk 2 (first-responder
   // lacks an authorization model). Reference:
-  // https://github.com/QwenLM/qwen-code/pull/3889#issuecomment-4427773706
+  // https://github.com/QwenLM/hopcode/pull/3889#issuecomment-4427773706
   async requestPermission(
     params: RequestPermissionRequest,
   ): Promise<RequestPermissionResponse> {
@@ -546,7 +546,7 @@ class BridgeClient implements Client {
     // grow `pendingPermissionIds` past the limit.
     if (entry.pendingPermissionIds.size >= this.maxPendingPerSession) {
       writeStderrLine(
-        `qwen serve: session ${entry.sessionId} exceeded ` +
+        `hopcode serve: session ${entry.sessionId} exceeded ` +
           `maxPendingPermissionsPerSession (${this.maxPendingPerSession}) — ` +
           `resolving new permission as cancelled.`,
       );
@@ -623,7 +623,7 @@ class BridgeClient implements Client {
         timer = setTimeout(() => {
           if (settled) return;
           writeStderrLine(
-            `qwen serve: session ${entry.sessionId} permission ` +
+            `hopcode serve: session ${entry.sessionId} permission ` +
               `${requestId} timed out after ${this.permissionTimeoutMs}ms ` +
               `(no client voted) — resolving as cancelled.`,
           );
@@ -810,7 +810,7 @@ class BridgeClient implements Client {
       !this.inFlightRestoreIds.has(sessionId)
     ) {
       writeStderrLine(
-        `qwen serve: dropping mcp guardrail extNotification ` +
+        `hopcode serve: dropping mcp guardrail extNotification ` +
           `for tombstoned session ${JSON.stringify(sessionId)} ` +
           `(post-close stale event)`,
       );
@@ -827,7 +827,7 @@ class BridgeClient implements Client {
         // notification pressure from 64+ concurrent sessions —
         // worth surfacing.
         writeStderrLine(
-          `qwen serve: dropping mcp guardrail extNotification — ` +
+          `hopcode serve: dropping mcp guardrail extNotification — ` +
             `early-event buffer at MAX_EARLY_EVENT_SESSIONS ` +
             `(${MAX_EARLY_EVENT_SESSIONS}); possible session-id fanout abuse`,
         );
@@ -838,7 +838,7 @@ class BridgeClient implements Client {
     }
     if (buf.frames.length >= MAX_EARLY_EVENTS_PER_SESSION) {
       writeStderrLine(
-        `qwen serve: dropping mcp guardrail extNotification ` +
+        `hopcode serve: dropping mcp guardrail extNotification ` +
           `for session ${JSON.stringify(sessionId)} — per-session ` +
           `cap (${MAX_EARLY_EVENTS_PER_SESSION}) reached`,
       );
@@ -1534,7 +1534,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
   };
 
   /**
-   * Get-or-create the daemon's single `qwen --acp` channel (#3803 §02).
+   * Get-or-create the daemon's single `hopcode --acp` channel (#3803 §02).
    * N sessions multiplex onto it via `connection.newSession()`.
    * Concurrent callers coalesce through `inFlightChannelSpawn` so we
    * never spawn two children. The returned `ChannelInfo` is shared —
@@ -1617,7 +1617,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
       // `aliveChannels` declaration.
       if (aliveChannels.size > 2) {
         writeStderrLine(
-          `qwen serve: WARNING aliveChannels.size=${aliveChannels.size} ` +
+          `hopcode serve: WARNING aliveChannels.size=${aliveChannels.size} ` +
             `(expected 1, max 2 during killSession-then-spawnOrAttach ` +
             `overlap) — possible channel leak; check that prior channels' ` +
             `channel.exited fired and the handler ran cleanup.`,
@@ -1658,7 +1658,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         // `session_died` frame and disconnects, the daemon's
         // child-stderr forwarder emits whatever the child wrote before
         // dying (often nothing on a SIGKILL / segfault), and operators
-        // can't tell from `qwen serve`'s own output that the agent
+        // can't tell from `hopcode serve`'s own output that the agent
         // process is gone.
         //
         // Suppressed during `shuttingDown` because the operator
@@ -1670,7 +1670,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         // cleanup actually ran.
         if (!shuttingDown) {
           writeStderrLine(
-            `qwen serve: channel exited (code=${exitInfo?.exitCode ?? 'none'}, signal=${exitInfo?.signalCode ?? 'none'}, ${sessions.length} session(s) torn down)`,
+            `hopcode serve: channel exited (code=${exitInfo?.exitCode ?? 'none'}, signal=${exitInfo?.signalCode ?? 'none'}, ${sessions.length} session(s) torn down)`,
           );
         }
         for (const sid of sessions) {
@@ -1714,7 +1714,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
             clientCapabilities: {
               fs: { readTextFile: true, writeTextFile: true },
             },
-            clientInfo: { name: 'qwen-serve-bridge', version: '0' },
+            clientInfo: { name: 'hopcode-serve-bridge', version: '0' },
           }),
           initTimeoutMs,
           'initialize',
@@ -2881,7 +2881,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         originatorClientId = resolveTrustedClientId(entry, context.clientId);
       }
       writeStderrLine(
-        `qwen serve: closing session ${JSON.stringify(sessionId)}` +
+        `hopcode serve: closing session ${JSON.stringify(sessionId)}` +
           (originatorClientId
             ? ` by client ${JSON.stringify(originatorClientId)}`
             : ''),
@@ -2924,7 +2924,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         ci.isDying = true;
         await ci.channel.kill().catch((err) => {
           writeStderrLine(
-            `qwen serve: closeSession channel kill failed for session ` +
+            `hopcode serve: closeSession channel kill failed for session ` +
               `${JSON.stringify(sessionId)}: ${String(err)}`,
           );
         });
@@ -2957,7 +2957,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         if (entry.displayName !== nextDisplayName) {
           entry.displayName = nextDisplayName;
           writeStderrLine(
-            `qwen serve: updated session metadata ${JSON.stringify(sessionId)} ` +
+            `hopcode serve: updated session metadata ${JSON.stringify(sessionId)} ` +
               `displayName=${entry.displayName === undefined ? 'cleared' : 'set'}` +
               (context?.clientId
                 ? ` by client ${JSON.stringify(context.clientId)}`
@@ -3090,13 +3090,13 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
           if (shuttingDown) {
             writeServeDebugLine(detail);
           } else {
-            writeStderrLine(`qwen serve: ${detail}`);
+            writeStderrLine(`hopcode serve: ${detail}`);
           }
         }
       }
       if (sessions.length > 0 && successCount === 0 && !shuttingDown) {
         writeStderrLine(
-          `qwen serve: publishWorkspaceEvent type=${event.type} dropped on ALL ${failureCount} session bus(es); SSE subscribers will miss this event (GET fallback still authoritative)`,
+          `hopcode serve: publishWorkspaceEvent type=${event.type} dropped on ALL ${failureCount} session bus(es); SSE subscribers will miss this event (GET fallback still authoritative)`,
         );
       }
     },
@@ -3105,7 +3105,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
       // Snapshot the union of every live session's stamped client ids.
       // Returned as a fresh Set so callers can mutate-safely (the live
       // per-session maps stay private). Workspace-level mutation routes
-      // use this to validate `X-Qwen-Client-Id` without owning a
+      // use this to validate `X-HopCode-Client-Id` without owning a
       // session id; PR 24 will replace it with a workspace-scoped
       // registry that doesn't conflate session-attach with workspace-
       // attach.
@@ -3161,7 +3161,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         );
       } catch (err) {
         writeStderrLine(
-          `qwen serve: statusProvider.getEnvStatus failed; ` +
+          `hopcode serve: statusProvider.getEnvStatus failed; ` +
             `falling back to idle envelope: ` +
             (err instanceof Error ? err.message : String(err)),
         );
@@ -3198,7 +3198,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
             await opts.statusProvider.getDaemonPreflightCells(boundWorkspace);
         } catch (err) {
           writeStderrLine(
-            `qwen serve: statusProvider.getDaemonPreflightCells failed; ` +
+            `hopcode serve: statusProvider.getDaemonPreflightCells failed; ` +
               `falling back to empty daemon cells: ` +
               (err instanceof Error ? err.message : String(err)),
           );
@@ -3355,7 +3355,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
     },
 
     async setSessionApprovalMode(sessionId, mode, opts, context) {
-      // #4175 Wave 4 PR 17. Forwards through `qwen/control/session/
+      // #4175 Wave 4 PR 17. Forwards through `hopcode/control/session/
       // approval_mode` so the change lands inside the ACP child's own
       // `Config` (per-session `setApprovalMode`). The bridge layer adds
       // two things on top: trusted `originatorClientId` resolution and
@@ -3370,7 +3370,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
         entry,
         context?.clientId,
       );
-      // #4282 fold-in 4 (qwen-latest C1): validate the persist contract
+      // #4282 fold-in 4 (hopcode-latest C1): validate the persist contract
       // BEFORE the ACP roundtrip changes the in-process mode. The previous
       // post-call placement meant a missing `persistApprovalMode` callback
       // produced a 500 *after* the ACP child had already applied the
@@ -3452,7 +3452,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
       } catch {
         /* bus closed */
       }
-      // #4282 fold-in 4 (qwen-latest S2): when the change is persisted to
+      // #4282 fold-in 4 (hopcode-latest S2): when the change is persisted to
       // workspace settings, the new mode becomes the default for every
       // future session in this workspace. Fan out a workspace-scoped
       // mirror so peer sessions can update their UI before they next
@@ -3588,7 +3588,7 @@ export function createHttpAcpBridge(opts: BridgeOptions): HttpAcpBridge {
     },
 
     async initWorkspace(initOpts, originatorClientId) {
-      // #4175 Wave 4 PR 17. Mechanical scaffold of an empty `QWEN.md`
+      // #4175 Wave 4 PR 17. Mechanical scaffold of an empty `HOPCODE.md`
       // (or whatever `getCurrentGeminiMdFilename()` returns under
       // `--memory-file-name` overrides). No ACP roundtrip, no LLM
       // call — clients that want AI-fill follow up with
@@ -4036,7 +4036,7 @@ async function withTimeout<T>(
 
 /**
  * Default channel factory: spawn the current Node executable running this
- * CLI's entry script in `--acp` mode. `process.argv[1]` resolves to the qwen
+ * CLI's entry script in `--acp` mode. `process.argv[1]` resolves to the hopcode
  * entry script when launched via the `qwen` bin shim.
  *
  * Note on `cwd`: CodeQL flags the `workspaceCwd` flow into `spawn({cwd})`
@@ -4052,7 +4052,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   childEnvOverrides,
 ) => {
   // Resolution order:
-  //   1. `QWEN_CLI_ENTRY` env override — escape hatch for non-standard
+  //   1. `HOPCODE_CLI_ENTRY` env override — escape hatch for non-standard
   //      launch paths (bundled binaries, npx wrappers, `node -e`,
   //      `tsx ./src/...`, custom shims, container images that
   //      relocate the entry script). Anyone hitting "process.argv[1]
@@ -4061,7 +4061,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   //   2. `process.argv[1]` — works when launched via the `qwen` bin
   //      shim, which is the common path.
   // Fail loudly with an actionable error if neither resolves.
-  const cliEntry = process.env['QWEN_CLI_ENTRY'] || process.argv[1];
+  const cliEntry = process.env['HOPCODE_CLI_ENTRY'] || process.argv[1];
   if (!cliEntry) {
     throw new MissingCliEntryError();
   }
@@ -4081,7 +4081,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   // Note: spawning `process.execPath` only works when the entry script can
   // be loaded by raw Node. In dev (e.g. `npm run dev` via `tsx`) the entry
   // is a `.ts` file Node can't run; users should `npm run build` before
-  // `qwen serve` or set `process.execPath` to a tsx-aware shim. Stage 1
+  // `hopcode serve` or set `process.execPath` to a tsx-aware shim. Stage 1
   // accepts this — the daemon is meant for built deployments.
   // Pass through the daemon's full environment to the child, scrubbing
   // ONLY daemon-internal secrets (see SCRUBBED_CHILD_ENV_KEYS at module
@@ -4248,7 +4248,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
 const KILL_HARD_DEADLINE_MS = 10_000;
 
 /**
- * Environment variables stripped from the spawned `qwen --acp` child's
+ * Environment variables stripped from the spawned `hopcode --acp` child's
  * environment. Everything else is passed through — see the
  * threat-model rationale at the call site in `defaultSpawnChannelFactory`.
  *

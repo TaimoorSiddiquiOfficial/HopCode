@@ -903,14 +903,14 @@ describe('modelConfigResolver', () => {
       expect(result.sources['modalities'].kind).toBe('computed');
     });
 
-    it('Qwen OAuth path: modalities auto-detected for default coder-model', () => {
-      // resolveGenerationConfig is shared by both the OpenAI and Qwen OAuth
+    it('HopCode OAuth path: modalities auto-detected for default coder-model', () => {
+      // resolveGenerationConfig is shared by both the OpenAI and HopCode OAuth
       // paths; the latter (resolveQwenOAuthConfig) passes the resolved Qwen
       // OAuth model name (defaults to DEFAULT_HOPCODE_MODEL = 'coder-model') as
       // modelId, so the new modalities fallback also fires here.
       //
       // modalityDefaults.ts maps /^coder-model$/ to { image: true, video: true }
-      // because the Qwen OAuth coder-model now supports vision (see warning
+      // because the HopCode OAuth coder-model now supports vision (see warning
       // text at modelConfigResolver.ts ~L330). This test pins that down so a
       // future edit to MODALITY_PATTERNS doesn't silently regress OAuth.
       const result = resolveModelConfig({

@@ -856,7 +856,7 @@ export class SkillManager {
       case 'user':
         return SKILL_PROVIDER_CONFIG_DIRS.map((v) =>
           v === QWEN_DIR
-            ? path.join(Storage.getGlobalQwenDir(), SKILLS_CONFIG_DIR)
+            ? path.join(Storage.getGlobalHopCodeDir(), SKILLS_CONFIG_DIR)
             : path.join(os.homedir(), v, SKILLS_CONFIG_DIR),
         );
       case 'bundled':
@@ -1155,7 +1155,7 @@ export class SkillManager {
   }
 
   private async ensureUserSkillsDir(): Promise<void> {
-    const baseDir = path.join(Storage.getGlobalQwenDir(), SKILLS_CONFIG_DIR);
+    const baseDir = path.join(Storage.getGlobalHopCodeDir(), SKILLS_CONFIG_DIR);
     try {
       await fs.mkdir(baseDir, { recursive: true });
     } catch (error) {

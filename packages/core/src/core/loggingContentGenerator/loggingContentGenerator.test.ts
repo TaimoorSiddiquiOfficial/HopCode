@@ -153,7 +153,7 @@ vi.mock('../../telemetry/index.js', () => {
 
   return {
     startLLMRequestSpan: vi.fn((model: string, promptId: string) =>
-      createSpan('qwen-code.llm_request', {
+      createSpan('hopcode.llm_request', {
         model,
         prompt_id: promptId,
       }),
@@ -293,20 +293,20 @@ const createResponse = (
 
 const getStreamSpanRecord = () => {
   const spanRecord = loggingSpanRecords.find(
-    (record) => record.name === 'qwen-code.llm_request',
+    (record) => record.name === 'hopcode.llm_request',
   );
   if (!spanRecord) {
-    throw new Error('qwen-code.llm_request span was not created');
+    throw new Error('hopcode.llm_request span was not created');
   }
   return spanRecord;
 };
 
 const getGenerateContentSpanRecord = () => {
   const spanRecord = loggingSpanRecords.find(
-    (record) => record.name === 'qwen-code.llm_request',
+    (record) => record.name === 'hopcode.llm_request',
   );
   if (!spanRecord) {
-    throw new Error('qwen-code.llm_request span was not created');
+    throw new Error('hopcode.llm_request span was not created');
   }
   return spanRecord;
 };
@@ -1086,7 +1086,7 @@ describe('LoggingContentGenerator', () => {
   });
 
   it('preserves stream success when the OK status update fails', async () => {
-    loggingSpanNamesWithSetStatusFailure.add('qwen-code.llm_request');
+    loggingSpanNamesWithSetStatusFailure.add('hopcode.llm_request');
     const response = createResponse('resp-status', 'model-stream', [
       { text: 'ok' },
     ]);
@@ -1154,7 +1154,7 @@ describe('LoggingContentGenerator', () => {
       // Consume stream to trigger cleanup.
     }
 
-    expect(activeContextDuringWrappedCall).toBe('qwen-code.llm_request');
+    expect(activeContextDuringWrappedCall).toBe('hopcode.llm_request');
   });
 
   it('logs stream setup errors before leaving the stream span context', async () => {
@@ -1185,7 +1185,7 @@ describe('LoggingContentGenerator', () => {
     ).rejects.toThrow('setup-fail');
 
     expect(logApiError).toHaveBeenCalledTimes(1);
-    expect(activeContextDuringApiError).toBe('qwen-code.llm_request');
+    expect(activeContextDuringApiError).toBe('hopcode.llm_request');
     expect(spanEndedDuringApiError).toBe(false);
 
     const spanRecord = getStreamSpanRecord();
@@ -1474,7 +1474,7 @@ describe('LoggingContentGenerator', () => {
   });
 
   it('preserves stream errors when the error status update fails', async () => {
-    loggingSpanNamesWithSetStatusFailure.add('qwen-code.llm_request');
+    loggingSpanNamesWithSetStatusFailure.add('hopcode.llm_request');
     const response1 = createResponse('resp-1', 'model-stream', [
       { text: 'partial' },
     ]);

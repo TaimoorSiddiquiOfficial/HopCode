@@ -729,7 +729,7 @@ export class ModelsConfig {
       this._generationConfig.apiKey = 'HOPCODE_OAUTH_DYNAMIC_TOKEN';
       this.generationConfigSources['apiKey'] = {
         kind: 'computed',
-        detail: 'Qwen OAuth placeholder token',
+        detail: 'HopCode OAuth placeholder token',
       };
       this._generationConfig.apiKeyEnvKey = undefined;
       delete this.generationConfigSources['apiKeyEnvKey'];

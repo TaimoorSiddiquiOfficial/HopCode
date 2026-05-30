@@ -187,7 +187,7 @@ export function getCoreSystemPrompt(
   deferredTools?: Array<{ name: string; description: string }>,
 ): string {
   // if QWEN_SYSTEM_MD is set (and not 0|false), override system prompt from file
-  // default path is .qwen/system.md (project-level), can be overridden via QWEN_SYSTEM_MD
+  // default path is .hopcode/system.md (project-level), can be overridden via QWEN_SYSTEM_MD
   let systemMdEnabled = false;
   let systemMdPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
   // Resolve the environment variable to get either a path or a switch value.
@@ -885,7 +885,6 @@ function getToolCallExamples(model?: string): string {
   if (toolCallStyle) {
     switch (toolCallStyle.toLowerCase()) {
       case 'hopcoder':
-      case 'qwen-coder':
         return hopCoderToolCallExamples;
       case 'hopvl':
       case 'qwen-vl':

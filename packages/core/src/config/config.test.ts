@@ -203,7 +203,7 @@ vi.mock('../tools/memory-config', () => ({
   getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
   AGENT_CONTEXT_FILENAME: 'AGENTS.md',
-  MEMORY_SECTION_HEADER: '## Qwen Added Memories',
+  MEMORY_SECTION_HEADER: '## HopCode Added Memories',
 }));
 
 vi.mock('../core/contentGenerator.js');

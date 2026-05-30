@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -72,7 +72,7 @@ function sanitizeForStderr(value: string): string {
 }
 
 /**
- * Qwen-OAuth implementation of `DeviceFlowProvider` for `qwen serve`.
+ * Qwen-OAuth implementation of `DeviceFlowProvider` for `hopcode serve`.
  *
  * Uses the lower-level `QwenOAuth2Client` primitives (`requestDeviceAuthorization`
  * / `pollDeviceToken`) directly rather than the high-level
@@ -81,7 +81,7 @@ function sanitizeForStderr(value: string): string {
  * from the daemon â€” only the SDK/user side may decide to open a URL.
  */
 export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
-  readonly providerId: DeviceFlowProviderId = 'qwen-oauth';
+  readonly providerId: DeviceFlowProviderId = 'hopcode-oauth';
   private readonly client: IHopCodeOAuth2Client;
 
   constructor(client?: IHopCodeOAuth2Client) {
@@ -120,7 +120,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // when needed).
       const detail = err instanceof Error ? err.message : String(err);
       writeStderrLine(
-        `[serve] qwen device-flow start failed (raw): ${truncateForStderr(detail)}`,
+        `[serve] hopcode device-flow start failed (raw): ${truncateForStderr(detail)}`,
       );
       throw new UpstreamDeviceFlowError(
         'Qwen IdP device authorization request failed',
@@ -137,7 +137,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       const errorData = auth as { error?: string; error_description?: string };
       writeStderrLine(
         truncateForStderr(
-          `[serve] qwen device-flow start error envelope (raw): error=${
+          `[serve] hopcode device-flow start error envelope (raw): error=${
             errorData?.error ?? 'unknown'
           } description=${errorData?.error_description ?? '(none)'}`,
         ),
@@ -275,7 +275,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
           safeDetail = `<non-Error throw: ${typeof err}>`;
         }
         writeStderrLine(
-          `[serve] qwen device-flow poll failed (errorKind=${errorKind}): ${truncateForStderr(safeDetail)}`,
+          `[serve] hopcode device-flow poll failed (errorKind=${errorKind}): ${truncateForStderr(safeDetail)}`,
         );
       }
       return {

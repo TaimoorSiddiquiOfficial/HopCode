@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Reusable helpers for `qwen serve` daemon tests:
+ * Reusable helpers for `hopcode serve` daemon tests:
  *
  *   - `spawnDaemon` lifts the inline `beforeAll` boot pattern from
- *     `qwen-serve-routes.test.ts` / `qwen-serve-streaming.test.ts` into one
+ *     `hopcode-serve-routes.test.ts` / `hopcode-serve-streaming.test.ts` into one
  *     place so test files don't reimplement port-0 wait + token + workspace
  *     pinning + SIGTERM teardown.
  *   - `getRssMB` / `startRssPolling` sample the daemon process's RSS via
@@ -16,7 +16,7 @@
  *     across session counts.
  *   - `countDescendants` walks the daemon's process tree via `pgrep -P`
  *     (matches the existing inline pattern at
- *     `qwen-serve-streaming.test.ts:144`, with optional filtered subtree
+ *     `hopcode-serve-streaming.test.ts:144`, with optional filtered subtree
  *     matching). Used to surface the P1 "MCP child × session"
  *     amplification before the M2 shared-pool fix.
  *   - `percentiles` is a dependency-free p50/p90/p99 calculator for the
@@ -45,7 +45,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Default workspace and CLI binary resolution mirrors the existing
- * `qwen-serve-routes.test.ts` constants so callers that copy/paste between
+ * `hopcode-serve-routes.test.ts` constants so callers that copy/paste between
  * test files don't see drift.
  */
 export const DEFAULT_REPO_ROOT = path.resolve(__dirname, '../..');
@@ -130,7 +130,7 @@ export async function spawnDaemon(
   });
 
   // Parse the listening port from stdout. Mirrors the pattern in
-  // qwen-serve-routes.test.ts: capture the timer handle so a successful
+  // hopcode-serve-routes.test.ts: capture the timer handle so a successful
   // resolution clears it (an un-cleared 10s timer leaks past the spawn
   // promise and shows up as flaky test timeouts on slow CI).
   const port = await new Promise<number>((resolve, reject) => {
@@ -218,7 +218,7 @@ export async function spawnDaemon(
 }
 
 /**
- * Write a `.qwen/settings.json` into `workspaceCwd` so the daemon picks up
+ * Write a `.hopcode/settings.json` into `workspaceCwd` so the daemon picks up
  * `mcpServers` (and any other settings) at boot. Caller is responsible for
  * cleaning up the temp dir if they created one. Returns the absolute
  * settings file path for visibility in test output.
@@ -227,7 +227,7 @@ export function writeWorkspaceSettings(
   workspaceCwd: string,
   settings: Record<string, unknown>,
 ): string {
-  const settingsDir = path.join(workspaceCwd, '.qwen');
+  const settingsDir = path.join(workspaceCwd, '.hopcode');
   fs.mkdirSync(settingsDir, { recursive: true });
   const settingsPath = path.join(settingsDir, 'settings.json');
   fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
@@ -295,14 +295,14 @@ export function startRssPolling(pid: number, intervalMs = 100): RssPoller {
 /**
  * Walk daemon → ACP child → MCP descendants via `pgrep -P` calls.
  * Pattern starts with the existing inline approach at
- * `qwen-serve-streaming.test.ts:144`. When `pgrepOpts.mcpFilter` is
+ * `hopcode-serve-streaming.test.ts:144`. When `pgrepOpts.mcpFilter` is
  * supplied, matching MCP processes are searched recursively within each
  * ACP child subtree because the ACP transport can introduce an extra
- * `qwen --acp` process between the daemon-facing ACP child and stdio MCP
+ * `hopcode --acp` process between the daemon-facing ACP child and stdio MCP
  * servers.
  *
- * `pgrepOpts.acpFilter` defaults to `'qwen.*--acp'` (matches the spawned
- * `qwen --acp` child); pass an override only if a future bridge changes
+ * `pgrepOpts.acpFilter` defaults to `'hopcode.*--acp'` (matches the spawned
+ * `hopcode --acp` child); pass an override only if a future bridge changes
  * the ACP child invocation shape.
  *
  * Returns explicit PID arrays so callers can cross-check (e.g., assert
@@ -319,7 +319,7 @@ export function countDescendants(
   daemonPid: number,
   pgrepOpts: { acpFilter?: string; mcpFilter?: string } = {},
 ): DescendantCount {
-  const acpFilter = pgrepOpts.acpFilter ?? 'qwen.*--acp';
+  const acpFilter = pgrepOpts.acpFilter ?? 'hopcode.*--acp';
   const acpChildren = pgrepChildren(daemonPid, acpFilter);
   const mcpGrandchildren: number[] = [];
   for (const acpPid of acpChildren) {

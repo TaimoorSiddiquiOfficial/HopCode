@@ -50,7 +50,7 @@ export interface SkillConfig {
   /**
    * Optional model override for this skill's execution.
    * Uses the same selector syntax as subagent model selectors:
-   * `fast`, bare model ID (e.g., `qwen-coder-plus`),
+   * `fast`, bare model ID (e.g., `hopcoder-plus`),
    * `authType:modelId` for cross-provider, or omitted/`inherit`
    * to use the session model.
    */

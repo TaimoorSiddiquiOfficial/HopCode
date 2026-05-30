@@ -925,7 +925,7 @@ describe('AppContainer State Management', () => {
       // claude-code parity: ESC immediately after submit (model produced
       // nothing) rewinds the user item + trailing INFO and pulls the prompt
       // text back into the input box. Up-arrow history is implicitly cleaned
-      // because qwen-code's userMessages list is derived from the same
+      // because hopcode's userMessages list is derived from the same
       // historyManager.history.
       const mockSetText = vi.fn();
       const mockTruncateToItem = vi.fn();

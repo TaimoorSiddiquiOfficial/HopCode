@@ -2293,7 +2293,7 @@ export class CoreToolScheduler {
           if (toolSpan) {
             try {
               toolSpan.setAttributes({
-                'qwen-code.tool.modify_with_editor_unavailable': true,
+                'hopcode.tool.modify_with_editor_unavailable': true,
               });
             } catch {
               // OTel errors must not block API behavior.

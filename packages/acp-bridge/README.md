@@ -1,6 +1,6 @@
 # `@hoptrendy/hopcode-acp-bridge`
 
-Shared ACP bridge primitives consumed by `qwen serve`, channels, IDE, TUI,
+Shared ACP bridge primitives consumed by `hopcode serve`, channels, IDE, TUI,
 and remote-control adapters. Lives in the monorepo, not published to npm.
 
 This is **PR 22a** of the Mode B daemon roadmap (#4175 Wave 5). The full
@@ -19,7 +19,7 @@ extraction is split:
   (`slow_client_warning` → `client_evicted`).
 - `inMemoryChannel` — paired NDJSON streams without spawning a child;
   used for in-process bridge tests and the parked Mode A
-  (`qwen --serve`) path.
+  (`hopcode --serve`) path.
 - `channel` — `AcpChannel` / `AcpChannelExitInfo` / `ChannelFactory`
   type contract that `httpAcpBridge.ts` already injects via
   `BridgeOptions.channelFactory`.

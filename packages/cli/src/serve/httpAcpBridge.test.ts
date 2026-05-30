@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -463,7 +463,7 @@ describe('createHttpAcpBridge', () => {
       channelFactory: async () => {
         const h = makeChannel({
           extMethodImpl: (method) => {
-            if (method === 'qwen/status/workspace/mcp') {
+            if (method === 'hopcode/status/workspace/mcp') {
               return {
                 v: 1,
                 workspaceCwd: WS_A,
@@ -471,7 +471,7 @@ describe('createHttpAcpBridge', () => {
                 servers: [],
               };
             }
-            if (method === 'qwen/status/workspace/skills') {
+            if (method === 'hopcode/status/workspace/skills') {
               return {
                 v: 1,
                 workspaceCwd: WS_A,
@@ -505,9 +505,9 @@ describe('createHttpAcpBridge', () => {
 
     expect(handles).toHaveLength(1);
     expect(handles[0]?.agent.extMethodCalls.map((c) => c.method)).toEqual([
-      'qwen/status/workspace/mcp',
-      'qwen/status/workspace/skills',
-      'qwen/status/workspace/providers',
+      'hopcode/status/workspace/mcp',
+      'hopcode/status/workspace/skills',
+      'hopcode/status/workspace/providers',
     ]);
     expect(handles[0]?.agent.extMethodCalls.map((c) => c.params)).toEqual([
       { cwd: WS_A },
@@ -722,7 +722,7 @@ describe('createHttpAcpBridge', () => {
       channelFactory: async () => {
         const h = makeChannel({
           extMethodImpl: (method) => {
-            if (method === 'qwen/status/workspace/preflight') {
+            if (method === 'hopcode/status/workspace/preflight') {
               return { cells: acpCells };
             }
             return { cells: [] };
@@ -815,7 +815,7 @@ describe('createHttpAcpBridge', () => {
       channelFactory: async () => {
         const h = makeChannel({
           extMethodImpl: (method, params) => {
-            if (method === 'qwen/status/session/context') {
+            if (method === 'hopcode/status/session/context') {
               return {
                 v: 1,
                 sessionId: params['sessionId'],
@@ -851,8 +851,8 @@ describe('createHttpAcpBridge', () => {
       availableSkills: [],
     });
     expect(handles[0]?.agent.extMethodCalls.map((c) => c.method)).toEqual([
-      'qwen/status/session/context',
-      'qwen/status/session/supported_commands',
+      'hopcode/status/session/context',
+      'hopcode/status/session/supported_commands',
     ]);
 
     await bridge.shutdown();
@@ -961,7 +961,7 @@ describe('createHttpAcpBridge', () => {
         channelFactory: async () => makeChannel().channel,
       });
       const session = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
-      // Anonymous heartbeats (no `X-Qwen-Client-Id`) bump only the session
+      // Anonymous heartbeats (no `X-HopCode-Client-Id`) bump only the session
       // watermark — every identified-client lookup must stay empty so a
       // future revocation policy doesn't see ghost timestamps.
       const before = Date.now();
@@ -1723,7 +1723,7 @@ describe('createHttpAcpBridge', () => {
     expect(first.attached).toBe(false);
     expect(second.attached).toBe(false);
     // Stage 1.5 multi-session: the two thread-scope calls SHARE the
-    // workspace's `qwen --acp` child. Only one `channelFactory` call.
+    // workspace's `hopcode --acp` child. Only one `channelFactory` call.
     // Each `newSession()` call to the agent produces a distinct id.
     expect(handles).toHaveLength(1);
     expect(bridge.sessionCount).toBe(2);
@@ -4397,8 +4397,8 @@ describe('createHttpAcpBridge', () => {
 
   describe('setSessionApprovalMode (#4175 Wave 4 PR 17)', () => {
     /**
-     * #4282 fold-in 4 (qwen-latest C1). Build a channel factory whose
-     * extMethod handler answers `qwen/control/session/approval_mode`
+     * #4282 fold-in 4 (hopcode-latest C1). Build a channel factory whose
+     * extMethod handler answers `hopcode/control/session/approval_mode`
      * with the expected `{previous, current}` shape. Tracks invocations
      * so the guard-ordering tests can assert that the ACP call did NOT
      * happen when the persist contract was already violated upfront.
@@ -4413,7 +4413,7 @@ describe('createHttpAcpBridge', () => {
         const agent = new FakeAgent({
           extMethodImpl: (method, params) => {
             calls.push({ method });
-            if (method === 'qwen/control/session/approval_mode') {
+            if (method === 'hopcode/control/session/approval_mode') {
               return Promise.resolve({
                 previous: 'default',
                 current: (params as { mode: string }).mode,
@@ -4456,7 +4456,7 @@ describe('createHttpAcpBridge', () => {
       ).rejects.toThrow(/persistApprovalMode/);
       expect(
         getCalls().some(
-          (c) => c.method === 'qwen/control/session/approval_mode',
+          (c) => c.method === 'hopcode/control/session/approval_mode',
         ),
       ).toBe(false);
       await bridge.shutdown();
@@ -4707,7 +4707,7 @@ describe('createHttpAcpBridge', () => {
     let tmpWs: string;
 
     beforeEach(async () => {
-      tmpWs = await fsp.mkdtemp(path.join(os.tmpdir(), 'qwen-init-workspace-'));
+      tmpWs = await fsp.mkdtemp(path.join(os.tmpdir(), 'hopcode-init-workspace-'));
     });
 
     afterEach(async () => {
@@ -5695,7 +5695,7 @@ describe('createHttpAcpBridge', () => {
 
     it('Stage 1.5 multi-session: N sessions on same workspace share ONE channel', async () => {
       // The headline of the Stage 1.5 refactor — multiple thread-scope
-      // sessions on one workspace pay for one `qwen --acp` child, not
+      // sessions on one workspace pay for one `hopcode --acp` child, not
       // N children. LaZzyMan + tanzhenxin pushed for this; the agent
       // already supports it via `acpAgent.ts:194 sessions:
       // Map<string, Session>`.

@@ -1,13 +1,13 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Unit tests for `HopCodeOAuthDeviceFlowProvider`'s stderr audit path.
  *
- * PR #4291 follow-up review (qwen-latest, #1): the catch block in
+ * PR #4291 follow-up review (hopcode-latest, #1): the catch block in
  * `poll()` adds 4 distinct branches (AbortError skip, structured
  * `HopCodeOAuthPollError`, generic `Error` with name+length redaction,
  * non-Error throw) that drive what â€” if anything â€” lands in the
@@ -201,7 +201,7 @@ describe('HopCodeOAuthDeviceFlowProvider.poll() â€” stderr audit branches',
     expect(result.kind).toBe('error');
     expect(stderrLines).toHaveLength(1);
     const line = stderrLines[0];
-    expect(line).toContain('qwen device-flow poll failed');
+    expect(line).toContain('hopcode device-flow poll failed');
     expect(line).toContain('oauthError=slow_down');
     // The raw default message ("Device token poll failed: slow_down -
     // Polling too fast") MUST NOT appear â€” only the structured field.
@@ -216,7 +216,7 @@ describe('HopCodeOAuthDeviceFlowProvider.poll() â€” stderr audit branches',
     // its message). Log just the constructor name + length so
     // on-call gets a triage-able breadcrumb without the request body.
     const longMessage =
-      'HTTP 502 from qwen IdP: <html><body>Forbidden â€” request body: device_code=device-code-secret-AAAA1111&code_verifier=pkce-verifier-secret-BBBB2222</body></html>';
+      'HTTP 502 from HopCode IdP: <html><body>Forbidden â€” request body: device_code=device-code-secret-AAAA1111&code_verifier=pkce-verifier-secret-BBBB2222</body></html>';
     const provider = new HopCodeOAuthDeviceFlowProvider(
       fakeClient({
         pollDeviceToken: async () => {
@@ -238,7 +238,7 @@ describe('HopCodeOAuthDeviceFlowProvider.poll() â€” stderr audit branches',
     expect(line).toContain('raw suppressed');
     // Hard assertions: NEITHER the raw message NOR the templated
     // device-flow secrets may appear in stderr.
-    expect(line).not.toContain('HTTP 502 from qwen');
+    expect(line).not.toContain('HTTP 502 from HopCode');
     expect(line).not.toContain('device-code-secret');
     expect(line).not.toContain('pkce-verifier-secret');
   });

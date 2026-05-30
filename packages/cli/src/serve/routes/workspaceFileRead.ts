@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -95,7 +95,7 @@ export function sendFsError(res: Response, err: unknown, route: string): void {
     return;
   }
   writeStderrLine(
-    `qwen serve: ${route} unexpected error: ${
+    `hopcode serve: ${route} unexpected error: ${
       err instanceof Error ? err.message : String(err)
     }`,
   );
@@ -154,7 +154,7 @@ function requireStringQuery(
       status: 400,
     });
     writeStderrLine(
-      `qwen serve: ${route} rejected request missing required ?${name}`,
+      `hopcode serve: ${route} rejected request missing required ?${name}`,
     );
     return null;
   }
@@ -189,7 +189,7 @@ function getFsFactory(
 interface RegisterDeps {
   /**
    * Pulls the daemon-stamped client identity off the request. Re-used
-   * from `serve/server.ts` so the X-Qwen-Client-Id validation lives
+   * from `serve/server.ts` so the X-HopCode-Client-Id validation lives
    * in one place; PR 19 routes thread the trusted id into the audit
    * context. Returning `null` means the helper already sent a 400
    * — the route must short-circuit.

@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Daemon-backed IDE connection spike. It mirrors the ACP process connection
- * shape while replacing the local child process with a qwen serve session.
+ * shape while replacing the local child process with a hopcode serve session.
  */
 
 import type {

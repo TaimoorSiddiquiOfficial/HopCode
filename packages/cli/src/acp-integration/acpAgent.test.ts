@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -909,13 +909,13 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
         .fn()
         .mockImplementation((name: string) => name === 'disabled'),
       getSkillManager: vi.fn().mockReturnValue({ listSkills }),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getAllConfiguredModels: vi.fn().mockReturnValue([
         {
           id: 'qwen-plus',
           label: 'Qwen Plus',
           description: 'General coding model',
-          authType: 'qwen',
+          authType: 'hopcode',
           contextWindowSize: 65_536,
           baseUrl: 'https://secret.example.com',
           envKey: 'DASHSCOPE_API_KEY',
@@ -1021,12 +1021,12 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
       v: 1,
       workspaceCwd: '/work/status',
       initialized: true,
-      current: { authType: 'qwen', modelId: 'qwen-plus(qwen)' },
+      current: { authType: 'hopcode', modelId: 'qwen-plus(qwen)' },
       providers: [
         {
           kind: 'model_provider',
           status: 'ok',
-          authType: 'qwen',
+          authType: 'hopcode',
           current: true,
           models: [
             {
@@ -1056,7 +1056,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
       getMcpServers: vi.fn(() => {
         throw new Error('broken mcp config');
       }),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getActiveRuntimeModelSnapshot: vi.fn().mockReturnValue(undefined),
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getAllConfiguredModels: vi.fn(() => {
@@ -1106,12 +1106,12 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('extMethod qwen/status/workspace/preflight returns 6 ACP-side cells', async () => {
+  it('extMethod hopcode/status/workspace/preflight returns 6 ACP-side cells', async () => {
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
       getMcpServers: vi.fn().mockReturnValue({}),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getActiveRuntimeModelSnapshot: vi.fn().mockReturnValue(undefined),
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getSkillManager: vi.fn().mockReturnValue({
@@ -1121,7 +1121,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
         {
           id: 'qwen-plus',
           label: 'Qwen Plus',
-          authType: 'qwen',
+          authType: 'hopcode',
           baseUrl: 'https://api.example.com',
           isRuntimeModel: false,
         },
@@ -1181,7 +1181,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
       getMcpServers: vi.fn().mockReturnValue({}),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getSkillManager: vi.fn().mockReturnValue({
         listSkills: vi.fn().mockRejectedValue(skillError),
@@ -1230,7 +1230,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
       getMcpServers: vi.fn().mockReturnValue({}),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getSkillManager: vi.fn(() => {
         throw new Error('config getter exploded mid-eval');
@@ -1276,14 +1276,14 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getActiveRuntimeModelSnapshot: vi.fn().mockReturnValue(undefined),
       getModel: vi.fn().mockReturnValue('missing-model'),
       getAllConfiguredModels: vi.fn().mockReturnValue([
         {
           id: 'qwen-plus',
           label: 'Qwen Plus',
-          authType: 'qwen',
+          authType: 'hopcode',
         },
       ]),
     } as unknown as Config;
@@ -1304,10 +1304,10 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
     await expect(
       agent.extMethod(SERVE_STATUS_EXT_METHODS.workspaceProviders, {}),
     ).resolves.toMatchObject({
-      current: { authType: 'qwen', modelId: 'missing-model(qwen)' },
+      current: { authType: 'hopcode', modelId: 'missing-model(hopcode)' },
       providers: [
         {
-          authType: 'qwen',
+          authType: 'hopcode',
           current: false,
           models: [
             {
@@ -1329,10 +1329,10 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getActiveRuntimeModelSnapshot: vi.fn().mockReturnValue({
         id: 'runtime-qwen-plus',
-        authType: 'qwen',
+        authType: 'hopcode',
       }),
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getAllConfiguredModels: vi.fn().mockReturnValue([
@@ -1340,7 +1340,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
           id: 'qwen-plus',
           runtimeSnapshotId: 'runtime-qwen-plus',
           label: 'Runtime Qwen Plus',
-          authType: 'qwen',
+          authType: 'hopcode',
           isRuntimeModel: true,
         },
       ]),
@@ -1362,10 +1362,10 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
     await expect(
       agent.extMethod(SERVE_STATUS_EXT_METHODS.workspaceProviders, {}),
     ).resolves.toMatchObject({
-      current: { authType: 'qwen', modelId: 'runtime-qwen-plus(qwen)' },
+      current: { authType: 'hopcode', modelId: 'runtime-qwen-plus(qwen)' },
       providers: [
         {
-          authType: 'qwen',
+          authType: 'hopcode',
           current: true,
           models: [
             {

@@ -554,10 +554,10 @@ describe('Telemetry SDK', () => {
 
     it('user-provided service.name wins over default', () => {
       vi.spyOn(mockConfig, 'getTelemetryResourceAttributes').mockReturnValue({
-        'service.name': 'qwen-code-ci',
+        'service.name': 'hopcode-ci',
       });
       initializeTelemetry(mockConfig);
-      expect(getResourceAttributes()['service.name']).toBe('qwen-code-ci');
+      expect(getResourceAttributes()['service.name']).toBe('hopcode-ci');
     });
 
     it('user-provided service.version is ignored (runtime value wins)', () => {

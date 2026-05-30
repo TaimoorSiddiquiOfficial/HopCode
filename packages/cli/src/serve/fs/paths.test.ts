@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +22,7 @@ describe('canonicalizeWorkspace', () => {
 
   beforeEach(async () => {
     const id = randomBytes(6).toString('hex');
-    scratch = await fsp.mkdtemp(path.join(os.tmpdir(), `qwen-fs-paths-${id}-`));
+    scratch = await fsp.mkdtemp(path.join(os.tmpdir(), `hopcode-fs-paths-${id}-`));
   });
 
   afterEach(async () => {
@@ -180,7 +180,7 @@ describe('resolveWithinWorkspace', () => {
   beforeEach(async () => {
     const id = randomBytes(6).toString('hex');
     scratch = await fsp.mkdtemp(
-      path.join(os.tmpdir(), `qwen-fs-resolve-${id}-`),
+      path.join(os.tmpdir(), `hopcode-fs-resolve-${id}-`),
     );
     workspace = path.join(scratch, 'workspace');
     await fsp.mkdir(workspace);

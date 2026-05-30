@@ -48,7 +48,7 @@ Based on the remaining arguments:
 - **PR number or same-repo URL** (e.g., `123` or a URL whose owner/repo matches the current repo — cross-repo URLs are handled by the lightweight mode above):
 
   > ⚠️ **MANDATORY worktree flow.** Do NOT use `gh pr checkout`, `git checkout <branch>`, `git switch`, `git pull`, `git reset --hard`, or any other command that changes the user's current HEAD or working tree contents. The ONLY entry point is `qwen review fetch-pr` (below) — it isolates the PR into an ephemeral worktree so the user's local state is never touched. After it returns, every subsequent command in Steps 2-8 MUST operate inside the returned `worktreePath` (e.g. `cd <worktreePath>` first, or pass the path as a `--cwd` / explicit argument).
-  - **Run `qwen review fetch-pr`** to set up the working state in one pass — it cleans any stale worktree, fetches the PR HEAD into `qwen-review/pr-<n>`, queries `gh pr view` for metadata, and creates an ephemeral worktree at `.qwen/tmp/review-pr-<n>`:
+  - **Run `qwen review fetch-pr`** to set up the working state in one pass — it cleans any stale worktree, fetches the PR HEAD into `qwen-review/pr-<n>`, queries `gh pr view` for metadata, and creates an ephemeral worktree at `.hopcode/tmp/review-pr-<n>`:
 
     ```bash
     hopcode review fetch-pr <pr_number> <owner>/<repo> \

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -164,7 +164,7 @@ export function supportsHyperlinks(
   // guard sits above `FORCE_HYPERLINK` on purpose: a user who has
   // `FORCE_HYPERLINK=1` in their shell profile (to enable OSC 8 inside
   // tmux/Hyper interactively) still shouldn't see escape bytes when they
-  // run `qwen | cat` or `qwen > out.txt`.
+  // run `hopcode | cat` or `hopcode > out.txt`.
   if (!stream || !stream.isTTY) return false;
 
   // Explicit force overrides every heuristic below — but not the opt-outs

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,8 +67,8 @@ export const SERVE_CAPABILITY_REGISTRY = {
   workspace_skills: { since: 'v1' },
   workspace_providers: { since: 'v1' },
   // Issue #4175 PR 16: workspace memory CRUD (`GET/POST /workspace/memory`).
-  // Daemon exposes hierarchical QWEN.md state and accepts append/replace
-  // writes scoped to either the bound workspace or the global ~/.qwen
+  // Daemon exposes hierarchical HOPCODE.md state and accepts append/replace
+  // writes scoped to either the bound workspace or the global ~/.hopcode
   // directory. Mutation path is gated by the centralized mutation gate.
   workspace_memory: { since: 'v1' },
   // Issue #4175 PR 16: workspace agents CRUD (`GET/POST /workspace/agents`
@@ -144,7 +144,7 @@ export const SERVE_CAPABILITY_REGISTRY = {
   // (`tools.disabled` is consulted at `Config` construction time).
   workspace_tool_toggle: { since: 'v1' },
   // #4175 Wave 4 PR 17. `POST /workspace/init` scaffolds an empty
-  // `QWEN.md` (or whatever `getCurrentGeminiMdFilename()` returns) at
+  // `HOPCODE.md` (or whatever `getCurrentGeminiMdFilename()` returns) at
   // the bound workspace root. Body: `{force?: boolean}`. Default
   // refuses with 409 when the file already exists; `force: true`
   // overwrites. Mechanical only — does NOT call the LLM. To AI-fill

@@ -141,8 +141,8 @@ export class Storage {
     return Storage.getGlobalHopCodeDir();
   }
 
-  static getGlobalQwenDir(): string {
-    const envDir = process.env['QWEN_HOME'];
+  static getGlobalHopCodeDir(): string {
+    const envDir = process.env['HOPCODE_HOME'];
     if (envDir) {
       return Storage.resolvePath(envDir);
     }
@@ -151,10 +151,6 @@ export class Storage {
       return path.join(os.tmpdir(), '.hopcode');
     }
     return path.join(homeDir, HOPCODE_DIR);
-  }
-
-  static getGlobalHopCodeDir(): string {
-    return Storage.getGlobalQwenDir();
   }
 
   static getMcpOAuthTokensPath(): string {
@@ -197,7 +193,7 @@ export class Storage {
     // Pinned to the global Qwen dir so the VS Code companion (which only
     // sees env vars, not settings-based runtimeOutputDir) finds the same
     // lock-file location as the CLI.
-    return path.join(Storage.getGlobalQwenDir(), IDE_DIR_NAME);
+    return path.join(Storage.getGlobalHopCodeDir(), IDE_DIR_NAME);
   }
 
   /**
@@ -281,7 +277,7 @@ export class Storage {
       return resolvedPlansDirectory;
     }
 
-    return path.join(Storage.getGlobalQwenDir(), PLANS_DIR_NAME);
+    return path.join(Storage.getGlobalHopCodeDir(), PLANS_DIR_NAME);
   }
 
   static getPlanFilePath(
@@ -383,7 +379,7 @@ export class Storage {
     const homeDir = os.homedir() || os.tmpdir();
     return SKILL_PROVIDER_CONFIG_DIRS.map((dir) =>
       dir === HOPCODE_DIR
-        ? path.join(Storage.getGlobalQwenDir(), 'skills')
+        ? path.join(Storage.getGlobalHopCodeDir(), 'skills')
         : path.join(homeDir, dir, 'skills'),
     );
   }

@@ -25,7 +25,7 @@ git commit -q -m "initial"
 Each group uses a unique tmux session name (e.g. `wt-test-a`, `wt-test-b`) and a unique temp dir.
 
 Baseline binary: globally installed `hopcode` (0.15.10).
-Local build binary: `node /Users/mochi/code/qwen-code/.claude/worktrees/trusting-euclid-6fdfb9/bundle/qwen.js`.
+Local build binary: `node /Users/mochi/code/hopcode/.claude/worktrees/trusting-euclid-6fdfb9/bundle/qwen.js`.
 
 ## Test Group A: EnterWorktree tool registration and basic creation
 
@@ -238,15 +238,15 @@ E2E spot check (optional): manually `touch -t 200001010000 .hopcode/worktrees/ag
 
 ### F1: Arena worktree path unchanged
 
-**Steps:** Run an Arena session (separate from EnterWorktree); verify it still creates worktrees under `~/.qwen/arena/<sessionId>/worktrees/` and not under `.hopcode/worktrees/`.
+**Steps:** Run an Arena session (separate from EnterWorktree); verify it still creates worktrees under `~/.hopcode/arena/<sessionId>/worktrees/` and not under `.hopcode/worktrees/`.
 
 ```bash
 # Setup: requires Arena-enabled config. Detailed steps depend on Arena CLI invocation.
-# Pre-implementation: arena worktrees are under ~/.qwen/arena/.
+# Pre-implementation: arena worktrees are under ~/.hopcode/arena/.
 # Post-implementation: SAME — arena path is independent.
 ```
 
-(If Arena is not easily reachable from headless mode, this group is verified by unit test that ArenaManager.ts:125 (`this.arenaBaseDir = arenaSettings?.worktreeBaseDir ?? path.join(Storage.getGlobalQwenDir(), 'arena')`) is unchanged.)
+(If Arena is not easily reachable from headless mode, this group is verified by unit test that ArenaManager.ts:125 (`this.arenaBaseDir = arenaSettings?.worktreeBaseDir ?? path.join(Storage.getGlobalHopCodeDir(), 'arena')`) is unchanged.)
 
 ## Unit test coverage (collocated with implementation)
 

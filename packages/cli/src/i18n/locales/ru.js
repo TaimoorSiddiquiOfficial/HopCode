@@ -341,8 +341,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': 'Просмотр и изменение настроек HopCode',
   Settings: 'Настройки',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    'Для применения изменений необходимо перезапустить Qwen Code. Нажмите r для выхода и применения изменений.',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    'Для применения изменений необходимо перезапустить HopCode. Нажмите r для выхода и применения изменений.',
   // ============================================================================
   // Метки настроек
   // ============================================================================
@@ -454,8 +454,8 @@ export default {
   remote: 'удалённый',
   'This extension will add the following commands: {{commands}}.':
     'Это расширение добавит следующие команды: {{commands}}.',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    'Это расширение добавит информацию в ваш контекст QWEN.md с помощью {{fileName}}',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    'Это расширение добавит информацию в ваш контекст HOPCODE.md с помощью {{fileName}}',
   'This extension will install the following skills:':
     'Это расширение установит следующие навыки:',
   'This extension will install the following subagents:':
@@ -1050,12 +1050,12 @@ export default {
   'HopCode OAuth': 'HopCode OAuth',
   'Discontinued — switch to Coding Plan or API Key':
     'Прекращено — переключитесь на Coding Plan или API Key',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Бесплатный уровень Qwen OAuth прекращён 2026-04-15. Выберите Coding Plan или API Key.',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Бесплатный уровень Qwen OAuth был прекращен 2026-04-15. Пожалуйста, выберите модель от другого провайдера или выполните /auth для переключения.',
-  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ Бесплатный уровень Qwen OAuth прекращён 2026-04-15. Выберите другую опцию.\n',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'Бесплатный уровень HopCode OAuth прекращён 2026-04-15. Выберите Coding Plan или API Key.',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'Бесплатный уровень HopCode OAuth был прекращен 2026-04-15. Пожалуйста, выберите модель от другого провайдера или выполните /auth для переключения.',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ Бесплатный уровень HopCode OAuth прекращён 2026-04-15. Выберите другую опцию.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     'Платно \u00B7 До 6 000 запросов/5 часов \u00B7 Все модели Alibaba Cloud Coding Plan',
   'Alibaba Cloud Coding Plan': 'Alibaba Cloud Coding Plan',
@@ -1064,18 +1064,18 @@ export default {
     'Браузерная аутентификация с использованием сторонних провайдеров (например, OpenRouter, ModelScope)',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     'Авторизация должна быть {{enforcedType}}, но вы сейчас используете {{currentType}}.',
-  'Qwen OAuth Authentication': 'Авторизация Qwen OAuth',
+  'HopCode OAuth Authentication': 'Авторизация HopCode OAuth',
   'Please visit this URL to authorize:':
     'Пожалуйста, посетите этот URL для авторизации:',
   'Waiting for authorization': 'Ожидание авторизации',
   'Time remaining:': 'Осталось времени:',
-  'Qwen OAuth Authentication Timeout': 'Таймаут авторизации Qwen OAuth',
+  'HopCode OAuth Authentication Timeout': 'Таймаут авторизации HopCode OAuth',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'Токен OAuth истек (более {{seconds}} секунд). Пожалуйста, выберите метод авторизации снова.',
   'Press any key to return to authentication type selection.':
     'Нажмите любую клавишу для возврата к выбору типа авторизации.',
-  'Waiting for Qwen OAuth authentication...':
-    'Ожидание авторизации Qwen OAuth...',
+  'Waiting for HopCode OAuth authentication...':
+    'Ожидание авторизации HopCode OAuth...',
   'Authentication timed out. Please try again.':
     'Время ожидания авторизации истекло. Пожалуйста, попробуйте снова.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1642,8 +1642,8 @@ export default {
   servers: 'серверов',
   'Add MCP servers to your settings to get started.':
     'Добавьте MCP servers в настройки, чтобы начать.',
-  'Run qwen --debug to see error logs':
-    'Запустите qwen --debug для просмотра журналов ошибок',
+  'Run hopcode --debug to see error logs':
+    'Запустите hopcode --debug для просмотра журналов ошибок',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth-аутентификация',
@@ -1681,7 +1681,7 @@ export default {
     '↑/↓: Навигация | ←/→: Переключение вкладок | Enter: Выбор',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: Навигация | Enter: Выбор | Esc: Отмена',
-  'Authenticate using Qwen OAuth': 'Аутентификация через Qwen OAuth',
+  'Authenticate using HopCode OAuth': 'Аутентификация через HopCode OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Аутентификация через Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
@@ -1713,8 +1713,8 @@ export default {
     '⚠️  Метод аутентификации не настроен.\n',
   'Run one of the following commands to get started:\n':
     'Выполните одну из следующих команд для начала:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - Аутентификация через Qwen OAuth (прекращено)',
+  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  hopcode auth hopcode-oauth     - Аутентификация через HopCode OAuth (прекращено)',
   'Or simply run:': 'Или просто выполните:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Интерактивная настройка аутентификации\n',
@@ -1723,8 +1723,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Тип: Бесплатный уровень (прекращено 2026-04-15)',
   '  Limit: No longer available': '  Лимит: Больше не доступен',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Бесплатный уровень Qwen OAuth прекращён 2026-04-15. Выполните /auth для переключения на Coding Plan, OpenRouter, Fireworks AI или другого провайдера.',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'Бесплатный уровень HopCode OAuth прекращён 2026-04-15. Выполните /auth для переключения на Coding Plan, OpenRouter, Fireworks AI или другого провайдера.',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ Метод аутентификации: Alibaba Cloud Coding Plan',
   'Global - Alibaba Cloud': 'Глобальный - Alibaba Cloud',
@@ -1736,8 +1736,8 @@ export default {
     '⚠️  Метод аутентификации: Alibaba Cloud Coding Plan (Не завершён)',
   '  Issue: API key not found in environment or settings\n':
     '  Проблема: API Key не найден в окружении или настройках\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  Выполните `qwen auth coding-plan` для повторной настройки.\n',
+  '  Run `hopcode auth coding-plan` to re-configure.\n':
+    '  Выполните `hopcode auth coding-plan` для повторной настройки.\n',
   '✓ Authentication Method: {{type}}': '✓ Метод аутентификации: {{type}}',
   '  Status: Configured\n': '  Статус: Настроено\n',
   'Failed to check authentication status: {{error}}':

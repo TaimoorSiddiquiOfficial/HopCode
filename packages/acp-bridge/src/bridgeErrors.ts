@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -114,7 +114,7 @@ export class WorkspaceMismatchError extends Error {
         : requested;
     super(
       `Workspace mismatch: daemon is bound to "${bound}" but ` +
-        `request asked for "${safeRequested}". Each \`qwen serve\` ` +
+        `request asked for "${safeRequested}". Each \`hopcode serve\` ` +
         `daemon binds to exactly one workspace; start a separate ` +
         `daemon for "${safeRequested}" (or route the request to one ` +
         `via an orchestrator).`,

@@ -17,11 +17,11 @@ const projectRoot = join(import.meta.dirname, '..');
 
 bootstrapHomeEnv();
 
-const USER_SETTINGS_DIR = process.env.QWEN_HOME
-  ? resolvePath(process.env.QWEN_HOME)
-  : join(os.homedir(), '.qwen');
+const USER_SETTINGS_DIR = process.env.HOPCODE_HOME
+  ? resolvePath(process.env.HOPCODE_HOME)
+  : join(os.homedir(), '.hopcode');
 const USER_SETTINGS_PATH = join(USER_SETTINGS_DIR, 'settings.json');
-const WORKSPACE_SETTINGS_PATH = join(projectRoot, '.qwen', 'settings.json');
+const WORKSPACE_SETTINGS_PATH = join(projectRoot, '.hopcode', 'settings.json');
 
 let settingsTarget = undefined;
 

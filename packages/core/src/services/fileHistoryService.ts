@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Code
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -145,7 +145,7 @@ function getBackupFileName(filePath: string, version: number): string {
 
 function resolveBackupPath(backupFileName: string, sessionId: string): string {
   return join(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalHopCodeDir(),
     FILE_HISTORY_DIR,
     sessionId,
     backupFileName,

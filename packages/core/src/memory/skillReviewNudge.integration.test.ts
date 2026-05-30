@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,7 +46,7 @@ describe('Skill Nudge E2E Integration Tests', () => {
     mgr = new MemoryManager();
     mockConfig = {
       getSessionId: () => 'test-session-1',
-      getModel: () => 'qwen-coder-32b',
+      getModel: () => 'hopcoder-32b',
       getProjectRoot: () => projectRoot,
     } as Config;
   });
@@ -433,7 +433,7 @@ describe('Skill Nudge E2E Integration Tests', () => {
       // Directory may not exist yet, but the path should be valid
       // Use path.normalize-friendly comparison for cross-platform (Windows uses backslash)
       const normalizedPath = skillsRootPath.split(path.sep).join('/');
-      expect(normalizedPath.includes('.qwen/skills')).toBe(true);
+      expect(normalizedPath.includes('.hopcode/skills')).toBe(true);
     });
   });
 });

@@ -298,8 +298,8 @@ describe('retryWithBackoff', () => {
     });
   });
 
-  describe('Qwen OAuth 429 error handling', () => {
-    it('should retry for Qwen OAuth 429 errors that are throttling-related', async () => {
+  describe('HopCode OAuth 429 error handling', () => {
+    it('should retry for HopCode OAuth 429 errors that are throttling-related', async () => {
       const errorWith429: HttpError = new Error('Rate limit exceeded');
       errorWith429.status = 429;
 
@@ -324,7 +324,7 @@ describe('retryWithBackoff', () => {
       expect(fn).toHaveBeenCalledTimes(2);
     });
 
-    it('should throw immediately for Qwen OAuth with insufficient_quota message', async () => {
+    it('should throw immediately for HopCode OAuth with insufficient_quota message', async () => {
       const errorWithInsufficientQuota = Object.assign(
         new Error('Free allocated quota exceeded.'),
         { status: 429, code: 'insufficient_quota' },
@@ -340,14 +340,14 @@ describe('retryWithBackoff', () => {
       });
 
       await expect(promise).rejects.toThrow(
-        /Qwen OAuth free tier has been discontinued/,
+        /HopCode OAuth free tier has been discontinued/,
       );
 
       // Should be called only once (no retries)
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
-    it('should throw immediately for Qwen OAuth with free allocated quota exceeded message', async () => {
+    it('should throw immediately for HopCode OAuth with free allocated quota exceeded message', async () => {
       const errorWithQuotaExceeded = Object.assign(
         new Error('Free allocated quota exceeded.'),
         { status: 429, code: 'insufficient_quota' },
@@ -363,14 +363,14 @@ describe('retryWithBackoff', () => {
       });
 
       await expect(promise).rejects.toThrow(
-        /Qwen OAuth free tier has been discontinued/,
+        /HopCode OAuth free tier has been discontinued/,
       );
 
       // Should be called only once (no retries)
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
-    it('should retry for Qwen OAuth with throttling message', async () => {
+    it('should retry for HopCode OAuth with throttling message', async () => {
       const throttlingError: HttpError = new Error(
         'requests throttling triggered',
       );
@@ -398,7 +398,7 @@ describe('retryWithBackoff', () => {
       expect(fn).toHaveBeenCalledTimes(3);
     });
 
-    it('should retry for Qwen OAuth with throttling error', async () => {
+    it('should retry for HopCode OAuth with throttling error', async () => {
       const throttlingError: HttpError = new Error('throttling');
       throttlingError.status = 429;
 
@@ -423,7 +423,7 @@ describe('retryWithBackoff', () => {
       expect(fn).toHaveBeenCalledTimes(2);
     });
 
-    it('should throw immediately for Qwen OAuth with quota message', async () => {
+    it('should throw immediately for HopCode OAuth with quota message', async () => {
       const errorWithQuota = Object.assign(
         new Error('Free allocated quota exceeded.'),
         { status: 429, code: 'insufficient_quota' },
@@ -439,14 +439,14 @@ describe('retryWithBackoff', () => {
       });
 
       await expect(promise).rejects.toThrow(
-        /Qwen OAuth free tier has been discontinued/,
+        /HopCode OAuth free tier has been discontinued/,
       );
 
       // Should be called only once (no retries)
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
-    it('should retry normal errors for Qwen OAuth (not quota-related)', async () => {
+    it('should retry normal errors for HopCode OAuth (not quota-related)', async () => {
       const normalError: HttpError = new Error('Network error');
       normalError.status = 500;
 

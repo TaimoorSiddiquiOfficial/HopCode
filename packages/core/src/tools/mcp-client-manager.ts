@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -165,7 +165,7 @@ export type McpTransportKind =
 /**
  * Snapshot of the manager's live + reserved MCP state. The daemon's
  * read-only `GET /workspace/mcp` route fans this out via the ACP
- * `qwen/status/workspace/mcp` ext-method. `subprocessCount` is the
+ * `hopcode/status/workspace/mcp` ext-method. `subprocessCount` is the
  * value PR 1's `pgrep -P` baseline harness can validate against.
  */
 export interface McpClientAccounting {
@@ -247,8 +247,8 @@ export function mcpTransportOf(config: MCPServerConfig): McpTransportKind {
 
 /**
  * Resolve budget config from env vars when the constructor caller
- * doesn't pass one. Daemon-mode (`qwen serve`) sets these when
- * spawning the `qwen --acp` child; standalone `qwen` invocations
+ * doesn't pass one. Daemon-mode (`hopcode serve`) sets these when
+ * spawning the `hopcode --acp` child; standalone `hopcode` invocations
  * leave them unset and get `{ budgetMode: 'off' }` — the historical
  * behavior, no enforcement.
  *
@@ -275,7 +275,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       // boot breadcrumb so operators see the misconfiguration in
       // journald / docker logs.
       process.stderr.write(
-        `qwen serve: ignoring invalid QWEN_SERVE_MCP_CLIENT_BUDGET=` +
+        `hopcode serve: ignoring invalid QWEN_SERVE_MCP_CLIENT_BUDGET=` +
           `'${rawBudget}' (expected positive integer); ` +
           `MCP budget enforcement disabled for this child.\n`,
       );
@@ -291,7 +291,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
       // budget-driven default; now it gets a stderr line so the
       // typo is visible.
       process.stderr.write(
-        `qwen serve: ignoring invalid QWEN_SERVE_MCP_BUDGET_MODE=` +
+        `hopcode serve: ignoring invalid QWEN_SERVE_MCP_BUDGET_MODE=` +
           `'${rawMode}' (expected enforce|warn|off); falling back to ` +
           `${clientBudget === undefined ? 'off' : 'warn'}.\n`,
       );
@@ -322,7 +322,7 @@ function readBudgetFromEnv(): McpBudgetConfig {
     clientBudget === undefined
   ) {
     process.stderr.write(
-      `qwen serve: QWEN_SERVE_MCP_BUDGET_MODE=${budgetMode} requires ` +
+      `hopcode serve: QWEN_SERVE_MCP_BUDGET_MODE=${budgetMode} requires ` +
         `QWEN_SERVE_MCP_CLIENT_BUDGET=N; downgrading to off. ` +
         `Set both env vars to enable MCP guardrail enforcement.\n`,
     );
@@ -474,8 +474,8 @@ export class McpClientManager {
     this.healthConfig = { ...DEFAULT_HEALTH_CONFIG, ...healthConfig };
 
     // Tests inject `budgetConfig` directly; production reads env vars
-    // set by `qwen serve --mcp-client-budget=N --mcp-budget-mode=X`
-    // when spawning the ACP child. Standalone `qwen` invocations
+    // set by `hopcode serve --mcp-client-budget=N --mcp-budget-mode=X`
+    // when spawning the ACP child. Standalone `hopcode` invocations
     // leave both unset and get `mode: 'off'` — the pre-PR-14 default.
     const resolved = budgetConfig ?? readBudgetFromEnv();
     let resolvedMode = resolved.budgetMode;
@@ -501,7 +501,7 @@ export class McpClientManager {
       resolved.clientBudget === undefined
     ) {
       process.stderr.write(
-        `qwen serve: McpClientManager constructed with budgetMode=${resolvedMode} ` +
+        `hopcode serve: McpClientManager constructed with budgetMode=${resolvedMode} ` +
           `but no clientBudget; downgrading to off.\n`,
       );
       resolvedMode = 'off';
@@ -710,7 +710,7 @@ export class McpClientManager {
     // `lastRefusedServerNames.includes` guard above).
     this.pendingRefusalNames.add(serverName);
     process.stderr.write(
-      `qwen serve: MCP server '${serverName}' refused (budget exhausted, ` +
+      `hopcode serve: MCP server '${serverName}' refused (budget exhausted, ` +
         `budget=${this.clientBudget}, mode=enforce)\n`,
     );
   }

@@ -91,7 +91,7 @@ const otherProviderModel: ModelInfo = {
 };
 
 describe('ModelSelector — discontinued state (Issue #3745)', () => {
-  it('renders the (Discontinued) badge for non-runtime Qwen OAuth models', () => {
+  it('renders the (Discontinued) badge for non-runtime HopCode OAuth models', () => {
     const { container } = renderModelSelector({
       models: [discontinuedModel],
     });
@@ -114,7 +114,7 @@ describe('ModelSelector — discontinued state (Issue #3745)', () => {
     );
   });
 
-  it('does NOT mark a runtime Qwen OAuth snapshot as discontinued', () => {
+  it('does NOT mark a runtime HopCode OAuth snapshot as discontinued', () => {
     const { container } = renderModelSelector({
       models: [runtimeOAuthModel],
     });
@@ -143,7 +143,7 @@ describe('ModelSelector — discontinued state (Issue #3745)', () => {
       '[data-testid="model-selector-blocked"]',
     );
     expect(blocked?.textContent).toContain(
-      'Qwen OAuth free tier was discontinued on 2026-04-15',
+      'HopCode OAuth free tier was discontinued on 2026-04-15',
     );
   });
 
@@ -160,7 +160,7 @@ describe('ModelSelector — discontinued state (Issue #3745)', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps a runtime Qwen OAuth snapshot selectable', () => {
+  it('keeps a runtime HopCode OAuth snapshot selectable', () => {
     const { container, onSelectModel } = renderModelSelector({
       models: [runtimeOAuthModel],
     });

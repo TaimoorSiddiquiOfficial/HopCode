@@ -13,7 +13,7 @@ import { getTrustedFoldersPath } from './trustedFolders.js';
 // Regression guard: `QWEN_HOME` is resolved by `preResolveHomeEnvOverrides()`
 // AFTER any module that imports a settings/trustedFolders path has loaded.
 // A top-level `const` would freeze the pre-bootstrap value and split state
-// across callers. Each test mutates `process.env.QWEN_HOME` post-load and
+// across callers. Each test mutates `process.env.HOPCODE_HOME` post-load and
 // asserts the exported path getters reflect the new value.
 
 describe('settings/trustedFolders path getters are lazy', () => {
@@ -21,15 +21,15 @@ describe('settings/trustedFolders path getters are lazy', () => {
   let originalTrustedPath: string | undefined;
 
   beforeEach(() => {
-    originalQwenHome = process.env['QWEN_HOME'];
+    originalQwenHome = process.env['HOPCODE_HOME'];
     originalTrustedPath = process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
-    delete process.env['QWEN_HOME'];
+    delete process.env['HOPCODE_HOME'];
     delete process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
   });
 
   afterEach(() => {
-    if (originalQwenHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = originalQwenHome;
+    if (originalQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalQwenHome;
     if (originalTrustedPath === undefined)
       delete process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
     else process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'] = originalTrustedPath;
@@ -39,17 +39,17 @@ describe('settings/trustedFolders path getters are lazy', () => {
     const defaultPath = getUserSettingsPath();
     expect(defaultPath).toBe(path.join(homedir(), '.hopcode', 'settings.json'));
 
-    process.env['QWEN_HOME'] = '/tmp/qwen-lazy-test';
+    process.env['HOPCODE_HOME'] = '/tmp/hopcode-lazy-test';
     expect(getUserSettingsPath()).toBe(
-      path.join('/tmp/qwen-lazy-test', 'settings.json'),
+      path.join('/tmp/hopcode-lazy-test', 'settings.json'),
     );
   });
 
   it('getUserSettingsDir() reflects QWEN_HOME set after module load', () => {
     expect(getUserSettingsDir()).toBe(path.join(homedir(), '.hopcode'));
 
-    process.env['QWEN_HOME'] = '/tmp/qwen-lazy-test';
-    expect(getUserSettingsDir()).toBe(path.normalize('/tmp/qwen-lazy-test'));
+    process.env['HOPCODE_HOME'] = '/tmp/hopcode-lazy-test';
+    expect(getUserSettingsDir()).toBe(path.normalize('/tmp/hopcode-lazy-test'));
   });
 
   it('getTrustedFoldersPath() reflects QWEN_HOME set after module load', () => {
@@ -57,9 +57,9 @@ describe('settings/trustedFolders path getters are lazy', () => {
       path.join(homedir(), '.hopcode', 'trustedFolders.json'),
     );
 
-    process.env['QWEN_HOME'] = '/tmp/qwen-lazy-test';
+    process.env['HOPCODE_HOME'] = '/tmp/hopcode-lazy-test';
     expect(getTrustedFoldersPath()).toBe(
-      path.join('/tmp/qwen-lazy-test', 'trustedFolders.json'),
+      path.join('/tmp/hopcode-lazy-test', 'trustedFolders.json'),
     );
   });
 });

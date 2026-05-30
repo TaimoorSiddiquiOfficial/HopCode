@@ -88,7 +88,7 @@ export function getMemoryBaseDir(): string {
   if (process.env['HOPCODE_MEMORY_BASE_DIR']) {
     return process.env['HOPCODE_MEMORY_BASE_DIR'];
   }
-  return Storage.getGlobalQwenDir();
+  return Storage.getGlobalHopCodeDir();
 }
 
 // Memoize by projectRoot — findCanonicalGitRoot() walks the file system (existsSync

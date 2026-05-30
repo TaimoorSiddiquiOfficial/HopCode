@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +22,7 @@ const debugLogger = createDebugLogger('PROMPT_HOOK_RUNNER');
 /**
  * System prompt for LLM hook evaluation
  */
-const LLM_HOOK_SYSTEM_PROMPT = `You are evaluating a hook in Qwen Code.
+const LLM_HOOK_SYSTEM_PROMPT = `You are evaluating a hook in HopCode.
 Your task is to analyze the provided context and make a decision.
 
 You MUST respond with valid JSON in one of these formats:

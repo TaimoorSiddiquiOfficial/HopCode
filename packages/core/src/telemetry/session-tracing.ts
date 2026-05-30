@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -184,8 +184,8 @@ function sweepStaleSpans(now: number): void {
         // walk-aways consistently with explicit user aborts.
         try {
           ctx.span.setAttributes({
-            'qwen-code.span.ttl_expired': true,
-            'qwen-code.span.duration_ms': ageMs,
+            'hopcode.span.ttl_expired': true,
+            'hopcode.span.duration_ms': ageMs,
             ...(ctx.type === 'tool.blocked_on_user'
               ? {
                   decision: 'aborted',
@@ -284,10 +284,10 @@ export function startInteractionSpan(
 
   const attributes: Attributes = {
     'session.id': config.getSessionId(),
-    'qwen-code.prompt_id': options.promptId,
-    'qwen-code.message_type': options.messageType,
-    'qwen-code.model': options.model,
-    'qwen-code.approval_mode': config.getApprovalMode(),
+    'hopcode.prompt_id': options.promptId,
+    'hopcode.message_type': options.messageType,
+    'hopcode.model': options.model,
+    'hopcode.approval_mode': config.getApprovalMode(),
     'interaction.sequence': interactionSequence,
   };
 
@@ -322,7 +322,7 @@ export function endInteractionSpan(
   const duration = Date.now() - spanCtx.startTime;
   spanCtx.span.setAttributes({
     'interaction.duration_ms': duration,
-    'qwen-code.turn_status': status,
+    'hopcode.turn_status': status,
   });
 
   if (status === 'error') {
@@ -355,11 +355,11 @@ export function startLLMRequestSpan(model: string, promptId: string): Span {
   const ctx = resolveParentContext(parentCtx);
 
   const attributes: Attributes = {
-    'qwen-code.model': model,
-    'qwen-code.prompt_id': promptId,
+    'hopcode.model': model,
+    'hopcode.prompt_id': promptId,
     'llm_request.context': parentCtx ? 'interaction' : 'standalone',
     // Dual-emit OTel GenAI semantic convention (Stable). Private name
-    // (qwen-code.model) remains authoritative; gen_ai.* is a compat layer
+    // (hopcode.model) remains authoritative; gen_ai.* is a compat layer
     // for spec-aware backends. See docs/design/telemetry-llm-request-timing-design.md (D8).
     'gen_ai.request.model': model,
   };

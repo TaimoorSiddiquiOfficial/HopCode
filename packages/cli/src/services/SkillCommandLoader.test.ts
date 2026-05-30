@@ -18,14 +18,14 @@ function makeSkill(overrides: Partial<SkillConfig> = {}): SkillConfig {
     name: 'my-skill',
     description: 'My skill description',
     level: 'user',
-    filePath: '/tmp/qwen-test/skills/my-skill/SKILL.md',
+    filePath: '/tmp/hopcode-test/skills/my-skill/SKILL.md',
     body: 'Skill body content.',
     ...overrides,
   };
 }
 
 function makeSkillPrompt(body: string): string {
-  return buildSkillLlmContent('/tmp/qwen-test/skills/my-skill', body);
+  return buildSkillLlmContent('/tmp/hopcode-test/skills/my-skill', body);
 }
 
 describe('SkillCommandLoader', () => {

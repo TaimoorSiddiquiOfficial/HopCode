@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -106,7 +106,7 @@ export function mountWorkspaceAgentsRoutes(
 
   app.get('/workspace/agents', async (_req, res) => {
     try {
-      // `force: true` re-walks `.qwen/agents/` on every call so out-of-
+      // `force: true` re-walks `.hopcode/agents/` on every call so out-of-
       // band edits (a developer editing an agent file in their IDE
       // while the daemon is running) appear immediately. Without it
       // `SubagentManager.listSubagents()` serves a stale cache and
@@ -141,7 +141,7 @@ export function mountWorkspaceAgentsRoutes(
       res.status(200).json(status);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspace/agents failed: ${
+        `hopcode serve: GET /workspace/agents failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );
@@ -219,7 +219,7 @@ export function mountWorkspaceAgentsRoutes(
           if (err.code === SubagentErrorCode.FILE_ERROR) {
             // `SubagentError(FILE_ERROR)` wraps Node fs error
             // messages like `"ENOENT: no such file or directory, open
-            // '/Users/<x>/.qwen/agents/foo.md'"` — leaking the
+            // '/Users/<x>/.hopcode/agents/foo.md'"` — leaking the
             // operator's absolute filesystem layout through an
             // authenticated route response. Gate the message behind
             // `QWEN_SERVE_DEBUG` so default production responses
@@ -239,7 +239,7 @@ export function mountWorkspaceAgentsRoutes(
           }
         }
         writeStderrLine(
-          `qwen serve: POST /workspace/agents failed: ${
+          `hopcode serve: POST /workspace/agents failed: ${
             err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
@@ -264,7 +264,7 @@ export function mountWorkspaceAgentsRoutes(
         // a proper rollback policy on top once mutation auditing
         // arrives.
         writeStderrLine(
-          `qwen serve: agent_create_reload_failed (name=${safeLogValue(config.name)} ` +
+          `hopcode serve: agent_create_reload_failed (name=${safeLogValue(config.name)} ` +
             `level=${level}) — file likely persisted on disk; check ` +
             `\`GET /workspace/agents\` for a phantom entry`,
         );
@@ -301,7 +301,7 @@ export function mountWorkspaceAgentsRoutes(
       res.status(200).json(toDetail(config));
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspace/agents/${safeLogValue(agentType)} failed: ${
+        `hopcode serve: GET /workspace/agents/${safeLogValue(agentType)} failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );
@@ -417,7 +417,7 @@ export function mountWorkspaceAgentsRoutes(
           }
         }
         writeStderrLine(
-          `qwen serve: POST /workspace/agents/${safeLogValue(agentType)} failed: ${
+          `hopcode serve: POST /workspace/agents/${safeLogValue(agentType)} failed: ${
             err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
@@ -436,7 +436,7 @@ export function mountWorkspaceAgentsRoutes(
         // change with the failed POST. The file is in its updated
         // state on disk; subsequent reads will pick it up.
         writeStderrLine(
-          `qwen serve: agent_update_reload_failed (name=${safeLogValue(agentType)} ` +
+          `hopcode serve: agent_update_reload_failed (name=${safeLogValue(agentType)} ` +
             `level=${existing.level}) — disk write completed; check ` +
             `\`GET /workspace/agents/${safeLogValue(agentType)}\` for the new state`,
         );
@@ -514,7 +514,7 @@ export function mountWorkspaceAgentsRoutes(
           }
         }
         writeStderrLine(
-          `qwen serve: DELETE /workspace/agents/${safeLogValue(agentType)} failed: ${
+          `hopcode serve: DELETE /workspace/agents/${safeLogValue(agentType)} failed: ${
             err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
@@ -559,7 +559,7 @@ export function mountWorkspaceAgentsRoutes(
 
       if (remaining.length > 0) {
         writeStderrLine(
-          `qwen serve: DELETE /workspace/agents/${safeLogValue(agentType)} partial — ` +
+          `hopcode serve: DELETE /workspace/agents/${safeLogValue(agentType)} partial — ` +
             `removed=${removed.map((r) => r.level).join(',') || 'none'} ` +
             `remaining=${remaining
               .map((r) => `${r.level}:${r.filePath}`)
@@ -809,7 +809,7 @@ function parseAgentConfig(
   }
   // Reject names that shadow a built-in subagent. Without this check a
   // client could `POST /workspace/agents { name: "general-purpose" }`
-  // and write a project-level file at `<workspace>/.qwen/agents/
+  // and write a project-level file at `<workspace>/.hopcode/agents/
   // general-purpose.md`. List/load resolve the project entry first
   // (project > builtin), but `SubagentManager.deleteSubagent` rejects
   // by name alone (`subagent-manager.ts:302`) — so DELETE returns 403
@@ -1300,7 +1300,7 @@ export function createDaemonSubagentManager(
       // implementing every Config method.
       if (prop === 'then') return undefined;
       throw new Error(
-        `qwen serve workspace agents: SubagentManager touched Config.` +
+        `hopcode serve workspace agents: SubagentManager touched Config.` +
           `${String(prop)} which the daemon stub does not implement. ` +
           `Add it to createDaemonSubagentManager and audit safety.`,
       );
@@ -1318,7 +1318,7 @@ export function createDaemonSubagentManager(
       // continues to behave correctly.
       if (prop === 'then') return false;
       throw new Error(
-        `qwen serve workspace agents: SubagentManager probed Config.` +
+        `hopcode serve workspace agents: SubagentManager probed Config.` +
           `${String(prop)} via 'in' check; the daemon stub does not ` +
           `implement it. Add it to createDaemonSubagentManager and ` +
           `audit safety.`,

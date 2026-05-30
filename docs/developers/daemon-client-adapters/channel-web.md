@@ -2,14 +2,14 @@
 
 ## Goal
 
-Let channel adapters and web chat backends consume `qwen serve` through
+Let channel adapters and web chat backends consume `hopcode serve` through
 `DaemonSessionClient` while keeping existing channel ACP subprocess behavior as
 the default.
 
 This draft covers server-side clients only:
 
-- Channel bot backend -> `qwen serve`
-- Web browser -> web backend / BFF -> `qwen serve`
+- Channel bot backend -> `hopcode serve`
+- Web browser -> web backend / BFF -> `hopcode serve`
 
 It explicitly does not allow browser JavaScript to call the daemon directly.
 The daemon currently rejects browser `Origin` requests by design.
@@ -108,7 +108,7 @@ Weixin, Dingtalk, plugin channel, and browser behavior remains unchanged.
 - Unit-test channel session-key to daemon-session binding.
 - Unit-test daemon event to channel/web message mapping.
 - Unit-test prompt, cancel, model switch, and permission response forwarding.
-- Smoke-test one single-user channel backend against local `qwen serve`.
+- Smoke-test one single-user channel backend against local `hopcode serve`.
 - Smoke-test browser -> BFF -> daemon without exposing daemon token.
 
 ## Blockers Before Default Migration

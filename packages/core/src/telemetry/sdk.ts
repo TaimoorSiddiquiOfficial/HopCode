@@ -224,7 +224,7 @@ export function initializeTelemetry(config: Config): void {
   if (attrWarnings.length > 0) {
     // eslint-disable-next-line no-console
     console.warn(
-      `[qwen-code telemetry] ${attrWarnings.length} resource attribute issue(s):`,
+      `[hopcode telemetry] ${attrWarnings.length} resource attribute issue(s):`,
     );
     for (const w of attrWarnings) {
       // eslint-disable-next-line no-console
@@ -513,7 +513,7 @@ export function initializeTelemetry(config: Config): void {
       // Modern fetch (`globalThis.fetch` / undici) is the HTTP layer used by
       // `openai`, `@google/genai`, and `@anthropic-ai/sdk`. Without this
       // instrumentation, outbound LLM requests carry no `traceparent` header
-      // and the trace tree terminates at the qwen-code process boundary.
+      // and the trace tree terminates at the hopcode process boundary.
       new UndiciInstrumentation({
         ignoreRequestHook: (request) => {
           if (otlpUrlPrefixes.length === 0) return false;

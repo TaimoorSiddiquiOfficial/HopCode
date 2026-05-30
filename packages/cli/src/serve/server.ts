@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +99,7 @@ export function createDefaultFsAuditEmit(): (event: BridgeEvent) => void {
       if (data?.pathHash) ctx.push(`pathHash=${data.pathHash}`);
       const ctxStr = ctx.length > 0 ? ` (${ctx.join(' ')})` : '';
       writeStderrLine(
-        `qwen serve: fs audit emit is the default no-op â€” ${droppedCount} event(s) dropped so far. ` +
+        `hopcode serve: fs audit emit is the default no-op â€” ${droppedCount} event(s) dropped so far. ` +
           `Latest type=${event.type}${ctxStr}. ` +
           `Inject deps.fsFactory in createServeApp to wire audit into the EventBus.`,
       );
@@ -157,7 +157,7 @@ export interface ServeAppDeps {
 }
 
 /**
- * Build the Express app for `qwen serve`. Pure function â€” no side effects on
+ * Build the Express app for `hopcode serve`. Pure function â€” no side effects on
  * the network or process; `runHopCodeServe` does the listen/signal handling.
  *
  * `getPort` is invoked lazily by the host-allowlist middleware so callers
@@ -330,9 +330,9 @@ export function createServeApp(
   for (const provider of deps.deviceFlowProviders ?? []) {
     deviceFlowProviderMap.set(provider.providerId, provider);
   }
-  if (!deviceFlowProviderMap.has('qwen-oauth')) {
+  if (!deviceFlowProviderMap.has('hopcode-oauth')) {
     deviceFlowProviderMap.set(
-      'qwen-oauth',
+      'hopcode-oauth',
       new HopCodeOAuthDeviceFlowProvider(),
     );
   }
@@ -439,7 +439,7 @@ export function createServeApp(
         .send(getDemoHtml(getPort()));
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /demo render failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: /demo render failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({ error: 'Failed to render demo page' });
     }
@@ -450,7 +450,7 @@ export function createServeApp(
   // carry the daemon's bearer; round-tripping a 401 just to know
   // the listener is up is waste). On non-loopback binds the
   // exemption becomes a low-severity info leak (attacker can probe
-  // arbitrary IP:port to confirm a `qwen serve` is listening), so
+  // arbitrary IP:port to confirm a `hopcode serve` is listening), so
   // we register `/health` AFTER `bearerAuth` and let it 401 like
   // every other route. Operators using the loopback default get the
   // probe-friendly behavior; operators exposing the daemon publicly
@@ -467,7 +467,7 @@ export function createServeApp(
   // defense-in-depth net for custom bridge impls whose getters MAY
   // throw â€” but the real bridge's getters never do, so under normal
   // operation the 503 path is unreachable. Per BQ-6F: the docs
-  // (`docs/users/qwen-serve.md` + `qwen-serve-protocol.md`) clarify
+  // (`docs/users/hopcode-serve.md` + `hopcode-serve-protocol.md`) clarify
   // that deep is for counters, not health verification. Default (no
   // query) stays cheap so high-frequency liveness probes don't load
   // the bridge.
@@ -489,7 +489,7 @@ export function createServeApp(
       });
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /health deep probe failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: /health deep probe failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(503).json({ status: 'degraded' });
     }
@@ -734,10 +734,10 @@ export function createServeApp(
   // `GET /workspace/auth/status` stays bearer-only because its
   // pendingDeviceFlows entries intentionally omit `userCode`).
   //
-  // PR #4291 follow-up review (qwen-latest, #4): GET now also runs
+  // PR #4291 follow-up review (hopcode-latest, #4): GET now also runs
   // `parseClientIdHeader` to drive the `callerIsInitiator` gate in
   // `toDeviceFlowStateBody`. INTENTIONAL contract change: a malformed
-  // `X-Qwen-Client-Id` (>128 chars or invalid characters) returns
+  // `X-HopCode-Client-Id` (>128 chars or invalid characters) returns
   // `400 invalid_client_id` instead of the previous 200, matching the
   // POST/DELETE behavior. SDK clients that send the header on POST
   // should send a valid value on GET too. Anonymous callers (header
@@ -765,7 +765,7 @@ export function createServeApp(
       }
       const clientId = parseClientIdHeader(req, res);
       if (clientId === null) return;
-      // PR #4291 follow-up review (qwen-latest, N4): when the
+      // PR #4291 follow-up review (hopcode-latest, N4): when the
       // `callerIsInitiator` gate redacts the verification fields,
       // operators triaging "SDK got HTTP 200 but no userCode" have
       // zero signal in daemon stderr / audit. The redaction happens
@@ -790,7 +790,7 @@ export function createServeApp(
         )
       ) {
         writeStderrLine(
-          `qwen serve debug: GET /workspace/auth/device-flow/${id} redacted verification fields â€” caller-clientId mismatch (initiator=${view.initiatorClientId ?? 'anonymous'}, caller=${clientId ?? 'anonymous'})`,
+          `hopcode serve debug: GET /workspace/auth/device-flow/${id} redacted verification fields â€” caller-clientId mismatch (initiator=${view.initiatorClientId ?? 'anonymous'}, caller=${clientId ?? 'anonymous'})`,
         );
       }
       res.status(200).json(toDeviceFlowStateBody(view, clientId));
@@ -1203,7 +1203,7 @@ export function createServeApp(
   app.post('/session/:id/heartbeat', mutate(), (req, res) => {
     // #4175 PR 9: clients ping the daemon to update last-seen
     // bookkeeping. Bridge throws `SessionNotFoundError` for unknown
-    // ids and `InvalidClientIdError` when an `X-Qwen-Client-Id`
+    // ids and `InvalidClientIdError` when an `X-HopCode-Client-Id`
     // header is supplied but not registered for this session â€” both
     // are routed through `sendBridgeError` so they share the same
     // typed shape (`404` and `400 invalid_client_id`) the rest of
@@ -1429,7 +1429,7 @@ export function createServeApp(
         });
         return;
       }
-      // #4282 fold-in 4 (qwen-latest S1): match the
+      // #4282 fold-in 4 (hopcode-latest S1): match the
       // `MAX_TOOL_NAME_LENGTH` cap so the server name (which propagates
       // into SSE event bodies, ACP messages, and error responses) can't
       // be used to bloat any of those surfaces with an unbounded
@@ -1441,7 +1441,7 @@ export function createServeApp(
         });
         return;
       }
-      // #4282 fold-in 1 (gpt-5.5 C2): validate `X-Qwen-Client-Id`
+      // #4282 fold-in 1 (gpt-5.5 C2): validate `X-HopCode-Client-Id`
       // against `bridge.knownClientIds()` so the originator stamped
       // onto `mcp_server_restart*` events is grounded in a known
       // identity rather than a forged header.
@@ -1460,7 +1460,7 @@ export function createServeApp(
 
   app.post('/workspace/init', mutate({ strict: true }), async (req, res) => {
     // #4175 Wave 4 PR 17. Scaffold-only init: the bridge writes an
-    // empty QWEN.md without invoking the LLM. Default refuses
+    // empty HOPCODE.md without invoking the LLM. Default refuses
     // overwrite (409); body `{force: true}` overrides.
     const body = safeBody(req);
     const force = body['force'];
@@ -1504,7 +1504,7 @@ export function createServeApp(
         });
         return;
       }
-      // #4282 fold-in 4 (qwen-latest C3): trim before persistence so the
+      // #4282 fold-in 4 (hopcode-latest C3): trim before persistence so the
       // write path matches the read path. `loadCliConfig` applies
       // `.trim()` when consuming `tools.disabled` at child spawn, so a
       // leading/trailing space stored verbatim would never round-trip:
@@ -1526,7 +1526,7 @@ export function createServeApp(
       // (`mcp__<server>__<tool>`) while staying well under any
       // settings-file pathological-input concern. Mirrors the
       // explicit caps on `cwd` (`MAX_WORKSPACE_PATH_LENGTH`) and
-      // `X-Qwen-Client-Id` (`MAX_CLIENT_ID_LENGTH`).
+      // `X-HopCode-Client-Id` (`MAX_CLIENT_ID_LENGTH`).
       if (toolName.length > MAX_TOOL_NAME_LENGTH) {
         res.status(400).json({
           error: `Tool name exceeds ${MAX_TOOL_NAME_LENGTH}-character limit`,
@@ -1662,7 +1662,7 @@ export function createServeApp(
       // a raw-fetch client gets the same structured error.
       if (err instanceof SubscriberLimitExceededError) {
         writeStderrLine(
-          `qwen serve: subscriber limit reached for session ${sessionId} (limit=${err.limit}); rejecting new SSE client with 429`,
+          `hopcode serve: subscriber limit reached for session ${sessionId} (limit=${err.limit}); rejecting new SSE client with 429`,
         );
         res.setHeader('Retry-After', '5');
         res.status(429).json({
@@ -1804,7 +1804,7 @@ export function createServeApp(
       // the listener exists primarily so Node doesn't crash on EPIPE
       // â€” but operators get a breadcrumb when chasing flaky clients.
       writeStderrLine(
-        `qwen serve: SSE socket error (session ${sessionId}): ${err.message}`,
+        `hopcode serve: SSE socket error (session ${sessionId}): ${err.message}`,
       );
       cleanup();
     });
@@ -1878,7 +1878,7 @@ export function createServeApp(
         return;
       }
       writeStderrLine(
-        `qwen serve: unhandled error: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+        `hopcode serve: unhandled error: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
       );
       if (!res.headersSent) {
         res.status(500).json({ error: 'Internal server error' });
@@ -1914,11 +1914,11 @@ const PROTOTYPE_POLLUTION_KEYS: ReadonlySet<string> = new Set([
   'prototype',
 ]);
 
-const CLIENT_ID_HEADER = 'x-qwen-client-id';
+const CLIENT_ID_HEADER = 'x-hopcode-client-id';
 const MAX_CLIENT_ID_LENGTH = 128;
 /** #4282 fold-in 2 (deepseek SV1) â€” see /workspace/tools/:name/enable. */
 const MAX_TOOL_NAME_LENGTH = 256;
-/** #4282 fold-in 4 (qwen-latest S1) â€” see /workspace/mcp/:server/restart. */
+/** #4282 fold-in 4 (hopcode-latest S1) â€” see /workspace/mcp/:server/restart. */
 const MAX_SERVER_NAME_LENGTH = 256;
 const CLIENT_ID_RE = /^[A-Za-z0-9._:-]+$/;
 const INVALID_PERMISSION_OUTCOME_ERROR =
@@ -2029,9 +2029,9 @@ function toDeviceFlowStartResponseBody(
   // POST when the caller is the same client that started the flow
   // (or when the take-over caller explicitly identified
   // themselves and matches the original starter). An anonymous
-  // take-over caller (no `X-Qwen-Client-Id`) gets no echo of the
+  // take-over caller (no `X-HopCode-Client-Id`) gets no echo of the
   // original starter's id; this preserves the symmetry "the
-  // daemon respects the absence of `X-Qwen-Client-Id` as a
+  // daemon respects the absence of `X-HopCode-Client-Id` as a
   // privacy signal." Bearer-gated already, so the blast radius
   // was small, but the asymmetry is now closed.
   if (
@@ -2062,7 +2062,7 @@ function toDeviceFlowStateBody(
   // PR #4255 follow-up review thread (deepseek-v4-pro): symmetrize with
   // the POST take-over response shape â€” only echo `userCode` /
   // `verificationUri` / `verificationUriComplete` / `initiatorClientId`
-  // back to the original starter (matched by `X-Qwen-Client-Id`). An
+  // back to the original starter (matched by `X-HopCode-Client-Id`). An
   // anonymous GET caller, or a caller identifying as a different client,
   // sees only the public envelope (`status` / `errorKind` / `hint` /
   // timestamps). Bearer-token gated already (the route uses
@@ -2071,7 +2071,7 @@ function toDeviceFlowStateBody(
   // enumerate other clients' verification codes.
   //
   // **Threat model (PR #4291 follow-up review by Copilot):** this gate
-  // is BEST-EFFORT ATTRIBUTION, not authentication. `X-Qwen-Client-Id`
+  // is BEST-EFFORT ATTRIBUTION, not authentication. `X-HopCode-Client-Id`
   // is a syntactic header, not bound to a server-validated identity â€”
   // anyone holding the bearer token can spoof it. The bearer token IS
   // the auth boundary; this gate exists to prevent ACCIDENTAL
@@ -2081,9 +2081,9 @@ function toDeviceFlowStateBody(
   // the daemon bearer token already wins; locking down GET further
   // would require binding identity into bearer-token issuance, which
   // is a separate architectural change.
-  // PR #4291 follow-up review (qwen-latest, #3): the gate must accept
+  // PR #4291 follow-up review (hopcode-latest, #3): the gate must accept
   // the both-undefined case too, otherwise an anonymously-started flow
-  // (POST without `X-Qwen-Client-Id` â†’ `initiatorClientId === undefined`)
+  // (POST without `X-HopCode-Client-Id` â†’ `initiatorClientId === undefined`)
   // becomes silently unreadable: even the same anonymous caller GETting
   // the same id can no longer retrieve `userCode`/`verificationUri` â€”
   // the body switches from "what they got from POST" to a redacted
@@ -2118,7 +2118,7 @@ function parseClientIdHeader(
   if (raw.length > MAX_CLIENT_ID_LENGTH || !CLIENT_ID_RE.test(raw)) {
     res.status(400).json({
       error:
-        '`X-Qwen-Client-Id` must be a non-empty token of 128 characters or fewer',
+        '`X-HopCode-Client-Id` must be a non-empty token of 128 characters or fewer',
       code: 'invalid_client_id',
     });
     return null;
@@ -2128,7 +2128,7 @@ function parseClientIdHeader(
 
 /**
  * #4282 fold-in 1 (gpt-5.5 C2). Workspace-level mutation routes validate
- * the parsed `X-Qwen-Client-Id` against `bridge.knownClientIds()` so the
+ * the parsed `X-HopCode-Client-Id` against `bridge.knownClientIds()` so the
  * `originatorClientId` stamped onto fan-out events is grounded in a
  * client identity the daemon previously issued. Without this check, any
  * authenticated caller could forge the originator on `tool_toggled`,
@@ -2227,7 +2227,7 @@ function parseMaxQueuedQuery(
     // a fresh entry). Matches the `workspace_mismatch` log style in
     // `sendBridgeError`.
     writeStderrLine(
-      `qwen serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
+      `hopcode serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
         `(not a decimal integer)`,
     );
     res.status(400).json({
@@ -2243,7 +2243,7 @@ function parseMaxQueuedQuery(
     n > MAX_QUERY_MAX_QUEUED
   ) {
     writeStderrLine(
-      `qwen serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
+      `hopcode serve: rejected ?maxQueued ${safeLogValue(raw)} ` +
         `(outside [${MIN_QUERY_MAX_QUEUED}, ${MAX_QUERY_MAX_QUEUED}])`,
     );
     res.status(400).json({
@@ -2279,7 +2279,7 @@ function parseLastEventId(raw: unknown): number | undefined {
     // "first connect, no resume").
     if (typeof raw === 'string' && raw.length > 0) {
       writeStderrLine(
-        `qwen serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
+        `hopcode serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
           `(not a decimal integer)`,
       );
     }
@@ -2291,7 +2291,7 @@ function parseLastEventId(raw: unknown): number | undefined {
   // tries to resume from beyond that is either malicious or broken.
   if (!Number.isFinite(n) || n > Number.MAX_SAFE_INTEGER) {
     writeStderrLine(
-      `qwen serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
+      `hopcode serve: rejected Last-Event-ID ${safeLogValue(raw)} ` +
         `(exceeds Number.MAX_SAFE_INTEGER)`,
     );
     return undefined;
@@ -2444,7 +2444,7 @@ function sendBridgeError(
     // (`req.workspaceCwd` â†’ `canonicalizeWorkspace` â†’ here). `path.resolve`
     // + `realpathSync.native` both preserve control characters inside
     // path segments â€” they only normalize separators / `..` / `.` and
-    // walk symlinks. A body like `{"cwd": "/legit/path\nqwen serve:
+    // walk symlinks. A body like `{"cwd": "/legit/path\nhopcode serve:
     // FAKE LOG LINE"}` would otherwise emit two valid-looking daemon
     // log lines, weaponizing line-based log shippers (Splunk / Loki /
     // journald â†’ SIEM). `JSON.stringify` escapes control chars and
@@ -2529,7 +2529,7 @@ function sendBridgeError(
   ].filter(Boolean);
   const ctxStr = ctxParts.length > 0 ? ` (${ctxParts.join(' ')})` : '';
   writeStderrLine(
-    `qwen serve: bridge error${ctxStr}: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+    `hopcode serve: bridge error${ctxStr}: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
   );
   res.status(500).json(errorPayload(err));
 }

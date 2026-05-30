@@ -7,9 +7,9 @@
 import { ApprovalMode, type Config } from '@hoptrendy/hopcode-core';
 
 export const HEADLESS_YOLO_NO_SANDBOX_WARNING =
-  'Warning: running headless with --yolo / approval-mode=yolo and no sandbox. ' +
+  'Warning: running headless with --yolo / approval-mode=izn and no sandbox. ' +
   "All tool calls (shell, write, edit) auto-execute at this process's privilege level. " +
-  'Enable a sandbox via --sandbox / QWEN_SANDBOX, or set ' +
+  'Enable a sandbox via --sandbox / HOPCODE_SANDBOX, or set ' +
   'QWEN_CODE_SUPPRESS_YOLO_WARNING=1 to silence this notice.';
 
 /**
@@ -33,7 +33,7 @@ export function getHeadlessYoloSafetyWarning(
   if (config.getSandbox()) return null;
   // `SANDBOX` is set by the sandbox transport itself: macOS seatbelt sets
   // it to `sandbox-exec`, Docker/Podman to the container name (e.g.
-  // `qwen-code-sandbox`). Match the rest of the codebase
+  // `hopcode-sandbox`). Match the rest of the codebase
   // (sandboxConfig.ts, gemini.tsx, Footer.tsx, prompts.ts, …) which all
   // treat any non-empty value as "inside a sandbox". A strict 1/true
   // check here misfires inside real sandboxes, where the helper would

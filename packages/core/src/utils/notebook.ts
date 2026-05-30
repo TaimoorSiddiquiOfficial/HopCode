@@ -213,10 +213,10 @@ export function makeCellId(notebook: NotebookContent): string | undefined {
   );
 
   let fallbackIndex = 1;
-  let fallback = `qwen-cell-${fallbackIndex}`;
+  let fallback = `hopcode-cell-${fallbackIndex}`;
   while (existingDisplayIds.has(fallback)) {
     fallbackIndex++;
-    fallback = `qwen-cell-${fallbackIndex}`;
+    fallback = `hopcode-cell-${fallbackIndex}`;
   }
   return fallback;
 }

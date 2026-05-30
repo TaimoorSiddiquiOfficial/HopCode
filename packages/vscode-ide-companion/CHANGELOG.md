@@ -6,7 +6,7 @@ All notable changes to the HopCode VS Code Companion extension.
 
 ### Breaking Changes
 
-- **Approval mode renamed**: `yolo` mode is now `izn` (Izn). The `--yolo` / `-y` flags are replaced with `--izn` / `-z`. Update CI workflows and scripts that reference the old flags.
+- **Approval mode renamed**: `yolo` mode is now `izn` (Izn). The `--izn` / `-y` flags are replaced with `--izn` / `-z`. Update CI workflows and scripts that reference the old flags.
 
 ### Added
 
@@ -16,9 +16,9 @@ All notable changes to the HopCode VS Code Companion extension.
 ### Changed
 
 - Approval mode UI labels now display "Izn" across all surfaces (indicator, settings, toggle).
-- Settings schema defaults updated from `'yolo'` to `'izn'`.
+- Settings schema defaults updated from `'izn'` to `'izn'`.
 - CLI error messages and help text now reference `--izn` / `-z`.
-- SDK permission mode enum now uses `'izn'` instead of `'yolo'`.
+- SDK permission mode enum now uses `'izn'` instead of `'izn'`.
 
 ## 0.22.0
 

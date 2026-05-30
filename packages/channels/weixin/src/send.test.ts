@@ -241,11 +241,11 @@ describe('validateImagePath', () => {
   });
 
   it('allows Windows paths inside the workspace directory', () => {
-    const imagePath = 'D:\\WorkGroup\\QwenCode\\002\\hello.png';
-    const workspaceDir = 'D:\\WorkGroup\\QwenCode\\002';
+    const imagePath = 'D:\\WorkGroup\\HopCode\\002\\hello.png';
+    const workspaceDir = 'D:\\WorkGroup\\HopCode\\002';
     mockRealpathSync.mockImplementation((p: string) => {
       if (p.includes('hello.png')) return imagePath;
-      if (p.includes('QwenCode\\002')) return workspaceDir;
+      if (p.includes('HopCode\\002')) return workspaceDir;
       return p;
     });
 
@@ -253,11 +253,11 @@ describe('validateImagePath', () => {
   });
 
   it('rejects Windows paths in a sibling directory with the same prefix', () => {
-    const imagePath = 'D:\\WorkGroup\\QwenCode\\0022\\hello.png';
-    const workspaceDir = 'D:\\WorkGroup\\QwenCode\\002';
+    const imagePath = 'D:\\WorkGroup\\HopCode\\0022\\hello.png';
+    const workspaceDir = 'D:\\WorkGroup\\HopCode\\002';
     mockRealpathSync.mockImplementation((p: string) => {
       if (p.includes('hello.png')) return imagePath;
-      if (p.includes('QwenCode\\002')) return workspaceDir;
+      if (p.includes('HopCode\\002')) return workspaceDir;
       return p;
     });
 

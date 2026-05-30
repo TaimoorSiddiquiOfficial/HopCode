@@ -51,7 +51,7 @@ observability framework — HopCode's observability system provides:
 
 ## Configuration
 
-All telemetry behavior is controlled through your `.qwen/settings.json` file.
+All telemetry behavior is controlled through your `.hopcode/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
 | Setting                          | Environment Variable                               | CLI Flag                                                 | Description                                                                                                                          | Values            | Default                 |
@@ -77,7 +77,7 @@ other value will disable it.
 **Sensitive span attributes:** When `includeSensitiveSpanAttributes` is enabled,
 two things happen:
 
-1. **Native span attributes (`qwen-code.interaction`, `api.generateContent*`,
+1. **Native span attributes (`hopcode.interaction`, `api.generateContent*`,
    `tool.<name>`)** carry verbatim conversation content:
    - User prompts (`new_context`)
    - System prompts (`system_prompt` — full text once per session, deduped by
@@ -136,7 +136,7 @@ deployment region, or any other dimension your backend cares about.
 Two sources, merged in priority order (lowest → highest):
 
 1. The standard `OTEL_RESOURCE_ATTRIBUTES` env var
-2. `telemetry.resourceAttributes` in `.qwen/settings.json` (overrides env on
+2. `telemetry.resourceAttributes` in `.hopcode/settings.json` (overrides env on
    key conflict)
 
 `OTEL_SERVICE_NAME` is a separate escape hatch — when set, it overrides
@@ -153,10 +153,10 @@ export OTEL_RESOURCE_ATTRIBUTES="team=platform,env=prod,cost_center=eng-123"
 **Route to a per-tenant collector via `service.name`:**
 
 ```bash
-export OTEL_SERVICE_NAME=qwen-code-ci
+export OTEL_SERVICE_NAME=hopcode-ci
 ```
 
-**Fleet baseline (`~/.qwen/settings.json`) + per-host override:**
+**Fleet baseline (`~/.hopcode/settings.json`) + per-host override:**
 
 ```json
 {
@@ -201,15 +201,15 @@ pairs are skipped with a warning rather than failing telemetry startup.
 Reserved keys (`service.version`, `session.id`), malformed pairs, non-string
 settings values, and invalid percent-encoding are all silently dropped with a
 warning logged via the OpenTelemetry diagnostics channel. That channel routes
-to the debug log file (`~/.qwen/log/otel-*.log`), **not** the console, so the
+to the debug log file (`~/.hopcode/log/otel-*.log`), **not** the console, so the
 behavior can look like silent failure.
 
 If a custom resource attribute isn't appearing on exported telemetry:
 
-1. Check `~/.qwen/log/otel-*.log` for lines matching `cannot override` (reserved
+1. Check `~/.hopcode/log/otel-*.log` for lines matching `cannot override` (reserved
    key dropped), `Skipping malformed` (bad env var pair), or `must be a string`
    (non-string settings value).
-2. Verify the env var is set in the qwen-code process's environment (not just
+2. Verify the env var is set in the hopcode process's environment (not just
    your shell) and that values are percent-encoded.
 3. Confirm `telemetry.enabled` is `true` — telemetry init only runs if enabled.
 
@@ -221,7 +221,7 @@ high-cardinality field like `session.id` to a metric causes time-series fan-out
 proportional to the number of sessions, which quickly exhausts metric backend
 storage.
 
-To prevent this, Qwen Code keeps high-cardinality attributes off metric data
+To prevent this, HopCode keeps high-cardinality attributes off metric data
 points by default. Spans and logs are per-event and unaffected, so they
 continue to carry `session.id` for trace and log correlation.
 
@@ -264,7 +264,7 @@ cardinality pressure.
 
 ### Client-side HTTP span on outbound fetch
 
-When telemetry is enabled, Qwen Code registers `UndiciInstrumentation`
+When telemetry is enabled, HopCode registers `UndiciInstrumentation`
 which creates a client-side HTTP span for every outbound `fetch()`
 request originated by the process — including the LLM SDKs (`openai`,
 `@google/genai`, `@anthropic-ai/sdk`), the MCP StreamableHTTP client, the
@@ -282,7 +282,7 @@ also written into the outgoing request stream is controlled by a
 
 **Feedback-loop avoidance.** OTel SDK uses `fetch` internally to upload OTLP
 data. Without protection, instrumenting `fetch` would trace those uploads,
-which would themselves be uploaded, causing an infinite loop. Qwen Code's
+which would themselves be uploaded, causing an infinite loop. HopCode's
 undici instrumentation is configured with an `ignoreRequestHook` that skips
 URLs matching the configured `telemetry.otlpEndpoint` /
 `telemetry.otlpTracesEndpoint` / `telemetry.otlpLogsEndpoint` /
@@ -294,7 +294,7 @@ outbound HTTP uploads, so the hook is a no-op.
 These settings live in a **separate top-level namespace** from `telemetry.*`
 on purpose: telemetry controls data flow into the operator's own
 observability backend, while `outboundCorrelation.*` controls what
-client-side correlation data qwen-code writes **into outbound LLM API
+client-side correlation data hopcode writes **into outbound LLM API
 request streams** that reach third-party LLM provider endpoints
 (DashScope, OpenAI, Anthropic, etc.). Different recipients, different
 consent decision. **All values default to off.** See PR #4390 review
@@ -308,7 +308,7 @@ discussion for the framing rationale.
 }
 ```
 
-When `false` (default), Qwen Code installs a no-op `TextMapPropagator` on
+When `false` (default), HopCode installs a no-op `TextMapPropagator` on
 the OTel SDK. UndiciInstrumentation still creates client HTTP spans for
 your OTLP collector, but `propagation.inject()` is a no-op so **no
 `traceparent` is written onto outbound requests**. Trace IDs stay
@@ -439,13 +439,13 @@ For local development and debugging, you can capture telemetry data locally:
 
 ### File-based Output (Recommended)
 
-1. Enable telemetry in your `.qwen/settings.json`:
+1. Enable telemetry in your `.hopcode/settings.json`:
 
    ```json
    {
      "telemetry": {
        "enabled": true,
-       "outfile": ".qwen/telemetry.log"
+       "outfile": ".hopcode/telemetry.log"
      }
    }
    ```
@@ -454,8 +454,8 @@ For local development and debugging, you can capture telemetry data locally:
    > The `target` and `otlpEndpoint` settings are not needed for file-only
    > output and can be safely omitted from your config.
 
-2. Run Qwen Code and send prompts.
-3. View logs and metrics in the specified file (e.g., `.qwen/telemetry.log`).
+2. Run HopCode and send prompts.
+3. View logs and metrics in the specified file (e.g., `.hopcode/telemetry.log`).
 
 ### Collector-Based Export (Advanced)
 

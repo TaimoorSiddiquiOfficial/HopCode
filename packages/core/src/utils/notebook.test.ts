@@ -596,7 +596,7 @@ describe('notebook utilities', () => {
         nbformat: 4,
         nbformat_minor: 5,
         cells: [
-          { cell_type: 'code', id: 'qwen-cell-1', source: '', metadata: {} },
+          { cell_type: 'code', id: 'hopcode-cell-1', source: '', metadata: {} },
           { cell_type: 'code', source: '', metadata: {} },
         ],
         metadata: {},
@@ -604,14 +604,14 @@ describe('notebook utilities', () => {
     );
 
     expect(hasStableCellIds(notebook)).toBe(false);
-    expect(makeCellId(notebook)).toBe('qwen-cell-2');
+    expect(makeCellId(notebook)).toBe('hopcode-cell-2');
     notebook.cells.push({
       cell_type: 'code',
-      id: 'qwen-cell-2',
+      id: 'hopcode-cell-2',
       source: '',
       metadata: {},
     });
-    expect(makeCellId(notebook)).toBe('qwen-cell-3');
+    expect(makeCellId(notebook)).toBe('hopcode-cell-3');
   });
 
   it('should not generate cell IDs for old notebook formats', () => {

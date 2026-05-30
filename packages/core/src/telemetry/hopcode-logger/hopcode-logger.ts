@@ -306,12 +306,12 @@ export class HopCodeLogger {
 
   readSourceInfo(): string {
     try {
-      const globalDir = Storage.getGlobalQwenDir();
+      const globalDir = Storage.getGlobalHopCodeDir();
       const sourceJsonPath = path.join(globalDir, 'source.json');
 
-      // Also check legacy ~/.qwen/source.json when QWEN_HOME is set,
-      // since the installer writes to ~/.qwen/ regardless of the env var.
-      const legacyPath = path.join(os.homedir(), '.qwen', 'source.json');
+      // Also check legacy ~/.hopcode/source.json when QWEN_HOME is set,
+      // since the installer writes to ~/.hopcode/ regardless of the env var.
+      const legacyPath = path.join(os.homedir(), '.hopcode', 'source.json');
       const candidates =
         path.normalize(sourceJsonPath) !== path.normalize(legacyPath)
           ? [sourceJsonPath, legacyPath]

@@ -41,7 +41,7 @@ zed --install-extension hopcode
 
 - Zed Editor (latest version recommended)
 - Internet connection for AI model access
-- Node.js >= 22 (for running Qwen Code agent server)
+- Node.js >= 22 (for running HopCode agent server)
 
 ## Configuration
 

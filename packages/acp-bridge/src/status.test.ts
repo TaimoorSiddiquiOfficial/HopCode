@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -74,7 +74,7 @@ describe('MissingCliEntryError', () => {
     const err = new MissingCliEntryError();
     expect(err.name).toBe('MissingCliEntryError');
     expect(err.message).toContain('Cannot determine CLI entry path');
-    expect(err.message).toContain('QWEN_CLI_ENTRY');
+    expect(err.message).toContain('HOPCODE_CLI_ENTRY');
     expect(err).toBeInstanceOf(Error);
   });
 });

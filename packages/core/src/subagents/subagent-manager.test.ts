@@ -88,7 +88,7 @@ describe('SubagentManager', () => {
 
   beforeEach(() => {
     // Mock os.homedir before makeFakeConfig, since Config constructor
-    // calls Storage.getGlobalQwenDir() which needs os.homedir()
+    // calls Storage.getGlobalHopCodeDir() which needs os.homedir()
     vi.mocked(os.homedir).mockReturnValue('/home/user');
     vi.mocked(os.tmpdir).mockReturnValue('/tmp');
 

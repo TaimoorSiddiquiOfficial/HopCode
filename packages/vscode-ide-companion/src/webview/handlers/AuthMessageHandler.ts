@@ -208,7 +208,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
       // entries as non-selectable group headers (mirrors the CLI grouping).
       const selectedId = await this.pick(
         items,
-        'Qwen Code: Select Provider',
+        'HopCode: Select Provider',
         'Choose how to connect',
       );
       if (!selectedId) return;
@@ -237,7 +237,7 @@ export class AuthMessageHandler extends BaseMessageHandler {
 
   private async runProviderSetupFlow(provider: ProviderConfig): Promise<void> {
     const flowTitle =
-      provider.uiLabels?.flowTitle ?? `Qwen Code: ${provider.label}`;
+      provider.uiLabels?.flowTitle ?? `HopCode: ${provider.label}`;
 
     // Step 0: Protocol (only for providers offering multiple, e.g. custom)
     let protocol: AuthType | undefined;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +30,7 @@ describe('ExitWorktreeTool — WorktreeSession sidecar cleanup', () => {
   let sessionId: string;
 
   beforeEach(async () => {
-    const raw = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-exit-sess-'));
+    const raw = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-exit-sess-'));
     repoRoot = await fs.realpath(raw);
     execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
     execFileSync('git', ['config', 'user.email', 't@e.com'], { cwd: repoRoot });
@@ -94,7 +94,7 @@ describe('ExitWorktreeTool — WorktreeSession sidecar cleanup', () => {
     const sessionPath = sessionService.getWorktreeSessionPath(sessionId);
     expect(await readWorktreeSession(sessionPath)).not.toBeNull();
 
-    // EnterWorktree writes a .qwen-worktree-session marker file inside the
+    // EnterWorktree writes a .hopcode-worktree-session marker file inside the
     // worktree, which shows up as untracked. Pass discard_changes to bypass
     // the dirty-state guard so we can exercise the remove → clear path.
     const exit = new ExitWorktreeTool(makeConfig());

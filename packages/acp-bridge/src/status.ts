@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,7 +67,7 @@ export class BridgeChannelClosedError extends Error {
 }
 
 /**
- * Raised by `defaultSpawnChannelFactory` when neither `QWEN_CLI_ENTRY` nor
+ * Raised by `defaultSpawnChannelFactory` when neither `HOPCODE_CLI_ENTRY` nor
  * `process.argv[1]` resolves to a path that can be re-spawned for the ACP
  * child. Replaces a generic `new Error(...)` so `mapDomainErrorToErrorKind`
  * can return `'missing_binary'` via `instanceof` rather than regex-matching
@@ -78,23 +78,23 @@ export class MissingCliEntryError extends Error {
   constructor() {
     super(
       'Cannot determine CLI entry path for spawning the ACP child: ' +
-        'process.argv[1] is empty and QWEN_CLI_ENTRY is unset. ' +
-        'Set QWEN_CLI_ENTRY to the absolute path of the qwen entry ' +
-        'script (e.g. `export QWEN_CLI_ENTRY=$(which qwen)`) to override.',
+        'process.argv[1] is empty and HOPCODE_CLI_ENTRY is unset. ' +
+        'Set HOPCODE_CLI_ENTRY to the absolute path of the hopcode entry ' +
+        'script (e.g. `export HOPCODE_CLI_ENTRY=$(which hopcode)`) to override.',
     );
     this.name = 'MissingCliEntryError';
   }
 }
 
 export const SERVE_STATUS_EXT_METHODS = {
-  workspaceMcp: 'qwen/status/workspace/mcp',
-  workspaceSkills: 'qwen/status/workspace/skills',
-  workspaceProviders: 'qwen/status/workspace/providers',
-  workspaceMemory: 'qwen/status/workspace/memory',
-  workspaceAgents: 'qwen/status/workspace/agents',
-  workspacePreflight: 'qwen/status/workspace/preflight',
-  sessionContext: 'qwen/status/session/context',
-  sessionSupportedCommands: 'qwen/status/session/supported_commands',
+  workspaceMcp: 'hopcode/status/workspace/mcp',
+  workspaceSkills: 'hopcode/status/workspace/skills',
+  workspaceProviders: 'hopcode/status/workspace/providers',
+  workspaceMemory: 'hopcode/status/workspace/memory',
+  workspaceAgents: 'hopcode/status/workspace/agents',
+  workspacePreflight: 'hopcode/status/workspace/preflight',
+  sessionContext: 'hopcode/status/session/context',
+  sessionSupportedCommands: 'hopcode/status/session/supported_commands',
 } as const;
 
 /**
@@ -105,8 +105,8 @@ export const SERVE_STATUS_EXT_METHODS = {
  * which then mutates Config / ToolRegistry / McpClientManager state.
  */
 export const SERVE_CONTROL_EXT_METHODS = {
-  sessionApprovalMode: 'qwen/control/session/approval_mode',
-  workspaceMcpRestart: 'qwen/control/workspace/mcp/restart',
+  sessionApprovalMode: 'hopcode/control/session/approval_mode',
+  workspaceMcpRestart: 'hopcode/control/workspace/mcp/restart',
 } as const;
 
 export type ServeStatus =
@@ -184,7 +184,7 @@ export interface ServeMcpBudgetStatusCell extends ServeStatusCell {
    * — so the budget caps live MCP clients **per session**, not
    * per-workspace. The snapshot reflects the bootstrap session's
    * view; concurrent sessions each enforce their own copy of the
-   * cap independently. See `qwen-serve-protocol.md` "PR 14 v1
+   * cap independently. See `hopcode-serve-protocol.md` "PR 14 v1
    * scope: per-session" for the operator-facing rationale.
    *
    * Future PRs:
@@ -315,7 +315,7 @@ export interface ServeWorkspaceMemoryFile {
   path: string;
   /**
    * 'workspace' for files under the bound workspace tree, 'global' for
-   * `~/.qwen/QWEN.md` style entries. Helps adapters render scope chips.
+   * `~/.hopcode/HOPCODE.md` style entries. Helps adapters render scope chips.
    */
   scope: ServeContextFileScope;
   /** Size in bytes of the file's serialized contents on disk. */
@@ -330,11 +330,11 @@ export interface ServeWorkspaceMemoryStatus {
   /** Total bytes across all hierarchical files (sum of `files[].bytes`). */
   totalBytes: number;
   /**
-   * Number of merged QWEN.md / AGENTS.md files the loader pulled in.
+   * Number of merged HOPCODE.md / AGENTS.md files the loader pulled in.
    * Mirrors `LoadServerHierarchicalMemoryResponse.fileCount`.
    */
   fileCount: number;
-  /** Baseline path-rule count from `.qwen/rules/`. */
+  /** Baseline path-rule count from `.hopcode/rules/`. */
   ruleCount: number;
   errors?: ServeStatusCell[];
 }

@@ -75,7 +75,7 @@ describe('doctorCommand', () => {
       'Memory diagnostics\nRSS: 100.0 MiB\nActive handles: 3',
     );
     vi.mocked(memoryDiagnosticsModule.writeMemoryHeapSnapshot).mockReturnValue(
-      '/tmp/qwen-code-heap.heapsnapshot',
+      '/tmp/hopcode-heap.heapsnapshot',
     );
     vi.mocked(
       memoryDiagnosticsModule.collectMemoryPressureSamples,
@@ -304,7 +304,7 @@ describe('doctorCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Memory diagnostics\nRSS: 100.0 MiB\nActive handles: 3\n\nHeap snapshot written: /tmp/qwen-code-heap.heapsnapshot\nHeap snapshot may contain prompts, file contents, tool results, and other sensitive data. Do not share it publicly without reviewing it first.',
+        'Memory diagnostics\nRSS: 100.0 MiB\nActive handles: 3\n\nHeap snapshot written: /tmp/hopcode-heap.heapsnapshot\nHeap snapshot may contain prompts, file contents, tool results, and other sensitive data. Do not share it publicly without reviewing it first.',
     });
   });
 
@@ -817,7 +817,7 @@ describe('doctorCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Memory diagnostics\nRSS: 100.0 MiB\nActive handles: 3\n\nHeap snapshot written: /tmp/qwen-code-heap.heapsnapshot\nHeap snapshot may contain prompts, file contents, tool results, and other sensitive data. Do not share it publicly without reviewing it first.',
+        'Memory diagnostics\nRSS: 100.0 MiB\nActive handles: 3\n\nHeap snapshot written: /tmp/hopcode-heap.heapsnapshot\nHeap snapshot may contain prompts, file contents, tool results, and other sensitive data. Do not share it publicly without reviewing it first.',
     });
   });
 

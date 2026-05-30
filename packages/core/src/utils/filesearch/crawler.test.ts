@@ -51,7 +51,7 @@ async function initGitRepo(dir: string): Promise<void> {
       '-c',
       'user.name=Qwen Test',
       '-c',
-      'user.email=qwen-test@example.com',
+      'user.email=hopcode-test@example.com',
       'commit',
       '--no-gpg-sign',
       '-m',

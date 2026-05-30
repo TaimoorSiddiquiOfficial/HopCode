@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,7 +36,7 @@ async function makeHarness(opts?: {
   includeRawPaths?: boolean;
 }): Promise<Harness> {
   const scratch = await fsp.mkdtemp(
-    path.join(os.tmpdir(), `qwen-wfs-${randomBytes(4).toString('hex')}-`),
+    path.join(os.tmpdir(), `hopcode-wfs-${randomBytes(4).toString('hex')}-`),
   );
   const wsDir = path.join(scratch, 'ws');
   await fsp.mkdir(wsDir);
@@ -1003,7 +1003,7 @@ describe('WorkspaceFileSystem - factory', () => {
     const scratch = await fsp.mkdtemp(
       path.join(
         os.tmpdir(),
-        `qwen-wfs-canon-${randomBytes(4).toString('hex')}-`,
+        `hopcode-wfs-canon-${randomBytes(4).toString('hex')}-`,
       ),
     );
     try {

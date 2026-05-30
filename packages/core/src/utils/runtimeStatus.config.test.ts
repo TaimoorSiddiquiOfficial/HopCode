@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Integration coverage for the runtime.json sidecar wiring through
@@ -24,7 +24,7 @@ let runtimeDir: string;
 let prevRuntimeEnv: string | undefined;
 
 beforeEach(async () => {
-  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'qwen-rt-cfg-'));
+  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'hopcode-rt-cfg-'));
   runtimeDir = path.join(tmpDir, 'runtime');
   prevRuntimeEnv = process.env['QWEN_RUNTIME_DIR'];
   process.env['QWEN_RUNTIME_DIR'] = runtimeDir;

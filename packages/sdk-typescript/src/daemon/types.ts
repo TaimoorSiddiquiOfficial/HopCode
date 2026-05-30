@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Wire types for the `qwen serve` daemon HTTP API.
+ * Wire types for the `hopcode serve` daemon HTTP API.
  *
  * These mirror the shapes emitted by `packages/cli/src/serve` but are
  * defined SDK-side to avoid an SDK→CLI dependency. The shapes are stable
@@ -49,7 +49,7 @@ export interface DaemonCapabilities {
    * extension to v=1 envelopes (added by #3803 §02). Daemons
    * predating §02 still announce `v: 1` but omit this field; the
    * protocol's "bump v only on incompatible frame changes" stance
-   * (see `qwen-serve-protocol.md`) makes additive optionality the
+   * (see `hopcode-serve-protocol.md`) makes additive optionality the
    * correct shape. All post-§02 daemons populate it.
    *
    * **SDK consumers**: if you need the value as a non-undefined
@@ -264,7 +264,7 @@ export interface DaemonMcpBudgetStatusCell extends DaemonStatusCell {
    * The `string & {}` widening keeps IDE autocomplete + literal
    * narrowing for known scopes while allowing unknown scopes through
    * — the protocol contract is "consumers MUST tolerate additional
-   * scope values, drop don't fail." See `qwen-serve-protocol.md`.
+   * scope values, drop don't fail." See `hopcode-serve-protocol.md`.
    */
   scope: 'session' | 'workspace' | (string & {});
   liveCount: number;
@@ -507,7 +507,7 @@ export interface DaemonWorkspaceFileEditResult {
 /**
  * Storage level for a subagent definition.
  *
- * `project` / `user` / `builtin` are the levels the `qwen serve`
+ * `project` / `user` / `builtin` are the levels the `hopcode serve`
  * daemon currently surfaces through `GET /workspace/agents` and the
  * per-`agentType` detail route.
  *
@@ -797,7 +797,7 @@ export type DaemonMcpRestartResult =
  * Returned from `POST /session/:id/heartbeat`. `lastSeenAt` is the
  * server-side `Date.now()` epoch (ms) the daemon stored for this
  * session. `clientId` is echoed back only when the caller supplied a
- * trusted one through `X-Qwen-Client-Id`. Older daemons (pre-PR 9) do
+ * trusted one through `X-HopCode-Client-Id`. Older daemons (pre-PR 9) do
  * not expose this route — clients should pre-flight
  * `caps.features.client_heartbeat` before sending.
  */
@@ -809,7 +809,7 @@ export interface HeartbeatResult {
 
 /** Issue #4175 PR 21 — auth device-flow wire types. */
 
-export type DaemonAuthProviderId = 'qwen-oauth' | (string & {});
+export type DaemonAuthProviderId = 'hopcode-oauth' | (string & {});
 
 // PR #4255 review S4: Sdk-prefixed aliases USED to be parallel literal
 // unions, which silently diverged from the canonical event-side types

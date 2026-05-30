@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -71,7 +71,7 @@ const DEFAULT_MAX_QUEUED = 256;
  * 8000 matches the target set in #3803 §02 for chatty Stage 1
  * sessions, with ~30–60× headroom over a typical-but-busy turn at
  * the cost of a few hundred KB of RAM per session. Operators can
- * override per-daemon via `qwen serve --event-ring-size <n>`.
+ * override per-daemon via `hopcode serve --event-ring-size <n>`.
  */
 export const DEFAULT_RING_SIZE = 8000;
 /**
@@ -156,7 +156,7 @@ export class SubscriberLimitExceededError extends Error {
 // of running parallel event streams. The `BridgeEvent` shape is
 // already close to what's needed; what's missing is the bus being
 // publicly addressable. Reference:
-// https://github.com/QwenLM/qwen-code/pull/3889#issuecomment-4427773706
+// https://github.com/QwenLM/hopcode/pull/3889#issuecomment-4427773706
 export class EventBus {
   private nextId = 1;
   private readonly ring: BridgeEvent[] = [];

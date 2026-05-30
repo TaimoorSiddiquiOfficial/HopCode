@@ -299,7 +299,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 #### Java SDK (`packages/sdk-java/`):
 
 - [ ] `HopCode/` → Package names (decision required)
-- [ ] `QWEN.md` → `HOPCODE.md`
+- [ ] `HOPCODE.md` → `HOPCODE.md`
 - [ ] `pom.xml` → Maven configuration
 - [ ] `client/` → Client library
 
@@ -393,7 +393,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 ### Configuration
 
 - [ ] `packages/*/hopcode-extension.json` → `hopcode-extension.json`
-- [ ] `packages/sdk-java/QWEN.md` → `HOPCODE.md`
+- [ ] `packages/sdk-java/HOPCODE.md` → `HOPCODE.md`
 
 ---
 

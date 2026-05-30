@@ -331,7 +331,7 @@ function resolveHopCodeOAuthConfig(
         ? ` Note: vision-model has been removed since coder-model now supports vision capabilities.`
         : '';
       warnings.push(
-        `Warning: Unsupported Qwen OAuth model '${requestedModel}', falling back to '${DEFAULT_HOPCODE_MODEL}'.${extraMessage}`,
+        `Warning: Unsupported HopCode OAuth model '${requestedModel}', falling back to '${DEFAULT_HOPCODE_MODEL}'.${extraMessage}`,
       );
     }
     resolvedModel = DEFAULT_HOPCODE_MODEL;
@@ -339,7 +339,7 @@ function resolveHopCodeOAuthConfig(
   }
 
   sources['model'] = modelSource;
-  sources['apiKey'] = computedSource('Qwen OAuth dynamic token');
+  sources['apiKey'] = computedSource('HopCode OAuth dynamic token');
   sources['authType'] = computedSource('provided by caller');
 
   if (proxy) {

@@ -94,7 +94,7 @@ export const tipRegistry: ContextualTip[] = [
   {
     id: 'new-user-resume',
     content:
-      'You can resume a previous conversation by running qwen --continue or qwen --resume.',
+      'You can resume a previous conversation by running hopcode --continue or hopcode --resume.',
     trigger: 'startup',
     isRelevant: (ctx) => ctx.sessionCount < 10,
     cooldownPrompts: 0,

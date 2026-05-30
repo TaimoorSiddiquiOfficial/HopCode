@@ -1,13 +1,13 @@
----
+﻿---
 name: memory-leak-debug
-description: Diagnose memory leaks in the Qwen Code CLI using heap snapshots and
+description: Diagnose memory leaks in the HopCode CLI using heap snapshots and
   the chrome-devtools CLI. Use when investigating high memory usage, unbounded
   growth, or suspected object retention issues.
 ---
 
 # Memory Leak Debugging
 
-Diagnose memory leaks in the Qwen Code Node.js CLI by capturing heap snapshots
+Diagnose memory leaks in the HopCode Node.js CLI by capturing heap snapshots
 and analyzing retained object sizes via `chrome-devtools` CLI tooling.
 
 ## Prerequisites
@@ -23,9 +23,9 @@ Use tmux so you can interact with the TUI and trigger snapshots from another
 pane. Use the tmux-real-user-testing helper script:
 
 ```bash
-HELPER=.qwen/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh
+HELPER=.hopcode/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh
 eval "$(bash "$HELPER" start memleak . \
-  env QWEN_CODE_NO_RELAUNCH=true NODE_OPTIONS=--heapsnapshot-signal=SIGUSR2 \
+  env HOPCODE_NO_RELAUNCH=true NODE_OPTIONS=--heapsnapshot-signal=SIGUSR2 \
   npm run dev)"
 echo "SESSION=$SESSION OUTDIR=$OUTDIR"
 ```
@@ -38,7 +38,7 @@ Notes:
 
 - `npm run dev` runs from TypeScript source via tsx — no build step needed and
   changes to core/cli are reflected immediately.
-- `QWEN_CODE_NO_RELAUNCH=true` prevents the CLI from spawning a child process,
+- `HOPCODE_NO_RELAUNCH=true` prevents the CLI from spawning a child process,
   so PID management is simpler.
 - `NODE_OPTIONS` propagates the flag through npm → tsx → node.
 
@@ -47,12 +47,12 @@ chain (npm → node scripts/dev.js → tsx → node CLI), so walk the tree to th
 innermost node child:
 
 ```bash
-NODE_PID=$(bash .qwen/skills/memory-leak-debug/scripts/find-leaf-node.sh "<session-name>")
+NODE_PID=$(bash .hopcode/skills/memory-leak-debug/scripts/find-leaf-node.sh "<session-name>")
 ```
 
 To profile the production bundle instead (e.g., verifying tree-shaking):
 `npm run bundle` first, then use
-`env QWEN_CODE_NO_RELAUNCH=true node --heapsnapshot-signal=SIGUSR2 dist/cli.js`
+`env HOPCODE_NO_RELAUNCH=true node --heapsnapshot-signal=SIGUSR2 dist/cli.js`
 as the command. Since node is the direct pane process, PID discovery is simpler:
 
 ```bash
@@ -149,7 +149,7 @@ After applying the fix:
 ## Cleanup
 
 ```bash
-HELPER=.qwen/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh
+HELPER=.hopcode/skills/tmux-real-user-testing/scripts/tmux-real-user-log.sh
 bash "$HELPER" finish "<session-name>" "<outdir>"
 chrome-devtools stop
 rm *.heapsnapshot  # if no longer needed

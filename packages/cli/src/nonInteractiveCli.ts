@@ -1255,7 +1255,7 @@ export async function runNonInteractive(
       if (!skipAdapterEmit) {
         // Wrap in try/catch: emitResult eventually hits stdout.write, which
         // can throw on EPIPE / ERR_STREAM_WRITE_AFTER_END when a piped
-        // consumer closes early (`qwen -p ... | head -n 1` is the common
+        // consumer closes early (`hopcode -p ... | head -n 1` is the common
         // case). Letting that throw bubble out skips `handleBudgetExceededError`
         // / `handleError` below, dropping the documented exit code 55
         // contract — precisely when stdout is in trouble. Best-effort emit
@@ -1286,7 +1286,7 @@ export async function runNonInteractive(
       await handleError(error, config);
     } finally {
       // Cancel the wall-clock timer so it doesn't fire after a successful
-      // run completes — important for callers (e.g. the `qwen serve`
+      // run completes — important for callers (e.g. the `hopcode serve`
       // daemon, SDK) that reuse a single process across many runs.
       budgetEnforcer.stop();
 

@@ -930,7 +930,7 @@ export class SubagentManager {
     const baseDir =
       level === 'project'
         ? path.join(this.config.getProjectRoot(), HOPCODE_DIR, AGENT_CONFIG_DIR)
-        : path.join(Storage.getGlobalQwenDir(), AGENT_CONFIG_DIR);
+        : path.join(Storage.getGlobalHopCodeDir(), AGENT_CONFIG_DIR);
 
     return path.join(baseDir, `${name}.md`);
   }
@@ -968,7 +968,7 @@ export class SubagentManager {
     const baseDir =
       level === 'project'
         ? path.join(projectRoot, HOPCODE_DIR, AGENT_CONFIG_DIR)
-        : path.join(Storage.getGlobalQwenDir(), AGENT_CONFIG_DIR);
+        : path.join(Storage.getGlobalHopCodeDir(), AGENT_CONFIG_DIR);
 
     try {
       const files = await fs.readdir(baseDir);

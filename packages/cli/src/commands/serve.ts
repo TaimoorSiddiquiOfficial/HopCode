@@ -51,7 +51,7 @@ interface ServeArgs {
 export const serveCommand: CommandModule<unknown, ServeArgs> = {
   command: 'serve',
   describe:
-    'Run Qwen Code as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
+    'Run HopCode as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
   builder: (yargs: Argv) =>
     yargs
       .option('port', {
@@ -124,7 +124,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         type: 'boolean',
         default: true,
         description:
-          'Stage 1 mode: one `qwen --acp` child per daemon (the daemon binds to ' +
+          'Stage 1 mode: one `hopcode --acp` child per daemon (the daemon binds to ' +
           'one workspace at boot, multiplexing N sessions onto that child via ' +
           "the agent's native `newSession()`). Stage 2 native in-process mode " +
           'is not yet implemented; this flag will become opt-in then.',
@@ -153,7 +153,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
   handler: async (argv) => {
     if (!argv['http-bridge']) {
       writeStderrLine(
-        'qwen serve: --no-http-bridge (native mode) is not yet implemented; ' +
+        'hopcode serve: --no-http-bridge (native mode) is not yet implemented; ' +
           'falling back to http-bridge.',
       );
     }
@@ -163,7 +163,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       // operators toward the env-var path which uses
       // `/proc/<pid>/environ` (owner-only).
       writeStderrLine(
-        'qwen serve: --token is visible in the process command line; ' +
+        'hopcode serve: --token is visible in the process command line; ' +
           'prefer the QWEN_SERVER_TOKEN env var for any non-trivial ' +
           'deployment.',
       );
@@ -181,14 +181,14 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         mcpClientBudget <= 0
       ) {
         writeStderrLine(
-          'qwen serve: --mcp-client-budget must be a positive integer.',
+          'hopcode serve: --mcp-client-budget must be a positive integer.',
         );
         process.exit(1);
       }
     }
     if (mcpBudgetMode === 'enforce' && mcpClientBudget === undefined) {
       writeStderrLine(
-        'qwen serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.',
+        'hopcode serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.',
       );
       process.exit(1);
     }
@@ -199,7 +199,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       // policy in stderr (journald / docker logs) so operators don't
       // have to parse /capabilities or /workspace/mcp to confirm it.
       writeStderrLine(
-        `qwen serve: --mcp-client-budget=${mcpClientBudget} mode=${resolvedMcpMode}` +
+        `hopcode serve: --mcp-client-budget=${mcpClientBudget} mode=${resolvedMcpMode}` +
           (resolvedMcpMode === 'enforce'
             ? ' (servers past the cap will be refused at discovery)'
             : resolvedMcpMode === 'warn'
@@ -258,7 +258,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       });
     } catch (err) {
       writeStderrLine(
-        `qwen serve: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: ${err instanceof Error ? err.message : String(err)}`,
       );
       process.exit(1);
     }

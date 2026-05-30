@@ -47,7 +47,7 @@ const getBuiltinLocalesDir = (): string =>
   path.join(resolveBundleDir(import.meta.url), 'locales');
 
 const getUserLocalesDir = (): string =>
-  path.join(Storage.getGlobalQwenDir(), 'locales');
+  path.join(Storage.getGlobalHopCodeDir(), 'locales');
 
 /**
  * Get the path to the user's custom locales directory.

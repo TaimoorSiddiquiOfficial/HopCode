@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -50,7 +50,7 @@ function formatHostForUrl(host: string): string {
 }
 
 /**
- * #4282 fold-in 4 (qwen-latest C2). Per-workspace promise chain that
+ * #4282 fold-in 4 (hopcode-latest C2). Per-workspace promise chain that
  * serializes settings read-modify-write cycles inside this process.
  *
  * Both `persistApprovalMode` and `persistDisabledTools` re-read
@@ -61,7 +61,7 @@ function formatHostForUrl(host: string): string {
  * holds the chain until its `setValue` flush completes, and the second
  * sees the post-write state when it runs its own load.
  *
- * Scope is INTRA-process: a separate `qwen serve` invocation against
+ * Scope is INTRA-process: a separate `hopcode serve` invocation against
  * the same workspace would not share the Map, but per-workspace
  * single-daemon is the supported deployment shape (see #3803 §02).
  * The lock decays naturally — when no callers are queued, the chain
@@ -327,7 +327,7 @@ export async function runHopCodeServe(
       // touched the file between calls, so the freshest state wins
       // over a stale in-memory cache.
       //
-      // #4282 fold-in 4 (qwen-latest C2): both persist callbacks run
+      // #4282 fold-in 4 (hopcode-latest C2): both persist callbacks run
       // through `withSettingsLock` — a per-workspace promise chain that
       // serializes the read-modify-write cycle. Without the lock, two
       // concurrent `POST /workspace/tools/:name/enable` requests could
@@ -431,7 +431,7 @@ export async function runHopCodeServe(
   // operators conventionally type `[::1]` (or copy/paste from URLs that
   // need the brackets to disambiguate the port). Strip brackets at
   // bind-time, keep them for the printed URL — without this fixup
-  // `qwen serve --hostname [::1]` would pass the loopback/token check
+  // `hopcode serve --hostname [::1]` would pass the loopback/token check
   // and then fail to start with ENOTFOUND.
   //
   // Only accept *pure* bracketed forms: `[…]` with no trailing `:port`
@@ -511,7 +511,7 @@ export async function runHopCodeServe(
       actualPort = typeof addr === 'object' && addr ? addr.port : opts.port;
       const url = `http://${formatHostForUrl(opts.hostname)}:${actualPort}`;
       writeStdoutLine(
-        `qwen serve listening on ${url} (mode=${opts.mode}, ` +
+        `hopcode serve listening on ${url} (mode=${opts.mode}, ` +
           `workspace=${boundWorkspace})`,
       );
       // Operator log on stderr too (systemd/docker/k8s default
@@ -527,11 +527,11 @@ export async function runHopCodeServe(
       // somehow contained one — operator-controlled today, but
       // cheap defense-in-depth).
       writeStderrLine(
-        `qwen serve: bound to workspace ${JSON.stringify(boundWorkspace)}`,
+        `hopcode serve: bound to workspace ${JSON.stringify(boundWorkspace)}`,
       );
       if (!token) {
         writeStderrLine(
-          `qwen serve: bearer auth disabled (loopback default). Set ${QWEN_SERVER_TOKEN_ENV} to enable.`,
+          `hopcode serve: bearer auth disabled (loopback default). Set ${QWEN_SERVER_TOKEN_ENV} to enable.`,
         );
       } else if (opts.requireAuth) {
         // The boot check above guarantees `token` is set whenever
@@ -541,7 +541,7 @@ export async function runHopCodeServe(
         // `/capabilities` (and is a useful breadcrumb when triaging
         // "why is loopback returning 401" tickets).
         writeStderrLine(
-          'qwen serve: --require-auth enabled (bearer token mandatory ' +
+          'hopcode serve: --require-auth enabled (bearer token mandatory ' +
             'on every route, including loopback /health).',
         );
       }
@@ -559,30 +559,30 @@ export async function runHopCodeServe(
           // Match standard daemon behavior (nginx, redis, etc.):
           // first signal = graceful drain; second = hard exit.
           //
-          // Bd1y6: synchronously SIGKILL every live `qwen --acp`
+          // Bd1y6: synchronously SIGKILL every live `hopcode --acp`
           // child BEFORE `process.exit(1)`. Otherwise the daemon
           // vanishes but its child processes keep running with
           // dangling stdin/stdout pipes — visible as orphan
-          // `qwen` processes in the operator's `ps` output.
+          // `hopcode` processes in the operator's `ps` output.
           writeStderrLine(
-            `qwen serve: received ${signal} during drain — forcing exit`,
+            `hopcode serve: received ${signal} during drain — forcing exit`,
           );
           try {
             bridge.killAllSync();
           } catch (err) {
             writeStderrLine(
-              `qwen serve: force-kill error: ${err instanceof Error ? err.message : String(err)}`,
+              `hopcode serve: force-kill error: ${err instanceof Error ? err.message : String(err)}`,
             );
           }
           process.exit(1);
           return;
         }
-        writeStderrLine(`qwen serve: received ${signal}, draining...`);
+        writeStderrLine(`hopcode serve: received ${signal}, draining...`);
         try {
           await handle.close();
           process.exit(0);
         } catch (err) {
-          writeStderrLine(`qwen serve: shutdown error: ${String(err)}`);
+          writeStderrLine(`hopcode serve: shutdown error: ${String(err)}`);
           process.exit(1);
         }
       };
@@ -657,7 +657,7 @@ export async function runHopCodeServe(
                 deviceFlowRegistry.dispose();
               } catch (err) {
                 writeStderrLine(
-                  `qwen serve: device-flow registry dispose error: ${
+                  `hopcode serve: device-flow registry dispose error: ${
                     err instanceof Error ? err.message : String(err)
                   }`,
                 );
@@ -667,7 +667,7 @@ export async function runHopCodeServe(
               .shutdown()
               .catch((err) => {
                 writeStderrLine(
-                  `qwen serve: bridge shutdown error: ${String(err)}`,
+                  `hopcode serve: bridge shutdown error: ${String(err)}`,
                 );
                 bridgeShutdownError =
                   err instanceof Error ? err : new Error(String(err));
@@ -692,7 +692,7 @@ export async function runHopCodeServe(
                 let secondaryTimer: NodeJS.Timeout | undefined;
                 const forceTimer = setTimeout(() => {
                   writeStderrLine(
-                    `qwen serve: ${SHUTDOWN_FORCE_CLOSE_MS}ms listener-drain timeout reached; force-closing remaining connections`,
+                    `hopcode serve: ${SHUTDOWN_FORCE_CLOSE_MS}ms listener-drain timeout reached; force-closing remaining connections`,
                   );
                   server.closeAllConnections();
                   // After force-close, server.close's callback
@@ -703,7 +703,7 @@ export async function runHopCodeServe(
                   // bent.
                   secondaryTimer = setTimeout(() => {
                     writeStderrLine(
-                      `qwen serve: server.close did not fire ${SECONDARY_DEADLINE_MS}ms after force-close; resolving anyway`,
+                      `hopcode serve: server.close did not fire ${SECONDARY_DEADLINE_MS}ms after force-close; resolving anyway`,
                     );
                     finish();
                   }, SECONDARY_DEADLINE_MS);
@@ -733,7 +733,7 @@ export async function runHopCodeServe(
       server.removeAllListeners('error');
       server.on('error', (err) => {
         writeStderrLine(
-          `qwen serve: server error: ${err instanceof Error ? err.message : String(err)}`,
+          `hopcode serve: server error: ${err instanceof Error ? err.message : String(err)}`,
         );
       });
       resolve(handle);

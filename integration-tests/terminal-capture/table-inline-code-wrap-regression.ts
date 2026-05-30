@@ -1,7 +1,7 @@
 #!/usr/bin/env npx tsx
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -259,7 +259,7 @@ async function main(): Promise<void> {
   const repoRoot = resolve(process.env['QWEN_TUI_E2E_REPO'] ?? defaultRepoRoot);
   const outputDir = resolve(
     process.env['QWEN_TUI_E2E_OUT'] ??
-      join(tmpdir(), 'qwen-table-wrap-ansi', basename(repoRoot)),
+      join(tmpdir(), 'hopcode-table-wrap-ansi', basename(repoRoot)),
   );
   const expectedPass = process.env['QWEN_TUI_E2E_EXPECT_PASS'] !== 'false';
 
@@ -279,7 +279,7 @@ async function main(): Promise<void> {
     NODE_NO_WARNINGS: '1',
     QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
     QWEN_CODE_NO_RELAUNCH: '1',
-    QWEN_SANDBOX: 'false',
+    HOPCODE_SANDBOX: 'false',
     TERM: 'xterm-256color',
     USERPROFILE: homeDir,
   };

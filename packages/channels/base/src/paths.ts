@@ -28,20 +28,20 @@ export function resolvePath(dir: string): string {
 }
 
 /**
- * Returns the global Qwen home directory (config, credentials, etc.).
+ * Returns the global HopCode home directory (config, credentials, etc.).
  *
- * Priority: QWEN_HOME env var > ~/.qwen
+ * Priority: HOPCODE_HOME env var > ~/.hopcode
  *
- * This mirrors packages/core Storage.getGlobalQwenDir() without importing
+ * This mirrors packages/core Storage.getGlobalHopCodeDir() without importing
  * from core to avoid cross-package dependencies.
  */
-export function getGlobalQwenDir(): string {
-  const envDir = process.env['QWEN_HOME'];
+export function getGlobalHopCodeDir(): string {
+  const envDir = process.env['HOPCODE_HOME'];
   if (envDir) {
     return resolvePath(envDir);
   }
   const homeDir = os.homedir();
   return homeDir
-    ? path.join(homeDir, '.qwen')
-    : path.join(os.tmpdir(), '.qwen');
+    ? path.join(homeDir, '.hopcode')
+    : path.join(os.tmpdir(), '.hopcode');
 }

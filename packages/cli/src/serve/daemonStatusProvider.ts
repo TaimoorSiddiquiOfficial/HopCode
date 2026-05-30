@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Daemon-host implementation of the `DaemonStatusProvider` interface
  * (declared in `@hoptrendy/hopcode-acp-bridge/bridgeOptions`). Production
- * `qwen serve` wires this into `BridgeOptions.statusProvider` so the
+ * `hopcode serve` wires this into `BridgeOptions.statusProvider` so the
  * bridge factory can pull env / preflight cells without importing
  * daemon-host-specific modules directly.
  *
@@ -32,7 +32,7 @@ import { buildEnvStatusFromProcess } from './envSnapshot.js';
 const REQUIRED_NODE_MAJOR = 22;
 
 /**
- * Construct the production `DaemonStatusProvider` for `qwen serve`.
+ * Construct the production `DaemonStatusProvider` for `hopcode serve`.
  * Returns a fresh provider per call; provider is stateless so callers
  * can cache if hot-path overhead matters (currently both methods are
  * called only from the route handlers, so per-request allocation is
@@ -125,7 +125,7 @@ async function buildDaemonPreflightCells(
   // Mirrors `defaultSpawnChannelFactory`'s lookup so the preflight cell
   // reflects the path the child would actually be spawned from.
   const cliEntryCell = (): ServePreflightCell => {
-    const cliEntry = process.env['QWEN_CLI_ENTRY'] || process.argv[1] || '';
+    const cliEntry = process.env['HOPCODE_CLI_ENTRY'] || process.argv[1] || '';
     if (cliEntry) {
       return {
         kind: 'cli_entry',
@@ -133,8 +133,8 @@ async function buildDaemonPreflightCells(
         locality: 'daemon',
         detail: {
           path: cliEntry,
-          source: process.env['QWEN_CLI_ENTRY']
-            ? 'QWEN_CLI_ENTRY'
+          source: process.env['HOPCODE_CLI_ENTRY']
+            ? 'HOPCODE_CLI_ENTRY'
             : 'process.argv[1]',
         },
       };
@@ -144,7 +144,7 @@ async function buildDaemonPreflightCells(
       status: 'error',
       errorKind: 'missing_binary',
       error: 'Cannot determine CLI entry path for spawning the ACP child.',
-      hint: 'Set QWEN_CLI_ENTRY to the absolute path of the qwen entry script.',
+      hint: 'Set HOPCODE_CLI_ENTRY to the absolute path of the hopcode entry script.',
       locality: 'daemon',
     };
   };

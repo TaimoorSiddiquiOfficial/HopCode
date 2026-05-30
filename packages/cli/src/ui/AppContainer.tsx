@@ -1183,7 +1183,7 @@ export const AppContainer = (props: AppContainerProps) => {
           // Anchor at the repo top-level (captured at enter time) rather
           // than the current targetDir — when the CLI was launched from
           // a monorepo subdirectory, `config.getTargetDir()` is that
-          // subdir but the worktree lives at `<repoRoot>/.qwen/worktrees/`,
+          // subdir but the worktree lives at `<repoRoot>/.hopcode/worktrees/`,
           // so a service rooted at the subdir would never find it. (PR
           // #4174 review finding 3252368637.)
           const svc = new GitWorktreeService(activeWorktree.originalCwd);

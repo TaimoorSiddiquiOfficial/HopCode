@@ -5,7 +5,7 @@
  */
 
 /**
- * @fileoverview Subagents — file-based configuration layer.
+ * @fileoverview Subagents ï¿½ file-based configuration layer.
  *
  * This module provides the foundation for the subagents feature by implementing
  * a file-based configuration system that builds on the agent runtime.
@@ -24,7 +24,7 @@ export type {
 
 // `SubagentErrorCode` is both a value (the const enum-like object used
 // at runtime) and a type. Re-export both shapes so callers like the
-// `qwen serve` workspace-agents route can use it as a value without
+// `hopcode serve` workspace-agents route can use it as a value without
 // reaching into `./types.js` directly.
 export { SubagentError, SubagentErrorCode } from './types.js';
 

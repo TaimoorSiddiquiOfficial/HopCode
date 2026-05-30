@@ -2142,7 +2142,7 @@ describe('ChatCompressionService.compress sideQuery config', () => {
     await service.compress(mockChat, {
       promptId: 'p',
       force: true,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: mockConfig,
       consecutiveFailures: 0,
       originalTokenCount: 180_000,
@@ -2205,7 +2205,7 @@ describe('ChatCompressionService.compress sideQuery config', () => {
     const result = await new ChatCompressionService().compress(mockChat, {
       promptId: 'p',
       force: true,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: mockConfig,
       consecutiveFailures: 0,
       originalTokenCount: 180_000,
@@ -2281,7 +2281,7 @@ describe('ChatCompressionService.compress cheap-gate uses estimated tokens', () 
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 200_000 }),
       consecutiveFailures: 0,
       originalTokenCount: 160_000,
@@ -2301,7 +2301,7 @@ describe('ChatCompressionService.compress cheap-gate uses estimated tokens', () 
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 200_000 }),
       consecutiveFailures: 0,
       originalTokenCount: 80_000,
@@ -2419,7 +2419,7 @@ describe('ChatCompressionService.compress cheap-gate uses computeThresholds.auto
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 200_000 }),
       consecutiveFailures: 0,
       originalTokenCount: 160_000,
@@ -2442,7 +2442,7 @@ describe('ChatCompressionService.compress cheap-gate uses computeThresholds.auto
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 200_000 }),
       consecutiveFailures: 0,
       originalTokenCount: 168_000,

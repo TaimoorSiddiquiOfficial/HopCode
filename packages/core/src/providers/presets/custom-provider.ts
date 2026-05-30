@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +25,7 @@ export const CUSTOM_API_KEY_ENV_PREFIX = 'HOPCODE_CUSTOM_API_KEY_';
  * while still keeping the env var name pasteable into a dashboard.
  *
  * Migration note: this suffix changed from 6 → 12 chars in a recent commit.
- * Old 6-char keys persist in settings.json (and ~/.qwen/env-equivalent
+ * Old 6-char keys persist in settings.json (and ~/.hopcode/env-equivalent
  * stores) until either the user reconnects under the same URL (which writes
  * the new 12-char key but leaves the old one as orphan disk state — harmless,
  * never read) or runs the "clear auth" flow. The old key is never read by

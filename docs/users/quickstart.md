@@ -71,7 +71,7 @@ Choose your preferred authentication method:
 - **Alibaba Cloud Coding Plan**: Select `Alibaba Cloud Coding Plan` for a fixed monthly fee with diverse model options. See the [Coding Plan guide](https://bailian.console.aliyun.com/cn-beijing/?tab=coding-plan#/efm/coding-plan-index) ([intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) for setup instructions.
 - **API Key**: Select `API Key`, then enter your API key from Alibaba Cloud Model Studio ([Beijing](https://bailian.console.aliyun.com/) / [intl](https://modelstudio.console.alibabacloud.com/)). See the API setup guide ([Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=doc#/doc/?type=model&url=3023091) / [intl](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model&url=2974721)) for details.
 
-> ⚠️ **Note**: Qwen OAuth was discontinued on April 15, 2026. If you were previously using Qwen OAuth, please switch to one of the methods above.
+> ⚠️ **Note**: HopCode OAuth was discontinued on April 15, 2026. If you were previously using HopCode OAuth, please switch to one of the methods above.
 
 > [!note]
 >
@@ -79,7 +79,7 @@ Choose your preferred authentication method:
 
 > [!tip]
 >
-> To configure authentication, start Qwen Code and run `/auth`. Use `/doctor` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
+> To configure authentication, start HopCode and run `/auth`. Use `/doctor` to check your current configuration at any time. See the [Authentication](./configuration/auth) page for details.
 
 ## Step 3: Start your first session
 

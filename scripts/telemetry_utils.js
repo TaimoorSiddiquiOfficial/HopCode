@@ -44,11 +44,11 @@ function getRuntimeBaseDir() {
   if (runtimeDir) {
     return resolvePath(runtimeDir);
   }
-  const homeEnv = process.env.QWEN_HOME;
+  const homeEnv = process.env.HOPCODE_HOME;
   if (homeEnv) {
     return resolvePath(homeEnv);
   }
-  return path.join(os.homedir(), '.qwen');
+  return path.join(os.homedir(), '.hopcode');
 }
 
 // Project-level .hopcode directory in the workspace

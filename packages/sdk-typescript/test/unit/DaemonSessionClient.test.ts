@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -100,7 +100,7 @@ describe('DaemonSessionClient', () => {
 
     const session = await DaemonSessionClient.createOrAttach(client, {
       workspaceCwd: '/work/a',
-      modelServiceId: 'qwen-prod',
+      modelServiceId: 'hopcode-prod',
     });
 
     expect(session.sessionId).toBe('s-1');
@@ -110,7 +110,7 @@ describe('DaemonSessionClient', () => {
     expect(calls[0]?.url).toBe('http://daemon/session');
     expect(JSON.parse(calls[0]!.body!)).toEqual({
       cwd: '/work/a',
-      modelServiceId: 'qwen-prod',
+      modelServiceId: 'hopcode-prod',
     });
   });
 
@@ -153,7 +153,7 @@ describe('DaemonSessionClient', () => {
     );
     await DaemonSessionClient.resume(client, 's-1', {}, 'client-reuse');
 
-    expect(calls.map((c) => c.headers['x-qwen-client-id'])).toEqual([
+    expect(calls.map((c) => c.headers['x-hopcode-client-id'])).toEqual([
       'client-reuse',
       'client-reuse',
       'client-reuse',
@@ -178,7 +178,7 @@ describe('DaemonSessionClient', () => {
 
     const session = await DaemonSessionClient.createOrAttach(client, {
       workspaceCwd: '/work/a',
-      modelServiceId: 'qwen-prod',
+      modelServiceId: 'hopcode-prod',
     });
 
     for await (const _event of session.events()) {
@@ -354,7 +354,7 @@ describe('DaemonSessionClient', () => {
     });
     expect(calls[0]?.url).toBe('http://daemon/session/s-1/heartbeat');
     expect(calls[0]?.method).toBe('POST');
-    expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+    expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
   });
 
   it('forwards session-scoped operations through DaemonClient', async () => {
@@ -474,7 +474,7 @@ describe('DaemonSessionClient', () => {
       'http://daemon/session/s-1',
     ]);
     expect(calls[0]?.signal).toBe(controller.signal);
-    expect(calls.map((c) => c.headers['x-qwen-client-id'])).toEqual([
+    expect(calls.map((c) => c.headers['x-hopcode-client-id'])).toEqual([
       'client-1',
       'client-1',
       'client-1',

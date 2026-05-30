@@ -3367,10 +3367,10 @@ describe('runNonInteractive', () => {
     it('emits structuredResult to stdout in OutputFormat.TEXT mode', async () => {
       // The other --json-schema tests pin OutputFormat.JSON /
       // OutputFormat.STREAM_JSON. TEXT is the default for headless runs
-      // (`qwen -p "..."` without --output-format), so it needs its own
+      // (`hopcode -p "..."` without --output-format), so it needs its own
       // pin: a regression that diverged the TEXT adapter's
       // structuredResult handling from the JSON / stream-json paths
-      // would only surface to users running plain `qwen -p`.
+      // would only surface to users running plain `hopcode -p`.
       (mockConfig.getJsonSchema as Mock).mockReturnValue({
         type: 'object',
         properties: { summary: { type: 'string' } },
@@ -3447,12 +3447,12 @@ describe('runNonInteractive', () => {
       );
       const realTmpDir = await fs.realpath(tmpDir);
       // restoreWorktreeContext enforces a structural invariant:
-      // worktreePath MUST live under `<originalCwd>/.qwen/worktrees/`
+      // worktreePath MUST live under `<originalCwd>/.hopcode/worktrees/`
       // (PR #4174 review #3256839787). The test fixture mirrors that
       // shape so the restore path isn't rejected as tampered.
       const worktreeDir = path.join(
         realTmpDir,
-        '.qwen',
+        '.hopcode',
         'worktrees',
         'worktree-real',
       );

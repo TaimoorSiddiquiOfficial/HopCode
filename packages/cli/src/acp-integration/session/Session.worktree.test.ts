@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * Phase C — Session.pendingWorktreeNotice consumption tests.
@@ -175,7 +175,7 @@ describe('Session.pendingWorktreeNotice', () => {
     );
 
     const notice =
-      '[Resumed] Active worktree: "feat" at /repo/.qwen/worktrees/feat ' +
+      '[Resumed] Active worktree: "feat" at /repo/.hopcode/worktrees/feat ' +
       '(branch: worktree-feat). Continue using this path for all file operations.';
     session.pendingWorktreeNotice = notice;
 

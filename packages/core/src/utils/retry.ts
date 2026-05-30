@@ -202,7 +202,7 @@ export async function retryWithBackoff<T>(
         isHopCodeQuotaExceededError(error)
       ) {
         throw new Error(
-          `Qwen OAuth free tier has been discontinued as of 2026-04-15.\n\n` +
+          `HopCode OAuth free tier has been discontinued as of 2026-04-15.\n\n` +
             `To continue using HopCode, try one of these alternatives:\n` +
             `  - OpenRouter:    https://openrouter.ai/docs/quickstart\n` +
             `  - Fireworks AI:  https://docs.fireworks.ai/api-reference/introduction\n` +

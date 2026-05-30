@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +13,7 @@ import {
 /**
  * Stage 1 daemon mode shape.
  *
- * `http-bridge` (Stage 1): per #3803 §02, one `qwen --acp` child per
+ * `http-bridge` (Stage 1): per #3803 §02, one `hopcode --acp` child per
  *   daemon (the daemon binds to ONE workspace at boot). Multiple
  *   sessions multiplex onto that child via the agent's native
  *   `connection.newSession()` (see `acp-integration/acpAgent.ts:194`),

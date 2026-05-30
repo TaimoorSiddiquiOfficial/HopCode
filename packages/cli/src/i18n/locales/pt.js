@@ -82,7 +82,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'Qwen Code': 'Qwen Code',
+  'HopCode': 'HopCode',
   OS: 'SO',
   Auth: 'Autenticação',
   Model: 'Modelo',
@@ -340,8 +340,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': 'Ver e editar configurações do HopCode',
   Settings: 'Configurações',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    'Para ver as alterações, o Qwen Code deve ser reiniciado. Pressione r para sair e aplicar as alterações agora.',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    'Para ver as alterações, o HopCode deve ser reiniciado. Pressione r para sair e aplicar as alterações agora.',
   // ============================================================================
   // Settings Labels
   // ============================================================================
@@ -453,8 +453,8 @@ export default {
   remote: 'remoto',
   'This extension will add the following commands: {{commands}}.':
     'Esta extensão adicionará os seguintes comandos: {{commands}}.',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    'Esta extensão anexará informações ao seu contexto QWEN.md usando {{fileName}}',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    'Esta extensão anexará informações ao seu contexto HOPCODE.md usando {{fileName}}',
   'This extension will install the following skills:':
     'Esta extensão instalará as seguintes habilidades:',
   'This extension will install the following subagents:':
@@ -1011,8 +1011,8 @@ export default {
   servers: 'servidores',
   'Add MCP servers to your settings to get started.':
     'Adicione MCP servers às suas configurações para começar.',
-  'Run qwen --debug to see error logs':
-    'Execute qwen --debug para ver os logs de erro',
+  'Run hopcode --debug to see error logs':
+    'Execute hopcode --debug para ver os logs de erro',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'Autenticação OAuth',
@@ -1101,12 +1101,12 @@ export default {
   'HopCode OAuth': 'HopCode OAuth',
   'Discontinued — switch to Coding Plan or API Key':
     'Descontinuado — mude para Coding Plan ou API Key',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Selecione Coding Plan ou API Key.',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Por favor, selecione um modelo de outro provedor ou execute /auth para trocar.',
-  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Selecione outra opção.\n',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'O nível gratuito do HopCode OAuth foi descontinuado em 2026-04-15. Selecione Coding Plan ou API Key.',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'O nível gratuito do HopCode OAuth foi descontinuado em 2026-04-15. Por favor, selecione um modelo de outro provedor ou execute /auth para trocar.',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ O nível gratuito do HopCode OAuth foi descontinuado em 2026-04-15. Selecione outra opção.\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     'Pago \u00B7 Até 6.000 solicitações/5 hrs \u00B7 Todos os modelos Alibaba Cloud Coding Plan',
   'Alibaba Cloud Coding Plan': 'Alibaba Cloud Coding Plan',
@@ -1115,18 +1115,18 @@ export default {
     'Autenticação baseada em navegador com provedores terceiros (por exemplo, OpenRouter, ModelScope)',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     'A autenticação é forçada para {{enforcedType}}, mas você está usando {{currentType}} no momento.',
-  'Qwen OAuth Authentication': 'Autenticação Qwen OAuth',
+  'HopCode OAuth Authentication': 'Autenticação HopCode OAuth',
   'Please visit this URL to authorize:': 'Visite esta URL para autorizar:',
   'Waiting for authorization': 'Aguardando autorização',
   'Time remaining:': 'Tempo restante:',
-  'Qwen OAuth Authentication Timeout':
-    'Tempo Limite de Autenticação Qwen OAuth',
+  'HopCode OAuth Authentication Timeout':
+    'Tempo Limite de Autenticação HopCode OAuth',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'Token OAuth expirado (mais de {{seconds}} segundos). Selecione o método de autenticação novamente.',
   'Press any key to return to authentication type selection.':
     'Pressione qualquer tecla para retornar à seleção do tipo de autenticação.',
-  'Waiting for Qwen OAuth authentication...':
-    'Aguardando autenticação Qwen OAuth...',
+  'Waiting for HopCode OAuth authentication...':
+    'Aguardando autenticação HopCode OAuth...',
   'Authentication timed out. Please try again.':
     'A autenticação expirou. Tente novamente.',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -1672,7 +1672,7 @@ export default {
     '↑/↓: Navegar | ←/→: Alternar abas | Enter: Selecionar',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: Navegar | Enter: Selecionar | Esc: Cancelar',
-  'Authenticate using Qwen OAuth': 'Autenticar usando Qwen OAuth',
+  'Authenticate using HopCode OAuth': 'Autenticar usando HopCode OAuth',
   'Authenticate using Alibaba Cloud Coding Plan':
     'Autenticar usando Alibaba Cloud Coding Plan',
   'Region for Coding Plan (china/global)':
@@ -1704,8 +1704,8 @@ export default {
     '⚠️  Nenhum método de autenticação configurado.\n',
   'Run one of the following commands to get started:\n':
     'Execute um dos seguintes comandos para começar:\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - Autenticar com Qwen OAuth (descontinuado)',
+  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  hopcode auth hopcode-oauth     - Autenticar com HopCode OAuth (descontinuado)',
   'Or simply run:': 'Ou simplesmente execute:',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - Configuração interativa de autenticação\n',
@@ -1714,8 +1714,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipo: Nível gratuito (descontinuado 2026-04-15)',
   '  Limit: No longer available': '  Limite: Não mais disponível',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'O nível gratuito do Qwen OAuth foi descontinuado em 2026-04-15. Execute /auth para mudar para Coding Plan, OpenRouter, Fireworks AI ou outro provedor.',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'O nível gratuito do HopCode OAuth foi descontinuado em 2026-04-15. Execute /auth para mudar para Coding Plan, OpenRouter, Fireworks AI ou outro provedor.',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ Método de autenticação: Alibaba Cloud Coding Plan',
   'Global - Alibaba Cloud': 'Global - Alibaba Cloud',
@@ -1727,8 +1727,8 @@ export default {
     '⚠️  Método de autenticação: Alibaba Cloud Coding Plan (Incompleto)',
   '  Issue: API key not found in environment or settings\n':
     '  Problema: API Key não encontrada no ambiente ou configurações\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  Execute `qwen auth coding-plan` para reconfigurar.\n',
+  '  Run `hopcode auth coding-plan` to re-configure.\n':
+    '  Execute `hopcode auth coding-plan` para reconfigurar.\n',
   '✓ Authentication Method: {{type}}': '✓ Método de autenticação: {{type}}',
   '  Status: Configured\n': '  Status: Configurado\n',
   'Failed to check authentication status: {{error}}':

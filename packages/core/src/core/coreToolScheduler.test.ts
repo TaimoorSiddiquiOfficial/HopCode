@@ -5478,7 +5478,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       (r) => r.name === 'tool.mockEditTool',
     );
     expect(
-      toolSpan?.spanAttributes['qwen-code.tool.modify_with_editor_unavailable'],
+      toolSpan?.spanAttributes['hopcode.tool.modify_with_editor_unavailable'],
     ).toBe(true);
     // Span stays open — user can recover via Cancel/Proceed.
     expect(toolSpan?.ended).toBe(false);

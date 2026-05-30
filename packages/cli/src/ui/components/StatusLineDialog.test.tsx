@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +18,7 @@ import { MessageType, StreamingState } from '../types.js';
 import { StatusLineDialog } from './StatusLineDialog.js';
 
 function createSettings(): LoadedSettings {
-  const dir = mkdtempSync(path.join(tmpdir(), 'qwen-statusline-'));
+  const dir = mkdtempSync(path.join(tmpdir(), 'hopcode-statusline-'));
   return new LoadedSettings(
     {
       settings: {},

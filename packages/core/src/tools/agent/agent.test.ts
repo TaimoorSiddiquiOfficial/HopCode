@@ -148,7 +148,7 @@ describe('AgentTool', () => {
       getToolRegistry: vi.fn().mockReturnValue(stubToolRegistry),
       createToolRegistry: vi.fn().mockResolvedValue(stubToolRegistry),
       storage: {
-        getProjectDir: vi.fn().mockReturnValue('/test/project/.qwen'),
+        getProjectDir: vi.fn().mockReturnValue('/test/project/.hopcode'),
       },
     } as unknown as Config;
 
@@ -365,7 +365,7 @@ describe('AgentTool', () => {
       const os = await import('node:os');
       const { execFileSync } = await import('node:child_process');
       const repo = await fs.mkdtemp(
-        pathMod.join(os.tmpdir(), 'qwen-iso-dirty-'),
+        pathMod.join(os.tmpdir(), 'hopcode-iso-dirty-'),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -406,7 +406,7 @@ describe('AgentTool', () => {
       const os = await import('node:os');
       const { execFileSync } = await import('node:child_process');
       const repo = await fs.mkdtemp(
-        pathMod.join(os.tmpdir(), 'qwen-iso-clean-'),
+        pathMod.join(os.tmpdir(), 'hopcode-iso-clean-'),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });

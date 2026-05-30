@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +45,7 @@ const NONSECRET_ENV_VARS = [
   'LANG',
   'LC_ALL',
   'TERM',
-  'QWEN_CLI_ENTRY',
+  'HOPCODE_CLI_ENTRY',
 ] as const;
 
 const PROXY_VARS = [

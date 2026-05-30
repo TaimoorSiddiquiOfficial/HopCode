@@ -1879,7 +1879,7 @@ describe('useGeminiStream', () => {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
         getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'qwen-main'),
+        getModel: vi.fn(() => 'hopcode-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -1928,7 +1928,7 @@ describe('useGeminiStream', () => {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
         getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'qwen-main'),
+        getModel: vi.fn(() => 'hopcode-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -2031,7 +2031,7 @@ describe('useGeminiStream', () => {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
         getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'qwen-main'),
+        getModel: vi.fn(() => 'hopcode-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;

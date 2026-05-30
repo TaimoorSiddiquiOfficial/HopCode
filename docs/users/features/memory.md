@@ -44,7 +44,7 @@ Use it for **project-specific but personal** instructions — things that belong
 
 It loads **after** the shared project `HOPCODE.md`, so your local instructions can supplement or override the team's.
 
-**You must gitignore it yourself.** Although `.hopcode/` is often treated as a local directory, qwen-code does not generate a `.gitignore` for you, and some projects commit `.hopcode/settings.json`. Add this line to your `.gitignore` (or to your global git ignore):
+**You must gitignore it yourself.** Although `.hopcode/` is often treated as a local directory, hopcode does not generate a `.gitignore` for you, and some projects commit `.hopcode/settings.json`. Add this line to your `.gitignore` (or to your global git ignore):
 
 ```
 .hopcode/HOPCODE.local.md

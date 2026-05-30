@@ -53,7 +53,7 @@ export function bootstrapHomeEnv() {
   if (process.env.HOPCODE_HOME && process.env.HOPCODE_RUNTIME_DIR) {
     return;
   }
-  const initialHopcodeHome = process.env.HOPCODE_HOME ?? process.env.QWEN_HOME;
+  const initialHopcodeHome = process.env.HOPCODE_HOME ?? process.env.HOPCODE_HOME;
   const initialHopcodeDir = initialHopcodeHome
     ? resolvePath(initialHopcodeHome)
     : path.join(os.homedir(), '.hopcode');
@@ -86,7 +86,7 @@ function readEnvInto(file) {
     for (const key of [
       'HOPCODE_HOME',
       'HOPCODE_RUNTIME_DIR',
-      'QWEN_HOME',
+      'HOPCODE_HOME',
       'QWEN_RUNTIME_DIR',
     ]) {
       if (parsed[key] && !Object.hasOwn(process.env, key)) {

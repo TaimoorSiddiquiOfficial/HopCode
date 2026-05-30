@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -153,7 +153,7 @@ const EXPECTED_REGISTERED_FEATURES = [
 interface FakeBridgeOpts {
   /**
    * #4282 fold-in 1 (gpt-5.5 C2): tests that exercise workspace
-   * mutation routes with `X-Qwen-Client-Id` set need the fakeBridge
+   * mutation routes with `X-HopCode-Client-Id` set need the fakeBridge
    * to advertise those ids as "known", or the new client-id
    * validator returns 400. Defaults to an empty set.
    */
@@ -1071,12 +1071,12 @@ describe('createServeApp', () => {
         v: 1,
         workspaceCwd: WS_BOUND,
         initialized: true,
-        current: { authType: 'qwen', modelId: 'qwen3(qwen)' },
+        current: { authType: 'hopcode', modelId: 'qwen3(qwen)' },
         providers: [
           {
             kind: 'model_provider',
             status: 'ok',
-            authType: 'qwen',
+            authType: 'hopcode',
             current: true,
             models: [
               {
@@ -1523,7 +1523,7 @@ describe('createServeApp', () => {
       }
     });
 
-    it('forwards X-Qwen-Client-Id to the bridge on create/attach', async () => {
+    it('forwards X-HopCode-Client-Id to the bridge on create/attach', async () => {
       const bridge = fakeBridge({
         spawnImpl: async (req) => ({
           sessionId: 'fake-identity',
@@ -1536,7 +1536,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-existing')
+        .set('X-HopCode-Client-Id', 'client-existing')
         .send({ cwd: '/work/a' });
       expect(res.status).toBe(200);
       expect(res.body.clientId).toBe('client-existing');
@@ -1551,7 +1551,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'bad client id')
+        .set('X-HopCode-Client-Id', 'bad client id')
         .send({ cwd: '/work/a' });
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({ code: 'invalid_client_id' });
@@ -1695,7 +1695,7 @@ describe('createServeApp', () => {
         const res = await request(app)
           .post(`/session/persisted-1/${action}`)
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({});
         expect(res.status).toBe(200);
         const calls = action === 'load' ? bridge.loadCalls : bridge.resumeCalls;
@@ -1888,7 +1888,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/prompt')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ prompt: [{ type: 'text', text: 'hi' }] });
       expect(res.status).toBe(200);
       expect(bridge.promptCalls[0]?.context).toEqual({
@@ -1906,7 +1906,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/prompt')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-unknown')
+        .set('X-HopCode-Client-Id', 'client-unknown')
         .send({ prompt: [{ type: 'text', text: 'hi' }] });
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
@@ -2163,7 +2163,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/model')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ modelId: 'qwen3-coder' });
       expect(res.status).toBe(200);
       expect(bridge.setModelCalls[0]?.context).toEqual({
@@ -2224,7 +2224,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/approval-mode')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .send({ mode: 'yolo' });
+        .send({ mode: 'izn' });
       expect(res.status).toBe(401);
       expect(res.body.code).toBe('token_required');
       expect(bridge.setApprovalModeCalls).toHaveLength(0);
@@ -2235,18 +2235,18 @@ describe('createServeApp', () => {
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(
         request(app).post('/session/session-A/approval-mode'),
-      ).send({ mode: 'yolo' });
+      ).send({ mode: 'izn' });
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
         sessionId: 'session-A',
-        mode: 'yolo',
+        mode: 'izn',
         previous: 'default',
         persisted: false,
       });
       expect(bridge.setApprovalModeCalls).toHaveLength(1);
       expect(bridge.setApprovalModeCalls[0]).toMatchObject({
         sessionId: 'session-A',
-        mode: 'yolo',
+        mode: 'izn',
         opts: { persist: false },
       });
     });
@@ -2268,7 +2268,7 @@ describe('createServeApp', () => {
       const res = await auth(
         request(app).post('/session/session-A/approval-mode'),
       )
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ mode: 'plan' });
       expect(res.status).toBe(200);
       expect(bridge.setApprovalModeCalls[0]?.context).toEqual({
@@ -2304,7 +2304,7 @@ describe('createServeApp', () => {
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(
         request(app).post('/session/session-A/approval-mode'),
-      ).send({ mode: 'yolo', persist: 'truthy' });
+      ).send({ mode: 'izn', persist: 'truthy' });
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_persist_flag');
       expect(bridge.setApprovalModeCalls).toHaveLength(0);
@@ -2321,7 +2321,7 @@ describe('createServeApp', () => {
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(
         request(app).post('/session/session-A/approval-mode'),
-      ).send({ mode: 'yolo' });
+      ).send({ mode: 'izn' });
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 'trust_gate',
@@ -2338,7 +2338,7 @@ describe('createServeApp', () => {
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(
         request(app).post('/session/missing/approval-mode'),
-      ).send({ mode: 'yolo' });
+      ).send({ mode: 'izn' });
       expect(res.status).toBe(404);
       expect(res.body.sessionId).toBe('missing');
     });
@@ -2393,25 +2393,25 @@ describe('createServeApp', () => {
 
     it('passes client identity into the bridge', async () => {
       // #4282 fold-in 1 (gpt-5.5 C2): the workspace mutation route
-      // validates `X-Qwen-Client-Id` against `bridge.knownClientIds()`.
+      // validates `X-HopCode-Client-Id` against `bridge.knownClientIds()`.
       // Register `client-1` so the validation succeeds and the
       // originator stamp lands on the bridge call.
       const bridge = fakeBridge({ knownClientIds: ['client-1'] });
       const app = createServeApp(tokenOpts, undefined, { bridge });
       await auth(request(app).post('/workspace/init'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({});
       expect(bridge.initWorkspaceCalls[0]?.originatorClientId).toBe('client-1');
     });
 
-    it('400 invalid_client_id when X-Qwen-Client-Id is not in knownClientIds', async () => {
+    it('400 invalid_client_id when X-HopCode-Client-Id is not in knownClientIds', async () => {
       // #4282 fold-in 1 (gpt-5.5 C2): the validator rejects forged
       // headers with a structured 400 instead of stamping the
       // originator on the SSE event.
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/workspace/init'))
-        .set('X-Qwen-Client-Id', 'forged-client')
+        .set('X-HopCode-Client-Id', 'forged-client')
         .send({});
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
@@ -2510,18 +2510,18 @@ describe('createServeApp', () => {
       const bridge = fakeBridge({ knownClientIds: ['client-1'] });
       const app = createServeApp(tokenOpts, undefined, { bridge });
       await auth(request(app).post('/workspace/mcp/docs/restart'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({});
       expect(bridge.restartMcpServerCalls[0]?.originatorClientId).toBe(
         'client-1',
       );
     });
 
-    it('400 invalid_client_id on unknown X-Qwen-Client-Id', async () => {
+    it('400 invalid_client_id on unknown X-HopCode-Client-Id', async () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/workspace/mcp/docs/restart'))
-        .set('X-Qwen-Client-Id', 'forged-client')
+        .set('X-HopCode-Client-Id', 'forged-client')
         .send({});
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
@@ -2623,18 +2623,18 @@ describe('createServeApp', () => {
       const bridge = fakeBridge({ knownClientIds: ['client-1'] });
       const app = createServeApp(tokenOpts, undefined, { bridge });
       await auth(request(app).post('/workspace/tools/Bash/enable'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ enabled: false });
       expect(bridge.setToolEnabledCalls[0]?.originatorClientId).toBe(
         'client-1',
       );
     });
 
-    it('400 invalid_client_id on unknown X-Qwen-Client-Id', async () => {
+    it('400 invalid_client_id on unknown X-HopCode-Client-Id', async () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/workspace/tools/Bash/enable'))
-        .set('X-Qwen-Client-Id', 'forged-client')
+        .set('X-HopCode-Client-Id', 'forged-client')
         .send({ enabled: false });
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
@@ -2730,7 +2730,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/permission/req-1')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ outcome: { outcome: 'cancelled' } });
       expect(res.status).toBe(200);
       expect(bridge.sessionPermissionVotes[0]?.context).toEqual({
@@ -2848,7 +2848,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/permission/req-1')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ outcome: { outcome: 'selected', optionId: 'allow' } });
       expect(res.status).toBe(200);
       expect(bridge.permissionVotes[0]?.context).toEqual({
@@ -2866,7 +2866,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/permission/req-1')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-unknown')
+        .set('X-HopCode-Client-Id', 'client-unknown')
         .send({ outcome: { outcome: 'selected', optionId: 'allow' } });
 
       expect(res.status).toBe(400);
@@ -2988,7 +2988,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/cancel')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1');
+        .set('X-HopCode-Client-Id', 'client-1');
       expect(res.status).toBe(204);
       expect(bridge.cancelCalls[0]?.context).toEqual({
         clientId: 'client-1',
@@ -3038,7 +3038,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .delete('/session/session-A')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1');
+        .set('X-HopCode-Client-Id', 'client-1');
       expect(res.status).toBe(204);
       expect(bridge.closeCalls[0]?.context).toEqual({
         clientId: 'client-1',
@@ -3069,7 +3069,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .delete('/session/session-A')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'bad-client');
+        .set('X-HopCode-Client-Id', 'bad-client');
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_client_id');
     });
@@ -3101,7 +3101,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .patch('/session/session-A/metadata')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ displayName: 'test' });
       expect(res.status).toBe(200);
       expect(bridge.updateMetadataCalls[0]?.context).toEqual({
@@ -3176,7 +3176,7 @@ describe('createServeApp', () => {
       expect(bridge.heartbeatCalls).toEqual([{ sessionId: 'session-A' }]);
     });
 
-    it('forwards X-Qwen-Client-Id into the bridge context and echoes it back', async () => {
+    it('forwards X-HopCode-Client-Id into the bridge context and echoes it back', async () => {
       const bridge = fakeBridge({
         heartbeatImpl: (sessionId, context) => ({
           sessionId,
@@ -3190,7 +3190,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/heartbeat')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1');
+        .set('X-HopCode-Client-Id', 'client-1');
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
         sessionId: 'session-A',
@@ -3208,7 +3208,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/heartbeat')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'bad client id');
+        .set('X-HopCode-Client-Id', 'bad client id');
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({ code: 'invalid_client_id' });
       expect(bridge.heartbeatCalls).toHaveLength(0);
@@ -3224,7 +3224,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/heartbeat')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-unknown');
+        .set('X-HopCode-Client-Id', 'client-unknown');
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 'invalid_client_id',
@@ -3844,7 +3844,7 @@ describe('runHopCodeServe', () => {
     const captured: BridgeEvent[] = [];
     const bridge = fakeBridge();
     const wsRoot = await fsp.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-runqwen-fs-'),
+      path.join(os.tmpdir(), 'hopcode-run-fs-'),
     );
     await fsp.writeFile(path.join(wsRoot, 'a.txt'), 'hello');
     try {
@@ -3957,7 +3957,7 @@ describe('runHopCodeServe', () => {
     // for review.
     const bridge = fakeBridge();
     const wsRoot = await fsp.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-runqwen-trust-'),
+      path.join(os.tmpdir(), 'hopcode-runqwen-trust-'),
     );
     try {
       const captured: BridgeEvent[] = [];
@@ -4000,7 +4000,7 @@ describe('runHopCodeServe', () => {
     // `assertTrustedForIntent` rejects writes with
     // `untrusted_workspace` — exactly what PR 20 will rely on.
     const wsRoot = await fsp.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-runqwen-untrust-'),
+      path.join(os.tmpdir(), 'hopcode-runqwen-untrust-'),
     );
     try {
       // Mirror runHopCodeServe's construction. If `runHopCodeServe`
@@ -4653,7 +4653,7 @@ describe('createServeApp ServeAppDeps.fsFactory wiring (#4175 PR 18)', () => {
     const { isFsError } = await import('./fs/index.js');
     const os = await import('node:os');
     const tmp = await import('node:fs').then((m) =>
-      m.promises.mkdtemp(path.join(os.tmpdir(), 'qwen-serve-default-trust-')),
+      m.promises.mkdtemp(path.join(os.tmpdir(), 'hopcode-serve-default-trust-')),
     );
     try {
       const app = createServeApp(
@@ -4705,7 +4705,7 @@ describe('auth device-flow routes', () => {
     let starts = 0;
     return {
       provider: {
-        providerId: 'qwen-oauth' as const,
+        providerId: 'hopcode-oauth' as const,
         async start() {
           starts += 1;
           return {
@@ -4752,9 +4752,9 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(res.status).toBe(201);
-    expect(res.body.providerId).toBe('qwen-oauth');
+    expect(res.body.providerId).toBe('hopcode-oauth');
     expect(res.body.userCode).toBe('USER-1');
     expect(res.body.attached).toBe(false);
     expect(typeof res.body.deviceFlowId).toBe('string');
@@ -4770,7 +4770,7 @@ describe('auth device-flow routes', () => {
     const res = await request(app)
       .post('/workspace/auth/device-flow')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(res.status).toBe(401);
     expect(res.body.code).toBe('token_required');
   });
@@ -4784,7 +4784,7 @@ describe('auth device-flow routes', () => {
       .send({ providerId: 'totally-fake' });
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('unsupported_provider');
-    expect(res.body.supportedProviders).toContain('qwen-oauth');
+    expect(res.body.supportedProviders).toContain('hopcode-oauth');
   });
 
   it('POST is idempotent take-over for the same providerId — second POST returns 200 + attached:true', async () => {
@@ -4793,13 +4793,13 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(first.status).toBe(201);
     const second = await request(app)
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(second.status).toBe(200);
     expect(second.body.attached).toBe(true);
     expect(second.body.deviceFlowId).toBe(first.body.deviceFlowId);
@@ -4823,8 +4823,8 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'sdk-A')
-      .send({ providerId: 'qwen-oauth' });
+      .set('X-HopCode-Client-Id', 'sdk-A')
+      .send({ providerId: 'hopcode-oauth' });
     expect(first.status).toBe(201);
     // Fresh starter MUST see the verification material — they ARE
     // the initiator.
@@ -4837,8 +4837,8 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'sdk-B')
-      .send({ providerId: 'qwen-oauth' });
+      .set('X-HopCode-Client-Id', 'sdk-B')
+      .send({ providerId: 'hopcode-oauth' });
     expect(takeoverDifferent.status).toBe(200);
     expect(takeoverDifferent.body.attached).toBe(true);
     expect(takeoverDifferent.body.deviceFlowId).toBe(first.body.deviceFlowId);
@@ -4855,7 +4855,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(takeoverAnon.status).toBe(200);
     expect(takeoverAnon.body.attached).toBe(true);
     expect(takeoverAnon.body).not.toHaveProperty('userCode');
@@ -4865,8 +4865,8 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'sdk-A')
-      .send({ providerId: 'qwen-oauth' });
+      .set('X-HopCode-Client-Id', 'sdk-A')
+      .send({ providerId: 'hopcode-oauth' });
     expect(takeoverSame.status).toBe(200);
     expect(takeoverSame.body.attached).toBe(true);
     expect(takeoverSame.body.userCode).toBe('USER-1');
@@ -4884,7 +4884,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(first.status).toBe(201);
     expect(first.body.userCode).toBe('USER-1');
 
@@ -4892,7 +4892,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(reattach.status).toBe(200);
     expect(reattach.body.attached).toBe(true);
     expect(reattach.body.deviceFlowId).toBe(first.body.deviceFlowId);
@@ -4910,7 +4910,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     const id = post.body.deviceFlowId as string;
     const ok = await request(app)
       .get(`/workspace/auth/device-flow/${id}`)
@@ -4934,7 +4934,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     const id = post.body.deviceFlowId as string;
     const first = await request(app)
       .delete(`/workspace/auth/device-flow/${id}`)
@@ -4960,7 +4960,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     const id = start.body.deviceFlowId as string;
     const status = await request(app)
       .get('/workspace/auth/status')
@@ -4968,7 +4968,7 @@ describe('auth device-flow routes', () => {
       .set('Host', `127.0.0.1:${baseOpts.port}`);
     expect(status.status).toBe(200);
     expect(status.body.v).toBe(1);
-    expect(status.body.supportedDeviceFlowProviders).toContain('qwen-oauth');
+    expect(status.body.supportedDeviceFlowProviders).toContain('hopcode-oauth');
     expect(status.body.pendingDeviceFlows).toHaveLength(1);
     expect(status.body.pendingDeviceFlows[0].deviceFlowId).toBe(id);
     // Status payload MUST NOT echo userCode/verificationUri.
@@ -4994,7 +4994,7 @@ describe('auth device-flow routes', () => {
     // provider whose start always throws.
     const { UpstreamDeviceFlowError } = await import('./auth/deviceFlow.js');
     const failingProvider: import('./auth/deviceFlow.js').DeviceFlowProvider = {
-      providerId: 'qwen-oauth',
+      providerId: 'hopcode-oauth',
       async start() {
         throw new UpstreamDeviceFlowError('mocked upstream outage');
       },
@@ -5011,7 +5011,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(res.status).toBe(502);
     expect(res.body.code).toBe('upstream_error');
     expect(res.body.error).toContain('mocked upstream outage');
@@ -5024,7 +5024,7 @@ describe('auth device-flow routes', () => {
       './auth/deviceFlow.js'
     );
     const fakeProvider: import('./auth/deviceFlow.js').DeviceFlowProvider = {
-      providerId: 'qwen-oauth',
+      providerId: 'hopcode-oauth',
       async start() {
         return {
           deviceCode: brandSecret('device-1'),
@@ -5044,7 +5044,7 @@ describe('auth device-flow routes', () => {
     const intervalsRegistered: Array<{ cb: () => void }> = [];
     const registry = new DeviceFlowRegistry({
       events: { publish: () => {} },
-      resolveProvider: (id) => (id === 'qwen-oauth' ? fakeProvider : undefined),
+      resolveProvider: (id) => (id === 'hopcode-oauth' ? fakeProvider : undefined),
       now: () => now,
       // Run polls forever-deferred; sweeper interval is what we drive.
       schedule: (_ms, _cb) => ({ cancelled: false }) as never,
@@ -5067,7 +5067,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(startRes.status).toBe(201);
     const id = startRes.body.deviceFlowId as string;
 
@@ -5146,7 +5146,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     expect(res.status).toBe(409);
     expect(res.body.code).toBe('too_many_active_flows');
   });
@@ -5194,8 +5194,8 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'sdk-A')
-      .send({ providerId: 'qwen-oauth' });
+      .set('X-HopCode-Client-Id', 'sdk-A')
+      .send({ providerId: 'hopcode-oauth' });
     const id = post.body.deviceFlowId as string;
     expect(typeof id).toBe('string');
 
@@ -5203,7 +5203,7 @@ describe('auth device-flow routes', () => {
       .get(`/workspace/auth/device-flow/${id}`)
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'sdk-A');
+      .set('X-HopCode-Client-Id', 'sdk-A');
     expect(matchingCaller.status).toBe(200);
     expect(matchingCaller.body.deviceFlowId).toBe(id);
     expect(matchingCaller.body.userCode).toBe('USER-1');
@@ -5227,7 +5227,7 @@ describe('auth device-flow routes', () => {
       .get(`/workspace/auth/device-flow/${id}`)
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'sdk-B');
+      .set('X-HopCode-Client-Id', 'sdk-B');
     expect(differentCaller.status).toBe(200);
     expect(differentCaller.body.deviceFlowId).toBe(id);
     expect(differentCaller.body).not.toHaveProperty('userCode');
@@ -5236,8 +5236,8 @@ describe('auth device-flow routes', () => {
     expect(differentCaller.body).not.toHaveProperty('initiatorClientId');
   });
 
-  it('GET /workspace/auth/device-flow/:id returns 400 invalid_client_id when X-Qwen-Client-Id is malformed (qwen-latest review N3)', async () => {
-    // PR #4291 follow-up review (qwen-latest, N3): the GET handler's
+  it('GET /workspace/auth/device-flow/:id returns 400 invalid_client_id when X-HopCode-Client-Id is malformed (hopcode-latest review N3)', async () => {
+    // PR #4291 follow-up review (hopcode-latest, N3): the GET handler's
     // strict-clientId behavior — added in this PR to drive the
     // `callerIsInitiator` gate — was documented in JSDoc but not
     // pinned in CI. A future refactor that removes or reorders the
@@ -5249,7 +5249,7 @@ describe('auth device-flow routes', () => {
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     const id = post.body.deviceFlowId as string;
 
     // Over-length: 129 chars.
@@ -5258,7 +5258,7 @@ describe('auth device-flow routes', () => {
       .get(`/workspace/auth/device-flow/${id}`)
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', tooLong);
+      .set('X-HopCode-Client-Id', tooLong);
     expect(tooLongRes.status).toBe(400);
     expect(tooLongRes.body.code).toBe('invalid_client_id');
 
@@ -5268,29 +5268,29 @@ describe('auth device-flow routes', () => {
       .get(`/workspace/auth/device-flow/${id}`)
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'has spaces and "quotes"');
+      .set('X-HopCode-Client-Id', 'has spaces and "quotes"');
     expect(badChars.status).toBe(400);
     expect(badChars.body.code).toBe('invalid_client_id');
   });
 
   it('GET /workspace/auth/device-flow/:id returns userCode for an anonymously-started flow when the GET caller is also anonymous', async () => {
-    // PR #4291 follow-up review (qwen-latest, #3): the original
+    // PR #4291 follow-up review (hopcode-latest, #3): the original
     // gate required both `initiatorClientId` AND `callerClientId`
     // to be defined and equal — which silently locked anonymous-
     // started flows out of their own data (the SDK that didn't
-    // pass `X-Qwen-Client-Id` on POST also doesn't pass it on
+    // pass `X-HopCode-Client-Id` on POST also doesn't pass it on
     // GET, but the response body switched from "useful" to
     // "redacted public envelope" with HTTP 200 and no error). Fix:
     // also accept `both undefined` as the same caller. The gate's
     // purpose is to prevent CROSS-client reads, not to lock
     // anonymous flows out of themselves.
     const { app } = buildApp({ token: 'tkn' });
-    // Start anonymously (no X-Qwen-Client-Id header).
+    // Start anonymously (no X-HopCode-Client-Id header).
     const post = await request(app)
       .post('/workspace/auth/device-flow')
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .send({ providerId: 'qwen-oauth' });
+      .send({ providerId: 'hopcode-oauth' });
     const id = post.body.deviceFlowId as string;
     expect(typeof id).toBe('string');
     // Anonymous GET — must still see the verification fields.
@@ -5310,7 +5310,7 @@ describe('auth device-flow routes', () => {
       .get(`/workspace/auth/device-flow/${id}`)
       .set('Authorization', 'Bearer tkn')
       .set('Host', `127.0.0.1:${baseOpts.port}`)
-      .set('X-Qwen-Client-Id', 'sdk-X');
+      .set('X-HopCode-Client-Id', 'sdk-X');
     expect(identified.status).toBe(200);
     expect(identified.body).not.toHaveProperty('userCode');
     expect(identified.body).not.toHaveProperty('verificationUri');

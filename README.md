@@ -1,7 +1,7 @@
 <div align="center">
 
 [![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
-[![License](https://img.shields.io/github/license/QwenLM/qwen-code.svg)](./LICENSE)
+[![License](https://img.shields.io/github/license/QwenLM/hopcode.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
 
@@ -20,9 +20,9 @@
 
 ## 🎉 News
 
-- **2026-04-15**: Qwen OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `hopcode auth` to configure.
+- **2026-04-15**: HopCode OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `hopcode auth` to configure.
 
-- **2026-04-13**: Qwen OAuth free tier policy update: daily quota adjusted to 100 requests/day (from 1,000).
+- **2026-04-13**: HopCode OAuth free tier policy update: daily quota adjusted to 100 requests/day (from 1,000).
 
 - **2026-04-02**: Qwen3.6-Plus is now live! Get an API key from [Alibaba Cloud ModelStudio](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model&url=2840914_2&modelId=qwen3.6-plus) to access it through the OpenAI-compatible API.
 
@@ -125,7 +125,7 @@ HopCode supports the following authentication methods:
 - **API Key (recommended)**: use an API key from Alibaba Cloud Model Studio ([Beijing](https://bailian.console.aliyun.com/) / [intl](https://modelstudio.console.alibabacloud.com/)) or any supported provider (OpenAI, Anthropic, Google GenAI, and other compatible endpoints).
 - **Coding Plan**: subscribe to the Alibaba Cloud Coding Plan ([Beijing](https://bailian.console.aliyun.com/cn-beijing?tab=coding-plan#/efm/coding-plan-index) / [intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) for a fixed monthly fee with higher quotas.
 
-> ⚠️ **Qwen OAuth was discontinued on April 15, 2026.** If you were previously using Qwen OAuth, please switch to one of the methods above. Run `hopcode` and then `/auth` to reconfigure.
+> ⚠️ **HopCode OAuth was discontinued on April 15, 2026.** If you were previously using HopCode OAuth, please switch to one of the methods above. Run `hopcode` and then `/auth` to reconfigure.
 
 #### API Key (recommended)
 
@@ -428,13 +428,13 @@ and adjust it to the context length configured on your local server.
 
 ## Usage
 
-As an open-source terminal agent, you can use Qwen Code in five primary ways:
+As an open-source terminal agent, you can use HopCode in five primary ways:
 
 1. Interactive mode (terminal UI)
 2. Headless mode (scripts, CI)
 3. IDE integration (VS Code, Zed)
 4. SDKs (TypeScript, Python, Java)
-5. Daemon mode — `qwen serve` exposes ACP over HTTP+SSE so multiple clients share one agent (experimental)
+5. Daemon mode — `hopcode serve` exposes ACP over HTTP+SSE so multiple clients share one agent (experimental)
 
 #### Interactive mode
 
@@ -476,19 +476,19 @@ Run HopCode as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custo
 - [HTTP protocol reference](https://hopcode.dev/hopcode-docs/en/developers/hopcode-serve-protocol)
 - [DaemonClient TypeScript quickstart](https://hopcode.dev/hopcode-docs/en/developers/examples/daemon-client-quickstart)
 
-#### Daemon mode (`qwen serve`, experimental)
+#### Daemon mode (`hopcode serve`, experimental)
 
 ```bash
 cd your-project/
-qwen serve
-# → qwen serve listening on http://127.0.0.1:4170 (mode=http-bridge)
+hopcode serve
+# → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge)
 ```
 
-Run Qwen Code as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custom CLIs all share **one** agent session over HTTP+SSE — instead of each spawning their own subprocess. Loopback bind has no auth by default (set `QWEN_SERVER_TOKEN` to enable bearer auth even on loopback); remote binds (`--hostname 0.0.0.0`) **require** a token — boot refuses without one. See:
+Run HopCode as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custom CLIs all share **one** agent session over HTTP+SSE — instead of each spawning their own subprocess. Loopback bind has no auth by default (set `QWEN_SERVER_TOKEN` to enable bearer auth even on loopback); remote binds (`--hostname 0.0.0.0`) **require** a token — boot refuses without one. See:
 
-- [Daemon mode user guide](https://qwenlm.github.io/qwen-code-docs/en/users/qwen-serve)
-- [HTTP protocol reference](https://qwenlm.github.io/qwen-code-docs/en/developers/qwen-serve-protocol)
-- [DaemonClient TypeScript quickstart](https://qwenlm.github.io/qwen-code-docs/en/developers/examples/daemon-client-quickstart)
+- [Daemon mode user guide](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/qwen-serve)
+- [HTTP protocol reference](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/developers/qwen-serve-protocol)
+- [DaemonClient TypeScript quickstart](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/developers/examples/daemon-client-quickstart)
 
 #### SDKs
 
@@ -586,7 +586,7 @@ If you encounter issues, check the [troubleshooting guide](https://hopcode.dev/h
 
 **Common issues:**
 
-- **`Qwen OAuth free tier was discontinued on 2026-04-15`**: Qwen OAuth is no longer available. Run `hopcode` → `/auth` and switch to API Key or Coding Plan. See the [Authentication](#authentication) section above for setup instructions.
+- **`HopCode OAuth free tier was discontinued on 2026-04-15`**: HopCode OAuth is no longer available. Run `hopcode` → `/auth` and switch to API Key or Coding Plan. See the [Authentication](#authentication) section above for setup instructions.
 
 To report a bug from within the CLI, run `/bug` and include a short title and repro steps.
 

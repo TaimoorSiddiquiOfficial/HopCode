@@ -39,7 +39,7 @@ describe('getHeadlessYoloSafetyWarning', () => {
   it('does not warn when a sandbox is configured', () => {
     const cfg = makeConfig(ApprovalMode.YOLO, {
       command: 'docker',
-      image: 'qwen-code-sandbox',
+      image: 'hopcode-sandbox',
     });
     expect(getHeadlessYoloSafetyWarning(cfg, {})).toBeNull();
   });
@@ -52,7 +52,7 @@ describe('getHeadlessYoloSafetyWarning', () => {
     ).toBeNull();
     // Docker / Podman container name
     expect(
-      getHeadlessYoloSafetyWarning(cfg, { SANDBOX: 'qwen-code-sandbox' }),
+      getHeadlessYoloSafetyWarning(cfg, { SANDBOX: 'hopcode-sandbox' }),
     ).toBeNull();
     // Generic truthy values
     expect(getHeadlessYoloSafetyWarning(cfg, { SANDBOX: '1' })).toBeNull();

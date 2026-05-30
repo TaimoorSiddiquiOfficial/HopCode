@@ -393,8 +393,8 @@ export default {
   // ============================================================================
   'View and edit HopCode settings': '查看和编辑 HopCode 设置',
   Settings: '设置',
-  'To see changes, Qwen Code must be restarted. Press r to exit and apply changes now.':
-    '要查看更改，必须重启 Qwen Code。按 r 退出并立即应用更改。',
+  'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
+    '要查看更改，必须重启 HopCode。按 r 退出并立即应用更改。',
   // ============================================================================
   // Settings Labels
   // ============================================================================
@@ -498,8 +498,8 @@ export default {
   remote: '远程',
   'This extension will add the following commands: {{commands}}.':
     '此扩展将添加以下命令：{{commands}}。',
-  'This extension will append info to your QWEN.md context using {{fileName}}':
-    '此扩展将使用 {{fileName}} 向您的 QWEN.md 上下文追加信息',
+  'This extension will append info to your HOPCODE.md context using {{fileName}}':
+    '此扩展将使用 {{fileName}} 向您的 HOPCODE.md 上下文追加信息',
   'This extension will install the following skills:': '此扩展将安装以下技能：',
   'This extension will install the following subagents:':
     '此扩展将安装以下子智能体：',
@@ -928,7 +928,7 @@ export default {
   servers: '个服务器',
   'Add MCP servers to your settings to get started.':
     '请在设置中添加 MCP servers 以开始使用。',
-  'Run qwen --debug to see error logs': '运行 qwen --debug 查看错误日志',
+  'Run hopcode --debug to see error logs': '运行 hopcode --debug 查看错误日志',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth 认证',
@@ -1113,12 +1113,12 @@ export default {
   'HopCode OAuth': 'HopCode OAuth (免费)',
   'Discontinued — switch to Coding Plan or API Key':
     '已停用 — 请切换到 Coding Plan 或 API Key',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
-    'Qwen OAuth 免费额度已于 2026-04-15 停用。请选择 Coding Plan 或 API Key。',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
-    'Qwen OAuth免费层已于2026-04-15停止服务。请选择其他提供商的模型或运行 /auth 切换。',
-  '\n⚠ Qwen OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
-    '\n⚠ Qwen OAuth 免费额度已于 2026-04-15 停用。请选择其他选项。\n',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select Coding Plan or API Key instead.':
+    'HopCode OAuth 免费额度已于 2026-04-15 停用。请选择 Coding Plan 或 API Key。',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.':
+    'HopCode OAuth免费层已于2026-04-15停止服务。请选择其他提供商的模型或运行 /auth 切换。',
+  '\n⚠ HopCode OAuth free tier was discontinued on 2026-04-15. Please select another option.\n':
+    '\n⚠ HopCode OAuth 免费额度已于 2026-04-15 停用。请选择其他选项。\n',
   'Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
     '付费 \u00B7 每 5 小时最多 6,000 次请求 \u00B7 支持阿里云百炼 Coding Plan 全部模型',
   'For teams \u00B7 Paid \u00B7 Up to 6,000 requests/5 hrs \u00B7 All Alibaba Cloud Coding Plan Models':
@@ -1143,16 +1143,16 @@ export default {
     '基于浏览器的第三方提供商认证（例如 OpenRouter、ModelScope）',
   'Authentication is enforced to be {{enforcedType}}, but you are currently using {{currentType}}.':
     '认证方式被强制设置为 {{enforcedType}}，但您当前使用的是 {{currentType}}',
-  'Qwen OAuth Authentication': 'Qwen OAuth 认证',
+  'HopCode OAuth Authentication': 'HopCode OAuth 认证',
   'Please visit this URL to authorize:': '请访问此 URL 进行授权：',
   'Waiting for authorization': '等待授权中',
   'Time remaining:': '剩余时间：',
-  'Qwen OAuth Authentication Timeout': 'Qwen OAuth 认证超时',
+  'HopCode OAuth Authentication Timeout': 'HopCode OAuth 认证超时',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth 令牌已过期（超过 {{seconds}} 秒）。请重新选择认证方法',
   'Press any key to return to authentication type selection.':
     '按任意键返回认证类型选择',
-  'Waiting for Qwen OAuth authentication...': '正在等待 Qwen OAuth 认证...',
+  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 认证...',
   'Authentication timed out. Please try again.': '认证超时。请重试。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待认证...（按 ESC 或 CTRL+C 取消）',
@@ -1602,7 +1602,7 @@ export default {
     '↑/↓: 导航 | ←/→: 切换标签页 | Enter: 选择',
   '↑/↓: Navigate | Enter: Select | Esc: Cancel':
     '↑/↓: 导航 | Enter: 选择 | Esc: 取消',
-  'Authenticate using Qwen OAuth': '使用 Qwen OAuth 进行认证',
+  'Authenticate using HopCode OAuth': '使用 HopCode OAuth 进行认证',
   'Authenticate using Alibaba Cloud Coding Plan':
     '使用阿里云百炼 Coding Plan 进行认证',
   'Region for Coding Plan (china/global)': 'Coding Plan 区域 (china/global)',
@@ -1629,8 +1629,8 @@ export default {
   '⚠️  No authentication method configured.\n': '⚠️  未配置认证方式。\n',
   'Run one of the following commands to get started:\n':
     '运行以下命令之一开始配置：\n',
-  '  qwen auth qwen-oauth     - Authenticate with Qwen OAuth (discontinued)':
-    '  qwen auth qwen-oauth     - 使用 Qwen OAuth 登录（已停用）',
+  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  hopcode auth hopcode-oauth     - 使用 HopCode OAuth 登录（已停用）',
   'Or simply run:': '或者直接运行：',
   '  hopcode auth                - Interactive authentication setup\n':
     '  hopcode auth                - 交互式认证配置\n',
@@ -1638,8 +1638,8 @@ export default {
   '  Type: Free tier (discontinued 2026-04-15)':
     '  类型：免费额度（2026-04-15 已停用）',
   '  Limit: No longer available': '  限额：已不可用',
-  'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
-    'Qwen OAuth 免费额度已于 2026-04-15 停用。请运行 /auth 切换到 Coding Plan、OpenRouter、Fireworks AI 或其他服务商。',
+  'HopCode OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan, OpenRouter, Fireworks AI, or another provider.':
+    'HopCode OAuth 免费额度已于 2026-04-15 停用。请运行 /auth 切换到 Coding Plan、OpenRouter、Fireworks AI 或其他服务商。',
   '✓ Authentication Method: Alibaba Cloud Coding Plan':
     '✓ 认证方式：阿里云百炼 Coding Plan',
   'Global - Alibaba Cloud': '全球 - Alibaba Cloud',
@@ -1651,8 +1651,8 @@ export default {
     '⚠️  认证方式：阿里云百炼 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  问题：在环境变量或设置中未找到 API Key\n',
-  '  Run `qwen auth coding-plan` to re-configure.\n':
-    '  运行 `qwen auth coding-plan` 重新配置。\n',
+  '  Run `hopcode auth coding-plan` to re-configure.\n':
+    '  运行 `hopcode auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 认证方式：{{type}}',
   '  Status: Configured\n': '  状态：已配置\n',
   'Failed to check authentication status: {{error}}':

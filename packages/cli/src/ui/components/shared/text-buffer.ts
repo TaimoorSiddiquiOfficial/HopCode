@@ -2281,7 +2281,7 @@ export function useTextBuffer({
       let tmpDir: string;
       let filePath: string;
       try {
-        tmpDir = fs.mkdtempSync(pathMod.join(os.tmpdir(), 'qwen-edit-'));
+        tmpDir = fs.mkdtempSync(pathMod.join(os.tmpdir(), 'hopcode-edit-'));
         filePath = pathMod.join(tmpDir, 'buffer.txt');
       } catch (err) {
         debugLogger.error(

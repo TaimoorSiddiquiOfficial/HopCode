@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +18,7 @@ import {
 let tmpDir: string;
 
 beforeEach(async () => {
-  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'qwen-runtime-status-'));
+  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'hopcode-runtime-status-'));
 });
 
 afterEach(async () => {

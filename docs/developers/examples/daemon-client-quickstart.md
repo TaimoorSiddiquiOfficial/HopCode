@@ -1,6 +1,6 @@
 # DaemonClient quickstart (TypeScript)
 
-A minimal end-to-end example: start a `qwen serve` daemon in another terminal, then drive it from a Node script with the SDK's `DaemonClient`. See also: [Daemon mode user guide](../../users/qwen-serve.md) and [HTTP protocol reference](../qwen-serve-protocol.md).
+A minimal end-to-end example: start a `hopcode serve` daemon in another terminal, then drive it from a Node script with the SDK's `DaemonClient`. See also: [Daemon mode user guide](../../users/hopcode-serve.md) and [HTTP protocol reference](../hopcode-serve-protocol.md).
 
 ## Setup
 
@@ -8,11 +8,11 @@ In one terminal:
 
 ```bash
 cd your-project/
-qwen serve --port 4170
-# → qwen serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/your-project)
+hopcode serve --port 4170
+# → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/your-project)
 ```
 
-Per [#3803](https://github.com/QwenLM/qwen-code/issues/3803) §02 each daemon binds to one workspace at boot (the current `cwd`, or override with `--workspace /path/to/dir`). The daemon's bound path is advertised on `/capabilities.workspaceCwd` so clients can pre-flight check + omit `cwd` from `POST /session`.
+Per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02 each daemon binds to one workspace at boot (the current `cwd`, or override with `--workspace /path/to/dir`). The daemon's bound path is advertised on `/capabilities.workspaceCwd` so clients can pre-flight check + omit `cwd` from `POST /session`.
 
 In another:
 
@@ -262,6 +262,6 @@ Cancel only winds down the **active** prompt — anything you'd already POSTed a
 
 ## What's next
 
-- [HTTP protocol reference](../qwen-serve-protocol.md) — full route spec with status codes
-- [Daemon mode user guide](../../users/qwen-serve.md) — operator-side docs
+- [HTTP protocol reference](../hopcode-serve-protocol.md) — full route spec with status codes
+- [Daemon mode user guide](../../users/hopcode-serve.md) — operator-side docs
 - Source: `packages/sdk-typescript/src/daemon/`

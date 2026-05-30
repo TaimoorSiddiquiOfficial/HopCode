@@ -12,7 +12,7 @@ pip install hopcode-sdk
 For preview releases, enable pre-release resolution:
 
 ```bash
-pip install --pre qwen-code-sdk
+pip install --pre hopcode-sdk
 ```
 
 ## Requirements
@@ -26,7 +26,7 @@ You can also point the SDK at an explicit CLI binary or script with
 Before using the SDK, verify that the CLI works in the same environment:
 
 ```bash
-qwen --version
+hopcode --version
 ```
 
 ## Quick Start

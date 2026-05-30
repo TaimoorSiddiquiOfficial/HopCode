@@ -91,7 +91,7 @@ async function getGeminiMdFilePathsInternalForEachDir(
 
   for (const geminiMdFilename of geminiMdFilenames) {
     const resolvedHome = path.resolve(userHomePath);
-    const globalQwenDir = Storage.getGlobalQwenDir();
+    const globalQwenDir = Storage.getGlobalHopCodeDir();
     const globalMemoryPath = path.join(globalQwenDir, geminiMdFilename);
 
     // Handle the case where we're in the home directory (dir is empty string or home path)

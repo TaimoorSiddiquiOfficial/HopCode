@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -123,11 +123,11 @@ function buildApp(opts: {
     boundWorkspace: opts.boundWorkspace,
     mutate,
     parseClientId: (req, res) => {
-      const raw = req.get('x-qwen-client-id');
+      const raw = req.get('x-hopcode-client-id');
       if (raw === undefined || raw === '') return undefined;
       if (raw.length > 128 || !/^[A-Za-z0-9._:-]+$/.test(raw)) {
         res.status(400).json({
-          error: '`X-Qwen-Client-Id` must be a non-empty token',
+          error: '`X-HopCode-Client-Id` must be a non-empty token',
           code: 'invalid_client_id',
         });
         return null;
@@ -156,20 +156,20 @@ describe('workspace memory routes', () => {
   let tmp: string;
   let workspace: string;
   let globalDir: string;
-  let getGlobalQwenDirSpy: MockInstance<() => string>;
+  let getGlobalHopCodeDirSpy: MockInstance<() => string>;
 
   beforeEach(async () => {
-    tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-serve-memory-'));
+    tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-serve-memory-'));
     workspace = path.join(tmp, 'workspace');
     globalDir = path.join(tmp, 'global');
     await fs.mkdir(workspace, { recursive: true });
-    getGlobalQwenDirSpy = vi
-      .spyOn(Storage, 'getGlobalQwenDir')
+    getGlobalHopCodeDirSpy = vi
+      .spyOn(Storage, 'getGlobalHopCodeDir')
       .mockReturnValue(globalDir);
   });
 
   afterEach(async () => {
-    getGlobalQwenDirSpy.mockRestore();
+    getGlobalHopCodeDirSpy.mockRestore();
     await fs.rm(tmp, { recursive: true, force: true });
   });
 
@@ -261,7 +261,7 @@ describe('workspace memory routes', () => {
       expect(written).toBe('new\n');
     });
 
-    it('writes to the global ~/.qwen directory when scope=global', async () => {
+    it('writes to the global ~/.hopcode directory when scope=global', async () => {
       const bridge = buildBridgeStub();
       const app = buildApp({ bridge, boundWorkspace: workspace });
       const res = await request(app)
@@ -332,12 +332,12 @@ describe('workspace memory routes', () => {
       expect(res.body.code).toBe('token_required');
     });
 
-    it('rejects 400 invalid_client_id when X-Qwen-Client-Id is unknown', async () => {
+    it('rejects 400 invalid_client_id when X-HopCode-Client-Id is unknown', async () => {
       const bridge = buildBridgeStub({ knownIds: ['client_known'] });
       const app = buildApp({ bridge, boundWorkspace: workspace });
       const res = await request(app)
         .post('/workspace/memory')
-        .set('X-Qwen-Client-Id', 'client_unknown')
+        .set('X-HopCode-Client-Id', 'client_unknown')
         .send({ scope: 'workspace', content: '- x' });
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_client_id');
@@ -440,10 +440,10 @@ describe('workspace memory routes', () => {
     it('returns 500 memory_discovery_failed when GET helper throws unexpectedly', async () => {
       const bridge = buildBridgeStub();
       const app = buildApp({ bridge, boundWorkspace: workspace });
-      // Force the helper to throw by spying on `Storage.getGlobalQwenDir`
+      // Force the helper to throw by spying on `Storage.getGlobalHopCodeDir`
       // — every call site of the discovery walk uses it.
       const failGlobal = vi
-        .spyOn(Storage, 'getGlobalQwenDir')
+        .spyOn(Storage, 'getGlobalHopCodeDir')
         .mockImplementation(() => {
           throw new Error('boom');
         });
@@ -461,7 +461,7 @@ describe('workspace memory routes', () => {
       const app = buildApp({ bridge, boundWorkspace: workspace });
       const res = await request(app)
         .post('/workspace/memory')
-        .set('X-Qwen-Client-Id', 'client_a')
+        .set('X-HopCode-Client-Id', 'client_a')
         .send({ scope: 'workspace', mode: 'append', content: '- x' });
       expect(res.status).toBe(200);
       const events = (bridge as unknown as { events: RecordedEvent[] }).events;

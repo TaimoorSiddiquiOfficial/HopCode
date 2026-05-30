@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -560,7 +560,7 @@ describe('osc8 helpers', () => {
     it('FORCE_HYPERLINK=1 does NOT override non-TTY suppression', () => {
       // A user with `FORCE_HYPERLINK=1` in their shell profile (to enable
       // OSC 8 inside tmux interactively) must still get a clean pipe when
-      // running `qwen | cat` — escape bytes never go into a file/pipe.
+      // running `hopcode | cat` — escape bytes never go into a file/pipe.
       setTTY(false);
       process.env['FORCE_HYPERLINK'] = '1';
       expect(supportsHyperlinks()).toBe(false);

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1101,7 +1101,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'workspace',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/HOPCODE.md',
         mode: 'append',
         bytesWritten: 42,
       },
@@ -1118,7 +1118,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'remote',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/HOPCODE.md',
         mode: 'append',
         bytesWritten: 1,
       },
@@ -1132,7 +1132,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'workspace',
-        filePath: '/work/QWEN.md',
+        filePath: '/work/HOPCODE.md',
         mode: 'append',
       },
     };
@@ -1175,7 +1175,7 @@ describe('daemon event schema', () => {
         type: 'memory_changed',
         data: {
           scope: 'workspace',
-          filePath: '/work/QWEN.md',
+          filePath: '/work/HOPCODE.md',
           mode: 'append',
           bytesWritten: 12,
         },
@@ -1207,7 +1207,7 @@ describe('daemon event schema', () => {
       type: 'memory_changed',
       data: {
         scope: 'global',
-        filePath: '/home/.qwen/QWEN.md',
+        filePath: '/home/.hopcode/HOPCODE.md',
         mode: 'replace',
         bytesWritten: 100,
       },
@@ -1215,7 +1215,7 @@ describe('daemon event schema', () => {
     expect(state.lastWorkspaceMutationType).toBe('memory_changed');
     expect(state.lastWorkspaceMutation).toEqual({
       scope: 'global',
-      filePath: '/home/.qwen/QWEN.md',
+      filePath: '/home/.hopcode/HOPCODE.md',
       mode: 'replace',
       bytesWritten: 100,
     });
@@ -1234,7 +1234,7 @@ describe('PR 21 — auth device-flow events', () => {
     const datas: Record<(typeof types)[number], unknown> = {
       auth_device_flow_started: {
         deviceFlowId: 'flow-1',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 1_700_000_000_000,
       },
       auth_device_flow_throttled: {
@@ -1243,7 +1243,7 @@ describe('PR 21 — auth device-flow events', () => {
       },
       auth_device_flow_authorized: {
         deviceFlowId: 'flow-1',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 1_700_000_900_000,
         accountAlias: 'user-A',
       },
@@ -1275,7 +1275,7 @@ describe('PR 21 — auth device-flow events', () => {
         type: 'auth_device_flow_started',
         data: {
           deviceFlowId: 'x',
-          providerId: 'qwen-oauth' /* missing expiresAt */,
+          providerId: 'hopcode-oauth' /* missing expiresAt */,
         },
       }),
     ).toBeUndefined();
@@ -1313,7 +1313,7 @@ describe('PR 21 — auth device-flow events', () => {
         type: 'auth_device_flow_started',
         data: {
           deviceFlowId: 'flow-A',
-          providerId: 'qwen-oauth',
+          providerId: 'hopcode-oauth',
           expiresAt: 1_700_000_900_000,
         },
       },
@@ -1329,14 +1329,14 @@ describe('PR 21 — auth device-flow events', () => {
         type: 'auth_device_flow_authorized',
         data: {
           deviceFlowId: 'flow-A',
-          providerId: 'qwen-oauth',
+          providerId: 'hopcode-oauth',
           expiresAt: 1_700_000_999_000,
           accountAlias: 'user-A',
         },
       },
     ];
     const state = reduceDaemonAuthEvents(events);
-    const flow = state.flows['qwen-oauth'];
+    const flow = state.flows['hopcode-oauth'];
     expect(flow).toBeDefined();
     expect(flow?.status).toBe('authorized');
     expect(flow?.intervalMs).toBe(10_000);
@@ -1358,7 +1358,7 @@ describe('PR 21 — auth device-flow events', () => {
         type: 'auth_device_flow_started',
         data: {
           deviceFlowId: 'flow-X',
-          providerId: 'qwen-oauth',
+          providerId: 'hopcode-oauth',
           expiresAt: 0,
         },
       }),
@@ -1369,8 +1369,8 @@ describe('PR 21 — auth device-flow events', () => {
         data: { deviceFlowId: 'flow-X', errorKind: 'expired_token' },
       },
     );
-    expect(expired.flows['qwen-oauth']?.status).toBe('error');
-    expect(expired.flows['qwen-oauth']?.errorKind).toBe('expired_token');
+    expect(expired.flows['hopcode-oauth']?.status).toBe('error');
+    expect(expired.flows['hopcode-oauth']?.errorKind).toBe('expired_token');
 
     const denied = reduceDaemonAuthEvent(
       reduceDaemonAuthEvent(createDaemonAuthState(), {
@@ -1379,7 +1379,7 @@ describe('PR 21 — auth device-flow events', () => {
         type: 'auth_device_flow_started',
         data: {
           deviceFlowId: 'flow-Y',
-          providerId: 'qwen-oauth',
+          providerId: 'hopcode-oauth',
           expiresAt: 0,
         },
       }),
@@ -1390,8 +1390,8 @@ describe('PR 21 — auth device-flow events', () => {
         data: { deviceFlowId: 'flow-Y', errorKind: 'access_denied' },
       },
     );
-    expect(denied.flows['qwen-oauth']?.status).toBe('error');
-    expect(denied.flows['qwen-oauth']?.errorKind).toBe('access_denied');
+    expect(denied.flows['hopcode-oauth']?.status).toBe('error');
+    expect(denied.flows['hopcode-oauth']?.errorKind).toBe('access_denied');
 
     // P1-10 cousin: new `persist_failed` errorKind also lands as
     // `status: 'error'`, with the kind preserved.
@@ -1402,7 +1402,7 @@ describe('PR 21 — auth device-flow events', () => {
         type: 'auth_device_flow_started',
         data: {
           deviceFlowId: 'flow-Z',
-          providerId: 'qwen-oauth',
+          providerId: 'hopcode-oauth',
           expiresAt: 0,
         },
       }),
@@ -1413,8 +1413,8 @@ describe('PR 21 — auth device-flow events', () => {
         data: { deviceFlowId: 'flow-Z', errorKind: 'persist_failed' },
       },
     );
-    expect(persistFailed.flows['qwen-oauth']?.status).toBe('error');
-    expect(persistFailed.flows['qwen-oauth']?.errorKind).toBe('persist_failed');
+    expect(persistFailed.flows['hopcode-oauth']?.status).toBe('error');
+    expect(persistFailed.flows['hopcode-oauth']?.errorKind).toBe('persist_failed');
   });
 
   it('reduceDaemonAuthEvent ignores stale events that do not match the current flow', () => {
@@ -1424,7 +1424,7 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_started',
       data: {
         deviceFlowId: 'flow-A',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 100,
       },
     });
@@ -1434,11 +1434,11 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_authorized',
       data: {
         deviceFlowId: 'flow-OTHER',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 200,
       },
     });
-    expect(stale.flows['qwen-oauth']?.status).toBe('pending');
+    expect(stale.flows['hopcode-oauth']?.status).toBe('pending');
   });
 
   it('reduceDaemonAuthEvent rejects out-of-order frames (fold-in 8 #2 monotonicity)', () => {
@@ -1451,7 +1451,7 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_started',
       data: {
         deviceFlowId: 'flow-A',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 1_700_000_900_000,
       },
     });
@@ -1461,12 +1461,12 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_authorized',
       data: {
         deviceFlowId: 'flow-A',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 1_700_001_000_000,
       },
     });
-    expect(state.flows['qwen-oauth']?.status).toBe('authorized');
-    expect(state.flows['qwen-oauth']?.lastSeenEventId).toBe(10);
+    expect(state.flows['hopcode-oauth']?.status).toBe('authorized');
+    expect(state.flows['hopcode-oauth']?.lastSeenEventId).toBe(10);
 
     const replayedStale = reduceDaemonAuthEvent(state, {
       id: 7, // stale: less than the current lastSeenEventId (10)
@@ -1478,9 +1478,9 @@ describe('PR 21 — auth device-flow events', () => {
       },
     });
     // Stale frame must NOT overwrite the authorized terminal.
-    expect(replayedStale.flows['qwen-oauth']?.status).toBe('authorized');
-    expect(replayedStale.flows['qwen-oauth']?.lastSeenEventId).toBe(10);
-    expect(replayedStale.flows['qwen-oauth']?.errorKind).toBeUndefined();
+    expect(replayedStale.flows['hopcode-oauth']?.status).toBe('authorized');
+    expect(replayedStale.flows['hopcode-oauth']?.lastSeenEventId).toBe(10);
+    expect(replayedStale.flows['hopcode-oauth']?.errorKind).toBeUndefined();
 
     // A fresh `started` (id=4 < 10) for a NEW flow under the same
     // providerId is also rejected as stale — the SDK has already
@@ -1492,14 +1492,14 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_started',
       data: {
         deviceFlowId: 'flow-OLD',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 1_700_000_500_000,
       },
     });
-    expect(replayedStartedStale.flows['qwen-oauth']?.deviceFlowId).toBe(
+    expect(replayedStartedStale.flows['hopcode-oauth']?.deviceFlowId).toBe(
       'flow-A',
     );
-    expect(replayedStartedStale.flows['qwen-oauth']?.status).toBe('authorized');
+    expect(replayedStartedStale.flows['hopcode-oauth']?.status).toBe('authorized');
   });
 
   it('reduceDaemonAuthEvent passes synthetic frames (no envelope id) through the gate', () => {
@@ -1512,7 +1512,7 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_started',
       data: {
         deviceFlowId: 'flow-A',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 1_700_000_900_000,
       },
     });
@@ -1522,7 +1522,7 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_cancelled',
       data: { deviceFlowId: 'flow-A' },
     });
-    expect(state.flows['qwen-oauth']?.status).toBe('cancelled');
+    expect(state.flows['hopcode-oauth']?.status).toBe('cancelled');
   });
 
   it('reduceDaemonSessionEvent no-ops on auth events (workspace-scoped)', () => {
@@ -1533,7 +1533,7 @@ describe('PR 21 — auth device-flow events', () => {
       type: 'auth_device_flow_started',
       data: {
         deviceFlowId: 'flow-A',
-        providerId: 'qwen-oauth',
+        providerId: 'hopcode-oauth',
         expiresAt: 1_700_000_900_000,
       },
     });
@@ -1610,7 +1610,7 @@ describe('PR 21 — auth device-flow events', () => {
         id: 8,
         v: 1,
         type: 'workspace_initialized',
-        data: { path: '/work/QWEN.md', action: 'created' },
+        data: { path: '/work/HOPCODE.md', action: 'created' },
       });
       expect(afterCreate.workspaceInitCount).toBe(1);
       expect(afterCreate.lastWorkspaceInit?.action).toBe('created');
@@ -1618,7 +1618,7 @@ describe('PR 21 — auth device-flow events', () => {
         id: 9,
         v: 1,
         type: 'workspace_initialized',
-        data: { path: '/work/QWEN.md', action: 'noop' },
+        data: { path: '/work/HOPCODE.md', action: 'noop' },
       });
       expect(afterNoop.workspaceInitCount).toBe(2);
       expect(afterNoop.lastWorkspaceInit?.action).toBe('noop');
@@ -1627,7 +1627,7 @@ describe('PR 21 — auth device-flow events', () => {
         id: 10,
         v: 1,
         type: 'workspace_initialized',
-        data: { path: '/work/QWEN.md', action: 'replaced' },
+        data: { path: '/work/HOPCODE.md', action: 'replaced' },
       };
       expect(asKnownDaemonEvent(malformed)).toBeUndefined();
     });

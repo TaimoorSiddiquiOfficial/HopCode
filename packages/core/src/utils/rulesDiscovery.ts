@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -320,8 +320,8 @@ export async function loadRules(
 
   const allRules: RuleFile[] = [];
 
-  // 1. Global rules: <QWEN_HOME or ~/.qwen>/rules/
-  const globalRulesDir = path.join(Storage.getGlobalQwenDir(), 'rules');
+  // 1. Global rules: <HOPCODE_HOME or ~/.hopcode>/rules/
+  const globalRulesDir = path.join(Storage.getGlobalHopCodeDir(), 'rules');
   const globalRules = await loadRulesFromDir(globalRulesDir, excludes);
   allRules.push(...globalRules);
   logger.debug(`Loaded ${globalRules.length} global rule(s)`);

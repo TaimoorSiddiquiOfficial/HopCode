@@ -1,6 +1,6 @@
 # Subagents
 
-Subagents are specialized AI assistants that handle specific types of tasks within Qwen Code. They allow you to delegate focused work to AI agents that are configured with task-specific prompts, tools, and behaviors.
+Subagents are specialized AI assistants that handle specific types of tasks within HopCode. They allow you to delegate focused work to AI agents that are configured with task-specific prompts, tools, and behaviors.
 
 ## What are Subagents?
 
@@ -14,7 +14,7 @@ Subagents are independent AI assistants that:
 
 ## Fork Subagent (Implicit Fork)
 
-In addition to named subagents, Qwen Code supports **implicit forking** — when the AI omits the `subagent_type` parameter, it triggers a fork that inherits the parent's full conversation context.
+In addition to named subagents, HopCode supports **implicit forking** — when the AI omits the `subagent_type` parameter, it triggers a fork that inherits the parent's full conversation context.
 
 ### How Fork Differs from Named Subagents
 
@@ -105,8 +105,8 @@ Subagents are managed through the `/agents` slash command and its subcommands:
 
 Subagents are stored as Markdown files in multiple locations:
 
-- **Project-level**: `.qwen/agents/` (highest precedence)
-- **User-level**: `~/.qwen/agents/` (fallback)
+- **Project-level**: `.hopcode/agents/` (highest precedence)
+- **User-level**: `~/.hopcode/agents/` (fallback)
 - **Extension-level**: Provided by installed extensions
 
 This allows you to have project-specific agents, personal agents that work across all projects, and extension-provided agents that add specialized capabilities.
@@ -122,7 +122,7 @@ Extension subagents:
 - Cannot be edited directly (edit the extension source instead)
 - Follow the same configuration format as user-defined agents
 
-To see which extensions provide subagents, check the extension's `qwen-extension.json` file for an `agents` field.
+To see which extensions provide subagents, check the extension's `hopcode-extension.json` file for an `agents` field.
 
 ### File Format
 
@@ -155,7 +155,7 @@ Use the optional `model` frontmatter field to control which model a subagent use
 - Omit the field: Same as `inherit`.
 - `fast`: Use the configured `fastModel`. If no valid fast model is configured,
   the subagent falls back to `inherit`.
-- `glm-5`: Use that model ID. Qwen Code first checks the main conversation's
+- `glm-5`: Use that model ID. HopCode first checks the main conversation's
   auth type; if the model is not available there, it can resolve the model from
   another configured provider.
 - `openai:gpt-4o`: Use an explicit provider and model ID. This is useful when a
@@ -190,7 +190,7 @@ tools:
 The `fast` selector uses the same `fastModel` setting configured in
 `settings.json` or with `/model --fast`. That setting may itself refer to a
 model under another configured auth type, such as `openai:deepseek-v4-flash`.
-When the selector resolves to another auth type, Qwen Code creates a dedicated
+When the selector resolves to another auth type, HopCode creates a dedicated
 runtime provider for that subagent request and sends the provider only the bare
 model ID.
 
@@ -209,7 +209,7 @@ If you omit this field, the subagent's permission mode is determined automatical
 - If the parent session is in **plan** mode, the subagent stays in plan mode. An analyze-only session cannot mutate files through a delegated agent.
 - If the parent session is in **default** mode (in a trusted folder), the subagent gets **auto-edit** so it can work autonomously.
 
-When you do set `approvalMode`, the parent's permissive modes still take priority. For example, if the parent is in yolo mode, a subagent with `approvalMode: plan` will still run in yolo mode.
+When you do set `approvalMode`, the parent's permissive modes still take priority. For example, if the parent is in izn mode, a subagent with `approvalMode: plan` will still run in izn mode.
 
 ```
 ---
@@ -293,7 +293,7 @@ new contributors and end users understand the project.
 
 ### Automatic Delegation
 
-Qwen Code proactively delegates tasks based on:
+HopCode proactively delegates tasks based on:
 
 - The task description in your request
 - The description field in Subagents configurations

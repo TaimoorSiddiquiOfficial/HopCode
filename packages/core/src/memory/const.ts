@@ -26,7 +26,7 @@ export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
  * the global Qwen dir at `~/.hopcode/`.
  */
 export const LOCAL_CONTEXT_FILENAME = 'HOPCODE.local.md';
-export const MEMORY_SECTION_HEADER = '## Qwen Added Memories';
+export const MEMORY_SECTION_HEADER = '## HopCode Added Memories';
 
 // This variable will hold the currently configured filename for context files.
 // It defaults to include both HOPCODE.md and AGENTS.md but can be overridden by setGeminiMdFilename.

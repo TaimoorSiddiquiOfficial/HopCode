@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -212,8 +212,8 @@ export interface DaemonMcpChildRefusedBatchData {
 
 /**
  * Issue #4175 PR 16: a `POST /workspace/memory` write completed
- * successfully. `scope` records which file was touched (workspace QWEN.md
- * vs global ~/.qwen/QWEN.md), `mode` is the requested write mode, and
+ * successfully. `scope` records which file was touched (workspace HOPCODE.md
+ * vs global ~/.hopcode/HOPCODE.md), `mode` is the requested write mode, and
  * `bytesWritten` is the size of the file post-write.
  */
 export interface DaemonMemoryChangedData {
@@ -239,9 +239,9 @@ export interface DaemonAgentChangedData {
 
 /** Issue #4175 PR 21 — auth device-flow event payloads. */
 
-/** Provider id. Open string union for forward-compatible providers; `qwen-oauth`
+/** Provider id. Open string union for forward-compatible providers; `hopcode-oauth`
  *  is the only value v1 currently emits. */
-export type DaemonAuthDeviceFlowProviderId = 'qwen-oauth' | (string & {});
+export type DaemonAuthDeviceFlowProviderId = 'hopcode-oauth' | (string & {});
 
 export type DaemonAuthDeviceFlowStatus =
   | 'pending'
@@ -651,7 +651,7 @@ export interface DaemonSessionViewState {
   /**
    * #4175 Wave 4 PR 17. Workspace-scoped — every session bus receives
    * `workspace_initialized` events. `lastWorkspaceInit` records the
-   * most recent envelope so adapters can render a "QWEN.md was just
+   * most recent envelope so adapters can render a "HOPCODE.md was just
    * scaffolded by another client" notice without polling.
    */
   workspaceInitCount: number;
@@ -1046,7 +1046,7 @@ export function reduceDaemonSessionEvent(
       };
     case 'workspace_initialized':
       // Workspace-scoped fan-out. Non-terminal — just records that a
-      // QWEN.md scaffold was performed.
+      // HOPCODE.md scaffold was performed.
       return {
         ...base,
         workspaceInitCount: base.workspaceInitCount + 1,
@@ -1450,7 +1450,7 @@ function isMcpBudgetWarningData(
   // role here is wire-shape validation; threshold semantics are
   // owned by the daemon's `MCP_BUDGET_WARN_FRACTION` constant
   // (`packages/core/src/tools/mcp-client-manager.ts`) and documented
-  // in `qwen-serve-protocol.md`. Pinning the literal in the SDK
+  // in `hopcode-serve-protocol.md`. Pinning the literal in the SDK
   // would mean a daemon-side change to e.g. 0.80 silently routes
   // every warning through `unrecognizedKnownEventCount` — a
   // cross-package coordination hazard with no operator-visible

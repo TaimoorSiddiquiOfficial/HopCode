@@ -308,7 +308,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: undefined as string | undefined,
     description:
-      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.qwen/plans.',
+      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.hopcode/plans.',
     showInDialog: false,
   },
 
@@ -1045,7 +1045,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: undefined as OutboundCorrelationSettings | undefined,
     description:
-      "SECURITY-RELEVANT. Controls what client-side correlation data qwen-code writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope).",
+      "SECURITY-RELEVANT. Controls what client-side correlation data hopcode writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope).",
     showInDialog: false,
     jsonSchemaOverride: {
       type: 'object',
@@ -2066,7 +2066,7 @@ const SETTINGS_SCHEMA = {
         default: undefined as string | undefined,
         description:
           'Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). ' +
-          'Config files remain at ~/.qwen (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.',
+          'Config files remain at ~/.hopcode (or HOPCODE_HOME if set). Env var HOPCODE_RUNTIME_DIR takes priority.',
         showInDialog: false,
       },
     },
@@ -2189,7 +2189,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: DEFAULT_STOP_HOOK_BLOCK_CAP,
     description:
-      'Maximum consecutive blocking Stop/SubagentStop hook decisions before Qwen Code overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.',
+      'Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.',
     // This is an advanced safety valve for runaway hook loops, not a common
     // interactive preference.
     showInDialog: false,

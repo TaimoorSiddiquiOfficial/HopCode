@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +22,7 @@ describe('bundled locale fallback', () => {
 
   it('loads bundled builtin translations when locale files are absent on disk', async () => {
     const qwenLocalePathPattern =
-      /([\\/]\.qwen|[\\/]i18n)[\\/]locales([\\/]|$)/;
+      /([\\/]\.hopcode|[\\/]i18n)[\\/]locales([\\/]|$)/;
 
     vi.doMock('node:fs', async (importOriginal) => {
       const actualFs = await importOriginal<typeof import('node:fs')>();
@@ -62,7 +62,7 @@ describe('bundled locale fallback', () => {
       'utf-8',
     );
 
-    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(tempDir);
+    vi.spyOn(Storage, 'getGlobalHopCodeDir').mockReturnValue(tempDir);
 
     const { setLanguageAsync, t } = await import('./index.js');
     await setLanguageAsync('zh');
@@ -84,7 +84,7 @@ describe('bundled locale fallback', () => {
       'utf-8',
     );
 
-    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(tempDir);
+    vi.spyOn(Storage, 'getGlobalHopCodeDir').mockReturnValue(tempDir);
 
     const { setLanguageAsync, t } = await import('./index.js');
     await setLanguageAsync('zh');

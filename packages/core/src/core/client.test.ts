@@ -989,7 +989,7 @@ describe('Gemini Client (client.ts)', () => {
       await client.startChat(undefined, SessionStartSource.Startup);
 
       expect(client.getChat()['generationConfig'].systemInstruction).toBe(
-        'Base instruction\n\n---\n\nUser memory\n\n---\n\nAppended rule\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</qwen:session-start-context>',
+        'Base instruction\n\n---\n\nUser memory\n\n---\n\nAppended rule\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</hopcode:session-start-context>',
       );
     });
 
@@ -1022,7 +1022,7 @@ describe('Gemini Client (client.ts)', () => {
       await client.refreshSystemInstruction();
 
       expect(client.getChat()['generationConfig'].systemInstruction).toBe(
-        'Updated instruction\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</qwen:session-start-context>',
+        'Updated instruction\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</hopcode:session-start-context>',
       );
     });
 
@@ -1285,7 +1285,7 @@ describe('Gemini Client (client.ts)', () => {
       await client.setTools();
 
       expect(client.getChat()['generationConfig'].systemInstruction).toBe(
-        'Refreshed instruction\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nHookCtx\n</qwen:session-start-context>',
+        'Refreshed instruction\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nHookCtx\n</hopcode:session-start-context>',
       );
     });
   });
@@ -1740,7 +1740,7 @@ describe('Gemini Client (client.ts)', () => {
     }
 
     beforeEach(async () => {
-      mcTmpDir = await mkdtemp(join(tmpdir(), 'qwen-mc-cache-'));
+      mcTmpDir = await mkdtemp(join(tmpdir(), 'hopcode-mc-cache-'));
       mockTurnRunFn.mockReturnValue(
         (async function* () {
           yield { type: GeminiEventType.Content, value: 'response' };
@@ -3513,7 +3513,7 @@ hello
         expect(client['skillsModifiedInSession']).toBe(false);
 
         client.recordCompletedToolCall('write_file', {
-          file_path: '/project/.qwen/skills/my-skill.md',
+          file_path: '/project/.hopcode/skills/my-skill.md',
         });
 
         expect(client['skillsModifiedInSession']).toBe(true);
@@ -3534,7 +3534,7 @@ hello
           '/project',
         );
         client.recordCompletedToolCall('edit', {
-          path: '/project/.qwen/skills/my-skill.md',
+          path: '/project/.hopcode/skills/my-skill.md',
         });
         expect(client['skillsModifiedInSession']).toBe(true);
       });
@@ -3544,7 +3544,7 @@ hello
           '/project',
         );
         client.recordCompletedToolCall('read_file', {
-          file_path: '/project/.qwen/skills/my-skill.md',
+          file_path: '/project/.hopcode/skills/my-skill.md',
         });
         expect(client['skillsModifiedInSession']).toBe(false);
       });

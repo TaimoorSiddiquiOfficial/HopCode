@@ -222,7 +222,7 @@ describe('downloadFromNpmRegistry', () => {
           type: 'npm',
           registryUrl: 'https://user:token@registry.example.com',
         },
-        '/tmp/qwen-extension',
+        '/tmp/hopcode-extension',
       ),
     ).rejects.toThrow(
       'npm registry request failed with status 404: https://***REDACTED***@registry.example.com/@scope%2fpkg',

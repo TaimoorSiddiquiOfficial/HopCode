@@ -12,7 +12,7 @@ import {
   chmodSync,
 } from 'node:fs';
 import { join } from 'node:path';
-import { getGlobalQwenDir } from '@hoptrendy/channel-base';
+import { getGlobalHopCodeDir } from '@hoptrendy/channel-base';
 
 export const DEFAULT_BASE_URL = 'https://ilinkai.weixin.qq.com';
 
@@ -26,7 +26,7 @@ export interface AccountData {
 export function getStateDir(): string {
   const dir =
     process.env['WEIXIN_STATE_DIR'] ||
-    join(getGlobalQwenDir(), 'channels', 'weixin');
+    join(getGlobalHopCodeDir(), 'channels', 'weixin');
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }

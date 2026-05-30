@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,7 +18,7 @@ export const STATUS_LINE_PRESET_ITEM_IDS = [
   'pull-request-number',
   'branch-changes',
   'run-state',
-  'qwen-version',
+  'hopcode-version',
   'context-window-size',
   'used-tokens',
   'total-input-tokens',
@@ -130,9 +130,9 @@ export const STATUS_LINE_PRESET_ITEMS: readonly StatusLinePresetItem[] = [
     description: 'Compact session run-state text',
   },
   {
-    id: 'qwen-version',
-    label: 'qwen-version',
-    description: 'Qwen Code application version',
+    id: 'hopcode-version',
+    label: 'hopcode-version',
+    description: 'HopCode application version',
   },
   {
     id: 'context-window-size',
@@ -359,7 +359,7 @@ export function buildStatusLinePresetParts(
       case 'run-state':
         parts.push(getRunStateLabel(data.streamingState));
         break;
-      case 'qwen-version':
+      case 'hopcode-version':
         parts.push(`v${data.version}`);
         break;
       case 'context-window-size':

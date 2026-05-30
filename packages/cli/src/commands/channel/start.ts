@@ -53,7 +53,7 @@ export function resolveProxy(
 }
 
 function sessionsPath(): string {
-  return path.join(Storage.getGlobalQwenDir(), 'channels', 'sessions.json');
+  return path.join(Storage.getGlobalHopCodeDir(), 'channels', 'sessions.json');
 }
 
 function loadChannelsConfig(): Record<string, unknown> {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -99,7 +99,7 @@ export interface BridgeClientRequestContext {
  * Returned from `recordHeartbeat`. `lastSeenAt` is the server-side
  * `Date.now()` epoch (ms) the bridge stored for this session/client
  * pair. `clientId` is echoed only when the caller provided a trusted
- * one through `X-Qwen-Client-Id`; anonymous heartbeats omit it but
+ * one through `X-HopCode-Client-Id`; anonymous heartbeats omit it but
  * still bump the per-session timestamp.
  */
 export interface BridgeHeartbeatResult {
@@ -242,7 +242,7 @@ export interface HttpAcpBridge {
 
   /**
    * Union of every live session's `clientIds`. Used by workspace-level
-   * mutation routes to validate the optional `X-Qwen-Client-Id` header.
+   * mutation routes to validate the optional `X-HopCode-Client-Id` header.
    * Returns a snapshot — callers must not mutate.
    */
   knownClientIds(): ReadonlySet<string>;
@@ -325,7 +325,7 @@ export interface HttpAcpBridge {
   ): Promise<{ toolName: string; enabled: boolean }>;
 
   /**
-   * Scaffold an empty `QWEN.md` (or whatever
+   * Scaffold an empty `HOPCODE.md` (or whatever
    * `getCurrentGeminiMdFilename()` returns) at the bound workspace
    * root. Default refuses to overwrite via
    * `WorkspaceInitConflictError`; `opts.force === true` overwrites.

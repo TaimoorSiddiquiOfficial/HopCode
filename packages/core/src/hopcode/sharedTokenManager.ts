@@ -692,7 +692,7 @@ export class SharedTokenManager {
    * @returns The absolute path to the credentials file
    */
   private getCredentialFilePath(): string {
-    return path.join(Storage.getGlobalQwenDir(), QWEN_CREDENTIAL_FILENAME);
+    return path.join(Storage.getGlobalHopCodeDir(), QWEN_CREDENTIAL_FILENAME);
   }
 
   /**
@@ -701,7 +701,7 @@ export class SharedTokenManager {
    * @returns The absolute path to the lock file
    */
   private getLockFilePath(): string {
-    return path.join(Storage.getGlobalQwenDir(), QWEN_LOCK_FILENAME);
+    return path.join(Storage.getGlobalHopCodeDir(), QWEN_LOCK_FILENAME);
   }
 
   /**

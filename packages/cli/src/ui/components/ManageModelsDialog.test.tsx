@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -86,7 +86,7 @@ describe('ManageModelsDialog helpers', () => {
     expect(
       applyCatalogFilters({
         entries,
-        query: 'qwen',
+        query: 'hopcode',
         selectedIds: [],
         filterMode: 'free',
       }).map((entry) => entry.id),

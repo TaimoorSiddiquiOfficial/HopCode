@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -29,8 +29,8 @@ import {
  * Issue #4175 PR 16: workspace memory CRUD routes.
  *
  * `GET /workspace/memory` returns the daemon's snapshot of explicit
- * `QWEN.md` / `AGENTS.md` files reachable from the bound workspace
- * plus the user's `~/.qwen/` global. Read-only; returns
+ * `HOPCODE.md` / `AGENTS.md` files reachable from the bound workspace
+ * plus the user's `~/.hopcode/` global. Read-only; returns
  * `initialized: false` and an empty `files` list when no files exist
  * (no synthetic 500s, mirroring PR 12's read-only routes).
  *
@@ -42,11 +42,11 @@ import {
  * Both routes are filesystem-only — neither spawns the ACP child.
  *
  * **Absolute filePath disclosure note**: success / 413 / GET-list
- * responses include absolute on-disk paths (`/work/<x>/QWEN.md`,
- * `/Users/<x>/.qwen/QWEN.md`). This is by design for a daemon
+ * responses include absolute on-disk paths (`/work/<x>/HOPCODE.md`,
+ * `/Users/<x>/.hopcode/HOPCODE.md`). This is by design for a daemon
  * contract: clients pre-flight `caps.workspaceCwd` to learn the
  * bound workspace root and can compute relative paths if they
- * prefer; the global scope (`~/.qwen/QWEN.md`) is NOT under the
+ * prefer; the global scope (`~/.hopcode/HOPCODE.md`) is NOT under the
  * workspace root, so rewriting to a workspace-relative form would
  * lose information. The bearer-token gate + the daemon's loopback-
  * default binding already restrict who can see these paths. If a
@@ -98,7 +98,7 @@ export function mountWorkspaceMemoryRoutes(
       // exactly the silent-failure mode PR 12's read-only routes
       // avoided by routing bridge errors through `sendBridgeError`.
       writeStderrLine(
-        `qwen serve: GET /workspace/memory failed: ${
+        `hopcode serve: GET /workspace/memory failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );
@@ -221,7 +221,7 @@ export function mountWorkspaceMemoryRoutes(
         // either trim the file or switch to mode=replace.
         if (err instanceof WorkspaceMemoryWriteTimeoutError) {
           writeStderrLine(
-            `qwen serve: POST /workspace/memory timeout — file lock at ` +
+            `hopcode serve: POST /workspace/memory timeout — file lock at ` +
               `${err.filePath} did not acquire within ${err.timeoutMs}ms ` +
               `(stalled FS / OneDrive / NFS)`,
           );
@@ -240,14 +240,14 @@ export function mountWorkspaceMemoryRoutes(
         }
         if (err instanceof WorkspaceMemoryFileTooLargeError) {
           writeStderrLine(
-            `qwen serve: POST /workspace/memory refused — existing file ` +
+            `hopcode serve: POST /workspace/memory refused — existing file ` +
               `${err.filePath} is ${err.bytes} bytes (cap ${err.limit})`,
           );
           // Path disclosure: both `error` (which embeds the absolute
           // file path in the constructor message — see
           // `WorkspaceMemoryFileTooLargeError`) and `filePath` are
           // gated behind QWEN_SERVE_DEBUG so production responses
-          // don't include `/Users/<x>/.qwen/...` in the body.
+          // don't include `/Users/<x>/.hopcode/...` in the body.
           // Operators triaging an issue locally enable the debug
           // toggle to get the full text; in default mode SDK
           // callers branch on `code` + `bytes` / `limit` instead
@@ -268,7 +268,7 @@ export function mountWorkspaceMemoryRoutes(
           return;
         }
         writeStderrLine(
-          `qwen serve: POST /workspace/memory failed (scope=${scope} mode=${mode}): ${
+          `hopcode serve: POST /workspace/memory failed (scope=${scope} mode=${mode}): ${
             err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
@@ -310,9 +310,9 @@ interface DiscoveredFile {
 }
 
 /**
- * Filesystem-only discovery of explicit `QWEN.md` / `AGENTS.md`
+ * Filesystem-only discovery of explicit `HOPCODE.md` / `AGENTS.md`
  * files reachable from the daemon's bound workspace plus the user's
- * `~/.qwen/` global directory.
+ * `~/.hopcode/` global directory.
  *
  * Discovers the bound-workspace-root file(s) (no parent-directory
  * walk in this version) plus the global dir. `walkWorkspaceForMemory`
@@ -321,7 +321,7 @@ interface DiscoveredFile {
  * surface as "workspace root + global". Auto-memory (the `MEMORY.md`
  * index + per-type files) is intentionally NOT included; that's PR
  * 16.5's responsibility per scope decision in issue #4175. Path-
- * based rules (`.qwen/rules/`) are also out of scope for v1.
+ * based rules (`.hopcode/rules/`) are also out of scope for v1.
  */
 async function collectWorkspaceMemoryStatus(
   boundWorkspace: string,
@@ -337,7 +337,7 @@ async function collectWorkspaceMemoryStatus(
   );
   files.push(...workspaceFiles);
 
-  const globalDir = Storage.getGlobalQwenDir();
+  const globalDir = Storage.getGlobalHopCodeDir();
   for (const filename of filenames) {
     const candidate = path.join(globalDir, filename);
     try {
@@ -388,7 +388,7 @@ async function collectWorkspaceMemoryStatus(
 }
 
 /**
- * Stat each known memory filename (`QWEN.md`, `AGENTS.md`) at the
+ * Stat each known memory filename (`HOPCODE.md`, `AGENTS.md`) at the
  * bound workspace root and return the matches. v1 does not walk
  * parent directories — that's reserved for PR 16.5's hierarchical
  * mode, which will replace this helper with a real upward walk

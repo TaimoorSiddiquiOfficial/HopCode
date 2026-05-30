@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -178,7 +178,7 @@ describe('statusLinePresets', () => {
     expect(
       aggregateModelTokens({
         models: {
-          qwen: { tokens: { prompt: 100, candidates: 20 } },
+          hopcode: { tokens: { prompt: 100, candidates: 20 } },
           coder: { tokens: { prompt: 300, candidates: 40 } },
         },
       }),

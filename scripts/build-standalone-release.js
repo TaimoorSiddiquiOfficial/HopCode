@@ -2,7 +2,7 @@
 
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -203,7 +203,7 @@ function assertStandaloneOutput(outDir) {
     .sort();
   const expectedArchiveNames = RELEASE_TARGETS.map(
     ({ qwenTarget }) =>
-      `qwen-code-${qwenTarget}.${qwenTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
+      `hopcode-${qwenTarget}.${qwenTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
   ).sort();
   const missing = expectedArchiveNames.filter(
     (archiveName) => !archiveNames.includes(archiveName),

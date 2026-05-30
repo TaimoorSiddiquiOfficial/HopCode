@@ -125,8 +125,8 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
   const globalMemoryPath = useMemo(
     () =>
       path.join(
-        Storage.getGlobalQwenDir(),
-        getAllGeminiMdFilenames()[0] ?? 'QWEN.md',
+        Storage.getGlobalHopCodeDir(),
+        getAllGeminiMdFilenames()[0] ?? 'HOPCODE.md',
       ),
     [],
   );
@@ -215,8 +215,8 @@ export function MemoryDialog({ onClose }: MemoryDialogProps) {
           );
         case 'global':
           return resolvePreferredMemoryFile(
-            Storage.getGlobalQwenDir(),
-            getAllGeminiMdFilenames()[0] ?? 'QWEN.md',
+            Storage.getGlobalHopCodeDir(),
+            getAllGeminiMdFilenames()[0] ?? 'HOPCODE.md',
           );
         case 'managed':
           return managedMemoryPath;

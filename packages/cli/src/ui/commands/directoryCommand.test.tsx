@@ -343,7 +343,7 @@ describe('getDirPathCompletions', () => {
       }
     }
 
-    tempTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-dir-test-'));
+    tempTestDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-dir-test-'));
     // Create a nested directory structure: root/sub1, root/sub2, root/sub1/deep
     fs.mkdirSync(tempTestDir, { recursive: true });
     fs.mkdirSync(path.join(tempTestDir, 'sub1'), { recursive: true });

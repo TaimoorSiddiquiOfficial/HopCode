@@ -24,7 +24,7 @@ pip install hopcode-sdk
 For preview releases:
 
 ```bash
-pip install --pre qwen-code-sdk
+pip install --pre hopcode-sdk
 ```
 
 If `qwen` is not on `PATH`, pass `path_to_qwen_executable` explicitly.
@@ -32,7 +32,7 @@ If `qwen` is not on `PATH`, pass `path_to_qwen_executable` explicitly.
 Before writing SDK code, make sure the CLI works in the same shell:
 
 ```bash
-qwen --version
+hopcode --version
 ```
 
 ## Quick Start

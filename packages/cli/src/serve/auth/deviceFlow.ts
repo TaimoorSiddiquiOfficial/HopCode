@@ -1,11 +1,11 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Device-flow authorization registry for `qwen serve` (issue #4175 Wave 4
+ * Device-flow authorization registry for `hopcode serve` (issue #4175 Wave 4
  * PR 21). The registry brokers an OAuth 2.0 Device Authorization Grant
  * (RFC 8628) initiated through `POST /workspace/auth/device-flow` so a
  * remote SDK client can ask the daemon to log in. Tokens land on the
@@ -107,7 +107,7 @@ export const DEVICE_FLOW_MAX_INTERVAL_MS = 60_000;
 // union + `readonly DeviceFlowProviderId[]` annotation) let the
 // type and the array drift apart silently. Mirrors the codebase's
 // `SERVE_ERROR_KINDS` / `ServeErrorKind` pattern in `status.ts`.
-export const DEVICE_FLOW_SUPPORTED_PROVIDERS = ['qwen-oauth'] as const;
+export const DEVICE_FLOW_SUPPORTED_PROVIDERS = ['hopcode-oauth'] as const;
 export type DeviceFlowProviderId =
   (typeof DEVICE_FLOW_SUPPORTED_PROVIDERS)[number];
 
@@ -219,7 +219,7 @@ export interface BrandedSecret<T extends string = string> {
   toJSON(): '[redacted]';
   [Symbol.toPrimitive](): '[redacted]';
   /** Phantom marker preserving the literal type at the type level so
-   *  `BrandedSecret<'qwen-oauth'>` is distinguishable from
+   *  `BrandedSecret<'hopcode-oauth'>` is distinguishable from
    *  `BrandedSecret<string>` when a caller wants a narrower brand. */
   readonly _phantom?: T;
 }
@@ -511,7 +511,7 @@ interface DeviceFlowEntry {
   /**
    * Client id of the SDK caller that invoked `cancel()` (via
    * `DELETE /workspace/auth/device-flow/:id`'s
-   * `X-Qwen-Client-Id`). Stamped only on the in-flight
+   * `X-HopCode-Client-Id`). Stamped only on the in-flight
    * persist-defer path so the persist resolution branch's deferred
    * event publish + audit can attribute the cancel back to the
    * actual canceller, not the original initiator. PR #4255 fold-in
@@ -613,7 +613,7 @@ export class UpstreamDeviceFlowError extends Error {
 /**
  * Sentinel error raised by `runPollTick`'s own `Promise.race` timer when
  * `provider.poll()` exceeds `DEVICE_FLOW_POLL_TIMEOUT_MS`. PR #4291
- * follow-up review (qwen-latest): the catch block previously routed
+ * follow-up review (hopcode-latest): the catch block previously routed
  * this through the same `provider.poll() threw (raw): ...` audit path
  * as a real provider throw, mis-leading on-call into investigating
  * provider code when the actual issue is a hung IdP / network
@@ -1090,7 +1090,7 @@ export class DeviceFlowRegistry {
     // sweeper / daemon restart). The rejecting timer aborts the signal
     // first so cooperative providers can still tear down cleanly.
     //
-    // PR #4291 follow-up review (qwen-latest, #5): keep a reference to
+    // PR #4291 follow-up review (hopcode-latest, #5): keep a reference to
     // the original `provider.poll()` promise so we can detect a LATE
     // success/error after our race timer already settled the wrapper.
     // Without this, a flaky IdP that responds 1s past the 30s timeout
@@ -1136,7 +1136,7 @@ export class DeviceFlowRegistry {
       // through the audit channel (whose backing impl writes to
       // stderr) for operator visibility.
       //
-      // PR #4291 follow-up review (qwen-latest, #2): the previous
+      // PR #4291 follow-up review (hopcode-latest, #2): the previous
       // shape routed our own race-timer rejection through the same
       // `provider.poll() threw (raw): ...` audit path as a real
       // provider throw â€” at 3 AM, on-call would mis-triage as
@@ -1163,7 +1163,7 @@ export class DeviceFlowRegistry {
     } finally {
       if (pollTimer !== undefined) this.clearScheduled(pollTimer);
     }
-    // PR #4291 follow-up review (qwen-latest, #5): if our race timer
+    // PR #4291 follow-up review (hopcode-latest, #5): if our race timer
     // settled the wrapper as a timeout, attach a passive observer on
     // the original `provider.poll()` promise so a late resolution
     // (IdP eventually responded after the 30s ceiling) leaves an
@@ -1184,7 +1184,7 @@ export class DeviceFlowRegistry {
             clientId: entry.initiatorClientId,
             status: 'failed',
             errorKind: 'upstream_error',
-            // PR #4291 follow-up review (qwen-latest, N1): the late-
+            // PR #4291 follow-up review (hopcode-latest, N1): the late-
             // poll resolve branch fires when `provider.poll()` returns
             // a result AFTER our race timer settled the wrapper. For a
             // cooperative provider whose abort path resolves to

@@ -2,7 +2,7 @@
 
 Run HopCode as a local HTTP daemon so multiple clients (IDE plugins, web UIs, CI scripts, custom CLIs) share one agent session over HTTP + Server-Sent Events instead of each spawning their own subprocess.
 
-> **Status:** Stage 1 (experimental). The protocol surface is locked at the §04 routes table from issue [#3803](https://github.com/QwenLM/qwen-code/issues/3803). Stage 1.5 (`hopcode --serve` flag — TUI co-hosts the same HTTP server) and Stage 2 (in-process refactor + `mDNS`/OpenAPI/WebSocket/Prometheus polish) are immediately downstream.
+> **Status:** Stage 1 (experimental). The protocol surface is locked at the §04 routes table from issue [#3803](https://github.com/QwenLM/hopcode/issues/3803). Stage 1.5 (`hopcode --serve` flag — TUI co-hosts the same HTTP server) and Stage 2 (in-process refactor + `mDNS`/OpenAPI/WebSocket/Prometheus polish) are immediately downstream.
 >
 > **Scope honesty:** Stage 1 is sized for **developers prototyping clients against the protocol surface** and for **local single-user / small-team collaboration**. Production-grade multi-client / long-running / network-flaky workloads (mobile companions, IM bots reaching 1000+ chats) need Stage 1.5+ guarantees that aren't in this release. See [Stage 1.5+ runtime guarantees](#stage-15-runtime-guarantees) for the full gap list and #3803 for the convergence roadmap.
 
@@ -11,7 +11,7 @@ Run HopCode as a local HTTP daemon so multiple clients (IDE plugins, web UIs, CI
 - **One agent process, many clients** — under the default `sessionScope: 'single'`, every client connecting to the daemon shares one ACP session. Live cross-client collaboration on the same conversation, the same file diffs, the same permission prompts.
 - **Reconnect-safe streaming** — SSE with `Last-Event-ID` reconnect lets a client drop and pick up exactly where it left off (within the ring's replay window).
 - **First-responder permissions** — when the agent asks for permission to run a tool, every connected client sees the request; whichever client answers first wins.
-- **One daemon, one workspace** — each `hopcode serve` process binds to exactly one workspace at boot (per [#3803](https://github.com/QwenLM/qwen-code/issues/3803) §02). Multi-workspace deployments run one daemon per workspace on separate ports (or behind an orchestrator).
+- **One daemon, one workspace** — each `hopcode serve` process binds to exactly one workspace at boot (per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02). Multi-workspace deployments run one daemon per workspace on separate ports (or behind an orchestrator).
 
 ## Quickstart
 
@@ -113,9 +113,9 @@ The token comparison is constant-time (SHA-256 + `crypto.timingSafeEqual`); 401 
 | `--hostname <addr>`     | `127.0.0.1`     | Bind interface. Anything beyond loopback requires a token.                                                                                                                                                                                                                                                                                          |
 | `--token <str>`         | —               | Bearer token. Falls back to `HOPCODE_SERVER_TOKEN` env var (with leading/trailing whitespace stripped — handy for `$(cat token.txt)`).                                                                                                                                                                                                              |
 | `--max-sessions <n>`    | `20`            | Cap on concurrent live sessions. New `POST /session` requests that would spawn a fresh child return `503` (with `Retry-After: 5`) when the cap is hit; attaches to existing sessions are NOT counted. Set to `0` to disable. Sized for single-user / small-team usage; raise it if your deployment has the RAM/FD headroom (~30–50 MB per session). |
-| `--workspace <path>`    | `process.cwd()` | Absolute workspace path this daemon binds to (per [#3803](https://github.com/QwenLM/qwen-code/issues/3803) §02 — 1 daemon = 1 workspace). `POST /session` requests with a mismatched `cwd` return `400 workspace_mismatch`. For multi-workspace deployments, run one `hopcode serve` per workspace on separate ports.                               |
+| `--workspace <path>`    | `process.cwd()` | Absolute workspace path this daemon binds to (per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02 — 1 daemon = 1 workspace). `POST /session` requests with a mismatched `cwd` return `400 workspace_mismatch`. For multi-workspace deployments, run one `hopcode serve` per workspace on separate ports.                                 |
 | `--max-connections <n>` | `256`           | Listener-level TCP connection cap (`server.maxConnections`). Bounds raw socket count irrespective of session count — slow / phantom SSE clients get rejected at accept time once full. Raise alongside `--max-sessions` if your deployment expects many SSE subscribers per session.                                                                |
-| `--http-bridge`         | `true`          | Stage 1 mode: one `hopcode --acp` child per daemon (bound to one workspace at boot, per [#3803](https://github.com/QwenLM/qwen-code/issues/3803) §02); N sessions multiplex onto that child via ACP `newSession()`. Stage 2 native in-process becomes available later.                                                                              |
+| `--http-bridge`         | `true`          | Stage 1 mode: one `hopcode --acp` child per daemon (bound to one workspace at boot, per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02); N sessions multiplex onto that child via ACP `newSession()`. Stage 2 native in-process becomes available later.                                                                                |
 
 > **Sizing the load knobs.** `--max-sessions` is the **new-child** cap.
 > Three other layers also limit load — when sizing for a high-concurrency
@@ -165,13 +165,13 @@ The token comparison is constant-time (SHA-256 + `crypto.timingSafeEqual`); 401 
 
 ## Multi-session & multi-workspace deployment
 
-Per [#3803](https://github.com/QwenLM/qwen-code/issues/3803) §02, each `hopcode serve` process binds to **one workspace** at boot. Within that workspace it multiplexes N sessions onto a single `hopcode --acp` child via the agent's native session map — sessions share the child's process / OAuth state / file-read cache / hierarchy-memory parse.
+Per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02, each `hopcode serve` process binds to **one workspace** at boot. Within that workspace it multiplexes N sessions onto a single `hopcode --acp` child via the agent's native session map — sessions share the child's process / OAuth state / file-read cache / hierarchy-memory parse.
 
 To host **multiple workspaces** (one user, several repos; or several users on the same host), run **multiple daemon processes** — one per workspace, each on its own port, supervised by systemd / docker-compose / k8s / a `hopcode-coordinator` reference orchestrator. The trade-off is intentional: one workspace per child means `loadSettings(cwd)` / OAuth / MCP server scope stay aligned with the bound directory and don't drift across requests.
 
 > **Subscribe BEFORE posting `modelServiceId` on attach.** When a client `POST /session` with a `modelServiceId` and the workspace already has a session running a different model, the daemon issues an internal `setSessionModel` call — failures are NOT propagated as an HTTP error (the session stays operational on its current model). The visible failure signal is a `model_switch_failed` event on the session's SSE stream. If you call `POST /session` and only THEN open `GET /session/:id/events`, you'll miss the failure event and silently keep talking to the wrong model. Open the SSE stream first, or pass `Last-Event-ID: 0` on subscribe to replay the ring's oldest available event.
 
-To handle multiple **users** (each with their own quota, audit log, sandbox) or to scale beyond one process's reach (cold-start budget, FD count, RSS), spawn one daemon per workspace per user behind an external orchestrator. That orchestrator (multi-tenancy / OIDC / Quota / Audit / k8s) is **out of scope** for the HopCode project — see issue [#3803](https://github.com/QwenLM/qwen-code/issues/3803) "External Reference Architecture" for the design pointers.
+To handle multiple **users** (each with their own quota, audit log, sandbox) or to scale beyond one process's reach (cold-start budget, FD count, RSS), spawn one daemon per workspace per user behind an external orchestrator. That orchestrator (multi-tenancy / OIDC / Quota / Audit / k8s) is **out of scope** for the HopCode project — see issue [#3803](https://github.com/QwenLM/hopcode/issues/3803) "External Reference Architecture" for the design pointers.
 
 ## Durability model
 
@@ -186,7 +186,7 @@ If your integration needs cross-restart durability, you need either Stage 1.5+ (
 
 ## Stage 1.5+ runtime guarantees
 
-Stage 1's contract is sized for prototyping. Per [#3889 chiga0 downstream-consumer review](https://github.com/QwenLM/qwen-code/pull/3889#issuecomment-4427875644), the following are **not** in Stage 1 — production-grade integrations need Stage 1.5+ before relying on them:
+Stage 1's contract is sized for prototyping. Per [#3889 chiga0 downstream-consumer review](https://github.com/QwenLM/hopcode/pull/3889#issuecomment-4427875644), the following are **not** in Stage 1 — production-grade integrations need Stage 1.5+ before relying on them:
 
 **Blockers for serious downstream use:**
 
@@ -207,13 +207,13 @@ Stage 1's contract is sized for prototyping. Per [#3889 chiga0 downstream-consum
 9. **`/capabilities` actual feature negotiation** — `protocol_versions: { acp: '0.14.x', daemon_envelope: 1 }` so clients can detect drift instead of falling through to "unknown frame, ignore".
 10. **First-class durability documentation** (this section) — already shipped above.
 
-The full convergence roadmap is tracked on [#3803](https://github.com/QwenLM/qwen-code/issues/3803).
+The full convergence roadmap is tracked on [#3803](https://github.com/QwenLM/hopcode/issues/3803).
 
 ## Stage 1 scope boundaries — what we won't fix in Stage 1.5
 
 Two structural choices are explicit non-goals for the Stage 1 / 1.5 / 2 main-line roadmap. If your use case depends on either, plan around them rather than waiting for us.
 
-### Session state is local-mutation-only (per [LaZzyMan review #4270256721](https://github.com/QwenLM/qwen-code/pull/3889#pullrequestreview-4270256721))
+### Session state is local-mutation-only (per [LaZzyMan review #4270256721](https://github.com/QwenLM/hopcode/pull/3889#pullrequestreview-4270256721))
 
 The Stage 1.5 plan describes TUI as an in-process EventBus subscriber. In practice **TUI UI is strictly larger than the wire protocol**:
 
@@ -244,7 +244,7 @@ In this mode, TUI is a **"super-client"** — it observes the same agent convers
 
 #### Why (A) and not (B) (promote mutations to `session_state_changed` event family)
 
-(B) is the more ambitious answer but locks Stage 1.5 into a substantially larger wire surface that must also pass cleanly through the planned in-process refactor. We'd rather walk the smaller scope honestly. The session-state-event taxonomy work — enumerating which TUI flows are local-only by design vs. could plausibly graduate to wire under a future opt-in (B)-flavor extension — moves to [#3803](https://github.com/QwenLM/qwen-code/issues/3803), not Stage 1.5 code.
+(B) is the more ambitious answer but locks Stage 1.5 into a substantially larger wire surface that must also pass cleanly through the planned in-process refactor. We'd rather walk the smaller scope honestly. The session-state-event taxonomy work — enumerating which TUI flows are local-only by design vs. could plausibly graduate to wire under a future opt-in (B)-flavor extension — moves to [#3803](https://github.com/QwenLM/hopcode/issues/3803), not Stage 1.5 code.
 
 ### N parallel sessions share one `hopcode --acp` child
 
@@ -273,4 +273,4 @@ The bridge keeps **one channel per daemon** (one daemon per workspace, per §02)
 
 - **Build a client?** See the [DaemonClient TypeScript quickstart](../developers/examples/daemon-client-quickstart.md) and the [HTTP protocol reference](../developers/hopcode-serve-protocol.md).
 - **Reading the source?** Bridge code lives at `packages/cli/src/serve/`; SDK client at `packages/sdk-typescript/src/daemon/`.
-- **Tracking the roadmap?** Stage 1.5 / Stage 2 progress is tracked on issue [#3803](https://github.com/QwenLM/qwen-code/issues/3803).
+- **Tracking the roadmap?** Stage 1.5 / Stage 2 progress is tracked on issue [#3803](https://github.com/QwenLM/hopcode/issues/3803).

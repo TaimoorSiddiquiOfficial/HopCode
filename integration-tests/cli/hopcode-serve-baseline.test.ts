@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * `qwen serve` daemon — performance baseline harness.
+ * `hopcode serve` daemon — performance baseline harness.
  *
  * First implementation PR of the Mode B v0.16 rollout (issue #4175 Wave 1
  * PR 1). Captures reference metrics for: RSS curve across session counts,
@@ -26,7 +26,7 @@
  *
  * POSIX only. The harness uses `ps` + `pgrep` against the host process
  * table. Windows is skipped (no `ps`/`pgrep`); Docker/Podman sandbox is
- * also skipped because the daemon's `qwen --acp` child and its MCP
+ * also skipped because the daemon's `hopcode --acp` child and its MCP
  * grandchildren run inside the sandbox container's PID namespace, which
  * host-side `pgrep -P` cannot observe — the descendant walk would always
  * see zero MCP grandchildren and time out. Same rationale and skip shape
@@ -66,8 +66,8 @@ interface BridgeEventLike {
 const SKIP =
   process.platform === 'win32' ||
   Boolean(
-    process.env['QWEN_SANDBOX'] &&
-      process.env['QWEN_SANDBOX']!.toLowerCase() !== 'false',
+    process.env['HOPCODE_SANDBOX'] &&
+      process.env['HOPCODE_SANDBOX']!.toLowerCase() !== 'false',
   );
 
 // Read iteration tunings from env (documented in #4175 PR 1 plan).
@@ -470,7 +470,7 @@ async function measureRssAtSessionCount(sessionCount: number): Promise<{
       // `mcp_child_refused_batch` — reads) against external `pgrep -P`
       // measurement.
       //
-      // Architectural note (PR 22a): a `qwen serve` ACP child runs
+      // Architectural note (PR 22a): a `hopcode serve` ACP child runs
       // two `Config` objects, each carrying its own
       // `McpClientManager`. The bootstrap Config (`runAcpAgent` →
       // `config.initialize`) discovers MCP servers when the child
@@ -724,7 +724,7 @@ function renderMarkdown(s: SnapshotShape): string {
       ? `p50=${p.p50.toFixed(0)} p90=${p.p90.toFixed(0)} p99=${p.p99.toFixed(0)} mean=${p.mean.toFixed(0)} (n=${p.count})`
       : 'n/a';
   return [
-    `# qwen serve daemon — perf baseline`,
+    `# hopcode serve daemon — perf baseline`,
     ``,
     `Captured: ${s.capturedAt}`,
     `Git: ${s.gitCommit ?? 'unknown'}`,

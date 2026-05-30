@@ -15,7 +15,7 @@ export interface ServiceInfo {
 }
 
 function pidFilePath(): string {
-  return path.join(Storage.getGlobalQwenDir(), 'channels', 'service.pid');
+  return path.join(Storage.getGlobalHopCodeDir(), 'channels', 'service.pid');
 }
 
 /** Check if a process is alive. */

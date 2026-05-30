@@ -2,7 +2,7 @@
 
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +44,7 @@ const REMOTE_FETCH_TIMEOUT_MS = 30_000;
 function standaloneArchiveNamesFromReleaseTargets(releaseTargets) {
   return releaseTargets.map(
     ({ qwenTarget }) =>
-      `qwen-code-${qwenTarget}.${qwenTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
+      `hopcode-${qwenTarget}.${qwenTarget === 'win-x64' ? 'zip' : 'tar.gz'}`,
   );
 }
 

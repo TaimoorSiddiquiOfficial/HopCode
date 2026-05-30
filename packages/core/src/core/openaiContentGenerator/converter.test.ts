@@ -2112,7 +2112,7 @@ describe('OpenAIContentConverter', () => {
     });
 
     it('should preserve legitimate duplicate import-line chunks (regression: silent data loss)', () => {
-      // Regression for https://github.com/QwenLM/qwen-code/pull/3896 review
+      // Regression for https://github.com/QwenLM/hopcode/pull/3896 review
       // (wenshao, 2026-05-13 CHANGES_REQUESTED, finding #1). Realistic
       // incremental streams emit duplicate import/boilerplate lines and the
       // exact-repeat threshold must be high enough that those legitimate
@@ -2199,7 +2199,7 @@ describe('OpenAIContentConverter', () => {
     });
 
     it('should detect cumulative mode even when the first chunk exceeds the detection window cap', () => {
-      // Regression for https://github.com/QwenLM/qwen-code/pull/3896 review:
+      // Regression for https://github.com/QwenLM/hopcode/pull/3896 review:
       // Some cumulative providers ship a large initial chunk (>1024 chars)
       // and then accumulate more text on subsequent chunks. The detection
       // window cap must not short-circuit prefix-overlap detection before the
@@ -2240,7 +2240,7 @@ describe('OpenAIContentConverter', () => {
     });
 
     it('should not duplicate emitted bytes when an incremental stream transitions into cumulative mode past the window cap', () => {
-      // Regression for https://github.com/QwenLM/qwen-code/pull/3896 review
+      // Regression for https://github.com/QwenLM/hopcode/pull/3896 review
       // (wenshao, 2026-05-13 CHANGES_REQUESTED, finding #2). Hybrid scenario:
       // upstream emits 200 distinct incremental chunks of 8 bytes each (1600
       // bytes of user-visible content, well past the 1024-byte detection-

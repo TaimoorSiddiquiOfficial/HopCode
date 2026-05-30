@@ -220,9 +220,9 @@ Commands for obtaining information and performing system settings.
 | `/stats`        | Display detailed statistics for current session | `/stats`                         |
 | `/settings`     | Open settings editor                            | `/settings`                      |
 | `/auth`         | Change authentication method                    | `/auth`                          |
-| `/bug`          | Submit issue about Qwen Code                    | `/bug Button click unresponsive` |
+| `/bug`          | Submit issue about HopCode                      | `/bug Button click unresponsive` |
 | `/copy`         | Copy last output content to clipboard           | `/copy`                          |
-| `/quit`         | Exit Qwen Code immediately                      | `/quit` or `/exit`               |
+| `/quit`         | Exit HopCode immediately                        | `/quit` or `/exit`               |
 
 ### 1.9 Common Shortcuts
 
@@ -236,7 +236,7 @@ Commands for obtaining information and performing system settings.
 
 ### 1.10 Authentication Commands
 
-Use `/auth` inside a Qwen Code session to configure authentication. Use `/doctor` to inspect the current authentication and environment status.
+Use `/auth` inside a HopCode session to configure authentication. Use `/doctor` to inspect the current authentication and environment status.
 
 | Command   | Description                                |
 | --------- | ------------------------------------------ |

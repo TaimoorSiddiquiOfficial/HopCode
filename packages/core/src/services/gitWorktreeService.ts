@@ -1296,7 +1296,7 @@ export class GitWorktreeService {
    */
   private async ensureWorktreesGitignored(): Promise<void> {
     try {
-      const hopcodeDir = path.join(this.sourceRepoPath, '.qwen');
+      const hopcodeDir = path.join(this.sourceRepoPath, '.hopcode');
       await fs.mkdir(hopcodeDir, { recursive: true });
       const gitignorePath = path.join(hopcodeDir, '.gitignore');
       // `flag: 'wx'` is "open for write, fail if exists" — one atomic

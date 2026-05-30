@@ -149,7 +149,7 @@ hopcode mcp add --transport sse sseServer http://localhost:8080/sse --timeout 30
 
 ## Progressive availability and discovery timeouts
 
-Qwen Code discovers MCP servers in the background after the UI is already
+HopCode discovers MCP servers in the background after the UI is already
 interactive. You see the cli's first prompt within a few hundred
 milliseconds even when one of your MCP servers takes several seconds
 (or never responds), and the model's tool list updates within roughly

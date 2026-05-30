@@ -106,7 +106,7 @@ import {
 
 const sample: WorktreeSession = {
   slug: 'my-feature',
-  worktreePath: '/repo/.qwen/worktrees/my-feature',
+  worktreePath: '/repo/.hopcode/worktrees/my-feature',
   worktreeBranch: 'worktree-my-feature',
   originalCwd: '/repo',
   originalBranch: 'main',
@@ -481,7 +481,7 @@ async function seedSession(cfg: Config, slug: string) {
     cfg.getSessionService().getWorktreeSessionPath(cfg.getSessionId()),
     {
       slug,
-      worktreePath: `/repo/.qwen/worktrees/${slug}`,
+      worktreePath: `/repo/.hopcode/worktrees/${slug}`,
       worktreeBranch: `worktree-${slug}`,
       originalCwd: '/repo',
       originalBranch: 'main',
@@ -726,7 +726,7 @@ worktree?: {
 };
 ```
 
-字段名和 claude-code 保持一致，方便用户在 qwen-code 和 claude-code 之间复用 statusline 脚本。
+字段名和 claude-code 保持一致，方便用户在 hopcode 和 claude-code 之间复用 statusline 脚本。
 
 找到 `doUpdate` 回调中构造 `input: StatusLineCommandInput` 对象的地方（约行 225），在 `...(ui.branchName && { git: { branch: ui.branchName } })` 之后新增：
 
@@ -933,7 +933,7 @@ describe('WorktreeExitDialog', () => {
       <WorktreeExitDialog
         slug="my-feature"
         branch="worktree-my-feature"
-        worktreePath="/tmp/repo/.qwen/worktrees/my-feature"
+        worktreePath="/tmp/repo/.hopcode/worktrees/my-feature"
         originalHeadCommit="abc1234"
         onKeep={vi.fn()}
         onRemove={vi.fn()}
