@@ -2290,7 +2290,6 @@ describe('createServeApp', () => {
         'auto-edit',
         'auto',
         'izn',
-        'izn',
       ]);
       const unknown = await auth(
         request(app).post('/session/session-A/approval-mode'),

@@ -220,17 +220,6 @@ describe('useAutoAcceptIndicator', () => {
       } as Key);
     });
     expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
-      ApprovalMode.IZN,
-    );
-    expect(result.current).toBe(ApprovalMode.IZN);
-
-    act(() => {
-      capturedUseKeypressHandler({
-        name: 'tab',
-        shift: true,
-      } as Key);
-    });
-    expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
       ApprovalMode.PLAN,
     );
     expect(result.current).toBe(ApprovalMode.PLAN);
@@ -245,6 +234,17 @@ describe('useAutoAcceptIndicator', () => {
       ApprovalMode.DEFAULT,
     );
     expect(result.current).toBe(ApprovalMode.DEFAULT);
+
+    act(() => {
+      capturedUseKeypressHandler({
+        name: 'tab',
+        shift: true,
+      } as Key);
+    });
+    expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
+      ApprovalMode.AUTO_EDIT,
+    );
+    expect(result.current).toBe(ApprovalMode.AUTO_EDIT);
   });
 
   it('should not toggle if only one key or other keys combinations are pressed', () => {

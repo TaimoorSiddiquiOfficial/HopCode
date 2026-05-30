@@ -86,7 +86,7 @@ describe('ManageModelsDialog helpers', () => {
     expect(
       applyCatalogFilters({
         entries,
-        query: 'hopcode',
+        query: 'qwen',
         selectedIds: [],
         filterMode: 'free',
       }).map((entry) => entry.id),

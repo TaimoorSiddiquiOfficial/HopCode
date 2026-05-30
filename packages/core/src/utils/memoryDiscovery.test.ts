@@ -14,7 +14,7 @@ import {
   DEFAULT_CONTEXT_FILENAME,
 } from '../memory/const.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
-import { HOPCODE_DIR } from './paths.js';
+import { HOPCODE_DIR, QWEN_DIR } from './paths.js';
 
 vi.mock('os', async (importOriginal) => {
   const actualOs = await importOriginal<typeof os>();
@@ -553,7 +553,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('loads .hopcode/QWEN.local.md from project root when present', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'local context content',
       );
 
@@ -577,7 +577,7 @@ describe('loadServerHierarchicalMemory', () => {
         'shared project context',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'local override',
       );
 
@@ -610,7 +610,7 @@ describe('loadServerHierarchicalMemory', () => {
         'cwd memory',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'local memory',
       );
 
@@ -651,12 +651,12 @@ describe('loadServerHierarchicalMemory', () => {
 
       expect(result.fileCount).toBe(1);
       expect(result.memoryContent).toContain('project content');
-      expect(result.memoryContent).not.toContain('QWEN.local.md');
+      expect(result.memoryContent).not.toContain('HOPCODE.local.md');
     });
 
     it('does not load QWEN.local.md from untrusted workspaces', async () => {
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'local content',
       );
 
@@ -674,7 +674,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('does not load QWEN.local.md in explicit-only mode', async () => {
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'local content',
       );
 
@@ -698,7 +698,7 @@ describe('loadServerHierarchicalMemory', () => {
       // project root) must NOT be picked up — the slot is single, fixed,
       // and lives at <projectRoot>/.hopcode/QWEN.local.md.
       await createTestFile(
-        path.join(cwd, QWEN_DIR, 'QWEN.local.md'),
+        path.join(cwd, QWEN_DIR, 'HOPCODE.local.md'),
         'misplaced local content',
       );
 
@@ -716,7 +716,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('loads QWEN.local.md even when no project HOPCODE.md exists', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'standalone local',
       );
 
@@ -750,7 +750,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
 
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'worktree local',
       );
 
@@ -779,11 +779,11 @@ describe('loadServerHierarchicalMemory', () => {
       });
 
       await createTestFile(
-        path.join(cwd, QWEN_DIR, 'QWEN.local.md'),
+        path.join(cwd, QWEN_DIR, 'HOPCODE.local.md'),
         'cwd-anchored local that must not load',
       );
       await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'projectRoot-anchored local that must not load either',
       );
 
@@ -814,7 +814,7 @@ describe('loadServerHierarchicalMemory', () => {
         force: true,
       });
       await createTestFile(
-        path.join(homedir, QWEN_DIR, 'QWEN.local.md'),
+        path.join(homedir, QWEN_DIR, 'HOPCODE.local.md'),
         'do not promote this to project-local',
       );
 
@@ -845,7 +845,7 @@ describe('loadServerHierarchicalMemory', () => {
       // slot loader from then appending the same file a second time
       // (double content + inflated fileCount). Pin that behavior.
       const localFile = await createTestFile(
-        path.join(projectRoot, QWEN_DIR, 'QWEN.local.md'),
+        path.join(projectRoot, QWEN_DIR, 'HOPCODE.local.md'),
         'slot content only once',
       );
 
