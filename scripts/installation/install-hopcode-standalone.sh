@@ -1299,7 +1299,7 @@ print_final_instructions() {
     local install_method="${3:-standalone}"
     local installed_bin=""
     local quoted_install_bin_dir=""
-    local standalone_uninstall_url="https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh"
+    local standalone_uninstall_url="https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh"
     if [[ -n "${install_bin_dir}" ]]; then
         installed_bin="${install_bin_dir}/hopcode"
         quoted_install_bin_dir=$(shell_quote "${install_bin_dir}")

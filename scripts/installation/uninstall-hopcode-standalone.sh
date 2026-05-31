@@ -134,7 +134,7 @@ is_hopcode_standalone_install_dir() {
     [[ -f "${manifest_path}" ]] || return 1
     grep -Eq '"name"[[:space:]]*:[[:space:]]*"@hoptrendy/hopcode-cli"' "${manifest_path}" 2>/dev/null || return 1
     grep -Eq '"target"[[:space:]]*:[[:space:]]*"(darwin|linux)-(arm64|x64)"' "${manifest_path}" 2>/dev/null || return 1
-    [[ -f "${install_dir}/bin/qwen" && ! -L "${install_dir}/bin/qwen" && -x "${install_dir}/bin/qwen" ]] || return 1
+    [[ -f "${install_dir}/bin/hopcode" && ! -L "${install_dir}/bin/hopcode" && -x "${install_dir}/bin/hopcode" ]] || return 1
     [[ -f "${install_dir}/node/bin/node" && ! -L "${install_dir}/node/bin/node" && -x "${install_dir}/node/bin/node" ]] || return 1
 }
 
@@ -143,8 +143,8 @@ shell_quote() {
 }
 
 remove_install_wrapper() {
-    local wrapper_path="${INSTALL_BIN_DIR}/qwen"
-    local hopcode_bin="${INSTALL_LIB_DIR}/bin/qwen"
+    local wrapper_path="${INSTALL_BIN_DIR}/hopcode"
+    local hopcode_bin="${INSTALL_LIB_DIR}/bin/hopcode"
 
     if [[ ! -e "${wrapper_path}" ]]; then
         return 0
@@ -181,7 +181,7 @@ remove_install_wrapper() {
 remove_shell_path_entry() {
     local begin_marker="# HopCode PATH block begin"
     local end_marker="# HopCode PATH block end"
-    local legacy_marker="# Added by hopcode installer (multi-qwen shadow fix)"
+    local legacy_marker="# Added by hopcode installer (multi-hopcode shadow fix)"
     local rc_files=()
     local rc_file
 
@@ -303,7 +303,7 @@ fi
 if [[ "${install_was_managed}" == "1" ]]; then
     remove_install_wrapper
 else
-    log_info "Leaving ${INSTALL_BIN_DIR}/qwen unchanged because no managed standalone runtime was removed."
+    log_info "Leaving ${INSTALL_BIN_DIR}/hopcode unchanged because no managed standalone runtime was removed."
 fi
 
 remove_shell_path_entry
