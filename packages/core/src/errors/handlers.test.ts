@@ -74,6 +74,7 @@ describe('withRetry', () => {
   });
 
   it('fails after max retries', async () => {
+    vi.useRealTimers();
     const error = NetworkErrors.connectionRefused('api.example.com');
     const operation = vi
       .fn()
@@ -81,14 +82,12 @@ describe('withRetry', () => {
       .mockRejectedValueOnce(error)
       .mockRejectedValueOnce(error);
 
-    const promise = withRetry(operation, {
-      maxRetries: 2,
-      initialDelayMs: 100,
-    });
-
-    await vi.runAllTimersAsync();
-
-    await expect(promise).rejects.toThrow(NetworkError);
+    await expect(
+      withRetry(operation, {
+        maxRetries: 2,
+        initialDelayMs: 0,
+      }),
+    ).rejects.toThrow(NetworkError);
     expect(operation).toHaveBeenCalledTimes(3); // 1 initial + 2 retries
   });
 
@@ -152,24 +151,27 @@ describe('withRetry', () => {
   });
 
   it('uses exponential backoff', async () => {
-    const operation = vi.fn().mockImplementation(async () => {
-      throw NetworkErrors.connectionRefused('api.example.com');
-    });
+    vi.useRealTimers();
+    const onRetry = vi.fn();
+    const operation = vi
+      .fn()
+      .mockRejectedValue(NetworkErrors.connectionRefused('api.example.com'));
 
-    const promise = withRetry(operation, {
-      maxRetries: 3,
-      initialDelayMs: 100,
-      backoffMultiplier: 2,
-      maxDelayMs: 1000,
-    });
+    await expect(
+      withRetry(operation, {
+        maxRetries: 3,
+        initialDelayMs: 1,
+        backoffMultiplier: 2,
+        maxDelayMs: 1000,
+        onRetry,
+      }),
+    ).rejects.toThrow('Connection refused');
 
-    // Run timers for each retry: 100ms, 200ms, 400ms
-    await vi.advanceTimersByTimeAsync(100);
-    await vi.advanceTimersByTimeAsync(200);
-    await vi.advanceTimersByTimeAsync(400);
-
-    await expect(promise).rejects.toThrow('Connection refused');
     expect(operation).toHaveBeenCalledTimes(4);
+    expect(onRetry).toHaveBeenCalledTimes(3);
+    expect(onRetry).toHaveBeenNthCalledWith(1, expect.any(NetworkError), 1, 1);
+    expect(onRetry).toHaveBeenNthCalledWith(2, expect.any(NetworkError), 2, 2);
+    expect(onRetry).toHaveBeenNthCalledWith(3, expect.any(NetworkError), 3, 4);
   });
 });
 
