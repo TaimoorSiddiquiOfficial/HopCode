@@ -23,10 +23,10 @@ are only required when the installer falls back to npm or when
 
 ## Installation Scripts
 
-- Linux/macOS: `install-qwen-standalone.sh`
-- Windows: `install-qwen-standalone.ps1`
-- Linux/macOS uninstall: `uninstall-qwen-standalone.sh`
-- Windows uninstall: `uninstall-qwen-standalone.ps1`
+- Linux/macOS: `install-hopcode-standalone.sh`
+- Windows: `install-hopcode-standalone.ps1`
+- Linux/macOS uninstall: `uninstall-hopcode-standalone.sh`
+- Windows uninstall: `uninstall-hopcode-standalone.ps1`
 
 ## Release Artifacts
 
@@ -39,8 +39,8 @@ GitHub releases publish these standalone archives:
 - `hopcode-win-x64.zip`
 - `SHA256SUMS`
 
-The new standalone-first installer scripts (`install-qwen-standalone.sh`,
-`install-qwen-standalone.ps1`) are not republished per release. They are served
+The new standalone-first installer scripts (`install-hopcode-standalone.sh`,
+`install-hopcode-standalone.ps1`) are not republished per release. They are served
 from a hosted installation endpoint and accept `--version` to pin a specific
 standalone release. The `standalone` suffix intentionally avoids overwriting the
 existing production `install-qwen.sh` / `install-qwen.bat` OSS objects during
@@ -53,19 +53,19 @@ release archive sync have been validated in production.
 
 Hosted installer assets are staged separately from GitHub Release archives:
 
-- `install-qwen-standalone.sh` is the Linux/macOS hosted entrypoint.
-- `install-qwen-standalone.ps1` is the Windows hosted entrypoint for `irm | iex`.
-- `install-qwen-standalone.bat` is the Windows installer implementation used by
-  `install-qwen-standalone.ps1` and can also be downloaded and run directly.
-- `uninstall-qwen-standalone.sh` removes Linux/macOS standalone installs.
-- `uninstall-qwen-standalone.ps1` removes Windows standalone installs.
+- `install-hopcode-standalone.sh` is the Linux/macOS hosted entrypoint.
+- `install-hopcode-standalone.ps1` is the Windows hosted entrypoint for `irm | iex`.
+- `install-hopcode-standalone.bat` is the Windows installer implementation used by
+  `install-hopcode-standalone.ps1` and can also be downloaded and run directly.
+- `uninstall-hopcode-standalone.sh` removes Linux/macOS standalone installs.
+- `uninstall-hopcode-standalone.ps1` removes Windows standalone installs.
 
 The global standalone-suffixed OSS entrypoints are maintained under
-`installation/install-qwen-standalone.sh`,
-`installation/install-qwen-standalone.ps1`,
-`installation/install-qwen-standalone.bat`,
-`installation/uninstall-qwen-standalone.sh`, and
-`installation/uninstall-qwen-standalone.ps1`.
+`installation/install-hopcode-standalone.sh`,
+`installation/install-hopcode-standalone.ps1`,
+`installation/install-hopcode-standalone.bat`,
+`installation/uninstall-hopcode-standalone.sh`, and
+`installation/uninstall-hopcode-standalone.ps1`.
 
 Build them with:
 
@@ -73,9 +73,9 @@ Build them with:
 npm run package:hosted-installation -- --out-dir dist/installation
 ```
 
-The staged `install-qwen-standalone.sh`, `install-qwen-standalone.ps1`,
-`install-qwen-standalone.bat`, `uninstall-qwen-standalone.sh`, and
-`uninstall-qwen-standalone.ps1` files map to the standalone-suffixed hosted URLs
+The staged `install-hopcode-standalone.sh`, `install-hopcode-standalone.ps1`,
+`install-hopcode-standalone.bat`, `uninstall-hopcode-standalone.sh`, and
+`uninstall-hopcode-standalone.ps1` files map to the standalone-suffixed hosted URLs
 shown above. The staging command also writes `SHA256SUMS` for upload
 verification. During a non-dry-run stable release, the publish workflow uploads
 a byte-for-byte snapshot to `installation/vX.Y.Z/` for audit and rollback, and
@@ -129,13 +129,13 @@ The default method is `detect`:
 You can force a method:
 
 ```bash
-bash install-qwen-standalone.sh --method standalone
-bash install-qwen-standalone.sh --method npm
+bash install-hopcode-standalone.sh --method standalone
+bash install-hopcode-standalone.sh --method npm
 ```
 
 ```bat
-install-qwen-standalone.bat --method standalone
-install-qwen-standalone.bat --method npm
+install-hopcode-standalone.bat --method standalone
+install-hopcode-standalone.bat --method npm
 ```
 
 ## Optional Native Modules
@@ -153,20 +153,20 @@ modules for the current machine.
 
 ```bash
 # Default: standalone archive with npm fallback
-bash install-qwen-standalone.sh
+bash install-hopcode-standalone.sh
 
 # Record a source value
-bash install-qwen-standalone.sh --source github
+bash install-hopcode-standalone.sh --source github
 
 # Use npm explicitly
-bash install-qwen-standalone.sh --method npm --registry https://registry.npmjs.org
+bash install-hopcode-standalone.sh --method npm --registry https://registry.npmjs.org
 
 # Use the Aliyun standalone mirror
-bash install-qwen-standalone.sh --mirror aliyun
+bash install-hopcode-standalone.sh --mirror aliyun
 
 # Install an offline archive
 # SHA256SUMS must be in the same directory.
-bash install-qwen-standalone.sh --archive ./hopcode-linux-x64.tar.gz
+bash install-hopcode-standalone.sh --archive ./hopcode-linux-x64.tar.gz
 ```
 
 Standalone installs to:
@@ -180,7 +180,7 @@ Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_PARENT`,
 Uninstall a standalone Linux/macOS install:
 
 ```bash
-curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh | bash
 ```
 
 The uninstaller removes only the standalone runtime, generated `qwen` wrapper,
@@ -192,20 +192,20 @@ files are still preserved.
 
 ```bat
 REM Default: standalone archive with npm fallback
-install-qwen-standalone.bat
+install-hopcode-standalone.bat
 
 REM Record a source value
-install-qwen-standalone.bat --source github
+install-hopcode-standalone.bat --source github
 
 REM Use npm explicitly
-install-qwen-standalone.bat --method npm --registry https://registry.npmjs.org
+install-hopcode-standalone.bat --method npm --registry https://registry.npmjs.org
 
 REM Use the Aliyun standalone mirror
-install-qwen-standalone.bat --mirror aliyun
+install-hopcode-standalone.bat --mirror aliyun
 
 REM Install an offline archive
 REM SHA256SUMS must be in the same directory.
-install-qwen-standalone.bat --archive hopcode-win-x64.zip
+install-hopcode-standalone.bat --archive hopcode-win-x64.zip
 ```
 
 Standalone installs to:
@@ -221,7 +221,7 @@ Restart the terminal if `qwen` is not immediately available on PATH.
 Uninstall a standalone Windows install:
 
 ```bat
-powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1 | iex"
 ```
 
 The uninstaller removes only the standalone runtime, generated `qwen.cmd`

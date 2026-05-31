@@ -28,7 +28,7 @@ import {
   DaemonClient,
   DaemonHttpError,
   type DaemonSessionSummary,
-} from '@hoptrendy/hopcode-sdk';
+} from '@hoptrendy/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Match the rest of the integration suite: prefer the bundled CLI
@@ -407,7 +407,7 @@ describe('hopcode serve — cancel + list', () => {
     const sessions = await client.listWorkspaceSessions(REPO_ROOT);
     expect(sessions.length).toBeGreaterThanOrEqual(1);
     // Explicit `s` type because the reviewer's tsc run resolves
-    // `@hoptrendy/hopcode-sdk` against a possibly-stale dist .d.ts (per
+    // `@hoptrendy/sdk` against a possibly-stale dist .d.ts (per
     // integration-tests/tsconfig.json `paths` mapping); without
     // the annotation `s` widens to `any` in that environment and
     // trips strict-mode TS7006.

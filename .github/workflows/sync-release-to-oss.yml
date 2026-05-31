@@ -142,7 +142,7 @@ jobs:
           node scripts/upload-aliyun-oss-assets.js \
             --bucket "${ALIYUN_OSS_BUCKET}" \
             --config "${RUNNER_TEMP}/.ossutilconfig" \
-            --prefix "releases/qwen-code/${RELEASE_TAG}" \
+            --prefix "releases/hopcode/${RELEASE_TAG}" \
             "${release_assets[@]}"
 
       - name: 'Verify Aliyun OSS Release Assets'
@@ -152,7 +152,7 @@ jobs:
         run: |-
           set -euo pipefail
 
-          npm run verify:installation-release -- --base-url "${ALIYUN_OSS_PUBLIC_BASE_URL}/releases/qwen-code/${RELEASE_TAG}"
+          npm run verify:installation-release -- --base-url "${ALIYUN_OSS_PUBLIC_BASE_URL}/releases/hopcode/${RELEASE_TAG}"
 
       - name: 'Sync Hosted Installation Assets to Aliyun OSS'
         if: |-
@@ -164,11 +164,11 @@ jobs:
           set -euo pipefail
 
           hosted_assets=(
-            dist/installation/install-qwen-standalone.sh
-            dist/installation/install-qwen-standalone.ps1
-            dist/installation/install-qwen-standalone.bat
-            dist/installation/uninstall-qwen-standalone.sh
-            dist/installation/uninstall-qwen-standalone.ps1
+            dist/installation/install-hopcode-standalone.sh
+            dist/installation/install-hopcode-standalone.ps1
+            dist/installation/install-hopcode-standalone.bat
+            dist/installation/uninstall-hopcode-standalone.sh
+            dist/installation/uninstall-hopcode-standalone.ps1
             dist/installation/SHA256SUMS
           )
           node scripts/upload-aliyun-oss-assets.js \
@@ -194,7 +194,7 @@ jobs:
           hosted_tmp_dir="$(mktemp -d)"
           trap 'rm -rf "${hosted_tmp_dir}"' EXIT
           mkdir -p "${hosted_tmp_dir}/versioned" "${hosted_tmp_dir}/global"
-          for asset in install-qwen-standalone.sh install-qwen-standalone.ps1 install-qwen-standalone.bat uninstall-qwen-standalone.sh uninstall-qwen-standalone.ps1 SHA256SUMS; do
+          for asset in install-hopcode-standalone.sh install-hopcode-standalone.ps1 install-hopcode-standalone.bat uninstall-hopcode-standalone.sh uninstall-hopcode-standalone.ps1 SHA256SUMS; do
             url="${ALIYUN_OSS_PUBLIC_BASE_URL}/installation/${RELEASE_TAG}/${asset}"
             global_url="${ALIYUN_OSS_PUBLIC_BASE_URL}/installation/${asset}"
             curl -fsSL --connect-timeout 15 --max-time 300 "${url}" -o "${hosted_tmp_dir}/versioned/${asset}"
@@ -223,10 +223,10 @@ jobs:
         run: |-
           set -euo pipefail
 
-          printf '%s\n' "${RELEASE_TAG}" > "${RUNNER_TEMP}/qwen-code-latest-version"
-          ossutil cp "${RUNNER_TEMP}/qwen-code-latest-version" "oss://${ALIYUN_OSS_BUCKET}/releases/qwen-code/latest/VERSION" -c "${RUNNER_TEMP}/.ossutilconfig" -f --acl public-read
+          printf '%s\n' "${RELEASE_TAG}" > "${RUNNER_TEMP}/hopcode-latest-version"
+          ossutil cp "${RUNNER_TEMP}/hopcode-latest-version" "oss://${ALIYUN_OSS_BUCKET}/releases/hopcode/latest/VERSION" -c "${RUNNER_TEMP}/.ossutilconfig" -f --acl public-read
 
-          latest_version="$(curl -fsSL --connect-timeout 15 --max-time 300 "${ALIYUN_OSS_PUBLIC_BASE_URL}/releases/qwen-code/latest/VERSION" | tr -d '[:space:]')"
+          latest_version="$(curl -fsSL --connect-timeout 15 --max-time 300 "${ALIYUN_OSS_PUBLIC_BASE_URL}/releases/hopcode/latest/VERSION" | tr -d '[:space:]')"
           if [[ "${latest_version}" != "${RELEASE_TAG}" ]]; then
             echo "::error::Aliyun latest VERSION points to ${latest_version}, expected ${RELEASE_TAG}"
             exit 1

@@ -5,8 +5,8 @@
 # This script intentionally does not install Node.js or change npm config.
 #
 # Usage:
-#   install-qwen-standalone.sh --source [github|npm|internal|local-build]
-#   install-qwen-standalone.sh --method [detect|standalone|npm]
+#   install-hopcode-standalone.sh --source [github|npm|internal|local-build]
+#   install-hopcode-standalone.sh --method [detect|standalone|npm]
 
 if [ -z "${BASH_VERSION}" ] && [ -z "${__HOPCODE_INSTALL_REEXEC:-}" ]; then
     if command -v bash >/dev/null 2>&1; then
@@ -107,10 +107,10 @@ Options:
   -h, --help               Show this help message.
 
 Examples:
-  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
-  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash -s -- --source github
-  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash -s -- --method standalone
-  ./install-qwen-standalone.sh --archive ./hopcode-linux-x64.tar.gz
+  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash
+  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash -s -- --source github
+  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash -s -- --method standalone
+  ./install-hopcode-standalone.sh --archive ./hopcode-linux-x64.tar.gz
 EOF
 }
 
@@ -562,11 +562,11 @@ github_base_url_for_version() {
 
 aliyun_base_url_for_version() {
     local version_path="$1"
-    echo "https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/${version_path}"
+    echo "https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/${version_path}"
 }
 
 aliyun_latest_version_url() {
-    echo "https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/latest/VERSION"
+    echo "https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/latest/VERSION"
 }
 
 normalize_version_path_value() {
@@ -1008,12 +1008,12 @@ is_hopcode_standalone_install_dir() {
 write_unix_wrapper() {
     local wrapper_path="$1"
     local hopcode_bin="$2"
-    local quoted_hopcode_bin
-    quoted_hopcode_bin=$(shell_quote "${hopcode_bin}")
+    local quoted_HOPCODE_bin
+    quoted_HOPCODE_bin=$(shell_quote "${hopcode_bin}")
 
     if ! cat > "${wrapper_path}" <<EOF
 #!/usr/bin/env sh
-exec ${quoted_hopcode_bin} "\$@"
+exec ${quoted_HOPCODE_bin} "\$@"
 EOF
     then
         return 1
@@ -1072,7 +1072,7 @@ install_standalone() {
             fi
         fi
         if [[ -n "${github_fallback_base_url}" && "${requested_version_path}" == "latest" ]]; then
-            local aliyun_release_base="https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/"
+            local aliyun_release_base="https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/"
             if [[ "${base_url}" == "${aliyun_release_base}"* ]]; then
                 local resolved_version_path="${base_url#"${aliyun_release_base}"}"
                 if [[ -n "${resolved_version_path}" && "${resolved_version_path}" != "latest" && "${resolved_version_path}" != */* ]]; then
@@ -1299,7 +1299,7 @@ print_final_instructions() {
     local install_method="${3:-standalone}"
     local installed_bin=""
     local quoted_install_bin_dir=""
-    local standalone_uninstall_url="https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh"
+    local standalone_uninstall_url="https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh"
     if [[ -n "${install_bin_dir}" ]]; then
         installed_bin="${install_bin_dir}/hopcode"
         quoted_install_bin_dir=$(shell_quote "${install_bin_dir}")

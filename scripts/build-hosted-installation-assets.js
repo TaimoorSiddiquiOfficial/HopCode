@@ -23,27 +23,27 @@ const rootDir = path.resolve(__dirname, '..');
 
 const HOSTED_INSTALLATION_ASSETS = [
   {
-    sourcePath: ['scripts', 'installation', 'install-qwen-standalone.sh'],
-    output: 'install-qwen-standalone.sh',
-    mode: 0o755,
-  },
-  {
-    sourcePath: ['scripts', 'installation', 'install-qwen-standalone.bat'],
-    output: 'install-qwen-standalone.bat',
+    sourcePath: ['scripts', 'installation', 'install-hopcode-standalone.bat'],
+    output: 'install-hopcode-standalone.bat',
     lineEndings: 'crlf',
   },
   {
-    sourcePath: ['scripts', 'installation', 'install-qwen-standalone.ps1'],
-    output: 'install-qwen-standalone.ps1',
+    sourcePath: ['scripts', 'installation', 'install-hopcode-standalone.ps1'],
+    output: 'install-hopcode-standalone.ps1',
   },
   {
-    sourcePath: ['scripts', 'installation', 'uninstall-qwen-standalone.sh'],
-    output: 'uninstall-qwen-standalone.sh',
+    sourcePath: ['scripts', 'installation', 'install-hopcode-standalone.sh'],
+    output: 'install-hopcode-standalone.sh',
     mode: 0o755,
   },
   {
-    sourcePath: ['scripts', 'installation', 'uninstall-qwen-standalone.ps1'],
-    output: 'uninstall-qwen-standalone.ps1',
+    sourcePath: ['scripts', 'installation', 'uninstall-hopcode-standalone.ps1'],
+    output: 'uninstall-hopcode-standalone.ps1',
+  },
+  {
+    sourcePath: ['scripts', 'installation', 'uninstall-hopcode-standalone.sh'],
+    output: 'uninstall-hopcode-standalone.sh',
+    mode: 0o755,
   },
 ];
 const HOSTED_INSTALLATION_ASSET_NAMES = HOSTED_INSTALLATION_ASSETS.map(
@@ -52,7 +52,7 @@ const HOSTED_INSTALLATION_ASSET_NAMES = HOSTED_INSTALLATION_ASSETS.map(
 /** Regex guards that verify each installer script contains required behaviors.
  *  Build fails if a pattern is missing, preventing broken entrypoints from shipping. */
 const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
-  'install-qwen-standalone.sh': [
+  'install-hopcode-standalone.sh': [
     {
       name: 'HOPCODE_INSTALL_VERSION',
       pattern: /HOPCODE_INSTALL_VERSION/,
@@ -62,7 +62,7 @@ const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
       pattern: /--version\)|--version=\*\)/,
     },
   ],
-  'install-qwen-standalone.bat': [
+  'install-hopcode-standalone.bat': [
     {
       name: 'HOPCODE_INSTALL_VERSION',
       pattern: /HOPCODE_INSTALL_VERSION/,
@@ -72,10 +72,10 @@ const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
       pattern: /ARG_KEY!"=="--version"|"%~1"=="--version"/,
     },
   ],
-  'install-qwen-standalone.ps1': [
+  'install-hopcode-standalone.ps1': [
     {
       name: 'argument forwarding',
-      pattern: /& \$qwenInstallerPath @args/,
+      pattern: /& \$hopcodeInstallerPath @args/,
     },
     {
       name: 'SHA256SUMS verification',
@@ -90,7 +90,7 @@ const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
       pattern: /HOPCODE_INSTALL_VERSION/,
     },
   ],
-  'uninstall-qwen-standalone.sh': [
+  'uninstall-hopcode-standalone.sh': [
     {
       name: 'standalone directory guard',
       pattern: /is_hopcode_standalone_install_dir/,
@@ -104,7 +104,7 @@ const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
       pattern: /HOPCODE_UNINSTALL_PURGE/,
     },
   ],
-  'uninstall-qwen-standalone.ps1': [
+  'uninstall-hopcode-standalone.ps1': [
     {
       name: 'standalone directory guard',
       pattern: /Test-HopcodeStandaloneInstallDir/,
@@ -128,11 +128,11 @@ const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
 // or help text even when the actual default has been changed. The patterns
 // allow whitespace flexibility but require the literal default value.
 const HOSTED_INSTALLER_DEFAULT_VERSION_PATTERNS = {
-  'install-qwen-standalone.sh':
+  'install-hopcode-standalone.sh':
     /VERSION\s*=\s*"\$\{HOPCODE_INSTALL_VERSION:-latest\}"/,
-  'install-qwen-standalone.bat': /set\s+"VERSION=latest"/,
+  'install-hopcode-standalone.bat': /set\s+"VERSION=latest"/,
 };
-// install-qwen-standalone.ps1 is a shim that downloads the .bat and forwards
+// install-hopcode-standalone.ps1 is a shim that downloads the .bat and forwards
 // `@args` unchanged, so it has no VERSION variable to default-pin. Guard the
 // shim instead with forbidden-content patterns: any attempt to hardcode a
 // specific version (either by assigning $env:HOPCODE_INSTALL_VERSION or by
@@ -140,7 +140,7 @@ const HOSTED_INSTALLER_DEFAULT_VERSION_PATTERNS = {
 // Patterns are matched per non-comment line (PowerShell line comments start
 // with `#`) so the usage examples in the header docstring keep working.
 const HOSTED_INSTALLER_FORBIDDEN_PATTERNS = {
-  'install-qwen-standalone.ps1': [
+  'install-hopcode-standalone.ps1': [
     {
       name: 'no hardcoded HOPCODE_INSTALL_VERSION assignment',
       pattern: /^\s*\$env:HOPCODE_INSTALL_VERSION\s*=/m,
@@ -148,7 +148,7 @@ const HOSTED_INSTALLER_FORBIDDEN_PATTERNS = {
     {
       name: 'no hardcoded --version prepended to forwarded args',
       pattern:
-        /^\s*&\s+\$qwenInstallerPath\s+(?:'--version'|"--version"|--version)/m,
+        /^\s*&\s+\$hopcodeInstallerPath\s+(?:'--version'|"--version"|--version)/m,
     },
   ],
 };
@@ -253,16 +253,16 @@ function copyHostedInstallationAsset(source, destination, asset) {
  * given release version so the hosted installer installs the tagged version.
  *
  * @param {string} filePath - Path to the copied asset on disk.
- * @param {string} assetName - Logical asset name (e.g. 'install-qwen-standalone.sh').
+ * @param {string} assetName - Logical asset name (e.g. 'install-hopcode-standalone.sh').
  * @param {string} version - Release version to stamp (e.g. 'v1.2.3' or '1.2.3').
  */
 function stampVersionInAsset(filePath, assetName, version) {
   const replacements = {
-    'install-qwen-standalone.sh': {
+    'install-hopcode-standalone.sh': {
       from: 'VERSION="${HOPCODE_INSTALL_VERSION:-latest}"',
       to: `VERSION="\${HOPCODE_INSTALL_VERSION:-${version}}"`,
     },
-    'install-qwen-standalone.bat': {
+    'install-hopcode-standalone.bat': {
       from: 'set "VERSION=latest"',
       to: `set "VERSION=${version}"`,
     },

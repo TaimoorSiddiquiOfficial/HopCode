@@ -431,7 +431,7 @@ jobs:
 
           gh release create "${RELEASE_TAG}" \
             dist/cli.js \
-            dist/standalone/qwen-code-* \
+            dist/standalone/hopcode-* \
             dist/standalone/SHA256SUMS \
             --target "${RELEASE_BRANCH}" \
             --title "Release ${RELEASE_TAG}" \

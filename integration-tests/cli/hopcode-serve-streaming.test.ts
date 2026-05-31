@@ -27,8 +27,8 @@ import { spawn, execSync, type ChildProcess } from 'node:child_process';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { DaemonClient, parseSseStream } from '@hoptrendy/hopcode-sdk';
-import type { DaemonEvent, DaemonSessionSummary } from '@hoptrendy/hopcode-sdk';
+import { DaemonClient, parseSseStream } from '@hoptrendy/sdk';
+import type { DaemonEvent, DaemonSessionSummary } from '@hoptrendy/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Match the rest of the integration suite: prefer `TEST_CLI_PATH`

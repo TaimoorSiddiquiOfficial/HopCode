@@ -1,6 +1,6 @@
 @echo off
-REM Qwen Code Installation Script
-REM Installs Qwen Code from a standalone archive when available, with npm fallback.
+REM HopCode Installation Script
+REM Installs HopCode from a standalone archive when available, with npm fallback.
 REM This script intentionally does not install Node.js or change npm config.
 
 setlocal enabledelayedexpansion
@@ -24,12 +24,12 @@ if defined HOPCODE_INSTALL_VERSION set "VERSION=!HOPCODE_INSTALL_VERSION!"
 set "NPM_REGISTRY=https://registry.npmmirror.com"
 if defined HOPCODE_NPM_REGISTRY set "NPM_REGISTRY=!HOPCODE_NPM_REGISTRY!"
 if defined LOCALAPPDATA (
-    set "INSTALL_BASE=!LOCALAPPDATA!\qwen-code"
+    set "INSTALL_BASE=!LOCALAPPDATA!\hopcode"
 ) else (
-    set "INSTALL_BASE=!USERPROFILE!\AppData\Local\qwen-code"
+    set "INSTALL_BASE=!USERPROFILE!\AppData\Local\hopcode"
 )
 if defined HOPCODE_INSTALL_ROOT set "INSTALL_BASE=!HOPCODE_INSTALL_ROOT!"
-set "INSTALL_DIR=!INSTALL_BASE!\qwen-code"
+set "INSTALL_DIR=!INSTALL_BASE!\hopcode"
 if defined HOPCODE_INSTALL_LIB_DIR set "INSTALL_DIR=!HOPCODE_INSTALL_LIB_DIR!"
 set "INSTALL_BIN_DIR=!INSTALL_BASE!\bin"
 if defined HOPCODE_INSTALL_BIN_DIR set "INSTALL_BIN_DIR=!HOPCODE_INSTALL_BIN_DIR!"
@@ -223,10 +223,10 @@ for %%c in (
     "!APPDATA!\npm\hopcode.cmd"
     "!USERPROFILE!\.bun\bin\hopcode.cmd"
     "!LOCALAPPDATA!\bun\bin\hopcode.cmd"
-    "!LOCALAPPDATA!\qwen-code\bin\hopcode.cmd"
+    "!LOCALAPPDATA!\hopcode\bin\hopcode.cmd"
 ) do if exist %%c echo %%~c>>"!PRE_INSTALL_HOPCODES_FILE!"
 for /f "delims=" %%i in ('npm prefix -g 2^>nul') do (
-    if exist "%%i\hopcode.cmd" echo %%i\qwen.cmd>>"!PRE_INSTALL_HOPCODES_FILE!"
+    if exist "%%i\hopcode.cmd" echo %%i\hopcode.cmd>>"!PRE_INSTALL_HOPCODES_FILE!"
 )
 set "PRE_INSTALL_HOPCODES_LIST="
 if exist "!PRE_INSTALL_HOPCODES_FILE!" (
@@ -291,9 +291,9 @@ call :PrintUsage
 exit /b 1
 
 :PrintUsage
-echo Qwen Code Installer
+echo HopCode Installer
 echo.
-echo Usage: install-qwen-standalone.bat [OPTIONS]
+echo Usage: install-hopcode-standalone.bat [OPTIONS]
 echo.
 echo Options:
 echo   -s, --source SOURCE      Record the installation source.
@@ -317,7 +317,7 @@ set "DISPLAY_VERSION=!VERSION!"
 if /i not "!DISPLAY_VERSION!"=="latest" (
     if /i "!DISPLAY_VERSION:~0,1!"=="v" set "DISPLAY_VERSION=!DISPLAY_VERSION:~1!"
 )
-echo Installing Qwen Code version: !DISPLAY_VERSION!
+echo Installing HopCode version: !DISPLAY_VERSION!
 exit /b 0
 
 :ValidateRawEnvironmentOptions
@@ -502,11 +502,11 @@ exit /b 0
 
 :AliyunBaseUrlForVersion
 rem args: %~1=version_path  → sets HOPCODE_OSS_BASE_URL
-set "HOPCODE_OSS_BASE_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/%~1"
+set "HOPCODE_OSS_BASE_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/%~1"
 exit /b 0
 
 :AliyunLatestVersionUrl
-set "HOPCODE_OSS_LATEST_VERSION_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/qwen-code/latest/VERSION"
+set "HOPCODE_OSS_LATEST_VERSION_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/latest/VERSION"
 exit /b 0
 
 :RaceMirrorHead
@@ -715,11 +715,14 @@ if "!EXPECTED_HASH!"=="" (
 )
 
 set "ACTUAL_HASH="
-set "HOPCODE_HASH_FILE=!ARCHIVE_FILE!"
-for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; (Get-FileHash -Algorithm SHA256 -LiteralPath $env:HOPCODE_HASH_FILE).Hash" 2^>nul') do (
-    if "!ACTUAL_HASH!"=="" set "ACTUAL_HASH=%%H"
+set "_CERTUTIL_LINES=0"
+for /f "skip=1 tokens=* delims=" %%H in ('certutil -hashfile "!ARCHIVE_FILE!" SHA256 2^>nul') do (
+    if "!_CERTUTIL_LINES!"=="0" (
+        set "ACTUAL_HASH=%%H"
+        set "_CERTUTIL_LINES=1"
+    )
 )
-set "HOPCODE_HASH_FILE="
+set "_CERTUTIL_LINES="
 
 if not "!TEMP_CHECKSUM!"=="" del /F /Q "!TEMP_CHECKSUM!" >nul 2>&1
 
@@ -752,7 +755,7 @@ if not "!ARCHIVE_PATH!"=="" (
     call :DetectTarget
     if !ERRORLEVEL! NEQ 0 exit /b 2
 
-    set "ARCHIVE_NAME=qwen-code-!TARGET!.zip"
+    set "ARCHIVE_NAME=hopcode-!TARGET!.zip"
     set "REQUESTED_MIRROR=!MIRROR!"
     set "REQUESTED_VERSION_PATH="
     set "GITHUB_FALLBACK_BASE_URL="
@@ -874,15 +877,15 @@ if !ERRORLEVEL! NEQ 0 (
     exit /b 1
 )
 
-if not exist "!EXTRACT_DIR!\qwen-code\bin\hopcode.cmd" (
+if not exist "!EXTRACT_DIR!\hopcode\bin\hopcode.cmd" (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Archive does not contain qwen-code\bin\qwen.cmd.
+    echo ERROR: Archive does not contain hopcode\bin\hopcode.cmd.
     exit /b 1
 )
 
-if not exist "!EXTRACT_DIR!\qwen-code\node\node.exe" (
+if not exist "!EXTRACT_DIR!\hopcode\node\node.exe" (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Archive does not contain qwen-code\node\node.exe.
+    echo ERROR: Archive does not contain hopcode\node\node.exe.
     exit /b 1
 )
 
@@ -945,7 +948,7 @@ if exist "!OLD_INSTALL_DIR!" (
         exit /b 1
     )
 )
-move /Y "!EXTRACT_DIR!\qwen-code" "!NEW_INSTALL_DIR!" >nul
+move /Y "!EXTRACT_DIR!\hopcode" "!NEW_INSTALL_DIR!" >nul
 if !ERRORLEVEL! NEQ 0 (
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
     echo ERROR: Failed to stage standalone archive.
@@ -975,21 +978,21 @@ rem loosened, the wrapper write below becomes a command injection sink.
 (
 echo @echo off
 echo call "!INSTALL_DIR!\bin\hopcode.cmd" %%*
-) > "!INSTALL_BIN_DIR!\qwen.cmd.new"
+) > "!INSTALL_BIN_DIR!\hopcode.cmd.new"
 if !ERRORLEVEL! NEQ 0 (
     call :RemoveInstalledDirWithWarning
     call :RestoreOldInstall
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
-move /Y "!INSTALL_BIN_DIR!\qwen.cmd.new" "!INSTALL_BIN_DIR!\hopcode.cmd" >nul
+move /Y "!INSTALL_BIN_DIR!\hopcode.cmd.new" "!INSTALL_BIN_DIR!\hopcode.cmd" >nul
 if !ERRORLEVEL! NEQ 0 (
-    if exist "!INSTALL_BIN_DIR!\qwen.cmd.new" del /F /Q "!INSTALL_BIN_DIR!\qwen.cmd.new" >nul 2>&1
+    if exist "!INSTALL_BIN_DIR!\hopcode.cmd.new" del /F /Q "!INSTALL_BIN_DIR!\hopcode.cmd.new" >nul 2>&1
     call :RemoveInstalledDirWithWarning
     call :RestoreOldInstall
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 
@@ -1002,13 +1005,13 @@ set "PATH=!INSTALL_BIN_DIR!;!PATH!"
 call :CreateSourceJson
 if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
 
-echo SUCCESS: Qwen Code standalone archive installed successfully.
+echo SUCCESS: HopCode standalone archive installed successfully.
 echo INFO: Installed to !INSTALL_DIR!
 exit /b 0
 
 :CreateTempDir
 set "TEMP_DIR="
-for /f "usebackq delims=" %%I in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = Join-Path $env:TEMP ('qwen-code-install-' + [IO.Path]::GetRandomFileName()); New-Item -ItemType Directory -Path $dir -ErrorAction Stop | Out-Null; [Console]::Write($dir)"`) do set "TEMP_DIR=%%I"
+for /f "usebackq delims=" %%I in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = Join-Path $env:TEMP ('hopcode-install-' + [IO.Path]::GetRandomFileName()); New-Item -ItemType Directory -Path $dir -ErrorAction Stop | Out-Null; [Console]::Write($dir)"`) do set "TEMP_DIR=%%I"
 if "!TEMP_DIR!"=="" (
     echo ERROR: Failed to create a temporary directory.
     exit /b 1
@@ -1103,17 +1106,17 @@ exit /b %PS_STATUS%
 :EnsureManagedInstallDir
 set "MANAGED_DIR=%~1"
 set "HOPCODE_MANAGED_DIR=!MANAGED_DIR!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = $env:HOPCODE_MANAGED_DIR; if (!(Test-Path -LiteralPath $dir)) { exit 0 }; if (!(Test-Path -LiteralPath $dir -PathType Container)) { exit 1 }; $manifest = Join-Path $dir 'manifest.json'; if (!(Test-Path -LiteralPath $manifest -PathType Leaf)) { exit 1 }; try { $data = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json } catch { exit 1 }; if ($data.name -ne '@hoptrendy/hopcode-cli') { exit 1 }; if ([string]$data.target -notmatch '^win-(x64|arm64)$') { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'bin\qwen.cmd') -PathType Leaf)) { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'node\node.exe') -PathType Leaf)) { exit 1 }; exit 0"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = $env:HOPCODE_MANAGED_DIR; if (!(Test-Path -LiteralPath $dir)) { exit 0 }; if (!(Test-Path -LiteralPath $dir -PathType Container)) { exit 1 }; $manifest = Join-Path $dir 'manifest.json'; if (!(Test-Path -LiteralPath $manifest -PathType Leaf)) { exit 1 }; try { $data = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json } catch { exit 1 }; if ($data.name -ne '@hoptrendy/hopcode-cli') { exit 1 }; if ([string]$data.target -notmatch '^win-(x64|arm64)$') { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'bin\hopcode.cmd') -PathType Leaf)) { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'node\node.exe') -PathType Leaf)) { exit 1 }; exit 0"
 set "PS_STATUS=!ERRORLEVEL!"
 set "HOPCODE_MANAGED_DIR="
 if !PS_STATUS! EQU 0 exit /b 0
 
-rem Directory exists but is not a qwen-code standalone install.
+rem Directory exists but is not a hopcode standalone install.
 rem Back it up so the user doesn't lose data, then proceed.
 for /f "delims=" %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMddTHHmmss"') do set "BACKUP_TIMESTAMP=%%t"
 set "BACKUP_DIR=!MANAGED_DIR!.backup.!BACKUP_TIMESTAMP!"
 if "!BACKUP_TIMESTAMP!"=="" set "BACKUP_DIR=!MANAGED_DIR!.backup"
-echo WARNING: !MANAGED_DIR! exists but is not a Qwen Code standalone install.
+echo WARNING: !MANAGED_DIR! exists but is not a HopCode standalone install.
 echo WARNING: Backing up to !BACKUP_DIR!
 move /Y "!MANAGED_DIR!" "!BACKUP_DIR!" >nul
 if !ERRORLEVEL! NEQ 0 (
@@ -1127,7 +1130,7 @@ where node >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Node.js was not found.
     echo.
-    echo Node.js 22 or newer is required before installing Qwen Code with npm.
+    echo Node.js 22 or newer is required before installing HopCode with npm.
     echo Please install Node.js from https://nodejs.org/ and rerun this installer.
     exit /b 1
 )
@@ -1135,7 +1138,7 @@ if %ERRORLEVEL% NEQ 0 (
 for /f "delims=" %%i in ('node -p "process.versions.node" 2^>nul') do set "NODE_VERSION=%%i"
 if "%NODE_VERSION%"=="" (
     echo ERROR: Unable to determine Node.js version.
-    echo Node.js 22 or newer is required before installing Qwen Code with npm.
+    echo Node.js 22 or newer is required before installing HopCode with npm.
     exit /b 1
 )
 
@@ -1143,7 +1146,7 @@ for /f "tokens=1 delims=." %%a in ("%NODE_VERSION%") do set "MAJOR_VERSION=%%a"
 set /a NODE_MAJOR_NUM=%MAJOR_VERSION% >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Unable to determine Node.js version.
-    echo Node.js 22 or newer is required before installing Qwen Code with npm.
+    echo Node.js 22 or newer is required before installing HopCode with npm.
     exit /b 1
 )
 
@@ -1187,8 +1190,8 @@ call :NpmPackageSpec
 
 where hopcode >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    for /f "delims=" %%i in ('qwen --version 2^>nul') do set "QWEN_VERSION=%%i"
-    echo INFO: Existing Qwen Code detected: !QWEN_VERSION!
+    for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "QWEN_VERSION=%%i"
+    echo INFO: Existing HopCode detected: !QWEN_VERSION!
     if /i "!VERSION!"=="latest" (
         echo INFO: Upgrading to the latest version.
     ) else (
@@ -1199,7 +1202,7 @@ if %ERRORLEVEL% EQU 0 (
 echo INFO: Running: npm install -g !NPM_PACKAGE_SPEC! --registry !NPM_REGISTRY!
 call npm install -g !NPM_PACKAGE_SPEC! --registry "!NPM_REGISTRY!"
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to install Qwen Code.
+    echo ERROR: Failed to install HopCode.
     echo.
     echo This installer does not change your npm prefix or PATH.
     echo If the failure is a permission error, fix your npm global package directory, then run:
@@ -1207,14 +1210,14 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-echo SUCCESS: Qwen Code installed successfully.
+echo SUCCESS: HopCode installed successfully.
 call :CreateSourceJson
 exit /b 0
 
 :CreateSourceJson
 if "!SOURCE!"=="unknown" exit /b 0
 
-set "HOPCODE_DIR=!USERPROFILE!\.qwen"
+set "HOPCODE_DIR=!USERPROFILE!\.hopcode"
 call :EnsureDir "!HOPCODE_DIR!"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 
@@ -1224,14 +1227,14 @@ echo   "source": "!SOURCE!"
 echo }
 ) > "!HOPCODE_DIR!\source.json"
 
-echo SUCCESS: Installation source saved to !USERPROFILE!\.qwen\source.json
+echo SUCCESS: Installation source saved to !USERPROFILE!\.hopcode\source.json
 exit /b 0
 
 :PrintFinalInstructions
 set "EXTRA_BIN=%~1"
 set "SUMMARY_INSTALL_DIR=%~2"
 set "SUMMARY_INSTALL_METHOD=%~3"
-set "STANDALONE_UNINSTALL_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1"
+set "STANDALONE_UNINSTALL_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1"
 if "!SUMMARY_INSTALL_METHOD!"=="" set "SUMMARY_INSTALL_METHOD=standalone"
 
 set "INSTALLED_BIN="
@@ -1247,13 +1250,13 @@ if not "!INSTALLED_BIN!"=="" if exist "!INSTALLED_BIN!" (
     for /f "delims=" %%i in ('"!INSTALLED_BIN!" --version 2^>nul') do set "INSTALLED_VERSION=%%i"
 )
 
-echo QWEN CODE
+echo HOPCODE
 echo.
-echo Qwen Code !INSTALLED_VERSION! installed successfully.
+echo HopCode !INSTALLED_VERSION! installed successfully.
 echo.
 echo To start:
 echo   cd ^<project^>
-echo   qwen
+echo   hopcode
 
 if not "!SUMMARY_INSTALL_DIR!"=="" (
     echo.
@@ -1315,7 +1318,7 @@ if defined OTHER_QWENS (
     exit /b 0
 )
 
-if /i "!QWEN_INSTALLER_PARENT_POWERSHELL!"=="1" (
+if /i "!HOPCODE_INSTALLER_PARENT_POWERSHELL!"=="1" (
     echo INFO: Final PATH refresh is handled by the PowerShell entrypoint.
     exit /b 0
 )
