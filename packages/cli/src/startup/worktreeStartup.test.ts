@@ -95,7 +95,7 @@ describe('setupStartupWorktree', () => {
       expect(res!.context.slug).toMatch(/^[a-z]+-[a-z]+-[0-9a-f]{6}$/);
       expect(res!.context.branch).toBe(`worktree-${res!.context.slug}`);
       expect(res!.context.worktreePath).toContain(
-        path.join('.qwen', 'worktrees', res!.context.slug),
+        path.join('.hopcode', 'worktrees', res!.context.slug),
       );
       expect(res!.context.repoRoot).toBe(tempRepo);
       expect(res!.context.originalBranch).toBe('main');
@@ -123,7 +123,7 @@ describe('setupStartupWorktree', () => {
       expect(res!.context.slug).toBe('my-feature');
       expect(res!.context.branch).toBe('worktree-my-feature');
       expect(res!.context.worktreePath).toBe(
-        path.join(tempRepo, '.qwen', 'worktrees', 'my-feature'),
+        path.join(tempRepo, '.hopcode', 'worktrees', 'my-feature'),
       );
     }
   });
@@ -234,7 +234,7 @@ describe('setupStartupWorktree', () => {
         expect(res!.context.branch).toBe('worktree-pr-42');
         expect(res!.context.isPullRequest).toBe(true);
         expect(res!.context.worktreePath).toBe(
-          path.join(tempRepo, '.qwen', 'worktrees', 'pr-42'),
+          path.join(tempRepo, '.hopcode', 'worktrees', 'pr-42'),
         );
 
         // The PR file lives inside the worktree (proving FETCH_HEAD was
@@ -306,7 +306,7 @@ describe('setupStartupWorktree', () => {
     // is NOT a git worktree (just a plain dir with a file in it).
     const slotPath = path.join(
       tempRepo,
-      '.qwen',
+      '.hopcode',
       'worktrees',
       'plain-dir-conflict',
     );

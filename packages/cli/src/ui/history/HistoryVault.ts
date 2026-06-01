@@ -77,14 +77,16 @@ export class HistoryVault {
   }
 
   /** Update an existing item by id.  Clears the context note cache when the
-   *  mutated item falls in the "older" section (before the window start). */
-  updateItem(id: number, updater: (prev: HistoryItem) => HistoryItem): void {
+   *  mutated item falls in the "older" section (before the window start).
+   *  Returns true if the item was found and updated, false if not found. */
+  updateItem(id: number, updater: (prev: HistoryItem) => HistoryItem): boolean {
     const idx = this._items.findIndex((i) => i.id === id);
-    if (idx === -1) return;
+    if (idx === -1) return false;
     this._items[idx] = updater(this._items[idx]);
     if (idx < this._windowStart) {
       this._contextNoteCache.clear();
     }
+    return true;
   }
 
   /** Replace the entire history (e.g. after /resume or loadHistory). */

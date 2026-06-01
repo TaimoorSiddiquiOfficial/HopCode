@@ -591,15 +591,15 @@ describe('loggers', () => {
     } as unknown as Config;
 
     beforeEach(() => {
-      vi.spyOn(QwenLogger.prototype, 'logSkillLaunchEvent');
+      vi.spyOn(HopCodeLogger.prototype, 'logSkillLaunchEvent');
     });
 
-    it('forwards the event to QwenLogger and emits an OTLP record', () => {
+    it('forwards the event to HopCodeLogger and emits an OTLP record', () => {
       const event = new SkillLaunchEvent('test-skill', true, 'prompt-id-42');
 
       logSkillLaunch(mockConfig, event);
 
-      expect(QwenLogger.prototype.logSkillLaunchEvent).toHaveBeenCalledWith(
+      expect(HopCodeLogger.prototype.logSkillLaunchEvent).toHaveBeenCalledWith(
         event,
       );
 
@@ -618,13 +618,13 @@ describe('loggers', () => {
       );
     });
 
-    it('forwards to QwenLogger even when OTLP SDK is not initialized', () => {
+    it('forwards to HopCodeLogger even when OTLP SDK is not initialized', () => {
       vi.spyOn(sdk, 'isTelemetrySdkInitialized').mockReturnValue(false);
       const event = new SkillLaunchEvent('another-skill', false, 'prompt-id-7');
 
       logSkillLaunch(mockConfig, event);
 
-      expect(QwenLogger.prototype.logSkillLaunchEvent).toHaveBeenCalledWith(
+      expect(HopCodeLogger.prototype.logSkillLaunchEvent).toHaveBeenCalledWith(
         event,
       );
       expect(mockLogger.emit).not.toHaveBeenCalled();

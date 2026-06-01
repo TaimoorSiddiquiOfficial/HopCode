@@ -292,7 +292,7 @@ describe('session-tracing', () => {
         messageType: 'userQuery',
       });
 
-      const span = mockSpans.find((s) => s.name === 'qwen-code.interaction');
+      const span = mockSpans.find((s) => s.name === 'hopcode.interaction');
       expect(span?.parentContext).toBe(fakeRoot);
     });
 
@@ -307,7 +307,7 @@ describe('session-tracing', () => {
         messageType: 'userQuery',
       });
 
-      const span = mockSpans.find((s) => s.name === 'qwen-code.interaction');
+      const span = mockSpans.find((s) => s.name === 'hopcode.interaction');
       expect(span?.parentContext).toBe(fakeRoot);
     });
 
@@ -322,7 +322,7 @@ describe('session-tracing', () => {
         messageType: 'userQuery',
       });
 
-      const span = mockSpans.find((s) => s.name === 'qwen-code.interaction');
+      const span = mockSpans.find((s) => s.name === 'hopcode.interaction');
       expect(span?.parentContext).toMatchObject({ __activeSpan: fakeActive });
     });
   });

@@ -831,7 +831,7 @@ describe('HopCodeLogger', () => {
 
   describe('logSkillLaunchEvent', () => {
     it('writes skill_name, success and prompt_id into RUM event properties', () => {
-      const logger = QwenLogger.getInstance(mockConfig)!;
+      const logger = HopCodeLogger.getInstance(mockConfig)!;
       const enqueueSpy = vi.spyOn(logger, 'enqueueLogEvent');
 
       const event = new SkillLaunchEvent('code-review', true, 'prompt-xyz');
@@ -853,7 +853,7 @@ describe('HopCodeLogger', () => {
     });
 
     it('encodes failed launches with success=0 and still carries prompt_id', () => {
-      const logger = QwenLogger.getInstance(mockConfig)!;
+      const logger = HopCodeLogger.getInstance(mockConfig)!;
       const enqueueSpy = vi.spyOn(logger, 'enqueueLogEvent');
 
       const event = new SkillLaunchEvent('missing-skill', false, 'prompt-fail');

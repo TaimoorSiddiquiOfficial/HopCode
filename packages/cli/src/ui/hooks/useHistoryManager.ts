@@ -11,6 +11,9 @@ import {
   type HistoryWindowInfo,
   type HistorySearchResult,
 } from '../history/HistoryVault.js';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
+
+const debugLogger = createDebugLogger('useHistoryManager');
 
 // Type for the updater function passed to updateItem
 type HistoryItemUpdater = (
@@ -112,12 +115,16 @@ export function useHistory(): UseHistoryManagerReturn {
       id: number,
       updates: Partial<HistoryItemWithoutId> | HistoryItemUpdater,
     ) => {
-      vaultRef.current.updateItem(id, (prev) => {
+      const updated = vaultRef.current.updateItem(id, (prev) => {
         const newUpdates =
           typeof updates === 'function' ? updates(prev) : updates;
         return { ...prev, ...newUpdates } as HistoryItem;
       });
-      syncState();
+      if (updated) {
+        syncState();
+      } else {
+        debugLogger.debug(`Skipped history update; item ${id} was not found.`);
+      }
     },
     [syncState],
   );

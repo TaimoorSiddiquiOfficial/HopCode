@@ -131,24 +131,24 @@ export function resolveCompactionTuning(
 ): ResolvedCompactionTuning {
   return {
     maxRecentFiles: resolveNumber(
-      process.env['QWEN_COMPACT_MAX_RECENT_FILES'],
+      process.env['HOPCODE_COMPACT_MAX_RECENT_FILES'],
       settings?.maxRecentFilesToRetain,
       DEFAULT_MAX_RECENT_FILES,
       { minInclusive: 0 },
     ),
     maxRecentImages: resolveNumber(
-      process.env['QWEN_COMPACT_MAX_RECENT_IMAGES'],
+      process.env['HOPCODE_COMPACT_MAX_RECENT_IMAGES'],
       settings?.maxRecentImagesToRetain,
       DEFAULT_MAX_RECENT_IMAGES,
       { minInclusive: 0 },
     ),
     enableScreenshotTrigger: resolveBoolean(
-      process.env['QWEN_COMPACT_SCREENSHOT_TRIGGER'],
+      process.env['HOPCODE_COMPACT_SCREENSHOT_TRIGGER'],
       settings?.enableScreenshotTrigger,
       DEFAULT_SCREENSHOT_TRIGGER_ENABLED,
     ),
     screenshotTriggerThreshold: resolveNumber(
-      process.env['QWEN_COMPACT_SCREENSHOT_THRESHOLD'],
+      process.env['HOPCODE_COMPACT_SCREENSHOT_THRESHOLD'],
       settings?.screenshotTriggerThreshold,
       DEFAULT_SCREENSHOT_TRIGGER_THRESHOLD,
       { minInclusive: 1 },

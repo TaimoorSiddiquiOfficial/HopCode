@@ -147,7 +147,8 @@ export const AUTH_PREFLIGHT_ENV_KEYS: Readonly<
  * waived rather than a missing entry.
  */
 export const AUTH_PREFLIGHT_WAIVED_AUTH_TYPES: ReadonlySet<string> = new Set([
-  'qwen-oauth',
+  'hopcode-oauth',
+  'qwen_oauth',
 ]);
 
 export async function runAcpAgent(

@@ -1630,7 +1630,7 @@ export class Config {
     // behavior with `QWEN_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
     // an escape hatch.
     const legacyBlockingMcp =
-      process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'] === '1';
+      process.env['HOPCODE_LEGACY_MCP_BLOCKING'] === '1';
     const skipInlineMcpDiscovery = this.getBareMode() || !legacyBlockingMcp;
 
     this.toolRegistry = await this.createToolRegistry(
@@ -2339,7 +2339,11 @@ export class Config {
     // - Non-qwen providers may need to re-validate credentials / baseUrl / envKey.
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
-    if (authType === AuthType.QWEN_OAUTH && !requiresRefresh) {
+    if (
+      (authType === AuthType.QWEN_OAUTH ||
+        authType === AuthType.HOPCODE_OAUTH) &&
+      !requiresRefresh
+    ) {
       const { config, sources } = resolveContentGeneratorConfigWithSources(
         this,
         authType,

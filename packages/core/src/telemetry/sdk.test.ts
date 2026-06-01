@@ -382,9 +382,9 @@ describe('Telemetry SDK', () => {
     const appendFileSpy = vi
       .spyOn(fs, 'appendFile')
       .mockResolvedValue(undefined);
-    const previousDebugLogFileEnv = process.env['QWEN_DEBUG_LOG_FILE'];
+    const previousDebugLogFileEnv = process.env['HOPCODE_DEBUG_LOG_FILE'];
     try {
-      process.env['QWEN_DEBUG_LOG_FILE'] = '1';
+      process.env['HOPCODE_DEBUG_LOG_FILE'] = '1';
       setDebugLogSession({ getSessionId: () => 'log-to-span-sink-test' });
 
       initializeTelemetry(mockConfig);
@@ -404,9 +404,9 @@ describe('Telemetry SDK', () => {
       });
     } finally {
       if (previousDebugLogFileEnv === undefined) {
-        delete process.env['QWEN_DEBUG_LOG_FILE'];
+        delete process.env['HOPCODE_DEBUG_LOG_FILE'];
       } else {
-        process.env['QWEN_DEBUG_LOG_FILE'] = previousDebugLogFileEnv;
+        process.env['HOPCODE_DEBUG_LOG_FILE'] = previousDebugLogFileEnv;
       }
       setDebugLogSession(null);
       resetDebugLoggingState();

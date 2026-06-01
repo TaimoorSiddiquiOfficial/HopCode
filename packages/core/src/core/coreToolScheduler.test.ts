@@ -712,7 +712,7 @@ describe('CoreToolScheduler', () => {
         ToolErrorType.EXECUTION_DENIED,
       );
       expect(completedCall.response.error?.message).toBe(
-        'Qwen Code requires permission to use edit, but that permission was declined.',
+        'HopCode requires permission to use edit, but that permission was declined.',
       );
     }
     expect(execute).not.toHaveBeenCalled();
@@ -1533,7 +1533,7 @@ describe('CoreToolScheduler', () => {
       if (completedCall.status === 'error') {
         const errorMessage = completedCall.response.error?.message;
         expect(errorMessage).toBe(
-          'Qwen Code requires permission to use write_file, but that permission was declined.',
+          'HopCode requires permission to use write_file, but that permission was declined.',
         );
         // Should NOT contain "not found in registry"
         expect(errorMessage).not.toContain('not found in registry');
@@ -5756,7 +5756,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       (r) => r.name === 'tool.mockEditTool',
     );
     expect(
-      toolSpan?.spanAttributes['qwen-code.tool.modify_with_editor_unavailable'],
+      toolSpan?.spanAttributes['hopcode.tool.modify_with_editor_unavailable'],
     ).toBe(true);
     // Span stays open — user can recover via Cancel/Proceed.
     expect(toolSpan?.ended).toBe(false);

@@ -45,7 +45,8 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
   ): boolean {
     const { authType, baseUrl } = contentGeneratorConfig;
 
-    if (authType === AuthType.HOPCODE_OAUTH) return true;
+    if (authType === AuthType.HOPCODE_OAUTH || authType === AuthType.QWEN_OAUTH)
+      return true;
     if (!baseUrl) return true;
 
     const normalizedBaseUrl = baseUrl.endsWith('/')

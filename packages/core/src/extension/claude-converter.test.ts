@@ -9,7 +9,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import {
-  convertClaudeToQwenConfig,
+  convertClaudeToHopCodeConfig,
   convertClaudeAgentConfig,
   mergeClaudeConfigs,
   isClaudePluginConfig,
@@ -21,14 +21,14 @@ import {
 import { HookType } from '../hooks/types.js';
 import { performVariableReplacement } from './variables.js';
 
-describe('convertClaudeToQwenConfig', () => {
+describe('convertClaudeToHopCodeConfig', () => {
   it('should convert basic Claude config', () => {
     const claudeConfig: ClaudePluginConfig = {
       name: 'claude-plugin',
       version: '1.0.0',
     };
 
-    const result = convertClaudeToQwenConfig(claudeConfig);
+    const result = convertClaudeToHopCodeConfig(claudeConfig);
 
     expect(result.name).toBe('claude-plugin');
     expect(result.version).toBe('1.0.0');
@@ -43,7 +43,7 @@ describe('convertClaudeToQwenConfig', () => {
       skills: ['skills/skill1'],
     };
 
-    const result = convertClaudeToQwenConfig(claudeConfig);
+    const result = convertClaudeToHopCodeConfig(claudeConfig);
 
     // Commands, skills, agents are collected as directories, not in config
     expect(result.name).toBe('full-plugin');
@@ -66,7 +66,7 @@ describe('convertClaudeToQwenConfig', () => {
       },
     };
 
-    const result = convertClaudeToQwenConfig(claudeConfig);
+    const result = convertClaudeToHopCodeConfig(claudeConfig);
 
     expect(result.lspServers).toEqual(claudeConfig.lspServers);
   });
@@ -76,7 +76,7 @@ describe('convertClaudeToQwenConfig', () => {
       version: '1.0.0',
     } as ClaudePluginConfig;
 
-    expect(() => convertClaudeToQwenConfig(invalidConfig)).toThrow();
+    expect(() => convertClaudeToHopCodeConfig(invalidConfig)).toThrow();
   });
 });
 
@@ -695,9 +695,9 @@ describe('performVariableReplacement for Claude extensions', () => {
     performVariableReplacement(extDir);
 
     const result = fs.readFileSync(path.join(extDir, 'setup.sh'), 'utf-8');
-    expect(result).toContain('$HOME/.qwen/config');
-    expect(result).toContain('~/.qwen/cache');
-    expect(result).toContain('./.qwen/local');
+    expect(result).toContain('$HOME/.hopcode/config');
+    expect(result).toContain('~/.hopcode/cache');
+    expect(result).toContain('./.hopcode/local');
     expect(result).not.toContain('.claude');
   });
 
