@@ -2359,9 +2359,9 @@ describe('Settings Loading and Merging', () => {
       delete process.env['MY_SECRET_TOKEN'];
     });
 
-    it('should not search dirname(qwenDir)/.env when QWEN_HOME is set (#4466)', () => {
+    it('should not search dirname(qwenDir)/.env when HOPCODE_HOME is set (#4466)', () => {
       const customHome = '/custom/qwen/home';
-      process.env['QWEN_HOME'] = customHome;
+      process.env['HOPCODE_HOME'] = customHome;
       const customSettingsPath = path.join(customHome, 'settings.json');
       const dirnameEnvPath = path.join(path.dirname(customHome), '.env');
       const userSettingsContent = {
@@ -2398,7 +2398,7 @@ describe('Settings Loading and Merging', () => {
       );
 
       delete process.env['MY_TOKEN'];
-      delete process.env['QWEN_HOME'];
+      delete process.env['HOPCODE_HOME'];
     });
 
     it('should resolve ${VAR} from ~/.env when QWEN_HOME is not set (#4466)', () => {

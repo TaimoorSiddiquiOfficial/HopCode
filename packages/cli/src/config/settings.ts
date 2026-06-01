@@ -84,8 +84,8 @@ export const ENV_WAS_RECOVERED = 'HOPCODE_SETTINGS_WAS_RECOVERED';
 // project-controlled directory. Always excluded from project .env files,
 // regardless of user-configurable `advanced.excludedEnvVars`.
 const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
-  'QWEN_HOME',
-  'QWEN_RUNTIME_DIR',
+  'HOPCODE_HOME',
+  'HOPCODE_RUNTIME_DIR',
   ENV_CORRUPTED_PATH,
   ENV_WAS_RECOVERED,
 ];
@@ -163,8 +163,8 @@ export function migrateLegacyPermissions(
 }
 
 export function getSystemSettingsPath(): string {
-  if (process.env['QWEN_CODE_SYSTEM_SETTINGS_PATH']) {
-    return process.env['QWEN_CODE_SYSTEM_SETTINGS_PATH'];
+  if (process.env['HOPCODE_SYSTEM_SETTINGS_PATH']) {
+    return process.env['HOPCODE_SYSTEM_SETTINGS_PATH'];
   }
   if (platform() === 'darwin') {
     return '/Library/Application Support/QwenCode/settings.json';
@@ -695,7 +695,7 @@ function detectQwenHomeRedirectWithoutMigration(
     return null;
   }
   return (
-    `QWEN_HOME points to "${activeQwenDir}" but no settings.json was found there. ` +
+    `HOPCODE_HOME points to "${activeQwenDir}" but no settings.json was found there. ` +
     `Existing config remains at "${legacyQwenDir}" — OAuth tokens, settings, memory, ` +
     `extensions, and skills are not auto-migrated. Copy them manually if you want them ` +
     `to apply at the new location.`
