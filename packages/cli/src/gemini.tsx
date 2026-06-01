@@ -250,7 +250,7 @@ export async function startInteractiveUI(
     await writeRuntimeStatus(runtimeStatusPath, {
       sessionId,
       workDir: config.getTargetDir(),
-      qwenVersion: version,
+      hopcodeVersion: version,
     });
     config.markRuntimeStatusEnabled();
   } catch {

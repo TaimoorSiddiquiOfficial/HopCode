@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "Qwen Code settings configuration",
+  "description": "HopCode settings configuration",
   "properties": {
     "mcpServers": {
       "description": "Configuration for MCP servers.",
@@ -606,8 +606,8 @@
               "type": "boolean",
               "default": true
             },
-            "respectQwenIgnore": {
-              "description": "Respect .qwenignore files when searching",
+            "respectHopCodeIgnore": {
+              "description": "Respect .hopcodeignore files when searching",
               "type": "boolean",
               "default": true
             },
@@ -793,12 +793,13 @@
           }
         },
         "approvalMode": {
-          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, auto, yolo",
+          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, auto, izn, yolo",
           "enum": [
             "plan",
             "default",
             "auto-edit",
             "auto",
+            "izn",
             "yolo"
           ],
           "default": "default"
@@ -932,6 +933,10 @@
           "description": "Automatically configure Node.js memory limits",
           "type": "boolean",
           "default": false
+        },
+        "tavilyApiKey": {
+          "description": "API key for Tavily web search provider. Falls back to TAVILY_API_KEY environment variable.",
+          "type": "string"
         },
         "dnsResolutionOrder": {
           "description": "The DNS resolution order.",
@@ -2284,6 +2289,32 @@
           }
         }
       }
+    },
+    "webSearch": {
+      "description": "Web search provider configuration.",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "List of web search provider names.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "default": {
+          "description": "Default web search provider name.",
+          "type": "string"
+        },
+        "mode": {
+          "description": "Web search mode: auto or manual.",
+          "type": "string"
+        }
+      }
+    },
+    "agentModels": {
+      "description": "Per-agent model overrides mapping subagent names to model configuration.",
+      "type": "object",
+      "additionalProperties": true
     },
     "$version": {
       "type": "number",

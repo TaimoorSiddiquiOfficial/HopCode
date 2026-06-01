@@ -64,6 +64,7 @@ dist
 
 # Leftover test artifacts from install-script.test.js (dist backup dirs)
 qwen-dist-backup-*/
+hopcode-dist-backup-*/
 
 # Docker folder to help skip auth refreshes
 .docker

@@ -5,7 +5,7 @@ import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { basename, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import * as lark from '@larksuiteoapi/node-sdk';
-import { ChannelBase } from '@qwen-code/channel-base';
+import { ChannelBase } from '@hoptrendy/channel-base';
 import { buildCardContent, extractTitle, splitChunks } from './markdown.js';
 import { downloadMedia } from './media.js';
 import type {
@@ -13,7 +13,7 @@ import type {
   ChannelBaseOptions,
   Envelope,
   AcpBridge,
-} from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
 
 /** Feishu message event data shape. */
 interface FeishuMessageEvent {
@@ -687,7 +687,9 @@ export class FeishuChannel extends ChannelBase {
     if (!token) return { messageId: '', success: false };
 
     const cardTitle =
-      title || (inboundMsgId && this.msgToQuestion.get(inboundMsgId)) || 'Qwen';
+      title ||
+      (inboundMsgId && this.msgToQuestion.get(inboundMsgId)) ||
+      'HopCode';
     const card = buildCardContent(text, {
       title: cardTitle,
       showStopButton: true,
@@ -749,8 +751,8 @@ export class FeishuChannel extends ChannelBase {
     if (!token) return false;
 
     const cardTitle = inboundMsgId
-      ? this.msgToQuestion.get(inboundMsgId) || 'Qwen'
-      : 'Qwen';
+      ? this.msgToQuestion.get(inboundMsgId) || 'HopCode'
+      : 'HopCode';
     const card = buildCardContent(text, {
       title: cardTitle,
       showStopButton: !finished,

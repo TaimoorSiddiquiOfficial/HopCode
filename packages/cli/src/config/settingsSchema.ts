@@ -1383,13 +1383,13 @@ const SETTINGS_SCHEMA = {
             description: 'Respect .gitignore files when searching',
             showInDialog: true,
           },
-          respectQwenIgnore: {
+          respectHopCodeIgnore: {
             type: 'boolean',
-            label: 'Respect .qwenignore',
+            label: 'Respect .hopcodeignore',
             category: 'Context',
             requiresRestart: true,
             default: true,
-            description: 'Respect .qwenignore files when searching',
+            description: 'Respect .hopcodeignore files when searching',
             showInDialog: true,
           },
           enableRecursiveFileSearch: {
@@ -1737,6 +1737,7 @@ const SETTINGS_SCHEMA = {
           { value: ApprovalMode.DEFAULT, label: 'Default' },
           { value: ApprovalMode.AUTO_EDIT, label: 'Auto Edit' },
           { value: ApprovalMode.AUTO, label: 'Auto' },
+          { value: ApprovalMode.IZN, label: 'IZN' },
           { value: ApprovalMode.YOLO, label: 'YOLO' },
         ],
       },
@@ -1991,6 +1992,16 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: false,
         description: 'Automatically configure Node.js memory limits',
+        showInDialog: false,
+      },
+      tavilyApiKey: {
+        type: 'string',
+        label: 'Tavily API Key',
+        category: 'Advanced',
+        requiresRestart: false,
+        default: undefined as string | undefined,
+        description:
+          'API key for Tavily web search provider. Falls back to TAVILY_API_KEY environment variable.',
         showInDialog: false,
       },
       dnsResolutionOrder: {
@@ -2373,6 +2384,60 @@ const SETTINGS_SCHEMA = {
         showInDialog: false,
       },
     },
+  },
+  webSearch: {
+    type: 'object',
+    label: 'Web Search',
+    category: 'Advanced',
+    requiresRestart: false,
+    default: undefined as
+      | { provider?: string[]; default?: string; mode?: string }
+      | undefined,
+    description: 'Web search provider configuration.',
+    showInDialog: false,
+    properties: {
+      provider: {
+        type: 'array',
+        label: 'Web Search Providers',
+        category: 'Advanced',
+        requiresRestart: false,
+        default: undefined as string[] | undefined,
+        description: 'List of web search provider names.',
+        showInDialog: false,
+        items: { type: 'string' },
+      },
+      default: {
+        type: 'string',
+        label: 'Default Web Search Provider',
+        category: 'Advanced',
+        requiresRestart: false,
+        default: undefined as string | undefined,
+        description: 'Default web search provider name.',
+        showInDialog: false,
+      },
+      mode: {
+        type: 'string',
+        label: 'Web Search Mode',
+        category: 'Advanced',
+        requiresRestart: false,
+        default: undefined as string | undefined,
+        description: 'Web search mode: auto or manual.',
+        showInDialog: false,
+      },
+    },
+  },
+  agentModels: {
+    type: 'object',
+    label: 'Agent Model Overrides',
+    category: 'Advanced',
+    requiresRestart: false,
+    default: {} as Record<
+      string,
+      string | { model: string; baseUrl?: string; apiKey?: string }
+    >,
+    description:
+      'Per-agent model overrides mapping subagent names to model configuration.',
+    showInDialog: false,
   },
 } as const satisfies SettingsSchema;
 

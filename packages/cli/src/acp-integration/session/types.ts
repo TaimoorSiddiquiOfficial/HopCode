@@ -19,7 +19,7 @@ export type ApprovalModeValue =
   | 'auto-edit'
   | 'auto'
   | 'izn'
-  | 'izn';
+  | 'yolo';
 
 /**
  * Interface for sending session updates to the ACP client.

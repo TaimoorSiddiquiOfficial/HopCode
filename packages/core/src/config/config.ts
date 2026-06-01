@@ -137,8 +137,13 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
-import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
+import { DEFAULT_HOPCODE_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
+import type { WebSearchConfig } from '../tools/web-search/types.js';
+import type { PowerShellSecurityConfig } from '../security/powershell-security.js';
+import { resolvePowerShellConfig } from '../security/powershell-security.js';
+import { PermissionBlockerService } from '../services/permissionBlockerService.js';
+import { TaskStore } from '../services/task-store.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
   clearRuntimeStatus,
@@ -185,6 +190,7 @@ export enum ApprovalMode {
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
+  IZN = 'izn',
   YOLO = 'yolo',
 }
 
@@ -245,6 +251,11 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     id: ApprovalMode.YOLO,
     name: 'YOLO',
     description: 'Automatically approve all tools',
+  },
+  [ApprovalMode.IZN]: {
+    id: ApprovalMode.IZN,
+    name: 'IZN',
+    description: 'IZN mode - Automatically approve all tools',
   },
 };
 
@@ -478,7 +489,15 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
   };
 }
 
-export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
+export type AgentModelOverride =
+  | string
+  | { model: string; baseUrl?: string; apiKey?: string };
+
+export type ExtensionOriginSource =
+  | 'HopCode'
+  | 'QwenCode'
+  | 'Claude'
+  | 'Gemini';
 
 export interface ExtensionInstallMetadata {
   source: string;
@@ -669,7 +688,7 @@ export interface ConfigParameters {
   fileReadCacheDisabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    respectQwenIgnore?: boolean;
+    respectHopCodeIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
   };
@@ -835,6 +854,9 @@ export interface ConfigParameters {
     ruleType: 'allow' | 'ask' | 'deny',
     rule: string,
   ) => Promise<void>;
+  webSearch?: WebSearchConfig | null;
+  agentModels?: Record<string, AgentModelOverride>;
+  powershellConfig?: Partial<PowerShellSecurityConfig>;
 }
 
 function normalizeConfigOutputFormat(
@@ -1034,7 +1056,7 @@ export class Config {
   private cronScheduler: CronScheduler | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectQwenIgnore: boolean;
+    respectHopCodeIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
@@ -1097,6 +1119,15 @@ export class Config {
     ruleType: 'allow' | 'ask' | 'deny',
     rule: string,
   ) => Promise<void>;
+  private readonly agentModels: Record<string, AgentModelOverride> | undefined;
+  private readonly webSearch: WebSearchConfig | null;
+  private readonly powershellConfig:
+    | Partial<PowerShellSecurityConfig>
+    | undefined;
+  private readonly permissionBlockerService:
+    | PermissionBlockerService
+    | undefined;
+  private readonly taskStore: TaskStore | undefined;
   private initialized: boolean = false;
   readonly storage: Storage;
   private readonly fileExclusions: FileExclusions;
@@ -1133,7 +1164,8 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel = params.embeddingModel ?? DEFAULT_QWEN_EMBEDDING_MODEL;
+    this.embeddingModel =
+      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
@@ -1213,7 +1245,7 @@ export class Config {
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
+      respectHopCodeIgnore: params.fileFiltering?.respectHopCodeIgnore ?? true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -1265,8 +1297,13 @@ export class Config {
     this.addLegacyPlanLocationWarning();
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
-
-    // (web search removed)
+    this.webSearch = params.webSearch ?? null;
+    this.agentModels = params.agentModels;
+    this.powershellConfig = params.powershellConfig;
+    this.taskStore = new TaskStore(this.targetDir, this.sessionId);
+    this.permissionBlockerService = new PermissionBlockerService(
+      path.join(this.targetDir, '.hopcode', 'permission-blocker.json'),
+    );
     this.useRipgrep = params.useRipgrep ?? true;
     this.useBuiltinRipgrep = params.useBuiltinRipgrep ?? true;
     this.shouldUseNodePtyShell =
@@ -2102,7 +2139,7 @@ export class Config {
           await writeRuntimeStatus(newPath, {
             sessionId: newSessionId,
             workDir,
-            qwenVersion: cliVersion,
+            hopcodeVersion: cliVersion,
           });
         } catch {
           // ignored: best-effort cleanup
@@ -2202,6 +2239,26 @@ export class Config {
       : selector.modelId;
   }
 
+  /**
+   * Returns the fast model for side-query paths. Unlike {@link getFastModel},
+   * this can return an authType-qualified selector because BaseLlmClient can
+   * route a single request through a provider different from the main session.
+   */
+  getFastModelForSideQuery(): string | undefined {
+    const selector = this.resolveFastModelSelector();
+    if (!selector) return undefined;
+    if (selector.authType) {
+      const available = this.getAllConfiguredModels([selector.authType]);
+      return available.some((m) => m.id === selector.modelId)
+        ? `${selector.authType}:${selector.modelId}`
+        : undefined;
+    }
+    const allModels = this.getAllConfiguredModels();
+    return allModels.some((m) => m.id === selector.modelId)
+      ? selector.modelId
+      : undefined;
+  }
+
   private resolveFastModelSelector() {
     if (!this.fastModel) return undefined;
     try {
@@ -2221,6 +2278,26 @@ export class Config {
    */
   setFastModel(model: string | undefined): void {
     this.fastModel = model || undefined;
+  }
+
+  getTaskStore(): TaskStore | undefined {
+    return this.taskStore;
+  }
+
+  getWebSearchConfig(): WebSearchConfig | null {
+    return this.webSearch ?? null;
+  }
+
+  getPowerShellConfig(): PowerShellSecurityConfig {
+    return resolvePowerShellConfig(this.powershellConfig);
+  }
+
+  getAgentModels(): Record<string, AgentModelOverride> | undefined {
+    return this.agentModels;
+  }
+
+  getPermissionBlockerService(): PermissionBlockerService | undefined {
+    return this.permissionBlockerService;
   }
 
   /**
@@ -2754,6 +2831,14 @@ export class Config {
     this.geminiMdFileCount = count;
   }
 
+  getContextMdFileCount(): number {
+    return this.geminiMdFileCount;
+  }
+
+  setContextMdFileCount(count: number): void {
+    this.geminiMdFileCount = count;
+  }
+
   getArenaManager(): ArenaManager | null {
     return this.arenaManager;
   }
@@ -3193,14 +3278,14 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
-  getFileFilteringRespectQwenIgnore(): boolean {
-    return this.fileFiltering.respectQwenIgnore;
+  getFileFilteringrespectHopCodeIgnore(): boolean {
+    return this.fileFiltering.respectHopCodeIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
+      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
     };
   }
 
@@ -4184,4 +4269,20 @@ export class Config {
     // Pre-init path: stash for `createToolRegistry` to consume.
     this.pendingMcpBudgetCallback = cb;
   }
+}
+
+/**
+ * Creates a shallow override of a Config by prototype delegation.
+ * The returned object delegates to `base` for all properties not
+ * explicitly overridden in `overrides`.
+ */
+export function createConfigOverride<T extends Config>(
+  base: T,
+  overrides: Partial<Record<keyof T, () => unknown>>,
+): T {
+  const override = Object.create(base) as T;
+  for (const [key, getter] of Object.entries(overrides)) {
+    (override as Record<string, unknown>)[key] = getter;
+  }
+  return override;
 }

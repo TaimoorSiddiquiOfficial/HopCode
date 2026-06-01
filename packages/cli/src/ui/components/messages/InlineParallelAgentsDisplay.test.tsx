@@ -11,7 +11,7 @@ import type {
   AgentResultDisplay,
   AgentTask,
   Config,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { InlineParallelAgentsDisplay } from './InlineParallelAgentsDisplay.js';
 import type { IndividualToolCallDisplay } from '../../types.js';
 import { ToolCallStatus } from '../../types.js';
@@ -225,7 +225,7 @@ describe('<InlineParallelAgentsDisplay />', () => {
           totalTokens: 2400,
           toolUsage: [],
         },
-      } as AgentResultDisplay,
+      } as unknown as AgentResultDisplay,
       status: ToolCallStatus.Success,
       confirmationDetails: undefined,
     };

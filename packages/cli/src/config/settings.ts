@@ -11,7 +11,7 @@ import * as dotenv from 'dotenv';
 import process from 'node:process';
 import {
   FatalConfigError,
-  QWEN_DIR,
+  HOPCODE_DIR,
   getErrorMessage,
   Storage,
   createDebugLogger,
@@ -58,7 +58,7 @@ function getMergeStrategyForPath(path: string[]): MergeStrategy | undefined {
 
 export type { Settings, MemoryImportFormat };
 
-export const SETTINGS_DIRECTORY_NAME = QWEN_DIR;
+export const SETTINGS_DIRECTORY_NAME = HOPCODE_DIR;
 
 // Lazy getters: must NOT be top-level consts. `QWEN_HOME` may be resolved
 // from `~/.env` or `~/.hopcode/.env` by `preResolveHomeEnvOverrides()` in
@@ -537,7 +537,7 @@ function getUserLevelEnvPaths(): Set<string> {
     path.normalize(path.join(homeDir, '.env')),
     path.normalize(path.join(globalHopcodeDir, '.env')),
   ]);
-  const legacyQwenEnv = path.normalize(path.join(homeDir, QWEN_DIR, '.env'));
+  const legacyQwenEnv = path.normalize(path.join(homeDir, HOPCODE_DIR, '.env'));
   paths.add(legacyQwenEnv);
   return paths;
 }
@@ -719,7 +719,7 @@ function findEnvFile(
   const isTrusted = isWorkspaceTrusted(settings).isTrusted;
 
   const globalHopcodeDir = Storage.getGlobalHopCodeDir();
-  const legacyQwenDir = path.normalize(path.join(homeDir, QWEN_DIR));
+  const legacyQwenDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
   const hasCustomConfigDir = path.normalize(globalHopcodeDir) !== legacyQwenDir;
 
   const canUseEnvFile = (filePath: string): boolean =>
@@ -753,7 +753,7 @@ function findEnvFile(
       if (found) return found;
     } else {
       // Workspace step: prefer .qwen/.env, then plain .env.
-      const geminiEnvPath = path.join(currentDir, QWEN_DIR, '.env');
+      const geminiEnvPath = path.join(currentDir, HOPCODE_DIR, '.env');
       if (fs.existsSync(geminiEnvPath) && canUseEnvFile(geminiEnvPath)) {
         return geminiEnvPath;
       }
@@ -828,7 +828,7 @@ export function loadEnvironment(settings: Settings): void {
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
       const isQwenScopedEnvFile =
         isHomeScopedEnvFile ||
-        path.basename(path.dirname(normalizedEnvFilePath)) === QWEN_DIR;
+        path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
 
       for (const key in parsedEnv) {
         if (Object.hasOwn(parsedEnv, key)) {

@@ -1,7 +1,7 @@
 {
-  "name": "@qwen-code/channel-feishu",
-  "version": "0.17.0",
-  "description": "Feishu (Lark) channel adapter for Qwen Code",
+  "name": "@hoptrendy/channel-feishu",
+  "version": "0.30.0",
+  "description": "Feishu (Lark) channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,10 +18,15 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@qwen-code/channel-base": "file:../base",
+    "@hoptrendy/channel-base": "file:../base",
     "@larksuiteoapi/node-sdk": "^1.45.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "directory": "packages/channels/feishu"
   }
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FeishuChannel } from './FeishuAdapter.js';
-import type { ChannelConfig, AcpBridge } from '@qwen-code/channel-base';
+import type { ChannelConfig, AcpBridge } from '@hoptrendy/channel-base';
 
 function createMockBridge(): AcpBridge {
   return {

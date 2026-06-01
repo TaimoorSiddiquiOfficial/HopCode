@@ -29,8 +29,8 @@ import {
   worktreeBranchForSlug,
   writeWorktreeSession,
   writeWorktreeSessionMarker,
-} from '@qwen-code/qwen-code-core';
-import type { Config, WorktreeSession } from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
+import type { Config, WorktreeSession } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('WORKTREE_STARTUP');
 

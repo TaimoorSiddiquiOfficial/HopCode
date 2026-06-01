@@ -10,8 +10,8 @@ import {
   AuthType,
   clearCachedCredentialFile,
   createDebugLogger,
-  QwenOAuth2Event,
-  qwenOAuth2Events,
+  HopCodeOAuth2Event,
+  HopCodeOAuth2Events,
   MCP_BUDGET_WARN_FRACTION,
   MCPServerConfig,
   SessionService,
@@ -365,7 +365,7 @@ class QwenAgent implements Agent {
     };
 
     if (method === AuthType.QWEN_OAUTH) {
-      qwenOAuth2Events.once(QwenOAuth2Event.AuthUri, authUriHandler);
+      HopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthUri, authUriHandler);
     }
 
     await clearCachedCredentialFile();
@@ -378,7 +378,7 @@ class QwenAgent implements Agent {
       );
     } finally {
       if (method === AuthType.QWEN_OAUTH) {
-        qwenOAuth2Events.off(QwenOAuth2Event.AuthUri, authUriHandler);
+        HopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, authUriHandler);
       }
     }
   }
