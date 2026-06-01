@@ -220,6 +220,17 @@ describe('useAutoAcceptIndicator', () => {
       } as Key);
     });
     expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
+      ApprovalMode.YOLO,
+    );
+    expect(result.current).toBe(ApprovalMode.YOLO);
+
+    act(() => {
+      capturedUseKeypressHandler({
+        name: 'tab',
+        shift: true,
+      } as Key);
+    });
+    expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
       ApprovalMode.PLAN,
     );
     expect(result.current).toBe(ApprovalMode.PLAN);
@@ -407,8 +418,8 @@ describe('useAutoAcceptIndicator', () => {
       );
     });
 
-    it('should cycle from IZN to PLAN when Shift+Tab is pressed', () => {
-      mockConfigInstance.getApprovalMode.mockReturnValue(ApprovalMode.IZN);
+    it('should cycle from YOLO to PLAN when Shift+Tab is pressed', () => {
+      mockConfigInstance.getApprovalMode.mockReturnValue(ApprovalMode.YOLO);
       const mockAddItem = vi.fn();
       renderHook(() =>
         useAutoAcceptIndicator({

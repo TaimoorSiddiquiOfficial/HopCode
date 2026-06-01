@@ -561,10 +561,10 @@ describe('SettingsDialog', () => {
 
       it('loops back when reaching the end of an enum', async () => {
         vi.mocked(saveModifiedSettings).mockClear();
-        // Use Tool Approval Mode set to IZN (last value) to test looping back to first
+        // Use Tool Approval Mode set to YOLO (last value) to test looping back to first
         const settings = createMockSettings({
           tools: {
-            approvalMode: 'izn', // Last enum value
+            approvalMode: 'yolo', // Last enum value
           },
         });
         const onSelect = vi.fn();
@@ -595,7 +595,7 @@ describe('SettingsDialog', () => {
           new Set<string>(['tools.approvalMode']),
           expect.objectContaining({
             tools: expect.objectContaining({
-              approvalMode: 'plan', // First enum value after IZN
+              approvalMode: 'plan', // First enum value after YOLO (wrap-around)
             }),
           }),
           expect.any(LoadedSettings),
