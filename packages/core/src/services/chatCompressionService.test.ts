@@ -184,10 +184,10 @@ describe('ChatCompressionService', () => {
 
   describe('screenshot-overflow trigger', () => {
     const SCREENSHOT_ENV = [
-      'QWEN_COMPACT_SCREENSHOT_TRIGGER',
-      'QWEN_COMPACT_SCREENSHOT_THRESHOLD',
-      'QWEN_COMPACT_MAX_RECENT_FILES',
-      'QWEN_COMPACT_MAX_RECENT_IMAGES',
+      'HOPCODE_COMPACT_SCREENSHOT_TRIGGER',
+      'HOPCODE_COMPACT_SCREENSHOT_THRESHOLD',
+      'HOPCODE_COMPACT_MAX_RECENT_FILES',
+      'HOPCODE_COMPACT_MAX_RECENT_IMAGES',
     ];
     beforeEach(() => {
       for (const k of SCREENSHOT_ENV) delete process.env[k];
@@ -328,7 +328,7 @@ describe('ChatCompressionService', () => {
       expect(generateText).not.toHaveBeenCalled();
     });
 
-    it('reads threshold + enable flag from QWEN_COMPACT_* env over settings', async () => {
+    it('reads threshold + enable flag from HOPCODE_COMPACT_* env over settings', async () => {
       vi.mocked(mockChat.getHistory).mockReturnValue(historyWithToolImages(4));
       // Settings would NOT trigger (threshold 50); env lowers it to 4 and
       // force-enables, so the env values must win.
@@ -336,8 +336,8 @@ describe('ChatCompressionService', () => {
         enableScreenshotTrigger: false,
         screenshotTriggerThreshold: 50,
       } as ReturnType<typeof mockConfig.getChatCompression>);
-      process.env['QWEN_COMPACT_SCREENSHOT_TRIGGER'] = 'true';
-      process.env['QWEN_COMPACT_SCREENSHOT_THRESHOLD'] = '4';
+      process.env['HOPCODE_COMPACT_SCREENSHOT_TRIGGER'] = 'true';
+      process.env['HOPCODE_COMPACT_SCREENSHOT_THRESHOLD'] = '4';
       setWindow128k();
       const generateText = mockSummarySideQuery();
 
