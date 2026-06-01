@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,33 +18,17 @@ export function buildAuthMethods(): AuthMethod[] {
         args: ['--auth-type=openai'],
       },
     },
-    {
-      id: AuthType.HOPCODE_OAUTH,
-      name: 'HopCode OAuth',
-      description: 'HopCode OAuth (free tier discontinued 2026-04-15)',
-      _meta: {
-        type: 'terminal',
-        args: ['--auth-type=hopcode-oauth'],
-      },
-    },
   ];
 }
 
-export function filterAuthMethodsById(
-  authMethods: AuthMethod[],
-  authMethodId: string,
+export function pickAuthMethodsForAuthRequired(
+  selectedType?: AuthType | string,
 ): AuthMethod[] {
-  return authMethods.filter((method) => method.id === authMethodId);
-}
-
-export function pickAuthMethodsForDetails(details?: string): AuthMethod[] {
   const authMethods = buildAuthMethods();
-  if (!details) {
-    return authMethods;
+  if (selectedType) {
+    const matched = authMethods.filter((method) => method.id === selectedType);
+    return matched.length ? matched : authMethods;
   }
-  if (details.includes('hopcode-oauth') || details.includes('HopCode OAuth')) {
-    const narrowed = filterAuthMethodsById(authMethods, AuthType.HOPCODE_OAUTH);
-    return narrowed.length ? narrowed : authMethods;
-  }
+
   return authMethods;
 }

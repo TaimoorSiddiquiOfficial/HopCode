@@ -1,4 +1,4 @@
-import type { ChannelPlugin } from '@hoptrendy/channel-base';
+import type { ChannelPlugin } from '@qwen-code/channel-base';
 
 const registry = new Map<string, ChannelPlugin>();
 let builtinsPromise: Promise<void> | null = null;
@@ -6,14 +6,14 @@ let builtinsPromise: Promise<void> | null = null;
 function ensureBuiltins(): Promise<void> {
   if (!builtinsPromise) {
     builtinsPromise = (async () => {
-      const [telegram, weixin, dingtalk, discord] = await Promise.all([
+      const [telegram, weixin, dingtalk, feishu] = await Promise.all([
         import('@hoptrendy/channel-telegram'),
         import('@hoptrendy/channel-weixin'),
         import('@hoptrendy/channel-dingtalk'),
-        import('@hoptrendy/channel-discord'),
+        import('@hoptrendy/channel-feishu'),
       ]);
 
-      for (const mod of [telegram, weixin, dingtalk, discord]) {
+      for (const mod of [telegram, weixin, dingtalk, feishu]) {
         registry.set(mod.plugin.channelType, mod.plugin);
       }
     })();

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -24,11 +24,6 @@ import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
 import type { AnyToolInvocation } from '../tools/tools.js';
 import type { ArenaManager } from '../agents/arena/ArenaManager.js';
-import type { WebSearchConfig } from '../tools/web-search/types.js';
-import type { PowerShellSecurityConfig } from '../security/powershell-security.js';
-import { resolvePowerShellConfig } from '../security/powershell-security.js';
-import { PermissionBlockerService } from '../services/permissionBlockerService.js';
-import { TaskStore } from '../services/task-store.js';
 import { ArenaAgentClient } from '../agents/arena/ArenaAgentClient.js';
 
 // Core
@@ -53,6 +48,12 @@ import { GitService } from '../services/gitService.js';
 import { GitWorktreeService } from '../services/gitWorktreeService.js';
 import { cleanupStaleAgentWorktrees } from '../services/worktreeCleanup.js';
 import { CronScheduler } from '../services/cronScheduler.js';
+import {
+  MemoryPressureMonitor,
+  DEFAULT_PRESSURE_CONFIG,
+  validateMemoryPressureConfig,
+  type MemoryPressureConfig,
+} from '../services/memoryPressureMonitor.js';
 
 // Tools — only lightweight imports; tool classes are lazy-loaded via dynamic import
 import {
@@ -114,6 +115,7 @@ import {
 import {
   PermissionMode,
   NotificationType,
+  type PermissionDeniedReason,
   type PermissionSuggestion,
   type HookEventName,
   type HookDefinition,
@@ -135,7 +137,7 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
-import { DEFAULT_HOPCODE_EMBEDDING_MODEL } from './models.js';
+import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
 import {
@@ -160,6 +162,7 @@ import { MemoryManager } from '../memory/manager.js';
 import { CommitAttributionService } from '../services/commitAttribution.js';
 
 const gitCoAuthorLogger = createDebugLogger('GIT_CO_AUTHOR');
+const memoryPressureConfigLogger = createDebugLogger('MEMORY_PRESSURE');
 
 import {
   ModelsConfig,
@@ -182,7 +185,7 @@ export enum ApprovalMode {
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
-  IZN = 'izn',
+  YOLO = 'yolo',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -238,9 +241,9 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     name: 'Auto',
     description: 'LLM classifier auto-approves safe actions, blocks risky ones',
   },
-  [ApprovalMode.IZN]: {
-    id: ApprovalMode.IZN,
-    name: 'IZN',
+  [ApprovalMode.YOLO]: {
+    id: ApprovalMode.YOLO,
+    name: 'YOLO',
     description: 'Automatically approve all tools',
   },
 };
@@ -275,12 +278,39 @@ export interface BugCommandSettings {
 export interface ChatCompressionSettings {
   /**
    * Estimated tokens for a single inline image / document part when
-   * apportioning chars across history in `findCompressSplitPoint`.
+   * apportioning chars across history during compression size estimation.
    * Also used as the placeholder budget when stripping inline media
    * out of the side-query compaction prompt. Default 1600.
    * Env override: `HOPCODE_IMAGE_TOKEN_ESTIMATE`.
    */
   imageTokenEstimate?: number;
+  /**
+   * Number of most-recently-touched files whose current content is
+   * restored (embedded or referenced) after auto-compaction. Default 5.
+   * Env override: `HOPCODE_COMPACT_MAX_RECENT_FILES`.
+   */
+  maxRecentFilesToRetain?: number;
+  /**
+   * Number of most-recent images (tool screenshots / user pastes)
+   * restored after auto-compaction. Default 3.
+   * Env override: `HOPCODE_COMPACT_MAX_RECENT_IMAGES`.
+   */
+  maxRecentImagesToRetain?: number;
+  /**
+   * When true, auto-compaction also fires once the number of
+   * tool-returned images accumulated in history reaches
+   * `screenshotTriggerThreshold`, independent of token usage. Aimed at
+   * computer-use sessions where frequent screenshots dilute model
+   * attention without necessarily exceeding the token budget. Default true.
+   * Env override: `HOPCODE_COMPACT_SCREENSHOT_TRIGGER` (`1`/`true`/`0`/`false`).
+   */
+  enableScreenshotTrigger?: boolean;
+  /**
+   * Tool-returned image count at or above which the screenshot trigger
+   * fires (only when `enableScreenshotTrigger`). Default 50.
+   * Env override: `HOPCODE_COMPACT_SCREENSHOT_THRESHOLD`.
+   */
+  screenshotTriggerThreshold?: number;
 }
 
 /**
@@ -343,12 +373,12 @@ export interface TelemetryMetricsSettings {
 
 /**
  * Security-relevant settings controlling what client-side correlation
- * data hopcode writes into outbound LLM API requests.
+ * data qwen-code writes into outbound LLM API requests.
  *
  * **Why this is a separate namespace from `telemetry.*`:** telemetry
  * controls data flow into the user's OWN observability backend (OTLP
  * collector / file outfile). The settings here control data flow OUT of
- * the hopcode process and INTO third-party LLM provider request
+ * the qwen-code process and INTO third-party LLM provider request
  * streams (DashScope, OpenAI, Anthropic, etc.). Different recipients =
  * different consent decision, so a different settings tree. See PR
  * #4390 review (LaZzyMan) for the framing rationale.
@@ -448,11 +478,7 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
   };
 }
 
-export type ExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
-
-export type AgentModelOverride =
-  | string
-  | { model: string; baseUrl?: string; apiKey?: string };
+export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
 
 export interface ExtensionInstallMetadata {
   source: string;
@@ -537,12 +563,33 @@ export interface SandboxConfig {
  * Settings shared across multi-agent collaboration features
  * (Arena, Team, Swarm).
  */
+/**
+ * General-purpose worktree settings (Phase D-2). Distinct from
+ * {@link AgentsCollabSettings.arena.worktreeBaseDir}, which only governs
+ * Arena multi-model worktrees.
+ */
+export interface WorktreeSettings {
+  /**
+   * Directories under the main repository to symlink into every
+   * general-purpose worktree on creation (the `enter_worktree` tool,
+   * `agent isolation: "worktree"`, and the `--worktree` startup flag).
+   *
+   * Paths must be relative to the repo root; absolute paths and any
+   * entry containing `..` are rejected by the service. Entries that
+   * resolve to git-internal paths (`.git`, `.qwen`) are also rejected
+   * — symlinking those would either break git inside the worktree or
+   * create a worktrees-inside-worktrees loop. Missing source dirs and
+   * pre-existing destinations are silently skipped.
+   */
+  symlinkDirectories?: readonly string[];
+}
+
 export interface AgentsCollabSettings {
   /** Display mode for multi-agent sessions ('in-process' | 'tmux' | 'iterm2') */
   displayMode?: string;
   /** Arena-specific settings */
   arena?: {
-    /** Custom base directory for Arena worktrees (default: ~/.hopcode/arena) */
+    /** Custom base directory for Arena worktrees (default: ~/.qwen/arena) */
     worktreeBaseDir?: string;
     /** Preserve worktrees and state files after session ends */
     preserveArtifacts?: boolean;
@@ -572,7 +619,7 @@ export interface ConfigParameters {
    * CLI surface. Matched case-insensitively on the final (post-rename)
    * command name. Sourced from settings (`slashCommands.disabled`, UNION
    * merged across scopes), the `--disabled-slash-commands` CLI flag, and
-   * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
+   * the `QWEN_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
   /**
@@ -622,7 +669,7 @@ export interface ConfigParameters {
   fileReadCacheDisabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    respectHopCodeIgnore?: boolean;
+    respectQwenIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
   };
@@ -638,15 +685,24 @@ export interface ConfigParameters {
   model?: string;
   outputLanguageFilePath?: string;
   maxSessionTurns?: number;
+  /**
+   * Wall-clock budget for an unattended run, in seconds. `-1` (default)
+   * means no limit. Enforced by the CLI's non-interactive run loop —
+   * see `RunBudgetEnforcer` in `packages/cli/src/utils/runBudget.ts`.
+   * Issue: QwenLM/qwen-code#4103.
+   */
   maxWallTimeSeconds?: number;
+  /**
+   * Cumulative tool-call budget across the entire run. `-1` means no
+   * limit. Counts every `executeToolCall` invocation (incl. failed
+   * tools, since the model is still consuming tokens reading the error).
+   */
   maxToolCalls?: number;
-  webSearch?: WebSearchConfig | null;
-  agentModels?: Record<string, AgentModelOverride>;
-  powershellConfig?: Partial<PowerShellSecurityConfig>;
   clearContextOnIdle?: ClearContextOnIdleSettings;
   sessionTokenLimit?: number;
   experimentalZedIntegration?: boolean;
   cronEnabled?: boolean;
+  computerUseEnabled?: boolean;
   emitToolUseSummaries?: boolean;
   listExtensions?: boolean;
   overrideExtensions?: string[];
@@ -690,7 +746,7 @@ export interface ConfigParameters {
   channel?: string;
   /**
    * File descriptor number for structured JSON event output (dual output mode).
-   * When set, HopCode outputs structured JSON events to this fd while
+   * When set, Qwen Code outputs structured JSON events to this fd while
    * continuing to render the TUI on stdout. The caller must provide this fd
    * via spawn stdio configuration.
    * Mutually exclusive with jsonFile.
@@ -706,7 +762,7 @@ export interface ConfigParameters {
    * JSON Schema that the model's final output must conform to. When set, a
    * synthetic `structured_output` tool is registered and the non-interactive
    * CLI ends the session the first time the model calls it with valid args.
-   * Only meaningful in headless mode (`hopcode -p`).
+   * Only meaningful in headless mode (`qwen -p`).
    */
   jsonSchema?: Record<string, unknown>;
   /**
@@ -719,6 +775,8 @@ export interface ConfigParameters {
   modelProvidersConfig?: ModelProvidersConfig;
   /** Multi-agent collaboration settings (Arena, Team, Swarm) */
   agents?: AgentsCollabSettings;
+  /** General-purpose worktree settings (Phase D-2). */
+  worktree?: WorktreeSettings;
   /** Enable managed auto-memory background extraction and dream. Defaults to true. */
   enableManagedAutoMemory?: boolean;
   /** Enable managed auto-dream consolidation separately from extraction. Defaults to true. */
@@ -757,7 +815,7 @@ export interface ConfigParameters {
   projectHooks?: Record<string, unknown>;
 
   hooks?: Record<string, unknown>;
-  /** Glob patterns to exclude from .hopcode/rules/ loading. */
+  /** Glob patterns to exclude from .qwen/rules/ loading. */
   contextRuleExcludes?: string[];
   /** Warnings generated during configuration resolution */
   warnings?: string[];
@@ -798,6 +856,53 @@ function normalizeConfigOutputFormat(
   }
 }
 
+function loadMemoryPressureConfig(): MemoryPressureConfig {
+  const config: MemoryPressureConfig = { ...DEFAULT_PRESSURE_CONFIG };
+
+  try {
+    config.softPressureRatio = readMemoryPressureRatioEnv(
+      'QWEN_MEMORY_PRESSURE_SOFT',
+      config.softPressureRatio,
+    );
+    config.hardPressureRatio = readMemoryPressureRatioEnv(
+      'QWEN_MEMORY_PRESSURE_HARD',
+      config.hardPressureRatio,
+    );
+    config.criticalRatio = readMemoryPressureRatioEnv(
+      'QWEN_MEMORY_PRESSURE_CRITICAL',
+      config.criticalRatio,
+    );
+
+    if (process.env['QWEN_MEMORY_ENABLE_GC'] === '1') {
+      config.enableExplicitGC = true;
+    }
+
+    validateMemoryPressureConfig(config);
+  } catch (err) {
+    const fallbackMsg =
+      '[QWEN] WARNING: Invalid memory pressure config; using defaults. ' +
+      `Error: ${getErrorMessage(err)}`;
+    process.stderr.write(`${fallbackMsg}\n`);
+    memoryPressureConfigLogger.warn(fallbackMsg);
+    return { ...DEFAULT_PRESSURE_CONFIG };
+  }
+
+  return config;
+}
+
+function readMemoryPressureRatioEnv(envName: string, fallback: number): number {
+  const raw = process.env[envName];
+  if (!raw) {
+    return fallback;
+  }
+
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`${envName} must be a finite number`);
+  }
+  return parsed;
+}
+
 /**
  * Options for Config.initialize()
  */
@@ -824,6 +929,20 @@ const DEFAULT_BARE_CORE_TOOLS = [
 export class Config {
   private sessionId: string;
   private sessionData?: ResumedSessionData;
+  /**
+   * One-shot notice produced by `setupStartupWorktree` (Phase D-1) when the
+   * CLI was launched with `--worktree`. The active entry point (TUI XOR
+   * headless) reads it via {@link consumePendingStartupWorktreeNotice} on
+   * the model's first prompt and skips Phase C's `restoreWorktreeContext`
+   * for that turn — startup wins over the resumed-session sidecar. ACP is
+   * gated out earlier in `gemini.tsx` (mutex with `--worktree`) so it
+   * never reaches this slot.
+   *
+   * @invariant At most one consumer per process. If a future entry path
+   * sets this slot without ever consuming, the string persists until
+   * process exit (which dies with the process — no leak).
+   */
+  private pendingStartupWorktreeNotice: string | null = null;
   private debugLogger: DebugLogger;
   private toolRegistry!: ToolRegistry;
   /**
@@ -833,12 +952,14 @@ export class Config {
    * `startMcpDiscoveryInBackground` (or legacy blocking discovery)
    * fires the first pass. Pre-fix the acpAgent registered after
    * `initialize()` returned, missing the first pass entirely under
-   * `HOPCODE_LEGACY_MCP_BLOCKING=1` and racing against background
+   * `QWEN_CODE_LEGACY_MCP_BLOCKING=1` and racing against background
    * discovery completion under the default mode.
    */
   private pendingMcpBudgetCallback?: (event: McpBudgetEvent) => void;
   private promptRegistry!: PromptRegistry;
   private subagentManager!: SubagentManager;
+  private memoryPressureConfig?: MemoryPressureConfig;
+  private memoryPressureMonitor?: MemoryPressureMonitor;
   private readonly backgroundTaskRegistry = new BackgroundTaskRegistry();
   private readonly monitorRegistry = new MonitorRegistry();
   private backgroundAgentResumeService?: BackgroundAgentResumeService;
@@ -913,7 +1034,7 @@ export class Config {
   private cronScheduler: CronScheduler | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectHopCodeIgnore: boolean;
+    respectQwenIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
@@ -946,6 +1067,7 @@ export class Config {
   private runtimeStatusEnabled = false;
   private readonly experimentalZedIntegration: boolean = false;
   private readonly cronEnabled: boolean = false;
+  private readonly computerUseEnabled: boolean = true;
   private readonly emitToolUseSummaries: boolean = true;
   private readonly chatRecordingEnabled: boolean;
   private readonly loadMemoryFromIncludeDirectories: boolean = false;
@@ -964,15 +1086,7 @@ export class Config {
     | null = null;
   private readonly arenaAgentClient: ArenaAgentClient | null;
   private readonly agentsSettings: AgentsCollabSettings;
-  private readonly agentModels: Record<string, AgentModelOverride> | undefined;
-  private readonly webSearch: WebSearchConfig | null;
-  private readonly powershellConfig:
-    | Partial<PowerShellSecurityConfig>
-    | undefined;
-  private readonly permissionBlockerService:
-    | PermissionBlockerService
-    | undefined;
-  private readonly taskStore: TaskStore | undefined;
+  private readonly worktreeSettings: WorktreeSettings;
   private readonly skipLoopDetection: boolean;
   private readonly skipStartupContext: boolean;
   private readonly bareMode: boolean;
@@ -1019,8 +1133,7 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel =
-      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
+    this.embeddingModel = params.embeddingModel ?? DEFAULT_QWEN_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
@@ -1092,7 +1205,7 @@ export class Config {
     this.gitCoAuthor = {
       ...normalizeGitCoAuthor(params.gitCoAuthor),
       name: 'Qwen-Coder',
-      email: 'hopcoder@alibabacloud.com',
+      email: 'qwen-coder@alibabacloud.com',
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
     this.fileReadCacheDisabled = params.fileReadCacheDisabled ?? false;
@@ -1100,7 +1213,7 @@ export class Config {
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectHopCodeIgnore: params.fileFiltering?.respectHopCodeIgnore ?? true,
+      respectQwenIgnore: params.fileFiltering?.respectQwenIgnore ?? true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -1126,6 +1239,7 @@ export class Config {
     this.experimentalZedIntegration =
       params.experimentalZedIntegration ?? false;
     this.cronEnabled = params.cronEnabled ?? false;
+    this.computerUseEnabled = params.computerUseEnabled ?? true;
     this.emitToolUseSummaries = params.emitToolUseSummaries ?? true;
     this.listExtensions = params.listExtensions ?? false;
     this.overrideExtensions = params.overrideExtensions;
@@ -1141,24 +1255,6 @@ export class Config {
     this.loadMemoryFromIncludeDirectories =
       params.loadMemoryFromIncludeDirectories ?? false;
     this.importFormat = params.importFormat ?? 'tree';
-    // Auto-compaction threshold moved to built-in constants (computeThresholds
-    // in chatCompressionService.ts). The old `contextPercentageThreshold`
-    // field is deprecated; if present in user settings, emit a one-time
-    // warning and ignore the value.
-    if (
-      params.chatCompression &&
-      typeof (params.chatCompression as Record<string, unknown>)[
-        'contextPercentageThreshold'
-      ] !== 'undefined'
-    ) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        '[hopcode] chatCompression.contextPercentageThreshold has been removed ' +
-          'and is now controlled by built-in thresholds. Setting will be ignored. ' +
-          'Remove this key from your settings.json to silence this warning; ' +
-          'see docs/users/configuration/settings.md for current compaction behavior.',
-      );
-    }
     this.chatCompression = params.chatCompression;
     this.interactive = params.interactive ?? false;
     this.trustedFolder = params.trustedFolder;
@@ -1169,9 +1265,8 @@ export class Config {
     this.addLegacyPlanLocationWarning();
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
-    this.webSearch = params.webSearch ?? null;
-    this.agentModels = params.agentModels;
-    this.powershellConfig = params.powershellConfig;
+
+    // (web search removed)
     this.useRipgrep = params.useRipgrep ?? true;
     this.useBuiltinRipgrep = params.useBuiltinRipgrep ?? true;
     this.shouldUseNodePtyShell =
@@ -1200,6 +1295,7 @@ export class Config {
     this.eventEmitter = params.eventEmitter;
     this.arenaAgentClient = ArenaAgentClient.create();
     this.agentsSettings = params.agents ?? {};
+    this.worktreeSettings = params.worktree ?? {};
     if (params.contextFileName) {
       setGeminiMdFilename(params.contextFileName);
     }
@@ -1238,8 +1334,8 @@ export class Config {
       isWorkspaceTrusted: this.isTrustedFolder(),
     });
     this.enableManagedAutoMemory = params.enableManagedAutoMemory ?? true;
-    this.enableManagedAutoDream = params.enableManagedAutoDream ?? false;
-    this.enableAutoSkill = params.enableAutoSkill ?? false;
+    this.enableManagedAutoDream = params.enableManagedAutoDream ?? true;
+    this.enableAutoSkill = params.enableAutoSkill ?? true;
     this.fastModel = params.fastModel || undefined;
     this.disableAllHooks = params.disableAllHooks ?? false;
     this.stopHookBlockingCap = resolveStopHookBlockingCap(
@@ -1251,10 +1347,6 @@ export class Config {
     // Legacy: fall back to merged hooks if new fields are not provided
     this.hooks = params.hooks;
     this.memoryManager = new MemoryManager();
-    this.taskStore = new TaskStore(this.targetDir, this.sessionId);
-    this.permissionBlockerService = new PermissionBlockerService(
-      path.join(this.targetDir, '.hopcode', 'permission-blocker.json'),
-    );
   }
 
   /**
@@ -1398,6 +1490,16 @@ export class Config {
                   signal,
                 );
                 break;
+              case 'PermissionDenied':
+                result = await hookSystem.firePermissionDeniedEvent(
+                  (input['tool_name'] as string) || '',
+                  (input['tool_input'] as Record<string, unknown>) || {},
+                  (input['tool_use_id'] as string) || '',
+                  (input['reason'] as PermissionDeniedReason) ||
+                    'classifier_blocked',
+                  signal,
+                );
+                break;
               case 'SubagentStart':
                 result = await hookSystem.fireSubagentStartEvent(
                   (input['agent_id'] as string) || '',
@@ -1461,6 +1563,12 @@ export class Config {
     }
     this.debugLogger.debug('Skill manager initialized');
 
+    this.memoryPressureConfig = loadMemoryPressureConfig();
+    this.memoryPressureMonitor = new MemoryPressureMonitor(
+      this,
+      this.memoryPressureConfig,
+    );
+
     this.permissionManager = new PermissionManager(this);
     this.permissionManager.initialize();
     this.debugLogger.debug('Permission manager initialized');
@@ -1482,10 +1590,10 @@ export class Config {
     // after the registry exists. This lets `Config.initialize()` (and the
     // cli's `input_enabled` checkpoint) resolve without waiting on MCP
     // server response time. Users can opt back into the legacy synchronous
-    // behavior with `HOPCODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
+    // behavior with `QWEN_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
     // an escape hatch.
     const legacyBlockingMcp =
-      process.env['HOPCODE_LEGACY_MCP_BLOCKING'] === '1';
+      process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'] === '1';
     const skipInlineMcpDiscovery = this.getBareMode() || !legacyBlockingMcp;
 
     this.toolRegistry = await this.createToolRegistry(
@@ -1539,13 +1647,13 @@ export class Config {
     // directory the worktree creators (`enter_worktree` and
     // `agent isolation:'worktree'`) write to. Using `this.targetDir`
     // directly would cause launches from a monorepo subdirectory to
-    // scan `<subdir>/.hopcode/worktrees/` — which never exists — and the
+    // scan `<subdir>/.qwen/worktrees/` — which never exists — and the
     // sweep would silently be a no-op forever.
     if (!this.getBareMode()) {
       void (async () => {
         try {
           // Resolve the repo top-level FIRST. The previous code bailed
-          // on `fs.access(<targetDir>/.hopcode/worktrees)` before resolving,
+          // on `fs.access(<targetDir>/.qwen/worktrees)` before resolving,
           // so a monorepo subdir launch (where `targetDir` is the
           // subdir, not the repo root) always early-returned and the
           // sweep was permanently a no-op. Fast-bail still happens, just
@@ -1682,7 +1790,7 @@ export class Config {
    *
    * Resolves immediately when:
    * - bare mode is on (no MCP discovery is started),
-   * - `HOPCODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
+   * - `QWEN_CODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
    *   synchronously inside {@link initialize}), or
    * - no MCP servers are configured.
    */
@@ -1956,6 +2064,7 @@ export class Config {
     // constructed via Object.create — those should clear their own
     // cache, not the parent's.
     this.getFileReadCache().clear();
+    this.getMemoryPressureMonitor()?.resetForNewSession();
     this.fileHistoryService = undefined;
     refreshSessionContext(this.sessionId);
     // The commit-attribution singleton accumulates per-file AI edits
@@ -1977,7 +2086,7 @@ export class Config {
     //
     // Only refresh when THIS process established its own sidecar at
     // startup (interactive UI). A non-interactive `/clear` (e.g.
-    // hopcode --prompt-interactive) must not delete a sibling shell's
+    // qwen --prompt-interactive) must not delete a sibling shell's
     // sidecar that happens to share the outgoing session id —
     // mirrors kimi-cli PR #2082's "write only when a session is
     // established for this process" rule.
@@ -1993,7 +2102,7 @@ export class Config {
           await writeRuntimeStatus(newPath, {
             sessionId: newSessionId,
             workDir,
-            hopcodeVersion: cliVersion,
+            qwenVersion: cliVersion,
           });
         } catch {
           // ignored: best-effort cleanup
@@ -2146,14 +2255,14 @@ export class Config {
     // Some OpenAI-compatible reasoning models (e.g. DeepSeek) require
     // reasoning_content to be preserved across turns.
 
-    // Hot update path: only supported for hopcode-oauth.
+    // Hot update path: only supported for qwen-oauth.
     // For other auth types we always refresh to recreate the ContentGenerator.
     //
     // Rationale:
-    // - Non-hopcode providers may need to re-validate credentials / baseUrl / envKey.
+    // - Non-qwen providers may need to re-validate credentials / baseUrl / envKey.
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
-    if (authType === AuthType.HOPCODE_OAUTH && !requiresRefresh) {
+    if (authType === AuthType.QWEN_OAUTH && !requiresRefresh) {
       const { config, sources } = resolveContentGeneratorConfigWithSources(
         this,
         authType,
@@ -2165,7 +2274,7 @@ export class Config {
         },
       );
 
-      // Hot-update fields (hopcode-oauth models share the same auth + client).
+      // Hot-update fields (qwen-oauth models share the same auth + client).
       this.contentGeneratorConfig.model = config.model;
       this.contentGeneratorConfig.samplingParams = config.samplingParams;
       this.contentGeneratorConfig.contextWindowSize = config.contextWindowSize;
@@ -2237,7 +2346,7 @@ export class Config {
    *
    * For runtime models, the modelId should be in format `$runtime|${authType}|${modelId}`.
    * This triggers a refresh of the ContentGenerator when required (always on authType changes).
-   * For hopcode-oauth model switches that are hot-update safe, this may update in place.
+   * For qwen-oauth model switches that are hot-update safe, this may update in place.
    *
    * @param authType - Target authentication type
    * @param modelId - Target model ID (or `$runtime|${authType}|${modelId}` for runtime models)
@@ -2293,6 +2402,29 @@ export class Config {
 
   getTargetDir(): string {
     return this.targetDir;
+  }
+
+  /**
+   * Stashes a one-shot context message that the next user prompt will
+   * inject into the model (see {@link pendingStartupWorktreeNotice}). Called
+   * from `gemini.tsx` right after `loadCliConfig` when `--worktree` produced
+   * a valid worktree. Pass `null` to clear (rarely needed).
+   */
+  setPendingStartupWorktreeNotice(notice: string | null): void {
+    this.pendingStartupWorktreeNotice = notice;
+  }
+
+  /**
+   * Reads and clears the pending startup-worktree notice. Returns `null`
+   * when nothing is stashed (the common case). Each entry point (TUI /
+   * headless / ACP) calls this on the model's first prompt; a non-null
+   * return means the entry point should NOT additionally call
+   * `restoreWorktreeContext()` for that prompt — startup overrides resume.
+   */
+  consumePendingStartupWorktreeNotice(): string | null {
+    const v = this.pendingStartupWorktreeNotice;
+    this.pendingStartupWorktreeNotice = null;
+    return v;
   }
 
   getProjectRoot(): string {
@@ -2606,6 +2738,10 @@ export class Config {
     return this.userMemory;
   }
 
+  getOutputLanguageFilePath(): string | undefined {
+    return this.outputLanguageFilePath;
+  }
+
   setUserMemory(newUserMemory: string): void {
     this.userMemory = newUserMemory;
   }
@@ -2620,40 +2756,6 @@ export class Config {
 
   getArenaManager(): ArenaManager | null {
     return this.arenaManager;
-  }
-
-  /**
-   * Returns the fast model for side-query paths. Unlike {@link getFastModel},
-   * this can return an authType-qualified selector because BaseLlmClient can
-   * route a single request through a provider different from the main session.
-   */
-  getFastModelForSideQuery(): string | undefined {
-    const selector = this.resolveFastModelSelector();
-    if (!selector) return undefined;
-
-    if (selector.authType) {
-      const available = this.getAllConfiguredModels([selector.authType]);
-      return available.some((m) => m.id === selector.modelId)
-        ? `${selector.authType}:${selector.modelId}`
-        : undefined;
-    }
-
-    const allModels = this.getAllConfiguredModels();
-    return allModels.some((m) => m.id === selector.modelId)
-      ? selector.modelId
-      : undefined;
-  }
-
-  setContextMdFileCount(count: number): void {
-    this.geminiMdFileCount = count;
-  }
-
-  getContextMdFileCount(): number {
-    return this.geminiMdFileCount;
-  }
-
-  getWebSearchConfig(): WebSearchConfig | null {
-    return this.webSearch ?? null;
   }
 
   setArenaManager(manager: ArenaManager | null): void {
@@ -2677,6 +2779,18 @@ export class Config {
 
   getAgentsSettings(): AgentsCollabSettings {
     return this.agentsSettings;
+  }
+
+  /**
+   * Convenience accessor for `worktree.symlinkDirectories` — returns an
+   * empty array when the setting is unset, so callers can pass the
+   * result directly into the GitWorktreeService loop without nullchecks.
+   *
+   * (No general `getWorktreeSettings()` getter yet — add one when a
+   * second field on `WorktreeSettings` justifies the broader API.)
+   */
+  getWorktreeSymlinkDirectories(): readonly string[] {
+    return this.worktreeSettings.symlinkDirectories ?? [];
   }
 
   /**
@@ -3008,6 +3122,33 @@ export class Config {
     return this.geminiClient;
   }
 
+  /**
+   * Session-scoped memory pressure monitor. Child Configs created with
+   * `Object.create(parent)` inherit the parent's monitor through the prototype
+   * chain until this getter installs an own monitor backed by the inherited
+   * pressure config snapshot. This mirrors getFileReadCache()'s isolation
+   * contract while keeping type-safe direct field assignment inside the class.
+   */
+  getMemoryPressureMonitor(): MemoryPressureMonitor | undefined {
+    if (!Object.prototype.hasOwnProperty.call(this, 'memoryPressureMonitor')) {
+      const inheritedMonitor = this.memoryPressureMonitor;
+      if (inheritedMonitor) {
+        const inheritedConfig = this.memoryPressureConfig;
+        if (!inheritedConfig) {
+          throw new Error(
+            'Inherited memory pressure monitor is missing config',
+          );
+        }
+        this.memoryPressureConfig = { ...inheritedConfig };
+        this.memoryPressureMonitor = new MemoryPressureMonitor(
+          this,
+          this.memoryPressureConfig,
+        );
+      }
+    }
+    return this.memoryPressureMonitor;
+  }
+
   getCronScheduler(): CronScheduler {
     if (!this.cronScheduler) {
       this.cronScheduler = new CronScheduler();
@@ -3017,8 +3158,12 @@ export class Config {
 
   isCronEnabled(): boolean {
     // Cron is experimental and opt-in: enabled via settings or env var
-    if (process.env['HOPCODE_ENABLE_CRON'] === '1') return true;
+    if (process.env['QWEN_CODE_ENABLE_CRON'] === '1') return true;
     return this.cronEnabled;
+  }
+
+  isComputerUseEnabled(): boolean {
+    return this.computerUseEnabled;
   }
 
   /**
@@ -3027,11 +3172,11 @@ export class Config {
    * `CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES` gate, but defaults to on so the
    * compact-mode UI benefits without configuration.
    *
-   * Env overrides (either direction): `HOPCODE_EMIT_TOOL_USE_SUMMARIES=0`
+   * Env overrides (either direction): `QWEN_CODE_EMIT_TOOL_USE_SUMMARIES=0`
    * to force off, `=1` to force on.
    */
   getEmitToolUseSummaries(): boolean {
-    const env = process.env['HOPCODE_EMIT_TOOL_USE_SUMMARIES'];
+    const env = process.env['QWEN_CODE_EMIT_TOOL_USE_SUMMARIES'];
     if (env === '0' || env === 'false') return false;
     if (env === '1' || env === 'true') return true;
     return this.emitToolUseSummaries;
@@ -3048,14 +3193,14 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
-  getFileFilteringRespectHopCodeIgnore(): boolean {
-    return this.fileFiltering.respectHopCodeIgnore;
+  getFileFilteringRespectQwenIgnore(): boolean {
+    return this.fileFiltering.respectQwenIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
+      respectQwenIgnore: this.fileFiltering.respectQwenIgnore,
     };
   }
 
@@ -3207,22 +3352,6 @@ export class Config {
    */
   setMessageBus(messageBus: MessageBus): void {
     this.messageBus = messageBus;
-  }
-
-  getTaskStore(): TaskStore | undefined {
-    return this.taskStore;
-  }
-
-  getPermissionBlockerService(): PermissionBlockerService | undefined {
-    return this.permissionBlockerService;
-  }
-
-  getPowerShellConfig(): PowerShellSecurityConfig {
-    return resolvePowerShellConfig(this.powershellConfig);
-  }
-
-  getAgentModels(): Record<string, AgentModelOverride> | undefined {
-    return this.agentModels;
   }
 
   /**
@@ -3763,7 +3892,7 @@ export class Config {
     // --json-schema runs. It must be registered in BOTH the bare-mode
     // branch and the regular branch — without it the model can't finish
     // a structured run, so omitting either branch causes
-    // `hopcode [--bare] --json-schema X -p "..."` to loop until
+    // `qwen [--bare] --json-schema X -p "..."` to loop until
     // maxSessionTurns and exit via the "plain text" failure path. Hoisted
     // out of the two branches so the dynamic-import factory shape stays
     // in sync between them.
@@ -3957,6 +4086,21 @@ export class Config {
       });
     }
 
+    // Register computer-use tools unless disabled. All 9 are deferred —
+    // they surface only via ToolSearch keyword match
+    // (see packages/core/src/tools/computer-use/).
+    //
+    // Pass `registerLazy` (not the bare `registry`) so the same
+    // PermissionManager.isToolEnabled() check that gates every other
+    // built-in also gates these. Direct registry.registerFactory() would
+    // bypass coreTools allowlist + whole-tool deny rules.
+    if (this.isComputerUseEnabled()) {
+      const { registerComputerUseTools } = await import(
+        '../tools/computer-use/index.js'
+      );
+      await registerComputerUseTools(registerLazy);
+    }
+
     // Register monitor tool
     await registerLazy(ToolNames.MONITOR, async () => {
       const { MonitorTool } = await import('../tools/monitor.js');
@@ -4040,20 +4184,4 @@ export class Config {
     // Pre-init path: stash for `createToolRegistry` to consume.
     this.pendingMcpBudgetCallback = cb;
   }
-}
-
-/**
- * Creates a shallow override of a Config by prototype delegation.
- * The returned object delegates to `base` for all properties not
- * explicitly overridden in `overrides`.
- */
-export function createConfigOverride<T extends Config>(
-  base: T,
-  overrides: Partial<Record<keyof T, () => unknown>>,
-): T {
-  const override = Object.create(base) as T;
-  for (const [key, getter] of Object.entries(overrides)) {
-    (override as Record<string, unknown>)[key] = getter;
-  }
-  return override;
 }

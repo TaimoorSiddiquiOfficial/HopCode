@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,7 +55,6 @@ import { WriteFileTool } from '../tools/write-file.js';
 import { ShellTool, ShellToolInvocation } from '../tools/shell.js';
 import type { ShellToolParams } from '../tools/shell.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
-import { IznGateHandler } from '../confirmation-bus/iznGateHandler.js';
 
 type ToolSpanRecord = {
   name: string;
@@ -84,6 +83,7 @@ type ToolSpanRecord = {
 const toolSpanRecords = vi.hoisted((): ToolSpanRecord[] => []);
 const shouldThrowToolSpanSetAttribute = vi.hoisted(() => ({ value: false }));
 const shouldThrowToolSpanSetStatus = vi.hoisted(() => ({ value: false }));
+const runSideQueryMock = vi.hoisted(() => vi.fn());
 
 vi.mock('../telemetry/tracer.js', () => ({
   safeSetStatus: (
@@ -96,6 +96,10 @@ vi.mock('../telemetry/tracer.js', () => ({
       // Match production best-effort telemetry behavior.
     }
   },
+}));
+
+vi.mock('../utils/sideQuery.js', () => ({
+  runSideQuery: (...args: unknown[]) => runSideQueryMock(...args),
 }));
 
 function createMockToolSpan(
@@ -480,14 +484,22 @@ async function waitForStatus(
 }
 
 describe('CoreToolScheduler', () => {
+  beforeEach(() => {
+    runSideQueryMock.mockReset();
+  });
+
   function createSchedulerForLegacyToolTests(options: {
     toolsByName: Map<string, MockTool>;
     approvalMode?: ApprovalMode;
     getPermissionsDeny?: () => string[] | undefined;
     messageBus?: { request: ReturnType<typeof vi.fn> };
+    hookSystem?: {
+      firePermissionDeniedEvent: ReturnType<typeof vi.fn>;
+    };
     disableHooks?: boolean;
     onAllToolCallsComplete?: ReturnType<typeof vi.fn>;
     onToolCallsUpdate?: ReturnType<typeof vi.fn>;
+    memoryMonitor?: { scheduleCheck: () => void };
   }) {
     const ensureTool = vi.fn(
       async (name: string) =>
@@ -516,13 +528,14 @@ describe('CoreToolScheduler', () => {
         getSessionId: () => 'test-session-id',
         getUsageStatisticsEnabled: () => true,
         getDebugMode: () => false,
-        getApprovalMode: () => options.approvalMode ?? ApprovalMode.IZN,
+        getApprovalMode: () => options.approvalMode ?? ApprovalMode.YOLO,
         getPermissionsAllow: () => [],
         getPermissionsDeny: options.getPermissionsDeny ?? (() => undefined),
         getContentGeneratorConfig: () => ({
           model: 'test-model',
           authType: 'gemini',
         }),
+        getModel: () => 'test-model',
         getShellExecutionConfig: () => ({
           terminalWidth: 90,
           terminalHeight: 30,
@@ -537,10 +550,23 @@ describe('CoreToolScheduler', () => {
         getUseModelRouter: () => false,
         getGeminiClient: () => null,
         getChatRecordingService: () => undefined,
+        getMemoryPressureMonitor: () => options.memoryMonitor,
         getMessageBus: vi.fn().mockReturnValue(options.messageBus),
+        getHookSystem: vi.fn().mockReturnValue(options.hookSystem),
         getDisableAllHooks: vi
           .fn()
           .mockReturnValue(options.disableHooks ?? true),
+        getAutoModeDenialState: vi.fn().mockReturnValue({
+          consecutiveBlock: 0,
+          consecutiveUnavailable: 0,
+          totalBlock: 0,
+          totalUnavailable: 0,
+        }),
+        setAutoModeDenialState: vi.fn(),
+        getAutoModeSettings: () => ({}),
+        getWorkspaceContext: () => ({
+          isPathWithinWorkspace: () => false,
+        }),
         isInteractive: () => true,
         getInputFormat: () => undefined,
         getExperimentalZedIntegration: () => false,
@@ -606,6 +632,43 @@ describe('CoreToolScheduler', () => {
     );
   });
 
+  it('schedules a memory pressure check after tool execution', async () => {
+    const execute = vi.fn().mockResolvedValue({
+      llmContent: 'ok',
+      returnDisplay: 'ok',
+    });
+    const toolsByName = new Map<string, MockTool>([
+      [
+        'mockTool',
+        new MockTool({
+          name: 'mockTool',
+          execute,
+        }),
+      ],
+    ]);
+    const scheduleCheck = vi.fn();
+    const { scheduler } = createSchedulerForLegacyToolTests({
+      toolsByName,
+      memoryMonitor: { scheduleCheck },
+    });
+
+    await scheduler.schedule(
+      [
+        {
+          callId: 'memory-check',
+          name: 'mockTool',
+          args: {},
+          isClientInitiated: false,
+          prompt_id: 'prompt-memory-check',
+        },
+      ],
+      new AbortController().signal,
+    );
+
+    expect(execute).toHaveBeenCalledOnce();
+    expect(scheduleCheck).toHaveBeenCalledTimes(1);
+  });
+
   it('applies canonical legacy tool names to the deny-list fallback', async () => {
     const execute = vi.fn().mockResolvedValue({
       llmContent: 'edited',
@@ -649,11 +712,226 @@ describe('CoreToolScheduler', () => {
         ToolErrorType.EXECUTION_DENIED,
       );
       expect(completedCall.response.error?.message).toBe(
-        'HopCode requires permission to use edit, but that permission was declined.',
+        'Qwen Code requires permission to use edit, but that permission was declined.',
       );
     }
     expect(execute).not.toHaveBeenCalled();
     expect(ensureTool).not.toHaveBeenCalled();
+  });
+
+  it('fires PermissionDenied hooks for AUTO classifier blocks', async () => {
+    runSideQueryMock
+      .mockResolvedValueOnce({ shouldBlock: true })
+      .mockResolvedValueOnce({
+        shouldBlock: true,
+        reason: 'dangerous shell command',
+      });
+    const execute = vi.fn().mockResolvedValue({
+      llmContent: 'should not execute',
+      returnDisplay: 'should not execute',
+    });
+    const toolsByName = new Map<string, MockTool>([
+      [
+        ToolNames.SHELL,
+        new MockTool({
+          name: ToolNames.SHELL,
+          getDefaultPermission: MOCK_TOOL_GET_DEFAULT_PERMISSION,
+          getConfirmationDetails: MOCK_TOOL_GET_CONFIRMATION_DETAILS,
+          execute,
+        }),
+      ],
+    ]);
+    const hookSystem = {
+      firePermissionDeniedEvent: vi.fn().mockResolvedValue(undefined),
+    };
+    const { scheduler, onAllToolCallsComplete } =
+      createSchedulerForLegacyToolTests({
+        toolsByName,
+        approvalMode: ApprovalMode.AUTO,
+        hookSystem,
+        disableHooks: false,
+      });
+    const abortController = new AbortController();
+
+    await scheduler.schedule(
+      [
+        {
+          callId: 'auto-denied',
+          name: ToolNames.SHELL,
+          args: { command: 'rm -rf /tmp/example' },
+          isClientInitiated: false,
+          prompt_id: 'prompt-auto-denied',
+        },
+      ],
+      abortController.signal,
+    );
+
+    await vi.waitFor(() => {
+      expect(onAllToolCallsComplete).toHaveBeenCalled();
+    });
+    expect(hookSystem.firePermissionDeniedEvent).toHaveBeenCalledWith(
+      ToolNames.SHELL,
+      { command: 'rm -rf /tmp/example' },
+      'auto-denied',
+      'classifier_blocked',
+      abortController.signal,
+    );
+    expect(execute).not.toHaveBeenCalled();
+    const completedCalls = onAllToolCallsComplete.mock
+      .calls[0][0] as ToolCall[];
+    expect(completedCalls[0].status).toBe('error');
+  });
+
+  it('fires PermissionDenied hooks for AUTO classifier unavailable blocks', async () => {
+    runSideQueryMock
+      .mockResolvedValueOnce({ shouldBlock: true })
+      .mockRejectedValueOnce(new Error('classifier timed out'));
+    const execute = vi.fn().mockResolvedValue({
+      llmContent: 'should not execute',
+      returnDisplay: 'should not execute',
+    });
+    const toolsByName = new Map<string, MockTool>([
+      [
+        ToolNames.SHELL,
+        new MockTool({
+          name: ToolNames.SHELL,
+          getDefaultPermission: MOCK_TOOL_GET_DEFAULT_PERMISSION,
+          getConfirmationDetails: MOCK_TOOL_GET_CONFIRMATION_DETAILS,
+          execute,
+        }),
+      ],
+    ]);
+    const hookSystem = {
+      firePermissionDeniedEvent: vi.fn().mockResolvedValue(undefined),
+    };
+    const { scheduler, onAllToolCallsComplete } =
+      createSchedulerForLegacyToolTests({
+        toolsByName,
+        approvalMode: ApprovalMode.AUTO,
+        hookSystem,
+        disableHooks: false,
+      });
+    const abortController = new AbortController();
+
+    await scheduler.schedule(
+      [
+        {
+          callId: 'auto-unavailable',
+          name: ToolNames.SHELL,
+          args: { command: 'rm -rf /tmp/example' },
+          isClientInitiated: false,
+          prompt_id: 'prompt-auto-unavailable',
+        },
+      ],
+      abortController.signal,
+    );
+
+    await vi.waitFor(() => {
+      expect(onAllToolCallsComplete).toHaveBeenCalled();
+    });
+    expect(hookSystem.firePermissionDeniedEvent).toHaveBeenCalledWith(
+      ToolNames.SHELL,
+      { command: 'rm -rf /tmp/example' },
+      'auto-unavailable',
+      'classifier_unavailable',
+      abortController.signal,
+    );
+    expect(execute).not.toHaveBeenCalled();
+  });
+
+  it('skips PermissionDenied hooks when hooks are disabled', async () => {
+    runSideQueryMock
+      .mockResolvedValueOnce({ shouldBlock: true })
+      .mockResolvedValueOnce({
+        shouldBlock: true,
+        reason: 'dangerous shell command',
+      });
+    const toolsByName = new Map<string, MockTool>([
+      [
+        ToolNames.SHELL,
+        new MockTool({
+          name: ToolNames.SHELL,
+          getDefaultPermission: MOCK_TOOL_GET_DEFAULT_PERMISSION,
+          getConfirmationDetails: MOCK_TOOL_GET_CONFIRMATION_DETAILS,
+        }),
+      ],
+    ]);
+    const hookSystem = {
+      firePermissionDeniedEvent: vi.fn().mockResolvedValue(undefined),
+    };
+    const { scheduler, onAllToolCallsComplete } =
+      createSchedulerForLegacyToolTests({
+        toolsByName,
+        approvalMode: ApprovalMode.AUTO,
+        hookSystem,
+        disableHooks: true,
+      });
+
+    await scheduler.schedule(
+      [
+        {
+          callId: 'auto-denied-hooks-off',
+          name: ToolNames.SHELL,
+          args: { command: 'rm -rf /tmp/example' },
+          isClientInitiated: false,
+          prompt_id: 'prompt-auto-denied-hooks-off',
+        },
+      ],
+      new AbortController().signal,
+    );
+
+    await vi.waitFor(() => {
+      expect(onAllToolCallsComplete).toHaveBeenCalled();
+    });
+    expect(hookSystem.firePermissionDeniedEvent).not.toHaveBeenCalled();
+  });
+
+  it('does not fire PermissionDenied hooks when AUTO classifier approves', async () => {
+    runSideQueryMock.mockResolvedValueOnce({ shouldBlock: false });
+    const execute = vi.fn().mockResolvedValue({
+      llmContent: 'executed',
+      returnDisplay: 'executed',
+    });
+    const toolsByName = new Map<string, MockTool>([
+      [
+        ToolNames.SHELL,
+        new MockTool({
+          name: ToolNames.SHELL,
+          getDefaultPermission: MOCK_TOOL_GET_DEFAULT_PERMISSION,
+          getConfirmationDetails: MOCK_TOOL_GET_CONFIRMATION_DETAILS,
+          execute,
+        }),
+      ],
+    ]);
+    const hookSystem = {
+      firePermissionDeniedEvent: vi.fn().mockResolvedValue(undefined),
+    };
+    const { scheduler, onAllToolCallsComplete } =
+      createSchedulerForLegacyToolTests({
+        toolsByName,
+        approvalMode: ApprovalMode.AUTO,
+        hookSystem,
+        disableHooks: false,
+      });
+
+    await scheduler.schedule(
+      [
+        {
+          callId: 'auto-approved',
+          name: ToolNames.SHELL,
+          args: { command: 'echo ok' },
+          isClientInitiated: false,
+          prompt_id: 'prompt-auto-approved',
+        },
+      ],
+      new AbortController().signal,
+    );
+
+    await vi.waitFor(() => {
+      expect(onAllToolCallsComplete).toHaveBeenCalled();
+    });
+    expect(hookSystem.firePermissionDeniedEvent).not.toHaveBeenCalled();
+    expect(execute).toHaveBeenCalledOnce();
   });
 
   it.each(Object.entries(ToolNamesMigration))(
@@ -1255,7 +1533,7 @@ describe('CoreToolScheduler', () => {
       if (completedCall.status === 'error') {
         const errorMessage = completedCall.response.error?.message;
         expect(errorMessage).toBe(
-          'HopCode requires permission to use write_file, but that permission was declined.',
+          'Qwen Code requires permission to use write_file, but that permission was declined.',
         );
         // Should NOT contain "not found in registry"
         expect(errorMessage).not.toContain('not found in registry');
@@ -1796,7 +2074,7 @@ describe('CoreToolScheduler edit cancellation', () => {
   });
 });
 
-describe('CoreToolScheduler IZN mode', () => {
+describe('CoreToolScheduler YOLO mode', () => {
   it('should execute tool requiring confirmation directly without waiting', async () => {
     // Arrange
     const executeFn = vi.fn().mockResolvedValue({
@@ -1830,12 +2108,12 @@ describe('CoreToolScheduler IZN mode', () => {
     const onAllToolCallsComplete = vi.fn();
     const onToolCallsUpdate = vi.fn();
 
-    // Configure the scheduler for IZN mode.
+    // Configure the scheduler for YOLO mode.
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -1873,7 +2151,7 @@ describe('CoreToolScheduler IZN mode', () => {
       name: 'mockTool',
       args: { param: 'value' },
       isClientInitiated: false,
-      prompt_id: 'prompt-id-izn',
+      prompt_id: 'prompt-id-yolo',
     };
 
     // Act
@@ -2098,7 +2376,7 @@ describe('CoreToolScheduler request queueing', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN, // Use IZN to avoid confirmation prompts
+      getApprovalMode: () => ApprovalMode.YOLO, // Use YOLO to avoid confirmation prompts
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -2223,7 +2501,7 @@ describe('CoreToolScheduler request queueing', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -2747,7 +3025,7 @@ describe('CoreToolScheduler Sequential Execution', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN, // Use IZN to avoid confirmation prompts
+      getApprovalMode: () => ApprovalMode.YOLO, // Use YOLO to avoid confirmation prompts
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -2870,7 +3148,7 @@ describe('CoreToolScheduler Sequential Execution', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -3388,7 +3666,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5070,14 +5348,14 @@ describe('CoreToolScheduler telemetry spans', () => {
       getAllTools: () => [],
       getToolsByServer: () => [],
     } as unknown as ToolRegistry;
-    // The auto-approve IZN path doesn't call _schedule's getMessageBus
+    // The auto-approve YOLO path doesn't call _schedule's getMessageBus
     // branch, so the only getMessageBus call is the prelude one at
     // _executeToolCallBody. Make that call throw.
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({}),
       getShellExecutionConfig: () => ({
@@ -5478,7 +5756,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       (r) => r.name === 'tool.mockEditTool',
     );
     expect(
-      toolSpan?.spanAttributes['hopcode.tool.modify_with_editor_unavailable'],
+      toolSpan?.spanAttributes['qwen-code.tool.modify_with_editor_unavailable'],
     ).toBe(true);
     // Span stays open — user can recover via Cancel/Proceed.
     expect(toolSpan?.ended).toBe(false);
@@ -5929,15 +6207,15 @@ describe('Fire hook functions integration', () => {
 
   describe('Concurrent tool execution', () => {
     // Ensure tests are deterministic regardless of environment.
-    const origEnv = process.env['HOPCODE_MAX_TOOL_CONCURRENCY'];
+    const origEnv = process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
     beforeEach(() => {
-      delete process.env['HOPCODE_MAX_TOOL_CONCURRENCY'];
+      delete process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
     });
     afterEach(() => {
       if (origEnv !== undefined) {
-        process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] = origEnv;
+        process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'] = origEnv;
       } else {
-        delete process.env['HOPCODE_MAX_TOOL_CONCURRENCY'];
+        delete process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
       }
     });
 
@@ -6006,7 +6284,7 @@ describe('Fire hook functions integration', () => {
         execute: async (params) => {
           const id = (params as { id: string }).id;
           executionLog.push(`start:${id}`);
-          // Simulate async work � concurrent agents will interleave here
+          // Simulate async work — concurrent agents will interleave here
           await new Promise((r) => setTimeout(r, 50));
           executionLog.push(`end:${id}`);
           return {
@@ -6155,7 +6433,7 @@ describe('Fire hook functions integration', () => {
       expect(completedCalls).toHaveLength(4);
       expect(completedCalls.every((c) => c.status === 'success')).toBe(true);
 
-      // All 4 tools are concurrency-safe ? they should all start
+      // All 4 tools are concurrency-safe → they should all start
       // before any of them finishes (parallel execution).
       const allStarts = [
         executionLog.indexOf('read:start:1'),
@@ -6307,8 +6585,8 @@ describe('Fire hook functions integration', () => {
         onToolCallsUpdate,
       );
 
-      // [Read1, Read2, Edit, Read3]
-      // Expected batches: [Read1,Read2](parallel) ? [Edit](seq) ? [Read3](seq)
+      // [Read₁, Read₂, Edit, Read₃]
+      // Expected batches: [Read₁,Read₂](parallel) → [Edit](seq) → [Read₃](seq)
       const requests = [
         {
           callId: '1',
@@ -6348,7 +6626,7 @@ describe('Fire hook functions integration', () => {
       expect(completedCalls).toHaveLength(4);
       expect(completedCalls.every((c) => c.status === 'success')).toBe(true);
 
-      // Batch 1: Read1 and Read2 run in parallel (both start before either ends)
+      // Batch 1: Read₁ and Read₂ run in parallel (both start before either ends)
       const read1Start = executionLog.indexOf('read:start:1');
       const read2Start = executionLog.indexOf('read:start:2');
       const firstReadEnd = Math.min(
@@ -6370,7 +6648,7 @@ describe('Fire hook functions integration', () => {
       expect(editStart).not.toBe(-1);
       expect(editStart).toBeGreaterThan(lastReadEnd);
 
-      // Batch 3: Read3 starts after Edit completes
+      // Batch 3: Read₃ starts after Edit completes
       const editEnd = executionLog.indexOf('edit:end:E');
       const read3Start = executionLog.indexOf('read:start:3');
       expect(editEnd).not.toBe(-1);
@@ -6407,8 +6685,8 @@ describe('Fire hook functions integration', () => {
         onToolCallsUpdate,
       );
 
-      // "git log" and "ls" are read-only ? concurrent
-      // "npm install" is not read-only ? sequential, breaks the batch
+      // "git log" and "ls" are read-only → concurrent
+      // "npm install" is not read-only → sequential, breaks the batch
       const requests = [
         {
           callId: '1',
@@ -6927,7 +7205,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -7021,7 +7299,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
     msg = getLastErrorMessage(onToolCallsUpdate);
     expect(msg).not.toContain(RETRY_LOOP_STOP_DIRECTIVE);
 
-    // Turn 3: same bad params � should trigger directive
+    // Turn 3: same bad params — should trigger directive
     await scheduler.schedule(
       [makeRequest('c3', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -7051,7 +7329,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       new AbortController().signal,
     );
 
-    // Turn 4: back to tool � should be count 1 again (no directive)
+    // Turn 4: back to tool — should be count 1 again (no directive)
     await scheduler.schedule(
       [makeRequest('c4', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -7081,7 +7359,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       new AbortController().signal,
     );
 
-    // Two more failures � count should restart at 1, not jump to 3+.
+    // Two more failures — count should restart at 1, not jump to 3+.
     await scheduler.schedule(
       [makeRequest('c4', 'strictStringTool', { value: 123 })],
       new AbortController().signal,
@@ -7178,7 +7456,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -7563,7 +7841,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -7758,7 +8036,7 @@ describe('CoreToolScheduler activation wiring', () => {
         getSessionId: () => 'test-session-id',
         getUsageStatisticsEnabled: () => true,
         getDebugMode: () => false,
-        getApprovalMode: () => ApprovalMode.IZN,
+        getApprovalMode: () => ApprovalMode.YOLO,
         getPermissionsAllow: () => [],
         getContentGeneratorConfig: () => ({
           model: 'test-model',
@@ -7875,7 +8153,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -7973,7 +8251,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -8064,7 +8342,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -8303,7 +8581,7 @@ describe('CoreToolScheduler shell-tool promote integration (#3831 PR-2)', () => 
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.YOLO,
       getContentGeneratorConfig: () => ({
         model: 'test-model',
         authType: 'gemini',
@@ -8363,17 +8641,69 @@ describe('CoreToolScheduler shell-tool promote integration (#3831 PR-2)', () => 
   });
 });
 
-describe('CoreToolScheduler IZN gate integration', () => {
-  // Build a minimal scheduler wired with the given iznGateHandler.
-  // The mock tool registry always returns a MockTool whose execute
-  // function is controlled by `executeFn`.
-  function buildIznScheduler(iznGateHandler: IznGateHandler, executeFn: Mock) {
-    const tool = new MockTool({
-      name: ToolNames.SHELL,
-      execute: executeFn,
-      getDefaultPermission: MOCK_TOOL_GET_DEFAULT_PERMISSION,
-      getConfirmationDetails: MOCK_TOOL_GET_CONFIRMATION_DETAILS,
-    });
+// Verifies the duck-typed setPromptId contract between CoreToolScheduler
+// and tool invocations. This is the integration point that lets
+// SkillToolInvocation (and any future invocation) record the prompt_id
+// of the user turn that triggered them — required for the
+// SkillFollowupRecord join in §4.1.2 of the RT optimization design.
+describe('CoreToolScheduler prompt_id propagation', () => {
+  class PromptIdAwareInvocation extends BaseToolInvocation<
+    Record<string, unknown>,
+    ToolResult
+  > {
+    capturedPromptId?: string;
+
+    constructor(params: Record<string, unknown>) {
+      super(params);
+    }
+
+    setPromptId(id: string): void {
+      this.capturedPromptId = id;
+    }
+
+    override async getDefaultPermission(): Promise<PermissionDecision> {
+      return 'allow';
+    }
+
+    getDescription(): string {
+      return 'prompt-id-aware test tool';
+    }
+
+    async execute(): Promise<ToolResult> {
+      return {
+        llmContent: `captured prompt_id=${this.capturedPromptId ?? '<unset>'}`,
+        returnDisplay: '',
+      };
+    }
+  }
+
+  class PromptIdAwareTool extends BaseDeclarativeTool<
+    Record<string, unknown>,
+    ToolResult
+  > {
+    lastBuiltInvocation?: PromptIdAwareInvocation;
+
+    constructor() {
+      super(
+        'promptIdAwareTool',
+        'promptIdAwareTool',
+        'A tool that captures prompt_id via setPromptId',
+        Kind.Read,
+        {},
+      );
+    }
+
+    protected createInvocation(
+      params: Record<string, unknown>,
+    ): ToolInvocation<Record<string, unknown>, ToolResult> {
+      const invocation = new PromptIdAwareInvocation(params);
+      this.lastBuiltInvocation = invocation;
+      return invocation;
+    }
+  }
+
+  it('passes request.prompt_id to invocation.setPromptId via buildInvocation', async () => {
+    const tool = new PromptIdAwareTool();
     const mockToolRegistry = {
       getTool: () => tool,
       ensureTool: async () => tool,
@@ -8389,22 +8719,111 @@ describe('CoreToolScheduler IZN gate integration', () => {
       getToolsByServer: () => [],
     } as unknown as ToolRegistry;
 
-    const onAllToolCallsComplete = vi.fn();
-    const onToolCallsUpdate = vi.fn();
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.IZN,
+      getApprovalMode: () => ApprovalMode.DEFAULT,
+      getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
         authType: 'gemini',
       }),
-      getToolRegistry: () => mockToolRegistry,
       getShellExecutionConfig: () => ({
-        terminalWidth: 80,
-        terminalHeight: 24,
+        terminalWidth: 90,
+        terminalHeight: 30,
       }),
+      storage: {
+        getProjectTempDir: () => '/tmp',
+      },
+      getToolRegistry: () => mockToolRegistry,
+      getUseModelRouter: () => false,
+      getGeminiClient: () => null,
+      isInteractive: () => true,
+      getIdeMode: () => false,
+      getExperimentalZedIntegration: () => false,
+      getChatRecordingService: () => undefined,
+      getMessageBus: vi.fn().mockReturnValue(undefined),
+      getDisableAllHooks: vi.fn().mockReturnValue(true),
+    } as unknown as Config;
+
+    const onAllToolCallsComplete = vi.fn();
+    const scheduler = new CoreToolScheduler({
+      config: mockConfig,
+      onAllToolCallsComplete,
+      onToolCallsUpdate: vi.fn(),
+      getPreferredEditor: () => 'vscode',
+      onEditorClose: vi.fn(),
+    });
+
+    const abortController = new AbortController();
+    await scheduler.schedule(
+      [
+        {
+          callId: 'call-1',
+          name: 'promptIdAwareTool',
+          args: {},
+          isClientInitiated: false,
+          prompt_id: 'expected-prompt-id-xyz',
+        },
+      ],
+      abortController.signal,
+    );
+
+    await vi.waitFor(() => {
+      expect(onAllToolCallsComplete).toHaveBeenCalled();
+    });
+
+    expect(tool.lastBuiltInvocation?.capturedPromptId).toBe(
+      'expected-prompt-id-xyz',
+    );
+  });
+
+  it('buildInvocation calls setPromptId when promptId is provided (covers both setArgs and schedule call sites)', () => {
+    // Directly exercises the private buildInvocation method so that both
+    // call sites (L1036 setArgs path, L1497 main schedule path) are
+    // covered by a single test on the wiring itself — testing setArgs
+    // through the public confirmation API requires mocking modifyWithEditor
+    // + filesystem + editor type, which would dwarf the change under test.
+    const tool = new PromptIdAwareTool();
+    const mockToolRegistry = {
+      getTool: () => tool,
+      ensureTool: async () => tool,
+      getFunctionDeclarations: () => [],
+      tools: new Map(),
+      discovery: {},
+      registerTool: () => {},
+      getToolByName: () => tool,
+      getToolByDisplayName: () => tool,
+      getTools: () => [],
+      discoverTools: async () => {},
+      getAllTools: () => [],
+      getToolsByServer: () => [],
+    } as unknown as ToolRegistry;
+
+    const mockConfig = {
+      getSessionId: () => 'test-session-id',
+      getUsageStatisticsEnabled: () => true,
+      getDebugMode: () => false,
+      getApprovalMode: () => ApprovalMode.DEFAULT,
+      getPermissionsAllow: () => [],
+      getContentGeneratorConfig: () => ({
+        model: 'test-model',
+        authType: 'gemini',
+      }),
+      getShellExecutionConfig: () => ({
+        terminalWidth: 90,
+        terminalHeight: 30,
+      }),
+      storage: {
+        getProjectTempDir: () => '/tmp',
+      },
+      getToolRegistry: () => mockToolRegistry,
+      getUseModelRouter: () => false,
+      getGeminiClient: () => null,
+      isInteractive: () => true,
+      getIdeMode: () => false,
+      getExperimentalZedIntegration: () => false,
       getChatRecordingService: () => undefined,
       getMessageBus: vi.fn().mockReturnValue(undefined),
       getDisableAllHooks: vi.fn().mockReturnValue(true),
@@ -8412,115 +8831,178 @@ describe('CoreToolScheduler IZN gate integration', () => {
 
     const scheduler = new CoreToolScheduler({
       config: mockConfig,
-      iznGateHandler,
-      onAllToolCallsComplete,
-      onToolCallsUpdate,
+      onAllToolCallsComplete: vi.fn(),
+      onToolCallsUpdate: vi.fn(),
       getPreferredEditor: () => 'vscode',
       onEditorClose: vi.fn(),
     });
 
-    return { scheduler, onAllToolCallsComplete, onToolCallsUpdate };
-  }
+    // Direct call: this is the same code path that L1036 (setArgs) and
+    // L1497 (schedule) both go through. Both callers pass
+    // call.request.prompt_id / reqInfo.prompt_id as the fourth arg.
+    const invocation = (
+      scheduler as unknown as {
+        buildInvocation: (
+          t: typeof tool,
+          a: Record<string, unknown>,
+          callId: string,
+          promptId: string,
+        ) => PromptIdAwareInvocation;
+      }
+    ).buildInvocation(tool, {}, 'call-direct', 'expected-via-setArgs-path');
 
-  it('blocks a destructive shell command and returns a clarification message', async () => {
-    const executeFn = vi
-      .fn()
-      .mockResolvedValue({ llmContent: 'deleted', returnDisplay: 'deleted' });
-    const iznGateHandler = new IznGateHandler();
-    const { scheduler, onAllToolCallsComplete } = buildIznScheduler(
-      iznGateHandler,
-      executeFn,
-    );
-
-    await scheduler.schedule(
-      [
-        {
-          callId: 'rm-gate-1',
-          name: ToolNames.SHELL,
-          args: { command: 'rm -rf /tmp/test-dir' },
-          isClientInitiated: false,
-          prompt_id: 'p-gate',
-        },
-      ],
-      new AbortController().signal,
-    );
-
-    await vi.waitFor(() => expect(onAllToolCallsComplete).toHaveBeenCalled());
-
-    const completedCalls = onAllToolCallsComplete.mock
-      .calls[0][0] as ToolCall[];
-    expect(completedCalls).toHaveLength(1);
-    const call = completedCalls[0];
-
-    // Gate should have blocked the command — tool must not have executed
-    expect(executeFn).not.toHaveBeenCalled();
-    expect(call.status).toBe('error');
-
-    // The resultDisplay confirms the gate blocked the call
-    if (call.status === 'error') {
-      expect(call.response.resultDisplay).toBe(
-        'Izn gate blocked a destructive tool call.',
-      );
-      // The response parts contain the clarification message
-      const partsText = call.response.responseParts
-        .map((p) => (typeof p === 'string' ? p : JSON.stringify(p)))
-        .join('');
-      expect(partsText).toContain('system-reminder');
-    }
+    expect(invocation.capturedPromptId).toBe('expected-via-setArgs-path');
   });
 
-  it('allows a retry of the same blocked command (hash bypass across scheduler instances)', async () => {
-    // Simulates the production pattern: each processFunctionCalls() creates a
-    // new CoreToolScheduler but shares the same class-level IznGateHandler.
-    const executeFn = vi
-      .fn()
-      .mockResolvedValue({ llmContent: 'deleted', returnDisplay: 'deleted' });
-    const iznGateHandler = new IznGateHandler();
+  it('buildInvocation does not throw when promptId is omitted', () => {
+    // Ensures the optional fourth argument stays optional — callers that
+    // do not yet pass promptId (none in production today, but the type
+    // is `promptId?: string`) keep working.
+    const tool = new PromptIdAwareTool();
+    const mockToolRegistry = {
+      getTool: () => tool,
+      ensureTool: async () => tool,
+      getFunctionDeclarations: () => [],
+      tools: new Map(),
+      discovery: {},
+      registerTool: () => {},
+      getToolByName: () => tool,
+      getToolByDisplayName: () => tool,
+      getTools: () => [],
+      discoverTools: async () => {},
+      getAllTools: () => [],
+      getToolsByServer: () => [],
+    } as unknown as ToolRegistry;
 
-    // First turn: gate blocks and stores a hash for the command
-    const { scheduler: scheduler1, onAllToolCallsComplete: complete1 } =
-      buildIznScheduler(iznGateHandler, executeFn);
+    const mockConfig = {
+      getSessionId: () => 'test-session-id',
+      getUsageStatisticsEnabled: () => true,
+      getDebugMode: () => false,
+      getApprovalMode: () => ApprovalMode.DEFAULT,
+      getPermissionsAllow: () => [],
+      getContentGeneratorConfig: () => ({
+        model: 'test-model',
+        authType: 'gemini',
+      }),
+      getShellExecutionConfig: () => ({
+        terminalWidth: 90,
+        terminalHeight: 30,
+      }),
+      storage: {
+        getProjectTempDir: () => '/tmp',
+      },
+      getToolRegistry: () => mockToolRegistry,
+      getUseModelRouter: () => false,
+      getGeminiClient: () => null,
+      isInteractive: () => true,
+      getIdeMode: () => false,
+      getExperimentalZedIntegration: () => false,
+      getChatRecordingService: () => undefined,
+      getMessageBus: vi.fn().mockReturnValue(undefined),
+      getDisableAllHooks: vi.fn().mockReturnValue(true),
+    } as unknown as Config;
 
-    await scheduler1.schedule(
-      [
-        {
-          callId: 'rm-gate-retry-1',
-          name: ToolNames.SHELL,
-          args: { command: 'rm -rf /tmp/retry-dir' },
-          isClientInitiated: false,
-          prompt_id: 'p-gate-retry',
-        },
-      ],
-      new AbortController().signal,
-    );
+    const scheduler = new CoreToolScheduler({
+      config: mockConfig,
+      onAllToolCallsComplete: vi.fn(),
+      onToolCallsUpdate: vi.fn(),
+      getPreferredEditor: () => 'vscode',
+      onEditorClose: vi.fn(),
+    });
 
-    await vi.waitFor(() => expect(complete1).toHaveBeenCalled());
-    expect(executeFn).not.toHaveBeenCalled();
+    const invocation = (
+      scheduler as unknown as {
+        buildInvocation: (
+          t: typeof tool,
+          a: Record<string, unknown>,
+          callId?: string,
+          promptId?: string,
+        ) => PromptIdAwareInvocation;
+      }
+    ).buildInvocation(tool, {}, 'call-omitted');
 
-    // Second turn (new scheduler, shared IznGateHandler): hash bypass allows
-    iznGateHandler.clearBlockHistory();
-    const { scheduler: scheduler2, onAllToolCallsComplete: complete2 } =
-      buildIznScheduler(iznGateHandler, executeFn);
+    // promptId not passed → setPromptId not called → field stays undefined.
+    expect(invocation.capturedPromptId).toBeUndefined();
+  });
 
-    await scheduler2.schedule(
-      [
-        {
-          callId: 'rm-gate-retry-2',
-          name: ToolNames.SHELL,
-          args: { command: 'rm -rf /tmp/retry-dir' },
-          isClientInitiated: false,
-          prompt_id: 'p-gate-retry-2',
-        },
-      ],
-      new AbortController().signal,
-    );
+  it('is a no-op when invocation does not expose setPromptId', async () => {
+    // Reuses the existing TestApprovalTool which has no setPromptId.
+    // The scheduler must not throw when the duck-type check fails.
+    const tool = new TestApprovalTool({
+      getApprovalMode: () => ApprovalMode.AUTO_EDIT,
+      setApprovalMode: () => {},
+    } as unknown as Config);
 
-    await vi.waitFor(() => expect(complete2).toHaveBeenCalled());
+    const mockToolRegistry = {
+      getTool: () => tool,
+      ensureTool: async () => tool,
+      getFunctionDeclarations: () => [],
+      tools: new Map(),
+      discovery: {},
+      registerTool: () => {},
+      getToolByName: () => tool,
+      getToolByDisplayName: () => tool,
+      getTools: () => [],
+      discoverTools: async () => {},
+      getAllTools: () => [],
+      getToolsByServer: () => [],
+    } as unknown as ToolRegistry;
 
-    const completedCalls = complete2.mock.calls[0][0] as ToolCall[];
-    expect(completedCalls).toHaveLength(1);
-    // Command should have been allowed through on the second attempt
-    expect(executeFn).toHaveBeenCalledOnce();
-    expect(completedCalls[0].status).toBe('success');
+    const mockConfig = {
+      getSessionId: () => 'test-session-id',
+      getUsageStatisticsEnabled: () => true,
+      getDebugMode: () => false,
+      getApprovalMode: () => ApprovalMode.AUTO_EDIT,
+      getPermissionsAllow: () => [],
+      getContentGeneratorConfig: () => ({
+        model: 'test-model',
+        authType: 'gemini',
+      }),
+      getShellExecutionConfig: () => ({
+        terminalWidth: 90,
+        terminalHeight: 30,
+      }),
+      storage: {
+        getProjectTempDir: () => '/tmp',
+      },
+      getToolRegistry: () => mockToolRegistry,
+      getUseModelRouter: () => false,
+      getGeminiClient: () => null,
+      isInteractive: () => true,
+      getIdeMode: () => false,
+      getExperimentalZedIntegration: () => false,
+      getChatRecordingService: () => undefined,
+      getMessageBus: vi.fn().mockReturnValue(undefined),
+      getDisableAllHooks: vi.fn().mockReturnValue(true),
+    } as unknown as Config;
+
+    const onAllToolCallsComplete = vi.fn();
+    const scheduler = new CoreToolScheduler({
+      config: mockConfig,
+      onAllToolCallsComplete,
+      onToolCallsUpdate: vi.fn(),
+      getPreferredEditor: () => 'vscode',
+      onEditorClose: vi.fn(),
+    });
+
+    const abortController = new AbortController();
+    await expect(
+      scheduler.schedule(
+        [
+          {
+            callId: 'call-1',
+            name: 'testApprovalTool',
+            args: { id: 'a' },
+            isClientInitiated: false,
+            prompt_id: 'whatever',
+          },
+        ],
+        abortController.signal,
+      ),
+    ).resolves.not.toThrow();
+
+    await vi.waitFor(() => {
+      expect(onAllToolCallsComplete).toHaveBeenCalled();
+    });
   });
 });

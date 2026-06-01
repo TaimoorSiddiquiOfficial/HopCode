@@ -8,20 +8,33 @@ import type { Content } from '@google/genai';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   DEFAULT_IMAGE_TOKEN_ESTIMATE,
+  DEFAULT_MAX_RECENT_FILES,
+  DEFAULT_MAX_RECENT_IMAGES,
+  DEFAULT_SCREENSHOT_TRIGGER_ENABLED,
+  DEFAULT_SCREENSHOT_TRIGGER_THRESHOLD,
   estimateContentChars,
   estimatePartChars,
+  resolveCompactionTuning,
   resolveSlimmingConfig,
   sanitizeMimeForPlaceholder,
   slimCompactionInput,
 } from './compactionInputSlimming.js';
 
+const COMPACTION_ENV_KEYS = [
+  'HOPCODE_IMAGE_TOKEN_ESTIMATE',
+  'HOPCODE_COMPACT_MAX_RECENT_FILES',
+  'HOPCODE_COMPACT_MAX_RECENT_IMAGES',
+  'HOPCODE_COMPACT_SCREENSHOT_TRIGGER',
+  'HOPCODE_COMPACT_SCREENSHOT_THRESHOLD',
+];
+
 describe('compactionInputSlimming', () => {
   beforeEach(() => {
-    delete process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'];
+    for (const k of COMPACTION_ENV_KEYS) delete process.env[k];
   });
 
   afterEach(() => {
-    delete process.env['HOPCODE_IMAGE_TOKEN_ESTIMATE'];
+    for (const k of COMPACTION_ENV_KEYS) delete process.env[k];
   });
 
   describe('resolveSlimmingConfig', () => {
@@ -55,6 +68,89 @@ describe('compactionInputSlimming', () => {
       const cfg = resolveSlimmingConfig(undefined);
       // Falls through to default.
       expect(cfg.imageTokenEstimate).toBe(DEFAULT_IMAGE_TOKEN_ESTIMATE);
+    });
+  });
+
+  describe('resolveCompactionTuning', () => {
+    it('returns defaults when nothing is set', () => {
+      const t = resolveCompactionTuning(undefined);
+      expect(t.maxRecentFiles).toBe(DEFAULT_MAX_RECENT_FILES);
+      expect(t.maxRecentImages).toBe(DEFAULT_MAX_RECENT_IMAGES);
+      expect(t.enableScreenshotTrigger).toBe(
+        DEFAULT_SCREENSHOT_TRIGGER_ENABLED,
+      );
+      expect(t.screenshotTriggerThreshold).toBe(
+        DEFAULT_SCREENSHOT_TRIGGER_THRESHOLD,
+      );
+    });
+
+    it('honors settings when env is unset', () => {
+      const t = resolveCompactionTuning({
+        maxRecentFilesToRetain: 2,
+        maxRecentImagesToRetain: 1,
+        enableScreenshotTrigger: false,
+        screenshotTriggerThreshold: 12,
+      });
+      expect(t.maxRecentFiles).toBe(2);
+      expect(t.maxRecentImages).toBe(1);
+      expect(t.enableScreenshotTrigger).toBe(false);
+      expect(t.screenshotTriggerThreshold).toBe(12);
+    });
+
+    it('accepts 0 for the retention caps (restore none)', () => {
+      const t = resolveCompactionTuning({
+        maxRecentFilesToRetain: 0,
+        maxRecentImagesToRetain: 0,
+      });
+      expect(t.maxRecentFiles).toBe(0);
+      expect(t.maxRecentImages).toBe(0);
+    });
+
+    it('env overrides settings for every knob', () => {
+      process.env['HOPCODE_COMPACT_MAX_RECENT_FILES'] = '7';
+      process.env['HOPCODE_COMPACT_MAX_RECENT_IMAGES'] = '9';
+      process.env['HOPCODE_COMPACT_SCREENSHOT_TRIGGER'] = '0';
+      process.env['HOPCODE_COMPACT_SCREENSHOT_THRESHOLD'] = '99';
+      const t = resolveCompactionTuning({
+        maxRecentFilesToRetain: 1,
+        maxRecentImagesToRetain: 1,
+        enableScreenshotTrigger: true,
+        screenshotTriggerThreshold: 5,
+      });
+      expect(t.maxRecentFiles).toBe(7);
+      expect(t.maxRecentImages).toBe(9);
+      expect(t.enableScreenshotTrigger).toBe(false);
+      expect(t.screenshotTriggerThreshold).toBe(99);
+    });
+
+    it('parses the boolean env both ways and ignores typos', () => {
+      process.env['HOPCODE_COMPACT_SCREENSHOT_TRIGGER'] = 'false';
+      expect(resolveCompactionTuning(undefined).enableScreenshotTrigger).toBe(
+        false,
+      );
+      process.env['HOPCODE_COMPACT_SCREENSHOT_TRIGGER'] = '1';
+      expect(resolveCompactionTuning(undefined).enableScreenshotTrigger).toBe(
+        true,
+      );
+      // Unrecognized env string falls through to the settings value.
+      process.env['HOPCODE_COMPACT_SCREENSHOT_TRIGGER'] = 'yes-please';
+      expect(
+        resolveCompactionTuning({ enableScreenshotTrigger: false })
+          .enableScreenshotTrigger,
+      ).toBe(false);
+    });
+
+    it('falls through invalid numeric env to settings, then defaults', () => {
+      process.env['HOPCODE_COMPACT_SCREENSHOT_THRESHOLD'] = 'not-a-number';
+      expect(
+        resolveCompactionTuning({ screenshotTriggerThreshold: 33 })
+          .screenshotTriggerThreshold,
+      ).toBe(33);
+      // Threshold has a min of 1, so 0 is rejected → default.
+      process.env['HOPCODE_COMPACT_SCREENSHOT_THRESHOLD'] = '0';
+      expect(
+        resolveCompactionTuning(undefined).screenshotTriggerThreshold,
+      ).toBe(DEFAULT_SCREENSHOT_TRIGGER_THRESHOLD);
     });
   });
 

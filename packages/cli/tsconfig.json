@@ -9,8 +9,8 @@
     "paths": {
       "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
       "@hoptrendy/hopcode-core/*": ["../core/src/*"],
-      "@hoptrendy/hopcode-acp-bridge": ["../acp-bridge/src/index.ts"],
-      "@hoptrendy/hopcode-acp-bridge/*": ["../acp-bridge/src/*"]
+      "@qwen-code/acp-bridge": ["../acp-bridge/src/index.ts"],
+      "@qwen-code/acp-bridge/*": ["../acp-bridge/src/*"]
     }
   },
   "include": [
@@ -18,11 +18,14 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.json",
-    "./package.json"
+    "./package.json",
+    "../core/src/utils/toml-to-markdown-converter.test.ts",
+    "../core/src/utils/toml-to-markdown-converter.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
+    // TODO(5691): Fix type errors and remove excludes.
     "src/commands/mcp.test.ts",
     "src/commands/mcp/add.test.ts",
     "src/commands/mcp/list.test.ts",
@@ -81,6 +84,7 @@
     "src/ui/hooks/useCommandCompletion.test.ts",
     "src/ui/hooks/useFocus.test.ts",
     "src/ui/hooks/useFolderTrust.test.ts",
+    "src/ui/hooks/useGeminiStream.test.tsx",
     "src/ui/hooks/useKeypress.test.ts",
     "src/ui/hooks/usePhraseCycler.test.ts",
     "src/ui/hooks/vim.test.ts",
@@ -97,7 +101,6 @@
     { "path": "../channels/telegram" },
     { "path": "../channels/weixin" },
     { "path": "../channels/dingtalk" },
-    { "path": "../channels/discord" },
-    { "path": "../web-templates" }
+    { "path": "../channels/feishu" }
   ]
 }

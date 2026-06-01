@@ -913,6 +913,7 @@ export class HopCodeLogger {
       properties: {
         skill_name: event.skill_name,
         success: event.success ? 1 : 0,
+        prompt_id: event.prompt_id,
       },
     });
 

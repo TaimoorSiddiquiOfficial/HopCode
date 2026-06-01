@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,8 +10,8 @@ import {
   AuthType,
   clearCachedCredentialFile,
   createDebugLogger,
-  HopCodeOAuth2Event,
-  hopCodeOAuth2Events,
+  QwenOAuth2Event,
+  qwenOAuth2Events,
   MCP_BUDGET_WARN_FRACTION,
   MCPServerConfig,
   SessionService,
@@ -40,7 +40,6 @@ import type { Content } from '@google/genai';
 import type {
   Agent,
   AuthenticateRequest,
-  AuthMethod,
   CancelNotification,
   ClientCapabilities,
   InitializeRequest,
@@ -69,7 +68,10 @@ import type {
   SetSessionModeRequest,
   SetSessionModeResponse,
 } from '@agentclientprotocol/sdk';
-import { buildAuthMethods } from './authMethods.js';
+import {
+  buildAuthMethods,
+  pickAuthMethodsForAuthRequired,
+} from './authMethods.js';
 import { AcpFileSystemService } from './service/filesystem.js';
 import { Readable, Writable } from 'node:stream';
 import type { LoadedSettings } from '../config/settings.js';
@@ -125,7 +127,7 @@ const debugLogger = createDebugLogger('ACP_AGENT');
  *
  * Drift detection: `AUTH_PREFLIGHT_AUDITED_AUTH_TYPES` below lists every
  * `AuthType` enum value that has been triaged for this map (either keyed
- * here, or explicitly waived for non-env-based auth like hopcode-oauth). The
+ * here, or explicitly waived for non-env-based auth like qwen-oauth). The
  * paired test `AUTH_PREFLIGHT_AUDITED_AUTH_TYPES covers every AuthType`
  * walks the public enum and fails CI when core adds a new auth method
  * without a deliberate decision here.
@@ -145,8 +147,7 @@ export const AUTH_PREFLIGHT_ENV_KEYS: Readonly<
  * waived rather than a missing entry.
  */
 export const AUTH_PREFLIGHT_WAIVED_AUTH_TYPES: ReadonlySet<string> = new Set([
-  'hopcode-oauth',
-  'qwen_oauth',
+  'qwen-oauth',
 ]);
 
 export async function runAcpAgent(
@@ -190,9 +191,9 @@ export async function runAcpAgent(
   console.debug = console.error;
 
   const stream = ndJsonStream(stdout, stdin);
-  let agentInstance: HopCodeAgent | undefined;
+  let agentInstance: QwenAgent | undefined;
   const connection = new AgentSideConnection((conn) => {
-    agentInstance = new HopCodeAgent(config, settings, argv, conn);
+    agentInstance = new QwenAgent(config, settings, argv, conn);
     return agentInstance;
   }, stream);
 
@@ -305,7 +306,7 @@ export function toHttpServer(
   return undefined;
 }
 
-class HopCodeAgent implements Agent {
+class QwenAgent implements Agent {
   private sessions: Map<string, Session> = new Map();
   private clientCapabilities: ClientCapabilities | undefined;
 
@@ -328,8 +329,8 @@ class HopCodeAgent implements Agent {
     return {
       protocolVersion: PROTOCOL_VERSION,
       agentInfo: {
-        name: 'hopcode',
-        title: 'HopCode',
+        name: 'qwen-code',
+        title: 'Qwen Code',
         version,
       },
       authMethods,
@@ -363,8 +364,8 @@ class HopCodeAgent implements Agent {
       });
     };
 
-    if (method === AuthType.HOPCODE_OAUTH) {
-      hopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthUri, authUriHandler);
+    if (method === AuthType.QWEN_OAUTH) {
+      qwenOAuth2Events.once(QwenOAuth2Event.AuthUri, authUriHandler);
     }
 
     await clearCachedCredentialFile();
@@ -376,8 +377,8 @@ class HopCodeAgent implements Agent {
         method,
       );
     } finally {
-      if (method === AuthType.HOPCODE_OAUTH) {
-        hopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, authUriHandler);
+      if (method === AuthType.QWEN_OAUTH) {
+        qwenOAuth2Events.off(QwenOAuth2Event.AuthUri, authUriHandler);
       }
     }
   }
@@ -765,7 +766,7 @@ class HopCodeAgent implements Agent {
         // having set debug=true, which makes silent slot-leak / type-
         // mismatch failures invisible in real deployments.
         process.stderr.write(
-          `hopcode serve: getMcpClientAccounting failed: ` +
+          `qwen serve: getMcpClientAccounting failed: ` +
             `${err instanceof Error ? err.message : String(err)}\n`,
         );
       }
@@ -931,7 +932,7 @@ class HopCodeAgent implements Agent {
       kind: 'mcp_budget',
       // PR 14 v1: per-session, not per-workspace. Each ACP session has
       // its own `Config`/`McpClientManager` (via `newSessionConfig`)
-      // and reads `HOPCODE_SERVE_MCP_CLIENT_BUDGET` independently.
+      // and reads `QWEN_SERVE_MCP_CLIENT_BUDGET` independently.
       // Snapshot shows the bootstrap session's view. Wave 5 PR 23
       // shared MCP pool will graduate this to `'workspace'`.
       scope: 'session',
@@ -1149,7 +1150,7 @@ class HopCodeAgent implements Agent {
           status: 'warning',
           errorKind: 'auth_env_error',
           error: 'No auth method configured.',
-          hint: 'Run `hopcode` and complete the auth flow, or set a provider env var.',
+          hint: 'Run `qwen` and complete the auth flow, or set a provider env var.',
           detail: { source: 'none', hasToken: false },
         });
       }
@@ -1158,7 +1159,7 @@ class HopCodeAgent implements Agent {
         Boolean(process.env[name]),
       );
       const hasToken = Boolean(presentVar);
-      // No env-var registration → either OAuth-style auth (hopcode-oauth) or
+      // No env-var registration → either OAuth-style auth (qwen-oauth) or
       // a custom provider whose key is sourced from settings rather than
       // env. Surface as `unknown` (the SDK consumer can defer to the
       // `/session` boot for definitive validation) rather than a false
@@ -1852,7 +1853,7 @@ class HopCodeAgent implements Agent {
     // PR 14b fix #2 (codex review round 1): register the MCP guardrail
     // budget-event callback BEFORE `config.initialize()`. Pre-fix the
     // registration ran AFTER initialize, which (a) missed end-of-pass
-    // events under `HOPCODE_LEGACY_MCP_BLOCKING=1` (synchronous
+    // events under `QWEN_CODE_LEGACY_MCP_BLOCKING=1` (synchronous
     // discovery completes inside initialize, before our setter runs)
     // and (b) raced against background-discovery completion under the
     // default progressive mode. `Config.setMcpBudgetEventCallback`
@@ -1937,7 +1938,7 @@ class HopCodeAgent implements Agent {
     const selectedType = config.getModelsConfig().getCurrentAuthType();
     if (!selectedType) {
       throw RequestError.authRequired(
-        { authMethods: this.pickAuthMethodsForAuthRequired() },
+        { authMethods: pickAuthMethodsForAuthRequired() },
         'Use HopCode CLI to authenticate first.',
       );
     }
@@ -1948,49 +1949,11 @@ class HopCodeAgent implements Agent {
       debugLogger.error(`Authentication failed: ${e}`);
       throw RequestError.authRequired(
         {
-          authMethods: this.pickAuthMethodsForAuthRequired(selectedType, e),
+          authMethods: pickAuthMethodsForAuthRequired(selectedType),
         },
         'Authentication failed: ' + (e as Error).message,
       );
     }
-  }
-
-  private pickAuthMethodsForAuthRequired(
-    selectedType?: AuthType | string,
-    error?: unknown,
-  ): AuthMethod[] {
-    const authMethods = buildAuthMethods();
-    const errorMessage = this.extractErrorMessage(error);
-    if (
-      errorMessage?.includes('hopcode-oauth') ||
-      errorMessage?.includes('HopCode OAuth')
-    ) {
-      const hopcodeOAuthMethods = authMethods.filter(
-        (m) => m.id === AuthType.HOPCODE_OAUTH,
-      );
-      return hopcodeOAuthMethods.length ? hopcodeOAuthMethods : authMethods;
-    }
-
-    if (selectedType) {
-      const matched = authMethods.filter((m) => m.id === selectedType);
-      return matched.length ? matched : authMethods;
-    }
-
-    return authMethods;
-  }
-
-  private extractErrorMessage(error?: unknown): string | undefined {
-    if (error instanceof Error) return error.message;
-    if (
-      typeof error === 'object' &&
-      error != null &&
-      'message' in error &&
-      typeof error.message === 'string'
-    ) {
-      return error.message;
-    }
-    if (typeof error === 'string') return error;
-    return undefined;
   }
 
   private setupFileSystem(config: Config): void {

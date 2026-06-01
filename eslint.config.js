@@ -204,6 +204,8 @@ export default tseslint.config(
       'esbuild.config.js',
       'fix-index-signatures.js',
       'packages/*/scripts/**/*.js',
+      // Verification reproducer scripts under docs/ also run with `node`.
+      'docs/**/*.mjs',
     ],
     languageOptions: {
       globals: {
@@ -312,9 +314,6 @@ export default tseslint.config(
     files: [
       'packages/web-templates/src/**/*.{js,jsx,ts,tsx}',
       'packages/web-templates/*.mjs',
-      'resolve-all-conflicts.mjs',
-      'temp_fix_all_mojibake.js',
-      'temp_mojibake_fix.js',
     ],
     languageOptions: {
       globals: {

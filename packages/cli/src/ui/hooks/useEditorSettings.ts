@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { useState, useCallback } from 'react';
 import type { LoadedSettings, SettingScope } from '../../config/settings.js';
-import { type HistoryItem, MessageType } from '../types.js';
+import { type HistoryItemWithoutId, MessageType } from '../types.js';
 import type { EditorType } from '@hoptrendy/hopcode-core';
 import {
   allowEditorTypeInSandbox,
@@ -26,7 +26,7 @@ interface UseEditorSettingsReturn {
 export const useEditorSettings = (
   loadedSettings: LoadedSettings,
   setEditorError: (error: string | null) => void,
-  addItem: (item: Omit<HistoryItem, 'id'>, timestamp: number) => void,
+  addItem: (item: HistoryItemWithoutId, timestamp: number) => void,
 ): UseEditorSettingsReturn => {
   const [isEditorDialogOpen, setIsEditorDialogOpen] = useState(false);
 

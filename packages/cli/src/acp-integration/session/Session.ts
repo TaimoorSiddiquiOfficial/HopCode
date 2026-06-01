@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,6 +23,8 @@ import type {
   MessageBus,
   StreamEvent,
   ChatCompressionInfo,
+  AutoModeDecision,
+  AutoModeOutcome,
 } from '@hoptrendy/hopcode-core';
 import {
   AuthType,
@@ -62,11 +64,13 @@ import {
   formatStopHookBlockingCapWarning,
   applyAutoModeDecision,
   evaluateAutoMode,
+  getAutoModePermissionDeniedReason,
   isApproveOutcome,
   MAX_TRANSCRIPT_MESSAGES,
   recordAllow,
   recordFallbackApprove,
   shouldFallback,
+  shouldFirePermissionDeniedForAutoMode,
   shouldRunAutoModeForCall,
 } from '@hoptrendy/hopcode-core';
 import { getCommandSubcommandNames } from '../../services/commandMetadata.js';
@@ -157,6 +161,31 @@ export function computeInitialTurnFromHistory(
   }
 
   return maxPromptTurn > 0 ? maxPromptTurn : userMessageCount;
+}
+
+export async function fireSessionPermissionDeniedForAutoMode(
+  config: Config,
+  decision: AutoModeDecision,
+  outcome: AutoModeOutcome,
+  toolName: string,
+  toolParams: Record<string, unknown>,
+  callId: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  if (
+    !config.getDisableAllHooks?.() &&
+    shouldFirePermissionDeniedForAutoMode(decision, outcome)
+  ) {
+    await config
+      .getHookSystem?.()
+      ?.firePermissionDeniedEvent(
+        toolName,
+        toolParams,
+        callId,
+        getAutoModePermissionDeniedReason(decision),
+        signal,
+      );
+  }
 }
 
 function getRecordPromptIds(record: ChatRecord): string[] {
@@ -1120,8 +1149,12 @@ export class Session implements SessionContext {
         compressionInfo = compressed;
         this.#recordCompressionTokenCount(compressed);
         if (compressed.compressionStatus === CompressionStatus.COMPRESSED) {
+          const reasonClause =
+            compressed.triggerReason === 'image_overflow'
+              ? `accumulated enough tool screenshots to trigger compaction for ${this.config.getModel()}`
+              : `approached the input token limit for ${this.config.getModel()}`;
           compressionDiagnostic =
-            `IMPORTANT: This conversation approached the input token limit for ${this.config.getModel()}. ` +
+            `IMPORTANT: This conversation ${reasonClause}. ` +
             `A compressed context will be sent for future messages (compressed from: ` +
             `${compressed.originalTokenCount ?? 'unknown'} to ` +
             `${compressed.newTokenCount ?? 'unknown'} tokens).`;
@@ -1566,7 +1599,7 @@ export class Session implements SessionContext {
       default: ApprovalMode.DEFAULT,
       'auto-edit': ApprovalMode.AUTO_EDIT,
       auto: ApprovalMode.AUTO,
-      izn: ApprovalMode.IZN,
+      yolo: ApprovalMode.YOLO,
     };
 
     const approvalMode = modeMap[params.modeId as ApprovalModeValue];
@@ -1602,7 +1635,7 @@ export class Session implements SessionContext {
       selectedAuthType,
       parsed.modelId,
       selectedAuthType !== previousAuthType &&
-        selectedAuthType === AuthType.HOPCODE_OAUTH
+        selectedAuthType === AuthType.QWEN_OAUTH
         ? { requireCachedCredentials: true }
         : undefined,
     );
@@ -1679,11 +1712,11 @@ export class Session implements SessionContext {
 
     // Bounded-concurrency runner: matches core's `runConcurrently`
     // behaviour (`coreToolScheduler.ts:1506`), capped by
-    // `HOPCODE_MAX_TOOL_CONCURRENCY` (default 10). Results are returned
+    // `QWEN_CODE_MAX_TOOL_CONCURRENCY` (default 10). Results are returned
     // in input order regardless of resolution order.
     const runBounded = async (calls: FunctionCall[]): Promise<Part[][]> => {
       const parsed = parseInt(
-        process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] || '',
+        process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'] || '',
         10,
       );
       const maxConcurrency =
@@ -1844,7 +1877,7 @@ export class Session implements SessionContext {
     if (pm && !(await pm.isToolEnabled(fc.name as string))) {
       return earlyErrorResponse(
         new Error(
-          `HopCode requires permission to use "${fc.name}", but that permission was declined.`,
+          `Qwen Code requires permission to use "${fc.name}", but that permission was declined.`,
         ),
         fc.name,
       );
@@ -1903,7 +1936,7 @@ export class Session implements SessionContext {
       //
       // L3: Tool's intrinsic default permission
       // L4: PermissionManager rule override
-      // L5: ApprovalMode override (IZN / AUTO_EDIT / PLAN)
+      // L5: ApprovalMode override (YOLO / AUTO_EDIT / PLAN)
       //
       // AUTO_EDIT auto-approval is handled HERE, same as coreToolScheduler.
       // The VS Code extension is just a UI layer for requestPermission.
@@ -1979,6 +2012,15 @@ export class Session implements SessionContext {
           decision,
           this.config,
           denialState,
+        );
+        await fireSessionPermissionDeniedForAutoMode(
+          this.config,
+          decision,
+          outcome,
+          fc.name,
+          toolParams,
+          callId,
+          abortSignal,
         );
         switch (outcome.kind) {
           case 'approved':
@@ -2085,7 +2127,7 @@ export class Session implements SessionContext {
           if (hooksEnabled && messageBus) {
             void fireNotificationHook(
               messageBus,
-              `HopCode needs your permission to use ${fc.name}`,
+              `Qwen Code needs your permission to use ${fc.name}`,
               NotificationType.PermissionPrompt,
               'Permission needed',
             );
@@ -2191,7 +2233,7 @@ export class Session implements SessionContext {
       }
 
       if (!didRequestPermission && !isTodoWriteTool) {
-        // Auto-approved (L3 allow / L4 PM allow / L5 IZN|AUTO_EDIT)
+        // Auto-approved (L3 allow / L4 PM allow / L5 YOLO|AUTO_EDIT)
         // → emit tool_call start notification
         const startParams: ToolCallStartParams = {
           callId,

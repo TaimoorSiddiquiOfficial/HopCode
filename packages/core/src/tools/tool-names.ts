@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,24 +36,27 @@ export const ToolNames = {
   CRON_CREATE: 'cron_create',
   CRON_LIST: 'cron_list',
   CRON_DELETE: 'cron_delete',
-  TASK_CREATE: 'task_create',
-  TASK_GET: 'task_get',
-  TASK_LIST: 'task_list',
-  TASK_OUTPUT: 'task_output',
-  TASK_READY: 'task_ready',
-  TASK_UPDATE: 'task_update',
   TASK_STOP: 'task_stop',
   SEND_MESSAGE: 'send_message',
-  WEB_SEARCH: 'web_search',
   STRUCTURED_OUTPUT: 'structured_output',
   MONITOR: 'monitor',
   NOTEBOOK_EDIT: 'notebook_edit',
   TOOL_SEARCH: 'tool_search',
   ENTER_WORKTREE: 'enter_worktree',
   EXIT_WORKTREE: 'exit_worktree',
-  REPO_MAP: 'repo_map',
-  BROWSER: 'browser',
-  BG_STOP: 'bg_stop',
+  // Computer Use tools — built-in but backed by an upstream MCP server.
+  // All deferred; revealed only when the user-initiated request triggers
+  // a computer-use action. See packages/core/src/tools/computer-use/.
+  COMPUTER_USE_LIST_APPS: 'computer_use__list_apps',
+  COMPUTER_USE_GET_APP_STATE: 'computer_use__get_app_state',
+  COMPUTER_USE_CLICK: 'computer_use__click',
+  COMPUTER_USE_PERFORM_SECONDARY_ACTION:
+    'computer_use__perform_secondary_action',
+  COMPUTER_USE_SCROLL: 'computer_use__scroll',
+  COMPUTER_USE_DRAG: 'computer_use__drag',
+  COMPUTER_USE_TYPE_TEXT: 'computer_use__type_text',
+  COMPUTER_USE_PRESS_KEY: 'computer_use__press_key',
+  COMPUTER_USE_SET_VALUE: 'computer_use__set_value',
 } as const;
 
 /**
@@ -80,24 +83,24 @@ export const ToolDisplayNames = {
   CRON_CREATE: 'CronCreate',
   CRON_LIST: 'CronList',
   CRON_DELETE: 'CronDelete',
-  TASK_CREATE: 'TaskCreate',
-  TASK_GET: 'TaskGet',
-  TASK_LIST: 'TaskList',
-  TASK_OUTPUT: 'TaskOutput',
-  TASK_READY: 'TaskReady',
-  TASK_UPDATE: 'TaskUpdate',
   TASK_STOP: 'TaskStop',
   SEND_MESSAGE: 'SendMessage',
-  WEB_SEARCH: 'WebSearch',
   STRUCTURED_OUTPUT: 'StructuredOutput',
   MONITOR: 'Monitor',
   NOTEBOOK_EDIT: 'NotebookEdit',
   TOOL_SEARCH: 'ToolSearch',
   ENTER_WORKTREE: 'EnterWorktree',
   EXIT_WORKTREE: 'ExitWorktree',
-  REPO_MAP: 'RepoMap',
-  BROWSER: 'Browser',
-  BG_STOP: 'BgStop',
+  COMPUTER_USE_LIST_APPS: 'computer_use__list_apps',
+  COMPUTER_USE_GET_APP_STATE: 'computer_use__get_app_state',
+  COMPUTER_USE_CLICK: 'computer_use__click',
+  COMPUTER_USE_PERFORM_SECONDARY_ACTION:
+    'computer_use__perform_secondary_action',
+  COMPUTER_USE_SCROLL: 'computer_use__scroll',
+  COMPUTER_USE_DRAG: 'computer_use__drag',
+  COMPUTER_USE_TYPE_TEXT: 'computer_use__type_text',
+  COMPUTER_USE_PRESS_KEY: 'computer_use__press_key',
+  COMPUTER_USE_SET_VALUE: 'computer_use__set_value',
 } as const;
 
 // Migration from old tool names to new tool names

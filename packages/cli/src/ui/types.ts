@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,7 +37,7 @@ export enum StreamingState {
 }
 
 // Copied from server/src/core/turn.ts for CLI usage
-export enum HopCodeEventType {
+export enum GeminiEventType {
   Content = 'content',
   ToolCallRequest = 'tool_call_request',
   // Add other event types if the UI hook needs to handle them
@@ -97,6 +97,16 @@ export type HistoryItemUser = HistoryItemBase & {
   type: 'user';
   text: string;
   promptId?: string;
+  /**
+   * Whether this UI history item represents a user turn that reached the model.
+   *
+   * NOTE: This is set explicitly by slash command processing because visible
+   * slash-command invocations may be handled locally without entering API
+   * history. Regular user messages leave this undefined and are classified by
+   * the legacy lexical fallback in isRealUserTurn. New user-item paths with
+   * ambiguous model-history behavior must set this explicitly.
+   */
+  sentToModel?: boolean;
 };
 
 export type HistoryItemGemini = HistoryItemBase & {
@@ -617,7 +627,6 @@ export enum MessageType {
   HELP = 'help',
   STATS = 'stats',
   MODEL_STATS = 'model_stats',
-  DIFF_STATS = 'diff_stats',
   TOOL_STATS = 'tool_stats',
   QUIT = 'quit',
   GEMINI = 'gemini',
@@ -632,6 +641,8 @@ export enum MessageType {
   ARENA_SESSION_COMPLETE = 'arena_session_complete',
   INSIGHT_PROGRESS = 'insight_progress',
   BTW = 'btw',
+  NOTIFICATION = 'notification',
+  DIFF_STATS = 'diff_stats',
   GOAL_STATUS = 'goal_status',
 }
 
@@ -737,7 +748,7 @@ export interface SubmitPromptResult {
 }
 
 /**
- * Defines the result of the slash command processor for its consumer (useHopCodeStream).
+ * Defines the result of the slash command processor for its consumer (useGeminiStream).
  */
 export type SlashCommandProcessorResult =
   | {

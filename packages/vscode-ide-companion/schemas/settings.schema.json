@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "HopCode settings configuration",
+  "description": "Qwen Code settings configuration",
   "properties": {
     "mcpServers": {
       "description": "Configuration for MCP servers.",
@@ -19,7 +19,7 @@
       "additionalProperties": true
     },
     "plansDirectory": {
-      "description": "Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.hopcode/plans.",
+      "description": "Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.qwen/plans.",
       "type": "string"
     },
     "env": {
@@ -60,7 +60,7 @@
           "default": 5
         },
         "gitCoAuthor": {
-          "description": "Attribution added to git commits and pull requests created through HopCode.",
+          "description": "Attribution added to git commits and pull requests created through Qwen Code.",
           "default": {
             "commit": true,
             "pr": true
@@ -73,12 +73,12 @@
               "type": "object",
               "properties": {
                 "commit": {
-                  "description": "Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through HopCode. Disabling skips both.",
+                  "description": "Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through Qwen Code. Disabling skips both.",
                   "type": "boolean",
                   "default": true
                 },
                 "pr": {
-                  "description": "Append a HopCode attribution line to PR descriptions when running `gh pr create`.",
+                  "description": "Append a Qwen Code attribution line to PR descriptions when running `gh pr create`.",
                   "type": "boolean",
                   "default": true
                 }
@@ -103,7 +103,7 @@
           "default": false
         },
         "language": {
-          "description": "The language for the user interface. Use \"auto\" to detect from system settings. You can also use custom language codes (e.g., \"es\", \"fr\") by placing JS language files in ~/.hopcode/locales/ (e.g., ~/.hopcode/locales/es.js). Options: auto, en, zh-TW, zh, ru, de, ja, pt, fr, ca",
+          "description": "The language for the user interface. Use \"auto\" to detect from system settings. You can also use custom language codes (e.g., \"es\", \"fr\") by placing JS language files in ~/.qwen/locales/ (e.g., ~/.qwen/locales/es.js). Options: auto, en, zh-TW, zh, ru, de, ja, pt, fr, ca",
           "enum": [
             "auto",
             "en",
@@ -183,7 +183,7 @@
         "theme": {
           "description": "The color theme for the UI.",
           "type": "string",
-          "default": "HopCode Dark"
+          "default": "Qwen Dark"
         },
         "autoModeAcknowledged": {
           "description": "True once the user has seen the first-time information message about the AUTO approval mode. Set automatically; not intended for manual configuration.",
@@ -211,7 +211,7 @@
           "default": false
         },
         "showStatusInTitle": {
-          "description": "Show HopCode status and thoughts in the terminal window title",
+          "description": "Show Qwen Code status and thoughts in the terminal window title",
           "type": "boolean",
           "default": false
         },
@@ -251,7 +251,7 @@
           "default": true
         },
         "enableUserFeedback": {
-          "description": "Show optional feedback dialog after conversations to help improve HopCode performance.",
+          "description": "Show optional feedback dialog after conversations to help improve Qwen performance.",
           "type": "boolean",
           "default": true
         },
@@ -306,7 +306,7 @@
           "default": false
         },
         "customBannerTitle": {
-          "description": "Replace the default \">_ HopCode\" title shown in the banner info panel. The version suffix is always appended.",
+          "description": "Replace the default \">_ Qwen Code\" title shown in the banner info panel. The version suffix is always appended.",
           "type": "string",
           "default": ""
         },
@@ -377,7 +377,7 @@
               "additionalProperties": false
             }
           ],
-          "description": "Replace the default HopCode ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
+          "description": "Replace the default QWEN ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
         }
       }
     },
@@ -450,7 +450,7 @@
         }
       },
       "additionalProperties": false,
-      "description": "SECURITY-RELEVANT. Controls what client-side correlation data hopcode writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope)."
+      "description": "SECURITY-RELEVANT. Controls what client-side correlation data qwen-code writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope)."
     },
     "fastModel": {
       "description": "Model used for generating prompt suggestions and speculative execution. Leave empty to use the main model. A smaller/faster model (e.g., qwen3-coder-flash) reduces latency and cost.",
@@ -531,7 +531,7 @@
               "default": true
             },
             "splitToolMedia": {
-              "description": "When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: \"tool\"` messages with HTTP 400 \"Invalid 'messages' in payload\". Default false preserves the prior behavior for permissive providers. See hoptrendy/hopcode#3616.",
+              "description": "When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: \"tool\"` messages with HTTP 400 \"Invalid 'messages' in payload\". Default false preserves the prior behavior for permissive providers. See QwenLM/qwen-code#3616.",
               "type": "boolean",
               "default": false
             },
@@ -544,7 +544,7 @@
               "default": "auto"
             },
             "contextWindowSize": {
-              "description": "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from HopCode's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
+              "description": "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from Qwen Code's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
               "type": "number"
             }
           }
@@ -606,8 +606,8 @@
               "type": "boolean",
               "default": true
             },
-            "respectHopcodeIgnore": {
-              "description": "Respect .hopcodeignore files when searching",
+            "respectQwenIgnore": {
+              "description": "Respect .qwenignore files when searching",
               "type": "boolean",
               "default": true
             },
@@ -637,12 +637,12 @@
         "enableManagedAutoDream": {
           "description": "Enable automatic consolidation (dream) of collected memories.",
           "type": "boolean",
-          "default": false
+          "default": true
         },
         "enableAutoSkill": {
           "description": "Enable background review for reusable project skills after tool-heavy sessions.",
           "type": "boolean",
-          "default": false
+          "default": true
         }
       }
     },
@@ -729,7 +729,7 @@
           "additionalProperties": true
         },
         "sandboxImage": {
-          "description": "Sandbox image URI used by Docker/Podman when --sandbox-image and HOPCODE_SANDBOX_IMAGE are not set.",
+          "description": "Sandbox image URI used by Docker/Podman when --sandbox-image and QWEN_SANDBOX_IMAGE are not set.",
           "type": "string"
         },
         "toolSearch": {
@@ -793,13 +793,13 @@
           }
         },
         "approvalMode": {
-          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, auto, izn",
+          "description": "Approval mode for tool usage. Controls how tools are approved before execution. Options: plan, default, auto-edit, auto, yolo",
           "enum": [
             "plan",
             "default",
             "auto-edit",
             "auto",
-            "izn"
+            "yolo"
           ],
           "default": "default"
         },
@@ -835,6 +835,17 @@
           "description": "The number of lines to keep when truncating tool output.",
           "type": "number",
           "default": 1000
+        },
+        "computerUse": {
+          "description": "Cross-platform desktop automation via the upstream open-computer-use MCP server. Tools: list_apps, get_app_state, click, type_text, scroll, drag, press_key, perform_secondary_action, set_value. On first invocation, the upstream binary is fetched via npx and the user is walked through macOS Accessibility / Screen Recording permissions if needed.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "When enabled (default), the 9 computer_use__* tools are registered as deferred built-ins.",
+              "type": "boolean",
+              "default": true
+            }
+          }
         }
       }
     },
@@ -910,35 +921,6 @@
             "description": "URL pattern (supports * wildcard)",
             "type": "string"
           }
-        },
-        "powershell": {
-          "description": "Configuration for PowerShell command security policies.",
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "description": "Enable PowerShell security policies.",
-              "type": "boolean",
-              "default": false
-            },
-            "mode": {
-              "description": "PowerShell security mode: allow, ask, or deny.",
-              "type": "string"
-            },
-            "allowlist": {
-              "description": "Commands allowed when mode is \"ask\".",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "blocklist": {
-              "description": "Commands always blocked regardless of mode.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
         }
       }
     },
@@ -950,10 +932,6 @@
           "description": "Automatically configure Node.js memory limits",
           "type": "boolean",
           "default": false
-        },
-        "tavilyApiKey": {
-          "description": "API key for Tavily web search provider. Falls back to TAVILY_API_KEY environment variable.",
-          "type": "string"
         },
         "dnsResolutionOrder": {
           "description": "The DNS resolution order.",
@@ -976,7 +954,7 @@
           "additionalProperties": true
         },
         "runtimeOutputDir": {
-          "description": "Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). Config files remain at ~/.hopcode (or HOPCODE_HOME if set). Env var HOPCODE_RUNTIME_DIR takes priority.",
+          "description": "Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). Config files remain at ~/.qwen (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.",
           "type": "string"
         }
       }
@@ -996,7 +974,7 @@
           "type": "object",
           "properties": {
             "worktreeBaseDir": {
-              "description": "Custom base directory for Arena worktrees. Defaults to ~/.hopcode/arena.",
+              "description": "Custom base directory for Arena worktrees. Defaults to ~/.qwen/arena.",
               "type": "string"
             },
             "preserveArtifacts": {
@@ -1032,7 +1010,7 @@
       "default": false
     },
     "stopHookBlockingCap": {
-      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_CODE_STOP_HOOK_BLOCK_CAP.",
+      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before Qwen Code overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.",
       "type": "number",
       "default": 8
     },
@@ -2283,42 +2261,29 @@
       "type": "object",
       "properties": {
         "cron": {
-          "description": "Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via HOPCODE_ENABLE_CRON=1 environment variable.",
+          "description": "Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via QWEN_CODE_ENABLE_CRON=1 environment variable.",
           "type": "boolean",
           "default": false
         },
         "emitToolUseSummaries": {
-          "description": "Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.",
+          "description": "Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with QWEN_CODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.",
           "type": "boolean",
           "default": true
         }
       }
     },
-    "webSearch": {
-      "description": "Web search provider configuration.",
+    "worktree": {
+      "description": "Configuration for general-purpose git worktrees created by the CLI (the `enter_worktree` tool, the `agent isolation: \"worktree\"` parameter, and the startup `--worktree` flag). Does NOT affect Agent Arena worktrees — see `agents.arena.worktreeBaseDir` for those.",
       "type": "object",
       "properties": {
-        "provider": {
-          "description": "List of web search provider names.",
+        "symlinkDirectories": {
+          "description": "Directories under the main repository to symlink into every general-purpose worktree on creation. Useful for sharing large opt-in dirs like `node_modules` so the model can run tests / builds inside the worktree without a fresh install. Paths must be relative to the repo root; absolute paths, anything containing `..`, and any path inside `.git` or `.hopcode` (the CLI-managed metadata tree, which contains the worktrees directory itself) are rejected. Missing source dirs and existing destination paths are silently skipped (no overwrite, no failure).",
           "type": "array",
           "items": {
             "type": "string"
           }
-        },
-        "default": {
-          "description": "Default web search provider name.",
-          "type": "string"
-        },
-        "mode": {
-          "description": "Web search mode: auto or manual.",
-          "type": "string"
         }
       }
-    },
-    "agentModels": {
-      "description": "Per-agent model overrides mapping subagent names to model configuration.",
-      "type": "object",
-      "additionalProperties": true
     },
     "$version": {
       "type": "number",

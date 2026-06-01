@@ -269,7 +269,13 @@ export interface CLIPartialAssistantMessage {
   parent_tool_use_id: string | null;
 }
 
-export type PermissionMode = 'default' | 'plan' | 'auto-edit' | 'auto' | 'izn' | 'izn';
+export type PermissionMode =
+  | 'default'
+  | 'plan'
+  | 'auto-edit'
+  | 'auto'
+  | 'izn'
+  | 'izn';
 
 /**
  * Permission suggestion for tool use requests
@@ -364,6 +370,9 @@ export interface CLIMcpServerConfig {
 export interface CLIControlInitializeRequest {
   subtype: 'initialize';
   hooks?: HookRegistration[] | null;
+  timeout?: {
+    canUseTool?: number;
+  };
   /**
    * SDK MCP servers config
    * These are MCP servers running in the SDK process, connected via control plane.

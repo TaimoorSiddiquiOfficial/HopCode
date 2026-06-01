@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -308,7 +308,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: undefined as string | undefined,
     description:
-      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.hopcode/plans.',
+      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.qwen/plans.',
     showInDialog: false,
   },
 
@@ -408,13 +408,13 @@ const SETTINGS_SCHEMA = {
         // editor-surfaced defaults.
         default: { commit: true, pr: true },
         description:
-          'Attribution added to git commits and pull requests created through HopCode.',
+          'Attribution added to git commits and pull requests created through Qwen Code.',
         showInDialog: false,
         // Pre-V4 settings stored this as a single boolean. The V3→V4
         // migration rewrites those on first launch, but the IDE schema
         // validator runs before that — accept the boolean shape so users
         // editing settings.json in VS Code don't see a spurious warning
-        // until they run HopCode once. Config.normalizeGitCoAuthor handles
+        // until they run qwen once. Config.normalizeGitCoAuthor handles
         // the boolean at runtime.
         legacyTypes: ['boolean'],
         properties: {
@@ -425,7 +425,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description:
-              'Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through HopCode. Disabling skips both.',
+              'Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through Qwen Code. Disabling skips both.',
             showInDialog: true,
           },
           pr: {
@@ -435,7 +435,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description:
-              'Append a HopCode attribution line to PR descriptions when running `gh pr create`.',
+              'Append a Qwen Code attribution line to PR descriptions when running `gh pr create`.',
             showInDialog: true,
           },
         },
@@ -478,7 +478,7 @@ const SETTINGS_SCHEMA = {
         description:
           'The language for the user interface. Use "auto" to detect from system settings. ' +
           'You can also use custom language codes (e.g., "es", "fr") by placing JS language files ' +
-          'in ~/.hopcode/locales/ (e.g., ~/.hopcode/locales/es.js).',
+          'in ~/.qwen/locales/ (e.g., ~/.qwen/locales/es.js).',
         showInDialog: true,
         options: [] as readonly SettingEnumOption[],
       },
@@ -617,7 +617,7 @@ const SETTINGS_SCHEMA = {
         label: 'Theme',
         category: 'UI',
         requiresRestart: false,
-        default: 'HopCode Dark' as string,
+        default: 'Qwen Dark' as string,
         description: 'The color theme for the UI.',
         showInDialog: true,
       },
@@ -689,7 +689,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: false,
         description:
-          'Show HopCode status and thoughts in the terminal window title',
+          'Show Qwen Code status and thoughts in the terminal window title',
         showInDialog: false,
       },
       hideTips: {
@@ -759,7 +759,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Show optional feedback dialog after conversations to help improve HopCode performance.',
+          'Show optional feedback dialog after conversations to help improve Qwen performance.',
         showInDialog: true,
       },
       enableFollowupSuggestions: {
@@ -867,7 +867,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: '' as string,
         description:
-          'Replace the default ">_ HopCode" title shown in the banner info panel. The version suffix is always appended.',
+          'Replace the default ">_ Qwen Code" title shown in the banner info panel. The version suffix is always appended.',
         showInDialog: false,
       },
       customBannerSubtitle: {
@@ -887,7 +887,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: undefined as CustomAsciiArtSetting | undefined,
         description:
-          'Replace the default HopCode ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
+          'Replace the default QWEN ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
         showInDialog: false,
         // The runtime accepts three shapes (inline string, {path}, or
         // {small,large} where each tier is itself string-or-{path}). The
@@ -1045,7 +1045,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: undefined as OutboundCorrelationSettings | undefined,
     description:
-      "SECURITY-RELEVANT. Controls what client-side correlation data hopcode writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope).",
+      "SECURITY-RELEVANT. Controls what client-side correlation data qwen-code writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope).",
     showInDialog: false,
     jsonSchemaOverride: {
       type: 'object',
@@ -1232,7 +1232,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: false,
             description:
-              'When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: "tool"` messages with HTTP 400 "Invalid \'messages\' in payload". Default false preserves the prior behavior for permissive providers. See hoptrendy/hopcode#3616.',
+              'When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: "tool"` messages with HTTP 400 "Invalid \'messages\' in payload". Default false preserves the prior behavior for permissive providers. See QwenLM/qwen-code#3616.',
             parentKey: 'generationConfig',
             showInDialog: false,
           },
@@ -1258,7 +1258,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: undefined,
             description:
-              "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from HopCode's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
+              "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from Qwen Code's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
             parentKey: 'generationConfig',
             showInDialog: false,
           },
@@ -1383,13 +1383,13 @@ const SETTINGS_SCHEMA = {
             description: 'Respect .gitignore files when searching',
             showInDialog: true,
           },
-          respectHopcodeIgnore: {
+          respectQwenIgnore: {
             type: 'boolean',
-            label: 'Respect .hopcodeignore',
+            label: 'Respect .qwenignore',
             category: 'Context',
             requiresRestart: true,
             default: true,
-            description: 'Respect .hopcodeignore files when searching',
+            description: 'Respect .qwenignore files when searching',
             showInDialog: true,
           },
           enableRecursiveFileSearch: {
@@ -1439,7 +1439,7 @@ const SETTINGS_SCHEMA = {
         label: 'Enable Managed Auto-Dream',
         category: 'Memory',
         requiresRestart: false,
-        default: false,
+        default: true,
         description:
           'Enable automatic consolidation (dream) of collected memories.',
         showInDialog: false,
@@ -1449,7 +1449,7 @@ const SETTINGS_SCHEMA = {
         label: 'Enable Auto Skill',
         category: 'Memory',
         requiresRestart: false,
-        default: false,
+        default: true,
         description:
           'Enable background review for reusable project skills after tool-heavy sessions.',
         showInDialog: false,
@@ -1618,7 +1618,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: undefined as string | undefined,
         description:
-          'Sandbox image URI used by Docker/Podman when --sandbox-image and HOPCODE_SANDBOX_IMAGE are not set.',
+          'Sandbox image URI used by Docker/Podman when --sandbox-image and QWEN_SANDBOX_IMAGE are not set.',
         showInDialog: false,
       },
       toolSearch: {
@@ -1737,7 +1737,7 @@ const SETTINGS_SCHEMA = {
           { value: ApprovalMode.DEFAULT, label: 'Default' },
           { value: ApprovalMode.AUTO_EDIT, label: 'Auto Edit' },
           { value: ApprovalMode.AUTO, label: 'Auto' },
-          { value: ApprovalMode.IZN, label: 'IZN' },
+          { value: ApprovalMode.YOLO, label: 'YOLO' },
         ],
       },
       autoAccept: {
@@ -1806,6 +1806,28 @@ const SETTINGS_SCHEMA = {
         default: DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES,
         description: 'The number of lines to keep when truncating tool output.',
         showInDialog: false,
+      },
+      computerUse: {
+        type: 'object',
+        label: 'Computer Use',
+        category: 'Tools',
+        requiresRestart: true,
+        default: {},
+        description:
+          'Cross-platform desktop automation via the upstream open-computer-use MCP server. Tools: list_apps, get_app_state, click, type_text, scroll, drag, press_key, perform_secondary_action, set_value. On first invocation, the upstream binary is fetched via npx and the user is walked through macOS Accessibility / Screen Recording permissions if needed.',
+        showInDialog: false,
+        properties: {
+          enabled: {
+            type: 'boolean',
+            label: 'Enable Computer Use',
+            category: 'Tools',
+            requiresRestart: true,
+            default: true,
+            description:
+              'When enabled (default), the 9 computer_use__* tools are registered as deferred built-ins.',
+            showInDialog: true,
+          },
+        },
       },
     },
   },
@@ -1950,55 +1972,6 @@ const SETTINGS_SCHEMA = {
           description: 'URL pattern (supports * wildcard)',
         },
       },
-      powershell: {
-        type: 'object',
-        label: 'PowerShell Security',
-        category: 'Security',
-        requiresRestart: false,
-        default: {},
-        description: 'Configuration for PowerShell command security policies.',
-        showInDialog: false,
-        properties: {
-          enabled: {
-            type: 'boolean',
-            label: 'PowerShell Security Enabled',
-            category: 'Security',
-            requiresRestart: false,
-            default: false,
-            description: 'Enable PowerShell security policies.',
-            showInDialog: false,
-          },
-          mode: {
-            type: 'string',
-            label: 'PowerShell Security Mode',
-            category: 'Security',
-            requiresRestart: false,
-            default: undefined as string | undefined,
-            description: 'PowerShell security mode: allow, ask, or deny.',
-            showInDialog: false,
-          },
-          allowlist: {
-            type: 'array',
-            label: 'PowerShell Allow List',
-            category: 'Security',
-            requiresRestart: false,
-            default: [] as string[],
-            description: 'Commands allowed when mode is "ask".',
-            showInDialog: false,
-            items: { type: 'string' },
-          },
-          blocklist: {
-            type: 'array',
-            label: 'PowerShell Block List',
-            category: 'Security',
-            requiresRestart: false,
-            default: [] as string[],
-            description: 'Commands always blocked regardless of mode.',
-            showInDialog: false,
-            items: { type: 'string' },
-          },
-        },
-      },
     },
   },
 
@@ -2018,16 +1991,6 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: false,
         description: 'Automatically configure Node.js memory limits',
-        showInDialog: false,
-      },
-      tavilyApiKey: {
-        type: 'string',
-        label: 'Tavily API Key',
-        category: 'Advanced',
-        requiresRestart: false,
-        default: undefined as string | undefined,
-        description:
-          'API key for Tavily web search provider. Falls back to TAVILY_API_KEY environment variable.',
         showInDialog: false,
       },
       dnsResolutionOrder: {
@@ -2066,7 +2029,7 @@ const SETTINGS_SCHEMA = {
         default: undefined as string | undefined,
         description:
           'Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). ' +
-          'Config files remain at ~/.hopcode (or HOPCODE_HOME if set). Env var HOPCODE_RUNTIME_DIR takes priority.',
+          'Config files remain at ~/.qwen (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.',
         showInDialog: false,
       },
     },
@@ -2113,7 +2076,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: undefined as string | undefined,
             description:
-              'Custom base directory for Arena worktrees. Defaults to ~/.hopcode/arena.',
+              'Custom base directory for Arena worktrees. Defaults to ~/.qwen/arena.',
             showInDialog: false,
           },
           preserveArtifacts: {
@@ -2189,7 +2152,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: DEFAULT_STOP_HOOK_BLOCK_CAP,
     description:
-      'Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_CODE_STOP_HOOK_BLOCK_CAP.',
+      'Maximum consecutive blocking Stop/SubagentStop hook decisions before Qwen Code overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.',
     // This is an advanced safety valve for runaway hook loops, not a common
     // interactive preference.
     showInDialog: false,
@@ -2361,7 +2324,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: false,
         description:
-          'Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via HOPCODE_ENABLE_CRON=1 environment variable.',
+          'Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via QWEN_CODE_ENABLE_CRON=1 environment variable.',
         showInDialog: true,
       },
       emitToolUseSummaries: {
@@ -2371,66 +2334,45 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.',
+          'Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with QWEN_CODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.',
         showInDialog: true,
       },
     },
   },
 
-  webSearch: {
+  worktree: {
     type: 'object',
-    label: 'Web Search',
+    label: 'Worktree',
     category: 'Advanced',
     requiresRestart: false,
-    default: undefined as
-      | { provider?: string[]; default?: string; mode?: string }
-      | undefined,
-    description: 'Web search provider configuration.',
+    default: {},
+    description:
+      'Configuration for general-purpose git worktrees created by the ' +
+      'CLI (the `enter_worktree` tool, the `agent isolation: "worktree"` ' +
+      'parameter, and the startup `--worktree` flag). Does NOT affect ' +
+      'Agent Arena worktrees — see `agents.arena.worktreeBaseDir` for those.',
     showInDialog: false,
     properties: {
-      provider: {
+      symlinkDirectories: {
         type: 'array',
-        label: 'Web Search Providers',
+        label: 'Symlink Directories Into Worktrees',
         category: 'Advanced',
         requiresRestart: false,
         default: undefined as string[] | undefined,
-        description: 'List of web search provider names.',
-        showInDialog: false,
-        items: { type: 'string' },
-      },
-      default: {
-        type: 'string',
-        label: 'Default Web Search Provider',
-        category: 'Advanced',
-        requiresRestart: false,
-        default: undefined as string | undefined,
-        description: 'Default web search provider name.',
-        showInDialog: false,
-      },
-      mode: {
-        type: 'string',
-        label: 'Web Search Mode',
-        category: 'Advanced',
-        requiresRestart: false,
-        default: undefined as string | undefined,
-        description: 'Web search mode: auto or manual.',
+        description:
+          'Directories under the main repository to symlink into every ' +
+          'general-purpose worktree on creation. Useful for sharing ' +
+          'large opt-in dirs like `node_modules` so the model can run ' +
+          'tests / builds inside the worktree without a fresh install. ' +
+          'Paths must be relative to the repo root; absolute paths, ' +
+          'anything containing `..`, and any path inside `.git` or ' +
+          '`.hopcode` (the CLI-managed metadata tree, which contains ' +
+          'the worktrees directory itself) are rejected. Missing ' +
+          'source dirs and existing destination paths are silently ' +
+          'skipped (no overwrite, no failure).',
         showInDialog: false,
       },
     },
-  },
-
-  agentModels: {
-    type: 'object',
-    label: 'Agent Model Overrides',
-    category: 'Advanced',
-    requiresRestart: false,
-    default: {} as Record<
-      string,
-      string | { model: string; baseUrl?: string; apiKey?: string }
-    >,
-    description:
-      'Per-agent model overrides mapping subagent names to model configuration.',
-    showInDialog: false,
   },
 } as const satisfies SettingsSchema;
 
