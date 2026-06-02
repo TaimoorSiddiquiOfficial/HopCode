@@ -196,7 +196,7 @@ export interface CliArgs {
    * - `--worktree=#123` / `--worktree https://github.com/o/r/pull/123` → PR ref
    *
    * Consumed by `setupStartupWorktree()` before `loadCliConfig()`. When set,
-   * the CLI chdirs into `<repoRoot>/.qwen/worktrees/<slug>/` and the entire
+   * the CLI chdirs into `<repoRoot>/.hopcode/worktrees/<slug>/` and the entire
    * session runs inside that worktree.
    */
   worktree?: string | undefined;
@@ -879,7 +879,7 @@ export async function parseArguments(): Promise<CliArgs> {
         .option('worktree', {
           type: 'string',
           description:
-            'Start the session inside a git worktree at <repoRoot>/.qwen/worktrees/<slug>/. ' +
+            'Start the session inside a git worktree at <repoRoot>/.hopcode/worktrees/<slug>/. ' +
             'Pass a slug (`--worktree my-feature`), a PR reference (`--worktree=#123` or a full ' +
             'GitHub pull-request URL), or use bare `--worktree` to auto-generate a slug. ' +
             'On exit, the WorktreeExitDialog prompts to keep or remove the worktree.',

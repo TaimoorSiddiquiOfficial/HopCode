@@ -220,17 +220,6 @@ describe('useAutoAcceptIndicator', () => {
       } as Key);
     });
     expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
-      ApprovalMode.IZN,
-    );
-    expect(result.current).toBe(ApprovalMode.IZN);
-
-    act(() => {
-      capturedUseKeypressHandler({
-        name: 'tab',
-        shift: true,
-      } as Key);
-    });
-    expect(mockConfigInstance.setApprovalMode).toHaveBeenCalledWith(
       ApprovalMode.PLAN,
     );
     expect(result.current).toBe(ApprovalMode.PLAN);

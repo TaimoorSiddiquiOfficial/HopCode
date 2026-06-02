@@ -220,24 +220,24 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     expect(wrote).toBe(false);
   });
 
-  it('rejects paths inside .qwen (security guard)', async () => {
-    // `.qwen` is CLI metadata: symlinking `.qwen/worktrees` would create
-    // a worktrees-inside-worktrees loop; symlinking `.qwen/projects` or
-    // `.qwen/tmp` would alias session metadata users have no legitimate
+  it('rejects paths inside .hopcode (security guard)', async () => {
+    // `.hopcode` is CLI metadata: symlinking `.hopcode/worktrees` would create
+    // a worktrees-inside-worktrees loop; symlinking `.hopcode/projects` or
+    // `.hopcode/tmp` would alias session metadata users have no legitimate
     // reason to share across worktrees. Guard rejects the whole subtree.
-    await fs.mkdir(path.join(repoRoot, '.qwen'), { recursive: true });
-    await fs.writeFile(path.join(repoRoot, '.qwen', 'projects'), 'data');
+    await fs.mkdir(path.join(repoRoot, '.hopcode'), { recursive: true });
+    await fs.writeFile(path.join(repoRoot, '.hopcode', 'projects'), 'data');
 
     const service = new GitWorktreeService(repoRoot);
-    const result = await service.createUserWorktree('reject-qwen', 'main', {
-      symlinkDirectories: ['.qwen/projects'],
+    const result = await service.createUserWorktree('reject-hopcode', 'main', {
+      symlinkDirectories: ['.hopcode/projects'],
     });
     expect(result.success).toBe(true);
 
     const wt = result.worktree!.path;
-    // No symlink at <worktree>/.qwen/projects.
+    // No symlink at <worktree>/.hopcode/projects.
     const wrote = await fs
-      .lstat(path.join(wt, '.qwen', 'projects'))
+      .lstat(path.join(wt, '.hopcode', 'projects'))
       .then((s) => s.isSymbolicLink())
       .catch(() => false);
     expect(wrote).toBe(false);
@@ -320,9 +320,9 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     }
   });
 
-  it('refuses sources whose realpath escapes the repo root or lands in .git/.qwen (committed-symlink bypass)', async () => {
+  it('refuses sources whose realpath escapes the repo root or lands in .git/.hopcode (committed-symlink bypass)', async () => {
     // Round-7 security fix: the lexical `isWithinRoot(sourceAbs, …)` and
-    // `.git`/`.qwen` blocklist checks DON'T resolve symlinks, so a symlink
+    // `.git`/`.hopcode` blocklist checks DON'T resolve symlinks, so a symlink
     // committed into the source repo HEAD (or set up out-of-band by a
     // malicious post-install script / repo tarball) can chain through to
     // arbitrary targets. Two flavours covered here:

@@ -227,7 +227,7 @@ function writeSettings(settings: Record<string, unknown>): void {
     fs.renameSync(tmpPath, settingsPath);
   } catch (renameErr) {
     // renameSync can fail on Windows when a watcher / antivirus holds the
-    // target (EPERM/EBUSY). The temp file otherwise lingers in ~/.qwen
+    // target (EPERM/EBUSY). The temp file otherwise lingers in ~/.hopcode
     // containing API keys — clean it up so secrets don't accumulate on
     // disk across repeated failed writes.
     try {

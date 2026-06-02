@@ -143,7 +143,7 @@ describe('setupStartupWorktree', () => {
 
     // No worktree directory was created.
     const exists = await fs
-      .stat(path.join(tempRepo, '.qwen', 'worktrees'))
+      .stat(path.join(tempRepo, '.hopcode', 'worktrees'))
       .then(() => true)
       .catch(() => false);
     expect(exists).toBe(false);
@@ -168,7 +168,7 @@ describe('setupStartupWorktree', () => {
 
     // No worktree directory was created — fail-close means no side effect.
     const exists = await fs
-      .stat(path.join(tempRepo, '.qwen', 'worktrees'))
+      .stat(path.join(tempRepo, '.hopcode', 'worktrees'))
       .then(() => true)
       .catch(() => false);
     expect(exists).toBe(false);
@@ -336,11 +336,11 @@ describe('setupStartupWorktree', () => {
     expect(survived).toBe('oops');
   });
 
-  it('refuses nested worktree creation from inside .qwen/worktrees/', async () => {
+  it('refuses nested worktree creation from inside .hopcode/worktrees/', async () => {
     tempRepo = await makeTempRepo();
     // Pre-create a fake worktree path and chdir into it. We don't need a
     // real git worktree — the guard fires on path shape, not git state.
-    const nestedPath = path.join(tempRepo, '.qwen', 'worktrees', 'outer');
+    const nestedPath = path.join(tempRepo, '.hopcode', 'worktrees', 'outer');
     await fs.mkdir(nestedPath, { recursive: true });
     process.chdir(nestedPath);
 
@@ -360,7 +360,7 @@ describe('buildStartupWorktreeNotice', () => {
   // signature lets us keep the fixture minimal so adding new
   // StartupWorktreeContext fields doesn't churn this file.
   const baseContext = {
-    worktreePath: '/repo/.qwen/worktrees/foo',
+    worktreePath: '/repo/.hopcode/worktrees/foo',
     slug: 'foo',
     branch: 'worktree-foo',
     wasReattached: false,
@@ -371,7 +371,7 @@ describe('buildStartupWorktreeNotice', () => {
     expect(notice).toContain('[Startup]');
     expect(notice).toContain('Active worktree');
     expect(notice).toContain('"foo"');
-    expect(notice).toContain('/repo/.qwen/worktrees/foo');
+    expect(notice).toContain('/repo/.hopcode/worktrees/foo');
     expect(notice).toContain('worktree-foo');
     expect(notice).not.toContain('Re-attached');
     expect(notice).not.toContain('overrode');

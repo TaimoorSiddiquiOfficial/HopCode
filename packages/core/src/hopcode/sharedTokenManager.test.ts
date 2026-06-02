@@ -278,7 +278,7 @@ describe('SharedTokenManager', () => {
       // never exercised — atomicWriteFile is mocked as always-successful.
       // Verify the error path so a regression that swallowed the failure
       // (or skipped the cache-mtime update on failure) would be caught.
-      const mockClient = createMockQwenClient(createExpiredCredentials());
+      const mockClient = createMockHopCodeClient(createExpiredCredentials());
       const refreshResponse = createSuccessfulRefreshResponse();
       mockClient.refreshAccessToken = vi
         .fn()

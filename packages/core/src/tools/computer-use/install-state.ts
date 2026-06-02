@@ -20,7 +20,7 @@ export interface InstallState {
  * point at a temp directory.
  */
 export function installStatePathFor(home: string = homedir()): string {
-  return join(home, '.qwen', 'computer-use', 'installed.json');
+  return join(home, '.hopcode', 'computer-use', 'installed.json');
 }
 
 export async function loadInstallState(

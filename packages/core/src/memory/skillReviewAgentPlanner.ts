@@ -147,7 +147,7 @@ async function evaluateScopedDecision(
       }
       // Restrict to the canonical `<name>/SKILL.md` slot. Without this,
       // the agent could write auxiliary files (notes, README, attachments)
-      // anywhere under `.qwen/skills/**` — SkillManager would ignore them
+      // anywhere under `.hopcode/skills/**` — SkillManager would ignore them
       // but they still pollute the directory.
       if (path.basename(ctx.filePath) !== SKILL_FILE_NAME) {
         return 'deny';
@@ -270,7 +270,7 @@ function buildAgentHistory(history: Content[]): Content[] {
 /**
  * Enumerate directories under the project skills root that contain a
  * SKILL.md. Returned names are the directory basenames (the same identifier
- * the agent uses when picking `.qwen/skills/<name>/SKILL.md`).
+ * the agent uses when picking `.hopcode/skills/<name>/SKILL.md`).
  *
  * Best-effort: any read error (ENOENT, EACCES, ...) returns `[]` so a
  * temporarily-unreadable skills dir downgrades to "no enumeration" rather

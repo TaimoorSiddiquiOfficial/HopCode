@@ -126,9 +126,9 @@ export async function setupStartupWorktree(
   }
 
   // Refuse nested creation: launching with --worktree from inside an existing
-  // worktree creates `<otherRepo>/.qwen/worktrees/<slug>/`, which is rarely
+  // worktree creates `<otherRepo>/.hopcode/worktrees/<slug>/`, which is rarely
   // what the user wants and corrupts ownership tracking.
-  if (/[\\/]\.qwen[\\/]worktrees[\\/]/.test(launchCwd)) {
+  if (/[\\/]\.hopcode[\\/]worktrees[\\/]/.test(launchCwd)) {
     return {
       ok: false,
       error: `--worktree: cannot start a new worktree from inside another worktree (cwd: ${launchCwd}). Run from the main checkout.`,
