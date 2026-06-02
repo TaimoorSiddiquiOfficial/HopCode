@@ -5,9 +5,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { cleanup } from 'ink-testing-library';
+import { cleanup , renderWithProviders } from '../../../test-utils/render.js';
 import { HooksManagementDialog } from './HooksManagementDialog.js';
-import { renderWithProviders } from '../../../test-utils/render.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { useConfig } from '../../contexts/ConfigContext.js';
 import { loadSettings, SettingScope } from '../../../config/settings.js';
@@ -162,6 +161,11 @@ function pressKey(name: string, sequence = ''): void {
   latestHandler!(createKey(name, sequence));
 }
 
+// Generous timeout for async navigation assertions — CI runners can be under
+// heavy load (integration tests running in parallel) causing React re-renders
+// to be delayed beyond the 1 s default.
+const NAV_TIMEOUT = { timeout: 10_000 };
+
 describe('HooksManagementDialog', () => {
   const mockOnClose = vi.fn();
 
@@ -247,28 +251,28 @@ describe('HooksManagementDialog', () => {
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
-    });
+    }, NAV_TIMEOUT);
 
     pressKey('return');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('[User] Read');
-    });
+    }, NAV_TIMEOUT);
 
     pressKey('down');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [User] Bash');
-    });
+    }, NAV_TIMEOUT);
     pressKey('return');
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('PreToolUse - Matcher: Bash');
       expect(lastFrame()).toContain('echo bash');
-    });
+    }, NAV_TIMEOUT);
 
     pressKey('escape', '\x1b');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('PreToolUse - Matchers');
-    });
+    }, NAV_TIMEOUT);
   });
 
   it('should navigate from matcher detail to config detail', async () => {
@@ -294,31 +298,31 @@ describe('HooksManagementDialog', () => {
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
-    });
+    }, NAV_TIMEOUT);
 
     pressKey('return');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('[User] Read');
-    });
+    }, NAV_TIMEOUT);
     pressKey('down');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [User] Bash');
-    });
+    }, NAV_TIMEOUT);
     pressKey('return');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('PreToolUse - Matcher: Bash');
-    });
+    }, NAV_TIMEOUT);
 
     pressKey('down');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [command] echo second');
-    });
+    }, NAV_TIMEOUT);
     pressKey('return');
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hook details');
       expect(lastFrame()).toContain('echo second');
-    });
+    }, NAV_TIMEOUT);
   });
 
   it('should navigate directly from a non-matcher hook to config detail', async () => {
@@ -339,32 +343,32 @@ describe('HooksManagementDialog', () => {
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
-    });
+    }, NAV_TIMEOUT);
 
     for (let i = 0; i < 6; i++) {
       pressKey('down');
       await vi.waitFor(() => {
         expect(lastFrame()).toContain(`❯  ${i + 2}.`);
-      });
+      }, NAV_TIMEOUT);
     }
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯  7. Stop');
-    });
+    }, NAV_TIMEOUT);
     pressKey('return');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Stop');
       expect(lastFrame()).toContain('echo stop one');
-    });
+    }, NAV_TIMEOUT);
 
     pressKey('down');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [command] echo stop two');
-    });
+    }, NAV_TIMEOUT);
     pressKey('return');
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hook details');
       expect(lastFrame()).toContain('echo stop two');
-    });
+    }, NAV_TIMEOUT);
   });
 });
