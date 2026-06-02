@@ -96,6 +96,7 @@ packages/vscode-ide-companion/*.vsix
 !.hopcode/agents/**
 !.hopcode/settings.json.example
 logs/
+.repro-runs/
 # GHA credentials
 gha-creds-*.json
 
