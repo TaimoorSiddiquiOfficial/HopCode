@@ -160,7 +160,7 @@ function InsightApp({ data }: { data: InsightData }) {
       hasRecordEntries(data.friction));
   const showFeatures =
     !!data.qualitative &&
-    (hasMeaningfulArray(data.qualitative.improvements?.Qwen_md_additions) ||
+    (hasMeaningfulArray(data.qualitative.improvements?.Hopcode_md_additions) ||
       hasMeaningfulArray(data.qualitative.improvements?.features_to_try));
   const showPatterns =
     !!data.qualitative &&

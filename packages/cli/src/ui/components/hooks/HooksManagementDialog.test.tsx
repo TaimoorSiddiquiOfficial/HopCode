@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { cleanup , renderWithProviders } from '../../../test-utils/render.js';
+import { cleanup, renderWithProviders } from '../../../test-utils/render.js';
 import { HooksManagementDialog } from './HooksManagementDialog.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { useConfig } from '../../contexts/ConfigContext.js';
@@ -74,8 +74,6 @@ vi.mock('../../hooks/useTerminalSize.js', () => ({
 vi.mock('../../contexts/ConfigContext.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../contexts/ConfigContext.js')>();
-  // Return a stable reference so `fetchHooksData` (which depends on `config`)
-  // is not recreated on every render — preventing an infinite effect loop.
   const stableConfig = {
     getExtensions: vi.fn(() => []),
     getDisableAllHooks: vi.fn(() => false),
@@ -161,9 +159,6 @@ function pressKey(name: string, sequence = ''): void {
   latestHandler!(createKey(name, sequence));
 }
 
-// Generous timeout for async navigation assertions — CI runners can be under
-// heavy load (integration tests running in parallel) causing React re-renders
-// to be delayed beyond the 1 s default.
 const NAV_TIMEOUT = { timeout: 10_000 };
 
 describe('HooksManagementDialog', () => {

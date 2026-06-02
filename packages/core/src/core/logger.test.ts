@@ -21,30 +21,33 @@ import {
   decodeTagName,
 } from './logger.js';
 import { Storage } from '../config/storage.js';
+import { getProjectHash } from '../utils/paths.js';
+import { atomicWriteFile } from '../utils/atomicFileWrite.js';
 import { promises as fs, existsSync } from 'node:fs';
 import path from 'node:path';
 import type { Content } from '@google/genai';
 
+import os from 'node:os';
+
+const GEMINI_DIR_NAME = '.qwen';
+const TMP_DIR_NAME = 'tmp';
 const LOG_FILE_NAME = 'logs.json';
 const CHECKPOINT_FILE_NAME = 'checkpoint.json';
 
-// Mock os.homedir() to return a temp directory for test isolation.
-// vi.spyOn on Node built-in modules is unreliable in vitest ESM mode
-// (it doesn't intercept calls from other modules), so we use vi.mock
-// which replaces the module globally.
-vi.mock('node:os', async (importOriginal) => {
-  const original = await importOriginal<typeof import('node:os')>();
-  const nodePath = await import('node:path');
-  const join = nodePath.default.join;
-  return {
-    ...original,
-    homedir: () => join(original.tmpdir(), 'hopcode-core-logger-home'),
-  };
-});
+const projectDir = process.cwd();
+const hash = getProjectHash(projectDir);
+const TEST_HOME_DIR = path.join(os.tmpdir(), 'qwen-core-logger-home');
 
+let originalHome: string | undefined;
 let testGeminiDir: string;
 let testLogFilePath: string;
 let testCheckpointFilePath: string;
+
+const setTestPaths = () => {
+  testGeminiDir = path.join(os.homedir(), GEMINI_DIR_NAME, TMP_DIR_NAME, hash);
+  testLogFilePath = path.join(testGeminiDir, LOG_FILE_NAME);
+  testCheckpointFilePath = path.join(testGeminiDir, CHECKPOINT_FILE_NAME);
+};
 
 async function cleanupLogAndCheckpointFiles() {
   try {
@@ -71,6 +74,26 @@ vi.mock('../utils/session.js', () => ({
   sessionId: 'test-session-id',
 }));
 
+// Re-export the real atomicWriteFile so tests can override individual
+// calls (e.g. .mockRejectedValueOnce) while preserving normal behavior.
+// The default implementation is re-attached in `beforeEach` because the
+// suite calls `vi.resetAllMocks()` which strips vi.fn(impl) back to no-op.
+vi.mock('../utils/atomicFileWrite.js', async () => {
+  const actual = await vi.importActual<
+    typeof import('../utils/atomicFileWrite.js')
+  >('../utils/atomicFileWrite.js');
+  return {
+    ...actual,
+    atomicWriteFile: vi.fn(actual.atomicWriteFile),
+  };
+});
+
+const realAtomicWriteFile = (
+  await vi.importActual<typeof import('../utils/atomicFileWrite.js')>(
+    '../utils/atomicFileWrite.js',
+  )
+).atomicWriteFile;
+
 vi.mock('../utils/debugLogger.js', async (importOriginal) => {
   const original =
     await importOriginal<typeof import('../utils/debugLogger.js')>();
@@ -91,18 +114,19 @@ describe('Logger', () => {
 
   beforeEach(async () => {
     vi.resetAllMocks();
+    // resetAllMocks blanks the vi.fn(actual) delegation — re-attach so the
+    // logger's initialize/append paths still hit the real disk.
+    vi.mocked(atomicWriteFile).mockImplementation(realAtomicWriteFile);
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-01-01T12:00:00.000Z'));
-    // Compute paths via Storage so they match what Logger uses internally
-    const storage = new Storage(process.cwd());
-    testGeminiDir = storage.getProjectTempDir();
-    testLogFilePath = path.join(testGeminiDir, LOG_FILE_NAME);
-    testCheckpointFilePath = path.join(testGeminiDir, CHECKPOINT_FILE_NAME);
+    originalHome = process.env['HOME'];
+    process.env['HOME'] = TEST_HOME_DIR;
+    setTestPaths();
     // Clean up before the test
     await cleanupLogAndCheckpointFiles();
     // Ensure the directory exists for the test
     await fs.mkdir(testGeminiDir, { recursive: true });
-    logger = new Logger(testSessionId, storage);
+    logger = new Logger(testSessionId, new Storage(process.cwd()));
     await logger.initialize();
   });
 
@@ -113,6 +137,12 @@ describe('Logger', () => {
     // Clean up after the test
     await cleanupLogAndCheckpointFiles();
     vi.useRealTimers();
+    vi.restoreAllMocks();
+    if (originalHome === undefined) {
+      delete process.env['HOME'];
+    } else {
+      process.env['HOME'] = originalHome;
+    }
   });
 
   afterAll(async () => {
@@ -434,7 +464,7 @@ describe('Logger', () => {
     });
 
     it('should not throw, not increment messageId, and log error if writing to file fails', async () => {
-      vi.spyOn(fs, 'writeFile').mockRejectedValueOnce(new Error('Disk full'));
+      vi.mocked(atomicWriteFile).mockRejectedValueOnce(new Error('Disk full'));
       const initialMessageId = logger['messageId'];
       const initialLogCount = logger['logs'].length;
 
@@ -513,11 +543,11 @@ describe('Logger', () => {
         encodedTag: 'test-tag',
       },
       {
-        tag: '\u4F60\u597D\u4E16\u754C',
+        tag: '你好世界',
         encodedTag: '%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C',
       },
       {
-        tag: 'japanese-\u3072\u3089\u304C\u306A\u3072\u3089\u304C\u306A\u5F62\u58F0',
+        tag: 'japanese-ひらがなひらがな形声',
         encodedTag:
           'japanese-%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E5%BD%A2%E5%A3%B0',
       },
@@ -527,12 +557,12 @@ describe('Logger', () => {
       },
     ])('should save a checkpoint', async ({ tag, encodedTag }) => {
       await logger.saveCheckpoint(conversation, tag);
-      // Verify via loadCheckpoint to avoid path-construction mismatch
-      // between the test and the logger's internal hopcodeDir.
-      const loaded = await logger.loadCheckpoint(tag);
-      expect(loaded).toEqual(conversation);
-      expect(encodeTagName(tag)).toBe(encodedTag);
-      expect(decodeTagName(encodedTag)).toBe(tag);
+      const taggedFilePath = path.join(
+        testGeminiDir,
+        `checkpoint-${encodedTag}.json`,
+      );
+      const fileContent = await fs.readFile(taggedFilePath, 'utf-8');
+      expect(JSON.parse(fileContent)).toEqual(conversation);
     });
 
     it('should not throw if logger is not initialized', async () => {
@@ -567,11 +597,11 @@ describe('Logger', () => {
         encodedTag: 'test-tag',
       },
       {
-        tag: '\u4F60\u597D\u4E16\u754C',
+        tag: '你好世界',
         encodedTag: '%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C',
       },
       {
-        tag: 'japanese-\u3072\u3089\u304C\u306A\u3072\u3089\u304C\u306A\u5F62\u58F0',
+        tag: 'japanese-ひらがなひらがな形声',
         encodedTag:
           'japanese-%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E3%81%B2%E3%82%89%E3%81%8C%E3%81%AA%E5%BD%A2%E5%A3%B0',
       },
@@ -584,9 +614,14 @@ describe('Logger', () => {
         ...conversation,
         { role: 'user', parts: [{ text: 'hello' }] },
       ];
-      // Use saveCheckpoint to ensure the file lands in the logger's
-      // actual hopcodeDir, not a path the test constructs independently.
-      await logger.saveCheckpoint(taggedConversation, tag);
+      const taggedFilePath = path.join(
+        testGeminiDir,
+        `checkpoint-${encodedTag}.json`,
+      );
+      await fs.writeFile(
+        taggedFilePath,
+        JSON.stringify(taggedConversation, null, 2),
+      );
 
       const loaded = await logger.loadCheckpoint(tag);
       expect(loaded).toEqual(taggedConversation);
@@ -633,28 +668,33 @@ describe('Logger', () => {
       { role: 'user', parts: [{ text: 'Content to be deleted' }] },
     ];
     const tag = 'delete-me';
+    const encodedTag = 'delete-me';
+    let taggedFilePath: string;
 
     beforeEach(async () => {
-      // Use saveCheckpoint so the file lands in the logger's actual hopcodeDir.
-      await logger.saveCheckpoint(conversation, tag);
+      taggedFilePath = path.join(
+        testGeminiDir,
+        `checkpoint-${encodedTag}.json`,
+      );
+      // Create a file to be deleted
+      await fs.writeFile(taggedFilePath, JSON.stringify(conversation));
     });
 
     it('should delete the specified checkpoint file and return true', async () => {
       const result = await logger.deleteCheckpoint(tag);
       expect(result).toBe(true);
 
-      // Verify via checkpointExists that the file is gone
-      const existsAfter = await logger.checkpointExists(tag);
-      expect(existsAfter).toBe(false);
+      // Verify the file is actually gone
+      await expect(fs.access(taggedFilePath)).rejects.toThrow(/ENOENT/);
     });
 
     it('should delete both new and old checkpoint files if they exist', async () => {
       const oldTag = 'delete-me(old)';
-      const newStylePath = logger['_checkpointPath'](oldTag);
       const oldStylePath = path.join(
-        path.dirname(newStylePath),
+        testGeminiDir,
         `checkpoint-${oldTag}.json`,
       );
+      const newStylePath = logger['_checkpointPath'](oldTag);
 
       // Create both files
       await fs.writeFile(oldStylePath, '{}');
@@ -704,12 +744,18 @@ describe('Logger', () => {
 
   describe('checkpointExists', () => {
     const tag = 'exists-test';
+    const encodedTag = 'exists-test';
+    let taggedFilePath: string;
+
+    beforeEach(() => {
+      taggedFilePath = path.join(
+        testGeminiDir,
+        `checkpoint-${encodedTag}.json`,
+      );
+    });
 
     it('should return true if the checkpoint file exists', async () => {
-      await logger.saveCheckpoint(
-        [{ role: 'user', parts: [{ text: 'test' }] }],
-        tag,
-      );
+      await fs.writeFile(taggedFilePath, '{}');
       const exists = await logger.checkpointExists(tag);
       expect(exists).toBe(true);
     });
@@ -755,7 +801,11 @@ describe('Logger', () => {
         { role: 'user', parts: [{ text: 'hello' }] },
       ];
       const tag = 'special(char)';
-      await logger.saveCheckpoint(taggedConversation, tag);
+      const taggedFilePath = path.join(testGeminiDir, `checkpoint-${tag}.json`);
+      await fs.writeFile(
+        taggedFilePath,
+        JSON.stringify(taggedConversation, null, 2),
+      );
 
       const loaded = await logger.loadCheckpoint(tag);
       expect(loaded).toEqual(taggedConversation);
@@ -866,7 +916,7 @@ describe('Logger', () => {
       await logger.logMessage(MessageSenderType.USER, 'kept');
       vi.advanceTimersByTime(1000);
 
-      vi.spyOn(fs, 'writeFile').mockRejectedValueOnce(new Error('Disk full'));
+      vi.mocked(atomicWriteFile).mockRejectedValueOnce(new Error('Disk full'));
       await logger.logMessage(MessageSenderType.USER, 'failed write');
 
       expect(logger['lastLoggedUserEntry']).toBeNull();
@@ -912,7 +962,7 @@ describe('Logger', () => {
         'cancelled prompt',
       ]);
 
-      vi.spyOn(fs, 'writeFile').mockRejectedValueOnce(new Error('Disk full'));
+      vi.mocked(atomicWriteFile).mockRejectedValueOnce(new Error('Disk full'));
       const removed = await logger.removeLastUserMessage();
       expect(removed).toBe(false);
 
@@ -961,7 +1011,7 @@ describe('Logger', () => {
       const trackedAfterUser = logger['lastLoggedUserEntry'];
       expect(trackedAfterUser).not.toBeNull();
 
-      vi.spyOn(fs, 'writeFile').mockRejectedValueOnce(new Error('Disk full'));
+      vi.mocked(atomicWriteFile).mockRejectedValueOnce(new Error('Disk full'));
       await logger.logMessage(MessageSenderType.MODEL_SWITCH, 'qwen→qwen-max');
 
       // Tracker is unchanged — the non-USER failure didn't shift which

@@ -567,13 +567,13 @@ function HopcodeMdAdditionsSection({
   const checkedCount = checkedState.filter(Boolean).length;
 
   return (
-    <div className="hopcode-md-section">
+    <div className="qwen-md-section">
       <h3>Suggested HOPCODE.md Additions</h3>
       <p className="text-xs text-slate-500 mb-3">
         Just copy this into HopCode to add it to your HOPCODE.md.
       </p>
 
-      <div className="hopcode-md-actions" style={{ marginBottom: '12px' }}>
+      <div className="qwen-md-actions" style={{ marginBottom: '12px' }}>
         <button
           className={`copy-all-btn ${copiedAll ? 'copied' : ''}`}
           onClick={handleCopyAll}
@@ -584,7 +584,7 @@ function HopcodeMdAdditionsSection({
       </div>
 
       {additions.map((item, idx) => (
-        <div key={idx} className="hopcode-md-item">
+        <div key={idx} className="qwen-md-item">
           <input
             type="checkbox"
             checked={checkedState[idx]}
@@ -613,8 +613,8 @@ export function Improvements({
   if (!improvements) return null;
 
   const hasFeatureSuggestions =
-    (Array.isArray(improvements.Qwen_md_additions) &&
-      improvements.Qwen_md_additions.length > 0) ||
+    (Array.isArray(improvements.Hopcode_md_additions) &&
+      improvements.Hopcode_md_additions.length > 0) ||
     (Array.isArray(improvements.features_to_try) &&
       improvements.features_to_try.length > 0);
   const hasUsagePatterns =

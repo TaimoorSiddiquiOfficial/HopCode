@@ -1482,7 +1482,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
     // Flag command substitution ($(), backticks, <(), >()) so the user
     // sees a visible warning in the confirmation dialog. We surface this
     // as an informational warning rather than denying outright; the deny
-    // path was inconsistent and could not be overridden by YOLO mode
+    // path was inconsistent and could not be overridden by IZN mode
     // (see issue #4093). Substitution is detected on both the stripped
     // and original command so wrappers like `bash -c "..."` are checked
     // along with their inner contents.

@@ -99,7 +99,7 @@ export class HookRunner {
     const signal =
       contextOrSignal && 'aborted' in contextOrSignal
         ? contextOrSignal
-        : (contextOrSignal as FunctionHookContext | undefined)?.signal;
+        : contextOrSignal?.signal;
 
     // Check if already aborted before starting
     if (signal?.aborted) {
@@ -573,7 +573,7 @@ export class HookRunner {
         ...process.env,
         GEMINI_PROJECT_DIR: input.cwd,
         CLAUDE_PROJECT_DIR: input.cwd, // For compatibility
-        HOPCODE_PROJECT_DIR: input.cwd,
+        HOPCODE_PROJECT_DIR: input.cwd, // For HopCode compatibility
         ...getShellContextEnvVars(),
         ...hookConfig.env,
       };

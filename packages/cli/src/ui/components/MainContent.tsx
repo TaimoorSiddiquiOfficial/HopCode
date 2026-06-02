@@ -108,7 +108,7 @@ export const MainContent = () => {
   const uiActions = useUIActions();
   const { compactMode } = useCompactMode();
   const {
-    pendingGeminiHistoryItems,
+    pendingHistoryItems,
     terminalWidth,
     mainAreaWidth,
     staticAreaMaxItemHeight,
@@ -330,7 +330,7 @@ export const MainContent = () => {
   const pendingHistoryItemsWithSourceCopyOffsets = useMemo(() => {
     let runningOffsets = cloneSourceCopyOffsets(pendingStartSourceCopyOffsets);
 
-    return pendingGeminiHistoryItems.map((item) => {
+    return pendingHistoryItems.map((item) => {
       if (item.type === 'gemini') {
         runningOffsets = createEmptySourceCopyOffsets();
         const offsets = cloneSourceCopyOffsets(runningOffsets);
@@ -350,7 +350,7 @@ export const MainContent = () => {
 
       return { item, sourceCopyIndexOffsets: undefined };
     });
-  }, [pendingGeminiHistoryItems, pendingStartSourceCopyOffsets]);
+  }, [pendingHistoryItems, pendingStartSourceCopyOffsets]);
 
   // Progressive Static replay (issue #3899). `replayCount` is the number of
   // history items currently passed to <Static>. It catches up to
@@ -423,12 +423,9 @@ export const MainContent = () => {
   const allVirtualItems = useMemo(
     (): HistoryItem[] => [
       ...mergedHistory,
-      ...pendingGeminiHistoryItems.map((item, i) => ({
-        ...item,
-        id: -(i + 1),
-      })),
+      ...pendingHistoryItems.map((item, i) => ({ ...item, id: -(i + 1) })),
     ],
-    [mergedHistory, pendingGeminiHistoryItems],
+    [mergedHistory, pendingHistoryItems],
   );
 
   // Source-copy index offsets propagation. The legacy <Static> path threads

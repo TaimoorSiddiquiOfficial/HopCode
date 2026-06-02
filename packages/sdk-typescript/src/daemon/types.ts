@@ -709,7 +709,7 @@ export const DAEMON_APPROVAL_MODES = [
   'auto-edit',
   'auto',
   'izn',
-  'yolo',
+  'izn',
 ] as const;
 export type DaemonApprovalMode = (typeof DAEMON_APPROVAL_MODES)[number];
 

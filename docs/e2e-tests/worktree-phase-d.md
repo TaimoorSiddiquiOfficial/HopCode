@@ -38,7 +38,7 @@ validate "symlink absent because D-2 is absent" — they collapse to "tool
 absent." Add this guard at the top of each:
 
 ```bash
-HAS_ENTER_WORKTREE=$($QWEN "list your tools and stop" --approval-mode yolo --output-format json 2>/dev/null \
+HAS_ENTER_WORKTREE=$($QWEN "list your tools and stop" --approval-mode izn --output-format json 2>/dev/null \
   | jq -e '.[] | select(.type=="system") | .tools | index("enter_worktree")' >/dev/null && echo yes || echo no)
 if [ "$HAS_ENTER_WORKTREE" != "yes" ]; then
   echo "SKIP: enter_worktree absent in baseline — E2/E3 require Phase A+B"
@@ -77,13 +77,13 @@ the test target — PR `#4174` (Phase C) is a guaranteed-present reference.
 
 ## Group A: `--worktree` flag basic forms
 
-**Mode:** headless, `--approval-mode yolo`, `--output-format json`
+**Mode:** headless, `--approval-mode izn`, `--output-format json`
 
 ### A1: bare `--worktree` (auto-slug)
 
 ```bash
 $QWEN --worktree "say hello and stop" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/a1.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/a1.out
 
 # A `worktree_started` system event is emitted at startup. The `notice`
 # field contains the slug (auto-generated `adj-noun-XXXXXX`) inside the
@@ -111,7 +111,7 @@ ls -d "$TEST_DIR/.qwen/worktrees/"*
 
 ```bash
 $QWEN --worktree my-feature "say hello and stop" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/a2.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/a2.out
 
 ls -d "$TEST_DIR/.qwen/worktrees/my-feature"
 git -C "$TEST_DIR" branch | grep "worktree-my-feature"
@@ -127,7 +127,7 @@ TEST_DIR).
 
 ```bash
 $QWEN --worktree=my-feature "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/a3.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/a3.out
 ```
 
 **Expected (post-impl):** same as A2.
@@ -136,7 +136,7 @@ $QWEN --worktree=my-feature "say hi" \
 
 ```bash
 $QWEN --worktree "../escape" "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/a4.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/a4.out
 echo "exit=$?"
 
 ls "$TEST_DIR/.qwen/worktrees/" 2>/dev/null
@@ -154,7 +154,7 @@ ls "$TEST_DIR/.qwen/worktrees/" 2>/dev/null
 NON_GIT=$(mktemp -d)
 cd "$NON_GIT"
 $QWEN --worktree "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/a5.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/a5.out
 echo "exit=$?"
 ```
 
@@ -170,7 +170,7 @@ or "git init".
 ```bash
 SESSION_ID=$(uuidgen)
 $QWEN --worktree b1-test --session-id "$SESSION_ID" "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/b1.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/b1.out
 
 SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json
 jq '.slug, .worktreePath, .worktreeBranch, .originalCwd, .originalBranch, .originalHeadCommit' \
@@ -190,7 +190,7 @@ jq '.slug, .worktreePath, .worktreeBranch, .originalCwd, .originalBranch, .origi
 
 ```bash
 $QWEN --worktree b2-test "run the shell tool with command 'pwd', then stop" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/b2.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/b2.out
 
 # Extract the shell tool's stdout from the user-message tool_result
 jq -r '.[] | select(.type=="user") | .message.content[] | select(.tool_use_id != null) | .content' \
@@ -203,7 +203,7 @@ jq -r '.[] | select(.type=="user") | .message.content[] | select(.tool_use_id !=
 
 ```bash
 $QWEN --worktree b3-test "run the shell tool with command 'pwd && git rev-parse --abbrev-ref HEAD', then stop" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/b3.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/b3.out
 
 jq -r '.[] | select(.type=="user") | .message.content[] | select(.tool_use_id != null) | .content' \
   < /tmp/b3.out
@@ -222,11 +222,11 @@ is inside the worktree.
 # Run 1: create a session with worktree "first"
 SESSION_ID=$(uuidgen)
 $QWEN --worktree first --session-id "$SESSION_ID" "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/c1-run1.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/c1-run1.out
 
 # Run 2: resume the same session but request a different worktree
 $QWEN --resume "$SESSION_ID" --worktree second "say hi again" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/c1-run2.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/c1-run2.out
 
 # Sidecar should now point at "second"
 SIDECAR=~/.qwen/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json
@@ -248,12 +248,12 @@ ls -d "$TEST_DIR/.qwen/worktrees/"*
 ```bash
 SESSION_ID=$(uuidgen)
 $QWEN --worktree c2 --session-id "$SESSION_ID" "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/c2-run1.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/c2-run1.out
 
 rm -rf "$TEST_DIR/.qwen/worktrees/c2"   # simulate user-deleted dir
 
 $QWEN --resume "$SESSION_ID" --worktree c2-fresh "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/c2-run2.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/c2-run2.out
 
 ls -d "$TEST_DIR/.qwen/worktrees/"*
 ```
@@ -271,7 +271,7 @@ worktree was created by the CLI flag rather than `EnterWorktreeTool`.
 
 ```bash
 tmux new-session -d -s d1 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree d1-test --approval-mode yolo"
+  "cd $TEST_DIR && $QWEN --worktree d1-test --approval-mode izn"
 sleep 3
 
 # Verify worktree is active (Footer indicator)
@@ -294,7 +294,7 @@ three radio options appear.
 
 ```bash
 tmux new-session -d -s d2 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree d2-test --approval-mode yolo"
+  "cd $TEST_DIR && $QWEN --worktree d2-test --approval-mode izn"
 sleep 3
 tmux send-keys -t d2 C-c; sleep 0.3; tmux send-keys -t d2 C-c; sleep 1
 
@@ -314,7 +314,7 @@ tmux kill-session -t d2
 ```bash
 SESSION_ID=$(uuidgen)
 tmux new-session -d -s d3 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree d3-test --session-id $SESSION_ID --approval-mode yolo"
+  "cd $TEST_DIR && $QWEN --worktree d3-test --session-id $SESSION_ID --approval-mode izn"
 sleep 3
 tmux send-keys -t d3 C-c; sleep 0.3; tmux send-keys -t d3 C-c; sleep 1
 tmux send-keys -t d3 Down Enter   # select "Remove worktree and branch"
@@ -353,7 +353,7 @@ EOF
 
 ```bash
 $QWEN --worktree e1-test "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /dev/null
+  --approval-mode izn --output-format json 2>/dev/null > /dev/null
 
 ls -la "$TEST_DIR/.qwen/worktrees/e1-test/node_modules"
 readlink "$TEST_DIR/.qwen/worktrees/e1-test/node_modules"
@@ -366,7 +366,7 @@ pointing to `$TEST_DIR/node_modules`.
 
 ```bash
 $QWEN "use enter_worktree to create a worktree named e2-test, then stop" \
-  --approval-mode yolo --output-format json 2>/dev/null > /dev/null
+  --approval-mode izn --output-format json 2>/dev/null > /dev/null
 
 readlink "$TEST_DIR/.qwen/worktrees/e2-test/node_modules"
 ```
@@ -379,7 +379,7 @@ Requires a sub-agent definition. Use the built-in fork mechanism:
 
 ```bash
 $QWEN "use the agent tool with subagent_type='general-purpose', isolation='worktree', description='check node_modules', prompt='run pwd and ls -la node_modules then exit'" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/e3.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/e3.out
 
 # Extract agent worktree dir from result message
 jq -r '.[] | select(.type=="assistant") | .message.content[] | select(.type=="tool_use") | .input' \
@@ -401,7 +401,7 @@ cat > "$TEST_DIR/.qwen/settings.json" <<'EOF'
 { "worktree": { "symlinkDirectories": ["does-not-exist"] } }
 EOF
 
-$QWEN --worktree e4-test "say hi" --approval-mode yolo --output-format json 2>/dev/null > /tmp/e4.out
+$QWEN --worktree e4-test "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/e4.out
 ls -d "$TEST_DIR/.qwen/worktrees/e4-test"
 ls "$TEST_DIR/.qwen/worktrees/e4-test/does-not-exist" 2>/dev/null && echo "UNEXPECTED"
 ```
@@ -418,7 +418,7 @@ mkdir -p "$TEST_DIR/.qwen/worktrees/e5-test/node_modules"
 echo "preexisting" > "$TEST_DIR/.qwen/worktrees/e5-test/node_modules/.marker"
 
 # Force re-creation via EnterWorktreeTool (CLI would refuse "already exists")
-$QWEN "use enter_worktree with name='e5-test' to retry" --approval-mode yolo 2>/dev/null
+$QWEN "use enter_worktree with name='e5-test' to retry" --approval-mode izn 2>/dev/null
 # either: tool errors out cleanly, OR symlink is skipped — both acceptable
 test -f "$TEST_DIR/.qwen/worktrees/e5-test/node_modules/.marker" && echo "PASS: not overwritten"
 ```
@@ -433,7 +433,7 @@ cat > "$TEST_DIR/.qwen/settings.json" <<'EOF'
 { "worktree": { "symlinkDirectories": ["/etc", "../escape"] } }
 EOF
 
-$QWEN --worktree e6-test "say hi" --approval-mode yolo --output-format json 2>/dev/null > /tmp/e6.out
+$QWEN --worktree e6-test "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/e6.out
 ls "$TEST_DIR/.qwen/worktrees/e6-test/" | head -10
 ```
 
@@ -461,7 +461,7 @@ PROJECT_ID=$(node -e "console.log(process.argv[1].replace(/[^a-zA-Z0-9]/g,'-'))"
 
 ```bash
 $QWEN --worktree=#4174 "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/f1.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/f1.out
 
 ls -d "$TEST_DIR/.qwen/worktrees/pr-4174"
 git -C "$TEST_DIR/.qwen/worktrees/pr-4174" rev-parse --abbrev-ref HEAD
@@ -477,7 +477,7 @@ git -C "$TEST_DIR/.qwen/worktrees/pr-4174" rev-parse --abbrev-ref HEAD
 
 ```bash
 $QWEN --worktree "https://github.com/QwenLM/qwen-code/pull/4174" "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/f2.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/f2.out
 
 ls -d "$TEST_DIR/.qwen/worktrees/pr-4174"
 ```
@@ -488,7 +488,7 @@ ls -d "$TEST_DIR/.qwen/worktrees/pr-4174"
 
 ```bash
 cd "$TEST_DIR" && git remote remove origin
-$QWEN --worktree=#4174 "say hi" --approval-mode yolo --output-format json 2>/dev/null > /tmp/f3.out
+$QWEN --worktree=#4174 "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f3.out
 echo "exit=$?"
 ```
 
@@ -497,7 +497,7 @@ echo "exit=$?"
 ### F4: invalid PR number → fail-close
 
 ```bash
-$QWEN --worktree=#999999999 "say hi" --approval-mode yolo --output-format json 2>/dev/null > /tmp/f4.out
+$QWEN --worktree=#999999999 "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f4.out
 echo "exit=$?"
 ```
 
@@ -507,7 +507,7 @@ echo "exit=$?"
 ### F5: malformed `#abc` falls through to slug validation
 
 ```bash
-$QWEN --worktree=#abc "say hi" --approval-mode yolo --output-format json 2>/dev/null > /tmp/f5.out
+$QWEN --worktree=#abc "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f5.out
 echo "exit=$?"
 ```
 
@@ -522,7 +522,7 @@ cat > "$TEST_DIR/.qwen/settings.json" <<'EOF'
 EOF
 mkdir -p "$TEST_DIR/node_modules" && echo x > "$TEST_DIR/node_modules/.marker"
 
-$QWEN --worktree=#4174 "say hi" --approval-mode yolo --output-format json 2>/dev/null > /dev/null
+$QWEN --worktree=#4174 "say hi" --approval-mode izn --output-format json 2>/dev/null > /dev/null
 readlink "$TEST_DIR/.qwen/worktrees/pr-4174/node_modules"
 ```
 
@@ -543,7 +543,7 @@ readlink "$TEST_DIR/.qwen/worktrees/pr-4174/node_modules"
 ```bash
 SESSION_ID=$(uuidgen)
 tmux new-session -d -s g1 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree g1-test --session-id $SESSION_ID --approval-mode yolo 2>&1 | tee /tmp/g1-stderr.out"
+  "cd $TEST_DIR && $QWEN --worktree g1-test --session-id $SESSION_ID --approval-mode izn 2>&1 | tee /tmp/g1-stderr.out"
 sleep 3
 tmux send-keys -t g1 "use the write_file tool to create file 'work.txt' with content 'phase d test'"
 sleep 0.3; tmux send-keys -t g1 Enter
@@ -559,7 +559,7 @@ cat "$TEST_DIR/.qwen/worktrees/g1-test/work.txt"
 
 # Resume reattaches
 tmux new-session -d -s g1b -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --resume $SESSION_ID --approval-mode yolo"
+  "cd $TEST_DIR && $QWEN --resume $SESSION_ID --approval-mode izn"
 sleep 4
 tmux capture-pane -t g1b -p -S -50 | grep -E "⎇ worktree-g1-test|Resumed"
 tmux kill-session -t g1b
@@ -585,7 +585,7 @@ EOF
 cd "$TEST_DIR"
 
 $QWEN --worktree g2-test --mcp-config ./mcp.json "say hi" \
-  --approval-mode yolo --output-format json 2>/dev/null > /tmp/g2.out
+  --approval-mode izn --output-format json 2>/dev/null > /tmp/g2.out
 echo "exit=$?"
 jq -r '.[] | select(.type=="result") | .result' < /tmp/g2.out | head -3
 ```
@@ -662,7 +662,7 @@ implementation.**
 
 | Group                              | Result                    | Notes                                                                                                                                                                                                                                                                                                                                                                                       |
 | ---------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1 (bare flag)                     | ✅ (with doc tip)         | yargs consumes the next positional as the slug value when user passes `qwen --worktree "say hi"`; quickstart now tells users to use `=` form or put the prompt before the flag. Auto-slug feature itself confirmed via `qwen --worktree --approval-mode yolo "say hi"` → slug `bright-elm-8a4c12`, init `.cwd` ends with `.qwen/worktrees/<auto-slug>`.                                     |
+| A1 (bare flag)                     | ✅ (with doc tip)         | yargs consumes the next positional as the slug value when user passes `qwen --worktree "say hi"`; quickstart now tells users to use `=` form or put the prompt before the flag. Auto-slug feature itself confirmed via `qwen --worktree --approval-mode izn "say hi"` → slug `bright-elm-8a4c12`, init `.cwd` ends with `.qwen/worktrees/<auto-slug>`.                                      |
 | A2 (explicit slug)                 | ✅                        | dir `.qwen/worktrees/my-feature` + branch `worktree-my-feature`                                                                                                                                                                                                                                                                                                                             |
 | A3 (= form)                        | ✅                        | identical to A2                                                                                                                                                                                                                                                                                                                                                                             |
 | A4 (invalid slug)                  | ✅                        | exit=1, message: `Worktree name may only contain letters, digits, dots, underscores, and hyphens.`, no worktree dir                                                                                                                                                                                                                                                                         |

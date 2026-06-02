@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -138,13 +138,13 @@ async function runHousekeeping(
   // active session uses a brand-new sessionId/dir, so it's never aliased
   // against any sweep target. Not a bug — slightly conservative is fine.
   const currentSessionId = config.getSessionId();
-  const hopCodeDir = Storage.getGlobalHopCodeDir();
+  const hopcodeDir = Storage.getGlobalHopCodeDir();
 
   await runThrottledOnce(
     {
       name: 'file-history-cleanup',
-      markerPath: join(hopCodeDir, FILE_HISTORY_MARKER),
-      lockPath: join(hopCodeDir, FILE_HISTORY_MARKER + '.lock'),
+      markerPath: join(hopcodeDir, FILE_HISTORY_MARKER),
+      lockPath: join(hopcodeDir, FILE_HISTORY_MARKER + '.lock'),
     },
     async () => {
       const r = await cleanupOldFileHistoryBackups({

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -561,10 +561,10 @@ describe('SettingsDialog', () => {
 
       it('loops back when reaching the end of an enum', async () => {
         vi.mocked(saveModifiedSettings).mockClear();
-        // Use Tool Approval Mode set to YOLO (last value) to test looping back to first
+        // Use Tool Approval Mode set to IZN (last value) to test looping back to first
         const settings = createMockSettings({
           tools: {
-            approvalMode: 'yolo', // Last enum value
+            approvalMode: 'izn', // Last enum value
           },
         });
         const onSelect = vi.fn();
@@ -595,7 +595,7 @@ describe('SettingsDialog', () => {
           new Set<string>(['tools.approvalMode']),
           expect.objectContaining({
             tools: expect.objectContaining({
-              approvalMode: 'plan', // First enum value after YOLO (wrap-around)
+              approvalMode: 'plan', // First enum value after IZN (wrap-around)
             }),
           }),
           expect.any(LoadedSettings),

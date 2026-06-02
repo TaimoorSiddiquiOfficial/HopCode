@@ -275,7 +275,7 @@ export type PermissionMode =
   | 'auto-edit'
   | 'auto'
   | 'izn'
-  | 'yolo';
+  | 'izn';
 
 /**
  * Permission suggestion for tool use requests
