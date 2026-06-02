@@ -75,18 +75,21 @@ vi.mock('../../hooks/useTerminalSize.js', () => ({
 vi.mock('../../contexts/ConfigContext.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../contexts/ConfigContext.js')>();
+  // Return a stable reference so `fetchHooksData` (which depends on `config`)
+  // is not recreated on every render — preventing an infinite effect loop.
+  const stableConfig = {
+    getExtensions: vi.fn(() => []),
+    getDisableAllHooks: vi.fn(() => false),
+    getHookSystem: vi.fn(() => ({
+      getSessionHooksManager: vi.fn(() => ({
+        getAllSessionHooks: vi.fn(() => []),
+      })),
+    })),
+    getSessionId: vi.fn(() => 'test-session-id'),
+  };
   return {
     ...actual,
-    useConfig: vi.fn(() => ({
-      getExtensions: vi.fn(() => []),
-      getDisableAllHooks: vi.fn(() => false),
-      getHookSystem: vi.fn(() => ({
-        getSessionHooksManager: vi.fn(() => ({
-          getAllSessionHooks: vi.fn(() => []),
-        })),
-      })),
-      getSessionId: vi.fn(() => 'test-session-id'),
-    })),
+    useConfig: vi.fn(() => stableConfig),
   };
 });
 
