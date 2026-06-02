@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Code
  * SPDX-License-Identifier: Apache-2.0
@@ -47,7 +47,7 @@ const SESSION_OUTCOMES = [
   'unclear_from_transcript',
 ] as const;
 const OUTCOME_FALLBACK = 'unclear_from_transcript';
-const QWEN_HELPFULNESS_LEVELS = [
+const HOPCODE_HELPFULNESS_LEVELS = [
   'unhelpful',
   'slightly_helpful',
   'moderately_helpful',
@@ -161,9 +161,9 @@ function normalizeSessionFacet(
     user_satisfaction_counts: normalizeInsightCountRecord(
       rawFacet['user_satisfaction_counts'],
     ),
-    Qwen_helpfulness: normalizeInsightEnum(
-      rawFacet['Qwen_helpfulness'],
-      QWEN_HELPFULNESS_LEVELS,
+    HOPCODE_helpfulness: normalizeInsightEnum(
+      rawFacet['HOPCODE_helpfulness'],
+      HOPCODE_HELPFULNESS_LEVELS,
       'moderately_helpful',
     ),
     session_type: normalizeInsightEnum(

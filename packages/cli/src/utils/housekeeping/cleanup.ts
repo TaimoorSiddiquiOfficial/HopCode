@@ -10,7 +10,7 @@ import {
   Storage,
   FILE_HISTORY_DIR,
   createDebugLogger,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('HOUSEKEEPING');
 
@@ -49,7 +49,7 @@ export async function cleanupOldFileHistoryBackups(
   opts: CleanupOptions,
 ): Promise<CleanupResult> {
   const result: CleanupResult = { removed: 0, errors: 0 };
-  const root = join(Storage.getGlobalQwenDir(), FILE_HISTORY_DIR);
+  const root = join(Storage.getGlobalHopCodeDir(), FILE_HISTORY_DIR);
   const excludes = opts.excludeSessionIds ?? new Set<string>();
 
   let entries;

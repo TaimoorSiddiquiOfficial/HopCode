@@ -118,7 +118,7 @@ export class MemoryDiagnosticsDumper {
       // Phase 2: full collection (may fork subprocesses — risky under pressure)
       const diagnostics = await collectMemoryDiagnostics({
         sessionId,
-        qwenVersion: this.config.getCliVersion(),
+        hopcodeVersion: this.config.getCliVersion(),
       });
 
       const fullPayload = {

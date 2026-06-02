@@ -10,7 +10,7 @@ import {
   Storage,
   type Config,
   createDebugLogger,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { cleanupOldFileHistoryBackups, getCutoffDate } from './cleanup.js';
 import { runThrottledOnce } from './throttledOnce.js';
@@ -60,7 +60,7 @@ async function scheduleFirstPass(
   config: Config,
   settings: LoadedSettings,
 ): Promise<void> {
-  const markerPath = join(Storage.getGlobalQwenDir(), FILE_HISTORY_MARKER);
+  const markerPath = join(Storage.getGlobalHopCodeDir(), FILE_HISTORY_MARKER);
   const delay = (await needsCatchUp(markerPath))
     ? STARTUP_DELAY_CATCHUP_MS
     : STARTUP_DELAY_MS;
@@ -138,13 +138,13 @@ async function runHousekeeping(
   // active session uses a brand-new sessionId/dir, so it's never aliased
   // against any sweep target. Not a bug — slightly conservative is fine.
   const currentSessionId = config.getSessionId();
-  const qwenDir = Storage.getGlobalQwenDir();
+  const hopCodeDir = Storage.getGlobalHopCodeDir();
 
   await runThrottledOnce(
     {
       name: 'file-history-cleanup',
-      markerPath: join(qwenDir, FILE_HISTORY_MARKER),
-      lockPath: join(qwenDir, FILE_HISTORY_MARKER + '.lock'),
+      markerPath: join(hopCodeDir, FILE_HISTORY_MARKER),
+      lockPath: join(hopCodeDir, FILE_HISTORY_MARKER + '.lock'),
     },
     async () => {
       const r = await cleanupOldFileHistoryBackups({

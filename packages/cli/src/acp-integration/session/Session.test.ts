@@ -28,9 +28,9 @@ import { CommandKind } from '../../ui/commands/types.js';
 
 const debugLoggerWarnSpy = vi.hoisted(() => vi.fn());
 
-vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@qwen-code/qwen-code-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     createDebugLogger: () => ({
