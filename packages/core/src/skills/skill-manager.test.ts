@@ -162,10 +162,10 @@ describe('SkillManager', () => {
         return { name: 'regular-skill', description: 'A regular skill' };
       }
       if (yamlString.includes('name: shared-skill')) {
-        const desc = yamlString.includes('From qwen dir')
-          ? 'From qwen dir'
-          : yamlString.includes('From agent dir')
-            ? 'From agent dir'
+        const desc = yamlString.includes('From hopcode dir')
+          ? 'From hopcode dir'
+          : yamlString.includes('From agents dir')
+            ? 'From agents dir'
             : 'A shared skill';
         return { name: 'shared-skill', description: desc };
       }
@@ -838,13 +838,17 @@ Body`);
     it('should deduplicate same-name skills across provider dirs within a level', async () => {
       // Override readdir to return the same skill name from both .hopcode and .agents dirs
       vi.mocked(fs.readdir).mockReset();
-      const projectQwenDir = path.join('/test/project', '.hopcode', 'skills');
+      const projectHopCodeDir = path.join(
+        '/test/project',
+        '.hopcode',
+        'skills',
+      );
       const projectAgentDir = path.join('/test/project', '.agents', 'skills');
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(fs.readdir).mockImplementation((dirPath: any) => {
         const pathStr = String(dirPath);
-        if (pathStr === projectQwenDir) {
+        if (pathStr === projectHopCodeDir) {
           return Promise.resolve([
             {
               name: 'shared-skill',
