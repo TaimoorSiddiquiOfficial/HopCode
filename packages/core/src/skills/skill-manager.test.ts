@@ -972,6 +972,13 @@ Body`);
       isSymbolicLink: () => false,
     };
 
+    const simplifyDirEntry = {
+      name: 'simplify',
+      isDirectory: () => true,
+      isFile: () => false,
+      isSymbolicLink: () => false,
+    };
+
     const emptyDir = [] as unknown as Awaited<ReturnType<typeof fs.readdir>>;
 
     function mockReaddirForLevels(levels: Set<string>) {
@@ -985,8 +992,14 @@ Body`);
         const isUser =
           pathStr.includes(userDirSegment) && pathStr.startsWith(userPrefix);
 
+        if (levels.has('bundled') && isBundled) {
+          return Promise.resolve([
+            reviewDirEntry,
+            simplifyDirEntry,
+          ] as unknown as Awaited<ReturnType<typeof fs.readdir>>);
+        }
+
         if (
-          (levels.has('bundled') && isBundled) ||
           (levels.has('project') && isProject) ||
           (levels.has('user') && isUser)
         ) {
@@ -994,21 +1007,42 @@ Body`);
             ReturnType<typeof fs.readdir>
           >);
         }
+
         return Promise.resolve(emptyDir);
       });
     }
 
     function setupReviewSkillMocks() {
       vi.mocked(fs.access).mockResolvedValue(undefined);
-      vi.mocked(fs.readFile).mockResolvedValue(`---
+      vi.mocked(fs.readFile).mockImplementation(async (filePath) => {
+        const pathStr = String(filePath);
+        if (pathStr.includes(`${path.sep}simplify${path.sep}`)) {
+          return `---
+name: simplify
+description: Simplify recent changes
+---
+Simplify content`;
+        }
+
+        return `---
 name: review
 description: Review code changes
 ---
-Review content`);
+Review content`;
+      });
 
-      mockParseYaml.mockReturnValue({
-        name: 'review',
-        description: 'Review code changes',
+      mockParseYaml.mockImplementation((yamlString: string) => {
+        if (yamlString.includes('name: simplify')) {
+          return {
+            name: 'simplify',
+            description: 'Simplify recent changes',
+          };
+        }
+
+        return {
+          name: 'review',
+          description: 'Review code changes',
+        };
       });
     }
 
@@ -1019,8 +1053,11 @@ Review content`);
       const skills = await manager.listSkills({ force: true });
 
       expect(skills.some((s) => s.name === 'review')).toBe(true);
+      expect(skills.some((s) => s.name === 'simplify')).toBe(true);
       const reviewSkill = skills.find((s) => s.name === 'review');
+      const simplifySkill = skills.find((s) => s.name === 'simplify');
       expect(reviewSkill!.level).toBe('bundled');
+      expect(simplifySkill!.level).toBe('bundled');
     });
 
     it('should prioritize project-level over bundled skills with same name', async () => {
@@ -1032,6 +1069,8 @@ Review content`);
       const reviewSkills = skills.filter((s) => s.name === 'review');
       expect(reviewSkills).toHaveLength(1);
       expect(reviewSkills[0].level).toBe('project');
+      // simplify has no name conflict, so it must still survive alongside the deduped review skill
+      expect(skills.some((s) => s.name === 'simplify')).toBe(true);
     });
 
     it('should prioritize user-level over bundled skills with same name', async () => {
@@ -1043,6 +1082,8 @@ Review content`);
       const reviewSkills = skills.filter((s) => s.name === 'review');
       expect(reviewSkills).toHaveLength(1);
       expect(reviewSkills[0].level).toBe('user');
+      // simplify has no name conflict, so it must still survive alongside the deduped review skill
+      expect(skills.some((s) => s.name === 'simplify')).toBe(true);
     });
 
     it('should skip all skills in bare mode', async () => {
