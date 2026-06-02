@@ -269,13 +269,7 @@ export interface CLIPartialAssistantMessage {
   parent_tool_use_id: string | null;
 }
 
-export type PermissionMode =
-  | 'default'
-  | 'plan'
-  | 'auto-edit'
-  | 'auto'
-  | 'izn'
-  | 'izn';
+export type PermissionMode = 'default' | 'plan' | 'auto-edit' | 'auto' | 'izn';
 
 /**
  * Permission suggestion for tool use requests
