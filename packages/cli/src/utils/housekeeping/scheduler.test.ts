@@ -88,7 +88,7 @@ describe('_runHousekeepingForTesting', () => {
   beforeEach(() => {
     qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
     fileHistoryRoot = path.join(qwenHome, FILE_HISTORY_DIR);
-    vi.stubEnv('QWEN_HOME', qwenHome);
+    vi.stubEnv('HOPCODE_HOME', qwenHome);
   });
 
   afterEach(() => {
@@ -171,7 +171,7 @@ describe('_runPassForTesting (timer-chain defense)', () => {
 
   beforeEach(() => {
     qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
-    vi.stubEnv('QWEN_HOME', qwenHome);
+    vi.stubEnv('HOPCODE_HOME', qwenHome);
     resetInteraction();
   });
 
@@ -224,7 +224,7 @@ describe('startBackgroundHousekeeping', () => {
 
   beforeEach(() => {
     qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
-    vi.stubEnv('QWEN_HOME', qwenHome);
+    vi.stubEnv('HOPCODE_HOME', qwenHome);
     _resetForTesting();
     resetInteraction();
   });
