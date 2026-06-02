@@ -13,5 +13,4 @@ export type ApprovalModeValue =
   | 'default'
   | 'auto-edit'
   | 'auto'
-  | 'izn'
   | 'izn';

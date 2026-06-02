@@ -308,7 +308,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: undefined as string | undefined,
     description:
-      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.qwen/plans.',
+      'Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. Defaults to ~/.hopcode/plans.',
     showInDialog: false,
   },
 
@@ -407,7 +407,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: 30,
         description:
-          'Number of days to retain ~/.qwen/file-history/ session backups used by /rewind. Backups older than this are removed by a background housekeeping pass that runs at most once per day. Set to 0 for minimum retention (~1 hour) — protects sessions touched in the last hour, plus the currently active session. Other persistent caches will honor the same setting in the future.',
+          'Number of days to retain ~/.hopcode/file-history/ session backups used by /rewind. Backups older than this are removed by a background housekeeping pass that runs at most once per day. Set to 0 for minimum retention (~1 hour) — protects sessions touched in the last hour, plus the currently active session. Other persistent caches will honor the same setting in the future.',
         showInDialog: true,
       },
       gitCoAuthor: {
@@ -491,7 +491,7 @@ const SETTINGS_SCHEMA = {
         description:
           'The language for the user interface. Use "auto" to detect from system settings. ' +
           'You can also use custom language codes (e.g., "es", "fr") by placing JS language files ' +
-          'in ~/.qwen/locales/ (e.g., ~/.qwen/locales/es.js).',
+          'in ~/.hopcode/locales/ (e.g., ~/.hopcode/locales/es.js).',
         showInDialog: true,
         options: [] as readonly SettingEnumOption[],
       },
@@ -1763,8 +1763,7 @@ const SETTINGS_SCHEMA = {
           { value: ApprovalMode.DEFAULT, label: 'Default' },
           { value: ApprovalMode.AUTO_EDIT, label: 'Auto Edit' },
           { value: ApprovalMode.AUTO, label: 'Auto' },
-          { value: ApprovalMode.IZN, label: 'IZN' },
-          { value: ApprovalMode.YOLO, label: 'YOLO' },
+          { value: ApprovalMode.IZN, label: 'Izn' },
         ],
       },
       autoAccept: {
@@ -2066,7 +2065,7 @@ const SETTINGS_SCHEMA = {
         default: undefined as string | undefined,
         description:
           'Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). ' +
-          'Config files remain at ~/.qwen (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.',
+          'Config files remain at ~/.hopcode (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.',
         showInDialog: false,
       },
     },
@@ -2113,7 +2112,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: undefined as string | undefined,
             description:
-              'Custom base directory for Arena worktrees. Defaults to ~/.qwen/arena.',
+              'Custom base directory for Arena worktrees. Defaults to ~/.hopcode/arena.',
             showInDialog: false,
           },
           preserveArtifacts: {

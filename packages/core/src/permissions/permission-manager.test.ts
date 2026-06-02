@@ -1002,7 +1002,7 @@ describe('PermissionManager', () => {
     // produce a hard 'deny' from resolveDefaultPermission. Before the fix
     // the L4 default branch returned 'deny' for any command containing
     // $(), backticks, <(), or >(), which:
-    //   1. could not be overridden by YOLO mode, and
+    //   1. could not be overridden by IZN mode, and
     //   2. fired inconsistently — only when hasRelevantRules() happened to
     //      be true (e.g. a compound command where another sub-command
     //      matched an unrelated allow rule). Standalone substitution

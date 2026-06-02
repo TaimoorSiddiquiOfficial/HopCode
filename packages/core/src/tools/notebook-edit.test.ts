@@ -691,7 +691,7 @@ describe('NotebookEditTool', () => {
     ).toThrow(/additional properties|modified_notebook_content/i);
   });
 
-  it('rejects qwenignored notebooks during validation', () => {
+  it('rejects hopcodeignored notebooks during validation', () => {
     fs.writeFileSync(
       path.join(tempDir, '.hopcodeignore'),
       '*.ipynb\n',

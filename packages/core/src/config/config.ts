@@ -191,7 +191,6 @@ export enum ApprovalMode {
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
   IZN = 'izn',
-  YOLO = 'yolo',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -247,15 +246,10 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     name: 'Auto',
     description: 'LLM classifier auto-approves safe actions, blocks risky ones',
   },
-  [ApprovalMode.YOLO]: {
-    id: ApprovalMode.YOLO,
-    name: 'YOLO',
-    description: 'Automatically approve all tools',
-  },
   [ApprovalMode.IZN]: {
     id: ApprovalMode.IZN,
-    name: 'IZN',
-    description: 'IZN mode - Automatically approve all tools',
+    name: 'Izn',
+    description: 'Automatically approve all tools',
   },
 };
 
@@ -595,7 +589,7 @@ export interface WorktreeSettings {
    *
    * Paths must be relative to the repo root; absolute paths and any
    * entry containing `..` are rejected by the service. Entries that
-   * resolve to git-internal paths (`.git`, `.qwen`) are also rejected
+   * resolve to git-internal paths (`.git`, `.hopcode`) are also rejected
    * — symlinking those would either break git inside the worktree or
    * create a worktrees-inside-worktrees loop. Missing source dirs and
    * pre-existing destinations are silently skipped.
@@ -608,7 +602,7 @@ export interface AgentsCollabSettings {
   displayMode?: string;
   /** Arena-specific settings */
   arena?: {
-    /** Custom base directory for Arena worktrees (default: ~/.qwen/arena) */
+    /** Custom base directory for Arena worktrees (default: ~/.hopcode/arena) */
     worktreeBaseDir?: string;
     /** Preserve worktrees and state files after session ends */
     preserveArtifacts?: boolean;
@@ -834,7 +828,7 @@ export interface ConfigParameters {
   projectHooks?: Record<string, unknown>;
 
   hooks?: Record<string, unknown>;
-  /** Glob patterns to exclude from .qwen/rules/ loading. */
+  /** Glob patterns to exclude from .hopcode/rules/ loading. */
   contextRuleExcludes?: string[];
   /** Warnings generated during configuration resolution */
   warnings?: string[];
@@ -1700,13 +1694,13 @@ export class Config {
     // directory the worktree creators (`enter_worktree` and
     // `agent isolation:'worktree'`) write to. Using `this.targetDir`
     // directly would cause launches from a monorepo subdirectory to
-    // scan `<subdir>/.qwen/worktrees/` — which never exists — and the
+    // scan `<subdir>/.hopcode/worktrees/` — which never exists — and the
     // sweep would silently be a no-op forever.
     if (!this.getBareMode()) {
       void (async () => {
         try {
           // Resolve the repo top-level FIRST. The previous code bailed
-          // on `fs.access(<targetDir>/.qwen/worktrees)` before resolving,
+          // on `fs.access(<targetDir>/.hopcode/worktrees)` before resolving,
           // so a monorepo subdir launch (where `targetDir` is the
           // subdir, not the repo root) always early-returned and the
           // sweep was permanently a no-op. Fast-bail still happens, just

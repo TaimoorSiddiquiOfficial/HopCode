@@ -115,11 +115,8 @@ export function needsConfirmation(
 ): boolean {
   const isAskUserQuestionTool = toolName === ToolNames.ASK_USER_QUESTION;
 
-  // IZN and YOLO modes auto-approve everything except ask_user_question
-  if (
-    (approvalMode === ApprovalMode.IZN || approvalMode === ApprovalMode.YOLO) &&
-    !isAskUserQuestionTool
-  ) {
+  // IZN mode auto-approves everything except ask_user_question
+  if (approvalMode === ApprovalMode.IZN && !isAskUserQuestionTool) {
     return false;
   }
 

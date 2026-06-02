@@ -434,7 +434,7 @@ describe('convertClaudePluginPackage', () => {
       'crlf-agents-plugin',
     );
 
-    // Verify: agent file was properly parsed and converted into .qwen/agents folder structure
+    // Verify: agent file was properly parsed and converted into .hopcode/agents folder structure
     const convertedAgentsDir = path.join(result.convertedDir, 'agents');
     expect(fs.existsSync(convertedAgentsDir)).toBe(true);
 
@@ -682,7 +682,7 @@ describe('performVariableReplacement for Claude extensions', () => {
     }
   });
 
-  it('should replace .claude with .qwen in shell scripts', () => {
+  it('should replace .claude with .hopcode in shell scripts', () => {
     const extDir = path.join(testDir, 'ext-sh');
     fs.mkdirSync(extDir, { recursive: true });
 

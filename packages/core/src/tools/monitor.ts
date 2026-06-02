@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -174,12 +174,12 @@ class MonitorToolInvocation extends BaseToolInvocation<
 
     // Command substitution ($(), ``, <(), >()) is NOT a hard deny here —
     // it falls through to 'ask' along with every other non-read-only
-    // command, so the user (or YOLO mode) can decide. The user-facing
+    // command, so the user (or IZN mode) can decide. The user-facing
     // warning is surfaced by getConfirmationDetails below so the
     // confirmation prompt still flags the substitution clearly. This
     // mirrors the same reasoning applied to ShellToolInvocation and
     // PermissionManager.resolveDefaultPermission in #4093: a hard deny
-    // here (a) cannot be overridden by YOLO and (b) was inconsistent
+    // here (a) cannot be overridden by IZN and (b) was inconsistent
     // with the shell-tool path. Monitor still maintains a separate
     // permission boundary (Monitor(...) rules don't share with
     // Bash(...) — see comment in getConfirmationDetails); only the

@@ -30,7 +30,7 @@ qwen --resume <session-id> --worktree=my-feature
 >
 > - `qwen --worktree=my-feature "say hi"` (always works — explicit slug via `=`)
 > - `qwen "say hi" --worktree` (positional first, flag at the end → auto slug)
-> - `qwen --worktree --approval-mode yolo "say hi"` (any flag between them anchors the bare form)
+> - `qwen --worktree --approval-mode izn "say hi"` (any flag between them anchors the bare form)
 
 > **Tip — `qwen --resume --worktree foo` (no session ID) shows an empty picker on first use.** The picker scopes to the chosen worktree's session storage; sessions started outside that worktree are not listed. To resume a session that was started inside `foo`, use `qwen --resume <id> --worktree foo` directly — the CLI re-attaches to the existing `foo/` directory rather than re-creating it.
 

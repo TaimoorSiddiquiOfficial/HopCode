@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -237,7 +237,7 @@ describe('Session', () => {
 
     mockToolRegistry = {
       getTool: vi.fn(),
-      // #executePrompt â†’ #buildInitialSystemReminders calls
+      // #executePrompt → #buildInitialSystemReminders calls
       // getToolRegistry().ensureTool(ToolNames.AGENT) on every session.prompt(),
       // so the default mock must provide it (#1151 / #3479).
       ensureTool: vi.fn().mockResolvedValue(true),
@@ -1892,7 +1892,7 @@ describe('Session', () => {
 
     it('passes resolved paths to read_many_files tool', async () => {
       const tempDir = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'hopcode-acp-session-'),
+        path.join(os.tmpdir(), 'qwen-acp-session-'),
       );
       const fileName = 'README.md';
       const filePath = path.join(tempDir, fileName);
@@ -3054,12 +3054,12 @@ describe('Session', () => {
     describe('tool call concurrency', () => {
       it('runs multiple Agent tool calls concurrently (issue #2516)', async () => {
         // Each Agent call has two controllable async boundaries:
-        //   - `called`  â€” resolves *when* the test code reaches `execute()`
-        //   - `result`  â€” the promise `execute()` returns, resolved by the
+        //   - `called`  — resolves *when* the test code reaches `execute()`
+        //   - `result`  — the promise `execute()` returns, resolved by the
         //                 test after observing both `called` signals.
         //
         // Under the old sequential for-loop, call-b's `execute()` would
-        // only run after call-a's `execute()` promise resolved â€” so the
+        // only run after call-a's `execute()` promise resolved — so the
         // `await Promise.all([called-a, called-b])` below deadlocks and
         // the test hits vitest's default per-test timeout. Under the
         // concurrent implementation both `called` signals fire before
@@ -3146,7 +3146,7 @@ describe('Session', () => {
         });
 
         // Wait until both `execute()` bodies have been entered. Sequential
-        // behaviour deadlocks here â†’ vitest times out the test â†’ failure.
+        // behaviour deadlocks here → vitest times out the test → failure.
         await Promise.all([called['call-a'].promise, called['call-b'].promise]);
 
         // Resolve out of order to also verify that final part ordering
@@ -3157,7 +3157,7 @@ describe('Session', () => {
         await promptPromise;
 
         // The second sendMessageStream invocation carries the tool responses
-        // that will be fed back to the model â€” assert their order matches
+        // that will be fed back to the model — assert their order matches
         // the original function-call order (A before B).
         expect(sendMessageStream).toHaveBeenCalledTimes(2);
         const followUp = sendMessageStream.mock.calls[1][1] as {

@@ -2443,7 +2443,7 @@ describe('Settings Loading and Merging', () => {
       delete process.env['HOME_ENV_TOKEN'];
     });
 
-    it('should prefer ~/.qwen/.env over ~/.env for the same key (first-write-wins) (#4466)', () => {
+    it('should prefer ~/.hopcode/.env over ~/.env for the same key (first-write-wins) (#4466)', () => {
       const qwenEnvPath = path.join(path.dirname(USER_SETTINGS_PATH), '.env');
       const homeEnvPath = path.join(
         path.dirname(path.dirname(USER_SETTINGS_PATH)),
@@ -2467,7 +2467,7 @@ describe('Settings Loading and Merging', () => {
         (p: fs.PathOrFileDescriptor) => {
           if (p === USER_SETTINGS_PATH)
             return JSON.stringify(userSettingsContent);
-          if (p === qwenEnvPath) return 'PRECEDENCE_TOKEN=from_qwen_dir';
+          if (p === qwenEnvPath) return 'PRECEDENCE_TOKEN=from_hopcode_dir';
           if (p === homeEnvPath) return 'PRECEDENCE_TOKEN=from_home_dir';
           return '{}';
         },
@@ -2482,7 +2482,7 @@ describe('Settings Loading and Merging', () => {
         { headers?: Record<string, string> }
       >;
       expect(mcpServers?.['myServer']?.headers?.['Authorization']).toBe(
-        'Bearer from_qwen_dir',
+        'Bearer from_hopcode_dir',
       );
 
       delete process.env['PRECEDENCE_TOKEN'];

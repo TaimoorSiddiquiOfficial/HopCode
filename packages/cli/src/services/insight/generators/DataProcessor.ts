@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Code
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 

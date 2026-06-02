@@ -210,10 +210,6 @@ export const hooksCommand: SlashCommand = {
     }
 
     const result = await listCommand.action?.(context, args);
-    return (result ?? {
-      type: 'message',
-      messageType: 'info',
-      content: '',
-    }) as SlashCommandActionReturn;
+    return result ?? { type: 'message', messageType: 'info', content: '' };
   },
 };

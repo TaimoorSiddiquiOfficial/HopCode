@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,8 +36,8 @@ export async function runThrottledOnce(
   const minIntervalMs = opts.minIntervalMs ?? ONE_DAY_MS;
   const staleLockMs = opts.staleLockMs ?? STALE_LOCK_MS;
 
-  // First-ever housekeeping pass may run before ~/.qwen/ exists. mode 0o700
-  // matches the rest of the codebase's convention for ~/.qwen/ subdirs
+  // First-ever housekeeping pass may run before ~/.hopcode/ exists. mode 0o700
+  // matches the rest of the codebase's convention for ~/.hopcode/ subdirs
   // (e.g., file-token-storage.ts, sharedTokenManager.ts) so a slow main-app
   // initialization doesn't get races us into creating a world-readable dir.
   await mkdir(dirname(opts.lockPath), { recursive: true, mode: 0o700 }).catch(

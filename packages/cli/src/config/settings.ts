@@ -526,7 +526,7 @@ export function createMinimalSettings(): LoadedSettings {
  *
  * User-level paths cover the home `.env` and the global Qwen config dir
  * `.env` (which respects `QWEN_HOME`). When `QWEN_HOME` redirects elsewhere,
- * the legacy `<homedir>/.qwen/.env` is also included so credentials users
+ * the legacy `<homedir>/.hopcode/.env` is also included so credentials users
  * left there continue to load (and the trust check in untrusted workspaces
  * still allows reading it).
  */
@@ -548,7 +548,7 @@ function getUserLevelEnvPaths(): Set<string> {
  * module-load `Storage.getGlobalHopCodeDir()` would otherwise snapshot legacy
  * paths for settings.json, OAuth tokens, installation_id, etc., while the
  * regular `.env` load (inside `loadSettings`) only runs later — splitting
- * global state between `~/.qwen/...` and `<QWEN_HOME>/...`.
+ * global state between `~/.hopcode/...` and `<QWEN_HOME>/...`.
  *
  * Only home-scoped paths are consulted; project `.env` files are barred from
  * changing these vars by `PROJECT_ENV_HARDCODED_EXCLUSIONS`.
@@ -570,7 +570,7 @@ export function preResolveHomeEnvOverrides(): void {
 
   // Storage.getGlobalHopCodeDir() shares the same homedir resolution as the
   // rest of the storage layer; when QWEN_HOME is unset it equals
-  // `<homedir>/.qwen`, so path.dirname() recovers `<homedir>`.
+  // `<homedir>/.hopcode`, so path.dirname() recovers `<homedir>`.
   const initialQwenHome = process.env['HOPCODE_HOME'];
   const initialQwenDir = Storage.getGlobalHopCodeDir();
   const candidates: string[] = [path.join(initialQwenDir, '.env')];
@@ -752,7 +752,7 @@ function findEnvFile(
       const found = findHomeCandidate();
       if (found) return found;
     } else {
-      // Workspace step: prefer .qwen/.env, then plain .env.
+      // Workspace step: prefer .hopcode/.env, then plain .env.
       const geminiEnvPath = path.join(currentDir, HOPCODE_DIR, '.env');
       if (fs.existsSync(geminiEnvPath) && canUseEnvFile(geminiEnvPath)) {
         return geminiEnvPath;
@@ -821,12 +821,12 @@ export function loadEnvironment(settings: Settings): void {
       const excludedVars =
         settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
       const normalizedEnvFilePath = path.normalize(envFilePath);
-      // homeScoped: `.env` lives under the user's home Qwen dir or `~/.env` —
+      // homeScoped: `.env` lives under the user's home HopCode dir or `~/.env` —
       //   only these may set QWEN_HOME / QWEN_RUNTIME_DIR.
-      // qwenScoped: any `.env` whose immediate parent is `.qwen` (including
-      //   `<repo>/.qwen/.env`) — exempt from the user `excludedEnvVars` list.
+      // hopCodeScoped: any `.env` whose immediate parent is `.hopcode` (including
+      //   `<repo>/.hopcode/.env`) — exempt from the user `excludedEnvVars` list.
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
-      const isQwenScopedEnvFile =
+      const isHopCodeScopedEnvFile =
         isHomeScopedEnvFile ||
         path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
 
@@ -838,7 +838,7 @@ export function loadEnvironment(settings: Settings): void {
           ) {
             continue;
           }
-          if (!isQwenScopedEnvFile && excludedVars.includes(key)) {
+          if (!isHopCodeScopedEnvFile && excludedVars.includes(key)) {
             continue;
           }
 
@@ -871,7 +871,7 @@ export const CORRUPTED_SUFFIX = '.corrupted';
 
 /**
  * Load and merge settings from all scopes:
- * System Defaults → User (~/.qwen/settings.json) → Workspace → System.
+ * System Defaults → User (~/.hopcode/settings.json) → Workspace → System.
  */
 export function loadSettings(
   workspaceDir: string = process.cwd(),

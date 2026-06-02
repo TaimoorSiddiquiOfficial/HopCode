@@ -1102,8 +1102,8 @@ export class GitWorktreeService {
    * repo.
    *
    * Used by Phase D-1's re-attach path: when `--worktree foo` is passed
-   * and `<repoRoot>/.qwen/worktrees/foo` already exists on disk, we
-   * verify it really IS a Qwen-managed worktree of the current repo (not
+   * and `<repoRoot>/.hopcode/worktrees/foo` already exists on disk, we
+   * verify it really IS a HopCode-managed worktree of the current repo (not
    * a standalone `git init` someone dropped at that path) before
    * assuming it's safe to chdir into. Returning the HEAD SHA in the
    * same call avoids a second subprocess to recapture it after chdir.
@@ -1123,7 +1123,7 @@ export class GitWorktreeService {
    * 4. `--show-toplevel` → git's idea of the worktree top. For a real
    *    linked worktree this equals `worktreePath`; for a plain
    *    directory living UNDER the main repo (e.g. `mkdir
-   *    <repo>/.qwen/worktrees/foo`) git walks up to the outer `.git`
+   *    <repo>/.hopcode/worktrees/foo`) git walks up to the outer `.git`
    *    and returns the OUTER repo's root — which would otherwise pass
    *    the common-dir check and let us "re-attach" to a non-worktree
    *    directory. Compare paths to reject this.
@@ -1642,7 +1642,7 @@ export class GitWorktreeService {
       return;
     }
     const gitDirAbs = path.join(repoRootAbs, '.git');
-    const qwenDirAbs = path.join(repoRootAbs, '.qwen');
+    const hopcodeDirAbs = path.join(repoRootAbs, '.hopcode');
     // Same canonical-vs-canonical requirement for the dest side. The
     // worktree was just created by `git worktree add`, so the path
     // should exist; fall back to the input path on realpath error so a
@@ -1699,14 +1699,14 @@ export class GitWorktreeService {
       // Refuse to symlink git-internal paths into the worktree. `.git`
       // would silently break commits / status / diff inside the
       // worktree (the worktree's own gitlink file points at the parent
-      // common-dir, and a symlink would shadow it). The whole `.qwen`
-      // tree is also off-limits: linking `.qwen` (parent) would
-      // recursively pull `.qwen/worktrees` into the new worktree,
-      // recreating the loop; linking `.qwen/worktrees` directly
-      // creates the same loop more obviously; and `.qwen/projects`
-      // / `.qwen/tmp` are CLI metadata users have no legitimate
+      // common-dir, and a symlink would shadow it). The whole `.hopcode`
+      // tree is also off-limits: linking `.hopcode` (parent) would
+      // recursively pull `.hopcode/worktrees` into the new worktree,
+      // recreating the loop; linking `.hopcode/worktrees` directly
+      // creates the same loop more obviously; and `.hopcode/projects`
+      // / `.hopcode/tmp` are CLI metadata users have no legitimate
       // reason to share across worktrees.
-      // `gitDirAbs` / `qwenDirAbs` are canonical (derived from the
+      // `gitDirAbs` / `hopcodeDirAbs` are canonical (derived from the
       // realpath'd `repoRootAbs` hoisted above the loop), so these
       // comparisons stay consistent with the post-stat realpath check.
       if (isWithinRoot(sourceAbs, gitDirAbs)) {
@@ -1715,10 +1715,10 @@ export class GitWorktreeService {
         );
         continue;
       }
-      if (isWithinRoot(sourceAbs, qwenDirAbs)) {
+      if (isWithinRoot(sourceAbs, hopcodeDirAbs)) {
         debugLogger.warn(
           `symlinkConfiguredDirectories: refusing path "${raw}" — ` +
-            `the .qwen tree is CLI-managed; symlinking any of it could ` +
+            `the .hopcode tree is CLI-managed; symlinking any of it could ` +
             `create a worktrees-inside-worktrees loop or alias CLI metadata.`,
         );
         continue;
@@ -1748,7 +1748,7 @@ export class GitWorktreeService {
       // containment + blocklist checks against the realpath. The lexical
       // checks above only see `path.resolve(repoRoot, raw)` — they can't
       // tell that `<repo>/node_modules` is actually a symlink chaining
-      // into `.git`, an outside dir, or `.qwen`. Without this step a
+      // into `.git`, an outside dir, or `.hopcode`. Without this step a
       // committed-or-out-of-band source symlink bypasses every guard the
       // lexical loop set up. Use the realpath as the symlink target so
       // the new link points canonically rather than preserving the chain.
@@ -1773,9 +1773,9 @@ export class GitWorktreeService {
         );
         continue;
       }
-      if (isWithinRoot(realSource, qwenDirAbs)) {
+      if (isWithinRoot(realSource, hopcodeDirAbs)) {
         debugLogger.warn(
-          `symlinkConfiguredDirectories: refusing path "${raw}" — real source ${realSource} resolves inside .qwen`,
+          `symlinkConfiguredDirectories: refusing path "${raw}" — real source ${realSource} resolves inside .hopcode`,
         );
         continue;
       }

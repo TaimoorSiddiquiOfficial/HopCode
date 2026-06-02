@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -419,7 +419,7 @@ describe('MonitorTool', () => {
     // Command substitution previously returned 'deny' here. Per #4093 it
     // now falls through to 'ask' (matching ShellToolInvocation and
     // PermissionManager.resolveDefaultPermission); the substitution
-    // warning is surfaced via getConfirmationDetails. YOLO mode can now
+    // warning is surfaced via getConfirmationDetails. IZN mode can now
     // override the prompt; before this change it could not.
     it('asks for command substitution before confirmation', async () => {
       const invocation = createInvocation({

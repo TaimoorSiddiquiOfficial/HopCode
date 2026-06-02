@@ -400,10 +400,10 @@ export class PermissionManager {
    *
    * Command substitution ($(), ``, <(), >()) is NOT a hard deny here — it
    * falls through to 'ask' along with every other non-read-only command, so
-   * the user (or YOLO mode) can decide. The user-facing warning is surfaced
+   * the user (or IZN mode) can decide. The user-facing warning is surfaced
    * by ShellToolInvocation.getConfirmationDetails so the confirmation prompt
    * still flags the substitution clearly. See issue #4093 for why a hard
-   * deny here is wrong: it (a) cannot be overridden by YOLO mode and (b)
+   * deny here is wrong: it (a) cannot be overridden by IZN mode and (b)
    * fires inconsistently based on whether the PermissionManager has
    * "relevant" rules for the surrounding compound command.
    *

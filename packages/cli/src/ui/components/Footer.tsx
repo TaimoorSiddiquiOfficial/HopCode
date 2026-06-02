@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,11 +16,13 @@ import { MCPHealthPill } from './mcp/MCPHealthPill.js';
 import { isNarrowWidth } from '../utils/isNarrowWidth.js';
 
 import { useStatusLine } from '../hooks/useStatusLine.js';
+import { useConfigInitMessage } from '../hooks/useConfigInitMessage.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { useVimMode } from '../contexts/VimModeContext.js';
 import { ApprovalMode } from '@hoptrendy/hopcode-core';
+import { GeminiSpinner } from './GeminiRespondingSpinner.js';
 import { GoalPill, useFooterGoalState } from './GoalPill.js';
 import { t } from '../../i18n/index.js';
 
@@ -35,6 +37,7 @@ export const Footer: React.FC = () => {
     respectUserColors,
     hideContextIndicator,
   } = useStatusLine();
+  const configInitMessage = useConfigInitMessage(uiState.isConfigInitialized);
 
   const { promptTokenCount, showAutoAcceptIndicator } = {
     promptTokenCount: uiState.sessionStats.lastPromptTokenCount,
@@ -60,19 +63,20 @@ export const Footer: React.FC = () => {
   const contextWindowSize =
     config.getContentGeneratorConfig()?.contextWindowSize;
 
-  // Determine if config is still initializing
-  const isInitializing = uiState.isConfigInitialized === false;
-
   // Hide "? for shortcuts" when a custom status line is active (it already
   // occupies the footer, so the hint is redundant). Matches upstream behavior.
-  const suppressHint = isInitializing || statusLineLines.length > 0;
+  const suppressHint = statusLineLines.length > 0;
 
-  // Left bottom row: high-priority messages > approval mode > hint.
-  const leftBottomContent = isInitializing ? (
-    <Text color={theme.text.secondary} dimColor>
-      {t('Initializing...')}
-    </Text>
-  ) : uiState.ctrlCPressedOnce ? (
+  // MCP init progress lives in this row (not a standalone component above the
+  // input) so the live area's height is constant in the default case, avoiding
+  // the residual-blank-line artifact left behind when a separate block unmounts.
+  // When a custom status line is active, the row shrinks by 1 on transition to
+  // ready — a one-time, small regression preferred over hiding init progress.
+  //
+  // `configInitMessage` is placed ahead of `showAutoAcceptIndicator` so users
+  // launched with IZN / auto-accept-edits still see the ~1s startup progress;
+  // the approval-mode indicator takes over as soon as init finishes.
+  const leftBottomContent = uiState.ctrlCPressedOnce ? (
     <Text color={theme.status.warning}>{t('Press Ctrl+C again to exit.')}</Text>
   ) : uiState.ctrlDPressedOnce ? (
     <Text color={theme.status.warning}>{t('Press Ctrl+D again to exit.')}</Text>
@@ -86,6 +90,10 @@ export const Footer: React.FC = () => {
     <Text color={theme.text.secondary}>-- INSERT --</Text>
   ) : uiState.shellModeActive ? (
     <ShellModeIndicator />
+  ) : configInitMessage ? (
+    <Text color={theme.text.secondary}>
+      <GeminiSpinner /> {configInitMessage}
+    </Text>
   ) : showAutoAcceptIndicator !== undefined &&
     showAutoAcceptIndicator !== ApprovalMode.DEFAULT ? (
     <AutoAcceptIndicator approvalMode={showAutoAcceptIndicator} />
