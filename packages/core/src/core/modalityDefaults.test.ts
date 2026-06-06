@@ -107,7 +107,7 @@ describe('defaultModalities', () => {
 
   describe('Qwen', () => {
     it('returns image + video for qwen-vl-max', () => {
-      const m = defaultModalities('hopcode-vl-max');
+      const m = defaultModalities('qwen-vl-max');
       expect(m.image).toBe(true);
       expect(m.video).toBe(true);
       expect(m.pdf).toBeUndefined();
@@ -148,7 +148,7 @@ describe('defaultModalities', () => {
     });
 
     it('returns text-only for qwen-turbo', () => {
-      expect(defaultModalities('hopcode-turbo')).toEqual({});
+      expect(defaultModalities('qwen-turbo')).toEqual({});
     });
   });
 
@@ -179,6 +179,14 @@ describe('defaultModalities', () => {
   });
 
   describe('MiniMax', () => {
+    it('returns image + video for MiniMax-M3', () => {
+      const m = defaultModalities('MiniMax-M3');
+      expect(m.image).toBe(true);
+      expect(m.video).toBe(true);
+      expect(m.pdf).toBeUndefined();
+      expect(m.audio).toBeUndefined();
+    });
+
     it('returns text-only for MiniMax-M2.5', () => {
       expect(defaultModalities('MiniMax-M2.5')).toEqual({});
     });

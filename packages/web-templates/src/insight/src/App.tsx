@@ -160,7 +160,7 @@ function InsightApp({ data }: { data: InsightData }) {
       hasRecordEntries(data.friction));
   const showFeatures =
     !!data.qualitative &&
-    (hasMeaningfulArray(data.qualitative.improvements?.Hopcode_md_additions) ||
+    (hasMeaningfulArray(data.qualitative.improvements?.HopCode_md_additions) ||
       hasMeaningfulArray(data.qualitative.improvements?.features_to_try));
   const showPatterns =
     !!data.qualitative &&
@@ -179,7 +179,7 @@ function InsightApp({ data }: { data: InsightData }) {
   if (showInteractionStyle) {
     navSections.push({
       href: '#section-usage',
-      label: 'How You Use Qwen Code',
+      label: 'How You Use HopCode',
     });
   }
   if (showImpressiveWorkflows) {

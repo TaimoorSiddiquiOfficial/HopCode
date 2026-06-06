@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -128,10 +128,7 @@ export class TipHistory {
    * Load history from disk, incrementing session count.
    */
   static load(): TipHistory {
-    const filePath = path.join(
-      Storage.getGlobalHopCodeDir(),
-      'tip_history.json',
-    );
+    const filePath = path.join(Storage.getGlobalHopCodeDir(), 'tip_history.json');
     let data: TipHistoryData = { sessionCount: 0, tips: {} };
     try {
       if (fs.existsSync(filePath)) {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,48 +20,43 @@ const FULL_MULTIMODAL: InputModalities = {
  */
 const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   // -------------------
-  // Google Gemini � full multimodal
+  // Google Gemini — full multimodal
   // -------------------
   [/^gemini-3/, FULL_MULTIMODAL],
   [/^gemini-/, FULL_MULTIMODAL],
 
   // -------------------
-  // OpenAI � image by default for all gpt/o-series models
+  // OpenAI — image by default for all gpt/o-series models
   // -------------------
   [/^gpt-5/, { image: true }],
   [/^gpt-/, { image: true }],
   [/^o\d/, { image: true }],
 
   // -------------------
-  // Anthropic Claude � image + pdf
+  // Anthropic Claude — image + pdf
   // -------------------
   [/^claude-/, { image: true, pdf: true }],
 
   // -------------------
-  // Alibaba / HopCode
+  // Alibaba / Qwen
   // -------------------
   // Qwen3.5-Plus, Qwen3.6-Plus: image + video support
   [/^qwen3\.5-plus/, { image: true, video: true }],
   [/^qwen3\.6-plus/, { image: true, video: true }],
   [/^coder-model$/, { image: true, video: true }],
 
-  // HopCode VL (vision-language) models: image + video
+  // Qwen VL (vision-language) models: image + video
   [/^qwen-vl-/, { image: true, video: true }],
-  [/^hopcode-vl-/, { image: true, video: true }],
   [/^qwen3-vl-/, { image: true, video: true }],
-  [/^hopcode3-vl-/, { image: true, video: true }],
 
-  // HopCode coder / text models: text-only
+  // Qwen coder / text models: text-only
   [/^qwen3-coder-/, {}],
-  [/^hopcode3-coder-/, {}],
   // Qwen3.6-35B-A3B (local quant variants) — image + video
   [/^qwen3\.6-35b/, { image: true, video: true }],
-  [/^hopcode3\.6-35b/, { image: true, video: true }],
   [/^qwen/, {}],
-  [/^hopcode/, {}],
 
   // -------------------
-  // DeepSeek � text-only
+  // DeepSeek — text-only
   // -------------------
   [/^deepseek/, {}],
 
@@ -73,8 +68,9 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   [/^glm-/, {}],
 
   // -------------------
-  // MiniMax � text-only
+  // MiniMax — M3 supports image + video input; older models default to text-only
   // -------------------
+  [/^minimax-m3/i, { image: true, video: true }],
   [/^minimax-/, {}],
 
   // -------------------

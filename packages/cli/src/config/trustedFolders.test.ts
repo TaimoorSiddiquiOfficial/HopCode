@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -169,9 +169,9 @@ describe('Trusted Folders Loading', () => {
     expect(errors[0].message).toContain('Unexpected token');
   });
 
-  it('should use HOPCODE_TRUSTED_FOLDERS_PATH env var if set', () => {
+  it('should use HOPCODE_CODE_TRUSTED_FOLDERS_PATH env var if set', () => {
     const customPath = '/custom/path/to/trusted_folders.json';
-    process.env['HOPCODE_TRUSTED_FOLDERS_PATH'] = customPath;
+    process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = customPath;
 
     (mockFsExistsSync as Mock).mockImplementation((p) => p === customPath);
     const userContent = {
@@ -191,7 +191,7 @@ describe('Trusted Folders Loading', () => {
     ]);
     expect(errors).toEqual([]);
 
-    delete process.env['HOPCODE_TRUSTED_FOLDERS_PATH'];
+    delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
   });
 
   it('setValue should update the user config and save it', () => {

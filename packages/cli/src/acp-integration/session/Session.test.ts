@@ -199,7 +199,7 @@ describe('Session', () => {
     ensureTool: ReturnType<typeof vi.fn>;
   };
   beforeEach(() => {
-    currentModel = 'qwen3-code-plus';
+    currentModel = 'hopcode3-code-plus';
     currentAuthType = AuthType.USE_OPENAI;
     switchModelSpy = vi
       .fn()
@@ -470,7 +470,7 @@ describe('Session', () => {
 
   describe('setModel', () => {
     it('sets model via config and returns current model', async () => {
-      const requested = `qwen3-coder-plus(${AuthType.USE_OPENAI})`;
+      const requested = `hopcode3-coder-plus(${AuthType.USE_OPENAI})`;
       await session.setModel({
         sessionId: 'test-session-id',
         modelId: `  ${requested}  `,
@@ -478,13 +478,13 @@ describe('Session', () => {
 
       expect(mockConfig.switchModel).toHaveBeenCalledWith(
         AuthType.USE_OPENAI,
-        'qwen3-coder-plus',
+        'hopcode3-coder-plus',
         undefined,
       );
       expect(mockSettings.setValue).toHaveBeenCalledWith(
         SettingScope.User,
         'model.name',
-        'qwen3-coder-plus',
+        'hopcode3-coder-plus',
       );
       expect(mockSettings.setValue).toHaveBeenCalledWith(
         SettingScope.User,
@@ -509,14 +509,14 @@ describe('Session', () => {
       await session.setModel(
         {
           sessionId: 'test-session-id',
-          modelId: `qwen3-coder-flash(${AuthType.USE_OPENAI})`,
+          modelId: `hopcode3-coder-flash(${AuthType.USE_OPENAI})`,
         },
         { persistDefault: false },
       );
 
       expect(mockConfig.switchModel).toHaveBeenCalledWith(
         AuthType.USE_OPENAI,
-        'qwen3-coder-flash',
+        'hopcode3-coder-flash',
         undefined,
       );
       expect(mockSettings.setValue).not.toHaveBeenCalled();
@@ -896,7 +896,7 @@ describe('Session', () => {
 
         expect(mockChat.sendMessageStream).not.toHaveBeenCalled();
         expect(compressedChat.sendMessageStream).toHaveBeenCalledWith(
-          'qwen3-code-plus',
+          'hopcode3-code-plus',
           {
             message: expect.any(Array),
             config: { abortSignal: expect.any(AbortSignal) },
@@ -927,7 +927,7 @@ describe('Session', () => {
             content: {
               type: 'text',
               text:
-                'IMPORTANT: This conversation approached the input token limit for qwen3-code-plus. ' +
+                'IMPORTANT: This conversation approached the input token limit for hopcode3-code-plus. ' +
                 'A compressed context will be sent for future messages (compressed from: 1200 to 450 tokens).',
             },
           },
@@ -957,7 +957,7 @@ describe('Session', () => {
             content: {
               type: 'text',
               text:
-                'IMPORTANT: This conversation accumulated enough tool screenshots to trigger compaction for qwen3-code-plus. ' +
+                'IMPORTANT: This conversation accumulated enough tool screenshots to trigger compaction for hopcode3-code-plus. ' +
                 'A compressed context will be sent for future messages (compressed from: 1200 to 450 tokens).',
             },
           },
@@ -983,7 +983,7 @@ describe('Session', () => {
           expect.any(AbortSignal),
         );
         expect(mockChat.sendMessageStream).toHaveBeenCalledWith(
-          'qwen3-code-plus',
+          'hopcode3-code-plus',
           {
             message: expect.any(Array),
             config: { abortSignal: expect.any(AbortSignal) },
@@ -1322,7 +1322,7 @@ describe('Session', () => {
             content: {
               type: 'text',
               text:
-                'IMPORTANT: This conversation approached the input token limit for qwen3-code-plus. ' +
+                'IMPORTANT: This conversation approached the input token limit for hopcode3-code-plus. ' +
                 'A compressed context will be sent for future messages (compressed from: 1200 to 101 tokens).',
             },
           },
@@ -1892,7 +1892,7 @@ describe('Session', () => {
 
     it('passes resolved paths to read_many_files tool', async () => {
       const tempDir = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'qwen-acp-session-'),
+        path.join(os.tmpdir(), 'hopcode-acp-session-'),
       );
       const fileName = 'README.md';
       const filePath = path.join(tempDir, fileName);

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  *
  */
@@ -21,7 +21,7 @@ import type {
   HopCodeCredentials,
   TokenRefreshData,
   ErrorData,
-} from './hopCodeOAuth2.js';
+} from './hopcodeOAuth2.js';
 
 // Mock external dependencies
 vi.mock('node:fs', () => ({
@@ -639,7 +639,7 @@ describe('SharedTokenManager', () => {
       await expect(
         tokenManager.getValidCredentials(mockClient),
       ).rejects.toThrow(TokenManagerError);
-    }, 500); // 500ms timeout for lock test (3 attempts � 50ms = ~150ms + buffer)
+    }, 500); // 500ms timeout for lock test (3 attempts × 50ms = ~150ms + buffer)
 
     it('should handle refresh response without access token', async () => {
       // Create a fresh token manager instance to avoid state contamination
@@ -835,9 +835,7 @@ describe('SharedTokenManager', () => {
 
   describe('CredentialsClearRequiredError handling', () => {
     it('should clear memory cache when CredentialsClearRequiredError is thrown during refresh', async () => {
-      const { CredentialsClearRequiredError } = await import(
-        './hopCodeOAuth2.js'
-      );
+      const { CredentialsClearRequiredError } = await import('./hopcodeOAuth2.js');
 
       const tokenManager = SharedTokenManager.getInstance();
       tokenManager.clearCache();
@@ -901,9 +899,7 @@ describe('SharedTokenManager', () => {
     });
 
     it('should convert CredentialsClearRequiredError to TokenManagerError', async () => {
-      const { CredentialsClearRequiredError } = await import(
-        './hopCodeOAuth2.js'
-      );
+      const { CredentialsClearRequiredError } = await import('./hopcodeOAuth2.js');
 
       const tokenManager = SharedTokenManager.getInstance();
       tokenManager.clearCache();

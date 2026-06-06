@@ -5,8 +5,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { cleanup, renderWithProviders } from '../../../test-utils/render.js';
+import { cleanup } from 'ink-testing-library';
 import { HooksManagementDialog } from './HooksManagementDialog.js';
+import { renderWithProviders } from '../../../test-utils/render.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { useConfig } from '../../contexts/ConfigContext.js';
 import { loadSettings, SettingScope } from '../../../config/settings.js';
@@ -74,19 +75,18 @@ vi.mock('../../hooks/useTerminalSize.js', () => ({
 vi.mock('../../contexts/ConfigContext.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../contexts/ConfigContext.js')>();
-  const stableConfig = {
-    getExtensions: vi.fn(() => []),
-    getDisableAllHooks: vi.fn(() => false),
-    getHookSystem: vi.fn(() => ({
-      getSessionHooksManager: vi.fn(() => ({
-        getAllSessionHooks: vi.fn(() => []),
-      })),
-    })),
-    getSessionId: vi.fn(() => 'test-session-id'),
-  };
   return {
     ...actual,
-    useConfig: vi.fn(() => stableConfig),
+    useConfig: vi.fn(() => ({
+      getExtensions: vi.fn(() => []),
+      getDisableAllHooks: vi.fn(() => false),
+      getHookSystem: vi.fn(() => ({
+        getSessionHooksManager: vi.fn(() => ({
+          getAllSessionHooks: vi.fn(() => []),
+        })),
+      })),
+      getSessionId: vi.fn(() => 'test-session-id'),
+    })),
   };
 });
 
@@ -154,12 +154,15 @@ function mockSettingsHooks(userHooks: Record<string, unknown>): void {
 }
 
 function pressKey(name: string, sequence = ''): void {
-  const latestHandler = mockedUseKeypress.mock.calls.at(-1)?.[0];
-  expect(latestHandler).toBeDefined();
-  latestHandler!(createKey(name, sequence));
+  expect(keypressHandler).toBeDefined();
+  keypressHandler!(createKey(name, sequence));
 }
 
-const NAV_TIMEOUT = { timeout: 10_000 };
+async function waitForNextKeypressHandler(previousCalls: number): Promise<void> {
+  await vi.waitFor(() => {
+    expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(previousCalls);
+  });
+}
 
 describe('HooksManagementDialog', () => {
   const mockOnClose = vi.fn();
@@ -246,28 +249,37 @@ describe('HooksManagementDialog', () => {
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
-    }, NAV_TIMEOUT);
-
-    pressKey('return');
+    });
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain('[User] Read');
-    }, NAV_TIMEOUT);
+      expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(1);
+    });
 
+    let handlerCalls = mockedUseKeypress.mock.calls.length;
+    pressKey('return');
+    await waitForNextKeypressHandler(handlerCalls);
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain('PreToolUse - Matchers');
+    });
+
+    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('down');
+    await waitForNextKeypressHandler(handlerCalls);
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [User] Bash');
-    }, NAV_TIMEOUT);
+    });
+    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('return');
+    await waitForNextKeypressHandler(handlerCalls);
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('PreToolUse - Matcher: Bash');
       expect(lastFrame()).toContain('echo bash');
-    }, NAV_TIMEOUT);
+    });
 
     pressKey('escape', '\x1b');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('PreToolUse - Matchers');
-    }, NAV_TIMEOUT);
+    });
   });
 
   it('should navigate from matcher detail to config detail', async () => {
@@ -293,31 +305,31 @@ describe('HooksManagementDialog', () => {
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
-    }, NAV_TIMEOUT);
+    });
 
     pressKey('return');
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain('[User] Read');
-    }, NAV_TIMEOUT);
+      expect(lastFrame()).toContain('PreToolUse - Matchers');
+    });
     pressKey('down');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [User] Bash');
-    }, NAV_TIMEOUT);
+    });
     pressKey('return');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('PreToolUse - Matcher: Bash');
-    }, NAV_TIMEOUT);
+    });
 
     pressKey('down');
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [command] echo second');
-    }, NAV_TIMEOUT);
+    });
     pressKey('return');
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hook details');
       expect(lastFrame()).toContain('echo second');
-    }, NAV_TIMEOUT);
+    });
   });
 
   it('should navigate directly from a non-matcher hook to config detail', async () => {
@@ -338,32 +350,40 @@ describe('HooksManagementDialog', () => {
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
-    }, NAV_TIMEOUT);
+    });
+    await vi.waitFor(() => {
+      expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(1);
+    });
 
     for (let i = 0; i < 6; i++) {
+      const handlerCalls = mockedUseKeypress.mock.calls.length;
       pressKey('down');
-      await vi.waitFor(() => {
-        expect(lastFrame()).toContain(`❯  ${i + 2}.`);
-      }, NAV_TIMEOUT);
+      await waitForNextKeypressHandler(handlerCalls);
     }
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯  7. Stop');
-    }, NAV_TIMEOUT);
+    });
+    let handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('return');
+    await waitForNextKeypressHandler(handlerCalls);
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Stop');
       expect(lastFrame()).toContain('echo stop one');
-    }, NAV_TIMEOUT);
+    });
 
+    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('down');
+    await waitForNextKeypressHandler(handlerCalls);
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [command] echo stop two');
-    }, NAV_TIMEOUT);
+    });
+    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('return');
+    await waitForNextKeypressHandler(handlerCalls);
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hook details');
       expect(lastFrame()).toContain('echo stop two');
-    }, NAV_TIMEOUT);
+    });
   });
 });

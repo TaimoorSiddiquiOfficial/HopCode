@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +25,7 @@ const RECURRING_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const RECENT_INTERACTION_MS = 60 * 1000;
 
 // Catch-up: if the marker is older than this, the user has either not run
-// qwen for a while or every session has been < 10 min — either way we have
+// hopcode for a while or every session has been < 10 min — either way we have
 // a backlog to sweep, so shorten the first-pass delay. 7 days is "long
 // enough that occasional short sessions don't trigger it, short enough that
 // the typical sporadic user still gets periodic cleanup".

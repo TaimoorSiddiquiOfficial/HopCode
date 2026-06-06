@@ -1,11 +1,12 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import type React from 'react';
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import process from 'node:process';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
 import {
   AuthType,
@@ -16,8 +17,6 @@ import {
   type AvailableModel as CoreAvailableModel,
   type ContentGeneratorConfig,
   type InputModalities,
-  type ModelProvidersConfig,
-  type ProviderModelConfig,
 } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
@@ -27,19 +26,6 @@ import { UIStateContext, type UIState } from '../contexts/UIStateContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import { t } from '../../i18n/index.js';
-import {
-  PROVIDER_REGISTRY,
-  type ProviderConfig,
-} from '../../commands/auth/registry.js';
-import {
-  getCatalog,
-  type ModelCategory,
-} from '../../commands/model/catalog.js';
-import {
-  fetchOpenAICompatibleModels,
-  fetchOpenRouterModels,
-} from '../../commands/model/discovery.js';
-import { fetchOllamaModels } from '../../commands/model/ollama.js';
 
 function formatModalities(modalities?: InputModalities): string {
   if (!modalities) return t('text-only');
@@ -122,58 +108,22 @@ function persistAuthTypeSelection(
   settings.setValue(scope, 'security.auth.selectedType', authType);
 }
 
-/**
- * Ensure a model from the live/catalog list is registered in modelRegistry
- * before calling config.switchModel(). Without this, catalog extras and
- * live-fetched models that are not yet in settings.modelProviders would throw
- * "Model not found for authType 'openai'".
- *
- * Mirrors the persistence logic in ProviderDialog.persistProviderConfig.
- */
-function registerModelForActiveProvider(
+function hydrateApiKeyEnvFromSettings(
   settings: ReturnType<typeof useSettings>,
-  provider: ProviderConfig,
-  modelId: string,
-  config:
-    | {
-        reloadModelProvidersConfig?: (
-          cfg: ModelProvidersConfig | undefined,
-        ) => void;
-      }
-    | null
-    | undefined,
+  envKey: string | undefined,
 ): void {
-  const scope = getPersistScopeForModelSelection(settings);
-
-  const newModelConfig: ProviderModelConfig = {
-    id: modelId,
-    name: `[${provider.label}] ${modelId}`,
-    envKey: provider.envKey || undefined,
-    ...(provider.baseUrl ? { baseUrl: provider.baseUrl } : {}),
-  };
-
-  // Only openai-compat providers use modelProviders.openai
-  if (provider.authType !== AuthType.USE_OPENAI) return;
-
-  const existingConfigs =
-    ((settings.merged?.modelProviders as Record<
-      string,
-      ProviderModelConfig[]
-    >) ?? {})[AuthType.USE_OPENAI] ?? [];
-
-  // Keep entries for other providers; replace the entry for this provider
-  const filteredConfigs = existingConfigs.filter(
-    (c) => !(c.envKey === provider.envKey && c.baseUrl === provider.baseUrl),
-  );
-
-  settings.setValue(scope, `modelProviders.${AuthType.USE_OPENAI}`, [
-    newModelConfig,
-    ...filteredConfigs,
-  ]);
-
-  config?.reloadModelProvidersConfig?.(
-    settings.merged?.modelProviders as ModelProvidersConfig | undefined,
-  );
+  if (!envKey || process.env[envKey]) {
+    return;
+  }
+  const settingsEnvValue = (
+    settings?.merged?.env as Record<string, unknown> | undefined
+  )?.[envKey];
+  if (
+    typeof settingsEnvValue === 'string' &&
+    settingsEnvValue.trim().length > 0
+  ) {
+    process.env[envKey] = settingsEnvValue;
+  }
 }
 
 interface HandleModelSwitchSuccessParams {
@@ -254,200 +204,44 @@ export function ModelDialog({
 
   const authType = config?.getAuthType();
 
-  // Detect which registry provider is currently active
-  const activeProviderEntry = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const merged = settings?.merged as any;
-    if (!merged) return null;
-
-    const selectedType = merged?.security?.auth?.selectedType as
-      | string
-      | undefined;
-    let activeProviderId: string | undefined;
-
-    if (selectedType === AuthType.USE_ANTHROPIC) {
-      activeProviderId = 'anthropic';
-    } else if (selectedType === AuthType.USE_GEMINI) {
-      activeProviderId = 'gemini';
-    } else if (selectedType === AuthType.USE_OPENAI) {
-      const openaiCfg = merged?.modelProviders?.openai?.[0] as
-        | { envKey?: string; baseUrl?: string }
-        | undefined;
-      if (openaiCfg) {
-        const match = PROVIDER_REGISTRY.find(
-          (p) =>
-            p.envKey === openaiCfg.envKey && p.baseUrl === openaiCfg.baseUrl,
-        );
-        activeProviderId = match?.id;
-      }
-    }
-
-    if (!activeProviderId) return null;
-    return PROVIDER_REGISTRY.find((p) => p.id === activeProviderId) ?? null;
-  }, [settings]);
-
-  // All providers that have an API key configured (or don't need one)
-  const configuredProviders = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const merged = settings?.merged as any;
-    return PROVIDER_REGISTRY.filter((provider) => {
-      if (!provider.requiresApiKey) return true;
-      const envKey = provider.envKey;
-      if (!envKey) return false;
-      const key =
-        process.env[envKey] ||
-        (merged?.env as Record<string, string> | undefined)?.[envKey];
-      return !!key?.trim();
-    });
-  }, [settings]);
-
-  // State for live model discovery — map from providerId → categories
-  const [liveModelCategoriesMap, setLiveModelCategoriesMap] = useState<
-    Map<string, ModelCategory[]>
-  >(new Map());
-  const [isLoadingLiveModels, setIsLoadingLiveModels] = useState(false);
-
-  // Fetch live models for ALL configured providers that support live discovery
-  useEffect(() => {
-    const liveProviders = configuredProviders.filter((p) => p.liveModels);
-    if (liveProviders.length === 0) {
-      setIsLoadingLiveModels((prev) => {
-        if (!prev) return prev;
-        return false;
-      });
-      return;
-    }
-
-    let cancelled = false;
-    setIsLoadingLiveModels(true);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const merged = settings?.merged as any;
-
-    async function fetchAllLive(): Promise<void> {
-      const results = new Map<string, ModelCategory[]>();
-
-      await Promise.allSettled(
-        liveProviders.map(async (provider) => {
-          const storedApiKey = provider.envKey
-            ? process.env[provider.envKey] ||
-              (merged?.env as Record<string, string> | undefined)?.[
-                provider.envKey
-              ]
-            : undefined;
-
-          let cats: ModelCategory[] | null = null;
-          if (provider.id === 'openrouter') {
-            cats = await fetchOpenRouterModels(storedApiKey);
-          } else if (provider.id.startsWith('ollama')) {
-            cats = provider.baseUrl
-              ? await fetchOllamaModels(provider.baseUrl, storedApiKey)
-              : null;
-          } else if (provider.baseUrl) {
-            cats = await fetchOpenAICompatibleModels(
-              provider.baseUrl,
-              storedApiKey,
-            );
-          }
-
-          if (cats) results.set(provider.id, cats);
-        }),
-      );
-
-      if (!cancelled) {
-        setLiveModelCategoriesMap(results);
-        setIsLoadingLiveModels(false);
-      }
-    }
-
-    fetchAllLive().catch(() => {
-      if (!cancelled) {
-        setLiveModelCategoriesMap(new Map());
-        setIsLoadingLiveModels(false);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [configuredProviders, settings]);
-
   const availableModelEntries = useMemo(() => {
-    const allCoreModels = config ? config.getAllConfiguredModels() : [];
+    const allModels = config ? config.getAllConfiguredModels() : [];
 
-    // Exclude discontinued hopcode-oauth registry models — they can't be selected
-    // and confuse users. Runtime hopcode-oauth snapshots (from cached tokens) are
-    // still allowed so existing sessions keep working.
-    const runtimeModels = allCoreModels.filter((m) => m.isRuntimeModel);
-    const registryModels = allCoreModels.filter(
-      (m) => !m.isRuntimeModel && m.authType !== AuthType.HOPCODE_OAUTH,
-    );
+    // Separate runtime models from registry models
+    const runtimeModels = allModels.filter((m) => m.isRuntimeModel);
+    const registryModels = allModels.filter((m) => !m.isRuntimeModel);
 
-    // For each USE_OPENAI registry model, resolve its ProviderConfig via baseUrl
-    const coreModelProviderMap = new Map<string, ProviderConfig | null>();
-    for (const m of registryModels) {
-      if (m.authType === AuthType.USE_OPENAI) {
-        const entry =
-          PROVIDER_REGISTRY.find(
-            (p) =>
-              p.authType === AuthType.USE_OPENAI && p.baseUrl === m.baseUrl,
-          ) ?? null;
-        coreModelProviderMap.set(`${m.id}::${m.baseUrl ?? ''}`, entry);
+    // Group registry models by authType
+    const modelsByAuthTypeMap = new Map<AuthType, CoreAvailableModel[]>();
+    for (const model of registryModels) {
+      const authType = model.authType;
+      if (!modelsByAuthTypeMap.has(authType)) {
+        modelsByAuthTypeMap.set(authType, []);
       }
+      modelsByAuthTypeMap.get(authType)!.push(model);
     }
 
-    // Catalog/live extras from ALL configured providers (deduplicated)
-    type CatalogEntry = { model: CoreAvailableModel; provider: ProviderConfig };
-    const catalogEntries: CatalogEntry[] = [];
-    const existingKeys = new Set(
-      registryModels.map((m) => `${m.authType}::${m.id}::${m.baseUrl ?? ''}`),
+    // Fixed order: hopcode-oauth first, then others in a stable order
+    const authTypeOrder: AuthType[] = [
+      AuthType.HOPCODE_OAUTH,
+      AuthType.USE_OPENAI,
+      AuthType.USE_ANTHROPIC,
+      AuthType.USE_GEMINI,
+      AuthType.USE_VERTEX_AI,
+    ];
+
+    // Filter to only include authTypes that have registry models and maintain order
+    const availableAuthTypes = new Set(modelsByAuthTypeMap.keys());
+    const orderedAuthTypes = authTypeOrder.filter((t) =>
+      availableAuthTypes.has(t),
     );
 
-    for (const provider of configuredProviders) {
-      const categories =
-        provider.liveModels && liveModelCategoriesMap.has(provider.id)
-          ? liveModelCategoriesMap.get(provider.id)!
-          : (getCatalog(provider.id)?.categories ?? null);
-
-      if (!categories) continue;
-
-      for (const cat of categories) {
-        for (const m of cat.models) {
-          const key = `${provider.authType}::${m.id}::${provider.baseUrl ?? ''}`;
-          if (existingKeys.has(key)) continue;
-          existingKeys.add(key);
-          catalogEntries.push({
-            model: {
-              id: m.id,
-              label: m.label,
-              description:
-                cat.name + (m.description ? ` · ${m.description}` : ''),
-              authType: provider.authType,
-              isRuntimeModel: false,
-              baseUrl: provider.baseUrl,
-              envKey: provider.envKey,
-              capabilities: {
-                image: false,
-                pdf: false,
-                audio: false,
-                video: false,
-              } as InputModalities,
-            } as CoreAvailableModel,
-            provider,
-          });
-        }
-      }
-    }
-
+    // Build ordered list: runtime models first, then registry models grouped by authType
     const result: Array<{
       authType: AuthType;
       model: CoreAvailableModel;
       isRuntime?: boolean;
       snapshotId?: string;
-      /** Human-readable provider name for the badge, e.g. "Ollama Cloud" */
-      providerLabel?: string;
-      /** The ProviderConfig this model belongs to (null for non-USE_OPENAI) */
-      providerEntry?: ProviderConfig | null;
     }> = [];
 
     // Add all runtime models first
@@ -460,64 +254,26 @@ export function ModelDialog({
       });
     }
 
-    // Add registry models (already persisted in settings)
-    for (const m of registryModels) {
-      const providerEntry =
-        m.authType === AuthType.USE_OPENAI
-          ? (coreModelProviderMap.get(`${m.id}::${m.baseUrl ?? ''}`) ??
-            activeProviderEntry)
-          : null;
-      result.push({
-        authType: m.authType,
-        model: m,
-        isRuntime: false,
-        providerLabel:
-          m.authType === AuthType.USE_OPENAI
-            ? (providerEntry?.label ?? activeProviderEntry?.label)
-            : undefined,
-        providerEntry,
-      });
-    }
-
-    // Add catalog/live extras grouped by provider (active provider first)
-    const sorted = [...catalogEntries].sort((a, b) => {
-      const aIsActive = a.provider.id === activeProviderEntry?.id ? 0 : 1;
-      const bIsActive = b.provider.id === activeProviderEntry?.id ? 0 : 1;
-      return aIsActive - bIsActive;
-    });
-    for (const { model, provider } of sorted) {
-      result.push({
-        authType: model.authType,
-        model,
-        isRuntime: false,
-        providerLabel:
-          model.authType === AuthType.USE_OPENAI ? provider.label : undefined,
-        providerEntry: provider,
-      });
+    // Add registry models grouped by authType
+    for (const t of orderedAuthTypes) {
+      for (const model of modelsByAuthTypeMap.get(t) ?? []) {
+        result.push({ authType: t, model, isRuntime: false });
+      }
     }
 
     return result;
-  }, [
-    config,
-    activeProviderEntry,
-    configuredProviders,
-    liveModelCategoriesMap,
-  ]);
+  }, [config]);
 
   const MODEL_OPTIONS = useMemo(
     () =>
       availableModelEntries.map(
-        ({ authType: t2, model, isRuntime, snapshotId, providerLabel }) => {
-          // Runtime models use snapshotId directly (format: $runtime|${authType}|${modelId})
+        ({ authType: t2, model, isRuntime, snapshotId }) => {
           const value =
             isRuntime && snapshotId
               ? snapshotId
               : buildModelSelectionKey(t2, model.id, model.baseUrl);
 
           const isHopCodeOAuth = t2 === AuthType.HOPCODE_OAUTH;
-          // Show real provider label (e.g. "Ollama Cloud") when available,
-          // otherwise fall back to the raw authType string.
-          const badgeLabel = providerLabel ?? t2;
 
           const title = (
             <Text>
@@ -531,15 +287,9 @@ export function ModelDialog({
                       : theme.text.accent
                 }
               >
-                [{badgeLabel}]
+                [{t2}]
               </Text>
-              <Text>{` ${
-                // Strip the "[ProviderName] " prefix that persistProviderConfig
-                // embeds in the stored model name — the badge already shows it.
-                model.label.startsWith(`[${badgeLabel}] `)
-                  ? model.label.slice(`[${badgeLabel}] `.length)
-                  : model.label
-              }`}</Text>
+              <Text>{` ${model.label}`}</Text>
               {isRuntime && (
                 <Text color={theme.status.warning}> (Runtime)</Text>
               )}
@@ -659,6 +409,16 @@ export function ModelDialog({
   const handleSelect = useCallback(
     async (selected: string) => {
       setErrorMessage(null);
+      const selectedEntry = availableModelEntries.find(
+        ({ authType: t2, model, isRuntime, snapshotId }) => {
+          const value =
+            isRuntime && snapshotId
+              ? snapshotId
+              : buildModelSelectionKey(t2, model.id, model.baseUrl);
+          return value === selected;
+        },
+      );
+      hydrateApiKeyEnvFromSettings(settings, selectedEntry?.model.envKey);
 
       // Fast model mode: save authType:modelId so duplicate model ids across
       // providers remain unambiguous. baseUrl is intentionally discarded.
@@ -744,40 +504,13 @@ export function ModelDialog({
           selectedBaseUrl = parsed.baseUrl;
         }
 
-        // For OpenAI-compat providers: ensure the selected model exists in the
-        // modelRegistry before calling switchModel. Catalog and live-fetched models
-        // that the user hasn't previously selected won't be in the registry yet,
-        // causing "Model not found for authType 'openai'". Persisting the entry
-        // here (mirrors ProviderDialog.persistProviderConfig) and reloading the
-        // registry fixes that without requiring a full provider re-auth flow.
-        if (!isRuntime && selectedAuthType === AuthType.USE_OPENAI) {
-          // Use the provider that owns this specific model (not necessarily the active one)
-          const modelEntry = availableModelEntries.find(
-            ({ authType: t2, model, isRuntime: ir, snapshotId }) => {
-              const v = ir && snapshotId ? snapshotId : `${t2}::${model.id}`;
-              return v === selected;
-            },
-          );
-          const modelProviderEntry =
-            modelEntry?.providerEntry ?? activeProviderEntry;
-          if (modelProviderEntry) {
-            registerModelForActiveProvider(
-              settings,
-              modelProviderEntry,
-              modelId,
-              config,
-            );
-          }
-        }
-
-        await config.switchModel(
-          selectedAuthType,
-          modelId,
-          selectedAuthType !== authType &&
-            selectedAuthType === AuthType.HOPCODE_OAUTH
-            ? { requireCachedCredentials: true, baseUrl: selectedBaseUrl }
-            : { baseUrl: selectedBaseUrl },
-        );
+        await config.switchModel(selectedAuthType, modelId, {
+          ...(selectedAuthType !== authType &&
+          selectedAuthType === AuthType.HOPCODE_OAUTH
+            ? { requireCachedCredentials: true }
+            : {}),
+          baseUrl: selectedBaseUrl,
+        });
 
         if (!isRuntime) {
           const event = new ModelSlashCommandEvent(modelId);
@@ -816,7 +549,6 @@ export function ModelDialog({
       uiState,
       setErrorMessage,
       isFastModelMode,
-      activeProviderEntry,
       availableModelEntries,
     ],
   );
@@ -833,17 +565,7 @@ export function ModelDialog({
     >
       <Text bold>{t('Select Model')}</Text>
 
-      {isLoadingLiveModels && !hasModels ? (
-        <Box marginTop={1}>
-          <Text color={theme.text.secondary}>
-            {activeProviderEntry?.id.startsWith('ollama')
-              ? t('⟳ Connecting to {{provider}}…', {
-                  provider: activeProviderEntry.label,
-                })
-              : t('⟳ Fetching available models…')}
-          </Text>
-        </Box>
-      ) : !hasModels ? (
+      {!hasModels ? (
         <Box marginTop={1} flexDirection="column">
           <Text color={theme.status.warning}>
             {t(
@@ -862,7 +584,7 @@ export function ModelDialog({
           </Box>
         </Box>
       ) : (
-        <Box marginTop={1} flexDirection="column">
+        <Box marginTop={1}>
           <DescriptiveRadioButtonSelect
             items={MODEL_OPTIONS}
             onSelect={handleSelect}
@@ -870,28 +592,6 @@ export function ModelDialog({
             initialIndex={initialIndex}
             showNumbers={true}
           />
-          {isLoadingLiveModels && (
-            <Box marginTop={1}>
-              <Text color={theme.text.secondary}>
-                {activeProviderEntry?.id.startsWith('ollama')
-                  ? t('⟳ Connecting to {{provider}}…', {
-                      provider: activeProviderEntry.label,
-                    })
-                  : t('⟳ Fetching available models…')}
-              </Text>
-            </Box>
-          )}
-          {!isLoadingLiveModels &&
-            activeProviderEntry?.id === 'ollama-local' && (
-              <Box marginTop={1}>
-                <Text color={theme.text.secondary}>
-                  Tip: pull more models with{' '}
-                  <Text bold>
-                    ollama pull {'<'}model{'>'}
-                  </Text>
-                </Text>
-              </Box>
-            )}
         </Box>
       )}
 

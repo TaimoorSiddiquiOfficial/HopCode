@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -700,7 +700,7 @@ export class DataProcessor {
     const schemaImprovements = {
       type: 'object',
       properties: {
-        Hopcode_md_additions: {
+        HopCode_md_additions: {
           type: 'array',
           items: {
             type: 'object',
@@ -739,7 +739,7 @@ export class DataProcessor {
           },
         },
       },
-      required: ['Hopcode_md_additions', 'features_to_try', 'usage_patterns'],
+      required: ['HopCode_md_additions', 'features_to_try', 'usage_patterns'],
     };
 
     // 7. Interaction Style
@@ -960,7 +960,7 @@ ${sessionSummaries}
 FRICTION DETAILS:
 ${frictionDetails}
 
-USER INSTRUCTIONS TO HopCode:
+USER INSTRUCTIONS TO HOPCODE:
 None captured`;
   }
 

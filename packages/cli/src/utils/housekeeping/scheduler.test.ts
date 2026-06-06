@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -56,7 +56,7 @@ describe('_needsCatchUpForTesting', () => {
   let markerPath: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
     markerPath = path.join(tempDir, '.marker');
   });
 
@@ -82,18 +82,18 @@ describe('_needsCatchUpForTesting', () => {
 });
 
 describe('_runHousekeepingForTesting', () => {
-  let qwenHome: string;
+  let hopcodeHome: string;
   let fileHistoryRoot: string;
 
   beforeEach(() => {
-    qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
-    fileHistoryRoot = path.join(qwenHome, FILE_HISTORY_DIR);
-    vi.stubEnv('HOPCODE_HOME', qwenHome);
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
+    fileHistoryRoot = path.join(hopcodeHome, FILE_HISTORY_DIR);
+    vi.stubEnv('HOPCODE_HOME', hopcodeHome);
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    fs.rmSync(qwenHome, { recursive: true, force: true });
+    fs.rmSync(hopcodeHome, { recursive: true, force: true });
   });
 
   it('whitelists the current session via lazy getSessionId()', async () => {
@@ -109,7 +109,7 @@ describe('_runHousekeepingForTesting', () => {
     expect(fs.readdirSync(fileHistoryRoot)).toEqual(['current-session']);
     // Marker was written by throttledOnce.
     expect(
-      fs.existsSync(path.join(qwenHome, _FILE_HISTORY_MARKER_FOR_TESTING)),
+      fs.existsSync(path.join(hopcodeHome, _FILE_HISTORY_MARKER_FOR_TESTING)),
     ).toBe(true);
   });
 
@@ -129,7 +129,7 @@ describe('_runHousekeepingForTesting', () => {
     expect(fs.readdirSync(fileHistoryRoot)).toEqual(['session-1']);
 
     // Reset marker so the second pass is not throttled out.
-    fs.rmSync(path.join(qwenHome, _FILE_HISTORY_MARKER_FOR_TESTING));
+    fs.rmSync(path.join(hopcodeHome, _FILE_HISTORY_MARKER_FOR_TESTING));
 
     // Backdate session-1 so it would be sweepable if not whitelisted.
     fs.utimesSync(path.join(fileHistoryRoot, 'session-1'), old, old);
@@ -167,17 +167,17 @@ describe('_runHousekeepingForTesting', () => {
 });
 
 describe('_runPassForTesting (timer-chain defense)', () => {
-  let qwenHome: string;
+  let hopcodeHome: string;
 
   beforeEach(() => {
-    qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
-    vi.stubEnv('HOPCODE_HOME', qwenHome);
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
+    vi.stubEnv('HOPCODE_HOME', hopcodeHome);
     resetInteraction();
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    fs.rmSync(qwenHome, { recursive: true, force: true });
+    fs.rmSync(hopcodeHome, { recursive: true, force: true });
   });
 
   it('catches errors escaping runHousekeeping so the next pass still gets scheduled', async () => {
@@ -220,18 +220,18 @@ describe('startBackgroundHousekeeping', () => {
   // setup. The building blocks (needsCatchUp, runHousekeeping, runPass) are
   // covered above; the glue is a few lines of imperative scheduling that
   // should be verified by the manual smoke test in the pre-PR checklist.
-  let qwenHome: string;
+  let hopcodeHome: string;
 
   beforeEach(() => {
-    qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
-    vi.stubEnv('HOPCODE_HOME', qwenHome);
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
+    vi.stubEnv('HOPCODE_HOME', hopcodeHome);
     _resetForTesting();
     resetInteraction();
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    fs.rmSync(qwenHome, { recursive: true, force: true });
+    fs.rmSync(hopcodeHome, { recursive: true, force: true });
     _resetForTesting();
   });
 

@@ -421,13 +421,13 @@ const SETTINGS_SCHEMA = {
         // editor-surfaced defaults.
         default: { commit: true, pr: true },
         description:
-          'Attribution added to git commits and pull requests created through Qwen Code.',
+          'Attribution added to git commits and pull requests created through HopCode.',
         showInDialog: false,
         // Pre-V4 settings stored this as a single boolean. The V3→V4
         // migration rewrites those on first launch, but the IDE schema
         // validator runs before that — accept the boolean shape so users
         // editing settings.json in VS Code don't see a spurious warning
-        // until they run qwen once. Config.normalizeGitCoAuthor handles
+        // until they run hopcode once. Config.normalizeGitCoAuthor handles
         // the boolean at runtime.
         legacyTypes: ['boolean'],
         properties: {
@@ -438,7 +438,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description:
-              'Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through Qwen Code. Disabling skips both.',
+              'Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through HopCode. Disabling skips both.',
             showInDialog: true,
           },
           pr: {
@@ -448,7 +448,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description:
-              'Append a Qwen Code attribution line to PR descriptions when running `gh pr create`.',
+              'Append a HopCode attribution line to PR descriptions when running `gh pr create`.',
             showInDialog: true,
           },
         },
@@ -630,7 +630,7 @@ const SETTINGS_SCHEMA = {
         label: 'Theme',
         category: 'UI',
         requiresRestart: false,
-        default: 'Qwen Dark' as string,
+        default: 'HopCode Dark' as string,
         description: 'The color theme for the UI.',
         showInDialog: true,
       },
@@ -705,7 +705,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: false,
         description:
-          'Show Qwen Code status and thoughts in the terminal window title',
+          'Show HopCode status and thoughts in the terminal window title',
         showInDialog: false,
       },
       hideTips: {
@@ -775,7 +775,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Show optional feedback dialog after conversations to help improve Qwen performance.',
+          'Show optional feedback dialog after conversations to help improve HopCode performance.',
         showInDialog: true,
       },
       enableFollowupSuggestions: {
@@ -893,7 +893,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: '' as string,
         description:
-          'Replace the default ">_ Qwen Code" title shown in the banner info panel. The version suffix is always appended.',
+          'Replace the default ">_ HopCode" title shown in the banner info panel. The version suffix is always appended.',
         showInDialog: false,
       },
       customBannerSubtitle: {
@@ -913,7 +913,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: undefined as CustomAsciiArtSetting | undefined,
         description:
-          'Replace the default QWEN ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
+          'Replace the default HOPCODE ASCII art. Accepts an inline string, {"path": "..."}, or {"small": ..., "large": ...} for width-aware selection.',
         showInDialog: false,
         // The runtime accepts three shapes (inline string, {path}, or
         // {small,large} where each tier is itself string-or-{path}). The
@@ -1071,7 +1071,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: undefined as OutboundCorrelationSettings | undefined,
     description:
-      "SECURITY-RELEVANT. Controls what client-side correlation data qwen-code writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope).",
+      "SECURITY-RELEVANT. Controls what client-side correlation data hopcode-code writes into outbound LLM API requests (DashScope, OpenAI, Anthropic, etc.) — separate from `telemetry.*` which governs data flow into the operator's OWN OTLP collector. All values default to off. Opt in only when the LLM provider also reports into your OTel collector for cross-process trace stitching (e.g. ARMS Tracing + DashScope).",
     showInDialog: false,
     jsonSchemaOverride: {
       type: 'object',
@@ -1094,7 +1094,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: false,
     default: '',
     description:
-      'Model used for generating prompt suggestions and speculative execution. Leave empty to use the main model. A smaller/faster model (e.g., qwen3-coder-flash) reduces latency and cost.',
+      'Model used for generating prompt suggestions and speculative execution. Leave empty to use the main model. A smaller/faster model (e.g., hopcode3-coder-flash) reduces latency and cost.',
     showInDialog: true,
   },
 
@@ -1258,7 +1258,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: false,
             description:
-              'When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: "tool"` messages with HTTP 400 "Invalid \'messages\' in payload". Default false preserves the prior behavior for permissive providers. See QwenLM/qwen-code#3616.',
+              'When true, media (images / audio / video / files) returned by MCP tool calls is split into a follow-up user message instead of being embedded in the tool message. Required for strict OpenAI-compatible servers (e.g., LM Studio) that reject non-text content on `role: "tool"` messages with HTTP 400 "Invalid \'messages\' in payload". Default false preserves the prior behavior for permissive providers. See HopCodeLM/hopcode-code#3616.',
             parentKey: 'generationConfig',
             showInDialog: false,
           },
@@ -1284,7 +1284,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: undefined,
             description:
-              "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from Qwen Code's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
+              "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from HopCode's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
             parentKey: 'generationConfig',
             showInDialog: false,
           },
@@ -1308,7 +1308,7 @@ const SETTINGS_SCHEMA = {
         >
       | undefined,
     description:
-      'Optional per-model pricing for cost estimation in /stats model. Example: {"qwen3-coder": {"inputPerMillionTokens": 0.30, "outputPerMillionTokens": 1.20}}',
+      'Optional per-model pricing for cost estimation in /stats model. Example: {"hopcode3-coder": {"inputPerMillionTokens": 0.30, "outputPerMillionTokens": 1.20}}',
     showInDialog: false,
   },
 
@@ -1644,7 +1644,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: undefined as string | undefined,
         description:
-          'Sandbox image URI used by Docker/Podman when --sandbox-image and QWEN_SANDBOX_IMAGE are not set.',
+          'Sandbox image URI used by Docker/Podman when --sandbox-image and HOPCODE_SANDBOX_IMAGE are not set.',
         showInDialog: false,
       },
       toolSearch: {
@@ -1763,7 +1763,7 @@ const SETTINGS_SCHEMA = {
           { value: ApprovalMode.DEFAULT, label: 'Default' },
           { value: ApprovalMode.AUTO_EDIT, label: 'Auto Edit' },
           { value: ApprovalMode.AUTO, label: 'Auto' },
-          { value: ApprovalMode.IZN, label: 'Izn' },
+          { value: ApprovalMode.IZN, label: 'IZN' },
         ],
       },
       autoAccept: {
@@ -2065,7 +2065,7 @@ const SETTINGS_SCHEMA = {
         default: undefined as string | undefined,
         description:
           'Custom directory for runtime output (temp files, debug logs, session data, todos, etc.). ' +
-          'Config files remain at ~/.hopcode (or QWEN_HOME if set). Env var QWEN_RUNTIME_DIR takes priority.',
+          'Config files remain at ~/.hopcode (or HOPCODE_HOME if set). Env var HOPCODE_RUNTIME_DIR takes priority.',
         showInDialog: false,
       },
     },
@@ -2188,7 +2188,7 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: DEFAULT_STOP_HOOK_BLOCK_CAP,
     description:
-      'Maximum consecutive blocking Stop/SubagentStop hook decisions before Qwen Code overrides the hook loop and ends the turn. Can be overridden by QWEN_CODE_STOP_HOOK_BLOCK_CAP.',
+      'Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_CODE_STOP_HOOK_BLOCK_CAP.',
     // This is an advanced safety valve for runaway hook loops, not a common
     // interactive preference.
     showInDialog: false,
@@ -2360,7 +2360,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: false,
         description:
-          'Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via QWEN_CODE_ENABLE_CRON=1 environment variable.',
+          'Enable in-session cron/loop tools (experimental). When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can also be enabled via HOPCODE_CODE_ENABLE_CRON=1 environment variable.',
         showInDialog: true,
       },
       emitToolUseSummaries: {
@@ -2370,7 +2370,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with QWEN_CODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.',
+          'Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.',
         showInDialog: true,
       },
     },

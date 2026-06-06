@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -61,20 +61,20 @@ describe('getCutoffDate', () => {
 });
 
 describe('cleanupOldFileHistoryBackups', () => {
-  let qwenHome: string;
+  let hopcodeHome: string;
   let fileHistoryRoot: string;
   let cutoff: Date;
 
   beforeEach(() => {
-    qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-cleanup-test-'));
-    fileHistoryRoot = path.join(qwenHome, FILE_HISTORY_DIR);
-    vi.stubEnv('HOPCODE_HOME', qwenHome);
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-cleanup-test-'));
+    fileHistoryRoot = path.join(hopcodeHome, FILE_HISTORY_DIR);
+    vi.stubEnv('HOPCODE_HOME', hopcodeHome);
     cutoff = new Date(Date.now() - 30 * MS_PER_DAY);
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    fs.rmSync(qwenHome, { recursive: true, force: true });
+    fs.rmSync(hopcodeHome, { recursive: true, force: true });
   });
 
   it('returns zero result when root does not exist', async () => {
