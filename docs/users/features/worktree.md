@@ -10,29 +10,29 @@ If you know up front that the entire session should run inside a worktree, pass 
 
 ```bash
 # Auto-generated slug (e.g. tender-jemison-037f0a)
-qwen --worktree
+hopcode --worktree
 
 # Explicit name
-qwen --worktree my-feature
+hopcode --worktree my-feature
 
 # `=` form (recommended when also passing a positional prompt — see tip below)
-qwen --worktree=my-feature
+hopcode --worktree=my-feature
 
 # PR reference — fetches refs/pull/<N>/head from `origin`
-qwen --worktree=#4174
-qwen --worktree https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174
+hopcode --worktree=#4174
+hopcode --worktree https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174
 
 # Continue a previous --worktree session — re-attaches to the existing dir
-qwen --resume <session-id> --worktree=my-feature
+hopcode --resume <session-id> --worktree=my-feature
 ```
 
-> **Tip — bare `--worktree` followed by a positional prompt is ambiguous.** Because `--worktree` takes an optional value, `qwen --worktree "say hi"` makes yargs consume `"say hi"` as the slug (and reject it because of the space). Use one of:
+> **Tip — bare `--worktree` followed by a positional prompt is ambiguous.** Because `--worktree` takes an optional value, `hopcode --worktree "say hi"` makes yargs consume `"say hi"` as the slug (and reject it because of the space). Use one of:
 >
-> - `qwen --worktree=my-feature "say hi"` (always works — explicit slug via `=`)
-> - `qwen "say hi" --worktree` (positional first, flag at the end → auto slug)
-> - `qwen --worktree --approval-mode izn "say hi"` (any flag between them anchors the bare form)
+> - `hopcode --worktree=my-feature "say hi"` (always works — explicit slug via `=`)
+> - `hopcode "say hi" --worktree` (positional first, flag at the end → auto slug)
+> - `hopcode --worktree --approval-mode izn "say hi"` (any flag between them anchors the bare form)
 
-> **Tip — `qwen --resume --worktree foo` (no session ID) shows an empty picker on first use.** The picker scopes to the chosen worktree's session storage; sessions started outside that worktree are not listed. To resume a session that was started inside `foo`, use `qwen --resume <id> --worktree foo` directly — the CLI re-attaches to the existing `foo/` directory rather than re-creating it.
+> **Tip — `hopcode --resume --worktree foo` (no session ID) shows an empty picker on first use.** The picker scopes to the chosen worktree's session storage; sessions started outside that worktree are not listed. To resume a session that was started inside `foo`, use `hopcode --resume <id> --worktree foo` directly — the CLI re-attaches to the existing `foo/` directory rather than re-creating it.
 
 `process.cwd()` and the model's workspace are switched to the worktree before the first turn runs. Exit with `Ctrl+C` twice and the [Exit Dialog](#exit-dialog-ctrlc--ctrld) prompts to keep or remove the worktree.
 
@@ -79,7 +79,7 @@ The two mid-session tools (`enter_worktree` / `exit_worktree`) are deliberately 
 
 ## What Gets Created
 
-Every Qwen-managed worktree is placed under your project's `.qwen` directory:
+Every HopCode-managed worktree is placed under your project's `.hopcode` directory:
 
 ```
 <repoRoot>/.hopcode/worktrees/<slug>/         # Working directory
@@ -289,11 +289,11 @@ See [Sub-Agents](./sub-agents.md) for the rest of the agent tool reference.
 ### `--worktree [name | #N | url]`
 
 ```bash
-qwen --worktree                                               # auto-generate slug
-qwen --worktree my-feature                                    # explicit slug
-qwen --worktree=my-feature                                    # = form
-qwen --worktree=#123                                          # PR reference
-qwen --worktree https://github.com/owner/repo/pull/123        # PR URL
+hopcode --worktree                                               # auto-generate slug
+hopcode --worktree my-feature                                    # explicit slug
+hopcode --worktree=my-feature                                    # = form
+hopcode --worktree=#123                                          # PR reference
+hopcode --worktree https://github.com/owner/repo/pull/123        # PR URL
 ```
 
 | Input                         | Result                                                                                                                |
@@ -324,7 +324,7 @@ The following items are intentionally not implemented in the current phase:
 - **No sparse checkout.** Large monorepos check out the full tree. (`worktree.sparsePaths` is a roadmap item.)
 - **No tmux integration.** The CLI does not spawn worktree sessions in new tmux windows.
 - **Worktrees are separate "projects" for session storage.** Sessions started with `--worktree foo` are saved under that worktree's chats dir; to resume them later you must pass `--worktree foo` again. Sessions started without `--worktree` are saved under the main checkout and won't appear in the worktree's resume picker.
-- **No cross-slug session override.** `qwen --resume <sid> --worktree second` where `<sid>` was created with `--worktree first` will fail to find the session — sessions and worktrees are tightly bound by `projectHash(cwd)`. To switch worktrees on an existing session you must exit, then re-launch with the new `--worktree` and a fresh prompt. A future architectural change (anchoring storage at the repo root instead of `cwd`) would lift this constraint.
+- **No cross-slug session override.** `hopcode --resume <sid> --worktree second` where `<sid>` was created with `--worktree first` will fail to find the session — sessions and worktrees are tightly bound by `projectHash(cwd)`. To switch worktrees on an existing session you must exit, then re-launch with the new `--worktree` and a fresh prompt. A future architectural change (anchoring storage at the repo root instead of `cwd`) would lift this constraint.
 - **Mid-session `enter_worktree` does NOT switch `process.cwd()` or `Config.targetDir`.** That tool uses the model-context-only convention (see [Sub-Agents](./sub-agents.md)). Only the startup `--worktree` flag actually switches the process working directory.
 - **Relative paths in other arg fields are resolved BEFORE the worktree chdir.** Path-taking flags (`--mcp-config`, `--openai-logging-dir`, `--json-file`, `--input-file`, `--telemetry-outfile`, `--include-directories`) are normalized to absolute paths against the launch cwd when `--worktree` is set. Other path-shaped argv fields not in this list still resolve against the worktree cwd — use absolute paths to be safe.
 

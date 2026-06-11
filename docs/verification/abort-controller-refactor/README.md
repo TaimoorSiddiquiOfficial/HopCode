@@ -20,14 +20,14 @@ mkdir -p "$LOGDIR"
 For each scenario:
 
 ```sh
-tmux new-session -d -s qwen-verify-XX
-tmux pipe-pane -t qwen-verify-XX -o "cat >> $LOGDIR/XX-name.log"
-tmux send-keys -t qwen-verify-XX "cd /path/to/your/test/workspace && exec node $WT/packages/cli/dist/index.js" C-m
-tmux attach -t qwen-verify-XX
+tmux new-session -d -s hopcode-verify-XX
+tmux pipe-pane -t hopcode-verify-XX -o "cat >> $LOGDIR/XX-name.log"
+tmux send-keys -t hopcode-verify-XX "cd /path/to/your/test/workspace && exec node $WT/packages/cli/dist/index.js" C-m
+tmux attach -t hopcode-verify-XX
 ```
 
 Then drive the session manually per the matrix below. Hit `C-b d` to detach
-when done; `tmux kill-session -t qwen-verify-XX` to stop the pane.
+when done; `tmux kill-session -t hopcode-verify-XX` to stop the pane.
 
 ### 00 — Baseline (PRE-fix)
 
@@ -38,14 +38,14 @@ when done; `tmux kill-session -t qwen-verify-XX` to stop the pane.
 
 ### 01 — Long-session, DEBUG mode (this branch)
 
-- **Setup:** `NODE_OPTIONS=--trace-warnings DEBUG=1 qwen`.
+- **Setup:** `NODE_OPTIONS=--trace-warnings DEBUG=1 hopcode`.
 - **Input:** same 50-round script as #00.
 - **Expected:** no `MaxListenersExceededWarning` printed; any other warnings still print.
 - **Log:** `01-long-session-debug.log`.
 
 ### 02 — Long-session, prod mode (this branch)
 
-- **Setup:** `qwen` (no debug env).
+- **Setup:** `hopcode` (no debug env).
 - **Input:** same 50-round script.
 - **Expected:** clean output; a temporary `console.error` probe inside the handler (added then removed) confirms the filter fires.
 - **Log:** `02-long-session-prod.log`.
@@ -73,7 +73,7 @@ when done; `tmux kill-session -t qwen-verify-XX` to stop the pane.
 
 ### 06 — Headless / non-interactive abort
 
-- **Setup:** `qwen --prompt "do a long task"`; send `SIGINT` from outside via `kill -INT <pid>`.
+- **Setup:** `hopcode --prompt "do a long task"`; send `SIGINT` from outside via `kill -INT <pid>`.
 - **Expected:** clean shutdown, exit code 130, no warnings.
 - **Log:** `06-headless-abort.log`.
 
@@ -86,7 +86,7 @@ when done; `tmux kill-session -t qwen-verify-XX` to stop the pane.
 
 ### 08 — Memory baseline
 
-- **Setup:** `qwen --inspect`, attach Chrome devtools.
+- **Setup:** `hopcode --inspect`, attach Chrome devtools.
 - **Input:** 100-round session.
 - **Expected:** heap snapshots at round 0/50/100. `AbortSignal` instance count and per-signal listener count stable (no monotonic growth).
 - **Log:** `08-memory-snapshots/`.

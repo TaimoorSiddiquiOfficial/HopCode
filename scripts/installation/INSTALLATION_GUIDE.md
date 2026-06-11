@@ -11,8 +11,8 @@ The installers are intentionally lightweight:
 - They try a standalone archive first by default.
 - They do not install Node.js, NVM, or any other Node version manager.
 - They do not edit npm config. Standalone installs may update the shell profile
-  or user PATH so the generated `qwen` shim is discoverable.
-- They do not start `qwen` automatically after installation.
+  or user PATH so the generated `hopcode` shim is discoverable.
+- They do not start `hopcode` automatically after installation.
 - They store source information in `~/.hopcode/source.json` or
   `%USERPROFILE%\.hopcode\source.json` when `--source` is provided.
 
@@ -43,7 +43,7 @@ The new standalone-first installer scripts (`install-hopcode-standalone.sh`,
 `install-hopcode-standalone.ps1`) are not republished per release. They are served
 from a hosted installation endpoint and accept `--version` to pin a specific
 standalone release. The `standalone` suffix intentionally avoids overwriting the
-existing production `install-qwen.sh` / `install-qwen.bat` OSS objects during
+existing production `install-hopcode.sh` / `install-hopcode.bat` OSS objects during
 the staged rollout.
 
 Public installation documentation intentionally continues to use the existing
@@ -107,8 +107,8 @@ Archive layout:
 
 ```text
 hopcode/
-  bin/qwen
-  bin/qwen.cmd
+  bin/hopcode
+  bin/hopcode.cmd
   lib/cli.js
   node/
   package.json
@@ -172,7 +172,7 @@ bash install-hopcode-standalone.sh --archive ./hopcode-linux-x64.tar.gz
 Standalone installs to:
 
 - Runtime: `~/.local/lib/hopcode`
-- Shim: `~/.local/bin/qwen`
+- Shim: `~/.local/bin/hopcode`
 
 Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_PARENT`,
 `HOPCODE_INSTALL_LIB_DIR`, or `HOPCODE_INSTALL_BIN_DIR` when needed.
@@ -183,7 +183,7 @@ Uninstall a standalone Linux/macOS install:
 curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh | bash
 ```
 
-The uninstaller removes only the standalone runtime, generated `qwen` wrapper,
+The uninstaller removes only the standalone runtime, generated `hopcode` wrapper,
 and installer-managed shell PATH block. It preserves `~/.hopcode` by default. Set
 `HOPCODE_UNINSTALL_PURGE=1` to remove `~/.hopcode/source.json`; other config and auth
 files are still preserved.
@@ -211,12 +211,12 @@ install-hopcode-standalone.bat --archive hopcode-win-x64.zip
 Standalone installs to:
 
 - Runtime: `%LOCALAPPDATA%\hopcode\hopcode`
-- Shim: `%LOCALAPPDATA%\hopcode\bin\qwen.cmd`
+- Shim: `%LOCALAPPDATA%\hopcode\bin\hopcode.cmd`
 
 Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_DIR`, or
 `HOPCODE_INSTALL_BIN_DIR` when needed.
 
-Restart the terminal if `qwen` is not immediately available on PATH.
+Restart the terminal if `hopcode` is not immediately available on PATH.
 
 Uninstall a standalone Windows install:
 
@@ -224,9 +224,9 @@ Uninstall a standalone Windows install:
 powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1 | iex"
 ```
 
-The uninstaller removes only the standalone runtime, generated `qwen.cmd`
+The uninstaller removes only the standalone runtime, generated `hopcode.cmd`
 wrapper, user PATH entry, and the current-session `cmd.exe` shim created by the
-hosted PowerShell installer. It preserves `%USERPROFILE%\.qwen` by default. Set
+hosted PowerShell installer. It preserves `%USERPROFILE%\.hopcode` by default. Set
 `HOPCODE_UNINSTALL_PURGE=1` to remove `%USERPROFILE%\.hopcode\source.json`; other
 config and auth files are still preserved.
 
@@ -330,7 +330,7 @@ user-owned Node.js installation, then rerun:
 npm install -g @hoptrendy/hopcode-cli@latest --registry https://registry.npmmirror.com
 ```
 
-### qwen Is Not on PATH After Installation
+### hopcode Is Not on PATH After Installation
 
 Restart the terminal first. For standalone installs, add the shim directory:
 

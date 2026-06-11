@@ -6,7 +6,7 @@ This skill follows the nested-agent pattern described in "解决问题的原始�
 
 - Outer harness: the current agent session.
 - Reference program: a nested `codex`, `claude`, or `claude-code` command that demonstrates the feature.
-- Target program: Qwen Code in the current working directory unless the user explicitly provides another path.
+- Target program: HopCode in the current working directory unless the user explicitly provides another path.
 - Capture layer: local state snapshots, `mitmdump`, and terminal transcript
   capture.
 
@@ -42,13 +42,13 @@ Use both when a feature has model calls and visible terminal state.
 Run a state snapshot before and after the reference scenario:
 
 ```sh
-.qwen/skills/agent-reproduce-feature/scripts/capture_state.py \
+.hopcode/skills/agent-reproduce-feature/scripts/capture_state.py \
   snapshot OUT_DIR/state-before --agent codex
 
-.qwen/skills/agent-reproduce-feature/scripts/capture_state.py \
+.hopcode/skills/agent-reproduce-feature/scripts/capture_state.py \
   snapshot OUT_DIR/state-after --agent codex
 
-.qwen/skills/agent-reproduce-feature/scripts/capture_state.py \
+.hopcode/skills/agent-reproduce-feature/scripts/capture_state.py \
   diff OUT_DIR/state-before OUT_DIR/state-after \
   --out-dir OUT_DIR/state-diff
 ```
@@ -84,7 +84,7 @@ python -m pip install --user mitmproxy
 Run a command under capture:
 
 ```sh
-.qwen/skills/agent-reproduce-feature/scripts/run_with_mitm.sh OUT_DIR -- COMMAND ARG...
+.hopcode/skills/agent-reproduce-feature/scripts/run_with_mitm.sh OUT_DIR -- COMMAND ARG...
 ```
 
 Generated files:
@@ -108,7 +108,7 @@ The default CA path is `~/.mitmproxy/mitmproxy-ca-cert.pem`. Some CLIs ignore on
 Run:
 
 ```sh
-.qwen/skills/agent-reproduce-feature/scripts/run_tmux_capture.sh OUT_DIR COMMAND ARG...
+.hopcode/skills/agent-reproduce-feature/scripts/run_tmux_capture.sh OUT_DIR COMMAND ARG...
 ```
 
 Generated files:

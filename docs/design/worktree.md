@@ -8,24 +8,24 @@ hopcode 目前仅有面向 Arena 多模型对比场景的内部 worktree 实现�
 
 ## 现状对比
 
-| 功能                              | hopcode         | claude-code | 阶段    |
-| --------------------------------- | --------------- | ----------- | ------- |
-| `EnterWorktree` 工具              | ✅（Phase A）   | ✅          | —       |
-| `ExitWorktree` 工具               | ✅（Phase A）   | ✅          | —       |
-| AgentTool `isolation: 'worktree'` | ✅（Phase B）   | ✅          | —       |
-| 过期 worktree 自动清理            | ✅（Phase B）   | ✅          | —       |
-| worktree 会话状态持久化与恢复     | ❌              | ✅          | Phase C |
-| Post-creation setup（hooks 配置） | ❌              | ✅          | Phase C |
-| StatusLine worktree 状态展示      | ❌              | ✅          | Phase C |
-| WorktreeExitDialog（退出提示）    | ❌              | ✅          | Phase C |
-| `--worktree` CLI 启动标志         | ✅（Phase D）   | ✅          | —       |
-| 符号链接目录（node_modules 等）   | ✅（Phase D）   | ✅          | —       |
-| PR 引用（`--worktree=#123`）      | ✅（Phase D）   | ✅          | —       |
-| sparse checkout                   | ❌              | ✅          | Future  |
-| tmux 集成                         | ❌              | ✅          | Future  |
-| Arena 多模型 worktree 隔离        | ✅（qwen 独有） | ❌          | —       |
-| 脏状态覆盖（stash + copy）        | ✅              | ✅          | —       |
-| Baseline commit 追踪              | ✅（qwen 独有） | ❌          | —       |
+| 功能                              | hopcode            | claude-code | 阶段    |
+| --------------------------------- | ------------------ | ----------- | ------- |
+| `EnterWorktree` 工具              | ✅（Phase A）      | ✅          | —       |
+| `ExitWorktree` 工具               | ✅（Phase A）      | ✅          | —       |
+| AgentTool `isolation: 'worktree'` | ✅（Phase B）      | ✅          | —       |
+| 过期 worktree 自动清理            | ✅（Phase B）      | ✅          | —       |
+| worktree 会话状态持久化与恢复     | ❌                 | ✅          | Phase C |
+| Post-creation setup（hooks 配置） | ❌                 | ✅          | Phase C |
+| StatusLine worktree 状态展示      | ❌                 | ✅          | Phase C |
+| WorktreeExitDialog（退出提示）    | ❌                 | ✅          | Phase C |
+| `--worktree` CLI 启动标志         | ✅（Phase D）      | ✅          | —       |
+| 符号链接目录（node_modules 等）   | ✅（Phase D）      | ✅          | —       |
+| PR 引用（`--worktree=#123`）      | ✅（Phase D）      | ✅          | —       |
+| sparse checkout                   | ❌                 | ✅          | Future  |
+| tmux 集成                         | ❌                 | ✅          | Future  |
+| Arena 多模型 worktree 隔离        | ✅（hopcode 独有） | ❌          | —       |
+| 脏状态覆盖（stash + copy）        | ✅                 | ✅          | —       |
+| Baseline commit 追踪              | ✅（hopcode 独有） | ❌          | —       |
 
 ## 设计原则
 
@@ -245,11 +245,11 @@ _WorktreeExitDialog：_
 
 **参数形态：** yargs 选项接受三种形式：
 
-| 形式                      | 行为                                                 |
-| ------------------------- | ---------------------------------------------------- |
-| `qwen --worktree`         | bare flag，自动生成 slug（`{形容词}-{名词}-{6hex}`） |
-| `qwen --worktree my-name` | 显式 slug，沿用 `EnterWorktreeTool` 的 slug 校验规则 |
-| `qwen --worktree=my-name` | 等价于上一种                                         |
+| 形式                         | 行为                                                 |
+| ---------------------------- | ---------------------------------------------------- |
+| `hopcode --worktree`         | bare flag，自动生成 slug（`{形容词}-{名词}-{6hex}`） |
+| `hopcode --worktree my-name` | 显式 slug，沿用 `EnterWorktreeTool` 的 slug 校验规则 |
+| `hopcode --worktree=my-name` | 等价于上一种                                         |
 
 不提供短别名 `-w`（hopcode 短别名只保留给最高频参数，避免命名冲突）。
 

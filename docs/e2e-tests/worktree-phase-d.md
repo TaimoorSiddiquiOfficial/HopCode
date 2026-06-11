@@ -19,9 +19,9 @@ Phase D delivers three cross-cutting capabilities:
 ## Binaries
 
 - **Local build (Phase 6 verification)**: `node /Users/mochi/code/hopcode/.claude/worktrees/tender-jemison-037f0a/dist/cli.js`
-- **Phase 4 dry-run baseline**: globally installed `qwen`
+- **Phase 4 dry-run baseline**: globally installed `hopcode`
 
-For dry-runs the globally installed `qwen` is expected to fail Groups A / E / F
+For dry-runs the globally installed `hopcode` is expected to fail Groups A / E / F
 because the features don't exist yet — that's the validation that the plan
 correctly detects implementation.
 
@@ -32,7 +32,7 @@ symlink) require **Phase A + B** to be present in the baseline — they exercise
 the existing `enter_worktree` tool and `agent isolation: "worktree"` parameter
 to confirm the symlink loop fires on those code paths too.
 
-The globally installed `qwen` may predate PR #4073 (Phase A+B, merged 2026-05-14)
+The globally installed `hopcode` may predate PR #4073 (Phase A+B, merged 2026-05-14)
 and therefore lack these tools entirely. When that is the case, E2 / E3 cannot
 validate "symlink absent because D-2 is absent" — they collapse to "tool
 absent." Add this guard at the top of each:
@@ -615,7 +615,7 @@ Run A/B/C/D/E/G in parallel; F serially after the clone setup.
 
 ## Reproduction report
 
-### Phase 4 dry-run — baseline `qwen` v0.15.11 (2026-05-20)
+### Phase 4 dry-run — baseline `hopcode` v0.15.11 (2026-05-20)
 
 Runtime: 3 parallel `test-engineer` agents, ~7 minutes total. Baseline lacks
 both Phase D (expected) and Phase A+B (older binary than expected — see
@@ -662,7 +662,7 @@ implementation.**
 
 | Group                              | Result                    | Notes                                                                                                                                                                                                                                                                                                                                                                                       |
 | ---------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1 (bare flag)                     | ✅ (with doc tip)         | yargs consumes the next positional as the slug value when user passes `qwen --worktree "say hi"`; quickstart now tells users to use `=` form or put the prompt before the flag. Auto-slug feature itself confirmed via `qwen --worktree --approval-mode izn "say hi"` → slug `bright-elm-8a4c12`, init `.cwd` ends with `.hopcode/worktrees/<auto-slug>`.                                   |
+| A1 (bare flag)                     | ✅ (with doc tip)         | yargs consumes the next positional as the slug value when user passes `hopcode --worktree "say hi"`; quickstart now tells users to use `=` form or put the prompt before the flag. Auto-slug feature itself confirmed via `hopcode --worktree --approval-mode izn "say hi"` → slug `bright-elm-8a4c12`, init `.cwd` ends with `.hopcode/worktrees/<auto-slug>`.                             |
 | A2 (explicit slug)                 | ✅                        | dir `.hopcode/worktrees/my-feature` + branch `worktree-my-feature`                                                                                                                                                                                                                                                                                                                          |
 | A3 (= form)                        | ✅                        | identical to A2                                                                                                                                                                                                                                                                                                                                                                             |
 | A4 (invalid slug)                  | ✅                        | exit=1, message: `Worktree name may only contain letters, digits, dots, underscores, and hyphens.`, no worktree dir                                                                                                                                                                                                                                                                         |
@@ -708,8 +708,8 @@ not an implementation issue. **Ready for Phase 7 code review.**
 
 ## Reproduction report — Phase 4 dry-run (Groups F + G), 2026-05-20
 
-**Binary**: `qwen` (globally installed, v0.15.11 at `/Users/mochi/.nvm/versions/node/v22.21.1/bin/qwen`)
-**Override**: `QWEN="qwen"`
+**Binary**: `hopcode` (globally installed, v0.15.11 at `/Users/mochi/.nvm/versions/node/v22.21.1/bin/hopcode`)
+**Override**: `HOPCODE="hopcode"`
 
 ### Results table
 
@@ -743,6 +743,6 @@ The failure mode is uniformly at the yargs layer, not downstream. This confirms 
 
 ### SCRIPT-BUG notes for the test plan
 
-**G1 (tmux):** The tmux session command pipes through `tee` with a subshell `echo 'PROC_EXIT='$?` that captures the exit of `tee`, not of `qwen`. When the process exits instantly (as with an Unknown argument error), the session terminates before `sleep 3` finishes and the pane name `g1dry` is gone by the time `tmux capture-pane` runs, producing `can't find pane: g1dry`. Fix: use `|| true` after `tmux capture-pane`, or add a `|| sleep 0` guard; better still, for the baseline-fail case redirect stderr+stdout to a file outside tmux and check the file directly (as done here via `tee /tmp/g1_raw.out`).
+**G1 (tmux):** The tmux session command pipes through `tee` with a subshell `echo 'PROC_EXIT='$?` that captures the exit of `tee`, not of `hopcode`. When the process exits instantly (as with an Unknown argument error), the session terminates before `sleep 3` finishes and the pane name `g1dry` is gone by the time `tmux capture-pane` runs, producing `can't find pane: g1dry`. Fix: use `|| true` after `tmux capture-pane`, or add a `|| sleep 0` guard; better still, for the baseline-fail case redirect stderr+stdout to a file outside tmux and check the file directly (as done here via `tee /tmp/g1_raw.out`).
 
 **G2 (`--prompt-file`):** The test plan uses `--prompt-file ./relative.txt` as a combined test with `--worktree`. In the baseline, `--prompt-file` is also an unknown argument (it does not exist in v0.15.11 yargs schema either — the flag is `--prompt-interactive` / `-p`). The error lists both unknown args together. The plan should note that `--prompt-file` will need to be implemented alongside `--worktree`, or use an existing flag (e.g. pipe via stdin or use `--prompt`) for the relative-path resolution test.
