@@ -1,15 +1,15 @@
-# Migrating from HopCode to HopCode
+# Migrating from Qwen Code to HopCode
 
-This guide helps existing HopCode users transition to HopCode.
+This guide helps existing Qwen Code users transition to HopCode.
 
 ## What Changed
 
-HopCode is a fork of HopCode with expanded multi-provider support, new features, and a rebranded identity. The core functionality remains the same, but there are some changes to configuration, commands, and environment variables.
+HopCode is a fork of Qwen Code with expanded multi-provider support, new features, and a rebranded identity. The core functionality remains the same, but there are some changes to configuration, commands, and environment variables.
 
 ## Quick Migration Checklist
 
 - [ ] Update global installation: `npm install -g @hoptrendy/hopcode`
-- [ ] Rename config directory: `mv ~/.hopcode ~/.hopcode`
+- [ ] Rename config directory: `mv ~/.qwen ~/.hopcode`
 - [ ] Update shell aliases: `alias hopcode='hopcode'` (replace `qwen`)
 - [ ] Update IDE extensions: Install HopCode VS Code / Zed extensions
 - [ ] Update CI scripts: Replace `qwen` command with `hopcode`
@@ -17,11 +17,11 @@ HopCode is a fork of HopCode with expanded multi-provider support, new features,
 
 ## Command Changes
 
-| HopCode          | HopCode             | Notes                            |
+| Qwen Code        | HopCode             | Notes                            |
 | ---------------- | ------------------- | -------------------------------- |
 | `qwen`           | `hopcode`           | Main CLI entry point             |
 | `qwen --json`    | `hopcode --json`    | Headless JSON output             |
-| `hopcode serve`  | `hopcode serve`     | HTTP API server                  |
+| `qwen serve`     | `hopcode serve`     | HTTP API server                  |
 | `qwen dashboard` | `hopcode dashboard` | Web dashboard                    |
 | `qwen profile`   | `hopcode profile`   | Profile management               |
 | —                | `hopcode grpc`      | **New** — gRPC headless server   |
@@ -29,36 +29,36 @@ HopCode is a fork of HopCode with expanded multi-provider support, new features,
 
 ## Configuration Directory
 
-| HopCode              | HopCode              |
-| -------------------- | -------------------- |
-| `~/.hopcode/`        | `~/.hopcode/`        |
-| `.hopcode/agents/`   | `.hopcode/agents/`   |
-| `.hopcode/skills/`   | `.hopcode/skills/`   |
-| `.hopcode/commands/` | `.hopcode/commands/` |
+| Qwen Code         | HopCode              |
+| ----------------- | -------------------- |
+| `~/.qwen/`        | `~/.hopcode/`        |
+| `.qwen/agents/`   | `.hopcode/agents/`   |
+| `.qwen/skills/`   | `.hopcode/skills/`   |
+| `.qwen/commands/` | `.hopcode/commands/` |
 
 **Migration:**
 
 ```bash
 # Linux/macOS
-mv ~/.hopcode ~/.hopcode
+mv ~/.qwen ~/.hopcode
 
 # Windows
-rename %USERPROFILE%\.hopcode %USERPROFILE%\.hopcode
+rename %USERPROFILE%\.qwen %USERPROFILE%\.hopcode
 ```
 
 ## Environment Variables
 
-| HopCode           | HopCode           | Status                          |
-| ----------------- | ----------------- | ------------------------------- |
-| `HOPCODE_SIMPLE`  | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
-| `HOPCODE_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended              |
+| Qwen Code      | HopCode           | Status                          |
+| -------------- | ----------------- | ------------------------------- |
+| `QWEN_SIMPLE`  | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
+| `QWEN_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended              |
 
 ## Package Name Changes
 
-| Old         | New                  |
-| ----------- | -------------------- |
-| `hopcode`   | `@hoptrendy/hopcode` |
-| `@qwen/sdk` | `@hoptrendy/sdk`     |
+| Old                    | New                  |
+| ---------------------- | -------------------- |
+| `@qwen-code/qwen-code` | `@hoptrendy/hopcode` |
+| `@qwen/sdk`            | `@hoptrendy/sdk`     |
 
 **Update imports:**
 
@@ -74,18 +74,18 @@ import { Query } from '@hoptrendy/sdk';
 
 ### VS Code
 
-1. Uninstall the HopCode extension
+1. Uninstall the Qwen Code extension
 2. Install `hopcode-vscode-ide-companion` from the marketplace
 3. Your settings will be migrated automatically on first launch
 
 ### Zed
 
-1. Uninstall the Qwen extension
+1. Uninstall the Qwen Code extension
 2. Install the HopCode Zed extension
 
 ## New Features in HopCode
 
-Features not available in HopCode:
+Features not available in Qwen Code:
 
 - **Multi-provider support** — Claude, GPT, Gemini, DeepSeek, Groq, Ollama, and 15+ others
 - **Per-agent model routing** — Different models for different agents/tasks
@@ -98,10 +98,10 @@ Features not available in HopCode:
 
 ## Breaking Changes
 
-1. **Config directory rename** — `~/.hopcode` → `~/.hopcode`
+1. **Config directory rename** — `~/.qwen` → `~/.hopcode`
 2. **Binary name** — `qwen` → `hopcode`
-3. **NPM scope** — `@qwen/*` → `@hoptrendy/*`
-4. **Docker image** — `ghcr.io/qwenlm/hopcode` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
+3. **NPM scope** — `@qwen-code/*` → `@hoptrendy/*`
+4. **Docker image** — `ghcr.io/qwenlm/qwen-code` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
 
 ## Troubleshooting
 

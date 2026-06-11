@@ -758,5 +758,5 @@ HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true qwen "投资分析"
 - **更多 cardinality toggle**：未来若 metric 上引入 `user.account_uuid` / `model` 等，按需补 toggle
 - **Per-span 动态 attribute hook**：可借鉴 hopcode 自家 hooks 系统，加 `OnSpanStart(span, context) => attrs` 回调。需要独立设计。
 - **Resource attribute schema 校验**：限制 key 命名空间（如禁止覆盖 `service.*` 前缀以外的内建 attr），目前靠保留键列表硬编码够用。
-- **Hot reload Resource**：当 settings.json 在进程内被修改（设想 qwen-serve daemon 场景），目前不会重建 Resource。若 daemon 场景成熟，可以增加一条 reload 路径。
+- **Hot reload Resource**：当 settings.json 在进程内被修改（设想 hopcode-serve daemon 场景），目前不会重建 Resource。若 daemon 场景成熟，可以增加一条 reload 路径。
 - **跨进程 subagent context 传播**：subagent 跨进程时，把 parent 的 trace context（包括 resource）通过 OTel context propagation 标准 header 传过去。需要独立设计。
