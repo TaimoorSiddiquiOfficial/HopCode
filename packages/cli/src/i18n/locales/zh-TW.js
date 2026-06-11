@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -398,7 +398,7 @@ export default {
   'Max Retries': '最大重試次數',
   'Load Memory From Include Directories': '從包含目錄加載內存',
   'Respect .gitignore': '遵守 .gitignore',
-  'Respect .qwenignore': '遵守 .qwenignore',
+  'Respect .hopcodeignore': '遵守 .hopcodeignore',
   'Enable Recursive File Search': '啟用遞歸檔案搜索',
   'Interactive Shell (PTY)': '交互式 Shell (PTY)',
   'Show Color': '顯示顏色',

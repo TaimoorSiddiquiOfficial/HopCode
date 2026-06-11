@@ -19,25 +19,25 @@ describe('channels/base paths – getGlobalHopCodeDir', () => {
     expect(getGlobalHopCodeDir()).toBe(path.join(os.homedir(), '.hopcode'));
   });
 
-  it('uses QWEN_HOME when set to absolute path', () => {
+  it('uses HOPCODE_HOME when set to absolute path', () => {
     const configDir = path.resolve('/tmp/custom-hopcode');
     process.env['HOPCODE_HOME'] = configDir;
     expect(getGlobalHopCodeDir()).toBe(configDir);
   });
 
-  it('resolves relative QWEN_HOME against process.cwd', () => {
+  it('resolves relative HOPCODE_HOME against process.cwd', () => {
     process.env['HOPCODE_HOME'] = 'relative/config';
     expect(getGlobalHopCodeDir()).toBe(path.resolve('relative/config'));
   });
 
-  it('expands tilde (~/x) in QWEN_HOME', () => {
+  it('expands tilde (~/x) in HOPCODE_HOME', () => {
     process.env['HOPCODE_HOME'] = '~/custom-hopcode';
     expect(getGlobalHopCodeDir()).toBe(
       path.join(os.homedir(), 'custom-hopcode'),
     );
   });
 
-  it('expands Windows-style tilde (~\\x) in QWEN_HOME', () => {
+  it('expands Windows-style tilde (~\\x) in HOPCODE_HOME', () => {
     process.env['HOPCODE_HOME'] = '~\\custom-hopcode';
     expect(getGlobalHopCodeDir()).toBe(
       path.join(os.homedir(), 'custom-hopcode'),

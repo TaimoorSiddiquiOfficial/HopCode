@@ -36,9 +36,9 @@ export async function registerComputerUseTools(
 ): Promise<void> {
   for (const upstreamName of COMPUTER_USE_TOOL_NAMES) {
     const schema = COMPUTER_USE_SCHEMAS[upstreamName];
-    const qwenName = `computer_use__${upstreamName}` as ToolName;
+    const hopcodeName = `computer_use__${upstreamName}` as ToolName;
     await registerLazy(
-      qwenName,
+      hopcodeName,
       async () => new ComputerUseTool(upstreamName, schema),
     );
   }

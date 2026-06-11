@@ -76,7 +76,7 @@ function sanitizeForStderr(value: string): string {
  *
  * Uses the lower-level `QwenOAuth2Client` primitives (`requestDeviceAuthorization`
  * / `pollDeviceToken`) directly rather than the high-level
- * `authWithQwenDeviceFlow` because that helper invokes `open(url)` to launch
+ * `authWithHopCodeDeviceFlow` because that helper invokes `open(url)` to launch
  * a browser on the daemon host. PR 21 design Â§8 #1 forbids browser-spawning
  * from the daemon â€” only the SDK/user side may decide to open a URL.
  */

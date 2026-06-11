@@ -83,7 +83,7 @@ export const tipRegistry: ContextualTip[] = [
     priority: 70,
   },
   {
-    id: 'new-user-qwenmd',
+    id: 'new-user-hopcodemd',
     content:
       'Add a HOPCODE.md file to give HopCode persistent project context.',
     trigger: 'startup',

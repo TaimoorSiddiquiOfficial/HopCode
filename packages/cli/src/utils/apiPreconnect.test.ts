@@ -72,7 +72,9 @@ describe('apiPreconnect', () => {
   describe('shouldSkipPreconnect', () => {
     it('should skip when NODE_EXTRA_CA_CERTS is set', () => {
       process.env['NODE_EXTRA_CA_CERTS'] = '/path/to/ca.pem';
-      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', {
+        proxy: 'http://proxy.example.com:8080',
+      });
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });
@@ -161,7 +163,7 @@ describe('apiPreconnect', () => {
 
     it('should fall back to authType default when resolvedBaseUrl is a non-URL sentinel', () => {
       preconnectApi('hopcode-oauth', {
-        resolvedBaseUrl: 'DYNAMIC_QWEN_OAUTH_BASE_URL',
+        resolvedBaseUrl: 'DYNAMIC_HOPCODE_OAUTH_BASE_URL',
         proxy: 'http://proxy.example.com:8080',
       });
       expect(mockFetch).toHaveBeenCalledWith(
@@ -274,7 +276,9 @@ describe('apiPreconnect', () => {
       expect(mockFetch).not.toHaveBeenCalled();
 
       // Second call: proxy is now available, so preconnect should still fire.
-      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', {
+        proxy: 'http://proxy.example.com:8080',
+      });
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockGetOrCreateSharedDispatcher).toHaveBeenCalledWith(
         'http://proxy.example.com:8080',
@@ -285,7 +289,9 @@ describe('apiPreconnect', () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
       // Should not throw
       expect(() =>
-        preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' }),
+        preconnectApi('hopcode-oauth', {
+          proxy: 'http://proxy.example.com:8080',
+        }),
       ).not.toThrow();
     });
 
@@ -313,7 +319,9 @@ describe('apiPreconnect', () => {
         throw new Error('Failed to create dispatcher');
       });
       expect(() =>
-        preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' }),
+        preconnectApi('hopcode-oauth', {
+          proxy: 'http://proxy.example.com:8080',
+        }),
       ).not.toThrow();
     });
 
@@ -336,13 +344,17 @@ describe('apiPreconnect', () => {
 
     it('should skip when HOPCODE_DISABLE_PRECONNECT is set', () => {
       process.env['HOPCODE_DISABLE_PRECONNECT'] = '1';
-      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', {
+        proxy: 'http://proxy.example.com:8080',
+      });
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it('should skip in sandbox mode', () => {
       process.env['SANDBOX'] = '1';
-      preconnectApi('hopcode-oauth', { proxy: 'http://proxy.example.com:8080' });
+      preconnectApi('hopcode-oauth', {
+        proxy: 'http://proxy.example.com:8080',
+      });
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });

@@ -1,4 +1,4 @@
-﻿# HopCode Visual Branding Review & Strategy
+# HopCode Visual Branding Review & Strategy
 
 **Document Version:** 1.0  
 **Created:** 2026-04-18  
@@ -77,7 +77,7 @@ This document provides a comprehensive review of all visual branding assets in t
 --app-background-tertiary: #2d2d2d;
 ```
 
-#### CLI Theme Colors (Qwen Dark)
+#### CLI Theme Colors (HopCode Dark)
 
 ```typescript
 Background: '#0b0e14'; // Dark blue-black
@@ -93,7 +93,7 @@ GradientColors: ['#FFD700', '#da7959']; // Gold → Coral
 
 **Available Themes:** 14 total (7 dark, 7 light)
 
-- Qwen Dark / Qwen Light (custom themes)
+- HopCode Dark / HopCode Light (custom themes)
 - Standard themes: Dracula, GitHub, Ayu, Atom One, etc.
 
 ---

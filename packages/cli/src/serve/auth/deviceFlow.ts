@@ -313,7 +313,7 @@ export type DeviceFlowPollResult =
        *  inside `persist` MUST take `signal` as input AND propagate
        *  it down to abortable primitives (`fs.writeFile`, `fetch`,
        *  etc.). `cacheHopCodeCredentials({signal})` in
-       *  `qwenDeviceFlowProvider` is the canonical example. */
+       *  `hopCodeDeviceFlowProvider` is the canonical example. */
       persist(opts: { signal: AbortSignal }): Promise<{
         expiresAt?: number;
         accountAlias?: string;
@@ -366,7 +366,7 @@ export interface DeviceFlowProvider {
    *      detail through `writeStderrLine` for operator audit; the
    *      thrown `message` is the SSE-visible surface.
    *
-   * `qwenDeviceFlowProvider` is the canonical example â€” see PR #4255
+   * `hopCodeDeviceFlowProvider` is the canonical example — see PR #4255
    * review S2 + fold-in 3 #9 + fold-in 5 #4 for the historical
    * regressions this contract prevents.
    */

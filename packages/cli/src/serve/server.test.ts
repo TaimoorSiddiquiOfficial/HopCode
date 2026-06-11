@@ -3954,7 +3954,7 @@ describe('runHopCodeServe', () => {
     // for review.
     const bridge = fakeBridge();
     const wsRoot = await fsp.mkdtemp(
-      path.join(os.tmpdir(), 'hopcode-runqwen-trust-'),
+      path.join(os.tmpdir(), 'hopcode-run-hopcode-trust-'),
     );
     try {
       const captured: BridgeEvent[] = [];
@@ -3997,7 +3997,7 @@ describe('runHopCodeServe', () => {
     // `assertTrustedForIntent` rejects writes with
     // `untrusted_workspace` — exactly what PR 20 will rely on.
     const wsRoot = await fsp.mkdtemp(
-      path.join(os.tmpdir(), 'hopcode-runqwen-untrust-'),
+      path.join(os.tmpdir(), 'hopcode-run-hopcode-untrust-'),
     );
     try {
       // Mirror runHopCodeServe's construction. If `runHopCodeServe`

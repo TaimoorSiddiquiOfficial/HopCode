@@ -183,10 +183,10 @@ export class ComputerUseTool extends BaseDeclarativeTool<
     private readonly upstreamName: ComputerUseToolName,
     schema: ComputerUseToolSchema,
   ) {
-    const qwenName = `computer_use__${upstreamName}`;
+    const hopcodeName = `computer_use__${upstreamName}`;
     super(
-      qwenName,
-      qwenName, // displayName == name; no MCP branding in UI
+      hopcodeName,
+      hopcodeName, // displayName == name; no MCP branding in UI
       schema.description,
       Kind.Other,
       schema.parameterSchema,

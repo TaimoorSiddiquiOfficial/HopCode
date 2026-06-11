@@ -487,11 +487,7 @@ export type AgentModelOverride =
   | string
   | { model: string; baseUrl?: string; apiKey?: string };
 
-export type ExtensionOriginSource =
-  | 'HopCode'
-  | 'QwenCode'
-  | 'Claude'
-  | 'Gemini';
+export type ExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
 
 export interface ExtensionInstallMetadata {
   source: string;
