@@ -168,14 +168,14 @@ describe('<Footer />', () => {
 
     it('renders status line with respectUserColors enabled', () => {
       useStatusLineMock.mockReturnValue({
-        lines: ['\x1b[38;2;99;102;241m🤖 qwen\x1b[0m'],
+        lines: ['\x1b[38;2;99;102;241m🤖 hopcode\x1b[0m'],
         useThemeColors: false,
         respectUserColors: true,
         hideContextIndicator: false,
       });
       const { lastFrame } = renderWithWidth(120, createMockUIState());
       const frame = lastFrame()!;
-      expect(frame).toContain('🤖 qwen');
+      expect(frame).toContain('🤖 hopcode');
     });
 
     it('hides context indicator when hideContextIndicator is true', () => {

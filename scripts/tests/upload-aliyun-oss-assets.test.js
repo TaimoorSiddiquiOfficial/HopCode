@@ -119,7 +119,7 @@ describe('uploadAssets (integration)', () => {
       uploadAssets(
         {
           assets,
-          bucket: 'qwen-test-bucket',
+          bucket: 'hopcode-test-bucket',
           config: configPath,
           prefix: 'releases/hopcode/v0.0.0',
         },
@@ -128,10 +128,10 @@ describe('uploadAssets (integration)', () => {
 
       const log = fs.readFileSync(logPath, 'utf8');
       expect(log).toContain(
-        `oss://qwen-test-bucket/releases/hopcode/v0.0.0/a.tar.gz`,
+        `oss://hopcode-test-bucket/releases/hopcode/v0.0.0/a.tar.gz`,
       );
       expect(log).toContain(
-        `oss://qwen-test-bucket/releases/hopcode/v0.0.0/b.zip`,
+        `oss://hopcode-test-bucket/releases/hopcode/v0.0.0/b.zip`,
       );
       expect(log).toContain(`-c\n${configPath}`);
       expect(log).toContain('--acl\npublic-read');
@@ -156,7 +156,7 @@ describe('uploadAssets (integration)', () => {
         uploadAssets(
           {
             assets: [assetPath],
-            bucket: 'qwen-test-bucket',
+            bucket: 'hopcode-test-bucket',
             config: configPath,
             prefix: 'releases/hopcode/v0.0.0',
           },

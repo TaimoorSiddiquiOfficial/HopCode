@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,10 +8,10 @@ import {
   DEFAULT_HOPCODE_MODEL,
   MAINLINE_CODER_MODEL,
 } from '../config/models.js';
+import type { AuthType } from '../core/contentGenerator.js';
 
 import type { ModelConfig } from './types.js';
 
-type AuthType = import('../core/contentGenerator.js').AuthType;
 type ContentGeneratorConfig =
   import('../core/contentGenerator.js').ContentGeneratorConfig;
 
@@ -119,7 +119,7 @@ export const AUTH_ENV_MAPPINGS = {
     baseUrl: [],
     model: [],
   },
-  'qwen_oauth': {
+  hopcode_oauth: {
     apiKey: [],
     baseUrl: [],
     model: [],

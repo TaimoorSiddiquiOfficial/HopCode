@@ -1,4 +1,4 @@
-﻿# Worktree Phase C E2E Test Plan
+# Worktree Phase C E2E Test Plan
 
 ## Scope
 
@@ -27,7 +27,7 @@ Phase C delivers:
 Each group runs in its own temp git repo and tmux session:
 
 ```bash
-TEST_DIR=$(mktemp -d -t qwen-wt-phc-XXXXXX)
+TEST_DIR=$(mktemp -d -t hopcode-wt-phc-XXXXXX)
 TEST_DIR=$(cd "$TEST_DIR" && pwd -P)   # resolve symlinks (macOS /var → /private/var)
 cd "$TEST_DIR"
 git init -q -b main
@@ -150,7 +150,7 @@ test "$HOOKS_PATH" = "$TEST_DIR/.husky" && echo "PASS" || echo "FAIL got=$HOOKS_
 mkdir -p "$TEST_DIR/.git/hooks"
 cat > "$TEST_DIR/.git/hooks/pre-commit" <<'EOF'
 #!/bin/sh
-echo "hook-fired" > /tmp/qwen-wt-hook-marker
+echo "hook-fired" > /tmp/hopcode-wt-hook-marker
 EOF
 chmod +x "$TEST_DIR/.git/hooks/pre-commit"
 
@@ -161,13 +161,13 @@ node $QWEN "use enter_worktree with name='b3-test' to create a worktree" \
 WT="$TEST_DIR/.hopcode/worktrees/b3-test"
 echo "x" > "$WT/file.txt"
 git -C "$WT" add file.txt
-rm -f /tmp/qwen-wt-hook-marker
+rm -f /tmp/hopcode-wt-hook-marker
 git -C "$WT" commit -m "trigger hook" 2>&1
-test -f /tmp/qwen-wt-hook-marker && echo "PASS: hook fired" || echo "FAIL: hook did not fire"
-rm -f /tmp/qwen-wt-hook-marker
+test -f /tmp/hopcode-wt-hook-marker && echo "PASS: hook fired" || echo "FAIL: hook did not fire"
+rm -f /tmp/hopcode-wt-hook-marker
 ```
 
-**Expected:** `/tmp/qwen-wt-hook-marker` exists after the commit.
+**Expected:** `/tmp/hopcode-wt-hook-marker` exists after the commit.
 
 ---
 
@@ -526,11 +526,11 @@ SETTINGS_DIR=~/.hopcode
 SETTINGS_FILE=$SETTINGS_DIR/settings.json
 cp -f "$SETTINGS_FILE" /tmp/qwen-settings-backup.json 2>/dev/null || true
 mkdir -p "$SETTINGS_DIR"
-SL_SCRIPT=/tmp/qwen-wt-statusline.sh
+SL_SCRIPT=/tmp/hopcode-wt-statusline.sh
 cat > $SL_SCRIPT <<'EOF'
 #!/bin/sh
 INPUT=$(cat)
-echo "$INPUT" > /tmp/qwen-wt-statusline-input.json
+echo "$INPUT" > /tmp/hopcode-wt-statusline-input.json
 WT_NAME=$(echo "$INPUT" | jq -r '.worktree.name // "no-worktree"')
 echo "WT=$WT_NAME"
 EOF
@@ -552,7 +552,7 @@ for i in $(seq 1 30); do sleep 2; tmux capture-pane -t wt-f2 -p | grep -q "Type 
 sleep 3  # let statusline refresh after sidecar change
 
 # Inspect the captured payload
-cat /tmp/qwen-wt-statusline-input.json | jq '.worktree.name, .worktree.path, .worktree.branch'
+cat /tmp/hopcode-wt-statusline-input.json | jq '.worktree.name, .worktree.path, .worktree.branch'
 
 # Verify built-in Footer indicator is HIDDEN when custom statusline is active
 tmux capture-pane -t wt-f2 -p -S -100 > /tmp/wt-f2.out
@@ -565,7 +565,7 @@ cp -f /tmp/qwen-settings-backup.json "$SETTINGS_FILE" 2>/dev/null || rm -f "$SET
 
 **Expected:**
 
-- `/tmp/qwen-wt-statusline-input.json` has `.worktree.name == "f2-test"`, `.path`, `.branch` set
+- `/tmp/hopcode-wt-statusline-input.json` has `.worktree.name == "f2-test"`, `.path`, `.branch` set
 - Custom statusline output `WT=f2-test` appears in Footer
 - Built-in `⎇ worktree-...` row is NOT rendered (suppressed by custom statusline)
 

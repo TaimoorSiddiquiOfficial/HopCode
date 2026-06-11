@@ -160,7 +160,7 @@ export type DeviceFlowErrorKind =
    *  the failure originated from `provider.persist()` ignoring the
    *  registry's signal AND the underlying disk write later
    *  succeeded (PR #4255 fold-in 9 #7 â€” only reachable for
-   *  non-conforming future providers; the Qwen provider honors
+   *  non-conforming future providers; the HopCode provider honors
    *  signal end-to-end), the daemon emits
    *  `auth_device_flow_failed`/`persist_failed` to SSE while the
    *  credentials are silently on disk. A naive SDK retry (\"disk
@@ -472,7 +472,7 @@ interface DeviceFlowEntry {
    * caller's `initiatorClientId` differs from `entry.initiatorClientId`.
    * Surfaced through the audit trail so incident response can see
    * "client A started this flow, client B took it over at 12:34" â€”
-   * useful when two SDK processes race on the same Qwen account
+   * useful when two SDK processes race on the same HopCode account
    * across hosts. Event-routing still uses the original
    * `initiatorClientId` (events are workspace-broadcast; the
    * originator field is metadata, and changing it mid-flow would
@@ -536,7 +536,7 @@ export interface DeviceFlowRegistryDeps {
   events: DeviceFlowEventSink;
   audit?: DeviceFlowAuditSink;
   /** Provider lookup. Tests stub a fake provider; production wires the
-   *  Qwen-OAuth implementation. */
+   *  HopCode-OAuth implementation. */
   resolveProvider(
     providerId: DeviceFlowProviderId,
   ): DeviceFlowProvider | undefined;
@@ -1188,7 +1188,7 @@ export class DeviceFlowRegistry {
             // poll resolve branch fires when `provider.poll()` returns
             // a result AFTER our race timer settled the wrapper. For a
             // cooperative provider whose abort path resolves to
-            // `{kind: 'error', errorKind: 'upstream_error'}` (the Qwen
+            // `{kind: 'error', errorKind: 'upstream_error'}` (the HopCode
             // implementation does this in response to AbortError), the
             // "response" is just the abort-cooperation path â€” the IdP
             // could be completely down. Don't assert "responsive but
@@ -1298,7 +1298,7 @@ export class DeviceFlowRegistry {
         // â€” daemon now has credentials on disk while every SSE
         // subscriber thinks the login failed.
         //
-        // The Qwen provider is signal-honoring (see fold-in 3 #10)
+        // The HopCode provider is signal-honoring (see fold-in 3 #10)
         // so this is forward-defense for future providers. We
         // can't pre-commit-rollback (`fs.unlink` would race with
         // provider-internal state) so the contract stays

@@ -82,7 +82,7 @@ export function HookEventMatcherListStep({
           </Box>
           <Box marginTop={1}>
             <Text color={theme.text.secondary}>
-              {t('To add hooks, edit settings.json directly or ask Qwen.')}
+              {t('To add hooks, edit settings.json directly or ask HopCode.')}
             </Text>
           </Box>
           <Box marginTop={1}>

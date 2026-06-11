@@ -1,4 +1,4 @@
-﻿import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -44,7 +44,7 @@ describe('ComputerUseTool', () => {
     delete process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'];
   });
 
-  it('exposes qwen-facing name with computer_use__ prefix', () => {
+  it('exposes hopcode-facing name with computer_use__ prefix', () => {
     const tool = new ComputerUseTool('click', COMPUTER_USE_SCHEMAS.click);
     expect(tool.name).toBe('computer_use__click');
     expect(tool.displayName).toBe('computer_use__click');
@@ -230,7 +230,7 @@ describe('ComputerUseInvocation confirmation pathway', () => {
   let tmpHome: string;
 
   beforeEach(() => {
-    tmpHome = mkdtempSync(join(tmpdir(), 'qwen-cu-tool-'));
+    tmpHome = mkdtempSync(join(tmpdir(), 'hopcode-cu-tool-'));
     mockHome = tmpHome;
     ComputerUseClient.setSharedForTest(undefined);
     vi.clearAllMocks();

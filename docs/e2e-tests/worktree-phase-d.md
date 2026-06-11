@@ -1,4 +1,4 @@
-﻿# Worktree Phase D E2E Test Plan
+# Worktree Phase D E2E Test Plan
 
 ## Scope
 
@@ -54,7 +54,7 @@ Phase A-C, so the guard is a no-op and the tests run in full.
 Each group runs in its own temp git repo and tmux session:
 
 ```bash
-TEST_DIR=$(mktemp -d -t qwen-wt-phd-XXXXXX)
+TEST_DIR=$(mktemp -d -t hopcode-wt-phd-XXXXXX)
 TEST_DIR=$(cd "$TEST_DIR" && pwd -P)   # resolve symlinks (macOS /var → /private/var)
 cd "$TEST_DIR"
 git init -q -b main
@@ -450,7 +450,7 @@ inside it; debug log carries warn lines.
 
 ```bash
 # Use hopcode itself as the test repo
-TEST_DIR=$(mktemp -d -t qwen-wt-phd-pr-XXXXXX)
+TEST_DIR=$(mktemp -d -t hopcode-wt-phd-pr-XXXXXX)
 TEST_DIR=$(cd "$TEST_DIR" && pwd -P)
 cd "$TEST_DIR"
 git clone --depth 1 https://github.com/TaimoorSiddiquiOfficial/HopCode.git .

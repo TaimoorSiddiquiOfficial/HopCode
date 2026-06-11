@@ -382,7 +382,7 @@ export default {
   'Show Welcome Back Dialog': '顯示歡迎回來對話框',
   'Enable User Feedback': '啟用用戶反饋',
   'How is HopCode doing this session? (optional)':
-    'Qwen 這次表現如何？（可選）',
+    'HopCode 這次表現如何？（可選）',
   Bad: '不滿意',
   Fine: '還行',
   Good: '滿意',

@@ -175,7 +175,7 @@ validate_version() {
 }
 
 validate_github_repo() {
-    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/hopcode}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-TaimoorSiddiquiOfficial/HopCode}"
     if [[ "${github_repo}" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
         return 0
     fi
@@ -552,7 +552,7 @@ maybe_update_shell_path() {
 
 github_base_url_for_version() {
     local version_path="$1"
-    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/hopcode}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-TaimoorSiddiquiOfficial/HopCode}"
     if [[ "${version_path}" == "latest" ]]; then
         echo "https://github.com/${github_repo}/releases/latest/download"
     else
@@ -1203,7 +1203,7 @@ install_standalone() {
 
     if ! write_unix_wrapper "${wrapper_tmp}" "${INSTALL_LIB_DIR}/bin/hopcode"; then
         rm -rf "${temp_dir}" "${new_install_dir}" "${wrapper_tmp}"
-        log_error "Failed to create qwen wrapper in ${INSTALL_BIN_DIR}."
+        log_error "Failed to create hopcode wrapper in ${INSTALL_BIN_DIR}."
         return 1
     fi
 

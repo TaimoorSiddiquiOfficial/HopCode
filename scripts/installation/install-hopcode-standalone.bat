@@ -208,7 +208,7 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 
 call :PrintHeader
 
-REM Discover all qwen executables on disk BEFORE we install. We can't
+REM Discover all hopcode executables on disk BEFORE we install. We can't
 REM reliably simulate the user's PATH ordering, so enumerate well-known
 REM per-tool bin directories plus everything `where hopcode` returns.
 call :CreateTempFile "hopcode-pre-install"
@@ -490,7 +490,7 @@ exit /b 0
 
 :GithubBaseUrlForVersion
 rem args: %~1=version_path  → sets HOPCODE_GH_BASE_URL
-set "HOPCODE_GH_REPO=QwenLM/qwen-code"
+set "HOPCODE_GH_REPO=TaimoorSiddiquiOfficial/HopCode"
 if defined HOPCODE_INSTALL_GITHUB_REPO set "HOPCODE_GH_REPO=!HOPCODE_INSTALL_GITHUB_REPO!"
 if /i "%~1"=="latest" (
     set "HOPCODE_GH_BASE_URL=https://github.com/!HOPCODE_GH_REPO!/releases/latest/download"
@@ -1190,8 +1190,8 @@ call :NpmPackageSpec
 
 where hopcode >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "QWEN_VERSION=%%i"
-    echo INFO: Existing HopCode detected: !QWEN_VERSION!
+    for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "HOPCODE_VERSION=%%i"
+    echo INFO: Existing HopCode detected: !HOPCODE_VERSION!
     if /i "!VERSION!"=="latest" (
         echo INFO: Upgrading to the latest version.
     ) else (
@@ -1280,16 +1280,16 @@ if /i "!SUMMARY_INSTALL_METHOD!"=="npm" (
     )
 )
 
-rem Build OTHER_QWENS = PRE_INSTALL_HOPCODES_LIST minus the install we just made.
-set "OTHER_QWENS="
+rem Build OTHER_HOPCODES = PRE_INSTALL_HOPCODES_LIST minus the install we just made.
+set "OTHER_HOPCODES="
 if defined PRE_INSTALL_HOPCODES_LIST (
     for %%i in ("!PRE_INSTALL_HOPCODES_LIST:|=" "!") do (
         set "ENTRY=%%~i"
         if not "!ENTRY!"=="" if /i not "!ENTRY!"=="!INSTALLED_BIN!" (
-            if "!OTHER_QWENS!"=="" (
-                set "OTHER_QWENS=!ENTRY!"
+            if "!OTHER_HOPCODES!"=="" (
+                set "OTHER_HOPCODES=!ENTRY!"
             ) else (
-                set "OTHER_QWENS=!OTHER_QWENS!|!ENTRY!"
+                set "OTHER_HOPCODES=!OTHER_HOPCODES!|!ENTRY!"
             )
         )
     )
@@ -1304,11 +1304,11 @@ if not "!EXTRA_BIN!"=="" if /i not "!NO_MODIFY_PATH!"=="1" (
     )
 )
 
-if defined OTHER_QWENS (
+if defined OTHER_HOPCODES (
     echo.
     echo WARNING: Other 'hopcode' executables exist on this system. Depending on
     echo WARNING: your PATH order, one of these may run instead of the install above:
-    for %%i in ("!OTHER_QWENS:|=" "!") do (
+    for %%i in ("!OTHER_HOPCODES:|=" "!") do (
         set "OQ=%%~i"
         if not "!OQ!"=="" echo WARNING:   !OQ!
     )
@@ -1322,5 +1322,5 @@ if /i "!HOPCODE_INSTALLER_PARENT_POWERSHELL!"=="1" (
     echo INFO: Final PATH refresh is handled by the PowerShell entrypoint.
     exit /b 0
 )
-echo qwen is ready to use in this terminal.
+echo hopcode is ready to use in this terminal.
 exit /b 0

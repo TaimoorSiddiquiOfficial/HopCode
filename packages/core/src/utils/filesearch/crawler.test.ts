@@ -49,7 +49,7 @@ async function initGitRepo(dir: string): Promise<void> {
     'git',
     [
       '-c',
-      'user.name=Qwen Test',
+      'user.name=HopCode Test',
       '-c',
       'user.email=hopcode-test@example.com',
       'commit',

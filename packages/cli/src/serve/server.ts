@@ -143,7 +143,7 @@ export interface ServeAppDeps {
    * (`now` / `schedule` overrides for deterministic timer control,
    * stubbed providers, captured event sink). Production callers omit
    * this and `createServeApp` constructs a default wired to the
-   * shipped Qwen provider, the bridge's `publishWorkspaceEvent`,
+   * shipped HopCode provider, the bridge's `publishWorkspaceEvent`,
    * and a stderr audit sink.
    */
   deviceFlowRegistry?: DeviceFlowRegistry;
@@ -151,7 +151,7 @@ export interface ServeAppDeps {
    * Issue #4175 PR 21 â€” extra device-flow providers for tests / future
    * extensions. Production builds register only `HopCodeOAuthDeviceFlowProvider`;
    * passing extra entries here registers them in addition to the default
-   * Qwen provider. Used by tests that stub the OAuth flow.
+   * HopCode provider. Used by tests that stub the OAuth flow.
    */
   deviceFlowProviders?: DeviceFlowProvider[];
 }
@@ -320,7 +320,7 @@ export function createServeApp(
   (app.locals as { boundWorkspace?: string }).boundWorkspace = boundWorkspace;
 
   // Issue #4175 PR 21 â€” wire the device-flow registry. Default builds
-  // a single Qwen provider; tests inject `deps.deviceFlowRegistry`
+  // a single HopCode provider; tests inject `deps.deviceFlowRegistry`
   // wholesale (with controlled clock/scheduler) or
   // `deps.deviceFlowProviders` to stub the OAuth client only.
   const deviceFlowProviderMap = new Map<

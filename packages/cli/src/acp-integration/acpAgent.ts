@@ -127,7 +127,7 @@ const debugLogger = createDebugLogger('ACP_AGENT');
  *
  * Drift detection: `AUTH_PREFLIGHT_AUDITED_AUTH_TYPES` below lists every
  * `AuthType` enum value that has been triaged for this map (either keyed
- * here, or explicitly waived for non-env-based auth like qwen-oauth). The
+ * here, or explicitly waived for non-env-based auth like hopcode-oauth). The
  * paired test `AUTH_PREFLIGHT_AUDITED_AUTH_TYPES covers every AuthType`
  * walks the public enum and fails CI when core adds a new auth method
  * without a deliberate decision here.
@@ -148,7 +148,7 @@ export const AUTH_PREFLIGHT_ENV_KEYS: Readonly<
  */
 export const AUTH_PREFLIGHT_WAIVED_AUTH_TYPES: ReadonlySet<string> = new Set([
   'hopcode-oauth',
-  'qwen_oauth',
+  AuthType.HOPCODE_OAUTH_DEPRECATED,
 ]);
 
 export async function runAcpAgent(
@@ -767,7 +767,7 @@ class HopCodeAgent implements Agent {
         // having set debug=true, which makes silent slot-leak / type-
         // mismatch failures invisible in real deployments.
         process.stderr.write(
-          `qwen serve: getMcpClientAccounting failed: ` +
+          `hopcode serve: getMcpClientAccounting failed: ` +
             `${err instanceof Error ? err.message : String(err)}\n`,
         );
       }
@@ -1151,7 +1151,7 @@ class HopCodeAgent implements Agent {
           status: 'warning',
           errorKind: 'auth_env_error',
           error: 'No auth method configured.',
-          hint: 'Run `qwen` and complete the auth flow, or set a provider env var.',
+          hint: 'Run `hopcode` and complete the auth flow, or set a provider env var.',
           detail: { source: 'none', hasToken: false },
         });
       }
@@ -1160,7 +1160,7 @@ class HopCodeAgent implements Agent {
         Boolean(process.env[name]),
       );
       const hasToken = Boolean(presentVar);
-      // No env-var registration → either OAuth-style auth (qwen-oauth) or
+      // No env-var registration → either OAuth-style auth (hopcode-oauth) or
       // a custom provider whose key is sourced from settings rather than
       // env. Surface as `unknown` (the SDK consumer can defer to the
       // `/session` boot for definitive validation) rather than a false
@@ -1897,7 +1897,7 @@ class HopCodeAgent implements Agent {
         // an MCP guardrail incident, they see exactly which event
         // dropped and why.
         void this.connection
-          .extNotification('qwen/notify/session/mcp-budget-event', {
+          .extNotification('hopcode/notify/session/mcp-budget-event', {
             v: 1,
             sessionId: sid,
             ...event,

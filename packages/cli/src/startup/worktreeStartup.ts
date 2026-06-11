@@ -195,8 +195,8 @@ export async function setupStartupWorktree(
       : undefined;
 
   // Re-attach to an existing worktree instead of erroring out. Common
-  // case: user did `qwen --worktree foo` previously, exited with Keep,
-  // and now runs `qwen --resume <sid> --worktree foo` to continue. The
+  // case: user did `hopcode --worktree foo` previously, exited with Keep,
+  // and now runs `hopcode --resume <sid> --worktree foo` to continue. The
   // directory + branch are already on disk; we just chdir into them.
   //
   // `getRegisteredWorktreeBranch` returns the worktree's HEAD commit
@@ -463,7 +463,7 @@ export function buildStartupWorktreeNotice(
     return (
       `${base}\n` +
       `Note: --worktree overrode the resumed session's previous worktree "${override.overriddenSlug}". ` +
-      `That worktree directory was left intact; re-attach with \`qwen --worktree ${override.overriddenSlug}\` if needed.`
+      `That worktree directory was left intact; re-attach with \`hopcode --worktree ${override.overriddenSlug}\` if needed.`
     );
   }
   return base;

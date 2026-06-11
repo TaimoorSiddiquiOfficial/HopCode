@@ -19,7 +19,9 @@ import {
 const exec = promisify(execFile);
 
 async function makeTempRepo(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-wt-startup-test-'));
+  const dir = await fs.mkdtemp(
+    path.join(os.tmpdir(), 'hopcode-wt-startup-test-'),
+  );
   // macOS resolves /var → /private/var; pwd -P is the cheapest way to
   // normalise. Use realpath so subsequent string comparisons against
   // process.cwd() match exactly.
@@ -70,7 +72,7 @@ describe('setupStartupWorktree', () => {
   });
 
   it('rejects when the launch cwd is not a git repo', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-wt-nongit-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-wt-nongit-'));
     tempRepo = dir;
     process.chdir(await fs.realpath(dir));
 
@@ -195,7 +197,7 @@ describe('setupStartupWorktree', () => {
     // the remote is github.com. update-ref lets us materialise the ref
     // locally without an actual GitHub round-trip.
     const upstream = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-wt-pr-upstream-'),
+      path.join(os.tmpdir(), 'hopcode-wt-pr-upstream-'),
     );
     const upstreamResolved = await fs.realpath(upstream);
     await exec('git', ['init', '-q', '--bare', '-b', 'main'], {
@@ -283,7 +285,7 @@ describe('setupStartupWorktree', () => {
     expect(first!.context.wasReattached).toBe(false);
 
     // Restore cwd so the second call starts from launch cwd, mirroring
-    // the real `qwen --resume <sid> --worktree foo` invocation flow.
+    // the real `hopcode --resume <sid> --worktree foo` invocation flow.
     process.chdir(tempRepo);
 
     // Second call with the same slug now re-attaches, doesn't create.
@@ -396,7 +398,7 @@ describe('buildStartupWorktreeNotice', () => {
     expect(notice).toContain('[Startup]');
     expect(notice).toContain('overrode');
     expect(notice).toContain('"old-slug"');
-    expect(notice).toContain('qwen --worktree old-slug');
+    expect(notice).toContain('hopcode --worktree old-slug');
   });
 
   it('does NOT append the override hint when overrodeResumedWorktree is false', () => {

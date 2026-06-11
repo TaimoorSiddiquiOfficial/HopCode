@@ -422,7 +422,7 @@ describe('installation scripts', () => {
 
   it('injects Windows processor overrides directly into cmd commands', () => {
     const prepared = prepareWindowsCommand(
-      'call "C:\\tools\\install-qwen-standalone.bat"',
+      'call "C:\\tools\\install-hopcode-standalone.bat"',
       {
         Path: 'C:\\fake-bin',
         PROCESSOR_ARCHITECTURE: 'AMD64',
@@ -436,7 +436,7 @@ describe('installation scripts', () => {
     );
 
     expect(prepared.command).toBe(
-      'set "PROCESSOR_ARCHITECTURE=AMD64" && set "PROCESSOR_ARCHITEW6432=" && call "C:\\tools\\install-qwen-standalone.bat"',
+      'set "PROCESSOR_ARCHITECTURE=AMD64" && set "PROCESSOR_ARCHITEW6432=" && call "C:\\tools\\install-hopcode-standalone.bat"',
     );
     expect(prepared.env).toEqual({ Path: 'C:\\fake-bin' });
   });
@@ -460,12 +460,16 @@ describe('release-script-utils', () => {
     const { parseSha256Sums } = await import(releaseScriptUtilsUrl);
 
     const checksums = parseSha256Sums(
-      `\uFEFF${'a'.repeat(64)}  install-hopcode-standalone.sh\n\n${'b'.repeat(64)} *install-qwen-standalone.bat\r\n${'c'.repeat(64)}  install-qwen-standalone.ps1\n`,
+      `\uFEFF${'a'.repeat(64)}  install-hopcode-standalone.sh\n\n${'b'.repeat(64)} *install-hopcode-standalone.bat\r\n${'c'.repeat(64)}  install-hopcode-standalone.ps1\n`,
     );
 
     expect(checksums.get('install-hopcode-standalone.sh')).toBe('a'.repeat(64));
-    expect(checksums.get('install-qwen-standalone.bat')).toBe('b'.repeat(64));
-    expect(checksums.get('install-qwen-standalone.ps1')).toBe('c'.repeat(64));
+    expect(checksums.get('install-hopcode-standalone.bat')).toBe(
+      'b'.repeat(64),
+    );
+    expect(checksums.get('install-hopcode-standalone.ps1')).toBe(
+      'c'.repeat(64),
+    );
   });
 
   it('rejects malformed SHA256SUMS entries', async () => {
@@ -1259,6 +1263,7 @@ describe('standalone release packaging', () => {
     expect(warnSpy).not.toHaveBeenCalled();
     for (const [url] of fetchedUrls) {
       expect(url).not.toMatch(/install-qwen\.(sh|bat|ps1)$/);
+      expect(url).not.toMatch(/install-hopcode-standalone\.(sh|bat|ps1)$/);
       expect(url).not.toMatch(/\/install$/);
     }
   });

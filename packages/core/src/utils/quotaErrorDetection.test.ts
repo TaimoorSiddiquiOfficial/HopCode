@@ -16,7 +16,7 @@ import {
 
 describe('quotaErrorDetection', () => {
   describe('isHopCodeQuotaExceededError', () => {
-    it('should detect the Qwen insufficient_quota error', () => {
+    it('should detect the HopCode insufficient_quota error', () => {
       const error = {
         status: 429,
         code: 'insufficient_quota',

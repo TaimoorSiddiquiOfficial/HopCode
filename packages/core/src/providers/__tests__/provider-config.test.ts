@@ -602,7 +602,7 @@ describe('providerMatchesCredentials with function envKey (custom provider)', ()
   // to findProviderByCredentials → /doctor and system-info diagnostics.
   it('matches a custom-style provider whose envKey is a function deriving from baseUrl', () => {
     const derivedFor = (_protocol: AuthType, baseUrl: string) =>
-      `QWEN_CUSTOM_${Buffer.from(baseUrl).toString('hex').slice(0, 8)}`;
+      `HOPCODE_CUSTOM_${Buffer.from(baseUrl).toString('hex').slice(0, 8)}`;
     const config = makeConfig({
       id: 'custom-like',
       envKey: derivedFor,
@@ -617,7 +617,7 @@ describe('providerMatchesCredentials with function envKey (custom provider)', ()
 
   it('does not match when the derived key differs from the supplied envKey', () => {
     const derivedFor = (_protocol: AuthType, baseUrl: string) =>
-      `QWEN_CUSTOM_${baseUrl.length}`;
+      `HOPCODE_CUSTOM_${baseUrl.length}`;
     const config = makeConfig({
       id: 'custom-like',
       envKey: derivedFor,
@@ -657,7 +657,7 @@ describe('providerMatchesCredentials with function envKey (custom provider)', ()
     // custom provider configured under Anthropic/Gemini still gets matched
     // back from the on-disk envKey.
     const derivedFor = (protocol: AuthType, baseUrl: string) =>
-      `QWEN_CUSTOM_${protocol.toUpperCase()}_${baseUrl.length}`;
+      `HOPCODE_CUSTOM_${protocol.toUpperCase()}_${baseUrl.length}`;
     const config = makeConfig({
       id: 'custom-like',
       envKey: derivedFor,

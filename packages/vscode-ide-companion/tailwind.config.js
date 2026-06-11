@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -44,7 +44,7 @@ export default {
         'slide-up': 'slide-up 200ms ease-out both',
       },
       colors: {
-        qwen: {
+        hopcode: {
           orange: '#615fff',
           'clay-orange': '#4f46e5',
           ivory: '#f5f5ff',

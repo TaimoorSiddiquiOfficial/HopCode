@@ -139,7 +139,7 @@ export function getSandboxEnv(stripPrefix = false): string {
 
   // For bug reports, remove hopcode- prefix
   if (stripPrefix) {
-    return sandbox.replace(/^(?:hopcode-|qwen-(?:code-)?)/, '');
+    return sandbox.replace(/^(?:hopcode-)/, '');
   }
 
   return sandbox;

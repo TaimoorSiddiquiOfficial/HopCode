@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -496,7 +496,7 @@ export default {
     'stderr をユーザーのみに表示し、ツール呼び出しを続ける',
   'block processing, erase original prompt, and show stderr to user only':
     '処理をブロックし、元のプロンプトを消去し、stderr をユーザーのみに表示',
-  'stdout shown to HopCode': 'stdout を Qwen に表示',
+  'stdout shown to HopCode': 'stdout を HopCode に表示',
   'show stderr to user only (blocking errors ignored)':
     'stderr をユーザーのみに表示（ブロッキングエラーは無視）',
   'command completes successfully': 'コマンドが正常に完了',
@@ -1342,7 +1342,7 @@ export default {
   'Show Welcome Back Dialog': 'おかえりダイアログを表示',
   'Enable User Feedback': 'ユーザーフィードバックを有効化',
   'How is HopCode doing this session? (optional)':
-    'このセッションでの Qwen の調子はどうですか？（任意）',
+    'このセッションでの HopCode の調子はどうですか？（任意）',
   'Interactive Shell (PTY)': '対話型シェル (PTY)',
   'Select Editor': 'エディタを選択',
   'Editor Preference': 'エディタ設定',

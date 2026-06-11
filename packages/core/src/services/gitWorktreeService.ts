@@ -1531,7 +1531,7 @@ export class GitWorktreeService {
     }
 
     // Fall back to the canonical hooks dir. Construct `<sourceRepoPath>/.git/hooks`
-    // assumes `.git` is a directory — but when Qwen itself is launched
+    // assumes `.git` is a directory — but when HopCode itself is launched
     // from a linked worktree, `.git` is a FILE pointing at the real
     // gitdir, and the constructed path ENOTDIRs. Use `git rev-parse
     // --git-common-dir` to get the canonical hooks parent regardless
@@ -1574,7 +1574,7 @@ export class GitWorktreeService {
     }
     // Only write when the key is unset. A non-empty existing value is
     // either inherited (system / global / local config from the user
-    // or from a previous Qwen run) or an explicit user policy override
+    // or from a previous HopCode run) or an explicit user policy override
     // — in both cases overwriting silently replaces the user's choice.
     // (PR #4174 review #3259975242.)
     if (existing === '') {
@@ -1582,7 +1582,7 @@ export class GitWorktreeService {
     } else if (existing !== hooksPath) {
       debugLogger.debug(
         `configureHooksPath: preserving existing core.hooksPath=${existing} ` +
-          `(Qwen would have set it to ${hooksPath})`,
+          `(HopCode would have set it to ${hooksPath})`,
       );
     }
   }

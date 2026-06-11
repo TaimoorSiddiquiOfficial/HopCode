@@ -750,7 +750,7 @@ class BridgeClient implements Client {
 
   /**
    * PR 14b: handle child→bridge ACP `extNotification` calls. Only one
-   * method is recognized today — `qwen/notify/session/mcp-budget-event`
+   * method is recognized today — `hopcode/notify/session/mcp-budget-event`
    * — translating the McpClientManager's budget-event payload into a
    * session-scoped SSE frame. Unknown methods, unknown event kinds,
    * and missing sessionIds are dropped silently for forward-compat
@@ -767,7 +767,7 @@ class BridgeClient implements Client {
     method: string,
     params: Record<string, unknown>,
   ): Promise<void> {
-    if (method !== 'qwen/notify/session/mcp-budget-event') return;
+    if (method !== 'hopcode/notify/session/mcp-budget-event') return;
     const sessionId = params['sessionId'];
     if (typeof sessionId !== 'string') return;
     const kind = params['kind'];
@@ -4061,7 +4061,7 @@ async function withTimeout<T>(
 /**
  * Default channel factory: spawn the current Node executable running this
  * CLI's entry script in `--acp` mode. `process.argv[1]` resolves to the hopcode
- * entry script when launched via the `qwen` bin shim.
+ * entry script when launched via the `hopcode` bin shim.
  *
  * Note on `cwd`: CodeQL flags the `workspaceCwd` flow into `spawn({cwd})`
  * as an "uncontrolled data used in path expression" finding. That's the
@@ -4082,7 +4082,7 @@ export const defaultSpawnChannelFactory: ChannelFactory = async (
   //      relocate the entry script). Anyone hitting "process.argv[1]
   //      is empty" or "process.argv[1] points at the wrong file" can
   //      set this without code changes.
-  //   2. `process.argv[1]` — works when launched via the `qwen` bin
+  //   2. `process.argv[1]` — works when launched via the `hopcode` bin
   //      shim, which is the common path.
   // Fail loudly with an actionable error if neither resolves.
   const cliEntry = process.env['HOPCODE_CLI_ENTRY'] || process.argv[1];

@@ -47,7 +47,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
 
     if (
       authType === AuthType.HOPCODE_OAUTH ||
-      authType === AuthType.HOPCODE_OAUTH
+      authType === AuthType.HOPCODE_OAUTH_DEPRECATED
     )
       return true;
     if (!baseUrl) return true;

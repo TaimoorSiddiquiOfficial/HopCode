@@ -73,7 +73,7 @@ export function useMouseEvents(
     // Belt-and-braces: if the process exits without React unmounting us
     // (Ctrl+C → exit, SIGTERM, parent killed), the React cleanup below
     // never runs and the terminal stays in SGR mouse-tracking mode after
-    // qwen exits — wheel events would be echoed as literal escape
+    // hopcode exits — wheel events would be echoed as literal escape
     // sequences. Hook `exit` to write the disable seq one more time as
     // a fallback. Node never throws from an `exit` listener, so even if
     // stdout is broken (EPIPE) the process still terminates cleanly.

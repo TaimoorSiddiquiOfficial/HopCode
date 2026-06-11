@@ -72,7 +72,7 @@ function sanitizeForStderr(value: string): string {
 }
 
 /**
- * Qwen-OAuth implementation of `DeviceFlowProvider` for `hopcode serve`.
+ * HopCode-OAuth implementation of `DeviceFlowProvider` for `hopcode serve`.
  *
  * Uses the lower-level `HopCodeOAuth2Client` primitives (`requestDeviceAuthorization`
  * / `pollDeviceToken`) directly rather than the high-level
@@ -106,7 +106,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
         { signal: opts.signal },
       );
     } catch (err: unknown) {
-      // Network / parse / non-2xx errors from the Qwen IdP. Wrap so the
+      // Network / parse / non-2xx errors from the HopCode IdP. Wrap so the
       // route layer maps to `502 upstream_error` rather than the generic
       // `500` fall-through in `sendBridgeError`.
       //
@@ -123,7 +123,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
         `[serve] hopcode device-flow start failed (raw): ${truncateForStderr(detail)}`,
       );
       throw new UpstreamDeviceFlowError(
-        'Qwen IdP device authorization request failed',
+        'HopCode IdP device authorization request failed',
       );
     }
     if (opts.signal.aborted) {
@@ -143,7 +143,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
         ),
       );
       throw new UpstreamDeviceFlowError(
-        'Qwen IdP rejected the device authorization request',
+        'HopCode IdP rejected the device authorization request',
       );
     }
     return {
@@ -153,7 +153,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       verificationUri: auth.verification_uri,
       verificationUriComplete: auth.verification_uri_complete,
       expiresIn: auth.expires_in,
-      // Qwen IdP doesn't return `interval`; registry falls back to the
+      // HopCode IdP doesn't return `interval`; registry falls back to the
       // RFC 8628 default (5s) when this is undefined.
     };
   }
@@ -166,11 +166,11 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
     opts: { signal: AbortSignal },
   ): Promise<DeviceFlowPollResult> {
     if (!state.pkceVerifier) {
-      // Qwen *requires* PKCE; missing verifier is a programmer error.
+      // HopCode *requires* PKCE; missing verifier is a programmer error.
       return {
         kind: 'error',
         errorKind: 'invalid_grant',
-        hint: 'Qwen device-flow requires a PKCE verifier',
+        hint: 'HopCode device-flow requires a PKCE verifier',
       };
     }
     if (opts.signal.aborted) {
@@ -284,7 +284,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
         hint:
           errorKind === 'upstream_error'
             ? 'unexpected response from identity provider'
-            : `Qwen IdP returned ${errorKind}`,
+            : `HopCode IdP returned ${errorKind}`,
       };
     }
     if (isDeviceTokenSuccess(response)) {
@@ -326,7 +326,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
             // refresh happens on next SharedTokenManager mtime poll
           }
           // PR #4255 review W3: `accountAlias` USED to be wired
-          // through events / reducer / audit but the Qwen IdP token
+          // through events / reducer / audit but the HopCode IdP token
           // response doesn't carry one (see DeviceTokenData shape in
           // `HopCodeOAuth2.ts:152-160` â€” no `name` / `email` / `sub`
           // field). Returning only `{expiresAt}` makes the field

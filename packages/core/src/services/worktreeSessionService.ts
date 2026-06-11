@@ -197,7 +197,7 @@ export async function restoreWorktreeContext(
   // already ensures the fields are strings, but a manually-edited or
   // copy-pasted sidecar could still point worktreePath at an arbitrary
   // existing directory — the model would then be directed to operate
-  // there. Restrict to the Qwen-managed worktrees subtree so a
+  // there. Restrict to the HopCode-managed worktrees subtree so a
   // tampered sidecar can't redirect file operations to /etc, ~/, etc.
   // (PR #4174 review #3256839787.)
   const expectedParent = path.join(

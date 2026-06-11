@@ -144,7 +144,7 @@ export const useFeedbackDialog = ({
     const checkAndShowFeedback = () => {
       if (streamingState === StreamingState.Idle && history.length > 0) {
         // Show feedback dialog if:
-        // 1. Qwen logger is enabled (required for feedback submission)
+        // 1. HopCode logger is enabled (required for feedback submission)
         // 2. User feedback is enabled in settings
         // 3. The last message is an AI response
         // 4. Random chance (25% probability)

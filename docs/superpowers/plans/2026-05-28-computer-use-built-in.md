@@ -1,4 +1,4 @@
-﻿# Computer Use Built-In Implementation Plan
+# Computer Use Built-In Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -1170,7 +1170,7 @@ describe('install-state', () => {
   let tmpHome: string;
 
   beforeEach(() => {
-    tmpHome = mkdtempSync(join(tmpdir(), 'qwen-cu-test-'));
+    tmpHome = mkdtempSync(join(tmpdir(), 'hopcode-cu-test-'));
   });
 
   afterEach(() => {
@@ -1508,7 +1508,7 @@ describe('runBootstrap', () => {
   let deps: BootstrapDeps;
 
   beforeEach(() => {
-    tmpHome = mkdtempSync(join(tmpdir(), 'qwen-cu-bs-'));
+    tmpHome = mkdtempSync(join(tmpdir(), 'hopcode-cu-bs-'));
     deps = {
       homeDir: tmpHome,
       packageSpec: 'open-computer-use@^0.3.0',

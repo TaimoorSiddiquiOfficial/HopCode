@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025-2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -24,7 +24,9 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
   let repoRoot: string;
 
   beforeEach(async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-wt-symlinks-'));
+    const dir = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-wt-symlinks-'),
+    );
     // Resolve symlinks (macOS /var → /private/var) so path comparisons
     // line up with what GitWorktreeService produces internally.
     repoRoot = await fs.realpath(dir);
@@ -171,21 +173,21 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     // Put a sibling directory next to the repo so `../sibling` resolves to
     // something real — proving the guard fires on traversal shape rather
     // than on "source missing".
-    const siblingDir = path.join(path.dirname(repoRoot), 'qwen-wt-sibling');
+    const siblingDir = path.join(path.dirname(repoRoot), 'hopcode-wt-sibling');
     await fs.mkdir(siblingDir);
     await fs.writeFile(path.join(siblingDir, 'marker'), 'outside');
 
     const service = new GitWorktreeService(repoRoot);
     const result = await service.createUserWorktree('traverse', 'main', {
-      symlinkDirectories: ['../qwen-wt-sibling'],
+      symlinkDirectories: ['../hopcode-wt-sibling'],
     });
 
     try {
       expect(result.success).toBe(true);
-      const dest = path.join(result.worktree!.path, '..', 'qwen-wt-sibling');
+      const dest = path.join(result.worktree!.path, '..', 'hopcode-wt-sibling');
       // No symlink was created inside the worktree directory.
       const stat = await fs
-        .lstat(path.join(result.worktree!.path, 'qwen-wt-sibling'))
+        .lstat(path.join(result.worktree!.path, 'hopcode-wt-sibling'))
         .catch(() => null);
       expect(stat).toBeNull();
       // Sibling itself is untouched.
@@ -257,11 +259,11 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     // `sourceRepoPath` differs from its canonical realpath.
 
     const realDirRaw = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-wt-realdir-'),
+      path.join(os.tmpdir(), 'hopcode-wt-realdir-'),
     );
     const realDir = await fs.realpath(realDirRaw);
     const linkParentRaw = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-wt-linkdir-'),
+      path.join(os.tmpdir(), 'hopcode-wt-linkdir-'),
     );
     const linkParent = await fs.realpath(linkParentRaw);
     const repoViaSymlink = path.join(linkParent, 'repo-via-symlink');
@@ -346,7 +348,7 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     await fs.symlink('.git', path.join(repoRoot, 'escape-to-git'));
 
     const outsideDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-wt-outside-'),
+      path.join(os.tmpdir(), 'hopcode-wt-outside-'),
     );
     const outsideResolved = await fs.realpath(outsideDir);
     await fs.writeFile(path.join(outsideResolved, 'secret'), 'should-not-leak');
@@ -480,7 +482,7 @@ describe('GitWorktreeService.createUserWorktree() — symlinkDirectories', () =>
     it('handles "no such ref" when origin is reachable but the PR does not exist', async () => {
       // Set up a bare upstream with only main — no pull/<N>/head refs.
       const upstream = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'qwen-wt-pr-no-such-ref-'),
+        path.join(os.tmpdir(), 'hopcode-wt-pr-no-such-ref-'),
       );
       const upstreamResolved = await fs.realpath(upstream);
       execFileSync('git', ['init', '-q', '--bare', '-b', 'main'], {

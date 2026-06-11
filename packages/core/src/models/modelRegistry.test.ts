@@ -56,7 +56,7 @@ describe('ModelRegistry', () => {
         'hopcode-oauth': [
           {
             id: 'custom-hopcode',
-            name: 'Custom Qwen',
+            name: 'Custom HopCode',
           },
         ],
       };
@@ -702,7 +702,7 @@ describe('ModelRegistry', () => {
         openai: [{ id: 'gpt-4', name: 'GPT-4' }],
       });
       const modelProvidersConfig: ModelProvidersConfig = {
-        'hopcode-oauth': [{ id: 'custom-hopcode', name: 'Custom Qwen' }],
+        'hopcode-oauth': [{ id: 'custom-hopcode', name: 'Custom HopCode' }],
       };
 
       registry.reloadModels(modelProvidersConfig);

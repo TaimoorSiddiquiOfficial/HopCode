@@ -13,7 +13,7 @@ describe('install-state', () => {
   let tmpHome: string;
 
   beforeEach(() => {
-    tmpHome = mkdtempSync(pathJoin(tmpdir(), 'qwen-cu-test-'));
+    tmpHome = mkdtempSync(pathJoin(tmpdir(), 'hopcode-cu-test-'));
   });
 
   afterEach(() => {

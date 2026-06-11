@@ -15,7 +15,7 @@ export function getDemoHtml(_port: number): string {
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Qwen Serve Demo</title>
+<title>HopCode Serve Demo</title>
 <style>
   :root { --bg: #1a1a2e; --surface: #16213e; --border: #0f3460; --accent: #e94560; --text: #eee; --text2: #aab; --ok: #4ade80; --warn: #fbbf24; --err: #f87171; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,7 +76,7 @@ export function getDemoHtml(_port: number): string {
 <body>
 
 <div class="header">
-  <h1>Qwen Serve</h1>
+  <h1>HopCode Serve</h1>
   <span class="badge">Demo</span>
   <div class="status">
     <span class="dot" id="statusDot"></span>

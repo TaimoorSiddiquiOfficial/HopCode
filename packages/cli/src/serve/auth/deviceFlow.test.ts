@@ -936,7 +936,7 @@ describe('DeviceFlowRegistry — authoritative timeouts (fold-in 7)', () => {
     }
   });
 
-  it("does NOT double-audit when late rejection is the registry's own DeviceFlowPollTimeoutError (qwen-latest review N2 guard)", async () => {
+  it("does NOT double-audit when late rejection is the registry's own DeviceFlowPollTimeoutError (hopcode-latest review N2 guard)", async () => {
     // PR #4291 follow-up review (hopcode-latest, N2): the late-rejection
     // observer must filter out our own timer rejection — otherwise a
     // single timeout would produce two audit lines (one from the
@@ -1120,7 +1120,7 @@ describe('DeviceFlowRegistry — abort propagation to provider.poll', () => {
 
       // Cancel the flow — registry should abort the entry's
       // cancelController, which is the SAME signal the provider's
-      // `poll` saw. A real Qwen provider passes this to `fetch`, so
+      // `poll` saw. A real HopCode provider passes this to `fetch`, so
       // an in-flight HTTP socket gets torn down immediately.
       registry.cancel(started.deviceFlowId);
       expect(provider.lastPollSignal!.aborted).toBe(true);

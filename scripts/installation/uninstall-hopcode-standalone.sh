@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # HopCode standalone uninstaller.
-# Removes files owned by install-qwen-standalone.sh and preserves user config.
+# Removes files owned by install-hopcode-standalone.sh and preserves user config.
 
 if [ -z "${BASH_VERSION}" ] && [ -z "${__HOPCODE_UNINSTALL_REEXEC:-}" ]; then
     if command -v bash >/dev/null 2>&1; then

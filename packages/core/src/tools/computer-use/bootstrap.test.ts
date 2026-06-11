@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -31,7 +31,7 @@ describe('runBootstrap', () => {
   let deps: BootstrapDeps;
 
   beforeEach(() => {
-    tmpHome = mkdtempSync(join(tmpdir(), 'qwen-cu-bs-'));
+    tmpHome = mkdtempSync(join(tmpdir(), 'hopcode-cu-bs-'));
     deps = {
       homeDir: tmpHome,
       packageSpec: 'open-computer-use@^0.3.0',

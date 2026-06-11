@@ -94,7 +94,8 @@ const HAS_PROMPT_LATENCY_CREDENTIAL =
   process.env['HOPCODE_BASELINE_ENABLE_PROMPT_LATENCY'] === '1' ||
   PROMPT_LATENCY_CREDENTIAL_ENV_KEYS.some((key) => Boolean(process.env[key])) ||
   Object.entries(process.env).some(
-    ([key, value]) => key.startsWith('QWEN_CUSTOM_API_KEY_') && Boolean(value),
+    ([key, value]) =>
+      key.startsWith('HOPCODE_CUSTOM_API_KEY_') && Boolean(value),
   );
 const SKIP_PROMPT_LATENCY =
   process.env['HOPCODE_BASELINE_SKIP_PROMPT_LATENCY'] === '1' ||
@@ -220,7 +221,9 @@ function gitHead(): string | null {
 }
 
 function makeTempWorkspace(label: string): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `qwen-baseline-${label}-`));
+  const dir = fs.mkdtempSync(
+    path.join(os.tmpdir(), `hopcode-baseline-${label}-`),
+  );
   return dir;
 }
 

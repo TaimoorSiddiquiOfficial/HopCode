@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -4957,7 +4957,7 @@ describe('createHttpAcpBridge', () => {
   });
 
   // PR 14b: ext-notification handler for child→bridge MCP budget events.
-  // Translates `qwen/notify/session/mcp-budget-event` into session-scoped
+  // Translates `hopcode/notify/session/mcp-budget-event` into session-scoped
   // SSE frames (`mcp_budget_warning` / `mcp_child_refused_batch`).
   describe('extNotification — MCP budget events (PR 14b)', () => {
     it('publishes mcp_budget_warning when the child fires the warning event', async () => {
@@ -4985,7 +4985,7 @@ describe('createHttpAcpBridge', () => {
       });
 
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         {
           v: 1,
           sessionId: session.sessionId,
@@ -5044,7 +5044,7 @@ describe('createHttpAcpBridge', () => {
       });
 
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         {
           v: 1,
           sessionId: session.sessionId,
@@ -5104,23 +5104,26 @@ describe('createHttpAcpBridge', () => {
       });
 
       // Unknown method — drop.
-      void capturedConn!.extNotification('qwen/notify/session/unknown-event', {
-        sessionId: session.sessionId,
-        kind: 'budget_warning',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/unknown-event',
+        {
+          sessionId: session.sessionId,
+          kind: 'budget_warning',
+        },
+      );
       // Missing sessionId — drop.
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         { kind: 'budget_warning' },
       );
       // Unknown kind — drop.
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         { sessionId: session.sessionId, kind: 'mystery_kind' },
       );
       // Resolvable sessionId but session id doesn't exist — drop.
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         {
           sessionId: 'nonexistent',
           kind: 'budget_warning',
@@ -5133,7 +5136,7 @@ describe('createHttpAcpBridge', () => {
       );
       // Real event — must arrive AFTER all drops above.
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         {
           v: 1,
           sessionId: session.sessionId,
@@ -5212,7 +5215,7 @@ describe('createHttpAcpBridge', () => {
       expect(seed.sessionId).not.toBe(futureSessionId);
 
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         {
           v: 1,
           sessionId: futureSessionId,
@@ -5303,7 +5306,7 @@ describe('createHttpAcpBridge', () => {
       // child for the closed sessionId. Pre-fix this would land in
       // `earlyEvents`. Post-fix the tombstone rejects it.
       void capturedConn!.extNotification(
-        'qwen/notify/session/mcp-budget-event',
+        'hopcode/notify/session/mcp-budget-event',
         {
           v: 1,
           sessionId,
@@ -5383,7 +5386,7 @@ describe('createHttpAcpBridge', () => {
               // behavior.
               void agent;
               void capturedConn!.extNotification(
-                'qwen/notify/session/mcp-budget-event',
+                'hopcode/notify/session/mcp-budget-event',
                 {
                   v: 1,
                   sessionId: req.sessionId,

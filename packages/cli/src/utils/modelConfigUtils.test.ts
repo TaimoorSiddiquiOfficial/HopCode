@@ -1068,7 +1068,7 @@ describe('modelConfigUtils', () => {
       const argv = {};
       const hopcodeProvider: ProviderModelConfig = {
         id: 'hopcode-env-model',
-        name: 'Qwen Env Model',
+        name: 'HopCode Env Model',
       };
       const settings = makeMockSettings({
         model: undefined as unknown as Settings['model'],
@@ -1110,7 +1110,7 @@ describe('modelConfigUtils', () => {
       };
       const hopcodeProvider: ProviderModelConfig = {
         id: 'hopcode-env-model',
-        name: 'Qwen Env Model',
+        name: 'HopCode Env Model',
       };
       const settings = makeMockSettings({
         model: undefined as unknown as Settings['model'],

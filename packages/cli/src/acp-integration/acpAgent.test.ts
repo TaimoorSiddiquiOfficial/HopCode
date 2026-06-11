@@ -806,7 +806,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('does not return discontinued qwen-oauth as the only ACP auth option', async () => {
+  it('does not return discontinued hopcode-oauth as the only ACP auth option', async () => {
     vi.mocked(buildAuthMethods).mockReturnValue([
       {
         id: 'openai',
@@ -817,10 +817,10 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
 
     const innerConfig = makeInnerConfig();
     vi.mocked(innerConfig.getModelsConfig).mockReturnValue({
-      getCurrentAuthType: vi.fn().mockReturnValue('qwen-oauth'),
+      getCurrentAuthType: vi.fn().mockReturnValue('hopcode-oauth'),
     } as unknown as ReturnType<Config['getModelsConfig']>);
     vi.mocked(innerConfig.refreshAuth).mockRejectedValue(
-      new Error('qwen-oauth token expired'),
+      new Error('hopcode-oauth token expired'),
     );
     vi.mocked(loadSettings).mockReturnValue(makeSessionSettings());
     vi.mocked(loadCliConfig).mockResolvedValue(
@@ -2244,7 +2244,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
 
     expect(extNotification).toHaveBeenCalledTimes(1);
     expect(extNotification).toHaveBeenCalledWith(
-      'qwen/notify/session/mcp-budget-event',
+      'hopcode/notify/session/mcp-budget-event',
       {
         v: 1,
         sessionId,
@@ -2268,7 +2268,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
 
     expect(extNotification).toHaveBeenCalledTimes(2);
     expect(extNotification).toHaveBeenLastCalledWith(
-      'qwen/notify/session/mcp-budget-event',
+      'hopcode/notify/session/mcp-budget-event',
       {
         v: 1,
         sessionId,

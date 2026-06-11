@@ -2362,7 +2362,7 @@ describe('Settings Loading and Merging', () => {
     });
 
     it('should not search dirname(hopCodeDir)/.env when HOPCODE_HOME is set (#4466)', () => {
-      const customHome = '/custom/qwen/home';
+      const customHome = '/custom/hopcode/home';
       process.env['HOPCODE_HOME'] = customHome;
       const customSettingsPath = path.join(customHome, 'settings.json');
       const dirnameEnvPath = path.join(path.dirname(customHome), '.env');

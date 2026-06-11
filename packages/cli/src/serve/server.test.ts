@@ -4457,7 +4457,7 @@ describe('GET /demo', () => {
       .set('Host', `127.0.0.1:${baseOpts.port}`);
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toMatch(/text\/html/);
-    expect(res.text).toContain('Qwen Serve');
+    expect(res.text).toContain('HopCode Serve');
     expect(res.text).toContain('<!DOCTYPE html>');
   });
 

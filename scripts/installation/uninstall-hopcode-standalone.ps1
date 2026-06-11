@@ -1,9 +1,9 @@
 # HopCode standalone uninstaller.
-# Removes files owned by install-qwen-standalone.bat/.ps1 and preserves user
+# Removes files owned by install-hopcode-standalone.bat/.ps1 and preserves user
 # config by default.
 #
 # Usage:
-#   powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex"
+#   powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1 | iex"
 #
 # Set $env:HOPCODE_UNINSTALL_PURGE = '1' (or pass -Purge) to also remove the
 # installer source marker at %USERPROFILE%\.hopcode\source.json. Other HopCode
@@ -21,7 +21,7 @@ if ($Help) {
 HopCode standalone uninstaller.
 
 Usage:
-  uninstall-qwen-standalone.ps1 [-Purge] [-Help]
+  uninstall-hopcode-standalone.ps1 [-Purge] [-Help]
 
 Options:
   -Purge   Also remove %USERPROFILE%\.hopcode\source.json (same as
@@ -50,7 +50,7 @@ function Write-WarningMessage {
     Write-Output "WARNING: $Message"
 }
 
-function Get-QwenInstallBase {
+function Get-HopCodeInstallBase {
     if (-not [string]::IsNullOrEmpty($env:HOPCODE_INSTALL_ROOT)) {
         return $env:HOPCODE_INSTALL_ROOT
     }
@@ -62,24 +62,24 @@ function Get-QwenInstallBase {
     return Join-Path (Join-Path $env:USERPROFILE 'AppData\Local') 'hopcode'
 }
 
-function Get-QwenInstallDir {
+function Get-HopCodeInstallDir {
     if (-not [string]::IsNullOrEmpty($env:HOPCODE_INSTALL_LIB_DIR)) {
         return $env:HOPCODE_INSTALL_LIB_DIR
     }
 
-    return Join-Path (Get-QwenInstallBase) 'hopcode'
+    return Join-Path (Get-HopCodeInstallBase) 'hopcode'
 }
 
-function Get-QwenInstallBinDir {
+function Get-HopCodeInstallBinDir {
     if (-not [string]::IsNullOrEmpty($env:HOPCODE_INSTALL_BIN_DIR)) {
         return $env:HOPCODE_INSTALL_BIN_DIR
     }
 
-    return Join-Path (Get-QwenInstallBase) 'bin'
+    return Join-Path (Get-HopCodeInstallBase) 'bin'
 }
 
 function Get-CurrentCmdShimStatePath {
-    return Join-Path (Get-QwenInstallBase) 'current-cmd-shim.txt'
+    return Join-Path (Get-HopCodeInstallBase) 'current-cmd-shim.txt'
 }
 
 function Get-NormalizedPath {
@@ -233,7 +233,7 @@ function Remove-CurrentCmdPathShimFile {
     }
 
     Remove-Item -LiteralPath $ShimPath -Force -ErrorAction SilentlyContinue
-    Write-Success "Removed current cmd.exe qwen shim: $ShimPath"
+    Write-Success "Removed current cmd.exe hopcode shim: $ShimPath"
 }
 
 function Remove-RecordedCurrentCmdPathShim {
@@ -320,11 +320,11 @@ function Remove-SourceMarker {
         return
     }
 
-    $qwenDir = Join-Path $env:USERPROFILE '.hopcode'
-    $sourceJson = Join-Path $qwenDir 'source.json'
+    $hopcodeDir = Join-Path $env:USERPROFILE '.hopcode'
+    $sourceJson = Join-Path $hopcodeDir 'source.json'
 
     if ($env:HOPCODE_UNINSTALL_PURGE -ne '1') {
-        Write-Info "Preserving $qwenDir (set HOPCODE_UNINSTALL_PURGE=1 to remove source.json)."
+        Write-Info "Preserving $hopcodeDir (set HOPCODE_UNINSTALL_PURGE=1 to remove source.json)."
         return
     }
 
@@ -333,15 +333,15 @@ function Remove-SourceMarker {
         Write-Success "Removed $sourceJson"
     }
 
-    Remove-EmptyDirectory -Directory $qwenDir
+    Remove-EmptyDirectory -Directory $hopcodeDir
 }
 
 Write-Output "HopCode Standalone Uninstaller"
 Write-Output ""
 
-$installBase = Get-QwenInstallBase
-$installDir = Get-QwenInstallDir
-$installBinDir = Get-QwenInstallBinDir
+$installBase = Get-HopCodeInstallBase
+$installDir = Get-HopCodeInstallDir
+$installBinDir = Get-HopCodeInstallBinDir
 $installWasManaged = Test-HopcodeStandaloneInstallDir -InstallDir $installDir
 
 if ($installWasManaged) {

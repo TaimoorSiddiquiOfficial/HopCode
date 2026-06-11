@@ -63,7 +63,7 @@ export function hostAllowlist(
       `host.docker.internal:${port}`,
     ]);
     // RFC 7230 §5.4: clients may omit the port suffix when it matches
-    // the URI scheme's default. http → 80, https → 443. The qwen
+    // the URI scheme's default. http → 80, https → 443. The hopcode
     // serve daemon is plain HTTP, so accept the no-port forms when
     // we're listening on port 80 (uncommon but valid for an operator
     // who points at a privileged port for clean URLs).
