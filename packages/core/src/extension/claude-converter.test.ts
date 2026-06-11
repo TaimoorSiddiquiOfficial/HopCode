@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -453,7 +453,7 @@ describe('convertClaudePluginPackage', () => {
   });
 
   it('should populate commands/skills/agents when marketplace references the whole folder (deep-wiki shape)', async () => {
-    // Regression test for https://github.com/QwenLM/qwen-code/issues/4452.
+    // Regression test for https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4452.
     //
     // microsoft/skills/.../deep-wiki declares its resources as
     //   commands: ["./commands/"]

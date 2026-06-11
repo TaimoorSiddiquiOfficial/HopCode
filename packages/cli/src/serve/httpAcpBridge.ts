@@ -184,7 +184,7 @@ export type { AcpChannel, AcpChannelExitInfo, ChannelFactory };
 // one constructor dep; benefit: Stage 1 clients see correct fs
 // semantics today instead of a wire-level break at Stage 2. Tracked
 // under #3803. Reference:
-// https://github.com/QwenLM/hopcode/pull/3889#issuecomment-4427773706
+// https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3889#issuecomment-4427773706
 
 // `BridgeOptions` + `DaemonStatusProvider` lifted to
 // `@hoptrendy/hopcode-acp-bridge/bridgeOptions` in #4175 PR 22b/2 — the
@@ -562,7 +562,7 @@ class BridgeClient implements Client {
   // agent-exposing surfaces share one lifecycle. This is also the
   // closure point for the prior chiga0 audit Risk 2 (first-responder
   // lacks an authorization model). Reference:
-  // https://github.com/QwenLM/hopcode/pull/3889#issuecomment-4427773706
+  // https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3889#issuecomment-4427773706
   async requestPermission(
     params: RequestPermissionRequest,
   ): Promise<RequestPermissionResponse> {

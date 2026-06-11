@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -190,8 +190,8 @@ export function getCoreSystemPrompt(
   appendInstruction?: string,
   deferredTools?: Array<{ name: string; description: string }>,
 ): string {
-  // if QWEN_SYSTEM_MD is set (and not 0|false), override system prompt from file
-  // default path is .hopcode/system.md (project-level), can be overridden via QWEN_SYSTEM_MD
+  // if HOPCODE_SYSTEM_MD is set (and not 0|false), override system prompt from file
+  // default path is .hopcode/system.md (project-level), can be overridden via HOPCODE_SYSTEM_MD
   let systemMdEnabled = false;
   let systemMdPath = path.resolve(path.join(HOPCODE_DIR, 'system.md'));
   // Resolve the environment variable to get either a path or a switch value.

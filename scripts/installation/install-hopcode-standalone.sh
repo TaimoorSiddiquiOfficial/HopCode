@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 
 # HopCode Installation Script
 # Installs HopCode from a standalone archive when available, with npm fallback.
@@ -107,9 +107,9 @@ Options:
   -h, --help               Show this help message.
 
 Examples:
-  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash
-  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash -s -- --source github
-  curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash -s -- --method standalone
+  curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash
+  curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash -s -- --source github
+  curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash -s -- --method standalone
   ./install-hopcode-standalone.sh --archive ./hopcode-linux-x64.tar.gz
 EOF
 }
@@ -175,7 +175,7 @@ validate_version() {
 }
 
 validate_github_repo() {
-    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/qwen-code}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/hopcode}"
     if [[ "${github_repo}" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
         return 0
     fi
@@ -552,7 +552,7 @@ maybe_update_shell_path() {
 
 github_base_url_for_version() {
     local version_path="$1"
-    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/qwen-code}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/hopcode}"
     if [[ "${version_path}" == "latest" ]]; then
         echo "https://github.com/${github_repo}/releases/latest/download"
     else
@@ -562,11 +562,11 @@ github_base_url_for_version() {
 
 aliyun_base_url_for_version() {
     local version_path="$1"
-    echo "https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/${version_path}"
+    echo "https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/${version_path}"
 }
 
 aliyun_latest_version_url() {
-    echo "https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/latest/VERSION"
+    echo "https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/latest/VERSION"
 }
 
 normalize_version_path_value() {
@@ -1072,7 +1072,7 @@ install_standalone() {
             fi
         fi
         if [[ -n "${github_fallback_base_url}" && "${requested_version_path}" == "latest" ]]; then
-            local aliyun_release_base="https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/"
+            local aliyun_release_base="https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/"
             if [[ "${base_url}" == "${aliyun_release_base}"* ]]; then
                 local resolved_version_path="${base_url#"${aliyun_release_base}"}"
                 if [[ -n "${resolved_version_path}" && "${resolved_version_path}" != "latest" && "${resolved_version_path}" != */* ]]; then

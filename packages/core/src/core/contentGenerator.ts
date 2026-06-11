@@ -58,7 +58,7 @@ export enum AuthType {
   USE_GEMINI = 'gemini',
   USE_VERTEX_AI = 'vertex-ai',
   USE_ANTHROPIC = 'anthropic',
-  QWEN_OAUTH = 'qwen_oauth',
+  HOPCODE_OAUTH = 'qwen_oauth',
 }
 
 /**
@@ -133,7 +133,7 @@ export type ContentGeneratorConfig = {
   // LM Studio) reject anything else with HTTP 400 "Invalid 'messages' in
   // payload". Enable this for any provider that strictly validates tool
   // message content. Default: false (preserves prior behavior for permissive
-  // providers). See QwenLM/hopcode#3616.
+  // providers). See TaimoorSiddiquiOfficial/HopCode#3616.
   splitToolMedia?: boolean;
 };
 

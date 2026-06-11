@@ -1,12 +1,12 @@
-# Computer Use Built-In Implementation Plan
+﻿# Computer Use Built-In Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make `open-computer-use` a zero-config built-in capability in qwen-code. 9 computer-use tools appear in the deferred tool list as `computer_use__click`, `computer_use__type_text`, etc. First invocation transparently installs the upstream npm binary, walks the user through macOS Accessibility / Screen Recording permissions if needed, and forwards the call to the upstream MCP server.
+**Goal:** Make `open-computer-use` a zero-config built-in capability in hopcode. 9 computer-use tools appear in the deferred tool list as `computer_use__click`, `computer_use__type_text`, etc. First invocation transparently installs the upstream npm binary, walks the user through macOS Accessibility / Screen Recording permissions if needed, and forwards the call to the upstream MCP server.
 
-**Architecture:** Thin shell over upstream `npx -y open-computer-use mcp`. We do NOT bundle the binary; upstream's `npx` cache + `.app` bundle handles distribution and macOS TCC. 9 tools are registered as parameterized `ComputerUseTool` instances (one per tool name) backed by a singleton `ComputerUseClient` that owns a long-running MCP stdio child process. Bootstrap state machine layers on top: standard qwen-code tool permission (existing) → first-time install confirm → optional macOS permission guide.
+**Architecture:** Thin shell over upstream `npx -y open-computer-use mcp`. We do NOT bundle the binary; upstream's `npx` cache + `.app` bundle handles distribution and macOS TCC. 9 tools are registered as parameterized `ComputerUseTool` instances (one per tool name) backed by a singleton `ComputerUseClient` that owns a long-running MCP stdio child process. Bootstrap state machine layers on top: standard hopcode tool permission (existing) → first-time install confirm → optional macOS permission guide.
 
-**Tech Stack:** TypeScript, vitest, `@modelcontextprotocol/sdk` (already a qwen-code dep), `node:child_process`, `node:fs/promises`.
+**Tech Stack:** TypeScript, vitest, `@modelcontextprotocol/sdk` (already a hopcode dep), `node:child_process`, `node:fs/promises`.
 
 ---
 
@@ -21,7 +21,7 @@ packages/core/src/tools/computer-use/
   tool.ts                           # ComputerUseTool — parameterized BaseDeclarativeTool
   client.ts                         # ComputerUseClient — singleton MCP stdio process manager
   bootstrap.ts                      # state machine: probe → install confirm → install → perm guide
-  install-state.ts                  # ~/.qwen/computer-use/installed.json read/write
+  install-state.ts                  # ~/.hopcode/computer-use/installed.json read/write
   permission-detector.ts            # parse upstream error strings to detect missing perms
   schemas.test.ts                   # all 9 schemas parse, names match contract
   tool.test.ts                      # parameterized tool wiring
@@ -92,7 +92,7 @@ Mirror in `ToolDisplayNames`:
 - [ ] **Step 2: Verify the existing tool-names test still passes**
 
 Run: `npm test -- packages/core/src/tools/tool-names`
-Expected: PASS (if there's no test file, run `npm run build -- --filter @qwen-code/qwen-code-core` to typecheck)
+Expected: PASS (if there's no test file, run `npm run build -- --filter @hopcode/hopcode-core` to typecheck)
 
 - [ ] **Step 3: Commit**
 
@@ -127,7 +127,7 @@ describe('computer-use schemas', () => {
 
   it('each tool name matches the upstream convention (no computer_use__ prefix)', () => {
     // schemas.ts uses upstream names verbatim ("click", "type_text").
-    // The computer_use__ prefix lives on the qwen-code-facing wrapper.
+    // The computer_use__ prefix lives on the hopcode-facing wrapper.
     for (const name of COMPUTER_USE_TOOL_NAMES) {
       expect(name).not.toContain('computer_use__');
       expect(name).toMatch(/^[a-z_]+$/);
@@ -174,12 +174,12 @@ Expected: FAIL with "Cannot find module './schemas.js'"
 
 - [ ] **Step 3: Write the schemas module**
 
-Create `packages/core/src/tools/computer-use/schemas.ts`. The schemas below are MVP — they reflect upstream's tool surface and parameter naming. The `sync-computer-use-schemas.ts` script (Task 13) will regenerate this file from a live upstream snapshot in CI before each qwen-code release.
+Create `packages/core/src/tools/computer-use/schemas.ts`. The schemas below are MVP — they reflect upstream's tool surface and parameter naming. The `sync-computer-use-schemas.ts` script (Task 13) will regenerate this file from a live upstream snapshot in CI before each hopcode release.
 
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,7 +190,7 @@ Create `packages/core/src/tools/computer-use/schemas.ts`. The schemas below are 
  *
  * Regenerated by `scripts/sync-computer-use-schemas.ts` — do not hand-edit.
  * The upstream tool names ("click", "type_text") appear verbatim here;
- * the `computer_use__` prefix is added by the qwen-code-facing wrapper in
+ * the `computer_use__` prefix is added by the hopcode-facing wrapper in
  * `tool.ts` so the model sees `computer_use__click` without any MCP
  * concept leaking through.
  */
@@ -478,7 +478,7 @@ this.computerUseEnabled = params.computerUseEnabled ?? true;
 
 - [ ] **Step 4: Typecheck**
 
-Run: `npm run build -- --filter @qwen-code/qwen-code-core --filter @qwen-code/qwen-code`
+Run: `npm run build -- --filter @hopcode/hopcode-core --filter @hopcode/hopcode`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -547,7 +547,7 @@ Create `packages/core/src/tools/computer-use/client.ts`:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -566,7 +566,7 @@ import type {
  * the npx cache and are sub-second.
  *
  * Lifecycle: lazy spawn on first `callTool` invocation. The process
- * stays alive until `stop()` or qwen-code exits. State (element_index
+ * stays alive until `stop()` or hopcode exits. State (element_index
  * map per app) lives in the process — if the process restarts, the
  * model must call `get_app_state` again before any element-targeted
  * action.
@@ -600,7 +600,7 @@ export class ComputerUseClient {
     if (!ComputerUseClient.singleton) {
       ComputerUseClient.singleton = new ComputerUseClient({
         packageSpec:
-          process.env['QWEN_COMPUTER_USE_PACKAGE'] ??
+          process.env['HOPCODE_COMPUTER_USE_PACKAGE'] ??
           'open-computer-use@latest',
       });
     }
@@ -652,7 +652,7 @@ export class ComputerUseClient {
         env: { ...process.env } as Record<string, string>,
       });
       const client = new Client(
-        { name: 'qwen-code-computer-use', version: '1.0.0' },
+        { name: 'hopcode-computer-use', version: '1.0.0' },
         { capabilities: {} },
       );
       await client.connect(transport);
@@ -673,7 +673,7 @@ export class ComputerUseClient {
   }
 
   /**
-   * Call a tool by upstream name (NOT the qwen-code-facing
+   * Call a tool by upstream name (NOT the hopcode-facing
    * `computer_use__` prefixed name). Returns the raw MCP result so the
    * caller can inspect `isError` and parse text content.
    */
@@ -816,7 +816,7 @@ Create `packages/core/src/tools/computer-use/tool.ts`:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -931,7 +931,7 @@ Create `packages/core/src/tools/computer-use/bootstrap.ts`:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -986,7 +986,7 @@ Create `packages/core/src/tools/computer-use/index.ts`:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1079,7 +1079,7 @@ Run:
 
 ```bash
 npm test -- packages/core/src/tools/computer-use/
-npm run build -- --filter @qwen-code/qwen-code-core
+npm run build -- --filter @hopcode/hopcode-core
 ```
 
 Expected: All PASS.
@@ -1107,14 +1107,14 @@ npx -y open-computer-use@latest --version
 
 On macOS: also run `npx -y open-computer-use@latest doctor` and grant any prompted permissions. This bypasses our bootstrap so we can verify the transport layer in isolation.
 
-- [ ] **Step 2: Build qwen-code**
+- [ ] **Step 2: Build hopcode**
 
 Run: `npm run build`
 Expected: PASS.
 
-- [ ] **Step 3: Launch qwen-code and test discovery**
+- [ ] **Step 3: Launch hopcode and test discovery**
 
-Start qwen-code, then ask the model: _"Use the ToolSearch tool with query 'click computer use' to find any desktop automation tools available."_
+Start hopcode, then ask the model: _"Use the ToolSearch tool with query 'click computer use' to find any desktop automation tools available."_
 
 Expected: ToolSearch returns 9 `computer_use__*` schemas.
 
@@ -1141,7 +1141,7 @@ This phase replaces the `runBootstrap` stub from Task 5 with the full state mach
 - Create: `packages/core/src/tools/computer-use/install-state.ts`
 - Create: `packages/core/src/tools/computer-use/install-state.test.ts`
 
-Persisted at `~/.qwen/computer-use/installed.json`:
+Persisted at `~/.hopcode/computer-use/installed.json`:
 
 ```json
 {
@@ -1233,7 +1233,7 @@ Create `packages/core/src/tools/computer-use/install-state.ts`:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1307,7 +1307,7 @@ Expected: PASS, 5 tests
 
 ```bash
 git add packages/core/src/tools/computer-use/install-state.ts packages/core/src/tools/computer-use/install-state.test.ts
-git commit -m "feat(computer-use): persist install approval state under ~/.qwen"
+git commit -m "feat(computer-use): persist install approval state under ~/.hopcode"
 ```
 
 ---
@@ -1387,7 +1387,7 @@ Create `packages/core/src/tools/computer-use/permission-detector.ts`:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1463,7 +1463,7 @@ The state machine has three sub-flows:
 2. **Spawn**: ensure the client is started.
 3. **Permission probe + guide** (macOS only): if a permission error surfaces, spawn `open-computer-use doctor`, poll for grant up to 10 min, retry.
 
-Note: the actual "ask user a question mid-execution" mechanic in qwen-code uses the existing tool-confirmation framework. **IMPLEMENTER**: before writing this task's implementation, grep for `shouldConfirmExecute` in `packages/core/src/tools/` to see how `shell.ts` / similar do confirmation. This task assumes that mechanic is available; if it isn't, swap in `process.stderr.write` + read from `process.stdin` for the install confirm (acceptable v0 UX).
+Note: the actual "ask user a question mid-execution" mechanic in hopcode uses the existing tool-confirmation framework. **IMPLEMENTER**: before writing this task's implementation, grep for `shouldConfirmExecute` in `packages/core/src/tools/` to see how `shell.ts` / similar do confirmation. This task assumes that mechanic is available; if it isn't, swap in `process.stderr.write` + read from `process.stdin` for the install confirm (acceptable v0 UX).
 
 - [ ] **Step 1: Investigate confirmation patterns**
 
@@ -1660,7 +1660,7 @@ Replace `packages/core/src/tools/computer-use/bootstrap.ts` with:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1676,7 +1676,7 @@ Replace `packages/core/src/tools/computer-use/bootstrap.ts` with:
  *      then poll until permissions grant or 10 min timeout.
  *
  * IMPLEMENTER: pre-step 1 (Task 10 step 1) — verify whether
- * qwen-code's BaseDeclarativeTool exposes a `shouldConfirmExecute()`
+ * hopcode's BaseDeclarativeTool exposes a `shouldConfirmExecute()`
  * pathway from inside `execute()`. If not, `promptInstallApproval`
  * defaults to a `process.stderr.write` + readline fallback. The
  * dependency-injection design here keeps that decision swappable
@@ -1706,7 +1706,7 @@ export interface BootstrapDeps {
   platform: NodeJS.Platform;
   /**
    * Prompt the user to approve installing the upstream binary. Returns
-   * true if approved. Implementation may use the qwen-code confirm
+   * true if approved. Implementation may use the hopcode confirm
    * tool path or a stdin fallback.
    */
   promptInstallApproval: (packageSpec: string) => Promise<boolean>;
@@ -1734,11 +1734,11 @@ function defaultDeps(): BootstrapDeps {
   return {
     homeDir: homedir(),
     packageSpec:
-      process.env['QWEN_COMPUTER_USE_PACKAGE'] ?? 'open-computer-use@latest',
+      process.env['HOPCODE_COMPUTER_USE_PACKAGE'] ?? 'open-computer-use@latest',
     platform: process.platform,
     promptInstallApproval: async (spec) => {
       // v0 fallback: stderr prompt + stdin read. Replace with
-      // qwen-code's standard confirm pathway when wired in.
+      // hopcode's standard confirm pathway when wired in.
       process.stderr.write(
         `\n[Computer Use] First-time install\n` +
           `  Package: ${spec}\n` +
@@ -1748,9 +1748,9 @@ function defaultDeps(): BootstrapDeps {
           `Proceed? [y/N] `,
       );
       // IMPLEMENTER: in real interactive sessions, replace with the
-      // qwen-code confirm system. For headless / SDK contexts the
+      // hopcode confirm system. For headless / SDK contexts the
       // default is to refuse — explicit user opt-in required.
-      return process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'] === '1';
+      return process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'] === '1';
     },
     spawnDoctor: () => {
       const child = spawn('npx', ['-y', defaultDeps().packageSpec, 'doctor'], {
@@ -1851,7 +1851,7 @@ git commit -m "feat(computer-use): bootstrap state machine (install + permission
 
 ---
 
-### Task 11: Wire the real `promptInstallApproval` to qwen-code's confirm system
+### Task 11: Wire the real `promptInstallApproval` to hopcode's confirm system
 
 **Files:**
 
@@ -1880,16 +1880,16 @@ This is the task with the most variable scope. **IMPLEMENTER**: read the investi
 Wipe install state:
 
 ```bash
-rm -rf ~/.qwen/computer-use
+rm -rf ~/.hopcode/computer-use
 ```
 
-Launch qwen-code and ask a computer-use question. Confirm the install prompt appears in the chosen UX (confirm dialog or stderr) and that approving it persists state correctly.
+Launch hopcode and ask a computer-use question. Confirm the install prompt appears in the chosen UX (confirm dialog or stderr) and that approving it persists state correctly.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add -A
-git commit -m "feat(computer-use): wire install approval to qwen-code confirm UX"
+git commit -m "feat(computer-use): wire install approval to hopcode confirm UX"
 ```
 
 ---
@@ -1901,7 +1901,7 @@ This is a non-coding gate.
 - [ ] **Step 1: Clear caches**
 
 ```bash
-rm -rf ~/.qwen/computer-use
+rm -rf ~/.hopcode/computer-use
 rm -rf ~/.npm/_npx
 # macOS: revoke permissions
 # System Settings → Privacy & Security → Accessibility / Screen Recording
@@ -1912,7 +1912,7 @@ rm -rf ~/.npm/_npx
 
 ```bash
 npm run build
-# launch qwen-code, ask a computer-use question
+# launch hopcode, ask a computer-use question
 ```
 
 - [ ] **Step 3: Verify the full flow**
@@ -1939,7 +1939,7 @@ If any step fails, capture the error and stop. Iterate.
 
 - Create: `scripts/sync-computer-use-schemas.ts`
 
-Runs as part of qwen-code release prep. Spawns `npx -y open-computer-use@<pin> mcp`, sends `tools/list`, regenerates `schemas.ts`.
+Runs as part of hopcode release prep. Spawns `npx -y open-computer-use@<pin> mcp`, sends `tools/list`, regenerates `schemas.ts`.
 
 - [ ] **Step 1: Create the script**
 
@@ -1972,7 +1972,7 @@ async function main(): Promise<void> {
     args: ['-y', packageSpec, 'mcp'],
   });
   const client = new Client(
-    { name: 'qwen-code-schema-sync', version: '1.0.0' },
+    { name: 'hopcode-schema-sync', version: '1.0.0' },
     { capabilities: {} },
   );
   await client.connect(transport);
@@ -1999,7 +1999,7 @@ async function main(): Promise<void> {
 
   const out = `/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -2072,7 +2072,7 @@ git commit -m "chore(computer-use): script to sync schemas from upstream"
 
 ## Out of Scope (deferred to follow-up PRs)
 
-- Idle timeout for the MCP server process (resource savings; v0 keeps it alive until qwen-code exits).
+- Idle timeout for the MCP server process (resource savings; v0 keeps it alive until hopcode exits).
 - Telemetry on bootstrap failures (network failure vs gatekeeper vs permission timeout breakdowns).
 - Offline install path / cached tarball support.
 - Capability probe before reveal (currently failure surfaces at first-call time).

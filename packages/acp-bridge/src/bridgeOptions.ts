@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -94,7 +94,7 @@ export interface BridgeOptions {
    * omits the field. See the `session_scope_override` capability on
    * `/capabilities.features` for negotiation.
    * Reference:
-   * https://github.com/QwenLM/hopcode/pull/3889#issuecomment-4427875644
+   * https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3889#issuecomment-4427875644
    */
   sessionScope?: 'single' | 'thread';
   /** Channel factory; defaults to spawning `hopcode --acp` as a child process. */

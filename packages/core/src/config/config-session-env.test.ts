@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -10,7 +10,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  * Tests for the module-level `sessionEnvClaimed` guard in Config.
  *
  * The guard ensures that only the first Config instance in a process sets
- * `process.env['QWEN_CODE_SESSION_ID']`, preventing throwaway instances
+ * `process.env['HOPCODE_CODE_SESSION_ID']`, preventing throwaway instances
  * (e.g. telemetry-only) from overwriting the real session's ID.
  *
  * We use `vi.isolateModules` to get a fresh module scope (resetting the
@@ -105,8 +105,8 @@ describe('Config sessionEnvClaimed guard', () => {
   let originalEnv: string | undefined;
 
   beforeEach(() => {
-    originalEnv = process.env['QWEN_CODE_SESSION_ID'];
-    delete process.env['QWEN_CODE_SESSION_ID'];
+    originalEnv = process.env['HOPCODE_CODE_SESSION_ID'];
+    delete process.env['HOPCODE_CODE_SESSION_ID'];
 
     (fs.existsSync as Mock).mockReturnValue(true);
     (fs.readdirSync as Mock).mockReturnValue([]);
@@ -124,18 +124,18 @@ describe('Config sessionEnvClaimed guard', () => {
 
   afterEach(() => {
     if (originalEnv !== undefined) {
-      process.env['QWEN_CODE_SESSION_ID'] = originalEnv;
+      process.env['HOPCODE_CODE_SESSION_ID'] = originalEnv;
     } else {
-      delete process.env['QWEN_CODE_SESSION_ID'];
+      delete process.env['HOPCODE_CODE_SESSION_ID'];
     }
     vi.resetModules();
   });
 
-  it('first Config sets process.env QWEN_CODE_SESSION_ID to its sessionId', async () => {
+  it('first Config sets process.env HOPCODE_CODE_SESSION_ID to its sessionId', async () => {
     const { Config } = await import('./config.js');
     const config = new Config({ ...baseParams });
 
-    expect(process.env['QWEN_CODE_SESSION_ID']).toBe(config.getSessionId());
+    expect(process.env['HOPCODE_CODE_SESSION_ID']).toBe(config.getSessionId());
   });
 
   it('subsequent Config does not overwrite the env var set by the first', async () => {
@@ -150,8 +150,8 @@ describe('Config sessionEnvClaimed guard', () => {
     });
 
     // The env var should still be the first config's session ID
-    expect(process.env['QWEN_CODE_SESSION_ID']).toBe(firstSessionId);
-    expect(process.env['QWEN_CODE_SESSION_ID']).not.toBe(
+    expect(process.env['HOPCODE_CODE_SESSION_ID']).toBe(firstSessionId);
+    expect(process.env['HOPCODE_CODE_SESSION_ID']).not.toBe(
       secondConfig.getSessionId(),
     );
   });
@@ -161,12 +161,12 @@ describe('Config sessionEnvClaimed guard', () => {
     const config = new Config({ ...baseParams });
     const originalSessionId = config.getSessionId();
 
-    expect(process.env['QWEN_CODE_SESSION_ID']).toBe(originalSessionId);
+    expect(process.env['HOPCODE_CODE_SESSION_ID']).toBe(originalSessionId);
 
     // Simulate /clear or session switch
     config.startNewSession('new-session-uuid-123');
 
-    expect(process.env['QWEN_CODE_SESSION_ID']).toBe('new-session-uuid-123');
-    expect(process.env['QWEN_CODE_SESSION_ID']).not.toBe(originalSessionId);
+    expect(process.env['HOPCODE_CODE_SESSION_ID']).toBe('new-session-uuid-123');
+    expect(process.env['HOPCODE_CODE_SESSION_ID']).not.toBe(originalSessionId);
   });
 });

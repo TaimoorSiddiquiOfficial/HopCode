@@ -55,7 +55,7 @@ export function isDeepSeekHostname(
  * same input-format constraint, so the model-name fallback is
  * intentional. For decisions that depend on the wire shape DeepSeek's
  * own API exposes (e.g. `reasoning_effort`, `thinking`), use
- * `isDeepSeekHostname` instead — see https://github.com/QwenLM/hopcode/issues/3613.
+ * `isDeepSeekHostname` instead — see https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3613.
  */
 export function isDeepSeekProvider(
   contentGeneratorConfig: ContentGeneratorConfig,

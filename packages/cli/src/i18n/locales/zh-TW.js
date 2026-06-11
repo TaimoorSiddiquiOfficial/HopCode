@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -1034,8 +1034,8 @@ export default {
   'Failed to authenticate. Message: {{message}}': '認證失敗。消息：{{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     '使用 {{authType}} 憑據成功認證。',
-  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    '無效的 QWEN_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值為：{{validValues}}',
+  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    '無效的 HOPCODE_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值為：{{validValues}}',
   'Select Model': '選擇模型',
   'API Key': 'API Key',
   '(default)': '(默認)',

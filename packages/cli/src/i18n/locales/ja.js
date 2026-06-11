@@ -879,8 +879,8 @@ export default {
     '認証に失敗しました。メッセージ: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     '{{authType}} 認証情報で正常に認証されました',
-  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    '無効な QWEN_DEFAULT_AUTH_TYPE 値: "{{value}}"。有効な値: {{validValues}}',
+  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    '無効な HOPCODE_DEFAULT_AUTH_TYPE 値: "{{value}}"。有効な値: {{validValues}}',
   // Dialogs - Model
   'Select Model': 'モデルを選択',
   Modality: 'モダリティ',

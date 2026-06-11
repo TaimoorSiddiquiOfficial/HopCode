@@ -21,7 +21,7 @@
  * - The cancel/dispose lifecycle MUST stay quiet â€” emitting a "poll
  *   failed" line on every normal cancellation pollutes the audit.
  *
- * These tests pin all four branches against a stub `IQwenOAuth2Client`
+ * These tests pin all four branches against a stub `IHopCodeOAuth2Client`
  * so a future refactor that drops the redaction shows up in CI.
  */
 

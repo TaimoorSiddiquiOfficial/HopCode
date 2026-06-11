@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -358,7 +358,7 @@ export class ContentGenerationPipeline {
       // would leak the field, and a non-qwen config with a qwen request
       // model would miss the disable signal (the #4501 regression).
       //
-      // `coder-model` is the QWEN_OAUTH default (DEFAULT_QWEN_MODEL in
+      // `coder-model` is the HOPCODE_OAUTH default (DEFAULT_QWEN_MODEL in
       // config/models.ts, aliased to Qwen 3.6 Plus hybrid) — it doesn't
       // start with `qwen` but is the most common hybrid-thinking model
       // for first-time users, so it must be covered.

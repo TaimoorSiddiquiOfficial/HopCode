@@ -1,4 +1,4 @@
-# Installation Guide for HopCode with Source Tracking
+﻿# Installation Guide for HopCode with Source Tracking
 
 This guide describes the source-tracking installation scripts for HopCode.
 The scripts prefer standalone release archives and can fall back to npm when a
@@ -14,7 +14,7 @@ The installers are intentionally lightweight:
   or user PATH so the generated `qwen` shim is discoverable.
 - They do not start `qwen` automatically after installation.
 - They store source information in `~/.hopcode/source.json` or
-  `%USERPROFILE%\.qwen\source.json` when `--source` is provided.
+  `%USERPROFILE%\.hopcode\source.json` when `--source` is provided.
 
 Standalone archives include a private Node.js runtime, so users do not need a
 local Node.js installation on the standalone path. Node.js 22 or newer and npm
@@ -184,7 +184,7 @@ curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/unin
 ```
 
 The uninstaller removes only the standalone runtime, generated `qwen` wrapper,
-and installer-managed shell PATH block. It preserves `~/.qwen` by default. Set
+and installer-managed shell PATH block. It preserves `~/.hopcode` by default. Set
 `HOPCODE_UNINSTALL_PURGE=1` to remove `~/.hopcode/source.json`; other config and auth
 files are still preserved.
 
@@ -227,7 +227,7 @@ powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzho
 The uninstaller removes only the standalone runtime, generated `qwen.cmd`
 wrapper, user PATH entry, and the current-session `cmd.exe` shim created by the
 hosted PowerShell installer. It preserves `%USERPROFILE%\.qwen` by default. Set
-`HOPCODE_UNINSTALL_PURGE=1` to remove `%USERPROFILE%\.qwen\source.json`; other
+`HOPCODE_UNINSTALL_PURGE=1` to remove `%USERPROFILE%\.hopcode\source.json`; other
 config and auth files are still preserved.
 
 ## Mirrors and Overrides
@@ -285,7 +285,7 @@ When `--source` or `-s` is provided, the installer writes:
 Locations:
 
 - Linux/macOS: `~/.hopcode/source.json`
-- Windows: `%USERPROFILE%\.qwen\source.json`
+- Windows: `%USERPROFILE%\.hopcode\source.json`
 
 The telemetry logger reads this file when available. Missing, invalid, or
 unreadable source files are ignored.

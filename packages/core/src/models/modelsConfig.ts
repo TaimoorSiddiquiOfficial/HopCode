@@ -465,7 +465,7 @@ export class ModelsConfig {
             ) ?? this.modelRegistry.getModel(authType, previousModelId))
           : undefined;
       const canReusePreviousApiKey =
-        authType !== AuthType.QWEN_OAUTH &&
+        authType !== AuthType.HOPCODE_OAUTH &&
         !isAuthTypeChange &&
         !!rollbackSnapshot.generationConfig.apiKey &&
         !!model.envKey &&

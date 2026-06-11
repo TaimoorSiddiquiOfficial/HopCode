@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -557,7 +557,7 @@ describe('GitWorktreeService', () => {
     it('recognises full GitHub PR URLs (any host)', () => {
       expect(
         GitWorktreeService.parsePRReference(
-          'https://github.com/QwenLM/qwen-code/pull/4174',
+          'https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174',
         ),
       ).toBe(4174);
       expect(

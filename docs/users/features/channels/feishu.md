@@ -1,6 +1,6 @@
-# Feishu (Lark)
+﻿# Feishu (Lark)
 
-This guide covers setting up a Qwen Code channel on Feishu (飞书) / Lark.
+This guide covers setting up a HopCode channel on Feishu (飞书) / Lark.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ After configuring permissions and events, create a version and publish it. The b
 
 ## Configuration
 
-Add the channel to `~/.qwen/settings.json`:
+Add the channel to `~/.hopcode/settings.json`:
 
 ```json
 {

@@ -1,4 +1,4 @@
-# HopCode Visual Branding Review & Strategy
+﻿# HopCode Visual Branding Review & Strategy
 
 **Document Version:** 1.0  
 **Created:** 2026-04-18  
@@ -602,9 +602,9 @@ Code (14px, Mono)
 
 ```css
 /* Use JetBrains Mono for all code blocks */
---hopcode-code-background: #1e1e2e;
---hopcode-code-foreground: #e4e4e7;
---hopcode-code-border: #3f3f46;
+--hopcode-background: #1e1e2e;
+--hopcode-foreground: #e4e4e7;
+--hopcode-border: #3f3f46;
 ```
 
 ---

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +20,7 @@ import { resolveComputerUsePackageSpec } from './constants.js';
  * the npx cache and are sub-second.
  *
  * Lifecycle: lazy spawn on first `callTool` invocation. The process
- * stays alive until `stop()` or qwen-code exits. State (element_index
+ * stays alive until `stop()` or hopcode exits. State (element_index
  * map per app) lives in the process — if the process restarts, the
  * model must call `get_app_state` again before any element-targeted
  * action.
@@ -114,7 +114,7 @@ export class ComputerUseClient {
         env: { ...process.env } as Record<string, string>,
       });
       const client = new Client(
-        { name: 'qwen-code-computer-use', version: '1.0.0' },
+        { name: 'hopcode-computer-use', version: '1.0.0' },
         { capabilities: {} },
       );
       await client.connect(transport);
@@ -134,7 +134,7 @@ export class ComputerUseClient {
   }
 
   /**
-   * Call a tool by upstream name (NOT the qwen-code-facing
+   * Call a tool by upstream name (NOT the hopcode-facing
    * `computer_use__` prefixed name). Returns the raw MCP result so the
    * caller can inspect `isError` and parse text content.
    *

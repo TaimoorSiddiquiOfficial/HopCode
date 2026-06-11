@@ -1,4 +1,4 @@
-# Channel And Web Backend Daemon Adapter Draft
+﻿# Channel And Web Backend Daemon Adapter Draft
 
 ## Goal
 
@@ -19,20 +19,20 @@ The daemon currently rejects browser `Origin` requests by design.
 Channel backend:
 
 ```bash
-QWEN_CHANNEL_DAEMON_URL=http://127.0.0.1:4170 qwen channel start telegram
+HOPCODE_CHANNEL_DAEMON_URL=http://127.0.0.1:4170 qwen channel start telegram
 ```
 
 Web backend:
 
 ```bash
-QWEN_WEB_DAEMON_URL=http://127.0.0.1:4170 qwen web-chat-backend
+HOPCODE_WEB_DAEMON_URL=http://127.0.0.1:4170 qwen web-chat-backend
 ```
 
 Shared optional variables:
 
 ```bash
-QWEN_DAEMON_TOKEN=...
-QWEN_DAEMON_WORKSPACE=/repo
+HOPCODE_DAEMON_TOKEN=...
+HOPCODE_DAEMON_WORKSPACE=/repo
 ```
 
 ## Minimal Channel Flow

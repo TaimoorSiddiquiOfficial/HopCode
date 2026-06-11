@@ -1,7 +1,7 @@
-# Telemetry: Outbound Trace Context & Session ID Header Propagation
+﻿# Telemetry: Outbound Trace Context & Session ID Header Propagation
 
-> 配套 issue: [#4384](https://github.com/QwenLM/hopcode/issues/4384)
-> 父 issue: [#3731](https://github.com/QwenLM/hopcode/issues/3731) (P3 deeper observability)
+> 配套 issue: [#4384](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4384)
+> 父 issue: [#3731](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3731) (P3 deeper observability)
 > 前置 PR: #4367 (resource attributes — merged 2026-05-21, commit `64401e1`)
 > 基于 2026-05-21 对 hopcode main 分支 + 直接验证的 claude-code 源码
 
@@ -635,7 +635,7 @@ return parsed.some(
 
 ## 11. R3 修订 — Host-Allowlist Scoping for `X-Qwen-Code-Session-Id`
 
-> 触发：[LaZzyMan 在 PR #4390 的 REQUEST_CHANGES review](https://github.com/QwenLM/hopcode/pull/4390)
+> 触发：[LaZzyMan 在 PR #4390 的 REQUEST_CHANGES review](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4390)
 > 落地 commit：`1c8528a56` (核心实现) + `cb162e716` (Vertex baseUrl fail-closed + `["*"]` trim 容错)
 
 ### 11.1 触发与论证
@@ -768,7 +768,7 @@ Gemini SDK 有两个不可见 default endpoint（`generativelanguage.googleapis.
 
 ## 12. R4 修订 — Scope Conflation Split
 
-> 触发：[LaZzyMan round-8 follow-up review on PR #4390](https://github.com/QwenLM/hopcode/pull/4390)
+> 触发：[LaZzyMan round-8 follow-up review on PR #4390](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4390)
 > 落地：本 PR 收窄；R3 落地的 session-id 整套挪到独立 follow-up PR
 
 ### 12.1 触发与论证

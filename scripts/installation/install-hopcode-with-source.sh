@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 
 # HopCode Installation Script
 # Installs HopCode from a standalone archive when available, with npm fallback.
@@ -493,11 +493,11 @@ standalone_base_url() {
     fi
 
     if [[ "${version_path}" == "latest" ]]; then
-        echo "https://github.com/HopCodeLM/HopCode-code/releases/latest/download"
+        echo "https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download"
         return 0
     fi
 
-    echo "https://github.com/HopCodeLM/HopCode-code/releases/download/${version_path}"
+    echo "https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/download/${version_path}"
 }
 
 download_file() {

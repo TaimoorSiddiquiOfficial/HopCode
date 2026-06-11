@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -447,9 +447,9 @@ export async function resolveWithinWorkspace(
                 // and an absolute outside-target string would leak the
                 // attacker's intended exfiltration path through audit
                 // events. Operators wanting the actual target value
-                // run with `QWEN_AUDIT_RAW_PATHS=1` and read it from
+                // run with `HOPCODE_AUDIT_RAW_PATHS=1` and read it from
                 // `relPath` / `message`.
-                hint: 'symlink chain leaves the workspace; enable QWEN_AUDIT_RAW_PATHS for the resolved target',
+                hint: 'symlink chain leaves the workspace; enable HOPCODE_AUDIT_RAW_PATHS for the resolved target',
               },
             );
           }

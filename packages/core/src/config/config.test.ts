@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -290,10 +290,10 @@ vi.mock('../ide/ide-client.js', () => ({
 import { BaseLlmClient } from '../core/baseLlmClient.js';
 
 const MEMORY_PRESSURE_ENV_KEYS = [
-  'QWEN_MEMORY_PRESSURE_SOFT',
-  'QWEN_MEMORY_PRESSURE_HARD',
-  'QWEN_MEMORY_PRESSURE_CRITICAL',
-  'QWEN_MEMORY_ENABLE_GC',
+  'HOPCODE_MEMORY_PRESSURE_SOFT',
+  'HOPCODE_MEMORY_PRESSURE_HARD',
+  'HOPCODE_MEMORY_PRESSURE_CRITICAL',
+  'HOPCODE_MEMORY_ENABLE_GC',
 ];
 
 vi.mock('../core/baseLlmClient.js');
@@ -508,9 +508,9 @@ describe('Server Config (config.ts)', () => {
     }
 
     it('applies valid memory pressure env overrides', async () => {
-      process.env['QWEN_MEMORY_PRESSURE_SOFT'] = '0.3';
-      process.env['QWEN_MEMORY_PRESSURE_HARD'] = '0.6';
-      process.env['QWEN_MEMORY_PRESSURE_CRITICAL'] = '0.9';
+      process.env['HOPCODE_MEMORY_PRESSURE_SOFT'] = '0.3';
+      process.env['HOPCODE_MEMORY_PRESSURE_HARD'] = '0.6';
+      process.env['HOPCODE_MEMORY_PRESSURE_CRITICAL'] = '0.9';
 
       const config = new Config(baseParams);
       await config.initialize({ skipGeminiInitialization: true });
@@ -523,9 +523,9 @@ describe('Server Config (config.ts)', () => {
 
     it('falls back to defaults and warns on strict env parse failures', async () => {
       const stderrSpy = mockStderrWrite();
-      process.env['QWEN_MEMORY_PRESSURE_SOFT'] = '0.3extra';
-      process.env['QWEN_MEMORY_PRESSURE_HARD'] = '0.6';
-      process.env['QWEN_MEMORY_PRESSURE_CRITICAL'] = '0.9';
+      process.env['HOPCODE_MEMORY_PRESSURE_SOFT'] = '0.3extra';
+      process.env['HOPCODE_MEMORY_PRESSURE_HARD'] = '0.6';
+      process.env['HOPCODE_MEMORY_PRESSURE_CRITICAL'] = '0.9';
 
       const config = new Config(baseParams);
       await config.initialize({ skipGeminiInitialization: true });
@@ -541,7 +541,7 @@ describe('Server Config (config.ts)', () => {
 
     it('falls back to defaults and warns on invalid threshold ordering', async () => {
       const stderrSpy = mockStderrWrite();
-      process.env['QWEN_MEMORY_PRESSURE_SOFT'] = '0.7';
+      process.env['HOPCODE_MEMORY_PRESSURE_SOFT'] = '0.7';
 
       const config = new Config(baseParams);
       await config.initialize({ skipGeminiInitialization: true });
@@ -558,7 +558,7 @@ describe('Server Config (config.ts)', () => {
       'falls back to defaults for invalid soft threshold %s',
       async (value) => {
         const stderrSpy = mockStderrWrite();
-        process.env['QWEN_MEMORY_PRESSURE_SOFT'] = value;
+        process.env['HOPCODE_MEMORY_PRESSURE_SOFT'] = value;
 
         const config = new Config(baseParams);
         await config.initialize({ skipGeminiInitialization: true });
@@ -574,7 +574,7 @@ describe('Server Config (config.ts)', () => {
     );
 
     it('enables explicit GC when requested by env', async () => {
-      process.env['QWEN_MEMORY_ENABLE_GC'] = '1';
+      process.env['HOPCODE_MEMORY_ENABLE_GC'] = '1';
       const globalWithGc = global as typeof global & { gc?: () => void };
       const originalGc = globalWithGc.gc;
       const gcSpy = vi.fn();
@@ -604,15 +604,15 @@ describe('Server Config (config.ts)', () => {
     });
 
     it('child Config monitors inherit the parent memory pressure config snapshot', async () => {
-      process.env['QWEN_MEMORY_PRESSURE_SOFT'] = '0.3';
-      process.env['QWEN_MEMORY_PRESSURE_HARD'] = '0.6';
-      process.env['QWEN_MEMORY_PRESSURE_CRITICAL'] = '0.9';
+      process.env['HOPCODE_MEMORY_PRESSURE_SOFT'] = '0.3';
+      process.env['HOPCODE_MEMORY_PRESSURE_HARD'] = '0.6';
+      process.env['HOPCODE_MEMORY_PRESSURE_CRITICAL'] = '0.9';
       const parent = new Config(baseParams);
       await parent.initialize({ skipGeminiInitialization: true });
 
-      process.env['QWEN_MEMORY_PRESSURE_SOFT'] = '0.9';
-      process.env['QWEN_MEMORY_PRESSURE_HARD'] = '0.95';
-      process.env['QWEN_MEMORY_PRESSURE_CRITICAL'] = '0.97';
+      process.env['HOPCODE_MEMORY_PRESSURE_SOFT'] = '0.9';
+      process.env['HOPCODE_MEMORY_PRESSURE_HARD'] = '0.95';
+      process.env['HOPCODE_MEMORY_PRESSURE_CRITICAL'] = '0.97';
       const child = Object.create(parent) as Config;
       mockMemoryRatio(0.35);
 
@@ -2351,7 +2351,7 @@ describe('Server Config (config.ts)', () => {
   // `Config.setMcpBudgetEventCallback → pendingMcpBudgetCallback →
   // createToolRegistry → registry.getMcpClientManager().setOnBudgetEvent`
   // boundary previously had NO test. The acpAgent test stubs the
-  // setter (proves QwenAgent calls it pre-`initialize`); the manager
+  // setter (proves HopCodeAgent calls it pre-`initialize`); the manager
   // tests bypass Config by passing `onBudgetEvent` directly to
   // `McpClientManager`. Neither covers the actual stash + apply path
   // inside Config — and that path is the safety net that prevents

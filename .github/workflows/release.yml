@@ -394,7 +394,7 @@ jobs:
           RELEASE_VERSION: '${{ needs.prepare.outputs.release_version }}'
         run: 'npm run package:standalone:release -- --version "${RELEASE_VERSION}" --out-dir dist/standalone'
 
-      - name: 'Publish @qwen-code/qwen-code'
+      - name: 'Publish @hopcode/hopcode'
         working-directory: 'dist'
         run: |-
           npm publish --access public --tag=${{ needs.prepare.outputs.npm_tag }} ${{ needs.prepare.outputs.is_dry_run == 'true' && '--dry-run' || '' }}

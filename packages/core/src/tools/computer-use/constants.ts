@@ -1,12 +1,12 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * The exact upstream `open-computer-use` version this release of
- * qwen-code is pinned to. Hardcoded `schemas.ts` is generated against
+ * hopcode is pinned to. Hardcoded `schemas.ts` is generated against
  * this version; bumping it requires re-running the sync script.
  *
  * To bump:
@@ -27,12 +27,12 @@ export const PINNED_OPEN_COMPUTER_USE_VERSION = '0.1.51';
 
 /**
  * Resolve the upstream open-computer-use package spec to use for
- * spawning the MCP server. Reads `QWEN_COMPUTER_USE_PACKAGE` env var
+ * spawning the MCP server. Reads `HOPCODE_COMPUTER_USE_PACKAGE` env var
  * at call time so tests / power users can override the pinned version.
  */
 export function resolveComputerUsePackageSpec(): string {
   return (
-    process.env['QWEN_COMPUTER_USE_PACKAGE'] ??
+    process.env['HOPCODE_COMPUTER_USE_PACKAGE'] ??
     `open-computer-use@${PINNED_OPEN_COMPUTER_USE_VERSION}`
   );
 }

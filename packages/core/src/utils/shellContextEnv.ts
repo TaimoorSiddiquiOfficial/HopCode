@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025-2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,19 +23,19 @@ import { promptIdContext } from './promptIdContext.js';
 export function getShellContextEnvVars(): Record<string, string> {
   const env: Record<string, string> = {};
 
-  const sessionId = process.env['QWEN_CODE_SESSION_ID'];
+  const sessionId = process.env['HOPCODE_CODE_SESSION_ID'];
   if (sessionId) {
-    env['QWEN_CODE_SESSION_ID'] = sessionId;
+    env['HOPCODE_CODE_SESSION_ID'] = sessionId;
   }
 
   // For agent/prompt IDs: explicitly set empty string when no ALS context
-  // exists, so that stale values inherited from a parent qwen-code process
+  // exists, so that stale values inherited from a parent hopcode process
   // (via process.env spread) are overwritten rather than leaked.
   const agentId = getCurrentAgentId();
-  env['QWEN_CODE_AGENT_ID'] = agentId ?? '';
+  env['HOPCODE_CODE_AGENT_ID'] = agentId ?? '';
 
   const promptId = promptIdContext.getStore();
-  env['QWEN_CODE_PROMPT_ID'] = promptId ?? '';
+  env['HOPCODE_CODE_PROMPT_ID'] = promptId ?? '';
 
   return env;
 }

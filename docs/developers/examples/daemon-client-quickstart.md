@@ -1,4 +1,4 @@
-# DaemonClient quickstart (TypeScript)
+﻿# DaemonClient quickstart (TypeScript)
 
 A minimal end-to-end example: start a `hopcode serve` daemon in another terminal, then drive it from a Node script with the SDK's `DaemonClient`. See also: [Daemon mode user guide](../../users/hopcode-serve.md) and [HTTP protocol reference](../hopcode-serve-protocol.md).
 
@@ -12,7 +12,7 @@ hopcode serve --port 4170
 # → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/your-project)
 ```
 
-Per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02 each daemon binds to one workspace at boot (the current `cwd`, or override with `--workspace /path/to/dir`). The daemon's bound path is advertised on `/capabilities.workspaceCwd` so clients can pre-flight check + omit `cwd` from `POST /session`.
+Per [#3803](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3803) §02 each daemon binds to one workspace at boot (the current `cwd`, or override with `--workspace /path/to/dir`). The daemon's bound path is advertised on `/capabilities.workspaceCwd` so clients can pre-flight check + omit `cwd` from `POST /session`.
 
 In another:
 
@@ -27,7 +27,7 @@ import { DaemonClient, type DaemonEvent } from '@hoptrendy/sdk';
 
 const client = new DaemonClient({
   baseUrl: 'http://127.0.0.1:4170',
-  // token: process.env.QWEN_SERVER_TOKEN, // required for non-loopback binds
+  // token: process.env.HOPCODE_SERVER_TOKEN, // required for non-loopback binds
 });
 
 // 1. Confirm we can reach the daemon, gate UI on its features, and
@@ -130,7 +130,7 @@ console.log(updated.hash);
 `expectedHash` is SHA-256 over the raw on-disk bytes. `mode: "replace"` and
 `editWorkspaceFile()` require it so stale clients do not overwrite a file they
 did not just read. Write/edit require bearer-token configuration even on
-loopback; start the daemon with `--token` or `QWEN_SERVER_TOKEN` before using
+loopback; start the daemon with `--token` or `HOPCODE_SERVER_TOKEN` before using
 them.
 
 ## Reconnect with `Last-Event-ID`
@@ -229,7 +229,7 @@ When the daemon was started with a token (any non-loopback bind requires one):
 ```ts
 const client = new DaemonClient({
   baseUrl: 'https://your-host:4170',
-  token: process.env.QWEN_SERVER_TOKEN,
+  token: process.env.HOPCODE_SERVER_TOKEN,
 });
 ```
 

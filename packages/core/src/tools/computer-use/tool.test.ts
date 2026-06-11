@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+﻿import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -37,11 +37,11 @@ describe('ComputerUseTool', () => {
     // Auto-approve install so tool.test.ts doesn't block on the install
     // confirmation prompt. The bootstrap state machine is tested in detail
     // in bootstrap.test.ts; tool.test.ts focuses on the tool wrapper logic.
-    process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'] = '1';
+    process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'] = '1';
   });
 
   afterEach(() => {
-    delete process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'];
+    delete process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'];
   });
 
   it('exposes qwen-facing name with computer_use__ prefix', () => {
@@ -147,11 +147,11 @@ describe('coerceTypes', () => {
 describe('ComputerUseTool.build() coercion integration', () => {
   beforeEach(() => {
     ComputerUseClient.setSharedForTest(undefined);
-    process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'] = '1';
+    process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'] = '1';
   });
 
   afterEach(() => {
-    delete process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'];
+    delete process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'];
   });
 
   it('build() succeeds when element_index is a string (schema type: string)', () => {
@@ -459,11 +459,11 @@ describe('buildDisplayText', () => {
 describe('execute() image content forwarding', () => {
   beforeEach(() => {
     ComputerUseClient.setSharedForTest(undefined);
-    process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'] = '1';
+    process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'] = '1';
   });
 
   afterEach(() => {
-    delete process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'];
+    delete process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'];
     ComputerUseClient.setSharedForTest(undefined);
   });
 

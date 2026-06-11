@@ -1,4 +1,4 @@
-# HopCode Java SDK
+﻿# HopCode Java SDK
 
 The HopCode Java SDK is a minimum experimental SDK for programmatic access to HopCode functionality. It provides a Java interface to interact with the HopCode CLI, allowing developers to integrate HopCode capabilities into their Java applications.
 
@@ -22,7 +22,7 @@ Add the following dependency to your Maven `pom.xml`:
 ```xml
 <dependency>
     <groupId>com.alibaba</groupId>
-    <artifactId>qwencode-sdk</artifactId>
+    <artifactId>hopcode-sdk</artifactId>
     <version>{$version}</version>
 </dependency>
 ```
@@ -30,7 +30,7 @@ Add the following dependency to your Maven `pom.xml`:
 Or if using Gradle, add to your `build.gradle`:
 
 ```gradle
-implementation 'com.alibaba:qwencode-sdk:{$version}'
+implementation 'com.alibaba:hopcode-sdk:{$version}'
 ```
 
 ## Building and Running
@@ -268,7 +268,7 @@ The SDK uses a thread pool for managing concurrent operations with the following
 - **Maximum Pool Size**: 100 threads
 - **Keep-Alive Time**: 60 seconds
 - **Queue Capacity**: 300 tasks (using LinkedBlockingQueue)
-- **Thread Naming**: "qwen_code_cli-pool-{number}"
+- **Thread Naming**: "hopcode_cli-pool-{number}"
 - **Daemon Threads**: false
 - **Rejected Execution Handler**: CallerRunsPolicy
 

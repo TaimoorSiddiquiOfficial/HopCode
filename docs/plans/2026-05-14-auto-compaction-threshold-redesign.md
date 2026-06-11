@@ -1,4 +1,4 @@
-# Auto-Compaction Threshold Redesign Implementation Plan
+﻿# Auto-Compaction Threshold Redesign Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -1188,7 +1188,7 @@ export interface ChatCompressionSettings {
    * apportioning chars across history in `findCompressSplitPoint`.
    * Also used as the placeholder budget when stripping inline media
    * out of the side-query compaction prompt. Default 1600.
-   * Env override: `QWEN_IMAGE_TOKEN_ESTIMATE`.
+   * Env override: `HOPCODE_IMAGE_TOKEN_ESTIMATE`.
    */
   imageTokenEstimate?: number;
 }

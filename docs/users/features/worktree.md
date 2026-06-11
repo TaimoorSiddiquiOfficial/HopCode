@@ -1,4 +1,4 @@
-# Worktrees
+﻿# Worktrees
 
 > Isolate experimental work in a temporary [git worktree](https://git-scm.com/docs/git-worktree) without leaving your current session. Useful when the model is about to make wide-ranging edits you want to keep separate from your main checkout, or when you want a subagent to work in a sandbox of its own.
 
@@ -20,7 +20,7 @@ qwen --worktree=my-feature
 
 # PR reference — fetches refs/pull/<N>/head from `origin`
 qwen --worktree=#4174
-qwen --worktree https://github.com/QwenLM/qwen-code/pull/4174
+qwen --worktree https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174
 
 # Continue a previous --worktree session — re-attaches to the existing dir
 qwen --resume <session-id> --worktree=my-feature
@@ -40,15 +40,15 @@ The `--worktree` flag cannot be combined with `--acp`/`--experimental-acp` — f
 
 ### Or ask mid-session
 
-Alternatively, ask Qwen Code in plain language to create a worktree from inside an existing session:
+Alternatively, ask HopCode in plain language to create a worktree from inside an existing session:
 
 ```text
 > start a worktree called experiment-a
 Worktree experiment-a created on branch worktree-experiment-a
-.qwen/worktrees/experiment-a
+.hopcode/worktrees/experiment-a
 ```
 
-From this point on, the model routes every file edit and shell command through `.qwen/worktrees/experiment-a/`. Your original working directory is untouched.
+From this point on, the model routes every file edit and shell command through `.hopcode/worktrees/experiment-a/`. Your original working directory is untouched.
 
 When you are done:
 
@@ -61,7 +61,7 @@ If you want to come back later, ask to exit with the worktree kept on disk inste
 
 ```text
 > exit the worktree but keep it
-Kept worktree experiment-a at .qwen/worktrees/experiment-a
+Kept worktree experiment-a at .hopcode/worktrees/experiment-a
 ```
 
 ## When Worktrees Are Used
@@ -82,7 +82,7 @@ The two mid-session tools (`enter_worktree` / `exit_worktree`) are deliberately 
 Every Qwen-managed worktree is placed under your project's `.qwen` directory:
 
 ```
-<repoRoot>/.qwen/worktrees/<slug>/         # Working directory
+<repoRoot>/.hopcode/worktrees/<slug>/         # Working directory
                           ↳ branch worktree-<slug>   # Created off your current branch
 ```
 
@@ -91,7 +91,7 @@ Every Qwen-managed worktree is placed under your project's `.qwen` directory:
 - **Hooks** — the worktree's `core.hooksPath` is automatically pointed at the main repo's `.husky/` (preferred) or `.git/hooks/` so commits inside the worktree still trigger your existing pre-commit / commit-msg hooks.
 - **Optional symlinks** — directories listed in `worktree.symlinkDirectories` (see [Settings](#settings)) are symlinked from the main repo into the new worktree so heavy dirs like `node_modules` can be reused without reinstalling.
 
-The general-purpose worktree path is **not configurable** — it must live under `<repoRoot>/.qwen/worktrees/` so the CLI can find it on restart and on stale-cleanup sweeps. (The unrelated `agents.arena.worktreeBaseDir` setting controls only [Agent Arena](./arena.md) worktrees, which use a separate path tree under `~/.qwen/arena/`.)
+The general-purpose worktree path is **not configurable** — it must live under `<repoRoot>/.hopcode/worktrees/` so the CLI can find it on restart and on stale-cleanup sweeps. (The unrelated `agents.arena.worktreeBaseDir` setting controls only [Agent Arena](./arena.md) worktrees, which use a separate path tree under `~/.hopcode/arena/`.)
 
 ## Footer and Status Line
 
@@ -107,7 +107,7 @@ If you use a [custom status line script](./status-line.md), it also receives a `
 {
   "worktree": {
     "name": "experiment-a",
-    "path": "/path/to/repo/.qwen/worktrees/experiment-a",
+    "path": "/path/to/repo/.hopcode/worktrees/experiment-a",
     "branch": "worktree-experiment-a",
     "original_cwd": "/path/to/repo",
     "original_branch": "main"
@@ -169,13 +169,13 @@ The model is **not** automatically `chdir`'d into the worktree — the reminder 
 
 ## Sub-Agent Isolation
 
-The `agent` tool accepts an optional `isolation: "worktree"` parameter. When set, Qwen Code creates an ephemeral worktree at `<repoRoot>/.qwen/worktrees/agent-<7hex>/` before the sub-agent starts, and:
+The `agent` tool accepts an optional `isolation: "worktree"` parameter. When set, HopCode creates an ephemeral worktree at `<repoRoot>/.hopcode/worktrees/agent-<7hex>/` before the sub-agent starts, and:
 
 - **No changes** → the worktree is automatically removed when the agent finishes.
 - **Has changes** → the worktree is preserved; its path and branch are appended to the agent's result, e.g.
   ```
   …agent output…
-  [worktree preserved: /path/to/.qwen/worktrees/agent-3f2a1b9 (branch worktree-agent-3f2a1b9)]
+  [worktree preserved: /path/to/.hopcode/worktrees/agent-3f2a1b9 (branch worktree-agent-3f2a1b9)]
   ```
   Review the diff and merge or delete it manually.
 
@@ -220,7 +220,7 @@ Two settings shape the general-purpose worktree experience:
 Example:
 
 ```jsonc
-// ~/.qwen/settings.json or <repo>/.qwen/settings.json
+// ~/.hopcode/settings.json or <repo>/.hopcode/settings.json
 {
   "worktree": {
     "symlinkDirectories": ["node_modules", ".turbo", "dist"],
@@ -232,7 +232,7 @@ Applies to ALL worktree-creation paths: `--worktree` flag, `enter_worktree` tool
 
 Settings unrelated to general worktrees but worth knowing about:
 
-- `agents.arena.worktreeBaseDir` — controls **Agent Arena** worktree placement (default `~/.qwen/arena`). Does not affect general-purpose worktrees, which always live under `<repoRoot>/.qwen/worktrees/`.
+- `agents.arena.worktreeBaseDir` — controls **Agent Arena** worktree placement (default `~/.hopcode/arena`). Does not affect general-purpose worktrees, which always live under `<repoRoot>/.hopcode/worktrees/`.
 
 There is no schema for `worktree.sparsePaths` yet — that's a roadmap item (see [Limitations](#limitations)).
 
@@ -251,7 +251,7 @@ There is no schema for `worktree.sparsePaths` yet — that's a roadmap item (see
 Refuses to run when:
 
 - The CLI is not in a git repository.
-- The current working directory is already inside `.qwen/worktrees/` (no nested worktrees).
+- The current working directory is already inside `.hopcode/worktrees/` (no nested worktrees).
 
 ### `exit_worktree`
 

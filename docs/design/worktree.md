@@ -1,4 +1,4 @@
-# Worktree 通用能力设计
+﻿# Worktree 通用能力设计
 
 ## 问题陈述
 
@@ -251,7 +251,7 @@ _WorktreeExitDialog：_
 | `qwen --worktree my-name` | 显式 slug，沿用 `EnterWorktreeTool` 的 slug 校验规则 |
 | `qwen --worktree=my-name` | 等价于上一种                                         |
 
-不提供短别名 `-w`（qwen-code 短别名只保留给最高频参数，避免命名冲突）。
+不提供短别名 `-w`（hopcode 短别名只保留给最高频参数，避免命名冲突）。
 
 **启动序列：** worktree 在以下位置创建：
 
@@ -335,7 +335,7 @@ worktree 创建本身**不会**因为 symlink 失败而中止 —— 与 `config
 **slug 与分支命名：**
 
 - slug：`pr-<N>`（特殊保留前缀，与用户 slug 区分）
-- 分支：`worktree-pr-<N>`（沿用 qwen-code 现有 `worktree-<slug>` 命名规则；不采用 claude-code 的 `pr-<N>` 直接命名，避免与本地 `pr-<N>` 分支冲突）
+- 分支：`worktree-pr-<N>`（沿用 hopcode 现有 `worktree-<slug>` 命名规则；不采用 claude-code 的 `pr-<N>` 直接命名，避免与本地 `pr-<N>` 分支冲突）
 
 **fetch 策略：**
 
@@ -380,7 +380,7 @@ git fetch origin pull/<N>/head
 
 #### 开放问题
 
-1. **`--worktree-keep-on-exit`？** claude-code 没有，qwen-code 是否需要一个 CLI flag 让 Exit Dialog 默认选 keep？建议**先不加**，等用户反馈。
+1. **`--worktree-keep-on-exit`？** claude-code 没有，hopcode 是否需要一个 CLI flag 让 Exit Dialog 默认选 keep？建议**先不加**，等用户反馈。
 2. **`worktree.symlinkDirectories` 是否需要 per-project override？** 当前 settings 已经支持 user/workspace/project 三级合并，无需特殊处理。
 3. **PR fetch 是否要拉取 `merge` ref（`pull/<N>/merge`，即与 base 合并后的 ref）而非 `head`？** claude-code 选 `head`，理由是用户通常想看 PR 的实际改动。沿用此选择。
 

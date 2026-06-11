@@ -1,7 +1,7 @@
-# Telemetry: Custom Resource Attributes + Metric Cardinality Controls
+﻿# Telemetry: Custom Resource Attributes + Metric Cardinality Controls
 
-> 配套 issue: [#4365](https://github.com/QwenLM/hopcode/issues/4365)
-> 父 issue: [#3731](https://github.com/QwenLM/hopcode/issues/3731)
+> 配套 issue: [#4365](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4365)
+> 父 issue: [#3731](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3731)
 > 基于 2026-05-21 对 hopcode main 分支的代码复核
 
 ## 1. 背景
@@ -383,7 +383,7 @@ if (env['OTEL_SERVICE_NAME']) {
 const resourceAttributes = merged;
 
 const metricsIncludeSessionId =
-  parseBooleanEnvFlag(env['QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID']) ??
+  parseBooleanEnvFlag(env['HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID']) ??
   settings.metrics?.includeSessionId ??
   false;
 
@@ -615,7 +615,7 @@ it('emits session.id when toggle is true', async () => {
 **选项 A**：恢复旧行为（短期 debug 推荐）
 
 ```bash
-export QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true
+export HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true
 ```
 
 或 `settings.json`：
@@ -647,7 +647,7 @@ time-series fan-out.
 
 - Spans and logs are unaffected — `session.id` is still present.
 - To restore the previous behavior (short-term debugging only), set
-  `QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true` or in settings.json:
+  `HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true` or in settings.json:
   `telemetry.metrics.includeSessionId: true`.
 - For long-term session correlation, query against trace / log
   backends instead of metric backends.
@@ -700,7 +700,7 @@ export OTEL_RESOURCE_ATTRIBUTES="debug_run=true"
 
 ```bash
 # 一次性 debug run
-QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true qwen "投资分析"
+HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true qwen "投资分析"
 ```
 
 完事即关闭，不要持久化到 settings。

@@ -11,7 +11,7 @@ import type { HookDefinition, HookEventName } from '../hooks/types.js';
  * - 'project': Stored in `.hopcode/skills/` within the project directory
  * - 'user': Stored in `~/.hopcode/skills/` in the user's home directory
  * - 'extension': Provided by an installed extension
- * - 'bundled': Built-in skills shipped with hopcode-code
+ * - 'bundled': Built-in skills shipped with hopcode
  */
 export type SkillLevel = 'project' | 'user' | 'extension' | 'bundled';
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+﻿#!/usr/bin/env npx tsx
 /**
  * @license
  * Copyright 2026 HopCode Team
@@ -165,7 +165,7 @@ async function startFakeOpenAIServer(): Promise<FakeServer> {
   };
 }
 
-function qwenArgs(baseUrl: string): string[] {
+function hopCodeArgs(baseUrl: string): string[] {
   return [
     'dist/cli.js',
     '--no-chat-recording',
@@ -256,12 +256,14 @@ function foregroundsAtOccurrences(raw: string, needle: string): string[] {
 async function main(): Promise<void> {
   const scriptDir = dirname(fileURLToPath(import.meta.url));
   const defaultRepoRoot = resolve(scriptDir, '../..');
-  const repoRoot = resolve(process.env['QWEN_TUI_E2E_REPO'] ?? defaultRepoRoot);
+  const repoRoot = resolve(
+    process.env['HOPCODE_TUI_E2E_REPO'] ?? defaultRepoRoot,
+  );
   const outputDir = resolve(
-    process.env['QWEN_TUI_E2E_OUT'] ??
+    process.env['HOPCODE_TUI_E2E_OUT'] ??
       join(tmpdir(), 'hopcode-table-wrap-ansi', basename(repoRoot)),
   );
-  const expectedPass = process.env['QWEN_TUI_E2E_EXPECT_PASS'] !== 'false';
+  const expectedPass = process.env['HOPCODE_TUI_E2E_EXPECT_PASS'] !== 'false';
 
   if (existsSync(outputDir)) {
     rmSync(outputDir, { recursive: true });
@@ -277,14 +279,14 @@ async function main(): Promise<void> {
     FORCE_COLOR: '1',
     HOME: homeDir,
     NODE_NO_WARNINGS: '1',
-    QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
-    QWEN_CODE_NO_RELAUNCH: '1',
+    HOPCODE_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
+    HOPCODE_CODE_NO_RELAUNCH: '1',
     HOPCODE_SANDBOX: 'false',
     TERM: 'xterm-256color',
     USERPROFILE: homeDir,
   };
   delete env['NO_COLOR'];
-  delete env['QWEN_CODE_SIMPLE'];
+  delete env['HOPCODE_CODE_SIMPLE'];
   for (const key of [
     'HTTP_PROXY',
     'http_proxy',
@@ -310,7 +312,7 @@ async function main(): Promise<void> {
 
   const screenshots: string[] = [];
   try {
-    await terminal.spawn('node', qwenArgs(fakeServer.baseUrl));
+    await terminal.spawn('node', hopCodeArgs(fakeServer.baseUrl));
     await terminal.waitFor('Type your message', { timeout: 30000 });
     await terminal.type(PROMPT_TEXT, { delay: 12, slow: true });
     await terminal.idle(400, 4000);

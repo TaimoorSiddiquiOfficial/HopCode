@@ -1,4 +1,4 @@
-{
+﻿{
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
@@ -9,8 +9,8 @@
     "paths": {
       "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
       "@hoptrendy/hopcode-core/*": ["../core/src/*"],
-      "@qwen-code/acp-bridge": ["../acp-bridge/src/index.ts"],
-      "@qwen-code/acp-bridge/*": ["../acp-bridge/src/*"]
+      "@hopcode/acp-bridge": ["../acp-bridge/src/index.ts"],
+      "@hopcode/acp-bridge/*": ["../acp-bridge/src/*"]
     }
   },
   "include": [

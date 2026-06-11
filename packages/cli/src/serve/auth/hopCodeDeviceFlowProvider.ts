@@ -29,12 +29,12 @@ import {
   type DeviceFlowStartResult,
 } from './deviceFlow.js';
 
-const QWEN_OAUTH_SCOPE = 'openid profile email model.completion';
+const HOPCODE_OAUTH_SCOPE = 'openid profile email model.completion';
 
 /**
  * Maximum length of raw IdP detail written to stderr for operator
  * audit. PR #4255 fold-in 6 review thread #5: the raw `err.message`
- * from `QwenOAuth2Client` embeds the full upstream response body,
+ * from `HopCodeOAuth2Client` embeds the full upstream response body,
  * which on a misbehaving reverse proxy / WAF can be megabytes of
  * HTML â€” and container log-aggregation pipelines (Loki, Fluent Bit,
  * Stackdriver) typically truncate or reject lines past 4â€“32 KiB,
@@ -74,7 +74,7 @@ function sanitizeForStderr(value: string): string {
 /**
  * Qwen-OAuth implementation of `DeviceFlowProvider` for `hopcode serve`.
  *
- * Uses the lower-level `QwenOAuth2Client` primitives (`requestDeviceAuthorization`
+ * Uses the lower-level `HopCodeOAuth2Client` primitives (`requestDeviceAuthorization`
  * / `pollDeviceToken`) directly rather than the high-level
  * `authWithHopCodeDeviceFlow` because that helper invokes `open(url)` to launch
  * a browser on the daemon host. PR 21 design Â§8 #1 forbids browser-spawning
@@ -99,7 +99,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // them compatible.
       auth = await this.client.requestDeviceAuthorization(
         {
-          scope: QWEN_OAUTH_SCOPE,
+          scope: HOPCODE_OAUTH_SCOPE,
           code_challenge,
           code_challenge_method: 'S256',
         },
@@ -111,12 +111,12 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // `500` fall-through in `sendBridgeError`.
       //
       // PR #4255 fold-in 3 (#9): the raw `err.message` from the
-      // QwenOAuth2Client embeds the full IdP response body (which can
+      // HopCodeOAuth2Client embeds the full IdP response body (which can
       // be HTML from a reverse proxy / WAF â€” hundreds of bytes,
       // potentially leaking infrastructure detail). Use a stable
       // bounded message for the route response; the original err
       // detail goes through stderr audit only via the registry's
-      // standard error path (qwenOAuth2.ts logs via `debugLogger`
+      // standard error path (HopCodeOAuth2.ts logs via `debugLogger`
       // when needed).
       const detail = err instanceof Error ? err.message : String(err);
       writeStderrLine(
@@ -200,7 +200,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // `authorization_pending` or `slow_down`. Map RFC 8628 errors to
       // structured terminal results; everything else is `upstream_error`.
       // PR #4255 review S2: do NOT echo the raw thrown message into
-      // `hint` â€” `qwenOAuth2.ts` embeds the entire IdP responseText
+      // `hint` â€” `HopCodeOAuth2.ts` embeds the entire IdP responseText
       // (which can be an HTML error page from a reverse proxy / WAF
       // running into hundreds of bytes) into the message, and that
       // would flow through `publishWorkspaceEvent` to every SSE
@@ -211,7 +211,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       // HopCodeOAuthPollError` and read the structured `oauthError`
       // field instead of substring-matching the message text. The
       // earlier regex was a fragile cross-file string contract that
-      // would silently degrade to `upstream_error` if `qwenOAuth2.ts`
+      // would silently degrade to `upstream_error` if `HopCodeOAuth2.ts`
       // ever changed its message format. The typed class makes the
       // contract explicit + tsc-checkable.
       const errorKind: DeviceFlowErrorKind =
@@ -328,7 +328,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
           // PR #4255 review W3: `accountAlias` USED to be wired
           // through events / reducer / audit but the Qwen IdP token
           // response doesn't carry one (see DeviceTokenData shape in
-          // `qwenOAuth2.ts:152-160` â€” no `name` / `email` / `sub`
+          // `HopCodeOAuth2.ts:152-160` â€” no `name` / `email` / `sub`
           // field). Returning only `{expiresAt}` makes the field
           // type-honestly absent rather than always-undefined. A
           // future provider whose token response carries an alias
@@ -345,8 +345,8 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
       const pending = response as DeviceTokenPendingData;
       return pending.slowDown ? { kind: 'slow_down' } : { kind: 'pending' };
     }
-    // The `QwenOAuth2Client.pollDeviceToken` implementation in
-    // `qwenOAuth2.ts:386-393` THROWS on every non-pending non-success
+    // The `HopCodeOAuth2Client.pollDeviceToken` implementation in
+    // `HopCodeOAuth2.ts:386-393` THROWS on every non-pending non-success
     // response (it never returns a structured error envelope from the
     // success path). So this fall-through is reached only if a future
     // refactor changes that contract. Map defensively to
@@ -366,7 +366,7 @@ export class HopCodeOAuthDeviceFlowProvider implements DeviceFlowProvider {
  * `DeviceFlowErrorKind` taxonomy. Unknown / missing codes fall
  * through to `upstream_error`. PR #4255 fold-in 5 (#4) replaced the
  * earlier substring-regex match against the message text, which was
- * an implicit string contract with `qwenOAuth2.ts` that would
+ * an implicit string contract with `HopCodeOAuth2.ts` that would
  * silently degrade if the message format changed.
  */
 function mapRfc8628OAuthCode(code: string | undefined): DeviceFlowErrorKind {

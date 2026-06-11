@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -170,7 +170,7 @@ import { Session } from './session/Session.js';
 // Test suite — VP1, VP2, VP2b
 // ---------------------------------------------------------------------------
 
-describe('QwenAgent loadSession — Phase C worktree context restore', () => {
+describe('HopCodeAgent loadSession — Phase C worktree context restore', () => {
   type AgentSideConnectionLike = { closed: Promise<void> };
   type AgentLike = {
     initialize: (args: Record<string, unknown>) => Promise<unknown>;

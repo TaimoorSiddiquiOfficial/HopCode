@@ -1,4 +1,4 @@
-import type { ScenarioConfig } from '../scenario-runner.js';
+﻿import type { ScenarioConfig } from '../scenario-runner.js';
 
 const markdownPrompt = `Output a compact Markdown rendering verification sample with exactly:
 
@@ -15,7 +15,7 @@ export default {
   name: 'markdown-rendering',
   spawn: ['node', 'dist/cli.js', '--izn'],
   terminal: {
-    title: 'hopcode-code markdown rendering',
+    title: 'hopcode markdown rendering',
     cwd: '../../..',
     cols: 140,
     rows: 42,

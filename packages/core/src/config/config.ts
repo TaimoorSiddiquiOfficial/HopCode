@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -378,12 +378,12 @@ export interface TelemetryMetricsSettings {
 
 /**
  * Security-relevant settings controlling what client-side correlation
- * data qwen-code writes into outbound LLM API requests.
+ * data hopcode writes into outbound LLM API requests.
  *
  * **Why this is a separate namespace from `telemetry.*`:** telemetry
  * controls data flow into the user's OWN observability backend (OTLP
  * collector / file outfile). The settings here control data flow OUT of
- * the qwen-code process and INTO third-party LLM provider request
+ * the hopcode process and INTO third-party LLM provider request
  * streams (DashScope, OpenAI, Anthropic, etc.). Different recipients =
  * different consent decision, so a different settings tree. See PR
  * #4390 review (LaZzyMan) for the framing rationale.
@@ -467,7 +467,7 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
       if (!knownDisable.includes(lowered)) {
         // Unrecognised string — disable (safer-by-default) but log
         // so a user wondering "why is my setting being ignored?"
-        // can see the actual coercion in QWEN_DEBUG_LOG_FILE.
+        // can see the actual coercion in HOPCODE_DEBUG_LOG_FILE.
         gitCoAuthorLogger.warn(
           `Unrecognized string value for general.gitCoAuthor.${fieldName}: ${JSON.stringify(v)}; treating as false. Accepted forms: true/yes/on/1, false/no/off/0/empty.`,
         );
@@ -628,7 +628,7 @@ export interface ConfigParameters {
    * CLI surface. Matched case-insensitively on the final (post-rename)
    * command name. Sourced from settings (`slashCommands.disabled`, UNION
    * merged across scopes), the `--disabled-slash-commands` CLI flag, and
-   * the `QWEN_DISABLED_SLASH_COMMANDS` environment variable.
+   * the `HOPCODE_DISABLED_SLASH_COMMANDS` environment variable.
    */
   disabledSlashCommands?: string[];
   /**
@@ -698,7 +698,7 @@ export interface ConfigParameters {
    * Wall-clock budget for an unattended run, in seconds. `-1` (default)
    * means no limit. Enforced by the CLI's non-interactive run loop —
    * see `RunBudgetEnforcer` in `packages/cli/src/utils/runBudget.ts`.
-   * Issue: QwenLM/qwen-code#4103.
+   * Issue: TaimoorSiddiquiOfficial/HopCode#4103.
    */
   maxWallTimeSeconds?: number;
   /**
@@ -755,7 +755,7 @@ export interface ConfigParameters {
   channel?: string;
   /**
    * File descriptor number for structured JSON event output (dual output mode).
-   * When set, Qwen Code outputs structured JSON events to this fd while
+   * When set, HopCode outputs structured JSON events to this fd while
    * continuing to render the TUI on stdout. The caller must provide this fd
    * via spawn stdio configuration.
    * Mutually exclusive with jsonFile.
@@ -873,19 +873,19 @@ function loadMemoryPressureConfig(): MemoryPressureConfig {
 
   try {
     config.softPressureRatio = readMemoryPressureRatioEnv(
-      'QWEN_MEMORY_PRESSURE_SOFT',
+      'HOPCODE_MEMORY_PRESSURE_SOFT',
       config.softPressureRatio,
     );
     config.hardPressureRatio = readMemoryPressureRatioEnv(
-      'QWEN_MEMORY_PRESSURE_HARD',
+      'HOPCODE_MEMORY_PRESSURE_HARD',
       config.hardPressureRatio,
     );
     config.criticalRatio = readMemoryPressureRatioEnv(
-      'QWEN_MEMORY_PRESSURE_CRITICAL',
+      'HOPCODE_MEMORY_PRESSURE_CRITICAL',
       config.criticalRatio,
     );
 
-    if (process.env['QWEN_MEMORY_ENABLE_GC'] === '1') {
+    if (process.env['HOPCODE_MEMORY_ENABLE_GC'] === '1') {
       config.enableExplicitGC = true;
     }
 
@@ -939,8 +939,8 @@ const DEFAULT_BARE_CORE_TOOLS = [
 ];
 
 // Tracks whether the first Config in this process has claimed the global
-// QWEN_CODE_SESSION_ID env var. Prevents throwaway Config instances from
-// overwriting the real session's ID while still allowing nested qwen-code
+// HOPCODE_CODE_SESSION_ID env var. Prevents throwaway Config instances from
+// overwriting the real session's ID while still allowing nested hopcode
 // processes to claim their own (they start with a fresh module scope).
 let sessionEnvClaimed = false;
 
@@ -970,7 +970,7 @@ export class Config {
    * `startMcpDiscoveryInBackground` (or legacy blocking discovery)
    * fires the first pass. Pre-fix the acpAgent registered after
    * `initialize()` returned, missing the first pass entirely under
-   * `QWEN_CODE_LEGACY_MCP_BLOCKING=1` and racing against background
+   * `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` and racing against background
    * discovery completion under the default mode.
    */
   private pendingMcpBudgetCallback?: (event: McpBudgetEvent) => void;
@@ -1160,11 +1160,11 @@ export class Config {
     // Only set the global env marker once per process lifetime, so
     // throwaway Config instances (e.g. telemetry-only) don't clobber
     // the real interactive session's ID. Uses a module-level flag
-    // rather than checking env existence — otherwise a nested qwen-code
+    // rather than checking env existence — otherwise a nested hopcode
     // launched from within a session would inherit the parent's ID and
     // never claim its own.
     if (!sessionEnvClaimed && process.env) {
-      process.env['QWEN_CODE_SESSION_ID'] = this.sessionId;
+      process.env['HOPCODE_CODE_SESSION_ID'] = this.sessionId;
       sessionEnvClaimed = true;
     }
     this.sessionData = params.sessionData;
@@ -1243,7 +1243,7 @@ export class Config {
     this.gitCoAuthor = {
       ...normalizeGitCoAuthor(params.gitCoAuthor),
       name: 'Qwen-Coder',
-      email: 'qwen-coder@alibabacloud.com',
+      email: 'hopcoder@alibabacloud.com',
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
     this.fileReadCacheDisabled = params.fileReadCacheDisabled ?? false;
@@ -1633,7 +1633,7 @@ export class Config {
     // after the registry exists. This lets `Config.initialize()` (and the
     // cli's `input_enabled` checkpoint) resolve without waiting on MCP
     // server response time. Users can opt back into the legacy synchronous
-    // behavior with `QWEN_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
+    // behavior with `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
     // an escape hatch.
     const legacyBlockingMcp =
       process.env['HOPCODE_LEGACY_MCP_BLOCKING'] === '1';
@@ -1833,7 +1833,7 @@ export class Config {
    *
    * Resolves immediately when:
    * - bare mode is on (no MCP discovery is started),
-   * - `QWEN_CODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
+   * - `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
    *   synchronously inside {@link initialize}), or
    * - no MCP servers are configured.
    */
@@ -2095,7 +2095,7 @@ export class Config {
     // instance (the one that already claimed via sessionEnvClaimed), so this
     // correctly updates the env var to reflect the new active session.
     if (process.env) {
-      process.env['QWEN_CODE_SESSION_ID'] = this.sessionId;
+      process.env['HOPCODE_CODE_SESSION_ID'] = this.sessionId;
     }
     this.sessionData = sessionData;
     setDebugLogSession(this);
@@ -2352,7 +2352,7 @@ export class Config {
     // - ModelsConfig.applyResolvedModelDefaults can clear or change credentials sources.
     // - Refresh keeps runtime behavior consistent and centralized.
     if (
-      (authType === AuthType.QWEN_OAUTH ||
+      (authType === AuthType.HOPCODE_OAUTH ||
         authType === AuthType.HOPCODE_OAUTH) &&
       !requiresRefresh
     ) {
@@ -3259,7 +3259,7 @@ export class Config {
 
   isCronEnabled(): boolean {
     // Cron is experimental and opt-in: enabled via settings or env var
-    if (process.env['QWEN_CODE_ENABLE_CRON'] === '1') return true;
+    if (process.env['HOPCODE_CODE_ENABLE_CRON'] === '1') return true;
     return this.cronEnabled;
   }
 
@@ -3273,11 +3273,11 @@ export class Config {
    * `CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES` gate, but defaults to on so the
    * compact-mode UI benefits without configuration.
    *
-   * Env overrides (either direction): `QWEN_CODE_EMIT_TOOL_USE_SUMMARIES=0`
+   * Env overrides (either direction): `HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES=0`
    * to force off, `=1` to force on.
    */
   getEmitToolUseSummaries(): boolean {
-    const env = process.env['QWEN_CODE_EMIT_TOOL_USE_SUMMARIES'];
+    const env = process.env['HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES'];
     if (env === '0' || env === 'false') return false;
     if (env === '1' || env === 'true') return true;
     return this.emitToolUseSummaries;

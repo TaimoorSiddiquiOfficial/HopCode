@@ -1,4 +1,4 @@
-# @hoptrendy/sdk
+﻿# @hoptrendy/sdk
 
 A minimum experimental TypeScript SDK for programmatic access to HopCode.
 
@@ -113,7 +113,7 @@ import { DaemonClient, DaemonSessionClient } from '@hoptrendy/sdk';
 
 const daemon = new DaemonClient({
   baseUrl: 'http://127.0.0.1:4170',
-  token: process.env['QWEN_SERVER_TOKEN'],
+  token: process.env['HOPCODE_SERVER_TOKEN'],
 });
 
 const caps = await daemon.capabilities();

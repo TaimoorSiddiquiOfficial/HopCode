@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+﻿import OpenAI from 'openai';
 import type { GenerateContentConfig } from '@google/genai';
 import type { Config } from '../../../config/config.js';
 import type { ContentGeneratorConfig } from '../../contentGenerator.js';
@@ -45,7 +45,10 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
   ): boolean {
     const { authType, baseUrl } = contentGeneratorConfig;
 
-    if (authType === AuthType.HOPCODE_OAUTH || authType === AuthType.QWEN_OAUTH)
+    if (
+      authType === AuthType.HOPCODE_OAUTH ||
+      authType === AuthType.HOPCODE_OAUTH
+    )
       return true;
     if (!baseUrl) return true;
 

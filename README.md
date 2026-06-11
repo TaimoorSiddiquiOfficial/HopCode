@@ -1,7 +1,7 @@
-<div align="center">
+﻿<div align="center">
 
 [![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
-[![License](https://img.shields.io/github/license/QwenLM/hopcode.svg)](./LICENSE)
+[![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/HopCode.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
 
@@ -496,7 +496,7 @@ Build on top of HopCode with the available SDKs:
 
 - TypeScript: [Use the HopCode SDK](./packages/sdk-typescript/README.md)
 - Python: [Use the Python SDK](./packages/sdk-python/README.md)
-- Java: [Use the Java SDK](./packages/sdk-java/qwencode/README.md)
+- Java: [Use the Java SDK](./packages/sdk-java/hopcode/README.md)
 
 Python SDK example:
 

@@ -1,4 +1,4 @@
-# TUI Daemon Adapter Draft
+﻿# TUI Daemon Adapter Draft
 
 ## Goal
 
@@ -13,18 +13,18 @@ permission, and lifecycle diagnostics are stable.
 ## Proposed Entry Point
 
 ```bash
-QWEN_DAEMON_URL=http://127.0.0.1:4170 hopcode --experimental-daemon-tui
+HOPCODE_DAEMON_URL=http://127.0.0.1:4170 hopcode --experimental-daemon-tui
 ```
 
 Optional:
 
 ```bash
-QWEN_DAEMON_TOKEN=... QWEN_DAEMON_WORKSPACE=/repo hopcode --experimental-daemon-tui
+HOPCODE_DAEMON_TOKEN=... HOPCODE_DAEMON_WORKSPACE=/repo hopcode --experimental-daemon-tui
 ```
 
 The CLI should refuse this mode unless both are true:
 
-- `QWEN_DAEMON_URL` or `--daemon-url` is set.
+- `HOPCODE_DAEMON_URL` or `--daemon-url` is set.
 - `GET /capabilities` advertises `session_create`, `session_prompt`, and
   `session_events`.
 

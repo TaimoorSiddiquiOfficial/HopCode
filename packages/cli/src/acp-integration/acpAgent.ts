@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -192,9 +192,9 @@ export async function runAcpAgent(
   console.debug = console.error;
 
   const stream = ndJsonStream(stdout, stdin);
-  let agentInstance: QwenAgent | undefined;
+  let agentInstance: HopCodeAgent | undefined;
   const connection = new AgentSideConnection((conn) => {
-    agentInstance = new QwenAgent(config, settings, argv, conn);
+    agentInstance = new HopCodeAgent(config, settings, argv, conn);
     return agentInstance;
   }, stream);
 
@@ -307,7 +307,7 @@ export function toHttpServer(
   return undefined;
 }
 
-class QwenAgent implements Agent {
+class HopCodeAgent implements Agent {
   private sessions: Map<string, Session> = new Map();
   private clientCapabilities: ClientCapabilities | undefined;
 
@@ -330,8 +330,8 @@ class QwenAgent implements Agent {
     return {
       protocolVersion: PROTOCOL_VERSION,
       agentInfo: {
-        name: 'qwen-code',
-        title: 'Qwen Code',
+        name: 'hopcode',
+        title: 'HopCode',
         version,
       },
       authMethods,
@@ -365,7 +365,7 @@ class QwenAgent implements Agent {
       });
     };
 
-    if (method === AuthType.QWEN_OAUTH) {
+    if (method === AuthType.HOPCODE_OAUTH) {
       HopCodeOAuth2Events.once(HopCodeOAuth2Event.AuthUri, authUriHandler);
     }
 
@@ -378,7 +378,7 @@ class QwenAgent implements Agent {
         method,
       );
     } finally {
-      if (method === AuthType.QWEN_OAUTH) {
+      if (method === AuthType.HOPCODE_OAUTH) {
         HopCodeOAuth2Events.off(HopCodeOAuth2Event.AuthUri, authUriHandler);
       }
     }
@@ -933,7 +933,7 @@ class QwenAgent implements Agent {
       kind: 'mcp_budget',
       // PR 14 v1: per-session, not per-workspace. Each ACP session has
       // its own `Config`/`McpClientManager` (via `newSessionConfig`)
-      // and reads `QWEN_SERVE_MCP_CLIENT_BUDGET` independently.
+      // and reads `HOPCODE_SERVE_MCP_CLIENT_BUDGET` independently.
       // Snapshot shows the bootstrap session's view. Wave 5 PR 23
       // shared MCP pool will graduate this to `'workspace'`.
       scope: 'session',
@@ -1854,7 +1854,7 @@ class QwenAgent implements Agent {
     // PR 14b fix #2 (codex review round 1): register the MCP guardrail
     // budget-event callback BEFORE `config.initialize()`. Pre-fix the
     // registration ran AFTER initialize, which (a) missed end-of-pass
-    // events under `QWEN_CODE_LEGACY_MCP_BLOCKING=1` (synchronous
+    // events under `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` (synchronous
     // discovery completes inside initialize, before our setter runs)
     // and (b) raced against background-discovery completion under the
     // default progressive mode. `Config.setMcpBudgetEventCallback`

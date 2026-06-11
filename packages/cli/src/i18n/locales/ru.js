@@ -1098,8 +1098,8 @@ export default {
     'Не удалось авторизоваться. Сообщение: {{message}}',
   'Authenticated successfully with {{authType}} credentials.':
     'Успешно авторизовано с учетными данными {{authType}}.',
-  'Invalid QWEN_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
-    'Неверное значение QWEN_DEFAULT_AUTH_TYPE: "{{value}}". Допустимые значения: {{validValues}}',
+  'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
+    'Неверное значение HOPCODE_DEFAULT_AUTH_TYPE: "{{value}}". Допустимые значения: {{validValues}}',
   // ============================================================================
   // Диалоги - Модель
   // ============================================================================

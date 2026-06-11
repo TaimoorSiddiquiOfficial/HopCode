@@ -1,4 +1,4 @@
-# AbortController refactor — verification plan
+﻿# AbortController refactor — verification plan
 
 Scenarios used to validate the change manually before opening the PR. Each
 scenario captures its tmux pane via `tmux pipe-pane -o 'cat >> <log>'`.
@@ -7,7 +7,7 @@ scenario captures its tmux pane via `tmux pipe-pane -o 'cat >> <log>'`.
 
 ```sh
 # Point WT at your local checkout of the branch under review.
-WT=/path/to/qwen-code/worktree
+WT=/path/to/hopcode/worktree
 LOGDIR=$WT/docs/verification/abort-controller-refactor/logs
 mkdir -p "$LOGDIR"
 

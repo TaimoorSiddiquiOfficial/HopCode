@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -285,7 +285,7 @@ describe('hopcode serve — POST /session validation + concurrent coalescing', (
   it('omits cwd → falls back to bound workspace (#3803 §02)', async () => {
     // The route accepts an empty body and falls back to the daemon's
     // bound workspace. Asserting this end-to-end through a real
-    // daemon process verifies the runQwenServe → createServeApp →
+    // daemon process verifies the runHopCodeServe → createServeApp →
     // bridge plumbing for the fallback path.
     const res = await fetch(`${base}/session`, {
       method: 'POST',

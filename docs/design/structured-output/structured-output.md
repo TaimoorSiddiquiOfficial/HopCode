@@ -1,4 +1,4 @@
-# Structured Output (`--json-schema`) — Design
+﻿# Structured Output (`--json-schema`) — Design
 
 This document captures the implementation decisions behind the
 `--json-schema` headless feature. User-facing usage lives in
@@ -397,7 +397,7 @@ points users at "schema is unsatisfiable" as a likely cause.
   in `--json-schema` arguments.
 - SDK protocol additions (Python / TypeScript / Java SDKs exposing a
   typed `structured_result` field) — track separately;
-  [PR #4001](https://github.com/QwenLM/hopcode/pull/4001) (closed
+  [PR #4001](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4001) (closed
   unmerged on 2026-05-11) covered that scope before the cli/core work
   landed and was superseded.
 

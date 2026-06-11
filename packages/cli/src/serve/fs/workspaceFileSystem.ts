@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -218,7 +218,7 @@ export interface CreateWorkspaceFileSystemFactoryDeps {
    * one per workspace via `loadIgnoreRules`.
    */
   ignore?: Ignore;
-  /** Override audit raw-path mode. Defaults to env `QWEN_AUDIT_RAW_PATHS=1`. */
+  /** Override audit raw-path mode. Defaults to env `HOPCODE_AUDIT_RAW_PATHS=1`. */
   includeRawPaths?: boolean;
 }
 

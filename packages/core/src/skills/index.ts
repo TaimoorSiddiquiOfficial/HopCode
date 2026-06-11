@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -17,7 +17,7 @@
  * - Project-level: `.hopcode/skills/`
  * - User-level: `~/.hopcode/skills/`
  * - Extension-level: provided by installed extensions
- * - Bundled: built-in skills shipped with hopcode-code
+ * - Bundled: built-in skills shipped with hopcode
  */
 
 // Core types and interfaces

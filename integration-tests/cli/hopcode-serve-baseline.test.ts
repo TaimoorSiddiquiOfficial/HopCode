@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -71,15 +71,15 @@ const SKIP =
   );
 
 // Read iteration tunings from env (documented in #4175 PR 1 plan).
-const HEAVY = process.env['QWEN_BASELINE_HEAVY'] === '1';
+const HEAVY = process.env['HOPCODE_BASELINE_HEAVY'] === '1';
 const PROMPT_ITERATIONS = Number(
-  process.env['QWEN_BASELINE_PROMPT_ITERATIONS'] ?? (HEAVY ? 100 : 20),
+  process.env['HOPCODE_BASELINE_PROMPT_ITERATIONS'] ?? (HEAVY ? 100 : 20),
 );
 const RSS_SAMPLE_INTERVAL_MS = Number(
-  process.env['QWEN_BASELINE_RSS_SAMPLE_INTERVAL_MS'] ?? 100,
+  process.env['HOPCODE_BASELINE_RSS_SAMPLE_INTERVAL_MS'] ?? 100,
 );
 const RSS_SAMPLE_DURATION_MS = Number(
-  process.env['QWEN_BASELINE_RSS_SAMPLE_DURATION_MS'] ??
+  process.env['HOPCODE_BASELINE_RSS_SAMPLE_DURATION_MS'] ??
     (HEAVY ? 15_000 : 5_000),
 );
 const PROMPT_LATENCY_CREDENTIAL_ENV_KEYS = [
@@ -88,16 +88,16 @@ const PROMPT_LATENCY_CREDENTIAL_ENV_KEYS = [
   'ANTHROPIC_API_KEY',
   'GEMINI_API_KEY',
   'GOOGLE_API_KEY',
-  'QWEN_API_KEY',
+  'HOPCODE_API_KEY',
 ];
 const HAS_PROMPT_LATENCY_CREDENTIAL =
-  process.env['QWEN_BASELINE_ENABLE_PROMPT_LATENCY'] === '1' ||
+  process.env['HOPCODE_BASELINE_ENABLE_PROMPT_LATENCY'] === '1' ||
   PROMPT_LATENCY_CREDENTIAL_ENV_KEYS.some((key) => Boolean(process.env[key])) ||
   Object.entries(process.env).some(
     ([key, value]) => key.startsWith('QWEN_CUSTOM_API_KEY_') && Boolean(value),
   );
 const SKIP_PROMPT_LATENCY =
-  process.env['QWEN_BASELINE_SKIP_PROMPT_LATENCY'] === '1' ||
+  process.env['HOPCODE_BASELINE_SKIP_PROMPT_LATENCY'] === '1' ||
   !HAS_PROMPT_LATENCY_CREDENTIAL;
 
 const FIXTURES_DIR = path.resolve(__dirname, '../fixtures');
@@ -694,7 +694,7 @@ async function measureRssAtSessionCount(sessionCount: number): Promise<{
             totalMs: null,
             skipped: true,
             skipReason:
-              'No recognized model credential env var is set; prompt latency requires real model access. Set QWEN_BASELINE_ENABLE_PROMPT_LATENCY=1 to force-run with non-env auth.',
+              'No recognized model credential env var is set; prompt latency requires real model access. Set HOPCODE_BASELINE_ENABLE_PROMPT_LATENCY=1 to force-run with non-env auth.',
           };
           // Mark via a no-op assertion so the suite still appears in output.
           expect(true).toBe(true);

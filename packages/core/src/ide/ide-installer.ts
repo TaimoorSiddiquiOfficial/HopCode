@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -123,7 +123,7 @@ class VsCodeInstaller implements IdeInstaller {
         isWindows ? `"${commandPath}"` : commandPath,
         [
           '--install-extension',
-          'qwenlm.hopcode-code-vscode-ide-companion',
+          'hopcode.hopcode-vscode-ide-companion',
           '--force',
         ],
         { stdio: 'pipe', shell: isWindows },

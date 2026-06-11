@@ -1,4 +1,4 @@
-# Language Server Protocol (LSP) Support
+﻿# Language Server Protocol (LSP) Support
 
 HopCode provides native Language Server Protocol (LSP) support, enabling advanced code intelligence features like go-to-definition, find references, diagnostics, and code actions. This integration allows the AI agent to understand your code more deeply and provide more accurate assistance.
 
@@ -375,8 +375,8 @@ rg "LSP|Native LSP|clangd|connection closed" ~/.hopcode/debug/latest
 # Or, without ripgrep:
 grep -E "LSP|Native LSP|clangd|connection closed" ~/.hopcode/debug/latest
 
-# If QWEN_RUNTIME_DIR is configured
-rg "LSP|Native LSP|clangd|connection closed" "$QWEN_RUNTIME_DIR/debug/latest"
+# If HOPCODE_RUNTIME_DIR is configured
+rg "LSP|Native LSP|clangd|connection closed" "$HOPCODE_RUNTIME_DIR/debug/latest"
 ```
 
 Useful entries include:
@@ -475,8 +475,8 @@ rg "LSP|Native LSP|<server-name>" ~/.hopcode/debug/latest
 # Or:
 grep -E "LSP|Native LSP|<server-name>" ~/.hopcode/debug/latest
 
-# If QWEN_RUNTIME_DIR is configured
-rg "LSP|Native LSP|<server-name>" "$QWEN_RUNTIME_DIR/debug/latest"
+# If HOPCODE_RUNTIME_DIR is configured
+rg "LSP|Native LSP|<server-name>" "$HOPCODE_RUNTIME_DIR/debug/latest"
 ```
 
 LSP uses HopCode's normal `--debug` mode; there is no separate LSP debug flag.

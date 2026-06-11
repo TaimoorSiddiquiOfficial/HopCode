@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +6,7 @@
 
 /**
  * Run-level budget enforcement for headless / non-interactive HopCode
- * sessions. See issue QwenLM/hopcode#4103.
+ * sessions. See issue TaimoorSiddiquiOfficial/HopCode#4103.
  *
  * Two budgets are enforced today:
  *  - `--max-wall-time` / `model.maxWallTimeSeconds` — clock-time guardrail

@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+﻿#!/usr/bin/env tsx
 /**
  * Regenerate packages/core/src/tools/computer-use/schemas.ts from a
  * live upstream open-computer-use MCP server.
@@ -36,7 +36,7 @@ async function main(): Promise<void> {
     args: ['-y', packageSpec, 'mcp'],
   });
   const client = new Client(
-    { name: 'qwen-code-schema-sync', version: '1.0.0' },
+    { name: 'hopcode-schema-sync', version: '1.0.0' },
     { capabilities: {} },
   );
   await client.connect(transport);
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
 
   const out = `/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 

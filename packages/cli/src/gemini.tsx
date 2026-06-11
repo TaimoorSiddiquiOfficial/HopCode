@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -144,7 +144,7 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     );
   }
 
-  if (process.env['QWEN_CODE_NO_RELAUNCH']) {
+  if (process.env['HOPCODE_CODE_NO_RELAUNCH']) {
     return [];
   }
 
@@ -408,7 +408,7 @@ export async function main() {
   profileCheckpoint('main_entry');
   // Bridge core-package startup events (Config.initialize, MCP discovery,
   // GeminiClient.setTools) into the cli's startup profiler. Gated on
-  // `isStartupProfilerEnabled()` so that when QWEN_CODE_PROFILE_STARTUP is
+  // `isStartupProfilerEnabled()` so that when HOPCODE_CODE_PROFILE_STARTUP is
   // unset (the common case) every core-side `recordStartupEvent()` call
   // sees a null sink and short-circuits at the first comparison, instead
   // of going through this arrow wrapper and the profiler's own enabled
@@ -754,7 +754,7 @@ export async function main() {
   }
 
   // We are now past the logic handling potentially launching a child process
-  // to run Qwen Code. It is now safe to perform expensive initialization that
+  // to run HopCode. It is now safe to perform expensive initialization that
   // may have side effects.
   profileCheckpoint('after_sandbox_check');
 
@@ -941,7 +941,7 @@ export async function main() {
         ...getSettingsWarnings(settings),
         ...config.getWarnings(),
         ...(config.getModelsConfig().getCurrentAuthType() ===
-        AuthType.QWEN_OAUTH
+        AuthType.HOPCODE_OAUTH
           ? [
               'Qwen OAuth free tier was discontinued on 2026-04-15. Run /auth to switch to Coding Plan or another provider.',
             ]
@@ -1075,7 +1075,7 @@ export async function main() {
         writeStderrLine(
           `Warning: MCP server(s) failed to start: ${failedMcpServers.join(', ')}. ` +
             `Continuing with built-in tools and any servers that did connect. ` +
-            `Re-run with QWEN_CODE_DEBUG=1 to see per-server reasons.`,
+            `Re-run with HOPCODE_CODE_DEBUG=1 to see per-server reasons.`,
         );
       }
       // Finalize the non-interactive startup profile here so MCP events

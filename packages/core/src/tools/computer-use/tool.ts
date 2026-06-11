@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -84,7 +84,7 @@ class ComputerUseInvocation extends BaseToolInvocation<
    * access.
    *
    * On Cancel: install state is NOT written; execute() / runBootstrap()
-   * will use the env-var fallback (QWEN_COMPUTER_USE_AUTO_APPROVE),
+   * will use the env-var fallback (HOPCODE_COMPUTER_USE_AUTO_APPROVE),
    * which defaults to refusing — producing a clear error message.
    */
   override async getConfirmationDetails(

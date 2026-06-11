@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025-2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -179,7 +179,7 @@ describe('setupStartupWorktree', () => {
     process.chdir(tempRepo);
 
     const res = await setupStartupWorktree(
-      'https://github.com/QwenLM/qwen-code/pull/4174',
+      'https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174',
     );
     expect(res).not.toBeNull();
     expect(res!.ok).toBe(false);

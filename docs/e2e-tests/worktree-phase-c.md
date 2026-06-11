@@ -1,4 +1,4 @@
-# Worktree Phase C E2E Test Plan
+﻿# Worktree Phase C E2E Test Plan
 
 ## Scope
 
@@ -522,7 +522,7 @@ tmux kill-session -t wt-f1
 
 ```bash
 # Create a statusline script that prints the JSON it receives via stdin
-SETTINGS_DIR=~/.qwen
+SETTINGS_DIR=~/.hopcode
 SETTINGS_FILE=$SETTINGS_DIR/settings.json
 cp -f "$SETTINGS_FILE" /tmp/qwen-settings-backup.json 2>/dev/null || true
 mkdir -p "$SETTINGS_DIR"

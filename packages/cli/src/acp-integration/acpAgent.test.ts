@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -2042,7 +2042,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
   });
 
   it('per-session newSession surfaces MCP failures to stderr (round-7 fix: was silent before)', async () => {
-    // Round-7 regression: `QwenAgent.initializeConfig()` (per-session ACP
+    // Round-7 regression: `HopCodeAgent.initializeConfig()` (per-session ACP
     // path) calls `waitForMcpReady()` but the round-4 fix only added the
     // failure warning to the top-level `runAcpAgent` path. Per-session
     // configs with failed MCP servers silently fell back to built-in
@@ -2324,7 +2324,7 @@ describe('HopCodeAcpAgent MCP SSE/HTTP support', () => {
 // recording service's in-memory `currentCustomTitle` stale, and the next
 // re-anchor (every 32KB) or finalize() silently reverted the rename by
 // re-emitting the cached old title at EOF.
-describe('QwenAgent extMethod renameSession routing', () => {
+describe('HopCodeAgent extMethod renameSession routing', () => {
   type AgentSideConnectionLike = { closed: Promise<void> };
   type AgentLike = {
     initialize: (args: Record<string, unknown>) => Promise<unknown>;
@@ -2541,11 +2541,11 @@ describe('QwenAgent extMethod renameSession routing', () => {
   });
 });
 
-// Tests for QwenAgent.loadSession() and QwenAgent.unstable_resumeSession()
+// Tests for HopCodeAgent.loadSession() and HopCodeAgent.unstable_resumeSession()
 // — locks the session-existence guard, the resourceNotFound error contract,
 // and the resume-vs-load semantic difference (load replays UI history,
 // resume does not).
-describe('QwenAgent loadSession / unstable_resumeSession', () => {
+describe('HopCodeAgent loadSession / unstable_resumeSession', () => {
   let capturedAgentFactory:
     | ((conn: { closed: Promise<void> }) => {
         loadSession: (args: Record<string, unknown>) => Promise<unknown>;

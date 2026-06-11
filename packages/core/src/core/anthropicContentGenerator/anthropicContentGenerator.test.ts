@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -1687,7 +1687,7 @@ describe('AnthropicContentGenerator', () => {
     });
   });
 
-  // https://github.com/QwenLM/hopcode/issues/3786 — DeepSeek's
+  // https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3786 — DeepSeek's
   // anthropic-compatible API rejects requests in thinking mode when a prior
   // assistant turn carrying `tool_use` omits a thinking block. Plain-text
   // assistant turns without thinking are accepted unchanged.

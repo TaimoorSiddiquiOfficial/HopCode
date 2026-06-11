@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -905,7 +905,7 @@ describe('modelConfigResolver', () => {
 
     it('HopCode OAuth path: modalities auto-detected for default coder-model', () => {
       // resolveGenerationConfig is shared by both the OpenAI and HopCode OAuth
-      // paths; the latter (resolveQwenOAuthConfig) passes the resolved Qwen
+      // paths; the latter (resolveHopCodeOAuthConfig) passes the resolved Qwen
       // OAuth model name (defaults to DEFAULT_HOPCODE_MODEL = 'coder-model') as
       // modelId, so the new modalities fallback also fires here.
       //

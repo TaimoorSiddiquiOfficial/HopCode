@@ -77,7 +77,7 @@ function isDeepSeekAnthropicHostname(
  * anthropic-compatible endpoints (sglang/vllm). For decisions where a model-
  * name false positive is dangerous (e.g. `reasoning.effort: 'max'` clamping),
  * use `isDeepSeekAnthropicHostname` instead.
- * https://github.com/QwenLM/hopcode/issues/3786
+ * https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3786
  */
 function isDeepSeekAnthropicProvider(
   contentGeneratorConfig: ContentGeneratorConfig,

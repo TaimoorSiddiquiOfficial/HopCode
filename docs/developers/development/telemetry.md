@@ -1,4 +1,4 @@
-# Observability with OpenTelemetry
+﻿# Observability with OpenTelemetry
 
 Learn how to enable and setup OpenTelemetry for HopCode.
 
@@ -54,20 +54,20 @@ observability framework — HopCode's observability system provides:
 All telemetry behavior is controlled through your `.hopcode/settings.json` file.
 These settings can be overridden by environment variables or CLI flags.
 
-| Setting                          | Environment Variable                               | CLI Flag                                                 | Description                                                                                                                          | Values            | Default                 |
-| -------------------------------- | -------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ----------------------- |
-| `enabled`                        | `QWEN_TELEMETRY_ENABLED`                           | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                                                                                                          | `true`/`false`    | `false`                 |
-| `target`                         | `QWEN_TELEMETRY_TARGET`                            | `--telemetry-target <local\|gcp>` _(deprecated)_         | Informational destination label; does not control exporter routing — set `otlpEndpoint` or `outfile` to configure where data is sent | `"gcp"`/`"local"` | `"local"`               |
-| `otlpEndpoint`                   | `QWEN_TELEMETRY_OTLP_ENDPOINT`                     | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                                                                                              | URL string        | `http://localhost:4317` |
-| `otlpProtocol`                   | `QWEN_TELEMETRY_OTLP_PROTOCOL`                     | `--telemetry-otlp-protocol <grpc\|http>`                 | OTLP transport protocol                                                                                                              | `"grpc"`/`"http"` | `"grpc"`                |
-| `otlpTracesEndpoint`             | `QWEN_TELEMETRY_OTLP_TRACES_ENDPOINT`              | -                                                        | Per-signal endpoint override for traces (HTTP only)                                                                                  | URL string        | -                       |
-| `otlpLogsEndpoint`               | `QWEN_TELEMETRY_OTLP_LOGS_ENDPOINT`                | -                                                        | Per-signal endpoint override for logs (HTTP only)                                                                                    | URL string        | -                       |
-| `otlpMetricsEndpoint`            | `QWEN_TELEMETRY_OTLP_METRICS_ENDPOINT`             | -                                                        | Per-signal endpoint override for metrics (HTTP only)                                                                                 | URL string        | -                       |
-| `outfile`                        | `QWEN_TELEMETRY_OUTFILE`                           | `--telemetry-outfile <path>`                             | Save telemetry to file (overrides OTLP export)                                                                                       | file path         | -                       |
-| `logPrompts`                     | `QWEN_TELEMETRY_LOG_PROMPTS`                       | `--telemetry-log-prompts` / `--no-telemetry-log-prompts` | Include prompts in telemetry logs                                                                                                    | `true`/`false`    | `true`                  |
-| `includeSensitiveSpanAttributes` | `QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES` | -                                                        | Include user prompts, system prompts, tool I/O, and model output as native span attributes (in addition to log-to-span bridge spans) | `true`/`false`    | `false`                 |
-| `resourceAttributes`             | `OTEL_RESOURCE_ATTRIBUTES` (+ `OTEL_SERVICE_NAME`) | -                                                        | Static resource attributes attached to every exported span / log / metric. See [Resource attributes](#resource-attributes) below.    | `key=value,…`     | `{}`                    |
-| `metrics.includeSessionId`       | `QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID`        | -                                                        | Include `session.id` on metric data points. **Disabled by default** to protect metric backends from time-series fan-out.             | `true`/`false`    | `false`                 |
+| Setting                          | Environment Variable                                  | CLI Flag                                                 | Description                                                                                                                          | Values            | Default                 |
+| -------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ----------------------- |
+| `enabled`                        | `HOPCODE_TELEMETRY_ENABLED`                           | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                                                                                                          | `true`/`false`    | `false`                 |
+| `target`                         | `HOPCODE_TELEMETRY_TARGET`                            | `--telemetry-target <local\|gcp>` _(deprecated)_         | Informational destination label; does not control exporter routing — set `otlpEndpoint` or `outfile` to configure where data is sent | `"gcp"`/`"local"` | `"local"`               |
+| `otlpEndpoint`                   | `QWEN_TELEMETRY_OTLP_ENDPOINT`                        | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                                                                                              | URL string        | `http://localhost:4317` |
+| `otlpProtocol`                   | `HOPCODE_TELEMETRY_OTLP_PROTOCOL`                     | `--telemetry-otlp-protocol <grpc\|http>`                 | OTLP transport protocol                                                                                                              | `"grpc"`/`"http"` | `"grpc"`                |
+| `otlpTracesEndpoint`             | `HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT`              | -                                                        | Per-signal endpoint override for traces (HTTP only)                                                                                  | URL string        | -                       |
+| `otlpLogsEndpoint`               | `HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT`                | -                                                        | Per-signal endpoint override for logs (HTTP only)                                                                                    | URL string        | -                       |
+| `otlpMetricsEndpoint`            | `HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT`             | -                                                        | Per-signal endpoint override for metrics (HTTP only)                                                                                 | URL string        | -                       |
+| `outfile`                        | `HOPCODE_TELEMETRY_OUTFILE`                           | `--telemetry-outfile <path>`                             | Save telemetry to file (overrides OTLP export)                                                                                       | file path         | -                       |
+| `logPrompts`                     | `HOPCODE_TELEMETRY_LOG_PROMPTS`                       | `--telemetry-log-prompts` / `--no-telemetry-log-prompts` | Include prompts in telemetry logs                                                                                                    | `true`/`false`    | `true`                  |
+| `includeSensitiveSpanAttributes` | `HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES` | -                                                        | Include user prompts, system prompts, tool I/O, and model output as native span attributes (in addition to log-to-span bridge spans) | `true`/`false`    | `false`                 |
+| `resourceAttributes`             | `OTEL_RESOURCE_ATTRIBUTES` (+ `OTEL_SERVICE_NAME`)    | -                                                        | Static resource attributes attached to every exported span / log / metric. See [Resource attributes](#resource-attributes) below.    | `key=value,…`     | `{}`                    |
+| `metrics.includeSessionId`       | `HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID`        | -                                                        | Include `session.id` on metric data points. **Disabled by default** to protect metric backends from time-series fan-out.             | `true`/`false`    | `false`                 |
 
 **Note on boolean environment variables:** For the boolean settings (`enabled`,
 `logPrompts`, `includeSensitiveSpanAttributes`), setting the
@@ -228,7 +228,7 @@ continue to carry `session.id` for trace and log correlation.
 #### `telemetry.metrics.includeSessionId` (default: `false`)
 
 Setting this to `true` (via settings or
-`QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true`) re-attaches `session.id` to
+`HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true`) re-attaches `session.id` to
 every metric data point.
 
 ⚠️ **Warning:** each CLI session creates a new value. Leaving this on for a
@@ -244,7 +244,7 @@ your Prometheus queries / Grafana dashboards / alert rules reference
 **Option A** — restore the previous behavior for short-term debugging:
 
 ```bash
-export QWEN_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true
+export HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true
 ```
 
 or:

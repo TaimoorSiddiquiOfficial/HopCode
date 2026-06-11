@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -853,12 +853,12 @@ describe('WorkspaceFileSystem - audit always emits on body errors', () => {
     expect(denied).toBeDefined();
   });
 
-  it('fs.denied audit message field is gated behind QWEN_AUDIT_RAW_PATHS (privacy default omits)', async () => {
+  it('fs.denied audit message field is gated behind HOPCODE_AUDIT_RAW_PATHS (privacy default omits)', async () => {
     // Default (privacy) mode: `message` MUST be absent because the
     // underlying `FsError.message` embeds `${p}` absolute paths
     // that would otherwise leak workspace structure to audit
     // consumers — even when operators explicitly disabled
-    // raw-path logging via not-setting `QWEN_AUDIT_RAW_PATHS`.
+    // raw-path logging via not-setting `HOPCODE_AUDIT_RAW_PATHS`.
     // See `audit.ts:recordDenied` — message gates on
     // `includeRawPaths`.
     const err = (await h.fs

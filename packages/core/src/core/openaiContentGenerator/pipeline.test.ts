@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -846,8 +846,8 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBe(false);
     });
 
-    it('emits enable_thinking:false on QWEN_OAUTH with the default coder-model', async () => {
-      // QWEN_OAUTH is the default auth flow for first-time users and
+    it('emits enable_thinking:false on HOPCODE_OAUTH with the default coder-model', async () => {
+      // HOPCODE_OAUTH is the default auth flow for first-time users and
       // ships with `model: 'coder-model'` (DEFAULT_QWEN_MODEL in
       // config/models.ts — aliased to Qwen 3.6 Plus hybrid). The string
       // doesn't start with `qwen`, so the gate must special-case it;
@@ -855,7 +855,7 @@ describe('ContentGenerationPipeline', () => {
       // burning reasoning tokens on the default flow) remains live.
       mockContentGeneratorConfig = {
         ...mockContentGeneratorConfig,
-        authType: AuthType.QWEN_OAUTH,
+        authType: AuthType.HOPCODE_OAUTH,
         baseUrl: 'https://some-oauth-issued-endpoint.example/v1',
         model: 'coder-model',
       } as ContentGeneratorConfig;

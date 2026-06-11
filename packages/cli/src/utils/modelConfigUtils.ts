@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -25,7 +25,7 @@ const AUTH_ENV_MODEL_VARS: Record<AuthType, string[]> = {
   [AuthType.USE_VERTEX_AI]: ['GOOGLE_MODEL'],
   [AuthType.USE_ANTHROPIC]: ['ANTHROPIC_MODEL'],
   [AuthType.HOPCODE_OAUTH]: [],
-  [AuthType.QWEN_OAUTH]: [],
+  [AuthType.HOPCODE_OAUTH]: [],
 };
 
 function getIgnoredTopLevelGenerationConfigFields(

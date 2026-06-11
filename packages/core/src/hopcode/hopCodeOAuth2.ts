@@ -110,7 +110,7 @@ export class CredentialsClearRequiredError extends Error {
 }
 
 /**
- * Typed error thrown by `QwenOAuth2Client.pollDeviceToken` for upstream
+ * Typed error thrown by `HopCodeOAuth2Client.pollDeviceToken` for upstream
  * RFC 8628 errors that aren't `authorization_pending` / `slow_down`.
  *
  * Earlier the class threw a plain `Error` with the OAuth code embedded
@@ -1061,7 +1061,7 @@ export async function cacheHopCodeCredentials(
   credentials: HopCodeCredentials,
   opts?: { signal?: AbortSignal },
 ) {
-  const filePath = getQwenCachedCredentialPath();
+  const filePath = getHopCodeCachedCredentialPath();
   try {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
 
@@ -1191,7 +1191,7 @@ export async function cacheHopCodeCredentials(
  */
 export async function clearHopCodeCredentials(): Promise<void> {
   try {
-    const filePath = getQwenCachedCredentialPath();
+    const filePath = getHopCodeCachedCredentialPath();
     await fs.unlink(filePath);
     debugLogger.debug('Cached HopCode credentials cleared successfully.');
   } catch (error: unknown) {
@@ -1216,7 +1216,7 @@ export async function clearHopCodeCredentials(): Promise<void> {
   }
 }
 
-function getQwenCachedCredentialPath(): string {
+function getHopCodeCachedCredentialPath(): string {
   return path.join(Storage.getGlobalHopCodeDir(), HOPCODE_CREDENTIAL_FILENAME);
 }
 

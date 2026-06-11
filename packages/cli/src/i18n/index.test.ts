@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -21,7 +21,7 @@ describe('bundled locale fallback', () => {
   });
 
   it('loads bundled builtin translations when locale files are absent on disk', async () => {
-    const qwenLocalePathPattern =
+    const hopCodeLocalePathPattern =
       /([\\/]\.hopcode|[\\/]i18n)[\\/]locales([\\/]|$)/;
 
     vi.doMock('node:fs', async (importOriginal) => {
@@ -29,7 +29,7 @@ describe('bundled locale fallback', () => {
       return {
         ...actualFs,
         existsSync: (target: Parameters<typeof actualFs.existsSync>[0]) => {
-          if (qwenLocalePathPattern.test(String(target))) {
+          if (hopCodeLocalePathPattern.test(String(target))) {
             return false;
           }
           return actualFs.existsSync(target);

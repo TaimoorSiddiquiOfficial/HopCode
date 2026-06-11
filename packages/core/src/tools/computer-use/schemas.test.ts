@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import { COMPUTER_USE_SCHEMAS, COMPUTER_USE_TOOL_NAMES } from './schemas.js';
 
 describe('computer-use schemas', () => {
@@ -8,7 +8,7 @@ describe('computer-use schemas', () => {
 
   it('each tool name matches the upstream convention (no computer_use__ prefix)', () => {
     // schemas.ts uses upstream names verbatim ("click", "type_text").
-    // The computer_use__ prefix lives on the qwen-code-facing wrapper.
+    // The computer_use__ prefix lives on the hopcode-facing wrapper.
     for (const name of COMPUTER_USE_TOOL_NAMES) {
       expect(name).not.toContain('computer_use__');
       expect(name).toMatch(/^[a-z_]+$/);

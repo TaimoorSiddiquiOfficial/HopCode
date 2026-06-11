@@ -1,4 +1,4 @@
-# IDE Daemon Adapter Draft
+﻿# IDE Daemon Adapter Draft
 
 ## Goal
 
@@ -24,7 +24,7 @@ VS Code settings:
 Environment fallback for local dogfood:
 
 ```bash
-QWEN_IDE_DAEMON_URL=http://127.0.0.1:4170 code .
+HOPCODE_IDE_DAEMON_URL=http://127.0.0.1:4170 code .
 ```
 
 ## Minimal Flow

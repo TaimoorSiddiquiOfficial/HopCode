@@ -1,4 +1,4 @@
-{
+﻿{
   "version": 1,
   "capturedAt": "2026-05-16T08:36:52.441Z",
   "gitCommit": "df32345d0553560cf342c1b4e6ad44df5646111b",
@@ -49,6 +49,6 @@
     "firstByteMs": null,
     "totalMs": null,
     "skipped": true,
-    "skipReason": "No recognized model credential env var is set; prompt latency requires real model access. Set QWEN_BASELINE_ENABLE_PROMPT_LATENCY=1 to force-run with non-env auth."
+    "skipReason": "No recognized model credential env var is set; prompt latency requires real model access. Set HOPCODE_BASELINE_ENABLE_PROMPT_LATENCY=1 to force-run with non-env auth."
   }
 }

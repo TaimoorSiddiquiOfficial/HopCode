@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -555,12 +555,12 @@ describe('BaseLlmClient', () => {
         getSessionId: vi.fn().mockReturnValue('test-session-id'),
         getContentGeneratorConfig: vi
           .fn()
-          .mockReturnValue({ authType: AuthType.QWEN_OAUTH }),
+          .mockReturnValue({ authType: AuthType.HOPCODE_OAUTH }),
         getEmbeddingModel: vi.fn().mockReturnValue('test-embedding-model'),
         getModel: vi.fn().mockReturnValue('main-model'),
         getFastModel: vi.fn().mockReturnValue(undefined),
         getAllConfiguredModels: vi.fn((authTypes?: AuthType[]) =>
-          authTypes?.includes(AuthType.QWEN_OAUTH)
+          authTypes?.includes(AuthType.HOPCODE_OAUTH)
             ? []
             : [
                 {
@@ -579,7 +579,7 @@ describe('BaseLlmClient', () => {
       const resolved = await c.resolveForModel('main-model');
 
       expect(resolved.contentGenerator).toBe(mockContentGenerator);
-      expect(resolved.retryAuthType).toBe(AuthType.QWEN_OAUTH);
+      expect(resolved.retryAuthType).toBe(AuthType.HOPCODE_OAUTH);
       expect(getResolvedModel).not.toHaveBeenCalled();
       expect(mockCreateContentGenerator).not.toHaveBeenCalled();
     });
@@ -608,9 +608,9 @@ describe('BaseLlmClient', () => {
     });
 
     it('builds a per-model generator when model differs and is registered under another authType', async () => {
-      // Main authType is QWEN_OAUTH; fast model only resolves under USE_ANTHROPIC.
+      // Main authType is HOPCODE_OAUTH; fast model only resolves under USE_ANTHROPIC.
       getResolvedModel.mockImplementation((authType: string, model: string) => {
-        if (authType === AuthType.QWEN_OAUTH) return undefined;
+        if (authType === AuthType.HOPCODE_OAUTH) return undefined;
         if (authType === AuthType.USE_ANTHROPIC && model === fastModel) {
           return {
             authType: AuthType.USE_ANTHROPIC,
@@ -674,7 +674,7 @@ describe('BaseLlmClient', () => {
 
       expect(resolved.contentGenerator).toBe(mockContentGenerator);
       // Falls back to main authType for retry classification.
-      expect(resolved.retryAuthType).toBe(AuthType.QWEN_OAUTH);
+      expect(resolved.retryAuthType).toBe(AuthType.HOPCODE_OAUTH);
       expect(mockCreateContentGenerator).not.toHaveBeenCalled();
     });
 

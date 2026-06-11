@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -51,7 +51,7 @@ export interface BootstrapDeps {
   /**
    * Prompt the user to approve installing the upstream binary. Returns
    * true if approved. Default uses stderr + the
-   * QWEN_COMPUTER_USE_AUTO_APPROVE=1 env-var fallback; the interactive
+   * HOPCODE_COMPUTER_USE_AUTO_APPROVE=1 env-var fallback; the interactive
    * confirmation dialog is wired through ComputerUseTool's
    * getConfirmationDetails(), which runs BEFORE execute() reaches
    * runBootstrap (so by the time we get here the install-state file
@@ -148,9 +148,9 @@ function defaultDeps(): BootstrapDeps {
           `  This will fetch ~50MB from the npm registry the first time.\n` +
           `  Computer Use can click, type, and read your desktop apps.\n` +
           `  On macOS you'll be guided through Accessibility and Screen Recording permissions next.\n` +
-          `Set QWEN_COMPUTER_USE_AUTO_APPROVE=1 to skip this prompt.\n`,
+          `Set HOPCODE_COMPUTER_USE_AUTO_APPROVE=1 to skip this prompt.\n`,
       );
-      return process.env['QWEN_COMPUTER_USE_AUTO_APPROVE'] === '1';
+      return process.env['HOPCODE_COMPUTER_USE_AUTO_APPROVE'] === '1';
     },
     probePermissions: probePermissionsViaDoctor,
   };
@@ -202,7 +202,7 @@ export async function runBootstrap(
   // client.stop() + client.start() directly without re-entering
   // runBootstrap. The model therefore receives permissionDenied on
   // every subsequent tool call with no automatic recovery — the user
-  // must restart qwen-code to re-enter the permission flow. This is
+  // must restart hopcode to re-enter the permission flow. This is
   // an acceptable trade-off: TCC revocation mid-session is extremely
   // rare.
   if (wasAlreadyStarted) return;

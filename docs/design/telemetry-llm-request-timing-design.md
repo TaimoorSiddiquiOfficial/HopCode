@@ -1,4 +1,4 @@
-# LLM Request Timing Decomposition Design (P3 Phase 4)
+﻿# LLM Request Timing Decomposition Design (P3 Phase 4)
 
 > Issue #3731 — Phase 4 of hierarchical session tracing. Adds time-to-first-token, request-setup duration, sampling duration, and per-attempt retry telemetry to the `hopcode.llm_request` span so operators can answer "why was this LLM call slow?" without guessing.
 >
@@ -34,7 +34,7 @@ These gaps make `hopcode.llm_request` the least informative span in the trace tr
 - **Per-token streaming metrics** (inter-token latency, per-chunk size). Useful for inference-engine perf debugging, not for the user-perceived latency questions Phase 4 targets.
 - **Separate TTFT for reasoning/thinking blocks.** "First token" includes thinking content (see D1). A future enhancement could split `ttft_to_reasoning_ms` vs `ttft_to_answer_ms`, but only after we know there's demand.
 - **Sampling phase as a dedicated child span.** Computable from `duration_ms - ttft_ms - request_setup_ms`; child span adds nothing for OTel-only backends (claude-code uses one for Perfetto only). Stored as a span attribute instead — see D6.
-- **Persistent retry mode (`QWEN_CODE_UNATTENDED_RETRY`) event-level rate limiting.** A single LLM request can produce 50+ `ContentRetryEvent` / `ApiRetryEvent` records under persistent retry. Capping emission is a follow-up — Phase 4 emits all events; if production volumes prove unbearable, add a per-span emission cap with a "+N more attempts (truncated)" summary event in a follow-up PR.
+- **Persistent retry mode (`HOPCODE_CODE_UNATTENDED_RETRY`) event-level rate limiting.** A single LLM request can produce 50+ `ContentRetryEvent` / `ApiRetryEvent` records under persistent retry. Capping emission is a follow-up — Phase 4 emits all events; if production volumes prove unbearable, add a per-span emission cap with a "+N more attempts (truncated)" summary event in a follow-up PR.
 - **`TOKEN_PROCESSING` breakdown phase.** Enum value exists but hopcode has no real post-stream local processing worth measuring (<10ms typical). Skipped in production callers; enum value retained for future use or for callers we don't control.
 - **Migrating `ContentRetryEvent` onto LLM span as span events.** Same reasoning as Phase 3's `subagent_execution` LogRecord: existing consumers (qwen-logger RUM, future metrics) are tightly coupled to the LogRecord. Bridge-span coverage is good enough.
 
@@ -182,7 +182,7 @@ export class ApiRetryEvent implements BaseTelemetryEvent {
 
 **ContentRetryEvent coexistence**: ContentRetryEvent stays as-is for content-recovery retries inside `geminiChat.ts:806,830`. ApiRetryEvent covers the rate-limit / 5xx retries from `retryWithBackoff`. The two events fire from different layers and never duplicate. Existing log-bridge behavior for both events is preserved via `LogToSpanProcessor` — both events nest under the active LLM span automatically (Phase 1 wiring ensures the LLM span is active during retries).
 
-**Persistent retry mode (`QWEN_CODE_UNATTENDED_RETRY`)**: a single 429-loop request may emit 50+ events. Out of scope to rate-limit emission in Phase 4 — if production volumes prove unbearable, add a per-span cap with summary event in a follow-up PR. The aggregated `attempt` and `retry_total_delay_ms` on the parent LLM span (D5) remain accurate regardless of event cap.
+**Persistent retry mode (`HOPCODE_CODE_UNATTENDED_RETRY`)**: a single 429-loop request may emit 50+ events. Out of scope to rate-limit emission in Phase 4 — if production volumes prove unbearable, add a per-span cap with summary event in a follow-up PR. The aggregated `attempt` and `retry_total_delay_ms` on the parent LLM span (D5) remain accurate regardless of event cap.
 
 ### D5 — Parent LLM span aggregation: scalar attributes only (no map-typed attrs)
 

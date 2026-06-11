@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+﻿import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   PINNED_OPEN_COMPUTER_USE_VERSION,
   resolveComputerUsePackageSpec,
@@ -8,15 +8,15 @@ describe('computer-use constants', () => {
   let originalEnv: string | undefined;
 
   beforeEach(() => {
-    originalEnv = process.env['QWEN_COMPUTER_USE_PACKAGE'];
-    delete process.env['QWEN_COMPUTER_USE_PACKAGE'];
+    originalEnv = process.env['HOPCODE_COMPUTER_USE_PACKAGE'];
+    delete process.env['HOPCODE_COMPUTER_USE_PACKAGE'];
   });
 
   afterEach(() => {
     if (originalEnv === undefined) {
-      delete process.env['QWEN_COMPUTER_USE_PACKAGE'];
+      delete process.env['HOPCODE_COMPUTER_USE_PACKAGE'];
     } else {
-      process.env['QWEN_COMPUTER_USE_PACKAGE'] = originalEnv;
+      process.env['HOPCODE_COMPUTER_USE_PACKAGE'] = originalEnv;
     }
   });
 
@@ -45,17 +45,17 @@ describe('computer-use constants', () => {
       );
     });
 
-    it('honors QWEN_COMPUTER_USE_PACKAGE override', () => {
-      process.env['QWEN_COMPUTER_USE_PACKAGE'] = 'open-computer-use@0.99.99';
+    it('honors HOPCODE_COMPUTER_USE_PACKAGE override', () => {
+      process.env['HOPCODE_COMPUTER_USE_PACKAGE'] = 'open-computer-use@0.99.99';
       expect(resolveComputerUsePackageSpec()).toBe('open-computer-use@0.99.99');
     });
 
     it('reads env var at call time (not at module load)', () => {
       // Different overrides between calls should both be picked up —
       // tests that mutate the env var must see fresh values per call.
-      process.env['QWEN_COMPUTER_USE_PACKAGE'] = 'spec-a';
+      process.env['HOPCODE_COMPUTER_USE_PACKAGE'] = 'spec-a';
       expect(resolveComputerUsePackageSpec()).toBe('spec-a');
-      process.env['QWEN_COMPUTER_USE_PACKAGE'] = 'spec-b';
+      process.env['HOPCODE_COMPUTER_USE_PACKAGE'] = 'spec-b';
       expect(resolveComputerUsePackageSpec()).toBe('spec-b');
     });
   });

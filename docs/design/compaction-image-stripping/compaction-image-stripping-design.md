@@ -1,4 +1,4 @@
-# Compaction Image Stripping + Token Estimation Fix
+﻿# Compaction Image Stripping + Token Estimation Fix
 
 ## Problem Statement
 
@@ -131,7 +131,7 @@ One new field under `chatCompression` settings:
 }
 ```
 
-Plus an env override for ops/debug: `QWEN_IMAGE_TOKEN_ESTIMATE`.
+Plus an env override for ops/debug: `HOPCODE_IMAGE_TOKEN_ESTIMATE`.
 
 ## Key Design Decisions
 

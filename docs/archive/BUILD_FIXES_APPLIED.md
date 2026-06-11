@@ -53,7 +53,7 @@
 **`packages/sdk-typescript/package.json`:**
 
 - ✅ Description: "HopCode CLI" (was "hopcode CLI")
-- ✅ Keywords: `hopcode`, `hopcode-code` (was `hopcode`, `hopcode`)
+- ✅ Keywords: `hopcode`, `hopcode` (was `hopcode`, `hopcode`)
 - ✅ Author: "HopCode Team" (was "HopCode Team")
 - ✅ Bugs URL: Updated to new repository
 - ✅ Homepage: `hopcode.dev/docs` (was `qwenlm.github.io/hopcode-docs`)

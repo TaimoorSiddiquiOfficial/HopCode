@@ -1,10 +1,10 @@
-# Qwen Code Agent Loop RT 优化技术方案
+﻿# HopCode Agent Loop RT 优化技术方案
 
 ## 1. 背景与问题定义
 
 ### 1.1 现状
 
-Qwen Code 的 Agent Loop 为严格串行模型：
+HopCode 的 Agent Loop 为严格串行模型：
 
 ```
 User Prompt → [LLM 决策] → Tool Execution → [LLM 决策] → Tool Execution → ... → [LLM 回复] → Idle
@@ -594,7 +594,7 @@ prevalidate 必须与这个分批模型对齐：
 | ------------------------------------------ | ------ | ---------------------------------------------------------------------- |
 | 缓存 diff 与确认时实际文件不一致（TOCTOU） | 高     | 方案 A：Edit 不进 allowlist；方案 B：缓存附 `(mtime, size, hash)` 校验 |
 | prevalidate 失败影响调度                   | 低     | 失败/超时退回原 `shouldConfirmExecute` 路径，缓存缺失 ≡ 未启用         |
-| 并发 prevalidate 共享 fd / 资源争抢        | 低     | `QWEN_CODE_MAX_TOOL_CONCURRENCY` 已限并发上限（默认 10）               |
+| 并发 prevalidate 共享 fd / 资源争抢        | 低     | `HOPCODE_CODE_MAX_TOOL_CONCURRENCY` 已限并发上限（默认 10）            |
 
 #### 收益
 
@@ -754,7 +754,7 @@ abort 中断的 stream **大概率收不到 `finishReason` / `usageMetadata`**�
 
 #### 发布策略（适配本地 CLI）
 
-Qwen Code 是本地 CLI，**没有运行时下发能力**——传统"5% / 25% / 100% 灰度"不适用。采用**阶段性 release 推进**：
+HopCode 是本地 CLI，**没有运行时下发能力**——传统"5% / 25% / 100% 灰度"不适用。采用**阶段性 release 推进**：
 
 | 阶段                  | Release 节点           | feature flag 默认值 | 触发条件                                                    |
 | --------------------- | ---------------------- | ------------------- | ----------------------------------------------------------- |
@@ -1166,12 +1166,12 @@ TTL 滑动窗口意味着 agent loop 内 summary 轮**几乎 100% 命中** prima
 
 #### 启动时一次，session 内不变
 
-| 位置     | 内容                                                                                             | 何时可能变                |
-| -------- | ------------------------------------------------------------------------------------------------ | ------------------------- |
-| L190     | `process.env['QWEN_SYSTEM_MD']` 决定 basePrompt 来源（默认 vs 用户 system.md）                   | 进程内不变                |
-| L342-343 | `process.env['SANDBOX']` 决定 sandbox 段选哪一版（Seatbelt / Sandbox / Outside）                 | 进程内不变                |
-| L366     | `isGitRepository(process.cwd())` 决定 git 段是否插入                                             | cwd 同 session 内通常不变 |
-| L871     | `process.env['QWEN_CODE_TOOL_CALL_STYLE']` 决定 tool call 风格（qwen-coder / qwen-vl / general） | 进程内不变                |
+| 位置     | 内容                                                                                              | 何时可能变                |
+| -------- | ------------------------------------------------------------------------------------------------- | ------------------------- |
+| L190     | `process.env['HOPCODE_SYSTEM_MD']` 决定 basePrompt 来源（默认 vs 用户 system.md）                 | 进程内不变                |
+| L342-343 | `process.env['SANDBOX']` 决定 sandbox 段选哪一版（Seatbelt / Sandbox / Outside）                  | 进程内不变                |
+| L366     | `isGitRepository(process.cwd())` 决定 git 段是否插入                                              | cwd 同 session 内通常不变 |
+| L871     | `process.env['HOPCODE_CODE_TOOL_CALL_STYLE']` 决定 tool call 风格（hopcoder / qwen-vl / general） | 进程内不变                |
 
 #### 事件触发（低频）
 
@@ -1184,7 +1184,7 @@ TTL 滑动窗口意味着 agent loop 内 summary 轮**几乎 100% 命中** prima
 
 #### 一个隐蔽的小坑
 
-L207-209：若设置了 `QWEN_SYSTEM_MD` env，**每次** `getCoreSystemPrompt` 都会 `fs.readFileSync(systemMdPath)`：
+L207-209：若设置了 `HOPCODE_SYSTEM_MD` env，**每次** `getCoreSystemPrompt` 都会 `fs.readFileSync(systemMdPath)`：
 
 ```typescript
 const basePrompt = systemMdEnabled
@@ -1193,7 +1193,7 @@ const basePrompt = systemMdEnabled
 ```
 
 - 文件不变时内容稳定 → cache 命中不受影响
-- 但每轮 LLM 调用都有一次同步 IO（默认 `.qwen/system.md`，网络挂载文件会更慢）
+- 但每轮 LLM 调用都有一次同步 IO（默认 `.hopcode/system.md`，网络挂载文件会更慢）
 - 不影响本节"cache 友好性"结论，仅作为已知性能小坑记录
 
 #### 连带结论

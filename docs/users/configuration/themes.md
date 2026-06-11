@@ -38,7 +38,7 @@ Selected themes are saved in HopCode's [configuration](../configuration/settings
 
 ## Auto Theme Detection
 
-When the theme is set to `"auto"` (or left unset), Qwen Code automatically detects whether your terminal uses a dark or light background and selects the matching Qwen theme (`Qwen Dark` or `Qwen Light`).
+When the theme is set to `"auto"` (or left unset), HopCode automatically detects whether your terminal uses a dark or light background and selects the matching Qwen theme (`Qwen Dark` or `Qwen Light`).
 
 ### How to enable
 
@@ -56,7 +56,7 @@ Or select **Auto** in the `/theme` dialog. This is the default behavior when no 
 
 ### Detection methods
 
-Qwen Code uses multiple detection methods in a fallback chain. At startup (async path), the order is:
+HopCode uses multiple detection methods in a fallback chain. At startup (async path), the order is:
 
 | Priority | Method                  | Platform   | How it works                                                                                         |
 | -------- | ----------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
@@ -77,7 +77,7 @@ The first method that returns a result wins. The detected value is cached for th
 
 ## Auto Theme Detection
 
-When the theme is set to `"auto"` (or left unset), Qwen Code automatically detects whether your terminal uses a dark or light background and selects the matching Qwen theme (`Qwen Dark` or `Qwen Light`).
+When the theme is set to `"auto"` (or left unset), HopCode automatically detects whether your terminal uses a dark or light background and selects the matching Qwen theme (`Qwen Dark` or `Qwen Light`).
 
 ### How to enable
 
@@ -95,7 +95,7 @@ Or select **Auto** in the `/theme` dialog. This is the default behavior when no 
 
 ### Detection methods
 
-Qwen Code uses multiple detection methods in a fallback chain. At startup (async path), the order is:
+HopCode uses multiple detection methods in a fallback chain. At startup (async path), the order is:
 
 | Priority | Method                  | Platform   | How it works                                                                                         |
 | -------- | ----------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
