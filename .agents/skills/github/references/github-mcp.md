@@ -106,7 +106,7 @@ client wrapping the same GitHub REST API. It's used internally by:
 ### Usage in custom code
 
 ```typescript
-import { createGitHubMCPClient } from '@hoptrendy/hopcode-core/mcp/github-mcp-client';
+import { createGitHubMCPClient } from '@hopcode/hopcode-core/mcp/github-mcp-client';
 
 const client = createGitHubMCPClient(config);
 

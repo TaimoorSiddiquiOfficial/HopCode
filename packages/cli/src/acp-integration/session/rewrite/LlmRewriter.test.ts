@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import type { TurnContent, MessageRewriteConfig } from './types.js';
 
 // Track runSideQuery calls so each test can assert on the options the
@@ -15,7 +15,7 @@ const mockGenerateContent = vi.fn();
 // Mock core to avoid Vite https resolution issue. runSideQuery is stubbed
 // to forward the caller's options into mockGenerateContent so existing
 // assertions on call args still apply.
-vi.mock('@hoptrendy/hopcode-core', () => ({
+vi.mock('@hopcode/hopcode-core', () => ({
   createDebugLogger: () => ({
     info: vi.fn(),
     warn: vi.fn(),

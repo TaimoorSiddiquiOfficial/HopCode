@@ -15,8 +15,8 @@ import {
   SETTINGS_DIRECTORY_NAME,
 } from '../config/settings.js';
 import { promisify } from 'node:util';
-import type { Config, SandboxConfig } from '@hoptrendy/hopcode-core';
-import { FatalSandboxError, Storage, isSubpath } from '@hoptrendy/hopcode-core';
+import type { Config, SandboxConfig } from '@hopcode/hopcode-core';
+import { FatalSandboxError, Storage, isSubpath } from '@hopcode/hopcode-core';
 import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
 
@@ -321,10 +321,7 @@ export async function start_sandbox(
       process.on('SIGINT', stopProxy);
       process.on('SIGTERM', stopProxy);
 
-      // commented out as it disrupts ink rendering
-      // proxyProcess.stdout?.on('data', (data) => {
-      //   console.info(data.toString());
-      // });
+      // Proxy stdout is intentionally not piped — it disrupts ink rendering.
       proxyProcess.stderr?.on('data', (data) => {
         writeStderrLine(data.toString());
       });
@@ -855,10 +852,7 @@ export async function start_sandbox(
     process.on('SIGINT', stopProxy);
     process.on('SIGTERM', stopProxy);
 
-    // commented out as it disrupts ink rendering
-    // proxyProcess.stdout?.on('data', (data) => {
-    //   console.info(data.toString());
-    // });
+    // Proxy stdout is intentionally not piped — it disrupts ink rendering.
     proxyProcess.stderr?.on('data', (data) => {
       writeStderrLine(data.toString().trim());
     });
@@ -925,12 +919,9 @@ async function imageExists(sandbox: string, image: string): Promise<boolean> {
       resolve(false);
     });
 
-    checkProcess.on('close', (code) => {
-      // Non-zero code might indicate docker daemon not running, etc.
+    checkProcess.on('close', () => {
+      // Non-zero exit code may indicate docker daemon not running, etc.
       // The primary success indicator is non-empty stdoutData.
-      if (code !== 0) {
-        // console.warn(`'${sandbox} images -q ${image}' exited with code ${code}.`);
-      }
       resolve(stdoutData.trim() !== '');
     });
   });

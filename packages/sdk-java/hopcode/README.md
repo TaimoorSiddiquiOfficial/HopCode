@@ -124,7 +124,7 @@ public static void runStreamingExample() {
 }
 ```
 
-other examples see src/test/java/com/alibaba/qwen/code/cli/example
+other examples see src/test/java/com/alibaba/hopcode/code/cli/example
 
 ## Architecture
 

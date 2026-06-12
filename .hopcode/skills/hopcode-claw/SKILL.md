@@ -19,7 +19,7 @@ Use this skill when you need to:
 ## Install
 
 ```bash
-npm install -g @hoptrendy/hopcode-cli
+npm install -g @hopcode/hopcode
 ```
 
 For normal session reuse, prefer a global install over `npx`.

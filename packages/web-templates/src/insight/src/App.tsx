@@ -94,7 +94,7 @@ function InsightApp({ data }: { data: InsightData }) {
       const imgData = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = imgData;
-      link.download = `hopcode-insights-card-${new Date().toISOString().slice(0, 10)}.png`;
+      link.download = `qwen-insights-card-${new Date().toISOString().slice(0, 10)}.png`;
       link.click();
     } catch (error) {
       console.error('Export card error:', error);
@@ -160,7 +160,7 @@ function InsightApp({ data }: { data: InsightData }) {
       hasRecordEntries(data.friction));
   const showFeatures =
     !!data.qualitative &&
-    (hasMeaningfulArray(data.qualitative.improvements?.HopCode_md_additions) ||
+    (hasMeaningfulArray(data.qualitative.improvements?.HOPCODE_md_additions) ||
       hasMeaningfulArray(data.qualitative.improvements?.features_to_try));
   const showPatterns =
     !!data.qualitative &&

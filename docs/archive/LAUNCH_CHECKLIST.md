@@ -142,7 +142,7 @@ HopCode is an open-source AI coding assistant that helps you:
 ## Get Started
 
 ```bash
-npm install -g @hoptrendy/hopcode
+npm install -g @hopcode/hopcode
 hopcode auth login
 ```
 ````
@@ -173,7 +173,7 @@ Anthropic, Google, Groq, and more!
 The butterfly effect of intelligent code is here.
 
 Try it now:
-npm install -g @hoptrendy/hopcode
+npm install -g @hopcode/hopcode
 
 Multi-AI support coming soon!
 
@@ -192,7 +192,7 @@ An AI-powered coding assistant with:
 ✅ VS Code + Zed support  
 ✅ Multi-AI coming soon
 
-Try it: npm install -g @hoptrendy/hopcode
+Try it: npm install -g @hopcode/hopcode
 
 #HopCode #AI #SoftwareDevelopment #OpenSource #Innovation
 

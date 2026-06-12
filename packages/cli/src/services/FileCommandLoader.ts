@@ -10,12 +10,12 @@ import path from 'node:path';
 import toml from '@iarna/toml';
 import { glob } from 'glob';
 import { z } from 'zod';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import {
   createDebugLogger,
   EXTENSIONS_CONFIG_FILENAME,
   Storage,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { ICommandLoader } from './types.js';
 import {
   parseMarkdownCommand,

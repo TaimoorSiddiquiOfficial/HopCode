@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,7 @@ import {
   HookEventName,
   HooksConfigSource,
   HookType,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { HookMatcherDetailStep } from './HookMatcherDetailStep.js';
 import type {
   HookConfigDisplayInfo,

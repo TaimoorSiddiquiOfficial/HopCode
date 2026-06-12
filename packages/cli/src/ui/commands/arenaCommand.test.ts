@@ -9,7 +9,7 @@ import {
   type ArenaManager,
   AgentStatus,
   ArenaSessionStatus,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { arenaCommand } from './arenaCommand.js';
 import type {
   CommandContext,

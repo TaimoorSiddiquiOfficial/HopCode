@@ -66,7 +66,7 @@ vi.mock('../../services/sessionExportService.js', () => ({
   exportSessionToFile: mockExportSessionToFile,
 }));
 
-vi.mock('@hoptrendy/webui', () => ({
+vi.mock('@hopcode/webui', () => ({
   stripZeroWidthSpaces: (text: string) => text.replace(/\u200B/g, ''),
 }));
 

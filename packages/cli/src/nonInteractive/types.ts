@@ -3,7 +3,7 @@ import type {
   ActiveGoal,
   SubagentConfig,
   McpToolProgressData,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 /**
  * Annotation for attaching metadata to content blocks

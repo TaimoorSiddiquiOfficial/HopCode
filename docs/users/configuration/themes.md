@@ -1,4 +1,4 @@
-﻿# Themes
+# Themes
 
 HopCode supports a variety of themes to customize its color scheme and appearance. You can change the theme to suit your preferences via the `/theme` command or `"theme":` configuration setting.
 
@@ -33,6 +33,45 @@ HopCode comes with a selection of pre-defined themes, which you can list using t
 ### Theme Persistence
 
 Selected themes are saved in HopCode's [configuration](../configuration/settings) so your preference is remembered across sessions.
+
+---
+
+## Auto Theme Detection
+
+When the theme is set to `"auto"` (or left unset), HopCode automatically detects whether your terminal uses a dark or light background and selects the matching Qwen theme (`Qwen Dark` or `Qwen Light`).
+
+### How to enable
+
+Set the theme to `"auto"` in `settings.json`:
+
+```json
+{
+  "ui": {
+    "theme": "auto"
+  }
+}
+```
+
+Or select **Auto** in the `/theme` dialog. This is the default behavior when no theme is explicitly configured.
+
+### Detection methods
+
+HopCode uses multiple detection methods in a fallback chain. At startup (async path), the order is:
+
+| Priority | Method                  | Platform   | How it works                                                                                         |
+| -------- | ----------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
+| 1        | `COLORFGBG`             | All        | Reads the `COLORFGBG` environment variable (set by terminals like iTerm2, rxvt, Konsole)             |
+| 2        | OSC 11                  | All (TTY)  | Sends an `ESC]11;?` query to the terminal and parses the background color from the response (~200ms) |
+| 3        | macOS system appearance | macOS only | Runs `defaults read -g AppleInterfaceStyle` to check if macOS Dark Mode is active                    |
+| 4        | Default                 | All        | Falls back to dark theme if no method succeeds                                                       |
+
+The first method that returns a result wins. The detected value is cached for the session so subsequent theme resolutions (e.g. reselecting Auto in the `/theme` dialog) stay consistent.
+
+### When to use Auto
+
+- **Most users** — Auto works well if your terminal background matches your OS appearance or if your terminal sets `COLORFGBG` / supports OSC 11.
+- **tmux / screen users** — OSC 11 may not pass through multiplexers. Detection falls back to `COLORFGBG` or macOS system appearance. If neither is available, the default dark theme is used. Set a specific theme if auto-detection gives the wrong result.
+- **SSH sessions** — detection depends on the remote environment. If `COLORFGBG` is not forwarded and the remote terminal doesn't respond to OSC 11, the default dark theme is used.
 
 ---
 

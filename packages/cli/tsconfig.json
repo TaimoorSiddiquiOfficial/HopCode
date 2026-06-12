@@ -1,4 +1,4 @@
-﻿{
+{
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
@@ -7,10 +7,12 @@
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
-      "@hoptrendy/hopcode-core/*": ["../core/src/*"],
+      "@hopcode/hopcode-core": ["../core/src/index.ts"],
+      "@hopcode/hopcode-core/*": ["../core/src/*"],
       "@hopcode/acp-bridge": ["../acp-bridge/src/index.ts"],
-      "@hopcode/acp-bridge/*": ["../acp-bridge/src/*"]
+      "@hopcode/acp-bridge/*": ["../acp-bridge/src/*"],
+      "@hopcode/hopcode-server": ["../server/src/index.ts"],
+      "@hopcode/hopcode-server/*": ["../server/src/*"]
     }
   },
   "include": [
@@ -85,7 +87,6 @@
     "src/ui/hooks/useGeminiStream.test.tsx",
     "src/ui/hooks/useKeypress.test.ts",
     "src/ui/hooks/usePhraseCycler.test.ts",
-    "src/ui/hooks/vim.test.ts",
     "src/ui/utils/computeStats.test.ts",
     "src/ui/themes/theme.test.ts",
     "src/validateNonInterActiveAuth.test.ts",
@@ -95,6 +96,7 @@
   "references": [
     { "path": "../core" },
     { "path": "../acp-bridge" },
+    { "path": "../server" },
     { "path": "../channels/base" },
     { "path": "../channels/telegram" },
     { "path": "../channels/weixin" },

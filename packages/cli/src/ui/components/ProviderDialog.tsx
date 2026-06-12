@@ -10,7 +10,7 @@ import {
   AuthType,
   type ModelProvidersConfig,
   type ProviderModelConfig as ModelConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { theme } from '../semantic-colors.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import {

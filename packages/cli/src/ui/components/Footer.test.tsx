@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,9 +22,9 @@ const useTerminalSizeMock = vi.mocked(useTerminalSize.useTerminalSize);
 vi.mock('../hooks/useStatusLine.js');
 const useStatusLineMock = vi.mocked(useStatusLineModule.useStatusLine);
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   const registry = {
     list: vi.fn(() => []),
     subscribe: vi.fn(() => () => {}),
@@ -76,7 +76,7 @@ const createMockUIState = (overrides: Partial<UIState> = {}): UIState =>
     },
     currentModel: 'gemini-pro',
     branchName: undefined,
-    contextMdFileCount: 0,
+    geminiMdFileCount: 0,
     contextFileNames: [],
     showToolDescriptions: false,
     ideContextState: undefined,
@@ -168,14 +168,14 @@ describe('<Footer />', () => {
 
     it('renders status line with respectUserColors enabled', () => {
       useStatusLineMock.mockReturnValue({
-        lines: ['\x1b[38;2;99;102;241m🤖 hopcode\x1b[0m'],
+        lines: ['\x1b[38;2;99;102;241m🤖 qwen\x1b[0m'],
         useThemeColors: false,
         respectUserColors: true,
         hideContextIndicator: false,
       });
       const { lastFrame } = renderWithWidth(120, createMockUIState());
       const frame = lastFrame()!;
-      expect(frame).toContain('🤖 hopcode');
+      expect(frame).toContain('🤖 qwen');
     });
 
     it('hides context indicator when hideContextIndicator is true', () => {

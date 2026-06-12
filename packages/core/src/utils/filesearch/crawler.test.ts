@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -846,6 +846,179 @@ describe('crawler', () => {
       expect(results).toEqual(
         expect.arrayContaining(['.', 'src/', 'file1.js', 'src/file2.js']),
       );
+    });
+
+    it('should preserve non-ASCII tracked paths from git output', async () => {
+      tmpDir = await createTmpDir({
+        'café.txt': '',
+        '文档.md': '',
+        plain: ['nested.txt'],
+      });
+      await initGitRepo(tmpDir);
+
+      const ignore = loadIgnoreRules({
+        projectRoot: tmpDir,
+        useGitignore: false,
+        useHopcodeignore: false,
+        ignoreDirs: [],
+      });
+
+      const results = await crawl({
+        crawlDirectory: tmpDir,
+        cwd: tmpDir,
+        ignore,
+        cache: false,
+        cacheTtl: 0,
+      });
+
+      expect(results).toEqual(
+        expect.arrayContaining(['café.txt', '文档.md', 'plain/nested.txt']),
+      );
+    });
+
+    it('should recurse into tracked submodules on the git path', async () => {
+      tmpDir = await createTmpDir({});
+      const parentRepo = path.join(tmpDir, 'parent');
+      const submoduleSource = path.join(tmpDir, 'submodule-source');
+
+      await fs.mkdir(parentRepo);
+      await fs.mkdir(submoduleSource);
+      await fs.writeFile(path.join(submoduleSource, 'inner.txt'), 'submodule');
+      await initGitRepo(submoduleSource);
+
+      await fs.writeFile(path.join(parentRepo, 'root.txt'), 'root');
+      await initGitRepo(parentRepo);
+      await runExecFile(
+        'git',
+        [
+          '-c',
+          'protocol.file.allow=always',
+          'submodule',
+          'add',
+          submoduleSource,
+          'vendor/lib',
+        ],
+        parentRepo,
+      );
+      await runExecFile(
+        'git',
+        [
+          '-c',
+          'user.name=Qwen Test',
+          '-c',
+          'user.email=hopcode-test@example.com',
+          'commit',
+          '--no-gpg-sign',
+          '-m',
+          'add submodule',
+        ],
+        parentRepo,
+      );
+
+      const ignore = loadIgnoreRules({
+        projectRoot: parentRepo,
+        useGitignore: false,
+        useHopcodeignore: false,
+        ignoreDirs: [],
+      });
+
+      const results = await crawl({
+        crawlDirectory: parentRepo,
+        cwd: parentRepo,
+        ignore,
+        cache: false,
+        cacheTtl: 0,
+      });
+
+      expect(results).toContain('vendor/lib/inner.txt');
+    }, 15_000);
+
+    it('should skip missing tracked paths from submodule indexes', async () => {
+      tmpDir = await createTmpDir({});
+      await fs.mkdir(path.join(tmpDir, 'vendor', 'lib'), { recursive: true });
+      await fs.writeFile(path.join(tmpDir, 'vendor', 'lib', 'alive.txt'), '');
+
+      __setCommandRunnerForTests(async (command, args) => {
+        if (command !== 'git') {
+          return { success: false, lines: [] };
+        }
+        if (args.includes('rev-parse') && args.includes('--show-toplevel')) {
+          return { success: true, lines: [tmpDir] };
+        }
+        if (args.includes('ls-files') && args.includes('--others')) {
+          return { success: true, lines: [] };
+        }
+        if (args.includes('ls-files') && args.includes('--deleted')) {
+          return { success: true, lines: [] };
+        }
+        if (args.includes('ls-files') && args.includes('--cached')) {
+          return {
+            success: true,
+            lines: ['H vendor/lib/alive.txt', 'H vendor/lib/deleted.txt'],
+          };
+        }
+        return { success: false, lines: [] };
+      });
+
+      const ignore = loadIgnoreRules({
+        projectRoot: tmpDir,
+        useGitignore: false,
+        useHopcodeignore: false,
+        ignoreDirs: [],
+      });
+
+      const results = await crawl({
+        crawlDirectory: tmpDir,
+        cwd: tmpDir,
+        ignore,
+        cache: false,
+        cacheTtl: 0,
+      });
+
+      expect(results).toContain('vendor/lib/alive.txt');
+      expect(results).not.toContain('vendor/lib/deleted.txt');
+    });
+
+    it('should skip cached gitlink directories from uninitialized submodules', async () => {
+      tmpDir = await createTmpDir({});
+      await fs.mkdir(path.join(tmpDir, 'vendor', 'lib'), { recursive: true });
+
+      __setCommandRunnerForTests(async (command, args) => {
+        if (command !== 'git') {
+          return { success: false, lines: [] };
+        }
+        if (args.includes('rev-parse') && args.includes('--show-toplevel')) {
+          return { success: true, lines: [tmpDir] };
+        }
+        if (args.includes('ls-files') && args.includes('--others')) {
+          return { success: true, lines: [] };
+        }
+        if (args.includes('ls-files') && args.includes('--deleted')) {
+          return { success: true, lines: [] };
+        }
+        if (args.includes('ls-files') && args.includes('--cached')) {
+          return { success: true, lines: ['H vendor/lib'] };
+        }
+        return { success: false, lines: [] };
+      });
+
+      const ignore = loadIgnoreRules({
+        projectRoot: tmpDir,
+        useGitignore: false,
+        useHopcodeignore: false,
+        ignoreDirs: [],
+      });
+
+      const results = await crawl({
+        crawlDirectory: tmpDir,
+        cwd: tmpDir,
+        ignore,
+        cache: false,
+        cacheTtl: 0,
+      });
+
+      expect(results).not.toContain('vendor/lib');
+      expect(results).not.toContain('vendor/lib/');
     });
 
     it('should resolve the git root from a subdirectory crawl', async () => {

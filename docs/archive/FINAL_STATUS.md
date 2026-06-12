@@ -202,7 +202,7 @@
 
 ```bash
 # Install HopCode (after npm publish)
-npm install -g @hoptrendy/hopcode
+npm install -g @hopcode/hopcode
 
 # Configure HopCode OAuth
 hopcode auth login

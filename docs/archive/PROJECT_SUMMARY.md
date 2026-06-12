@@ -233,7 +233,7 @@ npm test
 
 ### Step 7: Publish & Launch
 
-- [ ] Publish npm packages (@hoptrendy/\*)
+- [ ] Publish npm packages (@hopcode/\*)
 - [ ] Release extensions
 - [ ] Update documentation
 - [ ] Announce to community
@@ -277,7 +277,7 @@ npm test
 | ----------------- | ------------ | ------------- | ----------- |
 | **Project Name**  | HopCode      | HopCode       | 9000+ refs  |
 | **CLI Command**   | `hopcode`    | `hopcode`     | 100+ refs   |
-| **NPM Scope**     | @hopcode/\*  | @hoptrendy/\* | 14 packages |
+| **NPM Scope**     | @hopcode/\*  | @hopcode/\* | 14 packages |
 | **Config Dir**    | `.hopcode/`  | `.hopcode/`   | 50+ refs    |
 | **Env Variables** | QWEN*CODE*\* | HOPCODE\_\*   | 15+ vars    |
 | **CSS Classes**   | .hopcode-\*  | .hopcode-\*   | 50+ classes |

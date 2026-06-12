@@ -17,7 +17,7 @@ import {
   isSDKAssistantMessage,
   isSDKSystemMessage,
   type SDKMessage,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   extractText,

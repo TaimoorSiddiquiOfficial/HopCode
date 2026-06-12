@@ -8,7 +8,7 @@ import type {
   HookConfig,
   HooksConfigSource,
   HookEventName,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 export interface HookExitCode {
   code: number | string;

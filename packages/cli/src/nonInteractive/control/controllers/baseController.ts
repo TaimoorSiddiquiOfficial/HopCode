@@ -16,8 +16,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { DebugLogger } from '@hoptrendy/hopcode-core';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import type { DebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 import type { IControlContext } from '../ControlContext.js';
 import type {
   ControlRequestPayload,

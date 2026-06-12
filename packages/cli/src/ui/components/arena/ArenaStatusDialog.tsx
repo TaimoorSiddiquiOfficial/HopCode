@@ -15,7 +15,7 @@ import {
   isSettledStatus,
   ArenaSessionStatus,
   DISPLAY_MODE,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { theme } from '../../semantic-colors.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { formatDuration } from '../../utils/formatters.js';

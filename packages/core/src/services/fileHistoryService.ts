@@ -19,7 +19,7 @@ import { dirname, isAbsolute, join, relative, sep } from 'node:path';
 import {
   diffLines,
   structuredPatch,
-  type StructuredPatchHunk as Hunk,
+  type Hunk,
 } from 'diff';
 import { Storage } from '../config/storage.js';
 import { createDebugLogger } from '../utils/debugLogger.js';

@@ -1,11 +1,14 @@
 /**
  * @license
- * Copyright 2026 HopCode Team team
+ * Copyright 2025 Qwen team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect } from 'vitest';
-import { extractShellOperations } from './shell-semantics.js';
+import {
+  extractShellOperations,
+  extractShellOperationsAcrossCommand,
+} from './shell-semantics.js';
 import type { ShellOperation } from './shell-semantics.js';
 
 const CWD = '/home/user/project';
@@ -20,7 +23,7 @@ function sorted(ops: ShellOperation[]) {
 }
 
 describe('extractShellOperations', () => {
-  // -- Empty / no-op ----------------------------------------------------------
+  // ── Empty / no-op ──────────────────────────────────────────────────────────
 
   it('returns [] for empty string', () => {
     expect(extractShellOperations('', CWD)).toEqual([]);
@@ -38,7 +41,7 @@ describe('extractShellOperations', () => {
     expect(extractShellOperations('FOO=bar', CWD)).toEqual([]);
   });
 
-  // -- cat --------------------------------------------------------------------
+  // ── cat ────────────────────────────────────────────────────────────────────
 
   it('cat: absolute path', () => {
     const ops = extractShellOperations('cat /etc/passwd', CWD);
@@ -79,7 +82,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- head / tail ------------------------------------------------------------
+  // ── head / tail ────────────────────────────────────────────────────────────
 
   it('head: -n value not treated as path', () => {
     const ops = extractShellOperations('head -n 10 /var/log/syslog', CWD);
@@ -96,7 +99,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- diff -------------------------------------------------------------------
+  // ── diff ───────────────────────────────────────────────────────────────────
 
   it('diff: two files', () => {
     const ops = extractShellOperations('diff /old /new', CWD);
@@ -106,7 +109,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- grep -------------------------------------------------------------------
+  // ── grep ───────────────────────────────────────────────────────────────────
 
   it('grep: first positional is pattern, rest are files', () => {
     const ops = extractShellOperations('grep password /etc/shadow', CWD);
@@ -131,9 +134,9 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  it('grep: -f patternfile � positionals are file paths', () => {
+  it('grep: -f patternfile — positionals are file paths', () => {
     const ops = extractShellOperations('grep -f patterns.txt /etc/hosts', CWD);
-    // -f consumes patterns.txt; /etc/hosts is the only positional ? first positional skipped? No.
+    // -f consumes patterns.txt; /etc/hosts is the only positional → first positional skipped? No.
     // With -f, hasPatternFlag=true, so all positionals are file paths (no slice(1))
     expect(ops).toEqual([{ virtualTool: 'read_file', filePath: '/etc/hosts' }]);
   });
@@ -145,7 +148,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- ls / find --------------------------------------------------------------
+  // ── ls / find ──────────────────────────────────────────────────────────────
 
   it('ls: no args defaults to cwd', () => {
     const ops = extractShellOperations('ls', CWD);
@@ -169,7 +172,30 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'list_directory', filePath: CWD }]);
   });
 
-  // -- touch / mkdir ----------------------------------------------------------
+  it('find: extracts write ops from exec clauses', () => {
+    const ops = extractShellOperations(
+      'find . -exec cp payload .hopcode/settings.json ;',
+      CWD,
+    );
+    expect(ops).toEqual([
+      { virtualTool: 'list_directory', filePath: CWD },
+      { virtualTool: 'read_file', filePath: `${CWD}/payload` },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/settings.json` },
+    ]);
+  });
+
+  it('find: preserves exec placeholder operands for write detection', () => {
+    const ops = extractShellOperations(
+      'find . -exec cp {} .hopcode/settings.json ;',
+      CWD,
+    );
+    expect(ops).toContainEqual({
+      virtualTool: 'write_file',
+      filePath: `${CWD}/.hopcode/settings.json`,
+    });
+  });
+
+  // ── touch / mkdir ──────────────────────────────────────────────────────────
 
   it('touch: creates a file (write_file)', () => {
     const ops = extractShellOperations('touch /tmp/new.txt', CWD);
@@ -183,7 +209,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'write_file', filePath: '/tmp/a/b' }]);
   });
 
-  // -- cp / mv ----------------------------------------------------------------
+  // ── cp / mv ────────────────────────────────────────────────────────────────
 
   it('cp: src=read, dst=write', () => {
     const ops = extractShellOperations('cp /etc/passwd /tmp/backup', CWD);
@@ -201,7 +227,40 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- rm ---------------------------------------------------------------------
+  it('cp/mv/install/ln -t forms emit target-directory writes', () => {
+    expect(
+      sorted(extractShellOperations('cp -t .hopcode /tmp/settings.json', CWD)),
+    ).toEqual([
+      { virtualTool: 'read_file', filePath: '/tmp/settings.json' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/settings.json` },
+    ]);
+    expect(
+      sorted(extractShellOperations('mv --target-directory=.hopcode /tmp/a', CWD)),
+    ).toEqual([
+      { virtualTool: 'edit', filePath: '/tmp/a' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/a` },
+    ]);
+    expect(
+      sorted(extractShellOperations('install -t .hopcode /tmp/tool', CWD)),
+    ).toEqual([
+      { virtualTool: 'read_file', filePath: '/tmp/tool' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/tool` },
+    ]);
+    expect(
+      sorted(extractShellOperations('ln -t .hopcode /tmp/target', CWD)),
+    ).toEqual([
+      { virtualTool: 'read_file', filePath: '/tmp/target' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/target` },
+    ]);
+    expect(
+      sorted(extractShellOperations('cp -rt .hopcode /tmp/payload', CWD)),
+    ).toEqual([
+      { virtualTool: 'read_file', filePath: '/tmp/payload' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/payload` },
+    ]);
+  });
+
+  // ── rm ─────────────────────────────────────────────────────────────────────
 
   it('rm: single file is edit', () => {
     const ops = extractShellOperations('rm /tmp/secret.txt', CWD);
@@ -213,7 +272,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/tmp/dir' }]);
   });
 
-  // -- chmod / chown ----------------------------------------------------------
+  // ── chmod / chown ──────────────────────────────────────────────────────────
 
   it('chmod: mode arg is skipped, file is edit', () => {
     const ops = extractShellOperations('chmod 755 /usr/local/bin/script', CWD);
@@ -227,7 +286,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/etc/config' }]);
   });
 
-  // -- sed --------------------------------------------------------------------
+  // ── sed ────────────────────────────────────────────────────────────────────
 
   it('sed without -i: read_file', () => {
     const ops = extractShellOperations("sed 's/foo/bar/' /etc/hosts", CWD);
@@ -239,6 +298,11 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/etc/hosts' }]);
   });
 
+  it('sed combined short flags containing i: edit', () => {
+    const ops = extractShellOperations("sed -nie 's/foo/bar/' /etc/hosts", CWD);
+    expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/etc/hosts' }]);
+  });
+
   it('sed -e: all positionals are files', () => {
     const ops = extractShellOperations("sed -e 's/foo/bar/' /a /b", CWD);
     expect(sorted(ops)).toEqual([
@@ -247,7 +311,7 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- awk --------------------------------------------------------------------
+  // ── awk ────────────────────────────────────────────────────────────────────
 
   it('awk: program expression filtered, file identified', () => {
     const ops = extractShellOperations("awk '{print $1}' /etc/passwd", CWD);
@@ -263,7 +327,31 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- dd ---------------------------------------------------------------------
+  it('awk -i inplace: edits files in place', () => {
+    const ops = extractShellOperations(
+      'awk -i inplace \'{gsub(/x/, "y")}1\' /etc/hosts',
+      CWD,
+    );
+    expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/etc/hosts' }]);
+  });
+
+  it('awk --include=inplace: edits files in place', () => {
+    const ops = extractShellOperations(
+      'awk --include=inplace \'{gsub(/x/, "y")}1\' /etc/hosts',
+      CWD,
+    );
+    expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/etc/hosts' }]);
+  });
+
+  it('gawk -i inplace: edits files in place', () => {
+    const ops = extractShellOperations(
+      'gawk -i inplace \'{gsub(/x/, "y")}1\' /etc/hosts',
+      CWD,
+    );
+    expect(ops).toEqual([{ virtualTool: 'edit', filePath: '/etc/hosts' }]);
+  });
+
+  // ── dd ─────────────────────────────────────────────────────────────────────
 
   it('dd if= and of=', () => {
     const ops = extractShellOperations('dd if=/dev/sda of=/tmp/disk.img', CWD);
@@ -273,7 +361,57 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- Redirections -----------------------------------------------------------
+  it('rsync destination is a write', () => {
+    const ops = extractShellOperations(
+      'rsync /tmp/payload .hopcode/settings.json',
+      CWD,
+    );
+    expect(sorted(ops)).toEqual([
+      { virtualTool: 'read_file', filePath: '/tmp/payload' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/settings.json` },
+    ]);
+  });
+
+  it('perl -i edits file operands', () => {
+    const ops = extractShellOperations(
+      "perl -i -pe 's/x/y/' .hopcode/settings.json",
+      CWD,
+    );
+    expect(ops).toEqual([
+      { virtualTool: 'edit', filePath: `${CWD}/.hopcode/settings.json` },
+    ]);
+
+    expect(
+      extractShellOperations("perl -i -e 's/x/y/' .hopcode/settings.json", CWD),
+    ).toEqual([
+      { virtualTool: 'edit', filePath: `${CWD}/.hopcode/settings.json` },
+    ]);
+  });
+
+  it('patch edits positional target files', () => {
+    const ops = extractShellOperations(
+      'patch .hopcode/settings.json fix.patch',
+      CWD,
+    );
+    expect(ops).toContainEqual({
+      virtualTool: 'edit',
+      filePath: `${CWD}/.hopcode/settings.json`,
+    });
+  });
+
+  it('patch edits output flag targets', () => {
+    for (const command of [
+      'patch --output=.hopcode/settings.json -i fix.patch',
+      'patch -o .hopcode/settings.json -i fix.patch',
+    ]) {
+      expect(extractShellOperations(command, CWD)).toContainEqual({
+        virtualTool: 'edit',
+        filePath: `${CWD}/.hopcode/settings.json`,
+      });
+    }
+  });
+
+  // ── Redirections ───────────────────────────────────────────────────────────
 
   it('redirect >: write_file', () => {
     const ops = extractShellOperations('echo hello > /tmp/out.txt', CWD);
@@ -297,6 +435,29 @@ describe('extractShellOperations', () => {
     });
   });
 
+  it('sort -o emits the output path as a write', () => {
+    expect(
+      sorted(
+        extractShellOperations('sort -o .hopcode/settings.json /tmp/in', CWD),
+      ),
+    ).toEqual([
+      { virtualTool: 'read_file', filePath: '/tmp/in' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/settings.json` },
+    ]);
+
+    expect(
+      sorted(
+        extractShellOperations(
+          'sort --output=.hopcode/settings.json /tmp/in',
+          CWD,
+        ),
+      ),
+    ).toEqual([
+      { virtualTool: 'read_file', filePath: '/tmp/in' },
+      { virtualTool: 'write_file', filePath: `${CWD}/.hopcode/settings.json` },
+    ]);
+  });
+
   it('combined redirect >file without space', () => {
     const ops = extractShellOperations('echo hi >/tmp/foo', CWD);
     expect(ops).toContainEqual({
@@ -316,7 +477,7 @@ describe('extractShellOperations', () => {
     });
   });
 
-  // -- curl / wget ------------------------------------------------------------
+  // ── curl / wget ────────────────────────────────────────────────────────────
 
   it('curl: extracts domain', () => {
     const ops = extractShellOperations(
@@ -328,13 +489,36 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  it('curl: -o flag value not treated as URL', () => {
+  it('curl: -o flag value emits write op and is not treated as URL', () => {
     const ops = extractShellOperations(
       'curl -o /tmp/out.json https://api.example.com',
       CWD,
     );
-    expect(ops).toEqual([
+    expect(sorted(ops)).toEqual([
       { virtualTool: 'web_fetch', domain: 'api.example.com' },
+      { virtualTool: 'write_file', filePath: '/tmp/out.json' },
+    ]);
+  });
+
+  it('curl: attached -o flag value emits write op', () => {
+    const ops = extractShellOperations(
+      'curl -o/tmp/out.json https://api.example.com',
+      CWD,
+    );
+    expect(sorted(ops)).toEqual([
+      { virtualTool: 'web_fetch', domain: 'api.example.com' },
+      { virtualTool: 'write_file', filePath: '/tmp/out.json' },
+    ]);
+  });
+
+  it('curl: attached -o= flag value emits write op', () => {
+    const ops = extractShellOperations(
+      'curl -o=/tmp/out.json https://api.example.com',
+      CWD,
+    );
+    expect(sorted(ops)).toEqual([
+      { virtualTool: 'web_fetch', domain: 'api.example.com' },
+      { virtualTool: 'write_file', filePath: '/tmp/out.json' },
     ]);
   });
 
@@ -346,15 +530,40 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'web_fetch', domain: 'example.com' }]);
   });
 
-  it('wget: -O flag value not treated as URL', () => {
+  it('wget: -O flag value emits write op and is not treated as URL', () => {
     const ops = extractShellOperations(
       'wget -O /tmp/file.gz https://example.com/f.gz',
       CWD,
     );
-    expect(ops).toEqual([{ virtualTool: 'web_fetch', domain: 'example.com' }]);
+    expect(sorted(ops)).toEqual([
+      { virtualTool: 'web_fetch', domain: 'example.com' },
+      { virtualTool: 'write_file', filePath: '/tmp/file.gz' },
+    ]);
   });
 
-  // -- sudo / prefix commands -------------------------------------------------
+  it('wget: attached -O flag value emits write op', () => {
+    const ops = extractShellOperations(
+      'wget -O/tmp/file.gz https://example.com/f.gz',
+      CWD,
+    );
+    expect(sorted(ops)).toEqual([
+      { virtualTool: 'web_fetch', domain: 'example.com' },
+      { virtualTool: 'write_file', filePath: '/tmp/file.gz' },
+    ]);
+  });
+
+  it('wget: attached -O= flag value emits write op', () => {
+    const ops = extractShellOperations(
+      'wget -O=/tmp/file.gz https://example.com/f.gz',
+      CWD,
+    );
+    expect(sorted(ops)).toEqual([
+      { virtualTool: 'web_fetch', domain: 'example.com' },
+      { virtualTool: 'write_file', filePath: '/tmp/file.gz' },
+    ]);
+  });
+
+  // ── sudo / prefix commands ─────────────────────────────────────────────────
 
   it('sudo cat: transparent wrapper', () => {
     const ops = extractShellOperations('sudo cat /etc/sudoers', CWD);
@@ -383,7 +592,7 @@ describe('extractShellOperations', () => {
     expect(ops).toEqual([{ virtualTool: 'web_fetch', domain: 'example.com' }]);
   });
 
-  // -- Combination: command + redirect ---------------------------------------
+  // ── Combination: command + redirect ───────────────────────────────────────
 
   it('cat src > dst: both read and write', () => {
     const ops = extractShellOperations('cat /etc/passwd > /tmp/copy', CWD);
@@ -404,11 +613,348 @@ describe('extractShellOperations', () => {
     ]);
   });
 
-  // -- Variables / unresolvable patterns -------------------------------------
+  // ── Variables / unresolvable patterns ─────────────────────────────────────
 
   it('$VAR paths are not included', () => {
     const ops = extractShellOperations('cat $SECRET_FILE', CWD);
     // $SECRET_FILE starts with $, filtered by looksLikePath
     expect(ops).toEqual([]);
+  });
+});
+
+// ─── extractShellOperationsAcrossCommand ─────────────────────────────────────
+//
+// Shared compound shell analysis for permission rules and AUTO review.
+
+describe('extractShellOperationsAcrossCommand', () => {
+  it('tracks literal `cd` across compound segments before resolving writes', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "cd .hopcode && bash -lc 'echo {} > settings.json'",
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('handles leading env assignments before redirected commands', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        'FOO=bar echo x > .hopcode/settings.json',
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('handles leading env assignments before write commands', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        'FOO=bar tee .hopcode/settings.json',
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('tracks cwd before leading env assignments', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "cd .hopcode && FOO=bar echo '{}' > settings.json",
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('recursively unwraps nested shell wrappers', () => {
+    // The actual write is nested two wrapper levels deep.
+    expect(
+      extractShellOperationsAcrossCommand(
+        'bash -lc "sh -c \'echo hi > .mcp.json\'"',
+        '/repo',
+      ),
+    ).toEqual([{ virtualTool: 'write_file', filePath: '/repo/.mcp.json' }]);
+  });
+
+  it('preserves sibling segments after a shell wrapper', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "bash -lc 'echo ok' && echo hi > .hopcode/settings.json",
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('splits literal newlines as command boundaries', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        'cd .hopcode\ncp /tmp/malicious settings.json',
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'read_file',
+        filePath: '/tmp/malicious',
+      },
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/.hopcode/settings.json',
+      },
+    ]);
+  });
+
+  it('tracks cwd through brace-grouped commands', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "{ cd .hopcode && echo '{}' > settings.json; }",
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/.hopcode/settings.json',
+      },
+    ]);
+  });
+
+  it('strips grouping and background syntax from command and path tokens', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        '(echo > .hopcode/settings.json) && echo > .hopcode/hooks/run.sh&',
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/hooks/run.sh' },
+    ]);
+  });
+
+  it('does not treat heredoc body lines as executable shell segments', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        [
+          'cd .hopcode',
+          "cat <<'EOF'",
+          'cd /tmp',
+          'EOF',
+          'echo > settings.json',
+        ].join('\n'),
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('does not treat quoted heredoc-looking text as a heredoc marker', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        ["echo '<<EOF'", 'cd .hopcode', "echo '{}' > settings.json"].join('\n'),
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('handles `cd --` and other POSIX flag forms before the target', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "cd -- .hopcode && printf '{}' > settings.local.json",
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/.hopcode/settings.local.json',
+      },
+    ]);
+  });
+
+  it('treats the word after `cd --` as the target even when it starts with dash', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "cd -- -some-dir && printf '{}' > settings.local.json",
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/-some-dir/settings.local.json',
+      },
+    ]);
+  });
+
+  it('ignores redirects attached to cd when resolving static cwd', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "cd .hopcode >/dev/null && echo '{}' > settings.json",
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('tracks static pushd targets like cd targets', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "pushd .hopcode && printf '{}' > settings.local.json",
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/.hopcode/settings.local.json',
+      },
+    ]);
+  });
+
+  it('marks writes after popd as cwd-unknown', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "popd && printf '{}' > settings.local.json",
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/settings.local.json',
+        cwdUnknown: true,
+        pathMayDependOnCwd: true,
+      },
+    ]);
+  });
+
+  it('marks writes after popd with expansion args as cwd-unknown', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        "popd $DIR && printf '{}' > settings.local.json",
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/settings.local.json',
+        cwdUnknown: true,
+        pathMayDependOnCwd: true,
+      },
+    ]);
+  });
+
+  it.each(['pushd', 'pushd +2', 'pushd -2', 'pushd -n /tmp'])(
+    'marks writes after `%s` as cwd-unknown',
+    (command) => {
+      expect(
+        extractShellOperationsAcrossCommand(
+          `${command} && printf '{}' > settings.local.json`,
+          '/repo',
+        ),
+      ).toEqual([
+        {
+          virtualTool: 'write_file',
+          filePath: '/repo/settings.local.json',
+          cwdUnknown: true,
+          pathMayDependOnCwd: true,
+        },
+      ]);
+    },
+  );
+
+  it('marks relative writes after dynamic `cd` targets as cwd-unknown', () => {
+    // Keep the guessed path, but mark it unsafe to trust as final.
+    expect(
+      extractShellOperationsAcrossCommand(
+        'cd $TARGET && echo hi > out.txt',
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/repo/out.txt',
+        cwdUnknown: true,
+        pathMayDependOnCwd: true,
+      },
+    ]);
+  });
+
+  it('marks all file ops after dynamic `cd` as cwd-unknown', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        'cd "$HOPCODE_HOME" && echo hi > ../settings.json',
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/settings.json',
+        cwdUnknown: true,
+        pathMayDependOnCwd: true,
+      },
+    ]);
+  });
+
+  it('does not mark absolute writes after dynamic `cd` as cwd-dependent', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        'cd "$HOPCODE_HOME" && echo hi > /tmp/out.txt',
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/tmp/out.txt',
+        cwdUnknown: true,
+        pathMayDependOnCwd: false,
+      },
+    ]);
+  });
+
+  it('clears cwd-unknown after an absolute static `cd`', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        'cd $TARGET && cd /repo/.hopcode && echo hi > settings.json',
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/.hopcode/settings.json' },
+    ]);
+  });
+
+  it('preserves operation order across compound segments', () => {
+    expect(
+      extractShellOperationsAcrossCommand(
+        'echo a > one.txt && cd sub && echo b > two.txt; cat /etc/hosts',
+        '/repo',
+      ),
+    ).toEqual([
+      { virtualTool: 'write_file', filePath: '/repo/one.txt' },
+      { virtualTool: 'write_file', filePath: '/repo/sub/two.txt' },
+      { virtualTool: 'read_file', filePath: '/etc/hosts' },
+    ]);
+  });
+
+  it('returns no ops when only `cd` segments are present', () => {
+    expect(
+      extractShellOperationsAcrossCommand('cd .hopcode && cd ..', '/repo'),
+    ).toEqual([]);
+  });
+
+  it('falls back gracefully on excessively deep wrapper nesting', () => {
+    // A pathological wrapper chain hits MAX_SHELL_UNWRAP_DEPTH (4) and we
+    // analyse whatever remains as-is rather than recursing forever. The
+    // exact result here doesn't matter — what matters is that the call
+    // returns without throwing or hanging.
+    const deep = 'bash -lc "bash -lc \\"bash -lc \'bash -lc echo > x.txt\'\\""';
+    expect(() =>
+      extractShellOperationsAcrossCommand(deep, '/repo'),
+    ).not.toThrow();
   });
 });

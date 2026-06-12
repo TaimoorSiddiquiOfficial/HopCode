@@ -1,7 +1,7 @@
 export { WeixinChannel } from './WeixinAdapter.js';
 
 import { WeixinChannel } from './WeixinAdapter.js';
-import type { ChannelPlugin } from '@hoptrendy/channel-base';
+import type { ChannelPlugin } from '@hopcode/channel-base';
 
 export const plugin: ChannelPlugin = {
   channelType: 'weixin',

@@ -17,11 +17,11 @@ import {
   type MockedFunction,
 } from 'vitest';
 
-import { ExtensionManager, parseInstallSource } from '@hoptrendy/hopcode-core';
+import { ExtensionManager, parseInstallSource } from '@hopcode/hopcode-core';
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     parseInstallSource: vi.fn(),

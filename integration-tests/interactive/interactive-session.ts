@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 hopcode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -76,7 +76,7 @@ export class InteractiveSession {
    * @example
    * ```ts
    * const session = await InteractiveSession.start({
-   *   env: { hopcode_ENABLE_CRON: '1' },
+   *   env: { HOPCODE_CODE_DISABLE_CRON: '1' },
    *   args: ['--approval-mode', 'izn'],
    * });
    * ```

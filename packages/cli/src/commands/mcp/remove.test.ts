@@ -36,9 +36,9 @@ vi.mock('../../config/settings.js', async () => {
   };
 });
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     MCPOAuthTokenStorage: vi.fn(() => ({

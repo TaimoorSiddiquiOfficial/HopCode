@@ -8,7 +8,7 @@ import type { RefObject } from 'react';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type { CompletionItem } from '../../types/completionItemTypes.js';
 import { shouldAllowCompletionQuery } from '../utils/slashCommandUtils.js';
-import { stripZeroWidthSpaces } from '@hoptrendy/webui';
+import { stripZeroWidthSpaces } from '@hopcode/webui';
 
 interface CompletionTriggerState {
   isOpen: boolean;
@@ -33,7 +33,7 @@ export function useCompletionTrigger(
   const LOADING_ITEM = useMemo<CompletionItem>(
     () => ({
       id: 'loading',
-      label: 'Loading…',
+      label: 'Loadingï¿½',
       type: 'info',
     }),
     [],

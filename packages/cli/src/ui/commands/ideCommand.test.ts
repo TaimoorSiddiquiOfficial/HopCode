@@ -8,10 +8,10 @@ import type { MockInstance } from 'vitest';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ideCommand } from './ideCommand.js';
 import { type CommandContext } from './types.js';
-import { IDE_DEFINITIONS } from '@hoptrendy/hopcode-core';
-import * as core from '@hoptrendy/hopcode-core';
+import { IDE_DEFINITIONS } from '@hopcode/hopcode-core';
+import * as core from '@hopcode/hopcode-core';
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const original = await importOriginal<typeof core>();
   return {
     ...original,

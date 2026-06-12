@@ -10,7 +10,7 @@ import {
   getErrorMessage,
   logAuth,
   AuthEvent,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 /**
  * Handles the initial authentication flow.

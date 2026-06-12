@@ -10,7 +10,7 @@ import { type CommandContext } from '../ui/commands/types.js';
 import { createMockCommandContext } from '../test-utils/mockCommandContext.js';
 import * as systemInfoUtils from './systemInfo.js';
 import * as authModule from '../config/auth.js';
-import * as allProviders from '@hoptrendy/hopcode-core';
+import * as allProviders from '@hopcode/hopcode-core';
 
 vi.mock('./systemInfo.js');
 vi.mock('../config/auth.js');
@@ -22,9 +22,9 @@ vi.mock('../auth/allProviders.js', async (importOriginal) => {
     findProviderByCredentials: vi.fn(actual.findProviderByCredentials),
   };
 });
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    (await importOriginal()) as typeof import('@hoptrendy/hopcode-core');
+    (await importOriginal()) as typeof import('@hopcode/hopcode-core');
   return {
     ...actual,
     findProviderByCredentials: vi.fn(actual.findProviderByCredentials),
@@ -246,7 +246,6 @@ describe('runDoctorChecks', () => {
           getUseBuiltinRipgrep: vi.fn().mockReturnValue(false),
         },
         settings: { merged: {} },
-        git: undefined,
       },
     } as unknown as CommandContext);
 
@@ -273,7 +272,6 @@ describe('runDoctorChecks', () => {
           getUseBuiltinRipgrep: vi.fn().mockReturnValue(false),
         },
         settings: { merged: {} },
-        git: undefined,
       },
     } as unknown as CommandContext);
 

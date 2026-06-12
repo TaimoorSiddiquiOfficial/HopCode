@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +17,8 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'シェルモード',
-  'Izn mode': 'Iznモード',
+  'YOLO mode': 'YOLOモード',
+  'Auto mode': 'Autoモード',
   'plan mode': 'プランモード',
   'auto-accept edits': '編集を自動承認',
   'Accepting edits': '編集を承認中',
@@ -73,7 +74,39 @@ export default {
     'プロジェクトを分析し、カスタマイズされた HOPCODE.md ファイルを作成',
   'List available HopCode tools. Usage: /tools [desc]':
     '利用可能な HopCode ツールを一覧表示。使い方: /tools [desc]',
-  'List available skills.': '利用可能なスキルを一覧表示する。',
+  'Open the skills panel (browse, search, toggle, pick).':
+    'スキルパネルを開く（一覧・検索・有効化/無効化・選択）。',
+  'Manage Skills': 'スキルを管理',
+  'Skills configuration saved.': 'スキル設定を保存しました。',
+  'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
+    'スキル設定を保存しましたが、更新に失敗しました：{{error}}。再起動して新しい状態が反映されることを確認してください。',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.hopcode/settings.json directly to manage skills at user scope.':
+    'ワークスペースが信頼されていないため、ワークスペース設定はマージ設定で無視されます。先に /trust を実行するか、~/.hopcode/settings.json を直接編集してユーザースコープでスキルを管理してください。',
+  'SkillManager not available.': 'SkillManager は利用できません。',
+  'Loading skills…': 'スキルを読み込み中…',
+  'Failed to load skills: {{error}}': 'スキルの読み込みに失敗：{{error}}',
+  'Failed to save skills configuration: {{error}}':
+    'スキル設定の保存に失敗しました：{{error}}',
+  'All available skills are disabled. Edit ~/.hopcode/settings.json or .hopcode/settings.json (skills.disabled) to re-enable.':
+    'すべての利用可能なスキルが無効化されています。~/.hopcode/settings.json または .hopcode/settings.json (skills.disabled) を編集して再有効化してください。',
+  'Press esc to close.': 'Esc で閉じる。',
+  '{{count}} skills · ': '{{count}} スキル · ',
+  '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} スキル · ',
+  'Space toggle · Enter pick (fill input) · Esc save & exit · workspace scope':
+    'スペース 切替 · Enter 選択（入力欄に挿入） · Esc 保存して終了 · ワークスペーススコープ',
+  'Search:': '検索：',
+  'type to filter…': 'フィルタを入力…',
+  'No skills are currently available.': '利用可能なスキルはありません。',
+  'All available skills are locked at a higher scope (see below).':
+    'すべての利用可能なスキルは上位スコープでロックされています（下記参照）。',
+  'No skills match the search.': '検索に一致するスキルはありません。',
+  'Locked by higher-scope settings (cannot toggle here):':
+    '上位スコープ設定によってロックされています（ここでは切替不可）：',
+  'higher scope': '上位スコープ',
+  '  {{name}} {{description}}  [locked: {{scope}}]':
+    '  {{name}} {{description}}  [ロック中：{{scope}}]',
+  '↑/↓ navigate · backspace edits search': '↑/↓ 移動 · Backspace 検索編集',
+  Bundled: '組み込み',
   'Available HopCode CLI tools:': '利用可能な HopCode CLI ツール:',
   'No tools available': '利用可能なツールはありません',
   'View or change the approval mode for tool usage':
@@ -148,8 +181,8 @@ export default {
     'ブラウザで HopCode のドキュメントを開く',
   'Configuration not available.': '設定が利用できません',
   'Connect an LLM provider': 'LLM プロバイダーに接続',
-  'Copy the last result or code snippet to clipboard':
-    '最後の結果またはコードスニペットをクリップボードにコピー',
+  'Copy the last AI response to clipboard (/copy N for Nth-latest)':
+    '最新のAI応答をクリップボードにコピー（/copy N で新しい方からN番目）',
 
   // ============================================================================
   // Commands - Agents
@@ -292,9 +325,9 @@ export default {
   Text: 'テキスト',
   JSON: 'JSON',
   Plan: 'プラン',
-  Default: 'デフォルト',
+  'Ask permissions': '許可を確認',
   'Auto Edit': '自動編集',
-  Izn: 'Izn',
+  YOLO: 'YOLO',
   'toggle vim mode on/off': 'Vim モードのオン/オフを切り替え',
   'exit the cli': 'CLIを終了',
   Timeout: 'タイムアウト',
@@ -405,8 +438,8 @@ export default {
   'Configured hooks:': '設定済みのフック：',
   'No hooks configured for this event.':
     'このイベントにはフックが設定されていません。',
-  'To add hooks, edit settings.json directly or ask HopCode.':
-    'フックを追加するには、settings.json を直接編集するか、HopCode に尋ねてください。',
+  'To add hooks, edit settings.json directly or ask Qwen.':
+    'フックを追加するには、settings.json を直接編集するか、Qwen に尋ねてください。',
   'Enter to select · Esc to go back': 'Enter で選択 · Esc で戻る',
   // Hooks - Config Detail Step
   'Hook details': 'フック詳細',
@@ -414,8 +447,8 @@ export default {
   'Extension:': '拡張機能：',
   'Desc:': '説明：',
   'No hook config selected': 'フック設定が選択されていません',
-  'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'このフックを変更または削除するには、settings.json を直接編集するか、HopCode に尋ねてください。',
+  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+    'このフックを変更または削除するには、settings.json を直接編集するか、Qwen に尋ねてください。',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'フック設定 - 無効',
   'All hooks are currently disabled. You have {{count}} that are not running.':
@@ -446,8 +479,11 @@ export default {
   'After tool execution fails': 'ツール実行失敗時',
   'When notifications are sent': '通知送信時',
   'When the user submits a prompt': 'ユーザーがプロンプトを送信した時',
+  'When a slash command expands into a prompt':
+    'スラッシュコマンドがプロンプトに展開された時',
   'When a new session is started': '新しいセッションが開始された時',
-  'Right before HopCode concludes its response': 'HopCode が応答を終了する直前',
+  'Right before HopCode concludes its response':
+    'HopCode が応答を終了する直前',
   'When a subagent (Agent tool call) is started':
     'サブエージェント（Agent ツール呼び出し）が開始された時',
   'Right before a subagent concludes its response':
@@ -468,6 +504,8 @@ export default {
     'コマンドへの入力は通知メッセージとタイプを持つ JSON です。',
   'Input to command is JSON with original user prompt text.':
     'コマンドへの入力は元のユーザープロンプトテキストを持つ JSON です。',
+  'Input to command is JSON with command_name, command_args, and expanded prompt text.':
+    'コマンドへの入力は command_name、command_args、展開後のプロンプトテキストを持つ JSON です。',
   'Input to command is JSON with session start source.':
     'コマンドへの入力はセッション開始ソースを持つ JSON です。',
   'Input to command is JSON with session end reason.':
@@ -496,7 +534,9 @@ export default {
     'stderr をユーザーのみに表示し、ツール呼び出しを続ける',
   'block processing, erase original prompt, and show stderr to user only':
     '処理をブロックし、元のプロンプトを消去し、stderr をユーザーのみに表示',
-  'stdout shown to HopCode': 'stdout を HopCode に表示',
+  'block expanded prompt submission and show stderr to user only':
+    '展開後のプロンプト送信をブロックし、stderr をユーザーのみに表示',
+  'stdout shown to Qwen': 'stdout を Qwen に表示',
   'show stderr to user only (blocking errors ignored)':
     'stderr をユーザーのみに表示（ブロッキングエラーは無視）',
   'command completes successfully': 'コマンドが正常に完了',
@@ -543,20 +583,28 @@ export default {
   'Resume a previous session': '前のセッションを再開する',
   'Fork the current conversation into a new session':
     '現在の会話を新しいセッションに分岐する',
+  'Spawn a background agent that inherits the full conversation':
+    '会話全体を引き継ぐバックグラウンドエージェントを起動する',
+  'Please provide a directive. Usage: /fork <directive>':
+    '指示を入力してください。使用法: /fork <指示>',
+  'Cannot fork while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
+    '応答またはツール呼び出しの処理中はフォークできません。完了するか、保留中のツール呼び出しを解決してください。',
+  'Cannot fork before the first conversation turn.':
+    '最初の会話ターンの前にはフォークできません。',
+  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
+    '/fork コマンドには fork フィーチャーゲートが必要です。有効にするには HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 を設定してください。',
+  'The agent tool is unavailable; cannot fork.':
+    'エージェントツールを利用できないため、フォークできません。',
+  'Failed to launch fork: {{error}}': 'フォークの起動に失敗しました: {{error}}',
+  'User launched a background fork via /fork: {{directive}}':
+    'ユーザーが /fork でバックグラウンドフォークを起動しました: {{directive}}',
+  'Forked into a background agent. It inherits this conversation and runs without blocking — track it in the background tasks panel; it reports back when done.':
+    'バックグラウンドエージェントにフォークしました。この会話を引き継ぎ、ブロックせずに実行されます — バックグラウンドタスクパネルで追跡でき、完了時に報告します。',
   'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
     '応答またはツール呼び出しの処理中は分岐できません。完了するか、保留中のツール呼び出しを解決してください。',
   'No conversation to branch.': '分岐できる会話がありません。',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     'ツール呼び出しを復元します。これにより、会話とファイルの履歴はそのツール呼び出しが提案された時点の状態に戻ります',
-  'Navigate and search session history': 'セッション履歴のナビゲートと検索',
-  'Full-text search across all history items (entire session)':
-    'すべての履歴項目の全文検索（セッション全体）',
-  'Load the previous 2 000 history items': '前の2 000件の履歴項目を読み込む',
-  'Load the next 2 000 history items': '次の2 000件の履歴項目を読み込む',
-  'Show current history window statistics': '現在の履歴ウィンドウの統計を表示',
-  'Jump to a specific item index in history':
-    '履歴内の特定の項目インデックスにジャンプ',
-  'Full-text search across all history items': 'すべての履歴項目の全文検索',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'ターミナルの種類を検出できませんでした。サポートされているターミナル: VS Code、Cursor、Windsurf、Trae',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -587,12 +635,13 @@ export default {
     '追加のUI言語パックをリクエストするには、GitHub で Issue を作成してください',
   'Available options:': '使用可能なオプション:',
   'Set UI language to {{name}}': 'UI言語を {{name}} に設定',
-  '{{mode}} mode': '{{mode}}モード',
   'Analyze only, do not modify files or execute commands':
     '分析のみ、ファイルの変更やコマンドの実行はしません',
   'Require approval for file edits or shell commands':
     'ファイル編集やシェルコマンドには承認が必要',
   'Automatically approve file edits': 'ファイル編集を自動承認',
+  'Use classifier to automatically approve safe tool calls':
+    '分類器を使用して安全なツール呼び出しを自動承認',
   'Automatically approve all tools': 'すべてのツールを自動承認',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
     'ワークスペースの承認モードが存在し、優先されます。ユーザーレベルの変更は効果がありません',
@@ -869,8 +918,7 @@ export default {
     'OAuthトークンが期限切れです({{seconds}}秒以上)。認証方法を再度選択してください',
   'Press any key to return to authentication type selection.':
     '認証タイプ選択に戻るには任意のキーを押してください',
-  'Waiting for HopCode OAuth authentication...':
-    'HopCode OAuth認証を待っています...',
+  'Waiting for HopCode OAuth authentication...': 'HopCode OAuth認証を待っています...',
   'Authentication timed out. Please try again.':
     '認証がタイムアウトしました。再度お試しください',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -916,8 +964,7 @@ export default {
   'From project settings': 'プロジェクト設定から',
   'From session': 'セッションから',
   'Project settings': 'プロジェクト設定',
-  'Checked in at .hopcode/settings.json':
-    '.hopcode/settings.json にチェックイン',
+  'Checked in at .hopcode/settings.json': '.hopcode/settings.json にチェックイン',
   'User settings': 'ユーザー設定',
   'Saved in at ~/.hopcode/settings.json': '~/.hopcode/settings.json に保存',
   'Add a new rule…': '新しいルールを追加…',
@@ -1094,6 +1141,21 @@ export default {
     'このセッションではツール呼び出しが行われていません',
   'Session start time is unavailable, cannot calculate stats.':
     'セッション開始時刻が利用できないため、統計を計算できません',
+  Activity: 'アクティビティ',
+  Efficiency: '効率',
+  Today: '今日',
+  'Token Trend': 'Token トレンド',
+  'Cache Hit Rate': 'キャッシュヒット率',
+  'Tool Success': 'ツール成功率',
+  'Tool Leaderboard': 'ツールランキング',
+  Time: '時間',
+  Success: '成功率',
+  Cache: 'キャッシュ',
+  Latency: 'レイテンシ',
+  'Code Impact': 'コード変更',
+  net: '純増',
+  streak: '連続',
+  best: '最長',
   // Loading
   'Waiting for user confirmation...': 'ユーザーの確認を待っています...',
   // Witty Loading Phrases
@@ -1224,8 +1286,7 @@ export default {
   'API key for Coding Plan': 'Coding Plan の API Key',
   'Show current authentication status': '現在の認証ステータスを表示',
   'Authentication completed successfully.': '認証が正常に完了しました。',
-  'Starting HopCode OAuth authentication...':
-    'HopCode OAuth 認証を開始しています...',
+  'Starting HopCode OAuth authentication...': 'HopCode OAuth 認証を開始しています...',
   'Successfully authenticated with HopCode OAuth.':
     'HopCode OAuth での認証に成功しました。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
@@ -1248,11 +1309,11 @@ export default {
     '⚠️  認証方法が設定されていません。\n',
   'Run one of the following commands to get started:\n':
     '以下のコマンドのいずれかを実行して開始してください:\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - HopCode OAuth で認証（終了）',
+  '  qwen auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  qwen auth hopcode-oauth     - HopCode OAuth で認証（終了）',
   'Or simply run:': 'または以下を実行:',
-  '  hopcode auth                - Interactive authentication setup\n':
-    '  hopcode auth                - インタラクティブ認証セットアップ\n',
+  '  qwen auth                - Interactive authentication setup\n':
+    '  qwen auth                - インタラクティブ認証セットアップ\n',
   '✓ Authentication Method: HopCode OAuth': '✓ 認証方法: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  タイプ: 無料枠（2026-04-15 終了）',
@@ -1270,8 +1331,8 @@ export default {
     '⚠️  認証方法: Alibaba Cloud Coding Plan（不完全）',
   '  Issue: API key not found in environment or settings\n':
     '  問題: 環境変数または設定に API Key が見つかりません\n',
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  `hopcode auth coding-plan` を実行して再設定してください。\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  `qwen auth coding-plan` を実行して再設定してください。\n',
   '✓ Authentication Method: {{type}}': '✓ 認証方法: {{type}}',
   '  Status: Configured\n': '  ステータス: 設定済み\n',
   'Failed to check authentication status: {{error}}':
@@ -1341,8 +1402,8 @@ export default {
   'Show Line Numbers in Code': 'コードの行番号を表示',
   'Show Welcome Back Dialog': 'おかえりダイアログを表示',
   'Enable User Feedback': 'ユーザーフィードバックを有効化',
-  'How is HopCode doing this session? (optional)':
-    'このセッションでの HopCode の調子はどうですか？（任意）',
+  'How is Qwen doing this session? (optional)':
+    'このセッションでの Qwen の調子はどうですか？（任意）',
   'Interactive Shell (PTY)': '対話型シェル (PTY)',
   'Select Editor': 'エディタを選択',
   'Editor Preference': 'エディタ設定',
@@ -1455,7 +1516,7 @@ export default {
 
   // === Missing key backfill ===
   Status: 'ステータス',
-  HopCode: 'HopCode',
+  'HopCode': 'HopCode',
   Runtime: 'ランタイム',
   OS: 'OS',
   Auth: '認証',
@@ -1680,4 +1741,40 @@ export default {
   'Attribution: commit': 'コミットの帰属表示',
   '中国 (China)': '中国',
   '中国 (China) - 阿里云百炼': '中国 - 阿里云百炼',
+
+  // Stats Dashboard — Category 2 (missing from ja)
+  'Activity Heatmap': 'アクティビティヒートマップ',
+  Less: '少',
+  More: '多',
+  Sessions: 'セッション数',
+  Duration: '所要時間',
+  Projects: 'プロジェクト',
+  'Loading stats...': '統計を読み込み中...',
+  '(no data)': '(データなし)',
+  d: '日',
+  h: '時',
+  m: '分',
+  Input: '入力',
+  Models: 'モデル',
+  'All time': '全期間',
+  'Last 7 days': '過去 7 日間',
+  'Last 30 days': '過去 30 日間',
+  'Show usage statistics dashboard.': '使用統計ダッシュボードを表示する。',
+
+  // Stats Dashboard — keyboard hints (not translated)
+  'tab \xB7 esc': 'tab \xB7 esc',
+  'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc':
+    'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc',
+  'tab \xB7 r dates \xB7 esc': 'tab \xB7 r dates \xB7 esc',
+
+  // Stats Dashboard — missing labels
+  'API Requests': 'APIリクエスト',
+  'Tool Calls': 'ツール呼び出し',
+  'Success rate': '成功率',
+  'Code Changes': 'コード変更',
+  Tool: 'ツール',
+  reqs: 'リクエスト',
+  in: '入力',
+  out: '出力',
+  'In/Out': '入力/出力',
 };

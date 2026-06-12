@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { Storage } from '@hoptrendy/hopcode-core';
+import { Storage } from '@hopcode/hopcode-core';
 
 describe('bundled locale fallback', () => {
   beforeEach(() => {

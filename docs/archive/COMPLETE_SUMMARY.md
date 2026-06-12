@@ -133,7 +133,7 @@ Display:     'Inter', SemiBold (600)
 | Element           | Before        | After             | Status |
 | ----------------- | ------------- | ----------------- | ------ |
 | **Project Name**  | HopCode       | HopCode           | ✅     |
-| **NPM Scope**     | @hopcode/\*   | @hoptrendy/\*     | ✅     |
+| **NPM Scope**     | @hopcode/\*   | @hopcode/\*     | ✅     |
 | **CLI Command**   | qwen          | hopcode           | ✅     |
 | **Config Dir**    | .hopcode/     | .hopcode/         | ✅     |
 | **Env Vars**      | QWEN*CODE*\*  | HOPCODE\_\*       | ✅     |
@@ -149,7 +149,7 @@ Display:     'Inter', SemiBold (600)
 
 ```json
 {
-  "name": "@hoptrendy/hopcode",  ✅
+  "name": "@hopcode/hopcode",  ✅
   "repository": "TaimoorSiddiquiOfficial/HopCode",  ✅
   "sandboxImageUri": "ghcr.io/TaimoorSiddiquiOfficial/HopCode:0.14.5"  ✅
 }

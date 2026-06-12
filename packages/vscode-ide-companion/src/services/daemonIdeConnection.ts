@@ -20,7 +20,7 @@ import type {
 import {
   DaemonClient,
   DaemonSessionClient as SdkDaemonSessionClient,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 import type { AskUserQuestionRequest } from '../types/acpTypes.js';
 
 export interface DaemonIdeEvent {

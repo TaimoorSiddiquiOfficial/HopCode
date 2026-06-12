@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { ApprovalMode, type Config } from '@hoptrendy/hopcode-core';
+import { ApprovalMode, type Config } from '@hopcode/hopcode-core';
 import {
   HEADLESS_IZN_NO_SANDBOX_WARNING,
   getHeadlessIznSafetyWarning,

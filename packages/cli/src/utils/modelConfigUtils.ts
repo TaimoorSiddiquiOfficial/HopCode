@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,8 @@ import {
   resolveModelConfig,
   type ModelConfigSourcesInput,
   type ProviderModelConfig,
-} from '@hoptrendy/hopcode-core';
+  stripRuntimeSnapshotPrefix,
+} from '@hopcode/hopcode-core';
 import type { Settings } from '../config/settings.js';
 
 /**
@@ -25,7 +26,6 @@ const AUTH_ENV_MODEL_VARS: Record<AuthType, string[]> = {
   [AuthType.USE_VERTEX_AI]: ['GOOGLE_MODEL'],
   [AuthType.USE_ANTHROPIC]: ['ANTHROPIC_MODEL'],
   [AuthType.HOPCODE_OAUTH]: [],
-  [AuthType.HOPCODE_OAUTH_DEPRECATED]: [],
 };
 
 function getIgnoredTopLevelGenerationConfigFields(
@@ -160,7 +160,8 @@ export function resolveCliGenerationConfig(
   if (argv.model) {
     resolvedModel = argv.model;
   } else if (settings.model?.name) {
-    resolvedModel = settings.model.name;
+    // Self-heal configs already corrupted by older builds.
+    resolvedModel = stripRuntimeSnapshotPrefix(settings.model.name);
   } else if (authType && AUTH_ENV_MODEL_VARS[authType]) {
     // Only check env vars for the current auth type
     for (const envVar of AUTH_ENV_MODEL_VARS[authType]) {
@@ -213,7 +214,9 @@ export function resolveCliGenerationConfig(
       baseUrl: argv.openaiBaseUrl,
     },
     settings: {
-      model: settings.model?.name,
+      model: settings.model?.name
+        ? stripRuntimeSnapshotPrefix(settings.model.name)
+        : undefined,
       apiKey: settings.security?.auth?.apiKey,
       baseUrl: settings.security?.auth?.baseUrl,
       generationConfig: settings.model?.generationConfig as

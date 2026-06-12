@@ -31,16 +31,18 @@ These commands help you save, restore, and summarize work progress.
 
 Commands for adjusting interface appearance and work environment.
 
-| Command      | Description                                                                                                                                                                       | Usage Examples                |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `/clear`     | Clear terminal screen content                                                                                                                                                     | `/clear` (shortcut: `Ctrl+L`) |
-| `/context`   | Show context window usage breakdown                                                                                                                                               | `/context`                    |
-| → `detail`   | Show per-item context usage breakdown                                                                                                                                             | `/context detail`             |
-| `/diff`      | Open an interactive diff viewer showing uncommitted changes and per-turn diffs. Use ←/→ to switch between current git diff and individual conversation turns, ↑/↓ to browse files | `/diff`                       |
-| `/theme`     | Change HopCode visual theme                                                                                                                                                     | `/theme`                      |
-| `/vim`       | Turn input area Vim editing mode on/off                                                                                                                                           | `/vim`                        |
-| `/directory` | Manage multi-directory support workspace                                                                                                                                          | `/dir add ./src,./tests`      |
-| `/editor`    | Open dialog to select supported editor                                                                                                                                            | `/editor`                     |
+| Command              | Description                                                                                                                                                                       | Usage Examples                          |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `/clear`             | Clear terminal screen content                                                                                                                                                     | `/clear` (shortcut: `Ctrl+L`)           |
+| `/context`           | Show context window usage breakdown                                                                                                                                               | `/context`                              |
+| → `detail`           | Show per-item context usage breakdown                                                                                                                                             | `/context detail`                       |
+| `/diff`              | Open an interactive diff viewer showing uncommitted changes and per-turn diffs. Use ←/→ to switch between current git diff and individual conversation turns, ↑/↓ to browse files | `/diff`                                 |
+| `/theme`             | Change HopCode visual theme                                                                                                                                                     | `/theme`                                |
+| `/vim`               | Turn input area Vim editing mode on/off                                                                                                                                           | `/vim`                                  |
+| `/directory`         | Manage multi-directory support workspace                                                                                                                                          | `/dir add ./src,./tests`                |
+| `/editor`            | Open dialog to select supported editor                                                                                                                                            | `/editor`                               |
+| `/statusline`        | Open interactive [status line](./status-line.md) preset dialog                                                                                                                    | `/statusline`                           |
+| `/statusline <text>` | Generate a command-mode [status line](./status-line.md) via agent                                                                                                                 | `/statusline show model and git branch` |
 
 ### 1.3 Language Settings
 
@@ -69,9 +71,9 @@ Commands for managing AI tools and models.
 | →`plan`          | Analysis only, no execution                   | Secure review                                 |
 | →`default`       | Require approval for edits                    | Daily use                                     |
 | →`auto-edit`     | Automatically approve edits                   | Trusted environment                           |
-| →`izn`          | Automatically approve all                     | Quick prototyping                             |
+| →`yolo`          | Automatically approve all                     | Quick prototyping                             |
 | `/model`         | Switch model used in current session          | `/model`                                      |
-| `/model --fast`  | Set a lighter model for prompt suggestions    | `/model --fast hopcode3-coder-flash`             |
+| `/model --fast`  | Set a lighter model for prompt suggestions    | `/model --fast qwen3-coder-flash`             |
 | `/extensions`    | List all active extensions in current session | `/extensions`                                 |
 | `/memory`        | Open the Memory Manager dialog                | `/memory`                                     |
 | `/remember`      | Save a durable memory                         | `/remember Prefer terse responses`            |
@@ -206,7 +208,7 @@ this setting.
 > [!tip]
 >
 > Configure a fast model via `/model --fast <model>` (e.g.
-> `hopcode3-coder-flash`) to make `/recap` fast and cheap. Set
+> `qwen3-coder-flash`) to make `/recap` fast and cheap. Set
 > `general.showSessionRecap` to `false` to opt out of the auto-trigger
 > while keeping the manual command available.
 
@@ -223,7 +225,7 @@ In interactive mode, `/diff` opens a dialog with a **source picker** along the t
 
 The file list displays per-file stats (lines added/removed) with tags for special states (`new`, `deleted`, `untracked`, `binary`, `truncated`, `oversized`). Press Enter on a file to view its inline diff with syntax-highlighted hunks.
 
-Per-turn diffs require [file checkpointing](./checkpointing) to be enabled (on by default in interactive mode). When file checkpointing is off, only the "Current" source is available.
+Per-turn diffs require file checkpointing to be enabled (on by default in interactive mode). When file checkpointing is off, only the "Current" source is available.
 
 **Keyboard shortcuts:**
 
@@ -266,17 +268,19 @@ In headless (`--prompt`) or non-interactive contexts, `/diff` prints a plain-tex
 
 Commands for obtaining information and performing system settings.
 
-| Command         | Description                                     | Usage Examples                   |
-| --------------- | ----------------------------------------------- | -------------------------------- |
-| `/help`         | Display help information for available commands | `/help` or `/?`                  |
-| `/status`       | Display version information                     | `/status` or `/about`            |
-| `/status paths` | Display current session file and log paths      | `/status paths`                  |
-| `/stats`        | Display detailed statistics for current session | `/stats`                         |
-| `/settings`     | Open settings editor                            | `/settings`                      |
-| `/auth`         | Change authentication method                    | `/auth`                          |
-| `/bug`          | Submit issue about HopCode                    | `/bug Button click unresponsive` |
-| `/copy`         | Copy last output content to clipboard           | `/copy`                          |
-| `/quit`         | Exit HopCode immediately                      | `/quit` or `/exit`               |
+| Command         | Description                                                                                                                                                                                                                                                                                     | Usage Examples                   |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `/help`         | Display help information for available commands                                                                                                                                                                                                                                                 | `/help` or `/?`                  |
+| `/status`       | Display version information                                                                                                                                                                                                                                                                     | `/status` or `/about`            |
+| `/status paths` | Display current session file and log paths                                                                                                                                                                                                                                                      | `/status paths`                  |
+| `/stats`        | Open interactive usage statistics dashboard with three tabs: Session (live metrics), Activity (heatmap, token trend, project ranking), and Efficiency (cache rate, tool leaderboard, model comparison). Use `tab` to switch tabs, `r` to cycle time ranges, `←→` to pan months, `esc` to close. | `/stats`                         |
+| `/stats model`  | Show per-model token breakdown and estimated cost                                                                                                                                                                                                                                               | `/stats model`                   |
+| `/stats tools`  | Show per-tool call counts                                                                                                                                                                                                                                                                       | `/stats tools`                   |
+| `/settings`     | Open settings editor                                                                                                                                                                                                                                                                            | `/settings`                      |
+| `/auth`         | Change authentication method                                                                                                                                                                                                                                                                    | `/auth`                          |
+| `/bug`          | Submit issue about HopCode                                                                                                                                                                                                                                                                    | `/bug Button click unresponsive` |
+| `/copy`         | Copy AI output to clipboard (`/copy N` = Nth-last AI message)                                                                                                                                                                                                                                   | `/copy` or `/copy 2`             |
+| `/quit`         | Exit HopCode immediately                                                                                                                                                                                                                                                                      | `/quit` or `/exit`               |
 
 ### 1.10 Common Shortcuts
 
@@ -299,7 +303,7 @@ Use `/auth` inside a HopCode session to configure authentication. Use `/doctor` 
 
 > [!note]
 >
-> The standalone `hopcode auth` CLI command has been removed. Legacy invocations such as `hopcode auth status` print a removal notice with migration guidance. See the [Authentication](../configuration/auth) page for full details.
+> The standalone `qwen auth` CLI command has been removed. Legacy invocations such as `qwen auth status` print a removal notice with migration guidance. See the [Authentication](../configuration/auth) page for full details.
 
 ## 2. @ Commands (Introducing Files)
 

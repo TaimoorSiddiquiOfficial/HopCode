@@ -8,7 +8,7 @@ import {
   MAIN_SOURCE,
   type ModelMetrics,
   type ModelMetricsCore,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 /**
  * One entry in the flattened view of the `models` metric map. Each entry

@@ -1,14 +1,15 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import type React from 'react';
 import { Text } from 'ink';
 import { theme } from '../semantic-colors.js';
-import { ApprovalMode } from '@hoptrendy/hopcode-core';
+import { ApprovalMode } from '@hopcode/hopcode-core';
 import { t } from '../../i18n/index.js';
+import { getApprovalModeIndicatorColor } from './approvalModeVisuals.js';
 
 interface AutoAcceptIndicatorProps {
   approvalMode: ApprovalMode;
@@ -17,7 +18,7 @@ interface AutoAcceptIndicatorProps {
 export const AutoAcceptIndicator: React.FC<AutoAcceptIndicatorProps> = ({
   approvalMode,
 }) => {
-  let textColor = '';
+  const textColor = getApprovalModeIndicatorColor(approvalMode) ?? '';
   let textContent = '';
   let subText = '';
 
@@ -28,23 +29,19 @@ export const AutoAcceptIndicator: React.FC<AutoAcceptIndicatorProps> = ({
 
   switch (approvalMode) {
     case ApprovalMode.PLAN:
-      textColor = theme.status.success;
       textContent = t('plan mode');
       subText = cycleText;
       break;
     case ApprovalMode.AUTO_EDIT:
-      textColor = theme.status.warning;
       textContent = t('auto-accept edits');
       subText = cycleText;
       break;
     case ApprovalMode.AUTO:
-      textColor = theme.status.warning;
       textContent = t('auto mode (classifier-evaluated)');
       subText = cycleText;
       break;
     case ApprovalMode.IZN:
-      textColor = theme.status.error;
-      textContent = t('Izn mode');
+      textContent = t('IZN mode');
       subText = cycleText;
       break;
     case ApprovalMode.DEFAULT:

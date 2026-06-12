@@ -1,17 +1,19 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { cleanup } from 'ink-testing-library';
+import { HookEventName } from '@hopcode/hopcode-core';
 import { HooksManagementDialog } from './HooksManagementDialog.js';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { useConfig } from '../../contexts/ConfigContext.js';
 import { loadSettings, SettingScope } from '../../../config/settings.js';
 import type { Key } from '../../contexts/KeypressContext.js';
+import { DISPLAY_HOOK_EVENTS } from './constants.js';
 
 vi.mock('../../hooks/useKeypress.js', () => ({
   useKeypress: vi.fn(),
@@ -119,9 +121,9 @@ vi.mock('../../semantic-colors.js', () => ({
   },
 }));
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     createDebugLogger: vi.fn(() => ({
@@ -154,14 +156,9 @@ function mockSettingsHooks(userHooks: Record<string, unknown>): void {
 }
 
 function pressKey(name: string, sequence = ''): void {
-  expect(keypressHandler).toBeDefined();
-  keypressHandler!(createKey(name, sequence));
-}
-
-async function waitForNextKeypressHandler(previousCalls: number): Promise<void> {
-  await vi.waitFor(() => {
-    expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(previousCalls);
-  });
+  const latestHandler = mockedUseKeypress.mock.calls.at(-1)?.[0];
+  expect(latestHandler).toBeDefined();
+  latestHandler!(createKey(name, sequence));
 }
 
 describe('HooksManagementDialog', () => {
@@ -250,26 +247,17 @@ describe('HooksManagementDialog', () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
     });
-    await vi.waitFor(() => {
-      expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(1);
-    });
 
-    let handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('return');
-    await waitForNextKeypressHandler(handlerCalls);
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain('PreToolUse - Matchers');
+      expect(lastFrame()).toContain('[User] Read');
     });
 
-    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('down');
-    await waitForNextKeypressHandler(handlerCalls);
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [User] Bash');
     });
-    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('return');
-    await waitForNextKeypressHandler(handlerCalls);
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('PreToolUse - Matcher: Bash');
@@ -309,7 +297,7 @@ describe('HooksManagementDialog', () => {
 
     pressKey('return');
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain('PreToolUse - Matchers');
+      expect(lastFrame()).toContain('[User] Read');
     });
     pressKey('down');
     await vi.waitFor(() => {
@@ -351,35 +339,28 @@ describe('HooksManagementDialog', () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hooks');
     });
-    await vi.waitFor(() => {
-      expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(1);
-    });
 
-    for (let i = 0; i < 6; i++) {
-      const handlerCalls = mockedUseKeypress.mock.calls.length;
+    const stopEventIndex = DISPLAY_HOOK_EVENTS.indexOf(HookEventName.Stop);
+    for (let i = 0; i < stopEventIndex; i++) {
       pressKey('down');
-      await waitForNextKeypressHandler(handlerCalls);
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain(`❯  ${i + 2}.`);
+      });
     }
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain('❯  7. Stop');
+      expect(lastFrame()).toContain(`❯  ${stopEventIndex + 1}. Stop`);
     });
-    let handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('return');
-    await waitForNextKeypressHandler(handlerCalls);
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Stop');
       expect(lastFrame()).toContain('echo stop one');
     });
 
-    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('down');
-    await waitForNextKeypressHandler(handlerCalls);
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('❯ 2. [command] echo stop two');
     });
-    handlerCalls = mockedUseKeypress.mock.calls.length;
     pressKey('return');
-    await waitForNextKeypressHandler(handlerCalls);
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('Hook details');

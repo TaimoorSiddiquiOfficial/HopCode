@@ -10,13 +10,13 @@ import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import * as doctorChecksModule from '../../utils/doctorChecks.js';
 import * as memoryDiagnosticsModule from '../../utils/memoryDiagnostics.js';
-import { collectMemoryDiagnostics } from '@hoptrendy/hopcode-core';
+import { collectMemoryDiagnostics } from '@hopcode/hopcode-core';
 import type { DoctorCheckResult } from '../types.js';
 
 vi.mock('../../utils/doctorChecks.js');
 vi.mock('../../utils/memoryDiagnostics.js');
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@hoptrendy/hopcode-core')>()),
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@hopcode/hopcode-core')>()),
   collectMemoryDiagnostics: vi.fn(),
 }));
 
@@ -177,10 +177,18 @@ describe('doctorCommand', () => {
   it('should complete memory subcommand names', async () => {
     await expect(doctorCommand.completion!(mockContext, '')).resolves.toEqual([
       'memory',
+      'cpu-profile',
+      'rollback',
     ]);
     await expect(
       doctorCommand.completion!(mockContext, 'mem'),
     ).resolves.toEqual(['memory']);
+    await expect(
+      doctorCommand.completion!(mockContext, 'cpu'),
+    ).resolves.toEqual(['cpu-profile']);
+    await expect(
+      doctorCommand.completion!(mockContext, 'roll'),
+    ).resolves.toEqual(['rollback']);
     await expect(doctorCommand.completion!(mockContext, 'x')).resolves.toEqual(
       [],
     );
@@ -1049,6 +1057,8 @@ describe('doctorCommand', () => {
   });
 
   it('should advertise the memory subcommand on the parent doctor argumentHint', () => {
-    expect(doctorCommand.argumentHint).toBe('[memory] [--sample] [--snapshot]');
+    expect(doctorCommand.argumentHint).toBe(
+      '[memory|cpu-profile|rollback] [--sample] [--snapshot] [--duration]',
+    );
   });
 });

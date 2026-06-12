@@ -14,7 +14,7 @@ import type {
   ToolResultDisplay,
   SlashCommandRecordPayload,
   AtCommandRecordPayload,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type {
   HistoryItem,
   HistoryItemWithoutId,

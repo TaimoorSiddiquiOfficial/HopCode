@@ -446,7 +446,7 @@ describe('openrouterOAuth', () => {
             },
           },
           {
-            id: 'qwen/qwen3-coder:free',
+            id: 'hopcode/qwen3-coder:free',
             name: 'Qwen3 Coder',
             architecture: {
               input_modalities: ['text'],
@@ -490,7 +490,7 @@ describe('openrouterOAuth', () => {
     );
     expect(models).toEqual([
       {
-        id: 'qwen/qwen3-coder:free',
+        id: 'hopcode/qwen3-coder:free',
         name: 'OpenRouter · Qwen3 Coder',
         baseUrl: 'https://openrouter.ai/api/v1',
         envKey: 'OPENROUTER_API_KEY',
@@ -521,7 +521,7 @@ describe('openrouterOAuth', () => {
   it('selects verified free OpenRouter models', () => {
     const recommended = selectRecommendedOpenRouterModels([
       {
-        id: 'qwen/qwen3-max',
+        id: 'hopcode/qwen3-max',
         name: 'OpenRouter · Qwen3 Max',
         baseUrl: 'https://openrouter.ai/api/v1',
         envKey: 'OPENROUTER_API_KEY',

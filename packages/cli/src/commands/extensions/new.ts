@@ -7,7 +7,7 @@
 import { access, cp, mkdir, readdir, writeFile } from 'node:fs/promises';
 import { join, basename } from 'node:path';
 import type { CommandModule } from 'yargs';
-import { resolveBundleDir } from '@hoptrendy/hopcode-core';
+import { resolveBundleDir } from '@hopcode/hopcode-core';
 import { getErrorMessage } from '../../utils/errors.js';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 

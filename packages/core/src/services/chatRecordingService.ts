@@ -207,12 +207,12 @@ function autoTitleDisabledByEnv(): boolean {
 
 /**
  * A single record stored in the JSONL file.
- * Forms a tree structure via uuid/parentUuid for future checkpointing support.
+ * Forms a tree structure via uuid/parentUuid for future conversation branching support.
  *
  * Each record is self-contained with full metadata, enabling:
  * - Append-only writes (crash-safe)
  * - Tree reconstruction by following parentUuid chain
- * - Future checkpointing by branching from any historical record
+ * - Future conversation branching by forking from any historical record
  */
 export interface ChatRecord {
   /** Unique identifier for this logical message */
@@ -453,7 +453,7 @@ export interface RewindRecordPayload {
  * Each record has uuid/parentUuid fields enabling:
  * - Append-only writes (never rewrite the file)
  * - Linear history reconstruction
- * - Future checkpointing (branch from any historical point)
+ * - Future conversation branching (fork from any historical point)
  *
  * File location: ~/.hopcode/tmp/<project_id>/chats/
  *
@@ -1017,9 +1017,15 @@ export class ChatRecordingService {
     // Headless/one-shot CLI flows (`hopcode -p "…"`, cron, CI scripts) run a
     // single prompt and throw the session away. Spending fast-model tokens
     // on a title no one will ever resume is pure waste; skip entirely.
-    // Checked before `getFastModel()` because it's strictly cheaper (a bool
-    // field read vs. a method that looks up available models).
-    if (!this.config.isInteractive()) return;
+    // Daemon (ACP) sessions are long-lived and user-resumable, so they
+    // DO need auto-titles even though `isInteractive()` returns false
+    // (the ACP child is spawned with pipe stdio, not a TTY).
+    if (
+      !this.config.isInteractive() &&
+      !this.config.getExperimentalZedIntegration()
+    ) {
+      return;
+    }
     const fastModel = this.config.getFastModel();
     if (!fastModel) return;
 

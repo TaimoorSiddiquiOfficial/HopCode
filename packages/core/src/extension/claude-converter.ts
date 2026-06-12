@@ -347,6 +347,7 @@ export function convertClaudeToHopCodeConfig(
   return {
     name: claudeConfig.name,
     version: claudeConfig.version,
+    description: claudeConfig.description,
     mcpServers,
     lspServers: claudeConfig.lspServers,
     hooks, // Assign the properly typed hooks variable

@@ -367,7 +367,7 @@ The connection then closes.
 | Path                                                    | Purpose                                                               |
 | ------------------------------------------------------- | --------------------------------------------------------------------- |
 | `packages/cli/src/commands/serve.ts`                    | yargs command + flag schema                                           |
-| `packages/cli/src/serve/runQwenServe.ts`                | listener lifecycle + signal handling                                  |
+| `packages/cli/src/serve/runHopCodeServe.ts`                | listener lifecycle + signal handling                                  |
 | `packages/cli/src/serve/server.ts`                      | Express routes + middleware                                           |
 | `packages/cli/src/serve/auth.ts`                        | bearer + Host allowlist + CORS deny                                   |
 | `packages/cli/src/serve/httpAcpBridge.ts`               | spawn-or-attach + per-session FIFO + permission registry              |

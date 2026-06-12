@@ -22,7 +22,7 @@ import {
   isSDKSystemMessage,
   type SDKMessage,
   type SDKSystemMessage,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   extractText,

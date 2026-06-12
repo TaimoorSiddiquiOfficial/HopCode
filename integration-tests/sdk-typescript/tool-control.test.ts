@@ -18,7 +18,7 @@ import {
   isSDKResultMessage,
   type SDKMessage,
   type SDKUserMessage,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   extractText,

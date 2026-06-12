@@ -6,7 +6,7 @@
 
 import { render } from 'ink-testing-library';
 import { AnsiOutputText } from './AnsiOutput.js';
-import type { AnsiOutput, AnsiToken } from '@hoptrendy/hopcode-core';
+import type { AnsiOutput, AnsiToken } from '@hopcode/hopcode-core';
 
 // Helper to create a valid AnsiToken with default values
 const createAnsiToken = (overrides: Partial<AnsiToken>): AnsiToken => ({

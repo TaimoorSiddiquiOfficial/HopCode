@@ -13,11 +13,11 @@ import { CommandKind } from './types.js';
 import {
   GitHubDeviceFlowAuth,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type {
   DeviceFlowResponse,
   DeviceFlowTokenResponse,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 // GitHub OAuth App configuration
 const GITHUB_OAUTH_CLIENT_ID = 'Iv23livRiRBTa9cyBnk1';

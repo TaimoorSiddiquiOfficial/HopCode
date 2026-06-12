@@ -1,4 +1,4 @@
-﻿# Telemetry: Custom Resource Attributes + Metric Cardinality Controls
+# Telemetry: Custom Resource Attributes + Metric Cardinality Controls
 
 > 配套 issue: [#4365](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4365)
 > 父 issue: [#3731](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3731)
@@ -70,7 +70,7 @@ const baseMetricDefinition = {
 `packages/core/src/telemetry/config.ts:resolveTelemetrySettings()` 用统一的优先级链：
 
 ```
-argv (highest)  >  QWEN_* env  >  OTEL_* env  >  settings.json (lowest)
+argv (highest)  >  HOPCODE_* env  >  OTEL_* env  >  settings.json (lowest)
 ```
 
 新加项照搬这个 pattern。
@@ -730,7 +730,7 @@ HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true qwen "投资分析"
 | -------------------------- | ------------------------------------------------ | ------------------------------------------------ | -------------------------------------------------- |
 | 标准 OTel env var          | `OTEL_RESOURCE_ATTRIBUTES` / `OTEL_SERVICE_NAME` | ✅ 一致                                          | 标准契约                                           |
 | `OTEL_SERVICE_NAME` 优先级 | 遵守 OTel 规范                                   | ✅ 遵守                                          | spec 明确规定                                      |
-| Cardinality 开关命名       | `OTEL_METRICS_INCLUDE_*`                         | `QWEN_TELEMETRY_METRICS_INCLUDE_*`               | 不污染标准 OTel 命名空间                           |
+| Cardinality 开关命名       | `OTEL_METRICS_INCLUDE_*`                         | `HOPCODE_TELEMETRY_METRICS_INCLUDE_*`               | 不污染标准 OTel 命名空间                           |
 | 开关作用域                 | 仅 metric                                        | ✅ 仅 metric                                     | spans / logs 是 per-event，无 cardinality 爆炸问题 |
 | 默认值                     | 高基数 attribute 默认 false                      | ✅ 默认 false                                    | 安全优先                                           |
 | Per-attribute granularity  | 每 attribute 一个 toggle                         | ✅ 一致                                          | 灵活，符合实际诊断需求                             |

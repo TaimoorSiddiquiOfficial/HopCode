@@ -18,7 +18,7 @@ import type {
   ListSessionsResult,
   SessionListItem,
   SessionService,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   filterSessions,
   SESSION_PAGE_SIZE,

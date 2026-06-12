@@ -11,13 +11,13 @@ import {
   logIdeConnection,
   IdeConnectionEvent,
   IdeConnectionType,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   HOPCODE_COMPANION_EXTENSION_NAME,
   getIdeInstaller,
   IDEConnectionStatus,
   ideContextStore,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import path from 'node:path';
 import type {
   CommandContext,

@@ -10,7 +10,7 @@ import {
   isValidEditorType,
   allowEditorTypeInSandbox,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { useSettings } from '../contexts/SettingsContext.js';
 
 const debugLogger = createDebugLogger('PREFERRED_EDITOR');

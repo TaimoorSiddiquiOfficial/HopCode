@@ -11,7 +11,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCommandCompletion } from './useCommandCompletion.js';
 import type { CommandContext, SlashCommand } from '../commands/types.js';
 import { CommandKind } from '../commands/types.js';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
 import { useEffect } from 'react';
 import type { Suggestion } from '../components/SuggestionsDisplay.js';

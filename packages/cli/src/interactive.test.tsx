@@ -22,8 +22,8 @@ import {
 import type { CliArgs } from './config/config.js';
 import { type LoadedSettings } from './config/settings.js';
 import { appEvents, AppEvent } from './utils/events.js';
-import type { Config } from '@hoptrendy/hopcode-core';
-import { OutputFormat } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
+import { OutputFormat } from '@hopcode/hopcode-core';
 
 const mockWriteStderrLine = vi.hoisted(() => vi.fn());
 
@@ -186,7 +186,7 @@ describe('interactive.tsx main function', () => {
         getIdeMode: () => false,
         getExperimentalZedIntegration: () => false,
         getScreenReader: () => false,
-        getContextMdFileCount: () => 0,
+        getGeminiMdFileCount: () => 0,
         getProjectRoot: () => '/',
         getOutputFormat: () => OutputFormat.TEXT,
         getWarnings: () => [],
@@ -264,7 +264,7 @@ describe('interactive.tsx main function', () => {
       getIdeMode: () => false,
       getExperimentalZedIntegration: () => false,
       getScreenReader: () => false,
-      getContextMdFileCount: () => 0,
+      getGeminiMdFileCount: () => 0,
       getProjectRoot: () => '/',
       getOutputFormat: () => OutputFormat.TEXT,
       getWarnings: () => [],
@@ -439,7 +439,7 @@ describe('interactive.tsx main function', () => {
       getIdeMode: () => false,
       getExperimentalZedIntegration: () => false,
       getScreenReader: () => false,
-      getContextMdFileCount: () => 0,
+      getGeminiMdFileCount: () => 0,
       getProjectRoot: () => '/',
       getInputFormat: () => 'stream-json',
       getContentGeneratorConfig: () => ({ authType: 'test-auth' }),
@@ -564,7 +564,7 @@ describe('interactive.tsx main function kitty protocol', () => {
       getIdeMode: () => false,
       getExperimentalZedIntegration: () => false,
       getScreenReader: () => false,
-      getContextMdFileCount: () => 0,
+      getGeminiMdFileCount: () => 0,
       getWarnings: () => [],
       getModelsConfig: () => ({ getCurrentAuthType: () => null }),
       getUsageStatisticsEnabled: () => true,
@@ -593,7 +593,7 @@ describe('interactive.tsx main function kitty protocol', () => {
       systemPrompt: undefined,
       appendSystemPrompt: undefined,
       query: undefined,
-      izn: undefined,
+      IZN: undefined,
       bare: undefined,
       approvalMode: undefined,
       telemetry: undefined,

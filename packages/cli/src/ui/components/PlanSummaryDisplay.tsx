@@ -8,7 +8,7 @@ import type React from 'react';
 import { Box, Text } from 'ink';
 import { MarkdownDisplay } from '../utils/MarkdownDisplay.js';
 import { Colors } from '../colors.js';
-import type { PlanResultDisplay } from '@hoptrendy/hopcode-core';
+import type { PlanResultDisplay } from '@hopcode/hopcode-core';
 
 interface PlanSummaryDisplayProps {
   data: PlanResultDisplay;

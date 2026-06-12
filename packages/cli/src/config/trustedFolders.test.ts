@@ -9,7 +9,7 @@ import {
   atomicWriteFileSync,
   FatalConfigError,
   ideContextStore,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   describe,
   it,
@@ -54,9 +54,9 @@ vi.mock('strip-json-comments', () => ({
   default: vi.fn((content) => content),
 }));
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     atomicWriteFileSync: vi.fn(),

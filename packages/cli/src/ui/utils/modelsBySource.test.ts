@@ -9,7 +9,7 @@ import {
   MAIN_SOURCE,
   type ModelMetrics,
   type ModelMetricsCore,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { flattenModelsBySource } from './modelsBySource.js';
 
 const emptyCore = (): ModelMetricsCore => ({

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -657,7 +657,7 @@ const catalogs: ProviderCatalog[] = [
             context: '32k',
           },
           {
-            id: 'togetherai/Qwen/Qwen2.5-72B-Instruct-Turbo',
+            id: 'togetherai/hopcode/Qwen2.5-72B-Instruct-Turbo',
             label: 'Qwen 2.5 72B',
             description: 'Alibaba model',
             context: '32k',
@@ -746,7 +746,7 @@ const catalogs: ProviderCatalog[] = [
             context: '32k',
           },
           {
-            id: 'Qwen/Qwen2.5-72B-Instruct',
+            id: 'hopcode/Qwen2.5-72B-Instruct',
             label: 'Qwen 2.5 72B',
             description: 'Alibaba model',
             context: '128k',
@@ -1128,7 +1128,7 @@ const catalogs: ProviderCatalog[] = [
             context: '64k',
           },
           {
-            id: 'qwen/qwen2.5-72b-instruct',
+            id: 'hopcode/qwen2.5-72b-instruct',
             label: 'Qwen 2.5 72B',
             description: 'Alibaba model',
             context: '32k',
@@ -1220,7 +1220,7 @@ const catalogs: ProviderCatalog[] = [
     providerId: 'dashscope',
     categories: [
       {
-        name: 'Qwen',
+        name: 'hopcode',
         models: [
           {
             id: 'qwen-max',

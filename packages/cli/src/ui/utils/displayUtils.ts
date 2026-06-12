@@ -5,7 +5,7 @@
  */
 
 import { theme } from '../semantic-colors.js';
-import { AgentStatus } from '@hoptrendy/hopcode-core';
+import { AgentStatus } from '@hopcode/hopcode-core';
 
 // --- Status Labels ---
 

@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { generateSessionRecap, type Config } from '@hoptrendy/hopcode-core';
+import { generateSessionRecap, type Config } from '@hopcode/hopcode-core';
 import type {
   HistoryItem,
   HistoryItemAwayRecap,

@@ -6,16 +6,16 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getExtensionManager, extensionToOutputString } from './utils.js';
-import type { Extension, ExtensionManager } from '@hoptrendy/hopcode-core';
+import type { Extension, ExtensionManager } from '@hopcode/hopcode-core';
 
 const mockRefreshCache = vi.fn();
 const mockExtensionManagerInstance = {
   refreshCache: mockRefreshCache,
 };
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     ExtensionManager: vi
@@ -60,7 +60,7 @@ describe('getExtensionManager', () => {
   });
 
   it('should use current working directory as workspace', async () => {
-    const { ExtensionManager } = await import('@hoptrendy/hopcode-core');
+    const { ExtensionManager } = await import('@hopcode/hopcode-core');
 
     await getExtensionManager();
 
@@ -136,6 +136,70 @@ describe('extensionToOutputString', () => {
     );
 
     expect(resultWithoutInline).toEqual(resultWithInlineFalse);
+  });
+
+  it('should include description when present', () => {
+    const extension = createMockExtension({
+      config: {
+        name: 'test-extension',
+        version: '1.0.0',
+        description: 'A helpful test extension',
+      },
+    });
+    const result = extensionToOutputString(
+      extension,
+      mockExtensionManager,
+      '/workspace',
+    );
+
+    expect(result).toContain('Description:');
+    expect(result).toContain('A helpful test extension');
+  });
+
+  it('should strip ANSI escape codes from description', () => {
+    const extension = createMockExtension({
+      config: {
+        name: 'test-extension',
+        version: '1.0.0',
+        description: '\x1b[31mMalicious\x1b[0m description',
+      },
+    });
+    const result = extensionToOutputString(
+      extension,
+      mockExtensionManager,
+      '/workspace',
+    );
+
+    expect(result).toContain('Malicious description');
+    expect(result).not.toContain('\x1b[31m');
+  });
+
+  it('should handle non-string description gracefully', () => {
+    const extension = createMockExtension({
+      config: {
+        name: 'test-extension',
+        version: '1.0.0',
+        description: 42,
+      },
+    });
+    const result = extensionToOutputString(
+      extension,
+      mockExtensionManager,
+      '/workspace',
+    );
+
+    expect(result).not.toContain('Description:');
+  });
+
+  it('should not include description line when absent', () => {
+    const extension = createMockExtension();
+    const result = extensionToOutputString(
+      extension,
+      mockExtensionManager,
+      '/workspace',
+    );
+
+    expect(result).not.toContain('Description:');
   });
 
   it('should redact URL credentials in install source output', () => {

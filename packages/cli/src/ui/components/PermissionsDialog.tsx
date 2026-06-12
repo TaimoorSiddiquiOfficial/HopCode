@@ -23,8 +23,8 @@ import type {
   PermissionManager,
   RuleWithSource,
   RuleType,
-} from '@hoptrendy/hopcode-core';
-import { isPathWithinRoot, parseRule } from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
+import { isPathWithinRoot, parseRule } from '@hopcode/hopcode-core';
 
 // ---------------------------------------------------------------------------
 // Types

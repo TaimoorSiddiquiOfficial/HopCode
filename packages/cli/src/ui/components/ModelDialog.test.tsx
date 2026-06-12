@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -12,8 +12,8 @@ import { useKeypress } from '../hooks/useKeypress.js';
 import { DescriptiveRadioButtonSelect } from './shared/DescriptiveRadioButtonSelect.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { SettingsContext } from '../contexts/SettingsContext.js';
-import type { Config } from '@hoptrendy/hopcode-core';
-import { AuthType, DEFAULT_HOPCODE_MODEL } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
+import { AuthType, DEFAULT_HOPCODE_MODEL } from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
 import { getFilteredHopCodeModels } from '../models/availableModels.js';

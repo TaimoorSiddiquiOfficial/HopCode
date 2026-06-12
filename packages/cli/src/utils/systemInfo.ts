@@ -14,7 +14,7 @@ import {
   AuthType,
   createDebugLogger,
   type LspStatusSnapshot,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { formatMemoryUsage } from '../ui/utils/formatters.js';
 import { GIT_COMMIT_INFO } from '../generated/git-commit.js';
 

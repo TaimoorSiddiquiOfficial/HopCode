@@ -428,7 +428,7 @@ describe('DefaultOpenAICompatibleProvider', () => {
 
     it('mirrors reasoning_content into reasoning for Qwen3 assistant history turns without mutating the source request', () => {
       const originalRequest: OpenAI.Chat.ChatCompletionCreateParams = {
-        model: 'Qwen/Qwen3.6-35B-A3B',
+        model: 'hopcode/Qwen3.6-35B-A3B',
         messages: [
           { role: 'user', content: 'First turn' },
           {

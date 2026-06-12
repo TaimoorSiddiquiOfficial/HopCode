@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -31,7 +31,7 @@ import {
   type ArenaSessionErrorEvent,
   type ArenaSessionStartEvent,
   type ArenaSessionUpdateEvent,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   MessageType,
   type ArenaAgentCardData,
@@ -83,7 +83,6 @@ function parseArenaArgs(args: string): {
     task = task.replace(/--models\s+\S+/, '').trim();
   }
 
-  // Strip surrounding quotes from task
   task = task.replace(/^["']|["']$/g, '').trim();
 
   return { models, task };
@@ -195,7 +194,7 @@ function executeArenaCommand(
   // its worktree directory — keeping the parent's would duplicate it.
   let chatHistory;
   try {
-    const fullHistory = config.getGeminiClient().getHistory();
+    const fullHistory = config.getGeminiClient().getChat().getHistoryShallow();
     chatHistory = stripStartupContext(fullHistory);
   } catch {
     debugLogger.debug('Could not retrieve chat history for arena agents');

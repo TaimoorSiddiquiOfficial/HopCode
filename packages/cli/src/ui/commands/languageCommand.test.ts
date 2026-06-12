@@ -58,9 +58,9 @@ vi.mock('node:fs', async (importOriginal) => {
 });
 
 // Mock Storage from core
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     Storage: {
@@ -87,6 +87,8 @@ describe('languageCommand', () => {
       services: {
         config: {
           getModel: vi.fn().mockReturnValue('test-model'),
+          getOutputLanguageFilePath: vi.fn().mockReturnValue(undefined),
+          setOutputLanguageFilePath: vi.fn(),
         },
         settings: {
           merged: {},
@@ -438,6 +440,12 @@ describe('languageCommand', () => {
         'general.outputLanguage',
         'Chinese',
       );
+      // Verify path registration on first-time creation (getOutputLanguageFilePath returned undefined)
+      expect(
+        (mockContext.services.config as unknown as Record<string, unknown>)[
+          'setOutputLanguageFilePath'
+        ],
+      ).toHaveBeenCalledWith(expect.any(String));
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
@@ -461,6 +469,8 @@ describe('languageCommand', () => {
         }
       ).config = {
         getModel: vi.fn().mockReturnValue('test-model'),
+        getOutputLanguageFilePath: vi.fn().mockReturnValue(undefined),
+        setOutputLanguageFilePath: vi.fn(),
         refreshHierarchicalMemory,
         getGeminiClient,
       };
@@ -502,6 +512,8 @@ describe('languageCommand', () => {
         }
       ).config = {
         getModel: vi.fn().mockReturnValue('test-model'),
+        getOutputLanguageFilePath: vi.fn().mockReturnValue(undefined),
+        setOutputLanguageFilePath: vi.fn(),
         refreshHierarchicalMemory,
         // No getGeminiClient — refreshSystemInstruction must not be reached.
       };

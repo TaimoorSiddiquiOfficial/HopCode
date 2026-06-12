@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -129,6 +129,8 @@ interface ParsedLog {
     function_args?: string;
     success?: boolean;
     duration_ms?: number;
+    status?: string;
+    'error.message'?: string;
   };
   scopeMetrics?: {
     metrics: {
@@ -168,8 +170,8 @@ export class TestRig {
     mkdirSync(this.testDir, { recursive: true });
 
     // Create a settings file to point the CLI to the local collector
-    const hopcodedir = join(this.testDir, '.hopcode');
-    mkdirSync(hopcodedir, { recursive: true });
+    const hopcodeDir = join(this.testDir, '.hopcode');
+    mkdirSync(hopcodeDir, { recursive: true });
     // In sandbox mode, use an absolute path for telemetry inside the container
     // The container mounts the test directory at the same path as the host
     const telemetryPath = join(this.testDir, 'telemetry.log'); // Always use test directory for telemetry
@@ -181,11 +183,11 @@ export class TestRig {
         otlpEndpoint: '',
         outfile: telemetryPath,
       },
-      sandbox: env.HOPCODE_SANDBOX !== 'false' ? env['HOPCODE_SANDBOX'] : false,
+      sandbox: env.HOPCODE_SANDBOX !== 'false' ? env.HOPCODE_SANDBOX : false,
       ...options.settings, // Allow tests to override/add settings
     };
     writeFileSync(
-      join(hopcodedir, 'settings.json'),
+      join(hopcodeDir, 'settings.json'),
       JSON.stringify(settings, null, 2),
     );
   }
@@ -207,7 +209,7 @@ export class TestRig {
 
   /**
    * The command and args to use to invoke HopCode CLI. Allows us to switch
-   * between using the bundled cli.js (the default) and using the installed
+   * between using the bundled gemini.js (the default) and using the installed
    * 'hopcode' (used to verify npm bundles).
    */
   private _getCommandAndArgs(extraInitialArgs: string[] = []): {
@@ -229,7 +231,7 @@ export class TestRig {
       | { prompt?: string; stdin?: string; stdinDoesNotEnd?: boolean },
     ...args: string[]
   ): Promise<string> {
-    const { command, initialArgs } = this._getCommandAndArgs(['--izn']);
+    const { command, initialArgs } = this._getCommandAndArgs(['--IZN']);
     const commandArgs = [...initialArgs];
     const execOptions: {
       cwd: string;
@@ -395,15 +397,15 @@ export class TestRig {
     }
 
     child.stdout!.on('data', (data: Buffer) => {
-      stdout += data.toString();
-      if (env['KEEP_OUTPUT'] === 'true' || env['VERBOSE'] === 'true') {
+      stdout += data;
+      if (env.KEEP_OUTPUT === 'true' || env.VERBOSE === 'true') {
         process.stdout.write(data);
       }
     });
 
     child.stderr!.on('data', (data: Buffer) => {
-      stderr += data.toString();
-      if (env['KEEP_OUTPUT'] === 'true' || env['VERBOSE'] === 'true') {
+      stderr += data;
+      if (env.KEEP_OUTPUT === 'true' || env.VERBOSE === 'true') {
         process.stderr.write(data);
       }
     });
@@ -569,6 +571,8 @@ export class TestRig {
         args: string;
         success: boolean;
         duration_ms: number;
+        status?: string;
+        error?: string;
       };
     }[] = [];
 
@@ -715,7 +719,7 @@ export class TestRig {
         logs.push(logData);
       } catch (e) {
         // Skip objects that aren't valid JSON
-        if (env['VERBOSE'] === 'true') {
+        if (env.VERBOSE === 'true') {
           console.error('Failed to parse telemetry object:', e);
         }
       }
@@ -760,6 +764,8 @@ export class TestRig {
         args: string;
         success: boolean;
         duration_ms: number;
+        status?: string;
+        error?: string;
       };
     }[] = [];
 
@@ -769,13 +775,15 @@ export class TestRig {
         logData.attributes &&
         logData.attributes['event.name'] === 'hopcode.tool_call'
       ) {
-        const attrs = logData.attributes as Record<string, unknown>;
+        const toolName = logData.attributes.function_name;
         logs.push({
           toolRequest: {
-            name: attrs['function_name'] as string,
-            args: attrs['function_args'] as string,
-            success: attrs['success'] as boolean,
-            duration_ms: attrs['duration_ms'] as number,
+            name: toolName,
+            args: logData.attributes.function_args,
+            success: logData.attributes.success,
+            duration_ms: logData.attributes.duration_ms,
+            status: logData.attributes.status,
+            error: logData.attributes['error.message'],
           },
         });
       }
@@ -791,8 +799,7 @@ export class TestRig {
         logData.attributes &&
         logData.attributes['event.name'] === 'hopcode.api_request',
     );
-    const result = apiRequests.pop();
-    return result ? (result as unknown as Record<string, unknown>) : null;
+    return apiRequests.pop() || null;
   }
 
   readMetric(metricName: string): Record<string, unknown> | null {
@@ -829,7 +836,7 @@ export class TestRig {
     ptyProcess: pty.IPty;
     promise: Promise<{ exitCode: number; signal?: number; output: string }>;
   } {
-    const { command, initialArgs } = this._getCommandAndArgs(['--izn']);
+    const { command, initialArgs } = this._getCommandAndArgs(['--IZN']);
     const commandArgs = [...initialArgs, ...args];
 
     this._interactiveOutput = ''; // Reset output for the new run
@@ -842,9 +849,9 @@ export class TestRig {
       env: process.env as { [key: string]: string },
     });
 
-    ptyProcess.onData((data: string) => {
+    ptyProcess.onData((data) => {
       this._interactiveOutput += data;
-      if (env['KEEP_OUTPUT'] === 'true' || env['VERBOSE'] === 'true') {
+      if (env.KEEP_OUTPUT === 'true' || env.VERBOSE === 'true') {
         process.stdout.write(data);
       }
     });
@@ -854,11 +861,9 @@ export class TestRig {
       signal?: number;
       output: string;
     }>((resolve) => {
-      ptyProcess.onExit(
-        ({ exitCode, signal }: { exitCode: number; signal?: number }) => {
-          resolve({ exitCode, signal, output: this._interactiveOutput });
-        },
-      );
+      ptyProcess.onExit(({ exitCode, signal }) => {
+        resolve({ exitCode, signal, output: this._interactiveOutput });
+      });
     });
 
     return { ptyProcess, promise };

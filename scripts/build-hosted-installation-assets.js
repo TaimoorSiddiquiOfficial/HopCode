@@ -71,6 +71,22 @@ const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
       name: '--version parser',
       pattern: /ARG_KEY!"=="--version"|"%~1"=="--version"/,
     },
+    {
+      name: '--repair-path parser',
+      pattern: /if \/i "%~1"=="--repair-path"/,
+    },
+    {
+      name: '--path-scope parser',
+      pattern: /if \/i "!ARG_KEY!"=="--path-scope"/,
+    },
+    {
+      name: 'HOPCODE_INSTALL_REPAIR_PATH',
+      pattern: /HOPCODE_INSTALL_REPAIR_PATH/,
+    },
+    {
+      name: 'HOPCODE_INSTALL_PATH_SCOPE',
+      pattern: /HOPCODE_INSTALL_PATH_SCOPE/,
+    },
   ],
   'install-hopcode-standalone.ps1': [
     {
@@ -111,7 +127,7 @@ const HOSTED_INSTALLER_BEHAVIOR_PATTERNS = {
     },
     {
       name: 'PATH cleanup',
-      pattern: /Remove-UserPathEntry/,
+      pattern: /Remove-PathEntryFromAllScopes/,
     },
     {
       name: 'current cmd shim cleanup',

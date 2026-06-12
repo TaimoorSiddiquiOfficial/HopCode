@@ -10,7 +10,7 @@
  */
 
 import type { FC } from 'react';
-import type { ToolCallData } from '@hoptrendy/webui';
+import type { ToolCallData } from '@hopcode/webui';
 import { ToolCallRouter } from './index.js';
 
 // Re-export types from webui for backward compatibility
@@ -18,7 +18,7 @@ export type {
   ToolCallData,
   BaseToolCallProps as ToolCallProps,
   ToolCallContent,
-} from '@hoptrendy/webui';
+} from '@hopcode/webui';
 
 export const ToolCall: FC<{
   toolCall: ToolCallData;

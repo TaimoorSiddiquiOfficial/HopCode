@@ -19,7 +19,7 @@ import {
   type ToolUseBlock,
   type SDKSystemMessage,
   type SDKUserMessage,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   createMCPServer,

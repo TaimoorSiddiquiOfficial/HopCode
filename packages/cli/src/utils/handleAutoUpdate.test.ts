@@ -12,6 +12,7 @@ import type { UpdateObject } from '../ui/utils/updateCheck.js';
 import type { LoadedSettings } from '../config/settings.js';
 import EventEmitter from 'node:events';
 import { handleAutoUpdate, setUpdateHandler } from './handleAutoUpdate.js';
+import { performStandaloneUpdate } from './standalone-update.js';
 import { MessageType } from '../ui/types.js';
 
 vi.mock('./installationInfo.js', async () => {
@@ -21,6 +22,10 @@ vi.mock('./installationInfo.js', async () => {
     getInstallationInfo: vi.fn(),
   };
 });
+
+vi.mock('./standalone-update.js', () => ({
+  performStandaloneUpdate: vi.fn(),
+}));
 
 vi.mock('./updateEventEmitter.js', async () => {
   const { EventEmitter } = await import('node:events');
@@ -38,6 +43,7 @@ interface MockChildProcess extends EventEmitter {
 }
 
 const mockGetInstallationInfo = vi.mocked(getInstallationInfo);
+const mockPerformStandaloneUpdate = vi.mocked(performStandaloneUpdate);
 
 describe('handleAutoUpdate', () => {
   let mockSpawn: Mock;
@@ -55,7 +61,7 @@ describe('handleAutoUpdate', () => {
         latest: '2.0.0',
         current: '1.0.0',
         type: 'major',
-        name: '@hoptrendy/hopcode-cli',
+        name: '@hopcode/hopcode',
       },
       message: 'An update is available!',
     };
@@ -97,9 +103,9 @@ describe('handleAutoUpdate', () => {
     // but if handleAutoUpdate is still called, it should show a manual update message.
     mockSettings.merged.general!.enableAutoUpdate = false;
     mockGetInstallationInfo.mockReturnValue({
-      updateCommand: 'npm i -g @hoptrendy/hopcode-cli@latest',
+      updateCommand: 'npm i -g @hopcode/hopcode@latest',
       updateMessage:
-        'Please run npm i -g @hoptrendy/hopcode-cli@latest to update',
+        'Please run npm i -g @hopcode/hopcode@latest to update',
       isGlobal: true,
       packageManager: PackageManager.NPM,
     });
@@ -109,7 +115,7 @@ describe('handleAutoUpdate', () => {
     // Should still emit update-received with manual update message
     expect(emitSpy).toHaveBeenCalledWith('update-received', {
       message:
-        'An update is available!\nPlease run npm i -g @hoptrendy/hopcode-cli@latest to update',
+        'An update is available!\nPlease run npm i -g @hopcode/hopcode@latest to update',
     });
     // Should NOT spawn update when enableAutoUpdate is false
     expect(mockSpawn).not.toHaveBeenCalled();
@@ -150,7 +156,7 @@ describe('handleAutoUpdate', () => {
 
   it('should attempt to perform an update when conditions are met', async () => {
     mockGetInstallationInfo.mockReturnValue({
-      updateCommand: 'npm i -g @hoptrendy/hopcode-cli@latest',
+      updateCommand: 'npm i -g @hopcode/hopcode@latest',
       updateMessage: 'This is an additional message.',
       isGlobal: false,
       packageManager: PackageManager.NPM,
@@ -169,7 +175,7 @@ describe('handleAutoUpdate', () => {
   it('should emit "update-failed" when the update process fails', async () => {
     await new Promise<void>((resolve) => {
       mockGetInstallationInfo.mockReturnValue({
-        updateCommand: 'npm i -g @hoptrendy/hopcode-cli@latest',
+        updateCommand: 'npm i -g @hopcode/hopcode@latest',
         updateMessage: 'This is an additional message.',
         isGlobal: false,
         packageManager: PackageManager.NPM,
@@ -187,14 +193,14 @@ describe('handleAutoUpdate', () => {
 
     expect(emitSpy).toHaveBeenCalledWith('update-failed', {
       message:
-        'Automatic update failed. Please try updating manually. (command: npm i -g @hoptrendy/hopcode-cli@2.0.0, stderr: An error occurred)',
+        'Automatic update failed. Please try updating manually. (command: npm i -g @hopcode/hopcode@2.0.0, stderr: An error occurred)',
     });
   });
 
   it('should emit "update-failed" when the spawn function throws an error', async () => {
     await new Promise<void>((resolve) => {
       mockGetInstallationInfo.mockReturnValue({
-        updateCommand: 'npm i -g @hoptrendy/hopcode-cli@latest',
+        updateCommand: 'npm i -g @hopcode/hopcode@latest',
         updateMessage: 'This is an additional message.',
         isGlobal: false,
         packageManager: PackageManager.NPM,
@@ -218,7 +224,7 @@ describe('handleAutoUpdate', () => {
   it('should use the "@nightly" tag for nightly updates', async () => {
     mockUpdateInfo.update.latest = '2.0.0-nightly';
     mockGetInstallationInfo.mockReturnValue({
-      updateCommand: 'npm i -g @hoptrendy/hopcode-cli@latest',
+      updateCommand: 'npm i -g @hopcode/hopcode@latest',
       updateMessage: 'This is an additional message.',
       isGlobal: false,
       packageManager: PackageManager.NPM,
@@ -230,7 +236,7 @@ describe('handleAutoUpdate', () => {
       expect.stringMatching(/^(bash|cmd\.exe)$/),
       expect.arrayContaining([
         expect.stringMatching(/^(-c|\/c)$/),
-        'npm i -g @hoptrendy/hopcode-cli@nightly',
+        'npm i -g @hopcode/hopcode@nightly',
       ]),
       {
         stdio: 'pipe',
@@ -241,7 +247,7 @@ describe('handleAutoUpdate', () => {
   it('should emit "update-success" when the update process succeeds', async () => {
     await new Promise<void>((resolve) => {
       mockGetInstallationInfo.mockReturnValue({
-        updateCommand: 'npm i -g @hoptrendy/hopcode-cli@latest',
+        updateCommand: 'npm i -g @hopcode/hopcode@latest',
         updateMessage: 'This is an additional message.',
         isGlobal: false,
         packageManager: PackageManager.NPM,
@@ -258,8 +264,128 @@ describe('handleAutoUpdate', () => {
 
     expect(emitSpy).toHaveBeenCalledWith('update-success', {
       message:
+        'Update successful! Please restart HopCode to use the new version. ' +
+        'Switching model providers before restarting may not work correctly.',
+    });
+  });
+});
+
+describe('handleAutoUpdate — standalone path', () => {
+  let mockSpawn: Mock;
+  let mockUpdateInfo: UpdateObject;
+  let mockSettings: LoadedSettings;
+  let emitSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    mockSpawn = vi.fn();
+    vi.clearAllMocks();
+    emitSpy = vi.spyOn(updateEventEmitter, 'emit');
+    mockUpdateInfo = {
+      update: {
+        latest: '2.0.0',
+        current: '1.0.0',
+        type: 'major',
+        name: '@hopcode/hopcode',
+      },
+      message: 'An update is available!',
+    };
+    mockSettings = {
+      merged: { general: { enableAutoUpdate: true } },
+    } as LoadedSettings;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('calls performStandaloneUpdate and does NOT spawn npm', async () => {
+    mockGetInstallationInfo.mockReturnValue({
+      updateCommand: 'npm i -g @hopcode/hopcode@latest',
+      updateMessage: '',
+      isGlobal: false,
+      isStandalone: true,
+      standaloneDir: '/home/user/.local/lib/hopcode',
+      packageManager: PackageManager.NPM,
+    });
+    mockPerformStandaloneUpdate.mockResolvedValue('done');
+
+    handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', mockSpawn);
+    await vi.waitFor(() =>
+      expect(emitSpy).toHaveBeenCalledWith('update-success', expect.anything()),
+    );
+
+    expect(mockPerformStandaloneUpdate).toHaveBeenCalledWith(
+      '/home/user/.local/lib/hopcode',
+      '2.0.0',
+    );
+    expect(mockSpawn).not.toHaveBeenCalled();
+  });
+
+  it('emits deferred message when result is "deferred"', async () => {
+    mockGetInstallationInfo.mockReturnValue({
+      updateCommand: undefined,
+      updateMessage: '',
+      isGlobal: false,
+      isStandalone: true,
+      standaloneDir: '/home/user/.local/lib/hopcode',
+      packageManager: PackageManager.NPM,
+    });
+    mockPerformStandaloneUpdate.mockResolvedValue('deferred');
+
+    handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', mockSpawn);
+    await vi.waitFor(() =>
+      expect(emitSpy).toHaveBeenCalledWith('update-success', expect.anything()),
+    );
+
+    expect(emitSpy).toHaveBeenCalledWith('update-success', {
+      message:
+        'Update downloaded. It will be applied after you exit this session.',
+    });
+  });
+
+  it('emits "done" success message when result is "done"', async () => {
+    mockGetInstallationInfo.mockReturnValue({
+      updateCommand: undefined,
+      updateMessage: '',
+      isGlobal: false,
+      isStandalone: true,
+      standaloneDir: '/home/user/.local/lib/hopcode',
+      packageManager: PackageManager.NPM,
+    });
+    mockPerformStandaloneUpdate.mockResolvedValue('done');
+
+    handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', mockSpawn);
+    await vi.waitFor(() =>
+      expect(emitSpy).toHaveBeenCalledWith('update-success', expect.anything()),
+    );
+
+    expect(emitSpy).toHaveBeenCalledWith('update-success', {
+      message:
         'Update successful! The new version will be used on your next run.',
     });
+  });
+
+  it('emits update-failed on rejection', async () => {
+    mockGetInstallationInfo.mockReturnValue({
+      updateCommand: undefined,
+      updateMessage: '',
+      isGlobal: false,
+      isStandalone: true,
+      standaloneDir: '/home/user/.local/lib/hopcode',
+      packageManager: PackageManager.NPM,
+    });
+    mockPerformStandaloneUpdate.mockRejectedValue(new Error('Download failed'));
+
+    handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', mockSpawn);
+    await vi.waitFor(() =>
+      expect(emitSpy).toHaveBeenCalledWith('update-failed', expect.anything()),
+    );
+
+    expect(emitSpy).toHaveBeenCalledWith('update-failed', {
+      message:
+        'Automatic update failed: Download failed. Re-run the installer to update manually.',
+    });
+    expect(mockSpawn).not.toHaveBeenCalled();
   });
 });
 
@@ -288,7 +414,43 @@ describe('setUpdateHandler', () => {
     expect(addItem).toHaveBeenCalledWith(
       {
         type: MessageType.INFO,
-        text: 'Update successful! The new version will be used on your next run.',
+        text: 'Update successful!',
+      },
+      expect.any(Number),
+    );
+
+    cleanup();
+  });
+
+  it('should use default success message when update-success has no message', () => {
+    const isIdleRef = { current: true };
+    const { cleanup } = setUpdateHandler(addItem, setUpdateInfo, isIdleRef);
+
+    updateEventEmitter.emit('update-success', {});
+
+    expect(addItem).toHaveBeenCalledWith(
+      {
+        type: MessageType.INFO,
+        text:
+          'Update successful! Please restart HopCode to use the new version. ' +
+          'Switching model providers before restarting may not work correctly.',
+      },
+      expect.any(Number),
+    );
+
+    cleanup();
+  });
+
+  it('should use default failure message when update-failed has no message', () => {
+    const isIdleRef = { current: true };
+    const { cleanup } = setUpdateHandler(addItem, setUpdateInfo, isIdleRef);
+
+    updateEventEmitter.emit('update-failed', {});
+
+    expect(addItem).toHaveBeenCalledWith(
+      {
+        type: MessageType.ERROR,
+        text: 'Automatic update failed. Please try updating manually.',
       },
       expect.any(Number),
     );
@@ -342,7 +504,7 @@ describe('setUpdateHandler', () => {
     expect(addItem).toHaveBeenCalledWith(
       {
         type: MessageType.INFO,
-        text: 'Update successful! The new version will be used on your next run.',
+        text: 'Update successful!',
       },
       expect.any(Number),
     );
@@ -369,7 +531,7 @@ describe('setUpdateHandler', () => {
     expect(addItem).toHaveBeenCalledWith(
       {
         type: MessageType.ERROR,
-        text: 'Automatic update failed. Please try updating manually',
+        text: 'Update failed',
       },
       expect.any(Number),
     );
@@ -402,7 +564,7 @@ describe('setUpdateHandler', () => {
       2,
       {
         type: MessageType.INFO,
-        text: 'Update successful! The new version will be used on your next run.',
+        text: 'Success!',
       },
       expect.any(Number),
     );

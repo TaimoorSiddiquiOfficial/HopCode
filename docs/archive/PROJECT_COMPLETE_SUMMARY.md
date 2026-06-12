@@ -20,7 +20,7 @@
 **Key Changes:**
 
 - Project name: "HopCode" → "HopCode"
-- NPM scope: `@hopcode/*` → `@hoptrendy/*`
+- NPM scope: `@hopcode/*` → `@hopcode/*`
 - CLI command: `hopcode` → `hopcode`
 - Config directory: `.hopcode/` → `.hopcode/`
 - Environment variables: `HOPCODE_*` → `HOPCODE_*`

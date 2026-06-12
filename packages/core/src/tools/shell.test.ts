@@ -89,7 +89,7 @@ describe('ShellTool', () => {
         commit: true,
         pr: true,
         name: 'HopCode',
-        email: 'hopcode@hoptrendy.com',
+        email: 'hopcode@hopcode.com',
       }),
       getShouldUseNodePtyShell: vi.fn().mockReturnValue(false),
       getBackgroundShellRegistry: vi.fn().mockReturnValue({
@@ -160,6 +160,52 @@ describe('ShellTool', () => {
       expect(() =>
         shellTool.build({ command: ' ', is_background: false }),
       ).toThrow('Command cannot be empty.');
+    });
+
+    it('should mention the intentional sleep escape hatch when blocking sleep', async () => {
+      const error = shellTool.validateToolParams({
+        command: 'sleep 5',
+        is_background: false,
+      });
+
+      expect(error).toContain('intentional-sleep:');
+    });
+
+    it('should explain rejected intentional sleep comments', async () => {
+      const shortReasonError = shellTool.validateToolParams({
+        command: 'sleep 5 # intentional-sleep: wait',
+        is_background: false,
+      });
+      const overCapError = shellTool.validateToolParams({
+        command:
+          'sleep 601s # intentional-sleep: wait for MCP rate limit reset',
+        is_background: false,
+      });
+
+      expect(shortReasonError).toContain('reason is too short');
+      expect(shortReasonError).not.toContain('add a trailing comment like');
+      expect(overCapError).toContain('foreground sleeps over 10 minutes');
+      expect(overCapError).not.toContain('add a trailing comment like');
+    });
+
+    it('should allow sleep with a valid intentional sleep comment', async () => {
+      const error = shellTool.validateToolParams({
+        command: 'sleep 5 # intentional-sleep: wait for MCP rate limit reset',
+        is_background: false,
+      });
+
+      expect(error).toBeNull();
+    });
+
+    it('should guide model to split and use intentional-sleep for sleep chains', async () => {
+      const error = shellTool.validateToolParams({
+        command: 'sleep 5 && echo ok',
+        is_background: false,
+      });
+
+      expect(error).toContain('Split into two calls');
+      expect(error).toContain('intentional-sleep:');
+      expect(error).toContain('reason');
     });
 
     it('should throw an error for a relative directory path', async () => {
@@ -471,6 +517,15 @@ describe('ShellTool', () => {
         'Background shell commands must not end with a bare "&". Remove the trailing "&" and rely on is_background: true instead.',
       );
       expect(mockShellExecutionService).not.toHaveBeenCalled();
+    });
+
+    it('keeps pre-existing comment trimming behavior for managed background validation', async () => {
+      const invocation = shellTool.build({
+        command: 'echo ok # note\nsleep 5 &',
+        is_background: true,
+      });
+
+      expect(invocation).toBeDefined();
     });
 
     it('preserves a trailing && (logical AND would be syntactically broken otherwise)', async () => {
@@ -1455,6 +1510,42 @@ describe('ShellTool', () => {
         }
       });
 
+      it('truncates shell output char-only so the line cap cannot undercut the char budget', async () => {
+        // Regression (C2): the in-tool truncateToolOutput call omitted `lines`,
+        // so it fell back to the config line cap (default 1000). Many-short-line
+        // output (find /, ls -R) then got line-truncated while the 30k char
+        // budget still had room — contradicting the per-tool char-only contract.
+        // Pin that shell declares lines: Infinity.
+        const truncationModule = await import('../utils/truncation.js');
+        const spy = vi
+          .spyOn(truncationModule, 'truncateToolOutput')
+          .mockResolvedValue({ content: 'unused', outputFile: undefined });
+        try {
+          const invocation = shellTool.build({
+            command: 'find /',
+            is_background: false,
+          });
+          const promise = invocation.execute(mockAbortSignal);
+          await vi.advanceTimersByTimeAsync(1_000);
+          resolveShellExecution({
+            output: 'short line\n'.repeat(50),
+            exitCode: 0,
+          });
+          await promise;
+
+          // Shell must pass lines: Infinity so the global line cap can't
+          // undercut its declared 30k char budget.
+          expect(spy).toHaveBeenCalledWith(
+            expect.anything(),
+            ShellTool.Name,
+            expect.any(String),
+            expect.objectContaining({ lines: Number.POSITIVE_INFINITY }),
+          );
+        } finally {
+          spy.mockRestore();
+        }
+      });
+
       it('threshold scales with the user-supplied timeout (not the default)', async () => {
         // User explicitly sets timeout: 600_000 (10 min) because they
         // expect a long command. Threshold is half that, so a 100s
@@ -1660,7 +1751,7 @@ describe('ShellTool', () => {
         // Verify that the command was executed with co-author added
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
+            'Co-authored-by: HopCode <hopcode@hopcode.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -1692,7 +1783,7 @@ describe('ShellTool', () => {
 
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
+            'Co-authored-by: HopCode <hopcode@hopcode.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -1724,7 +1815,7 @@ describe('ShellTool', () => {
 
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
+            'Co-authored-by: HopCode <hopcode@hopcode.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -1756,7 +1847,7 @@ describe('ShellTool', () => {
 
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
+            'Co-authored-by: HopCode <hopcode@hopcode.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -1848,7 +1939,7 @@ describe('ShellTool', () => {
 
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
+            'Co-authored-by: HopCode <hopcode@hopcode.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -1868,7 +1959,7 @@ describe('ShellTool', () => {
           commit: false,
           pr: true,
           name: 'HopCode',
-          email: 'hopcode@hoptrendy.com',
+          email: 'hopcode@hopcode.com',
         });
 
         const command = 'git commit -m "Initial commit"';
@@ -1906,7 +1997,7 @@ describe('ShellTool', () => {
           commit: false,
           pr: false,
           name: 'HopCode',
-          email: 'hopcode@hoptrendy.com',
+          email: 'hopcode@hopcode.com',
         });
 
         const command = 'git commit -m "Initial commit"';
@@ -2665,7 +2756,7 @@ describe('ShellTool', () => {
         // the first; a simple way to assert this is that `Body line 1`
         // and the trailer share the same closing quote.
         expect(observed).toMatch(
-          /-m\s+"Body line 1\s+Co-authored-by: HopCode <hopcode@hoptrendy\.com>"/s,
+          /-m\s+"Body line 1\s+Co-authored-by: HopCode <hopcode@hopcode\.com>"/s,
         );
         // And the first -m's title is unchanged.
         expect(observed).toMatch(/-m\s+"Title"\s/);
@@ -2949,7 +3040,7 @@ describe('ShellTool', () => {
 
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
+            'Co-authored-by: HopCode <hopcode@hopcode.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -2985,7 +3076,7 @@ describe('ShellTool', () => {
 
         expect(mockShellExecutionService).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Co-authored-by: HopCode <hopcode@hoptrendy.com>',
+            'Co-authored-by: HopCode <hopcode@hopcode.com>',
           ),
           expect.any(String),
           expect.any(Function),
@@ -3393,7 +3484,7 @@ describe('ShellTool', () => {
           commit: true,
           pr: false,
           name: 'HopCode',
-          email: 'hopcode@hoptrendy.com',
+          email: 'hopcode@hopcode.com',
         });
 
         const command = 'gh pr create --title "x" --body "Summary"';
@@ -5516,7 +5607,8 @@ describe('detectBlockedSleepPattern', () => {
 
   it('blocks sleep followed by a top-level shell comment', () => {
     // Shell ignores trailing comments, so these are equivalent to
-    // standalone foreground sleeps and must not bypass the guard.
+    // standalone foreground sleeps unless they use the explicit
+    // intentional-sleep escape hatch.
     expect(detectBlockedSleepPattern('sleep 5 # wait')).toBe(
       'standalone sleep 5',
     );
@@ -5527,6 +5619,69 @@ describe('detectBlockedSleepPattern', () => {
       'standalone sleep 2s',
     );
     expect(detectBlockedSleepPattern('sleep 5 && echo ok # trailing')).toBe(
+      'sleep 5 followed by: echo ok',
+    );
+  });
+
+  it('allows standalone sleep with an intentional sleep comment', () => {
+    expect(
+      detectBlockedSleepPattern(
+        'sleep 5 # intentional-sleep: wait for MCP rate limit reset',
+      ),
+    ).toBeNull();
+    expect(
+      detectBlockedSleepPattern(
+        'sleep 2s # intentional-sleep: deliberate rate limit backoff',
+      ),
+    ).toBeNull();
+    expect(
+      detectBlockedSleepPattern(
+        'sleep 10m # intentional-sleep: wait for MCP rate limit reset',
+      ),
+    ).toBeNull();
+  });
+
+  it('requires a meaningful intentional sleep reason', () => {
+    expect(detectBlockedSleepPattern('sleep 5 # intentional-sleep:')).toBe(
+      'standalone sleep 5',
+    );
+    expect(detectBlockedSleepPattern('sleep 5 # intentional-sleep: wait')).toBe(
+      'standalone sleep 5',
+    );
+    expect(
+      detectBlockedSleepPattern('sleep 5 # intentional-sleep: 1234567'),
+    ).toBe('standalone sleep 5');
+    expect(
+      detectBlockedSleepPattern('sleep 5 # intentional-sleep: 12345678'),
+    ).toBeNull();
+  });
+
+  it('blocks intentional sleep comments above the duration cap', () => {
+    expect(
+      detectBlockedSleepPattern(
+        'sleep 601s # intentional-sleep: wait for MCP rate limit reset',
+      ),
+    ).toBe('standalone sleep 601s');
+  });
+
+  it('does not allow intentional sleep comments on leading sleep chains', () => {
+    expect(
+      detectBlockedSleepPattern(
+        'sleep 5 && echo ok # intentional-sleep: wait for rate limit reset',
+      ),
+    ).toBe('sleep 5 followed by: echo ok');
+  });
+
+  it('does not allow intentional sleep comments to hide newline commands', () => {
+    expect(
+      detectBlockedSleepPattern(
+        'sleep 5 # intentional-sleep: wait for rate limit reset\necho ok',
+      ),
+    ).toBe('sleep 5 followed by: echo ok');
+  });
+
+  it('preserves commands after a shell comment newline', () => {
+    expect(detectBlockedSleepPattern('sleep 5 # wait\necho ok')).toBe(
       'sleep 5 followed by: echo ok',
     );
   });

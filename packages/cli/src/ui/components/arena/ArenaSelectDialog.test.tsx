@@ -12,7 +12,7 @@ import {
   type ArenaManager,
   type ArenaAgentResult,
   type Config,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { ArenaSelectDialog } from './ArenaSelectDialog.js';
 

@@ -16,7 +16,7 @@ import {
   getDefaultModelIds,
   resolveBaseUrl,
   type ProviderSetupInputs,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   useAuthCommand,
   normalizeCustomModelIds,
@@ -355,27 +355,27 @@ describe('generateCustomApiKeyEnvKey', () => {
 
 describe('normalizeCustomModelIds', () => {
   it('splits comma-separated model IDs', () => {
-    const result = normalizeCustomModelIds('qwen/qwen3-coder,openai/gpt-4.1');
-    expect(result).toEqual(['qwen/qwen3-coder', 'openai/gpt-4.1']);
+    const result = normalizeCustomModelIds('hopcode/qwen3-coder,openai/gpt-4.1');
+    expect(result).toEqual(['hopcode/qwen3-coder', 'openai/gpt-4.1']);
   });
 
   it('trims whitespace from each model ID', () => {
     const result = normalizeCustomModelIds(
-      ' qwen/qwen3-coder , openai/gpt-4.1 ',
+      ' hopcode/qwen3-coder , openai/gpt-4.1 ',
     );
-    expect(result).toEqual(['qwen/qwen3-coder', 'openai/gpt-4.1']);
+    expect(result).toEqual(['hopcode/qwen3-coder', 'openai/gpt-4.1']);
   });
 
   it('deduplicates while preserving order', () => {
     const result = normalizeCustomModelIds(
-      'qwen/qwen3-coder,openai/gpt-4.1,qwen/qwen3-coder',
+      'hopcode/qwen3-coder,openai/gpt-4.1,hopcode/qwen3-coder',
     );
-    expect(result).toEqual(['qwen/qwen3-coder', 'openai/gpt-4.1']);
+    expect(result).toEqual(['hopcode/qwen3-coder', 'openai/gpt-4.1']);
   });
 
   it('removes empty entries', () => {
-    const result = normalizeCustomModelIds('qwen/qwen3-coder,,openai/gpt-4.1');
-    expect(result).toEqual(['qwen/qwen3-coder', 'openai/gpt-4.1']);
+    const result = normalizeCustomModelIds('hopcode/qwen3-coder,,openai/gpt-4.1');
+    expect(result).toEqual(['hopcode/qwen3-coder', 'openai/gpt-4.1']);
   });
 
   it('returns empty array for empty input', () => {
@@ -389,8 +389,8 @@ describe('normalizeCustomModelIds', () => {
   });
 
   it('handles single model ID', () => {
-    const result = normalizeCustomModelIds('qwen/qwen3-coder');
-    expect(result).toEqual(['qwen/qwen3-coder']);
+    const result = normalizeCustomModelIds('hopcode/qwen3-coder');
+    expect(result).toEqual(['hopcode/qwen3-coder']);
   });
 });
 

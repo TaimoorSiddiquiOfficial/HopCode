@@ -47,7 +47,7 @@
 | Element           | Before                 | After                       | Status |
 | ----------------- | ---------------------- | --------------------------- | ------ |
 | **Project Name**  | HopCode                | HopCode                     | ✅     |
-| **NPM Scope**     | @hopcode/\*            | @hoptrendy/\*               | ✅     |
+| **NPM Scope**     | @hopcode/\*            | @hopcode/\*               | ✅     |
 | **CLI Command**   | qwen                   | hopcode                     | ✅     |
 | **Config Dir**    | .hopcode/              | .hopcode/                   | ✅     |
 | **Env Vars**      | QWEN*CODE*\*           | HOPCODE\_\*                 | ✅     |
@@ -149,7 +149,7 @@ Monospace:   'JetBrains Mono'
 
 ### Core Changes
 
-- [x] Package.json name: `@hoptrendy/hopcode`
+- [x] Package.json name: `@hopcode/hopcode`
 - [x] README.md: 24+ HopCode references
 - [x] CSS variables: `--app-hopcode-*`
 - [x] CSS classes: `.hopcode-*`

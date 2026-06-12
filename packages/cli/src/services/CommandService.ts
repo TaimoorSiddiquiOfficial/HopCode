@@ -6,7 +6,7 @@
 
 import type { SlashCommand, ExecutionMode } from '../ui/commands/types.js';
 import type { ICommandLoader } from './types.js';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 import { filterCommandsForMode } from './commandUtils.js';
 
 const debugLogger = createDebugLogger('CLI_COMMANDS');

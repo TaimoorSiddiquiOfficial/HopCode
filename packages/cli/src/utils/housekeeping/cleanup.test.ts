@@ -66,7 +66,7 @@ describe('cleanupOldFileHistoryBackups', () => {
   let cutoff: Date;
 
   beforeEach(() => {
-    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-cleanup-test-'));
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-cleanup-test-'));
     fileHistoryRoot = path.join(hopcodeHome, FILE_HISTORY_DIR);
     vi.stubEnv('HOPCODE_HOME', hopcodeHome);
     cutoff = new Date(Date.now() - 30 * MS_PER_DAY);

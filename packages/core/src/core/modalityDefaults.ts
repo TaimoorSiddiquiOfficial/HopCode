@@ -40,20 +40,21 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   // -------------------
   // Alibaba / Qwen
   // -------------------
-  // Qwen3.5-Plus, Qwen3.6-Plus: image + video support
+  // Qwen Plus models: image + video support (Max models are text-only)
   [/^qwen3\.5-plus/, { image: true, video: true }],
   [/^qwen3\.6-plus/, { image: true, video: true }],
+  [/^qwen3\.7-plus/, { image: true, video: true }],
   [/^coder-model$/, { image: true, video: true }],
 
   // Qwen VL (vision-language) models: image + video
   [/^qwen-vl-/, { image: true, video: true }],
   [/^qwen3-vl-/, { image: true, video: true }],
 
-  // Qwen coder / text models: text-only
+  // HopCoder / text models: text-only
   [/^qwen3-coder-/, {}],
   // Qwen3.6-35B-A3B (local quant variants) — image + video
   [/^qwen3\.6-35b/, { image: true, video: true }],
-  [/^qwen/, {}],
+  [/^hopcode/, {}],
 
   // -------------------
   // DeepSeek — text-only
@@ -78,6 +79,18 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   // -------------------
   [/^kimi-k2\.5/, { image: true, video: true }],
   [/^kimi-/, {}],
+
+  // -------------------
+  // ByteDance Doubao — Seed-series and *-vision / *-vl models accept image
+  // input; other Doubao models (pro / lite / text) are text-only.
+  // (QwenLM/hopcode#4876)
+  // -------------------
+  // seedance (text→video) and seedream (text→image) are generation models with
+  // text-only input — exclude them before the multimodal Seed chat series.
+  [/^doubao-seed(ance|ream)/, {}],
+  [/^doubao-seed/, { image: true }],
+  [/^doubao-.*(vision|vl)/, { image: true }],
+  [/^doubao/, {}],
 ];
 
 /**

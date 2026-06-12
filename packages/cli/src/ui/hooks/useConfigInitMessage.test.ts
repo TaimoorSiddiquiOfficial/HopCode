@@ -6,7 +6,7 @@
 
 import { describe, it, expect, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { MCPServerStatus, type McpClient } from '@hoptrendy/hopcode-core';
+import { MCPServerStatus, type McpClient } from '@hopcode/hopcode-core';
 import { appEvents } from '../../utils/events.js';
 import { useConfigInitMessage } from './useConfigInitMessage.js';
 

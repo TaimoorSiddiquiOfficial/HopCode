@@ -1,11 +1,12 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createDebugLogger, isGitRepository } from '@hoptrendy/hopcode-core';
+import { createDebugLogger, isGitRepository } from '@hopcode/hopcode-core';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import * as childProcess from 'node:child_process';
 
@@ -17,15 +18,22 @@ export enum PackageManager {
   BUN = 'bun',
   BUNX = 'bunx',
   HOMEBREW = 'homebrew',
+  STANDALONE = 'standalone',
   NPX = 'npx',
   UNKNOWN = 'unknown',
 }
 
 const debugLogger = createDebugLogger('INSTALLATION_INFO');
+const STANDALONE_UNIX_INSTALLER =
+  'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh';
+const STANDALONE_WINDOWS_INSTALLER =
+  'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.ps1';
 
 export interface InstallationInfo {
   packageManager: PackageManager;
   isGlobal: boolean;
+  isStandalone?: boolean;
+  standaloneDir?: string;
   updateCommand?: string;
   updateMessage?: string;
 }
@@ -76,6 +84,14 @@ export function getInstallationInfo(
       };
     }
 
+    const standaloneInfo = getStandaloneInstallInfo(
+      realPath,
+      isAutoUpdateEnabled,
+    );
+    if (standaloneInfo) {
+      return standaloneInfo;
+    }
+
     // Check for Homebrew
     if (process.platform === 'darwin') {
       try {
@@ -96,7 +112,7 @@ export function getInstallationInfo(
 
     // Check for pnpm
     if (realPath.includes('/.pnpm/global')) {
-      const updateCommand = 'pnpm add -g @hoptrendy/hopcode-cli@latest';
+      const updateCommand = 'pnpm add -g @hopcode/hopcode@latest';
       return {
         packageManager: PackageManager.PNPM,
         isGlobal: true,
@@ -109,7 +125,7 @@ export function getInstallationInfo(
 
     // Check for yarn
     if (realPath.includes('/.yarn/global')) {
-      const updateCommand = 'yarn global add @hoptrendy/hopcode-cli@latest';
+      const updateCommand = 'yarn global add @hopcode/hopcode@latest';
       return {
         packageManager: PackageManager.YARN,
         isGlobal: true,
@@ -129,7 +145,7 @@ export function getInstallationInfo(
       };
     }
     if (realPath.includes('/.bun/bin')) {
-      const updateCommand = 'bun add -g @hoptrendy/hopcode-cli@latest';
+      const updateCommand = 'bun add -g @hopcode/hopcode@latest';
       return {
         packageManager: PackageManager.BUN,
         isGlobal: true,
@@ -161,8 +177,46 @@ export function getInstallationInfo(
       };
     }
 
-    // Assume global npm
-    const updateCommand = 'npm install -g @hoptrendy/hopcode-cli@latest';
+    // Check if the package directory is writable to determine whether npm update requires sudo
+    const npmPackageDir = path.dirname(path.dirname(realPath));
+    let npmPrefixWritable = false;
+    try {
+      fs.accessSync(npmPackageDir, fs.constants.W_OK);
+      npmPrefixWritable = true;
+    } catch {
+      // Not writable (e.g., /usr/local/lib/node_modules owned by root)
+    }
+
+    if (!npmPrefixWritable && isAutoUpdateEnabled) {
+      // npm prefix requires sudo — fall back to standalone update path
+      // which installs to ~/.local/lib/hopcode/ (user-writable)
+      const installRoot = process.env['HOME'] || os.homedir();
+      if (!installRoot || installRoot === '/') {
+        // Cannot determine a safe user-writable location; skip migration
+        return {
+          packageManager: PackageManager.NPM,
+          isGlobal: true,
+          updateMessage:
+            'Update requires sudo. Run: sudo npm install -g @hopcode/hopcode@latest',
+        };
+      }
+      const fallbackStandaloneDir = path.join(
+        installRoot,
+        '.local',
+        'lib',
+        'hopcode',
+      );
+      return {
+        packageManager: PackageManager.NPM,
+        isGlobal: true,
+        isStandalone: true,
+        standaloneDir: fallbackStandaloneDir,
+        updateMessage:
+          'npm install requires sudo. Migrating to standalone installer for automatic updates.',
+      };
+    }
+
+    const updateCommand = 'npm install -g @hopcode/hopcode@latest';
     return {
       packageManager: PackageManager.NPM,
       isGlobal: true,
@@ -175,4 +229,100 @@ export function getInstallationInfo(
     debugLogger.error('Failed to detect installation info:', error);
     return { packageManager: PackageManager.UNKNOWN, isGlobal: false };
   }
+}
+
+function getStandaloneInstallInfo(
+  realPath: string,
+  isAutoUpdateEnabled: boolean,
+): InstallationInfo | null {
+  const installDir = standaloneInstallDirForCliPath(realPath);
+  if (!installDir || !isStandaloneInstallDir(installDir)) {
+    return null;
+  }
+
+  const updateCommand =
+    process.platform === 'win32'
+      ? `powershell -ExecutionPolicy Bypass -c "irm ${STANDALONE_WINDOWS_INSTALLER} | iex"`
+      : `curl -fsSL ${STANDALONE_UNIX_INSTALLER} | bash`;
+
+  return {
+    packageManager: PackageManager.STANDALONE,
+    isGlobal: true,
+    isStandalone: true,
+    standaloneDir: installDir,
+    updateMessage: isAutoUpdateEnabled
+      ? 'Standalone install detected. Attempting to automatically update now...'
+      : `Standalone install detected. Please rerun the standalone installer to update: ${updateCommand}`,
+  };
+}
+
+function standaloneInstallDirForCliPath(realPath: string): string | null {
+  const normalized = realPath.replace(/\\/g, '/');
+  const suffix = '/lib/cli.js';
+  if (!normalized.endsWith(suffix)) {
+    return null;
+  }
+  return realPath.slice(0, -suffix.length);
+}
+
+function isStandaloneInstallDir(installDir: string): boolean {
+  try {
+    const manifestPath = path.join(installDir, 'manifest.json');
+    if (!fs.existsSync(manifestPath)) {
+      return false;
+    }
+
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as {
+      name?: unknown;
+      target?: unknown;
+    };
+    // Manifest format is produced by writeManifest in create-standalone-package.js.
+    if (
+      manifest.name !== '@hopcode/hopcode' ||
+      typeof manifest.target !== 'string' ||
+      !isStandaloneTargetForCurrentPlatform(manifest.target)
+    ) {
+      return false;
+    }
+
+    const hopcodeBin =
+      process.platform === 'win32'
+        ? path.join(installDir, 'bin', 'hopcode.cmd')
+        : path.join(installDir, 'bin', 'hopcode');
+    const nodeBin =
+      process.platform === 'win32'
+        ? path.join(installDir, 'node', 'node.exe')
+        : path.join(installDir, 'node', 'bin', 'node');
+
+    return (
+      fs.existsSync(hopcodeBin) &&
+      fs.existsSync(nodeBin) &&
+      isStandaloneRuntimeFile(hopcodeBin) &&
+      isStandaloneRuntimeFile(nodeBin)
+    );
+  } catch (err) {
+    debugLogger.error('Standalone detection failed:', installDir, err);
+    return false;
+  }
+}
+
+function isStandaloneTargetForCurrentPlatform(target: string): boolean {
+  switch (process.platform) {
+    case 'darwin':
+      return /^darwin-(arm64|x64)$/.test(target);
+    case 'linux':
+      return /^linux-(arm64|x64)$/.test(target);
+    case 'win32':
+      return /^win-(arm64|x64)$/.test(target);
+    default:
+      return false;
+  }
+}
+
+function isStandaloneRuntimeFile(filePath: string): boolean {
+  const stats = fs.lstatSync(filePath);
+  if (!stats.isFile() || stats.isSymbolicLink()) {
+    return false;
+  }
+  return process.platform === 'win32' || (stats.mode & 0o111) !== 0;
 }

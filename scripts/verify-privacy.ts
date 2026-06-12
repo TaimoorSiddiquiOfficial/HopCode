@@ -153,7 +153,7 @@ async function main(): Promise<void> {
         process.env.OPENAI_BASE_URL = 'http://127.0.0.1:${port}/v1';
         process.env.OPENAI_API_KEY = 'test-privacy-key';
         // Just import the package to trigger any side-effect HTTP calls
-        import('@hoptrendy/hopcode-core').then(() => process.exit(0)).catch(() => process.exit(0));
+        import('@hopcode/hopcode-core').then(() => process.exit(0)).catch(() => process.exit(0));
       `,
       ],
       {

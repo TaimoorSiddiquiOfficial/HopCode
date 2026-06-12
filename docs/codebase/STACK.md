@@ -9,21 +9,21 @@
 ## Monorepo Structure
 
 - **Package Manager**: npm workspaces
-- **Root Package**: `@hoptrendy/hopcode` v0.15.3
-- **NPM Scope**: `@hoptrendy`
+- **Root Package**: `@hopcode/hopcode` v0.15.3
+- **NPM Scope**: `@hopcode`
 - **Build Tool**: Custom TypeScript build scripts + esbuild for bundling
 
 ## Major Packages
 
 | Package                        | Version | Description                                                         |
 | ------------------------------ | ------- | ------------------------------------------------------------------- |
-| `@hoptrendy/hopcode-cli`       | 0.15.3  | CLI entry point with Ink-based terminal UI                          |
-| `@hoptrendy/hopcode-core`      | 0.15.3  | Core logic: providers, agents, tools, MCP                           |
-| `@hoptrendy/sdk`               | 0.19.5  | TypeScript SDK for programmatic access                              |
+| `@hopcode/hopcode`       | 0.15.3  | CLI entry point with Ink-based terminal UI                          |
+| `@hopcode/hopcode-core`      | 0.15.3  | Core logic: providers, agents, tools, MCP                           |
+| `@hopcode/sdk`               | 0.19.5  | TypeScript SDK for programmatic access                              |
 | `hopcode-vscode-ide-companion` | 0.15.3  | VS Code extension (native sidebar integration)                      |
-| `@hoptrendy/web-templates`     | -       | Web UI component templates                                          |
-| `@hoptrendy/webui`             | -       | Shared web UI components                                            |
-| `@hoptrendy/channel-*`         | -       | Enterprise messaging channels (WeChat, DingTalk, Discord, Telegram) |
+| `@hopcode/web-templates`     | -       | Web UI component templates                                          |
+| `@hopcode/webui`             | -       | Shared web UI components                                            |
+| `@hopcode/channel-*`         | -       | Enterprise messaging channels (WeChat, DingTalk, Discord, Telegram) |
 
 ## AI/LLM Integration
 

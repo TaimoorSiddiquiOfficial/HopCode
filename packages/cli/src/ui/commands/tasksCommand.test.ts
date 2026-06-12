@@ -12,7 +12,7 @@ import type {
   AgentTask,
   MonitorTask,
   ShellTask,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 type AgentTaskTestEntry = AgentTask;
 

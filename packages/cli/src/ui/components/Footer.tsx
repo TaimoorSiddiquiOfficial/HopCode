@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,8 +20,8 @@ import { useConfigInitMessage } from '../hooks/useConfigInitMessage.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
-import { useVimMode } from '../contexts/VimModeContext.js';
-import { ApprovalMode } from '@hoptrendy/hopcode-core';
+import { useVimModeState } from '../contexts/VimModeContext.js';
+import { ApprovalMode } from '@hopcode/hopcode-core';
 import { GeminiSpinner } from './GeminiRespondingSpinner.js';
 import { GoalPill, useFooterGoalState } from './GoalPill.js';
 import { t } from '../../i18n/index.js';
@@ -30,7 +30,7 @@ export const Footer: React.FC = () => {
   const uiState = useUIState();
   const config = useConfig();
   const settings = useSettings();
-  const { vimEnabled, vimMode } = useVimMode();
+  const { vimEnabled, vimMode } = useVimModeState();
   const {
     lines: statusLineLines,
     useThemeColors,
@@ -88,6 +88,8 @@ export const Footer: React.FC = () => {
     </Text>
   ) : vimEnabled && vimMode === 'INSERT' ? (
     <Text color={theme.text.secondary}>-- INSERT --</Text>
+  ) : vimEnabled && vimMode === 'NORMAL' ? (
+    <Text color={theme.text.secondary}>-- NORMAL --</Text>
   ) : uiState.shellModeActive ? (
     <ShellModeIndicator />
   ) : configInitMessage ? (

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team Team
  * SPDX-License-Identifier: Apache-2.0
@@ -10,7 +10,7 @@ import {
   getFilteredHopCodeModels,
   getOpenAIAvailableModelFromEnv,
 } from './availableModels.js';
-import { AuthType, type Config } from '@hoptrendy/hopcode-core';
+import { AuthType, type Config } from '@hopcode/hopcode-core';
 
 describe('availableModels', () => {
   describe('HopCode models', () => {

@@ -2,7 +2,7 @@ export { DingtalkChannel } from './DingtalkAdapter.js';
 export { downloadMedia } from './media.js';
 
 import { DingtalkChannel } from './DingtalkAdapter.js';
-import type { ChannelPlugin } from '@hoptrendy/channel-base';
+import type { ChannelPlugin } from '@hopcode/channel-base';
 
 export const plugin: ChannelPlugin = {
   channelType: 'dingtalk',

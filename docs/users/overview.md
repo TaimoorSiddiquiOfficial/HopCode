@@ -1,37 +1,33 @@
-﻿# HopCode overview
+# HopCode overview
 
-[![@hoptrendy/hopcode downloads](https://img.shields.io/npm/dw/@hoptrendy/hopcode.svg)](https://npm-compare.com/@hoptrendy/hopcode)
-[![@hoptrendy/hopcode version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
+[![@hopcode/hopcode downloads](https://img.shields.io/npm/dw/@hopcode/hopcode.svg)](https://npm-compare.com/@hopcode/hopcode)
+[![@hopcode/hopcode version](https://img.shields.io/npm/v/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
 
-> Learn about HopCode, an agentic coding tool that lives in your terminal and helps you turn ideas into code faster than ever before.
+> Learn about HopCode, Qwen's agentic coding tool that lives in your terminal and helps you turn ideas into code faster than ever before.
 
 ## Get started in 30 seconds
 
-### Install HopCode
+### Install HopCode:
 
 The recommended installer uses a standalone archive when one is available for
-your platform. If it falls back to npm, Node.js 20 or later with npm must be
-available on PATH.
-
-The recommended installer uses a standalone archive when one is available for
-your platform. If it falls back to npm, Node.js 20 or later with npm must be
+your platform. If it falls back to npm, Node.js 22 or later with npm must be
 available on PATH.
 
 **Linux / macOS**
 
 ```sh
-curl -fsSL https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.sh | bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
 ```
 
 **Windows**
 
-```cmd
-powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
+```powershell
+irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.ps1 | iex
 ```
 
 > [!note]
 >
-> It's recommended to restart your terminal after installation if `qwen` is not
+> It's recommended to restart your terminal after installation if `hopcode` is not
 > immediately available on PATH. If the installation fails, please refer to
 > [Manual Installation](./quickstart#manual-installation) in the Quickstart
 > guide. For offline installation, download a release archive and run the
@@ -41,7 +37,7 @@ powershell -Command "Invoke-WebRequest 'https://github.com/TaimoorSiddiquiOffici
 
 ```bash
 cd your-project
-hopcode
+qwen
 ```
 
 Choose your authentication method — **API Key** or **[Alibaba Cloud Coding Plan](https://bailian.console.aliyun.com/cn-beijing/?tab=coding-plan#/efm/coding-plan-index)** ([intl](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index)) — and follow the prompts to configure. See the API setup guide ([Beijing](https://bailian.console.aliyun.com/cn-beijing/?tab=doc#/doc/?type=model&url=3023091) / [intl](https://modelstudio.console.alibabacloud.com/ap-southeast-1?tab=doc#/doc/?type=model&url=2974721)) for step-by-step instructions. Then let's start with understanding your codebase. Try one of these commands:
@@ -60,7 +56,7 @@ You'll be prompted to log in on first use. That's it! [Continue with Quickstart 
 
 > [!note]
 >
-> **New VS Code Extension (Beta)**: Prefer a graphical interface? Our new **VS Code extension** provides an easy-to-use native IDE experience without requiring terminal familiarity. Simply install from the marketplace and start coding with HopCode directly in your sidebar. Download and install the [HopCode Companion](https://marketplace.visualstudio.com/items?itemName=hopcode.hopcode-vscode-ide-companion) now.
+> **New VS Code Extension (Beta)**: Prefer a graphical interface? Our new **VS Code extension** provides an easy-to-use native IDE experience without requiring terminal familiarity. Simply install from the marketplace and start coding with HopCode directly in your sidebar. Download and install the [HopCode Companion](https://marketplace.visualstudio.com/items?itemName=qwenlm.hopcode-vscode-ide-companion) now.
 
 ## What HopCode does for you
 

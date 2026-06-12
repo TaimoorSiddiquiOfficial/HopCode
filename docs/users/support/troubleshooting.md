@@ -1,4 +1,4 @@
-﻿# Troubleshooting
+# Troubleshooting
 
 This guide provides solutions to common issues and debugging tips, including topics on:
 
@@ -37,7 +37,7 @@ This guide provides solutions to common issues and debugging tips, including top
 ## Frequently asked questions (FAQs)
 
 - **Q: How do I update HopCode to the latest version?**
-  - A: If you installed it globally via `npm`, update it using the command `npm install -g @hoptrendy/hopcode-cli@latest`. If you compiled it from source, pull the latest changes from the repository, and then rebuild using the command `npm run build`.
+  - A: If you installed HopCode with the standalone installer, rerun the standalone install command. If you installed it globally via `npm`, update it using the command `npm install -g @hopcode/hopcode@latest`. If you compiled it from source, pull the latest changes from the repository, and then rebuild using the command `npm run build`.
 
 - **Q: Where are the HopCode configuration or settings files stored?**
   - A: The HopCode configuration is stored in two `settings.json` files:
@@ -60,7 +60,8 @@ This guide provides solutions to common issues and debugging tips, including top
   - **Cause:** The CLI is not correctly installed or it is not in your system's `PATH`.
   - **Solution:**
     The update depends on how you installed HopCode:
-    - If you installed `hopcode` globally, check that your `npm` global binary directory is in your `PATH`. You can update using the command `npm install -g @hoptrendy/hopcode-cli@latest`.
+    - If you installed `hopcode` with the standalone installer, rerun the standalone install command and then open a new terminal.
+    - If you installed `hopcode` globally, check that your `npm` global binary directory is in your `PATH`. You can update using the command `npm install -g @hopcode/hopcode@latest`.
     - If you are running `hopcode` from source, ensure you are using the correct command to invoke it (e.g. `node packages/cli/dist/index.js ...`). To update, pull the latest changes from the repository, and then rebuild using the command `npm run build`.
 
 - **Error: `MODULE_NOT_FOUND` or import errors.**
@@ -77,7 +78,7 @@ This guide provides solutions to common issues and debugging tips, including top
 - **HopCode is not running in interactive mode in "CI" environments**
   - **Issue:** HopCode does not enter interactive mode (no prompt appears) if an environment variable starting with `CI_` (e.g. `CI_TOKEN`) is set. This is because the `is-in-ci` package, used by the underlying UI framework, detects these variables and assumes a non-interactive CI environment.
   - **Cause:** The `is-in-ci` package checks for the presence of `CI`, `CONTINUOUS_INTEGRATION`, or any environment variable with a `CI_` prefix. When any of these are found, it signals that the environment is non-interactive, which prevents the CLI from starting in its interactive mode.
-  - **Solution:** If the `CI_` prefixed variable is not needed for the CLI to function, you can temporarily unset it for the command. e.g. `env -u CI_TOKEN hopcode`
+  - **Solution:** If the `CI_` prefixed variable is not needed for the CLI to function, you can temporarily unset it for the command. e.g. `env -u CI_TOKEN qwen`
 
 - **DEBUG mode not working from project .env file**
   - **Issue:** Setting `DEBUG=true` in a project's `.env` file doesn't enable debug mode for the CLI.
@@ -88,8 +89,8 @@ This guide provides solutions to common issues and debugging tips, including top
 
 - Ensure VS Code has a single workspace folder open.
 - Restart the integrated terminal after installing the extension so it inherits:
-  - `HOPCODE_IDE_WORKSPACE_PATH`
-  - `HOPCODE_IDE_SERVER_PORT`
+  - `HOPCODE_CODE_IDE_WORKSPACE_PATH`
+  - `HOPCODE_CODE_IDE_SERVER_PORT`
 - If running in a container, verify `host.docker.internal` resolves. Otherwise, map the host appropriately.
 - Reinstall the companion with `/ide install` and use “HopCode: Run” in the Command Palette to verify it launches.
 
@@ -126,4 +127,4 @@ The HopCode uses specific exit codes to indicate the reason for termination. Thi
 
 ## Existing GitHub Issues similar to yours or creating new Issues
 
-If you encounter an issue that was not covered here in this _Troubleshooting guide_, consider searching the HopCode [Issue tracker on GitHub](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues). If you can't find an issue similar to yours, consider creating a new GitHub Issue with a detailed description. Pull requests are also welcome!
+If you encounter an issue that was not covered here in this _Troubleshooting guide_, consider searching the HopCode [Issue tracker on GitHub](https://github.com/QwenLM/hopcode/issues). If you can't find an issue similar to yours, consider creating a new GitHub Issue with a detailed description. Pull requests are also welcome!

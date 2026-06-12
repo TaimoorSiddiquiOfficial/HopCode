@@ -6,8 +6,8 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { Config } from '@hoptrendy/hopcode-core';
-import { createDebugLogger, runSideQuery } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
+import { createDebugLogger, runSideQuery } from '@hopcode/hopcode-core';
 import type { TurnContent, MessageRewriteConfig } from './types.js';
 
 const debugLogger = createDebugLogger('MESSAGE_REWRITER');

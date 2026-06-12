@@ -5,8 +5,8 @@
  */
 
 import * as path from 'node:path';
-import type { Ignore } from '@hoptrendy/hopcode-core';
-import { isBinaryFile } from '@hoptrendy/hopcode-core';
+import type { Ignore } from '@hopcode/hopcode-core';
+import { isBinaryFile } from '@hopcode/hopcode-core';
 import { FsError } from './errors.js';
 import type { Intent, ResolvedPath } from './paths.js';
 

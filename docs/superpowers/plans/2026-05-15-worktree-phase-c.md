@@ -599,7 +599,7 @@ import * as fs from 'node:fs';
 import {
   readWorktreeSession,
   type WorktreeSession,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { useConfig } from '../contexts/ConfigContext.js';
 
 export function useWorktreeSession(): WorktreeSession | null {
@@ -639,7 +639,7 @@ export function useWorktreeSession(): WorktreeSession | null {
 }
 ```
 
-注意：`readWorktreeSession` 和 `WorktreeSession` 需要从 `@hoptrendy/hopcode-core` 导出，需要同时在 `packages/core/src/index.ts` 中新增导出：
+注意：`readWorktreeSession` 和 `WorktreeSession` 需要从 `@hopcode/hopcode-core` 导出，需要同时在 `packages/core/src/index.ts` 中新增导出：
 
 ```typescript
 export {
@@ -865,7 +865,7 @@ if (resumedSessionData) {
 import {
   readWorktreeSession,
   clearWorktreeSession,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import * as fs from 'node:fs/promises';
 ```
 

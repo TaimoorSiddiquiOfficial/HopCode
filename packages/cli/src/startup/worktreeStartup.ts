@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025-2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -29,8 +29,8 @@ import {
   worktreeBranchForSlug,
   writeWorktreeSession,
   writeWorktreeSessionMarker,
-} from '@hoptrendy/hopcode-core';
-import type { Config, WorktreeSession } from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
+import type { Config, WorktreeSession } from '@hopcode/hopcode-core';
 
 const debugLogger = createDebugLogger('WORKTREE_STARTUP');
 

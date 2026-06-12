@@ -1,5 +1,6 @@
-﻿import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
+  PINNED_OPEN_COMPUTER_USE_PACKAGE_NAME,
   PINNED_OPEN_COMPUTER_USE_VERSION,
   resolveComputerUsePackageSpec,
 } from './constants.js';
@@ -38,16 +39,27 @@ describe('computer-use constants', () => {
     });
   });
 
+  describe('PINNED_OPEN_COMPUTER_USE_PACKAGE_NAME', () => {
+    it('is the scoped QwenLM fork package', () => {
+      expect(PINNED_OPEN_COMPUTER_USE_PACKAGE_NAME).toBe(
+        '@hopcode/open-computer-use',
+      );
+    });
+  });
+
   describe('resolveComputerUsePackageSpec', () => {
-    it('defaults to open-computer-use@<PINNED_VERSION> when env var is unset', () => {
+    it('defaults to <PACKAGE_NAME>@<PINNED_VERSION> when env var is unset', () => {
       expect(resolveComputerUsePackageSpec()).toBe(
-        `open-computer-use@${PINNED_OPEN_COMPUTER_USE_VERSION}`,
+        `${PINNED_OPEN_COMPUTER_USE_PACKAGE_NAME}@${PINNED_OPEN_COMPUTER_USE_VERSION}`,
       );
     });
 
     it('honors HOPCODE_COMPUTER_USE_PACKAGE override', () => {
-      process.env['HOPCODE_COMPUTER_USE_PACKAGE'] = 'open-computer-use@0.99.99';
-      expect(resolveComputerUsePackageSpec()).toBe('open-computer-use@0.99.99');
+      process.env['HOPCODE_COMPUTER_USE_PACKAGE'] =
+        '@hopcode/open-computer-use@0.99.99';
+      expect(resolveComputerUsePackageSpec()).toBe(
+        '@hopcode/open-computer-use@0.99.99',
+      );
     });
 
     it('reads env var at call time (not at module load)', () => {

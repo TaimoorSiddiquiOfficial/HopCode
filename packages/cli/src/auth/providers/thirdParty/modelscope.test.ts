@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { AuthType } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@hopcode/hopcode-core';
 import { modelscopeProvider, buildInstallPlan } from '../../allProviders.js';
 
 describe('modelscopeProvider', () => {
@@ -22,7 +22,7 @@ describe('modelscopeProvider', () => {
     const plan = buildInstallPlan(modelscopeProvider, {
       baseUrl: 'https://api-inference.modelscope.cn/v1',
       apiKey: 'sk-modelscope',
-      modelIds: ['deepseek-ai/DeepSeek-V4-Flash', 'Qwen/Qwen3.5-397B-A17B'],
+      modelIds: ['deepseek-ai/DeepSeek-V4-Flash', 'hopcode/Qwen3.5-397B-A17B'],
     });
 
     const models = plan.modelProviders?.[0]?.models;
@@ -33,8 +33,8 @@ describe('modelscopeProvider', () => {
       generationConfig: { contextWindowSize: 1000000 },
     });
     expect(models?.[1]).toMatchObject({
-      id: 'Qwen/Qwen3.5-397B-A17B',
-      name: '[ModelScope] Qwen/Qwen3.5-397B-A17B',
+      id: 'hopcode/Qwen3.5-397B-A17B',
+      name: '[ModelScope] hopcode/Qwen3.5-397B-A17B',
       generationConfig: { contextWindowSize: 1000000 },
     });
   });

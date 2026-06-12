@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -21,6 +21,7 @@ export default defineConfig({
     exclude: [
       '**/terminal-bench/*.test.ts',
       '**/hook-integration/**',
+      '**/hopcode-daemon-loadtest*',
       '**/node_modules/**',
     ],
     retry: 2,
@@ -35,7 +36,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // Use built SDK bundle for e2e tests
-      '@hoptrendy/sdk': resolve(
+      '@hopcode/sdk': resolve(
         __dirname,
         '../packages/sdk-typescript/dist/index.mjs',
       ),

@@ -18,7 +18,7 @@ import {
   type AvailableModel,
   type Config,
   resolveModelId,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { parseAcpModelOption } from '../../utils/acpModelUtils.js';
 

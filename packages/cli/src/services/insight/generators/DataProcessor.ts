@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import path from 'path';
 import {
   read as readJsonlFile,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import pLimit from 'p-limit';
 import type {
   InsightData,
@@ -34,7 +34,7 @@ import {
   runSideQuery,
   type Config,
   type ChatRecord,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 const logger = createDebugLogger('DataProcessor');
 
@@ -700,7 +700,7 @@ export class DataProcessor {
     const schemaImprovements = {
       type: 'object',
       properties: {
-        HopCode_md_additions: {
+        HOPCODE_md_additions: {
           type: 'array',
           items: {
             type: 'object',
@@ -739,7 +739,7 @@ export class DataProcessor {
           },
         },
       },
-      required: ['HopCode_md_additions', 'features_to_try', 'usage_patterns'],
+      required: ['HOPCODE_md_additions', 'features_to_try', 'usage_patterns'],
     };
 
     // 7. Interaction Style
@@ -960,7 +960,7 @@ ${sessionSummaries}
 FRICTION DETAILS:
 ${frictionDetails}
 
-USER INSTRUCTIONS TO HOPCODE:
+USER INSTRUCTIONS TO HopCode:
 None captured`;
   }
 

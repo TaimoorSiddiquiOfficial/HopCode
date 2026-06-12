@@ -27,7 +27,7 @@ import {
   buildSkillLlmContent,
   computeThresholds,
   type CompactionThresholds,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { t } from '../../i18n/index.js';
 
 /**
@@ -100,7 +100,7 @@ function parseMemoryFiles(memoryContent: string): ContextMemoryDetail[] {
 }
 
 export async function collectContextData(
-  config: import('@hoptrendy/hopcode-core').Config,
+  config: import('@hopcode/hopcode-core').Config,
   showDetails: boolean,
 ): Promise<HistoryItemContextUsage> {
   const modelName = config.getModel() || 'unknown';
@@ -378,7 +378,10 @@ function fmtCategoryRow(
   contextWindowSize: number,
   indent = '  ',
 ): string {
-  const percentage = ((tokens / contextWindowSize) * 100).toFixed(1);
+  const percentage =
+    contextWindowSize > 0
+      ? ((tokens / contextWindowSize) * 100).toFixed(1)
+      : '0.0';
   const right = `${fmtTokens(tokens)} tokens (${percentage}%)`;
   const leftPart = `${indent}${label}`;
   const totalWidth = 56;
@@ -536,9 +539,8 @@ export const contextCommand: SlashCommand = {
   kind: CommandKind.BUILT_IN,
   supportedModes: ['interactive', 'non_interactive', 'acp'] as const,
   action: async (context: CommandContext, args?: string) => {
-    const showDetails =
-      args?.trim().toLowerCase() === 'detail' ||
-      args?.trim().toLowerCase() === '-d';
+    const normalizedArgs = args?.trim().toLowerCase();
+    const showDetails = normalizedArgs === 'detail' || normalizedArgs === '-d';
     const executionMode = context.executionMode ?? 'interactive';
     const { config } = context.services;
     if (!config) {
@@ -564,13 +566,12 @@ export const contextCommand: SlashCommand = {
     if (executionMode === 'interactive') {
       context.ui.addItem(contextUsageItem, Date.now());
       return;
-    } else {
-      return {
-        type: 'message',
-        messageType: 'info',
-        content: formatContextUsageText(contextUsageItem),
-      };
     }
+    return {
+      type: 'message',
+      messageType: 'info',
+      content: formatContextUsageText(contextUsageItem),
+    };
   },
   subCommands: [
     {

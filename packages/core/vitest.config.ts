@@ -12,7 +12,7 @@ const TEST_TIMEOUT_MS = process.platform === 'win32' ? 15_000 : 5_000;
 export default defineConfig({
   resolve: {
     alias: {
-      '@hoptrendy/quran-guidance': path.resolve(
+      '@hopcode/quran-guidance': path.resolve(
         __dirname,
         '../quran-guidance/src/index.ts',
       ),

@@ -123,36 +123,36 @@ For each package, update and publish:
 
 **Core Package:**
 
-- [ ] `packages/core/package.json` → name: `@hoptrendy/core`
+- [ ] `packages/core/package.json` → name: `@hopcode/core`
 - [ ] Build: `npm run build`
 - [ ] Test: `npm test`
 - [ ] Publish: `npm publish --access public`
 
 **CLI Package:**
 
-- [ ] `packages/cli/package.json` → name: `@hoptrendy/hopcode`
+- [ ] `packages/cli/package.json` → name: `@hopcode/hopcode`
 - [ ] Update bin: `hopcode`
 - [ ] Build, test, publish
 
 **SDK Package:**
 
-- [ ] `packages/sdk-typescript/package.json` → name: `@hoptrendy/sdk`
+- [ ] `packages/sdk-typescript/package.json` → name: `@hopcode/sdk`
 - [ ] Update documentation references
 - [ ] Build, test, publish
 
 **WebUI Package:**
 
-- [ ] `packages/webui/package.json` → name: `@hoptrendy/webui`
+- [ ] `packages/webui/package.json` → name: `@hopcode/webui`
 - [ ] Build, test, publish
 
 **Channel Packages:**
 
-- [ ] `@hoptrendy/channel-base`
-- [ ] `@hoptrendy/channel-telegram`
-- [ ] `@hoptrendy/channel-dingtalk`
-- [ ] `@hoptrendy/channel-weixin`
-- [ ] `@hoptrendy/cli-insight`
-- [ ] `@hoptrendy/terminal-capture`
+- [ ] `@hopcode/channel-base`
+- [ ] `@hopcode/channel-telegram`
+- [ ] `@hopcode/channel-dingtalk`
+- [ ] `@hopcode/channel-weixin`
+- [ ] `@hopcode/cli-insight`
+- [ ] `@hopcode/terminal-capture`
 
 **VS Code Extension:**
 
@@ -229,7 +229,7 @@ For each package, update and publish:
 
 #### Functional Testing
 
-- [ ] Install via npm: `npm install -g @hoptrendy/hopcode`
+- [ ] Install via npm: `npm install -g @hopcode/hopcode`
 - [ ] Run CLI command: `hopcode --version`
 - [ ] Test authentication: `hopcode auth login`
 - [ ] Test in VS Code extension

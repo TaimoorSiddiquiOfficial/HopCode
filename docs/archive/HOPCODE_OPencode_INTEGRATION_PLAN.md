@@ -251,7 +251,7 @@ export const ProviderConfig = z.object({
 **Current:**
 
 ```typescript
-import { QwenContentGenerator } from '../qwen/qwenContentGenerator';
+import { QwenContentGenerator } from '../hopcode/qwenContentGenerator';
 
 export function createContentGenerator(config: Config) {
   return new QwenContentGenerator(config);
@@ -600,7 +600,7 @@ docs/providers/
 
 ```bash
 # Install HopCode
-npm install -g @hoptrendy/hopcode
+npm install -g @hopcode/hopcode
 
 # Configure provider
 hopcode providers select

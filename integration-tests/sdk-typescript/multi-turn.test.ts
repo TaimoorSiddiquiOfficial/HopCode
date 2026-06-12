@@ -21,7 +21,7 @@ import {
   type SDKMessage,
   type ControlMessage,
   type ToolUseBlock,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 import {
   SDKTestHelper,
   createSharedTestOptions,

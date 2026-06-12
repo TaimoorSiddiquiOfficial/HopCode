@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,7 +23,7 @@ import type {
   EditorType,
   GeminiClient,
   AnyToolInvocation,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   ApprovalMode,
   AuthType,
@@ -31,14 +31,10 @@ import {
   SendMessageType,
   ToolErrorType,
   ToolConfirmationOutcome,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { Part, PartListUnion } from '@google/genai';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
-import type {
-  HistoryItem,
-  HistoryItemWithoutId,
-  SlashCommandProcessorResult,
-} from '../types.js';
+import type { HistoryItem, SlashCommandProcessorResult } from '../types.js';
 import { MessageType, StreamingState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { findLastSafeSplitPoint } from '../utils/markdownUtilities.js';
@@ -97,11 +93,10 @@ const mockActiveGoalEquals = vi.hoisted(() => vi.fn());
 const mockSetActiveGoal = vi.hoisted(() => vi.fn());
 const mockClearActiveGoal = vi.hoisted(() => vi.fn());
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actualCoreModule = (await importOriginal()) as any;
   return {
     ...actualCoreModule,
-    GitService: vi.fn(),
     GeminiClient: MockedGeminiClientClass,
     UserPromptEvent: MockedUserPromptEvent,
     ApiCancelEvent: MockedApiCancelEvent,
@@ -225,9 +220,11 @@ describe('useGeminiStream', () => {
         () => ({ getToolSchemaList: vi.fn(() => []) }) as any,
       ),
       getProjectRoot: vi.fn(() => '/test/dir'),
-      getCheckpointingEnabled: vi.fn(() => false),
+      getFileCheckpointingEnabled: vi.fn(() => false),
       getGeminiClient: mockGetGeminiClient,
       getApprovalMode: () => ApprovalMode.DEFAULT,
+      getTeamManager: vi.fn(() => null),
+      onTeamManagerChange: vi.fn(),
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
       addHistory: vi.fn(),
@@ -412,6 +409,60 @@ describe('useGeminiStream', () => {
         }),
       );
     });
+  });
+
+  it('renders teammate reports as a compact notification, not a raw envelope bubble', async () => {
+    const mockManager = { setLeaderMessageCallback: vi.fn() };
+    (mockConfig.getTeamManager as unknown as Mock).mockReturnValue(mockManager);
+
+    const { mockSendMessageStream } = renderTestHook();
+
+    await waitFor(() => {
+      expect(mockManager.setLeaderMessageCallback).toHaveBeenCalledWith(
+        expect.any(Function),
+      );
+    });
+
+    const display = '**scout-cli** reported back';
+    const modelText =
+      '<teammate_message_abcdef0123456789 from="scout-cli">\n' +
+      'a very long report that should never reach the UI verbatim\n' +
+      '</teammate_message_abcdef0123456789>';
+
+    const callback = (mockManager.setLeaderMessageCallback as Mock).mock
+      .calls[0][0] as (modelText: string, display: string) => void;
+
+    act(() => {
+      callback(modelText, display);
+    });
+
+    // The compact display line is added to history…
+    await waitFor(() => {
+      expect(mockAddItem).toHaveBeenCalledWith(
+        { type: 'notification', text: display },
+        expect.any(Number),
+      );
+    });
+
+    // …and the full envelope is sent to the model as a Teammate turn.
+    await waitFor(() => {
+      expect(mockSendMessageStream).toHaveBeenCalledWith(
+        modelText,
+        expect.any(AbortSignal),
+        expect.any(String),
+        expect.objectContaining({
+          type: SendMessageType.Teammate,
+          notificationDisplayText: display,
+        }),
+      );
+    });
+
+    // The raw envelope is never rendered as a history item (no `> …`
+    // user bubble dumping the whole report on screen).
+    const addedTexts = (mockAddItem as Mock).mock.calls
+      .map((c) => (c[0] as { text?: string })?.text)
+      .filter((t): t is string => typeof t === 'string');
+    expect(addedTexts.some((t) => t.includes('teammate_message'))).toBe(false);
   });
 
   it('should not submit tool responses if not all tool calls are completed', () => {
@@ -1882,7 +1933,7 @@ describe('useGeminiStream', () => {
       const config = {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => false),
-        getFastModel: vi.fn(() => 'hopcode-fast'),
+        getFastModel: vi.fn(() => 'qwen-fast'),
         getGeminiClient: vi.fn(() => ({
           generateContent: vi.fn(),
         })),
@@ -1927,7 +1978,7 @@ describe('useGeminiStream', () => {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
         getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'hopcode-main'),
+        getModel: vi.fn(() => 'qwen-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -1976,7 +2027,7 @@ describe('useGeminiStream', () => {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
         getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'hopcode-main'),
+        getModel: vi.fn(() => 'qwen-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -2079,7 +2130,7 @@ describe('useGeminiStream', () => {
         ...mockConfig,
         getEmitToolUseSummaries: vi.fn(() => true),
         getFastModel: vi.fn(() => 'qwen-fast'),
-        getModel: vi.fn(() => 'hopcode-main'),
+        getModel: vi.fn(() => 'qwen-main'),
         getGeminiClient: vi.fn(() => ({})),
         getBaseLlmClient: vi.fn(() => ({ generateText })),
       } as unknown as Config;
@@ -2134,13 +2185,13 @@ describe('useGeminiStream', () => {
 
       expect(mockSendMessageStream).toHaveBeenCalledTimes(1);
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       await act(async () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini',
           text: 'Hello',
@@ -2200,7 +2251,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       await act(async () => {
         releaseNextChunk();
@@ -2212,7 +2263,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini',
           text: '哈哈',
@@ -2261,13 +2312,13 @@ describe('useGeminiStream', () => {
       });
 
       expect(mockSendMessageStream).toHaveBeenCalledTimes(1);
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       await act(async () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           text: 'Thinking',
@@ -2325,7 +2376,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
       expect(result.current.thought).toBeNull();
 
       await act(async () => {
@@ -2338,7 +2389,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           text: 'Thinking',
@@ -2844,7 +2895,7 @@ describe('useGeminiStream', () => {
       });
 
       // Sanity: the throttle has not fired yet.
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       act(() => {
         result.current.cancelOngoingRequest();
@@ -3965,6 +4016,22 @@ describe('useGeminiStream', () => {
           message: '⚠️  Response stopped due to image safety violations.',
         },
         {
+          reason: 'IMAGE_PROHIBITED_CONTENT',
+          message: '⚠️  Response stopped due to image prohibited content.',
+        },
+        {
+          reason: 'NO_IMAGE',
+          message: '⚠️  Response stopped due to no image.',
+        },
+        {
+          reason: 'IMAGE_RECITATION',
+          message: '⚠️  Response stopped due to image recitation policy.',
+        },
+        {
+          reason: 'IMAGE_OTHER',
+          message: '⚠️  Response stopped due to other image-related reasons.',
+        },
+        {
           reason: 'UNEXPECTED_TOOL_CALL',
           message: '⚠️  Response stopped due to unexpected tool call.',
         },
@@ -4251,7 +4318,7 @@ describe('useGeminiStream', () => {
             type: ServerGeminiEventType.Thought,
             value: {
               subject: '',
-              description: ' user mentioned globally installed hopcode,',
+              description: ' user mentioned globally installed qwen,',
             },
           };
           yield {
@@ -4271,14 +4338,14 @@ describe('useGeminiStream', () => {
         expect(mockAddItem).toHaveBeenCalledWith(
           expect.objectContaining({
             type: 'gemini_thought',
-            text: 'The user mentioned globally installed hopcode,',
+            text: 'The user mentioned globally installed qwen,',
           }),
           expect.any(Number),
         );
       });
       expect(result.current.thought).toEqual({
         subject: 'Evaluating installation approach',
-        description: 'The user mentioned globally installed hopcode,',
+        description: 'The user mentioned globally installed qwen,',
       });
     });
 
@@ -4346,7 +4413,7 @@ describe('useGeminiStream', () => {
         });
 
         const findErrorItem = () =>
-          result.current.pendingGeminiHistoryItems.find(
+          result.current.pendingHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           );
 
@@ -4368,10 +4435,9 @@ describe('useGeminiStream', () => {
           await vi.advanceTimersByTimeAsync(1000);
         });
 
-        const errorAfterOneSecond =
-          result.current.pendingGeminiHistoryItems.find(
-            (item) => item.type === MessageType.ERROR,
-          );
+        const errorAfterOneSecond = result.current.pendingHistoryItems.find(
+          (item) => item.type === MessageType.ERROR,
+        );
         expect((errorAfterOneSecond as { hint?: string })?.hint).toContain(
           '2s',
         );
@@ -4390,7 +4456,7 @@ describe('useGeminiStream', () => {
         });
 
         // Error item (with hint) should be cleared after retry succeeds
-        const remainingError = result.current.pendingGeminiHistoryItems.find(
+        const remainingError = result.current.pendingHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         );
         expect(remainingError).toBeUndefined();
@@ -4458,14 +4524,14 @@ describe('useGeminiStream', () => {
           void result.current.submitQuery('Trigger retry after countdown');
         });
 
-        let errorItem = result.current.pendingGeminiHistoryItems.find(
+        let errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         ) as { hint?: string } | undefined;
         for (let attempts = 0; attempts < 5 && !errorItem; attempts++) {
           await act(async () => {
             await Promise.resolve();
           });
-          errorItem = result.current.pendingGeminiHistoryItems.find(
+          errorItem = result.current.pendingHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           ) as { hint?: string } | undefined;
         }
@@ -4476,7 +4542,7 @@ describe('useGeminiStream', () => {
         });
 
         const staleErrorBeforeRetryCompletes =
-          result.current.pendingGeminiHistoryItems.find(
+          result.current.pendingHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           ) as { hint?: string } | undefined;
         expect(staleErrorBeforeRetryCompletes?.hint).toContain('0s');
@@ -4487,7 +4553,7 @@ describe('useGeminiStream', () => {
           await Promise.resolve();
         });
 
-        const remainingError = result.current.pendingGeminiHistoryItems.find(
+        const remainingError = result.current.pendingHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         );
         expect(remainingError).toBeUndefined();
@@ -4496,7 +4562,7 @@ describe('useGeminiStream', () => {
       }
     });
 
-    it('should memoize pendingGeminiHistoryItems', () => {
+    it('should memoize pendingHistoryItems', () => {
       mockUseReactToolScheduler.mockReturnValue([
         [],
         mockScheduleToolCalls,
@@ -4527,9 +4593,9 @@ describe('useGeminiStream', () => {
         ),
       );
 
-      const firstResult = result.current.pendingGeminiHistoryItems;
+      const firstResult = result.current.pendingHistoryItems;
       rerender();
-      const secondResult = result.current.pendingGeminiHistoryItems;
+      const secondResult = result.current.pendingHistoryItems;
 
       expect(firstResult).toStrictEqual(secondResult);
 
@@ -4557,7 +4623,7 @@ describe('useGeminiStream', () => {
       ]);
 
       rerender();
-      const thirdResult = result.current.pendingGeminiHistoryItems;
+      const thirdResult = result.current.pendingHistoryItems;
 
       expect(thirdResult).not.toStrictEqual(secondResult);
     });
@@ -4663,7 +4729,7 @@ describe('useGeminiStream', () => {
       // Verify error message appears in pending history items (not via addItem,
       // since errors with retry hints are now stored as pending items)
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
+        const errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -4717,7 +4783,7 @@ describe('useGeminiStream', () => {
 
       // Verify error appears in pending history items
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
+        const errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -4740,7 +4806,7 @@ describe('useGeminiStream', () => {
 
       // Verify the error is cleared (no longer in pending history items)
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
+        const errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeUndefined();
@@ -4768,8 +4834,8 @@ describe('useGeminiStream', () => {
       });
 
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
-          (item: HistoryItemWithoutId) => item.type === 'error',
+        const errorItem = result.current.pendingHistoryItems.find(
+          (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
       });
@@ -4809,8 +4875,8 @@ describe('useGeminiStream', () => {
       expect(errorCommit?.[0]).not.toHaveProperty('hint');
 
       // The pending region is cleared, as before.
-      const errorItem = result.current.pendingGeminiHistoryItems.find(
-        (item: HistoryItemWithoutId) => item.type === 'error',
+      const errorItem = result.current.pendingHistoryItems.find(
+        (item) => item.type === 'error',
       );
       expect(errorItem).toBeUndefined();
     });

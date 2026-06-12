@@ -105,36 +105,36 @@ esbuild
         __dirname,
         'packages/cli/src/patches/is-in-ci.ts',
       ),
-      '@hoptrendy/hopcode-core': path.resolve(
+      '@hopcode/hopcode-core': path.resolve(
         __dirname,
         'packages/core/src/index.ts',
       ),
-      '@hoptrendy/web-templates': path.resolve(
+      '@hopcode/web-templates': path.resolve(
         __dirname,
         'packages/web-templates/src/index.ts',
       ),
       // Sub-path exports must come before their parent alias
-      '@hoptrendy/channel-weixin/accounts': path.resolve(
+      '@hopcode/channel-weixin/accounts': path.resolve(
         __dirname,
         'packages/channels/weixin/src/accounts.ts',
       ),
-      '@hoptrendy/channel-weixin/login': path.resolve(
+      '@hopcode/channel-weixin/login': path.resolve(
         __dirname,
         'packages/channels/weixin/src/login.ts',
       ),
-      '@hoptrendy/channel-base': path.resolve(
+      '@hopcode/channel-base': path.resolve(
         __dirname,
         'packages/channels/base/src/index.ts',
       ),
-      '@hoptrendy/channel-telegram': path.resolve(
+      '@hopcode/channel-telegram': path.resolve(
         __dirname,
         'packages/channels/telegram/src/index.ts',
       ),
-      '@hoptrendy/channel-weixin': path.resolve(
+      '@hopcode/channel-weixin': path.resolve(
         __dirname,
         'packages/channels/weixin/src/index.ts',
       ),
-      '@hoptrendy/channel-dingtalk': path.resolve(
+      '@hopcode/channel-dingtalk': path.resolve(
         __dirname,
         'packages/channels/dingtalk/src/index.ts',
       ),

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,22 +11,55 @@ import path from 'node:path';
 export default defineConfig({
   resolve: {
     alias: {
-      '@hoptrendy/hopcode-core': path.resolve(__dirname, '../core/index.ts'),
-      '@hoptrendy/hopcode-server': path.resolve(
+      '@hopcode/hopcode-core': path.resolve(__dirname, '../core/index.ts'),
+      // cli's daemonStatusProvider.test.ts imports `FakeAgent` /
+      // `makeChannel` from acp-bridge's package-private
+      // `internal/testUtils` module. This alias overrides the runtime
+      // resolution so vitest reads the .ts source directly instead of
+      // the build-then-stale `dist/` copy.
+      '@hopcode/acp-bridge/internal/testUtils': path.resolve(
         __dirname,
-        '../server/dist/index.js',
+        '../acp-bridge/src/internal/testUtils.ts',
       ),
-      '@hoptrendy/quran-guidance': path.resolve(
+      // Same rationale as above: bridgeErrors and status subpaths
+      // resolve to dist/ via package.json exports, but tests in the
+      // monorepo worktree need the live source (dist may be stale or
+      // absent during development).
+      '@hopcode/acp-bridge/bridgeErrors': path.resolve(
         __dirname,
-        '../quran-guidance/src/index.ts',
+        '../acp-bridge/src/bridgeErrors.ts',
       ),
-      '@hoptrendy/channel-base': path.resolve(
+      '@hopcode/acp-bridge/status': path.resolve(
         __dirname,
-        '../channels/base/src/index.ts',
+        '../acp-bridge/src/status.ts',
       ),
-      '@hoptrendy/web-templates': path.resolve(
+      '@hopcode/acp-bridge/bridge': path.resolve(
         __dirname,
-        '../web-templates/src/index.ts',
+        '../acp-bridge/src/bridge.ts',
+      ),
+      '@hopcode/acp-bridge/spawnChannel': path.resolve(
+        __dirname,
+        '../acp-bridge/src/spawnChannel.ts',
+      ),
+      '@hopcode/acp-bridge/bridgeClient': path.resolve(
+        __dirname,
+        '../acp-bridge/src/bridgeClient.ts',
+      ),
+      '@hopcode/acp-bridge/bridgeOptions': path.resolve(
+        __dirname,
+        '../acp-bridge/src/bridgeOptions.ts',
+      ),
+      '@hopcode/acp-bridge/bridgeTypes': path.resolve(
+        __dirname,
+        '../acp-bridge/src/bridgeTypes.ts',
+      ),
+      '@hopcode/acp-bridge/bridgeFileSystem': path.resolve(
+        __dirname,
+        '../acp-bridge/src/bridgeFileSystem.ts',
+      ),
+      '@hopcode/acp-bridge/workspacePaths': path.resolve(
+        __dirname,
+        '../acp-bridge/src/workspacePaths.ts',
       ),
     },
   },
@@ -63,7 +96,7 @@ export default defineConfig({
     },
     server: {
       deps: {
-        inline: [/@hoptrendy\/hopcode-core/, /@hoptrendy\/hopcode-server/],
+        inline: [/@hopcode\/hopcode-core/],
       },
     },
   },

@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type {
   ResumedSessionData,
   SessionService,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { theme } from '../semantic-colors.js';
 import { HistoryItemDisplay } from './HistoryItemDisplay.js';
 import { useKeypress } from '../hooks/useKeypress.js';

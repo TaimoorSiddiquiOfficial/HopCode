@@ -5,7 +5,7 @@
  */
 
 import type { ModelInfo } from '@agentclientprotocol/sdk';
-import { knownTokenLimit } from '@hoptrendy/hopcode-core';
+import { knownTokenLimit } from '@hopcode/hopcode-core';
 import type { ApprovalModeValue } from '../types/approvalModeValueTypes.js';
 
 type AcpMeta = Record<string, unknown>;

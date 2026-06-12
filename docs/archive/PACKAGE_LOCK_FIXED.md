@@ -11,10 +11,10 @@
 **Error:**
 
 ```
-Missing: @hoptrendy/channel-base@0.14.5 from lock file
+Missing: @hopcode/channel-base@0.14.5 from lock file
 ```
 
-**Cause:** Package names were updated to @hoptrendy/_ but lock file still had @hoptrendy/_
+**Cause:** Package names were updated to @hopcode/_ but lock file still had @hopcode/_
 
 ---
 
@@ -28,7 +28,7 @@ npm install --package-lock-only
 
 **Updated references:**
 
-- @hoptrendy/_ → @hoptrendy/_ (in lock file)
+- @hopcode/_ → @hopcode/_ (in lock file)
 - All workspace dependencies updated
 
 **Commit:** b07bd4eac  
@@ -66,10 +66,10 @@ ref: main
 ✅ prepare (1-2 min)
    ↓
 ✅ publish-packages (3-5 min)
-   ├─ @hoptrendy/hopcode-cli
-   ├─ @hoptrendy/hopcode-core
-   ├─ @hoptrendy/sdk
-   ├─ @hoptrendy/webui
+   ├─ @hopcode/hopcode
+   ├─ @hopcode/hopcode-core
+   ├─ @hopcode/sdk
+   ├─ @hopcode/webui
    └─ etc...
    ↓
 ✅ notify (30 sec)
@@ -80,8 +80,8 @@ ref: main
 ```
 ✓ Install Dependencies
 ✓ Build Package
-✓ Publish @hoptrendy/hopcode-cli
-  DRY RUN: Would publish @hoptrendy/hopcode-cli
+✓ Publish @hopcode/hopcode
+  DRY RUN: Would publish @hopcode/hopcode
 ```
 
 ---
@@ -97,7 +97,7 @@ ref: main
 **Scope:**
 
 ```
-@hoptrendy/* → @hoptrendy/*
+@hopcode/* → @hopcode/*
 ```
 
 ---
@@ -115,14 +115,14 @@ ref: main
 2. **Verify on npm:**
 
    ```
-   https://www.npmjs.com/package/@hoptrendy/hopcode
-   https://www.npmjs.com/package/@hoptrendy/core
-   https://www.npmjs.com/package/@hoptrendy/sdk
+   https://www.npmjs.com/package/@hopcode/hopcode
+   https://www.npmjs.com/package/@hopcode/core
+   https://www.npmjs.com/package/@hopcode/sdk
    ```
 
 3. **Test installation:**
    ```bash
-   npm install -g @hoptrendy/hopcode
+   npm install -g @hopcode/hopcode
    hoptrendy --version
    ```
 

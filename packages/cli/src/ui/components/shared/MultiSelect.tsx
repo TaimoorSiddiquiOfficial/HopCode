@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,6 +26,8 @@ export interface MultiSelectProps<T> {
   onSelectedKeysChange?: (selectedKeys: string[]) => void;
   onHighlight?: (value: T) => void;
   isFocused?: boolean;
+  /** Suppress j/k vim-nav while keeping arrows/Enter/space active. */
+  disableVimNav?: boolean;
   showNumbers?: boolean;
   showScrollArrows?: boolean;
   maxItemsToShow?: number;
@@ -54,6 +56,7 @@ export function MultiSelect<T>({
   onSelectedKeysChange,
   onHighlight,
   isFocused = true,
+  disableVimNav = false,
   showNumbers = true,
   showScrollArrows = false,
   maxItemsToShow = 10,
@@ -68,7 +71,8 @@ export function MultiSelect<T>({
     items,
     initialIndex,
     isFocused,
-    // Disable numeric quick-select in useSelectionList � in a multi-select
+    disableVimNav,
+    // Disable numeric quick-select in useSelectionList — in a multi-select
     // context, onSelect triggers onConfirm (submit), so numeric keys would
     // accidentally submit the dialog instead of toggling checkboxes.
     // Numbers are still rendered visually via the showNumbers prop below.
@@ -136,7 +140,7 @@ export function MultiSelect<T>({
   return (
     <Box flexDirection="column">
       {showScrollArrows && hasMoreAbove && (
-        <Text color={theme.text.secondary}>? {moreAboveCount} more above</Text>
+        <Text color={theme.text.secondary}>↑ {moreAboveCount} more above</Text>
       )}
 
       {visibleItems.map((item, index) => {
@@ -204,7 +208,7 @@ export function MultiSelect<T>({
       })}
 
       {showScrollArrows && hasMoreBelow && (
-        <Text color={theme.text.secondary}>? {moreBelowCount} more below</Text>
+        <Text color={theme.text.secondary}>↓ {moreBelowCount} more below</Text>
       )}
     </Box>
   );

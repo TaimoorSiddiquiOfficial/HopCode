@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,8 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'Izn mode': 'Mode Izn',
+  'YOLO mode': 'Mode YOLO',
+  'Auto mode': 'Mode auto',
   'plan mode': 'mode de planificació',
   'auto-accept edits': 'acceptació automàtica de canvis',
   'Accepting edits': 'Acceptant canvis',
@@ -88,7 +89,7 @@ export default {
   // ============================================================================
   // Informació del sistema
   // ============================================================================
-  HopCode: 'HopCode',
+  'HopCode': 'HopCode',
   Runtime: "Entorn d'execució",
   OS: 'SO',
   Auth: 'Autenticació',
@@ -108,7 +109,42 @@ export default {
     'Analitza el projecte i crea un fitxer HOPCODE.md personalitzat.',
   'List available HopCode tools. Usage: /tools [desc]':
     'Llistar les eines disponibles de HopCode. Ús: /tools [desc]',
-  'List available skills.': 'Llistar les habilitats disponibles.',
+  'Open the skills panel (browse, search, toggle, pick).':
+    "Obrir el panell d'habilitats (explorar, cercar, activar, triar).",
+  'Manage Skills': 'Gestionar habilitats',
+  'Skills configuration saved.': "Configuració d'habilitats desada.",
+  'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
+    "Configuració d'habilitats desada, però l'actualització ha fallat: {{error}}. Reinicia per assegurar-te que el nou estat s'apliqui.",
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.hopcode/settings.json directly to manage skills at user scope.':
+    "L'espai de treball no és de confiança; els paràmetres de l'espai de treball s'ignoren a la configuració fusionada. Executa /trust primer, o edita ~/.hopcode/settings.json directament per gestionar habilitats a l'àmbit d'usuari.",
+  'SkillManager not available.': 'SkillManager no disponible.',
+  'Loading skills…': 'Carregant habilitats…',
+  'Failed to load skills: {{error}}':
+    'No s’han pogut carregar les habilitats: {{error}}',
+  'Failed to save skills configuration: {{error}}':
+    "No s'ha pogut desar la configuració d'habilitats: {{error}}",
+  'All available skills are disabled. Edit ~/.hopcode/settings.json or .hopcode/settings.json (skills.disabled) to re-enable.':
+    'Totes les habilitats disponibles estan desactivades. Edita ~/.hopcode/settings.json o .hopcode/settings.json (skills.disabled) per tornar-les a activar.',
+  'Press esc to close.': 'Prem Esc per tancar.',
+  '{{count}} skills · ': '{{count}} habilitats · ',
+  '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} habilitats · ',
+  'Space toggle · Enter pick (fill input) · Esc save & exit · workspace scope':
+    "Espai alternar · Enter triar (omple l'entrada) · Esc desar i sortir · àmbit d'espai de treball",
+  'Search:': 'Cerca:',
+  'type to filter…': 'escriu per filtrar…',
+  'No skills are currently available.':
+    'No hi ha habilitats disponibles actualment.',
+  'All available skills are locked at a higher scope (see below).':
+    'Totes les habilitats disponibles estan bloquejades en un àmbit superior (veure a sota).',
+  'No skills match the search.': 'Cap habilitat coincideix amb la cerca.',
+  'Locked by higher-scope settings (cannot toggle here):':
+    "Bloquejades per paràmetres d'àmbit superior (aquí no es poden commutar):",
+  'higher scope': 'àmbit superior',
+  '  {{name}} {{description}}  [locked: {{scope}}]':
+    '  {{name}} {{description}}  [bloquejada: {{scope}}]',
+  '↑/↓ navigate · backspace edits search':
+    '↑/↓ navega · Retrocés edita la cerca',
+  Bundled: 'Integrada',
   'Available HopCode CLI tools:': 'Eines del CLI de HopCode disponibles:',
   'No tools available': 'No hi ha eines disponibles',
   'View or change the approval mode for tool usage':
@@ -191,8 +227,8 @@ export default {
     'obrir la documentació completa de HopCode al navegador',
   'Configuration not available.': 'Configuració no disponible.',
   'Connect an LLM provider': 'Connectar un proveïdor LLM',
-  'Copy the last result or code snippet to clipboard':
-    "Copiar l'últim resultat o fragment de codi al porta-retalls",
+  'Copy the last AI response to clipboard (/copy N for Nth-latest)':
+    "Copia l'última resposta de la IA al porta-retalls (/copy N per a l'N-èsima)",
 
   // ============================================================================
   // Ordres - Agents
@@ -386,7 +422,8 @@ export default {
   // ============================================================================
   // Ordres - General (continuació)
   // ============================================================================
-  'View and edit HopCode settings': 'Veure i editar la configuració de HopCode',
+  'View and edit HopCode settings':
+    'Veure i editar la configuració de HopCode',
   Settings: 'Configuració',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
     'Per veure els canvis, cal reiniciar HopCode. Premeu r per sortir i aplicar els canvis ara.',
@@ -412,8 +449,8 @@ export default {
   'Custom Witty Phrases': 'Frases enginyoses personalitzades',
   'Show Welcome Back Dialog': 'Mostrar el diàleg de benvinguda',
   'Enable User Feedback': 'Activar les valoracions dels usuaris',
-  'How is HopCode doing this session? (optional)':
-    'Com va HopCode en aquesta sessió? (opcional)',
+  'How is Qwen doing this session? (optional)':
+    'Com va Qwen en aquesta sessió? (opcional)',
   Bad: 'Malament',
   Fine: 'Bé',
   Good: 'Molt bé',
@@ -448,9 +485,9 @@ export default {
   Text: 'Text',
   JSON: 'JSON',
   Plan: 'Planificació',
-  Default: 'Per defecte',
+  'Ask permissions': 'Demanar permisos',
   'Auto Edit': 'Edició automàtica',
-  Izn: 'Izn',
+  YOLO: 'YOLO',
   'toggle vim mode on/off': 'activar/desactivar el mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'comprovar les estadístiques de la sessió. Ús: /stats [model|tools]',
@@ -676,16 +713,16 @@ export default {
   'Configured hooks:': 'Hooks configurats:',
   'No hooks configured for this event.':
     'No hi ha hooks configurats per a aquest esdeveniment.',
-  'To add hooks, edit settings.json directly or ask HopCode.':
-    'Per afegir hooks, editeu settings.json directament o demaneu-ho a HopCode.',
+  'To add hooks, edit settings.json directly or ask Qwen.':
+    'Per afegir hooks, editeu settings.json directament o demaneu-ho a Qwen.',
   'Enter to select · Esc to go back':
     'Enter per seleccionar · Esc per tornar enrere',
   'Hook details': 'Detalls del hook',
   'Event:': 'Esdeveniment:',
   'Extension:': 'Extensió:',
   'No hook config selected': 'Cap configuració de hook seleccionada',
-  'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'Per modificar o eliminar aquest hook, editeu settings.json directament o demaneu ajuda a HopCode.',
+  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+    'Per modificar o eliminar aquest hook, editeu settings.json directament o demaneu ajuda a Qwen.',
   'Hook Configuration - Disabled': 'Configuració de hooks - Desactivats',
   'All hooks are currently disabled. You have {{count}} that are not running.':
     'Tots els hooks estan desactivats. En teniu {{count}} que no estan en execució.',
@@ -713,6 +750,8 @@ export default {
   'After tool execution fails': "Quan falla l'execució de l'eina",
   'When notifications are sent': "Quan s'envien notificacions",
   'When the user submits a prompt': "Quan l'usuari envia un missatge",
+  'When a slash command expands into a prompt':
+    "Quan una ordre de barra s'expandeix en un missatge",
   'When a new session is started': "Quan s'inicia una nova sessió",
   'Right before HopCode concludes its response':
     'Immediatament abans que HopCode conclou la seva resposta',
@@ -734,6 +773,8 @@ export default {
     "L'entrada a l'ordre és JSON amb el missatge de notificació i el tipus.",
   'Input to command is JSON with original user prompt text.':
     "L'entrada a l'ordre és JSON amb el text original del missatge de l'usuari.",
+  'Input to command is JSON with command_name, command_args, and expanded prompt text.':
+    "L'entrada a l'ordre és JSON amb command_name, command_args i el text del missatge expandit.",
   'Input to command is JSON with session start source.':
     "L'entrada a l'ordre és JSON amb la font d'inici de sessió.",
   'Input to command is JSON with session end reason.':
@@ -757,7 +798,9 @@ export default {
     "mostrar stderr només a l'usuari però continuar amb la crida a l'eina",
   'block processing, erase original prompt, and show stderr to user only':
     "blocar el processament, esborrar el missatge original i mostrar stderr només a l'usuari",
-  'stdout shown to HopCode': 'stdout mostrat a HopCode',
+  'block expanded prompt submission and show stderr to user only':
+    "blocar l'enviament del missatge expandit i mostrar stderr només a l'usuari",
+  'stdout shown to Qwen': 'stdout mostrat a Qwen',
   'show stderr to user only (blocking errors ignored)':
     "mostrar stderr només a l'usuari (errors de bloqueig ignorats)",
   'command completes successfully': "l'ordre es completa correctament",
@@ -796,25 +839,29 @@ export default {
   'Resume a previous session': 'Reprendre una sessió anterior',
   'Fork the current conversation into a new session':
     'Bifurca la conversa actual en una sessió nova',
+  'Spawn a background agent that inherits the full conversation':
+    'Inicia un agent en segon pla que hereta tota la conversa',
+  'Please provide a directive. Usage: /fork <directive>':
+    'Proporcioneu una directiva. Ús: /fork <directiva>',
+  'Cannot fork while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
+    "No es pot crear una bifurcació mentre hi ha una resposta o una crida a una eina en curs. Espereu que acabi o resolgueu la crida a l'eina pendent.",
+  'Cannot fork before the first conversation turn.':
+    'No es pot crear una bifurcació abans del primer torn de conversa.',
+  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
+    'L’ordre /fork requereix el feature gate de fork. Definiu HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 per activar-lo.',
+  'The agent tool is unavailable; cannot fork.':
+    "L'eina d'agent no està disponible; no es pot crear una bifurcació.",
+  'Failed to launch fork: {{error}}':
+    'No s’ha pogut iniciar la bifurcació: {{error}}',
+  'User launched a background fork via /fork: {{directive}}':
+    "L'usuari ha iniciat una bifurcació en segon pla amb /fork: {{directive}}",
+  'Forked into a background agent. It inherits this conversation and runs without blocking — track it in the background tasks panel; it reports back when done.':
+    "S'ha bifurcat a un agent en segon pla. Hereta aquesta conversa i s'executa sense bloquejar — feu-ne el seguiment al tauler de tasques en segon pla; informarà quan acabi.",
   'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
     "No es pot bifurcar mentre hi ha una resposta o una crida a una eina en curs. Espereu que acabi o resolgueu la crida a l'eina pendent.",
   'No conversation to branch.': 'No hi ha cap conversa per bifurcar.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     "Restaurar una crida a una eina. Això restablirà la conversa i l'historial de fitxers a l'estat en què es trobaven quan es va suggerir la crida a l'eina",
-  'Navigate and search session history':
-    "Navegar i cercar a l'historial de sessió",
-  'Full-text search across all history items (entire session)':
-    "Cerca de text complet a tots els elements de l'historial (tota la sessió)",
-  'Load the previous 2 000 history items':
-    "Carregar els 2 000 elements anteriors de l'historial",
-  'Load the next 2 000 history items':
-    "Carregar els propers 2 000 elements de l'historial",
-  'Show current history window statistics':
-    "Mostrar estadístiques de la finestra d'historial actual",
-  'Jump to a specific item index in history':
-    "Anar a un índex d'element específic a l'historial",
-  'Full-text search across all history items':
-    "Cerca de text complet a tots els elements de l'historial",
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     "No s'ha pogut detectar el tipus de terminal. Terminals compatibles: VS Code, Cursor, Windsurf i Trae.",
   'Terminal "{{terminal}}" is not supported yet.':
@@ -858,13 +905,14 @@ export default {
   // Ordres - Mode d'aprovació
   // ============================================================================
   'Tool Approval Mode': "Mode d'aprovació d'eines",
-  '{{mode}} mode': 'Mode {{mode}}',
   'Analyze only, do not modify files or execute commands':
     'Analitzar només, sense modificar fitxers ni executar ordres',
   'Require approval for file edits or shell commands':
     'Requerir aprovació per a edicions de fitxers o ordres shell',
   'Automatically approve file edits':
     'Aprovar automàticament les edicions de fitxers',
+  'Use classifier to automatically approve safe tool calls':
+    'Utilitzar el classificador per aprovar automàticament les crides segures a eines',
   'Automatically approve all tools': 'Aprovar automàticament totes les eines',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
     "Existeix un mode d'aprovació de l'espai de treball i té prioritat. El canvi a nivell d'usuari no tindrà cap efecte.",
@@ -1423,6 +1471,21 @@ export default {
     "No s'ha realitzat cap crida a eines en aquesta sessió.",
   'Session start time is unavailable, cannot calculate stats.':
     "L'hora d'inici de la sessió no està disponible, no es poden calcular les estadístiques.",
+  Activity: 'Activitat',
+  Efficiency: 'Eficiència',
+  Today: 'Avui',
+  'Token Trend': 'Tendència de Tokens',
+  'Cache Hit Rate': "Taxa d'encert de cache",
+  'Tool Success': "Èxit d'eines",
+  'Tool Leaderboard': "Classificació d'eines",
+  Time: 'Temps',
+  Success: 'Èxit',
+  Cache: 'Cache',
+  Latency: 'Latència',
+  'Code Impact': 'Impacte al codi',
+  net: 'net',
+  streak: 'ratxa',
+  best: 'rècord',
 
   // ============================================================================
   // Migració del format d'ordres
@@ -1752,13 +1815,12 @@ export default {
     "⚠️  Cap mètode d'autenticació configurat.\n",
   'Run one of the following commands to get started:\n':
     'Executeu una de les ordres següents per començar:\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - Autenticar-se amb HopCode OAuth (descontinuat)',
+  '  qwen auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  qwen auth hopcode-oauth     - Autenticar-se amb HopCode OAuth (descontinuat)',
   'Or simply run:': 'O simplement executeu:',
-  '  hopcode auth                - Interactive authentication setup\n':
-    "  hopcode auth                - Configuració interactiva de l'autenticació\n",
-  '✓ Authentication Method: HopCode OAuth':
-    "✓ Mètode d'autenticació: HopCode OAuth",
+  '  qwen auth                - Interactive authentication setup\n':
+    "  qwen auth                - Configuració interactiva de l'autenticació\n",
+  '✓ Authentication Method: HopCode OAuth': "✓ Mètode d'autenticació: HopCode OAuth",
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipus: Nivell gratuït (descontinuat el 15-04-2026)',
   '  Limit: No longer available': '  Límit: Ja no disponible',
@@ -1775,8 +1837,8 @@ export default {
     "⚠️  Mètode d'autenticació: Coding Plan d'Alibaba Cloud (Incomplet)",
   '  Issue: API key not found in environment or settings\n':
     "  Problema: API Key no trobada a l'entorn o la configuració\n",
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  Executeu `hopcode auth coding-plan` per tornar a configurar.\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  Executeu `qwen auth coding-plan` per tornar a configurar.\n',
   '✓ Authentication Method: {{type}}': "✓ Mètode d'autenticació: {{type}}",
   '  Status: Configured\n': '  Estat: Configurat\n',
   'Failed to check authentication status: {{error}}':
@@ -1874,4 +1936,40 @@ export default {
   'Ref:': 'Referència:',
   '中国 (China)': 'Xina',
   '中国 (China) - 阿里云百炼': 'Xina - 阿里云百炼',
+
+  // Stats Dashboard — Category 2
+  'Activity Heatmap': "Mapa d'activitat",
+  Less: 'Menys',
+  More: 'Més',
+  Sessions: 'Sessions',
+  Duration: 'Durada',
+  Projects: 'Projectes',
+  'Loading stats...': 'Carregant estadístiques...',
+  '(no data)': '(sense dades)',
+  d: 'd',
+  h: 'h',
+  m: 'm',
+  Input: 'Entrada',
+  Models: 'Models',
+  'All time': 'Tot el temps',
+  'Last 7 days': 'Últims 7 dies',
+  'Last 30 days': 'Últims 30 dies',
+  'Show usage statistics dashboard.': "Mostra el tauler d'estadístiques d'ús.",
+
+  // Stats Dashboard — keyboard hints (not translated)
+  'tab \xB7 esc': 'tab \xB7 esc',
+  'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc':
+    'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc',
+  'tab \xB7 r dates \xB7 esc': 'tab \xB7 r dates \xB7 esc',
+
+  // Stats Dashboard — missing labels
+  'API Requests': "Sol·licituds d'API",
+  'Tool Calls': "Crides d'eines",
+  'Success rate': "Taxa d'èxit",
+  'Code Changes': 'Canvis de codi',
+  Tool: 'Eina',
+  reqs: 'sol.',
+  in: 'ent.',
+  out: 'sort.',
+  'In/Out': 'Ent/Sort',
 };

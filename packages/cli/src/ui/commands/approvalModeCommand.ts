@@ -12,12 +12,13 @@ import type {
 } from './types.js';
 import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';
-import type { ApprovalMode } from '@hoptrendy/hopcode-core';
+import type { ApprovalMode } from '@hopcode/hopcode-core';
 import {
   APPROVAL_MODES,
   ApprovalMode as ApprovalModeEnum,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { emitAutoModeEntryNotices } from '../hooks/useAutoAcceptIndicator.js';
+import { formatApprovalModeName } from '../utils/approvalModeDisplay.js';
 
 /**
  * Parses the argument string and returns the corresponding ApprovalMode if valid.
@@ -101,7 +102,9 @@ export const approvalModeCommand: SlashCommand = {
     return {
       type: 'message',
       messageType: 'info',
-      content: t('Approval mode set to "{{mode}}"', { mode }),
+      content: t('Approval mode set to "{{mode}}"', {
+        mode: formatApprovalModeName(mode),
+      }),
     };
   },
 };

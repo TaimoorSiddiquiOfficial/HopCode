@@ -9,7 +9,7 @@ import {
   AuthType,
   type Config,
   type ModelProvidersConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import {
   fetchManageModelsCatalog,
@@ -42,7 +42,7 @@ describe('manageModels', () => {
   it('fetchManageModelsCatalog maps OpenRouter models into catalog entries', async () => {
     mockFetchOpenRouterModels.mockResolvedValue([
       {
-        id: 'qwen/qwen3-coder:free',
+        id: 'hopcode/qwen3-coder:free',
         name: 'OpenRouter · Qwen3 Coder',
         capabilities: { vision: true },
         generationConfig: { contextWindowSize: 1_000_000 },

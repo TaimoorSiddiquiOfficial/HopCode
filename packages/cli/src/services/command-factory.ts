@@ -10,7 +10,7 @@
  */
 
 import path from 'node:path';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 import { t } from '../i18n/index.js';
 import type {
   CommandContext,

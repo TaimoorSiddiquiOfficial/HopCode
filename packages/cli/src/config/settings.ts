@@ -15,7 +15,8 @@ import {
   getErrorMessage,
   Storage,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+  stripRuntimeSnapshotPrefix,
+} from '@hopcode/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 import { DefaultLight } from '../ui/themes/default-light.js';
 import { DefaultDark } from '../ui/themes/default.js';
@@ -75,8 +76,8 @@ export const DEFAULT_EXCLUDED_ENV_VARS = ['DEBUG', 'DEBUG_MODE'];
 
 // Env var names used for inter-process communication of corruption state.
 // Defined as constants to avoid duplicated string literals.
-export const ENV_CORRUPTED_PATH = 'HOPCODE_SETTINGS_CORRUPTED_PATH';
-export const ENV_WAS_RECOVERED = 'HOPCODE_SETTINGS_WAS_RECOVERED';
+export const ENV_CORRUPTED_PATH = 'HOPCODE_CODE_SETTINGS_CORRUPTED_PATH';
+export const ENV_WAS_RECOVERED = 'HOPCODE_CODE_SETTINGS_WAS_RECOVERED';
 
 // HOPCODE_HOME and HOPCODE_RUNTIME_DIR control where global state (settings, OAuth
 // credentials, installation IDs, etc.) is written. A project `.env` must never
@@ -89,6 +90,32 @@ const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
   ENV_CORRUPTED_PATH,
   ENV_WAS_RECOVERED,
 ];
+
+const RELOAD_EXCLUDED_KEYS = new Set([
+  ...PROJECT_ENV_HARDCODED_EXCLUSIONS,
+  'HOPCODE_SERVER_TOKEN',
+  'HOPCODE_CLI_ENTRY',
+  'NODE_OPTIONS',
+  'NODE_PATH',
+  'NODE_TLS_REJECT_UNAUTHORIZED',
+  'LD_PRELOAD',
+  'LD_AUDIT',
+  'LD_LIBRARY_PATH',
+  'DYLD_INSERT_LIBRARIES',
+  'DYLD_LIBRARY_PATH',
+  'BASH_ENV',
+  'ENV',
+  'PATH',
+  'HOME',
+  'TMPDIR',
+  'TMP',
+  'TEMP',
+]);
+
+const dotEnvSourcedKeys = new Set<string>();
+const settingsEnvSourcedKeys = new Set<string>();
+const lastReloadSnapshot = new Map<string, string>();
+let lastReloadSnapshotSeeded = false;
 
 // Settings version to track migration state
 export const SETTINGS_VERSION = 4;
@@ -163,8 +190,8 @@ export function migrateLegacyPermissions(
 }
 
 export function getSystemSettingsPath(): string {
-  if (process.env['HOPCODE_SYSTEM_SETTINGS_PATH']) {
-    return process.env['HOPCODE_SYSTEM_SETTINGS_PATH'];
+  if (process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH']) {
+    return process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'];
   }
   if (platform() === 'darwin') {
     return '/Library/Application Support/HopCode/settings.json';
@@ -176,8 +203,8 @@ export function getSystemSettingsPath(): string {
 }
 
 export function getSystemDefaultsPath(): string {
-  if (process.env['HOPCODE_SYSTEM_DEFAULTS_PATH']) {
-    return process.env['HOPCODE_SYSTEM_DEFAULTS_PATH'];
+  if (process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH']) {
+    return process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'];
   }
   return path.join(
     path.dirname(getSystemSettingsPath()),
@@ -464,6 +491,10 @@ export class LoadedSettings {
   }
 
   setValue(scope: SettingScope, key: string, value: unknown): void {
+    // Never persist a runtime snapshot ID to model.name (it re-wraps on restart).
+    if (key === 'model.name' && typeof value === 'string') {
+      value = stripRuntimeSnapshotPrefix(value);
+    }
     const settingsFile = this.forScope(scope);
     setNestedPropertySafe(settingsFile.settings, key, value);
     setNestedPropertySafe(settingsFile.originalSettings, key, value);
@@ -473,6 +504,36 @@ export class LoadedSettings {
   }
 
   recomputeMerged(): void {
+    this._merged = this.computeMergedSettings();
+  }
+
+  reloadScopeFromDisk(scope: SettingScope): void {
+    const file = this.forScope(scope);
+    try {
+      if (!fs.existsSync(file.path)) {
+        file.settings = {};
+        file.originalSettings = {};
+        file.rawJson = undefined;
+        this._merged = this.computeMergedSettings();
+        return;
+      }
+
+      const content = fs.readFileSync(file.path, 'utf-8');
+      const parsed = JSON.parse(stripJsonComments(content));
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        const resolved = resolveEnvVarsInObject(
+          parsed as Settings,
+          getHomeEnvFallbackVars(),
+        );
+        file.settings = resolved;
+        file.originalSettings = structuredClone(parsed) as Settings;
+        file.rawJson = content;
+      }
+    } catch (err) {
+      debugLogger.warn(
+        `reloadScopeFromDisk(${scope}): ${getErrorMessage(err)}`,
+      );
+    }
     this._merged = this.computeMergedSettings();
   }
 
@@ -537,10 +598,8 @@ function getUserLevelEnvPaths(): Set<string> {
     path.normalize(path.join(homeDir, '.env')),
     path.normalize(path.join(globalHopcodeDir, '.env')),
   ]);
-  const legacyHopCodeEnv = path.normalize(
-    path.join(homeDir, HOPCODE_DIR, '.env'),
-  );
-  paths.add(legacyHopCodeEnv);
+  const legacyQwenEnv = path.normalize(path.join(homeDir, HOPCODE_DIR, '.env'));
+  paths.add(legacyQwenEnv);
   return paths;
 }
 
@@ -573,11 +632,11 @@ export function preResolveHomeEnvOverrides(): void {
   // Storage.getGlobalHopCodeDir() shares the same homedir resolution as the
   // rest of the storage layer; when HOPCODE_HOME is unset it equals
   // `<homedir>/.hopcode`, so path.dirname() recovers `<homedir>`.
-  const initialHopCodeHome = process.env['HOPCODE_HOME'];
-  const initialHopCodeDir = Storage.getGlobalHopCodeDir();
-  const candidates: string[] = [path.join(initialHopCodeDir, '.env')];
-  if (!initialHopCodeHome) {
-    candidates.push(path.join(path.dirname(initialHopCodeDir), '.env'));
+  const initialhopcodeHome = process.env['HOPCODE_HOME'];
+  const initialHopcodeDir = Storage.getGlobalHopCodeDir();
+  const candidates: string[] = [path.join(initialHopcodeDir, '.env')];
+  if (!initialhopcodeHome) {
+    candidates.push(path.join(path.dirname(initialHopcodeDir), '.env'));
   }
 
   for (const candidate of candidates) {
@@ -588,10 +647,10 @@ export function preResolveHomeEnvOverrides(): void {
   // HOPCODE_RUNTIME_DIR can be sourced from there (mirrors the VS Code
   // companion's bootstrapHomeEnvOverrides — without this third pass the
   // CLI and companion would diverge on the runtime dir).
-  const discoveredHopCodeHome = process.env['HOPCODE_HOME'];
-  if (discoveredHopCodeHome && discoveredHopCodeHome !== initialHopCodeHome) {
+  const discoveredhopcodeHome = process.env['HOPCODE_HOME'];
+  if (discoveredhopcodeHome && discoveredhopcodeHome !== initialhopcodeHome) {
     const discoveredDir = Storage.getGlobalHopCodeDir();
-    if (discoveredDir !== initialHopCodeDir) {
+    if (discoveredDir !== initialHopcodeDir) {
       readHomeEnvInto(path.join(discoveredDir, '.env'));
     }
   }
@@ -668,7 +727,7 @@ function getHomeEnvFallbackVars(): Record<string, string> {
  * tokens / settings / memory is intentionally skipped, but silently starting
  * fresh is a footgun. Returns null when there's nothing to warn about.
  */
-function detectHopCodeHomeRedirectWithoutMigration(
+function detecthopcodeHomeRedirectWithoutMigration(
   activeUserSettingsPath: string,
 ): string | null {
   if (!process.env['HOPCODE_HOME']) {
@@ -677,28 +736,28 @@ function detectHopCodeHomeRedirectWithoutMigration(
   // Compute the legacy path by briefly unsetting HOPCODE_HOME so Storage uses
   // its homedir-based default — same homedir resolution as the rest of the
   // storage layer. try/finally restores the env on any throw.
-  const activeHopCodeDir = Storage.getGlobalHopCodeDir();
-  const savedHopCodeHome = process.env['HOPCODE_HOME'];
+  const activehopcodeDir = Storage.getGlobalHopCodeDir();
+  const savedhopcodeHome = process.env['HOPCODE_HOME'];
   delete process.env['HOPCODE_HOME'];
-  let legacyHopCodeDir: string;
+  let legacyhopcodeDir: string;
   try {
-    legacyHopCodeDir = Storage.getGlobalHopCodeDir();
+    legacyhopcodeDir = Storage.getGlobalHopCodeDir();
   } finally {
-    process.env['HOPCODE_HOME'] = savedHopCodeHome;
+    process.env['HOPCODE_HOME'] = savedhopcodeHome;
   }
-  if (path.resolve(activeHopCodeDir) === path.resolve(legacyHopCodeDir)) {
+  if (path.resolve(activehopcodeDir) === path.resolve(legacyhopcodeDir)) {
     return null;
   }
   if (fs.existsSync(activeUserSettingsPath)) {
     return null;
   }
-  const legacyUserSettings = path.join(legacyHopCodeDir, 'settings.json');
+  const legacyUserSettings = path.join(legacyhopcodeDir, 'settings.json');
   if (!fs.existsSync(legacyUserSettings)) {
     return null;
   }
   return (
-    `HOPCODE_HOME points to "${activeHopCodeDir}" but no settings.json was found there. ` +
-    `Existing config remains at "${legacyHopCodeDir}" — OAuth tokens, settings, memory, ` +
+    `HOPCODE_HOME points to "${activehopcodeDir}" but no settings.json was found there. ` +
+    `Existing config remains at "${legacyhopcodeDir}" — OAuth tokens, settings, memory, ` +
     `extensions, and skills are not auto-migrated. Copy them manually if you want them ` +
     `to apply at the new location.`
   );
@@ -721,9 +780,8 @@ function findEnvFile(
   const isTrusted = isWorkspaceTrusted(settings).isTrusted;
 
   const globalHopcodeDir = Storage.getGlobalHopCodeDir();
-  const legacyHopCodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
-  const hasCustomConfigDir =
-    path.normalize(globalHopcodeDir) !== legacyHopCodeDir;
+  const legacyhopcodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
+  const hasCustomConfigDir = path.normalize(globalHopcodeDir) !== legacyhopcodeDir;
 
   const canUseEnvFile = (filePath: string): boolean =>
     isTrusted !== false || userLevelPaths.has(path.normalize(filePath));
@@ -736,7 +794,7 @@ function findEnvFile(
   const findHomeCandidate = (): string | null => {
     const candidates = [path.join(globalHopcodeDir, '.env')];
     if (hasCustomConfigDir) {
-      candidates.push(path.join(legacyHopCodeDir, '.env'));
+      candidates.push(path.join(legacyhopcodeDir, '.env'));
     }
     candidates.push(path.join(homeDir, '.env'));
     for (const candidate of candidates) {
@@ -826,10 +884,10 @@ export function loadEnvironment(settings: Settings): void {
       const normalizedEnvFilePath = path.normalize(envFilePath);
       // homeScoped: `.env` lives under the user's home HopCode dir or `~/.env` —
       //   only these may set HOPCODE_HOME / HOPCODE_RUNTIME_DIR.
-      // hopCodeScoped: any `.env` whose immediate parent is `.hopcode` (including
+      // hopcodeScoped: any `.env` whose immediate parent is `.hopcode` (including
       //   `<repo>/.hopcode/.env`) — exempt from the user `excludedEnvVars` list.
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
-      const isHopCodeScopedEnvFile =
+      const ishopcodeScopedEnvFile =
         isHomeScopedEnvFile ||
         path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
 
@@ -841,12 +899,18 @@ export function loadEnvironment(settings: Settings): void {
           ) {
             continue;
           }
-          if (!isHopCodeScopedEnvFile && excludedVars.includes(key)) {
+          if (!ishopcodeScopedEnvFile && excludedVars.includes(key)) {
             continue;
           }
 
           if (!Object.hasOwn(process.env, key)) {
             process.env[key] = parsedEnv[key];
+            dotEnvSourcedKeys.add(key);
+          }
+          // Seed snapshot with ALL parsed keys (not just written ones)
+          // so child processes can detect deletions on first reload.
+          if (!lastReloadSnapshotSeeded) {
+            lastReloadSnapshot.set(key, parsedEnv[key]!);
           }
         }
       }
@@ -865,9 +929,158 @@ export function loadEnvironment(settings: Settings): void {
       }
       if (!Object.hasOwn(process.env, key) && typeof value === 'string') {
         process.env[key] = value;
+        settingsEnvSourcedKeys.add(key);
+      }
+      if (
+        !lastReloadSnapshotSeeded &&
+        typeof value === 'string' &&
+        !lastReloadSnapshot.has(key)
+      ) {
+        lastReloadSnapshot.set(key, value);
       }
     }
   }
+  lastReloadSnapshotSeeded = true;
+}
+
+export interface EnvReloadResult {
+  updatedKeys: string[];
+  removedKeys: string[];
+}
+
+/**
+ * Only keys previously set by loadEnvironment() are overwritten;
+ * shell-exported variables are never touched.
+ * Fully synchronous — no TOCTOU window between delete and re-add.
+ */
+export function reloadEnvironment(
+  settings: Settings,
+  workspaceCwd: string,
+): EnvReloadResult {
+  const userLevelPaths = getUserLevelEnvPaths();
+  const envFilePath = findEnvFile(settings, workspaceCwd, userLevelPaths);
+
+  if (process.env['CLOUD_SHELL'] === 'true') {
+    setUpCloudShellEnvironment(envFilePath);
+  }
+
+  // Build the set of new keys from .env (higher priority) + settings.env
+  let dotEnvReadFailed = false;
+  const newDotEnvKeys = new Map<string, string>();
+  const newSettingsEnvKeys = new Map<string, string>();
+
+  if (envFilePath) {
+    try {
+      const envFileContent = fs.readFileSync(envFilePath, 'utf-8');
+      const parsedEnv = dotenv.parse(envFileContent);
+      const excludedVars =
+        settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
+      const normalizedEnvFilePath = path.normalize(envFilePath);
+      const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
+      const ishopcodeScopedEnvFile =
+        isHomeScopedEnvFile ||
+        path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
+
+      for (const key in parsedEnv) {
+        if (!Object.hasOwn(parsedEnv, key)) continue;
+        if (RELOAD_EXCLUDED_KEYS.has(key)) continue;
+        if (
+          !isHomeScopedEnvFile &&
+          PROJECT_ENV_HARDCODED_EXCLUSIONS.includes(key)
+        ) {
+          continue;
+        }
+        if (!ishopcodeScopedEnvFile && excludedVars.includes(key)) continue;
+        newDotEnvKeys.set(key, parsedEnv[key]!);
+      }
+    } catch {
+      dotEnvReadFailed = true;
+    }
+  }
+
+  if (settings.env) {
+    for (const [key, value] of Object.entries(settings.env)) {
+      if (RELOAD_EXCLUDED_KEYS.has(key)) continue;
+      if (PROJECT_ENV_HARDCODED_EXCLUSIONS.includes(key)) continue;
+      if (typeof value !== 'string') continue;
+      if (newDotEnvKeys.has(key)) continue;
+      // When .env read failed, use the snapshot as the shadow set so
+      // settings.env keys that were previously shadowed by .env don't
+      // accidentally overwrite the still-live .env values in process.env.
+      if (dotEnvReadFailed && lastReloadSnapshot.has(key)) continue;
+      newSettingsEnvKeys.set(key, value);
+    }
+  }
+
+  // Union of all new keys
+  const allNewKeys = new Set([
+    ...newDotEnvKeys.keys(),
+    ...newSettingsEnvKeys.keys(),
+  ]);
+
+  const updatedKeys: string[] = [];
+  const removedKeys: string[] = [];
+
+  // Delete keys previously known (from tracking Sets OR the boot snapshot)
+  // that are no longer in any source file. The snapshot covers keys that
+  // ACP children inherited from the daemon without tracking.
+  // Skip deletion entirely if the .env file became unreadable — treat as
+  // transient I/O failure rather than intentional key removal.
+  if (!dotEnvReadFailed) {
+    const previouslyKnown = new Set([
+      ...lastReloadSnapshot.keys(),
+      ...dotEnvSourcedKeys,
+      ...settingsEnvSourcedKeys,
+    ]);
+    for (const key of previouslyKnown) {
+      if (!allNewKeys.has(key) && !RELOAD_EXCLUDED_KEYS.has(key)) {
+        delete process.env[key];
+        removedKeys.push(key);
+      }
+    }
+  }
+
+  // Force-write all source keys. RELOAD_EXCLUDED_KEYS are already filtered
+  // at parse time so dangerous keys (PATH, HOME, etc.) never reach here.
+  // This unconditional write is necessary because ACP children inherit
+  // daemon env without tracking, so the tracking-based guard would miss them.
+  for (const [key, value] of newDotEnvKeys) {
+    if (process.env[key] !== value) {
+      updatedKeys.push(key);
+    }
+    process.env[key] = value;
+  }
+  for (const [key, value] of newSettingsEnvKeys) {
+    if (process.env[key] !== value) {
+      updatedKeys.push(key);
+    }
+    process.env[key] = value;
+  }
+
+  // Update tracking sets and snapshot only when the .env file was readable.
+  // A transient read failure must not wipe provenance — the stale tracking
+  // state is needed so the next successful reload can still detect deletions.
+  if (!dotEnvReadFailed) {
+    dotEnvSourcedKeys.clear();
+    for (const key of newDotEnvKeys.keys()) {
+      dotEnvSourcedKeys.add(key);
+    }
+    lastReloadSnapshot.clear();
+    for (const [key, value] of newDotEnvKeys) {
+      lastReloadSnapshot.set(key, value);
+    }
+    for (const [key, value] of newSettingsEnvKeys) {
+      lastReloadSnapshot.set(key, value);
+    }
+  }
+  // settings.env is always readable (from settings.json, not a file),
+  // so its tracking set is always updated.
+  settingsEnvSourcedKeys.clear();
+  for (const key of newSettingsEnvKeys.keys()) {
+    settingsEnvSourcedKeys.add(key);
+  }
+
+  return { updatedKeys, removedKeys };
 }
 
 export const CORRUPTED_SUFFIX = '.corrupted';
@@ -876,18 +1089,27 @@ export const CORRUPTED_SUFFIX = '.corrupted';
  * Load and merge settings from all scopes:
  * System Defaults → User (~/.hopcode/settings.json) → Workspace → System.
  */
+export interface LoadSettingsOptions {
+  consumeCorruptionEnvVars?: boolean;
+  skipLoadEnvironment?: boolean;
+}
+
 export function loadSettings(
   workspaceDir: string = process.cwd(),
-  consumeCorruptionEnvVars: boolean = true,
+  consumeCorruptionEnvVars: boolean | LoadSettingsOptions = true,
 ): LoadedSettings {
+  const opts: LoadSettingsOptions =
+    typeof consumeCorruptionEnvVars === 'object'
+      ? consumeCorruptionEnvVars
+      : { consumeCorruptionEnvVars };
   // Apply any HOPCODE_HOME / HOPCODE_RUNTIME_DIR set in user-level `.env` files
   // BEFORE any code reads a path derived from them. After this call, the
   // lazy `getUserSettingsPath()` / `Storage.getGlobalHopCodeDir()` getters
   // return the post-bootstrap value.
   preResolveHomeEnvOverrides();
   const userSettingsPath = getUserSettingsPath();
-  const hopCodeHomeRedirectWarning =
-    detectHopCodeHomeRedirectWithoutMigration(userSettingsPath);
+  const hopcodeHomeRedirectWarning =
+    detecthopcodeHomeRedirectWithoutMigration(userSettingsPath);
 
   let systemSettings: Settings = {};
   let systemDefaultSettings: Settings = {};
@@ -1020,7 +1242,7 @@ export function loadSettings(
         // don't re-trigger this path.
         const envCorruptedPath = process.env[ENV_CORRUPTED_PATH];
         if (
-          consumeCorruptionEnvVars &&
+          (opts.consumeCorruptionEnvVars ?? true) &&
           envCorruptedPath &&
           envCorruptedPath === corruptedPath &&
           scope === SettingScope.User
@@ -1215,7 +1437,9 @@ export function loadSettings(
 
   // loadEnviroment depends on settings so we have to create a temp version of
   // the settings to avoid a cycle
-  loadEnvironment(tempMergedSettings);
+  if (!opts.skipLoadEnvironment) {
+    loadEnvironment(tempMergedSettings);
+  }
 
   // Create LoadedSettings first
 
@@ -1230,7 +1454,7 @@ export function loadSettings(
 
   // Collect all migration warnings from all scopes
   const allMigrationWarnings: string[] = [
-    ...(hopCodeHomeRedirectWarning ? [hopCodeHomeRedirectWarning] : []),
+    ...(hopcodeHomeRedirectWarning ? [hopcodeHomeRedirectWarning] : []),
     ...(systemResult.migrationWarnings ?? []),
     ...(systemDefaultsResult.migrationWarnings ?? []),
     ...(userResult.migrationWarnings ?? []),

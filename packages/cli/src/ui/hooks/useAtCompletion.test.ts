@@ -13,12 +13,12 @@ import type {
   Config,
   FileSearch,
   FileSystemStructure,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   FileSearchFactory,
   createTmpDir,
   cleanupTmpDir,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { useState } from 'react';
 import type { Suggestion } from '../components/SuggestionsDisplay.js';
 

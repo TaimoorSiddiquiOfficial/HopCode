@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,8 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'Izn mode': 'Izn 模式',
+  'YOLO mode': 'YOLO 模式',
+  'Auto mode': 'Auto 模式',
   'plan mode': '规划模式',
   'auto-accept edits': '自动接受编辑',
   'Accepting edits': '接受编辑',
@@ -88,7 +89,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  HopCode: 'HopCode',
+  'HopCode': 'HopCode',
   Runtime: '运行环境',
   OS: '操作系统',
   Auth: '认证',
@@ -108,7 +109,43 @@ export default {
     '分析项目并创建定制的 HOPCODE.md 文件',
   'List available HopCode tools. Usage: /tools [desc]':
     '列出可用的 HopCode 工具。用法：/tools [desc]',
-  'List available skills.': '列出可用技能。',
+  'Open the skills panel (browse, search, toggle, pick).':
+    '打开技能面板（浏览、搜索、启停、选择）。',
+  // SkillsManagerDialog (`/skills` 弹出的面板)
+  'Manage Skills': '管理技能',
+  'Skills configuration saved.': '技能配置已保存。',
+  'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
+    '技能配置已保存，但刷新失败：{{error}}。请重启以确保新状态生效。',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.hopcode/settings.json directly to manage skills at user scope.':
+    '当前工作区未受信任，工作区设置会被合并配置忽略。请先执行 /trust，或直接编辑 ~/.hopcode/settings.json 在用户范围管理技能。',
+  'SkillManager not available.': 'SkillManager 不可用。',
+  'Loading skills…': '正在加载技能…',
+  'Failed to load skills: {{error}}': '加载技能失败：{{error}}',
+  'Failed to save skills configuration: {{error}}':
+    '保存技能配置失败：{{error}}',
+  'All available skills are disabled. Edit ~/.hopcode/settings.json or .hopcode/settings.json (skills.disabled) to re-enable.':
+    '所有可用技能均已禁用。请编辑 ~/.hopcode/settings.json 或 .hopcode/settings.json（skills.disabled）以重新启用。',
+  'Press esc to close.': '按 Esc 关闭。',
+  '{{count}} skills · ': '{{count}} 个技能 · ',
+  '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} 个技能 · ',
+  'Space toggle · Enter pick (fill input) · Esc save & exit · workspace scope':
+    '空格 启停 · 回车 选中(填入输入框) · Esc 保存并退出 · 工作区范围',
+  'Search:': '搜索：',
+  'type to filter…': '输入以过滤…',
+  'No skills are currently available.': '当前没有可用的技能。',
+  'All available skills are locked at a higher scope (see below).':
+    '所有可用技能都被更高范围锁定（详见下方）。',
+  'No skills match the search.': '没有匹配搜索的技能。',
+  'Locked by higher-scope settings (cannot toggle here):':
+    '被更高范围设置锁定（此处无法切换）：',
+  'higher scope': '更高范围',
+  '  {{name}} {{description}}  [locked: {{scope}}]':
+    '  {{name}} {{description}}  [已锁定：{{scope}}]',
+  '↑/↓ navigate · backspace edits search': '↑/↓ 导航 · 退格 编辑搜索',
+  // Note: Project / User / Extension are already translated elsewhere in
+  // this file. `Bundled` is new — only the SkillsManagerDialog uses it
+  // as a level label so far.
+  Bundled: '内置',
   'Available HopCode CLI tools:': '可用的 HopCode CLI 工具：',
   'No tools available': '没有可用工具',
   'View or change the approval mode for tool usage':
@@ -184,8 +221,8 @@ export default {
     '在浏览器中打开完整的 HopCode 文档',
   'Configuration not available.': '配置不可用',
   'Connect an LLM provider': '连接 LLM 提供商',
-  'Copy the last result or code snippet to clipboard':
-    '将最后的结果或代码片段复制到剪贴板',
+  'Copy the last AI response to clipboard (/copy N for Nth-latest)':
+    '将最近的 AI 回复复制到剪贴板（/copy N 复制倒数第 N 条）',
   'Show working-tree change stats versus HEAD':
     '显示工作区相对 HEAD 的变更统计',
   'Could not determine current working directory.': '无法确定当前工作目录。',
@@ -417,8 +454,7 @@ export default {
   'Custom Witty Phrases': '自定义诙谐短语',
   'Show Welcome Back Dialog': '显示欢迎回来对话框',
   'Enable User Feedback': '启用用户反馈',
-  'How is HopCode doing this session? (optional)':
-    'HopCode 这次表现如何？（可选）',
+  'How is Qwen doing this session? (optional)': 'Qwen 这次表现如何？（可选）',
   Bad: '不满意',
   Fine: '还行',
   Good: '满意',
@@ -452,12 +488,11 @@ export default {
   Text: '文本',
   JSON: 'JSON',
   Plan: '规划',
-  Default: '默认',
+  'Ask permissions': '请求授权',
   'Auto Edit': '自动编辑',
-  Izn: 'Izn',
+  YOLO: 'YOLO',
   'toggle vim mode on/off': '切换 vim 模式开关',
-  'check session stats. Usage: /stats [model|tools]':
-    '检查会话统计信息。用法：/stats [model|tools]',
+  'Show usage statistics dashboard.': '显示使用统计面板。',
   'Show model-specific usage statistics.': '显示模型相关的使用统计信息',
   'Show tool-specific usage statistics.': '显示工具相关的使用统计信息',
   'exit the cli': '退出命令行界面',
@@ -552,6 +587,7 @@ export default {
   'The name of the extension to update.': '要更新的扩展名称。',
   'Either an extension name or --all must be provided':
     '必须提供扩展名称或 --all',
+  'List installed extensions': '列出已安装的扩展',
   'Lists installed extensions.': '列出已安装的扩展。',
   'Path:': '路径：',
   'Source:': '来源：',
@@ -662,8 +698,8 @@ export default {
   'Exit codes:': '退出码：',
   'Configured hooks:': '已配置的 Hook：',
   'No hooks configured for this event.': '此事件未配置 Hook。',
-  'To add hooks, edit settings.json directly or ask HopCode.':
-    '要添加 Hook，请直接编辑 settings.json 或询问 HopCode。',
+  'To add hooks, edit settings.json directly or ask Qwen.':
+    '要添加 Hook，请直接编辑 settings.json 或询问 Qwen。',
   'Enter to select · Esc to go back': 'Enter 选择 · Esc 返回',
   // Hooks - Config Detail Step
   'Hook details': 'Hook 详情',
@@ -671,8 +707,8 @@ export default {
   'Extension:': '扩展：',
   'Desc:': '描述：',
   'No hook config selected': '未选择 Hook 配置',
-  'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    '要修改或删除此 Hook，请直接编辑 settings.json 或询问 HopCode。',
+  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+    '要修改或删除此 Hook，请直接编辑 settings.json 或询问 Qwen。',
   // Hooks - Disabled Step
   'Hook Configuration - Disabled': 'Hook 配置 - 已禁用',
   'All hooks are currently disabled. You have {{count}} that are not running.':
@@ -702,6 +738,7 @@ export default {
   'After tool execution fails': '工具执行失败后',
   'When notifications are sent': '发送通知时',
   'When the user submits a prompt': '用户提交提示时',
+  'When a slash command expands into a prompt': '斜杠命令展开为提示时',
   'When a new session is started': '新会话开始时',
   'Right before HopCode concludes its response': 'HopCode 结束响应之前',
   'When a subagent (Agent tool call) is started':
@@ -723,6 +760,8 @@ export default {
     '命令输入为包含通知消息和类型的 JSON。',
   'Input to command is JSON with original user prompt text.':
     '命令输入为包含原始用户提示文本的 JSON。',
+  'Input to command is JSON with command_name, command_args, and expanded prompt text.':
+    '命令输入为包含 command_name、command_args 和展开后提示文本的 JSON。',
   'Input to command is JSON with session start source.':
     '命令输入为包含会话启动来源的 JSON。',
   'Input to command is JSON with session end reason.':
@@ -750,7 +789,9 @@ export default {
     '仅向用户显示 stderr 但继续工具调用',
   'block processing, erase original prompt, and show stderr to user only':
     '阻止处理，擦除原始提示，仅向用户显示 stderr',
-  'stdout shown to HopCode': '向 HopCode 显示 stdout',
+  'block expanded prompt submission and show stderr to user only':
+    '阻止提交展开后的提示，并仅向用户显示 stderr',
+  'stdout shown to Qwen': '向 Qwen 显示 stdout',
   'show stderr to user only (blocking errors ignored)':
     '仅向用户显示 stderr（忽略阻塞错误）',
   'command completes successfully': '命令成功完成',
@@ -795,19 +836,27 @@ export default {
   // ============================================================================
   'Resume a previous session': '恢复先前会话',
   'Fork the current conversation into a new session': '将当前对话分支到新会话',
+  'Spawn a background agent that inherits the full conversation':
+    '启动继承完整对话的后台智能体',
+  'Please provide a directive. Usage: /fork <directive>':
+    '请提供指令。用法：/fork <指令>',
+  'Cannot fork while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
+    '响应或工具调用正在进行时无法分支。请等待其完成或处理待确认的工具调用。',
+  'Cannot fork before the first conversation turn.': '首次对话轮次前无法分支。',
+  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
+    '/fork 命令需要启用 fork 功能开关。设置 HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 以启用。',
+  'The agent tool is unavailable; cannot fork.': 'Agent 工具不可用；无法分支。',
+  'Failed to launch fork: {{error}}': '启动分支失败：{{error}}',
+  'the background agent could not be started.': '后台智能体无法启动。',
+  'User launched a background fork via /fork: {{directive}}':
+    '用户通过 /fork 启动了后台分支：{{directive}}',
+  'Forked into a background agent. It inherits this conversation and runs without blocking — track it in the background tasks panel; it reports back when done.':
+    '已分支到后台智能体。它会继承此对话并以非阻塞方式运行，可在后台任务面板中跟踪；完成后会回报结果。',
   'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
     '响应或工具调用正在进行时无法分支。请等待其完成或处理待确认的工具调用。',
   'No conversation to branch.': '没有可分支的对话。',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     '恢复某次工具调用。这将把对话与文件历史重置到提出该工具调用建议时的状态',
-  'Navigate and search session history': '浏览和搜索会话历史',
-  'Full-text search across all history items (entire session)':
-    '全文搜索所有历史条目（整个会话）',
-  'Load the previous 2 000 history items': '加载前2,000条历史条目',
-  'Load the next 2 000 history items': '加载后2,000条历史条目',
-  'Show current history window statistics': '显示当前历史窗口统计信息',
-  'Jump to a specific item index in history': '跳转到历史中特定条目索引',
-  'Full-text search across all history items': '全文搜索所有历史条目',
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     '无法检测终端类型。支持的终端：VS Code、Cursor、Windsurf 和 Trae。',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -846,12 +895,13 @@ export default {
   // Commands - Approval Mode
   // ============================================================================
   'Tool Approval Mode': '工具审批模式',
-  '{{mode}} mode': '{{mode}} 模式',
   'Analyze only, do not modify files or execute commands':
     '仅分析，不修改文件或执行命令',
   'Require approval for file edits or shell commands':
     '需要批准文件编辑或 shell 命令',
   'Automatically approve file edits': '自动批准文件编辑',
+  'Use classifier to automatically approve safe tool calls':
+    '使用分类器自动批准安全的工具调用',
   'Automatically approve all tools': '自动批准所有工具',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
     '工作区审批模式已存在并具有优先级。用户级别的更改将无效。',
@@ -1150,11 +1200,10 @@ export default {
   'Time remaining:': '剩余时间：',
   'HopCode OAuth Authentication Timeout': 'HopCode OAuth 认证超时',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
-    'OAuth 令牌已过期（超过 {{seconds}} 秒）。请重新选择认证方法',
+    'OAuth token 已过期（超过 {{seconds}} 秒）。请重新选择认证方法',
   'Press any key to return to authentication type selection.':
     '按任意键返回认证类型选择',
-  'Waiting for HopCode OAuth authentication...':
-    '正在等待 HopCode OAuth 认证...',
+  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 认证...',
   'Authentication timed out. Please try again.': '认证超时。请重试。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待认证...（按 ESC 或 CTRL+C 取消）',
@@ -1374,22 +1423,41 @@ export default {
   'Tool Time:': '工具时间：',
   'Session Stats': '会话统计',
   'Model Usage': '模型使用情况',
-  Reqs: '请求数',
   'Input Tokens': '输入 token 数',
   'Output Tokens': '输出 token 数',
   'Savings Highlight:': '节省亮点：',
   'of input tokens were served from the cache, reducing costs.':
     '从缓存载入 token ，降低了成本',
   'Tip: For a full token breakdown, run `/stats model`.':
-    '提示：要查看完整的令牌明细，请运行 `/stats model`',
+    '提示：要查看完整的 token 明细，请运行 `/stats model`',
   'Model Stats For Nerds': '模型统计（技术细节）',
   'Tool Stats For Nerds': '工具统计（技术细节）',
   Metric: '指标',
   API: 'API',
+  Session: '会话',
+  Activity: '概览',
+  Efficiency: '性能',
+  Success: '成功率',
+  Today: '今天',
+  'Token Trend': 'Token 趋势',
+  'Cache Hit Rate': '缓存命中率',
+  'Tool Success': '工具成功率',
+  'Tool Leaderboard': '工具排行',
+  Calls: '调用次数',
+  Time: '耗时',
+  Reqs: '请求',
+  Cache: '缓存',
+  Latency: '延迟',
+  'In/Out': '输入/输出',
+  'Code Impact': '代码变更',
+  'Failed to load stats. Press r to retry.': '加载统计失败，按 r 重试。',
+  net: '净增',
+  streak: '连续',
+  best: '最长',
   Requests: '请求数',
   Errors: '错误数',
   'Avg Latency': '平均延迟',
-  Tokens: '令牌',
+  Tokens: 'Token',
   Total: '总计',
   Prompt: '提示',
   Cached: '缓存',
@@ -1398,7 +1466,6 @@ export default {
   'No API calls have been made in this session.':
     '本次会话中未进行任何 API 调用',
   'Tool Name': '工具名称',
-  Calls: '调用次数',
   'Success Rate': '成功率',
   'Avg Duration': '平均耗时',
   'User Decision Summary': '用户决策摘要',
@@ -1612,8 +1679,7 @@ export default {
   'Show current authentication status': '显示当前认证状态',
   'Authentication completed successfully.': '认证完成。',
   'Starting HopCode OAuth authentication...': '正在启动 HopCode OAuth 认证...',
-  'Successfully authenticated with HopCode OAuth.':
-    '已成功通过 HopCode OAuth 认证。',
+  'Successfully authenticated with HopCode OAuth.': '已成功通过 HopCode OAuth 认证。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
     'HopCode OAuth 认证失败：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
@@ -1631,11 +1697,11 @@ export default {
   '⚠️  No authentication method configured.\n': '⚠️  未配置认证方式。\n',
   'Run one of the following commands to get started:\n':
     '运行以下命令之一开始配置：\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - 使用 HopCode OAuth 登录（已停用）',
+  '  qwen auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  qwen auth hopcode-oauth     - 使用 HopCode OAuth 登录（已停用）',
   'Or simply run:': '或者直接运行：',
-  '  hopcode auth                - Interactive authentication setup\n':
-    '  hopcode auth                - 交互式认证配置\n',
+  '  qwen auth                - Interactive authentication setup\n':
+    '  qwen auth                - 交互式认证配置\n',
   '✓ Authentication Method: HopCode OAuth': '✓ 认证方式：HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  类型：免费额度（2026-04-15 已停用）',
@@ -1653,8 +1719,8 @@ export default {
     '⚠️  认证方式：阿里云百炼 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  问题：在环境变量或设置中未找到 API Key\n',
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  运行 `hopcode auth coding-plan` 重新配置。\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  运行 `qwen auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 认证方式：{{type}}',
   '  Status: Configured\n': '  状态：已配置\n',
   'Failed to check authentication status: {{error}}':
@@ -1731,6 +1797,18 @@ export default {
   'Loading suggestions...': '正在加载建议...',
   'Open the memory manager.': '打开记忆管理器。',
   'Show current process memory diagnostics': '显示当前进程的内存诊断。',
+  'Record a CPU profile for Chrome DevTools analysis':
+    '录制 CPU 性能分析文件，用于 Chrome DevTools 分析',
+  'Roll back a standalone update to the previous version':
+    '将独立安装回滚到上一个版本',
+  'Rollback is not available in ACP mode.': '回滚在 ACP 模式下不可用。',
+  'Rollback is only available for standalone installations.':
+    '回滚仅适用于独立安装。',
+  'Rollback successful. Restart your terminal to use the previous version.':
+    '回滚成功。请重启终端以使用上一个版本。',
+  'Rollback failed:': '回滚失败：',
+  'Rollback on Windows requires manual intervention. Rename hopcode.old to hopcode in your installation directory.':
+    '在 Windows 上回滚需要手动操作。请将安装目录中的 hopcode.old 重命名为 hopcode。',
   'Save a durable memory to the memory system.':
     '将一条持久记忆保存到记忆系统。',
   'Show per-item context usage breakdown.': '显示按项目划分的上下文使用详情。',
@@ -1779,6 +1857,69 @@ export default {
     '后续记忆整理可能会因锁定而跳过，直到下一次会话过期清理清除此文件。',
   "The scheduler gate did not see this dream's timestamp; the next dream cycle may re-fire sooner than usual.":
     '调度门控未看到本次记忆整理的时间戳；下一轮记忆整理可能会比平时更早重新触发。',
+
+  // ============================================================================
+  // Stats
+  // ============================================================================
+
+  // statsCommand non-interactive output
+  'Session duration: {{duration}}': '会话时长：{{duration}}',
+  'Prompts: {{count}}': '提示次数：{{count}}',
+  'API requests: {{count}}': 'API 请求数：{{count}}',
+  'Tokens — prompt: {{prompt}}, output: {{output}}':
+    'Tokens — 输入：{{prompt}}，输出：{{output}}',
+  'Tool calls: {{total}} ({{success}} ok, {{fail}} fail)':
+    '工具调用：{{total}}（{{success}} 成功，{{fail}} 失败）',
+  'Files: +{{added}} / -{{removed}} lines':
+    '文件：+{{added}} / -{{removed}} 行',
+  prompt: '输入',
+  output: '输出',
+  cached: '缓存',
+  'Estimated cost: ${{cost}}': '预估费用：${{cost}}',
+  'No model usage data yet.': '暂无模型使用数据。',
+  'No tool usage data yet.': '暂无工具使用数据。',
+
+  // StatsDialog
+  Models: '模型',
+  'All time': '所有时间',
+  'Last 7 days': '最近 7 天',
+  'Last 30 days': '最近 30 天',
+  'N/A': '无',
+  Sessions: '会话数',
+  days: '天',
+  Input: '输入',
+  'Tool calls': '工具调用',
+  'Code changes': '代码变更',
+  Projects: '项目统计',
+  Name: '名称',
+  Duration: '时长',
+  'Activity Heatmap': '用量热力统计',
+  'Loading stats...': '加载统计数据...',
+  '\u2191 tabs \u00b7 r to cycle dates \u00b7 esc to close':
+    '\u2191 tab 切换标签 \u00b7 r 切换时间范围 \u00b7 esc 关闭',
+  Cost: '费用',
+  Less: '少',
+  More: '多',
+  '(no data)': '（无数据）',
+  d: '天',
+  h: '时',
+  m: '分',
+
+  // Stats Dashboard — keyboard hints (not translated)
+  'tab \xB7 esc': 'tab \xB7 esc',
+  'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc':
+    'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc',
+  'tab \xB7 r dates \xB7 esc': 'tab \xB7 r dates \xB7 esc',
+
+  // Stats Dashboard — missing labels
+  'API Requests': 'API 请求',
+  'Tool Calls': '工具调用',
+  'Success rate': '成功率',
+  'Code Changes': '代码变更',
+  Tool: '工具',
+  reqs: '请求',
+  in: '输入',
+  out: '输出',
 
   // === Same-as-English optimization ===
   ' (not in model registry)': '（不在模型注册表中）',

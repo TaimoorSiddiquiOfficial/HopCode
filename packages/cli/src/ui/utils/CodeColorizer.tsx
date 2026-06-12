@@ -20,7 +20,7 @@ import {
   MINIMUM_MAX_HEIGHT,
 } from '../components/shared/MaxSizedBox.js';
 import type { LoadedSettings } from '../../config/settings.js';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 import {
   getLowlightInstance,
   isLowlightCoolingDown,

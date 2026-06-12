@@ -16,17 +16,17 @@ import {
 import { renderHook, act } from '@testing-library/react';
 import { useAutoAcceptIndicator } from './useAutoAcceptIndicator.js';
 
-import { Config, ApprovalMode } from '@hoptrendy/hopcode-core';
-import type { Config as ActualConfigType } from '@hoptrendy/hopcode-core';
+import { Config, ApprovalMode } from '@hopcode/hopcode-core';
+import type { Config as ActualConfigType } from '@hopcode/hopcode-core';
 import type { Key } from './useKeypress.js';
 import { useKeypress } from './useKeypress.js';
 import { MessageType } from '../types.js';
 
 vi.mock('./useKeypress.js');
 
-vi.mock('@hoptrendy/hopcode-core', async () => {
+vi.mock('@hopcode/hopcode-core', async () => {
   const actualServerModule = (await vi.importActual(
-    '@hoptrendy/hopcode-core',
+    '@hopcode/hopcode-core',
   )) as Record<string, unknown>;
   return {
     ...actualServerModule,
@@ -49,7 +49,7 @@ interface MockConfigInstanceShape {
   getFullContext: Mock<() => boolean>;
   getUserAgent: Mock<() => string>;
   getUserMemory: Mock<() => string>;
-  getContextMdFileCount: Mock<() => number>;
+  getGeminiMdFileCount: Mock<() => number>;
   getToolRegistry: Mock<() => { discoverTools: Mock<() => void> }>;
 }
 
@@ -98,7 +98,7 @@ describe('useAutoAcceptIndicator', () => {
           () => string
         >,
         getUserMemory: vi.fn().mockReturnValue('') as Mock<() => string>,
-        getContextMdFileCount: vi.fn().mockReturnValue(0) as Mock<() => number>,
+        getGeminiMdFileCount: vi.fn().mockReturnValue(0) as Mock<() => number>,
         getToolRegistry: vi
           .fn()
           .mockReturnValue({ discoverTools: vi.fn() }) as Mock<

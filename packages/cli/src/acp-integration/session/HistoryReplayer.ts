@@ -9,7 +9,7 @@ import type {
   AgentResultDisplay,
   SlashCommandRecordPayload,
   NotificationRecordPayload,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type {
   Content,
   GenerateContentResponseUsageMetadata,

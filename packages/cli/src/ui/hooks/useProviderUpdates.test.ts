@@ -16,7 +16,7 @@ import {
   buildProviderTemplate,
   computeModelListVersion,
   PROVIDER_METADATA_NS,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { useProviderUpdates } from './useProviderUpdates.js';
 
 vi.mock('../../utils/settingsUtils.js', () => ({

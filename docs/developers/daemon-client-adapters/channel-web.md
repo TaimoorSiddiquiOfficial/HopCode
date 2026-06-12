@@ -1,4 +1,4 @@
-﻿# Channel And Web Backend Daemon Adapter Draft
+# Channel And Web Backend Daemon Adapter Draft
 
 ## Goal
 
@@ -19,13 +19,13 @@ The daemon currently rejects browser `Origin` requests by design.
 Channel backend:
 
 ```bash
-HOPCODE_CHANNEL_DAEMON_URL=http://127.0.0.1:4170 qwen channel start telegram
+HOPCODE_CHANNEL_DAEMON_URL=http://127.0.0.1:4170 hopcode channel start telegram
 ```
 
 Web backend:
 
 ```bash
-HOPCODE_WEB_DAEMON_URL=http://127.0.0.1:4170 qwen web-chat-backend
+HOPCODE_WEB_DAEMON_URL=http://127.0.0.1:4170 hopcode web-chat-backend
 ```
 
 Shared optional variables:
@@ -85,7 +85,7 @@ Do not silently multiplex unrelated channel threads into one daemon session.
 
 Unknown daemon events must be ignored or forwarded as debug metadata, not fatal.
 
-The bridge is not wired into `qwen channel start` yet. Existing Telegram,
+The bridge is not wired into `hopcode channel start` yet. Existing Telegram,
 Weixin, Dingtalk, plugin channel, and browser behavior remains unchanged.
 
 ## Explicit Non-Goals

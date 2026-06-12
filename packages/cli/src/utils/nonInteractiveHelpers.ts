@@ -13,13 +13,13 @@ import type {
   ToolCallResponseInfo,
   SessionMetrics,
   McpToolProgressData,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   OutputFormat,
   ToolErrorType,
   createDebugLogger,
   getMCPServerStatus,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { Part, PartListUnion } from '@google/genai';
 import type {
   CLIUserMessage,

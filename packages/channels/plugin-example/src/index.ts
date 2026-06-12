@@ -1,4 +1,4 @@
-import type { ChannelPlugin } from '@hoptrendy/channel-base';
+import type { ChannelPlugin } from '@hopcode/channel-base';
 import { MockPluginChannel } from './MockPluginChannel.js';
 
 export { MockPluginChannel } from './MockPluginChannel.js';

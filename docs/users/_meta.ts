@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   'Getting started': {
     type: 'separator',
     title: 'Getting started', // Title is optional
@@ -15,6 +15,7 @@
   'integration-jetbrains': 'JetBrains IDEs',
   'integration-github-action': 'GitHub Actions',
   'hopcode-serve': 'Daemon mode (hopcode serve)',
+  'hopcode-serve-deploy-local': 'Daemon mode — local launch templates',
   'Code with HopCode': {
     type: 'separator',
     title: 'Code with HopCode', // Title is optional

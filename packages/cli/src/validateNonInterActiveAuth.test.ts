@@ -6,8 +6,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { validateNonInteractiveAuth } from './validateNonInterActiveAuth.js';
-import { AuthType, OutputFormat } from '@hoptrendy/hopcode-core';
-import type { Config } from '@hoptrendy/hopcode-core';
+import { AuthType, OutputFormat } from '@hopcode/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import * as auth from './config/auth.js';
 import { type LoadedSettings } from './config/settings.js';
 import * as JsonOutputAdapterModule from './nonInteractive/io/JsonOutputAdapter.js';

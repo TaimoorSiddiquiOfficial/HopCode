@@ -1,16 +1,24 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, expect, it } from 'vitest';
+import { RUNTIME_SNAPSHOT_PREFIX } from '@hopcode/hopcode-core';
 import {
   DISCONTINUED_MESSAGES,
   isDiscontinuedModel,
   parseAcpModelId,
   HOPCODE_OAUTH_AUTH_TYPE,
+  RUNTIME_PREFIX,
 } from './discontinuedModel.js';
+
+describe('RUNTIME_PREFIX', () => {
+  it('stays in sync with core RUNTIME_SNAPSHOT_PREFIX', () => {
+    expect(RUNTIME_PREFIX).toBe(RUNTIME_SNAPSHOT_PREFIX);
+  });
+});
 
 describe('parseAcpModelId', () => {
   it('extracts authType and base model id from a registry entry', () => {
@@ -62,9 +70,7 @@ describe('isDiscontinuedModel', () => {
 
   it('does NOT flag a runtime HopCode OAuth snapshot as discontinued', () => {
     expect(
-      isDiscontinuedModel(
-        '$runtime|hopcode-oauth|qwen3-coder-plus(hopcode-oauth)',
-      ),
+      isDiscontinuedModel('$runtime|hopcode-oauth|qwen3-coder-plus(hopcode-oauth)'),
     ).toBe(false);
   });
 

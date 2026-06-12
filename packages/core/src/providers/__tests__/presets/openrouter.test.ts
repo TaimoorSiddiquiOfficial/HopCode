@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 // Re-import via the relative source path so the new ownsModel envKey gate
-// is exercised even before dist/ is rebuilt (the @hoptrendy/hopcode-core
+// is exercised even before dist/ is rebuilt (the @hopcode/hopcode-core
 // package resolves to dist/ on a fresh branch).
 import {
   openRouterProvider,

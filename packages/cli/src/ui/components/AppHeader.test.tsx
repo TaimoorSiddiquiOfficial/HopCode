@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -47,6 +47,7 @@ const createSettings = (options?: {
 const createMockConfig = (overrides = {}) => ({
   getContentGeneratorConfig: vi.fn(() => ({ authType: undefined })),
   getModel: vi.fn(() => 'gemini-pro'),
+  getModelDisplayName: vi.fn(() => 'Gemini Pro'),
   getTargetDir: vi.fn(() => '/projects/hopcode'),
   getMcpServers: vi.fn(() => ({})),
   getBlockedMcpServers: vi.fn(() => []),
@@ -106,7 +107,7 @@ describe('<AppHeader />', () => {
   it('shows the header with all info when banner is visible', () => {
     const { lastFrame } = renderWithProviders(createMockUIState());
     expect(lastFrame()).toContain('>_ HopCode');
-    expect(lastFrame()).toContain('gemini-pro');
+    expect(lastFrame()).toContain('Gemini Pro');
     expect(lastFrame()).toContain('/projects/hopcode');
   });
 
@@ -147,7 +148,7 @@ describe('<AppHeader />', () => {
     expect(frame).toContain('Acme CLI');
     expect(frame).not.toContain('>_ HopCode');
     expect(frame).toContain('ACME');
-    // Default HopCode logo must NOT bleed through when the user supplied art.
+    // Default Qwen logo must NOT bleed through when the user supplied art.
     expect(frame).not.toContain('██╔═══██╗');
   });
 });

@@ -9,7 +9,7 @@ import {
   AuthType,
   deepseekProvider,
   buildInstallPlan,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 describe('deepseekProvider', () => {
   it('has correct provider config', () => {

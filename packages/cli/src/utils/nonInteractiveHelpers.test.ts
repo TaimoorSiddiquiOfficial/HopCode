@@ -10,13 +10,13 @@ import type {
   SessionMetrics,
   AgentResultDisplay,
   ToolCallResponseInfo,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   ToolErrorType,
   MCPServerStatus,
   getMCPServerStatus,
   OutputFormat,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { Part } from '@google/genai';
 import type {
   CLIUserMessage,
@@ -82,9 +82,9 @@ vi.mock('../ui/utils/computeStats.js', () => ({
   }),
 }));
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     getMCPServerStatus: vi.fn(),
@@ -680,7 +680,7 @@ describe('createToolProgressHandler', () => {
 
     expect(mockAdapter.emitToolProgress).not.toHaveBeenCalled();
 
-    // Also test with a plain string — should not emit
+    // Also test with a plain string ï¿½ should not emit
     handler('tool-call-1', 'plain string progress');
 
     expect(mockAdapter.emitToolProgress).not.toHaveBeenCalled();

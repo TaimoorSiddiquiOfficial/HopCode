@@ -1,6 +1,6 @@
 {
-  "name": "@hoptrendy/channel-plugin-example",
-  "version": "0.30.1",
+  "name": "@hopcode/channel-plugin-example",
+  "version": "0.17.1",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
@@ -14,25 +14,20 @@
   "files": [
     "dist",
     "src",
-    "hopcode-extension.json"
+    "qwen-extension.json"
   ],
   "bin": {
-    "hopcode-channel-plugin-example-server": "dist/start-server.js"
+    "qwen-channel-plugin-example-server": "dist/start-server.js"
   },
   "scripts": {
     "build": "tsc --build",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@hoptrendy/channel-base": "file:../base",
+    "@hopcode/channel-base": "file:../base",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/ws": "^8.5.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
-    "directory": "packages/channels/plugin-example"
   }
 }

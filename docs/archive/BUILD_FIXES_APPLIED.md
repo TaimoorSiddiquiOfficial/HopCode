@@ -1,4 +1,4 @@
-﻿# 🔧 HopCode Build Fixes Applied
+# 🔧 HopCode Build Fixes Applied
 
 **Date:** 2026-04-18  
 **Status:** ✅ **FIXES APPLIED**
@@ -37,10 +37,10 @@
 
 **Updated Package Names:**
 
-- ✅ `@hoptrendy/hopcode-cli` (was `@hoptrendy/hopcode`)
-- ✅ `@hoptrendy/hopcode-core` (was `@hoptrendy/hopcode-core`)
+- ✅ `@hopcode/hopcode` (was `@hopcode/hopcode`)
+- ✅ `@hopcode/hopcode-core` (was `@hopcode/hopcode-core`)
 - ✅ `hopcode-vscode-ide-companion` (publisher: `hopcode`)
-- ✅ `@hoptrendy/sdk` (description updated)
+- ✅ `@hopcode/sdk` (description updated)
 
 **Bin Commands:**
 
@@ -99,8 +99,8 @@ The authentication type `HOPCODE_OAUTH` refers to the actual Alibaba Cloud HopCo
 - `packages/core/src/models/modelRegistry.ts` (7 errors)
 - `packages/core/src/models/modelsConfig.test.ts` (11 errors)
 - `packages/core/src/models/modelsConfig.ts` (6 errors)
-- `packages/core/src/qwen/qwenContentGenerator.test.ts` (12 errors)
-- `packages/core/src/qwen/qwenContentGenerator.ts` (5 errors)
+- `packages/core/src/hopcode/qwenContentGenerator.test.ts` (12 errors)
+- `packages/core/src/hopcode/qwenContentGenerator.ts` (5 errors)
 - `packages/core/src/services/fileDiscoveryService.ts` (4 errors)
 - `packages/core/src/telemetry/qwen-logger/qwen-logger.test.ts` (1 error)
 - `packages/core/src/utils/retry.test.ts` (7 errors)
@@ -124,7 +124,7 @@ AuthType.hopcode_OAUTH → AuthType.HOPCODE_OAUTH
 
 **Files:**
 
-- `packages/core/src/qwen/qwenContentGenerator.ts`
+- `packages/core/src/hopcode/qwenContentGenerator.ts`
 - `packages/core/src/services/fileDiscoveryService.ts`
 
 **Solution:**
@@ -139,7 +139,7 @@ These internal service names that refer to actual Qwen API clients should remain
 
 ### ✅ SHOULD Be Changed (Brand-facing)
 
-- Package names (`@hopcode/*` → `@hoptrendy/*`)
+- Package names (`@hopcode/*` → `@hopcode/*`)
 - CLI command name (`hopcode` → `hopcode`)
 - Project name in descriptions ("HopCode" → "HopCode")
 - Repository URLs
@@ -175,7 +175,7 @@ findstr /S /I "AuthType.hopcode_OAUTH" *.ts */*.ts
 
 ### Step 2: Fix Service Property Names
 
-In `packages/core/src/qwen/qwenContentGenerator.ts`:
+In `packages/core/src/hopcode/qwenContentGenerator.ts`:
 
 - Change `hopcodeClient` back to `qwenClient`
 - Change all references accordingly

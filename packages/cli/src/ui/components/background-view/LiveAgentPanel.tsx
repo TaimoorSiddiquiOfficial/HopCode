@@ -33,7 +33,7 @@ import {
   DEFAULT_BUILTIN_SUBAGENT_TYPE as CORE_DEFAULT_SUBAGENT_TYPE,
   ToolDisplayNames,
   ToolNames,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { useBackgroundTaskViewState } from '../../contexts/BackgroundTaskViewContext.js';
 import { ConfigContext } from '../../contexts/ConfigContext.js';
 import { theme } from '../../semantic-colors.js';

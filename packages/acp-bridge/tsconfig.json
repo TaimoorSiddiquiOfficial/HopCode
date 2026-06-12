@@ -8,8 +8,8 @@
     "composite": true,
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
-      "@hoptrendy/hopcode-core/*": ["../core/src/*"]
+      "@hopcode/hopcode-core": ["../core/src/index.ts"],
+      "@hopcode/hopcode-core/*": ["../core/src/*"]
     }
   },
   "include": ["src/**/*.ts"],

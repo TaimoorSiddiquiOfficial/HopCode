@@ -1,4 +1,4 @@
-﻿name: 'Release'
+name: 'Release'
 
 on:
   schedule:
@@ -43,7 +43,7 @@ jobs:
     name: 'Prepare Release Metadata'
     runs-on: 'ubuntu-latest'
     if: |-
-      ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}
+      ${{ github.repository == 'QwenLM/hopcode' }}
     permissions:
       contents: 'read'
     outputs:
@@ -224,10 +224,6 @@ jobs:
         run: |-
           npm ci --no-audit --progress=false
 
-      - name: 'Build CLI Bundle'
-        run: |-
-          npm run build && npm run bundle
-
       - name: 'Run CLI Integration Tests'
         run: |-
           npm run test:integration:cli:sandbox:none
@@ -268,10 +264,6 @@ jobs:
           NPM_CONFIG_PREFER_OFFLINE: 'true'
         run: |-
           npm ci --no-audit --progress=false
-
-      - name: 'Build CLI Bundle'
-        run: |-
-          npm run build && npm run bundle
 
       - name: 'Set up Docker'
         uses: 'docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd' # ratchet:docker/setup-buildx-action@v4
@@ -337,7 +329,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@hoptrendy'
+          scope: '@hopcode'
 
       - name: 'Install Dependencies'
         env:
@@ -401,7 +393,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
 
-      - name: 'Publish @hoptrendy/channel-base'
+      - name: 'Publish @hopcode/channel-base'
         working-directory: 'packages/channels/base'
         run: |-
           npm publish --access public --tag=${{ needs.prepare.outputs.npm_tag }} ${{ needs.prepare.outputs.is_dry_run == 'true' && '--dry-run' || '' }}
@@ -439,6 +431,36 @@ jobs:
             --generate-notes \
             ${PRERELEASE_FLAG}
 
+      - name: 'Regenerate CHANGELOG.md'
+        # Stable releases only: nightly/preview ship daily and would drown out
+        # the changelog. The just-created GitHub Release is already queryable,
+        # so the generator picks it up. The release branch was already pushed
+        # above, so push this follow-up commit too — otherwise the PR opened
+        # below (whose head is the remote branch) would not include it.
+        #
+        # Non-blocking by design: the only realistic failures are transient
+        # (the gh API read or the git push). The changelog is rebuilt from the
+        # full release history on every run, so a skipped update self-heals on
+        # the next stable release — never worth blocking the version-bump PR to
+        # main that follows.
+        if: |-
+          ${{ needs.prepare.outputs.is_dry_run == 'false' && needs.prepare.outputs.is_nightly == 'false' && needs.prepare.outputs.is_preview == 'false' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          RELEASE_TAG: '${{ needs.prepare.outputs.release_tag }}'
+          BRANCH_NAME: '${{ steps.release_branch.outputs.BRANCH_NAME }}'
+        run: |-
+          set -euo pipefail
+          node scripts/generate-changelog.js
+          git add CHANGELOG.md
+          if git diff --cached --quiet -- CHANGELOG.md; then
+            echo "CHANGELOG.md already up to date."
+          else
+            git commit -m "docs(changelog): sync for ${RELEASE_TAG}"
+            git push origin "${BRANCH_NAME}"
+          fi
+
       - name: 'Create PR to merge release branch into main'
         if: |-
           ${{ needs.prepare.outputs.is_dry_run == 'false' && needs.prepare.outputs.is_nightly == 'false' && needs.prepare.outputs.is_preview == 'false' }}
@@ -455,8 +477,8 @@ jobs:
             pr_url="$(gh pr create \
               --base main \
               --head "${RELEASE_BRANCH}" \
-              --title "chore(release): ${RELEASE_TAG} [skip ci]" \
-              --body "Automated release PR for ${RELEASE_TAG}. Syncs package.json versions on main.")"
+              --title "chore(release): ${RELEASE_TAG}" \
+              --body "Automated release PR for ${RELEASE_TAG}. Syncs package.json versions and CHANGELOG.md on main.")"
           fi
 
           echo "PR_URL=${pr_url}" >> "${GITHUB_OUTPUT}"
@@ -470,10 +492,9 @@ jobs:
           RELEASE_TAG: '${{ needs.prepare.outputs.release_tag }}'
         run: |-
           set -euo pipefail
-          # Keep [skip ci] on the squash commit that lands on main. The release
-          # PR title also includes it for visibility, but --subject makes the
-          # post-merge CI-skip behavior explicit instead of depending on gh's
-          # default squash subject.
+          # Keep [skip ci] only on the squash commit that lands on main. The
+          # release branch commit and PR title intentionally omit it so tag-push
+          # workflows and PR metadata stay unaffected.
           gh pr merge "${PR_URL}" \
             --squash \
             --auto \

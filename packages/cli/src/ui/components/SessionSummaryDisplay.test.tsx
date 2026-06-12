@@ -13,7 +13,7 @@ import type {
   ModelMetricsCore,
   SessionMetrics,
 } from '../contexts/SessionContext.js';
-import { MAIN_SOURCE } from '@hoptrendy/hopcode-core';
+import { MAIN_SOURCE } from '@hopcode/hopcode-core';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 
 const mainOnly = (core: ModelMetricsCore): ModelMetrics => ({

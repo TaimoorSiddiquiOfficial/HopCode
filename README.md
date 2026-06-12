@@ -1,26 +1,26 @@
-﻿<div align="center">
+<div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
-[![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/HopCode.svg)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
+[![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/hopcode.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
-[![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode-cli.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode-cli)
+[![Downloads](https://img.shields.io/npm/dm/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
 
-<a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="TaimoorSiddiquiOfficial%2FHopCode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="TaimoorSiddiquiOfficial%2Fhopcode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
 **An open-source AI agent that lives in your terminal.**
 
-<a href="https://hopcode.dev/hopcode-docs/zh/users/overview">中文</a> |
-<a href="https://hopcode.dev/hopcode-docs/de/users/overview">Deutsch</a> |
-<a href="https://hopcode.dev/hopcode-docs/fr/users/overview">français</a> |
-<a href="https://hopcode.dev/hopcode-docs/ja/users/overview">日本語</a> |
-<a href="https://hopcode.dev/hopcode-docs/ru/users/overview">Русский</a> |
-<a href="https://hopcode.dev/hopcode-docs/pt-BR/users/overview">Português (Brasil)</a>
+<a href="https://qwenlm.github.io/hopcode-docs/zh/users/overview">中文</a> |
+<a href="https://qwenlm.github.io/hopcode-docs/de/users/overview">Deutsch</a> |
+<a href="https://qwenlm.github.io/hopcode-docs/fr/users/overview">français</a> |
+<a href="https://qwenlm.github.io/hopcode-docs/ja/users/overview">日本語</a> |
+<a href="https://qwenlm.github.io/hopcode-docs/ru/users/overview">Русский</a> |
+<a href="https://qwenlm.github.io/hopcode-docs/pt-BR/users/overview">Português (Brasil)</a>
 
 </div>
 
 ## 🎉 News
 
-- **2026-04-15**: HopCode OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `hopcode auth` to configure.
+- **2026-04-15**: HopCode OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `qwen auth` to configure.
 
 - **2026-04-13**: HopCode OAuth free tier policy update: daily quota adjusted to 100 requests/day (from 1,000).
 
@@ -46,15 +46,13 @@ HopCode is an open-source AI agent for the terminal, optimized for Qwen series m
 #### Linux / macOS
 
 ```bash
-bash -c "$(curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.sh)"
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash
 ```
 
-#### Windows (Run as Administrator)
+#### Windows
 
-Works in both Command Prompt and PowerShell:
-
-```cmd
-powershell -Command "Invoke-WebRequest 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode.bat' -OutFile (Join-Path $env:TEMP 'install-hopcode.bat'); & (Join-Path $env:TEMP 'install-hopcode.bat')"
+```powershell
+irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.ps1 | iex
 ```
 
 > **Note**: It's recommended to restart your terminal after installation to ensure environment variables take effect.
@@ -68,7 +66,7 @@ Make sure you have Node.js 22 or later installed. Download it from [nodejs.org](
 #### NPM
 
 ```bash
-npm install -g @hoptrendy/hopcode@latest
+npm install -g @hopcode/hopcode@latest
 ```
 
 #### Homebrew (macOS, Linux)
@@ -114,7 +112,7 @@ Copy the prompt below and paste it into your agent:
 
 ```
 Use HopCode as a coding agent. First, fetch and read this skill reference:
-https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
+https://raw.githubusercontent.com/QwenLM/hopcode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
 Then follow the instructions inside to install, authenticate, and use HopCode via acpx for all coding tasks.
 ```
 
@@ -180,12 +178,12 @@ Here is a complete example:
 | `modelProviders[].baseUrl`   | The API endpoint URL (required for non-default endpoints).                                                                            |
 | `env`                        | A fallback place to store API keys (lowest priority; prefer `.env` files or `export` for sensitive keys).                             |
 | `security.auth.selectedType` | The protocol to use on startup (`openai`, `anthropic`, `gemini`, `vertex-ai`).                                                        |
-| `model.name`                 | The default model to use when HopCode starts.                                                                                         |
+| `model.name`                 | The default model to use when HopCode starts.                                                                                       |
 
 **Step 3:** Start HopCode — your configuration takes effect automatically:
 
 ```bash
-hopcode
+qwen
 ```
 
 Use the `/model` command at any time to switch between all configured models.
@@ -345,7 +343,7 @@ Use the `/model` command at any time to switch between all configured models.
 
 </details>
 
-> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://hopcode.dev/hopcode-docs/en/users/configuration/auth/) for full details.
+> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://qwenlm.github.io/hopcode-docs/en/users/configuration/auth/) for full details.
 
 > **Security note:** Never commit API keys to version control. The `~/.hopcode/settings.json` file is in your home directory and should stay private.
 
@@ -395,7 +393,7 @@ and adjust it to the context length configured on your local server.
 <summary>vLLM setup</summary>
 
 1. Install vLLM: `pip install vllm`
-2. Start the server: `vllm serve Qwen/Qwen3-32B`
+2. Start the server: `vllm serve hopcode/Qwen3-32B`
 3. Configure `~/.hopcode/settings.json`:
 
 ```json
@@ -403,7 +401,7 @@ and adjust it to the context length configured on your local server.
   "modelProviders": {
     "openai": [
       {
-        "id": "Qwen/Qwen3-32B",
+        "id": "hopcode/Qwen3-32B",
         "name": "Qwen3 32B (vLLM)",
         "baseUrl": "http://localhost:8000/v1",
         "description": "Qwen3 32B running locally via vLLM",
@@ -419,7 +417,7 @@ and adjust it to the context length configured on your local server.
     }
   },
   "model": {
-    "name": "Qwen/Qwen3-32B"
+    "name": "hopcode/Qwen3-32B"
   }
 }
 ```
@@ -452,15 +450,15 @@ cd your-project/
 hopcode -p "your question"
 ```
 
-Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://hopcode.dev/hopcode-docs/en/users/features/headless).
+Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://qwenlm.github.io/hopcode-docs/en/users/features/headless).
 
 #### IDE integration
 
 Use HopCode inside your editor (VS Code, Zed, and JetBrains IDEs):
 
-- [Use in VS Code](https://hopcode.dev/hopcode-docs/en/users/integration-vscode/)
-- [Use in Zed](https://hopcode.dev/hopcode-docs/en/users/integration-zed/)
-- [Use in JetBrains IDEs](https://hopcode.dev/hopcode-docs/en/users/integration-jetbrains/)
+- [Use in VS Code](https://qwenlm.github.io/hopcode-docs/en/users/integration-vscode/)
+- [Use in Zed](https://qwenlm.github.io/hopcode-docs/en/users/integration-zed/)
+- [Use in JetBrains IDEs](https://qwenlm.github.io/hopcode-docs/en/users/integration-jetbrains/)
 
 #### Daemon mode (`hopcode serve`, experimental)
 
@@ -472,23 +470,9 @@ hopcode serve
 
 Run HopCode as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custom CLIs all share **one** agent session over HTTP+SSE — instead of each spawning their own subprocess. Loopback bind has no auth by default (set `HOPCODE_SERVER_TOKEN` to enable bearer auth even on loopback); remote binds (`--hostname 0.0.0.0`) **require** a token — boot refuses without one. See:
 
-- [Daemon mode user guide](https://hopcode.dev/hopcode-docs/en/users/hopcode-serve)
-- [HTTP protocol reference](https://hopcode.dev/hopcode-docs/en/developers/hopcode-serve-protocol)
-- [DaemonClient TypeScript quickstart](https://hopcode.dev/hopcode-docs/en/developers/examples/daemon-client-quickstart)
-
-#### Daemon mode (`hopcode serve`, experimental)
-
-```bash
-cd your-project/
-hopcode serve
-# → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge)
-```
-
-Run HopCode as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custom CLIs all share **one** agent session over HTTP+SSE — instead of each spawning their own subprocess. Loopback bind has no auth by default (set `HOPCODE_SERVER_TOKEN` to enable bearer auth even on loopback); remote binds (`--hostname 0.0.0.0`) **require** a token — boot refuses without one. See:
-
-- [Daemon mode user guide](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/hopcode-serve)
-- [HTTP protocol reference](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/developers/hopcode-serve-protocol)
-- [DaemonClient TypeScript quickstart](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/developers/examples/daemon-client-quickstart)
+- [Daemon mode user guide](https://qwenlm.github.io/hopcode-docs/en/users/hopcode-serve)
+- [HTTP protocol reference](https://qwenlm.github.io/hopcode-docs/en/developers/hopcode-serve-protocol)
+- [DaemonClient TypeScript quickstart](https://qwenlm.github.io/hopcode-docs/en/developers/examples/daemon-client-quickstart)
 
 #### SDKs
 
@@ -496,14 +480,14 @@ Build on top of HopCode with the available SDKs:
 
 - TypeScript: [Use the HopCode SDK](./packages/sdk-typescript/README.md)
 - Python: [Use the Python SDK](./packages/sdk-python/README.md)
-- Java: [Use the Java SDK](./packages/sdk-java/hopcode/README.md)
+- Java: [Use the Java SDK](./packages/sdk-java/HopCode/README.md)
 
 Python SDK example:
 
 ```python
 import asyncio
 
-from hopcode_sdk import is_sdk_result_message, query
+from HOPCODE_code_sdk import is_sdk_result_message, query
 
 
 async def main() -> None:
@@ -511,7 +495,7 @@ async def main() -> None:
         "Summarize the repository layout.",
         {
             "cwd": "/path/to/project",
-            "path_to_qwen_executable": "hopcode",
+            "path_to_HOPCODE_executable": "hopcode",
         },
     )
 
@@ -540,16 +524,16 @@ asyncio.run(main())
 - `Ctrl+D` - Exit (on empty line)
 - `Up/Down` - Navigate command history
 
-> Learn more about [Commands](https://hopcode.dev/hopcode-docs/en/users/features/commands/)
+> Learn more about [Commands](https://qwenlm.github.io/hopcode-docs/en/users/features/commands/)
 >
-> **Tip**: In IZN mode (`--izn`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://hopcode.dev/hopcode-docs/en/users/features/approval-mode/)
+> **Tip**: In YOLO mode (`--yolo`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://qwenlm.github.io/hopcode-docs/en/users/features/approval-mode/)
 
 ## Configuration
 
 HopCode can be configured via `settings.json`, environment variables, and CLI flags.
 
-| File                       | Scope         | Description                                                                           |
-| -------------------------- | ------------- | ------------------------------------------------------------------------------------- |
+| File                    | Scope         | Description                                                                             |
+| ----------------------- | ------------- | --------------------------------------------------------------------------------------- |
 | `~/.hopcode/settings.json` | User (global) | Applies to all your HopCode sessions. **Recommended for `modelProviders` and `env`.** |
 | `.hopcode/settings.json`   | Project       | Applies only when running HopCode in this project. Overrides user settings.           |
 
@@ -560,16 +544,16 @@ The most commonly used top-level fields in `settings.json`:
 | `modelProviders`             | Define available models per protocol (`openai`, `anthropic`, `gemini`, `vertex-ai`).                 |
 | `env`                        | Fallback environment variables (e.g. API keys). Lower priority than shell `export` and `.env` files. |
 | `security.auth.selectedType` | The protocol to use on startup (e.g. `openai`).                                                      |
-| `model.name`                 | The default model to use when HopCode starts.                                                        |
+| `model.name`                 | The default model to use when HopCode starts.                                                      |
 
-> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://hopcode.dev/hopcode-docs/en/users/configuration/settings/) for all available options.
+> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://qwenlm.github.io/hopcode-docs/en/users/configuration/settings/) for all available options.
 
 ## Benchmark Results
 
 ### Terminal-Bench Performance
 
-| Agent   | Model              | Accuracy |
-| ------- | ------------------ | -------- |
+| Agent     | Model              | Accuracy |
+| --------- | ------------------ | -------- |
 | HopCode | Qwen3-Coder-480A35 | 37.5%    |
 | HopCode | Qwen3-Coder-30BA3B | 31.3%    |
 
@@ -582,7 +566,7 @@ Looking for a graphical interface?
 
 ## Troubleshooting
 
-If you encounter issues, check the [troubleshooting guide](https://hopcode.dev/hopcode-docs/en/users/support/troubleshooting/).
+If you encounter issues, check the [troubleshooting guide](https://qwenlm.github.io/hopcode-docs/en/users/support/troubleshooting/).
 
 **Common issues:**
 
@@ -597,4 +581,4 @@ To report a bug from within the CLI, run `/bug` and include a short title and re
 
 ## Acknowledgments
 
-This project is based on [Google Gemini CLI](https://github.com/google-gemini/gemini-cli). We acknowledge and appreciate the excellent work of the Gemini CLI team. Our main contribution focuses on parser-level adaptations to better support Qwen-Coder models.
+This project is based on [Google Gemini CLI](https://github.com/google-gemini/gemini-cli). We acknowledge and appreciate the excellent work of the Gemini CLI team. Our main contribution focuses on parser-level adaptations to better support HopCode models.

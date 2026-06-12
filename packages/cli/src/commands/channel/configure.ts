@@ -5,8 +5,8 @@ import {
   saveAccount,
   clearAccount,
   DEFAULT_BASE_URL,
-} from '@hoptrendy/channel-weixin/accounts';
-import { startLogin, waitForLogin } from '@hoptrendy/channel-weixin/login';
+} from '@hopcode/channel-weixin/accounts';
+import { startLogin, waitForLogin } from '@hopcode/channel-weixin/login';
 
 export const configureWeixinCommand: CommandModule<
   object,

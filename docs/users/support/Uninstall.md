@@ -1,6 +1,6 @@
-﻿# Uninstall
+# Uninstall
 
-Your uninstall method depends on how you ran the CLI. Follow the instructions for either npx or a global npm installation.
+Your uninstall method depends on how you installed the CLI.
 
 ## Method 1: Using npx
 
@@ -33,10 +33,28 @@ Remove-Item -Path (Join-Path $env:LocalAppData "npm-cache\_npx") -Recurse -Force
 
 ## Method 2: Using npm (Global Install)
 
-If you installed the CLI globally (e.g. `npm install -g @hoptrendy/hopcode-cli`), use the `npm uninstall` command with the `-g` flag to remove it.
+If you installed the CLI globally (e.g. `npm install -g @hopcode/hopcode`), use the `npm uninstall` command with the `-g` flag to remove it.
 
 ```bash
-npm uninstall -g @hoptrendy/hopcode-cli
+npm uninstall -g @hopcode/hopcode
 ```
 
 This command completely removes the package from your system.
+
+## Method 3: Standalone Install
+
+If you installed via the standalone installer (`curl ... | bash` or `irm ... | iex`), use the dedicated uninstall script.
+
+**Linux / macOS**
+
+```bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
+```
+
+**Windows**
+
+```powershell
+irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex
+```
+
+The uninstaller removes the standalone runtime, generated `hopcode` wrapper, and installer-managed PATH changes. Your HopCode configuration (`~/.hopcode`) is preserved by default.

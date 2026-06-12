@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +19,8 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'Izn mode': 'Izn 模式',
+  'YOLO mode': 'YOLO 模式',
+  'Auto mode': 'Auto 模式',
   'plan mode': '規劃模式',
   'auto-accept edits': '自動接受編輯',
   'Accepting edits': '接受編輯',
@@ -81,7 +82,7 @@ export default {
   'show paths for current session files and logs': '顯示目前會話檔案和日誌路徑',
   'submit a bug report': '提交錯誤報告',
   Status: '狀態',
-  HopCode: 'HopCode',
+  'HopCode': 'HopCode',
   Runtime: '運行環境',
   OS: '操作系統',
   Auth: '認證',
@@ -97,7 +98,39 @@ export default {
     '分析項目並創建定製的 HOPCODE.md 檔案',
   'List available HopCode tools. Usage: /tools [desc]':
     '列出可用的 HopCode 工具。用法：/tools [desc]',
-  'List available skills.': '列出可用技能。',
+  'Open the skills panel (browse, search, toggle, pick).':
+    '開啟技能面板（瀏覽、搜尋、啟停、選擇）。',
+  'Manage Skills': '管理技能',
+  'Skills configuration saved.': '技能設定已儲存。',
+  'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
+    '技能設定已儲存，但重新整理失敗：{{error}}。請重新啟動以確保新狀態生效。',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.hopcode/settings.json directly to manage skills at user scope.':
+    '目前工作區未受信任，工作區設定會被合併設定忽略。請先執行 /trust，或直接編輯 ~/.hopcode/settings.json 在使用者範圍管理技能。',
+  'SkillManager not available.': 'SkillManager 不可用。',
+  'Loading skills…': '正在載入技能…',
+  'Failed to load skills: {{error}}': '載入技能失敗：{{error}}',
+  'Failed to save skills configuration: {{error}}':
+    '儲存技能設定失敗：{{error}}',
+  'All available skills are disabled. Edit ~/.hopcode/settings.json or .hopcode/settings.json (skills.disabled) to re-enable.':
+    '所有可用技能皆已停用。請編輯 ~/.hopcode/settings.json 或 .hopcode/settings.json（skills.disabled）以重新啟用。',
+  'Press esc to close.': '按 Esc 關閉。',
+  '{{count}} skills · ': '{{count}} 個技能 · ',
+  '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} 個技能 · ',
+  'Space toggle · Enter pick (fill input) · Esc save & exit · workspace scope':
+    '空白鍵 啟停 · 回車 選取(填入輸入框) · Esc 儲存並離開 · 工作區範圍',
+  'Search:': '搜尋：',
+  'type to filter…': '輸入以篩選…',
+  'No skills are currently available.': '目前沒有可用的技能。',
+  'All available skills are locked at a higher scope (see below).':
+    '所有可用技能都被更高範圍鎖定（詳見下方）。',
+  'No skills match the search.': '沒有符合搜尋條件的技能。',
+  'Locked by higher-scope settings (cannot toggle here):':
+    '被更高範圍設定鎖定（此處無法切換）：',
+  'higher scope': '更高範圍',
+  '  {{name}} {{description}}  [locked: {{scope}}]':
+    '  {{name}} {{description}}  [已鎖定：{{scope}}]',
+  '↑/↓ navigate · backspace edits search': '↑/↓ 導覽 · 倒退 編輯搜尋',
+  Bundled: '內建',
   'Available HopCode CLI tools:': '可用的 HopCode CLI 工具：',
   'No tools available': '沒有可用工具',
   'View or change the approval mode for tool usage':
@@ -173,8 +206,8 @@ export default {
     '在瀏覽器中打開完整的 HopCode 文檔',
   'Configuration not available.': '配置不可用',
   'Connect an LLM provider': '連接 LLM 提供商',
-  'Copy the last result or code snippet to clipboard':
-    '將最後的結果或代碼片段複製到剪貼板',
+  'Copy the last AI response to clipboard (/copy N for Nth-latest)':
+    '將最近的 AI 回應複製到剪貼簿（/copy N 複製倒數第 N 則）',
   'Show working-tree change stats versus HEAD':
     '顯示工作區相對 HEAD 的變更統計',
   'Could not determine current working directory.': '無法確定當前工作目錄。',
@@ -381,8 +414,7 @@ export default {
   'Custom Witty Phrases': '自定義詼諧短語',
   'Show Welcome Back Dialog': '顯示歡迎回來對話框',
   'Enable User Feedback': '啟用用戶反饋',
-  'How is HopCode doing this session? (optional)':
-    'HopCode 這次表現如何？（可選）',
+  'How is Qwen doing this session? (optional)': 'Qwen 這次表現如何？（可選）',
   Bad: '不滿意',
   Fine: '還行',
   Good: '滿意',
@@ -415,12 +447,10 @@ export default {
   Text: '文本',
   JSON: 'JSON',
   Plan: '規劃',
-  Default: '默認',
+  'Ask permissions': '請求授權',
   'Auto Edit': '自動編輯',
-  Izn: 'Izn',
+  YOLO: 'YOLO',
   'toggle vim mode on/off': '切換 vim 模式開關',
-  'check session stats. Usage: /stats [model|tools]':
-    '檢查會話統計信息。用法：/stats [model|tools]',
   'Show model-specific usage statistics.': '顯示模型相關的使用統計信息',
   'Show tool-specific usage statistics.': '顯示工具相關的使用統計信息',
   'exit the cli': '退出命令行界面',
@@ -515,6 +545,7 @@ export default {
   'The name of the extension to update.': '要更新的擴展名稱。',
   'Either an extension name or --all must be provided':
     '必須提供擴展名稱或 --all',
+  'List installed extensions': '列出已安裝的擴展',
   'Lists installed extensions.': '列出已安裝的擴展。',
   'Path:': '路徑：',
   'Source:': '來源：',
@@ -615,16 +646,16 @@ export default {
   'Exit codes:': '退出碼：',
   'Configured hooks:': '已配置的 Hook：',
   'No hooks configured for this event.': '此事件未配置 Hook。',
-  'To add hooks, edit settings.json directly or ask HopCode.':
-    '要添加 Hook，請直接編輯 settings.json 或詢問 HopCode。',
+  'To add hooks, edit settings.json directly or ask Qwen.':
+    '要添加 Hook，請直接編輯 settings.json 或詢問 Qwen。',
   'Enter to select · Esc to go back': 'Enter 選擇 · Esc 返回',
   'Hook details': 'Hook 詳情',
   'Event:': '事件：',
   'Extension:': '擴展：',
   'Desc:': '描述：',
   'No hook config selected': '未選擇 Hook 配置',
-  'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    '要修改或刪除此 Hook，請直接編輯 settings.json 或詢問 HopCode。',
+  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+    '要修改或刪除此 Hook，請直接編輯 settings.json 或詢問 Qwen。',
   'Hook Configuration - Disabled': 'Hook 配置 - 已禁用',
   'All hooks are currently disabled. You have {{count}} that are not running.':
     '所有 Hook 當前已禁用。您有 {{count}} 未運行。',
@@ -652,6 +683,7 @@ export default {
   'After tool execution fails': '工具執行失敗後',
   'When notifications are sent': '發送通知時',
   'When the user submits a prompt': '用戶提交提示時',
+  'When a slash command expands into a prompt': '斜線命令展開為提示時',
   'When a new session is started': '新會話開始時',
   'Right before HopCode concludes its response': 'HopCode 結束響應之前',
   'When a subagent (Agent tool call) is started':
@@ -670,6 +702,8 @@ export default {
     '命令輸入為包含通知消息和類型的 JSON。',
   'Input to command is JSON with original user prompt text.':
     '命令輸入為包含原始用戶提示文本的 JSON。',
+  'Input to command is JSON with command_name, command_args, and expanded prompt text.':
+    '命令輸入為包含 command_name、command_args 和展開後提示文本的 JSON。',
   'Input to command is JSON with session start source.':
     '命令輸入為包含會話啟動來源的 JSON。',
   'Input to command is JSON with session end reason.':
@@ -692,7 +726,9 @@ export default {
     '僅向用戶顯示 stderr 但繼續工具調用',
   'block processing, erase original prompt, and show stderr to user only':
     '阻止處理，擦除原始提示，僅向用戶顯示 stderr',
-  'stdout shown to HopCode': '向 HopCode 顯示 stdout',
+  'block expanded prompt submission and show stderr to user only':
+    '阻止提交展開後的提示，並僅向用戶顯示 stderr',
+  'stdout shown to Qwen': '向 Qwen 顯示 stdout',
   'show stderr to user only (blocking errors ignored)':
     '僅向用戶顯示 stderr（忽略阻塞錯誤）',
   'command completes successfully': '命令成功完成',
@@ -719,6 +755,22 @@ export default {
     '根據你的聊天記錄生成個性化編程洞察',
   'Resume a previous session': '恢復先前會話',
   'Fork the current conversation into a new session': '將目前對話分支到新會話',
+  'Spawn a background agent that inherits the full conversation':
+    '啟動繼承完整對話的背景智能體',
+  'Please provide a directive. Usage: /fork <directive>':
+    '請提供指令。用法：/fork <指令>',
+  'Cannot fork while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
+    '回應或工具呼叫正在進行時無法分支。請等待其完成或處理待確認的工具呼叫。',
+  'Cannot fork before the first conversation turn.': '首次對話輪次前無法分支。',
+  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
+    '/fork 命令需要啟用 fork 功能開關。設定 HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 以啟用。',
+  'The agent tool is unavailable; cannot fork.': 'Agent 工具不可用；無法分支。',
+  'Failed to launch fork: {{error}}': '啟動分支失敗：{{error}}',
+  'the background agent could not be started.': '背景智能體無法啟動。',
+  'User launched a background fork via /fork: {{directive}}':
+    '使用者透過 /fork 啟動了背景分支：{{directive}}',
+  'Forked into a background agent. It inherits this conversation and runs without blocking — track it in the background tasks panel; it reports back when done.':
+    '已分支到背景智能體。它會繼承此對話並以非阻塞方式執行，可在背景任務面板中追蹤；完成後會回報結果。',
   'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
     '回應或工具呼叫正在進行時無法分支。請等待其完成或處理待確認的工具呼叫。',
   'No conversation to branch.': '沒有可分支的對話。',
@@ -754,12 +806,13 @@ export default {
   'Available options:': '可用選項：',
   'Set UI language to {{name}}': '將 UI 語言設置為 {{name}}',
   'Tool Approval Mode': '工具審批模式',
-  '{{mode}} mode': '{{mode}} 模式',
   'Analyze only, do not modify files or execute commands':
     '僅分析，不修改檔案或執行命令',
   'Require approval for file edits or shell commands':
     '需要批准檔案編輯或 shell 命令',
   'Automatically approve file edits': '自動批准檔案編輯',
+  'Use classifier to automatically approve safe tool calls':
+    '使用分類器自動批准安全的工具調用',
   'Automatically approve all tools': '自動批准所有工具',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
     '工作區審批模式已存在並具有優先級。用戶級別的更改將無效。',
@@ -1010,11 +1063,10 @@ export default {
   'Time remaining:': '剩餘時間：',
   'HopCode OAuth Authentication Timeout': 'HopCode OAuth 認證超時',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
-    'OAuth 令牌已過期（超過 {{seconds}} 秒）。請重新選擇認證方法',
+    'OAuth token 已過期（超過 {{seconds}} 秒）。請重新選擇認證方法',
   'Press any key to return to authentication type selection.':
     '按任意鍵返回認證類型選擇',
-  'Waiting for HopCode OAuth authentication...':
-    '正在等待 HopCode OAuth 認證...',
+  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 認證...',
   'Authentication timed out. Please try again.': '認證超時。請重試。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待認證...（按 ESC 或 CTRL+C 取消）',
@@ -1210,22 +1262,41 @@ export default {
   'Tool Time:': '工具時間：',
   'Session Stats': '會話統計',
   'Model Usage': '模型使用情況',
-  Reqs: '請求數',
   'Input Tokens': '輸入 token 數',
   'Output Tokens': '輸出 token 數',
   'Savings Highlight:': '節省亮點：',
   'of input tokens were served from the cache, reducing costs.':
     '從緩存載入 token ，降低了成本',
   'Tip: For a full token breakdown, run `/stats model`.':
-    '提示：要查看完整的令牌明細，請運行 `/stats model`',
+    '提示：要查看完整的 token 明細，請運行 `/stats model`',
   'Model Stats For Nerds': '模型統計（技術細節）',
   'Tool Stats For Nerds': '工具統計（技術細節）',
   Metric: '指標',
   API: 'API',
+  Session: '會話',
+  Activity: '概覽',
+  Efficiency: '性能',
+  Success: '成功率',
+  Today: '今天',
+  'Token Trend': 'Token 趨勢',
+  'Cache Hit Rate': '緩存命中率',
+  'Tool Success': '工具成功率',
+  'Tool Leaderboard': '工具排行',
+  Calls: '調用次數',
+  Time: '耗時',
+  Reqs: '請求',
+  Cache: '緩存',
+  Latency: '延遲',
+  'In/Out': '輸入/輸出',
+  'Code Impact': '代碼變更',
+  'Failed to load stats. Press r to retry.': '載入統計失敗，按 r 重試。',
+  net: '淨增',
+  streak: '連續',
+  best: '最長',
   Requests: '請求數',
   Errors: '錯誤數',
   'Avg Latency': '平均延遲',
-  Tokens: '令牌',
+  Tokens: 'Token',
   Total: '總計',
   Prompt: '提示',
   Cached: '緩存',
@@ -1234,7 +1305,6 @@ export default {
   'No API calls have been made in this session.':
     '本次會話中未進行任何 API 調用',
   'Tool Name': '工具名稱',
-  Calls: '調用次數',
   'Success Rate': '成功率',
   'Avg Duration': '平均耗時',
   'User Decision Summary': '用戶決策摘要',
@@ -1402,8 +1472,7 @@ export default {
   'Show current authentication status': '顯示當前認證狀態',
   'Authentication completed successfully.': '認證完成。',
   'Starting HopCode OAuth authentication...': '正在啟動 HopCode OAuth 認證...',
-  'Successfully authenticated with HopCode OAuth.':
-    '已成功通過 HopCode OAuth 認證。',
+  'Successfully authenticated with HopCode OAuth.': '已成功通過 HopCode OAuth 認證。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
     'HopCode OAuth 認證失敗：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
@@ -1423,11 +1492,11 @@ export default {
   '⚠️  No authentication method configured.\n': '⚠️  未配置認證方式。\n',
   'Run one of the following commands to get started:\n':
     '運行以下命令之一開始配置：\n',
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - 使用 HopCode OAuth 登錄（已停用）',
+  '  qwen auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  qwen auth hopcode-oauth     - 使用 HopCode OAuth 登錄（已停用）',
   'Or simply run:': '或者直接運行：',
-  '  hopcode auth                - Interactive authentication setup\n':
-    '  hopcode auth                - 交互式認證配置\n',
+  '  qwen auth                - Interactive authentication setup\n':
+    '  qwen auth                - 交互式認證配置\n',
   '✓ Authentication Method: HopCode OAuth': '✓ 認證方式：HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  類型：免費額度（2026-04-15 已停用）',
@@ -1446,8 +1515,8 @@ export default {
     '⚠️  認證方式：阿里雲百鍊 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  問題：在環境變量或設置中未找到 API Key\n',
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  運行 `hopcode auth coding-plan` 重新配置。\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  運行 `qwen auth coding-plan` 重新配置。\n',
   '✓ Authentication Method: {{type}}': '✓ 認證方式：{{type}}',
   '  Status: Configured\n': '  狀態：已配置\n',
   'Failed to check authentication status: {{error}}':
@@ -1488,6 +1557,18 @@ export default {
   // === Core: added from PR #3328 ===
   'Open the memory manager.': '打開記憶管理器。',
   'Show current process memory diagnostics': '顯示目前程序的內存診斷。',
+  'Record a CPU profile for Chrome DevTools analysis':
+    '錄製 CPU 效能分析檔案，用於 Chrome DevTools 分析',
+  'Roll back a standalone update to the previous version':
+    '將獨立安裝回滾到上一個版本',
+  'Rollback is not available in ACP mode.': '回滾在 ACP 模式下不可用。',
+  'Rollback is only available for standalone installations.':
+    '回滾僅適用於獨立安裝。',
+  'Rollback successful. Restart your terminal to use the previous version.':
+    '回滾成功。請重啟終端以使用上一個版本。',
+  'Rollback failed:': '回滾失敗：',
+  'Rollback on Windows requires manual intervention. Rename hopcode.old to hopcode in your installation directory.':
+    '在 Windows 上回滾需要手動操作。請將安裝目錄中的 hopcode.old 重新命名為 hopcode。',
   'Save a durable memory to the memory system.': '將持久記憶保存到記憶系統。',
   'Ask a quick side question without affecting the main conversation':
     '在不影響主對話的情況下快速提問旁支問題',
@@ -1582,6 +1663,66 @@ export default {
     '後續記憶整理可能會因鎖定而略過，直到下一次會話過期清理清除此檔案。',
   "The scheduler gate did not see this dream's timestamp; the next dream cycle may re-fire sooner than usual.":
     '排程門控未看到本次記憶整理的時間戳；下一輪記憶整理可能會比平時更早重新觸發。',
+
+  // Stats Dashboard — Category 2 (missing from zh-TW)
+  'Activity Heatmap': '活動熱力圖',
+  Less: '少',
+  More: '多',
+  Sessions: '會話數',
+  Duration: '時長',
+  Projects: '專案統計',
+  'Loading stats...': '載入統計...',
+  '(no data)': '（暫無資料）',
+  d: '天',
+  h: '時',
+  m: '分',
+  Input: '輸入',
+  Models: '模型',
+  'All time': '所有時間',
+  'Last 7 days': '最近 7 天',
+  'Last 30 days': '最近 30 天',
+  'Show usage statistics dashboard.': '顯示使用統計面板。',
+
+  // Stats Dashboard — keyboard hints (not translated)
+  'tab \xB7 esc': 'tab \xB7 esc',
+  'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc':
+    'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc',
+  'tab \xB7 r dates \xB7 esc': 'tab \xB7 r dates \xB7 esc',
+
+  // Stats Dashboard — missing labels
+  'API Requests': 'API 請求',
+  'Tool Calls': '工具呼叫',
+  'Success rate': '成功率',
+  'Code Changes': '程式碼變更',
+  Tool: '工具',
+  reqs: '請求',
+  in: '輸入',
+  out: '輸出',
+
+  // statsCommand non-interactive output
+  'API requests: {{count}}': 'API 請求：{{count}}',
+  'Code changes': '程式碼變更',
+  Cost: '費用',
+  'Estimated cost: ${{cost}}': '預估費用：${{cost}}',
+  'Files: +{{added}} / -{{removed}} lines':
+    '檔案：+{{added}} / -{{removed}} 行',
+  'N/A': 'N/A',
+  Name: '名稱',
+  'No model usage data yet.': '尚無模型使用資料。',
+  'No tool usage data yet.': '尚無工具使用資料。',
+  'Prompts: {{count}}': '提示：{{count}}',
+  'Session duration: {{duration}}': '會話時長：{{duration}}',
+  'Tokens \u2014 prompt: {{prompt}}, output: {{output}}':
+    'Token — 輸入：{{prompt}}，輸出：{{output}}',
+  'Tool calls': '工具呼叫',
+  'Tool calls: {{total}} ({{success}} ok, {{fail}} fail)':
+    '工具呼叫：{{total}}（{{success}} 成功，{{fail}} 失敗）',
+  cached: '快取',
+  days: '天',
+  output: '輸出',
+  prompt: '輸入',
+  '\u2191 tabs \u00B7 r to cycle dates \u00B7 esc to close':
+    '\u2191 tab 切換標籤 \u00B7 r 切換時間範圍 \u00B7 esc 關閉',
 
   // === Same-as-English optimization ===
   ' (not in model registry)': '（不在模型註冊表中）',

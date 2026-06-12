@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthType } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@hopcode/hopcode-core';
 import { z } from 'zod';
 
 /**

@@ -1,4 +1,4 @@
-# ✅ NPM Scope Updated to @hoptrendy!
+# ✅ NPM Scope Updated to @hopcode!
 
 **Status:** ✅ Complete and pushed to GitHub
 
@@ -9,23 +9,23 @@
 **All package names updated:**
 
 ```
-@hoptrendy/* → @hoptrendy/*
+@hopcode/* → @hopcode/*
 ```
 
 **Packages:**
 
-- ✅ @hoptrendy/hopcode (main CLI)
-- ✅ @hoptrendy/hopcode-core
-- ✅ @hoptrendy/hopcode-cli
-- ✅ @hoptrendy/sdk
-- ✅ @hoptrendy/webui
-- ✅ @hoptrendy/channel-base
-- ✅ @hoptrendy/channel-telegram
-- ✅ @hoptrendy/channel-dingtalk
-- ✅ @hoptrendy/channel-weixin
-- ✅ @hoptrendy/channel-plugin-example
-- ✅ @hoptrendy/web-templates
-- ✅ hoptrendy-vscode-ide-companion
+- ✅ @hopcode/hopcode (main CLI)
+- ✅ @hopcode/hopcode-core
+- ✅ @hopcode/hopcode
+- ✅ @hopcode/sdk
+- ✅ @hopcode/webui
+- ✅ @hopcode/channel-base
+- ✅ @hopcode/channel-telegram
+- ✅ @hopcode/channel-dingtalk
+- ✅ @hopcode/channel-weixin
+- ✅ @hopcode/channel-plugin-example
+- ✅ @hopcode/web-templates
+- ✅ hopcode-vscode-ide-companion
 
 ---
 
@@ -36,19 +36,19 @@
 **Updated scope:**
 
 ```yaml
-scope: '@hoptrendy'  ← Updated from @hopcode
+scope: '@hopcode'  ← Updated from @hopcode
 ```
 
 ---
 
 ## 📋 Next Steps
 
-### **1. Get NPM Token for @hoptrendy**
+### **1. Get NPM Token for @hopcode**
 
 **Go to:**
 
 ```
-https://www.npmjs.com/settings/hoptrendy/tokens
+https://www.npmjs.com/settings/hopcode/tokens
 ```
 
 **Create token:**
@@ -56,7 +56,7 @@ https://www.npmjs.com/settings/hoptrendy/tokens
 ```
 Name: HopCode GitHub Actions
 Scope: Automation
-Organization: hoptrendy
+Organization: hopcode
 ```
 
 **Copy the token!**
@@ -99,8 +99,8 @@ ref: main
 **Expected logs:**
 
 ```
-DRY RUN: Would publish @hoptrendy/hopcode
-DRY RUN: Would publish @hoptrendy/core
+DRY RUN: Would publish @hopcode/hopcode
+DRY RUN: Would publish @hopcode/core
 etc...
 ```
 
@@ -121,9 +121,9 @@ ref: main
 **Verify on npm:**
 
 ```
-https://www.npmjs.com/package/@hoptrendy/hopcode
-https://www.npmjs.com/package/@hoptrendy/core
-https://www.npmjs.com/package/@hoptrendy/sdk
+https://www.npmjs.com/package/@hopcode/hopcode
+https://www.npmjs.com/package/@hopcode/core
+https://www.npmjs.com/package/@hopcode/sdk
 ```
 
 ---
@@ -134,14 +134,14 @@ https://www.npmjs.com/package/@hoptrendy/sdk
 
 ```bash
 # Install globally
-npm install -g @hoptrendy/hopcode
+npm install -g @hopcode/hopcode
 
 # Test CLI
-hoptrendy --version
-hoptrendy --help
+hopcode --version
+hopcode --help
 
 # Or run with npx
-npx @hoptrendy/hopcode --help
+npx @hopcode/hopcode --help
 ```
 
 ---
@@ -152,7 +152,7 @@ npx @hoptrendy/hopcode --help
 
 ```json
 {
-  "name": "@hoptrendy/hopcode"
+  "name": "@hopcode/hopcode"
 }
 ```
 
@@ -160,7 +160,7 @@ npx @hoptrendy/hopcode --help
 
 ```json
 {
-  "name": "@hoptrendy/hopcode"
+  "name": "@hopcode/hopcode"
 }
 ```
 
@@ -171,7 +171,7 @@ npx @hoptrendy/hopcode --help
 **Your npm org:**
 
 ```
-https://www.npmjs.com/org/hoptrendy
+https://www.npmjs.com/org/hopcode
 ```
 
 **Your npm profile:**
@@ -183,7 +183,7 @@ https://www.npmjs.com/~taimoor214
 **Create tokens:**
 
 ```
-https://www.npmjs.com/settings/hoptrendy/tokens
+https://www.npmjs.com/settings/hopcode/tokens
 ```
 
 **GitHub workflow:**
@@ -201,14 +201,14 @@ https://github.com/TaimoorSiddiquiOfficial/HopCode/actions/workflows/publish-npm
 **Make sure your token:**
 
 - ✅ Has "Automation" scope
-- ✅ Is for @hoptrendy organization
+- ✅ Is for @hopcode organization
 - ✅ Is added to GitHub Secrets as `NPM_TOKEN`
 
 ### **Package Names**
 
 **All packages now use:**
 
-- ✅ @hoptrendy scope
+- ✅ @hopcode scope
 - ✅ Consistent naming
 - ✅ Ready for publishing
 
@@ -217,9 +217,9 @@ https://github.com/TaimoorSiddiquiOfficial/HopCode/actions/workflows/publish-npm
 **After install:**
 
 ```bash
-# The CLI command is still 'hoptrendy' (not 'hopcode')
-hoptrendy --version
-hoptrendy auth login
+# The CLI command is still 'hopcode' (not 'hopcode')
+hopcode --version
+hopcode auth login
 ```
 
 ---
@@ -230,14 +230,14 @@ Before running the workflow:
 
 - [ ] NPM_TOKEN added to GitHub Secrets
 - [ ] Token has Automation scope
-- [ ] Token is for @hoptrendy org
+- [ ] Token is for @hopcode org
 - [ ] Ready to test with dry_run: true
 
 ---
 
 ## 🎯 Ready to Publish!
 
-**Everything is configured for @hoptrendy scope!**
+**Everything is configured for @hopcode scope!**
 
 **Next:**
 

@@ -33,7 +33,7 @@ import {
   type MonitorTask,
   type ShellTask,
   type TaskState,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 // Cap on retained terminal dream entries surfaced via the dialog.
 // `MemoryManager.tasks` has no eviction; without this cap the list
@@ -44,7 +44,7 @@ import {
 const MAX_RETAINED_TERMINAL_DREAMS = 3;
 
 /**
- * @deprecated Use {@link AgentTask} from `@hoptrendy/hopcode-core`
+ * @deprecated Use {@link AgentTask} from `@hopcode/hopcode-core`
  * directly. Kept as a one-release alias while UI consumers migrate.
  */
 export type AgentDialogEntry = AgentTask;

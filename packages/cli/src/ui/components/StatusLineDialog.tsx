@@ -7,7 +7,7 @@
 import type React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
 import type { UseHistoryManagerReturn } from '../hooks/useHistoryManager.js';
@@ -100,7 +100,7 @@ function getPreviewData(config: Config, uiState: UIState) {
   return buildStatusLinePresetData({
     sessionId: stats.sessionId,
     version: config.getCliVersion(),
-    modelDisplayName: uiState.currentModel || config.getModel(),
+    modelDisplayName: config.getModelDisplayName(),
     reasoning: contentGeneratorConfig?.reasoning,
     currentDir: config.getTargetDir(),
     branch: uiState.branchName,

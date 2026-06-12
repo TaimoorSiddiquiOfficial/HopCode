@@ -1,11 +1,11 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, expect, it } from 'vitest';
-import { AgentStatus } from '@hoptrendy/hopcode-core';
+import { AgentStatus } from '@hopcode/hopcode-core';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { ArenaSessionCard } from './ArenaCards.js';
 import type { ArenaAgentCardData } from '../../types.js';

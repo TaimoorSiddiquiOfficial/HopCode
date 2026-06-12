@@ -15,8 +15,8 @@ import {
   MCPOAuthProvider,
   MCPOAuthTokenStorage,
   getErrorMessage,
-} from '@hoptrendy/hopcode-core';
-import type { OAuthDisplayPayload } from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
+import type { OAuthDisplayPayload } from '@hopcode/hopcode-core';
 import { appEvents, AppEvent } from '../../../../utils/events.js';
 import {
   osc8Hyperlink,

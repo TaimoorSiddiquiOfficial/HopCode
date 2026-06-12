@@ -8,7 +8,7 @@ import {
   flatMapTextParts,
   readPathFromWorkspace,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { CommandContext } from '../../ui/commands/types.js';
 import { MessageType } from '../../ui/types.js';
 import {

@@ -15,7 +15,7 @@ import {
   computeModelListVersion,
   getDefaultModelIds,
   resolveBaseUrl,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 describe('coding plan provider', () => {
   it('creates a Coding Plan install plan', () => {

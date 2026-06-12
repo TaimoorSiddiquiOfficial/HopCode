@@ -15,7 +15,7 @@ import { RequestError } from '@agentclientprotocol/sdk';
 import type {
   FileSystemService,
   ReadTextFileResponse,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 const RESOURCE_NOT_FOUND_CODE = -32002;
 

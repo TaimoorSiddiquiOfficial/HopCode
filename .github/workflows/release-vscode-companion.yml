@@ -137,13 +137,13 @@ jobs:
         if: |-
           ${{ github.event.inputs.force_skip_tests != 'true' }}
         run: |
-          npm run build --workspace=@hoptrendy/hopcode-core
+          npm run build --workspace=@hopcode/hopcode-core
 
       - name: 'Build webui dependency'
         if: |-
           ${{ github.event.inputs.force_skip_tests != 'true' }}
         run: |
-          npm run build --workspace=@hoptrendy/webui
+          npm run build --workspace=@hopcode/webui
 
       - name: 'Run Tests'
         if: |-
@@ -226,7 +226,7 @@ jobs:
           VSCODE_TARGET: '${{ matrix.target }}'
         run: |
           # Build and stage the extension + bundled CLI
-          npm --workspace=hoptrendy-vscode-ide-companion run prepackage
+          npm --workspace=hopcode-vscode-ide-companion run prepackage
 
       - name: 'Package VSIX (platform-specific)'
         if: "${{ matrix.target != '' }}"

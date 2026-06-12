@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +13,7 @@
  *  - Keyboard events are scoped — no conflict with the main InputPrompt
  *
  * Wraps its content in a local StreamingContext.Provider so reusable
- * components like LoadingIndicator and HopCodeRespondingSpinner read the
+ * components like LoadingIndicator and GeminiRespondingSpinner read the
  * agent's derived streaming state instead of the main agent's.
  */
 
@@ -24,7 +24,7 @@ import {
   isTerminalStatus,
   ApprovalMode,
   APPROVAL_MODES,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   useAgentViewState,
   useAgentViewActions,
@@ -45,6 +45,7 @@ import { keyMatchers, Command } from '../../keyMatchers.js';
 import { theme } from '../../semantic-colors.js';
 import { usePreferredEditor } from '../../hooks/usePreferredEditor.js';
 import { t } from '../../../i18n/index.js';
+import { getApprovalModePromptStyle } from '../approvalModeVisuals.js';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -243,14 +244,8 @@ export const AgentComposer: React.FC<AgentComposerProps> = ({ agentId }) => {
 
   // ── Approval-mode styling (mirrors main InputPrompt) ──
 
-  const isIzn = agentApprovalMode === ApprovalMode.IZN;
-  const isAutoAccept = agentApprovalMode !== ApprovalMode.DEFAULT;
-
-  const statusColor = isIzn
-    ? theme.status.errorDim
-    : isAutoAccept
-      ? theme.status.warningDim
-      : undefined;
+  const approvalModePromptStyle = getApprovalModePromptStyle(agentApprovalMode);
+  const statusColor = approvalModePromptStyle.color;
 
   const inputBorderColor =
     !isInputActive || agentTabBarFocused
@@ -258,7 +253,9 @@ export const AgentComposer: React.FC<AgentComposerProps> = ({ agentId }) => {
       : (statusColor ?? theme.border.focused);
 
   const prefixNode = (
-    <Text color={statusColor ?? theme.text.accent}>{isIzn ? '*' : '>'} </Text>
+    <Text color={statusColor ?? theme.text.accent}>
+      {approvalModePromptStyle.prefix}{' '}
+    </Text>
   );
 
   return (

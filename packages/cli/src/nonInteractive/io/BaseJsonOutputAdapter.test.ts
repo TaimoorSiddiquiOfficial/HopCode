@@ -11,7 +11,7 @@ import {
   type ServerGeminiStreamEvent,
   type ToolCallRequestInfo,
   type AgentResultDisplay,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { Part, GenerateContentResponseUsageMetadata } from '@google/genai';
 import type {
   CLIMessage,

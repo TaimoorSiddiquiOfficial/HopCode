@@ -1,4 +1,4 @@
-﻿# HopCode Runtime Diagnostics Benchmark Report
+# HopCode Runtime Diagnostics Benchmark Report
 
 Date: 2026-05-19
 
@@ -29,7 +29,7 @@ The run used the local bundled CLI from the diagnostics branch, with
 hooks were not loaded for this benchmark.
 
 Important caveat: these absolute RSS numbers are lower than the previous
-PATH-resolved `qwen` runs because this run used `node dist/cli.js` from the
+PATH-resolved `hopcode` runs because this run used `node dist/cli.js` from the
 local branch plus a stripped temporary config. Treat this report as an internal
 diagnostics distribution run, not a direct replacement for the earlier installed
 CLI RSS comparison.
@@ -43,9 +43,9 @@ or the normal user config.
 
 | CLI                 | Config mode     | Total tokens | Tree RSS peak | Root RSS peak | Process count peak | Runtime diagnostics |
 | ------------------- | --------------- | -----------: | ------------: | ------------: | -----------------: | ------------------- |
-| PATH `qwen`         | stripped config |       33,965 |     542.4 MiB |     249.9 MiB |                  3 | no                  |
+| PATH `hopcode`         | stripped config |       33,965 |     542.4 MiB |     249.9 MiB |                  3 | no                  |
 | local `dist/cli.js` | stripped config |       47,281 |     455.2 MiB |     214.2 MiB |                  4 | yes                 |
-| PATH `qwen`         | normal config   |       97,615 |   1,099.9 MiB |     250.1 MiB |                  6 | no                  |
+| PATH `hopcode`         | normal config   |       97,615 |   1,099.9 MiB |     250.1 MiB |                  6 | no                  |
 | local `dist/cli.js` | normal config   |       97,954 |   1,105.4 MiB |     212.7 MiB |                  8 | yes                 |
 
 This check changes the attribution: the earlier 1 GiB user-visible peak is
@@ -93,8 +93,8 @@ process-tree RSS comes from normal config and configured child processes.
 
 | CLI                 | Mode     | Wall | Turns | Tool uses | Tree RSS peak | Root RSS peak | Process count peak |
 | ------------------- | -------- | ---: | ----: | --------: | ------------: | ------------: | -----------------: |
-| PATH `qwen`         | normal   | 5.5s |     1 |         0 |   1,021.3 MiB |     251.5 MiB |                  5 |
-| PATH `qwen`         | `--bare` | 2.4s |     1 |         0 |     525.7 MiB |     246.4 MiB |                  2 |
+| PATH `hopcode`         | normal   | 5.5s |     1 |         0 |   1,021.3 MiB |     251.5 MiB |                  5 |
+| PATH `hopcode`         | `--bare` | 2.4s |     1 |         0 |     525.7 MiB |     246.4 MiB |                  2 |
 | local `dist/cli.js` | normal   | 4.9s |     1 |         0 |   1,046.2 MiB |     213.3 MiB |                  5 |
 | local `dist/cli.js` | `--bare` | 2.3s |     1 |         0 |     454.3 MiB |     216.5 MiB |                  3 |
 
@@ -122,10 +122,10 @@ reasoning quality.
 
 | CLI                 | Temporary config     | MCP servers | Tools | Tree RSS peak | Root RSS peak | Process count peak |
 | ------------------- | -------------------- | ----------: | ----: | ------------: | ------------: | -----------------: |
-| PATH `qwen`         | full                 |           4 |    46 |   1,017.4 MiB |     249.8 MiB |                  5 |
-| PATH `qwen`         | MCP disabled         |           0 |    17 |     548.7 MiB |     252.4 MiB |                  2 |
-| PATH `qwen`         | hooks disabled       |           4 |    46 |   1,003.8 MiB |     246.4 MiB |                  5 |
-| PATH `qwen`         | MCP + hooks disabled |           0 |    17 |     542.5 MiB |     248.0 MiB |                  2 |
+| PATH `hopcode`         | full                 |           4 |    46 |   1,017.4 MiB |     249.8 MiB |                  5 |
+| PATH `hopcode`         | MCP disabled         |           0 |    17 |     548.7 MiB |     252.4 MiB |                  2 |
+| PATH `hopcode`         | hooks disabled       |           4 |    46 |   1,003.8 MiB |     246.4 MiB |                  5 |
+| PATH `hopcode`         | MCP + hooks disabled |           0 |    17 |     542.5 MiB |     248.0 MiB |                  2 |
 | local `dist/cli.js` | full                 |           4 |    48 |     865.9 MiB |     220.4 MiB |                  6 |
 | local `dist/cli.js` | MCP disabled         |           0 |    19 |     442.9 MiB |     209.6 MiB |                  2 |
 | local `dist/cli.js` | hooks disabled       |           4 |    48 |     848.3 MiB |     212.6 MiB |                  5 |
@@ -259,7 +259,7 @@ Overlapping small PR `#4268` model snapshot:
 2. The local bundle run peaks around 0.36-0.41 GiB, not the earlier
    0.83-1.04 GiB, because the matrix used a stripped temporary config. A
    follow-up normal-config sanity check reproduced about 1.1 GiB tree RSS on
-   both PATH `qwen` and local `dist/cli.js`, with the extra memory coming from
+   both PATH `hopcode` and local `dist/cli.js`, with the extra memory coming from
    child MCP/Node processes in the process tree.
 3. V8 heap is much smaller than RSS. End heap is about 99-143 MiB while end RSS
    is about 216-411 MiB. The remaining footprint is likely loaded modules,

@@ -5,6 +5,9 @@
  */
 
 import type {
+  StartImmediateSubagentActionReturn,
+} from './commands/types.js';
+import type {
   CompactionThresholds,
   CompressionStatus,
   MCPServerConfig,
@@ -14,7 +17,7 @@ import type {
   ToolResultDisplay,
   AgentStatus,
   ArenaDiffSummary,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { PartListUnion } from '@google/genai';
 import { type ReactNode } from 'react';
 
@@ -759,7 +762,8 @@ export type SlashCommandProcessorResult =
   | {
       type: 'handled'; // Indicates the command was processed and no further action is needed.
     }
-  | SubmitPromptResult;
+  | SubmitPromptResult
+  | StartImmediateSubagentActionReturn;
 
 export interface ShellConfirmationRequest {
   commands: string[];

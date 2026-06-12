@@ -195,7 +195,7 @@ describe('settings-migration', () => {
 
       // Expected output based on stable test output
       expect(migratedSettings['$version']).toBe(4);
-      expect(migratedSettings['model']).toEqual({ name: 'qwen-plus' });
+      expect(migratedSettings['model']).toEqual({ name: 'hopcode-plus' });
       expect(migratedSettings['ui']).toEqual({
         hideWindowTitle: true,
         theme: 'light',

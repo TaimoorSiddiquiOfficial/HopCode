@@ -5,7 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import { Storage } from '@hoptrendy/hopcode-core';
+import { Storage } from '@hopcode/hopcode-core';
 
 export function getLocalResourceRoots(
   extensionUri: vscode.Uri,

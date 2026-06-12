@@ -4,4 +4,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type { CompletionItem, CompletionItemType } from '@hoptrendy/webui';
+export type { CompletionItem, CompletionItemType } from '@hopcode/webui';

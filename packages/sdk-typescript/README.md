@@ -1,4 +1,4 @@
-﻿# @hoptrendy/sdk
+# @hopcode/sdk
 
 A minimum experimental TypeScript SDK for programmatic access to HopCode.
 
@@ -7,7 +7,7 @@ Feel free to submit a feature request/issue/PR.
 ## Installation
 
 ```bash
-npm install @hoptrendy/sdk
+npm install @hopcode/sdk
 ```
 
 ## Requirements
@@ -19,7 +19,7 @@ npm install @hoptrendy/sdk
 ## Quick Start
 
 ```typescript
-import { query } from '@hoptrendy/sdk';
+import { query } from '@hopcode/sdk';
 
 // Single-turn query
 const result = query({
@@ -43,7 +43,7 @@ for await (const message of result) {
 
 ### `query(config)`
 
-Creates a new query session with HopCode.
+Creates a new query session with the HopCode.
 
 #### Parameters
 
@@ -52,27 +52,27 @@ Creates a new query session with HopCode.
 
 #### QueryOptions
 
-| Option                    | Type                                          | Default          | Description                                                                                                                                                                                                                                                                                                                                      |
-| ------------------------- | --------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `cwd`                     | `string`                                      | `process.cwd()`  | The working directory for the query session. Determines the context in which file operations and commands are executed.                                                                                                                                                                                                                          |
-| `model`                   | `string`                                      | -                | The AI model to use (e.g., `'qwen-max'`, `'qwen-plus'`, `'qwen-turbo'`). Takes precedence over `OPENAI_MODEL` and `HOPCODE_MODEL` environment variables.                                                                                                                                                                                         |
-| `pathToHopCodeExecutable` | `string`                                      | Auto-detected    | Path to the HopCode executable. Supports multiple formats: `'hopcode'` (native binary from PATH), `'/path/to/hopcode'` (explicit path), `'/path/to/cli.js'` (Node.js bundle), `'node:/path/to/cli.js'` (force Node.js runtime), `'bun:/path/to/cli.js'` (force Bun runtime). If not provided, auto-detects the bundled CLI from the SDK package. |
-| `permissionMode`          | `'default' \| 'plan' \| 'auto-edit' \| 'izn'` | `'default'`      | Permission mode controlling tool execution approval. See [Permission Modes](#permission-modes) for details.                                                                                                                                                                                                                                      |
-| `canUseTool`              | `CanUseTool`                                  | -                | Custom permission handler for tool execution approval. Invoked when a tool requires confirmation. Must respond within 60 seconds or the request will be auto-denied. See [Custom Permission Handler](#custom-permission-handler).                                                                                                                |
-| `env`                     | `Record<string, string>`                      | -                | Environment variables to pass to the HopCode process. Merged with the current process environment.                                                                                                                                                                                                                                               |
-| `systemPrompt`            | `string \| QuerySystemPromptPreset`           | -                | System prompt configuration for the main session. Use a string to fully override the built-in HopCode system prompt, or a preset object to keep the built-in prompt and append extra instructions.                                                                                                                                               |
-| `mcpServers`              | `Record<string, McpServerConfig>`             | -                | MCP (Model Context Protocol) servers to connect. Supports external servers (stdio/SSE/HTTP) and SDK-embedded servers. External servers are configured with transport options like `command`, `args`, `url`, `httpUrl`, etc. SDK servers use `{ type: 'sdk', name: string, instance: Server }`.                                                   |
-| `abortController`         | `AbortController`                             | -                | Controller to cancel the query session. Call `abortController.abort()` to terminate the session and cleanup resources.                                                                                                                                                                                                                           |
-| `debug`                   | `boolean`                                     | `false`          | Enable debug mode for verbose logging from the CLI process.                                                                                                                                                                                                                                                                                      |
-| `maxSessionTurns`         | `number`                                      | `-1` (unlimited) | Maximum number of conversation turns before the session automatically terminates. A turn consists of a user message and an assistant response.                                                                                                                                                                                                   |
-| `coreTools`               | `string[]`                                    | -                | Equivalent to `permissions.allow` in settings.json as an allowlist. If specified, only these tools will be available to the AI (all other tools are disabled at registry level). Supports tool name aliases and pattern matching. Example: `['Read', 'Edit', 'Bash(git *)']`.                                                                    |
-| `excludeTools`            | `string[]`                                    | -                | Equivalent to `permissions.deny` in settings.json. Excluded tools return a permission error immediately. Takes highest priority over all other permission settings. Supports tool name aliases and pattern matching: tool name (`'write_file'`), shell command prefix (`'Bash(rm *)'`), or path patterns (`'Read(.env)'`, `'Edit(/src/**)'`).    |
-| `allowedTools`            | `string[]`                                    | -                | Equivalent to `permissions.allow` in settings.json. Matching tools bypass `canUseTool` callback and execute automatically. Only applies when tool requires confirmation. Supports same pattern matching as `excludeTools`. Example: `['ShellTool(git status)', 'ShellTool(npm test)']`.                                                          |
-| `authType`                | `'openai' \| 'hopcode-oauth'`                 | `'openai'`       | Authentication type for the AI service. Using `'hopcode-oauth'` in SDK is not recommended as credentials are stored in `~/.hopcode` and may need periodic refresh.                                                                                                                                                                               |
-| `agents`                  | `SubagentConfig[]`                            | -                | Configuration for subagents that can be invoked during the session. Subagents are specialized AI agents for specific tasks or domains.                                                                                                                                                                                                           |
-| `includePartialMessages`  | `boolean`                                     | `false`          | When `true`, the SDK emits incomplete messages as they are being generated, allowing real-time streaming of the AI's response.                                                                                                                                                                                                                   |
-| `resume`                  | `string`                                      | -                | Resume a previous session by providing its session ID. Equivalent to CLI's `--resume` flag.                                                                                                                                                                                                                                                      |
-| `sessionId`               | `string`                                      | -                | Specify a session ID for the new session. Ensures SDK and CLI use the same ID without resuming history. Equivalent to CLI's `--session-id` flag.                                                                                                                                                                                                 |
+| Option                   | Type                                           | Default          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------ | ---------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cwd`                    | `string`                                       | `process.cwd()`  | The working directory for the query session. Determines the context in which file operations and commands are executed.                                                                                                                                                                                                                                                                                                                                                               |
+| `model`                  | `string`                                       | -                | The AI model to use (e.g., `'qwen-max'`, `'qwen-plus'`, `'qwen-turbo'`). Takes precedence over `OPENAI_MODEL` and `HOPCODE_MODEL` environment variables.                                                                                                                                                                                                                                                                                                                                 |
+| `pathToQwenExecutable`   | `string`                                       | Auto-detected    | Path to the HopCode executable. Supports multiple formats: `'hopcode'` (native binary from PATH), `'/path/to/qwen'` (explicit path), `'/path/to/cli.js'` (Node.js bundle), `'node:/path/to/cli.js'` (force Node.js runtime), `'bun:/path/to/cli.js'` (force Bun runtime). If not provided, auto-detects from: `HOPCODE_CODE_CLI_PATH` env var, `~/.volta/bin/hopcode`, `~/.npm-global/bin/hopcode`, `/usr/local/bin/hopcode`, `~/.local/bin/hopcode`, `~/node_modules/.bin/hopcode`, `~/.yarn/bin/hopcode`. |
+| `permissionMode`         | `'default' \| 'plan' \| 'auto-edit' \| 'yolo'` | `'default'`      | Permission mode controlling tool execution approval. See [Permission Modes](#permission-modes) for details.                                                                                                                                                                                                                                                                                                                                                                           |
+| `canUseTool`             | `CanUseTool`                                   | -                | Custom permission handler for tool execution approval. Invoked when a tool requires confirmation. Must respond within 60 seconds or the request will be auto-denied. See [Custom Permission Handler](#custom-permission-handler).                                                                                                                                                                                                                                                     |
+| `env`                    | `Record<string, string>`                       | -                | Environment variables to pass to the HopCode process. Merged with the current process environment.                                                                                                                                                                                                                                                                                                                                                                                  |
+| `systemPrompt`           | `string \| QuerySystemPromptPreset`            | -                | System prompt configuration for the main session. Use a string to fully override the built-in HopCode system prompt, or a preset object to keep the built-in prompt and append extra instructions.                                                                                                                                                                                                                                                                                  |
+| `mcpServers`             | `Record<string, McpServerConfig>`              | -                | MCP (Model Context Protocol) servers to connect. Supports external servers (stdio/SSE/HTTP) and SDK-embedded servers. External servers are configured with transport options like `command`, `args`, `url`, `httpUrl`, etc. SDK servers use `{ type: 'sdk', name: string, instance: Server }`.                                                                                                                                                                                        |
+| `abortController`        | `AbortController`                              | -                | Controller to cancel the query session. Call `abortController.abort()` to terminate the session and cleanup resources.                                                                                                                                                                                                                                                                                                                                                                |
+| `debug`                  | `boolean`                                      | `false`          | Enable debug mode for verbose logging from the CLI process.                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `maxSessionTurns`        | `number`                                       | `-1` (unlimited) | Maximum number of conversation turns before the session automatically terminates. A turn consists of a user message and an assistant response.                                                                                                                                                                                                                                                                                                                                        |
+| `coreTools`              | `string[]`                                     | -                | Equivalent to `permissions.allow` in settings.json as an allowlist. If specified, only these tools will be available to the AI (all other tools are disabled at registry level). Supports tool name aliases and pattern matching. Example: `['Read', 'Edit', 'Bash(git *)']`.                                                                                                                                                                                                         |
+| `excludeTools`           | `string[]`                                     | -                | Equivalent to `permissions.deny` in settings.json. Excluded tools return a permission error immediately. Takes highest priority over all other permission settings. Supports tool name aliases and pattern matching: tool name (`'write_file'`), shell command prefix (`'Bash(rm *)'`), or path patterns (`'Read(.env)'`, `'Edit(/src/**)'`).                                                                                                                                         |
+| `allowedTools`           | `string[]`                                     | -                | Equivalent to `permissions.allow` in settings.json. Matching tools bypass `canUseTool` callback and execute automatically. Only applies when tool requires confirmation. Supports same pattern matching as `excludeTools`. Example: `['ShellTool(git status)', 'ShellTool(npm test)']`.                                                                                                                                                                                               |
+| `authType`               | `'openai' \| 'hopcode-oauth'`                     | `'openai'`       | Authentication type for the AI service. Using `'hopcode-oauth'` in SDK is not recommended as credentials are stored in `~/.hopcode` and may need periodic refresh.                                                                                                                                                                                                                                                                                                                          |
+| `agents`                 | `SubagentConfig[]`                             | -                | Configuration for subagents that can be invoked during the session. Subagents are specialized AI agents for specific tasks or domains.                                                                                                                                                                                                                                                                                                                                                |
+| `includePartialMessages` | `boolean`                                      | `false`          | When `true`, the SDK emits incomplete messages as they are being generated, allowing real-time streaming of the AI's response.                                                                                                                                                                                                                                                                                                                                                        |
+| `resume`                 | `string`                                       | -                | Resume a previous session by providing its session ID. Equivalent to CLI's `--resume` flag.                                                                                                                                                                                                                                                                                                                                                                                           |
+| `sessionId`              | `string`                                       | -                | Specify a session ID for the new session. Ensures SDK and CLI use the same ID without resuming history. Equivalent to CLI's `--session-id` flag.                                                                                                                                                                                                                                                                                                                                      |
 
 > [!tip]
 > If you need to configure `coreTools`, `excludeTools`, or `allowedTools`, it is **strongly recommended** to read the [permissions configuration documentation](../docs/users/configuration/settings.md#permissions) first, especially the **Tool name aliases** and **Rule syntax examples** sections, to understand the available aliases and pattern matching syntax (e.g., `Bash(git *)`, `Read(.env)`, `Edit(/src/**)`).
@@ -109,7 +109,7 @@ channel, IDE, or web backend adapters do not need to pass `sessionId` into every
 call.
 
 ```typescript
-import { DaemonClient, DaemonSessionClient } from '@hoptrendy/sdk';
+import { DaemonClient, DaemonSessionClient } from '@hopcode/sdk';
 
 const daemon = new DaemonClient({
   baseUrl: 'http://127.0.0.1:4170',
@@ -160,7 +160,7 @@ import {
   asKnownDaemonEvent,
   createDaemonSessionViewState,
   reduceDaemonSessionEvent,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 
 let view = createDaemonSessionViewState();
 for await (const event of session.events()) {
@@ -184,7 +184,7 @@ import {
   isSDKSystemMessage,
   isSDKResultMessage,
   isSDKPartialAssistantMessage,
-} from '@hoptrendy/sdk';
+} from '@hopcode/sdk';
 
 for await (const message of result) {
   if (isSDKAssistantMessage(message)) {
@@ -212,7 +212,7 @@ const closed = q.isClosed();
 await q.interrupt();
 
 // Change permission mode mid-session
-await q.setPermissionMode('izn');
+await q.setPermissionMode('yolo');
 
 // Change model mid-session
 await q.setModel('qwen-max');
@@ -228,7 +228,7 @@ The SDK supports different permission modes for controlling tool execution:
 - **`default`**: Write tools are denied unless approved via `canUseTool` callback or in `allowedTools`. Read-only tools execute without confirmation.
 - **`plan`**: Blocks all write tools, instructing AI to present a plan first.
 - **`auto-edit`**: Auto-approve edit tools (`edit`, `write_file`, `notebook_edit`) while other tools require confirmation.
-- **`izn`**: All tools execute automatically without confirmation.
+- **`yolo`**: All tools execute automatically without confirmation.
 
 ### Permission Priority Chain
 
@@ -239,7 +239,7 @@ The first matching rule wins.
 1. `excludeTools` / `permissions.deny` - Blocks tools completely (returns permission error)
 2. `permissions.ask` - Always requires user confirmation
 3. `permissionMode: 'plan'` - Blocks all non-read-only tools
-4. `permissionMode: 'izn'` - Auto-approves all tools
+4. `permissionMode: 'yolo'` - Auto-approves all tools
 5. `allowedTools` / `permissions.allow` - Auto-approves matching tools
 6. `canUseTool` callback - Custom approval logic (if provided, not called for allowed tools)
 7. Default behavior - Auto-deny in SDK mode (write tools require explicit approval)
@@ -249,7 +249,7 @@ The first matching rule wins.
 ### Multi-turn Conversation
 
 ```typescript
-import { query, type SDKUserMessage } from '@hoptrendy/sdk';
+import { query, type SDKUserMessage } from '@hopcode/sdk';
 
 async function* generateMessages(): AsyncIterable<SDKUserMessage> {
   yield {
@@ -283,7 +283,7 @@ for await (const message of result) {
 ### Custom Permission Handler
 
 ```typescript
-import { query, type CanUseTool } from '@hoptrendy/sdk';
+import { query, type CanUseTool } from '@hopcode/sdk';
 
 const canUseTool: CanUseTool = async (toolName, input, { signal }) => {
   // Allow all read operations
@@ -312,7 +312,7 @@ const result = query({
 ### With External MCP Servers
 
 ```typescript
-import { query } from '@hoptrendy/sdk';
+import { query } from '@hopcode/sdk';
 
 const result = query({
   prompt: 'Use the custom tool from my MCP server',
@@ -331,7 +331,7 @@ const result = query({
 ### Override the System Prompt
 
 ```typescript
-import { query } from '@hoptrendy/sdk';
+import { query } from '@hopcode/sdk';
 
 const result = query({
   prompt: 'Say hello in one sentence.',
@@ -344,14 +344,14 @@ const result = query({
 ### Append to the Built-in System Prompt
 
 ```typescript
-import { query } from '@hoptrendy/sdk';
+import { query } from '@hopcode/sdk';
 
 const result = query({
   prompt: 'Review the current directory.',
   options: {
     systemPrompt: {
       type: 'preset',
-      preset: 'hopcode',
+      preset: 'HOPCODE_code',
       append: 'Be terse and focus on concrete findings.',
     },
   },
@@ -402,7 +402,7 @@ Returns a `McpSdkServerConfigWithInstance` object that can be passed directly to
 
 ```typescript
 import { z } from 'zod';
-import { query, tool, createSdkMcpServer } from '@hoptrendy/sdk';
+import { query, tool, createSdkMcpServer } from '@hopcode/sdk';
 
 // Define a tool with Zod schema
 const calculatorTool = tool(
@@ -424,7 +424,7 @@ const server = createSdkMcpServer({
 const result = query({
   prompt: 'What is 42 + 17?',
   options: {
-    permissionMode: 'izn',
+    permissionMode: 'yolo',
     mcpServers: {
       calculator: server,
     },
@@ -439,7 +439,7 @@ for await (const message of result) {
 ### Abort a Query
 
 ```typescript
-import { query, isAbortError } from '@hoptrendy/sdk';
+import { query, isAbortError } from '@hopcode/sdk';
 
 const abortController = new AbortController();
 
@@ -471,7 +471,7 @@ try {
 The SDK provides an `AbortError` class for handling aborted queries:
 
 ```typescript
-import { AbortError, isAbortError } from '@hoptrendy/sdk';
+import { AbortError, isAbortError } from '@hopcode/sdk';
 
 try {
   // ... query operations
@@ -492,11 +492,11 @@ If you're using SDK version **0.1.0**, please note the following requirements:
 
 #### HopCode Installation Required
 
-Version 0.1.0 requires [HopCode](https://github.com/TaimoorSiddiquiOfficial/HopCode) **>= 0.4.0** to be installed separately and accessible in your PATH.
+Version 0.1.0 requires [HopCode](https://github.com/QwenLM/hopcode) **>= 0.4.0** to be installed separately and accessible in your PATH.
 
 ```bash
 # Install HopCode globally
-npm install -g hopcode@^0.4.0
+npm install -g @hopcode/hopcode@latest
 ```
 
 **Note**: From version **0.1.1** onwards, the CLI is bundled with the SDK, so no separate HopCode installation is needed.

@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
+import { ToolConfirmationOutcome } from '@hopcode/hopcode-core';
 import { toPermissionOptions } from './permissionUtils.js';
 
 describe('permissionUtils', () => {

@@ -8,7 +8,7 @@ import { createServer, type Server } from 'node:http';
 import { createHash, randomBytes } from 'node:crypto';
 import open from 'open';
 
-import { type ProviderModelConfig as ModelConfig } from '@hoptrendy/hopcode-core';
+import { type ProviderModelConfig as ModelConfig } from '@hopcode/hopcode-core';
 
 export const OPENROUTER_ENV_KEY = 'OPENROUTER_API_KEY';
 export const OPENROUTER_DEFAULT_MODEL = 'z-ai/glm-4.5-air:free';

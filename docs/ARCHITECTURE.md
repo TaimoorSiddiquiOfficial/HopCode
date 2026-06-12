@@ -11,11 +11,11 @@
 | ---------------- | --------------------------------- |
 | **Product name** | HopCode                           |
 | **Binary**       | `hopcode`                         |
-| **NPM scope**    | `@hoptrendy`                      |
-| **Root package** | `@hoptrendy/hopcode`              |
-| **Core package** | `@hoptrendy/hopcode-core`         |
-| **CLI package**  | `@hoptrendy/hopcode-cli`          |
-| **SDK package**  | `@hoptrendy/sdk`                  |
+| **NPM scope**    | `@hopcode`                      |
+| **Root package** | `@hopcode/hopcode`              |
+| **Core package** | `@hopcode/hopcode-core`         |
+| **CLI package**  | `@hopcode/hopcode`          |
+| **SDK package**  | `@hopcode/sdk`                  |
 | **Version**      | see `package.json` (root)         |
 | **GitHub**       | `TaimoorSiddiquiOfficial/HopCode` |
 
@@ -50,7 +50,7 @@ packages/cli
 packages/core
     └── depends on AI SDK packages (@ai-sdk/*, ai)
 integration-tests
-    └── depends on @hoptrendy/hopcode-core (via packages/core)
+    └── depends on @hopcode/hopcode-core (via packages/core)
 ```
 
 ---
@@ -251,7 +251,7 @@ node packages/cli/dist/hopcode.js
 - Bump `version` in `package.json` for any meaningful feature/fix
 - All sub-packages should bump in sync
 - Use semantic versioning: `MAJOR.MINOR.PATCH`
-- Current scope: `@hoptrendy` (NPM org)
+- Current scope: `@hopcode` (NPM org)
 
 ---
 

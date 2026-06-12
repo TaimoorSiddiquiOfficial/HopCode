@@ -22,7 +22,7 @@ import {
 import { getRenderableGradientColors } from '../utils/gradientUtils.js';
 import { computeSessionStats } from '../utils/computeStats.js';
 import { t } from '../../i18n/index.js';
-import { formatCostUsd } from '@hoptrendy/hopcode-core';
+import { formatCostUsd } from '@hopcode/hopcode-core';
 
 // A more flexible and powerful StatRow component
 interface StatRowProps {

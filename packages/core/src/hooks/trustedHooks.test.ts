@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -57,7 +57,7 @@ describe('TrustedHooksManager', () => {
     });
   });
 
-  it('trustHooks writes the configPath under the global hopcode dir', () => {
+  it('trustHooks writes the configPath under the global qwen dir', () => {
     const manager = new TrustedHooksManager();
     manager.trustHooks('/project/a', {
       PreToolUse: [

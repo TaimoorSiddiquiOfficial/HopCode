@@ -7,11 +7,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { StreamingState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import {
   fireNotificationHook,
   NotificationType,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { TerminalNotification } from './useTerminalNotification.js';
 import type { TrackedToolCall } from './useReactToolScheduler.js';
 import { sendNotification } from '../../services/notificationService.js';
@@ -118,9 +118,15 @@ export const useAttentionNotifications = ({
             'HopCode is waiting for your input',
             NotificationType.IdlePrompt,
             'Waiting for input',
-          ).catch(() => {
-            // Silently ignore errors - fireNotificationHook has internal error handling
-          });
+          )
+            .then((hookResult) => {
+              if (hookResult.terminalSequence) {
+                terminal.writeTerminalSequence(hookResult.terminalSequence);
+              }
+            })
+            .catch(() => {
+              // Silently ignore errors - fireNotificationHook has internal error handling
+            });
         }
         idleNotificationSentRef.current = true;
       }

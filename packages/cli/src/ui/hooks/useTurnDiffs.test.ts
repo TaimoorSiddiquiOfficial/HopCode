@@ -6,14 +6,14 @@
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import type { FileHistoryService, TurnDiff } from '@hoptrendy/hopcode-core';
+import type { FileHistoryService, TurnDiff } from '@hopcode/hopcode-core';
 import { useTurnDiffs } from './useTurnDiffs.js';
 import type { HistoryItem } from '../types.js';
 
 // The shared debug logger pulls in the full core module graph during test
 // startup, which is overkill for a focused renderHook spec. Stub it so the
 // hook can call `createDebugLogger(...)` without instantiating Storage etc.
-vi.mock('@hoptrendy/hopcode-core', () => ({
+vi.mock('@hopcode/hopcode-core', () => ({
   createDebugLogger: () => ({
     debug: vi.fn(),
     warn: vi.fn(),

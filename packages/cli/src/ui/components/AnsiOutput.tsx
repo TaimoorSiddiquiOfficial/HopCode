@@ -6,7 +6,7 @@
 
 import type React from 'react';
 import { Box, Text } from 'ink';
-import type { AnsiLine, AnsiOutput, AnsiToken } from '@hoptrendy/hopcode-core';
+import type { AnsiLine, AnsiOutput, AnsiToken } from '@hopcode/hopcode-core';
 import { formatMemoryUsage } from '../utils/formatters.js';
 import { theme } from '../semantic-colors.js';
 import { MaxSizedBox } from './shared/MaxSizedBox.js';

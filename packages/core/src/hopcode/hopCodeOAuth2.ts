@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,6 +14,7 @@ import type { Config } from '../config/config.js';
 import { randomUUID } from 'node:crypto';
 import { formatFetchErrorForUser } from '../utils/fetch.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
+import { combineAbortSignals } from '../utils/abortController.js';
 import {
   SharedTokenManager,
   TokenManagerError,
@@ -34,6 +35,7 @@ const HOPCODE_OAUTH_CLIENT_ID = 'f0304373b74a44d2b584a3fb70ca9e56';
 
 const HOPCODE_OAUTH_SCOPE = 'openid profile email model.completion';
 const HOPCODE_OAUTH_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';
+const HOPCODE_OAUTH_REFRESH_TIMEOUT_MS = 30_000;
 
 // File System Configuration
 const HOPCODE_CREDENTIAL_FILENAME = 'oauth_creds.json';
@@ -84,6 +86,19 @@ function objectToUrlEncoded(data: Record<string, string>): string {
   return Object.keys(data)
     .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
     .join('&');
+}
+
+function createTokenRefreshNetworkError(
+  error: unknown,
+  timedOut: boolean,
+): Error {
+  const prefix = timedOut ? 'Token refresh timeout' : 'Token refresh failed';
+  return new Error(
+    `${prefix}: ${formatFetchErrorForUser(error, {
+      url: HOPCODE_OAUTH_TOKEN_ENDPOINT,
+    })}`,
+    { cause: error },
+  );
 }
 
 /**
@@ -354,7 +369,7 @@ export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
         'x-request-id': randomUUID(),
       },
       body: objectToUrlEncoded(bodyData),
-      // PR #4255 â€” daemon device-flow registry passes its
+      // PR #4255 — daemon device-flow registry passes its
       // `cancelController.signal` so dispose / cancel during a slow
       // device-authorization request actually aborts the in-flight
       // socket immediately. Pre-existing CLI callers omit it; the
@@ -372,7 +387,7 @@ export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
     const result = (await response.json()) as DeviceAuthorizationResponse;
     // PR #4255 fold-in 9 review thread #12: do NOT log the full
     // result. `device_code` is an RFC 8628 bearer-equivalent
-    // credential â€” anyone holding it within the grant's lifetime
+    // credential — anyone holding it within the grant's lifetime
     // can complete the token exchange. The daemon device-flow
     // registry's `BrandedSecret` keeps `device_code` out of HTTP
     // bodies / events / logs, but a debug-mode `console.log(result)`
@@ -425,7 +440,7 @@ export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
         Accept: 'application/json',
       },
       body: objectToUrlEncoded(bodyData),
-      // PR #4255 â€” daemon device-flow registry passes its per-entry
+      // PR #4255 — daemon device-flow registry passes its per-entry
       // `cancelController.signal` so cancel() / dispose() during a
       // slow IdP response actually aborts the in-flight socket
       // instead of waiting for the upstream timeout.
@@ -494,71 +509,92 @@ export class HopCodeOAuth2Client implements IHopCodeOAuth2Client {
       client_id: HOPCODE_OAUTH_CLIENT_ID,
     };
 
-    const response = await fetch(HOPCODE_OAUTH_TOKEN_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
-      },
-      body: objectToUrlEncoded(bodyData),
+    const { signal, cleanup } = combineAbortSignals([], {
+      timeoutMs: HOPCODE_OAUTH_REFRESH_TIMEOUT_MS,
     });
+    debugLogger.debug('Refreshing access token...');
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      // Handle 400/401 errors which indicate refresh token expiry or invalidity
-      if (response.status === 400 || response.status === 401) {
-        await clearHopCodeCredentials();
-        throw new CredentialsClearRequiredError(
-          "Refresh token expired or invalid. Please use '/auth' to re-authenticate.",
-          { status: response.status, response: errorData },
+    try {
+      let response: Response;
+      try {
+        response = await fetch(HOPCODE_OAUTH_TOKEN_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+          },
+          body: objectToUrlEncoded(bodyData),
+          signal,
+        });
+      } catch (error) {
+        throw createTokenRefreshNetworkError(error, signal.aborted);
+      }
+
+      if (!response.ok) {
+        let errorData: string;
+        try {
+          errorData = await response.text();
+        } catch (error) {
+          throw createTokenRefreshNetworkError(error, signal.aborted);
+        }
+        // Handle 400/401 errors which indicate refresh token expiry or invalidity
+        if (response.status === 400 || response.status === 401) {
+          await clearHopCodeCredentials();
+          throw new CredentialsClearRequiredError(
+            "Refresh token expired or invalid. Please use '/auth' to re-authenticate.",
+            { status: response.status, response: errorData },
+          );
+        }
+        throw new Error(
+          `Token refresh failed: ${response.status} ${response.statusText}. Response: ${errorData}`,
         );
       }
-      throw new Error(
-        `Token refresh failed: ${response.status} ${response.statusText}. Response: ${errorData}`,
-      );
+
+      let responseText: string;
+      try {
+        responseText = await response.text();
+      } catch (error) {
+        throw createTokenRefreshNetworkError(error, signal.aborted);
+      }
+
+      let responseData: TokenRefreshResponse;
+      try {
+        responseData = JSON.parse(responseText) as TokenRefreshResponse;
+      } catch {
+        throw new Error(
+          `HopCode OAuth refresh returned invalid JSON: ${responseText || '(empty response body)'}`,
+        );
+      }
+
+      // Check if the response indicates success
+      if (isErrorResponse(responseData)) {
+        const errorData = responseData as ErrorData;
+        throw new Error(
+          `Token refresh failed: ${errorData?.error || 'Unknown error'} - ${errorData?.error_description || 'No details provided'}`,
+        );
+      }
+
+      // Handle successful response
+      const tokenData = responseData as TokenRefreshData;
+      const tokens: HopCodeCredentials = {
+        access_token: tokenData.access_token,
+        token_type: tokenData.token_type,
+        // Use new refresh token if provided, otherwise preserve existing one
+        refresh_token:
+          tokenData.refresh_token || this.credentials.refresh_token,
+        resource_url: tokenData.resource_url, // Include resource_url if provided
+        expiry_date: Date.now() + tokenData.expires_in * 1000,
+      };
+
+      this.setCredentials(tokens);
+
+      // Note: File caching is now handled by SharedTokenManager
+      // to prevent cross-session token invalidation issues
+
+      return responseData;
+    } finally {
+      cleanup();
     }
-
-    let responseText: string;
-    try {
-      responseText = await response.text();
-    } catch {
-      responseText = '';
-    }
-
-    let responseData: TokenRefreshResponse;
-    try {
-      responseData = JSON.parse(responseText) as TokenRefreshResponse;
-    } catch {
-      throw new Error(
-        `HopCode OAuth refresh returned invalid JSON: ${responseText || '(empty response body)'}`,
-      );
-    }
-
-    // Check if the response indicates success
-    if (isErrorResponse(responseData)) {
-      const errorData = responseData as ErrorData;
-      throw new Error(
-        `Token refresh failed: ${errorData?.error || 'Unknown error'} - ${errorData?.error_description || 'No details provided'}`,
-      );
-    }
-
-    // Handle successful response
-    const tokenData = responseData as TokenRefreshData;
-    const tokens: HopCodeCredentials = {
-      access_token: tokenData.access_token,
-      token_type: tokenData.token_type,
-      // Use new refresh token if provided, otherwise preserve existing one
-      refresh_token: tokenData.refresh_token || this.credentials.refresh_token,
-      resource_url: tokenData.resource_url, // Include resource_url if provided
-      expiry_date: Date.now() + tokenData.expires_in * 1000,
-    };
-
-    this.setCredentials(tokens);
-
-    // Note: File caching is now handled by SharedTokenManager
-    // to prevent cross-session token invalidation issues
-
-    return responseData;
   }
 }
 
@@ -580,7 +616,7 @@ export type AuthResult =
     };
 
 /**
- * Global event emitter instance for HopCodeOAuth2 authentication events
+ * Global event emitter instance for hopcodeOAuth2 authentication events
  */
 export const HopCodeOAuth2Events = new EventEmitter();
 
@@ -904,7 +940,7 @@ async function authWithHopCodeDeviceFlow(
 
           // Cache the new tokens. `cacheHopCodeCredentials` itself folds
           // in `SharedTokenManager.clearCache()` (PR #4255 review D1) so
-          // we no longer need a paired call here â€” the previous explicit
+          // we no longer need a paired call here — the previous explicit
           // post-cache clear was a duplicate that fired clearCache twice
           // on the success path.
           await cacheHopCodeCredentials(credentials);
@@ -1069,9 +1105,9 @@ export async function cacheHopCodeCredentials(
     // PR #4255 round-11 #2 (gpt-5.5 review): atomic write with
     // permission hardening BEFORE the secret payload becomes
     // accessible at the canonical filename. The earlier shape was
-    //   1. fs.writeFile(filePath, creds, {mode: 0o600})  â† creates
+    //   1. fs.writeFile(filePath, creds, {mode: 0o600})  ← creates
     //      with 0o600 OR retains existing broader perms
-    //   2. fs.chmod(filePath, 0o600)                     â† post-hoc
+    //   2. fs.chmod(filePath, 0o600)                     ← post-hoc
     //      tightening
     // which left a window where, if `oauth_creds.json` already
     // existed with broader perms (operator pre-creation, prior
@@ -1081,13 +1117,13 @@ export async function cacheHopCodeCredentials(
     // to a warning while the broadly-readable tokens stayed.
     //
     // New shape: write to a temp file (created with 0o600 atomically
-    // via the `mode` flag â€” which DOES apply on creation since the
+    // via the `mode` flag — which DOES apply on creation since the
     // path didn't exist), verify perms, then `rename` over the
     // canonical filename. `fs.rename` is atomic on POSIX (within a
     // filesystem) and on Windows. The canonical filename never
     // contains the new tokens until they're already at 0o600.
     //
-    // PR #4255 fold-in 3 (#10): `signal` threading is preserved â€”
+    // PR #4255 fold-in 3 (#10): `signal` threading is preserved —
     // both `writeFile` AND the temp-file path honor the registry's
     // persist-timeout + cancelController.
     const tempPath = `${filePath}.tmp.${process.pid}.${randomUUID()}`;
@@ -1098,7 +1134,7 @@ export async function cacheHopCodeCredentials(
       });
       // Defensive: if the platform ignored `mode` on creation
       // (some Windows FSes), explicit chmod tightens the temp BEFORE
-      // it's renamed into place. Failure here is a HARD ERROR â€” we
+      // it's renamed into place. Failure here is a HARD ERROR — we
       // refuse to publish broadly-readable tokens to the canonical
       // path. A non-cooperative FS that can't tighten a 0o600 file
       // shouldn't be serving credentials anyway.
@@ -1107,7 +1143,7 @@ export async function cacheHopCodeCredentials(
       } catch (chmodErr) {
         if (process.platform !== 'win32') {
           throw new Error(
-            `cacheHopCodeCredentials: refusing to publish credentials â€” chmod 0o${HOPCODE_CREDENTIAL_FILE_MODE.toString(8)} on temp file failed: ${
+            `cacheHopCodeCredentials: refusing to publish credentials — chmod 0o${HOPCODE_CREDENTIAL_FILE_MODE.toString(8)} on temp file failed: ${
               chmodErr instanceof Error ? chmodErr.message : String(chmodErr)
             }`,
           );
@@ -1127,7 +1163,7 @@ export async function cacheHopCodeCredentials(
       // the new creds, never a partial mix.
       await fs.rename(tempPath, filePath);
     } catch (writeErr) {
-      // Best-effort cleanup of the temp file â€” if rename succeeded
+      // Best-effort cleanup of the temp file — if rename succeeded
       // there's nothing to clean (path no longer points anywhere);
       // if it failed there's a leftover .tmp.<pid>.<uuid> file we
       // shouldn't leave on disk. Swallow ENOENT (already-renamed)
@@ -1156,7 +1192,7 @@ export async function cacheHopCodeCredentials(
       // (worst case: device auth re-prompts), but the silent swallow
       // it used to be made the symptom invisible. Warn so logs show
       // it. Unit tests stubbing `SharedTokenManager.getInstance()`
-      // with a minimal shape will also flow through here â€” acceptable
+      // with a minimal shape will also flow through here — acceptable
       // noise for the production-visibility win.
       debugLogger.warn(
         `cacheHopCodeCredentials: SharedTokenManager.clearCache failed; in-process callers may serve stale credentials until the next mtime poll: ${
@@ -1186,14 +1222,14 @@ export async function cacheHopCodeCredentials(
 }
 
 /**
- * Clear cached HopCode credentials from disk
+ * Clear cached Qwen credentials from disk
  * This is useful when credentials have expired or need to be reset
  */
 export async function clearHopCodeCredentials(): Promise<void> {
   try {
     const filePath = getHopCodeCachedCredentialPath();
     await fs.unlink(filePath);
-    debugLogger.debug('Cached HopCode credentials cleared successfully.');
+    debugLogger.debug('Cached Qwen credentials cleared successfully.');
   } catch (error: unknown) {
     // If file doesn't exist or can't be deleted, we consider it cleared
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
@@ -1202,7 +1238,7 @@ export async function clearHopCodeCredentials(): Promise<void> {
     }
     // Log other errors but don't throw - clearing credentials should be non-critical
     debugLogger.warn(
-      'Warning: Failed to clear cached HopCode credentials:',
+      'Warning: Failed to clear cached Qwen credentials:',
       error,
     );
   } finally {
@@ -1221,5 +1257,3 @@ function getHopCodeCachedCredentialPath(): string {
 }
 
 export const clearCachedCredentialFile = clearHopCodeCredentials;
-export const hopCodeOAuth2Events = HopCodeOAuth2Events;
-export const clearHopcodeCredentials = clearHopCodeCredentials;

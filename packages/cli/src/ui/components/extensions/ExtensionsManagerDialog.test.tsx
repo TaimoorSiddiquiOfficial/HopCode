@@ -10,7 +10,7 @@ import { ExtensionsManagerDialog } from './ExtensionsManagerDialog.js';
 import { UIStateContext } from '../../contexts/UIStateContext.js';
 import { KeypressProvider } from '../../contexts/KeypressContext.js';
 import type { UIState } from '../../contexts/UIStateContext.js';
-import type { Config, Extension } from '@hoptrendy/hopcode-core';
+import type { Config, Extension } from '@hopcode/hopcode-core';
 import { ExtensionUpdateState } from '../../state/extensions.js';
 
 const createMockExtension = (

@@ -18,7 +18,7 @@ import {
   FileDiscoveryService,
   FileSearchFactory,
   type FileSearch,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { getErrorMessage } from '../../utils/errorMessage.js';
 
 /**

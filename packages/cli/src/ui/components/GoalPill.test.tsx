@@ -10,7 +10,7 @@ import {
   registerGoalHook,
   unregisterGoalHook,
   type Config,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { GoalPill } from './GoalPill.js';
 

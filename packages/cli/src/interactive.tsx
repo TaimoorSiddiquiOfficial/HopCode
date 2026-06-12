@@ -14,7 +14,7 @@ import {
   Storage,
   type Config,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { render } from 'ink';
 import dns from 'node:dns';
 import os from 'node:os';

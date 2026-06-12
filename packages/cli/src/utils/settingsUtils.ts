@@ -300,7 +300,7 @@ const SETTINGS_DIALOG_ORDER: readonly string[] = [
 
   // File Filtering
   'context.fileFiltering.respectGitIgnore',
-  'context.fileFiltering.respectHopCodeIgnore',
+  'context.fileFiltering.respectHopcodeIgnore',
 
   // System Settings - rarely changed
   'general.disableAutoUpdate',

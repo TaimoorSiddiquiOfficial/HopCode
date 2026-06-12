@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -9,7 +9,7 @@ import {
   type Config,
   type AvailableModel as CoreAvailableModel,
   HOPCODE_OAUTH_MODELS,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { t } from '../../i18n/index.js';
 
 export type AvailableModel = {

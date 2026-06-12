@@ -6,7 +6,7 @@
 
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SessionListItem } from '@hoptrendy/hopcode-core';
+import type { SessionListItem } from '@hopcode/hopcode-core';
 import type { Key, KeypressHandler } from '../contexts/KeypressContext.js';
 import { useKeypress } from './useKeypress.js';
 import { useSessionPicker } from './useSessionPicker.js';

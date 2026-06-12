@@ -12,15 +12,15 @@
  *   VP4: second Session.prompt() does NOT inject the notice again.
  *   VP4b: no notice set — first prompt is sent without any worktree reminder.
  *
- * This file does NOT mock @hoptrendy/hopcode-core at the module level so
+ * This file does NOT mock @hopcode/hopcode-core at the module level so
  * the real Session class and its dependencies resolve correctly.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Session } from './Session.js';
-import type { Config, GeminiChat } from '@hoptrendy/hopcode-core';
-import { ApprovalMode, AuthType, Storage } from '@hoptrendy/hopcode-core';
-import * as core from '@hoptrendy/hopcode-core';
+import type { Config, GeminiChat } from '@hopcode/hopcode-core';
+import { ApprovalMode, AuthType, Storage } from '@hopcode/hopcode-core';
+import * as core from '@hopcode/hopcode-core';
 import type {
   AgentSideConnection,
   PromptRequest,
@@ -116,12 +116,7 @@ describe('Session.pendingWorktreeNotice', () => {
       }),
       getToolRegistry: vi.fn().mockReturnValue({
         getTool: vi.fn(),
-        // Called on every prompt() via #buildInitialSystemReminders
         ensureTool: vi.fn().mockResolvedValue(true),
-      }),
-      // Called on every prompt() to check subagent system reminders
-      getSubagentManager: vi.fn().mockReturnValue({
-        listSubagents: vi.fn().mockResolvedValue([]),
       }),
       getFileService: vi.fn().mockReturnValue({
         shouldGitIgnoreFile: vi.fn().mockReturnValue(false),
@@ -140,6 +135,17 @@ describe('Session.pendingWorktreeNotice', () => {
       // Added on main after the test was written; Session.prompt's stop-hook
       // loop reads this so the mock has to provide it.
       getStopHookBlockingCap: vi.fn().mockReturnValue(0),
+      // Session constructor registers background-notification callbacks on
+      // these registries; provide no-op stubs so construction succeeds.
+      getBackgroundTaskRegistry: vi.fn().mockReturnValue({
+        setNotificationCallback: vi.fn(),
+      }),
+      getMonitorRegistry: vi.fn().mockReturnValue({
+        setNotificationCallback: vi.fn(),
+      }),
+      getBackgroundShellRegistry: vi.fn().mockReturnValue({
+        setNotificationCallback: vi.fn(),
+      }),
     } as unknown as Config;
 
     mockClient = {

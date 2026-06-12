@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -58,7 +58,6 @@ export enum AuthType {
   USE_GEMINI = 'gemini',
   USE_VERTEX_AI = 'vertex-ai',
   USE_ANTHROPIC = 'anthropic',
-  HOPCODE_OAUTH_DEPRECATED = 'hopcode_oauth',
 }
 
 /**
@@ -126,14 +125,15 @@ export type ContentGeneratorConfig = {
   // Supported input modalities. Unsupported media types are replaced with text
   // placeholders. Leave undefined to use automatic detection from model name.
   modalities?: InputModalities;
-  // When true, media parts in MCP tool responses are split into a follow-up
-  // `role: "user"` message instead of being embedded inside the `role: "tool"`
-  // message. The OpenAI Chat Completions spec only permits string / text-part
-  // content on tool messages; strict OpenAI-compatible servers (notably
-  // LM Studio) reject anything else with HTTP 400 "Invalid 'messages' in
-  // payload". Enable this for any provider that strictly validates tool
-  // message content. Default: false (preserves prior behavior for permissive
-  // providers). See TaimoorSiddiquiOfficial/HopCode#3616.
+  // When true, media parts in tool responses (including the built-in read_file
+  // and MCP tools) are split into a follow-up `role: "user"` message instead of
+  // being embedded inside the `role: "tool"` message. The OpenAI Chat
+  // Completions spec only permits string / text-part content on tool messages;
+  // strict OpenAI-compatible servers (e.g. doubao / new-api / LM Studio) drop or
+  // reject anything else (HTTP 400 "Invalid 'messages' in payload"), so an image
+  // read via read_file never reaches the model. Default: true (spec-compliant
+  // and safe for permissive providers); set false to restore the legacy
+  // embed-in-tool-message behavior. See QwenLM/hopcode#4876, #3616.
   splitToolMedia?: boolean;
 };
 
@@ -311,6 +311,24 @@ export function createContentGeneratorConfig(
   ).config;
 }
 
+function getModuleNotFoundError(
+  error: unknown,
+): NodeJS.ErrnoException | undefined {
+  let current = error;
+
+  while (current instanceof Error) {
+    if (
+      'code' in current &&
+      (current as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND'
+    ) {
+      return current as NodeJS.ErrnoException;
+    }
+    current = current.cause;
+  }
+
+  return undefined;
+}
+
 export async function createContentGenerator(
   generatorConfig: ContentGeneratorConfig,
   config: Config,
@@ -328,51 +346,64 @@ export async function createContentGenerator(
 
   let baseGenerator: ContentGenerator;
 
-  if (authType === AuthType.USE_OPENAI) {
-    const { createOpenAIContentGenerator } = await import(
-      './openaiContentGenerator/index.js'
-    );
-    baseGenerator = createOpenAIContentGenerator(generatorConfig, config);
-  } else if (authType === AuthType.HOPCODE_OAUTH) {
-    const { getHopCodeOAuthClient } = await import(
-      '../hopcode/hopCodeOAuth2.js'
-    );
-    const { HopCodeContentGenerator } = await import(
-      '../hopcode/hopCodeContentGenerator.js'
-    );
+  try {
+    if (authType === AuthType.USE_OPENAI) {
+      const { createOpenAIContentGenerator } = await import(
+        './openaiContentGenerator/index.js'
+      );
+      baseGenerator = createOpenAIContentGenerator(generatorConfig, config);
+    } else if (authType === AuthType.HOPCODE_OAUTH) {
+      const { getHopCodeOAuthClient: getHopCodeOAuthClient } = await import(
+        '../hopcode/hopCodeOAuth2.js'
+      );
+      const { HopCodeContentGenerator } = await import(
+        '../hopcode/hopCodeContentGenerator.js'
+      );
 
-    try {
-      const hopcodeClient = await getHopCodeOAuthClient(
-        config,
-        isInitialAuth ? { requireCachedCredentials: true } : undefined,
+      try {
+        const hopcodeClient = await getHopCodeOAuthClient(
+          config,
+          isInitialAuth ? { requireCachedCredentials: true } : undefined,
+        );
+        baseGenerator = new HopCodeContentGenerator(
+          hopcodeClient,
+          generatorConfig,
+          config,
+        );
+      } catch (error) {
+        if (getModuleNotFoundError(error)) {
+          throw error;
+        }
+        throw new Error(error instanceof Error ? error.message : String(error));
+      }
+    } else if (authType === AuthType.USE_ANTHROPIC) {
+      const { createAnthropicContentGenerator } = await import(
+        './anthropicContentGenerator/index.js'
       );
-      baseGenerator = new HopCodeContentGenerator(
-        hopcodeClient,
-        generatorConfig,
-        config,
+      baseGenerator = createAnthropicContentGenerator(generatorConfig, config);
+    } else if (
+      authType === AuthType.USE_GEMINI ||
+      authType === AuthType.USE_VERTEX_AI
+    ) {
+      const { createGeminiContentGenerator } = await import(
+        './geminiContentGenerator/index.js'
       );
-    } catch (error) {
+      baseGenerator = createGeminiContentGenerator(generatorConfig, config);
+    } else {
       throw new Error(
-        `${error instanceof Error ? error.message : String(error)}`,
+        `Error creating contentGenerator: Unsupported authType: ${authType}`,
       );
     }
-  } else if (authType === AuthType.USE_ANTHROPIC) {
-    const { createAnthropicContentGenerator } = await import(
-      './anthropicContentGenerator/index.js'
-    );
-    baseGenerator = createAnthropicContentGenerator(generatorConfig, config);
-  } else if (
-    authType === AuthType.USE_GEMINI ||
-    authType === AuthType.USE_VERTEX_AI
-  ) {
-    const { createGeminiContentGenerator } = await import(
-      './geminiContentGenerator/index.js'
-    );
-    baseGenerator = createGeminiContentGenerator(generatorConfig, config);
-  } else {
-    throw new Error(
-      `Error creating contentGenerator: Unsupported authType: ${authType}`,
-    );
+  } catch (error) {
+    const moduleNotFoundError = getModuleNotFoundError(error);
+    if (moduleNotFoundError) {
+      throw new Error(
+        `HopCode was updated in the background and needs to be restarted.\n` +
+          `Please exit and restart HopCode to use the '${authType}' provider.`,
+        { cause: moduleNotFoundError },
+      );
+    }
+    throw error;
   }
 
   return new LoggingContentGenerator(baseGenerator, config, generatorConfig);

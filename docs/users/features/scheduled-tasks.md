@@ -1,4 +1,4 @@
-﻿# Run Prompts on a Schedule
+# Run Prompts on a Schedule
 
 > Use `/loop` and the cron scheduling tools to run prompts repeatedly, poll for status, or set one-time reminders within a HopCode session.
 
@@ -6,7 +6,7 @@ Scheduled tasks let HopCode re-run a prompt automatically on an interval. Use th
 
 Tasks are session-scoped: they live in the current HopCode process and are gone when you exit. Nothing is written to disk.
 
-> **Note:** Scheduled tasks are an experimental feature. Enable them with `experimental.cron: true` in your [settings](../configuration/settings.md), or set `HOPCODE_ENABLE_CRON=1` in your environment.
+> **Tip:** Scheduled tasks are enabled by default. To disable them, set `experimental.cron: false` in your [settings](../configuration/settings.md), or set `HOPCODE_CODE_DISABLE_CRON=1` in your environment.
 
 ## Schedule a recurring prompt with /loop
 

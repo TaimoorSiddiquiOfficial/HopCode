@@ -20,11 +20,11 @@
  * triaging it here breaks CI loudly instead of degrading silently.
  *
  * Lives in its own file so it can `import` the real `AuthType` enum without
- * fighting the heavy `vi.mock('@hoptrendy/hopcode-core', ...)` block in
+ * fighting the heavy `vi.mock('@hopcode/hopcode-core', ...)` block in
  * `acpAgent.test.ts`.
  */
 import { describe, expect, it } from 'vitest';
-import { AuthType } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@hopcode/hopcode-core';
 import {
   AUTH_PREFLIGHT_ENV_KEYS,
   AUTH_PREFLIGHT_WAIVED_AUTH_TYPES,

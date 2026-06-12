@@ -14,7 +14,7 @@ import { ApprovalMode } from '../../../types/acpTypes.js';
 import type { CompletionItem } from '../../../types/completionItemTypes.js';
 import { InputForm } from './InputForm.js';
 
-vi.mock('@hoptrendy/webui', async () => {
+vi.mock('@hopcode/webui', async () => {
   const actual = await vi.importActual(
     '../../../../../webui/src/components/layout/InputForm.tsx',
   );

@@ -1,4 +1,4 @@
-﻿# Virtual viewport for long conversations on ink 7
+# Virtual viewport for long conversations on ink 7
 
 Status: **implemented**, PR #4146 ships:
 core viewport, ASCII scrollbar with auto-hide animation, SGR mouse-wheel, `ui.useTerminalBuffer` gate, keyboard scroll keys.

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,13 +10,10 @@
 
 // Core configuration
 export * from './config/config.js';
-export { Storage, HOPCODE_DIR } from './config/storage.js';
+export { Storage } from './config/storage.js';
 
 // Permission system
 export * from './permissions/index.js';
-
-// Security features
-export * from './security/powershell-security.js';
 
 // Model configuration
 export {
@@ -64,6 +61,7 @@ export * from './core/permissionFlow.js';
 export * from './core/permission-helpers.js';
 export * from './core/geminiChat.js';
 export * from './core/geminiRequest.js';
+export * from './core/inlineMediaLimit.js';
 export * from './core/insightProtocol.js';
 export * from './core/logger.js';
 export * from './core/nonInteractiveToolExecutor.js';
@@ -84,22 +82,40 @@ export * from './tools/tools.js';
 // Individual tools — MCP/SDK infrastructure only (tool classes are lazy-loaded)
 export * from './tools/mcp-client.js';
 export * from './tools/mcp-client-manager.js';
+// pool primitives consumed by acpAgent (daemon
+// pool construction) and downstream daemon status routes.
+export {
+  McpTransportPool,
+  type DrainResult,
+  type McpPoolSnapshot,
+  type McpTransportPoolOptions,
+} from './tools/mcp-transport-pool.js';
+export {
+  POOLED_TRANSPORTS_DEFAULT,
+  connectionIdOf,
+  mcpTransportOf,
+  parseConnectionId,
+  type McpTransportKind,
+  type PoolKey,
+} from './tools/mcp-pool-key.js';
+export type { ConnectionId, PoolEvent } from './tools/mcp-pool-events.js';
+export { WorkspaceMcpBudget } from './tools/mcp-workspace-budget.js';
 export * from './tools/mcp-tool.js';
 export * from './tools/read-file.js';
 export * from './tools/ripGrep.js';
 export * from './tools/sdk-control-client-transport.js';
 export * from './tools/modifiable-tool.js';
 
-// Web search types
-export type { WebSearchProviderConfig } from './tools/web-search/types.js';
-
 // Selective re-exports of types/utilities from tool files (avoids loading full tool modules)
-export { buildSkillLlmContent } from './tools/skill-utils.js';
+export {
+  buildSkillLlmContent,
+  applySkillAllowedTools,
+} from './tools/skill-utils.js';
 
 // Backward-compatible type re-exports for tool classes removed from eager loading.
 // These preserve TypeScript type compatibility for downstream consumers.
 // Note: runtime value imports (e.g. `new EditTool(...)`) must use the direct
-// module path (e.g. `@hoptrendy/hopcode-core/dist/tools/edit.js`) as these
+// module path (e.g. `@hopcode/hopcode-core/dist/tools/edit.js`) as these
 // classes are now lazy-loaded and are not exported as values from the package root.
 export type { EditTool, EditToolParams } from './tools/edit.js';
 export type {
@@ -122,6 +138,10 @@ export type {
 export type { SkillTool, SkillParams } from './tools/skill.js';
 export type { AgentTool, AgentParams } from './tools/agent/agent.js';
 export type {
+  WorkflowTool,
+  WorkflowParams,
+} from './tools/workflow/workflow.js';
+export type {
   TodoWriteTool,
   TodoItem,
   TodoWriteParams,
@@ -132,6 +152,7 @@ export type { CronCreateTool, CronCreateParams } from './tools/cron-create.js';
 export type { CronListTool, CronListParams } from './tools/cron-list.js';
 export type { CronDeleteTool, CronDeleteParams } from './tools/cron-delete.js';
 export type { ToolSearchTool, ToolSearchParams } from './tools/tool-search.js';
+export type { WebSearchProviderConfig } from './tools/web-search/types.js';
 
 // ============================================================================
 // Providers
@@ -154,11 +175,11 @@ export * from './services/fileHistoryService.js';
 export * from './services/fileReadCache.js';
 export * from './services/fileSystemService.js';
 export { decodeBufferWithEncodingInfo } from './utils/fileUtils.js';
-export * from './services/gitService.js';
 export * from './services/gitWorktreeService.js';
 export * from './services/sessionRecap.js';
 export * from './services/sessionService.js';
 export * from './services/sessionTitle.js';
+export * from './services/sleepInhibitor.js';
 export * from './services/worktreeSessionService.js';
 export {
   stripTerminalControlSequences,
@@ -170,7 +191,7 @@ export * from './services/shellExecutionService.js';
 export * from './services/monitorRegistry.js';
 export * from './services/backgroundShellRegistry.js';
 export * from './services/toolUseSummary.js';
-export * from './services/repoMapService.js';
+export * from './services/usageHistoryService.js';
 export * from './utils/bareMode.js';
 
 // ============================================================================
@@ -184,13 +205,11 @@ export * from './memory/manager.js';
 
 // Foundational utilities (paths, storage scaffold, type definitions, constants)
 // that are legitimately needed by UI code (MemoryDialog, commands, etc.)
-import './util/zod-meta.js';
-import './util/bun-shim.js';
 export * from './memory/types.js';
 export * from './memory/paths.js';
 export * from './memory/store.js';
 export * from './memory/const.js';
-// Issue #4175 PR 16: write helper for hierarchical context files,
+// Issue : write helper for hierarchical context files,
 // re-exported so the `hopcode serve` daemon can mutate workspace memory
 // via `POST /workspace/memory` without depending on internal paths.
 export * from './memory/writeContextFile.js';
@@ -238,32 +257,6 @@ export type {
   OAuthDisplayPayload,
 } from './mcp/oauth-provider.js';
 export { MCPOAuthTokenStorage } from './mcp/oauth-token-storage.js';
-export {
-  GitHubAppAuth,
-  loadGitHubAppConfigFromEnv,
-  createGitHubAppAuth,
-} from './auth/github-app-auth.js';
-export type {
-  GitHubAppConfig,
-  GitHubInstallationToken,
-} from './auth/github-app-auth.js';
-export type {
-  DeviceFlowResponse,
-  DeviceFlowTokenResponse,
-} from './auth/github-device-flow-auth.js';
-export {
-  GitHubDeviceFlowAuth,
-  createGitHubDeviceFlowAuth,
-  DeviceFlowPendingError,
-  DeviceFlowSlowDownError,
-  DeviceFlowExpiredError,
-  DeviceFlowAccessDeniedError,
-} from './auth/github-device-flow-auth.js';
-export { GitHubSubagentRegistry } from './agents/github-agents.js';
-export {
-  GitHubMCPClient,
-  createGitHubMCPClient,
-} from './mcp/github-mcp-client.js';
 export { KeychainTokenStorage } from './mcp/token-storage/keychain-token-storage.js';
 export type {
   OAuthCredentials,
@@ -274,6 +267,14 @@ export type {
   OAuthAuthorizationServerMetadata,
   OAuthProtectedResourceMetadata,
 } from './mcp/oauth-utils.js';
+
+export {
+  GitHubDeviceFlowAuth,
+} from './auth/github-device-flow-auth.js';
+export type {
+  DeviceFlowResponse,
+  DeviceFlowTokenResponse,
+} from './auth/github-device-flow-auth.js';
 
 // ============================================================================
 // Telemetry
@@ -303,7 +304,6 @@ export {
   PromptSuggestionEvent,
   SpeculationEvent,
 } from './telemetry/types.js';
-export { formatCostUsd, estimateModelCost } from './telemetry/modelPricing.js';
 
 // ============================================================================
 // Extensions, Skills, Subagents & Agents
@@ -382,6 +382,7 @@ export {
 } from './utils/runtimeFetchOptions.js';
 export * from './utils/runtimeStatus.js';
 export * from './utils/schemaValidator.js';
+export * from './utils/sessionIdContext.js';
 export * from './utils/shell-utils.js';
 export * from './utils/subagentGenerator.js';
 export * from './utils/symlink.js';
@@ -393,6 +394,7 @@ export * from './utils/toml-to-markdown-converter.js';
 export * from './utils/tool-utils.js';
 export * from './utils/workspaceContext.js';
 export * from './utils/yaml-parser.js';
+export * from './utils/btwUtils.js';
 export * from './utils/forkedAgent.js';
 export * from './utils/sideQuery.js';
 
@@ -428,6 +430,7 @@ export * from './hooks/types.js';
 export {
   HookSystem,
   HookRegistry,
+  createInstructionsLoadedCallback,
   hookEventSupportsMatcher,
 } from './hooks/index.js';
 export type { HookRegistryEntry, SessionHookEntry } from './hooks/index.js';

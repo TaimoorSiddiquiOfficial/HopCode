@@ -1,5 +1,5 @@
-import type { ChannelConfig } from '@hoptrendy/channel-base';
-import { resolvePath } from '@hoptrendy/channel-base';
+import type { ChannelConfig } from '@hopcode/channel-base';
+import { resolvePath } from '@hopcode/channel-base';
 import * as path from 'node:path';
 import { getPlugin, supportedTypes } from './channel-registry.js';
 

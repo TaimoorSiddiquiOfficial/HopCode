@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { AsyncFzf } from 'fzf';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 import type { Suggestion } from '../components/SuggestionsDisplay.js';
 import {
   CommandKind,
@@ -309,6 +309,7 @@ function toCommandSuggestion(
     matchedAlias,
     supportedModes: command.supportedModes,
     modelInvocable: command.modelInvocable,
+    submitOnAccept: command.submitOnAccept,
   };
 }
 

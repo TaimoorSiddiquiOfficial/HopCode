@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import {
   startBackgroundHousekeeping,
@@ -56,7 +56,7 @@ describe('_needsCatchUpForTesting', () => {
   let markerPath: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
     markerPath = path.join(tempDir, '.marker');
   });
 
@@ -86,7 +86,7 @@ describe('_runHousekeepingForTesting', () => {
   let fileHistoryRoot: string;
 
   beforeEach(() => {
-    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
     fileHistoryRoot = path.join(hopcodeHome, FILE_HISTORY_DIR);
     vi.stubEnv('HOPCODE_HOME', hopcodeHome);
   });
@@ -170,7 +170,7 @@ describe('_runPassForTesting (timer-chain defense)', () => {
   let hopcodeHome: string;
 
   beforeEach(() => {
-    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
     vi.stubEnv('HOPCODE_HOME', hopcodeHome);
     resetInteraction();
   });
@@ -223,7 +223,7 @@ describe('startBackgroundHousekeeping', () => {
   let hopcodeHome: string;
 
   beforeEach(() => {
-    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-scheduler-test-'));
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-scheduler-test-'));
     vi.stubEnv('HOPCODE_HOME', hopcodeHome);
     _resetForTesting();
     resetInteraction();

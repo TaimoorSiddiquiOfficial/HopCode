@@ -8,7 +8,7 @@ import { render } from 'ink-testing-library';
 import { describe, it, expect, vi } from 'vitest';
 import { ExtensionListStep } from './ExtensionListStep.js';
 import { KeypressProvider } from '../../../contexts/KeypressContext.js';
-import type { Extension } from '@hoptrendy/hopcode-core';
+import type { Extension } from '@hopcode/hopcode-core';
 import { ExtensionUpdateState } from '../../../state/extensions.js';
 
 const createMockExtension = (

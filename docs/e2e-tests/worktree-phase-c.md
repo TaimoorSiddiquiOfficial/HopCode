@@ -20,7 +20,7 @@ Phase C delivers:
 ## Binaries
 
 - **Local build**: `node /Users/mochi/code/hopcode/.claude/worktrees/romantic-burnell-b6e48c/dist/cli.js`
-- **Baseline (for pre-impl comparison if needed)**: globally installed `qwen`
+- **Baseline (for pre-impl comparison if needed)**: globally installed `hopcode`
 
 ## Test environment template
 
@@ -184,7 +184,7 @@ INIT_OUT=$(node $QWEN "use enter_worktree with name='c1-test' to create a worktr
 SESSION=$(echo "$INIT_OUT" | jq -r '.[] | select(.type=="system") | .session_id' | head -1)
 
 # Resume the session and ask "what's my context?"
-RESUMED=$(node $QWEN --resume "$SESSION" "say SIDECAR-CONFIRM" \
+RESUMED=$(node $hopcode --resume "$SESSION" "say SIDECAR-CONFIRM" \
   --approval-mode izn --output-format json 2>/dev/null)
 
 # Look for the injected INFO message text in the conversation
@@ -208,7 +208,7 @@ rm -rf "$TEST_DIR/.hopcode/worktrees/c2-test"
 test -f "$SIDECAR" || { echo "SKIP: sidecar was already gone"; exit 0; }
 
 # Resume — should clean up the stale sidecar
-node $QWEN --resume "$SESSION" "hello" --approval-mode izn --output-format json 2>/dev/null > /dev/null
+node $hopcode --resume "$SESSION" "hello" --approval-mode izn --output-format json 2>/dev/null > /dev/null
 test ! -f "$SIDECAR" && echo "PASS: stale sidecar cleaned" || echo "FAIL: stale sidecar still present"
 ```
 
@@ -224,7 +224,7 @@ test ! -f "$SIDECAR" && echo "PASS: stale sidecar cleaned" || echo "FAIL: stale 
 
 ```bash
 tmux new-session -d -s wt-d1 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 tmux send-keys -t wt-d1 "use enter_worktree with name='d1-test'"
@@ -251,7 +251,7 @@ tmux kill-session -t wt-d1
 
 ```bash
 tmux new-session -d -s wt-d2 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 tmux send-keys -t wt-d2 "use enter_worktree with name='d2-test'"
@@ -288,7 +288,7 @@ tmux kill-session -t wt-d2
 
 ```bash
 tmux new-session -d -s wt-e1 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 tmux send-keys -t wt-e1 "use enter_worktree with name='e1-test'"
@@ -323,7 +323,7 @@ tmux kill-session -t wt-e1
 
 ```bash
 tmux new-session -d -s wt-e2 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 tmux send-keys -t wt-e2 "use enter_worktree with name='e2-test'"
@@ -358,7 +358,7 @@ tmux kill-session -t wt-e2
 
 ```bash
 tmux new-session -d -s wt-e3 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 tmux send-keys -t wt-e3 "use enter_worktree with name='e3-test'"
@@ -397,7 +397,7 @@ tmux kill-session -t wt-e3
 
 ```bash
 tmux new-session -d -s wt-e4 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 tmux send-keys -t wt-e4 "use enter_worktree with name='e4-test'"
@@ -433,7 +433,7 @@ tmux kill-session -t wt-e4 2>/dev/null || true
 
 ```bash
 tmux new-session -d -s wt-e5 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 tmux send-keys -t wt-e5 "use enter_worktree with name='e5-test'"
@@ -478,7 +478,7 @@ tmux kill-session -t wt-e5 2>/dev/null || true
 
 ```bash
 tmux new-session -d -s wt-f1 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 3
 
 # Step 1: enter worktree
@@ -541,7 +541,7 @@ cat > "$SETTINGS_FILE" <<EOF
 EOF
 
 tmux new-session -d -s wt-f2 -x 200 -y 50 \
-  "cd $TEST_DIR && node $QWEN --approval-mode izn"
+  "cd $TEST_DIR && node $hopcode --approval-mode izn"
 sleep 5  # statusline needs an extra tick
 
 tmux send-keys -t wt-f2 "use enter_worktree with name='f2-test'"

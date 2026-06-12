@@ -8,7 +8,7 @@
  * Contextual tip registry — defines tips, their conditions, and display rules.
  */
 
-import { type CompactionThresholds } from '@hoptrendy/hopcode-core';
+import { type CompactionThresholds } from '@hopcode/hopcode-core';
 
 export type TipTrigger = 'startup' | 'post-response';
 

@@ -15,12 +15,12 @@ import type {
   Config,
   GeminiClient,
   ShellExecutionResult,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   createDebugLogger,
   isBinary,
   ShellExecutionService,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { type PartListUnion } from '@google/genai';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { SHELL_COMMAND_NAME } from '../constants.js';

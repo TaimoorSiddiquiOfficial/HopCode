@@ -1,4 +1,4 @@
-﻿# Observability with OpenTelemetry
+# Observability with OpenTelemetry
 
 Learn how to enable and setup OpenTelemetry for HopCode.
 
@@ -58,7 +58,7 @@ These settings can be overridden by environment variables or CLI flags.
 | -------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ----------------------- |
 | `enabled`                        | `HOPCODE_TELEMETRY_ENABLED`                           | `--telemetry` / `--no-telemetry`                         | Enable or disable telemetry                                                                                                          | `true`/`false`    | `false`                 |
 | `target`                         | `HOPCODE_TELEMETRY_TARGET`                            | `--telemetry-target <local\|gcp>` _(deprecated)_         | Informational destination label; does not control exporter routing — set `otlpEndpoint` or `outfile` to configure where data is sent | `"gcp"`/`"local"` | `"local"`               |
-| `otlpEndpoint`                   | `QWEN_TELEMETRY_OTLP_ENDPOINT`                        | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                                                                                              | URL string        | `http://localhost:4317` |
+| `otlpEndpoint`                   | `HOPCODE_TELEMETRY_OTLP_ENDPOINT`                        | `--telemetry-otlp-endpoint <URL>`                        | OTLP collector endpoint                                                                                                              | URL string        | `http://localhost:4317` |
 | `otlpProtocol`                   | `HOPCODE_TELEMETRY_OTLP_PROTOCOL`                     | `--telemetry-otlp-protocol <grpc\|http>`                 | OTLP transport protocol                                                                                                              | `"grpc"`/`"http"` | `"grpc"`                |
 | `otlpTracesEndpoint`             | `HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT`              | -                                                        | Per-signal endpoint override for traces (HTTP only)                                                                                  | URL string        | -                       |
 | `otlpLogsEndpoint`               | `HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT`                | -                                                        | Per-signal endpoint override for logs (HTTP only)                                                                                    | URL string        | -                       |
@@ -347,7 +347,7 @@ Verify both flags when wiring an ARMS+DashScope correlation setup:
 
 ### Other outbound correlation headers
 
-`X-Qwen-Code-Session-Id` and `X-Qwen-Code-Request-Id` are **not part of
+`X-hopcode-Session-Id` and `X-hopcode-Request-Id` are **not part of
 this PR**. They will be designed and proposed in their own follow-up
 PR(s) under the same `outboundCorrelation.*` namespace, each with its
 own threat model and operator-consent flow. PR #4390 review (LaZzyMan)

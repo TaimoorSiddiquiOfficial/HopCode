@@ -20,7 +20,7 @@ import {
   isTerminalStatus,
   type AgentInteractive,
   type AgentEventEmitter,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { StreamingState } from '../types.js';
 import { useTimer } from './useTimer.js';
 

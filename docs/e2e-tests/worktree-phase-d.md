@@ -82,7 +82,7 @@ the test target — PR `#4174` (Phase C) is a guaranteed-present reference.
 ### A1: bare `--worktree` (auto-slug)
 
 ```bash
-$QWEN --worktree "say hello and stop" \
+$hopcode --worktree "say hello and stop" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/a1.out
 
 # A `worktree_started` system event is emitted at startup. The `notice`
@@ -110,7 +110,7 @@ ls -d "$TEST_DIR/.hopcode/worktrees/"*
 ### A2: `--worktree my-feature` (explicit slug)
 
 ```bash
-$QWEN --worktree my-feature "say hello and stop" \
+$hopcode --worktree my-feature "say hello and stop" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/a2.out
 
 ls -d "$TEST_DIR/.hopcode/worktrees/my-feature"
@@ -126,7 +126,7 @@ Identical to A2 with `=` form. Cleanup between A2 and A3 required (different
 TEST_DIR).
 
 ```bash
-$QWEN --worktree=my-feature "say hi" \
+$hopcode --worktree=my-feature "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/a3.out
 ```
 
@@ -135,7 +135,7 @@ $QWEN --worktree=my-feature "say hi" \
 ### A4: invalid slug rejected before any git operation
 
 ```bash
-$QWEN --worktree "../escape" "say hi" \
+$hopcode --worktree "../escape" "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/a4.out
 echo "exit=$?"
 
@@ -153,7 +153,7 @@ ls "$TEST_DIR/.hopcode/worktrees/" 2>/dev/null
 ```bash
 NON_GIT=$(mktemp -d)
 cd "$NON_GIT"
-$QWEN --worktree "say hi" \
+$hopcode --worktree "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/a5.out
 echo "exit=$?"
 ```
@@ -169,7 +169,7 @@ or "git init".
 
 ```bash
 SESSION_ID=$(uuidgen)
-$QWEN --worktree b1-test --session-id "$SESSION_ID" "say hi" \
+$hopcode --worktree b1-test --session-id "$SESSION_ID" "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/b1.out
 
 SIDECAR=~/.hopcode/projects/$PROJECT_ID/chats/$SESSION_ID.worktree.json
@@ -189,7 +189,7 @@ jq '.slug, .worktreePath, .worktreeBranch, .originalCwd, .originalBranch, .origi
 ### B2: `process.cwd()` switched at startup
 
 ```bash
-$QWEN --worktree b2-test "run the shell tool with command 'pwd', then stop" \
+$hopcode --worktree b2-test "run the shell tool with command 'pwd', then stop" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/b2.out
 
 # Extract the shell tool's stdout from the user-message tool_result
@@ -202,7 +202,7 @@ jq -r '.[] | select(.type=="user") | .message.content[] | select(.tool_use_id !=
 ### B3: `Config.targetDir` switched (Footer / status payload)
 
 ```bash
-$QWEN --worktree b3-test "run the shell tool with command 'pwd && git rev-parse --abbrev-ref HEAD', then stop" \
+$hopcode --worktree b3-test "run the shell tool with command 'pwd && git rev-parse --abbrev-ref HEAD', then stop" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/b3.out
 
 jq -r '.[] | select(.type=="user") | .message.content[] | select(.tool_use_id != null) | .content' \
@@ -221,11 +221,11 @@ is inside the worktree.
 ```bash
 # Run 1: create a session with worktree "first"
 SESSION_ID=$(uuidgen)
-$QWEN --worktree first --session-id "$SESSION_ID" "say hi" \
+$hopcode --worktree first --session-id "$SESSION_ID" "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/c1-run1.out
 
 # Run 2: resume the same session but request a different worktree
-$QWEN --resume "$SESSION_ID" --worktree second "say hi again" \
+$hopcode --resume "$SESSION_ID" --worktree second "say hi again" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/c1-run2.out
 
 # Sidecar should now point at "second"
@@ -247,12 +247,12 @@ ls -d "$TEST_DIR/.hopcode/worktrees/"*
 
 ```bash
 SESSION_ID=$(uuidgen)
-$QWEN --worktree c2 --session-id "$SESSION_ID" "say hi" \
+$hopcode --worktree c2 --session-id "$SESSION_ID" "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/c2-run1.out
 
 rm -rf "$TEST_DIR/.hopcode/worktrees/c2"   # simulate user-deleted dir
 
-$QWEN --resume "$SESSION_ID" --worktree c2-fresh "say hi" \
+$hopcode --resume "$SESSION_ID" --worktree c2-fresh "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/c2-run2.out
 
 ls -d "$TEST_DIR/.hopcode/worktrees/"*
@@ -271,7 +271,7 @@ worktree was created by the CLI flag rather than `EnterWorktreeTool`.
 
 ```bash
 tmux new-session -d -s d1 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree d1-test --approval-mode izn"
+  "cd $TEST_DIR && $hopcode --worktree d1-test --approval-mode izn"
 sleep 3
 
 # Verify worktree is active (Footer indicator)
@@ -294,7 +294,7 @@ three radio options appear.
 
 ```bash
 tmux new-session -d -s d2 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree d2-test --approval-mode izn"
+  "cd $TEST_DIR && $hopcode --worktree d2-test --approval-mode izn"
 sleep 3
 tmux send-keys -t d2 C-c; sleep 0.3; tmux send-keys -t d2 C-c; sleep 1
 
@@ -314,7 +314,7 @@ tmux kill-session -t d2
 ```bash
 SESSION_ID=$(uuidgen)
 tmux new-session -d -s d3 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree d3-test --session-id $SESSION_ID --approval-mode izn"
+  "cd $TEST_DIR && $hopcode --worktree d3-test --session-id $SESSION_ID --approval-mode izn"
 sleep 3
 tmux send-keys -t d3 C-c; sleep 0.3; tmux send-keys -t d3 C-c; sleep 1
 tmux send-keys -t d3 Down Enter   # select "Remove worktree and branch"
@@ -352,7 +352,7 @@ EOF
 ### E1: `--worktree` path applies symlink
 
 ```bash
-$QWEN --worktree e1-test "say hi" \
+$hopcode --worktree e1-test "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /dev/null
 
 ls -la "$TEST_DIR/.hopcode/worktrees/e1-test/node_modules"
@@ -401,7 +401,7 @@ cat > "$TEST_DIR/.hopcode/settings.json" <<'EOF'
 { "worktree": { "symlinkDirectories": ["does-not-exist"] } }
 EOF
 
-$QWEN --worktree e4-test "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/e4.out
+$hopcode --worktree e4-test "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/e4.out
 ls -d "$TEST_DIR/.hopcode/worktrees/e4-test"
 ls "$TEST_DIR/.hopcode/worktrees/e4-test/does-not-exist" 2>/dev/null && echo "UNEXPECTED"
 ```
@@ -433,7 +433,7 @@ cat > "$TEST_DIR/.hopcode/settings.json" <<'EOF'
 { "worktree": { "symlinkDirectories": ["/etc", "../escape"] } }
 EOF
 
-$QWEN --worktree e6-test "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/e6.out
+$hopcode --worktree e6-test "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/e6.out
 ls "$TEST_DIR/.hopcode/worktrees/e6-test/" | head -10
 ```
 
@@ -460,7 +460,7 @@ PROJECT_ID=$(node -e "console.log(process.argv[1].replace(/[^a-zA-Z0-9]/g,'-'))"
 ### F1: `--worktree=#4174` parses + fetches
 
 ```bash
-$QWEN --worktree=#4174 "say hi" \
+$hopcode --worktree=#4174 "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/f1.out
 
 ls -d "$TEST_DIR/.hopcode/worktrees/pr-4174"
@@ -476,7 +476,7 @@ git -C "$TEST_DIR/.hopcode/worktrees/pr-4174" rev-parse --abbrev-ref HEAD
 ### F2: full URL form
 
 ```bash
-$QWEN --worktree "https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174" "say hi" \
+$hopcode --worktree "https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174" "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/f2.out
 
 ls -d "$TEST_DIR/.hopcode/worktrees/pr-4174"
@@ -488,7 +488,7 @@ ls -d "$TEST_DIR/.hopcode/worktrees/pr-4174"
 
 ```bash
 cd "$TEST_DIR" && git remote remove origin
-$QWEN --worktree=#4174 "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f3.out
+$hopcode --worktree=#4174 "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f3.out
 echo "exit=$?"
 ```
 
@@ -497,7 +497,7 @@ echo "exit=$?"
 ### F4: invalid PR number → fail-close
 
 ```bash
-$QWEN --worktree=#999999999 "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f4.out
+$hopcode --worktree=#999999999 "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f4.out
 echo "exit=$?"
 ```
 
@@ -507,7 +507,7 @@ echo "exit=$?"
 ### F5: malformed `#abc` falls through to slug validation
 
 ```bash
-$QWEN --worktree=#abc "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f5.out
+$hopcode --worktree=#abc "say hi" --approval-mode izn --output-format json 2>/dev/null > /tmp/f5.out
 echo "exit=$?"
 ```
 
@@ -522,7 +522,7 @@ cat > "$TEST_DIR/.hopcode/settings.json" <<'EOF'
 EOF
 mkdir -p "$TEST_DIR/node_modules" && echo x > "$TEST_DIR/node_modules/.marker"
 
-$QWEN --worktree=#4174 "say hi" --approval-mode izn --output-format json 2>/dev/null > /dev/null
+$hopcode --worktree=#4174 "say hi" --approval-mode izn --output-format json 2>/dev/null > /dev/null
 readlink "$TEST_DIR/.hopcode/worktrees/pr-4174/node_modules"
 ```
 
@@ -543,7 +543,7 @@ readlink "$TEST_DIR/.hopcode/worktrees/pr-4174/node_modules"
 ```bash
 SESSION_ID=$(uuidgen)
 tmux new-session -d -s g1 -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --worktree g1-test --session-id $SESSION_ID --approval-mode izn 2>&1 | tee /tmp/g1-stderr.out"
+  "cd $TEST_DIR && $hopcode --worktree g1-test --session-id $SESSION_ID --approval-mode izn 2>&1 | tee /tmp/g1-stderr.out"
 sleep 3
 tmux send-keys -t g1 "use the write_file tool to create file 'work.txt' with content 'phase d test'"
 sleep 0.3; tmux send-keys -t g1 Enter
@@ -559,7 +559,7 @@ cat "$TEST_DIR/.hopcode/worktrees/g1-test/work.txt"
 
 # Resume reattaches
 tmux new-session -d -s g1b -x 200 -y 50 \
-  "cd $TEST_DIR && $QWEN --resume $SESSION_ID --approval-mode izn"
+  "cd $TEST_DIR && $hopcode --resume $SESSION_ID --approval-mode izn"
 sleep 4
 tmux capture-pane -t g1b -p -S -50 | grep -E "⎇ worktree-g1-test|Resumed"
 tmux kill-session -t g1b
@@ -584,7 +584,7 @@ cat > "$TEST_DIR/mcp.json" <<'EOF'
 EOF
 cd "$TEST_DIR"
 
-$QWEN --worktree g2-test --mcp-config ./mcp.json "say hi" \
+$hopcode --worktree g2-test --mcp-config ./mcp.json "say hi" \
   --approval-mode izn --output-format json 2>/dev/null > /tmp/g2.out
 echo "exit=$?"
 jq -r '.[] | select(.type=="result") | .result' < /tmp/g2.out | head -3

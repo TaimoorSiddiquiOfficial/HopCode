@@ -192,7 +192,7 @@ Minimum clear space = height of "H" in logo
 ❌ Don't add effects (shadows, outlines, etc.)  
 ❌ Don't rotate at angles  
 ❌ Don't place on busy backgrounds  
-❌ Don't use old "Qwen" logo
+❌ Don't use old "hopcode" logo
 
 ---
 

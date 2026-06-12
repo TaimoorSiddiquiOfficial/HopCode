@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,8 +12,9 @@ import {
   FileDiscoveryService,
   getAllGeminiMdFilenames,
   loadServerHierarchicalMemory,
+  type LoadServerHierarchicalMemoryOptions,
   type LoadServerHierarchicalMemoryResponse,
-  setGeminiMdFilename,
+  setGeminiMdFilename as setServerGeminiMdFilename,
   resolveTelemetrySettings,
   FatalConfigError,
   Storage,
@@ -33,10 +34,11 @@ import {
   SchemaValidator,
   type ConfigParameters,
   type MCPServerConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { extensionsCommand } from '../commands/extensions.js';
 import { hooksCommand } from '../commands/hooks.js';
-import type { Settings } from './settings.js';
+import { normalizeDisabledToolList } from './normalizeDisabledTools.js';
+import type { LoadedSettings, Settings } from './settings.js';
 import { loadSettings, SettingScope } from './settings.js';
 import {
   resolveCliGenerationConfig,
@@ -59,15 +61,6 @@ import { channelCommand } from '../commands/channel.js';
 import { authCommand } from '../commands/auth.js';
 import { reviewCommand } from '../commands/review.js';
 import { serveCommand } from '../commands/serve.js';
-import { githubCommand } from '../commands/github/index.js';
-import { modelCommand } from '../commands/model/index.js';
-import { skillsCommand } from '../commands/skills.js';
-import { profileCommand } from '../commands/profile/index.js';
-import { dashboardCommand } from '../commands/dashboard.js';
-import { grpcCommand } from '../commands/grpc.js';
-import { learnCommand } from '../commands/learn.js';
-import { cronCommand } from '../commands/cron.js';
-import { searchCommand } from '../commands/search.js';
 
 // UUID v4 regex pattern for validation
 const SESSION_ID_REGEX =
@@ -83,7 +76,6 @@ export function isValidSessionId(value: string): boolean {
 }
 
 import { isWorkspaceTrusted } from './trustedFolders.js';
-import { buildWebSearchConfig } from './webSearch.js';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 import {
   parseDurationSeconds,
@@ -139,11 +131,10 @@ export interface CliArgs {
   promptInteractive: string | undefined;
   systemPrompt: string | undefined;
   appendSystemPrompt: string | undefined;
-  izn: boolean | undefined;
+  IZN: boolean | undefined;
   bare: boolean | undefined;
   approvalMode: string | undefined;
   telemetry: boolean | undefined;
-  checkpointing: boolean | undefined;
   telemetryTarget: string | undefined;
   telemetryOtlpEndpoint: string | undefined;
   telemetryOtlpProtocol: string | undefined;
@@ -163,10 +154,6 @@ export interface CliArgs {
   openaiLoggingDir: string | undefined;
   proxy: string | undefined;
   includeDirectories: string[] | undefined;
-  tavilyApiKey: string | undefined;
-  googleApiKey: string | undefined;
-  googleSearchEngineId: string | undefined;
-  webSearchDefault: string | undefined;
   screenReader: boolean | undefined;
   inputFormat?: string | undefined;
   outputFormat: string | undefined;
@@ -212,13 +199,18 @@ export interface CliArgs {
   jsonFile?: string | undefined;
   jsonSchema?: string | undefined;
   inputFile?: string | undefined;
+  checkpointing?: boolean | undefined;
+  tavilyApiKey?: string | undefined;
+  googleApiKey?: string | undefined;
+  googleSearchEngineId?: string | undefined;
+  webSearchDefault?: string | undefined;
 }
 
 /**
  * Returns true if the root of the given schema can accept a JSON object.
  *
  * JSON Schema applies sibling keywords conjunctively, so `type`, `anyOf`,
- * `oneOf`, and `allOf` at the same level must EACH allow an object � they
+ * `oneOf`, and `allOf` at the same level must EACH allow an object — they
  * can't rescue one another. For example, `{type:"object", anyOf:[{type:"string"}]}`
  * is unsatisfiable for any value because `type` requires object while
  * `anyOf` requires string. Walk all four rather than returning on the
@@ -227,7 +219,7 @@ export interface CliArgs {
  * For `anyOf` / `oneOf`, at least one branch must admit object (a value
  * only has to match one branch). For `allOf`, every branch must admit
  * object (a value has to match all of them). Root `$ref` is rejected
- * unconditionally � Ajv applies `$ref` conjunctively with sibling
+ * unconditionally — Ajv applies `$ref` conjunctively with sibling
  * keywords, so even `{type:"object", $ref:"#/$defs/Foo"}` is
  * unsatisfiable when `Foo` resolves to a non-object schema. We don't
  * follow refs ourselves (local-only resolution would still need to
@@ -237,7 +229,7 @@ export interface CliArgs {
  * The `$ref` rejection is **root-only**. Sub-schemas inside `anyOf` /
  * `oneOf` / `allOf` recurse with `isRoot=false`, where a `$ref` is
  * treated as opaque (assume-object-compatible) and deferred to Ajv at
- * runtime � otherwise common composition shapes like
+ * runtime — otherwise common composition shapes like
  * `{anyOf:[{$ref:"#/$defs/Foo"}, {type:"string"}]}` would be wrongly
  * rejected at parse time even though Ajv can resolve them.
  */
@@ -250,7 +242,7 @@ function schemaRootAcceptsObject(
     // `type:"object"` is present" carve-out was unsound: Ajv applies
     // both keywords, so `{type:"object", $ref:"#/$defs/Foo",
     // $defs:{Foo:{type:"array"}}}` parses fine but no object argument
-    // can satisfy both at runtime � the model would loop forever on
+    // can satisfy both at runtime — the model would loop forever on
     // validation failures.
     return false;
   }
@@ -266,7 +258,7 @@ function schemaRootAcceptsObject(
 
   // Root `const` / `enum` pin the value to specific literals. If those
   // literals can never be a JSON object (e.g. `{const: 1}` or
-  // `{enum: ["a", "b"]}`), no object satisfies the schema � reject.
+  // `{enum: ["a", "b"]}`), no object satisfies the schema — reject.
   if ('const' in schema) {
     const constVal = schema['const'];
     if (
@@ -295,7 +287,7 @@ function schemaRootAcceptsObject(
     if (v === false) return false;
     if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
       // isRoot=false: nested branches don't trigger the root-only `$ref`
-      // rejection � the parent's keyword scope already pins the
+      // rejection — the parent's keyword scope already pins the
       // sub-schema's role to "candidate value type", and Ajv will
       // resolve the ref at runtime.
       return schemaRootAcceptsObject(v as Record<string, unknown>, false);
@@ -306,7 +298,7 @@ function schemaRootAcceptsObject(
   for (const key of ['anyOf', 'oneOf'] as const) {
     const variants = schema[key];
     if (Array.isArray(variants)) {
-      // Empty anyOf/oneOf is unsatisfiable per JSON Schema � no value can
+      // Empty anyOf/oneOf is unsatisfiable per JSON Schema — no value can
       // match a member of an empty union. Reject rather than treating it
       // as "no constraint".
       if (variants.length === 0) return false;
@@ -316,7 +308,7 @@ function schemaRootAcceptsObject(
 
   const allOf = schema['allOf'];
   if (Array.isArray(allOf) && allOf.length > 0) {
-    // allOf is conjunctive � `false` in any branch makes the schema
+    // allOf is conjunctive — `false` in any branch makes the schema
     // unsatisfiable, `true` is neutral.
     if (!allOf.every(variantAcceptsObject)) return false;
   }
@@ -324,9 +316,9 @@ function schemaRootAcceptsObject(
   // Best-effort `not` handling: when `not` directly forbids object via its
   // own `type` keyword (e.g. `{not:{type:"object"}}` or
   // `{not:{type:["object","null"]}}`), the schema can never be satisfied
-  // by an object � reject. We don't try to do full satisfiability analysis
+  // by an object — reject. We don't try to do full satisfiability analysis
   // for arbitrary `not` schemas (e.g. `not:{const:"foo"}` is fine, but
-  // `not:{anyOf:[{type:"object"},�]}` would also reject objects); those
+  // `not:{anyOf:[{type:"object"},…]}` would also reject objects); those
   // fall through to Ajv at runtime.
   const notSchema = schema['not'];
   if (
@@ -338,9 +330,9 @@ function schemaRootAcceptsObject(
     const notType = notRecord['type'];
     if (notType !== undefined) {
       const types = Array.isArray(notType) ? notType : [notType];
-      // If `not` is JUST `{type: "object"[�]}` (no additional keywords),
+      // If `not` is JUST `{type: "object"[…]}` (no additional keywords),
       // every object value matches the `not` subschema and so gets
-      // excluded � schema is unsatisfiable for objects, reject.
+      // excluded — schema is unsatisfiable for objects, reject.
       //
       // If `not` has additional constraints alongside `type` (e.g.
       // `{not:{type:"object",required:["error"]}}`), those constraints
@@ -349,7 +341,7 @@ function schemaRootAcceptsObject(
       // narrowing constraints survive. Example: `{}` satisfies
       // `{not:{type:"object",required:["error"]}}` because the value
       // lacks the `error` key. Rejecting at parse time would be a
-      // false positive � defer to Ajv at runtime.
+      // false positive — defer to Ajv at runtime.
       if (types.includes('object') && Object.keys(notRecord).length === 1) {
         return false;
       }
@@ -361,10 +353,10 @@ function schemaRootAcceptsObject(
   // it must match `else` (defaults to `true`). For root-acceptance we can
   // only decide statically when `if` is itself a constant boolean
   // subschema:
-  //   `if: true`  ? every object matches `if`, so it MUST match `then`.
-  //   `if: false` ? no value matches `if`, so it must match `else`.
+  //   `if: true`  → every object matches `if`, so it MUST match `then`.
+  //   `if: false` → no value matches `if`, so it must match `else`.
   // Other shapes for `if` (object schemas) depend on the candidate value
-  // and fall through to Ajv at runtime � we can't decide acceptance
+  // and fall through to Ajv at runtime — we can't decide acceptance
   // without seeing the value.
   if ('if' in schema) {
     const ifSchema = schema['if'];
@@ -382,14 +374,14 @@ function schemaRootAcceptsObject(
         return false;
       }
     }
-    // ifSchema is an object schema � runtime Ajv decides; do nothing.
+    // ifSchema is an object schema — runtime Ajv decides; do nothing.
   }
 
-  // No narrowing at the root � lenient default, treated as object-compatible.
+  // No narrowing at the root — lenient default, treated as object-compatible.
   return true;
 }
 
-/** 4 MiB � well above any real schema, well below an accidental
+/** 4 MiB — well above any real schema, well below an accidental
  * gigabyte-sized file that would OOM `fs.readFileSync` + `JSON.parse`.
  */
 const MAX_JSON_SCHEMA_FILE_BYTES = 4 * 1024 * 1024;
@@ -398,7 +390,7 @@ const MAX_JSON_SCHEMA_FILE_BYTES = 4 * 1024 * 1024;
  * Resolves the `--json-schema` argument into a parsed JSON Schema object.
  *
  * Accepts either a JSON literal or `@path/to/schema.json`. Fails fast with a
- * FatalConfigError if the input can't be read/parsed/compiled � invalid
+ * FatalConfigError if the input can't be read/parsed/compiled — invalid
  * schemas should not silently skip validation at runtime.
  */
 export function resolveJsonSchemaArg(
@@ -458,8 +450,8 @@ export function resolveJsonSchemaArg(
   try {
     parsed = JSON.parse(payload);
   } catch (err) {
-    // For inline JSON the user IS the source � echoing the SyntaxError
-    // (which on Node =18 embeds a 10-char input snippet) is fine. For
+    // For inline JSON the user IS the source — echoing the SyntaxError
+    // (which on Node ≥18 embeds a 10-char input snippet) is fine. For
     // @path, the error message would leak a prefix of the file's bytes
     // through stderr to whatever wrapping process surfaces it; emit a
     // generic message instead.
@@ -500,7 +492,7 @@ export function resolveJsonSchemaArg(
 
   // Ajv compile-time validation. SchemaValidator.validate is deliberately
   // lenient at runtime (falls back to no-op on compile failure to support
-  // exotic MCP schemas) � but `--json-schema` is explicit user intent, so
+  // exotic MCP schemas) — but `--json-schema` is explicit user intent, so
   // surface a bad schema here rather than letting it silently no-op later.
   const compileError = SchemaValidator.compileStrict(parsed);
   if (compileError) {
@@ -534,11 +526,8 @@ export async function parseArguments(): Promise<CliArgs> {
   if (
     rawArgv.length > 0 &&
     (rawArgv[0].endsWith('/dist/hopcode-cli/cli.js') ||
-      rawArgv[0].endsWith('\\dist\\hopcode-cli\\cli.js') ||
       rawArgv[0].endsWith('/dist/cli.js') ||
-      rawArgv[0].endsWith('\\dist\\cli.js') ||
-      rawArgv[0].endsWith('/dist/cli/cli.js') ||
-      rawArgv[0].endsWith('\\dist\\cli\\cli.js'))
+      rawArgv[0].endsWith('/dist/cli/cli.js'))
   ) {
     rawArgv = rawArgv.slice(1);
   }
@@ -671,22 +660,17 @@ export async function parseArguments(): Promise<CliArgs> {
           description: 'Sandbox image URI.',
         })
         .option('izn', {
-          alias: 'z',
+          alias: 'y',
           type: 'boolean',
           description:
-            'Automatically accept all actions (aka Izn mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?',
+            'Automatically accept all actions (aka IZN mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?',
           default: false,
         })
         .option('approval-mode', {
           type: 'string',
-          choices: ['plan', 'default', 'auto-edit', 'auto', 'izn', 'izn'],
+          choices: ['plan', 'default', 'auto-edit', 'auto', 'izn'],
           description:
-            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), izn (auto-approve all tools)',
-        })
-        .option('checkpointing', {
-          type: 'boolean',
-          description: 'Enables checkpointing of file edits',
-          default: false,
+            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), IZN (auto-approve all tools)',
         })
         .option('acp', {
           type: 'boolean',
@@ -712,8 +696,8 @@ export async function parseArguments(): Promise<CliArgs> {
         })
         .option('channel', {
           type: 'string',
-          choices: ['VSCode', 'ACP', 'SDK', 'CI'],
-          description: 'Channel identifier (VSCode, ACP, SDK, CI)',
+          choices: ['VSCode', 'ACP', 'SDK', 'CI', 'desktop'],
+          description: 'Channel identifier (VSCode, ACP, SDK, CI, desktop)',
         })
         .option('allowed-mcp-server-names', {
           type: 'array',
@@ -782,23 +766,6 @@ export async function parseArguments(): Promise<CliArgs> {
         .option('openai-base-url', {
           type: 'string',
           description: 'OpenAI base URL (for custom endpoints)',
-        })
-        .option('tavily-api-key', {
-          type: 'string',
-          description: 'Tavily API key for web search',
-        })
-        .option('google-api-key', {
-          type: 'string',
-          description: 'Google Custom Search API key',
-        })
-        .option('google-search-engine-id', {
-          type: 'string',
-          description: 'Google Custom Search Engine ID',
-        })
-        .option('web-search-default', {
-          type: 'string',
-          description:
-            'Default web search provider (dashscope, tavily, google)',
         })
         .option('screen-reader', {
           type: 'boolean',
@@ -891,7 +858,7 @@ export async function parseArguments(): Promise<CliArgs> {
         .option('max-wall-time', {
           type: 'string',
           description:
-            'Run-level wall-clock budget for headless / unattended runs. Accepts seconds (e.g. `90`), or a duration string with unit (e.g. `30s`, `5m`, `1h`, `1.5h`). Minimum 1s � sub-second values (`500ms`, `0.5`) are rejected as typos; max ~24 days. Aborts the run with exit code 55 when exceeded.',
+            'Run-level wall-clock budget for headless / unattended runs. Accepts seconds (e.g. `90`), or a duration string with unit (e.g. `30s`, `5m`, `1h`, `1.5h`). Minimum 1s — sub-second values (`500ms`, `0.5`) are rejected as typos; max ~24 days. Aborts the run with exit code 55 when exceeded.',
         })
         .option('max-tool-calls', {
           type: 'number',
@@ -946,10 +913,6 @@ export async function parseArguments(): Promise<CliArgs> {
           'Use the "tools.sandboxImage" setting in settings.json instead. This flag will be removed in a future version.',
         )
         .deprecateOption(
-          'checkpointing',
-          'Use the "general.checkpointing.enabled" setting in settings.json instead. This flag will be removed in a future version.',
-        )
-        .deprecateOption(
           'prompt',
           'Use the positional prompt instead. This flag will be removed in a future version.',
         )
@@ -974,7 +937,7 @@ export async function parseArguments(): Promise<CliArgs> {
             return 'Cannot use both --prompt (-p) and --prompt-interactive (-i) together';
           }
           if (argv['izn'] && argv['approvalMode']) {
-            return 'Cannot use both --izn (-z) and --approval-mode together. Use --approval-mode=izn instead.';
+            return 'Cannot use both --IZN (-y) and --approval-mode together. Use --approval-mode=IZN instead.';
           }
           if (
             argv['includePartialMessages'] &&
@@ -997,12 +960,6 @@ export async function parseArguments(): Promise<CliArgs> {
           }
           if (argv['forkSession'] && !(argv['continue'] || hasResume)) {
             return '--fork-session must be used with --resume or --continue.';
-          }
-          if (
-            argv['sandboxSessionId'] &&
-            (argv['sessionId'] || argv['continue'] || argv['resume'])
-          ) {
-            return 'Cannot use internal --sandbox-session-id with --session-id, --continue, or --resume.';
           }
           if (
             argv['sandboxSessionId'] &&
@@ -1057,7 +1014,7 @@ export async function parseArguments(): Promise<CliArgs> {
             // Allow stdin piping (`echo "..." | hopcode --json-schema ...`):
             // when stdin is not a TTY, the prompt is supplied via the pipe
             // and headless mode runs normally. Only reject true interactive
-            // invocations with neither flag nor positional nor pipe � the
+            // invocations with neither flag nor positional nor pipe — the
             // synthetic tool's "session ends now" llmContent has no
             // termination handler in the TUI loop, so silently launching
             // the TUI would strand the run.
@@ -1078,28 +1035,9 @@ export async function parseArguments(): Promise<CliArgs> {
     .command(hooksCommand)
     // Register Channel subcommands
     .command(channelCommand)
-    // Register GitHub integration commands
-    .command(githubCommand)
-    // Register model selector command
-    .command(modelCommand)
-    .command(skillsCommand)
-    // Register profile manager command
-    .command(profileCommand)
-    // Register web dashboard command
-    .command(dashboardCommand)
-    // Register headless HTTP API server command
-    .command(serveCommand)
-    // Register gRPC headless server command
-    .command(grpcCommand)
-    // Register learning loop command
-    .command(learnCommand)
-    // Register persistent cron scheduler command
-    .command(cronCommand)
-    // Register cross-session search command
-    .command(searchCommand)
     // Register /review skill helpers (presubmit checks, cleanup)
     .command(reviewCommand)
-    // Register `hopcode serve` (Stage 1 daemon � see issue #3803)
+    // Register `hopcode serve` (Stage 1 daemon)
     .command(serveCommand);
 
   yargsInstance
@@ -1162,7 +1100,7 @@ export async function parseArguments(): Promise<CliArgs> {
   // Handle deprecated --experimental-acp flag
   if (result['experimentalAcp']) {
     writeStderrLine(
-      '\x1b[33m? Warning: --experimental-acp is deprecated and will be removed in a future release. Please use --acp instead.\x1b[0m',
+      '\x1b[33m⚠ Warning: --experimental-acp is deprecated and will be removed in a future release. Please use --acp instead.\x1b[0m',
     );
     // Map experimental-acp to acp if acp is not explicitly set
     if (!result['acp']) {
@@ -1181,7 +1119,7 @@ export async function parseArguments(): Promise<CliArgs> {
 // This function is now a thin wrapper around the server's implementation.
 // It's kept in the CLI for now as App.tsx directly calls it for memory refresh.
 // TODO: Consider if App.tsx should get memory via a server call or if Config should refresh itself.
-export async function loadHierarchicalContextMemory(
+export async function loadHierarchicalGeminiMemory(
   currentWorkingDirectory: string,
   includeDirectoriesToReadGemini: readonly string[] = [],
   fileService: FileDiscoveryService,
@@ -1189,6 +1127,7 @@ export async function loadHierarchicalContextMemory(
   folderTrust: boolean,
   memoryImportFormat: 'flat' | 'tree' = 'tree',
   contextRuleExcludes: string[] = [],
+  options: LoadServerHierarchicalMemoryOptions = {},
 ): Promise<LoadServerHierarchicalMemoryResponse> {
   // FIX: Use real, canonical paths for a reliable comparison to handle symlinks.
   const realCwd = fs.realpathSync(path.resolve(currentWorkingDirectory));
@@ -1208,6 +1147,7 @@ export async function loadHierarchicalContextMemory(
     folderTrust,
     memoryImportFormat,
     contextRuleExcludes,
+    options,
   );
 }
 
@@ -1219,7 +1159,7 @@ export async function loadHierarchicalContextMemory(
  * The CLI flag is a duration string (`30s` / `5m` / `1h` / `90`); the
  * settings entry is a plain number of seconds (parity with
  * `model.maxSessionTurns`). Both layers reject `0` and out-of-range
- * values up front � a typo in a CI guardrail should fail loud at startup,
+ * values up front — a typo in a CI guardrail should fail loud at startup,
  * not silently disable the budget.
  */
 function resolveMaxWallTimeSeconds(argv: CliArgs, settings: Settings): number {
@@ -1271,11 +1211,14 @@ function resolveMaxToolCalls(argv: CliArgs, settings: Settings): number {
 }
 
 export function isDebugMode(argv: CliArgs): boolean {
+  if (argv.debug) return true;
+  const debugVal = process.env['DEBUG'];
+  const debugModeVal = process.env['DEBUG_MODE'];
   return (
-    argv.debug ||
-    [process.env['DEBUG'], process.env['DEBUG_MODE']].some(
-      (v) => v === 'true' || v === '1',
-    )
+    debugVal === 'true' ||
+    debugVal === '1' ||
+    debugModeVal === 'true' ||
+    debugModeVal === '1'
   );
 }
 
@@ -1357,6 +1300,45 @@ function parseMcpConfig(
   }
 }
 
+/**
+ * Builds the live-read closure for `Config.getDisabledSkillNames()`.
+ *
+ * The returned function reads through `loadedSettings.merged` on every
+ * call, so `LoadedSettings.setValue('skills.disabled', ...)` invocations
+ * are reflected without rebuilding `Config`. The closure is over the
+ * `LoadedSettings` instance, NOT over its `.merged` snapshot — that
+ * distinction matters because `LoadedSettings.setValue` replaces the
+ * internal `_merged` object on every call. A closure over `.merged` would
+ * stay frozen at construction time.
+ *
+ * Use this from every `loadCliConfig` call site (interactive entry, ACP
+ * session start, etc.) so all surfaces — `<available_skills>` in the
+ * model description, `/skill-name` slash commands, `/skills` listing and
+ * completion — agree on which skills are currently disabled.
+ */
+export function buildDisabledSkillNamesProvider(
+  loadedSettings: LoadedSettings,
+): () => ReadonlySet<string> {
+  return () => {
+    // Defensive: settings.json is user-editable, so the `disabled` slot
+    // could be a non-array (e.g. `"disabled": "all"` or `"disabled": 42`)
+    // OR an array containing non-strings (e.g. `[42, null]`). The `??`
+    // fallback only catches `null`/`undefined`, so we MUST also guard
+    // against non-array values before `.filter()` — otherwise calling
+    // `"all".filter` throws `TypeError: list.filter is not a function`
+    // and bricks every skill invocation (validateToolParams + execute
+    // both call this provider without a try/catch).
+    const raw = loadedSettings.merged.skills?.disabled;
+    const list = Array.isArray(raw) ? raw : [];
+    return new Set(
+      list
+        .filter((n): n is string => typeof n === 'string')
+        .map((n) => n.trim().toLowerCase())
+        .filter(Boolean),
+    );
+  };
+}
+
 export async function loadCliConfig(
   settings: Settings,
   argv: CliArgs,
@@ -1370,6 +1352,21 @@ export async function loadCliConfig(
     userHooks?: Record<string, unknown>;
     projectHooks?: Record<string, unknown>;
   },
+  /**
+   * Live-read provider for the set of disabled skill names. Forwarded to
+   * `ConfigParameters` so that `Config.getDisabledSkillNames()` reflects
+   * `LoadedSettings.merged.skills?.disabled` even after `setValue`
+   * mutations within the same process.
+   *
+   * Callers MUST close over the live `LoadedSettings` instance, NOT over
+   * the `settings: Settings` snapshot passed as the first argument here —
+   * `LoadedSettings.setValue` replaces `_merged`, so any closure over a
+   * snapshot would only see cold data and the dialog/subcommand toggles
+   * would not take effect on the model side. Use
+   * `buildDisabledSkillNamesProvider(loadedSettings)` to construct it
+   * correctly.
+   */
+  disabledSkillNamesProvider?: () => ReadonlySet<string>,
 ): Promise<Config> {
   const debugMode = isDebugMode(argv);
   const bareMode = isBareMode(argv.bare);
@@ -1387,12 +1384,12 @@ export async function loadCliConfig(
   // Set the context filename in the server's memoryTool module BEFORE loading memory
   // TODO(b/343434939): This is a bit of a hack. The contextFileName should ideally be passed
   // directly to the Config constructor in core, and have core handle setGeminiMdFilename.
-  // However, loadHierarchicalContextMemory is called *before* createServerConfig.
+  // However, loadHierarchicalGeminiMemory is called *before* createServerConfig.
   if (settings.context?.fileName) {
-    setGeminiMdFilename(settings.context.fileName);
+    setServerGeminiMdFilename(settings.context.fileName);
   } else {
     // Reset to default context filenames if not provided in settings.
-    setGeminiMdFilename(getAllGeminiMdFilenames());
+    setServerGeminiMdFilename(getAllGeminiMdFilenames());
   }
 
   // Automatically load output-language.md if it exists
@@ -1414,31 +1411,6 @@ export async function loadCliConfig(
       outputLanguageFilePath = globalOutputLanguagePath;
     }
   }
-
-  // Load SOUL.md global persona (cross-project user personality).
-  // Read ~/.hopcode/SOUL.md and prepend it to appendSystemPrompt so the agent
-  // always knows who it's talking to, regardless of which project is active.
-  let soulPersona: string | undefined;
-  if (!bareMode) {
-    const soulPath = path.join(Storage.getGlobalHopCodeDir(), 'SOUL.md');
-    if (fs.existsSync(soulPath)) {
-      try {
-        const soulContent = fs.readFileSync(soulPath, 'utf-8').trim();
-        if (soulContent) {
-          soulPersona = soulContent;
-        }
-      } catch {
-        // best-effort ? ignore read errors
-      }
-    }
-  }
-
-  // Merge SOUL.md with any --append-system-prompt from argv
-  const effectiveAppendSystemPrompt = soulPersona
-    ? argv.appendSystemPrompt
-      ? `${soulPersona}\n\n${argv.appendSystemPrompt}`
-      : soulPersona
-    : argv.appendSystemPrompt;
 
   const fileService = new FileDiscoveryService(cwd);
 
@@ -1473,7 +1445,7 @@ export async function loadCliConfig(
   let approvalMode: ApprovalMode;
   if (argv.approvalMode) {
     approvalMode = parseApprovalModeValue(argv.approvalMode);
-  } else if (argv.izn) {
+  } else if (argv.IZN) {
     approvalMode = ApprovalMode.IZN;
   } else if (!bareMode && settings.tools?.approvalMode) {
     approvalMode = parseApprovalModeValue(settings.tools.approvalMode);
@@ -1534,22 +1506,22 @@ export async function loadCliConfig(
     // (fallback for edge cases where query/prompt is provided with TEXT output)
     interactive = false;
   }
-  // -- Unified permissions construction -------------------------------------
+  // ── Unified permissions construction ─────────────────────────────────────
   // All permission sources are merged here, before constructing Config.
   // The resulting three arrays are the single source of truth that Config /
   // PermissionManager will use.
   //
   // Sources (in order of precedence within each list):
   //   1. settings.permissions.{allow,ask,deny}  (persistent, merged by LoadedSettings)
-  //   2. argv.coreTools   ? allow  (allowlist mode: only these tools are available)
-  //   3. argv.allowedTools ? allow  (auto-approve these tools/commands)
-  //   4. argv.excludeTools ? deny   (block these tools completely)
-  //   5. Non-interactive mode exclusions ? deny (unless explicitly allowed above)
+  //   2. argv.coreTools   → allow  (allowlist mode: only these tools are available)
+  //   3. argv.allowedTools → allow  (auto-approve these tools/commands)
+  //   4. argv.excludeTools → deny   (block these tools completely)
+  //   5. Non-interactive mode exclusions → deny (unless explicitly allowed above)
 
   // Start from settings-level rules.
   // Read from both new `permissions` and legacy `tools` paths for compatibility.
   // Note: settings.tools.core / argv.coreTools are intentionally NOT merged into
-  // mergedAllow ? they have whitelist semantics (only listed tools are registered),
+  // mergedAllow — they have whitelist semantics (only listed tools are registered),
   // not auto-approve semantics. They are passed via the `coreTools` Config param
   // and handled by PermissionManager.coreToolsAllowList.
   const resolvedCoreTools: string[] = [
@@ -1595,27 +1567,16 @@ export async function loadCliConfig(
   };
   for (const name of settings.slashCommands?.disabled ?? []) addDisabled(name);
   for (const name of argv.disabledSlashCommands ?? []) addDisabled(name);
-  for (const name of (
-    process.env['HOPCODE_DISABLED_SLASH_COMMANDS'] ??
-    process.env['HOPCODE_DISABLED_SLASH_COMMANDS'] ??
-    ''
-  ).split(',')) {
+  for (const name of (process.env['HOPCODE_DISABLED_SLASH_COMMANDS'] ?? '').split(
+    ',',
+  )) {
     addDisabled(name);
   }
 
-  // Resolve the per-workspace tool denylist (#4175 Wave 4 PR 17). De-duplicate
-  // while preserving original casing; downstream lookups go through
-  // `Config.getDisabledTools()` which materializes a Set, so the order here
-  // is only meaningful for diagnostic output.
-  const disabledTools: string[] = [];
-  const seenDisabledTools = new Set<string>();
-  for (const raw of settings.tools?.disabled ?? []) {
-    if (typeof raw !== 'string') continue;
-    const trimmed = raw.trim();
-    if (!trimmed || seenDisabledTools.has(trimmed)) continue;
-    seenDisabledTools.add(trimmed);
-    disabledTools.push(trimmed);
-  }
+  // Resolve the per-workspace tool denylist. De-duplicate while preserving
+  // original casing; shared helper since the MCP restart refresh path
+  // must agree byte-for-byte with this.
+  const disabledTools = normalizeDisabledToolList(settings.tools?.disabled);
 
   // Helper: check if a tool is explicitly covered by an allow rule OR by the
   // coreTools whitelist. Uses alias matching for coreTools (via isToolEnabled)
@@ -1678,7 +1639,7 @@ export async function loadCliConfig(
         denyUnlessAllowed(ToolNames.MONITOR as ToolName);
         break;
       case ApprovalMode.IZN:
-        // No extra denials for Izn mode.
+        // No extra denials for IZN mode.
         break;
       default:
         break;
@@ -1728,7 +1689,7 @@ export async function loadCliConfig(
   // list, client.ts eagerly reveals all deferred tools so every MCP tool
   // schema is in the initial declaration list, keeping the prompt prefix
   // stable and maximizing cache hit rates.
-  // Note: no `^` anchor � model names may include a provider prefix
+  // Note: no `^` anchor — model names may include a provider prefix
   // (e.g. "openrouter/deepseek/deepseek-v4-flash").
   const toolSearchExplicitlyEnabled = settings.tools?.toolSearch?.enabled;
   const shouldDisableToolSearch =
@@ -1834,8 +1795,8 @@ export async function loadCliConfig(
     debugMode,
     question,
     systemPrompt: argv.systemPrompt,
-    appendSystemPrompt: effectiveAppendSystemPrompt,
-    // Legacy fields ? kept for backward compatibility with getCoreTools() etc.
+    appendSystemPrompt: argv.appendSystemPrompt,
+    // Legacy fields – kept for backward compatibility with getCoreTools() etc.
     coreTools: bareMode
       ? undefined
       : argv.coreTools || settings.tools?.core || undefined,
@@ -1845,6 +1806,7 @@ export async function loadCliConfig(
     excludeTools: mergedDeny,
     disabledSlashCommands:
       disabledSlashCommands.length > 0 ? disabledSlashCommands : undefined,
+    disabledSkillNamesProvider,
     disabledTools: disabledTools.length > 0 ? disabledTools : undefined,
     // New unified permissions (PermissionManager source of truth).
     permissions: {
@@ -1895,8 +1857,6 @@ export async function loadCliConfig(
     usageStatisticsEnabled: settings.privacy?.usageStatisticsEnabled ?? true,
     clearContextOnIdle: settings.context?.clearContextOnIdle,
     fileFiltering: settings.context?.fileFiltering,
-    checkpointing:
-      argv.checkpointing || settings.general?.checkpointing?.enabled,
     plansDirectory: settings.plansDirectory,
     proxy:
       argv.proxy ||
@@ -1916,7 +1876,8 @@ export async function loadCliConfig(
     maxWallTimeSeconds: resolveMaxWallTimeSeconds(argv, settings),
     maxToolCalls: resolveMaxToolCalls(argv, settings),
     experimentalZedIntegration: argv.acp || argv.experimentalAcp || false,
-    cronEnabled: settings.experimental?.cron ?? false,
+    cronEnabled: settings.experimental?.cron ?? true,
+    agentTeamEnabled: settings.experimental?.agentTeam ?? false,
     computerUseEnabled: settings.tools?.computerUse?.enabled ?? true,
     emitToolUseSummaries: settings.experimental?.emitToolUseSummaries ?? true,
     listExtensions: argv.listExtensions || false,
@@ -1935,10 +1896,6 @@ export async function loadCliConfig(
       ? []
       : (settings.security?.allowedHttpHookUrls ?? []),
     cliVersion: await getCliVersion(),
-    webSearch: bareMode
-      ? undefined
-      : buildWebSearchConfig(argv, settings, selectedAuthType),
-    agentModels: settings.agentModels,
     ideMode,
     chatCompression: settings.model?.chatCompression,
     folderTrust,
@@ -1947,11 +1904,13 @@ export async function loadCliConfig(
     useRipgrep: settings.tools?.useRipgrep,
     useBuiltinRipgrep: settings.tools?.useBuiltinRipgrep,
     shouldUseNodePtyShell: settings.tools?.shell?.enableInteractiveShell,
+    preventSystemSleep: settings.general?.preventSystemSleep ?? true,
     skipNextSpeakerCheck: settings.model?.skipNextSpeakerCheck,
     skipLoopDetection: settings.model?.skipLoopDetection ?? true,
     skipStartupContext: settings.model?.skipStartupContext ?? false,
     truncateToolOutputThreshold: settings.tools?.truncateToolOutputThreshold,
     truncateToolOutputLines: settings.tools?.truncateToolOutputLines,
+    toolOutputBatchBudget: settings.tools?.toolOutputBatchBudget,
     eventEmitter: appEvents,
     gitCoAuthor: settings.general?.gitCoAuthor,
     output: {
@@ -1977,7 +1936,7 @@ export async function loadCliConfig(
     stopHookBlockingCap: bareMode ? undefined : settings.stopHookBlockingCap,
     channel: argv.channel,
     // CLI flag wins over settings.json. `--json-fd` is fd-only (no settings
-    // equivalent ? fd passing is a spawn-time concern). `--json-file` and
+    // equivalent — fd passing is a spawn-time concern). `--json-file` and
     // `--input-file` fall back to settings.dualOutput.* when the flag is
     // absent.
     jsonFd: argv.jsonFd,

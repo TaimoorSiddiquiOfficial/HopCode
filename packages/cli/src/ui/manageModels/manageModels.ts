@@ -9,7 +9,7 @@ import {
   type Config,
   type ProviderModelConfig as ModelConfig,
   type ModelProvidersConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import {

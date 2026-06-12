@@ -296,7 +296,7 @@ npx eslint packages/core/src packages/cli/src --ext .ts,.tsx
 
 **File**: `packages/cli/src/config/config.test.ts`
 
-**Error**: Failed to resolve entry for package "@hoptrendy/hopcode-server"
+**Error**: Failed to resolve entry for package "@hopcode/hopcode-server"
 
 **Status**: Unrelated to dependency updates, pre-existing issue
 

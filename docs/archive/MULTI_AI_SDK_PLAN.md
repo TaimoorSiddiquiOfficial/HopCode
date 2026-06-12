@@ -191,7 +191,7 @@ export class ProviderRegistry {
 ```typescript
 export interface ProviderConfig {
   // Provider selection
-  provider: 'qwen' | 'openai' | 'anthropic' | 'google' | 'github' | string;
+  provider: 'hopcode' | 'openai' | 'anthropic' | 'google' | 'github' | string;
 
   // Model configuration
   model: string;
@@ -544,11 +544,11 @@ Create comprehensive docs for each provider:
 
 ### 5.1 Provider SDK for Contributions
 
-**Create:** `@hoptrendy/provider-sdk`
+**Create:** `@hopcode/provider-sdk`
 
 ```typescript
 // Template for community contributions
-import { BaseProvider } from '@hoptrendy/provider-sdk';
+import { BaseProvider } from '@hopcode/provider-sdk';
 
 export class MyCustomProvider extends BaseProvider {
   providerId = 'my-provider';

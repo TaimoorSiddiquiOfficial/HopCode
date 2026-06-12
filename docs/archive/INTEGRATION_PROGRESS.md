@@ -109,7 +109,7 @@ export const ProviderConfig = z.object({
 **Before:**
 
 ```typescript
-import { QwenContentGenerator } from '../qwen/qwenContentGenerator';
+import { QwenContentGenerator } from '../hopcode/qwenContentGenerator';
 
 export function createContentGenerator(config: Config) {
   return new QwenContentGenerator(config);

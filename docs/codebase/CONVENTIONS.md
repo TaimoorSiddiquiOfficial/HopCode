@@ -403,7 +403,7 @@ import process from 'node:process';
 
 // 2. External dependencies
 import { z } from 'zod';
-import { ModelRegistry } from '@hoptrendy/hopcode-core';
+import { ModelRegistry } from '@hopcode/hopcode-core';
 
 // 3. Internal packages (no relative imports between packages)
 import { Config } from '../config/config.js';
@@ -418,7 +418,7 @@ import type { ToolName } from './tool-names.js';
 
 ```typescript
 // ✅ Good (in packages/cli/src/commands/model.ts)
-import { ModelRegistry } from '@hoptrendy/hopcode-core';
+import { ModelRegistry } from '@hopcode/hopcode-core';
 
 // ❌ Bad
 import { ModelRegistry } from '../../../core/src/models/index.js';

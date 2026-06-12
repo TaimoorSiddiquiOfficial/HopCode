@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Box } from 'ink';
 import { RadioButtonSelect } from '../../shared/RadioButtonSelect.js';
 import { MANAGEMENT_STEPS } from '../types.js';
-import { type SubagentConfig } from '@hoptrendy/hopcode-core';
+import { type SubagentConfig } from '@hopcode/hopcode-core';
 import { t } from '../../../../i18n/index.js';
 
 interface ActionSelectionStepProps {

@@ -5,7 +5,7 @@ import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { basename, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import * as lark from '@larksuiteoapi/node-sdk';
-import { ChannelBase } from '@hoptrendy/channel-base';
+import { ChannelBase } from '@hopcode/channel-base';
 import { buildCardContent, extractTitle, splitChunks } from './markdown.js';
 import { downloadMedia } from './media.js';
 import type {
@@ -13,7 +13,7 @@ import type {
   ChannelBaseOptions,
   Envelope,
   AcpBridge,
-} from '@hoptrendy/channel-base';
+} from '@hopcode/channel-base';
 
 /** Feishu message event data shape. */
 interface FeishuMessageEvent {

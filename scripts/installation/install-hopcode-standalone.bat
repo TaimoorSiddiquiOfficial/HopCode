@@ -15,6 +15,16 @@ set "MIRROR=auto"
 if defined HOPCODE_INSTALL_MIRROR set "MIRROR=!HOPCODE_INSTALL_MIRROR!"
 set "NO_MODIFY_PATH=0"
 if defined HOPCODE_NO_MODIFY_PATH set "NO_MODIFY_PATH=!HOPCODE_NO_MODIFY_PATH!"
+set "REPAIR_PATH=0"
+if defined HOPCODE_INSTALL_REPAIR_PATH set "REPAIR_PATH=!HOPCODE_INSTALL_REPAIR_PATH!"
+set "PATH_SCOPE=user"
+REM Auto-detect SYSTEM account and default to machine scope so that new sessions
+REM spawned by service processes (SSM agent, WinRM, scheduled tasks) inherit PATH.
+if not defined HOPCODE_INSTALL_PATH_SCOPE (
+    whoami /user 2>nul | findstr /i "S-1-5-18" >nul 2>&1
+    if !ERRORLEVEL! EQU 0 set "PATH_SCOPE=machine"
+)
+if defined HOPCODE_INSTALL_PATH_SCOPE set "PATH_SCOPE=!HOPCODE_INSTALL_PATH_SCOPE!"
 set "BASE_URL="
 if defined HOPCODE_INSTALL_BASE_URL set "BASE_URL=!HOPCODE_INSTALL_BASE_URL!"
 set "ARCHIVE_PATH="
@@ -194,6 +204,30 @@ if /i "%~1"=="--no-modify-path" (
     shift
     goto parse_args
 )
+if /i "%~1"=="--repair-path" (
+    set "REPAIR_PATH=1"
+    shift
+    goto parse_args
+)
+if /i "!ARG_KEY!"=="--path-scope" (
+    if "!ARG_HAS_INLINE_VALUE!"=="1" (
+        if "!ARG_VALUE!"=="" (
+            echo ERROR: --path-scope requires a value
+            exit /b 1
+        )
+        set "PATH_SCOPE=!ARG_VALUE!"
+        shift
+        goto parse_args
+    )
+    if "%~2"=="" (
+        echo ERROR: --path-scope requires a value
+        exit /b 1
+    )
+    set "PATH_SCOPE=%~2"
+    shift
+    shift
+    goto parse_args
+)
 if /i "%~1"=="-h" goto usage
 if /i "%~1"=="--help" goto usage
 
@@ -206,39 +240,46 @@ goto usage_error
 call :ValidateOptions
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
+if /i "!REPAIR_PATH!"=="1" (
+    call :RepairPath
+    if !ERRORLEVEL! NEQ 0 exit /b !ERRORLEVEL!
+    endlocal & set "PATH=%INSTALL_BIN_DIR%;%PATH%"
+    exit /b 0
+)
+
 call :PrintHeader
 
-REM Discover all hopcode executables on disk BEFORE we install. We can't
+REM Discover all qwen executables on disk BEFORE we install. We can't
 REM reliably simulate the user's PATH ordering, so enumerate well-known
-REM per-tool bin directories plus everything `where hopcode` returns.
-call :CreateTempFile "hopcode-pre-install"
+REM per-tool bin directories plus everything `where qwen` returns.
+call :CreateTempFile "qwen-pre-install"
 if !ERRORLEVEL! NEQ 0 exit /b 1
-set "PRE_INSTALL_HOPCODES_FILE=!TEMP_FILE!"
+set "PRE_INSTALL_QWENS_FILE=!TEMP_FILE!"
 rem Avoid `call echo` here: `call` triggers an extra parse pass on the
 rem expanded path, so a directory containing &/|/<,>/etc. would be re-evaluated
 rem as command separators. Plain `echo` writes the literal value.
-for /f "delims=" %%i in ('where hopcode 2^>nul') do echo %%i>>"!PRE_INSTALL_HOPCODES_FILE!"
+for /f "delims=" %%i in ('where qwen 2^>nul') do echo %%i>>"!PRE_INSTALL_QWENS_FILE!"
 for %%c in (
     "!USERPROFILE!\.opencode\bin\hopcode.cmd"
     "!APPDATA!\npm\hopcode.cmd"
     "!USERPROFILE!\.bun\bin\hopcode.cmd"
     "!LOCALAPPDATA!\bun\bin\hopcode.cmd"
     "!LOCALAPPDATA!\hopcode\bin\hopcode.cmd"
-) do if exist %%c echo %%~c>>"!PRE_INSTALL_HOPCODES_FILE!"
+) do if exist %%c echo %%~c>>"!PRE_INSTALL_QWENS_FILE!"
 for /f "delims=" %%i in ('npm prefix -g 2^>nul') do (
-    if exist "%%i\hopcode.cmd" echo %%i\hopcode.cmd>>"!PRE_INSTALL_HOPCODES_FILE!"
+    if exist "%%i\hopcode.cmd" echo %%i\hopcode.cmd>>"!PRE_INSTALL_QWENS_FILE!"
 )
-set "PRE_INSTALL_HOPCODES_LIST="
-if exist "!PRE_INSTALL_HOPCODES_FILE!" (
-    for /f "delims=" %%i in ('sort "!PRE_INSTALL_HOPCODES_FILE!" 2^>nul ^| findstr /v "^$"') do (
-        if "!PRE_INSTALL_HOPCODES_LIST!"=="" (
-            set "PRE_INSTALL_HOPCODES_LIST=%%i"
+set "PRE_INSTALL_QWENS_LIST="
+if exist "!PRE_INSTALL_QWENS_FILE!" (
+    for /f "delims=" %%i in ('sort "!PRE_INSTALL_QWENS_FILE!" 2^>nul ^| findstr /v "^$"') do (
+        if "!PRE_INSTALL_QWENS_LIST!"=="" (
+            set "PRE_INSTALL_QWENS_LIST=%%i"
         ) else (
-            echo !PRE_INSTALL_HOPCODES_LIST! | findstr /i /c:"%%i" >nul 2>&1
-            if errorlevel 1 set "PRE_INSTALL_HOPCODES_LIST=!PRE_INSTALL_HOPCODES_LIST!|%%i"
+            echo !PRE_INSTALL_QWENS_LIST! | findstr /i /c:"%%i" >nul 2>&1
+            if errorlevel 1 set "PRE_INSTALL_QWENS_LIST=!PRE_INSTALL_QWENS_LIST!|%%i"
         )
     )
-    del /f /q "!PRE_INSTALL_HOPCODES_FILE!" >nul 2>&1
+    del /f /q "!PRE_INSTALL_QWENS_FILE!" >nul 2>&1
 )
 
 REM Dispatch after validation; detect falls back to npm only when unavailable.
@@ -293,23 +334,20 @@ exit /b 1
 :PrintUsage
 echo HopCode Installer
 echo.
-echo Usage: install-hopcode-standalone.bat [OPTIONS]
+echo Usage: install-qwen-standalone.bat [OPTIONS]
 echo.
 echo Options:
-echo   -s, --source SOURCE      Record the installation source.
-echo                            Only letters, numbers, dot, underscore, and dash are allowed.
-echo   --method METHOD          Install method: detect, standalone, or npm.
-echo   --mirror MIRROR          Standalone archive mirror: auto, github, or aliyun.
-echo                            Defaults to HOPCODE_INSTALL_MIRROR or auto, which picks
-echo                            whichever responds first via a HEAD probe.
-echo   --base-url URL           Override standalone archive base URL.
-echo   --archive PATH           Install from a local standalone archive.
-echo   --version VERSION        Standalone release version. Defaults to latest.
-echo   --registry REGISTRY      npm registry to use.
-echo                            Defaults to HOPCODE_NPM_REGISTRY or https://registry.npmmirror.com
-echo   --no-modify-path         Do not prepend INSTALL_BIN_DIR to user PATH even
-echo                            when a shadowing 'hopcode' is detected.
-echo   -h, --help               Show this help message.
+echo   --method METHOD      Install method: detect, standalone, or npm (default: detect)
+echo   --mirror MIRROR      Mirror: auto, github, or aliyun (default: auto)
+echo   --base-url URL       Override standalone archive base URL
+echo   --archive PATH       Install from a local standalone archive
+echo   --version VERSION    Release version (default: latest)
+echo   --registry URL       npm registry (default: https://registry.npmmirror.com)
+echo   --no-modify-path     Do not modify PATH
+echo   --repair-path        Repair PATH for an existing standalone install
+echo   --path-scope SCOPE   PATH scope: user or machine (default: user, auto machine for SYSTEM)
+echo   -s, --source SOURCE  Record installation source
+echo   -h, --help           Show this help message
 exit /b 0
 
 :PrintHeader
@@ -317,11 +355,24 @@ set "DISPLAY_VERSION=!VERSION!"
 if /i not "!DISPLAY_VERSION!"=="latest" (
     if /i "!DISPLAY_VERSION:~0,1!"=="v" set "DISPLAY_VERSION=!DISPLAY_VERSION:~1!"
 )
+echo.
 echo Installing HopCode version: !DISPLAY_VERSION!
+echo.
+exit /b 0
+
+:PrintLogo
+rem HopCode logo with color (Windows Terminal VT100 support)
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$e=[char]27; Write-Host \"  $e[38;2;71;150;228mQ W E N  $e[38;2;132;122;206mC O D E$e[0m\""
+echo.
+exit /b 0
+
+:PrintProgressComplete
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$esc = [char]27; $bar = [string]::new([char]0x25A0, 50); Write-Host \"$esc[38;5;214m$bar 100%%$esc[0m\""
 exit /b 0
 
 :ValidateRawEnvironmentOptions
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124); $rawNames = @('HOPCODE_INSTALL_METHOD','HOPCODE_INSTALL_MIRROR','HOPCODE_NO_MODIFY_PATH','HOPCODE_INSTALL_BASE_URL','HOPCODE_INSTALL_ARCHIVE','HOPCODE_INSTALL_VERSION','HOPCODE_NPM_REGISTRY','HOPCODE_INSTALL_ROOT','HOPCODE_INSTALL_LIB_DIR','HOPCODE_INSTALL_BIN_DIR','HOPCODE_INSTALL_GITHUB_REPO','HOPCODE_INSTALL_CURL_EXE'); foreach ($name in $rawNames) { $value = [Environment]::GetEnvironmentVariable($name); if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 } }; exit 0"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124); $rawNames = @('HOPCODE_INSTALL_METHOD','HOPCODE_INSTALL_MIRROR','HOPCODE_NO_MODIFY_PATH','HOPCODE_INSTALL_REPAIR_PATH','HOPCODE_INSTALL_PATH_SCOPE','HOPCODE_INSTALL_BASE_URL','HOPCODE_INSTALL_ARCHIVE','HOPCODE_INSTALL_VERSION','HOPCODE_NPM_REGISTRY','HOPCODE_INSTALL_ROOT','HOPCODE_INSTALL_LIB_DIR','HOPCODE_INSTALL_BIN_DIR','HOPCODE_INSTALL_GITHUB_REPO','HOPCODE_INSTALL_CURL_EXE'); foreach ($name in $rawNames) { $value = [Environment]::GetEnvironmentVariable($name); if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 } }; exit 0"
 if %ERRORLEVEL% EQU 0 exit /b 0
 echo ERROR: installer options contain unsafe command characters.
 exit /b 1
@@ -339,11 +390,12 @@ set "HOPCODE_VALIDATE_INSTALL_BASE=!INSTALL_BASE!"
 set "HOPCODE_VALIDATE_INSTALL_DIR=!INSTALL_DIR!"
 set "HOPCODE_VALIDATE_INSTALL_BIN_DIR=!INSTALL_BIN_DIR!"
 set "HOPCODE_VALIDATE_SOURCE=!SOURCE!"
-call :CreateTempFile "hopcode-validate-options" ".ps1"
+set "HOPCODE_VALIDATE_PATH_SCOPE=!PATH_SCOPE!"
+call :CreateTempFile "qwen-validate-options" ".ps1"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 set "HOPCODE_VALIDATE_OPTIONS_SCRIPT=!TEMP_FILE!"
 > "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo $unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124)
->> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo $names = @('METHOD','MIRROR','BASE_URL','ARCHIVE_PATH','VERSION','NPM_REGISTRY','INSTALL_BASE','INSTALL_DIR','INSTALL_BIN_DIR','SOURCE')
+>> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo $names = @('METHOD','MIRROR','BASE_URL','ARCHIVE_PATH','VERSION','NPM_REGISTRY','INSTALL_BASE','INSTALL_DIR','INSTALL_BIN_DIR','SOURCE','PATH_SCOPE')
 >> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo foreach ($name in $names) {
 >> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo   $value = [Environment]::GetEnvironmentVariable('HOPCODE_VALIDATE_' + $name)
 >> "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo   if ($null -ne $value -and $value.IndexOfAny($unsafe) -ge 0) { exit 1 }
@@ -363,6 +415,7 @@ set "HOPCODE_VALIDATE_INSTALL_BASE="
 set "HOPCODE_VALIDATE_INSTALL_DIR="
 set "HOPCODE_VALIDATE_INSTALL_BIN_DIR="
 set "HOPCODE_VALIDATE_SOURCE="
+set "HOPCODE_VALIDATE_PATH_SCOPE="
 if %PS_STATUS% NEQ 0 (
     echo ERROR: installer options contain unsafe command characters.
     exit /b 1
@@ -413,6 +466,18 @@ echo ERROR: --mirror must be auto, github, or aliyun.
 exit /b 1
 
 :validate_mirror_ok
+if "!REPAIR_PATH!"=="0" goto validate_repair_path_ok
+if "!REPAIR_PATH!"=="1" goto validate_repair_path_ok
+echo ERROR: HOPCODE_INSTALL_REPAIR_PATH must be 0 or 1.
+exit /b 1
+
+:validate_repair_path_ok
+if /i "!PATH_SCOPE!"=="user" goto validate_path_scope_ok
+if /i "!PATH_SCOPE!"=="machine" goto validate_path_scope_ok
+echo ERROR: --path-scope must be user or machine.
+exit /b 1
+
+:validate_path_scope_ok
 call :ValidateHttpsUrlVar "BASE_URL" "--base-url"
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
@@ -490,7 +555,7 @@ exit /b 0
 
 :GithubBaseUrlForVersion
 rem args: %~1=version_path  → sets HOPCODE_GH_BASE_URL
-set "HOPCODE_GH_REPO=TaimoorSiddiquiOfficial/HopCode"
+set "HOPCODE_GH_REPO=QwenLM/hopcode"
 if defined HOPCODE_INSTALL_GITHUB_REPO set "HOPCODE_GH_REPO=!HOPCODE_INSTALL_GITHUB_REPO!"
 if /i "%~1"=="latest" (
     set "HOPCODE_GH_BASE_URL=https://github.com/!HOPCODE_GH_REPO!/releases/latest/download"
@@ -502,11 +567,11 @@ exit /b 0
 
 :AliyunBaseUrlForVersion
 rem args: %~1=version_path  → sets HOPCODE_OSS_BASE_URL
-set "HOPCODE_OSS_BASE_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/%~1"
+set "HOPCODE_OSS_BASE_URL=https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/%~1"
 exit /b 0
 
 :AliyunLatestVersionUrl
-set "HOPCODE_OSS_LATEST_VERSION_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/latest/VERSION"
+set "HOPCODE_OSS_LATEST_VERSION_URL=https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode/latest/VERSION"
 exit /b 0
 
 :RaceMirrorHead
@@ -547,11 +612,11 @@ if /i "!MIRROR!"=="auto" (
     )
     call :RaceMirrorHead 2 "!HOPCODE_GH_BASE_URL!/SHA256SUMS" "!HOPCODE_OSS_PROBE_URL!"
     if /i "!HOPCODE_RACE_RESULT!"=="timeout" (
-        echo INFO: Mirror auto-selection timed out; defaulting to github.
+        REM Mirror auto-selection timed out; defaulting to github.
         set "MIRROR=github"
     ) else (
         set "MIRROR=!HOPCODE_RACE_RESULT!"
-        echo INFO: Mirror auto-selected via HEAD probe: !HOPCODE_RACE_RESULT!
+        REM Mirror auto-selected: !HOPCODE_RACE_RESULT!
     )
     set "HOPCODE_GH_BASE_URL="
     set "HOPCODE_OSS_BASE_URL="
@@ -584,24 +649,26 @@ set "GITHUB_FALLBACK_BASE_URL="
 set "MIRROR=github"
 exit /b 0
 
-:MaybeUpdateUserPath
+:MaybeUpdatePath
 rem args: %~1=install_bin_dir
-rem Prepend the install dir to the user-level PATH (HKCU\Environment) via
+rem Prepend the install dir to the selected PATH scope via
 rem [Environment]::SetEnvironmentVariable. Idempotent: skips if the dir is
-rem already on the user PATH. Uses PowerShell rather than `setx` because setx
+rem already on PATH. Uses PowerShell rather than `setx` because setx
 rem truncates PATH at 1024 chars, which can silently mangle long PATHs.
 set "HOPCODE_NEW_BIN=%~1"
 if "!HOPCODE_NEW_BIN!"=="" exit /b 0
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$bin = $env:HOPCODE_NEW_BIN; $userPath = [Environment]::GetEnvironmentVariable('Path', 'User'); if ([string]::IsNullOrEmpty($userPath)) { $userPath = '' }; $entries = $userPath -split ';' | Where-Object { $_ -ne '' }; if ($entries -contains $bin) { Write-Output ('INFO: User PATH already contains ' + $bin + ' (skipping).'); exit 0 }; $newPath = (@($bin) + $entries) -join ';'; [Environment]::SetEnvironmentVariable('Path', $newPath, 'User'); Write-Output ('SUCCESS: Prepended ' + $bin + ' to your user PATH.'); Write-Output 'INFO: Open a NEW command prompt for the change to take effect.'"
+set "HOPCODE_PATH_SCOPE=!PATH_SCOPE!"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; try { $bin = $env:HOPCODE_NEW_BIN; $scope = $env:HOPCODE_PATH_SCOPE; $target = if ($scope -ieq 'machine') { 'Machine' } else { 'User' }; $pathValue = [Environment]::GetEnvironmentVariable('Path', $target); if ([string]::IsNullOrEmpty($pathValue)) { $pathValue = '' }; $entries = @($pathValue -split ';' | Where-Object { $_ -ne '' }); $remaining = @($entries | Where-Object { -not [string]::Equals($_, $bin, [StringComparison]::OrdinalIgnoreCase) }); if ($entries.Count -gt 0 -and [string]::Equals($entries[0], $bin, [StringComparison]::OrdinalIgnoreCase) -and $remaining.Count -eq ($entries.Count - 1)) { exit 0 }; $newPath = (@($bin) + $remaining) -join ';'; [Environment]::SetEnvironmentVariable('Path', $newPath, $target); exit 0 } catch { exit 1 }"
 set "PS_STATUS=%ERRORLEVEL%"
 set "HOPCODE_NEW_BIN="
+set "HOPCODE_PATH_SCOPE="
 exit /b %PS_STATUS%
 
 :UrlExists
 set "HOPCODE_CHECK_URL=%~1"
 rem Prefer Tls12+Tls13; fall back to Tls12 alone on older .NET Framework where the Tls13 enum is missing.
 rem AllowAutoRedirect=true is required for GitHub release asset URLs which return HTTP 302.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Test-HopcodeUrl($method, $range) { try { $request = [Net.WebRequest]::Create($env:HOPCODE_CHECK_URL); $request.Timeout = 10000; $request.Method = $method; if ($range) { $request.Headers.Add('Range', 'bytes=0-0') }; if ($request -is [Net.HttpWebRequest]) { $request.ReadWriteTimeout = 30000; $request.AllowAutoRedirect = $true }; $response = $request.GetResponse(); $response.Close(); return $true } catch { return $false } }; if (Test-HopcodeUrl 'HEAD' $false) { exit 0 }; if (Test-HopcodeUrl 'GET' $true) { exit 0 }; exit 1" >nul 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Test-QwenUrl($method, $range) { try { $request = [Net.WebRequest]::Create($env:HOPCODE_CHECK_URL); $request.Timeout = 10000; $request.Method = $method; if ($range) { $request.Headers.Add('Range', 'bytes=0-0') }; if ($request -is [Net.HttpWebRequest]) { $request.ReadWriteTimeout = 30000; $request.AllowAutoRedirect = $true }; $response = $request.GetResponse(); $response.Close(); return $true } catch { return $false } }; if (Test-QwenUrl 'HEAD' $false) { exit 0 }; if (Test-QwenUrl 'GET' $true) { exit 0 }; exit 1" >nul 2>&1
 set "PS_STATUS=%ERRORLEVEL%"
 set "HOPCODE_CHECK_URL="
 exit /b %PS_STATUS%
@@ -611,7 +678,8 @@ set "HOPCODE_DOWNLOAD_URL=%~1"
 set "HOPCODE_DOWNLOAD_DEST=%~2"
 rem Prefer curl.exe -# for a hash-mark progress bar (Windows 10+ includes it);
 rem fall back to Invoke-WebRequest (which shows its own progress bar).
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $curl = $env:HOPCODE_INSTALL_CURL_EXE; if ([string]::IsNullOrEmpty($curl)) { $cmd = Get-Command curl.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -ne $cmd) { $curl = $cmd.Source } }; if (-not [string]::IsNullOrEmpty($curl)) { & $curl --connect-timeout 15 --max-time 300 --retry 2 -#fSLo $env:HOPCODE_DOWNLOAD_DEST $env:HOPCODE_DOWNLOAD_URL; if ($LASTEXITCODE -ne 0) { throw ('curl.exe download failed (exit code ' + $LASTEXITCODE + ')') }; exit 0 }; try { try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; Invoke-WebRequest -Uri $env:HOPCODE_DOWNLOAD_URL -OutFile $env:HOPCODE_DOWNLOAD_DEST -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 300; exit 0 } catch { [Console]::Error.WriteLine('Download error: ' + $_.Exception.Message); exit 1 }"
+rem Progress output is suppressed (-s overrides -#) because PrintProgressComplete provides the visual.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $curl = $env:HOPCODE_INSTALL_CURL_EXE; if ([string]::IsNullOrEmpty($curl)) { $cmd = Get-Command curl.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -ne $cmd) { $curl = $cmd.Source } }; if (-not [string]::IsNullOrEmpty($curl)) { & $curl --connect-timeout 15 --max-time 300 --retry 2 -#fSLo $env:HOPCODE_DOWNLOAD_DEST $env:HOPCODE_DOWNLOAD_URL -s --show-error; if ($LASTEXITCODE -ne 0) { throw ('curl.exe download failed (exit code ' + $LASTEXITCODE + ')') }; exit 0 }; try { $ProgressPreference = 'SilentlyContinue'; try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; Invoke-WebRequest -Uri $env:HOPCODE_DOWNLOAD_URL -OutFile $env:HOPCODE_DOWNLOAD_DEST -UseBasicParsing -MaximumRedirection 10 -TimeoutSec 300; exit 0 } catch { [Console]::Error.WriteLine('Download error: ' + $_.Exception.Message); exit 1 }"
 set "PS_STATUS=%ERRORLEVEL%"
 set "HOPCODE_DOWNLOAD_URL="
 set "HOPCODE_DOWNLOAD_DEST="
@@ -634,7 +702,7 @@ if /i not "%~1"=="latest" (
 )
 
 call :AliyunLatestVersionUrl
-call :CreateTempFile "hopcode-code-latest-version"
+call :CreateTempFile "hopcode-latest-version"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 set "TEMP_VERSION_FILE=!TEMP_FILE!"
 
@@ -667,7 +735,7 @@ if "!RESOLVED_VERSION_PATH!"=="" (
     exit /b 1
 )
 
-echo INFO: Resolved Aliyun latest to !RESOLVED_VERSION_PATH!.
+REM Resolved Aliyun latest to !RESOLVED_VERSION_PATH!
 exit /b 0
 
 :VerifyChecksum
@@ -680,10 +748,10 @@ if "!CHECKSUM_FILE!"=="" (
     for %%I in ("!ARCHIVE_FILE!") do set "CHECKSUM_FILE=%%~dpISHA256SUMS"
 ) else (
     if /i "!CHECKSUM_FILE:~0,8!"=="https://" (
-        call :CreateTempFile "hopcode-code-checksums"
+        call :CreateTempFile "hopcode-checksums"
         if !ERRORLEVEL! NEQ 0 exit /b 1
         set "TEMP_CHECKSUM=!TEMP_FILE!"
-        call :DownloadFile "!CHECKSUM_FILE!" "!TEMP_CHECKSUM!"
+        call :DownloadFileQuiet "!CHECKSUM_FILE!" "!TEMP_CHECKSUM!"
         if !ERRORLEVEL! NEQ 0 (
             if exist "!TEMP_CHECKSUM!" del /F /Q "!TEMP_CHECKSUM!" >nul 2>&1
             echo ERROR: Could not download SHA256SUMS for checksum verification.
@@ -715,14 +783,11 @@ if "!EXPECTED_HASH!"=="" (
 )
 
 set "ACTUAL_HASH="
-set "_CERTUTIL_LINES=0"
-for /f "skip=1 tokens=* delims=" %%H in ('certutil -hashfile "!ARCHIVE_FILE!" SHA256 2^>nul') do (
-    if "!_CERTUTIL_LINES!"=="0" (
-        set "ACTUAL_HASH=%%H"
-        set "_CERTUTIL_LINES=1"
-    )
+set "HOPCODE_HASH_FILE=!ARCHIVE_FILE!"
+for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; (Get-FileHash -Algorithm SHA256 -LiteralPath $env:HOPCODE_HASH_FILE).Hash" 2^>nul') do (
+    if "!ACTUAL_HASH!"=="" set "ACTUAL_HASH=%%H"
 )
-set "_CERTUTIL_LINES="
+set "HOPCODE_HASH_FILE="
 
 if not "!TEMP_CHECKSUM!"=="" del /F /Q "!TEMP_CHECKSUM!" >nul 2>&1
 
@@ -736,7 +801,7 @@ if /i not "!EXPECTED_HASH!"=="!ACTUAL_HASH!" (
     exit /b 1
 )
 
-echo SUCCESS: Checksum verified for !ARCHIVE_NAME!.
+REM Checksum verified for !ARCHIVE_NAME!
 exit /b 0
 
 :InstallStandalone
@@ -823,7 +888,6 @@ if not "!ARCHIVE_PATH!"=="" (
         if exist "!ARCHIVE_FILE!" del /F /Q "!ARCHIVE_FILE!" >nul 2>&1
         echo WARNING: Aliyun standalone archive download failed; retrying GitHub mirror.
         call :UseGithubFallbackBaseUrl
-        echo Downloading !ARCHIVE_NAME!
         call :DownloadFile "!ARCHIVE_URL!" "!ARCHIVE_FILE!"
         set "DOWNLOAD_STATUS=!ERRORLEVEL!"
     )
@@ -833,6 +897,7 @@ if not "!ARCHIVE_PATH!"=="" (
         if /i "!METHOD!"=="detect" exit /b 2
         exit /b 1
     )
+    call :PrintProgressComplete
 )
 
 if "!TEMP_DIR!"=="" (
@@ -983,7 +1048,7 @@ if !ERRORLEVEL! NEQ 0 (
     call :RemoveInstalledDirWithWarning
     call :RestoreOldInstall
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 move /Y "!INSTALL_BIN_DIR!\hopcode.cmd.new" "!INSTALL_BIN_DIR!\hopcode.cmd" >nul
@@ -992,7 +1057,7 @@ if !ERRORLEVEL! NEQ 0 (
     call :RemoveInstalledDirWithWarning
     call :RestoreOldInstall
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 
@@ -1005,8 +1070,36 @@ set "PATH=!INSTALL_BIN_DIR!;!PATH!"
 call :CreateSourceJson
 if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
 
-echo SUCCESS: HopCode standalone archive installed successfully.
-echo INFO: Installed to !INSTALL_DIR!
+REM Standalone archive installed to !INSTALL_DIR!
+exit /b 0
+
+:RepairPath
+set "INSTALLED_BIN=!INSTALL_BIN_DIR!\hopcode.cmd"
+if not exist "!INSTALLED_BIN!" (
+    echo ERROR: HopCode standalone wrapper was not found:
+    echo   !INSTALLED_BIN!
+    echo ERROR: Set HOPCODE_INSTALL_ROOT or HOPCODE_INSTALL_BIN_DIR to the existing install, or install HopCode first.
+    exit /b 1
+)
+
+set "PATH=!INSTALL_BIN_DIR!;!PATH!"
+if /i not "!NO_MODIFY_PATH!"=="1" (
+    call :MaybeUpdatePath "!INSTALL_BIN_DIR!"
+    if !ERRORLEVEL! NEQ 0 (
+        echo ERROR: Failed to update !PATH_SCOPE! PATH. Run as administrator for --path-scope machine, or add this directory manually:
+        echo   !INSTALL_BIN_DIR!
+        exit /b 1
+    )
+)
+
+set "INSTALLED_VERSION=unknown"
+for /f "delims=" %%i in ('"!INSTALLED_BIN!" --version 2^>nul') do set "INSTALLED_VERSION=%%i"
+
+echo.
+echo HopCode !INSTALLED_VERSION! is already installed.
+echo PATH repaired for !PATH_SCOPE! scope:
+echo   !INSTALL_BIN_DIR!
+echo.
 exit /b 0
 
 :CreateTempDir
@@ -1053,7 +1146,7 @@ REM with backslash separators even though the ZIP spec requires '/'. We
 REM accept either separator and reject only entries that, after
 REM normalization, are empty, absolute, drive-rooted, or contain a '..'
 REM segment.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $archive = $null; try { Add-Type -AssemblyName System.IO.Compression.FileSystem; $archive = [IO.Compression.ZipFile]::OpenRead($env:HOPCODE_ARCHIVE_FILE); foreach ($entry in $archive.Entries) { $raw = $entry.FullName; if ($raw.IndexOfAny([char[]](10,13)) -ge 0) { [Console]::Error.WriteLine('Archive contains unsafe path with control character: ' + $raw); exit 1 }; $name = $raw -replace '\\', '/'; while ($name.StartsWith('./')) { $name = $name.Substring(2) }; if ($name -eq '' -or $name.StartsWith('/') -or $name -match '^[A-Za-z]:' -or $name -match '(^|/)\.\.(/|$)') { [Console]::Error.WriteLine('Archive contains unsafe path: ' + $entry.FullName); exit 1 } } } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 } finally { if ($null -ne $archive) { $archive.Dispose() } }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $archive = $null; try { Add-Type -AssemblyName System.IO.Compression.FileSystem; $archive = [IO.Compression.ZipFile]::OpenRead($env:HOPCODE_ARCHIVE_FILE); if ($archive.Entries.Count -eq 0) { [Console]::Error.WriteLine('Archive is empty: ' + $env:HOPCODE_ARCHIVE_FILE); exit 3 }; foreach ($entry in $archive.Entries) { $raw = $entry.FullName; if ($raw.IndexOfAny([char[]](10,13)) -ge 0) { [Console]::Error.WriteLine('Archive contains unsafe path with control character: ' + $raw); exit 1 }; $name = $raw -replace '\\', '/'; while ($name.StartsWith('./')) { $name = $name.Substring(2) }; if ($name -eq '' -or $name.StartsWith('/') -or $name -match '^[A-Za-z]:' -or $name -match '(^|/)\.\.(/|$)') { [Console]::Error.WriteLine('Archive contains unsafe path: ' + $entry.FullName); exit 1 } } } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 } finally { if ($null -ne $archive) { $archive.Dispose() } }"
 set "PS_STATUS=%ERRORLEVEL%"
 set "HOPCODE_ARCHIVE_FILE="
 if %PS_STATUS% EQU 0 exit /b 0
@@ -1063,6 +1156,10 @@ if %PS_STATUS% EQU 1 (
 )
 if %PS_STATUS% EQU 2 (
     echo ERROR: Archive could not be inspected before extraction.
+    exit /b 1
+)
+if %PS_STATUS% EQU 3 (
+    echo ERROR: Archive is empty: %~1
     exit /b 1
 )
 echo ERROR: Archive validation failed before extraction.
@@ -1106,7 +1203,7 @@ exit /b %PS_STATUS%
 :EnsureManagedInstallDir
 set "MANAGED_DIR=%~1"
 set "HOPCODE_MANAGED_DIR=!MANAGED_DIR!"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = $env:HOPCODE_MANAGED_DIR; if (!(Test-Path -LiteralPath $dir)) { exit 0 }; if (!(Test-Path -LiteralPath $dir -PathType Container)) { exit 1 }; $manifest = Join-Path $dir 'manifest.json'; if (!(Test-Path -LiteralPath $manifest -PathType Leaf)) { exit 1 }; try { $data = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json } catch { exit 1 }; if ($data.name -ne '@hoptrendy/hopcode-cli') { exit 1 }; if ([string]$data.target -notmatch '^win-(x64|arm64)$') { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'bin\hopcode.cmd') -PathType Leaf)) { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'node\node.exe') -PathType Leaf)) { exit 1 }; exit 0"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $dir = $env:HOPCODE_MANAGED_DIR; if (!(Test-Path -LiteralPath $dir)) { exit 0 }; if (!(Test-Path -LiteralPath $dir -PathType Container)) { exit 1 }; $manifest = Join-Path $dir 'manifest.json'; if (!(Test-Path -LiteralPath $manifest -PathType Leaf)) { exit 1 }; try { $data = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json } catch { exit 1 }; if ($data.name -ne '@hopcode/hopcode') { exit 1 }; if ([string]$data.target -notmatch '^win-(x64|arm64)$') { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'bin\hopcode.cmd') -PathType Leaf)) { exit 1 }; if (!(Test-Path -LiteralPath (Join-Path $dir 'node\node.exe') -PathType Leaf)) { exit 1 }; exit 0"
 set "PS_STATUS=!ERRORLEVEL!"
 set "HOPCODE_MANAGED_DIR="
 if !PS_STATUS! EQU 0 exit /b 0
@@ -1116,8 +1213,7 @@ rem Back it up so the user doesn't lose data, then proceed.
 for /f "delims=" %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMddTHHmmss"') do set "BACKUP_TIMESTAMP=%%t"
 set "BACKUP_DIR=!MANAGED_DIR!.backup.!BACKUP_TIMESTAMP!"
 if "!BACKUP_TIMESTAMP!"=="" set "BACKUP_DIR=!MANAGED_DIR!.backup"
-echo WARNING: !MANAGED_DIR! exists but is not a HopCode standalone install.
-echo WARNING: Backing up to !BACKUP_DIR!
+rem Silently back up existing directory
 move /Y "!MANAGED_DIR!" "!BACKUP_DIR!" >nul
 if !ERRORLEVEL! NEQ 0 (
     echo ERROR: Failed to back up !MANAGED_DIR!. Move or remove it manually, then rerun the installer.
@@ -1156,27 +1252,26 @@ if %NODE_MAJOR_NUM% LSS 22 (
     exit /b 1
 )
 
-echo SUCCESS: Node.js %NODE_VERSION% detected.
+REM Node.js %NODE_VERSION% detected.
 exit /b 0
 
 :RequireNpm
 where npm >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: npm was not found.
-    echo Please install Node.js with npm included, then rerun this installer.
+    echo ERROR: npm was not found. Install Node.js with npm from https://nodejs.org/
     exit /b 1
 )
 
 for /f "delims=" %%i in ('npm -v 2^>nul') do set "NPM_VERSION=%%i"
-echo SUCCESS: npm %NPM_VERSION% detected.
+REM npm %NPM_VERSION% detected.
 exit /b 0
 
 :NpmPackageSpec
-set "NPM_PACKAGE_SPEC=@hoptrendy/hopcode-cli@latest"
+set "NPM_PACKAGE_SPEC=@hopcode/hopcode@latest"
 if /i "!VERSION!"=="latest" exit /b 0
 set "NPM_VERSION_SPEC=!VERSION!"
 if /i "!NPM_VERSION_SPEC:~0,1!"=="v" set "NPM_VERSION_SPEC=!NPM_VERSION_SPEC:~1!"
-set "NPM_PACKAGE_SPEC=@hoptrendy/hopcode-cli@!NPM_VERSION_SPEC!"
+set "NPM_PACKAGE_SPEC=@hopcode/hopcode@!NPM_VERSION_SPEC!"
 exit /b 0
 
 :InstallNpm
@@ -1188,29 +1283,11 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 
 call :NpmPackageSpec
 
-where hopcode >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "HOPCODE_VERSION=%%i"
-    echo INFO: Existing HopCode detected: !HOPCODE_VERSION!
-    if /i "!VERSION!"=="latest" (
-        echo INFO: Upgrading to the latest version.
-    ) else (
-        echo INFO: Installing requested version !VERSION!.
-    )
-)
-
-echo INFO: Running: npm install -g !NPM_PACKAGE_SPEC! --registry !NPM_REGISTRY!
 call npm install -g !NPM_PACKAGE_SPEC! --registry "!NPM_REGISTRY!"
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to install HopCode.
-    echo.
-    echo This installer does not change your npm prefix or PATH.
-    echo If the failure is a permission error, fix your npm global package directory, then run:
-    echo   npm install -g !NPM_PACKAGE_SPEC! --registry !NPM_REGISTRY!
+    echo ERROR: Failed to install. Try: npm install -g !NPM_PACKAGE_SPEC! --registry !NPM_REGISTRY!
     exit /b 1
 )
-
-echo SUCCESS: HopCode installed successfully.
 call :CreateSourceJson
 exit /b 0
 
@@ -1227,14 +1304,14 @@ echo   "source": "!SOURCE!"
 echo }
 ) > "!HOPCODE_DIR!\source.json"
 
-echo SUCCESS: Installation source saved to !USERPROFILE!\.hopcode\source.json
 exit /b 0
 
 :PrintFinalInstructions
 set "EXTRA_BIN=%~1"
 set "SUMMARY_INSTALL_DIR=%~2"
 set "SUMMARY_INSTALL_METHOD=%~3"
-set "STANDALONE_UNINSTALL_URL=https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1"
+set "STANDALONE_UNINSTALL_URL=https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1"
+set "PATH_UPDATE_APPLIED=0"
 if "!SUMMARY_INSTALL_METHOD!"=="" set "SUMMARY_INSTALL_METHOD=standalone"
 
 set "INSTALLED_BIN="
@@ -1250,77 +1327,27 @@ if not "!INSTALLED_BIN!"=="" if exist "!INSTALLED_BIN!" (
     for /f "delims=" %%i in ('"!INSTALLED_BIN!" --version 2^>nul') do set "INSTALLED_VERSION=%%i"
 )
 
-echo HOPCODE
-echo.
-echo HopCode !INSTALLED_VERSION! installed successfully.
-echo.
-echo To start:
-echo   cd ^<project^>
-echo   hopcode
-
-if not "!SUMMARY_INSTALL_DIR!"=="" (
-    echo.
-    echo Installed to:
-    echo   !SUMMARY_INSTALL_DIR!
-)
-
-echo.
-echo Uninstall:
-if /i "!SUMMARY_INSTALL_METHOD!"=="npm" (
-    echo   npm uninstall -g @hoptrendy/hopcode-cli
-) else (
-    if not "!SUMMARY_INSTALL_DIR!"=="" (
-        if not "!EXTRA_BIN!"=="" (
-            echo   set "HOPCODE_INSTALL_LIB_DIR=!SUMMARY_INSTALL_DIR!" ^&^& set "HOPCODE_INSTALL_BIN_DIR=!EXTRA_BIN!" ^&^& powershell -ExecutionPolicy Bypass -c "irm !STANDALONE_UNINSTALL_URL! ^| iex"
-        ) else (
-            echo   powershell -ExecutionPolicy Bypass -c "irm !STANDALONE_UNINSTALL_URL! ^| iex"
-        )
-    ) else (
-        echo   powershell -ExecutionPolicy Bypass -c "irm !STANDALONE_UNINSTALL_URL! ^| iex"
-    )
-)
-
-rem Build OTHER_HOPCODES = PRE_INSTALL_HOPCODES_LIST minus the install we just made.
-set "OTHER_HOPCODES="
-if defined PRE_INSTALL_HOPCODES_LIST (
-    for %%i in ("!PRE_INSTALL_HOPCODES_LIST:|=" "!") do (
-        set "ENTRY=%%~i"
-        if not "!ENTRY!"=="" if /i not "!ENTRY!"=="!INSTALLED_BIN!" (
-            if "!OTHER_HOPCODES!"=="" (
-                set "OTHER_HOPCODES=!ENTRY!"
-            ) else (
-                set "OTHER_HOPCODES=!OTHER_HOPCODES!|!ENTRY!"
-            )
-        )
-    )
-)
-
-rem Persist the install bin to user PATH unless --no-modify-path is set.
+rem Persist the install bin to PATH unless --no-modify-path is set.
 if not "!EXTRA_BIN!"=="" if /i not "!NO_MODIFY_PATH!"=="1" (
-    call :MaybeUpdateUserPath "!EXTRA_BIN!"
+    call :MaybeUpdatePath "!EXTRA_BIN!"
     if !ERRORLEVEL! NEQ 0 (
-        echo WARNING: Failed to update user PATH. Add the directory manually:
+        echo WARNING: Failed to update !PATH_SCOPE! PATH. Add the directory manually:
         echo   !EXTRA_BIN!
+    ) else (
+        set "PATH_UPDATE_APPLIED=1"
     )
 )
 
-if defined OTHER_HOPCODES (
-    echo.
-    echo WARNING: Other 'hopcode' executables exist on this system. Depending on
-    echo WARNING: your PATH order, one of these may run instead of the install above:
-    for %%i in ("!OTHER_HOPCODES:|=" "!") do (
-        set "OQ=%%~i"
-        if not "!OQ!"=="" echo WARNING:   !OQ!
-    )
-    echo.
-    echo To make this install take priority, restart your command prompt.
-    echo Or invoke directly: "!INSTALLED_BIN!"
-    exit /b 0
-)
+echo.
+echo HopCode !INSTALLED_VERSION! installed successfully, to start:
+echo.
+echo   cd ^<project^>
+echo   qwen
+echo.
+echo For more information visit https://github.com/QwenLM/hopcode
 
 if /i "!HOPCODE_INSTALLER_PARENT_POWERSHELL!"=="1" (
-    echo INFO: Final PATH refresh is handled by the PowerShell entrypoint.
+    REM Final PATH refresh is handled by the PowerShell entrypoint.
     exit /b 0
 )
-echo hopcode is ready to use in this terminal.
 exit /b 0

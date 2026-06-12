@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 hopcode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +26,6 @@ function makeEnv(): NodeJS.ProcessEnv {
   delete env['NO_COLOR'];
   return {
     ...env,
-    hopcode_ENABLE_CRON: '1',
     FORCE_COLOR: '1',
     TERM: 'xterm-256color',
     NODE_NO_WARNINGS: '1',

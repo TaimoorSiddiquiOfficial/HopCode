@@ -7,8 +7,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AuthDialog } from './AuthDialog.js';
 import { LoadedSettings } from '../../config/settings.js';
-import type { Config } from '@hoptrendy/hopcode-core';
-import { AuthType } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
+import { AuthType } from '@hopcode/hopcode-core';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { UIStateContext } from '../contexts/UIStateContext.js';
 import { UIActionsContext } from '../contexts/UIActionsContext.js';
@@ -1456,7 +1456,7 @@ describe('AuthDialog Custom API Key Wizard', { timeout: 15000 }, () => {
         stdin,
         lastFrame,
         'sk-test-key-12345',
-        'qwen/qwen3-coder,gpt-4.1',
+        'hopcode/qwen3-coder,gpt-4.1',
       );
       await pressEnterAndWaitFor(
         stdin,
@@ -1470,7 +1470,7 @@ describe('AuthDialog Custom API Key Wizard', { timeout: 15000 }, () => {
           expect(frame).toContain('Custom Provider · Step 6/6 · Review');
           expect(frame).toContain('The following JSON will be saved');
           expect(frame).toContain('HOPCODE_CUSTOM_API_KEY_');
-          expect(frame).toContain('qwen/qwen3-coder');
+          expect(frame).toContain('hopcode/qwen3-coder');
           expect(frame).toContain('gpt-4.1');
           expect(frame).toContain('Enter to save');
         },

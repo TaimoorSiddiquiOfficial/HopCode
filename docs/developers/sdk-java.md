@@ -1,4 +1,4 @@
-﻿# HopCode Java SDK
+# HopCode Java SDK
 
 The HopCode Java SDK is a minimum experimental SDK for programmatic access to HopCode functionality. It provides a Java interface to interact with the HopCode CLI, allowing developers to integrate HopCode capabilities into their Java applications.
 
@@ -124,7 +124,7 @@ public static void runStreamingExample() {
 }
 ```
 
-other examples see src/test/java/com/alibaba/qwen/code/cli/example
+other examples see src/test/java/com/alibaba/hopcode/code/cli/example
 
 ## Architecture
 
@@ -282,9 +282,9 @@ The SDK provides specific exception types for different error scenarios:
 
 ## FAQ / Troubleshooting
 
-### Q: Do I need to install the Qwen CLI separately?
+### Q: Do I need to install the hopcode CLI separately?
 
-A: yes, requires Qwen CLI 0.5.5 or higher.
+A: yes, requires hopcode CLI 0.5.5 or higher.
 
 ### Q: What Java versions are supported?
 

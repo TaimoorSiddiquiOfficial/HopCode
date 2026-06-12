@@ -6,7 +6,7 @@
 
 import { execSync } from 'node:child_process';
 import process from 'node:process';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 
 const debugLogger = createDebugLogger('THEME_DETECT');
 

@@ -27,7 +27,7 @@ import type {
   ApprovalMode,
   IdeInfo,
   SessionListItem,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { DOMElement } from 'ink';
 import type { SessionStatsState } from '../contexts/SessionContext.js';
 import type { ExtensionUpdateState } from '../state/extensions.js';
@@ -159,12 +159,15 @@ export interface UIState {
   // Subagent dialogs
   isSubagentCreateDialogOpen: boolean;
   isAgentsManagerDialogOpen: boolean;
+  // Skills manager dialog (`/skills`)
+  isSkillsManagerDialogOpen: boolean;
   // Extensions manager dialog
   isExtensionsManagerDialogOpen: boolean;
   // MCP dialog
   isMcpDialogOpen: boolean;
   // Hooks dialog
   isHooksDialogOpen: boolean;
+  isStatsDialogOpen: boolean;
   // Feedback dialog
   isFeedbackDialogOpen: boolean;
   // Per-task token tracking

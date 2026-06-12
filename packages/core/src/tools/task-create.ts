@@ -1,68 +1,120 @@
 /**
  * @license
- * Copyright 2026 HopCode Team (adapted from protoCLI)
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ToolInvocation, ToolResult } from './tools.js';
+/**
+ * task_create tool — create a new task in the team task list.
+ */
+
+import type {
+  ToolCallConfirmationDetails,
+  ToolInfoConfirmationDetails,
+  ToolInvocation,
+  ToolResult,
+} from './tools.js';
 import { BaseDeclarativeTool, BaseToolInvocation, Kind } from './tools.js';
 import { ToolNames, ToolDisplayNames } from './tool-names.js';
 import type { Config } from '../config/config.js';
-import type { TaskPriority } from '../services/task-store.js';
+import type { PermissionDecision } from '../permissions/types.js';
+import { resolveActiveTeamName } from '../agents/team/identity.js';
+import { createTask } from '../agents/team/tasks.js';
 
 export interface TaskCreateParams {
-  title: string;
-  description?: string;
-  parentTaskId?: string;
-  priority?: string;
+  subject: string;
+  description: string;
+  activeForm?: string;
+  metadata?: Record<string, unknown>;
 }
 
-class TaskCreateToolInvocation extends BaseToolInvocation<
+/** Cap on how much of a task description the confirmation dialog shows. */
+const CONFIRMATION_DESCRIPTION_LIMIT = 2000;
+
+/**
+ * Truncate a task description for the interactive confirmation dialog.
+ * Descriptions can be up to 10KB; the dialog needs enough to judge the
+ * instruction, not the whole payload.
+ */
+export function truncateForConfirmation(text: string): string {
+  if (text.length <= CONFIRMATION_DESCRIPTION_LIMIT) return text;
+  return (
+    `${text.slice(0, CONFIRMATION_DESCRIPTION_LIMIT)}\n` +
+    `… (${text.length - CONFIRMATION_DESCRIPTION_LIMIT} more characters)`
+  );
+}
+
+class TaskCreateInvocation extends BaseToolInvocation<
   TaskCreateParams,
   ToolResult
 > {
   constructor(
-    private readonly config: Config,
+    private config: Config,
     params: TaskCreateParams,
   ) {
     super(params);
   }
 
   getDescription(): string {
-    return `Create task: ${this.params.title}`;
+    return `Create task: ${this.params.subject}`;
   }
 
-  async execute(_signal: AbortSignal): Promise<ToolResult> {
-    const store = this.config.getTaskStore();
-    if (!store) {
-      return {
-        llmContent: 'Task store is not available.',
-        returnDisplay: 'Task store is not available.',
-        error: { message: 'Task store is not available.' },
-      };
-    }
-    const task = store.create({
-      title: this.params.title,
-      description: this.params.description,
-      parentTaskId: this.params.parentTaskId,
-      priority: this.params.priority as TaskPriority | undefined,
-    });
+  /**
+   * A task's `description` becomes the prompt an idle teammate auto-claims
+   * and executes with full tool access — the same privileged-sink shape as
+   * `send_message`, where free-form text turns into a new instruction for
+   * another agent. The base default `'allow'` short-circuits the classifier
+   * in AUTO mode, so override to `'ask'` to keep that injection path under
+   * the classifier / human-in-the-loop.
+   */
+  override async getDefaultPermission(): Promise<PermissionDecision> {
+    return 'ask';
+  }
 
-    const taskJson = JSON.stringify(task, null, 2);
-    return {
-      llmContent: `Task created successfully.\n\n<system-reminder>\nNew task: ${taskJson}\nUse task_update to mark progress.\n</system-reminder>`,
-      returnDisplay: {
-        type: 'todo_list',
-        todos: store.list().map((t) => ({
-          id: t.id,
-          content: t.title,
-          status:
-            t.status === 'blocked' || t.status === 'cancelled'
-              ? ('pending' as const)
-              : t.status,
-        })),
+  /**
+   * Unlike the one-line getDescription() used for transcript rendering,
+   * the confirmation prompt must show the instruction text itself: the
+   * `description` is what an idle teammate will auto-claim and execute
+   * with full tool access, so it is exactly what the human is approving.
+   */
+  override getConfirmationDetails(
+    _abortSignal: AbortSignal,
+  ): Promise<ToolCallConfirmationDetails> {
+    const details: ToolInfoConfirmationDetails = {
+      type: 'info',
+      title: 'Confirm TaskCreate',
+      prompt:
+        `Create task: ${this.params.subject}\n\n` +
+        truncateForConfirmation(this.params.description),
+      onConfirm: async () => {
+        // No-op: persistence is handled by coreToolScheduler via PM rules
       },
     };
+    return Promise.resolve(details);
+  }
+
+  async execute(): Promise<ToolResult> {
+    const teamName = resolveActiveTeamName(
+      this.config.getTeamContext()?.teamName,
+    );
+    if (!teamName) {
+      const msg = 'No active team. Create a team first.';
+      return {
+        llmContent: msg,
+        returnDisplay: msg,
+        error: { message: msg },
+      };
+    }
+
+    const task = await createTask(teamName, {
+      subject: this.params.subject,
+      description: this.params.description,
+      activeForm: this.params.activeForm,
+      metadata: this.params.metadata,
+    });
+
+    const llmContent = `Task #${task.id} created: "${task.subject}"`;
+    return { llmContent, returnDisplay: llmContent };
   }
 }
 
@@ -70,40 +122,41 @@ export class TaskCreateTool extends BaseDeclarativeTool<
   TaskCreateParams,
   ToolResult
 > {
-  static readonly Name: string = ToolNames.TASK_CREATE;
+  static readonly Name = ToolNames.TASK_CREATE;
 
-  constructor(private readonly config: Config) {
+  constructor(private config: Config) {
     super(
       TaskCreateTool.Name,
       ToolDisplayNames.TASK_CREATE,
-      'Creates a new task to track work. Use this to break complex work into trackable units before starting multi-step operations.',
-      Kind.Think,
+      'Create a new task in the team task list. ' +
+        'Tasks are automatically assigned to idle teammates.',
+      Kind.Other,
       {
         type: 'object',
         properties: {
-          title: {
+          subject: {
             type: 'string',
-            description: 'Short title describing the task.',
-            minLength: 1,
+            description: 'Short title for the task.',
+            maxLength: 200,
           },
           description: {
             type: 'string',
-            description:
-              'Optional longer description with details or acceptance criteria.',
+            description: 'Detailed description of the task.',
+            maxLength: 10000,
           },
-          parentTaskId: {
+          activeForm: {
             type: 'string',
+            maxLength: 200,
             description:
-              'Optional ID of a parent task, creating a subtask hierarchy.',
+              'Present tense label for UI ' + '(e.g., "Running tests").',
           },
-          priority: {
-            type: 'string',
-            enum: ['low', 'medium', 'high', 'critical'],
-            description: 'Optional priority level. Defaults to medium.',
+          metadata: {
+            type: 'object',
+            description: 'Optional arbitrary metadata.',
           },
         },
-        required: ['title'],
-        $schema: 'http://json-schema.org/draft-07/schema#',
+        required: ['subject', 'description'],
+        additionalProperties: false,
       },
     );
   }
@@ -111,6 +164,22 @@ export class TaskCreateTool extends BaseDeclarativeTool<
   protected createInvocation(
     params: TaskCreateParams,
   ): ToolInvocation<TaskCreateParams, ToolResult> {
-    return new TaskCreateToolInvocation(this.config, params);
+    return new TaskCreateInvocation(this.config, params);
+  }
+
+  /**
+   * Forward the task content to the classifier. The base sentinel `''`
+   * projects to an empty args object, so without this override the AUTO
+   * classifier rules on `task_create({})` — the injected payload that
+   * `getDefaultPermission() === 'ask'` exists to inspect would be
+   * invisible to it. Mirrors `send_message`'s projection.
+   */
+  override toAutoClassifierInput(
+    params: TaskCreateParams,
+  ): Record<string, unknown> {
+    return {
+      subject: params.subject,
+      description: params.description,
+    };
   }
 }

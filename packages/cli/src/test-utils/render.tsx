@@ -9,7 +9,7 @@
 import type React from 'react';
 import { EventEmitter } from 'node:events';
 import { render as inkRender } from 'ink';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import { LoadedSettings } from '../config/settings.js';
 import { KeypressProvider } from '../ui/contexts/KeypressContext.js';
 import { SettingsContext } from '../ui/contexts/SettingsContext.js';

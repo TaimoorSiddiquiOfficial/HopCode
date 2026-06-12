@@ -7,8 +7,8 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { ChatViewer } from '@hoptrendy/webui';
-import type { ChatMessageData } from '@hoptrendy/webui';
+import { ChatViewer } from '@hopcode/webui';
+import type { ChatMessageData } from '@hopcode/webui';
 import type { SessionMeta } from '../App.js';
 
 interface ChatRecord {

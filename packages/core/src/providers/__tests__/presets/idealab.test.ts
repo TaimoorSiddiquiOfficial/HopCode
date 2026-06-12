@@ -9,7 +9,7 @@ import {
   AuthType,
   idealabProvider,
   buildInstallPlan,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 describe('idealabProvider', () => {
   it('has correct provider config', () => {

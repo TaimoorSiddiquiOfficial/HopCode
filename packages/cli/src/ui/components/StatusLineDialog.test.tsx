@@ -7,7 +7,7 @@
 import { act } from 'react';
 import { render } from 'ink-testing-library';
 import { describe, expect, it, vi } from 'vitest';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -48,6 +48,7 @@ function createSettings(): LoadedSettings {
 const config = {
   getCliVersion: () => '1.2.3',
   getModel: () => 'qwen3-code-plus',
+  getModelDisplayName: () => 'Qwen3 Code Plus',
   getTargetDir: () => '/repo/project',
   getContentGeneratorConfig: () => ({
     contextWindowSize: 1000,
@@ -106,7 +107,7 @@ describe('StatusLineDialog', () => {
       frame.indexOf('current-dir'),
     );
     expect(lastFrame()).toContain('Preview');
-    expect(lastFrame()).toContain('qwen3-code-plus high');
+    expect(lastFrame()).toContain('Qwen3 Code Plus high');
   });
 
   it('persists selected presets on enter', async () => {
@@ -187,7 +188,7 @@ describe('StatusLineDialog', () => {
     await press(' ');
 
     expect(lastFrame()).toContain(
-      'qwen3-code-plus high | feature/pr-4087-statusline | Context 75% left',
+      'Qwen3 Code Plus high | feature/pr-4087-statusline | Context 75% left',
     );
 
     await press('\r');

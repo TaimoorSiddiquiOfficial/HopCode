@@ -14,7 +14,7 @@ import {
 import {
   getProjectSummaryPrompt,
   runSideQuery,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { HistoryItemSummary } from '../types.js';
 import { t } from '../../i18n/index.js';
 
@@ -72,7 +72,7 @@ export const summaryCommand: SlashCommand = {
 
     const getChatHistory = () => {
       const chat = geminiClient.getChat();
-      return chat.getHistory();
+      return chat.getHistoryShallow();
     };
 
     const validateChatHistory = (

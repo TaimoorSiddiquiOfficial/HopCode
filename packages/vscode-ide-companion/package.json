@@ -2,12 +2,12 @@
   "name": "hopcode-vscode-ide-companion",
   "displayName": "HopCode Companion",
   "description": "Enable HopCode with direct access to your VS Code workspace.",
-  "version": "0.30.1",
+  "version": "0.17.1",
   "publisher": "hopcode",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "url": "https://github.com/QwenLM/hopcode.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {
@@ -21,7 +21,7 @@
   "keywords": [
     "hopcode",
     "HopCode",
-    "HopCode",
+    "hopcode",
     "HopCode",
     "cli",
     "ide integration",
@@ -83,17 +83,17 @@
     },
     "languages": [
       {
-        "id": "hopcode-diff-editable"
+        "id": "qwen-diff-editable"
       }
     ],
     "commands": [
       {
-        "command": "HopCode.diff.accept",
+        "command": "qwen.diff.accept",
         "title": "HopCode: Accept Current Diff",
         "icon": "$(check)"
       },
       {
-        "command": "HopCode.diff.cancel",
+        "command": "qwen.diff.cancel",
         "title": "HopCode: Close Diff Editor",
         "icon": "$(close)"
       },
@@ -142,12 +142,12 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "HopCode.diff.accept",
-          "when": "HopCode.diff.isVisible"
+          "command": "qwen.diff.accept",
+          "when": "qwen.diff.isVisible"
         },
         {
-          "command": "HopCode.diff.cancel",
-          "when": "HopCode.diff.isVisible"
+          "command": "qwen.diff.cancel",
+          "when": "qwen.diff.isVisible"
         },
         {
           "command": "hopcode.auth"
@@ -184,13 +184,13 @@
       ],
       "editor/title": [
         {
-          "command": "HopCode.diff.accept",
-          "when": "HopCode.diff.isVisible",
+          "command": "qwen.diff.accept",
+          "when": "qwen.diff.isVisible",
           "group": "navigation"
         },
         {
-          "command": "HopCode.diff.cancel",
-          "when": "HopCode.diff.isVisible",
+          "command": "qwen.diff.cancel",
+          "when": "qwen.diff.isVisible",
           "group": "navigation"
         },
         {
@@ -252,14 +252,14 @@
     },
     "keybindings": [
       {
-        "command": "HopCode.diff.accept",
+        "command": "qwen.diff.accept",
         "key": "ctrl+s",
-        "when": "HopCode.diff.isVisible"
+        "when": "qwen.diff.isVisible"
       },
       {
-        "command": "HopCode.diff.accept",
+        "command": "qwen.diff.accept",
         "key": "cmd+s",
-        "when": "HopCode.diff.isVisible"
+        "when": "qwen.diff.isVisible"
       },
       {
         "command": "hopcode.focusChat",
@@ -298,6 +298,7 @@
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/vsce": "^3.9.2",
     "autoprefixer": "^10.4.22",
     "esbuild": "^0.25.3",
     "eslint": "^9.25.1",
@@ -310,9 +311,9 @@
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^0.14.1",
-    "@hoptrendy/sdk": "*",
-    "@hoptrendy/webui": "*",
-    "@modelcontextprotocol/sdk": "^1.25.1",
+    "@hopcode/sdk": "*",
+    "@hopcode/webui": "*",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "cors": "^2.8.5",
     "dotenv": "^17.1.0",
     "express": "^5.1.0",

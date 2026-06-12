@@ -7,7 +7,7 @@
 import { render } from 'ink-testing-library';
 import type { CompressionDisplayProps } from './CompressionMessage.js';
 import { CompressionMessage } from './CompressionMessage.js';
-import { CompressionStatus } from '@hoptrendy/hopcode-core';
+import { CompressionStatus } from '@hopcode/hopcode-core';
 import type { CompressionProps } from '../../types.js';
 import { describe, it, expect } from 'vitest';
 

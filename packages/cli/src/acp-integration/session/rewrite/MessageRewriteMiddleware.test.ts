@@ -6,10 +6,10 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { SessionUpdate } from '@agentclientprotocol/sdk';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 
 // Mock core to avoid Vite https resolution issue
-vi.mock('@hoptrendy/hopcode-core', () => ({
+vi.mock('@hopcode/hopcode-core', () => ({
   createDebugLogger: () => ({
     info: vi.fn(),
     warn: vi.fn(),
@@ -201,6 +201,52 @@ describe('MessageRewriteMiddleware', () => {
       ] as Record<string, unknown>;
       expect(meta['rewritten']).toBe(true);
       expect(meta['turnIndex']).toBe(1);
+    });
+
+    it('preserves background discrete metadata on rewritten messages', async () => {
+      const { middleware, mockSendUpdate } = createMiddleware('message');
+
+      await middleware.interceptUpdate({
+        sessionUpdate: 'agent_message_chunk',
+        content: { type: 'text', text: 'background response' },
+        _meta: {
+          source: 'background_notification_response',
+          hopcodeDiscreteMessage: true,
+          backgroundTask: {
+            taskId: 'monitor-1',
+            status: 'completed',
+            kind: 'monitor',
+            toolUseId: 'tool-1',
+          },
+          customTraceId: 'trace-1',
+        },
+      } as unknown as SessionUpdate);
+
+      await middleware.flushTurn();
+      await middleware.waitForPendingRewrites();
+
+      const rewriteCall = mockSendUpdate.mock.calls.find(
+        (call: unknown[]) =>
+          (
+            (call[0] as Record<string, unknown>)['_meta'] as
+              | Record<string, unknown>
+              | undefined
+          )?.['rewritten'] === true,
+      );
+      expect(rewriteCall).toBeDefined();
+      expect((rewriteCall![0] as Record<string, unknown>)['_meta']).toEqual({
+        source: 'background_notification_response',
+        hopcodeDiscreteMessage: true,
+        backgroundTask: {
+          taskId: 'monitor-1',
+          status: 'completed',
+          kind: 'monitor',
+          toolUseId: 'tool-1',
+        },
+        customTraceId: 'trace-1',
+        rewritten: true,
+        turnIndex: 1,
+      });
     });
   });
 

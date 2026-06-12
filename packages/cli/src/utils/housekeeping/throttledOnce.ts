@@ -6,7 +6,7 @@
 
 import { mkdir, open, stat, unlink, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 
 const debugLogger = createDebugLogger('HOUSEKEEPING');
 

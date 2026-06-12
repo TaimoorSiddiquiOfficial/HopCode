@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,6 +13,7 @@ import {
   APPROVAL_MODES,
   APPROVAL_MODE_INFO,
   MCPServerConfig,
+  TrustGateError,
 } from './config.js';
 import { Storage } from './storage.js';
 import * as fs from 'node:fs';
@@ -39,7 +40,6 @@ import {
   resolveContentGeneratorConfigWithSources,
 } from '../core/contentGenerator.js';
 import { GeminiClient } from '../core/client.js';
-import { GitService } from '../services/gitService.js';
 import { ShellTool } from '../tools/shell.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
 import { logRipgrepFallback } from '../telemetry/loggers.js';
@@ -49,6 +49,7 @@ import { ToolNames } from '../tools/tool-names.js';
 import { fireNotificationHook } from '../core/toolHookTriggers.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { loadServerHierarchicalMemory } from '../utils/memoryDiscovery.js';
+import type { LoadServerHierarchicalMemoryOptions } from '../utils/memoryDiscovery.js';
 import { readAutoMemoryIndex } from '../memory/store.js';
 import { ExtensionManager } from '../extension/extensionManager.js';
 import { SkillManager } from '../skills/skill-manager.js';
@@ -141,6 +142,7 @@ vi.mock('../utils/memoryDiscovery.js', () => ({
 
 vi.mock('../memory/store.js', () => ({
   readAutoMemoryIndex: vi.fn().mockResolvedValue(null),
+  readUserAutoMemoryIndex: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('../hooks/index.js', () => {
@@ -151,6 +153,29 @@ vi.mock('../hooks/index.js', () => {
   return {
     HookSystem: HookSystemMock,
     createHookOutput: vi.fn(),
+    createInstructionsLoadedCallback:
+      (
+        getHookSystem: () => {
+          fireInstructionsLoadedEvent?: (...args: unknown[]) => unknown;
+        },
+      ) =>
+      async (notification: {
+        filePath: string;
+        memoryType: string;
+        loadReason: string;
+        triggerFilePath?: string;
+        parentFilePath?: string;
+      }) => {
+        await getHookSystem()?.fireInstructionsLoadedEvent?.(
+          notification.filePath,
+          notification.memoryType,
+          notification.loadReason,
+          {
+            triggerFilePath: notification.triggerFilePath,
+            parentFilePath: notification.parentFilePath,
+          },
+        );
+      },
   };
 });
 
@@ -200,7 +225,7 @@ vi.mock('../tools/memory-config', () => ({
   getAllGeminiMdFilenames: vi.fn(() => ['HOPCODE.md', 'AGENTS.md']),
   DEFAULT_CONTEXT_FILENAME: 'HOPCODE.md',
   AGENT_CONTEXT_FILENAME: 'AGENTS.md',
-  MEMORY_SECTION_HEADER: '## HopCode Added Memories',
+  MEMORY_SECTION_HEADER: '## Qwen Added Memories',
 }));
 
 vi.mock('../core/contentGenerator.js');
@@ -234,12 +259,6 @@ vi.mock('../telemetry/loggers.js', async (importOriginal) => {
     ...actual,
     logRipgrepFallback: vi.fn(),
   };
-});
-
-vi.mock('../services/gitService.js', () => {
-  const GitServiceMock = vi.fn();
-  GitServiceMock.prototype.initialize = vi.fn();
-  return { GitService: GitServiceMock };
 });
 
 vi.mock('../skills/skill-manager.js', () => {
@@ -352,10 +371,9 @@ describe('Server Config (config.ts)', () => {
     (fs.unlinkSync as Mock).mockImplementation(() => undefined);
     (fs.readFileSync as Mock).mockImplementation(() => undefined);
     vi.mocked(isTelemetrySdkInitialized).mockReturnValue(false);
-    vi.spyOn(
-      HopCodeLogger.prototype,
-      'logStartSessionEvent',
-    ).mockImplementation(async () => undefined);
+    vi.spyOn(HopCodeLogger.prototype, 'logStartSessionEvent').mockImplementation(
+      async () => undefined,
+    );
 
     // Setup default mock for resolveContentGeneratorConfigWithSources
     vi.mocked(resolveContentGeneratorConfigWithSources).mockImplementation(
@@ -598,6 +616,9 @@ describe('Server Config (config.ts)', () => {
       mockMemoryRatio(0.85);
 
       config.getMemoryPressureMonitor()?.performCheck();
+      // Critical tier has 4 async steps, need enough microtask drains
+      for (let i = 0; i < 6; i++) await Promise.resolve();
+      await new Promise<void>((resolve) => setImmediate(resolve));
       await Promise.resolve();
 
       expect(gcSpy).toHaveBeenCalledTimes(1);
@@ -764,34 +785,9 @@ describe('Server Config (config.ts)', () => {
   });
 
   describe('initialize', () => {
-    it('should throw an error if checkpointing is enabled and GitService fails', async () => {
-      const gitError = new Error('Git is not installed');
-      (GitService.prototype.initialize as Mock).mockRejectedValue(gitError);
-
-      const config = new Config({
-        ...baseParams,
-        checkpointing: true,
-      });
-
-      await expect(config.initialize()).rejects.toThrow(gitError);
-    });
-
-    it('should not throw an error if checkpointing is disabled and GitService fails', async () => {
-      const gitError = new Error('Git is not installed');
-      (GitService.prototype.initialize as Mock).mockRejectedValue(gitError);
-
-      const config = new Config({
-        ...baseParams,
-        checkpointing: false,
-      });
-
-      await expect(config.initialize()).resolves.toBeUndefined();
-    });
-
     it('should throw an error if initialized more than once', async () => {
       const config = new Config({
         ...baseParams,
-        checkpointing: false,
       });
 
       await expect(config.initialize()).resolves.toBeUndefined();
@@ -807,7 +803,6 @@ describe('Server Config (config.ts)', () => {
 
       const config = new Config({
         ...baseParams,
-        checkpointing: false,
         bareMode: true,
       });
 
@@ -831,7 +826,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     it('skips inline MCP discovery by default (progressive availability)', async () => {
-      const config = new Config({ ...baseParams, checkpointing: false });
+      const config = new Config({ ...baseParams });
       await config.initialize();
 
       // Default path passes `skipDiscovery: true` to createToolRegistry,
@@ -840,11 +835,11 @@ describe('Server Config (config.ts)', () => {
       expect(ToolRegistry.prototype.discoverAllTools).not.toHaveBeenCalled();
     });
 
-    it('honors HOPCODE_LEGACY_MCP_BLOCKING=1 by running MCP discovery inline', async () => {
-      const originalLegacy = process.env['HOPCODE_LEGACY_MCP_BLOCKING'];
-      process.env['HOPCODE_LEGACY_MCP_BLOCKING'] = '1';
+    it('honors HOPCODE_CODE_LEGACY_MCP_BLOCKING=1 by running MCP discovery inline', async () => {
+      const originalLegacy = process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'];
+      process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'] = '1';
       try {
-        const config = new Config({ ...baseParams, checkpointing: false });
+        const config = new Config({ ...baseParams });
         await config.initialize();
 
         // Legacy escape hatch must call back into the synchronous discover
@@ -854,9 +849,9 @@ describe('Server Config (config.ts)', () => {
         );
       } finally {
         if (originalLegacy === undefined) {
-          delete process.env['HOPCODE_LEGACY_MCP_BLOCKING'];
+          delete process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'];
         } else {
-          process.env['HOPCODE_LEGACY_MCP_BLOCKING'] = originalLegacy;
+          process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'] = originalLegacy;
         }
       }
     });
@@ -865,7 +860,7 @@ describe('Server Config (config.ts)', () => {
       // No MCP servers + non-bare + default mode: startMcpDiscoveryInBackground
       // is called but the registry mock returns no manager, so the discovery
       // promise stays undefined and waitForMcpReady is a no-op.
-      const config = new Config({ ...baseParams, checkpointing: false });
+      const config = new Config({ ...baseParams });
       await config.initialize();
       await expect(config.waitForMcpReady()).resolves.toBeUndefined();
     });
@@ -875,7 +870,7 @@ describe('Server Config (config.ts)', () => {
       // failed to start" emission. Must be a no-op when there's nothing
       // to warn about, otherwise --prompt runs with no MCP config would
       // emit a spurious warning every time.
-      const config = new Config({ ...baseParams, checkpointing: false });
+      const config = new Config({ ...baseParams });
       expect(config.getFailedMcpServerNames()).toEqual([]);
     });
 
@@ -886,7 +881,6 @@ describe('Server Config (config.ts)', () => {
       // `excludedMcpServers` (see `isMcpServerDisabled`).
       const config = new Config({
         ...baseParams,
-        checkpointing: false,
         mcpServers: { off: new MCPServerConfig() },
         excludedMcpServers: ['off'],
       } as ConfigParameters);
@@ -1384,6 +1378,21 @@ describe('Server Config (config.ts)', () => {
     expect(config.getUserMemory()).toBe('');
   });
 
+  it('Config constructor should enable runtime sleep prevention by default', () => {
+    const config = new Config(baseParams);
+
+    expect(config.getPreventSystemSleepEnabled()).toBe(true);
+  });
+
+  it('Config constructor should store runtime sleep prevention override', () => {
+    const config = new Config({
+      ...baseParams,
+      preventSystemSleep: false,
+    });
+
+    expect(config.getPreventSystemSleepEnabled()).toBe(false);
+  });
+
   it('refreshHierarchicalMemory should append managed auto-memory index when present', async () => {
     const config = new Config(baseParams);
 
@@ -1441,7 +1450,7 @@ describe('Server Config (config.ts)', () => {
     await config.refreshHierarchicalMemory();
 
     const lastCall = vi.mocked(loadServerHierarchicalMemory).mock.calls.at(-1);
-    expect(lastCall?.at(-1)).toEqual({ explicitOnly: true });
+    expect(lastCall?.at(-1)).toMatchObject({ explicitOnly: true });
     expect(lastCall?.[1]).toEqual([]);
     expect(readAutoMemoryIndex).not.toHaveBeenCalled();
     expect(config.getUserMemory()).toContain('Project rules');
@@ -1469,7 +1478,49 @@ describe('Server Config (config.ts)', () => {
 
     const lastCall = vi.mocked(loadServerHierarchicalMemory).mock.calls.at(-1);
     expect(lastCall?.[1]).toEqual([explicitDir]);
-    expect(lastCall?.at(-1)).toEqual({ explicitOnly: true });
+    expect(lastCall?.at(-1)).toMatchObject({ explicitOnly: true });
+  });
+
+  it('refreshHierarchicalMemory should fire InstructionsLoaded hooks from memory notifications', async () => {
+    const config = new Config(baseParams);
+    const fireInstructionsLoadedEvent = vi.fn().mockResolvedValue(undefined);
+    config['hookSystem'] = {
+      fireInstructionsLoadedEvent,
+    } as unknown as HookSystem;
+
+    vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
+      fileCount: 1,
+      ruleCount: 0,
+      conditionalRules: [],
+      projectRoot: '/tmp',
+    });
+
+    await config.refreshHierarchicalMemory();
+
+    const lastCall = vi.mocked(loadServerHierarchicalMemory).mock.calls.at(-1);
+    const options = lastCall?.at(-1) as
+      | LoadServerHierarchicalMemoryOptions
+      | undefined;
+    expect(options?.onInstructionsLoaded).toEqual(expect.any(Function));
+
+    await options?.onInstructionsLoaded?.({
+      filePath: '/tmp/project/HOPCODE.md',
+      memoryType: 'project',
+      loadReason: 'include',
+      triggerFilePath: '/tmp/project/AGENTS.md',
+      parentFilePath: '/tmp/project/AGENTS.md',
+    });
+
+    expect(fireInstructionsLoadedEvent).toHaveBeenCalledWith(
+      '/tmp/project/HOPCODE.md',
+      'project',
+      'include',
+      {
+        triggerFilePath: '/tmp/project/AGENTS.md',
+        parentFilePath: '/tmp/project/AGENTS.md',
+      },
+    );
   });
 
   it('Config constructor should call setGeminiMdFilename with contextFileName if provided', () => {
@@ -1605,9 +1656,7 @@ describe('Server Config (config.ts)', () => {
       });
       await config.initialize();
 
-      expect(
-        HopCodeLogger.prototype.logStartSessionEvent,
-      ).toHaveBeenCalledOnce();
+      expect(HopCodeLogger.prototype.logStartSessionEvent).toHaveBeenCalledOnce();
     });
   });
 
@@ -2466,17 +2515,28 @@ describe('setApprovalMode with folder trust', () => {
     cwd: '.',
   };
 
-  it('should throw an error when setting IZN mode in an untrusted folder', () => {
+  it('should throw a TrustGateError when setting IZN mode in an untrusted folder', () => {
+    // #4297 fold-in 1 (16:32:44-round S3): assert on the typed class,
+    // not just message text. The 403 mapping in `serve/server.ts`
+    // matches `err instanceof TrustGateError`; an accidental revert
+    // to `throw new Error(...)` would silently downgrade to 500
+    // while the message text test kept passing.
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
+    expect(() => config.setApprovalMode(ApprovalMode.IZN)).toThrow(
+      TrustGateError,
+    );
     expect(() => config.setApprovalMode(ApprovalMode.IZN)).toThrow(
       'Cannot enable privileged approval modes in an untrusted folder.',
     );
   });
 
-  it('should throw an error when setting AUTO_EDIT mode in an untrusted folder', () => {
+  it('should throw a TrustGateError when setting AUTO_EDIT mode in an untrusted folder', () => {
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
+    expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).toThrow(
+      TrustGateError,
+    );
     expect(() => config.setApprovalMode(ApprovalMode.AUTO_EDIT)).toThrow(
       'Cannot enable privileged approval modes in an untrusted folder.',
     );
@@ -2645,9 +2705,9 @@ describe('setApprovalMode with folder trust', () => {
     it('AUTO appears in APPROVAL_MODES between AUTO_EDIT and IZN', () => {
       const autoEditIdx = APPROVAL_MODES.indexOf(ApprovalMode.AUTO_EDIT);
       const autoIdx = APPROVAL_MODES.indexOf(ApprovalMode.AUTO);
-      const iznIdx = APPROVAL_MODES.indexOf(ApprovalMode.IZN);
+      const yoloIdx = APPROVAL_MODES.indexOf(ApprovalMode.IZN);
       expect(autoIdx).toBeGreaterThan(autoEditIdx);
-      expect(autoIdx).toBeLessThan(iznIdx);
+      expect(autoIdx).toBeLessThan(yoloIdx);
     });
 
     it('APPROVAL_MODE_INFO has an entry for AUTO', () => {
@@ -2665,11 +2725,20 @@ describe('setApprovalMode with folder trust', () => {
       expect(config.getAutoModeSettings()).toEqual({});
     });
 
-    it('returns the provided autoMode hints and environment', () => {
+    it('returns the provided autoMode classifier settings, hints, and environment', () => {
       const config = new Config({
         ...baseParams,
         permissions: {
           autoMode: {
+            classifier: {
+              timeouts: {
+                stage1Ms: 12_345,
+                stage2Ms: 67_890,
+              },
+              thinking: {
+                stage2Enabled: true,
+              },
+            },
             hints: {
               allow: ['Allow xyz commands'],
               deny: ['Block intranet calls'],
@@ -2679,6 +2748,15 @@ describe('setApprovalMode with folder trust', () => {
         },
       });
       expect(config.getAutoModeSettings()).toEqual({
+        classifier: {
+          timeouts: {
+            stage1Ms: 12_345,
+            stage2Ms: 67_890,
+          },
+          thinking: {
+            stage2Enabled: true,
+          },
+        },
         hints: {
           allow: ['Allow xyz commands'],
           deny: ['Block intranet calls'],
@@ -3188,6 +3266,68 @@ describe('setApprovalMode with folder trust', () => {
   });
 });
 
+describe('disabledTools runtime sync (#4282 fold-in 5 P2-2 / #4297 fold-in 5)', () => {
+  const baseParams: ConfigParameters = {
+    targetDir: '.',
+    debugMode: false,
+    model: 'test-model',
+    cwd: '.',
+  };
+
+  it('initializes from `disabledTools` ConfigParameters', () => {
+    const config = new Config({
+      ...baseParams,
+      disabledTools: ['Foo', 'Bar'],
+    });
+    expect(config.getDisabledTools()).toEqual(new Set(['Foo', 'Bar']));
+  });
+
+  it('defaults to an empty set when `disabledTools` is omitted', () => {
+    const config = new Config(baseParams);
+    expect(config.getDisabledTools()).toEqual(new Set());
+  });
+
+  it('setDisabledTools replaces the live snapshot for runtime sync', () => {
+    // The daemon's `acpAgent` MCP-restart handler calls
+    // `setDisabledTools(new Set(disabledList))` after re-reading
+    // workspace settings, so a `tools.disabled` toggle applied
+    // since this Config was constructed takes effect on the next
+    // `ToolRegistry.registerTool` call. Pin that contract so a
+    // future regression that drops the setter (or re-freezes the
+    // field) fails this test instead of silently re-enabling
+    // tools the user just disabled.
+    const config = new Config({
+      ...baseParams,
+      disabledTools: ['A', 'B'],
+    });
+    expect(config.getDisabledTools()).toEqual(new Set(['A', 'B']));
+    config.setDisabledTools(new Set(['B', 'C']));
+    expect(config.getDisabledTools()).toEqual(new Set(['B', 'C']));
+  });
+
+  it('setDisabledTools copies the input — caller mutations do not leak', () => {
+    // The setter constructs a fresh `new Set(disabled)` from the
+    // input, so a caller that holds a reference to the input set
+    // and later mutates it cannot retroactively change the live
+    // Config snapshot. Locks this defensive-copy contract.
+    const config = new Config(baseParams);
+    const liveInput = new Set(['X']);
+    config.setDisabledTools(liveInput);
+    liveInput.add('Y');
+    expect(config.getDisabledTools()).toEqual(new Set(['X']));
+    expect(config.getDisabledTools().has('Y')).toBe(false);
+  });
+
+  it('setDisabledTools accepts an empty set (clears the live snapshot)', () => {
+    const config = new Config({
+      ...baseParams,
+      disabledTools: ['A', 'B'],
+    });
+    config.setDisabledTools(new Set());
+    expect(config.getDisabledTools()).toEqual(new Set());
+  });
+});
+
 describe('BaseLlmClient Lifecycle', () => {
   const MODEL = 'gemini-pro';
   const SANDBOX: SandboxConfig = {
@@ -3286,7 +3426,7 @@ describe('Model Switching and Config Updates', () => {
 
     // Switch to a different model with different token limits
     const newConfig: ContentGeneratorConfig = {
-      ['model']: 'hopcode-max',
+      ['model']: 'qwen-max',
       ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,
@@ -3316,7 +3456,7 @@ describe('Model Switching and Config Updates', () => {
 
     // Verify all fields are updated
     const updatedConfig = config.getContentGeneratorConfig();
-    expect(updatedConfig['model']).toBe('hopcode-max');
+    expect(updatedConfig['model']).toBe('qwen-max');
     expect(updatedConfig['contextWindowSize']).toBe(128_000);
     expect(updatedConfig['samplingParams']?.temperature).toBe(0.8);
     expect(updatedConfig['enableCacheControl']).toBe(false);
@@ -3403,7 +3543,7 @@ describe('Model Switching and Config Updates', () => {
 
     // Switch to model with defined limits
     const newConfig: ContentGeneratorConfig = {
-      ['model']: 'hopcode-max',
+      ['model']: 'qwen-max',
       ['authType']: AuthType.HOPCODE_OAUTH,
       ['apiKey']: 'test-key',
       ['contextWindowSize']: 128_000,
@@ -3562,6 +3702,144 @@ describe('Model Switching and Config Updates', () => {
           expect(config.getModel()).toBe(baseParams.model);
         },
       );
+    });
+  });
+
+  describe('Config runtime MCP overlay', () => {
+    it('addRuntimeMcpServer does not mutate this.mcpServers', () => {
+      const config = new Config({
+        ...baseParams,
+        mcpServers: {
+          'settings-server': new MCPServerConfig('cmd-a'),
+        },
+      });
+      // Simulate post-init state
+      (config as unknown as { initialized: boolean }).initialized = true;
+      config.addRuntimeMcpServer(
+        'runtime-server',
+        new MCPServerConfig('cmd-b'),
+      );
+      const settingsLayer = (
+        config as unknown as {
+          mcpServers: Record<string, MCPServerConfig>;
+        }
+      ).mcpServers;
+      expect(Object.keys(settingsLayer)).toEqual(['settings-server']);
+      expect(settingsLayer['runtime-server']).toBeUndefined();
+    });
+
+    it('removeRuntimeMcpServer returns false when name not present', () => {
+      const config = new Config(baseParams);
+      expect(config.removeRuntimeMcpServer('does-not-exist')).toBe(false);
+    });
+
+    it('removeRuntimeMcpServer returns true and drops the entry', () => {
+      const config = new Config(baseParams);
+      (config as unknown as { initialized: boolean }).initialized = true;
+      config.addRuntimeMcpServer('x', new MCPServerConfig('cmd'));
+      expect(config.removeRuntimeMcpServer('x')).toBe(true);
+      expect(config.removeRuntimeMcpServer('x')).toBe(false);
+    });
+  });
+
+  describe('getMcpServers cascade with runtime overlay', () => {
+    it('runtime layer overlays settings layer (last write wins)', () => {
+      const config = new Config({
+        ...baseParams,
+        mcpServers: {
+          shared: new MCPServerConfig('settings-cmd'),
+        },
+      });
+      (config as unknown as { initialized: boolean }).initialized = true;
+      config.addRuntimeMcpServer('shared', new MCPServerConfig('runtime-cmd'));
+      const merged = config.getMcpServers();
+      expect(merged!['shared'].command).toBe('runtime-cmd');
+    });
+
+    it('runtime-only entries appear in cascade', () => {
+      const config = new Config({ ...baseParams, mcpServers: {} });
+      (config as unknown as { initialized: boolean }).initialized = true;
+      config.addRuntimeMcpServer('only-runtime', new MCPServerConfig('cmd'));
+      const merged = config.getMcpServers();
+      expect(merged!['only-runtime']).toBeDefined();
+    });
+
+    it('removing runtime entry restores settings entry', () => {
+      const config = new Config({
+        ...baseParams,
+        mcpServers: {
+          shared: new MCPServerConfig('settings-cmd'),
+        },
+      });
+      (config as unknown as { initialized: boolean }).initialized = true;
+      config.addRuntimeMcpServer('shared', new MCPServerConfig('runtime-cmd'));
+      expect(config.getMcpServers()!['shared'].command).toBe('runtime-cmd');
+      config.removeRuntimeMcpServer('shared');
+      expect(config.getMcpServers()!['shared'].command).toBe('settings-cmd');
+    });
+
+    it('isMcpServerDisabled still flags runtime entries when excluded', () => {
+      const config = new Config({ ...baseParams });
+      (config as unknown as { initialized: boolean }).initialized = true;
+      config.addRuntimeMcpServer('blocked', new MCPServerConfig('cmd'));
+      config.setExcludedMcpServers(['blocked']);
+      // The entry appears in getMcpServers (UI layer filters via isMcpServerDisabled)
+      expect(config.getMcpServers()!['blocked']).toBeDefined();
+      expect(config.isMcpServerDisabled('blocked')).toBe(true);
+    });
+  });
+
+  describe('getModelDisplayName', () => {
+    it('should return resolved name when model is in registry', () => {
+      const config = new Config({
+        ...baseParams,
+        authType: AuthType.USE_OPENAI,
+        model: 'gpt-4o',
+        modelProvidersConfig: {
+          [AuthType.USE_OPENAI]: [
+            {
+              id: 'gpt-4o',
+              name: 'GPT-4o',
+              baseUrl: 'https://api.openai.example.com/v1',
+              envKey: 'OPENAI_API_KEY',
+            },
+          ],
+        },
+      });
+
+      expect(config.getModelDisplayName()).toBe('GPT-4o');
+    });
+
+    it('should return raw modelId when model is not in registry', () => {
+      const config = new Config({
+        ...baseParams,
+        authType: AuthType.USE_OPENAI,
+        model: 'custom-runtime-model',
+        modelProvidersConfig: {
+          [AuthType.USE_OPENAI]: [
+            {
+              id: 'gpt-4o',
+              name: 'GPT-4o',
+              baseUrl: 'https://api.openai.example.com/v1',
+              envKey: 'OPENAI_API_KEY',
+            },
+          ],
+        },
+      });
+
+      expect(config.getModelDisplayName()).toBe('custom-runtime-model');
+    });
+
+    it('should return raw modelId when currentAuthType is falsy', () => {
+      const config = new Config({
+        ...baseParams,
+        model: 'some-model',
+        // authType is not set
+      });
+
+      // getModel() returns 'some-model', getModelDisplayName returns it as-is
+      // because currentAuthType is falsy
+      expect(config.getModelDisplayName()).toBe('some-model');
     });
   });
 });

@@ -1,11 +1,11 @@
-﻿/**
+/**
  * @license
  * Copyright 2025-2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import { InputFormat } from '@hoptrendy/hopcode-core';
+import { InputFormat } from '@hopcode/hopcode-core';
 import { createMinimalSettings } from '../../../config/settings.js';
 import type { StreamJsonOutputAdapter } from '../../io/StreamJsonOutputAdapter.js';
 import type { IControlContext } from '../ControlContext.js';

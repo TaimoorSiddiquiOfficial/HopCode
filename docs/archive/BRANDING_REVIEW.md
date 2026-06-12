@@ -1,4 +1,4 @@
-﻿# HopCode Visual Branding Review & Strategy
+# HopCode Visual Branding Review & Strategy
 
 **Document Version:** 1.0  
 **Created:** 2026-04-18  
@@ -28,7 +28,7 @@ This document provides a comprehensive review of all visual branding assets in t
 
 #### Current Logo Analysis
 
-**The existing logo is a geometric "Q" letterform** - fundamentally tied to the "Qwen" name and **CANNOT be reused** for HopCode.
+**The existing logo is a geometric "Q" letterform** - fundamentally tied to the "hopcode" name and **CANNOT be reused** for HopCode.
 
 **SVG Path Data (current Q logo):**
 
@@ -540,7 +540,7 @@ Minimum clear space = height of "H" in HopCode logo
 ❌ Don't add effects (shadows, gradients, outlines)  
 ❌ Don't rotate at angles  
 ❌ Don't place on busy backgrounds  
-❌ Don't use outdated "Qwen" logo
+❌ Don't use outdated "hopcode" logo
 
 ---
 

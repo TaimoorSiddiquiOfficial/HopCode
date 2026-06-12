@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,9 +27,16 @@ export const EVENT_IDE_CONNECTION = 'hopcode.ide_connection';
 export const EVENT_CHAT_COMPRESSION = 'hopcode.chat_compression';
 export const EVENT_INVALID_CHUNK = 'hopcode.chat.invalid_chunk';
 export const EVENT_CONTENT_RETRY = 'hopcode.chat.content_retry';
-export const EVENT_CONTENT_RETRY_FAILURE = 'hopcode.chat.content_retry_failure';
+export const EVENT_CONTENT_RETRY_FAILURE =
+  'hopcode.chat.content_retry_failure';
+// Phase 4b — HTTP-status retry telemetry emitted by `retryWithBackoff` for
+// 429 / 5xx errors at LLM call sites. Distinct from EVENT_CONTENT_RETRY,
+// which is fired by geminiChat for InvalidStreamError retries on a separate
+// retry budget. See docs/design/telemetry-llm-request-timing-design.md.
+export const EVENT_API_RETRY = 'hopcode.api_retry';
 export const EVENT_CONVERSATION_FINISHED = 'hopcode.conversation_finished';
-export const EVENT_MALFORMED_JSON_RESPONSE = 'hopcode.malformed_json_response';
+export const EVENT_MALFORMED_JSON_RESPONSE =
+  'hopcode.malformed_json_response';
 export const EVENT_FILE_OPERATION = 'hopcode.file_operation';
 export const EVENT_MODEL_SLASH_COMMAND = 'hopcode.slash_command.model';
 export const EVENT_SUBAGENT_EXECUTION = 'hopcode.subagent_execution';
@@ -66,3 +73,10 @@ export const SPAN_TOOL_EXECUTION = 'hopcode.tool.execution';
 export const SPAN_TOOL_BLOCKED_ON_USER = 'hopcode.tool.blocked_on_user';
 /** Wraps each pre/post-tool-use hook fire site for per-hook latency / decision tracking. */
 export const SPAN_HOOK = 'hopcode.hook';
+/**
+ * Wraps a single subagent invocation. Parents the LLM/tool/hook spans the
+ * subagent emits, so concurrent subagents (parallel AGENT tool calls) get
+ * isolated subtrees instead of interleaving under the parent interaction
+ * (#3731 Phase 3).
+ */
+export const SPAN_SUBAGENT = 'hopcode.subagent';

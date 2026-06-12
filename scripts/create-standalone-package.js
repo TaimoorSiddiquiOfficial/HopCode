@@ -513,7 +513,7 @@ function writeManifest(packageRoot, manifest) {
     manifestPath,
     JSON.stringify(
       {
-        name: '@hoptrendy/hopcode-cli',
+        name: '@hopcode/hopcode',
         version: manifest.version,
         target: manifest.target,
         nodeArchive: manifest.nodeArchive,
@@ -610,4 +610,4 @@ function fail(message) {
   throw new Error(`Error: ${message}`);
 }
 
-export { writeSha256Sums };
+export { TARGETS, writeSha256Sums };

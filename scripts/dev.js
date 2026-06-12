@@ -71,7 +71,7 @@ import { pathToFileURL } from 'node:url';
 const coreSourceUrl = '${coreSourceUrl}';
 
 export function resolve(specifier, context, nextResolve) {
-  if (specifier === '@hoptrendy/hopcode-core') {
+  if (specifier === '@hopcode/hopcode-core') {
     return {
       shortCircuit: true,
       url: coreSourceUrl,
@@ -109,24 +109,27 @@ const env = {
 
 // On Windows, use tsx.cmd; on Unix, use tsx directly
 const isWin = platform() === 'win32';
-const localTsxCmd = join(
-  root,
-  'node_modules',
-  '.bin',
-  isWin ? 'tsx.cmd' : 'tsx',
-);
-const tsxCmd = existsSync(localTsxCmd)
-  ? localTsxCmd
-  : isWin
-    ? 'tsx.cmd'
-    : 'tsx';
-const tsxArgs = [cliEntry, ...process.argv.slice(2)];
+const tsxBinName = isWin ? 'tsx.cmd' : 'tsx';
+const localTsxCli = join(root, 'node_modules', 'tsx', 'dist', 'cli.mjs');
+const localTsxCmd = join(root, 'node_modules', '.bin', tsxBinName);
+const hasLocalTsxCli = existsSync(localTsxCli);
+const tsxCmd = hasLocalTsxCli
+  ? process.execPath
+  : existsSync(localTsxCmd)
+    ? localTsxCmd
+    : tsxBinName;
+const tsxArgs = [
+  ...(hasLocalTsxCli ? [localTsxCli] : []),
+  cliEntry,
+  ...process.argv.slice(2),
+];
+const useShell = isWin && !hasLocalTsxCli;
 
 const child = spawn(tsxCmd, tsxArgs, {
   stdio: 'inherit',
   env,
   cwd: process.cwd(),
-  shell: isWin, // Use shell on Windows to resolve .cmd files
+  shell: useShell, // Needed only when falling back to tsx.cmd on Windows.
 });
 
 child.on('error', (err) => {

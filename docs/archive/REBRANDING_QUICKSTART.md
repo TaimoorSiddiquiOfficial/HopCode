@@ -282,7 +282,7 @@ grep -r "@hopcode" packages/ --include="*.ts"
 {
   "compilerOptions": {
     "paths": {
-      "@hoptrendy/*": ["packages/*/src"]
+      "@hopcode/*": ["packages/*/src"]
     }
   }
 }
@@ -314,7 +314,7 @@ git clean -fd
 
 ## Post-Rebranding Checklist
 
-- [ ] All `@hopcode/*` packages renamed to `@hoptrendy/*`
+- [ ] All `@hopcode/*` packages renamed to `@hopcode/*`
 - [ ] CLI command changed from `hopcode` to `hopcode`
 - [ ] Config directory updated to `.hopcode/`
 - [ ] Environment variables updated to `HOPCODE_*`

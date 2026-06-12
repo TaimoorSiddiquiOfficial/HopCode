@@ -61,9 +61,9 @@ const vscodeMock = vi.hoisted(() => {
 });
 
 vi.mock('vscode', () => vscodeMock);
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     FileDiscoveryService: class {

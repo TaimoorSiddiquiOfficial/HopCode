@@ -333,7 +333,7 @@ Notes:
 │                                                              │
 │ Enter one or more model IDs, separated by commas.            │
 │                                                              │
-│ Model IDs: qwen/qwen3-coder,openai/gpt-4.1_                  │
+│ Model IDs: hopcode/qwen3-coder,openai/gpt-4.1_                  │
 │                                                              │
 │ Enter to continue, Esc to go back                            │
 └──────────────────────────────────────────────────────────────┘
@@ -357,10 +357,10 @@ Example:
 
 ```text
 Input:
-qwen/qwen3-coder, openai/gpt-4.1, qwen/qwen3-coder
+hopcode/qwen3-coder, openai/gpt-4.1, hopcode/qwen3-coder
 
 Normalized:
-qwen/qwen3-coder, openai/gpt-4.1
+hopcode/qwen3-coder, openai/gpt-4.1
 ```
 
 ### Step 5: Review JSON
@@ -377,16 +377,16 @@ OpenAI-compatible example:
 │                                                              │
 │ {                                                            │
 │   "env": {                                                   │
-│     "QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1":│
+│     "HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1":│
 │       "sk-••••••••••••••••"                                  │
 │   },                                                         │
 │   "modelProviders": {                                        │
 │     "openai": [                                              │
 │       {                                                      │
-│         "id": "qwen/qwen3-coder",                           │
-│         "name": "qwen/qwen3-coder",                         │
+│         "id": "hopcode/qwen3-coder",                           │
+│         "name": "hopcode/qwen3-coder",                         │
 │         "baseUrl": "https://openrouter.ai/api/v1",          │
-│         "envKey": "QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1"│
+│         "envKey": "HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1"│
 │       }                                                      │
 │     ]                                                        │
 │   },                                                         │
@@ -396,7 +396,7 @@ OpenAI-compatible example:
 │     }                                                        │
 │   },                                                         │
 │   "model": {                                                 │
-│     "name": "qwen/qwen3-coder"                              │
+│     "name": "hopcode/qwen3-coder"                              │
 │   }                                                          │
 │ }                                                            │
 │                                                              │
@@ -409,7 +409,7 @@ Anthropic-compatible example:
 ```json
 {
   "env": {
-    "QWEN_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_ANTHROPIC_COM_V1": "sk-••••"
+    "HOPCODE_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_ANTHROPIC_COM_V1": "sk-••••"
   },
   "modelProviders": {
     "anthropic": [
@@ -417,7 +417,7 @@ Anthropic-compatible example:
         "id": "claude-sonnet-4-5",
         "name": "claude-sonnet-4-5",
         "baseUrl": "https://api.anthropic.com/v1",
-        "envKey": "QWEN_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_ANTHROPIC_COM_V1"
+        "envKey": "HOPCODE_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_ANTHROPIC_COM_V1"
       }
     ]
   },
@@ -488,7 +488,7 @@ Qwen-managed API keys are stored in `settings.json.env`, so the env key should b
 ### Format
 
 ```text
-QWEN_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
+HOPCODE_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
 ```
 
 Including the protocol avoids collisions when the same endpoint is used under different protocol adapters.
@@ -498,23 +498,23 @@ Including the protocol avoids collisions when the same endpoint is used under di
 ```text
 Protocol: openai
 Base URL: https://api.openai.com/v1
--> QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_API_OPENAI_COM_V1
+-> HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_API_OPENAI_COM_V1
 
 Protocol: openai
 Base URL: https://openrouter.ai/api/v1
--> QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1
+-> HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1
 
 Protocol: anthropic
 Base URL: https://api.anthropic.com/v1
--> QWEN_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_ANTHROPIC_COM_V1
+-> HOPCODE_CUSTOM_API_KEY_ANTHROPIC_HTTPS_API_ANTHROPIC_COM_V1
 
 Protocol: gemini
 Base URL: https://generativelanguage.googleapis.com
--> QWEN_CUSTOM_API_KEY_GEMINI_HTTPS_GENERATIVELANGUAGE_GOOGLEAPIS_COM
+-> HOPCODE_CUSTOM_API_KEY_GEMINI_HTTPS_GENERATIVELANGUAGE_GOOGLEAPIS_COM
 
 Protocol: openai
 Base URL: http://localhost:11434/v1
--> QWEN_CUSTOM_API_KEY_OPENAI_HTTP_LOCALHOST_11434_V1
+-> HOPCODE_CUSTOM_API_KEY_OPENAI_HTTP_LOCALHOST_11434_V1
 ```
 
 ### Normalization rule
@@ -532,7 +532,7 @@ baseUrl
   -> collapse consecutive _ characters
   -> remove leading/trailing _
 
-return QWEN_CUSTOM_API_KEY_${NORMALIZED_PROTOCOL}_${NORMALIZED_BASE_URL}
+return HOPCODE_CUSTOM_API_KEY_${NORMALIZED_PROTOCOL}_${NORMALIZED_BASE_URL}
 ```
 
 Pseudo-code:
@@ -547,7 +547,7 @@ function generateCustomApiKeyEnvKey(protocol: string, baseUrl: string): string {
       .replace(/_+/g, '_')
       .replace(/^_+|_+$/g, '');
 
-  return `QWEN_CUSTOM_API_KEY_${normalize(protocol)}_${normalize(baseUrl)}`;
+  return `HOPCODE_CUSTOM_API_KEY_${normalize(protocol)}_${normalize(baseUrl)}`;
 }
 ```
 
@@ -559,7 +559,7 @@ Given user input:
 Protocol: openai
 Base URL: https://openrouter.ai/api/v1
 API key: sk-or-v1-xxx
-Model IDs: qwen/qwen3-coder,openai/gpt-4.1
+Model IDs: hopcode/qwen3-coder,openai/gpt-4.1
 ```
 
 The wizard should produce:
@@ -567,21 +567,21 @@ The wizard should produce:
 ```json
 {
   "env": {
-    "QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1": "sk-or-v1-xxx"
+    "HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1": "sk-or-v1-xxx"
   },
   "modelProviders": {
     "openai": [
       {
-        "id": "qwen/qwen3-coder",
-        "name": "qwen/qwen3-coder",
+        "id": "hopcode/qwen3-coder",
+        "name": "hopcode/qwen3-coder",
         "baseUrl": "https://openrouter.ai/api/v1",
-        "envKey": "QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1"
+        "envKey": "HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1"
       },
       {
         "id": "openai/gpt-4.1",
         "name": "openai/gpt-4.1",
         "baseUrl": "https://openrouter.ai/api/v1",
-        "envKey": "QWEN_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1"
+        "envKey": "HOPCODE_CUSTOM_API_KEY_OPENAI_HTTPS_OPENROUTER_AI_API_V1"
       }
     ]
   },
@@ -591,7 +591,7 @@ The wizard should produce:
     }
   },
   "model": {
-    "name": "qwen/qwen3-coder"
+    "name": "hopcode/qwen3-coder"
   }
 }
 ```
@@ -641,7 +641,7 @@ This ensures `refreshAuth(selectedProtocol)` can use the newly entered key in th
 For the generated env key:
 
 ```text
-generatedEnvKey = QWEN_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
+generatedEnvKey = HOPCODE_CUSTOM_API_KEY_${PROTOCOL}_${NORMALIZED_BASE_URL}
 ```
 
 Update `modelProviders[selectedProtocol]` as follows:

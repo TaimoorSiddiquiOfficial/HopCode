@@ -5,7 +5,7 @@
  */
 
 /**
- * Browser-safe subset of @hoptrendy/hopcode-core tokenLimits.
+ * Browser-safe subset of @hopcode/hopcode-core tokenLimits.
  *
  * The webview bundle (IIFE, platform: browser) cannot `require` Node.js
  * packages. This module replicates the constants and logic the webview
@@ -112,7 +112,7 @@ const INPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^coder-model$/, LIMITS['1m']],
   [/^qwen3-max/, LIMITS['256k']],
   [/^qwen3-coder-/, LIMITS['256k']],
-  [/^qwen/, LIMITS['256k']],
+  [/^hopcode/, LIMITS['256k']],
 
   // DeepSeek
   [/^deepseek/, LIMITS['128k']],
@@ -150,7 +150,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
 
   [/^qwen3\.\d/, LIMITS['64k']],
   [/^coder-model$/, LIMITS['64k']],
-  [/^qwen/, LIMITS['32k']],
+  [/^hopcode/, LIMITS['32k']],
 
   [/^deepseek-reasoner/, LIMITS['64k']],
   [/^deepseek-r1/, LIMITS['64k']],
@@ -172,7 +172,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
  * Return the token limit for a given model name.
  *
  * This is a browser-safe mirror of `tokenLimit()` in
- * `@hoptrendy/hopcode-core`. The webview only calls this as a fallback
+ * `@hopcode/hopcode-core`. The webview only calls this as a fallback
  * when `modelInfo._meta.contextLimit` is unavailable.
  *
  * @param model - The model identifier string

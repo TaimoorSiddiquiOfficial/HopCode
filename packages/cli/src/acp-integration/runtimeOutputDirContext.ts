@@ -1,4 +1,4 @@
-import { Storage } from '@hoptrendy/hopcode-core';
+import { Storage } from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../config/settings.js';
 
 export function runWithAcpRuntimeOutputDir<T>(

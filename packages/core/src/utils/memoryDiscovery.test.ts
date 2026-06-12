@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,9 +12,21 @@ import { loadServerHierarchicalMemory } from './memoryDiscovery.js';
 import {
   setGeminiMdFilename,
   DEFAULT_CONTEXT_FILENAME,
+  LOCAL_CONTEXT_FILENAME,
 } from '../memory/const.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
-import { HOPCODE_DIR, HOPCODE_DIR_ALIAS } from './paths.js';
+import { HOPCODE_DIR } from './paths.js';
+import type { InstructionsLoadedNotification } from './memoryDiscovery.js';
+
+const mockLogger = vi.hoisted(() => ({
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+}));
+
+vi.mock('./debugLogger.js', () => ({
+  createDebugLogger: () => mockLogger,
+}));
 
 vi.mock('os', async (importOriginal) => {
   const actualOs = await importOriginal<typeof os>();
@@ -103,11 +115,7 @@ describe('loadServerHierarchicalMemory', () => {
         'Src directory memory',
       ); // Untrusted
 
-      const filepath = path.join(
-        homedir,
-        HOPCODE_DIR,
-        DEFAULT_CONTEXT_FILENAME,
-      );
+      const filepath = path.join(homedir, HOPCODE_DIR, DEFAULT_CONTEXT_FILENAME);
       await createTestFile(filepath, 'default context content'); // In user home dir (outside untrusted space).
       const { fileCount, memoryContent } = await loadServerHierarchicalMemory(
         cwd,
@@ -442,6 +450,382 @@ describe('loadServerHierarchicalMemory', () => {
     });
   });
 
+  it('notifies when startup instruction files are loaded', async () => {
+    const globalFile = await createTestFile(
+      path.join(homedir, HOPCODE_DIR, DEFAULT_CONTEXT_FILENAME),
+      'global context',
+    );
+    const projectFile = await createTestFile(
+      path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
+      'project context',
+    );
+    const extensionFile = await createTestFile(
+      path.join(testRootDir, 'extensions/ext1/HOPCODE.md'),
+      'extension context',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      cwd,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [extensionFile],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    expect(notifications).toEqual(
+      expect.arrayContaining([
+        {
+          filePath: globalFile,
+          memoryType: 'user',
+          loadReason: 'session_start',
+        },
+        {
+          filePath: projectFile,
+          memoryType: 'project',
+          loadReason: 'session_start',
+        },
+        {
+          filePath: extensionFile,
+          memoryType: 'extension',
+          loadReason: 'session_start',
+        },
+      ]),
+    );
+  });
+
+  it('uses refresh load reason for explicit memory refreshes', async () => {
+    const projectFile = await createTestFile(
+      path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
+      'project context',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      cwd,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        loadReason: 'refresh',
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    expect(notifications).toEqual(
+      expect.arrayContaining([
+        {
+          filePath: projectFile,
+          memoryType: 'project',
+          loadReason: 'refresh',
+        },
+      ]),
+    );
+  });
+
+  it('classifies home-directory project files as project memory', async () => {
+    await createEmptyDir(path.join(homedir, '.git'));
+    const globalFile = await createTestFile(
+      path.join(homedir, HOPCODE_DIR, DEFAULT_CONTEXT_FILENAME),
+      'global context',
+    );
+    const projectFile = await createTestFile(
+      path.join(homedir, DEFAULT_CONTEXT_FILENAME),
+      'home project context',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      homedir,
+      [],
+      new FileDiscoveryService(homedir),
+      [],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    expect(notifications).toContainEqual({
+      filePath: globalFile,
+      memoryType: 'user',
+      loadReason: 'session_start',
+    });
+    expect(notifications).toContainEqual({
+      filePath: projectFile,
+      memoryType: 'project',
+      loadReason: 'session_start',
+    });
+  });
+
+  it('notifies when imported instruction files are loaded', async () => {
+    await createEmptyDir(path.join(projectRoot, '.git'));
+    const importedFile = await createTestFile(
+      path.join(projectRoot, 'included.md'),
+      'included content',
+    );
+    const projectFile = await createTestFile(
+      path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
+      'project context @./included.md',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      cwd,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    expect(notifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          filePath: projectFile,
+          memoryType: 'project',
+          loadReason: 'session_start',
+        }),
+        expect.objectContaining({
+          filePath: importedFile,
+          memoryType: 'project',
+          loadReason: 'include',
+          triggerFilePath: projectFile,
+          parentFilePath: projectFile,
+        }),
+      ]),
+    );
+    expect(
+      notifications.findIndex((item) => item.filePath === projectFile),
+    ).toBeGreaterThan(
+      notifications.findIndex((item) => item.filePath === importedFile),
+    );
+  });
+
+  it('inherits memory type from the importing instruction file', async () => {
+    const importedFile = await createTestFile(
+      path.join(homedir, 'rules', 'personal.md'),
+      'personal included content',
+    );
+    const userFile = await createTestFile(
+      path.join(homedir, DEFAULT_CONTEXT_FILENAME),
+      'user context @./rules/personal.md',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      homedir,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    expect(notifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          filePath: userFile,
+          memoryType: 'user',
+          loadReason: 'session_start',
+        }),
+        expect.objectContaining({
+          filePath: importedFile,
+          memoryType: 'user',
+          loadReason: 'include',
+          triggerFilePath: userFile,
+          parentFilePath: userFile,
+        }),
+      ]),
+    );
+  });
+
+  it('inherits memory type from the root instruction file for nested imports', async () => {
+    const nestedFile = await createTestFile(
+      path.join(homedir, 'rules', 'nested.md'),
+      'nested included content',
+    );
+    const importedFile = await createTestFile(
+      path.join(homedir, 'rules', 'personal.md'),
+      'personal included content @./nested.md',
+    );
+    const userFile = await createTestFile(
+      path.join(homedir, DEFAULT_CONTEXT_FILENAME),
+      'user context @./rules/personal.md',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      homedir,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    expect(notifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          filePath: nestedFile,
+          memoryType: 'user',
+          loadReason: 'include',
+          triggerFilePath: userFile,
+          parentFilePath: importedFile,
+        }),
+      ]),
+    );
+  });
+
+  it('reports the root trigger and immediate parent for nested imports', async () => {
+    await createEmptyDir(path.join(projectRoot, '.git'));
+    const grandchildFile = await createTestFile(
+      path.join(projectRoot, 'grandchild.md'),
+      'grandchild content',
+    );
+    const childFile = await createTestFile(
+      path.join(projectRoot, 'child.md'),
+      'child content @./grandchild.md',
+    );
+    const projectFile = await createTestFile(
+      path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
+      'project context @./child.md',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      cwd,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    // The grandchild is imported by child.md, but the chain was started by the
+    // top-level discovered HOPCODE.md, so trigger != parent at depth > 1.
+    expect(notifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          filePath: grandchildFile,
+          loadReason: 'include',
+          triggerFilePath: projectFile,
+          parentFilePath: childFile,
+        }),
+      ]),
+    );
+  });
+
+  it('classifies extension-owned imports as extension memory', async () => {
+    const extensionDir = path.join(testRootDir, 'extensions/ext1');
+    const importedFile = await createTestFile(
+      path.join(extensionDir, 'included.md'),
+      'extension included content',
+    );
+    const extensionFile = await createTestFile(
+      path.join(extensionDir, DEFAULT_CONTEXT_FILENAME),
+      'extension context @./included.md',
+    );
+    const notifications: InstructionsLoadedNotification[] = [];
+
+    await loadServerHierarchicalMemory(
+      cwd,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [extensionFile],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: (notification) => {
+          notifications.push(notification);
+        },
+      },
+    );
+
+    expect(notifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          filePath: importedFile,
+          memoryType: 'extension',
+          loadReason: 'include',
+          triggerFilePath: extensionFile,
+          parentFilePath: extensionFile,
+        }),
+      ]),
+    );
+  });
+
+  it('still loads memory when instruction load notification fails', async () => {
+    const projectFile = await createTestFile(
+      path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
+      'project context',
+    );
+
+    const result = await loadServerHierarchicalMemory(
+      cwd,
+      [],
+      new FileDiscoveryService(projectRoot),
+      [],
+      DEFAULT_FOLDER_TRUST,
+      'tree',
+      [],
+      {
+        onInstructionsLoaded: () => {
+          throw new Error('hook failed');
+        },
+      },
+    );
+
+    expect(result.fileCount).toBe(1);
+    expect(result.memoryContent).toContain(
+      `--- Context from: ${path.relative(cwd, projectFile)} ---\nproject context`,
+    );
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      `InstructionsLoaded notification failed for ${projectFile}: hook failed`,
+    );
+  });
+
   it('should load memory from included directories', async () => {
     const includedDir = await createEmptyDir(
       path.join(testRootDir, 'included'),
@@ -553,7 +937,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('loads .hopcode/HOPCODE.local.md from project root when present', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'local context content',
       );
 
@@ -571,13 +955,46 @@ describe('loadServerHierarchicalMemory', () => {
       );
     });
 
+    it('notifies when HOPCODE.local.md is loaded', async () => {
+      const localFile = await createTestFile(
+        path.join(projectRoot, HOPCODE_DIR, LOCAL_CONTEXT_FILENAME),
+        'local context content',
+      );
+      const notifications: InstructionsLoadedNotification[] = [];
+
+      await loadServerHierarchicalMemory(
+        cwd,
+        [],
+        new FileDiscoveryService(projectRoot),
+        [],
+        DEFAULT_FOLDER_TRUST,
+        'tree',
+        [],
+        {
+          onInstructionsLoaded: (notification) => {
+            notifications.push(notification);
+          },
+        },
+      );
+
+      expect(notifications).toEqual(
+        expect.arrayContaining([
+          {
+            filePath: localFile,
+            memoryType: 'local',
+            loadReason: 'session_start',
+          },
+        ]),
+      );
+    });
+
     it('orders HOPCODE.local.md after the project-root HOPCODE.md', async () => {
       const projectFile = await createTestFile(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
         'shared project context',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'local override',
       );
 
@@ -610,7 +1027,7 @@ describe('loadServerHierarchicalMemory', () => {
         'cwd memory',
       );
       const localFile = await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'local memory',
       );
 
@@ -656,7 +1073,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('does not load HOPCODE.local.md from untrusted workspaces', async () => {
       await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'local content',
       );
 
@@ -674,7 +1091,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('does not load HOPCODE.local.md in explicit-only mode', async () => {
       await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'local content',
       );
 
@@ -698,7 +1115,7 @@ describe('loadServerHierarchicalMemory', () => {
       // project root) must NOT be picked up — the slot is single, fixed,
       // and lives at <projectRoot>/.hopcode/HOPCODE.local.md.
       await createTestFile(
-        path.join(cwd, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(cwd, HOPCODE_DIR, 'HOPCODE.local.md'),
         'misplaced local content',
       );
 
@@ -716,7 +1133,7 @@ describe('loadServerHierarchicalMemory', () => {
 
     it('loads HOPCODE.local.md even when no project HOPCODE.md exists', async () => {
       const localFile = await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'standalone local',
       );
 
@@ -750,7 +1167,7 @@ describe('loadServerHierarchicalMemory', () => {
       );
 
       const localFile = await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'worktree local',
       );
 
@@ -779,11 +1196,11 @@ describe('loadServerHierarchicalMemory', () => {
       });
 
       await createTestFile(
-        path.join(cwd, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(cwd, HOPCODE_DIR, 'HOPCODE.local.md'),
         'cwd-anchored local that must not load',
       );
       await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'projectRoot-anchored local that must not load either',
       );
 
@@ -807,14 +1224,14 @@ describe('loadServerHierarchicalMemory', () => {
     it('skips HOPCODE.local.md when cwd === homedir without .git (avoids global-dir collision)', async () => {
       // When cwd is the home directory and there is no `.git` there, the
       // would-be slot path resolves to `<homedir>/.hopcode/HOPCODE.local.md` —
-      // i.e. inside the GLOBAL HopCode dir. Loading that as a project-local
+      // i.e. inside the GLOBAL Qwen dir. Loading that as a project-local
       // override is wrong: there is no project. Pin the "skip" behavior.
       await fsPromises.rm(path.join(projectRoot, '.git'), {
         recursive: true,
         force: true,
       });
       await createTestFile(
-        path.join(homedir, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(homedir, HOPCODE_DIR, 'HOPCODE.local.md'),
         'do not promote this to project-local',
       );
 
@@ -845,7 +1262,7 @@ describe('loadServerHierarchicalMemory', () => {
       // slot loader from then appending the same file a second time
       // (double content + inflated fileCount). Pin that behavior.
       const localFile = await createTestFile(
-        path.join(projectRoot, HOPCODE_DIR_ALIAS, 'HOPCODE.local.md'),
+        path.join(projectRoot, HOPCODE_DIR, 'HOPCODE.local.md'),
         'slot content only once',
       );
 

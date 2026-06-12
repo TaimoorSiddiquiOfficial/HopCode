@@ -10,7 +10,7 @@ import {
   IdeConnectionType,
   logIdeConnection,
   type Config,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { type LoadedSettings } from '../config/settings.js';
 import { performInitialAuth } from './auth.js';
 import { validateTheme } from './theme.js';
@@ -61,6 +61,6 @@ export async function initializeApp(
     authError,
     themeError,
     shouldOpenAuthDialog,
-    contextMdFileCount: config.getContextMdFileCount(),
+    contextMdFileCount: config.getGeminiMdFileCount(),
   };
 }

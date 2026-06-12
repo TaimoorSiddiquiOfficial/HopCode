@@ -11,7 +11,7 @@ import {
   CUSTOM_API_KEY_ENV_PREFIX,
   buildInstallPlan,
   shouldShowStep,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 // Re-import generateCustomEnvKey from the relative source path so the new
 // hash-suffix format is exercised even before dist/ is rebuilt.
 import { generateCustomEnvKey } from '../../presets/custom-provider.js';

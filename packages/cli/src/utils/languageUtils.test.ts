@@ -35,8 +35,8 @@ vi.mock('../i18n/index.js', () => ({
   }),
 }));
 
-// Mock @hoptrendy/hopcode-core
-vi.mock('@hoptrendy/hopcode-core', () => ({
+// Mock @hopcode/hopcode-core
+vi.mock('@hopcode/hopcode-core', () => ({
   Storage: {
     getGlobalHopCodeDir: vi.fn(() => '/mock/home/.hopcode'),
   },
@@ -50,6 +50,7 @@ import {
   resolveOutputLanguage,
   writeOutputLanguageFile,
   updateOutputLanguageFile,
+  writeOutputLanguageAndRegisterPath,
   initializeLlmOutputLanguage,
 } from './languageUtils.js';
 
@@ -238,6 +239,19 @@ describe('languageUtils', () => {
         'This is a mandatory requirement, not a preference.',
       );
       expect(writtenContent).not.toContain('Prefer responding');
+    });
+
+    it('should write to custom targetPath when provided', () => {
+      writeOutputLanguageFile('Korean', '/proj/.hopcode/output-language.md');
+
+      expect(fs.mkdirSync).toHaveBeenCalledWith('/proj/.hopcode', {
+        recursive: true,
+      });
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        '/proj/.hopcode/output-language.md',
+        expect.stringContaining('Korean'),
+        'utf-8',
+      );
     });
 
     it('should include exception clause for explicit user language requests', () => {
@@ -477,6 +491,69 @@ describe('languageUtils', () => {
       }
 
       expect(resolvedPath).toBeUndefined();
+    });
+  });
+
+  describe('writeOutputLanguageAndRegisterPath', () => {
+    beforeEach(() => {
+      vi.mocked(fs.mkdirSync).mockImplementation(() => undefined);
+      vi.mocked(fs.writeFileSync).mockImplementation(() => undefined);
+    });
+
+    it('writes to config-bound path when available', () => {
+      const config = {
+        getOutputLanguageFilePath: vi
+          .fn()
+          .mockReturnValue('/proj/.hopcode/output-language.md'),
+        setOutputLanguageFilePath: vi.fn(),
+      };
+
+      writeOutputLanguageAndRegisterPath('Chinese', config);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        '/proj/.hopcode/output-language.md',
+        expect.stringContaining('Chinese'),
+        'utf-8',
+      );
+      expect(config.setOutputLanguageFilePath).not.toHaveBeenCalled();
+    });
+
+    it('writes to global default and registers path when config path is undefined', () => {
+      const config = {
+        getOutputLanguageFilePath: vi.fn().mockReturnValue(undefined),
+        setOutputLanguageFilePath: vi.fn(),
+      };
+
+      writeOutputLanguageAndRegisterPath('Japanese', config);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('output-language.md'),
+        expect.stringContaining('Japanese'),
+        'utf-8',
+      );
+      expect(config.setOutputLanguageFilePath).toHaveBeenCalledWith(
+        expect.stringContaining('output-language.md'),
+      );
+    });
+
+    it('handles null config gracefully', () => {
+      writeOutputLanguageAndRegisterPath('Korean', null);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('output-language.md'),
+        expect.stringContaining('Korean'),
+        'utf-8',
+      );
+    });
+
+    it('handles undefined config gracefully', () => {
+      writeOutputLanguageAndRegisterPath('Russian', undefined);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('output-language.md'),
+        expect.stringContaining('Russian'),
+        'utf-8',
+      );
     });
   });
 });

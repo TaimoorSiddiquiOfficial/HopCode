@@ -14,11 +14,11 @@ import {
   createFollowupController,
   logPromptSuggestion,
   PromptSuggestionEvent,
-} from '@hoptrendy/hopcode-core';
-import type { FollowupState, Config } from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
+import type { FollowupState, Config } from '@hopcode/hopcode-core';
 
 // Re-export for consumers that import from here
-export type { FollowupState } from '@hoptrendy/hopcode-core';
+export type { FollowupState } from '@hopcode/hopcode-core';
 
 /**
  * Options for the hook

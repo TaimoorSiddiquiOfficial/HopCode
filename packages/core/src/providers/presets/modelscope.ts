@@ -21,7 +21,7 @@ export const modelscopeProvider: ProviderConfig = {
       enableThinking: true,
     },
     {
-      id: 'Qwen/Qwen3.5-397B-A17B',
+      id: 'hopcode/Qwen3.5-397B-A17B',
       contextWindowSize: 1000000,
       enableThinking: true,
     },

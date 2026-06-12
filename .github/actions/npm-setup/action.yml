@@ -12,7 +12,7 @@ inputs:
   scope:
     description: 'NPM scope for the registry'
     required: false
-    default: '@hoptrendy'
+    default: '@hopcode'
 
 runs:
   using: 'composite'

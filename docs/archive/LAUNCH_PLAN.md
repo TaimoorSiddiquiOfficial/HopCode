@@ -139,7 +139,7 @@
 
 **Day 2:**
 
-- [ ] npm publish @hoptrendy/hopcode
+- [ ] npm publish @hopcode/hopcode
 - [ ] Publish VS Code extension
 - [ ] Publish Zed extension
 - [ ] Update GitHub repo
@@ -190,7 +190,7 @@ We're building support for 20+ AI providers including:
 ## Get Started
 
 ```bash
-npm install -g @hoptrendy/hopcode
+npm install -g @hopcode/hopcode
 hopcode auth login
 ````
 
@@ -220,7 +220,7 @@ while maintaining the best possible coding experience.
 The butterfly effect of intelligent code is here.
 
 Try it now:
-npm install -g @hoptrendy/hopcode
+npm install -g @hopcode/hopcode
 
 Multi-AI support coming soon with OpenAI, Anthropic, Google & more!
 
@@ -239,7 +239,7 @@ An AI-powered coding assistant with:
 ✅ VS Code + Zed support
 ✅ Multi-AI coming soon
 
-Try it: npm install -g @hoptrendy/hopcode
+Try it: npm install -g @hopcode/hopcode
 
 #HopCode #AI #SoftwareDevelopment #OpenSource
 

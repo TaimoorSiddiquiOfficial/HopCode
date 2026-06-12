@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HooksConfigSource } from '@hoptrendy/hopcode-core';
+import { HooksConfigSource } from '@hopcode/hopcode-core';
 import type { HookConfigDisplayInfo } from './types.js';
 import { getTranslatedSourceDisplayMap } from './constants.js';
 import { t } from '../../../i18n/index.js';

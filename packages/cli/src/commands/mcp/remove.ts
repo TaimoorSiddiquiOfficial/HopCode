@@ -8,7 +8,7 @@
 import type { CommandModule } from 'yargs';
 import { loadSettings, SettingScope } from '../../config/settings.js';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
-import { MCPOAuthTokenStorage } from '@hoptrendy/hopcode-core';
+import { MCPOAuthTokenStorage } from '@hopcode/hopcode-core';
 
 async function removeMcpServer(
   name: string,

@@ -11,7 +11,7 @@ import {
   fetchGitDiffHunks,
   type GitDiffHunk,
   type GitDiffResult,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 const debugLogger = createDebugLogger('DiffDialog');
 

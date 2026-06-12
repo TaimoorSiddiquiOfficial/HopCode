@@ -277,7 +277,7 @@ packages/core/src/voice/
 
 **Key Implementation Points:**
 
-1. Add optional `voice` dependency group: `@hoptrendy/hopcode-voice`
+1. Add optional `voice` dependency group: `@hopcode/hopcode-voice`
 2. In interactive mode, detect voice message (e.g., special file type or flag)
 3. STT: transcribe → send as text prompt
 4. TTS: synthesize AI response → play audio

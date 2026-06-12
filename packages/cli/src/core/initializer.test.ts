@@ -27,7 +27,7 @@ const mockConnect = vi.fn();
 const mockGetInstance = vi.fn().mockResolvedValue({ connect: mockConnect });
 const mockLogIdeConnection = vi.fn();
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
@@ -42,7 +42,7 @@ describe('initializeApp', () => {
   let mockConfig: {
     getModelsConfig: ReturnType<typeof vi.fn>;
     getIdeMode: ReturnType<typeof vi.fn>;
-    getContextMdFileCount: ReturnType<typeof vi.fn>;
+    getGeminiMdFileCount: ReturnType<typeof vi.fn>;
   };
   let mockSettings: {
     merged: Record<string, unknown>;
@@ -58,7 +58,7 @@ describe('initializeApp', () => {
         wasAuthTypeExplicitlyProvided: vi.fn().mockReturnValue(false),
       }),
       getIdeMode: vi.fn().mockReturnValue(false),
-      getContextMdFileCount: vi.fn().mockReturnValue(0),
+      getGeminiMdFileCount: vi.fn().mockReturnValue(0),
     };
 
     mockSettings = {

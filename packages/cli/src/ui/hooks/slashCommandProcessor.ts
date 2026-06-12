@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,14 +19,13 @@ import {
   type Logger,
   type Config,
   createDebugLogger,
-  GitService,
   logSlashCommand,
   makeSlashCommandEvent,
   SlashCommandStatus,
   ToolConfirmationOutcome,
   IdeClient,
   type SessionListItem,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import type {
   Message,
@@ -57,9 +56,22 @@ import {
   type ExtensionUpdateAction,
   type ExtensionUpdateStatus,
 } from '../state/extensions.js';
+import {
+  appendUserPromptExpansionAdditionalContext,
+  formatUserPromptExpansionBlockedMessage,
+  serializeUserPromptExpansionPrompt,
+} from '../../utils/userPromptExpansionHook.js';
 
 type SerializableHistoryItem = Record<string, unknown>;
 const debugLogger = createDebugLogger('SLASH_COMMAND_PROCESSOR');
+
+function hasUserPromptExpansionHooks(config: Config | null): config is Config {
+  return (
+    !!config &&
+    !config.getDisableAllHooks?.() &&
+    (config.hasHooksForEvent?.('UserPromptExpansion') ?? false)
+  );
+}
 
 function serializeHistoryItemForRecording(
   item: HistoryItemWithoutId,
@@ -105,13 +117,14 @@ export interface SlashCommandProcessorActions {
   addConfirmUpdateExtensionRequest: (request: ConfirmationRequest) => void;
   openSubagentCreateDialog: () => void;
   openAgentsManagerDialog: () => void;
+  openSkillsManagerDialog: () => void;
   openExtensionsManagerDialog: () => void;
   openMcpDialog: () => void;
   openHooksDialog: () => void;
+  openStatsDialog: () => void;
   openRewindSelector: () => void;
   openDiffDialog: () => void;
   openHelpDialog: () => void;
-  openManageModelsDialog: () => void;
 }
 
 /**
@@ -123,13 +136,6 @@ export const useSlashCommandProcessor = (
   addItem: UseHistoryManagerReturn['addItem'],
   clearItems: UseHistoryManagerReturn['clearItems'],
   loadHistory: UseHistoryManagerReturn['loadHistory'],
-  searchHistory: UseHistoryManagerReturn['searchHistory'],
-  jumpToSearchResult: UseHistoryManagerReturn['jumpToSearchResult'],
-  canLoadOlderHistory: boolean,
-  canLoadNewerHistory: boolean,
-  loadOlderHistory: UseHistoryManagerReturn['loadOlderHistory'],
-  loadNewerHistory: UseHistoryManagerReturn['loadNewerHistory'],
-  windowInfo: UseHistoryManagerReturn['windowInfo'],
   refreshStatic: () => void,
   toggleVimEnabled: () => Promise<boolean>,
   isProcessing: boolean,
@@ -201,13 +207,6 @@ export const useSlashCommandProcessor = (
   const [sessionShellAllowlist, setSessionShellAllowlist] = useState(
     new Set<string>(),
   );
-  const gitService = useMemo(() => {
-    if (!config?.getProjectRoot()) {
-      return;
-    }
-    return new GitService(config.getProjectRoot(), config.storage);
-  }, [config]);
-
   const [pendingItem, setPendingItem] = useState<HistoryItemWithoutId | null>(
     null,
   );
@@ -320,7 +319,6 @@ export const useSlashCommandProcessor = (
       services: {
         config,
         settings,
-        git: gitService,
         logger,
       },
       ui: {
@@ -343,20 +341,12 @@ export const useSlashCommandProcessor = (
         isIdleRef,
         toggleVimEnabled,
         setGeminiMdFileCount,
-        setContextMdFileCount: setGeminiMdFileCount,
         reloadCommands,
         setSessionName: setSessionName ?? (() => {}),
         extensionsUpdateState,
         dispatchExtensionStateUpdate: actions.dispatchExtensionStateUpdate,
         addConfirmUpdateExtensionRequest:
           actions.addConfirmUpdateExtensionRequest,
-        canLoadOlderHistory,
-        canLoadNewerHistory,
-        loadOlderHistory,
-        loadNewerHistory,
-        windowInfo,
-        searchHistory,
-        jumpToSearchResult,
       },
       session: {
         stats: sessionStats,
@@ -368,16 +358,8 @@ export const useSlashCommandProcessor = (
     [
       config,
       settings,
-      gitService,
       logger,
       loadHistory,
-      searchHistory,
-      jumpToSearchResult,
-      canLoadOlderHistory,
-      canLoadNewerHistory,
-      loadOlderHistory,
-      loadNewerHistory,
-      windowInfo,
       addItem,
       clearItems,
       refreshStatic,
@@ -437,6 +419,15 @@ export const useSlashCommandProcessor = (
       return;
     }
     return skillManager.addChangeListener(() => {
+      // The `/skills` dialog calls `reloadCommands()` itself BEFORE it
+      // calls `notifyConfigChanged()`, so a listener-driven second reload
+      // would be a wasted CommandService rebuild on every save. Honor the
+      // one-shot suppression signal — disk-driven changes (no
+      // dialog-orchestrated reload) leave the flag false and reload
+      // normally.
+      if (skillManager.consumeSlashReloadSuppression()) {
+        return;
+      }
       reloadCommands();
     });
   }, [config, isConfigInitialized, reloadCommands]);
@@ -487,11 +478,37 @@ export const useSlashCommandProcessor = (
                   name,
                   args,
                 },
-                services: { config, settings, git: gitService, logger: null },
+                services: { config, settings, logger: null },
               } as unknown as Parameters<typeof cmd.action>[0];
               const result = await cmd.action(minimalContext, args);
               if (!result || result.type !== 'submit_prompt') return null;
-              const content = result.content;
+              const output = hasUserPromptExpansionHooks(config)
+                ? await config
+                    .getHookSystem()
+                    ?.fireUserPromptExpansionEvent(
+                      name,
+                      args,
+                      serializeUserPromptExpansionPrompt(result.content),
+                      controller.signal,
+                    )
+                : undefined;
+              if (controller.signal.aborted) {
+                return { error: 'Skill execution cancelled by user.' };
+              }
+              if (output) {
+                const blockingError = output.getBlockingError();
+                if (blockingError.blocked || output.shouldStopExecution()) {
+                  return {
+                    error: formatUserPromptExpansionBlockedMessage(
+                      blockingError.reason || output.getEffectiveReason(),
+                    ),
+                  };
+                }
+              }
+              const content = appendUserPromptExpansionAdditionalContext(
+                result.content,
+                output?.getAdditionalContext(),
+              );
               if (typeof content === 'string') return content;
               if (Array.isArray(content)) {
                 return content
@@ -526,7 +543,6 @@ export const useSlashCommandProcessor = (
     reloadTrigger,
     isConfigInitialized,
     settings,
-    gitService,
     resolveCommandReloads,
   ]);
 
@@ -662,9 +678,9 @@ export const useSlashCommandProcessor = (
                     toolArgs: result.toolArgs,
                   };
                 case 'message':
-                  if (result.messageType === 'error') {
+                  if (result.messageType === 'info') {
                     addMessage({
-                      type: MessageType.ERROR,
+                      type: MessageType.INFO,
                       content: result.content,
                       timestamp: new Date(),
                     });
@@ -676,7 +692,7 @@ export const useSlashCommandProcessor = (
                     });
                   } else {
                     addMessage({
-                      type: MessageType.INFO,
+                      type: MessageType.ERROR,
                       content: result.content,
                       timestamp: new Date(),
                     });
@@ -732,11 +748,17 @@ export const useSlashCommandProcessor = (
                     case 'subagent_list':
                       actions.openAgentsManagerDialog();
                       return { type: 'handled' };
+                    case 'skills_manage':
+                      actions.openSkillsManagerDialog();
+                      return { type: 'handled' };
                     case 'mcp':
                       actions.openMcpDialog();
                       return { type: 'handled' };
                     case 'hooks':
                       actions.openHooksDialog();
+                      return { type: 'handled' };
+                    case 'stats':
+                      actions.openStatsDialog();
                       return { type: 'handled' };
                     case 'approval-mode':
                       actions.openApprovalModeDialog();
@@ -773,7 +795,7 @@ export const useSlashCommandProcessor = (
                       actions.openHelpDialog();
                       return { type: 'handled' };
                     case 'manage-models':
-                      actions.openManageModelsDialog();
+                      actions.openModelDialog();
                       return { type: 'handled' };
                     default: {
                       const unhandled: never = result.dialog;
@@ -795,7 +817,41 @@ export const useSlashCommandProcessor = (
                   actions.quit(result.messages);
                   return { type: 'handled' };
 
-                case 'submit_prompt':
+                case 'submit_prompt': {
+                  const invocation = fullCommandContext.invocation;
+                  let content = result.content;
+                  const output = hasUserPromptExpansionHooks(config)
+                    ? await config
+                        .getHookSystem()
+                        ?.fireUserPromptExpansionEvent(
+                          invocation?.name ?? '',
+                          invocation?.args ?? '',
+                          serializeUserPromptExpansionPrompt(content),
+                          abortController.signal,
+                        )
+                    : undefined;
+                  if (abortController.signal.aborted) {
+                    hasError = true;
+                    return { type: 'handled' };
+                  }
+                  if (output) {
+                    const blockingError = output.getBlockingError();
+                    if (blockingError.blocked || output.shouldStopExecution()) {
+                      hasError = true;
+                      addMessage({
+                        type: MessageType.ERROR,
+                        content: formatUserPromptExpansionBlockedMessage(
+                          blockingError.reason || output.getEffectiveReason(),
+                        ),
+                        timestamp: new Date(),
+                      });
+                      return { type: 'handled' };
+                    }
+                    content = appendUserPromptExpansionAdditionalContext(
+                      content,
+                      output.getAdditionalContext(),
+                    );
+                  }
                   if (invocationItemId !== undefined) {
                     invocationSentToModel = true;
                     debugLogger.debug(
@@ -810,14 +866,10 @@ export const useSlashCommandProcessor = (
                   }
                   return {
                     type: 'submit_prompt',
-                    content: result.content,
+                    content,
                     onComplete: result.onComplete,
                   };
-                case 'startImmediateSubagent':
-                  return {
-                    type: 'submit_prompt',
-                    content: `Use the Agent tool with subagent_type: "${result.subagent}" and this prompt:\n\n${result.prompt}`,
-                  };
+                }
                 case 'confirm_shell_commands': {
                   const { outcome, approvedCommands } = await new Promise<{
                     outcome: ToolConfirmationOutcome;
@@ -892,6 +944,12 @@ export const useSlashCommandProcessor = (
                     true,
                     invocationItemId,
                   );
+                }
+                case 'startImmediateSubagent': {
+                  // Handled by the caller (AppContainer) which starts the
+                  // subagent prompt. The slash command processor itself
+                  // does not own the prompt loop.
+                  return result;
                 }
                 case 'stream_messages': {
                   // stream_messages is only used in ACP/Zed integration mode
@@ -1024,8 +1082,13 @@ export const useSlashCommandProcessor = (
     btwItem,
     setBtwItem,
     cancelBtw,
+    cancelSlashCommand,
     commandContext,
     shellConfirmationRequest,
     confirmationRequest,
+    // Exposed so dialogs (e.g. SkillsManagerDialog) can trigger a
+    // CommandService rebuild without going through `commandContext.ui`,
+    // which is plumbed only to slash-command actions, not arbitrary UI.
+    reloadCommands,
   };
 };

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ApprovalMode, type Config } from '@hoptrendy/hopcode-core';
+import { ApprovalMode, type Config } from '@hopcode/hopcode-core';
 
 export const HEADLESS_IZN_NO_SANDBOX_WARNING =
   'Warning: running headless with --izn / approval-mode=izn and no sandbox. ' +

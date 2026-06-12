@@ -8,11 +8,11 @@
  */
 
 import type { ClipboardEvent, FC, ReactNode } from 'react';
-import { InputForm as BaseInputForm, getEditModeIcon } from '@hoptrendy/webui';
+import { InputForm as BaseInputForm, getEditModeIcon } from '@hopcode/webui';
 import type {
   InputFormProps as BaseInputFormProps,
   EditModeInfo,
-} from '@hoptrendy/webui';
+} from '@hopcode/webui';
 import type { CompletionItem } from '../../../types/completionItemTypes.js';
 import { getApprovalModeInfoFromString } from '../../../types/acpTypes.js';
 import type { ApprovalModeValue } from '../../../types/approvalModeValueTypes.js';

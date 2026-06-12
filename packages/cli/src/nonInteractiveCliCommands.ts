@@ -11,7 +11,7 @@ import {
   uiTelemetryService,
   type Config,
   createDebugLogger,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { CommandService } from './services/CommandService.js';
 import { BuiltinCommandLoader } from './services/BuiltinCommandLoader.js';
 import { BundledSkillLoader } from './services/BundledSkillLoader.js';
@@ -28,6 +28,11 @@ import { createNonInteractiveUI } from './ui/noninteractive/nonInteractiveUi.js'
 import type { LoadedSettings } from './config/settings.js';
 import type { SessionStatsState } from './ui/contexts/SessionContext.js';
 import { t } from './i18n/index.js';
+import {
+  appendUserPromptExpansionAdditionalContext,
+  formatUserPromptExpansionBlockedMessage,
+  serializeUserPromptExpansionPrompt,
+} from './utils/userPromptExpansionHook.js';
 
 const debugLogger = createDebugLogger('NON_INTERACTIVE_COMMANDS');
 
@@ -179,6 +184,60 @@ function handleCommandResult(
   }
 }
 
+async function fireUserPromptExpansionHook(
+  config: Config,
+  commandName: string,
+  commandArgs: string,
+  content: PartListUnion,
+  signal: AbortSignal,
+): Promise<{
+  blockedResult?: NonInteractiveSlashCommandResult;
+  content: PartListUnion;
+}> {
+  if (
+    config.getDisableAllHooks?.() ||
+    !(config.hasHooksForEvent?.('UserPromptExpansion') ?? false)
+  ) {
+    return { content };
+  }
+
+  const hookSystem = config.getHookSystem();
+  if (!hookSystem) {
+    return { content };
+  }
+
+  const output = await hookSystem.fireUserPromptExpansionEvent(
+    commandName,
+    commandArgs,
+    serializeUserPromptExpansionPrompt(content),
+    signal,
+  );
+  if (!output) {
+    return { content };
+  }
+
+  const blockingError = output.getBlockingError();
+  if (blockingError.blocked || output.shouldStopExecution()) {
+    return {
+      blockedResult: {
+        type: 'message',
+        messageType: 'error',
+        content: formatUserPromptExpansionBlockedMessage(
+          blockingError.reason || output.getEffectiveReason(),
+        ),
+      },
+      content,
+    };
+  }
+
+  return {
+    content: appendUserPromptExpansionAdditionalContext(
+      content,
+      output.getAdditionalContext(),
+    ),
+  };
+}
+
 /**
  * Processes a slash command in a non-interactive environment.
  *
@@ -259,11 +318,23 @@ export const handleSlashCommand = async (
           name,
           args,
         },
-        services: { config, settings, git: undefined, logger: null },
+        services: { config, settings, logger: null },
       } as unknown as CommandContext;
       const result = await cmd.action(minimalContext, args);
       if (!result || result.type !== 'submit_prompt') return null;
-      const content = result.content;
+      const hookResult = await fireUserPromptExpansionHook(
+        config,
+        name,
+        args,
+        result.content,
+        abortController.signal,
+      );
+      if (hookResult.blockedResult) {
+        return hookResult.blockedResult.type === 'message'
+          ? { error: hookResult.blockedResult.content }
+          : null;
+      }
+      const content = hookResult.content;
       if (typeof content === 'string') return content;
       if (Array.isArray(content)) {
         return content
@@ -330,7 +401,7 @@ export const handleSlashCommand = async (
   const sessionStats: SessionStatsState = {
     sessionId: config?.getSessionId(),
     sessionStartTime: new Date(),
-    metrics: uiTelemetryService.getMetrics(),
+    metrics: config ? uiTelemetryService.getMetricsForSession(config.getSessionId()) : uiTelemetryService.getMetrics(),
     lastPromptTokenCount: 0,
     promptCount: 1,
   };
@@ -342,7 +413,6 @@ export const handleSlashCommand = async (
     services: {
       config,
       settings,
-      git: undefined,
       logger,
     },
     ui: createNonInteractiveUI(),
@@ -366,6 +436,20 @@ export const handleSlashCommand = async (
       messageType: 'info',
       content: 'Command executed successfully.',
     };
+  }
+
+  if (result.type === 'submit_prompt') {
+    const hookResult = await fireUserPromptExpansionHook(
+      config,
+      commandToExecute.name,
+      args,
+      result.content,
+      abortController.signal,
+    );
+    if (hookResult.blockedResult) {
+      return hookResult.blockedResult;
+    }
+    return handleCommandResult({ ...result, content: hookResult.content });
   }
 
   // Handle different result types

@@ -14,7 +14,7 @@ import {
   type Config,
   DEFAULT_TOKEN_LIMIT,
   computeThresholds,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   StreamingState,
   MessageType,

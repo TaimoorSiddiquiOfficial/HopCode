@@ -7,11 +7,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as vscode from 'vscode';
 import { activate } from './extension.js';
-import { IDE_DEFINITIONS, detectIdeFromEnv } from '@hoptrendy/hopcode-core';
+import { IDE_DEFINITIONS, detectIdeFromEnv } from '@hopcode/hopcode-core';
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     detectIdeFromEnv: vi.fn(() => actual.IDE_DEFINITIONS.vscode),
@@ -292,7 +292,7 @@ describe('activate', () => {
 
       expect(executeCommandMock).toHaveBeenCalledWith(
         'workbench.extensions.installExtension',
-        'hoptrendy.hoptrendy-vscode-ide-companion',
+        'hopcode.hopcode-vscode-ide-companion',
       );
     });
 

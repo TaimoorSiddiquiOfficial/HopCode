@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,8 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'Izn mode': 'Mode Izn',
+  'YOLO mode': 'Mode YOLO',
+  'Auto mode': 'Mode auto',
   'plan mode': 'mode plan',
   'auto-accept edits': 'acceptation automatique des modifications',
   'Accepting edits': 'Acceptation des modifications',
@@ -87,7 +88,7 @@ export default {
   // ============================================================================
   // Informations système
   // ============================================================================
-  HopCode: 'HopCode',
+  'HopCode': 'HopCode',
   Runtime: 'Environnement',
   OS: 'OS',
   Model: 'Modèle',
@@ -106,7 +107,43 @@ export default {
     'Analyse le projet et crée un fichier HOPCODE.md personnalisé.',
   'List available HopCode tools. Usage: /tools [desc]':
     'Lister les outils HopCode disponibles. Utilisation : /tools [desc]',
-  'List available skills.': 'Lister les compétences disponibles.',
+  'Open the skills panel (browse, search, toggle, pick).':
+    'Ouvrir le panneau des compétences (parcourir, rechercher, activer, choisir).',
+  'Manage Skills': 'Gérer les compétences',
+  'Skills configuration saved.': 'Configuration des compétences enregistrée.',
+  'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
+    'Configuration des compétences enregistrée, mais le rafraîchissement a échoué : {{error}}. Redémarrez pour garantir l’application du nouvel état.',
+  'Workspace is untrusted; workspace settings are ignored by the merged config. Run /trust first to persist skills changes here, or edit ~/.hopcode/settings.json directly to manage skills at user scope.':
+    'L’espace de travail n’est pas approuvé ; les paramètres de l’espace de travail sont ignorés par la configuration fusionnée. Exécutez d’abord /trust, ou modifiez directement ~/.hopcode/settings.json pour gérer les compétences au niveau utilisateur.',
+  'SkillManager not available.': 'SkillManager non disponible.',
+  'Loading skills…': 'Chargement des compétences…',
+  'Failed to load skills: {{error}}':
+    'Échec du chargement des compétences : {{error}}',
+  'Failed to save skills configuration: {{error}}':
+    "Échec de l'enregistrement de la configuration des compétences : {{error}}",
+  'All available skills are disabled. Edit ~/.hopcode/settings.json or .hopcode/settings.json (skills.disabled) to re-enable.':
+    'Toutes les compétences disponibles sont désactivées. Modifiez ~/.hopcode/settings.json ou .hopcode/settings.json (skills.disabled) pour les réactiver.',
+  'Press esc to close.': 'Appuyez sur Échap pour fermer.',
+  '{{count}} skills · ': '{{count}} compétences · ',
+  '{{matched}} / {{total}} skills · ': '{{matched}} / {{total}} compétences · ',
+  'Space toggle · Enter pick (fill input) · Esc save & exit · workspace scope':
+    'Espace bascule · Entrée choisir (remplit l’entrée) · Échap enregistrer & quitter · portée espace de travail',
+  'Search:': 'Recherche :',
+  'type to filter…': 'tapez pour filtrer…',
+  'No skills are currently available.':
+    'Aucune compétence n’est actuellement disponible.',
+  'All available skills are locked at a higher scope (see below).':
+    'Toutes les compétences disponibles sont verrouillées à une portée supérieure (voir ci-dessous).',
+  'No skills match the search.':
+    'Aucune compétence ne correspond à la recherche.',
+  'Locked by higher-scope settings (cannot toggle here):':
+    'Verrouillées par des paramètres de portée supérieure (impossible de basculer ici) :',
+  'higher scope': 'portée supérieure',
+  '  {{name}} {{description}}  [locked: {{scope}}]':
+    '  {{name}} {{description}}  [verrouillée : {{scope}}]',
+  '↑/↓ navigate · backspace edits search':
+    '↑/↓ naviguer · Retour modifie la recherche',
+  Bundled: 'Intégrée',
   'Available HopCode CLI tools:': 'Outils HopCode CLI disponibles :',
   'No tools available': 'Aucun outil disponible',
   'View or change the approval mode for tool usage':
@@ -191,8 +228,8 @@ export default {
     'ouvrir la documentation complète de HopCode dans votre navigateur',
   'Configuration not available.': 'Configuration non disponible.',
   'Connect an LLM provider': 'Se connecter à un fournisseur LLM',
-  'Copy the last result or code snippet to clipboard':
-    'Copier le dernier résultat ou extrait de code dans le presse-papiers',
+  'Copy the last AI response to clipboard (/copy N for Nth-latest)':
+    'Copier la dernière réponse IA dans le presse-papiers (/copy N pour la Nième)',
 
   // ============================================================================
   // Commandes - Agents
@@ -277,7 +314,8 @@ export default {
   'Step {{n}}: Choose Location': "Étape {{n}} : Choisir l'emplacement",
   'Step {{n}}: Choose Generation Method':
     'Étape {{n}} : Choisir la méthode de génération',
-  'Generate with HopCode (Recommended)': 'Générer avec HopCode (Recommandé)',
+  'Generate with HopCode (Recommended)':
+    'Générer avec HopCode (Recommandé)',
   'Manual Creation': 'Création manuelle',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Décrivez ce que ce sous-agent doit faire et quand il doit être utilisé. (Soyez complet pour de meilleurs résultats)',
@@ -416,8 +454,8 @@ export default {
   'Custom Witty Phrases': 'Phrases personnalisées spirituelles',
   'Show Welcome Back Dialog': 'Afficher le dialogue de bienvenue',
   'Enable User Feedback': 'Activer les retours utilisateur',
-  'How is HopCode doing this session? (optional)':
-    'Comment se passe cette session avec HopCode ? (facultatif)',
+  'How is Qwen doing this session? (optional)':
+    'Comment se passe cette session avec Qwen ? (facultatif)',
   Bad: 'Mauvais',
   Fine: 'Correct',
   Good: 'Bien',
@@ -452,9 +490,9 @@ export default {
   Text: 'Texte',
   JSON: 'JSON',
   Plan: 'Plan',
-  Default: 'Par défaut',
+  'Ask permissions': "Demander l'autorisation",
   'Auto Edit': 'Édition automatique',
-  Izn: 'Izn',
+  YOLO: 'YOLO',
   'toggle vim mode on/off': 'activer/désactiver le mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'vérifier les stats de session. Utilisation : /stats [modèle|outils]',
@@ -683,8 +721,8 @@ export default {
   'Configured hooks:': 'Hooks configurés :',
   'No hooks configured for this event.':
     'Aucun hook configuré pour cet événement.',
-  'To add hooks, edit settings.json directly or ask HopCode.':
-    'Pour ajouter des hooks, éditez settings.json directement ou demandez à HopCode.',
+  'To add hooks, edit settings.json directly or ask Qwen.':
+    'Pour ajouter des hooks, éditez settings.json directement ou demandez à Qwen.',
   'Enter to select · Esc to go back':
     'Enter pour sélectionner · Esc pour revenir',
   'Hook details': 'Détails du hook',
@@ -692,8 +730,8 @@ export default {
   'Extension:': 'Extension :',
   'Desc:': 'Description :',
   'No hook config selected': 'Aucune configuration de hook sélectionnée',
-  'To modify or remove this hook, edit settings.json directly or ask HopCode to help.':
-    'Pour modifier ou supprimer ce hook, éditez settings.json directement ou demandez à HopCode.',
+  'To modify or remove this hook, edit settings.json directly or ask Qwen to help.':
+    'Pour modifier ou supprimer ce hook, éditez settings.json directement ou demandez à Qwen.',
   'Hook Configuration - Disabled': 'Configuration du hook - Désactivé',
   'All hooks are currently disabled. You have {{count}} that are not running.':
     "Tous les hooks sont actuellement désactivés. Vous en avez {{count}} qui ne s'exécutent pas.",
@@ -720,6 +758,8 @@ export default {
   'After tool execution fails': "Après l'échec de l'exécution de l'outil",
   'When notifications are sent': 'Quand des notifications sont envoyées',
   'When the user submits a prompt': "Quand l'utilisateur soumet une invite",
+  'When a slash command expands into a prompt':
+    'Quand une commande slash se développe en invite',
   'When a new session is started': 'Quand une nouvelle session est démarrée',
   'Right before HopCode concludes its response':
     'Juste avant que HopCode conclue sa réponse',
@@ -744,6 +784,8 @@ export default {
     "L'entrée de la commande est du JSON avec le message et le type de notification.",
   'Input to command is JSON with original user prompt text.':
     "L'entrée de la commande est du JSON avec le texte d'invite original de l'utilisateur.",
+  'Input to command is JSON with command_name, command_args, and expanded prompt text.':
+    "L'entrée de la commande est du JSON avec command_name, command_args et le texte d'invite développé.",
   'Input to command is JSON with session start source.':
     "L'entrée de la commande est du JSON avec la source de démarrage de session.",
   'Input to command is JSON with session end reason.':
@@ -771,7 +813,9 @@ export default {
     "afficher stderr à l'utilisateur uniquement mais continuer l'appel d'outil",
   'block processing, erase original prompt, and show stderr to user only':
     "bloquer le traitement, effacer l'invite originale et afficher stderr à l'utilisateur uniquement",
-  'stdout shown to HopCode': 'stdout affiché à HopCode',
+  'block expanded prompt submission and show stderr to user only':
+    "bloquer l'envoi de l'invite développée et afficher stderr uniquement à l'utilisateur",
+  'stdout shown to Qwen': 'stdout affiché à Qwen',
   'show stderr to user only (blocking errors ignored)':
     "afficher stderr à l'utilisateur uniquement (erreurs bloquantes ignorées)",
   'command completes successfully': 'la commande se termine avec succès',
@@ -816,26 +860,29 @@ export default {
   'Resume a previous session': 'Reprendre une session précédente',
   'Fork the current conversation into a new session':
     'Créer une branche de la conversation actuelle dans une nouvelle session',
+  'Spawn a background agent that inherits the full conversation':
+    'Lancer un agent en arrière-plan qui hérite de toute la conversation',
+  'Please provide a directive. Usage: /fork <directive>':
+    'Veuillez fournir une directive. Utilisation : /fork <directive>',
+  'Cannot fork while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
+    "Impossible de créer un fork pendant qu'une réponse ou un appel d'outil est en cours. Attendez la fin ou traitez l'appel d'outil en attente.",
+  'Cannot fork before the first conversation turn.':
+    'Impossible de créer un fork avant le premier tour de conversation.',
+  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
+    'La commande /fork nécessite le feature gate fork. Définissez HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 pour l’activer.',
+  'The agent tool is unavailable; cannot fork.':
+    "L'outil agent est indisponible ; impossible de créer un fork.",
+  'Failed to launch fork: {{error}}': 'Échec du lancement du fork : {{error}}',
+  'User launched a background fork via /fork: {{directive}}':
+    "L'utilisateur a lancé un fork en arrière-plan via /fork : {{directive}}",
+  'Forked into a background agent. It inherits this conversation and runs without blocking — track it in the background tasks panel; it reports back when done.':
+    "Fork lancé dans un agent en arrière-plan. Il hérite de cette conversation et s'exécute sans bloquer — suivez-le dans le panneau des tâches en arrière-plan ; il fera un rapport une fois terminé.",
   'Cannot branch while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
     "Impossible de créer une branche pendant qu'une réponse ou un appel d'outil est en cours. Attendez la fin ou traitez l'appel d'outil en attente.",
   'No conversation to branch.':
     'Aucune conversation à dupliquer dans une branche.',
   'Restore a tool call. This will reset the conversation and file history to the state it was in when the tool call was suggested':
     "Restaurer un appel d'outil. Cela réinitialisera la conversation et l'historique des fichiers à l'état où il se trouvait lors de la suggestion de l'appel d'outil",
-  'Navigate and search session history':
-    "Naviguer et rechercher dans l'historique de session",
-  'Full-text search across all history items (entire session)':
-    "Recherche en texte intégral dans tous les éléments de l'historique (session entière)",
-  'Load the previous 2 000 history items':
-    "Charger les 2 000 éléments précédents de l'historique",
-  'Load the next 2 000 history items':
-    "Charger les 2 000 éléments suivants de l'historique",
-  'Show current history window statistics':
-    "Afficher les statistiques de la fenêtre d'historique actuelle",
-  'Jump to a specific item index in history':
-    "Aller à un indice d'élément spécifique dans l'historique",
-  'Full-text search across all history items':
-    "Recherche en texte intégral dans tous les éléments de l'historique",
   'Could not detect terminal type. Supported terminals: VS Code, Cursor, Windsurf, and Trae.':
     'Impossible de détecter le type de terminal. Terminaux pris en charge : VS Code, Cursor, Windsurf et Trae.',
   'Terminal "{{terminal}}" is not supported yet.':
@@ -881,13 +928,14 @@ export default {
   // Commandes - Mode d'approbation
   // ============================================================================
   'Tool Approval Mode': "Mode d'approbation des outils",
-  '{{mode}} mode': 'Mode {{mode}}',
   'Analyze only, do not modify files or execute commands':
     'Analyser uniquement, ne pas modifier les fichiers ni exécuter des commandes',
   'Require approval for file edits or shell commands':
     "Demander l'approbation pour les modifications de fichiers ou les commandes shell",
   'Automatically approve file edits':
     'Approuver automatiquement les modifications de fichiers',
+  'Use classifier to automatically approve safe tool calls':
+    'Utiliser le classificateur pour approuver automatiquement les appels d’outils sûrs',
   'Automatically approve all tools':
     'Approuver automatiquement tous les outils',
   'Workspace approval mode exists and takes priority. User-level change will have no effect.':
@@ -1161,8 +1209,7 @@ export default {
     'Veuillez visiter cette URL pour autoriser :',
   'Waiting for authorization': "En attente d'autorisation",
   'Time remaining:': 'Temps restant :',
-  'HopCode OAuth Authentication Timeout':
-    "Délai d'authentification HopCode OAuth",
+  'HopCode OAuth Authentication Timeout': "Délai d'authentification HopCode OAuth",
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     "Token OAuth expiré (plus de {{seconds}} secondes). Veuillez sélectionner à nouveau la méthode d'authentification.",
   'Press any key to return to authentication type selection.':
@@ -1238,8 +1285,7 @@ export default {
   'Project settings': 'Paramètres du projet',
   'Checked in at .hopcode/settings.json': 'Validé dans .hopcode/settings.json',
   'User settings': 'Paramètres utilisateur',
-  'Saved in at ~/.hopcode/settings.json':
-    'Enregistré dans ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json': 'Enregistré dans ~/.hopcode/settings.json',
   'Add a new rule…': 'Ajouter une nouvelle règle…',
   'Add {{type}} permission rule': 'Ajouter {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1420,6 +1466,21 @@ export default {
     "Aucun appel d'outil n'a été effectué dans cette session.",
   'Session start time is unavailable, cannot calculate stats.':
     "L'heure de début de session est indisponible, impossible de calculer les stats.",
+  Activity: 'Activité',
+  Efficiency: 'Efficacité',
+  Today: "Aujourd'hui",
+  'Token Trend': 'Tendance Tokens',
+  'Cache Hit Rate': 'Taux de cache',
+  'Tool Success': 'Succès outils',
+  'Tool Leaderboard': 'Classement outils',
+  Time: 'Temps',
+  Success: 'Succès',
+  Cache: 'Cache',
+  Latency: 'Latence',
+  'Code Impact': 'Impact code',
+  net: 'net',
+  streak: 'série',
+  best: 'record',
 
   // ============================================================================
   // Migration de format de commande
@@ -1741,11 +1802,11 @@ export default {
     "⚠️  Aucune méthode d'authentification configurée.\n",
   'Run one of the following commands to get started:\n':
     "Exécutez l'une des commandes suivantes pour commencer :\n",
-  '  hopcode auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
-    '  hopcode auth hopcode-oauth     - Authentification avec HopCode OAuth (abandonné)',
+  '  qwen auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
+    '  qwen auth hopcode-oauth     - Authentification avec HopCode OAuth (abandonné)',
   'Or simply run:': 'Ou simplement exécutez :',
-  '  hopcode auth                - Interactive authentication setup\n':
-    "  hopcode auth                - Configuration d'authentification interactive\n",
+  '  qwen auth                - Interactive authentication setup\n':
+    "  qwen auth                - Configuration d'authentification interactive\n",
   '✓ Authentication Method: HopCode OAuth':
     "✓ Méthode d'authentification : HopCode OAuth",
   '  Type: Free tier (discontinued 2026-04-15)':
@@ -1765,8 +1826,8 @@ export default {
     "⚠️  Méthode d'authentification : Alibaba Cloud Coding Plan (Incomplète)",
   '  Issue: API key not found in environment or settings\n':
     "  Problème : API Key introuvable dans l'environnement ou les paramètres\n",
-  '  Run `hopcode auth coding-plan` to re-configure.\n':
-    '  Exécutez `hopcode auth coding-plan` pour reconfigurer.\n',
+  '  Run `qwen auth coding-plan` to re-configure.\n':
+    '  Exécutez `qwen auth coding-plan` pour reconfigurer.\n',
   '✓ Authentication Method: {{type}}':
     "✓ Méthode d'authentification : {{type}}",
   '  Status: Configured\n': '  Statut : Configuré\n',
@@ -1912,4 +1973,41 @@ export default {
   Tokens: 'Jetons',
   tokens: 'jetons',
   '中国 (China)': 'Chine',
+
+  // Stats Dashboard — Category 2
+  'Activity Heatmap': "Carte d'activité",
+  Less: 'Moins',
+  More: 'Plus',
+  Sessions: 'Sessions',
+  Duration: 'Durée',
+  Projects: 'Projets',
+  'Loading stats...': 'Chargement des stats...',
+  '(no data)': '(aucune donnée)',
+  d: 'j',
+  h: 'h',
+  m: 'm',
+  Input: 'Entrée',
+  Models: 'Modèles',
+  'All time': 'Tout le temps',
+  'Last 7 days': '7 derniers jours',
+  'Last 30 days': '30 derniers jours',
+  'Show usage statistics dashboard.':
+    "Afficher le tableau de bord des statistiques d'utilisation.",
+
+  // Stats Dashboard — keyboard hints (not translated)
+  'tab \xB7 esc': 'tab \xB7 esc',
+  'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc':
+    'tab \xB7 r dates \xB7 \u2190\u2192 month \xB7 esc',
+  'tab \xB7 r dates \xB7 esc': 'tab \xB7 r dates \xB7 esc',
+
+  // Stats Dashboard — missing labels
+  'API Requests': 'Requêtes API',
+  'Tool Calls': "Appels d'outils",
+  'Success rate': 'Taux de réussite',
+  'Code Changes': 'Modifications du code',
+  Tool: 'Outil',
+  reqs: 'req.',
+  in: 'ent.',
+  out: 'sort.',
+  'In/Out': 'Ent/Sort',
 };

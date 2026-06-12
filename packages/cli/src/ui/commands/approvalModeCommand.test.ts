@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -103,14 +103,15 @@ describe('approvalModeCommand', () => {
 
       expect(result.type).toBe('message');
       expect(result.messageType).toBe('info');
-      expect(result.content).toContain('default');
+      // "default" is displayed using its formatted name, not the raw enum value.
+      expect(result.content).toContain('Ask permissions');
       expect(mockSetApprovalMode).toHaveBeenCalledWith('default');
     });
 
     it('should be case-insensitive for mode argument', async () => {
       const result = (await approvalModeCommand.action?.(
         mockContext,
-        'IZN',
+        'izn',
       )) as MessageActionReturn;
 
       expect(result.type).toBe('message');

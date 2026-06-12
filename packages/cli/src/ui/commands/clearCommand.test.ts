@@ -8,16 +8,19 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { clearCommand } from './clearCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
-import { SessionEndReason } from '@hoptrendy/hopcode-core';
+import { SessionEndReason } from '@hopcode/hopcode-core';
 
 // Mock the telemetry service
-vi.mock('@hoptrendy/hopcode-core', async () => {
-  const actual = await vi.importActual('@hoptrendy/hopcode-core');
+vi.mock('@hopcode/hopcode-core', async () => {
+  const actual = await vi.importActual('@hopcode/hopcode-core');
   return {
     ...actual,
     uiTelemetryService: {
       reset: vi.fn(),
+      getMetrics: vi.fn(() => ({ models: {} })),
+      getSessionStartTime: vi.fn(() => new Date()),
     },
+    persistSessionUsage: vi.fn(),
   };
 });
 
@@ -78,6 +81,8 @@ describe('clearCommand', () => {
           getModel: () => 'test-model',
           getToolRegistry: () => undefined,
           getApprovalMode: () => 'default',
+          getSessionId: () => 'test-session-id',
+          getProjectRoot: () => '/test/project',
           getMonitorRegistry: () => ({
             getRunning: vi.fn().mockReturnValue([]),
             abortAll: mockAbortMonitors,
@@ -166,6 +171,32 @@ describe('clearCommand', () => {
     expect(mockResetMonitors.mock.invocationCallOrder[0]).toBeLessThan(
       mockStartNewSession.mock.invocationCallOrder[0],
     );
+  });
+
+  it('should persist usage when session has activity before clearing', async () => {
+    const core = await import('@hopcode/hopcode-core');
+    (
+      core.uiTelemetryService.getMetrics as ReturnType<typeof vi.fn>
+    ).mockReturnValue({
+      models: { 'test-model': { api: { totalRequests: 5 } } },
+    });
+
+    await clearCommand.action!(mockContext, '');
+
+    expect(core.persistSessionUsage).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not persist usage when session has no activity', async () => {
+    const core = await import('@hopcode/hopcode-core');
+    (
+      core.uiTelemetryService.getMetrics as ReturnType<typeof vi.fn>
+    ).mockReturnValue({
+      models: {},
+    });
+
+    await clearCommand.action!(mockContext, '');
+
+    expect(core.persistSessionUsage).not.toHaveBeenCalled();
   });
 
   it('should handle hook errors gracefully and continue execution', async () => {

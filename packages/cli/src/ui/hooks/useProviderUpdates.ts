@@ -9,7 +9,7 @@ import type {
   ProviderModelConfig,
   Config,
   ProviderConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import {
   ALL_PROVIDERS,
   applyProviderInstallPlan,
@@ -21,7 +21,7 @@ import {
   resolveBaseUrl,
   resolveMetadataKey,
   resolveOwnsModel,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { t } from '../../i18n/index.js';
 import { createLoadedSettingsAdapter } from '../../config/loadedSettingsAdapter.js';

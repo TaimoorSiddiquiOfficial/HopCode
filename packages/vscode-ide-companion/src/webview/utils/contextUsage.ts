@@ -5,7 +5,7 @@
  */
 
 import type { ModelInfo } from '@agentclientprotocol/sdk';
-import type { ContextUsage } from '@hoptrendy/webui';
+import type { ContextUsage } from '@hopcode/webui';
 import type { UsageStatsPayload } from '../../types/chatTypes.js';
 
 export function computeContextUsage(

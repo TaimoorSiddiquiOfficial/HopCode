@@ -71,7 +71,7 @@ vi.mock('../ui/commands/hooksCommand.js', async () => {
 
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { BuiltinCommandLoader } from './BuiltinCommandLoader.js';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import { CommandKind } from '../ui/commands/types.js';
 
 import { restoreCommand } from '../ui/commands/restoreCommand.js';
@@ -209,6 +209,14 @@ describe('BuiltinCommandLoader', () => {
     const modelCmd = commands.find((c) => c.name === 'model');
     expect(modelCmd).toBeDefined();
     expect(modelCmd?.name).toBe('model');
+  });
+
+  it('should always register the /fork command', async () => {
+    const loader = new BuiltinCommandLoader(mockConfig);
+    const commands = await loader.loadCommands(new AbortController().signal);
+    const forkCmd = commands.find((c) => c.name === 'fork');
+    expect(forkCmd).toBeDefined();
+    expect(forkCmd?.kind).toBe(CommandKind.BUILT_IN);
   });
 
   it('should include lsp command only when LSP is enabled', async () => {

@@ -7,7 +7,7 @@ This document explains how to run HopCode inside a sandbox to reduce risk when t
 Before using sandboxing, you need to install and set up HopCode:
 
 ```bash
-npm install -g @hoptrendy/hopcode-cli
+npm install -g @hopcode/hopcode
 ```
 
 To verify the installation

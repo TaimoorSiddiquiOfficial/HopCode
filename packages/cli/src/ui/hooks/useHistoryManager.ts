@@ -1,29 +1,27 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { useState, useRef, useCallback, useMemo } from 'react';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 import type { HistoryItem, HistoryItemWithoutId } from '../types.js';
-import {
-  HistoryVault,
-  type HistoryWindowInfo,
-  type HistorySearchResult,
-} from '../history/HistoryVault.js';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import process from 'node:process';
 
-const debugLogger = createDebugLogger('useHistoryManager');
+const debugLogger = createDebugLogger('HISTORY_MANAGER');
 
-// Type for the updater function passed to updateItem
+// Type for the updater function passed to updateHistoryItem
 type HistoryItemUpdater = (
   prevItem: HistoryItem,
-) => Partial<Omit<HistoryItem, 'id'>>;
+) => Partial<HistoryItemWithoutId>;
+
+const UI_COMPACT_CLEARED_MESSAGE = '[Old tool result content cleared]';
+const UI_COMPACT_KEEP_RECENT = 20;
 
 export interface UseHistoryManagerReturn {
-  /** The currently visible window of history items (up to WINDOW_SIZE). */
   history: HistoryItem[];
-  addItem: (itemData: HistoryItemWithoutId, baseTimestamp: number) => number;
+  addItem: (itemData: HistoryItemWithoutId, baseTimestamp: number) => number; // Returns the generated ID
   updateItem: (
     id: number,
     updates: Partial<HistoryItemWithoutId> | HistoryItemUpdater,
@@ -31,77 +29,62 @@ export interface UseHistoryManagerReturn {
   clearItems: () => void;
   loadHistory: (newHistory: HistoryItem[]) => void;
   truncateToItem: (itemId: number) => void;
-  // -- Window navigation --------------------------------------------------
-  canLoadOlderHistory: boolean;
-  canLoadNewerHistory: boolean;
-  loadOlderHistory: () => void;
-  loadNewerHistory: () => void;
-  windowInfo: HistoryWindowInfo;
-  // -- Search -------------------------------------------------------------
-  searchHistory: (query: string) => HistorySearchResult[];
-  jumpToSearchResult: (globalIndex: number) => void;
+  compactOldItems: () => void;
 }
 
 /**
  * Custom hook to manage the chat history state.
  *
- * Wraps a {@link HistoryVault} that holds the full unbounded history off React
- * state.  Only the active window (up to 2 000 items) is pushed to React state,
- * preventing unbounded memory growth while still giving the AI access to the
- * complete session context via the vault's context-note mechanism.
+ * Encapsulates the history array, message ID generation, adding items,
+ * updating items, and clearing the history.
  */
 export function useHistory(): UseHistoryManagerReturn {
-  const vaultRef = useRef<HistoryVault>(new HistoryVault());
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const messageIdCounterRef = useRef(0);
 
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [windowInfo, setWindowInfo] = useState<HistoryWindowInfo>({
-    windowStart: 0,
-    windowEnd: 0,
-    total: 0,
-    hasOlder: false,
-    hasNewer: false,
-  });
-
-  /** Push the vault's current window and info into React state. */
-  const syncState = useCallback(() => {
-    const vault = vaultRef.current;
-    setHistory(vault.getWindowItems());
-    setWindowInfo(vault.getWindowInfo());
-  }, []);
-
+  // Generates a unique message ID based on a timestamp and a counter.
   const getNextMessageId = useCallback((baseTimestamp: number): number => {
     messageIdCounterRef.current += 1;
     return baseTimestamp + messageIdCounterRef.current;
   }, []);
 
+  const loadHistory = useCallback((newHistory: HistoryItem[]) => {
+    setHistory(newHistory);
+  }, []);
+
+  // Adds a new item to the history state with a unique ID.
   const addItem = useCallback(
     (itemData: HistoryItemWithoutId, baseTimestamp: number): number => {
       const id = getNextMessageId(baseTimestamp);
       const newItem: HistoryItem = { ...itemData, id } as HistoryItem;
 
-      const vault = vaultRef.current;
-      const lastItem = vault.getLastItem();
+      setHistory((prevHistory) => {
+        if (prevHistory.length > 0) {
+          const lastItem = prevHistory[prevHistory.length - 1];
+          // Prevent adding duplicate consecutive user messages
+          if (
+            lastItem.type === 'user' &&
+            newItem.type === 'user' &&
+            lastItem.text === newItem.text
+          ) {
+            return prevHistory; // Don't add the duplicate
+          }
+        }
 
-      // Prevent adding duplicate consecutive user messages.
-      // Check vault's last item (not React state) because a context-note
-      // may be the last item in the window slice but not the last real item.
-      if (
-        lastItem?.type === 'user' &&
-        newItem.type === 'user' &&
-        'text' in lastItem &&
-        'text' in newItem &&
-        (lastItem as { text: string }).text ===
-          (newItem as { text: string }).text
-      ) {
-        return id;
-      }
-
-      vault.push(newItem);
-      syncState();
-      return id;
+        const newHistory = [...prevHistory, newItem];
+        if (debugLogger.isEnabled()) {
+          const textSize = newItem.text?.length ?? 0;
+          debugLogger.debug(
+            `[ADD_ITEM] type=${newItem.type}, ` +
+              `textSize=${textSize}, ` +
+              `historyLength=${newHistory.length}`,
+          );
+        }
+        return newHistory;
+      });
+      return id; // Return the generated ID (even if not added, to keep signature)
     },
-    [getNextMessageId, syncState],
+    [getNextMessageId],
   );
 
   /**
@@ -110,69 +93,146 @@ export function useHistory(): UseHistoryManagerReturn {
    * rendering all history items in <Static /> for performance reasons. Only use
    * if ABSOLUTELY NECESSARY
    */
+  //
   const updateItem = useCallback(
     (
       id: number,
       updates: Partial<HistoryItemWithoutId> | HistoryItemUpdater,
     ) => {
-      const updated = vaultRef.current.updateItem(id, (prev) => {
-        const newUpdates =
-          typeof updates === 'function' ? updates(prev) : updates;
-        return { ...prev, ...newUpdates } as HistoryItem;
+      setHistory((prevHistory) => {
+        let updated = false;
+        const nextHistory = prevHistory.map((item) => {
+          if (item.id === id) {
+            updated = true;
+            // Apply updates based on whether it's an object or a function
+            const newUpdates =
+              typeof updates === 'function' ? updates(item) : updates;
+            return { ...item, ...newUpdates } as HistoryItem;
+          }
+          return item;
+        });
+        if (!updated) {
+          debugLogger.debug(
+            `Skipped history update; item ${id} was not found.`,
+          );
+          return prevHistory;
+        }
+        return nextHistory;
       });
-      if (updated) {
-        syncState();
-      } else {
-        debugLogger.debug(`Skipped history update; item ${id} was not found.`);
-      }
     },
-    [syncState],
-  );
-
-  const clearItems = useCallback(() => {
-    vaultRef.current.clear();
-    messageIdCounterRef.current = 0;
-    syncState();
-  }, [syncState]);
-
-  const loadHistory = useCallback(
-    (newHistory: HistoryItem[]) => {
-      vaultRef.current.replaceAll(newHistory);
-      syncState();
-    },
-    [syncState],
-  );
-
-  const truncateToItem = useCallback(
-    (itemId: number) => {
-      vaultRef.current.truncateFromId(itemId);
-      syncState();
-    },
-    [syncState],
-  );
-
-  const loadOlderHistory = useCallback(() => {
-    vaultRef.current.loadOlderWindow();
-    syncState();
-  }, [syncState]);
-
-  const loadNewerHistory = useCallback(() => {
-    vaultRef.current.loadNewerWindow();
-    syncState();
-  }, [syncState]);
-
-  const searchHistory = useCallback(
-    (query: string): HistorySearchResult[] => vaultRef.current.search(query),
     [],
   );
 
-  const jumpToSearchResult = useCallback(
-    (globalIndex: number) => {
-      vaultRef.current.jumpToIndex(globalIndex);
-      syncState();
-    },
-    [syncState],
-  );
+  // Clears the entire history state and resets the ID counter.
+  const clearItems = useCallback(() => {
+    if (debugLogger.isEnabled()) {
+      debugLogger.debug(
+        `[CLEAR_HISTORY] Clearing history, memory before=${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)}MB`,
+      );
+    }
+    setHistory([]);
+    messageIdCounterRef.current = 0;
+  }, []);
+
+  // Truncates history to exclude the item with the given ID and everything after it.
+  const truncateToItem = useCallback((itemId: number) => {
+    setHistory((prev) => {
+      const index = prev.findIndex((h) => h.id === itemId);
+      return index === -1 ? prev : prev.slice(0, index);
+    });
+  }, []);
+
+  const compactOldItems = useCallback(() => {
+    setHistory((prev) => {
+      if (prev.length === 0) return prev;
+
+      let thoughtRemoved = 0;
+      let toolGroupsCompacted = 0;
+
+      let totalThoughts = 0;
+      let totalToolGroupsWithOutput = 0;
+      for (const item of prev) {
+        if (
+          item.type === 'gemini_thought' ||
+          item.type === 'gemini_thought_content'
+        ) {
+          totalThoughts++;
+        } else if (
+          item.type === 'tool_group' &&
+          item.tools.some(
+            (t) =>
+              t.resultDisplay != null &&
+              t.resultDisplay !== UI_COMPACT_CLEARED_MESSAGE,
+          )
+        ) {
+          totalToolGroupsWithOutput++;
+        }
+      }
+      const thoughtsToDrop = Math.max(
+        0,
+        totalThoughts - UI_COMPACT_KEEP_RECENT,
+      );
+      const toolGroupsToCompact = Math.max(
+        0,
+        totalToolGroupsWithOutput - UI_COMPACT_KEEP_RECENT,
+      );
+      let thoughtsDropped = 0;
+      let toolGroupsSeen = 0;
+
+      const next = prev
+        .filter((item) => {
+          if (
+            item.type === 'gemini_thought' ||
+            item.type === 'gemini_thought_content'
+          ) {
+            if (thoughtsDropped < thoughtsToDrop) {
+              thoughtsDropped++;
+              thoughtRemoved++;
+              return false;
+            }
+          }
+          return true;
+        })
+        .map((item) => {
+          if (item.type !== 'tool_group') return item;
+          // Check for any non-null resultDisplay (covers string, FileDiff,
+          // AnsiOutputDisplay, AgentResultDisplay, etc.)
+          const hasOldOutput = item.tools.some(
+            (t) =>
+              t.resultDisplay != null &&
+              t.resultDisplay !== UI_COMPACT_CLEARED_MESSAGE,
+          );
+          if (!hasOldOutput) return item;
+          toolGroupsSeen++;
+          if (toolGroupsSeen > toolGroupsToCompact) return item;
+          toolGroupsCompacted++;
+          return {
+            ...item,
+            tools: item.tools.map((t) => {
+              if (
+                t.resultDisplay != null &&
+                t.resultDisplay !== UI_COMPACT_CLEARED_MESSAGE
+              ) {
+                return { ...t, resultDisplay: UI_COMPACT_CLEARED_MESSAGE };
+              }
+              return t;
+            }),
+          };
+        });
+
+      if (thoughtRemoved > 0 || toolGroupsCompacted > 0) {
+        if (debugLogger.isEnabled()) {
+          debugLogger.debug(
+            `[COMPACT_UI_HISTORY] removed ${thoughtRemoved} thought item(s), ` +
+              `compacted ${toolGroupsCompacted} tool group(s), ` +
+              `historyLength ${prev.length} -> ${next.length}, ` +
+              `memory=${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)}MB`,
+          );
+        }
+      }
+      return thoughtRemoved > 0 || toolGroupsCompacted > 0 ? next : prev;
+    });
+  }, []);
 
   return useMemo(
     () => ({
@@ -182,13 +242,7 @@ export function useHistory(): UseHistoryManagerReturn {
       clearItems,
       loadHistory,
       truncateToItem,
-      canLoadOlderHistory: windowInfo.hasOlder,
-      canLoadNewerHistory: windowInfo.hasNewer,
-      loadOlderHistory,
-      loadNewerHistory,
-      windowInfo,
-      searchHistory,
-      jumpToSearchResult,
+      compactOldItems,
     }),
     [
       history,
@@ -197,11 +251,7 @@ export function useHistory(): UseHistoryManagerReturn {
       clearItems,
       loadHistory,
       truncateToItem,
-      windowInfo,
-      loadOlderHistory,
-      loadNewerHistory,
-      searchHistory,
-      jumpToSearchResult,
+      compactOldItems,
     ],
   );
 }

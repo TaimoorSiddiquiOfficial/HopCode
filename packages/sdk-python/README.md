@@ -34,7 +34,7 @@ hopcode --version
 ```python
 import asyncio
 
-from qwen_code_sdk import (
+from HOPCODE_code_sdk import (
     is_sdk_assistant_message,
     is_sdk_result_message,
     query,
@@ -86,14 +86,14 @@ already runs an event loop, such as Jupyter, FastAPI, or pytest-asyncio, call
 ## Sync API
 
 ```python
-from qwen_code_sdk import is_sdk_result_message, query_sync
+from HOPCODE_code_sdk import is_sdk_result_message, query_sync
 
 
 with query_sync(
     "Say hello",
     {
         "cwd": "/path/to/project",
-        "path_to_qwen_executable": "qwen",
+        "path_to_HOPCODE_executable": "hopcode",
     },
 ) as result:
     for message in result:
@@ -120,7 +120,7 @@ for multi-turn sessions.
 ```python
 options = {
     "cwd": "/path/to/project",
-    "path_to_qwen_executable": "qwen",
+    "path_to_HOPCODE_executable": "hopcode",
     "model": "qwen-plus",
     "permission_mode": "plan",
     "max_session_turns": 1,
@@ -138,7 +138,7 @@ options = {
 Common fields:
 
 - `cwd`: working directory used by the CLI
-- `path_to_qwen_executable`: `qwen`, an absolute binary path, or a `.js` CLI
+- `path_to_HOPCODE_executable`: `hopcode`, an absolute binary path, or a `.js` CLI
   bundle
 - `model`: model override for this session
 - `permission_mode`: one of `default`, `plan`, `auto-edit`, or `izn`; `izn`
@@ -162,7 +162,7 @@ Use a stable UUID for `session_id` when you want to correlate messages:
 ```python
 import asyncio
 
-from qwen_code_sdk import SDKUserMessage, is_sdk_result_message, query
+from HOPCODE_code_sdk import SDKUserMessage, is_sdk_result_message, query
 
 SESSION_ID = "123e4567-e89b-12d3-a456-426614174000"
 
@@ -190,7 +190,7 @@ async def main():
         prompts(),
         {
             "cwd": "/path/to/project",
-            "path_to_qwen_executable": "qwen",
+            "path_to_HOPCODE_executable": "hopcode",
             "session_id": SESSION_ID,
         },
     ) as result:
@@ -217,7 +217,7 @@ call.
 import asyncio
 from pathlib import Path
 
-from qwen_code_sdk import is_sdk_result_message, query
+from HOPCODE_code_sdk import is_sdk_result_message, query
 
 PROJECT_ROOT = Path("/path/to/project").resolve()
 
@@ -261,7 +261,7 @@ async def main():
         "Update README.md with a one paragraph summary.",
         {
             "cwd": str(PROJECT_ROOT),
-            "path_to_qwen_executable": "qwen",
+            "path_to_HOPCODE_executable": "hopcode",
             "can_use_tool": can_use_tool,
         },
     ) as result:
@@ -293,7 +293,7 @@ Control methods can be called while a session is active:
 ```python
 import asyncio
 
-from qwen_code_sdk import is_sdk_result_message, query
+from HOPCODE_code_sdk import is_sdk_result_message, query
 
 
 async def main():
@@ -301,7 +301,7 @@ async def main():
         "Inspect this project and wait for my next instruction.",
         {
             "cwd": "/path/to/project",
-            "path_to_qwen_executable": "qwen",
+            "path_to_HOPCODE_executable": "hopcode",
         },
     ) as result:
         commands = await result.supported_commands()
@@ -330,7 +330,7 @@ the underlying process.
 ```python
 import asyncio
 
-from qwen_code_sdk import is_sdk_result_message, query
+from HOPCODE_code_sdk import is_sdk_result_message, query
 
 
 async def main():
@@ -338,7 +338,7 @@ async def main():
     async with query(
         "Continue from the previous state.",
         {
-            "path_to_qwen_executable": "qwen",
+            "path_to_HOPCODE_executable": "hopcode",
             "resume": "123e4567-e89b-12d3-a456-426614174000",
         },
     ) as result:
@@ -359,14 +359,14 @@ To continue the latest session instead:
 ```python
 import asyncio
 
-from qwen_code_sdk import is_sdk_result_message, query
+from HOPCODE_code_sdk import is_sdk_result_message, query
 
 
 async def main():
     async with query(
         "Continue the last session.",
         {
-            "path_to_qwen_executable": "qwen",
+            "path_to_HOPCODE_executable": "hopcode",
             "continue_session": True,
         },
     ) as latest:
@@ -393,7 +393,7 @@ SDK raises `ValidationError` if these session options are combined.
 - `AbortError`: query or control request was cancelled
 
 ```python
-from qwen_code_sdk import (
+from HOPCODE_code_sdk import (
     ProcessExitError,
     ValidationError,
     is_sdk_result_message,
@@ -401,7 +401,7 @@ from qwen_code_sdk import (
 )
 
 try:
-    with query_sync("Say hello", {"path_to_qwen_executable": "qwen"}) as result:
+    with query_sync("Say hello", {"path_to_HOPCODE_executable": "hopcode"}) as result:
         for message in result:
             if is_sdk_result_message(message):
                 if message.get("is_error"):

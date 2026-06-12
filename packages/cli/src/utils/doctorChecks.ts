@@ -1,12 +1,10 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import process from 'node:process';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import os from 'node:os';
 import { getNpmVersion, getGitVersion } from './systemInfo.js';
 import { validateAuthMethod } from '../config/auth.js';
@@ -15,11 +13,10 @@ import {
   canUseRipgrep,
   getMCPServerStatus,
   MCPServerStatus,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { CommandContext } from '../ui/commands/types.js';
 import type { DoctorCheckResult } from '../ui/types.js';
 import { t } from '../i18n/index.js';
-import { loadGitHubToken } from './githubTokenStore.js';
 
 const MIN_NODE_MAJOR = 22;
 
@@ -344,48 +341,7 @@ async function checkRipgrep(
   }
 }
 
-const execFileAsync = promisify(execFile);
-
-const NPM_PACKAGE_NAME = '@hoptrendy/hopcode-cli';
-
-async function checkNpmCli(): Promise<DoctorCheckResult> {
-  try {
-    const { stdout } = await execFileAsync('npm', [
-      'view',
-      NPM_PACKAGE_NAME,
-      'version',
-      '--json',
-    ]);
-    const published = stdout.trim().replace(/^"|"$/g, '');
-    return {
-      category: t('HopCode'),
-      name: t('NPM CLI package'),
-      status: 'pass',
-      message: t('published v{{version}}', { version: published }),
-    };
-  } catch {
-    return {
-      category: t('HopCode'),
-      name: t('NPM CLI package'),
-      status: 'warn',
-      message: t('not found on npm'),
-      detail: t('{{pkg}} has not been published to NPM yet.', {
-        pkg: NPM_PACKAGE_NAME,
-      }),
-    };
-  }
-}
-
-async function checkGit(context: CommandContext): Promise<DoctorCheckResult> {
-  if (context.services.git) {
-    return {
-      category: t('Git'),
-      name: t('Git'),
-      status: 'pass',
-      message: t('available'),
-    };
-  }
-  // services.git is undefined in non-interactive mode — probe the binary directly
+async function checkGit(_context: CommandContext): Promise<DoctorCheckResult> {
   const version = await getGitVersion();
   if (version === 'unknown') {
     return {
@@ -404,153 +360,20 @@ async function checkGit(context: CommandContext): Promise<DoctorCheckResult> {
   };
 }
 
-function checkGithubToken(): DoctorCheckResult {
-  const stored = loadGitHubToken();
-  const token = stored?.accessToken ?? process.env['GITHUB_TOKEN'];
-  if (token) {
-    return {
-      category: t('HopCode'),
-      name: t('GitHub token'),
-      status: 'pass',
-      message: t('configured'),
-    };
-  }
-  return {
-    category: t('HopCode'),
-    name: t('GitHub token'),
-    status: 'warn',
-    message: t('not configured'),
-    detail: t(
-      'Set GITHUB_TOKEN env var or run: hopcode github auth. Required for /ci command.',
-    ),
-  };
-}
-
 /**
- * Check that the configured web search provider endpoint is reachable.
+ * Run all doctor diagnostic checks.
  */
-async function checkProviderReachability(
-  context: CommandContext,
-): Promise<DoctorCheckResult> {
-  const config = context.services.config;
-  const webSearchConfig = config?.getWebSearchConfig?.();
-
-  if (!webSearchConfig || webSearchConfig.provider.length === 0) {
-    return {
-      category: t('Configuration'),
-      name: t('Web search provider'),
-      status: 'warn',
-      message: t('not configured'),
-      detail: t(
-        'No web search providers are configured. DuckDuckGo (free) is used as fallback.',
-      ),
-    };
-  }
-
-  // Try to ping the first non-duckduckgo provider; DDG has no /v1/models endpoint
-  const providerEndpoints: Record<string, string> = {
-    tavily: 'https://api.tavily.com',
-    exa: 'https://api.exa.ai',
-    bing: 'https://api.bing.microsoft.com',
-    jina: 'https://s.jina.ai',
-    firecrawl: 'https://api.firecrawl.dev',
-    google: 'https://www.googleapis.com',
-    dashscope: 'https://dashscope.aliyuncs.com',
-  };
-
-  const configuredTypes = webSearchConfig.provider
-    .map((p) => p.type)
-    .filter((t) => t !== 'duckduckgo');
-
-  if (configuredTypes.length === 0) {
-    return {
-      category: t('Configuration'),
-      name: t('Web search provider'),
-      status: 'pass',
-      message: t('DuckDuckGo (free fallback, always available)'),
-    };
-  }
-
-  const providerType = configuredTypes[0]!;
-  const baseUrl = providerEndpoints[providerType];
-
-  if (!baseUrl) {
-    return {
-      category: t('Configuration'),
-      name: t('Web search provider'),
-      status: 'pass',
-      message: t('configured ({{provider}})', { provider: providerType }),
-    };
-  }
-
-  try {
-    const start = Date.now();
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-
-    const response = await fetch(baseUrl, {
-      method: 'HEAD',
-      signal: controller.signal,
-    }).catch(() =>
-      fetch(baseUrl, { method: 'GET', signal: controller.signal }),
-    );
-
-    clearTimeout(timeout);
-    const latency = Date.now() - start;
-
-    if (response.status === 401 || response.status === 403) {
-      // Endpoint reachable, but bad/missing API key — still a pass for reachability
-      return {
-        category: t('Configuration'),
-        name: t('Web search provider'),
-        status: 'pass',
-        message: t('{{provider}} reachable ({{latency}}ms) — check API key', {
-          provider: providerType,
-          latency: String(latency),
-        }),
-      };
-    }
-
-    return {
-      category: t('Configuration'),
-      name: t('Web search provider'),
-      status: 'pass',
-      message: t('{{provider}} reachable ({{latency}}ms)', {
-        provider: providerType,
-        latency: String(latency),
-      }),
-    };
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return {
-      category: t('Configuration'),
-      name: t('Web search provider'),
-      status: 'warn',
-      message: t('{{provider}} unreachable', { provider: providerType }),
-      detail: msg,
-    };
-  }
-}
-
 export async function runDoctorChecks(
   context: CommandContext,
 ): Promise<DoctorCheckResult[]> {
   // Run async checks in parallel
-  const [
-    npmResult,
-    ripgrepResult,
-    apiClientResult,
-    gitResult,
-    npmCliResult,
-    providerResult,
-  ] = await Promise.all([
-    checkNpmVersion(),
-    checkRipgrep(context),
-    checkApiClient(context),
-    checkGit(context),
-    checkNpmCli(),
-    checkProviderReachability(context),
-  ]);
+  const [npmResult, ripgrepResult, apiClientResult, gitResult] =
+    await Promise.all([
+      checkNpmVersion(),
+      checkRipgrep(context),
+      checkApiClient(context),
+      checkGit(context),
+    ]);
 
   return [
     // System
@@ -568,12 +391,7 @@ export async function runDoctorChecks(
     // Tools
     checkToolRegistry(context),
     ripgrepResult,
-    // Web Search
-    providerResult,
     // Git
     gitResult,
-    // HopCode
-    npmCliResult,
-    checkGithubToken(),
   ];
 }

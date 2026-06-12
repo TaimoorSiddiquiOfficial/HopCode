@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'ink-testing-library';
-import { HooksConfigSource, HookType } from '@hoptrendy/hopcode-core';
+import { HooksConfigSource, HookType } from '@hopcode/hopcode-core';
 import { HandlerListBody } from './HandlerListBody.js';
 import type { HookConfigDisplayInfo } from './types.js';
 

@@ -5,8 +5,8 @@
  */
 
 import type { Part } from '@google/genai';
-import { ToolNames } from '@hoptrendy/hopcode-core';
-import type { ChatRecord, Config, Kind } from '@hoptrendy/hopcode-core';
+import { ToolNames } from '@hopcode/hopcode-core';
+import type { ChatRecord, Config, Kind } from '@hopcode/hopcode-core';
 import { buildTruncatedDiffPreviewText } from '../../../utils/truncatedDiffPreview.js';
 import type { ExportMessage, ExportSessionData } from './types.js';
 

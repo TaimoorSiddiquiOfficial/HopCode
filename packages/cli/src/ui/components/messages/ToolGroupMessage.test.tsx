@@ -15,7 +15,7 @@ import type {
   AgentResultDisplay,
   Config,
   ToolCallConfirmationDetails,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { TOOL_STATUS } from '../../constants.js';
 import { ConfigContext } from '../../contexts/ConfigContext.js';
 import { CompactModeProvider } from '../../contexts/CompactModeContext.js';
@@ -594,7 +594,7 @@ describe('<ToolGroupMessage />', () => {
     const renderCompact = (component: React.ReactElement, compactMode = true) =>
       render(
         <ConfigContext.Provider value={mockConfig}>
-          <CompactModeProvider value={{ compactMode }}>
+          <CompactModeProvider value={{ compactMode, compactInline: false }}>
             {component}
           </CompactModeProvider>
         </ConfigContext.Provider>,

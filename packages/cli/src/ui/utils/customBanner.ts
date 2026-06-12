@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Code
  * SPDX-License-Identifier: Apache-2.0
@@ -12,7 +12,7 @@ import {
   TERMINAL_OSC_REGEX,
   TERMINAL_CSI_REGEX,
   TERMINAL_SHIFT_DCS_REGEX,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { LoadedSettings, SettingsFile } from '../../config/settings.js';
 import type {
   AsciiArtSource,
@@ -339,7 +339,7 @@ function readArtFile(absolutePath: string): string | undefined {
 /**
  * Banner-specific sanitizer. Re-uses the OSC / CSI / SS2 / SS3 patterns
  * exported from `stripTerminalControlSequences` (in
- * `@hoptrendy/hopcode-core`) so the regexes are authored once, but
+ * `@hopcode/hopcode-core`) so the regexes are authored once, but
  * preserves `\n` and `\t` — multi-line / tab-aligned ASCII art needs
  * those, while the shared core helper strips them. The fallback range
  * here matches the core helper's C0/C1/DEL strip but carves out

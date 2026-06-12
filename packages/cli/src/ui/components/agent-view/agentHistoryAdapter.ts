@@ -21,7 +21,7 @@ import type {
   AgentMessage,
   ToolCallConfirmationDetails,
   ToolResultDisplay,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { HistoryItem, IndividualToolCallDisplay } from '../../types.js';
 import { ToolCallStatus } from '../../types.js';
 

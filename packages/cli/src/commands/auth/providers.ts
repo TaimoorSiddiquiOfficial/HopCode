@@ -20,7 +20,7 @@ import {
   AuthType,
   getErrorMessage,
   type ProviderModelConfig as ModelConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { promptForSecretInput } from '../../utils/promptUtils.js';
 import { t } from '../../i18n/index.js';
@@ -126,7 +126,7 @@ export async function handleApiKeyAuth(
       debug: undefined,
       prompt: undefined,
       promptInteractive: undefined,
-      izn: undefined,
+      IZN: undefined,
       approvalMode: undefined,
       telemetry: undefined,
       checkpointing: undefined,

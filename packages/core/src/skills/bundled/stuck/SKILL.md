@@ -1,4 +1,4 @@
-﻿---
+---
 name: stuck
 description: Diagnose frozen, stuck, or slow HopCode sessions on this machine. Scans for problematic processes, high CPU/memory usage, hung subprocesses, and debug logs. Use /stuck or /stuck <PID> to focus on a specific process.
 argument-hint: '[PID or symptom]'
@@ -66,7 +66,7 @@ Otherwise (no arg, or symptom-only arg), run the general path below:
 
 1. **Enumerate live sessions via the runtime sidecar** (preferred, reliable):
 
-   HopCode writes a `runtime.json` sidecar for each interactive session at `"$RUNTIME_DIR"/projects/<sanitized-cwd>/chats/<sessionId>.runtime.json`. Each file contains `{schema_version, pid, session_id, work_dir, hostname, started_at, qwen_version}` — the authoritative source of `(pid, session_id, work_dir)` mappings.
+   HopCode writes a `runtime.json` sidecar for each interactive session at `"$RUNTIME_DIR"/projects/<sanitized-cwd>/chats/<sessionId>.runtime.json`. Each file contains `{schema_version, pid, session_id, work_dir, hostname, started_at, HOPCODE_version}` — the authoritative source of `(pid, session_id, work_dir)` mappings.
 
    Filter to live `(pid, sidecar-path)` pairs in one shot. Use Node (guaranteed available — hopcode requires it) instead of `jq` (often missing on default macOS / minimal Linux) so this path doesn't silently degrade:
 
@@ -84,7 +84,7 @@ Otherwise (no arg, or symptom-only arg), run the general path below:
    ps -xo pid=,pcpu=,rss=,etime=,state=,comm=,command= -u "$(id -u)" -ww | grep -E '((^|/)hopcode[^ /]*/[^ ]*\.(js|ts|mjs|cjs)( |$)|/qwen( |$))' | grep -v grep
    ```
 
-   `-u "$(id -u)"` restricts the scan to the current user — on shared hosts this avoids exposing other users' Qwen process paths/arguments into the chat. `-ww` disables column truncation so long "qwen" paths aren't cut off. The `comm` column will be `node` or `bun`, not `qwen`; filter to rows where the `command` column contains a qwen path (e.g., `hopcode/dist/cli.js`, or a bin symlink ending in `/qwen`). Cross-reference with the PIDs from step 1.
+   `-u "$(id -u)"` restricts the scan to the current user — on shared hosts this avoids exposing other users' Qwen process paths/arguments into the chat. `-ww` disables column truncation so long "hopcode" paths aren't cut off. The `comm` column will be `node` or `bun`, not `hopcode`; filter to rows where the `command` column contains a qwen path (e.g., `hopcode/dist/cli.js`, or a bin symlink ending in `/qwen`). Cross-reference with the PIDs from step 1.
 
    Note: `ps` reports `rss` in **kilobytes** on both macOS and Linux. To report in MB, divide by 1024; to report in GB, divide by 1048576. The 4GB threshold is `4194304` KB — compare the raw `rss` value against that, or compare the GB value against 4. Do not divide once and then compare against 4; that would flag every process >4MB as "very high RSS".
 

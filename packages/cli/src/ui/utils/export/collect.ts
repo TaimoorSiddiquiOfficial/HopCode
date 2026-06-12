@@ -5,7 +5,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { Config, ChatRecord } from '@hoptrendy/hopcode-core';
+import type { Config, ChatRecord } from '@hopcode/hopcode-core';
 import type { GenerateContentResponseUsageMetadata } from '@google/genai';
 import type { SessionContext } from '../../../acp-integration/session/types.js';
 import type { SessionUpdate, ToolCall } from '@agentclientprotocol/sdk';
@@ -348,7 +348,7 @@ async function extractMetadata(
   // Get git repository name
   let gitRepo: string | undefined;
   if (cwd) {
-    const { getGitRepoName } = await import('@hoptrendy/hopcode-core');
+    const { getGitRepoName } = await import('@hopcode/hopcode-core');
     gitRepo = getGitRepoName(cwd);
   }
 

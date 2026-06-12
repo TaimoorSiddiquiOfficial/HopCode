@@ -124,7 +124,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^qwen3-coder-/, LIMITS['256k']],
   // HopCode fallback (VL, turbo, plus, 2.5, etc.): 128K
   [/^hopcode/, LIMITS['256k']],
-  [/^qwen/, LIMITS['256k']],
+  [/^hopcode/, LIMITS['256k']],
 
   // -------------------
   // DeepSeek
@@ -179,7 +179,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
   // Alibaba / HopCode
   [/^qwen3\.\d/, LIMITS['64k']],
   [/^coder-model$/, LIMITS['64k']],
-  [/^qwen/, LIMITS['32k']], // Qwen fallback (VL, turbo, plus, etc.): 8K
+  [/^hopcode/, LIMITS['32k']], // Qwen fallback (VL, turbo, plus, etc.): 8K
 
   // DeepSeek
   [/^deepseek-v4/, LIMITS['384k']], // DeepSeek V4 (flash, pro): 384K

@@ -5,7 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { SendMessageType, type Config } from '@hoptrendy/hopcode-core';
+import { SendMessageType, type Config } from '@hopcode/hopcode-core';
 import { runNonInteractiveStreamJson } from './session.js';
 import type {
   CLIUserMessage,

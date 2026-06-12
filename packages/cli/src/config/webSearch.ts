@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { WebSearchProviderConfig } from '@hoptrendy/hopcode-core';
+import type { WebSearchProviderConfig } from '@hopcode/hopcode-core';
 import type { Settings } from './settings.js';
 
 /**
@@ -82,7 +82,7 @@ export function buildWebSearchConfig(
     // Tavily
     const tavilyKey =
       argv.tavilyApiKey ||
-      settings.advanced?.tavilyApiKey ||
+      (settings.advanced as Record<string, string | undefined>)?.['tavilyApiKey'] ||
       process.env['TAVILY_API_KEY'];
     if (tavilyKey) {
       providers.push({ type: 'tavily', apiKey: tavilyKey });
@@ -163,7 +163,7 @@ export function buildWebSearchConfig(
 
   return {
     provider: providers,
-    default: defaultProvider,
+    default: defaultProvider!,
     mode,
   };
 }

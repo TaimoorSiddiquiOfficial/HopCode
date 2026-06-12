@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthType } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@hopcode/hopcode-core';
 import type { ProviderConfig } from '../../providerConfig.js';
 
 export const modelscopeProvider: ProviderConfig = {
@@ -22,7 +22,7 @@ export const modelscopeProvider: ProviderConfig = {
       enableThinking: true,
     },
     {
-      id: 'Qwen/Qwen3.5-397B-A17B',
+      id: 'hopcode/Qwen3.5-397B-A17B',
       contextWindowSize: 1000000,
       enableThinking: true,
     },

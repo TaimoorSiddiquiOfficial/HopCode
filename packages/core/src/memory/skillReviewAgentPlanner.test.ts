@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -19,9 +19,11 @@ import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Config } from '../config/config.js';
 import {
+  AUTO_SKILL_DIR_PREFIX,
   buildTaskPrompt,
   createSkillScopedAgentConfig,
   listExistingSkillDirNames,
+  SKILL_REVIEW_SYSTEM_PROMPT,
 } from './skillReviewAgentPlanner.js';
 import { ToolNames } from '../tools/tool-names.js';
 
@@ -349,5 +351,30 @@ describe('buildTaskPrompt', () => {
     const prompt = await buildTaskPrompt(projectRoot);
     expect(prompt).toContain(path.join(projectRoot, '.hopcode', 'skills'));
     expect(prompt).toContain('real');
+  });
+
+  it('instructs the agent to use the auto-skill- directory prefix (#4837)', async () => {
+    // The `.gitignore` re-ignores `.hopcode/skills/auto-skill-*/`, so new
+    // auto-generated skills must land under an `auto-skill-`-prefixed
+    // directory to stay out of version control. The prompt is the soft
+    // guard that steers the agent there.
+    const prompt = await buildTaskPrompt(projectRoot);
+    expect(prompt).toContain(AUTO_SKILL_DIR_PREFIX);
+    expect(prompt).toContain(`.hopcode/skills/${AUTO_SKILL_DIR_PREFIX}<name>/`);
+    expect(prompt).toMatch(/mandatory/i);
+  });
+});
+
+describe('SKILL_REVIEW_SYSTEM_PROMPT', () => {
+  it('requires the auto-skill- directory prefix for new skills (#4837)', () => {
+    // The system prompt and buildTaskPrompt carry the prefix instruction on
+    // two independent string arrays. buildTaskPrompt is asserted above; this
+    // guards the parallel system-prompt line so an edit to one can't silently
+    // drop the prefix mandate from the other.
+    expect(SKILL_REVIEW_SYSTEM_PROMPT).toContain(AUTO_SKILL_DIR_PREFIX);
+    expect(SKILL_REVIEW_SYSTEM_PROMPT).toContain(
+      `.hopcode/skills/${AUTO_SKILL_DIR_PREFIX}<name>/`,
+    );
+    expect(SKILL_REVIEW_SYSTEM_PROMPT).toMatch(/MUST use/i);
   });
 });

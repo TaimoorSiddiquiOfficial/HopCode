@@ -1,21 +1,6 @@
-﻿# Temp rebrand/fix scripts (one-time use, already served their purpose)
-_rebrand_*.mjs
-fix_*.mjs
-inspect_*.mjs
-rebrand_*.mjs
-resolve_*.mjs
-
 # API keys and secrets
 .env
 .env~
-
-# GitHub App private keys (CRITICAL: Never commit these)
-*.pem
-*.key
-**/*.pem
-**/*.key
-.github/*.pem
-.github/*.key
 
 # gemini-cli settings
 # We want to keep the .gemini in the root of the repo and ignore any .gemini
@@ -38,19 +23,26 @@ package-lock.json
 .idea
 *.iml
 .cursor
-.hopcode
 .qoder
 .claude
 CLAUDE.md
 .codex
 
-# Temporary planning and notes markdown files
-# Keep only product-essential docs; ignore all other .md at root
-/*.md
-!README.md
-!CONTRIBUTING.md
-!SECURITY.md
-!AGENTS.md
+# HopCode Configs
+.hopcode/*
+!.hopcode/commands/
+!.hopcode/commands/**
+!.hopcode/skills/
+!.hopcode/skills/**
+# Re-ignore auto-generated skills (created by the managed-skill-extractor
+# agent with the mandatory `auto-skill-` directory prefix). Git's last-rule-
+# wins semantics keep hand-authored project skills tracked while excluding
+# these transient, session-specific directories. The `auto-skill-` prefix is
+# reserved for auto-generated skills — do not hand-author a project skill with
+# this prefix, or its directory will be ignored here.
+.hopcode/skills/auto-skill-*/
+!.hopcode/agents/
+!.hopcode/agents/**
 
 # OS metadata
 .DS_Store
@@ -61,10 +53,6 @@ Thumbs.db
 
 # Ignore built ts files
 dist
-
-# Leftover test artifacts from install-script.test.js (dist backup dirs)
-qwen-dist-backup-*/
-hopcode-dist-backup-*/
 
 # Docker folder to help skip auth refreshes
 .docker
@@ -85,16 +73,6 @@ packages/web-templates/src/generated/
 .integration-tests/
 packages/vscode-ide-companion/*.vsix
 
-# HopCode Configs
-
-.hopcode/*
-!.hopcode/commands/
-!.hopcode/commands/**
-!.hopcode/skills/
-!.hopcode/skills/**
-!.hopcode/agents/
-!.hopcode/agents/**
-!.hopcode/settings.json.example
 logs/
 .repro-runs/
 # GHA credentials

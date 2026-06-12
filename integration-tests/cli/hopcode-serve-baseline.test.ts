@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 hopcode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,9 +33,7 @@
  * as `acp-integration.test.ts` / `cron-tools.test.ts`.
  */
 
-import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
-import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -48,10 +46,19 @@ import {
   countDescendants,
   percentiles,
   writeWorkspaceSettings,
+  gitHead,
+  makeTempWorkspace,
+  sleep,
   type SpawnedDaemon,
   type DescendantCount,
   type Percentiles,
 } from './_daemon-harness.js';
+import {
+  resolveOutputDir,
+  formatPercentiles,
+  writeSnapshotArtifacts,
+  collectPlatformInfo,
+} from './_daemon-perf-report.js';
 
 // Minimal type-shape for the SSE backpressure unit suite — we only assert
 // `.type`, so we avoid coupling tests to the full BridgeEvent surface.
@@ -94,8 +101,7 @@ const HAS_PROMPT_LATENCY_CREDENTIAL =
   process.env['HOPCODE_BASELINE_ENABLE_PROMPT_LATENCY'] === '1' ||
   PROMPT_LATENCY_CREDENTIAL_ENV_KEYS.some((key) => Boolean(process.env[key])) ||
   Object.entries(process.env).some(
-    ([key, value]) =>
-      key.startsWith('HOPCODE_CUSTOM_API_KEY_') && Boolean(value),
+    ([key, value]) => key.startsWith('HOPCODE_CUSTOM_API_KEY_') && Boolean(value),
   );
 const SKIP_PROMPT_LATENCY =
   process.env['HOPCODE_BASELINE_SKIP_PROMPT_LATENCY'] === '1' ||
@@ -108,10 +114,7 @@ const MCP_FIXTURE_PGREP_FILTER = 'idle-mcp/server\\.mjs';
 const MCP_DESCENDANT_WAIT_TIMEOUT_MS = 10_000;
 const MCP_DESCENDANT_POLL_MS = 250;
 const RSS_DROPPED_SAMPLE_RATIO_MAX = 0.2;
-const RUN_TS = new Date().toISOString().replace(/[:.]/g, '').replace(/Z$/, '');
-const OUTPUT_DIR =
-  process.env['INTEGRATION_TEST_FILE_DIR'] ??
-  path.join(process.cwd(), '.integration-tests', `baseline-${RUN_TS}`);
+const OUTPUT_DIR = resolveOutputDir('baseline');
 
 // Catastrophic-regression upper bounds. These are intentionally loose —
 // tightening them is a deliberate one-line PR after a regression is
@@ -185,11 +188,7 @@ const snapshot: SnapshotShape = {
   version: 1,
   capturedAt: new Date().toISOString(),
   gitCommit: gitHead(),
-  platform: {
-    os: process.platform,
-    arch: process.arch,
-    nodeVersion: process.version,
-  },
+  platform: collectPlatformInfo(),
   notes: [
     'Daemon defaults to sessionScope: "single", so N successive ' +
       'createOrAttachSession calls against the same workspace return the ' +
@@ -207,29 +206,6 @@ const snapshot: SnapshotShape = {
     heavy: HEAVY,
   },
 };
-
-function gitHead(): string | null {
-  try {
-    return execFileSync('git', ['rev-parse', 'HEAD'], {
-      encoding: 'utf8',
-      timeout: 2_000,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-  } catch {
-    return null;
-  }
-}
-
-function makeTempWorkspace(label: string): string {
-  const dir = fs.mkdtempSync(
-    path.join(os.tmpdir(), `hopcode-baseline-${label}-`),
-  );
-  return dir;
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -707,25 +683,19 @@ async function measureRssAtSessionCount(sessionCount: number): Promise<{
 
     afterAll(() => {
       if (SKIP) return;
-      fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-      const jsonPath = path.join(OUTPUT_DIR, 'perf-baseline.json');
-      fs.writeFileSync(jsonPath, JSON.stringify(snapshot, null, 2));
-      fs.writeFileSync(
-        path.join(OUTPUT_DIR, 'perf-baseline.md'),
+      writeSnapshotArtifacts(
+        OUTPUT_DIR,
+        'perf-baseline',
+        snapshot,
         renderMarkdown(snapshot),
+        'baseline',
       );
-      // Echo the path so a reviewer / CI logs surface where the artifact
-      // landed.
-      console.log(`[baseline] perf-baseline.json written to ${jsonPath}`);
     });
   },
 );
 
 function renderMarkdown(s: SnapshotShape): string {
-  const fmt = (p: Percentiles | null | undefined): string =>
-    p
-      ? `p50=${p.p50.toFixed(0)} p90=${p.p90.toFixed(0)} p99=${p.p99.toFixed(0)} mean=${p.mean.toFixed(0)} (n=${p.count})`
-      : 'n/a';
+  const fmt = formatPercentiles;
   return [
     `# hopcode serve daemon — perf baseline`,
     ``,

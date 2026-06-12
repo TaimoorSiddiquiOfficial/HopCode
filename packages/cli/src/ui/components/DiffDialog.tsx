@@ -13,7 +13,7 @@ import type {
   PerFileStats,
   TurnDiff,
   TurnFileDiff,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { HistoryItem } from '../types.js';
 import { theme } from '../semantic-colors.js';
 import { useKeypress } from '../hooks/useKeypress.js';

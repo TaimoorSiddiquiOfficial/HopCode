@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-// NODE_OPTIONS="--max-old-space-size=8192" node dist/cli.js
-// For large projects, increase heap: NODE_OPTIONS=--max-old-space-size=8192 hopcode
 
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,9 +11,14 @@ import { initStartupProfiler } from './src/utils/startupProfiler.js';
 // Must run before any other imports to capture the earliest possible T0.
 initStartupProfiler();
 
-import './src/interactive.js';
-import { main } from './src/interactive.js';
-import { FatalError } from '@hoptrendy/hopcode-core';
+import { initCpuProfiler } from './src/utils/cpuProfiler.js';
+// Initialize early to register SIGUSR1 handler and start recording when
+// HOPCODE_CODE_CPU_PROFILE=1, capturing as much of the startup as possible.
+initCpuProfiler();
+
+import './src/gemini.js';
+import { main } from './src/gemini.js';
+import { FatalError } from '@hopcode/hopcode-core';
 import { AlreadyReportedError } from './src/utils/errors.js';
 import { writeStderrLine } from './src/utils/stdioHelpers.js';
 

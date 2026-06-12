@@ -9,7 +9,7 @@ import * as fsp from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'node:crypto';
 import type { ContentBlock } from '@agentclientprotocol/sdk';
-import { Storage } from '@hoptrendy/hopcode-core';
+import { Storage } from '@hopcode/hopcode-core';
 import type {
   ImageAttachment,
   SavedImageAttachment,

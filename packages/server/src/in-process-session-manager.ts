@@ -32,7 +32,7 @@ import {
   AgentStatus,
   ContextState,
   type Config,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type {
   AgentRoundTextEvent,
   AgentStreamTextEvent,
@@ -43,9 +43,9 @@ import type {
   AgentUsageEvent,
   AgentStatusChangeEvent,
   AgentErrorEvent,
-} from '@hoptrendy/hopcode-core';
-import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
+import { ToolConfirmationOutcome } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hopcode/hopcode-core';
 
 const debugLogger = createDebugLogger('GRPC_IN_PROCESS');
 

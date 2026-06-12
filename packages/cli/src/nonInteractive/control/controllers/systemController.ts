@@ -27,7 +27,7 @@ import {
   MCPServerConfig,
   AuthProviderType,
   type MCPOAuthConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 const debugLogger = createDebugLogger('SYSTEM_CONTROLLER');
 

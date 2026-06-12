@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest';
 // Re-import via the relative source path so this test exercises the
 // in-tree implementation even before dist/ is rebuilt (the
-// @hoptrendy/hopcode-core package main points at dist/ on a fresh
+// @hopcode/hopcode-core package main points at dist/ on a fresh
 // branch). The provider was deleted from the CLI side in this PR and not
 // rebuilt in core's test folder until now.
 import { AuthType } from '../../../core/contentGenerator.js';
@@ -29,7 +29,7 @@ describe('modelscopeProvider', () => {
     const plan = buildInstallPlan(modelscopeProvider, {
       baseUrl: 'https://api-inference.modelscope.cn/v1',
       apiKey: 'sk-modelscope',
-      modelIds: ['deepseek-ai/DeepSeek-V4-Flash', 'Qwen/Qwen3.5-397B-A17B'],
+      modelIds: ['deepseek-ai/DeepSeek-V4-Flash', 'hopcode/Qwen3.5-397B-A17B'],
     });
 
     const models = plan.modelProviders?.[0]?.models;
@@ -40,8 +40,8 @@ describe('modelscopeProvider', () => {
       generationConfig: { contextWindowSize: 1000000 },
     });
     expect(models?.[1]).toMatchObject({
-      id: 'Qwen/Qwen3.5-397B-A17B',
-      name: '[ModelScope] Qwen/Qwen3.5-397B-A17B',
+      id: 'hopcode/Qwen3.5-397B-A17B',
+      name: '[ModelScope] hopcode/Qwen3.5-397B-A17B',
       generationConfig: { contextWindowSize: 1000000 },
     });
   });

@@ -11,7 +11,7 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 import { HopCodeSessionManager } from './session-manager.js';
 import { InProcessSessionManager } from './in-process-session-manager.js';
 

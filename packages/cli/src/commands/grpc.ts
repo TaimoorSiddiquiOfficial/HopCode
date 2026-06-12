@@ -25,7 +25,7 @@
 import type { CommandModule, Argv } from 'yargs';
 import { loadCliConfig, parseArguments } from '../config/config.js';
 import { loadSettings } from '../config/settings.js';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config } from '@hopcode/hopcode-core';
 
 interface GrpcArgs {
   port: number;
@@ -57,7 +57,7 @@ async function startGrpcServer(
     const runtimeConfig = useSubprocess ? undefined : await buildConfig();
 
     // Dynamic import so the server package is only loaded when this command runs.
-    const { HopCodeServer } = await import('@hoptrendy/hopcode-server');
+    const { HopCodeServer } = await import('@hopcode/hopcode-server');
 
     const server = new HopCodeServer({
       port,

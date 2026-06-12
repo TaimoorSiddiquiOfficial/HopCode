@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,11 +12,7 @@ import type { ContentBlock } from '@agentclientprotocol/sdk';
 // Mock vscode so it can be resolved without the actual VS Code runtime.
 vi.mock('vscode', () => ({}));
 
-import {
-  AcpConnection,
-  AcpConnectionDisconnectError,
-  isAcpConnectionDisconnectError,
-} from './acpConnection.js';
+import { AcpConnection } from './acpConnection.js';
 import { ACP_ERROR_CODES } from '../constants/acpSchema.js';
 
 type AcpConnectionInternal = {
@@ -25,7 +21,6 @@ type AcpConnectionInternal = {
   sessionId: string | null;
   lastExitCode: number | null;
   lastExitSignal: string | null;
-  disconnectRequested: boolean;
   mapReadTextFileError: (error: unknown, filePath: string) => unknown;
   ensureConnection: () => unknown;
 };
@@ -230,24 +225,20 @@ describe('AcpConnection lastExitCode/lastExitSignal', () => {
   });
 });
 
-describe('AcpConnectionDisconnectError', () => {
-  it('identifies intentional disconnect errors', () => {
-    const error = new AcpConnectionDisconnectError('startup cancelled');
+describe('AcpConnection extension notifications', () => {
+  it('parses end_turn reason and source', () => {
+    const conn = new AcpConnection();
+    const onEndTurn = vi.fn();
+    conn.onEndTurn = onEndTurn;
 
-    expect(isAcpConnectionDisconnectError(error)).toBe(true);
-    expect(isAcpConnectionDisconnectError(new Error('other'))).toBe(false);
-  });
-
-  it('marks disconnect requests before killing the child process', () => {
-    const mockKill = vi.fn();
-    const conn = createConnection({
-      child: createMockChild({ kill: mockKill }),
-      disconnectRequested: false,
+    conn.handleExtNotification('_HopCode/end_turn', {
+      reason: 'end_turn',
+      source: 'background_notification',
     });
 
-    (conn as unknown as AcpConnection).disconnect();
-
-    expect(conn.disconnectRequested).toBe(true);
-    expect(mockKill).toHaveBeenCalledOnce();
+    expect(onEndTurn).toHaveBeenCalledWith(
+      'end_turn',
+      'background_notification',
+    );
   });
 });

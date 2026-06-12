@@ -4,10 +4,11 @@ import type {
   ExtensionRequestOptions,
   SkillConfig,
   SubagentConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { ConfirmationRequest } from '../../ui/types.js';
 import chalk from 'chalk';
 import prompts from 'prompts';
+import stripAnsi from 'strip-ansi';
 import { t } from '../../i18n/index.js';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
 
@@ -164,6 +165,12 @@ export function extensionConsentString(
   output.push(
     t('Installing extension "{{name}}".', { name: extensionConfig.name }),
   );
+  if (
+    typeof extensionConfig.description === 'string' &&
+    extensionConfig.description
+  ) {
+    output.push(stripAnsi(extensionConfig.description));
+  }
   output.push(
     t(
       '**Extensions may introduce unexpected behavior. Ensure you have investigated the extension source and trust the author.**',

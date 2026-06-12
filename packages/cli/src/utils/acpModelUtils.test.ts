@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { AuthType } from '@hoptrendy/hopcode-core';
+import { AuthType } from '@hopcode/hopcode-core';
 import {
   formatAcpModelId,
   parseAcpBaseModelId,

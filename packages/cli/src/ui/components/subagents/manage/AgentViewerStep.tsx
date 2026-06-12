@@ -7,7 +7,7 @@
 import { Box, Text } from 'ink';
 import { theme } from '../../../semantic-colors.js';
 import { shouldShowColor, getColorForDisplay } from '../utils.js';
-import { type SubagentConfig } from '@hoptrendy/hopcode-core';
+import { type SubagentConfig } from '@hopcode/hopcode-core';
 import { t } from '../../../../i18n/index.js';
 
 interface AgentViewerStepProps {

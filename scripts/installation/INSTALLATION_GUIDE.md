@@ -1,4 +1,4 @@
-﻿# Installation Guide for HopCode with Source Tracking
+# Installation Guide for HopCode with Source Tracking
 
 This guide describes the source-tracking installation scripts for HopCode.
 The scripts prefer standalone release archives and can fall back to npm when a
@@ -11,7 +11,7 @@ The installers are intentionally lightweight:
 - They try a standalone archive first by default.
 - They do not install Node.js, NVM, or any other Node version manager.
 - They do not edit npm config. Standalone installs may update the shell profile
-  or user PATH so the generated `hopcode` shim is discoverable.
+  or user/machine PATH so the generated `hopcode` shim is discoverable.
 - They do not start `hopcode` automatically after installation.
 - They store source information in `~/.hopcode/source.json` or
   `%USERPROFILE%\.hopcode\source.json` when `--source` is provided.
@@ -23,10 +23,10 @@ are only required when the installer falls back to npm or when
 
 ## Installation Scripts
 
-- Linux/macOS: `install-hopcode-standalone.sh`
-- Windows: `install-hopcode-standalone.ps1`
-- Linux/macOS uninstall: `uninstall-hopcode-standalone.sh`
-- Windows uninstall: `uninstall-hopcode-standalone.ps1`
+- Linux/macOS: `install-qwen-standalone.sh`
+- Windows: `install-qwen-standalone.ps1`
+- Linux/macOS uninstall: `uninstall-qwen-standalone.sh`
+- Windows uninstall: `uninstall-qwen-standalone.ps1`
 
 ## Release Artifacts
 
@@ -39,33 +39,28 @@ GitHub releases publish these standalone archives:
 - `hopcode-win-x64.zip`
 - `SHA256SUMS`
 
-The new standalone-first installer scripts (`install-hopcode-standalone.sh`,
-`install-hopcode-standalone.ps1`) are not republished per release. They are served
+The new standalone-first installer scripts (`install-qwen-standalone.sh`,
+`install-qwen-standalone.ps1`) are not republished per release. They are served
 from a hosted installation endpoint and accept `--version` to pin a specific
 standalone release. The `standalone` suffix intentionally avoids overwriting the
-existing production `install-hopcode.sh` / `install-hopcode.bat` OSS objects during
+existing production `install-hopcode.sh` / `install-qwen.bat` OSS objects during
 the staged rollout.
-
-Public installation documentation intentionally continues to use the existing
-production installer in this PR. Update README and other public quick-install
-instructions in a follow-up after the standalone-suffixed hosted installers and
-release archive sync have been validated in production.
 
 Hosted installer assets are staged separately from GitHub Release archives:
 
-- `install-hopcode-standalone.sh` is the Linux/macOS hosted entrypoint.
-- `install-hopcode-standalone.ps1` is the Windows hosted entrypoint for `irm | iex`.
-- `install-hopcode-standalone.bat` is the Windows installer implementation used by
-  `install-hopcode-standalone.ps1` and can also be downloaded and run directly.
-- `uninstall-hopcode-standalone.sh` removes Linux/macOS standalone installs.
-- `uninstall-hopcode-standalone.ps1` removes Windows standalone installs.
+- `install-qwen-standalone.sh` is the Linux/macOS hosted entrypoint.
+- `install-qwen-standalone.ps1` is the Windows hosted entrypoint for `irm | iex`.
+- `install-qwen-standalone.bat` is the Windows installer implementation used by
+  `install-qwen-standalone.ps1` and can also be downloaded and run directly.
+- `uninstall-qwen-standalone.sh` removes Linux/macOS standalone installs.
+- `uninstall-qwen-standalone.ps1` removes Windows standalone installs.
 
 The global standalone-suffixed OSS entrypoints are maintained under
-`installation/install-hopcode-standalone.sh`,
-`installation/install-hopcode-standalone.ps1`,
-`installation/install-hopcode-standalone.bat`,
-`installation/uninstall-hopcode-standalone.sh`, and
-`installation/uninstall-hopcode-standalone.ps1`.
+`installation/install-qwen-standalone.sh`,
+`installation/install-qwen-standalone.ps1`,
+`installation/install-qwen-standalone.bat`,
+`installation/uninstall-qwen-standalone.sh`, and
+`installation/uninstall-qwen-standalone.ps1`.
 
 Build them with:
 
@@ -73,9 +68,9 @@ Build them with:
 npm run package:hosted-installation -- --out-dir dist/installation
 ```
 
-The staged `install-hopcode-standalone.sh`, `install-hopcode-standalone.ps1`,
-`install-hopcode-standalone.bat`, `uninstall-hopcode-standalone.sh`, and
-`uninstall-hopcode-standalone.ps1` files map to the standalone-suffixed hosted URLs
+The staged `install-qwen-standalone.sh`, `install-qwen-standalone.ps1`,
+`install-qwen-standalone.bat`, `uninstall-qwen-standalone.sh`, and
+`uninstall-qwen-standalone.ps1` files map to the standalone-suffixed hosted URLs
 shown above. The staging command also writes `SHA256SUMS` for upload
 verification. During a non-dry-run stable release, the publish workflow uploads
 a byte-for-byte snapshot to `installation/vX.Y.Z/` for audit and rollback, and
@@ -129,13 +124,21 @@ The default method is `detect`:
 You can force a method:
 
 ```bash
-bash install-hopcode-standalone.sh --method standalone
-bash install-hopcode-standalone.sh --method npm
+bash install-qwen-standalone.sh --method standalone
+bash install-qwen-standalone.sh --method npm
 ```
 
 ```bat
-install-hopcode-standalone.bat --method standalone
-install-hopcode-standalone.bat --method npm
+install-qwen-standalone.bat --method standalone
+install-qwen-standalone.bat --method npm
+```
+
+Repair PATH for an existing standalone Windows install without downloading or
+reinstalling HopCode:
+
+```bat
+install-qwen-standalone.bat --repair-path
+install-qwen-standalone.bat --repair-path --path-scope machine
 ```
 
 ## Optional Native Modules
@@ -153,20 +156,20 @@ modules for the current machine.
 
 ```bash
 # Default: standalone archive with npm fallback
-bash install-hopcode-standalone.sh
+bash install-qwen-standalone.sh
 
 # Record a source value
-bash install-hopcode-standalone.sh --source github
+bash install-qwen-standalone.sh --source github
 
 # Use npm explicitly
-bash install-hopcode-standalone.sh --method npm --registry https://registry.npmjs.org
+bash install-qwen-standalone.sh --method npm --registry https://registry.npmjs.org
 
 # Use the Aliyun standalone mirror
-bash install-hopcode-standalone.sh --mirror aliyun
+bash install-qwen-standalone.sh --mirror aliyun
 
 # Install an offline archive
 # SHA256SUMS must be in the same directory.
-bash install-hopcode-standalone.sh --archive ./hopcode-linux-x64.tar.gz
+bash install-qwen-standalone.sh --archive ./hopcode-linux-x64.tar.gz
 ```
 
 Standalone installs to:
@@ -180,7 +183,7 @@ Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_PARENT`,
 Uninstall a standalone Linux/macOS install:
 
 ```bash
-curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh | bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
 ```
 
 The uninstaller removes only the standalone runtime, generated `hopcode` wrapper,
@@ -192,20 +195,20 @@ files are still preserved.
 
 ```bat
 REM Default: standalone archive with npm fallback
-install-hopcode-standalone.bat
+install-qwen-standalone.bat
 
 REM Record a source value
-install-hopcode-standalone.bat --source github
+install-qwen-standalone.bat --source github
 
 REM Use npm explicitly
-install-hopcode-standalone.bat --method npm --registry https://registry.npmjs.org
+install-qwen-standalone.bat --method npm --registry https://registry.npmjs.org
 
 REM Use the Aliyun standalone mirror
-install-hopcode-standalone.bat --mirror aliyun
+install-qwen-standalone.bat --mirror aliyun
 
 REM Install an offline archive
 REM SHA256SUMS must be in the same directory.
-install-hopcode-standalone.bat --archive hopcode-win-x64.zip
+install-qwen-standalone.bat --archive hopcode-win-x64.zip
 ```
 
 Standalone installs to:
@@ -216,19 +219,32 @@ Standalone installs to:
 Override with `HOPCODE_INSTALL_ROOT`, `HOPCODE_INSTALL_LIB_DIR`, or
 `HOPCODE_INSTALL_BIN_DIR` when needed.
 
+For self-hosted Windows runners, install under the runner account once, then
+repair machine-level PATH without reinstalling:
+
+```powershell
+$env:HOPCODE_INSTALL_REPAIR_PATH = '1'
+$env:HOPCODE_INSTALL_PATH_SCOPE = 'machine'
+irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.ps1 | iex
+```
+
+Restart the runner service or machine after updating machine-level PATH so jobs
+inherit the refreshed environment.
+
 Restart the terminal if `hopcode` is not immediately available on PATH.
 
 Uninstall a standalone Windows install:
 
 ```bat
-powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex"
 ```
 
 The uninstaller removes only the standalone runtime, generated `hopcode.cmd`
-wrapper, user PATH entry, and the current-session `cmd.exe` shim created by the
-hosted PowerShell installer. It preserves `%USERPROFILE%\.hopcode` by default. Set
-`HOPCODE_UNINSTALL_PURGE=1` to remove `%USERPROFILE%\.hopcode\source.json`; other
-config and auth files are still preserved.
+wrapper, user or machine PATH entry, and the current-session `cmd.exe` shim
+created by the hosted PowerShell installer. It preserves `%USERPROFILE%\.hopcode`
+by default. Set `HOPCODE_UNINSTALL_PURGE=1` to remove
+`%USERPROFILE%\.hopcode\source.json`; other config and auth files are still
+preserved.
 
 ## Mirrors and Overrides
 
@@ -241,6 +257,8 @@ Options:
 - `--version VERSION`
 - `--registry REGISTRY`
 - `--source SOURCE`
+- `--repair-path`
+- `--path-scope user|machine`
 
 Environment variables:
 
@@ -250,6 +268,8 @@ Environment variables:
 - `HOPCODE_INSTALL_ARCHIVE`
 - `HOPCODE_INSTALL_VERSION`
 - `HOPCODE_NPM_REGISTRY`
+- `HOPCODE_INSTALL_REPAIR_PATH`
+- `HOPCODE_INSTALL_PATH_SCOPE`
 
 Use `--base-url` for private mirrors. The URL must contain
 `hopcode-<target>` archives and `SHA256SUMS` in the same directory. Custom
@@ -295,7 +315,7 @@ unreadable source files are ignored.
 If source tracking is not needed and Node.js 22 or newer is already available:
 
 ```bash
-npm install -g @hoptrendy/hopcode-cli@latest
+npm install -g @hopcode/hopcode@latest
 ```
 
 Homebrew users can also install HopCode with:
@@ -327,10 +347,10 @@ fails with a permission error, fix the npm global install location or use a
 user-owned Node.js installation, then rerun:
 
 ```bash
-npm install -g @hoptrendy/hopcode-cli@latest --registry https://registry.npmmirror.com
+npm install -g @hopcode/hopcode@latest --registry https://registry.npmmirror.com
 ```
 
-### hopcode Is Not on PATH After Installation
+### qwen Is Not on PATH After Installation
 
 Restart the terminal first. For standalone installs, add the shim directory:
 

@@ -16,12 +16,22 @@ import {
 import { ConfigContext } from '../contexts/ConfigContext.js';
 // Mock VimModeContext hook
 vi.mock('../contexts/VimModeContext.js', () => ({
-  useVimMode: vi.fn(() => ({
+  useVimModeState: vi.fn(() => ({
     vimEnabled: false,
     vimMode: 'NORMAL',
   })),
+  useVimModeActions: vi.fn(() => ({
+    toggleVimEnabled: vi.fn(),
+    setVimMode: vi.fn(),
+  })),
+  useVimMode: vi.fn(() => ({
+    vimEnabled: false,
+    vimMode: 'NORMAL',
+    toggleVimEnabled: vi.fn(),
+    setVimMode: vi.fn(),
+  })),
 }));
-import { ApprovalMode } from '@hoptrendy/hopcode-core';
+import { ApprovalMode } from '@hopcode/hopcode-core';
 import { StreamingState } from '../types.js';
 
 // Mock child components

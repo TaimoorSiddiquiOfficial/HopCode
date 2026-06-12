@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import type { Config, ServerGeminiStreamEvent } from '@hoptrendy/hopcode-core';
-import { GeminiEventType, OutputFormat } from '@hoptrendy/hopcode-core';
+import type { Config, ServerGeminiStreamEvent } from '@hopcode/hopcode-core';
+import { GeminiEventType, OutputFormat } from '@hopcode/hopcode-core';
 import type { Part } from '@google/genai';
 import { JsonOutputAdapter } from './JsonOutputAdapter.js';
 

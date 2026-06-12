@@ -1,4 +1,4 @@
-﻿import OpenAI from 'openai';
+import OpenAI from 'openai';
 import type { GenerateContentConfig } from '@google/genai';
 import type { Config } from '../../../config/config.js';
 import type { ContentGeneratorConfig } from '../../contentGenerator.js';
@@ -45,11 +45,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
   ): boolean {
     const { authType, baseUrl } = contentGeneratorConfig;
 
-    if (
-      authType === AuthType.HOPCODE_OAUTH ||
-      authType === AuthType.HOPCODE_OAUTH_DEPRECATED
-    )
-      return true;
+    if (authType === AuthType.HOPCODE_OAUTH) return true;
     if (!baseUrl) return true;
 
     const normalizedBaseUrl = baseUrl.endsWith('/')
@@ -364,7 +360,8 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
     'qwen-vl', // qwen-vl-max, qwen-vl-max-latest, etc.
     'qwen3-vl-plus', // qwen3-vl-plus variants
     'qwen3.5-plus', // qwen3.5-plus (has built-in vision capabilities)
-    'hopcode-vl', // hopcode-vl-max, etc.
+    'qwen3.6-plus', // qwen3.6-plus (multimodal)
+    'qwen3.7-plus', // qwen3.7-plus (multimodal)
   ];
 
   private isVisionModel(model: string | undefined): boolean {

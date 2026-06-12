@@ -17,14 +17,14 @@ import {
   Partials,
   type Attachment as DiscordAttachment,
 } from 'discord.js';
-import { ChannelBase } from '@hoptrendy/channel-base';
+import { ChannelBase } from '@hopcode/channel-base';
 import type {
   ChannelConfig,
   ChannelBaseOptions,
   Envelope,
   Attachment,
   AcpBridge,
-} from '@hoptrendy/channel-base';
+} from '@hopcode/channel-base';
 
 const DISCORD_MAX_LENGTH = 2000;
 

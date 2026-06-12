@@ -1,4 +1,4 @@
-﻿# IDE Daemon Adapter Draft
+# IDE Daemon Adapter Draft
 
 ## Goal
 
@@ -45,7 +45,7 @@ The first implementation introduces a sibling connection path, not replace
 `AcpConnection`:
 
 ```text
-QwenAgentManager
+HopCodeAgentManager
   current default -> AcpConnection -> hopcode --acp child
   experimental    -> DaemonIdeConnection -> hopcode serve HTTP/SSE
 ```
@@ -55,7 +55,7 @@ If an event cannot be faithfully mapped yet, the daemon path should surface a
 clear unsupported-state warning rather than silently pretending parity.
 
 This PR adds `DaemonIdeConnection` as the locally verifiable extension-host
-adapter spike. It is not wired into the default `QwenAgentManager` path yet, so
+adapter spike. It is not wired into the default `HopCodeAgentManager` path yet, so
 existing VS Code behavior remains ACP subprocess based.
 
 ## Event Mapping Contract

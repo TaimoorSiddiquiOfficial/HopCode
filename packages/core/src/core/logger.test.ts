@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,7 +36,7 @@ const CHECKPOINT_FILE_NAME = 'checkpoint.json';
 
 const projectDir = process.cwd();
 const hash = getProjectHash(projectDir);
-const TEST_HOME_DIR = path.join(os.tmpdir(), 'hopcode-core-logger-home');
+const TEST_HOME_DIR = path.join(os.tmpdir(), 'qwen-core-logger-home');
 
 let originalHome: string | undefined;
 let testGeminiDir: string;
@@ -861,17 +861,14 @@ describe('Logger', () => {
     it('only undoes USER entries (model_switch is left intact)', async () => {
       await logger.logMessage(MessageSenderType.USER, 'real prompt');
       vi.advanceTimersByTime(1000);
-      await logger.logMessage(
-        MessageSenderType.MODEL_SWITCH,
-        'hopcode→qwen-max',
-      );
+      await logger.logMessage(MessageSenderType.MODEL_SWITCH, 'qwen→qwen-max');
 
       // The model-switch write does NOT update lastLoggedUserEntry, so undo
       // still targets the earlier USER row.
       const removed = await logger.removeLastUserMessage();
       expect(removed).toBe(true);
       const onDisk = await readLogFile();
-      expect(onDisk.map((e) => e.message)).toEqual(['hopcode→qwen-max']);
+      expect(onDisk.map((e) => e.message)).toEqual(['qwen→qwen-max']);
     });
 
     it('returns false when the tracked entry is no longer on disk', async () => {
@@ -1015,10 +1012,7 @@ describe('Logger', () => {
       expect(trackedAfterUser).not.toBeNull();
 
       vi.mocked(atomicWriteFile).mockRejectedValueOnce(new Error('Disk full'));
-      await logger.logMessage(
-        MessageSenderType.MODEL_SWITCH,
-        'hopcode→qwen-max',
-      );
+      await logger.logMessage(MessageSenderType.MODEL_SWITCH, 'qwen→qwen-max');
 
       // Tracker is unchanged — the non-USER failure didn't shift which
       // row was the most recent user prompt.

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,7 +37,10 @@ import {
   readHopCodeSettingsForVSCode,
   clearPersistedAuth,
 } from '../../services/settingsWriter.js';
-import { buildInstallPlan, parseInsightMessage } from '@hoptrendy/hopcode-core';
+import {
+  buildInstallPlan,
+  parseInsightMessage,
+} from '@hopcode/hopcode-core';
 
 /** Threshold (ms) before a completed task triggers a notification. */
 const LONG_TASK_THRESHOLD_MS = 20_000;
@@ -64,7 +67,7 @@ const AUTH_RELATED_HOPCODE_SETTINGS = [
   'hopcode.codingPlanRegion',
 ] as const;
 
-export function resolveHopcodeCliEntryPath(
+export function resolveHopCodeCliEntryPath(
   extensionUri: vscode.Uri,
   extensionMode: vscode.ExtensionMode | undefined,
 ): string {
@@ -81,8 +84,7 @@ export function resolveHopcodeCliEntryPath(
     }
   }
 
-  return vscode.Uri.joinPath(extensionUri, 'dist', 'hopcode-cli', 'cli.js')
-    .fsPath;
+  return vscode.Uri.joinPath(extensionUri, 'dist', 'qwen-cli', 'cli.js').fsPath;
 }
 
 function isInsightCommand(command: string): boolean {
@@ -185,15 +187,15 @@ export class WebViewProvider {
     // The isSyncingToVSCode guard prevents a loop when we programmatically populate VSCode settings.
     const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(
       async (e) => {
-        const authSettingsChanged = AUTH_RELATED_HOPCODE_SETTINGS.some(
-          (setting) => e.affectsConfiguration(setting),
+        const authSettingsChanged = AUTH_RELATED_HOPCODE_SETTINGS.some((setting) =>
+          e.affectsConfiguration(setting),
         );
 
         if (authSettingsChanged && !this.isSyncingToVSCode) {
           console.log(
             '[WebViewProvider] Auth-related hopcode settings changed by user, syncing...',
           );
-          const synced = await this.syncVSCodeSettingsToHopCodeConfig();
+          const synced = await this.syncVSCodeSettingsToQwenConfig();
           if (synced && this.agentInitialized) {
             // Settings changed and we have an active connection — reconnect
             try {
@@ -245,13 +247,35 @@ export class WebViewProvider {
     this.disposables.push(fileWatcherDisposable);
 
     // Setup agent callbacks
-    this.agentManager.onMessage((message: unknown) => {
+    this.agentManager.onMessage((message) => {
       // Do not suppress messages during checkpoint saves.
       // Checkpoint persistence now writes directly to disk and should not
       // generate ACP session/update traffic. Suppressing here could drop
       // legitimate history replay messages (e.g., session/load) or
       // assistant replies when a new prompt starts while an async save is
       // still finishing.
+      if (message.source?.startsWith('background_notification')) {
+        // Prefer the originating ACP session id (forwarded on the message)
+        // over the currently active conversation. The notification was
+        // generated using the originating conversation's full chat history
+        // as context; persisting it under whichever conversation is active
+        // *now* would leak that context into an unrelated conversation if
+        // the user switched panels between triggering the background task
+        // and the notification being delivered.
+        const conversationId =
+          message.sessionId ??
+          this.conversationStore.getCurrentConversationId();
+        if (conversationId) {
+          void this.conversationStore
+            .addMessage(conversationId, message)
+            .catch((error) => {
+              console.warn(
+                '[WebViewProvider] Failed to persist background notification:',
+                error,
+              );
+            });
+        }
+      }
       this.sendMessageToWebView({
         type: 'message',
         data: message,
@@ -281,54 +305,52 @@ export class WebViewProvider {
       });
     });
 
-    this.agentManager.onSlashCommandNotification(
-      (event: { command: string; messageType: string; message: string }) => {
-        if (isInsightCommand(event.command) && event.messageType === 'error') {
-          this.sendMessageToWebView({
-            type: 'insightProgressCleared',
-            data: {},
-          });
-        }
-
-        // Try to parse as structured insight message
-        if (isInsightCommand(event.command) && event.messageType === 'info') {
-          const parsed = parseInsightMessage(event.message);
-          if (parsed?.type === 'insight_progress') {
-            this.sendMessageToWebView({
-              type: 'insightProgress',
-              data: {
-                stage: parsed.stage,
-                progress: parsed.progress,
-                detail: parsed.detail,
-              },
-            });
-            return;
-          }
-
-          if (parsed?.type === 'insight_ready') {
-            this.sendMessageToWebView({
-              type: 'insightReportReady',
-              data: {
-                path: parsed.path,
-              },
-            });
-            return;
-          }
-        }
-
-        const chunk = event.message.endsWith('\n')
-          ? event.message
-          : `${event.message}\n`;
-        this.messageHandler.appendStreamContent(chunk);
+    this.agentManager.onSlashCommandNotification((event) => {
+      if (isInsightCommand(event.command) && event.messageType === 'error') {
         this.sendMessageToWebView({
-          type: 'streamChunk',
-          data: { chunk },
+          type: 'insightProgressCleared',
+          data: {},
         });
-      },
-    );
+      }
+
+      // Try to parse as structured insight message
+      if (isInsightCommand(event.command) && event.messageType === 'info') {
+        const parsed = parseInsightMessage(event.message);
+        if (parsed?.type === 'insight_progress') {
+          this.sendMessageToWebView({
+            type: 'insightProgress',
+            data: {
+              stage: parsed.stage,
+              progress: parsed.progress,
+              detail: parsed.detail,
+            },
+          });
+          return;
+        }
+
+        if (parsed?.type === 'insight_ready') {
+          this.sendMessageToWebView({
+            type: 'insightReportReady',
+            data: {
+              path: parsed.path,
+            },
+          });
+          return;
+        }
+      }
+
+      const chunk = event.message.endsWith('\n')
+        ? event.message
+        : `${event.message}\n`;
+      this.messageHandler.appendStreamContent(chunk);
+      this.sendMessageToWebView({
+        type: 'streamChunk',
+        data: { chunk },
+      });
+    });
 
     // Surface available modes and current mode (from ACP initialize)
-    this.agentManager.onModeInfo((info: { currentModeId?: string } | null) => {
+    this.agentManager.onModeInfo((info) => {
       try {
         const current = (info?.currentModeId || null) as
           | 'plan'
@@ -347,9 +369,9 @@ export class WebViewProvider {
     });
 
     // Surface mode changes (from ACP or immediate set_mode response)
-    this.agentManager.onModeChanged((modeId: unknown) => {
+    this.agentManager.onModeChanged((modeId) => {
       try {
-        this.currentModeId = modeId as ApprovalModeValue | null;
+        this.currentModeId = modeId;
       } catch (_error) {
         // Ignore error when setting mode id
       }
@@ -359,14 +381,14 @@ export class WebViewProvider {
       });
     });
 
-    this.agentManager.onUsageUpdate((stats: unknown) => {
+    this.agentManager.onUsageUpdate((stats) => {
       this.sendMessageToWebView({
         type: 'usageStats',
         data: stats,
       });
     });
 
-    this.agentManager.onModelInfo((info: unknown) => {
+    this.agentManager.onModelInfo((info) => {
       this.sendMessageToWebView({
         type: 'modelInfo',
         data: info,
@@ -374,7 +396,7 @@ export class WebViewProvider {
     });
 
     // Surface model changes (primarily from set_model response path)
-    this.agentManager.onModelChanged((model: unknown) => {
+    this.agentManager.onModelChanged((model) => {
       this.sendMessageToWebView({
         type: 'modelChanged',
         data: { model },
@@ -382,8 +404,8 @@ export class WebViewProvider {
     });
 
     // Surface available commands (from ACP available_commands_update)
-    this.agentManager.onAvailableCommands((commands: unknown) => {
-      this.cachedAvailableCommands = commands as AvailableCommand[] | null;
+    this.agentManager.onAvailableCommands((commands) => {
+      this.cachedAvailableCommands = commands;
       this.sendMessageToWebView({
         type: 'availableCommands',
         data: { commands },
@@ -391,8 +413,8 @@ export class WebViewProvider {
     });
 
     // Surface available skills for the /skills secondary picker
-    this.agentManager.onAvailableSkills((skills: unknown) => {
-      this.cachedAvailableSkills = skills as string[] | null;
+    this.agentManager.onAvailableSkills((skills) => {
+      this.cachedAvailableSkills = skills;
       this.sendMessageToWebView({
         type: 'availableSkills',
         data: { skills },
@@ -400,13 +422,13 @@ export class WebViewProvider {
     });
 
     // Surface available models (from session/new response)
-    this.agentManager.onAvailableModels((models: unknown) => {
+    this.agentManager.onAvailableModels((models) => {
       console.log(
         '[WebViewProvider] onAvailableModels received, sending to webview:',
         models,
       );
       // Cache models for re-sending when webview becomes ready
-      this.cachedAvailableModels = models as ModelInfo[] | null;
+      this.cachedAvailableModels = models;
       this.sendMessageToWebView({
         type: 'availableModels',
         data: { models },
@@ -414,24 +436,34 @@ export class WebViewProvider {
     });
 
     // Setup end-turn handler from ACP stopReason notifications
-    this.agentManager.onEndTurn((reason: unknown) => {
+    this.agentManager.onEndTurn((reason, source) => {
       // Ensure WebView exits streaming state even if no explicit streamEnd was emitted elsewhere
+      const data: {
+        timestamp: number;
+        reason: string;
+        source?: string;
+      } = {
+        timestamp: Date.now(),
+        reason: reason || 'end_turn',
+      };
+      if (source) {
+        data.source = source;
+      }
       this.sendMessageToWebView({
         type: 'streamEnd',
-        data: {
-          timestamp: Date.now(),
-          reason: reason || 'end_turn',
-        },
+        data,
       });
       // Fire the idle notification from here (authoritative "task done" event) rather
       // than relying on the webview's isStreaming transition, which fires on every
       // intermediate streamEnd in multi-tool-call sequences and on cancellation.
-      this.handleAgentIdle();
+      if (source !== 'background_notification') {
+        this.handleAgentIdle();
+      }
     });
 
     // Note: Tool call updates are handled in handleSessionUpdate within HopCodeAgentManager
     // and sent via onStreamChunk callback
-    this.agentManager.onToolCall((update: unknown) => {
+    this.agentManager.onToolCall((update) => {
       // Always surface tool calls; they are part of the live assistant flow.
       // Cast update to access sessionUpdate property
       const updateData = update as unknown as Record<string, unknown>;
@@ -460,7 +492,7 @@ export class WebViewProvider {
     });
 
     // Setup plan handler
-    this.agentManager.onPlan((entries: unknown) => {
+    this.agentManager.onPlan((entries) => {
       this.sendMessageToWebView({
         type: 'plan',
         data: { entries },
@@ -526,8 +558,8 @@ export class WebViewProvider {
               (request.toolCall as { kind?: string } | undefined)?.kind ===
               'switch_mode';
 
-            // Always close open diff editors after any permission decision
-            void vscode.commands.executeCommand('hopcode.diff.closeAll');
+            // Always close open qwen-diff editors after any permission decision
+            void vscode.commands.executeCommand('qwen.diff.closeAll');
 
             if (isCancel) {
               // Fire and forget — for normal tool calls, cancel generation and
@@ -603,9 +635,7 @@ export class WebViewProvider {
               })();
             } else {
               // Allowed/proceeded — suppress diff re-open briefly
-              void vscode.commands.executeCommand(
-                'hopcode.diff.suppressBriefly',
-              );
+              void vscode.commands.executeCommand('qwen.diff.suppressBriefly');
             }
           };
           // Store handler in message handler
@@ -671,7 +701,7 @@ export class WebViewProvider {
       },
     );
 
-    this.agentManager.onDisconnected((code: unknown, signal: unknown) => {
+    this.agentManager.onDisconnected((code, signal) => {
       console.log(
         `[WebViewProvider] Agent disconnected (code: ${code}, signal: ${signal})`,
       );
@@ -1070,7 +1100,7 @@ export class WebViewProvider {
    *
    * @returns true if settings were synced (apiKey is configured), false otherwise
    */
-  private async syncVSCodeSettingsToHopCodeConfig(): Promise<boolean> {
+  private async syncVSCodeSettingsToQwenConfig(): Promise<boolean> {
     const config = vscode.workspace.getConfiguration('hopcode');
     const apiKey = config.get<string>('apiKey', '');
 
@@ -1109,7 +1139,7 @@ export class WebViewProvider {
    * This makes existing CLI-configured non-secret metadata visible in the
    * VSCode Settings page without mirroring credentials into settings.json.
    */
-  private async syncHopCodeConfigToVSCodeSettings(): Promise<void> {
+  private async syncQwenConfigToVSCodeSettings(): Promise<void> {
     try {
       const hopcodeSettings = readHopCodeSettingsForVSCode();
       if (!hopcodeSettings) {
@@ -1126,12 +1156,9 @@ export class WebViewProvider {
       const updates: Array<Thenable<void>> = [];
 
       if (
-        config.get<string>('provider', 'coding-plan') !==
-        hopcodeSettings.provider
+        config.get<string>('provider', 'coding-plan') !== hopcodeSettings.provider
       ) {
-        updates.push(
-          config.update('provider', hopcodeSettings.provider, target),
-        );
+        updates.push(config.update('provider', hopcodeSettings.provider, target));
       }
       if (
         config.get<'china' | 'global'>('codingPlanRegion', 'china') !==
@@ -1162,7 +1189,7 @@ export class WebViewProvider {
       }
     } catch (error) {
       console.error(
-        '[WebViewProvider] Failed to sync hopcode config to VSCode settings:',
+        '[WebViewProvider] Failed to sync qwen config to VSCode settings:',
         error,
       );
     }
@@ -1183,7 +1210,7 @@ export class WebViewProvider {
 
     this.initializationPromise = (async () => {
       try {
-        await this.syncHopCodeConfigToVSCodeSettings();
+        await this.syncQwenConfigToVSCodeSettings();
 
         console.log('[WebViewProvider] Attempting connection...');
         // Attempt a connection to detect prior auth without forcing login
@@ -1231,7 +1258,7 @@ export class WebViewProvider {
         `[WebViewProvider] Using CLI-managed authentication (autoAuth=${autoAuthenticate})`,
       );
 
-      const cliEntry = resolveHopcodeCliEntryPath(
+      const cliEntry = resolveHopCodeCliEntryPath(
         this.extensionUri,
         this.context.extensionMode,
       );
@@ -1286,7 +1313,7 @@ export class WebViewProvider {
           });
         }
 
-        // Load messages from the current HopCode session
+        // Load messages from the current Qwen session
         const sessionReady = await this.loadCurrentSessionMessages(options);
 
         if (sessionReady) {
@@ -1304,7 +1331,7 @@ export class WebViewProvider {
         const errorMsg = getErrorMessage(_error);
         console.error('[WebViewProvider] Agent connection error:', _error);
         vscode.window.showWarningMessage(
-          `Failed to connect to HopCode CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
+          `Failed to connect to Qwen CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
         );
         // Fallback to empty conversation
         await this.initializeEmptyConversation();
@@ -1325,11 +1352,11 @@ export class WebViewProvider {
   /**
    * Handle auth interactive — interactive auth flow result.
    * Writes provider config to ~/.hopcode/settings.json and reconnects.
-   * Mirrors the CLI's `hopcode auth coding-plan` / `hopcode auth` flow.
+   * Mirrors the CLI's `qwen auth coding-plan` / `qwen auth` flow.
    */
   private async handleAuthInteractive(
-    providerConfig: import('@hoptrendy/hopcode-core').ProviderConfig,
-    inputs: import('@hoptrendy/hopcode-core').ProviderSetupInputs,
+    providerConfig: import('@hopcode/hopcode-core').ProviderConfig,
+    inputs: import('@hopcode/hopcode-core').ProviderSetupInputs,
   ): Promise<void> {
     if (!inputs.apiKey) {
       this.sendMessageToWebView({
@@ -1490,7 +1517,7 @@ export class WebViewProvider {
       type: 'agentConnectionError',
       data: {
         message:
-          'Lost connection to HopCode agent and auto-reconnect failed. Please use the refresh button to try again.',
+          'Lost connection to Qwen agent and auto-reconnect failed. Please use the refresh button to try again.',
       },
     });
   }
@@ -1545,7 +1572,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Load messages from current HopCode session
+   * Load messages from current Qwen session
    * Skips session restoration and creates a new session directly
    */
   private async loadCurrentSessionMessages(options?: {
@@ -1767,7 +1794,7 @@ export class WebViewProvider {
    * Context-aware handler for the "New Chat" action (openNewChatTab message).
    *
    * - View host (sidebar / secondary bar): resets the conversation in-place by
-   *   routing to the newHopCodeSession handler (includes auth checks and UI clearing).
+   *   routing to the newQwenSession handler (includes auth checks and UI clearing).
    * - Editor tab: returns false so the message falls through to
    *   SessionMessageHandler which opens a brand-new editor tab.
    *
@@ -1780,7 +1807,7 @@ export class WebViewProvider {
     if (message.type !== 'openNewChatTab' || !this.isViewHost) {
       return false;
     }
-    void this.messageHandler.route({ type: 'newHopCodeSession', data: {} });
+    void this.messageHandler.route({ type: 'newQwenSession', data: {} });
     return true;
   }
 
@@ -2458,7 +2485,7 @@ export class WebViewProvider {
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       const workingDir = workspaceFolder?.uri.fsPath || process.cwd();
 
-      // Create new HopCode session via agent manager
+      // Create new Qwen session via agent manager
       await this.agentManager.createNewSession(workingDir, { forceNew: true });
       this.messageHandler.setCurrentConversationId(null);
 

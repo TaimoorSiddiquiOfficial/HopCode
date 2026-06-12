@@ -19,7 +19,7 @@ import {
   addMCPStatusChangeListener,
   removeMCPStatusChangeListener,
   getAllMCPServerStatuses,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 export interface MCPHealthSnapshot {
   /** Total servers tracked by the registry (configured + discovered). */

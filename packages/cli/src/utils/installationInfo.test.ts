@@ -9,11 +9,11 @@ import { getInstallationInfo, PackageManager } from './installationInfo.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as childProcess from 'node:child_process';
-import { isGitRepository } from '@hoptrendy/hopcode-core';
+import { isGitRepository } from '@hopcode/hopcode-core';
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     isGitRepository: vi.fn(),
@@ -26,6 +26,9 @@ vi.mock('fs', async (importOriginal) => {
     ...actualFs,
     realpathSync: vi.fn(),
     existsSync: vi.fn(),
+    lstatSync: vi.fn(),
+    readFileSync: vi.fn(),
+    accessSync: vi.fn(),
   };
 });
 
@@ -40,21 +43,49 @@ vi.mock('child_process', async (importOriginal) => {
 const mockedIsGitRepository = vi.mocked(isGitRepository);
 const mockedRealPathSync = vi.mocked(fs.realpathSync);
 const mockedExistsSync = vi.mocked(fs.existsSync);
+const mockedLstatSync = vi.mocked(fs.lstatSync);
+const mockedReadFileSync = vi.mocked(fs.readFileSync);
 const mockedExecSync = vi.mocked(childProcess.execSync);
 
 describe('getInstallationInfo', () => {
   const projectRoot = '/path/to/project';
   let originalArgv: string[];
+  let originalPlatform: PropertyDescriptor | undefined;
+
+  const setPlatform = (platform: NodeJS.Platform) => {
+    Object.defineProperty(process, 'platform', {
+      configurable: true,
+      value: platform,
+    });
+  };
+
+  const fileStats = (mode = 0o755): fs.Stats =>
+    ({
+      isFile: () => true,
+      isSymbolicLink: () => false,
+      mode,
+    }) as fs.Stats;
+
+  const symlinkStats = (): fs.Stats =>
+    ({
+      isFile: () => true,
+      isSymbolicLink: () => true,
+      mode: 0o755,
+    }) as fs.Stats;
 
   beforeEach(() => {
     vi.resetAllMocks();
     originalArgv = [...process.argv];
+    originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
     // Mock process.cwd() for isGitRepository
     vi.spyOn(process, 'cwd').mockReturnValue(projectRoot);
   });
 
   afterEach(() => {
     process.argv = originalArgv;
+    if (originalPlatform) {
+      Object.defineProperty(process, 'platform', originalPlatform);
+    }
   });
 
   it('should return UNKNOWN when cliPath is not available', () => {
@@ -130,10 +161,256 @@ describe('getInstallationInfo', () => {
     expect(info.updateMessage).toBe('Running via bunx, update not applicable.');
   });
 
-  it('should detect Homebrew installation via execSync', () => {
-    Object.defineProperty(process, 'platform', {
-      value: 'darwin',
+  it('should detect standalone installs and avoid npm auto-update', () => {
+    setPlatform('linux');
+    const installDir = '/Users/test/.local/lib/hopcode';
+    const cliPath = `${installDir}/lib/cli.js`;
+    process.argv[1] = cliPath;
+    mockedRealPathSync.mockReturnValue(cliPath);
+    mockedExistsSync.mockImplementation((candidate) =>
+      [
+        path.join(installDir, 'manifest.json'),
+        path.join(installDir, 'bin', 'hopcode'),
+        path.join(installDir, 'node', 'bin', 'node'),
+      ].includes(String(candidate)),
+    );
+    mockedReadFileSync.mockImplementation((candidate) => {
+      if (candidate === path.join(installDir, 'manifest.json')) {
+        return JSON.stringify({
+          name: '@hopcode/hopcode',
+          target: 'linux-x64',
+        });
+      }
+      throw new Error(`Unexpected read: ${candidate}`);
     });
+    mockedLstatSync.mockImplementation((candidate) => {
+      if (
+        [
+          path.join(installDir, 'bin', 'hopcode'),
+          path.join(installDir, 'node', 'bin', 'node'),
+        ].includes(String(candidate))
+      ) {
+        return fileStats();
+      }
+      throw new Error(`Unexpected lstat: ${candidate}`);
+    });
+
+    const info = getInstallationInfo(projectRoot, true);
+
+    expect(info.packageManager).toBe(PackageManager.STANDALONE);
+    expect(info.isGlobal).toBe(true);
+    expect(info.isStandalone).toBe(true);
+    expect(info.standaloneDir).toBe(installDir);
+    expect(info.updateCommand).toBeUndefined();
+    expect(info.updateMessage).toContain('Standalone install detected');
+    expect(info.updateMessage).not.toContain('npm install');
+  });
+
+  it('should detect Windows standalone installs and avoid npm auto-update', () => {
+    setPlatform('win32');
+    const installDir = 'C:/Users/test/AppData/Local/hopcode';
+    const cliPath = `${installDir}/lib/cli.js`;
+    process.argv[1] = cliPath;
+    mockedRealPathSync.mockReturnValue(cliPath);
+    mockedExistsSync.mockImplementation((candidate) =>
+      [
+        `${installDir}/manifest.json`,
+        `${installDir}/bin/hopcode.cmd`,
+        `${installDir}/node/node.exe`,
+      ].includes(String(candidate).replace(/\\/g, '/')),
+    );
+    mockedReadFileSync.mockImplementation((candidate) => {
+      if (
+        String(candidate).replace(/\\/g, '/') === `${installDir}/manifest.json`
+      ) {
+        return JSON.stringify({
+          name: '@hopcode/hopcode',
+          target: 'win-x64',
+        });
+      }
+      throw new Error(`Unexpected read: ${candidate}`);
+    });
+    mockedLstatSync.mockImplementation((candidate) => {
+      if (
+        [`${installDir}/bin/hopcode.cmd`, `${installDir}/node/node.exe`].includes(
+          String(candidate).replace(/\\/g, '/'),
+        )
+      ) {
+        return fileStats(0o644);
+      }
+      throw new Error(`Unexpected lstat: ${candidate}`);
+    });
+
+    const info = getInstallationInfo(projectRoot, true);
+
+    expect(info.packageManager).toBe(PackageManager.STANDALONE);
+    expect(info.isStandalone).toBe(true);
+    expect(info.standaloneDir).toBe(installDir);
+    expect(info.updateCommand).toBeUndefined();
+    expect(info.updateMessage).toContain('Standalone install detected');
+    expect(info.updateMessage).not.toContain('npm install');
+  });
+
+  it('should detect macOS standalone installs and avoid npm auto-update', () => {
+    setPlatform('darwin');
+    const installDir = '/Users/test/.local/lib/hopcode';
+    const cliPath = `${installDir}/lib/cli.js`;
+    process.argv[1] = cliPath;
+    mockedRealPathSync.mockReturnValue(cliPath);
+    mockedExistsSync.mockImplementation((candidate) =>
+      [
+        path.join(installDir, 'manifest.json'),
+        path.join(installDir, 'bin', 'hopcode'),
+        path.join(installDir, 'node', 'bin', 'node'),
+      ].includes(String(candidate)),
+    );
+    mockedReadFileSync.mockImplementation((candidate) => {
+      if (candidate === path.join(installDir, 'manifest.json')) {
+        return JSON.stringify({
+          name: '@hopcode/hopcode',
+          target: 'darwin-arm64',
+        });
+      }
+      throw new Error(`Unexpected read: ${candidate}`);
+    });
+    mockedLstatSync.mockImplementation((candidate) => {
+      if (
+        [
+          path.join(installDir, 'bin', 'hopcode'),
+          path.join(installDir, 'node', 'bin', 'node'),
+        ].includes(String(candidate))
+      ) {
+        return fileStats();
+      }
+      throw new Error(`Unexpected lstat: ${candidate}`);
+    });
+
+    const info = getInstallationInfo(projectRoot, true);
+
+    expect(info.packageManager).toBe(PackageManager.STANDALONE);
+    expect(info.isGlobal).toBe(true);
+    expect(info.isStandalone).toBe(true);
+    expect(info.standaloneDir).toBe(installDir);
+    expect(info.updateMessage).toContain('Standalone install detected');
+  });
+
+  it('should fall back to npm when manifest.json is malformed', () => {
+    setPlatform('linux');
+    const installDir = '/Users/test/.local/lib/hopcode';
+    const cliPath = `${installDir}/lib/cli.js`;
+    process.argv[1] = cliPath;
+    mockedRealPathSync.mockReturnValue(cliPath);
+    mockedExistsSync.mockImplementation((candidate) =>
+      [
+        path.join(installDir, 'manifest.json'),
+        path.join(installDir, 'bin', 'hopcode'),
+        path.join(installDir, 'node', 'bin', 'node'),
+      ].includes(String(candidate)),
+    );
+    mockedReadFileSync.mockReturnValue('{invalid json');
+    mockedLstatSync.mockReturnValue(fileStats());
+
+    const info = getInstallationInfo(projectRoot, true);
+
+    expect(info.packageManager).toBe(PackageManager.NPM);
+    expect(info.updateCommand).toBe(
+      'npm install -g @hopcode/hopcode@latest',
+    );
+  });
+
+  it('should ignore standalone-like installs for the wrong target', () => {
+    setPlatform('linux');
+    const installDir = '/Users/test/.local/lib/hopcode';
+    const cliPath = `${installDir}/lib/cli.js`;
+    process.argv[1] = cliPath;
+    mockedRealPathSync.mockReturnValue(cliPath);
+    mockedExistsSync.mockImplementation((candidate) =>
+      [
+        path.join(installDir, 'manifest.json'),
+        path.join(installDir, 'bin', 'hopcode'),
+        path.join(installDir, 'node', 'bin', 'node'),
+      ].includes(String(candidate)),
+    );
+    mockedReadFileSync.mockReturnValue(
+      JSON.stringify({
+        name: '@hopcode/hopcode',
+        target: 'win-x64',
+      }),
+    );
+    mockedLstatSync.mockReturnValue(fileStats());
+
+    const info = getInstallationInfo(projectRoot, true);
+
+    expect(info.packageManager).toBe(PackageManager.NPM);
+    expect(info.updateCommand).toBe(
+      'npm install -g @hopcode/hopcode@latest',
+    );
+  });
+
+  it('should ignore standalone-like installs with symlinked runtime files', () => {
+    setPlatform('linux');
+    const installDir = '/Users/test/.local/lib/hopcode';
+    const cliPath = `${installDir}/lib/cli.js`;
+    process.argv[1] = cliPath;
+    mockedRealPathSync.mockReturnValue(cliPath);
+    mockedExistsSync.mockImplementation((candidate) =>
+      [
+        path.join(installDir, 'manifest.json'),
+        path.join(installDir, 'bin', 'hopcode'),
+        path.join(installDir, 'node', 'bin', 'node'),
+      ].includes(String(candidate)),
+    );
+    mockedReadFileSync.mockReturnValue(
+      JSON.stringify({
+        name: '@hopcode/hopcode',
+        target: 'linux-x64',
+      }),
+    );
+    mockedLstatSync.mockImplementation((candidate) => {
+      if (candidate === path.join(installDir, 'bin', 'hopcode')) {
+        return symlinkStats();
+      }
+      return fileStats();
+    });
+
+    const info = getInstallationInfo(projectRoot, true);
+
+    expect(info.packageManager).toBe(PackageManager.NPM);
+  });
+
+  it('should ignore Unix standalone-like installs with non-executable runtime files', () => {
+    setPlatform('linux');
+    const installDir = '/Users/test/.local/lib/hopcode';
+    const cliPath = `${installDir}/lib/cli.js`;
+    process.argv[1] = cliPath;
+    mockedRealPathSync.mockReturnValue(cliPath);
+    mockedExistsSync.mockImplementation((candidate) =>
+      [
+        path.join(installDir, 'manifest.json'),
+        path.join(installDir, 'bin', 'hopcode'),
+        path.join(installDir, 'node', 'bin', 'node'),
+      ].includes(String(candidate)),
+    );
+    mockedReadFileSync.mockReturnValue(
+      JSON.stringify({
+        name: '@hopcode/hopcode',
+        target: 'linux-x64',
+      }),
+    );
+    mockedLstatSync.mockImplementation((candidate) => {
+      if (candidate === path.join(installDir, 'bin', 'hopcode')) {
+        return fileStats(0o644);
+      }
+      return fileStats();
+    });
+
+    const info = getInstallationInfo(projectRoot, true);
+
+    expect(info.packageManager).toBe(PackageManager.NPM);
+  });
+
+  it('should detect Homebrew installation via execSync', () => {
+    setPlatform('darwin');
     const cliPath = '/usr/local/bin/gemini';
     process.argv[1] = cliPath;
     mockedRealPathSync.mockReturnValue(cliPath);
@@ -151,9 +428,7 @@ describe('getInstallationInfo', () => {
   });
 
   it('should fall through if brew command fails', () => {
-    Object.defineProperty(process, 'platform', {
-      value: 'darwin',
-    });
+    setPlatform('darwin');
     const cliPath = '/usr/local/bin/gemini';
     process.argv[1] = cliPath;
     mockedRealPathSync.mockReturnValue(cliPath);
@@ -173,7 +448,7 @@ describe('getInstallationInfo', () => {
   });
 
   it('should detect global pnpm installation', () => {
-    const pnpmPath = `/Users/test/.pnpm/global/5/node_modules/.pnpm/some-hash/node_modules/@hoptrendy/hopcode-cli/dist/index.js`;
+    const pnpmPath = `/Users/test/.pnpm/global/5/node_modules/.pnpm/some-hash/node_modules/@hopcode/hopcode/dist/index.js`;
     process.argv[1] = pnpmPath;
     mockedRealPathSync.mockReturnValue(pnpmPath);
     mockedExecSync.mockImplementation(() => {
@@ -185,7 +460,7 @@ describe('getInstallationInfo', () => {
     expect(info.packageManager).toBe(PackageManager.PNPM);
     expect(info.isGlobal).toBe(true);
     expect(info.updateCommand).toBe(
-      'pnpm add -g @hoptrendy/hopcode-cli@latest',
+      'pnpm add -g @hopcode/hopcode@latest',
     );
     expect(info.updateMessage).toContain('Attempting to automatically update');
 
@@ -195,7 +470,7 @@ describe('getInstallationInfo', () => {
   });
 
   it('should detect global yarn installation', () => {
-    const yarnPath = `/Users/test/.yarn/global/node_modules/@hoptrendy/hopcode-cli/dist/index.js`;
+    const yarnPath = `/Users/test/.yarn/global/node_modules/@hopcode/hopcode/dist/index.js`;
     process.argv[1] = yarnPath;
     mockedRealPathSync.mockReturnValue(yarnPath);
     mockedExecSync.mockImplementation(() => {
@@ -207,7 +482,7 @@ describe('getInstallationInfo', () => {
     expect(info.packageManager).toBe(PackageManager.YARN);
     expect(info.isGlobal).toBe(true);
     expect(info.updateCommand).toBe(
-      'yarn global add @hoptrendy/hopcode-cli@latest',
+      'yarn global add @hopcode/hopcode@latest',
     );
     expect(info.updateMessage).toContain('Attempting to automatically update');
 
@@ -228,7 +503,7 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, true);
     expect(info.packageManager).toBe(PackageManager.BUN);
     expect(info.isGlobal).toBe(true);
-    expect(info.updateCommand).toBe('bun add -g @hoptrendy/hopcode-cli@latest');
+    expect(info.updateCommand).toBe('bun add -g @hopcode/hopcode@latest');
     expect(info.updateMessage).toContain('Attempting to automatically update');
 
     // isAutoUpdateEnabled = false -> "Please run..."
@@ -316,7 +591,7 @@ describe('getInstallationInfo', () => {
     expect(info.packageManager).toBe(PackageManager.NPM);
     expect(info.isGlobal).toBe(true);
     expect(info.updateCommand).toBe(
-      'npm install -g @hoptrendy/hopcode-cli@latest',
+      'npm install -g @hopcode/hopcode@latest',
     );
     expect(info.updateMessage).toContain('Attempting to automatically update');
 

@@ -27,7 +27,6 @@ export function createNonInteractiveUI(): CommandContext['ui'] {
     isIdleRef: { current: true },
     toggleVimEnabled: async () => false,
     setGeminiMdFileCount: (_count) => {},
-    setContextMdFileCount: (_count) => {},
     reloadCommands: () => {},
     setSessionName: () => {},
     extensionsUpdateState: new Map(),

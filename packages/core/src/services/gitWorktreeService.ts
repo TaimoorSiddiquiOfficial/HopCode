@@ -12,7 +12,7 @@ import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 import { simpleGit, CheckRepoActions } from 'simple-git';
-import type { SimpleGit } from 'simple-git';
+import type { SimpleGit, SimpleGitOptions } from 'simple-git';
 import { Storage } from '../config/storage.js';
 import { isCommandAvailable } from '../utils/shell-utils.js';
 import { isNodeError } from '../utils/errors.js';
@@ -1559,7 +1559,7 @@ export class GitWorktreeService {
 
     const worktreeGit = simpleGit(worktreePath, {
       unsafe: { allowUnsafeHooksPath: true },
-    });
+    } as unknown as Partial<SimpleGitOptions>);
     let existing = '';
     try {
       // Saves the write subprocess when value already matches. The probe

@@ -13,7 +13,7 @@ import {
 import type {
   ExtensionConfig,
   ClaudeMarketplaceConfig,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import prompts from 'prompts';
 
 vi.mock('../../i18n/index.js', () => ({
@@ -41,6 +41,56 @@ describe('extensionConsentString', () => {
     const result = extensionConsentString(config);
 
     expect(result).toContain('Installing extension "test-extension".');
+  });
+
+  it('should include description when present', () => {
+    const config: ExtensionConfig = {
+      name: 'test-extension',
+      version: '1.0.0',
+      description: 'A helpful test extension',
+    };
+
+    const result = extensionConsentString(config);
+
+    expect(result).toContain('A helpful test extension');
+  });
+
+  it('should strip ANSI escape codes from description', () => {
+    const config: ExtensionConfig = {
+      name: 'test-extension',
+      version: '1.0.0',
+      description: '\x1b[31mMalicious\x1b[0m description',
+    };
+
+    const result = extensionConsentString(config);
+
+    expect(result).toContain('Malicious description');
+    expect(result).not.toContain('\x1b[31m');
+  });
+
+  it('should handle non-string description gracefully', () => {
+    const config = {
+      name: 'test-extension',
+      version: '1.0.0',
+      description: 123,
+    } as unknown as ExtensionConfig;
+
+    const result = extensionConsentString(config);
+
+    expect(result).not.toContain('123');
+  });
+
+  it('should not include description when absent', () => {
+    const config: ExtensionConfig = {
+      name: 'test-extension',
+      version: '1.0.0',
+    };
+
+    const result = extensionConsentString(config);
+
+    const lines = result.split('\n');
+    expect(lines[0]).toContain('Installing extension "test-extension".');
+    expect(lines[1]).toContain('Extensions may introduce unexpected behavior');
   });
 
   it('should include warning message', () => {

@@ -13,7 +13,7 @@ import type { ApprovalModeValue } from './approvalModeValueTypes.js';
 // ---------------------------------------------------------------------------
 
 // Default auth method for ACP authenticate requests.
-// Value matches AuthType.USE_OPENAI from @hoptrendy/hopcode-core.
+// Value matches AuthType.USE_OPENAI from @hopcode/hopcode-core.
 // Cannot import directly because this file is used in the webview bundle
 // where core (Node.js-only) is excluded as external.
 export const authMethod = 'openai';
@@ -40,6 +40,26 @@ export interface SessionUpdateMeta {
   durationMs?: number | null;
   timestamp?: number | null;
   availableSkills?: string[] | null;
+  availableSkillDetails?: Array<{
+    name: string;
+    description?: string;
+    body?: string;
+    filePath?: string;
+    level?: string;
+    modelInvocable?: boolean;
+  }> | null;
+  source?: string | null;
+  hopcodeDiscreteMessage?: boolean | null;
+  // Set on the summary emitted by MessageRewriteMiddleware so consumers can
+  // distinguish the rewritten copy from the original chunk (which carries the
+  // same hopcodeDiscreteMessage flag) and avoid persisting both.
+  rewritten?: boolean | null;
+  backgroundTask?: {
+    taskId?: string;
+    status?: string;
+    kind?: string;
+    toolUseId?: string;
+  } | null;
 }
 
 export {

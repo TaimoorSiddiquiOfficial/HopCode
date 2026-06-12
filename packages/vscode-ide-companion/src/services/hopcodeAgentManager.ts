@@ -23,7 +23,7 @@ import {
   type HopCodeMessage,
 } from './hopcodeSessionReader.js';
 import { HopCodeSessionManager } from './hopcodeSessionManager.js';
-import { SessionService } from '@hoptrendy/hopcode-core';
+import { SessionService } from '@hopcode/hopcode-core';
 import type {
   ChatMessage,
   PlanEntry,
@@ -250,10 +250,10 @@ export class HopCodeAgentManager {
       return { optionId: 'cancel' };
     };
 
-    this.connection.onEndTurn = (reason?: string) => {
+    this.connection.onEndTurn = (reason?: string, source?: string) => {
       try {
         if (this.callbacks.onEndTurn) {
-          this.callbacks.onEndTurn(reason);
+          this.callbacks.onEndTurn(reason, source);
         } else if (this.callbacks.onStreamChunk) {
           // Fallback: send a zero-length chunk then rely on streamEnd elsewhere
           this.callbacks.onStreamChunk('');
@@ -1425,7 +1425,7 @@ export class HopCodeAgentManager {
    *
    * @param callback - Called when ACP stopReason is reported
    */
-  onEndTurn(callback: (reason?: string) => void): void {
+  onEndTurn(callback: (reason?: string, source?: string) => void): void {
     this.callbacks.onEndTurn = callback;
     this.sessionUpdateHandler.updateCallbacks(this.callbacks);
   }

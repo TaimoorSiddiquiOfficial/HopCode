@@ -14,7 +14,7 @@
 import type {
   ModelProvidersConfig,
   ProviderSettingsAdapter,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import type { LoadedSettings, SettingScope } from './settings.js';
 import { getPersistScopeForModelSelection } from './modelProvidersScope.js';
 import {

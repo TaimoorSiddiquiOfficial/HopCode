@@ -1,26 +1,36 @@
 /**
  * @license
- * Copyright 2026 HopCode Team (adapted from protoCLI)
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ToolInvocation, ToolResult } from './tools.js';
+/**
+ * task_list tool — list tasks with optional filters.
+ */
+
+import type {
+  ToolInvocation,
+  ToolResult,
+  TaskListResultDisplay,
+} from './tools.js';
 import { BaseDeclarativeTool, BaseToolInvocation, Kind } from './tools.js';
 import { ToolNames, ToolDisplayNames } from './tool-names.js';
 import type { Config } from '../config/config.js';
-import type { TaskStatus } from '../services/task-store.js';
+import { getTeamName, resolveActiveTeamName } from '../agents/team/identity.js';
+import { listTasks } from '../agents/team/tasks.js';
 
 export interface TaskListParams {
-  status?: string;
-  parentTaskId?: string;
+  status?: 'pending' | 'in_progress' | 'completed';
+  owner?: string;
+  blockedBy?: string;
 }
 
-class TaskListToolInvocation extends BaseToolInvocation<
+class TaskListInvocation extends BaseToolInvocation<
   TaskListParams,
   ToolResult
 > {
   constructor(
-    private readonly config: Config,
+    private config: Config,
     params: TaskListParams,
   ) {
     super(params);
@@ -28,50 +38,96 @@ class TaskListToolInvocation extends BaseToolInvocation<
 
   getDescription(): string {
     const filters: string[] = [];
-    if (this.params.status) filters.push(`status=${this.params.status}`);
-    if (this.params.parentTaskId)
-      filters.push(`parent=${this.params.parentTaskId}`);
+    if (this.params.status) {
+      filters.push(`status=${this.params.status}`);
+    }
+    if (this.params.owner) {
+      filters.push(`owner=${this.params.owner}`);
+    }
+    if (this.params.blockedBy) {
+      filters.push(`blockedBy=${this.params.blockedBy}`);
+    }
     return filters.length > 0
       ? `List tasks (${filters.join(', ')})`
       : 'List all tasks';
   }
 
-  async execute(_signal: AbortSignal): Promise<ToolResult> {
-    const store = this.config.getTaskStore();
-    if (!store) {
+  async execute(): Promise<ToolResult> {
+    const teamName = resolveActiveTeamName(
+      this.config.getTeamContext()?.teamName,
+    );
+    if (!teamName) {
+      const msg = 'No active team. Create a team first.';
       return {
-        llmContent: 'Task store is not available.',
-        returnDisplay: 'Task store is not available.',
-        error: { message: 'Task store is not available.' },
+        llmContent: msg,
+        returnDisplay: msg,
+        error: { message: msg },
       };
     }
-    const tasks = store.list({
-      status: this.params.status as TaskStatus | undefined,
-      parentTaskId: this.params.parentTaskId,
+
+    const tasks = await listTasks(teamName, {
+      status: this.params.status,
+      owner: this.params.owner,
+      blockedBy: this.params.blockedBy,
     });
 
     if (tasks.length === 0) {
-      return {
-        llmContent:
-          'No tasks found.\n\n<system-reminder>\nTask list is empty. Create tasks with task_create before starting multi-step work.\n</system-reminder>',
-        returnDisplay: { type: 'todo_list' as const, todos: [] },
-      };
+      const llmContent = 'No tasks found.';
+      return { llmContent, returnDisplay: llmContent };
     }
 
-    return {
-      llmContent: `Current tasks:\n\n${JSON.stringify(tasks, null, 2)}\n\n<system-reminder>\nYou have ${tasks.length} task(s). Continue working through them systematically.\n</system-reminder>`,
-      returnDisplay: {
-        type: 'todo_list' as const,
-        todos: tasks.map((t) => ({
-          id: t.id,
-          content: t.title,
-          status:
-            t.status === 'blocked' || t.status === 'cancelled'
-              ? ('pending' as const)
-              : t.status,
-        })),
-      },
+    const lines = tasks.map(
+      (t) =>
+        `#${t.id} [${t.status}]` +
+        (t.owner ? ` @${t.owner}` : '') +
+        ` — ${t.subject}`,
+    );
+
+    // Include unread leader messages if called by the
+    // leader (no teammate identity = leader context).
+    const manager = this.config.getTeamManager();
+    if (manager && !getTeamName()) {
+      try {
+        const msgs = await manager.getLeaderMessages();
+        if (msgs.length > 0) {
+          lines.push('');
+          lines.push('--- Teammate messages ---');
+          // Run the same nonce envelope `pollLeaderInbox` uses so a
+          // teammate can't slip a forged `[leader]: ...` header into
+          // the leader's conversation through the `task_list` path.
+          for (const wrapped of manager.formatLeaderEnvelope(msgs)) {
+            lines.push(wrapped);
+          }
+        }
+      } catch {
+        // Ignore — leader inbox may not exist.
+      }
+
+      // Hint to the leader: don't poll task_list repeatedly.
+      if (manager.hasActiveTeammates()) {
+        lines.push('');
+        lines.push(
+          'NOTE: Teammates are still working. Their results' +
+            ' will be delivered as messages — do NOT call' +
+            ' task_list again to check. End your turn and' +
+            ' wait for teammate messages.',
+        );
+      }
+    }
+
+    const llmContent = lines.join('\n');
+
+    const display: TaskListResultDisplay = {
+      type: 'task_list',
+      tasks: tasks.map((t) => ({
+        id: t.id,
+        subject: t.subject,
+        status: t.status,
+        owner: t.owner,
+      })),
     };
+
+    return { llmContent, returnDisplay: display };
   }
 }
 
@@ -79,35 +135,33 @@ export class TaskListTool extends BaseDeclarativeTool<
   TaskListParams,
   ToolResult
 > {
-  static readonly Name: string = ToolNames.TASK_LIST;
+  static readonly Name = ToolNames.TASK_LIST;
 
-  constructor(private readonly config: Config) {
+  constructor(private config: Config) {
     super(
       TaskListTool.Name,
       ToolDisplayNames.TASK_LIST,
-      'Lists tasks with optional filtering by status or parent task.',
-      Kind.Think,
+      'List tasks in the team task list. ' +
+        'All filter parameters are optional.',
+      Kind.Read,
       {
         type: 'object',
         properties: {
           status: {
             type: 'string',
-            enum: [
-              'pending',
-              'in_progress',
-              'completed',
-              'blocked',
-              'cancelled',
-            ],
-            description: 'Optional: filter tasks by status.',
+            enum: ['pending', 'in_progress', 'completed'],
+            description: 'Filter by task status.',
           },
-          parentTaskId: {
+          owner: {
             type: 'string',
-            description:
-              'Optional: filter to subtasks of a specific parent task ID.',
+            description: 'Filter by owner agent name.',
+          },
+          blockedBy: {
+            type: 'string',
+            description: 'Filter for tasks blocked by this task ID.',
           },
         },
-        $schema: 'http://json-schema.org/draft-07/schema#',
+        additionalProperties: false,
       },
     );
   }
@@ -115,6 +169,6 @@ export class TaskListTool extends BaseDeclarativeTool<
   protected createInvocation(
     params: TaskListParams,
   ): ToolInvocation<TaskListParams, ToolResult> {
-    return new TaskListToolInvocation(this.config, params);
+    return new TaskListInvocation(this.config, params);
   }
 }

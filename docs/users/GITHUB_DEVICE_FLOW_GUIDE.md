@@ -271,7 +271,7 @@ user:email        - Access user email addresses
 ### TypeScript Example
 
 ```typescript
-import { GitHubDeviceFlowAuth } from '@hoptrendy/hopcode-core';
+import { GitHubDeviceFlowAuth } from '@hopcode/hopcode-core';
 
 const deviceAuth = new GitHubDeviceFlowAuth(
   'Iv23livRiRBTa9cyBnk1', // Client ID
@@ -308,7 +308,7 @@ const token = await deviceAuth.authenticateWithProgress(
 ```javascript
 #!/usr/bin/env node
 
-import { GitHubDeviceFlowAuth } from '@hoptrendy/hopcode-core';
+import { GitHubDeviceFlowAuth } from '@hopcode/hopcode-core';
 
 async function authenticate() {
   const auth = new GitHubDeviceFlowAuth(process.env.GITHUB_CLIENT_ID);

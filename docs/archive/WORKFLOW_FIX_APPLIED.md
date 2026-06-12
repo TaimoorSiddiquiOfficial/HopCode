@@ -62,9 +62,9 @@
 ✅ prepare (1-2 min)
    ↓
 ✅ publish-packages (3-5 min)
-   ├─ @hoptrendy/hopcode
-   ├─ @hoptrendy/core
-   ├─ @hoptrendy/sdk
+   ├─ @hopcode/hopcode
+   ├─ @hopcode/core
+   ├─ @hopcode/sdk
    └─ etc...
    ↓
 ✅ notify (30 sec) ← This should work now!
@@ -87,9 +87,9 @@
 **On npmjs.com:**
 
 ```
-https://www.npmjs.com/package/@hoptrendy/hopcode
-https://www.npmjs.com/package/@hoptrendy/core
-https://www.npmjs.com/package/@hoptrendy/sdk
+https://www.npmjs.com/package/@hopcode/hopcode
+https://www.npmjs.com/package/@hopcode/core
+https://www.npmjs.com/package/@hopcode/sdk
 ```
 
 ---
@@ -162,8 +162,8 @@ ref: main
 **You should see in logs:**
 
 ```
-DRY RUN: Would publish @hoptrendy/hopcode
-DRY RUN: Would publish @hoptrendy/core
+DRY RUN: Would publish @hopcode/hopcode
+DRY RUN: Would publish @hopcode/core
 etc...
 ```
 

@@ -12,11 +12,11 @@ import {
   MCPDiscoveryState,
   getMCPServerStatus,
   getMCPDiscoveryState,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   const mockAuthenticate = vi.fn();
   return {
     ...actual,

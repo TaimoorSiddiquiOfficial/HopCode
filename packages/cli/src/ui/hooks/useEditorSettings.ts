@@ -7,11 +7,11 @@
 import { useState, useCallback } from 'react';
 import type { LoadedSettings, SettingScope } from '../../config/settings.js';
 import { type HistoryItemWithoutId, MessageType } from '../types.js';
-import type { EditorType } from '@hoptrendy/hopcode-core';
+import type { EditorType } from '@hopcode/hopcode-core';
 import {
   allowEditorTypeInSandbox,
   checkHasEditorType,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 interface UseEditorSettingsReturn {
   isEditorDialogOpen: boolean;

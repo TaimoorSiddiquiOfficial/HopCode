@@ -6,7 +6,7 @@
 
 /**
  * Daemon-host implementation of the `DaemonStatusProvider` interface
- * (declared in `@hoptrendy/hopcode-acp-bridge/bridgeOptions`). Production
+ * (declared in `@hopcode/acp-bridge/bridgeOptions`). Production
  * `hopcode serve` wires this into `BridgeOptions.statusProvider` so the
  * bridge factory can pull env / preflight cells without importing
  * daemon-host-specific modules directly.
@@ -18,14 +18,14 @@
  */
 
 import { promises as fs } from 'node:fs';
-import { canUseRipgrep } from '@hoptrendy/hopcode-core';
+import { canUseRipgrep } from '@hopcode/hopcode-core';
 import {
   type DaemonStatusProvider,
   mapDomainErrorToErrorKind,
   type ServePreflightCell,
   type ServePreflightKind,
   type ServeWorkspaceEnvStatus,
-} from '@hoptrendy/hopcode-acp-bridge';
+} from '@hopcode/acp-bridge';
 import { getGitVersion, getNpmVersion } from '../utils/systemInfo.js';
 import { buildEnvStatusFromProcess } from './envSnapshot.js';
 

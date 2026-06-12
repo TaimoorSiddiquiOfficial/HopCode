@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -16,10 +16,10 @@ import type {
   Config,
   SessionListItem,
   ListSessionsResult,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
-vi.mock('@hoptrendy/hopcode-core', async () => {
-  const actual = await vi.importActual('@hoptrendy/hopcode-core');
+vi.mock('@hopcode/hopcode-core', async () => {
+  const actual = await vi.importActual('@hopcode/hopcode-core');
   return {
     ...actual,
     getGitBranch: vi.fn().mockReturnValue('main'),

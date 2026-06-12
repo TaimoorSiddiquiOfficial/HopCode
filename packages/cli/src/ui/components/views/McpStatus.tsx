@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { MCPServerConfig } from '@hoptrendy/hopcode-core';
-import { MCPServerStatus } from '@hoptrendy/hopcode-core';
+import type { MCPServerConfig } from '@hopcode/hopcode-core';
+import { MCPServerStatus } from '@hopcode/hopcode-core';
 import { Box, Text } from 'ink';
 import type React from 'react';
 import { theme } from '../../semantic-colors.js';

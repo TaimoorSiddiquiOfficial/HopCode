@@ -16,7 +16,7 @@ import type { CommandContext } from '../ui/commands/types.js';
 import { createMockCommandContext } from '../test-utils/mockCommandContext.js';
 import type * as child_process from 'node:child_process';
 import os from 'node:os';
-import { IdeClient } from '@hoptrendy/hopcode-core';
+import { IdeClient } from '@hopcode/hopcode-core';
 import * as versionUtils from './version.js';
 
 // `getNpmVersion` / `getGitVersion` use `execFile` callback-style. Mock
@@ -62,19 +62,24 @@ const setExecFileError = (err: Error) => {
   }) as unknown as typeof child_process.execFile);
 };
 
-vi.mock('node:os', () => ({
-  default: {
-    release: vi.fn(),
-  },
-}));
+vi.mock('node:os', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:os')>();
+  return {
+    ...actual,
+    default: {
+      ...actual,
+      release: vi.fn(),
+    },
+  };
+});
 
 vi.mock('./version.js', () => ({
   getCliVersion: vi.fn(),
 }));
 
-vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+    await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     IdeClient: {
@@ -272,7 +277,7 @@ describe('systemInfo', () => {
       } as unknown as IdeClient);
       setExecFileStdout('10.0.0');
 
-      const { AuthType } = await import('@hoptrendy/hopcode-core');
+      const { AuthType } = await import('@hopcode/hopcode-core');
       // Update the mock context to use OpenAI auth
       mockContext.services.settings.merged.security!.auth!.selectedType =
         AuthType.USE_OPENAI;

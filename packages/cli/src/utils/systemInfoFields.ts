@@ -9,7 +9,7 @@ import { t } from '../i18n/index.js';
 import {
   findProviderByCredentials,
   resolveMetadataKey,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 
 /**
  * Field configuration for system information display

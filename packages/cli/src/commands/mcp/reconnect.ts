@@ -11,9 +11,9 @@ import {
   Config,
   FileDiscoveryService,
   ExtensionManager,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { isWorkspaceTrusted } from '../../config/trustedFolders.js';
-import type { MCPServerConfig } from '@hoptrendy/hopcode-core';
+import type { MCPServerConfig } from '@hopcode/hopcode-core';
 
 async function getMcpServersFromConfig(
   extensionManager?: ExtensionManager,
