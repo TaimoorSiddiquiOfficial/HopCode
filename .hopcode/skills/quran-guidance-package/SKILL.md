@@ -2,7 +2,7 @@
 name: quran-guidance-package
 description: Reusable verification and scope discipline for changes touching the @hopcode/quran-guidance package.
 source: auto-skill
-extracted_at: '2026-06-12T11:37:11.398Z'
+extracted_at: '2026-06-12T12:00:58.542Z'
 ---
 
 # Quran Guidance Package Workflow
@@ -21,6 +21,21 @@ Do not add speculative features or abstractions for one-off behavior.
   verification workflow, not a hard-blocking mechanism.
 - The Izn gate should only apply to `run_shell_command`; file/edit/search tools
   should not be treated as destructive execution.
+
+## Root Build Order
+
+If core integration depends on generated or compiled `@hopcode/quran-guidance`
+outputs, ensure root build order builds `packages/quran-guidance` before
+`packages/core`. This matters for clean CI flows where `npm ci` does not reuse
+existing `dist/` artifacts.
+
+Verify with the root build after touching this dependency boundary:
+
+```bash
+npm run build
+```
+
+If you only need package-level verification, use the package checks below.
 
 ## Verification Order
 

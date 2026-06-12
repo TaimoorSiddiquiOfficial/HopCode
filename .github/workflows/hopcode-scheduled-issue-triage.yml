@@ -38,7 +38,7 @@ jobs:
 
       - name: 'Install dependencies and build'
         run: |-
-          npm ci
+          npm ci --ignore-scripts
           npm run build
           npm run bundle
 

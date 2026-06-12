@@ -83,7 +83,7 @@ jobs:
         env:
           NPM_CONFIG_PREFER_OFFLINE: 'true'
         run: |-
-          npm ci
+          npm ci --ignore-scripts
 
       - name: 'Get the version'
         id: 'version'
@@ -132,6 +132,12 @@ jobs:
         env:
           IS_PREVIEW: '${{ steps.vars.outputs.is_preview }}'
           MANUAL_VERSION: '${{ inputs.version }}'
+
+      - name: 'Build quran-guidance dependency'
+        if: |-
+          ${{ github.event.inputs.force_skip_tests != 'true' }}
+        run: |
+          npm run build --workspace=@hopcode/quran-guidance
 
       - name: 'Build core dependency'
         if: |-
@@ -207,7 +213,7 @@ jobs:
         env:
           NPM_CONFIG_PREFER_OFFLINE: 'true'
         run: |-
-          npm ci
+          npm ci --ignore-scripts
 
       - name: 'Install VSCE'
         run: |-

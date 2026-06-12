@@ -210,7 +210,7 @@ jobs:
 
       - name: 'Install Dependencies'
         run: |
-          npm ci
+          npm ci --ignore-scripts
           python -m pip install --upgrade pip
           python -m pip install -e 'packages/sdk-python[dev]' build
 

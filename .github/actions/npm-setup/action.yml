@@ -30,4 +30,4 @@ runs:
 
     - name: 'Install Dependencies'
       shell: 'bash'
-      run: 'npm ci --no-audit --progress=false'
+      run: 'npm ci --ignore-scripts --no-audit --progress=false'

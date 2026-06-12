@@ -61,7 +61,7 @@ jobs:
         env:
           NPM_CONFIG_PREFER_OFFLINE: 'true'
         run: |-
-          npm ci --no-audit --progress=false
+          npm ci --ignore-scripts --no-audit --progress=false
 
       - name: 'Download Release Assets from GitHub'
         env:

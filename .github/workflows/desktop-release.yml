@@ -296,7 +296,7 @@ jobs:
       - name: 'Install HopCode source dependencies'
         if: "${{ inputs.HOPCODE_code_source == 'source_branch' }}"
         working-directory: '${{ runner.temp }}/hopcode-source'
-        run: 'npm ci'
+        run: 'npm ci --ignore-scripts'
 
       - name: 'Bump desktop version'
         working-directory: 'packages/desktop'
