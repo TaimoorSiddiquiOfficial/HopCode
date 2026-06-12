@@ -139,7 +139,6 @@ jobs:
           npm run build --workspace=packages/web-templates
           npm run build --workspace=packages/server
           npm run build --workspace=packages/channels/base
-          npm run build --workspace=packages/channels/discord
           npm run build --workspace=packages/channels/telegram
           npm run build --workspace=packages/channels/weixin
           npm run build --workspace=packages/channels/dingtalk
@@ -218,7 +217,6 @@ jobs:
           npm run build --workspace=packages/web-templates
           npm run build --workspace=packages/server
           npm run build --workspace=packages/channels/base
-          npm run build --workspace=packages/channels/discord
           npm run build --workspace=packages/channels/telegram
           npm run build --workspace=packages/channels/weixin
           npm run build --workspace=packages/channels/dingtalk
