@@ -1,6 +1,6 @@
 import type { JSONValue } from '@ai-sdk/provider';
 
-export type OpenAICompatibleChatPrompt = Array<OpenAICompatibleMessage>;
+export type OpenAICompatibleChatPrompt = OpenAICompatibleMessage[];
 
 export type OpenAICompatibleMessage =
   | OpenAICompatibleSystemMessage
@@ -18,7 +18,7 @@ type JsonRecord<T = never> = Record<
 export interface OpenAICompatibleSystemMessage
   extends JsonRecord<OpenAICompatibleSystemContentPart> {
   role: 'system';
-  content: string | Array<OpenAICompatibleSystemContentPart>;
+  content: string | OpenAICompatibleSystemContentPart[];
 }
 
 export interface OpenAICompatibleSystemContentPart extends JsonRecord {
@@ -29,7 +29,7 @@ export interface OpenAICompatibleSystemContentPart extends JsonRecord {
 export interface OpenAICompatibleUserMessage
   extends JsonRecord<OpenAICompatibleContentPart> {
   role: 'user';
-  content: string | Array<OpenAICompatibleContentPart>;
+  content: string | OpenAICompatibleContentPart[];
 }
 
 export type OpenAICompatibleContentPart =
@@ -50,7 +50,7 @@ export interface OpenAICompatibleAssistantMessage
   extends JsonRecord<OpenAICompatibleMessageToolCall> {
   role: 'assistant';
   content?: string | null;
-  tool_calls?: Array<OpenAICompatibleMessageToolCall>;
+  tool_calls?: OpenAICompatibleMessageToolCall[];
   // Copilot-specific reasoning fields
   reasoning_text?: string;
   reasoning_opaque?: string;

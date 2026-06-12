@@ -1,5 +1,6 @@
+import type {
+  APICallError} from '@ai-sdk/provider';
 import {
-  APICallError,
   InvalidResponseDataError,
   type LanguageModelV2,
   type LanguageModelV2CallWarning,
@@ -237,7 +238,7 @@ export class OpenAICompatibleChatLanguageModel implements LanguageModelV2 {
     });
 
     const choice = responseBody.choices[0];
-    const content: Array<LanguageModelV2Content> = [];
+    const content: LanguageModelV2Content[] = [];
 
     // text content:
     const text = choice.message.content;

@@ -21,12 +21,12 @@ import {
 import { z } from 'zod/v4';
 import type { OpenAIConfig } from './openai-config.js';
 import { openaiFailedResponseHandler } from './openai-error.js';
-import {
+import type {
   codeInterpreterInputSchema,
   codeInterpreterOutputSchema,
 } from './tool/code-interpreter.js';
-import { fileSearchOutputSchema } from './tool/file-search.js';
-import { imageGenerationOutputSchema } from './tool/image-generation.js';
+import type { fileSearchOutputSchema } from './tool/file-search.js';
+import type { imageGenerationOutputSchema } from './tool/image-generation.js';
 import { convertToOpenAIResponsesInput } from './convert-to-openai-responses-input.js';
 import { mapOpenAIResponseFinishReason } from './map-openai-responses-finish-reason.js';
 import type {
@@ -35,7 +35,7 @@ import type {
 } from './openai-responses-api-types.js';
 import { prepareResponsesTools } from './openai-responses-prepare-tools.js';
 import type { OpenAIResponsesModelId } from './openai-responses-settings.js';
-import { localShellInputSchema } from './tool/local-shell.js';
+import type { localShellInputSchema } from './tool/local-shell.js';
 
 const webSearchCallItem = z.object({
   type: z.literal('web_search_call'),
@@ -532,7 +532,7 @@ export class OpenAIResponsesLanguageModel implements LanguageModelV2 {
       });
     }
 
-    const content: Array<LanguageModelV2Content> = [];
+    const content: LanguageModelV2Content[] = [];
     const logprobs: Array<z.infer<typeof LOGPROBS_SCHEMA>> = [];
 
     // flag that checks if there have been client-side tool calls (not executed by openai)

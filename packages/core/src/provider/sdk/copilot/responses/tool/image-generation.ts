@@ -111,6 +111,4 @@ const imageGenerationToolFactory =
 
 export const imageGeneration = (
   args: ImageGenerationArgs = {}, // default
-) => {
-  return imageGenerationToolFactory(args);
-};
+) => imageGenerationToolFactory(args);

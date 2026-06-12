@@ -19,7 +19,7 @@ export function prepareResponsesTools({
   toolChoice?: LanguageModelV2CallOptions['toolChoice'];
   strictJsonSchema: boolean;
 }): {
-  tools?: Array<OpenAIResponsesTool>;
+  tools?: OpenAIResponsesTool[];
   toolChoice?:
     | 'auto'
     | 'none'
@@ -41,7 +41,7 @@ export function prepareResponsesTools({
     return { tools: undefined, toolChoice: undefined, toolWarnings };
   }
 
-  const openaiTools: Array<OpenAIResponsesTool> = [];
+  const openaiTools: OpenAIResponsesTool[] = [];
 
   for (const tool of tools) {
     switch (tool.type) {

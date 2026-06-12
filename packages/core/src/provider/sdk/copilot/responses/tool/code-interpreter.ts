@@ -84,6 +84,4 @@ export const codeInterpreterToolFactory =
 
 export const codeInterpreter = (
   args: CodeInterpreterArgs = {}, // default
-) => {
-  return codeInterpreterToolFactory(args);
-};
+) => codeInterpreterToolFactory(args);

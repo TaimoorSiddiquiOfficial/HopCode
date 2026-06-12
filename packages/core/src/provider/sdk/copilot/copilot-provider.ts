@@ -74,23 +74,19 @@ export function createOpenaiCompatible(
   const getHeaders = () =>
     withUserAgentSuffix(headers, `ai-sdk/openai-compatible/${VERSION}`);
 
-  const createChatModel = (modelId: OpenaiCompatibleModelId) => {
-    return new OpenAICompatibleChatLanguageModel(modelId, {
+  const createChatModel = (modelId: OpenaiCompatibleModelId) => new OpenAICompatibleChatLanguageModel(modelId, {
       provider: `${options.name ?? 'openai-compatible'}.chat`,
       headers: getHeaders,
       url: ({ path }) => `${baseURL}${path}`,
       fetch: options.fetch,
     });
-  };
 
-  const createResponsesModel = (modelId: OpenaiCompatibleModelId) => {
-    return new OpenAIResponsesLanguageModel(modelId, {
+  const createResponsesModel = (modelId: OpenaiCompatibleModelId) => new OpenAIResponsesLanguageModel(modelId, {
       provider: `${options.name ?? 'openai-compatible'}.responses`,
       headers: getHeaders,
       url: ({ path }) => `${baseURL}${path}`,
       fetch: options.fetch,
     });
-  };
 
   const createLanguageModel = (modelId: OpenaiCompatibleModelId) =>
     createChatModel(modelId);

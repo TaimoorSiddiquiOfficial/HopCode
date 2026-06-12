@@ -58,7 +58,7 @@ export const fileSearch = createProviderDefinedToolFactoryWithOutputSchema<
      */
     results:
       | null
-      | {
+      | Array<{
           /**
            * Set of 16 key-value pairs that can be attached to an object.
            * This can be useful for storing additional information about the object
@@ -87,7 +87,7 @@ export const fileSearch = createProviderDefinedToolFactoryWithOutputSchema<
            * The text that was retrieved from the file.
            */
           text: string;
-        }[];
+        }>;
   },
   {
     /**

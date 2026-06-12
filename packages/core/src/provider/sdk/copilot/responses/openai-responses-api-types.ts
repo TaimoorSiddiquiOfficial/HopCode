@@ -1,6 +1,6 @@
 import type { JSONSchema7 } from '@ai-sdk/provider';
 
-export type OpenAIResponsesInput = Array<OpenAIResponsesInputItem>;
+export type OpenAIResponsesInput = OpenAIResponsesInputItem[];
 
 export type OpenAIResponsesInputItem =
   | OpenAIResponsesSystemMessage
@@ -24,7 +24,7 @@ export type OpenAIResponsesIncludeValue =
   | 'reasoning.encrypted_content';
 
 export type OpenAIResponsesIncludeOptions =
-  | Array<OpenAIResponsesIncludeValue>
+  | OpenAIResponsesIncludeValue[]
   | undefined
   | null;
 

@@ -38,10 +38,10 @@ export async function convertToOpenAIResponsesInput({
   hasLocalShellTool?: boolean;
 }): Promise<{
   input: OpenAIResponsesInput;
-  warnings: Array<LanguageModelV2CallWarning>;
+  warnings: LanguageModelV2CallWarning[];
 }> {
   const input: OpenAIResponsesInput = [];
-  const warnings: Array<LanguageModelV2CallWarning> = [];
+  const warnings: LanguageModelV2CallWarning[] = [];
 
   for (const { role, content } of prompt) {
     switch (role) {

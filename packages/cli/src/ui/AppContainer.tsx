@@ -3297,7 +3297,7 @@ export const AppContainer = (props: AppContainerProps) => {
       settingInputRequests,
       pluginChoiceRequests,
       loopDetectionConfirmationRequest,
-      geminiMdFileCount: geminiMdFileCount,
+      geminiMdFileCount,
       streamingState,
       initError,
       pendingGeminiHistoryItems,

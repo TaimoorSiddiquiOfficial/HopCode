@@ -98,6 +98,4 @@ export const webSearchToolFactory = createProviderDefinedToolFactory<
 
 export const webSearch = (
   args: Parameters<typeof webSearchToolFactory>[0] = {}, // default
-) => {
-  return webSearchToolFactory(args);
-};
+) => webSearchToolFactory(args);

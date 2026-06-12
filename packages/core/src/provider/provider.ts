@@ -921,7 +921,7 @@ export namespace Provider {
 
     const configProviders = Object.entries(
       (config.provider as Record<string, any>) ?? {},
-    ) as [string, any][];
+    ) as Array<[string, any]>;
 
     // Add GitHub Copilot Enterprise provider that inherits from GitHub Copilot
     if (database['github-copilot']) {
@@ -1554,10 +1554,10 @@ export namespace Provider {
 
     const providers = await list();
     const recent = (await Filesystem.readJson<{
-      recent?: { providerID: string; modelID: string }[];
+      recent?: Array<{ providerID: string; modelID: string }>;
     }>(path.join(Global.Path.state, 'model.json'))
       .then((x) => (Array.isArray(x.recent) ? x.recent : []))
-      .catch(() => [])) as { providerID: string; modelID: string }[];
+      .catch(() => [])) as Array<{ providerID: string; modelID: string }>;
     for (const entry of recent) {
       const provider = providers[entry.providerID];
       if (!provider) continue;

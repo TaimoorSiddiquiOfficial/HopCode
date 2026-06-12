@@ -22,7 +22,7 @@ export function convertToOpenAICompatibleChatMessages(
       case 'system': {
         messages.push({
           role: 'system',
-          content: content,
+          content,
           ...metadata,
         });
         break;
