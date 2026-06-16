@@ -1,7 +1,7 @@
 {
-  "name": "@hopcode/channel-telegram",
-  "version": "0.17.1",
-  "description": "Telegram channel adapter for HopCode",
+  "name": "@qwen-code/channel-telegram",
+  "version": "0.18.1",
+  "description": "Telegram channel adapter for Qwen Code",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -88,6 +88,11 @@ describe('clearCommand', () => {
             abortAll: mockAbortMonitors,
             reset: mockResetMonitors,
           }),
+          getWorkflowRunRegistry: () => ({
+            hasRunningEntries: vi.fn().mockReturnValue(false),
+            reset: vi.fn(),
+            abortAll: vi.fn(),
+          }),
         },
       },
       session: {
@@ -341,6 +346,11 @@ describe('clearCommand', () => {
               abortAll: mockAbortMonitors,
               reset: mockResetMonitors,
             }),
+            getWorkflowRunRegistry: () => ({
+              hasRunningEntries: vi.fn().mockReturnValue(false),
+              reset: vi.fn(),
+              abortAll: vi.fn(),
+            }),
           },
         },
         session: {
@@ -403,6 +413,11 @@ describe('clearCommand', () => {
             getMonitorRegistry: vi.fn().mockReturnValue({
               getRunning: vi.fn().mockReturnValue([]),
               reset: vi.fn(),
+            }),
+            getWorkflowRunRegistry: vi.fn().mockReturnValue({
+              hasRunningEntries: vi.fn().mockReturnValue(false),
+              reset: vi.fn(),
+              abortAll: vi.fn(),
             }),
             getHookSystem: mockGetHookSystem,
             startNewSession: mockStartNewSession,
@@ -515,6 +530,11 @@ describe('clearCommand', () => {
             getMonitorRegistry: vi.fn().mockReturnValue({
               getRunning: vi.fn().mockReturnValue([]),
               reset: vi.fn(),
+            }),
+            getWorkflowRunRegistry: vi.fn().mockReturnValue({
+              hasRunningEntries: vi.fn().mockReturnValue(false),
+              reset: vi.fn(),
+              abortAll: vi.fn(),
             }),
             getHookSystem: mockGetHookSystem,
             startNewSession: mockStartNewSession,

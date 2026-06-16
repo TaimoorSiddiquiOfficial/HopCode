@@ -197,7 +197,7 @@ describe('systemInfo', () => {
       expect(getSandboxEnv(true)).toBe('test-sandbox');
     });
 
-    it('should handle legacy hopcode-code- prefix removal', () => {
+    it('should handle legacy hopcode- prefix removal', () => {
       process.env['SANDBOX'] = 'hopcode-custom-sandbox';
       expect(getSandboxEnv(true)).toBe('custom-sandbox');
     });

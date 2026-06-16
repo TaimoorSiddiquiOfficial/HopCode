@@ -60,6 +60,7 @@ import {
 import { type Part, type PartListUnion, FinishReason } from '@google/genai';
 import type {
   HistoryItem,
+  HistoryItemGoalStatus,
   HistoryItemWithoutId,
   HistoryItemToolGroup,
   SlashCommandProcessorResult,
@@ -90,6 +91,7 @@ import { useSessionStats } from '../contexts/SessionContext.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { t } from '../../i18n/index.js';
 import { useDualOutput } from '../../dualOutput/DualOutputContext.js';
+import { recordGoalStatusItem } from '../utils/restoreGoal.js';
 import process from 'node:process';
 
 const debugLogger = createDebugLogger('GEMINI_STREAM');
@@ -345,6 +347,8 @@ export const useGeminiStream = (
   const lastPromptErroredRef = useRef(false);
   const dualOutput = useDualOutput();
   const [isResponding, setIsResponding] = useState<boolean>(false);
+  // React state can lag by one render; this tracks the actual stream lifetime.
+  const activeModelStreamsRef = useRef(0);
   const [thought, setThought] = useState<ThoughtSummary | null>(null);
   // Hold the latest history in a ref so handleCompletedTools can read it
   // without depending on `history` (which would recreate the tool scheduler
@@ -1369,17 +1373,16 @@ export const useGeminiStream = (
       // continuation, not a hook failure.
       const activeGoal = getActiveGoal(config.getSessionId());
       if (activeGoal && activeGoal.condition) {
-        addItem(
-          {
-            type: MessageType.GOAL_STATUS,
-            kind: 'checking',
-            condition: activeGoal.condition,
-            iterations: value.iterationCount,
-            lastReason:
-              activeGoal.lastReason ?? value.reasons[value.reasons.length - 1],
-          } as HistoryItemWithoutId,
-          userMessageTimestamp,
-        );
+        const item: HistoryItemGoalStatus = {
+          type: MessageType.GOAL_STATUS,
+          kind: 'checking',
+          condition: activeGoal.condition,
+          iterations: activeGoal.iterations,
+          lastReason:
+            activeGoal.lastReason ?? value.reasons[value.reasons.length - 1],
+        };
+        addItem(item, userMessageTimestamp);
+        recordGoalStatusItem(config, item);
         return;
       }
       addItem(
@@ -1536,6 +1539,7 @@ export const useGeminiStream = (
               break;
             case ServerGeminiEventType.UserCancelled:
               flushBufferedStreamEvents();
+              toolCallRequests.length = 0;
               handleUserCancelledEvent(userMessageTimestamp);
               break;
             case ServerGeminiEventType.Error:
@@ -1664,7 +1668,7 @@ export const useGeminiStream = (
         flushBufferedStreamEventsRef.current.delete(flushBufferedStreamEvents);
       }
       dualOutput?.finalizeAssistantMessage();
-      if (toolCallRequests.length > 0) {
+      if (toolCallRequests.length > 0 && !signal.aborted) {
         scheduleToolCalls(toolCallRequests, signal);
       }
       return StreamProcessingStatus.Completed;
@@ -1858,6 +1862,7 @@ export const useGeminiStream = (
           logUserRetry(config, new UserRetryEvent(prompt_id));
         }
 
+        activeModelStreamsRef.current += 1;
         setIsResponding(true);
         setInitError(null);
         // Entering "requesting" phase — no content yet for this API call.
@@ -1972,7 +1977,13 @@ export const useGeminiStream = (
           }
         } finally {
           submitPromptOnCompleteRef.current = null;
-          setIsResponding(false);
+          activeModelStreamsRef.current = Math.max(
+            0,
+            activeModelStreamsRef.current - 1,
+          );
+          if (activeModelStreamsRef.current === 0) {
+            setIsResponding(false);
+          }
           isSubmittingQueryRef.current = false;
         }
       });
@@ -2117,14 +2128,14 @@ export const useGeminiStream = (
           },
         );
 
-      // History-based dedup MUST run before the `isResponding` early-return.
+      // History-based dedup MUST run before the active-stream early-return.
       // If a synthetic `functionResponse` for this callId is already in
       // chat.history (planted on session-load by
       // `client.repairOrphanedToolUseTurnsInHistory` or on every
       // `chat.sendMessageStream` push by the inline repair pass), the
       // in-flight scheduler result must be marked submitted NOW —
       // `useReactToolScheduler.allToolCallsCompleteHandler` is single-shot
-      // per batch, so a later isResponding=true early-return would leave
+      // per batch, so a later active-stream early-return would leave
       // the tool stuck in `completed-but-not-submitted` forever (Race A
       // surfaced in PR #4176 review). The real result is dropped on the
       // wire — same trade-off upstream Claude Code makes when its
@@ -2185,7 +2196,7 @@ export const useGeminiStream = (
         markToolsAsSubmitted(dedupedCallIds);
       }
 
-      if (isResponding) {
+      if (activeModelStreamsRef.current > 0) {
         return;
       }
 
@@ -2234,6 +2245,16 @@ export const useGeminiStream = (
       }
 
       if (geminiTools.length === 0) {
+        return;
+      }
+
+      if (
+        turnCancelledRef.current ||
+        abortControllerRef.current?.signal.aborted
+      ) {
+        markToolsAsSubmitted(
+          geminiTools.map((toolCall) => toolCall.request.callId),
+        );
         return;
       }
 
@@ -2412,7 +2433,6 @@ export const useGeminiStream = (
       submitQuery(responsesToSend, SendMessageType.ToolResult, prompt_ids[0]);
     },
     [
-      isResponding,
       submitQuery,
       markToolsAsSubmitted,
       geminiClient,
@@ -2545,15 +2565,37 @@ export const useGeminiStream = (
     notificationQueueRef.current = [];
   }, [sessionStates.sessionId]);
 
+  // Current sessionId for the cron effect, read through a ref so the
+  // effect doesn't list sessionId as a dep. Keeping it out of the deps is
+  // deliberate: /clear swaps the sessionId mid-session, and a re-run would
+  // fire the cleanup below — printing a false "loops cancelled" notice and
+  // tearing down a scheduler that immediately restarts. The effect should
+  // run once on mount and clean up only on real unmount.
+  const cronSessionIdRef = useRef(sessionStates.sessionId);
+  cronSessionIdRef.current = sessionStates.sessionId;
+
   // Start the cron scheduler on mount, stop on unmount.
   // Cron fires enqueue onto the shared notification queue.
   useEffect(() => {
     if (!config.isCronEnabled()) return;
     const scheduler = config.getCronScheduler();
-    scheduler.start((job: { prompt: string }) => {
+
+    // Enable durable (file-backed) cron support (loads tasks from the
+    // user's per-project runtime dir, acquires the lock). The tasks file
+    // lives under ~/.qwen, not the working tree, so it's user-owned rather
+    // than project-controlled — no folder-trust gate needed; the user's
+    // own loops run regardless of how the folder is trusted.
+    // Missed one-shots arrive as late fires through the start() callback.
+    void scheduler.enableDurable(cronSessionIdRef.current).catch((err) => {
+      debugLogger.warn(
+        `Durable cron init failed — persistent tasks will not fire in this session: ${err}`,
+      );
+    });
+
+    scheduler.start((job: { prompt: string; missed?: boolean }) => {
       const label = job.prompt.slice(0, 40);
       notificationQueueRef.current.push({
-        displayText: `Cron: ${label}`,
+        displayText: `${job.missed ? 'Missed' : 'Cron'}: ${label}`,
         modelText: job.prompt,
         sendMessageType: SendMessageType.Cron,
       });
@@ -2603,7 +2645,11 @@ export const useGeminiStream = (
   // Register monitor notification callback onto the shared queue.
   useEffect(() => {
     const registry = config.getMonitorRegistry();
-    registry.setNotificationCallback((displayText, modelText) => {
+    registry.setNotificationCallback((displayText, modelText, meta) => {
+      if (meta.status === 'running' && typeof registry.get === 'function') {
+        const entry = registry.get(meta.monitorId);
+        if (!entry || entry.status !== 'running') return;
+      }
       notificationQueueRef.current.push({
         displayText,
         modelText,
@@ -2616,23 +2662,55 @@ export const useGeminiStream = (
     };
   }, [config]);
 
-  // When idle, drain the unified queue one item at a time.
-  // Skip when another submission is in flight (e.g. the teammate
-  // drain effect won this render) — the queue stays intact and
-  // the effect will re-fire when streamingState returns to Idle.
+  // When idle, batch-drain all contiguous same-type notifications from the
+  // front of the queue into a single API call. This reduces token waste: N
+  // notifications that accumulate while the model is busy become 1 roundtrip
+  // instead of N sequential ones. Skip when another submission is in flight
+  // (e.g. the teammate drain effect won this render) — the queue stays
+  // intact and the effect will re-fire when streamingState returns to Idle.
   useEffect(() => {
     if (
       streamingState === StreamingState.Idle &&
       !isSubmittingQueryRef.current &&
       notificationQueueRef.current.length > 0
     ) {
-      const item = notificationQueueRef.current.shift()!;
-      addItem(
-        { type: 'notification' as const, text: item.displayText },
-        Date.now(),
-      );
-      submitQuery(item.modelText, item.sendMessageType, undefined, {
-        notificationDisplayText: item.displayText,
+      const queue = notificationQueueRef.current;
+      const targetType = queue[0]!.sendMessageType;
+
+      // Cron prompts must run as individual turns — each needs its own
+      // slash/shell/@ preprocessing and approval cycle. Only batch
+      // Notification items (which pass through without preprocessing).
+      if (targetType === SendMessageType.Cron) {
+        const item = queue.shift()!;
+        addItem(
+          { type: 'notification' as const, text: item.displayText },
+          Date.now(),
+        );
+        submitQuery(item.modelText, item.sendMessageType, undefined, {
+          notificationDisplayText: item.displayText,
+        });
+        return;
+      }
+
+      // Drain contiguous leading Notification items into one batch.
+      let splitIdx = 0;
+      while (
+        splitIdx < queue.length &&
+        queue[splitIdx]!.sendMessageType === targetType
+      ) {
+        splitIdx++;
+      }
+      const batch = queue.splice(0, splitIdx);
+
+      const now = Date.now();
+      for (const item of batch) {
+        addItem({ type: 'notification' as const, text: item.displayText }, now);
+      }
+
+      const combinedModelText = batch.map((e) => e.modelText).join('\n\n');
+      const combinedDisplayText = batch.map((e) => e.displayText).join('; ');
+      submitQuery(combinedModelText, targetType, undefined, {
+        notificationDisplayText: combinedDisplayText,
       });
     }
   }, [streamingState, submitQuery, notificationTrigger, addItem]);

@@ -28,6 +28,11 @@ import type {
 import type { Status } from '../core/coreToolScheduler.js';
 import type { AgentResultDisplay, FileDiff } from '../tools/tools.js';
 import type { UiEvent } from '../telemetry/uiTelemetry.js';
+import type {
+  FileHistorySnapshot,
+  SerializedFileHistorySnapshot,
+} from './fileHistoryService.js';
+import { serializeSnapshot } from './fileHistoryService.js';
 
 const debugLogger = createDebugLogger('CHAT_RECORDING');
 
@@ -242,7 +247,8 @@ export interface ChatRecord {
     | 'custom_title'
     | 'rewind'
     | 'agent_bootstrap'
-    | 'agent_launch_prompt';
+    | 'agent_launch_prompt'
+    | 'file_history_snapshot';
   /** Working directory at time of message */
   cwd: string;
   /** CLI version for compatibility tracking */
@@ -288,7 +294,8 @@ export interface ChatRecord {
     | CustomTitleRecordPayload
     | NotificationRecordPayload
     | RewindRecordPayload
-    | AgentBootstrapRecordPayload;
+    | AgentBootstrapRecordPayload
+    | FileHistorySnapshotRecordPayload;
 
   /** Background subagent that produced this record (e.g. "explore-7f3c"). */
   agentId?: string;
@@ -436,6 +443,14 @@ export interface RewindRecordPayload {
 }
 
 /**
+ * Stored payload for file history snapshot persistence.
+ * Each entry records one or more snapshots for session resume.
+ */
+export interface FileHistorySnapshotRecordPayload {
+  snapshots: SerializedFileHistorySnapshot[];
+}
+
+/**
  * Service for recording the current chat session to disk.
  *
  * This service provides comprehensive conversation recording that captures:
@@ -530,6 +545,9 @@ export class ChatRecordingService {
    * hydrate.
    */
   private lastAttributionSnapshotJson: string | undefined;
+  private cachedGitBranch:
+    | { cwd: string; branch: string | undefined }
+    | undefined;
 
   /**
    * Approximate bytes of JSONL content appended since the last
@@ -662,16 +680,24 @@ export class ChatRecordingService {
   private createBaseRecord(
     type: ChatRecord['type'],
   ): Omit<ChatRecord, 'message' | 'tokens' | 'model' | 'toolCallsMetadata'> {
+    const cwd = this.config.getProjectRoot();
     return {
       uuid: randomUUID(),
       parentUuid: this.lastRecordUuid,
       sessionId: this.getSessionId(),
       timestamp: new Date().toISOString(),
       type,
-      cwd: this.config.getProjectRoot(),
+      cwd,
       version: this.config.getCliVersion() || 'unknown',
-      gitBranch: getGitBranch(this.config.getProjectRoot()),
+      gitBranch: this.getCachedGitBranch(cwd),
     };
+  }
+
+  private getCachedGitBranch(cwd: string): string | undefined {
+    if (!this.cachedGitBranch || this.cachedGitBranch.cwd !== cwd) {
+      this.cachedGitBranch = { cwd, branch: getGitBranch(cwd) };
+    }
+    return this.cachedGitBranch.branch;
   }
 
   /**
@@ -819,54 +845,13 @@ export class ChatRecordingService {
   }
 
   /**
-   * Accumulates bytes written and, when the re-anchor threshold is crossed,
-   * inserts a sidecar `custom_title` record at EOF without disturbing the
-   * active parent UUID chain.
-   *
-   * The re-anchor keeps the title within the 64 KB tail window that
-   * SessionPicker scans, preventing it from being scrolled off during a
-   * long session. The byte counter is always reset (even on failure) to
-   * prevent a retry storm if the append fails.
-   *
-   * @param record The record that was just appended — used for byte counting.
+   * Clears cached filesystem paths after Config swaps to a new working
+   * directory. The recorder keeps session state, but future appends must
+   * resolve the JSONL path through the updated Config.storage.
    */
-  private afterWrite(record: ChatRecord): void {
-    this.bytesSinceLastTitle += Buffer.byteLength(
-      JSON.stringify(record),
-      'utf8',
-    );
-    if (
-      !this.currentCustomTitle ||
-      this.bytesSinceLastTitle < TITLE_REANCHOR_THRESHOLD_BYTES
-    ) {
-      return;
-    }
-    // Reset BEFORE attempting the write to bound retry attempts when the
-    // underlying append fails (disk full, permissions, etc.).
-    this.bytesSinceLastTitle = 0;
-    // Save the current parent pointer — the re-anchor is a sidecar write
-    // that must NOT become the parent of subsequent records.
-    const savedUuid = this.lastRecordUuid;
-    try {
-      const reanchorRecord: ChatRecord = {
-        ...this.createBaseRecord('system'),
-        type: 'system',
-        subtype: 'custom_title',
-        systemPayload: {
-          customTitle: this.currentCustomTitle,
-          ...(this.currentTitleSource !== undefined
-            ? { titleSource: this.currentTitleSource }
-            : {}),
-        },
-      };
-      this.appendRecord(reanchorRecord);
-    } catch (error) {
-      debugLogger.error('Error re-anchoring title:', error);
-    } finally {
-      // Restore the active parent so the next real record chains from
-      // the triggering record, not from the re-anchor.
-      this.lastRecordUuid = savedUuid;
-    }
+  resetStoragePaths(): void {
+    this.chatsDirEnsured = false;
+    this.cachedConversationFile = undefined;
   }
 
   /**
@@ -1203,7 +1188,11 @@ export class ChatRecordingService {
    *   nothing before it), 1 means keep the first user turn, etc.
    * @param payload Additional metadata to persist with the rewind record.
    */
-  rewindRecording(targetTurnIndex: number, payload: RewindRecordPayload): void {
+  rewindRecording(
+    targetTurnIndex: number,
+    payload: RewindRecordPayload,
+    survivingFileHistorySnapshots?: FileHistorySnapshot[],
+  ): void {
     try {
       // Re-root: point back to the record just before the target user turn.
       this.lastRecordUuid = this.turnParentUuids[targetTurnIndex] ?? null;
@@ -1215,7 +1204,6 @@ export class ChatRecordingService {
       // post-rewind identical snapshot would be skipped and the rewound
       // session would lose all attribution state on restore.
       this.lastAttributionSnapshotJson = undefined;
-
       const record: ChatRecord = {
         ...this.createBaseRecord('system'),
         type: 'system',
@@ -1224,6 +1212,12 @@ export class ChatRecordingService {
       };
 
       this.appendRecord(record);
+
+      // Re-record surviving file history snapshots on the active branch so
+      // they are visible to reconstructHistory on resume.
+      if (survivingFileHistorySnapshots?.length) {
+        this.recordFileHistorySnapshotBatch(survivingFileHistorySnapshots);
+      }
     } catch (error) {
       debugLogger.error('Error saving rewind record:', error);
     }
@@ -1262,6 +1256,26 @@ export class ChatRecordingService {
   }
 
   /**
+   * Observer invoked after a custom title record lands (manual or auto).
+   * The ACP session layer registers here to push a live title notification
+   * to connected daemon clients — without it, auto-generated titles are
+   * only discoverable via the next session-list poll (generation runs in
+   * this child process; the daemon bridge never sees it happen).
+   */
+  private titleRecordedCallback?: (
+    customTitle: string,
+    titleSource: TitleSource,
+  ) => void;
+
+  setTitleRecordedCallback(
+    callback:
+      | ((customTitle: string, titleSource: TitleSource) => void)
+      | undefined,
+  ): void {
+    this.titleRecordedCallback = callback;
+  }
+
+  /**
    * Records a custom title for the session.
    * Appended as a system record so it persists with the session data.
    * Also caches the title in memory for re-append on shutdown.
@@ -1286,7 +1300,11 @@ export class ChatRecordingService {
       this.appendRecord(record);
       this.currentCustomTitle = customTitle;
       this.currentTitleSource = titleSource;
-      this.bytesSinceLastTitle = 0;
+      try {
+        this.titleRecordedCallback?.(customTitle, titleSource);
+      } catch {
+        // Observer errors must never break title recording.
+      }
       return true;
     } catch (error) {
       debugLogger.error('Error saving custom title record:', error);
@@ -1377,6 +1395,7 @@ export class ChatRecordingService {
   recordAttributionSnapshot(snapshot: AttributionSnapshot): void {
     let json: string | undefined;
     try {
+      this.cachedGitBranch = undefined;
       json = JSON.stringify(snapshot);
       if (json === this.lastAttributionSnapshotJson) {
         return;
@@ -1409,6 +1428,42 @@ export class ChatRecordingService {
         this.lastAttributionSnapshotJson = undefined;
       }
       debugLogger.error('Error saving attribution snapshot:', error);
+    }
+  }
+
+  recordFileHistorySnapshot(snapshot: FileHistorySnapshot): void {
+    try {
+      this.appendSerializedFileHistorySnapshotBatch([
+        serializeSnapshot(snapshot),
+      ]);
+    } catch (error) {
+      debugLogger.error('Error saving file history snapshot:', error);
+    }
+  }
+
+  recordFileHistorySnapshotBatch(snapshots: FileHistorySnapshot[]): void {
+    if (snapshots.length === 0) return;
+    try {
+      const serialized = snapshots.map(serializeSnapshot);
+      this.appendSerializedFileHistorySnapshotBatch(serialized);
+    } catch (error) {
+      debugLogger.error('Error saving file history snapshot batch:', error);
+    }
+  }
+
+  private appendSerializedFileHistorySnapshotBatch(
+    snapshots: SerializedFileHistorySnapshot[],
+  ): void {
+    try {
+      const record: ChatRecord = {
+        ...this.createBaseRecord('system'),
+        type: 'system',
+        subtype: 'file_history_snapshot',
+        systemPayload: { snapshots },
+      };
+      this.appendRecord(record);
+    } catch (error) {
+      debugLogger.error('Error saving file history snapshot batch:', error);
     }
   }
 }

@@ -19,11 +19,14 @@ import {
 
 import { ExtensionManager, parseInstallSource } from '@hopcode/hopcode-core';
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
+
+vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
+    openBrowserSecurely: mockOpenBrowserSecurely,
     parseInstallSource: vi.fn(),
   };
 });
@@ -43,6 +46,7 @@ describe('extensionsCommand', () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    mockOpenBrowserSecurely.mockResolvedValue(undefined);
     mockExtensionManager = createMockExtensionManager();
     mockGetExtensions.mockReturnValue([]);
     mockGetLoadedExtensions.mockReturnValue([]);
@@ -58,6 +62,47 @@ describe('extensionsCommand', () => {
       ui: {
         dispatchExtensionStateUpdate: vi.fn(),
       },
+    });
+  });
+
+  describe('explore', () => {
+    const exploreAction = extensionsCommand.subCommands?.find(
+      (cmd) => cmd.name === 'explore',
+    )?.action;
+
+    if (!exploreAction) {
+      throw new Error('Explore action not found');
+    }
+
+    it('should open the selected extensions gallery through the shared browser helper', async () => {
+      vi.stubEnv('NODE_ENV', 'development');
+      await exploreAction(mockContext, 'Gemini');
+
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        {
+          type: MessageType.INFO,
+          text: 'Opening extensions page in your browser: https://geminicli.com/extensions/',
+        },
+        expect.any(Number),
+      );
+      expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(
+        'https://geminicli.com/extensions/',
+      );
+    });
+
+    it('should show the URL when browser launch fails', async () => {
+      vi.stubEnv('NODE_ENV', 'development');
+      mockOpenBrowserSecurely.mockRejectedValue(new Error('no browser'));
+
+      await exploreAction(mockContext, 'ClaudeCode');
+
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        {
+          type: MessageType.ERROR,
+          text: 'Failed to open browser. Check out the extensions gallery at https://claudemarketplaces.com/',
+        },
+        expect.any(Number),
+      );
     });
   });
 

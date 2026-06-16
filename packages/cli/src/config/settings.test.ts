@@ -1485,14 +1485,17 @@ describe('Settings Loading and Merging', () => {
           args: ['--user-arg'],
           description: 'User MCP server',
         },
+        // Workspace-sourced servers are stamped with provenance scope (#4615).
         'workspace-server': {
           command: 'workspace-command',
           args: ['--workspace-arg'],
           description: 'Workspace MCP server',
+          scope: 'workspace',
         },
         'shared-server': {
           command: 'workspace-shared-command',
           description: 'Workspace shared server config',
+          scope: 'workspace',
         },
       });
     });
@@ -1551,6 +1554,36 @@ describe('Settings Loading and Merging', () => {
         'workspace-only-server': {
           command: 'workspace-only-command',
           description: 'Workspace only server',
+          scope: 'workspace',
+        },
+      });
+    });
+
+    it('should force workspace MCP server scope even if settings declare another scope', () => {
+      (mockFsExistsSync as Mock).mockImplementation(
+        (p: fs.PathLike) => p === MOCK_WORKSPACE_SETTINGS_PATH,
+      );
+      const workspaceSettingsContent = {
+        mcpServers: {
+          'workspace-server': {
+            command: 'workspace-command',
+            scope: 'system',
+          },
+        },
+      };
+      (fs.readFileSync as Mock).mockImplementation(
+        (p: fs.PathOrFileDescriptor) => {
+          if (p === MOCK_WORKSPACE_SETTINGS_PATH)
+            return JSON.stringify(workspaceSettingsContent);
+          return '';
+        },
+      );
+
+      const settings = loadSettings(MOCK_WORKSPACE_DIR);
+      expect(settings.merged.mcpServers).toEqual({
+        'workspace-server': {
+          command: 'workspace-command',
+          scope: 'workspace',
         },
       });
     });
@@ -1618,13 +1651,18 @@ describe('Settings Loading and Merging', () => {
         },
         'workspace-server': {
           command: 'workspace-command',
+          scope: 'workspace',
         },
+        // system-sourced servers are stamped 'system' (ungated, highest
+        // precedence) (#4615).
         'system-only-server': {
           command: 'system-only-command',
+          scope: 'system',
         },
         'shared-server': {
           command: 'system-command',
           args: ['--system-arg'],
+          scope: 'system',
         },
       });
     });
@@ -3833,9 +3871,10 @@ describe('Settings Loading and Merging', () => {
         expect(process.env['HOPCODE_HOME_TEST_VAR']).toEqual('hello');
       });
 
-      it('ignores HOPCODE_HOME and HOPCODE_RUNTIME_DIR set in a project .env', () => {
-        delete process.env['HOPCODE_HOME'];
-        delete process.env['HOPCODE_RUNTIME_DIR'];
+      it('ignores global-state paths set in a project .env', () => {
+        delete process.env['QWEN_HOME'];
+        delete process.env['QWEN_RUNTIME_DIR'];
+        delete process.env['QWEN_CODE_MCP_APPROVALS_PATH'];
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')
@@ -3854,8 +3893,9 @@ describe('Settings Loading and Merging', () => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
             if (p === projectEnvPath)
               return [
-                'HOPCODE_HOME=/tmp/hijack',
-                'HOPCODE_RUNTIME_DIR=/tmp/hijack-runtime',
+                'QWEN_HOME=/tmp/hijack',
+                'QWEN_RUNTIME_DIR=/tmp/hijack-runtime',
+                'QWEN_CODE_MCP_APPROVALS_PATH=/tmp/preapproved.json',
                 'OTHER_VAR=ok',
               ].join('\n');
             return '{}';
@@ -3865,8 +3905,9 @@ describe('Settings Loading and Merging', () => {
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
         // A project .env must never redirect global state.
-        expect(process.env['HOPCODE_HOME']).toBeUndefined();
-        expect(process.env['HOPCODE_RUNTIME_DIR']).toBeUndefined();
+        expect(process.env['QWEN_HOME']).toBeUndefined();
+        expect(process.env['QWEN_RUNTIME_DIR']).toBeUndefined();
+        expect(process.env['QWEN_CODE_MCP_APPROVALS_PATH']).toBeUndefined();
         // Other vars from the same project .env still load.
         expect(process.env['OTHER_VAR']).toEqual('ok');
 

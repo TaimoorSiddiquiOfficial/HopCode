@@ -216,19 +216,19 @@ $allFiles = Get-SourceFiles -Extensions @("*.ts", "*.tsx", "*.js", "*.mjs", "*.c
 $stringReplacements = [ordered]@{
     # Docker image references
     "ghcr.io/qwenlm/hopcode" = "ghcr.io/taimoorsiddiquiofficial/hopcode"
-    "ghcr.io/hopcodelm/hopcode-code" = "ghcr.io/taimoorsiddiquiofficial/hopcode"
+    "ghcr.io/hopcodelm/hopcode" = "ghcr.io/taimoorsiddiquiofficial/hopcode"
     "HopCodeLM/HopCode-code" = "TaimoorSiddiquiOfficial/HopCode"
     "HopCodeLM/hopcode" = "TaimoorSiddiquiOfficial/HopCode"
-    "qwenlm.hopcode-code-vscode-ide-companion" = "hopcode.hopcode-vscode-ide-companion"
-    "qwenlm.hopcode-code" = "hopcode.hopcode"
+    "qwenlm.hopcode-vscode-ide-companion" = "hopcode.hopcode-vscode-ide-companion"
+    "qwenlm.hopcode" = "hopcode.hopcode"
     # Package scope references
     "@hopcode/" = "@hopcode/"
     # hopcode-sandbox -> hopcode-sandbox
     "hopcode-sandbox" = "hopcode-sandbox"
-    "hopcode-code-sandbox" = "hopcode-sandbox"
+    "hopcode-sandbox" = "hopcode-sandbox"
     # hopcode -> hopcode (product name)
     "hopcode" = "hopcode"
-    "hopcode-code" = "hopcode"
+    "hopcode" = "hopcode"
     # HOPCODE_code_sdk stays as-is (external Python SDK) - skip
     # HOPCODE_code_cli -> hopcode_cli
     "HOPCODE_code_cli" = "hopcode_cli"

@@ -40,7 +40,8 @@ describe('useFocus', () => {
     mockedUseStdin.mockReturnValue({
       stdin,
       setRawMode: vi.fn(),
-    } as ReturnType<typeof useStdin>);
+      isRawModeSupported: true,
+    } as unknown as ReturnType<typeof useStdin>);
     mockedUseStdout.mockReturnValue({ stdout } as unknown as ReturnType<
       typeof useStdout
     >);

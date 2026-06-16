@@ -10,7 +10,7 @@ import { addCommand } from './mcp/add.js';
 import { removeCommand } from './mcp/remove.js';
 import { listCommand } from './mcp/list.js';
 import { reconnectCommand } from './mcp/reconnect.js';
-import { presetsCommand } from './mcp/presets.js';
+import { approveCommand, rejectCommand } from './mcp/approve.js';
 
 export const mcpCommand: CommandModule = {
   command: 'mcp',
@@ -21,7 +21,8 @@ export const mcpCommand: CommandModule = {
       .command(removeCommand)
       .command(listCommand)
       .command(reconnectCommand)
-      .command(presetsCommand)
+      .command(approveCommand)
+      .command(rejectCommand)
       .demandCommand(1, 'You need at least one command before continuing.')
       .version(false),
   handler: () => {

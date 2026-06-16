@@ -126,7 +126,7 @@ function Invoke-Phase1 {
     
     Write-Info "Updating root package.json..."
     Replace-InFile -File (Join-Path $RootDir "package.json") -Old "@qwen-code/qwen-code" -New "@hopcode/hopcode"
-    Replace-InFile -File (Join-Path $RootDir "package.json") -Old "QwenLM/qwen-code" -New "TaimoorSiddiquiOfficial/HopCode"
+    Replace-InFile -File (Join-Path $RootDir "package.json") -Old "TaimoorSiddiquiOfficial/HopCode" -New "TaimoorSiddiquiOfficial/HopCode"
     Replace-InFile -File (Join-Path $RootDir "package.json") -Old "ghcr.io/qwenlm/qwen-code" -New "ghcr.io/hopcode/hopcode"
     Replace-InFile -File (Join-Path $RootDir "package.json") -Old '"qwen": "cli.js"' -New '"hopcode": "cli.js"'
     
@@ -212,8 +212,8 @@ function Invoke-Phase2 {
         Replace-InFile -File $zedExt -Old 'name = "Qwen Code"' -New 'name = "HopCode"'
         Replace-InFile -File $zedExt -Old 'authors = ["Qwen Team"]' -New 'authors = ["HopCode Team"]'
         Replace-InFile -File $zedExt -Old "Qwen Code Agent Server" -New "HopCode Agent Server"
-        Replace-InFile -File $zedExt -Old "QwenLM/qwen-code" -New "TaimoorSiddiquiOfficial/HopCode"
-        Replace-InFile -File $zedExt -Old '[agent_servers.hopcode-code]' -New '[agent_servers.hopcode]'
+        Replace-InFile -File $zedExt -Old "TaimoorSiddiquiOfficial/HopCode" -New "TaimoorSiddiquiOfficial/HopCode"
+        Replace-InFile -File $zedExt -Old '[agent_servers.hopcode]' -New '[agent_servers.hopcode]'
     }
     
     Write-Info "Updating WebUI package..."
@@ -284,7 +284,7 @@ function Invoke-Phase4 {
     Write-Info "Updating documentation site..."
     $docsSite = Join-Path $RootDir "docs-site/src/app/layout.jsx"
     if (Test-Path $docsSite) {
-        Replace-InFile -File $docsSite -Old "QwenLM/qwen-code" -New "TaimoorSiddiquiOfficial/HopCode"
+        Replace-InFile -File $docsSite -Old "TaimoorSiddiquiOfficial/HopCode" -New "TaimoorSiddiquiOfficial/HopCode"
     }
     
     Write-Info "Updating SDK documentation..."

@@ -94,8 +94,8 @@ How should we handle database migration?
 ```json
 // .hopcode/settings.json
 {
-  "permissions": {
-    "defaultMode": "plan"
+  "tools": {
+    "approvalMode": "plan"
   }
 }
 ```
@@ -157,8 +157,8 @@ You can review each proposed change and approve or reject it individually.
 ```bash
 // .hopcode/settings.json
 {
-  "permissions": {
-"defaultMode": "default"
+  "tools": {
+    "approvalMode": "default"
   }
 }
 ```
@@ -340,10 +340,8 @@ YOLO Mode grants HopCode the highest permissions, automatically approving all to
 ```bash
 // .hopcode/settings.json
 {
-  "permissions": {
-"defaultMode": "yolo",
-"confirmShellCommands": false,
-"confirmFileEdits": false
+  "tools": {
+    "approvalMode": "yolo"
   }
 }
 ```
@@ -364,10 +362,10 @@ hopcode --prompt "Run the test suite, fix all failing tests, then commit changes
 
 ### Keyboard Shortcut Switching
 
-During a HopCode session, use **Shift+Tab**​ (or **Tab** on Windows) to quickly cycle through the four modes:
+During a Qwen Code session, use **Shift+Tab**​ (or **Tab** on Windows) to quickly cycle through the five modes:
 
 ```
-Ask Permissions Mode → Auto-Edit Mode → YOLO Mode → Plan Mode → Ask Permissions Mode
+Plan Mode → Ask Permissions Mode → Auto-Edit Mode → Auto Mode → YOLO Mode → Plan Mode
 ```
 
 ### Persistent Configuration
@@ -376,10 +374,8 @@ Ask Permissions Mode → Auto-Edit Mode → YOLO Mode → Plan Mode → Ask Perm
 // Project-level: ./.hopcode/settings.json
 // User-level: ~/.hopcode/settings.json
 {
-  "permissions": {
-"defaultMode": "auto-edit",  // or "plan" or "yolo"
-"confirmShellCommands": true,
-"confirmFileEdits": true
+  "tools": {
+    "approvalMode": "auto-edit"  // or "plan", "default", "auto", "yolo"
   }
 }
 ```

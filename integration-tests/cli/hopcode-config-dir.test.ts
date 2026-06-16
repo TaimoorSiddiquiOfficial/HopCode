@@ -55,8 +55,9 @@ describe('HOPCODE_HOME environment variable', () => {
 
   afterEach(async () => {
     // Always clean up env vars regardless of test outcome
-    delete process.env['HOPCODE_HOME'];
-    delete process.env['HOPCODE_RUNTIME_DIR'];
+    delete process.env['QWEN_HOME'];
+    delete process.env['QWEN_RUNTIME_DIR'];
+    delete process.env['QWEN_DEBUG_LOG_FILE'];
     await rig.cleanup();
   });
 
@@ -322,8 +323,9 @@ describe('HOPCODE_HOME environment variable', () => {
       mkdirSync(customConfigDir, { recursive: true });
       mkdirSync(runtimeDir, { recursive: true });
 
-      process.env['HOPCODE_HOME'] = customConfigDir;
-      process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
+      process.env['QWEN_HOME'] = customConfigDir;
+      process.env['QWEN_RUNTIME_DIR'] = runtimeDir;
+      process.env['QWEN_DEBUG_LOG_FILE'] = '1';
 
       try {
         await rig.run('say hello');

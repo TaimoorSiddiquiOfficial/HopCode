@@ -153,7 +153,7 @@ phase_1_core_identity() {
     # 1.1 Root package.json
     log_info "Updating root package.json..."
     replace_in_file "package.json" "@qwen-code/qwen-code" "@hopcode/hopcode"
-    replace_in_file "package.json" "QwenLM/qwen-code" "TaimoorSiddiquiOfficial/HopCode"
+    replace_in_file "package.json" "TaimoorSiddiquiOfficial/HopCode" "TaimoorSiddiquiOfficial/HopCode"
     replace_in_file "package.json" "ghcr.io/qwenlm/qwen-code" "ghcr.io/hopcode/hopcode"
     replace_in_file "package.json" '"qwen": "cli.js"' '"hopcode": "cli.js"'
     
@@ -243,7 +243,7 @@ phase_2_high_visibility() {
         replace_in_file "packages/vscode-ide-companion/package.json" "Enable Qwen Code" "Enable HopCode"
         replace_in_file "packages/vscode-ide-companion/package.json" '"publisher": "qwenlm"' '"publisher": "hopcode"'
         replace_in_file "packages/vscode-ide-companion/package.json" "qwen-code" "hopcode"
-        replace_in_file "packages/vscode-ide-companion/package.json" "qwenlm.hopcode-code" "hopcode.hopcode"
+        replace_in_file "packages/vscode-ide-companion/package.json" "qwenlm.hopcode" "hopcode.hopcode"
     fi
     
     # 2.4 Zed Extension
@@ -253,8 +253,8 @@ phase_2_high_visibility() {
         replace_in_file "packages/zed-extension/extension.toml" 'name = "Qwen Code"' 'name = "HopCode"'
         replace_in_file "packages/zed-extension/extension.toml" 'authors = \["Qwen Team"\]' 'authors = ["HopCode Team"]'
         replace_in_file "packages/zed-extension/extension.toml" "Qwen Code Agent Server" "HopCode Agent Server"
-        replace_in_file "packages/zed-extension/extension.toml" "QwenLM/qwen-code" "TaimoorSiddiquiOfficial/HopCode"
-        replace_in_file "packages/zed-extension/extension.toml" '\[agent_servers.hopcode-code\]' '[agent_servers.hopcode]'
+        replace_in_file "packages/zed-extension/extension.toml" "TaimoorSiddiquiOfficial/HopCode" "TaimoorSiddiquiOfficial/HopCode"
+        replace_in_file "packages/zed-extension/extension.toml" '\[agent_servers.hopcode\]' '[agent_servers.hopcode]'
     fi
     
     # 2.5 WebUI Package
@@ -327,7 +327,7 @@ phase_4_documentation() {
     
     # 4.3 Documentation site
     log_info "Updating documentation site..."
-    replace_in_file "docs-site/src/app/layout.jsx" "QwenLM/qwen-code" "TaimoorSiddiquiOfficial/HopCode"
+    replace_in_file "docs-site/src/app/layout.jsx" "TaimoorSiddiquiOfficial/HopCode" "TaimoorSiddiquiOfficial/HopCode"
     
     # 4.4 SDK documentation
     log_info "Updating SDK documentation..."

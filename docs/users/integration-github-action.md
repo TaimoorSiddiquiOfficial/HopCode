@@ -120,16 +120,16 @@ This type of action can be used to invoke a general-purpose, conversational HopC
 
 - <a name="__input_hopcode_model"></a><a href="#user-content-__input_hopcode_model"><code>hopcode_model</code></a>: \*(Optional)\_ The model to use with HopCode.
 
-- <a name="__input_prompt"></a><a href="#user-content-__input_prompt"><code>prompt</code></a>: _(Optional, default: `You are a helpful assistant.`)_ A string passed to the HopCode CLI's [`--prompt` argument](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/configuration.md#command-line-arguments).
+- <a name="__input_prompt"></a><a href="#user-content-__input_prompt"><code>prompt</code></a>: _(Optional, default: `You are a helpful assistant.`)_ A string passed to the HopCode CLI's [`--prompt` argument](https://github.com/TaimoorSiddiquiOfficial/HopCode-action/blob/main/docs/cli/configuration.md#command-line-arguments).
 
 - <a name="__input_settings"></a><a href="#user-content-__input_settings"><code>settings</code></a>: _(Optional)_ A JSON string written to `.hopcode/settings.json` to configure the CLI's _project_ settings.
-  For more details, see the documentation on [settings files](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/configuration.md#settings-files).
+  For more details, see the documentation on [settings files](https://github.com/TaimoorSiddiquiOfficial/HopCode-action/blob/main/docs/cli/configuration.md#settings-files).
 
 - <a name="__input_use_hopcode_assist"></a><a href="#user-content-__input_use_hopcode_assist"><code>use*HOPCODE_assist</code></a>: *(Optional, default: `false`)\* Whether to use Code Assist for HopCode model access instead of the default HopCode API key.
-  For more information, see the [HopCode CLI documentation](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/authentication.md).
+  For more information, see the [HopCode CLI documentation](https://github.com/TaimoorSiddiquiOfficial/HopCode-action/blob/main/docs/cli/authentication.md).
 
 - <a name="__input_use_vertex_ai"></a><a href="#user-content-__input_use_vertex_ai"><code>use*vertex_ai</code></a>: *(Optional, default: `false`)\* Whether to use Vertex AI for HopCode model access instead of the default HopCode API key.
-  For more information, see the [HopCode CLI documentation](https://github.com/TaimoorSiddiquiOfficial/hopcode-action/blob/main/docs/cli/authentication.md).
+  For more information, see the [HopCode CLI documentation](https://github.com/TaimoorSiddiquiOfficial/HopCode-action/blob/main/docs/cli/authentication.md).
 
 - <a name="__input_extensions"></a><a href="#user-content-__input_extensions"><code>extensions</code></a>: _(Optional)_ A list of HopCode CLI extensions to install.
 
