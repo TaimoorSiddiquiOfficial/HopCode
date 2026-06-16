@@ -12,9 +12,11 @@
  * Unlike the previous open-computer-use backend, cua-driver is NOT on npm.
  * It ships as per-platform, Developer-ID-signed + Apple-notarized binaries
  * attached to GitHub releases (tag `cua-driver-rs-v<version>`). We download
- * the pinned asset once into `~/.qwen/computer-use/`, preferring a
- * hopcode-owned OSS mirror (reliable in CN where GitHub release downloads
- * are slow/blocked) and falling back to GitHub.
+ * the pinned asset once into `~/.hopcode/computer-use/`, preferring the
+ * qwen-code-assets OSS mirror (reliable in CN where GitHub release downloads
+ * are slow/blocked) and falling back to the upstream GitHub release.
+ * Enterprises can override the host via `HOPCODE_COMPUTER_USE_DOWNLOAD_HOST`
+ * to point at an internal mirror.
  *
  * Source: https://github.com/trycua/cua/tree/main/libs/cua-driver
  * License: MIT (the driver pulls no AGPL deps — AGPL only affects the
@@ -34,30 +36,26 @@ import { homedir } from 'node:os';
  * can't silently drift our hardcoded schemas or break the download.
  *
  * To bump: update this, re-run `scripts/sync-computer-use-schemas.ts`
- * against the new binary, sync the new assets to OSS via
- * `scripts/sync-cua-driver-to-oss.ts`, then smoke-test on macOS.
+ * against the new binary, then smoke-test on macOS.
  */
 export const CUA_DRIVER_VERSION = '0.5.2';
 
 /**
- * hopcode-owned OSS mirror base (primary download source — reliable in CN
- * where GitHub release downloads are slow/blocked). Assets live under
- * `<base>/cua-driver-rs/v<version>/<asset>`, mirrored from the upstream
- * trycua/cua release by the "Sync cua-driver to Aliyun OSS" workflow
- * (.github/workflows/sync-cua-driver-to-oss.yml), which auto-triggers on pushes
- * to main that touch this file — a CUA_DRIVER_VERSION bump auto-mirrors the new
- * release (a checksums.txt guard no-ops when already mirrored); manual
- * workflow_dispatch covers first-time / forced re-mirror. Until a version is
- * mirrored there, the GitHub fallback (GITHUB_RELEASE_BASE) serves it
- * transparently.
+ * Shared qwen-code-assets OSS mirror base (reliable in CN where GitHub release
+ * downloads are slow/blocked). Assets live under
+ * `<base>/cua-driver-rs/v<version>/<asset>` and are mirrored from the upstream
+ * trycua/cua release by the Qwen project. The HopCode fork consumes this same
+ * public mirror because we do not operate our own OSS bucket.
  *
- * Hosted on the shared `hopcode-assets` bucket (same one the CLI's own
- * release/installation assets use), under a `computer-use` namespace.
+ * The upstream workflow that populates this mirror is
+ * `.github/workflows/sync-cua-driver-to-oss.yml` in the QwenLM/qwen-code repo.
  */
 export const OSS_MIRROR_BASE =
-  'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/computer-use';
+  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/computer-use';
 
-/** GitHub release download base for the pinned tag (fallback source). */
+/**
+ * GitHub release download base for the pinned tag (fallback source).
+ */
 export const GITHUB_RELEASE_BASE =
   'https://github.com/trycua/cua/releases/download';
 
@@ -140,8 +138,8 @@ export function resolveAssetTarget(
 
 /**
  * Ordered list of full download URLs for an asset: env override (if set),
- * then OSS mirror, then GitHub. The downloader tries each in order until
- * one succeeds.
+ * then the qwen-code-assets OSS mirror, then GitHub. The downloader tries each
+ * in order until one succeeds.
  *
  * `HOPCODE_COMPUTER_USE_DOWNLOAD_HOST` lets enterprises / power users point at
  * an internal mirror laid out like OSS (`<host>/cua-driver-rs/v<ver>/<asset>`).
