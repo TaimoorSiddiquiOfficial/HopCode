@@ -37,10 +37,7 @@ import {
   readHopCodeSettingsForVSCode,
   clearPersistedAuth,
 } from '../../services/settingsWriter.js';
-import {
-  buildInstallPlan,
-  parseInsightMessage,
-} from '@hopcode/hopcode-core';
+import { buildInstallPlan, parseInsightMessage } from '@hopcode/hopcode-core';
 
 /** Threshold (ms) before a completed task triggers a notification. */
 const LONG_TASK_THRESHOLD_MS = 20_000;
@@ -84,7 +81,8 @@ export function resolveHopCodeCliEntryPath(
     }
   }
 
-  return vscode.Uri.joinPath(extensionUri, 'dist', 'qwen-cli', 'cli.js').fsPath;
+  return vscode.Uri.joinPath(extensionUri, 'dist', 'hopcode-cli', 'cli.js')
+    .fsPath;
 }
 
 function isInsightCommand(command: string): boolean {
@@ -187,15 +185,15 @@ export class WebViewProvider {
     // The isSyncingToVSCode guard prevents a loop when we programmatically populate VSCode settings.
     const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(
       async (e) => {
-        const authSettingsChanged = AUTH_RELATED_HOPCODE_SETTINGS.some((setting) =>
-          e.affectsConfiguration(setting),
+        const authSettingsChanged = AUTH_RELATED_HOPCODE_SETTINGS.some(
+          (setting) => e.affectsConfiguration(setting),
         );
 
         if (authSettingsChanged && !this.isSyncingToVSCode) {
           console.log(
             '[WebViewProvider] Auth-related hopcode settings changed by user, syncing...',
           );
-          const synced = await this.syncVSCodeSettingsToQwenConfig();
+          const synced = await this.syncVSCodeSettingsToHopCodeConfig();
           if (synced && this.agentInitialized) {
             // Settings changed and we have an active connection — reconnect
             try {
@@ -1100,7 +1098,7 @@ export class WebViewProvider {
    *
    * @returns true if settings were synced (apiKey is configured), false otherwise
    */
-  private async syncVSCodeSettingsToQwenConfig(): Promise<boolean> {
+  private async syncVSCodeSettingsToHopCodeConfig(): Promise<boolean> {
     const config = vscode.workspace.getConfiguration('hopcode');
     const apiKey = config.get<string>('apiKey', '');
 
@@ -1139,7 +1137,7 @@ export class WebViewProvider {
    * This makes existing CLI-configured non-secret metadata visible in the
    * VSCode Settings page without mirroring credentials into settings.json.
    */
-  private async syncQwenConfigToVSCodeSettings(): Promise<void> {
+  private async syncHopCodeConfigToVSCodeSettings(): Promise<void> {
     try {
       const hopcodeSettings = readHopCodeSettingsForVSCode();
       if (!hopcodeSettings) {
@@ -1156,9 +1154,12 @@ export class WebViewProvider {
       const updates: Array<Thenable<void>> = [];
 
       if (
-        config.get<string>('provider', 'coding-plan') !== hopcodeSettings.provider
+        config.get<string>('provider', 'coding-plan') !==
+        hopcodeSettings.provider
       ) {
-        updates.push(config.update('provider', hopcodeSettings.provider, target));
+        updates.push(
+          config.update('provider', hopcodeSettings.provider, target),
+        );
       }
       if (
         config.get<'china' | 'global'>('codingPlanRegion', 'china') !==
@@ -1189,7 +1190,7 @@ export class WebViewProvider {
       }
     } catch (error) {
       console.error(
-        '[WebViewProvider] Failed to sync qwen config to VSCode settings:',
+        '[WebViewProvider] Failed to sync HopCode config to VSCode settings:',
         error,
       );
     }
@@ -1210,7 +1211,7 @@ export class WebViewProvider {
 
     this.initializationPromise = (async () => {
       try {
-        await this.syncQwenConfigToVSCodeSettings();
+        await this.syncHopCodeConfigToVSCodeSettings();
 
         console.log('[WebViewProvider] Attempting connection...');
         // Attempt a connection to detect prior auth without forcing login
@@ -1352,7 +1353,7 @@ export class WebViewProvider {
   /**
    * Handle auth interactive — interactive auth flow result.
    * Writes provider config to ~/.hopcode/settings.json and reconnects.
-   * Mirrors the CLI's `qwen auth coding-plan` / `qwen auth` flow.
+   * Mirrors the CLI's `hopcode auth coding-plan` / `hopcode auth` flow.
    */
   private async handleAuthInteractive(
     providerConfig: import('@hopcode/hopcode-core').ProviderConfig,

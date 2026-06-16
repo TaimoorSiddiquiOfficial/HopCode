@@ -231,7 +231,7 @@ describe('AcpConnection extension notifications', () => {
     const onEndTurn = vi.fn();
     conn.onEndTurn = onEndTurn;
 
-    conn.handleExtNotification('_HopCode/end_turn', {
+    conn.handleExtNotification('_hopcode/end_turn', {
       reason: 'end_turn',
       source: 'background_notification',
     });

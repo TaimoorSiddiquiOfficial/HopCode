@@ -196,6 +196,7 @@ export default tseslint.config(
       './scripts/**/*.js',
       './scripts/**/*.mjs',
       'esbuild.config.js',
+      'fix-index-signatures.js',
       'packages/*/scripts/**/*.js',
       // Verification reproducer scripts under docs/ also run with `node`.
       'docs/**/*.mjs',
@@ -234,8 +235,35 @@ export default tseslint.config(
       'no-undef': 'off',
     },
   },
+  // Upstream provider implementation keeps SDK/vendor-style code that does
+  // not follow this repo's stricter application lint profile.
+  {
+    files: ['packages/core/src/provider/**/*.ts', 'packages/core/test-openai-provider.ts'],
+    rules: {
+      '@typescript-eslint/array-type': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/consistent-type-imports': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-this-alias': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'arrow-body-style': 'off',
+      'default-case': 'off',
+      'import/no-internal-modules': 'off',
+      'no-console': 'off',
+      'no-fallthrough': 'off',
+      'object-shorthand': 'off',
+    },
+  },
   // ==================== no-console allowlist ====================
   // The following files/packages are allowed to use console.*
+
+  // Web dashboard - out of scope for no-console rule
+  {
+    files: ['packages/web-dashboard/**/*.{ts,tsx}'],
+    rules: { 'no-console': 'off' },
+  },
 
   // VS Code IDE companion - out of scope for no-console rule
   {
