@@ -379,7 +379,7 @@ describe('ChatRecordingService - recordCustomTitle', () => {
         return originalAppendRecord(record);
       };
 
-      // 25 × 2KB ≈ 50KB > 32KB → first re-anchor fires (and throws).
+      // 25 × 2KB ≈ 50KB > 32KB → re-anchor fires (and throws).
       // With the counter-reset fix, it stays reset; without it, every
       // subsequent message would re-trigger reanchor.
       const bulkText = 'x'.repeat(2000);
@@ -388,11 +388,11 @@ describe('ChatRecordingService - recordCustomTitle', () => {
       }
       await chatRecordingService.flush();
 
-      // One failed attempt per mechanism is acceptable (two independent
-      // re-anchor paths: updateTitleAnchorTracking + afterWrite). Multiple
-      // beyond that means a counter was pinned and turned a single fault into
-      // a per-record loop.
-      expect(reanchorAttempts).toBe(2);
+      // Exactly one failed attempt is acceptable: the threshold is breached
+      // once and reanchorTitle throws. Multiple attempts would mean the byte
+      // counter was pinned above the threshold, turning a single I/O fault
+      // into a per-record retry storm.
+      expect(reanchorAttempts).toBe(1);
     });
 
     it('does not re-anchor on small write bursts under threshold', async () => {
