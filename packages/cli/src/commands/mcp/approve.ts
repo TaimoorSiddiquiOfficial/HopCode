@@ -18,7 +18,7 @@ import {
 
 /**
  * All gated (approval-requiring) servers visible from `cwd` — project
- * `.mcp.json` plus workspace `.qwen/settings.json` (#4615). Non-gated sources
+ * `.mcp.json` plus workspace `.hopcode/settings.json` (#4615). Non-gated sources
  * (user/system/extension) never need approval and are excluded.
  */
 function loadGatedServers(cwd: string): Record<string, MCPServerConfig> {
@@ -44,7 +44,7 @@ async function setProjectServerStatus(
   const names = Object.keys(servers);
   if (names.length === 0) {
     writeStdoutLine(
-      'No approval-requiring MCP servers found (looked in .mcp.json and .qwen/settings.json).',
+      'No approval-requiring MCP servers found (looked in .mcp.json and .hopcode/settings.json).',
     );
     return;
   }
@@ -84,7 +84,7 @@ async function setProjectServerStatus(
 export const approveCommand: CommandModule = {
   command: 'approve [name]',
   describe:
-    'Approve a gated MCP server (.mcp.json or workspace .qwen/settings.json)',
+    'Approve a gated MCP server (.mcp.json or workspace .hopcode/settings.json)',
   builder: (yargs) =>
     yargs
       .usage('Usage: qwen mcp approve [options] [name]')
@@ -109,7 +109,7 @@ export const approveCommand: CommandModule = {
 export const rejectCommand: CommandModule = {
   command: 'reject [name]',
   describe:
-    'Reject a gated MCP server (.mcp.json or workspace .qwen/settings.json)',
+    'Reject a gated MCP server (.mcp.json or workspace .hopcode/settings.json)',
   builder: (yargs) =>
     yargs
       .usage('Usage: qwen mcp reject [options] [name]')

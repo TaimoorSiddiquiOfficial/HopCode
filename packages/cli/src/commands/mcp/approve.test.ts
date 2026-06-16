@@ -73,10 +73,10 @@ describe('qwen mcp approve / reject', () => {
   };
 
   const writeWorkspaceSettings = (servers: Record<string, unknown>) => {
-    const qwenDir = path.join(dir, '.qwen');
-    fs.mkdirSync(qwenDir, { recursive: true });
+    const hopcodeDir = path.join(dir, '.hopcode');
+    fs.mkdirSync(hopcodeDir, { recursive: true });
     fs.writeFileSync(
-      path.join(qwenDir, 'settings.json'),
+      path.join(hopcodeDir, 'settings.json'),
       JSON.stringify({ mcpServers: servers }),
     );
   };
@@ -105,7 +105,7 @@ describe('qwen mcp approve / reject', () => {
     expect(output()).toContain('Approved MCP server "slack"');
   });
 
-  it('approves a workspace .qwen/settings.json server', async () => {
+  it('approves a workspace .hopcode/settings.json server', async () => {
     writeWorkspaceSettings({ ws: { command: 'node', args: ['ws.js'] } });
 
     await run(approveCommand, { name: 'ws', all: false });

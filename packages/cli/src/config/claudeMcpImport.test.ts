@@ -53,10 +53,10 @@ describe('claude MCP import', () => {
         mcpServers: options.workspaceMcpServers,
       }),
     };
-    const userFile = path.join(homeDir, '.qwen', 'settings.json');
+    const userFile = path.join(homeDir, '.hopcode', 'settings.json');
     const workspaceFile = options?.inHome
       ? userFile
-      : path.join(projectDir, '.qwen', 'settings.json');
+      : path.join(projectDir, '.hopcode', 'settings.json');
     const mergedMcpServers =
       options?.mergedMcpServers ??
       (options?.userMcpServers || options?.workspaceMcpServers

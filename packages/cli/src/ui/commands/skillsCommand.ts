@@ -69,7 +69,7 @@ export const skillsCommand: SlashCommand = {
           : userInvocableSkills.length === 0
             ? t('No skills are currently available.')
             : t(
-                'All available skills are disabled. Edit ~/.qwen/settings.json or .qwen/settings.json (skills.disabled) to re-enable.',
+                'All available skills are disabled. Edit ~/.hopcode/settings.json or .hopcode/settings.json (skills.disabled) to re-enable.',
               );
       context.ui.addItem(
         {

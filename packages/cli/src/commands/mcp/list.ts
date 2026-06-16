@@ -130,7 +130,7 @@ export async function listMcpServers(): Promise<void> {
       serverInfo += `${server.command} ${server.args?.join(' ') || ''} (stdio)`;
     }
 
-    // Gated (project `.mcp.json` / workspace `.qwen/settings.json`) servers that
+    // Gated (project `.mcp.json` / workspace `.hopcode/settings.json`) servers that
     // are not approved are listed WITHOUT connecting — inspecting an untrusted
     // config must stay side-effect-free (#4615). Only approved / non-gated
     // servers get a live connection test.
