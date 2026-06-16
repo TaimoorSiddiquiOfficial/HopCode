@@ -4543,7 +4543,10 @@ describe('createServeApp', () => {
         path.join(os.tmpdir(), 'qwen-init-force-'),
       );
       try {
-        await fsp.writeFile(path.join(wsRoot, 'HOPCODE.md'), 'existing content');
+        await fsp.writeFile(
+          path.join(wsRoot, 'HOPCODE.md'),
+          'existing content',
+        );
         const bridge = fakeBridge();
         const opts: ServeOptions = {
           ...baseOpts,
@@ -8629,7 +8632,9 @@ describe('createServeApp ServeAppDeps.fsFactory wiring (#4175 PR 18)', () => {
     const { isFsError } = await import('./fs/index.js');
     const os = await import('node:os');
     const tmp = await import('node:fs').then((m) =>
-      m.promises.mkdtemp(path.join(os.tmpdir(), 'hopcode-serve-default-trust-')),
+      m.promises.mkdtemp(
+        path.join(os.tmpdir(), 'hopcode-serve-default-trust-'),
+      ),
     );
     try {
       const app = createServeApp(
@@ -9226,7 +9231,8 @@ describe('auth device-flow routes', () => {
     const intervalsRegistered: Array<{ cb: () => void }> = [];
     const registry = new DeviceFlowRegistry({
       events: { publish: () => {} },
-      resolveProvider: (id) => (id === 'hopcode-oauth' ? fakeProvider : undefined),
+      resolveProvider: (id) =>
+        id === 'hopcode-oauth' ? fakeProvider : undefined,
       now: () => now,
       // Run polls forever-deferred; sweeper interval is what we drive.
       schedule: (_ms, _cb) => ({ cancelled: false }) as never,

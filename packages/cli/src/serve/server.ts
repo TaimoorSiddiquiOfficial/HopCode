@@ -1034,7 +1034,10 @@ export function createServeApp(
     deviceFlowProviderMap.set(provider.providerId, provider);
   }
   if (!deviceFlowProviderMap.has('hopcode-oauth')) {
-    deviceFlowProviderMap.set('hopcode-oauth', new HopCodeOAuthDeviceFlowProvider());
+    deviceFlowProviderMap.set(
+      'hopcode-oauth',
+      new HopCodeOAuthDeviceFlowProvider(),
+    );
   }
   const deviceFlowEventSink: DeviceFlowEventSink = {
     publish(emission, originatorClientId) {
@@ -1438,9 +1441,7 @@ export function createServeApp(
     const envelope: CapabilitiesEnvelope = {
       v: CAPABILITIES_SCHEMA_VERSION,
       protocolVersions: getServeProtocolVersions(),
-      ...(deps.HopCodeVersion
-        ? { HopCodeVersion: deps.HopCodeVersion }
-        : {}),
+      ...(deps.HopCodeVersion ? { HopCodeVersion: deps.HopCodeVersion } : {}),
       mode: opts.mode,
       features: currentServeFeatures(),
       modelServices: [],
@@ -3448,7 +3449,9 @@ export function createServeApp(
 
     if (daemonLog) {
       const sseOpenedAt = Date.now();
-      const sseClientId = req.headers['x-hopcode-client-id'] as string | undefined;
+      const sseClientId = req.headers['x-hopcode-client-id'] as
+        | string
+        | undefined;
       daemonLog.info('SSE stream opened', { sessionId, clientId: sseClientId });
       res.on('close', () => {
         try {

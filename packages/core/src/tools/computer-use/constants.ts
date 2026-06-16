@@ -170,7 +170,8 @@ export function resolveChecksumUrls(
 }
 
 /** Env var name for overriding the screenshot longest-edge cap. */
-export const MAX_IMAGE_DIMENSION_ENV = 'HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION';
+export const MAX_IMAGE_DIMENSION_ENV =
+  'HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION';
 
 /**
  * Coerce a raw value into a valid `max_image_dimension` override, or

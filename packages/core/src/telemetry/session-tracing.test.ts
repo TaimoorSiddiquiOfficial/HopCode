@@ -1142,9 +1142,7 @@ describe('session-tracing', () => {
         cancelled: true,
       });
 
-      const record = mockSpans.find(
-        (s) => s.name === 'hopcode.tool.execution',
-      );
+      const record = mockSpans.find((s) => s.name === 'hopcode.tool.execution');
       expect(record?.ended).toBe(true);
       // No setStatus call — status stays UNSET, matching setToolSpanCancelled
       // on the parent tool span. Without this, success: false would set ERROR
@@ -1165,9 +1163,7 @@ describe('session-tracing', () => {
         error: 'Tool execution failed',
       });
 
-      const record = mockSpans.find(
-        (s) => s.name === 'hopcode.tool.execution',
-      );
+      const record = mockSpans.find((s) => s.name === 'hopcode.tool.execution');
       expect(record?.statuses).toHaveLength(1);
       expect(record?.statuses[0]!.code).toBe(SpanStatusCode.ERROR);
       expect(record?.statuses[0]!.message).toBe('Tool execution failed');
@@ -1753,9 +1749,7 @@ describe('session-tracing', () => {
       // Dual-emit: spec + vendor keys for id and name.
       expect(record!.attributes['gen_ai.agent.id']).toBe('Explore-abc123');
       expect(record!.attributes['gen_ai.agent.name']).toBe('Explore');
-      expect(record!.attributes['hopcode.subagent.id']).toBe(
-        'Explore-abc123',
-      );
+      expect(record!.attributes['hopcode.subagent.id']).toBe('Explore-abc123');
       expect(record!.attributes['hopcode.subagent.name']).toBe('Explore');
       // Required spec attrs.
       expect(record!.attributes['gen_ai.operation.name']).toBe('invoke_agent');

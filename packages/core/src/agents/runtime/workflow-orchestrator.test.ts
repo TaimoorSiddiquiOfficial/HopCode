@@ -917,7 +917,9 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
       ).toBe(64);
       // Just under the ceiling is preserved.
       expect(
-        resolveConcurrencyLimit({ HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY: '63' }),
+        resolveConcurrencyLimit({
+          HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY: '63',
+        }),
       ).toBe(63);
     });
 
