@@ -60,11 +60,11 @@ Handles common cross-cutting concerns: sender gating (allowlist / denylist), gro
 
 ### Per-channel adapters
 
-| Adapter         | File                                                | Transport                           | Notes                                                                                    |
-| --------------- | --------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------- |
-| DingTalk        | `packages/channels/dingtalk/src/DingtalkAdapter.ts` | DingTalk Stream SDK WebSocket       | Sends via `sessionWebhook` POST; media images downloaded via DT API, base64 in envelope. |
-| WeChat (Weixin) | `packages/channels/weixin/src/WeixinAdapter.ts`     | iLink Bot HTTP long-poll            | Sends via proprietary `sendText` / `sendImage` API; typing indicators.                   |
-| Telegram        | `packages/channels/telegram/src/TelegramAdapter.ts` | Telegram Bot API long-poll (grammy) | Sends HTML chunks via `sendMessage`.                                                     |
+| Adapter         | File                                                | Transport                                              | Notes                                                                                                        |
+| --------------- | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| DingTalk        | `packages/channels/dingtalk/src/DingtalkAdapter.ts` | DingTalk Stream SDK WebSocket                          | Sends via `sessionWebhook` POST; media images downloaded via DT API, base64 in envelope.                     |
+| WeChat (Weixin) | `packages/channels/weixin/src/WeixinAdapter.ts`     | iLink Bot HTTP long-poll                               | Sends via proprietary `sendText` / `sendImage` API; typing indicators.                                       |
+| Telegram        | `packages/channels/telegram/src/TelegramAdapter.ts` | Telegram Bot API long-poll (grammy)                    | Sends HTML chunks via `sendMessage`.                                                                         |
 | Feishu          | `packages/channels/feishu/src/FeishuAdapter.ts`     | Feishu/Lark Stream WebSocket (default) or HTTP webhook | Sends via Lark SDK as interactive cards; webhook mode requires `encryptKey` for HMAC signature verification. |
 
 Each adapter implements:
@@ -77,11 +77,11 @@ Each adapter implements:
 
 ### Adapter matrix
 
-| Adapter      | Transport         | Identity                                                 | Permission UX                       | Auto-approve config                               |
-| ------------ | ----------------- | -------------------------------------------------------- | ----------------------------------- | ------------------------------------------------- |
-| **DingTalk** | WebSocket stream  | `senderStaffId` (+ optional `conversationId` for groups) | Inline buttons via DT markdown      | `ChannelConfig.approvalMode = 'auto' \| 'prompt'` |
-| **WeChat**   | HTTP long-poll    | `senderWxid` (+ optional `groupWxid`)                    | Text-only prompts with reply tokens | Same                                              |
-| **Telegram** | Bot API long-poll | `from.id` (+ optional `chat.id` for groups)              | Inline keyboard buttons             | Same                                              |
+| Adapter      | Transport                       | Identity                                                 | Permission UX                       | Auto-approve config                               |
+| ------------ | ------------------------------- | -------------------------------------------------------- | ----------------------------------- | ------------------------------------------------- |
+| **DingTalk** | WebSocket stream                | `senderStaffId` (+ optional `conversationId` for groups) | Inline buttons via DT markdown      | `ChannelConfig.approvalMode = 'auto' \| 'prompt'` |
+| **WeChat**   | HTTP long-poll                  | `senderWxid` (+ optional `groupWxid`)                    | Text-only prompts with reply tokens | Same                                              |
+| **Telegram** | Bot API long-poll               | `from.id` (+ optional `chat.id` for groups)              | Inline keyboard buttons             | Same                                              |
 | **Feishu**   | WebSocket stream / HTTP webhook | `sender.open_id` (+ optional `chat_id` for groups)       | Interactive card buttons            | Same                                              |
 
 > **Note:** The "Permission UX" column describes each platform's native affordance, but none is wired up yet — `AcpBridge.requestPermission` currently auto-approves every request (`packages/channels/base/src/AcpBridge.ts`), and `ChannelConfig.approvalMode` is declared but not yet read. Interactive approval is planned (Phase 5).
@@ -180,7 +180,7 @@ Channel-specific keys layer on top (DingTalk: `streamCredentials`; WeChat: `ilin
 
 ## Caveats & Known Limits
 
-- **Channels do not directly import `@qwen-code/sdk`.** They go through `ChannelBase` → `DaemonChannelBridge` → `DaemonChannelSessionClient` (which the bridge constructs from the SDK). The indirection lets the bridge swap implementations, such as a test stub, without requiring channel changes.
+- **Channels do not directly import `@hopcode/sdk`.** They go through `ChannelBase` → `DaemonChannelBridge` → `DaemonChannelSessionClient` (which the bridge constructs from the SDK). The indirection lets the bridge swap implementations, such as a test stub, without requiring channel changes.
 - **Permission UX is per-channel.** DingTalk uses markdown buttons; WeChat is text-only; Telegram uses inline keyboards; Feishu uses interactive card buttons. (All currently auto-approve via `AcpBridge`; interactive approval is planned.) No common "interactive permission widget" abstraction yet.
 - **Auto-approve is a deployment-side decision**, not a daemon-side one. The daemon's `permission_mediation` policy still applies; auto-approve only means the channel responds without prompting the human. Do not combine `auto` with `enforce`-grade workflows.
 - **Per-channel rate limits / message-size limits are the adapter's job.** `DaemonChannelBridge` only handles chunking; pushing past WeChat's per-message size or Telegram's flood limit is on the adapter.

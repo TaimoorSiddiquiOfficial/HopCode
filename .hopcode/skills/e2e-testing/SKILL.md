@@ -28,7 +28,7 @@ Headless auth comes from `~/.hopcode`. Force a known-good model with `--auth-typ
 
 ```bash
 <hopcode> "your prompt" --auth-type openai --model deepseek-v4-flash \
-  --approval-mode yolo --output-format json
+  --approval-mode izn --output-format json
 ```
 
 **Gotcha:** `--model` alone won't switch providers — `--auth-type` (`openai`/`anthropic`/`hopcode-oauth`/`gemini`/`vertex-ai`) does. Omit it and the run falls back to the default provider and dies
@@ -59,7 +59,7 @@ Run the CLI non-interactively with JSON output (`<hopcode>` = `hopcode` or
 
 ```bash
 <hopcode> "your prompt here" \
-  --approval-mode yolo \
+  --approval-mode izn \
   --output-format json \
   2>/dev/null
 ```
@@ -83,7 +83,7 @@ what the user sees. Headless mode is simpler when you only need structured outpu
 
 ```bash
 tmux new-session -d -s test -x 200 -y 50 \
-  "cd /tmp/test-dir && <hopcode> --approval-mode yolo"
+  "cd /tmp/test-dir && <hopcode> --approval-mode izn"
 sleep 3  # wait for TUI to initialize
 ```
 
@@ -144,7 +144,7 @@ logging to see the exact request/response payloads:
 
 ```bash
 <hopcode> "prompt" \
-  --approval-mode yolo \
+  --approval-mode izn \
   --output-format json \
   --openai-logging \
   --openai-logging-dir /tmp/api-logs
@@ -235,5 +235,5 @@ CLI at it, and patterns for specializing the zero-dependency template at
   exist there.
 - Use interactive (tmux) mode for hang-related issues. Headless mode produces
   no output when the process stalls, giving you nothing to work with.
-- Use `--approval-mode default` when testing permission rules. `yolo` bypasses
+- Use `--approval-mode default` when testing permission rules. `izn` bypasses
   rule evaluation entirely — it can't test whether a rule matches.

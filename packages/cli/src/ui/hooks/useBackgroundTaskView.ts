@@ -34,7 +34,7 @@ import {
   type ShellTask,
   type TaskState,
   type WorkflowTask,
-} from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
 
 // Cap on retained terminal dream entries surfaced via the dialog.
 // `MemoryManager.tasks` has no eviction; without this cap the list

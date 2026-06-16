@@ -1,7 +1,7 @@
 {
-  "name": "@qwen-code/qwen-code",
+  "name": "@hopcode/hopcode",
   "version": "0.18.1",
-  "description": "Qwen Code",
+  "description": "HopCode",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/QwenLM/hopcode.git"

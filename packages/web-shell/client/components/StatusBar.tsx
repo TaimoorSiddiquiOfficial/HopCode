@@ -8,7 +8,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 import type { DaemonSessionTaskStatus } from '@hopcode/sdk/daemon';
-import { useConnection } from '@qwen-code/webui/daemon-react-sdk';
+import { useConnection } from '@hopcode/webui/daemon-react-sdk';
 import { useI18n } from '../i18n';
 import styles from './StatusBar.module.css';
 
@@ -32,7 +32,7 @@ function getModeIndicator(
     case 'auto':
       return { label: t('mode.auto'), className: styles.modeAuto };
     case 'izn':
-      return { label: t('mode.izn'), className: styles.modeYolo };
+      return { label: t('mode.izn'), className: styles.modeIzn };
     default:
       // Only reached before a mode is known (e.g. while disconnected).
       return null;

@@ -10,7 +10,7 @@ import {
   type SlashCommand,
   CommandKind,
 } from './types.js';
-import { openBrowserSecurely } from '@qwen-code/qwen-code-core';
+import { openBrowserSecurely } from '@hopcode/hopcode-core';
 import { MessageType } from '../types.js';
 import { t, getCurrentLanguage } from '../../i18n/index.js';
 

@@ -17,7 +17,7 @@ import {
 import { defaultSessionOptions } from '@/hooks/useSessionOptions';
 import { resolveEffectiveConnectionSlug } from '@config/llm-connections';
 import { getWorkspaceDisplayName } from '@/utils/workspace';
-import { hopcodeCapabilitiesFromSkills } from '@/lib/qwen-capability-cache';
+import { hopcodeCapabilitiesFromSkills } from '@/lib/hopcode-capability-cache';
 import { contentBadgesToTextElements } from '@craft-agent/core/utils';
 import type {
   CreateSessionOptions,

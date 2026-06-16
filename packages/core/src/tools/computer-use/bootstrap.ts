@@ -45,7 +45,7 @@ const execFileAsync = promisify(execFile);
 export interface BootstrapContext {
   signal: AbortSignal;
   updateOutput?: (output: string) => void;
-  /** Treat the first-use install as pre-approved (YOLO / AUTO_EDIT / AUTO). */
+  /** Treat the first-use install as pre-approved (IZN / AUTO_EDIT / AUTO). */
   autoApproveInstall?: boolean;
 }
 

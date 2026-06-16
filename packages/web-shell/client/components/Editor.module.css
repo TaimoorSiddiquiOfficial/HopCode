@@ -51,7 +51,7 @@
   color: var(--warning-color);
 }
 
-.prefixYolo {
+.prefixIzn {
   color: var(--error-color);
 }
 
@@ -71,8 +71,8 @@
   background: #8b7530;
 }
 
-.modeYolo .borderTop,
-.modeYolo .borderBottom {
+.modeIzn .borderTop,
+.modeIzn .borderBottom {
   background: #8b3a4a;
 }
 

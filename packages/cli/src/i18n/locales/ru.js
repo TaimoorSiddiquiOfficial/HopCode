@@ -23,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Режим терминала',
-  'YOLO mode': 'Режим YOLO',
+  'IZN mode': 'Режим IZN',
   'Auto mode': 'Автоматический режим',
   'plan mode': 'Режим планирования',
   'auto-accept edits': 'Режим принятия правок',
@@ -91,7 +91,7 @@ export default {
   // ============================================================================
   // Поля системной информации
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Среда выполнения',
   OS: 'ОС',
   Auth: 'Аутентификация',
@@ -290,7 +290,8 @@ export default {
   // Агенты - Мастер создания
   // ============================================================================
   'Project Level (.hopcode/agents/)': 'Уровень проекта (.hopcode/agents/)',
-  'User Level (~/.hopcode/agents/)': 'Уровень пользователя (~/.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)':
+    'Уровень пользователя (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ Подагент успешно создан!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Подагент "{{name}}" сохранен на уровне {{level}}.',
@@ -436,7 +437,7 @@ export default {
   Plan: 'План',
   'Ask permissions': 'Запрашивать разрешения',
   'Auto Edit': 'Авторедактирование',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'Включение/выключение режима vim',
   'check session stats. Usage: /stats [model|tools]':
     'Просмотр статистики сессии. Использование: /stats [model|tools]',
@@ -1184,9 +1185,11 @@ export default {
   'From project settings': 'Из настроек проекта',
   'From session': 'Из сессии',
   'Project settings': 'Настройки проекта',
-  'Checked in at .hopcode/settings.json': 'Зафиксировано в .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Зафиксировано в .hopcode/settings.json',
   'User settings': 'Пользовательские настройки',
-  'Saved in at ~/.hopcode/settings.json': 'Сохранено в ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Сохранено в ~/.hopcode/settings.json',
   'Add a new rule…': 'Добавить новое правило…',
   'Add {{type}} permission rule': 'Добавить {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1794,7 +1797,8 @@ export default {
   'Or simply run:': 'Или просто выполните:',
   '  qwen auth                - Interactive authentication setup\n':
     '  qwen auth                - Интерактивная настройка аутентификации\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Метод аутентификации: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Метод аутентификации: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Тип: Бесплатный уровень (прекращено 2026-04-15)',
   '  Limit: No longer available': '  Лимит: Больше не доступен',

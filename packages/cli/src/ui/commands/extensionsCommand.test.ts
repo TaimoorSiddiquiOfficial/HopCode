@@ -21,9 +21,8 @@ import { ExtensionManager, parseInstallSource } from '@hopcode/hopcode-core';
 
 const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
 
-vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     openBrowserSecurely: mockOpenBrowserSecurely,

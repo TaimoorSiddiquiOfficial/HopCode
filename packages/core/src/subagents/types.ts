@@ -72,7 +72,7 @@ export interface SubagentConfig {
   /**
    * Optional permission mode for this subagent.
    * Controls how tool calls are approved during execution.
-   * Valid values: 'default', 'plan', 'auto-edit', 'yolo', 'bubble'.
+   * Valid values: 'default', 'plan', 'auto-edit', 'izn', 'bubble'.
    * If omitted, the resolved mode depends on the parent's mode
    * (permissive parent modes win; otherwise defaults to 'auto-edit').
    *
@@ -121,7 +121,7 @@ export interface SubagentConfig {
 
   /**
    * When true, this agent always runs as a background task when spawned.
-   * OR'd with the `run_in_background` tool parameter — if either is true,
+   * OR'd with the `run_in_background` tool parameter ï¿½ if either is true,
    * the agent runs in the background.
    */
   background?: boolean;

@@ -20,7 +20,7 @@ import {
   useWorkspaceActions,
   type DaemonSessionNotice,
   type DaemonStreamingState,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hopcode/webui/daemon-react-sdk';
 import { isDaemonTurnError } from '@hopcode/sdk/daemon';
 import type {
   DaemonTranscriptBlock,

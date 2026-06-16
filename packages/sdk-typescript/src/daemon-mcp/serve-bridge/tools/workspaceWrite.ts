@@ -83,7 +83,7 @@ export function workspaceWriteTools(state: BridgeState): any[] {
       'Change the approval mode of a session (plan, default, auto-edit, auto, IZN).',
       {
         mode: z
-          .enum(['plan', 'default', 'auto-edit', 'auto', 'yolo'])
+          .enum(['plan', 'default', 'auto-edit', 'auto', 'izn'])
           .describe('Approval mode.'),
         persist: z
           .boolean()

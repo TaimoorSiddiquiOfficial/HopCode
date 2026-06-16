@@ -5,7 +5,7 @@
  * Run from the desktop package:  node apps/electron/scripts/generate-pet-spritesheets.mjs
  * Pass --contact to also emit a QA contact sheet next to the webp.
  *
- * Output: apps/electron/src/renderer/assets/pets/qwen-spritesheet.webp
+ * Output: apps/electron/src/renderer/assets/pets/hopcode-spritesheet.webp
  *
  * The head is drawn in a 1024-unit design space and scaled into each cell.
  * Atlas contract (shared with renderer/pets/pet-animation.ts):
@@ -124,13 +124,13 @@ async function main() {
   const outDir = join(__dirname, '..', 'src', 'renderer', 'assets', 'pets');
   mkdirSync(outDir, { recursive: true });
   const atlas = await buildAtlas();
-  const webpPath = join(outDir, 'qwen-spritesheet.webp');
+  const webpPath = join(outDir, 'hopcode-spritesheet.webp');
   await atlas.clone().webp({ lossless: true }).toFile(webpPath);
   if (wantContact) {
     const png = await atlas.clone().png().toBuffer();
     await sharp({ create: { width: AW, height: AH, channels: 4, background: { r: 235, g: 235, b: 238, alpha: 1 } } })
       .composite([{ input: png, left: 0, top: 0 }]).png().toFile(join(outDir, 'qwen-contact.png'));
   }
-  console.log(`wrote qwen-spritesheet.webp (${statSync(webpPath).size} bytes)`);
+  console.log(`wrote hopcode-spritesheet.webp (${statSync(webpPath).size} bytes)`);
 }
 main().catch((e) => { console.error(e); process.exit(1); });

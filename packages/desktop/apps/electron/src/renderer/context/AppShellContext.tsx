@@ -25,7 +25,7 @@ import type {
   LlmConnectionWithStatus,
   TestAutomationResult,
 } from '../../shared/types'
-import type { HopCodeCapabilitySnapshot } from '@/lib/qwen-capability-cache'
+import type { HopCodeCapabilitySnapshot } from '@/lib/hopcode-capability-cache'
 import type { SessionStatus as SessionStatusConfig } from '@/config/session-status-config'
 import type {
   SessionOptions,

@@ -13,7 +13,7 @@ import {
   Storage,
   atomicWriteFile,
   type MCPServerConfig,
-} from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 

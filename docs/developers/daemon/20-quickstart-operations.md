@@ -296,7 +296,7 @@ For the complete route and wire protocol reference, see [`../qwen-serve-protocol
 ## 12. Embedded invocation (bypass CLI)
 
 ```ts
-import { runQwenServe } from '@qwen-code/qwen-code/serve';
+import { runQwenServe } from '@hopcode/hopcode/serve';
 
 const handle = await runQwenServe({
   port: 0, // ephemeral
@@ -313,7 +313,7 @@ await handle.close(); // programmatic shutdown
 Or get the Express app directly and listen yourself:
 
 ```ts
-import { createServeApp } from '@qwen-code/qwen-code/serve';
+import { createServeApp } from '@hopcode/hopcode/serve';
 
 const app = createServeApp(
   {

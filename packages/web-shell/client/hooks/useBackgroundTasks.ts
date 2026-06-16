@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { DaemonSessionTaskStatus } from '@hopcode/sdk/daemon';
-import { useActions } from '@qwen-code/webui/daemon-react-sdk';
+import { useActions } from '@hopcode/webui/daemon-react-sdk';
 import { TASKS_STATUS_ACTIVE_EVENT } from '../components/messages/TasksStatusMessage';
 
 const TASKS_POLL_INTERVAL_MS = 3000;

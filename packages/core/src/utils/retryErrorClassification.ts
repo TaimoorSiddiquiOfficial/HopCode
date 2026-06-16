@@ -76,7 +76,7 @@ export function classifyRetryError(
   };
 
   if (
-    context.authType === AuthType.QWEN_OAUTH &&
+    context.authType === AuthType.HOPCODE_OAUTH &&
     isHopCodeQuotaExceededError(error)
   ) {
     return {

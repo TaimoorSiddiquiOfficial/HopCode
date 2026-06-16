@@ -1,5 +1,5 @@
 import type { ProviderDriver } from '../driver-types.ts';
-import { fetchQwenModelsViaSharedAcp } from '../../../qwen-agent.ts';
+import { fetchQwenModelsViaSharedAcp } from '../../../hopcode-agent.ts';
 
 export const hopcodeDriver: ProviderDriver = {
   provider: 'hopcode',

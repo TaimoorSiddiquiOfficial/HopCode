@@ -21,7 +21,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'YOLO mode': 'Mode YOLO',
+  'IZN mode': 'Mode IZN',
   'Auto mode': 'Mode auto',
   'plan mode': 'mode de planificació',
   'auto-accept edits': 'acceptació automàtica de canvis',
@@ -89,7 +89,7 @@ export default {
   // ============================================================================
   // Informació del sistema
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: "Entorn d'execució",
   OS: 'SO',
   Auth: 'Autenticació',
@@ -422,8 +422,7 @@ export default {
   // ============================================================================
   // Ordres - General (continuació)
   // ============================================================================
-  'View and edit HopCode settings':
-    'Veure i editar la configuració de HopCode',
+  'View and edit HopCode settings': 'Veure i editar la configuració de HopCode',
   Settings: 'Configuració',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
     'Per veure els canvis, cal reiniciar HopCode. Premeu r per sortir i aplicar els canvis ara.',
@@ -487,7 +486,7 @@ export default {
   Plan: 'Planificació',
   'Ask permissions': 'Demanar permisos',
   'Auto Edit': 'Edició automàtica',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'activar/desactivar el mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'comprovar les estadístiques de la sessió. Ús: /stats [model|tools]',
@@ -1838,7 +1837,8 @@ export default {
   'Or simply run:': 'O simplement executeu:',
   '  qwen auth                - Interactive authentication setup\n':
     "  qwen auth                - Configuració interactiva de l'autenticació\n",
-  '✓ Authentication Method: HopCode OAuth': "✓ Mètode d'autenticació: HopCode OAuth",
+  '✓ Authentication Method: HopCode OAuth':
+    "✓ Mètode d'autenticació: HopCode OAuth",
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipus: Nivell gratuït (descontinuat el 15-04-2026)',
   '  Limit: No longer available': '  Límit: Ja no disponible',

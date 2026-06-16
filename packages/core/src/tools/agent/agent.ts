@@ -2206,7 +2206,7 @@ class AgentToolInvocation extends BaseToolInvocation<AgentParams, ToolResult> {
 
         // Background agents have no inline UI, so a tool call that still needs
         // confirmation is by default auto-denied rather than auto-approved
-        // (YOLO). PermissionRequest hooks still run and can override. When the
+        // (IZN). PermissionRequest hooks still run and can override. When the
         // agent's definition uses `approvalMode: bubble` AND the session is
         // interactive, we instead let the normal approval path open (emitting
         // TOOL_WAITING_APPROVAL) and surface the prompt in the parent session's

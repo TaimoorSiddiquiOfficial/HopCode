@@ -17,7 +17,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'シェルモード',
-  'YOLO mode': 'YOLOモード',
+  'IZN mode': 'IZNモード',
   'Auto mode': 'Autoモード',
   'plan mode': 'プランモード',
   'auto-accept edits': '編集を自動承認',
@@ -327,7 +327,7 @@ export default {
   Plan: 'プラン',
   'Ask permissions': '許可を確認',
   'Auto Edit': '自動編集',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'Vim モードのオン/オフを切り替え',
   'exit the cli': 'CLIを終了',
   Timeout: 'タイムアウト',
@@ -482,8 +482,7 @@ export default {
   'When a slash command expands into a prompt':
     'スラッシュコマンドがプロンプトに展開された時',
   'When a new session is started': '新しいセッションが開始された時',
-  'Right before HopCode concludes its response':
-    'HopCode が応答を終了する直前',
+  'Right before HopCode concludes its response': 'HopCode が応答を終了する直前',
   'When a subagent (Agent tool call) is started':
     'サブエージェント（Agent ツール呼び出し）が開始された時',
   'Right before a subagent concludes its response':
@@ -938,7 +937,8 @@ export default {
     'OAuthトークンが期限切れです({{seconds}}秒以上)。認証方法を再度選択してください',
   'Press any key to return to authentication type selection.':
     '認証タイプ選択に戻るには任意のキーを押してください',
-  'Waiting for HopCode OAuth authentication...': 'HopCode OAuth認証を待っています...',
+  'Waiting for HopCode OAuth authentication...':
+    'HopCode OAuth認証を待っています...',
   'Authentication timed out. Please try again.':
     '認証がタイムアウトしました。再度お試しください',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
@@ -984,7 +984,8 @@ export default {
   'From project settings': 'プロジェクト設定から',
   'From session': 'セッションから',
   'Project settings': 'プロジェクト設定',
-  'Checked in at .hopcode/settings.json': '.hopcode/settings.json にチェックイン',
+  'Checked in at .hopcode/settings.json':
+    '.hopcode/settings.json にチェックイン',
   'User settings': 'ユーザー設定',
   'Saved in at ~/.hopcode/settings.json': '~/.hopcode/settings.json に保存',
   'Add a new rule…': '新しいルールを追加…',
@@ -1306,7 +1307,8 @@ export default {
   'API key for Coding Plan': 'Coding Plan の API Key',
   'Show current authentication status': '現在の認証ステータスを表示',
   'Authentication completed successfully.': '認証が正常に完了しました。',
-  'Starting HopCode OAuth authentication...': 'HopCode OAuth 認証を開始しています...',
+  'Starting HopCode OAuth authentication...':
+    'HopCode OAuth 認証を開始しています...',
   'Successfully authenticated with HopCode OAuth.':
     'HopCode OAuth での認証に成功しました。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
@@ -1536,7 +1538,7 @@ export default {
 
   // === Missing key backfill ===
   Status: 'ステータス',
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'ランタイム',
   OS: 'OS',
   Auth: '認証',

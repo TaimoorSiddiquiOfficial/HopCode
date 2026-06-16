@@ -166,7 +166,7 @@ import {
   providerSkillsFromQwenCapabilities,
   hopcodeCapabilitiesFromSkills,
   type HopCodeCapabilitySnapshot,
-} from '@/lib/qwen-capability-cache'
+} from '@/lib/hopcode-capability-cache'
 import {
   useNavigation,
   useNavigationState,

@@ -5,7 +5,7 @@
  * come from the main process (`loadCustomPets`) as base64 data URLs.
  */
 import type { CustomPetEntry } from '@craft-agent/shared/config';
-import hopcodeSpritesheet from '@/assets/pets/qwen-spritesheet.webp';
+import hopcodeSpritesheet from '@/assets/pets/hopcode-spritesheet.webp';
 
 export interface PetDescriptor {
   id: string;

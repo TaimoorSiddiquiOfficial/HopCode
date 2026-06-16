@@ -123,7 +123,7 @@ dmg:
     height: 380
 
 win:
-  icon: resources/brands/qwen-code/icon.ico
+  icon: resources/brands/hopcode/icon.ico
   # Windows releases are currently unsigned, so keep this update channel unsigned
   # from the first release. Re-enable only with a planned signed-channel migration.
   verifyUpdateCodeSignature: false

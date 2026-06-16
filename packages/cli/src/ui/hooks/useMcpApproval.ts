@@ -9,8 +9,8 @@ import type {
   Config,
   MCPServerConfig,
   McpServerScope,
-} from '@qwen-code/qwen-code-core';
-import { isGatedMcpScope } from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
+import { isGatedMcpScope } from '@hopcode/hopcode-core';
 import { loadMcpApprovals } from '../../config/mcpApprovals.js';
 import { McpApprovalChoice } from '../components/mcp/MCPServerApprovalDialog.js';
 

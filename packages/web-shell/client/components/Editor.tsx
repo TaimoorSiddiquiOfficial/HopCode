@@ -170,7 +170,7 @@ function getModeClass(mode: string, shellMode: boolean): string {
     case 'auto-edit':
       return styles.modeAutoEdit;
     case 'izn':
-      return styles.modeYolo;
+      return styles.modeIzn;
     default:
       return '';
   }
@@ -1867,7 +1867,7 @@ export const Editor = forwardRef<EditorHandle, EditorProps>(function Editor(
     shellMode
       ? styles.prefixShell
       : currentMode === 'izn'
-        ? styles.prefixYolo
+        ? styles.prefixIzn
         : currentMode === 'auto-edit'
           ? styles.prefixAutoEdit
           : '',

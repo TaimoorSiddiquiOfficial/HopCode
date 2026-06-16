@@ -7,7 +7,7 @@ import type {
   LlmAuthType,
   LlmProviderType,
 } from './types.ts';
-import { HopCodeAgent } from '../qwen-agent.ts';
+import { HopCodeAgent } from '../hopcode-agent.ts';
 import {
   getDefaultLlmConnection,
   getLlmConnection,

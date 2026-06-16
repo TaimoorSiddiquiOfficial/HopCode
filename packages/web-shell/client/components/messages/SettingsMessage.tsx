@@ -11,7 +11,7 @@ import type {
   DaemonSettingDescriptor,
   DaemonSettingUpdateResult,
   DaemonWorkspaceSettingsStatus,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hopcode/webui/daemon-react-sdk';
 import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import {
   WEB_SHELL_LANGUAGES,

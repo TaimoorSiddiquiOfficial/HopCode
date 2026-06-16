@@ -23,12 +23,12 @@ import {
   UnsupportedDeviceFlowProviderError,
   UpstreamDeviceFlowError,
 } from '../auth/deviceFlow.js';
-import type { HttpAcpBridge } from '@qwen-code/acp-bridge/bridgeTypes';
-import type { BridgeEvent } from '@qwen-code/acp-bridge/eventBus';
+import type { HttpAcpBridge } from '@hopcode/acp-bridge/bridgeTypes';
+import type { BridgeEvent } from '@hopcode/acp-bridge/eventBus';
 import {
   SessionShellClientRequiredError,
   SessionShellDisabledError,
-} from '@qwen-code/acp-bridge/bridgeErrors';
+} from '@hopcode/acp-bridge/bridgeErrors';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import { MAX_WORKSPACE_PATH_LENGTH } from '../fs/paths.js';
 import type { WorkspaceFileSystemFactory } from '../fs/index.js';

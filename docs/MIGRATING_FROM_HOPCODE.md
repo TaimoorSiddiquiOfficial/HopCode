@@ -17,11 +17,11 @@ HopCode is a fork of HopCode with expanded multi-provider support, new features,
 
 ## Command Changes
 
-| HopCode        | HopCode             | Notes                            |
+| HopCode          | HopCode             | Notes                            |
 | ---------------- | ------------------- | -------------------------------- |
 | `qwen`           | `hopcode`           | Main CLI entry point             |
 | `qwen --json`    | `hopcode --json`    | Headless JSON output             |
-| `hopcode serve`     | `hopcode serve`     | HTTP API server                  |
+| `hopcode serve`  | `hopcode serve`     | HTTP API server                  |
 | `qwen dashboard` | `hopcode dashboard` | Web dashboard                    |
 | `qwen profile`   | `hopcode profile`   | Profile management               |
 | —                | `hopcode grpc`      | **New** — gRPC headless server   |
@@ -29,8 +29,8 @@ HopCode is a fork of HopCode with expanded multi-provider support, new features,
 
 ## Configuration Directory
 
-| HopCode         | HopCode              |
-| ----------------- | -------------------- |
+| HopCode              | HopCode              |
+| -------------------- | -------------------- |
 | `~/.hopcode/`        | `~/.hopcode/`        |
 | `.hopcode/agents/`   | `.hopcode/agents/`   |
 | `.hopcode/skills/`   | `.hopcode/skills/`   |
@@ -48,17 +48,17 @@ rename %USERPROFILE%\.hopcode %USERPROFILE%\.hopcode
 
 ## Environment Variables
 
-| HopCode      | HopCode           | Status                          |
+| HopCode        | HopCode           | Status                          |
 | -------------- | ----------------- | ------------------------------- |
 | `QWEN_SIMPLE`  | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
 | `QWEN_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended              |
 
 ## Package Name Changes
 
-| Old                    | New                  |
-| ---------------------- | -------------------- |
+| Old                | New                |
+| ------------------ | ------------------ |
 | `@hopcode/hopcode` | `@hopcode/hopcode` |
-| `@hopcode/sdk`            | `@hopcode/sdk`     |
+| `@hopcode/sdk`     | `@hopcode/sdk`     |
 
 **Update imports:**
 

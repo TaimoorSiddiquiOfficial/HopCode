@@ -9,7 +9,7 @@ import {
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import type { AgentEvent, Message } from '@craft-agent/core/types';
-import { HopCodeAgent } from '../qwen-agent.ts';
+import { HopCodeAgent } from '../hopcode-agent.ts';
 
 type HopCodeAgentConfig = ConstructorParameters<typeof HopCodeAgent>[0];
 
@@ -364,7 +364,7 @@ describe('HopCodeAgent slash command history', () => {
           sessionUpdate: 'user_message_chunk',
           content: {
             type: 'text',
-            text: 'please inspect @packages/shared/src/agent/qwen-agent.ts:42',
+            text: 'please inspect @packages/shared/src/agent/hopcode-agent.ts:42',
           },
           _meta: { timestamp: 1234 },
         },

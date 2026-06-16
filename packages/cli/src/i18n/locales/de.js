@@ -23,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell-Modus',
-  'YOLO mode': 'YOLO-Modus',
+  'IZN mode': 'IZN-Modus',
   'Auto mode': 'Auto-Modus',
   'plan mode': 'Planungsmodus',
   'auto-accept edits': 'Änderungen automatisch akzeptieren',
@@ -71,7 +71,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Laufzeit',
   OS: 'Betriebssystem',
   Auth: 'Authentifizierung',
@@ -289,8 +289,7 @@ export default {
   'Step {{n}}: Choose Location': 'Schritt {{n}}: Speicherort wählen',
   'Step {{n}}: Choose Generation Method':
     'Schritt {{n}}: Generierungsmethode wählen',
-  'Generate with HopCode (Recommended)':
-    'Mit HopCode generieren (Empfohlen)',
+  'Generate with HopCode (Recommended)': 'Mit HopCode generieren (Empfohlen)',
   'Manual Creation': 'Manuelle Erstellung',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Beschreiben Sie, was dieser Unteragent tun soll und wann er verwendet werden soll. (Ausführliche Beschreibung für beste Ergebnisse)',
@@ -418,7 +417,7 @@ export default {
   Plan: 'Plan',
   'Ask permissions': 'Berechtigung anfragen',
   'Auto Edit': 'Automatisch bearbeiten',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'Vim-Modus ein-/ausschalten',
   'check session stats. Usage: /stats [model|tools]':
     'Sitzungsstatistiken prüfen. Verwendung: /stats [model|tools]',
@@ -1237,9 +1236,11 @@ export default {
   'From project settings': 'Aus Projekteinstellungen',
   'From session': 'Aus Sitzung',
   'Project settings': 'Projekteinstellungen',
-  'Checked in at .hopcode/settings.json': 'Eingecheckt in .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Eingecheckt in .hopcode/settings.json',
   'User settings': 'Benutzereinstellungen',
-  'Saved in at ~/.hopcode/settings.json': 'Gespeichert in ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Gespeichert in ~/.hopcode/settings.json',
   'Add a new rule…': 'Neue Regel hinzufügen…',
   'Add {{type}} permission rule': '{{type}} permission rule hinzufügen',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':

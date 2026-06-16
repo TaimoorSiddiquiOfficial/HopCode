@@ -27,7 +27,7 @@ import {
 } from '@/components/settings';
 import { routes } from '@/lib/navigate';
 import type { DetailsPageMeta } from '@/lib/navigation-registry';
-import { normalizehopcodeSettingsSnapshot } from '@/lib/qwen-settings-snapshot';
+import { normalizehopcodeSettingsSnapshot } from '@/lib/hopcode-settings-snapshot';
 import type {
   HopCodeCoreSettingKey,
   HopCodeCoreSettingsSnapshot,

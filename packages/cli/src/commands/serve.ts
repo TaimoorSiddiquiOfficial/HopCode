@@ -12,10 +12,7 @@ import type { Argv, CommandModule } from 'yargs';
 // handler below so it only loads when the user actually runs `hopcode serve`.
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 import { DEFAULT_RING_SIZE } from '../serve/eventBus.js';
-import {
-  ApprovalMode,
-  MCP_BUDGET_WARN_FRACTION,
-} from '@hopcode/hopcode-core';
+import { ApprovalMode, MCP_BUDGET_WARN_FRACTION } from '@hopcode/hopcode-core';
 import { loadSettings } from '../config/settings.js';
 import { HEADLESS_IZN_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarnings.js';
 
@@ -326,14 +323,14 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
     // sessions will load. Per-session override (the ACP client flipping
     // approval mode mid-session) is out of scope here; this warns about
     // a deployment that's wide-open at boot. Suppress with
-    // HOPCODE_CODE_SUPPRESS_YOLO_WARNING=1.
+    // HOPCODE_CODE_SUPPRESS_IZN_WARNING=1.
     try {
       const loaded = loadSettings(argv.workspace ?? process.cwd());
       const merged = loaded.merged;
       const approvalMode = merged.tools?.approvalMode;
       const sandbox = merged.tools?.sandbox;
       const sandboxEnv = process.env['SANDBOX'];
-      const suppress = process.env['HOPCODE_CODE_SUPPRESS_YOLO_WARNING'];
+      const suppress = process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'];
       const suppressed = suppress === '1' || suppress === 'true';
       if (
         approvalMode === ApprovalMode.IZN &&
@@ -367,7 +364,8 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       rateLimitPrompt =
         argv['rate-limit-prompt'] ?? envInt('HOPCODE_SERVE_RATE_LIMIT_PROMPT');
       rateLimitMutation =
-        argv['rate-limit-mutation'] ?? envInt('HOPCODE_SERVE_RATE_LIMIT_MUTATION');
+        argv['rate-limit-mutation'] ??
+        envInt('HOPCODE_SERVE_RATE_LIMIT_MUTATION');
       rateLimitRead =
         argv['rate-limit-read'] ?? envInt('HOPCODE_SERVE_RATE_LIMIT_READ');
       rateLimitWindowMs =

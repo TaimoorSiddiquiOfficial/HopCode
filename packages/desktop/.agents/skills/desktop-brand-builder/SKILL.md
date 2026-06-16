@@ -65,7 +65,7 @@ Use explicit user-provided override values as-is after basic validation.
 ## Build Workflow
 
 Use an isolated build directory under the current working directory so user
-changes in the current worktree are not mutated. Default to the qwen-code main
+changes in the current worktree are not mutated. Default to the hopcode main
 branch; do not clone from `craft-agents-oss`, OpenWork, or another local
 checkout unless the user explicitly asks for that source:
 
@@ -74,8 +74,8 @@ BUILD_ROOT="$PWD/brand-builds/<brandId>-<timestamp>"
 mkdir -p "$BUILD_ROOT"
 git clone --branch main --single-branch \
   https://github.com/TaimoorSiddiquiOfficial/HopCode.git \
-  "$BUILD_ROOT/qwen-code"
-cd "$BUILD_ROOT/qwen-code"
+  "$BUILD_ROOT/hopcode"
+cd "$BUILD_ROOT/hopcode"
 git checkout -B brand-<brandId> origin/main
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: qc-helper
-description: Answer any question about HopCode usage, features, configuration, and troubleshooting by referencing the official user documentation. Also helps users view or modify their settings.json. Invoke with `/qc-helper` followed by a question, e.g. `/qc-helper how do I configure MCP servers?` or `/qc-helper change approval mode to yolo`.
+  description: Answer any question about HopCode usage, features, configuration, and troubleshooting by referencing the official user documentation. Also helps users view or modify their settings.json. Invoke with `/qc-helper` followed by a question, e.g. `/qc-helper how do I configure MCP servers?` or `/qc-helper change approval mode to izn`.
 argument-hint: '<question>'
 allowedTools:
   - read_file
@@ -41,31 +41,31 @@ Use this index to locate the right document for the user's question. Load only t
 | Settings reference (all config keys)      | `docs/configuration/settings.md`        |
 | Authentication setup                      | `docs/configuration/auth.md`            |
 | Model providers (OpenAI-compatible, etc.) | `docs/configuration/model-providers.md` |
-| .hopcodeignore file                          | `docs/configuration/hopcode-ignore.md`     |
+| .hopcodeignore file                       | `docs/configuration/hopcode-ignore.md`  |
 | Themes                                    | `docs/configuration/themes.md`          |
 | Trusted folders                           | `docs/configuration/trusted-folders.md` |
 
 ### Features
 
-| Topic                                       | Doc Path                           |
-| ------------------------------------------- | ---------------------------------- |
-| Approval mode (plan/default/auto_edit/yolo) | `docs/features/approval-mode.md`   |
-| Auto mode (AI-driven approval)              | `docs/features/auto-mode.md`       |
-| Hooks (lifecycle hooks)                     | `docs/features/hooks.md`           |
-| MCP (Model Context Protocol)                | `docs/features/mcp.md`             |
-| Memory                                      | `docs/features/memory.md`          |
-| Skills system                               | `docs/features/skills.md`          |
-| Sub-agents                                  | `docs/features/sub-agents.md`      |
-| Sandbox / security                          | `docs/features/sandbox.md`         |
-| Slash commands                              | `docs/features/commands.md`        |
-| Headless / non-interactive mode             | `docs/features/headless.md`        |
-| LSP integration                             | `docs/features/lsp.md`             |
-| Token caching                               | `docs/features/token-caching.md`   |
-| Language / i18n                             | `docs/features/language.md`        |
-| Arena mode                                  | `docs/features/arena.md`           |
-| Status line                                 | `docs/features/status-line.md`     |
-| Scheduled tasks (cron/loop)                 | `docs/features/scheduled-tasks.md` |
-| Worktree                                    | `docs/features/worktree.md`        |
+| Topic                                      | Doc Path                           |
+| ------------------------------------------ | ---------------------------------- |
+| Approval mode (plan/default/auto_edit/izn) | `docs/features/approval-mode.md`   |
+| Auto mode (AI-driven approval)             | `docs/features/auto-mode.md`       |
+| Hooks (lifecycle hooks)                    | `docs/features/hooks.md`           |
+| MCP (Model Context Protocol)               | `docs/features/mcp.md`             |
+| Memory                                     | `docs/features/memory.md`          |
+| Skills system                              | `docs/features/skills.md`          |
+| Sub-agents                                 | `docs/features/sub-agents.md`      |
+| Sandbox / security                         | `docs/features/sandbox.md`         |
+| Slash commands                             | `docs/features/commands.md`        |
+| Headless / non-interactive mode            | `docs/features/headless.md`        |
+| LSP integration                            | `docs/features/lsp.md`             |
+| Token caching                              | `docs/features/token-caching.md`   |
+| Language / i18n                            | `docs/features/language.md`        |
+| Arena mode                                 | `docs/features/arena.md`           |
+| Status line                                | `docs/features/status-line.md`     |
+| Scheduled tasks (cron/loop)                | `docs/features/scheduled-tasks.md` |
+| Worktree                                   | `docs/features/worktree.md`        |
 
 ### IDE Integration
 
@@ -103,10 +103,10 @@ When the user asks about configuration, the primary reference is `docs/configura
 
 ### Config File Locations & Priority
 
-| Level   | Path                                                         | Description                            |
-| ------- | ------------------------------------------------------------ | -------------------------------------- |
-| User    | `~/.hopcode/settings.json`                                      | Personal global config                 |
-| Project | `<project>/.hopcode/settings.json`                              | Project-specific, overrides user level |
+| Level   | Path                                                        | Description                            |
+| ------- | ----------------------------------------------------------- | -------------------------------------- |
+| User    | `~/.hopcode/settings.json`                                  | Personal global config                 |
+| Project | `<project>/.hopcode/settings.json`                          | Project-specific, overrides user level |
 | System  | macOS: `/Library/Application Support/HopCode/settings.json` | Admin-level config                     |
 
 **Priority** (highest to lowest): CLI args > env vars > system settings > project settings > user settings > defaults

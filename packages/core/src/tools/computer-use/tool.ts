@@ -38,7 +38,7 @@ const INSTALL_REASON =
  * Tools / params that perform irreversible or sensitive actions and must NOT be
  * silently auto-approved in AUTO_EDIT mode. They surface a confirmation in
  * AUTO_EDIT; AUTO still routes them through its classifier (getDefaultPermission
- * stays 'ask'); YOLO still auto-approves everything.
+ * stays 'ask'); IZN still auto-approves everything.
  *   - kill_app          force-kills a PID
  *   - launch_app        launches arbitrary apps (incl. with CDP debug ports)
  *   - start_recording   captures the screen to disk
@@ -171,7 +171,7 @@ class ComputerUseInvocation extends BaseToolInvocation<
     // High-risk calls (review round 1) surface as 'mcp' type so AUTO_EDIT does
     // NOT silently auto-approve them — isAutoEditApproved() only auto-approves
     // 'edit'/'info'. AUTO still routes them through its classifier (this tool's
-    // getDefaultPermission stays 'ask'); YOLO still auto-approves everything.
+    // getDefaultPermission stays 'ask'); IZN still auto-approves everything.
     if (isHighRiskCall(this.upstreamName, this.params)) {
       // NOTE: args are deliberately NOT folded into `title` — no mcp
       // confirmation surface (TUI / non-interactive / ACP) renders the mcp
@@ -235,7 +235,7 @@ class ComputerUseInvocation extends BaseToolInvocation<
     // fall back to the env-var path in bootstrap's default promptInstallApproval.
     // Reaching execute() means the scheduler already approved THIS call — via
     // the confirmation dialog, a persisted always-allow rule, or an auto-approve
-    // mode (YOLO / AUTO_EDIT / AUTO). Treat any of those as install consent. The
+    // mode (IZN / AUTO_EDIT / AUTO). Treat any of those as install consent. The
     // subtle case is a saved always-allow rule: it SUPPRESSES the dialog, so
     // onConfirm never writes install-state, and in DEFAULT mode bootstrap would
     // then fall into the headless refuse path and dead-end ("install declined")

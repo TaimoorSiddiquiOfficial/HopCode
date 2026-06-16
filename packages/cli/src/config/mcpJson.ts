@@ -6,7 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { MCPServerConfig } from '@qwen-code/qwen-code-core';
+import type { MCPServerConfig } from '@hopcode/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 
 /** Project-scoped MCP config filename, read from the workspace root. */

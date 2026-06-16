@@ -228,7 +228,7 @@ describeLLM('hopcode serve — multi-client first-responder permission', () => {
 
     // Pin the session to `default` approval mode. The ACP child
     // inherits the host's user-level settings — a developer machine
-    // with `approvalMode: yolo` auto-approves the write below, no
+    // with `approvalMode: izn` auto-approves the write below, no
     // permission_request ever fires, and this test fails only
     // locally. CI passes because its HOME has no user settings.
     await client.setSessionApprovalMode(session.sessionId, 'default');

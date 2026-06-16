@@ -11,7 +11,7 @@
  *   3. Point the CLI at it:
  *        OPENAI_BASE_URL=http://localhost:8765/v1 \
  *        OPENAI_API_KEY=mock \
- *        <hopcode> "your prompt" --approval-mode yolo --output-format json
+ *        <hopcode> "your prompt" --approval-mode izn --output-format json
  *
  * Sanity check without the CLI:
  *   curl -s -X POST http://localhost:8765/v1/chat/completions \

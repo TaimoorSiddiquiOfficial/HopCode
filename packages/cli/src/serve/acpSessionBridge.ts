@@ -105,7 +105,7 @@ export {
   PermissionPolicyNotImplementedError,
   SessionShellClientRequiredError,
   SessionShellDisabledError,
-} from '@qwen-code/acp-bridge/bridgeErrors';
+} from '@hopcode/acp-bridge/bridgeErrors';
 
 export {
   MAX_WORKSPACE_PATH_LENGTH,

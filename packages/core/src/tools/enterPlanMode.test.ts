@@ -106,15 +106,15 @@ describe('EnterPlanModeTool', () => {
       expect(savedPrePlanMode).toBe(ApprovalMode.AUTO);
     });
 
-    it('should switch from YOLO to PLAN', async () => {
-      approvalMode = ApprovalMode.YOLO;
+    it('should switch from IZN to PLAN', async () => {
+      approvalMode = ApprovalMode.IZN;
       const invocation = tool.build({});
       await invocation.execute(new AbortController().signal);
 
       expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
         ApprovalMode.PLAN,
       );
-      expect(savedPrePlanMode).toBe(ApprovalMode.YOLO);
+      expect(savedPrePlanMode).toBe(ApprovalMode.IZN);
     });
 
     it('should be idempotent: already in PLAN does not call setApprovalMode', async () => {

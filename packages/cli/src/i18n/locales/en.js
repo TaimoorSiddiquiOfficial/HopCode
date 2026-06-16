@@ -23,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell mode',
-  'YOLO mode': 'YOLO mode',
+  'IZN mode': 'IZN mode',
   'Auto mode': 'Auto mode',
   'plan mode': 'plan mode',
   'auto-accept edits': 'auto-accept edits',
@@ -93,7 +93,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Runtime',
   OS: 'OS',
   Auth: 'Auth',
@@ -339,8 +339,7 @@ export default {
   'Step {{n}}: Choose Location': 'Step {{n}}: Choose Location',
   'Step {{n}}: Choose Generation Method':
     'Step {{n}}: Choose Generation Method',
-  'Generate with HopCode (Recommended)':
-    'Generate with HopCode (Recommended)',
+  'Generate with HopCode (Recommended)': 'Generate with HopCode (Recommended)',
   'Manual Creation': 'Manual Creation',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)',
@@ -514,7 +513,7 @@ export default {
   Plan: 'Plan',
   'Ask permissions': 'Ask permissions',
   'Auto Edit': 'Auto Edit',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'toggle vim mode on/off',
   'Show usage statistics dashboard.': 'Show usage statistics dashboard.',
   'Show model-specific usage statistics.':
@@ -1040,7 +1039,8 @@ export default {
   servers: 'servers',
   'Add MCP servers to your settings to get started.':
     'Add MCP servers to your settings to get started.',
-  'Run hopcode --debug to see error logs': 'Run hopcode --debug to see error logs',
+  'Run hopcode --debug to see error logs':
+    'Run hopcode --debug to see error logs',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth Authentication',
@@ -1264,7 +1264,8 @@ export default {
   'Please visit this URL to authorize:': 'Please visit this URL to authorize:',
   'Waiting for authorization': 'Waiting for authorization',
   'Time remaining:': 'Time remaining:',
-  'HopCode OAuth Authentication Timeout': 'HopCode OAuth Authentication Timeout',
+  'HopCode OAuth Authentication Timeout':
+    'HopCode OAuth Authentication Timeout',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.',
   'Press any key to return to authentication type selection.':
@@ -1336,9 +1337,11 @@ export default {
   'From project settings': 'From project settings',
   'From session': 'From session',
   'Project settings': 'Project settings',
-  'Checked in at .hopcode/settings.json': 'Checked in at .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Checked in at .hopcode/settings.json',
   'User settings': 'User settings',
-  'Saved in at ~/.hopcode/settings.json': 'Saved in at ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Saved in at ~/.hopcode/settings.json',
   'Add a new rule…': 'Add a new rule…',
   'Add {{type}} permission rule': 'Add {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1915,7 +1918,8 @@ export default {
   'Or simply run:': 'Or simply run:',
   '  qwen auth                - Interactive authentication setup\n':
     '  qwen auth                - Interactive authentication setup\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Authentication Method: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Authentication Method: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type: Free tier (discontinued 2026-04-15)',
   '  Limit: No longer available': '  Limit: No longer available',

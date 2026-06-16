@@ -3242,11 +3242,11 @@ describe('resolveSubagentApprovalMode', () => {
   });
 
   it('should let a permissive parent win over a "bubble" subagent mode', () => {
-    // Consistent with every other mode: a yolo/auto-edit parent wins, so a
+    // Consistent with every other mode: an izn/auto-edit parent wins, so a
     // bubble agent under such a parent runs permissively (and never bubbles,
     // since no confirmation is ever requested).
-    expect(resolveSubagentApprovalMode(ApprovalMode.YOLO, 'bubble', true)).toBe(
-      PermissionMode.Yolo,
+    expect(resolveSubagentApprovalMode(ApprovalMode.IZN, 'bubble', true)).toBe(
+      PermissionMode.Izn,
     );
     expect(
       resolveSubagentApprovalMode(ApprovalMode.AUTO_EDIT, 'bubble', true),

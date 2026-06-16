@@ -42,7 +42,7 @@ http_proxy= https_proxy= \
   --openai-base-url http://127.0.0.1:8765/v1 \
   --openai-api-key sk-mock \
   -m mock-model \
-  --approval-mode yolo --output-format json \
+  --approval-mode izn --output-format json \
   -p 'your prompt'
 ```
 

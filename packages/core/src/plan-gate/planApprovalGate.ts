@@ -11,7 +11,7 @@
  * produces a {@link GateDecision}.
  *
  * This module is called from `ExitPlanModeToolInvocation.execute()` when
- * the pre-plan mode is AUTO or YOLO.
+ * the pre-plan mode is AUTO or IZN.
  */
 
 import type { Config } from '../config/config.js';

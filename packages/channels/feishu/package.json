@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/channel-feishu",
+  "name": "@hopcode/channel-feishu",
   "version": "0.18.1",
   "description": "Feishu (Lark) channel adapter for Qwen Code",
   "type": "module",

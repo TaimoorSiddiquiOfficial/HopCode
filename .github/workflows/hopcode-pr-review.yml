@@ -479,7 +479,7 @@ jobs:
           # GNU timeout times out command children unless --foreground is used.
           timeout --kill-after=10s "${HOPCODE_TIMEOUT}m" qwen \
             --auth-type openai \
-            --approval-mode yolo \
+            --approval-mode izn \
             "${MODEL_ARGS[@]}" \
             --prompt "$PROMPT" \
             --output-format stream-json \

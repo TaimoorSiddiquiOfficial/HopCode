@@ -19,7 +19,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'YOLO mode': 'YOLO 模式',
+  'IZN mode': 'IZN 模式',
   'Auto mode': 'Auto 模式',
   'plan mode': '規劃模式',
   'auto-accept edits': '自動接受編輯',
@@ -82,7 +82,7 @@ export default {
   'show paths for current session files and logs': '顯示目前會話檔案和日誌路徑',
   'submit a bug report': '提交錯誤報告',
   Status: '狀態',
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: '運行環境',
   OS: '操作系統',
   Auth: '認證',
@@ -452,7 +452,7 @@ export default {
   Plan: '規劃',
   'Ask permissions': '請求授權',
   'Auto Edit': '自動編輯',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': '切換 vim 模式開關',
   'Show model-specific usage statistics.': '顯示模型相關的使用統計信息',
   'Show tool-specific usage statistics.': '顯示工具相關的使用統計信息',
@@ -1068,7 +1068,8 @@ export default {
     'OAuth token 已過期（超過 {{seconds}} 秒）。請重新選擇認證方法',
   'Press any key to return to authentication type selection.':
     '按任意鍵返回認證類型選擇',
-  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 認證...',
+  'Waiting for HopCode OAuth authentication...':
+    '正在等待 HopCode OAuth 認證...',
   'Authentication timed out. Please try again.': '認證超時。請重試。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待認證...（按 ESC 或 CTRL+C 取消）',
@@ -1474,7 +1475,8 @@ export default {
   'Show current authentication status': '顯示當前認證狀態',
   'Authentication completed successfully.': '認證完成。',
   'Starting HopCode OAuth authentication...': '正在啟動 HopCode OAuth 認證...',
-  'Successfully authenticated with HopCode OAuth.': '已成功通過 HopCode OAuth 認證。',
+  'Successfully authenticated with HopCode OAuth.':
+    '已成功通過 HopCode OAuth 認證。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
     'HopCode OAuth 認證失敗：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':

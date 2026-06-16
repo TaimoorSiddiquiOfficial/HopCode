@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { normalizeHopCodeMemorySettings } from '../qwen-settings.ts'
+import { normalizeHopCodeMemorySettings } from '../hopcode-settings.ts'
 
 describe('Qwen memory settings', () => {
   it('defaults missing memory settings', () => {

@@ -46,14 +46,6 @@ const SESSION_FILE_DIFF_AGGREGATE_CHAR_LIMIT = 100_000;
 const SESSION_FILE_DIFF_CHAR_LIMIT = 50_000;
 const SESSION_FILE_CONTENT_CHAR_LIMIT = 16_000;
 /**
- * Re-append the custom_title record to EOF once this many UTF-8 bytes of
- * non-title content have accumulated since the last title write. Keeps the
- * title within the 64 KB tail window that SessionPicker scans for session
- * metadata, even in long-running sessions with large tool outputs.
- */
-const TITLE_REANCHOR_THRESHOLD_BYTES = 32 * 1024;
-
-/**
  * Re-append a fresh `custom_title` record to EOF once this many bytes
  * of other JSONL content have been written since the last title
  * anchor. Half of the picker's 64KB tail-read window so that even an
@@ -506,8 +498,6 @@ export class ChatRecordingService {
   private writeChain: Promise<void> = Promise.resolve();
   /** In-memory cache of the current session's custom title (for re-append on exit) */
   private currentCustomTitle: string | undefined;
-  /** Bytes accumulated since the last custom_title write; drives re-anchor. */
-  private bytesSinceLastTitle = 0;
   /**
    * Source of {@link currentCustomTitle}. `undefined` on legacy records that
    * pre-date the `titleSource` field — that's treated as manual everywhere
@@ -1351,7 +1341,6 @@ export class ChatRecordingService {
         },
       };
       this.appendRecord(record);
-      this.bytesSinceLastTitle = 0;
     } catch (error) {
       debugLogger.error('Error finalizing session metadata:', error);
     }

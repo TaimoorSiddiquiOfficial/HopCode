@@ -14,7 +14,7 @@ import {
   createTransport,
   ExtensionManager,
   isGatedMcpScope,
-} from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { isWorkspaceTrusted } from '../../config/trustedFolders.js';
 import { assembleMcpServers } from '../../config/mcpServers.js';

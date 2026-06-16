@@ -135,7 +135,7 @@ Subagents are configured using Markdown files with YAML frontmatter. This format
 name: agent-name
 description: Brief description of when and how to use this agent
 model: inherit # Optional: inherit, fast, modelId, or authType:modelId
-approvalMode: auto-edit # Optional: default, plan, auto-edit, yolo, bubble
+approvalMode: auto-edit # Optional: default, plan, auto-edit, izn, bubble
 tools:         # Optional: allowlist of tools
   - tool1
   - tool2
@@ -201,7 +201,7 @@ Use the optional `approvalMode` frontmatter field to control how a subagent's to
 - `default`: Tools require interactive approval (same as the main session default)
 - `plan`: Analyze-only mode — the agent plans but does not execute changes
 - `auto-edit`: Tools are auto-approved without prompting (recommended for most agents)
-- `yolo`: All tools auto-approved, including potentially destructive ones
+- `izn`: All tools auto-approved, including potentially destructive ones
 - `bubble`: Background-agent tool approvals are surfaced in the parent session
 
 If you omit this field, the subagent's permission mode is determined automatically:

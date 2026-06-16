@@ -13,7 +13,7 @@ import {
   ExtensionManager,
 } from '@hopcode/hopcode-core';
 import { isWorkspaceTrusted } from '../../config/trustedFolders.js';
-import type { MCPServerConfig } from '@qwen-code/qwen-code-core';
+import type { MCPServerConfig } from '@hopcode/hopcode-core';
 import { getPendingGatedMcpServers } from '../../config/mcpApprovals.js';
 import { assembleMcpServers } from '../../config/mcpServers.js';
 

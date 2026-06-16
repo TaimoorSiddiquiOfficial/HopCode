@@ -373,9 +373,10 @@ describe('Server Config (config.ts)', () => {
     (fs.unlinkSync as Mock).mockImplementation(() => undefined);
     (fs.readFileSync as Mock).mockImplementation(() => undefined);
     vi.mocked(isTelemetrySdkInitialized).mockReturnValue(false);
-    vi.spyOn(HopCodeLogger.prototype, 'logStartSessionEvent').mockImplementation(
-      async () => undefined,
-    );
+    vi.spyOn(
+      HopCodeLogger.prototype,
+      'logStartSessionEvent',
+    ).mockImplementation(async () => undefined);
 
     // Setup default mock for resolveContentGeneratorConfigWithSources
     vi.mocked(resolveContentGeneratorConfigWithSources).mockImplementation(
@@ -2225,7 +2226,9 @@ describe('Server Config (config.ts)', () => {
       });
       await config.initialize();
 
-      expect(HopCodeLogger.prototype.logStartSessionEvent).toHaveBeenCalledOnce();
+      expect(
+        HopCodeLogger.prototype.logStartSessionEvent,
+      ).toHaveBeenCalledOnce();
     });
   });
 
@@ -3344,9 +3347,9 @@ describe('setApprovalMode with folder trust', () => {
     it('AUTO appears in APPROVAL_MODES between AUTO_EDIT and IZN', () => {
       const autoEditIdx = APPROVAL_MODES.indexOf(ApprovalMode.AUTO_EDIT);
       const autoIdx = APPROVAL_MODES.indexOf(ApprovalMode.AUTO);
-      const yoloIdx = APPROVAL_MODES.indexOf(ApprovalMode.IZN);
+      const iznIdx = APPROVAL_MODES.indexOf(ApprovalMode.IZN);
       expect(autoIdx).toBeGreaterThan(autoEditIdx);
-      expect(autoIdx).toBeLessThan(yoloIdx);
+      expect(autoIdx).toBeLessThan(iznIdx);
     });
 
     it('APPROVAL_MODE_INFO has an entry for AUTO', () => {

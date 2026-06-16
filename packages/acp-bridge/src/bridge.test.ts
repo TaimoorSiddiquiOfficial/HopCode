@@ -43,7 +43,7 @@ import type { ChannelFactory } from './channel.js';
 import type { BridgeTelemetry } from './bridgeOptions.js';
 import { createInMemoryChannel } from './inMemoryChannel.js';
 import type { BridgeEvent } from './eventBus.js';
-import { ApprovalMode, ShellExecutionService } from '@qwen-code/qwen-code-core';
+import { ApprovalMode, ShellExecutionService } from '@hopcode/hopcode-core';
 import {
   FakeAgent,
   type ChannelHandle,
@@ -6368,10 +6368,13 @@ describe('createAcpSessionBridge', () => {
       });
 
       // Unknown method — drop.
-      void capturedConn!.extNotification('hopcode/notify/session/unknown-event', {
-        sessionId: session.sessionId,
-        kind: 'budget_warning',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/unknown-event',
+        {
+          sessionId: session.sessionId,
+          kind: 'budget_warning',
+        },
+      );
       // Missing sessionId — drop.
       void capturedConn!.extNotification(
         'hopcode/notify/session/mcp-budget-event',
@@ -6748,11 +6751,14 @@ describe('createAcpSessionBridge', () => {
         signal: abort.signal,
       });
 
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-max',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-max',
+        },
+      );
 
       const collected: Array<{ type: string; data: unknown }> = [];
       for await (const e of iter) {
@@ -6823,11 +6829,14 @@ describe('createAcpSessionBridge', () => {
       await new Promise((r) => setTimeout(r, 10));
 
       // Concurrent in-session notification — must be SUPPRESSED.
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-turbo',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-turbo',
+        },
+      );
       await new Promise((r) => setTimeout(r, 10));
 
       // Release the hung roundtrip → the bridge publishes its authoritative one.
@@ -6879,15 +6888,21 @@ describe('createAcpSessionBridge', () => {
       })();
 
       // Non-string currentModelId / missing sessionId → early return, no throw.
-      await capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 123 as unknown as string,
-      });
-      await capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        currentModelId: 'hopcode-max',
-      });
+      await capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 123 as unknown as string,
+        },
+      );
+      await capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          currentModelId: 'hopcode-max',
+        },
+      );
       await new Promise((r) => setTimeout(r, 10));
       abort.abort();
       await collecting;
@@ -6924,11 +6939,14 @@ describe('createAcpSessionBridge', () => {
         for await (const e of iter) seen.push(e.type);
       })();
 
-      await capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: 'nonexistent-session',
-        currentModelId: 'hopcode-max',
-      });
+      await capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: 'nonexistent-session',
+          currentModelId: 'hopcode-max',
+        },
+      );
       await new Promise((r) => setTimeout(r, 10));
       abort.abort();
       await collecting;
@@ -6986,11 +7004,14 @@ describe('createAcpSessionBridge', () => {
         .catch(() => {});
       await new Promise((r) => setTimeout(r, 10));
 
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-max',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-max',
+        },
+      );
 
       const collected: Array<{ type: string; originatorClientId?: string }> =
         [];
@@ -8430,11 +8451,9 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         signal: abort.signal,
       });
 
-      await bridge.setSessionApprovalMode(
-        session.sessionId,
-        ApprovalMode.IZN,
-        { persist: false },
-      );
+      await bridge.setSessionApprovalMode(session.sessionId, ApprovalMode.IZN, {
+        persist: false,
+      });
 
       const it2 = iter[Symbol.asyncIterator]();
       const next = await it2.next();
@@ -8592,11 +8611,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
 
       // No events should have been produced (no approval_mode_changed).
       // Send a known good one to break the iterator.
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-max',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-max',
+        },
+      );
 
       const seen: string[] = [];
       for await (const e of iter) {
@@ -8644,11 +8666,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
 
       // A known good model-update breaks the iterator; the bogus mode must
       // not have produced an approval_mode_changed (or a legacy dual-emit).
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-max',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-max',
+        },
+      );
 
       const seen: string[] = [];
       for await (const e of iter) {
@@ -8753,11 +8778,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
 
       // A known good model-update breaks the iterator; assert exactly one
       // approval_mode_changed and NO legacy session_update from this path.
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-max',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-max',
+        },
+      );
 
       const seen: string[] = [];
       for await (const e of iter) {
@@ -8792,11 +8820,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       const session = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
 
       // Promote a model change to populate the cache.
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-turbo',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-turbo',
+        },
+      );
       await new Promise((r) => setTimeout(r, 20));
 
       // Subscribe with snapshot=true (triggers replay_complete + snapshot).
@@ -8898,11 +8929,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       const session = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
 
       // Promote a model change so there IS cache state.
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-turbo',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-turbo',
+        },
+      );
       await new Promise((r) => setTimeout(r, 20));
 
       // Subscribe WITHOUT snapshot.
@@ -8916,11 +8950,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       const collected: BridgeEvent[] = [];
       // Publish something after a short delay so the iterator eventually yields.
       setTimeout(() => {
-        void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-          v: 1,
-          sessionId: session.sessionId,
-          currentModelId: 'hopcode-max',
-        });
+        void capturedConn!.extNotification(
+          'hopcode/notify/session/model-update',
+          {
+            v: 1,
+            sessionId: session.sessionId,
+            currentModelId: 'hopcode-max',
+          },
+        );
       }, 30);
 
       for await (const e of iter) {
@@ -8963,11 +9000,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       const bridge = makeBridge({ channelFactory: factory });
       const session = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
 
-      void capturedConn!.extNotification('hopcode/notify/session/model-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        currentModelId: 'hopcode-turbo',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/model-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          currentModelId: 'hopcode-turbo',
+        },
+      );
       await new Promise((r) => setTimeout(r, 20));
 
       // Fresh subscribe — snapshot=true, NO lastEventId.
@@ -8999,7 +9039,9 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
               sessionId: `sess:${p.cwd}`,
               models: {
                 currentModelId: 'hopcode-plus',
-                availableModels: [{ modelId: 'hopcode-plus', name: 'hopcode Plus' }],
+                availableModels: [
+                  { modelId: 'hopcode-plus', name: 'hopcode Plus' },
+                ],
               },
               modes: {
                 currentModeId: 'auto-edit',
@@ -9374,7 +9416,11 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         }
       }
       // The two requested changes, then ONE corrective from the rerun.
-      expect(switches).toEqual(['hopcode-max', 'hopcode-plus', 'hopcode-turbo']);
+      expect(switches).toEqual([
+        'hopcode-max',
+        'hopcode-plus',
+        'hopcode-turbo',
+      ]);
       // Two reads total: the gated (discarded) one + the rerun.
       expect(statusReads).toBe(2);
       abort.abort();

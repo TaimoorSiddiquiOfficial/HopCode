@@ -21,7 +21,7 @@ export {
   getQwenWorkspacePreflightViaAcp,
   fetchQwenModelsViaSharedAcp,
   connectHopCodeProviderViaAcp,
-} from './qwen-agent.ts';
+} from './hopcode-agent.ts';
 export * from './errors.ts';
 
 // Export session-scoped-tools - tools scoped to a specific session

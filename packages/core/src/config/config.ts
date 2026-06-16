@@ -209,7 +209,6 @@ export enum ApprovalMode {
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
   IZN = 'izn',
-  YOLO = 'yolo',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -269,11 +268,6 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     id: ApprovalMode.IZN,
     name: 'IZN',
     description: 'Automatically approve all tools',
-  },
-  [ApprovalMode.YOLO]: {
-    id: ApprovalMode.YOLO,
-    name: 'YOLO',
-    description: 'Automatically approve all tools with minimal oversight',
   },
 };
 
@@ -1341,6 +1335,7 @@ export class Config {
   private messageBus?: MessageBus;
   private readonly memoryManager: MemoryManager;
   private readonly modelChangeListeners = new Set<(model: string) => void>();
+  private taskStore?: TaskStore;
 
   constructor(params: ConfigParameters) {
     this.sessionId = params.sessionId ?? randomUUID();
@@ -1357,7 +1352,8 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel = params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
+    this.embeddingModel =
+      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);

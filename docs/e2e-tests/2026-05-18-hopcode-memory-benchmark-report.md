@@ -35,7 +35,7 @@ unknown, and what diagnostics should be added next.
 | Date                                          | 2026-05-18                                 |
 | Platform                                      | macOS local development machine            |
 | HopCode version                               | `0.15.11`                                  |
-| HopCode binary                                | PATH-resolved `hopcode` binary                |
+| HopCode binary                                | PATH-resolved `hopcode` binary             |
 | Claude Code version used in the latest matrix | `2.1.129`                                  |
 | Claude Code binary used in the latest matrix  | PATH-resolved `claude` binary              |
 | Node.js version                               | v22.x (default system install)             |

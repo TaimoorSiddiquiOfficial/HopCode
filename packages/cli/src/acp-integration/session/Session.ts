@@ -95,11 +95,11 @@ import {
   setGoalTerminalObserver,
   sessionIdContext,
   dedupeToolCallsById,
-} from '@qwen-code/qwen-code-core';
-import { NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE } from '@qwen-code/acp-bridge/bridgeErrors';
+} from '@hopcode/hopcode-core';
+import { NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE } from '@hopcode/acp-bridge/bridgeErrors';
 // Single source of truth shared with the daemon-side answerer (BridgeClient),
 // so a rename can't desync caller and answerer into a silent -32601 latch.
-import { MID_TURN_QUEUE_DRAIN_METHOD } from '@qwen-code/acp-bridge/bridgeTypes';
+import { MID_TURN_QUEUE_DRAIN_METHOD } from '@hopcode/acp-bridge/bridgeTypes';
 import { getCommandSubcommandNames } from '../../services/commandMetadata.js';
 import { getEffectiveSupportedModes } from '../../services/commandUtils.js';
 
@@ -3494,7 +3494,7 @@ export class Session implements SessionContext {
           // Clean up event listeners
           subAgentCleanupFunctions.forEach((cleanup) => cleanup());
 
-          // enter_plan_mode and the AUTO/YOLO gate path of exit_plan_mode change the
+          // enter_plan_mode and the AUTO/IZN gate path of exit_plan_mode change the
           // approval mode inside execute() without going through the user-confirmation
           // branch above, so notify the client of the current mode explicitly.
           // Only send when the mode actually changed (a gate "blocked" result keeps

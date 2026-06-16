@@ -314,7 +314,7 @@ jobs:
                HEAD.
             2. **Reproduce first**: demonstrate the bug via E2E before
                touching code — headless mode (`node dist/cli.js --approval-mode
-               yolo --output-format json`) or interactive tmux mode per the
+               izn --output-format json`) or interactive tmux mode per the
                E2E skill. OPENAI_* credentials are available for the CLI
                under test. If you cannot reproduce the bug, STOP: write
                /tmp/autofix/failure.md explaining why and exit without

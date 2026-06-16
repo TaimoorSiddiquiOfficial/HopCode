@@ -16,11 +16,8 @@ import {
   Storage,
   createDebugLogger,
   stripRuntimeSnapshotPrefix,
-} from '@qwen-code/qwen-code-core';
-import type {
-  MCPServerConfig,
-  McpServerScope,
-} from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
+import type { MCPServerConfig, McpServerScope } from '@hopcode/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 import { DefaultLight } from '../ui/themes/default-light.js';
 import { DefaultDark } from '../ui/themes/default.js';
@@ -812,7 +809,8 @@ function findEnvFile(
 
   const globalHopcodeDir = Storage.getGlobalHopCodeDir();
   const legacyhopcodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
-  const hasCustomConfigDir = path.normalize(globalHopcodeDir) !== legacyhopcodeDir;
+  const hasCustomConfigDir =
+    path.normalize(globalHopcodeDir) !== legacyhopcodeDir;
 
   const canUseEnvFile = (filePath: string): boolean =>
     isTrusted !== false || userLevelPaths.has(path.normalize(filePath));

@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import type { MCPServerConfig } from '@qwen-code/qwen-code-core';
+import type { MCPServerConfig } from '@hopcode/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 import { SettingScope, type LoadedSettings } from './settings.js';
 

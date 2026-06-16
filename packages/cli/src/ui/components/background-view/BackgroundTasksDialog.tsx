@@ -32,7 +32,7 @@ import {
   type MonitorTask,
   type ToolCallConfirmationDetails,
   type WorkflowTask,
-} from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
 import { ToolConfirmationMessage } from '../messages/ToolConfirmationMessage.js';
 import { formatDuration, formatTokenCount } from '../../utils/formatters.js';
 import { escapeAnsiCtrlCodes } from '../../utils/textUtils.js';

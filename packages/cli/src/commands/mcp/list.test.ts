@@ -10,7 +10,7 @@ import { loadSettings } from '../../config/settings.js';
 import { isWorkspaceTrusted } from '../../config/trustedFolders.js';
 import { assembleMcpServers } from '../../config/mcpServers.js';
 import { loadMcpApprovals } from '../../config/mcpApprovals.js';
-import { createTransport, ExtensionManager } from '@qwen-code/qwen-code-core';
+import { createTransport, ExtensionManager } from '@hopcode/hopcode-core';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 
 const mockWriteStdoutLine = vi.hoisted(() => vi.fn());

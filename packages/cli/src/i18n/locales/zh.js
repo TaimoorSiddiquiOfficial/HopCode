@@ -21,7 +21,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'YOLO mode': 'YOLO 模式',
+  'IZN mode': 'IZN 模式',
   'Auto mode': 'Auto 模式',
   'plan mode': '规划模式',
   'auto-accept edits': '自动接受编辑',
@@ -89,7 +89,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: '运行环境',
   OS: '操作系统',
   Auth: '认证',
@@ -493,7 +493,7 @@ export default {
   Plan: '规划',
   'Ask permissions': '请求授权',
   'Auto Edit': '自动编辑',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': '切换 vim 模式开关',
   'Show usage statistics dashboard.': '显示使用统计面板。',
   'Show model-specific usage statistics.': '显示模型相关的使用统计信息',
@@ -1205,7 +1205,8 @@ export default {
     'OAuth token 已过期（超过 {{seconds}} 秒）。请重新选择认证方法',
   'Press any key to return to authentication type selection.':
     '按任意键返回认证类型选择',
-  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 认证...',
+  'Waiting for HopCode OAuth authentication...':
+    '正在等待 HopCode OAuth 认证...',
   'Authentication timed out. Please try again.': '认证超时。请重试。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待认证...（按 ESC 或 CTRL+C 取消）',
@@ -1681,7 +1682,8 @@ export default {
   'Show current authentication status': '显示当前认证状态',
   'Authentication completed successfully.': '认证完成。',
   'Starting HopCode OAuth authentication...': '正在启动 HopCode OAuth 认证...',
-  'Successfully authenticated with HopCode OAuth.': '已成功通过 HopCode OAuth 认证。',
+  'Successfully authenticated with HopCode OAuth.':
+    '已成功通过 HopCode OAuth 认证。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
     'HopCode OAuth 认证失败：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':

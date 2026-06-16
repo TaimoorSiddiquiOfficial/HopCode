@@ -106,7 +106,7 @@ class ExitPlanModeToolInvocation extends BaseToolInvocation<
   }
 
   /**
-   * For AUTO/YOLO pre-plan modes (without user takeover), the gate runs
+   * For AUTO/IZN pre-plan modes (without user takeover), the gate runs
    * inside execute() and no user confirmation prompt is needed. For
    * DEFAULT/AUTO_EDIT (or after user takeover), the existing confirmation
    * UI handles approval.
@@ -199,7 +199,7 @@ class ExitPlanModeToolInvocation extends BaseToolInvocation<
         return this.approveAndRestore(plan, prePlanMode, 'Gate user override');
       }
 
-      // ── Path B: AUTO/YOLO gate path (no takeover) ──────────────
+      // ── Path B: AUTO/IZN gate path (no takeover) ──────────────
       if (
         isAutonomousPrePlanMode(prePlanMode) &&
         gateState &&

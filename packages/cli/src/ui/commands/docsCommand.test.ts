@@ -12,9 +12,8 @@ import { MessageType } from '../types.js';
 
 const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
 
-vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@qwen-code/qwen-code-core')>();
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     openBrowserSecurely: mockOpenBrowserSecurely,

@@ -23,7 +23,7 @@ Before this change, the desktop app already had most of the runtime surface:
 Update source configuration belongs in `packages/shared/src/branding.ts` with the rest of desktop brand metadata. Each brand owns its release location:
 
 - `openwork` uses `modelstudioai/openwork`.
-- `qwen-code` uses a fixed `TaimoorSiddiquiOfficial/HopCode` `desktop-latest` release download URL so desktop updates do not depend on the repository-wide GitHub latest release.
+- `hopcode` uses a fixed `TaimoorSiddiquiOfficial/HopCode` `desktop-latest` release download URL so desktop updates do not depend on the repository-wide GitHub latest release.
 
 The brand config exposes an update source plus `releasePageUrl`. GitHub sources use `provider`, `owner`, and `repo`; generic sources use `provider` and `url`. `scripts/electron-builder-config.ts` reads it and emits the `publish` block in `apps/electron/electron-builder.generated.yml`. Runtime code reads the same brand update source to decide whether packaged builds can check for updates.
 

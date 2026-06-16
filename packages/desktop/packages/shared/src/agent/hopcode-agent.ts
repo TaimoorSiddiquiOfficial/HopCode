@@ -95,8 +95,8 @@ import type {
 import type {
   HopCodeMemoryPaths,
   HopCodeMemorySettings,
-} from '../config/qwen-settings.ts';
-import { normalizeHopCodeMemorySettings } from '../config/qwen-settings.ts';
+} from '../config/hopcode-settings.ts';
+import { normalizeHopCodeMemorySettings } from '../config/hopcode-settings.ts';
 
 type JsonRecord = Record<string, unknown>;
 

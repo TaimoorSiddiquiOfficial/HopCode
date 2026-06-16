@@ -141,7 +141,7 @@ describe('classifyRetryError', () => {
           code: 'insufficient_quota',
           message: 'Free allocated quota exceeded',
         },
-        { authType: AuthType.QWEN_OAUTH },
+        { authType: AuthType.HOPCODE_OAUTH },
       ),
     ).toMatchObject({
       kind: 'provider-business',

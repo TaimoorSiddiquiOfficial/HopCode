@@ -355,7 +355,7 @@ describe('ExitPlanModeTool', () => {
     });
   });
 
-  describe('YOLO mode', () => {
+  describe('IZN mode', () => {
     const finding: MergedGateFinding = {
       id: 'GF-1',
       severity: 'P2',
@@ -364,12 +364,12 @@ describe('ExitPlanModeTool', () => {
       suggestedFix: 'Add rollback steps before exiting plan mode.',
     };
 
-    it('should restore YOLO via user_override gate path', async () => {
-      // With the gate, YOLO exit goes through the autonomous path.
+    it('should restore IZN via user_override gate path', async () => {
+      // With the gate, IZN exit goes through the autonomous path.
       // user_override skips the gate and restores prePlanMode.
       approvalMode = ApprovalMode.PLAN;
       (mockConfig.getPrePlanMode as ReturnType<typeof vi.fn>).mockReturnValue(
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
       );
       (mockConfig.getPlanGateState as ReturnType<typeof vi.fn>).mockReturnValue(
         {
@@ -382,7 +382,7 @@ describe('ExitPlanModeTool', () => {
         },
       );
 
-      const params: ExitPlanModeParams = { plan: 'YOLO test plan' };
+      const params: ExitPlanModeParams = { plan: 'IZN test plan' };
       const signal = new AbortController().signal;
 
       const invocation = tool.build(params);
@@ -390,16 +390,14 @@ describe('ExitPlanModeTool', () => {
 
       expect(result.llmContent).toContain('You can now start coding');
       expect(result.llmContent).not.toContain('not approved');
-      // Should restore YOLO, not downgrade
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.YOLO,
-      );
+      // Should restore IZN, not downgrade
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.IZN);
     });
 
-    it('should return allow from getDefaultPermission when prePlanMode is YOLO', async () => {
+    it('should return allow from getDefaultPermission when prePlanMode is IZN', async () => {
       approvalMode = ApprovalMode.PLAN;
       (mockConfig.getPrePlanMode as ReturnType<typeof vi.fn>).mockReturnValue(
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
       );
       (mockConfig.getPlanGateState as ReturnType<typeof vi.fn>).mockReturnValue(
         {
@@ -412,22 +410,22 @@ describe('ExitPlanModeTool', () => {
         },
       );
 
-      const params: ExitPlanModeParams = { plan: 'YOLO test plan' };
+      const params: ExitPlanModeParams = { plan: 'IZN test plan' };
       const invocation = tool.build(params);
       const permission = await invocation.getDefaultPermission();
       expect(permission).toBe('allow');
     });
 
-    it('should fall back to ask when no gateState even with YOLO prePlanMode', async () => {
+    it('should fall back to ask when no gateState even with IZN prePlanMode', async () => {
       approvalMode = ApprovalMode.PLAN;
       (mockConfig.getPrePlanMode as ReturnType<typeof vi.fn>).mockReturnValue(
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
       );
       (mockConfig.getPlanGateState as ReturnType<typeof vi.fn>).mockReturnValue(
         undefined,
       );
 
-      const params: ExitPlanModeParams = { plan: 'YOLO no gate' };
+      const params: ExitPlanModeParams = { plan: 'IZN no gate' };
       const invocation = tool.build(params);
       const permission = await invocation.getDefaultPermission();
       expect(permission).toBe('ask');
@@ -490,7 +488,7 @@ describe('ExitPlanModeTool', () => {
           needsUserPending: false,
         };
         (mockConfig.getPrePlanMode as ReturnType<typeof vi.fn>).mockReturnValue(
-          ApprovalMode.YOLO,
+          ApprovalMode.IZN,
         );
         (
           mockConfig.getPlanGateState as ReturnType<typeof vi.fn>

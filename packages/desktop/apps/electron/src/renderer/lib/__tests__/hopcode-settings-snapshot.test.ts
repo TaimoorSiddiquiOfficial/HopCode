@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import type { HopCodeCoreSettingsSnapshot } from '@craft-agent/shared/protocol'
-import { normalizehopcodeSettingsSnapshot } from '../qwen-settings-snapshot'
+import { normalizehopcodeSettingsSnapshot } from '../hopcode-settings-snapshot'
 
 describe('normalizehopcodeSettingsSnapshot', () => {
   it('adds empty extension settings for older core settings snapshots', () => {

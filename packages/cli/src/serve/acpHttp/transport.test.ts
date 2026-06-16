@@ -9,15 +9,15 @@ import express from 'express';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import WebSocket from 'ws';
-import type { HttpAcpBridge } from '@qwen-code/acp-bridge/bridgeTypes';
-import type { BridgeEvent } from '@qwen-code/acp-bridge/eventBus';
+import type { HttpAcpBridge } from '@hopcode/acp-bridge/bridgeTypes';
+import type { BridgeEvent } from '@hopcode/acp-bridge/eventBus';
 import {
   InvalidClientIdError,
   PromptQueueFullError,
   SessionShellClientRequiredError,
   SessionShellDisabledError,
-} from '@qwen-code/acp-bridge/bridgeErrors';
-import { SessionService } from '@qwen-code/qwen-code-core';
+} from '@hopcode/acp-bridge/bridgeErrors';
+import { SessionService } from '@hopcode/hopcode-core';
 import type { DaemonWorkspaceService } from '../workspace-service/types.js';
 import { mountAcpHttp } from './index.js';
 

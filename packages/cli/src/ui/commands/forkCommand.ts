@@ -8,8 +8,8 @@ import {
   createDebugLogger,
   ToolNames,
   FORK_SUBAGENT_TYPE,
-} from '@qwen-code/qwen-code-core';
-import type { AgentParams } from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
+import type { AgentParams } from '@hopcode/hopcode-core';
 import type {
   CommandContext,
   SlashCommand,

@@ -2,7 +2,7 @@
 
 ## Overview
 
-`packages/cli/src/serve/` is the boot layer for `qwen serve`. It translates CLI flags into `ServeOptions`, validates startup configuration, builds the Express app, wires middleware, registers routes, exposes daemon-host preflight/status providers, maintains the permission audit ring, and owns the two-phase graceful shutdown sequence. HTTP-facing work lives in this layer; ACP-facing work lives one layer below in `@qwen-code/acp-bridge` (see [`03-acp-bridge.md`](./03-acp-bridge.md)).
+`packages/cli/src/serve/` is the boot layer for `qwen serve`. It translates CLI flags into `ServeOptions`, validates startup configuration, builds the Express app, wires middleware, registers routes, exposes daemon-host preflight/status providers, maintains the permission audit ring, and owns the two-phase graceful shutdown sequence. HTTP-facing work lives in this layer; ACP-facing work lives one layer below in `@hopcode/acp-bridge` (see [`03-acp-bridge.md`](./03-acp-bridge.md)).
 
 ## Responsibilities
 
@@ -53,9 +53,9 @@
 
 **Re-export shims** for compatibility with pre-F1 import paths:
 
-- `serve/eventBus.ts` -> `@qwen-code/acp-bridge/eventBus`
-- `serve/status.ts` -> `@qwen-code/acp-bridge/status`
-- `serve/httpAcpBridge.ts` -> `@qwen-code/acp-bridge`
+- `serve/eventBus.ts` -> `@hopcode/acp-bridge/eventBus`
+- `serve/status.ts` -> `@hopcode/acp-bridge/status`
+- `serve/httpAcpBridge.ts` -> `@hopcode/acp-bridge`
 
 ## Flow
 
@@ -106,7 +106,7 @@ Calling `createServeApp` directly returns only an `Application`; the embedder ow
 
 | Upstream used by `serve/`                                                                       | Downstream using `serve/`                 |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| `@qwen-code/acp-bridge`: bridge, event bus, status types                                        | The `qwen` CLI `serve` subcommand handler |
+| `@hopcode/acp-bridge`: bridge, event bus, status types                                          | The `qwen` CLI `serve` subcommand handler |
 | `packages/core`: `loadSettings`, `getCurrentGeminiMdFilename`, `Config`, `WorkspaceContext`     | Direct embedders, tests                   |
 | ACP SDK (`@agentclientprotocol/sdk`): `PROTOCOL_VERSION`, `ClientSideConnection` through bridge |                                           |
 | Express + body-parser, `node:crypto`, `node:fs`, `node:path`                                    |                                           |

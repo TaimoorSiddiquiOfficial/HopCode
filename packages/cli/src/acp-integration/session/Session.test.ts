@@ -14,7 +14,7 @@ import {
   Session,
 } from './Session.js';
 import type { Content, FunctionCall, Part } from '@google/genai';
-import type { ChatRecord, Config, GeminiChat } from '@qwen-code/qwen-code-core';
+import type { ChatRecord, Config, GeminiChat } from '@hopcode/hopcode-core';
 import {
   ApprovalMode,
   AuthType,
@@ -35,8 +35,7 @@ import { CommandKind } from '../../ui/commands/types.js';
 const debugLoggerWarnSpy = vi.hoisted(() => vi.fn());
 
 vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     createDebugLogger: () => ({
@@ -5103,22 +5102,20 @@ describe('Session', () => {
         isOutputMarkdown: true,
       });
 
-      const parts = await (session as unknown as ToolCallInternals).runToolCalls(
-        new AbortController().signal,
-        'prompt-dup',
-        [
-          {
-            id: 'dup_id_0001',
-            name: 'read_file',
-            args: { file_path: 'a.ts' },
-          },
-          {
-            id: 'dup_id_0001',
-            name: 'read_file',
-            args: { file_path: 'b.ts' },
-          },
-        ],
-      );
+      const parts = await (
+        session as unknown as ToolCallInternals
+      ).runToolCalls(new AbortController().signal, 'prompt-dup', [
+        {
+          id: 'dup_id_0001',
+          name: 'read_file',
+          args: { file_path: 'a.ts' },
+        },
+        {
+          id: 'dup_id_0001',
+          name: 'read_file',
+          args: { file_path: 'b.ts' },
+        },
+      ]);
 
       expect(execute).toHaveBeenCalledOnce();
       expect(parts.map((part) => part.functionResponse?.id)).toEqual([
@@ -5148,22 +5145,20 @@ describe('Session', () => {
         isOutputMarkdown: true,
       });
 
-      const parts = await (session as unknown as ToolCallInternals).runToolCalls(
-        new AbortController().signal,
-        'prompt-empty',
-        [
-          {
-            id: '',
-            name: 'read_file',
-            args: { file_path: 'a.ts' },
-          },
-          {
-            id: '',
-            name: 'read_file',
-            args: { file_path: 'b.ts' },
-          },
-        ],
-      );
+      const parts = await (
+        session as unknown as ToolCallInternals
+      ).runToolCalls(new AbortController().signal, 'prompt-empty', [
+        {
+          id: '',
+          name: 'read_file',
+          args: { file_path: 'a.ts' },
+        },
+        {
+          id: '',
+          name: 'read_file',
+          args: { file_path: 'b.ts' },
+        },
+      ]);
 
       expect(execute).toHaveBeenCalledTimes(2);
       expect(parts).toHaveLength(2);

@@ -6,10 +6,7 @@
 
 import type { GenerateContentResponse } from '@google/genai';
 import { AuthType } from '../core/contentGenerator.js';
-import {
-  isHopCodeQuotaExceededError,
-  isQwenQuotaExceededError,
-} from './quotaErrorDetection.js';
+import { isHopCodeQuotaExceededError } from './quotaErrorDetection.js';
 import { createDebugLogger } from './debugLogger.js';
 import { getErrorStatus } from './errors.js';
 import { isRateLimitError } from './rateLimit.js';
@@ -342,7 +339,10 @@ export async function retryWithBackoff<T>(
       }
 
       // Check for HopCode OAuth quota exceeded error - throw immediately without retry
-      if (authType === AuthType.QWEN_OAUTH && isQwenQuotaExceededError(error)) {
+      if (
+        authType === AuthType.HOPCODE_OAUTH &&
+        isHopCodeQuotaExceededError(error)
+      ) {
         debugLogger.error(
           'Qwen OAuth quota exceeded, fast-failing',
           retryDiagnostics,

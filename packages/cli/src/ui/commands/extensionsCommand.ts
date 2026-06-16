@@ -18,7 +18,7 @@ import {
   parseInstallSource,
   createDebugLogger,
   redactUrlCredentials,
-} from '@qwen-code/qwen-code-core';
+} from '@hopcode/hopcode-core';
 
 const debugLogger = createDebugLogger('EXTENSIONS_COMMAND');
 const EXTENSION_EXPLORE_URL = {

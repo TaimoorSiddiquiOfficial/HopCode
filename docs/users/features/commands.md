@@ -6,7 +6,7 @@ HopCode commands are triggered through specific prefixes and fall into three cat
 
 | Prefix Type                | Function Description                                | Typical Use Case                                                 |
 | -------------------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
-| Slash Commands (`/`)       | Meta-level control of HopCode itself              | Managing sessions, modifying settings, getting help              |
+| Slash Commands (`/`)       | Meta-level control of HopCode itself                | Managing sessions, modifying settings, getting help              |
 | At Commands (`@`)          | Quickly inject local file content into conversation | Allowing AI to analyze specified files or code under directories |
 | Exclamation Commands (`!`) | Direct interaction with system Shell                | Executing system commands like `git status`, `ls`, etc.          |
 
@@ -44,7 +44,7 @@ Commands for adjusting interface appearance and work environment.
 | `/context`           | Show context window usage breakdown                                                                                                                                               | `/context`                              |
 | → `detail`           | Show per-item context usage breakdown                                                                                                                                             | `/context detail`                       |
 | `/diff`              | Open an interactive diff viewer showing uncommitted changes and per-turn diffs. Use ←/→ to switch between current git diff and individual conversation turns, ↑/↓ to browse files | `/diff`                                 |
-| `/theme`             | Change HopCode visual theme                                                                                                                                                     | `/theme`                                |
+| `/theme`             | Change HopCode visual theme                                                                                                                                                       | `/theme`                                |
 | `/vim`               | Turn input area Vim editing mode on/off                                                                                                                                           | `/vim`                                  |
 | `/directory`         | Manage multi-directory support workspace                                                                                                                                          | `/dir add ./src,./tests`                |
 | `/editor`            | Open dialog to select supported editor                                                                                                                                            | `/editor`                               |
@@ -80,7 +80,7 @@ Commands for managing AI tools and models.
 | →`default`       | Require approval for edits                    | Daily use                                     |
 | →`auto-edit`     | Automatically approve edits                   | Trusted environment                           |
 | →`auto`          | Classifier-evaluated approval                 | Autonomous sessions with safety guardrails    |
-| →`yolo`          | Automatically approve all                     | Quick prototyping                             |
+| →`izn`           | Automatically approve all                     | Quick prototyping                             |
 | `/model`         | Switch model used in current session          | `/model`                                      |
 | `/model --fast`  | Set a lighter model for prompt suggestions    | `/model --fast qwen3-coder-flash`             |
 | `/extensions`    | List all active extensions in current session | `/extensions`                                 |
@@ -106,7 +106,7 @@ These commands invoke bundled skills that provide specialized workflows.
 | `/review`    | Review code changes with 5 parallel agents + deterministic analysis | `/review`, `/review 123`, `/review 123 --comment` |
 | `/loop`      | Run a prompt on a recurring schedule                                | `/loop 5m check the build`                        |
 | `/simplify`  | Review recent changes and apply safe cleanup edits directly         | `/simplify`, `/simplify focus on duplication`     |
-| `/qc-helper` | Answer questions about HopCode usage and configuration            | `/qc-helper how do I configure MCP?`              |
+| `/qc-helper` | Answer questions about HopCode usage and configuration              | `/qc-helper how do I configure MCP?`              |
 
 See [Code Review](./code-review.md) for full `/review` documentation.
 
@@ -302,7 +302,7 @@ Commands for obtaining information and performing system settings.
 | `/setup-github` | Set up GitHub Actions                                                                                                                                                                                                                                                                           | `/setup-github`                  |
 | `/bug`          | Submit issue about Qwen Code                                                                                                                                                                                                                                                                    | `/bug Button click unresponsive` |
 | `/copy`         | Copy AI output to clipboard (`/copy N` = Nth-last AI message)                                                                                                                                                                                                                                   | `/copy` or `/copy 2`             |
-| `/quit`         | Exit HopCode immediately                                                                                                                                                                                                                                                                      | `/quit` or `/exit`               |
+| `/quit`         | Exit HopCode immediately                                                                                                                                                                                                                                                                        | `/quit` or `/exit`               |
 
 ### 1.10 Common Shortcuts
 
@@ -360,9 +360,9 @@ Save frequently used prompts as shortcut commands to improve work efficiency and
 
 ### Quick Overview
 
-| Function         | Description                                | Advantages                             | Priority | Applicable Scenarios                                 |
-| ---------------- | ------------------------------------------ | -------------------------------------- | -------- | ---------------------------------------------------- |
-| Namespace        | Subdirectory creates colon-named commands  | Better command organization            |          |                                                      |
+| Function         | Description                                   | Advantages                             | Priority | Applicable Scenarios                                 |
+| ---------------- | --------------------------------------------- | -------------------------------------- | -------- | ---------------------------------------------------- |
+| Namespace        | Subdirectory creates colon-named commands     | Better command organization            |          |                                                      |
 | Global Commands  | `~/.hopcode/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
 | Project Commands | `<project root directory>/.hopcode/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
 
@@ -372,8 +372,8 @@ Priority Rules: Project commands > User commands (project command used when name
 
 #### File Path to Command Name Mapping Table
 
-| File Location                            | Generated Command | Example Call          |
-| ---------------------------------------- | ----------------- | --------------------- |
+| File Location                               | Generated Command | Example Call          |
+| ------------------------------------------- | ----------------- | --------------------- |
 | `~/.hopcode/commands/test.md`               | `/test`           | `/test Parameter`     |
 | `<project>/.hopcode/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
 
@@ -487,12 +487,12 @@ Review {{args}}, reference standards:
 
 #### "Pure Function Refactoring" Command Creation Steps Table
 
-| Operation                     | Command/Code                              |
-| ----------------------------- | ----------------------------------------- |
+| Operation                     | Command/Code                                 |
+| ----------------------------- | -------------------------------------------- |
 | 1. Create directory structure | `mkdir -p ~/.hopcode/commands/refactor`      |
 | 2. Create command file        | `touch ~/.hopcode/commands/refactor/pure.md` |
-| 3. Edit command content       | Refer to the complete code below.         |
-| 4. Test command               | `@file.js` → `/refactor:pure`             |
+| 3. Edit command content       | Refer to the complete code below.            |
+| 4. Test command               | `@file.js` → `/refactor:pure`                |
 
 ```markdown
 ---

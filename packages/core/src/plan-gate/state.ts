@@ -54,7 +54,7 @@ export function createPlanGateState(entryId: number): PlanGateState {
   };
 }
 
-/** AUTO and YOLO are the autonomous modes that route exit through the gate. */
+/** AUTO and IZN are the autonomous modes that route exit through the gate. */
 export function isAutonomousPrePlanMode(mode: ApprovalMode): boolean {
-  return mode === ApprovalMode.AUTO || mode === ApprovalMode.YOLO;
+  return mode === ApprovalMode.AUTO || mode === ApprovalMode.IZN;
 }

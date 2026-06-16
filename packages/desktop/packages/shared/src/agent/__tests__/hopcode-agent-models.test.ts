@@ -11,7 +11,7 @@ import {
   extractQwenParentToolUseId,
   formatQwenAcpErrorMessage,
   resolveQwenParentToolUseId,
-} from '../qwen-agent.ts';
+} from '../hopcode-agent.ts';
 
 type HopCodeModelInternals = {
   recordSessionModels: (result: Record<string, unknown>) => void;
