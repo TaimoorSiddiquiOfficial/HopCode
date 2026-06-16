@@ -27,7 +27,7 @@ describe('mcpApprovals (hash-bound approval store)', () => {
 
   beforeEach(() => {
     dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-approvals-'));
-    process.env['QWEN_CODE_MCP_APPROVALS_PATH'] = path.join(
+    process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'] = path.join(
       dir,
       MCP_APPROVALS_FILENAME,
     );
@@ -35,7 +35,7 @@ describe('mcpApprovals (hash-bound approval store)', () => {
   });
 
   afterEach(() => {
-    delete process.env['QWEN_CODE_MCP_APPROVALS_PATH'];
+    delete process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
     resetMcpApprovalsForTesting();
     fs.rmSync(dir, { recursive: true, force: true });
   });

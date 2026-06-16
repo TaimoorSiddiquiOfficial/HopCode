@@ -1425,7 +1425,7 @@ export function createServeApp(
       );
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /daemon/status failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: /daemon/status failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to build daemon status',
@@ -2294,7 +2294,7 @@ export function createServeApp(
       });
       return;
     }
-    addDaemonRequestAttribute('qwen-code.prompt_id', promptId);
+    addDaemonRequestAttribute('hopcode.prompt_id', promptId);
 
     const abort = new AbortController();
     const effectiveDeadlineMs = resolvePromptDeadlineMs(

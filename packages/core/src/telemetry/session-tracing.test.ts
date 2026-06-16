@@ -1011,7 +1011,7 @@ describe('session-tracing', () => {
       endToolSpan(toolSpan, { success: true });
 
       const blocked = mockSpans.find(
-        (s) => s.name === 'qwen-code.tool.blocked_on_user',
+        (s) => s.name === 'hopcode.tool.blocked_on_user',
       );
       expect(blocked?.attributes['session.id']).toBe('session-A');
     });
@@ -1036,7 +1036,7 @@ describe('session-tracing', () => {
       endHookSpan(hookSpan, { success: true, shouldProceed: true });
       endToolSpan(toolSpan, { success: true });
 
-      const hook = mockSpans.find((s) => s.name === 'qwen-code.hook');
+      const hook = mockSpans.find((s) => s.name === 'hopcode.hook');
       expect(hook?.attributes['session.id']).toBe('session-A');
     });
 

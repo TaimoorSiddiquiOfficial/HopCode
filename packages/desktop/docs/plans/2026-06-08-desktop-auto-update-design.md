@@ -29,7 +29,7 @@ The brand config exposes an update source plus `releasePageUrl`. GitHub sources 
 
 ## Release Flow
 
-The existing desktop release workflow remains responsible for uploading assets to GitHub Releases. `electron-builder` should generate updater metadata, but the workflow continues to publish assets itself. Qwen Code publishes versioned `desktop-v*` releases for history and also clobbers the fixed `desktop-latest` release used by the generic update feed.
+The existing desktop release workflow remains responsible for uploading assets to GitHub Releases. `electron-builder` should generate updater metadata, but the workflow continues to publish assets itself. HopCode publishes versioned `desktop-v*` releases for history and also clobbers the fixed `desktop-latest` release used by the generic update feed.
 
 Expected assets include platform installers and feed files:
 

@@ -627,18 +627,18 @@ export async function start_sandbox(
     args.push('--env', `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`);
   }
   for (const envVar of [
-    'QWEN_DEBUG_LOG_FILE',
-    'QWEN_CODE_LEGACY_MCP_BLOCKING',
+    'HOPCODE_DEBUG_LOG_FILE',
+    'HOPCODE_CODE_LEGACY_MCP_BLOCKING',
   ] as const) {
     if (process.env[envVar]) {
       args.push('--env', `${envVar}=${process.env[envVar]}`);
     }
   }
-  if (process.env['QWEN_CODE_MCP_APPROVALS_PATH']) {
+  if (process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']) {
     args.push(
       '--env',
-      `QWEN_CODE_MCP_APPROVALS_PATH=${getContainerPath(
-        process.env['QWEN_CODE_MCP_APPROVALS_PATH'],
+      `HOPCODE_CODE_MCP_APPROVALS_PATH=${getContainerPath(
+        process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'],
       )}`,
     );
   }

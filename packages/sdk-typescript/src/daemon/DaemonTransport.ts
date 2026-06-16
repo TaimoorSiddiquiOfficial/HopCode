@@ -47,7 +47,7 @@ export type DaemonTransportType = 'rest' | 'acp-http' | 'acp-ws';
  * Pluggable transport for the daemon SDK.
  *
  * The default transport (`RestSseTransport`) speaks the existing
- * `qwen serve` REST+SSE surface. ACP transports (`AcpHttpTransport`,
+ * `hopcode serve` REST+SSE surface. ACP transports (`AcpHttpTransport`,
  * `AcpWsTransport`) map the same URL-shaped calls to JSON-RPC over
  * HTTP or WebSocket, synthesizing standard `Response` objects so
  * `DaemonClient` needs no control-flow changes.

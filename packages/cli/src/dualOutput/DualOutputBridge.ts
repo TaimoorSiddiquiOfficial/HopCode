@@ -141,7 +141,7 @@ export class DualOutputBridge {
               throw new Error(
                 `--json-file "${target.filePath}": permission denied opening FIFO for read-write. ` +
                   'Check read/write permissions on the file and its parent directories, ' +
-                  'or start a reader before launching Qwen Code.',
+                  'or start a reader before launching HopCode.',
               );
             }
             throw retryErr;

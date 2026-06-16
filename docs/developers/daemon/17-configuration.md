@@ -2,15 +2,15 @@
 
 ## Overview
 
-This page collects every setting that affects the `qwen serve` daemon and its adapters: environment variables, CLI flags, `settings.json` keys, and programmatic options. Feature-specific pages link back here when they need cross-cutting configuration details.
+This page collects every setting that affects the `hopcode serve` daemon and its adapters: environment variables, CLI flags, `settings.json` keys, and programmatic options. Feature-specific pages link back here when they need cross-cutting configuration details.
 
-## CLI flags (`qwen serve`)
+## CLI flags (`hopcode serve`)
 
 | Flag                                    | Type                       | Default                                    | Effect                                                                                                                                                                              |
 | --------------------------------------- | -------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--hostname <host>`                     | string                     | `127.0.0.1`                                | Bind address. Loopback values: `127.0.0.1`, `localhost`, `::1`, `[::1]`. Non-loopback requires a bearer token at boot. `host:port` input is rejected with guidance to use `--port`. |
 | `--port <n>`                            | number                     | `4170`                                     | Listen port; `0` means ephemeral.                                                                                                                                                   |
-| `--token <s>`                           | string                     | env                                        | Bearer token. Overrides `QWEN_SERVER_TOKEN` and is trimmed at boot. It appears in the process command line, so prefer env in deployments.                                           |
+| `--token <s>`                           | string                     | env                                        | Bearer token. Overrides `HOPCODE_SERVER_TOKEN` and is trimmed at boot. It appears in the process command line, so prefer env in deployments.                                        |
 | `--require-auth`                        | boolean                    | `false`                                    | Extends bearer auth to loopback and `/health`; boot refuses to start without a token.                                                                                               |
 | `--workspace <dir>`                     | absolute path              | `process.cwd()`                            | Bound workspace. Must be absolute and a directory; canonicalized once at boot.                                                                                                      |
 | `--max-sessions <n>`                    | number                     | `20`                                       | Active session cap. `0` / `Infinity` means unlimited; `NaN` / negative values throw.                                                                                                |
@@ -33,43 +33,43 @@ This page collects every setting that affects the `qwen serve` daemon and its ad
 | `--rate-limit-mutation <n>`             | positive integer           | `30`                                       | Mutation request limit per window; requires rate limiting to be enabled.                                                                                                            |
 | `--rate-limit-read <n>`                 | positive integer           | `120`                                      | Read request limit per window; requires rate limiting to be enabled.                                                                                                                |
 | `--rate-limit-window-ms <n>`            | integer `>= 1000`          | `60000`                                    | Rate limit window length; requires rate limiting to be enabled.                                                                                                                     |
-| no flag                                 | -                          | -                                          | `QWEN_SERVE_NO_MCP_POOL=1` fully disables the pool.                                                                                                                                 |
+| no flag                                 | -                          | -                                          | `HOPCODE_SERVE_NO_MCP_POOL=1` fully disables the pool.                                                                                                                              |
 
 ## Environment variables
 
 ### Read by `runQwenServe` / Express middleware
 
-| Env                                 | Effect                                                                                                                                                                   |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `QWEN_SERVER_TOKEN`                 | Bearer token; trimmed at boot.                                                                                                                                           |
-| `QWEN_SERVE_DEBUG`                  | `1` / `true` / `on` / `yes` (case-insensitive) enables verbose stderr logs. See [`19-observability.md`](./19-observability.md).                                          |
-| `QWEN_SERVE_NO_MCP_POOL`            | `1` disables the workspace MCP transport pool and falls back to per-session `McpClientManager`; capabilities stop advertising `mcp_workspace_pool` / `mcp_pool_restart`. |
-| `QWEN_SERVE_PROMPT_DEADLINE_MS`     | Env fallback for `--prompt-deadline-ms`.                                                                                                                                 |
-| `QWEN_SERVE_WRITER_IDLE_TIMEOUT_MS` | Env fallback for `--writer-idle-timeout-ms`.                                                                                                                             |
-| `QWEN_SERVE_RATE_LIMIT`             | `1` / `true` enables per-tier HTTP rate limiting; CLI `--rate-limit` / `--no-rate-limit` wins.                                                                           |
-| `QWEN_SERVE_RATE_LIMIT_PROMPT`      | Env fallback for `--rate-limit-prompt`.                                                                                                                                  |
-| `QWEN_SERVE_RATE_LIMIT_MUTATION`    | Env fallback for `--rate-limit-mutation`.                                                                                                                                |
-| `QWEN_SERVE_RATE_LIMIT_READ`        | Env fallback for `--rate-limit-read`.                                                                                                                                    |
-| `QWEN_SERVE_RATE_LIMIT_WINDOW_MS`   | Env fallback for `--rate-limit-window-ms`.                                                                                                                               |
+| Env                                    | Effect                                                                                                                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `HOPCODE_SERVER_TOKEN`                 | Bearer token; trimmed at boot.                                                                                                                                           |
+| `HOPCODE_SERVE_DEBUG`                  | `1` / `true` / `on` / `yes` (case-insensitive) enables verbose stderr logs. See [`19-observability.md`](./19-observability.md).                                          |
+| `HOPCODE_SERVE_NO_MCP_POOL`            | `1` disables the workspace MCP transport pool and falls back to per-session `McpClientManager`; capabilities stop advertising `mcp_workspace_pool` / `mcp_pool_restart`. |
+| `HOPCODE_SERVE_PROMPT_DEADLINE_MS`     | Env fallback for `--prompt-deadline-ms`.                                                                                                                                 |
+| `HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS` | Env fallback for `--writer-idle-timeout-ms`.                                                                                                                             |
+| `HOPCODE_SERVE_RATE_LIMIT`             | `1` / `true` enables per-tier HTTP rate limiting; CLI `--rate-limit` / `--no-rate-limit` wins.                                                                           |
+| `HOPCODE_SERVE_RATE_LIMIT_PROMPT`      | Env fallback for `--rate-limit-prompt`.                                                                                                                                  |
+| `HOPCODE_SERVE_RATE_LIMIT_MUTATION`    | Env fallback for `--rate-limit-mutation`.                                                                                                                                |
+| `HOPCODE_SERVE_RATE_LIMIT_READ`        | Env fallback for `--rate-limit-read`.                                                                                                                                    |
+| `HOPCODE_SERVE_RATE_LIMIT_WINDOW_MS`   | Env fallback for `--rate-limit-window-ms`.                                                                                                                               |
 
 ### Forwarded to the ACP child through `BridgeOptions.childEnvOverrides`
 
-`runQwenServe` builds these per handle so two daemons in one process do not race on `process.env`. The budget variables are not parent-process env fallbacks for `qwen serve`; the CLI path must generate them from `--mcp-client-budget` / `--mcp-budget-mode`.
+`runQwenServe` builds these per handle so two daemons in one process do not race on `process.env`. The budget variables are not parent-process env fallbacks for `hopcode serve`; the CLI path must generate them from `--mcp-client-budget` / `--mcp-budget-mode`.
 
-| Env                              | Effect                                                                                                                   |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `QWEN_SERVE_MCP_CLIENT_BUDGET`   | Positive integer string consumed by the ACP child's `readBudgetFromEnv()`.                                               |
-| `QWEN_SERVE_MCP_BUDGET_MODE`     | `off` / `warn` / `enforce`.                                                                                              |
-| `QWEN_SERVE_MCP_POOL_TRANSPORTS` | Comma-separated transport allowlist; default pooled transports are `stdio,websocket`; can explicitly include `http,sse`. |
-| `QWEN_SERVE_MCP_POOL_DRAIN_MS`   | Pool entry idle drain delay; default `30000`, clamped to `1000..600000` ms.                                              |
+| Env                                 | Effect                                                                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `HOPCODE_SERVE_MCP_CLIENT_BUDGET`   | Positive integer string consumed by the ACP child's `readBudgetFromEnv()`.                                               |
+| `HOPCODE_SERVE_MCP_BUDGET_MODE`     | `off` / `warn` / `enforce`.                                                                                              |
+| `HOPCODE_SERVE_MCP_POOL_TRANSPORTS` | Comma-separated transport allowlist; default pooled transports are `stdio,websocket`; can explicitly include `http,sse`. |
+| `HOPCODE_SERVE_MCP_POOL_DRAIN_MS`   | Pool entry idle drain delay; default `30000`, clamped to `1000..600000` ms.                                              |
 
 ### Read by SDK / adapters
 
-| Env                     | Effect                                                            |
-| ----------------------- | ----------------------------------------------------------------- |
-| `QWEN_DAEMON_URL`       | Daemon base URL for CLI TUI adapter, channels, and IDE companion. |
-| `QWEN_DAEMON_TOKEN`     | Bearer token.                                                     |
-| `QWEN_DAEMON_WORKSPACE` | Overrides the `cwd` sent to `POST /session`.                      |
+| Env                        | Effect                                                            |
+| -------------------------- | ----------------------------------------------------------------- |
+| `HOPCODE_DAEMON_URL`       | Daemon base URL for CLI TUI adapter, channels, and IDE companion. |
+| `HOPCODE_DAEMON_TOKEN`     | Bearer token.                                                     |
+| `HOPCODE_DAEMON_WORKSPACE` | Overrides the `cwd` sent to `POST /session`.                      |
 
 ## `settings.json` keys
 
@@ -92,7 +92,7 @@ The daemon reads settings once at boot through `loadSettings(boundWorkspace)` in
 | ----------------------------- | --------------------------------------------------------------------------------------------- |
 | `eventRingSize`               | Overrides the default per-session ring size.                                                  |
 | `maxPendingPromptsPerSession` | Pending prompt cap per session; `0` / `Infinity` means unlimited.                             |
-| `mcpPoolActive`               | Programmatic switch, defaulting from `QWEN_SERVE_NO_MCP_POOL`.                                |
+| `mcpPoolActive`               | Programmatic switch, defaulting from `HOPCODE_SERVE_NO_MCP_POOL`.                             |
 | `allowOrigins`                | Cross-origin allowlist (`string[]`), corresponding to `--allow-origin`.                       |
 | `allowPrivateAuthBaseUrl`     | Allows private / localhost auth provider `baseUrl` installation.                              |
 | `enableSessionShell`          | Enables session shell execution; bearer token and session-bound client id are still required. |

@@ -1,7 +1,7 @@
 {
   "name": "@hopcode/channel-feishu",
   "version": "0.18.1",
-  "description": "Feishu (Lark) channel adapter for Qwen Code",
+  "description": "Feishu (Lark) channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

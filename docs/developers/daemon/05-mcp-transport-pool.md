@@ -48,7 +48,7 @@ class McpTransportPool {
 - `workspaceContext: WorkspaceContext` (required).
 - `debugMode: boolean`.
 - `sendSdkMcpMessage?` — per-session callback (pool bypasses SDK MCP).
-- `pooledTransports?: ReadonlySet<McpTransportKind>` — default `{stdio, websocket}`. HTTP/SSE transports stay unpooled by default because their headers can carry session-specific OAuth state, but operators can explicitly opt them into pooling with `QWEN_SERVE_MCP_POOL_TRANSPORTS`.
+- `pooledTransports?: ReadonlySet<McpTransportKind>` — default `{stdio, websocket}`. HTTP/SSE transports stay unpooled by default because their headers can carry session-specific OAuth state, but operators can explicitly opt them into pooling with `HOPCODE_SERVE_MCP_POOL_TRANSPORTS`.
 - `drainDelayMs?` — default `30_000`.
 - `entryOptions?: (transport) => PoolEntryOptions`.
 - `budget?: WorkspaceMcpBudget`.
@@ -241,7 +241,7 @@ sequenceDiagram
 
 | Source                        | Knob                                                            | Effect                                                                                                    |
 | ----------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Env                           | `QWEN_SERVE_NO_MCP_POOL=1`                                      | Kill switch — `QwenAgent.mcpPool` stays undefined; per-session `McpClientManager` enforces (pre-F2 path). |
+| Env                           | `HOPCODE_SERVE_NO_MCP_POOL=1`                                   | Kill switch — `QwenAgent.mcpPool` stays undefined; per-session `McpClientManager` enforces (pre-F2 path). |
 | Flag                          | `--mcp-client-budget=N`, `--mcp-budget-mode={off,warn,enforce}` | Forwarded to ACP child via `childEnvOverrides`; child constructs `WorkspaceMcpBudget` and passes to pool. |
 | Capability tags (conditional) | `mcp_workspace_pool`, `mcp_pool_restart`                        | Advertised together when pool is on. SDK pre-flights both to branch on pool-aware response shapes.        |
 
@@ -269,7 +269,7 @@ When the pool is active, each `ServeWorkspaceMcpStatus` server cell
 | Field            | Type                                        | Purpose                                                                                                                                                                                                                                                                                                                                       |
 | ---------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `disabledReason` | `'config' \| 'budget'`                      | Distinguishes operator-disabled servers (`disabled: true` from `disabledMcpServers`) from budget refusal (`status: 'error', errorKind: 'budget_exhausted'`). Dashboards can render one server row without cross-reading `errors[]` or `budgets[]`.                                                                                            |
-| `entryCount`     | `number` (`>=1`)                            | In pool mode a workspace can have multiple `PoolEntry` instances with the same name when sessions inject different fingerprints such as per-session OAuth headers. This field is absent when `QWEN_SERVE_NO_MCP_POOL=1` disables the pool. New clients render an "N entries" badge when `entryCount > 1`.                                     |
+| `entryCount`     | `number` (`>=1`)                            | In pool mode a workspace can have multiple `PoolEntry` instances with the same name when sessions inject different fingerprints such as per-session OAuth headers. This field is absent when `HOPCODE_SERVE_NO_MCP_POOL=1` disables the pool. New clients render an "N entries" badge when `entryCount > 1`.                                  |
 | `entrySummary`   | `ReadonlyArray<{entryIndex, refs, status}>` | Per-entry breakdown. `entryIndex` is the stable opaque integer assigned when the entry was created; it is not the raw fingerprint, so snapshot diffs do not leak OAuth or env rotation timing. `refs` is the current attached-session count. `status` lets dashboards show per-entry health while aggregate `mcpStatus` is already connected. |
 
 `(entryCount, entrySummary)` are always broadcast as a pair. The
@@ -463,7 +463,7 @@ Design document: [`../../design/f2-mcp-transport-pool.md`](../../design/f2-mcp-t
 
 ## Caveats & Known Limits
 
-- **HTTP / SSE transports are unpooled by default** — unless operators explicitly include them in `QWEN_SERVE_MCP_POOL_TRANSPORTS`, each acquire mints a fresh entry that lives only as long as its session. Their headers may carry session-specific OAuth state, so pooling them by default would risk leaking credentials across sessions.
+- **HTTP / SSE transports are unpooled by default** — unless operators explicitly include them in `HOPCODE_SERVE_MCP_POOL_TRANSPORTS`, each acquire mints a fresh entry that lives only as long as its session. Their headers may carry session-specific OAuth state, so pooling them by default would risk leaking credentials across sessions.
 - **`maxIdleMs` is a hard cap that survives attach/detach churn.** A 5-minute idle hard cap means even an aggressively attaching/detaching client cannot keep an idle transport pinned past 5 minutes. Operators who want pinned long-lived transports should increase `maxIdleMs` or run the server outside the pool.
 - **Per-server-name budget slots** mean two pool entries that share a name but differ by fingerprint consume ONE slot together, not two. Subprocess accounting is exposed separately via `pool.getSnapshot().subprocessCount`.
 - **`startsWith` regression** was avoided in `hasNameSibling` because MCP server names can legitimately contain `::` (`mcp-pool-key.test.ts`). Always use `parseConnectionId`'s `lastIndexOf('::')` split, never string-prefix matching.

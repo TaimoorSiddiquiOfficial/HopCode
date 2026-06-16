@@ -366,12 +366,12 @@ describe('gemini.tsx main function', () => {
   });
 
   it('writes non-interactive warnings discovered during config initialization', async () => {
-    const originalNoRelaunch = process.env['QWEN_CODE_NO_RELAUNCH'];
+    const originalNoRelaunch = process.env['HOPCODE_CODE_NO_RELAUNCH'];
     const originalIsTTY = Object.getOwnPropertyDescriptor(
       process.stdin,
       'isTTY',
     );
-    process.env['QWEN_CODE_NO_RELAUNCH'] = 'true';
+    process.env['HOPCODE_CODE_NO_RELAUNCH'] = 'true';
     Object.defineProperty(process.stdin, 'isTTY', {
       value: true,
       configurable: true,
@@ -473,9 +473,9 @@ describe('gemini.tsx main function', () => {
         delete (process.stdin as { isTTY?: unknown }).isTTY;
       }
       if (originalNoRelaunch !== undefined) {
-        process.env['QWEN_CODE_NO_RELAUNCH'] = originalNoRelaunch;
+        process.env['HOPCODE_CODE_NO_RELAUNCH'] = originalNoRelaunch;
       } else {
-        delete process.env['QWEN_CODE_NO_RELAUNCH'];
+        delete process.env['HOPCODE_CODE_NO_RELAUNCH'];
       }
     }
 

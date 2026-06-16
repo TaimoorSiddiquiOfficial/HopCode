@@ -190,7 +190,7 @@ export interface BridgeHeartbeatState {
  * (`bridgeClient.ts`) both import THIS single definition, so a rename can't
  * silently desync them into a runtime `-32601 methodNotFound` (which would
  * latch the drain off for the session). The desktop ACP client answers the same
- * method from its own in-memory queue; in `qwen serve` the daemon answers it
+ * method from its own in-memory queue; in `hopcode serve` the daemon answers it
  * from `SessionEntry.midTurnMessageQueue`.
  */
 export const MID_TURN_QUEUE_DRAIN_METHOD = 'craft/drainMidTurnQueue';

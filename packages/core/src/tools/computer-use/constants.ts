@@ -13,7 +13,7 @@
  * It ships as per-platform, Developer-ID-signed + Apple-notarized binaries
  * attached to GitHub releases (tag `cua-driver-rs-v<version>`). We download
  * the pinned asset once into `~/.qwen/computer-use/`, preferring a
- * qwen-code-owned OSS mirror (reliable in CN where GitHub release downloads
+ * hopcode-owned OSS mirror (reliable in CN where GitHub release downloads
  * are slow/blocked) and falling back to GitHub.
  *
  * Source: https://github.com/trycua/cua/tree/main/libs/cua-driver
@@ -25,7 +25,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 
 /**
- * The exact `cua-driver-rs` release this build of qwen-code is pinned to.
+ * The exact `cua-driver-rs` release this build of hopcode is pinned to.
  * Hardcoded `schemas.ts` is generated against this version.
  *
  * Exact pin (NOT a range) is deliberate: cua-driver is pre-1.0 and ships
@@ -40,7 +40,7 @@ import { homedir } from 'node:os';
 export const CUA_DRIVER_VERSION = '0.5.2';
 
 /**
- * qwen-code-owned OSS mirror base (primary download source — reliable in CN
+ * hopcode-owned OSS mirror base (primary download source — reliable in CN
  * where GitHub release downloads are slow/blocked). Assets live under
  * `<base>/cua-driver-rs/v<version>/<asset>`, mirrored from the upstream
  * trycua/cua release by the "Sync cua-driver to Aliyun OSS" workflow
@@ -51,11 +51,11 @@ export const CUA_DRIVER_VERSION = '0.5.2';
  * mirrored there, the GitHub fallback (GITHUB_RELEASE_BASE) serves it
  * transparently.
  *
- * Hosted on the shared `qwen-code-assets` bucket (same one the CLI's own
+ * Hosted on the shared `hopcode-assets` bucket (same one the CLI's own
  * release/installation assets use), under a `computer-use` namespace.
  */
 export const OSS_MIRROR_BASE =
-  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/computer-use';
+  'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/computer-use';
 
 /** GitHub release download base for the pinned tag (fallback source). */
 export const GITHUB_RELEASE_BASE =
@@ -143,7 +143,7 @@ export function resolveAssetTarget(
  * then OSS mirror, then GitHub. The downloader tries each in order until
  * one succeeds.
  *
- * `QWEN_COMPUTER_USE_DOWNLOAD_HOST` lets enterprises / power users point at
+ * `HOPCODE_COMPUTER_USE_DOWNLOAD_HOST` lets enterprises / power users point at
  * an internal mirror laid out like OSS (`<host>/cua-driver-rs/v<ver>/<asset>`).
  */
 export function resolveAssetUrls(
@@ -152,7 +152,7 @@ export function resolveAssetUrls(
   version: string = CUA_DRIVER_VERSION,
 ): string[] {
   const urls: string[] = [];
-  const override = env['QWEN_COMPUTER_USE_DOWNLOAD_HOST'];
+  const override = env['HOPCODE_COMPUTER_USE_DOWNLOAD_HOST'];
   if (override) {
     urls.push(`${trimSlash(override)}/cua-driver-rs/v${version}/${asset}`);
   }
@@ -170,7 +170,7 @@ export function resolveChecksumUrls(
 }
 
 /** Env var name for overriding the screenshot longest-edge cap. */
-export const MAX_IMAGE_DIMENSION_ENV = 'QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION';
+export const MAX_IMAGE_DIMENSION_ENV = 'HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION';
 
 /**
  * Coerce a raw value into a valid `max_image_dimension` override, or
@@ -194,7 +194,7 @@ function coerceImageDimension(
  * Resolve the screenshot longest-edge cap (px) to apply to cua-driver via the
  * `set_config` `max_image_dimension` knob. Precedence:
  *
- *   1. `QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION` env var (if a valid override)
+ *   1. `HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION` env var (if a valid override)
  *   2. the `tools.computerUse.maxImageDimension` setting
  *   3. `undefined` → no override; cua-driver keeps its built-in default (1568)
  *

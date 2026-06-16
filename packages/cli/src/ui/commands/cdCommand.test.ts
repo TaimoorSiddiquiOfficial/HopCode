@@ -40,7 +40,7 @@ describe('cdCommand', () => {
     nextDir = path.join(tmpDir, 'next');
     fs.mkdirSync(currentDir);
     fs.mkdirSync(nextDir);
-    process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'] = path.join(
+    process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = path.join(
       tmpDir,
       'trustedFolders.json',
     );
@@ -64,7 +64,7 @@ describe('cdCommand', () => {
   });
 
   afterEach(() => {
-    delete process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
+    delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
     resetTrustedFoldersForTesting();
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });

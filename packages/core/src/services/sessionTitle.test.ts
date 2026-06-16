@@ -89,7 +89,7 @@ describe('tryGenerateSessionTitle', () => {
           role: 'user',
           parts: [
             {
-              text: "<system-reminder>\nThis is the Qwen Code. We are setting up the context for our chat.\nToday's date is Monday, June 15, 2026.\nMy operating system is: linux\nI'm currently working in the directory: /home/me/project\n</system-reminder>",
+              text: "<system-reminder>\nThis is the HopCode. We are setting up the context for our chat.\nToday's date is Monday, June 15, 2026.\nMy operating system is: linux\nI'm currently working in the directory: /home/me/project\n</system-reminder>",
             },
           ],
         },

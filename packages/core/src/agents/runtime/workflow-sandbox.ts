@@ -513,10 +513,10 @@ export interface SandboxOptions {
  * 0-token-hang backstop, NOT a precise cost cap: it bounds patterns like an
  * in-script `await new Promise(() => {})` that the vm timeout cannot reach.
  * For genuine cost control, use the env-overridable per-run cap
- * (`QWEN_CODE_MAX_WORKFLOW_AGENTS`) and concurrency window
- * (`QWEN_CODE_MAX_WORKFLOW_CONCURRENCY`). 30 minutes is set generously
+ * (`HOPCODE_CODE_MAX_WORKFLOW_AGENTS`) and concurrency window
+ * (`HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY`). 30 minutes is set generously
  * enough that typical workflows never see it but a hang doesn't waste
- * operator hours; raise via `QWEN_CODE_MAX_WORKFLOW_SECONDS` for long
+ * operator hours; raise via `HOPCODE_CODE_MAX_WORKFLOW_SECONDS` for long
  * legitimate fan-outs (1000 agents × 10-min subagent cap ÷ default
  * concurrency would already exceed 30 min).
  */
@@ -673,7 +673,7 @@ export function createWorkflowSandbox(opts: SandboxOptions): WorkflowSandbox {
     pushLog: safeLog,
     lastPhase: () => phases[phases.length - 1],
     hostAgent: opts.dispatch,
-    // PR #4947 R2 T7 (qwen-code-ci-bot): host-side log hook for reviveInRealm's
+    // PR #4947 R2 T7 (hopcode-ci-bot): host-side log hook for reviveInRealm's
     // catch path. Mirrors the rejection-logging in settleToNullArray so an
     // operator running with debug logging can distinguish "thunk rejected"
     // (settleToNullArray.warn) from "thunk resolved to a non-JSON-serializable

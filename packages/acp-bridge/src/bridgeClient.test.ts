@@ -602,7 +602,7 @@ describe('BridgeClient — requestPermission pre-publish collision guard', () =>
 /**
  * `extMethod` is the daemon's answer to the ACP child's
  * `craft/drainMidTurnQueue` call (web-shell mid-turn drain). Desktop answers
- * the same method from its own in-memory queue; in `qwen serve` the BridgeClient
+ * the same method from its own in-memory queue; in `hopcode serve` the BridgeClient
  * answers it from `SessionEntry.midTurnMessageQueue`. Without this the SDK's
  * ClientSideConnection would reject the call with -32601 and the child would
  * latch the drain as unavailable for the whole session.

@@ -71,8 +71,7 @@ const mockDebugLogger = vi.hoisted(() => ({
 }));
 
 vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     createDebugLogger: () => mockDebugLogger,
@@ -3872,9 +3871,9 @@ describe('Settings Loading and Merging', () => {
       });
 
       it('ignores global-state paths set in a project .env', () => {
-        delete process.env['QWEN_HOME'];
-        delete process.env['QWEN_RUNTIME_DIR'];
-        delete process.env['QWEN_CODE_MCP_APPROVALS_PATH'];
+        delete process.env['HOPCODE_HOME'];
+        delete process.env['HOPCODE_RUNTIME_DIR'];
+        delete process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
 
         const cwdSpy = vi
           .spyOn(process, 'cwd')
@@ -3893,9 +3892,9 @@ describe('Settings Loading and Merging', () => {
             if (p === USER_SETTINGS_PATH) return JSON.stringify({});
             if (p === projectEnvPath)
               return [
-                'QWEN_HOME=/tmp/hijack',
-                'QWEN_RUNTIME_DIR=/tmp/hijack-runtime',
-                'QWEN_CODE_MCP_APPROVALS_PATH=/tmp/preapproved.json',
+                'HOPCODE_HOME=/tmp/hijack',
+                'HOPCODE_RUNTIME_DIR=/tmp/hijack-runtime',
+                'HOPCODE_CODE_MCP_APPROVALS_PATH=/tmp/preapproved.json',
                 'OTHER_VAR=ok',
               ].join('\n');
             return '{}';
@@ -3905,9 +3904,9 @@ describe('Settings Loading and Merging', () => {
         loadEnvironment(loadSettings(MOCK_WORKSPACE_DIR).merged);
 
         // A project .env must never redirect global state.
-        expect(process.env['QWEN_HOME']).toBeUndefined();
-        expect(process.env['QWEN_RUNTIME_DIR']).toBeUndefined();
-        expect(process.env['QWEN_CODE_MCP_APPROVALS_PATH']).toBeUndefined();
+        expect(process.env['HOPCODE_HOME']).toBeUndefined();
+        expect(process.env['HOPCODE_RUNTIME_DIR']).toBeUndefined();
+        expect(process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']).toBeUndefined();
         // Other vars from the same project .env still load.
         expect(process.env['OTHER_VAR']).toEqual('ok');
 

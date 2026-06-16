@@ -3295,7 +3295,7 @@ describe('createServeApp', () => {
 
         expect(res.status).toBe(202);
         expect(setAttribute).toHaveBeenCalledWith(
-          'qwen-code.prompt_id',
+          'hopcode.prompt_id',
           res.body.promptId,
         );
       } finally {

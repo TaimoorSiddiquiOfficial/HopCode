@@ -228,8 +228,8 @@ export default {
     'Compresses the context by replacing it with a summary.',
   'Fast context compression without AI. Strips old tool outputs and thinking parts.':
     'Fast context compression without AI. Strips old tool outputs and thinking parts.',
-  'open full Qwen Code documentation in your browser':
-    'open full Qwen Code documentation in your browser',
+  'open full HopCode documentation in your browser':
+    'open full HopCode documentation in your browser',
   'Configuration not available.': 'Configuration not available.',
   'Connect an LLM provider': 'Connect an LLM provider',
   'Copy to clipboard: reply, code (by lang), LaTeX, or Mermaid. N = Nth-latest message, index = block number':

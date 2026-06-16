@@ -2,7 +2,7 @@
 
 ## Overview
 
-`packages/sdk-typescript/src/daemon/` is the **TypeScript SDK's daemon client**. It is the canonical way to connect to a running `qwen serve` daemon from any TypeScript / JavaScript host (the CLI's own TUI adapter, channel bot backends, the VS Code IDE companion, custom scripts, and server-side web backends). All other adapters depend on it.
+`packages/sdk-typescript/src/daemon/` is the **TypeScript SDK's daemon client**. It is the canonical way to connect to a running `hopcode serve` daemon from any TypeScript / JavaScript host (the CLI's own TUI adapter, channel bot backends, the VS Code IDE companion, custom scripts, and server-side web backends). All other adapters depend on it.
 
 The package layout is intentionally small:
 

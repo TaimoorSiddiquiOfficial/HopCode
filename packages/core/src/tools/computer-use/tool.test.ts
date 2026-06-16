@@ -81,8 +81,8 @@ describe('ComputerUseTool', () => {
   });
 
   it('resolves the configured maxImageDimension and forwards it to the client', async () => {
-    const prev = process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
-    delete process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
+    const prev = process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
+    delete process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
     try {
       const fake = makeFakeClient(async () => ({
         content: [{ type: 'text', text: '[]' }],
@@ -103,9 +103,9 @@ describe('ComputerUseTool', () => {
       expect(fake.setMaxImageDimension).toHaveBeenCalledWith(1280);
     } finally {
       if (prev === undefined) {
-        delete process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
+        delete process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
       } else {
-        process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'] = prev;
+        process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'] = prev;
       }
     }
   });

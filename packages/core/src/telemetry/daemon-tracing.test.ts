@@ -125,10 +125,10 @@ describe('daemon-tracing', () => {
     expect(trace.getSpanContext(extracted!)?.traceId).toBe(traceId);
     expect(trace.getSpanContext(extracted!)?.spanId).toBe('2222222222222222');
     expect(startActiveSpan).toHaveBeenCalledWith(
-      'qwen-code.daemon.bridge',
+      'hopcode.daemon.bridge',
       expect.objectContaining({
         attributes: expect.objectContaining({
-          'qwen-code.daemon.operation': 'prompt.dispatch',
+          'hopcode.daemon.operation': 'prompt.dispatch',
           'session.id': 'session-A',
         }),
       }),

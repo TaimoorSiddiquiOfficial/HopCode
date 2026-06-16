@@ -178,8 +178,8 @@ describe('simple-mcp-server', () => {
     // request fires without the MCP `add` tool wired into the model's tool
     // surface, so the model answers `15` directly and `foundToolCall` stays
     // false. Remove once TaimoorSiddiquiOfficial/HopCode#4163 is fixed.
-    previousLegacyMcpBlocking = process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'];
-    process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'] = '1';
+    previousLegacyMcpBlocking = process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'];
+    process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'] = '1';
 
     // Setup test directory with MCP server configuration
     await rig.setup('simple-mcp-server', {
@@ -190,9 +190,9 @@ describe('simple-mcp-server', () => {
       },
     });
 
-    previousMcpApprovalsPath = process.env['QWEN_CODE_MCP_APPROVALS_PATH'];
+    previousMcpApprovalsPath = process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
     const approvalsPath = join(rig.testDir!, '.qwen', 'mcpApprovals.json');
-    process.env['QWEN_CODE_MCP_APPROVALS_PATH'] = approvalsPath;
+    process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'] = approvalsPath;
     writeFileSync(
       approvalsPath,
       JSON.stringify(
@@ -241,15 +241,16 @@ describe('simple-mcp-server', () => {
 
   afterAll(() => {
     if (previousLegacyMcpBlocking === undefined) {
-      delete process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'];
+      delete process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'];
     } else {
-      process.env['QWEN_CODE_LEGACY_MCP_BLOCKING'] = previousLegacyMcpBlocking;
+      process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'] =
+        previousLegacyMcpBlocking;
     }
 
     if (previousMcpApprovalsPath === undefined) {
-      delete process.env['QWEN_CODE_MCP_APPROVALS_PATH'];
+      delete process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
     } else {
-      process.env['QWEN_CODE_MCP_APPROVALS_PATH'] = previousMcpApprovalsPath;
+      process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'] = previousMcpApprovalsPath;
     }
   });
 

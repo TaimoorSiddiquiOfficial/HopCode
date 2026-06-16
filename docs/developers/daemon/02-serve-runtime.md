@@ -2,7 +2,7 @@
 
 ## Overview
 
-`packages/cli/src/serve/` is the boot layer for `qwen serve`. It translates CLI flags into `ServeOptions`, validates startup configuration, builds the Express app, wires middleware, registers routes, exposes daemon-host preflight/status providers, maintains the permission audit ring, and owns the two-phase graceful shutdown sequence. HTTP-facing work lives in this layer; ACP-facing work lives one layer below in `@hopcode/acp-bridge` (see [`03-acp-bridge.md`](./03-acp-bridge.md)).
+`packages/cli/src/serve/` is the boot layer for `hopcode serve`. It translates CLI flags into `ServeOptions`, validates startup configuration, builds the Express app, wires middleware, registers routes, exposes daemon-host preflight/status providers, maintains the permission audit ring, and owns the two-phase graceful shutdown sequence. HTTP-facing work lives in this layer; ACP-facing work lives one layer below in `@hopcode/acp-bridge` (see [`03-acp-bridge.md`](./03-acp-bridge.md)).
 
 ## Responsibilities
 
@@ -61,7 +61,7 @@
 
 ### Boot sequence
 
-1. **Resolve and trim token** from `opts.token` or `QWEN_SERVER_TOKEN`; this
+1. **Resolve and trim token** from `opts.token` or `HOPCODE_SERVER_TOKEN`; this
    avoids a trailing newline from `cat token.txt` silently breaking bearer
    comparison.
 2. **Hostname typo guard**: `--hostname localhost:4170` errors and suggests `--port`.
@@ -69,9 +69,9 @@
 4. **Workspace validation**: absolute path, exists, directory. `EACCES` / `EPERM` are wrapped to point at the flag.
 5. **Canonicalize workspace**: `canonicalizeWorkspace(rawWorkspace)` runs `realpathSync.native` once and feeds `/capabilities`, the `POST /session` fallback, and the bridge.
 6. **MCP budget validation**: positive integer; `enforce` requires a budget.
-7. **MCP pool toggle inference**: parent env `QWEN_SERVE_NO_MCP_POOL=1` makes `mcpPoolActive=false`, so capabilities honestly omit `mcp_workspace_pool` and `mcp_pool_restart`.
+7. **MCP pool toggle inference**: parent env `HOPCODE_SERVE_NO_MCP_POOL=1` makes `mcpPoolActive=false`, so capabilities honestly omit `mcp_workspace_pool` and `mcp_pool_restart`.
 8. **CORS / timeout / rate-limit validation**: `--allow-origin '*'` requires token; prompt, writer, channel idle, session idle, reaper, and rate-limit window values fail fast when invalid.
-9. **Per-handle `childEnvOverrides`**: pass `QWEN_SERVE_MCP_CLIENT_BUDGET` and `QWEN_SERVE_MCP_BUDGET_MODE` to the ACP child through `BridgeOptions.childEnvOverrides` instead of mutating `process.env`.
+9. **Per-handle `childEnvOverrides`**: pass `HOPCODE_SERVE_MCP_CLIENT_BUDGET` and `HOPCODE_SERVE_MCP_BUDGET_MODE` to the ACP child through `BridgeOptions.childEnvOverrides` instead of mutating `process.env`.
 10. **Load `settings.json` once**: read `context.fileName`, `policy.permissionStrategy`, and `policy.consensusQuorum`. Corrupt files fall back to defaults. `validatePolicyConfig()` checks `policy.*` against `SERVE_CAPABILITY_REGISTRY.permission_mediation.modes`; unknown strategies or non-positive `consensusQuorum` throw `InvalidPolicyConfigError`. A quorum set under a non-`consensus` strategy logs a stderr warning.
 11. **Allocate `PermissionAuditRing`** (512 entries).
 12. **Build `fsFactory`**: `runQwenServe` defaults to `trusted: true`; direct `createServeApp` callers default to `trusted: false` and warn once.
@@ -115,12 +115,12 @@ Calling `createServeApp` directly returns only an `Application`; the embedder ow
 
 | Source          | Key                                                                                             | Effect                                                                                                |
 | --------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Env             | `QWEN_SERVER_TOKEN`                                                                             | Bearer token after trim.                                                                              |
-| Env             | `QWEN_SERVE_NO_MCP_POOL=1`                                                                      | Forces `mcpPoolActive=false`.                                                                         |
-| ACP child env   | `QWEN_SERVE_MCP_CLIENT_BUDGET` / `QWEN_SERVE_MCP_BUDGET_MODE`                                   | Generated from `--mcp-client-budget` / `--mcp-budget-mode` and forwarded through `childEnvOverrides`. |
-| Env             | `QWEN_SERVE_PROMPT_DEADLINE_MS` / `QWEN_SERVE_WRITER_IDLE_TIMEOUT_MS`                           | Default prompt / SSE idle timeouts.                                                                   |
-| Env             | `QWEN_SERVE_RATE_LIMIT*`                                                                        | Rate-limit switch, prompt / mutation / read caps, and window default.                                 |
-| Env             | `QWEN_SERVE_DEBUG=1`                                                                            | Verbose stderr logs. See [`19-observability.md`](./19-observability.md).                              |
+| Env             | `HOPCODE_SERVER_TOKEN`                                                                          | Bearer token after trim.                                                                              |
+| Env             | `HOPCODE_SERVE_NO_MCP_POOL=1`                                                                   | Forces `mcpPoolActive=false`.                                                                         |
+| ACP child env   | `HOPCODE_SERVE_MCP_CLIENT_BUDGET` / `HOPCODE_SERVE_MCP_BUDGET_MODE`                             | Generated from `--mcp-client-budget` / `--mcp-budget-mode` and forwarded through `childEnvOverrides`. |
+| Env             | `HOPCODE_SERVE_PROMPT_DEADLINE_MS` / `HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS`                     | Default prompt / SSE idle timeouts.                                                                   |
+| Env             | `HOPCODE_SERVE_RATE_LIMIT*`                                                                     | Rate-limit switch, prompt / mutation / read caps, and window default.                                 |
+| Env             | `HOPCODE_SERVE_DEBUG=1`                                                                         | Verbose stderr logs. See [`19-observability.md`](./19-observability.md).                              |
 | Flags           | `--hostname`, `--port`                                                                          | Listen binding.                                                                                       |
 | Flags           | `--token`, `--require-auth`, `--enable-session-shell`                                           | Bearer token, loopback auth hardening, and explicit shell execution switch.                           |
 | Flag            | `--workspace`                                                                                   | Overrides `process.cwd()`.                                                                            |
