@@ -1578,9 +1578,9 @@ export async function loadCliConfig(
   };
   for (const name of settings.slashCommands?.disabled ?? []) addDisabled(name);
   for (const name of argv.disabledSlashCommands ?? []) addDisabled(name);
-  for (const name of (process.env['HOPCODE_DISABLED_SLASH_COMMANDS'] ?? '').split(
-    ',',
-  )) {
+  for (const name of (
+    process.env['HOPCODE_DISABLED_SLASH_COMMANDS'] ?? ''
+  ).split(',')) {
     addDisabled(name);
   }
 

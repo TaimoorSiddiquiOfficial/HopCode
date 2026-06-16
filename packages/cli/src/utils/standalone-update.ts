@@ -450,7 +450,10 @@ function atomicReplace(
     fs.renameSync(newDir, pendingDir);
 
     const lockFile = lockPath;
-    const logFile = path.join(path.dirname(standaloneDir), 'hopcode-update.log');
+    const logFile = path.join(
+      path.dirname(standaloneDir),
+      'hopcode-update.log',
+    );
     // Bat script runs detached after Node exits. It must:
     // 1. Wait for this Node process to release file locks (<= 30s).
     // 2. Run both moves with errorlevel checks; if move #2 fails, roll back
@@ -790,7 +793,10 @@ export type RollbackResult =
 export function rollbackStandaloneUpdate(
   standaloneDir: string,
 ): RollbackResult {
-  const lockPath = path.join(path.dirname(standaloneDir), '.hopcode-update.lock');
+  const lockPath = path.join(
+    path.dirname(standaloneDir),
+    '.hopcode-update.lock',
+  );
   try {
     const pidStr = fs.readFileSync(lockPath, 'utf-8').trim();
     const pid = parseInt(pidStr, 10);

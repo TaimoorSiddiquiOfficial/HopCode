@@ -767,7 +767,9 @@ export function mountAcpHttp(
     };
     httpServer.on('upgrade', upgradeListener!);
 
-    writeStderrLine(`hopcode serve: /acp WebSocket transport enabled on ${path}`);
+    writeStderrLine(
+      `hopcode serve: /acp WebSocket transport enabled on ${path}`,
+    );
   }
 
   return {

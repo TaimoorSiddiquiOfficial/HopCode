@@ -220,17 +220,17 @@ Here are the most important commands for daily use:
 
 | Command               | What it does                                     | Example                       |
 | --------------------- | ------------------------------------------------ | ----------------------------- |
-| `hopcode`                | start HopCode                                  | `hopcode`                        |
+| `hopcode`             | start HopCode                                    | `hopcode`                     |
 | `/auth`               | Change authentication method (in session)        | `/auth`                       |
 | `/doctor`             | Check current authentication and environment     | `/doctor`                     |
 | `/help`               | Display help information for available commands  | `/help` or `/?`               |
 | `/compress`           | Replace chat history with summary to save Tokens | `/compress`                   |
 | `/clear`              | Clear terminal screen content                    | `/clear` (shortcut: `Ctrl+L`) |
-| `/theme`              | Change HopCode visual theme                    | `/theme`                      |
+| `/theme`              | Change HopCode visual theme                      | `/theme`                      |
 | `/language`           | View or change language settings                 | `/language`                   |
 | → `ui [language]`     | Set UI interface language                        | `/language ui zh-CN`          |
 | → `output [language]` | Set LLM output language                          | `/language output Chinese`    |
-| `/quit`               | Exit HopCode immediately                       | `/quit` or `/exit`            |
+| `/quit`               | Exit HopCode immediately                         | `/quit` or `/exit`            |
 
 See the [CLI reference](./features/commands) for a complete list of commands.
 

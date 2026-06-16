@@ -12,7 +12,10 @@ import type { Argv, CommandModule } from 'yargs';
 // handler below so it only loads when the user actually runs `hopcode serve`.
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 import { DEFAULT_RING_SIZE } from '../serve/eventBus.js';
-import { ApprovalMode, MCP_BUDGET_WARN_FRACTION } from '@hoptrendy/hopcode-core';
+import {
+  ApprovalMode,
+  MCP_BUDGET_WARN_FRACTION,
+} from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../config/settings.js';
 import { HEADLESS_IZN_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarnings.js';
 

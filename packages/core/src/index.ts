@@ -278,9 +278,7 @@ export type {
 } from './mcp/oauth-utils.js';
 export { hashMcpServerConfig } from './mcp/configHash.js';
 
-export {
-  GitHubDeviceFlowAuth,
-} from './auth/github-device-flow-auth.js';
+export { GitHubDeviceFlowAuth } from './auth/github-device-flow-auth.js';
 export type {
   DeviceFlowResponse,
   DeviceFlowTokenResponse,

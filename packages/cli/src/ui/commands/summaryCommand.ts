@@ -11,10 +11,7 @@ import {
   CommandKind,
   type SlashCommandActionReturn,
 } from './types.js';
-import {
-  getProjectSummaryPrompt,
-  runSideQuery,
-} from '@hoptrendy/hopcode-core';
+import { getProjectSummaryPrompt, runSideQuery } from '@hoptrendy/hopcode-core';
 import type { HistoryItemSummary } from '../types.js';
 import { t } from '../../i18n/index.js';
 

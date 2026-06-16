@@ -6,11 +6,7 @@
 
 import type { MutableRefObject, ReactNode } from 'react';
 import type { Content, PartListUnion } from '@google/genai';
-import type {
-  Config,
-  Logger,
-  SessionListItem,
-} from '@hoptrendy/hopcode-core';
+import type { Config, Logger, SessionListItem } from '@hoptrendy/hopcode-core';
 import type {
   HistoryItemWithoutId,
   HistoryItem,

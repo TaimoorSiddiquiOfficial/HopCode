@@ -232,9 +232,10 @@ describe('getInstallationInfo', () => {
     });
     mockedLstatSync.mockImplementation((candidate) => {
       if (
-        [`${installDir}/bin/hopcode.cmd`, `${installDir}/node/node.exe`].includes(
-          String(candidate).replace(/\\/g, '/'),
-        )
+        [
+          `${installDir}/bin/hopcode.cmd`,
+          `${installDir}/node/node.exe`,
+        ].includes(String(candidate).replace(/\\/g, '/'))
       ) {
         return fileStats(0o644);
       }
@@ -313,9 +314,7 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, true);
 
     expect(info.packageManager).toBe(PackageManager.NPM);
-    expect(info.updateCommand).toBe(
-      'npm install -g @hoptrendy/hopcode@latest',
-    );
+    expect(info.updateCommand).toBe('npm install -g @hoptrendy/hopcode@latest');
   });
 
   it('should ignore standalone-like installs for the wrong target', () => {
@@ -342,9 +341,7 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, true);
 
     expect(info.packageManager).toBe(PackageManager.NPM);
-    expect(info.updateCommand).toBe(
-      'npm install -g @hoptrendy/hopcode@latest',
-    );
+    expect(info.updateCommand).toBe('npm install -g @hoptrendy/hopcode@latest');
   });
 
   it('should ignore standalone-like installs with symlinked runtime files', () => {
@@ -459,9 +456,7 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, true);
     expect(info.packageManager).toBe(PackageManager.PNPM);
     expect(info.isGlobal).toBe(true);
-    expect(info.updateCommand).toBe(
-      'pnpm add -g @hoptrendy/hopcode@latest',
-    );
+    expect(info.updateCommand).toBe('pnpm add -g @hoptrendy/hopcode@latest');
     expect(info.updateMessage).toContain('Attempting to automatically update');
 
     // isAutoUpdateEnabled = false -> "Please run..."
@@ -590,9 +585,7 @@ describe('getInstallationInfo', () => {
     const info = getInstallationInfo(projectRoot, true);
     expect(info.packageManager).toBe(PackageManager.NPM);
     expect(info.isGlobal).toBe(true);
-    expect(info.updateCommand).toBe(
-      'npm install -g @hoptrendy/hopcode@latest',
-    );
+    expect(info.updateCommand).toBe('npm install -g @hoptrendy/hopcode@latest');
     expect(info.updateMessage).toContain('Attempting to automatically update');
 
     // isAutoUpdateEnabled = false -> "Please run..."

@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  StartImmediateSubagentActionReturn,
-} from './commands/types.js';
+import type { StartImmediateSubagentActionReturn } from './commands/types.js';
 import type {
   CompactionThresholds,
   CompressionStatus,

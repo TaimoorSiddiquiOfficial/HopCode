@@ -355,7 +355,9 @@ describe('generateCustomApiKeyEnvKey', () => {
 
 describe('normalizeCustomModelIds', () => {
   it('splits comma-separated model IDs', () => {
-    const result = normalizeCustomModelIds('hopcode/qwen3-coder,openai/gpt-4.1');
+    const result = normalizeCustomModelIds(
+      'hopcode/qwen3-coder,openai/gpt-4.1',
+    );
     expect(result).toEqual(['hopcode/qwen3-coder', 'openai/gpt-4.1']);
   });
 
@@ -374,7 +376,9 @@ describe('normalizeCustomModelIds', () => {
   });
 
   it('removes empty entries', () => {
-    const result = normalizeCustomModelIds('hopcode/qwen3-coder,,openai/gpt-4.1');
+    const result = normalizeCustomModelIds(
+      'hopcode/qwen3-coder,,openai/gpt-4.1',
+    );
     expect(result).toEqual(['hopcode/qwen3-coder', 'openai/gpt-4.1']);
   });
 

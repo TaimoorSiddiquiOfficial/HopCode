@@ -757,4 +757,3 @@ describe('getAvailableCommands', () => {
     expect(commands.map((command) => command.name)).toContain('export');
   });
 });
-

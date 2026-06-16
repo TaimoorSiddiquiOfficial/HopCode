@@ -13,7 +13,8 @@ import { MessageType } from '../types.js';
 const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
 
 vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
+  const actual =
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     openBrowserSecurely: mockOpenBrowserSecurely,

@@ -10,10 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { theme } from '../semantic-colors.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { loadStatsData, type StatsData } from '../utils/statsDataService.js';
-import {
-  metricsToUsageRecord,
-  type TimeRange,
-} from '@hoptrendy/hopcode-core';
+import { metricsToUsageRecord, type TimeRange } from '@hoptrendy/hopcode-core';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { t } from '../../i18n/index.js';

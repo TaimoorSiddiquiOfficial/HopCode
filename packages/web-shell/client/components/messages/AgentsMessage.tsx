@@ -181,7 +181,9 @@ export function AgentsMessage({
   const [createScope, setCreateScope] = useState<'workspace' | 'global'>(() =>
     mode === 'create-user' ? 'global' : 'workspace',
   );
-  const [createMethod, setCreateMethod] = useState<'manual' | 'hopcode'>('manual');
+  const [createMethod, setCreateMethod] = useState<'manual' | 'hopcode'>(
+    'manual',
+  );
   const [createName, setCreateName] = useState('');
   const [createDesc, setCreateDesc] = useState('');
   const [createPrompt, setCreatePrompt] = useState('');

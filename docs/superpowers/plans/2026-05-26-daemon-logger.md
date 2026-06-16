@@ -16,20 +16,20 @@
 
 ## File map
 
-| File                                           | Action          | Purpose                                                                                                                      |
-| ---------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `packages/cli/src/serve/daemonLogger.ts`       | **new**         | Logger sink + format helper                                                                                                  |
-| `packages/cli/src/serve/daemonLogger.test.ts`  | **new**         | Unit tests for the above                                                                                                     |
-| `packages/acp-bridge/src/bridgeOptions.ts`     | modify          | Add `onDiagnosticLine?` field + `DiagnosticLineSink` type                                                                    |
-| `packages/acp-bridge/src/bridge.ts`            | modify          | Tee `writeServeDebugLine` through `opts.onDiagnosticLine` (via local `teeServeDebugLine` closure)                            |
-| `packages/acp-bridge/src/bridge.test.ts`       | modify          | Add test that `onDiagnosticLine` receives debug lines                                                                        |
-| `packages/acp-bridge/src/spawnChannel.ts`      | modify          | Export `createSpawnChannelFactory({ onDiagnosticLine })`; tee child stderr into callback                                     |
-| `packages/acp-bridge/src/spawnChannel.test.ts` | modify (or new) | Test stderr forwarding callback                                                                                              |
-| `packages/cli/src/serve/server.ts`             | modify          | `createServeApp` deps accept optional `daemonLog`; `sendBridgeError` routes through it when provided                         |
-| `packages/cli/src/serve/server.test.ts`        | modify          | Verify daemonLog receives route-error entries                                                                                |
-| `packages/cli/src/serve/runHopCodeServe.ts`       | modify          | Init logger, boot banner, wire spawn factory + bridge callback, replace lifecycle `writeStderrLine` calls, flush on shutdown |
-| `packages/cli/src/serve/runHopCodeServe.test.ts`  | modify          | Verify boot banner + flush behavior                                                                                          |
-| `docs/cli/serve.md` (or equivalent)            | modify          | Document daemon log path + opt-out                                                                                           |
+| File                                             | Action          | Purpose                                                                                                                      |
+| ------------------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `packages/cli/src/serve/daemonLogger.ts`         | **new**         | Logger sink + format helper                                                                                                  |
+| `packages/cli/src/serve/daemonLogger.test.ts`    | **new**         | Unit tests for the above                                                                                                     |
+| `packages/acp-bridge/src/bridgeOptions.ts`       | modify          | Add `onDiagnosticLine?` field + `DiagnosticLineSink` type                                                                    |
+| `packages/acp-bridge/src/bridge.ts`              | modify          | Tee `writeServeDebugLine` through `opts.onDiagnosticLine` (via local `teeServeDebugLine` closure)                            |
+| `packages/acp-bridge/src/bridge.test.ts`         | modify          | Add test that `onDiagnosticLine` receives debug lines                                                                        |
+| `packages/acp-bridge/src/spawnChannel.ts`        | modify          | Export `createSpawnChannelFactory({ onDiagnosticLine })`; tee child stderr into callback                                     |
+| `packages/acp-bridge/src/spawnChannel.test.ts`   | modify (or new) | Test stderr forwarding callback                                                                                              |
+| `packages/cli/src/serve/server.ts`               | modify          | `createServeApp` deps accept optional `daemonLog`; `sendBridgeError` routes through it when provided                         |
+| `packages/cli/src/serve/server.test.ts`          | modify          | Verify daemonLog receives route-error entries                                                                                |
+| `packages/cli/src/serve/runHopCodeServe.ts`      | modify          | Init logger, boot banner, wire spawn factory + bridge callback, replace lifecycle `writeStderrLine` calls, flush on shutdown |
+| `packages/cli/src/serve/runHopCodeServe.test.ts` | modify          | Verify boot banner + flush behavior                                                                                          |
+| `docs/cli/serve.md` (or equivalent)              | modify          | Document daemon log path + opt-out                                                                                           |
 
 ---
 
@@ -284,7 +284,8 @@ import { afterEach, beforeEach } from 'vitest';
 describe('initDaemonLogger opt-out', () => {
   const originalEnv = process.env['HOPCODE_DAEMON_LOG_FILE'];
   afterEach(() => {
-    if (originalEnv === undefined) delete process.env['HOPCODE_DAEMON_LOG_FILE'];
+    if (originalEnv === undefined)
+      delete process.env['HOPCODE_DAEMON_LOG_FILE'];
     else process.env['HOPCODE_DAEMON_LOG_FILE'] = originalEnv;
   });
 
@@ -1252,7 +1253,8 @@ it('runHopCodeServe initializes daemon logger and writes boot banner + flushes o
     const after = readFileSync(path.join(daemonDir, logs[0]), 'utf8');
     expect(after).toMatch(/shutdown/i);
   } finally {
-    if (originalRuntime === undefined) delete process.env['HOPCODE_RUNTIME_DIR'];
+    if (originalRuntime === undefined)
+      delete process.env['HOPCODE_RUNTIME_DIR'];
     else process.env['HOPCODE_RUNTIME_DIR'] = originalRuntime;
     rmSync(tmpRuntime, { recursive: true, force: true });
   }

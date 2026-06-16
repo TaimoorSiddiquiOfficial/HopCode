@@ -25,11 +25,7 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
-import type {
-  Config,
-  SkillConfig,
-  SkillLevel,
-} from '@hoptrendy/hopcode-core';
+import type { Config, SkillConfig, SkillLevel } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../../config/settings.js';
 import { SettingScope } from '../../../config/settings.js';
 import { t } from '../../../i18n/index.js';

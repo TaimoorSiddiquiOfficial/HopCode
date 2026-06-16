@@ -7,10 +7,7 @@
 import type { GenerateContentResponseUsageMetadata } from '@google/genai';
 import type { SubagentMeta } from '../types.js';
 import type { Usage } from '@agentclientprotocol/sdk';
-import {
-  getActiveGoal,
-  type GoalTerminalEvent,
-} from '@hoptrendy/hopcode-core';
+import { getActiveGoal, type GoalTerminalEvent } from '@hoptrendy/hopcode-core';
 import { BaseEmitter } from './BaseEmitter.js';
 import type { HistoryItemGoalStatus } from '../../../ui/types.js';
 

@@ -82,7 +82,9 @@ export function buildWebSearchConfig(
     // Tavily
     const tavilyKey =
       argv.tavilyApiKey ||
-      (settings.advanced as Record<string, string | undefined>)?.['tavilyApiKey'] ||
+      (settings.advanced as Record<string, string | undefined>)?.[
+        'tavilyApiKey'
+      ] ||
       process.env['TAVILY_API_KEY'];
     if (tavilyKey) {
       providers.push({ type: 'tavily', apiKey: tavilyKey });

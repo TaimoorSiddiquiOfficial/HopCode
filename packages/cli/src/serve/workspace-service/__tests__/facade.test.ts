@@ -807,7 +807,10 @@ describe('createDaemonWorkspaceService', () => {
           filePath: Parameters<typeof origOpen>[0],
           flags?: Parameters<typeof origOpen>[1],
         ) => {
-          if (String(flags) === 'wx' && String(filePath).endsWith('HOPCODE.md')) {
+          if (
+            String(flags) === 'wx' &&
+            String(filePath).endsWith('HOPCODE.md')
+          ) {
             const err = new Error('EEXIST') as NodeJS.ErrnoException;
             err.code = 'EEXIST';
             throw err;

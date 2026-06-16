@@ -1650,9 +1650,10 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
   });
 
   it('extMethod preflight surfaces SkillError as parse_error errorKind', async () => {
-    const skillError = new (
-      await import('@hoptrendy/hopcode-core')
-    ).SkillError('bad frontmatter', 'PARSE_ERROR');
+    const skillError = new (await import('@hoptrendy/hopcode-core')).SkillError(
+      'bad frontmatter',
+      'PARSE_ERROR',
+    );
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
@@ -2405,11 +2406,11 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
       },
     }) as AgentLike;
 
-    await expect(agent.extMethod('hopcode/settings/getPath', {})).resolves.toEqual(
-      {
-        path: '/home/test/.hopcode/settings.json',
-      },
-    );
+    await expect(
+      agent.extMethod('hopcode/settings/getPath', {}),
+    ).resolves.toEqual({
+      path: '/home/test/.hopcode/settings.json',
+    });
     await expect(
       agent.extMethod('hopcode/settings/getMemory', {}),
     ).resolves.toEqual({
@@ -2427,7 +2428,10 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
     ).resolves.toEqual({
       paths: {
         userMemoryFile: path.join('/tmp/hopcode-global-test', 'HOPCODE.md'),
-        projectMemoryFile: path.join('/tmp/hopcode-memory-cwd-test', 'HOPCODE.md'),
+        projectMemoryFile: path.join(
+          '/tmp/hopcode-memory-cwd-test',
+          'HOPCODE.md',
+        ),
         autoMemoryDir: '/tmp/hopcode-memory-root-test/.hopcode/memory',
       },
     });
@@ -3206,7 +3210,9 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
       },
     }) as AgentLike;
 
-    await expect(agent.extMethod('hopcode/providers/list', {})).resolves.toEqual({
+    await expect(
+      agent.extMethod('hopcode/providers/list', {}),
+    ).resolves.toEqual({
       providers: [
         expect.objectContaining({
           id: 'deepseek',
@@ -3919,7 +3925,12 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
     const tempProject = await fs.mkdtemp(
       path.join(os.tmpdir(), 'hopcode-project-cwd-skill-'),
     );
-    const skillDir = path.join(tempProject, '.hopcode', 'skills', 'issue-fixer');
+    const skillDir = path.join(
+      tempProject,
+      '.hopcode',
+      'skills',
+      'issue-fixer',
+    );
     const skillFile = path.join(skillDir, 'SKILL.md');
     await fs.mkdir(skillDir, { recursive: true });
     await fs.writeFile(
@@ -5569,9 +5580,7 @@ describe('normalizeCoreSettingValue', () => {
   });
 
   it('accepts an allowed enum value and rejects an unknown one', () => {
-    expect(normalizeCoreSettingValue('tools.approvalMode', 'izn')).toBe(
-      'izn',
-    );
+    expect(normalizeCoreSettingValue('tools.approvalMode', 'izn')).toBe('izn');
     expect(() =>
       normalizeCoreSettingValue('tools.approvalMode', 'bogus'),
     ).toThrowError(/must be one of/);

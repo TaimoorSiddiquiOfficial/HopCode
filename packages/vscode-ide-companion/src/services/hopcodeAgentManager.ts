@@ -289,12 +289,7 @@ export class HopCodeAgentManager {
         const obj = (init || {}) as Record<string, unknown>;
         const modes = obj['modes'] as
           | {
-              currentModeId?:
-                | 'plan'
-                | 'default'
-                | 'auto-edit'
-                | 'auto'
-                | 'izn';
+              currentModeId?: 'plan' | 'default' | 'auto-edit' | 'auto' | 'izn';
               availableModes?: Array<{
                 id: 'plan' | 'default' | 'auto-edit' | 'auto' | 'izn';
                 name: string;
@@ -660,21 +655,25 @@ export class HopCodeAgentManager {
       }));
       const filtered =
         cursor !== undefined
-          ? allWithMtime.filter((x: { raw: HopCodeSession; mtime: number }) => x.mtime < cursor)
+          ? allWithMtime.filter(
+              (x: { raw: HopCodeSession; mtime: number }) => x.mtime < cursor,
+            )
           : allWithMtime;
       const page = filtered.slice(0, size);
-      const sessions = page.map((x: { raw: HopCodeSession; mtime: number }) => ({
-        id: x.raw.sessionId,
-        sessionId: x.raw.sessionId,
-        title: this.sessionReader.getSessionTitle(x.raw),
-        name: this.sessionReader.getSessionTitle(x.raw),
-        startTime: x.raw.startTime,
-        lastUpdated: x.raw.lastUpdated,
-        messageCount: x.raw.messageCount ?? x.raw.messages.length,
-        projectHash: x.raw.projectHash,
-        filePath: x.raw.filePath,
-        cwd: x.raw.cwd,
-      }));
+      const sessions = page.map(
+        (x: { raw: HopCodeSession; mtime: number }) => ({
+          id: x.raw.sessionId,
+          sessionId: x.raw.sessionId,
+          title: this.sessionReader.getSessionTitle(x.raw),
+          name: this.sessionReader.getSessionTitle(x.raw),
+          startTime: x.raw.startTime,
+          lastUpdated: x.raw.lastUpdated,
+          messageCount: x.raw.messageCount ?? x.raw.messages.length,
+          projectHash: x.raw.projectHash,
+          filePath: x.raw.filePath,
+          cwd: x.raw.cwd,
+        }),
+      );
       const nextCursorVal =
         page.length > 0 ? page[page.length - 1].mtime : undefined;
       const hasMore = filtered.length > size;
@@ -1215,11 +1214,13 @@ export class HopCodeAgentManager {
       }
 
       // Convert message format
-      const messages: ChatMessage[] = session.messages.map((msg: HopCodeMessage) => ({
-        role: msg.type === 'user' ? 'user' : 'assistant',
-        content: msg.content,
-        timestamp: new Date(msg.timestamp).getTime(),
-      }));
+      const messages: ChatMessage[] = session.messages.map(
+        (msg: HopCodeMessage) => ({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.content,
+          timestamp: new Date(msg.timestamp).getTime(),
+        }),
+      );
 
       return messages;
     } catch (error) {
@@ -1450,11 +1451,7 @@ export class HopCodeAgentManager {
   /**
    * Register mode changed callback
    */
-  onModeChanged(
-    callback: (
-      modeId: ApprovalModeValue,
-    ) => void,
-  ): void {
+  onModeChanged(callback: (modeId: ApprovalModeValue) => void): void {
     this.callbacks.onModeChanged = callback;
     this.sessionUpdateHandler.updateCallbacks(this.callbacks);
   }

@@ -70,7 +70,9 @@ describe('isDiscontinuedModel', () => {
 
   it('does NOT flag a runtime HopCode OAuth snapshot as discontinued', () => {
     expect(
-      isDiscontinuedModel('$runtime|hopcode-oauth|qwen3-coder-plus(hopcode-oauth)'),
+      isDiscontinuedModel(
+        '$runtime|hopcode-oauth|qwen3-coder-plus(hopcode-oauth)',
+      ),
     ).toBe(false);
   });
 

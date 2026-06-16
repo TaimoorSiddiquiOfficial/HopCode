@@ -1662,7 +1662,8 @@ function getNestedSettingValue(
 function readCoreSettingValues(
   source: Record<string, unknown>,
 ): Partial<Record<HopCodeCoreSettingKey, HopCodeSettingValue>> {
-  const values: Partial<Record<HopCodeCoreSettingKey, HopCodeSettingValue>> = {};
+  const values: Partial<Record<HopCodeCoreSettingKey, HopCodeSettingValue>> =
+    {};
   for (const key of HOPCODE_CORE_SETTING_KEYS) {
     const value = getNestedSettingValue(source, key);
     if (value !== undefined) {
