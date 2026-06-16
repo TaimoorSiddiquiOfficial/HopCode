@@ -55,5 +55,10 @@
     "vitest": "^3.2.4",
     "@hoptrendy/sdk": "file:../sdk-typescript",
     "@hoptrendy/webui": "file:../webui"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "directory": "packages/web-shell"
   }
 }

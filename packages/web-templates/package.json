@@ -4,7 +4,8 @@
   "description": "Web templates bundled as embeddable JS/CSS strings",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QwenLM/hopcode.git"
+    "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git",
+    "directory": "packages/web-templates"
   },
   "type": "module",
   "main": "dist/index.js",
