@@ -265,7 +265,9 @@ export class AuthMessageHandler extends BaseMessageHandler {
         `${flowTitle}: Protocol`,
         'Select API protocol',
       );
-      if (!selected) return;
+      if (!selected) {
+        return;
+      }
       protocol = selected as AuthType;
     }
 
@@ -345,7 +347,9 @@ export class AuthMessageHandler extends BaseMessageHandler {
     // failures, and validateApiKey could reject in VS Code what the CLI
     // (which trims) accepts.
     const apiKey = apiKeyInput.trim();
-    if (!apiKey) return;
+    if (!apiKey) {
+      return;
+    }
 
     // Validate API key if provider has validation
     if (provider.validateApiKey) {
