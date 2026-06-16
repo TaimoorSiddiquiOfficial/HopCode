@@ -428,8 +428,8 @@ describe('Server Config (config.ts)', () => {
     vi.spyOn(config, 'getChatRecordingService').mockReturnValue({
       recordFileHistorySnapshot,
     } as unknown as ReturnType<Config['getChatRecordingService']>);
-    const getGlobalQwenDirSpy = vi
-      .spyOn(Storage, 'getGlobalQwenDir')
+    const getGlobalHopCodeDirSpy = vi
+      .spyOn(Storage, 'getGlobalHopCodeDir')
       .mockReturnValue(storageDir);
 
     try {
@@ -448,15 +448,17 @@ describe('Server Config (config.ts)', () => {
         }),
       );
     } finally {
-      getGlobalQwenDirSpy.mockRestore();
+      getGlobalHopCodeDirSpy.mockRestore();
       await rm(projectDir, { recursive: true, force: true });
       await rm(storageDir, { recursive: true, force: true });
     }
   });
 
   it('drops stale file history callbacks after session switch', async () => {
-    const projectDir = await mkdtemp(path.join(os.tmpdir(), 'qwen-config-'));
-    const storageDir = await mkdtemp(path.join(os.tmpdir(), 'qwen-storage-'));
+    const projectDir = await mkdtemp(path.join(os.tmpdir(), 'hopcode-config-'));
+    const storageDir = await mkdtemp(
+      path.join(os.tmpdir(), 'hopcode-storage-'),
+    );
     const config = new Config({
       ...baseParams,
       cwd: projectDir,
@@ -466,8 +468,8 @@ describe('Server Config (config.ts)', () => {
     vi.spyOn(config, 'getChatRecordingService').mockReturnValue({
       recordFileHistorySnapshot,
     } as unknown as ReturnType<Config['getChatRecordingService']>);
-    const getGlobalQwenDirSpy = vi
-      .spyOn(Storage, 'getGlobalQwenDir')
+    const getGlobalHopCodeDirSpy = vi
+      .spyOn(Storage, 'getGlobalHopCodeDir')
       .mockReturnValue(storageDir);
 
     try {
@@ -481,7 +483,7 @@ describe('Server Config (config.ts)', () => {
 
       expect(recordFileHistorySnapshot).not.toHaveBeenCalled();
     } finally {
-      getGlobalQwenDirSpy.mockRestore();
+      getGlobalHopCodeDirSpy.mockRestore();
       await rm(projectDir, { recursive: true, force: true });
       await rm(storageDir, { recursive: true, force: true });
     }

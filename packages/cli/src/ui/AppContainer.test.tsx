@@ -997,7 +997,7 @@ describe('AppContainer State Management', () => {
         streamingState: 'responding',
         submitQuery: vi.fn(),
         initError: null,
-        pendingHistoryItems: [],
+        pendingGeminiHistoryItems: [],
         thought: null,
         cancelOngoingRequest: cancelSpy,
         retryLastPrompt: vi.fn(),
