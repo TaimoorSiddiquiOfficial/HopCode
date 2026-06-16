@@ -75,8 +75,19 @@ describe('EventBus', () => {
 
     setTimeout(() => bus.publish({ type: 'foo', data: 'c' }), 5);
 
-    const events = await collect(iter, 3);
-    expect(events.map((e) => e.data)).toEqual(['a', 'b', 'c']);
+    const events = await collect(iter, 4);
+    expect(events.map((e) => e.type)).toEqual([
+      'foo',
+      'foo',
+      'replay_complete',
+      'foo',
+    ]);
+    expect(events.map((e) => e.data)).toEqual([
+      'a',
+      'b',
+      { lastReplayedEventId: 2, lastEventId: 2, replayedCount: 2 },
+      'c',
+    ]);
     abort.abort();
   });
 
@@ -246,10 +257,13 @@ describe('EventBus', () => {
     const events: BridgeEvent[] = [];
     for await (const e of iter) {
       events.push(e);
-      if (events.length === 11) break;
+      if (events.length === 12) break;
     }
     // The live frame must arrive — NOT a `client_evicted` terminal.
     expect(events.find((e) => e.type === 'client_evicted')).toBeUndefined();
+    expect(events.find((e) => e.type === 'replay_complete')).toMatchObject({
+      data: { lastReplayedEventId: 10, lastEventId: 10, replayedCount: 10 },
+    });
     expect(events.at(-1)?.type).toBe('live');
     expect(events.filter((e) => e.type === 'replay')).toHaveLength(10);
     abort.abort();
@@ -321,9 +335,21 @@ describe('EventBus', () => {
     const out: BridgeEvent[] = [];
     for await (const e of iter) {
       out.push(e);
-      if (out.length === 3) break;
+      if (out.length === 5) break;
     }
-    expect(out.map((e) => e.id)).toEqual([3, 4, 5]);
+    expect(out[0]).toMatchObject({
+      type: 'state_resync_required',
+      data: {
+        reason: 'ring_evicted',
+        lastDeliveredId: 0,
+        earliestAvailableId: 3,
+      },
+    });
+    expect(out.slice(1, 4).map((e) => e.id)).toEqual([3, 4, 5]);
+    expect(out[4]).toMatchObject({
+      type: 'replay_complete',
+      data: { lastReplayedEventId: 5, lastEventId: 5, replayedCount: 3 },
+    });
     abort.abort();
   });
 });

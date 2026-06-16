@@ -5365,8 +5365,8 @@ describe('createAcpSessionBridge', () => {
       // first fully completed.
       expect(maxInFlight).toBe(1);
       expect(order).toEqual([
-        'start:IZN',
-        'end:IZN',
+        'start:izn',
+        'end:izn',
         'start:default',
         'end:default',
       ]);
@@ -7204,12 +7204,15 @@ describe('createAcpSessionBridge', () => {
         signal: abort.signal,
       });
 
-      void capturedConn!.extNotification('qwen/notify/session/title-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        title: 'Fix login button on mobile',
-        titleSource: 'auto',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/title-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          title: 'Fix login button on mobile',
+          titleSource: 'auto',
+        },
+      );
 
       const collected: Array<{ type: string; data: unknown }> = [];
       for await (const e of iter) {
@@ -7242,24 +7245,36 @@ describe('createAcpSessionBridge', () => {
       })();
 
       // Missing title / empty title / non-string title / missing sessionId.
-      void capturedConn!.extNotification('qwen/notify/session/title-update', {
-        v: 1,
-        sessionId: session.sessionId,
-      });
-      void capturedConn!.extNotification('qwen/notify/session/title-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        title: '',
-      });
-      void capturedConn!.extNotification('qwen/notify/session/title-update', {
-        v: 1,
-        sessionId: session.sessionId,
-        title: 123 as unknown as string,
-      });
-      void capturedConn!.extNotification('qwen/notify/session/title-update', {
-        v: 1,
-        title: 'orphan',
-      });
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/title-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+        },
+      );
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/title-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          title: '',
+        },
+      );
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/title-update',
+        {
+          v: 1,
+          sessionId: session.sessionId,
+          title: 123 as unknown as string,
+        },
+      );
+      void capturedConn!.extNotification(
+        'hopcode/notify/session/title-update',
+        {
+          v: 1,
+          title: 'orphan',
+        },
+      );
       await new Promise((r) => setTimeout(r, 10));
       abort.abort();
       await collecting;

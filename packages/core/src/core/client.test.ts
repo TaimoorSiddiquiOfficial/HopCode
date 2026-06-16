@@ -1086,7 +1086,7 @@ describe('Gemini Client (client.ts)', () => {
       await client.startChat(undefined, SessionStartSource.Startup);
 
       expect(client.getChat()['generationConfig'].systemInstruction).toBe(
-        'Base instruction\n\n---\n\nUser memory\n\n---\n\nAppended rule\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</qwen:session-start-context>',
+        'Base instruction\n\n---\n\nUser memory\n\n---\n\nAppended rule\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</hopcode:session-start-context>',
       );
     });
 
@@ -1115,7 +1115,7 @@ describe('Gemini Client (client.ts)', () => {
       await client.refreshSystemInstruction();
 
       expect(client.getChat()['generationConfig'].systemInstruction).toBe(
-        'Updated instruction\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</qwen:session-start-context>',
+        'Updated instruction\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</hopcode:session-start-context>',
       );
     });
 
@@ -6996,7 +6996,6 @@ Other open files:
         expect.objectContaining({
           model: DEFAULT_HOPCODE_FLASH_MODEL,
           config: expect.objectContaining({
-            abortSignal,
             systemInstruction: getCoreSystemPrompt(''),
             temperature: 0.5,
           }),

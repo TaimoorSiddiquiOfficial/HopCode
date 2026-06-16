@@ -933,7 +933,7 @@ describe('DaemonSessionProvider', () => {
           data: {
             key: 'ui.theme',
             scope: 'workspace',
-            value: 'Qwen Dark',
+            value: 'HopCode Dark',
           },
         };
         yield {

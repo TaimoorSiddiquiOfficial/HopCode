@@ -2798,16 +2798,16 @@ describe('Settings Loading and Merging', () => {
       delete process.env['TEST_PORT'];
     });
 
-    describe('when HOPCODE_SYSTEM_SETTINGS_PATH is set', () => {
+    describe('when HOPCODE_CODE_SYSTEM_SETTINGS_PATH is set', () => {
       const MOCK_ENV_SYSTEM_SETTINGS_PATH = '/mock/env/system/settings.json';
 
       beforeEach(() => {
-        process.env['HOPCODE_SYSTEM_SETTINGS_PATH'] =
+        process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'] =
           MOCK_ENV_SYSTEM_SETTINGS_PATH;
       });
 
       afterEach(() => {
-        delete process.env['HOPCODE_SYSTEM_SETTINGS_PATH'];
+        delete process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'];
       });
 
       it('should load system settings from the path specified in the environment variable', () => {

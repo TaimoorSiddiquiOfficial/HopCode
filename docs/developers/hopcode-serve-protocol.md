@@ -517,7 +517,7 @@ omitted when discovery succeeds.
   "v": 1,
   "workspaceCwd": "/canonical/path",
   "initialized": true,
-  "current": { "authType": "qwen", "modelId": "qwen3(qwen)" },
+  "current": { "authType": "qwen", "modelId": "qwen3(hopcode)" },
   "providers": [
     {
       "kind": "model_provider",
@@ -526,7 +526,7 @@ omitted when discovery succeeds.
       "current": true,
       "models": [
         {
-          "modelId": "qwen3(qwen)",
+          "modelId": "qwen3(hopcode)",
           "baseModelId": "qwen3",
           "name": "Qwen 3",
           "description": null,

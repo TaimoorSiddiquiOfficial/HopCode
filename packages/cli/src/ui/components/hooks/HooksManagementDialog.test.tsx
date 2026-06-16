@@ -5,10 +5,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { cleanup } from 'ink-testing-library';
+import { act } from 'react';
 import { HookEventName } from '@hoptrendy/hopcode-core';
 import { HooksManagementDialog } from './HooksManagementDialog.js';
-import { renderWithProviders } from '../../../test-utils/render.js';
+import { cleanup, renderWithProviders } from '../../../test-utils/render.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { useConfig } from '../../contexts/ConfigContext.js';
 import { loadSettings, SettingScope } from '../../../config/settings.js';
@@ -23,6 +23,17 @@ const mockedUseKeypress = vi.mocked(useKeypress);
 const mockedUseConfig = vi.mocked(useConfig);
 const mockedLoadSettings = vi.mocked(loadSettings);
 let keypressHandler: ((key: Key) => void) | null = null;
+
+const mockDefaultConfig = vi.hoisted(() => ({
+  getExtensions: vi.fn(() => []),
+  getDisableAllHooks: vi.fn(() => false),
+  getHookSystem: vi.fn(() => ({
+    getSessionHooksManager: vi.fn(() => ({
+      getAllSessionHooks: vi.fn(() => []),
+    })),
+  })),
+  getSessionId: vi.fn(() => 'test-session-id'),
+}));
 
 /**
  * Returns a `useConfig` return value with `disableAllHooks` flipped on, while
@@ -79,16 +90,7 @@ vi.mock('../../contexts/ConfigContext.js', async (importOriginal) => {
     await importOriginal<typeof import('../../contexts/ConfigContext.js')>();
   return {
     ...actual,
-    useConfig: vi.fn(() => ({
-      getExtensions: vi.fn(() => []),
-      getDisableAllHooks: vi.fn(() => false),
-      getHookSystem: vi.fn(() => ({
-        getSessionHooksManager: vi.fn(() => ({
-          getAllSessionHooks: vi.fn(() => []),
-        })),
-      })),
-      getSessionId: vi.fn(() => 'test-session-id'),
-    })),
+    useConfig: vi.fn(() => mockDefaultConfig),
   };
 });
 
@@ -156,9 +158,11 @@ function mockSettingsHooks(userHooks: Record<string, unknown>): void {
 }
 
 function pressKey(name: string, sequence = ''): void {
-  const latestHandler = mockedUseKeypress.mock.calls.at(-1)?.[0];
-  expect(latestHandler).toBeDefined();
-  latestHandler!(createKey(name, sequence));
+  const latestHandler = keypressHandler;
+  expect(latestHandler).not.toBeNull();
+  act(() => {
+    latestHandler!(createKey(name, sequence));
+  });
 }
 
 describe('HooksManagementDialog', () => {

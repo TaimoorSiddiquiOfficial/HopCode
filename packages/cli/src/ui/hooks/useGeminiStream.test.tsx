@@ -2417,13 +2417,13 @@ describe('useGeminiStream', () => {
 
       expect(mockSendMessageStream).toHaveBeenCalledTimes(1);
 
-      expect(result.current.pendingHistoryItems).toEqual([]);
+      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
 
       await act(async () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingHistoryItems).toEqual([
+      expect(result.current.pendingGeminiHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini',
           text: 'Hello',
@@ -2483,7 +2483,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingHistoryItems).toEqual([]);
+      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
 
       await act(async () => {
         releaseNextChunk();
@@ -2495,7 +2495,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingHistoryItems).toEqual([
+      expect(result.current.pendingGeminiHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini',
           text: '哈哈',
@@ -2544,13 +2544,13 @@ describe('useGeminiStream', () => {
       });
 
       expect(mockSendMessageStream).toHaveBeenCalledTimes(1);
-      expect(result.current.pendingHistoryItems).toEqual([]);
+      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
 
       await act(async () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingHistoryItems).toEqual([
+      expect(result.current.pendingGeminiHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           text: 'Thinking',
@@ -2608,7 +2608,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingHistoryItems).toEqual([]);
+      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
       expect(result.current.thought).toBeNull();
 
       await act(async () => {
@@ -2621,7 +2621,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingHistoryItems).toEqual([
+      expect(result.current.pendingGeminiHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           text: 'Thinking',
@@ -3127,7 +3127,7 @@ describe('useGeminiStream', () => {
       });
 
       // Sanity: the throttle has not fired yet.
-      expect(result.current.pendingHistoryItems).toEqual([]);
+      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
 
       act(() => {
         result.current.cancelOngoingRequest();
@@ -4645,7 +4645,7 @@ describe('useGeminiStream', () => {
         });
 
         const findErrorItem = () =>
-          result.current.pendingHistoryItems.find(
+          result.current.pendingGeminiHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           );
 
@@ -4667,9 +4667,10 @@ describe('useGeminiStream', () => {
           await vi.advanceTimersByTimeAsync(1000);
         });
 
-        const errorAfterOneSecond = result.current.pendingHistoryItems.find(
-          (item) => item.type === MessageType.ERROR,
-        );
+        const errorAfterOneSecond =
+          result.current.pendingGeminiHistoryItems.find(
+            (item) => item.type === MessageType.ERROR,
+          );
         expect((errorAfterOneSecond as { hint?: string })?.hint).toContain(
           '2s',
         );
@@ -4688,7 +4689,7 @@ describe('useGeminiStream', () => {
         });
 
         // Error item (with hint) should be cleared after retry succeeds
-        const remainingError = result.current.pendingHistoryItems.find(
+        const remainingError = result.current.pendingGeminiHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         );
         expect(remainingError).toBeUndefined();
@@ -4756,14 +4757,14 @@ describe('useGeminiStream', () => {
           void result.current.submitQuery('Trigger retry after countdown');
         });
 
-        let errorItem = result.current.pendingHistoryItems.find(
+        let errorItem = result.current.pendingGeminiHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         ) as { hint?: string } | undefined;
         for (let attempts = 0; attempts < 5 && !errorItem; attempts++) {
           await act(async () => {
             await Promise.resolve();
           });
-          errorItem = result.current.pendingHistoryItems.find(
+          errorItem = result.current.pendingGeminiHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           ) as { hint?: string } | undefined;
         }
@@ -4774,7 +4775,7 @@ describe('useGeminiStream', () => {
         });
 
         const staleErrorBeforeRetryCompletes =
-          result.current.pendingHistoryItems.find(
+          result.current.pendingGeminiHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           ) as { hint?: string } | undefined;
         expect(staleErrorBeforeRetryCompletes?.hint).toContain('0s');
@@ -4785,7 +4786,7 @@ describe('useGeminiStream', () => {
           await Promise.resolve();
         });
 
-        const remainingError = result.current.pendingHistoryItems.find(
+        const remainingError = result.current.pendingGeminiHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         );
         expect(remainingError).toBeUndefined();
@@ -4794,7 +4795,7 @@ describe('useGeminiStream', () => {
       }
     });
 
-    it('should memoize pendingHistoryItems', () => {
+    it('should memoize pendingGeminiHistoryItems', () => {
       mockUseReactToolScheduler.mockReturnValue([
         [],
         mockScheduleToolCalls,
@@ -4825,9 +4826,9 @@ describe('useGeminiStream', () => {
         ),
       );
 
-      const firstResult = result.current.pendingHistoryItems;
+      const firstResult = result.current.pendingGeminiHistoryItems;
       rerender();
-      const secondResult = result.current.pendingHistoryItems;
+      const secondResult = result.current.pendingGeminiHistoryItems;
 
       expect(firstResult).toStrictEqual(secondResult);
 
@@ -4855,7 +4856,7 @@ describe('useGeminiStream', () => {
       ]);
 
       rerender();
-      const thirdResult = result.current.pendingHistoryItems;
+      const thirdResult = result.current.pendingGeminiHistoryItems;
 
       expect(thirdResult).not.toStrictEqual(secondResult);
     });
@@ -5032,7 +5033,7 @@ describe('useGeminiStream', () => {
       // Verify error message appears in pending history items (not via addItem,
       // since errors with retry hints are now stored as pending items)
       await waitFor(() => {
-        const errorItem = result.current.pendingHistoryItems.find(
+        const errorItem = result.current.pendingGeminiHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -5086,7 +5087,7 @@ describe('useGeminiStream', () => {
 
       // Verify error appears in pending history items
       await waitFor(() => {
-        const errorItem = result.current.pendingHistoryItems.find(
+        const errorItem = result.current.pendingGeminiHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -5109,7 +5110,7 @@ describe('useGeminiStream', () => {
 
       // Verify the error is cleared (no longer in pending history items)
       await waitFor(() => {
-        const errorItem = result.current.pendingHistoryItems.find(
+        const errorItem = result.current.pendingGeminiHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeUndefined();
@@ -5137,7 +5138,7 @@ describe('useGeminiStream', () => {
       });
 
       await waitFor(() => {
-        const errorItem = result.current.pendingHistoryItems.find(
+        const errorItem = result.current.pendingGeminiHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -5178,7 +5179,7 @@ describe('useGeminiStream', () => {
       expect(errorCommit?.[0]).not.toHaveProperty('hint');
 
       // The pending region is cleared, as before.
-      const errorItem = result.current.pendingHistoryItems.find(
+      const errorItem = result.current.pendingGeminiHistoryItems.find(
         (item) => item.type === 'error',
       );
       expect(errorItem).toBeUndefined();

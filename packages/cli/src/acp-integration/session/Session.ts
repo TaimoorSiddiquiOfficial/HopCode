@@ -2267,7 +2267,7 @@ export class Session implements SessionContext {
       .getChatRecordingService()
       ?.setTitleRecordedCallback((customTitle, titleSource) => {
         void this.client
-          .extNotification('qwen/notify/session/title-update', {
+          .extNotification('hopcode/notify/session/title-update', {
             v: 1,
             sessionId: this.sessionId,
             title: customTitle,

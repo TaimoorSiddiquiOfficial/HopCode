@@ -251,7 +251,7 @@ describe('GeminiChat', async () => {
       isolatedChat.setSessionStartContext('Ctx2');
 
       expect(isolatedChat['generationConfig'].systemInstruction).toBe(
-        'Base instruction\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx2\n</qwen:session-start-context>',
+        'Base instruction\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx2\n</hopcode:session-start-context>',
       );
     });
 
@@ -271,7 +271,7 @@ describe('GeminiChat', async () => {
       isolatedChat.setSessionStartContext('Ctx2');
 
       expect(isolatedChat['generationConfig'].systemInstruction).toBe(
-        'Base instruction\n\n---\n\nUser memory\n\n---\n\nAppended rule\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx2\n</qwen:session-start-context>',
+        'Base instruction\n\n---\n\nUser memory\n\n---\n\nAppended rule\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx2\n</hopcode:session-start-context>',
       );
     });
 
@@ -293,7 +293,7 @@ describe('GeminiChat', async () => {
       isolatedChat.setSessionStartContext('Ctx2');
 
       expect(isolatedChat['generationConfig'].systemInstruction).toBe(
-        'Base content instruction\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx2\n</qwen:session-start-context>',
+        'Base content instruction\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx2\n</hopcode:session-start-context>',
       );
     });
 
@@ -313,7 +313,7 @@ describe('GeminiChat', async () => {
       );
 
       expect(isolatedChat['generationConfig'].systemInstruction).toBe(
-        'Base instruction\n\n<qwen:session-start-context hidden="true">\nSessionStart additional context:\nSync ctx\n</qwen:session-start-context>',
+        'Base instruction\n\n<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nSync ctx\n</hopcode:session-start-context>',
       );
     });
 
@@ -335,7 +335,7 @@ describe('GeminiChat', async () => {
         'Legitimate content',
       );
       expect(isolatedChat['generationConfig'].systemInstruction).toContain(
-        '<qwen:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</qwen:session-start-context>',
+        '<hopcode:session-start-context hidden="true">\nSessionStart additional context:\nCtx1\n</hopcode:session-start-context>',
       );
     });
   });

@@ -597,12 +597,12 @@ export class BridgeClient implements Client {
 
   /**
    * Handle child->bridge ACP `extNotification` calls. Six methods are
-   * recognized — `qwen/notify/session/model-update`,
-   * `qwen/notify/session/mode-update`,
-   * `qwen/notify/session/title-update` (auto/in-process session titles),
-   * `qwen/notify/session/prompt-suggestion` (followup assist),
-   * `qwen/notify/session/terminal-sequence`, and
-   * `qwen/notify/session/mcp-budget-event` — each translated into a
+   * recognized — `hopcode/notify/session/model-update`,
+   * `hopcode/notify/session/mode-update`,
+   * `hopcode/notify/session/title-update` (auto/in-process session titles),
+   * `hopcode/notify/session/prompt-suggestion` (followup assist),
+   * `hopcode/notify/session/terminal-sequence`, and
+   * `hopcode/notify/session/mcp-budget-event` — each translated into a
    * session-scoped SSE frame. Unknown methods are dropped silently
    * for forward-compat.
    */
@@ -618,7 +618,7 @@ export class BridgeClient implements Client {
       this.handleInSessionModeUpdate(params);
       return;
     }
-    if (method === 'qwen/notify/session/title-update') {
+    if (method === 'hopcode/notify/session/title-update') {
       // Child-side title updates (auto-generated titles land in the child's
       // chat recording — the bridge never sees the write) are rebroadcast as
       // the canonical `session_metadata_updated` envelope, the same event
@@ -646,7 +646,7 @@ export class BridgeClient implements Client {
       }
       return;
     }
-    if (method === 'qwen/notify/session/prompt-suggestion') {
+    if (method === 'hopcode/notify/session/prompt-suggestion') {
       const sessionId = params['sessionId'];
       const suggestion = params['suggestion'];
       const promptId = params['promptId'];

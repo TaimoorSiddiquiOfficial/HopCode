@@ -1497,7 +1497,7 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
       v: 1,
       workspaceCwd: '/work/status',
       initialized: true,
-      current: { authType: 'hopcode', modelId: 'qwen-plus(qwen)' },
+      current: { authType: 'hopcode', modelId: 'qwen-plus(hopcode)' },
       providers: [
         {
           kind: 'model_provider',
@@ -1506,7 +1506,7 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
           current: true,
           models: [
             {
-              modelId: 'qwen-plus(qwen)',
+              modelId: 'qwen-plus(hopcode)',
               baseModelId: 'qwen-plus',
               name: 'Qwen Plus',
               description: 'General coding model',
@@ -1781,14 +1781,14 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
     await expect(
       agent.extMethod(SERVE_STATUS_EXT_METHODS.workspaceProviders, {}),
     ).resolves.toMatchObject({
-      current: { authType: 'hopcode', modelId: 'missing-model(qwen)' },
+      current: { authType: 'hopcode', modelId: 'missing-model(hopcode)' },
       providers: [
         {
           authType: 'hopcode',
           current: false,
           models: [
             {
-              modelId: 'qwen-plus(qwen)',
+              modelId: 'qwen-plus(hopcode)',
               baseModelId: 'qwen-plus',
               contextLimit: 128_000,
               isCurrent: false,
@@ -1839,14 +1839,14 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
     await expect(
       agent.extMethod(SERVE_STATUS_EXT_METHODS.workspaceProviders, {}),
     ).resolves.toMatchObject({
-      current: { authType: 'hopcode', modelId: 'runtime-qwen-plus(qwen)' },
+      current: { authType: 'hopcode', modelId: 'runtime-qwen-plus(hopcode)' },
       providers: [
         {
           authType: 'hopcode',
           current: true,
           models: [
             {
-              modelId: 'runtime-qwen-plus(qwen)',
+              modelId: 'runtime-qwen-plus(hopcode)',
               baseModelId: 'runtime-qwen-plus',
               contextLimit: 128_000,
               isCurrent: true,
@@ -3286,7 +3286,7 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
       },
     }) as AgentLike;
 
-    const providers = await agent.extMethod('qwen/providers/list', {});
+    const providers = await agent.extMethod('hopcode/providers/list', {});
     expect(providers).toEqual({
       providers: [
         expect.objectContaining({
