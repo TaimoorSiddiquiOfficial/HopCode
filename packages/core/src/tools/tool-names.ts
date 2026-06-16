@@ -53,6 +53,10 @@ export const ToolNames = {
   TOOL_SEARCH: 'tool_search',
   ENTER_WORKTREE: 'enter_worktree',
   EXIT_WORKTREE: 'exit_worktree',
+  BG_STOP: 'bg_stop',
+  BROWSER: 'browser',
+  REPO_MAP: 'repo_map',
+  WEB_SEARCH: 'web_search',
   // Computer Use tools (computer_use__*) are intentionally NOT enumerated here.
   // Their full 35-tool surface is generated into computer-use/schemas.ts and
   // registered via computer-use/index.ts (cast to ToolName). Duplicating a
@@ -103,6 +107,10 @@ export const ToolDisplayNames = {
   TOOL_SEARCH: 'ToolSearch',
   ENTER_WORKTREE: 'EnterWorktree',
   EXIT_WORKTREE: 'ExitWorktree',
+  BG_STOP: 'BgStop',
+  BROWSER: 'Browser',
+  REPO_MAP: 'RepoMap',
+  WEB_SEARCH: 'WebSearch',
   // computer_use__* display names are not enumerated here (see ToolNames).
   WORKFLOW: 'Workflow',
 } as const;

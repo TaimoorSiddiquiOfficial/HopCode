@@ -74,7 +74,7 @@ export interface DaemonWorkspaceProviderProps {
    * Optional pluggable transport forwarded to `DaemonClient`. When
    * omitted the client uses the default REST+SSE transport.
    */
-  transport?: import('@qwen-code/sdk/daemon').DaemonTransport;
+  transport?: import('@hopcode/sdk/daemon').DaemonTransport;
   children: ReactNode;
 }
 

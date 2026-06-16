@@ -401,7 +401,7 @@ describe('gemini.tsx main function', () => {
       authError: null,
       themeError: null,
       shouldOpenAuthDialog: false,
-      geminiMdFileCount: 0,
+      contextMdFileCount: 0,
     });
     vi.spyOn(startupWarningsModule, 'getStartupWarnings').mockResolvedValue([]);
     vi.spyOn(

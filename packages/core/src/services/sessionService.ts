@@ -174,12 +174,12 @@ async function copyFileHistoryBackups(
 ): Promise<void> {
   const fsPromises = await import('node:fs/promises');
   const sourceDir = path.join(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalHopCodeDir(),
     FILE_HISTORY_DIR,
     sourceSessionId,
   );
   const targetDir = path.join(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalHopCodeDir(),
     FILE_HISTORY_DIR,
     targetSessionId,
   );

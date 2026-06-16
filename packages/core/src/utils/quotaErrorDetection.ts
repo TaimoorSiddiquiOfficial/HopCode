@@ -99,6 +99,11 @@ export function isGenericQuotaExceededError(error: unknown): boolean {
   return false;
 }
 
+/** @deprecated Use isHopCodeQuotaExceededError instead. */
+export function isQwenQuotaExceededError(error: unknown): boolean {
+  return isHopCodeQuotaExceededError(error);
+}
+
 export function isHopCodeQuotaExceededError(error: unknown): boolean {
   // Match the specific HopCode free-tier quota error to distinguish it from
   // temporary throttling (429 due to concurrency) or paid account quota limits.

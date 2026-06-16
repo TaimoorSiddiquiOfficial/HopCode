@@ -1451,6 +1451,13 @@ export class ChatRecordingService {
     }
   }
 
+  /**
+   * Optional hook invoked synchronously after a record is queued for write.
+   * Placeholder for upstream callers that invoke this method; does not
+   * change local behavior.
+   */
+  private afterWrite(_record: ChatRecord): void {}
+
   private appendSerializedFileHistorySnapshotBatch(
     snapshots: SerializedFileHistorySnapshot[],
   ): void {

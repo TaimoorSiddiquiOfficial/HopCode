@@ -51,7 +51,7 @@ export function getMcpApprovalsPath(): string {
   }
   // Resolve lazily on every call (mirrors getTrustedFoldersPath): a top-level
   // const would be stale after home-env overrides are applied.
-  return path.join(Storage.getGlobalQwenDir(), MCP_APPROVALS_FILENAME);
+  return path.join(Storage.getGlobalHopCodeDir(), MCP_APPROVALS_FILENAME);
 }
 
 /** Keys are stored normalized so the same project resolves consistently. */

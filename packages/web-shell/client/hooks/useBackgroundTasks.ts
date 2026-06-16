@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { DaemonSessionTaskStatus } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionTaskStatus } from '@hopcode/sdk/daemon';
 import { useActions } from '@qwen-code/webui/daemon-react-sdk';
 import { TASKS_STATUS_ACTIVE_EVENT } from '../components/messages/TasksStatusMessage';
 

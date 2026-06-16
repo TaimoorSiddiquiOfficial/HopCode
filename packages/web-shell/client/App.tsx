@@ -21,11 +21,11 @@ import {
   type DaemonSessionNotice,
   type DaemonStreamingState,
 } from '@qwen-code/webui/daemon-react-sdk';
-import { isDaemonTurnError } from '@qwen-code/sdk/daemon';
+import { isDaemonTurnError } from '@hopcode/sdk/daemon';
 import type {
   DaemonTranscriptBlock,
   DaemonSessionTaskStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hopcode/sdk/daemon';
 import { extractPendingPermission } from './adapters/transcriptAdapter';
 import { removeInjectedFromQueue } from './midTurnDedup';
 import { MessageList, type MessageListHandle } from './components/MessageList';

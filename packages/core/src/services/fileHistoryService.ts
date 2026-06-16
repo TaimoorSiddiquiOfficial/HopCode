@@ -209,7 +209,7 @@ function getBackupFileName(filePath: string, version: number): string {
 
 function resolveBackupPath(backupFileName: string, sessionId: string): string {
   const baseDir = resolve(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalHopCodeDir(),
     FILE_HISTORY_DIR,
     sessionId,
   );

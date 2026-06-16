@@ -451,8 +451,8 @@ export async function runHopCodeServe(
     optsIn.enableSessionShell === true && token !== undefined;
   if (optsIn.enableSessionShell === true && token === undefined) {
     writeStderrLine(
-      `qwen serve: --enable-session-shell ignored because no bearer token ` +
-        `is configured. Set ${QWEN_SERVER_TOKEN_ENV} or pass --token to ` +
+        `hopcode serve: --enable-session-shell ignored because no bearer token ` +
+        `is configured. Set ${HOPCODE_SERVER_TOKEN_ENV} or pass --token to ` +
         `enable direct session shell.`,
     );
   }

@@ -55,6 +55,8 @@ export interface ContentGenerator {
 export enum AuthType {
   USE_OPENAI = 'openai',
   HOPCODE_OAUTH = 'hopcode-oauth',
+  /** @deprecated Use HOPCODE_OAUTH instead. */
+  QWEN_OAUTH = 'hopcode-oauth',
   USE_GEMINI = 'gemini',
   USE_VERTEX_AI = 'vertex-ai',
   USE_ANTHROPIC = 'anthropic',

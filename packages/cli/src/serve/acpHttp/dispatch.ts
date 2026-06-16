@@ -71,6 +71,8 @@ function errMsg(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
+const QWEN_METHOD_NS = HOPCODE_METHOD_NS;
+
 const SESSION_SHELL_METHOD = `${QWEN_METHOD_NS}session/shell`;
 
 const ALL_QWEN_VENDOR_METHODS: readonly string[] = [

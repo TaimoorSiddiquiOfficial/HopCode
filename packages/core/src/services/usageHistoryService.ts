@@ -176,7 +176,7 @@ export function metricsToUsageRecord(
 async function rebuildFromSessionJsonl(
   skipSessionInRebuild?: string,
 ): Promise<UsageSummaryRecord[]> {
-  const projectsDir = path.join(Storage.getGlobalQwenDir(), 'projects');
+  const projectsDir = path.join(Storage.getGlobalHopCodeDir(), 'projects');
   try {
     if (!fs.existsSync(projectsDir)) return [];
   } catch (e) {

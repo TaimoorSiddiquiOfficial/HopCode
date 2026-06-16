@@ -148,12 +148,13 @@ import {
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
 } from './constants.js';
 import { DEFAULT_TOOL_RESULTS_TOTAL_CHARS_THRESHOLD } from './clearContextDefaults.js';
-import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
+import { DEFAULT_HOPCODE_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
 import type { WebSearchConfig } from '../tools/web-search/types.js';
 import type { PowerShellSecurityConfig } from '../security/powershell-security.js';
 import { resolvePowerShellConfig } from '../security/powershell-security.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
+import { TaskStore } from '../services/task-store.js';
 import { CHARS_PER_TOKEN } from '../services/tokenEstimation.js';
 import {
   clearRuntimeStatus,
@@ -208,6 +209,7 @@ export enum ApprovalMode {
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
   IZN = 'izn',
+  YOLO = 'yolo',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -267,6 +269,11 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     id: ApprovalMode.IZN,
     name: 'IZN',
     description: 'Automatically approve all tools',
+  },
+  [ApprovalMode.YOLO]: {
+    id: ApprovalMode.YOLO,
+    name: 'YOLO',
+    description: 'Automatically approve all tools with minimal oversight',
   },
 };
 
@@ -2432,7 +2439,7 @@ export class Config {
         await writeRuntimeStatus(newPath, {
           sessionId: newSessionId,
           workDir,
-          qwenVersion: cliVersion,
+          hopcodeVersion: cliVersion,
         });
       });
     }
@@ -2480,7 +2487,7 @@ export class Config {
         {
           sessionId: this.sessionId,
           workDir,
-          qwenVersion: this.cliVersion ?? null,
+          hopcodeVersion: this.cliVersion ?? null,
         },
       );
     });

@@ -212,7 +212,7 @@ export function convertClaudeAgentConfig(
     hopcodeAgent['hooks'] = claudeAgent.hooks;
   }
   if (claudeAgent.mcpServers) {
-    qwenAgent['mcpServers'] = claudeAgent.mcpServers;
+    hopcodeAgent['mcpServers'] = claudeAgent.mcpServers;
   }
   if (claudeAgent.skills && claudeAgent.skills.length > 0) {
     hopcodeAgent['skills'] = claudeAgent.skills;
@@ -292,7 +292,7 @@ async function convertAgentFiles(agentsDir: string): Promise<void> {
       // `subagent-manager.ts:serializeSubagent` produces — without `.trim()`
       // the converter emits an extra blank line before the closing `---`.
       const newYaml = stringifyYaml(newFrontmatter).trim();
-      const systemPrompt = (qwenAgent['systemPrompt'] as string) || body.trim();
+      const systemPrompt = (hopcodeAgent['systemPrompt'] as string) || body.trim();
       const newContent = `---
 ${newYaml}
 ---

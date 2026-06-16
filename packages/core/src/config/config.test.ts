@@ -1787,7 +1787,7 @@ describe('Server Config (config.ts)', () => {
     expect(writeRuntimeStatusSpy).toHaveBeenCalledWith(newRuntimeStatusPath, {
       sessionId,
       workDir: newDir,
-      qwenVersion: null,
+      hopcodeVersion: null,
     });
 
     writeRuntimeStatusSpy.mockRestore();
