@@ -78,7 +78,7 @@ describe('convertClaudeToHopCodeConfig', () => {
       description: 'A plugin with a description',
     };
 
-    const result = convertClaudeToQwenConfig(claudeConfig);
+    const result = convertClaudeToHopCodeConfig(claudeConfig);
 
     expect(result.description).toBe('A plugin with a description');
   });
@@ -89,7 +89,7 @@ describe('convertClaudeToHopCodeConfig', () => {
       version: '1.0.0',
     };
 
-    const result = convertClaudeToQwenConfig(claudeConfig);
+    const result = convertClaudeToHopCodeConfig(claudeConfig);
 
     expect(result.description).toBeUndefined();
   });

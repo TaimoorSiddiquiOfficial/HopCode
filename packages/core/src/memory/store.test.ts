@@ -27,6 +27,7 @@ import { Storage } from '../config/storage.js';
 import { sanitizeCwd } from '../utils/paths.js';
 
 const originalMemoryLocal = process.env['HOPCODE_CODE_MEMORY_LOCAL'];
+const originalLegacyMemoryLocal = process.env['HOPCODE_MEMORY_LOCAL'];
 const originalMemoryBaseDir = process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
 const originalRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
 
@@ -41,6 +42,11 @@ describe('auto-memory storage scaffold', () => {
       delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     } else {
       process.env['HOPCODE_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
+    }
+    if (originalLegacyMemoryLocal === undefined) {
+      delete process.env['HOPCODE_MEMORY_LOCAL'];
+    } else {
+      process.env['HOPCODE_MEMORY_LOCAL'] = originalLegacyMemoryLocal;
     }
     if (originalMemoryBaseDir === undefined) {
       delete process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
@@ -65,6 +71,11 @@ describe('auto-memory storage scaffold', () => {
       delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     } else {
       process.env['HOPCODE_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
+    }
+    if (originalLegacyMemoryLocal === undefined) {
+      delete process.env['HOPCODE_MEMORY_LOCAL'];
+    } else {
+      process.env['HOPCODE_MEMORY_LOCAL'] = originalLegacyMemoryLocal;
     }
     if (originalMemoryBaseDir === undefined) {
       delete process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];

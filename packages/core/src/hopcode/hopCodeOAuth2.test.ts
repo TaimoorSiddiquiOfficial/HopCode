@@ -1661,7 +1661,7 @@ describe('Browser Launch and Error Handling', () => {
 
     expect(client).toBeInstanceOf(Object);
     expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(
-      'https://chat.qwen.ai/device?code=TEST123',
+      'https://chat.hopcode.ai/device?code=TEST123',
     );
 
     SharedTokenManager.getInstance = originalGetInstance;
@@ -1714,7 +1714,7 @@ describe('Browser Launch and Error Handling', () => {
 
     expect(client).toBeInstanceOf(Object);
     expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(
-      'https://chat.qwen.ai/device?code=TEST123',
+      'https://chat.hopcode.ai/device?code=TEST123',
     );
 
     SharedTokenManager.getInstance = originalGetInstance;

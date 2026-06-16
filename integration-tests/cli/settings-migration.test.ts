@@ -195,7 +195,8 @@ describe('settings-migration', () => {
 
       // Expected output based on stable test output
       expect(migratedSettings['$version']).toBe(4);
-      expect(migratedSettings['model']).toEqual({ name: 'hopcode-plus' });
+      // The V1 model alias is preserved as a string under model.name.
+      expect(migratedSettings['model']).toEqual({ name: 'qwen-plus' });
       expect(migratedSettings['ui']).toEqual({
         hideWindowTitle: true,
         theme: 'light',

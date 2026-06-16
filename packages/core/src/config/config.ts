@@ -3953,7 +3953,7 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
-  getFileFilteringrespectHopCodeIgnore(): boolean {
+  getFileFilteringRespectHopCodeIgnore(): boolean {
     return this.fileFiltering.respectHopCodeIgnore;
   }
 

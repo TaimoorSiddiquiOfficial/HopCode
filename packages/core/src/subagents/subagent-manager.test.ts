@@ -1088,7 +1088,7 @@ You are weird.
         permissionMode: 'bypassPermissions',
         approvalMode: 'izn',
       });
-      expect(serialized).toContain('approvalMode: IZN');
+      expect(serialized).toContain('approvalMode: izn');
       expect(serialized).not.toContain('permissionMode:');
     });
 

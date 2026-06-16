@@ -104,7 +104,9 @@ export function getMemoryBaseDir(): string {
 const _autoMemoryRootCache = new Map<string, string>();
 
 export function getAutoMemoryRoot(projectRoot: string): string {
-  const useLocalMemory = process.env['HOPCODE_CODE_MEMORY_LOCAL'] === '1';
+  const useLocalMemory =
+    process.env['HOPCODE_CODE_MEMORY_LOCAL'] === '1' ||
+    process.env['HOPCODE_MEMORY_LOCAL'] === '1';
   const memoryBaseDir = useLocalMemory ? '' : getMemoryBaseDir();
   const cacheKey = `${useLocalMemory ? 'local' : memoryBaseDir}\0${projectRoot}`;
   const cached = _autoMemoryRootCache.get(cacheKey);

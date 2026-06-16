@@ -581,7 +581,7 @@ describe('HookPlanner', () => {
         config: { type: HookType.Command, command: 'echo test' },
         source: HooksConfigSource.Project,
         eventName: HookEventName.InstructionsLoaded,
-        matcher: '\\.hopcode/QWEN\\.local\\.md$',
+        matcher: '\\.hopcode/HOPCODE\\.local\\.md$',
         enabled: true,
       };
       vi.mocked(mockRegistry.getHooksForEvent).mockReturnValue([entry]);

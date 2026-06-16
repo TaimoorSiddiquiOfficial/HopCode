@@ -120,10 +120,12 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^coder-model$/, LIMITS['1m']],
   // Commercial API models (256K context)
   [/^qwen3-max/, LIMITS['256k']],
+  [/^qwen3-vl-plus/, LIMITS['256k']],
   // Open-source Qwen3 variants: 256K native
   [/^qwen3-coder-/, LIMITS['256k']],
-  // HopCode fallback (VL, turbo, plus, 2.5, etc.): 128K
-  [/^hopcode/, LIMITS['256k']],
+  // Legacy Qwen2.x / 2.5 open-source: 256K native
+  [/^qwen2/, LIMITS['256k']],
+  // HopCode fallback (VL, turbo, plus, 2.5, etc.): 256K
   [/^hopcode/, LIMITS['256k']],
 
   // -------------------
@@ -182,6 +184,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
 
   // Alibaba / HopCode
   [/^qwen3\.\d/, LIMITS['64k']],
+  [/^qwen3-max/, LIMITS['32k']],
   [/^coder-model$/, LIMITS['64k']],
   [/^hopcode/, LIMITS['32k']], // Qwen fallback (VL, turbo, plus, etc.): 8K
 

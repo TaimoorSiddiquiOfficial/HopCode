@@ -357,6 +357,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
   private static readonly VISION_MODEL_EXACT_MATCHES = new Set(['coder-model']);
 
   private static readonly VISION_MODEL_PREFIX_PATTERNS = [
+    'hopcode-vl', // HopCode-branded VL models
     'qwen-vl', // qwen-vl-max, qwen-vl-max-latest, etc.
     'qwen3-vl-plus', // qwen3-vl-plus variants
     'qwen3.5-plus', // qwen3.5-plus (has built-in vision capabilities)

@@ -662,17 +662,18 @@ export async function parseArguments(): Promise<CliArgs> {
           description: 'Sandbox image URI.',
         })
         .option('izn', {
-          alias: 'y',
+          alias: 'z',
           type: 'boolean',
           description:
             'Automatically accept all actions (aka IZN mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?',
           default: false,
         })
+
         .option('approval-mode', {
           type: 'string',
           choices: ['plan', 'default', 'auto-edit', 'auto', 'izn'],
           description:
-            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), IZN (auto-approve all tools)',
+            'Set the approval mode: plan (plan only), default (prompt for approval), auto-edit (auto-approve edit tools), auto (LLM classifier auto-approves safe actions, blocks risky ones), izn (auto-approve all tools)',
         })
         .option('acp', {
           type: 'boolean',
@@ -939,7 +940,7 @@ export async function parseArguments(): Promise<CliArgs> {
             return 'Cannot use both --prompt (-p) and --prompt-interactive (-i) together';
           }
           if (argv['izn'] && argv['approvalMode']) {
-            return 'Cannot use both --IZN (-y) and --approval-mode together. Use --approval-mode=IZN instead.';
+            return 'Cannot use both --izn (-z) and --approval-mode together. Use --approval-mode=izn instead.';
           }
           if (
             argv['includePartialMessages'] &&
@@ -1114,6 +1115,10 @@ export async function parseArguments(): Promise<CliArgs> {
   if ((result['acp'] || result['experimentalAcp']) && !result['channel']) {
     (result as Record<string, unknown>)['channel'] = 'ACP';
   }
+
+  // Backward compatibility: expose the legacy `IZN` camelCase key used by
+  // downstream code and tests. yargs no longer camelCases single-word options.
+  (result as Record<string, unknown>)['IZN'] = result['izn'];
 
   return result as unknown as CliArgs;
 }

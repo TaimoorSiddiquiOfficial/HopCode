@@ -615,9 +615,11 @@ export type AuthResult =
     };
 
 /**
- * Global event emitter instance for hopcodeOAuth2 authentication events
+ * Global event emitter instance for hopcodeOAuth2 authentication events.
+ * The lowercase alias is retained for compatibility with existing callers/tests.
  */
 export const HopCodeOAuth2Events = new EventEmitter();
+export const hopCodeOAuth2Events = HopCodeOAuth2Events;
 
 export async function getHopCodeOAuthClient(
   config: Config,
@@ -1235,3 +1237,4 @@ function getHopCodeCachedCredentialPath(): string {
 }
 
 export const clearCachedCredentialFile = clearHopCodeCredentials;
+export const clearHopcodeCredentials = clearHopCodeCredentials;

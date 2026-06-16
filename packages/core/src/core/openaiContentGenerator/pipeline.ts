@@ -411,12 +411,17 @@ export class ContentGenerationPipeline {
       // config/models.ts, aliased to Qwen 3.6 Plus hybrid) — it doesn't
       // start with `hopcode` but is the most common hybrid-thinking model
       // for first-time users, so it must be covered.
+      //
+      // We also keep the legacy `qwen*` guard so raw qwen model names and
+      // existing test fixtures continue to emit the disable signal.
       const model = (context.model ?? '').toLowerCase();
       if (
         DashScopeOpenAICompatibleProvider.isDashScopeProvider(
           this.contentGeneratorConfig,
         ) &&
-        (model.startsWith('hopcode') || model === 'coder-model')
+        (model.startsWith('hopcode') ||
+          model.startsWith('qwen') ||
+          model === 'coder-model')
       ) {
         typed['enable_thinking'] = false;
       }
