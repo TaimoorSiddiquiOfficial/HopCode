@@ -23,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Режим терминала',
-  'YOLO mode': 'Режим YOLO',
+  'IZN mode': 'Режим IZN',
   'Auto mode': 'Автоматический режим',
   'plan mode': 'Режим планирования',
   'auto-accept edits': 'Режим принятия правок',
@@ -91,7 +91,7 @@ export default {
   // ============================================================================
   // Поля системной информации
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Среда выполнения',
   OS: 'ОС',
   Auth: 'Аутентификация',
@@ -290,7 +290,8 @@ export default {
   // Агенты - Мастер создания
   // ============================================================================
   'Project Level (.hopcode/agents/)': 'Уровень проекта (.hopcode/agents/)',
-  'User Level (~/.hopcode/agents/)': 'Уровень пользователя (~/.hopcode/agents/)',
+  'User Level (~/.hopcode/agents/)':
+    'Уровень пользователя (~/.hopcode/agents/)',
   '✅ Subagent Created Successfully!': '✅ Подагент успешно создан!',
   'Subagent "{{name}}" has been saved to {{level}} level.':
     'Подагент "{{name}}" сохранен на уровне {{level}}.',
@@ -436,7 +437,7 @@ export default {
   Plan: 'План',
   'Ask permissions': 'Запрашивать разрешения',
   'Auto Edit': 'Авторедактирование',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'Включение/выключение режима vim',
   'check session stats. Usage: /stats [model|tools]':
     'Просмотр статистики сессии. Использование: /stats [model|tools]',
@@ -816,8 +817,6 @@ export default {
     'Нельзя создать fork, пока выполняется ответ или вызов инструмента. Дождитесь завершения или обработайте ожидающий вызов инструмента.',
   'Cannot fork before the first conversation turn.':
     'Нельзя создать fork до первого сообщения в разговоре.',
-  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
-    'Команде /fork требуется feature gate fork. Установите HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1, чтобы включить его.',
   'The agent tool is unavailable; cannot fork.':
     'Инструмент агента недоступен; fork создать нельзя.',
   'Failed to launch fork: {{error}}': 'Не удалось запустить fork: {{error}}',
@@ -1186,9 +1185,11 @@ export default {
   'From project settings': 'Из настроек проекта',
   'From session': 'Из сессии',
   'Project settings': 'Настройки проекта',
-  'Checked in at .hopcode/settings.json': 'Зафиксировано в .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Зафиксировано в .hopcode/settings.json',
   'User settings': 'Пользовательские настройки',
-  'Saved in at ~/.hopcode/settings.json': 'Сохранено в ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Сохранено в ~/.hopcode/settings.json',
   'Add a new rule…': 'Добавить новое правило…',
   'Add {{type}} permission rule': 'Добавить {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1376,6 +1377,26 @@ export default {
   'Found {{count}} TOML command files:':
     'Найдено {{count}} файлов команд TOML:',
   'Current tasks': 'Текущие задачи',
+  'Background tasks': 'Фоновые задачи',
+  'No tasks currently running': 'Нет запущенных задач',
+  'No entry to show.': 'Нет записи для отображения.',
+  'needs approval': 'требует подтверждения',
+  'Background agent needs approval': 'Фоновый агент требует подтверждения',
+  'Approve or deny the request above': 'Подтвердите или отклоните запрос выше',
+  Running: 'Выполняется',
+  Paused: 'Приостановлено',
+  Completed: 'Завершено',
+  Failed: 'Ошибка',
+  Stopped: 'Остановлено',
+  Shell: 'Оболочка',
+  Monitor: 'Монитор',
+  Command: 'Команда',
+  Dream: 'Dream',
+  '[dream] memory consolidation': '[dream] консолидация памяти',
+  '[dream] memory consolidation (reviewing {{count}} session)':
+    '[dream] консолидация памяти (проверка {{count}} сессии)',
+  '[dream] memory consolidation (reviewing {{count}} sessions)':
+    '[dream] консолидация памяти (проверка {{count}} сессий)',
   '... and {{count}} more': '... и ещё {{count}}',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
     'Формат TOML устарел. Хотите перенести их в формат Markdown?',
@@ -1776,7 +1797,8 @@ export default {
   'Or simply run:': 'Или просто выполните:',
   '  qwen auth                - Interactive authentication setup\n':
     '  qwen auth                - Интерактивная настройка аутентификации\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Метод аутентификации: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Метод аутентификации: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Тип: Бесплатный уровень (прекращено 2026-04-15)',
   '  Limit: No longer available': '  Лимит: Больше не доступен',

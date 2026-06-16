@@ -6,7 +6,7 @@ HopCode commands are triggered through specific prefixes and fall into three cat
 
 | Prefix Type                | Function Description                                | Typical Use Case                                                 |
 | -------------------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
-| Slash Commands (`/`)       | Meta-level control of HopCode itself              | Managing sessions, modifying settings, getting help              |
+| Slash Commands (`/`)       | Meta-level control of HopCode itself                | Managing sessions, modifying settings, getting help              |
 | At Commands (`@`)          | Quickly inject local file content into conversation | Allowing AI to analyze specified files or code under directories |
 | Exclamation Commands (`!`) | Direct interaction with system Shell                | Executing system commands like `git status`, `ls`, etc.          |
 
@@ -18,14 +18,21 @@ Slash commands are used to manage HopCode sessions, interface, and basic behavio
 
 These commands help you save, restore, and summarize work progress.
 
-| Command     | Description                                               | Usage Examples                       |
-| ----------- | --------------------------------------------------------- | ------------------------------------ |
-| `/init`     | Analyze current directory and create initial context file | `/init`                              |
-| `/summary`  | Generate project summary based on conversation history    | `/summary`                           |
-| `/compress` | Replace chat history with summary to save Tokens          | `/compress`                          |
-| `/resume`   | Resume a previous conversation session                    | `/resume`                            |
-| `/recap`    | Generate a one-line session recap now                     | `/recap`                             |
-| `/restore`  | Restore files to state before tool execution              | `/restore` (list) or `/restore <ID>` |
+| Command          | Description                                                              | Usage Examples                                                |
+| ---------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| `/init`          | Analyze current directory and create initial context file                | `/init`                                                       |
+| `/summary`       | Generate project summary based on conversation history                   | `/summary`                                                    |
+| `/compress`      | Replace chat history with summary to save Tokens                         | `/compress`                                                   |
+| `/compress-fast` | Fast compression without AI — strips old tool outputs and thinking parts | `/compress-fast`                                              |
+| `/resume`        | Resume a previous conversation session                                   | `/resume`                                                     |
+| `/recap`         | Generate a one-line session recap now                                    | `/recap`                                                      |
+| `/restore`       | Revert project files to the checkpoint before a tool call ran            | `/restore` (list) or `/restore <ID>`                          |
+| `/delete`        | Delete a previous session                                                | `/delete`                                                     |
+| `/branch`        | Fork the current conversation into a new session                         | `/branch`                                                     |
+| `/fork`          | Spawn a background agent that inherits the full conversation             | `/fork <directive>`                                           |
+| `/rewind`        | Rewind conversation to a previous turn                                   | `/rewind` or `/rollback`                                      |
+| `/export`        | Export session history to file                                           | `/export html`, `/export md`, `/export json`, `/export jsonl` |
+| `/rename`        | Rename or tag the current session                                        | `/rename My Feature` or `/tag`                                |
 
 ### 1.2 Interface and Workspace Control
 
@@ -37,12 +44,13 @@ Commands for adjusting interface appearance and work environment.
 | `/context`           | Show context window usage breakdown                                                                                                                                               | `/context`                              |
 | → `detail`           | Show per-item context usage breakdown                                                                                                                                             | `/context detail`                       |
 | `/diff`              | Open an interactive diff viewer showing uncommitted changes and per-turn diffs. Use ←/→ to switch between current git diff and individual conversation turns, ↑/↓ to browse files | `/diff`                                 |
-| `/theme`             | Change HopCode visual theme                                                                                                                                                     | `/theme`                                |
+| `/theme`             | Change HopCode visual theme                                                                                                                                                       | `/theme`                                |
 | `/vim`               | Turn input area Vim editing mode on/off                                                                                                                                           | `/vim`                                  |
 | `/directory`         | Manage multi-directory support workspace                                                                                                                                          | `/dir add ./src,./tests`                |
 | `/editor`            | Open dialog to select supported editor                                                                                                                                            | `/editor`                               |
 | `/statusline`        | Open interactive [status line](./status-line.md) preset dialog                                                                                                                    | `/statusline`                           |
 | `/statusline <text>` | Generate a command-mode [status line](./status-line.md) via agent                                                                                                                 | `/statusline show model and git branch` |
+| `/terminal-setup`    | Configure terminal keybindings for multiline input                                                                                                                                | `/terminal-setup`                       |
 
 ### 1.3 Language Settings
 
@@ -71,7 +79,8 @@ Commands for managing AI tools and models.
 | →`plan`          | Analysis only, no execution                   | Secure review                                 |
 | →`default`       | Require approval for edits                    | Daily use                                     |
 | →`auto-edit`     | Automatically approve edits                   | Trusted environment                           |
-| →`yolo`          | Automatically approve all                     | Quick prototyping                             |
+| →`auto`          | Classifier-evaluated approval                 | Autonomous sessions with safety guardrails    |
+| →`izn`           | Automatically approve all                     | Quick prototyping                             |
 | `/model`         | Switch model used in current session          | `/model`                                      |
 | `/model --fast`  | Set a lighter model for prompt suggestions    | `/model --fast qwen3-coder-flash`             |
 | `/extensions`    | List all active extensions in current session | `/extensions`                                 |
@@ -79,6 +88,14 @@ Commands for managing AI tools and models.
 | `/remember`      | Save a durable memory                         | `/remember Prefer terse responses`            |
 | `/forget`        | Remove matching entries from auto-memory      | `/forget <query>`                             |
 | `/dream`         | Manually run auto-memory consolidation        | `/dream`                                      |
+| `/hooks`         | Manage Qwen Code hooks                        | `/hooks`, `/hooks list`                       |
+| `/permissions`   | Manage permission rules                       | `/permissions`                                |
+| `/agents`        | Manage subagents                              | `/agents manage`, `/agents create`            |
+| `/arena`         | Manage Arena sessions                         | `/arena start`, `/arena status`               |
+| `/goal`          | Set a goal — keep working until condition met | `/goal <condition>`, `/goal clear`            |
+| `/tasks`         | List background tasks                         | `/tasks`                                      |
+| `/lsp`           | Show LSP server status                        | `/lsp`                                        |
+| `/trust`         | Manage folder trust settings                  | `/trust`                                      |
 
 ### 1.5 Built-in Skills
 
@@ -89,7 +106,7 @@ These commands invoke bundled skills that provide specialized workflows.
 | `/review`    | Review code changes with 5 parallel agents + deterministic analysis | `/review`, `/review 123`, `/review 123 --comment` |
 | `/loop`      | Run a prompt on a recurring schedule                                | `/loop 5m check the build`                        |
 | `/simplify`  | Review recent changes and apply safe cleanup edits directly         | `/simplify`, `/simplify focus on duplication`     |
-| `/qc-helper` | Answer questions about HopCode usage and configuration            | `/qc-helper how do I configure MCP?`              |
+| `/qc-helper` | Answer questions about HopCode usage and configuration              | `/qc-helper how do I configure MCP?`              |
 
 See [Code Review](./code-review.md) for full `/review` documentation.
 
@@ -192,7 +209,7 @@ progress; otherwise it waits for the current turn to finish and then fires).
 Unlike the manual command, the auto-trigger is fully silent on failure: if
 generation errors or there is nothing to summarize, no message is added to
 the history. Controlled by the `general.showSessionRecap` setting
-(default: `true`); the manual `/recap` command always works regardless of
+(default: `false`); the manual `/recap` command always works regardless of
 this setting.
 
 **Example:**
@@ -209,8 +226,8 @@ this setting.
 >
 > Configure a fast model via `/model --fast <model>` (e.g.
 > `qwen3-coder-flash`) to make `/recap` fast and cheap. Set
-> `general.showSessionRecap` to `false` to opt out of the auto-trigger
-> while keeping the manual command available.
+> `general.showSessionRecap` to `true` to enable the auto-trigger; the
+> manual `/recap` command always works regardless of this setting.
 
 ### 1.8 Diff Viewer (`/diff`)
 
@@ -278,9 +295,14 @@ Commands for obtaining information and performing system settings.
 | `/stats tools`  | Show per-tool call counts                                                                                                                                                                                                                                                                       | `/stats tools`                   |
 | `/settings`     | Open settings editor                                                                                                                                                                                                                                                                            | `/settings`                      |
 | `/auth`         | Change authentication method                                                                                                                                                                                                                                                                    | `/auth`                          |
-| `/bug`          | Submit issue about HopCode                                                                                                                                                                                                                                                                    | `/bug Button click unresponsive` |
+| `/doctor`       | Run installation and environment diagnostics                                                                                                                                                                                                                                                    | `/doctor`, `/doctor memory`      |
+| `/docs`         | Open full Qwen Code documentation in browser                                                                                                                                                                                                                                                    | `/docs`                          |
+| `/ide`          | Manage IDE integration                                                                                                                                                                                                                                                                          | `/ide status`, `/ide install`    |
+| `/insight`      | Generate programming insights from chat history                                                                                                                                                                                                                                                 | `/insight`                       |
+| `/setup-github` | Set up GitHub Actions                                                                                                                                                                                                                                                                           | `/setup-github`                  |
+| `/bug`          | Submit issue about Qwen Code                                                                                                                                                                                                                                                                    | `/bug Button click unresponsive` |
 | `/copy`         | Copy AI output to clipboard (`/copy N` = Nth-last AI message)                                                                                                                                                                                                                                   | `/copy` or `/copy 2`             |
-| `/quit`         | Exit HopCode immediately                                                                                                                                                                                                                                                                      | `/quit` or `/exit`               |
+| `/quit`         | Exit HopCode immediately                                                                                                                                                                                                                                                                        | `/quit` or `/exit`               |
 
 ### 1.10 Common Shortcuts
 
@@ -338,9 +360,9 @@ Save frequently used prompts as shortcut commands to improve work efficiency and
 
 ### Quick Overview
 
-| Function         | Description                                | Advantages                             | Priority | Applicable Scenarios                                 |
-| ---------------- | ------------------------------------------ | -------------------------------------- | -------- | ---------------------------------------------------- |
-| Namespace        | Subdirectory creates colon-named commands  | Better command organization            |          |                                                      |
+| Function         | Description                                   | Advantages                             | Priority | Applicable Scenarios                                 |
+| ---------------- | --------------------------------------------- | -------------------------------------- | -------- | ---------------------------------------------------- |
+| Namespace        | Subdirectory creates colon-named commands     | Better command organization            |          |                                                      |
 | Global Commands  | `~/.hopcode/commands/`                        | Available in all projects              | Low      | Personal frequently used commands, cross-project use |
 | Project Commands | `<project root directory>/.hopcode/commands/` | Project-specific, version-controllable | High     | Team sharing, project-specific commands              |
 
@@ -350,8 +372,8 @@ Priority Rules: Project commands > User commands (project command used when name
 
 #### File Path to Command Name Mapping Table
 
-| File Location                            | Generated Command | Example Call          |
-| ---------------------------------------- | ----------------- | --------------------- |
+| File Location                               | Generated Command | Example Call          |
+| ------------------------------------------- | ----------------- | --------------------- |
 | `~/.hopcode/commands/test.md`               | `/test`           | `/test Parameter`     |
 | `<project>/.hopcode/commands/git/commit.md` | `/git:commit`     | `/git:commit Message` |
 
@@ -465,12 +487,12 @@ Review {{args}}, reference standards:
 
 #### "Pure Function Refactoring" Command Creation Steps Table
 
-| Operation                     | Command/Code                              |
-| ----------------------------- | ----------------------------------------- |
+| Operation                     | Command/Code                                 |
+| ----------------------------- | -------------------------------------------- |
 | 1. Create directory structure | `mkdir -p ~/.hopcode/commands/refactor`      |
 | 2. Create command file        | `touch ~/.hopcode/commands/refactor/pure.md` |
-| 3. Edit command content       | Refer to the complete code below.         |
-| 4. Test command               | `@file.js` → `/refactor:pure`             |
+| 3. Edit command content       | Refer to the complete code below.            |
+| 4. Test command               | `@file.js` → `/refactor:pure`                |
 
 ```markdown
 ---

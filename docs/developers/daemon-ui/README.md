@@ -82,20 +82,20 @@ store.subscribe(() => {
 
 ### Session-meta events (PR-A)
 
-| Event                           | When                                             |
-| ------------------------------- | ------------------------------------------------ |
-| `session.metadata.changed`      | Session title / display name updated             |
-| `session.approval_mode.changed` | Mode toggled (plan / default / yolo / auto-edit) |
-| `session.available_commands`    | Slash command list refreshed                     |
+| Event                           | When                                            |
+| ------------------------------- | ----------------------------------------------- |
+| `session.metadata.changed`      | Session title / display name updated            |
+| `session.approval_mode.changed` | Mode toggled (plan / default / izn / auto-edit) |
+| `session.available_commands`    | Slash command list refreshed                    |
 
 ### Workspace events (PR-A, Wave 3-4)
 
 | Event                                  | When                                  |
 | -------------------------------------- | ------------------------------------- |
-| `workspace.memory.changed`             | HOPCODE.md / memory file modified        |
+| `workspace.memory.changed`             | HOPCODE.md / memory file modified     |
 | `workspace.agent.changed`              | Sub-agent created / updated / deleted |
 | `workspace.tool.toggled`               | Builtin tool enabled / disabled       |
-| `workspace.initialized`                | `hopcode init` completed                 |
+| `workspace.initialized`                | `hopcode init` completed              |
 | `workspace.mcp.budget_warning`         | MCP child count approaching cap       |
 | `workspace.mcp.child_refused`          | MCP server refused due to budget      |
 | `workspace.mcp.server_restarted`       | Manual MCP restart succeeded          |
@@ -186,7 +186,7 @@ syntax highlighting, MCP server badge, image thumbnail, etc.).
 
 ```ts
 selectCurrentTool(state); // → DaemonToolTranscriptBlock | undefined
-selectApprovalMode(state); // → 'plan' | 'default' | 'auto-edit' | 'yolo' | undefined
+selectApprovalMode(state); // → 'plan' | 'default' | 'auto-edit' | 'izn' | undefined
 selectToolProgress(state, toolCallId); // → { ratio?, step? } | undefined
 selectPendingPermissionBlocks(state); // → ReadonlyArray<DaemonPermissionTranscriptBlock>
 selectTranscriptBlocks(state); // → ReadonlyArray<DaemonTranscriptBlock>

@@ -1,7 +1,7 @@
 {
   "name": "@hopcode/channel-dingtalk",
-  "version": "0.17.1",
-  "description": "DingTalk channel adapter for HopCode",
+  "version": "0.18.1",
+  "description": "DingTalk channel adapter for Qwen Code",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

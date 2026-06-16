@@ -29,7 +29,7 @@ export const meta: DetailsPageMeta = {
 const RULE_TYPES: PermissionRuleType[] = ['allow', 'ask', 'deny'];
 const SCOPES: PermissionSettingsScope[] = ['user', 'workspace'];
 const HOPCODE_PERMISSIONS_DOC_URL =
-  'https://qwenlm.github.io/hopcode-docs/en/users/configuration/settings/#permissions';
+  'https://hopcode.dev/docs/en/users/configuration/settings/#permissions';
 
 function ruleTypeLabel(type: PermissionRuleType, t: TFunction): string {
   return t(`settings.permissions.ruleType.${type}`);

@@ -447,7 +447,7 @@ export default function WorkspaceSettingsPage() {
                   value={permissionMode}
                   onValueChange={(v) => handlePermissionModeChange(v as PermissionMode)}
                   options={[
-                    { value: 'allow-all', label: t("mode.allow-all"), description: t("mode.yoloDesc") },
+                    { value: 'allow-all', label: t("mode.allow-all"), description: t("mode.iznDesc") },
                     { value: 'safe', label: t("mode.safe"), description: t("mode.planDesc") },
                     { value: 'ask', label: t("mode.ask"), description: t("mode.askDesc") },
                     { value: 'auto-edit', label: t("mode.auto-edit"), description: t("mode.autoEditDesc") },
@@ -464,7 +464,7 @@ export default function WorkspaceSettingsPage() {
               <SettingsCard>
                 {PERMISSION_MODE_ORDER.map((m) => {
                   const modeTranslations: Record<string, { label: string; desc: string }> = {
-                    'allow-all': { label: t("mode.allow-all"), desc: t("mode.yoloFullDesc") },
+                    'allow-all': { label: t("mode.allow-all"), desc: t("mode.iznFullDesc") },
                     'safe': { label: t("mode.safe"), desc: t("mode.planFullDesc") },
                     'ask': { label: t("mode.askToEdit"), desc: t("mode.askFullDesc") },
                     'auto-edit': { label: t("mode.auto-edit"), desc: t("mode.autoEditFullDesc") },

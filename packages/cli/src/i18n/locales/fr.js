@@ -21,7 +21,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'YOLO mode': 'Mode YOLO',
+  'IZN mode': 'Mode IZN',
   'Auto mode': 'Mode auto',
   'plan mode': 'mode plan',
   'auto-accept edits': 'acceptation automatique des modifications',
@@ -88,7 +88,7 @@ export default {
   // ============================================================================
   // Informations système
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Environnement',
   OS: 'OS',
   Model: 'Modèle',
@@ -314,8 +314,7 @@ export default {
   'Step {{n}}: Choose Location': "Étape {{n}} : Choisir l'emplacement",
   'Step {{n}}: Choose Generation Method':
     'Étape {{n}} : Choisir la méthode de génération',
-  'Generate with HopCode (Recommended)':
-    'Générer avec HopCode (Recommandé)',
+  'Generate with HopCode (Recommended)': 'Générer avec HopCode (Recommandé)',
   'Manual Creation': 'Création manuelle',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Décrivez ce que ce sous-agent doit faire et quand il doit être utilisé. (Soyez complet pour de meilleurs résultats)',
@@ -492,7 +491,7 @@ export default {
   Plan: 'Plan',
   'Ask permissions': "Demander l'autorisation",
   'Auto Edit': 'Édition automatique',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'activer/désactiver le mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'vérifier les stats de session. Utilisation : /stats [modèle|outils]',
@@ -868,8 +867,6 @@ export default {
     "Impossible de créer un fork pendant qu'une réponse ou un appel d'outil est en cours. Attendez la fin ou traitez l'appel d'outil en attente.",
   'Cannot fork before the first conversation turn.':
     'Impossible de créer un fork avant le premier tour de conversation.',
-  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
-    'La commande /fork nécessite le feature gate fork. Définissez HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 pour l’activer.',
   'The agent tool is unavailable; cannot fork.':
     "L'outil agent est indisponible ; impossible de créer un fork.",
   'Failed to launch fork: {{error}}': 'Échec du lancement du fork : {{error}}',
@@ -1209,7 +1206,8 @@ export default {
     'Veuillez visiter cette URL pour autoriser :',
   'Waiting for authorization': "En attente d'autorisation",
   'Time remaining:': 'Temps restant :',
-  'HopCode OAuth Authentication Timeout': "Délai d'authentification HopCode OAuth",
+  'HopCode OAuth Authentication Timeout':
+    "Délai d'authentification HopCode OAuth",
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     "Token OAuth expiré (plus de {{seconds}} secondes). Veuillez sélectionner à nouveau la méthode d'authentification.",
   'Press any key to return to authentication type selection.':
@@ -1285,7 +1283,8 @@ export default {
   'Project settings': 'Paramètres du projet',
   'Checked in at .hopcode/settings.json': 'Validé dans .hopcode/settings.json',
   'User settings': 'Paramètres utilisateur',
-  'Saved in at ~/.hopcode/settings.json': 'Enregistré dans ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Enregistré dans ~/.hopcode/settings.json',
   'Add a new rule…': 'Ajouter une nouvelle règle…',
   'Add {{type}} permission rule': 'Ajouter {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1491,6 +1490,28 @@ export default {
   'Found {{count}} TOML command files:':
     'Trouvé {{count}} fichiers de commande TOML :',
   'Current tasks': 'Tâches actuelles',
+  'Background tasks': 'Tâches en arrière-plan',
+  'No tasks currently running': 'Aucune tâche en cours',
+  'No entry to show.': 'Aucune entrée à afficher.',
+  'needs approval': 'nécessite une approbation',
+  'Background agent needs approval':
+    "L'agent en arrière-plan nécessite une approbation",
+  'Approve or deny the request above':
+    'Approuvez ou refusez la demande ci-dessus',
+  Running: 'En cours',
+  Paused: 'En pause',
+  Completed: 'Terminé',
+  Failed: 'Échec',
+  Stopped: 'Arrêté',
+  Shell: 'Shell',
+  Monitor: 'Moniteur',
+  Command: 'Commande',
+  Dream: 'Dream',
+  '[dream] memory consolidation': '[dream] consolidation de la mémoire',
+  '[dream] memory consolidation (reviewing {{count}} session)':
+    '[dream] consolidation de la mémoire (analyse de {{count}} session)',
+  '[dream] memory consolidation (reviewing {{count}} sessions)':
+    '[dream] consolidation de la mémoire (analyse de {{count}} sessions)',
   '... and {{count}} more': '... et {{count}} de plus',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
     'Le format TOML est obsolète. Souhaitez-vous les migrer vers le format Markdown ?',

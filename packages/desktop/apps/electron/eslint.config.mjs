@@ -165,7 +165,7 @@ export default [
     rules: {
       'no-restricted-imports': ['error', {
         paths: [
-          { name: '@craft-agent/shared/agent/qwen-agent', message: 'Use backend factory APIs from @craft-agent/shared/agent/backend instead.' },
+          { name: '@craft-agent/shared/agent/hopcode-agent', message: 'Use backend factory APIs from @craft-agent/shared/agent/backend instead.' },
         ],
       }],
     },

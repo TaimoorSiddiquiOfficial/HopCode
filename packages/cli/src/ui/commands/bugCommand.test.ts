@@ -5,15 +5,22 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import open from 'open';
 import { bugCommand } from './bugCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { GIT_COMMIT_INFO } from '../../generated/git-commit.js';
 import { AuthType } from '@hopcode/hopcode-core';
 import * as systemInfoUtils from '../../utils/systemInfo.js';
 
+const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
+
 // Mock dependencies
-vi.mock('open');
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+  return {
+    ...actual,
+    openBrowserSecurely: mockOpenBrowserSecurely,
+  };
+});
 vi.mock('../../utils/systemInfo.js');
 
 describe('bugCommand', () => {
@@ -36,7 +43,9 @@ describe('bugCommand', () => {
           ? GIT_COMMIT_INFO
           : undefined,
     });
-    vi.stubEnv('SANDBOX', 'hopcode-test');
+    mockOpenBrowserSecurely.mockClear();
+    mockOpenBrowserSecurely.mockResolvedValue(undefined);
+    vi.stubEnv('SANDBOX', 'qwen-test');
   });
 
   afterEach(() => {
@@ -84,7 +93,7 @@ Memory Usage: 100 MB`;
       },
       expect.any(Number),
     );
-    expect(open).toHaveBeenCalledWith(expectedUrl);
+    expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(expectedUrl);
   });
 
   it('should use a custom URL template from config if provided', async () => {
@@ -128,7 +137,7 @@ Memory Usage: 100 MB`;
       },
       expect.any(Number),
     );
-    expect(open).toHaveBeenCalledWith(expectedUrl);
+    expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(expectedUrl);
   });
 
   it('should include Base URL when auth type is OpenAI', async () => {
@@ -193,6 +202,28 @@ Memory Usage: 100 MB`;
       },
       expect.any(Number),
     );
-    expect(open).toHaveBeenCalledWith(expectedUrl);
+    expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(expectedUrl);
+  });
+
+  it('should report browser launch failures without failing the command', async () => {
+    mockOpenBrowserSecurely.mockRejectedValueOnce(new Error('browser failed'));
+    const mockContext = createMockCommandContext({
+      services: {
+        config: {
+          getBugCommand: () => undefined,
+        },
+      },
+    });
+
+    if (!bugCommand.action) throw new Error('Action is not defined');
+    await bugCommand.action(mockContext, 'Browser failure');
+
+    expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'error',
+        text: 'Could not open URL in browser: browser failed',
+      }),
+      expect.any(Number),
+    );
   });
 });

@@ -137,7 +137,7 @@ This document outlines the complete rebranding strategy to transform "HopCode" i
 - [ ] `publisher`: Update to new publisher
 - [ ] `repository.url`: New GitHub URL
 - [ ] Keywords: `hopcode`, `hopcode code`
-- [ ] Commands: `hopcode-code.*`, `hopcode.*`
+- [ ] Commands: `hopcode.*`, `hopcode.*`
 - [ ] Views: `hopcode-sidebar`, `hopcode-secondary`
 - [ ] `sandboxImageUri`: New container image
 

@@ -21,7 +21,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Mode shell',
-  'YOLO mode': 'Mode YOLO',
+  'IZN mode': 'Mode IZN',
   'Auto mode': 'Mode auto',
   'plan mode': 'mode de planificació',
   'auto-accept edits': 'acceptació automàtica de canvis',
@@ -89,7 +89,7 @@ export default {
   // ============================================================================
   // Informació del sistema
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: "Entorn d'execució",
   OS: 'SO',
   Auth: 'Autenticació',
@@ -422,8 +422,7 @@ export default {
   // ============================================================================
   // Ordres - General (continuació)
   // ============================================================================
-  'View and edit HopCode settings':
-    'Veure i editar la configuració de HopCode',
+  'View and edit HopCode settings': 'Veure i editar la configuració de HopCode',
   Settings: 'Configuració',
   'To see changes, HopCode must be restarted. Press r to exit and apply changes now.':
     'Per veure els canvis, cal reiniciar HopCode. Premeu r per sortir i aplicar els canvis ara.',
@@ -487,7 +486,7 @@ export default {
   Plan: 'Planificació',
   'Ask permissions': 'Demanar permisos',
   'Auto Edit': 'Edició automàtica',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'activar/desactivar el mode Vim',
   'check session stats. Usage: /stats [model|tools]':
     'comprovar les estadístiques de la sessió. Ús: /stats [model|tools]',
@@ -847,8 +846,6 @@ export default {
     "No es pot crear una bifurcació mentre hi ha una resposta o una crida a una eina en curs. Espereu que acabi o resolgueu la crida a l'eina pendent.",
   'Cannot fork before the first conversation turn.':
     'No es pot crear una bifurcació abans del primer torn de conversa.',
-  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
-    'L’ordre /fork requereix el feature gate de fork. Definiu HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 per activar-lo.',
   'The agent tool is unavailable; cannot fork.':
     "L'eina d'agent no està disponible; no es pot crear una bifurcació.",
   'Failed to launch fork: {{error}}':
@@ -1496,6 +1493,26 @@ export default {
   'Found {{count}} TOML command files:':
     "S'han trobat {{count}} fitxers d'ordres TOML:",
   'Current tasks': 'Tasques actuals',
+  'Background tasks': 'Tasques en segon pla',
+  'No tasks currently running': 'No hi ha cap tasca en execució',
+  'No entry to show.': 'No hi ha cap entrada per mostrar.',
+  'needs approval': 'necessita aprovació',
+  'Background agent needs approval': "L'agent en segon pla necessita aprovació",
+  'Approve or deny the request above': 'Aprova o denega la sol·licitud de dalt',
+  Running: 'En execució',
+  Paused: 'En pausa',
+  Completed: 'Completada',
+  Failed: 'Fallida',
+  Stopped: 'Aturada',
+  Shell: 'Shell',
+  Monitor: 'Monitor',
+  Command: 'Ordre',
+  Dream: 'Dream',
+  '[dream] memory consolidation': '[dream] consolidació de memòria',
+  '[dream] memory consolidation (reviewing {{count}} session)':
+    '[dream] consolidació de memòria (revisant {{count}} sessió)',
+  '[dream] memory consolidation (reviewing {{count}} sessions)':
+    '[dream] consolidació de memòria (revisant {{count}} sessions)',
   '... and {{count}} more': '... i {{count}} més',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
     'El format TOML és obsolet. Voleu migrar-los al format Markdown?',
@@ -1820,7 +1837,8 @@ export default {
   'Or simply run:': 'O simplement executeu:',
   '  qwen auth                - Interactive authentication setup\n':
     "  qwen auth                - Configuració interactiva de l'autenticació\n",
-  '✓ Authentication Method: HopCode OAuth': "✓ Mètode d'autenticació: HopCode OAuth",
+  '✓ Authentication Method: HopCode OAuth':
+    "✓ Mètode d'autenticació: HopCode OAuth",
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipus: Nivell gratuït (descontinuat el 15-04-2026)',
   '  Limit: No longer available': '  Límit: Ja no disponible',

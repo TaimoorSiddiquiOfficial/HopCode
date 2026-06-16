@@ -152,15 +152,15 @@ phase_1_core_identity() {
     
     # 1.1 Root package.json
     log_info "Updating root package.json..."
-    replace_in_file "package.json" "@qwen-code/qwen-code" "@hopcode/hopcode"
-    replace_in_file "package.json" "QwenLM/qwen-code" "TaimoorSiddiquiOfficial/HopCode"
+    replace_in_file "package.json" "@hopcode/hopcode" "@hopcode/hopcode"
+    replace_in_file "package.json" "TaimoorSiddiquiOfficial/HopCode" "TaimoorSiddiquiOfficial/HopCode"
     replace_in_file "package.json" "ghcr.io/qwenlm/qwen-code" "ghcr.io/hopcode/hopcode"
     replace_in_file "package.json" '"qwen": "cli.js"' '"hopcode": "cli.js"'
     
     # 1.2 All package.json files
     log_info "Updating all package.json files..."
     find packages -name "package.json" -type f | while read -r pkg; do
-        replace_in_file "$pkg" "@qwen-code/" "@hopcode/"
+        replace_in_file "$pkg" "@hopcode/" "@hopcode/"
         replace_in_file "$pkg" "qwen-code-vscode-ide-companion" "hopcode-vscode-ide-companion"
         replace_in_file "$pkg" "ghcr.io/qwenlm/qwen-code" "ghcr.io/hopcode/hopcode"
         replace_in_file "$pkg" '"qwen":' '"hopcode":'
@@ -195,8 +195,8 @@ phase_2_high_visibility() {
     log_info "Updating README.md..."
     replace_in_file "README.md" "Qwen Code" "HopCode"
     replace_in_file "README.md" "qwenlm.github.io/qwen-code-docs" "hopcode.dev/docs"
-    replace_in_file "README.md" "@qwen-code/qwen-code" "@hopcode/hopcode"
-    replace_in_file "README.md" "npm install -g @qwen-code/qwen-code" "npm install -g @hopcode/hopcode"
+    replace_in_file "README.md" "@hopcode/hopcode" "@hopcode/hopcode"
+    replace_in_file "README.md" "npm install -g @hopcode/hopcode" "npm install -g @hopcode/hopcode"
     replace_in_file "README.md" "brew install qwen-code" "brew install hopcode"
     replace_in_file "README.md" " qwen " " hopcode "
     replace_in_file "README.md" "Why Qwen Code?" "Why HopCode?"
@@ -209,7 +209,7 @@ phase_2_high_visibility() {
     if [ -f "scripts/installation/install-qwen-with-source.sh" ]; then
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "Qwen Code" "HopCode"
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "install_qwen_code" "install_hopcode"
-        replace_in_file "scripts/installation/install-qwen-with-source.sh" "@qwen-code/qwen-code" "@hopcode/hopcode"
+        replace_in_file "scripts/installation/install-qwen-with-source.sh" "@hopcode/hopcode" "@hopcode/hopcode"
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "HOPCODE_DIR" "HOPCODE_DIR"
         replace_in_file "scripts/installation/install-qwen-with-source.sh" "\.hopcode" ".hopcode"
         
@@ -222,7 +222,7 @@ phase_2_high_visibility() {
     if [ -f "scripts/installation/install-qwen-with-source.bat" ]; then
         replace_in_file "scripts/installation/install-qwen-with-source.bat" "Qwen Code" "HopCode"
         replace_in_file "scripts/installation/install-qwen-with-source.bat" ":InstallQwenCode" ":InstallHopCode"
-        replace_in_file "scripts/installation/install-qwen-with-source.bat" "@qwen-code/qwen-code" "@hopcode/hopcode"
+        replace_in_file "scripts/installation/install-qwen-with-source.bat" "@hopcode/hopcode" "@hopcode/hopcode"
         replace_in_file "scripts/installation/install-qwen-with-source.bat" "%USERPROFILE%\\.hopcode" "%USERPROFILE%\\.hopcode"
         
         if [ "$DRY_RUN" = false ]; then
@@ -243,7 +243,7 @@ phase_2_high_visibility() {
         replace_in_file "packages/vscode-ide-companion/package.json" "Enable Qwen Code" "Enable HopCode"
         replace_in_file "packages/vscode-ide-companion/package.json" '"publisher": "qwenlm"' '"publisher": "hopcode"'
         replace_in_file "packages/vscode-ide-companion/package.json" "qwen-code" "hopcode"
-        replace_in_file "packages/vscode-ide-companion/package.json" "qwenlm.hopcode-code" "hopcode.hopcode"
+        replace_in_file "packages/vscode-ide-companion/package.json" "qwenlm.hopcode" "hopcode.hopcode"
     fi
     
     # 2.4 Zed Extension
@@ -253,14 +253,14 @@ phase_2_high_visibility() {
         replace_in_file "packages/zed-extension/extension.toml" 'name = "Qwen Code"' 'name = "HopCode"'
         replace_in_file "packages/zed-extension/extension.toml" 'authors = \["Qwen Team"\]' 'authors = ["HopCode Team"]'
         replace_in_file "packages/zed-extension/extension.toml" "Qwen Code Agent Server" "HopCode Agent Server"
-        replace_in_file "packages/zed-extension/extension.toml" "QwenLM/qwen-code" "TaimoorSiddiquiOfficial/HopCode"
-        replace_in_file "packages/zed-extension/extension.toml" '\[agent_servers.hopcode-code\]' '[agent_servers.hopcode]'
+        replace_in_file "packages/zed-extension/extension.toml" "TaimoorSiddiquiOfficial/HopCode" "TaimoorSiddiquiOfficial/HopCode"
+        replace_in_file "packages/zed-extension/extension.toml" '\[agent_servers.hopcode\]' '[agent_servers.hopcode]'
     fi
     
     # 2.5 WebUI Package
     log_info "Updating WebUI package..."
     replace_in_file "packages/webui/vite.config.ts" "QwenCodeWebUI" "HopCodeWebUI"
-    replace_in_file "packages/webui/tailwind.preset.cjs" "@qwen-code/webui" "@hopcode/webui"
+    replace_in_file "packages/webui/tailwind.preset.cjs" "@hopcode/webui" "@hopcode/webui"
     replace_in_file "packages/webui/src/styles/variables.css" "--app-qwen-ivory" "--app-hopcode-ivory"
     replace_in_file "packages/webui/src/styles/variables.css" "--qwen-corner-radius" "--hopcode-corner-radius"
     replace_in_file "packages/webui/src/styles/timeline.css" ".hopcode-message" ".hopcode-message"
@@ -327,12 +327,12 @@ phase_4_documentation() {
     
     # 4.3 Documentation site
     log_info "Updating documentation site..."
-    replace_in_file "docs-site/src/app/layout.jsx" "QwenLM/qwen-code" "TaimoorSiddiquiOfficial/HopCode"
+    replace_in_file "docs-site/src/app/layout.jsx" "TaimoorSiddiquiOfficial/HopCode" "TaimoorSiddiquiOfficial/HopCode"
     
     # 4.4 SDK documentation
     log_info "Updating SDK documentation..."
     if [ -f "packages/sdk-typescript/README.md" ]; then
-        replace_in_file "packages/sdk-typescript/README.md" "@qwen-code/sdk" "@hopcode/sdk"
+        replace_in_file "packages/sdk-typescript/README.md" "@hopcode/sdk" "@hopcode/sdk"
         replace_in_file "packages/sdk-typescript/README.md" "qwen_code" "hopcode"
     fi
     
@@ -355,7 +355,7 @@ phase_5_infrastructure() {
     log_info "Updating GitHub workflows..."
     find .github/workflows -name "*.yml" -o -name "*.yaml" | while read -r file; do
         replace_in_file "$file" "qwen-code" "hopcode"
-        replace_in_file "$file" "@qwen-code/" "@hopcode/"
+        replace_in_file "$file" "@hopcode/" "@hopcode/"
     done
     
     # 5.2 Docker configuration

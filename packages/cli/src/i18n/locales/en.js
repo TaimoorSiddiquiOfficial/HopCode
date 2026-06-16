@@ -23,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell mode',
-  'YOLO mode': 'YOLO mode',
+  'IZN mode': 'IZN mode',
   'Auto mode': 'Auto mode',
   'plan mode': 'plan mode',
   'auto-accept edits': 'auto-accept edits',
@@ -93,7 +93,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Runtime',
   OS: 'OS',
   Auth: 'Auth',
@@ -115,6 +115,8 @@ export default {
     'List available HopCode tools. Usage: /tools [desc]',
   'Open the skills panel (browse, search, toggle, pick).':
     'Open the skills panel (browse, search, toggle, pick).',
+  'Move this session to a new working directory':
+    'Move this session to a new working directory',
   // SkillsManagerDialog (the panel `/skills` opens)
   'Manage Skills': 'Manage Skills',
   'Skills configuration saved.': 'Skills configuration saved.',
@@ -224,12 +226,14 @@ export default {
     'Clear conversation history and free up context',
   'Compresses the context by replacing it with a summary.':
     'Compresses the context by replacing it with a summary.',
-  'open full HopCode documentation in your browser':
-    'open full HopCode documentation in your browser',
+  'Fast context compression without AI. Strips old tool outputs and thinking parts.':
+    'Fast context compression without AI. Strips old tool outputs and thinking parts.',
+  'open full Qwen Code documentation in your browser':
+    'open full Qwen Code documentation in your browser',
   'Configuration not available.': 'Configuration not available.',
   'Connect an LLM provider': 'Connect an LLM provider',
-  'Copy the last AI response to clipboard (/copy N for Nth-latest)':
-    'Copy the last AI response to clipboard (/copy N for Nth-latest)',
+  'Copy to clipboard: reply, code (by lang), LaTeX, or Mermaid. N = Nth-latest message, index = block number':
+    'Copy to clipboard: reply, code (by lang), LaTeX, or Mermaid. N = Nth-latest message, index = block number',
   'Show working-tree change stats versus HEAD':
     'Show working-tree change stats versus HEAD',
   'Could not determine current working directory.':
@@ -335,8 +339,7 @@ export default {
   'Step {{n}}: Choose Location': 'Step {{n}}: Choose Location',
   'Step {{n}}: Choose Generation Method':
     'Step {{n}}: Choose Generation Method',
-  'Generate with HopCode (Recommended)':
-    'Generate with HopCode (Recommended)',
+  'Generate with HopCode (Recommended)': 'Generate with HopCode (Recommended)',
   'Manual Creation': 'Manual Creation',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)',
@@ -510,7 +513,7 @@ export default {
   Plan: 'Plan',
   'Ask permissions': 'Ask permissions',
   'Auto Edit': 'Auto Edit',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'toggle vim mode on/off',
   'Show usage statistics dashboard.': 'Show usage statistics dashboard.',
   'Show model-specific usage statistics.':
@@ -890,8 +893,6 @@ export default {
     'Cannot fork while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.',
   'Cannot fork before the first conversation turn.':
     'Cannot fork before the first conversation turn.',
-  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
-    'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.',
   'The agent tool is unavailable; cannot fork.':
     'The agent tool is unavailable; cannot fork.',
   'Failed to launch fork: {{error}}': 'Failed to launch fork: {{error}}',
@@ -974,6 +975,8 @@ export default {
     'No managed auto-memory entries matched: {{query}}',
   'Consolidate managed auto-memory topic files.':
     'Consolidate managed auto-memory topic files.',
+  'Import MCP servers from Claude configs':
+    'Import MCP servers from Claude configs',
   'Open MCP management dialog': 'Open MCP management dialog',
   'Could not retrieve tool registry.': 'Could not retrieve tool registry.',
   "Successfully authenticated and refreshed tools for '{{name}}'.":
@@ -1036,7 +1039,8 @@ export default {
   servers: 'servers',
   'Add MCP servers to your settings to get started.':
     'Add MCP servers to your settings to get started.',
-  'Run hopcode --debug to see error logs': 'Run hopcode --debug to see error logs',
+  'Run hopcode --debug to see error logs':
+    'Run hopcode --debug to see error logs',
 
   // MCP OAuth Authentication
   'OAuth Authentication': 'OAuth Authentication',
@@ -1260,7 +1264,8 @@ export default {
   'Please visit this URL to authorize:': 'Please visit this URL to authorize:',
   'Waiting for authorization': 'Waiting for authorization',
   'Time remaining:': 'Time remaining:',
-  'HopCode OAuth Authentication Timeout': 'HopCode OAuth Authentication Timeout',
+  'HopCode OAuth Authentication Timeout':
+    'HopCode OAuth Authentication Timeout',
   'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.':
     'OAuth token expired (over {{seconds}} seconds). Please select authentication method again.',
   'Press any key to return to authentication type selection.':
@@ -1332,9 +1337,11 @@ export default {
   'From project settings': 'From project settings',
   'From session': 'From session',
   'Project settings': 'Project settings',
-  'Checked in at .hopcode/settings.json': 'Checked in at .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Checked in at .hopcode/settings.json',
   'User settings': 'User settings',
-  'Saved in at ~/.hopcode/settings.json': 'Saved in at ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Saved in at ~/.hopcode/settings.json',
   'Add a new rule…': 'Add a new rule…',
   'Add {{type}} permission rule': 'Add {{type}} permission rule',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1539,6 +1546,9 @@ export default {
   'Background tasks': 'Background tasks',
   'No tasks currently running': 'No tasks currently running',
   'No entry to show.': 'No entry to show.',
+  'needs approval': 'needs approval',
+  'Background agent needs approval': 'Background agent needs approval',
+  'Approve or deny the request above': 'Approve or deny the request above',
   Running: 'Running',
   Paused: 'Paused',
   Completed: 'Completed',
@@ -1908,7 +1918,8 @@ export default {
   'Or simply run:': 'Or simply run:',
   '  qwen auth                - Interactive authentication setup\n':
     '  qwen auth                - Interactive authentication setup\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Authentication Method: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Authentication Method: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Type: Free tier (discontinued 2026-04-15)',
   '  Limit: No longer available': '  Limit: No longer available',
@@ -2026,6 +2037,7 @@ export default {
   'Loading suggestions...': 'Loading suggestions...',
   'Show per-item context usage breakdown.':
     'Show per-item context usage breakdown.',
+  'No compression needed.': 'No compression needed.',
 
   // ============================================================================
   // Stats

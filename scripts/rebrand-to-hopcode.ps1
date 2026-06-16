@@ -125,13 +125,13 @@ function Invoke-Phase1 {
     Write-Host "========================================="
     
     Write-Info "Updating root package.json..."
-    Replace-InFile -File (Join-Path $RootDir "package.json") -Old "@qwen-code/qwen-code" -New "@hopcode/hopcode"
-    Replace-InFile -File (Join-Path $RootDir "package.json") -Old "QwenLM/qwen-code" -New "TaimoorSiddiquiOfficial/HopCode"
+    Replace-InFile -File (Join-Path $RootDir "package.json") -Old "@hopcode/hopcode" -New "@hopcode/hopcode"
+    Replace-InFile -File (Join-Path $RootDir "package.json") -Old "TaimoorSiddiquiOfficial/HopCode" -New "TaimoorSiddiquiOfficial/HopCode"
     Replace-InFile -File (Join-Path $RootDir "package.json") -Old "ghcr.io/qwenlm/qwen-code" -New "ghcr.io/hopcode/hopcode"
     Replace-InFile -File (Join-Path $RootDir "package.json") -Old '"qwen": "cli.js"' -New '"hopcode": "cli.js"'
     
     Write-Info "Updating all package.json files..."
-    Replace-InFiles -Pattern "package.json" -Old "@qwen-code/" -New "@hopcode/" -Path (Join-Path $RootDir "packages")
+    Replace-InFiles -Pattern "package.json" -Old "@hopcode/" -New "@hopcode/" -Path (Join-Path $RootDir "packages")
     Replace-InFiles -Pattern "package.json" -Old "qwen-code-vscode-ide-companion" -New "hopcode-vscode-ide-companion" -Path (Join-Path $RootDir "packages")
     Replace-InFiles -Pattern "package.json" -Old "ghcr.io/qwenlm/qwen-code" -New "ghcr.io/hopcode/hopcode" -Path (Join-Path $RootDir "packages")
     
@@ -159,8 +159,8 @@ function Invoke-Phase2 {
     Write-Info "Updating README.md..."
     Replace-InFile -File (Join-Path $RootDir "README.md") -Old "Qwen Code" -New "HopCode"
     Replace-InFile -File (Join-Path $RootDir "README.md") -Old "qwenlm.github.io/qwen-code-docs" -New "hopcode.dev/docs"
-    Replace-InFile -File (Join-Path $RootDir "README.md") -Old "@qwen-code/qwen-code" -New "@hopcode/hopcode"
-    Replace-InFile -File (Join-Path $RootDir "README.md") -Old "npm install -g @qwen-code/qwen-code" -New "npm install -g @hopcode/hopcode"
+    Replace-InFile -File (Join-Path $RootDir "README.md") -Old "@hopcode/hopcode" -New "@hopcode/hopcode"
+    Replace-InFile -File (Join-Path $RootDir "README.md") -Old "npm install -g @hopcode/hopcode" -New "npm install -g @hopcode/hopcode"
     Replace-InFile -File (Join-Path $RootDir "README.md") -Old "brew install qwen-code" -New "brew install hopcode"
     Replace-InFile -File (Join-Path $RootDir "README.md") -Old "Why Qwen Code?" -New "Why HopCode?"
     Replace-InFile -File (Join-Path $RootDir "README.md") -Old "qwen-code-assets.oss-cn-hangzhou.aliyuncs.com" -New "hopcode-assets.example.com"
@@ -171,7 +171,7 @@ function Invoke-Phase2 {
     if (Test-Path (Join-Path $installDir "install-qwen-with-source.sh")) {
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "Qwen Code" -New "HopCode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "install_qwen_code" -New "install_hopcode"
-        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "@qwen-code/qwen-code" -New "@hopcode/hopcode"
+        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "@hopcode/hopcode" -New "@hopcode/hopcode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old "HOPCODE_DIR" -New "HOPCODE_DIR"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.sh") -Old ".hopcode" -New ".hopcode"
         
@@ -183,7 +183,7 @@ function Invoke-Phase2 {
     if (Test-Path (Join-Path $installDir "install-qwen-with-source.bat")) {
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "Qwen Code" -New "HopCode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old ":InstallQwenCode" -New ":InstallHopCode"
-        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "@qwen-code/qwen-code" -New "@hopcode/hopcode"
+        Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "@hopcode/hopcode" -New "@hopcode/hopcode"
         Replace-InFile -File (Join-Path $installDir "install-qwen-with-source.bat") -Old "%USERPROFILE%\.hopcode" -New "%USERPROFILE%\.hopcode"
         
         if (-not $DryRun) {
@@ -212,13 +212,13 @@ function Invoke-Phase2 {
         Replace-InFile -File $zedExt -Old 'name = "Qwen Code"' -New 'name = "HopCode"'
         Replace-InFile -File $zedExt -Old 'authors = ["Qwen Team"]' -New 'authors = ["HopCode Team"]'
         Replace-InFile -File $zedExt -Old "Qwen Code Agent Server" -New "HopCode Agent Server"
-        Replace-InFile -File $zedExt -Old "QwenLM/qwen-code" -New "TaimoorSiddiquiOfficial/HopCode"
-        Replace-InFile -File $zedExt -Old '[agent_servers.hopcode-code]' -New '[agent_servers.hopcode]'
+        Replace-InFile -File $zedExt -Old "TaimoorSiddiquiOfficial/HopCode" -New "TaimoorSiddiquiOfficial/HopCode"
+        Replace-InFile -File $zedExt -Old '[agent_servers.hopcode]' -New '[agent_servers.hopcode]'
     }
     
     Write-Info "Updating WebUI package..."
     Replace-InFile -File (Join-Path $RootDir "packages/webui/vite.config.ts") -Old "QwenCodeWebUI" -New "HopCodeWebUI"
-    Replace-InFile -File (Join-Path $RootDir "packages/webui/tailwind.preset.cjs") -Old "@qwen-code/webui" -New "@hopcode/webui"
+    Replace-InFile -File (Join-Path $RootDir "packages/webui/tailwind.preset.cjs") -Old "@hopcode/webui" -New "@hopcode/webui"
     Replace-InFile -File (Join-Path $RootDir "packages/webui/src/styles/variables.css") -Old "--app-qwen-ivory" -New "--app-hopcode-ivory"
     Replace-InFile -File (Join-Path $RootDir "packages/webui/src/styles/variables.css") -Old "--qwen-corner-radius" -New "--hopcode-corner-radius"
     Replace-InFile -File (Join-Path $RootDir "packages/webui/src/styles/timeline.css") -Old ".hopcode-message" -New ".hopcode-message"
@@ -284,13 +284,13 @@ function Invoke-Phase4 {
     Write-Info "Updating documentation site..."
     $docsSite = Join-Path $RootDir "docs-site/src/app/layout.jsx"
     if (Test-Path $docsSite) {
-        Replace-InFile -File $docsSite -Old "QwenLM/qwen-code" -New "TaimoorSiddiquiOfficial/HopCode"
+        Replace-InFile -File $docsSite -Old "TaimoorSiddiquiOfficial/HopCode" -New "TaimoorSiddiquiOfficial/HopCode"
     }
     
     Write-Info "Updating SDK documentation..."
     $sdkReadme = Join-Path $RootDir "packages/sdk-typescript/README.md"
     if (Test-Path $sdkReadme) {
-        Replace-InFile -File $sdkReadme -Old "@qwen-code/sdk" -New "@hopcode/sdk"
+        Replace-InFile -File $sdkReadme -Old "@hopcode/sdk" -New "@hopcode/sdk"
         Replace-InFile -File $sdkReadme -Old "qwen_code" -New "hopcode"
     }
     
@@ -314,7 +314,7 @@ function Invoke-Phase5 {
     if (Test-Path $workflows) {
         Get-ChildItem -Path $workflows -Filter "*.yml" -Recurse -File | ForEach-Object {
             Replace-InFile -File $_.FullName -Old "qwen-code" -New "hopcode"
-            Replace-InFile -File $_.FullName -Old "@qwen-code/" -New "@hopcode/"
+            Replace-InFile -File $_.FullName -Old "@hopcode/" -New "@hopcode/"
         }
     }
     

@@ -10,7 +10,7 @@ export default {
     title: 'Agent SDK',
     type: 'separator',
   },
-  'sdk-typescript': 'Typescript SDK',
+  'sdk-typescript': 'TypeScript SDK',
   'sdk-python': 'Python SDK (alpha)',
   'sdk-java': 'Java SDK (alpha)',
   'Dive Into HopCode': {
@@ -20,7 +20,8 @@ export default {
 
   'channel-plugins': 'Channel Plugin Guide',
   tools: 'Tools',
-  'hopcode-serve-protocol': 'hopcode serve HTTP protocol',
+  'qwen-serve-protocol': 'qwen serve HTTP protocol',
+  daemon: 'Daemon Mode (Developer Deep Dive)',
 
   examples: {
     display: 'hidden',

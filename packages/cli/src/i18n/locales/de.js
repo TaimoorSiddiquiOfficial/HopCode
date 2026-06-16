@@ -23,7 +23,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell-Modus',
-  'YOLO mode': 'YOLO-Modus',
+  'IZN mode': 'IZN-Modus',
   'Auto mode': 'Auto-Modus',
   'plan mode': 'Planungsmodus',
   'auto-accept edits': 'Änderungen automatisch akzeptieren',
@@ -71,7 +71,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: 'Laufzeit',
   OS: 'Betriebssystem',
   Auth: 'Authentifizierung',
@@ -289,8 +289,7 @@ export default {
   'Step {{n}}: Choose Location': 'Schritt {{n}}: Speicherort wählen',
   'Step {{n}}: Choose Generation Method':
     'Schritt {{n}}: Generierungsmethode wählen',
-  'Generate with HopCode (Recommended)':
-    'Mit HopCode generieren (Empfohlen)',
+  'Generate with HopCode (Recommended)': 'Mit HopCode generieren (Empfohlen)',
   'Manual Creation': 'Manuelle Erstellung',
   'Describe what this subagent should do and when it should be used. (Be comprehensive for best results)':
     'Beschreiben Sie, was dieser Unteragent tun soll und wann er verwendet werden soll. (Ausführliche Beschreibung für beste Ergebnisse)',
@@ -418,7 +417,7 @@ export default {
   Plan: 'Plan',
   'Ask permissions': 'Berechtigung anfragen',
   'Auto Edit': 'Automatisch bearbeiten',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'Vim-Modus ein-/ausschalten',
   'check session stats. Usage: /stats [model|tools]':
     'Sitzungsstatistiken prüfen. Verwendung: /stats [model|tools]',
@@ -804,8 +803,6 @@ export default {
     'Während eine Antwort oder ein Tool-Aufruf läuft, kann kein Hintergrund-Fork erstellt werden. Warten Sie, bis der Vorgang abgeschlossen ist, oder bearbeiten Sie den ausstehenden Tool-Aufruf.',
   'Cannot fork before the first conversation turn.':
     'Vor der ersten Gesprächsrunde kann kein Fork erstellt werden.',
-  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
-    'Der Befehl /fork erfordert das Fork-Feature-Gate. Setzen Sie HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1, um es zu aktivieren.',
   'The agent tool is unavailable; cannot fork.':
     'Das Agent-Tool ist nicht verfügbar; Fork kann nicht gestartet werden.',
   'Failed to launch fork: {{error}}':
@@ -1239,9 +1236,11 @@ export default {
   'From project settings': 'Aus Projekteinstellungen',
   'From session': 'Aus Sitzung',
   'Project settings': 'Projekteinstellungen',
-  'Checked in at .hopcode/settings.json': 'Eingecheckt in .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Eingecheckt in .hopcode/settings.json',
   'User settings': 'Benutzereinstellungen',
-  'Saved in at ~/.hopcode/settings.json': 'Gespeichert in ~/.hopcode/settings.json',
+  'Saved in at ~/.hopcode/settings.json':
+    'Gespeichert in ~/.hopcode/settings.json',
   'Add a new rule…': 'Neue Regel hinzufügen…',
   'Add {{type}} permission rule': '{{type}} permission rule hinzufügen',
   'Permission rules are a tool name, optionally followed by a specifier in parentheses.':
@@ -1429,6 +1428,27 @@ export default {
   'Found {{count}} TOML command files:':
     '{{count}} TOML-Befehlsdateien gefunden:',
   'Current tasks': 'Aktuelle Aufgaben',
+  'Background tasks': 'Hintergrundaufgaben',
+  'No tasks currently running': 'Derzeit laufen keine Aufgaben',
+  'No entry to show.': 'Kein Eintrag zum Anzeigen.',
+  'needs approval': 'wartet auf Genehmigung',
+  'Background agent needs approval': 'Hintergrund-Agent wartet auf Genehmigung',
+  'Approve or deny the request above':
+    'Genehmigen oder lehnen Sie die obige Anfrage ab',
+  Running: 'Läuft',
+  Paused: 'Pausiert',
+  Completed: 'Abgeschlossen',
+  Failed: 'Fehlgeschlagen',
+  Stopped: 'Gestoppt',
+  Shell: 'Shell',
+  Monitor: 'Monitor',
+  Command: 'Befehl',
+  Dream: 'Dream',
+  '[dream] memory consolidation': '[dream] Speicher-Konsolidierung',
+  '[dream] memory consolidation (reviewing {{count}} session)':
+    '[dream] Speicher-Konsolidierung (prüft {{count}} Sitzung)',
+  '[dream] memory consolidation (reviewing {{count}} sessions)':
+    '[dream] Speicher-Konsolidierung (prüft {{count}} Sitzungen)',
   '... and {{count}} more': '... und {{count}} weitere',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
     'Das TOML-Format ist veraltet. Möchten Sie sie ins Markdown-Format migrieren?',

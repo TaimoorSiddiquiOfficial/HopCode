@@ -17,7 +17,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Modo shell',
-  'YOLO mode': 'Modo YOLO',
+  'IZN mode': 'Modo IZN',
   'Auto mode': 'Modo auto',
   'plan mode': 'modo planejamento',
   'auto-accept edits': 'aceitar edições automaticamente',
@@ -83,7 +83,7 @@ export default {
   // ============================================================================
   // System Information Fields
   // ============================================================================
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   OS: 'SO',
   Auth: 'Autenticação',
   Model: 'Modelo',
@@ -441,7 +441,7 @@ export default {
   Plan: 'Planejamento',
   'Ask permissions': 'Pedir permissão',
   'Auto Edit': 'Edição Automática',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': 'alternar modo vim ligado/desligado',
   'check session stats. Usage: /stats [model|tools]':
     'verificar estatísticas da sessão. Uso: /stats [model|tools]',
@@ -809,8 +809,6 @@ export default {
     'Não é possível criar um fork enquanto uma resposta ou chamada de ferramenta está em andamento. Aguarde a conclusão ou resolva a chamada de ferramenta pendente.',
   'Cannot fork before the first conversation turn.':
     'Não é possível criar um fork antes da primeira rodada da conversa.',
-  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
-    'O comando /fork requer o feature gate de fork. Defina HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 para ativá-lo.',
   'The agent tool is unavailable; cannot fork.':
     'A ferramenta de agente está indisponível; não é possível criar um fork.',
   'Failed to launch fork: {{error}}': 'Falha ao iniciar o fork: {{error}}',
@@ -1241,7 +1239,8 @@ export default {
   'From project settings': 'Das configurações do projeto',
   'From session': 'Da sessão',
   'Project settings': 'Configurações do projeto',
-  'Checked in at .hopcode/settings.json': 'Registrado em .hopcode/settings.json',
+  'Checked in at .hopcode/settings.json':
+    'Registrado em .hopcode/settings.json',
   'User settings': 'Configurações do usuário',
   'Saved in at ~/.hopcode/settings.json': 'Salvo em ~/.hopcode/settings.json',
   'Add a new rule…': 'Adicionar nova regra…',
@@ -1462,6 +1461,27 @@ export default {
   'Found {{count}} TOML command files:':
     'Encontrados {{count}} arquivos de comando TOML:',
   'Current tasks': 'Tarefas atuais',
+  'Background tasks': 'Tarefas em segundo plano',
+  'No tasks currently running': 'Nenhuma tarefa em execução',
+  'No entry to show.': 'Nenhuma entrada para mostrar.',
+  'needs approval': 'precisa de aprovação',
+  'Background agent needs approval':
+    'Agente em segundo plano precisa de aprovação',
+  'Approve or deny the request above': 'Aprove ou negue a solicitação acima',
+  Running: 'Em execução',
+  Paused: 'Pausado',
+  Completed: 'Concluído',
+  Failed: 'Falhou',
+  Stopped: 'Parado',
+  Shell: 'Shell',
+  Monitor: 'Monitor',
+  Command: 'Comando',
+  Dream: 'Dream',
+  '[dream] memory consolidation': '[dream] consolidação de memória',
+  '[dream] memory consolidation (reviewing {{count}} session)':
+    '[dream] consolidação de memória (revisando {{count}} sessão)',
+  '[dream] memory consolidation (reviewing {{count}} sessions)':
+    '[dream] consolidação de memória (revisando {{count}} sessões)',
   '... and {{count}} more': '... e mais {{count}}',
   'The TOML format is deprecated. Would you like to migrate them to Markdown format?':
     'O formato TOML está obsoleto. Você gostaria de migrá-los para o formato Markdown?',
@@ -1770,7 +1790,8 @@ export default {
   'Or simply run:': 'Ou simplesmente execute:',
   '  qwen auth                - Interactive authentication setup\n':
     '  qwen auth                - Configuração interativa de autenticação\n',
-  '✓ Authentication Method: HopCode OAuth': '✓ Método de autenticação: HopCode OAuth',
+  '✓ Authentication Method: HopCode OAuth':
+    '✓ Método de autenticação: HopCode OAuth',
   '  Type: Free tier (discontinued 2026-04-15)':
     '  Tipo: Nível gratuito (descontinuado 2026-04-15)',
   '  Limit: No longer available': '  Limite: Não mais disponível',

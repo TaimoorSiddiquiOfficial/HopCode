@@ -347,10 +347,10 @@ This immediately resumes your most recent conversation without any prompts.
 **2. Continue in non-interactive mode**
 
 ```bash
-hopcode --continue --p "Continue with my task"
+qwen --continue -p "Continue with my task"
 ```
 
-Use `--print` with `--continue` to resume the most recent conversation in non-interactive mode, perfect for scripts or automation.
+Use `-p` (or `--prompt`) with `--continue` to resume the most recent conversation in non-interactive mode, perfect for scripts or automation.
 
 **3. Show conversation picker**
 
@@ -387,13 +387,13 @@ Use arrow keys to navigate and press Enter to select a conversation. Press Esc t
 > hopcode --continue
 >
 > # Continue most recent conversation with a specific prompt
-> hopcode --continue --p "Show me our progress"
+> qwen --continue -p "Show me our progress"
 >
 > # Show conversation picker
 > hopcode --resume
 >
 > # Continue most recent conversation in non-interactive mode
-> hopcode --continue --p "Run the tests again"
+> qwen --continue -p "Run the tests again"
 > ```
 
 ## Run parallel HopCode sessions with Git worktrees

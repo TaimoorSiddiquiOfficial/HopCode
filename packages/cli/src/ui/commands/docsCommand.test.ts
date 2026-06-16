@@ -5,24 +5,28 @@
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import open from 'open';
 import { docsCommand } from './docsCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { MessageType } from '../types.js';
 
-// Mock the 'open' library
-vi.mock('open', () => ({
-  default: vi.fn(),
-}));
+const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
+
+vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+  return {
+    ...actual,
+    openBrowserSecurely: mockOpenBrowserSecurely,
+  };
+});
 
 describe('docsCommand', () => {
   let mockContext: CommandContext;
   beforeEach(() => {
     // Create a fresh mock context before each test
     mockContext = createMockCommandContext();
-    // Reset the `open` mock
-    vi.mocked(open).mockClear();
+    mockOpenBrowserSecurely.mockClear();
+    mockOpenBrowserSecurely.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -47,7 +51,7 @@ describe('docsCommand', () => {
       expect.any(Number),
     );
 
-    expect(open).toHaveBeenCalledWith(docsUrl);
+    expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(docsUrl);
   });
 
   it('should only add an info message in a sandbox environment', async () => {
@@ -70,7 +74,7 @@ describe('docsCommand', () => {
     );
 
     // Ensure 'open' was not called in the sandbox
-    expect(open).not.toHaveBeenCalled();
+    expect(mockOpenBrowserSecurely).not.toHaveBeenCalled();
   });
 
   it("should not open browser for 'sandbox-exec'", async () => {
@@ -93,8 +97,27 @@ describe('docsCommand', () => {
       expect.any(Number),
     );
 
-    // 'open' should be called in this specific sandbox case
-    expect(open).toHaveBeenCalledWith(docsUrl);
+    // Browser launch should be called in this specific sandbox case.
+    expect(mockOpenBrowserSecurely).toHaveBeenCalledWith(docsUrl);
+  });
+
+  it('should show the docs URL when browser opening throws unexpectedly', async () => {
+    if (!docsCommand.action) {
+      throw new Error('docsCommand must have an action.');
+    }
+
+    const docsUrl = 'https://qwenlm.github.io/qwen-code-docs/en';
+    mockOpenBrowserSecurely.mockRejectedValueOnce(new Error('bad url'));
+
+    await docsCommand.action(mockContext, '');
+
+    expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+      {
+        type: MessageType.ERROR,
+        text: `Failed to open browser. View documentation at ${docsUrl}`,
+      },
+      expect.any(Number),
+    );
   });
 
   describe('non-interactive mode', () => {
@@ -114,7 +137,7 @@ describe('docsCommand', () => {
           'taimoor-siddiqui-official.github.io/HopCode',
         ),
       });
-      expect(open).not.toHaveBeenCalled();
+      expect(mockOpenBrowserSecurely).not.toHaveBeenCalled();
       expect(nonInteractiveContext.ui.addItem).not.toHaveBeenCalled();
     });
   });

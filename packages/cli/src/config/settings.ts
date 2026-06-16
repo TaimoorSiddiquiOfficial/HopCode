@@ -17,6 +17,7 @@ import {
   createDebugLogger,
   stripRuntimeSnapshotPrefix,
 } from '@hopcode/hopcode-core';
+import type { MCPServerConfig, McpServerScope } from '@hopcode/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 import { DefaultLight } from '../ui/themes/default-light.js';
 import { DefaultDark } from '../ui/themes/default.js';
@@ -85,8 +86,9 @@ export const ENV_WAS_RECOVERED = 'HOPCODE_CODE_SETTINGS_WAS_RECOVERED';
 // project-controlled directory. Always excluded from project .env files,
 // regardless of user-configurable `advanced.excludedEnvVars`.
 const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
-  'HOPCODE_HOME',
-  'HOPCODE_RUNTIME_DIR',
+  'QWEN_HOME',
+  'QWEN_RUNTIME_DIR',
+  'QWEN_CODE_MCP_APPROVALS_PATH',
   ENV_CORRUPTED_PATH,
   ENV_WAS_RECOVERED,
 ];
@@ -399,6 +401,30 @@ export function getSettingsWarnings(loadedSettings: LoadedSettings): string[] {
   return [...warningSet];
 }
 
+/**
+ * Stamp every MCP server in a scope's settings with its provenance `scope`
+ * BEFORE the merge, so the winning entry of the shallow `mcpServers` merge
+ * carries the scope it actually came from. This drives both the approval gate
+ * (`'workspace'` is gated) and precedence (`'workspace'`/`'system'` outrank a
+ * `.mcp.json` server). User/default scopes are left unstamped (trusted, lower
+ * precedence than `.mcp.json`). Returns a shallow copy — never mutates input.
+ * See issue #4615.
+ */
+function tagMcpServerScope(
+  settings: Settings,
+  scope: McpServerScope,
+): Settings {
+  const servers = settings.mcpServers;
+  if (!servers || Object.keys(servers).length === 0) {
+    return settings;
+  }
+  const tagged: Record<string, MCPServerConfig> = {};
+  for (const [name, config] of Object.entries(servers)) {
+    tagged[name] = { ...config, scope };
+  }
+  return { ...settings, mcpServers: tagged };
+}
+
 function mergeSettings(
   system: Settings,
   systemDefaults: Settings,
@@ -406,7 +432,9 @@ function mergeSettings(
   workspace: Settings,
   isTrusted: boolean,
 ): Settings {
-  const safeWorkspace = isTrusted ? workspace : ({} as Settings);
+  const safeWorkspace = isTrusted
+    ? tagMcpServerScope(workspace, 'workspace')
+    : ({} as Settings);
 
   // Settings are merged with the following precedence (last one wins for
   // single values):
@@ -420,7 +448,7 @@ function mergeSettings(
     systemDefaults,
     user,
     safeWorkspace,
-    system,
+    tagMcpServerScope(system, 'system'),
   ) as Settings;
 }
 
@@ -781,7 +809,8 @@ function findEnvFile(
 
   const globalHopcodeDir = Storage.getGlobalHopCodeDir();
   const legacyhopcodeDir = path.normalize(path.join(homeDir, HOPCODE_DIR));
-  const hasCustomConfigDir = path.normalize(globalHopcodeDir) !== legacyhopcodeDir;
+  const hasCustomConfigDir =
+    path.normalize(globalHopcodeDir) !== legacyhopcodeDir;
 
   const canUseEnvFile = (filePath: string): boolean =>
     isTrusted !== false || userLevelPaths.has(path.normalize(filePath));

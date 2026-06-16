@@ -19,7 +19,7 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'YOLO mode': 'YOLO 模式',
+  'IZN mode': 'IZN 模式',
   'Auto mode': 'Auto 模式',
   'plan mode': '規劃模式',
   'auto-accept edits': '自動接受編輯',
@@ -82,7 +82,7 @@ export default {
   'show paths for current session files and logs': '顯示目前會話檔案和日誌路徑',
   'submit a bug report': '提交錯誤報告',
   Status: '狀態',
-  'HopCode': 'HopCode',
+  HopCode: 'HopCode',
   Runtime: '運行環境',
   OS: '操作系統',
   Auth: '認證',
@@ -100,6 +100,7 @@ export default {
     '列出可用的 HopCode 工具。用法：/tools [desc]',
   'Open the skills panel (browse, search, toggle, pick).':
     '開啟技能面板（瀏覽、搜尋、啟停、選擇）。',
+  'Move this session to a new working directory': '將此會話移動到新的工作目錄',
   'Manage Skills': '管理技能',
   'Skills configuration saved.': '技能設定已儲存。',
   'Skills configuration saved, but refresh failed: {{error}}. Restart to ensure the new state is applied.':
@@ -202,12 +203,14 @@ export default {
   'Clear conversation history and free up context': '清除對話歷史並釋放上下文',
   'Compresses the context by replacing it with a summary.':
     '通過摘要替換來壓縮上下文',
-  'open full HopCode documentation in your browser':
-    '在瀏覽器中打開完整的 HopCode 文檔',
+  'Fast context compression without AI. Strips old tool outputs and thinking parts.':
+    '無需 AI 的快速上下文壓縮。清理舊工具輸出並剝離思考過程。',
+  'open full Qwen Code documentation in your browser':
+    '在瀏覽器中打開完整的 Qwen Code 文檔',
   'Configuration not available.': '配置不可用',
   'Connect an LLM provider': '連接 LLM 提供商',
-  'Copy the last AI response to clipboard (/copy N for Nth-latest)':
-    '將最近的 AI 回應複製到剪貼簿（/copy N 複製倒數第 N 則）',
+  'Copy to clipboard: reply, code (by lang), LaTeX, or Mermaid. N = Nth-latest message, index = block number':
+    '複製到剪貼簿：AI 回應、程式碼區塊（可依語言篩選）、LaTeX 或 Mermaid。N 為倒數第 N 則訊息，index 為程式碼區塊序號',
   'Show working-tree change stats versus HEAD':
     '顯示工作區相對 HEAD 的變更統計',
   'Could not determine current working directory.': '無法確定當前工作目錄。',
@@ -449,7 +452,7 @@ export default {
   Plan: '規劃',
   'Ask permissions': '請求授權',
   'Auto Edit': '自動編輯',
-  YOLO: 'YOLO',
+  IZN: 'IZN',
   'toggle vim mode on/off': '切換 vim 模式開關',
   'Show model-specific usage statistics.': '顯示模型相關的使用統計信息',
   'Show tool-specific usage statistics.': '顯示工具相關的使用統計信息',
@@ -762,8 +765,6 @@ export default {
   'Cannot fork while a response or tool call is in progress. Wait for it to finish or resolve the pending tool call.':
     '回應或工具呼叫正在進行時無法分支。請等待其完成或處理待確認的工具呼叫。',
   'Cannot fork before the first conversation turn.': '首次對話輪次前無法分支。',
-  'The /fork command requires the fork feature gate. Set HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 to enable it.':
-    '/fork 命令需要啟用 fork 功能開關。設定 HOPCODE_CODE_ENABLE_FORK_SUBAGENT=1 以啟用。',
   'The agent tool is unavailable; cannot fork.': 'Agent 工具不可用；無法分支。',
   'Failed to launch fork: {{error}}': '啟動分支失敗：{{error}}',
   'the background agent could not be started.': '背景智能體無法啟動。',
@@ -832,6 +833,7 @@ export default {
   'No managed auto-memory entries matched: {{query}}':
     '沒有匹配的託管自動記憶條目：{{query}}',
   'Consolidate managed auto-memory topic files.': '整理託管自動記憶主題檔案',
+  'Import MCP servers from Claude configs': '從 Claude 設定匯入 MCP 伺服器',
   'Open MCP management dialog': '打開 MCP 管理對話框',
   'Could not retrieve tool registry.': '無法檢索工具註冊表',
   "Successfully authenticated and refreshed tools for '{{name}}'.":
@@ -1066,7 +1068,8 @@ export default {
     'OAuth token 已過期（超過 {{seconds}} 秒）。請重新選擇認證方法',
   'Press any key to return to authentication type selection.':
     '按任意鍵返回認證類型選擇',
-  'Waiting for HopCode OAuth authentication...': '正在等待 HopCode OAuth 認證...',
+  'Waiting for HopCode OAuth authentication...':
+    '正在等待 HopCode OAuth 認證...',
   'Authentication timed out. Please try again.': '認證超時。請重試。',
   'Waiting for auth... (Press ESC or CTRL+C to cancel)':
     '正在等待認證...（按 ESC 或 CTRL+C 取消）',
@@ -1472,7 +1475,8 @@ export default {
   'Show current authentication status': '顯示當前認證狀態',
   'Authentication completed successfully.': '認證完成。',
   'Starting HopCode OAuth authentication...': '正在啟動 HopCode OAuth 認證...',
-  'Successfully authenticated with HopCode OAuth.': '已成功通過 HopCode OAuth 認證。',
+  'Successfully authenticated with HopCode OAuth.':
+    '已成功通過 HopCode OAuth 認證。',
   'Failed to authenticate with HopCode OAuth: {{error}}':
     'HopCode OAuth 認證失敗：{{error}}',
   'Processing Alibaba Cloud Coding Plan authentication...':
@@ -1624,6 +1628,9 @@ export default {
   'Background tasks': '背景任務',
   'No tasks currently running': '目前沒有正在執行的任務',
   'No entry to show.': '沒有可顯示的項目。',
+  'needs approval': '待審批',
+  'Background agent needs approval': '背景 agent 等待審批',
+  'Approve or deny the request above': '請核准或拒絕上方的請求',
   Running: '執行中',
   Paused: '已暫停',
   Completed: '已完成',
@@ -1727,4 +1734,5 @@ export default {
   // === Same-as-English optimization ===
   ' (not in model registry)': '（不在模型註冊表中）',
   'start server': '啟動伺服器',
+  'No compression needed.': '無需壓縮。',
 };

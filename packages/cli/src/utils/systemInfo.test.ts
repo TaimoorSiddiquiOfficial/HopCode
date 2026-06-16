@@ -78,8 +78,7 @@ vi.mock('./version.js', () => ({
 }));
 
 vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
   return {
     ...actual,
     IdeClient: {
@@ -197,7 +196,7 @@ describe('systemInfo', () => {
       expect(getSandboxEnv(true)).toBe('test-sandbox');
     });
 
-    it('should handle legacy hopcode-code- prefix removal', () => {
+    it('should handle legacy hopcode-custom- prefix removal', () => {
       process.env['SANDBOX'] = 'hopcode-custom-sandbox';
       expect(getSandboxEnv(true)).toBe('custom-sandbox');
     });

@@ -72,6 +72,9 @@ export type {
   BridgeClientRequestContext,
   BridgeHeartbeatResult,
   BridgeHeartbeatState,
+  BridgeDaemonStatusLimits,
+  BridgeDaemonSessionDiagnostic,
+  BridgeDaemonStatusSnapshot,
   AcpSessionBridge,
   HttpAcpBridge,
 } from '@hopcode/acp-bridge/bridgeTypes';
@@ -82,6 +85,7 @@ export {
   RestoreInProgressError,
   InvalidSessionScopeError,
   SessionLimitExceededError,
+  PromptQueueFullError,
   WorkspaceMismatchError,
   InvalidClientIdError,
   InvalidPermissionOptionError,
@@ -99,6 +103,8 @@ export {
   CancelSentinelCollisionError,
   PermissionForbiddenError,
   PermissionPolicyNotImplementedError,
+  SessionShellClientRequiredError,
+  SessionShellDisabledError,
 } from '@hopcode/acp-bridge/bridgeErrors';
 
 export {

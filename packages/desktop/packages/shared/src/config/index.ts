@@ -3,7 +3,7 @@ export * from './llm-connections.ts';
 export * from './models.ts';
 export * from './model-fetcher.ts';
 export * from './preferences.ts';
-export * from './qwen-settings.ts';
+export * from './hopcode-settings.ts';
 export * from './storage.ts';
 export * from './pets.ts';
 export * from './theme.ts';
