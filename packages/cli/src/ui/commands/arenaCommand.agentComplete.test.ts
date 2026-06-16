@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'node:events';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { AgentStatus, ArenaEventType, AuthType } from '@hopcode/hopcode-core';
+import { AgentStatus, ArenaEventType, AuthType } from '@hoptrendy/hopcode-core';
 import { arenaCommand } from './arenaCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 
@@ -18,9 +18,9 @@ const arenaManagerMocks = vi.hoisted(() => ({
   }>,
 }));
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
 
   class MockArenaManager {
     emitter = new EventEmitter();

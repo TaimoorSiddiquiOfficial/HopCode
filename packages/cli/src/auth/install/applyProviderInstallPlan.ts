@@ -7,7 +7,7 @@
 import type {
   ModelProvidersConfig,
   ProviderModelConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { getPersistScopeForModelSelection } from '../../config/modelProvidersScope.js';
 import {
   backupSettingsFile,

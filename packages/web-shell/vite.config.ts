@@ -36,22 +36,22 @@ export default defineConfig(({ command }) => ({
     alias:
       command === 'serve'
         ? {
-            '@hopcode/webui/daemon-react-sdk': resolve(
+            '@hoptrendy/webui/daemon-react-sdk': resolve(
               __dirname,
               '../webui/src/daemon-react-sdk.ts',
             ),
-            '@hopcode/webui': resolve(__dirname, '../webui/src/index.ts'),
-            '@hopcode/sdk/daemon': resolve(
+            '@hoptrendy/webui': resolve(__dirname, '../webui/src/index.ts'),
+            '@hoptrendy/sdk/daemon': resolve(
               __dirname,
               '../sdk-typescript/src/daemon/index.ts',
             ),
-            '@hopcode/sdk': resolve(
+            '@hoptrendy/sdk': resolve(
               __dirname,
               '../sdk-typescript/src/index.ts',
             ),
           }
         : {},
-    dedupe: ['react', 'react-dom', '@hopcode/webui', '@hopcode/sdk'],
+    dedupe: ['react', 'react-dom', '@hoptrendy/webui', '@hoptrendy/sdk'],
   },
   build: {
     outDir: '../dist',

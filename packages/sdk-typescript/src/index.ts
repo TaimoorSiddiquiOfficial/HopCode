@@ -178,7 +178,7 @@ export {
 // Auth
 // surface. These were re-exported from `./daemon/index.js` but the
 // public SDK entry (this file) never re-exported them, so an
-// `import { DaemonAuthFlow } from '@hopcode/sdk'` resolved to
+// `import { DaemonAuthFlow } from '@hoptrendy/sdk'` resolved to
 // undefined. The PR description lists `reduceDaemonAuthEvent` as
 // SDK surface and `client.auth.start()` works only because
 // `DaemonClient` (already exported above) constructs `DaemonAuthFlow`

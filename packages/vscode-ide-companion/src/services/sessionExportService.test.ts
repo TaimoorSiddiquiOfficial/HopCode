@@ -31,7 +31,7 @@ const {
   mockShowSaveDialog: vi.fn(),
 }));
 
-vi.mock('@hopcode/hopcode-core', () => {
+vi.mock('@hoptrendy/hopcode-core', () => {
   class SessionService {
     constructor(_cwd: string) {}
 
@@ -45,7 +45,7 @@ vi.mock('@hopcode/hopcode-core', () => {
   };
 });
 
-vi.mock('@hopcode/hopcode/export', () => ({
+vi.mock('@hoptrendy/hopcode/export', () => ({
   collectSessionData: mockCollectSessionData,
   normalizeSessionData: mockNormalizeSessionData,
   toHtml: mockToHtml,

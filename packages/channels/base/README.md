@@ -1,4 +1,4 @@
-# @hopcode/channel-base
+# @hoptrendy/channel-base
 
 Base infrastructure for building HopCode channel adapters. Provides the abstract base class, access control, session routing, and the ACP bridge that communicates with the agent.
 
@@ -7,7 +7,7 @@ If you're building a channel plugin, this is your only dependency.
 ## Install
 
 ```bash
-npm install @hopcode/channel-base
+npm install @hoptrendy/channel-base
 ```
 
 ## Quick start
@@ -15,12 +15,12 @@ npm install @hopcode/channel-base
 Subclass `ChannelBase` and implement three methods:
 
 ```typescript
-import { ChannelBase } from '@hopcode/channel-base';
+import { ChannelBase } from '@hoptrendy/channel-base';
 import type {
   ChannelConfig,
   Envelope,
   AcpBridge,
-} from '@hopcode/channel-base';
+} from '@hoptrendy/channel-base';
 
 class MyChannel extends ChannelBase {
   async connect(): Promise<void> {
@@ -42,7 +42,7 @@ class MyChannel extends ChannelBase {
 Export a `ChannelPlugin` object so the extension loader can discover it:
 
 ```typescript
-import type { ChannelPlugin } from '@hopcode/channel-base';
+import type { ChannelPlugin } from '@hoptrendy/channel-base';
 
 export const plugin: ChannelPlugin = {
   channelType: 'my-platform',
@@ -53,7 +53,7 @@ export const plugin: ChannelPlugin = {
 };
 ```
 
-For a complete working example, see [`@hopcode/channel-plugin-example`](../plugin-example/).
+For a complete working example, see [`@hoptrendy/channel-plugin-example`](../plugin-example/).
 
 ## Architecture
 
@@ -292,4 +292,4 @@ Block streaming and `onResponseChunk` work independently — plugins can overrid
 ## Further reading
 
 - [Channel Plugin Developer Guide](../../docs/developers/channel-plugins.md)
-- [`@hopcode/channel-plugin-example`](../plugin-example/) — working reference implementation
+- [`@hoptrendy/channel-plugin-example`](../plugin-example/) — working reference implementation

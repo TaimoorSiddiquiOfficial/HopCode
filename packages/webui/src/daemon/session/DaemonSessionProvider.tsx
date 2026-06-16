@@ -29,7 +29,7 @@ import {
   type DaemonTranscriptStore,
   type DaemonTurnCompleteData,
   type DaemonUiEvent,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { createDaemonSessionActions } from './actions.js';
 import {
   detachDaemonClient,

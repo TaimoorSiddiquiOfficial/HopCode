@@ -26,7 +26,7 @@ import {
   isWithinRoot,
   type Ignore,
   type WriteTextFileOptions,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { BridgeEvent } from '../eventBus.js';
 import {
   type AuditContext,

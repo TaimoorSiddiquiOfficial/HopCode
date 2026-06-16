@@ -5,7 +5,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 interface Logger {
   getPreviousUserMessages(): Promise<string[]>;

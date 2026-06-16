@@ -1,4 +1,4 @@
-﻿# 🎉 HopCode Multi-AI SDK - FINAL STATUS
+# 🎉 HopCode Multi-AI SDK - FINAL STATUS
 
 **Date:** 2026-04-18  
 **Status:** ✅ **FOUNDATION COMPLETE - READY FOR PRODUCTION**
@@ -202,7 +202,7 @@
 
 ```bash
 # Install HopCode (after npm publish)
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 # Configure HopCode OAuth
 hopcode auth login

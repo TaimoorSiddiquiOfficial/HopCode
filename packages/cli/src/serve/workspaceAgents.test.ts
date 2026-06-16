@@ -18,7 +18,7 @@ import {
   vi,
   type MockInstance,
 } from 'vitest';
-import { Storage, HOPCODE_DIR } from '@hopcode/hopcode-core';
+import { Storage, HOPCODE_DIR } from '@hoptrendy/hopcode-core';
 import { createMutationGate } from './auth.js';
 import type { AcpSessionBridge } from './acpSessionBridge.js';
 import type { BridgeEvent } from './eventBus.js';

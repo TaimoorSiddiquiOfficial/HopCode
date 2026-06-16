@@ -9,7 +9,7 @@ import * as net from 'node:net';
 import * as path from 'node:path';
 import express from 'express';
 import type { Application, NextFunction, Request, Response } from 'express';
-import type { ApprovalMode } from '@hopcode/hopcode-core';
+import type { ApprovalMode } from '@hoptrendy/hopcode-core';
 import {
   APPROVAL_MODES,
   ALL_PROVIDERS,
@@ -25,7 +25,7 @@ import {
   recordDaemonHttpRequest,
   recordDaemonHttpResponse,
   withDaemonRequestSpan,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 import type { DaemonLogger } from './daemonLogger.js';
 import {
@@ -47,7 +47,7 @@ import {
   type DeviceFlowProviderId,
   type DeviceFlowPublicView,
 } from './auth/deviceFlow.js';
-import { mapDomainErrorToErrorKind } from '@hopcode/acp-bridge';
+import { mapDomainErrorToErrorKind } from '@hoptrendy/acp-bridge';
 import { HopCodeOAuthDeviceFlowProvider } from './auth/hopCodeDeviceFlowProvider.js';
 import { createBridgeFileSystemAdapter } from './bridgeFileSystemAdapter.js';
 import { createDaemonStatusProvider } from './daemonStatusProvider.js';

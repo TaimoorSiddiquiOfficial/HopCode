@@ -207,9 +207,9 @@ flowchart LR
 
 ## Dependencies
 
-- `@hopcode/hopcode-core` — `Ignore`, `isBinaryFile`, `Config.isTrustedFolder()`.
+- `@hoptrendy/hopcode-core` — `Ignore`, `isBinaryFile`, `Config.isTrustedFolder()`.
 - `node:fs`, `node:path`, `node:crypto`.
-- `@hopcode/acp-bridge` — `BridgeFileSystem` contract on the ACP side.
+- `@hoptrendy/acp-bridge` — `BridgeFileSystem` contract on the ACP side.
 - HTTP routes: `packages/cli/src/serve/routes/workspaceFileRead.ts`, `workspaceFileWrite.ts`.
 
 ## Configuration

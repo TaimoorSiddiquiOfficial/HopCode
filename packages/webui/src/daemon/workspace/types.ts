@@ -44,7 +44,7 @@ import type {
   DaemonSessionSummary,
   DaemonWriteMemoryRequest,
   DaemonWriteMemoryResult,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 
 // ── Resource Hook Types (shared by workspace hooks) ────────────────
 
@@ -74,7 +74,7 @@ export interface DaemonWorkspaceProviderProps {
    * Optional pluggable transport forwarded to `DaemonClient`. When
    * omitted the client uses the default REST+SSE transport.
    */
-  transport?: import('@hopcode/sdk/daemon').DaemonTransport;
+  transport?: import('@hoptrendy/sdk/daemon').DaemonTransport;
   children: ReactNode;
 }
 

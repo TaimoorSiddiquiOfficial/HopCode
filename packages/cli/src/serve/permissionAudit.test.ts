@@ -13,7 +13,7 @@ import {
 import type {
   PermissionRequestRecord,
   PermissionVote,
-} from '@hopcode/acp-bridge/permission';
+} from '@hoptrendy/acp-bridge/permission';
 
 const RECORD: PermissionRequestRecord = {
   requestId: 'req-1',

@@ -23,8 +23,8 @@ import {
 import type { CliArgs } from './config/config.js';
 import { type LoadedSettings } from './config/settings.js';
 import { appEvents, AppEvent } from './utils/events.js';
-import type { Config } from '@hopcode/hopcode-core';
-import { ApprovalMode, OutputFormat } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
+import { ApprovalMode, OutputFormat } from '@hoptrendy/hopcode-core';
 
 const mockWriteStderrLine = vi.hoisted(() => vi.fn());
 const mockHandleListExtensions = vi.hoisted(() => vi.fn());

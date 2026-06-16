@@ -6,7 +6,7 @@ import type {
   DaemonToolTranscriptBlock,
   DaemonTranscriptBlock,
   DaemonUserShellTranscriptBlock,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { transcriptBlocksToDaemonMessages } from './transcriptToMessages.js';
 
 function textBlock(

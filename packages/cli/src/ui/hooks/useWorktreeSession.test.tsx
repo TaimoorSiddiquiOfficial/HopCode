@@ -14,7 +14,7 @@ import {
   clearWorktreeSession,
   type Config,
   type WorktreeSession,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { useWorktreeSession } from './useWorktreeSession.js';
 
 const SESSION_ID = 'test-session-id';

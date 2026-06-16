@@ -1,4 +1,4 @@
-﻿# JetBrains IDEs
+# JetBrains IDEs
 
 > JetBrains IDEs provide native support for AI coding assistants through the Agent Client Protocol (ACP). This integration allows you to use HopCode directly within your JetBrains IDE with real-time code suggestions.
 
@@ -21,7 +21,7 @@
 1. Install HopCode CLI:
 
    ```bash
-   npm install -g @hopcode/hopcode
+   npm install -g @hoptrendy/hopcode
    ```
 
 2. Open your JetBrains IDE and navigate to AI Chat tool window.
@@ -43,7 +43,7 @@
 1. Install HopCode CLI:
 
    ```bash
-   npm install -g @hopcode/hopcode
+   npm install -g @hoptrendy/hopcode
    ```
 
 2. Open your JetBrains IDE and navigate to AI Chat tool window.

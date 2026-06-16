@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   collectContextData,
   formatContextUsageText,
@@ -22,9 +22,9 @@ const { mockGetLastPromptTokenCount, mockGetLastCachedContentTokenCount } =
     mockGetLastCachedContentTokenCount: vi.fn().mockReturnValue(0),
   }));
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...original,
     uiTelemetryService: {

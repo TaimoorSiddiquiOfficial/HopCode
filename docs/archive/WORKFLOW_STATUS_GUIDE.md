@@ -53,7 +53,7 @@
 
    ```bash
    # Check if package was published
-   npm view @hopcode/hopcode
+   npm view @hoptrendy/hopcode
    ```
 
 2. **Check GitHub Release:**
@@ -63,7 +63,7 @@
 
 3. **Test Installation:**
    ```bash
-   npm install -g @hopcode/hopcode
+   npm install -g @hoptrendy/hopcode
    hopcode --version
    ```
 

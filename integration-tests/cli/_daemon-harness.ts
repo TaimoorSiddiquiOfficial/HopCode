@@ -40,7 +40,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DaemonClient, type SubscribeOptions } from '@hopcode/sdk';
+import { DaemonClient, type SubscribeOptions } from '@hoptrendy/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -553,7 +553,10 @@ export function gitHead(timeoutMs = 5_000): string | null {
   }
 }
 
-export function makeTempWorkspace(label: string, prefix = 'hopcode-test'): string {
+export function makeTempWorkspace(
+  label: string,
+  prefix = 'hopcode-test',
+): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), `${prefix}-${label}-`));
 }
 

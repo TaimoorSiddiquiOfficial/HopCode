@@ -519,7 +519,7 @@ function writeManifest(packageRoot, manifest) {
     manifestPath,
     JSON.stringify(
       {
-        name: '@hopcode/hopcode',
+        name: '@hoptrendy/hopcode',
         version: manifest.version,
         target: manifest.target,
         nodeArchive: manifest.nodeArchive,

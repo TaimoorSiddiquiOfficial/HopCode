@@ -101,7 +101,7 @@ const mainBuild = esbuild.build({
   },
   alias: {
     'is-in-ci': path.resolve(__dirname, 'packages/cli/src/patches/is-in-ci.ts'),
-    '@hopcode/web-templates': path.resolve(
+    '@hoptrendy/web-templates': path.resolve(
       __dirname,
       'packages/web-templates/src/index.ts',
     ),

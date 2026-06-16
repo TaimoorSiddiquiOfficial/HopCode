@@ -30,7 +30,7 @@ import type {
   PromptResult,
   SessionMetadataResult,
   SetModelResult,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 
 export type DaemonConnectionStatus =
   | 'idle'

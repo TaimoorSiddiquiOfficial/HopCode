@@ -13,7 +13,7 @@
  */
 
 import { PROVIDER_REGISTRY } from '../packages/cli/src/commands/auth/registry.js';
-import type { ProviderConfig } from '@hopcode/hopcode-core';
+import type { ProviderConfig } from '@hoptrendy/hopcode-core';
 import { writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';

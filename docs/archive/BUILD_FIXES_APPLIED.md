@@ -37,10 +37,10 @@
 
 **Updated Package Names:**
 
-- ✅ `@hopcode/hopcode` (was `@hopcode/hopcode`)
-- ✅ `@hopcode/hopcode-core` (was `@hopcode/hopcode-core`)
+- ✅ `@hoptrendy/hopcode` (was `@hoptrendy/hopcode`)
+- ✅ `@hoptrendy/hopcode-core` (was `@hoptrendy/hopcode-core`)
 - ✅ `hopcode-vscode-ide-companion` (publisher: `hopcode`)
-- ✅ `@hopcode/sdk` (description updated)
+- ✅ `@hoptrendy/sdk` (description updated)
 
 **Bin Commands:**
 
@@ -139,7 +139,7 @@ These internal service names that refer to actual Qwen API clients should remain
 
 ### ✅ SHOULD Be Changed (Brand-facing)
 
-- Package names (`@hopcode/*` → `@hopcode/*`)
+- Package names (`@hoptrendy/*` → `@hoptrendy/*`)
 - CLI command name (`hopcode` → `hopcode`)
 - Project name in descriptions ("HopCode" → "HopCode")
 - Repository URLs

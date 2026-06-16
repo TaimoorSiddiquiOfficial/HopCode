@@ -15,7 +15,7 @@ import {
   type DeviceTokenPendingData,
   type IHopCodeOAuth2Client,
   type HopCodeCredentials,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import {
   brandSecret,

@@ -9,7 +9,7 @@ import type {
   AuthType,
   InputModalities,
   ProviderModelConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { ProviderInstallPlan, ProviderInstallState } from './types.js';
 
 // ---------------------------------------------------------------------------

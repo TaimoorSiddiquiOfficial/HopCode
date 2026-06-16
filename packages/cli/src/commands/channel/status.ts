@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import * as path from 'node:path';
-import { Storage } from '@hopcode/hopcode-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 import type { CommandModule } from 'yargs';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { readServiceInfo } from './pidfile.js';
-import type { SessionTarget } from '@hopcode/channel-base';
+import type { SessionTarget } from '@hoptrendy/channel-base';
 
 interface PersistedEntry {
   sessionId: string;

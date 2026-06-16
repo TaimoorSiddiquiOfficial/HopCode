@@ -6,17 +6,17 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import type { DeviceAuthorizationData } from '@hopcode/hopcode-core';
+import type { DeviceAuthorizationData } from '@hoptrendy/hopcode-core';
 import { useHopCodeAuth } from './useHopCodeAuth.js';
 import {
   AuthType,
   HopCodeOAuth2Events,
   HopCodeOAuth2Event,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 // Mock the HopCodeOAuth2Events
-vi.mock('@hopcode/hopcode-core', async () => {
-  const actual = await vi.importActual('@hopcode/hopcode-core');
+vi.mock('@hoptrendy/hopcode-core', async () => {
+  const actual = await vi.importActual('@hoptrendy/hopcode-core');
   const mockEmitter = {
     on: vi.fn().mockReturnThis(),
     off: vi.fn().mockReturnThis(),

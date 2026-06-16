@@ -10,7 +10,7 @@ import {
   Storage,
   FILE_HISTORY_DIR,
   createDebugLogger,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('HOUSEKEEPING');
 

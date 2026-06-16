@@ -16,7 +16,7 @@ import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type {
   MCPServerConfig,
   TeammateApprovalRequestEvent,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { PermissionSuggestion } from '../../types.js';
 
 /**

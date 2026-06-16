@@ -20,12 +20,12 @@ import {
   useWorkspaceActions,
   type DaemonSessionNotice,
   type DaemonStreamingState,
-} from '@hopcode/webui/daemon-react-sdk';
-import { isDaemonTurnError } from '@hopcode/sdk/daemon';
+} from '@hoptrendy/webui/daemon-react-sdk';
+import { isDaemonTurnError } from '@hoptrendy/sdk/daemon';
 import type {
   DaemonTranscriptBlock,
   DaemonSessionTaskStatus,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { extractPendingPermission } from './adapters/transcriptAdapter';
 import { removeInjectedFromQueue } from './midTurnDedup';
 import { MessageList, type MessageListHandle } from './components/MessageList';
@@ -104,7 +104,7 @@ import { isBackgroundSubAgentToolCall } from './adapters/toolClassification';
 import {
   DAEMON_APPROVAL_MODES,
   type DaemonApprovalMode,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { serializeContextUsageMessage } from './components/messages/ContextUsageMessage';
 import {
   serializeStatsMessage,

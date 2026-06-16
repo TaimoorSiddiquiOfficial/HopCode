@@ -15,7 +15,7 @@ import {
   Storage,
   getAutoMemoryRoot,
   getAutoMemoryProjectStateDir,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { SettingScope } from '../../config/settings.js';

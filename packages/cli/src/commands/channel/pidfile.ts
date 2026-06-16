@@ -6,7 +6,7 @@ import {
   unlinkSync,
 } from 'node:fs';
 import * as path from 'node:path';
-import { Storage } from '@hopcode/hopcode-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 
 export interface ServiceInfo {
   pid: number;

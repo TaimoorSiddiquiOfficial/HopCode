@@ -16,14 +16,14 @@ import type {
   SetSessionModelRequest,
   SetSessionModelResponse,
 } from '@agentclientprotocol/sdk';
-import type { ApprovalMode } from '@hopcode/hopcode-core';
+import type { ApprovalMode } from '@hoptrendy/hopcode-core';
 import {
   DAEMON_TRACEPARENT_META_KEY,
   DAEMON_TRACESTATE_META_KEY,
   TrustGateError,
   ShellExecutionService,
   type ShellOutputEvent,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { ShellCommandResult } from './bridgeTypes.js';
 import type { AcpChannel } from './channel.js';
 import {

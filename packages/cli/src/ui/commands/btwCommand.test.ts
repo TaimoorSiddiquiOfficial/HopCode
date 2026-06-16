@@ -45,7 +45,7 @@ const mockBuildBtwPrompt = vi.hoisted(() =>
   vi.fn().mockImplementation((q: string) => `<system-reminder>...\n${q}`),
 );
 
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   BTW_MAX_INPUT_LENGTH: 4096,
   runForkedAgent: mockRunForkedAgent,
   getCacheSafeParams: mockGetCacheSafeParams,

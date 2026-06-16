@@ -61,7 +61,7 @@ import {
   ENV_WAS_RECOVERED,
 } from './settings.js';
 import { needsMigration } from './migration/index.js';
-import { HOPCODE_DIR } from '@hopcode/hopcode-core';
+import { HOPCODE_DIR } from '@hoptrendy/hopcode-core';
 
 const mockDebugLogger = vi.hoisted(() => ({
   debug: vi.fn(),
@@ -70,8 +70,8 @@ const mockDebugLogger = vi.hoisted(() => ({
   info: vi.fn(),
 }));
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     createDebugLogger: () => mockDebugLogger,

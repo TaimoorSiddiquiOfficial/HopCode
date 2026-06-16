@@ -5,7 +5,7 @@
  */
 
 import type { CommandModule } from 'yargs';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('HOOKS_UI');
 

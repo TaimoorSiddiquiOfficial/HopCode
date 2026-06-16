@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   useStreamingState,
   useTranscriptBlocks,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 
 interface LoadingMetrics {
   estimatedOutputTokens: number;

@@ -7,7 +7,7 @@
 import type { CommandModule } from 'yargs';
 import { getErrorMessage } from '../../utils/errors.js';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
-import { ExtensionManager } from '@hopcode/hopcode-core';
+import { ExtensionManager } from '@hoptrendy/hopcode-core';
 import {
   requestConsentNonInteractive,
   requestConsentOrFail,

@@ -22,7 +22,7 @@
 
 import { Box, Text } from 'ink';
 import { useState, useEffect, useCallback } from 'react';
-import { AgentStatus, AgentEventType } from '@hopcode/hopcode-core';
+import { AgentStatus, AgentEventType } from '@hoptrendy/hopcode-core';
 import {
   useAgentViewState,
   useAgentViewActions,

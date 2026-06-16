@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import {
   DaemonWorkspaceProvider,
   DaemonSessionProvider,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { App } from './App';
 import {
   getDaemonBaseUrl,

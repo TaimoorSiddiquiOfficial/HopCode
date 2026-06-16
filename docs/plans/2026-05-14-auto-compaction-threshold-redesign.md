@@ -1,4 +1,4 @@
-﻿# Auto-Compaction Threshold Redesign Implementation Plan
+# Auto-Compaction Threshold Redesign Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -1488,8 +1488,8 @@ Expected: FAIL — `TipContext` 没有 `thresholds` 字段；三条 tip 仍按 5
 [tipRegistry.ts:15-21](packages/cli/src/services/tips/tipRegistry.ts:15)：
 
 ```ts
-import type { CompactionThresholds } from '@hopcode/hopcode-core';
-import { DEFAULT_TOKEN_LIMIT } from '@hopcode/hopcode-core';
+import type { CompactionThresholds } from '@hoptrendy/hopcode-core';
+import { DEFAULT_TOKEN_LIMIT } from '@hoptrendy/hopcode-core';
 
 export type TipTrigger = 'startup' | 'post-response';
 
@@ -1571,7 +1571,7 @@ const tipCtx: TipContext = {
 加 import 到 AppContainer.tsx：
 
 ```tsx
-import { computeThresholds } from '@hopcode/hopcode-core';
+import { computeThresholds } from '@hoptrendy/hopcode-core';
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
@@ -1653,7 +1653,7 @@ Expected: FAIL — 当前 [contextCommand.ts:177-183](packages/cli/src/ui/comman
 替换 [contextCommand.ts:177-183](packages/cli/src/ui/commands/contextCommand.ts:177) 那段：
 
 ```ts
-import { computeThresholds } from '@hopcode/hopcode-core';
+import { computeThresholds } from '@hoptrendy/hopcode-core';
 
 // ... 在 buildContextSummary 或类似入口里：
 const thresholds = computeThresholds(contextWindowSize);

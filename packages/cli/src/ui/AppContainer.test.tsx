@@ -28,7 +28,7 @@ import {
   makeFakeConfig,
   type GeminiClient,
   type SubagentManager,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../config/settings.js';
 import type { InitializationResult } from '../core/initializer.js';
 import { UIStateContext, type UIState } from './contexts/UIStateContext.js';
@@ -154,7 +154,7 @@ import { useLogger } from './hooks/useLogger.js';
 import { useLoadingIndicator } from './hooks/useLoadingIndicator.js';
 import { useTerminalSize } from './hooks/useTerminalSize.js';
 import { useKeypress, type Key } from './hooks/useKeypress.js';
-import { ShellExecutionService } from '@hopcode/hopcode-core';
+import { ShellExecutionService } from '@hoptrendy/hopcode-core';
 
 describe('AppContainer State Management', () => {
   let mockConfig: Config;

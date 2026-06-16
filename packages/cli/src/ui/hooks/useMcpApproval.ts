@@ -9,8 +9,8 @@ import type {
   Config,
   MCPServerConfig,
   McpServerScope,
-} from '@hopcode/hopcode-core';
-import { isGatedMcpScope } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import { isGatedMcpScope } from '@hoptrendy/hopcode-core';
 import { loadMcpApprovals } from '../../config/mcpApprovals.js';
 import { McpApprovalChoice } from '../components/mcp/MCPServerApprovalDialog.js';
 

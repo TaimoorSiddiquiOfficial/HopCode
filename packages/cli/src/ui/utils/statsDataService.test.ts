@@ -8,18 +8,18 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type {
   UsageSummaryRecord,
   AggregatedReport,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     loadUsageHistory: vi.fn(),
   };
 });
 
-import { loadUsageHistory } from '@hopcode/hopcode-core';
+import { loadUsageHistory } from '@hoptrendy/hopcode-core';
 import {
   loadStatsData,
   getPreviousRangeBounds,

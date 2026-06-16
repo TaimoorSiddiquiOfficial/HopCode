@@ -13,7 +13,7 @@ import {
   type ModelConfigSourcesInput,
   type ProviderModelConfig,
   stripRuntimeSnapshotPrefix,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { Settings } from '../config/settings.js';
 
 /**

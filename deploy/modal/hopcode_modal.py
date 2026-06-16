@@ -25,7 +25,7 @@ image = (
         "apt-get install -y nodejs",
     )
     # Install HopCode globally from the local package or npm
-    .pip_install("@hopcode/hopcode")  # or .copy_local_dir("../../")
+    .pip_install("@hoptrendy/hopcode")  # or .copy_local_dir("../../")
 )
 
 app = modal.App("hopcode-agent", image=image)

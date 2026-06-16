@@ -6,7 +6,7 @@
 
 import type { SpawnOptions } from 'node:child_process';
 import { spawn } from 'node:child_process';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import type { SlashCommand } from '../commands/types.js';
 import type { RecentSlashCommands } from '../hooks/useSlashCompletion.js';
 import { writeOsc52 } from './clipboardUtils.js';

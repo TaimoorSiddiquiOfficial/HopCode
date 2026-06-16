@@ -133,11 +133,11 @@ Display:     'Inter', SemiBold (600)
 
 ```bash
 # Package Names
-@hopcode/hopcode      →  @hopcode/hopcode
-@hopcode/sdk            →  @hopcode/sdk
-@hopcode/webui          →  @hopcode/webui
-@hopcode/core           →  @hopcode/core
-@hopcode/cli-insight    →  @hopcode/cli-insight
+@hoptrendy/hopcode      →  @hoptrendy/hopcode
+@hoptrendy/sdk            →  @hoptrendy/sdk
+@hoptrendy/webui          →  @hoptrendy/webui
+@hoptrendy/core           →  @hoptrendy/core
+@hoptrendy/cli-insight    →  @hoptrendy/cli-insight
 
 # CLI Command
 qwen                      →  hopcode
@@ -340,7 +340,7 @@ Consider supporting both during transition:
 
 - [ ] Reserve `@hopcode` scope
 - [ ] Publish all 14 packages
-- [ ] Deprecate `@hopcode/*` packages with migration notice
+- [ ] Deprecate `@hoptrendy/*` packages with migration notice
 
 ---
 

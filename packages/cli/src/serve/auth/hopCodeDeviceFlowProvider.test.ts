@@ -29,7 +29,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   HopCodeOAuthPollError,
   type IHopCodeOAuth2Client,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { HopCodeOAuthDeviceFlowProvider } from './hopCodeDeviceFlowProvider.js';
 import { brandSecret } from './deviceFlow.js';
 

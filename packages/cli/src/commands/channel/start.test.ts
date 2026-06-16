@@ -70,7 +70,7 @@ vi.mock('./channel-registry.js', () => ({
   registerPlugin: mockRegisterPlugin,
 }));
 
-vi.mock('@hopcode/channel-base', () => ({
+vi.mock('@hoptrendy/channel-base', () => ({
   AcpBridge: mockAcpBridge,
   SessionRouter: mockSessionRouter,
 }));

@@ -7,7 +7,16 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@hoptrendy/sdk": ["../sdk-typescript/src/index.ts"],
+      "@hoptrendy/sdk/daemon": ["../sdk-typescript/src/daemon/index.ts"],
+      "@hoptrendy/sdk/*": ["../sdk-typescript/src/*/index.ts"],
+      "@hoptrendy/webui": ["../webui/src/index.ts"],
+      "@hoptrendy/webui/daemon-react-sdk": ["../webui/src/daemon-react-sdk.ts"],
+      "@hoptrendy/webui/*": ["../webui/src/*/index.ts"]
+    }
   },
   "include": ["client/**/*.ts", "client/**/*.tsx"],
   "exclude": ["node_modules", "dist"]

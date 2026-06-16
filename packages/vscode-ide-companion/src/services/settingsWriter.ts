@@ -20,7 +20,7 @@ import {
   type ProviderInstallPlan,
   type ProviderSettingsAdapter,
   type ModelProvidersConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   CODING_PLAN_ENV_KEY,
   CodingPlanRegion,

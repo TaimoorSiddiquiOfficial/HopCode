@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { SessionListItem } from '@hopcode/hopcode-core';
+import type { SessionListItem } from '@hoptrendy/hopcode-core';
 import { filterSessions, truncateText } from './sessionPickerUtils.js';
 
 function s(overrides: Partial<SessionListItem>): SessionListItem {

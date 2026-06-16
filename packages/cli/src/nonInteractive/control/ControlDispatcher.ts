@@ -36,7 +36,7 @@ import type {
   ControlResponse,
   ControlRequestPayload,
 } from '../types.js';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('CONTROL_DISPATCHER');
 

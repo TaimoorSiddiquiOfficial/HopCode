@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useReducer, useEffect, useRef } from 'react';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import type { Key } from './useKeypress.js';
 import type { TextBuffer } from '../components/shared/text-buffer.js';
 import {

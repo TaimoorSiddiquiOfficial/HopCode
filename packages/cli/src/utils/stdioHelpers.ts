@@ -11,7 +11,7 @@
  * CLI commands (like `hopcode extensions list`) where the output IS the user-facing
  * result, not debug logging.
  *
- * For debug/diagnostic logging, use `createDebugLogger()` from @hopcode/hopcode-core.
+ * For debug/diagnostic logging, use `createDebugLogger()` from @hoptrendy/hopcode-core.
  */
 
 /**

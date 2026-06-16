@@ -58,7 +58,7 @@ import {
   redactUrlCredentials,
   computeUniqueBranchTitle,
   unregisterGoalHook,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { randomUUID } from 'node:crypto';
 import type {
   ApprovalMode,
@@ -72,7 +72,7 @@ import type {
   ProviderConfig,
   ProviderModelConfig,
   ProviderSetupInputs,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   AgentSideConnection,
   RequestError,

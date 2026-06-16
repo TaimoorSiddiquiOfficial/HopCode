@@ -13,7 +13,7 @@ import {
   isWithinRoot,
   ideContextStore,
   Storage,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { Settings } from './settings.js';
 import stripJsonComments from 'strip-json-comments';
 import { writeStderrLine } from '../utils/stdioHelpers.js';

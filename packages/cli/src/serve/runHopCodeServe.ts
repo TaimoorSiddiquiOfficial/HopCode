@@ -47,7 +47,7 @@ import {
   type ProviderSetupInputs,
   type TelemetryRuntimeConfig,
   type TelemetrySettings,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { createBridgeFileSystemAdapter } from './bridgeFileSystemAdapter.js';
 import { createDaemonStatusProvider } from './daemonStatusProvider.js';
 import { isLoopbackBind } from './loopbackBinds.js';
@@ -62,7 +62,7 @@ import {
   resolveBridgeFsFactory,
 } from './server.js';
 import { initDaemonLogger, type DaemonLogger } from './daemonLogger.js';
-import { createSpawnChannelFactory } from '@hopcode/acp-bridge/spawnChannel';
+import { createSpawnChannelFactory } from '@hoptrendy/acp-bridge/spawnChannel';
 import { createDaemonWorkspaceService } from './workspace-service/index.js';
 import { SERVE_CAPABILITY_REGISTRY } from './capabilities.js';
 import type {
@@ -71,7 +71,7 @@ import type {
   ServeAuthProviderInstallResult,
 } from './types.js';
 import type { WorkspaceFileSystemFactory } from './fs/index.js';
-import type { PermissionPolicy } from '@hopcode/acp-bridge';
+import type { PermissionPolicy } from '@hoptrendy/acp-bridge';
 import { getCliVersion } from '../utils/version.js';
 import { getRateLimiter } from './rateLimit.js';
 import type { AcpHttpHandle } from './acpHttp/index.js';

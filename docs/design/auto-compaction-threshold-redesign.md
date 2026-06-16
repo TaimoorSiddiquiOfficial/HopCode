@@ -152,7 +152,7 @@ export interface ChatCompressionSettings {
 | 类型 | `boolean`                      | `number`                                                             |
 | 语义 | `true` = 永久禁用 auto-compact | `>= MAX_CONSECUTIVE_FAILURES`（默认 3）= 暂时禁用直到 force 成功重置 |
 
-仓库内只有 `GeminiChat.tryCompress` 一个内部消费方，所以内部 migration 风险低；但 `@hopcode/hopcode-core` 是 published package、`CompressOptions` 在 d.ts 里可见，下游 SDK 直接调 `service.compress({ ..., hasFailedCompressionAttempt: true })` 的代码会拿到 TS 编译错误。**迁移指引：** 把 `true` 改为 `MAX_CONSECUTIVE_FAILURES`（或任意 >= 3 的整数），`false` 改为 `0`。如果调用方维护自己的失败计数，直接传入即可。
+仓库内只有 `GeminiChat.tryCompress` 一个内部消费方，所以内部 migration 风险低；但 `@hoptrendy/hopcode-core` 是 published package、`CompressOptions` 在 d.ts 里可见，下游 SDK 直接调 `service.compress({ ..., hasFailedCompressionAttempt: true })` 的代码会拿到 TS 编译错误。**迁移指引：** 把 `true` 改为 `MAX_CONSECUTIVE_FAILURES`（或任意 >= 3 的整数），`false` 改为 `0`。如果调用方维护自己的失败计数，直接传入即可。
 
 ## Token 估算补偿
 

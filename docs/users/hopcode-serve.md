@@ -339,7 +339,7 @@ The daemon exposes ACP's `session/load` and resume flow over HTTP via two routes
 The TypeScript SDK exposes both as static factories on `DaemonSessionClient`:
 
 ```ts
-import { DaemonClient, DaemonSessionClient } from '@hopcode/sdk';
+import { DaemonClient, DaemonSessionClient } from '@hoptrendy/sdk';
 
 const client = new DaemonClient({ baseUrl: 'http://127.0.0.1:4170' });
 
@@ -484,7 +484,7 @@ curl http://127.0.0.1:4170/workspace/auth/device-flow/fa07c61b-… \
 The TypeScript SDK wraps both steps into a single helper:
 
 ```ts
-import { DaemonClient } from '@hopcode/sdk';
+import { DaemonClient } from '@hoptrendy/sdk';
 
 const client = new DaemonClient({ baseUrl, token });
 const flow = await client.auth.start({ providerId: 'qwen-oauth' });

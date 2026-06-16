@@ -11,7 +11,7 @@ import type {
   DaemonSessionContextStatus,
   DaemonSessionSupportedCommandsStatus,
   DaemonWorkspaceProvidersStatus,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import type {
   DaemonCommandInfo,
   DaemonConnectionState,

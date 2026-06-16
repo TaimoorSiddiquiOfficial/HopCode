@@ -13,8 +13,8 @@
  * circular dependency that leaves PROVIDER_REGISTRY undefined at runtime.
  */
 
-import { AuthType } from '@hopcode/hopcode-core';
-import type { ProviderModelConfig as ModelConfig } from '@hopcode/hopcode-core';
+import { AuthType } from '@hoptrendy/hopcode-core';
+import type { ProviderModelConfig as ModelConfig } from '@hoptrendy/hopcode-core';
 import { isCodingPlanConfig } from '../../constants/codingPlan.js';
 
 /**

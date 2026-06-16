@@ -12,15 +12,15 @@
  *   VP4: second Session.prompt() does NOT inject the notice again.
  *   VP4b: no notice set — first prompt is sent without any worktree reminder.
  *
- * This file does NOT mock @hopcode/hopcode-core at the module level so
+ * This file does NOT mock @hoptrendy/hopcode-core at the module level so
  * the real Session class and its dependencies resolve correctly.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Session } from './Session.js';
-import type { Config, GeminiChat } from '@hopcode/hopcode-core';
-import { ApprovalMode, AuthType, Storage } from '@hopcode/hopcode-core';
-import * as core from '@hopcode/hopcode-core';
+import type { Config, GeminiChat } from '@hoptrendy/hopcode-core';
+import { ApprovalMode, AuthType, Storage } from '@hoptrendy/hopcode-core';
+import * as core from '@hoptrendy/hopcode-core';
 import type {
   AgentSideConnection,
   PromptRequest,

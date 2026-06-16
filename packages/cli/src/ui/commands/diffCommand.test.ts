@@ -9,12 +9,12 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { computeDiffColumnWidths, diffCommand } from './diffCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
-import { fetchGitDiff, type GitDiffResult } from '@hopcode/hopcode-core';
+import { fetchGitDiff, type GitDiffResult } from '@hoptrendy/hopcode-core';
 
-vi.mock('@hopcode/hopcode-core', async () => {
+vi.mock('@hoptrendy/hopcode-core', async () => {
   const actual = await vi.importActual<
-    typeof import('@hopcode/hopcode-core')
-  >('@hopcode/hopcode-core');
+    typeof import('@hoptrendy/hopcode-core')
+  >('@hoptrendy/hopcode-core');
   return {
     ...actual,
     fetchGitDiff: vi.fn(),

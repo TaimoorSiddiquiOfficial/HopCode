@@ -13,19 +13,19 @@ const stubCssPlugin: Plugin = {
 };
 
 /**
- * Stub @hopcode/web-templates — its src/generated/ files are gitignored
+ * Stub @hoptrendy/web-templates — its src/generated/ files are gitignored
  * and only produced by the build:templates step, which does not run in CI
  * test jobs. Tests that pull in this package transitively (e.g. html.ts
- * imported via @hopcode/hopcode/export) only need a valid module shape.
+ * imported via @hoptrendy/hopcode/export) only need a valid module shape.
  */
 const stubWebTemplatesPlugin: Plugin = {
   name: 'stub-web-templates',
   enforce: 'pre',
   resolveId(id) {
-    if (id === '@hopcode/web-templates') return '\0@hopcode/web-templates';
+    if (id === '@hoptrendy/web-templates') return '\0@hoptrendy/web-templates';
   },
   load(id) {
-    if (id === '\0@hopcode/web-templates') {
+    if (id === '\0@hoptrendy/web-templates') {
       return `
         export const EXPORT_HTML_TEMPLATE = '';
         export const INSIGHT_JS = '';
@@ -40,24 +40,24 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        // Sub-path imports: @hopcode/hopcode-core/src/foo/bar.js → packages/core/src/foo/bar.ts
+        // Sub-path imports: @hoptrendy/hopcode-core/src/foo/bar.js → packages/core/src/foo/bar.ts
         find: /^@hopcode\/hopcode-core\/src\/(.+)\.js$/,
         replacement: `${coreSrcPath}/$1.ts`,
       },
       {
-        find: '@hopcode/hopcode-core',
+        find: '@hoptrendy/hopcode-core',
         replacement: path.resolve(__dirname, '../core/src/index.ts'),
       },
       {
-        find: '@hopcode/hopcode/export',
+        find: '@hoptrendy/hopcode/export',
         replacement: path.resolve(__dirname, '../cli/src/export/index.ts'),
       },
       {
-        find: '@hopcode/webui',
+        find: '@hoptrendy/webui',
         replacement: path.resolve(__dirname, '../webui/src/index.ts'),
       },
       {
-        find: '@hopcode/quran-guidance',
+        find: '@hoptrendy/quran-guidance',
         replacement: path.resolve(__dirname, '../quran-guidance/src/index.ts'),
       },
     ],

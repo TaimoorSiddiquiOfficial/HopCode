@@ -1,4 +1,4 @@
-# @hopcode/channel-plugin-example
+# @hoptrendy/channel-plugin-example
 
 A reference channel plugin for HopCode. It connects to a WebSocket server and routes messages through the full channel pipeline (access control, session routing, agent bridge).
 
@@ -12,7 +12,7 @@ Use this package to:
 ### 1. Install the package
 
 ```bash
-npm install @hopcode/channel-plugin-example
+npm install @hoptrendy/channel-plugin-example
 ```
 
 ### 2. Link it as a HopCode extension
@@ -20,7 +20,7 @@ npm install @hopcode/channel-plugin-example
 The package ships a `hopcode-extension.json` manifest, so it works as an extension out of the box:
 
 ```bash
-hopcode extensions link ./node_modules/@hopcode/channel-plugin-example
+hopcode extensions link ./node_modules/@hoptrendy/channel-plugin-example
 ```
 
 ### 3. Configure the channel

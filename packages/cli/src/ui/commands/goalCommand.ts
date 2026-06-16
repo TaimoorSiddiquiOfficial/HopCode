@@ -18,7 +18,7 @@ import {
   registerGoalHook,
   unregisterGoalHook,
   type GoalTerminalEvent,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { MessageType, type HistoryItemGoalStatus } from '../types.js';
 import { installGoalTerminalObserver } from '../utils/restoreGoal.js';
 import { formatDuration } from '../utils/formatters.js';

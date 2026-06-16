@@ -6,7 +6,7 @@
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { DataProcessor } from './DataProcessor.js';
-import type { Config, ChatRecord } from '@hopcode/hopcode-core';
+import type { Config, ChatRecord } from '@hoptrendy/hopcode-core';
 import type {
   InsightData,
   SessionFacets,
@@ -21,10 +21,10 @@ const mockLogger = vi.hoisted(() => ({
 const mockRunSideQuery = vi.hoisted(() => vi.fn());
 
 // Mock dependencies
-vi.mock('@hopcode/hopcode-core', async () => {
+vi.mock('@hoptrendy/hopcode-core', async () => {
   const actual = await vi.importActual<
-    typeof import('@hopcode/hopcode-core')
-  >('@hopcode/hopcode-core');
+    typeof import('@hoptrendy/hopcode-core')
+  >('@hoptrendy/hopcode-core');
   return {
     ...actual,
     read: vi.fn(),
@@ -43,7 +43,7 @@ vi.mock('fs/promises', () => ({
 }));
 
 import fs from 'fs/promises';
-import { read as readJsonlFile } from '@hopcode/hopcode-core';
+import { read as readJsonlFile } from '@hoptrendy/hopcode-core';
 
 const mockedFs = vi.mocked(fs);
 const mockedReadJsonlFile = vi.mocked(readJsonlFile);

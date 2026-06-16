@@ -147,10 +147,10 @@ on:
 ## Troubleshooting
 
 **Workflow fails with "hopcode: command not found"**
-Ensure the `npm install -g @hopcode/hopcode` step runs before any `hopcode` commands.
+Ensure the `npm install -g @hoptrendy/hopcode` step runs before any `hopcode` commands.
 
 **AI provider authentication fails**
 Check that your secret (e.g. `OPENAI_API_KEY`) is set in Settings → Secrets → Actions.
 
 **`/setup-github` downloads fail with 404**
-Ensure you're on the latest version of HopCode: `npm update -g @hopcode/hopcode`
+Ensure you're on the latest version of HopCode: `npm update -g @hoptrendy/hopcode`

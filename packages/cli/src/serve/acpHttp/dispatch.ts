@@ -16,19 +16,19 @@ import {
   WorkspaceMemoryWriteTimeoutError,
   writeWorkspaceContextFile,
   type SubagentLevel,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { FsError } from '../fs/errors.js';
 import {
   TooManyActiveDeviceFlowsError,
   UnsupportedDeviceFlowProviderError,
   UpstreamDeviceFlowError,
 } from '../auth/deviceFlow.js';
-import type { HttpAcpBridge } from '@hopcode/acp-bridge/bridgeTypes';
-import type { BridgeEvent } from '@hopcode/acp-bridge/eventBus';
+import type { HttpAcpBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
+import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
 import {
   SessionShellClientRequiredError,
   SessionShellDisabledError,
-} from '@hopcode/acp-bridge/bridgeErrors';
+} from '@hoptrendy/acp-bridge/bridgeErrors';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import { MAX_WORKSPACE_PATH_LENGTH } from '../fs/paths.js';
 import type { WorkspaceFileSystemFactory } from '../fs/index.js';

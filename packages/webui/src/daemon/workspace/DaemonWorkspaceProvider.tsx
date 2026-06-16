@@ -13,8 +13,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import type { DaemonCapabilities } from '@hopcode/sdk/daemon';
-import { DaemonClient } from '@hopcode/sdk/daemon';
+import type { DaemonCapabilities } from '@hoptrendy/sdk/daemon';
+import { DaemonClient } from '@hoptrendy/sdk/daemon';
 import { createDaemonWorkspaceActions } from './actions.js';
 import type {
   DaemonWorkspaceContextValue,

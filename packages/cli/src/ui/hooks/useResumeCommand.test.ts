@@ -48,7 +48,7 @@ vi.mock('../utils/restoreGoal.js', () => ({
   restoreGoalFromHistory: vi.fn(() => ({ restored: false })),
 }));
 
-vi.mock('@hopcode/hopcode-core', () => {
+vi.mock('@hoptrendy/hopcode-core', () => {
   class SessionService {
     constructor(_cwd: string) {}
     async loadSession(_sessionId: string) {
@@ -190,7 +190,7 @@ describe('useResumeCommand', () => {
         debug: vi.fn(),
         error: vi.fn(),
       }),
-    } as unknown as import('@hopcode/hopcode-core').Config;
+    } as unknown as import('@hoptrendy/hopcode-core').Config;
 
     const { result } = renderHook(() =>
       useResumeCommand({
@@ -293,7 +293,7 @@ describe('useResumeCommand', () => {
         debug: vi.fn(),
         error: vi.fn(),
       }),
-    } as unknown as import('@hopcode/hopcode-core').Config;
+    } as unknown as import('@hoptrendy/hopcode-core').Config;
 
     const { result } = renderHook(() =>
       useResumeCommand({
@@ -351,7 +351,7 @@ describe('useResumeCommand', () => {
         debug: vi.fn(),
         error: vi.fn(),
       }),
-    } as unknown as import('@hopcode/hopcode-core').Config;
+    } as unknown as import('@hoptrendy/hopcode-core').Config;
 
     const { result } = renderHook(() =>
       useResumeCommand({
@@ -420,7 +420,7 @@ describe('useResumeCommand', () => {
         debug: vi.fn(),
         error: vi.fn(),
       }),
-    } as unknown as import('@hopcode/hopcode-core').Config;
+    } as unknown as import('@hoptrendy/hopcode-core').Config;
 
     const { result } = renderHook(() =>
       useResumeCommand({

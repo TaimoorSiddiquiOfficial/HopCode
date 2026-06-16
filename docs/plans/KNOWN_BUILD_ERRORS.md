@@ -75,7 +75,7 @@ Updated `scripts/pre-commit.js` to filter out excluded directories.
 
 ```
 FAIL  packages/cli/src/config/config.test.ts
-Error: Failed to resolve entry for package "@hopcode/hopcode-server"
+Error: Failed to resolve entry for package "@hoptrendy/hopcode-server"
 ```
 
 ### Status

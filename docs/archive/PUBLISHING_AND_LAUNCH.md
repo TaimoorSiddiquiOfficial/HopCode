@@ -1,4 +1,4 @@
-﻿# 🚀 HopCode - Publishing & Launch Checklist
+# 🚀 HopCode - Publishing & Launch Checklist
 
 **Status:** 📋 Ready for Launch Preparation  
 **Updated:** 2026-04-18
@@ -214,9 +214,9 @@ authors = ["HopCode Team"]
 
 ```bash
 # Check package exists
-npm view @hopcode/core
-npm view @hopcode/hopcode
-npm view @hopcode/sdk
+npm view @hoptrendy/core
+npm view @hoptrendy/hopcode
+npm view @hoptrendy/sdk
 # ... etc for all 14 packages
 ```
 
@@ -224,7 +224,7 @@ npm view @hopcode/sdk
 
 ```bash
 # Install globally to test
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 # Run CLI
 hopcode --version
@@ -310,7 +310,7 @@ Key Features:
 ✓ MCP server integration
 ✓ Extensive hook system
 
-HopCode is available now on npm as @hopcode/hopcode and as
+HopCode is available now on npm as @hoptrendy/hopcode and as
 extensions for VS Code and Zed.
 
 Download: https://github.com/TaimoorSiddiquiOfficial/HopCode
@@ -337,7 +337,7 @@ The butterfly effect of intelligent code is here. We've rebranded from
 HopCode to HopCode, marking a new era of AI-assisted development.
 
 Try it now:
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 #HopCode #AI #CodingAssistant #OpenSource #DeveloperTools
 ```
@@ -357,7 +357,7 @@ models.
 - Multi-IDE support
 - Open-source SDK
 
-Try it: npm install -g @hopcode/hopcode
+Try it: npm install -g @hoptrendy/hopcode
 Learn more: [documentation link]
 
 #HopCode #AI #SoftwareDevelopment #OpenSource #Innovation
@@ -372,10 +372,10 @@ We've rebranded from HopCode to HopCode! Here's what you need to know:
 
 ✅ Same great AI coding assistant
 ✅ Fresh new name and logo
-✅ All packages now under @hopcode/*
+✅ All packages now under @hoptrendy/*
 ✅ Enhanced documentation
 
-Install: npm install -g @hopcode/hopcode
+Install: npm install -g @hoptrendy/hopcode
 Docs: https://hopcode.dev/docs
 
 Questions? Drop them below! 👇
@@ -454,14 +454,14 @@ Good news! HopCode is now HopCode. Here's how to upgrade:
 ## 1. Uninstall Old Version
 
 ```bash
-npm uninstall -g @hopcode/hopcode
+npm uninstall -g @hoptrendy/hopcode
 ```
 ````
 
 ## 2. Install New Version
 
 ```bash
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 ```
 
 ## 3. Migrate Configuration
@@ -474,7 +474,7 @@ configuration from `~/.hopcode/` to `~/.hopcode/` on first run.
 Update any scripts or documentation that reference:
 
 - `hopcode` command → `hopcode`
-- `@hopcode/*` packages → `@hopcode/*`
+- `@hoptrendy/*` packages → `@hoptrendy/*`
 - `.hopcode/` directory → `.hopcode/`
 
 ## Questions?
@@ -517,7 +517,7 @@ If critical issues arise:
 ### Step 1: Deprecate Problematic Packages
 
 ```bash
-npm deprecate @hopcode/hopcode@0.14.5 "Critical bug - please downgrade to 0.14.4"
+npm deprecate @hoptrendy/hopcode@0.14.5 "Critical bug - please downgrade to 0.14.4"
 ````
 
 ### Step 2: Restore Previous Version
@@ -525,7 +525,7 @@ npm deprecate @hopcode/hopcode@0.14.5 "Critical bug - please downgrade to 0.14.4
 ```bash
 # Tag previous version
 cd packages/cli
-npm dist-tag add @hopcode/hopcode@0.14.4 latest
+npm dist-tag add @hoptrendy/hopcode@0.14.4 latest
 ```
 
 ### Step 3: Communicate

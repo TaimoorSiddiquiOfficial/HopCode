@@ -9,7 +9,7 @@ import {
   AuthType,
   zaiProvider,
   buildInstallPlan,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 describe('zaiProvider', () => {
   it('offers standard API key and Coding Plan endpoints', () => {

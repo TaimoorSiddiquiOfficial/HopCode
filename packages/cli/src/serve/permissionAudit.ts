@@ -32,14 +32,14 @@
 import type {
   PermissionAuditPublisher,
   PermissionDecisionReason,
-} from '@hopcode/acp-bridge';
+} from '@hoptrendy/acp-bridge';
 import type {
   PermissionPolicy,
   PermissionRequestRecord,
   PermissionResolution,
   PermissionVote,
   PermissionVoteOutcome,
-} from '@hopcode/acp-bridge/permission';
+} from '@hoptrendy/acp-bridge/permission';
 
 /**
  * Default capacity of the audit ring. Mirrors the pre-F3

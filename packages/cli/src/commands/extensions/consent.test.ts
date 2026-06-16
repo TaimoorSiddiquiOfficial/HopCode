@@ -13,7 +13,7 @@ import {
 import type {
   ExtensionConfig,
   ClaudeMarketplaceConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import prompts from 'prompts';
 
 vi.mock('../../i18n/index.js', () => ({

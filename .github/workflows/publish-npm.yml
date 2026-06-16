@@ -50,7 +50,7 @@ jobs:
         shell: 'bash'
         run: |
           ROOT=$(pwd)
-          ROOT_PACKAGE='@hopcode/hopcode'
+          ROOT_PACKAGE='@hoptrendy/hopcode'
           PACKAGES_INPUT='${{ github.event.inputs.packages }}'
           # Fetch all workspace packages, excluding private ones (they cannot be published to npm)
           ALL_PACKAGES_RAW=$(npm query '.workspace' | jq -c --arg root "${ROOT}/" \
@@ -208,7 +208,7 @@ jobs:
             else
               if echo "$output" | grep -q "You cannot publish over the previously published versions"; then
                 version=$(node -p "require('./package.json').version")
-                echo "⏭️ @hopcode/hopcode@${version} already published, skipping"
+                echo "⏭️ @hoptrendy/hopcode@${version} already published, skipping"
               else
                 echo "$output" >&2
                 exit 1

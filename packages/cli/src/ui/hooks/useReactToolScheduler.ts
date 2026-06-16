@@ -19,12 +19,12 @@ import type {
   ToolCall,
   Status as CoreStatus,
   EditorType,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   CoreToolScheduler,
   createDebugLogger,
   isAnyAutoMemPath,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import * as path from 'node:path';
 import { useCallback, useState, useMemo } from 'react';
 import type {

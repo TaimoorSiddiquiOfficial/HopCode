@@ -14,7 +14,7 @@
 
 import type { HistoryItem, IndividualToolCallDisplay } from '../types.js';
 import { ToolCallStatus } from '../types.js';
-import type { AgentResultDisplay } from '@hopcode/hopcode-core';
+import type { AgentResultDisplay } from '@hoptrendy/hopcode-core';
 
 /**
  * Check if a tool's resultDisplay indicates a subagent with pending confirmation.

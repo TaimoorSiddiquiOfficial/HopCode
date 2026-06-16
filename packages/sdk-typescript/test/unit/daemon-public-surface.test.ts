@@ -66,7 +66,7 @@ describe('public SDK entry — typed daemon event surface (#4217)', () => {
 
   it('round-trips a raw DaemonEvent through the public narrow helper', () => {
     // Pin the user-facing contract: `import { asKnownDaemonEvent }
-    // from '@hopcode/sdk'` must work end-to-end via the published
+    // from '@hoptrendy/sdk'` must work end-to-end via the published
     // entry, not just exist as a re-export inside src/daemon/index.ts.
     const evt: DaemonEvent = {
       id: 1,

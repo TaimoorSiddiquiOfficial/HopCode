@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useSyncExternalStore } from 'react';
-import type { DaemonMidTurnMessageInjectedData } from '@hopcode/sdk/daemon';
+import type { DaemonMidTurnMessageInjectedData } from '@hoptrendy/sdk/daemon';
 import {
   consumeSidechannelMidTurnInjected,
   getSidechannelMidTurnInjected,

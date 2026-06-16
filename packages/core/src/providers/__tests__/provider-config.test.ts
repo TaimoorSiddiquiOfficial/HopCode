@@ -17,7 +17,7 @@ import {
   shouldShowStep,
   providerMatchesCredentials,
   type ProviderConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 function makeConfig(overrides: Partial<ProviderConfig> = {}): ProviderConfig {
   return {

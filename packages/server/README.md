@@ -1,4 +1,4 @@
-# @hopcode/hopcode-server
+# @hoptrendy/hopcode-server
 
 HopCode gRPC headless server — expose the core agent loop over a bidirectional gRPC stream.
 
@@ -13,7 +13,7 @@ This package provides a **gRPC server** that enables remote clients to interact 
 ## Installation
 
 ```bash
-npm install @hopcode/hopcode-server
+npm install @hoptrendy/hopcode-server
 ```
 
 ## Proto File
@@ -42,7 +42,7 @@ hopcode grpc --port 50051 --host 0.0.0.0
 ## Programmatic Usage
 
 ```typescript
-import { HopCodeServer } from '@hopcode/hopcode-server';
+import { HopCodeServer } from '@hoptrendy/hopcode-server';
 
 const server = new HopCodeServer({ port: 50051 });
 await server.start();
@@ -53,7 +53,7 @@ await server.stop();
 
 ## Architecture
 
-The server bridges `AgentInteractive` events from `@hopcode/hopcode-core` into gRPC messages:
+The server bridges `AgentInteractive` events from `@hoptrendy/hopcode-core` into gRPC messages:
 
 | Agent Event             | gRPC Message        |
 | ----------------------- | ------------------- |

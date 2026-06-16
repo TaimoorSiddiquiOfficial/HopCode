@@ -16,26 +16,26 @@ This document outlines the complete rebranding strategy to transform "HopCode" i
 
 ## Phase 1: Core Identity Changes (Breaking)
 
-### 1.1 Package Naming (`@hopcode/*` → `@hopcode/*`)
+### 1.1 Package Naming (`@hoptrendy/*` → `@hoptrendy/*`)
 
 **Impact:** Critical - Affects all dependencies and imports
 
 #### Files to Update:
 
 - [ ] `package.json` (root)
-  - `name`: `@hopcode/hopcode`
+  - `name`: `@hoptrendy/hopcode`
   - `repository.url`: Update to new GitHub repo
   - `sandboxImageUri`: `ghcr.io/hopcode/hopcode:0.14.5`
   - `bin`: `hopcode: 'cli.js'`
 
 - [ ] `packages/cli/package.json`
-  - `name`: `@hopcode/hopcode`
+  - `name`: `@hoptrendy/hopcode`
   - `description`: `HopCode`
   - `bin`: `{ "hopcode": "dist/index.js" }`
-  - All `@hopcode/*` dependencies → `@hopcode/*`
+  - All `@hoptrendy/*` dependencies → `@hoptrendy/*`
 
 - [ ] All `packages/*/package.json` files
-  - `@hopcode/sdk`, `@hopcode/webui`, `@hopcode/core`, etc.
+  - `@hoptrendy/sdk`, `@hoptrendy/webui`, `@hoptrendy/core`, etc.
 
 ### 1.2 CLI Command (`hopcode` → `hopcode`)
 
@@ -112,7 +112,7 @@ This document outlines the complete rebranding strategy to transform "HopCode" i
 - [ ] Update all comments and echo messages
 - [ ] `install_HOPCODE_code()` → `install_hopcode()`
 - [ ] Directory paths: `.hopcode` → `.hopcode`
-- [ ] npm package: `@hopcode/hopcode`
+- [ ] npm package: `@hoptrendy/hopcode`
 
 #### Batch Script (`scripts/installation/install-qwen-with-source.bat`)
 
@@ -196,7 +196,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 #### Configuration Files:
 
 - [ ] `vite.config.ts` → `name: 'HopCodeWebUI'`
-- [ ] `tailwind.preset.cjs` → `@hopcode/webui`
+- [ ] `tailwind.preset.cjs` → `@hoptrendy/webui`
 - [ ] `tailwind.config.cjs` → Copyright update
 
 #### Source Files (100+ files):
@@ -278,7 +278,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 ### 4.2 Developer Documentation (`docs/developers/`)
 
 - [ ] `contributing.md` → New repo URLs
-- [ ] `development/` → npm publishing as `@hopcode/*`
+- [ ] `development/` → npm publishing as `@hoptrendy/*`
 - [ ] `tools/` → Tool documentation
 - [ ] `sdk-typescript.md` → SDK docs
 
@@ -293,7 +293,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 #### TypeScript SDK (`packages/sdk-typescript/`):
 
 - [ ] `package.json` → Repository, homepage
-- [ ] `README.md` → `@hopcode/sdk`, `hopcode` preset
+- [ ] `README.md` → `@hoptrendy/sdk`, `hopcode` preset
 - [ ] `src/` → Type definitions
 
 #### Java SDK (`packages/sdk-java/`):
@@ -331,7 +331,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 - [ ] Reserve `@hopcode` scope on npm
 - [ ] Publish all packages under new scope
-- [ ] Deprecate old `@hopcode/*` packages with migration notice
+- [ ] Deprecate old `@hoptrendy/*` packages with migration notice
 
 ---
 
@@ -521,7 +521,7 @@ alias qwen='hopcode'  # Optional: temporary alias
 - [ ] Installation scripts work correctly
 - [ ] Extensions publish successfully to marketplaces
 - [ ] Documentation site live with new branding
-- [ ] NPM packages published under `@hopcode/*`
+- [ ] NPM packages published under `@hoptrendy/*`
 - [ ] Container images available in new registry
 - [ ] User migration path validated
 
@@ -536,7 +536,7 @@ alias qwen='hopcode'  # Optional: temporary alias
 | Project Name | HopCode                        | HopCode                        |
 | CLI Command  | `hopcode`                      | `hopcode`                      |
 | Config Dir   | `.hopcode/`                    | `.hopcode/`                    |
-| NPM Scope    | `@hopcode/`                    | `@hopcode/`                  |
+| NPM Scope    | `@hoptrendy/`                  | `@hoptrendy/`                  |
 | Env Vars     | `HOPCODE_*`                    | `HOPCODE_*`                    |
 | CSS Classes  | `.hopcode-*`                   | `.hopcode-*`                   |
 | VS Code Ext  | `hopcode-vscode-ide-companion` | `hopcode-vscode-ide-companion` |

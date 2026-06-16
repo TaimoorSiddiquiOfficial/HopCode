@@ -10,7 +10,7 @@ import * as path from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock cleanup.ts to avoid pulling in @hopcode/hopcode-core dependency chain
+// Mock cleanup.ts to avoid pulling in @hoptrendy/hopcode-core dependency chain
 vi.mock('./cleanup.js', () => ({
   registerCleanup: vi.fn(),
 }));

@@ -79,7 +79,7 @@ describe('package asset scripts', () => {
       'package.json',
       JSON.stringify(
         {
-          name: '@hopcode/hopcode',
+          name: '@hoptrendy/hopcode',
           version: '0.17.0',
           description: 'HopCode',
           repository: {

@@ -1,4 +1,4 @@
-# `@hopcode/hopcode-acp-bridge`
+# `@hoptrendy/hopcode-acp-bridge`
 
 Shared ACP bridge primitives consumed by `hopcode serve`, channels, IDE, TUI,
 and remote-control adapters. Lives in the monorepo, not published to npm.
@@ -96,7 +96,7 @@ Lift history (#4175 Mode B daemon roadmap):
 
 ## Imports — root vs subpaths
 
-The package exposes both a barrel root (`@hopcode/hopcode-acp-bridge`) and
+The package exposes both a barrel root (`@hoptrendy/hopcode-acp-bridge`) and
 per-module subpaths (`/eventBus`, `/inMemoryChannel`, `/channel`,
 `/permission`, `/status`, `/workspacePaths`, `/bridgeErrors`,
 `/bridgeTypes`, `/bridgeOptions`, `/spawnChannel`, `/bridgeClient`,

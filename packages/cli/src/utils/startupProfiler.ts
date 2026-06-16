@@ -35,7 +35,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { performance } from 'node:perf_hooks';
 
-import type { StartupEventAttrs } from '@hopcode/hopcode-core';
+import type { StartupEventAttrs } from '@hoptrendy/hopcode-core';
 
 interface Checkpoint {
   name: string;

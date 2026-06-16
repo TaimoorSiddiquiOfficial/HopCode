@@ -43,7 +43,7 @@ import type { ChannelFactory } from './channel.js';
 import type { BridgeTelemetry } from './bridgeOptions.js';
 import { createInMemoryChannel } from './inMemoryChannel.js';
 import type { BridgeEvent } from './eventBus.js';
-import { ApprovalMode, ShellExecutionService } from '@hopcode/hopcode-core';
+import { ApprovalMode, ShellExecutionService } from '@hoptrendy/hopcode-core';
 import {
   FakeAgent,
   type ChannelHandle,

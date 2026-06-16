@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createDebugLogger, isGitRepository } from '@hopcode/hopcode-core';
+import { createDebugLogger, isGitRepository } from '@hoptrendy/hopcode-core';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -112,7 +112,7 @@ export function getInstallationInfo(
 
     // Check for pnpm
     if (realPath.includes('/.pnpm/global')) {
-      const updateCommand = 'pnpm add -g @hopcode/hopcode@latest';
+      const updateCommand = 'pnpm add -g @hoptrendy/hopcode@latest';
       return {
         packageManager: PackageManager.PNPM,
         isGlobal: true,
@@ -125,7 +125,7 @@ export function getInstallationInfo(
 
     // Check for yarn
     if (realPath.includes('/.yarn/global')) {
-      const updateCommand = 'yarn global add @hopcode/hopcode@latest';
+      const updateCommand = 'yarn global add @hoptrendy/hopcode@latest';
       return {
         packageManager: PackageManager.YARN,
         isGlobal: true,
@@ -145,7 +145,7 @@ export function getInstallationInfo(
       };
     }
     if (realPath.includes('/.bun/bin')) {
-      const updateCommand = 'bun add -g @hopcode/hopcode@latest';
+      const updateCommand = 'bun add -g @hoptrendy/hopcode@latest';
       return {
         packageManager: PackageManager.BUN,
         isGlobal: true,
@@ -197,7 +197,7 @@ export function getInstallationInfo(
           packageManager: PackageManager.NPM,
           isGlobal: true,
           updateMessage:
-            'Update requires sudo. Run: sudo npm install -g @hopcode/hopcode@latest',
+            'Update requires sudo. Run: sudo npm install -g @hoptrendy/hopcode@latest',
         };
       }
       const fallbackStandaloneDir = path.join(
@@ -216,7 +216,7 @@ export function getInstallationInfo(
       };
     }
 
-    const updateCommand = 'npm install -g @hopcode/hopcode@latest';
+    const updateCommand = 'npm install -g @hoptrendy/hopcode@latest';
     return {
       packageManager: PackageManager.NPM,
       isGlobal: true,
@@ -278,7 +278,7 @@ function isStandaloneInstallDir(installDir: string): boolean {
     };
     // Manifest format is produced by writeManifest in create-standalone-package.js.
     if (
-      manifest.name !== '@hopcode/hopcode' ||
+      manifest.name !== '@hoptrendy/hopcode' ||
       typeof manifest.target !== 'string' ||
       !isStandaloneTargetForCurrentPlatform(manifest.target)
     ) {

@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { DaemonEvent } from '@hopcode/sdk/daemon';
+import type { DaemonEvent } from '@hoptrendy/sdk/daemon';
 import { getReplayTokenCount, getReplayTokenUsage } from './mappers.js';
 
 function usageEvent(

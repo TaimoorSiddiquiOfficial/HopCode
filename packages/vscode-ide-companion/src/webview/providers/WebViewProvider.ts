@@ -37,7 +37,7 @@ import {
   readHopCodeSettingsForVSCode,
   clearPersistedAuth,
 } from '../../services/settingsWriter.js';
-import { buildInstallPlan, parseInsightMessage } from '@hopcode/hopcode-core';
+import { buildInstallPlan, parseInsightMessage } from '@hoptrendy/hopcode-core';
 
 /** Threshold (ms) before a completed task triggers a notification. */
 const LONG_TASK_THRESHOLD_MS = 20_000;
@@ -1356,8 +1356,8 @@ export class WebViewProvider {
    * Mirrors the CLI's `hopcode auth coding-plan` / `hopcode auth` flow.
    */
   private async handleAuthInteractive(
-    providerConfig: import('@hopcode/hopcode-core').ProviderConfig,
-    inputs: import('@hopcode/hopcode-core').ProviderSetupInputs,
+    providerConfig: import('@hoptrendy/hopcode-core').ProviderConfig,
+    inputs: import('@hoptrendy/hopcode-core').ProviderSetupInputs,
   ): Promise<void> {
     if (!inputs.apiKey) {
       this.sendMessageToWebView({

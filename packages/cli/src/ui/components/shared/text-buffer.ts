@@ -15,7 +15,7 @@ import {
   escapePath,
   getExternalEditorCommand,
   type EditorType,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   toCodePoints,
   cpLen,

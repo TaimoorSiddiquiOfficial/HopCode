@@ -9,7 +9,7 @@ import {
   HookEventName,
   HooksConfigSource,
   hookEventSupportsMatcher,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 vi.mock('../../../i18n/index.js', () => ({
   t: vi.fn((key: string) => key),

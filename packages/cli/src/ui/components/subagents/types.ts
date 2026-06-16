@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SubagentLevel, Config } from '@hopcode/hopcode-core';
+import type { SubagentLevel, Config } from '@hoptrendy/hopcode-core';
 
 /**
  * State management for the subagent creation wizard.

@@ -11,7 +11,7 @@ import type {
   DaemonShellTranscriptBlock,
   DaemonStatusTranscriptBlock,
   DaemonUserShellTranscriptBlock,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import type {
   DaemonMessage,
   DaemonMessageToolCall,

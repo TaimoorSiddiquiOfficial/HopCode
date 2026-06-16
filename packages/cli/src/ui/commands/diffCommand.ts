@@ -8,7 +8,7 @@ import {
   fetchGitDiff,
   type GitDiffResult,
   type PerFileStats,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   CommandKind,
   type CommandContext,

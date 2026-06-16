@@ -3,7 +3,7 @@ import type {
   DaemonContextSkillDetail,
   DaemonContextToolDetail,
   DaemonSessionContextUsageStatus,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import styles from './ContextUsageMessage.module.css';
 

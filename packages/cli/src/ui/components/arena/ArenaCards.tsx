@@ -10,7 +10,7 @@ import { theme } from '../../semantic-colors.js';
 import { formatDuration } from '../../utils/formatters.js';
 import { getArenaStatusLabel } from '../../utils/displayUtils.js';
 import type { ArenaAgentCardData } from '../../types.js';
-import type { ArenaDiffSummary } from '@hopcode/hopcode-core';
+import type { ArenaDiffSummary } from '@hoptrendy/hopcode-core';
 
 // --- Helpers ------------------------------------------------
 

@@ -10,7 +10,7 @@ import type {
   Config,
   Logger,
   SessionListItem,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type {
   HistoryItemWithoutId,
   HistoryItem,

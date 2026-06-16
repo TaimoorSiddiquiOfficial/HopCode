@@ -8,8 +8,8 @@ import { useState, useEffect, useCallback } from 'react';
 import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 import path from 'node:path';
-import type { Config, WorktreeSession } from '@hopcode/hopcode-core';
-import { readWorktreeSession } from '@hopcode/hopcode-core';
+import type { Config, WorktreeSession } from '@hoptrendy/hopcode-core';
+import { readWorktreeSession } from '@hoptrendy/hopcode-core';
 
 /**
  * Watches the active session's WorktreeSession sidecar file and returns

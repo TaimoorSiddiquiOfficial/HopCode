@@ -9,7 +9,7 @@ import {
   createDebugLogger,
   type FileHistoryService,
   type TurnDiff,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { HistoryItem, HistoryItemUser } from '../types.js';
 
 type UserTurn = HistoryItem & HistoryItemUser;

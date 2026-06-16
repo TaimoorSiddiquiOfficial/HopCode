@@ -6,8 +6,8 @@
 
 // Files for 'qwen mcp approve' / 'qwen mcp reject' commands (issue #4615).
 import type { CommandModule } from 'yargs';
-import type { MCPServerConfig } from '@hopcode/hopcode-core';
-import { isGatedMcpScope } from '@hopcode/hopcode-core';
+import type { MCPServerConfig } from '@hoptrendy/hopcode-core';
+import { isGatedMcpScope } from '@hoptrendy/hopcode-core';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { loadSettings } from '../../config/settings.js';
 import { assembleMcpServers } from '../../config/mcpServers.js';

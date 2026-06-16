@@ -18,7 +18,7 @@ import {
   buildBtwCacheSafeParams,
   buildBtwPrompt,
   runForkedAgent,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 function formatBtwError(error: unknown): string {
   return t('Failed to answer btw question: {{error}}', {

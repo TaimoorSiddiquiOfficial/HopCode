@@ -109,7 +109,7 @@ vi.mock('node:stream', async (importOriginal) => {
 });
 
 // Mock core dependencies
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   createDebugLogger: () => ({
     debug: vi.fn(),
     error: vi.fn(),
@@ -472,7 +472,7 @@ import {
   fetchAllowedGitHub,
 } from './acpAgent.js';
 import { gzipSync } from 'node:zlib';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../config/settings.js';
 import type { CliArgs } from '../config/config.js';
 import {
@@ -489,7 +489,7 @@ import {
   applyProviderInstallPlan,
   Storage,
   unregisterGoalHook,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { McpServer } from '@agentclientprotocol/sdk';
 import { AgentSideConnection } from '@agentclientprotocol/sdk';
 import { loadSettings } from '../config/settings.js';
@@ -1651,7 +1651,7 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
 
   it('extMethod preflight surfaces SkillError as parse_error errorKind', async () => {
     const skillError = new (
-      await import('@hopcode/hopcode-core')
+      await import('@hoptrendy/hopcode-core')
     ).SkillError('bad frontmatter', 'PARSE_ERROR');
     mockConfig = {
       ...mockConfig,

@@ -13,9 +13,9 @@ const { mockGetGlobalSettingsPath } = vi.hoisted(() => ({
   mockGetGlobalSettingsPath: vi.fn(),
 }));
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     Storage: {
@@ -25,7 +25,7 @@ vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
   };
 });
 
-import { AuthType, type ProviderInstallPlan } from '@hopcode/hopcode-core';
+import { AuthType, type ProviderInstallPlan } from '@hoptrendy/hopcode-core';
 import { CODING_PLAN_ENV_KEY } from './subscriptionPlanDefinitions.js';
 import {
   applyProviderInstallPlanToFile,

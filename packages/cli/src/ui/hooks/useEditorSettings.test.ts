@@ -23,10 +23,10 @@ import {
   type EditorType,
   checkHasEditorType,
   allowEditorTypeInSandbox,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
-vi.mock('@hopcode/hopcode-core', async () => {
-  const actual = await vi.importActual('@hopcode/hopcode-core');
+vi.mock('@hoptrendy/hopcode-core', async () => {
+  const actual = await vi.importActual('@hoptrendy/hopcode-core');
   return {
     ...actual,
     checkHasEditorType: vi.fn(() => true),

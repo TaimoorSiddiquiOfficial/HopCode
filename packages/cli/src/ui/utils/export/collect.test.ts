@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import type { ChatRecord, Config } from '@hopcode/hopcode-core';
+import type { ChatRecord, Config } from '@hoptrendy/hopcode-core';
 import { collectSessionData } from './collect.js';
 
 describe('collectSessionData', () => {

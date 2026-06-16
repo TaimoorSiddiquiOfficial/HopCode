@@ -9,7 +9,7 @@ import {
   SessionService,
   type Config,
   type SessionListItem,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { buildResumedHistoryItems } from '../utils/resumeHistoryUtils.js';
 import { restoreGoalFromHistory } from '../utils/restoreGoal.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';

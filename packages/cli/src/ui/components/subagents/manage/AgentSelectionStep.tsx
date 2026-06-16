@@ -9,7 +9,7 @@ import { Box, Text } from 'ink';
 import { theme } from '../../../semantic-colors.js';
 import { useKeypress } from '../../../hooks/useKeypress.js';
 import { keyMatchers, Command } from '../../../keyMatchers.js';
-import { type SubagentConfig } from '@hopcode/hopcode-core';
+import { type SubagentConfig } from '@hoptrendy/hopcode-core';
 import { t } from '../../../../i18n/index.js';
 
 interface NavigationState {

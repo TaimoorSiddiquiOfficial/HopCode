@@ -8,7 +8,7 @@ import type {
   BackgroundTaskStatus,
   Config,
   ToolCallRequestInfo,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { isSlashCommand } from './ui/utils/commandUtils.js';
 import type { LoadedSettings } from './config/settings.js';
 import {
@@ -30,7 +30,7 @@ import {
   TeamEventType,
   ApprovalMode,
   ToolConfirmationOutcome,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { Content, Part, PartListUnion } from '@google/genai';
 import type { CLIUserMessage, PermissionMode } from './nonInteractive/types.js';
 import type { JsonOutputAdapterInterface } from './nonInteractive/io/BaseJsonOutputAdapter.js';
@@ -335,15 +335,15 @@ export async function runNonInteractive(
     // a new manager is installed (or in `finally`). Without
     // this, a reused stream-json session could leave callbacks
     // attached to a stale TeamManager.
-    let boundManager: import('@hopcode/hopcode-core').TeamManager | null =
+    let boundManager: import('@hoptrendy/hopcode-core').TeamManager | null =
       null;
     let approvalListener:
       | ((
-          event: import('@hopcode/hopcode-core').TeammateApprovalRequestEvent,
+          event: import('@hoptrendy/hopcode-core').TeammateApprovalRequestEvent,
         ) => void)
       | null = null;
     const detachFromManager = (
-      m: import('@hopcode/hopcode-core').TeamManager,
+      m: import('@hoptrendy/hopcode-core').TeamManager,
     ) => {
       m.setLeaderMessageCallback(null);
       if (approvalListener) {
@@ -355,7 +355,7 @@ export async function runNonInteractive(
       }
     };
     const onTeamManagerChangeHandler = (
-      manager: import('@hopcode/hopcode-core').TeamManager | null,
+      manager: import('@hoptrendy/hopcode-core').TeamManager | null,
     ) => {
       // Detach from the previous manager before rebinding.
       if (boundManager && boundManager !== manager) {

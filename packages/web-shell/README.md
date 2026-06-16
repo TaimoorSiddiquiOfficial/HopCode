@@ -1,4 +1,4 @@
-# @hopcode/web-shell
+# @hoptrendy/web-shell
 
 HopCode Web Shell 是面向浏览器的 daemon 会话终端 UI，可以作为 React
 组件嵌入到其他项目中。
@@ -7,8 +7,8 @@ HopCode Web Shell 是面向浏览器的 daemon 会话终端 UI，可以作为 Re
 
 - React：`^18.0.0 || ^19.0.0`
 - React DOM：`^18.0.0 || ^19.0.0`
-- `@hopcode/webui`：`>=0.0.1`
-- `@hopcode/sdk`：`>=0.1.8`
+- `@hoptrendy/webui`：`>=0.0.1`
+- `@hoptrendy/sdk`：`>=0.1.8`
 - 浏览器环境需要能访问 HopCode daemon serve 的 HTTP 接口。
 
 组件包会自动注入自身样式，样式已通过 CSS Modules 和组件作用域隔离；
@@ -17,13 +17,13 @@ HopCode Web Shell 是面向浏览器的 daemon 会话终端 UI，可以作为 Re
 ## 安装
 
 ```bash
-npm install @hopcode/web-shell
+npm install @hoptrendy/web-shell
 ```
 
 Peer dependencies 需要同时安装：
 
 ```bash
-npm install react react-dom @hopcode/webui @hopcode/sdk
+npm install react react-dom @hoptrendy/webui @hoptrendy/sdk
 ```
 
 ## 接入方式
@@ -36,7 +36,7 @@ WebShell 提供两种接入形态：
 `DaemonWorkspaceProvider` + `DaemonSessionProvider`。
 
 ```tsx
-import { WebShellWithProviders } from '@hopcode/web-shell';
+import { WebShellWithProviders } from '@hoptrendy/web-shell';
 
 export function HopCodePanel() {
   return (
@@ -63,8 +63,8 @@ chat + terminal）。宿主自行提供 Provider，WebShell 只消费 hooks。
 import {
   DaemonWorkspaceProvider,
   DaemonSessionProvider,
-} from '@hopcode/webui/daemon-react-sdk';
-import { WebShell } from '@hopcode/web-shell';
+} from '@hoptrendy/webui/daemon-react-sdk';
+import { WebShell } from '@hoptrendy/web-shell';
 
 export function App() {
   return (
@@ -106,9 +106,9 @@ export function App() {
 ## 架构说明
 
 ```text
-@hopcode/sdk/daemon         ← 协议层（SSE, REST, normalizer）
-@hopcode/webui/daemon-react-sdk  ← React adapter（Provider, hooks, store）
-@hopcode/web-shell          ← 终端 UI 组件
+@hoptrendy/sdk/daemon         ← 协议层（SSE, REST, normalizer）
+@hoptrendy/webui/daemon-react-sdk  ← React adapter（Provider, hooks, store）
+@hoptrendy/web-shell          ← 终端 UI 组件
 ```
 
 - `WebShell` 必须在 `DaemonWorkspaceProvider` 和 `DaemonSessionProvider` 之下使用。

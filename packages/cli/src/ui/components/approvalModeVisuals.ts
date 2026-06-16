@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ApprovalMode } from '@hopcode/hopcode-core';
+import { ApprovalMode } from '@hoptrendy/hopcode-core';
 import { theme } from '../semantic-colors.js';
 
 export function getApprovalModeIndicatorColor(

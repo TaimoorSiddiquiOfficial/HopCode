@@ -10,7 +10,7 @@ import {
   AuthType,
   findProviderByCredentials,
   resolveMetadataKey,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { Header, AuthDisplayType } from './Header.js';
 import { Tips } from './Tips.js';
 import { useSettings } from '../contexts/SettingsContext.js';

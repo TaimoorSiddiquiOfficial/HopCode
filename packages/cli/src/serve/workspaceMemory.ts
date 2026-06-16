@@ -13,7 +13,7 @@ import {
   WorkspaceMemoryWriteTimeoutError,
   getAllGeminiMdFilenames,
   writeWorkspaceContextFile,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 import { isServeDebugMode } from './debugMode.js';
 import type { AcpSessionBridge } from './acpSessionBridge.js';

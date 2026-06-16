@@ -74,7 +74,7 @@ mcp-servers/<name>/
 
 ```json
 {
-  "name": "@hopcode/mcp-<name>",
+  "name": "@hoptrendy/mcp-<name>",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",

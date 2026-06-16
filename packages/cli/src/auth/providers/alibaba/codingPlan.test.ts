@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { AuthType } from '@hopcode/hopcode-core';
+import { AuthType } from '@hoptrendy/hopcode-core';
 import {
   CODING_PLAN_CHINA_BASE_URL,
   CODING_PLAN_ENV_KEY,

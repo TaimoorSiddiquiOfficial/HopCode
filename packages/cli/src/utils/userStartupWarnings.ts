@@ -7,7 +7,7 @@
 import fs from 'node:fs/promises';
 import * as os from 'node:os';
 import path from 'node:path';
-import { canUseRipgrep } from '@hopcode/hopcode-core';
+import { canUseRipgrep } from '@hoptrendy/hopcode-core';
 
 type WarningCheckOptions = {
   workspaceRoot: string;

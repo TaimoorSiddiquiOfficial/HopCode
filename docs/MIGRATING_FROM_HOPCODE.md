@@ -8,7 +8,7 @@ HopCode is a fork of HopCode with expanded multi-provider support, new features,
 
 ## Quick Migration Checklist
 
-- [ ] Update global installation: `npm install -g @hopcode/hopcode`
+- [ ] Update global installation: `npm install -g @hoptrendy/hopcode`
 - [ ] Rename config directory: `mv ~/.hopcode ~/.hopcode`
 - [ ] Update shell aliases: `alias hopcode='hopcode'` (replace `qwen`)
 - [ ] Update IDE extensions: Install HopCode VS Code / Zed extensions
@@ -55,19 +55,19 @@ rename %USERPROFILE%\.hopcode %USERPROFILE%\.hopcode
 
 ## Package Name Changes
 
-| Old                | New                |
-| ------------------ | ------------------ |
-| `@hopcode/hopcode` | `@hopcode/hopcode` |
-| `@hopcode/sdk`     | `@hopcode/sdk`     |
+| Old                  | New                  |
+| -------------------- | -------------------- |
+| `@hoptrendy/hopcode` | `@hoptrendy/hopcode` |
+| `@hoptrendy/sdk`     | `@hoptrendy/sdk`     |
 
 **Update imports:**
 
 ```typescript
 // Before
-import { Query } from '@hopcode/sdk';
+import { Query } from '@hoptrendy/sdk';
 
 // After
-import { Query } from '@hopcode/sdk';
+import { Query } from '@hoptrendy/sdk';
 ```
 
 ## IDE Extension Migration
@@ -100,17 +100,17 @@ Features not available in HopCode:
 
 1. **Config directory rename** — `~/.hopcode` → `~/.hopcode`
 2. **Binary name** — `qwen` → `hopcode`
-3. **NPM scope** — `@hopcode/*` → `@hopcode/*`
+3. **NPM scope** — `@hoptrendy/*` → `@hoptrendy/*`
 4. **Docker image** — `ghcr.io/qwenlm/hopcode` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
 
 ## Troubleshooting
 
 ### "Command not found: hopcode"
 
-Ensure `@hopcode/hopcode` is installed globally:
+Ensure `@hoptrendy/hopcode` is installed globally:
 
 ```bash
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 ```
 
 ### "Cannot find config directory"

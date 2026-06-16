@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeDaemonEvent } from '@hopcode/sdk/daemon';
+import { normalizeDaemonEvent } from '@hoptrendy/sdk/daemon';
 import type { ACPToolCall, Message, TodoItem } from '../adapters/types';
 import {
   computeTodoDetails,

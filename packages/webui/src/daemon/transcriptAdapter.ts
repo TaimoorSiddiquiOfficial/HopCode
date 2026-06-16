@@ -11,7 +11,7 @@ import {
   sanitizeDaemonTerminalText,
   type DaemonTranscriptBlock,
   type DaemonToolTranscriptBlock,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import type { UnifiedMessage } from '../adapters/types.js';
 import type {
   ToolCallData,

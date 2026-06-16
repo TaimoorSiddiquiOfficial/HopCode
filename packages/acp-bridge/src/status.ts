@@ -5,8 +5,8 @@
  */
 
 import type { AvailableCommand } from '@agentclientprotocol/sdk';
-import type { HookEventName } from '@hopcode/hopcode-core';
-import { SkillError } from '@hopcode/hopcode-core';
+import type { HookEventName } from '@hoptrendy/hopcode-core';
+import { SkillError } from '@hoptrendy/hopcode-core';
 
 export const STATUS_SCHEMA_VERSION = 1 as const;
 
@@ -628,7 +628,7 @@ export interface ServeWorkspaceMemoryStatus {
  * the daemon-scoped `SubagentManager` runs against a stub `Config`
  * whose `getActiveExtensions()` returns `[]`, and session-level
  * subagents live in a runtime-only cache no CRUD route reads.
- * Mirrors `DaemonAgentLevel` in `@hopcode/sdk` so route + SDK
+ * Mirrors `DaemonAgentLevel` in `@hoptrendy/sdk` so route + SDK
  * consumers see the same forward-compat union.
  */
 export type ServeAgentLevel =
@@ -1183,12 +1183,12 @@ export function mapDomainErrorToErrorKind(
   if (err instanceof BridgeTimeoutError) return 'init_timeout';
   if (err instanceof BridgeChannelClosedError) return 'protocol_error';
   if (err instanceof MissingCliEntryError) return 'missing_binary';
-  // `SkillError` is defined in `@hopcode/hopcode-core/skills`; same
+  // `SkillError` is defined in `@hoptrendy/hopcode-core/skills`; same
   // cross-package bundling concern as `TrustGateError` below — when this
   // function is consumed from outside the monorepo (or under a bundler
   // that doesn't dedupe `file:` workspace deps), the `SkillError` class
   // identity at the throw site (cli's `SkillManager`) can diverge from
-  // the one resolved here through acp-bridge's `@hopcode/hopcode-core`
+  // the one resolved here through acp-bridge's `@hoptrendy/hopcode-core`
   // dependency, silently making `instanceof` return `false` and
   // dropping the skill `errorKind` classification on diagnostic cells.
   // The `OR .name === 'SkillError'` branch keeps classification working
@@ -1205,7 +1205,7 @@ export function mapDomainErrorToErrorKind(
   }
   if (err instanceof SyntaxError) return 'parse_error';
   if (!(err instanceof Error)) return undefined;
-  // `TrustGateError` is defined in `@hopcode/hopcode-core/config`; we
+  // `TrustGateError` is defined in `@hoptrendy/hopcode-core/config`; we
   // match by `.name` rather than `instanceof` because cross-package bundling
   // can produce duplicate class instances where `instanceof` returns false.
   if (err.name === 'TrustGateError') return 'auth_env_error';

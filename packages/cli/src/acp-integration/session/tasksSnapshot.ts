@@ -10,7 +10,7 @@ import {
   type Config,
   type MonitorTask,
   type ShellTask,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   STATUS_SCHEMA_VERSION,
   type ServeSessionAgentTaskStatus,

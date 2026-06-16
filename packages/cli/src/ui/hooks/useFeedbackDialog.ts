@@ -8,7 +8,7 @@ import {
   type UserFeedbackRating,
   isNodeError,
   Storage,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { StreamingState, MessageType, type HistoryItem } from '../types.js';
 import { SettingScope, type LoadedSettings } from '../../config/settings.js';
 import type { SessionStatsState } from '../contexts/SessionContext.js';

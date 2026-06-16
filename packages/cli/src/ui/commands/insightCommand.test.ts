@@ -7,7 +7,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import path from 'path';
 import { pathToFileURL } from 'node:url';
-import { parseInsightMessage, Storage } from '@hopcode/hopcode-core';
+import { parseInsightMessage, Storage } from '@hoptrendy/hopcode-core';
 import { insightCommand } from './insightCommand.js';
 import type { CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
@@ -15,8 +15,8 @@ import { createMockCommandContext } from '../../test-utils/mockCommandContext.js
 const mockGenerateStaticInsight = vi.fn();
 const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     openBrowserSecurely: mockOpenBrowserSecurely,

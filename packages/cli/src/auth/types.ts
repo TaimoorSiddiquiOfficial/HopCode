@@ -8,7 +8,7 @@ import type {
   AuthType,
   ModelProvidersConfig,
   ProviderModelConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { SettingScope, LoadedSettings } from '../config/settings.js';
 
 export type ProviderId = string;

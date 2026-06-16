@@ -13,7 +13,7 @@ import type {
   InsightProgressCallback,
 } from '../types/StaticInsightTypes.js';
 
-import { updateSymlink, Storage, type Config } from '@hopcode/hopcode-core';
+import { updateSymlink, Storage, type Config } from '@hoptrendy/hopcode-core';
 
 export class StaticInsightGenerator {
   private dataProcessor: DataProcessor;

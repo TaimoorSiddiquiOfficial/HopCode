@@ -21,7 +21,7 @@ import type {
   DaemonWorkspaceServiceDeps,
   WorkspaceRequestContext,
 } from './workspace-service/types.js';
-import { WS_A } from '@hopcode/acp-bridge/internal/testUtils';
+import { WS_A } from '@hoptrendy/acp-bridge/internal/testUtils';
 
 /**
  * Minimal request context for status queries.

@@ -1,4 +1,4 @@
-# @hopcode/webui
+# @hoptrendy/webui
 
 A shared React component library for HopCode applications, providing cross-platform UI components with consistent styling and behavior.
 
@@ -15,7 +15,7 @@ A shared React component library for HopCode applications, providing cross-platf
 ## Installation
 
 ```bash
-npm install @hopcode/webui
+npm install @hoptrendy/webui
 ```
 
 ## CDN Usage
@@ -61,12 +61,12 @@ You can also use this library directly in the browser via CDN:
     </script>
 
     <!-- Load the webui library -->
-    <script src="https://unpkg.com/@hopcode/webui@latest/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/@hoptrendy/webui@latest/dist/index.umd.js"></script>
 
     <!-- Load the CSS -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@hopcode/webui@latest/dist/styles.css"
+      href="https://unpkg.com/@hoptrendy/webui@latest/dist/styles.css"
     />
   </head>
   <body>
@@ -123,12 +123,12 @@ You can also use this library directly in the browser via CDN:
     </script>
 
     <!-- Load the webui library -->
-    <script src="https://unpkg.com/@hopcode/webui@latest/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/@hoptrendy/webui@latest/dist/index.umd.js"></script>
 
     <!-- Load the CSS -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@hopcode/webui@latest/dist/styles.css"
+      href="https://unpkg.com/@hoptrendy/webui@latest/dist/styles.css"
     />
   </head>
   <body>
@@ -156,8 +156,8 @@ For a complete working example, see [examples/cdn-usage-demo.html](./examples/cd
 ## Quick Start
 
 ```tsx
-import { Button, Input, Tooltip } from '@hopcode/webui';
-import { PlatformProvider } from '@hopcode/webui/context';
+import { Button, Input, Tooltip } from '@hoptrendy/webui';
+import { PlatformProvider } from '@hoptrendy/webui/context';
 
 function App() {
   return (
@@ -170,9 +170,9 @@ function App() {
 }
 ```
 
-## Daemon React SDK (`@hopcode/webui/daemon-react-sdk`)
+## Daemon React SDK (`@hoptrendy/webui/daemon-react-sdk`)
 
-All daemon-related React bindings (Providers, hooks, types) are published under the `daemon-react-sdk` sub-path. The main entry (`@hopcode/webui`) is purely UI components with zero daemon dependency.
+All daemon-related React bindings (Providers, hooks, types) are published under the `daemon-react-sdk` sub-path. The main entry (`@hoptrendy/webui`) is purely UI components with zero daemon dependency.
 
 ```tsx
 import {
@@ -182,7 +182,7 @@ import {
   useConnection,
   useActions,
   useStreamingState,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 ```
 
 ### Architecture
@@ -210,7 +210,7 @@ import {
   useTranscriptBlocks,
   useActions,
   useConnection,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 
 function App() {
   return (
@@ -310,7 +310,7 @@ All resource hooks accept `{ autoLoad?: boolean, enabled?: boolean }` and return
 #### Button
 
 ```tsx
-import { Button } from '@hopcode/webui';
+import { Button } from '@hoptrendy/webui';
 
 <Button variant="primary" size="md" loading={false}>
   Submit
@@ -329,7 +329,7 @@ import { Button } from '@hopcode/webui';
 #### Input
 
 ```tsx
-import { Input } from '@hopcode/webui';
+import { Input } from '@hoptrendy/webui';
 
 <Input
   label="Email"
@@ -352,7 +352,7 @@ import { Input } from '@hopcode/webui';
 #### Tooltip
 
 ```tsx
-import { Tooltip } from '@hopcode/webui';
+import { Tooltip } from '@hoptrendy/webui';
 
 <Tooltip content="Helpful tip">
   <span>Hover me</span>
@@ -362,7 +362,7 @@ import { Tooltip } from '@hopcode/webui';
 ### Icons
 
 ```tsx
-import { FileIcon, FolderIcon, CheckIcon } from '@hopcode/webui/icons';
+import { FileIcon, FolderIcon, CheckIcon } from '@hoptrendy/webui/icons';
 
 <FileIcon size={16} className="text-gray-500" />;
 ```
@@ -396,7 +396,7 @@ Available icon categories:
 The Platform Context provides an abstraction layer for platform-specific capabilities:
 
 ```tsx
-import { PlatformProvider, usePlatform } from '@hopcode/webui/context';
+import { PlatformProvider, usePlatform } from '@hoptrendy/webui/context';
 
 const platformContext = {
   postMessage: (message) => vscode.postMessage(message),
@@ -431,7 +431,7 @@ Use the shared Tailwind preset for consistent styling:
 ```js
 // tailwind.config.js
 module.exports = {
-  presets: [require('@hopcode/webui/tailwind.preset.cjs')],
+  presets: [require('@hoptrendy/webui/tailwind.preset.cjs')],
   // your customizations
 };
 ```

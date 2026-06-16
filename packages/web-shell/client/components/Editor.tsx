@@ -39,7 +39,7 @@ import type { PromptImage } from '../adapters/promptTypes';
 import {
   useOptionalWorkspace,
   type UseDaemonFollowupSuggestionReturn,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import {
   slashCompletionSource,
   getImplicitTabCompletion,

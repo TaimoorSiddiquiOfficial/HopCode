@@ -29,7 +29,7 @@
  * ## Usage (in adapter test file)
  *
  * ```ts
- * import { runAdapterConformanceSuite } from '@hopcode/sdk/daemon';
+ * import { runAdapterConformanceSuite } from '@hoptrendy/sdk/daemon';
  * import { reduceForTui, renderTuiState } from './my-tui-adapter';
  *
  * const result = runAdapterConformanceSuite({

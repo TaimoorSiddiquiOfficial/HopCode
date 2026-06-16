@@ -19,8 +19,8 @@ import type {
   ModelMetrics,
   ModelMetricsCore,
   ToolCallStats,
-} from '@hopcode/hopcode-core';
-import { uiTelemetryService } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import { uiTelemetryService } from '@hoptrendy/hopcode-core';
 
 export enum ToolCallDecision {
   ACCEPT = 'accept',

@@ -8,13 +8,13 @@
 import type { CommandModule } from 'yargs';
 import { loadSettings } from '../../config/settings.js';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
-import type { MCPServerConfig } from '@hopcode/hopcode-core';
+import type { MCPServerConfig } from '@hoptrendy/hopcode-core';
 import {
   MCPServerStatus,
   createTransport,
   ExtensionManager,
   isGatedMcpScope,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { isWorkspaceTrusted } from '../../config/trustedFolders.js';
 import { assembleMcpServers } from '../../config/mcpServers.js';

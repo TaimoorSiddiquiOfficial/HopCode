@@ -6,7 +6,7 @@
 
 import { Box, Text } from 'ink';
 import { theme } from '../../../semantic-colors.js';
-import { redactUrlCredentials, type Extension } from '@hopcode/hopcode-core';
+import { redactUrlCredentials, type Extension } from '@hoptrendy/hopcode-core';
 import { t } from '../../../../i18n/index.js';
 
 interface ExtensionDetailStepProps {

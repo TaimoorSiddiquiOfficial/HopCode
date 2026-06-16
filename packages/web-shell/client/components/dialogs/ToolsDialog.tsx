@@ -3,7 +3,7 @@ import { dp } from './dialogStyles';
 import {
   useTools,
   type DaemonWorkspaceToolStatus,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import { useI18n } from '../../i18n';
 

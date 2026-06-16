@@ -16,8 +16,8 @@ import type {
   ServerGeminiStreamEvent,
   ToolCallRequestInfo,
   ToolCallResponseInfo,
-} from '@hopcode/hopcode-core';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import type { Part } from '@google/genai';
 import { StreamJsonOutputAdapter } from '../nonInteractive/io/index.js';
 

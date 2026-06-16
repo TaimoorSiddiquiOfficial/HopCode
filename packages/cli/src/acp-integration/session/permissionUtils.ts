@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ToolCallConfirmationDetails } from '@hopcode/hopcode-core';
-import { ToolConfirmationOutcome } from '@hopcode/hopcode-core';
+import type { ToolCallConfirmationDetails } from '@hoptrendy/hopcode-core';
+import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
 import type {
   PermissionOption,
   ToolCallContent,

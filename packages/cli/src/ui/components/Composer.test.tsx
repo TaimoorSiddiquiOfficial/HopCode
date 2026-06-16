@@ -31,7 +31,7 @@ vi.mock('../contexts/VimModeContext.js', () => ({
     setVimMode: vi.fn(),
   })),
 }));
-import { ApprovalMode } from '@hopcode/hopcode-core';
+import { ApprovalMode } from '@hoptrendy/hopcode-core';
 import { StreamingState } from '../types.js';
 
 // Mock child components

@@ -28,7 +28,7 @@ import {
   DaemonClient,
   DaemonHttpError,
   type DaemonSessionSummary,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Match the rest of the integration suite: prefer the bundled CLI

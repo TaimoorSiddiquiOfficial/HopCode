@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { CompressionStatus } from '@hopcode/hopcode-core';
+import { CompressionStatus } from '@hoptrendy/hopcode-core';
 import type { HistoryItemCompression } from '../types.js';
 import { MessageType } from '../types.js';
 import type { SlashCommand } from './types.js';

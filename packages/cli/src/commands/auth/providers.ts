@@ -20,7 +20,7 @@ import {
   AuthType,
   getErrorMessage,
   type ProviderModelConfig as ModelConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { writeStdoutLine, writeStderrLine } from '../../utils/stdioHelpers.js';
 import { promptForSecretInput } from '../../utils/promptUtils.js';
 import { t } from '../../i18n/index.js';

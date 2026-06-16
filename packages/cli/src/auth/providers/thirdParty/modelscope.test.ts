@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { AuthType } from '@hopcode/hopcode-core';
+import { AuthType } from '@hoptrendy/hopcode-core';
 import { modelscopeProvider, buildInstallPlan } from '../../allProviders.js';
 
 describe('modelscopeProvider', () => {

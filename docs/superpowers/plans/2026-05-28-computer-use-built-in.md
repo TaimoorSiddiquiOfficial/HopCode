@@ -92,7 +92,7 @@ Mirror in `ToolDisplayNames`:
 - [ ] **Step 2: Verify the existing tool-names test still passes**
 
 Run: `npm test -- packages/core/src/tools/tool-names`
-Expected: PASS (if there's no test file, run `npm run build -- --filter @hopcode/hopcode-core` to typecheck)
+Expected: PASS (if there's no test file, run `npm run build -- --filter @hoptrendy/hopcode-core` to typecheck)
 
 - [ ] **Step 3: Commit**
 
@@ -478,7 +478,7 @@ this.computerUseEnabled = params.computerUseEnabled ?? true;
 
 - [ ] **Step 4: Typecheck**
 
-Run: `npm run build -- --filter @hopcode/hopcode-core --filter @hopcode/hopcode`
+Run: `npm run build -- --filter @hoptrendy/hopcode-core --filter @hoptrendy/hopcode`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1079,7 +1079,7 @@ Run:
 
 ```bash
 npm test -- packages/core/src/tools/computer-use/
-npm run build -- --filter @hopcode/hopcode-core
+npm run build -- --filter @hoptrendy/hopcode-core
 ```
 
 Expected: All PASS.

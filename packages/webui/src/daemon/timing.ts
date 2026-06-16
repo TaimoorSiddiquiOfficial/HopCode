@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { DaemonTranscriptStore } from '@hopcode/sdk/daemon';
+import type { DaemonTranscriptStore } from '@hoptrendy/sdk/daemon';
 
 const DEFAULT_ACTION_TIMEOUT_MS = 30_000;
 

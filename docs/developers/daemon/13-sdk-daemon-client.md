@@ -212,7 +212,7 @@ sequenceDiagram
 
 - `globalThis.fetch` (Node 18+ built-in, browser, undici, etc.). Injectable per `DaemonClient` for tests.
 - Native `AbortController` / `AbortSignal.any` / `setTimeout`.
-- No transitive dependencies on `@hopcode/hopcode-core` or `@hopcode/acp-bridge` — the SDK package is fully decoupled so external consumers do not pull in the daemon's internals.
+- No transitive dependencies on `@hoptrendy/hopcode-core` or `@hoptrendy/acp-bridge` — the SDK package is fully decoupled so external consumers do not pull in the daemon's internals.
 
 ## `ui/*` subpackage ([#4328](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4328) + [#4353](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4353))
 
@@ -232,7 +232,7 @@ The first production consumer is `packages/webui/src/daemon/` through React's
 for the detailed architecture, glossary, selector table, and relationship to
 the legacy `DaemonTuiAdapter`.
 
-The subpackage is exported from the `@hopcode/sdk/daemon` subpath. Existing
+The subpackage is exported from the `@hoptrendy/sdk/daemon` subpath. Existing
 code that does `import { DaemonClient }` is unaffected.
 
 ## Configuration

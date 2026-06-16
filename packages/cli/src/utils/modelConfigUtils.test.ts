@@ -9,7 +9,7 @@ import {
   AuthType,
   resolveModelConfig,
   type ProviderModelConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   getAuthTypeFromEnv,
   resolveCliGenerationConfig,
@@ -18,9 +18,9 @@ import type { Settings } from '../config/settings.js';
 
 const mockWriteStderrLine = vi.hoisted(() => vi.fn());
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...original,
     resolveModelConfig: vi.fn(),

@@ -16,7 +16,7 @@ import * as path from 'node:path';
 import {
   loadServerHierarchicalMemory,
   ConditionalRulesRegistry,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import { SettingScope } from '../../config/settings.js';
 

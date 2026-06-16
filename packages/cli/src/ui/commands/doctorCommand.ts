@@ -27,7 +27,7 @@ import { t } from '../../i18n/index.js';
 import {
   collectMemoryDiagnostics,
   type MemoryDiagnostics,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { formatMemoryUsage } from '../utils/formatters.js';
 
 const MEMORY_SUBCOMMAND = 'memory';

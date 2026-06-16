@@ -77,13 +77,13 @@ function generateTestCommand(failedFilesMap) {
       ['Job Error', 'Unknown File', 'Build Error', 'Lint Error'].includes(file)
     )
       continue;
-    let workspace = '@hopcode/cli';
+    let workspace = '@hoptrendy/cli';
     let relPath = file;
     if (file.startsWith('packages/core/')) {
-      workspace = '@hopcode/core';
+      workspace = '@hoptrendy/core';
       relPath = file.replace('packages/core/', '');
     } else if (file.startsWith('packages/cli/')) {
-      workspace = '@hopcode/cli';
+      workspace = '@hoptrendy/cli';
       relPath = file.replace('packages/cli/', '');
     }
     relPath = relPath.replace(/^.*packages\/[^\/]+\//, '');

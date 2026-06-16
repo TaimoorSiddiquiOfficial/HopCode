@@ -461,18 +461,18 @@ Create `packages/cli/src/ui/utils/statsDataService.test.ts`:
 
 ```typescript
 import { describe, it, expect, vi } from 'vitest';
-import type { UsageSummaryRecord } from '@hopcode/hopcode-core';
+import type { UsageSummaryRecord } from '@hoptrendy/hopcode-core';
 
 // Mock loadUsageHistory to return controlled data
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...orig,
     loadUsageHistory: vi.fn(),
   };
 });
 
-import { loadUsageHistory } from '@hopcode/hopcode-core';
+import { loadUsageHistory } from '@hoptrendy/hopcode-core';
 import { loadStatsData } from './statsDataService.js';
 
 const mockedLoad = vi.mocked(loadUsageHistory);

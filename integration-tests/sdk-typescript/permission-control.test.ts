@@ -1,4 +1,4 @@
-﻿/**
+/**
  * E2E tests for permission control features:
  * - canUseTool callback parameter
  * - setPermissionMode API
@@ -22,7 +22,7 @@ import {
   type SDKUserMessage,
   type ToolUseBlock,
   type ContentBlock,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 import {
   SDKTestHelper,
   createSharedTestOptions,

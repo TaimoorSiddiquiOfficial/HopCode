@@ -21,7 +21,7 @@ const { debugLoggerMock } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   createDebugLogger: () => debugLoggerMock,
 }));
 

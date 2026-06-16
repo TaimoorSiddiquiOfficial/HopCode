@@ -456,7 +456,7 @@ import * as nodeFs from 'node:fs';
 import * as nodePath from 'node:path';
 import * as crypto from 'node:crypto';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
-import { Storage } from '@hopcode/hopcode-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 
 function computeDaemonId(pid: number, boundWorkspace: string): string {
   const hash = crypto
@@ -832,7 +832,7 @@ export { updateSymlink } from './utils/symlink.js';
 Then import in `daemonLogger.ts`:
 
 ```ts
-import { Storage, updateSymlink } from '@hopcode/hopcode-core';
+import { Storage, updateSymlink } from '@hoptrendy/hopcode-core';
 ```
 
 (Merge with the existing `Storage` import added in Task 3.)
@@ -1272,7 +1272,7 @@ Edit `runHopCodeServe.ts`:
 
 ```ts
 import { initDaemonLogger, type DaemonLogger } from './daemonLogger.js';
-import { createSpawnChannelFactory } from '@hopcode/acp-bridge/spawnChannel';
+import { createSpawnChannelFactory } from '@hoptrendy/acp-bridge/spawnChannel';
 ```
 
 2. Inside `runHopCodeServe(opts)`, right after `boundWorkspace` is canonicalized (find the assignment; it's the value passed to `createHttpAcpBridge`):
@@ -1492,6 +1492,6 @@ EOF
 
 - **Trace context (§6 bullet)**: deferred. The spec leaves it explicit ("Helper extracted to a shared module ... or duplicated locally — leave to plan"). The current plan does NOT inject trace_id/span_id; that is a follow-up task tracked in §16. If reviewer pushes back, add a Task 4.5 that imports `trace` from `@opentelemetry/api` and folds the span context into `buildDaemonLogLine` — but only if the reviewer asks; YAGNI otherwise.
 
-- **`updateSymlink` import path**: Task 6 step 3 hedges on whether `updateSymlink` is exported from `@hopcode/hopcode-core`. Verify before editing: `grep -n updateSymlink packages/core/src/index.ts`. If missing, add the re-export in the same commit as Task 6.
+- **`updateSymlink` import path**: Task 6 step 3 hedges on whether `updateSymlink` is exported from `@hoptrendy/hopcode-core`. Verify before editing: `grep -n updateSymlink packages/core/src/index.ts`. If missing, add the re-export in the same commit as Task 6.
 
 - **acp-bridge test for `createSpawnChannelFactory`**: spawning a real child in a unit test is brittle. If Task 8 step 2 turns out to be flaky in CI, the fallback is to refactor the inner stderr forwarder into a small exported helper (`forwardChildStderr(stream, { prefix, onLine })`) and unit-test that in isolation — no real spawn needed.

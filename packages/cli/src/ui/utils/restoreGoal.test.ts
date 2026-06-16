@@ -12,7 +12,7 @@ import {
   notifyGoalTerminal,
   setActiveGoal,
   type Config,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { HistoryItem } from '../types.js';
 import {
   findGoalToRestore,

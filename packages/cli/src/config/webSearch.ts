@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { WebSearchProviderConfig } from '@hopcode/hopcode-core';
+import type { WebSearchProviderConfig } from '@hoptrendy/hopcode-core';
 import type { Settings } from './settings.js';
 
 /**

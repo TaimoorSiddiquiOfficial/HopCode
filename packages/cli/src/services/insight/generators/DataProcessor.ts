@@ -9,7 +9,7 @@ import path from 'path';
 import {
   read as readJsonlFile,
   createDebugLogger,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import pLimit from 'p-limit';
 import type {
   InsightData,
@@ -34,7 +34,7 @@ import {
   runSideQuery,
   type Config,
   type ChatRecord,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 const logger = createDebugLogger('DataProcessor');
 

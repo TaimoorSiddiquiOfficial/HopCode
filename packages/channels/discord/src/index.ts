@@ -1,7 +1,7 @@
 export { DiscordChannel } from './DiscordAdapter.js';
 
 import { DiscordChannel } from './DiscordAdapter.js';
-import type { ChannelPlugin } from '@hopcode/channel-base';
+import type { ChannelPlugin } from '@hoptrendy/channel-base';
 
 export const plugin: ChannelPlugin = {
   channelType: 'discord',

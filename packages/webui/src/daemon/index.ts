@@ -99,8 +99,8 @@ export { useDaemonMidTurnInjected } from './useDaemonMidTurnInjected.js';
 
 // ── Re-exported SDK types/constants for UI consumers ──────────────
 // These allow web-shell and other UI packages to depend only on
-// @hopcode/webui without importing @hopcode/sdk/daemon directly.
-export { DAEMON_APPROVAL_MODES } from '@hopcode/sdk/daemon';
+// @hoptrendy/webui without importing @hoptrendy/sdk/daemon directly.
+export { DAEMON_APPROVAL_MODES } from '@hoptrendy/sdk/daemon';
 export type {
   DaemonApprovalMode,
   DaemonAuthProviderBaseUrlOption,
@@ -131,4 +131,4 @@ export type {
   DaemonSettingDescriptor,
   DaemonWorkspaceSettingsStatus,
   DaemonSettingUpdateResult,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';

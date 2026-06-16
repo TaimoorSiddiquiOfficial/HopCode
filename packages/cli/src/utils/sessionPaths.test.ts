@@ -8,7 +8,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Storage } from '@hopcode/hopcode-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 import { createMockCommandContext } from '../test-utils/mockCommandContext.js';
 import {
   collectSessionPathInfo,

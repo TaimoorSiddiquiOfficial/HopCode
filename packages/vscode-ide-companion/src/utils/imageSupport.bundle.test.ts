@@ -19,12 +19,12 @@ describe('imageSupport browser bundling', () => {
       platform: 'browser',
       write: false,
       logLevel: 'silent',
-      external: ['@hopcode/hopcode-core'],
+      external: ['@hoptrendy/hopcode-core'],
     });
 
     const output = result.outputFiles[0]?.text ?? '';
 
-    expect(output).not.toContain('@hopcode/hopcode-core');
+    expect(output).not.toContain('@hoptrendy/hopcode-core');
     expect(output).not.toContain('supportedImageFormats.js');
   });
 
@@ -38,7 +38,7 @@ describe('imageSupport browser bundling', () => {
       platform: 'browser',
       write: false,
       logLevel: 'silent',
-      external: ['@hopcode/hopcode-core', '@hopcode/webui'],
+      external: ['@hoptrendy/hopcode-core', '@hoptrendy/webui'],
       loader: {
         '.png': 'dataurl',
       },
@@ -46,7 +46,7 @@ describe('imageSupport browser bundling', () => {
 
     const output = result.outputFiles[0]?.text ?? '';
 
-    expect(output).not.toContain('@hopcode/hopcode-core');
+    expect(output).not.toContain('@hoptrendy/hopcode-core');
     expect(output).not.toContain('tokenLimits.js');
   });
 });

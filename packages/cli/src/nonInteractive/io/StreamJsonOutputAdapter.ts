@@ -10,8 +10,8 @@ import type {
   ServerGeminiStreamEvent,
   ToolCallRequestInfo,
   McpToolProgressData,
-} from '@hopcode/hopcode-core';
-import { GeminiEventType } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import { GeminiEventType } from '@hoptrendy/hopcode-core';
 import type {
   CLIAssistantMessage,
   CLIMessage,

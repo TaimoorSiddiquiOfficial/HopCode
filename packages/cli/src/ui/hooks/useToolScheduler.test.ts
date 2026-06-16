@@ -24,18 +24,18 @@ import type {
   Status as ToolCallStatusType,
   AnyDeclarativeTool,
   AnyToolInvocation,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES,
   DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
   ApprovalMode,
   MockTool,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { ToolCallStatus } from '../types.js';
 
 // Mocks
-vi.mock('@hopcode/hopcode-core', async () => {
-  const actual = await vi.importActual('@hopcode/hopcode-core');
+vi.mock('@hoptrendy/hopcode-core', async () => {
+  const actual = await vi.importActual('@hoptrendy/hopcode-core');
   return {
     ...actual,
     ToolRegistry: vi.fn(),

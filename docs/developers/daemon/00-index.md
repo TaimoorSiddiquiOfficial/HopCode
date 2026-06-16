@@ -1,6 +1,6 @@
 # Daemon Developer Documentation
 
-This is the developer-facing technical documentation for **hopcode daemon mode**: the `hopcode serve` HTTP daemon, the `@hopcode/acp-bridge` package, the workspace-scoped MCP transport pool, multi-client permission mediation, typed daemon event schema v1, the TypeScript SDK daemon client, and the adapters that connect to the daemon.
+This is the developer-facing technical documentation for **hopcode daemon mode**: the `hopcode serve` HTTP daemon, the `@hoptrendy/acp-bridge` package, the workspace-scoped MCP transport pool, multi-client permission mediation, typed daemon event schema v1, the TypeScript SDK daemon client, and the adapters that connect to the daemon.
 
 It complements, rather than replaces, these existing docs:
 
@@ -34,7 +34,7 @@ Pick the path that matches your goal:
 ### Server core
 
 - [`02-serve-runtime.md`](./02-serve-runtime.md) - `runQwenServe` bootstrap, Express app, middleware chain, graceful shutdown.
-- [`03-acp-bridge.md`](./03-acp-bridge.md) - `@hopcode/acp-bridge` package internals, session multiplexing, channel factory, ACP child spawn.
+- [`03-acp-bridge.md`](./03-acp-bridge.md) - `@hoptrendy/acp-bridge` package internals, session multiplexing, channel factory, ACP child spawn.
 - [`04-permission-mediation.md`](./04-permission-mediation.md) - `MultiClientPermissionMediator`, four policies, N1 timeout invariant, cancel sentinel.
 - [`05-mcp-transport-pool.md`](./05-mcp-transport-pool.md) - `McpTransportPool` (F2), pool entries, reverse index, restart, drain.
 - [`06-mcp-budget-guardrails.md`](./06-mcp-budget-guardrails.md) - `WorkspaceMcpBudget`, modes (`off`/`warn`/`enforce`), hysteresis, refused-batch coalescing.
@@ -63,7 +63,7 @@ Pick the path that matches your goal:
 
 - **ACP** - Agent Client Protocol. JSON-RPC over stdio spoken between the daemon bridge and the ACP child process. This is not the HTTP protocol that clients use against the daemon.
 - **ACP child** - the child process the daemon spawns (`qwen --acp`) to host the actual agent runtime. The bridge multiplexes one ACP child across many connected clients.
-- **acp-bridge** - the `@hopcode/acp-bridge` package (`packages/acp-bridge/`). Owns session multiplexing, the permission mediator, the event bus, and the channel factory.
+- **acp-bridge** - the `@hoptrendy/acp-bridge` package (`packages/acp-bridge/`). Owns session multiplexing, the permission mediator, the event bus, and the channel factory.
 - **BridgeClient** - `packages/acp-bridge/src/bridgeClient.ts`. Wraps one ACP `ClientSideConnection`, and handles `requestPermission`, `sendPrompt`, and `cancelSession`.
 - **Channel factory** - pluggable strategy for spawning or attaching to an ACP child. The default `spawnChannel` runs `qwen --acp` as a subprocess; `inMemoryChannel` runs it in-process for tests.
 - **DaemonClient** - `packages/sdk-typescript/src/daemon/DaemonClient.ts`. The TypeScript SDK HTTP-level facade over the daemon.
@@ -86,7 +86,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 | Surface                             | Implementation anchors                                                                                                                                                                                                                                    | Primary docs                                                                                                           |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Bootstrap and HTTP assembly         | `packages/cli/src/serve/runQwenServe.ts`, `server.ts`, `/demo`                                                                                                                                                                                            | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)                                                   |
-| ACP bridge and session multiplexing | `packages/acp-bridge/src/bridge.ts`, `packages/acp-bridge/src/bridgeTypes.ts`, `@hopcode/acp-bridge`                                                                                                                                                      | [`03`](./03-acp-bridge.md), [`08`](./08-session-lifecycle.md)                                                          |
+| ACP bridge and session multiplexing | `packages/acp-bridge/src/bridge.ts`, `packages/acp-bridge/src/bridgeTypes.ts`, `@hoptrendy/acp-bridge`                                                                                                                                                    | [`03`](./03-acp-bridge.md), [`08`](./08-session-lifecycle.md)                                                          |
 | Permission mediation                | `packages/acp-bridge/src/permissionMediator.ts`, `fromLoopback: boolean`, `policy.*`                                                                                                                                                                      | [`04`](./04-permission-mediation.md), [`12`](./12-auth-security.md)                                                    |
 | MCP transport pool                  | `packages/core/src/tools/mcp-transport-pool.ts`, `mcp-pool-key.ts`, `pid-descendants.ts`, `session-mcp-view.ts`, `/mcp refresh`, `MCPCallInterruptedError`                                                                                                | [`05`](./05-mcp-transport-pool.md), [`06`](./06-mcp-budget-guardrails.md)                                              |
 | MCP budget guardrails               | `packages/core/src/tools/mcp-workspace-budget.ts`, `ServeMcpBudgetStatusCell.scope`, `budgets[]`                                                                                                                                                          | [`06`](./06-mcp-budget-guardrails.md)                                                                                  |

@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { appEvents } from '../../utils/events.js';
-import { type McpClient, MCPServerStatus } from '@hopcode/hopcode-core';
+import { type McpClient, MCPServerStatus } from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 
 // Tracks MCP connection progress. Returns the current status string while

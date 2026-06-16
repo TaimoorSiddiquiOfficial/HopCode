@@ -1,6 +1,6 @@
 {
-  "name": "@hopcode/hopcode-core",
-  "version": "0.18.1",
+  "name": "@hoptrendy/hopcode-core",
+  "version": "0.30.2",
   "description": "HopCode Core",
   "repository": {
     "type": "git",

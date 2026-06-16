@@ -8,7 +8,7 @@ import {
   allowEditorTypeInSandbox,
   checkHasEditorType,
   type EditorType,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 export interface EditorDisplay {
   name: string;

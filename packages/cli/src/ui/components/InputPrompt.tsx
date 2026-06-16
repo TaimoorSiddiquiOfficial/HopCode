@@ -28,7 +28,7 @@ import {
   type Config,
   Storage,
   createDebugLogger,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   parseInputForHighlighting,
   buildSegmentsForVisualSlice,

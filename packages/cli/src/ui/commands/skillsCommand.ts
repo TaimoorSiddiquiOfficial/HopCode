@@ -12,7 +12,7 @@ import {
 } from './types.js';
 import { MessageType, type HistoryItemSkillsList } from '../types.js';
 import { t } from '../../i18n/index.js';
-import { normalizeSkillPriority } from '@hopcode/hopcode-core';
+import { normalizeSkillPriority } from '@hoptrendy/hopcode-core';
 
 export const skillsCommand: SlashCommand = {
   name: 'skills',

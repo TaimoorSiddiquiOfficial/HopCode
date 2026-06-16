@@ -731,14 +731,14 @@ if %ERRORLEVEL% EQU 0 (
     echo INFO: Upgrading to the latest version.
 )
 
-echo INFO: Running: npm install -g @hopcode/hopcode@latest --registry !NPM_REGISTRY!
-call npm install -g @hopcode/hopcode@latest --registry "!NPM_REGISTRY!"
+echo INFO: Running: npm install -g @hoptrendy/hopcode@latest --registry !NPM_REGISTRY!
+call npm install -g @hoptrendy/hopcode@latest --registry "!NPM_REGISTRY!"
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Failed to install HopCode.
     echo.
     echo This installer does not change your npm prefix or PATH.
     echo If the failure is a permission error, fix your npm global package directory, then run:
-    echo   npm install -g @hopcode/hopcode@latest --registry !NPM_REGISTRY!
+    echo   npm install -g @hoptrendy/hopcode@latest --registry !NPM_REGISTRY!
     exit /b 1
 )
 

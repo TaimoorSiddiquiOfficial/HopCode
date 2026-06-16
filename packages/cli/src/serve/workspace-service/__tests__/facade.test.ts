@@ -9,10 +9,10 @@ import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 
-// Mock @hopcode/hopcode-core to avoid the undici dependency chain.
-// This is required so @hopcode/acp-bridge/status can load (it imports
+// Mock @hoptrendy/hopcode-core to avoid the undici dependency chain.
+// This is required so @hoptrendy/acp-bridge/status can load (it imports
 // SkillError from core).
-vi.mock('@hopcode/hopcode-core', () => {
+vi.mock('@hoptrendy/hopcode-core', () => {
   class SkillError extends Error {
     code: string;
     constructor(message: string, code: string) {
@@ -25,7 +25,7 @@ vi.mock('@hopcode/hopcode-core', () => {
 });
 
 const { createDaemonWorkspaceService } = await import('../index.js');
-import { SessionNotFoundError } from '@hopcode/acp-bridge/bridgeErrors';
+import { SessionNotFoundError } from '@hoptrendy/acp-bridge/bridgeErrors';
 import type {
   DaemonWorkspaceServiceDeps,
   WorkspaceRequestContext,

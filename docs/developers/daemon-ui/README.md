@@ -1,6 +1,6 @@
 # Daemon UI SDK — Developer Guide
 
-The `@hopcode/sdk/daemon` subpath ships shared UI primitives for daemon
+The `@hoptrendy/sdk/daemon` subpath ships shared UI primitives for daemon
 clients. The current adoption target is web chat and web terminal; native local
 TUI, channel, and IDE integrations keep their existing default paths while the
 daemon UI contract stabilizes. This guide covers the API surface introduced by
@@ -36,7 +36,7 @@ import {
   daemonBlockToMarkdown,
   selectCurrentTool,
   selectApprovalMode,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 
 const session = await DaemonSessionClient.createOrAttach(client, {
   workspaceCwd,
@@ -106,7 +106,7 @@ store.subscribe(() => {
 `auth.device_flow.{started,throttled,authorized,failed,cancelled}`
 
 Each carries the daemon's `deviceFlowId`. Failed events carry a closed-enum
-`errorKind` (closed enum — see `KNOWN_DEVICE_FLOW_ERROR_KINDS` exported from `@hopcode/sdk/daemon` for the canonical list, currently: `expired_token` / `access_denied` / `invalid_grant` / `upstream_error` / `persist_failed` / `not_found_or_evicted`).
+`errorKind` (closed enum — see `KNOWN_DEVICE_FLOW_ERROR_KINDS` exported from `@hoptrendy/sdk/daemon` for the canonical list, currently: `expired_token` / `access_denied` / `invalid_grant` / `upstream_error` / `persist_failed` / `not_found_or_evicted`).
 
 ## Render contract (PR-D)
 
@@ -237,7 +237,7 @@ would no longer resolve via `blockIndexById`).
 import {
   selectSubagentChildBlocks,
   isSubagentChildBlock,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 
 // Render a parent tool block, then walk children:
 function renderToolBlock(state, block) {
@@ -287,7 +287,7 @@ fallback to `clientReceivedAt`). Multiple clients viewing the same session
 see the same "5 minutes ago" only when both read from the daemon clock.
 
 ```ts
-import { formatBlockTimestamp } from '@hopcode/sdk/daemon';
+import { formatBlockTimestamp } from '@hoptrendy/sdk/daemon';
 
 const label = formatBlockTimestamp(block, {
   locale: 'zh-CN',
@@ -302,7 +302,7 @@ Validate your adapter projects the SDK's reference corpus to semantically
 equivalent output:
 
 ```ts
-import { runAdapterConformanceSuite } from '@hopcode/sdk/daemon';
+import { runAdapterConformanceSuite } from '@hoptrendy/sdk/daemon';
 
 it('my adapter conforms to daemon UI corpus', () => {
   const result = runAdapterConformanceSuite({
@@ -329,7 +329,7 @@ JSX; the framework only checks semantic content via `expectedContains` and
 daemon's typed-error taxonomy (when the daemon stamps it):
 
 ```ts
-import type { DaemonErrorKind } from '@hopcode/sdk/daemon';
+import type { DaemonErrorKind } from '@hoptrendy/sdk/daemon';
 // 'missing_binary' | 'blocked_egress' | 'auth_env_error' | 'init_timeout'
 // | 'protocol_error' | 'missing_file' | 'parse_error' | 'budget_exhausted'
 ```

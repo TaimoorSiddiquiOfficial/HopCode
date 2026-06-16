@@ -33,7 +33,7 @@ import {
   DEFAULT_BUILTIN_SUBAGENT_TYPE as CORE_DEFAULT_SUBAGENT_TYPE,
   ToolDisplayNames,
   ToolNames,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   useBackgroundTaskViewActions,
   useBackgroundTaskViewState,

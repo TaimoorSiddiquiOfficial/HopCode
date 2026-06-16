@@ -23,7 +23,7 @@ import {
   type HopCodeMessage,
 } from './hopcodeSessionReader.js';
 import { HopCodeSessionManager } from './hopcodeSessionManager.js';
-import { SessionService } from '@hopcode/hopcode-core';
+import { SessionService } from '@hoptrendy/hopcode-core';
 import type {
   ChatMessage,
   PlanEntry,

@@ -7,7 +7,7 @@
 import { render } from 'ink-testing-library';
 import { describe, it, expect, vi } from 'vitest';
 import { McpStatus } from './McpStatus.js';
-import { MCPServerStatus } from '@hopcode/hopcode-core';
+import { MCPServerStatus } from '@hoptrendy/hopcode-core';
 import { MessageType } from '../../types.js';
 
 describe('McpStatus', () => {
@@ -77,7 +77,7 @@ describe('McpStatus', () => {
 
   it('renders correctly with a disconnected server', async () => {
     vi.spyOn(
-      await import('@hopcode/hopcode-core'),
+      await import('@hoptrendy/hopcode-core'),
       'getMCPServerStatus',
     ).mockReturnValue(MCPServerStatus.DISCONNECTED);
     const { lastFrame } = render(<McpStatus {...baseProps} />);

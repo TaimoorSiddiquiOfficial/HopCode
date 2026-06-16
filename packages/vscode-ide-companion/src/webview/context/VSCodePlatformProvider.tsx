@@ -9,8 +9,8 @@
 
 import { useMemo, useCallback, useEffect, useRef } from 'react';
 import type { FC, ReactNode } from 'react';
-import { PlatformProvider } from '@hopcode/webui';
-import type { PlatformContextValue } from '@hopcode/webui';
+import { PlatformProvider } from '@hoptrendy/webui';
+import type { PlatformContextValue } from '@hoptrendy/webui';
 import { useVSCode } from '../hooks/useVSCode.js';
 import { generateIconUrl } from '../utils/resourceUrl.js';
 

@@ -5,8 +5,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import type { Storage } from '@hopcode/hopcode-core';
-import { Logger } from '@hopcode/hopcode-core';
+import type { Storage } from '@hoptrendy/hopcode-core';
+import { Logger } from '@hoptrendy/hopcode-core';
 
 /**
  * Hook to manage the logger instance.

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -15,7 +15,7 @@ import type { GenerateContentConfig } from '@google/genai';
 import {
   getQuranGuidedBehavior,
   QURAN_GUIDED_AGENT_PROMPT,
-} from '@hopcode/quran-guidance';
+} from '@hoptrendy/quran-guidance';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
 const debugLogger = createDebugLogger('PROMPTS');
@@ -1122,7 +1122,7 @@ export function getInsightPrompt(type: InsightPromptType): string {
 
 /**
  * Returns the Quran-guided coding behavior section for the system prompt.
- * Sources from the @hopcode/quran-guidance package's curated
+ * Sources from the @hoptrendy/quran-guidance package's curated
  * agent prompt, which encodes behavioral guidance
  * based on Quranic principles of verification, fairness, good speech,
  * patience, and constructive work.

@@ -26,7 +26,7 @@ import {
   type AgentInteractive,
   type ApprovalMode,
   type Config,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { useArenaInProcess } from '../hooks/useArenaInProcess.js';
 import { useTeamInProcess } from '../hooks/useTeamInProcess.js';
 

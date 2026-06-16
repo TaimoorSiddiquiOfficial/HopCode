@@ -12,7 +12,7 @@ import {
   type Config,
   type GoalTerminalEvent,
   type GoalTerminalKind,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   isTerminalGoalStatusKind,
   MessageType,

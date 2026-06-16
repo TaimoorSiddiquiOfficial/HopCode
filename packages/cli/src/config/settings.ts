@@ -16,8 +16,8 @@ import {
   Storage,
   createDebugLogger,
   stripRuntimeSnapshotPrefix,
-} from '@hopcode/hopcode-core';
-import type { MCPServerConfig, McpServerScope } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import type { MCPServerConfig, McpServerScope } from '@hoptrendy/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 import { DefaultLight } from '../ui/themes/default-light.js';
 import { DefaultDark } from '../ui/themes/default.js';

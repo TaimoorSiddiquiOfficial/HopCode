@@ -11,7 +11,7 @@ import type {
   SlashCommand,
   SlashCommandActionReturn,
 } from './types.js';
-import { getCurrentGeminiMdFilename } from '@hopcode/hopcode-core';
+import { getCurrentGeminiMdFilename } from '@hoptrendy/hopcode-core';
 import { CommandKind } from './types.js';
 import { Text } from 'ink';
 import React from 'react';

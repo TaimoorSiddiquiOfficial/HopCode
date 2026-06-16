@@ -13,7 +13,7 @@ import {
   Storage,
   atomicWriteFile,
   type MCPServerConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 

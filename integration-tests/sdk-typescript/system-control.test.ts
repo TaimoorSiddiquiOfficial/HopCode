@@ -1,4 +1,4 @@
-﻿/**
+/**
  * E2E tests for system controller features:
  * - setModel API for dynamic model switching
  */
@@ -10,7 +10,7 @@ import {
   isSDKSystemMessage,
   isSDKResultMessage,
   type SDKUserMessage,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 import {
   SDKTestHelper,
   createSharedTestOptions,

@@ -8,7 +8,7 @@ import {
   HooksConfigSource,
   HookEventName,
   hookEventSupportsMatcher,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { HookExitCode, HookEventDisplayInfo } from './types.js';
 import { t } from '../../../i18n/index.js';
 

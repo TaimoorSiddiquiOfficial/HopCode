@@ -1,4 +1,4 @@
-﻿# 🚀 HopCode Soft Launch - EXECUTION CHECKLIST
+# 🚀 HopCode Soft Launch - EXECUTION CHECKLIST
 
 **Launch Date:** 2026-04-18  
 **Status:** 🟡 **IN PROGRESS**
@@ -142,7 +142,7 @@ HopCode is an open-source AI coding assistant that helps you:
 ## Get Started
 
 ```bash
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 hopcode auth login
 ```
 ````
@@ -173,7 +173,7 @@ Anthropic, Google, Groq, and more!
 The butterfly effect of intelligent code is here.
 
 Try it now:
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 Multi-AI support coming soon!
 
@@ -192,7 +192,7 @@ An AI-powered coding assistant with:
 ✅ VS Code + Zed support  
 ✅ Multi-AI coming soon
 
-Try it: npm install -g @hopcode/hopcode
+Try it: npm install -g @hoptrendy/hopcode
 
 #HopCode #AI #SoftwareDevelopment #OpenSource #Innovation
 

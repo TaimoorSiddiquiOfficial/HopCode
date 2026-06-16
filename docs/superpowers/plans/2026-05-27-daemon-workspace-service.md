@@ -67,7 +67,7 @@ import type {
   ServeWorkspaceProvidersStatus,
   ServeWorkspaceEnvStatus,
   ServeWorkspacePreflightStatus,
-} from '@hopcode/acp-bridge';
+} from '@hoptrendy/acp-bridge';
 
 // --- Request Context ---
 
@@ -968,7 +968,7 @@ import { createFileService } from './fileService.js';
 import { createAuthService } from './authService.js';
 import { createAgentsService } from './agentsService.js';
 import { createMemoryService } from './memoryService.js';
-import { SERVE_STATUS_EXT_METHODS } from '@hopcode/acp-bridge';
+import { SERVE_STATUS_EXT_METHODS } from '@hoptrendy/acp-bridge';
 
 export {
   type DaemonWorkspaceService,

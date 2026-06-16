@@ -1,6 +1,6 @@
 {
-  "name": "@hopcode/hopcode",
-  "version": "0.18.1",
+  "name": "@hoptrendy/hopcode",
+  "version": "0.30.2",
   "description": "HopCode",
   "repository": {
     "type": "git",
@@ -44,15 +44,6 @@
     "@google/genai": "2.6.0",
     "@iarna/toml": "^2.2.5",
     "@modelcontextprotocol/sdk": "^1.25.2",
-    "@hopcode/acp-bridge": "file:../acp-bridge",
-    "@hopcode/channel-base": "file:../channels/base",
-    "@hopcode/channel-dingtalk": "file:../channels/dingtalk",
-    "@hopcode/channel-feishu": "file:../channels/feishu",
-    "@hopcode/channel-telegram": "file:../channels/telegram",
-    "@hopcode/channel-weixin": "file:../channels/weixin",
-    "@hopcode/hopcode-core": "file:../core",
-    "@hopcode/hopcode-server": "file:../server",
-    "@hopcode/web-templates": "file:../web-templates",
     "@types/update-notifier": "^6.0.8",
     "ansi-regex": "^6.2.2",
     "command-exists": "^1.2.9",
@@ -83,7 +74,16 @@
     "wrap-ansi": "^10.0.0",
     "ws": "^8.18.0",
     "yargs": "^17.7.2",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@hoptrendy/acp-bridge": "file:../acp-bridge",
+    "@hoptrendy/channel-base": "file:../channels/base",
+    "@hoptrendy/channel-dingtalk": "file:../channels/dingtalk",
+    "@hoptrendy/channel-feishu": "file:../channels/feishu",
+    "@hoptrendy/channel-telegram": "file:../channels/telegram",
+    "@hoptrendy/channel-weixin": "file:../channels/weixin",
+    "@hoptrendy/hopcode-core": "file:../core",
+    "@hoptrendy/hopcode-server": "file:../server",
+    "@hoptrendy/web-templates": "file:../web-templates"
   },
   "devDependencies": {
     "@babel/runtime": "^7.27.6",

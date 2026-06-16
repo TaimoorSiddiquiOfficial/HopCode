@@ -71,7 +71,7 @@ import { pathToFileURL } from 'node:url';
 const coreSourceUrl = '${coreSourceUrl}';
 
 export function resolve(specifier, context, nextResolve) {
-  if (specifier === '@hopcode/hopcode-core') {
+  if (specifier === '@hoptrendy/hopcode-core') {
     return {
       shortCircuit: true,
       url: coreSourceUrl,

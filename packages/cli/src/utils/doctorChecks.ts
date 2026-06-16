@@ -13,7 +13,7 @@ import {
   canUseRipgrep,
   getMCPServerStatus,
   MCPServerStatus,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { CommandContext } from '../ui/commands/types.js';
 import type { DoctorCheckResult } from '../ui/types.js';
 import { t } from '../i18n/index.js';

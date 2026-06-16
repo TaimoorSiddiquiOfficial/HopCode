@@ -78,7 +78,7 @@ packages/cli/
 └── dist/                       # Built output
 ```
 
-**Key Dependencies**: `ink`, `react`, `yargs`, `@hopcode/hopcode-core`
+**Key Dependencies**: `ink`, `react`, `yargs`, `@hoptrendy/hopcode-core`
 
 ---
 

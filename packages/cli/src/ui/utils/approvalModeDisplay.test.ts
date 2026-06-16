@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { ApprovalMode } from '@hopcode/hopcode-core';
+import { ApprovalMode } from '@hoptrendy/hopcode-core';
 import {
   formatApprovalModeDescription,
   formatApprovalModeName,

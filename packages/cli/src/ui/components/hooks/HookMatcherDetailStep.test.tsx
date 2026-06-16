@@ -10,7 +10,7 @@ import {
   HookEventName,
   HooksConfigSource,
   HookType,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { HookMatcherDetailStep } from './HookMatcherDetailStep.js';
 import type {
   HookConfigDisplayInfo,

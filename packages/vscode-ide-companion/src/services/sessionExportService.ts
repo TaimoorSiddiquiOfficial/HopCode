@@ -7,7 +7,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { SessionService, type Config } from '@hopcode/hopcode-core';
+import { SessionService, type Config } from '@hoptrendy/hopcode-core';
 import {
   collectSessionData,
   generateExportFilename,
@@ -16,14 +16,14 @@ import {
   toJson,
   toJsonl,
   toMarkdown,
-} from '@hopcode/hopcode/export';
+} from '@hoptrendy/hopcode/export';
 import {
   EXPORT_SESSION_FORMATS,
   getExportSubcommandRequiredMessage,
   isSessionExportFormat,
   type SessionExportFormat,
 } from '../utils/exportSlashCommand.js';
-import { stripZeroWidthSpaces } from '@hopcode/webui';
+import { stripZeroWidthSpaces } from '@hoptrendy/webui';
 
 export { EXPORT_SESSION_FORMATS as SESSION_EXPORT_FORMATS };
 export type { SessionExportFormat } from '../utils/exportSlashCommand.js';

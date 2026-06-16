@@ -10,7 +10,7 @@ import {
   expandHomeDir,
   getDirPathCompletions,
 } from './directoryCommand.js';
-import type { Config, WorkspaceContext } from '@hopcode/hopcode-core';
+import type { Config, WorkspaceContext } from '@hoptrendy/hopcode-core';
 import type { CommandContext, SlashCommandActionReturn } from './types.js';
 import { SettingScope } from '../../config/settings.js';
 import * as os from 'node:os';

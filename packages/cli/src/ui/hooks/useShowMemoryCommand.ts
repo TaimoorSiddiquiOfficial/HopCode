@@ -6,9 +6,9 @@
 
 import type { Message } from '../types.js';
 import { MessageType } from '../types.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('SHOW_MEMORY');
 

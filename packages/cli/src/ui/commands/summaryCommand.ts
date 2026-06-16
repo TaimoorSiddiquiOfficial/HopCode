@@ -14,7 +14,7 @@ import {
 import {
   getProjectSummaryPrompt,
   runSideQuery,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { HistoryItemSummary } from '../types.js';
 import { t } from '../../i18n/index.js';
 

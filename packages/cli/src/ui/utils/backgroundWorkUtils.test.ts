@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   hasBlockingBackgroundWork,
   resetBackgroundStateForSessionSwitch,

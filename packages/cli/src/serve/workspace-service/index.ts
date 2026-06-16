@@ -28,7 +28,7 @@ import {
   createIdleEnvStatus,
   createIdleAcpPreflightCells,
   type ServeWorkspacePreflightStatus,
-} from '@hopcode/acp-bridge/status';
+} from '@hoptrendy/acp-bridge/status';
 
 import {
   WorkspaceInitPathEscapeError,
@@ -38,10 +38,10 @@ import {
   McpServerNotFoundError,
   McpServerRestartFailedError,
   SessionNotFoundError,
-} from '@hopcode/acp-bridge/bridgeErrors';
+} from '@hoptrendy/acp-bridge/bridgeErrors';
 
-import { mapDomainErrorToErrorKind } from '@hopcode/acp-bridge/status';
-import { MCP_RESTART_SERVER_DEADLINE_MS } from '@hopcode/acp-bridge/mcpTimeouts';
+import { mapDomainErrorToErrorKind } from '@hoptrendy/acp-bridge/status';
+import { MCP_RESTART_SERVER_DEADLINE_MS } from '@hoptrendy/acp-bridge/mcpTimeouts';
 
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 

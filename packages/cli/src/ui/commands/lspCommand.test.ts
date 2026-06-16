@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import type { LspClient } from '@hopcode/hopcode-core';
+import type { LspClient } from '@hoptrendy/hopcode-core';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { MessageType } from '../types.js';
 import { lspCommand } from './lspCommand.js';

@@ -544,11 +544,11 @@ Create comprehensive docs for each provider:
 
 ### 5.1 Provider SDK for Contributions
 
-**Create:** `@hopcode/provider-sdk`
+**Create:** `@hoptrendy/provider-sdk`
 
 ```typescript
 // Template for community contributions
-import { BaseProvider } from '@hopcode/provider-sdk';
+import { BaseProvider } from '@hoptrendy/provider-sdk';
 
 export class MyCustomProvider extends BaseProvider {
   providerId = 'my-provider';

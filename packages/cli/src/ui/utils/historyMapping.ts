@@ -9,7 +9,7 @@ import type { Content } from '@google/genai';
 import {
   getStartupContextLength,
   isSystemReminderContent,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { isSlashCommand } from './commandUtils.js';
 
 /**

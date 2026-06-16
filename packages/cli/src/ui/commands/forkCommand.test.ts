@@ -22,7 +22,7 @@ vi.mock('../../i18n/index.js', () => ({
   },
 }));
 
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   createDebugLogger: () => ({ debug: () => undefined }),
   ToolNames: { AGENT: 'agent' },
   FORK_SUBAGENT_TYPE: 'fork',

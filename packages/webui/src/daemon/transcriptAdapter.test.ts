@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { DaemonTranscriptBlock } from '@hopcode/sdk/daemon';
+import type { DaemonTranscriptBlock } from '@hoptrendy/sdk/daemon';
 import { daemonTranscriptToUnifiedMessages } from './transcriptAdapter.js';
 
 describe('daemonTranscriptToUnifiedMessages', () => {

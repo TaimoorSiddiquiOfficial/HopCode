@@ -19,7 +19,7 @@ import {
   type ProviderConfig,
   type ProviderSetupInputs,
   type BaseUrlOption,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 /**
  * Auth message handler

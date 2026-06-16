@@ -7,8 +7,8 @@ import {
   useState,
   type KeyboardEvent,
 } from 'react';
-import type { DaemonSessionTaskStatus } from '@hopcode/sdk/daemon';
-import { useConnection } from '@hopcode/webui/daemon-react-sdk';
+import type { DaemonSessionTaskStatus } from '@hoptrendy/sdk/daemon';
+import { useConnection } from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../i18n';
 import styles from './StatusBar.module.css';
 

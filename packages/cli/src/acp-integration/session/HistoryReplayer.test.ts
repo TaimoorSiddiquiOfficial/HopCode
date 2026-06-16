@@ -13,7 +13,7 @@ import type {
   ToolRegistry,
   ToolResultDisplay,
   TodoResultDisplay,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 describe('HistoryReplayer', () => {
   let mockContext: SessionContext;

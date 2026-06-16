@@ -17,7 +17,7 @@
 
 import type { loadSettings } from '../config/settings.js';
 import { detectActiveProvider } from '../commands/auth/registry.js';
-import type { ProviderModelConfig as ModelConfig } from '@hopcode/hopcode-core';
+import type { ProviderModelConfig as ModelConfig } from '@hoptrendy/hopcode-core';
 import { isCodingPlanConfig } from '../constants/codingPlan.js';
 
 export interface ActiveProviderInfo {

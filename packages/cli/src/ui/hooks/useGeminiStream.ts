@@ -27,7 +27,7 @@ import type {
   GeminiErrorEventValue,
   StopFailureErrorType,
   ActiveGoal,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   GeminiEventType as ServerGeminiEventType,
   SendMessageType,
@@ -56,7 +56,7 @@ import {
   activeGoalEquals,
   setActiveGoal,
   clearActiveGoal,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { type Part, type PartListUnion, FinishReason } from '@google/genai';
 import type {
   HistoryItem,
@@ -2732,10 +2732,10 @@ export const useGeminiStream = (
   // otherwise a stale TeamManager could keep pushing into
   // the active queue ref after team recreation/remount.
   useEffect(() => {
-    let boundManager: import('@hopcode/hopcode-core').TeamManager | null =
+    let boundManager: import('@hoptrendy/hopcode-core').TeamManager | null =
       null;
     const handleManagerChange = (
-      manager: import('@hopcode/hopcode-core').TeamManager | null,
+      manager: import('@hoptrendy/hopcode-core').TeamManager | null,
     ) => {
       if (boundManager && boundManager !== manager) {
         boundManager.setLeaderMessageCallback(null);

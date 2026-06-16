@@ -336,7 +336,7 @@ hopcode workflows list
 ### GitHubAppAuth
 
 ```typescript
-import { GitHubAppAuth } from '@hopcode/hopcode-core';
+import { GitHubAppAuth } from '@hoptrendy/hopcode-core';
 
 const auth = new GitHubAppAuth({
   appId: '123456',
@@ -356,7 +356,7 @@ const repoToken = await auth.getTokenForRepository('owner', 'repo');
 ### GitHubMCPClient
 
 ```typescript
-import { GitHubMCPClient } from '@hopcode/hopcode-core';
+import { GitHubMCPClient } from '@hoptrendy/hopcode-core';
 
 const client = new GitHubMCPClient(config);
 

@@ -8,14 +8,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { bugCommand } from './bugCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { GIT_COMMIT_INFO } from '../../generated/git-commit.js';
-import { AuthType } from '@hopcode/hopcode-core';
+import { AuthType } from '@hoptrendy/hopcode-core';
 import * as systemInfoUtils from '../../utils/systemInfo.js';
 
 const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
 
 // Mock dependencies
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     openBrowserSecurely: mockOpenBrowserSecurely,

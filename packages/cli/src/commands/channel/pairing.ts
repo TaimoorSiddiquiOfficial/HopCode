@@ -1,5 +1,5 @@
 import type { CommandModule } from 'yargs';
-import { PairingStore } from '@hopcode/channel-base';
+import { PairingStore } from '@hoptrendy/channel-base';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 
 export const pairingListCommand: CommandModule<object, { name: string }> = {

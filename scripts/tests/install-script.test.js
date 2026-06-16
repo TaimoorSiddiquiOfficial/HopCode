@@ -68,7 +68,7 @@ describe('installation scripts', () => {
     );
     expect(script).toContain('Node.js 22 or newer is required');
     expect(script).toContain('npm_package_spec()');
-    expect(script).toContain('@hopcode/hopcode@latest');
+    expect(script).toContain('@hoptrendy/hopcode@latest');
     expect(script).toContain('Installing HopCode version:');
     expect(script).toContain('print_logo');
     expect(script).toContain('supports_truecolor()');
@@ -229,7 +229,7 @@ describe('installation scripts', () => {
     expect(script).toContain('Node.js 22 or newer is required');
     expect(script).toContain('Please install Node.js');
     expect(script).toContain(':NpmPackageSpec');
-    expect(script).toContain('@hopcode/hopcode@latest');
+    expect(script).toContain('@hoptrendy/hopcode@latest');
     expect(script).toContain('Installing HopCode version:');
     expect(script).toContain('HopCode');
     expect(script).toContain(
@@ -3345,7 +3345,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
         expect(output).toContain('Falling back to npm installation');
         expect(readScript(npmLog)).toContain(
-          'install -g @hopcode/hopcode@latest --registry',
+          'install -g @hoptrendy/hopcode@latest --registry',
         );
       } finally {
         rmSync(tmpDir, { recursive: true, force: true });
@@ -3420,7 +3420,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
       );
 
       expect(readScript(npmLog)).toContain(
-        'install -g @hopcode/hopcode@0.15.10 --registry',
+        'install -g @hoptrendy/hopcode@0.15.10 --registry',
       );
     } finally {
       rmSync(tmpDir, { recursive: true, force: true });
@@ -3644,7 +3644,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
 
         expect(output).toContain('Falling back to npm installation');
         expect(readScript(npmLog)).toContain(
-          'install -g @hopcode/hopcode@latest --registry',
+          'install -g @hoptrendy/hopcode@latest --registry',
         );
       } finally {
         rmSync(tmpDir, { recursive: true, force: true });
@@ -3682,7 +3682,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
       );
 
       expect(readScript(npmLog)).toContain(
-        'install -g @hopcode/hopcode@0.15.10 --registry',
+        'install -g @hoptrendy/hopcode@0.15.10 --registry',
       );
     } finally {
       rmSync(tmpDir, { recursive: true, force: true });
@@ -3822,7 +3822,7 @@ function ensureMinimalDist() {
   writeFileSync(path.join(distPath, 'chunks/index.js'), 'export {};\n');
   writeFileSync(
     path.join(distPath, 'package.json'),
-    JSON.stringify({ name: '@hopcode/hopcode', version: '0.0.0' }),
+    JSON.stringify({ name: '@hoptrendy/hopcode', version: '0.0.0' }),
   );
   return { backupPath, distPath };
 }
@@ -3921,7 +3921,7 @@ function createFakeWindowsStandaloneArchive(tmpDir) {
   writeFileSync(path.join(packageRoot, 'node', 'node.exe'), 'fake node.exe\n');
   writeFileSync(
     path.join(packageRoot, 'manifest.json'),
-    JSON.stringify({ name: '@hopcode/hopcode', target: 'win-x64' }),
+    JSON.stringify({ name: '@hoptrendy/hopcode', target: 'win-x64' }),
   );
 
   const archive = path.join(outDir, 'hopcode-win-x64.zip');
@@ -3939,7 +3939,7 @@ function createFakeWindowsStandaloneInstall(installRoot) {
 
   writeFileSync(
     path.join(installDir, 'manifest.json'),
-    JSON.stringify({ name: '@hopcode/hopcode', target: 'win-x64' }),
+    JSON.stringify({ name: '@hoptrendy/hopcode', target: 'win-x64' }),
   );
   writeFileSync(
     path.join(installDir, 'bin', 'hopcode.cmd'),
@@ -4335,7 +4335,7 @@ function createSymlinkStandaloneArchive(tmpDir) {
   chmodSync(path.join(packageRoot, 'node', 'bin', 'node'), 0o755);
   writeFileSync(
     path.join(packageRoot, 'manifest.json'),
-    JSON.stringify({ name: '@hopcode/hopcode', target: 'linux-x64' }),
+    JSON.stringify({ name: '@hoptrendy/hopcode', target: 'linux-x64' }),
   );
 
   const outDir = path.join(tmpDir, 'out');
@@ -4370,7 +4370,7 @@ function createTraversalStandaloneArchive(tmpDir) {
   chmodSync(path.join(packageRoot, 'node', 'bin', 'node'), 0o755);
   writeFileSync(
     path.join(packageRoot, 'manifest.json'),
-    JSON.stringify({ name: '@hopcode/hopcode', target: 'linux-x64' }),
+    JSON.stringify({ name: '@hoptrendy/hopcode', target: 'linux-x64' }),
   );
   writeFileSync(path.join(tmpDir, 'qwen-slip'), 'path traversal\n');
 

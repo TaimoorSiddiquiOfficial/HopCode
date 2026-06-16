@@ -8,7 +8,7 @@ import * as nodeFs from 'node:fs';
 import * as nodePath from 'node:path';
 import * as crypto from 'node:crypto';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
-import { Storage, updateSymlink } from '@hopcode/hopcode-core';
+import { Storage, updateSymlink } from '@hoptrendy/hopcode-core';
 
 export type DaemonLogLevel = 'INFO' | 'WARN' | 'ERROR';
 

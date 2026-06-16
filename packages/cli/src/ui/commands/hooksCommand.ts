@@ -16,7 +16,7 @@ import type {
   HookRegistryEntry,
   SessionHookEntry,
   HookEventName,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { supportsMatchers } from '../components/hooks/constants.js';
 import { normalizeMatcher } from '../components/hooks/matcherGrouping.js';
 

@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import Link from 'ink-link';
 import { theme } from '../semantic-colors.js';
-import type { DeviceAuthorizationData } from '@hopcode/hopcode-core';
+import type { DeviceAuthorizationData } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { t } from '../../i18n/index.js';
 

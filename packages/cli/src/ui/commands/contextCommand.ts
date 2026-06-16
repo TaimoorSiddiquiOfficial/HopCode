@@ -27,7 +27,7 @@ import {
   buildSkillLlmContent,
   computeThresholds,
   type CompactionThresholds,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 
 /**
@@ -100,7 +100,7 @@ function parseMemoryFiles(memoryContent: string): ContextMemoryDetail[] {
 }
 
 export async function collectContextData(
-  config: import('@hopcode/hopcode-core').Config,
+  config: import('@hoptrendy/hopcode-core').Config,
   showDetails: boolean,
 ): Promise<HistoryItemContextUsage> {
   const modelName = config.getModel() || 'unknown';

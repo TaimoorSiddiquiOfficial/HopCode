@@ -7,7 +7,7 @@
 import {
   getAutoMemoryRoot,
   getUserAutoMemoryRoot,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import type {
   CommandContext,

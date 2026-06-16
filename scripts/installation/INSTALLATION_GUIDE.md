@@ -315,7 +315,7 @@ unreadable source files are ignored.
 If source tracking is not needed and Node.js 22 or newer is already available:
 
 ```bash
-npm install -g @hopcode/hopcode@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
 Homebrew users can also install HopCode with:
@@ -347,7 +347,7 @@ fails with a permission error, fix the npm global install location or use a
 user-owned Node.js installation, then rerun:
 
 ```bash
-npm install -g @hopcode/hopcode@latest --registry https://registry.npmmirror.com
+npm install -g @hoptrendy/hopcode@latest --registry https://registry.npmmirror.com
 ```
 
 ### qwen Is Not on PATH After Installation

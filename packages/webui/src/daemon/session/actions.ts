@@ -14,12 +14,12 @@ import type {
   DaemonSessionTaskStatus,
   DaemonTranscriptStore,
   PermissionResponse,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import {
   isDaemonTurnError,
   isNonBlockingAccepted,
   type PromptResult,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { mapSupportedCommands } from './mappers.js';
 import { toDaemonPromptContent } from './promptContent.js';
 import {

@@ -8,7 +8,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import { RadioButtonSelect } from '../../shared/RadioButtonSelect.js';
 import type { ToolCategory } from '../types.js';
-import { Kind, type Config } from '@hopcode/hopcode-core';
+import { Kind, type Config } from '@hoptrendy/hopcode-core';
 import { theme } from '../../../semantic-colors.js';
 import { t } from '../../../../i18n/index.js';
 

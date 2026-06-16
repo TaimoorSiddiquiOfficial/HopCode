@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { Storage } from '@hopcode/hopcode-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 
 describe('bundled locale fallback', () => {
   beforeEach(() => {

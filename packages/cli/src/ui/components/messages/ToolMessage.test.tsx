@@ -17,7 +17,7 @@ import type {
   AnsiOutput,
   AnsiOutputDisplay,
   Config,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../../config/settings.js';
 
 vi.mock('../TerminalOutput.js', () => ({

@@ -1,9 +1,9 @@
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
+[![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 [![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/HopCode.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
-[![Downloads](https://img.shields.io/npm/dm/@hopcode/hopcode.svg)](https://www.npmjs.com/package/@hopcode/hopcode)
+[![Downloads](https://img.shields.io/npm/dm/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 
 <a href="https://trendshift.io/repositories/15287" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15287" alt="TaimoorSiddiquiOfficial%2Fhopcode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
@@ -66,7 +66,7 @@ Make sure you have Node.js 22 or later installed. Download it from [nodejs.org](
 #### NPM
 
 ```bash
-npm install -g @hopcode/hopcode@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
 #### Homebrew (macOS, Linux)

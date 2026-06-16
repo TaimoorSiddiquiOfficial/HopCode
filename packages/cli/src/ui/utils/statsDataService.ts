@@ -11,7 +11,7 @@ import {
   type AggregatedReport,
   type TimeRange,
   type UsageSummaryRecord,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 export interface StatsData {
   report: AggregatedReport;

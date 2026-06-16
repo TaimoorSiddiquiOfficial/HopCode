@@ -10,7 +10,7 @@ import {
   createDebugLogger,
   resolveOpenAILogDir,
   Storage,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { CommandContext } from '../ui/commands/types.js';
 
 const debugLogger = createDebugLogger('SESSION_PATHS');

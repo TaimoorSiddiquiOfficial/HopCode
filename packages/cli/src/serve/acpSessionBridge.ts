@@ -10,26 +10,26 @@
  * #4175 PR F1 lifted the bridge core (`BridgeClient`,
  * `defaultSpawnChannelFactory`, `createAcpSessionBridge` factory closure,
  * plus the supporting types/errors/options/status) to
- * `@hopcode/acp-bridge`. This shim preserves every existing relative
+ * `@hoptrendy/acp-bridge`. This shim preserves every existing relative
  * import path (`./acpSessionBridge.js`) so `server.ts`, `runHopCodeServe.ts`,
  * `workspaceAgents.ts`, `workspaceMemory.ts`, `index.ts`, plus the
  * bridge test suite, keep resolving without any call-site changes.
  *
  * The implementation now lives at:
- *   - `@hopcode/acp-bridge/bridge` — `createAcpSessionBridge` factory
- *   - `@hopcode/acp-bridge/bridgeClient` — `BridgeClient` class +
+ *   - `@hoptrendy/acp-bridge/bridge` — `createAcpSessionBridge` factory
+ *   - `@hoptrendy/acp-bridge/bridgeClient` — `BridgeClient` class +
  *     permission record types
- *   - `@hopcode/acp-bridge/spawnChannel` — `defaultSpawnChannelFactory`
- *   - `@hopcode/acp-bridge/bridgeOptions` — `BridgeOptions` +
+ *   - `@hoptrendy/acp-bridge/spawnChannel` — `defaultSpawnChannelFactory`
+ *   - `@hoptrendy/acp-bridge/bridgeOptions` — `BridgeOptions` +
  *     `DaemonStatusProvider` interfaces
- *   - `@hopcode/acp-bridge/bridgeTypes` — bridge session + heartbeat
+ *   - `@hoptrendy/acp-bridge/bridgeTypes` — bridge session + heartbeat
  *     types + `AcpSessionBridge` interface
- *   - `@hopcode/acp-bridge/bridgeErrors` — typed bridge error classes
- *   - `@hopcode/acp-bridge/workspacePaths` — `canonicalizeWorkspace`
+ *   - `@hoptrendy/acp-bridge/bridgeErrors` — typed bridge error classes
+ *   - `@hoptrendy/acp-bridge/workspacePaths` — `canonicalizeWorkspace`
  *     + `MAX_WORKSPACE_PATH_LENGTH`
- *   - `@hopcode/acp-bridge/status` — protocol-versioned status types
+ *   - `@hoptrendy/acp-bridge/status` — protocol-versioned status types
  *     + idle envelope helpers
- *   - `@hopcode/acp-bridge/channel` — `AcpChannel` + `ChannelFactory`
+ *   - `@hoptrendy/acp-bridge/channel` — `AcpChannel` + `ChannelFactory`
  *
  * The bridge is bound to a single canonical workspace
  * (`BridgeOptions.boundWorkspace`); multi-workspace deployments use
@@ -40,26 +40,26 @@
 export {
   createAcpSessionBridge,
   createHttpAcpBridge,
-} from '@hopcode/acp-bridge/bridge';
-export { defaultSpawnChannelFactory } from '@hopcode/acp-bridge/spawnChannel';
+} from '@hoptrendy/acp-bridge/bridge';
+export { defaultSpawnChannelFactory } from '@hoptrendy/acp-bridge/spawnChannel';
 // `MAX_RESOLVED_PERMISSION_RECORDS`, `PendingPermission`,
 // `PermissionResolutionRecord` re-exports were removed alongside the
 // source definitions — the mediator now owns pending+resolved state.
-export { BridgeClient } from '@hopcode/acp-bridge/bridgeClient';
-export type { BridgeClientSessionEntry } from '@hopcode/acp-bridge/bridgeClient';
+export { BridgeClient } from '@hoptrendy/acp-bridge/bridgeClient';
+export type { BridgeClientSessionEntry } from '@hoptrendy/acp-bridge/bridgeClient';
 
 export type {
   AcpChannel,
   AcpChannelExitInfo,
   ChannelFactory,
-} from '@hopcode/acp-bridge';
+} from '@hoptrendy/acp-bridge';
 
 export type {
   BridgeOptions,
   DaemonStatusProvider,
-} from '@hopcode/acp-bridge/bridgeOptions';
+} from '@hoptrendy/acp-bridge/bridgeOptions';
 
-export type { BridgeFileSystem } from '@hopcode/acp-bridge/bridgeFileSystem';
+export type { BridgeFileSystem } from '@hoptrendy/acp-bridge/bridgeFileSystem';
 
 export type {
   BridgeSpawnRequest,
@@ -77,7 +77,7 @@ export type {
   BridgeDaemonStatusSnapshot,
   AcpSessionBridge,
   HttpAcpBridge,
-} from '@hopcode/acp-bridge/bridgeTypes';
+} from '@hoptrendy/acp-bridge/bridgeTypes';
 
 export {
   BranchWhilePromptActiveError,
@@ -105,9 +105,9 @@ export {
   PermissionPolicyNotImplementedError,
   SessionShellClientRequiredError,
   SessionShellDisabledError,
-} from '@hopcode/acp-bridge/bridgeErrors';
+} from '@hoptrendy/acp-bridge/bridgeErrors';
 
 export {
   MAX_WORKSPACE_PATH_LENGTH,
   canonicalizeWorkspace,
-} from '@hopcode/acp-bridge/workspacePaths';
+} from '@hoptrendy/acp-bridge/workspacePaths';

@@ -28,7 +28,7 @@ import {
   SlashCommandStatus,
   ToolConfirmationOutcome,
   makeFakeConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 const { logSlashCommand, debugLoggerMock } = vi.hoisted(() => ({
   logSlashCommand: vi.fn(),
@@ -40,9 +40,9 @@ const { logSlashCommand, debugLoggerMock } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...original,
     logSlashCommand,

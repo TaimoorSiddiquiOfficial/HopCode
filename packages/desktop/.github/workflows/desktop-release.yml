@@ -28,7 +28,7 @@ on:
         default: main
         type: string
       HOPCODE_code_version:
-        description: "Optional exact @hopcode/hopcode npm version for pinned_package_version. Defaults to package.json HopCodeRuntime.version."
+        description: "Optional exact @hoptrendy/hopcode npm version for pinned_package_version. Defaults to package.json HopCodeRuntime.version."
         required: false
         type: string
       dry_run:

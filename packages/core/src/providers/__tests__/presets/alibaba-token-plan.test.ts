@@ -16,7 +16,7 @@ import {
   getDefaultModelIds,
   resolveBaseUrl,
   providerMatchesCredentials,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 describe('token plan provider', () => {
   it('creates a Token Plan install plan', () => {

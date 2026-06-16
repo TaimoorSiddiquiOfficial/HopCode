@@ -8,7 +8,7 @@ import type React from 'react';
 import { Box, Text } from 'ink';
 import type { IndividualToolCallDisplay } from '../../types.js';
 import { ToolCallStatus } from '../../types.js';
-import type { AnsiOutputDisplay } from '@hopcode/hopcode-core';
+import type { AnsiOutputDisplay } from '@hoptrendy/hopcode-core';
 import { SHELL_COMMAND_NAME, SHELL_NAME } from '../../constants.js';
 import { theme } from '../../semantic-colors.js';
 import { t } from '../../../i18n/index.js';

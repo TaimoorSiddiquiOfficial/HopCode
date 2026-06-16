@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import type {
   DaemonToolTranscriptBlock,
   DaemonTranscriptBlock,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import {
   extractDaemonTodosFromToolBlock,
   isDaemonSubAgentToolBlock,

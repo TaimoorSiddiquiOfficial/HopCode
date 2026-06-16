@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import type { DialogEntry } from '../../hooks/useBackgroundTaskView.js';
 import { getPillLabel, hasPendingApproval } from './BackgroundTasksPill.js';
-import type { BackgroundApproval } from '@hopcode/hopcode-core';
+import type { BackgroundApproval } from '@hoptrendy/hopcode-core';
 
 function approval(callId: string): BackgroundApproval {
   return {

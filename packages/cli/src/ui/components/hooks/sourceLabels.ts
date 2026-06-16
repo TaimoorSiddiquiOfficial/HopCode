@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { HooksConfigSource } from '@hopcode/hopcode-core';
+import { HooksConfigSource } from '@hoptrendy/hopcode-core';
 import type { HookConfigDisplayInfo } from './types.js';
 import { getTranslatedSourceDisplayMap } from './constants.js';
 import { t } from '../../../i18n/index.js';

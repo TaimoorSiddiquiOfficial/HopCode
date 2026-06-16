@@ -6,5 +6,5 @@
  * Re-export session grouping utilities from webui for backward compatibility
  */
 
-export { groupSessionsByDate, getTimeAgo } from '@hopcode/webui';
-export type { SessionGroup } from '@hopcode/webui';
+export { groupSessionsByDate, getTimeAgo } from '@hoptrendy/webui';
+export type { SessionGroup } from '@hoptrendy/webui';

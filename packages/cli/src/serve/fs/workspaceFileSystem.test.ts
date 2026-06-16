@@ -9,7 +9,7 @@ import { promises as fsp } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
-import { Ignore } from '@hopcode/hopcode-core';
+import { Ignore } from '@hoptrendy/hopcode-core';
 import {
   FS_ACCESS_EVENT_TYPE,
   FS_DENIED_EVENT_TYPE,

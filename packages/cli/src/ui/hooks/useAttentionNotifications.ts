@@ -7,11 +7,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { StreamingState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   fireNotificationHook,
   NotificationType,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { TerminalNotification } from './useTerminalNotification.js';
 import type { TrackedToolCall } from './useReactToolScheduler.js';
 import { sendNotification } from '../../services/notificationService.js';

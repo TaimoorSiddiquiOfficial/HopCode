@@ -9,7 +9,7 @@ import type {
   ComputedSessionStats,
   ModelMetricsCore,
 } from '../contexts/SessionContext.js';
-import { estimateModelCost } from '@hopcode/hopcode-core';
+import { estimateModelCost } from '@hoptrendy/hopcode-core';
 
 export function calculateErrorRate(metrics: ModelMetricsCore): number {
   if (metrics.api.totalRequests === 0) {

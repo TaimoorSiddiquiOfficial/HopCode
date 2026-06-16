@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useTranscriptBlocks } from '@hopcode/webui/daemon-react-sdk';
+import { useTranscriptBlocks } from '@hoptrendy/webui/daemon-react-sdk';
 import { transcriptBlocksToDaemonMessages } from '../adapters/transcriptToMessages';
 import type { Message } from '../adapters/types';
 

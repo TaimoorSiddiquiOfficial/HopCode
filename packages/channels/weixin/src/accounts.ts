@@ -12,7 +12,7 @@ import {
   chmodSync,
 } from 'node:fs';
 import { join } from 'node:path';
-import { getGlobalHopCodeDir } from '@hopcode/channel-base';
+import { getGlobalHopCodeDir } from '@hoptrendy/channel-base';
 
 export const DEFAULT_BASE_URL = 'https://ilinkai.weixin.qq.com';
 

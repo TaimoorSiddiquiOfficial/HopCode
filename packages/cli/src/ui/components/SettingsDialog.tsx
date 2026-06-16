@@ -34,7 +34,7 @@ import {
 } from '../contexts/VimModeContext.js';
 import { useCompactMode } from '../contexts/CompactModeContext.js';
 import { useUIActions } from '../contexts/UIActionsContext.js';
-import { createDebugLogger, type Config } from '@hopcode/hopcode-core';
+import { createDebugLogger, type Config } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { keyMatchers, Command } from '../keyMatchers.js';
 import chalk from 'chalk';

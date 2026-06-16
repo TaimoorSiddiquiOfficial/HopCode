@@ -7,7 +7,7 @@
 import type React from 'react';
 import { Text } from 'ink';
 import { theme } from '../semantic-colors.js';
-import { ApprovalMode } from '@hopcode/hopcode-core';
+import { ApprovalMode } from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import { getApprovalModeIndicatorColor } from './approvalModeVisuals.js';
 

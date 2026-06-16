@@ -17,13 +17,13 @@ Per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02 each daemon bind
 In another:
 
 ```bash
-npm install @hopcode/sdk
+npm install @hoptrendy/sdk
 ```
 
 ## Hello daemon
 
 ```ts
-import { DaemonClient, type DaemonEvent } from '@hopcode/sdk';
+import { DaemonClient, type DaemonEvent } from '@hoptrendy/sdk';
 
 const client = new DaemonClient({
   baseUrl: 'http://127.0.0.1:4170',
@@ -205,7 +205,7 @@ Both clients see the same `session_update` / `permission_request` stream. Either
 If `workspaceCwd` doesn't match the daemon's bound workspace, `createOrAttachSession` rejects with `DaemonHttpError` carrying status `400` and a structured body:
 
 ```ts
-import { DaemonHttpError } from '@hopcode/sdk';
+import { DaemonHttpError } from '@hoptrendy/sdk';
 
 try {
   await client.createOrAttachSession({ workspaceCwd: '/some/other/project' });
@@ -247,12 +247,12 @@ const client = new DaemonClient({
 const client = new DaemonClient({ baseUrl: 'https://your-host:4170' });
 ```
 
-The fallback strips leading/trailing whitespace (handy for `export HOPCODE_SERVER_TOKEN="$(cat token.txt)"` where `cat` adds a newline) and treats empty / whitespace-only values as unset (a stale `export HOPCODE_SERVER_TOKEN=""` won't accidentally send `Authorization: Bearer ` with no token). The fallback runs once at construction; later `process.env` mutations don't affect already-built clients. Browser bundles (e.g. via `@hopcode/webui`) get `undefined` cleanly because `globalThis.process` doesn't exist there.
+The fallback strips leading/trailing whitespace (handy for `export HOPCODE_SERVER_TOKEN="$(cat token.txt)"` where `cat` adds a newline) and treats empty / whitespace-only values as unset (a stale `export HOPCODE_SERVER_TOKEN=""` won't accidentally send `Authorization: Bearer ` with no token). The fallback runs once at construction; later `process.env` mutations don't affect already-built clients. Browser bundles (e.g. via `@hoptrendy/webui`) get `undefined` cleanly because `globalThis.process` doesn't exist there.
 
 Wrong / missing tokens return `401` with a uniform body — the SDK throws `DaemonHttpError` on any 4xx/5xx from a route handler.
 
 ```ts
-import { DaemonHttpError } from '@hopcode/sdk';
+import { DaemonHttpError } from '@hoptrendy/sdk';
 
 try {
   await client.health();

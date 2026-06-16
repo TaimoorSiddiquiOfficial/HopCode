@@ -8,7 +8,7 @@ import type {
   DaemonTextTranscriptBlock,
   DaemonToolTranscriptBlock,
   DaemonTranscriptBlock,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import type {
   DaemonPromptStatus,
   DaemonTodoItem,

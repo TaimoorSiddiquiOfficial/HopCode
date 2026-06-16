@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 /**
  * Direct simulation of the listener-accumulation pattern the agent runtime
  * exhibits in long sessions. Builds a deep parent → child chain to a depth
@@ -19,7 +19,7 @@
 import { getEventListeners, setMaxListeners } from 'node:events';
 
 // Inline copy of the production helper (packages/core/src/utils/abortController.ts)
-// so this script has no build-step dependency on @hopcode/hopcode-core.
+// so this script has no build-step dependency on @hoptrendy/hopcode-core.
 // Kept in sync — the child is held STRONGLY by the parent's listener closure
 // (no WeakRef on child) so propagation works even when a caller drops the
 // controller and keeps only the signal. WeakRef is used only on the PARENT,

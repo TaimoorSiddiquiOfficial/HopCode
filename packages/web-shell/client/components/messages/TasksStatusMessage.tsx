@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   DaemonSessionTasksStatus,
   DaemonSessionTaskStatus,
-} from '@hopcode/sdk/daemon';
-import { useActions } from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/sdk/daemon';
+import { useActions } from '@hoptrendy/webui/daemon-react-sdk';
 import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import { useI18n } from '../../i18n';
 import { formatRuntime } from '../../utils/formatRuntime';

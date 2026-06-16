@@ -117,8 +117,8 @@ const exportHtmlPackageJsonPath = resolve(
   'packages/web-templates/src/export-html/package.json',
 );
 const exportHtmlPackageJson = readJson(exportHtmlPackageJsonPath);
-if (exportHtmlPackageJson.dependencies?.['@hopcode/webui']) {
-  exportHtmlPackageJson.dependencies['@hopcode/webui'] = `^${newVersion}`;
+if (exportHtmlPackageJson.dependencies?.['@hoptrendy/webui']) {
+  exportHtmlPackageJson.dependencies['@hoptrendy/webui'] = `^${newVersion}`;
   writeJson(exportHtmlPackageJsonPath, exportHtmlPackageJson);
 }
 

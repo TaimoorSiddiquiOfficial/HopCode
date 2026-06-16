@@ -6,7 +6,7 @@
 
 /**
  * `BridgeOptions` and the daemon-host injection seam (`DaemonStatusProvider`)
- * for the ACP bridge factory. Lifted to `@hopcode/acp-bridge` so the
+ * for the ACP bridge factory. Lifted to `@hoptrendy/acp-bridge` so the
  * bridge package owns the construction contract independently of
  * `cli/src/serve/`.
  */
@@ -14,7 +14,7 @@
 import type {
   ApprovalMode,
   DaemonBridgeTelemetryMetrics,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { ChannelFactory } from './channel.js';
 import type { PermissionPolicy } from './permission.js';
 import type { PermissionAuditPublisher } from './permissionMediator.js';

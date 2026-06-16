@@ -5,7 +5,7 @@
  */
 
 import { useState, useRef, useCallback, useMemo } from 'react';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import type { HistoryItem, HistoryItemWithoutId } from '../types.js';
 import process from 'node:process';
 

@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PlanEmitter } from './PlanEmitter.js';
 import type { SessionContext, TodoItem } from '../types.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 
 describe('PlanEmitter', () => {
   let mockContext: SessionContext;

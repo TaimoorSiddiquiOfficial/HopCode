@@ -4,7 +4,7 @@ import {
   useMemory,
   type DaemonContextFileScope,
   type DaemonWorkspaceMemoryFile,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import { useI18n } from '../../i18n';
 import styles from './MemoryMessage.module.css';

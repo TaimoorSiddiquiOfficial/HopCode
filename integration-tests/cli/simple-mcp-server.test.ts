@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -14,7 +14,7 @@ import { describe, it, beforeAll, afterAll, expect } from 'vitest';
 import { TestRig, validateModelOutput } from '../test-helper.js';
 import { join, resolve } from 'node:path';
 import { writeFileSync } from 'node:fs';
-import { hashMcpServerConfig } from '@hopcode/hopcode-core';
+import { hashMcpServerConfig } from '@hoptrendy/hopcode-core';
 
 // Create a minimal MCP server that doesn't require external dependencies
 // This implements the MCP protocol directly using Node.js built-ins

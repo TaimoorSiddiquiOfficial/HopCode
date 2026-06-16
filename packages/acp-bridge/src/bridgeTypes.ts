@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ApprovalMode } from '@hopcode/hopcode-core';
+import type { ApprovalMode } from '@hoptrendy/hopcode-core';
 import type {
   CancelNotification,
   LoadSessionResponse,

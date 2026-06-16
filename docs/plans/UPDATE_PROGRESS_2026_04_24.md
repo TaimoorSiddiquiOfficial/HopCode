@@ -14,7 +14,7 @@ All core dependencies have been successfully updated to their latest compatible 
 
 ### Updated Packages
 
-#### Root Package (`@hopcode/hopcode`)
+#### Root Package (`@hoptrendy/hopcode`)
 
 | Package             | Before  | After   | Δ      |
 | ------------------- | ------- | ------- | ------ |
@@ -27,7 +27,7 @@ All core dependencies have been successfully updated to their latest compatible 
 | `typescript-eslint` | ^8.30.1 | ^8.32.0 | +2.0.0 |
 | `simple-git`        | ^3.28.0 | ^3.29.0 | +1.0.0 |
 
-#### Core Package (`@hopcode/hopcode-core`)
+#### Core Package (`@hoptrendy/hopcode-core`)
 
 **AI SDK Updates**:
 | Package | Before | After | Δ |
@@ -81,7 +81,7 @@ All core dependencies have been successfully updated to their latest compatible 
 | `yaml` | ^2.7.0 | ^2.8.0 | +0.1.0 |
 | `zod` | ^3.25.0 | ^3.25.76 | +0.0.76 |
 
-#### CLI Package (`@hopcode/hopcode`)
+#### CLI Package (`@hoptrendy/hopcode`)
 
 | Package            | Before    | After    | Δ       |
 | ------------------ | --------- | -------- | ------- |
@@ -134,12 +134,12 @@ npm run build
 
 ```
 npm run typecheck
-✓ @hopcode/hopcode
-✓ @hopcode/hopcode-core
-✓ @hopcode/sdk
-✓ @hopcode/hopcode-server
-✓ @hopcode/web-dashboard
-✓ @hopcode/webui
+✓ @hoptrendy/hopcode
+✓ @hoptrendy/hopcode-core
+✓ @hoptrendy/sdk
+✓ @hoptrendy/hopcode-server
+✓ @hoptrendy/web-dashboard
+✓ @hoptrendy/webui
 ```
 
 ### ✅ ESLint
@@ -156,7 +156,7 @@ cd packages/core && npx vitest run src/config/config.test.ts
 ✓ 98 tests passed (config.test.ts)
 ```
 
-**Note**: One pre-existing test failure in CLI package related to `@hopcode/hopcode-server` entry point (unrelated to dependency updates).
+**Note**: One pre-existing test failure in CLI package related to `@hoptrendy/hopcode-server` entry point (unrelated to dependency updates).
 
 ---
 

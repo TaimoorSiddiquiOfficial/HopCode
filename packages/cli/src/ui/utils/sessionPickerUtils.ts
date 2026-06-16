@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SessionListItem } from '@hopcode/hopcode-core';
+import type { SessionListItem } from '@hoptrendy/hopcode-core';
 
 /**
  * State for managing loaded sessions in the session picker.

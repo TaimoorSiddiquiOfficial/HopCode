@@ -1,4 +1,4 @@
-import type { DaemonTranscriptBlock } from '@hopcode/webui/daemon-react-sdk';
+import type { DaemonTranscriptBlock } from '@hoptrendy/webui/daemon-react-sdk';
 import type { PermissionRequest, PermissionOptionKind } from './types';
 
 type PermissionTranscriptBlock = Extract<

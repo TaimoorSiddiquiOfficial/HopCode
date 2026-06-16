@@ -1,4 +1,4 @@
-﻿/**
+/**
  * E2E tests for single-turn query execution
  * Tests basic query patterns with simple prompts and clear output expectations
  */
@@ -13,7 +13,7 @@ import {
   type SDKMessage,
   type SDKSystemMessage,
   type SDKAssistantMessage,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 import {
   SDKTestHelper,
   extractText,

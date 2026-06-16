@@ -8,7 +8,7 @@ import {
   ExtensionManager,
   redactUrlCredentials,
   type Extension,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import {
   requestConsentOrFail,

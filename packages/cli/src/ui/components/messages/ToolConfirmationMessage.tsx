@@ -16,12 +16,12 @@ import type {
   ToolMcpConfirmationDetails,
   Config,
   EditorType,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   IdeClient,
   ToolConfirmationOutcome,
   buildHumanReadableRuleLabel,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { RadioSelectItem } from '../shared/RadioButtonSelect.js';
 import { RadioButtonSelect } from '../shared/RadioButtonSelect.js';
 import { MaxSizedBox } from '../shared/MaxSizedBox.js';

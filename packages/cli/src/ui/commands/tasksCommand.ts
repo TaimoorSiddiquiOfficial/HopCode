@@ -9,7 +9,7 @@ import {
   type AgentTask,
   type MonitorTask,
   type ShellTask,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { SlashCommand } from './types.js';
 import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';

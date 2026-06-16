@@ -16,8 +16,8 @@ import { ColorSelector } from '../create/ColorSelector.js';
 import { MANAGEMENT_STEPS } from '../types.js';
 import { theme } from '../../../semantic-colors.js';
 import { getColorForDisplay, shouldShowColor } from '../utils.js';
-import type { SubagentConfig, Config } from '@hopcode/hopcode-core';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import type { SubagentConfig, Config } from '@hoptrendy/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../../../hooks/useKeypress.js';
 import { t } from '../../../../i18n/index.js';
 

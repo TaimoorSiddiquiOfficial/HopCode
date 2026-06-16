@@ -8,11 +8,11 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { clearCommand } from './clearCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
-import { SessionEndReason } from '@hopcode/hopcode-core';
+import { SessionEndReason } from '@hoptrendy/hopcode-core';
 
 // Mock the telemetry service
-vi.mock('@hopcode/hopcode-core', async () => {
-  const actual = await vi.importActual('@hopcode/hopcode-core');
+vi.mock('@hoptrendy/hopcode-core', async () => {
+  const actual = await vi.importActual('@hoptrendy/hopcode-core');
   return {
     ...actual,
     uiTelemetryService: {
@@ -179,7 +179,7 @@ describe('clearCommand', () => {
   });
 
   it('should persist usage when session has activity before clearing', async () => {
-    const core = await import('@hopcode/hopcode-core');
+    const core = await import('@hoptrendy/hopcode-core');
     (
       core.uiTelemetryService.getMetrics as ReturnType<typeof vi.fn>
     ).mockReturnValue({
@@ -192,7 +192,7 @@ describe('clearCommand', () => {
   });
 
   it('should not persist usage when session has no activity', async () => {
-    const core = await import('@hopcode/hopcode-core');
+    const core = await import('@hoptrendy/hopcode-core');
     (
       core.uiTelemetryService.getMetrics as ReturnType<typeof vi.fn>
     ).mockReturnValue({

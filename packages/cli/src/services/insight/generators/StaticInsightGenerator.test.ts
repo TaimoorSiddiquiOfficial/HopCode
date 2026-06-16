@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import path from 'path';
 import fs from 'fs/promises';
-import { Storage, type Config } from '@hopcode/hopcode-core';
+import { Storage, type Config } from '@hoptrendy/hopcode-core';
 import { StaticInsightGenerator } from './StaticInsightGenerator.js';
 
 vi.mock('fs/promises', () => ({

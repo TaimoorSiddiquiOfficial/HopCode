@@ -18,7 +18,7 @@ import {
   reportIznScope,
   type IznGateResult,
   type IznBlockHistoryEntry,
-} from '@hopcode/quran-guidance';
+} from '@hoptrendy/quran-guidance';
 
 /**
  * Builds a system-reminder message with the Izn gate's analysis plan,

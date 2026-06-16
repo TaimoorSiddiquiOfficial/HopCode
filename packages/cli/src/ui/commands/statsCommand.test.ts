@@ -9,8 +9,8 @@ import { statsCommand } from './statsCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { MessageType } from '../types.js';
-import { MAIN_SOURCE } from '@hopcode/hopcode-core';
-import type { ModelMetricsCore, ModelMetrics } from '@hopcode/hopcode-core';
+import { MAIN_SOURCE } from '@hoptrendy/hopcode-core';
+import type { ModelMetricsCore, ModelMetrics } from '@hoptrendy/hopcode-core';
 
 const toModelMetrics = (core: ModelMetricsCore): ModelMetrics => ({
   ...core,

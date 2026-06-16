@@ -11,8 +11,8 @@ import { tmpdir } from 'node:os';
 import type {
   ConfigParameters,
   ContentGeneratorConfig,
-} from '@hopcode/hopcode-core';
-import { Config } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import { Config } from '@hoptrendy/hopcode-core';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 export const server = setupServer();
@@ -39,8 +39,8 @@ const TEST_CONTENT_GENERATOR_CONFIG: ContentGeneratorConfig = {
 };
 
 // Mock file discovery service and tool registry
-vi.mock('@hopcode/hopcode-core', async () => {
-  const actual = await vi.importActual('@hopcode/hopcode-core');
+vi.mock('@hoptrendy/hopcode-core', async () => {
+  const actual = await vi.importActual('@hoptrendy/hopcode-core');
   return {
     ...actual,
     FileDiscoveryService: vi.fn().mockImplementation(() => ({

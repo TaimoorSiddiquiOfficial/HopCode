@@ -45,7 +45,7 @@ hopcode-serve-mcp
     "hopcode-serve-bridge": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "-p", "@hopcode/sdk", "hopcode-serve-mcp"],
+      "args": ["-y", "-p", "@hoptrendy/sdk", "hopcode-serve-mcp"],
       "env": {
         "HOPCODE_DAEMON_URL": "http://127.0.0.1:4170",
         "HOPCODE_DAEMON_TOKEN": "<your-token>"
@@ -58,7 +58,7 @@ hopcode-serve-mcp
 ### 方式二：全局安装后使用
 
 ```bash
-npm install -g @hopcode/sdk
+npm install -g @hoptrendy/sdk
 ```
 
 ```json
@@ -105,7 +105,7 @@ npm install -g @hopcode/sdk
 ### 编程式使用
 
 ```typescript
-import { createServeBridgeMcpServer } from '@hopcode/sdk';
+import { createServeBridgeMcpServer } from '@hoptrendy/sdk';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
 const server = createServeBridgeMcpServer({

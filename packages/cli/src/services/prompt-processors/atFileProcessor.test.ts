@@ -9,12 +9,12 @@ import { createMockCommandContext } from '../../test-utils/mockCommandContext.js
 import { type CommandContext } from '../../ui/commands/types.js';
 import { AtFileProcessor } from './atFileProcessor.js';
 import { MessageType } from '../../ui/types.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import type { PartUnion } from '@google/genai';
 
 // Mock the core dependency
 const mockReadPathFromWorkspace = vi.hoisted(() => vi.fn());
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const original = await importOriginal<object>();
   return {
     ...original,

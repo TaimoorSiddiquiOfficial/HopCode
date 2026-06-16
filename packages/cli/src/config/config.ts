@@ -34,7 +34,7 @@ import {
   SchemaValidator,
   type ConfigParameters,
   type MCPServerConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { extensionsCommand } from '../commands/extensions.js';
 import { hooksCommand } from '../commands/hooks.js';
 import { normalizeDisabledToolList } from './normalizeDisabledTools.js';

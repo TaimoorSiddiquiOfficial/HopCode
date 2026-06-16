@@ -9,7 +9,7 @@
 @tailwind utilities;
 
 /**
- * Default CSS variables for @hopcode/webui
+ * Default CSS variables for @hoptrendy/webui
  * These provide fallback values when running outside of VSCode.
  * In VSCode, these will be overridden by VSCode's design tokens.
  */

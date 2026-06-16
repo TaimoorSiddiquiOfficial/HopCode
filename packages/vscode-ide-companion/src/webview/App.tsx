@@ -22,8 +22,8 @@ import {
   shouldSendMessage,
   useMessageSubmit,
 } from './hooks/useMessageSubmit.js';
-import type { PermissionOption, PermissionToolCall } from '@hopcode/webui';
-import { stripZeroWidthSpaces } from '@hopcode/webui';
+import type { PermissionOption, PermissionToolCall } from '@hoptrendy/webui';
+import { stripZeroWidthSpaces } from '@hoptrendy/webui';
 import type { TextMessage } from './hooks/message/useMessageHandling.js';
 import type { ToolCallData } from './components/messages/toolcalls/ToolCall.js';
 import { ToolCall } from './components/messages/toolcalls/ToolCall.js';
@@ -49,7 +49,7 @@ import {
   EmptyState,
   ChatHeader,
   SessionSelector,
-} from '@hopcode/webui';
+} from '@hoptrendy/webui';
 import { InputForm } from './components/layout/InputForm.js';
 import {
   AccountInfoDialog,

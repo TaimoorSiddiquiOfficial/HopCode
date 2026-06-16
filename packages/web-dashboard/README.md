@@ -1,4 +1,4 @@
-# @hopcode/web-dashboard
+# @hoptrendy/web-dashboard
 
 Standalone web dashboard for **HopCode** — browse session history, read chat transcripts, and track token/cost stats — all from your browser.
 
@@ -59,7 +59,7 @@ packages/web-dashboard/
 │   ├── App.tsx            Root layout (header + sidebar + main)
 │   ├── components/
 │   │   ├── SessionList.tsx  Left sidebar — session list with search
-│   │   ├── ChatPanel.tsx    Main area — chat replay using @hopcode/webui
+│   │   ├── ChatPanel.tsx    Main area — chat replay using @hoptrendy/webui
 │   │   └── StatsBar.tsx     Top-right global stats
 │   └── styles.css         Dark-mode UI styles
 ├── vite.config.ts         Vite build config (proxies /api → :7899)

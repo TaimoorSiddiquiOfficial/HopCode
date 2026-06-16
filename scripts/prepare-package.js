@@ -161,9 +161,9 @@ if (result.signal) {
     repository: rootPackageJson.repository,
     type: 'module',
     main: 'cli.js',
-    bin: {
-      qwen: 'cli-entry.js',
-    },
+      bin: {
+        hopcode: 'cli-entry.js',
+      },
     files: [
       'cli-entry.js',
       'cli.js',

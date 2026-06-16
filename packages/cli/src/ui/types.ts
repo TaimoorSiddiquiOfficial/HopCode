@@ -17,7 +17,7 @@ import type {
   ToolResultDisplay,
   AgentStatus,
   ArenaDiffSummary,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { PartListUnion } from '@google/genai';
 import { type ReactNode } from 'react';
 

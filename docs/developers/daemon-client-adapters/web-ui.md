@@ -16,7 +16,7 @@ import {
   DaemonSessionClient,
   createDaemonTranscriptStore,
   normalizeDaemonEvent,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 ```
 
 The split is:
@@ -26,7 +26,7 @@ The split is:
 - `normalizeDaemonEvent()` converts daemon wire events into UI events.
 - `createDaemonTranscriptStore()` reduces UI events into transcript blocks.
 
-React clients can use the optional `@hopcode/webui` binding:
+React clients can use the optional `@hoptrendy/webui` binding:
 
 ```tsx
 import {
@@ -35,7 +35,7 @@ import {
   useDaemonConnection,
   useDaemonPendingPermissions,
   useDaemonTranscriptBlocks,
-} from '@hopcode/webui';
+} from '@hoptrendy/webui';
 ```
 
 Minimal React shape:
@@ -114,5 +114,5 @@ Ink rendering.
 - Build first-class chat and terminal renderers on top of transcript blocks.
 - Add richer typed events only where existing daemon events are too low-level
   for stable browser UI behavior.
-- Consider a dedicated `@hopcode/daemon-ui-core` package if non-SDK consumers
+- Consider a dedicated `@hoptrendy/daemon-ui-core` package if non-SDK consumers
   need the UI core as an independent dependency.

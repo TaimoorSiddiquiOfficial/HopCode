@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { DaemonSessionTasksStatus } from '@hopcode/sdk/daemon';
+import type { DaemonSessionTasksStatus } from '@hoptrendy/sdk/daemon';
 import {
   parseTasksStatusMessage,
   serializeTasksStatusMessage,

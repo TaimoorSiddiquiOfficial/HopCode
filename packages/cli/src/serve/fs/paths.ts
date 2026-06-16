@@ -6,11 +6,11 @@
 
 import { promises as fsp } from 'node:fs';
 import * as path from 'node:path';
-import { isWithinRoot } from '@hopcode/hopcode-core';
+import { isWithinRoot } from '@hoptrendy/hopcode-core';
 import { FsError, type FsErrorKind } from './errors.js';
 
 // `canonicalizeWorkspace` and `MAX_WORKSPACE_PATH_LENGTH` lifted to
-// `@hopcode/acp-bridge` in #4175 PR 22b — the bridge package owns the
+// `@hoptrendy/acp-bridge` in #4175 PR 22b — the bridge package owns the
 // cross-module workspace-canonicalization contract directly. Imported
 // here for the local `canonicalizeBoundWorkspaceCached` fast-path AND
 // re-exported so callers like `config.ts` / `settings.ts` /
@@ -19,7 +19,7 @@ import { FsError, type FsErrorKind } from './errors.js';
 import {
   canonicalizeWorkspace,
   MAX_WORKSPACE_PATH_LENGTH,
-} from '@hopcode/acp-bridge/workspacePaths';
+} from '@hoptrendy/acp-bridge/workspacePaths';
 export { canonicalizeWorkspace, MAX_WORKSPACE_PATH_LENGTH };
 
 /**

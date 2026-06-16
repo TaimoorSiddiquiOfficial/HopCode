@@ -69,7 +69,7 @@ async function verifyGitHubAuthentication(): Promise<boolean> {
     return true;
   } catch (error) {
     // Use debugLogger instead of console for proper logging
-    const { createDebugLogger } = await import('@hopcode/hopcode-core');
+    const { createDebugLogger } = await import('@hoptrendy/hopcode-core');
     const debugLogger = createDebugLogger('github-auth');
     debugLogger.error('GitHub auth verification failed:', error);
     return false;

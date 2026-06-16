@@ -21,7 +21,7 @@ import {
   getAllProviderBaseUrls,
   getOrCreateSharedDispatcher,
   redactProxyCredentials,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { fetch as undiciFetch } from 'undici';
 
 const debugLogger = createDebugLogger('PRECONNECT');

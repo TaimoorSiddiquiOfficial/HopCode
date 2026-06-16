@@ -16,7 +16,7 @@ import {
   getDefaultModelIds,
   resolveBaseUrl,
   type ProviderSetupInputs,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   useAuthCommand,
   normalizeCustomModelIds,

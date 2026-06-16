@@ -6,7 +6,7 @@
 
 import { render } from 'ink-testing-library';
 import { describe, it, expect, vi } from 'vitest';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import { AgentViewProvider } from './AgentViewContext.js';
 
 /**

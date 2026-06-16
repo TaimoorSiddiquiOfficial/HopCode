@@ -12,7 +12,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import type { ModelInfo } from '@agentclientprotocol/sdk';
 import { ModelSelector } from './ModelSelector.js';
 
-vi.mock('@hopcode/webui', () => ({
+vi.mock('@hoptrendy/webui', () => ({
   PlanCompletedIcon: () => null,
 }));
 

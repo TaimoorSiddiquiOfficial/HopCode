@@ -1,13 +1,13 @@
 ---
 name: quran-guidance-package
-description: Reusable verification and scope discipline for changes touching the @hopcode/quran-guidance package.
+description: Reusable verification and scope discipline for changes touching the @hoptrendy/quran-guidance package.
 source: auto-skill
 extracted_at: '2026-06-12T12:00:58.542Z'
 ---
 
 # Quran Guidance Package Workflow
 
-When working on `@hopcode/quran-guidance`, keep the package narrowly focused on
+When working on `@hoptrendy/quran-guidance`, keep the package narrowly focused on
 behavior prompts, classification, guidance resolution, and Izn gate helpers.
 Do not add speculative features or abstractions for one-off behavior.
 
@@ -24,7 +24,7 @@ Do not add speculative features or abstractions for one-off behavior.
 
 ## Root Build Order
 
-If core integration depends on generated or compiled `@hopcode/quran-guidance`
+If core integration depends on generated or compiled `@hoptrendy/quran-guidance`
 outputs, ensure root build order builds `packages/quran-guidance` before
 `packages/core`. This matters for clean CI flows where `npm ci` does not reuse
 existing `dist/` artifacts.

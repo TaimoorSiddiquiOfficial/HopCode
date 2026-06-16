@@ -1,7 +1,7 @@
 import {
   DaemonSessionProvider,
   DaemonWorkspaceProvider,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { App, type WebShellProps } from './App';
 
 export interface WebShellWithProvidersProps extends WebShellProps {
@@ -23,7 +23,7 @@ function resolveBaseUrl(baseUrl: string | undefined): string {
 
 /**
  * Low-level UI component. Requires ancestor `DaemonWorkspaceProvider` and
- * `DaemonSessionProvider` from `@hopcode/webui/daemon-react-sdk`.
+ * `DaemonSessionProvider` from `@hoptrendy/webui/daemon-react-sdk`.
  */
 export { App as WebShell };
 

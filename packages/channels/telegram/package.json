@@ -1,6 +1,6 @@
 {
-  "name": "@hopcode/channel-telegram",
-  "version": "0.18.1",
+  "name": "@hoptrendy/channel-telegram",
+  "version": "0.30.2",
   "description": "Telegram channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",
@@ -18,10 +18,10 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@hopcode/channel-base": "file:../base",
     "grammy": "^1.41.1",
     "https-proxy-agent": "^7.0.6",
-    "telegram-markdown-formatter": "^0.1.2"
+    "telegram-markdown-formatter": "^0.1.2",
+    "@hoptrendy/channel-base": "file:../base"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

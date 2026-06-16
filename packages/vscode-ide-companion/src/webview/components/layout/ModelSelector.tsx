@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FC } from 'react';
 import type { ModelInfo } from '@agentclientprotocol/sdk';
-import { PlanCompletedIcon } from '@hopcode/webui';
+import { PlanCompletedIcon } from '@hoptrendy/webui';
 
 interface ModelSelectorProps {
   visible: boolean;

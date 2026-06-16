@@ -1,4 +1,4 @@
-﻿# 🦋 HopCode Rebranding - Final Checklist
+# 🦋 HopCode Rebranding - Final Checklist
 
 **Project:** HopCode → HopCode Transformation  
 **Created:** 2026-04-18  
@@ -123,36 +123,36 @@ For each package, update and publish:
 
 **Core Package:**
 
-- [ ] `packages/core/package.json` → name: `@hopcode/core`
+- [ ] `packages/core/package.json` → name: `@hoptrendy/core`
 - [ ] Build: `npm run build`
 - [ ] Test: `npm test`
 - [ ] Publish: `npm publish --access public`
 
 **CLI Package:**
 
-- [ ] `packages/cli/package.json` → name: `@hopcode/hopcode`
+- [ ] `packages/cli/package.json` → name: `@hoptrendy/hopcode`
 - [ ] Update bin: `hopcode`
 - [ ] Build, test, publish
 
 **SDK Package:**
 
-- [ ] `packages/sdk-typescript/package.json` → name: `@hopcode/sdk`
+- [ ] `packages/sdk-typescript/package.json` → name: `@hoptrendy/sdk`
 - [ ] Update documentation references
 - [ ] Build, test, publish
 
 **WebUI Package:**
 
-- [ ] `packages/webui/package.json` → name: `@hopcode/webui`
+- [ ] `packages/webui/package.json` → name: `@hoptrendy/webui`
 - [ ] Build, test, publish
 
 **Channel Packages:**
 
-- [ ] `@hopcode/channel-base`
-- [ ] `@hopcode/channel-telegram`
-- [ ] `@hopcode/channel-dingtalk`
-- [ ] `@hopcode/channel-weixin`
-- [ ] `@hopcode/cli-insight`
-- [ ] `@hopcode/terminal-capture`
+- [ ] `@hoptrendy/channel-base`
+- [ ] `@hoptrendy/channel-telegram`
+- [ ] `@hoptrendy/channel-dingtalk`
+- [ ] `@hoptrendy/channel-weixin`
+- [ ] `@hoptrendy/cli-insight`
+- [ ] `@hoptrendy/terminal-capture`
 
 **VS Code Extension:**
 
@@ -229,7 +229,7 @@ For each package, update and publish:
 
 #### Functional Testing
 
-- [ ] Install via npm: `npm install -g @hopcode/hopcode`
+- [ ] Install via npm: `npm install -g @hoptrendy/hopcode`
 - [ ] Run CLI command: `hopcode --version`
 - [ ] Test authentication: `hopcode auth login`
 - [ ] Test in VS Code extension

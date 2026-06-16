@@ -22,7 +22,7 @@ import * as fs from 'node:fs';
 import { performance } from 'node:perf_hooks';
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { DaemonHttpError } from '@hopcode/sdk';
+import { DaemonHttpError } from '@hoptrendy/sdk';
 import {
   spawnDaemon,
   percentiles,

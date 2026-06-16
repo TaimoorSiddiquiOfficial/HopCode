@@ -91,7 +91,7 @@ const { mockRestoreWorktreeContext } = vi.hoisted(() => ({
     .mockResolvedValue({ contextMessage: null, session: null }),
 }));
 
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   createDebugLogger: () => ({
     debug: vi.fn(),
     error: vi.fn(),
@@ -229,10 +229,10 @@ vi.mock('../utils/acpModelUtils.js', () => ({
 // ---------------------------------------------------------------------------
 
 import { runAcpAgent } from './acpAgent.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../config/settings.js';
 import type { CliArgs } from '../config/config.js';
-import { SessionService } from '@hopcode/hopcode-core';
+import { SessionService } from '@hoptrendy/hopcode-core';
 import { AgentSideConnection } from '@agentclientprotocol/sdk';
 import { loadSettings } from '../config/settings.js';
 import { loadCliConfig } from '../config/config.js';

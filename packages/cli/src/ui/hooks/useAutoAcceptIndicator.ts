@@ -8,7 +8,7 @@ import {
   ApprovalMode,
   APPROVAL_MODES,
   type Config,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { useEffect, useState } from 'react';
 import { useKeypress } from './useKeypress.js';
 import type { HistoryItemWithoutId } from '../types.js';

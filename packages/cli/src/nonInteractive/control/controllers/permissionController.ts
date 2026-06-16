@@ -21,11 +21,11 @@ import type {
   ApprovalMode,
   TeammateApprovalRequestEvent,
   ToolConfirmationPayload,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   InputFormat,
   ToolConfirmationOutcome,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type {
   CLIControlPermissionRequest,
   CLIControlSetPermissionModeRequest,

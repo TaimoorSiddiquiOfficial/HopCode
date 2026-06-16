@@ -10,7 +10,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { atomicWriteFileSync, Storage } from '@hopcode/hopcode-core';
+import { atomicWriteFileSync, Storage } from '@hoptrendy/hopcode-core';
 
 interface TipHistoryEntry {
   totalShown: number;

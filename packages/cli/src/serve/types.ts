@@ -12,8 +12,8 @@ import {
 // Import the canonical `PermissionPolicy` union from acp-bridge
 // instead of inlining the string literals, so upstream changes
 // are compiler-flagged here.
-import type { PermissionPolicy } from '@hopcode/acp-bridge';
-import type { AuthType, InputModalities } from '@hopcode/hopcode-core';
+import type { PermissionPolicy } from '@hoptrendy/acp-bridge';
+import type { AuthType, InputModalities } from '@hoptrendy/hopcode-core';
 
 /**
  * Stage 1 daemon mode shape.

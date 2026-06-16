@@ -10,15 +10,15 @@ import {
   buildIznClarificationMessage,
   type IznGateCheckParams,
 } from './iznGateHandler.js';
-import type { IznGateResult } from '@hopcode/quran-guidance';
+import type { IznGateResult } from '@hoptrendy/quran-guidance';
 
 // Mock the quran-guidance module
-vi.mock('@hopcode/quran-guidance', () => ({
+vi.mock('@hoptrendy/quran-guidance', () => ({
   checkIznGate: vi.fn(),
   reportIznScope: vi.fn(),
 }));
 
-import { checkIznGate, reportIznScope } from '@hopcode/quran-guidance';
+import { checkIznGate, reportIznScope } from '@hoptrendy/quran-guidance';
 
 const mockCheckIznGate = checkIznGate as ReturnType<typeof vi.fn>;
 const mockReportIznScope = reportIznScope as ReturnType<typeof vi.fn>;

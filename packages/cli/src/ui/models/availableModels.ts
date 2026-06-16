@@ -9,7 +9,7 @@ import {
   type Config,
   type AvailableModel as CoreAvailableModel,
   HOPCODE_OAUTH_MODELS,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 
 export type AvailableModel = {

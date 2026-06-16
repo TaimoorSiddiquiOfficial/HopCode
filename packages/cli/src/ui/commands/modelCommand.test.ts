@@ -13,7 +13,7 @@ import {
   AuthType,
   type ContentGeneratorConfig,
   type Config,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 // Helper function to create a mock config
 function createMockConfig(

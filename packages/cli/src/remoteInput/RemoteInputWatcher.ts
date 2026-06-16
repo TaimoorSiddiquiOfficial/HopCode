@@ -6,7 +6,7 @@
 
 import { createReadStream, watchFile, unwatchFile, statSync } from 'node:fs';
 import { createInterface } from 'node:readline';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('REMOTE_INPUT');
 

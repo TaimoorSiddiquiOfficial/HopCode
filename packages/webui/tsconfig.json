@@ -17,8 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@hopcode/sdk": ["../sdk-typescript/src/index.ts"],
-      "@hopcode/sdk/daemon": ["../sdk-typescript/src/daemon/index.ts"]
+      "@hoptrendy/sdk": ["../sdk-typescript/src/index.ts"],
+      "@hoptrendy/sdk/daemon": ["../sdk-typescript/src/daemon/index.ts"]
     }
   },
   "include": ["src"],

@@ -79,8 +79,8 @@ export class MessageHandler {
    */
   setAuthInteractiveHandler(
     handler: (
-      config: import('@hopcode/hopcode-core').ProviderConfig,
-      inputs: import('@hopcode/hopcode-core').ProviderSetupInputs,
+      config: import('@hoptrendy/hopcode-core').ProviderConfig,
+      inputs: import('@hoptrendy/hopcode-core').ProviderSetupInputs,
     ) => Promise<void>,
   ): void {
     this.router.setAuthInteractiveHandler(handler);

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -19,7 +19,7 @@ import {
   type ToolUseBlock,
   type SDKSystemMessage,
   type SDKUserMessage,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 import {
   SDKTestHelper,
   createMCPServer,

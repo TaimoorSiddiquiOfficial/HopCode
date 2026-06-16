@@ -5,7 +5,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AuthType } from '@hopcode/hopcode-core';
+import { AuthType } from '@hoptrendy/hopcode-core';
 import { SettingScope } from '../../config/settings.js';
 import { applyProviderInstallPlan } from './applyProviderInstallPlan.js';
 import type { ProviderInstallPlan } from '../types.js';

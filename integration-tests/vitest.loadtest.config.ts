@@ -22,7 +22,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@hopcode/sdk': resolve(
+      '@hoptrendy/sdk': resolve(
         __dirname,
         '../packages/sdk-typescript/dist/index.mjs',
       ),

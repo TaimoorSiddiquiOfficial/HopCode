@@ -18,7 +18,7 @@ import {
   parseInstallSource,
   createDebugLogger,
   redactUrlCredentials,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('EXTENSIONS_COMMAND');
 const EXTENSION_EXPLORE_URL = {

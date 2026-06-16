@@ -11,12 +11,12 @@ import {
   resolveBaseUrl,
   getDefaultBaseUrlForProtocol,
   getDefaultModelIds,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type {
   InputModalities,
   ProviderConfig,
   ProviderSetupInputs,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import { normalizeModelIds, maskApiKey } from './useAuth.js';
 

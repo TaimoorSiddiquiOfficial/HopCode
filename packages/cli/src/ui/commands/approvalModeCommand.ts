@@ -12,11 +12,11 @@ import type {
 } from './types.js';
 import { CommandKind } from './types.js';
 import { t } from '../../i18n/index.js';
-import type { ApprovalMode } from '@hopcode/hopcode-core';
+import type { ApprovalMode } from '@hoptrendy/hopcode-core';
 import {
   APPROVAL_MODES,
   ApprovalMode as ApprovalModeEnum,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { emitAutoModeEntryNotices } from '../hooks/useAutoAcceptIndicator.js';
 import { formatApprovalModeName } from '../utils/approvalModeDisplay.js';
 

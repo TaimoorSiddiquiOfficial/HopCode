@@ -12,7 +12,7 @@ import {
   saveWelcomeBackRestartChoice,
   type ProjectSummaryInfo,
   type Config,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { type Settings } from '../../config/settingsSchema.js';
 
 export interface WelcomeBackState {

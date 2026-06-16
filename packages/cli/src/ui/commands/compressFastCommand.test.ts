@@ -8,7 +8,7 @@ import {
   CompressionStatus,
   type ChatCompressionInfo,
   type GeminiClient,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { compressFastCommand } from './compressFastCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';

@@ -23,7 +23,7 @@ import {
   ALIBABA_PROVIDERS,
   THIRD_PARTY_PROVIDERS,
   type ProviderConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { useProviderSetupFlow } from './useProviderSetupFlow.js';
 import { ProviderSetupSteps } from './ProviderSetupSteps.js';
 

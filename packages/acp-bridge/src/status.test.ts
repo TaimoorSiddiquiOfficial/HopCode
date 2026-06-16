@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SkillError, TrustGateError } from '@hopcode/hopcode-core';
+import { SkillError, TrustGateError } from '@hoptrendy/hopcode-core';
 import { describe, expect, it } from 'vitest';
 import {
   BridgeChannelClosedError,

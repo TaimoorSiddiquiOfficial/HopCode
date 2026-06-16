@@ -9,7 +9,7 @@ import {
   AuthType,
   minimaxProvider,
   buildInstallPlan,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 describe('minimaxProvider', () => {
   it('offers international and China endpoints', () => {

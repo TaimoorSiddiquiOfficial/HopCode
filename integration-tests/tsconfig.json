@@ -7,7 +7,7 @@
     "baseUrl": ".",
     "paths": {
       "//": "Resolve types from SDK source rather than dist so `tsc -p` here does not require a fresh `npm run build` of the SDK package before checking integration tests. The runtime vitest alias (`integration-tests/vitest.config.ts`) still points at the built `dist/index.mjs` to exercise the published-bundle shape; this paths entry only affects type resolution.",
-      "@hopcode/sdk": ["../packages/sdk-typescript/src/index.ts"]
+      "@hoptrendy/sdk": ["../packages/sdk-typescript/src/index.ts"]
     }
   },
   "include": ["**/*.ts"],

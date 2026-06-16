@@ -1,6 +1,6 @@
 {
-  "name": "@hopcode/channel-feishu",
-  "version": "0.18.1",
+  "name": "@hoptrendy/channel-feishu",
+  "version": "0.30.2",
   "description": "Feishu (Lark) channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",
@@ -18,8 +18,8 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@hopcode/channel-base": "file:../base",
-    "@larksuiteoapi/node-sdk": "^1.45.0"
+    "@larksuiteoapi/node-sdk": "^1.45.0",
+    "@hoptrendy/channel-base": "file:../base"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

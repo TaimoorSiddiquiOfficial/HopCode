@@ -5,17 +5,17 @@
  */
 
 /**
- * @hopcode/webui Tailwind CSS Preset
+ * @hoptrendy/webui Tailwind CSS Preset
  *
  * This preset provides shared theme configuration for all HopCode products.
  * Consumers should include this preset in their tailwind.config.js:
  *
  * @example
  * module.exports = {
- *   presets: [require('@hopcode/webui/tailwind.preset')],
+ *   presets: [require('@hoptrendy/webui/tailwind.preset')],
  *   content: [
  *     './src/**\/*.{ts,tsx}',
- *     './node_modules/@hopcode/webui/dist/**\/*.js'
+ *     './node_modules/@hoptrendy/webui/dist/**\/*.js'
  *   ]
  * }
  */

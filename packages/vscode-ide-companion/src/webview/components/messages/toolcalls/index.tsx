@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Tool call component factory - routes to specialized components by kind
- * All UI components are now imported from @hopcode/webui
+ * All UI components are now imported from @hoptrendy/webui
  */
 
-import { shouldShowToolCall, getToolCallComponent } from '@hopcode/webui';
+import { shouldShowToolCall, getToolCallComponent } from '@hoptrendy/webui';
 import type { FC } from 'react';
-import type { BaseToolCallProps } from '@hopcode/webui';
+import type { BaseToolCallProps } from '@hoptrendy/webui';
 
 /**
  * Main tool call component that routes to specialized implementations
@@ -32,4 +32,4 @@ export const ToolCallRouter: FC<BaseToolCallProps> = ({
 };
 
 // Re-export types for convenience
-export type { BaseToolCallProps, ToolCallData } from '@hopcode/webui';
+export type { BaseToolCallProps, ToolCallData } from '@hoptrendy/webui';

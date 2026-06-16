@@ -3,7 +3,7 @@ import {
   PHRASE_CHANGE_INTERVAL_MS,
   getLoadingPhrases,
 } from '../constants/loadingPhrases';
-import { useStreamingState } from '@hopcode/webui/daemon-react-sdk';
+import { useStreamingState } from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../i18n';
 import { useStreamingLoadingMetrics } from '../hooks/useStreamingLoadingMetrics';
 import { formatTokenCount } from '../utils/formatTokenCount';

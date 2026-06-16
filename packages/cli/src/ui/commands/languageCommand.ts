@@ -29,7 +29,7 @@ import {
   resolveOutputLanguage,
   writeOutputLanguageAndRegisterPath,
 } from '../../utils/languageUtils.js';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('LANGUAGE_COMMAND');
 

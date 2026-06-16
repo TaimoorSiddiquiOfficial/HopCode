@@ -12,7 +12,7 @@
  * user input being lost during startup.
  */
 
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('EARLY_INPUT');
 

@@ -19,7 +19,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { type Config, createDebugLogger } from '@hopcode/hopcode-core';
+import { type Config, createDebugLogger } from '@hoptrendy/hopcode-core';
 import {
   type DialogEntry,
   useBackgroundTaskView,

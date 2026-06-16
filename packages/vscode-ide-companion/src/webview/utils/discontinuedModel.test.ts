@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { RUNTIME_SNAPSHOT_PREFIX } from '@hopcode/hopcode-core';
+import { RUNTIME_SNAPSHOT_PREFIX } from '@hoptrendy/hopcode-core';
 import {
   DISCONTINUED_MESSAGES,
   isDiscontinuedModel,

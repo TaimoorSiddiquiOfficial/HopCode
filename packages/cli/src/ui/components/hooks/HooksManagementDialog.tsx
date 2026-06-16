@@ -19,7 +19,7 @@ import {
   type SessionHookEntry,
   createDebugLogger,
   HOOKS_CONFIG_FIELDS,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type {
   HooksManagementDialogProps,
   HookEventDisplayInfo,

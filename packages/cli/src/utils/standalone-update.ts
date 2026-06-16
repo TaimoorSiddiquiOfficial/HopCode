@@ -13,7 +13,7 @@ import { spawn, execFile } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 import { fetch } from 'undici';
 import * as tar from 'tar';
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import { verifySignature } from './standalone-update-verify.js';
 
 const debugLogger = createDebugLogger('STANDALONE_UPDATE');

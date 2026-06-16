@@ -12,7 +12,7 @@ import type {
   Config,
   ConversationRecord,
   ResumedSessionData,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { Part } from '@google/genai';
 
 const makeConfig = (tools: Record<string, AnyDeclarativeTool>) =>

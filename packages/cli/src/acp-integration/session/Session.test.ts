@@ -14,14 +14,14 @@ import {
   Session,
 } from './Session.js';
 import type { Content, FunctionCall, Part } from '@google/genai';
-import type { ChatRecord, Config, GeminiChat } from '@hopcode/hopcode-core';
+import type { ChatRecord, Config, GeminiChat } from '@hoptrendy/hopcode-core';
 import {
   ApprovalMode,
   AuthType,
   SYSTEM_REMINDER_OPEN,
   SYSTEM_REMINDER_CLOSE,
-} from '@hopcode/hopcode-core';
-import * as core from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import * as core from '@hoptrendy/hopcode-core';
 import { SettingScope } from '../../config/settings.js';
 import type {
   AgentSideConnection,
@@ -34,8 +34,8 @@ import { CommandKind } from '../../ui/commands/types.js';
 
 const debugLoggerWarnSpy = vi.hoisted(() => vi.fn());
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     createDebugLogger: () => ({

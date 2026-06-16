@@ -15,7 +15,7 @@ import {
   type Config,
   type SubagentConfig,
   type SubagentLevel,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 import { isServeDebugMode } from './debugMode.js';
 import {

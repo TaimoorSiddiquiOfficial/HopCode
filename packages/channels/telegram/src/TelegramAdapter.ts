@@ -8,13 +8,13 @@ import {
   telegramFormat,
   splitHtmlForTelegram,
 } from 'telegram-markdown-formatter';
-import { ChannelBase } from '@hopcode/channel-base';
+import { ChannelBase } from '@hoptrendy/channel-base';
 import type {
   ChannelConfig,
   ChannelBaseOptions,
   Envelope,
   AcpBridge,
-} from '@hopcode/channel-base';
+} from '@hoptrendy/channel-base';
 
 // ──────────────────────────────────────────────────────────────
 // Whisper transcription helper

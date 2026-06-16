@@ -10,7 +10,7 @@ import {
   getFilteredHopCodeModels,
   getOpenAIAvailableModelFromEnv,
 } from './availableModels.js';
-import { AuthType, type Config } from '@hopcode/hopcode-core';
+import { AuthType, type Config } from '@hoptrendy/hopcode-core';
 
 describe('availableModels', () => {
   describe('HopCode models', () => {

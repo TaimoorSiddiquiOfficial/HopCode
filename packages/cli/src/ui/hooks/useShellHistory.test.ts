@@ -25,7 +25,7 @@ vi.mock('fs', async (importOriginal) => {
     mkdirSync: vi.fn(),
   };
 });
-vi.mock('@hopcode/hopcode-core', () => {
+vi.mock('@hoptrendy/hopcode-core', () => {
   class Storage {
     getProjectTempDir(): string {
       return path.join('/test/home/', '.hopcode', 'tmp', 'mocked_hash');

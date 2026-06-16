@@ -10,7 +10,7 @@ import dts from 'vite-plugin-dts';
 import { resolve } from 'path';
 
 /**
- * Vite configuration for @hopcode/webui library
+ * Vite configuration for @hoptrendy/webui library
  *
  * Build outputs:
  * - Main entry:    dist/index.js, dist/index.cjs, dist/index.d.ts
@@ -22,11 +22,11 @@ export default defineConfig(({ command }) => ({
     command === 'serve'
       ? {
           alias: {
-            '@hopcode/sdk/daemon': resolve(
+            '@hoptrendy/sdk/daemon': resolve(
               __dirname,
               '../sdk-typescript/src/daemon/index.ts',
             ),
-            '@hopcode/sdk': resolve(
+            '@hoptrendy/sdk': resolve(
               __dirname,
               '../sdk-typescript/src/index.ts',
             ),
@@ -53,16 +53,16 @@ export default defineConfig(({ command }) => ({
     },
     rollupOptions: {
       external: [
-        '@hopcode/sdk',
-        '@hopcode/sdk/daemon',
+        '@hoptrendy/sdk',
+        '@hoptrendy/sdk/daemon',
         'react',
         'react-dom',
         'react/jsx-runtime',
       ],
       output: {
         globals: {
-          '@hopcode/sdk': 'HopCodeSdk',
-          '@hopcode/sdk/daemon': 'HopCodeSdkDaemon',
+          '@hoptrendy/sdk': 'HopCodeSdk',
+          '@hoptrendy/sdk/daemon': 'HopCodeSdkDaemon',
           react: 'React',
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'ReactJSXRuntime',

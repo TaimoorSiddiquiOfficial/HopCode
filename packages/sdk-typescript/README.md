@@ -1,4 +1,4 @@
-# @hopcode/sdk
+# @hoptrendy/sdk
 
 A minimum experimental TypeScript SDK for programmatic access to HopCode.
 
@@ -7,7 +7,7 @@ Feel free to submit a feature request/issue/PR.
 ## Installation
 
 ```bash
-npm install @hopcode/sdk
+npm install @hoptrendy/sdk
 ```
 
 ## Requirements
@@ -19,7 +19,7 @@ npm install @hopcode/sdk
 ## Quick Start
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 // Single-turn query
 const result = query({
@@ -109,7 +109,7 @@ channel, IDE, or web backend adapters do not need to pass `sessionId` into every
 call.
 
 ```typescript
-import { DaemonClient, DaemonSessionClient } from '@hopcode/sdk';
+import { DaemonClient, DaemonSessionClient } from '@hoptrendy/sdk';
 
 const daemon = new DaemonClient({
   baseUrl: 'http://127.0.0.1:4170',
@@ -160,7 +160,7 @@ import {
   asKnownDaemonEvent,
   createDaemonSessionViewState,
   reduceDaemonSessionEvent,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 
 let view = createDaemonSessionViewState();
 for await (const event of session.events()) {
@@ -184,7 +184,7 @@ import {
   isSDKSystemMessage,
   isSDKResultMessage,
   isSDKPartialAssistantMessage,
-} from '@hopcode/sdk';
+} from '@hoptrendy/sdk';
 
 for await (const message of result) {
   if (isSDKAssistantMessage(message)) {
@@ -249,7 +249,7 @@ The first matching rule wins.
 ### Multi-turn Conversation
 
 ```typescript
-import { query, type SDKUserMessage } from '@hopcode/sdk';
+import { query, type SDKUserMessage } from '@hoptrendy/sdk';
 
 async function* generateMessages(): AsyncIterable<SDKUserMessage> {
   yield {
@@ -283,7 +283,7 @@ for await (const message of result) {
 ### Custom Permission Handler
 
 ```typescript
-import { query, type CanUseTool } from '@hopcode/sdk';
+import { query, type CanUseTool } from '@hoptrendy/sdk';
 
 const canUseTool: CanUseTool = async (toolName, input, { signal }) => {
   // Allow all read operations
@@ -312,7 +312,7 @@ const result = query({
 ### With External MCP Servers
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 const result = query({
   prompt: 'Use the custom tool from my MCP server',
@@ -331,7 +331,7 @@ const result = query({
 ### Override the System Prompt
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 const result = query({
   prompt: 'Say hello in one sentence.',
@@ -344,7 +344,7 @@ const result = query({
 ### Append to the Built-in System Prompt
 
 ```typescript
-import { query } from '@hopcode/sdk';
+import { query } from '@hoptrendy/sdk';
 
 const result = query({
   prompt: 'Review the current directory.',
@@ -402,7 +402,7 @@ Returns a `McpSdkServerConfigWithInstance` object that can be passed directly to
 
 ```typescript
 import { z } from 'zod';
-import { query, tool, createSdkMcpServer } from '@hopcode/sdk';
+import { query, tool, createSdkMcpServer } from '@hoptrendy/sdk';
 
 // Define a tool with Zod schema
 const calculatorTool = tool(
@@ -439,7 +439,7 @@ for await (const message of result) {
 ### Abort a Query
 
 ```typescript
-import { query, isAbortError } from '@hopcode/sdk';
+import { query, isAbortError } from '@hoptrendy/sdk';
 
 const abortController = new AbortController();
 
@@ -471,7 +471,7 @@ try {
 The SDK provides an `AbortError` class for handling aborted queries:
 
 ```typescript
-import { AbortError, isAbortError } from '@hopcode/sdk';
+import { AbortError, isAbortError } from '@hoptrendy/sdk';
 
 try {
   // ... query operations
@@ -496,7 +496,7 @@ Version 0.1.0 requires [HopCode](https://github.com/QwenLM/hopcode) **>= 0.4.0**
 
 ```bash
 # Install HopCode globally
-npm install -g @hopcode/hopcode@latest
+npm install -g @hoptrendy/hopcode@latest
 ```
 
 **Note**: From version **0.1.1** onwards, the CLI is bundled with the SDK, so no separate HopCode installation is needed.

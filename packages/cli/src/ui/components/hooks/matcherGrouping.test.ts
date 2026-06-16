@@ -9,7 +9,7 @@ import {
   HookEventName,
   HooksConfigSource,
   HookType,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { HookEventDisplayInfo } from './types.js';
 import {
   addConfigToMatcherGroup,

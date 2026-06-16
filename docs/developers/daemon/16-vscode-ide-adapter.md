@@ -62,7 +62,7 @@ This is a **client-side hard constraint** distinct from the daemon's own `hostAl
 ### `createSdkDaemonSessionFactory()`
 
 `createSdkDaemonSessionFactory()` constructs `DaemonClient` and calls
-`DaemonSessionClient.createOrAttach()` from `@hopcode/sdk`. The connection
+`DaemonSessionClient.createOrAttach()` from `@hoptrendy/sdk`. The connection
 class holds the factory rather than instantiating directly so tests can inject a
 fake.
 

@@ -6,14 +6,14 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import * as core from '@hopcode/hopcode-core';
+import * as core from '@hoptrendy/hopcode-core';
 import { useAwaySummary } from './useAwaySummary.js';
 import type { HistoryItem } from '../types.js';
 
-vi.mock('@hopcode/hopcode-core', async () => {
+vi.mock('@hoptrendy/hopcode-core', async () => {
   const actual = await vi.importActual<
-    typeof import('@hopcode/hopcode-core')
-  >('@hopcode/hopcode-core');
+    typeof import('@hoptrendy/hopcode-core')
+  >('@hoptrendy/hopcode-core');
   return {
     ...actual,
     generateSessionRecap: vi.fn(),

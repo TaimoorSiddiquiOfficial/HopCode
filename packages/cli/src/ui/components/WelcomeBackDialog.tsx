@@ -6,7 +6,7 @@
 
 import { Box, Text } from 'ink';
 import { Colors } from '../colors.js';
-import { type ProjectSummaryInfo } from '@hopcode/hopcode-core';
+import { type ProjectSummaryInfo } from '@hoptrendy/hopcode-core';
 import {
   RadioButtonSelect,
   type RadioSelectItem,

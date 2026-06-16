@@ -25,7 +25,7 @@ import {
   ToolConfirmationOutcome,
   IdeClient,
   type SessionListItem,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import type {
   Message,

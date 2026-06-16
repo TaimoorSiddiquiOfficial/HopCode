@@ -23,7 +23,7 @@ import type {
   Config,
   McpToolProgressData,
   FileDiff,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { ToolConfirmationMessage } from './ToolConfirmationMessage.js';
 import { PlanSummaryDisplay } from '../PlanSummaryDisplay.js';
 import { ShellInputPrompt } from '../ShellInputPrompt.js';

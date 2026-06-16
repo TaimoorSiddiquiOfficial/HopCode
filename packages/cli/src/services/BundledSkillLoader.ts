@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   createDebugLogger,
   appendToLastTextPart,
   buildSkillLlmContent,
   applySkillAllowedTools,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { dirname } from 'node:path';
 import type { ICommandLoader } from './types.js';
 import type {

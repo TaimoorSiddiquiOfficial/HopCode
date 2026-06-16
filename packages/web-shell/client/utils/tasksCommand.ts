@@ -1,4 +1,4 @@
-import type { DaemonSessionTasksStatus } from '@hopcode/sdk/daemon';
+import type { DaemonSessionTasksStatus } from '@hoptrendy/sdk/daemon';
 import { serializeTasksStatusMessage } from '../components/messages/TasksStatusMessage';
 
 type LocalStatusDispatcher = (

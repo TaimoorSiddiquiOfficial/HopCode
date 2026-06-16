@@ -16,7 +16,7 @@ import {
   type MessageActionReturn,
 } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   loadTrustedFolders,
   resetTrustedFoldersForTesting,

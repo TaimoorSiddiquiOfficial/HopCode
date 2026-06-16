@@ -18,7 +18,7 @@
  * When disabled, no notification is sent.
  */
 
-import { createDebugLogger } from '@hopcode/hopcode-core';
+import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import type { TerminalNotification } from '../ui/hooks/useTerminalNotification.js';
 import { detectTerminal, generateKittyId } from '../utils/osc.js';
 

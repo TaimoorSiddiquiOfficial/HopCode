@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DAEMON_APPROVAL_MODES } from '@hopcode/webui/daemon-react-sdk';
+import { DAEMON_APPROVAL_MODES } from '@hoptrendy/webui/daemon-react-sdk';
 import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import { useI18n } from '../../i18n';
 import styles from './ApprovalModeMessage.module.css';

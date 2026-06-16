@@ -7,7 +7,7 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Text } from 'ink';
-import { getActiveGoal, type ActiveGoal } from '@hopcode/hopcode-core';
+import { getActiveGoal, type ActiveGoal } from '@hoptrendy/hopcode-core';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { theme } from '../semantic-colors.js';
 

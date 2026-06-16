@@ -6,7 +6,7 @@
  * Usage:
  *   npx hopcode-channel-plugin-example-server
  *   # or
- *   node node_modules/@hopcode/channel-plugin-example/dist/start-server.js
+ *   node node_modules/@hoptrendy/channel-plugin-example/dist/start-server.js
  *
  * Environment variables:
  *   HTTP_PORT  (default: 9200)

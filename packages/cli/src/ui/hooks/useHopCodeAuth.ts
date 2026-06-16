@@ -10,7 +10,7 @@ import {
   HopCodeOAuth2Events,
   HopCodeOAuth2Event,
   type DeviceAuthorizationData,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 export interface HopCodeAuthState {
   deviceAuth: DeviceAuthorizationData | null;

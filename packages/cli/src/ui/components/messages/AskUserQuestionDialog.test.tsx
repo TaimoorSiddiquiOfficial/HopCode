@@ -6,8 +6,8 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { AskUserQuestionDialog } from './AskUserQuestionDialog.js';
-import type { ToolAskUserQuestionConfirmationDetails } from '@hopcode/hopcode-core';
-import { ToolConfirmationOutcome } from '@hopcode/hopcode-core';
+import type { ToolAskUserQuestionConfirmationDetails } from '@hoptrendy/hopcode-core';
+import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import stripAnsi from 'strip-ansi';
 

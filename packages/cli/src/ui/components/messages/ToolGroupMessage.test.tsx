@@ -15,7 +15,7 @@ import type {
   AgentResultDisplay,
   Config,
   ToolCallConfirmationDetails,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { TOOL_STATUS } from '../../constants.js';
 import { ConfigContext } from '../../contexts/ConfigContext.js';
 import { CompactModeProvider } from '../../contexts/CompactModeContext.js';

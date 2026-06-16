@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type {
   DaemonTranscriptBlock,
   DaemonTranscriptState,
-} from '@hopcode/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { extractPendingPermission } from './transcriptAdapter';
 
 function state(blocks: DaemonTranscriptBlock[]): DaemonTranscriptState {

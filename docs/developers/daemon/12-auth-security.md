@@ -271,7 +271,7 @@ sequenceDiagram
 - `node:crypto` — `createHash`, `timingSafeEqual`.
 - `packages/cli/src/serve/loopbackBinds.ts` — `isLoopbackBind`.
 - `packages/cli/src/serve/auth/deviceFlow.ts` — device-flow state machine.
-- `@hopcode/acp-bridge` — surfaces device-flow events on the per-session SSE bus.
+- `@hoptrendy/acp-bridge` — surfaces device-flow events on the per-session SSE bus.
 
 ## Configuration
 

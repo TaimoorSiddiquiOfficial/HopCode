@@ -218,7 +218,7 @@ vi.mock('./components/AccountInfoDialog.js', () => ({
   AccountInfoDialog: () => null,
 }));
 
-vi.mock('@hopcode/webui', () => ({
+vi.mock('@hoptrendy/webui', () => ({
   AssistantMessage: () => null,
   UserMessage: () => null,
   ThinkingMessage: () => null,

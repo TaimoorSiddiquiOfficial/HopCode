@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -7,7 +7,7 @@
 /**
  * Channel Plugin Integration Test — Real E2E with WebSocket
  *
- * Tests the actual MockPluginChannel (from @hopcode/channel-plugin-example) connected
+ * Tests the actual MockPluginChannel (from @hoptrendy/channel-plugin-example) connected
  * to an in-process mock server via WebSocket. The full message flow is:
  *
  *   server.sendMessage("What is 2+2?")

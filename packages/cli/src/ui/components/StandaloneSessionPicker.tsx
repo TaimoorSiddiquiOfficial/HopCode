@@ -11,7 +11,7 @@ import {
   SessionService,
   type Config,
   type SessionListItem,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { KeypressProvider } from '../contexts/KeypressContext.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { SettingsContext } from '../contexts/SettingsContext.js';

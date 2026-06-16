@@ -222,7 +222,7 @@ $stringReplacements = [ordered]@{
     "qwenlm.hopcode-vscode-ide-companion" = "hopcode.hopcode-vscode-ide-companion"
     "qwenlm.hopcode" = "hopcode.hopcode"
     # Package scope references
-    "@hopcode/" = "@hopcode/"
+    "@hoptrendy/" = "@hoptrendy/"
     # hopcode-sandbox -> hopcode-sandbox
     "hopcode-sandbox" = "hopcode-sandbox"
     "hopcode-sandbox" = "hopcode-sandbox"

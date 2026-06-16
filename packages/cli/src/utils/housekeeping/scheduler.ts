@@ -10,7 +10,7 @@ import {
   Storage,
   type Config,
   createDebugLogger,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { cleanupOldFileHistoryBackups, getCutoffDate } from './cleanup.js';
 import { runThrottledOnce } from './throttledOnce.js';

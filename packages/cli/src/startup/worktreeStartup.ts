@@ -29,8 +29,8 @@ import {
   worktreeBranchForSlug,
   writeWorktreeSession,
   writeWorktreeSessionMarker,
-} from '@hopcode/hopcode-core';
-import type { Config, WorktreeSession } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import type { Config, WorktreeSession } from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('WORKTREE_STARTUP');
 

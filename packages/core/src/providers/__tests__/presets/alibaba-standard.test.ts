@@ -12,7 +12,7 @@ import {
   getDefaultModelIds,
   resolveBaseUrl,
   providerMatchesCredentials,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 describe('alibabaStandardProvider', () => {
   it('has correct provider config', () => {

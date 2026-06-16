@@ -25,7 +25,7 @@ import {
   type ArenaSessionCompleteEvent,
   type Config,
   type InProcessBackend,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { AgentViewActions } from '../contexts/AgentViewContext.js';
 import { theme } from '../semantic-colors.js';
 

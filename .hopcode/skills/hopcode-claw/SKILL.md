@@ -1,4 +1,4 @@
-﻿---
+---
 name: hopcode-claw
 description: Use HopCode as a Code Agent for code understanding, project generation, features, bug fixes, refactoring, and various programming tasks
 ---
@@ -19,7 +19,7 @@ Use this skill when you need to:
 ## Install
 
 ```bash
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 ```
 
 For normal session reuse, prefer a global install over `npx`.
@@ -182,7 +182,7 @@ Key settings:
 | Setting                      | Description                                         |
 | ---------------------------- | --------------------------------------------------- |
 | `model.name`                 | Model to use (e.g. `llama3.2`, `qwen2.5-coder:32b`) |
-| `tools.approvalMode`         | `plan` / `default` / `auto_edit` / `izn`           |
+| `tools.approvalMode`         | `plan` / `default` / `auto_edit` / `izn`            |
 | `permissions.allow/ask/deny` | Tool permission rules                               |
 | `mcpServers.*`               | MCP server configurations                           |
 

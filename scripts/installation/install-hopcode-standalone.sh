@@ -1125,7 +1125,7 @@ is_HOPCODE_standalone_install_dir() {
     [[ -f "${manifest_path}" ]] || return 1
     # Manifest format is produced by writeManifest in create-standalone-package.js.
     # Keep these grep checks in sync if that JSON layout changes.
-    grep -Eq '"name"[[:space:]]*:[[:space:]]*"@hopcode/hopcode"' "${manifest_path}" 2>/dev/null || return 1
+    grep -Eq '"name"[[:space:]]*:[[:space:]]*"@hoptrendy/hopcode"' "${manifest_path}" 2>/dev/null || return 1
     grep -Eq '"target"[[:space:]]*:[[:space:]]*"(darwin|linux)-(arm64|x64)"' "${manifest_path}" 2>/dev/null || return 1
     [[ -f "${install_dir}/bin/hopcode" && ! -L "${install_dir}/bin/hopcode" && -x "${install_dir}/bin/hopcode" ]] || return 1
     [[ -f "${install_dir}/node/bin/node" && ! -L "${install_dir}/node/bin/node" && -x "${install_dir}/node/bin/node" ]] || return 1
@@ -1369,12 +1369,12 @@ install_standalone() {
 
 npm_package_spec() {
     if [[ "${VERSION}" == "latest" ]]; then
-        echo "@hopcode/hopcode@latest"
+        echo "@hoptrendy/hopcode@latest"
         return 0
     fi
 
     local npm_version="${VERSION#v}"
-    echo "@hopcode/hopcode@${npm_version}"
+    echo "@hoptrendy/hopcode@${npm_version}"
 }
 
 install_npm() {

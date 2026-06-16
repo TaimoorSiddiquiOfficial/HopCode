@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Config } from '@hopcode/hopcode-core';
-import { getErrorMessage, getMCPServerPrompts } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
+import { getErrorMessage, getMCPServerPrompts } from '@hoptrendy/hopcode-core';
 import type {
   CommandContext,
   SlashCommand,

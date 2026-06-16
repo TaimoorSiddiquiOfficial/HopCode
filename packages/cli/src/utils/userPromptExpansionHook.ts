@@ -8,7 +8,7 @@ import type { PartListUnion } from '@google/genai';
 import {
   partToString,
   sanitizeUserPromptExpansionAdditionalContext,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 export function appendUserPromptExpansionAdditionalContext(
   content: PartListUnion,

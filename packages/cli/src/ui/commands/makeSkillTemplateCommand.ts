@@ -672,7 +672,7 @@ function generatePackageJson(
     path: 'package.json',
     description: 'NPM package configuration',
     content: `{
-  "name": "@hopcode/skill-${skillName}",
+  "name": "@hoptrendy/skill-${skillName}",
   "version": "1.0.0",
   "description": "${description}",
   "type": "module",

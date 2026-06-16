@@ -119,7 +119,7 @@ async function ensureQwenRuntimeForDev(): Promise<void> {
 
   const sourceLabel = env.HOPCODE_CODE_TARBALL
     ? `tarball ${env.HOPCODE_CODE_TARBALL}`
-    : `@hopcode/hopcode@${env.HOPCODE_CODE_VERSION}`;
+    : `@hoptrendy/hopcode@${env.HOPCODE_CODE_VERSION}`;
   console.log(`📦 Vendoring HopCode CLI from ${sourceLabel}...`);
 
   const proc = spawn({

@@ -8,8 +8,8 @@ import {
   createDebugLogger,
   ToolNames,
   FORK_SUBAGENT_TYPE,
-} from '@hopcode/hopcode-core';
-import type { AgentParams } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import type { AgentParams } from '@hoptrendy/hopcode-core';
 import type {
   CommandContext,
   SlashCommand,

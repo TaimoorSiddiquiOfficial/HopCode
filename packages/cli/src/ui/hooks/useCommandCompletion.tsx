@@ -20,7 +20,7 @@ import {
   type RecentSlashCommands,
   useSlashCompletion,
 } from './useSlashCompletion.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import { useCompletion } from './useCompletion.js';
 import { parseSlashCommand } from '../../utils/commands.js';
 

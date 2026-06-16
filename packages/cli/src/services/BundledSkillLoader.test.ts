@@ -11,7 +11,7 @@ import {
   buildSkillLlmContent,
   type Config,
   type SkillConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 function makeSkill(overrides: Partial<SkillConfig> = {}): SkillConfig {
   return {

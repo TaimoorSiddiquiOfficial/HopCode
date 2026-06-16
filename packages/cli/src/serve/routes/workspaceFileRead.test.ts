@@ -10,7 +10,7 @@ import * as path from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import request from 'supertest';
-import { Ignore } from '@hopcode/hopcode-core';
+import { Ignore } from '@hoptrendy/hopcode-core';
 import { createServeApp } from '../server.js';
 import {
   canonicalizeWorkspace,

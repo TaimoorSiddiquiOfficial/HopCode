@@ -9,22 +9,22 @@
 **All package names updated:**
 
 ```
-@hopcode/* → @hopcode/*
+@hoptrendy/* → @hoptrendy/*
 ```
 
 **Packages:**
 
-- ✅ @hopcode/hopcode (main CLI)
-- ✅ @hopcode/hopcode-core
-- ✅ @hopcode/hopcode
-- ✅ @hopcode/sdk
-- ✅ @hopcode/webui
-- ✅ @hopcode/channel-base
-- ✅ @hopcode/channel-telegram
-- ✅ @hopcode/channel-dingtalk
-- ✅ @hopcode/channel-weixin
-- ✅ @hopcode/channel-plugin-example
-- ✅ @hopcode/web-templates
+- ✅ @hoptrendy/hopcode (main CLI)
+- ✅ @hoptrendy/hopcode-core
+- ✅ @hoptrendy/hopcode
+- ✅ @hoptrendy/sdk
+- ✅ @hoptrendy/webui
+- ✅ @hoptrendy/channel-base
+- ✅ @hoptrendy/channel-telegram
+- ✅ @hoptrendy/channel-dingtalk
+- ✅ @hoptrendy/channel-weixin
+- ✅ @hoptrendy/channel-plugin-example
+- ✅ @hoptrendy/web-templates
 - ✅ hopcode-vscode-ide-companion
 
 ---
@@ -99,8 +99,8 @@ ref: main
 **Expected logs:**
 
 ```
-DRY RUN: Would publish @hopcode/hopcode
-DRY RUN: Would publish @hopcode/core
+DRY RUN: Would publish @hoptrendy/hopcode
+DRY RUN: Would publish @hoptrendy/core
 etc...
 ```
 
@@ -121,9 +121,9 @@ ref: main
 **Verify on npm:**
 
 ```
-https://www.npmjs.com/package/@hopcode/hopcode
-https://www.npmjs.com/package/@hopcode/core
-https://www.npmjs.com/package/@hopcode/sdk
+https://www.npmjs.com/package/@hoptrendy/hopcode
+https://www.npmjs.com/package/@hoptrendy/core
+https://www.npmjs.com/package/@hoptrendy/sdk
 ```
 
 ---
@@ -134,14 +134,14 @@ https://www.npmjs.com/package/@hopcode/sdk
 
 ```bash
 # Install globally
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 # Test CLI
 hopcode --version
 hopcode --help
 
 # Or run with npx
-npx @hopcode/hopcode --help
+npx @hoptrendy/hopcode --help
 ```
 
 ---
@@ -152,7 +152,7 @@ npx @hopcode/hopcode --help
 
 ```json
 {
-  "name": "@hopcode/hopcode"
+  "name": "@hoptrendy/hopcode"
 }
 ```
 
@@ -160,7 +160,7 @@ npx @hopcode/hopcode --help
 
 ```json
 {
-  "name": "@hopcode/hopcode"
+  "name": "@hoptrendy/hopcode"
 }
 ```
 

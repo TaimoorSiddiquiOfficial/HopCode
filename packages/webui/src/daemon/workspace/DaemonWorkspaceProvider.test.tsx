@@ -158,8 +158,8 @@ const sdkMocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('@hopcode/sdk/daemon', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@hopcode/sdk/daemon')>();
+vi.mock('@hoptrendy/sdk/daemon', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hoptrendy/sdk/daemon')>();
   return {
     ...actual,
     DaemonClient: sdkMocks.MockDaemonClient,

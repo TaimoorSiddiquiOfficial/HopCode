@@ -7,12 +7,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { goalCommand } from './goalCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   __resetActiveGoalStoreForTests,
   clearActiveGoal,
   notifyGoalTerminal,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 function makeConfig(overrides: Partial<Config> = {}): Config {
   return {

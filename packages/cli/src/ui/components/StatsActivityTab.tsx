@@ -15,7 +15,7 @@ import {
 import { fmtTokens, fmtDurationShort, TableRow } from './stats-helpers.js';
 import { HeatmapView } from './StatsHeatmapView.js';
 import type { StatsData } from '../utils/statsDataService.js';
-import type { TimeRange } from '@hopcode/hopcode-core';
+import type { TimeRange } from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 
 export const ActivityTab: React.FC<{

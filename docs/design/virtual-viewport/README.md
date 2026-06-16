@@ -325,8 +325,8 @@ V.3 (integration tests) is the remaining critical-path item before flipping the 
 
 Per-PR (mandatory before any "ready for review"):
 
-- `npm run typecheck --workspace=@hopcode/hopcode` — clean
-- `npm run lint --workspace=@hopcode/hopcode` — clean
+- `npm run typecheck --workspace=@hoptrendy/hopcode` — clean
+- `npm run lint --workspace=@hoptrendy/hopcode` — clean
 - `cd packages/cli && npx vitest run` — all green
 - Multi-round directionless audit per project workflow
 

@@ -19,7 +19,7 @@ import {
   encodeInsightReadyMessage,
   openBrowserSecurely,
   Storage,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 const logger = createDebugLogger('DataProcessor');
 

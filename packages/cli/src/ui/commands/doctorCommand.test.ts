@@ -10,13 +10,13 @@ import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import * as doctorChecksModule from '../../utils/doctorChecks.js';
 import * as memoryDiagnosticsModule from '../../utils/memoryDiagnostics.js';
-import { collectMemoryDiagnostics } from '@hopcode/hopcode-core';
+import { collectMemoryDiagnostics } from '@hoptrendy/hopcode-core';
 import type { DoctorCheckResult } from '../types.js';
 
 vi.mock('../../utils/doctorChecks.js');
 vi.mock('../../utils/memoryDiagnostics.js');
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@hopcode/hopcode-core')>()),
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@hoptrendy/hopcode-core')>()),
   collectMemoryDiagnostics: vi.fn(),
 }));
 

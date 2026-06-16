@@ -32,7 +32,7 @@ import {
   type MonitorTask,
   type ToolCallConfirmationDetails,
   type WorkflowTask,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { ToolConfirmationMessage } from '../messages/ToolConfirmationMessage.js';
 import { formatDuration, formatTokenCount } from '../../utils/formatters.js';
 import { escapeAnsiCtrlCodes } from '../../utils/textUtils.js';
@@ -732,7 +732,7 @@ const AgentDetailBody: React.FC<{
 };
 
 const ShellDetailBody: React.FC<{
-  entry: import('@hopcode/hopcode-core').ShellTask;
+  entry: import('@hoptrendy/hopcode-core').ShellTask;
   maxHeight: number;
   maxWidth: number;
 }> = ({ entry, maxHeight, maxWidth }) => {

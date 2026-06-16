@@ -16,7 +16,7 @@ import {
 } from '../utils/imageHandler.js';
 import { isAuthenticationRequiredError } from '../../utils/authErrors.js';
 import { getErrorMessage } from '../../utils/errorMessage.js';
-import { stripZeroWidthSpaces } from '@hopcode/webui';
+import { stripZeroWidthSpaces } from '@hoptrendy/webui';
 import {
   exportSessionToFile,
   parseExportSlashCommand,
@@ -1473,7 +1473,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
         });
         return;
       }
-      // Matches SESSION_TITLE_MAX_LENGTH from @hopcode/hopcode-core/sessionService
+      // Matches SESSION_TITLE_MAX_LENGTH from @hoptrendy/hopcode-core/sessionService
       if (trimmedTitle.length > 200) {
         this.sendToWebView({
           type: 'error',

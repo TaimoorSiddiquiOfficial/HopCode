@@ -8,8 +8,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import * as path from 'node:path';
 import mock from 'mock-fs';
 import { FileCommandLoader } from './FileCommandLoader.js';
-import type { Config } from '@hopcode/hopcode-core';
-import { Storage } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 
 describe('FileCommandLoader - Extension Commands Support', () => {
   const projectRoot = '/test/project';

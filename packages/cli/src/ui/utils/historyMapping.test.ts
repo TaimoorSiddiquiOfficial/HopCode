@@ -11,7 +11,7 @@ import type { Content, Part } from '@google/genai';
 import {
   SYSTEM_REMINDER_OPEN,
   SYSTEM_REMINDER_CLOSE,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -5,7 +5,7 @@
  */
 
 /**
- * `@hopcode/webui/daemon-react-sdk`
+ * `@hoptrendy/webui/daemon-react-sdk`
  *
  * React bindings for the HopCode daemon process.
  * Provides context Providers, hooks, types, and constants
@@ -18,7 +18,7 @@
  *   DaemonWorkspaceProvider,
  *   useConnection,
  *   useStreamingState,
- * } from '@hopcode/webui/daemon-react-sdk';
+ * } from '@hoptrendy/webui/daemon-react-sdk';
  * ```
  */
 
@@ -309,4 +309,4 @@ export type {
   DaemonTranscriptState,
   /** External store interface: getSnapshot, subscribe, dispatch, reset. */
   DaemonTranscriptStore,
-} from '@hopcode/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';

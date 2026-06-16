@@ -12,8 +12,8 @@ import type {
   ToolRegistry,
   AnyDeclarativeTool,
   AnyToolInvocation,
-} from '@hopcode/hopcode-core';
-import { Kind, ToolNames } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import { Kind, ToolNames } from '@hoptrendy/hopcode-core';
 import type { Part } from '@google/genai';
 
 // Helper to create mock message parts for tests

@@ -5,7 +5,7 @@
  */
 
 /**
- * Serve-side adapter that satisfies `@hopcode/acp-bridge`'s
+ * Serve-side adapter that satisfies `@hoptrendy/acp-bridge`'s
  * `BridgeFileSystem` interface by routing ACP `writeTextFile` /
  * `readTextFile` requests through the `WorkspaceFileSystem`. Agent-side
  * ACP fs calls pick up the same defensive guarantees the HTTP file
@@ -29,7 +29,7 @@
  *     etc.) is thrown unchanged through `BridgeClient`'s ACP
  *     `writeTextFile` / `readTextFile` handlers and serialized to the
  *     agent via the existing ACP error envelope. The classifier in
- *     `@hopcode/acp-bridge`'s `mapDomainErrorToErrorKind` does NOT
+ *     `@hoptrendy/acp-bridge`'s `mapDomainErrorToErrorKind` does NOT
  *     translate `FsError.kind` to `ServeErrorKind` — it only checks
  *     `instanceof` / `.name` / `.code`. The `.kind` field rides
  *     through on the error object itself; downstream consumers
@@ -55,7 +55,7 @@ import type {
   WriteTextFileRequest,
   WriteTextFileResponse,
 } from '@agentclientprotocol/sdk';
-import type { BridgeFileSystem } from '@hopcode/acp-bridge';
+import type { BridgeFileSystem } from '@hoptrendy/acp-bridge';
 import type {
   WorkspaceFileSystemFactory,
   RequestContext,

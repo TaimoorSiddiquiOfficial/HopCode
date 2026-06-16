@@ -17,12 +17,12 @@ import {
   type MockedFunction,
 } from 'vitest';
 
-import { ExtensionManager, parseInstallSource } from '@hopcode/hopcode-core';
+import { ExtensionManager, parseInstallSource } from '@hoptrendy/hopcode-core';
 
 const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn());
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@hopcode/hopcode-core')>();
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     openBrowserSecurely: mockOpenBrowserSecurely,

@@ -1,4 +1,4 @@
-﻿# HopCode CLI — Architecture Design
+# HopCode CLI — Architecture Design
 
 > **Purpose:** This document is the authoritative memory of the HopCode product architecture.
 > Read it before making changes to understand how components interact and where to start.
@@ -11,11 +11,11 @@
 | ---------------- | --------------------------------- |
 | **Product name** | HopCode                           |
 | **Binary**       | `hopcode`                         |
-| **NPM scope**    | `@hopcode`                      |
-| **Root package** | `@hopcode/hopcode`              |
-| **Core package** | `@hopcode/hopcode-core`         |
-| **CLI package**  | `@hopcode/hopcode`          |
-| **SDK package**  | `@hopcode/sdk`                  |
+| **NPM scope**    | `@hopcode`                        |
+| **Root package** | `@hoptrendy/hopcode`              |
+| **Core package** | `@hoptrendy/hopcode-core`         |
+| **CLI package**  | `@hoptrendy/hopcode`              |
+| **SDK package**  | `@hoptrendy/sdk`                  |
 | **Version**      | see `package.json` (root)         |
 | **GitHub**       | `TaimoorSiddiquiOfficial/HopCode` |
 
@@ -50,7 +50,7 @@ packages/cli
 packages/core
     └── depends on AI SDK packages (@ai-sdk/*, ai)
 integration-tests
-    └── depends on @hopcode/hopcode-core (via packages/core)
+    └── depends on @hoptrendy/hopcode-core (via packages/core)
 ```
 
 ---

@@ -78,8 +78,8 @@ foreach ($file in $files) {
     # 11. qwen-oauth -> hopcode-oauth
     $content = $content -replace 'qwen-oauth', 'hopcode-oauth'
 
-    # 12. @hopcode/ -> @hopcode/
-    $content = $content -replace '@hopcode/', '@hopcode/'
+    # 12. @hoptrendy/ -> @hoptrendy/
+    $content = $content -replace '@hoptrendy/', '@hoptrendy/'
 
     # 13. qwen-code (package name) -> hopcode
     # Only when it's clearly the package name, not a model

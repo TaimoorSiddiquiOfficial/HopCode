@@ -16,7 +16,7 @@ import {
   createDebugLogger,
   isSubpath,
   SessionService,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   collectSessionData,
   normalizeSessionData,

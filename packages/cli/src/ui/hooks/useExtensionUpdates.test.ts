@@ -21,7 +21,7 @@ import {
   type Extension,
   type ExtensionUpdateInfo,
   ExtensionUpdateState,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { MessageType } from '../types.js';
 

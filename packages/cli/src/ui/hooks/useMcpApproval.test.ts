@@ -9,7 +9,7 @@ import { renderHook, act } from '@testing-library/react';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import type { Config, MCPServerConfig } from '@hopcode/hopcode-core';
+import type { Config, MCPServerConfig } from '@hoptrendy/hopcode-core';
 import { useMcpApproval } from './useMcpApproval.js';
 import { McpApprovalChoice } from '../components/mcp/MCPServerApprovalDialog.js';
 import {

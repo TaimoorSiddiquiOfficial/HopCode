@@ -1,6 +1,6 @@
 {
-  "name": "@hopcode/sdk",
-  "version": "0.1.8",
+  "name": "@hoptrendy/sdk",
+  "version": "0.30.2",
   "description": "TypeScript SDK for programmatic access to hopcode CLI",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -58,7 +58,6 @@
     "zod": "^3.25.0"
   },
   "devDependencies": {
-    "@hopcode/acp-bridge": "file:../acp-bridge",
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.13.0",
@@ -67,7 +66,8 @@
     "esbuild": "^0.25.12",
     "eslint": "^8.57.0",
     "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "@hoptrendy/acp-bridge": "file:../acp-bridge"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"

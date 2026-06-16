@@ -10,7 +10,7 @@ import {
   type SlashCommandActionReturn,
   CommandKind,
 } from './types.js';
-import { generateSessionRecap } from '@hopcode/hopcode-core';
+import { generateSessionRecap } from '@hoptrendy/hopcode-core';
 import type { HistoryItemAwayRecap } from '../types.js';
 import { t } from '../../i18n/index.js';
 

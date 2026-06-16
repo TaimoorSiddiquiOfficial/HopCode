@@ -7,12 +7,12 @@
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@hopcode/hopcode-core": ["../core/src/index.ts"],
-      "@hopcode/hopcode-core/*": ["../core/src/*"],
-      "@hopcode/acp-bridge": ["../acp-bridge/src/index.ts"],
-      "@hopcode/acp-bridge/*": ["../acp-bridge/src/*"],
-      "@hopcode/hopcode-server": ["../server/src/index.ts"],
-      "@hopcode/hopcode-server/*": ["../server/src/*"]
+      "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
+      "@hoptrendy/hopcode-core/*": ["../core/src/*"],
+      "@hoptrendy/acp-bridge": ["../acp-bridge/src/index.ts"],
+      "@hoptrendy/acp-bridge/*": ["../acp-bridge/src/*"],
+      "@hoptrendy/hopcode-server": ["../server/src/index.ts"],
+      "@hoptrendy/hopcode-server/*": ["../server/src/*"]
     }
   },
   "include": [

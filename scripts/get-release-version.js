@@ -17,7 +17,7 @@ import {
 } from './lib/release-helpers.js';
 
 function getVersionFromNPM(distTag) {
-  const command = `npm view @hopcode/hopcode version --tag=${distTag}`;
+  const command = `npm view @hoptrendy/hopcode version --tag=${distTag}`;
   try {
     return execSync(command).toString().trim();
   } catch (error) {
@@ -29,7 +29,7 @@ function getVersionFromNPM(distTag) {
 }
 
 function getAllVersionsFromNPM() {
-  const command = `npm view @hopcode/hopcode versions --json`;
+  const command = `npm view @hoptrendy/hopcode versions --json`;
   try {
     const versionsJson = execSync(command).toString().trim();
     return JSON.parse(versionsJson);
@@ -40,7 +40,7 @@ function getAllVersionsFromNPM() {
 }
 
 function isVersionDeprecated(version) {
-  const command = `npm view @hopcode/hopcode@${version} deprecated`;
+  const command = `npm view @hoptrendy/hopcode@${version} deprecated`;
   try {
     const output = execSync(command).toString().trim();
     return output.length > 0;
@@ -121,7 +121,7 @@ function detectRollbackAndGetBaseline(npmDistTag) {
 function doesVersionExist(version) {
   // Check NPM
   try {
-    const command = `npm view @hopcode/hopcode@${version} version 2>/dev/null`;
+    const command = `npm view @hoptrendy/hopcode@${version} version 2>/dev/null`;
     const output = execSync(command).toString().trim();
     if (output === version) {
       console.error(`Version ${version} already exists on NPM.`);

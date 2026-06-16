@@ -600,7 +600,7 @@ docs/providers/
 
 ```bash
 # Install HopCode
-npm install -g @hopcode/hopcode
+npm install -g @hoptrendy/hopcode
 
 # Configure provider
 hopcode providers select

@@ -15,7 +15,7 @@ import {
   getToolInvalidReasons,
 } from './utils.js';
 import type { MCPServerDisplayInfo } from './types.js';
-import { MCPServerStatus } from '@hopcode/hopcode-core';
+import { MCPServerStatus } from '@hoptrendy/hopcode-core';
 
 describe('MCP utils', () => {
   describe('groupServersBySource', () => {

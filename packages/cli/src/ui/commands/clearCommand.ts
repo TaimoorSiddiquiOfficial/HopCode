@@ -13,7 +13,7 @@ import {
   ToolNames,
   persistSessionUsage,
   createDebugLogger,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   hasBlockingBackgroundWork,
   resetBackgroundStateForSessionSwitch,

@@ -16,7 +16,7 @@ import type {
   DaemonUserMessage,
   DaemonUserShellMessage,
 } from './messageTypes';
-import type { DaemonStreamingState } from '@hopcode/webui/daemon-react-sdk';
+import type { DaemonStreamingState } from '@hoptrendy/webui/daemon-react-sdk';
 
 export type Message = DaemonMessage;
 export type ACPToolCall = DaemonMessageToolCall;

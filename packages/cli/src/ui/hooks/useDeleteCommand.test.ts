@@ -7,7 +7,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, it, expect, vi } from 'vitest';
 import { useDeleteCommand } from './useDeleteCommand.js';
-import type { Config, RemoveSessionsResult } from '@hopcode/hopcode-core';
+import type { Config, RemoveSessionsResult } from '@hoptrendy/hopcode-core';
 
 function createConfig(opts: {
   currentSessionId: string;

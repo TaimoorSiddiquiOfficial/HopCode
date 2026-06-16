@@ -1,6 +1,6 @@
 {
-  "name": "@hopcode/channel-dingtalk",
-  "version": "0.18.1",
+  "name": "@hoptrendy/channel-dingtalk",
+  "version": "0.30.2",
   "description": "DingTalk channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",
@@ -18,8 +18,8 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@hopcode/channel-base": "file:../base",
-    "dingtalk-stream-sdk-nodejs": "^2.0.4"
+    "dingtalk-stream-sdk-nodejs": "^2.0.4",
+    "@hoptrendy/channel-base": "file:../base"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

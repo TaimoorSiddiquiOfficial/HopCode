@@ -23,7 +23,7 @@ import type {
   ServeWorkspaceEnvStatus,
   ServeWorkspacePreflightStatus,
   DaemonStatusProvider,
-} from '@hopcode/acp-bridge';
+} from '@hoptrendy/acp-bridge';
 
 // ---------------------------------------------------------------------------
 // WorkspaceRequestContext
