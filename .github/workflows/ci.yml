@@ -22,8 +22,7 @@ on:
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
-  cancel-in-progress: |-
-    ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release/') }}
+  cancel-in-progress: "${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release/') }}"
 
 permissions:
   checks: 'write'
@@ -220,6 +219,10 @@ jobs:
           npm run build --workspace=packages/channels/telegram
           npm run build --workspace=packages/channels/weixin
           npm run build --workspace=packages/channels/dingtalk
+          npm run build --workspace=packages/acp-bridge
+          npm run build --workspace=packages/sdk-typescript
+          npm run build --workspace=packages/webui
+          npm run build --workspace=packages/web-shell
           npm run generate
 
       - name: 'Run tests and generate reports'

@@ -1,16 +1,28 @@
 import { useCallback, useRef, useState } from 'react';
 
-const DEFAULT_STORAGE_KEY = 'qwen-web-shell-history';
+const DEFAULT_STORAGE_KEY = 'hopcode-web-shell-history';
+const LEGACY_DEFAULT_STORAGE_KEY = 'qwen-web-shell-history';
 const MAX_HISTORY = 100;
 
-function loadHistory(storageKey: string): string[] {
+function parseHistory(raw: string): string[] {
+  const parsed: unknown = JSON.parse(raw);
+  return Array.isArray(parsed)
+    ? parsed.filter((v) => typeof v === 'string')
+    : [];
+}
+
+function loadHistory(storageKey: string, legacyStorageKey?: string): string[] {
   try {
     const raw = localStorage.getItem(storageKey);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed)
-      ? parsed.filter((v) => typeof v === 'string')
-      : [];
+    if (raw) return parseHistory(raw);
+
+    if (!legacyStorageKey) return [];
+    const legacyRaw = localStorage.getItem(legacyStorageKey);
+    if (!legacyRaw) return [];
+
+    const history = parseHistory(legacyRaw);
+    saveHistory(storageKey, history);
+    return history;
   } catch {
     return [];
   }
@@ -27,10 +39,17 @@ function saveHistory(storageKey: string, history: string[]) {
   }
 }
 
-export function useInputHistory(storageKey = DEFAULT_STORAGE_KEY) {
+export function useInputHistory(
+  storageKey = DEFAULT_STORAGE_KEY,
+  legacyStorageKey = storageKey === DEFAULT_STORAGE_KEY
+    ? LEGACY_DEFAULT_STORAGE_KEY
+    : undefined,
+) {
   const storageKeyRef = useRef(storageKey);
   storageKeyRef.current = storageKey;
-  const historyRef = useRef<string[]>(loadHistory(storageKey));
+  const historyRef = useRef<string[]>(
+    loadHistory(storageKey, legacyStorageKey),
+  );
   const indexRef = useRef<number>(-1);
   const draftRef = useRef<string>('');
   const searchIndexRef = useRef<number>(-1);

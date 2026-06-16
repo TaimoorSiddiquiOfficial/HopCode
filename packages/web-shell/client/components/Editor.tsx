@@ -450,7 +450,10 @@ export const Editor = forwardRef<EditorHandle, EditorProps>(function Editor(
   const autoTriggerRef = useRef<{ text: string; from: number } | null>(null);
 
   const promptHistory = useInputHistory();
-  const shellHistory = useInputHistory('qwen-web-shell-command-history');
+  const shellHistory = useInputHistory(
+    'hopcode-web-shell-command-history',
+    'qwen-web-shell-command-history',
+  );
 
   const {
     push,

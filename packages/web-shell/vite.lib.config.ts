@@ -30,8 +30,8 @@ function injectCssModules(): Plugin {
         }
         item.code =
           `const __hopcodeWebShellCss=${escapedCss};\n` +
-          `if(typeof document!=="undefined"&&!document.querySelector('style[data-qwen-web-shell="component"]')){` +
-          `const s=document.createElement("style");s.dataset.hopcodeWebShell="component";s.textContent=__hopcodeWebShellCss;try{document.head.appendChild(s);}catch(e){console.warn("[qwen-web-shell] CSS injection blocked by CSP:",e);}}\n` +
+          `if(typeof document!=="undefined"&&!document.querySelector('style[data-hopcode-web-shell="component"]')){` +
+          `const s=document.createElement("style");s.dataset.hopcodeWebShell="component";s.textContent=__hopcodeWebShellCss;try{document.head.appendChild(s);}catch(e){console.warn("[hopcode-web-shell] CSS injection blocked by CSP:",e);}}\n` +
           item.code;
       }
     },
@@ -54,9 +54,9 @@ export default defineConfig({
         'react-dom',
         'react-dom/client',
         '@hoptrendy/sdk',
-        /^@hopcode\/sdk\//,
+        /^@hoptrendy\/sdk\//,
         '@hoptrendy/webui',
-        /^@hopcode\/webui\//,
+        /^@hoptrendy\/webui\//,
         'react-markdown',
         'remark-gfm',
         'remark-math',

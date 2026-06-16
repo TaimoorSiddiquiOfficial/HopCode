@@ -24,7 +24,7 @@ jobs:
   sync:
     name: 'Mirror cua-driver binaries to Aliyun OSS'
     runs-on: 'ubuntu-latest'
-    if: github.repository == 'QwenLM/qwen-code'
+    if: "github.repository == 'QwenLM/qwen-code'"
     steps:
       - name: 'No-op in HopCode fork'
         run: |-
