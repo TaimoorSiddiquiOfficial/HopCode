@@ -42,7 +42,7 @@ let nextSyntheticId = 1;
  *   - `session/update` notification → `DaemonEvent` with the `type`
  *     field read from `params.type`. The full `params` object becomes
  *     `data`.
- *   - `_qwen/notify` notification → `DaemonEvent` with `type` and
+ *   - `_hopcode/notify` notification → `DaemonEvent` with `type` and
  *     `data` read from `params`.
  *   - Notifications with `method` matching a known daemon event type
  *     directly (e.g. `memory_changed`, `agent_changed`) are passed
@@ -115,8 +115,8 @@ export function denormalizeAcpNotification(
     };
   }
 
-  // Extension path: _qwen/notify is a generic notification envelope.
-  if (notification.method === '_qwen/notify') {
+  // Extension path: _hopcode/notify is a generic notification envelope.
+  if (notification.method === '_hopcode/notify') {
     const type = params['type'];
     if (typeof type !== 'string' || type.length === 0) return undefined;
     return {

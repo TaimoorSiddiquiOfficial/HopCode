@@ -1288,7 +1288,7 @@ function fakeBridge(opts: FakeBridgeOpts = {}): FakeBridge {
       params?: Record<string, unknown>,
       _opts?: { timeoutMs?: number },
     ): Promise<T> {
-      if (method === 'qwen/control/workspace/mcp/restart') {
+      if (method === 'hopcode/control/workspace/mcp/restart') {
         const serverName = (params?.['serverName'] as string) ?? '';
         const entryIndex = params?.['entryIndex'] as number | undefined;
         restartMcpServerCalls.push({
@@ -2517,7 +2517,7 @@ describe('createServeApp', () => {
         .post(`/session/${sessionId}/mid-turn-message`)
         .set('Host', `127.0.0.1:${baseOpts.port}`)
         .set('Authorization', 'Bearer secret');
-      if (clientId !== undefined) r.set('X-Qwen-Client-Id', clientId);
+      if (clientId !== undefined) r.set('X-HopCode-Client-Id', clientId);
       return r.send(body);
     };
     const midTurnApp = (bridge: FakeBridge) =>
@@ -2597,7 +2597,7 @@ describe('createServeApp', () => {
       expect(res.body.sessionId).toBe('missing');
     });
 
-    it('400 on a malformed X-Qwen-Client-Id (never reaches the bridge)', async () => {
+    it('400 on a malformed X-HopCode-Client-Id (never reaches the bridge)', async () => {
       const bridge = fakeBridge();
       const res = await midTurnPost(
         midTurnApp(bridge),
@@ -2647,23 +2647,22 @@ describe('createServeApp', () => {
   });
 
   describe('middleware order — auth runs before body parser', () => {
-    it('rejects unauthorized POST without parsing the (possibly huge) body', async () => {
-      // If auth ran AFTER body-parsing, an unauthenticated client could
-      // force the daemon to JSON.parse a 10MB payload before the 401.
-      // This test verifies the 401 fires regardless of body content
-      // (no 413 / no parse error / no validation error).
+    it('rejects unauthorized POST without parsing the body', async () => {
+      // If auth ran AFTER body-parsing, this malformed JSON would fail
+      // before the 401. Keeping the payload small avoids a client-side
+      // ECONNRESET race when the server rejects before draining the body.
       const bridge = fakeBridge();
       const tokenedOpts: ServeOptions = {
         ...baseOpts,
         token: 'real-secret',
       };
       const app = createServeApp(tokenedOpts, undefined, { bridge });
-      const fakeBigBody = JSON.stringify({ filler: 'x'.repeat(100_000) });
+      const malformedJson = '{"filler":';
       const res = await request(app)
         .post('/session')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
         .set('content-type', 'application/json')
-        .send(fakeBigBody);
+        .send(malformedJson);
       expect(res.status).toBe(401);
       // Bridge must NOT have been touched — auth short-circuited.
       expect(bridge.calls).toHaveLength(0);
@@ -4117,7 +4116,7 @@ describe('createServeApp', () => {
       expect(bridge.shellCalls).toHaveLength(0);
     });
 
-    it('403 client_id_required before command validation when enabled without X-Qwen-Client-Id', async () => {
+    it('403 client_id_required before command validation when enabled without X-HopCode-Client-Id', async () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(
@@ -4131,11 +4130,11 @@ describe('createServeApp', () => {
       expect(bridge.shellCalls).toHaveLength(0);
     });
 
-    it('400 invalid_client_id for malformed X-Qwen-Client-Id before bridge dispatch', async () => {
+    it('400 invalid_client_id for malformed X-HopCode-Client-Id before bridge dispatch', async () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/session/session-A/shell'))
-        .set('X-Qwen-Client-Id', 'bad client id')
+        .set('X-HopCode-Client-Id', 'bad client id')
         .send({ command: 'pwd' });
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_client_id');
@@ -4146,7 +4145,7 @@ describe('createServeApp', () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/session/session-A/shell'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ command: '   ' });
       expect(res.status).toBe(400);
       expect(res.body.error).toContain('`command` is required');
@@ -4157,7 +4156,7 @@ describe('createServeApp', () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/session/session-A/shell'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ command: 'pwd' });
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
@@ -4183,7 +4182,7 @@ describe('createServeApp', () => {
       });
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/session/session-A/shell'))
-        .set('X-Qwen-Client-Id', 'client-2')
+        .set('X-HopCode-Client-Id', 'client-2')
         .send({ command: 'pwd' });
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
@@ -4203,7 +4202,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/shell')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ command: 'pwd' });
       expect(res.status).toBe(401);
       expect(res.body.code).toBe('token_required');
@@ -4222,7 +4221,7 @@ describe('createServeApp', () => {
       const disabled = await auth(
         request(disabledApp).post('/session/session-A/shell'),
       )
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ command: 'pwd' });
       expect(disabled.status).toBe(403);
       expect(disabled.body.errorKind).toBe('session_shell_disabled');
@@ -4238,7 +4237,7 @@ describe('createServeApp', () => {
       const clientRequired = await auth(
         request(clientRequiredApp).post('/session/session-A/shell'),
       )
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ command: 'pwd' });
       expect(clientRequired.status).toBe(403);
       expect(clientRequired.body.errorKind).toBe('client_id_required');
@@ -4695,10 +4694,22 @@ describe('createServeApp', () => {
         );
         try {
           await fsp.writeFile(path.join(outsideDir, 'target.md'), 'outside');
-          await fsp.symlink(
-            path.join(outsideDir, 'target.md'),
-            path.join(wsRoot, 'HOPCODE.md'),
-          );
+          try {
+            await fsp.symlink(
+              path.join(outsideDir, 'target.md'),
+              path.join(wsRoot, 'HOPCODE.md'),
+            );
+          } catch (err) {
+            if (
+              process.platform === 'win32' &&
+              err instanceof Error &&
+              'code' in err &&
+              (err.code === 'EPERM' || err.code === 'EACCES')
+            ) {
+              return;
+            }
+            throw err;
+          }
           const bridge = fakeBridge();
           const opts: ServeOptions = {
             ...baseOpts,
@@ -6433,7 +6444,7 @@ describe('createServeApp', () => {
       const app = createServeApp(baseOpts, undefined, {
         bridge,
         daemonLog,
-        qwenCodeVersion: '1.2.3-test',
+        HopCodeVersion: '1.2.3-test',
       });
 
       const res = await request(app)
@@ -6450,7 +6461,7 @@ describe('createServeApp', () => {
           pid: process.pid,
           mode: 'http-bridge',
           workspaceCwd: expect.any(String),
-          qwenCodeVersion: '1.2.3-test',
+          hopCodeVersion: '1.2.3-test',
           daemonId: 'test-daemon',
         },
         security: {
@@ -6585,7 +6596,7 @@ describe('createServeApp', () => {
             },
           },
           auth: {
-            supportedDeviceFlowProviders: ['qwen-oauth'],
+            supportedDeviceFlowProviders: ['hopcode-oauth'],
             pendingDeviceFlowCount: 0,
           },
         },
@@ -6699,7 +6710,7 @@ describe('runHopCodeServe', () => {
   });
 
   it('uses normalized token for session shell capability across REST and ACP initialize', async () => {
-    handle = await runQwenServe({
+    handle = await runHopCodeServe({
       hostname: '127.0.0.1',
       port: 0,
       mode: 'http-bridge',
@@ -6728,10 +6739,12 @@ describe('runHopCodeServe', () => {
     });
     expect(initRes.status).toBe(200);
     const init = (await initRes.json()) as {
-      result: { agentCapabilities: { _meta: { qwen: { methods: string[] } } } };
+      result: {
+        agentCapabilities: { _meta: { hopcode: { methods: string[] } } };
+      };
     };
-    expect(init.result.agentCapabilities._meta.qwen.methods).toContain(
-      '_qwen/session/shell',
+    expect(init.result.agentCapabilities._meta.hopcode.methods).toContain(
+      '_hopcode/session/shell',
     );
   });
 
@@ -6740,7 +6753,7 @@ describe('runHopCodeServe', () => {
       .spyOn(process.stderr, 'write')
       .mockImplementation((() => true) as typeof process.stderr.write);
     try {
-      handle = await runQwenServe({
+      handle = await runHopCodeServe({
         hostname: '127.0.0.1',
         port: 0,
         mode: 'http-bridge',
@@ -6772,14 +6785,16 @@ describe('runHopCodeServe', () => {
     });
     expect(initRes.status).toBe(200);
     const init = (await initRes.json()) as {
-      result: { agentCapabilities: { _meta: { qwen: { methods: string[] } } } };
+      result: {
+        agentCapabilities: { _meta: { hopcode: { methods: string[] } } };
+      };
     };
-    expect(init.result.agentCapabilities._meta.qwen.methods).not.toContain(
-      '_qwen/session/shell',
+    expect(init.result.agentCapabilities._meta.hopcode.methods).not.toContain(
+      '_hopcode/session/shell',
     );
   });
 
-  // PR 14 fix (review #4247): runQwenServe is the documented embedded
+  // PR 14 fix (review #4247): runHopCodeServe is the documented embedded
   // entry point, so budget validation must live here, not just in the
   // yargs CLI handler. Embedded callers (other tools wrapping the
   // daemon, deps.bridge test injection) silently produced an uncapped
@@ -6844,7 +6859,7 @@ describe('runHopCodeServe', () => {
     'rejects invalid maxPendingPromptsPerSession (%s) at boot',
     async (_label, value) => {
       await expect(
-        runQwenServe({
+        runHopCodeServe({
           hostname: '127.0.0.1',
           port: 0,
           mode: 'http-bridge',
@@ -8273,7 +8288,7 @@ describe('GET /demo', () => {
       .set('Host', `127.0.0.1:${baseOpts.port}`);
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toMatch(/text\/html/);
-    expect(res.text).toContain('hopcode serve');
+    expect(res.text).toContain('HopCode Serve');
     expect(res.text).toContain('<!DOCTYPE html>');
   });
 

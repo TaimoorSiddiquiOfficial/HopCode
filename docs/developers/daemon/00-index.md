@@ -33,13 +33,13 @@ Pick the path that matches your goal:
 
 ### Server core
 
-- [`02-serve-runtime.md`](./02-serve-runtime.md) - `runQwenServe` bootstrap, Express app, middleware chain, graceful shutdown.
+- [`02-serve-runtime.md`](./02-serve-runtime.md) - `runHopCodeServe` bootstrap, Express app, middleware chain, graceful shutdown.
 - [`03-acp-bridge.md`](./03-acp-bridge.md) - `@hoptrendy/acp-bridge` package internals, session multiplexing, channel factory, ACP child spawn.
 - [`04-permission-mediation.md`](./04-permission-mediation.md) - `MultiClientPermissionMediator`, four policies, N1 timeout invariant, cancel sentinel.
 - [`05-mcp-transport-pool.md`](./05-mcp-transport-pool.md) - `McpTransportPool` (F2), pool entries, reverse index, restart, drain.
 - [`06-mcp-budget-guardrails.md`](./06-mcp-budget-guardrails.md) - `WorkspaceMcpBudget`, modes (`off`/`warn`/`enforce`), hysteresis, refused-batch coalescing.
 - [`07-workspace-filesystem.md`](./07-workspace-filesystem.md) - `WorkspaceFileSystem` sandbox, path policy, audit, `BridgeFileSystem` contract.
-- [`08-session-lifecycle.md`](./08-session-lifecycle.md) - create / attach / load / resume, `X-Qwen-Client-Id`, heartbeat, eviction, metadata.
+- [`08-session-lifecycle.md`](./08-session-lifecycle.md) - create / attach / load / resume, `X-HopCode-Client-Id`, heartbeat, eviction, metadata.
 - [`09-event-schema.md`](./09-event-schema.md) - typed event schema v1: all 43 known event types with payloads, reducers, forward compatibility.
 - [`10-event-bus.md`](./10-event-bus.md) - `EventBus`, monotonic IDs, ring replay, `Last-Event-ID`, slow-client backpressure, `client_evicted`.
 - [`11-capabilities-versioning.md`](./11-capabilities-versioning.md) - capability registry, protocol version, schema version, conditional advertisement.
@@ -73,7 +73,7 @@ Pick the path that matches your goal:
 - **MCP** - Model Context Protocol. Servers expose tools, resources, and prompts; the daemon ACP child connects to them.
 - **McpTransportPool** - `packages/core/src/tools/mcp-transport-pool.ts`. F2 workspace-scoped pool sharing one MCP transport per server name and config fingerprint.
 - **Mediator policy** - one of `first-responder`, `designated`, `consensus`, or `local-only`. Decides how multi-client permission votes resolve.
-- **Originator client id** - the `X-Qwen-Client-Id` of the client that initiated the prompt currently requesting permission. The `designated` policy only accepts votes from this id.
+- **Originator client id** - the `X-HopCode-Client-Id` of the client that initiated the prompt currently requesting permission. The `designated` policy only accepts votes from this id.
 - **PoolEntry** - `packages/core/src/tools/mcp-pool-entry.ts`. One entry in `McpTransportPool`: one MCP transport, a refcount of attached sessions, and an idle drain timer.
 - **Session scope** - `single` (one ACP session shared by all clients) or `thread` (one session per conversation thread). The default is `single`.
 - **SSE** - Server-Sent Events. The daemon outbound event channel (`GET /session/:id/events`).
@@ -85,7 +85,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 | Surface                             | Implementation anchors                                                                                                                                                                                                                                    | Primary docs                                                                                                           |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Bootstrap and HTTP assembly         | `packages/cli/src/serve/runQwenServe.ts`, `server.ts`, `/demo`                                                                                                                                                                                            | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)                                                   |
+| Bootstrap and HTTP assembly         | `packages/cli/src/serve/runHopCodeServe.ts`, `server.ts`, `/demo`                                                                                                                                                                                         | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)                                                   |
 | ACP bridge and session multiplexing | `packages/acp-bridge/src/bridge.ts`, `packages/acp-bridge/src/bridgeTypes.ts`, `@hoptrendy/acp-bridge`                                                                                                                                                    | [`03`](./03-acp-bridge.md), [`08`](./08-session-lifecycle.md)                                                          |
 | Permission mediation                | `packages/acp-bridge/src/permissionMediator.ts`, `fromLoopback: boolean`, `policy.*`                                                                                                                                                                      | [`04`](./04-permission-mediation.md), [`12`](./12-auth-security.md)                                                    |
 | MCP transport pool                  | `packages/core/src/tools/mcp-transport-pool.ts`, `mcp-pool-key.ts`, `pid-descendants.ts`, `session-mcp-view.ts`, `/mcp refresh`, `MCPCallInterruptedError`                                                                                                | [`05`](./05-mcp-transport-pool.md), [`06`](./06-mcp-budget-guardrails.md)                                              |
@@ -112,7 +112,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 | Area                      | Current state                                                                                                                                                                    | Primary docs                                                              |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Bootstrap / listen path   | `hopcode serve` lazy-loads `runQwenServe`, validates auth/workspace/budget/settings, builds an Express app, then calls `app.listen` and blocks forever until signal.             | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)      |
+| Bootstrap / listen path   | `hopcode serve` lazy-loads `runHopCodeServe`, validates auth/workspace/budget/settings, builds an Express app, then calls `app.listen` and blocks forever until signal.          | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)      |
 | Auth / network guardrails | Loopback defaults to no bearer; non-loopback requires bearer; `--require-auth` extends bearer to loopback and `/health`; Host allowlist and default CORS deny are active.        | [`12`](./12-auth-security.md), [`17`](./17-configuration.md)              |
 | Session lifecycle         | `POST /session`, `load`, `resume`, metadata patch, heartbeat, eviction, idle reaping, prompt pending limits, and graceful close are documented.                                  | [`08`](./08-session-lifecycle.md), [`10`](./10-event-bus.md)              |
 | ACP bridge                | Single ACP child multiplexed by default; `sessionScope` supports `single` and `thread`; `BridgeFileSystem`, context filename, env overrides, and channel idle timeout are wired. | [`03`](./03-acp-bridge.md), [`07`](./07-workspace-filesystem.md)          |
@@ -121,13 +121,13 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 ### Wire protocol
 
-| Area          | Current state                                                                                                                                       | Primary docs                                                                                                  |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| HTTP routes   | The route catalog lives in `qwen-serve-protocol.md`; this daemon set only references it and explains implementation ownership.                      | [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md), [`20`](./20-quickstart-operations.md)               |
-| Event schema  | `EVENT_SCHEMA_VERSION = 1`; 43 known event types; id-less subscriber synthetic frames; `_meta.serverTimestamp` stamped at SSE write boundary.       | [`09`](./09-event-schema.md), [`10`](./10-event-bus.md)                                                       |
-| Capabilities  | `SERVE_PROTOCOL_VERSION = 'v1'`; 66 registered tags; 10 conditional tags.                                                                           | [`11`](./11-capabilities-versioning.md)                                                                       |
-| Session shell | `POST /session/:id/shell` exists behind `--enable-session-shell`, bearer auth, and session-bound `X-Qwen-Client-Id`; capability tag is conditional. | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md), [`20`](./20-quickstart-operations.md) |
-| Rate limiting | Optional per-tier HTTP rate limit is exposed by CLI flags/env and conditional capability tag.                                                       | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md)                                        |
+| Area          | Current state                                                                                                                                          | Primary docs                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| HTTP routes   | The route catalog lives in `qwen-serve-protocol.md`; this daemon set only references it and explains implementation ownership.                         | [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md), [`20`](./20-quickstart-operations.md)               |
+| Event schema  | `EVENT_SCHEMA_VERSION = 1`; 43 known event types; id-less subscriber synthetic frames; `_meta.serverTimestamp` stamped at SSE write boundary.          | [`09`](./09-event-schema.md), [`10`](./10-event-bus.md)                                                       |
+| Capabilities  | `SERVE_PROTOCOL_VERSION = 'v1'`; 66 registered tags; 10 conditional tags.                                                                              | [`11`](./11-capabilities-versioning.md)                                                                       |
+| Session shell | `POST /session/:id/shell` exists behind `--enable-session-shell`, bearer auth, and session-bound `X-HopCode-Client-Id`; capability tag is conditional. | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md), [`20`](./20-quickstart-operations.md) |
+| Rate limiting | Optional per-tier HTTP rate limit is exposed by CLI flags/env and conditional capability tag.                                                          | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md)                                        |
 
 ### Clients / SDK
 

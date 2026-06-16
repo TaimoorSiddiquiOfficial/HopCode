@@ -463,7 +463,7 @@ When the daemon runs on a remote pod (no shared display with you), you can still
 curl -X POST http://127.0.0.1:4170/workspace/auth/device-flow \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"providerId":"qwen-oauth"}'
+  -d '{"providerId":"hopcode-oauth"}'
 # → 201 {
 #     "deviceFlowId": "fa07c61b-…",
 #     "userCode": "USER-1",
@@ -487,7 +487,7 @@ The TypeScript SDK wraps both steps into a single helper:
 import { DaemonClient } from '@hoptrendy/sdk';
 
 const client = new DaemonClient({ baseUrl, token });
-const flow = await client.auth.start({ providerId: 'qwen-oauth' });
+const flow = await client.auth.start({ providerId: 'hopcode-oauth' });
 console.log(`Open ${flow.verificationUri}\nCode: ${flow.userCode}`);
 const result = await flow.awaitCompletion({ signal: abortCtrl.signal });
 // result.status === 'authorized'
@@ -497,19 +497,19 @@ const result = await flow.awaitCompletion({ signal: abortCtrl.signal });
 
 **`--require-auth` and dev convenience.** The device-flow routes use the strict mutation gate (PR 15), which means a token-less loopback default returns `401 token_required`. Locally, the simplest way around this during development is `hopcode serve --token=dev-token`; you don't need `--require-auth` unless you're hardening the loopback default.
 
-**Cross-daemon limitation.** `oauth_creds.json` is daemon-shared (`~/.qwen/oauth_creds.json`), so a successful login in daemon A is automatically picked up by daemon B's next token refresh — but daemon B's SDK clients won't receive the `auth_device_flow_authorized` event (events are per-daemon).
+**Cross-daemon limitation.** `oauth_creds.json` is daemon-shared (`~/.hopcode/oauth_creds.json`), so a successful login in daemon A is automatically picked up by daemon B's next token refresh — but daemon B's SDK clients won't receive the `auth_device_flow_authorized` event (events are per-daemon).
 
-**Cross-client take-over.** Two SDK clients on the same daemon that both `POST /workspace/auth/device-flow` for the same provider get the per-provider singleton: the first call starts a fresh IdP request and returns `attached: false`; the second call returns the EXISTING in-flight entry with `attached: true`. The take-over is recorded on the audit trail (under the second client's `X-Qwen-Client-Id`) but does NOT emit a separate event — both clients eventually observe the SAME `auth_device_flow_authorized` once the user finishes the IdP page. If your UI distinguishes "I started this" from "someone else's flow I joined", branch on the `attached` field returned by `start()`.
+**Cross-client take-over.** Two SDK clients on the same daemon that both `POST /workspace/auth/device-flow` for the same provider get the per-provider singleton: the first call starts a fresh IdP request and returns `attached: false`; the second call returns the EXISTING in-flight entry with `attached: true`. The take-over is recorded on the audit trail (under the second client's `X-HopCode-Client-Id`) but does NOT emit a separate event — both clients eventually observe the SAME `auth_device_flow_authorized` once the user finishes the IdP page. If your UI distinguishes "I started this" from "someone else's flow I joined", branch on the `attached` field returned by `start()`.
 
 ## Daemon log file
 
 `hopcode serve` writes a per-process diagnostic log to:
 
 ```
-${HOPCODE_RUNTIME_DIR or ~/.qwen}/debug/daemon/serve-<pid>-<workspaceHash>.log
+${HOPCODE_RUNTIME_DIR or ~/.hopcode}/debug/daemon/serve-<pid>-<workspaceHash>.log
 ```
 
-A `latest` symlink in the same directory always points at the current process's log, so `tail -f ~/.qwen/debug/daemon/latest` will follow whichever daemon is running.
+A `latest` symlink in the same directory always points at the current process's log, so `tail -f ~/.hopcode/debug/daemon/latest` will follow whichever daemon is running.
 
 The log captures lifecycle messages, route errors (with `route=` and `sessionId=` context), ACP child stderr, and — when `HOPCODE_SERVE_DEBUG=1` is set — extra bridge breadcrumbs. Lines that go to stderr today still go to stderr; the file log is **additive**, not a replacement.
 
@@ -519,7 +519,7 @@ Set `HOPCODE_DAEMON_LOG_FILE=0` (or `false`/`off`/`no`) to skip file logging ent
 
 ### Relation to session debug logs
 
-Session-scoped debug logs (`~/.qwen/debug/<sessionId>.txt` and the `~/.qwen/debug/latest` symlink) are independent. The daemon log lives in a sibling `daemon/` subdirectory; per-session debug semantics are unchanged by this feature.
+Session-scoped debug logs (`~/.hopcode/debug/<sessionId>.txt` and the `~/.hopcode/debug/latest` symlink) are independent. The daemon log lives in a sibling `daemon/` subdirectory; per-session debug semantics are unchanged by this feature.
 
 ### No rotation
 
@@ -584,7 +584,7 @@ Errors:
 | ------ | ------------------------- | -------------------------------------------------------------------------------------------------- |
 | `400`  | `invalid_server_name`     | Name empty, exceeds 256 chars, or contains characters outside `[A-Za-z0-9_-]`                      |
 | `400`  | `missing_required_field`  | `config` missing or not a non-null object                                                          |
-| `400`  | `invalid_client_id`       | `X-Qwen-Client-Id` header present but not registered for this workspace                            |
+| `400`  | `invalid_client_id`       | `X-HopCode-Client-Id` header present but not registered for this workspace                         |
 | `400`  | `invalid_config`          | Config shape rejected by the MCP transport validator                                               |
 | `401`  | `token_required`          | No bearer token configured (strict gate)                                                           |
 | `409`  | `mcp_budget_would_exceed` | `--mcp-budget-mode=enforce` and budget is full                                                     |
@@ -627,7 +627,7 @@ Errors:
 | Status | Code                      | When                                                                          |
 | ------ | ------------------------- | ----------------------------------------------------------------------------- |
 | `400`  | `invalid_server_name`     | Name empty, exceeds 256 chars, or contains characters outside `[A-Za-z0-9_-]` |
-| `400`  | `invalid_client_id`       | `X-Qwen-Client-Id` header present but not registered for this workspace       |
+| `400`  | `invalid_client_id`       | `X-HopCode-Client-Id` header present but not registered for this workspace    |
 | `401`  | `token_required`          | No bearer token configured (strict gate)                                      |
 | `503`  | `acp_channel_unavailable` | No live ACP child                                                             |
 

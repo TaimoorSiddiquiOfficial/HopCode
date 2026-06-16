@@ -1967,7 +1967,7 @@ export class Session implements SessionContext {
     // checking for work before the load completes would skip start() and
     // leave durable jobs dormant until the next prompt. Missed one-shots
     // are delivered as late fires through the start() callback below.
-    // Durable tasks live under ~/.qwen (user-owned, not in the working
+    // Durable tasks live under ~/.hopcode (user-owned, not in the working
     // tree), so no folder-trust gate is needed here.
     try {
       await scheduler.enableDurable(this.sessionId);

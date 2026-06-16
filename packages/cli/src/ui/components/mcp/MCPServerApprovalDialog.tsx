@@ -23,7 +23,7 @@ interface MCPServerApprovalDialogProps {
   serverName: string;
   /** One-line summary of its transport/config (e.g. `node slack.js (stdio)`). */
   summary: string;
-  /** Where the config came from (e.g. `.mcp.json`, `.qwen/settings.json`). */
+  /** Where the config came from (e.g. `.mcp.json`, `.hopcode/settings.json`). */
   source: string;
   /** All pending servers that would be approved by "Approve all". */
   pendingServers: PendingMcpServer[];

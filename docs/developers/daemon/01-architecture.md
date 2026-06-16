@@ -64,7 +64,7 @@ The daemon process and the ACP child are connected by an `AcpChannel` (default: 
 ```mermaid
 flowchart TB
     subgraph serve["packages/cli/src/serve"]
-        RQS["runQwenServe.ts<br/>(bootstrap)"]
+        RQS["runHopCodeServe.ts<br/>(bootstrap)"]
         SRV["server.ts (Express)"]
         CAP["capabilities.ts"]
         AUTH["auth.ts"]
@@ -153,7 +153,7 @@ sequenceDiagram
     participant BC as BridgeClient
     participant CH as ACP child
 
-    C->>MW: POST /session/:id/prompt<br/>Authorization: Bearer …<br/>X-Qwen-Client-Id: …
+    C->>MW: POST /session/:id/prompt<br/>Authorization: Bearer …<br/>X-HopCode-Client-Id: …
     MW->>MW: denyBrowserOriginCors
     MW->>MW: hostAllowlist (DNS rebinding guard)
     MW->>MW: access-log hook
@@ -298,7 +298,7 @@ sequenceDiagram
 sequenceDiagram
     autonumber
     participant Op as Operator (signal)
-    participant RQS as runQwenServe
+    participant RQS as runHopCodeServe
     participant APP as Express app
     participant BR as AcpBridge
     participant CH as ACP child
@@ -327,7 +327,7 @@ The two-phase shutdown matters because in-flight HTTP requests, in-flight SSE su
 
 | Concern              | File                                                        |
 | -------------------- | ----------------------------------------------------------- |
-| Bootstrap            | `packages/cli/src/serve/runQwenServe.ts`                    |
+| Bootstrap            | `packages/cli/src/serve/runHopCodeServe.ts`                 |
 | Express app          | `packages/cli/src/serve/server.ts`                          |
 | Capability registry  | `packages/cli/src/serve/capabilities.ts`                    |
 | Auth middleware      | `packages/cli/src/serve/auth.ts`                            |

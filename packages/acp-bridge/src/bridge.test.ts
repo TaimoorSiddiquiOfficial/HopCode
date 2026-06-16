@@ -2802,7 +2802,7 @@ describe('createAcpSessionBridge', () => {
       const factory: ChannelFactory = async () =>
         makeChannel({
           extMethodImpl: async (method) => {
-            if (method !== 'qwen/control/session/branch') return {};
+            if (method !== 'hopcode/control/session/branch') return {};
             await new Promise<void>((resolve) => {
               releaseBranch = resolve;
             });

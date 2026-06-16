@@ -129,10 +129,10 @@ describe('acpTransportUtils', () => {
       expect(result!.mapping.method).toBe('_capabilities');
     });
 
-    it('GET /health → _qwen/health', () => {
+    it('GET /health → _hopcode/health', () => {
       const result = matchRoute('/health', 'GET');
       expect(result).not.toBeNull();
-      expect(result!.mapping.method).toBe('_qwen/health');
+      expect(result!.mapping.method).toBe('_hopcode/health');
     });
 
     it('returns null for unknown path', () => {

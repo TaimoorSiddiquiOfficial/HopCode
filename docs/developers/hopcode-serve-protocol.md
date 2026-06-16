@@ -29,7 +29,7 @@ Matched origins receive the standard CORS response headers on every request:
 Access-Control-Allow-Origin: <echoed origin>
 Vary: Origin
 Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS
-Access-Control-Allow-Headers: Authorization, Content-Type, X-Qwen-Client-Id, Last-Event-ID
+Access-Control-Allow-Headers: Authorization, Content-Type, X-HopCode-Client-Id, Last-Event-ID
 Access-Control-Max-Age: 86400
 Access-Control-Expose-Headers: Retry-After
 ```
@@ -246,7 +246,7 @@ Response shape:
     "uptimeMs": 3600000,
     "mode": "http-bridge",
     "workspaceCwd": "/repo",
-    "qwenCodeVersion": "0.18.1",
+    "hopCodeVersion": "0.18.1",
     "daemonId": "serve-..."
   },
   "security": {
@@ -1219,9 +1219,9 @@ Bump the daemon's last-seen bookkeeping for this session. Long-lived adapters (T
 
 Headers:
 
-| Header             | Required | Notes                                                                                                                                                                                                                                   |
-| ------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `X-Qwen-Client-Id` | no       | Echoes the daemon-issued id from `POST /session`. Identified clients also bump their per-client timestamp; anonymous heartbeats only bump the per-session watermark. Must satisfy the same `[A-Za-z0-9._:-]{1,128}` shape as elsewhere. |
+| Header                | Required | Notes                                                                                                                                                                                                                                   |
+| --------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `X-HopCode-Client-Id` | no       | Echoes the daemon-issued id from `POST /session`. Identified clients also bump their per-client timestamp; anonymous heartbeats only bump the per-session watermark. Must satisfy the same `[A-Za-z0-9._:-]{1,128}` shape as elsewhere. |
 
 Request body is empty (`{}` is fine — no fields are read today).
 
@@ -1235,7 +1235,7 @@ Response:
 }
 ```
 
-`clientId` is echoed only when a trusted `X-Qwen-Client-Id` was supplied. `lastSeenAt` is the daemon-side `Date.now()` epoch (ms) the bridge stored.
+`clientId` is echoed only when a trusted `X-HopCode-Client-Id` was supplied. `lastSeenAt` is the daemon-side `Date.now()` epoch (ms) the bridge stored.
 
 Errors:
 
@@ -1266,7 +1266,7 @@ On success, publishes `model_switched` to the SSE stream. On failure, publishes 
 
 ### `POST /session/:id/recap`
 
-Capability tag: `session_recap`. Bridge → ACP extMethod `qwen/control/session/recap`.
+Capability tag: `session_recap`. Bridge → ACP extMethod `hopcode/control/session/recap`.
 
 Generate a one-sentence "where did I leave off" summary of the session. Wraps core's `generateSessionRecap` (`packages/core/src/services/sessionRecap.ts`), which runs a side-query against the fast model with tools disabled, `maxOutputTokens: 300`, and a strict `<recap>...</recap>` output format. The side-query reads the session's existing GeminiClient chat history and does **not** add to it.
 
@@ -1289,7 +1289,7 @@ Response (200):
 
 Errors:
 
-- `400 {code: 'invalid_client_id'}` — malformed `X-Qwen-Client-Id` header.
+- `400 {code: 'invalid_client_id'}` — malformed `X-HopCode-Client-Id` header.
 - `404` — session unknown.
 
 Cancellation: **none in v1**. The route does not listen for HTTP client disconnect, no `AbortSignal` is plumbed into the bridge, and the ACP child runs the side-query to completion regardless of whether the caller has disconnected. The only ceilings are the bridge's 60s backstop timeout (`SESSION_RECAP_TIMEOUT_MS`) and the transport-closed race against ACP channel death. This is acceptable because recap is short (single-attempt, `maxOutputTokens: 300`, ~1–5s typical); a request-id-based cancel ext-method can plumb full end-to-end cancellation in a future release if the bandwidth cost ever justifies it.
@@ -1299,14 +1299,14 @@ Cancellation: **none in v1**. The route does not listen for HTTP client disconne
 Issue [#4175](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4175) Wave 4 PR 17 adds four mutation control routes that let remote clients change runtime posture without touching the daemon host's CLI. All four:
 
 - Are gated by the **strict** mutation gate from PR 15. A daemon configured without a bearer token rejects them with `401 {code: 'token_required'}`. Configure `--token` (or `HOPCODE_SERVER_TOKEN`) before opting in.
-- Accept and stamp the `X-Qwen-Client-Id` header (PR 7 audit chain). When the header carries a trusted id, the daemon emits `originatorClientId` on the corresponding SSE event so cross-client UIs can suppress echoes of their own mutations.
+- Accept and stamp the `X-HopCode-Client-Id` header (PR 7 audit chain). When the header carries a trusted id, the daemon emits `originatorClientId` on the corresponding SSE event so cross-client UIs can suppress echoes of their own mutations.
 - Pre-flight each per-tag capability before exposing the affordance. Older daemons return `404` for the route.
 
 Three of the four routes (`tools/:name/enable`, `init`, `mcp/:server/restart`) emit **workspace-scoped** events: every active session SSE bus receives the event, regardless of which session was attached when the mutation was triggered. `approval-mode` emits a **session-scoped** event because the change is local to one session's `Config`.
 
 #### `POST /session/:id/approval-mode`
 
-Capability tag: `session_approval_mode_control`. Bridge → ACP extMethod `qwen/control/session/approval_mode`.
+Capability tag: `session_approval_mode_control`. Bridge → ACP extMethod `hopcode/control/session/approval_mode`.
 
 Change the approval mode of a live session. The new mode lands inside the ACP child's per-session `Config` immediately. Settings are NOT written to disk by default — pass `persist: true` to also write `tools.approvalMode` to workspace settings.
 
@@ -1400,7 +1400,7 @@ SSE event (workspace-scoped): `workspace_initialized` with `{path, action, origi
 
 #### `POST /workspace/mcp/:server/restart`
 
-Capability tag: `workspace_mcp_restart`. Bridge → ACP extMethod `qwen/control/workspace/mcp/restart`.
+Capability tag: `workspace_mcp_restart`. Bridge → ACP extMethod `hopcode/control/workspace/mcp/restart`.
 
 Restart a configured MCP server through the ACP child's `McpClientManager.discoverMcpToolsForServer` (disconnect + reconnect + rediscover). Pre-checks the live budget snapshot from PR 14 v1's accounting so a restart on a budget-saturated workspace returns a soft refusal rather than triggering a `BudgetExhaustedError` cascade.
 
@@ -1559,7 +1559,7 @@ After a successful vote, every connected client sees `permission_resolved` with 
 
 The daemon brokers an OAuth 2.0 Device Authorization Grant (RFC 8628) so a remote SDK client can trigger a login whose tokens land on the **daemon** filesystem — not on the client. The daemon polls the IdP itself; the client's only job is to display the verification URL + user code and (optionally) subscribe to SSE for completion events.
 
-Capability tag: `auth_device_flow` (always advertised). Supported providers in v1: `qwen-oauth`.
+Capability tag: `auth_device_flow` (always advertised). Supported providers in v1: `hopcode-oauth`.
 
 **Runtime locality.** The daemon never spawns a browser — even if it can. The client decides whether to call `open(verificationUri)` locally; on a headless pod (the canonical Mode B deployment) the user opens the URL on whatever device they have a browser on. See `docs/users/qwen-serve.md` for the recommended UX.
 
@@ -1574,7 +1574,7 @@ Strict mutation gate: requires a bearer token even on token-less loopback defaul
 Request:
 
 ```json
-{ "providerId": "qwen-oauth" }
+{ "providerId": "hopcode-oauth" }
 ```
 
 Response (`201` fresh start, `200` idempotent take-over):
@@ -1582,7 +1582,7 @@ Response (`201` fresh start, `200` idempotent take-over):
 ```json
 {
   "deviceFlowId": "fa07c61b-…",
-  "providerId": "qwen-oauth",
+  "providerId": "hopcode-oauth",
   "status": "pending",
   "userCode": "USER-1",
   "verificationUri": "https://chat.qwen.ai/api/v1/oauth2/device",
@@ -1626,11 +1626,11 @@ Snapshot of pending flows + supported providers:
   "pendingDeviceFlows": [
     {
       "deviceFlowId": "fa07c61b-…",
-      "providerId": "qwen-oauth",
+      "providerId": "hopcode-oauth",
       "expiresAt": 1700000600000
     }
   ],
-  "supportedDeviceFlowProviders": ["qwen-oauth"]
+  "supportedDeviceFlowProviders": ["hopcode-oauth"]
 }
 ```
 
@@ -1673,7 +1673,7 @@ The connection then closes.
 | Path                                                 | Purpose                                                                                                    |
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `packages/cli/src/commands/serve.ts`                 | yargs command + flag schema                                                                                |
-| `packages/cli/src/serve/runQwenServe.ts`             | listener lifecycle + signal handling                                                                       |
+| `packages/cli/src/serve/runHopCodeServe.ts`          | listener lifecycle + signal handling                                                                       |
 | `packages/cli/src/serve/server.ts`                   | Express routes + middleware                                                                                |
 | `packages/cli/src/serve/auth.ts`                     | bearer + Host allowlist + CORS deny                                                                        |
 | `packages/cli/src/serve/httpAcpBridge.ts`            | spawn-or-attach + per-session FIFO + permission registry                                                   |

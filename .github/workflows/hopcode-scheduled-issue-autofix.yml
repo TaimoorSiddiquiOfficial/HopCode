@@ -307,8 +307,8 @@ jobs:
             ## Workflow
 
             Follow the project conventions in AGENTS.md, the reproduce-first
-            workflow in .qwen/skills/bugfix/SKILL.md, and the E2E guide in
-            .qwen/skills/e2e-testing/SKILL.md.
+            workflow in .hopcode/skills/bugfix/SKILL.md, and the E2E guide in
+            .hopcode/skills/e2e-testing/SKILL.md.
 
             1. **Branch**: create `autofix/issue-${{ steps.decision.outputs.go_issue }}` from the current
                HEAD.

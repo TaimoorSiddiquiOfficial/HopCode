@@ -21,7 +21,7 @@ The walkthrough example is at [`../examples/daemon-client-quickstart.md`](../exa
 ## Responsibilities
 
 - Provide one TypeScript method per daemon HTTP route.
-- Stamp the bearer token + `X-Qwen-Client-Id` correctly on every request.
+- Stamp the bearer token + `X-HopCode-Client-Id` correctly on every request.
 - Compose per-call timeouts with caller-supplied `AbortSignal` (without killing long-lived SSE).
 - Stream and parse SSE frames into typed `DaemonEvent`s.
 - Track `lastSeenEventId` per session so reconnects replay correctly.
@@ -42,7 +42,7 @@ new DaemonClient({
 });
 ```
 
-Method groups (every method takes an optional `clientId` to stamp `X-Qwen-Client-Id`):
+Method groups (every method takes an optional `clientId` to stamp `X-HopCode-Client-Id`):
 
 | Group               | Methods                                                                                                                                                                                                                             |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -140,7 +140,7 @@ sequenceDiagram
 
     App->>SC: DaemonSessionClient.createOrAttach(client, {clientId: 'alice'})
     SC->>DC: client.createOrAttachSession({}, 'alice')
-    DC->>D: POST /session<br/>Authorization: Bearer ...<br/>X-Qwen-Client-Id: alice
+    DC->>D: POST /session<br/>Authorization: Bearer ...<br/>X-HopCode-Client-Id: alice
     D-->>DC: {sessionId, attached, clientId}
     DC-->>SC: DaemonSession
     SC-->>App: DaemonSessionClient
@@ -186,7 +186,7 @@ sequenceDiagram
     participant DC as DaemonClient
     participant D as Daemon
 
-    App->>AF: start({providerId: 'qwen-oauth'})
+    App->>AF: start({providerId: 'hopcode-oauth'})
     AF->>DC: client.startDeviceFlow(...)
     DC->>D: POST /workspace/auth/device-flow
     D-->>DC: {deviceFlowId, verificationUrl, userCode, intervalMs, expiresAt}
@@ -237,16 +237,16 @@ code that does `import { DaemonClient }` is unaffected.
 
 ## Configuration
 
-| Knob               | Where                                | Effect                                                                                  |
-| ------------------ | ------------------------------------ | --------------------------------------------------------------------------------------- |
-| `baseUrl`          | `DaemonClient` constructor           | Daemon URL; trailing slashes stripped.                                                  |
-| `token`            | `DaemonClient` constructor           | Stamped as `Authorization: Bearer`.                                                     |
-| `fetch`            | `DaemonClient` constructor           | Test injection point.                                                                   |
-| `fetchTimeoutMs`   | `DaemonClient` constructor           | Per-call timeout; `0` = disabled.                                                       |
-| `clientId`         | per-method optional arg              | `X-Qwen-Client-Id` header (see [`08-session-lifecycle.md`](./08-session-lifecycle.md)). |
-| `lastEventId`      | `DaemonSessionClient` constructor    | Seed replay cursor.                                                                     |
-| `maxQueued`        | per-subscribe option                 | `?maxQueued=N` for the SSE route; pre-flight `caps.features.slow_client_warning` first. |
-| `perCallTimeoutMs` | per-method (e.g. `restartMcpServer`) | Override client-wide timeout.                                                           |
+| Knob               | Where                                | Effect                                                                                     |
+| ------------------ | ------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `baseUrl`          | `DaemonClient` constructor           | Daemon URL; trailing slashes stripped.                                                     |
+| `token`            | `DaemonClient` constructor           | Stamped as `Authorization: Bearer`.                                                        |
+| `fetch`            | `DaemonClient` constructor           | Test injection point.                                                                      |
+| `fetchTimeoutMs`   | `DaemonClient` constructor           | Per-call timeout; `0` = disabled.                                                          |
+| `clientId`         | per-method optional arg              | `X-HopCode-Client-Id` header (see [`08-session-lifecycle.md`](./08-session-lifecycle.md)). |
+| `lastEventId`      | `DaemonSessionClient` constructor    | Seed replay cursor.                                                                        |
+| `maxQueued`        | per-subscribe option                 | `?maxQueued=N` for the SSE route; pre-flight `caps.features.slow_client_warning` first.    |
+| `perCallTimeoutMs` | per-method (e.g. `restartMcpServer`) | Override client-wide timeout.                                                              |
 
 ## Caveats & Known Limits
 

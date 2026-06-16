@@ -506,7 +506,7 @@ export class AcpDispatcher {
   }
 
   /**
-   * Build the `initialize` result advertising standard + `_qwen` caps.
+   * Build the `initialize` result advertising standard + `_hopcode` caps.
    * Negotiates the protocol version: we only implement stable V1, so we
    * clamp to `[1, ACP_PROTOCOL_VERSION]` — a client asking for 0/negative
    * (ACP marks V0 a pre-release fallback) or a future version gets `1`

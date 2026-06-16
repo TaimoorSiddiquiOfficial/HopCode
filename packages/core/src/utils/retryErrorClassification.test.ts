@@ -133,7 +133,7 @@ describe('classifyRetryError', () => {
     });
   });
 
-  it('marks Qwen OAuth free-tier quota errors as fail-fast', () => {
+  it('marks HopCode OAuth free-tier quota errors as fail-fast', () => {
     expect(
       classifyRetryError(
         {
@@ -148,7 +148,7 @@ describe('classifyRetryError', () => {
       diagnosis: 'fail-fast',
       statusCode: 429,
       providerCode: 'insufficient_quota',
-      reason: 'qwen-oauth-free-tier-quota',
+      reason: 'hopcode-oauth-free-tier-quota',
     });
   });
 

@@ -1,7 +1,7 @@
 /**
  * Cron scheduler with optional durable (file-backed) task support.
  * In-memory jobs live and die with the process. Durable jobs persist
- * under the user runtime dir (~/.qwen/tmp/<project-hash>/) and survive
+ * under the user runtime dir (~/.hopcode/tmp/<project-hash>/) and survive
  * restarts.
  */
 
@@ -47,7 +47,7 @@ export interface CronJob {
   expiresAt: number;
   lastFiredAt?: number;
   jitterMs: number;
-  /** Persisted under ~/.qwen (per-project) — survives restarts. */
+  /** Persisted under ~/.hopcode (per-project) — survives restarts. */
   durable?: boolean;
   /** One-shot that was due while no owning session ran — fired late. */
   missed?: boolean;
@@ -210,7 +210,7 @@ export class CronScheduler {
 
   /**
    * Creates a durable cron job: registered like any other job, and
-   * persisted under ~/.qwen (per-project) so it survives restarts.
+   * persisted under ~/.hopcode (per-project) so it survives restarts.
    * Throws if the job can't be persisted.
    */
   async createDurable(

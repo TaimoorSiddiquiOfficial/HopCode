@@ -510,7 +510,7 @@ async function runOverridePath(
   // only after createSchemaConfigOverride / createSchemaModeState /
   // addEventListener — so any throw in those three (e.g. a broken MCP
   // server during the schema override's tool-registry rebuild) orphaned
-  // the just-provisioned worktree on disk under .qwen/worktrees/. Move
+  // the just-provisioned worktree on disk under .hopcode/worktrees/. Move
   // schema setup + signal chaining + emitter creation inside.
   try {
     // Schema mode: build a per-call Config override with a fresh ToolRegistry
@@ -716,7 +716,7 @@ interface WorktreePreservedInfo {
  *    `hasUnmergedWorktreeCommits` (which resolves the slug to its
  *    branch name internally).
  *  - `path` — absolute worktree directory under
- *    `<projectRoot>/.qwen/worktrees/`; the subagent's rebound cwd.
+ *    `<projectRoot>/.hopcode/worktrees/`; the subagent's rebound cwd.
  *  - `branch` — the branch created for this worktree
  *    (`worktree-<slug>`); appears verbatim in the user-facing preserved
  *    suffix.
@@ -745,7 +745,7 @@ async function provisionWorkflowWorktree(
   config: Config,
 ): Promise<WorkflowWorktreeIsolation> {
   const cwd = config.getTargetDir();
-  if (/\.qwen[\\/]worktrees[\\/]/.test(cwd)) {
+  if (/\.hopcode[\\/]worktrees[\\/]/.test(cwd)) {
     throw new Error(
       `agent({isolation:'worktree'}): parent is already inside a worktree ` +
         `(${cwd}). Nested isolation worktrees are not supported — the ` +

@@ -33,7 +33,7 @@ describe('managed auto-memory prompt helpers', () => {
   });
 
   it('warns extraction not to save MCP tool schemas or failed calls', () => {
-    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
 
     expect(prompt).toContain(
       'MCP tool names, parameter schemas, field mappings, guessed tool-call formats, or raw failed tool-call transcripts',

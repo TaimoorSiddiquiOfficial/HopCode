@@ -105,10 +105,10 @@ describe('denormalizeAcpNotification', () => {
     expect(denormalizeAcpNotification(notification)).toBeUndefined();
   });
 
-  it('converts _qwen/notify', () => {
+  it('converts _hopcode/notify', () => {
     const notification: JsonRpcNotification = {
       jsonrpc: '2.0',
-      method: '_qwen/notify',
+      method: '_hopcode/notify',
       params: {
         type: 'workspace_initialized',
         data: { cwd: '/tmp' },

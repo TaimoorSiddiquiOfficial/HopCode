@@ -417,7 +417,7 @@ describe('DaemonSessionClient', () => {
     });
     expect(calls[0]?.url).toBe('http://daemon/session/s-1/recap');
     expect(calls[0]?.method).toBe('POST');
-    expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
+    expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     expect(calls[0]?.signal).toBe(ctrl.signal);
   });
 

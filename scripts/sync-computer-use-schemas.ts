@@ -6,7 +6,7 @@
  * Usage:
  *   npx tsx scripts/sync-computer-use-schemas.ts [binaryPath]
  *
- * Defaults to the pinned cua-driver binary under `~/.qwen/computer-use/`
+ * Defaults to the pinned cua-driver binary under `~/.hopcode/computer-use/`
  * (resolved from CUA_DRIVER_VERSION in constants.ts) — i.e. the binary that
  * gets installed the first time Computer Use runs. Pass an explicit path to
  * point at a different build.

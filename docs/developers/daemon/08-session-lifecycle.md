@@ -4,14 +4,14 @@
 
 A daemon **session** is one logical conversation pinned to one ACP `sessionId`. The bridge maintains a `SessionEntry` per session (see [`03-acp-bridge.md`](./03-acp-bridge.md)) which couples the ACP child connection with HTTP-side bookkeeping: prompt FIFO, model-change FIFO, event bus, pending permissions, attached clients, heartbeats, restore state, terminal-frame tombstones.
 
-A daemon **client** is identified by `X-Qwen-Client-Id` — an opaque, daemon-validated string the HTTP caller stamps on its requests. The bridge tracks which clients are attached to which sessions, and uses the originator client id to drive the `designated` permission policy, audit trails, and event attribution.
+A daemon **client** is identified by `X-HopCode-Client-Id` — an opaque, daemon-validated string the HTTP caller stamps on its requests. The bridge tracks which clients are attached to which sessions, and uses the originator client id to drive the `designated` permission policy, audit trails, and event attribution.
 
 This doc explains every session lifecycle transition (create / attach / load / resume / close / die / evict) and every identity surface the daemon exposes.
 
 ## Responsibilities
 
 - Mint, attach, restore, and reap sessions.
-- Validate `X-Qwen-Client-Id` and reject malformed ids.
+- Validate `X-HopCode-Client-Id` and reject malformed ids.
 - Track multiple attached clients per session (`clientIds: Map<string, count>`, `attachCount`).
 - Stamp `originatorClientId` on outbound events.
 - Run heartbeats so dashboards know which clients are still connected.
@@ -49,13 +49,13 @@ stateDiagram-v2
 
 ### Attach vs spawn
 
-Under `sessionScope: 'single'` (default), the bridge's `defaultEntry` is shared by every connecting client. A `POST /session` that arrives while `defaultEntry` already exists returns `attached: true` without spawning a new ACP child. The bridge synchronously bumps `attachCount` and registers the caller's `X-Qwen-Client-Id` into `clientIds`.
+Under `sessionScope: 'single'` (default), the bridge's `defaultEntry` is shared by every connecting client. A `POST /session` that arrives while `defaultEntry` already exists returns `attached: true` without spawning a new ACP child. The bridge synchronously bumps `attachCount` and registers the caller's `X-HopCode-Client-Id` into `clientIds`.
 
 Under `sessionScope: 'thread'`, each thread can mint a distinct session. The caller still respects `maxSessions`.
 
 ### Identity
 
-`X-Qwen-Client-Id` is **optional** but **strongly recommended**. The daemon does not generate one on the caller's behalf — clients pick their own and reuse it across requests so the daemon can attribute votes, audit events, and detect reconnects.
+`X-HopCode-Client-Id` is **optional** but **strongly recommended**. The daemon does not generate one on the caller's behalf — clients pick their own and reuse it across requests so the daemon can attribute votes, audit events, and detect reconnects.
 
 Validation rules:
 
@@ -65,11 +65,11 @@ Validation rules:
 
 The daemon stamps `originatorClientId` on outbound SSE events when:
 
-1. The request that triggered the event carried `X-Qwen-Client-Id`, AND
+1. The request that triggered the event carried `X-HopCode-Client-Id`, AND
 2. The id is currently registered in the session's `clientIds` set, AND
 3. The session has an `activePromptOriginatorClientId` set (inline `sessionUpdate` and `permission_request` inherit the originator from the active prompt).
 
-Anonymous callers (no `X-Qwen-Client-Id`) work fine for `first-responder` policy; `designated` rejects their votes with `permission_forbidden{ reason: 'designated_mismatch' }`; `consensus` rejects with the same `forbidden` reason because the voter is not in the issue-time `votersAtIssue` snapshot; `local-only` is the only policy that accepts anonymous loopback voters.
+Anonymous callers (no `X-HopCode-Client-Id`) work fine for `first-responder` policy; `designated` rejects their votes with `permission_forbidden{ reason: 'designated_mismatch' }`; `consensus` rejects with the same `forbidden` reason because the voter is not in the issue-time `votersAtIssue` snapshot; `local-only` is the only policy that accepts anonymous loopback voters.
 
 ## Workflow
 
@@ -83,7 +83,7 @@ sequenceDiagram
     participant B as Bridge.spawnOrAttach
     participant CH as ACP child
 
-    C->>R: POST /session<br/>X-Qwen-Client-Id: alice<br/>{cwd, sessionScope?}
+    C->>R: POST /session<br/>X-HopCode-Client-Id: alice<br/>{cwd, sessionScope?}
     R->>R: validate clientId pattern
     R->>B: spawnOrAttach({cwd, sessionScope, clientId})
     alt single scope + defaultEntry exists
@@ -110,7 +110,7 @@ Both:
 
 ### Heartbeat
 
-`POST /session/:id/heartbeat` updates `sessionLastSeenAt` regardless of `clientId`. If the request carries a registered `X-Qwen-Client-Id`, `clientLastSeenAt.set(clientId, Date.now())` also updates. Per-client eviction is **not** implemented in v1; revocation is planned for F-series Wave 5. Today, heartbeats provide observability for dashboards and for the upcoming revocation policy in PR 24.
+`POST /session/:id/heartbeat` updates `sessionLastSeenAt` regardless of `clientId`. If the request carries a registered `X-HopCode-Client-Id`, `clientLastSeenAt.set(clientId, Date.now())` also updates. Per-client eviction is **not** implemented in v1; revocation is planned for F-series Wave 5. Today, heartbeats provide observability for dashboards and for the upcoming revocation policy in PR 24.
 
 ### Metadata
 
@@ -255,7 +255,7 @@ new session arrives.
 - `connection.unstable_resumeSession` may still be unstable at the ACP layer, but the daemon advertises the committed v1 route contract with `session_resume`. `unstable_session_resume` is kept only as a deprecated compatibility alias.
 - v1 has **no per-client eviction**; only per-session and per-subscriber termination. Revocation policy is F-series Wave 5 / PR 24.
 - `client_evicted` is per-subscriber, not per-session. A client whose SSE subscriber was evicted can reconnect.
-- Anonymous clients (no `X-Qwen-Client-Id`) cannot vote under `designated` or `consensus` policies.
+- Anonymous clients (no `X-HopCode-Client-Id`) cannot vote under `designated` or `consensus` policies.
 
 ## References
 

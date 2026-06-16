@@ -215,7 +215,7 @@ SDK access: prefer `event._meta?.serverTimestamp`. Compatibility paths may also 
 
 ### `originatorClientId`
 
-Events triggered by a request that carried a registered `X-Qwen-Client-Id` may stamp this field. See [`08-session-lifecycle.md`](./08-session-lifecycle.md).
+Events triggered by a request that carried a registered `X-HopCode-Client-Id` may stamp this field. See [`08-session-lifecycle.md`](./08-session-lifecycle.md).
 
 ## Tool-call `_meta` (provenance / serverId)
 

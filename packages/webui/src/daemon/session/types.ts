@@ -44,7 +44,7 @@ export interface DaemonConnectionState {
   sessionId?: string;
   /**
    * Daemon-confirmed client identity bound to this session (the value sent as
-   * `X-Qwen-Client-Id`). Consumers use it to recognize their OWN
+   * `X-HopCode-Client-Id`). Consumers use it to recognize their OWN
    * originator-stamped frames — e.g. the web-shell dedupes a
    * `mid_turn_message_injected` batch only when its `originatorClientId`
    * matches this id (a peer on the same session must keep its own entry).

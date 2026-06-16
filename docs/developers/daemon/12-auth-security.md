@@ -24,7 +24,7 @@ This doc walks through each layer and the explicit invariants the boot path enfo
 
 ### Boot-time refuse rules
 
-In `runQwenServe.ts`:
+In `runHopCodeServe.ts`:
 
 ```ts
 if (!isLoopbackBind(opts.hostname) && !token) {
@@ -144,9 +144,9 @@ The `code: 'token_required'` shape is distinct from `bearerAuth`'s plain `Unauth
 
 On loopback binds, `/health` is registered **before** the bearer middleware so liveness probes inside the pod do not need to carry the token. Non-loopback binds gate `/health` behind bearer like every other route. `--require-auth` drops the exemption: `/health` requires `Authorization: Bearer <token>` on loopback too.
 
-### v1 client identity (`X-Qwen-Client-Id`) is self-reported
+### v1 client identity (`X-HopCode-Client-Id`) is self-reported
 
-The daemon validates only the format of `X-Qwen-Client-Id`
+The daemon validates only the format of `X-HopCode-Client-Id`
 (`[A-Za-z0-9._:-]{1,128}`) and tracks attached client ids per session. It does
 not currently perform proof-of-possession. A client that observes
 `originatorClientId` on SSE can re-register the same id and impersonate that
@@ -295,7 +295,7 @@ sequenceDiagram
 ## References
 
 - `packages/cli/src/serve/auth.ts` (entire file)
-- `packages/cli/src/serve/runQwenServe.ts` (refuse rules)
+- `packages/cli/src/serve/runHopCodeServe.ts` (refuse rules)
 - `packages/cli/src/serve/loopbackBinds.ts`
 - `packages/cli/src/serve/auth/deviceFlow.ts`
 - `packages/cli/src/serve/auth/qwenDeviceFlowProvider.ts`

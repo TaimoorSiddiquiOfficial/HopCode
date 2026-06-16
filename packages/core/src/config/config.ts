@@ -567,7 +567,7 @@ export const DEFAULT_TOOL_OUTPUT_BATCH_BUDGET = 200_000;
  * Provenance of an MCP server config. Two purposes (see issue #4615):
  *
  * - **Approval gating**: `'project'` (a workspace `.mcp.json`) and `'workspace'`
- *   (a workspace `.qwen/settings.json`) are checked-in / shareable and therefore
+ *   (a workspace `.hopcode/settings.json`) are checked-in / shareable and therefore
  *   untrusted — both are held behind the pending-approval gate. See
  *   {@link isGatedMcpScope}.
  * - **Precedence**: `'workspace'` and `'system'` rank ABOVE a `.mcp.json`

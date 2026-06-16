@@ -342,8 +342,8 @@ export class AcpHttpTransport implements DaemonTransport {
     }
 
     // Extract connectionId: try the response header first (canonical),
-    // then the JSON body at agentCapabilities._meta.qwen.connectionId,
-    // then the legacy path _meta.qwen.connectionId.
+    // then the JSON body at agentCapabilities._meta.hopcode.connectionId,
+    // then the legacy path _meta.hopcode.connectionId.
     const result = response.result;
     const headerConnId = res.headers.get('acp-connection-id');
     this.connectionId =

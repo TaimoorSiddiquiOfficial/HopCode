@@ -191,7 +191,7 @@ describe('simple-mcp-server', () => {
     });
 
     previousMcpApprovalsPath = process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
-    const approvalsPath = join(rig.testDir!, '.qwen', 'mcpApprovals.json');
+    const approvalsPath = join(rig.testDir!, '.hopcode', 'mcpApprovals.json');
     process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'] = approvalsPath;
     writeFileSync(
       approvalsPath,

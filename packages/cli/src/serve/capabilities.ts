@@ -164,7 +164,7 @@ export const SERVE_CAPABILITY_REGISTRY = {
   // Direct daemon-side shell execution for an existing session.
   // Advertised CONDITIONALLY: operators must explicitly enable it and
   // configure bearer auth. Clients must still send a session-bound
-  // X-Qwen-Client-Id when calling the route.
+  // X-HopCode-Client-Id when calling the route.
   session_shell_command: { since: 'v1' },
   // Daemon hosts a workspace-shared MCP transport
   // pool (`HopCodeAgent.mcpPool`); `GET /workspace/mcp` reflects pool-level

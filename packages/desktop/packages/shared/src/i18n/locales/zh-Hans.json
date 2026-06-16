@@ -873,7 +873,7 @@
   "settings.memory.managementDesc": "打开 /memory 使用的记忆文件和文件夹。",
   "settings.memory.pathUnavailable": "路径不可用",
   "settings.memory.projectMemoryFile": "项目记忆文件",
-  "settings.memory.qwenSettingsFile": "{{selfReferName}} 设置文件",
+  "settings.memory.hopcodeSettingsFile": "{{selfReferName}} 设置文件",
   "settings.memory.title": "记忆",
   "settings.memory.userMemoryFile": "用户记忆文件",
   "settings.messaging.bindings.empty": "无活跃绑定",

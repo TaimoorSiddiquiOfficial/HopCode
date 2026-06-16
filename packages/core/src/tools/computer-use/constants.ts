@@ -213,7 +213,7 @@ export function resolveMaxImageDimension(
 
 /** Install root for all Computer Use artifacts. Footprint stays here. */
 export function computerUseRoot(home: string = homedir()): string {
-  return join(home, '.qwen', 'computer-use');
+  return join(home, '.hopcode', 'computer-use');
 }
 
 /** Directory a given version's assets extract into. */

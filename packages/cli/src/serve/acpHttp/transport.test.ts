@@ -527,28 +527,28 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
     expect(bad.status).toBe(404);
   });
 
-  it('initialize omits _qwen/session/shell by default', async () => {
+  it('initialize omits _hopcode/session/shell by default', async () => {
     const { body } = await initializeRaw();
     const result = body['result'] as {
       agentCapabilities: {
-        _meta: { qwen: { methods: string[] } };
+        _meta: { hopcode: { methods: string[] } };
       };
     };
-    expect(result.agentCapabilities._meta.qwen.methods).not.toContain(
-      '_qwen/session/shell',
+    expect(result.agentCapabilities._meta.hopcode.methods).not.toContain(
+      '_hopcode/session/shell',
     );
   });
 
-  it('initialize advertises _qwen/session/shell when enabled', async () => {
+  it('initialize advertises _hopcode/session/shell when enabled', async () => {
     await restartServer({ sessionShellCommandEnabled: true });
     const { body } = await initializeRaw();
     const result = body['result'] as {
       agentCapabilities: {
-        _meta: { qwen: { methods: string[] } };
+        _meta: { hopcode: { methods: string[] } };
       };
     };
-    expect(result.agentCapabilities._meta.qwen.methods).toContain(
-      '_qwen/session/shell',
+    expect(result.agentCapabilities._meta.hopcode.methods).toContain(
+      '_hopcode/session/shell',
     );
   });
 
@@ -1440,7 +1440,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
     expect(byId[212].result).toBeDefined();
   });
 
-  it('translateEvent: stream_error + client_evicted → _qwen/notify with kind', async () => {
+  it('translateEvent: stream_error + client_evicted → _hopcode/notify with kind', async () => {
     const connId = await initialize();
     await newSession(connId);
     const sess = await openStream(connId, 'sess-1');
@@ -1453,7 +1453,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       method: string;
       params: { kind: string };
     }>;
-    expect(frames.every((f) => f.method === '_qwen/notify')).toBe(true);
+    expect(frames.every((f) => f.method === '_hopcode/notify')).toBe(true);
     const kinds = frames.map((f) => f.params.kind);
     expect(kinds).toEqual(
       expect.arrayContaining(['stream_error', 'client_evicted']),
@@ -1797,14 +1797,14 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/shell returns stable disabled error by default', async () => {
+    it('_hopcode/session/shell returns stable disabled error by default', async () => {
       const connId = await initialize();
       const streamRes = openStream(connId);
       await new Promise((r) => setTimeout(r, 30));
       await post(connId, {
         jsonrpc: '2.0',
         id: 53,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: '' },
       });
       const frames = await takeFrames(await streamRes, 1);
@@ -1827,7 +1827,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       ).toBe(false);
     });
 
-    it('_qwen/session/shell rejects unowned session when enabled', async () => {
+    it('_hopcode/session/shell rejects unowned session when enabled', async () => {
       await restartServer({ sessionShellCommandEnabled: true });
       const connId = await initialize();
       const streamRes = openStream(connId);
@@ -1835,7 +1835,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 54,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: 'pwd' },
       });
       const frames = await takeFrames(await streamRes, 1);
@@ -1848,7 +1848,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       ).toBe(false);
     });
 
-    it('_qwen/session/shell requires an owned bridge-stamped clientId when enabled', async () => {
+    it('_hopcode/session/shell requires an owned bridge-stamped clientId when enabled', async () => {
       const nextBridge = new FakeBridge();
       nextBridge.spawnClientId = undefined;
       await restartServer({
@@ -1868,7 +1868,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 55,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: 'pwd' },
       });
       const frames = await takeFrames(await streamRes, 2);
@@ -1881,7 +1881,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       expect(bridge.shellCalls).toHaveLength(0);
     });
 
-    it('_qwen/session/shell rejects empty command when enabled', async () => {
+    it('_hopcode/session/shell rejects empty command when enabled', async () => {
       await restartServer({ sessionShellCommandEnabled: true });
       const connId = await initialize();
       const streamRes = openStream(connId);
@@ -1896,7 +1896,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 56,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: '' },
       });
       const frames = await takeFrames(await streamRes, 2);
@@ -1904,7 +1904,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       expect(bridge.shellCalls).toHaveLength(0);
     });
 
-    it('_qwen/session/shell returns result', async () => {
+    it('_hopcode/session/shell returns result', async () => {
       await restartServer({ sessionShellCommandEnabled: true });
       const connId = await initialize();
       const streamRes = openStream(connId);
@@ -1920,7 +1920,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 57,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command },
       });
       const frames = await takeFrames(await streamRes, 2);
@@ -1945,7 +1945,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       expect(bridge.shellCalls[0]?.signal?.aborted).toBe(false);
     });
 
-    it('_qwen/session/shell maps bridge shell policy errors to RPC errorKind', async () => {
+    it('_hopcode/session/shell maps bridge shell policy errors to RPC errorKind', async () => {
       await restartServer({ sessionShellCommandEnabled: true });
       bridge.shellError = new SessionShellDisabledError();
       const connId = await initialize();
@@ -1961,7 +1961,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 58,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: 'pwd' },
       });
       const disabledFrames = await takeFrames(await streamRes, 2);
@@ -1987,7 +1987,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId2, {
         jsonrpc: '2.0',
         id: 59,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: 'pwd' },
       });
       const clientRequiredFrames = await takeFrames(await streamRes2, 2);
@@ -1999,7 +1999,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/shell preserves InvalidClientIdError invalid params mapping', async () => {
+    it('_hopcode/session/shell preserves InvalidClientIdError invalid params mapping', async () => {
       await restartServer({ sessionShellCommandEnabled: true });
       bridge.shellError = new InvalidClientIdError('sess-1', 'client-2');
       const connId = await initialize();
@@ -2015,14 +2015,14 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 60,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: 'pwd' },
       });
       const frames = await takeFrames(await streamRes, 2);
       expect(frames[1]).toMatchObject({ error: { code: -32602 } });
     });
 
-    it('_qwen/session/shell does not map arbitrary error names as shell policy errors', async () => {
+    it('_hopcode/session/shell does not map arbitrary error names as shell policy errors', async () => {
       await restartServer({ sessionShellCommandEnabled: true });
       bridge.shellError = Object.assign(new Error('fake policy'), {
         name: 'SessionShellDisabledError',
@@ -2040,7 +2040,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 61,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'sess-1', command: 'pwd' },
       });
       const frames = await takeFrames(await streamRes, 2);
@@ -2237,7 +2237,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       expect(frames[0]).toMatchObject({ error: { code: -32602 } });
     });
 
-    it('_qwen/sessions/delete sanitizes stderr close errors', async () => {
+    it('_hopcode/sessions/delete sanitizes stderr close errors', async () => {
       const lineSep = '\u2028';
       const bidiOverride = '\u202e';
       bridge.closeError = new Error(
@@ -2249,7 +2249,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 67,
-        method: '_qwen/sessions/delete',
+        method: '_hopcode/sessions/delete',
         params: { sessionIds: [`sess${lineSep}FAKE\r\x1b[31m`] },
       });
       const frames = await takeFrames(await streamRes, 1);
@@ -2269,7 +2269,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       expect(deleteLog).not.toContain(bidiOverride);
     });
 
-    it('_qwen/sessions/delete sanitizes stderr remove errors', async () => {
+    it('_hopcode/sessions/delete sanitizes stderr remove errors', async () => {
       const lineSep = '\u2028';
       const bidiOverride = '\u202e';
       const sessionId = `sess${lineSep}FAKE\r\x1b[31m`;
@@ -2294,7 +2294,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 68,
-          method: '_qwen/sessions/delete',
+          method: '_hopcode/sessions/delete',
           params: { sessionIds: [sessionId] },
         });
         const frames = await takeFrames(await streamRes, 1);

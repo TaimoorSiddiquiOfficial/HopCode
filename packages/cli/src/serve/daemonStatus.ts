@@ -58,7 +58,7 @@ export interface BuildDaemonStatusOptions {
   bridge: AcpSessionBridge;
   workspace: DaemonWorkspaceService;
   daemonLog?: DaemonLogger;
-  qwenCodeVersion?: string;
+  hopCodeVersion?: string;
   acpHandle?: AcpHttpHandle;
   rateLimiter?: RateLimiterInstance;
   getRestSseActive: () => number;
@@ -142,9 +142,7 @@ export async function buildDaemonStatusResponse(
       uptimeMs: Math.round(process.uptime() * 1000),
       mode: input.opts.mode,
       workspaceCwd: input.boundWorkspace,
-      ...(input.qwenCodeVersion
-        ? { qwenCodeVersion: input.qwenCodeVersion }
-        : {}),
+      ...(input.hopCodeVersion ? { hopCodeVersion: input.hopCodeVersion } : {}),
       ...(input.daemonLog?.getDaemonId()
         ? { daemonId: input.daemonLog.getDaemonId() }
         : {}),

@@ -46,7 +46,7 @@ export async function detachDaemonClient(opts: {
 }): Promise<void> {
   if (!opts.clientId) return;
   const headers: Record<string, string> = {
-    'X-Qwen-Client-Id': opts.clientId,
+    'X-HopCode-Client-Id': opts.clientId,
   };
   if (opts.token) headers['Authorization'] = `Bearer ${opts.token}`;
   const url = `${stripTrailingSlashes(opts.baseUrl)}/session/${encodeURIComponent(

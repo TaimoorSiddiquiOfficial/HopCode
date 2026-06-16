@@ -67,7 +67,7 @@ const WORKFLOW_PARAM_SCHEMA = {
         'a terminal error "subagent completed without calling StructuredOutput ' +
         '(after 2 in-conversation nudges)". ' +
         '`agentType` (string): resolves against the declarative-agents registry ' +
-        '(`.qwen/agents/<name>.md`, project then user then built-in). Unresolved ' +
+        '(`.hopcode/agents/<name>.md`, project then user then built-in). Unresolved ' +
         'names throw "agent({agentType}): agent type ' +
         "'X'" +
         ' not found". ' +
@@ -76,7 +76,7 @@ const WORKFLOW_PARAM_SCHEMA = {
         '`isolation`: `' +
         "'worktree'" +
         '` provisions a fresh git worktree under ' +
-        '`<projectRoot>/.qwen/worktrees/agent-<7hex>`; the worktree is auto-removed ' +
+        '`<projectRoot>/.hopcode/worktrees/agent-<7hex>`; the worktree is auto-removed ' +
         'if no changes, otherwise the path and branch are returned alongside the ' +
         "result. `'remote'` throws \"agent({isolation:'remote'}) is not available " +
         'in this build" (parity with upstream). isolation=worktree refuses to ' +

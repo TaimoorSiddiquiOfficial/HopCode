@@ -210,8 +210,7 @@ function makeOptions(input: MakeOptionsInput = {}): BuildDaemonStatusOptions {
     clearScheduledInterval: () => {},
   });
   const bridge = {
-    getDaemonStatusSnapshot: () =>
-      input.bridgeSnapshot ?? BASE_BRIDGE_SNAPSHOT,
+    getDaemonStatusSnapshot: () => input.bridgeSnapshot ?? BASE_BRIDGE_SNAPSHOT,
     getWorkspaceToolsStatus: async () =>
       input.toolsStatus ?? okStatus({ tools: [] }),
   } as unknown as AcpSessionBridge;
@@ -238,7 +237,7 @@ function makeOptions(input: MakeOptionsInput = {}): BuildDaemonStatusOptions {
     boundWorkspace: BASE_WORKSPACE,
     bridge,
     workspace,
-    qwenCodeVersion: 'test',
+    hopCodeVersion: 'test',
     ...(input.acpSnapshot
       ? {
           acpHandle: {
@@ -252,7 +251,7 @@ function makeOptions(input: MakeOptionsInput = {}): BuildDaemonStatusOptions {
     getRestSseActive: () => 0,
     features: ['health', 'daemon_status'],
     protocolVersions: { current: 'v1', supported: ['v1'] },
-    supportedDeviceFlowProviders: ['qwen-oauth'],
+    supportedDeviceFlowProviders: ['hopcode-oauth'],
     deviceFlowRegistry: registry,
     sessionShellCommandEnabled: false,
   };

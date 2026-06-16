@@ -1413,7 +1413,7 @@ export function createServeApp(
           bridge,
           workspace,
           daemonLog,
-          qwenCodeVersion: deps.HopCodeVersion,
+          hopCodeVersion: deps.HopCodeVersion,
           acpHandle: acpHandleRef.current,
           rateLimiter,
           getRestSseActive: getActiveSseCount,

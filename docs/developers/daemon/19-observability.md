@@ -63,7 +63,7 @@ curl -s http://127.0.0.1:4170/workspace/preflight | jq
 ```bash
 curl -N -H 'Accept: text/event-stream' \
      -H 'Authorization: Bearer XYZ' \
-     -H 'X-Qwen-Client-Id: debug-tail' \
+     -H 'X-HopCode-Client-Id: debug-tail' \
      -H 'Last-Event-ID: 0' \
      'http://127.0.0.1:4170/session/<sid>/events'
 ```

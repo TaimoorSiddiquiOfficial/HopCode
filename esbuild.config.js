@@ -138,8 +138,8 @@ const mainBuild = esbuild.build({
     // `packages/core/src/utils/bundlePaths.ts` — it both produces a
     // per-file path and strips the chunk segment when the module ends up
     // under `dist/chunks/`.
-    __dirname: '__qwen_dirname',
-    __filename: '__qwen_filename',
+    __dirname: '__hopcode_dirname',
+    __filename: '__hopcode_filename',
   },
   loader: { '.node': 'file' },
   plugins: [wasmBinaryPlugin, wasmLoader({ mode: 'embedded' })],

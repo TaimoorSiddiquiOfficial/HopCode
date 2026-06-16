@@ -63,7 +63,7 @@ recommended `js-yaml`'s `FAILSAFE_SCHEMA` / `CORE_SCHEMA`**. We are deviating
 from that guidance for three concrete reasons:
 
 1. **CC parity**. The whole point of porting CC's frontmatter schema is to
-   let users drop a CC agent file into `.qwen/agents/` and have it parse
+   let users drop a CC agent file into `.hopcode/agents/` and have it parse
    identically. Using the same parser CC uses minimizes drift on edge-case
    YAML constructs (multi-doc streams, flow vs block scalars, tag handling).
 2. **`yaml` is already a direct user inside `skill-manager.ts`** — see

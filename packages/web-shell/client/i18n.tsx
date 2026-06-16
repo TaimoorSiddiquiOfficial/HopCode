@@ -1706,7 +1706,7 @@ const ZH: Messages = {
     '终端失焦多少分钟后，下一次重新聚焦时触发自动回顾。默认与 Claude Code 一致为 5 分钟；如果只是短暂切换窗口，可以调高。',
   'settings.label.general.cleanupPeriodDays': '清理周期（天）',
   'settings.description.general.cleanupPeriodDays':
-    '~/.qwen/file-history/ 中用于 /rewind 的会话备份保留天数。后台清理最多每天运行一次。设为 0 表示最小保留（约 1 小时），仍会保护最近一小时触碰过的会话和当前活动会话。',
+    '~/.hopcode/file-history/ 中用于 /rewind 的会话备份保留天数。后台清理最多每天运行一次。设为 0 表示最小保留（约 1 小时），仍会保护最近一小时触碰过的会话和当前活动会话。',
   'settings.label.general.gitCoAuthor.commit': '归因：commit',
   'settings.description.general.gitCoAuthor.commit':
     '通过 HopCode 创建 commit 时，添加 Co-authored-by trailer，并写入逐文件 AI 归因 git note。关闭后两者都会跳过。',
@@ -1715,7 +1715,7 @@ const ZH: Messages = {
     '运行 gh pr create 时，在 PR 描述中追加 HopCode 归因行。',
   'settings.label.general.language': '语言：界面',
   'settings.description.general.language':
-    '用户界面的语言。使用 auto 可根据系统设置自动检测；也可以在 ~/.qwen/locales/ 中放置 JS 语言文件来使用自定义语言代码。',
+    '用户界面的语言。使用 auto 可根据系统设置自动检测；也可以在 ~/.hopcode/locales/ 中放置 JS 语言文件来使用自定义语言代码。',
   'settings.label.general.dynamicCommandTranslation': '语言：动态命令翻译',
   'settings.description.general.dynamicCommandTranslation':
     '为动态 slash command 描述启用 AI 翻译。关闭后动态命令使用原始描述，也不会触发翻译模型调用。',
@@ -1752,9 +1752,10 @@ const ZH: Messages = {
   'settings.label.context.fileFiltering.respectGitIgnore': '遵守 .gitignore',
   'settings.description.context.fileFiltering.respectGitIgnore':
     '搜索时遵守 .gitignore 文件。',
-  'settings.label.context.fileFiltering.respectQwenIgnore': '遵守 .qwenignore',
+  'settings.label.context.fileFiltering.respectQwenIgnore':
+    '遵守 .hopcodeignore',
   'settings.description.context.fileFiltering.respectQwenIgnore':
-    '搜索时遵守 .qwenignore 文件。',
+    '搜索时遵守 .hopcodeignore 文件。',
   'settings.label.context.fileFiltering.enableFuzzySearch': '启用模糊搜索',
   'settings.description.context.fileFiltering.enableFuzzySearch':
     '搜索文件时启用模糊搜索。',

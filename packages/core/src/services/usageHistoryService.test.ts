@@ -368,7 +368,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-history-'));
     originalQwenHome = process.env['HOPCODE_HOME'];
-    process.env['HOPCODE_HOME'] = path.join(tmpHome, '.qwen');
+    process.env['HOPCODE_HOME'] = path.join(tmpHome, '.hopcode');
     fs.mkdirSync(process.env['HOPCODE_HOME'], { recursive: true });
   });
 

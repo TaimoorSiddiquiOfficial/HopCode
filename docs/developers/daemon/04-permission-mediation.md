@@ -13,7 +13,7 @@ When the ACP child's agent calls `requestPermission`, the daemon does not simply
 | `consensus`       | N-of-M quorum across the v1 client-id snapshot; intermediate `permission_partial_vote` events let UIs render progress. | Enterprise change review where two operators must agree.                 |
 | `local-only`      | Refuses any non-loopback voter; blocks until a loopback client resolves.                                               | Workstations where remote control must never grant privilege escalation. |
 
-> **v1 security limit**: `X-Qwen-Client-Id` is self-reported. `designated` and
+> **v1 security limit**: `X-HopCode-Client-Id` is self-reported. `designated` and
 > `consensus` do not yet have proof-of-possession. A client that observes
 > `originatorClientId` can reuse that id. `{outcome:'cancelled'}` also routes
 > through the cancel sentinel before policy dispatch, so even `local-only`
@@ -214,8 +214,8 @@ unanimity for M = 4, use the same field.
 
 ## Boot-time policy validation
 
-`runQwenServe.validatePolicyConfig(policyConfig)`
-(`packages/cli/src/serve/runQwenServe.ts`) validates merged `settings.json`
+`runHopCodeServe.validatePolicyConfig(policyConfig)`
+(`packages/cli/src/serve/runHopCodeServe.ts`) validates merged `settings.json`
 `policy.*` at boot and throws `InvalidPolicyConfigError` for operator mistakes:
 
 - `policy.permissionStrategy` is set but not in the four supported modes. The
@@ -228,14 +228,14 @@ There is also a soft stderr warning when `consensusQuorum` is set while
 `permissionStrategy !== 'consensus'`; the override would otherwise be silently
 ignored under non-consensus policies.
 
-`InvalidPolicyConfigError` is exported for `instanceof` tests. `runQwenServe`
+`InvalidPolicyConfigError` is exported for `instanceof` tests. `runHopCodeServe`
 uses it to distinguish operator misconfiguration, which is rethrown as an
 explicit boot failure, from settings read I/O failures, which fall back to
 defaults.
 
 ## Security note: v1 client identity is self-reported
 
-`X-Qwen-Client-Id` is supplied by the HTTP client. In v1, the daemon validates
+`X-HopCode-Client-Id` is supplied by the HTTP client. In v1, the daemon validates
 the format (`[A-Za-z0-9._:-]{1,128}`) and tracks attached client ids in
 `clientIds`, but it does not perform proof-of-possession. Any client that can
 observe `originatorClientId` in SSE can register with the same id and
@@ -260,7 +260,7 @@ mechanism does not exist in v1.
 
 - **Cancel sentinel routes BEFORE policy dispatch** by design — a `local-only` daemon and a `consensus` daemon can both be cancelled by any voter who posts `{outcome: 'cancelled'}`. This is documented at `permissionMediator.ts` and is the agent-side abort path.
 - **`designated` and `consensus` overload `designated_mismatch`** in `PermissionVoteOutcome`. The mediator emits separate audit records but the wire shape is single. Future protocol versions may split the union.
-- **Anonymous voters (no `X-Qwen-Client-Id`)** are accepted under `first-responder` and `local-only` (loopback) only; `designated` and `consensus` reject them.
+- **Anonymous voters (no `X-HopCode-Client-Id`)** are accepted under `first-responder` and `local-only` (loopback) only; `designated` and `consensus` reject them.
 - **Cross-policy escape hatch** means cancel cannot be gated by policy. If a deployment needs policy-gated cancel that would be a future contract change — do not paper-over with route-level checks.
 - **`votesAtIssue` snapshot semantics** mean a consensus deployment with a churning client set can have legitimate clients rejected because they connected after the request was issued. Operators should pre-register collaborator client ids before issuing change-review prompts.
 

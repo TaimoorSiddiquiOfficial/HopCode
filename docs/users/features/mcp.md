@@ -1,4 +1,4 @@
-﻿# Connect HopCode to tools via MCP
+# Connect HopCode to tools via MCP
 
 HopCode can connect to external tools and data sources through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). MCP servers give HopCode access to your tools, databases, and APIs.
 
@@ -281,7 +281,7 @@ OAuth configuration properties:
 
 OAuth tokens are automatically:
 
-- **Stored securely** in `~/.qwen/mcp-oauth-tokens-v2.json` (AES-256-GCM encrypted), with keychain storage preferred when available
+- **Stored securely** in `~/.hopcode/mcp-oauth-tokens-v2.json` (AES-256-GCM encrypted), with keychain storage preferred when available
 - **Refreshed** when expired (if refresh tokens are available)
 - **Validated** before each connection attempt
 

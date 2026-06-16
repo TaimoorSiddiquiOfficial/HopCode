@@ -16,7 +16,7 @@
 
 ## Architecture
 
-**Entry**: `runQwenServe(opts, deps)` in `packages/cli/src/serve/runQwenServe.ts`. Returns a `RunHandle` (`{ url, port, close, ... }`).
+**Entry**: `runHopCodeServe(opts, deps)` in `packages/cli/src/serve/runHopCodeServe.ts`. Returns a `RunHandle` (`{ url, port, close, ... }`).
 
 **App factory**: `createServeApp(opts, getPort, deps)` in `packages/cli/src/serve/server.ts`. Builds the Express `Application`. Direct embedders and tests call it without the bootstrap wrapper.
 
@@ -74,7 +74,7 @@
 9. **Per-handle `childEnvOverrides`**: pass `HOPCODE_SERVE_MCP_CLIENT_BUDGET` and `HOPCODE_SERVE_MCP_BUDGET_MODE` to the ACP child through `BridgeOptions.childEnvOverrides` instead of mutating `process.env`.
 10. **Load `settings.json` once**: read `context.fileName`, `policy.permissionStrategy`, and `policy.consensusQuorum`. Corrupt files fall back to defaults. `validatePolicyConfig()` checks `policy.*` against `SERVE_CAPABILITY_REGISTRY.permission_mediation.modes`; unknown strategies or non-positive `consensusQuorum` throw `InvalidPolicyConfigError`. A quorum set under a non-`consensus` strategy logs a stderr warning.
 11. **Allocate `PermissionAuditRing`** (512 entries).
-12. **Build `fsFactory`**: `runQwenServe` defaults to `trusted: true`; direct `createServeApp` callers default to `trusted: false` and warn once.
+12. **Build `fsFactory`**: `runHopCodeServe` defaults to `trusted: true`; direct `createServeApp` callers default to `trusted: false` and warn once.
 13. **`createHttpAcpBridge`**, see [`03-acp-bridge.md`](./03-acp-bridge.md).
 14. **`createServeApp`** assembles Express.
 15. **`server.listen(port, hostname)`**, then resolve the actual `getPort()` for host allowlist.
@@ -144,7 +144,7 @@ See [`17-configuration.md`](./17-configuration.md) for the merged reference.
 
 ## References
 
-- `packages/cli/src/serve/runQwenServe.ts` (bootstrap, boot validation, graceful shutdown)
+- `packages/cli/src/serve/runHopCodeServe.ts` (bootstrap, boot validation, graceful shutdown)
 - `packages/cli/src/serve/server.ts` (`createServeApp()`, middleware and route assembly)
 - `packages/cli/src/serve/auth.ts` (CORS, Host allowlist, bearer auth, mutation gate)
 - `packages/cli/src/serve/rateLimit.ts` (per-tier HTTP rate limit)

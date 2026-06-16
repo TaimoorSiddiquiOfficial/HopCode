@@ -1343,7 +1343,7 @@ export async function runNonInteractive(
             : config.getCronScheduler();
 
           if (scheduler) {
-            // Durable tasks live under ~/.qwen (user-owned, not in the
+            // Durable tasks live under ~/.hopcode (user-owned, not in the
             // working tree), so no folder-trust gate is needed here.
             await scheduler
               .enableDurable(config.getSessionId())

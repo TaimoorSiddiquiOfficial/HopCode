@@ -93,7 +93,7 @@ Key points:
   (`DEFAULT_INIT_TIMEOUT_MS=10s`), calls `connection.newSession({cwd})`, then
   registers the new `SessionEntry`.
 - `SessionLimitExceededError` is thrown when `byId.size >= maxSessions`.
-- `InvalidClientIdError` is thrown if `X-Qwen-Client-Id` is outside
+- `InvalidClientIdError` is thrown if `X-HopCode-Client-Id` is outside
   `[A-Za-z0-9._:-]{1,128}`.
 - The disconnect-reaper in `server.ts` tracks the spawn owner via
   `attachCount`/`spawnOwnerWantedKill` to avoid tearing down a session whose
@@ -152,7 +152,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Op as runQwenServe
+    participant Op as runHopCodeServe
     participant B as Bridge
     participant CHs as Channels
     participant M as Mediator

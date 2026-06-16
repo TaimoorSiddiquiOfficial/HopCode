@@ -179,7 +179,7 @@ export class AcpWsTransport implements DaemonTransport {
     const params = mapping.extractParams(segments, body, httpMethod);
 
     // Forward per-request headers as JSON-RPC _meta so the server can
-    // see X-Qwen-Client-Id and similar metadata that HTTP transports
+    // see X-HopCode-Client-Id and similar metadata that HTTP transports
     // carry natively.
     const headerMeta = extractHeaderMeta(init.headers);
     if (headerMeta) {

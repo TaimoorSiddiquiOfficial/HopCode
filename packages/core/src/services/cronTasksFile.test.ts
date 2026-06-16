@@ -61,7 +61,7 @@ describe('cronTasksFile', () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'cron-test-'));
     // Durable tasks live under the user runtime dir, not the working tree.
     // Redirect that base into the test temp dir so the per-project hash dir
-    // lands under tmpDir instead of the real ~/.qwen.
+    // lands under tmpDir instead of the real ~/.hopcode.
     Storage.setRuntimeBaseDir(tmpDir);
   });
 
@@ -83,7 +83,9 @@ describe('cronTasksFile', () => {
       );
       // Crucially, not in the project working tree.
       expect(file.startsWith('/project')).toBe(false);
-      expect(file).not.toContain(`${path.sep}.qwen${path.sep}scheduled_tasks`);
+      expect(file).not.toContain(
+        `${path.sep}.hopcode${path.sep}scheduled_tasks`,
+      );
     });
   });
 
@@ -148,7 +150,19 @@ describe('cronTasksFile', () => {
       });
       const outside = path.join(tmpDir, 'outside.txt');
       await fs.writeFile(outside, 'PROTECTED');
-      await fs.symlink(outside, getCronFilePath(tmpDir));
+      try {
+        await fs.symlink(outside, getCronFilePath(tmpDir));
+      } catch (err) {
+        if (
+          process.platform === 'win32' &&
+          err instanceof Error &&
+          'code' in err &&
+          (err.code === 'EPERM' || err.code === 'EACCES')
+        ) {
+          return;
+        }
+        throw err;
+      }
 
       await writeCronTasks(tmpDir, [makeTask()]);
 

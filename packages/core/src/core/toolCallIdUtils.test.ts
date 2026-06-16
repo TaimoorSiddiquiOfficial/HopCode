@@ -65,18 +65,18 @@ describe('toolCallIdUtils', () => {
     expect(normalized).toEqual([
       {
         functionCall: {
-          id: 'dup_id_0001__qwen_dup_2',
+          id: 'dup_id_0001__hopcode_dup_2',
           name: 'read_file',
           args: { file_path: 'b.ts' },
         },
       },
       { text: 'done' },
     ]);
-    expect(seenIds.has('dup_id_0001__qwen_dup_2')).toBe(true);
+    expect(seenIds.has('dup_id_0001__hopcode_dup_2')).toBe(true);
   });
 
   it('generates stable non-empty ids for missing functionCall ids', () => {
-    const seenIds = new Set<string>(['call_qwen_1']);
+    const seenIds = new Set<string>(['call_hopcode_1']);
 
     const normalized = normalizeModelToolCallIds(
       [
@@ -88,8 +88,8 @@ describe('toolCallIdUtils', () => {
     );
 
     expect(normalized.map((part) => part.functionCall?.id)).toEqual([
-      'call_qwen_2',
-      'call_qwen_3',
+      'call_hopcode_2',
+      'call_hopcode_3',
     ]);
   });
 

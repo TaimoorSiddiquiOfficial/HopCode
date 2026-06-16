@@ -83,7 +83,7 @@ The CLI is defined in **`packages/cli/src/commands/serve.ts`**:
 | `--workspace <dir>`                     | string                         | `process.cwd()`                              | -                                        | Bound workspace. **Must be an absolute path, must exist, and must be a directory**. Boot canonicalizes it once via `canonicalizeWorkspace`. `POST /session` with a mismatched `cwd` returns `400 workspace_mismatch`. |
 | `--max-connections <n>`                 | number                         | `256`                                        | -                                        | Listener-level `server.maxConnections`. `0` / `Infinity` means unlimited. `NaN` / negative values fail boot to avoid fail-open behavior.                                                                              |
 | `--require-auth`                        | boolean                        | `false`                                      | Token required                           | Extends bearer auth to loopback **and** `/health`. Boot refuses to start without a token.                                                                                                                             |
-| `--enable-session-shell`                | boolean                        | `false`                                      | Token required                           | Enables direct `POST /session/:id/shell` execution. Callers must also send a session-bound `X-Qwen-Client-Id`.                                                                                                        |
+| `--enable-session-shell`                | boolean                        | `false`                                      | Token required                           | Enables direct `POST /session/:id/shell` execution. Callers must also send a session-bound `X-HopCode-Client-Id`.                                                                                                     |
 | `--event-ring-size <n>`                 | number                         | `8000`                                       | -                                        | Per-session SSE replay ring depth. Soft cap is `MAX_EVENT_RING_SIZE = 1_000_000`; out-of-range values throw during bridge construction.                                                                               |
 | `--http-bridge`                         | boolean                        | `true`                                       | -                                        | Stage 1 bridge mode: one `qwen --acp` child multiplexed by the daemon. Stage 2 in-process mode is not implemented yet; `--no-http-bridge` falls back and prints to stderr.                                            |
 | `--mcp-client-budget <n>`               | number                         | none                                         | Required for `mcp-budget-mode=enforce`   | Workspace MCP client cap. Must be a positive integer.                                                                                                                                                                 |
@@ -139,7 +139,7 @@ Settings I/O failure, such as malformed JSON, falls back to defaults. `InvalidPo
 
 ## 6. Boot refusal scenarios (explicit failures)
 
-`runQwenServe.ts` intentionally throws instead of falling back in these cases:
+`runHopCodeServe.ts` intentionally throws instead of falling back in these cases:
 
 | Scenario                                                                      | Error prefix                                                                                        |
 | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -182,13 +182,13 @@ curl -s http://127.0.0.1:4170/workspace/mcp | jq
 # 6. Create a session
 curl -s -X POST http://127.0.0.1:4170/session \
   -H 'Content-Type: application/json' \
-  -H 'X-Qwen-Client-Id: curl-debug' \
+  -H 'X-HopCode-Client-Id: curl-debug' \
   -d '{}' | jq
 
 # 7. Tail SSE (replace <sid>)
 curl -N \
   -H 'Accept: text/event-stream' \
-  -H 'X-Qwen-Client-Id: curl-debug' \
+  -H 'X-HopCode-Client-Id: curl-debug' \
   -H 'Last-Event-ID: 0' \
   'http://127.0.0.1:4170/session/<sid>/events'
 
@@ -228,11 +228,11 @@ config/config.ts                   await yargsInstance.parse()
    |
    v (handler)
 commands/serve.ts                  handler(argv) - boot pre-checks
-commands/serve.ts                  const { runQwenServe } = await import('../serve/index.js')   # lazy load
-commands/serve.ts                  await runQwenServe({...})
+commands/serve.ts                  const { runHopCodeServe } = await import('../serve/index.js') # lazy load
+commands/serve.ts                  await runHopCodeServe({...})
    |
    v
-serve/runQwenServe.ts              runQwenServe(opts, deps)
+serve/runHopCodeServe.ts           runHopCodeServe(opts, deps)
    |  |- trim token
    |  |- hostname mismatch fallback
    |  |- auth preflight
@@ -244,7 +244,7 @@ serve/runQwenServe.ts              runQwenServe(opts, deps)
    |  `- createHttpAcpBridge({...})
    |
    v
-serve/runQwenServe.ts              const app = createServeApp(opts, () => actualPort, {...})
+serve/runHopCodeServe.ts           const app = createServeApp(opts, () => actualPort, {...})
    |
    v
 serve/server.ts                    createServeApp() - builds Express app (**does not listen**)
@@ -253,7 +253,7 @@ serve/server.ts                    createServeApp() - builds Express app (**does
    |  `- return app
    |
    v
-serve/runQwenServe.ts              server = app.listen(port, hostname, cb)
+serve/runHopCodeServe.ts           server = app.listen(port, hostname, cb)
    |  |- server.maxConnections = cap
    |  |- actualPort = server.address().port
    |  |- write "hopcode serve listening on ..."
@@ -268,7 +268,7 @@ Key facts:
 
 - **`createServeApp` only builds; it does not listen.** It returns an `express()` instance with middleware and routes mounted. The caller owns `app.listen()`. `server.test.ts` uses the factory this way across roughly 25 cases, so the factory intentionally avoids owning lifecycle.
 - **`() => actualPort` is a lazy closure.** `actualPort` is assigned in the `app.listen` callback. The `hostAllowlist` middleware reads it on demand, so ephemeral ports (`--port 0`) still gate the `Host` header correctly.
-- **`await blockForever()` is intentional.** If `yargs.parse()` resolves, the CLI top level falls through into the interactive TUI entrypoint (`gemini.tsx`). SIGINT / SIGTERM exit through `runQwenServe`'s `onSignal` path.
+- **`await blockForever()` is intentional.** If `yargs.parse()` resolves, the CLI top level falls through into the interactive TUI entrypoint (`gemini.tsx`). SIGINT / SIGTERM exit through `runHopCodeServe`'s `onSignal` path.
 
 ## 10. HTTP route file split
 
@@ -286,19 +286,19 @@ For the complete route and wire protocol reference, see [`../qwen-serve-protocol
 
 ## 11. Graceful vs hard shutdown
 
-- **First SIGINT / SIGTERM** -> `runQwenServe` `onSignal` -> two-phase graceful shutdown:
+- **First SIGINT / SIGTERM** -> `runHopCodeServe` `onSignal` -> two-phase graceful shutdown:
   1. `bridge.shutdown()`: each channel gets `KILL_HARD_DEADLINE_MS` (10s), then `channel.kill()`.
   2. `server.close()`: in-flight requests drain, `SHUTDOWN_FORCE_CLOSE_MS` (5s) triggers `closeAllConnections()`, then a second 2s deadline applies.
 - **Second SIGINT / SIGTERM while already exiting** -> `bridge.killAllSync()` synchronously SIGKILLs all ACP children and calls `process.exit(1)` to avoid orphan processes.
 
-`RunHandle.close()` returned by `runQwenServe` is the programmatic equivalent for embedders and tests.
+`RunHandle.close()` returned by `runHopCodeServe` is the programmatic equivalent for embedders and tests.
 
 ## 12. Embedded invocation (bypass CLI)
 
 ```ts
-import { runQwenServe } from '@hoptrendy/hopcode/serve';
+import { runHopCodeServe } from '@hoptrendy/hopcode/serve';
 
-const handle = await runQwenServe({
+const handle = await runHopCodeServe({
   port: 0, // ephemeral
   hostname: '127.0.0.1',
   mode: 'http-bridge',
@@ -361,7 +361,7 @@ HOPCODE_SERVE_DEBUG=1 hopcode serve
 ## References
 
 - CLI entry: `packages/cli/src/commands/serve.ts`
-- Bootstrap: `packages/cli/src/serve/runQwenServe.ts`
+- Bootstrap: `packages/cli/src/serve/runHopCodeServe.ts`
 - Express factory: `packages/cli/src/serve/server.ts`
 - Middleware: `packages/cli/src/serve/auth.ts`
 - Bridge factory: `packages/acp-bridge/src/bridge.ts`

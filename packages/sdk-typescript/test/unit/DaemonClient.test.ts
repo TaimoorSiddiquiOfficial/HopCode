@@ -1510,7 +1510,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.deleteSessionsData(['s-1'], 'client-1');
-      expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('sends Content-Type application/json', async () => {
@@ -1846,7 +1846,7 @@ describe('DaemonClient', () => {
       );
       const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
       await client.recapSession('s-1', { clientId: 'client-1' });
-      expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
     });
 
     it('forwards the AbortSignal so callers can cancel mid-flight', async () => {
@@ -1913,7 +1913,7 @@ describe('DaemonClient', () => {
       expect(calls[0]?.url).toBe(
         'http://daemon/session/s%2F1/mid-turn-message',
       );
-      expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+      expect(calls[0]?.headers['x-hopcode-client-id']).toBe('client-1');
       // `fetchWithTimeout` composes the caller signal with its timeout
       // controller, so the forwarded signal is not identical to `ctrl.signal`,
       // but aborting the caller's signal must still propagate to the request

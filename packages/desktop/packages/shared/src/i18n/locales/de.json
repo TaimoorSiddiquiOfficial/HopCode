@@ -873,7 +873,7 @@
   "settings.memory.managementDesc": "Open the same memory files and folder used by /memory.",
   "settings.memory.pathUnavailable": "Path unavailable",
   "settings.memory.projectMemoryFile": "Project memory file",
-  "settings.memory.qwenSettingsFile": "{{selfReferName}} settings file",
+  "settings.memory.hopcodeSettingsFile": "{{selfReferName}} settings file",
   "settings.memory.title": "Memory",
   "settings.memory.userMemoryFile": "User memory file",
   "settings.messaging.bindings.empty": "No active bindings",

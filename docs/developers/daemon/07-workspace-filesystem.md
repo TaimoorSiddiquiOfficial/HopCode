@@ -19,7 +19,7 @@ The HTTP file routes (`GET /file`, `GET /file/bytes`, `POST /file/write`, `POST 
 - Refuse paths outside the bound workspace (`path_outside_workspace`) and paths whose target is a symlink (`symlink_escape`).
 - Refuse reads above `MAX_READ_BYTES`, writes above `MAX_WRITE_BYTES`, and binary files (`binary_file`).
 - Refuse writes/edits when the workspace is untrusted (`untrusted_workspace`) — gated by `assertTrustedForIntent(trusted, intent)`.
-- Honor `.gitignore` / `.qwenignore` patterns via `shouldIgnore`.
+- Honor `.gitignore` / `.hopcodeignore` patterns via `shouldIgnore`.
 - Perform atomic write-then-rename with target mode preservation; default new file mode is `0o600`.
 - Emit `fs.access` / `fs.denied` audit events on every operation.
 - Map every failure to a `FsError` with kind and HTTP status; route handlers serialize them uniformly.
@@ -116,9 +116,9 @@ the caller; the policy layer does not read `Config.isTrustedFolder()` directly.
 Read / list / stat / glob are always allowed (trust is only for writes). Write
 intents in untrusted workspaces throw
 `FsError('untrusted_workspace', ..., status: 403)`. The trust signal flows in
-via `WorkspaceFileSystemFactoryDeps.trusted: boolean` — `runQwenServe` passes
+via `WorkspaceFileSystemFactoryDeps.trusted: boolean` — `runHopCodeServe` passes
 `true` because the operator booted the daemon against a workspace they
-implicitly trust; `createServeApp` (direct embed without `runQwenServe`)
+implicitly trust; `createServeApp` (direct embed without `runHopCodeServe`)
 defaults to `false` and warns once per process (see
 [`02-serve-runtime.md`](./02-serve-runtime.md)).
 
@@ -200,10 +200,10 @@ flowchart LR
 
 ## State & Lifecycle
 
-- The factory is built once at daemon boot (`runQwenServe` → `resolveBridgeFsFactory` → adapter).
+- The factory is built once at daemon boot (`runHopCodeServe` → `resolveBridgeFsFactory` → adapter).
 - Each request constructs a `RequestContext` and invokes the factory's orchestrator for that call only — no long-lived per-file state.
 - Per-path locks live only for the duration of the write operation (no cross-call locking; concurrent writes to the same path race on the lock and serialize).
-- Audit ring is owned by `runQwenServe` and shared with the permission audit publisher.
+- Audit ring is owned by `runHopCodeServe` and shared with the permission audit publisher.
 
 ## Dependencies
 
@@ -214,14 +214,14 @@ flowchart LR
 
 ## Configuration
 
-| Source                                            | Knob                                                                  | Effect                                                                                                            |
-| ------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `WorkspaceFileSystemFactoryDeps.trusted: boolean` | Constructor input                                                     | Whether writes are allowed; defaults to `true` from `runQwenServe`, `false` from `createServeApp` (with warning). |
-| Constant                                          | `MAX_READ_BYTES = 256 KiB`                                            | Read cap; `file_too_large` past this.                                                                             |
-| Constant                                          | `MAX_WRITE_BYTES = 5 MiB`                                             | Write cap; sized below `express.json({ limit: '10mb' })`.                                                         |
-| Constant                                          | `BINARY_PROBE_BYTES = 4096`                                           | Sample size for content-based binary detection.                                                                   |
-| Capability tags                                   | `workspace_file_read`, `workspace_file_bytes`, `workspace_file_write` | See [`11-capabilities-versioning.md`](./11-capabilities-versioning.md).                                           |
-| Workspace files                                   | `.gitignore`, `.qwenignore`                                           | Ignored paths surface as `ignored: true` from `shouldIgnore`.                                                     |
+| Source                                            | Knob                                                                  | Effect                                                                                                               |
+| ------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `WorkspaceFileSystemFactoryDeps.trusted: boolean` | Constructor input                                                     | Whether writes are allowed; defaults to `true` from `runHopCodeServe`, `false` from `createServeApp` (with warning). |
+| Constant                                          | `MAX_READ_BYTES = 256 KiB`                                            | Read cap; `file_too_large` past this.                                                                                |
+| Constant                                          | `MAX_WRITE_BYTES = 5 MiB`                                             | Write cap; sized below `express.json({ limit: '10mb' })`.                                                            |
+| Constant                                          | `BINARY_PROBE_BYTES = 4096`                                           | Sample size for content-based binary detection.                                                                      |
+| Capability tags                                   | `workspace_file_read`, `workspace_file_bytes`, `workspace_file_write` | See [`11-capabilities-versioning.md`](./11-capabilities-versioning.md).                                              |
+| Workspace files                                   | `.gitignore`, `.hopcodeignore`                                        | Ignored paths surface as `ignored: true` from `shouldIgnore`.                                                        |
 
 ## Caveats & Known Limits
 

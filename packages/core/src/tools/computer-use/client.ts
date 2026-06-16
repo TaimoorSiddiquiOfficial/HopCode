@@ -17,7 +17,7 @@ import { binaryPath } from './constants.js';
  * Singleton stdio MCP client for the cua-driver binary.
  *
  * Spawned via `<binary> mcp`, where `<binary>` is the pinned cua-driver
- * downloaded under `~/.qwen/computer-use/` (the bootstrap state machine
+ * downloaded under `~/.hopcode/computer-use/` (the bootstrap state machine
  * downloads + verifies it before the first spawn). Spawns are sub-second
  * — there is no npx/download cost on this path anymore.
  *

@@ -16,7 +16,7 @@ This page collects every setting that affects the `hopcode serve` daemon and its
 | `--max-sessions <n>`                    | number                     | `20`                                       | Active session cap. `0` / `Infinity` means unlimited; `NaN` / negative values throw.                                                                                                |
 | `--max-pending-prompts-per-session <n>` | number                     | `5`                                        | Accepted but pending/running prompt cap per session. Excess prompt returns 503. `0` / `Infinity` means unlimited; negative or non-integer values throw.                             |
 | `--max-connections <n>`                 | number                     | `256`                                      | HTTP listener `server.maxConnections`; `0` / `Infinity` means unlimited.                                                                                                            |
-| `--enable-session-shell`                | boolean                    | `false`                                    | Enables direct `POST /session/:id/shell` execution. Requires bearer token, and every call must carry a session-bound `X-Qwen-Client-Id`.                                            |
+| `--enable-session-shell`                | boolean                    | `false`                                    | Enables direct `POST /session/:id/shell` execution. Requires bearer token, and every call must carry a session-bound `X-HopCode-Client-Id`.                                         |
 | `--event-ring-size <n>`                 | number                     | `8000`                                     | Per-session SSE replay ring; soft cap is `1_000_000`.                                                                                                                               |
 | `--http-bridge`                         | boolean                    | `true`                                     | Stage 1 bridge mode. `--no-http-bridge` still falls back to http-bridge and prints to stderr.                                                                                       |
 | `--mcp-client-budget <n>`               | positive integer           | unset                                      | Sets `WorkspaceMcpBudget.clientBudget` and forwards it to the ACP child through `childEnvOverrides`.                                                                                |
@@ -37,7 +37,7 @@ This page collects every setting that affects the `hopcode serve` daemon and its
 
 ## Environment variables
 
-### Read by `runQwenServe` / Express middleware
+### Read by `runHopCodeServe` / Express middleware
 
 | Env                                    | Effect                                                                                                                                                                   |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -54,7 +54,7 @@ This page collects every setting that affects the `hopcode serve` daemon and its
 
 ### Forwarded to the ACP child through `BridgeOptions.childEnvOverrides`
 
-`runQwenServe` builds these per handle so two daemons in one process do not race on `process.env`. The budget variables are not parent-process env fallbacks for `hopcode serve`; the CLI path must generate them from `--mcp-client-budget` / `--mcp-budget-mode`.
+`runHopCodeServe` builds these per handle so two daemons in one process do not race on `process.env`. The budget variables are not parent-process env fallbacks for `hopcode serve`; the CLI path must generate them from `--mcp-client-budget` / `--mcp-budget-mode`.
 
 | Env                                 | Effect                                                                                                                   |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -73,7 +73,7 @@ This page collects every setting that affects the `hopcode serve` daemon and its
 
 ## `settings.json` keys
 
-The daemon reads settings once at boot through `loadSettings(boundWorkspace)` inside `runQwenServe`. Malformed settings fall back to defaults through a try/catch guard.
+The daemon reads settings once at boot through `loadSettings(boundWorkspace)` inside `runHopCodeServe`. Malformed settings fall back to defaults through a try/catch guard.
 
 | Key                         | Type                                                               | Effect                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | --------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -86,7 +86,7 @@ The daemon reads settings once at boot through `loadSettings(boundWorkspace)` in
 
 ## `ServeOptions` (programmatic embedding)
 
-`packages/cli/src/serve/types.ts` defines the typed options object accepted by both `runQwenServe` and `createServeApp`. It mirrors the CLI flags above and adds:
+`packages/cli/src/serve/types.ts` defines the typed options object accepted by both `runHopCodeServe` and `createServeApp`. It mirrors the CLI flags above and adds:
 
 | Field                         | Effect                                                                                        |
 | ----------------------------- | --------------------------------------------------------------------------------------------- |
@@ -137,7 +137,7 @@ The daemon reads settings once at boot through `loadSettings(boundWorkspace)` in
 | `DEFAULT_MAX_PENDING_PER_SESSION` | `bridge.ts`             | `64`              | Aligned with `DEFAULT_MAX_SUBSCRIBERS`.                           |
 | `MAX_RESOLVED_PERMISSION_RECORDS` | `permissionMediator.ts` | `512`             | FIFO for recently resolved permissions.                           |
 | `KILL_HARD_DEADLINE_MS`           | `spawnChannel.ts`       | `10_000`          | Per-channel graceful shutdown window.                             |
-| `SHUTDOWN_FORCE_CLOSE_MS`         | `runQwenServe.ts`       | `5_000`           | HTTP server force-close timer.                                    |
+| `SHUTDOWN_FORCE_CLOSE_MS`         | `runHopCodeServe.ts`    | `5_000`           | HTTP server force-close timer.                                    |
 | `MAX_READ_BYTES`                  | `fs/policy.ts`          | `256 * 1024`      | Read cap.                                                         |
 | `MAX_WRITE_BYTES`                 | `fs/policy.ts`          | `5 * 1024 * 1024` | Write cap.                                                        |
 | `MAX_DISPLAY_NAME_LENGTH`         | `bridge.ts`             | `256`             | Session `displayName` cap.                                        |

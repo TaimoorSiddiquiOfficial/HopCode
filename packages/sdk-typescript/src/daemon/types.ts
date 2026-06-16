@@ -1275,7 +1275,7 @@ export type DaemonRuntimeMcpRemoveResult =
  * Returned from `POST /session/:id/heartbeat`. `lastSeenAt` is the
  * server-side `Date.now()` epoch (ms) the daemon stored for this
  * session. `clientId` is echoed back only when the caller supplied a
- * trusted one through `X-Qwen-Client-Id`. Older daemons do
+ * trusted one through `X-HopCode-Client-Id`. Older daemons do
  * not expose this route — clients should pre-flight
  * `caps.features.client_heartbeat` before sending.
  */
