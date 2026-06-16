@@ -199,7 +199,7 @@ wrappers that throw away stdout anyway.
 
 ## Quick start
 
-Run Qwen Code with both channels enabled using regular files:
+Run HopCode with both channels enabled using regular files:
 
 ```bash
 touch /tmp/qwen-events.jsonl /tmp/qwen-input.jsonl

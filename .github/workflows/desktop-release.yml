@@ -56,7 +56,7 @@ concurrency:
 
 env:
   BUN_VERSION: '1.3.9'
-  CRAFT_BRAND: 'qwen-code'
+  CRAFT_BRAND: 'hopcode'
   DESKTOP_UPDATE_FEED_TAG: 'desktop-latest'
 
 jobs:
@@ -598,7 +598,7 @@ jobs:
             gh release create "${create_args[@]}"
           fi
 
-          feed_title="Qwen Code Desktop latest"
+          feed_title="HopCode Desktop latest"
           feed_notes="Auto-update feed for ${RELEASE_TAG}. See https://github.com/${GH_REPO}/releases/tag/${RELEASE_TAG}."
           feed_upload_args=("$UPDATE_FEED_TAG" "${assets[@]}" --clobber)
           if gh release view "$UPDATE_FEED_TAG" >/dev/null 2>&1; then

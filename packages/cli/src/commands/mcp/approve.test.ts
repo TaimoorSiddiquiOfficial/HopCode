@@ -44,7 +44,7 @@ describe('qwen mcp approve / reject', () => {
 
   beforeEach(() => {
     dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-approve-'));
-    process.env['QWEN_CODE_MCP_APPROVALS_PATH'] = path.join(
+    process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'] = path.join(
       dir,
       MCP_APPROVALS_FILENAME,
     );
@@ -54,7 +54,7 @@ describe('qwen mcp approve / reject', () => {
   });
 
   afterEach(() => {
-    delete process.env['QWEN_CODE_MCP_APPROVALS_PATH'];
+    delete process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
     resetMcpApprovalsForTesting();
     cwdSpy.mockRestore();
     fs.rmSync(dir, { recursive: true, force: true });
@@ -84,7 +84,7 @@ describe('qwen mcp approve / reject', () => {
   /** Read the persisted approval status straight off disk (scope-agnostic). */
   const persistedStatus = (name: string): string | undefined => {
     const raw = fs.readFileSync(
-      process.env['QWEN_CODE_MCP_APPROVALS_PATH']!,
+      process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']!,
       'utf-8',
     );
     return JSON.parse(raw)[dir]?.[name]?.status;

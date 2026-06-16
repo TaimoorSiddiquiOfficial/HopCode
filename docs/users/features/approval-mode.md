@@ -362,7 +362,7 @@ hopcode --prompt "Run the test suite, fix all failing tests, then commit changes
 
 ### Keyboard Shortcut Switching
 
-During a Qwen Code session, use **Shift+Tab**​ (or **Tab** on Windows) to quickly cycle through the five modes:
+During a HopCode session, use **Shift+Tab**​ (or **Tab** on Windows) to quickly cycle through the five modes:
 
 ```
 Plan Mode → Ask Permissions Mode → Auto-Edit Mode → Auto Mode → IZN Mode → Plan Mode

@@ -71,30 +71,28 @@ function errMsg(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-const QWEN_METHOD_NS = HOPCODE_METHOD_NS;
+const SESSION_SHELL_METHOD = `${HOPCODE_METHOD_NS}session/shell`;
 
-const SESSION_SHELL_METHOD = `${QWEN_METHOD_NS}session/shell`;
-
-const ALL_QWEN_VENDOR_METHODS: readonly string[] = [
-  `${QWEN_METHOD_NS}session/heartbeat`,
-  `${QWEN_METHOD_NS}session/context`,
-  `${QWEN_METHOD_NS}session/supported_commands`,
-  `${QWEN_METHOD_NS}session/update_metadata`,
-  `${QWEN_METHOD_NS}workspace/mcp`,
-  `${QWEN_METHOD_NS}workspace/skills`,
-  `${QWEN_METHOD_NS}workspace/providers`,
-  `${QWEN_METHOD_NS}workspace/env`,
-  `${QWEN_METHOD_NS}workspace/preflight`,
-  `${QWEN_METHOD_NS}workspace/init`,
-  `${QWEN_METHOD_NS}workspace/set_tool_enabled`,
-  `${QWEN_METHOD_NS}workspace/restart_mcp_server`,
+const ALL_HOPCODE_VENDOR_METHODS: readonly string[] = [
+  `${HOPCODE_METHOD_NS}session/heartbeat`,
+  `${HOPCODE_METHOD_NS}session/context`,
+  `${HOPCODE_METHOD_NS}session/supported_commands`,
+  `${HOPCODE_METHOD_NS}session/update_metadata`,
+  `${HOPCODE_METHOD_NS}workspace/mcp`,
+  `${HOPCODE_METHOD_NS}workspace/skills`,
+  `${HOPCODE_METHOD_NS}workspace/providers`,
+  `${HOPCODE_METHOD_NS}workspace/env`,
+  `${HOPCODE_METHOD_NS}workspace/preflight`,
+  `${HOPCODE_METHOD_NS}workspace/init`,
+  `${HOPCODE_METHOD_NS}workspace/set_tool_enabled`,
+  `${HOPCODE_METHOD_NS}workspace/restart_mcp_server`,
   // Wave 1: session extensions
-  `${QWEN_METHOD_NS}session/recap`,
-  `${QWEN_METHOD_NS}session/btw`,
+  `${HOPCODE_METHOD_NS}session/recap`,
+  `${HOPCODE_METHOD_NS}session/btw`,
   SESSION_SHELL_METHOD,
-  `${QWEN_METHOD_NS}session/detach`,
-  `${QWEN_METHOD_NS}session/context_usage`,
-  `${QWEN_METHOD_NS}session/tasks`,
+  `${HOPCODE_METHOD_NS}session/detach`,
+  `${HOPCODE_METHOD_NS}session/context_usage`,
+  `${HOPCODE_METHOD_NS}session/tasks`,
   // Wave 1: memory
   `${HOPCODE_METHOD_NS}workspace/memory`,
   `${HOPCODE_METHOD_NS}workspace/memory/write`,
@@ -128,7 +126,7 @@ const ALL_QWEN_VENDOR_METHODS: readonly string[] = [
 function advertisedQwenVendorMethods(
   sessionShellCommandEnabled: boolean,
 ): string[] {
-  return ALL_QWEN_VENDOR_METHODS.filter(
+  return ALL_HOPCODE_VENDOR_METHODS.filter(
     (method) => sessionShellCommandEnabled || method !== SESSION_SHELL_METHOD,
   );
 }
@@ -146,7 +144,7 @@ const CONN_ROUTED_METHODS = new Set<string>([
   'session/list',
   'session/close',
   'session/fork',
-  ...ALL_QWEN_VENDOR_METHODS,
+  ...ALL_HOPCODE_VENDOR_METHODS,
 ]);
 
 // SYNC: server.ts MAX_TOOL_NAME_LENGTH / MAX_SERVER_NAME_LENGTH (both 256).
@@ -1068,7 +1066,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}session/heartbeat`: {
+        case `${HOPCODE_METHOD_NS}session/heartbeat`: {
           const sessionId = String(params['sessionId'] ?? '');
           if (!this.requireOwned(conn, sessionId, id)) return;
           const result = this.bridge.recordHeartbeat(
@@ -1966,7 +1964,7 @@ export class AcpDispatcher {
                   const safeSessionId = logSafe(sid.slice(0, 8));
                   const safeMessage = logSafe(msg);
                   writeStderrLine(
-                    `qwen serve: /acp sessions/delete closeSession(${safeSessionId}) failed: ${safeMessage}`,
+                    `hopcode serve: /acp sessions/delete closeSession(${safeSessionId}) failed: ${safeMessage}`,
                   );
                   closeErrors.push({ sessionId: sid, error: msg });
                 }
@@ -1979,7 +1977,7 @@ export class AcpDispatcher {
             const safeSessionId = logSafe(e.sessionId.slice(0, 8));
             const safeMessage = logSafe(errMsg(e.error));
             writeStderrLine(
-              `qwen serve: /acp sessions/delete removeSessions(${safeSessionId}) failed: ${safeMessage}`,
+              `hopcode serve: /acp sessions/delete removeSessions(${safeSessionId}) failed: ${safeMessage}`,
             );
           }
           this.replyConn(conn, id, {

@@ -426,7 +426,7 @@ export function microcompactHistory(
   settings: ClearContextOnIdleSettings,
   opts?: MicrocompactOptions,
 ): { history: Content[]; meta?: MicrocompactMeta } {
-  const envKeep = process.env['QWEN_MC_KEEP_RECENT'];
+  const envKeep = process.env['HOPCODE_MC_KEEP_RECENT'];
   const rawKeepRecent =
     envKeep !== undefined && Number.isFinite(Number(envKeep))
       ? Number(envKeep)

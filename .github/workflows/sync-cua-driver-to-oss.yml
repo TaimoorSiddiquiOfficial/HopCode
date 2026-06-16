@@ -1,7 +1,7 @@
 name: 'Sync cua-driver to Aliyun OSS'
 
 # Mirrors the pinned cua-driver-rs binaries from the upstream trycua/cua GitHub
-# release onto the qwen-code-assets OSS bucket, so Computer Use's in-bootstrap
+# release onto the hopcode-assets OSS bucket, so Computer Use's in-bootstrap
 # downloader can pull them fast from the CN mirror (with the trycua/cua GitHub
 # release as automatic fallback).
 #
@@ -68,7 +68,7 @@ jobs:
       - name: 'Skip if this version is already mirrored'
         id: 'guard'
         env:
-          ALIYUN_OSS_PUBLIC_BASE_URL: "${{ vars.ALIYUN_OSS_PUBLIC_BASE_URL || 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com' }}"
+          ALIYUN_OSS_PUBLIC_BASE_URL: "${{ vars.ALIYUN_OSS_PUBLIC_BASE_URL || 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com' }}"
           VERSION: '${{ steps.meta.outputs.version }}'
           FORCE: '${{ inputs.force }}'
         run: |-
@@ -82,7 +82,7 @@ jobs:
             echo "skip=false" >> "${GITHUB_OUTPUT}"
           fi
 
-      - name: 'Download the assets qwen-code consumes from trycua/cua'
+      - name: 'Download the assets hopcode consumes from trycua/cua'
         if: |-
           ${{ steps.guard.outputs.skip != 'true' }}
         env:
@@ -162,7 +162,7 @@ jobs:
         if: |-
           ${{ steps.guard.outputs.skip != 'true' }}
         env:
-          ALIYUN_OSS_BUCKET: "${{ vars.ALIYUN_OSS_BUCKET || 'qwen-code-assets' }}"
+          ALIYUN_OSS_BUCKET: "${{ vars.ALIYUN_OSS_BUCKET || 'hopcode-assets' }}"
           VERSION: '${{ steps.meta.outputs.version }}'
         run: |-
           set -euo pipefail
@@ -178,7 +178,7 @@ jobs:
         if: |-
           ${{ steps.guard.outputs.skip != 'true' }}
         env:
-          ALIYUN_OSS_PUBLIC_BASE_URL: "${{ vars.ALIYUN_OSS_PUBLIC_BASE_URL || 'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com' }}"
+          ALIYUN_OSS_PUBLIC_BASE_URL: "${{ vars.ALIYUN_OSS_PUBLIC_BASE_URL || 'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com' }}"
           VERSION: '${{ steps.meta.outputs.version }}'
         run: |-
           set -euo pipefail

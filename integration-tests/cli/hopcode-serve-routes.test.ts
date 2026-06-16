@@ -82,10 +82,10 @@ beforeAll(async () => {
         Object.entries(process.env).filter(
           ([k]) =>
             ![
-              'QWEN_SERVE_PROMPT_DEADLINE_MS',
-              'QWEN_SERVE_WRITER_IDLE_TIMEOUT_MS',
-              'QWEN_SERVE_RATE_LIMIT',
-              'QWEN_SERVE_NO_MCP_POOL',
+              'HOPCODE_SERVE_PROMPT_DEADLINE_MS',
+              'HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS',
+              'HOPCODE_SERVE_RATE_LIMIT',
+              'HOPCODE_SERVE_NO_MCP_POOL',
             ].includes(k),
         ),
       ),

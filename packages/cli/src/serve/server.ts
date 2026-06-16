@@ -1034,7 +1034,10 @@ export function createServeApp(
     deviceFlowProviderMap.set(provider.providerId, provider);
   }
   if (!deviceFlowProviderMap.has('hopcode-oauth')) {
-    deviceFlowProviderMap.set('hopcode-oauth', new HopCodeOAuthDeviceFlowProvider());
+    deviceFlowProviderMap.set(
+      'hopcode-oauth',
+      new HopCodeOAuthDeviceFlowProvider(),
+    );
   }
   const deviceFlowEventSink: DeviceFlowEventSink = {
     publish(emission, originatorClientId) {
@@ -1425,7 +1428,7 @@ export function createServeApp(
       );
     } catch (err) {
       writeStderrLine(
-        `qwen serve: /daemon/status failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: /daemon/status failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to build daemon status',
@@ -1438,9 +1441,7 @@ export function createServeApp(
     const envelope: CapabilitiesEnvelope = {
       v: CAPABILITIES_SCHEMA_VERSION,
       protocolVersions: getServeProtocolVersions(),
-      ...(deps.HopCodeVersion
-        ? { HopCodeVersion: deps.HopCodeVersion }
-        : {}),
+      ...(deps.HopCodeVersion ? { HopCodeVersion: deps.HopCodeVersion } : {}),
       mode: opts.mode,
       features: currentServeFeatures(),
       modelServices: [],
@@ -2294,7 +2295,7 @@ export function createServeApp(
       });
       return;
     }
-    addDaemonRequestAttribute('qwen-code.prompt_id', promptId);
+    addDaemonRequestAttribute('hopcode.prompt_id', promptId);
 
     const abort = new AbortController();
     const effectiveDeadlineMs = resolvePromptDeadlineMs(
@@ -3448,7 +3449,9 @@ export function createServeApp(
 
     if (daemonLog) {
       const sseOpenedAt = Date.now();
-      const sseClientId = req.headers['x-hopcode-client-id'] as string | undefined;
+      const sseClientId = req.headers['x-hopcode-client-id'] as
+        | string
+        | undefined;
       daemonLog.info('SSE stream opened', { sessionId, clientId: sseClientId });
       res.on('close', () => {
         try {

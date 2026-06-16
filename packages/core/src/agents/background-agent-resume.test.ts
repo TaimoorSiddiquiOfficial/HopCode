@@ -868,7 +868,7 @@ describe('BackgroundAgentResumeService', () => {
       persistedCliFlags: {
         approvalMode: 'auto-edit',
         bare: true,
-        sandbox: { command: 'docker', image: 'qwen-code-sandbox' },
+        sandbox: { command: 'docker', image: 'hopcode-sandbox' },
         screenReader: true,
         model: 'agent-model',
         maxSessionTurns: 7,
@@ -928,7 +928,7 @@ describe('BackgroundAgentResumeService', () => {
     expect(overriddenConfig.getBareMode()).toBe(true);
     expect(overriddenConfig.getSandbox()).toEqual({
       command: 'docker',
-      image: 'qwen-code-sandbox',
+      image: 'hopcode-sandbox',
     });
     expect(overriddenConfig.getScreenReader()).toBe(true);
     expect(overriddenConfig.getModel()).toBe('agent-model');

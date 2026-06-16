@@ -2,7 +2,7 @@
 
 ## Overview
 
-`qwen serve` is a local daemon by default and an exposed surface in the wrong configuration. Its security model is **layered** so that misconfiguration fails closed:
+`hopcode serve` is a local daemon by default and an exposed surface in the wrong configuration. Its security model is **layered** so that misconfiguration fails closed:
 
 1. **Bind** — non-loopback bind without a bearer token **refuses to start**.
 2. **Bearer auth** — `bearerAuth` middleware with constant-time SHA-256 compare protects every route except `/health` on loopback (`require_auth` extends this to loopback and `/health` too).
@@ -277,7 +277,7 @@ sequenceDiagram
 
 | Source          | Knob                                                                                    | Effect                                                                  |
 | --------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Env             | `QWEN_SERVER_TOKEN`                                                                     | Bearer token (trimmed).                                                 |
+| Env             | `HOPCODE_SERVER_TOKEN`                                                                  | Bearer token (trimmed).                                                 |
 | Flag            | `--token`                                                                               | Bearer token (overrides env).                                           |
 | Flag            | `--require-auth`                                                                        | Extends bearer to loopback + `/health`. Boots only with a token.        |
 | Flag            | `--hostname`                                                                            | Non-loopback bind requires `--token` (or env).                          |

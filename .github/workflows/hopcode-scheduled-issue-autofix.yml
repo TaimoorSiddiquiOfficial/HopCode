@@ -41,7 +41,7 @@ jobs:
       WORKDIR: '/tmp/autofix'
       # Comments from these accounts (triage/followup bots) do not count as
       # human engagement when judging whether an issue is unattended.
-      KNOWN_BOTS: '["qwen-code-ci-bot", "github-actions", "github-actions[bot]", "gemini-cli-robot"]'
+      KNOWN_BOTS: '["hopcode-ci-bot", "github-actions", "github-actions[bot]", "gemini-cli-robot"]'
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd' # v6.0.2
@@ -108,7 +108,7 @@ jobs:
         with:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
-          OPENAI_MODEL: '${{ vars.QWEN_PR_REVIEW_MODEL }}'
+          OPENAI_MODEL: '${{ vars.HOPCODE_PR_REVIEW_MODEL }}'
           settings_json: |-
             {
               "maxSessionTurns": 60,
@@ -262,7 +262,7 @@ jobs:
         with:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
-          OPENAI_MODEL: '${{ vars.QWEN_PR_REVIEW_MODEL }}'
+          OPENAI_MODEL: '${{ vars.HOPCODE_PR_REVIEW_MODEL }}'
           settings_json: |-
             {
               "maxSessionTurns": 400,
@@ -428,17 +428,17 @@ jobs:
         if: |-
           ${{ steps.decision.outputs.go_issue != '' && inputs.dry_run != true }}
         env:
-          # The qwen-code-ci-bot PAT (QWEN_CODE_BOT_TOKEN, falling back to
+          # The hopcode-ci-bot PAT (HOPCODE_CODE_BOT_TOKEN, falling back to
           # CI_BOT_PAT — the same secrets the issue follow-up bot uses) opens
-          # the PR as qwen-code-ci-bot. This is required: the default
+          # the PR as hopcode-ci-bot. This is required: the default
           # GITHUB_TOKEN is blocked from creating PRs ("GitHub Actions is not
           # permitted to create or approve pull requests"), and PRs it does
           # create do not trigger CI. The bot PAT clears both problems.
-          GITHUB_TOKEN: '${{ secrets.QWEN_CODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
+          GITHUB_TOKEN: '${{ secrets.HOPCODE_CODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
           ISSUE: '${{ steps.decision.outputs.go_issue }}'
         run: |-
           if [[ -z "${GITHUB_TOKEN}" ]]; then
-            echo '::error::QWEN_CODE_BOT_TOKEN or CI_BOT_PAT is required to publish the PR as qwen-code-ci-bot.'
+            echo '::error::HOPCODE_CODE_BOT_TOKEN or CI_BOT_PAT is required to publish the PR as hopcode-ci-bot.'
             exit 1
           fi
           BRANCH="autofix/issue-${ISSUE}"

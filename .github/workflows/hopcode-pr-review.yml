@@ -391,24 +391,24 @@ jobs:
             # qwen currently reads HTTP(S)_PROXY directly and does not apply
             # NO_PROXY when constructing its proxy agent. Clear proxy env for
             # qwen itself, while restoring it for child gh/git commands.
-            export QWEN_CI_HTTPS_PROXY="${HTTPS_PROXY:-}"
-            export QWEN_CI_https_proxy="${https_proxy:-}"
-            export QWEN_CI_HTTP_PROXY="${HTTP_PROXY:-}"
-            export QWEN_CI_http_proxy="${http_proxy:-}"
+            export HOPCODE_CI_HTTPS_PROXY="${HTTPS_PROXY:-}"
+            export HOPCODE_CI_https_proxy="${https_proxy:-}"
+            export HOPCODE_CI_HTTP_PROXY="${HTTP_PROXY:-}"
+            export HOPCODE_CI_http_proxy="${http_proxy:-}"
             proxy_bin="${RUNNER_TEMP:-/tmp}/qwen-network-bin"
             mkdir -p "$proxy_bin"
 
             if command -v gh >/dev/null 2>&1; then
               local real_gh
               real_gh="$(command -v gh)"
-              export QWEN_CI_REAL_GH="$real_gh"
+              export HOPCODE_CI_REAL_GH="$real_gh"
               {
                 printf '%s\n' '#!/usr/bin/env bash'
-                printf '%s\n' '[ -n "${QWEN_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$QWEN_CI_HTTPS_PROXY"'
-                printf '%s\n' '[ -n "${QWEN_CI_https_proxy:-}" ] && export https_proxy="$QWEN_CI_https_proxy"'
-                printf '%s\n' '[ -n "${QWEN_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$QWEN_CI_HTTP_PROXY"'
-                printf '%s\n' '[ -n "${QWEN_CI_http_proxy:-}" ] && export http_proxy="$QWEN_CI_http_proxy"'
-                printf '%s\n' 'exec "$QWEN_CI_REAL_GH" "$@"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$HOPCODE_CI_HTTPS_PROXY"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_https_proxy:-}" ] && export https_proxy="$HOPCODE_CI_https_proxy"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$HOPCODE_CI_HTTP_PROXY"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_http_proxy:-}" ] && export http_proxy="$HOPCODE_CI_http_proxy"'
+                printf '%s\n' 'exec "$HOPCODE_CI_REAL_GH" "$@"'
               } > "$proxy_bin/gh"
               chmod +x "$proxy_bin/gh"
             fi
@@ -416,14 +416,14 @@ jobs:
             if command -v git >/dev/null 2>&1; then
               local real_git
               real_git="$(command -v git)"
-              export QWEN_CI_REAL_GIT="$real_git"
+              export HOPCODE_CI_REAL_GIT="$real_git"
               {
                 printf '%s\n' '#!/usr/bin/env bash'
-                printf '%s\n' '[ -n "${QWEN_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$QWEN_CI_HTTPS_PROXY"'
-                printf '%s\n' '[ -n "${QWEN_CI_https_proxy:-}" ] && export https_proxy="$QWEN_CI_https_proxy"'
-                printf '%s\n' '[ -n "${QWEN_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$QWEN_CI_HTTP_PROXY"'
-                printf '%s\n' '[ -n "${QWEN_CI_http_proxy:-}" ] && export http_proxy="$QWEN_CI_http_proxy"'
-                printf '%s\n' 'exec "$QWEN_CI_REAL_GIT" "$@"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$HOPCODE_CI_HTTPS_PROXY"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_https_proxy:-}" ] && export https_proxy="$HOPCODE_CI_https_proxy"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$HOPCODE_CI_HTTP_PROXY"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_http_proxy:-}" ] && export http_proxy="$HOPCODE_CI_http_proxy"'
+                printf '%s\n' 'exec "$HOPCODE_CI_REAL_GIT" "$@"'
               } > "$proxy_bin/git"
               chmod +x "$proxy_bin/git"
             fi
@@ -435,7 +435,7 @@ jobs:
             qwen --version
             echo "openai_host=${openai_host}"
             echo "qwen_http_proxy=disabled"
-            if [ -n "${QWEN_CI_HTTPS_PROXY}${QWEN_CI_https_proxy}${QWEN_CI_HTTP_PROXY}${QWEN_CI_http_proxy}" ]; then
+            if [ -n "${HOPCODE_CI_HTTPS_PROXY}${HOPCODE_CI_https_proxy}${HOPCODE_CI_HTTP_PROXY}${HOPCODE_CI_http_proxy}" ]; then
               echo "child_git_github_proxy=restored"
             else
               echo "child_git_github_proxy=unset"

@@ -87,7 +87,7 @@ const WORKFLOW_PARAM_SCHEMA = {
         'Concurrency: `parallel([() => agent(...), ...])` runs thunks ' +
         'through a shared per-run window (default ' +
         '`max(1, min(16, cpus-2))` agents in flight; override via ' +
-        '`QWEN_CODE_MAX_WORKFLOW_CONCURRENCY`) and resolves to a ' +
+        '`HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY`) and resolves to a ' +
         'position-aligned array — a thunk that throws, or resolves to a ' +
         'non-JSON-serializable value, becomes `null` at its index ' +
         '(errors-as-data); parallel() itself rejects only on invalid ' +
@@ -97,7 +97,7 @@ const WORKFLOW_PARAM_SCHEMA = {
         'value drops that item to `null`. Pass ' +
         'THUNKS to parallel, not eager calls: `parallel([() => agent(...)])`, ' +
         'not `parallel([agent(...)])`. At most 1000 agent() calls per run ' +
-        '(override via `QWEN_CODE_MAX_WORKFLOW_AGENTS`). ' +
+        '(override via `HOPCODE_CODE_MAX_WORKFLOW_AGENTS`). ' +
         '`Date.now()` and `Math.random()` both throw — workflow scripts ' +
         'must be deterministic for resume. ' +
         '`export const meta = {...}` declarations are stripped before execution.',

@@ -132,7 +132,7 @@ Out-of-pass refusals (e.g. lazy `readResource` spawn that bypasses the bulk pass
 | --------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Flag            | `--mcp-client-budget=N`                                                                  | Sets `clientBudget` for the workspace controller.                                            |
 | Flag            | `--mcp-budget-mode={off,warn,enforce}`                                                   | Sets `mode`. `enforce` requires a positive `clientBudget`; otherwise boot fails explicitly.  |
-| Env             | `QWEN_SERVE_MCP_CLIENT_BUDGET`, `QWEN_SERVE_MCP_BUDGET_MODE`                             | Forwarded to ACP child via `childEnvOverrides`; child's `readBudgetFromEnv()` picks them up. |
+| Env             | `HOPCODE_SERVE_MCP_CLIENT_BUDGET`, `HOPCODE_SERVE_MCP_BUDGET_MODE`                       | Forwarded to ACP child via `childEnvOverrides`; child's `readBudgetFromEnv()` picks them up. |
 | Capability tags | `mcp_guardrails` (always; `modes: ['warn', 'enforce']`), `mcp_guardrail_events` (always) | See [`11-capabilities-versioning.md`](./11-capabilities-versioning.md).                      |
 
 ## Caveats & Known Limits
@@ -141,7 +141,7 @@ Out-of-pass refusals (e.g. lazy `readResource` spawn that bypasses the bulk pass
 - **Hysteresis triggers on reservation count, not live (CONNECTED) count.** Reservations include in-flight connects and survive transient disconnects, so hysteresis stays stable across reconnect cycles. Live count is exposed in event payloads as `liveCount` for SDK consumers that want that lens.
 - **`warn` mode never refuses.** It still tracks reservations and fires `mcp_budget_warning`, but `tryReserve` always returns `'reserved'`. Refusal semantics are `enforce`-only.
 - **Workspace-scoped budget events carry `scope: 'workspace'`** so they fan out to every attached session simultaneously. SDK reducers' `mcpBudgetWarningCount` / `mcpChildRefusedBatchCount` increment in lockstep across sessions on the same connection. Per-session legacy events from `McpClientManager` carry no `scope` (defaults to `'session'` semantically).
-- **The kill switch `QWEN_SERVE_NO_MCP_POOL=1`** disables the pool entirely; the workspace budget is also disabled, and the per-session `McpClientManager` budget takes over. The capabilities envelope drops `mcp_workspace_pool` and `mcp_pool_restart` to report this accurately.
+- **The kill switch `HOPCODE_SERVE_NO_MCP_POOL=1`** disables the pool entirely; the workspace budget is also disabled, and the per-session `McpClientManager` budget takes over. The capabilities envelope drops `mcp_workspace_pool` and `mcp_pool_restart` to report this accurately.
 - **`ServeMcpBudgetStatusCell.scope` is a forward-compatible list shape.** Snapshot cells expose `budgets[]`, not a single `budget?` field. PR 14 v1 emits one `scope: 'session'` cell for each ACP session because `acpAgent.newSessionConfig()` constructs that session's `Config` / `McpClientManager`. The `'pool'` scope is reserved for the Wave 5 PR 23 pool-scoped cell that will sit alongside session-scoped cells. Consumers must tolerate additional unknown `scope` values by dropping them rather than failing.
 
 ## References

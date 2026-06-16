@@ -75,15 +75,15 @@ describe('resolveAssetUrls', () => {
     const urls = resolveAssetUrls('a.tar.gz', {});
     expect(urls).toHaveLength(2);
     expect(urls[0]).toContain(
-      'qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/computer-use',
+      'hopcode-assets.oss-cn-hangzhou.aliyuncs.com/computer-use',
     );
     expect(urls[0]).toContain(`/cua-driver-rs/v${CUA_DRIVER_VERSION}/a.tar.gz`);
     expect(urls[1]).toContain('github.com/trycua/cua/releases/download');
   });
 
-  it('prepends QWEN_COMPUTER_USE_DOWNLOAD_HOST as the first source', () => {
+  it('prepends HOPCODE_COMPUTER_USE_DOWNLOAD_HOST as the first source', () => {
     const urls = resolveAssetUrls('a.tar.gz', {
-      QWEN_COMPUTER_USE_DOWNLOAD_HOST: 'https://mirror.internal/',
+      HOPCODE_COMPUTER_USE_DOWNLOAD_HOST: 'https://mirror.internal/',
     });
     expect(urls).toHaveLength(3);
     expect(urls[0]).toBe(
@@ -150,7 +150,7 @@ describe('resolveMaxImageDimension', () => {
     expect(resolveMaxImageDimension(0, {})).toBe(0);
     expect(
       resolveMaxImageDimension(undefined, {
-        QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION: '0',
+        HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION: '0',
       }),
     ).toBe(0);
   });
@@ -163,7 +163,7 @@ describe('resolveMaxImageDimension', () => {
   it('lets the env var override the setting', () => {
     expect(
       resolveMaxImageDimension(1024, {
-        QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION: '768',
+        HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION: '768',
       }),
     ).toBe(768);
   });
@@ -172,7 +172,7 @@ describe('resolveMaxImageDimension', () => {
     for (const bad of ['abc', '12.5', '', '   ', '-1']) {
       expect(
         resolveMaxImageDimension(1024, {
-          QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION: bad,
+          HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION: bad,
         }),
       ).toBe(1024);
     }
@@ -187,15 +187,15 @@ describe('resolveMaxImageDimension', () => {
   });
 
   it('reads process.env by default', () => {
-    const prev = process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
+    const prev = process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
     try {
-      process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'] = '640';
+      process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'] = '640';
       expect(resolveMaxImageDimension(undefined)).toBe(640);
     } finally {
       if (prev === undefined) {
-        delete process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
+        delete process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'];
       } else {
-        process.env['QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION'] = prev;
+        process.env['HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION'] = prev;
       }
     }
   });

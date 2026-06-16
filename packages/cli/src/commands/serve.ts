@@ -297,7 +297,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
         maxPendingPromptsPerSession < 0)
     ) {
       writeStderrLine(
-        'qwen serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).',
+        'hopcode serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).',
       );
       process.exit(1);
     }

@@ -220,8 +220,8 @@ export default {
     '通过摘要替换来压缩上下文',
   'Fast context compression without AI. Strips old tool outputs and thinking parts.':
     '无需 AI 的快速上下文压缩。清理旧工具输出并剥离思考过程。',
-  'open full Qwen Code documentation in your browser':
-    '在浏览器中打开完整的 Qwen Code 文档',
+  'open full HopCode documentation in your browser':
+    '在浏览器中打开完整的 HopCode 文档',
   'Configuration not available.': '配置不可用',
   'Connect an LLM provider': '连接 LLM 提供商',
   'Copy to clipboard: reply, code (by lang), LaTeX, or Mermaid. N = Nth-latest message, index = block number':

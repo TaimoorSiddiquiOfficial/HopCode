@@ -22,7 +22,7 @@ import { binaryPath } from './constants.js';
  * — there is no npx/download cost on this path anymore.
  *
  * Lifecycle: lazy spawn on first `callTool` invocation. The process
- * stays alive until `stop()` or qwen-code exits. State (element_index
+ * stays alive until `stop()` or hopcode exits. State (element_index
  * map per window) lives in the process — if the process restarts, the
  * model must call `get_window_state` again before any element-targeted
  * action.
@@ -124,7 +124,7 @@ export class ComputerUseClient {
       env: { ...process.env } as Record<string, string>,
     });
     const client = new Client(
-      { name: 'qwen-code-computer-use', version: '1.0.0' },
+      { name: 'hopcode-computer-use', version: '1.0.0' },
       { capabilities: {} },
     );
     await client.connect(transport);

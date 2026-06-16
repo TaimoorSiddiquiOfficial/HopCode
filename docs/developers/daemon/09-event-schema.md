@@ -275,7 +275,7 @@ per-event shapes listed above.
 ## Configuration
 
 - Always advertised: `typed_event_schema`, `mcp_guardrail_events`, and `permission_mediation` (with supported policy modes).
-- No env var or flag directly controls the schema itself. `QWEN_SERVE_NO_MCP_POOL=1` changes MCP event `scope` from `'workspace'` to absent or `'session'`.
+- No env var or flag directly controls the schema itself. `HOPCODE_SERVE_NO_MCP_POOL=1` changes MCP event `scope` from `'workspace'` to absent or `'session'`.
 
 ## Caveats and known limits
 

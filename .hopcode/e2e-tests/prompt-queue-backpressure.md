@@ -2,18 +2,18 @@
 
 ## Scope
 
-Validate per-session prompt admission backpressure for `qwen serve`, REST clients, ACP HTTP clients, and the TypeScript SDK.
+Validate per-session prompt admission backpressure for `hopcode serve`, REST clients, ACP HTTP clients, and the TypeScript SDK.
 
 ## Baseline
 
-1. Start `qwen serve` with defaults.
+1. Start `hopcode serve` with defaults.
 2. Create a session.
 3. Send one prompt.
 4. Expected: prompt is accepted and the session emits normal turn events.
 
 ## Full Queue
 
-1. Start `qwen serve` with defaults.
+1. Start `hopcode serve` with defaults.
 2. Create a session.
 3. Hold one prompt active and enqueue four more prompts for the same session.
 4. Send the sixth prompt.
@@ -40,7 +40,7 @@ Validate per-session prompt admission backpressure for `qwen serve`, REST client
 
 ## Disabled Cap
 
-1. Start `qwen serve --max-pending-prompts-per-session 0`.
+1. Start `hopcode serve --max-pending-prompts-per-session 0`.
 2. Create a session.
 3. Enqueue more than five prompts for the same session.
 4. Expected: admission is not rejected by the prompt queue cap. `/capabilities.limits.maxPendingPromptsPerSession` is `null`.

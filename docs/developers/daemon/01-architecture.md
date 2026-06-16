@@ -2,7 +2,7 @@
 
 ## Overview
 
-A `qwen serve` process is **one daemon = one workspace**. It hosts a single Express HTTP server, owns an `@hopcode/acp-bridge` instance, and spawns one ACP child process (`qwen --acp`) that runs the actual agent runtime. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
+A `hopcode serve` process is **one daemon = one workspace**. It hosts a single Express HTTP server, owns an `@hopcode/acp-bridge` instance, and spawns one ACP child process (`qwen --acp`) that runs the actual agent runtime. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
 
 Inside the ACP child, MCP servers are shared workspace-wide through `McpTransportPool` (F2): a single (server-name + config-fingerprint) tuple maps to one MCP transport, regardless of how many sessions discover it. The bridge's `MultiClientPermissionMediator` (F3) coordinates permission votes across all connected clients under one of four policies.
 
@@ -20,7 +20,7 @@ flowchart LR
         SDK["Any SDK consumer<br/>(packages/sdk-typescript/src/daemon)"]
     end
 
-    subgraph daemon["qwen serve process (one workspace)"]
+    subgraph daemon["hopcode serve process (one workspace)"]
         EXP["Express app<br/>(packages/cli/src/serve/server.ts)"]
         BR["AcpBridge<br/>(packages/acp-bridge/src/bridge.ts)"]
         MED["MultiClientPermissionMediator<br/>(F3)"]
@@ -303,7 +303,7 @@ sequenceDiagram
     participant BR as AcpBridge
     participant CH as ACP child
 
-    Op->>RQS: qwen serve --workspace … --token …
+    Op->>RQS: hopcode serve --workspace … --token …
     RQS->>RQS: validate flags + canonicalize workspace
     RQS->>RQS: allocate PermissionAuditRing
     RQS->>BR: createHttpAcpBridge(options)

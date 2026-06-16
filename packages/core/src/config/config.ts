@@ -1009,7 +1009,7 @@ function loadMemoryPressureConfig(): MemoryPressureConfig {
       config.criticalRatio,
     );
 
-    const enableGC = process.env['QWEN_MEMORY_ENABLE_GC'];
+    const enableGC = process.env['HOPCODE_MEMORY_ENABLE_GC'];
     if (
       enableGC &&
       ['0', 'false', 'off', 'no'].includes(enableGC.trim().toLowerCase())
@@ -3919,7 +3919,7 @@ export class Config {
   /**
    * Configured screenshot longest-edge cap for Computer Use, or `undefined`
    * to leave cua-driver's built-in default (1568) in place. Resolved together
-   * with the `QWEN_COMPUTER_USE_MAX_IMAGE_DIMENSION` env override at the point
+   * with the `HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION` env override at the point
    * the driver connects (see `resolveMaxImageDimension`).
    */
   getComputerUseMaxImageDimension(): number | undefined {

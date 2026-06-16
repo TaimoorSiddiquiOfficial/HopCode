@@ -20,8 +20,8 @@ const DAEMON_BASE_URL = getDaemonBaseUrl();
 const DAEMON_TOKEN = getDaemonToken();
 removeDaemonTokenFromUrl();
 
-const LANGUAGE_STORAGE_KEY = 'qwen-code-web-shell-language';
-const THEME_STORAGE_KEY = 'qwen-code-web-shell-theme';
+const LANGUAGE_STORAGE_KEY = 'hopcode-web-shell-language';
+const THEME_STORAGE_KEY = 'hopcode-web-shell-theme';
 
 function parseTheme(value: string | null): WebShellTheme | undefined {
   if (value === WebShellThemeId.Dark || value === WebShellThemeId.Light) {

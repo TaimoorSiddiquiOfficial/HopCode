@@ -1,6 +1,6 @@
 # Agent Tool (`agent`)
 
-This document describes the `agent` tool for Qwen Code.
+This document describes the `agent` tool for HopCode.
 
 ## Description
 
@@ -16,7 +16,7 @@ Use `agent` to launch a specialized subagent to handle complex, multi-step tasks
 - `run_in_background` (boolean, optional): Set to `true` to run the agent in the background. You will be notified when it completes.
 - `isolation` (string, optional): Set to `"worktree"` to run the agent in an isolated git worktree.
 
-## How to use `agent` with Qwen Code
+## How to use `agent` with HopCode
 
 The Agent tool dynamically loads available subagents from your configuration and delegates tasks to them. Each subagent runs independently and can use its own set of tools, allowing for specialized expertise and parallel execution.
 

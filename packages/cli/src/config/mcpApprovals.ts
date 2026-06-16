@@ -46,8 +46,8 @@ export interface McpApprovalsError {
 }
 
 export function getMcpApprovalsPath(): string {
-  if (process.env['QWEN_CODE_MCP_APPROVALS_PATH']) {
-    return process.env['QWEN_CODE_MCP_APPROVALS_PATH'];
+  if (process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']) {
+    return process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
   }
   // Resolve lazily on every call (mirrors getTrustedFoldersPath): a top-level
   // const would be stale after home-env overrides are applied.

@@ -45,10 +45,10 @@ import { rebuildToolRegistryOnOverride } from '../../tools/agent/agent.js';
  * cannot bypass it. The 1001st call throws. Override via env (see below).
  */
 export const DEFAULT_MAX_AGENTS_PER_RUN = 1000;
-export const MAX_WORKFLOW_AGENTS_ENV = 'QWEN_CODE_MAX_WORKFLOW_AGENTS';
+export const MAX_WORKFLOW_AGENTS_ENV = 'HOPCODE_CODE_MAX_WORKFLOW_AGENTS';
 /**
  * Absolute upper bound on the env-override agent cap. Even an operator who
- * sets `QWEN_CODE_MAX_WORKFLOW_AGENTS=999999999` cannot exceed this — the
+ * sets `HOPCODE_CODE_MAX_WORKFLOW_AGENTS=999999999` cannot exceed this — the
  * intent is to catch fat-finger / misconfig that would silently uncap a
  * runaway workflow (1000-agent default × per-agent token cost). 10000 is
  * 10× the default, generous for legitimate large fan-outs.
@@ -56,7 +56,7 @@ export const MAX_WORKFLOW_AGENTS_ENV = 'QWEN_CODE_MAX_WORKFLOW_AGENTS';
 export const HARD_MAX_AGENTS_PER_RUN_CEILING = 10_000;
 
 /**
- * Resolve the per-run agent cap, honoring `QWEN_CODE_MAX_WORKFLOW_AGENTS`.
+ * Resolve the per-run agent cap, honoring `HOPCODE_CODE_MAX_WORKFLOW_AGENTS`.
  * Mirrors `resolveMaxConcurrentBackgroundAgents` (background-tasks.ts): a
  * non-integer / <1 override is rejected with a debug warning and the default
  * is used. An override above `HARD_MAX_AGENTS_PER_RUN_CEILING` is clamped
@@ -89,7 +89,7 @@ export function resolveMaxAgentsPerRun(
 }
 
 export const MAX_WORKFLOW_CONCURRENCY_ENV =
-  'QWEN_CODE_MAX_WORKFLOW_CONCURRENCY';
+  'HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY';
 /**
  * Absolute upper bound on the env-override concurrency window. Above this,
  * a single Node process running N concurrent LLM calls is past the point a
@@ -101,7 +101,7 @@ export const HARD_MAX_CONCURRENCY_CEILING = 64;
  * Maximum agents in flight at once within a single run, shared across all
  * `parallel()` / `pipeline()` calls. `min(16, cpus-2)` mirrors upstream;
  * `max(1, …)` guards 1–2 core machines where `cpus-2 <= 0` would otherwise
- * produce a deadlocking limit. `QWEN_CODE_MAX_WORKFLOW_CONCURRENCY` overrides
+ * produce a deadlocking limit. `HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY` overrides
  * the computed value with an explicit integer in `[1, HARD_MAX_CONCURRENCY_CEILING]`;
  * an invalid override falls back to the cpu-derived default with a debug
  * warning, and an over-ceiling override is clamped.

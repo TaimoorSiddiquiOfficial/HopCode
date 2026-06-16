@@ -106,7 +106,7 @@ describe('docsCommand', () => {
       throw new Error('docsCommand must have an action.');
     }
 
-    const docsUrl = 'https://qwenlm.github.io/qwen-code-docs/en';
+    const docsUrl = 'https://hopcode.dev/docs/en';
     mockOpenBrowserSecurely.mockRejectedValueOnce(new Error('bad url'));
 
     await docsCommand.action(mockContext, '');

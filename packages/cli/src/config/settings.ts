@@ -86,9 +86,9 @@ export const ENV_WAS_RECOVERED = 'HOPCODE_CODE_SETTINGS_WAS_RECOVERED';
 // project-controlled directory. Always excluded from project .env files,
 // regardless of user-configurable `advanced.excludedEnvVars`.
 const PROJECT_ENV_HARDCODED_EXCLUSIONS = [
-  'QWEN_HOME',
-  'QWEN_RUNTIME_DIR',
-  'QWEN_CODE_MCP_APPROVALS_PATH',
+  'HOPCODE_HOME',
+  'HOPCODE_RUNTIME_DIR',
+  'HOPCODE_CODE_MCP_APPROVALS_PATH',
   ENV_CORRUPTED_PATH,
   ENV_WAS_RECOVERED,
 ];

@@ -367,14 +367,14 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
 
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-history-'));
-    originalQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(tmpHome, '.qwen');
-    fs.mkdirSync(process.env['QWEN_HOME'], { recursive: true });
+    originalQwenHome = process.env['HOPCODE_HOME'];
+    process.env['HOPCODE_HOME'] = path.join(tmpHome, '.qwen');
+    fs.mkdirSync(process.env['HOPCODE_HOME'], { recursive: true });
   });
 
   afterEach(() => {
-    if (originalQwenHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = originalQwenHome;
+    if (originalQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalQwenHome;
     fs.rmSync(tmpHome, { recursive: true, force: true });
   });
 
@@ -384,7 +384,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     const mid = new Date('2026-06-11T00:01:00Z').toISOString();
     const end = new Date('2026-06-11T00:02:00Z').toISOString();
     const projDir = path.join(
-      process.env['QWEN_HOME']!,
+      process.env['HOPCODE_HOME']!,
       'projects',
       'repro-project',
     );
@@ -409,7 +409,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
         subtype: 'ui_telemetry',
         systemPayload: {
           uiEvent: {
-            'event.name': 'qwen-code.api_response',
+            'event.name': 'hopcode.api_response',
             'event.timestamp': mid,
             response_id: 'r1',
             model: 'qwen-max',
@@ -476,7 +476,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     // two records with the same sessionId.
     const sessionId = 'sess-dup-1';
     const usagePath = path.join(
-      process.env['QWEN_HOME']!,
+      process.env['HOPCODE_HOME']!,
       'usage_record.jsonl',
     );
     const rec = (totalTokens: number) => ({
@@ -519,7 +519,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     const sessionId = 'sess-in-progress';
     plantChatJsonl(sessionId, 1600);
     const usagePath = path.join(
-      process.env['QWEN_HOME']!,
+      process.env['HOPCODE_HOME']!,
       'usage_record.jsonl',
     );
 

@@ -312,9 +312,9 @@ vi.mock('../ide/ide-client.js', () => ({
 import { BaseLlmClient } from '../core/baseLlmClient.js';
 
 const MEMORY_PRESSURE_ENV_KEYS = [
-  'QWEN_MEMORY_PRESSURE_SOFT',
-  'QWEN_MEMORY_PRESSURE_HARD',
-  'QWEN_MEMORY_PRESSURE_CRITICAL',
+  'HOPCODE_MEMORY_PRESSURE_SOFT',
+  'HOPCODE_MEMORY_PRESSURE_HARD',
+  'HOPCODE_MEMORY_PRESSURE_CRITICAL',
 ];
 
 vi.mock('../core/baseLlmClient.js');

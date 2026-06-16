@@ -1,6 +1,6 @@
 # Daemon Developer Documentation
 
-This is the developer-facing technical documentation for **qwen-code daemon mode**: the `qwen serve` HTTP daemon, the `@hopcode/acp-bridge` package, the workspace-scoped MCP transport pool, multi-client permission mediation, typed daemon event schema v1, the TypeScript SDK daemon client, and the adapters that connect to the daemon.
+This is the developer-facing technical documentation for **hopcode daemon mode**: the `hopcode serve` HTTP daemon, the `@hopcode/acp-bridge` package, the workspace-scoped MCP transport pool, multi-client permission mediation, typed daemon event schema v1, the TypeScript SDK daemon client, and the adapters that connect to the daemon.
 
 It complements, rather than replaces, these existing docs:
 
@@ -56,7 +56,7 @@ Pick the path that matches your goal:
 
 - [`17-configuration.md`](./17-configuration.md) - env vars, CLI flags, `settings.json` keys that affect the daemon.
 - [`18-error-taxonomy.md`](./18-error-taxonomy.md) - typed errors per layer with remediation.
-- [`19-observability.md`](./19-observability.md) - `QWEN_SERVE_DEBUG`, debugging recipes, telemetry gaps.
+- [`19-observability.md`](./19-observability.md) - `HOPCODE_SERVE_DEBUG`, debugging recipes, telemetry gaps.
 - [`20-quickstart-operations.md`](./20-quickstart-operations.md) - shortest startup path, curl checks, route map, and embedded invocation recipes.
 
 ## Glossary
@@ -112,11 +112,11 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 | Area                      | Current state                                                                                                                                                                    | Primary docs                                                              |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Bootstrap / listen path   | `qwen serve` lazy-loads `runQwenServe`, validates auth/workspace/budget/settings, builds an Express app, then calls `app.listen` and blocks forever until signal.                | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)      |
+| Bootstrap / listen path   | `hopcode serve` lazy-loads `runQwenServe`, validates auth/workspace/budget/settings, builds an Express app, then calls `app.listen` and blocks forever until signal.             | [`02`](./02-serve-runtime.md), [`20`](./20-quickstart-operations.md)      |
 | Auth / network guardrails | Loopback defaults to no bearer; non-loopback requires bearer; `--require-auth` extends bearer to loopback and `/health`; Host allowlist and default CORS deny are active.        | [`12`](./12-auth-security.md), [`17`](./17-configuration.md)              |
 | Session lifecycle         | `POST /session`, `load`, `resume`, metadata patch, heartbeat, eviction, idle reaping, prompt pending limits, and graceful close are documented.                                  | [`08`](./08-session-lifecycle.md), [`10`](./10-event-bus.md)              |
 | ACP bridge                | Single ACP child multiplexed by default; `sessionScope` supports `single` and `thread`; `BridgeFileSystem`, context filename, env overrides, and channel idle timeout are wired. | [`03`](./03-acp-bridge.md), [`07`](./07-workspace-filesystem.md)          |
-| MCP pool / budget         | Workspace MCP pool is on by default unless `QWEN_SERVE_NO_MCP_POOL=1`; guardrail events and restart semantics are documented.                                                    | [`05`](./05-mcp-transport-pool.md), [`06`](./06-mcp-budget-guardrails.md) |
+| MCP pool / budget         | Workspace MCP pool is on by default unless `HOPCODE_SERVE_NO_MCP_POOL=1`; guardrail events and restart semantics are documented.                                                 | [`05`](./05-mcp-transport-pool.md), [`06`](./06-mcp-budget-guardrails.md) |
 | Permissions               | F3 mediator supports `first-responder`, `designated`, `consensus`, and `local-only`; invalid settings fail explicitly.                                                           | [`04`](./04-permission-mediation.md), [`12`](./12-auth-security.md)       |
 
 ### Wire protocol
@@ -142,10 +142,10 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 | Area                    | Current state                                                                                                                                             | Primary docs                          |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| Configuration           | Full `qwen serve` flags, env vars, `settings.json`, `ServeOptions`, `BridgeOptions`, and important constants are collected in one page.                   | [`17`](./17-configuration.md)         |
+| Configuration           | Full `hopcode serve` flags, env vars, `settings.json`, `ServeOptions`, `BridgeOptions`, and important constants are collected in one page.                | [`17`](./17-configuration.md)         |
 | Quickstart / operations | Shortest startup path, launch recipes, curl checks, demo page auth behavior, route split, shutdown behavior, and embedded invocation recipes are covered. | [`20`](./20-quickstart-operations.md) |
 | Errors                  | Boot-time explicit failures, route errors, bridge errors, EventBus errors, filesystem errors, and mediator errors are summarized with remediation.        | [`18`](./18-error-taxonomy.md)        |
-| Observability           | `QWEN_SERVE_DEBUG`, curl recipes, useful events, telemetry gaps, and investigation checklists are documented.                                             | [`19`](./19-observability.md)         |
+| Observability           | `HOPCODE_SERVE_DEBUG`, curl recipes, useful events, telemetry gaps, and investigation checklists are documented.                                          | [`19`](./19-observability.md)         |
 
 ### Historical or deprecated surfaces
 

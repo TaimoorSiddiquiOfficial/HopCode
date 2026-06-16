@@ -582,7 +582,7 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   -f event="APPROVE" \
   -f body="No issues found. LGTM! ✅
 
-_— YOUR_MODEL_ID via Qwen Code /review_"
+_— YOUR_MODEL_ID via HopCode /review_"
 
 # downgradeApprove=true (self-PR, CI failing, or CI still running):
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
@@ -590,7 +590,7 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   -f event="COMMENT" \
   -f body="No review findings. Downgraded from Approve to Comment: <downgradeReasons joined with '; '>.
 
-_— YOUR_MODEL_ID via Qwen Code /review_"
+_— YOUR_MODEL_ID via HopCode /review_"
 ```
 
 Clean up the JSON file in Step 11.

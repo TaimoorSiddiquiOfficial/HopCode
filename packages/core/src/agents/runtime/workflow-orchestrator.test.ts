@@ -689,8 +689,8 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
     // before any stage-2 starts, breaking the timing assumption. Force the
     // limit to 2 AND use a release gate so the assertion is timing-free.
     it('is staggered with no inter-stage barrier (item A reaches stage 2 while item B is still in stage 1)', async () => {
-      const envPrev = process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'];
-      process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'] = '2';
+      const envPrev = process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'];
+      process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'] = '2';
       try {
         let releaseItem1Stage1: () => void = () => {};
         const item1Stage1Gate = new Promise<void>((resolve) => {
@@ -730,8 +730,8 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
         expect(item0ReachedStage2).toBe(true);
       } finally {
         if (envPrev === undefined)
-          delete process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'];
-        else process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'] = envPrev;
+          delete process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'];
+        else process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'] = envPrev;
       }
     }, 10_000);
   });
@@ -820,8 +820,8 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
     // → unrecoverable deadlock (silent hang until the 30-min wall clock).
     // Forcing the window to 1 makes the worst case deterministic.
     it('a parallel() inside a pipeline() stage does not deadlock at concurrency=1', async () => {
-      const prev = process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'];
-      process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'] = '1';
+      const prev = process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'];
+      process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'] = '1';
       try {
         const orchestrator = new WorkflowOrchestrator(async (p) => `r:${p}`);
         const outcome = await orchestrator.run({
@@ -833,14 +833,14 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
         expect(outcome.result).toEqual([['r:a0'], ['r:a1'], ['r:a2']]);
       } finally {
         if (prev === undefined)
-          delete process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'];
-        else process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'] = prev;
+          delete process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'];
+        else process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'] = prev;
       }
     }, 15_000);
 
     it('parallel() of parallel() does not deadlock at concurrency=1', async () => {
-      const prev = process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'];
-      process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'] = '1';
+      const prev = process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'];
+      process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'] = '1';
       try {
         const orchestrator = new WorkflowOrchestrator(async (p) => `r:${p}`);
         const outcome = await orchestrator.run({
@@ -853,8 +853,8 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
         expect(outcome.result).toEqual([['r:x'], ['r:y']]);
       } finally {
         if (prev === undefined)
-          delete process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'];
-        else process.env['QWEN_CODE_MAX_WORKFLOW_CONCURRENCY'] = prev;
+          delete process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'];
+        else process.env['HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY'] = prev;
       }
     }, 15_000);
   });
@@ -863,44 +863,44 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
     it('resolveMaxAgentsPerRun defaults to 1000 and honors a valid override', () => {
       expect(resolveMaxAgentsPerRun({})).toBe(DEFAULT_MAX_AGENTS_PER_RUN);
       expect(
-        resolveMaxAgentsPerRun({ QWEN_CODE_MAX_WORKFLOW_AGENTS: '50' }),
+        resolveMaxAgentsPerRun({ HOPCODE_CODE_MAX_WORKFLOW_AGENTS: '50' }),
       ).toBe(50);
     });
 
     it('resolveMaxAgentsPerRun rejects a non-integer / <1 override and falls back', () => {
       expect(
-        resolveMaxAgentsPerRun({ QWEN_CODE_MAX_WORKFLOW_AGENTS: '0' }),
+        resolveMaxAgentsPerRun({ HOPCODE_CODE_MAX_WORKFLOW_AGENTS: '0' }),
       ).toBe(DEFAULT_MAX_AGENTS_PER_RUN);
       expect(
-        resolveMaxAgentsPerRun({ QWEN_CODE_MAX_WORKFLOW_AGENTS: 'abc' }),
+        resolveMaxAgentsPerRun({ HOPCODE_CODE_MAX_WORKFLOW_AGENTS: 'abc' }),
       ).toBe(DEFAULT_MAX_AGENTS_PER_RUN);
       expect(
-        resolveMaxAgentsPerRun({ QWEN_CODE_MAX_WORKFLOW_AGENTS: '2.5' }),
+        resolveMaxAgentsPerRun({ HOPCODE_CODE_MAX_WORKFLOW_AGENTS: '2.5' }),
       ).toBe(DEFAULT_MAX_AGENTS_PER_RUN);
     });
 
     // PR #4947 R1 T4 (wenshao): an env override above the hard ceiling must
     // be clamped, not honored — protects operators from a fat-finger
-    // QWEN_CODE_MAX_WORKFLOW_AGENTS=999999999 silently uncapping the run.
+    // HOPCODE_CODE_MAX_WORKFLOW_AGENTS=999999999 silently uncapping the run.
     it('resolveMaxAgentsPerRun clamps an over-ceiling override to the hard maximum', () => {
       expect(
         resolveMaxAgentsPerRun({
-          QWEN_CODE_MAX_WORKFLOW_AGENTS: '999999999',
+          HOPCODE_CODE_MAX_WORKFLOW_AGENTS: '999999999',
         }),
       ).toBe(10_000);
       // Just under the ceiling is preserved.
       expect(
-        resolveMaxAgentsPerRun({ QWEN_CODE_MAX_WORKFLOW_AGENTS: '9999' }),
+        resolveMaxAgentsPerRun({ HOPCODE_CODE_MAX_WORKFLOW_AGENTS: '9999' }),
       ).toBe(9999);
     });
 
     it('resolveConcurrencyLimit honors a valid override and clamps the cpu default to [1,16]', () => {
       expect(
-        resolveConcurrencyLimit({ QWEN_CODE_MAX_WORKFLOW_CONCURRENCY: '4' }),
+        resolveConcurrencyLimit({ HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY: '4' }),
       ).toBe(4);
       // invalid → cpu-derived default, always within [1, 16]
       const fallback = resolveConcurrencyLimit({
-        QWEN_CODE_MAX_WORKFLOW_CONCURRENCY: '-1',
+        HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY: '-1',
       });
       expect(fallback).toBeGreaterThanOrEqual(1);
       expect(fallback).toBeLessThanOrEqual(16);
@@ -912,18 +912,20 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
     it('resolveConcurrencyLimit clamps an over-ceiling override to the hard maximum', () => {
       expect(
         resolveConcurrencyLimit({
-          QWEN_CODE_MAX_WORKFLOW_CONCURRENCY: '999999',
+          HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY: '999999',
         }),
       ).toBe(64);
       // Just under the ceiling is preserved.
       expect(
-        resolveConcurrencyLimit({ QWEN_CODE_MAX_WORKFLOW_CONCURRENCY: '63' }),
+        resolveConcurrencyLimit({
+          HOPCODE_CODE_MAX_WORKFLOW_CONCURRENCY: '63',
+        }),
       ).toBe(63);
     });
 
-    it('QWEN_CODE_MAX_WORKFLOW_AGENTS actually lowers the cap at run time', async () => {
-      const prev = process.env['QWEN_CODE_MAX_WORKFLOW_AGENTS'];
-      process.env['QWEN_CODE_MAX_WORKFLOW_AGENTS'] = '3';
+    it('HOPCODE_CODE_MAX_WORKFLOW_AGENTS actually lowers the cap at run time', async () => {
+      const prev = process.env['HOPCODE_CODE_MAX_WORKFLOW_AGENTS'];
+      process.env['HOPCODE_CODE_MAX_WORKFLOW_AGENTS'] = '3';
       try {
         const orchestrator = new WorkflowOrchestrator(async () => 'ok');
         const outcome = await orchestrator.run({
@@ -937,8 +939,8 @@ describe('WorkflowOrchestrator P2 — parallel() / pipeline() / caps', () => {
         expect(arr.filter((v) => v === null)).toHaveLength(1);
       } finally {
         if (prev === undefined)
-          delete process.env['QWEN_CODE_MAX_WORKFLOW_AGENTS'];
-        else process.env['QWEN_CODE_MAX_WORKFLOW_AGENTS'] = prev;
+          delete process.env['HOPCODE_CODE_MAX_WORKFLOW_AGENTS'];
+        else process.env['HOPCODE_CODE_MAX_WORKFLOW_AGENTS'] = prev;
       }
     });
   });
