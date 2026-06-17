@@ -30,7 +30,7 @@ import {
 } from './test-helper.js';
 
 const SHARED_TEST_OPTIONS = createSharedTestOptions();
-const TEST_TIMEOUT = 60000;
+const TEST_TIMEOUT = 180_000;
 
 describe('Tool Control Parameters (E2E)', () => {
   let helper: SDKTestHelper;

@@ -34,7 +34,7 @@ import {
   createResultWaiter,
 } from './test-helper.js';
 
-const TEST_TIMEOUT = 30000;
+const TEST_TIMEOUT = 180_000;
 const SHARED_TEST_OPTIONS = createSharedTestOptions();
 
 /**

@@ -628,6 +628,12 @@ describe('parseArguments', () => {
     mockExit.mockRestore();
   });
 
+  it('should accept legacy --IZN alias', async () => {
+    process.argv = ['node', 'script.js', '--IZN', '--prompt', 'hello'];
+    const argv = await parseArguments();
+    expect(argv.IZN).toBe(true);
+  });
+
   it('should throw an error when using short flags -z and --approval-mode together', async () => {
     process.argv = ['node', 'script.js', '-z', '--approval-mode', 'izn'];
 

@@ -668,6 +668,10 @@ export async function parseArguments(): Promise<CliArgs> {
             'Automatically accept all actions (aka IZN mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?',
           default: false,
         })
+        .option('IZN', {
+          type: 'boolean',
+          hidden: true,
+        })
 
         .option('approval-mode', {
           type: 'string',
@@ -939,7 +943,7 @@ export async function parseArguments(): Promise<CliArgs> {
           if (argv['prompt'] && argv['promptInteractive']) {
             return 'Cannot use both --prompt (-p) and --prompt-interactive (-i) together';
           }
-          if (argv['izn'] && argv['approvalMode']) {
+          if ((argv['izn'] || argv['IZN']) && argv['approvalMode']) {
             return 'Cannot use both --izn (-z) and --approval-mode together. Use --approval-mode=izn instead.';
           }
           if (
@@ -1118,7 +1122,9 @@ export async function parseArguments(): Promise<CliArgs> {
 
   // Backward compatibility: expose the legacy `IZN` camelCase key used by
   // downstream code and tests. yargs no longer camelCases single-word options.
-  (result as Record<string, unknown>)['IZN'] = result['izn'];
+  const izn = Boolean(result['izn'] || result['IZN']);
+  (result as Record<string, unknown>)['izn'] = izn;
+  (result as Record<string, unknown>)['IZN'] = izn;
 
   return result as unknown as CliArgs;
 }

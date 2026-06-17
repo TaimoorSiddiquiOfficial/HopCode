@@ -151,10 +151,15 @@ describeLLM('hopcode serve — child-crash recovery (real SIGKILL)', () => {
       workspaceCwd: REPO_ROOT,
     });
 
-    // Find the daemon's direct `--acp` child PID.
-    const childPids = execSync(`pgrep -P ${daemon.pid} -f "hopcode.*--acp"`, {
-      encoding: 'utf8',
-    })
+    // Find the daemon's direct `--acp` child PID. The CLI child may be
+    // invoked as the native `hopcode` command or as `node .../cli.js --acp`
+    // when running the bundled dist/cli.js output, so match either shape.
+    const childPids = execSync(
+      `pgrep -P ${daemon.pid} -f "(hopcode.*--acp|cli\\.js.*--acp)"`,
+      {
+        encoding: 'utf8',
+      },
+    )
       .trim()
       .split('\n')
       .filter(Boolean);
