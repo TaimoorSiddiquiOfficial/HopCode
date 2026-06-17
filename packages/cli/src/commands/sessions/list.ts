@@ -9,7 +9,7 @@ import type {
   SessionService,
   SessionListItem,
   ListSessionsResult,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import stringWidth from 'string-width';
 import { escapeAnsiCtrlCodes } from '../../ui/utils/textUtils.js';
 import { initSessionService } from './common.js';

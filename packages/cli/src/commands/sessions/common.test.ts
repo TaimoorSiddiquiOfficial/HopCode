@@ -14,7 +14,7 @@ vi.mock('../../config/settings.js', () => ({
   loadSettings: mockLoadSettings,
 }));
 
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   Storage: {
     setRuntimeBaseDir: mockSetRuntimeBaseDir,
   },
