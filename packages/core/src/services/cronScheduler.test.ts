@@ -757,9 +757,13 @@ describe('CronScheduler', () => {
           const raw = await fs.readFile(getLockFilePath(tmpDir), 'utf-8');
           expect(JSON.parse(raw).sessionId).toBe('session-1');
         });
-        // Now an owner, the durable job fires.
-        scheduler.tick(new Date(2025, 0, 15, 10, 31, 59));
-        expect(fired.map((j) => j.id)).toContain('probe-job');
+        // Now an owner, the durable job fires. The lock file can be visible
+        // before the probe callback has flipped scheduler ownership, so wait
+        // for the observable fire instead of racing that microtask.
+        await vi.waitFor(() => {
+          scheduler.tick(new Date(2025, 0, 15, 10, 31, 59));
+          expect(fired.map((j) => j.id)).toContain('probe-job');
+        });
       } finally {
         if (usingFakeTimers) vi.useRealTimers();
       }
