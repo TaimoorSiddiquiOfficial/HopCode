@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -4803,6 +4803,30 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
       ],
     ).toBeUndefined();
     expect(extNotification).not.toHaveBeenCalled();
+
+    mockConnectionState.resolve();
+    await agentPromise;
+  });
+
+  it('passes undefined (not []) as the extension override to loadCliConfig', async () => {
+    await setupSessionMocks('session-ext-override');
+
+    const agentPromise = runAcpAgent(
+      mockConfig,
+      makeSessionSettings(),
+      mockArgv,
+    );
+    await vi.waitFor(() => expect(capturedAgentFactory).toBeDefined());
+    const agent = capturedAgentFactory!({
+      get closed() {
+        return mockConnectionState.promise;
+      },
+    }) as AgentLike;
+
+    await agent.newSession({ cwd: '/tmp', mcpServers: [] });
+
+    // [] is truthy and silently blocks all extension commands (#5216).
+    expect(vi.mocked(loadCliConfig).mock.calls[0]?.[3]).toBeUndefined();
 
     mockConnectionState.resolve();
     await agentPromise;

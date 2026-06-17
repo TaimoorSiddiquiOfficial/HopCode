@@ -9,7 +9,7 @@ export const FORK_SUBAGENT_TYPE = 'fork';
  * Fork subagent availability gate.
  *
  * Fork is available in interactive sessions. Non-interactive sessions
- * (e.g. `qwen -p`, SDK headless, CI/CD) lack a terminal UI for fork progress
+ * (e.g. `hopcode -p`, SDK headless, CI/CD) lack a terminal UI for fork progress
  * display and permission prompts, which can cause hangs or silent failures.
  *
  * Forking is an explicit choice — the caller selects it with

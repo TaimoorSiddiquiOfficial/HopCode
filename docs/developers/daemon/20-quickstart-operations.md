@@ -85,7 +85,7 @@ The CLI is defined in **`packages/cli/src/commands/serve.ts`**:
 | `--require-auth`                        | boolean                        | `false`                                      | Token required                           | Extends bearer auth to loopback **and** `/health`. Boot refuses to start without a token.                                                                                                                             |
 | `--enable-session-shell`                | boolean                        | `false`                                      | Token required                           | Enables direct `POST /session/:id/shell` execution. Callers must also send a session-bound `X-HopCode-Client-Id`.                                                                                                     |
 | `--event-ring-size <n>`                 | number                         | `8000`                                       | -                                        | Per-session SSE replay ring depth. Soft cap is `MAX_EVENT_RING_SIZE = 1_000_000`; out-of-range values throw during bridge construction.                                                                               |
-| `--http-bridge`                         | boolean                        | `true`                                       | -                                        | Stage 1 bridge mode: one `qwen --acp` child multiplexed by the daemon. Stage 2 in-process mode is not implemented yet; `--no-http-bridge` falls back and prints to stderr.                                            |
+| `--http-bridge`                         | boolean                        | `true`                                       | -                                        | Stage 1 bridge mode: one `hopcode --acp` child multiplexed by the daemon. Stage 2 in-process mode is not implemented yet; `--no-http-bridge` falls back and prints to stderr.                                            |
 | `--mcp-client-budget <n>`               | number                         | none                                         | Required for `mcp-budget-mode=enforce`   | Workspace MCP client cap. Must be a positive integer.                                                                                                                                                                 |
 | `--mcp-budget-mode <m>`                 | `'enforce' \| 'warn' \| 'off'` | `warn` when a budget is set, otherwise `off` | `enforce` requires `--mcp-client-budget` | `enforce` refuses, `warn` only warns at 75%, `off` is observation only.                                                                                                                                               |
 | `--allow-origin <pattern>`              | repeatable string              | none                                         | -                                        | CORS allowlist that replaces the default Origin denial. `*` requires a token.                                                                                                                                         |
@@ -282,7 +282,7 @@ The main assembly happens in `createServeApp()` in `server.ts`, which mounts fou
 | `GET /file`, `/file/bytes`, `/list`, `/glob`, `/stat`                                                                     | `packages/cli/src/serve/routes/workspaceFileRead.ts`  | `registerWorkspaceFileReadRoutes()`           |
 | `POST /file/write`, `/file/edit`                                                                                          | `packages/cli/src/serve/routes/workspaceFileWrite.ts` | `registerWorkspaceFileWriteRoutes()`          |
 
-For the complete route and wire protocol reference, see [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md). For architecture, see [`01-architecture.md`](./01-architecture.md).
+For the complete route and wire protocol reference, see [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md). For architecture, see [`01-architecture.md`](./01-architecture.md).
 
 ## 11. Graceful vs hard shutdown
 
@@ -366,5 +366,5 @@ HOPCODE_SERVE_DEBUG=1 hopcode serve
 - Middleware: `packages/cli/src/serve/auth.ts`
 - Bridge factory: `packages/acp-bridge/src/bridge.ts`
 - Demo page HTML: `packages/cli/src/serve/demo.ts`
-- User docs: [`../../users/qwen-serve.md`](../../users/qwen-serve.md)
-- Wire protocol: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md)
+- User docs: [`../../users/hopcode-serve.md`](../../users/hopcode-serve.md)
+- Wire protocol: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md)

@@ -263,4 +263,4 @@ new session arrives.
 - `packages/acp-bridge/src/bridgeTypes.ts` (`HttpAcpBridge`, `BridgeSession`, `BridgeSessionState`)
 - `packages/sdk-typescript/src/daemon/types.ts` (`DaemonSession`)
 - `packages/sdk-typescript/src/daemon/DaemonSessionClient.ts`
-- Wire reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md) (route catalogue).
+- Wire reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md) (route catalogue).

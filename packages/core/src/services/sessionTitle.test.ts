@@ -83,7 +83,7 @@ describe('tryGenerateSessionTitle', () => {
     // like "初始化项目上下文" instead of one based on the user's actual
     // first message.
     const { config, generateJson } = makeConfig({
-      fastModel: 'qwen-turbo',
+      fastModel: 'hopcode-turbo',
       history: [
         {
           role: 'user',
@@ -107,7 +107,6 @@ describe('tryGenerateSessionTitle', () => {
     // The title model must NOT be called — the guard should short-circuit.
     expect(generateJson).not.toHaveBeenCalled();
   });
-
   it('returns {ok:false, reason:"model_error"} when the LLM throws', async () => {
     const { config } = makeConfig({
       fastModel: 'hopcode-turbo',

@@ -20,7 +20,7 @@ export default {
 
   'channel-plugins': 'Channel Plugin Guide',
   tools: 'Tools',
-  'qwen-serve-protocol': 'hopcode serve HTTP protocol',
+  'hopcode-serve-protocol': 'hopcode serve HTTP protocol',
   daemon: 'Daemon Mode (Developer Deep Dive)',
 
   examples: {

@@ -13,7 +13,7 @@
  * It ships as per-platform, Developer-ID-signed + Apple-notarized binaries
  * attached to GitHub releases (tag `cua-driver-rs-v<version>`). We download
  * the pinned asset once into `~/.hopcode/computer-use/`, preferring the
- * qwen-code-assets OSS mirror (reliable in CN where GitHub release downloads
+ * hopcode-assets OSS mirror (reliable in CN where GitHub release downloads
  * are slow/blocked) and falling back to the upstream GitHub release.
  * Enterprises can override the host via `HOPCODE_COMPUTER_USE_DOWNLOAD_HOST`
  * to point at an internal mirror.
@@ -41,17 +41,17 @@ import { homedir } from 'node:os';
 export const CUA_DRIVER_VERSION = '0.5.2';
 
 /**
- * Shared qwen-code-assets OSS mirror base (reliable in CN where GitHub release
+ * Shared hopcode-assets OSS mirror base (reliable in CN where GitHub release
  * downloads are slow/blocked). Assets live under
  * `<base>/cua-driver-rs/v<version>/<asset>` and are mirrored from the upstream
  * trycua/cua release by the Qwen project. The HopCode fork consumes this same
  * public mirror because we do not operate our own OSS bucket.
  *
  * The upstream workflow that populates this mirror is
- * `.github/workflows/sync-cua-driver-to-oss.yml` in the QwenLM/qwen-code repo.
+ * `.github/workflows/sync-cua-driver-to-oss.yml` in the TaimoorSiddiquiOfficial/HopCode repo.
  */
 export const OSS_MIRROR_BASE =
-  'https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/computer-use';
+  'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/computer-use';
 
 /**
  * GitHub release download base for the pinned tag (fallback source).
@@ -138,7 +138,7 @@ export function resolveAssetTarget(
 
 /**
  * Ordered list of full download URLs for an asset: env override (if set),
- * then the qwen-code-assets OSS mirror, then GitHub. The downloader tries each
+ * then the hopcode-assets OSS mirror, then GitHub. The downloader tries each
  * in order until one succeeds.
  *
  * `HOPCODE_COMPUTER_USE_DOWNLOAD_HOST` lets enterprises / power users point at

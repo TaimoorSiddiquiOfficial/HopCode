@@ -34,7 +34,7 @@ describe('runBootstrap', () => {
   let deps: BootstrapDeps;
 
   beforeEach(() => {
-    tmpHome = mkdtempSync(join(tmpdir(), 'qwen-cu-bs-'));
+    tmpHome = mkdtempSync(join(tmpdir(), 'hopcode-cu-bs-'));
     daemon = { kill: vi.fn() };
     deps = {
       homeDir: tmpHome,

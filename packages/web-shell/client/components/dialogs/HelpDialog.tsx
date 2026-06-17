@@ -24,7 +24,7 @@ const TABS: Array<{ id: HelpTab; labelKey: string }> = [
   { id: 'custom-commands', labelKey: 'help.tab.custom' },
 ];
 
-const DOCS_URL = 'https://qwenlm.github.io/hopcode-docs/';
+const DOCS_URL = 'https://taimoorsiddiquiofficial.github.io/hopcode-docs/';
 const BUILT_IN_COMMANDS = new Set([
   'about',
   'agents',
@@ -311,7 +311,7 @@ export function HelpDialog({ commands, onClose }: HelpDialogProps) {
         <button
           className={dp('resume-picker-close')}
           onClick={onClose}
-          title="Close"
+          title={t('common.close')}
         >
           ESC
         </button>

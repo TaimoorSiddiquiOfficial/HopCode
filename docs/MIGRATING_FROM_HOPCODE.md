@@ -10,17 +10,17 @@ HopCode is a fork of HopCode with expanded multi-provider support, new features,
 
 - [ ] Update global installation: `npm install -g @hoptrendy/hopcode`
 - [ ] Rename config directory: `mv ~/.hopcode ~/.hopcode`
-- [ ] Update shell aliases: `alias hopcode='hopcode'` (replace `qwen`)
+- [ ] Update shell aliases: `alias hopcode='hopcode'` (replace `hopcode`)
 - [ ] Update IDE extensions: Install HopCode VS Code / Zed extensions
-- [ ] Update CI scripts: Replace `qwen` command with `hopcode`
+- [ ] Update CI scripts: Replace `hopcode` command with `hopcode`
 - [ ] Update environment variables (see below)
 
 ## Command Changes
 
 | HopCode          | HopCode             | Notes                            |
 | ---------------- | ------------------- | -------------------------------- |
-| `qwen`           | `hopcode`           | Main CLI entry point             |
-| `qwen --json`    | `hopcode --json`    | Headless JSON output             |
+| `hopcode`           | `hopcode`           | Main CLI entry point             |
+| `hopcode --json`    | `hopcode --json`    | Headless JSON output             |
 | `hopcode serve`  | `hopcode serve`     | HTTP API server                  |
 | `qwen dashboard` | `hopcode dashboard` | Web dashboard                    |
 | `qwen profile`   | `hopcode profile`   | Profile management               |
@@ -50,8 +50,8 @@ rename %USERPROFILE%\.hopcode %USERPROFILE%\.hopcode
 
 | HopCode        | HopCode           | Status                          |
 | -------------- | ----------------- | ------------------------------- |
-| `QWEN_SIMPLE`  | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
-| `QWEN_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended              |
+| `HOPCODE_SIMPLE`  | `HOPCODE_SIMPLE`  | **Preferred** (old still works) |
+| `HOPCODE_SANDBOX` | `HOPCODE_SANDBOX` | Update recommended              |
 
 ## Package Name Changes
 
@@ -99,9 +99,9 @@ Features not available in HopCode:
 ## Breaking Changes
 
 1. **Config directory rename** — `~/.hopcode` → `~/.hopcode`
-2. **Binary name** — `qwen` → `hopcode`
+2. **Binary name** — `hopcode` → `hopcode`
 3. **NPM scope** — `@hoptrendy/*` → `@hoptrendy/*`
-4. **Docker image** — `ghcr.io/qwenlm/hopcode` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
+4. **Docker image** — `ghcr.io/TaimoorSiddiquiOfficial/HopCode` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
 
 ## Troubleshooting
 

@@ -184,7 +184,7 @@ export interface BridgeHeartbeatState {
 }
 
 /**
- * ACP ext-method the spawned `qwen --acp` child calls between tool batches to
+ * ACP ext-method the spawned `hopcode --acp` child calls between tool batches to
  * pull user messages the browser queued mid-turn. The child-side caller
  * (`cli/src/acp-integration/session/Session.ts`) and the daemon-side answerer
  * (`bridgeClient.ts`) both import THIS single definition, so a rename can't

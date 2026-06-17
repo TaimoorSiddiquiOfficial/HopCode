@@ -385,7 +385,7 @@ sends; safe when it doesn't."
 
 ## Cross-references
 
-- [PR #4328](https://github.com/QwenLM/hopcode/pull/4328) — base PR with the shared UI transcript layer
-- [PR #4353](https://github.com/QwenLM/hopcode/pull/4353) — this PR (unified completeness follow-up)
-- [Issue #3803](https://github.com/QwenLM/hopcode/issues/3803) — daemon mode proposal
-- [Issue #4175](https://github.com/QwenLM/hopcode/issues/4175) — Mode B v0.16 implementation tracker
+- [PR #4328](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4328) — base PR with the shared UI transcript layer
+- [PR #4353](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4353) — this PR (unified completeness follow-up)
+- [Issue #3803](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3803) — daemon mode proposal
+- [Issue #4175](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4175) — Mode B v0.16 implementation tracker

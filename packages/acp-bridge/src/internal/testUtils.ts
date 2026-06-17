@@ -237,7 +237,7 @@ export interface ChannelHandle {
   agent: FakeAgent;
   /**
    * The agent-side ACP connection. Test seam for driving the client-bound calls
-   * a real `qwen --acp` child makes — e.g. the mid-turn drain
+   * a real `hopcode --acp` child makes — e.g. the mid-turn drain
    * `agentConnection.extMethod('craft/drainMidTurnQueue', { sessionId })`,
    * answered by the bridge's `BridgeClient.extMethod`.
    */

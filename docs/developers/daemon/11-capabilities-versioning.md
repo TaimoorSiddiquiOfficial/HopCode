@@ -177,7 +177,7 @@ sequenceDiagram
 - **`--require-auth` hides preflight.** With `--require-auth`, all routes, including `/capabilities`, require bearer auth. An unauthenticated client cannot preflight `caps.features.require_auth`; the 401 response body is the discovery surface. The `require_auth` tag is an authenticated confirmation for hardened-deployment audit UIs.
 - **Tag presence means behavior exists.** If a future contributor adds behavior under an existing tag without bumping `since`, clients that preflighted the old tag can silently receive new behavior. The convention is: new behavior gets a new tag.
 - **`unstable_*` tags can change shape between versions** without a protocol bump. Pin an SDK version when depending on them.
-- The route catalog lives in [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md); this page intentionally does not duplicate it.
+- The route catalog lives in [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md); this page intentionally does not duplicate it.
 
 ## References
 
@@ -185,5 +185,5 @@ sequenceDiagram
 - `packages/cli/src/serve/types.ts` (`ServeOptions`, `CapabilitiesEnvelope`)
 - `packages/cli/src/serve/server.ts` (envelope assembly)
 - `packages/acp-bridge/src/eventBus.ts` (`EVENT_SCHEMA_VERSION`)
-- Wire reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md)
+- Wire reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md)
 - Auth and deployment guardrails: [`12-auth-security.md`](./12-auth-security.md)

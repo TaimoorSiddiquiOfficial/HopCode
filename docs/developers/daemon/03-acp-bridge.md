@@ -8,7 +8,7 @@ The bridge provides one `HttpAcpBridge` instance, one `AcpChannel` to the ACP ch
 
 ## Responsibilities
 
-- Spawn or attach to the ACP child via a pluggable `ChannelFactory`. Default factory: `defaultSpawnChannelFactory` (subprocess `qwen --acp`). Tests inject `inMemoryChannel`.
+- Spawn or attach to the ACP child via a pluggable `ChannelFactory`. Default factory: `defaultSpawnChannelFactory` (subprocess `hopcode --acp`). Tests inject `inMemoryChannel`.
 - Maintain `aliveChannels` (channel registry) and `byId` (session registry).
 - Multiplex N HTTP-side sessions onto one ACP child via `connection.newSession()`.
 - Serialize per-session prompts through `promptQueue` (ACP enforces one active prompt per session).
@@ -74,7 +74,7 @@ sequenceDiagram
         B-->>R: {sessionId, attached: true, restoreState?}
     else cold path
         B->>CF: factory(workspaceCwd, childEnvOverrides)
-        CF->>ACP: spawn qwen --acp + pipes
+        CF->>ACP: spawn hopcode --acp + pipes
         CF-->>B: AcpChannel
         B->>ACP: ACP initialize (timeout=DEFAULT_INIT_TIMEOUT_MS)
         ACP-->>B: initialize response
@@ -170,7 +170,7 @@ sequenceDiagram
 
 ## Channel factory
 
-`AcpChannel` (`channel.ts`) is the bridge's transport abstraction. Production uses `defaultSpawnChannelFactory` in `spawnChannel.ts`, which runs `qwen --acp` as a subprocess with a stdio pipe pair. Tests inject `inMemoryChannel` to run the agent in-process. The bridge knows nothing about the underlying mechanism — it only needs `{ stream, kill, killSync, exited }`.
+`AcpChannel` (`channel.ts`) is the bridge's transport abstraction. Production uses `defaultSpawnChannelFactory` in `spawnChannel.ts`, which runs `hopcode --acp` as a subprocess with a stdio pipe pair. Tests inject `inMemoryChannel` to run the agent in-process. The bridge knows nothing about the underlying mechanism — it only needs `{ stream, kill, killSync, exited }`.
 
 `ChannelFactory` accepts `childEnvOverrides` so each daemon handle can pass its own MCP-budget env vars (`HOPCODE_SERVE_MCP_CLIENT_BUDGET`, `HOPCODE_SERVE_MCP_BUDGET_MODE`) without mutating `process.env` (which would race when two embedded daemons run in the same Node process).
 

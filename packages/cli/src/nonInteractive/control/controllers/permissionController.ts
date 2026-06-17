@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -290,11 +290,15 @@ export class PermissionController extends BaseController {
             label: 'Deny',
             description: 'Block this file edit',
           },
-          {
-            type: 'modify',
-            label: 'Review Changes',
-            description: 'Review the proposed changes before applying',
-          },
+          ...(details['hideModify'] === true
+            ? []
+            : [
+                {
+                  type: 'modify' as const,
+                  label: 'Review Changes',
+                  description: 'Review the proposed changes before applying',
+                },
+              ]),
         ];
 
       case 'plan': // ToolPlanConfirmationDetails

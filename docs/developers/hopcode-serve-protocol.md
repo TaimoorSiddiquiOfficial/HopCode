@@ -517,12 +517,12 @@ omitted when discovery succeeds.
   "v": 1,
   "workspaceCwd": "/canonical/path",
   "initialized": true,
-  "current": { "authType": "qwen", "modelId": "qwen3(hopcode)" },
+  "current": { "authType": "hopcode", "modelId": "qwen3(hopcode)" },
   "providers": [
     {
       "kind": "model_provider",
       "status": "ok",
-      "authType": "qwen",
+      "authType": "hopcode",
       "current": true,
       "models": [
         {
@@ -654,7 +654,7 @@ Idle response (no ACP child):
       "kind": "cli_entry",
       "status": "ok",
       "locality": "daemon",
-      "detail": { "path": "/usr/local/bin/qwen", "source": "process.argv[1]" }
+      "detail": { "path": "/usr/local/bin/hopcode", "source": "process.argv[1]" }
     },
     {
       "kind": "workspace_dir",
@@ -1561,7 +1561,7 @@ The daemon brokers an OAuth 2.0 Device Authorization Grant (RFC 8628) so a remot
 
 Capability tag: `auth_device_flow` (always advertised). Supported providers in v1: `hopcode-oauth`.
 
-**Runtime locality.** The daemon never spawns a browser — even if it can. The client decides whether to call `open(verificationUri)` locally; on a headless pod (the canonical Mode B deployment) the user opens the URL on whatever device they have a browser on. See `docs/users/qwen-serve.md` for the recommended UX.
+**Runtime locality.** The daemon never spawns a browser — even if it can. The client decides whether to call `open(verificationUri)` locally; on a headless pod (the canonical Mode B deployment) the user opens the URL on whatever device they have a browser on. See `docs/users/hopcode-serve.md` for the recommended UX.
 
 **No token leakage in events.** `auth_device_flow_started` carries `{deviceFlowId, providerId, expiresAt}` only. The user code and verification URL come back point-to-point in the POST 201 body and via `GET /workspace/auth/device-flow/:id`; they are never broadcast on SSE.
 
@@ -1666,7 +1666,7 @@ The connection then closes.
 | Var                    | Purpose                                                                                                                                                             |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `HOPCODE_SERVER_TOKEN` | Bearer token. Stripped of leading/trailing whitespace at boot.                                                                                                      |
-| `SKIP_LLM_TESTS`       | Set to `1` to **skip** LLM-required integration tests in `integration-tests/cli/qwen-serve-streaming.test.ts` (default-on for CI envs that lack provider API keys). |
+| `SKIP_LLM_TESTS`       | Set to `1` to **skip** LLM-required integration tests in `integration-tests/cli/hopcode-serve-streaming.test.ts` (default-on for CI envs that lack provider API keys). |
 
 ## Source layout
 
@@ -1682,5 +1682,5 @@ The connection then closes.
 | `packages/cli/src/serve/eventBus.ts`                 | bounded async queue + replay ring                                                                          |
 | `packages/sdk-typescript/src/daemon/DaemonClient.ts` | TS client                                                                                                  |
 | `packages/sdk-typescript/src/daemon/sse.ts`          | EventSource frame parser                                                                                   |
-| `integration-tests/cli/qwen-serve-routes.test.ts`    | 18 cases, no LLM                                                                                           |
-| `integration-tests/cli/qwen-serve-streaming.test.ts` | 3 cases, real `qwen --acp` child (skipped when `SKIP_LLM_TESTS=1`)                                         |
+| `integration-tests/cli/hopcode-serve-routes.test.ts`    | 18 cases, no LLM                                                                                           |
+| `integration-tests/cli/hopcode-serve-streaming.test.ts` | 3 cases, real `hopcode --acp` child (skipped when `SKIP_LLM_TESTS=1`)                                         |

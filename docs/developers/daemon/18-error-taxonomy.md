@@ -8,7 +8,7 @@ The daemon's failure modes are deliberately closed unions so SDK consumers can e
 2. **`packages/acp-bridge/`** — bridge / mediator errors at the daemon-to-ACP-child boundary.
 3. **`packages/sdk-typescript/src/daemon/`** — SDK-side wrapping and structured error fields.
 
-Wire-level error shapes are documented in [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md); this doc adds cause and remediation guidance.
+Wire-level error shapes are documented in [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md); this doc adds cause and remediation guidance.
 
 ## Filesystem boundary (`packages/cli/src/serve/fs/errors.ts`)
 
@@ -58,7 +58,7 @@ Typed classes thrown by the bridge / mediator. Most carry an HTTP status via the
 | `PermissionPolicyNotImplementedError` | 500  | Requested policy not built into this daemon.                                          | Update daemon, or change `policy.permissionStrategy`.                                                                                                                            |
 | `BridgeChannelClosedError`            | 503  | ACP child channel closed mid-call.                                                    | Reconnect / retry; check `session_died` for cause.                                                                                                                               |
 | `BridgeTimeoutError`                  | 504  | Bridge-level wallclock exceeded.                                                      | Retry; investigate underlying slowness.                                                                                                                                          |
-| `MissingCliEntryError`                | 500  | The `qwen` CLI entry file is missing (defined in `status.ts`, not `bridgeErrors.ts`). | Confirm the CLI install is complete; check that `packages/cli/index.ts` exists.                                                                                                  |
+| `MissingCliEntryError`                | 500  | The `hopcode` CLI entry file is missing (defined in `status.ts`, not `bridgeErrors.ts`). | Confirm the CLI install is complete; check that `packages/cli/index.ts` exists.                                                                                                  |
 
 ## Boot-time configuration errors (`packages/cli/src/serve/runHopCodeServe.ts`)
 
@@ -158,4 +158,4 @@ flowchart TD
 - `packages/acp-bridge/src/bridgeErrors.ts` (every typed class)
 - `packages/acp-bridge/src/status.ts` (`SERVE_ERROR_KINDS`, `ServeErrorKind`)
 - `packages/cli/src/serve/auth.ts` (auth bodies)
-- Wire reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md).
+- Wire reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md).

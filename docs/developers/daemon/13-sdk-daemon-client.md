@@ -9,7 +9,7 @@ The package layout is intentionally small:
 | File                     | Surface                                                                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
 | `index.ts`               | Public barrel (`DaemonClient`, `DaemonSessionClient`, `DaemonAuthFlow`, `parseSseStream`, event reducers, types).              |
-| `DaemonClient.ts`        | Low-level HTTP/SSE facade — one method per `qwen-serve-protocol.md` route.                                                     |
+| `DaemonClient.ts`        | Low-level HTTP/SSE facade — one method per `hopcode-serve-protocol.md` route.                                                     |
 | `DaemonSessionClient.ts` | Session-scoped wrapper with SSE replay tracking.                                                                               |
 | `DaemonAuthFlow.ts`      | High-level OAuth device-flow helper.                                                                                           |
 | `sse.ts`                 | `parseSseStream` (NDJSON / SSE framing parser).                                                                                |

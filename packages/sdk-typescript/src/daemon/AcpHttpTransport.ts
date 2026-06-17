@@ -351,10 +351,10 @@ export class AcpHttpTransport implements DaemonTransport {
       extractConnectionId(result, [
         'agentCapabilities',
         '_meta',
-        'qwen',
+        'hopcode',
         'connectionId',
       ]) ??
-      extractConnectionId(result, ['_meta', 'qwen', 'connectionId']);
+      extractConnectionId(result, ['_meta', 'hopcode', 'connectionId']);
 
     this.initResult = result;
     this._initialized = true;

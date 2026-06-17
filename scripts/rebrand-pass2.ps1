@@ -65,7 +65,7 @@ foreach ($file in $files) {
     # 14. .qwen directory references in code/tests (not model names)
     # Already handled in pass 1 for most cases, but clean up remaining
     $content = $content -replace "path\.join\([^)]*'\.qwen'", "path.join([^)]*'.hopcode'"
-    $content = $content -replace '\.qwen\b', '.hopcode'
+    $content = $content -replace '\.hopcode\b', '.hopcode'
 
     # 15. QwenOAuth2Client -> HopCodeOAuth2Client
     $content = $content -replace 'QwenOAuth2Client', 'HopCodeOAuth2Client'
@@ -142,8 +142,8 @@ foreach ($file in $files) {
     # 39. QWEN.local.md in test strings
     # Already covered by #3
 
-    # 40. qwen_dirname (if any remain)
-    $content = $content -replace 'qwen_dirname', 'hopcode_dirname'
+    # 40. HOPCODE_dirname (if any remain)
+    $content = $content -replace 'HOPCODE_dirname', 'hopcode_dirname'
 
     if ($content -ne $original) {
         [System.IO.File]::WriteAllText($file, $content)

@@ -6,7 +6,7 @@ Every SSE frame emitted by the daemon on `GET /session/:id/events` has the shape
 
 The SDK exposes `asKnownDaemonEvent(evt)`. It returns a discriminated `KnownDaemonEvent` for known event types and `undefined` for other types. SDK consumers can therefore handle forward compatibility without requiring a lockstep SDK upgrade when a newer daemon adds an event type; the session reducer records those as `unrecognizedKnownEventCount`.
 
-The wire format lives in [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md). This page is the payload contract for each event.
+The wire format lives in [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md). This page is the payload contract for each event.
 
 ## Responsibilities
 
@@ -289,4 +289,4 @@ per-event shapes listed above.
 - `packages/sdk-typescript/src/daemon/events.ts`
 - `packages/acp-bridge/src/eventBus.ts` (`EVENT_SCHEMA_VERSION`)
 - `packages/cli/src/serve/capabilities.ts` (`typed_event_schema`, `mcp_guardrail_events`, `permission_mediation`)
-- Wire reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md)
+- Wire reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md)

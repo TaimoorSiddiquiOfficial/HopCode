@@ -242,4 +242,4 @@ flowchart LR
 - `packages/cli/src/serve/fs/workspaceFileSystem.ts`
 - `packages/cli/src/serve/bridgeFileSystemAdapter.ts`
 - `packages/acp-bridge/src/bridgeFileSystem.ts`
-- HTTP route reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md).
+- HTTP route reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md).

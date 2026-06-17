@@ -420,7 +420,7 @@ export class ContentGenerationPipeline {
           this.contentGeneratorConfig,
         ) &&
         (model.startsWith('hopcode') ||
-          model.startsWith('qwen') ||
+          model.startsWith('hopcode') ||
           model === 'coder-model')
       ) {
         typed['enable_thinking'] = false;
@@ -631,7 +631,7 @@ export class ContentGenerationPipeline {
         // `role: "tool"` messages, so tool-returned media (e.g. an image read
         // by read_file) embedded there is silently dropped or rejected by
         // strict providers (doubao / new-api / LM Studio) and the model never
-        // sees it (QwenLM/hopcode#4876). Splitting it into a follow-up user
+        // sees it (TaimoorSiddiquiOfficial/HopCode#4876). Splitting it into a follow-up user
         // message is spec-compliant and safe for permissive providers too.
         // Opt out via generationConfig.splitToolMedia = false.
         true,

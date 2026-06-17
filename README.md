@@ -9,12 +9,12 @@
 
 **An open-source AI agent that lives in your terminal.**
 
-<a href="https://qwenlm.github.io/hopcode-docs/zh/users/overview">中文</a> |
-<a href="https://qwenlm.github.io/hopcode-docs/de/users/overview">Deutsch</a> |
-<a href="https://qwenlm.github.io/hopcode-docs/fr/users/overview">français</a> |
-<a href="https://qwenlm.github.io/hopcode-docs/ja/users/overview">日本語</a> |
-<a href="https://qwenlm.github.io/hopcode-docs/ru/users/overview">Русский</a> |
-<a href="https://qwenlm.github.io/hopcode-docs/pt-BR/users/overview">Português (Brasil)</a>
+<a href="https://taimoorsiddiquiofficial.github.io/hopcode-docs/zh/users/overview">中文</a> |
+<a href="https://taimoorsiddiquiofficial.github.io/hopcode-docs/de/users/overview">Deutsch</a> |
+<a href="https://taimoorsiddiquiofficial.github.io/hopcode-docs/fr/users/overview">français</a> |
+<a href="https://taimoorsiddiquiofficial.github.io/hopcode-docs/ja/users/overview">日本語</a> |
+<a href="https://taimoorsiddiquiofficial.github.io/hopcode-docs/ru/users/overview">Русский</a> |
+<a href="https://taimoorsiddiquiofficial.github.io/hopcode-docs/pt-BR/users/overview">Português (Brasil)</a>
 
 </div>
 
@@ -112,7 +112,7 @@ Copy the prompt below and paste it into your agent:
 
 ```
 Use HopCode as a coding agent. First, fetch and read this skill reference:
-https://raw.githubusercontent.com/QwenLM/hopcode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
+https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/refs/heads/main/.hopcode/skills/hopcode-claw/SKILL.md
 Then follow the instructions inside to install, authenticate, and use HopCode via acpx for all coding tasks.
 ```
 
@@ -343,7 +343,7 @@ Use the `/model` command at any time to switch between all configured models.
 
 </details>
 
-> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://qwenlm.github.io/hopcode-docs/en/users/configuration/auth/) for full details.
+> **Tip:** You can also set API keys via `export` in your shell or `.env` files, which take higher priority than `settings.json` → `env`. See the [authentication guide](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/configuration/auth/) for full details.
 
 > **Security note:** Never commit API keys to version control. The `~/.hopcode/settings.json` file is in your home directory and should stay private.
 
@@ -450,15 +450,15 @@ cd your-project/
 hopcode -p "your question"
 ```
 
-Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://qwenlm.github.io/hopcode-docs/en/users/features/headless).
+Use `-p` to run HopCode without the interactive UI—ideal for scripts, automation, and CI/CD. Learn more: [Headless mode](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/features/headless).
 
 #### IDE integration
 
 Use HopCode inside your editor (VS Code, Zed, and JetBrains IDEs):
 
-- [Use in VS Code](https://qwenlm.github.io/hopcode-docs/en/users/integration-vscode/)
-- [Use in Zed](https://qwenlm.github.io/hopcode-docs/en/users/integration-zed/)
-- [Use in JetBrains IDEs](https://qwenlm.github.io/hopcode-docs/en/users/integration-jetbrains/)
+- [Use in VS Code](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/integration-vscode/)
+- [Use in Zed](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/integration-zed/)
+- [Use in JetBrains IDEs](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/integration-jetbrains/)
 
 #### Daemon mode (`hopcode serve`, experimental)
 
@@ -470,9 +470,9 @@ hopcode serve
 
 Run HopCode as a local HTTP daemon so IDE plugins, web UIs, CI scripts and custom CLIs all share **one** agent session over HTTP+SSE — instead of each spawning their own subprocess. Loopback bind has no auth by default (set `HOPCODE_SERVER_TOKEN` to enable bearer auth even on loopback); remote binds (`--hostname 0.0.0.0`) **require** a token — boot refuses without one. See:
 
-- [Daemon mode user guide](https://qwenlm.github.io/hopcode-docs/en/users/hopcode-serve)
-- [HTTP protocol reference](https://qwenlm.github.io/hopcode-docs/en/developers/hopcode-serve-protocol)
-- [DaemonClient TypeScript quickstart](https://qwenlm.github.io/hopcode-docs/en/developers/examples/daemon-client-quickstart)
+- [Daemon mode user guide](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/hopcode-serve)
+- [HTTP protocol reference](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/developers/hopcode-serve-protocol)
+- [DaemonClient TypeScript quickstart](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/developers/examples/daemon-client-quickstart)
 
 #### SDKs
 
@@ -524,9 +524,9 @@ asyncio.run(main())
 - `Ctrl+D` - Exit (on empty line)
 - `Up/Down` - Navigate command history
 
-> Learn more about [Commands](https://qwenlm.github.io/hopcode-docs/en/users/features/commands/)
+> Learn more about [Commands](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/features/commands/)
 >
-> **Tip**: In IZN mode (`--izn`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://qwenlm.github.io/hopcode-docs/en/users/features/approval-mode/)
+> **Tip**: In IZN mode (`--izn`), vision switching happens automatically without prompts when images are detected. Learn more about [Approval Mode](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/features/approval-mode/)
 
 ## Configuration
 
@@ -546,7 +546,7 @@ The most commonly used top-level fields in `settings.json`:
 | `security.auth.selectedType` | The protocol to use on startup (e.g. `openai`).                                                      |
 | `model.name`                 | The default model to use when HopCode starts.                                                        |
 
-> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://qwenlm.github.io/hopcode-docs/en/users/configuration/settings/) for all available options.
+> See the [Authentication](#api-key-flexible) section above for complete `settings.json` examples, and the [settings reference](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/configuration/settings/) for all available options.
 
 ## Benchmark Results
 
@@ -562,12 +562,12 @@ The most commonly used top-level fields in `settings.json`:
 Looking for a graphical interface?
 
 - [**HopCode Desktop**](https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/tag/desktop-latest) Official desktop app for macOS, Windows, and Linux
-- [**AionUi**](https://github.com/iOfficeAI/AionUi) A modern GUI for command-line AI tools including Qwen Code
-- [**Gemini CLI Desktop**](https://github.com/Piebald-AI/gemini-cli-desktop) A cross-platform desktop/web/mobile UI for Qwen Code
+- [**AionUi**](https://github.com/iOfficeAI/AionUi) A modern GUI for command-line AI tools including HopCode
+- [**Gemini CLI Desktop**](https://github.com/Piebald-AI/gemini-cli-desktop) A cross-platform desktop/web/mobile UI for HopCode
 
 ## Troubleshooting
 
-If you encounter issues, check the [troubleshooting guide](https://qwenlm.github.io/hopcode-docs/en/users/support/troubleshooting/).
+If you encounter issues, check the [troubleshooting guide](https://taimoorsiddiquiofficial.github.io/hopcode-docs/en/users/support/troubleshooting/).
 
 **Common issues:**
 

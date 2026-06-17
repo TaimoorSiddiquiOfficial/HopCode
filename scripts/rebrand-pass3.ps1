@@ -31,7 +31,7 @@ foreach ($file in $files) {
     $content = $content -replace "'QwenOAuth2Client'", "'HopCodeOAuth2Client'"
 
     # Remaining ".qwen" directory in test strings that might have been missed
-    $content = $content -replace '\.qwen\b', '.hopcode'
+    $content = $content -replace '\.hopcode\b', '.hopcode'
 
     # Remaining "qwen/" paths (not model names like qwen3, qwen-plus, etc.)
     # Only match standalone "qwen/" not followed by model identifiers
@@ -40,14 +40,14 @@ foreach ($file in $files) {
     # "runQwenServe" -> "runHopCodeServe" (function name)
     $content = $content -replace 'runQwenServe', 'runHopCodeServe'
 
-    # "QWEN_DIR" constant -> "HOPCODE_DIR"
-    $content = $content -replace 'QWEN_DIR\b', 'HOPCODE_DIR'
+    # "HOPCODE_DIR" constant -> "HOPCODE_DIR"
+    $content = $content -replace 'HOPCODE_DIR\b', 'HOPCODE_DIR'
 
-    # "Qwen Code" product name (one more pass for safety)
-    $content = $content -replace 'Qwen Code', 'HopCode'
+    # "HopCode" product name (one more pass for safety)
+    $content = $content -replace 'HopCode', 'HopCode'
 
-    # "qwen-code" package name
-    $content = $content -replace 'qwen-code', 'hopcode'
+    # "hopcode" package name
+    $content = $content -replace 'hopcode', 'hopcode'
 
     if ($content -ne $original) {
         [System.IO.File]::WriteAllText($file, $content)

@@ -149,4 +149,4 @@ The daemon reads settings once at boot through `loadSettings(boundWorkspace)` in
 - Event ring and backpressure tuning: [`10-event-bus.md`](./10-event-bus.md)
 - MCP pool / budget: [`05-mcp-transport-pool.md`](./05-mcp-transport-pool.md) and [`06-mcp-budget-guardrails.md`](./06-mcp-budget-guardrails.md)
 - Permission policy: [`04-permission-mediation.md`](./04-permission-mediation.md)
-- User operations guide: [`../../users/qwen-serve.md`](../../users/qwen-serve.md)
+- User operations guide: [`../../users/hopcode-serve.md`](../../users/hopcode-serve.md)

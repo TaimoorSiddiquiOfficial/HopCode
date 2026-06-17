@@ -149,4 +149,4 @@ flowchart TD
 - `packages/cli/src/serve/server.ts` (`daemonTelemetryMiddleware`, access-log middleware)
 - Configuration: [`17-configuration.md`](./17-configuration.md)
 - Error taxonomy: [`18-error-taxonomy.md`](./18-error-taxonomy.md)
-- User operations guide: [`../../users/qwen-serve.md`](../../users/qwen-serve.md)
+- User operations guide: [`../../users/hopcode-serve.md`](../../users/hopcode-serve.md)

@@ -299,5 +299,5 @@ sequenceDiagram
 - `packages/cli/src/serve/loopbackBinds.ts`
 - `packages/cli/src/serve/auth/deviceFlow.ts`
 - `packages/cli/src/serve/auth/qwenDeviceFlowProvider.ts`
-- User-facing threat model: [`../../users/qwen-serve.md`](../../users/qwen-serve.md).
-- Wire reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md).
+- User-facing threat model: [`../../users/hopcode-serve.md`](../../users/hopcode-serve.md).
+- Wire reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md).

@@ -206,4 +206,4 @@ Already-aborted signals at subscribe time call `onAbort()` synchronously before 
 - `packages/acp-bridge/src/bridge.ts` (publish sites, esp. `BridgeClient.sessionUpdate` and the F3 permission events)
 - `packages/cli/src/serve/server.ts` (SSE route handler — formats `BridgeEvent` to wire SSE)
 - `packages/sdk-typescript/src/daemon/sse.ts` (SSE wire parser on the client side)
-- Wire reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md) (the `Last-Event-ID` reconnect contract).
+- Wire reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md) (the `Last-Event-ID` reconnect contract).

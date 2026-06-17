@@ -188,7 +188,7 @@ export async function callA2uiAction(
   args: A2uiActionArgs,
 ): Promise<A2uiActionResult> {
   const transport = buildTransport(cfg);
-  const client = new Client({ name: 'qwen-serve-a2ui', version: '0.0.1' });
+  const client = new Client({ name: 'hopcode-serve-a2ui', version: '0.0.1' });
   try {
     await client.connect(transport, { timeout: CALL_TIMEOUT_MS });
     const result = (await client.callTool(

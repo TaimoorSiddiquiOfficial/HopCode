@@ -2421,7 +2421,7 @@ export function App({
                     .map(([k, v]) => `${k}: ${v}`)
                     .join('\n');
                   const url =
-                    `https://github.com/QwenLM/hopcode/issues/new?template=bug_report.yml` +
+                    `https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/new?template=bug_report.yml` +
                     `&title=${encodeURIComponent(bugTitle)}` +
                     `&info=${encodeURIComponent('\n' + fields + '\n')}`;
                   const win = window.open(url, '_blank');
@@ -2892,7 +2892,6 @@ export function App({
                     isResponding={streamingState !== 'idle'}
                     workspaceCwd={connection.workspaceCwd || ''}
                     shellOutputMaxLines={shellOutputMaxLines}
-                    commands={commands}
                     showRetryHint={showRetryHint}
                     onRetryClick={handleRetry}
                     welcomeHeader={welcomeHeader}

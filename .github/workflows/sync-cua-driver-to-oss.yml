@@ -2,8 +2,8 @@ name: 'Sync cua-driver to Aliyun OSS'
 
 # NOTE: This workflow is preserved for compatibility but is intentionally
 # no-op in the HopCode fork because we do not own the hopcode-assets OSS
-# bucket. The cua-driver downloader falls back to the qwen-code-assets OSS
-# mirror (populated by the upstream QwenLM/qwen-code repo) and the trycua/cua
+# bucket. The cua-driver downloader falls back to the hopcode-assets OSS
+# mirror (populated by the upstream TaimoorSiddiquiOfficial/HopCode repo) and the trycua/cua
 # GitHub release.
 #
 # Triggers still fire on constants.ts changes, but the job exits immediately
@@ -24,8 +24,8 @@ jobs:
   sync:
     name: 'Mirror cua-driver binaries to Aliyun OSS'
     runs-on: 'ubuntu-latest'
-    if: "github.repository == 'QwenLM/qwen-code'"
+    if: "github.repository == 'TaimoorSiddiquiOfficial/HopCode'"
     steps:
       - name: 'No-op in HopCode fork'
         run: |-
-          echo 'Skipping OSS mirror — HopCode uses the qwen-code-assets public mirror.'
+          echo 'Skipping OSS mirror — HopCode uses the hopcode-assets public mirror.'

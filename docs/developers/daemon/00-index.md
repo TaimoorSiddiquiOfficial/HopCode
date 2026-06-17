@@ -6,13 +6,13 @@ It complements, rather than replaces, these existing docs:
 
 | Existing doc                                                                         | Audience              | Source of truth for                                      |
 | ------------------------------------------------------------------------------------ | --------------------- | -------------------------------------------------------- |
-| [`../../users/qwen-serve.md`](../../users/qwen-serve.md)                             | Operators             | User quickstart, flags, threat model                     |
-| [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md)                             | Protocol implementers | HTTP route catalog, request/response shapes, error codes |
+| [`../../users/hopcode-serve.md`](../../users/hopcode-serve.md)                             | Operators             | User quickstart, flags, threat model                     |
+| [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md)                             | Protocol implementers | HTTP route catalog, request/response shapes, error codes |
 | [`../examples/daemon-client-quickstart.md`](../examples/daemon-client-quickstart.md) | SDK users             | End-to-end TypeScript walkthrough                        |
 | [`../daemon-client-adapters/`](../daemon-client-adapters/)                           | Adapter authors       | Client adapter design notes                              |
 | [`../../design/f2-mcp-transport-pool.md`](../../design/f2-mcp-transport-pool.md)     | F2 maintainers        | Workspace MCP transport pool design v2.2                 |
 
-If you want to **start a daemon and use it**, read `qwen-serve.md` first. If you want to **build a client against the wire format**, read `qwen-serve-protocol.md`. If you want to **understand, extend, or debug the daemon internals**, read this set.
+If you want to **start a daemon and use it**, read `hopcode-serve.md` first. If you want to **build a client against the wire format**, read `hopcode-serve-protocol.md`. If you want to **understand, extend, or debug the daemon internals**, read this set.
 
 ## Reading order
 
@@ -62,10 +62,10 @@ Pick the path that matches your goal:
 ## Glossary
 
 - **ACP** - Agent Client Protocol. JSON-RPC over stdio spoken between the daemon bridge and the ACP child process. This is not the HTTP protocol that clients use against the daemon.
-- **ACP child** - the child process the daemon spawns (`qwen --acp`) to host the actual agent runtime. The bridge multiplexes one ACP child across many connected clients.
+- **ACP child** - the child process the daemon spawns (`hopcode --acp`) to host the actual agent runtime. The bridge multiplexes one ACP child across many connected clients.
 - **acp-bridge** - the `@hoptrendy/acp-bridge` package (`packages/acp-bridge/`). Owns session multiplexing, the permission mediator, the event bus, and the channel factory.
 - **BridgeClient** - `packages/acp-bridge/src/bridgeClient.ts`. Wraps one ACP `ClientSideConnection`, and handles `requestPermission`, `sendPrompt`, and `cancelSession`.
-- **Channel factory** - pluggable strategy for spawning or attaching to an ACP child. The default `spawnChannel` runs `qwen --acp` as a subprocess; `inMemoryChannel` runs it in-process for tests.
+- **Channel factory** - pluggable strategy for spawning or attaching to an ACP child. The default `spawnChannel` runs `hopcode --acp` as a subprocess; `inMemoryChannel` runs it in-process for tests.
 - **DaemonClient** - `packages/sdk-typescript/src/daemon/DaemonClient.ts`. The TypeScript SDK HTTP-level facade over the daemon.
 - **DaemonSessionClient** - `packages/sdk-typescript/src/daemon/DaemonSessionClient.ts`. Session-scoped wrapper that tracks `lastSeenEventId` for SSE replay.
 - **EventBus** - `packages/acp-bridge/src/eventBus.ts`. Per-session in-memory pub/sub with monotonic IDs, a bounded ring, and per-subscriber backpressure.
@@ -103,7 +103,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 - **Java / Python SDK daemon clients** - only the TypeScript SDK ships a daemon client today. Doc 13 is TypeScript-only.
 - **Web UI product details** - the shared transcript layer and web UI daemon entry points are covered here, but product UI layout is tracked in `docs/developers/daemon-ui/` and adapter design notes.
-- **Zed extension (`packages/zed-extension/`)** - it launches `qwen --acp` over stdio directly and bypasses the daemon.
+- **Zed extension (`packages/zed-extension/`)** - it launches `hopcode --acp` over stdio directly and bypasses the daemon.
 - **Experimental in-process hosting** - `--no-http-bridge` still falls back to http-bridge today; a stable in-process serve mode would need new docs when it lands.
 
 ## Current daemon mode coverage
@@ -123,7 +123,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 | Area          | Current state                                                                                                                                          | Primary docs                                                                                                  |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| HTTP routes   | The route catalog lives in `qwen-serve-protocol.md`; this daemon set only references it and explains implementation ownership.                         | [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md), [`20`](./20-quickstart-operations.md)               |
+| HTTP routes   | The route catalog lives in `hopcode-serve-protocol.md`; this daemon set only references it and explains implementation ownership.                         | [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md), [`20`](./20-quickstart-operations.md)               |
 | Event schema  | `EVENT_SCHEMA_VERSION = 1`; 43 known event types; id-less subscriber synthetic frames; `_meta.serverTimestamp` stamped at SSE write boundary.          | [`09`](./09-event-schema.md), [`10`](./10-event-bus.md)                                                       |
 | Capabilities  | `SERVE_PROTOCOL_VERSION = 'v1'`; 66 registered tags; 10 conditional tags.                                                                              | [`11`](./11-capabilities-versioning.md)                                                                       |
 | Session shell | `POST /session/:id/shell` exists behind `--enable-session-shell`, bearer auth, and session-bound `X-HopCode-Client-Id`; capability tag is conditional. | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md), [`20`](./20-quickstart-operations.md) |

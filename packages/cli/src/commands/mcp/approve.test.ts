@@ -37,7 +37,7 @@ describe('qwen mcp approve / reject', () => {
   ) => {
     await (cmd.handler as (a: Record<string, unknown>) => Promise<void>)({
       _: [],
-      $0: 'qwen',
+      $0: 'hopcode',
       ...argv,
     });
   };

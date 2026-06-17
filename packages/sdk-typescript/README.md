@@ -492,7 +492,7 @@ If you're using SDK version **0.1.0**, please note the following requirements:
 
 #### HopCode Installation Required
 
-Version 0.1.0 requires [HopCode](https://github.com/QwenLM/hopcode) **>= 0.4.0** to be installed separately and accessible in your PATH.
+Version 0.1.0 requires [HopCode](https://github.com/TaimoorSiddiquiOfficial/HopCode) **>= 0.4.0** to be installed separately and accessible in your PATH.
 
 ```bash
 # Install HopCode globally

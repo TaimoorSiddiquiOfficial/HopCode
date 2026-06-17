@@ -2,7 +2,7 @@
 
 ## Overview
 
-A `hopcode serve` process is **one daemon = one workspace**. It hosts a single Express HTTP server, owns an `@hoptrendy/acp-bridge` instance, and spawns one ACP child process (`qwen --acp`) that runs the actual agent runtime. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
+A `hopcode serve` process is **one daemon = one workspace**. It hosts a single Express HTTP server, owns an `@hoptrendy/acp-bridge` instance, and spawns one ACP child process (`hopcode --acp`) that runs the actual agent runtime. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
 
 Inside the ACP child, MCP servers are shared workspace-wide through `McpTransportPool` (F2): a single (server-name + config-fingerprint) tuple maps to one MCP transport, regardless of how many sessions discover it. The bridge's `MultiClientPermissionMediator` (F3) coordinates permission votes across all connected clients under one of four policies.
 
@@ -28,7 +28,7 @@ flowchart LR
         FS["WorkspaceFileSystem<br/>(cli/src/serve/fs/)"]
     end
 
-    subgraph child["ACP child process (qwen --acp)"]
+    subgraph child["ACP child process (hopcode --acp)"]
         AGT["QwenAgent runtime"]
         POOL["McpTransportPool<br/>(F2, core/src/tools)"]
         BDG["WorkspaceMcpBudget"]
@@ -345,7 +345,7 @@ The two-phase shutdown matters because in-flight HTTP requests, in-flight SSE su
 ## References
 
 - Design issues: [#3803](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3803) (daemon design), [#4175](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4175) (F-series milestones).
-- User guide: [`../../users/qwen-serve.md`](../../users/qwen-serve.md).
-- Wire protocol reference: [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md).
+- User guide: [`../../users/hopcode-serve.md`](../../users/hopcode-serve.md).
+- Wire protocol reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md).
 - F2 design document: [`../../design/f2-mcp-transport-pool.md`](../../design/f2-mcp-transport-pool.md).
 - F2 design notes: issue [#4175](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4175) commits 4-6.

@@ -106,7 +106,7 @@ Calling `createServeApp` directly returns only an `Application`; the embedder ow
 
 | Upstream used by `serve/`                                                                       | Downstream using `serve/`                 |
 | ----------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| `@hoptrendy/acp-bridge`: bridge, event bus, status types                                        | The `qwen` CLI `serve` subcommand handler |
+| `@hoptrendy/acp-bridge`: bridge, event bus, status types                                        | The `hopcode` CLI `serve` subcommand handler |
 | `packages/core`: `loadSettings`, `getCurrentGeminiMdFilename`, `Config`, `WorkspaceContext`     | Direct embedders, tests                   |
 | ACP SDK (`@agentclientprotocol/sdk`): `PROTOCOL_VERSION`, `ClientSideConnection` through bridge |                                           |
 | Express + body-parser, `node:crypto`, `node:fs`, `node:path`                                    |                                           |
