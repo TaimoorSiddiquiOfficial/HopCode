@@ -240,7 +240,7 @@ describe('AcpHttpTransport', () => {
       const { fetch, calls } = initAwareFetch({
         initResult: {
           v: 1,
-          _meta: { qwen: { connectionId: 'conn-body-456' } },
+          _meta: { hopcode: { connectionId: 'conn-body-456' } },
         },
       });
       const transport = new AcpHttpTransport('http://d', undefined, fetch);
@@ -266,7 +266,7 @@ describe('AcpHttpTransport', () => {
       const { fetch, calls } = initAwareFetch({
         initResult: {
           agentCapabilities: {
-            _meta: { qwen: { connectionId: 'conn-agent-789' } },
+            _meta: { hopcode: { connectionId: 'conn-agent-789' } },
           },
         },
       });
@@ -292,7 +292,7 @@ describe('AcpHttpTransport', () => {
       const { fetch, calls } = initAwareFetch({
         connectionIdHeader: 'from-header',
         initResult: {
-          _meta: { qwen: { connectionId: 'from-body' } },
+          _meta: { hopcode: { connectionId: 'from-body' } },
         },
       });
       const transport = new AcpHttpTransport('http://d', undefined, fetch);
