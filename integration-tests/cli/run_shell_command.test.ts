@@ -76,7 +76,7 @@ describe('run_shell_command', () => {
     const rig = new TestRig();
     await rig.setup('should propagate environment variables');
 
-    const varName = 'hopcode_TEST_VAR';
+    const varName = 'HOPCODE_TEST_VAR';
     const varValue = `test-value-${Math.random().toString(36).substring(7)}`;
     process.env[varName] = varValue;
 

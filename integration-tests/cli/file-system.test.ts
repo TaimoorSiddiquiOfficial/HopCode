@@ -129,7 +129,8 @@ describe('file-system', () => {
     const writeCall = toolLogs.find(
       (log) =>
         log.toolRequest.name === 'write_file' ||
-        log.toolRequest.name === 'replace',
+        log.toolRequest.name === 'replace' ||
+        log.toolRequest.name === 'edit',
     );
 
     if (!readCall || !writeCall) {

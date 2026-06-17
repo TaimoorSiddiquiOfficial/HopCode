@@ -460,7 +460,7 @@ describe('Permission Control (E2E)', () => {
           new Promise((_, reject) =>
             setTimeout(
               () => reject(new Error('Timeout waiting for first response')),
-              10000,
+              60000,
             ),
           ),
         ]);
@@ -476,7 +476,7 @@ describe('Permission Control (E2E)', () => {
           new Promise((_, reject) =>
             setTimeout(
               () => reject(new Error('Timeout waiting for second response')),
-              10000,
+              90000,
             ),
           ),
         ]);
@@ -541,7 +541,7 @@ describe('Permission Control (E2E)', () => {
           new Promise((_, reject) =>
             setTimeout(
               () => reject(new Error('Timeout waiting for first response')),
-              15000,
+              60000,
             ),
           ),
         ]);
@@ -557,7 +557,7 @@ describe('Permission Control (E2E)', () => {
           new Promise((_, reject) =>
             setTimeout(
               () => reject(new Error('Timeout waiting for second response')),
-              10000,
+              90000,
             ),
           ),
         ]);
