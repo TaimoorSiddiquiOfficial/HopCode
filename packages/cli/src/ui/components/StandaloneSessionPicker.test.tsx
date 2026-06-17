@@ -955,14 +955,14 @@ describe('SessionPicker', () => {
 
       await wait(100);
       stdin.write('/login');
-      await wait(30);
+      await flush();
 
       let output = lastFrame() ?? '';
       // In search mode: caret-bearing "Search:" row is visible.
       expect(output).toContain('Search:');
 
       stdin.write(ARROW_DOWN);
-      await wait(50);
+      await flush();
 
       output = lastFrame() ?? '';
       // Now in list mode with filter preserved: the read-only
