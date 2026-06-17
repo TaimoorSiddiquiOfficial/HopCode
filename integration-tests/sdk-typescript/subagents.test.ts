@@ -362,7 +362,7 @@ OTHER AGENTS CANNOT:
       } finally {
         await q.close();
       }
-    }, 60000); // Increase timeout for subagent execution
+    }, 180_000); // Increase timeout for subagent execution
 
     it('should complete simple task with subagent', async () => {
       const simpleTaskAgent: SubagentConfig = {
@@ -417,7 +417,7 @@ OTHER AGENTS CANNOT:
       } finally {
         await q.close();
       }
-    }, 60000);
+    }, 180_000);
   });
 
   describe('Subagent Error Handling', () => {

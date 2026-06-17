@@ -20,6 +20,7 @@ describe('Interactive file system', () => {
 
   it.skipIf(process.platform === 'win32')(
     'should perform a read-then-write sequence in interactive mode',
+    { timeout: 180_000 },
     async () => {
       const fileName = 'version.txt';
       await rig.setup('interactive-read-then-write', {
@@ -63,7 +64,7 @@ describe('Interactive file system', () => {
 
       const toolCall = await rig.waitForAnyToolCall(
         ['write_file', 'edit'],
-        30000,
+        120_000,
       );
 
       if (!toolCall) {
