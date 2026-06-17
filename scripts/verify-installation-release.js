@@ -2,7 +2,7 @@
 
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,8 +43,8 @@ const REMOTE_FETCH_TIMEOUT_MS = 30_000;
 // has to be reflected here (and there) before a new target ships, otherwise
 // the verify and the build will disagree on expected filenames.
 function standaloneArchiveNamesFromReleaseTargets(releaseTargets) {
-  return releaseTargets.map(({ qwenTarget }) =>
-    standaloneArchiveName(qwenTarget),
+  return releaseTargets.map(({ hopcodeTarget }) =>
+    standaloneArchiveName(hopcodeTarget),
   );
 }
 
@@ -330,12 +330,12 @@ function redactUrlForLog(url) {
   }
 }
 
-function standaloneArchiveName(qwenTarget) {
-  const targetConfig = TARGETS.get(qwenTarget);
+function standaloneArchiveName(hopcodeTarget) {
+  const targetConfig = TARGETS.get(hopcodeTarget);
   if (!targetConfig) {
-    fail(`Unknown release target: ${qwenTarget}`);
+    fail(`Unknown release target: ${hopcodeTarget}`);
   }
-  return `hopcode-${qwenTarget}.${targetConfig.outputExtension}`;
+  return `hopcode-${hopcodeTarget}.${targetConfig.outputExtension}`;
 }
 
 function isPrivateOrReservedHost(hostname) {

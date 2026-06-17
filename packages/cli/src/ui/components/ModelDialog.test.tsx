@@ -137,6 +137,31 @@ describe('<ModelDialog />', () => {
     expect(props.showNumbers).toBe(true);
   });
 
+  it('hides discontinued hopcode-oauth models for other auth types', () => {
+    renderComponent(
+      {},
+      {
+        getAuthType: vi.fn(() => AuthType.USE_OPENAI),
+        getAllConfiguredModels: vi.fn(() => [
+          {
+            id: DEFAULT_HOPCODE_MODEL,
+            label: DEFAULT_HOPCODE_MODEL,
+            authType: AuthType.HOPCODE_OAUTH,
+          },
+          {
+            id: 'gpt-4',
+            label: 'GPT-4',
+            authType: AuthType.USE_OPENAI,
+          },
+        ]),
+      },
+    );
+
+    const items = mockedSelect.mock.calls[0][0].items;
+    expect(items).toHaveLength(1);
+    expect(items[0].value).toBe(`${AuthType.USE_OPENAI}::gpt-4`);
+  });
+
   it('initializes with the model from ConfigContext', () => {
     const mockGetModel = vi.fn(() => DEFAULT_HOPCODE_MODEL);
     renderComponent(
@@ -484,32 +509,26 @@ describe('<ModelDialog />', () => {
     expect(mockedSelect.mock.calls[0][0].initialIndex).toBe(deepseekIndex);
   });
 
-  it('blocks switching to hopcode-oauth from another authType (discontinued)', async () => {
+  it('hides hopcode-oauth when switching from another authType (discontinued)', () => {
     const switchModel = vi.fn().mockResolvedValue(undefined);
     const getAuthType = vi.fn(() => AuthType.USE_OPENAI);
-    const getAvailableModelsForAuthType = vi.fn((t: AuthType) => {
-      if (t === AuthType.USE_OPENAI) {
-        return [{ id: 'gpt-4', label: 'GPT-4', authType: t }];
-      }
-      if (t === AuthType.HOPCODE_OAUTH) {
-        return getFilteredHopCodeModels().map((m) => ({
-          id: m.id,
-          label: m.label,
-          authType: AuthType.HOPCODE_OAUTH,
-        }));
-      }
-      return [];
-    });
 
     const mockConfigWithSwitchAuthType = {
       getAuthType,
       getModel: vi.fn(() => 'gpt-4'),
+      getAllConfiguredModels: vi.fn(() => [
+        {
+          id: DEFAULT_HOPCODE_MODEL,
+          label: DEFAULT_HOPCODE_MODEL,
+          authType: AuthType.HOPCODE_OAUTH,
+        },
+        { id: 'gpt-4', label: 'GPT-4', authType: AuthType.USE_OPENAI },
+      ]),
       getContentGeneratorConfig: vi.fn(() => ({
         authType: AuthType.USE_OPENAI,
         model: 'gpt-4',
       })),
       switchModel,
-      getAvailableModelsForAuthType,
     };
 
     const { props } = renderComponent(
@@ -517,12 +536,11 @@ describe('<ModelDialog />', () => {
       mockConfigWithSwitchAuthType as unknown as Partial<Config>,
     );
 
-    const childOnSelect = mockedSelect.mock.calls[0][0].onSelect;
-    await childOnSelect(`${AuthType.HOPCODE_OAUTH}::${DEFAULT_HOPCODE_MODEL}`);
+    const items = mockedSelect.mock.calls[0][0].items;
 
-    // hopcode-oauth is discontinued — switchModel should NOT be called
+    expect(items).toHaveLength(1);
+    expect(items[0].value).toBe(`${AuthType.USE_OPENAI}::gpt-4`);
     expect(switchModel).not.toHaveBeenCalled();
-    // Dialog should NOT close
     expect(props.onClose).not.toHaveBeenCalled();
   });
 

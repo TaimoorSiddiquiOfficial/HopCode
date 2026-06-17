@@ -48,13 +48,13 @@ If you installed via the standalone installer (`curl ... | bash` or `irm ... | i
 **Linux / macOS**
 
 ```bash
-curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh | bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh | bash
 ```
 
 **Windows**
 
 ```powershell
-irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1 | iex
+irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1 | iex
 ```
 
 The uninstaller removes the standalone runtime, generated `hopcode` wrapper, and installer-managed PATH changes. Your HopCode configuration (`~/.hopcode`) is preserved by default.

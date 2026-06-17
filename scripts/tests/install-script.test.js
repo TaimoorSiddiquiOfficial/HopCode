@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -48,7 +48,7 @@ vi.setConfig({ testTimeout: 30_000 });
 describe('installation scripts', () => {
   it('keeps the Linux/macOS installer lightweight', () => {
     const script = readScript(
-      'scripts/installation/install-qwen-standalone.sh',
+      'scripts/installation/install-hopcode-standalone.sh',
     );
 
     expect(script).not.toContain('install_nvm');
@@ -59,7 +59,7 @@ describe('installation scripts', () => {
     expect(script).not.toContain('clean_npmrc_conflict');
     expect(script).not.toContain('.npmrc');
     expect(script).not.toContain('.npm-global');
-    expect(script).not.toMatch(/^\s*exec\s+qwen\s*$/m);
+    expect(script).not.toMatch(/^\s*exec\s+hopcode\s*$/m);
     expect(script).not.toContain('--print-env');
     expect(script).not.toMatch(/brew install node@\d+/);
     expect(script).toContain('brew install node');
@@ -75,13 +75,13 @@ describe('installation scripts', () => {
     expect(script).toContain('COLORTERM');
     expect(script).toContain('installed successfully, to start:');
     expect(script).toContain('cd <project>');
-    expect(script).toContain('uninstall-qwen-standalone.sh');
+    expect(script).toContain('uninstall-hopcode-standalone.sh');
     expect(script).not.toContain('rm -rf $(shell_quote "${install_dir}")');
   });
 
   it('supports code-server-style standalone install on Linux/macOS', () => {
     const script = readScript(
-      'scripts/installation/install-qwen-standalone.sh',
+      'scripts/installation/install-hopcode-standalone.sh',
     );
 
     expect(script).toContain('--method METHOD');
@@ -201,7 +201,7 @@ describe('installation scripts', () => {
 
   it('keeps the Windows installer lightweight', () => {
     const script = readScript(
-      'scripts/installation/install-qwen-standalone.bat',
+      'scripts/installation/install-hopcode-standalone.bat',
     );
 
     expect(script).not.toContain('InstallNodeJSDirectly');
@@ -219,7 +219,7 @@ describe('installation scripts', () => {
     expect(script).toContain('$request.ReadWriteTimeout = 30000');
     expect(script).not.toContain('PowerShell (Administrator)');
     expect(script).not.toContain('echo INFO: Installation source: %SOURCE%');
-    expect(script).not.toMatch(/^\s*call\s+qwen\s*$/m);
+    expect(script).not.toMatch(/^\s*call\s+hopcode\s*$/m);
     expect(script).toContain(':ValidateSource');
     expect(script).toContain(':PrintUsage');
     expect(script).toContain('findstr /R');
@@ -236,7 +236,7 @@ describe('installation scripts', () => {
       'HopCode !INSTALLED_VERSION! installed successfully, to start:',
     );
     expect(script).toContain('cd ^<project^>');
-    expect(script).toContain('uninstall-qwen-standalone.ps1');
+    expect(script).toContain('uninstall-hopcode-standalone.ps1');
     expect(script).toContain('HOPCODE_VERSION_POINTER_FILE');
     expect(script).toContain('HOPCODE_NORMALIZED_VERSION_FILE');
     expect(script).toContain('NORMALIZED_VERSION_FILE');
@@ -260,7 +260,7 @@ describe('installation scripts', () => {
 
   it('supports code-server-style standalone install on Windows', () => {
     const script = readScript(
-      'scripts/installation/install-qwen-standalone.bat',
+      'scripts/installation/install-hopcode-standalone.bat',
     );
 
     expect(script).toContain('--method METHOD');
@@ -273,7 +273,7 @@ describe('installation scripts', () => {
     expect(script).toContain(
       'SHA256SUMS not found at !CHECKSUM_FILE!; cannot verify archive',
     );
-    expect(script).toContain('Get-FileHash -Algorithm SHA256');
+    expect(script).toContain('[Security.Cryptography.SHA256]::Create()');
     expect(script).toContain('tokens=1,2');
     expect(script).toContain('CHECKSUM_NAME');
     expect(script).toContain('if "!CHECKSUM_NAME!"=="!ARCHIVE_NAME!"');
@@ -396,17 +396,17 @@ describe('installation scripts', () => {
         'check-attr',
         'eol',
         '--',
-        'scripts/installation/install-qwen-standalone.bat',
+        'scripts/installation/install-hopcode-standalone.bat',
       ],
       { encoding: 'utf8' },
     );
 
     expect(attrs).toContain(
-      'scripts/installation/install-qwen-standalone.bat: eol: crlf',
+      'scripts/installation/install-hopcode-standalone.bat: eol: crlf',
     );
 
     const script = readScript(
-      'scripts/installation/install-qwen-standalone.bat',
+      'scripts/installation/install-hopcode-standalone.bat',
     );
     const bareLfLines = script
       .split(/(?<=\n)/)
@@ -415,16 +415,16 @@ describe('installation scripts', () => {
   });
 
   it('prepends fake Windows tools to both PATH casings', () => {
-    const fakeBin = 'C:\\qwen-test-bin';
+    const fakeBin = 'C:\\hopcode-test-bin';
 
     const env = prependWindowsPath(fakeBin);
 
-    expect(env.PATH).toMatch(/^C:\\qwen-test-bin;/);
-    expect(env.Path).toMatch(/^C:\\qwen-test-bin;/);
+    expect(env.PATH).toMatch(/^C:\\hopcode-test-bin;/);
+    expect(env.Path).toMatch(/^C:\\hopcode-test-bin;/);
   });
 
   it('creates a fake Windows curl command script', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-curl-helper-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-curl-helper-'));
 
     try {
       const fakeCurl = createFakeWindowsCurlCommand(tmpDir);
@@ -443,7 +443,7 @@ describe('installation scripts', () => {
 
   it('injects Windows processor overrides directly into cmd commands', () => {
     const prepared = prepareWindowsCommand(
-      'call "C:\\tools\\install-qwen-standalone.bat"',
+      'call "C:\\tools\\install-hopcode-standalone.bat"',
       {
         Path: 'C:\\fake-bin',
         PROCESSOR_ARCHITECTURE: 'AMD64',
@@ -457,18 +457,18 @@ describe('installation scripts', () => {
     );
 
     expect(prepared.command).toBe(
-      'set "PROCESSOR_ARCHITECTURE=AMD64" && set "PROCESSOR_ARCHITEW6432=" && call "C:\\tools\\install-qwen-standalone.bat"',
+      'set "PROCESSOR_ARCHITECTURE=AMD64" && set "PROCESSOR_ARCHITEW6432=" && call "C:\\tools\\install-hopcode-standalone.bat"',
     );
     expect(prepared.env).toEqual({ Path: 'C:\\fake-bin' });
   });
 
   it('creates PowerShell validation scripts with a ps1 extension', () => {
     const script = readScript(
-      'scripts/installation/install-qwen-standalone.bat',
+      'scripts/installation/install-hopcode-standalone.bat',
     );
 
     expect(script).toContain(
-      'call :CreateTempFile "qwen-validate-options" ".ps1"',
+      'call :CreateTempFile "hopcode-validate-options" ".ps1"',
     );
     expect(script).toContain(
       "($env:HOPCODE_TEMP_FILE_PREFIX + '-' + [IO.Path]::GetRandomFileName() + $env:HOPCODE_TEMP_FILE_EXTENSION)",
@@ -481,19 +481,23 @@ describe('release-script-utils', () => {
     const { parseSha256Sums } = await import(releaseScriptUtilsUrl);
 
     const checksums = parseSha256Sums(
-      `\uFEFF${'a'.repeat(64)}  install-qwen-standalone.sh\n\n${'b'.repeat(64)} *install-qwen-standalone.bat\r\n${'c'.repeat(64)}  install-qwen-standalone.ps1\n`,
+      `\uFEFF${'a'.repeat(64)}  install-hopcode-standalone.sh\n\n${'b'.repeat(64)} *install-hopcode-standalone.bat\r\n${'c'.repeat(64)}  install-hopcode-standalone.ps1\n`,
     );
 
-    expect(checksums.get('install-qwen-standalone.sh')).toBe('a'.repeat(64));
-    expect(checksums.get('install-qwen-standalone.bat')).toBe('b'.repeat(64));
-    expect(checksums.get('install-qwen-standalone.ps1')).toBe('c'.repeat(64));
+    expect(checksums.get('install-hopcode-standalone.sh')).toBe('a'.repeat(64));
+    expect(checksums.get('install-hopcode-standalone.bat')).toBe(
+      'b'.repeat(64),
+    );
+    expect(checksums.get('install-hopcode-standalone.ps1')).toBe(
+      'c'.repeat(64),
+    );
   });
 
   it('rejects malformed SHA256SUMS entries', async () => {
     const { parseSha256Sums } = await import(releaseScriptUtilsUrl);
 
     expect(() =>
-      parseSha256Sums('short-hash  install-qwen-standalone.sh\n'),
+      parseSha256Sums('short-hash  install-hopcode-standalone.sh\n'),
     ).toThrow(/Malformed SHA256SUMS line 1/);
   });
 
@@ -504,9 +508,9 @@ describe('release-script-utils', () => {
 
     expect(() =>
       parseSha256Sums(
-        `${first}  install-qwen-standalone.sh\n${second}  install-qwen-standalone.sh\n`,
+        `${first}  install-hopcode-standalone.sh\n${second}  install-hopcode-standalone.sh\n`,
       ),
-    ).toThrow(/Duplicate SHA256SUMS entry for: install-qwen-standalone\.sh/);
+    ).toThrow(/Duplicate SHA256SUMS entry for: install-hopcode-standalone\.sh/);
   });
 
   it('supports --key=value form in parseArgs', async () => {
@@ -597,12 +601,18 @@ const STUB_SH_CONTENT =
 
 const STUB_UNINSTALL_SH_CONTENT =
   '#!/usr/bin/env bash\n' +
-  'is_HOPCODE_standalone_install_dir() { return 0; }\n' +
+  'is_hopcode_standalone_install_dir() { return 0; }\n' +
   'remove_shell_path_entry() { :; }\n' +
   'HOPCODE_UNINSTALL_PURGE=""\n';
 
+const STUB_PS1_CONTENT =
+  '# HOPCODE_INSTALL_VERSION documentation\n' +
+  '$tmp = Get-FileHash $env:TEMP\n' +
+  '# SHA256SUMS\n' +
+  '& $hopcodeInstallerPath @args\n';
+
 const STUB_UNINSTALL_PS1_CONTENT =
-  'function Test-QwenStandaloneInstallDir { return $true }\n' +
+  'function Test-HopcodeStandaloneInstallDir { return $true }\n' +
   'function Remove-PathEntryFromAllScopes { }\n' +
   'function Remove-CurrentCmdPathShim { }\n' +
   '$env:HOPCODE_UNINSTALL_PURGE = ""\n';
@@ -633,7 +643,7 @@ describe('standalone release packaging', () => {
     expect(existsSync('scripts/build-installation-assets.js')).toBe(false);
 
     const packageScript = readScript('scripts/create-standalone-package.js');
-    expect(packageScript).toContain('Copyright 2025 Qwen Team');
+    expect(packageScript).toContain('Copyright 2025 HopCode Team');
     expect(packageScript).toContain("'bundled/qc-helper/docs'");
     expect(packageScript).toContain('DIST_ALLOWED_ENTRIES');
     expect(packageScript).toContain('Unexpected dist asset');
@@ -650,7 +660,7 @@ describe('standalone release packaging', () => {
     expect(packageScript).toContain('Compress-Archive');
 
     const releaseScript = readScript('scripts/build-standalone-release.js');
-    expect(releaseScript).toContain('Copyright 2025 Qwen Team');
+    expect(releaseScript).toContain('Copyright 2025 HopCode Team');
     expect(releaseScript).toContain('https://nodejs.org/dist/v${nodeVersion}');
     expect(releaseScript).toContain('SHASUMS256.txt');
     expect(releaseScript).toContain('verifyNodeArchive');
@@ -660,7 +670,7 @@ describe('standalone release packaging', () => {
     expect(releaseScript).toContain('nodeArchiveExtension');
     expect(releaseScript).toContain('fs.createReadStream');
     expect(releaseScript).toContain('expectedArchiveNames');
-    expect(releaseScript).toContain('hopcode-${qwenTarget}');
+    expect(releaseScript).toContain('hopcode-${hopcodeTarget}');
     expect(releaseScript).toContain('scripts/create-standalone-package.js');
     expect(releaseScript).toContain('--skip-checksums');
     expect(releaseScript).toContain('writeSha256Sums(outDir)');
@@ -668,24 +678,24 @@ describe('standalone release packaging', () => {
     const hostedInstallScript = readScript(
       'scripts/build-hosted-installation-assets.js',
     );
-    expect(hostedInstallScript).toContain('Copyright 2026 Qwen Team');
+    expect(hostedInstallScript).toContain('Copyright 2026 HopCode Team');
     expect(hostedInstallScript).toContain('buildHostedInstallationAssets');
     expect(hostedInstallScript).toContain('HOSTED_INSTALLATION_ASSETS');
     expect(hostedInstallScript).toContain(
-      "output: 'install-qwen-standalone.sh'",
+      "output: 'install-hopcode-standalone.sh'",
     );
     expect(hostedInstallScript).toContain(
-      "output: 'install-qwen-standalone.bat'",
+      "output: 'install-hopcode-standalone.bat'",
     );
     expect(hostedInstallScript).toContain(
-      "output: 'install-qwen-standalone.ps1'",
+      "output: 'install-hopcode-standalone.ps1'",
     );
     expect(hostedInstallScript).not.toContain("output: 'install'");
 
     const releaseVerifyScript = readScript(
       'scripts/verify-installation-release.js',
     );
-    expect(releaseVerifyScript).toContain('Copyright 2026 Qwen Team');
+    expect(releaseVerifyScript).toContain('Copyright 2026 HopCode Team');
     expect(releaseVerifyScript).toContain('verifyReleaseDirectory');
     expect(releaseVerifyScript).toContain('verifyReleaseBaseUrl');
     expect(releaseVerifyScript).toContain('EXPECTED_RELEASE_ASSET_NAMES');
@@ -802,12 +812,12 @@ describe('standalone release packaging', () => {
     const { assertStandaloneOutput, RELEASE_TARGETS } = await import(
       standaloneReleaseScriptUrl
     );
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-release-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-release-test-'));
 
     try {
-      const lines = RELEASE_TARGETS.map(({ qwenTarget }) => {
-        const extension = qwenTarget === 'win-x64' ? 'zip' : 'tar.gz';
-        return `${'a'.repeat(64)}  hopcode-${qwenTarget}.${extension}`;
+      const lines = RELEASE_TARGETS.map(({ hopcodeTarget }) => {
+        const extension = hopcodeTarget === 'win-x64' ? 'zip' : 'tar.gz';
+        return `${'a'.repeat(64)}  hopcode-${hopcodeTarget}.${extension}`;
       });
       writeFileSync(path.join(tmpDir, 'SHA256SUMS'), `${lines.join('\n')}\n`);
 
@@ -825,7 +835,7 @@ describe('standalone release packaging', () => {
 
   it('installer scripts honor --version for hosted entrypoints', () => {
     const installShellSource = readScript(
-      'scripts/installation/install-qwen-standalone.sh',
+      'scripts/installation/install-hopcode-standalone.sh',
     );
     expect(installShellSource).toContain(
       'VERSION="${HOPCODE_INSTALL_VERSION:-latest}"',
@@ -834,7 +844,7 @@ describe('standalone release packaging', () => {
     expect(installShellSource).toContain('--version requires a value');
 
     const installBatchSource = readScript(
-      'scripts/installation/install-qwen-standalone.bat',
+      'scripts/installation/install-hopcode-standalone.bat',
     );
     expect(installBatchSource).toContain('set "VERSION=latest"');
     expect(installBatchSource).toContain(
@@ -844,9 +854,9 @@ describe('standalone release packaging', () => {
     expect(installBatchSource).toContain('--version requires a value');
 
     const installPowerShellSource = readScript(
-      'scripts/installation/install-qwen-standalone.ps1',
+      'scripts/installation/install-hopcode-standalone.ps1',
     );
-    expect(installPowerShellSource).toContain('install-qwen-standalone.bat');
+    expect(installPowerShellSource).toContain('install-hopcode-standalone.bat');
     expect(installPowerShellSource).toContain('Invoke-WebRequest');
     expect(installPowerShellSource).toContain('Download-File');
     expect(installPowerShellSource).toContain(
@@ -866,10 +876,10 @@ describe('standalone release packaging', () => {
 
   it('PowerShell hosted entrypoint refreshes the current Windows shell', () => {
     const installPowerShellSource = readScript(
-      'scripts/installation/install-qwen-standalone.ps1',
+      'scripts/installation/install-hopcode-standalone.ps1',
     );
     const installBatchSource = readScript(
-      'scripts/installation/install-qwen-standalone.bat',
+      'scripts/installation/install-hopcode-standalone.bat',
     );
 
     expect(installPowerShellSource).toContain('Update-CurrentSessionPath');
@@ -882,7 +892,7 @@ describe('standalone release packaging', () => {
       'TEMP environment variable is not set',
     );
     expect(installPowerShellSource).toMatch(
-      /function Get-QwenInstallBinDir \{[\s\S]*HOPCODE_INSTALL_BIN_DIR[\s\S]*return Join-Path \(Get-QwenInstallBase\) 'bin'[\s\S]*\}/,
+      /function Get-HopCodeInstallBinDir \{[\s\S]*HOPCODE_INSTALL_BIN_DIR[\s\S]*return Join-Path \(Get-HopCodeInstallBase\) 'bin'[\s\S]*\}/,
     );
     expect(installPowerShellSource).toContain(
       'Test-SystemManagedPathDirectory',
@@ -906,69 +916,71 @@ describe('standalone release packaging', () => {
       assertHostedInstallationAssetChecksums,
       buildHostedInstallationAssets,
     } = await import(hostedInstallationScriptUrl);
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-install-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-install-'));
 
     try {
       await buildHostedInstallationAssets(tmpDir);
 
-      const installSh = path.join(tmpDir, 'install-qwen-standalone.sh');
-      const installBat = path.join(tmpDir, 'install-qwen-standalone.bat');
-      const installPs1 = path.join(tmpDir, 'install-qwen-standalone.ps1');
-      const uninstallSh = path.join(tmpDir, 'uninstall-qwen-standalone.sh');
-      const uninstallPs1 = path.join(tmpDir, 'uninstall-qwen-standalone.ps1');
+      const installSh = path.join(tmpDir, 'install-hopcode-standalone.sh');
+      const installBat = path.join(tmpDir, 'install-hopcode-standalone.bat');
+      const installPs1 = path.join(tmpDir, 'install-hopcode-standalone.ps1');
+      const uninstallSh = path.join(tmpDir, 'uninstall-hopcode-standalone.sh');
+      const uninstallPs1 = path.join(
+        tmpDir,
+        'uninstall-hopcode-standalone.ps1',
+      );
       const checksums = readScript(path.join(tmpDir, 'SHA256SUMS'));
       const checksumLines = checksums.trim().split('\n');
 
       expect(HOSTED_INSTALLATION_ASSET_NAMES).toEqual([
-        'install-qwen-standalone.sh',
-        'install-qwen-standalone.bat',
-        'install-qwen-standalone.ps1',
-        'uninstall-qwen-standalone.sh',
-        'uninstall-qwen-standalone.ps1',
+        'install-hopcode-standalone.bat',
+        'install-hopcode-standalone.ps1',
+        'install-hopcode-standalone.sh',
+        'uninstall-hopcode-standalone.ps1',
+        'uninstall-hopcode-standalone.sh',
       ]);
       expect(HOSTED_INSTALLATION_ASSETS.map(({ output }) => output)).toEqual(
         HOSTED_INSTALLATION_ASSET_NAMES,
       );
       expect(readScript(installSh)).toBe(
-        readScript('scripts/installation/install-qwen-standalone.sh'),
+        readScript('scripts/installation/install-hopcode-standalone.sh'),
       );
       expect(readScript(installBat)).toBe(
-        readScript('scripts/installation/install-qwen-standalone.bat').replace(
-          /\r?\n/g,
-          '\r\n',
-        ),
+        readScript(
+          'scripts/installation/install-hopcode-standalone.bat',
+        ).replace(/\r?\n/g, '\r\n'),
       );
       expect(readScript(installPs1)).toBe(
-        readScript('scripts/installation/install-qwen-standalone.ps1'),
+        readScript('scripts/installation/install-hopcode-standalone.ps1'),
       );
       expect(readScript(uninstallSh)).toBe(
-        readScript('scripts/installation/uninstall-qwen-standalone.sh'),
+        readScript('scripts/installation/uninstall-hopcode-standalone.sh'),
       );
       expect(readScript(uninstallPs1)).toBe(
-        readScript('scripts/installation/uninstall-qwen-standalone.ps1'),
+        readScript('scripts/installation/uninstall-hopcode-standalone.ps1'),
       );
       expect(existsSync(path.join(tmpDir, 'install'))).toBe(false);
       expect(checksumLines.map((line) => line.split('  ')[1])).toEqual([
-        'install-qwen-standalone.bat',
-        'install-qwen-standalone.ps1',
-        'install-qwen-standalone.sh',
-        'uninstall-qwen-standalone.ps1',
-        'uninstall-qwen-standalone.sh',
+        'install-hopcode-standalone.bat',
+        'install-hopcode-standalone.ps1',
+        'install-hopcode-standalone.sh',
+        'uninstall-hopcode-standalone.ps1',
+        'uninstall-hopcode-standalone.sh',
       ]);
       expect(checksums).toMatch(
-        /^[0-9a-f]{64} {2}install-qwen-standalone\.sh$/m,
+        /^[0-9a-f]{64} {2}install-hopcode-standalone\.sh$/m,
       );
       expect(checksums).toMatch(
-        /^[0-9a-f]{64} {2}install-qwen-standalone\.bat$/m,
+        /^[0-9a-f]{64} {2}install-hopcode-standalone\.bat$/m,
       );
       expect(checksums).toMatch(
-        /^[0-9a-f]{64} {2}install-qwen-standalone\.ps1$/m,
+        /^[0-9a-f]{64} {2}install-hopcode-standalone\.ps1$/m,
       );
       expect(checksums).toMatch(
-        /^[0-9a-f]{64} {2}uninstall-qwen-standalone\.sh$/m,
+        /^[0-9a-f]{64} {2}uninstall-hopcode-standalone\.sh$/m,
       );
       expect(checksums).toMatch(
-        /^[0-9a-f]{64} {2}uninstall-qwen-standalone\.ps1$/m,
+        /^[0-9a-f]{64} {2}uninstall-hopcode-standalone\.ps1$/m,
       );
       if (process.platform !== 'win32') {
         expect(lstatSync(installSh).mode & 0o111).not.toBe(0);
@@ -978,7 +990,7 @@ describe('standalone release packaging', () => {
       writeFileSync(installSh, 'tampered');
       await expect(
         assertHostedInstallationAssetChecksums(tmpDir),
-      ).rejects.toThrow(/Checksum mismatch for install-qwen-standalone\.sh/);
+      ).rejects.toThrow(/Checksum mismatch for install-hopcode-standalone\.sh/);
     } finally {
       rmSync(tmpDir, { recursive: true, force: true });
     }
@@ -988,39 +1000,39 @@ describe('standalone release packaging', () => {
     const { buildHostedInstallationAssets } = await import(
       hostedInstallationScriptUrl
     );
-    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-root-'));
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-install-'));
+    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-root-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-install-'));
     const sourceDir = path.join(tmpRoot, 'scripts', 'installation');
 
     try {
       mkdirSync(sourceDir, { recursive: true });
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.sh'),
+        path.join(sourceDir, 'install-hopcode-standalone.sh'),
         '#!/usr/bin/env bash\n' +
           'VERSION="${HOPCODE_INSTALL_VERSION:-stable}"\n' +
           'case "$1" in --version) shift; VERSION="$1" ;; esac\n',
       );
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.bat'),
-        '@echo off\r\nset "VERSION=latest"\r\n',
+        path.join(sourceDir, 'install-hopcode-standalone.bat'),
+        STUB_BAT_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.ps1'),
-        "# --version vX.Y.Z\n$env:HOPCODE_INSTALL_VERSION = 'latest'\n",
+        path.join(sourceDir, 'install-hopcode-standalone.ps1'),
+        STUB_PS1_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.sh'),
-        '#!/usr/bin/env bash\nis_HOPCODE_standalone_install_dir() { return 0; }\n',
+        path.join(sourceDir, 'uninstall-hopcode-standalone.sh'),
+        STUB_UNINSTALL_SH_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.ps1'),
-        'function Test-QwenStandaloneInstallDir { return $true }\n',
+        path.join(sourceDir, 'uninstall-hopcode-standalone.ps1'),
+        'function Test-HopcodeStandaloneInstallDir { return $true }\n',
       );
 
       await expect(
         buildHostedInstallationAssets(tmpDir, { root: tmpRoot }),
       ).rejects.toThrow(
-        /install-qwen-standalone\.sh default install version must be 'latest'/,
+        /install-hopcode-standalone\.sh default install version must be 'latest'/,
       );
     } finally {
       rmSync(tmpRoot, { recursive: true, force: true });
@@ -1032,38 +1044,38 @@ describe('standalone release packaging', () => {
     const { buildHostedInstallationAssets } = await import(
       hostedInstallationScriptUrl
     );
-    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-root-'));
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-install-'));
+    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-root-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-install-'));
     const sourceDir = path.join(tmpRoot, 'scripts', 'installation');
 
     try {
       mkdirSync(sourceDir, { recursive: true });
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.sh'),
+        path.join(sourceDir, 'install-hopcode-standalone.sh'),
         '#!/usr/bin/env bash\n' +
           'VERSION="${HOPCODE_INSTALL_VERSION:-latest}"\n' +
           'echo "Usage: --version VERSION"\n',
       );
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.bat'),
-        '@echo off\r\nset "VERSION=latest"\r\n',
+        path.join(sourceDir, 'install-hopcode-standalone.bat'),
+        STUB_BAT_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.ps1'),
-        '& $qwenInstallerPath @args\n# HOPCODE_INSTALL_VERSION\n',
+        path.join(sourceDir, 'install-hopcode-standalone.ps1'),
+        STUB_PS1_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.sh'),
-        '#!/usr/bin/env bash\nis_HOPCODE_standalone_install_dir() { return 0; }\n',
+        path.join(sourceDir, 'uninstall-hopcode-standalone.sh'),
+        STUB_UNINSTALL_SH_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.ps1'),
-        'function Test-QwenStandaloneInstallDir { return $true }\n',
+        path.join(sourceDir, 'uninstall-hopcode-standalone.ps1'),
+        'function Test-HopcodeStandaloneInstallDir { return $true }\n',
       );
 
       await expect(
         buildHostedInstallationAssets(tmpDir, { root: tmpRoot }),
-      ).rejects.toThrow(/install-qwen-standalone\.sh.*--version parser/);
+      ).rejects.toThrow(/install-hopcode-standalone\.sh.*--version parser/);
     } finally {
       rmSync(tmpRoot, { recursive: true, force: true });
       rmSync(tmpDir, { recursive: true, force: true });
@@ -1074,44 +1086,44 @@ describe('standalone release packaging', () => {
     const { buildHostedInstallationAssets } = await import(
       hostedInstallationScriptUrl
     );
-    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-root-'));
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-install-'));
+    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-root-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-install-'));
     const sourceDir = path.join(tmpRoot, 'scripts', 'installation');
 
     try {
       mkdirSync(sourceDir, { recursive: true });
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.sh'),
+        path.join(sourceDir, 'install-hopcode-standalone.sh'),
         STUB_SH_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.bat'),
+        path.join(sourceDir, 'install-hopcode-standalone.bat'),
         STUB_BAT_CONTENT,
       );
       // The ps1 shim has every required behavior pattern but also contains
       // a hardcoded $env:HOPCODE_INSTALL_VERSION assignment, which must be
       // rejected by the forbidden-patterns guard.
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.ps1'),
+        path.join(sourceDir, 'install-hopcode-standalone.ps1'),
         '# HOPCODE_INSTALL_VERSION documentation\n' +
           '$env:HOPCODE_INSTALL_VERSION = "v0.1.0"\n' +
           '$tmp = Get-FileHash $env:TEMP\n' +
           '# SHA256SUMS\n' +
-          '& $qwenInstallerPath @args\n',
+          '& $hopcodeInstallerPath @args\n',
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.sh'),
+        path.join(sourceDir, 'uninstall-hopcode-standalone.sh'),
         STUB_UNINSTALL_SH_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.ps1'),
+        path.join(sourceDir, 'uninstall-hopcode-standalone.ps1'),
         STUB_UNINSTALL_PS1_CONTENT,
       );
 
       await expect(
         buildHostedInstallationAssets(tmpDir, { root: tmpRoot }),
       ).rejects.toThrow(
-        /install-qwen-standalone\.ps1 must not contain.*no hardcoded HOPCODE_INSTALL_VERSION assignment/,
+        /install-hopcode-standalone\.ps1 must not contain.*no hardcoded HOPCODE_INSTALL_VERSION assignment/,
       );
     } finally {
       rmSync(tmpRoot, { recursive: true, force: true });
@@ -1123,38 +1135,38 @@ describe('standalone release packaging', () => {
     const { buildHostedInstallationAssets } = await import(
       hostedInstallationScriptUrl
     );
-    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-root-'));
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-install-'));
+    const tmpRoot = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-root-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-install-'));
     const sourceDir = path.join(tmpRoot, 'scripts', 'installation');
 
     try {
       mkdirSync(sourceDir, { recursive: true });
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.sh'),
+        path.join(sourceDir, 'install-hopcode-standalone.sh'),
         STUB_SH_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.bat'),
+        path.join(sourceDir, 'install-hopcode-standalone.bat'),
         STUB_BAT_CONTENT,
       );
       // ps1 contains the exact docstring shipped in production
       // ("$env:HOPCODE_INSTALL_VERSION = 'vX.Y.Z'") as a `#` comment; the
       // forbidden-pattern guard must not regress on that documented example.
       writeFileSync(
-        path.join(sourceDir, 'install-qwen-standalone.ps1'),
+        path.join(sourceDir, 'install-hopcode-standalone.ps1'),
         '# To pin a specific release, set $env:HOPCODE_INSTALL_VERSION before invoking,\n' +
           "# e.g. $env:HOPCODE_INSTALL_VERSION = 'vX.Y.Z'. This is equivalent to passing\n" +
-          '# --version vX.Y.Z to install-qwen-standalone.bat directly.\n' +
+          '# --version vX.Y.Z to install-hopcode-standalone.bat directly.\n' +
           '$tmp = Get-FileHash $env:TEMP\n' +
           '# SHA256SUMS\n' +
-          '& $qwenInstallerPath @args\n',
+          '& $hopcodeInstallerPath @args\n',
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.sh'),
+        path.join(sourceDir, 'uninstall-hopcode-standalone.sh'),
         STUB_UNINSTALL_SH_CONTENT,
       );
       writeFileSync(
-        path.join(sourceDir, 'uninstall-qwen-standalone.ps1'),
+        path.join(sourceDir, 'uninstall-hopcode-standalone.ps1'),
         STUB_UNINSTALL_PS1_CONTENT,
       );
 
@@ -1170,7 +1182,7 @@ describe('standalone release packaging', () => {
     const { buildHostedInstallationAssets } = await import(
       hostedInstallationScriptUrl
     );
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-hosted-install-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-hosted-install-'));
 
     try {
       writeFileSync(path.join(tmpDir, 'install'), 'stale alias');
@@ -1186,7 +1198,7 @@ describe('standalone release packaging', () => {
   it('verifies release asset directory contents and checksums', async () => {
     const { EXPECTED_STANDALONE_ARCHIVE_NAMES, verifyReleaseDirectory } =
       await import(installationReleaseVerificationScriptUrl);
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-release-verify-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-release-verify-'));
 
     try {
       writeStandaloneReleaseAssets(tmpDir, EXPECTED_STANDALONE_ARCHIVE_NAMES);
@@ -1209,7 +1221,7 @@ describe('standalone release packaging', () => {
   it('rejects missing release archives and unexpected checksum entries', async () => {
     const { EXPECTED_STANDALONE_ARCHIVE_NAMES, verifyReleaseDirectory } =
       await import(installationReleaseVerificationScriptUrl);
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-release-verify-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-release-verify-'));
 
     try {
       writeStandaloneReleaseAssets(tmpDir, EXPECTED_STANDALONE_ARCHIVE_NAMES);
@@ -1234,7 +1246,7 @@ describe('standalone release packaging', () => {
   it('rejects unexpected files and non-file release assets', async () => {
     const { EXPECTED_STANDALONE_ARCHIVE_NAMES, verifyReleaseDirectory } =
       await import(installationReleaseVerificationScriptUrl);
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-release-verify-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-release-verify-'));
 
     try {
       writeStandaloneReleaseAssets(tmpDir, EXPECTED_STANDALONE_ARCHIVE_NAMES);
@@ -1257,7 +1269,7 @@ describe('standalone release packaging', () => {
   itOnUnix('rejects symlinked release assets and checksum files', async () => {
     const { EXPECTED_STANDALONE_ARCHIVE_NAMES, verifyReleaseDirectory } =
       await import(installationReleaseVerificationScriptUrl);
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-release-verify-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-release-verify-'));
     let linkedAsset = '';
     let linkedChecksums = '';
 
@@ -1334,7 +1346,7 @@ describe('standalone release packaging', () => {
     }
     expect(warnSpy).not.toHaveBeenCalled();
     for (const [url] of fetchedUrls) {
-      expect(url).not.toMatch(/install-qwen\.(sh|bat|ps1)$/);
+      expect(url).not.toMatch(/install-hopcode\.(sh|bat|ps1)$/);
       expect(url).not.toMatch(/\/install$/);
     }
   });
@@ -1588,7 +1600,7 @@ describe('standalone release packaging', () => {
   it('prints explicit release asset paths for GitHub release upload', async () => {
     const { EXPECTED_RELEASE_ASSET_NAMES, EXPECTED_STANDALONE_ARCHIVE_NAMES } =
       await import(installationReleaseVerificationScriptUrl);
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-release-list-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-release-list-'));
 
     try {
       writeStandaloneReleaseAssets(tmpDir, EXPECTED_STANDALONE_ARCHIVE_NAMES);
@@ -1616,7 +1628,7 @@ describe('standalone release packaging', () => {
 
   it('rejects a runtime archive without a Node executable', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-test-'));
 
     try {
       const target = process.platform === 'win32' ? 'win-x64' : 'linux-x64';
@@ -1650,7 +1662,7 @@ describe('standalone release packaging', () => {
 
   it('packages a win-x64 standalone archive', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-test-'));
 
     try {
       const outDir = path.join(tmpDir, 'out');
@@ -1693,7 +1705,7 @@ describe('standalone release packaging', () => {
 
   itOnUnix('dereferences safe Node.js runtime symlinks', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-test-'));
 
     try {
       const archive = packageFakeStandalone(tmpDir, {
@@ -1720,7 +1732,7 @@ describe('standalone release packaging', () => {
 
   itOnUnix('rejects Node.js runtime symlinks that escape the archive', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-test-'));
 
     try {
       expect(() =>
@@ -1750,7 +1762,7 @@ describe('standalone release packaging', () => {
 
   itOnUnix('rejects Node.js runtime symlink cycles', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-test-'));
 
     try {
       expect(() =>
@@ -1780,7 +1792,7 @@ describe('standalone release packaging', () => {
 
   it('rejects unexpected dist assets', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-test-'));
 
     try {
       writeFileSync('dist/debug-cache.tmp', 'debug\n');
@@ -1894,30 +1906,32 @@ describe('standalone release packaging', () => {
     );
     const syncStep = ossWorkflow.slice(syncStepIndex, verifyStepIndex);
     expect(syncStep).not.toContain('dist/installation/');
-    expect(syncStep).not.toContain('installation/install-qwen-standalone.sh');
+    expect(syncStep).not.toContain(
+      'installation/install-hopcode-standalone.sh',
+    );
     const syncHostedStep = ossWorkflow.slice(
       syncHostedStepIndex,
       verifyHostedStepIndex,
     );
     expect(syncHostedStep).toContain(
-      'dist/installation/install-qwen-standalone.sh',
+      'dist/installation/install-hopcode-standalone.sh',
     );
     expect(syncHostedStep).toContain(
-      'dist/installation/install-qwen-standalone.bat',
+      'dist/installation/install-hopcode-standalone.bat',
     );
     expect(syncHostedStep).toContain(
-      'dist/installation/install-qwen-standalone.ps1',
+      'dist/installation/install-hopcode-standalone.ps1',
     );
     expect(syncHostedStep).toContain(
-      'dist/installation/uninstall-qwen-standalone.sh',
+      'dist/installation/uninstall-hopcode-standalone.sh',
     );
     expect(syncHostedStep).toContain(
-      'dist/installation/uninstall-qwen-standalone.ps1',
+      'dist/installation/uninstall-hopcode-standalone.ps1',
     );
     expect(syncHostedStep).toContain('--prefix "installation/${RELEASE_TAG}"');
     expect(syncHostedStep).toContain('--prefix "installation"');
     expect(syncHostedStep).toContain(
-      'dist/installation/install-qwen-standalone.sh',
+      'dist/installation/install-hopcode-standalone.sh',
     );
     const uploadScript = readScript('scripts/upload-aliyun-oss-assets.js');
     expect(uploadScript).toContain("'--acl'");
@@ -1976,11 +1990,11 @@ describe('standalone release packaging', () => {
 
     expect(guide).toContain('Optional Native Modules');
     expect(guide).toContain('package:hosted-installation');
-    expect(guide).toContain('installation/install-qwen-standalone.sh');
-    expect(guide).toContain('installation/install-qwen-standalone.bat');
-    expect(guide).toContain('installation/install-qwen-standalone.ps1');
-    expect(guide).toContain('installation/uninstall-qwen-standalone.sh');
-    expect(guide).toContain('installation/uninstall-qwen-standalone.ps1');
+    expect(guide).toContain('installation/install-hopcode-standalone.sh');
+    expect(guide).toContain('installation/install-hopcode-standalone.bat');
+    expect(guide).toContain('installation/install-hopcode-standalone.ps1');
+    expect(guide).toContain('installation/uninstall-hopcode-standalone.sh');
+    expect(guide).toContain('installation/uninstall-hopcode-standalone.ps1');
     expect(guide).toContain('ALIYUN_OSS_ACCESS_KEY_ID');
     expect(guide).toContain('ALIYUN_OSS_ACCESS_KEY_SECRET');
     expect(guide).toContain('ALIYUN_OSS_BUCKET');
@@ -1992,22 +2006,22 @@ describe('standalone release packaging', () => {
 
   it('provides standalone uninstall scripts that clean install-owned files only', () => {
     const uninstallShellSource = readScript(
-      'scripts/installation/uninstall-qwen-standalone.sh',
+      'scripts/installation/uninstall-hopcode-standalone.sh',
     );
     const uninstallPowerShellSource = readScript(
-      'scripts/installation/uninstall-qwen-standalone.ps1',
+      'scripts/installation/uninstall-hopcode-standalone.ps1',
     );
 
-    expect(uninstallShellSource).toContain('is_HOPCODE_standalone_install_dir');
+    expect(uninstallShellSource).toContain('is_hopcode_standalone_install_dir');
     expect(uninstallShellSource).toContain('remove_shell_path_entry');
     expect(uninstallShellSource).toContain('shell_quote');
-    expect(uninstallShellSource).toContain('quoted_HOPCODE_bin');
+    expect(uninstallShellSource).toContain('quoted_hopcode_bin');
     expect(uninstallShellSource).toContain('HOPCODE_UNINSTALL_PURGE');
     expect(uninstallShellSource).toContain('Preserving');
     expect(uninstallShellSource).toContain('source.json');
 
     expect(uninstallPowerShellSource).toContain(
-      'Test-QwenStandaloneInstallDir',
+      'Test-HopcodeStandaloneInstallDir',
     );
     expect(uninstallPowerShellSource).toContain(
       'Remove-PathEntryFromAllScopes',
@@ -2024,7 +2038,7 @@ describe('standalone release packaging', () => {
       /if \(\$installWasManaged\) \{\n\s+Remove-CurrentCmdPathShim\n\s+Remove-Item/,
     );
     expect(uninstallPowerShellSource).not.toMatch(
-      /\$installWasManaged = Test-QwenStandaloneInstallDir[^\n]*\n\nRemove-CurrentCmdPathShim\n\nif \(\$installWasManaged\)/,
+      /\$installWasManaged = Test-HopcodeStandaloneInstallDir[^\n]*\n\nRemove-CurrentCmdPathShim\n\nif \(\$installWasManaged\)/,
     );
   });
 });
@@ -2199,7 +2213,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'installs a local standalone archive with checksum verification',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2240,7 +2254,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'resolves Aliyun latest through a single VERSION pointer before downloading archives',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2301,7 +2315,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         const output = execFileSync(
           'bash',
           [
-            'scripts/installation/install-qwen-standalone.sh',
+            'scripts/installation/install-hopcode-standalone.sh',
             '--method',
             'standalone',
             '--mirror',
@@ -2345,7 +2359,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'tries GitHub before npm when auto-selected Aliyun archive is unavailable',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2419,7 +2433,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         const output = execFileSync(
           'bash',
           [
-            'scripts/installation/install-qwen-standalone.sh',
+            'scripts/installation/install-hopcode-standalone.sh',
             '--method',
             'detect',
             '--mirror',
@@ -2467,7 +2481,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
   itOnUnix('uninstalls standalone files while preserving user config', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-uninstall-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-uninstall-test-'));
 
     try {
       const archive = packageFakeStandalone(tmpDir);
@@ -2486,9 +2500,9 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
           'after',
         ].join('\n') + '\n',
       );
-      const qwenDir = path.join(home, '.hopcode');
-      const sourceJson = path.join(qwenDir, 'source.json');
-      const settingsJson = path.join(qwenDir, 'settings.json');
+      const hopcodeDir = path.join(home, '.hopcode');
+      const sourceJson = path.join(hopcodeDir, 'source.json');
+      const settingsJson = path.join(hopcodeDir, 'settings.json');
       writeFileSync(settingsJson, '{"theme":"dark"}\n');
 
       runUnixUninstaller(installRoot, home);
@@ -2513,7 +2527,9 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'removes only installer-owned shell rc PATH lines during uninstall',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-uninstall-test-'));
+      const tmpDir = mkdtempSync(
+        path.join(tmpdir(), 'hopcode-uninstall-test-'),
+      );
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2526,10 +2542,10 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
           rcFile,
           [
             'before',
-            '# Added by hopcode installer (multi-qwen shadow fix)   ',
+            '# Added by hopcode installer (multi-hopcode shadow fix)   ',
             `export PATH='${installRoot}/bin':$PATH`,
             'middle',
-            '# Added by hopcode installer (multi-qwen shadow fix)',
+            '# Added by hopcode installer (multi-hopcode shadow fix)',
             'echo keep-me',
             'after',
           ].join('\n') + '\n',
@@ -2548,10 +2564,10 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
   );
 
   itOnUnix(
-    'warns when an existing qwen could shadow the standalone install',
+    'warns when an existing hopcode could shadow the standalone install',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2561,7 +2577,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         const home = path.join(tmpDir, 'home');
 
         mkdirSync(fakeBin, { recursive: true });
-        writeFileSync(existingQwen, '#!/usr/bin/env sh\necho old-qwen\n');
+        writeFileSync(existingQwen, '#!/usr/bin/env sh\necho old-hopcode\n');
         chmodSync(existingQwen, 0o755);
 
         const output = runUnixInstaller(
@@ -2580,7 +2596,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
         expect(output).toContain('installed successfully, to start:');
         expect(output).toContain(
-          'Other qwen executables were found and may shadow the new install',
+          'Other hopcode executables were found and may shadow the new install',
         );
         expect(output).toContain(existingQwen);
         expect(output).toContain('source ~/.bashrc');
@@ -2591,7 +2607,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
         const resolvedQwen = execFileSync(
           'bash',
-          ['-c', 'source "${HOME}/.bashrc"; command -v qwen'],
+          ['-c', 'source "${HOME}/.bashrc"; command -v hopcode'],
           {
             env: {
               ...process.env,
@@ -2615,7 +2631,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'prints a shell reload hint when the install dir is not on PATH yet',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2648,7 +2664,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'points the reload hint at ~/.bash_profile when it is the rc file written',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2687,7 +2703,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'appends a fresh PATH block when an existing PATH line is not last',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2701,7 +2717,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
         mkdirSync(fakeBin, { recursive: true });
         mkdirSync(home, { recursive: true });
-        writeFileSync(existingQwen, '#!/usr/bin/env sh\necho old-qwen\n');
+        writeFileSync(existingQwen, '#!/usr/bin/env sh\necho old-hopcode\n');
         chmodSync(existingQwen, 0o755);
         writeFileSync(
           bashrc,
@@ -2731,7 +2747,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
         const resolvedQwen = execFileSync(
           'bash',
-          ['-c', 'source "${HOME}/.bashrc"; command -v qwen'],
+          ['-c', 'source "${HOME}/.bashrc"; command -v hopcode'],
           {
             env: {
               ...process.env,
@@ -2755,7 +2771,9 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'removes installer-owned shell rc PATH blocks even when extra lines are inserted',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-uninstall-test-'));
+      const tmpDir = mkdtempSync(
+        path.join(tmpdir(), 'hopcode-uninstall-test-'),
+      );
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2790,7 +2808,9 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'preserves malformed shell rc PATH blocks without an end marker',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-uninstall-test-'));
+      const tmpDir = mkdtempSync(
+        path.join(tmpdir(), 'hopcode-uninstall-test-'),
+      );
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2830,7 +2850,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
   itOnUnix('shell-quotes custom install paths in the generated wrapper', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = packageFakeStandalone(tmpDir);
@@ -2839,7 +2859,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
       const installLibDir = path.join(
         installRoot,
         'lib',
-        'hopcode$(touch qwen-pwned)',
+        'hopcode$(touch hopcode-pwned)',
       );
 
       runUnixInstaller(archive, installRoot, home, 'standalone', {
@@ -2856,7 +2876,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         .toString()
         .trim();
       expect(version).toBe('0.0.0-smoke');
-      expect(existsSync(path.join(tmpDir, 'qwen-pwned'))).toBe(false);
+      expect(existsSync(path.join(tmpDir, 'hopcode-pwned'))).toBe(false);
     } finally {
       rmSync(tmpDir, { recursive: true, force: true });
       restoreMinimalDist(createdDist);
@@ -2867,17 +2887,17 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'shell-quotes PATH updates written to shell rc files',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
         const fakeBin = path.join(tmpDir, 'shadow-bin');
         const installRoot = path.join(tmpDir, 'install');
         const home = path.join(tmpDir, 'home');
-        const marker = path.join(tmpDir, 'qwen-pwned');
+        const marker = path.join(tmpDir, 'hopcode-pwned');
         const unsafeBinDir = path.join(
           installRoot,
-          'bin path $(touch qwen-pwned)',
+          'bin path $(touch hopcode-pwned)',
         );
 
         mkdirSync(fakeBin, { recursive: true });
@@ -2911,7 +2931,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'skips shell rc PATH updates for unsupported shells',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -2949,7 +2969,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'uses ranged GET fallback when archive HEAD probes fail',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -3025,7 +3045,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         const output = execFileSync(
           'bash',
           [
-            'scripts/installation/install-qwen-standalone.sh',
+            'scripts/installation/install-hopcode-standalone.sh',
             '--method',
             'detect',
             '--base-url',
@@ -3064,7 +3084,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
     'adds a new shell rc PATH entry when reinstalling with a different bin dir',
     () => {
       const createdDist = ensureMinimalDist();
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = packageFakeStandalone(tmpDir);
@@ -3095,7 +3115,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
   itOnUnix('rejects a tampered local archive', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = packageFakeStandalone(tmpDir);
@@ -3116,7 +3136,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
   itOnUnix('rejects a local archive when SHA256SUMS is missing', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = packageFakeStandalone(tmpDir);
@@ -3136,7 +3156,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
   });
 
   itOnUnix('rejects standalone archives containing symlinks', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = createSymlinkStandaloneArchive(tmpDir);
@@ -3155,7 +3175,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
   itOnUnix('rejects empty standalone archives', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = path.join(tmpDir, 'hopcode-linux-x64.tar.gz');
@@ -3180,7 +3200,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
   itOnUnix(
     'rejects standalone archives containing path traversal entries',
     () => {
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = createTraversalStandaloneArchive(tmpDir);
@@ -3200,7 +3220,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
   itOnUnix('backs up and overwrites a non-managed install directory', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = packageFakeStandalone(tmpDir);
@@ -3237,7 +3257,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
 
   itOnUnix('does not fall back to npm when detect finds a bad archive', () => {
     const createdDist = ensureMinimalDist();
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = packageFakeStandalone(tmpDir);
@@ -3267,7 +3287,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
   itOnUnix(
     'falls back to npm in detect mode when archive is unavailable',
     () => {
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const fakeBin = path.join(tmpDir, 'bin');
@@ -3319,7 +3339,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         const output = execFileSync(
           'bash',
           [
-            'scripts/installation/install-qwen-standalone.sh',
+            'scripts/installation/install-hopcode-standalone.sh',
             '--method',
             'detect',
             '--base-url',
@@ -3350,7 +3370,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
   );
 
   itOnUnix('passes pinned versions through to npm fallback', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const fakeBin = path.join(tmpDir, 'bin');
@@ -3395,7 +3415,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
       execFileSync(
         'bash',
         [
-          'scripts/installation/install-qwen-standalone.sh',
+          'scripts/installation/install-hopcode-standalone.sh',
           '--method',
           'detect',
           '--base-url',
@@ -3424,7 +3444,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
   });
 
   itOnUnix('preserves context when npm fallback also fails', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const fakeBin = path.join(tmpDir, 'bin');
@@ -3437,7 +3457,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         execFileSync(
           'bash',
           [
-            'scripts/installation/install-qwen-standalone.sh',
+            'scripts/installation/install-hopcode-standalone.sh',
             '--method',
             'detect',
             '--base-url',
@@ -3478,7 +3498,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
   itOnWindows(
     'installs a local standalone archive with checksum verification',
     () => {
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = createFakeWindowsStandaloneArchive(tmpDir);
@@ -3510,7 +3530,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
   );
 
   itOnWindows('rejects a tampered local archive', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = createFakeWindowsStandaloneArchive(tmpDir);
@@ -3529,7 +3549,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
   });
 
   itOnWindows('rejects unsafe environment-derived install paths', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const archive = createFakeWindowsStandaloneArchive(tmpDir);
@@ -3555,7 +3575,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
   itOnWindows(
     'resolves Aliyun latest through a single VERSION pointer before downloading archives',
     () => {
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const archive = createFakeWindowsStandaloneArchive(tmpDir);
@@ -3569,7 +3589,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
 
         const output = runWindowsCommand(
           [
-            `call "${path.resolve('scripts/installation/install-qwen-standalone.bat')}"`,
+            `call "${path.resolve('scripts/installation/install-hopcode-standalone.bat')}"`,
             '--method',
             'standalone',
             '--mirror',
@@ -3612,7 +3632,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
   itOnWindows(
     'falls back to npm in detect mode when archive is unavailable',
     () => {
-      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
       try {
         const fakeBin = path.join(tmpDir, 'bin');
@@ -3621,7 +3641,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
 
         const output = runWindowsCommand(
           [
-            `call "${path.resolve('scripts/installation/install-qwen-standalone.bat')}"`,
+            `call "${path.resolve('scripts/installation/install-hopcode-standalone.bat')}"`,
             '--method',
             'detect',
             '--source',
@@ -3649,7 +3669,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
   );
 
   itOnWindows('passes pinned versions through to npm fallback', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const fakeBin = path.join(tmpDir, 'bin');
@@ -3658,7 +3678,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
 
       runWindowsCommand(
         [
-          `call "${path.resolve('scripts/installation/install-qwen-standalone.bat')}"`,
+          `call "${path.resolve('scripts/installation/install-hopcode-standalone.bat')}"`,
           '--method',
           'detect',
           '--source',
@@ -3686,7 +3706,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
   });
 
   itOnWindows('preserves context when npm fallback also fails', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-install-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-install-test-'));
 
     try {
       const fakeBin = path.join(tmpDir, 'bin');
@@ -3700,7 +3720,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
       try {
         runWindowsCommand(
           [
-            `call "${path.resolve('scripts/installation/install-qwen-standalone.bat')}"`,
+            `call "${path.resolve('scripts/installation/install-hopcode-standalone.bat')}"`,
             '--method',
             'detect',
             '--source',
@@ -3733,7 +3753,7 @@ describe('Windows installer end-to-end', { timeout: 30000 }, () => {
 
 describe('Windows PowerShell uninstaller end-to-end', () => {
   itOnWindows('prints help without deleting standalone files', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-uninstall-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-uninstall-test-'));
 
     try {
       const installRoot = path.join(tmpDir, 'install');
@@ -3742,7 +3762,7 @@ describe('Windows PowerShell uninstaller end-to-end', () => {
       createFakeWindowsStandaloneInstall(installRoot);
 
       const output = runWindowsPowerShellScript(
-        'scripts/installation/uninstall-qwen-standalone.ps1',
+        'scripts/installation/uninstall-hopcode-standalone.ps1',
         ['-Help'],
         {
           USERPROFILE: home,
@@ -3759,24 +3779,24 @@ describe('Windows PowerShell uninstaller end-to-end', () => {
   });
 
   itOnWindows('purges the source marker while preserving other config', () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-uninstall-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-uninstall-test-'));
 
     try {
       const installRoot = path.join(tmpDir, 'install');
       const installDir = path.join(installRoot, 'hopcode');
       const installBinDir = path.join(installRoot, 'bin');
       const home = path.join(tmpDir, 'home');
-      const qwenConfigDir = path.join(home, '.hopcode');
-      const sourceMarker = path.join(qwenConfigDir, 'source.json');
-      const settingsFile = path.join(qwenConfigDir, 'settings.json');
+      const hopcodeConfigDir = path.join(home, '.hopcode');
+      const sourceMarker = path.join(hopcodeConfigDir, 'source.json');
+      const settingsFile = path.join(hopcodeConfigDir, 'settings.json');
 
       createFakeWindowsStandaloneInstall(installRoot);
-      mkdirSync(qwenConfigDir, { recursive: true });
+      mkdirSync(hopcodeConfigDir, { recursive: true });
       writeFileSync(sourceMarker, '{"source":"smoke"}\n');
       writeFileSync(settingsFile, '{"theme":"dark"}\n');
 
       const output = runWindowsPowerShellScript(
-        'scripts/installation/uninstall-qwen-standalone.ps1',
+        'scripts/installation/uninstall-hopcode-standalone.ps1',
         ['-Purge'],
         {
           USERPROFILE: home,
@@ -3800,7 +3820,7 @@ function ensureMinimalDist() {
   const backupPath = existsSync(distPath)
     ? path.join(
         path.dirname(distPath),
-        `qwen-dist-backup-${process.pid}-${Date.now()}-${Math.random()
+        `hopcode-dist-backup-${process.pid}-${Date.now()}-${Math.random()
           .toString(16)
           .slice(2)}`,
       )
@@ -4139,7 +4159,7 @@ function runUnixInstaller(
     return execFileSync(
       'bash',
       [
-        'scripts/installation/install-qwen-standalone.sh',
+        'scripts/installation/install-hopcode-standalone.sh',
         '--method',
         method,
         '--archive',
@@ -4174,7 +4194,7 @@ function runUnixUninstaller(installRoot, home, extraEnv = {}) {
   try {
     return execFileSync(
       'bash',
-      ['scripts/installation/uninstall-qwen-standalone.sh'],
+      ['scripts/installation/uninstall-hopcode-standalone.sh'],
       {
         env: {
           ...process.env,
@@ -4208,7 +4228,7 @@ function runWindowsInstaller(
   try {
     return runWindowsCommand(
       [
-        `call "${path.resolve('scripts/installation/install-qwen-standalone.bat')}"`,
+        `call "${path.resolve('scripts/installation/install-hopcode-standalone.bat')}"`,
         '--method',
         method,
         '--archive',
@@ -4370,12 +4390,12 @@ function createTraversalStandaloneArchive(tmpDir) {
     path.join(packageRoot, 'manifest.json'),
     JSON.stringify({ name: '@hoptrendy/hopcode', target: 'linux-x64' }),
   );
-  writeFileSync(path.join(tmpDir, 'qwen-slip'), 'path traversal\n');
+  writeFileSync(path.join(tmpDir, 'hopcode-slip'), 'path traversal\n');
 
   const outDir = path.join(tmpDir, 'out');
   mkdirSync(outDir, { recursive: true });
   const archive = path.join(outDir, 'hopcode-linux-x64.zip');
-  execFileSync('zip', ['-qr', archive, 'hopcode', '../qwen-slip'], {
+  execFileSync('zip', ['-qr', archive, 'hopcode', '../hopcode-slip'], {
     cwd: maliciousRoot,
     stdio: 'ignore',
   });

@@ -5,8 +5,8 @@
 # This script intentionally does not install Node.js or change npm config.
 #
 # Usage:
-#   install-qwen-standalone.sh --source [github|npm|internal|local-build]
-#   install-qwen-standalone.sh --method [detect|standalone|npm]
+#   install-hopcode-standalone.sh --source [github|npm|internal|local-build]
+#   install-hopcode-standalone.sh --method [detect|standalone|npm]
 
 if [ -z "${BASH_VERSION}" ] && [ -z "${__HOPCODE_INSTALL_REEXEC:-}" ]; then
     if command -v bash >/dev/null 2>&1; then
@@ -159,7 +159,7 @@ Options:
   -h, --help           Show this help message
 
 Example:
-  curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
+  curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash
 EOF
 }
 
@@ -712,7 +712,7 @@ race_mirror_head() {
     local gh_url="$2"
     local oss_url="$3"
     local tmpdir
-    if ! tmpdir=$(mktemp -d -t qwen-mirror.XXXXXX 2>/dev/null); then
+    if ! tmpdir=$(mktemp -d -t hopcode-mirror.XXXXXX 2>/dev/null); then
         # Refuse to fall back to a predictable PID-based path; a local attacker
         # could pre-create it to influence mirror selection.
         echo "mirror probe: mktemp failed" >&2
@@ -1303,7 +1303,7 @@ install_standalone() {
     # Stage into .new and keep .old so failed upgrades can roll back.
     local new_install_dir="${INSTALL_LIB_DIR}.new"
     local old_install_dir="${INSTALL_LIB_DIR}.old"
-    local wrapper_tmp="${INSTALL_BIN_DIR}/qwen.new"
+    local wrapper_tmp="${INSTALL_BIN_DIR}/hopcode.new"
     if ! ensure_managed_install_dir "${INSTALL_LIB_DIR}" ||
         ! ensure_managed_install_dir "${new_install_dir}" ||
         ! ensure_managed_install_dir "${old_install_dir}"; then
@@ -1326,7 +1326,7 @@ install_standalone() {
 
     if ! write_unix_wrapper "${wrapper_tmp}" "${INSTALL_LIB_DIR}/bin/hopcode"; then
         rm -rf "${temp_dir}" "${new_install_dir}" "${wrapper_tmp}"
-        log_error "Failed to create qwen wrapper in ${INSTALL_BIN_DIR}."
+        log_error "Failed to create hopcode wrapper in ${INSTALL_BIN_DIR}."
         return 1
     fi
 
@@ -1350,13 +1350,13 @@ install_standalone() {
     trap 'restore_cursor >&2; kill_active_download; cleanup_temp_dirs; exit 130' INT
     trap 'restore_cursor >&2; kill_active_download; cleanup_temp_dirs; exit 143' TERM
 
-    if ! mv -f "${wrapper_tmp}" "${INSTALL_BIN_DIR}/qwen"; then
+    if ! mv -f "${wrapper_tmp}" "${INSTALL_BIN_DIR}/hopcode"; then
         rm -rf "${INSTALL_LIB_DIR}" "${wrapper_tmp}"
         if [[ -e "${old_install_dir}" ]]; then
             mv "${old_install_dir}" "${INSTALL_LIB_DIR}"
         fi
         rm -rf "${temp_dir}"
-        log_error "Failed to create qwen wrapper in ${INSTALL_BIN_DIR}."
+        log_error "Failed to create hopcode wrapper in ${INSTALL_BIN_DIR}."
         return 1
     fi
 
@@ -1455,14 +1455,14 @@ print_final_instructions() {
     local install_dir="${2:-}"
     local install_method="${3:-standalone}"
     local installed_bin=""
-    local standalone_uninstall_url="https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.sh"
+    local standalone_uninstall_url="https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.sh"
     if [[ -n "${install_bin_dir}" ]]; then
-        installed_bin="${install_bin_dir}/qwen"
+        installed_bin="${install_bin_dir}/hopcode"
         export PATH="${install_bin_dir}:${PATH}"
     fi
 
-    # Detect shadowing qwen executables
-    local other_qwens=""
+    # Detect shadowing hopcode executables
+    local other_hopcodes=""
     if [[ -n "${PRE_INSTALL_QWENS:-}" ]]; then
         local saved_ifs="${IFS}"
         IFS=$'\n'
@@ -1470,10 +1470,10 @@ print_final_instructions() {
         for path in ${PRE_INSTALL_QWENS}; do
             [[ -z "${path}" ]] && continue
             [[ -n "${installed_bin}" && "${path}" == "${installed_bin}" ]] && continue
-            if [[ -z "${other_qwens}" ]]; then
-                other_qwens="${path}"
+            if [[ -z "${other_hopcodes}" ]]; then
+                other_hopcodes="${path}"
             else
-                other_qwens="${other_qwens}"$'\n'"${path}"
+                other_hopcodes="${other_hopcodes}"$'\n'"${path}"
             fi
         done
         IFS="${saved_ifs}"
@@ -1488,7 +1488,7 @@ print_final_instructions() {
     local installed_version="unknown"
     if [[ -n "${installed_bin}" && -x "${installed_bin}" ]]; then
         installed_version=$("${installed_bin}" --version 2>/dev/null || echo "unknown")
-    elif command_exists qwen; then
+    elif command_exists hopcode; then
         installed_version=$(hopcode --version 2>/dev/null || echo "unknown")
     fi
 
@@ -1500,10 +1500,10 @@ print_final_instructions() {
         rc_name="~${rc_name#"${HOME}"}"
     fi
     if [[ "${PATH_UPDATE_APPLIED:-0}" == "1" && -n "${rc_name}" ]]; then
-        echo -e "${MUTED}Successfully added${NC} qwen ${MUTED}to \$PATH in${NC} ${rc_name}"
+        echo -e "${MUTED}Successfully added${NC} hopcode ${MUTED}to \$PATH in${NC} ${rc_name}"
     fi
 
-    # The invoking shell keeps its original PATH (and possibly an older qwen
+    # The invoking shell keeps its original PATH (and possibly an older hopcode
     # resolved from it) until the rc file is reloaded. Detect both cases and
     # tell the user exactly what to run instead of letting `hopcode` silently
     # launch a stale version.
@@ -1514,14 +1514,14 @@ print_final_instructions() {
             *) shell_reload_needed=1 ;;
         esac
     fi
-    if [[ -n "${other_qwens}" ]]; then
+    if [[ -n "${other_hopcodes}" ]]; then
         shell_reload_needed=1
-        log_warning "Other qwen executables were found and may shadow the new install in this shell:"
+        log_warning "Other hopcode executables were found and may shadow the new install in this shell:"
         local shadow_path
         while IFS= read -r shadow_path; do
             [[ -z "${shadow_path}" ]] && continue
             printf '  %s\n' "${shadow_path}"
-        done <<< "${other_qwens}"
+        done <<< "${other_hopcodes}"
     fi
 
     local reload_cmd=""
@@ -1540,7 +1540,7 @@ print_final_instructions() {
         echo -e "${reload_cmd}  ${MUTED}# Load new PATH (or open a new terminal)${NC}"
     fi
     echo -e "cd <project>  ${MUTED}# Open directory${NC}"
-    echo -e "qwen          ${MUTED}# Run command${NC}"
+    echo -e "hopcode          ${MUTED}# Run command${NC}"
     echo ""
     echo -e "${MUTED}For more information visit ${NC}https://github.com/QwenLM/hopcode"
     echo ""
@@ -1552,7 +1552,7 @@ main() {
         exit 1
     fi
 
-    # Discover all qwen executables on disk BEFORE we install, so the
+    # Discover all hopcode executables on disk BEFORE we install, so the
     # just-installed binary doesn't pollute the search. We can't reliably
     # simulate the user's interactive shell PATH (some tools inject their
     # bin only under a tty), so we enumerate well-known per-tool bin
@@ -1562,7 +1562,7 @@ main() {
             IFS=:
             for dir in $PATH; do
                 [[ -z "${dir}" ]] && continue
-                [[ -x "${dir}/qwen" ]] && echo "${dir}/qwen"
+                [[ -x "${dir}/hopcode" ]] && echo "${dir}/hopcode"
             done
             for candidate in \
                 "${HOME}/.opencode/bin/hopcode" \
@@ -1572,7 +1572,7 @@ main() {
                 "${HOME}/.volta/bin/hopcode" \
                 "${HOME}/.fnm/bin/hopcode" \
                 "${HOME}/.local/bin/hopcode" \
-                "${HOME}/Library/pnpm/qwen" \
+                "${HOME}/Library/pnpm/hopcode" \
                 "/usr/local/bin/hopcode" \
                 "/opt/homebrew/bin/hopcode"; do
                 [[ -x "${candidate}" ]] && echo "${candidate}"

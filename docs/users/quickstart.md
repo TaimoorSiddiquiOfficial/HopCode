@@ -21,13 +21,13 @@ To install HopCode, use one of the following methods:
 **Linux / macOS**
 
 ```sh
-curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
+curl -fsSL https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.sh | bash
 ```
 
 **Windows**
 
 ```powershell
-irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.ps1 | iex
+irm https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-hopcode-standalone.ps1 | iex
 ```
 
 > [!note]

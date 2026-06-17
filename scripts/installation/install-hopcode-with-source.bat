@@ -194,7 +194,7 @@ exit /b 1
 :PrintUsage
 echo HopCode Installer
 echo.
-echo Usage: install-qwen-with-source.bat [OPTIONS]
+echo Usage: install-hopcode-with-source.bat [OPTIONS]
 echo.
 echo Options:
 echo   -s, --source SOURCE      Record the installation source.
@@ -607,7 +607,7 @@ if !ERRORLEVEL! NEQ 0 (
     if exist "!INSTALL_DIR!" rmdir /S /Q "!INSTALL_DIR!" >nul 2>&1
     if exist "!OLD_INSTALL_DIR!" move /Y "!OLD_INSTALL_DIR!" "!INSTALL_DIR!" >nul
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 move /Y "!INSTALL_BIN_DIR!\hopcode.cmd.new" "!INSTALL_BIN_DIR!\hopcode.cmd" >nul
@@ -616,7 +616,7 @@ if !ERRORLEVEL! NEQ 0 (
     if exist "!INSTALL_DIR!" rmdir /S /Q "!INSTALL_DIR!" >nul 2>&1
     if exist "!OLD_INSTALL_DIR!" move /Y "!OLD_INSTALL_DIR!" "!INSTALL_DIR!" >nul
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 
@@ -724,7 +724,7 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 call :RequireNpm
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
-where qwen >nul 2>&1
+where hopcode >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "HOPCODE_VERSION=%%i"
     echo INFO: Existing HopCode detected: !HOPCODE_VERSION!
@@ -771,26 +771,26 @@ echo Installation completed!
 echo ===========================================
 echo.
 
-where qwen >nul 2>&1
+where hopcode >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     for /f "delims=" %%i in ('hopcode --version 2^>nul') do set "HOPCODE_VERSION=%%i"
     echo SUCCESS: HopCode is ready to use: !HOPCODE_VERSION!
     echo.
-    echo You can now run: qwen
+    echo You can now run: hopcode
     echo.
-    echo INFO: Run qwen in your project directory to start an interactive session.
+    echo INFO: Run hopcode in your project directory to start an interactive session.
     exit /b 0
 )
 
-echo WARNING: HopCode was installed, but qwen is not on PATH in this prompt.
+echo WARNING: HopCode was installed, but hopcode is not on PATH in this prompt.
 echo.
-echo Restart your command prompt, then run: qwen
+echo Restart your command prompt, then run: hopcode
 if not "!EXTRA_BIN!"=="" (
     echo.
     echo Or add this directory to PATH:
     echo   !EXTRA_BIN!
     echo Then run:
-    echo   qwen
+    echo   hopcode
     exit /b 0
 )
 
@@ -800,6 +800,6 @@ if not "!NPM_PREFIX!"=="" (
     echo Or add this npm global directory to PATH:
     echo   !NPM_PREFIX!
     echo Then run:
-    echo   qwen
+    echo   hopcode
 )
 exit /b 0

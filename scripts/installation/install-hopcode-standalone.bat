@@ -249,16 +249,16 @@ if /i "!REPAIR_PATH!"=="1" (
 
 call :PrintHeader
 
-REM Discover all qwen executables on disk BEFORE we install. We can't
+REM Discover all hopcode executables on disk BEFORE we install. We can't
 REM reliably simulate the user's PATH ordering, so enumerate well-known
-REM per-tool bin directories plus everything `where qwen` returns.
-call :CreateTempFile "qwen-pre-install"
+REM per-tool bin directories plus everything `where hopcode` returns.
+call :CreateTempFile "hopcode-pre-install"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 set "PRE_INSTALL_QWENS_FILE=!TEMP_FILE!"
 rem Avoid `call echo` here: `call` triggers an extra parse pass on the
 rem expanded path, so a directory containing &/|/<,>/etc. would be re-evaluated
 rem as command separators. Plain `echo` writes the literal value.
-for /f "delims=" %%i in ('where qwen 2^>nul') do echo %%i>>"!PRE_INSTALL_QWENS_FILE!"
+for /f "delims=" %%i in ('where hopcode 2^>nul') do echo %%i>>"!PRE_INSTALL_QWENS_FILE!"
 for %%c in (
     "!USERPROFILE!\.opencode\bin\hopcode.cmd"
     "!APPDATA!\npm\hopcode.cmd"
@@ -334,7 +334,7 @@ exit /b 1
 :PrintUsage
 echo HopCode Installer
 echo.
-echo Usage: install-qwen-standalone.bat [OPTIONS]
+echo Usage: install-hopcode-standalone.bat [OPTIONS]
 echo.
 echo Options:
 echo   --method METHOD      Install method: detect, standalone, or npm (default: detect)
@@ -391,7 +391,7 @@ set "HOPCODE_VALIDATE_INSTALL_DIR=!INSTALL_DIR!"
 set "HOPCODE_VALIDATE_INSTALL_BIN_DIR=!INSTALL_BIN_DIR!"
 set "HOPCODE_VALIDATE_SOURCE=!SOURCE!"
 set "HOPCODE_VALIDATE_PATH_SCOPE=!PATH_SCOPE!"
-call :CreateTempFile "qwen-validate-options" ".ps1"
+call :CreateTempFile "hopcode-validate-options" ".ps1"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 set "HOPCODE_VALIDATE_OPTIONS_SCRIPT=!TEMP_FILE!"
 > "!HOPCODE_VALIDATE_OPTIONS_SCRIPT!" echo $unsafe = [char[]](10,13,33,34,37,38,60,62,94,96,124)
@@ -668,7 +668,7 @@ exit /b %PS_STATUS%
 set "HOPCODE_CHECK_URL=%~1"
 rem Prefer Tls12+Tls13; fall back to Tls12 alone on older .NET Framework where the Tls13 enum is missing.
 rem AllowAutoRedirect=true is required for GitHub release asset URLs which return HTTP 302.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Test-QwenUrl($method, $range) { try { $request = [Net.WebRequest]::Create($env:HOPCODE_CHECK_URL); $request.Timeout = 10000; $request.Method = $method; if ($range) { $request.Headers.Add('Range', 'bytes=0-0') }; if ($request -is [Net.HttpWebRequest]) { $request.ReadWriteTimeout = 30000; $request.AllowAutoRedirect = $true }; $response = $request.GetResponse(); $response.Close(); return $true } catch { return $false } }; if (Test-QwenUrl 'HEAD' $false) { exit 0 }; if (Test-QwenUrl 'GET' $true) { exit 0 }; exit 1" >nul 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13 } catch { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 }; function Test-HopcodeUrl($method, $range) { try { $request = [Net.WebRequest]::Create($env:HOPCODE_CHECK_URL); $request.Timeout = 10000; $request.Method = $method; if ($range) { $request.Headers.Add('Range', 'bytes=0-0') }; if ($request -is [Net.HttpWebRequest]) { $request.ReadWriteTimeout = 30000; $request.AllowAutoRedirect = $true }; $response = $request.GetResponse(); $response.Close(); return $true } catch { return $false } }; if (Test-HopcodeUrl 'HEAD' $false) { exit 0 }; if (Test-HopcodeUrl 'GET' $true) { exit 0 }; exit 1" >nul 2>&1
 set "PS_STATUS=%ERRORLEVEL%"
 set "HOPCODE_CHECK_URL="
 exit /b %PS_STATUS%
@@ -784,7 +784,7 @@ if "!EXPECTED_HASH!"=="" (
 
 set "ACTUAL_HASH="
 set "HOPCODE_HASH_FILE=!ARCHIVE_FILE!"
-for /f "delims=" %%H in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; (Get-FileHash -Algorithm SHA256 -LiteralPath $env:HOPCODE_HASH_FILE).Hash" 2^>nul') do (
+for /f "usebackq delims=" %%H in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$stream = [IO.File]::OpenRead($env:HOPCODE_HASH_FILE); try { $sha = [Security.Cryptography.SHA256]::Create(); $hash = $sha.ComputeHash($stream); [BitConverter]::ToString($hash).Replace('-', '').ToLowerInvariant() } finally { if ($sha) { $sha.Dispose() }; $stream.Dispose() }" 2^>nul`) do (
     if "!ACTUAL_HASH!"=="" set "ACTUAL_HASH=%%H"
 )
 set "HOPCODE_HASH_FILE="
@@ -1048,7 +1048,7 @@ if !ERRORLEVEL! NEQ 0 (
     call :RemoveInstalledDirWithWarning
     call :RestoreOldInstall
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 move /Y "!INSTALL_BIN_DIR!\hopcode.cmd.new" "!INSTALL_BIN_DIR!\hopcode.cmd" >nul
@@ -1057,7 +1057,7 @@ if !ERRORLEVEL! NEQ 0 (
     call :RemoveInstalledDirWithWarning
     call :RestoreOldInstall
     if exist "!TEMP_DIR!" rmdir /S /Q "!TEMP_DIR!" >nul 2>&1
-    echo ERROR: Failed to create qwen wrapper in !INSTALL_BIN_DIR!.
+    echo ERROR: Failed to create hopcode wrapper in !INSTALL_BIN_DIR!.
     exit /b 1
 )
 
@@ -1310,7 +1310,7 @@ exit /b 0
 set "EXTRA_BIN=%~1"
 set "SUMMARY_INSTALL_DIR=%~2"
 set "SUMMARY_INSTALL_METHOD=%~3"
-set "STANDALONE_UNINSTALL_URL=https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-qwen-standalone.ps1"
+set "STANDALONE_UNINSTALL_URL=https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/installation/uninstall-hopcode-standalone.ps1"
 set "PATH_UPDATE_APPLIED=0"
 if "!SUMMARY_INSTALL_METHOD!"=="" set "SUMMARY_INSTALL_METHOD=standalone"
 
@@ -1342,7 +1342,7 @@ echo.
 echo HopCode !INSTALLED_VERSION! installed successfully, to start:
 echo.
 echo   cd ^<project^>
-echo   qwen
+echo   hopcode
 echo.
 echo For more information visit https://github.com/QwenLM/hopcode
 

@@ -131,7 +131,7 @@ function Test-HopcodeStandaloneInstallDir {
         return $false
     }
 
-    if ($manifest.name -ne '@hoptrendy/hopcode-cli') {
+    if ($manifest.name -ne '@hoptrendy/hopcode') {
         return $false
     }
 
