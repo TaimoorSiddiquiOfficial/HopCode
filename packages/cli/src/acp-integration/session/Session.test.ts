@@ -6406,11 +6406,7 @@ describe('Session', () => {
         isOutputMarkdown: true,
       });
 
-<<<<<<< HEAD
-      const parts = await (
-=======
       const result = await (
->>>>>>> upstream/main
         session as unknown as ToolCallInternals
       ).runToolCalls(new AbortController().signal, 'prompt-dup', [
         {
@@ -6454,11 +6450,7 @@ describe('Session', () => {
         isOutputMarkdown: true,
       });
 
-<<<<<<< HEAD
-      const parts = await (
-=======
       const result = await (
->>>>>>> upstream/main
         session as unknown as ToolCallInternals
       ).runToolCalls(new AbortController().signal, 'prompt-empty', [
         {
