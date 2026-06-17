@@ -4542,7 +4542,7 @@ describe('useGeminiStream', () => {
       await waitFor(() => {
         expect(result.current.thought?.description).toBe('thinking more');
       });
-      expect(result.current.pendingHistoryItems).toEqual([
+      expect(result.current.pendingGeminiHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           durationMs: expect.any(Number),
@@ -4608,7 +4608,7 @@ describe('useGeminiStream', () => {
         }),
         expect.any(Number),
       );
-      expect(result.current.pendingHistoryItems).toEqual([
+      expect(result.current.pendingGeminiHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           durationMs: expect.any(Number),
