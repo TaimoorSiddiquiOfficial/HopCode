@@ -224,7 +224,7 @@ validate_version() {
 }
 
 validate_github_repo() {
-    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/hopcode}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-TaimoorSiddiquiOfficial/HopCode}"
     if [[ "${github_repo}" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
         return 0
     fi
@@ -582,7 +582,7 @@ maybe_update_shell_path() {
 
 github_base_url_for_version() {
     local version_path="$1"
-    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-QwenLM/hopcode}"
+    local github_repo="${HOPCODE_INSTALL_GITHUB_REPO:-TaimoorSiddiquiOfficial/HopCode}"
     if [[ "${version_path}" == "latest" ]]; then
         echo "https://github.com/${github_repo}/releases/latest/download"
     else
@@ -1463,11 +1463,11 @@ print_final_instructions() {
 
     # Detect shadowing hopcode executables
     local other_hopcodes=""
-    if [[ -n "${PRE_INSTALL_QWENS:-}" ]]; then
+    if [[ -n "${PRE_INSTALL_HOPCODES:-}" ]]; then
         local saved_ifs="${IFS}"
         IFS=$'\n'
         local path
-        for path in ${PRE_INSTALL_QWENS}; do
+        for path in ${PRE_INSTALL_HOPCODES}; do
             [[ -z "${path}" ]] && continue
             [[ -n "${installed_bin}" && "${path}" == "${installed_bin}" ]] && continue
             if [[ -z "${other_hopcodes}" ]]; then
@@ -1542,7 +1542,7 @@ print_final_instructions() {
     echo -e "cd <project>  ${MUTED}# Open directory${NC}"
     echo -e "hopcode          ${MUTED}# Run command${NC}"
     echo ""
-    echo -e "${MUTED}For more information visit ${NC}https://github.com/QwenLM/hopcode"
+    echo -e "${MUTED}For more information visit ${NC}https://github.com/TaimoorSiddiquiOfficial/HopCode"
     echo ""
 }
 
@@ -1557,7 +1557,7 @@ main() {
     # simulate the user's interactive shell PATH (some tools inject their
     # bin only under a tty), so we enumerate well-known per-tool bin
     # directories plus whatever bash inherited on PATH.
-    PRE_INSTALL_QWENS=$(
+    PRE_INSTALL_HOPCODES=$(
         {
             IFS=:
             for dir in $PATH; do
@@ -1586,7 +1586,7 @@ main() {
             fi
         } 2>/dev/null | sort -u
     )
-    export PRE_INSTALL_QWENS
+    export PRE_INSTALL_HOPCODES
 
     print_header
 

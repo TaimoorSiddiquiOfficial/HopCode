@@ -7,8 +7,8 @@ empty extension.
 
 ```
 starter/
-├── qwen-extension.json        # Manifest: name, version, context file, MCP servers
-├── QWEN.md                    # Context: persistent instructions for the model
+├── hopcode-extension.json     # Manifest: name, version, context file, MCP servers
+├── HOPCODE.md                 # Context: persistent instructions for the model
 ├── agents/
 │   └── diary.md               # Subagent: a focused diary-writing assistant
 ├── commands/
@@ -26,7 +26,7 @@ starter/
 
 | Capability | Where               | How it shows up                                          |
 | ---------- | ------------------- | -------------------------------------------------------- |
-| Context    | `QWEN.md`           | Persistent instructions injected into every session.     |
+| Context    | `HOPCODE.md`        | Persistent instructions injected into every session.     |
 | Subagent   | `agents/diary.md`   | Available via `/agents manage`.                          |
 | Command    | `commands/writing/` | Invoked as `/writing:polish <text>`.                     |
 | Skill      | `skills/synonyms/`  | Auto-activated via `/skills` when relevant.              |
@@ -39,7 +39,7 @@ From the extension directory:
 
 ```bash
 npm install
-npm run build   # emits dist/example.js, which qwen-extension.json points at
+npm run build   # emits dist/example.js, which hopcode-extension.json points at
 ```
 
 The other capabilities (context, agents, commands, skills) work without any
@@ -48,7 +48,7 @@ build step.
 ## Trying it out
 
 ```bash
-qwen extensions link /path/to/starter   # link this directory for local testing
+hopcode extensions link /path/to/starter   # link this directory for local testing
 ```
 
 Then restart HopCode. The context loads automatically, `/writing:polish` and

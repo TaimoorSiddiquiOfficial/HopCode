@@ -84,7 +84,7 @@ describe('package asset scripts', () => {
           description: 'HopCode',
           repository: {
             type: 'git',
-            url: 'https://github.com/QwenLM/hopcode.git',
+            url: 'https://github.com/TaimoorSiddiquiOfficial/HopCode.git',
           },
           config: {},
           engines: {

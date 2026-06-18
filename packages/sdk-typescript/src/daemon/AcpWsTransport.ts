@@ -572,7 +572,7 @@ export class AcpWsTransport implements DaemonTransport {
 // ---------------------------------------------------------------------------
 
 /** Headers forwarded from per-request `init.headers` into JSON-RPC `_meta`. */
-const FORWARDED_HEADERS = ['x-qwen-client-id'] as const;
+const FORWARDED_HEADERS = ['x-hopcode-client-id'] as const;
 
 /**
  * Extract metadata-relevant headers from `RequestInit.headers` and
@@ -604,8 +604,8 @@ function extractHeaderMeta(
     const value = get(hdr);
     if (value !== undefined) {
       // Normalize header name to a camelCase _meta key.
-      // 'x-qwen-client-id' → 'clientId'
-      if (hdr === 'x-qwen-client-id') {
+      // 'x-hopcode-client-id' → 'clientId'
+      if (hdr === 'x-hopcode-client-id') {
         meta['clientId'] = value;
       }
     }

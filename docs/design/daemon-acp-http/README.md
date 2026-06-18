@@ -236,14 +236,14 @@ on every type. The codebase's southbound leg already uses `unstable_*` method na
 (spec-compliant `_` prefix). Capabilities advertised under
 `agentCapabilities._meta.hopcode` at `initialize` so clients feature-detect before use.
 
-| Need                                                  | No standard ACP method? | Extension                                               |
-| ----------------------------------------------------- | ----------------------- | ------------------------------------------------------- |
-| Model switch                                          | yes                     | `_qwen/session/set_model`                               |
-| Workspace MCP/skills/providers/env introspection      | yes                     | `_qwen/workspace/list`, `_qwen/workspace/<area>`        |
-| Heartbeat / last-seen                                 | yes                     | `_qwen/session/heartbeat`                               |
-| Multi-client permission policy (consensus/designated) | partial                 | `session/request_permission` + `_meta.qwen.policy`      |
-| SSE backpressure tuning (`maxQueued`)                 | yes                     | `Acp-Qwen-Max-Queued` header on session GET             |
-| Resume cursor (ring `Last-Event-ID`)                  | RFD Phase 4             | `Last-Event-ID` header + `_meta.qwen.eventId` on frames |
+| Need                                                  | No standard ACP method? | Extension                                                  |
+| ----------------------------------------------------- | ----------------------- | ---------------------------------------------------------- |
+| Model switch                                          | yes                     | `_hopcode/session/set_model`                               |
+| Workspace MCP/skills/providers/env introspection      | yes                     | `_hopcode/workspace/list`, `_hopcode/workspace/<area>`     |
+| Heartbeat / last-seen                                 | yes                     | `_hopcode/session/heartbeat`                               |
+| Multi-client permission policy (consensus/designated) | partial                 | `session/request_permission` + `_meta.hopcode.policy`      |
+| SSE backpressure tuning (`maxQueued`)                 | yes                     | `Acp-HopCode-Max-Queued` header on session GET             |
+| Resume cursor (ring `Last-Event-ID`)                  | RFD Phase 4             | `Last-Event-ID` header + `_meta.hopcode.eventId` on frames |
 
 Standard methods are **never** renamed; extensions are strictly additive and ignorable.
 
@@ -387,7 +387,7 @@ All fixes verified by the expanded vitest suite (**18 tests**) + a fresh live sm
 | R6  | **P1**   | Pre-attach frame buffers (`connBuffer`/`binding.buffer`) were unbounded.                                                                                                                                                                          | Capped at 256 frames (drop-oldest), matching the EventBus `maxQueued`.                                                                                                                 |
 | R7  | **P2**   | `initialize` ignored the client's requested `protocolVersion`.                                                                                                                                                                                    | Negotiates `min(requested, 1)`.                                                                                                                                                        |
 | R8  | **P2**   | No `Acp-Session-Id` ↔ `params.sessionId` cross-check (RFD §2.3).                                                                                                                                                                                 | POST asserts they agree; mismatch → `INVALID_PARAMS`.                                                                                                                                  |
-| R9  | **P2**   | `session/cancel` request-form (with id) never answered; duplicate top-level `_meta.qwen`.                                                                                                                                                         | Reply when an id is present; single `agentCapabilities._meta.qwen`.                                                                                                                    |
+| R9  | **P2**   | `session/cancel` request-form (with id) never answered; duplicate top-level `_meta.hopcode`.                                                                                                                                                      | Reply when an id is present; single `agentCapabilities._meta.hopcode`.                                                                                                                 |
 
 ### Accepted / documented (not fixed in v1)
 
@@ -418,7 +418,7 @@ All fixes verified by the suite (now **22 tests**) + a fresh live run (16 `sessi
 | B6  | **P1**   | `session/new                                                                                                                                                                                                                                | load                                                                                                                                                                        | resume`accepted`cwd` unvalidated (REST validates string/length/absolute — amplification DoS). | Shared `parseOptionalWorkspaceCwd` (string, ≤4096, absolute). |
 | B7  | **P1**   | `session/prompt` forwarded an unvalidated `prompt` to the bridge.                                                                                                                                                                           | `validatePrompt` (non-empty array of objects), mirroring REST.                                                                                                              |
 | B8  | **P1**   | Raw bridge error messages echoed to the client.                                                                                                                                                                                             | `toRpcError` maps known bridge errors to coded, client-safe shapes; unknown → generic `Internal error` (full detail still to stderr).                                       |
-| B9  | **P1**   | `nextId` used sequential negatives — a client legally using negative ids could collide in `pending`.                                                                                                                                        | Daemon-originated ids are now strings (`_HOPCODE_perm_N`), disjoint from any client id.                                                                                        |
+| B9  | **P1**   | `nextId` used sequential negatives — a client legally using negative ids could collide in `pending`.                                                                                                                                        | Daemon-originated ids are now strings (`_HOPCODE_perm_N`), disjoint from any client id.                                                                                     |
 | B10 | **P2**   | `resolveClientResponse` param type excluded `JsonRpcError`; conn-scoped SSE stream had no `onClose`; `DELETE` with no header was a silent 202; `SseStream.close` ran `onClose` outside try/catch; `session/load`·`resume`·`close` untested. | Widened param to `JsonRpcResponse`; conn stream logs on close; `DELETE` missing header → `400`; `onClose` wrapped in try/catch; added load/resume/close + DELETE-400 tests. |
 
 **Out of scope (base-branch `daemon_mode_b_main`, not this diff)** — the second reviewer flagged

@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/sdk",
-  "version": "0.30.2",
+  "version": "0.30.3",
   "description": "TypeScript SDK for programmatic access to hopcode CLI",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -78,7 +78,7 @@
     "directory": "packages/sdk-typescript"
   },
   "bugs": {
-    "url": "https://github.com/QwenLM/hopcode/issues"
+    "url": "https://github.com/TaimoorSiddiquiOfficial/HopCode/issues"
   },
-  "homepage": "https://qwenlm.github.io/hopcode-docs/"
+  "homepage": "https://taimoorsiddiquiofficial.github.io/HopCode-docs/"
 }

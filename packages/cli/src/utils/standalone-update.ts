@@ -20,7 +20,8 @@ const debugLogger = createDebugLogger('STANDALONE_UPDATE');
 
 const OSS_BASE =
   'https://hopcode-assets.oss-cn-hangzhou.aliyuncs.com/releases/hopcode';
-const GITHUB_BASE = 'https://github.com/QwenLM/hopcode/releases/download';
+const GITHUB_BASE =
+  'https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/download';
 const FETCH_TIMEOUT_MS = 30_000;
 const ARCHIVE_TIMEOUT_MS = 300_000; // 5 min — archives are 50–150 MB
 

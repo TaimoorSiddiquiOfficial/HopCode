@@ -373,9 +373,9 @@ if [ -z "$DISPLAY" ]; then
 fi
 
 # Clear stale cache referencing AppImage mount paths
-# AppImage creates a new /tmp/.mount_Qwen-XXXX each launch, so any cached path is stale
+# AppImage creates a new /tmp/.mount_HopCode-XXXX each launch, so any cached path is stale
 for cache_dir in "$ELECTRON_CACHE" "$ELECTRON_CACHE_ALT"; do
-    if [ -d "$cache_dir" ] && grep -rq '/tmp/\.mount_Qwen' "$cache_dir" 2>/dev/null; then
+    if [ -d "$cache_dir" ] && grep -rq '/tmp/\.mount_HopCode' "$cache_dir" 2>/dev/null; then
         rm -rf "$cache_dir"
     fi
 done

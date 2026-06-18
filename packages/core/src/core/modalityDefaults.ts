@@ -83,7 +83,7 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   // -------------------
   // ByteDance Doubao — Seed-series and *-vision / *-vl models accept image
   // input; other Doubao models (pro / lite / text) are text-only.
-  // (QwenLM/hopcode#4876)
+  // (TaimoorSiddiquiOfficial/HopCode#4876)
   // -------------------
   // seedance (text→video) and seedream (text→image) are generation models with
   // text-only input — exclude them before the multimodal Seed chat series.

@@ -133,7 +133,7 @@ export type ContentGeneratorConfig = {
   // reject anything else (HTTP 400 "Invalid 'messages' in payload"), so an image
   // read via read_file never reaches the model. Default: true (spec-compliant
   // and safe for permissive providers); set false to restore the legacy
-  // embed-in-tool-message behavior. See QwenLM/hopcode#4876, #3616.
+  // embed-in-tool-message behavior. See TaimoorSiddiquiOfficial/HopCode#4876, #3616.
   splitToolMedia?: boolean;
 };
 

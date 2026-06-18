@@ -170,7 +170,7 @@ await server.instance.connect(transport);
 | `file_edit`                 | 编辑文件（精确匹配替换）           |
 | `session_set_approval_mode` | 变更审批模式                       |
 | `workspace_tool_toggle`     | 启用/禁用工具                      |
-| `workspace_init`            | 初始化 QWEN.md                     |
+| `workspace_init`            | 初始化 HOPCODE.md                  |
 | `workspace_mcp_restart`     | 重启 MCP 服务器                    |
 | `workspace_memory_read`     | 读工作区记忆                       |
 | `workspace_memory_write`    | 写工作区记忆                       |

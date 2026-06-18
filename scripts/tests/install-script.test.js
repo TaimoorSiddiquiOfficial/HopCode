@@ -351,7 +351,7 @@ describe('installation scripts', () => {
     expect(script).toContain('Failed to update !PATH_SCOPE! PATH');
     expect(script).toContain("$ErrorActionPreference = 'Stop'; try");
     expect(script).toContain('catch { exit 1 }');
-    expect(script).toContain('PRE_INSTALL_QWENS_LIST');
+    expect(script).toContain('PRE_INSTALL_HOPCODES_LIST');
     expect(script).toContain('HOPCODE_INSTALL_ROOT');
     expect(script).toContain('npm fallback also failed');
     expect(script).toContain('echo Downloading !ARCHIVE_NAME!');
@@ -2241,7 +2241,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
         expect(output).toContain('installed successfully, to start:');
         expect(output).toContain('0.0.0-smoke');
         expect(output).toContain('cd <project>');
-        expect(output).toContain('github.com/QwenLM/hopcode');
+        expect(output).toContain('github.com/TaimoorSiddiquiOfficial/HopCode');
         expect(output).not.toContain('rm -rf');
       } finally {
         rmSync(tmpDir, { recursive: true, force: true });
@@ -2645,7 +2645,7 @@ describe('Linux/macOS installer end-to-end', { timeout: 15000 }, () => {
           'standalone',
           // Minimal PATH keeps the fresh install dir off the invoking
           // shell's PATH so the reload hint is always printed. The shadow
-          // warning is NOT asserted on either way: PRE_INSTALL_QWENS also
+          // warning is NOT asserted on either way: PRE_INSTALL_HOPCODES also
           // scans well-known absolute paths (/usr/local/bin etc.), so its
           // output depends on the host machine.
           { SHELL: '/bin/bash', PATH: '/usr/bin:/bin' },

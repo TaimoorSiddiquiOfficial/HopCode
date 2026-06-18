@@ -184,7 +184,7 @@ export function formatRelease(release) {
 
 const HEADER = `# Changelog
 
-All notable changes to [HopCode](https://github.com/QwenLM/hopcode) are
+All notable changes to [HopCode](https://github.com/TaimoorSiddiquiOfficial/HopCode) are
 documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -193,7 +193,7 @@ and the project follows
 are listed; nightly and preview pre-releases are intentionally omitted.
 
 > **This file is generated automatically** from
-> [GitHub Releases](https://github.com/QwenLM/hopcode/releases). Do not edit it
+> [GitHub Releases](https://github.com/TaimoorSiddiquiOfficial/HopCode/releases). Do not edit it
 > by hand — run \`npm run changelog\` to regenerate.
 `;
 
@@ -267,7 +267,7 @@ function getDefaultRepo() {
   }
   const url = readJson(path.join(REPO_ROOT, 'package.json'))?.repository?.url;
   const match = /github\.com[/:]([^/]+\/[^/.]+)/.exec(url || '');
-  return match ? match[1] : 'QwenLM/hopcode';
+  return match ? match[1] : 'TaimoorSiddiquiOfficial/HopCode';
 }
 
 const HELP = `Generate CHANGELOG.md from GitHub Releases.

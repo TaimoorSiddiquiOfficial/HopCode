@@ -254,32 +254,32 @@ REM reliably simulate the user's PATH ordering, so enumerate well-known
 REM per-tool bin directories plus everything `where hopcode` returns.
 call :CreateTempFile "hopcode-pre-install"
 if !ERRORLEVEL! NEQ 0 exit /b 1
-set "PRE_INSTALL_QWENS_FILE=!TEMP_FILE!"
+set "PRE_INSTALL_HOPCODES_FILE=!TEMP_FILE!"
 rem Avoid `call echo` here: `call` triggers an extra parse pass on the
 rem expanded path, so a directory containing &/|/<,>/etc. would be re-evaluated
 rem as command separators. Plain `echo` writes the literal value.
-for /f "delims=" %%i in ('where hopcode 2^>nul') do echo %%i>>"!PRE_INSTALL_QWENS_FILE!"
+for /f "delims=" %%i in ('where hopcode 2^>nul') do echo %%i>>"!PRE_INSTALL_HOPCODES_FILE!"
 for %%c in (
     "!USERPROFILE!\.opencode\bin\hopcode.cmd"
     "!APPDATA!\npm\hopcode.cmd"
     "!USERPROFILE!\.bun\bin\hopcode.cmd"
     "!LOCALAPPDATA!\bun\bin\hopcode.cmd"
     "!LOCALAPPDATA!\hopcode\bin\hopcode.cmd"
-) do if exist %%c echo %%~c>>"!PRE_INSTALL_QWENS_FILE!"
+) do if exist %%c echo %%~c>>"!PRE_INSTALL_HOPCODES_FILE!"
 for /f "delims=" %%i in ('npm prefix -g 2^>nul') do (
-    if exist "%%i\hopcode.cmd" echo %%i\hopcode.cmd>>"!PRE_INSTALL_QWENS_FILE!"
+    if exist "%%i\hopcode.cmd" echo %%i\hopcode.cmd>>"!PRE_INSTALL_HOPCODES_FILE!"
 )
-set "PRE_INSTALL_QWENS_LIST="
-if exist "!PRE_INSTALL_QWENS_FILE!" (
-    for /f "delims=" %%i in ('sort "!PRE_INSTALL_QWENS_FILE!" 2^>nul ^| findstr /v "^$"') do (
-        if "!PRE_INSTALL_QWENS_LIST!"=="" (
-            set "PRE_INSTALL_QWENS_LIST=%%i"
+set "PRE_INSTALL_HOPCODES_LIST="
+if exist "!PRE_INSTALL_HOPCODES_FILE!" (
+    for /f "delims=" %%i in ('sort "!PRE_INSTALL_HOPCODES_FILE!" 2^>nul ^| findstr /v "^$"') do (
+        if "!PRE_INSTALL_HOPCODES_LIST!"=="" (
+            set "PRE_INSTALL_HOPCODES_LIST=%%i"
         ) else (
-            echo !PRE_INSTALL_QWENS_LIST! | findstr /i /c:"%%i" >nul 2>&1
-            if errorlevel 1 set "PRE_INSTALL_QWENS_LIST=!PRE_INSTALL_QWENS_LIST!|%%i"
+            echo !PRE_INSTALL_HOPCODES_LIST! | findstr /i /c:"%%i" >nul 2>&1
+            if errorlevel 1 set "PRE_INSTALL_HOPCODES_LIST=!PRE_INSTALL_HOPCODES_LIST!|%%i"
         )
     )
-    del /f /q "!PRE_INSTALL_QWENS_FILE!" >nul 2>&1
+    del /f /q "!PRE_INSTALL_HOPCODES_FILE!" >nul 2>&1
 )
 
 REM Dispatch after validation; detect falls back to npm only when unavailable.
@@ -555,7 +555,7 @@ exit /b 0
 
 :GithubBaseUrlForVersion
 rem args: %~1=version_path  → sets HOPCODE_GH_BASE_URL
-set "HOPCODE_GH_REPO=QwenLM/hopcode"
+set "HOPCODE_GH_REPO=TaimoorSiddiquiOfficial/HopCode"
 if defined HOPCODE_INSTALL_GITHUB_REPO set "HOPCODE_GH_REPO=!HOPCODE_INSTALL_GITHUB_REPO!"
 if /i "%~1"=="latest" (
     set "HOPCODE_GH_BASE_URL=https://github.com/!HOPCODE_GH_REPO!/releases/latest/download"
@@ -1344,7 +1344,7 @@ echo.
 echo   cd ^<project^>
 echo   hopcode
 echo.
-echo For more information visit https://github.com/QwenLM/hopcode
+echo For more information visit https://github.com/TaimoorSiddiquiOfficial/HopCode
 
 if /i "!HOPCODE_INSTALLER_PARENT_POWERSHELL!"=="1" (
     REM Final PATH refresh is handled by the PowerShell entrypoint.

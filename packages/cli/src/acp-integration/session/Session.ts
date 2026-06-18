@@ -2604,7 +2604,7 @@ export class Session implements SessionContext {
     reason: PromptResponse['stopReason'],
   ): Promise<void> {
     try {
-      await this.client.extNotification('_HopCode/end_turn', {
+      await this.client.extNotification('_hopcode/end_turn', {
         sessionId: this.sessionId,
         reason,
         source: 'background_notification',

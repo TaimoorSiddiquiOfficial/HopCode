@@ -149,7 +149,7 @@ export function workspaceWriteTools(state: BridgeState): any[] {
         force: z
           .boolean()
           .optional()
-          .describe('Overwrite existing QWEN.md if present.'),
+          .describe('Overwrite existing HOPCODE.md if present.'),
       },
       handler(async (args) =>
         formatJsonResult(

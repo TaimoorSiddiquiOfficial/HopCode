@@ -97,7 +97,7 @@ const HOPCODE_CODE_BRAND: BrandConfig = {
   helpMenuLinks: [
     {
       labelKey: 'menu.homepage',
-      url: 'https://qwen.ai/HopCode',
+      url: 'https://taimoorsiddiquiofficial.github.io/HopCode-docs/',
       icon: 'House',
     },
   ],
@@ -156,7 +156,7 @@ const BRANDS: Record<string, BrandConfig> = {
       {
         name: 'HopCode',
         role: 'AI Agent Engine',
-        url: 'https://github.com/QwenLM/hopcode',
+        url: 'https://github.com/TaimoorSiddiquiOfficial/HopCode',
       },
       {
         name: 'Craft Agents OSS',

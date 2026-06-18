@@ -594,7 +594,7 @@ describe('getInstallationInfo', () => {
   });
 
   it('should ask for sudo and NOT migrate to standalone when the npm global prefix is not writable', () => {
-    const globalPath = `/usr/lib/node_modules/@hopcode/hopcode/cli-entry.js`;
+    const globalPath = `/usr/lib/node_modules/@hoptrendy/hopcode/cli-entry.js`;
     process.argv[1] = globalPath;
     mockedRealPathSync.mockReturnValue(globalPath);
     mockedExecSync.mockImplementation(() => {

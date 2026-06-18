@@ -811,7 +811,7 @@ export interface ConfigParameters {
    * Wall-clock budget for an unattended run, in seconds. `-1` (default)
    * means no limit. Enforced by the CLI's non-interactive run loop
    * see `RunBudgetEnforcer` in `packages/cli/src/utils/runBudget.ts`.
-   * Issue: QwenLM/hopcode#4103.
+   * Issue: TaimoorSiddiquiOfficial/HopCode#4103.
    */
   maxWallTimeSeconds?: number;
   /**
@@ -2180,7 +2180,7 @@ export class Config {
     }
 
     return (
-      `Warning: Loaded QWEN.md/context instructions use about ` +
+      `Warning: Loaded HOPCODE.md/context instructions use about ` +
       `${estimatedTokens.toLocaleString()} tokens, more than ` +
       `${Math.round(MEMORY_CONTEXT_WARNING_RATIO * 100)}% of this ` +
       `model's ${contextWindowSize.toLocaleString()} token context window. ` +

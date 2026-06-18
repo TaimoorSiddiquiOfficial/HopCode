@@ -355,11 +355,11 @@ if /i "!MIRROR!"=="aliyun" (
 )
 
 if /i "!VERSION_PATH!"=="latest" (
-    set "STANDALONE_BASE_URL=https://github.com/QwenLM/hopcode/releases/latest/download"
+    set "STANDALONE_BASE_URL=https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/latest/download"
     exit /b 0
 )
 
-set "STANDALONE_BASE_URL=https://github.com/QwenLM/hopcode/releases/download/!VERSION_PATH!"
+set "STANDALONE_BASE_URL=https://github.com/TaimoorSiddiquiOfficial/HopCode/releases/download/!VERSION_PATH!"
 exit /b 0
 
 :UrlExists

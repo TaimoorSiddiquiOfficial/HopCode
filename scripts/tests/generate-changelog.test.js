@@ -17,7 +17,8 @@ import {
   parseJsonl,
 } from '../generate-changelog.js';
 
-const PR = (n) => `https://github.com/QwenLM/hopcode/pull/${n}`;
+const PR = (n) =>
+  `https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/${n}`;
 
 describe('categorize', () => {
   it('splits type, scope, and description', () => {
@@ -92,7 +93,7 @@ describe('parseReleaseEntries', () => {
       '## New Contributors',
       '* @newbie made their first contribution in ' + PR(99),
       '',
-      '**Full Changelog**: https://github.com/QwenLM/hopcode/compare/v1...v2',
+      '**Full Changelog**: https://github.com/TaimoorSiddiquiOfficial/HopCode/compare/v1...v2',
     ].join('\n');
 
     expect(parseReleaseEntries(body)).toEqual([

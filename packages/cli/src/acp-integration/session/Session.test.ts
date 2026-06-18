@@ -1330,7 +1330,7 @@ describe('Session', () => {
         },
       });
       expect(mockClient.extNotification).toHaveBeenCalledWith(
-        '_HopCode/end_turn',
+        '_hopcode/end_turn',
         {
           sessionId: 'test-session-id',
           reason: 'end_turn',
@@ -1396,7 +1396,7 @@ describe('Session', () => {
       expect(notificationCompression.signal?.aborted).toBe(true);
       await vi.waitFor(() => {
         expect(mockClient.extNotification).toHaveBeenCalledWith(
-          '_HopCode/end_turn',
+          '_hopcode/end_turn',
           {
             sessionId: 'test-session-id',
             reason: 'cancelled',
@@ -1541,7 +1541,7 @@ describe('Session', () => {
           }),
         });
         expect(mockClient.extNotification).toHaveBeenCalledWith(
-          '_HopCode/end_turn',
+          '_hopcode/end_turn',
           {
             sessionId: 'test-session-id',
             reason: 'end_turn',
@@ -5375,7 +5375,7 @@ describe('Session', () => {
 
         await vi.waitFor(() => {
           expect(mockClient.extNotification).toHaveBeenCalledWith(
-            '_qwencode/end_turn',
+            '_hopcode/end_turn',
             {
               sessionId: 'test-session-id',
               reason: 'end_turn',
