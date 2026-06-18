@@ -420,7 +420,7 @@ export class ContentGenerationPipeline {
           this.contentGeneratorConfig,
         ) &&
         (model.startsWith('hopcode') ||
-          model.startsWith('hopcode') ||
+          model.startsWith('qwen') ||
           model === 'coder-model')
       ) {
         typed['enable_thinking'] = false;
