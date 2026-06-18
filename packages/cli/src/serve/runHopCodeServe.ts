@@ -686,7 +686,7 @@ export async function runHopCodeServe(
     }
   }
   // Validate here (not just in the yargs handler) so embedded callers of
-  // `runQwenServe({ permissionResponseTimeoutMs })` also fail loud: the
+  // `runHopCodeServe({ permissionResponseTimeoutMs })` also fail loud: the
   // bridge treats a non-finite / negative value as the "disabled"
   // sentinel, which would silently drop the permission deadline. Mirrors
   // `channelIdleTimeoutMs`; out-of-range values are clamped by the bridge.
