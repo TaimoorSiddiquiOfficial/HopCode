@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -1347,8 +1347,7 @@ export function startSubagentSpan(opts: StartSubagentSpanOptions): Span {
     attributes['hopcode.subagent.parent_agent_id'] = opts.parentAgentId;
   }
   if (opts.invokingRequestId !== undefined) {
-    attributes['hopcode.subagent.invoking_request_id'] =
-      opts.invokingRequestId;
+    attributes['hopcode.subagent.invoking_request_id'] = opts.invokingRequestId;
   }
 
   const tracer = getTracer();

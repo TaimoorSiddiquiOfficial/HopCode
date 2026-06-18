@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -278,7 +278,7 @@ export class ITermBackend implements Backend {
   // --- Screen Capture -----------------------------------------
 
   getActiveSnapshot(): AnsiOutput | null {
-    // iTerm2 manages rendering — snapshots not supported
+    // iTerm2 manages rendering ï¿½ snapshots not supported
     return null;
   }
 
@@ -409,7 +409,7 @@ export class ITermBackend implements Backend {
 
         this.onExitCallback?.(agent.agentId, agent.exitCode, null);
       } catch {
-        // File doesn't exist yet — command still running
+        // File doesn't exist yet ï¿½ command still running
       }
     }
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -157,7 +157,7 @@ export class AcpFileHandler {
           }
         }
       } else {
-        // New file – write UTF-8 bytes directly.
+        // New file ï¿½ write UTF-8 bytes directly.
         const bytes = Buffer.from(params.content, 'utf-8');
         await vscode.workspace.fs.writeFile(uri, bytes);
       }

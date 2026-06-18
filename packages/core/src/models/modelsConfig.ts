@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -184,7 +184,8 @@ export class ModelsConfig {
         this.generationConfigSources,
       ),
       strictModelProviderSelection: this.strictModelProviderSelection,
-      requireCachedHopCodeCredentialsOnce: this.requireCachedHopCodeCredentialsOnce,
+      requireCachedHopCodeCredentialsOnce:
+        this.requireCachedHopCodeCredentialsOnce,
       hasManualCredentials: this.hasManualCredentials,
       activeRuntimeModelSnapshotId: this.activeRuntimeModelSnapshotId,
     };
@@ -444,7 +445,10 @@ export class ModelsConfig {
     }
 
     const rollbackSnapshot = this.createStateSnapshotForRollback();
-    if (authType === AuthType.HOPCODE_OAUTH && options?.requireCachedCredentials) {
+    if (
+      authType === AuthType.HOPCODE_OAUTH &&
+      options?.requireCachedCredentials
+    ) {
       this.requireCachedHopCodeCredentialsOnce = true;
     }
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -126,8 +126,7 @@ export async function withDaemonRequestSpan<T>(
       ...(options.clientId ? { 'hopcode.client_id': options.clientId } : {}),
       ...(options.permissionRequestId
         ? {
-            'hopcode.daemon.permission.request_id':
-              options.permissionRequestId,
+            'hopcode.daemon.permission.request_id': options.permissionRequestId,
           }
         : {}),
     },

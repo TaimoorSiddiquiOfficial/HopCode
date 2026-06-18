@@ -75,9 +75,9 @@ Without `loginctl enable-linger`, the user-level systemd instance shuts down whe
 
 ## macOS: launchd user agent
 
-> **Find your `hopcode` binary first.** Same constraint as systemd — `ProgramArguments` must hold an **absolute path**. Run `which qwen` to discover it. Common locations on macOS: `/opt/homebrew/bin/hopcode` (Homebrew on Apple Silicon), `/usr/local/bin/hopcode` (Homebrew on Intel, manual installs), `~/.nvm/versions/node/vX.Y.Z/bin/hopcode` (nvm), `~/.volta/bin/hopcode` (Volta). Substitute below where the template shows `/PATH/TO/qwen`.
+> **Find your `hopcode` binary first.** Same constraint as systemd — `ProgramArguments` must hold an **absolute path**. Run `which hopcode` to discover it. Common locations on macOS: `/opt/homebrew/bin/hopcode` (Homebrew on Apple Silicon), `/usr/local/bin/hopcode` (Homebrew on Intel, manual installs), `~/.nvm/versions/node/vX.Y.Z/bin/hopcode` (nvm), `~/.volta/bin/hopcode` (Volta). Substitute below where the template shows `/PATH/TO/hopcode`.
 
-`~/Library/LaunchAgents/com.qwenlm.hopcode-serve.plist`:
+`~/Library/LaunchAgents/com.hopcode.hopcode-serve.plist`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -85,11 +85,11 @@ Without `loginctl enable-linger`, the user-level systemd instance shuts down whe
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.qwenlm.hopcode-serve</string>
+  <string>com.hopcode.hopcode-serve</string>
   <key>ProgramArguments</key>
   <array>
-    <!-- Run `which qwen` to find the absolute path; launchd does NOT read $PATH. -->
-    <string>/PATH/TO/qwen</string>
+    <!-- Run `which hopcode` to find the absolute path; launchd does NOT read $PATH. -->
+    <string>/PATH/TO/hopcode</string>
     <string>serve</string>
     <string>--hostname</string>
     <string>127.0.0.1</string>
@@ -140,9 +140,9 @@ Manage:
 
 ```bash
 mkdir -p ~/Library/Logs/hopcode-serve                                       # first time only
-chmod 600 ~/Library/LaunchAgents/com.qwenlm.hopcode-serve.plist             # plist holds the inline token
-launchctl load   ~/Library/LaunchAgents/com.qwenlm.hopcode-serve.plist
-launchctl unload ~/Library/LaunchAgents/com.qwenlm.hopcode-serve.plist      # to stop
+chmod 600 ~/Library/LaunchAgents/com.hopcode.hopcode-serve.plist             # plist holds the inline token
+launchctl load   ~/Library/LaunchAgents/com.hopcode.hopcode-serve.plist
+launchctl unload ~/Library/LaunchAgents/com.hopcode.hopcode-serve.plist      # to stop
 tail -f ~/Library/Logs/hopcode-serve/out.log ~/Library/Logs/hopcode-serve/err.log
 ```
 
@@ -195,7 +195,7 @@ When auth is configured (i.e., the daemon was started with `--token` / `HOPCODE_
    (For the launchd / nohup / tmux templates: edit the plist's `<string>` value or re-`export HOPCODE_SERVER_TOKEN`. Don't forget `chmod 600` on the plist if you regenerate it.)
 2. Restart the daemon:
    - **systemd**: `systemctl --user restart hopcode-serve.service`
-   - **launchd**: `launchctl unload ~/Library/LaunchAgents/com.qwenlm.hopcode-serve.plist && launchctl load ~/Library/LaunchAgents/com.qwenlm.hopcode-serve.plist`
+   - **launchd**: `launchctl unload ~/Library/LaunchAgents/com.hopcode.hopcode-serve.plist && launchctl load ~/Library/LaunchAgents/com.hopcode.hopcode-serve.plist`
    - **tmux / nohup**: `kill <pid>` then re-run with the new token in env
 3. Update any client SDKs / scripts. The TypeScript SDK's `DaemonClient` reads `HOPCODE_SERVER_TOKEN` automatically (PR 27 fallback) — re-`export` the new value in any client shell and reconstruct the client.
 
@@ -218,4 +218,4 @@ A daemon **restart** drops all in-memory sessions; clients reconnect and start f
 - **Auto-generated daemon tokens** — alpha is BYO-token. Auto-gen + token-store infrastructure defers to v0.16.x.
 - **Windows native service** (`nssm`, Service Control Manager wrapper) — for now use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/) and follow the systemd section above.
 
-See the [v0.16-alpha known limits](./hopcode-serve.md#v016-alpha-known-limits) callout in the main user guide for the full deferred-features list, and [#4175](https://github.com/QwenLM/hopcode/issues/4175) for the v0.16-alpha rollout tracking issue.
+See the [v0.16-alpha known limits](./hopcode-serve.md#v016-alpha-known-limits) callout in the main user guide for the full deferred-features list, and [#4175](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/4175) for the v0.16-alpha rollout tracking issue.

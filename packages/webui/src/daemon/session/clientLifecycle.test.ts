@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,9 +25,7 @@ describe('getStableClientId', () => {
   it('generates a client ID without session storage compatibility fallback', () => {
     const id = getStableClientId(undefined);
     expect(id).toMatch(/^webui_/);
-    expect(
-      window.sessionStorage.getItem('hopcode-webui-client-id'),
-    ).toBeNull();
+    expect(window.sessionStorage.getItem('hopcode-webui-client-id')).toBeNull();
   });
 
   it('does not reuse the old tab-level client ID key', () => {
@@ -60,9 +58,7 @@ describe('persistStableClientId', () => {
   it('does not persist daemon-issued client ID without a session', () => {
     persistStableClientId('client-daemon');
 
-    expect(
-      window.sessionStorage.getItem('hopcode-webui-client-id'),
-    ).toBeNull();
+    expect(window.sessionStorage.getItem('hopcode-webui-client-id')).toBeNull();
     expect(getStableClientId(undefined)).toMatch(/^webui_/);
   });
 
@@ -77,9 +73,7 @@ describe('persistStableClientId', () => {
 
   it('ignores missing client ID', () => {
     persistStableClientId(undefined);
-    expect(
-      window.sessionStorage.getItem('hopcode-webui-client-id'),
-    ).toBeNull();
+    expect(window.sessionStorage.getItem('hopcode-webui-client-id')).toBeNull();
   });
 });
 

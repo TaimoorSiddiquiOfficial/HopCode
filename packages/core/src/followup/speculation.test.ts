@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,32 +63,30 @@ describe('startSpeculation', () => {
     forkedAgentMocks.runForkedAgent.mockResolvedValue({
       jsonResult: { suggestion: '' },
     });
-    forkedAgentMocks.sendMessageStream.mockImplementation(
-      async function* () {
-        if (forkedAgentMocks.sendMessageStream.mock.calls.length === 1) {
-          yield {
-            type: 'chunk',
-            value: {
-              candidates: [
-                {
-                  content: {
-                    parts: [
-                      {
-                        functionCall: {
-                          id: 'call_123',
-                          name: 'read_file',
-                          args: { path: 'a.ts' },
-                        },
+    forkedAgentMocks.sendMessageStream.mockImplementation(async function* () {
+      if (forkedAgentMocks.sendMessageStream.mock.calls.length === 1) {
+        yield {
+          type: 'chunk',
+          value: {
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      functionCall: {
+                        id: 'call_123',
+                        name: 'read_file',
+                        args: { path: 'a.ts' },
                       },
-                    ],
-                  },
+                    },
+                  ],
                 },
-              ],
-            },
-          };
-        }
-      },
-    );
+              },
+            ],
+          },
+        };
+      }
+    });
 
     const state = await startSpeculation(config, 'read a.ts');
     await vi.waitFor(() => {
@@ -97,9 +95,7 @@ describe('startSpeculation', () => {
 
     expect(execute).toHaveBeenCalledOnce();
     expect(state.messages[1].parts?.[0].functionCall?.id).toBe('call_123');
-    expect(state.messages[2].parts?.[0].functionResponse?.id).toBe(
-      'call_123',
-    );
+    expect(state.messages[2].parts?.[0].functionResponse?.id).toBe('call_123');
 
     await abortSpeculation(state);
   });
@@ -156,7 +152,7 @@ describe('ensureToolResultPairing', () => {
           { functionCall: { name: 'edit', args: {} } },
         ],
       },
-      // No functionResponse follows — boundary truncation
+      // No functionResponse follows ï¿½ boundary truncation
     ];
     const result = ensureToolResultPairing(messages);
     expect(result).toHaveLength(2);

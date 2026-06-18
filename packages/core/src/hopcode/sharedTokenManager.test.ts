@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  *
  */
@@ -835,7 +835,9 @@ describe('SharedTokenManager', () => {
 
   describe('CredentialsClearRequiredError handling', () => {
     it('should clear memory cache when CredentialsClearRequiredError is thrown during refresh', async () => {
-      const { CredentialsClearRequiredError } = await import('./hopCodeOAuth2.js');
+      const { CredentialsClearRequiredError } = await import(
+        './hopCodeOAuth2.js'
+      );
 
       const tokenManager = SharedTokenManager.getInstance();
       tokenManager.clearCache();
@@ -899,7 +901,9 @@ describe('SharedTokenManager', () => {
     });
 
     it('should convert CredentialsClearRequiredError to TokenManagerError', async () => {
-      const { CredentialsClearRequiredError } = await import('./hopCodeOAuth2.js');
+      const { CredentialsClearRequiredError } = await import(
+        './hopCodeOAuth2.js'
+      );
 
       const tokenManager = SharedTokenManager.getInstance();
       tokenManager.clearCache();

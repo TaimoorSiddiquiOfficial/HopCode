@@ -20,7 +20,7 @@
 
 ## 🎉 News
 
-- **2026-04-15**: HopCode OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `qwen auth` to configure.
+- **2026-04-15**: HopCode OAuth free tier has been discontinued. To continue using HopCode, switch to [Alibaba Cloud Coding Plan](https://modelstudio.console.alibabacloud.com/?tab=coding-plan#/efm/coding-plan-index), [OpenRouter](https://openrouter.ai), [Fireworks AI](https://app.fireworks.ai), or bring your own API key. Run `hopcode auth` to configure.
 
 - **2026-04-13**: HopCode OAuth free tier policy update: daily quota adjusted to 100 requests/day (from 1,000).
 

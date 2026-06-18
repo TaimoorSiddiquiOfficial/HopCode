@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -73,7 +73,7 @@ class JsonRpcConnection {
     try {
       await this.sendRequest('shutdown', {});
     } catch (_error) {
-      // Ignore shutdown errors – the server may already be gone.
+      // Ignore shutdown errors ï¿½ the server may already be gone.
     } finally {
       this.end();
     }

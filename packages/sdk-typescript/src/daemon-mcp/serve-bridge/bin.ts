@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -48,7 +48,9 @@ process.on('SIGTERM', shutdown);
 process.on('unhandledRejection', (err) => {
   const detail =
     err instanceof Error ? (err.stack ?? err.message) : String(err);
-  process.stderr.write(`[hopcode-serve-bridge] unhandled rejection: ${detail}\n`);
+  process.stderr.write(
+    `[hopcode-serve-bridge] unhandled rejection: ${detail}\n`,
+  );
   process.exit(1);
 });
 

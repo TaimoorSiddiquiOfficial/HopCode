@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -111,7 +111,8 @@ describe('buildDaemonLogLine', () => {
 describe('initDaemonLogger opt-out', () => {
   const originalEnv = process.env['HOPCODE_DAEMON_LOG_FILE'];
   afterEach(() => {
-    if (originalEnv === undefined) delete process.env['HOPCODE_DAEMON_LOG_FILE'];
+    if (originalEnv === undefined)
+      delete process.env['HOPCODE_DAEMON_LOG_FILE'];
     else process.env['HOPCODE_DAEMON_LOG_FILE'] = originalEnv;
   });
 

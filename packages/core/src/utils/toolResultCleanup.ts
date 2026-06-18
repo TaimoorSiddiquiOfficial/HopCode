@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,9 +60,7 @@ export async function cleanupOldToolResults(
     );
   }
   if (result.errors > 0) {
-    debugLogger.warn(
-      `${result.errors} errors during tool result cleanup`,
-    );
+    debugLogger.warn(`${result.errors} errors during tool result cleanup`);
   }
 
   return result;

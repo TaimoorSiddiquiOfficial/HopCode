@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -375,7 +375,7 @@ describe('TmuxBackend', () => {
     await backend.init();
     await spawnWithTimers(backend, makeConfig('a'));
 
-    // Pane stays alive — without cleanup, waitForAll would hang
+    // Pane stays alive ï¿½ without cleanup, waitForAll would hang
     hoistedTmuxListPanes.mockResolvedValue([
       { paneId: '%0', dead: false, deadStatus: 0 },
     ]);

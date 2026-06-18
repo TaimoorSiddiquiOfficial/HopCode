@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -64,21 +64,21 @@ export async function detectBackend(
   //
   // // 2. Auto-detect
   // if (process.env['TMUX']) {
-  //   debugLogger.info('Detected $TMUX — attempting TmuxBackend');
+  //   debugLogger.info('Detected $TMUX ï¿½ attempting TmuxBackend');
   //   return { backend: new TmuxBackend() };
   // }
   //
   // // Other terminals (including iTerm2): use tmux external session mode if available.
   // if (isTmuxAvailable()) {
   //   debugLogger.info(
-  //     'tmux is available — using TmuxBackend external session mode',
+  //     'tmux is available ï¿½ using TmuxBackend external session mode',
   //   );
   //   return { backend: new TmuxBackend() };
   // }
   //
   // // Fallback: use InProcessBackend
   // debugLogger.info(
-  //   'No PTY backend available — falling back to InProcessBackend',
+  //   'No PTY backend available ï¿½ falling back to InProcessBackend',
   // );
   // return {
   //   backend: new InProcessBackend(runtimeContext),

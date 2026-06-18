@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -339,7 +339,7 @@ export function useImagePaste({
 
           if (runningTotal + file.size > MAX_TOTAL_IMAGE_SIZE) {
             errors.push(
-              `Skipping image "${file.name || 'pasted image'}" – total attachment size would exceed ${formatFileSize(MAX_TOTAL_IMAGE_SIZE)}.`,
+              `Skipping image "${file.name || 'pasted image'}" ï¿½ total attachment size would exceed ${formatFileSize(MAX_TOTAL_IMAGE_SIZE)}.`,
             );
             continue;
           }

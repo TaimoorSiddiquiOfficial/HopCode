@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,11 +11,11 @@
  * agent panes on the right, arranged via `main-vertical`.
  *
  * +-----------------------------------------------+
- * ¦            ¦             Agent 1              ¦
- * ¦   Leader   +----------------------------------¦
- * ¦   (30%)    ¦             Agent 2              ¦
- * ¦            +----------------------------------¦
- * ¦            ¦             Agent 3              ¦
+ * ï¿½            ï¿½             Agent 1              ï¿½
+ * ï¿½   Leader   +----------------------------------ï¿½
+ * ï¿½   (30%)    ï¿½             Agent 2              ï¿½
+ * ï¿½            +----------------------------------ï¿½
+ * ï¿½            ï¿½             Agent 3              ï¿½
  * +-----------------------------------------------+
  *
  * Outside tmux: a dedicated tmux server is created and panes are arranged
@@ -229,7 +229,7 @@ export class TmuxBackend implements Backend {
       this.startExitPolling();
 
       debugLogger.info(
-        `[spawnAgentAsync] Spawned agent "${agentId}" in pane ${paneId} — SUCCESS`,
+        `[spawnAgentAsync] Spawned agent "${agentId}" in pane ${paneId} ï¿½ SUCCESS`,
       );
     } catch (error) {
       debugLogger.error(
@@ -279,7 +279,7 @@ export class TmuxBackend implements Backend {
   stopAgent(agentId: string): void {
     const pane = this.panes.get(agentId);
     if (!pane || pane.status !== 'running') return;
-    // Kill the pane outright — a single Ctrl-C only cancels the current
+    // Kill the pane outright ï¿½ a single Ctrl-C only cancels the current
     // turn in interactive CLI agents and does not reliably exit the process.
     if (pane.paneId) {
       void tmuxKillPane(pane.paneId, this.getServerName());
@@ -414,7 +414,7 @@ export class TmuxBackend implements Backend {
     // tmux panes are rendered by tmux itself. capture-pane is available
     // but returns raw text. For the progress bar we don't need snapshots;
     // full rendering is handled by tmux directly.
-    // Return null — the UI doesn't use snapshots for split-pane backends.
+    // Return null ï¿½ the UI doesn't use snapshots for split-pane backends.
     return null;
   }
 
@@ -544,7 +544,7 @@ export class TmuxBackend implements Backend {
     const paneCount = panes.length;
     if (paneCount === 1) {
       debugLogger.info(
-        `[spawnInsideTmux] First agent — split -h -l ${options.firstSplitPercent}% from ${this.mainPaneId}`,
+        `[spawnInsideTmux] First agent ï¿½ split -h -l ${options.firstSplitPercent}% from ${this.mainPaneId}`,
       );
       return await tmuxSplitWindow(this.mainPaneId, {
         horizontal: true,
@@ -583,7 +583,7 @@ export class TmuxBackend implements Backend {
       );
       this.mainPaneId = firstPaneId;
       debugLogger.info(
-        `[spawnOutsideTmux] First agent — respawn in pane ${firstPaneId}`,
+        `[spawnOutsideTmux] First agent ï¿½ respawn in pane ${firstPaneId}`,
       );
       await tmuxRespawnPane(firstPaneId, cmd, serverName);
       return firstPaneId;
@@ -775,11 +775,11 @@ export class TmuxBackend implements Backend {
 
       const info = paneMap.get(agent.paneId);
       if (!info) {
-        // Pane was killed externally — treat as exited
+        // Pane was killed externally ï¿½ treat as exited
         agent.status = 'exited';
         agent.exitCode = 1;
         debugLogger.info(
-          `[pollPaneStatus] Agent "${agent.agentId}" pane ${agent.paneId} not found in tmux list — marking as exited`,
+          `[pollPaneStatus] Agent "${agent.agentId}" pane ${agent.paneId} not found in tmux list ï¿½ marking as exited`,
         );
         this.onExitCallback?.(agent.agentId, 1, null);
         continue;

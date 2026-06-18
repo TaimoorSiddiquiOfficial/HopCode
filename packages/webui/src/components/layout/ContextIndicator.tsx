@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  *
  * ContextIndicator component - Shows context usage as a circular progress indicator
@@ -86,13 +86,13 @@ export const ContextIndicator: FC<ContextIndicatorProps> = ({
   const tooltipContent = (
     <div className="flex flex-col gap-1">
       <div className="font-medium">
-        {percentFormatted}% • {formatNumber(contextUsage.usedTokens)} /{' '}
+        {percentFormatted}% ï¿½ {formatNumber(contextUsage.usedTokens)} /{' '}
         {formatNumber(contextUsage.tokenLimit)} context used
       </div>
     </div>
   );
 
-  const ariaLabel = `${percentFormatted}% • ${formatNumber(contextUsage.usedTokens)} / ${formatNumber(contextUsage.tokenLimit)} context used`;
+  const ariaLabel = `${percentFormatted}% ï¿½ ${formatNumber(contextUsage.usedTokens)} / ${formatNumber(contextUsage.tokenLimit)} context used`;
 
   return (
     <Tooltip content={tooltipContent} position="top">

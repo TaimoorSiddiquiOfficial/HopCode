@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -586,7 +586,7 @@ export class LspServerManager {
    * Check if command exists by spawning it with --version.
    * Only returns false when the spawn itself fails (e.g. ENOENT).
    * A timeout means the process started successfully (command exists)
-   * but didn't exit in time — common for servers like jdtls that
+   * but didn't exit in time ï¿½ common for servers like jdtls that
    * don't support --version and start their full runtime instead.
    *
    * @param command - The command to check
@@ -622,7 +622,7 @@ export class LspServerManager {
       });
 
       // If the process is still running after the timeout, it means the
-      // command was found and started — it just didn't finish in time.
+      // command was found and started ï¿½ it just didn't finish in time.
       // This is expected for servers like jdtls that don't support --version.
       setTimeout(() => {
         if (!settled) {

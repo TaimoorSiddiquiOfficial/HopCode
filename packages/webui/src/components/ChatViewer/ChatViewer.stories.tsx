@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -383,11 +383,11 @@ Looking at the project structure, I found the following relevant files:
 \`\`\`
 packages/chrome-extension/
 +-- src/
-¦   +-- service-worker.ts      # Main service worker
-¦   +-- native-messaging/
-¦   ¦   +-- host.ts            # Native host communication
-¦   ¦   +-- protocol.ts        # Message protocol
-¦   +-- manifest.json          # Extension manifest
+ï¿½   +-- service-worker.ts      # Main service worker
+ï¿½   +-- native-messaging/
+ï¿½   ï¿½   +-- host.ts            # Native host communication
+ï¿½   ï¿½   +-- protocol.ts        # Message protocol
+ï¿½   +-- manifest.json          # Extension manifest
 +-- native-host/
     +-- index.js               # Native host entry
     +-- com.hopcode.cli.bridge.json  # Host manifest
@@ -1320,7 +1320,7 @@ const PLAYGROUND_SAMPLE = `[
         "type": "diff",
         "path": "src/components/Modal.tsx",
         "oldText": null,
-        "newText": "import type { FC, ReactNode } from 'react';\\nimport './Modal.css';\\n\\nexport interface ModalProps {\\n  isOpen: boolean;\\n  onClose: () => void;\\n  title: string;\\n  children: ReactNode;\\n}\\n\\nexport const Modal: FC<ModalProps> = ({\\n  isOpen,\\n  onClose,\\n  title,\\n  children,\\n}) => {\\n  if (!isOpen) return null;\\n\\n  return (\\n    <div className=\\"modal-overlay\\">\\n      <div className=\\"modal-content\\">\\n        <header className=\\"modal-header\\">\\n          <h2>{title}</h2>\\n          <button onClick={onClose}>×</button>\\n        </header>\\n        <div className=\\"modal-body\\">\\n          {children}\\n        </div>\\n      </div>\\n    </div>\\n  );\\n};"
+        "newText": "import type { FC, ReactNode } from 'react';\\nimport './Modal.css';\\n\\nexport interface ModalProps {\\n  isOpen: boolean;\\n  onClose: () => void;\\n  title: string;\\n  children: ReactNode;\\n}\\n\\nexport const Modal: FC<ModalProps> = ({\\n  isOpen,\\n  onClose,\\n  title,\\n  children,\\n}) => {\\n  if (!isOpen) return null;\\n\\n  return (\\n    <div className=\\"modal-overlay\\">\\n      <div className=\\"modal-content\\">\\n        <header className=\\"modal-header\\">\\n          <h2>{title}</h2>\\n          <button onClick={onClose}>ï¿½</button>\\n        </header>\\n        <div className=\\"modal-body\\">\\n          {children}\\n        </div>\\n      </div>\\n    </div>\\n  );\\n};"
       }],
       "locations": [{ "path": "src/components/Modal.tsx" }]
     }
@@ -1559,10 +1559,10 @@ const PlaygroundTemplate = () => {
           }}
         >
           <strong>Supported message types:</strong>
-          <br />• <code>user</code> - User messages with{' '}
+          <br />ï¿½ <code>user</code> - User messages with{' '}
           <code>message.parts[].text</code> or <code>message.content</code>
-          <br />• <code>assistant</code> - AI responses
-          <br />• <code>tool_call</code> - Tool calls with{' '}
+          <br />ï¿½ <code>assistant</code> - AI responses
+          <br />ï¿½ <code>tool_call</code> - Tool calls with{' '}
           <code>toolCall.kind</code> (read, write, edit, bash, grep, etc.)
         </div>
       </div>

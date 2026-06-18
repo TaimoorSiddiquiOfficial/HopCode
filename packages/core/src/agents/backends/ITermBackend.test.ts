@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -448,7 +448,7 @@ describe('ITermBackend', () => {
     // Reset to track future reads
     hoistedFsReadFile.mockClear();
 
-    // Advance more — should not poll anymore
+    // Advance more ï¿½ should not poll anymore
     await vi.advanceTimersByTimeAsync(2000);
     expect(hoistedFsReadFile).not.toHaveBeenCalled();
   });
