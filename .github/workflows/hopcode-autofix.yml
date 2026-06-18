@@ -1,4 +1,4 @@
-name: 'Qwen Autofix'
+name: 'HopCode Autofix'
 
 # One workflow for the whole autonomous-fix lifecycle:
 #
@@ -55,7 +55,7 @@ env:
   # PRs are ever eligible for the review phase — never a fork or another branch.
   AUTOFIX_BOT: 'hopcode-dev-bot'
   BRANCH_PREFIX: 'autofix/issue-'
-  # The automated Qwen PR reviewer posts as this account; its review counts as
+  # The automated HopCode PR reviewer posts as this account; its review counts as
   # actionable feedback even though it is not a human collaborator.
   REVIEW_BOT: 'hopcode-ci-bot'
   # Human reviews/comments only count when the author is a real maintainer. This
@@ -116,7 +116,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     timeout-minutes: 180
     concurrency:
-      group: 'qwen-autofix-issue'
+      group: 'hopcode-autofix-issue'
       cancel-in-progress: false
     permissions:
       contents: 'read'
@@ -711,7 +711,7 @@ jobs:
       matrix:
         target: '${{ fromJSON(needs.review-scan.outputs.targets) }}'
     concurrency:
-      group: 'qwen-autofix-review-${{ matrix.target.pr }}'
+      group: 'hopcode-autofix-review-${{ matrix.target.pr }}'
       cancel-in-progress: false
     env:
       REPO: '${{ github.repository }}'

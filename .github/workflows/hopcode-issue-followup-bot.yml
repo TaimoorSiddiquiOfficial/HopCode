@@ -1,4 +1,4 @@
-name: 'Qwen Issue Follow-up Bot'
+name: 'HopCode Issue Follow-up Bot'
 
 # Required for automatic runs:
 # - Repository variable HOPCODE_ISSUE_FOLLOWUP_BOT_ENABLED=true.
@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       issue_number:
-        description: 'Optional issue number. Leave empty to let Qwen select scheduled candidates.'
+        description: 'Optional issue number. Leave empty to let HopCode select scheduled candidates.'
         required: false
         type: 'number'
       dry_run:
@@ -53,7 +53,7 @@ jobs:
     timeout-minutes: 15
     if: |-
       ${{
-        github.repository == 'QwenLM/hopcode' &&
+        github.repository == 'TaimoorSiddiquiOfficial/HopCode' &&
         (github.event_name == 'workflow_dispatch' || vars.HOPCODE_ISSUE_FOLLOWUP_BOT_ENABLED == 'true') &&
         (github.event_name != 'issues' || github.event.issue.pull_request == null)
       }}
@@ -88,7 +88,7 @@ jobs:
           fi
 
           real_gh="$(command -v gh)"
-          safe_gh_dir="${RUNNER_TEMP}/qwen-safe-gh"
+          safe_gh_dir="${RUNNER_TEMP}/hopcode-safe-gh"
           mkdir -p "${safe_gh_dir}"
           # The shim intentionally accepts only subcommand-first `gh` calls
           # with explicit long-form mutation flags; global flags and short
@@ -291,8 +291,8 @@ jobs:
           echo "scheduled_limit=${SCHEDULED_LIMIT_INPUT}" >> "${GITHUB_OUTPUT}"
           echo "Issue follow-up state: event=${EVENT_NAME} dispatch_dry=${DISPATCH_DRY_RUN} issues_dry=${ISSUE_OPENED_DRY_RUN} schedule_dry=${SCHEDULE_DRY_RUN} resolved_dry_run=${dry_run} scheduled_limit=${SCHEDULED_LIMIT_INPUT}"
 
-      - name: 'Run Qwen issue follow-up'
-        uses: 'QwenLM/hopcode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
+      - name: 'Run HopCode issue follow-up'
+        uses: 'TaimoorSiddiquiOfficial/HopCode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
         env:
           GITHUB_TOKEN: '${{ env.BOT_GITHUB_TOKEN }}'
           GH_TOKEN: '${{ env.BOT_GITHUB_TOKEN }}'
@@ -361,15 +361,15 @@ jobs:
             - Skip closed issues, pull requests, issues assigned to anyone, and
               issues that already appear to be handled by maintainers.
             - Treat comments from repository collaborators, members, owners, or
-              the Qwen bot itself as existing follow-up. Skip those issues.
+              the HopCode bot itself as existing follow-up. Skip those issues.
             - Skip issues that already have one of these marker comments unless
               this is a manual `workflow_dispatch` run for that exact issue:
-              - `<!-- qwen-issue-bot:invalid -->`
-              - `<!-- qwen-issue-bot:needs-info -->`
-              - `<!-- qwen-issue-bot:related -->`
-              - `<!-- qwen-issue-bot:welcome-pr -->`
-              - `<!-- qwen-maintain:welcome-pr -->`
-              - `<!-- qwen-maintain:pr-intake -->`
+              - `<!-- hopcode-issue-bot:invalid -->`
+              - `<!-- hopcode-issue-bot:needs-info -->`
+              - `<!-- hopcode-issue-bot:related -->`
+              - `<!-- hopcode-issue-bot:welcome-pr -->`
+              - `<!-- hopcode-maintain:welcome-pr -->`
+              - `<!-- hopcode-maintain:pr-intake -->`
             - Do not assign issues to people in this phase.
             - Do not close issues in this workflow version.
             - Add labels only. Do not remove any labels, including
@@ -414,9 +414,9 @@ jobs:
 
             Put one of these hidden markers at the beginning of bot comments:
 
-            - Invalid issue: `<!-- qwen-issue-bot:invalid -->`
-            - Needs information: `<!-- qwen-issue-bot:needs-info -->`
-            - Related issues: `<!-- qwen-issue-bot:related -->`
+            - Invalid issue: `<!-- hopcode-issue-bot:invalid -->`
+            - Needs information: `<!-- hopcode-issue-bot:needs-info -->`
+            - Related issues: `<!-- hopcode-issue-bot:related -->`
 
             ## Execution Guidance
 
@@ -435,10 +435,10 @@ jobs:
               interpret `\n`, so writing the literal two characters `\` and
               `n` collapses the comment onto a single line on GitHub. Either
               break the argument across multiple lines, for example
-              `--body "<!-- qwen-issue-bot:related -->`, then a blank line,
+              `--body "<!-- hopcode-issue-bot:related -->`, then a blank line,
               then `This appears related to ...`, then ``- #1234 - ...``,
               all inside the same double-quoted argument; or use ANSI-C
-              quoting like `--body $'<!-- qwen-issue-bot:related -->\n\nThis appears ...\n\n- #1234 - ...'`.
+              quoting like `--body $'<!-- hopcode-issue-bot:related -->\n\nThis appears ...\n\n- #1234 - ...'`.
             - Do not update existing comments through `gh api`; skip issues with
               an existing marker comment unless a human explicitly re-runs this
               workflow for that issue.

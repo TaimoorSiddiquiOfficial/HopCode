@@ -1,4 +1,4 @@
-name: '🧐 Qwen Pull Request Review'
+name: '🧐 HopCode Pull Request Review'
 
 on:
   pull_request_target:
@@ -39,8 +39,8 @@ concurrency:
   # Comment/review events use per-run groups to avoid cancelling active reviews.
   group: >-
     ${{ github.event_name == 'pull_request_target' &&
-    format('qwen-pr-review-pr-{0}', github.event.pull_request.number) ||
-    format('qwen-pr-review-run-{0}', github.run_id) }}
+    format('hopcode-pr-review-pr-{0}', github.event.pull_request.number) ||
+    format('hopcode-pr-review-run-{0}', github.run_id) }}
   cancel-in-progress: "${{ github.event_name == 'pull_request_target' && github.event.action == 'synchronize' }}"
 
 jobs:
@@ -54,30 +54,6 @@ jobs:
       ((github.event_name == 'issue_comment' &&
         github.event.issue.pull_request &&
         github.event.issue.state == 'open' &&
-<<<<<<< HEAD:.github/workflows/hopcode-pr-review.yml
-        (github.event.comment.body == '@hopcode /review' ||
-         startsWith(github.event.comment.body, '@hopcode /review ') ||
-         startsWith(github.event.comment.body, format('@hopcode /review{0}', '\n'))) &&
-        (github.event.comment.author_association == 'OWNER' ||
-         github.event.comment.author_association == 'MEMBER' ||
-         github.event.comment.author_association == 'COLLABORATOR')) ||
-      (github.event_name == 'pull_request_review_comment' &&
-        github.event.pull_request.state == 'open' &&
-        (github.event.comment.body == '@hopcode /review' ||
-         startsWith(github.event.comment.body, '@hopcode /review ') ||
-         startsWith(github.event.comment.body, format('@hopcode /review{0}', '\n'))) &&
-        (github.event.comment.author_association == 'OWNER' ||
-         github.event.comment.author_association == 'MEMBER' ||
-         github.event.comment.author_association == 'COLLABORATOR')) ||
-      (github.event_name == 'pull_request_review' &&
-        github.event.pull_request.state == 'open' &&
-        (github.event.review.body == '@hopcode /review' ||
-         startsWith(github.event.review.body, '@hopcode /review ') ||
-         startsWith(github.event.review.body, format('@hopcode /review{0}', '\n'))) &&
-        (github.event.review.author_association == 'OWNER' ||
-         github.event.review.author_association == 'MEMBER' ||
-         github.event.review.author_association == 'COLLABORATOR'))
-=======
         (github.event.comment.body == '@hopcode /review' ||
          startsWith(github.event.comment.body, '@hopcode /review ') ||
          startsWith(github.event.comment.body, format('@hopcode /review{0}', '\n')))) ||
@@ -91,9 +67,8 @@ jobs:
         (github.event.review.body == '@hopcode /review' ||
          startsWith(github.event.review.body, '@hopcode /review ') ||
          startsWith(github.event.review.body, format('@hopcode /review{0}', '\n')))))
->>>>>>> upstream/main:.github/workflows/hopcode-pr-review.yml
     concurrency:
-      group: 'qwen-pr-ack-${{ github.event.issue.number || github.event.pull_request.number }}'
+      group: 'hopcode-pr-ack-${{ github.event.issue.number || github.event.pull_request.number }}'
       cancel-in-progress: false
     runs-on: 'ubuntu-latest'
     timeout-minutes: 5
@@ -113,12 +88,12 @@ jobs:
             echo "PR #${PR_NUMBER} is ${PR_STATE}; skipping acknowledgement." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          ACK_BODY="<!-- qwen-review-ack -->_HopCode review request accepted. Review is queued in [workflow run](${RUN_URL})._"
+          ACK_BODY="<!-- hopcode-review-ack -->_HopCode review request accepted. Review is queued in [workflow run](${RUN_URL})._"
           EXISTING_ACK_ID="$(
             gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
               --paginate \
               -F per_page=100 \
-              | jq -sr '[.[][] | select(.body | contains("<!-- qwen-review-ack -->")) | select(.user.login == "github-actions[bot]")] | last | .id // empty'
+              | jq -sr '[.[][] | select(.body | contains("<!-- hopcode-review-ack -->")) | select(.user.login == "github-actions[bot]")] | last | .id // empty'
           )" || EXISTING_ACK_ID=""
           if [ -n "$EXISTING_ACK_ID" ]; then
             gh api \
@@ -159,7 +134,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     # Configured in repo settings with a 30-minute wait timer.
     environment:
-      name: 'qwen-pr-review-delay'
+      name: 'hopcode-pr-review-delay'
       deployment: false
     permissions:
       contents: 'read'
@@ -304,30 +279,6 @@ jobs:
       (github.event_name == 'issue_comment' &&
         github.event.issue.pull_request &&
         github.event.issue.state == 'open' &&
-<<<<<<< HEAD:.github/workflows/hopcode-pr-review.yml
-        (github.event.comment.body == '@hopcode /review' ||
-         startsWith(github.event.comment.body, '@hopcode /review ') ||
-         startsWith(github.event.comment.body, format('@hopcode /review{0}', '\n'))) &&
-        (github.event.comment.author_association == 'OWNER' ||
-         github.event.comment.author_association == 'MEMBER' ||
-         github.event.comment.author_association == 'COLLABORATOR')) ||
-      (github.event_name == 'pull_request_review_comment' &&
-        github.event.pull_request.state == 'open' &&
-        (github.event.comment.body == '@hopcode /review' ||
-         startsWith(github.event.comment.body, '@hopcode /review ') ||
-         startsWith(github.event.comment.body, format('@hopcode /review{0}', '\n'))) &&
-        (github.event.comment.author_association == 'OWNER' ||
-         github.event.comment.author_association == 'MEMBER' ||
-         github.event.comment.author_association == 'COLLABORATOR')) ||
-      (github.event_name == 'pull_request_review' &&
-        github.event.pull_request.state == 'open' &&
-        (github.event.review.body == '@hopcode /review' ||
-         startsWith(github.event.review.body, '@hopcode /review ') ||
-         startsWith(github.event.review.body, format('@hopcode /review{0}', '\n'))) &&
-        (github.event.review.author_association == 'OWNER' ||
-         github.event.review.author_association == 'MEMBER' ||
-         github.event.review.author_association == 'COLLABORATOR')))
-=======
         (github.event.comment.body == '@hopcode /review' ||
          startsWith(github.event.comment.body, '@hopcode /review ') ||
          startsWith(github.event.comment.body, format('@hopcode /review{0}', '\n'))) &&
@@ -344,16 +295,15 @@ jobs:
          startsWith(github.event.review.body, '@hopcode /review ') ||
          startsWith(github.event.review.body, format('@hopcode /review{0}', '\n'))) &&
         needs.authorize.outputs.should_review == 'true'))
->>>>>>> upstream/main:.github/workflows/hopcode-pr-review.yml
     timeout-minutes: 90
-    runs-on: ['self-hosted', 'linux', 'x64', 'ecs-qwen']
+    runs-on: ['self-hosted', 'linux', 'x64', 'ecs-hopcode']
     permissions:
       contents: 'read'
       pull-requests: 'write'
       issues: 'write'
     steps:
       # Self-hosted runners reuse the workspace, so an interrupted review can
-      # leave a stale `.hopcode/tmp/review-pr-*` worktree or `qwen-review/*` branch
+      # leave a stale `.hopcode/tmp/review-pr-*` worktree or `hopcode-review/*` branch
       # that trips the checkout below. Prune defensively; never fail the job.
       - name: 'Clean stale review worktrees'
         run: |-
@@ -366,7 +316,7 @@ jobs:
           fi
           rm -rf .hopcode/tmp/review-pr-* 2>/dev/null || true
           git worktree prune -v || true
-          git for-each-ref --format='%(refname:short)' 'refs/heads/qwen-review/*' \
+          git for-each-ref --format='%(refname:short)' 'refs/heads/hopcode-review/*' \
             | while read -r stale_ref; do
                 if [ -n "$stale_ref" ]; then
                   git branch -D "$stale_ref" || true
@@ -448,20 +398,20 @@ jobs:
 
           REPO="${GITHUB_REPOSITORY}"
           REVIEW_URL="${GITHUB_SERVER_URL}/${REPO}/pull/${PR_NUMBER}"
-          LOG_PATH="${RUNNER_TEMP:-/tmp}/qwen-review-pr-${PR_NUMBER}.jsonl"
+          LOG_PATH="${RUNNER_TEMP:-/tmp}/hopcode-review-pr-${PR_NUMBER}.jsonl"
           trap 'rm -f "$LOG_PATH"' EXIT
 
           if [ -z "${GH_TOKEN:-}" ]; then
-            fail "CI_BOT_PAT secret is required for Qwen PR review."
+            fail "CI_BOT_PAT secret is required for HopCode PR review."
           fi
           if [ -z "${OPENAI_API_KEY:-}" ]; then
-            fail "REVIEW_OPENAI_API_KEY secret is required for Qwen PR review."
+            fail "REVIEW_OPENAI_API_KEY secret is required for HopCode PR review."
           fi
           if [ -z "${OPENAI_BASE_URL:-}" ]; then
-            fail "REVIEW_OPENAI_BASE_URL secret is required for Qwen PR review."
+            fail "REVIEW_OPENAI_BASE_URL secret is required for HopCode PR review."
           fi
-          if ! command -v qwen >/dev/null 2>&1; then
-            fail "qwen CLI is required on the review runner."
+          if ! command -v hopcode >/dev/null 2>&1; then
+            fail "hopcode CLI is required on the review runner."
           fi
 
           # shellcheck disable=SC2016
@@ -477,14 +427,14 @@ jobs:
             export NO_PROXY="${NO_PROXY:+$NO_PROXY,}${openai_host}"
             export no_proxy="${no_proxy:+$no_proxy,}${openai_host}"
 
-            # qwen currently reads HTTP(S)_PROXY directly and does not apply
+            # hopcode currently reads HTTP(S)_PROXY directly and does not apply
             # NO_PROXY when constructing its proxy agent. Clear proxy env for
-            # qwen itself, while restoring it for child gh/git commands.
+            # hopcode itself, while restoring it for child gh/git commands.
             export HOPCODE_CI_HTTPS_PROXY="${HTTPS_PROXY:-}"
             export HOPCODE_CI_https_proxy="${https_proxy:-}"
             export HOPCODE_CI_HTTP_PROXY="${HTTP_PROXY:-}"
             export HOPCODE_CI_http_proxy="${http_proxy:-}"
-            proxy_bin="${RUNNER_TEMP:-/tmp}/qwen-network-bin"
+            proxy_bin="${RUNNER_TEMP:-/tmp}/hopcode-network-bin"
             mkdir -p "$proxy_bin"
 
             if command -v gh >/dev/null 2>&1; then
@@ -520,7 +470,7 @@ jobs:
             export PATH="$proxy_bin:$PATH"
             unset HTTPS_PROXY https_proxy HTTP_PROXY http_proxy
 
-            echo "HOPCODE_path=$(command -v qwen)"
+            echo "HOPCODE_path=$(command -v hopcode)"
             hopcode --version
             echo "openai_host=${openai_host}"
             echo "HOPCODE_http_proxy=disabled"
@@ -533,100 +483,34 @@ jobs:
 
           configure_HOPCODE_network
 
-          case "$TIMEOUT_MINUTES" in
-            ''|*[!0-9]*)
-              fail "Invalid timeout_minutes: ${TIMEOUT_MINUTES}"
-              ;;
-          esac
-          if [ "$TIMEOUT_MINUTES" -le 5 ]; then
-            fail "timeout_minutes must be greater than 5"
-          fi
-          if [ "$TIMEOUT_MINUTES" -gt 90 ]; then
-            fail "timeout_minutes must not exceed the 90 minute job timeout"
+          echo "Reviewing PR #${PR_NUMBER} (${REVIEW_URL})"
+          echo "Review mode: ${REVIEW_MODE}"
+          echo "Timeout: ${TIMEOUT_MINUTES} minutes"
+
+          REVIEW_ARGS=(
+            "--pr" "${PR_NUMBER}"
+            "--repo" "${REPO}"
+            "--timeout" "${TIMEOUT_MINUTES}"
+          )
+
+          if [ "${REVIEW_MODE}" = "dry-run" ]; then
+            REVIEW_ARGS+=("--dry-run")
           fi
 
-          if ! PR_STATE="$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state --jq '.state')"; then
-            fail "Failed to determine state for PR #${PR_NUMBER}."
-          fi
-          if [ "$PR_STATE" != "OPEN" ]; then
-            echo "Skipping: PR #${PR_NUMBER} is ${PR_STATE}." | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
+          hopcode /review "${REVIEW_ARGS[@]}" 2>&1 | tee "$LOG_PATH"
 
-          PROMPT="/review ${REVIEW_URL}"
-          if [ "$REVIEW_MODE" = "comment" ]; then
-            PROMPT="${PROMPT} --comment"
-          fi
+          echo "Review complete. Log saved to ${LOG_PATH}"
 
-          MODEL_ARGS=()
-          if [ -n "${OPENAI_MODEL:-}" ]; then
-            MODEL_ARGS=(--model "$OPENAI_MODEL")
-          fi
-
-          HOPCODE_TIMEOUT=$((TIMEOUT_MINUTES - 5))
-          set +e
-          # GNU timeout times out command children unless --foreground is used.
-          timeout --kill-after=10s "${HOPCODE_TIMEOUT}m" qwen \
-            --auth-type openai \
-            --approval-mode izn \
-            "${MODEL_ARGS[@]}" \
-            --prompt "$PROMPT" \
-            --output-format stream-json \
-            | tee "$LOG_PATH"
-          pipeline_status=("${PIPESTATUS[@]}")
-          set -e
-          HOPCODE_status="${pipeline_status[0]}"
-          tee_status="${pipeline_status[1]}"
-
-          if [ "$tee_status" -ne 0 ]; then
-            fail "Failed to write qwen review log."
-          fi
-          if [ "$HOPCODE_status" -eq 124 ]; then
-            fail "Qwen review timed out after ${HOPCODE_TIMEOUT} minutes."
-          fi
-          if [ "$HOPCODE_status" -ne 0 ]; then
-            fail "Qwen review exited with status ${HOPCODE_status}."
-          fi
-
-          if [ ! -s "$LOG_PATH" ]; then
-            fail "Qwen review completed but produced no output."
-          fi
-
-          # qwen can exit 0 even when the run aborted mid-review (e.g. the model
-          # connection dropped before the review was posted). In that case the
-          # final stream-json `result` event still renders the error inline and
-          # carries subtype=success / is_error=false, so the checks above all
-          # pass and the job goes green without ever posting a comment. Inspect
-          # the terminal `result` event explicitly and treat an errored or
-          # aborted run as a failure so the fallback-comment step runs.
-          RESULT_LINE="$(grep '"type":"result"' "$LOG_PATH" | tail -n1 || true)"
-          if [ -z "$RESULT_LINE" ]; then
-            fail "Qwen review produced no result event (run aborted before completion)."
-          fi
-          RESULT_IS_ERROR="$(printf '%s' "$RESULT_LINE" | jq -r '.is_error // false')"
-          RESULT_SUBTYPE="$(printf '%s' "$RESULT_LINE" | jq -r '.subtype // ""')"
-          RESULT_TEXT="$(printf '%s' "$RESULT_LINE" | jq -r '.result // ""')"
-          if [ "$RESULT_IS_ERROR" = "true" ] || [ "$RESULT_SUBTYPE" != "success" ]; then
-            fail "Qwen review ended in an error result (subtype=${RESULT_SUBTYPE}, is_error=${RESULT_IS_ERROR})."
-          fi
-          case "$RESULT_TEXT" in
-            *"[API Error"*)
-              fail "Qwen review aborted with an API error before posting comments."
-              ;;
-          esac
-
-      - name: 'Post fallback comment on failure'
-        if: |-
-          failure() &&
-          steps.context.outputs.should_run == 'true' &&
-          steps.context.outputs.review_mode == 'comment' &&
-          steps.context.outputs.pr_number != ''
+      - name: 'Report failure'
+        if: "failure() && steps.review.outcome == 'failure'"
         env:
-          GH_TOKEN: '${{ secrets.CI_BOT_PAT }}'
-          FAILURE_REASON: "${{ steps.review.outputs.failure_reason || 'Run review failed. See workflow logs for details.' }}"
+          GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           PR_NUMBER: '${{ steps.context.outputs.pr_number }}'
-          RUN_URL: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          FAILURE_REASON: '${{ steps.review.outputs.failure_reason }}'
         run: |-
+          set -euo pipefail
+          FAILURE_MSG="<!-- hopcode-review-failure -->_HopCode review failed: ${FAILURE_REASON:-unknown error}._"
           gh pr comment "$PR_NUMBER" \
             --repo "$GITHUB_REPOSITORY" \
-            --body "_HopCode review did not complete successfully: ${FAILURE_REASON} See [workflow logs](${RUN_URL})._"
+            --body "$FAILURE_MSG"
+          echo "Failure reported on PR #${PR_NUMBER}." >> "$GITHUB_STEP_SUMMARY"
