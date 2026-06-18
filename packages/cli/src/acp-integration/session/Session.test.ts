@@ -2610,7 +2610,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           items: [
             {
@@ -2744,7 +2744,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           items: [
             {
@@ -2848,7 +2848,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           items: [
             {
@@ -2934,7 +2934,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           items: Array.from({ length: 12 }, (_value, index) => ({
             content: [{ type: 'text', text: `mid-turn ${index}` }],
@@ -3024,7 +3024,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           items: [
             {
@@ -3126,7 +3126,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           payload: ['safe follow-up'],
         });
@@ -3185,7 +3185,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           items: [
             {
@@ -3282,7 +3282,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockClient.extMethod = vi.fn().mockResolvedValue({
           items: [
             {

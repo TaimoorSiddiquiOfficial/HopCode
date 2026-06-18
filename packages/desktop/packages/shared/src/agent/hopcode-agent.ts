@@ -1502,7 +1502,7 @@ function hopcodeInitializeTimeoutMs(): number {
 function mapPermissionModeToHopCode(mode: PermissionMode): string {
   switch (mode) {
     case 'allow-all':
-      return 'yolo';
+      return 'izn';
     case 'safe':
       return 'plan';
     case 'auto-edit':
@@ -1519,7 +1519,7 @@ function mapHopCodeModeToPermissionMode(
   switch (mode) {
     case 'plan':
       return 'safe';
-    case 'yolo':
+    case 'izn':
       return 'allow-all';
     case 'auto-edit':
       return 'auto-edit';
