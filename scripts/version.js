@@ -33,10 +33,14 @@ if (!versionType) {
   process.exit(1);
 }
 
-// 2. Bump the version in the root and all workspace package.json files.
+// 2. Bump the version in the root package.json file.
 run(`npm version ${versionType} --no-git-tag-version --allow-same-version`);
 
-// 3. Get all workspaces and bump them to the release version.
+// 3. Read the new root version so all workspaces can be aligned exactly.
+const rootPackageJsonPath = resolve(process.cwd(), 'package.json');
+const newVersion = readJson(rootPackageJsonPath).version;
+
+// 4. Get all workspaces and bump them to the release version.
 // Exclude third-party packages that may appear in npm ls --workspaces output
 // but are not owned by this repo (e.g., patched/vendored packages).
 const workspacesToExclude = ['ansi-sequence-parser'];
@@ -76,13 +80,9 @@ const workspacesToVersion = allWorkspaces.filter(
 
 for (const workspaceName of workspacesToVersion) {
   run(
-    `npm version ${versionType} --workspace ${workspaceName} --no-git-tag-version --allow-same-version`,
+    `npm version ${newVersion} --workspace ${workspaceName} --no-git-tag-version --allow-same-version`,
   );
 }
-
-// 4. Get the new version number from the root package.json
-const rootPackageJsonPath = resolve(process.cwd(), 'package.json');
-const newVersion = readJson(rootPackageJsonPath).version;
 
 // 5. Update the sandboxImageUri in the root package.json
 const rootPackageJson = readJson(rootPackageJsonPath);

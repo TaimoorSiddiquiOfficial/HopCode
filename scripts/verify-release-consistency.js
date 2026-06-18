@@ -9,7 +9,11 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
-const workspacesToExclude = new Set();
+const workspacesToExclude = new Set([
+  // `packages/desktop` is an isolated nested workspace (openwork) with its own
+  // release cadence; the root workspace explicitly excludes it with `!packages/desktop`.
+  'openwork',
+]);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));

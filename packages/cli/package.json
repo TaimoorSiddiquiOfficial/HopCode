@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode",
-  "version": "0.30.3",
+  "version": "0.30.4",
   "description": "HopCode",
   "repository": {
     "type": "git",
@@ -38,7 +38,7 @@
     "dist"
   ],
   "config": {
-    "sandboxImageUri": "ghcr.io/hopcode/hopcode:0.18.1"
+    "sandboxImageUri": "ghcr.io/hopcode/hopcode:0.30.4"
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^0.14.1",

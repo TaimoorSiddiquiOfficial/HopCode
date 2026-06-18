@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/acp-bridge",
-  "version": "0.30.3",
+  "version": "0.30.4",
   "description": "Shared ACP bridge core (createHttpAcpBridge factory, BridgeClient, defaultSpawnChannelFactory, BridgeFileSystem injection seam) + primitives (EventBus, AcpChannel, in-memory channel, PermissionMediator interface) used by hopcode serve, channels, IDE, TUI, and remote-control adapters.",
   "repository": {
     "type": "git",
