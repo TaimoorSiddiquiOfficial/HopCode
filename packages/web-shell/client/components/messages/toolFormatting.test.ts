@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest';
 import type { ACPToolCall } from '../../adapters/types';
 import {
   formatToolDisplayName,
+  getAgentCurrentToolHint,
   getToolDescription,
   getToolResultSummary,
+  localizeToolDisplayName,
+  TOOL_DISPLAY_NAMES,
 } from './toolFormatting';
+import { getTranslator } from '../../i18n';
 
 function tool(overrides: Partial<ACPToolCall>): ACPToolCall {
   return {
@@ -71,8 +75,7 @@ describe('toolFormatting', () => {
       getToolDescription(
         tool({
           args: {
-            file_path:
-              '/Users/ytahdn/Documents/Codes/alishu/hopcode/README.md',
+            file_path: '/Users/ytahdn/Documents/Codes/alishu/hopcode/README.md',
           },
         }),
         '/Users/ytahdn/Documents/Codes/hopcode/hopcode',
@@ -158,7 +161,9 @@ describe('toolFormatting', () => {
           },
         }),
       ),
-    ).toBe('cat ~/.hopcode/settings.json (查看 ~/.hopcode/settings.json 文件内容)');
+    ).toBe(
+      'cat ~/.hopcode/settings.json (查看 ~/.hopcode/settings.json 文件内容)',
+    );
   });
 
   it('summarizes read_file rawOutput by line count', () => {
@@ -189,5 +194,62 @@ describe('toolFormatting', () => {
     );
     expect(result.length).toBeLessThan(5000);
     expect(result.endsWith('...')).toBe(true);
+  });
+
+  describe('localizeToolDisplayName', () => {
+    it('translates known tool names in Chinese', () => {
+      const t = getTranslator('zh-CN');
+      expect(localizeToolDisplayName('todo_write', t)).toBe('任务清单');
+      expect(localizeToolDisplayName('run_shell_command', t)).toBe('运行命令');
+      expect(localizeToolDisplayName('read_file', t)).toBe('读取文件');
+    });
+
+    it('keeps proper tool names / acronyms in English', () => {
+      const t = getTranslator('zh-CN');
+      expect(localizeToolDisplayName('agent', t)).toBe('Agent');
+      expect(localizeToolDisplayName('grep_search', t)).toBe('Grep');
+      expect(localizeToolDisplayName('glob', t)).toBe('Glob');
+      expect(localizeToolDisplayName('lsp', t)).toBe('LSP');
+    });
+
+    it('falls back to the English display name when the locale has no entry', () => {
+      const t = getTranslator('en');
+      expect(localizeToolDisplayName('todo_write', t)).toBe('TodoWrite');
+      expect(localizeToolDisplayName('grep_search', t)).toBe('Grep');
+    });
+
+    it('falls back to the raw wire name for unknown tools', () => {
+      expect(
+        localizeToolDisplayName('mystery_tool', getTranslator('zh-CN')),
+      ).toBe('mystery_tool');
+    });
+
+    it('has a zh translation for every tool in the display-name map', () => {
+      const tZh = getTranslator('zh-CN');
+      // Tools intentionally shown in English (proper names / acronyms).
+      const keepEnglish = new Set(['agent', 'grep_search', 'glob', 'search']);
+      const untranslated = Object.keys(TOOL_DISPLAY_NAMES).filter(
+        (wire) =>
+          !keepEnglish.has(wire) &&
+          localizeToolDisplayName(wire, tZh) === formatToolDisplayName(wire),
+      );
+      expect(untranslated).toEqual([]);
+    });
+
+    it('localizes the tool name in the agent activity hint', () => {
+      const agent = tool({
+        toolName: 'agent',
+        status: 'in_progress',
+        subTools: [
+          tool({ toolName: 'run_shell_command', status: 'in_progress' }),
+        ],
+      });
+      expect(getAgentCurrentToolHint(agent, getTranslator('zh-CN'))).toContain(
+        '运行命令',
+      );
+      expect(getAgentCurrentToolHint(agent, getTranslator('en'))).toContain(
+        'Shell',
+      );
+    });
   });
 });
