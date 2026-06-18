@@ -866,11 +866,11 @@ describe('SessionPicker', () => {
 
       await wait(100);
       stdin.write('/special');
-      await wait(30);
+      await flush();
 
       // First Enter: search → list, query stays applied, no resume.
       stdin.write('\r');
-      await wait(30);
+      await flush();
       expect(onSelect).not.toHaveBeenCalled();
       const afterFirstEnter = lastFrame() ?? '';
       expect(afterFirstEnter).toContain('Filter:');
@@ -878,7 +878,7 @@ describe('SessionPicker', () => {
 
       // Second Enter from list view selects the highlighted row.
       stdin.write('\r');
-      await wait(30);
+      await flush();
       expect(onSelect).toHaveBeenCalledWith('matching');
     });
 
