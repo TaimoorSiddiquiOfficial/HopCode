@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import type { AgentBackend } from '@craft-agent/shared/agent/backend';
 import type { Workspace } from '@craft-agent/shared/config';
-import { RPC_CHANNELS } from '@craft-agent/shared/protocol';
+import { RPC_CHANNELS, type FileAttachment } from '@craft-agent/shared/protocol';
 import {
   loadSession,
   saveSession,
@@ -1283,7 +1283,7 @@ describe('Qwen native history loading', () => {
         sdkSessionId: sessionId,
         sdkCwd: workspaceRoot,
         workingDirectory: workspaceRoot,
-        name: 'existing qwen title',
+        name: 'existing hopcode title',
         llmConnection: 'hopcode',
         lastMessageAt: timestamp,
       },
@@ -1368,7 +1368,7 @@ describe('Qwen native history loading', () => {
         sdkSessionId: sessionId,
         sdkCwd: workspaceRoot,
         workingDirectory: workspaceRoot,
-        name: 'existing qwen title',
+        name: 'existing hopcode title',
         llmConnection: 'hopcode',
         lastMessageAt: timestamp,
       },
@@ -1388,6 +1388,644 @@ describe('Qwen native history loading', () => {
     expect(persisted?.messages).toHaveLength(1);
     expect(persisted?.messages[0]?.content).toBe('这个是什么图片');
     expect(persisted?.messages[0]?.attachments).toEqual([attachment]);
+  });
+
+  it('offers live image attachments to HopCode mid-turn injection', async () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-live-visual';
+    const timestamp = Date.now();
+    const liveAttachment: FileAttachment = {
+      type: 'image',
+      path: join(workspaceRoot, 'subscription.jpg'),
+      name: 'subscription.jpg',
+      mimeType: 'image/jpeg',
+      base64: 'base64-image',
+      size: 1024,
+    };
+    const storedAttachment: NonNullable<Message['attachments']>[number] = {
+      id: 'attachment-1',
+      type: 'image',
+      name: 'subscription.jpg',
+      mimeType: 'image/jpeg',
+      size: 1024,
+      storedPath: join(
+        workspaceRoot,
+        'sessions',
+        sessionId,
+        'attachments',
+        'subscription.jpg',
+      ),
+      thumbnailBase64: 'data:image/jpeg;base64,thumb',
+    };
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    const enqueueCalls: Array<{
+      message: string;
+      attachments?: FileAttachment[];
+      metadata?: { messageId?: string; optimisticMessageId?: string };
+    }> = [];
+    managed.agent = {
+      enqueueMidTurnMessage: (
+        message: string,
+        attachments?: FileAttachment[],
+        metadata?: { messageId?: string; optimisticMessageId?: string },
+      ) => {
+        enqueueCalls.push({ message, attachments, metadata });
+        return true;
+      },
+      destroy: () => {},
+      dispose: () => {},
+    } as unknown as AgentBackend;
+    const manager = new SessionManager();
+    (
+      manager as unknown as { sessions: Map<string, typeof managed> }
+    ).sessions.set(sessionId, managed);
+
+    await manager.sendMessage(
+      sessionId,
+      '这个是什么图片',
+      [liveAttachment],
+      [storedAttachment],
+      { optimisticMessageId: 'optimistic-1' },
+    );
+
+    expect(enqueueCalls).toHaveLength(1);
+    expect(enqueueCalls[0]).toEqual({
+      message: '这个是什么图片',
+      attachments: [liveAttachment],
+      metadata: {
+        messageId: expect.any(String),
+        optimisticMessageId: 'optimistic-1',
+      },
+    });
+    expect(managed.messageQueue[0]?.midTurnPending).toBe(true);
+    expect(managed.messageQueue[0]?.attachments).toEqual([liveAttachment]);
+    expect(managed.messageQueue[0]?.storedAttachments).toEqual([
+      storedAttachment,
+    ]);
+  });
+
+  it('acknowledges HopCode mid-turn queued messages by messageId', () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-messageid-ack';
+    const timestamp = Date.now();
+    const storedAttachment: NonNullable<Message['attachments']>[number] = {
+      id: 'attachment-1',
+      type: 'image',
+      name: 'subscription.jpg',
+      mimeType: 'image/jpeg',
+      size: 1024,
+      storedPath: join(
+        workspaceRoot,
+        'sessions',
+        sessionId,
+        'attachments',
+        'subscription.jpg',
+      ),
+      thumbnailBase64: 'data:image/jpeg;base64,thumb',
+    };
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    managed.messages.push({
+      id: 'message-1',
+      role: 'user',
+      content: '这个是什么图片',
+      timestamp,
+      isQueued: true,
+      attachments: [storedAttachment],
+    });
+    managed.messageQueue.push({
+      message: '这个是什么图片',
+      storedAttachments: [storedAttachment],
+      messageId: 'message-1',
+      optimisticMessageId: 'optimistic-1',
+      midTurnPending: true,
+    });
+
+    const events: unknown[] = [];
+    const manager = new SessionManager();
+    manager.setEventSink((_channel, _target, event) => {
+      events.push(event);
+    });
+    const onMidTurnMessagesDrained = (
+      manager as unknown as {
+        createMidTurnMessagesDrainedCallback: (
+          managedSession: unknown,
+        ) => (messageIds: string[]) => void;
+      }
+    ).createMidTurnMessagesDrainedCallback(managed);
+
+    onMidTurnMessagesDrained(['message-1']);
+
+    expect(managed.messageQueue).toHaveLength(0);
+    expect(managed.messages[0]?.isQueued).toBe(false);
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'user_message',
+        sessionId,
+        status: 'accepted',
+        optimisticMessageId: 'optimistic-1',
+        workspaceId: workspace.id,
+        message: expect.objectContaining({
+          id: 'message-1',
+          isQueued: false,
+        }),
+      }),
+    );
+  });
+
+  it('does not text-match identified HopCode mid-turn queued messages', () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-text-collision';
+    const timestamp = Date.now();
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    managed.messageQueue.push(
+      {
+        message: 'duplicate response',
+        messageId: 'message-with-id',
+        midTurnPending: true,
+      },
+      {
+        message: 'duplicate response',
+        midTurnPending: true,
+      },
+    );
+
+    const manager = new SessionManager();
+    const onMidTurnMessagesDrained = (
+      manager as unknown as {
+        createMidTurnMessagesDrainedCallback: (
+          managedSession: unknown,
+        ) => (messageIds: string[]) => void;
+      }
+    ).createMidTurnMessagesDrainedCallback(managed);
+
+    onMidTurnMessagesDrained(['duplicate response']);
+
+    expect(managed.messageQueue).toHaveLength(1);
+    expect(managed.messageQueue[0]?.messageId).toBe('message-with-id');
+  });
+
+  it('acknowledges metadata-free HopCode mid-turn queued messages by empty text', () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-empty-text-ack';
+    const timestamp = Date.now();
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    managed.messageQueue.push(
+      {
+        message: '',
+        midTurnPending: true,
+      },
+      {
+        message: '',
+        midTurnPending: true,
+      },
+    );
+
+    const manager = new SessionManager();
+    const onMidTurnMessagesDrained = (
+      manager as unknown as {
+        createMidTurnMessagesDrainedCallback: (
+          managedSession: unknown,
+        ) => (messageIds: string[]) => void;
+      }
+    ).createMidTurnMessagesDrainedCallback(managed);
+
+    onMidTurnMessagesDrained(['', '']);
+
+    expect(managed.messageQueue).toHaveLength(0);
+  });
+
+  it('warns when HopCode mid-turn drain acknowledgements do not match', () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-unmatched-ack';
+    const timestamp = Date.now();
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    managed.messageQueue.push({
+      message: 'queued response',
+      messageId: 'message-with-id',
+      midTurnPending: true,
+    });
+
+    const warnings: unknown[][] = [];
+    const originalWarn = logger.warn;
+    logger.warn = (...args: unknown[]) => {
+      warnings.push(args);
+    };
+    try {
+      const manager = new SessionManager();
+      const onMidTurnMessagesDrained = (
+        manager as unknown as {
+          createMidTurnMessagesDrainedCallback: (
+            managedSession: unknown,
+          ) => (messageIds: string[]) => void;
+        }
+      ).createMidTurnMessagesDrainedCallback(managed);
+
+      onMidTurnMessagesDrained(['missing-message-id']);
+
+      expect(managed.messageQueue).toHaveLength(1);
+      expect(warnings).toContainEqual([
+        '[session]',
+        `Mid-turn drain acknowledgement matched 0/1 entries for session ${sessionId}`,
+      ]);
+    } finally {
+      logger.warn = originalWarn;
+    }
+  });
+
+  it('offers plain text follow-ups to HopCode mid-turn injection after visual messages', async () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-text-after-visual';
+    const timestamp = Date.now();
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    const enqueueCalls: Array<{
+      message: string;
+      attachments?: FileAttachment[];
+      metadata?: { messageId?: string; optimisticMessageId?: string };
+    }> = [];
+    managed.agent = {
+      enqueueMidTurnMessage: (
+        message: string,
+        attachments?: FileAttachment[],
+        metadata?: { messageId?: string; optimisticMessageId?: string },
+      ) => {
+        enqueueCalls.push({ message, attachments, metadata });
+        return true;
+      },
+      destroy: () => {},
+      dispose: () => {},
+    } as unknown as AgentBackend;
+    const manager = new SessionManager();
+    (
+      manager as unknown as { sessions: Map<string, typeof managed> }
+    ).sessions.set(sessionId, managed);
+
+    await manager.sendMessage(
+      sessionId,
+      'also summarize the visible text',
+      undefined,
+      undefined,
+      { optimisticMessageId: 'optimistic-text' },
+    );
+
+    expect(enqueueCalls).toHaveLength(1);
+    expect(enqueueCalls[0]).toEqual({
+      message: 'also summarize the visible text',
+      attachments: undefined,
+      metadata: {
+        messageId: expect.any(String),
+        optimisticMessageId: 'optimistic-text',
+      },
+    });
+    expect(managed.messageQueue[0]?.midTurnPending).toBe(true);
+    expect(managed.messageQueue[0]?.storedAttachments).toBeUndefined();
+  });
+
+  it('keeps stored-only image attachments queued for the next turn', async () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-stored-only-visual';
+    const timestamp = Date.now();
+    const storedAttachment: NonNullable<Message['attachments']>[number] = {
+      id: 'attachment-1',
+      type: 'image',
+      name: 'subscription.jpg',
+      mimeType: 'image/jpeg',
+      size: 1024,
+      storedPath: join(
+        workspaceRoot,
+        'sessions',
+        sessionId,
+        'attachments',
+        'subscription.jpg',
+      ),
+      thumbnailBase64: 'data:image/jpeg;base64,thumb',
+    };
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    const enqueueCalls: string[] = [];
+    managed.agent = {
+      enqueueMidTurnMessage: (message: string) => {
+        enqueueCalls.push(message);
+        return true;
+      },
+      destroy: () => {},
+      dispose: () => {},
+    } as unknown as AgentBackend;
+    const manager = new SessionManager();
+    (
+      manager as unknown as { sessions: Map<string, typeof managed> }
+    ).sessions.set(sessionId, managed);
+
+    await manager.sendMessage(
+      sessionId,
+      '这个是什么图片',
+      undefined,
+      [storedAttachment],
+      { optimisticMessageId: 'optimistic-1' },
+    );
+
+    expect(enqueueCalls).toEqual([]);
+    expect(managed.messageQueue[0]?.midTurnPending).toBe(false);
+    expect(managed.messageQueue[0]?.attachments).toBeUndefined();
+    expect(managed.messageQueue[0]?.storedAttachments).toEqual([
+      storedAttachment,
+    ]);
+  });
+
+  it('keeps image attachments queued when live base64 is unavailable', async () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-stored-visual';
+    const timestamp = Date.now();
+    const liveAttachment: FileAttachment = {
+      type: 'image',
+      path: join(workspaceRoot, 'subscription.jpg'),
+      name: 'subscription.jpg',
+      mimeType: 'image/jpeg',
+      size: 1024,
+    };
+    const storedAttachment: NonNullable<Message['attachments']>[number] = {
+      id: 'attachment-1',
+      type: 'image',
+      name: 'subscription.jpg',
+      mimeType: 'image/jpeg',
+      size: 1024,
+      storedPath: join(
+        workspaceRoot,
+        'sessions',
+        sessionId,
+        'attachments',
+        'subscription.jpg',
+      ),
+      thumbnailBase64: 'data:image/jpeg;base64,thumb',
+    };
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    const enqueueCalls: string[] = [];
+    managed.agent = {
+      enqueueMidTurnMessage: (message: string) => {
+        enqueueCalls.push(message);
+        return true;
+      },
+      destroy: () => {},
+      dispose: () => {},
+    } as unknown as AgentBackend;
+    const manager = new SessionManager();
+    (
+      manager as unknown as { sessions: Map<string, typeof managed> }
+    ).sessions.set(sessionId, managed);
+
+    await manager.sendMessage(
+      sessionId,
+      '这个是什么图片',
+      [liveAttachment],
+      [storedAttachment],
+      { optimisticMessageId: 'optimistic-1' },
+    );
+
+    expect(enqueueCalls).toEqual([]);
+    expect(managed.messageQueue[0]?.midTurnPending).toBe(false);
+    expect(managed.messageQueue[0]?.attachments).toEqual([liveAttachment]);
+    expect(managed.messageQueue[0]?.storedAttachments).toEqual([
+      storedAttachment,
+    ]);
+  });
+
+  it('keeps non-image attachments queued for the next turn', async () => {
+    const workspaceRoot = mkdtempSync(
+      join(tmpdir(), 'craft-managed-workspace-'),
+    );
+    tempRoots.push(workspaceRoot);
+
+    const sessionId = '260602-hopcode-midturn-pdf';
+    const timestamp = Date.now();
+    const liveAttachment: FileAttachment = {
+      type: 'pdf',
+      path: join(workspaceRoot, 'report.pdf'),
+      name: 'report.pdf',
+      mimeType: 'application/pdf',
+      base64: 'base64-pdf',
+      size: 1024,
+    };
+    const workspace: Workspace = {
+      id: 'workspace-qwen',
+      name: 'hopcode-code',
+      slug: 'hopcode-code',
+      rootPath: workspaceRoot,
+      createdAt: timestamp,
+    };
+    const managed = createManagedSession(
+      {
+        id: sessionId,
+        sdkSessionId: sessionId,
+        sdkCwd: workspaceRoot,
+        workingDirectory: workspaceRoot,
+        name: 'existing hopcode title',
+        llmConnection: 'hopcode-code',
+        lastMessageAt: timestamp,
+      },
+      workspace,
+      { isProcessing: true, messagesLoaded: true },
+    );
+    const enqueueCalls: string[] = [];
+    managed.agent = {
+      enqueueMidTurnMessage: (message: string) => {
+        enqueueCalls.push(message);
+        return true;
+      },
+      destroy: () => {},
+      dispose: () => {},
+    } as unknown as AgentBackend;
+    const manager = new SessionManager();
+    (
+      manager as unknown as { sessions: Map<string, typeof managed> }
+    ).sessions.set(sessionId, managed);
+
+    await manager.sendMessage(sessionId, 'read this pdf', [liveAttachment]);
+
+    expect(enqueueCalls).toEqual([]);
+    expect(managed.messageQueue[0]?.midTurnPending).toBe(false);
+    expect(managed.messageQueue[0]?.attachments).toEqual([liveAttachment]);
   });
 
   it('merges local visual overlays into provider-loaded Qwen messages', async () => {
@@ -2129,7 +2767,7 @@ describe('Qwen native history loading', () => {
       {
         id: 'qwen-4',
         role: 'assistant',
-        content: 'PR 已创建：https://github.com/QwenLM/hopcode/pull/3593',
+        content: 'PR 已创建：https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3593',
         timestamp: timestamp + 3,
       },
     ];
@@ -2206,7 +2844,7 @@ describe('Qwen native history loading', () => {
       ['tool', 'Running Bash...', 'Bash'],
       [
         'assistant',
-        'PR 已创建：https://github.com/QwenLM/hopcode/pull/3593',
+        'PR 已创建：https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3593',
         '',
       ],
     ]);

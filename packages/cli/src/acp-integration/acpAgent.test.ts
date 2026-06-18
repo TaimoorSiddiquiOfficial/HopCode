@@ -2524,6 +2524,28 @@ describe('HopCodeAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
+  it('hopcode/settings/setCoreValue clears model.baseUrl when setting model.name', async () => {
+    const settings = makeCoreSettings();
+    const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
+
+    await agent.extMethod('hopcode/settings/setCoreValue', {
+      scope: 'user',
+      key: 'model.name',
+      value: 'qwen3.7-max',
+    });
+
+    expect(settings.setValue).toHaveBeenCalledWith(
+      'User',
+      'model.name',
+      'qwen3.7-max',
+    );
+    // Id-only selection must clear the paired baseUrl disambiguator (tombstone).
+    expect(settings.setValue).toHaveBeenCalledWith('User', 'model.baseUrl', '');
+
+    mockConnectionState.resolve();
+    await agentPromise;
+  });
+
   it('hopcode/settings/getCore excludes untrusted workspace integrations from merged view', async () => {
     const settings = makeCoreSettings();
     (settings as { isTrusted: boolean }).isTrusted = false;

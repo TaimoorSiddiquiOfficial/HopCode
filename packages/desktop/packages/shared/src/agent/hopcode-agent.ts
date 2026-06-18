@@ -56,6 +56,7 @@ import type {
   BackendRewindResult,
   ChatOptions,
   BackendHostRuntimeContext,
+  MidTurnMessageMetadata,
   PermissionRequestType,
   SdkMcpServerConfig,
 } from './backend/types.ts';
@@ -102,6 +103,9 @@ type JsonRecord = Record<string, unknown>;
 
 const HOPCODE_RESPONSE_INTERRUPTED_MESSAGE = 'Response interrupted';
 const HOPCODE_TOOL_RESULT_MISSING_MESSAGE = 'Tool result was not recorded.';
+const MAX_MID_TURN_CONTENT_BUILD_FAILURES = 3;
+const MID_TURN_ATTACHMENT_PROCESSING_FAILURE_TEXT =
+  '[Attachment could not be processed]';
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -129,7 +133,7 @@ function getAcpErrorDetail(data: unknown): string | undefined {
   }
 }
 
-export function formatQwenAcpErrorMessage(error: unknown): string {
+export function formatHopCodeAcpErrorMessage(error: unknown): string {
   const message = getErrorMessage(error);
   const data =
     error && typeof error === 'object'
@@ -211,7 +215,7 @@ type HopCodeAcpLease = {
   release(): void;
 };
 
-const sharedAcpProcesses = new Map<string, SharedQwenAcpProcess>();
+const sharedAcpProcesses = new Map<string, SharedHopCodeAcpProcess>();
 
 function stableStringifyRecord(
   value: Record<string, string | undefined>,
@@ -241,19 +245,19 @@ function buildSharedAcpProcessKey(args: {
   ].join('\u0001');
 }
 
-async function acquireSharedQwenAcpProcess(
+async function acquireSharedHopCodeAcpProcess(
   options: HopCodeAcpProcessOptions,
   subscriber: HopCodeAcpSubscriber,
 ): Promise<HopCodeAcpLease> {
   let processEntry = sharedAcpProcesses.get(options.key);
   if (!processEntry) {
-    processEntry = new SharedQwenAcpProcess(options);
+    processEntry = new SharedHopCodeAcpProcess(options);
     sharedAcpProcesses.set(options.key, processEntry);
   }
   return processEntry.acquire(subscriber);
 }
 
-class SharedQwenAcpProcess {
+class SharedHopCodeAcpProcess {
   private child: ChildProcess | null = null;
   private connection: ClientSideConnection | null = null;
   private startPromise: Promise<void> | null = null;
@@ -320,7 +324,7 @@ class SharedQwenAcpProcess {
   }
 
   private async start(): Promise<void> {
-    this.debug(`Spawning shared Qwen ACP process: ${this.commandDescription}`);
+    this.debug(`Spawning shared HopCode ACP process: ${this.commandDescription}`);
     this.stderrBuffer = [];
     this.stderrBufferBytes = 0;
 
@@ -347,11 +351,11 @@ class SharedQwenAcpProcess {
       const text = data.toString();
       this.recordStderr(text);
       const trimmed = text.trim();
-      if (trimmed) this.debug(`[qwen stderr] ${trimmed}`);
+      if (trimmed) this.debug(`[hopcode stderr] ${trimmed}`);
     });
     child.on('exit', (code, signal) => this.handleExit(code, signal));
     child.on('error', (error) => {
-      this.debug(`Qwen ACP process error: ${error.message}`);
+      this.debug(`HopCode ACP process error: ${error.message}`);
     });
 
     void connection.closed.then(() => {
@@ -399,7 +403,7 @@ class SharedQwenAcpProcess {
         if (owner) return owner.onPermissionRequest(params);
 
         this.debug(
-          `Qwen permission request had no owner for session ${sessionId ?? 'unknown'}`,
+          `HopCode permission request had no owner for session ${sessionId ?? 'unknown'}`,
         );
         return { outcome: { outcome: 'cancelled' } };
       },
@@ -429,7 +433,7 @@ class SharedQwenAcpProcess {
       this.connection.signal.aborted ||
       !this.isActive()
     ) {
-      throw new Error('Qwen ACP process is not running');
+      throw new Error('HopCode ACP process is not running');
     }
     return this.connection;
   }
@@ -463,7 +467,7 @@ class SharedQwenAcpProcess {
 
   private handleExit(code: number | null, signal: NodeJS.Signals | null): void {
     this.debug(
-      `Qwen ACP process exited (code=${code ?? 'null'}, signal=${signal ?? 'null'})`,
+      `HopCode ACP process exited (code=${code ?? 'null'}, signal=${signal ?? 'null'})`,
     );
     this.initialized = false;
     this.child = null;
@@ -486,15 +490,15 @@ class SharedQwenAcpProcess {
   private recordStderr(chunk: string): void {
     if (!chunk) return;
     const effective =
-      chunk.length > SharedQwenAcpProcess.STDERR_BUFFER_MAX_BYTES
+      chunk.length > SharedHopCodeAcpProcess.STDERR_BUFFER_MAX_BYTES
         ? chunk.slice(
-            chunk.length - SharedQwenAcpProcess.STDERR_BUFFER_MAX_BYTES,
+            chunk.length - SharedHopCodeAcpProcess.STDERR_BUFFER_MAX_BYTES,
           )
         : chunk;
     this.stderrBuffer.push(effective);
     this.stderrBufferBytes += effective.length;
     while (
-      this.stderrBufferBytes > SharedQwenAcpProcess.STDERR_BUFFER_MAX_BYTES &&
+      this.stderrBufferBytes > SharedHopCodeAcpProcess.STDERR_BUFFER_MAX_BYTES &&
       this.stderrBuffer.length > 1
     ) {
       const dropped = this.stderrBuffer.shift()!;
@@ -512,7 +516,7 @@ class SharedQwenAcpProcess {
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeout = setTimeout(() => {
-        reject(new Error(`Qwen ACP request timed out: ${method}`));
+        reject(new Error(`HopCode ACP request timed out: ${method}`));
       }, timeoutMs);
     });
 
@@ -537,7 +541,7 @@ type HopCodeSettingsAcpOptions = {
   debug?: (message: string) => void;
 };
 
-function buildQwenAcpSpawnCommand(
+function buildHopCodeAcpSpawnCommand(
   hopcodeCliPath: string,
   nodePath: string,
 ): { command: string; args: string[] } {
@@ -564,7 +568,7 @@ function hopcodeAcpWithTimeout<T>(
   let timeout: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<never>((_, reject) => {
     timeout = setTimeout(() => {
-      reject(new Error(`Qwen ACP request timed out: ${method}`));
+      reject(new Error(`HopCode ACP request timed out: ${method}`));
     }, timeoutMs);
   });
 
@@ -573,7 +577,7 @@ function hopcodeAcpWithTimeout<T>(
   });
 }
 
-async function callhopcodeSettingsAcpMethod(
+async function callHopCodeSettingsAcpMethod(
   options: HopCodeSettingsAcpOptions,
   method: string,
   params: JsonRecord = {},
@@ -587,7 +591,7 @@ async function callhopcodeSettingsAcpMethod(
   }
 
   const nodePath = resolvedPaths.nodeRuntimePath || process.execPath;
-  const { command, args } = buildQwenAcpSpawnCommand(hopcodeCliPath, nodePath);
+  const { command, args } = buildHopCodeAcpSpawnCommand(hopcodeCliPath, nodePath);
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
   const processCwd = options.processCwd || cwd;
   const key = buildSharedAcpProcessKey({
@@ -597,7 +601,7 @@ async function callhopcodeSettingsAcpMethod(
     envOverrides: options.envOverrides,
   });
 
-  const lease = await acquireSharedQwenAcpProcess(
+  const lease = await acquireSharedHopCodeAcpProcess(
     {
       key,
       command,
@@ -631,7 +635,7 @@ async function callhopcodeSettingsAcpMethod(
 export async function getHopCodeMemorySettingsViaAcp(
   options: HopCodeSettingsAcpOptions,
 ): Promise<HopCodeMemorySettings> {
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     options,
     'hopcode/settings/getMemory',
   );
@@ -642,7 +646,7 @@ export async function setHopCodeMemorySettingsViaAcp(
   options: HopCodeSettingsAcpOptions,
   updates: Partial<HopCodeMemorySettings>,
 ): Promise<HopCodeMemorySettings> {
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     options,
     'hopcode/settings/setMemory',
     { updates },
@@ -650,23 +654,23 @@ export async function setHopCodeMemorySettingsViaAcp(
   return normalizeHopCodeMemorySettings(response.settings);
 }
 
-export async function gethopcodeSettingsPathViaAcp(
+export async function getHopCodeSettingsPathViaAcp(
   options: HopCodeSettingsAcpOptions,
 ): Promise<string> {
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     options,
     'hopcode/settings/getPath',
   );
   const settingsPath = asString(response.path);
-  if (!settingsPath) throw new Error('Qwen ACP did not return settings path');
+  if (!settingsPath) throw new Error('HopCode ACP did not return settings path');
   return settingsPath;
 }
 
-export async function getQwenCoreSettingsViaAcp(
+export async function getHopCodeCoreSettingsViaAcp(
   options: HopCodeSettingsAcpOptions,
 ): Promise<HopCodeCoreSettingsSnapshot> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/getCore',
     { cwd },
@@ -674,14 +678,14 @@ export async function getQwenCoreSettingsViaAcp(
   return response as unknown as HopCodeCoreSettingsSnapshot;
 }
 
-export async function setQwenCoreSettingViaAcp(
+export async function setHopCodeCoreSettingViaAcp(
   options: HopCodeSettingsAcpOptions,
   scope: HopCodeSettingsScope,
   key: HopCodeCoreSettingKey,
   value: HopCodeSettingValue,
 ): Promise<HopCodeCoreSettingsSnapshot> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/setCoreValue',
     { cwd, scope, key, value },
@@ -689,14 +693,14 @@ export async function setQwenCoreSettingViaAcp(
   return response as unknown as HopCodeCoreSettingsSnapshot;
 }
 
-export async function setQwenMcpServerViaAcp(
+export async function setHopCodeMcpServerViaAcp(
   options: HopCodeSettingsAcpOptions,
   scope: HopCodeSettingsScope,
   name: string,
   server: HopCodeMcpServerConfig,
 ): Promise<HopCodeCoreSettingsSnapshot> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/setMcpServer',
     { cwd, scope, name, server },
@@ -704,13 +708,13 @@ export async function setQwenMcpServerViaAcp(
   return response as unknown as HopCodeCoreSettingsSnapshot;
 }
 
-export async function removeQwenMcpServerViaAcp(
+export async function removeHopCodeMcpServerViaAcp(
   options: HopCodeSettingsAcpOptions,
   scope: HopCodeSettingsScope,
   name: string,
 ): Promise<HopCodeCoreSettingsSnapshot> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/removeMcpServer',
     { cwd, scope, name },
@@ -718,7 +722,7 @@ export async function removeQwenMcpServerViaAcp(
   return response as unknown as HopCodeCoreSettingsSnapshot;
 }
 
-export async function setQwenHookViaAcp(
+export async function setHopCodeHookViaAcp(
   options: HopCodeSettingsAcpOptions,
   scope: HopCodeSettingsScope,
   event: HopCodeHookEvent,
@@ -726,7 +730,7 @@ export async function setQwenHookViaAcp(
   hook: HopCodeHookDefinition,
 ): Promise<HopCodeCoreSettingsSnapshot> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/setHook',
     { cwd, scope, event, index, hook },
@@ -734,14 +738,14 @@ export async function setQwenHookViaAcp(
   return response as unknown as HopCodeCoreSettingsSnapshot;
 }
 
-export async function removeQwenHookViaAcp(
+export async function removeHopCodeHookViaAcp(
   options: HopCodeSettingsAcpOptions,
   scope: HopCodeSettingsScope,
   event: HopCodeHookEvent,
   index: number,
 ): Promise<HopCodeCoreSettingsSnapshot> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/removeHook',
     { cwd, scope, event, index },
@@ -749,7 +753,7 @@ export async function removeQwenHookViaAcp(
   return response as unknown as HopCodeCoreSettingsSnapshot;
 }
 
-export async function setQwenExtensionSettingViaAcp(
+export async function setHopCodeExtensionSettingViaAcp(
   options: HopCodeSettingsAcpOptions,
   extensionId: string,
   settingKey: string,
@@ -757,7 +761,7 @@ export async function setQwenExtensionSettingViaAcp(
   value: HopCodeSettingValue,
 ): Promise<HopCodeCoreSettingsSnapshot> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/setExtensionSetting',
     { cwd, extensionId, settingKey, scope, value },
@@ -769,7 +773,7 @@ export async function getHopCodePermissionSettingsViaAcp(
   options: HopCodeSettingsAcpOptions,
 ): Promise<HopCodePermissionSettings> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/permissions/getSettings',
     { cwd },
@@ -777,14 +781,14 @@ export async function getHopCodePermissionSettingsViaAcp(
   return response as unknown as HopCodePermissionSettings;
 }
 
-export async function setQwenPermissionRulesViaAcp(
+export async function setHopCodePermissionRulesViaAcp(
   options: HopCodeSettingsAcpOptions,
   scope: PermissionSettingsScope,
   ruleType: PermissionRuleType,
   rules: string[],
 ): Promise<HopCodePermissionSettings> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/permissions/setRules',
     { cwd, scope, ruleType, rules },
@@ -796,7 +800,7 @@ export async function getHopCodeMemoryPathsViaAcp(
   options: HopCodeSettingsAcpOptions & { projectRoot?: string },
 ): Promise<HopCodeMemoryPaths> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/settings/getMemoryPaths',
     { cwd, projectRoot: options.projectRoot ?? cwd },
@@ -806,7 +810,7 @@ export async function getHopCodeMemoryPathsViaAcp(
   const projectMemoryFile = asString(paths.projectMemoryFile);
   const autoMemoryDir = asString(paths.autoMemoryDir);
   if (!userMemoryFile || !projectMemoryFile || !autoMemoryDir) {
-    throw new Error('Qwen ACP did not return memory paths');
+    throw new Error('HopCode ACP did not return memory paths');
   }
   return { userMemoryFile, projectMemoryFile, autoMemoryDir };
 }
@@ -815,7 +819,7 @@ export async function listHopCodeProvidersViaAcp(
   options: HopCodeSettingsAcpOptions,
 ): Promise<HopCodeProviderCatalog> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/providers/list',
     { cwd },
@@ -823,16 +827,16 @@ export async function listHopCodeProvidersViaAcp(
   return normalizeHopCodeProviderCatalog(response);
 }
 
-export async function getQwenWorkspacePreflightViaAcp(
+export async function getHopCodeWorkspacePreflightViaAcp(
   options: HopCodeSettingsAcpOptions,
 ): Promise<Record<string, unknown>> {
-  return callhopcodeSettingsAcpMethod(options, 'hopcode/status/workspace/preflight');
+  return callHopCodeSettingsAcpMethod(options, 'hopcode/status/workspace/preflight');
 }
 
-export async function fetchQwenModelsViaSharedAcp(
+export async function fetchHopCodeModelsViaSharedAcp(
   options: HopCodeSettingsAcpOptions,
 ): Promise<ModelFetchResult> {
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     options,
     'hopcode/status/workspace/providers',
   );
@@ -849,7 +853,7 @@ export async function fetchQwenModelsViaSharedAcp(
       ? provider.models
       : [];
     for (const value of providerModels) {
-      const model = toQwenModelDefinition(value);
+      const model = toHopCodeModelDefinition(value);
       if (!model || seen.has(model.id)) continue;
       seen.add(model.id);
       models.push(model);
@@ -860,7 +864,7 @@ export async function fetchQwenModelsViaSharedAcp(
   }
 
   if (models.length === 0) {
-    throw new Error('Qwen ACP workspace providers did not return models');
+    throw new Error('HopCode ACP workspace providers did not return models');
   }
 
   return { models, serverDefault };
@@ -881,7 +885,7 @@ export async function connectHopCodeProviderViaAcp(
   params: HopCodeProviderConnectParams,
 ): Promise<HopCodeProviderConnectResult> {
   const cwd = options.cwd || hopcodeSettingsCwd(options.hostRuntime);
-  const response = await callhopcodeSettingsAcpMethod(
+  const response = await callHopCodeSettingsAcpMethod(
     { ...options, cwd },
     'hopcode/providers/connect',
     { cwd, ...(params as unknown as JsonRecord) },
@@ -915,7 +919,7 @@ function asString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-export function extractQwenParentToolUseId(
+export function extractHopCodeParentToolUseId(
   update: Record<string, unknown>,
 ): string | undefined {
   const meta = toRecord(update._meta);
@@ -929,12 +933,12 @@ export function extractQwenParentToolUseId(
   );
 }
 
-export function resolveQwenParentToolUseId(args: {
+export function resolveHopCodeParentToolUseId(args: {
   update: Record<string, unknown>;
   toolUseId?: string;
   activeParentToolUseIds?: ReadonlySet<string>;
 }): string | undefined {
-  const explicitParentToolUseId = extractQwenParentToolUseId(args.update);
+  const explicitParentToolUseId = extractHopCodeParentToolUseId(args.update);
   if (explicitParentToolUseId && explicitParentToolUseId !== args.toolUseId) {
     return explicitParentToolUseId;
   }
@@ -1021,7 +1025,7 @@ function firstRecord(...values: unknown[]): JsonRecord {
   return {};
 }
 
-function toQwenModelDefinition(value: unknown): ModelDefinition | null {
+function toHopCodeModelDefinition(value: unknown): ModelDefinition | null {
   const model = toRecord(value as ModelInfo);
   const id = asString(model.modelId);
   if (!id) return null;
@@ -1168,19 +1172,19 @@ function formatDebugNames(values: string[] | undefined, max = 40): string {
     : visible;
 }
 
-function parseQwenTimestamp(value: unknown): number | undefined {
+function parseHopCodeTimestamp(value: unknown): number | undefined {
   const raw = asString(value);
   if (!raw) return undefined;
   const timestamp = Date.parse(raw);
   return Number.isFinite(timestamp) ? timestamp : undefined;
 }
 
-function sanitizehopcodeCwd(cwd: string): string {
+function sanitizeHopCodeCwd(cwd: string): string {
   const normalizedCwd = platform() === 'win32' ? cwd.toLowerCase() : cwd;
   return normalizedCwd.replace(/[^a-zA-Z0-9]/g, '-');
 }
 
-function resolveQwenRuntimeDir(dir: string): string {
+function resolveHopCodeRuntimeDir(dir: string): string {
   if (dir === '~') return homedir();
   if (dir.startsWith('~/') || dir.startsWith('~\\')) {
     return join(
@@ -1194,18 +1198,18 @@ function resolveQwenRuntimeDir(dir: string): string {
   return isAbsolute(dir) ? dir : resolve(dir);
 }
 
-function getQwenRuntimeDir(): string {
+function getHopCodeRuntimeDir(): string {
   const envDir = process.env.HOPCODE_RUNTIME_DIR;
-  if (envDir) return resolveQwenRuntimeDir(envDir);
+  if (envDir) return resolveHopCodeRuntimeDir(envDir);
 
   const homeDir = homedir();
   return homeDir ? join(homeDir, '.hopcode') : join(tmpdir(), '.hopcode');
 }
 
-function getQwenTranscriptPath(sessionId: string, cwd: string): string {
-  const projectId = sanitizehopcodeCwd(resolve(cwd));
+function getHopCodeTranscriptPath(sessionId: string, cwd: string): string {
+  const projectId = sanitizeHopCodeCwd(resolve(cwd));
   return join(
-    getQwenRuntimeDir(),
+    getHopCodeRuntimeDir(),
     'projects',
     projectId,
     'chats',
@@ -1275,7 +1279,7 @@ function findNonOverlappingPlaceholderStart(
   return -1;
 }
 
-function buildQwenTranscriptTextElements(
+function buildHopCodeTranscriptTextElements(
   content: string,
   sourceElements?: MessageTextElement[],
 ): MessageTextElement[] | undefined {
@@ -1320,7 +1324,7 @@ function buildQwenTranscriptTextElements(
   return elements.length > 0 ? elements : undefined;
 }
 
-function toQwenTranscriptTextElements(
+function toHopCodeTranscriptTextElements(
   value: unknown,
 ): MessageTextElement[] | undefined {
   if (!Array.isArray(value)) return undefined;
@@ -1379,7 +1383,7 @@ function jsonStringify(value: unknown): string {
   }
 }
 
-function isQwenUserInterruptText(value: string | undefined): boolean {
+function isHopCodeUserInterruptText(value: string | undefined): boolean {
   if (!value) return false;
   const text = value.toLowerCase();
   return (
@@ -1391,15 +1395,15 @@ function isQwenUserInterruptText(value: string | undefined): boolean {
   );
 }
 
-function isQwenUserInterruptStatus(value: string | undefined): boolean {
+function isHopCodeUserInterruptStatus(value: string | undefined): boolean {
   return (
     value === 'cancelled' ||
     value === 'canceled' ||
-    isQwenUserInterruptText(value)
+    isHopCodeUserInterruptText(value)
   );
 }
 
-function isQwenToolFailureStatus(status: string | undefined): boolean {
+function isHopCodeToolFailureStatus(status: string | undefined): boolean {
   return status === 'failed' || status === 'error';
 }
 
@@ -1444,7 +1448,7 @@ function formatJsonMarkdown(value: unknown): string {
   return `\`\`\`json\n${jsonStringify(value)}\n\`\`\``;
 }
 
-function normalizeQwenAssistantText(
+function normalizeHopCodeAssistantText(
   text: string,
   options: { forceJsonFence?: boolean } = {},
 ): string {
@@ -1459,12 +1463,12 @@ function normalizeQwenAssistantText(
   return formatJsonMarkdown(parsed);
 }
 
-function formatQwenSlashOutputHistoryItem(
+function formatHopCodeSlashOutputHistoryItem(
   item: JsonRecord,
 ): string | undefined {
   const text = asString(item.text);
   if (text?.trim()) {
-    return normalizeQwenAssistantText(text, { forceJsonFence: true });
+    return normalizeHopCodeAssistantText(text, { forceJsonFence: true });
   }
 
   if (item.type === 'doctor') {
@@ -1495,10 +1499,10 @@ function hopcodeInitializeTimeoutMs(): number {
     : DEFAULT_INITIALIZE_TIMEOUT_MS;
 }
 
-function mapPermissionModeToQwen(mode: PermissionMode): string {
+function mapPermissionModeToHopCode(mode: PermissionMode): string {
   switch (mode) {
     case 'allow-all':
-      return 'izn';
+      return 'yolo';
     case 'safe':
       return 'plan';
     case 'auto-edit':
@@ -1509,13 +1513,13 @@ function mapPermissionModeToQwen(mode: PermissionMode): string {
   }
 }
 
-function mapQwenModeToPermissionMode(
+function mapHopCodeModeToPermissionMode(
   mode: string | undefined,
 ): PermissionMode | undefined {
   switch (mode) {
     case 'plan':
       return 'safe';
-    case 'izn':
+    case 'yolo':
       return 'allow-all';
     case 'auto-edit':
       return 'auto-edit';
@@ -1624,6 +1628,12 @@ function permissionTypeForKind(
   }
 }
 
+interface QueuedMidTurnMessage extends MidTurnMessageMetadata {
+  message: string;
+  attachments?: FileAttachment[];
+  buildFailureCount?: number;
+}
+
 export class HopCodeAgent extends BaseAgent {
   protected backendName = 'HopCode';
 
@@ -1631,11 +1641,11 @@ export class HopCodeAgent extends BaseAgent {
   private connection: ClientSideConnection | null = null;
 
   private hopcodeSessionId: string | null = null;
-  private ensureQwenSessionPromise: Promise<void> | null = null;
+  private ensureHopCodeSessionPromise: Promise<void> | null = null;
   private eventQueue = new EventQueue();
   private _isProcessing = false;
   private abortReason?: AbortReason;
-  private persistedhopcodeSessionId: string | null = null;
+  private persistedHopCodeSessionId: string | null = null;
   private activePromptRunId: number | null = null;
   private promptRunCounter = 0;
   private permissionRequestCounter = 0;
@@ -1671,12 +1681,12 @@ export class HopCodeAgent extends BaseAgent {
   private toolNames = new Map<string, string>();
   private toolInputs = new Map<string, Record<string, unknown>>();
   private activeParentToolUseIds = new Set<string>();
-  private midTurnMessageQueue: string[] = [];
+  private midTurnMessageQueue: QueuedMidTurnMessage[] = [];
 
   constructor(config: BackendConfig) {
     super(config, config.model || '');
     this._supportsBranching = false;
-    this.persistedhopcodeSessionId = config.session?.sdkSessionId || null;
+    this.persistedHopCodeSessionId = config.session?.sdkSessionId || null;
     this.pendingModeOverride =
       config.session?.permissionMode && !config.session?.sdkSessionId
         ? config.session.permissionMode
@@ -1695,7 +1705,7 @@ export class HopCodeAgent extends BaseAgent {
   override getSessionId(): string | null {
     return (
       this.hopcodeSessionId ??
-      this.persistedhopcodeSessionId ??
+      this.persistedHopCodeSessionId ??
       this.config.session?.sdkSessionId ??
       null
     );
@@ -1705,7 +1715,7 @@ export class HopCodeAgent extends BaseAgent {
     super.setSessionId(sessionId);
     if (this.hopcodeSessionId) this.unregisterAcpSession(this.hopcodeSessionId);
     this.hopcodeSessionId = sessionId;
-    this.persistedhopcodeSessionId = sessionId;
+    this.persistedHopCodeSessionId = sessionId;
     if (sessionId) this.registerAcpSession(sessionId);
   }
 
@@ -1713,7 +1723,7 @@ export class HopCodeAgent extends BaseAgent {
     super.clearHistory();
     if (this.hopcodeSessionId) this.unregisterAcpSession(this.hopcodeSessionId);
     this.hopcodeSessionId = null;
-    this.persistedhopcodeSessionId = null;
+    this.persistedHopCodeSessionId = null;
     this.pendingAvailableCommandsUpdates.clear();
     this.latestAvailableCommandsSnapshot = null;
     this.resolveAvailableCommandsWaiters(null);
@@ -1725,7 +1735,7 @@ export class HopCodeAgent extends BaseAgent {
     cleanMessage: string;
     missingSkills: string[];
   } {
-    const withQwenSkills = message.replace(
+    const withHopCodeSkills = message.replace(
       /\[skill:([^\]]+)\]/g,
       (_match, rawSkill: string) => {
         const normalized = rawSkill.trim();
@@ -1735,14 +1745,14 @@ export class HopCodeAgent extends BaseAgent {
         return skillName ? `@${skillName}` : '';
       },
     );
-    const withSources = resolveSourceMentions(withQwenSkills);
+    const withSources = resolveSourceMentions(withHopCodeSkills);
     const workDir =
       this.config.session?.workingDirectory ?? this.workingDirectory;
     const cleanMessage = resolveFileMentions(withSources, workDir).trim();
 
-    if (withQwenSkills !== message) {
+    if (withHopCodeSkills !== message) {
       this.debug(
-        '[extractSkillPaths] Qwen skill mentions are passed to ACP as @skill references',
+        '[extractSkillPaths] HopCode skill mentions are passed to ACP as @skill references',
       );
     }
 
@@ -1758,18 +1768,18 @@ export class HopCodeAgent extends BaseAgent {
     if (this.hopcodeSessionId) {
       this.unregisterAcpSession(this.hopcodeSessionId);
       this.hopcodeSessionId = null;
-      this.persistedhopcodeSessionId = null;
+      this.persistedHopCodeSessionId = null;
       this.pendingAvailableCommandsUpdates.clear();
       this.latestAvailableCommandsSnapshot = null;
       this.resolveAvailableCommandsWaiters(null);
       this.config.onSdkSessionIdCleared?.();
-      this.debug('Qwen ACP session cleared after working directory change');
+      this.debug('HopCode ACP session cleared after working directory change');
     }
   }
 
   private invalidateAvailableCommandsSnapshot(reason: string): void {
     if (this.latestAvailableCommandsSnapshot) {
-      this.debug(`Qwen slash command snapshot invalidated: ${reason}`);
+      this.debug(`HopCode slash command snapshot invalidated: ${reason}`);
     }
     this.latestAvailableCommandsSnapshot = null;
   }
@@ -1791,7 +1801,7 @@ export class HopCodeAgent extends BaseAgent {
     this.currentThoughtParentToolUseId = undefined;
     this.currentIsSlashCommand = isSlashCommandPrompt(message, attachments);
     this.capturedUsageInCurrentTurn = false;
-    this.currentTurnId = `qwen-turn-${promptRunId}`;
+    this.currentTurnId = `hopcode-turn-${promptRunId}`;
     this.toolNames.clear();
     this.toolInputs.clear();
     this.activeParentToolUseIds.clear();
@@ -1806,34 +1816,34 @@ export class HopCodeAgent extends BaseAgent {
       await this.ensureProcess();
 
       try {
-        await this.ensureQwenSession();
+        await this.ensureHopCodeSession();
       } catch (error) {
-        if (this.persistedhopcodeSessionId || this.config.session?.sdkSessionId) {
+        if (this.persistedHopCodeSessionId || this.config.session?.sdkSessionId) {
           this.debug(
-            `Qwen resume failed, starting a fresh session: ${error instanceof Error ? error.message : String(error)}`,
+            `HopCode resume failed, starting a fresh session: ${error instanceof Error ? error.message : String(error)}`,
           );
           this.hopcodeSessionId = null;
-          this.persistedhopcodeSessionId = null;
+          this.persistedHopCodeSessionId = null;
           this.config.onSdkSessionIdCleared?.();
           const recoveryContext = this.buildRecoveryContext();
           if (recoveryContext && !isSlashCommandPrompt(message, attachments)) {
             message = recoveryContext + message;
           }
-          await this.ensureQwenSession();
+          await this.ensureHopCodeSession();
         } else {
           throw error;
         }
       }
 
       const sessionId = this.hopcodeSessionId;
-      if (!sessionId) throw new Error('Qwen ACP session was not created');
+      if (!sessionId) throw new Error('HopCode ACP session was not created');
 
       const prompt = this.buildPromptBlocks(message, attachments);
       let transcriptTextElementsPersisted = false;
       const persistTranscriptTextElements = () => {
         if (transcriptTextElementsPersisted) return;
         transcriptTextElementsPersisted = true;
-        this.persistQwenTranscriptTextElements(
+        this.persistHopCodeTranscriptTextElements(
           sessionId,
           this.resolvedCwd(),
           options?.textElements,
@@ -1857,7 +1867,7 @@ export class HopCodeAgent extends BaseAgent {
           this.eventQueue.enqueue({ type: 'complete' });
           this.eventQueue.complete();
           this.debug(
-            `Qwen prompt complete${stopReason ? ` (${stopReason})` : ''}`,
+            `HopCode prompt complete${stopReason ? ` (${stopReason})` : ''}`,
           );
         })
         .catch((error) => {
@@ -1867,7 +1877,7 @@ export class HopCodeAgent extends BaseAgent {
             this.eventQueue.complete();
             return;
           }
-          const message = formatQwenAcpErrorMessage(error);
+          const message = formatHopCodeAcpErrorMessage(error);
           persistTranscriptTextElements();
           this.eventQueue.enqueue({ type: 'error', message });
           this.eventQueue.enqueue({ type: 'complete' });
@@ -1890,7 +1900,7 @@ export class HopCodeAgent extends BaseAgent {
         }
       }
     } catch (error) {
-      const message = formatQwenAcpErrorMessage(error);
+      const message = formatHopCodeAcpErrorMessage(error);
       yield { type: 'error', message };
       yield { type: 'complete' };
     } finally {
@@ -1937,19 +1947,34 @@ export class HopCodeAgent extends BaseAgent {
     }
   }
 
-  enqueueMidTurnMessage(message: string): boolean {
+  enqueueMidTurnMessage(
+    message: string,
+    attachments?: FileAttachment[],
+    metadata?: MidTurnMessageMetadata,
+  ): boolean {
     const trimmed = message.trim();
-    if (!trimmed || !this._isProcessing || this.abortReason) return false;
+    if (
+      (!trimmed && !attachments?.length) ||
+      !this._isProcessing ||
+      this.abortReason
+    ) {
+      return false;
+    }
 
-    this.midTurnMessageQueue.push(trimmed);
+    this.midTurnMessageQueue.push({
+      message: trimmed,
+      attachments,
+      messageId: metadata?.messageId,
+      optimisticMessageId: metadata?.optimisticMessageId,
+    });
     this.debug(
-      `Queued mid-turn user message for Qwen ACP injection (${this.midTurnMessageQueue.length} pending)`,
+      `Queued mid-turn user message for HopCode ACP injection (${this.midTurnMessageQueue.length} pending)`,
     );
     return true;
   }
 
   async abort(reason?: string): Promise<void> {
-    this.debug(`Qwen abort requested${reason ? `: ${reason}` : ''}`);
+    this.debug(`HopCode abort requested${reason ? `: ${reason}` : ''}`);
     this.emitAutomationEvent('Stop', { hook_event_name: 'Stop' });
     this.abortReason = AbortReason.UserStop;
     this._isProcessing = false;
@@ -1965,7 +1990,7 @@ export class HopCodeAgent extends BaseAgent {
         5_000,
       ).catch((error) => {
         this.debug(
-          `Qwen cancel failed: ${error instanceof Error ? error.message : String(error)}`,
+          `HopCode cancel failed: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
     }
@@ -1990,7 +2015,7 @@ export class HopCodeAgent extends BaseAgent {
         5_000,
       ).catch((error) => {
         this.debug(
-          `Qwen force cancel failed: ${error instanceof Error ? error.message : String(error)}`,
+          `HopCode force cancel failed: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
     }
@@ -2322,7 +2347,7 @@ export class HopCodeAgent extends BaseAgent {
 
   override setModel(model: string): void {
     if (!this.isKnownAvailableModel(model)) {
-      this.debug(`Ignoring Qwen model switch for unavailable model: ${model}`);
+      this.debug(`Ignoring HopCode model switch for unavailable model: ${model}`);
       return;
     }
     super.setModel(model);
@@ -2425,10 +2450,10 @@ export class HopCodeAgent extends BaseAgent {
     }
 
     await this.ensureProcess();
-    await this.ensureQwenSession();
+    await this.ensureHopCodeSession();
 
     const sessionId = this.hopcodeSessionId;
-    if (!sessionId) throw new Error('Qwen ACP session was not created');
+    if (!sessionId) throw new Error('HopCode ACP session was not created');
 
     const result = toRecord(
       await this.callAcp(
@@ -2444,7 +2469,7 @@ export class HopCodeAgent extends BaseAgent {
     );
 
     if (result.success !== true) {
-      throw new Error('Qwen ACP rewindSession did not report success');
+      throw new Error('HopCode ACP rewindSession did not report success');
     }
 
     const resultTargetTurnIndex = Number.isInteger(result.targetTurnIndex)
@@ -2504,12 +2529,12 @@ export class HopCodeAgent extends BaseAgent {
         cwd,
       );
       const messagesWithTranscriptTelemetry =
-        this.mergeQwenTranscriptTelemetryMessages(
+        this.mergeHopCodeTranscriptTelemetryMessages(
           sessionId,
           mergedMessages,
           cwd,
         );
-      const messagesWithTextElements = this.applyQwenTranscriptTextElements(
+      const messagesWithTextElements = this.applyHopCodeTranscriptTextElements(
         messagesWithTranscriptTelemetry,
         sessionId,
         cwd,
@@ -2541,7 +2566,7 @@ export class HopCodeAgent extends BaseAgent {
       }
     } catch (error) {
       this.debug(
-        `Qwen loadSessionMessages extension unavailable; falling back to session/load for ${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
+        `HopCode loadSessionMessages extension unavailable; falling back to session/load for ${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
@@ -2568,15 +2593,15 @@ export class HopCodeAgent extends BaseAgent {
 
   async refreshAvailableCommands(): Promise<AvailableCommandsSnapshot | null> {
     this.debug(
-      `Qwen slash command refresh requested (session=${this.hopcodeSessionId ?? this.persistedhopcodeSessionId ?? 'none'}, cwd=${this.resolvedCwd()})`,
+      `HopCode slash command refresh requested (session=${this.hopcodeSessionId ?? this.persistedHopCodeSessionId ?? 'none'}, cwd=${this.resolvedCwd()})`,
     );
     const hadLiveSessionBeforeRefresh = !!this.hopcodeSessionId;
     await this.ensureProcess();
-    await this.ensureQwenSession();
+    await this.ensureHopCodeSession();
 
     if (this.latestAvailableCommandsSnapshot) {
       this.debug(
-        `Qwen slash command refresh using latest snapshot: commands=${this.latestAvailableCommandsSnapshot.availableCommands.length} ` +
+        `HopCode slash command refresh using latest snapshot: commands=${this.latestAvailableCommandsSnapshot.availableCommands.length} ` +
           `skills=${this.latestAvailableCommandsSnapshot.availableSkills?.length ?? 0} ` +
           `names=${formatDebugNames(this.latestAvailableCommandsSnapshot.availableCommands.map((command) => command.name))}`,
       );
@@ -2588,7 +2613,7 @@ export class HopCodeAgent extends BaseAgent {
         await this.reloadCurrentSessionForAvailableCommands();
       if (reloadedSnapshot) {
         this.debug(
-          `Qwen slash command refresh reused current session after reload: commands=${reloadedSnapshot.availableCommands.length} ` +
+          `HopCode slash command refresh reused current session after reload: commands=${reloadedSnapshot.availableCommands.length} ` +
             `skills=${reloadedSnapshot.availableSkills?.length ?? 0} ` +
             `names=${formatDebugNames(reloadedSnapshot.availableCommands.map((command) => command.name))}`,
         );
@@ -2597,13 +2622,13 @@ export class HopCodeAgent extends BaseAgent {
     }
 
     this.debug(
-      'Qwen slash command refresh waiting for available_commands_update',
+      'HopCode slash command refresh waiting for available_commands_update',
     );
     const snapshot = await this.waitForAvailableCommandsSnapshot();
     this.debug(
       snapshot
-        ? `Qwen slash command refresh received after wait: commands=${snapshot.availableCommands.length} skills=${snapshot.availableSkills?.length ?? 0} names=${formatDebugNames(snapshot.availableCommands.map((command) => command.name))}`
-        : 'Qwen slash command refresh timed out waiting for available_commands_update',
+        ? `HopCode slash command refresh received after wait: commands=${snapshot.availableCommands.length} skills=${snapshot.availableSkills?.length ?? 0} names=${formatDebugNames(snapshot.availableCommands.map((command) => command.name))}`
+        : 'HopCode slash command refresh timed out waiting for available_commands_update',
     );
     return snapshot;
   }
@@ -2628,7 +2653,7 @@ export class HopCodeAgent extends BaseAgent {
           10_000,
         ).catch((error) => {
           this.debug(
-            `Qwen mini model switch failed: ${error instanceof Error ? error.message : String(error)}`,
+            `HopCode mini model switch failed: ${error instanceof Error ? error.message : String(error)}`,
           );
         });
       }
@@ -2654,7 +2679,7 @@ export class HopCodeAgent extends BaseAgent {
       this.miniCollectors.delete(sessionId);
       await this.deleteBackendSession(sessionId).catch((error) => {
         this.debug(
-          `Qwen mini session cleanup failed: ${error instanceof Error ? error.message : String(error)}`,
+          `HopCode mini session cleanup failed: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
       this.unregisterAcpSession(sessionId);
@@ -2720,7 +2745,7 @@ export class HopCodeAgent extends BaseAgent {
     });
 
     try {
-      this.acpLease = await acquireSharedQwenAcpProcess(
+      this.acpLease = await acquireSharedHopCodeAcpProcess(
         {
           key,
           command,
@@ -2738,12 +2763,12 @@ export class HopCodeAgent extends BaseAgent {
       );
       this.connection = this.acpLease.connection;
     } catch (error) {
-      const originalMessage = formatQwenAcpErrorMessage(error);
+      const originalMessage = formatHopCodeAcpErrorMessage(error);
       const recentStderr = this.getRecentStderr().trim();
       const message = [
         originalMessage,
-        `Qwen command: ${commandDescription}`,
-        recentStderr ? `Recent Qwen stderr:\n${recentStderr}` : undefined,
+        `HopCode command: ${commandDescription}`,
+        recentStderr ? `Recent HopCode stderr:\n${recentStderr}` : undefined,
       ]
         .filter(Boolean)
         .join('\n');
@@ -2788,14 +2813,76 @@ export class HopCodeAgent extends BaseAgent {
       return {};
     }
 
-    const messages = this.midTurnMessageQueue.splice(0);
-    if (messages.length > 0) {
-      this.debug(
-        `Drained ${messages.length} mid-turn user message(s) to Qwen ACP`,
-      );
-      this.config.onMidTurnMessagesDrained?.(messages);
+    const entries = this.midTurnMessageQueue.splice(0);
+
+    const hasAttachments = entries.some(
+      (entry) => entry.attachments && entry.attachments.length > 0,
+    );
+    if (!hasAttachments) {
+      if (entries.length > 0) {
+        this.debug(
+          `Drained ${entries.length} mid-turn user message(s) to HopCode ACP`,
+        );
+        this.config.onMidTurnMessagesDrained?.(
+          entries.map(
+            (entry) =>
+              entry.messageId ?? entry.optimisticMessageId ?? entry.message,
+          ),
+        );
+      }
+      return { messages: entries.map((entry) => entry.message) };
     }
-    return { messages };
+
+    const items: Array<{ content: ContentBlock[]; displayText: string }> = [];
+    const messageIds: string[] = [];
+    const failedEntries: QueuedMidTurnMessage[] = [];
+    for (const entry of entries) {
+      const displayText = entry.message || '[User message with attachments]';
+      try {
+        items.push({
+          content: this.buildPromptBlocks(entry.message, entry.attachments, {
+            includeContext: false,
+          }),
+          displayText,
+        });
+        messageIds.push(
+          entry.messageId ?? entry.optimisticMessageId ?? entry.message,
+        );
+      } catch (error) {
+        const buildFailureCount = (entry.buildFailureCount ?? 0) + 1;
+        this.debug(
+          `Failed to build mid-turn content blocks (${buildFailureCount}/${MAX_MID_TURN_CONTENT_BUILD_FAILURES}): ${getErrorMessage(error)}`,
+        );
+        if (buildFailureCount >= MAX_MID_TURN_CONTENT_BUILD_FAILURES) {
+          items.push({
+            content: [
+              { type: 'text', text: displayText },
+              { type: 'text', text: MID_TURN_ATTACHMENT_PROCESSING_FAILURE_TEXT },
+            ],
+            displayText,
+          });
+          messageIds.push(
+            entry.messageId ?? entry.optimisticMessageId ?? entry.message,
+          );
+        } else {
+          failedEntries.push({ ...entry, buildFailureCount });
+        }
+      }
+    }
+
+    if (failedEntries.length > 0) {
+      this.midTurnMessageQueue.unshift(...failedEntries);
+    }
+    if (messageIds.length > 0) {
+      this.debug(
+        `Drained ${messageIds.length} mid-turn user message(s) to HopCode ACP`,
+      );
+      this.config.onMidTurnMessagesDrained?.(messageIds);
+    }
+
+    return {
+      items,
+    };
   }
 
   private getAcpConnection(): ClientSideConnection {
@@ -2804,7 +2891,7 @@ export class HopCodeAgent extends BaseAgent {
       this.connection.signal.aborted ||
       !this.acpLease?.isActive()
     ) {
-      throw new Error('Qwen ACP process is not running');
+      throw new Error('HopCode ACP process is not running');
     }
     return this.connection;
   }
@@ -2831,7 +2918,7 @@ export class HopCodeAgent extends BaseAgent {
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeout = setTimeout(() => {
-        reject(new Error(`Qwen ACP request timed out: ${method}`));
+        reject(new Error(`HopCode ACP request timed out: ${method}`));
       }, timeoutMs);
     });
 
@@ -2844,7 +2931,7 @@ export class HopCodeAgent extends BaseAgent {
     code: number | null,
     signal: NodeJS.Signals | null,
   ): void {
-    const message = `Qwen ACP process exited (code=${code ?? 'null'}, signal=${signal ?? 'null'})`;
+    const message = `HopCode ACP process exited (code=${code ?? 'null'}, signal=${signal ?? 'null'})`;
     this.debug(message);
     this.acpLease = null;
     this.connection = null;
@@ -2883,10 +2970,10 @@ export class HopCodeAgent extends BaseAgent {
   // Session management
   // ============================================================
 
-  private async ensureQwenSession(): Promise<void> {
+  private async ensureHopCodeSession(): Promise<void> {
     if (this.hopcodeSessionId) {
       this.debug(
-        `Qwen ACP session reuse: using live session ${this.hopcodeSessionId}`,
+        `HopCode ACP session reuse: using live session ${this.hopcodeSessionId}`,
       );
       this.registerAcpSession(this.hopcodeSessionId);
       await this.applySessionSettings(this.hopcodeSessionId);
@@ -2894,24 +2981,24 @@ export class HopCodeAgent extends BaseAgent {
       return;
     }
 
-    if (this.ensureQwenSessionPromise) {
-      this.debug('Qwen ACP session reuse: waiting for in-flight session setup');
-      await this.ensureQwenSessionPromise;
+    if (this.ensureHopCodeSessionPromise) {
+      this.debug('HopCode ACP session reuse: waiting for in-flight session setup');
+      await this.ensureHopCodeSessionPromise;
       return;
     }
 
-    this.ensureQwenSessionPromise = this.createOrLoadQwenSession();
+    this.ensureHopCodeSessionPromise = this.createOrLoadHopCodeSession();
     try {
-      await this.ensureQwenSessionPromise;
+      await this.ensureHopCodeSessionPromise;
     } finally {
-      this.ensureQwenSessionPromise = null;
+      this.ensureHopCodeSessionPromise = null;
     }
   }
 
-  private async createOrLoadQwenSession(): Promise<void> {
+  private async createOrLoadHopCodeSession(): Promise<void> {
     if (this.hopcodeSessionId) {
       this.debug(
-        `Qwen ACP session reuse: using live session ${this.hopcodeSessionId}`,
+        `HopCode ACP session reuse: using live session ${this.hopcodeSessionId}`,
       );
       this.registerAcpSession(this.hopcodeSessionId);
       await this.applySessionSettings(this.hopcodeSessionId);
@@ -2922,11 +3009,11 @@ export class HopCodeAgent extends BaseAgent {
     const cwd = this.resolvedCwd();
     const mcpServers = this.buildAcpMcpServers();
     const existingSessionId =
-      this.persistedhopcodeSessionId ?? this.config.session?.sdkSessionId;
+      this.persistedHopCodeSessionId ?? this.config.session?.sdkSessionId;
 
     if (existingSessionId) {
       this.debug(
-        `Qwen ACP session reuse: loading persisted session ${existingSessionId}`,
+        `HopCode ACP session reuse: loading persisted session ${existingSessionId}`,
       );
       this.suppressedSessionUpdates.add(existingSessionId);
       try {
@@ -2943,7 +3030,7 @@ export class HopCodeAgent extends BaseAgent {
           ),
         );
         this.hopcodeSessionId = existingSessionId;
-        this.persistedhopcodeSessionId = existingSessionId;
+        this.persistedHopCodeSessionId = existingSessionId;
         this.registerAcpSession(existingSessionId);
         this.recordSessionModels(result);
         this.recordSessionModes(result);
@@ -2957,7 +3044,7 @@ export class HopCodeAgent extends BaseAgent {
     }
 
     this.debug(
-      'Qwen ACP session reuse: no existing session id, creating a new ACP session',
+      'HopCode ACP session reuse: no existing session id, creating a new ACP session',
     );
     const result = toRecord(
       await this.callAcp(
@@ -2973,11 +3060,11 @@ export class HopCodeAgent extends BaseAgent {
 
     const sessionId = asString(result.sessionId);
     if (!sessionId) {
-      throw new Error('Qwen ACP did not return a sessionId');
+      throw new Error('HopCode ACP did not return a sessionId');
     }
 
     this.hopcodeSessionId = sessionId;
-    this.persistedhopcodeSessionId = sessionId;
+    this.persistedHopCodeSessionId = sessionId;
     this.registerAcpSession(sessionId);
     this.recordSessionModels(result);
     this.recordSessionModes(result);
@@ -2992,13 +3079,13 @@ export class HopCodeAgent extends BaseAgent {
 
     if (this._isProcessing) {
       this.debug(
-        `Qwen slash command refresh did not reload session ${sessionId} because a prompt is active`,
+        `HopCode slash command refresh did not reload session ${sessionId} because a prompt is active`,
       );
       return null;
     }
 
     this.debug(
-      `Qwen slash command refresh reloading existing ACP session ${sessionId} to request available_commands_update`,
+      `HopCode slash command refresh reloading existing ACP session ${sessionId} to request available_commands_update`,
     );
     this.suppressedSessionUpdates.add(sessionId);
     try {
@@ -3039,7 +3126,7 @@ export class HopCodeAgent extends BaseAgent {
     const sessionId = asString(result.sessionId);
     if (!sessionId) {
       throw new Error(
-        'Qwen ACP did not return a sessionId for mini completion',
+        'HopCode ACP did not return a sessionId for mini completion',
       );
     }
     this.registerAcpSession(sessionId);
@@ -3051,7 +3138,7 @@ export class HopCodeAgent extends BaseAgent {
     const modelState = toRecord(result.models);
     const availableModels = Array.isArray(modelState.availableModels)
       ? modelState.availableModels
-          .map(toQwenModelDefinition)
+          .map(toHopCodeModelDefinition)
           .filter((model): model is ModelDefinition => !!model)
       : [];
     const currentModelId = asString(modelState.currentModelId);
@@ -3109,7 +3196,7 @@ export class HopCodeAgent extends BaseAgent {
 
     const modeState = toRecord(result.modes);
     const currentModeId = asString(modeState.currentModeId);
-    const mode = mapQwenModeToPermissionMode(currentModeId);
+    const mode = mapHopCodeModeToPermissionMode(currentModeId);
 
     if (!mode || mode === this.getPermissionMode()) return;
 
@@ -3123,7 +3210,7 @@ export class HopCodeAgent extends BaseAgent {
   ): Promise<void> {
     if (!model || !sessionId) return;
     if (!this.isKnownAvailableModel(model)) {
-      this.debug(`Skipping Qwen model forward for unavailable model: ${model}`);
+      this.debug(`Skipping HopCode model forward for unavailable model: ${model}`);
       return;
     }
 
@@ -3152,7 +3239,7 @@ export class HopCodeAgent extends BaseAgent {
       }
     } catch (error) {
       this.debug(
-        `Qwen session/set_model failed: ${error instanceof Error ? error.message : String(error)}`,
+        `HopCode session/set_model failed: ${error instanceof Error ? error.message : String(error)}`,
       );
       await this.callAcp(
         'session/set_config_option',
@@ -3165,7 +3252,7 @@ export class HopCodeAgent extends BaseAgent {
         10_000,
       ).catch((fallbackError) => {
         this.debug(
-          `Qwen model config fallback failed: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`,
+          `HopCode model config fallback failed: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`,
         );
       });
     }
@@ -3193,7 +3280,7 @@ export class HopCodeAgent extends BaseAgent {
         (connection) =>
           connection.setSessionMode({
             sessionId,
-            modeId: mapPermissionModeToQwen(mode),
+            modeId: mapPermissionModeToHopCode(mode),
           }),
         10_000,
       );
@@ -3202,7 +3289,7 @@ export class HopCodeAgent extends BaseAgent {
       }
     } catch (error) {
       this.debug(
-        `Qwen mode switch failed: ${error instanceof Error ? error.message : String(error)}`,
+        `HopCode mode switch failed: ${error instanceof Error ? error.message : String(error)}`,
       );
       if (this.pendingModeOverride === mode) {
         this.pendingModeOverride = null;
@@ -3219,7 +3306,7 @@ export class HopCodeAgent extends BaseAgent {
     );
   }
 
-  private extractQwenRecordText(record: JsonRecord): string {
+  private extractHopCodeRecordText(record: JsonRecord): string {
     const message = toRecord(record.message);
     const parts = Array.isArray(message.parts)
       ? message.parts.filter(isRecord)
@@ -3230,17 +3317,17 @@ export class HopCodeAgent extends BaseAgent {
       .join('\n\n');
   }
 
-  private getQwenTranscriptPatchContent(record: JsonRecord): string {
+  private getHopCodeTranscriptPatchContent(record: JsonRecord): string {
     if (record.type === 'system' && record.subtype === 'slash_command') {
       const payload = toRecord(record.systemPayload);
       if (payload.phase === 'invocation') {
         return asString(payload.rawCommand) || '';
       }
     }
-    return this.extractQwenRecordText(record);
+    return this.extractHopCodeRecordText(record);
   }
 
-  private isPatchableQwenUserRecord(
+  private isPatchableHopCodeUserRecord(
     record: JsonRecord,
     sessionId: string,
   ): boolean {
@@ -3251,12 +3338,12 @@ export class HopCodeAgent extends BaseAgent {
     return toRecord(record.systemPayload).phase === 'invocation';
   }
 
-  private persistQwenTranscriptTextElements(
+  private persistHopCodeTranscriptTextElements(
     sessionId: string,
     cwd: string,
     sourceElements?: MessageTextElement[],
   ): void {
-    const transcriptPath = getQwenTranscriptPath(sessionId, cwd);
+    const transcriptPath = getHopCodeTranscriptPath(sessionId, cwd);
     if (!existsSync(transcriptPath)) return;
 
     let fileContent: string;
@@ -3264,7 +3351,7 @@ export class HopCodeAgent extends BaseAgent {
       fileContent = readFileSync(transcriptPath, 'utf8');
     } catch (error) {
       this.debug(
-        `Failed to read Qwen transcript for text elements: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to read HopCode transcript for text elements: ${error instanceof Error ? error.message : String(error)}`,
       );
       return;
     }
@@ -3284,10 +3371,10 @@ export class HopCodeAgent extends BaseAgent {
         continue;
       }
 
-      if (!this.isPatchableQwenUserRecord(record, sessionId)) continue;
+      if (!this.isPatchableHopCodeUserRecord(record, sessionId)) continue;
 
-      const content = this.getQwenTranscriptPatchContent(record);
-      const textElements = buildQwenTranscriptTextElements(
+      const content = this.getHopCodeTranscriptPatchContent(record);
+      const textElements = buildHopCodeTranscriptTextElements(
         content,
         sourceElements,
       );
@@ -3309,22 +3396,22 @@ export class HopCodeAgent extends BaseAgent {
         );
         renameSync(tmpPath, transcriptPath);
         this.debug(
-          `Wrote ${textElements.length} text element(s) into Qwen transcript ${transcriptPath}`,
+          `Wrote text elements into HopCode transcript ${transcriptPath}`,
         );
       } catch (error) {
         this.debug(
-          `Failed to write Qwen transcript text elements: ${error instanceof Error ? error.message : String(error)}`,
+          `Failed to write HopCode transcript text elements: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
       return;
     }
   }
 
-  private readQwenTranscriptTextElements(
+  private readHopCodeTranscriptTextElements(
     sessionId: string,
     cwd: string,
   ): Array<{ content: string; textElements: MessageTextElement[] }> {
-    const transcriptPath = getQwenTranscriptPath(sessionId, cwd);
+    const transcriptPath = getHopCodeTranscriptPath(sessionId, cwd);
     if (!existsSync(transcriptPath)) return [];
 
     let fileContent: string;
@@ -3348,11 +3435,11 @@ export class HopCodeAgent extends BaseAgent {
         continue;
       }
 
-      if (!this.isPatchableQwenUserRecord(record, sessionId)) continue;
-      const textElements = toQwenTranscriptTextElements(record.textElements);
+      if (!this.isPatchableHopCodeUserRecord(record, sessionId)) continue;
+      const textElements = toHopCodeTranscriptTextElements(record.textElements);
       if (!textElements) continue;
 
-      const content = this.getQwenTranscriptPatchContent(record);
+      const content = this.getHopCodeTranscriptPatchContent(record);
       if (!content) continue;
       records.push({ content, textElements });
     }
@@ -3360,12 +3447,12 @@ export class HopCodeAgent extends BaseAgent {
     return records;
   }
 
-  private applyQwenTranscriptTextElements(
+  private applyHopCodeTranscriptTextElements(
     messages: Message[],
     sessionId: string,
     cwd: string,
   ): Message[] {
-    const records = this.readQwenTranscriptTextElements(sessionId, cwd);
+    const records = this.readHopCodeTranscriptTextElements(sessionId, cwd);
     if (records.length === 0) return messages;
 
     const remaining = [...records];
@@ -3447,13 +3534,15 @@ export class HopCodeAgent extends BaseAgent {
   private buildPromptBlocks(
     message: string,
     attachments?: FileAttachment[],
+    options?: { includeContext?: boolean },
   ): ContentBlock[] {
-    if (isSlashCommandPrompt(message, attachments)) {
+    const includeContext = options?.includeContext ?? true;
+    if (includeContext && isSlashCommandPrompt(message, attachments)) {
       return [{ type: 'text', text: message.trim() }];
     }
 
     const textParts: string[] = [];
-    const context = INCLUDE_CRAFT_CONTEXT_IN_HOPCODE_PROMPTS
+    const context = includeContext && INCLUDE_CRAFT_CONTEXT_IN_HOPCODE_PROMPTS
       ? this.buildCraftContext()
       : '';
 
@@ -3471,17 +3560,22 @@ export class HopCodeAgent extends BaseAgent {
         textParts.push(
           `[Attached text: ${attachment.name}]\n${attachment.text}`,
         );
+      } else {
+        this.debug(
+          `Skipping attachment ${attachment.name} while building prompt blocks: no readable content`,
+        );
       }
     }
 
     textParts.push(message);
     const text = textParts.filter(Boolean).join('\n\n');
-    const blocks: ContentBlock[] = [
-      {
+    const blocks: ContentBlock[] = [];
+    if (text || context) {
+      blocks.push({
         type: 'text',
         text: context ? `${text}\n\n` : text,
-      },
-    ];
+      });
+    }
 
     if (context) {
       blocks.push({
@@ -3635,7 +3729,7 @@ export class HopCodeAgent extends BaseAgent {
     let fallbackTimestamp = Date.now();
     let interruptionMessageAdded = false;
 
-    const nextId = () => `qwen-${sessionId}-${++idCounter}`;
+    const nextId = () => `hopcode-${sessionId}-${++idCounter}`;
     const timestampFor = (update: JsonRecord): number => {
       const meta = toRecord(update._meta);
       const timestamp = asNumber(meta.timestamp) ?? asNumber(update.timestamp);
@@ -3654,7 +3748,7 @@ export class HopCodeAgent extends BaseAgent {
     ) => {
       if (!text) return;
       const messageText =
-        role === 'assistant' ? normalizeQwenAssistantText(text) : text;
+        role === 'assistant' ? normalizeHopCodeAssistantText(text) : text;
       const previous = messages[messages.length - 1];
       if (
         previous &&
@@ -3668,7 +3762,7 @@ export class HopCodeAgent extends BaseAgent {
         const nextContent = previous.content + text;
         previous.content =
           role === 'assistant'
-            ? normalizeQwenAssistantText(nextContent)
+            ? normalizeHopCodeAssistantText(nextContent)
             : nextContent;
         return;
       }
@@ -3713,7 +3807,7 @@ export class HopCodeAgent extends BaseAgent {
       const timestamp = timestampFor(update);
       const content = toRecord(update.content);
       const text = content.type === 'text' ? asString(content.text) : undefined;
-      const parentToolUseId = resolveQwenParentToolUseId({
+      const parentToolUseId = resolveHopCodeParentToolUseId({
         update,
         activeParentToolUseIds,
       });
@@ -3748,7 +3842,7 @@ export class HopCodeAgent extends BaseAgent {
         case 'tool_call': {
           markTrailingAssistantAsCommentary();
           const toolUseId =
-            asString(update.toolCallId) || `qwen-history-tool-${++idCounter}`;
+            asString(update.toolCallId) || `hopcode-history-tool-${++idCounter}`;
           const rawInput = toRecord(update.rawInput);
           const meta = toRecord(update._meta);
           const kind = asString(update.kind);
@@ -3756,7 +3850,7 @@ export class HopCodeAgent extends BaseAgent {
             asString(meta.toolName) || asString(update.title),
             kind,
           );
-          const toolParentUseId = resolveQwenParentToolUseId({
+          const toolParentUseId = resolveHopCodeParentToolUseId({
             update,
             toolUseId,
             activeParentToolUseIds,
@@ -3785,14 +3879,14 @@ export class HopCodeAgent extends BaseAgent {
         case 'tool_call_update': {
           markTrailingAssistantAsCommentary();
           const toolUseId =
-            asString(update.toolCallId) || `qwen-history-tool-${++idCounter}`;
+            asString(update.toolCallId) || `hopcode-history-tool-${++idCounter}`;
           const existing = toolMessages.get(toolUseId);
           const meta = toRecord(update._meta);
           const toolName = normalizeToolName(
             asString(meta.toolName) || existing?.toolName,
             asString(update.kind),
           );
-          const toolParentUseId = resolveQwenParentToolUseId({
+          const toolParentUseId = resolveHopCodeParentToolUseId({
             update,
             toolUseId,
             activeParentToolUseIds,
@@ -3800,9 +3894,9 @@ export class HopCodeAgent extends BaseAgent {
           const result = this.formatToolResult(update);
           const status = asString(update.status);
           const isInterrupted =
-            isQwenUserInterruptText(result) ||
-            isQwenUserInterruptStatus(status);
-          const isError = isQwenToolFailureStatus(status) || isInterrupted;
+            isHopCodeUserInterruptText(result) ||
+            isHopCodeUserInterruptStatus(status);
+          const isError = isHopCodeToolFailureStatus(status) || isInterrupted;
           const toolResult = isInterrupted ? 'Interrupted' : result;
 
           if (existing) {
@@ -3854,7 +3948,7 @@ export class HopCodeAgent extends BaseAgent {
             content: 'Todo list updated',
             timestamp,
             toolName: 'TodoWrite',
-            toolUseId: `qwen-history-plan-${idCounter}`,
+            toolUseId: `hopcode-history-plan-${idCounter}`,
             toolInput: { todos },
             toolResult: 'Todo list updated',
             toolStatus: 'completed',
@@ -3871,12 +3965,12 @@ export class HopCodeAgent extends BaseAgent {
     return messages;
   }
 
-  private mergeQwenTranscriptTelemetryMessages(
+  private mergeHopCodeTranscriptTelemetryMessages(
     sessionId: string,
     messages: Message[],
     cwd: string,
   ): Message[] {
-    const transcriptMessages = this.loadQwenTranscriptTelemetryMessages(
+    const transcriptMessages = this.loadHopCodeTranscriptTelemetryMessages(
       sessionId,
       cwd,
     );
@@ -3930,11 +4024,11 @@ export class HopCodeAgent extends BaseAgent {
       .map(({ message }) => message);
   }
 
-  private loadQwenTranscriptTelemetryMessages(
+  private loadHopCodeTranscriptTelemetryMessages(
     sessionId: string,
     cwd: string,
   ): Message[] {
-    const transcriptPath = getQwenTranscriptPath(sessionId, cwd);
+    const transcriptPath = getHopCodeTranscriptPath(sessionId, cwd);
     if (!existsSync(transcriptPath)) return [];
 
     let fileContent: string;
@@ -3942,7 +4036,7 @@ export class HopCodeAgent extends BaseAgent {
       fileContent = readFileSync(transcriptPath, 'utf8');
     } catch (error) {
       this.debug(
-        `Failed to read Qwen transcript telemetry from ${transcriptPath}: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to read HopCode transcript telemetry from ${transcriptPath}: ${error instanceof Error ? error.message : String(error)}`,
       );
       return [];
     }
@@ -3955,7 +4049,7 @@ export class HopCodeAgent extends BaseAgent {
     let idCounter = 0;
     let interruptionMessageAdded = false;
 
-    const nextId = () => `qwen-${sessionId}-transcript-${++idCounter}`;
+    const nextId = () => `hopcode-${sessionId}-transcript-${++idCounter}`;
     const appendInterruptionMessage = (timestamp: number) => {
       if (interruptionMessageAdded) return;
       interruptionMessageAdded = true;
@@ -3996,11 +4090,11 @@ export class HopCodeAgent extends BaseAgent {
       }
 
       if (record.sessionId !== sessionId) continue;
-      const timestamp = parseQwenTimestamp(record.timestamp) ?? Date.now();
+      const timestamp = parseHopCodeTimestamp(record.timestamp) ?? Date.now();
 
       if (record.type === 'user') {
         completeOpenParentTools();
-        const content = this.extractQwenRecordText(record);
+        const content = this.extractHopCodeRecordText(record);
         if (!content) continue;
         messages.push({
           id: nextId(),
@@ -4024,7 +4118,7 @@ export class HopCodeAgent extends BaseAgent {
             messages.push({
               id: nextId(),
               role: 'assistant',
-              content: isThought ? text : normalizeQwenAssistantText(text),
+              content: isThought ? text : normalizeHopCodeAssistantText(text),
               timestamp,
               ...(isThought
                 ? {
@@ -4041,7 +4135,7 @@ export class HopCodeAgent extends BaseAgent {
 
           const toolName = normalizeToolName(functionName);
           const toolUseId =
-            asString(functionCall.id) || `qwen-transcript-tool-${++idCounter}`;
+            asString(functionCall.id) || `hopcode-transcript-tool-${++idCounter}`;
           const rawInput = toRecord(functionCall.args);
           const toolMessage: Message = {
             id: nextId(),
@@ -4071,7 +4165,7 @@ export class HopCodeAgent extends BaseAgent {
       }
 
       if (record.type === 'tool_result') {
-        const result = this.extractQwenTranscriptToolResult(record);
+        const result = this.extractHopCodeTranscriptToolResult(record);
         if (!result) continue;
 
         const existing = result.callId
@@ -4087,7 +4181,7 @@ export class HopCodeAgent extends BaseAgent {
           existing.isError = result.isError;
         } else if (result.callId || result.toolName) {
           const toolUseId =
-            result.callId || `qwen-transcript-tool-${++idCounter}`;
+            result.callId || `hopcode-transcript-tool-${++idCounter}`;
           const toolMessage: Message = {
             id: nextId(),
             role: 'tool',
@@ -4114,16 +4208,16 @@ export class HopCodeAgent extends BaseAgent {
         const payload = toRecord(record.systemPayload);
         const uiEvent = toRecord(payload.uiEvent);
         if (
-          uiEvent['event.name'] === 'hopcode.api_error' &&
-          (isQwenUserInterruptText(asString(uiEvent.error_message)) ||
-            isQwenUserInterruptText(asString(uiEvent.error_type)))
+          uiEvent['event.name'] === 'hopcode-code.api_error' &&
+          (isHopCodeUserInterruptText(asString(uiEvent.error_message)) ||
+            isHopCodeUserInterruptText(asString(uiEvent.error_type)))
         ) {
           appendInterruptionMessage(timestamp);
           continue;
         }
       }
 
-      const telemetryMessage = this.buildQwenTranscriptTelemetryMessage({
+      const telemetryMessage = this.buildHopCodeTranscriptTelemetryMessage({
         record,
         timestamp,
         nextId,
@@ -4161,7 +4255,7 @@ export class HopCodeAgent extends BaseAgent {
     return messages;
   }
 
-  private extractQwenTranscriptToolResult(record: JsonRecord):
+  private extractHopCodeTranscriptToolResult(record: JsonRecord):
     | {
         callId?: string;
         toolName?: string;
@@ -4186,12 +4280,12 @@ export class HopCodeAgent extends BaseAgent {
       const status = asString(result.status);
       const responseError = asString(response.error);
       const isInterrupted =
-        isQwenUserInterruptText(text) ||
-        isQwenUserInterruptStatus(status) ||
-        isQwenUserInterruptText(responseError);
+        isHopCodeUserInterruptText(text) ||
+        isHopCodeUserInterruptStatus(status) ||
+        isHopCodeUserInterruptText(responseError);
       const isError =
         isInterrupted ||
-        isQwenToolFailureStatus(status) ||
+        isHopCodeToolFailureStatus(status) ||
         responseError !== undefined;
 
       const callId = asString(functionResponse.id) || asString(result.callId);
@@ -4207,7 +4301,7 @@ export class HopCodeAgent extends BaseAgent {
     return undefined;
   }
 
-  private buildQwenTranscriptTelemetryMessage(args: {
+  private buildHopCodeTranscriptTelemetryMessage(args: {
     record: JsonRecord;
     timestamp: number;
     nextId: () => string;
@@ -4221,11 +4315,11 @@ export class HopCodeAgent extends BaseAgent {
 
     const payload = toRecord(record.systemPayload);
     const uiEvent = toRecord(payload.uiEvent);
-    if (uiEvent['event.name'] !== 'hopcode.tool_call') return undefined;
+    if (uiEvent['event.name'] !== 'hopcode-code.tool_call') return undefined;
 
     const toolName = normalizeToolName(asString(uiEvent.function_name));
     const toolUseId =
-      asString(record.uuid) || `qwen-transcript-tool-${nextId()}`;
+      asString(record.uuid) || `hopcode-transcript-tool-${nextId()}`;
     const input = toRecord(uiEvent.function_args);
     const isError = uiEvent.success === false || uiEvent.status === 'error';
     const error = asString(uiEvent.error);
@@ -4247,7 +4341,7 @@ export class HopCodeAgent extends BaseAgent {
       toolResult,
       toolStatus: isError ? 'error' : 'completed',
       toolDisplayName: displayNameForTool(toolName),
-      parentToolUseId: this.resolveQwenTranscriptTelemetryParent(
+      parentToolUseId: this.resolveHopCodeTranscriptTelemetryParent(
         uiEvent,
         parentToolUseIdsBySubagent,
         args.fallbackParentToolUseId,
@@ -4256,7 +4350,7 @@ export class HopCodeAgent extends BaseAgent {
     };
   }
 
-  private resolveQwenTranscriptTelemetryParent(
+  private resolveHopCodeTranscriptTelemetryParent(
     uiEvent: JsonRecord,
     parentToolUseIdsBySubagent: ReadonlyMap<string, string>,
     fallbackParentToolUseId?: string,
@@ -4317,7 +4411,7 @@ export class HopCodeAgent extends BaseAgent {
   ): boolean {
     const messageContent =
       message.role === 'assistant'
-        ? normalizeQwenAssistantText(message.content).trim()
+        ? normalizeHopCodeAssistantText(message.content).trim()
         : message.content.trim();
 
     return (
@@ -4331,7 +4425,7 @@ export class HopCodeAgent extends BaseAgent {
     sessionId: string,
     cwd: string,
   ): Message[] {
-    const transcriptPath = getQwenTranscriptPath(sessionId, cwd);
+    const transcriptPath = getHopCodeTranscriptPath(sessionId, cwd);
     if (!existsSync(transcriptPath)) return [];
 
     const invocations = new Map<string, SlashCommandInvocation>();
@@ -4360,7 +4454,7 @@ export class HopCodeAgent extends BaseAgent {
         if (!rawCommand) continue;
 
         const phase = asString(payload.phase);
-        const timestamp = parseQwenTimestamp(record.timestamp) ?? Date.now();
+        const timestamp = parseHopCodeTimestamp(record.timestamp) ?? Date.now();
         if (phase === 'invocation') {
           const uuid = asString(record.uuid);
           if (uuid) invocations.set(uuid, { rawCommand, timestamp });
@@ -4374,7 +4468,7 @@ export class HopCodeAgent extends BaseAgent {
           : [];
         const outputTexts = outputItems
           .filter(isRecord)
-          .map(formatQwenSlashOutputHistoryItem)
+          .map(formatHopCodeSlashOutputHistoryItem)
           .filter((text): text is string => !!text?.trim());
         if (outputTexts.length === 0) continue;
 
@@ -4386,13 +4480,13 @@ export class HopCodeAgent extends BaseAgent {
         const invocation = parentUuid ? invocations.get(parentUuid) : undefined;
         const userContent = invocation?.rawCommand || rawCommand;
         messages.push({
-          id: `qwen-${sessionId}-slash-${++idCounter}`,
+          id: `hopcode-${sessionId}-slash-${++idCounter}`,
           role: 'user',
           content: userContent,
           timestamp: invocation?.timestamp ?? timestamp,
         });
         messages.push({
-          id: `qwen-${sessionId}-slash-${++idCounter}`,
+          id: `hopcode-${sessionId}-slash-${++idCounter}`,
           role: 'assistant',
           content: outputTexts.join('\n\n'),
           timestamp,
@@ -4400,7 +4494,7 @@ export class HopCodeAgent extends BaseAgent {
       }
     } catch (error) {
       this.debug(
-        `Failed to read Qwen slash command history from ${transcriptPath}: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to read HopCode slash command history from ${transcriptPath}: ${error instanceof Error ? error.message : String(error)}`,
       );
       return [];
     }
@@ -4413,7 +4507,7 @@ export class HopCodeAgent extends BaseAgent {
     if (content.type !== 'text') return;
     const text = asString(content.text);
     if (!text) return;
-    const parentToolUseId = resolveQwenParentToolUseId({
+    const parentToolUseId = resolveHopCodeParentToolUseId({
       update,
       activeParentToolUseIds: this.activeParentToolUseIds,
     });
@@ -4438,7 +4532,7 @@ export class HopCodeAgent extends BaseAgent {
     if (content.type !== 'text') return;
     const text = asString(content.text);
     if (!text) return;
-    const parentToolUseId = resolveQwenParentToolUseId({
+    const parentToolUseId = resolveHopCodeParentToolUseId({
       update,
       activeParentToolUseIds: this.activeParentToolUseIds,
     });
@@ -4479,7 +4573,7 @@ export class HopCodeAgent extends BaseAgent {
 
   private flushAssistantText(isIntermediate?: boolean): void {
     if (!this.currentAssistantText) return;
-    const text = normalizeQwenAssistantText(this.currentAssistantText, {
+    const text = normalizeHopCodeAssistantText(this.currentAssistantText, {
       forceJsonFence: this.currentIsSlashCommand,
     });
     this.eventQueue.enqueue({
@@ -4496,7 +4590,7 @@ export class HopCodeAgent extends BaseAgent {
 
   private handleToolCall(update: JsonRecord): void {
     const toolUseId =
-      asString(update.toolCallId) || `qwen-tool-${++this.toolIdCounter}`;
+      asString(update.toolCallId) || `hopcode-tool-${++this.toolIdCounter}`;
     const rawInput = toRecord(update.rawInput);
     const meta = toRecord(update._meta);
     const kind = asString(update.kind);
@@ -4505,7 +4599,7 @@ export class HopCodeAgent extends BaseAgent {
       kind,
     );
     const title = asString(update.title);
-    const parentToolUseId = resolveQwenParentToolUseId({
+    const parentToolUseId = resolveHopCodeParentToolUseId({
       update,
       toolUseId,
       activeParentToolUseIds: this.activeParentToolUseIds,
@@ -4532,12 +4626,12 @@ export class HopCodeAgent extends BaseAgent {
 
   private handleToolCallUpdate(update: JsonRecord): void {
     const toolUseId =
-      asString(update.toolCallId) || `qwen-tool-${++this.toolIdCounter}`;
+      asString(update.toolCallId) || `hopcode-tool-${++this.toolIdCounter}`;
     const meta = toRecord(update._meta);
     const toolName =
       this.toolNames.get(toolUseId) ||
       normalizeToolName(asString(meta.toolName), asString(update.kind));
-    const parentToolUseId = resolveQwenParentToolUseId({
+    const parentToolUseId = resolveHopCodeParentToolUseId({
       update,
       toolUseId,
       activeParentToolUseIds: this.activeParentToolUseIds,
@@ -4572,7 +4666,7 @@ export class HopCodeAgent extends BaseAgent {
       }))
       .filter((todo) => todo.content);
 
-    const toolUseId = `qwen-plan-${++this.planUpdateCounter}`;
+    const toolUseId = `hopcode-plan-${++this.planUpdateCounter}`;
     const input = { todos };
     this.eventQueue.enqueue({
       type: 'tool_start',
@@ -4595,7 +4689,7 @@ export class HopCodeAgent extends BaseAgent {
 
   private handleModeUpdate(update: JsonRecord): void {
     const modeId = asString(update.modeId) || asString(update.currentModeId);
-    const mode = mapQwenModeToPermissionMode(modeId);
+    const mode = mapHopCodeModeToPermissionMode(modeId);
     if (!mode || mode === this.getPermissionMode()) return;
     this.applyAcpPermissionMode(mode);
   }
@@ -4653,7 +4747,7 @@ export class HopCodeAgent extends BaseAgent {
       this.latestAvailableCommandsSnapshot = latest;
       this.resolveAvailableCommandsWaiters(latest);
       this.debug(
-        `Qwen loadSessionMessages captured available commands: commands=${latest.availableCommands.length} ` +
+        `HopCode loadSessionMessages captured available commands: commands=${latest.availableCommands.length} ` +
           `skills=${latest.availableSkills?.length ?? 0} ` +
           `skillDetails=${latest.availableSkillDetails?.length ?? 0} ` +
           `names=${formatDebugNames(latest.availableCommands.map((command) => command.name))} ` +
@@ -4702,13 +4796,13 @@ export class HopCodeAgent extends BaseAgent {
 
     if (!snapshot) {
       this.debug(
-        'Qwen available_commands_update ignored because it contained no commands or skills',
+        'HopCode available_commands_update ignored because it contained no commands or skills',
       );
       return;
     }
 
     this.debug(
-      `Qwen available_commands_update parsed: commands=${snapshot.availableCommands.length} ` +
+      `HopCode available_commands_update parsed: commands=${snapshot.availableCommands.length} ` +
         `skills=${snapshot.availableSkills?.length ?? 0} ` +
         `skillDetails=${snapshot.availableSkillDetails?.length ?? 0} ` +
         `names=${formatDebugNames(snapshot.availableCommands.map((command) => command.name))} ` +
@@ -4737,14 +4831,14 @@ export class HopCodeAgent extends BaseAgent {
       !this.suppressedSessionUpdates.has(sessionId)
     ) {
       this.debug(
-        `Qwen available_commands_update received for active session ${sessionId}`,
+        `HopCode available_commands_update received for active session ${sessionId}`,
       );
       this.handleAvailableCommandsUpdate(update);
       return;
     }
 
     this.debug(
-      `Qwen available_commands_update buffered: updateSession=${sessionId} ` +
+      `HopCode available_commands_update buffered: updateSession=${sessionId} ` +
         `currentSession=${this.hopcodeSessionId ?? 'none'} ` +
         `suppressed=${this.suppressedSessionUpdates.has(sessionId)}`,
     );
@@ -4756,7 +4850,7 @@ export class HopCodeAgent extends BaseAgent {
     if (!update) return;
     this.pendingAvailableCommandsUpdates.delete(sessionId);
     this.debug(
-      `Qwen available_commands_update flushing buffered update for session ${sessionId}`,
+      `HopCode available_commands_update flushing buffered update for session ${sessionId}`,
     );
     this.handleAvailableCommandsUpdate(update);
   }
@@ -4781,7 +4875,7 @@ export class HopCodeAgent extends BaseAgent {
       };
       const timeout = setTimeout(() => {
         this.debug(
-          `Qwen slash command refresh wait timed out after ${timeoutMs}ms`,
+          `HopCode slash command refresh wait timed out after ${timeoutMs}ms`,
         );
         waiter(null);
       }, timeoutMs);
@@ -4795,7 +4889,7 @@ export class HopCodeAgent extends BaseAgent {
     const waiters = this.availableCommandsWaiters.splice(0);
     if (waiters.length > 0) {
       this.debug(
-        `Qwen resolving ${waiters.length} slash command refresh waiter(s)`,
+        `HopCode resolving ${waiters.length} slash command refresh waiter(s)`,
       );
     }
     for (const resolve of waiters) {
@@ -4929,7 +5023,7 @@ export class HopCodeAgent extends BaseAgent {
     }
 
     return new Promise<RequestPermissionResponse>((resolve) => {
-      const requestId = `qwen-permission-${++this.permissionRequestCounter}`;
+      const requestId = `hopcode-permission-${++this.permissionRequestCounter}`;
       this.pendingPermissions.set(requestId, { resolve, options });
 
       try {
@@ -4948,7 +5042,7 @@ export class HopCodeAgent extends BaseAgent {
         });
       } catch (error) {
         this.debug(
-          `Qwen permission callback failed: ${error instanceof Error ? error.message : String(error)}`,
+          `HopCode permission callback failed: ${error instanceof Error ? error.message : String(error)}`,
         );
         this.pendingPermissions.delete(requestId);
         resolve(this.createPermissionResponse(options, false, false));

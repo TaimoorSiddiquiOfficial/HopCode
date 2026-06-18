@@ -12,7 +12,7 @@ hopcode serve --port 4170
 # → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/your-project)
 ```
 
-Per [#3803](https://github.com/QwenLM/hopcode/issues/3803) §02 each daemon binds to one workspace at boot (the current `cwd`, or override with `--workspace /path/to/dir`). The daemon's bound path is advertised on `/capabilities.workspaceCwd` so clients can pre-flight check + omit `cwd` from `POST /session`.
+Per [#3803](https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/3803) §02 each daemon binds to one workspace at boot (the current `cwd`, or override with `--workspace /path/to/dir`). The daemon's bound path is advertised on `/capabilities.workspaceCwd` so clients can pre-flight check + omit `cwd` from `POST /session`.
 
 In another:
 
@@ -156,7 +156,7 @@ for await (const event of client.subscribeEvents(session.sessionId, {
 }
 ```
 
-The daemon retains the last 4000 events per session in a ring buffer; gaps beyond that window won't be re-deliverable.
+The daemon retains the last 8000 events per session in a ring buffer; gaps beyond that window won't be re-deliverable.
 
 ## Voting on permissions
 

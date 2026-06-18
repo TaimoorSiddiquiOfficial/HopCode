@@ -10,6 +10,7 @@ import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import type { AgentEvent, Message } from '@craft-agent/core/types';
 import { HopCodeAgent } from '../hopcode-agent.ts';
+import type { FileAttachment } from '../../utils/files.ts';
 
 type HopCodeAgentConfig = ConstructorParameters<typeof HopCodeAgent>[0];
 
@@ -24,12 +25,12 @@ type HopCodeHistoryInternals = {
     updates: Array<Record<string, unknown>>,
     cwd: string,
   ) => Message[];
-  persistQwenTranscriptTextElements: (
+  persistHopCodeTranscriptTextElements: (
     sessionId: string,
     cwd: string,
     sourceElements?: NonNullable<Message['textElements']>,
   ) => void;
-  applyQwenTranscriptTextElements: (
+  applyHopCodeTranscriptTextElements: (
     messages: Message[],
     sessionId: string,
     cwd: string,
@@ -39,6 +40,8 @@ type HopCodeHistoryInternals = {
 type HopCodePromptBlock = {
   type: string;
   text?: string;
+  data?: string;
+  mimeType?: string;
   resource?: {
     uri?: string;
     mimeType?: string | null;
@@ -48,7 +51,15 @@ type HopCodePromptBlock = {
 };
 
 type HopCodePromptInternals = {
-  buildPromptBlocks: (message: string) => HopCodePromptBlock[];
+  buildPromptBlocks: (
+    message: string,
+    attachments?: FileAttachment[],
+    options?: { includeContext?: boolean },
+  ) => HopCodePromptBlock[];
+};
+
+type HopCodeDebugInternals = {
+  onDebug?: (message: string) => void;
 };
 
 type HopCodeAvailableCommandsInternals = {
@@ -106,15 +117,15 @@ function createAgent(
   return new HopCodeAgent({
     provider: 'hopcode',
     workspace: {
-      id: 'workspace-qwen',
-      name: 'Qwen Workspace',
-      slug: 'qwen-workspace',
+      id: 'workspace-hopcode',
+      name: 'HopCode Workspace',
+      slug: 'hopcode-workspace',
       rootPath: cwd,
       createdAt: Date.now(),
     },
     session: {
-      id: 'session-qwen',
-      name: 'Qwen Session',
+      id: 'session-hopcode',
+      name: 'HopCode Session',
       workspaceRootPath: cwd,
       createdAt: Date.now(),
       lastUsedAt: Date.now(),
@@ -126,7 +137,7 @@ function createAgent(
   } as HopCodeAgentConfig);
 }
 
-function writeQwenTranscript(
+function writeHopCodeTranscript(
   runtimeRoot: string,
   cwd: string,
   sessionId: string,
@@ -141,7 +152,7 @@ function writeQwenTranscript(
   );
 }
 
-function readQwenTranscript(
+function readHopCodeTranscript(
   runtimeRoot: string,
   cwd: string,
   sessionId: string,
@@ -192,7 +203,7 @@ describe('HopCodeAgent slash command history', () => {
     expect(blocks).toEqual([{ type: 'text', text: '/context' }]);
   });
 
-  it('starts Qwen ACP with the desktop channel', () => {
+  it('starts HopCode ACP with the desktop channel', () => {
     const command = (
       HopCodeAgent.prototype as unknown as HopCodeSpawnInternals
     ).buildSpawnCommand('/opt/hopcode/dist/cli.js', '/usr/local/bin/node');
@@ -203,7 +214,7 @@ describe('HopCodeAgent slash command history', () => {
     });
   });
 
-  it('does not prepend Craft context to Qwen prompts while disabled', () => {
+  it('does not prepend Craft context to HopCode prompts while disabled', () => {
     const blocks = (
       HopCodeAgent.prototype as unknown as HopCodePromptInternals
     ).buildPromptBlocks('hello');
@@ -211,17 +222,51 @@ describe('HopCodeAgent slash command history', () => {
     expect(blocks).toEqual([{ type: 'text', text: 'hello' }]);
   });
 
+  it('logs attachments skipped while building prompt blocks', () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const agent = createAgent(cwd);
+    const debugMessages: string[] = [];
+    (agent as unknown as HopCodeDebugInternals).onDebug = (message) => {
+      debugMessages.push(message);
+    };
+
+    const attachment: FileAttachment = {
+      type: 'unknown',
+      path: '',
+      name: 'empty.bin',
+      mimeType: 'application/octet-stream',
+      size: 0,
+    };
+    const blocks = (agent as unknown as HopCodePromptInternals).buildPromptBlocks(
+      'hello',
+      [attachment],
+    );
+
+    expect(blocks).toEqual([{ type: 'text', text: 'hello' }]);
+    expect(debugMessages).toContain(
+      '[HopCodeAgent] Skipping attachment empty.bin while building prompt blocks: no readable content',
+    );
+
+    agent.destroy();
+  });
+
   it('drains queued mid-turn messages through the ACP extension handler', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const onMidTurnMessagesDrained = mock(() => {});
     const agent = createAgent(cwd, undefined, onMidTurnMessagesDrained);
     const internals = agent as unknown as HopCodeAvailableCommandsInternals;
-    internals.hopcodeSessionId = 'sdk-session-qwen';
+    internals.hopcodeSessionId = 'sdk-session-hopcode';
     internals._isProcessing = true;
 
-    expect(agent.enqueueMidTurnMessage('please also inspect tests')).toBe(true);
+    expect(
+      agent.enqueueMidTurnMessage('please also inspect tests', undefined, {
+        messageId: 'queued-1',
+      }),
+    ).toBe(true);
 
     await expect(
       internals.handleExtMethod('craft/drainMidTurnQueue', {
@@ -230,45 +275,386 @@ describe('HopCodeAgent slash command history', () => {
     ).resolves.toEqual({});
     await expect(
       internals.handleExtMethod('craft/drainMidTurnQueue', {
-        sessionId: 'session-qwen',
+        sessionId: 'session-hopcode',
       }),
     ).resolves.toEqual({
       messages: ['please also inspect tests'],
     });
-    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith([
-      'please also inspect tests',
-    ]);
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith(['queued-1']);
 
-    expect(agent.enqueueMidTurnMessage('and summarize findings')).toBe(true);
+    expect(
+      agent.enqueueMidTurnMessage('and summarize findings', undefined, {
+        messageId: 'queued-2',
+      }),
+    ).toBe(true);
     await expect(
       internals.handleExtMethod('craft/drainMidTurnQueue', {
-        sessionId: 'sdk-session-qwen',
+        sessionId: 'sdk-session-hopcode',
       }),
     ).resolves.toEqual({
       messages: ['and summarize findings'],
     });
-    expect(onMidTurnMessagesDrained).toHaveBeenLastCalledWith([
-      'and summarize findings',
-    ]);
+    expect(onMidTurnMessagesDrained).toHaveBeenLastCalledWith(['queued-2']);
     await expect(
       internals.handleExtMethod('craft/drainMidTurnQueue', {
-        sessionId: 'sdk-session-qwen',
+        sessionId: 'sdk-session-hopcode',
       }),
     ).resolves.toEqual({ messages: [] });
 
     agent.destroy();
   });
 
+  it('acknowledges drained mid-turn messages without metadata by text', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const onMidTurnMessagesDrained = mock(() => {});
+    const agent = createAgent(cwd, undefined, onMidTurnMessagesDrained);
+    const internals = agent as unknown as HopCodeAvailableCommandsInternals;
+    internals.hopcodeSessionId = 'sdk-session-hopcode';
+    internals._isProcessing = true;
+
+    expect(agent.enqueueMidTurnMessage('legacy queued message')).toBe(true);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({
+      messages: ['legacy queued message'],
+    });
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith([
+      'legacy queued message',
+    ]);
+
+    agent.destroy();
+  });
+
+  it('acknowledges metadata-free image-only mid-turn messages by empty text', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const onMidTurnMessagesDrained = mock((_messageIds: string[]) => {});
+    const agent = createAgent(cwd, undefined, onMidTurnMessagesDrained);
+    const internals = agent as unknown as HopCodeAvailableCommandsInternals;
+    internals.hopcodeSessionId = 'sdk-session-hopcode';
+    internals._isProcessing = true;
+
+    const attachment: FileAttachment = {
+      type: 'image',
+      path: join(cwd, 'screenshot.png'),
+      name: 'screenshot.png',
+      mimeType: 'image/png',
+      base64: 'iVBORw0KGgo=',
+      size: 8,
+    };
+    expect(agent.enqueueMidTurnMessage('', [attachment])).toBe(true);
+    expect(agent.enqueueMidTurnMessage('', [attachment])).toBe(true);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({
+      items: [
+        {
+          content: [
+            {
+              type: 'image',
+              data: 'iVBORw0KGgo=',
+              mimeType: 'image/png',
+            },
+          ],
+          displayText: '[User message with attachments]',
+        },
+        {
+          content: [
+            {
+              type: 'image',
+              data: 'iVBORw0KGgo=',
+              mimeType: 'image/png',
+            },
+          ],
+          displayText: '[User message with attachments]',
+        },
+      ],
+    });
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith(['', '']);
+
+    agent.destroy();
+  });
+
+  it('rejects empty mid-turn messages without attachments', () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const agent = createAgent(cwd);
+    const internals = agent as unknown as HopCodeAvailableCommandsInternals;
+    internals._isProcessing = true;
+
+    expect(agent.enqueueMidTurnMessage('')).toBe(false);
+    expect(agent.enqueueMidTurnMessage('   ')).toBe(false);
+
+    agent.destroy();
+  });
+
+  it('drains queued mid-turn image attachments as ACP content blocks', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const onMidTurnMessagesDrained = mock(() => {});
+    const agent = createAgent(cwd, undefined, onMidTurnMessagesDrained);
+    const internals = agent as unknown as HopCodeAvailableCommandsInternals;
+    internals.hopcodeSessionId = 'sdk-session-hopcode';
+    internals._isProcessing = true;
+
+    const attachment: FileAttachment = {
+      type: 'image',
+      path: join(cwd, 'screenshot.png'),
+      name: 'screenshot.png',
+      mimeType: 'image/png',
+      base64: 'iVBORw0KGgo=',
+      size: 8,
+    };
+    expect(
+      agent.enqueueMidTurnMessage('please inspect this image', [attachment], {
+        messageId: 'queued-image',
+      }),
+    ).toBe(true);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({
+      items: [
+        {
+          content: [
+            { type: 'text', text: 'please inspect this image' },
+            {
+              type: 'image',
+              data: 'iVBORw0KGgo=',
+              mimeType: 'image/png',
+            },
+          ],
+          displayText: 'please inspect this image',
+        },
+      ],
+    });
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith(['queued-image']);
+
+    agent.destroy();
+  });
+
+  it('retries and falls back when mid-turn attachment messages fail to build', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const onMidTurnMessagesDrained = mock(() => {});
+    const agent = createAgent(cwd, undefined, onMidTurnMessagesDrained);
+    const internals = agent as unknown as HopCodeAvailableCommandsInternals;
+    const promptInternals = agent as unknown as HopCodePromptInternals;
+    const originalBuildPromptBlocks =
+      promptInternals.buildPromptBlocks.bind(agent);
+    promptInternals.buildPromptBlocks = (message, attachments, options) => {
+      if (message === 'bad image') {
+        throw new Error('image decode failed');
+      }
+      return originalBuildPromptBlocks(message, attachments, options);
+    };
+    internals.hopcodeSessionId = 'sdk-session-hopcode';
+    internals._isProcessing = true;
+
+    const attachment: FileAttachment = {
+      type: 'image',
+      path: join(cwd, 'screenshot.png'),
+      name: 'screenshot.png',
+      mimeType: 'image/png',
+      base64: 'iVBORw0KGgo=',
+      size: 8,
+    };
+    expect(
+      agent.enqueueMidTurnMessage('bad image', [attachment], {
+        messageId: 'bad-image',
+      }),
+    ).toBe(true);
+    expect(
+      agent.enqueueMidTurnMessage('good image', [attachment], {
+        messageId: 'good-image',
+      }),
+    ).toBe(true);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({
+      items: [
+        {
+          content: [
+            { type: 'text', text: 'good image' },
+            {
+              type: 'image',
+              data: 'iVBORw0KGgo=',
+              mimeType: 'image/png',
+            },
+          ],
+          displayText: 'good image',
+        },
+      ],
+    });
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith(['good-image']);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({ items: [] });
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledTimes(1);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({
+      items: [
+        {
+          content: [
+            { type: 'text', text: 'bad image' },
+            {
+              type: 'text',
+              text: '[Attachment could not be processed]',
+            },
+          ],
+          displayText: 'bad image',
+        },
+      ],
+    });
+    expect(onMidTurnMessagesDrained).toHaveBeenLastCalledWith(['bad-image']);
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledTimes(2);
+
+    agent.destroy();
+  });
+
+  it('acknowledges image-only mid-turn messages by optimistic id', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const onMidTurnMessagesDrained = mock(() => {});
+    const agent = createAgent(cwd, undefined, onMidTurnMessagesDrained);
+    const internals = agent as unknown as HopCodeAvailableCommandsInternals;
+    internals.hopcodeSessionId = 'sdk-session-hopcode';
+    internals._isProcessing = true;
+
+    const attachment: FileAttachment = {
+      type: 'image',
+      path: join(cwd, 'screenshot.png'),
+      name: 'screenshot.png',
+      mimeType: 'image/png',
+      base64: 'iVBORw0KGgo=',
+      size: 8,
+    };
+    expect(
+      agent.enqueueMidTurnMessage('', [attachment], {
+        optimisticMessageId: 'optimistic-image',
+      }),
+    ).toBe(true);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({
+      items: [
+        {
+          content: [
+            {
+              type: 'image',
+              data: 'iVBORw0KGgo=',
+              mimeType: 'image/png',
+            },
+          ],
+          displayText: '[User message with attachments]',
+        },
+      ],
+    });
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith([
+      'optimistic-image',
+    ]);
+
+    agent.destroy();
+  });
+
+  it('drains mixed text and image mid-turn messages as ACP items', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    tempRoots.push(cwd);
+
+    const onMidTurnMessagesDrained = mock(() => {});
+    const agent = createAgent(cwd, undefined, onMidTurnMessagesDrained);
+    const internals = agent as unknown as HopCodeAvailableCommandsInternals;
+    internals.hopcodeSessionId = 'sdk-session-hopcode';
+    internals._isProcessing = true;
+
+    const attachment: FileAttachment = {
+      type: 'image',
+      path: join(cwd, 'screenshot.png'),
+      name: 'screenshot.png',
+      mimeType: 'image/png',
+      base64: 'iVBORw0KGgo=',
+      size: 8,
+    };
+    expect(
+      agent.enqueueMidTurnMessage('first text only', undefined, {
+        messageId: 'queued-text',
+      }),
+    ).toBe(true);
+    expect(
+      agent.enqueueMidTurnMessage('then inspect image', [attachment], {
+        messageId: 'queued-image',
+      }),
+    ).toBe(true);
+
+    await expect(
+      internals.handleExtMethod('craft/drainMidTurnQueue', {
+        sessionId: 'sdk-session-hopcode',
+      }),
+    ).resolves.toEqual({
+      items: [
+        {
+          content: [{ type: 'text', text: 'first text only' }],
+          displayText: 'first text only',
+        },
+        {
+          content: [
+            { type: 'text', text: 'then inspect image' },
+            {
+              type: 'image',
+              data: 'iVBORw0KGgo=',
+              mimeType: 'image/png',
+            },
+          ],
+          displayText: 'then inspect image',
+        },
+      ],
+    });
+    expect(onMidTurnMessagesDrained).toHaveBeenCalledWith([
+      'queued-text',
+      'queued-image',
+    ]);
+
+    agent.destroy();
+  });
+
   it('adds slash command invocations when their result produced output', () => {
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(runtimeRoot, cwd);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'b1e2b1a0-8ea5-4af5-85ba-dff6232c9c02';
     const insightInvocation = '2026-03-25T07:36:47.100Z';
     const insightResult = '2026-03-25T07:36:53.143Z';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'model-invocation',
         sessionId,
@@ -321,7 +707,7 @@ describe('HopCodeAgent slash command history', () => {
     const agent = createAgent(cwd);
     const acpMessages: Message[] = [
       {
-        id: 'qwen-existing-1',
+        id: 'hopcode-existing-1',
         role: 'assistant',
         content: 'This may take a couple minutes. Sit tight!',
         timestamp: Date.parse(insightResult),
@@ -350,8 +736,8 @@ describe('HopCodeAgent slash command history', () => {
     expect(messages[0]?.textElements).toBeUndefined();
   });
 
-  it('does not derive text elements from Qwen user history without metadata', () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('does not derive text elements from HopCode user history without metadata', () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -377,7 +763,7 @@ describe('HopCodeAgent slash command history', () => {
   });
 
   it('marks replayed pre-tool assistant text as commentary, not thought', () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -431,14 +817,14 @@ describe('HopCodeAgent slash command history', () => {
     ]);
   });
 
-  it('writes slash command text elements into the Qwen transcript user record', () => {
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('writes slash command text elements into the HopCode transcript user record', () => {
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(runtimeRoot, cwd);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'session-with-slash-metadata';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'u1',
         parentUuid: null,
@@ -454,7 +840,7 @@ describe('HopCodeAgent slash command history', () => {
     const agent = createAgent(cwd);
     (
       agent as unknown as HopCodeHistoryInternals
-    ).persistQwenTranscriptTextElements(sessionId, cwd, [
+    ).persistHopCodeTranscriptTextElements(sessionId, cwd, [
       {
         type: 'slash_command',
         byte_range: { start: 0, end: 10 },
@@ -464,7 +850,7 @@ describe('HopCodeAgent slash command history', () => {
       },
     ]);
 
-    const records = readQwenTranscript(runtimeRoot, cwd, sessionId);
+    const records = readHopCodeTranscript(runtimeRoot, cwd, sessionId);
     agent.destroy();
 
     expect(records[0]?.textElements).toEqual([
@@ -478,14 +864,14 @@ describe('HopCodeAgent slash command history', () => {
     ]);
   });
 
-  it('writes skill text elements into the Qwen transcript user record', () => {
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('writes skill text elements into the HopCode transcript user record', () => {
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(runtimeRoot, cwd);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'session-with-skill-metadata';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'u1',
         parentUuid: null,
@@ -501,7 +887,7 @@ describe('HopCodeAgent slash command history', () => {
     const agent = createAgent(cwd);
     (
       agent as unknown as HopCodeHistoryInternals
-    ).persistQwenTranscriptTextElements(sessionId, cwd, [
+    ).persistHopCodeTranscriptTextElements(sessionId, cwd, [
       {
         type: 'skill',
         byte_range: { start: 0, end: 17 },
@@ -511,7 +897,7 @@ describe('HopCodeAgent slash command history', () => {
       },
     ]);
 
-    const records = readQwenTranscript(runtimeRoot, cwd, sessionId);
+    const records = readHopCodeTranscript(runtimeRoot, cwd, sessionId);
     agent.destroy();
 
     expect(records[0]?.textElements).toEqual([
@@ -525,14 +911,14 @@ describe('HopCodeAgent slash command history', () => {
     ]);
   });
 
-  it('loads text elements back from the Qwen transcript', () => {
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('loads text elements back from the HopCode transcript', () => {
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(runtimeRoot, cwd);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'session-with-persisted-text-elements';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'u1',
         parentUuid: null,
@@ -557,7 +943,7 @@ describe('HopCodeAgent slash command history', () => {
     const agent = createAgent(cwd);
     const messages = (
       agent as unknown as HopCodeHistoryInternals
-    ).applyQwenTranscriptTextElements(
+    ).applyHopCodeTranscriptTextElements(
       [
         {
           id: 'message-1',
@@ -583,13 +969,13 @@ describe('HopCodeAgent slash command history', () => {
   });
 
   it('formats slash command JSON output as a markdown json block', () => {
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(runtimeRoot, cwd);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'a72a15d5-5096-4a15-b256-e7553763d94c';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'doctor-invocation',
         sessionId,
@@ -666,13 +1052,13 @@ describe('HopCodeAgent slash command history', () => {
   });
 
   it('restores structured doctor slash command output', () => {
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(runtimeRoot, cwd);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'a72a15d5-5096-4a15-b256-e7553763d94d';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'doctor-invocation',
         sessionId,
@@ -720,8 +1106,8 @@ describe('HopCodeAgent slash command history', () => {
     expect(messages[1]?.content).toContain('"message": "v24.11.1"');
   });
 
-  it('does not send Craft context while Qwen prompt context is disabled', () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('does not send Craft context while HopCode prompt context is disabled', () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -738,8 +1124,8 @@ describe('HopCodeAgent slash command history', () => {
     expect(resourceBlock).toBeUndefined();
   });
 
-  it('buffers ACP available command updates until the Qwen session id is recorded', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('buffers ACP available command updates until the HopCode Session id is recorded', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -797,7 +1183,7 @@ describe('HopCodeAgent slash command history', () => {
   });
 
   it('preserves ACP available command updates emitted during suppressed session load', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -834,14 +1220,14 @@ describe('HopCodeAgent slash command history', () => {
   });
 
   it('streams ACP thought chunks as intermediate assistant text before the final answer', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
     const internals = agent as unknown as HopCodeAvailableCommandsInternals;
     internals.hopcodeSessionId = 'hopcode-session';
     internals._isProcessing = true;
-    internals.currentTurnId = 'qwen-turn-test';
+    internals.currentTurnId = 'hopcode-turn-test';
 
     internals.handleSessionUpdate({
       sessionId: 'hopcode-session',
@@ -866,31 +1252,31 @@ describe('HopCodeAgent slash command history', () => {
     expect(first).toEqual({
       type: 'text_delta',
       text: 'I should inspect the project.',
-      turnId: 'qwen-turn-test',
+      turnId: 'hopcode-turn-test',
     });
     expect(second).toEqual({
       type: 'text_complete',
       text: 'I should inspect the project.',
       isIntermediate: true,
       intermediateKind: 'thought',
-      turnId: 'qwen-turn-test',
+      turnId: 'hopcode-turn-test',
     });
     expect(third).toEqual({
       type: 'text_delta',
       text: 'Here is the answer.',
-      turnId: 'qwen-turn-test',
+      turnId: 'hopcode-turn-test',
     });
   });
 
   it('flushes ACP text before tool calls so desktop can render progress live', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
     const internals = agent as unknown as HopCodeAvailableCommandsInternals;
     internals.hopcodeSessionId = 'hopcode-session';
     internals._isProcessing = true;
-    internals.currentTurnId = 'qwen-turn-tool';
+    internals.currentTurnId = 'hopcode-turn-tool';
 
     internals.handleSessionUpdate({
       sessionId: 'hopcode-session',
@@ -919,25 +1305,25 @@ describe('HopCodeAgent slash command history', () => {
     expect(first).toEqual({
       type: 'text_delta',
       text: 'I will read the file first.',
-      turnId: 'qwen-turn-tool',
+      turnId: 'hopcode-turn-tool',
     });
     expect(second).toEqual({
       type: 'text_complete',
       text: 'I will read the file first.',
       isIntermediate: true,
       intermediateKind: 'commentary',
-      turnId: 'qwen-turn-tool',
+      turnId: 'hopcode-turn-tool',
     });
     expect(third).toMatchObject({
       type: 'tool_start',
       toolName: 'Read',
       toolUseId: 'tool-read-1',
-      turnId: 'qwen-turn-tool',
+      turnId: 'hopcode-turn-tool',
     });
   });
 
   it('refreshes available commands by reloading the existing ACP session id', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -973,7 +1359,7 @@ describe('HopCodeAgent slash command history', () => {
   });
 
   it('invalidates cached available commands after installing a skill', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -1033,7 +1419,7 @@ describe('HopCodeAgent slash command history', () => {
   });
 
   it('deduplicates concurrent ACP session setup during command refresh', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const capturedSessionIds: string[] = [];
@@ -1083,8 +1469,8 @@ describe('HopCodeAgent slash command history', () => {
     ]);
   });
 
-  it('returns available commands captured while loading Qwen history', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('returns available commands captured while loading HopCode history', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -1126,8 +1512,8 @@ describe('HopCodeAgent slash command history', () => {
     ).toEqual([['user', 'hello']]);
   });
 
-  it('loads Qwen history updates through ACP extension before session/load fallback', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('loads HopCode history updates through ACP extension before session/load fallback', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
@@ -1176,14 +1562,14 @@ describe('HopCodeAgent slash command history', () => {
     ]);
   });
 
-  it('restores Qwen transcript API aborts as interrupted info', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
+  it('restores HopCode transcript API aborts as interrupted info', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
     tempRoots.push(cwd, runtimeRoot);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'hopcode-session';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'user-1',
         sessionId,
@@ -1227,9 +1613,9 @@ describe('HopCodeAgent slash command history', () => {
     ]);
   });
 
-  it('restores cancelled Qwen transcript tool results as interrupted tools', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
+  it('restores cancelled HopCode transcript tool results as interrupted tools', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
     tempRoots.push(cwd, runtimeRoot);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
@@ -1240,7 +1626,7 @@ describe('HopCodeAgent slash command history', () => {
       timeout: 15000,
     };
 
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'user-1',
         sessionId,
@@ -1355,9 +1741,9 @@ describe('HopCodeAgent slash command history', () => {
     });
   });
 
-  it('closes dangling Qwen transcript tool calls as terminal errors', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
+  it('closes dangling HopCode transcript tool calls as terminal errors', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
     tempRoots.push(cwd, runtimeRoot);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
@@ -1367,7 +1753,7 @@ describe('HopCodeAgent slash command history', () => {
       description: 'List open PRs',
     };
 
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'user-1',
         sessionId,
@@ -1439,15 +1825,15 @@ describe('HopCodeAgent slash command history', () => {
     );
   });
 
-  it('supplements Qwen history with transcript subagent telemetry', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
-    const runtimeRoot = mkdtempSync(join(tmpdir(), 'qwen-runtime-'));
+  it('supplements HopCode history with transcript subagent telemetry', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
+    const runtimeRoot = mkdtempSync(join(tmpdir(), 'hopcode-runtime-'));
     tempRoots.push(cwd, runtimeRoot);
     process.env.HOPCODE_RUNTIME_DIR = runtimeRoot;
 
     const sessionId = 'hopcode-session';
     const parentToolUseId = 'call-agent-1';
-    writeQwenTranscript(runtimeRoot, cwd, sessionId, [
+    writeHopCodeTranscript(runtimeRoot, cwd, sessionId, [
       {
         uuid: 'user-1',
         sessionId,
@@ -1536,8 +1922,8 @@ describe('HopCodeAgent slash command history', () => {
     });
   });
 
-  it('shares concurrent Qwen ACP process startup for one agent instance', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
+  it('shares concurrent HopCode ACP process startup for one agent instance', async () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-cwd-'));
     tempRoots.push(cwd);
 
     const agent = createAgent(cwd);
