@@ -24,8 +24,8 @@ import {
   getActiveSpanTraceContext,
 } from './trace-context.js';
 
-export const DAEMON_TRACEPARENT_META_KEY = 'qwen.telemetry.traceparent';
-export const DAEMON_TRACESTATE_META_KEY = 'qwen.telemetry.tracestate';
+export const DAEMON_TRACEPARENT_META_KEY = 'hopcode.telemetry.traceparent';
+export const DAEMON_TRACESTATE_META_KEY = 'hopcode.telemetry.tracestate';
 
 const SPAN_DAEMON_REQUEST = 'hopcode.daemon.request';
 const SPAN_DAEMON_BRIDGE = 'hopcode.daemon.bridge';

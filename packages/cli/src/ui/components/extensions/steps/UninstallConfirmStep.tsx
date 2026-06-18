@@ -5,11 +5,14 @@
  */
 
 import { Box, Text } from 'ink';
-import { type Extension } from '@hoptrendy/hopcode-core';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import {
+  type Extension,
+  createDebugLogger,
+  getExtensionDisplayName,
+} from '@hoptrendy/hopcode-core';
 import { theme } from '../../../semantic-colors.js';
 import { useKeypress } from '../../../hooks/useKeypress.js';
-import { t } from '../../../../i18n/index.js';
+import { t, getCurrentLanguage } from '../../../../i18n/index.js';
 
 interface UninstallConfirmStepProps {
   selectedExtension: Extension | null;
@@ -54,7 +57,10 @@ export function UninstallConfirmStep({
     <Box flexDirection="column" gap={1}>
       <Text color={theme.status.error}>
         {t('Are you sure you want to uninstall extension "{{name}}"?', {
-          name: selectedExtension.name,
+          name: getExtensionDisplayName(
+            selectedExtension,
+            getCurrentLanguage(),
+          ),
         })}
       </Text>
       <Text color={theme.text.secondary}>

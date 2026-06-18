@@ -643,6 +643,7 @@ export interface HopCodeExtensionSettingDefinition {
 export interface HopCodeExtensionSettingsEntry {
   id: string
   name: string
+  displayName?: string
   version?: string
   isActive?: boolean
   path?: string

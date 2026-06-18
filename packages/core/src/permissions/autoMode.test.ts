@@ -61,6 +61,7 @@ describe('SAFE_TOOL_ALLOWLIST', () => {
       ToolNames.MONITOR,
       ToolNames.CRON_CREATE,
       ToolNames.CRON_DELETE,
+      ToolNames.LOOP_WAKEUP,
       // `send_message` injects arbitrary text into another running agent
       // as a new instruction — the classifier must see destination + body
       // so it can detect inter-agent steering toward destructive actions.
@@ -275,7 +276,9 @@ describe('isAutoModeProtectedWritePath', () => {
   });
 
   it('re-resolves write paths after symlinks are created', () => {
-    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-write-path-'));
+    const tmpRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'hopcode-write-path-'),
+    );
 
     try {
       const protectedDir = path.join(tmpRoot, '.hopcode');
@@ -296,7 +299,9 @@ describe('isAutoModeProtectedWritePath', () => {
 
   it('caches normalized HOPCODE_HOME prefixes per configured home', () => {
     const originalhopcodeHome = process.env['HOPCODE_HOME'];
-    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-home-cache-'));
+    const tmpRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'hopcode-home-cache-'),
+    );
     const realpathSpy = vi.spyOn(fs.realpathSync, 'native');
 
     try {
@@ -391,7 +396,9 @@ describe('passesAcceptEditsFastPath', () => {
   });
 
   it('rejects symlinks that resolve to protected self-modification paths', () => {
-    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-auto-mode-'));
+    const tmpRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'hopcode-auto-mode-'),
+    );
     try {
       const hopcodeDir = path.join(tmpRoot, '.hopcode');
       fs.mkdirSync(hopcodeDir, { recursive: true });

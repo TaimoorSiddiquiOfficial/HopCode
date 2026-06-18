@@ -321,3 +321,15 @@ export async function initializeI18n(
 ): Promise<void> {
   await setLanguageAsync(lang ?? 'auto');
 }
+
+/**
+ * Resolves the language setting from env / settings / auto-detect.
+ * Shared by initializer.ts and extension commands that run before full init.
+ */
+export function resolveLanguageSetting(
+  settingsLanguage?: string,
+): SupportedLanguage | 'auto' {
+  return (process.env['HOPCODE_LANG'] || settingsLanguage || 'auto') as
+    | SupportedLanguage
+    | 'auto';
+}

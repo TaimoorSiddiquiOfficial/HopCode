@@ -1188,6 +1188,16 @@ const SETTINGS_SCHEMA = {
         description: 'Skip the next speaker check.',
         showInDialog: false,
       },
+      skipWorkflowUsageWarning: {
+        type: 'boolean',
+        label: 'Skip Workflow Usage Warning',
+        category: 'Model',
+        requiresRestart: false,
+        default: false,
+        description:
+          'Suppress the one-time Workflow tool usage banner that describes the HOPCODE_MAX_TOKENS_PER_WORKFLOW env knob. The banner fires at most once per session regardless of this setting.',
+        showInDialog: false,
+      },
       skipLoopDetection: {
         type: 'boolean',
         label: 'Skip Loop Detection',
@@ -1342,8 +1352,14 @@ const SETTINGS_SCHEMA = {
         category: 'Context',
         requiresRestart: false,
         default: undefined as string | string[] | undefined,
-        description: 'The name of the context file.',
+        description: 'The name of the context file or files.',
         showInDialog: false,
+        jsonSchemaOverride: {
+          anyOf: [
+            { type: 'string' },
+            { type: 'array', items: { type: 'string' } },
+          ],
+        },
       },
       importFormat: {
         type: 'string',
